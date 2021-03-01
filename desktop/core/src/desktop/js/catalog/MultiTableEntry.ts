@@ -22,7 +22,7 @@ import { CancellablePromise } from 'api/cancellablePromise';
 import { applyCancellable } from 'catalog/catalogUtils';
 import { getOptimizer, PopularityOptions } from 'catalog/optimizer/optimizer';
 import { UdfDetails } from 'sql/reference/types';
-import { Connector } from 'types/config';
+import { Connector } from 'config/types';
 import { hueWindow } from 'types/types';
 
 export interface TopJoinValue {

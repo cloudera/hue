@@ -18,7 +18,7 @@ import * as ko from 'knockout';
 import * as apiUtils from 'api/apiUtils';
 import * as refApiUtils from 'sql/reference/apiUtils';
 import AssistFunctionsPanel from './ko.assistFunctionsPanel';
-import { refreshConfig } from 'utils/hueConfig';
+import { refreshConfig } from 'config/hueConfig';
 import { sleep } from 'utils/hueUtils';
 
 describe('ko.assistFunctionsPanel.js', () => {

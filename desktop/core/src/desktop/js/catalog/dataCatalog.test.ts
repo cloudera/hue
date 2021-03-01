@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Compute, Connector, Namespace } from 'types/config';
+import { Compute, Connector, Namespace } from 'config/types';
 import dataCatalog from './dataCatalog';
 
 const connectorOne: Connector = {

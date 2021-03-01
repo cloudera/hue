@@ -32,7 +32,7 @@ import contextCatalog from 'catalog/contextCatalog';
 import dataCatalog from 'catalog/dataCatalog';
 import { ASSIST_KEY_COMPONENT } from 'ko/components/assist/ko.assistKey';
 import componentUtils from 'ko/components/componentUtils';
-import { findEditorConnector, GET_KNOWN_CONFIG_EVENT } from 'utils/hueConfig';
+import { findEditorConnector, GET_KNOWN_CONFIG_EVENT } from 'config/hueConfig';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import { getFromLocalStorage } from 'utils/storageUtils';

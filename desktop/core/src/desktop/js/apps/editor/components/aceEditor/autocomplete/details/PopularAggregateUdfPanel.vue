@@ -42,7 +42,7 @@
   import { Suggestion } from '../AutocompleteResults';
   import { TopAggValue } from 'catalog/MultiTableEntry';
   import SqlText from 'components/SqlText.vue';
-  import { Connector } from 'types/config';
+  import { Connector } from 'config/types';
   import I18n from 'utils/i18n';
 
   export default defineComponent({

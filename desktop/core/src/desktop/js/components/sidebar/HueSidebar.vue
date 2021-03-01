@@ -51,9 +51,9 @@
     ASSIST_ACTIVE_DB_CHANGED_EVENT,
     ASSIST_SET_DATABASE_EVENT
   } from 'ko/components/assist/events';
-  import { AppType, Connector, HueConfig, Namespace } from 'types/config';
+  import { AppType, Connector, HueConfig, Namespace } from 'config/types';
   import { hueWindow } from 'types/types';
-  import { CONFIG_REFRESHED_EVENT, getLastKnownConfig } from 'utils/hueConfig';
+  import { CONFIG_REFRESHED_EVENT, getLastKnownConfig } from 'config/hueConfig';
   import huePubSub from 'utils/huePubSub';
   import { onHueLinkClick } from 'utils/hueUtils';
   import I18n from 'utils/i18n';

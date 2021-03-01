@@ -37,7 +37,7 @@
   import { Suggestion } from '../AutocompleteResults';
   import { CategoryId } from '../Category';
   import SqlText from 'components/SqlText.vue';
-  import { Connector } from 'types/config';
+  import { Connector } from 'config/types';
   import I18n from 'utils/i18n';
 
   interface PopularityDetails {

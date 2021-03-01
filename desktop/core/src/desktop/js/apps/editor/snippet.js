@@ -54,7 +54,7 @@ import {
 } from 'ko/bindings/ace/aceLocationHandler';
 import { EXECUTE_ACTIVE_EXECUTABLE_EVENT } from './components/ExecutableActions.vue';
 import { ADD_TO_HISTORY_EVENT } from 'apps/editor/components/ko.queryHistory';
-import { findEditorConnector, getLastKnownConfig } from 'utils/hueConfig';
+import { findEditorConnector, getLastKnownConfig } from 'config/hueConfig';
 import { cancelActiveRequest } from 'api/apiUtils';
 import { getOptimizer } from 'catalog/optimizer/optimizer';
 import {

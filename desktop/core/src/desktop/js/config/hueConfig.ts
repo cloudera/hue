@@ -23,7 +23,7 @@ import {
   EditorInterpreter,
   HueConfig,
   Interpreter
-} from 'types/config';
+} from './types';
 import huePubSub from 'utils/huePubSub';
 
 export const REFRESH_CONFIG_EVENT = 'cluster.config.refresh.config';
