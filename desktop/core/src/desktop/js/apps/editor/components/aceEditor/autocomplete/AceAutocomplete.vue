@@ -88,7 +88,7 @@
   import { Ace } from 'ext/ace';
   import ace from 'ext/aceHelper';
   import { AutocompleteParser } from 'parse/types';
-  import { Connector } from 'types/config';
+  import { Connector } from 'config/types';
 
   import { Category, CategoryId, CategoryInfo, extractCategories } from './Category';
   import Executor from 'apps/editor/execution/executor';

@@ -25,7 +25,7 @@ import SubscriptionTracker, { Disposable } from 'components/utils/SubscriptionTr
 import { Ace } from 'ext/ace';
 import { ParsedSqlStatement } from 'parse/sqlStatementsParser';
 import { AutocompleteParser, AutocompleteParseResult } from 'parse/types';
-import { EditorInterpreter } from 'types/config';
+import { EditorInterpreter } from 'config/types';
 import AutocompleteResults from './AutocompleteResults';
 import { SqlReferenceProvider } from 'sql/reference/types';
 import huePubSub from 'utils/huePubSub';

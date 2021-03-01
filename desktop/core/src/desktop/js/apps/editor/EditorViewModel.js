@@ -33,7 +33,7 @@ import {
   GET_KNOWN_CONFIG_EVENT,
   findEditorConnector,
   getLastKnownConfig
-} from 'utils/hueConfig';
+} from 'config/hueConfig';
 import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
 
 export default class EditorViewModel {

@@ -21,7 +21,7 @@ import {
   UdfCategoryFunctions,
   UdfDetails
 } from 'sql/reference/types';
-import { Connector } from 'types/config';
+import { Connector } from 'config/types';
 import { matchesType } from './typeUtils';
 import I18n from 'utils/i18n';
 import huePubSub from 'utils/huePubSub';

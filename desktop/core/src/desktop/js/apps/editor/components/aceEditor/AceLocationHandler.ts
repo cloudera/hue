@@ -29,7 +29,7 @@ import {
   ParsedTable,
   SyntaxError
 } from 'parse/types';
-import { EditorInterpreter } from 'types/config';
+import { EditorInterpreter } from 'config/types';
 import { hueWindow } from 'types/types';
 import huePubSub, { HueSubscription } from 'utils/huePubSub';
 import I18n from 'utils/i18n';

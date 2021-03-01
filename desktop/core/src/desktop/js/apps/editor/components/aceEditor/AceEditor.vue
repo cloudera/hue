@@ -49,7 +49,7 @@
     ParsedLocation,
     SqlParserProvider
   } from 'parse/types';
-  import { EditorInterpreter } from 'types/config';
+  import { EditorInterpreter } from 'config/types';
   import { hueWindow } from 'types/types';
   import huePubSub from 'utils/huePubSub';
   import { defer } from 'utils/hueUtils';
