@@ -26,6 +26,8 @@ from desktop.lib.django_util import login_notrequired, JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.models import Document2, _get_gist_document
 
+from notebook.decorators import check_document_access_permission
+
 from django.http import HttpResponse
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt
@@ -89,7 +91,7 @@ def handle_on_message(channel_id, bot_id, text, user_id):
       if not response['ok']:
         raise PopupException(_("Error posting message"), detail=response["error"])
 
-
+@check_document_access_permission
 def handle_on_link_shared(channel_id, message_ts, links):
   for item in links:
     path = urlsplit(item['url'])[2]
