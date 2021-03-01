@@ -24,7 +24,7 @@ export interface ExecutorRaw {
   executables: ExecutableRaw[];
 }
 
-declare class Executor {
+export default class Executor {
   connector: KnockoutObservable<Connector>;
   compute: KnockoutObservable<Compute>;
   namespace: KnockoutObservable<Namespace>;

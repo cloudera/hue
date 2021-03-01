@@ -13,14 +13,13 @@ We wrap the web components to be able to set certain attributes/properties on th
 
 ## To run this project
 
-### In the Hue root folder:
-1. `npm install`
-2. `npm run webpack-npm`
-   
-### In this project folder:
-3. `npm install`
-4. `npm start`
-5. Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+1. Go to the Hue root folder `cd ../../../../`
+2. `npm install`
+3. `npm run webpack-npm`
+4. Go to the example project `cd tools/examples/components/sql-scratchpad`
+5. `npm install`
+6. `npm start`
+7. Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
 ## Base project creation steps (for reference)
 
