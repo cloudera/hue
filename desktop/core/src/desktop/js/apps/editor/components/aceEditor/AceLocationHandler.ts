@@ -17,6 +17,7 @@
 import { Ace } from 'ext/ace';
 import ace from 'ext/aceHelper';
 
+import { ActiveStatementChangedEventDetails } from './types';
 import Executor from 'apps/editor/execution/executor';
 import DataCatalogEntry, { TableSourceMeta } from 'catalog/DataCatalogEntry';
 import SubscriptionTracker, { Disposable } from 'components/utils/SubscriptionTracker';
@@ -44,16 +45,6 @@ import {
 } from 'sql/sqlWorkerHandler';
 import { getFromLocalStorage } from 'utils/storageUtils';
 
-export interface ActiveStatementChangedEvent {
-  id: string;
-  editorChangeTime: number;
-  activeStatementIndex: number;
-  totalStatementCount: number;
-  precedingStatements: ParsedSqlStatement[];
-  activeStatement: ParsedSqlStatement;
-  selectedStatements: ParsedSqlStatement[];
-  followingStatements: ParsedSqlStatement[];
-}
 export const REFRESH_STATEMENT_LOCATIONS_EVENT = 'editor.refresh.statement.locations';
 export const ACTIVE_STATEMENT_CHANGED_EVENT = 'editor.active.statement.changed';
 export const CURSOR_POSITION_CHANGED_EVENT = 'editor.cursor.position.changed';
@@ -702,7 +693,7 @@ export default class AceLocationHandler implements Disposable {
       selectedStatements.push(this.activeStatement);
     }
 
-    huePubSub.publish(ACTIVE_STATEMENT_CHANGED_EVENT, <ActiveStatementChangedEvent>{
+    huePubSub.publish(ACTIVE_STATEMENT_CHANGED_EVENT, <ActiveStatementChangedEventDetails>{
       id: this.editorId,
       editorChangeTime: this.lastKnownStatements.editorChangeTime,
       activeStatementIndex: statementIndex,
