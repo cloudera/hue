@@ -1,17 +1,17 @@
 import React, { FC } from 'react';
 
 import 'gethue/lib/components/query-editor-components';
-import Executable from 'gethue/src/apps/editor/execution/executable';
+import SqlExecutable from 'gethue/src/apps/editor/execution/sqlExecutable';
 
 export interface ExecuteActionsProps {
-  activeExecutable?: Executable
+  activeExecutable?: SqlExecutable
 }
 
 interface ExecuteActionsElement extends HTMLElement {
-  executable?: Executable;
+  executable?: SqlExecutable;
 }
 
-export const ExecuteActions: FC<ExecuteActionsProps> = ({ activeExecutable }) => {
+export const ExecuteActions: FC<ExecuteActionsProps> = React.memo(({ activeExecutable }) => {
   const newNode = document.createElement('query-editor-actions');
   newNode.setAttribute('executable', '');
   (newNode as ExecuteActionsElement).executable = activeExecutable;
@@ -26,4 +26,4 @@ export const ExecuteActions: FC<ExecuteActionsProps> = ({ activeExecutable }) =>
       }
     }
   />
-};
+});

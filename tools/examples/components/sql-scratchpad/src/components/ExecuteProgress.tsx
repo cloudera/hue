@@ -1,17 +1,17 @@
 import React, { FC } from 'react';
 
 import 'gethue/lib/components/query-editor-components';
-import Executable from 'gethue/src/apps/editor/execution/executable';
+import SqlExecutable from 'gethue/src/apps/editor/execution/sqlExecutable';
 
 export interface ExecuteProgressProps {
-  activeExecutable?: Executable
+  activeExecutable?: SqlExecutable
 }
 
 interface ProgressBarElement extends HTMLElement {
-  executable?: Executable;
+  executable?: SqlExecutable;
 }
 
-export const ExecuteProgress: FC<ExecuteProgressProps> = ({ activeExecutable }) => {
+export const ExecuteProgress: FC<ExecuteProgressProps> = React.memo(({ activeExecutable }) => {
   const newNode = document.createElement('query-editor-progress-bar');
   newNode.setAttribute('executable', '');
   (newNode as ProgressBarElement).executable = activeExecutable;
@@ -26,4 +26,4 @@ export const ExecuteProgress: FC<ExecuteProgressProps> = ({ activeExecutable }) 
       }
     }
   />
-};
+});
