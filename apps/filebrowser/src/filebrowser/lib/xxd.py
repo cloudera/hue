@@ -66,8 +66,13 @@ def xxd(shift, data, bytes_per_line, bytes_per_sentence):
   current = 0
   for current in range(0, len(data), bytes_per_line):
     line = data[current:current+bytes_per_line]
+    # Convert bytes object back to string object if the
+    # data is a bytes object
+    if isinstance(data, (bytes, bytearray)):
+      line = "".join( chr(x) for x in bytearray(line))
+
     line_printable = mask_not_alphanumeric(line)[1]
-    line_ordinals = list(map(ord, line))
+    line_ordinals = list(map(ord, str(line)))
     offsets = list(range(0, len(line_ordinals), bytes_per_sentence))
     line_ordinal_words = [ line_ordinals[x:x+bytes_per_sentence] for x in offsets ]
 
