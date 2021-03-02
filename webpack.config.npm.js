@@ -32,7 +32,7 @@ const defaultConfig = Object.assign({}, require('./webpack.config'), {
   plugins: []
 });
 
-const libConfig = Object.assign({}, defaultConfig, {
+const executorLibConfig = Object.assign({}, defaultConfig, {
   entry: {
     executor: [`${JS_ROOT}/apps/editor/execution/executor.ts`]
   },
@@ -54,6 +54,30 @@ const libConfig = Object.assign({}, defaultConfig, {
         {
           from: `${JS_ROOT}/apps/editor/execution/executor.d.ts`,
           to: `${DIST_DIR}/lib/execution`
+        }
+      ]
+    })
+  ]
+});
+
+const hueConfigLibConfig = Object.assign({}, defaultConfig, {
+  entry: {
+    hueConfig: [`${JS_ROOT}/config/hueConfig.ts`]
+  },
+  output: {
+    path: `${DIST_DIR}/lib/config`,
+    library: '[name]',
+    libraryExport: 'default',
+    libraryTarget: 'umd',
+    umdNamedDefine: true,
+    globalObject: `(typeof self !== 'undefined' ? self : this)`
+  },
+  plugins: [
+    new CopyWebpackPlugin({
+      patterns: [
+        {
+          from: `${JS_ROOT}/config/hueConfig.d.ts`,
+          to: `${DIST_DIR}/lib/config`
         }
       ]
     })
@@ -136,4 +160,4 @@ const parserConfig = Object.assign({}, defaultConfig, {
   }
 });
 
-module.exports = [libConfig, webComponentsConfig, parserConfig];
+module.exports = [executorLibConfig, hueConfigLibConfig, webComponentsConfig, parserConfig];
