@@ -23,6 +23,7 @@ const { VueLoaderPlugin } = require('vue-loader');
 
 const DIST_DIR = path.join(__dirname, 'npm_dist');
 const JS_ROOT = path.join(__dirname, '/desktop/core/src/desktop/js');
+const WRAPPER_DIR = `${__dirname}/tools/vue3-webcomponent-wrapper`;
 
 const defaultConfig = Object.assign({}, require('./webpack.config'), {
   mode: 'production',
@@ -32,7 +33,7 @@ const defaultConfig = Object.assign({}, require('./webpack.config'), {
   plugins: []
 });
 
-const libConfig = Object.assign({}, defaultConfig, {
+const executorLibConfig = Object.assign({}, defaultConfig, {
   entry: {
     executor: [`${JS_ROOT}/apps/editor/execution/executor.ts`]
   },
@@ -54,6 +55,30 @@ const libConfig = Object.assign({}, defaultConfig, {
         {
           from: `${JS_ROOT}/apps/editor/execution/executor.d.ts`,
           to: `${DIST_DIR}/lib/execution`
+        }
+      ]
+    })
+  ]
+});
+
+const hueConfigLibConfig = Object.assign({}, defaultConfig, {
+  entry: {
+    hueConfig: [`${JS_ROOT}/config/hueConfig.ts`]
+  },
+  output: {
+    path: `${DIST_DIR}/lib/config`,
+    library: '[name]',
+    libraryExport: 'default',
+    libraryTarget: 'umd',
+    umdNamedDefine: true,
+    globalObject: `(typeof self !== 'undefined' ? self : this)`
+  },
+  plugins: [
+    new CopyWebpackPlugin({
+      patterns: [
+        {
+          from: `${JS_ROOT}/config/hueConfig.d.ts`,
+          to: `${DIST_DIR}/lib/config`
         }
       ]
     })
@@ -136,7 +161,6 @@ const parserConfig = Object.assign({}, defaultConfig, {
   }
 });
 
-const WRAPPER_DIR = `${__dirname}/tools/vue3-webcomponent-wrapper`;
 const vue3WebCompWrapperConfig = Object.assign({}, defaultConfig, {
   entry: {
     index: [`${JS_ROOT}/vue/wrapper/index.ts`]
@@ -157,4 +181,10 @@ const vue3WebCompWrapperConfig = Object.assign({}, defaultConfig, {
   ]
 });
 
-module.exports = [libConfig, webComponentsConfig, parserConfig, vue3WebCompWrapperConfig];
+module.exports = [
+  executorLibConfig,
+  hueConfigLibConfig,
+  webComponentsConfig,
+  parserConfig,
+  vue3WebCompWrapperConfig
+];
