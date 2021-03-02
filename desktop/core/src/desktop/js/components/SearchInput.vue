@@ -35,7 +35,7 @@
           @input="$emit('input', $event.target.value)"
           @focusin="hasFocus = true"
           @focusout="hasFocus = false"
-          @keyup.enter="$emit('search', value)"
+          @keyup.enter="$emit('search', $event.target.value)"
         />
         <input
           v-model="autocomplete"

@@ -17,21 +17,22 @@
 -->
 
 <template>
-  <div v-if="!lazy || rendered" v-show="def.isActive">
+  <div v-if="!lazy || rendered" v-show="isActive">
     <slot />
   </div>
 </template>
 
 <script lang="ts">
   import { defineComponent, inject } from 'vue';
+  import { SELECTED_TAB_KEY, ADD_TAB_KEY, REMOVE_TAB_KEY } from './Tabs.vue';
 
   export interface TabRef {
     title: string;
-    isActive: boolean;
   }
 
   export default defineComponent({
     name: 'Tab',
+
     props: {
       title: {
         type: String,
@@ -43,47 +44,46 @@
       }
     },
 
-    setup(
-      props
-    ): {
-      addTab?: (tab: TabRef) => void;
-      removeTab?: (tab: TabRef) => void;
+    setup(props) {
+      const addTab: ((tab: TabRef) => void) | undefined = inject(ADD_TAB_KEY);
+      const removeTab: ((tab: TabRef) => void) | undefined = inject(REMOVE_TAB_KEY);
 
-      def: TabRef;
-    } {
+      const selectedTabRef: TabRef | undefined = inject(SELECTED_TAB_KEY);
+
       return {
-        addTab: inject('addTab'),
-        removeTab: inject('removeTab'),
+        addTab,
+        removeTab,
+        selectedTabRef,
 
-        def: {
-          title: props.title,
-          isActive: false
+        ref: {
+          title: props.title
         }
       };
     },
 
-    data(): {
-      rendered: boolean;
-    } {
+    data() {
       return {
         rendered: false
       };
     },
 
-    created() {
-      this.$watch(
-        (): boolean => this.def.isActive,
-        (isActive: boolean): void => {
-          if (isActive) {
-            this.rendered = true;
-          }
+    computed: {
+      isActive(): boolean {
+        return this.ref.title === this.selectedTabRef?.title;
+      }
+    },
+
+    watch: {
+      selectedTabRef(): void {
+        if (this.isActive) {
+          this.rendered = true;
         }
-      );
+      }
     },
 
     mounted(): void {
       if (this.addTab) {
-        this.addTab(this.def);
+        this.addTab(this.ref);
       }
     }
 

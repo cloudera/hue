@@ -13,15 +13,15 @@ This section goes into greater detail on how to build and reuse the components o
 ### Dependencies
 
 * The OS specific install instructions are listed in the [install guide](/administrator/installation/dependencies/)
-* Python 2.7+ or now Python 3
-* Django (2 soon 3 already included in the distribution)
+* Python 3.6+ and Django 3 (or Python 2.7 with Django 1.11)
+* Vue.js 3
 * Node.js ([10.0+](https://deb.nodesource.com/setup_10.x))
 
 ### Build & Start
 
 Build once:
 
-    # If you are using Python 3.5+, set PYTHON_VER before the build, like
+    # If you are using Python 3.6+, set PYTHON_VER before the build, like
     export PYTHON_VER=python3.8
 
     # Mac user might need to set

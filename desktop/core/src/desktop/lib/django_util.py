@@ -26,6 +26,7 @@ import datetime
 
 from django.conf import settings
 from django.core import serializers
+from django.core.exceptions import FieldDoesNotExist
 from django.template import context as django_template_context
 from django.template.context_processors import csrf
 from django.core.serializers.json import DjangoJSONEncoder
@@ -365,7 +366,7 @@ class TruncatingModel(models.Model):
       field = self._meta.get_field(name)
       if type(field) in [models.CharField, models.TextField] and type(value) == str:
         value = value[:field.max_length]
-    except models.fields.FieldDoesNotExist:
+    except FieldDoesNotExist:
       pass # This happens with foreign keys.
 
     super.__setattr__(self, name, value)

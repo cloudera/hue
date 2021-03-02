@@ -741,7 +741,6 @@ SLACK = ConfigSection(
     SLACK_CLIENT_ID=Config(
         key='slack_client_id',
         type=str,
-        private=True,
         dynamic_default=get_slack_client_id,
       ),
     SLACK_CLIENT_SECRET=Config(

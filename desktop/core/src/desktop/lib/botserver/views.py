@@ -17,12 +17,16 @@
 
 import logging
 import json
+from urllib.parse import urlsplit
 from pprint import pprint
 
 from desktop import conf
-from django.http import HttpResponse
+from desktop.conf import ENABLE_GIST_PREVIEW
 from desktop.lib.django_util import login_notrequired, JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
+from desktop.models import Document2, _get_gist_document
+
+from django.http import HttpResponse
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt
 
@@ -31,11 +35,10 @@ LOG = logging.getLogger(__name__)
 SLACK_VERIFICATION_TOKEN = conf.SLACK.SLACK_VERIFICATION_TOKEN.get()
 SLACK_BOT_USER_TOKEN = conf.SLACK.SLACK_BOT_USER_TOKEN.get()
 
-slack_client, appname = None, None
+slack_client = None
 if conf.SLACK.IS_ENABLED.get():
   from slack_sdk import WebClient
   slack_client = WebClient(token=SLACK_BOT_USER_TOKEN)
-  appname = "hue_bot"
 
 
 @login_notrequired
@@ -47,7 +50,7 @@ def slack_events(request):
     if slack_message['token'] != SLACK_VERIFICATION_TOKEN:
       return HttpResponse(status=403)
 
-      # challenge verification
+    # challenge verification
     if slack_message['type'] == 'url_verification':
       response_dict = {"challenge": slack_message['challenge']}
       return JsonResponse(response_dict, status=200)
@@ -55,45 +58,101 @@ def slack_events(request):
     if 'event' in slack_message:
       event_message = slack_message['event']
       parse_events(event_message)
-  except ValueError as e:
-    raise PopupException(_("Response content is not valid JSON"), detail=e)
-  
+  except ValueError as err:
+    raise PopupException(_("Response content is not valid JSON"), detail=err)
+
   return HttpResponse(status=200)
 
 
-def parse_events(event_message):
-  user_id = event_message.get('user')
-  text = event_message.get('text')
-  channel = event_message.get('channel')
+def parse_events(event):
+  """
+  Parses the event according to its 'type'.
 
-  BOT_ID = None
-  if appname is not None:
-    BOT_ID = get_bot_id(appname)
+  """
+  channel_id = event.get('channel')
+  if event.get('type') == 'message':
+    handle_on_message(channel_id, event.get('bot_id'), event.get('text'), event.get('user'))
 
-  # ignore bot's own message
-  if BOT_ID == user_id:
+  if event.get('type') == 'link_shared':
+    handle_on_link_shared(channel_id, event.get('message_ts'), event.get('links'))
+
+
+def handle_on_message(channel_id, bot_id, text, user_id):
+  # Ignore bot's own message since that will cause an infinite loop of messages if we respond.
+  if bot_id:
     return HttpResponse(status=200)
   
-  if slack_client is not None:
-    if 'hello hue' in text.lower():
-      response = say_hi_user(channel, user_id)
-      if response['ok']:
-        return HttpResponse(status=200)
-      else:
-        raise PopupException(response["error"])
+  if slack_client:
+    if text and 'hello hue' in text.lower():
+      response = say_hi_user(channel_id, user_id)
 
-  
-def say_hi_user(channel, user_id):
-  """Bot sends Hi<username> message in a specific channel"""
+      if not response['ok']:
+        raise PopupException(_("Error posting message"), detail=response["error"])
 
+
+def handle_on_link_shared(channel_id, message_ts, links):
+  for item in links:
+    path = urlsplit(item['url'])[2]
+    id_type, qid_or_uuid = urlsplit(item['url'])[3].split('=')
+
+    if path == '/hue/editor' and id_type == 'editor':
+      doc = Document2.objects.get(id=qid_or_uuid)
+    elif path == '/hue/gist' and id_type == 'uuid' and ENABLE_GIST_PREVIEW.get():
+      doc = _get_gist_document(uuid=qid_or_uuid)
+    else:
+      raise PopupException(_("Cannot unfurl link"))
+
+    doc_data = json.loads(doc.data)
+    statement = doc_data['snippets'][0]['statement_raw'] if id_type == 'editor' else doc_data['statement_raw']
+    dialect = doc_data['dialect'].capitalize() if id_type == 'editor' else doc.extra.capitalize()
+    created_by = doc.owner.get_full_name() or doc.owner.username
+
+    payload = _make_unfurl_payload(item['url'], statement, dialect, created_by)
+    response = slack_client.chat_unfurl(channel=channel_id, ts=message_ts, unfurls=payload)
+    if not response['ok']:
+      raise PopupException(_("Cannot unfurl link"), detail=response["error"])
+
+def _make_unfurl_payload(url, statement, dialect, created_by):
+  payload = {
+    url: {
+      "color": "#025BA6",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "\n*<{}|Hue - SQL Editor>*".format(url)
+          }
+        },
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": statement if len(statement) < 150 else (statement[:150] + '...')
+          }
+        },
+        {
+          "type": "section",
+          "fields": [
+            {
+              "type": "mrkdwn",
+              "text": "*Dialect:*\n{}".format(dialect)
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Created By:*\n{}".format(created_by)
+            }
+          ]
+        }
+      ]
+    }
+  }
+  return payload
+
+def say_hi_user(channel_id, user_id):
+  """
+  Sends Hi<user_id> message in a specific channel.
+
+  """
   bot_message = 'Hi <@{}> :wave:'.format(user_id)
-  return slack_client.api_call(api_method='chat.postMessage', json={'channel': channel, 'text': bot_message})
-
-def get_bot_id(botusername):
-  """Takes in bot username, Returns the bot id"""
-  
-  response = slack_client.api_call('users.list')
-  users = response['members']
-  for user in users:
-    if botusername in user.get('name', '') and not user.get('deleted'):
-      return user.get('id')
+  return slack_client.api_call(api_method='chat.postMessage', json={'channel': channel_id, 'text': bot_message})

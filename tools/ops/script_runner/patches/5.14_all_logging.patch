@@ -1,0 +1,239 @@
+# Licensed to Cloudera, Inc. under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  Cloudera, Inc. licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+diff --git a/apps/filebrowser/src/filebrowser/settings.py b/apps/filebrowser/src/filebrowser/settings.py
+index cb7a8c7c3d..9a783965a8 100644
+--- a/apps/filebrowser/src/filebrowser/settings.py
++++ b/apps/filebrowser/src/filebrowser/settings.py
+@@ -22,7 +22,7 @@ ICON = "filebrowser/art/icon_filebrowser_48.png"
+ MENU_INDEX = 20
+
+ from aws.s3.s3fs import PERMISSION_ACTION_S3
+-from azure.adls.webhdfs import PERMISSION_ACTION_ADLS
++PERMISSION_ACTION_ADLS = "adls_access"
+
+
+ PERMISSION_ACTIONS = (
+diff --git a/desktop/core/src/desktop/conf.py b/desktop/core/src/desktop/conf.py
+index 429ee983a5..7d20ad4f25 100644
+--- a/desktop/core/src/desktop/conf.py
++++ b/desktop/core/src/desktop/conf.py
+@@ -379,6 +379,18 @@ COLLECT_USAGE = Config(
+   type=coerce_bool,
+   default=True)
+
++REST_RESPONSE_SIZE = Config(
++  key="rest_response_size",
++  help=_("Number of characters the rest api reponse calls to dump to the logs when debug is enabled."),
++  type=int,
++  default=1000)
++
++THRIFT_RESPONSE_SIZE = Config(
++  key="thrift_response_size",
++  help=_("Number of characters the thrift api reponse calls to dump to the logs when debug is enabled."),
++  type=int,
++  default=1000)
++
+ LEAFLET_TILE_LAYER = Config(
+   key="leaflet_tile_layer",
+   help=_("Tile layer server URL for the Leaflet map charts. Read more on http://leafletjs.com/reference.html#tilelayer. Make sure you add the tile domain to the img-src section of the 'secure_content_security_policy' configuration parameter as well."),
+@@ -1314,6 +1326,17 @@ MEMORY_PROFILER = Config(
+   default=False)
+
+
++def get_instrumentation_default():
++  """If django_debug_mode is True, this is automatically enabled"""
++  return DJANGO_DEBUG_MODE.get()
++
++INSTRUMENTATION = Config(
++  key='instrumentation',
++  help=_('Enable or disable instrumentation. If django_debug_mode is True, this is automatically enabled.'),
++  type=coerce_bool,
++  dynamic_default=get_instrumentation_default)
++
++
+ AUDIT_EVENT_LOG_DIR = Config(
+   key="audit_event_log_dir",
+   help=_("The directory where to store the auditing logs. Auditing is disable if the value is empty."),
+diff --git a/desktop/core/src/desktop/lib/rest/resource.py b/desktop/core/src/desktop/lib/rest/resource.py
+index aa2e01a993..20150f9a09 100644
+--- a/desktop/core/src/desktop/lib/rest/resource.py
++++ b/desktop/core/src/desktop/lib/rest/resource.py
+@@ -18,8 +18,12 @@ import logging
+ import posixpath
+ import time
+
++from django.utils.encoding import iri_to_uri, smart_str
++from django.utils.http import urlencode
++
+ from desktop.lib.i18n import smart_unicode
+
++from desktop import conf
+
+ LOG = logging.getLogger(__name__)
+
+@@ -82,15 +86,24 @@ class Resource(object):
+                                 urlencode=self._urlencode,
+                                 clear_cookies=clear_cookies)
+
+-    if log_response and self._client.logger.isEnabledFor(logging.DEBUG):
+-      self._client.logger.debug(
+-        "%s %s Got response%s: %s%s" % (
+-          method,
+-          smart_unicode(path, errors='ignore'),
+-           ' in %dms' % ((time.time() - start_time) * 1000),
+-           smart_unicode(resp.content[:1000], errors='replace'),
+-           len(resp.content) > 1000 and "..." or "")
++    if self._client.logger.isEnabledFor(logging.DEBUG):
++      log_length = conf.REST_RESPONSE_SIZE.get() != -1 and conf.REST_RESPONSE_SIZE.get() # We want to output duration without content
++      duration = time.time() - start_time
++      message = '%s %s %s%s%s %s%s returned in %dms %s %s %s%s' % (
++        method,
++        type(self._client._session.auth) if self._client._session and self._client._session.auth else None,
++        self._client._base_url,
++        smart_str(path),
++        iri_to_uri('?' + urlencode(params)) if params else '',
++        smart_unicode(data, errors='replace')[:log_length] if data else "",
++        log_length and len(data) > log_length and "..." or "" if data else "",
++        (duration * 1000),
++        resp.status_code if resp else 0,
++        len(resp.content) if resp else 0,
++        smart_unicode(resp.content[:log_length], errors='replace') if resp else "",
++        log_length and len(resp.content) > log_length and "..." or "" if resp else ""
+       )
++      self._client.logger.debug("%s" % message)
+
+     return self._format_response(resp)
+
+diff --git a/desktop/core/src/desktop/lib/thrift_util.py b/desktop/core/src/desktop/lib/thrift_util.py
+index b36a99d000..a1c40b5092 100644
+--- a/desktop/core/src/desktop/lib/thrift_util.py
++++ b/desktop/core/src/desktop/lib/thrift_util.py
+@@ -36,6 +36,7 @@ from thrift.protocol.TMultiplexedProtocol import TMultiplexedProtocol
+ from django.conf import settings
+ from django.utils.translation import ugettext as _
+ from desktop.conf import SASL_MAX_BUFFER, CHERRYPY_SERVER_THREADS
++from desktop import conf
+
+ from desktop.lib.python_util import create_synchronous_io_multiplexer
+ from desktop.lib.thrift_.http_client import THttpClient
+@@ -440,7 +441,7 @@ class SuperClient(object):
+           log_msg = _unpack_guid_secret_in_handle(repr(ret))
+
+           # Truncate log message, increase output in DEBUG mode
+-          log_limit = 2000 if settings.DEBUG else 1000
++          log_limit = conf.THRIFT_RESPONSE_SIZE.get() if settings.DEBUG else 1000
+           log_msg = log_msg[:log_limit] + (log_msg[log_limit:] and '...')
+
+           duration = time.time() - st
+diff --git a/desktop/core/src/desktop/log/access.py b/desktop/core/src/desktop/log/access.py
+index 679f9d1035..ad3c48805f 100644
+--- a/desktop/core/src/desktop/log/access.py
++++ b/desktop/core/src/desktop/log/access.py
+@@ -22,6 +22,8 @@ This assumes a single-threaded server.
+
+ import logging
+ import re
++import resource
++import sys
+ import threading
+ import time
+
+@@ -81,15 +83,36 @@ class AccessInfo(dict):
+     self['agent'] = request.META.get('HTTP_USER_AGENT', '-')
+     self['time'] = time.time()
+     self['duration'] = None
++    self['memory'] = None
++
++  def memory_usage_resource(self):
++    """
++      This is a lightweight way to get the total peak memory as
++       doing the diffing before/after request with guppy was too inconsistent and memory intensive.
++      """
++    rusage_denom = 1024
++    if sys.platform == 'darwin':
++      rusage_denom = rusage_denom * 1024
++    # get peak memory usage, bytes on OSX, Kilobytes on Linux
++    return resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / rusage_denom
+
+   def log(self, level, msg=None, start_time=None):
+-    self['duration'] = ' returned in %dms' % ((time.time() - start_time) * 1000) if start_time is not None else ''
++    is_instrumentation = desktop.conf.INSTRUMENTATION.get()
++    self['duration'] = ' returned in %dms' % ((time.time() - start_time) * 1000) if start_time is not None and is_instrumentation else ''
++    self['memory'] = ' (mem: %dmb)' % self.memory_usage_resource() if is_instrumentation else ''
+
+     if msg is not None:
+       self['msg'] = msg
+-      ACCESS_LOG.log(level, '%(remote_ip)s %(username)s - "%(method)s %(path)s %(proto)s"%(duration)s -- %(msg)s' % self)
++      ACCESS_LOG.log(level, '%(remote_ip)s %(username)s - "%(method)s %(path)s %(proto)s"%(duration)s%(memory)s-- %(msg)s' % self)
+     else:
+-      ACCESS_LOG.log(level, '%(remote_ip)s %(username)s - "%(method)s %(path)s %(proto)s"%(duration)s' % self)
++      ACCESS_LOG.log(level, '%(remote_ip)s %(username)s - "%(method)s %(path)s %(proto)s"%(duration)s%(memory)s' % self)
++
++    if is_instrumentation:
++      import gc
++      gc.collect()
++      for o in gc.garbage:
++        for r in gc.get_referrers(o):
++          ACCESS_LOG.log(level, 'ref for %r: %r' % (o, r))
+
+   def add_to_access_history(self, app):
+     """Record this user access to the recent access map"""
+diff --git a/desktop/core/src/desktop/middleware.py b/desktop/core/src/desktop/middleware.py
+index 0feaf5b545..b53df44ad2 100644
+--- a/desktop/core/src/desktop/middleware.py
++++ b/desktop/core/src/desktop/middleware.py
+@@ -317,7 +317,8 @@ class LoginAndPermissionMiddleware(object):
+         return PopupException(
+             _("You do not have permission to access the %(app_name)s application.") % {'app_name': app_accessed.capitalize()}, error_code=401).response(request)
+       else:
+-        log_page_hit(request, view_func, level=access_log_level)
++        if not hasattr(request, 'view_func'):
++          log_page_hit(request, view_func, level=access_log_level)
+         return None
+
+     logging.info("Redirecting to login page: %s", request.get_full_path())
+@@ -334,7 +335,7 @@ class LoginAndPermissionMiddleware(object):
+
+   def process_response(self, request, response):
+     if hasattr(request, 'ts') and hasattr(request, 'view_func'):
+-      log_page_hit(request, request.view_func, level=logging.DEBUG, start_time=request.ts)
++      log_page_hit(request, request.view_func, level=logging.INFO, start_time=request.ts)
+     return response
+
+
+diff --git a/desktop/core/src/desktop/settings.py b/desktop/core/src/desktop/settings.py
+index a77673739d..7f83f68cc6 100644
+--- a/desktop/core/src/desktop/settings.py
++++ b/desktop/core/src/desktop/settings.py
+@@ -20,6 +20,7 @@
+ # Local customizations are done by symlinking a file
+ # as local_settings.py.
+
++import gc
+ import logging
+ import os
+ import pkg_resources
+@@ -506,6 +507,9 @@ if desktop.conf.MEMORY_PROFILER.get():
+   MEMORY_PROFILER = hpy()
+   MEMORY_PROFILER.setrelheap()
+
++# Instrumentation
++if desktop.conf.INSTRUMENTATION.get():
++  gc.set_debug(gc.DEBUG_UNCOLLECTABLE | gc.DEBUG_OBJECTS)
+
+ if not desktop.conf.DATABASE_LOGGING.get():
+   def disable_database_logging():

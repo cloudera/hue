@@ -15,17 +15,31 @@
 // limitations under the License.
 
 import axios from 'axios';
-import AceEditor from './AceEditor.vue';
-import { wrap } from 'vue/webComponentWrap';
-import style from '!!css-loader!sass-loader!./AceEditor.scss';
 
-wrap('query-editor', AceEditor, {
-  shadowCss: style,
-  connectedCallback() {
-    const element = <HTMLElement>this;
-    const hueBaseUrl = element.getAttribute('hue-base-url');
-    if (hueBaseUrl) {
-      axios.defaults.baseURL = hueBaseUrl;
-    }
+import AceEditor from './aceEditor/AceEditor.vue';
+import ExecutableActions from './ExecutableActions.vue';
+import ExecutableProgressBar from './ExecutableProgressBar.vue';
+import ResultTable from './result/ResultTable.vue';
+import { wrap } from 'vue/webComponentWrap';
+
+const registerBaseUrl = (element: HTMLElement): void => {
+  const hueBaseUrl = element.getAttribute('hue-base-url');
+  if (hueBaseUrl) {
+    axios.defaults.baseURL = hueBaseUrl;
   }
+};
+
+const components = [
+  { tag: 'query-editor', component: AceEditor },
+  { tag: 'query-editor-actions', component: ExecutableActions },
+  { tag: 'query-editor-progress-bar', component: ExecutableProgressBar },
+  { tag: 'query-editor-result-table', component: ResultTable }
+];
+
+components.forEach(({ tag, component }) => {
+  wrap(tag, component, {
+    connectedCallback() {
+      registerBaseUrl(this as HTMLElement);
+    }
+  });
 });

@@ -27,6 +27,24 @@ class DataCatalogContext {
     self.popover = options.popover;
     self.catalogEntry = ko.observable(options.catalogEntry);
 
+    self.parentIsView = ko.observable(false);
+    const checkIfParentIsView = catalogEntry => {
+      if (!catalogEntry) {
+        self.parentIsView(false);
+        return;
+      }
+      catalogEntry
+        .getParent()
+        .then(parentEntry => {
+          self.parentIsView(parentEntry.isView());
+        })
+        .catch(() => {
+          self.parentIsView(false);
+        });
+    };
+    checkIfParentIsView(self.catalogEntry());
+    self.catalogEntry.subscribe(checkIfParentIsView);
+
     self.loading = ko.observable(false);
     self.hasErrors = ko.observable(false);
     self.activePromises = [];

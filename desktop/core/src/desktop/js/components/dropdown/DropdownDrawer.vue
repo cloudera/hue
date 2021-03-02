@@ -18,13 +18,7 @@
 
 <template>
   <div class="hue-dropdown-drawer" :class="{ open: open }" @click="closeOnClick && closeDrawer()">
-    <div
-      v-if="open"
-      ref="innerPanelElement"
-      v-click-outside="closeDrawer"
-      class="hue-dropdown-drawer-inner"
-      :style="position"
-    >
+    <div v-if="open" ref="innerPanelElement" class="hue-dropdown-drawer-inner" :style="position">
       <slot />
     </div>
   </div>
@@ -33,7 +27,11 @@
 <script lang="ts">
   import { defineComponent, nextTick, PropType } from 'vue';
 
-  import { clickOutsideDirective } from '../directives/clickOutsideDirective';
+  import {
+    addClickOutsideHandler,
+    removeClickOutsideHandler
+  } from 'components/directives/clickOutsideDirective';
+  import { defer } from 'utils/hueUtils';
 
   const isOutsideViewport = (element: Element): { bottom: boolean; right: boolean } => {
     const clientRect = element.getBoundingClientRect();
@@ -54,9 +52,6 @@
 
   export default defineComponent({
     name: 'DropdownDrawer',
-    directives: {
-      'click-outside': clickOutsideDirective
-    },
     props: {
       open: {
         type: Boolean,
@@ -67,7 +62,7 @@
         default: true
       },
       triggerElement: {
-        type: Object as PropType<HTMLElement> | null,
+        type: Object as PropType<HTMLElement | null>,
         default: null
       }
     },
@@ -82,6 +77,7 @@
     watch: {
       async open(newValue) {
         if (!newValue) {
+          removeClickOutsideHandler(this.$el);
           return;
         }
 
@@ -102,6 +98,16 @@
           this.position.left = '';
           this.position.right = `${rightOffset}px`;
         }
+
+        defer(() => {
+          addClickOutsideHandler(this.$el, event => {
+            if (this.triggerElement !== event.target) {
+              this.$emit('close');
+            }
+          });
+        });
+
+        this.$forceUpdate();
       }
     },
     methods: {
@@ -120,7 +126,7 @@
 
   .hue-dropdown-drawer {
     position: fixed;
-    z-index: 1061;
+    z-index: 10610;
 
     &.open {
       .hue-dropdown-drawer-inner {
@@ -139,6 +145,44 @@
       border-radius: $hue-panel-border-radius;
 
       @include box-shadow(0, 5px, 10px, rgba(0, 0, 0, 0.2));
+
+      > ::v-deep(ul) {
+        overflow-x: hidden;
+        margin: 0 !important;
+        padding: 0;
+        list-style: none;
+        font-size: 13px;
+
+        li {
+          color: $fluid-gray-800;
+
+          button,
+          a {
+            display: block;
+            width: 100%;
+            padding: 6px 16px;
+            clear: both;
+            font-weight: 400;
+            text-align: inherit;
+            white-space: nowrap;
+            background-color: transparent;
+            border: 0;
+            position: relative;
+            outline: 0;
+
+            &:hover,
+            &.active,
+            &.focus {
+              background-color: $hue-primary-color-light;
+            }
+          }
+
+          &.selected button,
+          &.selected a {
+            background-color: $hue-primary-color-light;
+          }
+        }
+      }
     }
   }
 </style>

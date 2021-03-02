@@ -19,6 +19,7 @@
 <template>
   <div
     v-if="spin"
+    class="spinner-container"
     :class="{
       'hue-spinner-overlay': overlay,
       'hue-spinner-inline': inline,
@@ -72,4 +73,8 @@
   });
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+  .spinner-container {
+    z-index: 10000;
+  }
+</style>

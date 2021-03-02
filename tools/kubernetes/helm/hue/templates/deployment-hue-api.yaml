@@ -1,0 +1,31 @@
+{{- if .Values.api.enabled -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hue-api
+  labels:
+    deployment: hue
+{{ if .Values.monitoring.enabled }}
+  annotations:
+    "sidecar.jaegertracing.io/inject": "true"
+{{ end }}
+spec:
+  selector:
+    matchLabels:
+      pod: hue-api
+  replicas: {{ .Values.hue.replicas }}
+  template:
+    metadata:
+      labels:
+        pod: hue-api
+    spec:
+      containers:
+      - name: hue
+        image: gethue/compose:latest
+        imagePullPolicy: Always
+        ports:
+          - containerPort: 8005
+        resources:
+          requests:
+            cpu: "25m"
+{{- end -}}
