@@ -62,13 +62,26 @@ const libConfig = Object.assign({}, defaultConfig, {
 
 const webComponentsConfig = Object.assign({}, defaultConfig, {
   entry: {
-    'er-diagram': [`${JS_ROOT}/components/er-diagram/webcomp.ts`],
-    'query-editor-components': [`${JS_ROOT}/apps/editor/components/QueryEditorWebComponent.ts`]
+    ErDiagram: [`${JS_ROOT}/components/er-diagram/webcomp.ts`],
+    QueryEditorWebComponents: [`${JS_ROOT}/apps/editor/components/QueryEditorWebComponents.ts`]
   },
   output: {
-    path: `${DIST_DIR}/lib/components`
+    path: `${DIST_DIR}/lib/components`,
+    library: '[name]',
+    libraryExport: 'default',
+    libraryTarget: 'umd'
   },
-  plugins: [new VueLoaderPlugin()]
+  plugins: [
+    new VueLoaderPlugin(),
+    new CopyWebpackPlugin({
+      patterns: [
+        {
+          from: `${JS_ROOT}/apps/editor/components/QueryEditorWebComponents.d.ts`,
+          to: `${DIST_DIR}/lib/components`
+        }
+      ]
+    })
+  ]
 });
 
 const parserConfig = Object.assign({}, defaultConfig, {
