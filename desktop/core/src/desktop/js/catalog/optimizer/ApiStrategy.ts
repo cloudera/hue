@@ -30,7 +30,7 @@ import {
   RiskOptions,
   SimilarityOptions
 } from 'catalog/optimizer/optimizer';
-import { Connector } from 'types/config';
+import { Connector } from 'config/types';
 
 /**
  * Fetches the popularity for various aspects of the given tables

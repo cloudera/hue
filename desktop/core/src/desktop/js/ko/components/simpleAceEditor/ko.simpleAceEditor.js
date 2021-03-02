@@ -27,7 +27,7 @@ import SolrQueryAutocompleter from './solrQueryAutocompleter';
 import SqlAutocompleter from 'sql/sqlAutocompleter';
 import sqlWorkerHandler from 'sql/sqlWorkerHandler';
 import AceGutterHandler from 'ko/bindings/ace/aceGutterHandler';
-import { findEditorConnector } from 'utils/hueConfig';
+import { findEditorConnector } from 'config/hueConfig';
 
 export const NAME = 'hue-simple-ace-editor';
 export const MULTI_NAME = 'hue-simple-ace-editor-multi';

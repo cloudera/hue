@@ -20,7 +20,7 @@ import * as ko from 'knockout';
 import * as propsMappers from './propsMappers';
 import MetastoreSource from 'apps/tableBrowser/metastoreSource';
 import dataCatalog from 'catalog/dataCatalog';
-import { findEditorConnector, GET_KNOWN_CONFIG_EVENT } from 'utils/hueConfig';
+import { findEditorConnector, GET_KNOWN_CONFIG_EVENT } from 'config/hueConfig';
 import huePubSub from 'utils/huePubSub';
 import hueUtils from 'utils/hueUtils';
 import { getFromLocalStorage, withLocalStorage } from 'utils/storageUtils';

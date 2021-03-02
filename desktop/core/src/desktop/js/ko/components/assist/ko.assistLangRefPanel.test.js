@@ -18,7 +18,7 @@ import * as ko from 'knockout';
 
 import * as apiUtils from 'api/apiUtils';
 import AssistLangRefPanel from './ko.assistLangRefPanel';
-import { refreshConfig } from 'utils/hueConfig';
+import { refreshConfig } from 'config/hueConfig';
 import { sleep } from 'utils/hueUtils';
 
 describe('ko.assistLangRefPanel.js', () => {

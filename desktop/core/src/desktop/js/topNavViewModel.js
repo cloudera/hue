@@ -22,7 +22,7 @@ import {
   findEditorConnector,
   GET_KNOWN_CONFIG_EVENT,
   REFRESH_CONFIG_EVENT
-} from 'utils/hueConfig';
+} from 'config/hueConfig';
 import { withLocalStorage } from 'utils/storageUtils';
 
 class TopNavViewModel {

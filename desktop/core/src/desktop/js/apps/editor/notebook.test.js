@@ -16,7 +16,7 @@
 
 import Notebook from './notebook';
 import sessionManager from 'apps/editor/execution/sessionManager';
-import * as hueConfig from 'utils/hueConfig';
+import * as hueConfig from 'config/hueConfig';
 
 describe('notebook.js', () => {
   const viewModel = {

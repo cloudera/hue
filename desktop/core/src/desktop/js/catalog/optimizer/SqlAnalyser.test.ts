@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import Connector from '../types/config';
+import { Connector } from 'config/types';
 import SqlAnalyzer from './SqlAnalyzer';
 
 const connectorA: Connector = {

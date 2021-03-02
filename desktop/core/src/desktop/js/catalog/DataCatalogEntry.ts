@@ -28,7 +28,7 @@ import * as ko from 'knockout';
 
 import apiHelper from 'api/apiHelper';
 import { applyCancellable, forceSilencedErrors } from 'catalog/catalogUtils';
-import { Compute, Connector, Namespace } from 'types/config';
+import { Compute, Connector, Namespace } from 'config/types';
 import { hueWindow } from 'types/types';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';

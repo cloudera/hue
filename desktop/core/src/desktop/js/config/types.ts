@@ -97,7 +97,6 @@ export interface IdentifiableInterpreter extends Interpreter {
   id: string;
 }
 
-/* eslint-disable @typescript-eslint/no-empty-interface */
 export interface Connector extends IdentifiableInterpreter {
   dialect_properties?: {
     sql_identifier_quote?: string;

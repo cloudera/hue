@@ -38,7 +38,7 @@ import MultiTableEntry, {
   TopJoins
 } from 'catalog/MultiTableEntry';
 import { getOptimizer, LOCAL_STRATEGY } from 'catalog/optimizer/optimizer';
-import { Compute, Connector, Namespace } from 'types/config';
+import { Compute, Connector, Namespace } from 'config/types';
 import { hueWindow } from 'types/types';
 
 export interface TimestampedData {

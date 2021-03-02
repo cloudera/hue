@@ -22,7 +22,7 @@ import huePubSub from 'utils/huePubSub';
 import MetastoreViewModel from 'apps/tableBrowser/metastoreViewModel';
 import hueUtils from 'utils/hueUtils';
 import I18n from 'utils/i18n';
-import { GET_KNOWN_CONFIG_EVENT, CONFIG_REFRESHED_EVENT } from 'utils/hueConfig';
+import { GET_KNOWN_CONFIG_EVENT, CONFIG_REFRESHED_EVENT } from 'config/hueConfig';
 
 import 'components/er-diagram/webcomp';
 

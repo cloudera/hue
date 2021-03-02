@@ -19,7 +19,7 @@ import * as ko from 'knockout';
 import AssistStorageEntry from './assistStorageEntry';
 import apiHelper from 'api/apiHelper';
 import componentUtils from 'ko/components/componentUtils';
-import { getRootFilePath } from 'utils/hueConfig';
+import { getRootFilePath } from 'config/hueConfig';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';

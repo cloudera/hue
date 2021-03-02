@@ -53,7 +53,7 @@ import I18n from 'utils/i18n';
 import sqlUtils from 'sql/sqlUtils';
 import { matchesType } from 'sql/reference/typeUtils';
 import { cancelActiveRequest } from 'api/apiUtils';
-import { findBrowserConnector, getRootFilePath } from 'utils/hueConfig';
+import { findBrowserConnector, getRootFilePath } from 'config/hueConfig';
 import {
   findUdf,
   getArgumentDetailsForUdf,
