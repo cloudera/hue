@@ -16,7 +16,7 @@
 
 import * as ko from 'knockout';
 
-import * as apiUtils from 'api/apiUtils';
+import * as apiUtils from 'api/utils';
 import AssistLangRefPanel from './ko.assistLangRefPanel';
 import { refreshConfig } from 'config/hueConfig';
 import { sleep } from 'utils/hueUtils';
@@ -28,7 +28,7 @@ describe('ko.assistLangRefPanel.js', () => {
   });
 
   it('should handle cluster config updates', async () => {
-    const spy = jest.spyOn(apiUtils, 'simplePostAsync').mockImplementation(async () =>
+    const spy = jest.spyOn(apiUtils, 'post').mockImplementation(async () =>
       Promise.resolve({
         status: 0,
         app_config: {
@@ -48,7 +48,7 @@ describe('ko.assistLangRefPanel.js', () => {
 
     spy.mockRestore();
 
-    const changeSpy = jest.spyOn(apiUtils, 'simplePostAsync').mockImplementation(async () =>
+    const changeSpy = jest.spyOn(apiUtils, 'post').mockImplementation(async () =>
       Promise.resolve({
         status: 0,
         app_config: {
