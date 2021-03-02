@@ -1,6 +1,6 @@
 import React, {FC, useState} from 'react';
 
-import 'gethue/lib/components/query-editor-components';
+import hueComponents from 'gethue/lib/components/QueryEditorWebComponents';
 
 import Executor from 'gethue/lib/execution/executor';
 
@@ -9,6 +9,10 @@ import { ExecuteActions } from './ExecuteActions';
 import { ExecuteProgress } from './ExecuteProgress';
 import { ResultTable } from './ResultTable';
 import SqlExecutable from 'gethue/src/apps/editor/execution/sqlExecutable';
+
+hueComponents.configure({
+  baseUrl: 'http://localhost:1234/'
+});
 
 const executor = new Executor({
   compute: (() => ({ id: 'default' })) as KnockoutObservable<any>,
