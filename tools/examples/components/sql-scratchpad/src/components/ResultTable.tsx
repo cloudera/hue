@@ -1,15 +1,28 @@
 import React, { FC } from 'react';
 
 import 'gethue/lib/components/query-editor-components';
+import Executable from 'gethue/src/apps/editor/execution/executable';
 
-export const ResultTable: FC = () => {
-  const newNode = document.createElement('span');
-  newNode.innerText = 'ResultTable'
+export interface ResultTableProps {
+  activeExecutable?: Executable
+}
+
+interface ResultTableElement extends HTMLElement {
+  executable?: Executable;
+}
+
+export const ResultTable: FC<ResultTableProps> = ({ activeExecutable }) => {
+  const newNode = document.createElement('query-editor-result-table');
+  newNode.setAttribute('executable', '');
+  (newNode as ResultTableElement).executable = activeExecutable;
 
   return <div
     ref={
-      (nodeElement: HTMLDivElement | null) => {
-        nodeElement && nodeElement.appendChild(newNode)
+      (element: HTMLDivElement | null) => {
+        if (element) {
+          element.innerHTML = '';
+          element.appendChild(newNode)
+        }
       }
     }
   />

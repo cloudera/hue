@@ -5,7 +5,9 @@ import 'gethue/lib/components/query-editor-components';
 import hiveSyntaxParser from 'gethue/lib/parsers/hiveSyntaxParser';
 import hiveAutocompleteParser from 'gethue/lib/parsers/hiveAutocompleteParser';
 import Executor from 'gethue/lib/execution/executor';
+import Executable from 'gethue/src/apps/editor/execution/executable';
 import { SetOptions, SqlReferenceProvider, UdfCategory } from 'gethue/src/sql/reference/types'
+import { ActiveStatementChangedEvent } from 'gethue/src/apps/editor/components/aceEditor/types';
 
 const sqlReferenceProvider: SqlReferenceProvider = {
   async getReservedKeywords(dialect: string): Promise<Set<string>> {
@@ -39,22 +41,55 @@ interface QueryEditorElement extends HTMLElement {
 
 interface QueryEditorProps {
   executor: Executor;
+  id?: string; // Set a unique ID to allow multiple query editors on one page
+  setActiveExecutable(executable: Executable): void;
 }
 
-export const QueryEditor: FC<QueryEditorProps> = ({ executor }) => {
+export const QueryEditor: FC<QueryEditorProps> = ({ executor, id, setActiveExecutable }) => {
   const nodeElement = document.createElement('query-editor') as QueryEditorElement;
   nodeElement.setAttribute('hue-base-url', 'http://localhost:8888');
   nodeElement.setAttribute('executor', '');
   nodeElement.setAttribute('sql-parser-provider', '');
   nodeElement.setAttribute('sql-reference-provider', '');
+
+  nodeElement.setAttribute('id', id || 'some-id');
   nodeElement.executor = executor;
   nodeElement['sql-parser-provider'] = sqlAutocompleteProvider;
   nodeElement['sql-reference-provider'] = sqlReferenceProvider;
 
+  nodeElement.addEventListener('active-statement-changed', event => {
+    const activeStatementChangedEvent = event as ActiveStatementChangedEvent;
+    executor.update(activeStatementChangedEvent.detail, false);
+    setActiveExecutable(executor.activeExecutable);
+  })
+  
+  //nodeElement.addEventListener('value-changed', event => {
+  //  // event.detail contains the value
+  //})
+
+  // nodeElement.addEventListener('create-new-doc', () => {
+  //   // Triggered when the user presses ctrl+n
+  // })
+
+  // nodeElement.addEventListener('save-doc', () => {
+  //   // Triggered when the user presses ctrl+s
+  // })
+
+  // nodeElement.addEventListener('ace-created', event => {
+  //   // event.detail contains the Ace editor instance
+  // })
+
+  // nodeElement.addEventListener('cursor-changed', event => {
+  //   // event.detail contains the cursor position
+  // })
+
   return <div className={ 'query-editor-wrapper' }
     ref={
       element => {
-        element?.append(nodeElement);
+        if (element) {
+          element.innerHTML = '';
+          element.append(nodeElement);
+        }
       }
     }
   />;

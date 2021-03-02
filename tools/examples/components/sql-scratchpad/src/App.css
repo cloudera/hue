@@ -1,7 +1,6 @@
 .app {
   height: 100%;
   background-color: #282c34;
-  text-align: center;
   display: flex;
   flex-direction: column;
 }
@@ -10,9 +9,14 @@
   flex: 0 0 32px;
   background-color: #282c34;
   align-items: center;
+  text-align: center;
   justify-content: center;
   font-size: 25px;
   color: white;
+}
+
+.inline-block {
+  display: inline-block;
 }
 
 .app > .ace-editor {
@@ -36,12 +40,15 @@
 
 .app > .executable-progress-bar {
   flex: 1;
+  padding: 5px;
 }
 
 .app > .executable-actions {
   flex: 1;
+  padding: 5px;
 }
 
 .app > .result-table {
   flex: 0 1 50%;
+  padding: 5px;
 }
