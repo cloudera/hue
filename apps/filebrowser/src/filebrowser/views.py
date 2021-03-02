@@ -1407,8 +1407,8 @@ def extract_archive_using_batch_job(request):
 
     if upload_path and archive_name:
       try:
-        upload_path = urllib.unquote(upload_path)
-        archive_name = urllib.unquote(archive_name)
+        upload_path = urllib_unquote(upload_path)
+        archive_name = urllib_unquote(archive_name)
         response = extract_archive_in_hdfs(request, upload_path, archive_name)
       except Exception as e:
         response['message'] = _('Exception occurred while extracting archive: %s' % e)
@@ -1430,9 +1430,9 @@ def compress_files_using_batch_job(request):
 
     if upload_path and file_names and archive_name:
       try:
-        upload_path = urllib.unquote(upload_path)
-        archive_name = urllib.unquote(archive_name)
-        file_names = [urllib.unquote(name) for name in file_names]
+        upload_path = urllib_unquote(upload_path)
+        archive_name = urllib_unquote(archive_name)
+        file_names = [urllib_unquote(name) for name in file_names]
         response = compress_files_in_hdfs(request, file_names, upload_path, archive_name)
       except Exception as e:
         response['message'] = _('Exception occurred while compressing files: %s' % e)
