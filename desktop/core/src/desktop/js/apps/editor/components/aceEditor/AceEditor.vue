@@ -39,7 +39,7 @@
   import { attachPredictTypeahead } from './acePredict';
   import AceAutocomplete from './autocomplete/AceAutocomplete.vue';
   import AceGutterHandler from './AceGutterHandler';
-  import AceLocationHandler from './AceLocationHandler';
+  import AceLocationHandler, { ACTIVE_STATEMENT_CHANGED_EVENT } from './AceLocationHandler';
   import { formatSql } from 'apps/editor/api';
   import Executor from 'apps/editor/execution/executor';
   import SubscriptionTracker from 'components/utils/SubscriptionTracker';
@@ -49,7 +49,7 @@
     ParsedLocation,
     SqlParserProvider
   } from 'parse/types';
-  import { EditorInterpreter } from 'types/config';
+  import { EditorInterpreter } from 'config/types';
   import { hueWindow } from 'types/types';
   import huePubSub from 'utils/huePubSub';
   import { defer } from 'utils/hueUtils';
@@ -103,6 +103,7 @@
       }
     },
     emits: [
+      'active-statement-changed',
       'value-changed',
       'create-new-doc',
       'save-doc',
@@ -150,6 +151,15 @@
         executor: this.executor
       });
       this.subTracker.addDisposable(this.aceLocationHandler);
+
+      this.subTracker.subscribe(
+        ACTIVE_STATEMENT_CHANGED_EVENT,
+        (details: ActiveStatementChangedEventDetails) => {
+          if (this.id === details.id) {
+            this.$emit('active-statement-changed', details);
+          }
+        }
+      );
 
       const aceGutterHandler = new AceGutterHandler({
         editor: editor,

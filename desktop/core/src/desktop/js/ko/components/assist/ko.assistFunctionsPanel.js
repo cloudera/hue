@@ -25,7 +25,7 @@ import {
   getUdfCategories,
   UDF_DESCRIBED_EVENT
 } from 'sql/reference/sqlUdfRepository';
-import { CONFIG_REFRESHED_EVENT, filterEditorConnectors } from 'utils/hueConfig';
+import { CONFIG_REFRESHED_EVENT, filterEditorConnectors } from 'config/hueConfig';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';

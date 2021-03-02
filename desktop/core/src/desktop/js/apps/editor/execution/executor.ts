@@ -18,7 +18,7 @@ import Snippet from 'apps/editor/snippet';
 import Executable, { ExecutableRaw } from 'apps/editor/execution/executable';
 import { syncSqlExecutables } from 'apps/editor/execution/utils';
 import { StatementDetails } from 'parse/types';
-import { Compute, Connector, Namespace } from 'types/config';
+import { Compute, Connector, Namespace } from 'config/types';
 import { VariableIndex } from 'apps/editor/components/variableSubstitution/types';
 
 export interface ExecutorRaw {

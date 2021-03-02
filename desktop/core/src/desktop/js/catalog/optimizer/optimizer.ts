@@ -20,7 +20,7 @@ import { CancellablePromise } from 'api/cancellablePromise';
 import { OptimizerResponse } from 'catalog/dataCatalog';
 import { OptimizerMeta } from 'catalog/DataCatalogEntry';
 import { TopAggs, TopColumns, TopFilters, TopJoins } from 'catalog/MultiTableEntry';
-import { Connector } from 'types/config';
+import { Connector } from 'config/types';
 import { hueWindow } from 'types/types';
 
 export interface CompatibilityOptions {

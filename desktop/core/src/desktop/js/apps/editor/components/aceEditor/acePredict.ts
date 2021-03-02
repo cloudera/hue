@@ -16,7 +16,7 @@
 
 import { Ace } from 'ext/ace';
 import { Disposable } from 'components/utils/SubscriptionTracker';
-import { Connector } from 'types/config';
+import { Connector } from 'config/types';
 import { getOptimizer, PredictResponse } from 'catalog/optimizer/optimizer';
 import { CancellablePromise } from 'api/cancellablePromise';
 import { defer } from 'utils/hueUtils';

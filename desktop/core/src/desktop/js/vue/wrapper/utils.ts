@@ -33,11 +33,11 @@ export function callHooks(vm: ComponentPublicInstance | undefined, hook: string)
   }
 }
 
-export function createCustomEvent(name: string, args: unknown): CustomEvent {
+export function createCustomEvent(name: string, args: unknown[]): CustomEvent {
   return new CustomEvent(name, {
     bubbles: false,
     cancelable: false,
-    detail: args
+    detail: args.length === 1 ? args[0] : args
   });
 }
 
