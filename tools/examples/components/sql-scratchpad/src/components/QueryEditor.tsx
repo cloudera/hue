@@ -5,7 +5,7 @@ import 'gethue/lib/components/query-editor-components';
 import hiveSyntaxParser from 'gethue/lib/parsers/hiveSyntaxParser';
 import hiveAutocompleteParser from 'gethue/lib/parsers/hiveAutocompleteParser';
 import Executor from 'gethue/lib/execution/executor';
-import Executable from 'gethue/src/apps/editor/execution/executable';
+import SqlExecutable from 'gethue/src/apps/editor/execution/sqlExecutable';
 import { SetOptions, SqlReferenceProvider, UdfCategory } from 'gethue/src/sql/reference/types'
 import { ActiveStatementChangedEvent } from 'gethue/src/apps/editor/components/aceEditor/types';
 
@@ -42,10 +42,10 @@ interface QueryEditorElement extends HTMLElement {
 interface QueryEditorProps {
   executor: Executor;
   id?: string; // Set a unique ID to allow multiple query editors on one page
-  setActiveExecutable(executable: Executable): void;
+  setActiveExecutable(executable: SqlExecutable): void;
 }
 
-export const QueryEditor: FC<QueryEditorProps> = ({ executor, id, setActiveExecutable }) => {
+export const QueryEditor: FC<QueryEditorProps> = React.memo(({ executor, id, setActiveExecutable }) => {
   const nodeElement = document.createElement('query-editor') as QueryEditorElement;
   nodeElement.setAttribute('hue-base-url', 'http://localhost:8888');
   nodeElement.setAttribute('executor', '');
@@ -93,4 +93,4 @@ export const QueryEditor: FC<QueryEditorProps> = ({ executor, id, setActiveExecu
       }
     }
   />;
-}
+});

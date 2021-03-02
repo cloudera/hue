@@ -8,7 +8,7 @@ import { QueryEditor } from './QueryEditor';
 import { ExecuteActions } from './ExecuteActions';
 import { ExecuteProgress } from './ExecuteProgress';
 import { ResultTable } from './ResultTable';
-import Executable from 'gethue/src/apps/editor/execution/executable';
+import SqlExecutable from 'gethue/src/apps/editor/execution/sqlExecutable';
 
 const executor = new Executor({
   compute: (() => ({ id: 'default' })) as KnockoutObservable<any>,
@@ -22,7 +22,7 @@ const executor = new Executor({
 });
 
 export const SqlScratchpad: FC = () => {
-  const [activeExecutable, setActiveExecutable] = useState<Executable | undefined>(undefined);
+  const [activeExecutable, setActiveExecutable] = useState<SqlExecutable | undefined>(undefined);
 
   return <React.Fragment>
     <div className="ace-editor">
@@ -32,7 +32,7 @@ export const SqlScratchpad: FC = () => {
       <ExecuteProgress activeExecutable={activeExecutable}/>
     </div>
     <div className="executable-actions">
-      <ExecuteActions/>
+      <ExecuteActions activeExecutable={activeExecutable}/>
     </div>
     <div className="result-table">
       <ResultTable/>

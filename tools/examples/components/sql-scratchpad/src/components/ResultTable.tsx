@@ -1,17 +1,17 @@
 import React, { FC } from 'react';
 
 import 'gethue/lib/components/query-editor-components';
-import Executable from 'gethue/src/apps/editor/execution/executable';
+import SqlExecutable from 'gethue/src/apps/editor/execution/sqlExecutable';
 
 export interface ResultTableProps {
-  activeExecutable?: Executable
+  activeExecutable?: SqlExecutable
 }
 
 interface ResultTableElement extends HTMLElement {
-  executable?: Executable;
+  executable?: SqlExecutable;
 }
 
-export const ResultTable: FC<ResultTableProps> = ({ activeExecutable }) => {
+export const ResultTable: FC<ResultTableProps> = React.memo(({ activeExecutable }) => {
   const newNode = document.createElement('query-editor-result-table');
   newNode.setAttribute('executable', '');
   (newNode as ResultTableElement).executable = activeExecutable;
@@ -26,4 +26,4 @@ export const ResultTable: FC<ResultTableProps> = ({ activeExecutable }) => {
       }
     }
   />
-}
+})
