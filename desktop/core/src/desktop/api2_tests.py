@@ -726,6 +726,9 @@ class TestDocumentGist(object):
 
     assert_true(home_dir.children.filter(name='Gist').exists())
 
+    gist_dir2 = Directory.objects.create(name='Gist', owner=self.user, parent_directory=home_dir)
+    assert_raises(Directory.MultipleObjectsReturned, Document2.objects.get_gist_directory, self.user)
+
 
   def test_get_unfurl(self):
     # Unfurling on
