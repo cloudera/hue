@@ -22,24 +22,19 @@ import ExecutableProgressBar from './ExecutableProgressBar.vue';
 import ResultTable from './result/ResultTable.vue';
 import { wrap } from 'vue/webComponentWrap';
 
-const registerBaseUrl = (element: HTMLElement): void => {
-  const hueBaseUrl = element.getAttribute('hue-base-url');
-  if (hueBaseUrl) {
-    axios.defaults.baseURL = hueBaseUrl;
+wrap('query-editor', AceEditor);
+wrap('query-editor-actions', ExecutableActions);
+wrap('query-editor-progress-bar', ExecutableProgressBar);
+wrap('query-editor-result-table', ResultTable);
+
+export interface HueComponentConfig {
+  baseUrl?: string;
+}
+
+const configure = (config: HueComponentConfig): void => {
+  if (config.baseUrl) {
+    axios.defaults.baseURL = config.baseUrl;
   }
 };
 
-const components = [
-  { tag: 'query-editor', component: AceEditor },
-  { tag: 'query-editor-actions', component: ExecutableActions },
-  { tag: 'query-editor-progress-bar', component: ExecutableProgressBar },
-  { tag: 'query-editor-result-table', component: ResultTable }
-];
-
-components.forEach(({ tag, component }) => {
-  wrap(tag, component, {
-    connectedCallback() {
-      registerBaseUrl(this as HTMLElement);
-    }
-  });
-});
+export default { configure };
