@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { ComponentOptions, Component } from 'vue';
+import { ComponentOptions, Component, createApp, h } from 'vue';
 import wrapper, { WebComponentOptions } from './wrapper/index';
 
 export interface HueComponentOptions<T extends Component> extends ComponentOptions<T> {
@@ -31,7 +31,7 @@ export const wrap = <T extends Component>(
   options?: WebComponentOptions
 ): void => {
   if (!isRegistered(tag)) {
-    const customElement: CustomElementConstructor = wrapper(component, options);
+    const customElement: CustomElementConstructor = wrapper(component, createApp, h, options);
     window.customElements.define(tag, customElement);
   }
 };
