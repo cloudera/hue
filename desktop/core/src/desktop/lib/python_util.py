@@ -19,6 +19,7 @@ from builtins import object
 from six import string_types
 
 import datetime
+import logging
 import select
 import socket
 import sys
@@ -42,6 +43,8 @@ BOMS = (
 )
 
 __all__ = ['CaseInsensitiveDict', 'create_synchronous_io_multiplexer']
+
+LOG = logging.getLogger(__name__)
 
 
 class CaseInsensitiveDict(dict):
@@ -200,6 +203,49 @@ def isGB2312(data):
     return True
 
 
+def is_big5(data):
+  try:
+    data.decode('big5')
+  except UnicodeDecodeError:
+    return False
+  else:
+    return True
+
+
+def is_shift_jis(data):
+  try:
+    data.decode('shift-jis')
+  except UnicodeDecodeError:
+    return False
+  else:
+    return True
+
+
+def isEUCKR(data):
+  try:
+    data.decode('EUC-KR')
+  except UnicodeDecodeError:
+    return False
+  else:
+    return True
+
+
+def isISO8859_1(data):
+  try:
+    data.decode('iso-8859-1')
+  except UnicodeDecodeError:
+    return False
+  else:
+    return True
+
+def isCP1252(data):
+  try:
+    data.decode('cp1252')
+  except UnicodeDecodeError:
+    return False
+  else:
+    return True
+
 def isUTF8Strict(data):
   try:
     decoded = data.decode('UTF-8')
@@ -220,6 +266,7 @@ def check_encoding(data):
   """
   this is a simplified alternative to GPL chardet
   """
+  LOG.debug("checking data encoding: %s" % data)
   if isASCII(data):
     return 'ASCII'
   elif sys.version_info[0] == 2 and isUTF8(data):
@@ -230,8 +277,16 @@ def check_encoding(data):
     encoding = check_bom(data)
     if encoding:
       return encoding[0]
+    elif isEUCKR(data):
+      return 'EUC-KR'
     elif isGB2312(data):
       return 'gb2312'
+    elif is_big5(data):
+      return 'big5'
+    elif is_shift_jis(data):
+      return 'shift-jis'
+    elif isISO8859_1(data):
+      return 'iso-8859-1'
     else:
       return 'cp1252'
 
