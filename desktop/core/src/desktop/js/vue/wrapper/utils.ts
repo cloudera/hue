@@ -1,4 +1,4 @@
-import { ComponentPublicInstance, h, VNode } from 'vue';
+import { ComponentPublicInstance, VNode } from 'vue';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type KeyHash = { [key: string]: any };
@@ -65,18 +65,22 @@ export function convertAttributeValue(
   }
 }
 
-export function toVNodes(children: NodeListOf<ChildNode>): (VNode | null)[] {
+export function toVNodes(
+  children: NodeListOf<ChildNode>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  h: (name: string, data: any) => VNode
+): (VNode | null)[] {
   const res: (VNode | null)[] = [];
 
   for (let i = 0, l = children.length; i < l; i++) {
-    res.push(toVNode(children[i]));
+    res.push(toVNode(children[i], h));
   }
 
   return res;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function toVNode(node: any): VNode | null {
+function toVNode(node: any, h: (name: string, data: any) => VNode): VNode | null {
   if (node.nodeType === 3) {
     return node.data.trim() ? node.data : null;
   } else if (node.nodeType === 1) {
