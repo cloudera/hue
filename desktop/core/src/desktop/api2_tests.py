@@ -699,6 +699,29 @@ class TestDocumentGist(object):
         json.loads(Document2.objects.get(type='gist', uuid=gist2['uuid']).data)['statement_raw']
     )
 
+    # Create multiple gist directories and then make a new gist
+    home_dir = Directory.objects.get_home_directory(self.user)
+    gist_dir2 = Directory.objects.create(name='Gist', owner=self.user, parent_directory=home_dir)
+
+    assert_equal(2, Directory.objects.filter(name='Gist', type='directory').count())
+
+    response3 = self._create_gist(
+        statement='SELECT 3',
+        doc_type='hive-query',
+        name='test_gist_create3',
+    )
+    gist3 = json.loads(response3.content)
+
+    # Gist directories merged into one
+    assert_equal(1, Directory.objects.filter(name='Gist', type='directory').count())
+
+    assert_true(Document2.objects.filter(type='gist', name='test_gist_create3'))
+    assert_true(Document2.objects.filter(type='gist', uuid=gist3['uuid']))
+    assert_equal(
+        'SELECT 3',
+        json.loads(Document2.objects.get(type='gist', uuid=gist3['uuid']).data)['statement_raw']
+    )
+
 
   def test_get(self):
     response = self._create_gist(
@@ -725,9 +748,6 @@ class TestDocumentGist(object):
     Document2.objects.get_gist_directory(self.user)
 
     assert_true(home_dir.children.filter(name='Gist').exists())
-
-    gist_dir2 = Directory.objects.create(name='Gist', owner=self.user, parent_directory=home_dir)
-    assert_raises(Directory.MultipleObjectsReturned, Document2.objects.get_gist_directory, self.user)
 
 
   def test_get_unfurl(self):
