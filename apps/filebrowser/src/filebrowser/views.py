@@ -936,18 +936,18 @@ def _read_simple(fhandle, path, offset, length, stats):
 
 def detect_gzip(contents):
   '''This is a silly small function which checks to see if the file is Gzip'''
-  return contents[:2] == '\x1f\x8b'
+  return contents[:2] == b'\x1f\x8b'
 
 
 def detect_bz2(contents):
   '''This is a silly small function which checks to see if the file is Bz2'''
-  return contents[:3] == 'BZh'
+  return contents[:3] == b'BZh'
 
 
 def detect_avro(contents):
   '''This is a silly small function which checks to see if the file is Avro'''
   # Check if the first three bytes are 'O', 'b' and 'j'
-  return contents[:3] == '\x4F\x62\x6A'
+  return contents[:3] == b'\x4F\x62\x6A'
 
 
 def detect_snappy(contents):
