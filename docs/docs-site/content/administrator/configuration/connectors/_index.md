@@ -1135,7 +1135,7 @@ In the `[[interpreters]]` section:
     name=PySpark
     interface=livy
 
-    [[[sql]]]
+    [[[sparksql]]]
     name=SparkSql
     interface=livy
 
