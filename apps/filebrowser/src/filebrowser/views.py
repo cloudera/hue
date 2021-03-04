@@ -31,7 +31,6 @@ import urllib.request, urllib.error
 
 from bz2 import decompress
 from datetime import datetime
-from gzip import GzipFile
 
 from django.core.paginator import EmptyPage, Paginator, Page, InvalidPage
 from django.urls import reverse
@@ -83,6 +82,8 @@ if sys.version_info[0] > 2:
   from urllib.parse import unquote as urllib_unquote
   from urllib.parse import urlparse as lib_urlparse
   from builtins import str as new_str
+  from avro import datafile, io
+  from gzip import decompress as decompress_gzip
 else:
   from cStringIO import StringIO as string_io
   from urllib import quote as urllib_quote
@@ -91,6 +92,7 @@ else:
   new_str = unicode
   import parquet
   from avro import datafile, io
+  from gzip import GzipFile
 
 
 DEFAULT_CHUNK_SIZE_BYTES = 1024 * 4 # 4KB
@@ -725,11 +727,24 @@ def display(request, path):
   # Get contents as string for text mode, or at least try
   uni_contents = None
   if not mode or mode == 'text':
-    uni_contents = new_str(contents, encoding, errors='replace')
-    is_binary = uni_contents.find(i18n.REPLACEMENT_CHAR) != -1
-    # Auto-detect mode
-    if not mode:
-      mode = is_binary and 'binary' or 'text'
+    if sys.version_info[0] > 2:
+      if not isinstance(contents, str):
+        uni_contents = new_str(contents, encoding, errors='replace')
+        is_binary = uni_contents.find(i18n.REPLACEMENT_CHAR) != -1
+        # Auto-detect mode
+        if not mode:
+            mode = is_binary and 'binary' or 'text'
+      else:
+        # We already have a string.
+        uni_contents = contents
+        is_binary = False
+        mode = 'text'
+    else:
+      uni_contents = new_str(contents, encoding, errors='replace')
+      is_binary = uni_contents.find(i18n.REPLACEMENT_CHAR) != -1
+      # Auto-detect mode
+      if not mode:
+          mode = is_binary and 'binary' or 'text'
 
   # Get contents as bytes
   if mode == "binary":
@@ -906,7 +921,10 @@ def _read_gzip(fhandle, path, offset, length, stats):
   if offset and offset != 0:
     raise PopupException(_("Offsets are not supported with Gzip compression."))
   try:
-    contents = GzipFile('', 'r', 0, string_io(fhandle.read())).read(length)
+      if sys.version_info[0] > 2:
+        contents = decompress_gzip(fhandle.read())
+      else:
+        contents = GzipFile('', 'r', 0, string_io(fhandle.read())).read(length)
   except Exception as e:
     logging.exception('Could not decompress file at "%s": %s' % (path, e))
     raise PopupException(_("Failed to decompress file."))
@@ -936,18 +954,27 @@ def _read_simple(fhandle, path, offset, length, stats):
 
 def detect_gzip(contents):
   '''This is a silly small function which checks to see if the file is Gzip'''
-  return contents[:2] == b'\x1f\x8b'
+  if sys.version_info[0] > 2:
+    return contents[:2] == b'\x1f\x8b'
+  else:
+    return contents[:2] == '\x1f\x8b' 
 
 
 def detect_bz2(contents):
   '''This is a silly small function which checks to see if the file is Bz2'''
-  return contents[:3] == b'BZh'
+  if sys.version_info[0] > 2:
+    return contents[:3] == b'BZh'
+  else:
+    return contents[:3] == 'BZh'
 
 
 def detect_avro(contents):
   '''This is a silly small function which checks to see if the file is Avro'''
   # Check if the first three bytes are 'O', 'b' and 'j'
-  return contents[:3] == b'\x4F\x62\x6A'
+  if sys.version_info[0] > 2:
+    return contents[:3] == b'\x4F\x62\x6A'
+  else:
+    return contents[:3] == '\x4F\x62\x6A'
 
 
 def detect_snappy(contents):
