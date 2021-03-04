@@ -21,8 +21,8 @@
 
 import {
   Component,
-  h,
-  createApp,
+  CreateAppFunction,
+  ConcreteComponent,
   App,
   ComponentPublicInstance,
   VNode,
@@ -51,6 +51,8 @@ export interface WebComponentOptions {
  */
 export default function wrap(
   component: Component,
+  createApp: CreateAppFunction<Element>,
+  h: <P>(type: ConcreteComponent<P> | string, props?: KeyHash, children?: () => unknown) => VNode,
   options?: WebComponentOptions
 ): CustomElementConstructor {
   const componentObj: ComponentOptionsWithObjectProps = <ComponentOptionsWithObjectProps>component;
@@ -176,7 +178,7 @@ export default function wrap(
     }
 
     syncSlots(): void {
-      this._slotChildren = toVNodes(this.childNodes);
+      this._slotChildren = toVNodes(this.childNodes, h);
       this._component?.$forceUpdate();
     }
 

@@ -123,4 +123,25 @@ const parserConfig = Object.assign({}, defaultConfig, {
   }
 });
 
-module.exports = [libConfig, webComponentsConfig, parserConfig];
+const WRAPPER_DIR = `${__dirname}/tools/vue3-webcomponent-wrapper`;
+const vue3WebCompWrapperConfig = Object.assign({}, defaultConfig, {
+  entry: {
+    index: [`${JS_ROOT}/vue/wrapper/index.ts`]
+  },
+  output: {
+    path: `${WRAPPER_DIR}/dist`,
+    library: '[name]',
+    libraryExport: 'default',
+    libraryTarget: 'umd',
+    umdNamedDefine: true,
+    globalObject: `(typeof self !== 'undefined' ? self : this)`
+  },
+  plugins: [
+    new CleanWebpackPlugin([`${WRAPPER_DIR}/src`, `${WRAPPER_DIR}/dist`]),
+    new CopyWebpackPlugin({
+      patterns: [{ from: `${JS_ROOT}/vue/wrapper/`, to: `${WRAPPER_DIR}/src` }]
+    })
+  ]
+});
+
+module.exports = [libConfig, webComponentsConfig, parserConfig, vue3WebCompWrapperConfig];
