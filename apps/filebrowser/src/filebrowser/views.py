@@ -921,10 +921,10 @@ def _read_gzip(fhandle, path, offset, length, stats):
   if offset and offset != 0:
     raise PopupException(_("Offsets are not supported with Gzip compression."))
   try:
-      if sys.version_info[0] > 2:
-        contents = decompress_gzip(fhandle.read())
-      else:
-        contents = GzipFile('', 'r', 0, string_io(fhandle.read())).read(length)
+    if sys.version_info[0] > 2:
+      contents = decompress_gzip(fhandle.read())
+    else:
+      contents = GzipFile('', 'r', 0, string_io(fhandle.read())).read(length)
   except Exception as e:
     logging.exception('Could not decompress file at "%s": %s' % (path, e))
     raise PopupException(_("Failed to decompress file."))
