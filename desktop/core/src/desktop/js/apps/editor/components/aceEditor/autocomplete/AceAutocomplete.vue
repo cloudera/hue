@@ -158,14 +158,7 @@
     setup(props) {
       const subTracker = new SubscriptionTracker();
 
-      const autocompleter = new SqlAutocompleter({
-        editorId: props.editorId,
-        executor: props.executor,
-        editor: props.editor,
-        temporaryOnly: props.temporaryOnly,
-        autocompleteParser: props.autocompleteParser,
-        sqlReferenceProvider: props.sqlReferenceProvider
-      });
+      const autocompleter = new SqlAutocompleter(props);
 
       const autocompleteResults = autocompleter.autocompleteResults;
 
