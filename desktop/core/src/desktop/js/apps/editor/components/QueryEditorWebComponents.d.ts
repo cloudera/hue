@@ -14,12 +14,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import Executor, { ExecutorOptions } from '../execution/executor';
+
 export interface HueComponentConfig {
   baseUrl?: string;
 }
 
 declare const _default: {
   configure: (config: HueComponentConfig) => void;
+  createExecutor: (options: ExecutorOptions) => Executor;
 };
 
 export default _default;
