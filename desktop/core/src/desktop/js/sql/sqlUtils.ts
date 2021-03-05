@@ -26,6 +26,7 @@ import {
   Suggestion
 } from 'apps/editor/components/aceEditor/autocomplete/AutocompleteResults';
 import { Compute, Connector, Namespace } from 'config/types';
+import { SqlReferenceProvider } from './reference/types';
 
 const identifierEquals = (a?: string, b?: string): boolean =>
   !!a &&
@@ -260,15 +261,19 @@ export const resolveCatalogEntry = (options: {
 
 export default {
   autocompleteFilter: autocompleteFilter,
-  backTickIfNeeded: async (connector: Connector, identifier: string): Promise<string> => {
+  backTickIfNeeded: async (
+    connector: Connector,
+    identifier: string,
+    sqlReferenceProvider?: SqlReferenceProvider
+  ): Promise<string> => {
     const quoteChar =
       (connector.dialect_properties && connector.dialect_properties.sql_identifier_quote) || '`';
     if (identifier.indexOf(quoteChar) === 0) {
       return identifier;
     }
-    const reservedKeywords = await sqlReferenceRepository.getReservedKeywords(
-      connector.dialect || 'generic'
-    );
+    const reservedKeywords = await (
+      sqlReferenceProvider || sqlReferenceRepository
+    ).getReservedKeywords(connector.dialect || 'generic');
     if (reservedKeywords.has(identifier.toUpperCase())) {
       return quoteChar + identifier + quoteChar;
     }
