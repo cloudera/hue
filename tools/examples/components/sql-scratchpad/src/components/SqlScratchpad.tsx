@@ -71,7 +71,7 @@ export class SqlScratchpad extends React.Component<{}, SqlScratchpadState> {
           <ExecuteActions activeExecutable={this.state.activeExecutable}/>
         </div>
         <div className="result-table">
-          <ResultTable/>
+          <ResultTable activeExecutable={this.state.activeExecutable}/>
         </div>
       </React.Fragment>
     } else {
