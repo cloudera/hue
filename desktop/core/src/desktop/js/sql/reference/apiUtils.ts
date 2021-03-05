@@ -14,8 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { simplePostAsync } from 'api/apiUtils';
-import { AUTOCOMPLETE_API_PREFIX, DESCRIBE_API_PREFIX } from 'api/urls';
+import { post } from 'api/utils';
+import { AUTOCOMPLETE_API_PREFIX } from 'api/urls';
 import { UdfArgument, UdfDetails } from 'sql/reference/types';
 import { Connector } from 'config/types';
 import I18n from 'utils/i18n';
@@ -156,8 +156,10 @@ export const fetchUdfs = async (
   const data = createRequestData(connector, FUNCTIONS_OPERATION);
 
   try {
-    const response = await simplePostAsync(url, data, { silenceErrors: silenceErrors });
-    if (response && response.functions) {
+    const response = await post<{ functions?: ApiUdf[] }>(url, data, {
+      silenceErrors: silenceErrors
+    });
+    if (response?.functions) {
       return adaptApiFunctions(response.functions);
     }
   } catch (err) {}
@@ -174,8 +176,8 @@ export const fetchDescribe = async (
   const data = createRequestData(connector, FUNCTION_OPERATION);
 
   try {
-    const response = await simplePostAsync(url, data, { silenceErrors: silenceErrors });
-    if (response && response.function) {
+    const response = await post<{ function?: ApiUdf }>(url, data, { silenceErrors: silenceErrors });
+    if (response?.function) {
       return response.function;
     }
   } catch (err) {}
