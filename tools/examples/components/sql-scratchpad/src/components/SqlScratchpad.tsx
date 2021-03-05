@@ -39,14 +39,14 @@ export class SqlScratchpad extends React.Component<{}, SqlScratchpadState> {
       const connector = hueConfig.findEditorConnector(() => true); // Returns the first connector
 
       this.setState({
-        executor: new Executor({
+        executor: hueComponents.createExecutor({
           compute: (() => ({ id: 'default' })) as KnockoutObservable<any>,
           connector: (() => connector) as KnockoutObservable<any>,
           database: (() => 'default') as KnockoutObservable<any>,
           namespace: (() => ({ id: 'default' })) as KnockoutObservable<any>,
         })
       })
-    }).catch(err => {
+    }).catch(() => {
       console.warn('Failed loading the Hue config')
     })
   }
