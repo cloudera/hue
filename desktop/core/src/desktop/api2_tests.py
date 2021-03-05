@@ -713,9 +713,10 @@ class TestDocumentGist(object):
       doc_type='hive-query',
       name='test_gist_create',
     )
+    gist_parent_dir = Document2.objects.get(type='gist', name='test_gist_create').parent_directory
 
     assert_equal(1, Directory.objects.filter(name=Document2.GIST_DIR, type='directory').count())
-    assert_equal(Document2.GIST_DIR, Document2.objects.get(type='gist', name='test_gist_create').parent_directory.name)
+    assert_true(Directory.objects.filter(name=Document2.GIST_DIR, type='directory', uuid=gist_parent_dir.uuid).exists())
 
 
   def test_get(self):
