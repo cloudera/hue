@@ -20,6 +20,8 @@ import AceEditor from './aceEditor/AceEditor.vue';
 import ExecutableActions from './ExecutableActions.vue';
 import ExecutableProgressBar from './ExecutableProgressBar.vue';
 import ResultTable from './result/ResultTable.vue';
+import Executor, { ExecutorOptions } from '../execution/executor';
+import 'utils/json.bigDataParse';
 import { wrap } from 'vue/webComponentWrap';
 
 wrap('query-editor', AceEditor);
@@ -37,4 +39,6 @@ const configure = (config: HueComponentConfig): void => {
   }
 };
 
-export default { configure };
+const createExecutor = (options: ExecutorOptions): Executor => new Executor(options);
+
+export default { configure, createExecutor };
