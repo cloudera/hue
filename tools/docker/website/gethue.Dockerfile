@@ -12,8 +12,8 @@ RUN wget https://github.com/gohugoio/hugo/releases/download/v0.62.0/hugo_0.62.0_
   && rm hugo*.deb \
   && pip install Pygments
 
+# Need from root to get Git history for last date modified of posts
 ADD . /gethue
-#ADD docs/gethue /gethue
 WORKDIR /gethue
 
 RUN hugo --source docs/gethue --baseURL ""
