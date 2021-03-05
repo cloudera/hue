@@ -148,7 +148,8 @@
       this.aceLocationHandler = new AceLocationHandler({
         editor: editor,
         editorId: this.id,
-        executor: this.executor
+        executor: this.executor,
+        sqlReferenceProvider: this.sqlReferenceProvider
       });
       this.subTracker.addDisposable(this.aceLocationHandler);
 
