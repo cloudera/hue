@@ -150,13 +150,13 @@
 
     mounted(): void {
       this.subTracker.subscribe(EXECUTABLE_UPDATED_EVENT, (executable: Executable) => {
-        if (this.executable.id === executable.id) {
+        if (this.executable && this.executable.id === executable.id) {
           this.updateFromExecutable(executable);
         }
       });
 
       this.subTracker.subscribe(RESULT_UPDATED_EVENT, (executionResult: ExecutionResult) => {
-        if (this.executable.id === executionResult.executable.id) {
+        if (this.executable && this.executable.id === executionResult.executable.id) {
           this.handleResultChange();
         }
       });

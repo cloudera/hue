@@ -2,7 +2,7 @@
 
 Vue 3 wrapper to convert a Vue component into Web Component. It supports reactive attributes, events & slots.
 
-This is a port of [@vuejs/vue-web-component-wrapper](https://github.com/vuejs/vue-web-component-wrapper) (Official Vue 2 web component wrapper package) to work with Vue 3. And must be deprecated once the official wrapper package  starts supporting Vue 3. Progress of Vue3 support is tracked in this [issue.](https://github.com/vuejs/vue-web-component-wrapper/issues/93)
+This is a port of [@vuejs/vue-web-component-wrapper](https://github.com/vuejs/vue-web-component-wrapper) (Official Vue 2 web component wrapper package) to work with Vue 3. And could be deprecated once the official wrapper package  starts supporting Vue 3. Progress of Vue3 support is tracked in this [issue.](https://github.com/vuejs/vue-web-component-wrapper/issues/93)
 
 One main blocker preventing the official wrapper from upgrading was the lack of shadow-root CSS injection in Vue 3 build tooling. As we could live without a shadow dom in Hue this was not an issue and this port was created.
 

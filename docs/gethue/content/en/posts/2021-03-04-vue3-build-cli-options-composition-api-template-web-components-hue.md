@@ -40,7 +40,7 @@ ampforwp-amp-on-off:
   - default
 categories:
   - Version 4.10
-  - Release
+  - API
 
 ---
 
