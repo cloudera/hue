@@ -1,7 +1,5 @@
 import React, { FC } from 'react';
 
-import 'gethue/lib/components/query-editor-components';
-
 import hiveSyntaxParser from 'gethue/lib/parsers/hiveSyntaxParser';
 import hiveAutocompleteParser from 'gethue/lib/parsers/hiveAutocompleteParser';
 import Executor from 'gethue/lib/execution/executor';

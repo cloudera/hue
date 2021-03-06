@@ -1,6 +1,5 @@
 import React, { FC } from 'react';
 
-import 'gethue/lib/components/query-editor-components';
 import SqlExecutable from 'gethue/src/apps/editor/execution/sqlExecutable';
 
 export interface ExecuteActionsProps {
