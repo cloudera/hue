@@ -22,7 +22,7 @@ import componentUtils from 'ko/components/componentUtils';
 import dataCatalog from 'catalog/dataCatalog';
 import huePubSub from 'utils/huePubSub';
 import { TEMPLATE, AssistantUtils } from 'ko/components/assist/ko.assistEditorContextPanel';
-import { findDashboardConnector } from 'utils/hueConfig';
+import { findDashboardConnector } from 'config/hueConfig';
 
 class AssistDashboardPanel {
   constructor() {

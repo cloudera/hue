@@ -18,11 +18,22 @@ import Snippet from 'apps/editor/snippet';
 import Executable, { ExecutableRaw } from 'apps/editor/execution/executable';
 import { syncSqlExecutables } from 'apps/editor/execution/utils';
 import { StatementDetails } from 'parse/types';
-import { Compute, Connector, Namespace } from 'types/config';
+import { Compute, Connector, Namespace } from 'config/types';
 import { VariableIndex } from 'apps/editor/components/variableSubstitution/types';
 
 export interface ExecutorRaw {
   executables: ExecutableRaw[];
+}
+
+export interface ExecutorOptions {
+  connector: KnockoutObservable<Connector>;
+  compute: KnockoutObservable<Compute>;
+  namespace: KnockoutObservable<Namespace>;
+  database: KnockoutObservable<string>;
+  defaultLimit?: KnockoutObservable<number>;
+  isSqlEngine?: boolean;
+  snippet?: Snippet;
+  isOptimizerEnabled?: boolean;
 }
 
 export default class Executor {
@@ -38,16 +49,7 @@ export default class Executor {
   activeExecutable?: Executable;
   variables: VariableIndex = {};
 
-  constructor(options: {
-    connector: KnockoutObservable<Connector>;
-    compute: KnockoutObservable<Compute>;
-    namespace: KnockoutObservable<Namespace>;
-    database: KnockoutObservable<string>;
-    defaultLimit?: KnockoutObservable<number>;
-    isSqlEngine?: boolean;
-    snippet?: Snippet;
-    isOptimizerEnabled?: boolean;
-  }) {
+  constructor(options: ExecutorOptions) {
     this.connector = options.connector;
     this.compute = options.compute;
     this.namespace = options.namespace;

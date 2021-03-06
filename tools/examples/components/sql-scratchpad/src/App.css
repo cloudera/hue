@@ -1,18 +1,22 @@
 .app {
   height: 100%;
-  background-color: #282c34;
-  text-align: center;
+  background-color: #ccc;
   display: flex;
   flex-direction: column;
 }
 
 .app > .app-header {
   flex: 0 0 32px;
-  background-color: #282c34;
+  background-color: #ccc;
   align-items: center;
+  text-align: center;
   justify-content: center;
   font-size: 25px;
-  color: white;
+  color: #282c34;
+}
+
+.inline-block {
+  display: inline-block;
 }
 
 .app > .ace-editor {
@@ -36,12 +40,15 @@
 
 .app > .executable-progress-bar {
   flex: 1;
+  padding: 5px;
 }
 
 .app > .executable-actions {
   flex: 1;
+  padding: 5px;
 }
 
 .app > .result-table {
   flex: 0 1 50%;
+  padding: 5px;
 }

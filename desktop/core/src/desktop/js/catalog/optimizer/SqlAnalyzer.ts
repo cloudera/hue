@@ -35,7 +35,7 @@ import {
 
 import dataCatalog, { OptimizerResponse } from 'catalog/dataCatalog';
 import sqlParserRepository from 'parse/sql/sqlParserRepository';
-import { Connector, Namespace } from 'types/config';
+import { Connector, Namespace } from 'config/types';
 import { hueWindow } from 'types/types';
 import I18n from 'utils/i18n';
 

@@ -169,7 +169,6 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
 
     'django.middleware.http.ConditionalGetMiddleware',
-    #@TODO@ Prakash to check FailedLoginMiddleware working or not?
     #'axes.middleware.FailedLoginMiddleware',
     'desktop.middleware.MimeTypeJSFileFixStreamingMiddleware',
     'crequest.middleware.CrequestMiddleware',
@@ -359,6 +358,7 @@ EMAIL_SUBJECT_PREFIX = 'Hue %s - ' % desktop.conf.CLUSTER_ID.get()
 if desktop.conf.CORS_ENABLED.get():
   INSTALLED_APPS.append('corsheaders')
   MIDDLEWARE.append('corsheaders.middleware.CorsMiddleware')
+  MIDDLEWARE.remove('django.middleware.csrf.CsrfViewMiddleware')
   CORS_ALLOW_ALL_ORIGINS = True
 
 # Configure database

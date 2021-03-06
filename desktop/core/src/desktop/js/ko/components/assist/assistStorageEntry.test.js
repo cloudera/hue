@@ -17,7 +17,7 @@
 import $ from 'jquery';
 
 import AssistStorageEntry from './assistStorageEntry';
-import * as hueConfig from 'utils/hueConfig';
+import * as hueConfig from 'config/hueConfig';
 
 describe('assistStorageEntry.js', () => {
   it('it should handle domain in ADLS/ABFS', () => {

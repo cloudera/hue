@@ -351,6 +351,12 @@ class LoginAndPermissionMiddleware(MiddlewareMixin):
           log_page_hit(request, view_func, level=access_log_level)
         return None
 
+    if desktop.conf.CORS_ENABLED.get():
+      user = authenticate(request, username='hue', password='hue')
+      if user is not None:
+        login(request, user)
+        return None
+
     logging.info("Redirecting to login page: %s", request.get_full_path())
     access_log(request, 'login redirection', level=access_log_level)
     no_idle_backends = (

@@ -39,7 +39,7 @@ import {
   filterEditorConnectors,
   findDashboardConnector,
   findEditorConnector
-} from 'utils/hueConfig';
+} from 'config/hueConfig';
 import I18n from 'utils/i18n';
 import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
 

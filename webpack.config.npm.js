@@ -23,6 +23,7 @@ const { VueLoaderPlugin } = require('vue-loader');
 
 const DIST_DIR = path.join(__dirname, 'npm_dist');
 const JS_ROOT = path.join(__dirname, '/desktop/core/src/desktop/js');
+const WRAPPER_DIR = `${__dirname}/tools/vue3-webcomponent-wrapper`;
 
 const defaultConfig = Object.assign({}, require('./webpack.config'), {
   mode: 'production',
@@ -32,7 +33,7 @@ const defaultConfig = Object.assign({}, require('./webpack.config'), {
   plugins: []
 });
 
-const libConfig = Object.assign({}, defaultConfig, {
+const executorLibConfig = Object.assign({}, defaultConfig, {
   entry: {
     executor: [`${JS_ROOT}/apps/editor/execution/executor.ts`]
   },
@@ -60,15 +61,52 @@ const libConfig = Object.assign({}, defaultConfig, {
   ]
 });
 
-const webComponentsConfig = Object.assign({}, defaultConfig, {
+const hueConfigLibConfig = Object.assign({}, defaultConfig, {
   entry: {
-    'er-diagram': [`${JS_ROOT}/components/er-diagram/webcomp.ts`],
-    'query-editor-components': [`${JS_ROOT}/apps/editor/components/QueryEditorWebComponent.ts`]
+    hueConfig: [`${JS_ROOT}/config/hueConfig.ts`]
   },
   output: {
-    path: `${DIST_DIR}/lib/components`
+    path: `${DIST_DIR}/lib/config`,
+    library: '[name]',
+    libraryExport: 'default',
+    libraryTarget: 'umd',
+    umdNamedDefine: true,
+    globalObject: `(typeof self !== 'undefined' ? self : this)`
   },
-  plugins: [new VueLoaderPlugin()]
+  plugins: [
+    new CopyWebpackPlugin({
+      patterns: [
+        {
+          from: `${JS_ROOT}/config/hueConfig.d.ts`,
+          to: `${DIST_DIR}/lib/config`
+        }
+      ]
+    })
+  ]
+});
+
+const webComponentsConfig = Object.assign({}, defaultConfig, {
+  entry: {
+    ErDiagram: [`${JS_ROOT}/components/er-diagram/webcomp.ts`],
+    QueryEditorWebComponents: [`${JS_ROOT}/apps/editor/components/QueryEditorWebComponents.ts`]
+  },
+  output: {
+    path: `${DIST_DIR}/lib/components`,
+    library: '[name]',
+    libraryExport: 'default',
+    libraryTarget: 'umd'
+  },
+  plugins: [
+    new VueLoaderPlugin(),
+    new CopyWebpackPlugin({
+      patterns: [
+        {
+          from: `${JS_ROOT}/apps/editor/components/QueryEditorWebComponents.d.ts`,
+          to: `${DIST_DIR}/lib/components`
+        }
+      ]
+    })
+  ]
 });
 
 const parserConfig = Object.assign({}, defaultConfig, {
@@ -123,4 +161,30 @@ const parserConfig = Object.assign({}, defaultConfig, {
   }
 });
 
-module.exports = [libConfig, webComponentsConfig, parserConfig];
+const vue3WebCompWrapperConfig = Object.assign({}, defaultConfig, {
+  entry: {
+    index: [`${JS_ROOT}/vue/wrapper/index.ts`]
+  },
+  output: {
+    path: `${WRAPPER_DIR}/dist`,
+    library: '[name]',
+    libraryExport: 'default',
+    libraryTarget: 'umd',
+    umdNamedDefine: true,
+    globalObject: `(typeof self !== 'undefined' ? self : this)`
+  },
+  plugins: [
+    new CleanWebpackPlugin([`${WRAPPER_DIR}/src`, `${WRAPPER_DIR}/dist`]),
+    new CopyWebpackPlugin({
+      patterns: [{ from: `${JS_ROOT}/vue/wrapper/`, to: `${WRAPPER_DIR}/src` }]
+    })
+  ]
+});
+
+module.exports = [
+  executorLibConfig,
+  hueConfigLibConfig,
+  webComponentsConfig,
+  parserConfig,
+  vue3WebCompWrapperConfig
+];

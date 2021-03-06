@@ -14,8 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { simplePostAsync } from 'api/apiUtils';
-import { FETCH_CONFIG_API } from 'api/urls';
+import { post } from 'api/utils';
 import {
   AppType,
   BrowserInterpreter,
@@ -23,8 +22,10 @@ import {
   EditorInterpreter,
   HueConfig,
   Interpreter
-} from 'types/config';
+} from './types';
 import huePubSub from 'utils/huePubSub';
+
+const FETCH_CONFIG_API = '/desktop/api2/get_config/';
 
 export const REFRESH_CONFIG_EVENT = 'cluster.config.refresh.config';
 export const CONFIG_REFRESHED_EVENT = 'cluster.config.set.config';
@@ -33,13 +34,11 @@ export const GET_KNOWN_CONFIG_EVENT = 'cluster.config.get.config';
 let lastConfigPromise: Promise<HueConfig> | undefined;
 let lastKnownConfig: HueConfig | undefined;
 
-const fetchConfig = async (): Promise<HueConfig> =>
-  await simplePostAsync(FETCH_CONFIG_API, {}, { silenceErrors: true });
-
-export const refreshConfig = async (): Promise<HueConfig> => {
+export const refreshConfig = async (hueBaseUrl?: string): Promise<HueConfig> => {
   lastConfigPromise = new Promise<HueConfig>(async (resolve, reject) => {
     try {
-      const apiResponse = await fetchConfig();
+      const url = hueBaseUrl ? hueBaseUrl + FETCH_CONFIG_API : FETCH_CONFIG_API;
+      const apiResponse = await post<HueConfig>(url, {}, { silenceErrors: true });
       if (apiResponse.status == 0) {
         lastKnownConfig = apiResponse;
         resolve(lastKnownConfig);
@@ -127,3 +126,13 @@ huePubSub.subscribe(GET_KNOWN_CONFIG_EVENT, (callback?: (appConfig: HueConfig) =
     lastConfigPromise.then(callback).catch(callback);
   }
 });
+
+export default {
+  refreshConfig,
+  getInterpreters,
+  getLastKnownConfig,
+  getRootFilePath,
+  findBrowserConnector,
+  findDashboardConnector,
+  findEditorConnector
+};

@@ -21,7 +21,7 @@ import { ASSIST_DOC_HIGHLIGHT_EVENT, ASSIST_SHOW_DOC_EVENT } from './events';
 import { DOCUMENT_TYPES } from 'doc/docSupport';
 import HueFileEntry from 'doc/hueFileEntry';
 import componentUtils from 'ko/components/componentUtils';
-import { CONFIG_REFRESHED_EVENT, getLastKnownConfig } from 'utils/hueConfig';
+import { CONFIG_REFRESHED_EVENT, getLastKnownConfig } from 'config/hueConfig';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';

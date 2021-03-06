@@ -27,7 +27,7 @@ import sqlUtils from 'sql/sqlUtils';
 import { matchesType } from 'sql/reference/typeUtils';
 import { DIALECT } from 'apps/editor/snippet';
 import { cancelActiveRequest } from 'api/apiUtils';
-import { findBrowserConnector, getRootFilePath } from 'utils/hueConfig';
+import { findBrowserConnector, getRootFilePath } from 'config/hueConfig';
 import {
   findUdf,
   getArgumentDetailsForUdf,

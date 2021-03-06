@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import { UdfArgument } from 'sql/reference/types';
-import { Connector } from 'types/config';
+import { Connector } from 'config/types';
 import { getArgumentDetailsForUdf } from './sqlUdfRepository';
 import sqlReferenceRepository from './sqlReferenceRepository';
 import * as apiUtils from 'sql/reference/apiUtils';
