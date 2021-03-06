@@ -26,6 +26,10 @@ from desktop.lib.django_util import login_notrequired, JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.models import Document2, _get_gist_document
 
+from notebook.api import _fetch_result_data, _check_status
+from notebook.models import MockRequest
+from useradmin.models import UserProfile, User
+
 from django.http import HttpResponse
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt
@@ -109,7 +113,16 @@ def handle_on_link_shared(channel_id, message_ts, links):
     statement = doc_data['snippets'][0]['statement_raw'] if id_type == 'editor' else doc_data['statement_raw']
     dialect = doc_data['dialect'].capitalize() if id_type == 'editor' else doc.extra.capitalize()
     created_by = doc.owner.get_full_name() or doc.owner.username
-    
+
+    user = User.objects.get(username=doc.owner.username)
+    request = MockRequest(user=user)
+
+    status = _check_status(request, notebook=doc_data, snippet=doc_data['snippets'][0], operation_id=doc_data['uuid'])
+
+    if status['query_status']['status'] == 'available':
+      result = _fetch_result_data(request, notebook=doc_data, snippet=doc_data['snippets'][0], operation_id=doc_data['uuid'])
+
+
     payload = _make_unfurl_payload(item['url'], statement, dialect, created_by)
     response = slack_client.chat_unfurl(channel=channel_id, ts=message_ts, unfurls=payload)
     if not response['ok']:
