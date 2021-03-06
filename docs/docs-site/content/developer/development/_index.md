@@ -961,11 +961,11 @@ And then to build the static site just do:
 
 and grab the `public` directory.
 
-### Blog & Website
+### gethue.com Blog & Website
 
 Like for the [Documentation](#documentation-1) install hugo. The content for each language is in its [own directory](https://github.com/cloudera/hue/tree/master/docs/gethue/content).
 
-Blog posts are located in [docs/gethue/content/en/posts](https://github.com/cloudera/hue/tree/master/docs/gethue/content/en/posts).
+Blog posts are located in [docs/gethue/content/en/posts](https://github.com/cloudera/hue/tree/master/docs/gethue/content/en/posts). Here is an example of the source of a [release post](https://github.com/cloudera/hue/commit/fcc0078a4ba59e450a2e081ad0cc27e482a8703b#diff-9b1261f162231be68d3c30329e73b458c874858c0d685cf0c213fdace3309679).
 
 Build it and see live changes:
 
@@ -974,6 +974,8 @@ Build it and see live changes:
     hugo serve
 
 Will automatically start one server for each language domain.
+
+gethue.com refresh is currently manually kicked but this will be automated soon.
 
 ### SQL Autocomplete
 

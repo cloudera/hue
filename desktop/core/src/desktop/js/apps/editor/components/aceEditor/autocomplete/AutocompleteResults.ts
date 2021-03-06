@@ -598,7 +598,11 @@ class AutocompleteResults {
           databaseSuggestions.push({
             value:
               prefix +
-              (await sqlUtils.backTickIfNeeded(this.executor.connector(), name)) +
+              (await sqlUtils.backTickIfNeeded(
+                this.executor.connector(),
+                name,
+                this.sqlReferenceProvider
+              )) +
               (suggestDatabases.appendDot ? '.' : ''),
             filterValue: name,
             meta: MetaLabels.Database,
@@ -664,7 +668,13 @@ class AutocompleteResults {
           }
           const name = tableEntry.name;
           tableSuggestions.push({
-            value: prefix + (await sqlUtils.backTickIfNeeded(this.executor.connector(), name)),
+            value:
+              prefix +
+              (await sqlUtils.backTickIfNeeded(
+                this.executor.connector(),
+                name,
+                this.sqlReferenceProvider
+              )),
             filterValue: name,
             tableName: name,
             meta: tableEntry.isView() ? MetaLabels.View : MetaLabels.Table,
@@ -793,7 +803,11 @@ class AutocompleteResults {
       const type = column.type && column.type !== 'COLREF' ? column.type : 'T';
       if (column.alias) {
         columnSuggestions.push({
-          value: await sqlUtils.backTickIfNeeded(this.executor.connector(), column.alias),
+          value: await sqlUtils.backTickIfNeeded(
+            this.executor.connector(),
+            column.alias,
+            this.sqlReferenceProvider
+          ),
           filterValue: column.alias,
           meta: type,
           category: Category.Column,
@@ -809,7 +823,8 @@ class AutocompleteResults {
         columnSuggestions.push({
           value: await sqlUtils.backTickIfNeeded(
             this.executor.connector(),
-            column.identifierChain[column.identifierChain.length - 1].name
+            column.identifierChain[column.identifierChain.length - 1].name,
+            this.sqlReferenceProvider
           ),
           filterValue: column.identifierChain[column.identifierChain.length - 1].name,
           meta: type,
@@ -840,7 +855,11 @@ class AutocompleteResults {
             typeof column.type !== 'undefined' && column.type !== 'COLREF' ? column.type : 'T';
           if (column.alias) {
             columnSuggestions.push({
-              value: await sqlUtils.backTickIfNeeded(connector, column.alias),
+              value: await sqlUtils.backTickIfNeeded(
+                connector,
+                column.alias,
+                this.sqlReferenceProvider
+              ),
               filterValue: column.alias,
               meta: type,
               category: Category.Column,
@@ -852,7 +871,8 @@ class AutocompleteResults {
             columnSuggestions.push({
               value: await sqlUtils.backTickIfNeeded(
                 connector,
-                column.identifierChain[column.identifierChain.length - 1].name
+                column.identifierChain[column.identifierChain.length - 1].name,
+                this.sqlReferenceProvider
               ),
               filterValue: column.identifierChain[column.identifierChain.length - 1].name,
               meta: type,
@@ -920,7 +940,11 @@ class AutocompleteResults {
         });
 
         for (const childEntry of childEntries) {
-          let name = await sqlUtils.backTickIfNeeded(this.executor.connector(), childEntry.name);
+          let name = await sqlUtils.backTickIfNeeded(
+            this.executor.connector(),
+            childEntry.name,
+            this.sqlReferenceProvider
+          );
           if (this.dialect() === HIVE_DIALECT && (childEntry.isArray() || childEntry.isMap())) {
             name += '[]';
           }

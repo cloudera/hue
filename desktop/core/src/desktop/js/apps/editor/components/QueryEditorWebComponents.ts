@@ -20,26 +20,25 @@ import AceEditor from './aceEditor/AceEditor.vue';
 import ExecutableActions from './ExecutableActions.vue';
 import ExecutableProgressBar from './ExecutableProgressBar.vue';
 import ResultTable from './result/ResultTable.vue';
+import Executor, { ExecutorOptions } from '../execution/executor';
+import 'utils/json.bigDataParse';
 import { wrap } from 'vue/webComponentWrap';
 
-const registerBaseUrl = (element: HTMLElement): void => {
-  const hueBaseUrl = element.getAttribute('hue-base-url');
-  if (hueBaseUrl) {
-    axios.defaults.baseURL = hueBaseUrl;
+wrap('query-editor', AceEditor);
+wrap('query-editor-actions', ExecutableActions);
+wrap('query-editor-progress-bar', ExecutableProgressBar);
+wrap('query-editor-result-table', ResultTable);
+
+export interface HueComponentConfig {
+  baseUrl?: string;
+}
+
+const configure = (config: HueComponentConfig): void => {
+  if (config.baseUrl) {
+    axios.defaults.baseURL = config.baseUrl;
   }
 };
 
-const components = [
-  { tag: 'query-editor', component: AceEditor },
-  { tag: 'query-editor-actions', component: ExecutableActions },
-  { tag: 'query-editor-progress-bar', component: ExecutableProgressBar },
-  { tag: 'query-editor-result-table', component: ResultTable }
-];
+const createExecutor = (options: ExecutorOptions): Executor => new Executor(options);
 
-components.forEach(({ tag, component }) => {
-  wrap(tag, component, {
-    connectedCallback() {
-      registerBaseUrl(this as HTMLElement);
-    }
-  });
-});
+export default { configure, createExecutor };
