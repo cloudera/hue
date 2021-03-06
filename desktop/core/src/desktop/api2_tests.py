@@ -708,15 +708,17 @@ class TestDocumentGist(object):
 
     assert_equal(2, Directory.objects.filter(name=Document2.GIST_DIR, type='directory').count())
 
+    # get_gist_directory merges all duplicate gist directories into one
     response = self._create_gist(
       statement='SELECT 12345',
       doc_type='hive-query',
       name='test_gist_create',
     )
-    gist_parent_dir = Document2.objects.get(type='gist', name='test_gist_create').parent_directory
+    gist_uuid = json.loads(response.content)['uuid']
+    gist_parent_uuid = Document2.objects.get(uuid=gist_uuid).parent_directory.uuid
 
     assert_equal(1, Directory.objects.filter(name=Document2.GIST_DIR, type='directory').count())
-    assert_true(Directory.objects.filter(name=Document2.GIST_DIR, type='directory', uuid=gist_parent_dir.uuid).exists())
+    assert_true(Directory.objects.filter(name=Document2.GIST_DIR, type='directory', uuid=gist_parent_uuid).exists())
 
 
   def test_get(self):
