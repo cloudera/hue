@@ -44,6 +44,7 @@ import {
   POST_TO_SYNTAX_WORKER_EVENT
 } from 'sql/sqlWorkerHandler';
 import { getFromLocalStorage } from 'utils/storageUtils';
+import { SqlReferenceProvider } from '../../../../sql/reference/types';
 
 export const REFRESH_STATEMENT_LOCATIONS_EVENT = 'editor.refresh.statement.locations';
 export const ACTIVE_STATEMENT_CHANGED_EVENT = 'editor.active.statement.changed';
@@ -108,6 +109,7 @@ export default class AceLocationHandler implements Disposable {
   updateTimeout = -1;
   cursorChangePaused = false;
   sqlSyntaxWorkerSub?: HueSubscription;
+  sqlReferenceProvider?: SqlReferenceProvider;
 
   activeStatement: ParsedSqlStatement | undefined;
   lastKnownStatements = {
@@ -120,11 +122,13 @@ export default class AceLocationHandler implements Disposable {
     editorId: string;
     executor: Executor;
     temporaryOnly?: boolean;
+    sqlReferenceProvider?: SqlReferenceProvider;
   }) {
     this.editor = options.editor;
     this.editorId = options.editorId;
     this.executor = options.executor;
     this.temporaryOnly = !!options.temporaryOnly;
+    this.sqlReferenceProvider = options.sqlReferenceProvider;
 
     this.attachStatementLocator();
     this.attachSqlWorker();
@@ -1141,7 +1145,11 @@ export default class AceLocationHandler implements Disposable {
               const uniqueValues: IdentifierChainEntry[] = [];
               for (let i = 0; i < possibleValues.length; i++) {
                 const entry = <IdentifierChainEntry>possibleValues[i];
-                entry.name = await sqlUtils.backTickIfNeeded(this.executor.connector(), entry.name);
+                entry.name = await sqlUtils.backTickIfNeeded(
+                  this.executor.connector(),
+                  entry.name,
+                  this.sqlReferenceProvider
+                );
                 const nameLower = entry.name.toLowerCase();
                 if (
                   nameLower === tokenValLower ||
