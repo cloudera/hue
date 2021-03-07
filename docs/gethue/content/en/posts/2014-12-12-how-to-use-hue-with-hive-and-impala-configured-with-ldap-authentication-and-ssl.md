@@ -37,7 +37,6 @@ sf_remove_promo_bar:
 slide_template:
   - default
 categories:
-  - Administration
 
 ---
 We previously showed in detail how to use [SSL encryption][1] with the Impala or Hive Editors. Here is now a step by step guide about how to use LDAP authentication instead of no authentication or Kerberos.

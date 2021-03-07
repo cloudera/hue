@@ -37,7 +37,6 @@ sf_remove_promo_bar:
 slide_template:
   - default
 categories:
-  - Administration
 
 ---
 If after installing your cluster and submitting some Oozie jobs you are seeing this type of error:

@@ -41,7 +41,6 @@ slide_template:
 sf_page_title_image:
   - 222
 categories:
-  - Administration
   - Development
 
 ---

@@ -37,7 +37,6 @@ sf_thumbnail_type:
 ampforwp-amp-on-off:
   - default
 categories:
-  - Administration
   - Development
 
 ---
