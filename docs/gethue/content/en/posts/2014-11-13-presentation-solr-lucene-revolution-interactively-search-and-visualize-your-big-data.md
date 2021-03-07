@@ -37,7 +37,7 @@ sf_remove_promo_bar:
 slide_template:
   - default
 categories:
-  - News
+#  - News
 
 ---
 [Interactively Search and Visualize Your Big Data][1]

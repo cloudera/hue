@@ -37,7 +37,7 @@ sf_remove_promo_bar:
 slide_template:
   - default
 categories:
-  - News
+#  - News
 
 ---
 This talk describes how Hue can be integrated with existing Hadoop deployments with minimal changes/disturbances. Enrico covers details on how Hue can leverage the existing authentication system and security model of your company.

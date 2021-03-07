@@ -36,7 +36,7 @@ sf_remove_promo_bar:
   - 1
 categories:
   - Dev / API
-  - News
+#  - News
 
 ---
 Hello potential Hue developers! 🙂

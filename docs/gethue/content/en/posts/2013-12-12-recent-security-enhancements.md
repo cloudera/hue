@@ -37,7 +37,7 @@ sf_right_sidebar:
 sf_caption_position:
   - caption-right
 categories:
-  - News
+#  - News
 
 ---
 <p id="docs-internal-guid-4e51c4c8-e826-f763-73a0-2427956de77d">

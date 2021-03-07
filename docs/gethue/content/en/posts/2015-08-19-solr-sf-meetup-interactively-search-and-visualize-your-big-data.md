@@ -35,7 +35,7 @@ sf_caption_position:
 sf_remove_promo_bar:
   - 1
 categories:
-  - News
+#  - News
 
 ---
 ## [Interactively Search and Visualize Your Big Data: Solr SF Meetup][1]
