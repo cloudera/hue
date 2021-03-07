@@ -40,7 +40,6 @@ ampforwp-amp-on-off:
   - default
 categories:
   - Browsing
-  - Querying
   - Version 4
 
 ---

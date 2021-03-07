@@ -39,7 +39,6 @@ sf_caption_position:
 slide_template:
   - default
 categories:
-  - Querying
 ---
 
 <p id="docs-internal-guid-0ab02ef5-c3a4-c1fe-509c-31f69bf4beb7">

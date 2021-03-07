@@ -36,7 +36,6 @@ sf_remove_promo_bar:
   - 1
 categories:
   - Development
-  - Querying
 
 ---
 <span style="font-weight: 400;">Livy is an </span>[<span style="font-weight: 400;">open source REST interface</span>][1] <span style="font-weight: 400;">for using Spark from anywhere.</span>

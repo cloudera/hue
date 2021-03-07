@@ -36,7 +36,6 @@ slide_template:
   - default
 categories:
   - Administration
-  - Querying
 ---
 
 <p dir="ltr" id="docs-internal-guid-10fc66ac-2e20-af75-4d45-3e31a62fe3d3">

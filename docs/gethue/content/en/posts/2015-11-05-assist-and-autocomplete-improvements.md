@@ -35,7 +35,6 @@ sf_detail_type:
 sf_thumbnail_link_type:
   - link_to_post
 categories:
-  - Querying
   - Browsing
 ---
 

@@ -38,7 +38,6 @@ ampforwp-amp-on-off:
   - default
 categories:
   - Administration
-  - Querying
 ---
 
 The [Solr Search App][1] is having a great success and users often wonder if they could use it without the Hadoop related apps. As the app is only using the standard Apache Solr REST API and Hue allows to customize which apps to show, the answer is yes!

@@ -36,7 +36,6 @@ slide_template:
   - default
 categories:
   - Administration
-  - Querying
 ---
 
 Hue provides an [interface][1] for [Impala][2], the next generation SQL engine for Hadoop. In order to offer even more performances, Hue can distribute the query load across all of the Impala workers.

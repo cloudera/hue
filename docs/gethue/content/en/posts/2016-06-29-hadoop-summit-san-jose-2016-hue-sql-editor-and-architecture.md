@@ -38,7 +38,6 @@ sf_remove_promo_bar:
   - 1
 categories:
   - News
-  - Querying
 
 ---
 Presentation of the new SQL Editor.

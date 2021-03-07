@@ -36,7 +36,6 @@ sf_remove_promo_bar:
   - 1
 categories:
   - News
-  - Querying
 
 ---
 # [Apache Spark Lightning Night - New York][1]

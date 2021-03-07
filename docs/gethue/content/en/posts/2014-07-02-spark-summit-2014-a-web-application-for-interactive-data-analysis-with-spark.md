@@ -38,7 +38,6 @@ slide_template:
   - default
 categories:
   - News
-  - Querying
 
 ---
 ## <span style="color: #ff0000;"><em>Note:</em> <em>This post is deprecated as of Hue 3.8 / April 24th 2015</em>. Hue now have a new <a style="color: #ff0000;" href="https://gethue.com/new-notebook-application-for-spark-sql/" target="_blank" rel="noopener noreferrer">Spark Notebook</a> application.</span>

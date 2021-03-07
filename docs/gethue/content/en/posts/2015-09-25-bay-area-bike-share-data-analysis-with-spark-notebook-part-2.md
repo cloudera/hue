@@ -36,7 +36,6 @@ sf_remove_promo_bar:
   - 1
 categories:
   - Browsing
-  - Querying
 
 ---
 [In a previous post][1], we demonstrated how to use Hue's Search app to seamlessly index and visualize trip data from Bay Area Bike Share and use Spark to supplement that analysis by adding weather data to our dashboard.

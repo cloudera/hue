@@ -37,7 +37,6 @@ sf_remove_promo_bar:
 slide_template:
   - default
 categories:
-  - Querying
 ---
 
 Hue (3.6 or upcoming CDH5.1) ships with a dynamic dashboard builder for search. We presented the new interface in the previous <a href="https://gethue.com/hadoop-search-dynamic-search-dashboards-with-solr/" target="_blank" rel="noopener noreferrer">Search episode</a>.

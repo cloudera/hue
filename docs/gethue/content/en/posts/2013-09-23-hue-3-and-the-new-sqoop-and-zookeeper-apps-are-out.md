@@ -41,7 +41,6 @@ slide_template:
 categories:
   - Browsing
   - Release
-  - Querying
 
 ---
 ## Hi Big Data Surfers,

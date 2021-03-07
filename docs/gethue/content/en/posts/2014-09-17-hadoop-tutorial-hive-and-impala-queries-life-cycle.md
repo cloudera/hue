@@ -38,7 +38,6 @@ slide_template:
   - default
 categories:
   - Administration
-  - Querying
 
 ---
 <span style="color: #ff0000;"><em>Last update March 29th 2017</em></span>
