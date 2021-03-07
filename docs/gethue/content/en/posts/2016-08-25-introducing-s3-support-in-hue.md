@@ -36,7 +36,6 @@ sf_remove_promo_bar:
   - 1
 categories:
   - Browsing
-  - Querying
 ---
 
 <p class="p1">

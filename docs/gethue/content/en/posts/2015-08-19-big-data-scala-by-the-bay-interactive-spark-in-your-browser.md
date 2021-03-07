@@ -36,7 +36,6 @@ sf_remove_promo_bar:
   - 1
 categories:
   - News
-  - Querying
 
 ---
 ## [Interactive Spark in your Browser - Scala by the Bay][1]

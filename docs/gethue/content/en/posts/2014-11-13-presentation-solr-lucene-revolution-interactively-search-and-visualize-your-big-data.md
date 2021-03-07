@@ -38,7 +38,6 @@ slide_template:
   - default
 categories:
   - News
-  - Querying
 
 ---
 [Interactively Search and Visualize Your Big Data][1]

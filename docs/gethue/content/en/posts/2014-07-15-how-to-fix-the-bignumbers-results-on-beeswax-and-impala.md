@@ -36,7 +36,6 @@ slide_template:
   - default
 categories:
   - Administration
-  - Querying
   - Development
 
 ---

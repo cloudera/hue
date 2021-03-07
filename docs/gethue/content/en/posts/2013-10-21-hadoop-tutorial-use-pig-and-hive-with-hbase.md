@@ -38,7 +38,6 @@ sf_caption_position:
   - caption-right
 categories:
   - Browsing
-  - Querying
   - Tutorial
 ---
 

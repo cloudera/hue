@@ -37,7 +37,6 @@ slide_template:
 categories:
   - Administration
   - Browsing
-  - Querying
 
 ---
 Hi Data Crunchers,

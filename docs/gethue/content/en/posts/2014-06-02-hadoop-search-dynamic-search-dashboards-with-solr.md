@@ -37,7 +37,6 @@ sf_remove_promo_bar:
 slide_template:
   - default
 categories:
-  - Querying
 ---
 
 [Hue 3.6][1] and a team retreat in [Curacao][2] bring the second version of the previous [Search App][3] to some higher standards. The user experience has been greatly improved as now the app provides a very easy way to build custom dashboards and visualizations.

@@ -38,7 +38,6 @@ slide_template:
   - default
 categories:
   - Administration
-  - Querying
 
 ---
 This blog post details how to use Kerberos and Sentry in the Hue [Search Application][1]. If you only want to use Kerberos, just skip the paragraphs about Sentry.

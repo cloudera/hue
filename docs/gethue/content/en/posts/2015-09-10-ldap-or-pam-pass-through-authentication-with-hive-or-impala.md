@@ -36,7 +36,6 @@ sf_remove_promo_bar:
   - 1
 categories:
   - Administration
-  - Querying
 
 ---
 Hue is a server between users logged in their browsers and the respective Hadoop services. Consequently, Hue is seen as a single 'hue' user by the other servers.

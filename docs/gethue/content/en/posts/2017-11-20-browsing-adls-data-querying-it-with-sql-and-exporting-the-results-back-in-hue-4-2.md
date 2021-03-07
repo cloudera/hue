@@ -34,7 +34,6 @@ sf_caption_position:
   - caption-right
 categories:
   - Browsing
-  - Querying
   - Version 4
 ---
 

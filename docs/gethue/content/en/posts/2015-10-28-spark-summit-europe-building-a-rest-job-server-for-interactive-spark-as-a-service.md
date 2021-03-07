@@ -36,7 +36,6 @@ sf_remove_promo_bar:
   - 1
 categories:
   - News
-  - Querying
 
 ---
 # [Building a REST Job Server for interactive Spark as a service][1]

@@ -36,7 +36,6 @@ sf_remove_promo_bar:
   - 1
 categories:
   - News
-  - Querying
 
 ---
 ## Solr Search with Spark for Big Data Analytics in Action with Hue - [Big Data Day LA 2015][1]

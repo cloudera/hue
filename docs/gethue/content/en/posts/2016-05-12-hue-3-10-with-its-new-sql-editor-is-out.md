@@ -38,7 +38,6 @@ sf_thumbnail_type:
   - none
 categories:
   - Release
-  - Querying
 
 ---
 Hi Big Data Aficionados,

@@ -43,7 +43,6 @@ use_ampforwp_page_builder:
 amp-page-builder:
   - '{"rows":[],"totalrows":"1","totalmodules":"1","settingdata":{"front_class":"","front_css":""}}'
 categories:
-  - Querying
   - Version 4
 
 ---

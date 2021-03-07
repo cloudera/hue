@@ -37,7 +37,6 @@ ampforwp-amp-on-off:
 categories:
   - Administration
   - Browsing
-  - Querying
   - Version 4
 
 ---

@@ -40,7 +40,6 @@ slide_template:
   - default
 categories:
   - Administration
-  - Querying
 
 ---
 In the Hue versions before [3][1], Hue is sometimes getting slow and “stuck”. To fix this problem, it is recommended to switch Hue to use the CherryPy server instead of Spawning. In the [hue.ini][2] or the Hue Safety Valve in CM, enter:

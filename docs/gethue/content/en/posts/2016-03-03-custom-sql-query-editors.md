@@ -35,7 +35,6 @@ sf_right_sidebar:
 sf_left_sidebar:
   - Sidebar-2
 categories:
-  - Querying
 
 ---
 In the latest Hue available in the [master][1] branch, we're excited to offer a preview of our entirely revamped and redesigned query editors for Hive and Impala.  These query editors will be officially available in the next major Hue 3.10 release.
