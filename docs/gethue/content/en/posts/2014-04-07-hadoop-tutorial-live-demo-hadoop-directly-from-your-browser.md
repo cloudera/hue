@@ -36,7 +36,6 @@ slide_template:
   - default
 categories:
   - Administration
-  - Browsing
 
 ---
 Hi Data Crunchers,

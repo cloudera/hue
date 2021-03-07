@@ -41,7 +41,6 @@ sf_caption_position:
 sf_right_sidebar:
   - Sidebar-1
 categories:
-  - Browsing
   - Version 4
 
 ---

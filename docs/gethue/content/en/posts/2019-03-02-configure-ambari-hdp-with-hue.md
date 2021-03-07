@@ -42,7 +42,6 @@ ampforwp-amp-on-off:
   - default
 categories:
   - Administration
-  - Browsing
   - Version 4
 
 ---
