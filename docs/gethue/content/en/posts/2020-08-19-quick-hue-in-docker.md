@@ -42,7 +42,8 @@ sf_remove_promo_bar:
   - 1
 categories:
   - Administration
-  - Version 4.8
+  - Version 4
+#  - Version 4.8
 tags:
   - cloud
   - container

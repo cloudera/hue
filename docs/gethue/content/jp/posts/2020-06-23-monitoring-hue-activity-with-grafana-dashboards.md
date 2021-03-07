@@ -38,7 +38,8 @@ ampforwp-amp-on-off:
   - default
 categories:
   - Administration
-  - Version 4.8
+  - Version 4
+#  - Version 4.8
 
 ---
 
@@ -57,4 +58,3 @@ Home ダッシュボードを開くと、CPU、メモリ、アクティブユー
 フィードバックやご質問はありますか？何かあれば気軽に [Forum](https://discourse.gethue.com/) や [quick start](https://docs.gethue.com/quickstart/) までコメントください。Live SQL querying!
 
 Ying Chen from the Hue Team
-

@@ -38,7 +38,8 @@ ampforwp-amp-on-off:
   - default
 categories:
   - Administration
-  - Version 4.8
+  - Version 4
+#  - Version 4.8
 
 ---
 Hello, Hue administrators,
@@ -111,4 +112,3 @@ Any feedback or questions? Feel free to comment here or on the [Forum](https://d
 [@gethue](https://twitter.com/gethue) and [quick start](https://docs.gethue.com/quickstart/) SQL querying!
 
 Weixia Xu from the Hue Team
-

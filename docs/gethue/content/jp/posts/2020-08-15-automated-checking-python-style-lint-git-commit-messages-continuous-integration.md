@@ -38,7 +38,8 @@ ampforwp-amp-on-off:
   - default
 categories:
   - Administration
-  - Version 4.8
+  - Version 4
+#  - Version 4.8
 
 ---
 
@@ -46,7 +47,7 @@ categories:
 
 継続的インテグレーション (CI) と自動化への投資は、Hue プロジェクトのリソースと品質を拡大を支援するために続けられています。この1年では次のような大きな改善が見られました。
 
-* [Circle CI](https://circleci.com/gh/cloudera/hue) によって自動的に実行される[コミットフロー](https://gethue.com/improving-the-developer-productivity-with-some-continuous-integration/) 
+* [Circle CI](https://circleci.com/gh/cloudera/hue) によって自動的に実行される[コミットフロー](https://gethue.com/improving-the-developer-productivity-with-some-continuous-integration/)
 * gethue.com と demo.gethue.com ウェブサイトの[リンクのチェック](https://gethue.com/checking-dead-links-automatically-continuous-integration/)
 * JavaScript のスタイルとアーティファクトの[ライセンスチェック](/automated-checking-javascript-licenses-absolute-paths-continuous-integration/)
 
