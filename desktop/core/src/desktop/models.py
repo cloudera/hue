@@ -1076,11 +1076,14 @@ class Document2Manager(models.Manager, Document2QueryMixin):
     except Directory.MultipleObjectsReturned:
       LOG.exception('Multiple Gist directories detected. Merging all into one.')
 
-      gist_dir = self.filter(owner=user, parent_directory=home_dir, name=Document2.GIST_DIR, type='directory').latest('-last_modified')
-      gist_dirs = self.filter(owner=user, parent_directory=home_dir, name=Document2.GIST_DIR, type='directory').exclude(uuid=gist_dir.uuid)
-      for dir in gist_dirs:
+      all_gist_dirs = self.filter(owner=user, parent_directory=home_dir, name=Document2.GIST_DIR, type='directory').order_by('-last_modified')
+      gist_dir = all_gist_dirs.last()
+      gist_dirs_dup = all_gist_dirs.exclude(uuid=gist_dir.uuid)
+
+      for dir in gist_dirs_dup:
         dir.children.exclude(name='.Trash').update(parent_directory=gist_dir)
-        dir.delete()
+
+      gist_dirs_dup.delete()
 
     return gist_dir
 
