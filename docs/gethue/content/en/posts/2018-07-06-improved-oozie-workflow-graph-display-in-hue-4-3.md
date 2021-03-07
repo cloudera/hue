@@ -41,7 +41,6 @@ ampforwp-amp-on-off:
 categories:
   - Browsing
   - Version 4
-  - Scheduling
 
 ---
 <span style="font-weight: 400;">Hello Job Scheduler/Oozie users,</span>

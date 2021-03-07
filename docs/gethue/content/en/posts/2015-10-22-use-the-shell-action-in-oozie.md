@@ -35,7 +35,6 @@ sf_caption_position:
 ampforwp-amp-on-off:
   - default
 categories:
-  - Scheduling
 
 ---
 The following steps will successfully guide you to execute a Shell Action form [Oozie Editor][1].
