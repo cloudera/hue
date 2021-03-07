@@ -39,7 +39,6 @@ sf_caption_position:
 slide_template:
   - default
 categories:
-  - Administration
 
 ---
 _Last updated on July 9th 2015_
@@ -64,7 +63,7 @@ This blog post details the various features and capabilities available in Hue fo
 
 [Synchronizing users and groups][7]
 
-  1. [Attributes synchronized][8] 
+  1. [Attributes synchronized][8]
   2. [Useradmin interface][9]
   3. [Command line interface][10]
 
@@ -103,21 +102,21 @@ When authenticating via LDAP, Hue validates login credentials against a director
 &nbsp;
 
 <pre><code class="bash">'desktop]
-   
+
 [[auth]]
-   
+
 backend=desktop.auth.backend.LdapBackend
-  
+
 </code></pre>
 
 The LDAP authentication backend will automatically create users that don’t exist in Hue by default. Hue needs to import users in order to properly perform the authentication. The password is never imported when importing users. The following configuration can be used to disable automatic import:
 
 <pre><code class="bash">'desktop]
-    
+
 [[ldap]]
-    
+
 create_users_on_login=false
-  
+
 </code></pre>
 
 The purpose of disabling the automatic import is to only allow to login a predefined list of manually imported users.
@@ -157,11 +156,11 @@ If ‘nt_domain’ is provided, then Hue will use a UPN to bind to the LDAP serv
 &nbsp;
 
 <pre><code class="bash">'desktop]
-    
+
 [[ldap]]
-    
+
 nt_domain=example.com
-  
+
 </code></pre>
 
 Otherwise, the ‘ldap_username_pattern’ configuration is used (the <username> parameter will be replaced with the username provided at login):
@@ -169,11 +168,11 @@ Otherwise, the ‘ldap_username_pattern’ configuration is used (the <username>
 &nbsp;
 
 <pre><code class="bash">'desktop]
-      
+
 [[ldap]]
-      
+
 ldap_username_pattern="uid=<username>,ou=People,DC=hue-search,DC=ent,DC=cloudera,DC=com"
-  
+
 </code></pre>
 
 Typical attributes to search for include:
@@ -190,11 +189,11 @@ To enable direct bind authentication, the ‘search_bind_authentication’ confi
 &nbsp;
 
 <pre><code class="bash">'desktop]
-      
+
 [[ldap]]
-      
+
 search_bind_authentication=false
-  
+
 </code></pre>
 
 # 2.    Importing users {#t4}
@@ -235,13 +234,13 @@ Users and groups can be synchronized with the directory service via the Useradmi
 The groups of a user can be synced when he logs in (to keep its permission in sync):
 
 <pre><code class="bash">'desktop]
-    
+
 [[ldap]]
-    
+
 \# Synchronize a users groups when they login
-    
+
 \## sync_groups_on_login=false
-  
+
 </code></pre>
 
 ## 4.1.    Attributes synchronized {#t7}
@@ -270,19 +269,19 @@ There are two configurations for restricting the search process:
 Here is an example configuration:
 
 <pre><code class="bash">'desktop]
-      
+
 [[ldap]]
-      
+
 [[[users]]]
-      
+
 user_filter=”objectClass=*”
-      
+
 user_name_attr=uid
 
 \# Whether or not to follow referrals
-      
+
 \## follow_referrals=false
-  
+
 </code></pre>
 
 With the above configuration, the LDAP search filter will take on the form:
@@ -296,13 +295,13 @@ Hue can be configured to ignore the case of usernames as well as force usernames
 [desktop]
 
 <pre><code class="bash">'desktop]
-      
+
 [[ldap]]
-      
+
 ignore_username_case=true
-      
+
 force_username_lowercase=true
-  
+
 </code></pre>
 
 # 7.    LDAPS/StartTLS support {#t12}
@@ -310,21 +309,21 @@ force_username_lowercase=true
 Secure communication with LDAP is provided via the SSL/TLS and StartTLS protocols. It allows Hue to validate the directory service it’s going to converse with. Practically speaking, if a Certificate Authority Certificate file is provided, Hue will communicate via LDAPS:
 
 <pre><code class="bash">'desktop]
-      
+
 [[ldap]]
-      
+
 ldap_cert=/etc/hue/ca.crt
-  
+
 </code></pre>
 
 The StartTLS protocol can be used as well (step up to SSL/TLS):
 
 <pre><code class="bash">'desktop]
-      
+
 [[ldap]]
-      
+
 use_start_tls=true
-  
+
 </code></pre>
 
 &nbsp;
@@ -334,21 +333,21 @@ use_start_tls=true
 Get more information when querying LDAP and use the ldapsearch tool:
 
 <pre><code class="bash">'desktop]
-      
+
 [[ldap]]
-      
+
 debug=true
 
 \# Sets the debug level within the underlying LDAP C lib.
-      
+
 \## debug_level=255
 
 \# Possible values for trace_level are 0 for no logging, 1 for only logging the method calls with arguments,
-      
+
 \# 2 for logging the method calls with arguments and the complete results and 9 for also logging the traceback of method calls.
-      
+
 trace_level=0
-  
+
 </code></pre>
 
 **Note**
@@ -356,7 +355,7 @@ trace_level=0
 Make sure to add to the Hue server environment:
 
 <pre><code class="bash">DESKTOP_DEBUG=true
-  
+
 DEBUG=true</code></pre>
 
 &nbsp;
@@ -364,7 +363,7 @@ DEBUG=true</code></pre>
 # 9.    Notes {#t13}
 
   1. Setting “search_bind_authentication=true” in the hue.ini will tell Hue to perform an LDAP search using the bind credentials specified in the hue.ini (bind_dn, bind_password). Hue will then search using the base DN specified in “base_dn” for an entry with the attribute, defined in “user_name_attr”, with the value of the short name provided in the login page. The search filter, defined in “user_filter” will also be used to limit the search. Hue will search the entire subtree starting from the base DN.
-  2. Setting  ”search_bind_authentication=false” in the hue.ini will tell Hue to perform a direct bind to LDAP using the credentials provided (not bind_dn and bind_password specified in the hue.ini). There are two effective modes here: 
+  2. Setting  ”search_bind_authentication=false” in the hue.ini will tell Hue to perform a direct bind to LDAP using the credentials provided (not bind_dn and bind_password specified in the hue.ini). There are two effective modes here:
       1. nt_domain is specified in the hue.ini: This is used to connect to an Active Directory directory service. In this case, the UPN (User Principal Name) is used to perform a direct bind. Hue forms the UPN by concatenating the short name provided at login and the nt_domain like so: “<short name>@<nt_domain>”. The ‘ldap_username_pattern’ config is completely ignore.
       2. nt_domain is NOT specified in the hue.ini: This is used to connect to all other directory services (can even handle Active Directory, but nt_domain is the preferred way for AD). In this case, ‘ldap_username_pattern’ is used and it should take on the form “cn=<username>,dc=example,dc=com” where <username> will be replaced with whatever is provided at the login page.
   3. The UserAdmin app will always perform an LDAP search when manage LDAP entries and will then always use the “bind_dn”, “bind_password”, “base_dn”, etc. as defined in the hue.ini.

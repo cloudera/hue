@@ -33,7 +33,7 @@ sf_right_sidebar:
 sf_caption_position:
   - caption-right
 categories:
-  - Development
+  - Dev / API
 
 ---
 # Need for Speed!

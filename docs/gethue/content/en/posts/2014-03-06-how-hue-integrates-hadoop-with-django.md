@@ -40,7 +40,7 @@ slide_template:
   - default
 categories:
   - News
-  - Development
+  - Dev / API
 
 ---
 <div>

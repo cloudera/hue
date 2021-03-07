@@ -37,7 +37,6 @@ sf_right_sidebar:
 sf_caption_position:
   - caption-right
 categories:
-  - Administration
 
 ---
 Hello HUE admin,
@@ -51,41 +50,41 @@ This document describes some of the fixes and enables Hue administrators to enf
 The new Content-Security-Policy HTTP response header helps you reduce XSS risks on modern browsers by declaring what dynamic resources are allowed to load via a HTTP Header. (Read more here: <https://content-security-policy.com/>)
 
 <pre><code class="bash">
-  
+
 [desktop]
-  
+
 secure_content_security_policy="script-src 'self' 'unsafe-inline' 'unsafe-eval' \*.google-analytics.com \*.doubleclick.net \*.mathjax.org data:;img-src 'self' \*.google-analytics.com \*.doubleclick.net http://\*.tile.osm.org \*.tile.osm.org \*.gstatic.com data:;style-src 'self' 'unsafe-inline';connect-src 'self';child-src 'self' data:;object-src 'none'"
-  
+
 #In HUE 3.11 and higher it is enabled by default.
-  
+
 </code></pre>
 
 If you want to turn off content-security-policy header then use following value. <span style="color: #ff0000;">(Beware use it on your own risk)</span>
 
 <pre><code class="bash">
-  
+
 [desktop]
-  
+
 secure_content_security_policy=""
-  
+
 #(Beware use it on your own risk)
-  
+
 </code></pre>
 
 If you want to disable declaring what dynamic resources are allowed to load via a HTTP Header then you can use following value. <span style="color: #ff0000;">(Use it on your own risk)</span>
 
 <pre><code class="bash">
-  
+
 [desktop]
-  
+
 secure_content_security_policy="default-src 'self' 'unsafe-eval' 'unsafe-inline' data: *;"
-  
+
 #(Use it on your own risk)
-  
+
 </code></pre>
 
 [<img src="https://cdn.gethue.com/uploads/2016/09/block-content-1024x400.png" />
-  
+
 ][1] Example of image content blocked
 
 ### Server: header
@@ -93,27 +92,27 @@ secure_content_security_policy="default-src 'self' 'unsafe-eval' 'unsafe-inline'
 HUE now minimizes disclosure of web server information to minimize insight about web server it's version or other details. No change is needed from end user. Produces following HTTP response header :
 
 <pre><code class="bash">
-  
+
 Server:apache
-  
+
 </code></pre>
 
 ### These HTTP response headers are generated after above security fixes.
 
 <pre><code class="bash">
-  
+
 x-content-type-options:nosniff
-  
+
 X-Frame-Options:SAMEORIGIN
-  
+
 x-xss-protection:1; mode=block
-  
+
 Content-Security-Policy:script-src 'self' 'unsafe-inline' 'unsafe-eval' \*.google-analytics.com \*.doubleclick.net \*.mathjax.org data:;img-src 'self' \*.google-analytics.com \*.doubleclick.net http://\*.tile.osm.org *.tile.osm.org data:;style-src 'self' 'unsafe-inline';connect-src 'self';child-src 'self' data:;object-src 'none'
-  
+
 Strict-Transport-Security:max-age=31536000; includeSubDomains
-  
+
 Server:apache
-  
+
 </code></pre>
 
 ### X-Content-Type-Options: header
@@ -121,13 +120,13 @@ Server:apache
 Some browsers will try to guess the content types of the assets that they fetch, overriding the Content-Type header. To prevent the browser from guessing the content type, and force it to always use the type provided in the Content-Type header, you can pass the X-Content-Type-Options: nosniff header.
 
 <pre><code class="bash">
-  
+
 [desktop]
-  
+
 secure_content_type_nosniff=true
-  
+
 #In HUE 3.11 and higher it is enabled by default.
-  
+
 </code></pre>
 
 ### X-XSS-Protection: header
@@ -135,17 +134,17 @@ secure_content_type_nosniff=true
 Some browsers have ability to block content that appears to be an XSS attack. They work by looking for Javascript content in the GET or POST parameters of a page. To enable the XSS filter in the browser, and force it to always block suspected XSS attacks, you can pass the X-XSS-Protection: 1; mode=block header.
 
 <pre><code class="bash">
-  
+
 [desktop]
-  
+
 secure_browser_xss_filter=true
-  
+
 #In HUE 3.11 and higher it is enabled by default.
-  
+
 </code></pre>
 
 [
-  
+
 ][2] [<img src="https://cdn.gethue.com/uploads/2016/09/security-response-header.png" />][2]
 
 <p style="text-align: center;">
@@ -184,19 +183,19 @@ Because the wildcard only covers one level of subdomains (the asterisk doesn't m
 ### Fixed Arbitrary host header acceptance
 
 Fixed Arbitrary host header acceptance in Hue. Now one can set host/domain names that the Hue server can serve.
-  
+
 allowed_hosts="host.domain,host2.domain,host3.domain"
 
 <pre><code class="bash">
-  
+
 [desktop]
-  
+
 allowed_hosts="*.domain"
-  
+
 \# your own fqdn example: allowed_hosts="*.hadoop.cloudera.com"
-  
+
 \# or specific example: allowed_hosts="hue1.hadoop.cloudera.com,hue2.hadoop.cloudera.com"
-  
+
 </code></pre>
 
 ### Fixed Denial-of-service possibility by filling session store

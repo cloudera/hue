@@ -37,7 +37,6 @@ sf_right_sidebar:
 sf_caption_position:
   - caption-right
 categories:
-  - Administration
 
 ---
 [Hue][1] is a web interface for [Apache Hadoop][2] that makes common Hadoop tasks such as running [MapReduce][3] jobs, browsing [HDFS][3], and creating [Apache Oozie][4] workflows, easier. (To learn more about the integration of Oozie and Hue, see this [blog post][5].) In this post, we’re going to focus on how one of the fundamental components in Hue, Useradmin, has matured.
@@ -97,9 +96,9 @@ By explicitly setting the app level permissions, the apps that these users will 
 You can also blacklist the apps at the code level, e.g. in the hue.ini:
 
 <pre><code class="bash">[desktop]
-  
+
 app_blacklist=search,security,oozie,jobbrowser,pig,beeswax,search,zookeeper,impala,rdbms,spark,metastore,hbase,sqoop,jobsub
-  
+
 </code></pre>
 
 &nbsp;

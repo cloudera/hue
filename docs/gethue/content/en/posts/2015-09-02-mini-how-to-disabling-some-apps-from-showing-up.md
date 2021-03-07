@@ -35,7 +35,6 @@ sf_caption_position:
 sf_remove_promo_bar:
   - 1
 categories:
-  - Administration
 
 ---
 In the Hue ini [configuration file][1], in the `[desktop]` section, you can enter the names of the app to hide:
@@ -43,11 +42,11 @@ In the Hue ini [configuration file][1], in the `[desktop]` section, you can ente
 &nbsp;
 
 <pre><code class="bash">[desktop]
-  
+
 \# Comma separated list of apps to not load at server startup.
-  
+
 app_blacklist=beeswax,impala,security,filebrowser,jobbrowser,rdbms,jobsub,pig,hbase,sqoop,zookeeper,metastore,spark,oozie,indexer
-  
+
 </code></pre>
 
 &nbsp;
