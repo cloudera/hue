@@ -40,6 +40,7 @@ ampforwp-amp-on-off:
   - default
 categories:
   - Version 4
+  - Impala
 #  - Version 4.8
 
 ---

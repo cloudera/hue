@@ -40,6 +40,10 @@ ampforwp-amp-on-off:
   - default
 categories:
   - Version 4
+  - Phoenix
+  - Flink SQL
+  - ksqlDB
+  - Spark SQL
 #  - Version 4.8
 
 ---
