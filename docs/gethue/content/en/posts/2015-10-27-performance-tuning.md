@@ -37,7 +37,7 @@ sf_thumbnail_type:
 ampforwp-amp-on-off:
   - default
 categories:
-  - Development
+  - Dev / API
 
 ---
 <span style="color: #ff0000;"><em>Last update Aug 30th 2018</em></span>

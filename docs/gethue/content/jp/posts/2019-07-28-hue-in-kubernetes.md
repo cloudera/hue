@@ -39,9 +39,8 @@ sf_custom_excerpt:
     |
         デプロイをより自動化し、Kubernetesのようなコンテナーオーケストレーションで実行する方法を見てみましょう。
         私たちは、以前のブログで最新の Hue ウェブサーバーを「ボックス」にまとめる Hue Docker image 記事を紹介しました。
-        
+
 categories:
-  - Administration
   - Cloud
   - Hue 4.5
 
@@ -73,7 +72,7 @@ Hue は [Helm catalog][7] カタログにも記載されています。: <https:
   <div>
     フィードバックやご質問はありますか？何かありましたらこちら、あるいは <a href="https://twitter.com/gethue">@gethue</a>!
   </div>
-  
+
   <p>
     までお気軽にコメントお願いします。
   </p>

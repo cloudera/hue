@@ -25,7 +25,7 @@ sf_background_image_size:
 sf_custom_excerpt:
   - |
     以前、私たちはImpalaやHiveエディタでSSL暗号化を使用する方法の詳細について紹介しました。今回の記事は、認証なしまたはKerberosを使用する代わりに、LDAP認証を使用する方法についてのステップバイステップガイドです。
-    
+
     N注：これにはHue 3.7またはCDH5.2が必要です
 sf_social_sharing:
   - 1
@@ -40,7 +40,6 @@ sf_caption_position:
 sf_remove_promo_bar:
   - 1
 categories:
-  - Administration
   - Enterprise
   - Hive
   - Impala
@@ -51,7 +50,7 @@ categories:
 N注：これには[Hue 3.7][2]またはCDH5.2が必要です
 
 1.
-  
+
 HiveServer2はSSLが有効なので、HiveエディタはHiveServer2に接続できませんでした。HiveServer2のログは、受け取った平文でのSSLエラーを示します（原因を調べるための良いヒントです）
 
 Hueの安全バルブににこれを追加することで解決しました：
@@ -75,7 +74,7 @@ Hueの安全バルブににこれを追加することで解決しました：
 注：SSLを使用しない場合は、次のバグにヒットします： [HUE-2484][3]
 
 2.
-  
+
 変更を行った後にHueの同じ動作が発生しましたが、今度のHiveServer2のログには、err=49による認証失敗を示しました。
 
 そこで、Hueの安全バルブに以下のように追加しました：
@@ -86,7 +85,7 @@ Hueの安全バルブににこれを追加することで解決しました：
 </pre>
 
 3.
-  
+
 Hueはまだ同じ挙動を示していました。HiveServer2ログは以下のように示していました：
 
 <pre><code class="bash">&lt;HUE_LDAP_USERNAME&gt; is not allowed to impersonate bob
@@ -105,7 +104,7 @@ core-site.xmlのためにHDFS ->Service-Wide -> Advanced -> 安全バルブに�
 </pre>
 
 4.
-  
+
 この後、デフォルトのデータベースが表示されていましたが、show tables やその他の何も行うことが出来ませんでした。beelineは同じ挙動でした。
 
 私たちは、Hive アクションを試みているユーザー who にグループへのgrantを行い、その問題は収まりました。すべてのクエリは動作し、HueはHive/Impalaをクエリして結果を返しました！
