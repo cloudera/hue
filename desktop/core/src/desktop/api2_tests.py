@@ -719,6 +719,7 @@ class TestDocumentGist(object):
 
     assert_equal(1, Directory.objects.filter(name=Document2.GIST_DIR, type='directory').count())
     assert_true(Directory.objects.filter(name=Document2.GIST_DIR, type='directory', uuid=gist_parent_uuid).exists())
+    assert_equal(gist_dir1.uuid, Directory.objects.get(name=Document2.GIST_DIR, type='directory', parent_directory=home_dir).uuid)
 
 
   def test_get(self):
