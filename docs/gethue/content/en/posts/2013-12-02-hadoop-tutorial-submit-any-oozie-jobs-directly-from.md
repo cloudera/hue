@@ -40,7 +40,6 @@ slide_template:
   - default
 categories:
   - Browsing
-  - Scheduling
 ---
 
 <p id="docs-internal-guid-274cce61-b3d2-fe2c-661b-0f56659ca38c">

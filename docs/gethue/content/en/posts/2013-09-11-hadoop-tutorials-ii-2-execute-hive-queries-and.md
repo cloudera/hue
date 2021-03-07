@@ -41,7 +41,6 @@ slide_template:
 categories:
   - Browsing
   - Querying
-  - Scheduling
   - Tutorial
 ---
 

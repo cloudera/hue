@@ -35,7 +35,6 @@ sf_caption_position:
 sf_remove_promo_bar:
   - 1
 categories:
-  - Scheduling
 ---
 
 <span style="font-weight: 400;">Hello Oozie users,</span>

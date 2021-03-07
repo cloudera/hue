@@ -39,7 +39,6 @@ sf_caption_position:
 categories:
   - Browsing
   - Querying
-  - Scheduling
 
 ---
 This post is about the new release of [Hue,][1] an open source web-based interface that makes [Apache Hadoop][2] easier to use, that’s included in [CDH4.2][3].

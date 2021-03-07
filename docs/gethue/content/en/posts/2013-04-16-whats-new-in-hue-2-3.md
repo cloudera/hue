@@ -40,7 +40,6 @@ slide_template:
   - default
 categories:
   - Querying
-  - Scheduling
   - Release
 
 ---

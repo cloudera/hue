@@ -35,7 +35,6 @@ sf_remove_promo_bar:
 sf_right_sidebar:
   - Sidebar-1
 categories:
-  - Scheduling
 ---
 
 Hello Oozie users,

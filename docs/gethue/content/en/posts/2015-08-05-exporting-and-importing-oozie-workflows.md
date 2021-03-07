@@ -35,7 +35,6 @@ sf_caption_position:
 sf_remove_promo_bar:
   - 1
 categories:
-  - Scheduling
 ---
 
 Until now Hue did not have a good way to backup or transfer workflows between servers. A [command][1] was added in [Hue 3.8][2] but its usage was still advanced.
