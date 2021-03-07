@@ -39,7 +39,8 @@ sf_remove_promo_bar:
 ampforwp-amp-on-off:
   - default
 categories:
-  - Version 4.8
+  - Version 4
+#  - Version 4.8
   - Querying
 
 ---
@@ -207,7 +208,7 @@ Hive 4 は SQL 構文による[スケジューリングクエリ](https://cwiki.
 
 ![Table Create Wizard](https://cdn.gethue.com/uploads/2019/03/insta_importer_step1.png)
 
-## コネクタ付きエディタv2 
+## コネクタ付きエディタv2
 
 これらはベータ版の機能であり、まだかなりの量の研鑽が必要ですが、十分に安定しているので多くのユーザーに試していただきフィードバックを送っていただきたいと考えています。
 

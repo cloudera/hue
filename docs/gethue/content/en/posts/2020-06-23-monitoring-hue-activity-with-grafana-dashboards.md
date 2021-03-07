@@ -38,7 +38,8 @@ ampforwp-amp-on-off:
   - default
 categories:
   - Administration
-  - Version 4.8
+  - Version 4
+#  - Version 4.8
 
 ---
 
@@ -57,4 +58,3 @@ This dashboard will help administrators monitor Hue’s performance in the data 
 Any feedback or question? Feel free to comment here or on the [Forum](https://discourse.gethue.com/) and [quick start](https://docs.gethue.com/quickstart/) Live SQL querying!
 
 Ying Chen from the Hue Team
-
