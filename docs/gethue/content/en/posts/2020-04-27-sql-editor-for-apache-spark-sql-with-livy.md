@@ -40,6 +40,7 @@ ampforwp-amp-on-off:
   - default
 categories:
   - Version 4
+  - Spark SQL
 #  - Version 4.8
 
 ---

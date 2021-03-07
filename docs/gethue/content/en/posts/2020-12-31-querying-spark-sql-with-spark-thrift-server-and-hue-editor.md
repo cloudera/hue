@@ -41,6 +41,7 @@ ampforwp-amp-on-off:
 categories:
   - Tutorial
   - Version 4.9
+  - Spark SQL
 
 ---
 Write and Execute some Spark SQL quickly in your own Web Editor.

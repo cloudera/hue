@@ -41,6 +41,8 @@ ampforwp-amp-on-off:
 categories:
   - Tutorial
   - Version 4.9
+  - Flink SQL
+  - ksqlDB
 
 ---
 

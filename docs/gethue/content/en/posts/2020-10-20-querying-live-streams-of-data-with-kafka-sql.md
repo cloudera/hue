@@ -41,6 +41,7 @@ ampforwp-amp-on-off:
 categories:
   - Tutorial
   - Version 4.9
+  - ksqlDB
 
 ---
 Real time data querying is becoming a modern standard. Who wants to wait until the next day or week when needing to take decision now?
