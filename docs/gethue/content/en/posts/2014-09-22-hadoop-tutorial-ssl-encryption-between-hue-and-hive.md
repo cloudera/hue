@@ -37,7 +37,6 @@ sf_remove_promo_bar:
 slide_template:
   - default
 categories:
-  - Administration
 
 ---
 _This blog post was originally published on the_ [_MapR blog_][1]_._

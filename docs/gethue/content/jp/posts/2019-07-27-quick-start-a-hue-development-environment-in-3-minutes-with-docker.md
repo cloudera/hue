@@ -37,7 +37,6 @@ sf_caption_position:
 sf_custom_excerpt:
   - 'データベースとデータウェアハウスの使用を単純化することをお探しですか？あるいはクラウドウェブアプリの構築方法を学習していますか？ Hue が素晴らしい候補になるでしょう! '
 categories:
-  - Administration
   - Hue 4.5
 
 ---

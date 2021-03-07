@@ -35,7 +35,6 @@ sf_caption_position:
 slide_template:
   - default
 categories:
-  - Administration
 ---
 
 <p dir="ltr" id="docs-internal-guid-10fc66ac-2e20-af75-4d45-3e31a62fe3d3">

@@ -29,7 +29,6 @@ sf_right_sidebar:
 sf_caption_position:
   - caption-right
 categories:
-  - Administration
 
 ---
 We have seen in this [previous blog post][1] that there's a way to customize the top banner in Hue. In Hue 3.12 there's also the possibility to change the logo for further personalization!

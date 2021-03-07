@@ -37,7 +37,6 @@ sf_remove_promo_bar:
 slide_template:
   - default
 categories:
-  - Administration
 
 ---
 <span style="color: #ff0000;"><em>Last update March 29th 2017</em></span>

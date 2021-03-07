@@ -37,7 +37,6 @@ sf_caption_position:
 sf_remove_promo_bar:
   - 1
 categories:
-  - Administration
 ---
 
 [Cloudera Enterprise 5.8][1] brings the latest Hue 3.10, the Web UI that makes Hadoop easier to use.

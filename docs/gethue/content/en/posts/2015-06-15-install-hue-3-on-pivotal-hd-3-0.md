@@ -35,7 +35,6 @@ sf_caption_position:
 sf_remove_promo_bar:
   - 1
 categories:
-  - Administration
 
 ---
 This post was originally published on [Install Hue 3 with Pivotal HD 3.0][1] by [Christian Tzolov][2] of [@Pivotal][3].
