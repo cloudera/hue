@@ -39,7 +39,7 @@ sf_caption_position:
 slide_template:
   - default
 categories:
-  - News
+#  - News
 ---
 
 <p id="docs-internal-guid-7f078eb5-364c-66fe-f5c5-91daef3f06ec">

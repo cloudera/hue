@@ -35,7 +35,7 @@ sf_caption_position:
 sf_remove_promo_bar:
   - 1
 categories:
-  - News
+#  - News
 
 ---
 [Harness the power of Spark and Solr in Hue: Big Data Amsterdam v.2.0 meetup][1]
