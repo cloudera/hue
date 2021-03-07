@@ -38,7 +38,8 @@ ampforwp-amp-on-off:
   - default
 categories:
   - Administration
-  - Version 4.7
+  - Version 4
+#  - Version 4.7
 
 ---
 
