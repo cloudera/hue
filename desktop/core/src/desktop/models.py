@@ -1079,9 +1079,8 @@ class Document2Manager(models.Manager, Document2QueryMixin):
       all_gist_dirs = self.filter(owner=user, parent_directory=home_dir, name=Document2.GIST_DIR, type='directory').order_by('-last_modified')
       gist_dir = all_gist_dirs.last()
       gist_dirs_dup = all_gist_dirs.exclude(uuid=gist_dir.uuid)
-
       for dir in gist_dirs_dup:
-        dir.children.exclude(name='.Trash').update(parent_directory=gist_dir)
+        dir.children.update(parent_directory=gist_dir)
 
       gist_dirs_dup.delete()
 
