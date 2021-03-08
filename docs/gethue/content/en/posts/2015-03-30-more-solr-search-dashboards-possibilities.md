@@ -35,7 +35,6 @@ sf_caption_position:
 sf_remove_promo_bar:
   - 1
 categories:
-  - Querying
 ---
 
 The [Search dashboards][1] got a series of new options and long awaited features in Hue 3.8. Here is a summary of the major improvements.

@@ -39,7 +39,6 @@ sf_caption_position:
 slide_template:
   - default
 categories:
-  - Scheduling
 
 ---
 [Hue][1] is a web interface for [Apache Hadoop][2] that makes common Hadoop tasks such as running [MapReduce][3] jobs, browsing [HDFS][3], and creating [Apache Oozie][4] workflows, easier. In this post, we’re going to focus on the dynamic workflow builder that Hue provides for Oozie that will be released in Hue 2.2.0 (For a high-level description of Oozie integration in Hue, see this [blog post][5]).

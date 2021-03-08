@@ -35,8 +35,6 @@ sf_remove_promo_bar:
 sf_left_sidebar:
   - Sidebar-2
 categories:
-  - Browsing
-  - Querying
 ---
 
 Hue continues to boost the experience of SQL users with its improved autocompletes, smarter assist panel, [SQL notebooks][1]... and now a revamped Hive Metastore Browser.

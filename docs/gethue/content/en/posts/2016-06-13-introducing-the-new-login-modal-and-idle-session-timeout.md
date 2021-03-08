@@ -33,7 +33,6 @@ sf_right_sidebar:
 sf_caption_position:
   - caption-right
 categories:
-  - Administration
 
 ---
 With the latest release of Hue 3.10, we've added an additional security feature for Hue administrators to enforce and manage idle session timeouts in Hue. We've also improved the experience of re-authenticating into Hue when a user's session is timed out by introducing a new login modal.
@@ -41,13 +40,13 @@ With the latest release of Hue 3.10, we've added an additional security feature
 Hue now offers a new property, `idle_session_timeout`, that can be configured in the hue.ini file:
 
 <pre><code class="bash">
-  
+
 [desktop]
-  
+
 [[auth]]
-  
+
 idle_session_timeout=600
-  
+
 </code></pre>
 
 When `idle_session_timeout` is set, users will automatically be logged out after N (e.g. - 600) seconds of inactivity and be prompted to login again:

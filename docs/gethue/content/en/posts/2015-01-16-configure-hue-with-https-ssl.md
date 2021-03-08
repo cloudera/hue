@@ -37,7 +37,6 @@ sf_remove_promo_bar:
 slide_template:
   - default
 categories:
-  - Administration
 
 ---
 SSL / HTTPS is often not simple. Here is some light in addition to the [Cloudera Security guide][1] that should help.
@@ -57,7 +56,7 @@ openssl req -new -x509 -nodes -sha1 -key server.key > server.cert
 </code></pre>
 
 **
-  
+
 Note**: answer the questions that follow (complete example below). Entering the hostname for the server is important.
 
 **Note:** you will have to tell your browser to "trust" the self signed server certificate
@@ -83,15 +82,15 @@ Make sure Hue is setting the [cookie as secure][3].
 Here is an example of creation of a certificate for enabling SSL:
 
 <pre><code class="bash">
-  
+
 [root@cehd1 hue]# pwd
-  
+
 /home/hue
-  
+
 [root@cehd1 hue]# ls
-  
+
 cacerts  cert  key
-  
+
 </code></pre>
 
 Generate a private key for the server:
@@ -103,27 +102,27 @@ Generate a "certificate request" for the server:
 <pre><code class="bash">[root@cehd1 hue] openssl req -new -key key/server.key -out request/server.csr</code></pre>
 
 You are about to be asked to enter information that will be incorporated into your certificate request. What you are about to enter is what is called a Distinguished Name or a DN.
-  
+
 There are quite a few fields but you can leave some blank. For some fields there will be a default value, if you enter '.', the field will be left blank.
 
 <pre><code class="bash">Country Name (2 letter code) [XX]:US
-   
+
 State or Province Name (full name) []:Colorado
-   
+
 Locality Name (eg, city) [Default City]:Denver
-   
+
 Organization Name (eg, company) [Default Company Ltd]:Cloudera
-   
+
 Organizational Unit Name (eg, section) []:COE
-   
+
 Common Name (eg, your name or your server's hostname) []:test.lab
-   
+
 Email Address []:
 
 Please enter the following 'extra' attributes to be sent with your certificate request
-  
+
 A challenge password []:  ## note this was left
-  
+
 An optional company name []:
 
 </code></pre>
@@ -131,51 +130,51 @@ An optional company name []:
 Self-sign the request, creating a certificate for the server:
 
 <pre><code class="bash">[root@cehd1 hue] openssl x509 -req -days 365 -in request/server.csr -signkey key/server.key -out cert/server.crt
-   
+
 Signature ok
-   
+
 subject=/C=US/ST=Colorado/L=<wbr />Denver/O=Cloudera/OU=COE/CN=test.lab
-   
+
 Getting Private key
 
 </code></pre>
 
 <pre><code class="bash">[root@cehd1 hue]# ls -lR
-  
+
 .
-   
+
 total 16
-   
+
 drwxr-xr-x 2 hue  root 4096 Jul 16 18:04 cacerts
-   
+
 drwxr-xr-x 2 root root 4096 Jul 31 10:02 cert
-   
+
 drwxr-xr-x 2 root root 4096 Jul 31 09:46 key
-   
+
 drwxr-xr-x 2 root root 4096 Jul 31 10:00 request
-   
+
 ./cacerts:
-   
+
 total 4
-   
+
 -rw-r-r- 1 hue root 2036 Jul 16 18:04 win2k8x64-ad2-ca.pem
-   
+
 ./cert:
-   
+
 total 4
-   
+
 -rw-r-r- 1 root root 1907 Jul 31 10:02 server.crt
-   
+
 ./key:
-   
+
 total 4
-   
+
 -rw-r-r- 1 root root 3243 Jul 31 09:49 server.key
-   
+
 ./request:
-   
+
 total 4
-   
+
 -rw-r-r- 1 root root 1704 Jul 31 10:00 server.csr
 
 </code></pre>
@@ -199,11 +198,11 @@ Also, the Hue truststore has to be in PEM file format. At Cloudera we are using
     <p>
       <pre><code class="bash">keytool -exportcert -keystore hadoop-server.keystore -alias foo-1.cloudera.com \<br /> -storepass cloudera -file foo-1.cert<br /> openssl x509 -inform der -in foo-1.cert > foo-1.pem<br /> </code></pre>
     </p>
-    
+
     <p>
       Once you've done this for each host in the cluster, you can concatenate the .pem files into one .pem file which can serve as the Hue truststore:
     </p>
-    
+
     <div class="preformatted panel">
       <div class="preformattedContent panelContent">
         <p>
@@ -211,39 +210,39 @@ Also, the Hue truststore has to be in PEM file format. At Cloudera we are using
         </p>
       </div>
     </div>
-    
+
     <p>
       After running it, set REQUESTS_CA_BUNDLE in the Hue environment safety valve to /etc/hadoop/ssl-conf/huetrust.pem
     </p>
-    
+
     <p>
       <a href="https://cdn.gethue.com/uploads/2015/01/hue-contact-https.png"><img src="https://cdn.gethue.com/uploads/2015/01/hue-contact-https-1024x570.png" /></a>
     </p>
-    
+
     <p>
       &nbsp;
     </p>
-    
+
     <p>
       Here is an interesting <a href="http://www.akadia.com/services/ssh_test_certificate.html">link</a> if you want to read more about generating SSL certificates.
     </p>
-    
+
     <p>
       &nbsp;
     </p>
-    
+
     <p>
       As usual feel free to comment and send feedback on the <a href="http://groups.google.com/a/cloudera.org/group/hue-user">hue-user</a> list or <a href="https://twitter.com/gethue">@gethue</a>!
     </p>
-    
+
     <p>
       &nbsp;
     </p>
-    
+
     <p>
       &nbsp;
     </p>
-    
+
     <p>
       &nbsp;
     </p>

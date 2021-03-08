@@ -37,8 +37,6 @@ sf_remove_promo_bar:
 slide_template:
   - default
 categories:
-  - Scheduling
-  - Querying
 
 ---
 In Hue 3.0 we made transparent the use of [HCatalog in the Pig][1] scripts. Today, we are going to detail how to run Pig script with HCatalog in some secured cluster.

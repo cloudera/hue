@@ -37,8 +37,9 @@ sf_caption_position:
 ampforwp-amp-on-off:
   - default
 categories:
-  - Administration
-  - Version 4.8
+  - Version 4
+  - Dev / API
+#  - Version 4.8
 
 ---
 

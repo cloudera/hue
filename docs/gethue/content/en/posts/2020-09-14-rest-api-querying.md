@@ -39,8 +39,9 @@ sf_remove_promo_bar:
 ampforwp-amp-on-off:
   - default
 categories:
-  - Version 4.8
-  - Development
+  - Version 4
+#  - Version 4.8
+  - Dev / API
 
 ---
 Hi Data App Builders,

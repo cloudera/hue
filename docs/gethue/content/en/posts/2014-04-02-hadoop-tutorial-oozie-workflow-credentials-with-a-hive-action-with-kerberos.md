@@ -35,7 +35,6 @@ sf_caption_position:
 slide_template:
   - default
 categories:
-  - Scheduling
 ---
 
 When using Hadoop security and scheduling jobs using [Hive][1] (or Pig, [HBase][2]) you might have received this error:

@@ -37,18 +37,18 @@ sf_caption_position:
 ampforwp-amp-on-off:
   - default
 categories:
-  - Administration
-  - Version 4.7
+  - Version 4
+#  - Version 4.7
 
 ---
 
 
-To understand the performance of Hue, we want to know how many active users in Hue--and more specifically--how many on each host. An active user is who sends requests from his/her browser to the Hue server in the last one hour. Recently, Hue got some improvements for providing and displaying better metrics. 
+To understand the performance of Hue, we want to know how many active users in Hue--and more specifically--how many on each host. An active user is who sends requests from his/her browser to the Hue server in the last one hour. Recently, Hue got some improvements for providing and displaying better metrics.
 
-1. On premise, Hue is using [PyFormance](https://gethue.com/easier-administration-of-hue-with-the-new-threads-and-metrics-pages/) implements /desktop/metrics endpoint. Cloudera Manager collects data via the endpoint and displays the metric “Active Users” in the Charts Library, but all hosts show the same number of active users. With [HUE-9210](https://issues.cloudera.org/browse/HUE-9210), the active users metric on each host is collected based on its hostname (see screenshot).  
+1. On premise, Hue is using [PyFormance](https://gethue.com/easier-administration-of-hue-with-the-new-threads-and-metrics-pages/) implements /desktop/metrics endpoint. Cloudera Manager collects data via the endpoint and displays the metric “Active Users” in the Charts Library, but all hosts show the same number of active users. With [HUE-9210](https://issues.cloudera.org/browse/HUE-9210), the active users metric on each host is collected based on its hostname (see screenshot).
 
 	![cm_active_users.png](https://cdn.gethue.com/uploads/2020/04/cm_active_users.png)
-	
+
 	Here we can see three users on the blue Hue API server role and one on the green
 
 2. In Kubernetes, Hue is using [django-prometheus](https://gethue.com/collecting-hue-metrics-with-prometheus-in-kubernetes/) to implement endpoint /metrics. With [HUE-9194](https://issues.cloudera.org/browse/HUE-9194), we added two new active users metrics to display in Prometheus server. You may [set up your Prometheus server](https://gethue.com/set-up-prometheus-server-without-kubernetes/) without Kubernetes. Once setup is done and the server is started, open your browser at localhost:9090. From the drop down menu of metrics, you may find hue_active_users and hue_local_active_users.

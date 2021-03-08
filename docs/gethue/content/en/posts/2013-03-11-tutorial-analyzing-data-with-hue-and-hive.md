@@ -39,8 +39,6 @@ sf_caption_position:
 slide_template:
   - default
 categories:
-  - Browsing
-  - Querying
 ---
 
 In the first installment of the demo series about [Hue][1] — the open source Web UI that makes [Apache Hadoop][2] easier to use — you learned how file operations are simplified via the File Browser application. In this installment, we’ll focus on analyzing data with Hue, using Apache Hive via Hue’s Beeswax and Catalog applications (based on [Hue 2.3][3] and later).

@@ -39,7 +39,6 @@ sf_caption_position:
 slide_template:
   - default
 categories:
-  - Querying
 ---
 
 Edit: This post is deprecated since [Hue 3.6][1], clicking on the install button is the only thing to do now!

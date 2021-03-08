@@ -37,8 +37,7 @@ sf_remove_promo_bar:
 slide_template:
   - default
 categories:
-  - Administration
-  - News
+#  - News
 
 ---
 This presentation describes how Hue can leverage the LDAP or SAML authentication system and security model of your company.

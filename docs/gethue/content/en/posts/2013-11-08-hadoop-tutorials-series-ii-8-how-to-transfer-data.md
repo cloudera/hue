@@ -41,7 +41,6 @@ slide_template:
 ampforwp-amp-on-off:
   - default
 categories:
-  - Querying
   - Tutorial
 ---
 

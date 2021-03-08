@@ -39,8 +39,8 @@ sf_caption_position:
 slide_template:
   - default
 categories:
-  - News
-  - Development
+#  - News
+  - Dev / API
 
 ---
 <div>

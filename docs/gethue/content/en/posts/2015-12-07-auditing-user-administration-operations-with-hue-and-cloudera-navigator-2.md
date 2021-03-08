@@ -35,7 +35,6 @@ sf_caption_position:
 sf_remove_promo_bar:
   - 1
 categories:
-  - Administration
 
 ---
 With the latest release of [Hue 3.9][1], we've added an additional layer of monitoring for Hue administrators.
@@ -51,17 +50,17 @@ Hue admins can thus easily `monitor` superuser operations such as adding/editing
 To enable and configure the log file used for the audit log, there are 2 new configuration properties that have been added to the hue.ini file, and can be overridden in [Cloudera Manager's Service Access Audit Log Properties][4] controls.
 
 <pre><code class="bash">[desktop]
-  
+
 \# The directory where to store the auditing logs. Auditing is disable if the value is empty.
-  
+
 \# e.g. /var/log/hue/audit.log
-  
+
 audit_event_log_dir=/Users/jennykim/Dev/hue/logs/audit.log
 
 \# Size in KB/MB/GB for audit log to rollover.
-  
+
 audit_log_max_file_size=100MB
-  
+
 </code></pre>
 
 After configuring the audit log and restarting Hue, you can then start viewing the audited operations by tailing the log:
@@ -69,13 +68,13 @@ After configuring the audit log and restarting Hue, you can then start viewing t
 <pre><code class="bash">$ tail logs/audit.log
 
 {"username": "admin", "impersonator": "hue", "eventTime": 1447271632364, "operationText": "Successful login for user: admin", "service": "accounts", "url": "/accounts/login/", "allowed": true, "operation": "USER_LOGIN", "ipAddress": "127.0.0.1"}
-  
+
 {"username": "admin", "impersonator": "hue", "eventTime": 1447271704937, "operationText": "Created Group: admins, with member(s): jennykim, admin, hue", "service": "useradmin", "url": "/useradmin/groups/new", "allowed": true, "operation": "CREATE_GROUP", "ipAddress": "127.0.0.1"}
-  
+
 {"username": "admin", "impersonator": "hue", "eventTime": 1447271778278, "operationText": "Created Group: readonly, with member(s): ", "service": "useradmin", "url": "/useradmin/groups/new", "allowed": true, "operation": "CREATE_GROUP", "ipAddress": "127.0.0.1"}
-  
+
 {"username": "admin", "impersonator": "hue", "eventTime": 1447271788277, "operationText": "Successfully edited permissions: useradmin/access", "service": "useradmin", "url": "/useradmin/permissions/edit/useradmin/access", "allowed": true, "operation": "EDIT_PERMISSION", "ipAddress": "127.0.0.1"}
-  
+
 </code></pre>
 
 Each audited record contains fields for:

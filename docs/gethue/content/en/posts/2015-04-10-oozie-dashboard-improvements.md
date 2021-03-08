@@ -35,7 +35,6 @@ sf_caption_position:
 sf_remove_promo_bar:
   - 1
 categories:
-  - Scheduling
 ---
 
 In the upcoming Hue 3.8, Oozie Dashboard just got several improvements making them and their navigation even more intuitive (for the Editor revamp, see [this][1]). Here is a video demo that sums them up:

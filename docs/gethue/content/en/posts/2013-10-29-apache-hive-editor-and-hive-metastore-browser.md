@@ -39,9 +39,7 @@ sf_caption_position:
 slide_template:
   - default
 categories:
-  - Browsing
-  - Querying
-  - News
+#  - News
 
 ---
 <iframe src="http://www.slideshare.net/slideshow/embed_code/27695672" height="495" width="900" frameborder="0" marginwidth="0" marginheight="0" scrolling="no"></iframe>

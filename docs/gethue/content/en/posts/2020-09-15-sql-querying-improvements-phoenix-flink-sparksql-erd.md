@@ -39,8 +39,12 @@ sf_remove_promo_bar:
 ampforwp-amp-on-off:
   - default
 categories:
-  - Version 4.8
-  - Querying
+  - Version 4
+  - Phoenix
+  - Flink SQL
+  - ksqlDB
+  - Spark SQL
+#  - Version 4.8
 
 ---
 Hi Data Crunchers,

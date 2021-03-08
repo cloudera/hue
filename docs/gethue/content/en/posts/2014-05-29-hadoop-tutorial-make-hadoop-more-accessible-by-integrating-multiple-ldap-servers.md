@@ -37,7 +37,6 @@ sf_remove_promo_bar:
 slide_template:
   - default
 categories:
-  - Administration
 
 ---
 Hue 3.6 (coming up this week) LDAP configuration has been drastically improved to enable multiple server support. Here is a quick guide on how to configure LDAP in Hue using this new configuration model.
@@ -57,55 +56,55 @@ As described in [How to Make Hadoop Accessible to your Employees with Hue][1], t
 You can have multiple LDAP servers configured in the hue.ini by providing multiple server declarations:
 
 <pre><code class="bash">[desktop]
-    
+
 [[ldap]]
-      
+
 [[[ldap_servers]]]
-        
+
 [[[[server1]]]]
-        
+
 ldap_url=ldap://127.0.0.1
-        
+
 create_users_on_login=true
-        
+
 base_dn="dc=sub1.dc=example,dc=com"
-        
+
 [[[[[users]]]]]
-          
+
 user_filter="(objectClass=user)"
-          
+
 user_name_attr="uid"
-        
+
 [[[[[groups]]]]]
-          
+
 group_filter="(objectClass=group)"
-          
+
 group_name_attr="cn"
-          
+
 group_member_attr="member"
 
 [[[[server2]]]]
-        
+
 ldap_url=ldap://127.0.0.2
-        
+
 create_users_on_login=true
-        
+
 base_dn="dc=sub2,dc=example,dc=com"
-        
+
 [[[[[users]]]]]
-          
+
 user_filter="(objectClass=user)"
-          
+
 user_name_attr="uid"
-        
+
 [[[[[groups]]]]]
-          
+
 group_filter="(objectClass=group)"
-          
+
 group_name_attr="cn"
-          
+
 group_member_attr="member"
-  
+
 </code></pre>
 
 &nbsp;
@@ -128,10 +127,10 @@ To be more explicit, the parameters that are available to server declarations ar
   * ldap_username_pattern
   * bind_dn
   * bind_password
-  * users 
+  * users
       * user_filter
       * user_name_attr
-  * groups 
+  * groups
       * group_filter
       * group_name_attr
       * group_member_attr

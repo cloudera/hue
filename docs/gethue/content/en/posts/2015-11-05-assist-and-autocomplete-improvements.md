@@ -35,8 +35,6 @@ sf_detail_type:
 sf_thumbnail_link_type:
   - link_to_post
 categories:
-  - Querying
-  - Browsing
 ---
 
 We've recently made some nice improvements to the autocomplete and assist panel that should really boost the experience when working with the [notebooks][1] or editing SQL queries in the Hive and Impala query [editors][2].

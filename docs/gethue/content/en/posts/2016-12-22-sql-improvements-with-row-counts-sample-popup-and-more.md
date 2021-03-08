@@ -37,7 +37,6 @@ sf_caption_position:
 sf_remove_promo_bar:
   - 1
 categories:
-  - Querying
 
 ---
 <span style="font-weight: 400;">The Hue editor keeps getting better. Previously, we showed the </span>[<span style="font-weight: 400;">new autocomplete</span>][1] <span style="font-weight: 400;">and </span>[<span style="font-weight: 400;">result refining</span>][2]<span style="font-weight: 400;">. Here is a list of improvements coming in Hue 3.12:</span>

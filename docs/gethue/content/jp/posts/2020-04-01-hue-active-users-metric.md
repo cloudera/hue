@@ -37,8 +37,8 @@ sf_caption_position:
 ampforwp-amp-on-off:
   - default
 categories:
-  - Administration
-  - Version 4.7
+  - Version 4
+#  - Version 4.7
 
 ---
 
@@ -48,7 +48,7 @@ Hue のパフォーマンスを理解するために、Hue のアクティブユ
 1. オンプレミスでは、Hue は [PyFormance](https://gethue.com/easier-administration-of-hue-with-the-new-threads-and-metrics-pages/) を使用して /desktop/metrics エンドポイントを実装しています。Cloudera Manager はエンドポイント経由でデータを収集し、チャートライブラリに「Active Users」メトリクスを表示しますが、どのホストも同じ数のアクティブユーザーを表示しています。[HUE-9210](https://issues.cloudera.org/browse/HUE-9210) では、各ホストのアクティブユーザーのメトリクスは、ホスト名に基づいて収集されています。 (スクリーンショットを参照してください)
 
 	![cm_active_users.png](https://cdn.gethue.com/uploads/2020/04/cm_active_users.png)
-	
+
 ここでは、Hue API サーバーロールに青色の３人のユーザーと、別のサーバーロールに緑色の１人のユーザーがいることがわかります。
 
 2. Kubernetesでは、Hue は [django-prometheus](https://gethue.com/collecting-hue-metrics-with-prometheus-in-kubernetes/) を使用してエンドポイント/メトリクスを実装しています。[HUE-9194](https://issues.cloudera.org/browse/HUE-9194) では、Prometheus サーバーに表示するための2つの新しいアクティブユーザーのメトリクスを追加しました。Kubernetes を使用せずに[Prometheus サーバーをセットアップ](https://gethue.com/set-up-prometheus-server-without-kubernetes/) しても構いません。設定が完了してサーバーが開始したら、ブラウザで localhost:9090 を開きます。メトリクスのドロップダウンメニューで hue_active_users と hue_local_active_users を見つけることができます。

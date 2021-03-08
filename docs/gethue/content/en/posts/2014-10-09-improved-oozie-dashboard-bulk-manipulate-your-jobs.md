@@ -37,7 +37,6 @@ sf_remove_promo_bar:
 slide_template:
   - default
 categories:
-  - Scheduling
 ---
 
 Hue Oozie Dashboard just got a few improvements in order to make Oozie job management less tedious! Here is a video demo that sums them up:

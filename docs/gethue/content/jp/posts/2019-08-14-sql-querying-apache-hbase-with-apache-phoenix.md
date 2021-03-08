@@ -37,10 +37,9 @@ sf_caption_position:
 sf_remove_promo_bar:
   - 1
 categories:
-  - Querying
-  - Browsing
   - Version 4
-  - Version 4.8
+  - Version 4
+#  - Version 4.8
 
 ---
 [Apache Phoenix][1] は、非リレーショナル分散データストアである [Apache HBase][2]拡張する素晴らしいアドオンです。[HBase Browser][3]上で、Hue の [Editor][4] はデータをクエリするためのより一般的な構文を提供します。キー/バリューストアであることでSQLにはさまざまな構文があり、Hue のSQL UXの機能を完全にサポートするにはまだいくつかの洗練作業が必要なことにご注意ください。
@@ -49,7 +48,7 @@ categories:
 
 Hue は [SQL Connector documentation](https://docs.gethue.com/administrator/configuration/connectors/#apache-phoenix)に記載されている SqlAlchemy インターフェイスを介して Phoenix をサポートしています。[HUE-9367](https://issues.cloudera.org/browse/HUE-9367) により、コネクターは Hue に同梱されているのですぐにご利用いただけます。
 
-Hue のホストにて:	
+Hue のホストにて:
 
     ./build/env/bin/pip install pyPhoenix
 
@@ -99,7 +98,7 @@ Error: ERROR 505 (42000): Table is read only. (state=42000,code=505)
 
 **3** Phoenix は Apache Calcite に従っています。[SQL autocomplete](https://docs.gethue.com/developer/parsers/) で改善にご協力ください。
 
-**4** UI （およびベースとなる SQLAlchemy API) は 'ANY 名前空間' と 'empty/Default' 名前空間を区別することができません。 
+**4** UI （およびベースとなる SQLAlchemy API) は 'ANY 名前空間' と 'empty/Default' 名前空間を区別することができません。
 
 このCloudera の [Phoenix in CDH](https://blog.cloudera.com/blog/2019/07/apache-phoenix-for-cdh/) のブログ記事で Apache Phoenix の機能の詳細をご覧ください。
 

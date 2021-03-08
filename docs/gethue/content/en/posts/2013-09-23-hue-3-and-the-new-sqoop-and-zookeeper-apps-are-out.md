@@ -39,9 +39,7 @@ sf_caption_position:
 slide_template:
   - default
 categories:
-  - Browsing
   - Release
-  - Querying
 
 ---
 ## Hi Big Data Surfers,

@@ -35,7 +35,6 @@ sf_caption_position:
 sf_remove_promo_bar:
   - 1
 categories:
-  - Browsing
 ---
 
 Hue comes with an [HBase App][1] that lets you create table, search for rows, read cell content… in just a few clicks. We are now glad to release the last missing piece of security (available in the upcoming Hue 3.8) for making the app production ready!

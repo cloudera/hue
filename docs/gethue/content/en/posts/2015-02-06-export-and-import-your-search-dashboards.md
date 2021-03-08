@@ -37,8 +37,6 @@ sf_remove_promo_bar:
 slide_template:
   - default
 categories:
-  - Administration
-  - Querying
 
 ---
 <span style="color: #ff0000;">Update August 2015</span>: It is not much easier to import or export your [dashboards][1], it is the same interface as the [Oozie workflows exporter][2].

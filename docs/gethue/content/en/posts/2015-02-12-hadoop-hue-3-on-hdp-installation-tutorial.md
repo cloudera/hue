@@ -39,7 +39,6 @@ slide_template:
 ampforwp-amp-on-off:
   - default
 categories:
-  - Administration
 
 ---
 <p class="yt watch-title-container">
@@ -55,7 +54,7 @@ Note: for <span style="color: #ff0000;">Hive</span> issues, just scroll down bel
 ## Install in HDP 2.2
 
 **Initial draft rom Andrew Mo (<mo@andrewmo.com>)**
-  
+
 **Insight Data Science - Data Engineering Fellow**
 
 Last month I started a guest post on <gethue.com> demonstrating the [steps required][1] to use [HUE 3.7+][2] with the Hortonworks Data Platform (HDP); I’ve used HUE successfully with HDP 2.1 and 2.2, and have created a step-by-step guide on using HUE 3.7.1 with HDP 2.2 below.
@@ -69,13 +68,13 @@ With HDP, HUE’s features and ease of use are something I always miss, so I dec
 Features confirmed to work in partial or complete fashion:
 
 • Hive/Beeswax
-  
+
 • File Browser
-  
+
 • HDFS FACL Manager
-  
+
 • HBase Cluster Browser
-  
+
 • Job Browser
 
 _Still working on debugging/integrating Pig/Oozie!_
@@ -85,11 +84,11 @@ Spark is on my to do list as well.
 Technical Details:
 
 • Distribution: Hortonworks Data Platform (HDP) 2.2
-  
+
 • Cluster Manager: Apache Ambari 1.7
-  
+
 • Environment: Amazon EC2
-  
+
 • Operating System: Ubuntu 12.04 LTS (RHEL6/CentOS6 works fine as well)
 
 HUE will be deployed as a “Gateway” access node to our Hadoop cluster; this means that none of the core Hadoop services or clients are required on the HUE host.
@@ -103,11 +102,11 @@ HUE will be deployed as a “Gateway” access node to our Hadoop cluster; this 
 Note about <span style="color: #ff0000;">Tez</span>:
 
 <pre><code class="bash">[beeswax]
-   
+
 \# Hue will use at most this many HiveServer2 sessions per user at a time.
-   
+
 \# For Tez, increase the number to more if you need more than one query at the time, e.g. 2 or 3 (Tez as a maximum of 1 query by session).
-   
+
 max_number_of_sessions=1</code></pre>
 
 &nbsp;
@@ -133,21 +132,21 @@ Ubuntu uses ‘apt-get’ for package management. In our example, we’re using 
 Prepare dependencies:
 
 <pre><code class="bash">sudo apt-get install -y ant
-  
+
 sudo apt-get install -y gcc g++
-  
+
 sudo apt-get install -y libkrb5-dev libmysqlclient-dev
-  
+
 sudo apt-get install -y libssl-dev libsasl2-dev libsasl2-modules-gssapi-mit
-  
+
 sudo apt-get install -y libsqlite3-dev
-  
+
 sudo apt-get install -y libtidy-0.99-0 libxml2-dev libxslt-dev
-  
+
 sudo apt-get install -y maven
-  
+
 sudo apt-get install -y libldap2-dev
-  
+
 sudo apt-get install -y python-dev python-simplejson python-setuptools
 
 </code></pre>
@@ -157,11 +156,11 @@ Download Hue 3.8.1 release tarball (in case, older version [3.7.1 link][5]):
 • wget <https://cdn.gethue.com/downloads/releases/3.8.1/hue-3.8.1.tgz>
 
 Make sure you have Java installed and configured correctly!
-  
+
 I’m using Open JDK 1.7 in this example:
 
 <pre><code class="bash">sudo apt-get install -y openjdk-7-jre openjdk-7-jdk
-  
+
 sudo echo “JAVA_HOME=\”/usr/lib/jvm/java-7-openjdk-amd64/jre\”" &gt;&gt; /etc/environment
 
 </code></pre>
@@ -215,7 +214,7 @@ The HUE configuration file can be found at ‘/usr/local/hue/desktop/conf/hue.in
 Be sure to make a backup before editing!
 
 [<img src="https://cdn.gethue.com/uploads/2015/02/hue-hdp-1-1024x827.png"  />][12]
-  
+
 We’ll need to populate ‘hue.ini’ with our cluster’s configuration information.
 
 Examples are included below, but will vary with your cluster’s configuration.
@@ -225,7 +224,7 @@ In this example, the cluster is small, so our cluster NodeNode also happens to b
 WebHDFS needs to point to our cluster NameNode:
 
 [<img src="https://cdn.gethue.com/uploads/2015/02/hue-hdp-7-1024x827.png"  />][13]
-  
+
 Configure the correct values for our YARN cluster Resource Manager, Hive, Oozie, etc:
 
 [<img src="https://cdn.gethue.com/uploads/2015/02/hue-hdp-13-1024x827.png"  />][14] [<img src="https://cdn.gethue.com/uploads/2015/02/hue-hdp-14-1024x827.png"  />][15]
@@ -239,9 +238,9 @@ To disable HUE ‘apps’ that aren’t necessary, or are unsupported, for our c
 • We start the HUE server using the ‘supervisor’ command.
 
 [<img src="https://cdn.gethue.com/uploads/2015/02/hue-hdp-19-1024x827.png"  />][19]
-  
+
 • Use the ‘-d’ switch to start the HUE supervisor in daemon mode
-  
+
 Connect to your new HUE server at its IP address/FQDN and the default port of ‘8888’
 
 [<img src="https://cdn.gethue.com/uploads/2015/02/hue-hdp-18-1024x629.png"  />][20]

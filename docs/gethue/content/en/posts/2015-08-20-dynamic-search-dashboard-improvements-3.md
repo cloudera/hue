@@ -35,7 +35,6 @@ sf_caption_position:
 sf_remove_promo_bar:
   - 1
 categories:
-  - Querying
 ---
 
 [Apache Solr][1] is getting easier to use! This new version of the Search app provides a general improved dashboard experience by refreshing only the widgets that changed and integrating better with live indexing. A series of additional new functionalities are detailed below.

@@ -35,21 +35,20 @@ sf_caption_position:
 sf_remove_promo_bar:
   - 1
 categories:
-  - Administration
 
 ---
 We explained how to run Hue with [NGINX][1] serving the static files or under [Apache][2]. If you use another proxy, you might need to set these options:
 
 <pre><code class="bash">[desktop]
-  
+
 \# Enable X-Forwarded-Host header if the load balancer requires it.
-  
+
 use_x_forwarded_host=false
 
 \# Support for HTTPS termination at the load-balancer level with SECURE_PROXY_SSL_HEADER.
-  
+
 secure_proxy_ssl_header=false
-  
+
 </code></pre>
 
  [1]: https://gethue.com/using-nginx-to-speed-up-hue-3-8-0/

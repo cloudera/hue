@@ -39,8 +39,9 @@ sf_remove_promo_bar:
 ampforwp-amp-on-off:
   - default
 categories:
-  - Querying
-  - Version 4.8
+  - Version 4
+  - Impala
+#  - Version 4.8
 
 ---
 

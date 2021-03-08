@@ -37,8 +37,6 @@ sf_right_sidebar:
 sf_caption_position:
   - caption-right
 categories:
-  - Browsing
-  - Querying
 
 ---
 [Hue 2.2][1] , the open source web-based interface that makes [Apache Hadoop][2] easier to use, lets you interact with Hadoop services from within your browser without having to go to a command-line interface. It features different applications like an Apache Hive editor and Apache Oozie dashboard and [workflow builder][3].

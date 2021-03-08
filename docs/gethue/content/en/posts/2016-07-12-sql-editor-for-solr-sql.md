@@ -37,7 +37,6 @@ sf_caption_position:
 sf_remove_promo_bar:
   - 1
 categories:
-  - Querying
 ---
 
 Hue already integrates with Apache Solr and provide [Dynamic Search Dashboards][1]. With the [new SQL Editor][2] of Hue 3.10, Hue opens up to [any database][3], which is great as Solr 6 now provides a [SQL interface][4].

@@ -37,8 +37,6 @@ sf_caption_position:
 sf_remove_promo_bar:
   - 1
 categories:
-  - Scheduling
-  - Querying
 
 ---
 How to run Spark jobs with Spark on YARN? This often requires trial and error in order to make it work.

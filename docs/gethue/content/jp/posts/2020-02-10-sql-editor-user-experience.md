@@ -39,8 +39,8 @@ sf_remove_promo_bar:
 ampforwp-amp-on-off:
   - default
 categories:
-  - Version 4.7
-  - Querying
+  - Version 4
+#  - Version 4.7
 
 ---
 
@@ -211,7 +211,7 @@ FROM句に複数のテーブル(派生テーブルや結合済みのテーブル
 
 **スマートなキーワードの補完**
 
-オートコンプリーターは、ステートメント内のカーソルの位置に基づいてキーワードを提案します。可能であれば、IF NOT EXISTS のように一度に複数の単語を提案することもあります。誰もたくさん入力したくないでしょう? 
+オートコンプリーターは、ステートメント内のカーソルの位置に基づいてキーワードを提案します。可能であれば、IF NOT EXISTS のように一度に複数の単語を提案することもあります。誰もたくさん入力したくないでしょう?
 
 **関数**
 
@@ -387,7 +387,7 @@ Google Document と同様に、クエリは他のユーザーやグループと�
 **注**: 一般向けのリンクと Gist での共有は、次の Hue 4.7 でリリースされる予定です!
 
 
-## 次のステップ (SQL) 
+## 次のステップ (SQL)
 
 2020 年に Hue 5 および拡張された SQL Cloud エディタが登場し、より新しいデータクエリ体験が実現します。[Cloudera Cloud Data Warehouse](https://www.cloudera.com/products/data-warehouse.html) では、データウェアハウス専用の Hue もリリースされました。
 
