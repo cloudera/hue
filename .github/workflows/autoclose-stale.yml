@@ -15,3 +15,4 @@ jobs:
           stale-issue-message: 'This issue is stale because it has been open 30 days with no activity and is not "roadmap" labeled or part of any milestone. Remove stale label or comment or this will be closed in 5 days.'
           days-before-stale: 30
           days-before-close: 5
+          operations-per-run: 200
