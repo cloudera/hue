@@ -1,7 +1,7 @@
-import React, {FC, useState} from 'react';
+import React from 'react';
 
-import 'gethue/lib/components/query-editor-components';
-
+import hueComponents from 'gethue/lib/components/QueryEditorWebComponents';
+import hueConfig from 'gethue/lib/config/hueConfig';
 import Executor from 'gethue/lib/execution/executor';
 
 import { QueryEditor } from './QueryEditor';
@@ -10,32 +10,72 @@ import { ExecuteProgress } from './ExecuteProgress';
 import { ResultTable } from './ResultTable';
 import SqlExecutable from 'gethue/src/apps/editor/execution/sqlExecutable';
 
-const executor = new Executor({
-  compute: (() => ({ id: 'default' })) as KnockoutObservable<any>,
-  connector: (() => ({
-    dialect: 'hive',
-    id: 'hive',
-    is_sql: true
-  })) as KnockoutObservable<any>,
-  database: (() => 'default') as KnockoutObservable<any>,
-  namespace: (() => ({ id: 'default' })) as KnockoutObservable<any>,
+const HUE_BASE_URL = 'http://localhost:8888'
+
+hueComponents.configure({
+  baseUrl: HUE_BASE_URL
 });
 
-export const SqlScratchpad: FC = () => {
-  const [activeExecutable, setActiveExecutable] = useState<SqlExecutable | undefined>(undefined);
+interface SqlScratchpadState {
+  activeExecutable?: SqlExecutable;
+  executor?: Executor;
+}
 
-  return <React.Fragment>
-    <div className="ace-editor">
-      <QueryEditor executor={executor} setActiveExecutable={setActiveExecutable}/>
-    </div>
-    <div className="executable-progress-bar">
-      <ExecuteProgress activeExecutable={activeExecutable}/>
-    </div>
-    <div className="executable-actions">
-      <ExecuteActions activeExecutable={activeExecutable}/>
-    </div>
-    <div className="result-table">
-      <ResultTable/>
-    </div>
-  </React.Fragment>
-};
+export class SqlScratchpad extends React.Component<{}, SqlScratchpadState> {
+  state = {
+    activeExecutable: undefined,
+    executor: undefined
+  }
+
+  constructor(props: {}) {
+    super(props);
+    this.setActiveExecutable = this.setActiveExecutable.bind(this);
+  }
+
+  componentDidMount() {
+    console.info('Refreshing config');
+
+    hueConfig.refreshConfig(HUE_BASE_URL).then(() => {
+      const connector = hueConfig.findEditorConnector(() => true); // Returns the first connector
+
+      this.setState({
+        executor: hueComponents.createExecutor({
+          compute: (() => ({ id: 'default' })) as KnockoutObservable<any>,
+          connector: (() => connector) as KnockoutObservable<any>,
+          database: (() => 'default') as KnockoutObservable<any>,
+          namespace: (() => ({ id: 'default' })) as KnockoutObservable<any>,
+        })
+      })
+    }).catch(() => {
+      console.warn('Failed loading the Hue config')
+    })
+  }
+
+  setActiveExecutable(activeExecutable: SqlExecutable) {
+    this.setState({
+      activeExecutable
+    })
+  }
+
+  render() {
+    const executor = this.state.executor;
+    if (executor) {
+      return <React.Fragment>
+        <div className="ace-editor">
+          <QueryEditor executor={executor} setActiveExecutable={this.setActiveExecutable}/>
+        </div>
+        <div className="executable-progress-bar">
+          <ExecuteProgress activeExecutable={this.state.activeExecutable}/>
+        </div>
+        <div className="executable-actions">
+          <ExecuteActions activeExecutable={this.state.activeExecutable}/>
+        </div>
+        <div className="result-table">
+          <ResultTable activeExecutable={this.state.activeExecutable}/>
+        </div>
+      </React.Fragment>
+    } else {
+      return <div>Loading Config...</div>
+    }
+  }
+}

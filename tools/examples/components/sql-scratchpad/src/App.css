@@ -1,18 +1,18 @@
 .app {
   height: 100%;
-  background-color: #282c34;
+  background-color: #ccc;
   display: flex;
   flex-direction: column;
 }
 
 .app > .app-header {
   flex: 0 0 32px;
-  background-color: #282c34;
+  background-color: #ccc;
   align-items: center;
   text-align: center;
   justify-content: center;
   font-size: 25px;
-  color: white;
+  color: #282c34;
 }
 
 .inline-block {

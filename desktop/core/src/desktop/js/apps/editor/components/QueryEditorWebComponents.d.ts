@@ -14,24 +14,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { ComponentOptions, Component, createApp, h } from 'vue';
-import wrapper, { WebComponentOptions } from './wrapper/index';
+import Executor, { ExecutorOptions } from '../execution/executor';
 
-export interface HueComponentOptions<T extends Component> extends ComponentOptions<T> {
-  hueBaseUrl?: string;
+export interface HueComponentConfig {
+  baseUrl?: string;
 }
 
-const isRegistered = function (tag: string): boolean {
-  return window.customElements.get(tag) !== undefined;
+declare const _default: {
+  configure: (config: HueComponentConfig) => void;
+  createExecutor: (options: ExecutorOptions) => Executor;
 };
 
-export const wrap = <T extends Component>(
-  tag: string,
-  component: { new (): T },
-  options?: WebComponentOptions
-): void => {
-  if (!isRegistered(tag)) {
-    const customElement: CustomElementConstructor = wrapper(component, createApp, h, options);
-    window.customElements.define(tag, customElement);
-  }
-};
+export default _default;
