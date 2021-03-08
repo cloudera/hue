@@ -35,7 +35,6 @@ sf_caption_position:
 sf_remove_promo_bar:
   - 1
 categories:
-  - Browsing
 
 ---
 Are you seeing this error when submitting a job to YARN? Are you launching an Oozie workflow with a Spark action? You might be hitting this issue!

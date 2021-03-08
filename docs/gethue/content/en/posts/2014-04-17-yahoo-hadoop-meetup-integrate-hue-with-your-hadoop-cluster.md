@@ -35,8 +35,7 @@ sf_caption_position:
 slide_template:
   - default
 categories:
-  - Administration
-  - News
+#  - News
 
 ---
 This talk describes how Hue can be integrated with existing Hadoop deployments with minimal changes/disturbances. Romain covers details on how Hue can leverage the existing authentication system and security model of your company. He also covers the Hive/Shark/Pig/Oozie best practice setup for Hue.

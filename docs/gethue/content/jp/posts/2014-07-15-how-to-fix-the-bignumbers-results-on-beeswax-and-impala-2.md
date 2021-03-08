@@ -39,7 +39,6 @@ sf_custom_excerpt:
     Hue 3.6 には、BeeswaxとImpalaアプリのクエリの結果パネルでいくつかの大きな数字が丸められるというバグが含まれています。<br>
     私たちはこの問題を解決するためのブックマークレットを用意...
 categories:
-  - Administration
   - Hive
   - Impala
   - Programming

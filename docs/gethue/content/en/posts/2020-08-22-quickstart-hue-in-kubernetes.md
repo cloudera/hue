@@ -39,8 +39,8 @@ sf_remove_promo_bar:
 ampforwp-amp-on-off:
   - default
 categories:
-  - Administration
-  - Version 4.8
+  - Version 4
+#  - Version 4.8
 
 ---
 Let&#8217;s see how to automate the deployment further and run this into a container orchestration like [Kubernetes][1].

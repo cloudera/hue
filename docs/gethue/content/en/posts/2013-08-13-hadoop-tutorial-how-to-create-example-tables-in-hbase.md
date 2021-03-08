@@ -41,7 +41,6 @@ slide_template:
 ampforwp-amp-on-off:
   - default
 categories:
-  - Browsing
 ---
 
 <p id="docs-internal-guid-7c74e5e3-7999-5a0b-77ef-ac77803cb105">

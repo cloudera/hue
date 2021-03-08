@@ -39,7 +39,6 @@ sf_caption_position:
 ampforwp-amp-on-off:
   - default
 categories:
-  - Browsing
   # - Version 4.3
   # - Version 4.4
   - Version 4

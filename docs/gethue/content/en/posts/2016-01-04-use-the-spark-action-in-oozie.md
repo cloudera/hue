@@ -33,8 +33,6 @@ sf_right_sidebar:
 sf_caption_position:
   - caption-right
 categories:
-  - Scheduling
-  - Querying
 
 ---
 _<span style="color: #ff0000;">Update September 2016</span>: this post is getting replaced by <https://gethue.com/how-to-schedule-spark-jobs-with-spark-on-yarn-and-oozie/>_

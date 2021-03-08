@@ -37,8 +37,8 @@ sf_caption_position:
 ampforwp-amp-on-off:
   - default
 categories:
-  - Administration
-  - Version 4.7
+  - Version 4
+#  - Version 4.7
 
 ---
 
@@ -47,92 +47,92 @@ Hue prometheus のメトリクスを味わうには、Hue Server 上の [metrics
 **前提条件**: Hue server は localhost:8000 で実行されていること
 
 1. サービスユーザーを作成します
-	
+
 ```console
 	$ sudo useradd --no-create-home --shell /bin/false prometheus
 ```
 
 2. Prometheus の設定ファイル用に /etc にディレクトリを作成し、/var/lib にデータ用のディレクトリを作成します
-	
+
 ```console
 	$ sudo mkdir /etc/prometheus
 	$ sudo mkdir /var/lib/prometheus
 ```
 3. 新しいディレクトリのユーザーとグループを prometheus ユーザーに設定します
-	
+
 ```console
 	$ sudo chown prometheus:prometheus /etc/prometheus
 	$ sudo chown prometheus:prometheus /var/lib/prometheus
 ```
 4. Prometheus のバイナリを [https://prometheus.io/download/](https://prometheus.io/download/) からダウンロードします
-	
+
 ```console
 	$ cd ~/Downloads
 	$ curl -LO https://github.com/prometheus/prometheus/releases/download/v2.16.0/prometheus-2.16.0.linux-amd64.tar.gz
 ```
 5. チェックサムを検証します
-	
+
 ```console
-	$ Sha256sum prometheus-2.16.0.linux-amd64.tar.gz 
+	$ Sha256sum prometheus-2.16.0.linux-amd64.tar.gz
 ```
 6. ダウンロードしたアーカイブを解凍します
-	
+
 ```console
 	$ tar xvf prometheus-2.16.0.linux-amd64.tar.gz
 ```
 7. 2つのバイナリを /usr/local/bin ディレクトリにコピーします
-	
+
 ```console
 	$ sudo cp prometheus-2.16.0.linux-amd64/prometheus /usr/local/bin/
 	$ sudo cp prometheus-2.16.0.linux-amd64/promtool /usr/local/bin/
 ```
 8. consoles と console_libraries ディレクトリを /etc/prometheus にコピーします
-	
+
 ```console
 	$ sudo cp -r prometheus-2.16.0.linux-amd64/consoles /etc/prometheus
 	$ sudo cp -r prometheus-2.16.0.linux-amd64/console_libraries /etc/prometheus
 ```
 9. ディレクトリのユーザーとグループを prometheus ユーザーに設定します。-R フラグを使用して、ディレクトリ内のファイルにも所有者が設定されるようにしてください
-	
+
 ```console
 	$ sudo chown -R prometheus:prometheus /etc/prometheus/consoles
 	$ sudo chown -R prometheus:prometheus /etc/prometheus/console_libraries
 ```
 10. ダウンロードしたフォルダから残りのファイルを削除します
-	
+
 ```console
 	$ rm -rf prometheus-2.16.0.linux-amd64.tar.gz prometheus-2.16.0.linux-amd64
 ```
 11. prometheus.yml という名前の設定ファイルを作成します
-	
+
 ```console
 	$ vi /etc/prometheus/prometheus.yml
 ```
 
 prometheus.yml の port 8000 は Hue server のポートです。必要に応じて変更してください。
-	
+
 ```console
 	global:
 	  scrape_interval: 15s
-	 
+
 	scrape_configs:
 	  - job_name: 'prometheus'
 	    scrape_interval: 5s
 	    static_configs:
 	      - targets: ['localhost:9090']
-	 
+
 	  - job_name: 'hue'
 	    scrape_interval: 5s
 	    static_configs:
 	      - targets: ['localhost:8000']
 ```
 12. 設定ファイルのユーザーとグループを prometheus ユーザーに設定します
-	
+
 ```console
 	$ sudo chown prometheus:prometheus /etc/prometheus/prometheus.yml
 ```
 13. 新しい systemd サービスファイルを作成します
-	
+
 ```console
 	$ vi /etc/systemd/system/prometheus.service
 ```
@@ -143,7 +143,7 @@ prometheus.yml の port 8000 は Hue server のポートです。必要に応じ
 	Description=Prometheus
 	Wants=network-online.target
 	After=network-online.target
-	
+
 	[Service]
 	User=prometheus
 	Group=prometheus
@@ -153,13 +153,13 @@ prometheus.yml の port 8000 は Hue server のポートです。必要に応じ
 	    --storage.tsdb.path /var/lib/prometheus/ \
 	    --web.console.templates=/etc/prometheus/consoles \
 	    --web.console.libraries=/etc/prometheus/console_libraries
-	
+
 	[Install]
 	WantedBy=multi-user.target
 ```
 
 14. 新しく作成したサービを使用して、systemd をリロードして開始します。
-	
+
 ```console
 	$ sudo systemctl daemon-reload
 	$ sudo systemctl start prometheus
@@ -172,4 +172,3 @@ prometheus.yml の port 8000 は Hue server のポートです。必要に応じ
 
 
 Ying Chen from the Hue Team
-

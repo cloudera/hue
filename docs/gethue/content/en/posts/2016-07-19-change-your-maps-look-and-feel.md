@@ -35,9 +35,7 @@ sf_caption_position:
 sf_remove_promo_bar:
   - 1
 categories:
-  - Administration
-  - Development
-  - Querying
+  - Dev / API
 
 ---
 Did you know that you can change the look and feel of your Hue maps just by specifying two extra variables on the <a href="https://github.com/cloudera/hue/blob/master/desktop/conf.dist/hue.ini#L114" target="_blank" rel="noopener noreferrer">Hue configuration</a>?

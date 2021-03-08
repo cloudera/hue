@@ -39,7 +39,6 @@ sf_caption_position:
 slide_template:
   - default
 categories:
-  - Querying
 ---
 
 In the previous installment of the demo series about [Hue][1] — the open source Web UI that makes [Apache Hadoop][2] easier to use — you learned how to [analyze data with Hue using Apache Hive via Hue’s Beeswax and Catalog applications][3]. In this installment, we’ll focus on using the new editor for [Apache Pig][4] in [Hue 2.3][5].

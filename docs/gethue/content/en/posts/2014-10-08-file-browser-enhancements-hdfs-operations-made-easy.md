@@ -37,7 +37,6 @@ sf_remove_promo_bar:
 slide_template:
   - default
 categories:
-  - Browsing
 ---
 
 A lot of exciting work has been done on File Browser to provide additional features and the best user experience possible. Take a look at the updates below and start using them today!

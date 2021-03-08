@@ -39,7 +39,6 @@ sf_thumbnail_type:
 ampforwp-amp-on-off:
   - default
 categories:
-  - Querying
   - Version 4
   # - Version 4.4
 

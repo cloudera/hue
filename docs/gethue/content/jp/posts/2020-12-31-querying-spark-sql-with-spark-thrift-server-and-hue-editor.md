@@ -1,5 +1,5 @@
 ---
-title: Hue と Spark SQL Server を介したSpark SQL Editor 
+title: Hue と Spark SQL Server を介したSpark SQL Editor
 author: Romain
 type: post
 date: 2020-12-31T00:00:00+00:00
@@ -39,7 +39,6 @@ sf_remove_promo_bar:
 ampforwp-amp-on-off:
   - default
 categories:
-  - Querying
   - Tutorial
   - Version 4.9
 

@@ -37,8 +37,8 @@ sf_caption_position:
 ampforwp-amp-on-off:
   - default
 categories:
-  - Administration
-  - Version 4.8
+  - Version 4
+#  - Version 4.8
 
 ---
 Hue の管理者の皆さん、こんにちは
@@ -107,5 +107,3 @@ Ranger サービスにログインして、ユーザーまたはグループが�
 フィードバックやご質問はありますか？こちら、または<a href="https://discourse.gethue.com/">フォーラム</a> and <a href="https://docs.gethue.com/quickstart/">quick start</a> で気軽にコメントして、SQLクエリのクイックスタートをしましょう！
 
 Weixia Xu from the Hue Team
-
-

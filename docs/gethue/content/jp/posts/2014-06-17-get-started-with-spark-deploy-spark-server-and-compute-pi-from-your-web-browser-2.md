@@ -25,7 +25,7 @@ sf_background_image_size:
 sf_custom_excerpt:
   - |
     HueはブラウザからScalaとJavaのジョブを直接サブミットできるSpark Applicationを同梱しています。
-    
+
     Sparkとやり取りするために、オープンソースのSpark Job Serverを使用します...
 sf_social_sharing:
   - 1
@@ -42,13 +42,12 @@ sf_remove_promo_bar:
 slide_template:
   - default
 categories:
-  - Administration
   - Spark
   - Tutorial
   - Video
 
 ---
-HueはブラウザからScalaとJavaの[ジョブを直接サブミットできる][1][Spark Application][2][を同梱しています。][1] 
+HueはブラウザからScalaとJavaの[ジョブを直接サブミットできる][1][Spark Application][2][を同梱しています。][1]
 
 Sparkとやり取りするために、オープンソースの[Spark Job Server][3]を使用します。 (例: 一覧、Sparkジョブの投入、結果の取得、コンテキストの作成&#8230;)
 
@@ -93,7 +92,7 @@ Created distribution at /tmp/job-server/job-server.tar.gz
 主要なtarbal、tarball `/tmp/job-server/job-server.tar.gz`を持っており、サーバーにコピーする準備ができています。
 
 注:
-  
+
 `server_deploy.sh`で自動的にファイルをコピーすることもできます。
 
 ## Spark Job Serverを開始する
@@ -125,7 +124,7 @@ total 25208
 </pre>
 
 注:
-  
+
 [Spark Master Web UI][5]を調査してsparkのURLを得ることもできます。
 
 少なくともひとつのSpark workerがあることも確認します:  `"Workers: 1"`

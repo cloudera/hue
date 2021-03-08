@@ -39,7 +39,7 @@ sf_caption_position:
 slide_template:
   - default
 categories:
-  - News
+#  - News
 
 ---
 <blockquote class="link_og_blockquote">

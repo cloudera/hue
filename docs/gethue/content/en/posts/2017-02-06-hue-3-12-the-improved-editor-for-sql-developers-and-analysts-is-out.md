@@ -38,7 +38,6 @@ sf_remove_promo_bar:
   - 1
 categories:
   - Release
-  - Querying
 
 ---
 Hi Big Data Explorers,

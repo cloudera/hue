@@ -35,8 +35,7 @@ sf_caption_position:
 sf_remove_promo_bar:
   - 1
 categories:
-  - News
-  - Querying
+#  - News
 
 ---
 ## Interactively Query and Search your big data - [Hadoop Summit San Jose 2015][1]

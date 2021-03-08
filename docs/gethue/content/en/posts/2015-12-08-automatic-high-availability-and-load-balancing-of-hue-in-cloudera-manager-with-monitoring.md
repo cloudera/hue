@@ -35,7 +35,6 @@ sf_caption_position:
 sf_remove_promo_bar:
   - 1
 categories:
-  - Administration
 ---
 
 The release of [Hue 3.9][1] and CDH5.5 makes Hue noticeably faster and easy to monitor.

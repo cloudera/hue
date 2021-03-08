@@ -36,7 +36,6 @@ sf_caption_position:
   - caption-right
 categories:
   - Version 4
-  - Querying
 
 ---
 _This is a blog post from the community by Joanna He and Yongjie Zhao._

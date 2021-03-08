@@ -35,7 +35,6 @@ sf_caption_position:
 sf_remove_promo_bar:
   - 1
 categories:
-  - Administration
 ---
 
 In the upcoming Hue 3.9 release, Hue will support the ability to configure multiple authentication backends.

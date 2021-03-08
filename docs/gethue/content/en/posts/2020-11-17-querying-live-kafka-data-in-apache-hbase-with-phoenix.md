@@ -39,9 +39,9 @@ sf_remove_promo_bar:
 ampforwp-amp-on-off:
   - default
 categories:
-  - Querying
   - Tutorial
   - Version 4.9
+  - Phoenix
 
 ---
 Phoenix brings SQL to HBase and let you query Kafka data streams

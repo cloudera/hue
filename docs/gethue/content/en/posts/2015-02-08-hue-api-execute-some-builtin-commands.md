@@ -37,8 +37,7 @@ sf_remove_promo_bar:
 slide_template:
   - default
 categories:
-  - Administration
-  - Development
+  - Dev / API
 
 ---
 Last update: March 3rd 2016

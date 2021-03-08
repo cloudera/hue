@@ -35,7 +35,6 @@ sf_caption_position:
 sf_remove_promo_bar:
   - 1
 categories:
-  - Querying
 ---
 
 The Notebook application as well as the REST Spark Job Server are being revamped. These two components goals are to let users execute [Spark][1] in their browser or from anywhere. They are still in beta but next version of Hue will have them graduate. Here are a list of the improvements and a video demo:

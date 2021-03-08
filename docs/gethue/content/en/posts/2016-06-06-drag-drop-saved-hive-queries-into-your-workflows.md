@@ -37,8 +37,6 @@ sf_caption_position:
 sf_remove_promo_bar:
   - 1
 categories:
-  - Querying
-  - Scheduling
 ---
 
 The Oozie Workflow editor is getting a new generic action that let's you drag & drop any of your Hive query of the SQL Editor. Here it is in action:

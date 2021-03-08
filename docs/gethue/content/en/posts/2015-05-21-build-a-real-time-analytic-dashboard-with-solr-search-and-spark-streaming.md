@@ -35,7 +35,6 @@ sf_caption_position:
 sf_remove_promo_bar:
   - 1
 categories:
-  - Querying
   - Tutorial
 ---
 

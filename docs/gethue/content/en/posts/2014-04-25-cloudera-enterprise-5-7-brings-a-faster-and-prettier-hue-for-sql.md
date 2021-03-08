@@ -35,7 +35,7 @@ sf_thumbnail_link_type:
 sf_thumbnail_type:
   - none
 categories:
-  - News
+#  - News
 ---
 
 Cloudera Enterprise 5.7 brings a lot of changes (more than 1500) to HUE (the Web interface for querying and browsing data). The emphasize on performances and security continues from [5.5][1] as well as the improvement of the SQL user experience.
