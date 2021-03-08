@@ -39,7 +39,6 @@ sf_caption_position:
 slide_template:
   - default
 categories:
-  - Scheduling
 
 ---
 [Hue][1] is a Web-based interface that makes it easier to use [Apache Hadoop][2]. [Hue 2.1][3] (included in [CDH4.1][4]) provides a new application on top of [Apache Oozie][5] (a workflow scheduler system for Apache Hadoop) for creating workflows and scheduling them repetitively. For example, Hue makes it easy to group a set of MapReduce jobs and Hive scripts and run them every day of the week.

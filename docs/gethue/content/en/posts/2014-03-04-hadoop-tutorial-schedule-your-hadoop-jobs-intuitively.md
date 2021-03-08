@@ -39,7 +39,6 @@ sf_caption_position:
 slide_template:
   - default
 categories:
-  - Scheduling
 ---
 
 <p id="docs-internal-guid-be480bc2-8f87-c4e1-42a3-9789aa72a148">

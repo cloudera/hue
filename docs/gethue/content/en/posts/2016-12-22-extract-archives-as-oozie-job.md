@@ -33,8 +33,6 @@ sf_right_sidebar:
 sf_caption_position:
   - caption-right
 categories:
-  - Browsing
-  - Scheduling
 
 ---
 Hello Hue users,

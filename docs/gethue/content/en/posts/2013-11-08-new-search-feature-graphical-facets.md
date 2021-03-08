@@ -39,7 +39,6 @@ sf_caption_position:
 slide_template:
   - default
 categories:
-  - Querying
 ---
 
 This new feature completed in [Thailand][1] lets you search interactively:

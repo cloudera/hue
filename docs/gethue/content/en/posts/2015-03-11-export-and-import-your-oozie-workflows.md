@@ -35,7 +35,6 @@ sf_caption_position:
 sf_remove_promo_bar:
   - 1
 categories:
-  - Scheduling
 
 ---
 <span style="color: #ff0000;"><em>August 7th 2015 update: this post is now deprecated as of Hue 3.9:</em></span> [Exporting and importing Oozie workflows directly from the UI](https://gethue.com/exporting-and-importing-oozie-workflows/)

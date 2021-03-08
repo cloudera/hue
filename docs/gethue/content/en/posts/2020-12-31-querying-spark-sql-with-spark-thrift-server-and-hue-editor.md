@@ -39,9 +39,9 @@ sf_remove_promo_bar:
 ampforwp-amp-on-off:
   - default
 categories:
-  - Querying
   - Tutorial
   - Version 4.9
+  - Spark SQL
 
 ---
 Write and Execute some Spark SQL quickly in your own Web Editor.

@@ -37,7 +37,6 @@ sf_remove_promo_bar:
 ampforwp-amp-on-off:
   - default
 categories:
-  - Administration
 ---
 
 **Update March 2019**: this post was refresh in [Hue in Docker][1]

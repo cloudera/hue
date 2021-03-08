@@ -35,8 +35,7 @@ sf_caption_position:
 sf_remove_promo_bar:
   - 1
 categories:
-  - Development
-  - Querying
+  - Dev / API
 
 ---
 The Search app in Hue is getting [better and better][1]!

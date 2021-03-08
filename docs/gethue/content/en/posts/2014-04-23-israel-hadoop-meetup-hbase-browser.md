@@ -35,7 +35,7 @@ sf_caption_position:
 slide_template:
   - default
 categories:
-  - News
+#  - News
 
 ---
 <iframe style="border: 1px solid #CCC; border-width: 1px 1px 0; margin-bottom: 5px; max-width: 100%;" src="http://www.slideshare.net/slideshow/embed_code/33868566" height="600" width="900" allowfullscreen="" frameborder="0" marginwidth="0" marginheight="0" scrolling="no"></iframe>

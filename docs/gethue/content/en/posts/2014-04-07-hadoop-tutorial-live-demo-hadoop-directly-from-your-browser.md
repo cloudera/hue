@@ -35,9 +35,6 @@ sf_caption_position:
 slide_template:
   - default
 categories:
-  - Administration
-  - Browsing
-  - Querying
 
 ---
 Hi Data Crunchers,

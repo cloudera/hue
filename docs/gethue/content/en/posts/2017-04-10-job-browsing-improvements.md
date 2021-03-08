@@ -29,7 +29,6 @@ sf_right_sidebar:
 sf_caption_position:
   - caption-right
 categories:
-  - Browsing
 ---
 
 [Hue 3.12][1] comes with two significant job browsing improvements that make the navigation among thousands of jobs much simpler. Here is a demo describing the changes in detail.

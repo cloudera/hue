@@ -35,7 +35,6 @@ sf_caption_position:
 sf_remove_promo_bar:
   - 1
 categories:
-  - Scheduling
 ---
 
 Oozie is one of the [initial major][1] first app in Hue. We are continuously investing in making it better and just did a major jump in its editor (to learn about the improvements in the Dashboard in <a href="https://gethue.com/oozie-dashboard-improvements/" target="_blank" rel="noopener noreferrer">the other post</a>).

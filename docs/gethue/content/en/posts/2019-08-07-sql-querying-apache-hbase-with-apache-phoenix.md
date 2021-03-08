@@ -37,10 +37,9 @@ sf_caption_position:
 ampforwp-amp-on-off:
   - default
 categories:
-  - Querying
-  - Browsing
   - Version 4
-  - Version 4.8
+  - Version 4
+#  - Version 4.8
 
 ---
 [Apache Phoenix][1] is a great addon to extent SQL on top of [Apache HBase][2], the non relational distributed data store. On top of the [HBase Browser][3], now the [Editor][4] provides a more common syntax for querying the data. Note that being a key/value store, the SQL can have different idioms, and the Editor interface still requires some polishing to fully support all the SQL UX capabilities of Hue.

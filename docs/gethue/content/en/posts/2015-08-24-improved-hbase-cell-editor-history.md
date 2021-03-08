@@ -35,7 +35,6 @@ sf_caption_position:
 sf_remove_promo_bar:
   - 1
 categories:
-  - Browsing
 ---
 
 For Hue 3.9 we've made some improvements to the HBase Browser that will make your life easier when editing cell contents.

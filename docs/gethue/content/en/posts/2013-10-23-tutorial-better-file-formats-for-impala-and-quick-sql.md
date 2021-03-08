@@ -39,7 +39,6 @@ sf_caption_position:
 slide_template:
   - default
 categories:
-  - Querying
 
 ---
 # <span>Impala File Formats</span> {#docs-internal-guid-798b2644-e679-81ed-508c-e3685cd16a67}

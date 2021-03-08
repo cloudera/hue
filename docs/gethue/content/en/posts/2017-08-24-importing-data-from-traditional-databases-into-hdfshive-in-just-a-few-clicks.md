@@ -40,7 +40,6 @@ sf_detail_type:
   - none
 categories:
   - Version 4
-  - Querying
   - Tutorial
 ---
 

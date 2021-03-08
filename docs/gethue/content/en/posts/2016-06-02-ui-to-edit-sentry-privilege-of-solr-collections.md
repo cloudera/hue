@@ -37,7 +37,6 @@ sf_caption_position:
 sf_remove_promo_bar:
   - 1
 categories:
-  - Querying
 ---
 
 The [Sentry app][1] now let's you edit Solr Collection privileges. It previously only support editing permissions of the Hive Tables.

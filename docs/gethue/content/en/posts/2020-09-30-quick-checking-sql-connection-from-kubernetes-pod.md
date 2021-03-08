@@ -39,8 +39,8 @@ sf_remove_promo_bar:
 ampforwp-amp-on-off:
   - default
 categories:
-  - Administration
   - Version 4.9
+  - Hive
 
 ---
 Let's see one way to quickly check why Hue can't connect to a SQL Database in the Kubernetes world.

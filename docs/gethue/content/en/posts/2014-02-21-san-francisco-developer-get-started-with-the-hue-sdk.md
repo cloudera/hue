@@ -39,7 +39,7 @@ sf_caption_position:
 slide_template:
   - default
 categories:
-  - Development
+  - Dev / API
 
 ---
 From [San Francisco Developer Meetup][1]

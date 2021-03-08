@@ -39,10 +39,9 @@ slide_template:
 sf_custom_excerpt:
   - |
     HiveとImpalaのSQLエディタによって、Hueはよく使用されるようになっています:
-    
+
     しかし、クエリの結果はどうなるのでしょうか？それらはどのくらい保持されているのでしょうか？それらはなぜ時々消えているのでしょうか？なぜ一部のImpalaのクエリは、それらが完了した場合でも、まだ「実行中」なのでしょうか？
 categories:
-  - Administration
   - Hive
   - Impala
 

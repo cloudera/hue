@@ -37,7 +37,6 @@ slide_template:
 sf_custom_excerpt:
   - Hueは、Hadoopの次世代SQLエンジンであるImpala用のインタフェースを提供しています。さらなるパフォーマンスを提供するために、HueはImpalaのワーカーの全てに渡ってクエリのロードを分散することができます。
 categories:
-  - Administration
   - Impala
   - Video
 
@@ -64,10 +63,10 @@ Hueは、Hadoopの次世代SQLエンジンである[Impala][1]用の[インタ�
 （Cloudera Managerを日本語でセットアップしている場合には、適宜読み替えて下さい）
 
   1. Cloudera Managerから、メニューの“Clusters”をクリックして、Hueサービスを探します。
-  
+
     [<img class="alignnone  wp-image-1228" src="https://cdn.gethue.com/uploads/2014/05/impala-1.png" alt="impala-1" width="657" height="556" data-wp-pid="1228" />][4]
   2. Hueサービスから、 “Configuration -> View and Edit”を選択します。
-  
+
     [<img class="alignnone  wp-image-1227" src="https://cdn.gethue.com/uploads/2014/05/impala-2.png" alt="impala-2" width="292" height="165" data-wp-pid="1227" />][5]
   3. 適切なロードバランサーとソケットのタイムアウトを使用するために、Cloudera Managerで安全バルブ（safety valve)の設定を行う必要があります。“Service-Wide -> Advanced” に移動し、“Hue Service Advanced Configuration Snippet (Safety Valve)”の値をクリックします。値には、以下をテンプレートとして利用することができます: <pre><code class="bash">[impala]
 server_host=&lt;hostname running HAProxy&gt;
@@ -83,7 +82,7 @@ Cloudera ManagerでHueを設定するためのより多くの情報は、[Managi
 
   1. お好みのエディタで/etc/hue/hue.iniを開きます。
   2. &#8220;impala&#8221;セクションの下にある“server\_conn\_timeout”設定を大きな値（例：1時間）に変更します。この値は秒単位で設定しなければなりません（1時間 = 3600秒）。設定オプションは「Cloudera Managerによる設定」も参照して下さい。
-  
+
     [<img class="alignnone  wp-image-1229" src="https://cdn.gethue.com/uploads/2014/05/impala-3.png" alt="impala-3" width="492" height="405" data-wp-pid="1229" />][7]
   3. 次に、hue.iniの&#8221;impala&#8221;セクションで、新しいホストとポートをセットしなければなりません。ホスト名は &#8220;server\_host&#8221;に、ポートは &#8220;server\_port&#8221; に定義されています。設定オプションは「Cloudera Managerによる設定」も参照して下さい。
 

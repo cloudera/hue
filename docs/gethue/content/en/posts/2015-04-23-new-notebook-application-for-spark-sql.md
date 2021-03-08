@@ -35,7 +35,6 @@ sf_caption_position:
 sf_remove_promo_bar:
   - 1
 categories:
-  - Querying
 ---
 
 [Hue 3.8][1] brings a new way to directly submit Spark jobs from a Web UI.

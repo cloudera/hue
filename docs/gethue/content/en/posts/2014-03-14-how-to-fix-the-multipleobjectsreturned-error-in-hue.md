@@ -41,8 +41,7 @@ slide_template:
 sf_page_title_image:
   - 222
 categories:
-  - Administration
-  - Development
+  - Dev / API
 
 ---
 When going on the Home page (/home) in Hue 3.0, this error could appear:
