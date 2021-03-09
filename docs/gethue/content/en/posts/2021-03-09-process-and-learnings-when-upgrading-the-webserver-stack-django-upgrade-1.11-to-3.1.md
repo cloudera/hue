@@ -1,9 +1,9 @@
 ---
-title: 'Process & Learnings when upgrading the Webserver Stack: Django Upgrade (1.11 to 3.1)'
+title: Process & Learnings when upgrading the Webserver Stack - Django Upgrade (1.11 to 3.1)
 author: Hue Team
 type: post
 date: 2021-03-09T00:00:00+00:00
-url: /blog/process-and-learnings-when-upgrading-the-webserver-stack-django-upgrade-1.11-to-3.1
+url: /blog/2021-03-09-process-and-learnings-when-upgrading-the-webserver-stack-django-upgrade-1.11-to-3.1
 sf_thumbnail_type:
   - none
 sf_thumbnail_link_type:
@@ -51,7 +51,7 @@ The Hue project was started around [10 years](https://gethue.com/blog/2020-01-28
 
 * Hue running with Django 3.1 (latest) while still being able to compile/run with 1.11.
 
-## Why Upgrade 
+## Why Upgrade
 
 * The older version of [Django 1.11 is deprecated](https://www.djangoproject.com/download/#supported-versions) (e.g. no longer receiving security updates or improvements).
 * Django 1.11 requires Python 2 which is also [deprecated](https://docs.djangoproject.com/en/3.1/faq/install/#what-python-version-should-i-use-with-django).
@@ -66,8 +66,8 @@ The Hue project was started around [10 years](https://gethue.com/blog/2020-01-28
 
 ## Plan
 
-* Major tradeoff: 
-  * Python 3 build of Hue will move to Django 3. 
+* Major tradeoff:
+  * Python 3 build of Hue will move to Django 3.
   * Python 2 will stay with Django 1.11 (as Django 1.11 is the latest version supporting Python 2 anyway)
 * Move slowly but perfectly and not go backward, so we decided that we will upgrade Django step by step from 1.11 to 2.0 then 2.0 to 2.1 then 2.1 to 2.2 then 2.2 to 3.0 then 3.0 to 3.1.
 * Resolves the deprecation warnings raised by the current Django version and save them in google sheet before upgrading to the next version.
