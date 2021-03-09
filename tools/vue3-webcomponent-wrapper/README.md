@@ -9,7 +9,7 @@ One main blocker preventing the official wrapper from upgrading was the lack of 
 
 ## Usage
 
-Before with Vue 2 and [@vuejs/vue-web-component-wrapper](https://github.com/vuejs/vue-web-component-wrapper).
+**Before** with Vue 2 and [@vuejs/vue-web-component-wrapper](https://github.com/vuejs/vue-web-component-wrapper).
 
     import Vue from 'vue'
     import wrapper from '@vue/web-component-wrapper'
@@ -18,7 +18,7 @@ Before with Vue 2 and [@vuejs/vue-web-component-wrapper](https://github.com/vuej
     const CustomElement = wrapper(Vue, MyComponent)
     window.customElements.define('my-component', CustomElement)
 
-Now with Vue 3 and vue3-webcomponent-wrapper.
+**Now** with Vue 3 and vue3-webcomponent-wrapper.
 
     import { createApp, h } from "vue";
     import wrapper from "vue3-webcomponent-wrapper";
@@ -27,6 +27,7 @@ Now with Vue 3 and vue3-webcomponent-wrapper.
     const CustomElement = wrapper(MyComponent, createApp, h);
     window.customElements.define("my-component", CustomElement);
 
+**In the future**, when the official wrapper is released for Vue 3, this package could be deprecated. When that happens please check [this file](https://github.com/cloudera/hue/blob/master/desktop/core/src/desktop/js/vue/webComponentWrap.ts) for migrating. That's Hue's interface for web component and will contain migration changes.
 
 Please find more information in this [demo app](https://github.com/sreenaths/vue3-webcomponent-wrapper-demo).
 
