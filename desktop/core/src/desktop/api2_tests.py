@@ -750,11 +750,11 @@ class TestDocumentGist(object):
   def test_gist_directory_creation(self):
     home_dir = Directory.objects.get_home_directory(self.user)
 
-    assert_false(home_dir.children.filter(name='Gist').exists())
+    assert_false(home_dir.children.filter(name=Document2.GIST_DIR, owner=self.user).exists())
 
     Document2.objects.get_gist_directory(self.user)
 
-    assert_true(home_dir.children.filter(name='Gist').exists())
+    assert_true(home_dir.children.filter(name=Document2.GIST_DIR, owner=self.user).exists())
 
 
   def test_get_unfurl(self):
