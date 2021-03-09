@@ -1068,9 +1068,22 @@ class Document2Manager(models.Manager, Document2QueryMixin):
 
   def get_gist_directory(self, user):
     home_dir = self.get_home_directory(user)
-    gist_dir, created = Directory.objects.get_or_create(name=Document2.GIST_DIR, owner=user, parent_directory=home_dir)
-    if created:
-      LOG.info('Successfully created gist directory for user: %s' % user.username)
+
+    try:
+      gist_dir, created = Directory.objects.get_or_create(name=Document2.GIST_DIR, owner=user, parent_directory=home_dir)
+      if created:
+        LOG.info('Successfully created gist directory for user: %s' % user.username)
+    except Directory.MultipleObjectsReturned:
+      LOG.exception('Multiple Gist directories detected. Merging all into one.')
+
+      all_gist_dirs = self.filter(owner=user, parent_directory=home_dir, name=Document2.GIST_DIR, type='directory').order_by('-last_modified')
+      gist_dir = all_gist_dirs.last()
+      gist_dirs_dup = all_gist_dirs.exclude(uuid=gist_dir.uuid)
+      for dir in gist_dirs_dup:
+        dir.children.update(parent_directory=gist_dir)
+
+      gist_dirs_dup.delete()
+
     return gist_dir
 
   def get_by_path(self, user, path):
