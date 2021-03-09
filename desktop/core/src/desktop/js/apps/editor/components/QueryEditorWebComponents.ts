@@ -17,7 +17,8 @@
 import axios from 'axios';
 
 import AceEditor from './aceEditor/AceEditor.vue';
-import ExecutableActions from './ExecutableActions.vue';
+import ExecuteButton from 'apps/editor/components/ExecuteButton.vue';
+import ExecuteLimitInput from 'apps/editor/components/ExecuteLimitInput.vue';
 import ExecutableProgressBar from './ExecutableProgressBar.vue';
 import ResultTable from './result/ResultTable.vue';
 import Executor, { ExecutorOptions } from '../execution/executor';
@@ -25,7 +26,8 @@ import 'utils/json.bigDataParse';
 import { wrap } from 'vue/webComponentWrap';
 
 wrap('query-editor', AceEditor);
-wrap('query-editor-actions', ExecutableActions);
+wrap('query-editor-execute-button', ExecuteButton);
+wrap('query-editor-limit-input', ExecuteLimitInput);
 wrap('query-editor-progress-bar', ExecutableProgressBar);
 wrap('query-editor-result-table', ResultTable);
 

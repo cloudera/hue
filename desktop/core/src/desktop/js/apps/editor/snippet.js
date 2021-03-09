@@ -52,7 +52,6 @@ import {
   ACTIVE_STATEMENT_CHANGED_EVENT,
   REFRESH_STATEMENT_LOCATIONS_EVENT
 } from 'ko/bindings/ace/aceLocationHandler';
-import { EXECUTE_ACTIVE_EXECUTABLE_EVENT } from './components/ExecutableActions.vue';
 import { ADD_TO_HISTORY_EVENT } from 'apps/editor/components/ko.queryHistory';
 import { findEditorConnector, getLastKnownConfig } from 'config/hueConfig';
 import { cancelActiveRequest } from 'api/apiUtils';
@@ -194,6 +193,8 @@ const getDefaultSnippetProperties = snippetType => {
 
   return properties;
 };
+
+const EXECUTE_ACTIVE_EXECUTABLE_EVENT = 'executable.active.executable';
 
 const ERROR_REGEX = /line ([0-9]+)(:([0-9]+))?/i;
 
