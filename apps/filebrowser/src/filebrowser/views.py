@@ -733,7 +733,7 @@ def display(request, path):
         is_binary = uni_contents.find(i18n.REPLACEMENT_CHAR) != -1
         # Auto-detect mode
         if not mode:
-            mode = is_binary and 'binary' or 'text'
+          mode = is_binary and 'binary' or 'text'
       else:
         # We already have a string.
         uni_contents = contents
@@ -744,7 +744,7 @@ def display(request, path):
       is_binary = uni_contents.find(i18n.REPLACEMENT_CHAR) != -1
       # Auto-detect mode
       if not mode:
-          mode = is_binary and 'binary' or 'text'
+        mode = is_binary and 'binary' or 'text'
 
   # Get contents as bytes
   if mode == "binary":
