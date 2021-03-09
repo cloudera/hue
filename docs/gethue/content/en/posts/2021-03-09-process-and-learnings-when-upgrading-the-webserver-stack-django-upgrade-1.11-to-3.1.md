@@ -3,7 +3,7 @@ title: Process & Learnings when upgrading the Webserver Stack - Django Upgrade (
 author: Hue Team
 type: post
 date: 2021-03-09T00:00:00+00:00
-url: /blog/2021-03-09-process-and-learnings-when-upgrading-the-webserver-stack-django-upgrade-1.11-to-3.1
+url: /blog/2021-03-09-process-and-learnings-when-upgrading-the-webserver-stack-django-upgrade-1-to-3
 sf_thumbnail_type:
   - none
 sf_thumbnail_link_type:
