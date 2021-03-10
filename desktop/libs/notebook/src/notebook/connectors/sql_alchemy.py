@@ -87,6 +87,7 @@ else:
 
 ENGINES = {}
 CONNECTIONS = {}
+FETCH_RESULTS = {}
 ENGINE_KEY = '%(username)s-%(connector_name)s'
 URL_PATTERN = '(?P<driver_name>.+?://)(?P<host>[^:/ ]+):(?P<port>[0-9]*).*'
 
@@ -355,6 +356,15 @@ class SqlAlchemyApi(Api):
       data = handle['result'].fetchmany(rows)
       meta = handle['meta']
       self._assign_types(data, meta)
+      if not data:
+        return {
+          'has_more': data and len(data) >= rows or False,
+          'data': FETCH_RESULTS[guid],
+          'meta': meta if meta else [],
+          'type': 'table'
+        }
+      else:
+        FETCH_RESULTS[guid] = data
     else:
       raise QueryExpired()
 
@@ -411,6 +421,7 @@ class SqlAlchemyApi(Api):
       if connection:
         connection['connection'].close()
         del CONNECTIONS[guid]
+        del FETCH_RESULTS[guid]
       result['status'] = 0
     finally:
       return result

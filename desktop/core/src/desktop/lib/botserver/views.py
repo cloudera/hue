@@ -25,10 +25,12 @@ from desktop.conf import ENABLE_GIST_PREVIEW
 from desktop.lib.django_util import login_notrequired, JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.models import Document2, _get_gist_document
+from desktop.auth.backend import rewrite_user
 
 from notebook.api import _fetch_result_data, _check_status
 from notebook.models import MockRequest
-from useradmin.models import UserProfile, User
+
+from useradmin.models import User
 
 from django.http import HttpResponse
 from django.utils.translation import ugettext as _
@@ -114,21 +116,22 @@ def handle_on_link_shared(channel_id, message_ts, links):
     dialect = doc_data['dialect'].capitalize() if id_type == 'editor' else doc.extra.capitalize()
     created_by = doc.owner.get_full_name() or doc.owner.username
 
-    user = User.objects.get(username=doc.owner.username)
+    # Fetch query result
+    user = rewrite_user(User.objects.get(username='hue'))
     request = MockRequest(user=user)
 
-    status = _check_status(request, notebook=doc_data, snippet=doc_data['snippets'][0], operation_id=doc_data['uuid'])
+    operation_uuid = doc_data['uuid']
 
+    status = _check_status(request, operation_id=operation_uuid)
     if status['query_status']['status'] == 'available':
-      result = _fetch_result_data(request, notebook=doc_data, snippet=doc_data['snippets'][0], operation_id=doc_data['uuid'])
+      result = _fetch_result_data(request, operation_id=doc_data['uuid'])
 
-
-    payload = _make_unfurl_payload(item['url'], statement, dialect, created_by)
+    payload = _make_unfurl_payload(item['url'], statement, dialect, created_by, result['result']['data'])
     response = slack_client.chat_unfurl(channel=channel_id, ts=message_ts, unfurls=payload)
     if not response['ok']:
       raise PopupException(_("Cannot unfurl link"), detail=response["error"])
 
-def _make_unfurl_payload(url, statement, dialect, created_by):
+def _make_unfurl_payload(url, statement, dialect, created_by, result):
   payload = {
     url: {
       "color": "#025BA6",
@@ -159,7 +162,16 @@ def _make_unfurl_payload(url, statement, dialect, created_by):
               "text": "*Created By:*\n{}".format(created_by)
             }
           ]
-        }
+        },
+        {
+					"type": "section",
+					"fields": [
+						{
+							"type": "mrkdwn",
+							"text": "*Query Result: * {}".format(result),
+						}
+					]
+				}
       ]
     }
   }
