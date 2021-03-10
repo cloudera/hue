@@ -431,16 +431,22 @@ export default class AceLocationHandler implements Disposable {
             ) === -1) ||
             token.syntaxError)
         ) {
-          const range = token.parseLocation
-            ? markLocation(token.parseLocation)
-            : new AceRange(
-                (token.syntaxError && token.syntaxError.loc.first_line - 1) || 1,
-                (token.syntaxError && token.syntaxError.loc.first_column) || 1,
-                (token.syntaxError && token.syntaxError.loc.last_line - 1) || 1,
-                (token.syntaxError &&
-                  token.syntaxError.loc.first_column + token.syntaxError.text.length) ||
-                  1
-              );
+          let range: Ace.Range | undefined = undefined;
+
+          if (token.parseLocation) {
+            range = markLocation(token.parseLocation);
+          } else if (token.syntaxError) {
+            range = new AceRange(
+              token.syntaxError.loc.first_line - 1,
+              token.syntaxError.loc.first_column,
+              token.syntaxError.loc.last_line - 1,
+              token.syntaxError.loc.first_column + token.syntaxError.text.length
+            );
+          }
+
+          if (!range) {
+            return;
+          }
 
           const startCoordinates = this.editor.renderer.textToScreenCoordinates(
             range.start.row,
@@ -511,10 +517,10 @@ export default class AceLocationHandler implements Disposable {
               editorId: this.editorId,
               data: token.syntaxError,
               editor: this.editor,
-              range: range,
+              range,
               sourceType: this.executor.connector().dialect,
               defaultDatabase: this.executor.database(),
-              source: source
+              source
             });
           }
           e.preventDefault();
