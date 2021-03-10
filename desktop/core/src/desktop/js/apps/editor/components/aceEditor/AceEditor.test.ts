@@ -16,31 +16,92 @@
 
 import { shallowMount } from '@vue/test-utils';
 import { CancellablePromise } from 'api/cancellablePromise';
+import Executor from 'apps/editor/execution/executor';
 import dataCatalog from 'catalog/dataCatalog';
+import { Ace } from 'ext/ace';
+import { INSERT_AT_CURSOR_EVENT } from 'ko/bindings/ace/ko.aceEditor';
+import huePubSub from 'utils/huePubSub';
+import { nextTick } from 'vue';
 import AceEditor from './AceEditor.vue';
 
 describe('AceEditor.vue', () => {
+  const mockExecutor = ({
+    connector: ko.observable({
+      dialect: 'foo',
+      id: 'foo'
+    }),
+    namespace: ko.observable({
+      id: 'foo'
+    }),
+    compute: ko.observable({
+      id: 'foo'
+    })
+  } as unknown) as Executor;
+
   it('should render', () => {
     spyOn(dataCatalog, 'getChildren').and.returnValue(CancellablePromise.resolve([]));
 
     const wrapper = shallowMount(AceEditor, {
-      propsData: {
+      props: {
         value: 'some query',
         id: 'some-id',
-        executor: {
-          connector: ko.observable({
-            dialect: 'foo',
-            id: 'foo'
-          }),
-          namespace: ko.observable({
-            id: 'foo'
-          }),
-          compute: ko.observable({
-            id: 'foo'
-          })
-        }
+        executor: mockExecutor
       }
     });
     expect(wrapper.element).toMatchSnapshot();
+  });
+
+  it('should handle drag and drop pubsub event targeting this editor', async () => {
+    spyOn(dataCatalog, 'getChildren').and.returnValue(CancellablePromise.resolve([]));
+
+    const wrapper = shallowMount(AceEditor, {
+      props: {
+        value: '',
+        id: 'some-id',
+        executor: mockExecutor
+      }
+    });
+
+    await nextTick();
+
+    expect(wrapper.emitted()['ace-created']).toBeTruthy();
+
+    const editor = (wrapper.emitted()['ace-created'][0] as Ace.Editor[])[0];
+
+    const draggedText = 'Some dropped text';
+    huePubSub.publish(INSERT_AT_CURSOR_EVENT, {
+      text: draggedText,
+      targetEditor: editor,
+      cursorEndAdjust: 0
+    });
+
+    expect(editor.getValue()).toEqual(draggedText);
+  });
+
+  it('should not handle drag and drop pubsub event targeting another editor', async () => {
+    spyOn(dataCatalog, 'getChildren').and.returnValue(CancellablePromise.resolve([]));
+
+    const wrapper = shallowMount(AceEditor, {
+      props: {
+        value: '',
+        id: 'some-id',
+        executor: mockExecutor
+      }
+    });
+
+    await nextTick();
+
+    expect(wrapper.emitted()['ace-created']).toBeTruthy();
+
+    const editor = (wrapper.emitted()['ace-created'][0] as Ace.Editor[])[0];
+
+    const draggedText = 'Some dropped text';
+    huePubSub.publish(INSERT_AT_CURSOR_EVENT, {
+      text: draggedText,
+      targetEditor: {}, // Other instance
+      cursorEndAdjust: 0
+    });
+
+    expect(editor.getValue()).not.toEqual(draggedText);
   });
 });

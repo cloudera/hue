@@ -63,4 +63,4 @@ sqlparse==0.4.1
 tablib==0.13.0
 thrift==0.13.0
 thrift-sasl==0.4.2
-git+git://github.com/agl29/django-babel.git
+git+git://github.com/gethue/django-babel.git
