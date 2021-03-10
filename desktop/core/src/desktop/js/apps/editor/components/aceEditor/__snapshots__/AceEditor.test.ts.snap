@@ -3,7 +3,6 @@
 exports[`AceEditor.vue should render 1`] = `
 <div
   class="ace-editor-component"
-  value="some query"
 >
   <div
     class="ace-editor ace_editor ace-hue"
@@ -60,10 +59,6 @@ exports[`AceEditor.vue should render 1`] = `
           />
         </div>
       </div>
-      <div
-        class="ace_invisible ace_emptyMessage"
-        style="margin-left: 6px;"
-      />
     </div>
     <div
       class="ace_scrollbar ace_scrollbar-v"
@@ -96,6 +91,12 @@ exports[`AceEditor.vue should render 1`] = `
       </div>
     </div>
   </div>
-  <!--v-if-->
+  <ace-autocomplete-stub
+    autocomplete-parser="[object Object]"
+    editor="[object Object]"
+    editor-id="some-id"
+    executor="[object Object]"
+    sql-reference-provider="[object Object]"
+  />
 </div>
 `;
