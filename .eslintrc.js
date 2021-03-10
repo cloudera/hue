@@ -75,7 +75,7 @@ module.exports = {
       ],
       parser: 'vue-eslint-parser',
       parserOptions: {
-        parser: "@typescript-eslint/parser"
+        parser: '@typescript-eslint/parser'
       },
       plugins: ['vue', '@typescript-eslint'],
       rules: {
@@ -90,14 +90,15 @@ module.exports = {
           }
         ],
         'vue/html-self-closing': [
-          "error",
+          'error',
           {
-            "html": {
-              "void": "any"
+            html: {
+              void: 'any'
             }
           }
         ],
         'vue/singleline-html-element-content-newline': 0, // Conflicts with prettier
+        '@typescript-eslint/no-non-null-assertion': 0
       }
     },
     {
@@ -106,14 +107,18 @@ module.exports = {
       parser: '@typescript-eslint/parser',
       plugins: ['jest', '@typescript-eslint'],
       rules: {
-        'no-useless-constructor': 0
+        'no-useless-constructor': 0,
+        '@typescript-eslint/no-non-null-assertion': 0
       }
     },
     {
       files: ['*.ts'],
       extends: ['plugin:@typescript-eslint/recommended'],
       parser: '@typescript-eslint/parser',
-      plugins: ['jest', '@typescript-eslint']
+      plugins: ['jest', '@typescript-eslint'],
+      rules: {
+        '@typescript-eslint/no-non-null-assertion': 0
+      }
     }
   ],
   extends: ['plugin:prettier/recommended'],
