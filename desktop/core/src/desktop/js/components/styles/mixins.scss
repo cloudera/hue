@@ -147,7 +147,7 @@ $hue-panel-border-radius: 3px;
 }
 
 @mixin fade-in {
-  @include animation('fade-in-frames 2s');
+  @include animation('fade-in-frames 0.5s');
 }
 
 @mixin fillAbsolute {
