@@ -17,7 +17,13 @@
 -->
 
 <template>
-  <div class="hue-dropdown-drawer" :class="{ open: open }" @click="closeOnClick && closeDrawer()">
+  <div
+    ref="outerPanelElement"
+    class="hue-dropdown-drawer"
+    :class="{ open: open }"
+    :style="parentPosition"
+    @click="closeOnClick && closeDrawer()"
+  >
     <div v-if="open" ref="innerPanelElement" class="hue-dropdown-drawer-inner" :style="position">
       <slot />
     </div>
@@ -27,6 +33,7 @@
 <script lang="ts">
   import { defineComponent, nextTick, PropType } from 'vue';
 
+  import './DropdownDrawer.scss';
   import {
     addClickOutsideHandler,
     removeClickOutsideHandler
@@ -42,6 +49,7 @@
   };
 
   type PositionStyle = Pick<CSSStyleDeclaration, 'left' | 'right' | 'top' | 'bottom'>;
+  type ParentPositionStyle = Pick<CSSStyleDeclaration, 'position'>;
 
   const getDefaultPosition = (): PositionStyle => ({
     top: '100%',
@@ -71,7 +79,8 @@
       return {
         positionTop: false,
         positionLeft: false,
-        position: getDefaultPosition()
+        position: getDefaultPosition(),
+        parentPosition: { position: 'fixed' } as ParentPositionStyle
       };
     },
     watch: {
@@ -82,14 +91,14 @@
         }
 
         this.position = getDefaultPosition();
+        this.parentPosition = { position: 'fixed' };
         await nextTick();
 
-        if (!this.$refs.innerPanelElement) {
-          return;
-        }
         const { bottom, right } = isOutsideViewport(<HTMLElement>this.$refs.innerPanelElement);
         if (bottom) {
-          const bottomOffset = this.triggerElement ? this.triggerElement.offsetHeight : 0;
+          const bottomOffset = this.triggerElement?.offsetHeight || 0;
+          // position: relative Prevents fixed element from appearing below the window when at the bottom of the page
+          this.parentPosition = { position: 'relative' };
           this.position.top = '';
           this.position.bottom = `${bottomOffset}px`;
         }
@@ -119,70 +128,3 @@
     }
   });
 </script>
-
-<style lang="scss" scoped>
-  @import '../styles/colors';
-  @import '../styles/mixins';
-
-  .hue-dropdown-drawer {
-    position: fixed;
-    z-index: 10610;
-
-    &.open {
-      .hue-dropdown-drawer-inner {
-        display: block;
-      }
-    }
-
-    .hue-dropdown-drawer-inner {
-      display: none;
-      position: absolute;
-      z-index: 1000;
-      margin: 2px 0 0;
-      padding: 0;
-      background-color: $fluid-white;
-      border: 1px solid $hue-border-color;
-      border-radius: $hue-panel-border-radius;
-
-      @include box-shadow(0, 5px, 10px, rgba(0, 0, 0, 0.2));
-
-      > ::v-deep(ul) {
-        overflow-x: hidden;
-        margin: 0 !important;
-        padding: 0;
-        list-style: none;
-        font-size: 13px;
-
-        li {
-          color: $fluid-gray-800;
-
-          button,
-          a {
-            display: block;
-            width: 100%;
-            padding: 6px 16px;
-            clear: both;
-            font-weight: 400;
-            text-align: inherit;
-            white-space: nowrap;
-            background-color: transparent;
-            border: 0;
-            position: relative;
-            outline: 0;
-
-            &:hover,
-            &.active,
-            &.focus {
-              background-color: $hue-primary-color-light;
-            }
-          }
-
-          &.selected button,
-          &.selected a {
-            background-color: $hue-primary-color-light;
-          }
-        }
-      }
-    }
-  }
-</style>
