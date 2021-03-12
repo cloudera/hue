@@ -17,13 +17,13 @@
 -->
 
 <template>
-  <div class="hue-search-input">
+  <div class="hue-search-input" :class="{ 'search-input-small': small }">
     <div>
-      <i v-if="showMagnify && !spin" style="top: 6px;" class="magnify-icon fa fa-fw fa-search" />
-      <i v-else lass="magnify-icon fa fa-fw fa-spinner fa-spin" />
+      <i v-if="showMagnify && !spin" class="magnify-icon fa fa-fw fa-search" />
+      <i v-else-if="showMagnify && spin" class="magnify-icon fa fa-fw fa-spinner fa-spin" />
       <form autocomplete="off">
         <input
-          :value="value"
+          :value="modelValue"
           class="hue-search-input-el"
           autocorrect="off"
           autocomplete="do-not-autocomplete"
@@ -32,7 +32,12 @@
           type="text"
           :placeholder="(!hasFocus && placeholder) || ''"
           :class="{ 'magnify-icon-input': showMagnify }"
-          @input="$emit('input', $event.target.value)"
+          @input="
+            event => {
+              $emit('input', event.target.value);
+              $emit('update:model-value', event.target.value);
+            }
+          "
           @focusin="hasFocus = true"
           @focusout="hasFocus = false"
           @keyup.enter="$emit('search', $event.target.value)"
@@ -53,6 +58,7 @@
 <script lang="ts">
   import { defineComponent } from 'vue';
 
+  import './SearchInput.scss';
   import I18n from '../utils/i18n';
 
   export default defineComponent({
@@ -63,14 +69,16 @@
         type: String,
         default: I18n('Search...')
       },
-      value: {
+      modelValue: {
         type: String,
         default: ''
+      },
+      small: {
+        type: Boolean,
+        default: false
       }
     },
-
-    emits: ['input', 'search'],
-
+    emits: ['input', 'search', 'update:model-value'],
     data(): {
       spin: boolean;
       autocomplete: string;
@@ -84,70 +92,5 @@
         hasFocus: false
       };
     }
-
-    // TODO: Add autocomplete logic...
   });
 </script>
-
-<style lang="scss" scoped>
-  @import './styles/colors';
-  @import './styles/mixins';
-
-  .hue-search-input {
-    display: inline-block;
-    vertical-align: middle;
-    position: relative;
-    border-radius: $hue-panel-border-radius;
-    border: 1px solid $hue-border-color;
-    background-color: $fluid-white;
-    height: 30px;
-    width: 250px;
-
-    > div {
-      position: absolute;
-      left: 0;
-      right: 0;
-      height: 30px;
-
-      form {
-        margin: 0;
-      }
-
-      .magnify-icon {
-        position: absolute;
-        left: 10px;
-        top: 7px;
-        font-size: 16px;
-        color: $fluid-gray-700;
-      }
-
-      input {
-        display: block;
-        position: absolute;
-        border: none;
-        box-shadow: none;
-        margin: 0;
-        line-height: 15px;
-        background-color: transparent;
-
-        width: 100%;
-        height: 100%;
-        box-sizing: border-box;
-
-        &.magnify-icon-input {
-          padding-left: 35px;
-        }
-
-        &.hue-search-input-el {
-          z-index: 2;
-        }
-
-        &.hue-search-input-overlay {
-          color: $fluid-gray-500;
-          outline: none;
-          z-index: 1;
-        }
-      }
-    }
-  }
-</style>
