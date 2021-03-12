@@ -65,11 +65,13 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent } from 'vue';
+  import { defineComponent, computed, ref } from 'vue';
 
+  import './Paginator.scss';
   import HueIcon from './HueIcon.vue';
   import DropdownMenu from './dropdown/DropdownMenu.vue';
   import DropdownMenuButton from './dropdown/DropdownMenuButton.vue';
+  import { Page } from './Paginator';
 
   const DEFAULT_LIMIT = 25;
   const PRESET_LIMITS = [DEFAULT_LIMIT, 50, 100];
@@ -77,70 +79,67 @@
   export default defineComponent({
     name: 'Paginator',
     components: {
-      HueIcon,
       DropdownMenu,
-      DropdownMenuButton
+      DropdownMenuButton,
+      HueIcon
     },
-
     props: {
       totalEntries: {
         type: Number,
         required: true
       }
     },
-
     emits: ['page-changed'],
+    setup(props, { emit }) {
+      const currentPage = ref(1);
+      const limit = ref(DEFAULT_LIMIT);
 
-    setup(): {
-      presetLimits: number[];
-    } {
+      const offset = computed(() => (currentPage.value - 1) * limit.value);
+
+      let lastNotifiedPage = undefined as Page | undefined;
+
+      const notifyPageChanged = (): void => {
+        if (
+          lastNotifiedPage?.offset !== offset.value ||
+          lastNotifiedPage.limit !== limit.value ||
+          lastNotifiedPage.pageNumber !== currentPage.value
+        ) {
+          lastNotifiedPage = {
+            pageNumber: currentPage.value,
+            offset: offset.value,
+            limit: limit.value
+          };
+          emit('page-changed', lastNotifiedPage);
+        }
+      };
+
       return {
+        currentPage,
+        limit,
+        offset,
+        notifyPageChanged,
         presetLimits: PRESET_LIMITS
       };
     },
-
-    data(): {
-      currentPage: number;
-      limit: number;
-    } {
-      return {
-        currentPage: 1,
-        limit: DEFAULT_LIMIT
-      };
-    },
-
     computed: {
-      offset(): number {
-        return (this.currentPage - 1) * this.limit;
-      },
-
       lastDisplayedIndex(): number {
         return Math.min(this.offset + this.limit, this.totalEntries - 1);
       },
-
       totalPages(): number {
         return Math.ceil(this.totalEntries / this.limit) || 1;
       }
     },
-
     watch: {
-      currentPage(): void {
-        this.notifyPageChanged();
+      currentPage(newVal, oldVal): void {
+        if (newVal !== oldVal) {
+          this.notifyPageChanged();
+        }
       }
     },
-
     mounted(): void {
       this.notifyPageChanged();
     },
-
     methods: {
-      notifyPageChanged(): void {
-        this.$emit('page-changed', {
-          offset: this.offset,
-          limit: this.limit
-        });
-      },
-
       gotoFirstPage(): void {
         this.currentPage = 1;
       },
@@ -172,39 +171,3 @@
     }
   });
 </script>
-
-<style lang="scss" scoped>
-  @import 'styles/colors';
-
-  .hue-paginator {
-    width: 100%;
-    height: 25px;
-    text-align: right;
-    padding: 10px 0;
-
-    .page-status {
-      display: inline-block;
-      margin-right: 15px;
-    }
-
-    .navigation-actions {
-      a {
-        color: $fluid-gray-700;
-
-        &.disabled {
-          cursor: default;
-          color: $hue-action-disabled;
-        }
-
-        &:hover:not(.disabled) {
-          color: $hue-action-primary-hover;
-        }
-      }
-
-      font-size: 23px;
-      margin-left: 15px;
-      margin-right: 20px;
-      display: inline-block;
-    }
-  }
-</style>
