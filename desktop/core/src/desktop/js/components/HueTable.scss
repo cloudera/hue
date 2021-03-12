@@ -1,0 +1,133 @@
+/*
+ Licensed to Cloudera, Inc. under one
+ or more contributor license agreements.  See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership.  Cloudera, Inc. licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+*/
+
+@import './styles/colors';
+@import './styles/mixins';
+
+.hue-table-container {
+  overflow-x: auto;
+  width: 100%;
+  margin: 0 0 15px 0;
+
+  .hue-table {
+    line-height: 14px;
+    table-layout: auto;
+    border-collapse: separate;
+
+    &.header-less {
+      border-collapse: collapse;
+      tbody > tr:first-child {
+        border-top: 1px solid $fluid-gray-300;
+      }
+    }
+
+    thead,
+    tbody {
+      tr {
+        height: 40px;
+
+        th,
+        td {
+          @include nowrap-ellipsis;
+
+          height: 16px;
+          max-width: 300px;
+          padding: 12px;
+          border-bottom: 1px solid $fluid-gray-300;
+          text-align: left;
+
+          &.column-flush {
+            width: 100%;
+          }
+        }
+      }
+    }
+
+    thead {
+      tr {
+        th {
+          background-color: $fluid-white;
+          color: $fluid-gray-700;
+          font-size: 13px;
+          font-weight: 500;
+          white-space: nowrap;
+
+          &.sticky-first-col {
+            background-color: $fluid-white;
+            position: sticky;
+            position: -webkit-sticky;
+            left: 0;
+            z-index: 102;
+          }
+
+          .sort-header {
+            display: flex;
+            cursor: pointer;
+            align-items: center;
+            letter-spacing: normal;
+            outline: 0;
+          }
+        }
+      }
+    }
+
+    tbody {
+      tr {
+        td {
+          color: $fluid-gray-900;
+          font-size: 14px;
+
+          &.sticky-first-col {
+            @include position-sticky;
+
+            background-color: $fluid-white;
+            left: 0;
+            z-index: 100;
+          }
+
+          &:last-of-type {
+            padding-right: 8px;
+          }
+        }
+      }
+
+      &.clickable-rows tr {
+        cursor: pointer;
+
+        &:hover {
+          background-color: $fluid-blue-050;
+        }
+      }
+    }
+
+    &.sticky-header {
+      thead th {
+        @include position-sticky;
+
+        top: 0;
+        z-index: 101;
+
+        &.sticky-first-col {
+          @include position-sticky;
+
+          top: 0;
+        }
+      }
+    }
+  }
+}
