@@ -27,7 +27,7 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.models import Document2, _get_gist_document
 from desktop.auth.backend import rewrite_user
 
-from notebook.api import _fetch_result_data, _check_status
+from notebook.api import _fetch_result_data, _check_status, _execute_notebook
 from notebook.models import MockRequest
 
 from useradmin.models import User
@@ -95,6 +95,7 @@ def handle_on_message(channel_id, bot_id, text, user_id):
       if not response['ok']:
         raise PopupException(_("Error posting message"), detail=response["error"])
 
+
 def handle_on_link_shared(channel_id, message_ts, links):
   for item in links:
     path = urlsplit(item['url'])[2]
@@ -116,20 +117,29 @@ def handle_on_link_shared(channel_id, message_ts, links):
     dialect = doc_data['dialect'].capitalize() if id_type == 'editor' else doc.extra.capitalize()
     created_by = doc.owner.get_full_name() or doc.owner.username
 
-    # Fetch query result
-    user = rewrite_user(User.objects.get(username='hue'))
+    user = rewrite_user(User.objects.get(username=doc.owner.username))
     request = MockRequest(user=user)
 
-    operation_uuid = doc_data['uuid']
-
-    status = _check_status(request, operation_id=operation_uuid)
-    if status['query_status']['status'] == 'available':
-      result = _fetch_result_data(request, operation_id=doc_data['uuid'])
+    result = query_result(request, doc_data)
 
     payload = _make_unfurl_payload(item['url'], statement, dialect, created_by, result['result']['data'])
     response = slack_client.chat_unfurl(channel=channel_id, ts=message_ts, unfurls=payload)
     if not response['ok']:
       raise PopupException(_("Cannot unfurl link"), detail=response["error"])
+
+
+def query_result(request, notebook):
+  snippet = notebook['snippets'][0]
+  snippet['statement'] = notebook['snippets'][0]['statement_raw']
+  query_execute = _execute_notebook(request, notebook, snippet)
+
+  history_uuid = query_execute['history_uuid']
+  status = _check_status(request, operation_id=history_uuid)
+  if status['query_status']['status'] == 'available':
+      result = _fetch_result_data(request, operation_id=history_uuid)
+
+  return result
+
 
 def _make_unfurl_payload(url, statement, dialect, created_by, result):
   payload = {
@@ -164,12 +174,12 @@ def _make_unfurl_payload(url, statement, dialect, created_by, result):
           ]
         },
         {
-					"type": "section",
+          "type": "section",
 					"fields": [
 						{
 							"type": "mrkdwn",
 							"text": "*Query Result: * {}".format(result),
-						}
+            }
 					]
 				}
       ]
