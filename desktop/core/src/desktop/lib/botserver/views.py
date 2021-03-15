@@ -104,31 +104,23 @@ def handle_on_link_shared(channel_id, message_ts, links):
     try:
       if path == '/hue/editor' and id_type == 'editor':
         doc = Document2.objects.get(id=qid)
+        doc_type = 'Editor'
       elif path == '/hue/gist' and id_type == 'uuid' and ENABLE_GIST_PREVIEW.get():
         doc = _get_gist_document(uuid=qid)
+        doc_type = 'Gist'
       else:
         raise PopupException(_("Cannot unfurl link"))
     except Document2.DoesNotExist:
       msg = "Document with {key}={value} does not exist".format(key='uuid' if id_type == 'uuid' else 'id', value=qid)
       raise PopupException(_(msg))
 
-    doc_data = json.loads(doc.data)
-    statement = doc_data['snippets'][0]['statement_raw'] if id_type == 'editor' else doc_data['statement_raw']
-    dialect = doc_data['dialect'].capitalize() if id_type == 'editor' else doc.extra.capitalize()
-    created_by = doc.owner.get_full_name() or doc.owner.username
-
-    user = rewrite_user(User.objects.get(username=doc.owner.username))
-    request = MockRequest(user=user)
-
-    result = query_result(request, doc_data)
-
-    payload = _make_unfurl_payload(item['url'], statement, dialect, created_by, result['result']['data'])
+    payload = _make_unfurl_payload(item['url'], id_type, doc, doc_type)
     response = slack_client.chat_unfurl(channel=channel_id, ts=message_ts, unfurls=payload)
     if not response['ok']:
       raise PopupException(_("Cannot unfurl link"), detail=response["error"])
 
 
-def query_result(request, notebook):
+def _query_result(request, notebook):
   snippet = notebook['snippets'][0]
   snippet['statement'] = notebook['snippets'][0]['statement_raw']
   query_execute = _execute_notebook(request, notebook, snippet)
@@ -136,12 +128,24 @@ def query_result(request, notebook):
   history_uuid = query_execute['history_uuid']
   status = _check_status(request, operation_id=history_uuid)
   if status['query_status']['status'] == 'available':
-      result = _fetch_result_data(request, operation_id=history_uuid)
+      response = _fetch_result_data(request, operation_id=history_uuid)
+  
+  return response['result'] if response['result']['data'] else 'Query result expired or could not be found'
 
-  return result
+
+def _make_unfurl_payload(url, id_type, doc, doc_type):
+  doc_data = json.loads(doc.data)
+  statement = doc_data['snippets'][0]['statement_raw'] if id_type == 'editor' else doc_data['statement_raw']
+  dialect = doc_data['dialect'].capitalize() if id_type == 'editor' else doc.extra.capitalize()
+  created_by = doc.owner.get_full_name() or doc.owner.username
+
+  # Mock request for query execution and fetch result
+  user = rewrite_user(User.objects.get(username=doc.owner.username))
+  request = MockRequest(user=user)
+  if id_type == 'editor':
+    result = _query_result(request, json.loads(doc.data))
 
 
-def _make_unfurl_payload(url, statement, dialect, created_by, result):
   payload = {
     url: {
       "color": "#025BA6",
@@ -150,14 +154,17 @@ def _make_unfurl_payload(url, statement, dialect, created_by, result):
           "type": "section",
           "text": {
             "type": "mrkdwn",
-            "text": "\n*<{}|Hue - SQL Editor>*".format(url)
+            "text": "\n*<{}|Hue - SQL {}>*".format(url, doc_type)
           }
         },
+        {
+					"type": "divider"
+				},
         {
           "type": "section",
           "text": {
             "type": "mrkdwn",
-            "text": statement if len(statement) < 150 else (statement[:150] + '...')
+            "text": "*Statement:*\n`{}`".format(statement if len(statement) < 150 else (statement[:150] + '...'))
           }
         },
         {
@@ -169,7 +176,7 @@ def _make_unfurl_payload(url, statement, dialect, created_by, result):
             },
             {
               "type": "mrkdwn",
-              "text": "*Created By:*\n{}".format(created_by)
+              "text": "*Created by:*\n{}".format(created_by)
             }
           ]
         },
@@ -178,13 +185,14 @@ def _make_unfurl_payload(url, statement, dialect, created_by, result):
 					"fields": [
 						{
 							"type": "mrkdwn",
-							"text": "*Query Result: * {}".format(result),
+							"text": "*Query result: *\n{}".format(result),
             }
 					]
 				}
       ]
     }
   }
+
   return payload
 
 def say_hi_user(channel_id, user_id):
