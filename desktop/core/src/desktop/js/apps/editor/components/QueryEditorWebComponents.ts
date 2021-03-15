@@ -20,13 +20,16 @@ import AceEditor from './aceEditor/AceEditor.vue';
 import ExecuteButton from 'apps/editor/components/ExecuteButton.vue';
 import ExecuteLimitInput from 'apps/editor/components/ExecuteLimitInput.vue';
 import ExecutableProgressBar from './ExecutableProgressBar.vue';
+import QueryHistoryTable from './QueryHistoryTable.vue';
 import ResultTable from './result/ResultTable.vue';
 import Executor, { ExecutorOptions } from '../execution/executor';
 import 'utils/json.bigDataParse';
 import { wrap } from 'vue/webComponentWrap';
+import { hueWindow } from 'types/types';
 
 wrap('query-editor', AceEditor);
 wrap('query-editor-execute-button', ExecuteButton);
+wrap('query-editor-history-table', QueryHistoryTable);
 wrap('query-editor-limit-input', ExecuteLimitInput);
 wrap('query-editor-progress-bar', ExecutableProgressBar);
 wrap('query-editor-result-table', ResultTable);
@@ -38,6 +41,7 @@ export interface HueComponentConfig {
 const configure = (config: HueComponentConfig): void => {
   if (config.baseUrl) {
     axios.defaults.baseURL = config.baseUrl;
+    (window as hueWindow).HUE_BASE_URL = config.baseUrl;
   }
 };
 
