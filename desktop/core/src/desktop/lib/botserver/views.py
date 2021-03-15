@@ -17,6 +17,7 @@
 
 import logging
 import json
+from prettytable import PrettyTable
 from urllib.parse import urlsplit
 from pprint import pprint
 
@@ -120,7 +121,7 @@ def handle_on_link_shared(channel_id, message_ts, links):
       raise PopupException(_("Cannot unfurl link"), detail=response["error"])
 
 
-def _query_result(request, notebook):
+def query_result(request, notebook):
   snippet = notebook['snippets'][0]
   snippet['statement'] = notebook['snippets'][0]['statement_raw']
 
@@ -133,6 +134,15 @@ def _query_result(request, notebook):
 
   return response['result']
 
+def _make_result_table(result):
+  meta = []
+  for field in result['meta']:
+    meta.append(field['name'])
+
+  table = PrettyTable()
+  table.field_names = meta
+  table.add_rows(result['data'])
+  return table
 
 def _make_unfurl_payload(url, id_type, doc, doc_type):
   doc_data = json.loads(doc.data)
@@ -149,7 +159,7 @@ def _make_unfurl_payload(url, id_type, doc, doc_type):
     try:
       status = _check_status(request, operation_id=doc_data['uuid'])
       if status['query_status']['status'] == 'available':
-        result = _query_result(request, json.loads(doc.data))
+        result = _make_result_table(query_result(request, json.loads(doc.data)))
     except:
       result = 'Query result has expired or could not be found.'
 
@@ -172,7 +182,7 @@ def _make_unfurl_payload(url, id_type, doc, doc_type):
           "type": "section",
           "text": {
             "type": "mrkdwn",
-            "text": "*Statement:*\n`{}`".format(statement if len(statement) < 150 else (statement[:150] + '...'))
+            "text": "*Statement:*\n```{}```".format(statement if len(statement) < 150 else (statement[:150] + '...'))
           }
         },
         {
@@ -190,9 +200,9 @@ def _make_unfurl_payload(url, id_type, doc, doc_type):
         },
         {
           "type": "section",
-					"text": {
+          "text": {
             "type": "mrkdwn",
-            "text": "*Query result:*\n{}".format(result),
+            "text": "*Query result:*\n```{}```".format(result),
           }
 				}
       ]
