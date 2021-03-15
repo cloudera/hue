@@ -18,6 +18,7 @@
 
 <template>
   <button
+    v-bind="$attrs"
     class="hue-btn"
     type="button"
     :class="{
@@ -36,6 +37,8 @@
 
 <script lang="ts">
   import { defineComponent } from 'vue';
+
+  import './HueButton.scss';
 
   export default defineComponent({
     name: 'HueButton',
@@ -69,117 +72,3 @@
     emits: ['click']
   });
 </script>
-
-<style lang="scss" scoped>
-  @import './styles/colors';
-  @import './styles/variables';
-
-  .hue-btn {
-    height: 32px;
-    border-radius: $fluid-border-radius;
-    border: solid 1px $fluid-gray-300;
-    background-color: $fluid-white;
-    color: $fluid-blue-500;
-    padding: 0 12px;
-
-    &.hue-btn-small {
-      font-size: 12px;
-      height: 24px;
-      padding: 0 8px;
-    }
-
-    &.hue-btn-large {
-      font-size: 16px;
-      height: 40px;
-      padding: 0 20px;
-    }
-
-    &:hover {
-      border: solid 1px $fluid-blue-700;
-    }
-
-    &:active {
-      border: solid 1px $fluid-blue-800;
-    }
-
-    &[disabled] {
-      cursor: default;
-      color: $fluid-gray-400;
-      border: solid 1px $fluid-gray-200;
-    }
-
-    &:focus {
-      outline: none;
-    }
-
-    &:focus-visible {
-      border: solid 1px $fluid-blue-800;
-      outline: $fluid-blue-100 auto 4px;
-    }
-
-    &.hue-btn-primary:not([disabled]) {
-      color: $fluid-white;
-      background-color: $fluid-blue-500;
-      border: solid 1px $fluid-blue-500;
-
-      &:hover {
-        background-color: $fluid-blue-700;
-        border: solid 1px $fluid-blue-700;
-      }
-
-      &.active {
-        background-color: $fluid-blue-800;
-        border: solid 1px $fluid-blue-800;
-      }
-
-      &:focus-visible {
-        border: solid 1px $fluid-gray-900;
-      }
-    }
-
-    &.hue-btn-alert:not([disabled]) {
-      color: $fluid-white;
-      background-color: $fluid-red-500;
-      border: solid 1px $fluid-red-500;
-
-      &:hover {
-        background-color: $fluid-red-700;
-        border: solid 1px $fluid-red-700;
-      }
-
-      &:active {
-        background-color: $fluid-red-800;
-        border: solid 1px $fluid-red-800;
-      }
-
-      &:focus-visible {
-        border: solid 1px $fluid-red-800;
-        outline-color: $fluid-red-100;
-        outline-width: 4px;
-      }
-    }
-
-    &.hue-btn-borderless:not([disabled]) {
-      border: solid 1px transparent;
-
-      &:hover {
-        border: solid 1px $fluid-gray-300;
-      }
-
-      &:active {
-        border: solid 1px $fluid-gray-400;
-      }
-    }
-
-    &.hue-btn-borderless[disabled] {
-      border: solid 1px transparent;
-      color: $fluid-gray-400;
-    }
-
-    &.hue-btn-alert[disabled],
-    &.hue-btn-primary[disabled] {
-      background-color: $fluid-gray-200;
-      border: solid 1px $fluid-gray-200;
-    }
-  }
-</style>
