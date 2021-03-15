@@ -124,17 +124,14 @@ def _query_result(request, notebook):
   snippet = notebook['snippets'][0]
   snippet['statement'] = notebook['snippets'][0]['statement_raw']
 
-  try:
-    query_execute = _execute_notebook(request, notebook, snippet)
+  query_execute = _execute_notebook(request, notebook, snippet)
 
-    history_uuid = query_execute['history_uuid']
-    status = _check_status(request, operation_id=history_uuid)
-    if status['query_status']['status'] == 'available':
-        response = _fetch_result_data(request, operation_id=history_uuid)
+  history_uuid = query_execute['history_uuid']
+  status = _check_status(request, operation_id=history_uuid)
+  if status['query_status']['status'] == 'available':
+      response = _fetch_result_data(request, operation_id=history_uuid)
 
-    return response['result']
-  except:
-    return 'Query result expired or could not be found'
+  return response['result']
 
 
 def _make_unfurl_payload(url, id_type, doc, doc_type):
@@ -146,8 +143,15 @@ def _make_unfurl_payload(url, id_type, doc, doc_type):
   # Mock request for query execution and fetch result
   user = rewrite_user(User.objects.get(username=doc.owner.username))
   request = MockRequest(user=user)
+
+  result = 'Result is not available for Gist.'
   if id_type == 'editor':
-    result = _query_result(request, json.loads(doc.data))
+    try:
+      status = _check_status(request, operation_id=doc_data['uuid'])
+      if status['query_status']['status'] == 'available':
+        result = _query_result(request, json.loads(doc.data))
+    except:
+      result = 'Query result has expired or could not be found.'
 
 
   payload = {
@@ -186,12 +190,10 @@ def _make_unfurl_payload(url, id_type, doc, doc_type):
         },
         {
           "type": "section",
-					"fields": [
-						{
-							"type": "mrkdwn",
-							"text": "*Query result: *\n{}".format(result),
-            }
-					]
+					"text": {
+            "type": "mrkdwn",
+            "text": "*Query result:*\n{}".format(result),
+          }
 				}
       ]
     }
