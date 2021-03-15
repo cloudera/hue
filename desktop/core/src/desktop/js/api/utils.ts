@@ -14,7 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import axios, { AxiosError, AxiosResponse, AxiosTransformer, CancelToken } from 'axios';
+import axios, {
+  AxiosError,
+  AxiosRequestConfig,
+  AxiosResponse,
+  AxiosTransformer,
+  CancelToken
+} from 'axios';
 import qs from 'qs';
 import huePubSub from 'utils/huePubSub';
 
@@ -31,7 +37,7 @@ export interface DefaultApiResponse {
   traceback?: string;
 }
 
-export interface ApiFetchOptions<T, E = string> {
+export interface ApiFetchOptions<T, E = string> extends AxiosRequestConfig {
   silenceErrors?: boolean;
   ignoreSuccessErrors?: boolean;
   transformResponse?: AxiosTransformer;
@@ -153,7 +159,7 @@ export const post = <T, U = unknown, E = string>(
     axios
       .post<T & DefaultApiResponse>(url, qs.stringify(data), {
         cancelToken,
-        transformResponse: options && options.transformResponse
+        ...options
       })
       .then(response => {
         handleResponse(response, resolve, reject, options);
@@ -209,6 +215,22 @@ export const get = <T, U = unknown>(
       }
     });
   });
+
+export const upload = async <T>(
+  url: string,
+  data: FormData,
+  progressCallback?: (progress: number) => void
+): Promise<T> => {
+  const response = await axios.post<T>(url, data, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+    onUploadProgress: progressEvent => {
+      if (progressCallback) {
+        progressCallback(Math.round((progressEvent.loaded * 100) / progressEvent.total));
+      }
+    }
+  });
+  return response.data;
+};
 
 export const cancelActiveRequest = (request?: JQuery.jqXHR): void => {
   if (request && request.readyState < 4) {
