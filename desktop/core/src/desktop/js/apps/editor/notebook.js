@@ -25,13 +25,14 @@ import hueUtils from 'utils/hueUtils';
 import sessionManager from 'apps/editor/execution/sessionManager';
 
 import Snippet, { STATUS as SNIPPET_STATUS } from 'apps/editor/snippet';
-import { HISTORY_CLEARED_EVENT } from 'apps/editor/components/ko.queryHistory';
 import { UPDATE_SAVED_QUERIES_EVENT } from 'apps/editor/components/ko.savedQueries';
 import {
   ASSIST_DB_PANEL_IS_READY_EVENT,
   ASSIST_IS_DB_PANEL_READY_EVENT,
   ASSIST_SET_DATABASE_EVENT
 } from 'ko/components/assist/events';
+
+const HISTORY_CLEARED_EVENT = 'query.history.cleared';
 
 export default class Notebook {
   constructor(vm, notebookRaw) {

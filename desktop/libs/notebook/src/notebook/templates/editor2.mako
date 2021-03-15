@@ -968,15 +968,19 @@
         </ul>
         <div class="editor-bottom-tab-content tab-content">
           <div class="tab-pane" id="queryHistory" data-bind="css: { 'active': currentQueryTab() === 'queryHistory' }">
-            <div class="editor-bottom-tab-panel">
-              <!-- ko component: {
-                name: 'query-history',
-                params: {
-                  currentNotebook: parentNotebook,
-                  openFunction: parentVm.openNotebook.bind(parentVm),
-                  dialect: dialect
+            <div class="execution-history-tab-panel">
+              <query-history-table-ko-bridge style="width:100%; height: 100%; position: relative;" data-bind="
+                vueEvents: {
+                  'history-entry-clicked': function (event) {
+                    if (window.getSelection().toString() === '' && event.detail.uuid !== parentNotebook.uuid()) {
+                      parentVm.openNotebook(event.detail.uuid);
+                    }
+                  }
+                },
+                vueKoProps: {
+                  'connector-observable': connector
                 }
-              } --><!-- /ko -->
+              "></query-history-table-ko-bridge>
             </div>
           </div>
 
