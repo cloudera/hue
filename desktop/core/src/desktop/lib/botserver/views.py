@@ -125,7 +125,7 @@ def handle_on_link_shared(channel_id, message_ts, links):
       raise PopupException(_("Cannot unfurl link"), detail=response["error"])
 
 
-def query_result(request, notebook):
+def query_result(request, notebook, max_rows):
   snippet = notebook['snippets'][0]
   snippet['statement'] = notebook['snippets'][0]['statement_raw']
 
@@ -134,19 +134,25 @@ def query_result(request, notebook):
   history_uuid = query_execute['history_uuid']
   status = _check_status(request, operation_id=history_uuid)
   if status['query_status']['status'] == 'available':
-    response = _fetch_result_data(request, operation_id=history_uuid)
+    response = _fetch_result_data(request, operation_id=history_uuid, rows=max_rows)
     return response['result']
 
   return 'Query result has expired or could not be found'
 
-def _make_result_table(result):
-  meta = []
-  for field in result['meta']:
-    meta.append(field['name'])
 
+def _make_result_table(result, max_cols):
   table = PrettyTable()
+  
+  # Add first 'max_cols' number columns of meta and row_data in table if greater present
+  meta = []
+  result_meta = result['meta'] if len(result['meta']) < max_cols else result['meta'][:max_cols]
+  for field in result_meta:
+    meta.append(field['name'])
   table.field_names = meta
-  table.add_rows(result['data'])
+
+  for row_data in result['data']:
+    table.add_row(row_data if len(row_data) < max_cols else row_data[:max_cols])
+
   return table
 
 
@@ -161,12 +167,16 @@ def _make_unfurl_payload(url, id_type, doc, doc_type):
   request = MockRequest(user=user)
 
   if id_type == 'editor':
+    # Max row and column allowed in result preview table
+    max_cols = 4
+    max_rows = 20
+
     try:
       status = _check_status(request, operation_id=doc_data['uuid'])
       if status['query_status']['status'] == 'available':
-        fetch_result = query_result(request, json.loads(doc.data))
-        unfurl_result = _make_result_table(fetch_result) if isinstance(fetch_result, dict) else fetch_result
-    except:
+        fetch_result = query_result(request, json.loads(doc.data), max_rows)
+        unfurl_result = _make_result_table(fetch_result, max_cols) if isinstance(fetch_result, dict) else fetch_result
+    except Exception:
       unfurl_result = 'Query result has expired or could not be found'
   else:
     unfurl_result = 'Result is not available for Gist'
