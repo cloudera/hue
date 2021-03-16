@@ -161,6 +161,7 @@
     "publish-gethue": "make sql-all-parsers && npm run webpack-npm && cd npm_dist && npm publish",
     "dev": "webpack --watch --config webpack.config.js -d",
     "dev-workers": "webpack --config webpack.config.workers.js --watch -d",
+    "dev-webpack-npm": "webpack --config webpack.config.npm.js --watch -d",
     "less": "./node_modules/.bin/grunt less",
     "less-dev": "./node_modules/.bin/grunt watch",
     "style-lint": "stylelint \"desktop/core/src/desktop/static/desktop/less/**/*.less\" \"desktop/core/src/desktop/js/**/*.scss\"",
