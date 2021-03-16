@@ -2,18 +2,18 @@ import React, { FC } from 'react';
 
 import SqlExecutable from 'gethue/src/apps/editor/execution/sqlExecutable';
 
-export interface ExecuteActionsProps {
+export interface ExecuteLimitProps {
   activeExecutable?: SqlExecutable
 }
 
-interface ExecuteActionsElement extends HTMLElement {
+interface ExecuteLimitElement extends HTMLElement {
   executable?: SqlExecutable;
 }
 
-export const ExecuteActions: FC<ExecuteActionsProps> = React.memo(({ activeExecutable }) => {
-  const newNode = document.createElement('query-editor-actions');
+export const ExecuteLimit: FC<ExecuteLimitProps> = React.memo(({ activeExecutable }) => {
+  const newNode = document.createElement('query-editor-limit-input');
   newNode.setAttribute('executable', '');
-  (newNode as ExecuteActionsElement).executable = activeExecutable;
+  (newNode as ExecuteLimitElement).executable = activeExecutable;
 
   return <div
     ref={
