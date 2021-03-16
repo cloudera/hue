@@ -41,8 +41,16 @@ urlpatterns = [
   url(r'^table/(?P<database>[^/?]*)/(?P<table>\w+)/read$', metastore_views.read_table, name='read_table'),
   url(r'^table/(?P<database>[^/?]*)/(?P<table>\w+)/queries$', metastore_views.table_queries, name='table_queries'),
   url(r'^table/(?P<database>[^/?]*)/(?P<table>\w+)/partitions/?$', metastore_views.describe_partitions, name='describe_partitions'),
-  url(r'^table/(?P<database>[^/?]*)/(?P<table>\w+)/partitions/(?P<partition_spec>.+?)/read$', metastore_views.read_partition, name='read_partition'),
-  url(r'^table/(?P<database>[^/?]*)/(?P<table>\w+)/partitions/(?P<partition_spec>.+?)/browse$', metastore_views.browse_partition, name='browse_partition'),
+  url(
+    r'^table/(?P<database>[^/?]*)/(?P<table>\w+)/partitions/(?P<partition_spec>.+?)/read$',
+    metastore_views.read_partition,
+    name='read_partition'
+  ),
+  url(
+    r'^table/(?P<database>[^/?]*)/(?P<table>\w+)/partitions/(?P<partition_spec>.+?)/browse$',
+    metastore_views.browse_partition,
+    name='browse_partition'
+  ),
   url(r'^table/(?P<database>[^/?]*)/(?P<table>\w+)/partitions/drop$', metastore_views.drop_partition, name='drop_partition'),
   url(r'^table/(?P<database>[^/?]*)/(?P<table>\w+)/alter_column$', metastore_views.alter_column, name='alter_column'),
 ]
