@@ -5,10 +5,11 @@ import hueConfig from 'gethue/lib/config/hueConfig';
 import Executor from 'gethue/lib/execution/executor';
 
 import { QueryEditor } from './QueryEditor';
-import { ExecuteActions } from './ExecuteActions';
+import { ExecuteButton } from './ExecuteButton';
 import { ExecuteProgress } from './ExecuteProgress';
 import { ResultTable } from './ResultTable';
 import SqlExecutable from 'gethue/src/apps/editor/execution/sqlExecutable';
+import {ExecuteLimit} from "./ExecuteLimit";
 
 const HUE_BASE_URL = 'http://localhost:8888'
 
@@ -62,16 +63,17 @@ export class SqlScratchpad extends React.Component<{}, SqlScratchpadState> {
     if (executor) {
       return <React.Fragment>
         <div className="ace-editor">
-          <QueryEditor executor={executor} setActiveExecutable={this.setActiveExecutable}/>
+          <QueryEditor executor={executor} setActiveExecutable={this.setActiveExecutable} />
         </div>
         <div className="executable-progress-bar">
-          <ExecuteProgress activeExecutable={this.state.activeExecutable}/>
+          <ExecuteProgress activeExecutable={this.state.activeExecutable} />
         </div>
         <div className="executable-actions">
-          <ExecuteActions activeExecutable={this.state.activeExecutable}/>
+          <ExecuteButton activeExecutable={this.state.activeExecutable} />
+          <ExecuteLimit activeExecutable={this.state.activeExecutable} />
         </div>
         <div className="result-table">
-          <ResultTable activeExecutable={this.state.activeExecutable}/>
+          <ResultTable activeExecutable={this.state.activeExecutable} />
         </div>
       </React.Fragment>
     } else {

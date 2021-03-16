@@ -16,10 +16,10 @@
 
 import {
   ACTIVE_STATEMENT_CHANGED_EVENT,
-  ActiveStatementChangedEvent,
   GET_ACTIVE_LOCATIONS_EVENT,
   REFRESH_STATEMENT_LOCATIONS_EVENT
 } from '../AceLocationHandler';
+import { ActiveStatementChangedEventDetails } from '../types';
 import Executor from 'apps/editor/execution/executor';
 import SubscriptionTracker, { Disposable } from 'components/utils/SubscriptionTracker';
 import { Ace } from 'ext/ace';
@@ -70,7 +70,7 @@ export default class SqlAutocompleter implements Disposable {
 
     this.subTracker.subscribe(
       ACTIVE_STATEMENT_CHANGED_EVENT,
-      (event: ActiveStatementChangedEvent) => {
+      (event: ActiveStatementChangedEventDetails) => {
         if (event.id === this.editorId) {
           this.activeStatement = event.activeStatement;
         }
@@ -137,13 +137,16 @@ export default class SqlAutocompleter implements Disposable {
   async autocomplete(): Promise<AutocompleteParseResult | undefined> {
     let parseResult;
     try {
-      huePubSub.publish(GET_ACTIVE_LOCATIONS_EVENT, (locations: ActiveStatementChangedEvent) => {
-        // This could happen in case the user is editing at the borders of the statement and the locations haven't
-        // been updated yet, in that case we have to force a location update before parsing
-        if (locations.editorChangeTime !== this.editor.lastChangeTime) {
-          huePubSub.publish(REFRESH_STATEMENT_LOCATIONS_EVENT, this.editorId);
+      huePubSub.publish(
+        GET_ACTIVE_LOCATIONS_EVENT,
+        (locations: ActiveStatementChangedEventDetails) => {
+          // This could happen in case the user is editing at the borders of the statement and the locations haven't
+          // been updated yet, in that case we have to force a location update before parsing
+          if (locations.editorChangeTime !== this.editor.lastChangeTime) {
+            huePubSub.publish(REFRESH_STATEMENT_LOCATIONS_EVENT, this.editorId);
+          }
         }
-      });
+      );
 
       parseResult = await this.parseActiveStatement();
     } catch (e) {

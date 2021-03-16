@@ -20,7 +20,7 @@
 }
 
 .app > .ace-editor {
-  flex: 0 1 50%;
+  flex: 0 0 30%;
   position: relative;
   overflow: hidden;
 }
@@ -46,6 +46,11 @@
 .app > .executable-actions {
   flex: 1;
   padding: 5px;
+}
+
+.app > .executable-actions > div {
+  display: inline-block;
+  margin-right: 5px;
 }
 
 .app > .result-table {
