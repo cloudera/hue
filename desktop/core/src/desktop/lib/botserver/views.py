@@ -41,7 +41,7 @@ LOG = logging.getLogger(__name__)
 try:
   from prettytable import PrettyTable
 except ImportError:
-  raise ImportError("prettytable module not found")
+  pass
 
 SLACK_VERIFICATION_TOKEN = conf.SLACK.SLACK_VERIFICATION_TOKEN.get()
 SLACK_BOT_USER_TOKEN = conf.SLACK.SLACK_BOT_USER_TOKEN.get()
