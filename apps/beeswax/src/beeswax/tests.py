@@ -125,7 +125,7 @@ def get_csv(client, result_response):
   assert_true(content['isSuccess'])
   csv_link = '/beeswax/download/%s/csv' % content['id']
   csv_resp = client.get(csv_link)
-  return ''.join(csv_resp.streaming_content)
+  return ''.join(csv_resp.content)
 
 
 class TestHive(object):
@@ -310,7 +310,7 @@ for x in sys.stdin:
     # Download the data
     response = self.client.get(content["download_urls"]["csv"])
     # Header line plus data lines...
-    assert_equal(257, ''.join(response.streaming_content).count("\n"))
+    assert_equal(257, ''.join(response.content).count("\n"))
 
 
   def test_api_get_session(self):
@@ -849,7 +849,7 @@ for x in sys.stdin:
     handle = self.db.execute_and_wait(query)
     # Get the result in csv. Should have 3 + 1 header row.
     csv_resp = download(handle, 'csv', self.db)
-    csv_content = ''.join(csv_resp.streaming_content)
+    csv_content = ''.join(csv_resp.content)
     assert_equal(len(csv_content.strip().split('\n')), limit + 1)
 
 
@@ -891,7 +891,7 @@ for x in sys.stdin:
     handle = self.db.execute_and_wait(query)
 
     resp = download(handle, 'csv', self.db)
-    csv_resp = ''.join(resp.streaming_content)
+    csv_resp = ''.join(resp.content)
     csv_data = [[int(col) if col.isdigit() else col for col in row.split(',')] for row in csv_resp.strip().split('\r\n')]
 
     assert_equal(sheet_data, csv_data)
@@ -915,7 +915,7 @@ for x in sys.stdin:
       query = hql_query(hql)
       handle = self.db.execute_and_wait(query)
       resp = download(handle, 'csv', self.db)
-      content = "".join(resp.streaming_content)
+      content = "".join(resp.content)
       assert_true(len(content) <= 1024)
     finally:
       finish()

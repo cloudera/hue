@@ -260,7 +260,7 @@ class TestImpalaIntegration(object):
       handle = self.db.execute_and_wait(query)
       # Get the result in csv. Should have 5 + 1 header row.
       csv_resp = download(handle, 'csv', self.db)
-      csv_content = ''.join(csv_resp.streaming_content)
+      csv_content = ''.join(csv_resp.content)
       assert_equal(len(csv_content.strip().split('\n')), 5 + 1)
 
 
@@ -268,21 +268,21 @@ class TestImpalaIntegration(object):
 
       handle = self.db.execute_and_wait(query)
       csv_resp = download(handle, 'csv', self.db)
-      csv_content = ''.join(csv_resp.streaming_content)
+      csv_content = ''.join(csv_resp.content)
       assert_equal(len(csv_content.strip().split('\n')), 1)
 
       query = hql_query(hql % {'limit': 'LIMIT 1'})
 
       handle = self.db.execute_and_wait(query)
       csv_resp = download(handle, 'csv', self.db)
-      csv_content = ''.join(csv_resp.streaming_content)
+      csv_content = ''.join(csv_resp.content)
       assert_equal(len(csv_content.strip().split('\n')), 1 + 1)
 
       query = hql_query(hql % {'limit': 'LIMIT 2'})
 
       handle = self.db.execute_and_wait(query)
       csv_resp = download(handle, 'csv', self.db)
-      csv_content = ''.join(csv_resp.streaming_content)
+      csv_content = ''.join(csv_resp.content)
       assert_equal(len(csv_content.strip().split('\n')), 1 + 2)
     finally:
       data_export.FETCH_SIZE = FETCH_SIZE

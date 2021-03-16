@@ -494,7 +494,7 @@ class TestWithMockedSolr(TestSearchBase):
         'collection': json.dumps(self._get_collection_param(self.collection)),
         'query': json.dumps(QUERY)
     })
-    csv_response_content = b''.join(csv_response.streaming_content)
+    csv_response_content = b''.join(csv_response.content)
     assert_equal('application/csv', csv_response['Content-Type'])
     assert_equal('attachment; filename="query_result.csv"', csv_response['Content-Disposition'])
     assert_equal(4 + 1 + 1, len(csv_response_content.split(b'\n')), csv_response_content.split(b'\n'))
