@@ -52,9 +52,17 @@ urlpatterns = [
   url(r'^delete_coordinator$', oozie_views_editor.delete_coordinator, name='delete_coordinator'),
   url(r'^restore_coordinator$', oozie_views_editor.restore_coordinator, name='restore_coordinator'),
   url(r'^clone_coordinator/(?P<coordinator>\d+)$', oozie_views_editor.clone_coordinator, name='clone_coordinator'),
-  url(r'^create_coordinator_dataset/(?P<coordinator>[-\w]+)$', oozie_views_editor.create_coordinator_dataset, name='create_coordinator_dataset'),
+  url(
+    r'^create_coordinator_dataset/(?P<coordinator>[-\w]+)$',
+    oozie_views_editor.create_coordinator_dataset,
+    name='create_coordinator_dataset'
+  ),
   url(r'^edit_coordinator_dataset/(?P<dataset>\d+)$', oozie_views_editor.edit_coordinator_dataset, name='edit_coordinator_dataset'),
-  url(r'^create_coordinator_data/(?P<coordinator>[-\w]+)/(?P<data_type>(input|output))$', oozie_views_editor.create_coordinator_data, name='create_coordinator_data'),
+  url(
+    r'^create_coordinator_data/(?P<coordinator>[-\w]+)/(?P<data_type>(input|output))$',
+    oozie_views_editor.create_coordinator_data,
+    name='create_coordinator_data'
+  ),
   url(r'^submit_coordinator/(?P<coordinator>\d+)$', oozie_views_editor.submit_coordinator, name='submit_coordinator'),
 
   url(r'^list_bundles$', oozie_views_editor.list_bundles, name='list_bundles'),
@@ -66,7 +74,11 @@ urlpatterns = [
   url(r'^delete_bundle$', oozie_views_editor.delete_bundle, name='delete_bundle'),
   url(r'^restore_bundle$', oozie_views_editor.restore_bundle, name='restore_bundle'),
   url(r'^create_bundled_coordinator/(?P<bundle>\d+)$', oozie_views_editor.create_bundled_coordinator, name='create_bundled_coordinator'),
-  url(r'^edit_bundled_coordinator/(?P<bundle>\d+)/(?P<bundled_coordinator>\d+)$', oozie_views_editor.edit_bundled_coordinator, name='edit_bundled_coordinator'),
+  url(
+    r'^edit_bundled_coordinator/(?P<bundle>\d+)/(?P<bundled_coordinator>\d+)$',
+    oozie_views_editor.edit_bundled_coordinator,
+    name='edit_bundled_coordinator'
+  ),
 
   url(r'^list_history$', oozie_views_editor.list_history, name='list_history'), # Unused
   url(r'^list_history/(?P<record_id>[-\w]+)$', oozie_views_editor.list_history_record, name='list_history_record'),
@@ -82,7 +94,11 @@ urlpatterns += [
   url(r'^editor/workflow/copy/?$', oozie_views_editor2.copy_workflow, name='copy_workflow'),
   url(r'^editor/workflow/save/?$', oozie_views_editor2.save_workflow, name='save_workflow'),
   url(r'^editor/workflow/submit/(?P<doc_id>\d+)$', oozie_views_editor2.submit_workflow, name='editor_submit_workflow'),
-  url(r'^editor/workflow/submit_single_action/(?P<doc_id>\d+)/(?P<node_id>.+)$', oozie_views_editor2.submit_single_action, name='submit_single_action'),
+  url(
+    r'^editor/workflow/submit_single_action/(?P<doc_id>\d+)/(?P<node_id>.+)$',
+    oozie_views_editor2.submit_single_action,
+    name='submit_single_action'
+  ),
   url(r'^editor/workflow/new_node/?$', oozie_views_editor2.new_node, name='new_node'),
   url(r'^editor/workflow/add_node/?$', oozie_views_editor2.add_node, name='add_node'),
   url(r'^editor/workflow/parameters/?$', oozie_views_editor2.workflow_parameters, name='workflow_parameters'),
@@ -118,7 +134,11 @@ urlpatterns += [
   url(r'^workflows/(?P<workflow>\d+)$', oozie_views_api.workflow, name='workflow'),
   url(r'^workflows/(?P<workflow>\d+)/save$', oozie_views_api.workflow_save, name='workflow_save'),
   url(r'^workflows/(?P<workflow>\d+)/actions$', oozie_views_api.workflow_actions, name='workflow_actions'),
-  url(r'^workflows/(?P<workflow>\d+)/nodes/(?P<node_type>\w+)/validate$', oozie_views_api.workflow_validate_node, name='workflow_validate_node'),
+  url(
+    r'^workflows/(?P<workflow>\d+)/nodes/(?P<node_type>\w+)/validate$',
+    oozie_views_api.workflow_validate_node,
+    name='workflow_validate_node'
+  ),
   url(r'^workflows/autocomplete_properties/?$', oozie_views_api.autocomplete_properties, name='autocomplete_properties'),
 ]
 
@@ -132,14 +152,26 @@ urlpatterns += [
   url(r'^list_oozie_bundles/?$', oozie_views_dashboard.list_oozie_bundles, name='list_oozie_bundles'),
   url(r'^list_oozie_workflow/(?P<job_id>[-\w]+)/?$', oozie_views_dashboard.list_oozie_workflow, name='list_oozie_workflow'),
   url(r'^list_oozie_coordinator/(?P<job_id>[-\w]+)/?$', oozie_views_dashboard.list_oozie_coordinator, name='list_oozie_coordinator'),
-  url(r'^list_oozie_workflow_action/(?P<action>[-\w@]+)/?$', oozie_views_dashboard.list_oozie_workflow_action, name='list_oozie_workflow_action'),
+  url(
+    r'^list_oozie_workflow_action/(?P<action>[-\w@]+)/?$',
+    oozie_views_dashboard.list_oozie_workflow_action,
+    name='list_oozie_workflow_action'
+  ),
   url(r'^list_oozie_bundle/(?P<job_id>[-\w]+)$', oozie_views_dashboard.list_oozie_bundle, name='list_oozie_bundle'),
 
   url(r'^rerun_oozie_job/(?P<job_id>[-\w]+)(?:/(?P<app_path>.+?))?/?$', oozie_views_dashboard.rerun_oozie_job, name='rerun_oozie_job'),
-  url(r'^rerun_oozie_coord/(?P<job_id>[-\w]+)(?:/(?P<app_path>.+?))?/?$', oozie_views_dashboard.rerun_oozie_coordinator, name='rerun_oozie_coord'),
+  url(
+    r'^rerun_oozie_coord/(?P<job_id>[-\w]+)(?:/(?P<app_path>.+?))?/?$',
+    oozie_views_dashboard.rerun_oozie_coordinator,
+    name='rerun_oozie_coord'
+  ),
   url(r'^rerun_oozie_bundle/(?P<job_id>[-\w]+)/(?P<app_path>.+?)$', oozie_views_dashboard.rerun_oozie_bundle, name='rerun_oozie_bundle'),
   url(r'^sync_coord_workflow/(?P<job_id>[-\w]+)$', oozie_views_dashboard.sync_coord_workflow, name='sync_coord_workflow'),
-  url(r'^manage_oozie_jobs/(?P<job_id>[-\w]+)/(?P<action>(start|suspend|resume|kill|rerun|change|ignore))$', oozie_views_dashboard.manage_oozie_jobs, name='manage_oozie_jobs'),
+  url(
+    r'^manage_oozie_jobs/(?P<job_id>[-\w]+)/(?P<action>(start|suspend|resume|kill|rerun|change|ignore))$',
+    oozie_views_dashboard.manage_oozie_jobs,
+    name='manage_oozie_jobs'
+  ),
   url(r'^bulk_manage_oozie_jobs/?$', oozie_views_dashboard.bulk_manage_oozie_jobs, name='bulk_manage_oozie_jobs'),
 
   url(r'^submit_external_job/(?P<application_path>.+?)$', oozie_views_dashboard.submit_external_job, name='submit_external_job'),
