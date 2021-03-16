@@ -465,29 +465,29 @@
             el.insertAdjacentElement('beforebegin', doneElem);
           };
           editor.customMenuOptions.getClearIgnoredSyntaxChecks = () => false;
+        }
 
-          const AceAutocomplete = ace.require('ace/autocomplete').Autocomplete;
+        const AceAutocomplete = ace.require('ace/autocomplete').Autocomplete;
 
-          if (!editor.completer) {
-            editor.completer = new AceAutocomplete();
-          }
+        if (!editor.completer) {
+          editor.completer = new AceAutocomplete();
+        }
 
-          const isSqlDialect = (<EditorInterpreter>executor.value.connector()).is_sql;
+        const isSqlDialect = (<EditorInterpreter>executor.value.connector()).is_sql;
 
-          editor.completer.exactMatch = !isSqlDialect;
+        editor.completer.exactMatch = !isSqlDialect;
 
-          const langTools = ace.require('ace/ext/language_tools');
-          langTools.textCompleter.setSqlMode(isSqlDialect);
+        const langTools = ace.require('ace/ext/language_tools');
+        langTools.textCompleter.setSqlMode(isSqlDialect);
 
-          if (editor.completers) {
-            editor.completers.length = 0;
-            if (isSqlDialect) {
-              editor.useHueAutocompleter = true;
-            } else {
-              editor.completers.push(langTools.snippetCompleter);
-              editor.completers.push(langTools.textCompleter);
-              editor.completers.push(langTools.keyWordCompleter);
-            }
+        if (editor.completers) {
+          editor.completers.length = 0;
+          if (isSqlDialect) {
+            editor.useHueAutocompleter = true;
+          } else {
+            editor.completers.push(langTools.snippetCompleter);
+            editor.completers.push(langTools.textCompleter);
+            editor.completers.push(langTools.keyWordCompleter);
           }
         }
 
