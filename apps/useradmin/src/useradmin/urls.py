@@ -15,13 +15,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from django.conf.urls import url
+import sys
 
 from desktop.lib.django_util import get_username_re_rule, get_groupname_re_rule
 
 from useradmin import views as useradmin_views
 from useradmin import api as useradmin_api
 
+if sys.version_info[0] < 3:
+  from django.conf.urls import url
+else:
+  from django.urls import re_path as url
 
 username_re = get_username_re_rule()
 groupname_re = get_groupname_re_rule()

@@ -15,8 +15,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from django.conf.urls import url
+import sys
+
 from liboauth import views as liboauth_views
+
+if sys.version_info[0] < 3:
+  from django.conf.urls import url
+else:
+  from django.urls import re_path as url
 
 urlpatterns = [
        url(r'^accounts/login/$', liboauth_views.show_login_page, name='show_oauth_login'),

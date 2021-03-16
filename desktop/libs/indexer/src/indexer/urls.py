@@ -15,7 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from django.conf.urls import url
+import sys
+
 from indexer import views as indexer_views
 from indexer import solr_api as indexer_solr_api
 from indexer import api3 as indexer_api3
@@ -23,6 +24,11 @@ from indexer.indexers import rdbms as indexer_indexers_rdbms
 from indexer import api as indexer_api
 
 from indexer.conf import ENABLE_NEW_INDEXER
+
+if sys.version_info[0] < 3:
+  from django.conf.urls import url
+else:
+  from django.urls import re_path as url
 
 urlpatterns = [
   url(r'^install_examples$', indexer_views.install_examples, name='install_examples'),
