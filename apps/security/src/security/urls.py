@@ -51,8 +51,16 @@ urlpatterns += [
 
   url(r'^api/hive/list_sentry_roles_by_group', security_api_hive.list_sentry_roles_by_group, name='list_sentry_roles_by_group'),
   url(r'^api/hive/list_sentry_privileges_by_role', security_api_hive.list_sentry_privileges_by_role, name='list_sentry_privileges_by_role'),
-  url(r'^api/hive/list_sentry_privileges_for_provider$', security_api_hive.list_sentry_privileges_for_provider, name='list_sentry_privileges_for_provider'),
-  url(r'^api/hive/list_sentry_privileges_by_authorizable', security_api_hive.list_sentry_privileges_by_authorizable, name='list_sentry_privileges_by_authorizable'),
+  url(
+    r'^api/hive/list_sentry_privileges_for_provider$',
+    security_api_hive.list_sentry_privileges_for_provider,
+    name='list_sentry_privileges_for_provider'
+  ),
+  url(
+    r'^api/hive/list_sentry_privileges_by_authorizable',
+    security_api_hive.list_sentry_privileges_by_authorizable,
+    name='list_sentry_privileges_by_authorizable'
+  ),
   url(r'^api/hive/create_sentry_role', security_api_hive.create_sentry_role, name='create_sentry_role'),
   url(r'^api/hive/update_role_groups', security_api_hive.update_role_groups, name='update_role_groups'),
   url(r'^api/hive/drop_sentry_role', security_api_hive.drop_sentry_role, name='drop_sentry_role'),
@@ -72,9 +80,21 @@ urlpatterns += [
   url(r'^api/sentry/fetch_authorizables', security_api_sentry.fetch_authorizables, name='fetch_authorizables'),
 
   url(r'^api/sentry/list_sentry_roles_by_group', security_api_sentry.list_sentry_roles_by_group, name='list_sentry_roles_by_group'),
-  url(r'^api/sentry/list_sentry_privileges_by_role', security_api_sentry.list_sentry_privileges_by_role, name='list_sentry_privileges_by_role'),
-  url(r'^api/sentry/list_sentry_privileges_for_provider$', security_api_sentry.list_sentry_privileges_for_provider, name='list_sentry_privileges_for_provider'),
-  url(r'^api/sentry/list_sentry_privileges_by_authorizable', security_api_sentry.list_sentry_privileges_by_authorizable, name='list_sentry_privileges_by_authorizable'),
+  url(
+    r'^api/sentry/list_sentry_privileges_by_role',
+    security_api_sentry.list_sentry_privileges_by_role,
+    name='list_sentry_privileges_by_role'
+  ),
+  url(
+    r'^api/sentry/list_sentry_privileges_for_provider$',
+    security_api_sentry.list_sentry_privileges_for_provider,
+    name='list_sentry_privileges_for_provider'
+  ),
+  url(
+    r'^api/sentry/list_sentry_privileges_by_authorizable',
+    security_api_sentry.list_sentry_privileges_by_authorizable,
+    name='list_sentry_privileges_by_authorizable'
+  ),
   url(r'^api/sentry/create_sentry_role', security_api_sentry.create_sentry_role, name='create_sentry_role'),
   url(r'^api/sentry/update_role_groups', security_api_sentry.update_role_groups, name='update_role_groups'),
   url(r'^api/sentry/drop_sentry_role', security_api_sentry.drop_sentry_role, name='drop_sentry_role'),

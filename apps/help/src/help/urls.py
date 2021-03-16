@@ -25,6 +25,6 @@ else:
   from django.urls import re_path as url
 
 urlpatterns = [
-  url(r'^$', help_views.view, { "app": "desktop", "path": "/index.html" }),
+  url(r'^$', help_views.view, {"app": "desktop", "path": "/index.html"}),
   url(r'^(?P<app>\w*)(?P<path>/.*)$', help_views.view, name='help.views.view'),
 ]
