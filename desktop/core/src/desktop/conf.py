@@ -146,12 +146,16 @@ def get_slack_bot_user_token():
   """Returns Slack Bot User Token if set as environment variable else None"""
   return os.environ.get('SLACK_BOT_USER_TOKEN')
 
+def is_python2():
+  """Hue is running on Python 2."""
+  return sys.version_info[0] == 2
+
 
 USE_CHERRYPY_SERVER = Config(
   key="use_cherrypy_server",
   help=_("If set to true, CherryPy will be used. Otherwise, Gunicorn will be used as the webserver."),
   type=coerce_bool,
-  default=True)
+  dynamic_default=is_python2)
 
 GUNICORN_WORKER_CLASS = Config(
   key="gunicorn_work_class",
