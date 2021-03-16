@@ -16,8 +16,12 @@
 # limitations under the License.
 
 import logging
+import sys
 
-from django.conf.urls import url
+if sys.version_info[0] < 3:
+  from django.conf.urls import url
+else:
+  from django.urls import re_path as url
 
 LOG = logging.getLogger(__name__)
 

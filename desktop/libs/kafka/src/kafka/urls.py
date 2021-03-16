@@ -15,8 +15,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from django.conf.urls import url
+import sys
+
 from kafka import kafka_api as kafka_kafka_api
+
+if sys.version_info[0] < 3:
+  from django.conf.urls import url
+else:
+  from django.urls import re_path as url
 
 urlpatterns = [
   url(r'^api/topics/list/$', kafka_kafka_api.list_topics, name='list_topics'),

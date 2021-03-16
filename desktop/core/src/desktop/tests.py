@@ -35,7 +35,6 @@ from configobj import ConfigObj
 from django.db.models import query, CharField, SmallIntegerField
 from django.core.management import call_command
 from django.core.paginator import Paginator
-from django.conf.urls import url
 from django.db import connection
 from django.urls import reverse
 from django.test.client import Client
@@ -74,9 +73,11 @@ from desktop.views import check_config, home, generate_configspec, load_confs, c
 if sys.version_info[0] > 2:
   from io import StringIO as string_io
   from unittest.mock import patch, Mock
+  from django.urls import re_path as url
 else:
   from cStringIO import StringIO as string_io
   from mock import patch, Mock
+  from django.conf.urls import url
 
 
 LOG = logging.getLogger(__name__)

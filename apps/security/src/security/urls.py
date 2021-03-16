@@ -15,11 +15,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from django.conf.urls import url
+import sys
+
 from security import views as security_views
 from security.api import hdfs as security_api_hdfs
 from security.api import hive as security_api_hive
 from security.api import sentry as security_api_sentry 
+
+if sys.version_info[0] < 3:
+  from django.conf.urls import url
+else:
+  from django.urls import re_path as url
 
 urlpatterns = [
   url(r'^$', security_views.hive, name='index'),
