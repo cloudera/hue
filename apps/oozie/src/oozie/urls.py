@@ -15,12 +15,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from django.conf.urls import url
+import sys
+
 from oozie.views import editor as oozie_views_editor
 from oozie.views import editor2 as oozie_views_editor2
 from oozie.views import api as oozie_views_api
 from oozie.views import dashboard as oozie_views_dashboard
 
+if sys.version_info[0] < 3:
+  from django.conf.urls import url
+else:
+  from django.urls import re_path as url
 
 IS_URL_NAMESPACED = True
 
