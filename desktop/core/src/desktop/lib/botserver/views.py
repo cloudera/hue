@@ -135,9 +135,9 @@ def query_result(request, notebook):
   status = _check_status(request, operation_id=history_uuid)
   if status['query_status']['status'] == 'available':
     response = _fetch_result_data(request, operation_id=history_uuid)
+    return response['result']
 
-  return response['result']
-
+  return 'Query result has expired or could not be found'
 
 def _make_result_table(result):
   meta = []
@@ -164,11 +164,12 @@ def _make_unfurl_payload(url, id_type, doc, doc_type):
     try:
       status = _check_status(request, operation_id=doc_data['uuid'])
       if status['query_status']['status'] == 'available':
-        result = _make_result_table(query_result(request, json.loads(doc.data)))
+        fetch_result = query_result(request, json.loads(doc.data))
+        unfurl_result = _make_result_table(fetch_result) if isinstance(fetch_result, dict) else fetch_result
     except:
-      result = 'Query result has expired or could not be found.'
+      unfurl_result = 'Query result has expired or could not be found'
   else:
-    result = 'Result is not available for Gist.'
+    unfurl_result = 'Result is not available for Gist'
 
   payload = {
     url: {
@@ -208,7 +209,7 @@ def _make_unfurl_payload(url, id_type, doc, doc_type):
           "type": "section",
           "text": {
             "type": "mrkdwn",
-            "text": "*Query result:*\n```{}```".format(result),
+            "text": "*Query result:*\n```{}```".format(unfurl_result),
           }
 				}
       ]
