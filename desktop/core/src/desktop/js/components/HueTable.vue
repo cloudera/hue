@@ -19,14 +19,17 @@
 <!-- eslint-disable vue/no-v-html -->
 <template>
   <div ref="tableContainer" class="hue-table-container" @scroll="onContainerScroll">
-    <table class="hue-table" :class="{ 'sticky-header': stickyHeader }">
+    <table
+      class="hue-table"
+      :class="{ 'sticky-header': stickyHeader && showHeader, 'header-less': !showHeader }"
+    >
       <caption>
         <!-- Because of Web:TableWithoutCaptionCheck -->
         {{
           caption
         }}
       </caption>
-      <thead>
+      <thead v-if="showHeader">
         <tr class="header-row">
           <th
             v-for="(column, colIndex) in columns"
@@ -34,14 +37,14 @@
             :class="cellClass(column.headerCssClass, colIndex)"
             scope="col"
           >
-            {{ column.label }}
+            {{ column.label || column.key }}
           </th>
           <!-- To fill the blank space to the right when table width is smaller than available horizontal space -->
           <th class="column-flush" scope="col" />
         </tr>
       </thead>
-      <tbody>
-        <tr v-for="(row, rowIndex) in rows" :key="rowIndex" @click="$emit('row-clicked', row)">
+      <tbody :class="{ 'clickable-rows': clickableRows }">
+        <tr v-for="(row, rowIndex) in rows" :key="rowIndex" @click="onRowClick(row)">
           <td
             v-for="(column, colIndex) in columns"
             :key="colIndex"
@@ -64,6 +67,7 @@
 <script lang="ts">
   import { defineComponent, PropType } from 'vue';
 
+  import './HueTable.scss';
   import { Column, Row } from './HueTable';
 
   export default defineComponent({
@@ -83,6 +87,11 @@
         type: String,
         default: undefined
       },
+      showHeader: {
+        type: Boolean,
+        required: false,
+        default: true
+      },
       stickyHeader: {
         type: Boolean,
         required: false,
@@ -91,6 +100,10 @@
       stickyFirstColumn: {
         type: Boolean,
         required: false,
+        default: false
+      },
+      clickableRows: {
+        type: Boolean,
         default: false
       }
     },
@@ -101,18 +114,15 @@
       hasCellSlot(column: Column<unknown>): boolean {
         return !!this.$slots[this.cellSlotName(column)];
       },
-
       cellSlotName(column: Column<unknown>): string {
         return 'cell-' + column.key;
       },
-
       onContainerScroll(): void {
         const containerEl = <HTMLElement>this.$refs.tableContainer;
         if (containerEl.scrollHeight === containerEl.scrollTop + containerEl.clientHeight) {
           this.$emit('scroll-to-end');
         }
       },
-
       cellClass(cellClass: string | undefined, index: number): string | null {
         // This prevents rendering of empty class="" for :class="[x,y]" when x and y are undefined
         // Possibly fixed in Vue 3
@@ -122,110 +132,12 @@
           return 'sticky-first-col';
         }
         return cellClass || null;
+      },
+      onRowClick(row: Row): void {
+        if (this.clickableRows) {
+          this.$emit('row-clicked', row);
+        }
       }
     }
   });
 </script>
-
-<style lang="scss" scoped>
-  @import './styles/colors';
-  @import './styles/mixins';
-
-  .hue-table-container {
-    overflow-x: auto;
-    width: 100%;
-    margin: 0 0 15px 0;
-
-    .hue-table {
-      line-height: 14px;
-      table-layout: auto;
-      border-collapse: separate;
-
-      thead,
-      tbody {
-        tr {
-          height: 40px;
-
-          th,
-          td {
-            @include nowrap-ellipsis;
-
-            height: 16px;
-            max-width: 300px;
-            padding: 12px;
-            border-bottom: 1px solid $fluid-gray-300;
-            text-align: left;
-
-            &.column-flush {
-              width: 100%;
-            }
-          }
-        }
-      }
-
-      thead {
-        tr {
-          th {
-            background-color: $fluid-white;
-            color: $fluid-gray-700;
-            font-size: 13px;
-            font-weight: 500;
-            white-space: nowrap;
-
-            &.sticky-first-col {
-              background-color: $fluid-white;
-              position: sticky;
-              position: -webkit-sticky;
-              left: 0;
-              z-index: 102;
-            }
-
-            .sort-header {
-              display: flex;
-              cursor: pointer;
-              align-items: center;
-              letter-spacing: normal;
-              outline: 0;
-            }
-          }
-        }
-      }
-
-      tbody {
-        tr {
-          td {
-            color: $fluid-gray-900;
-            font-size: 14px;
-
-            &.sticky-first-col {
-              @include position-sticky;
-
-              background-color: $fluid-white;
-              left: 0;
-              z-index: 100;
-            }
-
-            &:last-of-type {
-              padding-right: 8px;
-            }
-          }
-        }
-      }
-
-      &.sticky-header {
-        thead th {
-          @include position-sticky;
-
-          top: 0;
-          z-index: 101;
-
-          &.sticky-first-col {
-            @include position-sticky;
-
-            top: 0;
-          }
-        }
-      }
-    }
-  }
-</style>

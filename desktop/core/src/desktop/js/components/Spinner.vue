@@ -21,26 +21,37 @@
     v-if="spin"
     class="spinner-container"
     :class="{
-      'hue-spinner-overlay': overlay,
-      'hue-spinner-inline': inline,
-      'hue-spinner': !overlay && !inline,
-      'hue-spinner-blackout': blackout
+      'spinner-overlay': overlay,
+      'spinner-inline': inline,
+      spinner: !overlay && !inline,
+      'spinner-blackout': blackout
     }"
   >
-    <em
-      class="fa fa-spinner fa-spin"
-      :style="{ width: center && inline ? '100%' : null }"
-      :class="{
-        'hue-spinner-large': size === 'large',
-        'hue-spinner-xlarge': size === 'xlarge',
-        'hue-spinner-center': center
-      }"
-    />
+    <div :style="{ width: center && inline ? '100%' : null }" :class="{ 'spinner-center': center }">
+      <i
+        class="fa fa-spinner fa-spin"
+        :class="{
+          'spinner-large': size === 'large',
+          'spinner-xlarge': size === 'xlarge'
+        }"
+      />
+      <span
+        v-if="label"
+        :class="{
+          'spinner-large': size === 'large',
+          'spinner-xlarge': size === 'xlarge'
+        }"
+      >
+        {{ label }}
+      </span>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
   import { defineComponent } from 'vue';
+
+  import './Spinner.scss';
 
   export default defineComponent({
     name: 'Spinner',
@@ -65,6 +76,10 @@
         type: Boolean,
         default: false
       },
+      label: {
+        type: String,
+        default: ''
+      },
       blackout: {
         type: Boolean,
         default: false
@@ -72,9 +87,3 @@
     }
   });
 </script>
-
-<style lang="scss" scoped>
-  .spinner-container {
-    z-index: 10000;
-  }
-</style>

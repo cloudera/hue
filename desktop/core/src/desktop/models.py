@@ -40,7 +40,7 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from django.urls import reverse, NoReverseMatch
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
-from dashboard.conf import get_engines, HAS_REPORT_ENABLED
+from dashboard.conf import get_engines, HAS_REPORT_ENABLED, IS_ENABLED as DASHBOARD_ENABLED
 from kafka.conf import has_kafka
 from metadata.conf import get_optimizer_mode
 from notebook.conf import DEFAULT_LIMIT, SHOW_NOTEBOOKS, get_ordered_interpreters
@@ -1076,7 +1076,9 @@ class Document2Manager(models.Manager, Document2QueryMixin):
     except Directory.MultipleObjectsReturned:
       LOG.exception('Multiple Gist directories detected. Merging all into one.')
 
-      all_gist_dirs = self.filter(owner=user, parent_directory=home_dir, name=Document2.GIST_DIR, type='directory').order_by('-last_modified')
+      all_gist_dirs = self.filter(
+        owner=user, parent_directory=home_dir, name=Document2.GIST_DIR, type='directory'
+      ).order_by('-last_modified')
       gist_dir = all_gist_dirs.last()
       gist_dirs_dup = all_gist_dirs.exclude(uuid=gist_dir.uuid)
       for dir in gist_dirs_dup:
@@ -1900,7 +1902,7 @@ class ClusterConfig(object):
     interpreters = get_engines(self.user)
     _interpreters = []
 
-    if interpreters:
+    if interpreters and DASHBOARD_ENABLED.get():
       if HAS_REPORT_ENABLED.get():
         _interpreters.append({
           'type': 'report',

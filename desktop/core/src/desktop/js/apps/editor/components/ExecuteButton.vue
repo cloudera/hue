@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <hue-button
+  <HueButton
     v-if="loadingSession"
     key="loading-button"
     :small="true"
@@ -25,8 +25,8 @@
     :title="I18n('Creating session')"
   >
     <i class="fa fa-fw fa-spinner fa-spin" /> {{ I18n('Loading') }}
-  </hue-button>
-  <hue-button
+  </HueButton>
+  <HueButton
     v-if="showExecute"
     key="execute-button"
     :small="true"
@@ -35,9 +35,9 @@
     @click="execute"
   >
     <i class="fa fa-play fa-fw" /> {{ I18n('Execute') }}
-  </hue-button>
+  </HueButton>
 
-  <hue-button
+  <HueButton
     v-if="showStop && !stopping"
     key="stop-button"
     :small="true"
@@ -47,11 +47,11 @@
     <i class="fa fa-stop fa-fw" />
     <span v-if="waiting">{{ I18n('Stop batch') }}</span>
     <span v-else>{{ I18n('Stop') }}</span>
-  </hue-button>
+  </HueButton>
 
-  <hue-button v-if="showStop && stopping" key="stopping-button" :small="true" :alert="true">
+  <HueButton v-if="showStop && stopping" key="stopping-button" :small="true" :alert="true">
     <i class="fa fa-fw fa-spinner fa-spin" /> {{ I18n('Stopping') }}
-  </hue-button>
+  </HueButton>
 </template>
 
 <script lang="ts">

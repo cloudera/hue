@@ -3,36 +3,42 @@
 exports[`Modal.vue should render a modal 1`] = `
 <transition-stub>
   <div
-    class="modal-mask"
+    class="hue-modal-mask"
   >
     <div
-      class="modal-wrapper"
+      class="hue-modal-wrapper"
     >
       <div
-        class="modal-container"
+        class="hue-modal-container"
       >
         <div
-          class="modal-header"
+          class="hue-modal-header"
+        >
+          <h3 />
+          <button
+            aria-label="{{ I18n('Close') }}"
+            class="hue-modal-close-button"
+            type="button"
+          >
+            <span
+              aria-hidden="true"
+            >
+              ×
+            </span>
+          </button>
+        </div>
+        <div
+          class="hue-modal-body"
         >
           
           
-          <i
-            aria-hidden="true"
-            class="fa fa-times"
-          />
         </div>
         <div
-          class="modal-body"
-        >
-          
-          
-        </div>
-        <div
-          class="modal-footer"
+          class="hue-modal-footer"
         >
           
           <button
-            class="modal-default-button"
+            class="hue-modal-default-button"
           >
             CLOSE
           </button>

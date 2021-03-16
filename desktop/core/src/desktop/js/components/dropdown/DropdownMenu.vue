@@ -17,18 +17,17 @@
 -->
 
 <template>
-  <dropdown-panel class="hue-dropdown-menu" :text="text" :link="link">
-    <div class="hue-dropdown-menu-inner">
-      <ul>
-        <slot />
-      </ul>
-    </div>
+  <dropdown-panel :text="text" :link="link">
+    <ul>
+      <slot />
+    </ul>
   </dropdown-panel>
 </template>
 
 <script lang="ts">
   import { defineComponent } from 'vue';
 
+  import './DropdownMenu.scss';
   import DropdownPanel from './DropdownPanel.vue';
 
   export default defineComponent({
@@ -36,7 +35,6 @@
     components: {
       DropdownPanel
     },
-
     props: {
       text: {
         type: String,
@@ -51,19 +49,3 @@
     }
   });
 </script>
-
-<style lang="scss" scoped>
-  @import '../styles/colors';
-
-  .hue-dropdown-menu {
-    .hue-dropdown-menu-inner {
-      min-width: 160px;
-      max-width: 250px;
-      min-height: 34px;
-      max-height: 200px;
-
-      overflow-x: hidden;
-      overflow-y: auto;
-    }
-  }
-</style>

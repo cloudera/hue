@@ -17,58 +17,47 @@
 -->
 
 <template>
-  <button
-    v-bind="$attrs"
-    class="hue-btn"
-    type="button"
-    :class="{
-      'hue-btn-primary': primary,
-      'hue-btn-alert': alert,
-      'hue-btn-borderless': borderless,
-      'hue-btn-small': small,
-      'hue-btn-large': large
-    }"
-    :disabled="disabled"
-    @click="$emit('click')"
-  >
-    <slot />
-  </button>
+  <form enctype="multipart/form-data" novalidate>
+    <input
+      type="file"
+      :accept="accept"
+      :disabled="disabled"
+      :multiple="multiple"
+      @change="onFileInputChange"
+    />
+  </form>
 </template>
 
 <script lang="ts">
-  import { defineComponent } from 'vue';
-
-  import './HueButton.scss';
+  import { defineComponent, PropType } from 'vue';
 
   export default defineComponent({
-    name: 'HueButton',
+    name: 'FileUpload',
     props: {
-      primary: {
-        type: Boolean,
-        required: false
+      modelValue: {
+        type: Object as PropType<FileList | null>,
+        default: null
       },
-      alert: {
-        type: Boolean,
-        required: false
+      accept: {
+        type: String,
+        default: '*'
       },
-      borderless: {
+      multiple: {
         type: Boolean,
-        required: false
-      },
-      small: {
-        type: Boolean,
-        required: false
-      },
-      large: {
-        type: Boolean,
-        required: false
+        default: false
       },
       disabled: {
         type: Boolean,
-        required: false
+        default: false
       }
     },
+    emits: ['update:model-value'],
+    setup(props, { emit }) {
+      const onFileInputChange = (event: InputEvent) => {
+        emit('update:model-value', (<HTMLInputElement>event.target).files);
+      };
 
-    emits: ['click']
+      return { onFileInputChange };
+    }
   });
 </script>

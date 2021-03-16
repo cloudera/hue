@@ -17,17 +17,17 @@
 -->
 
 <template>
-  <div class="hue-dropdown-panel">
-    <hue-link v-if="link" ref="triggerLinkElement" :disabled="disabled" @click="toggleDrawer">
+  <div ref="panelElement" class="hue-dropdown-panel">
+    <HueLink v-if="link" :disabled="disabled" @click="toggleDrawer">
       {{ text }} <i class="fa fa-caret-down" />
-    </hue-link>
-    <hue-button v-else ref="triggerButtonElement" :disabled="disabled" @click="toggleDrawer">
+    </HueLink>
+    <HueButton v-else :disabled="disabled" @click="toggleDrawer">
       {{ text }} <i class="fa fa-caret-down" />
-    </hue-button>
+    </HueButton>
     <DropdownDrawer
       :open="open"
       :trigger-element="triggerElement"
-      :close-on-click="false"
+      :close-on-click="true"
       @close="closeDrawer"
     >
       <slot :close-panel="closeDrawer" />
@@ -36,8 +36,9 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent } from 'vue';
+  import { defineComponent, onMounted, ref } from 'vue';
 
+  import './DropdownPanel.scss';
   import DropdownDrawer from './DropdownDrawer.vue';
   import HueButton from '../HueButton.vue';
   import HueLink from '../HueLink.vue';
@@ -63,29 +64,32 @@
         default: false
       }
     },
-    data() {
-      return {
-        open: false,
-        triggerElement: null as HTMLElement | null
+    setup() {
+      const panelElement = ref<HTMLElement | undefined>(undefined);
+      const triggerElement = ref<HTMLElement | undefined>(undefined);
+      const open = ref(false);
+
+      onMounted(() => {
+        if (panelElement.value?.firstChild) {
+          triggerElement.value = panelElement.value.firstChild as HTMLElement;
+        }
+      });
+
+      const toggleDrawer = () => {
+        open.value = !open.value;
       };
-    },
-    mounted() {
-      this.triggerElement =
-        <HTMLElement>(this.$refs.triggerLinkElement || this.$refs.triggerButtonElement) || null;
-    },
-    methods: {
-      toggleDrawer(): void {
-        this.open = !this.open;
-      },
-      closeDrawer(): void {
-        this.open = false;
-      }
+
+      const closeDrawer = () => {
+        open.value = false;
+      };
+
+      return {
+        closeDrawer,
+        open,
+        panelElement,
+        toggleDrawer,
+        triggerElement
+      };
     }
   });
 </script>
-
-<style lang="scss" scoped>
-  .hue-dropdown-panel {
-    display: inline-block;
-  }
-</style>
