@@ -163,7 +163,7 @@ GUNICORN_NUMBER_OF_WORKERS = Config(
   key="gunicorn_number_of_workers",
   help=_("The number of Gunicorn worker processes. If not specified, it uses: (number of CPU * 2) + 1."),
   type=int,
-  default=None)
+  default=1)
 
 HTTP_HOST = Config(
   key="http_host",
