@@ -42,7 +42,7 @@ def test_export_csv():
   generator = create_generator(content_generator(headers, data), "csv")
   response = make_response(generator, "csv", "foo")
   assert_equal("application/csv", response["content-type"])
-  content = b''.join(response.streaming_content)
+  content = b''.join(response.content)
   assert_equal(b'x,y\r\n1,2\r\n3,4\r\n"5,6",7\r\nNULL,NULL\r\nhttp://gethue.com,http://gethue.com\r\n', content)
   assert_equal('attachment; filename="foo.csv"', response["content-disposition"])
 
@@ -50,7 +50,7 @@ def test_export_csv():
   generator = create_generator(content_generator(headers, data), "csv")
   response = make_response(generator, "csv", u'gんtbhんjk？￥n')
   assert_equal("application/csv", response["content-type"])
-  content = b''.join(response.streaming_content)
+  content = b''.join(response.content)
   assert_equal(b'x,y\r\n1,2\r\n3,4\r\n"5,6",7\r\nNULL,NULL\r\nhttp://gethue.com,http://gethue.com\r\n', content)
   assert_equal('attachment; filename="g%E3%82%93tbh%E3%82%93jk%EF%BC%9F%EF%BF%A5n.csv"', response["content-disposition"])
 
@@ -61,7 +61,7 @@ def test_export_csv():
       user_agent='Mozilla / 5.0(Macintosh; Intel Mac OS X 10.12;rv:59.0) Gecko / 20100101 Firefox / 59.0)'
   )
   assert_equal("application/csv", response["content-type"])
-  content = b''.join(response.streaming_content)
+  content = b''.join(response.content)
   assert_equal(b'x,y\r\n1,2\r\n3,4\r\n"5,6",7\r\nNULL,NULL\r\nhttp://gethue.com,http://gethue.com\r\n', content)
   assert_equal(
       'attachment; filename*="g%E3%82%93tbh%E3%82%93jk%EF%BC%9F%EF%BF%A5n.csv"',
