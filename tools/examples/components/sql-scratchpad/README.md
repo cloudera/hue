@@ -13,13 +13,19 @@ We wrap the web components to be able to set certain attributes/properties on th
 
 ## To run this project
 
-1. Go to the Hue root folder `cd ../../../../`
-2. `npm install`
-3. `npm run webpack-npm`
-4. Go to the example project `cd tools/examples/components/sql-scratchpad`
-5. `npm install`
-6. `npm start`
-7. Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+1. Setup Hue to allow CORS, in your hue .ini add:
+```
+  [desktop]
+    cors_enabled=true
+```
+2. Make sure Hue has a "hue" user with the password "hue" (this will be improved soon)
+3. Go to the Hue root folder `cd ../../../../`
+4. `npm install`
+5. `npm run webpack-npm`
+6. Go to the example project `cd tools/examples/components/sql-scratchpad`
+7. `npm install`
+8. `npm start`
+9. Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
 ## Base project creation steps (for reference)
 

@@ -15,8 +15,8 @@
 // limitations under the License.
 
 export interface Column<T> {
-  label: string;
-  key: string | number;
+  label?: string;
+  key: keyof T | string | number;
   cssClass?: string;
   htmlValue?: boolean;
   headerCssClass?: string;

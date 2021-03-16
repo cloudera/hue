@@ -16,31 +16,143 @@
 
 import { shallowMount } from '@vue/test-utils';
 import { CancellablePromise } from 'api/cancellablePromise';
+import Executor from 'apps/editor/execution/executor';
 import dataCatalog from 'catalog/dataCatalog';
+import { Ace } from 'ext/ace';
+import { INSERT_AT_CURSOR_EVENT } from 'ko/bindings/ace/ko.aceEditor';
+import { AutocompleteParser, SqlParserProvider, SyntaxError, SyntaxParser } from 'parse/types';
+import { SetOptions, SqlReferenceProvider, UdfCategory } from 'sql/reference/types';
+import huePubSub from 'utils/huePubSub';
+import { nextTick } from 'vue';
 import AceEditor from './AceEditor.vue';
 
+import impalaSyntaxParser from 'parse/sql/impala/impalaSyntaxParser';
+import impalaAutocompleteParser from 'parse/sql/impala/impalaAutocompleteParser';
+
+const sqlParserProvider: SqlParserProvider = {
+  async getAutocompleteParser(): Promise<AutocompleteParser> {
+    return (impalaAutocompleteParser as unknown) as AutocompleteParser;
+  },
+
+  async getSyntaxParser(): Promise<SyntaxParser> {
+    return (impalaSyntaxParser as unknown) as SyntaxParser;
+  }
+};
+
+const sqlReferenceProvider: SqlReferenceProvider = {
+  getReservedKeywords(): Promise<Set<string>> {
+    return Promise.resolve(new Set<string>());
+  },
+  getSetOptions(): Promise<SetOptions> {
+    return Promise.resolve({});
+  },
+  getUdfCategories(): Promise<UdfCategory[]> {
+    return Promise.resolve([]);
+  },
+  hasUdfCategories(): boolean {
+    return false;
+  }
+};
+
 describe('AceEditor.vue', () => {
-  it('should render', () => {
+  const mockExecutor = ({
+    connector: ko.observable({
+      dialect: 'impala',
+      id: 'impala'
+    }),
+    namespace: ko.observable({
+      id: 'foo'
+    }),
+    compute: ko.observable({
+      id: 'foo'
+    }),
+    database: ko.observable('default')
+  } as unknown) as Executor;
+
+  const shallowMountForEditor = async (
+    initialValue?: string
+  ): Promise<{ element: Element; editor: Ace.Editor }> => {
     spyOn(dataCatalog, 'getChildren').and.returnValue(CancellablePromise.resolve([]));
 
     const wrapper = shallowMount(AceEditor, {
-      propsData: {
-        value: 'some query',
+      props: {
+        initialValue,
         id: 'some-id',
-        executor: {
-          connector: ko.observable({
-            dialect: 'foo',
-            id: 'foo'
-          }),
-          namespace: ko.observable({
-            id: 'foo'
-          }),
-          compute: ko.observable({
-            id: 'foo'
-          })
-        }
+        executor: mockExecutor,
+        sqlParserProvider,
+        sqlReferenceProvider
       }
     });
-    expect(wrapper.element).toMatchSnapshot();
+
+    await nextTick();
+
+    expect(wrapper.emitted()['ace-created']).toBeTruthy();
+
+    const editor = (wrapper.emitted()['ace-created'][0] as Ace.Editor[])[0];
+
+    return { element: wrapper.element, editor };
+  };
+
+  it('should render', async () => {
+    const { element } = await shallowMountForEditor('some query');
+    expect(element).toMatchSnapshot();
+  });
+
+  it('should handle drag and drop pubsub event targeting this editor', async () => {
+    const { editor } = await shallowMountForEditor();
+
+    const draggedText = 'Some dropped text';
+    huePubSub.publish(INSERT_AT_CURSOR_EVENT, {
+      text: draggedText,
+      targetEditor: editor,
+      cursorEndAdjust: 0
+    });
+
+    expect(editor.getValue()).toEqual(draggedText);
+  });
+
+  it('should not handle drag and drop pubsub event targeting another editor', async () => {
+    const { editor } = await shallowMountForEditor();
+
+    const draggedText = 'Some dropped text';
+    huePubSub.publish(INSERT_AT_CURSOR_EVENT, {
+      text: draggedText,
+      targetEditor: {}, // Other instance
+      cursorEndAdjust: 0
+    });
+
+    expect(editor.getValue()).not.toEqual(draggedText);
+  });
+
+  it('should adjust parser 1-based parser location to 0-based ace range for syntax errors', async () => {
+    const invalidTokenValue = 'slelect';
+    const { editor } = await shallowMountForEditor(invalidTokenValue);
+    expect(editor.getValue()).toEqual(invalidTokenValue);
+
+    // Add syntax error manually (normally through web socket)
+    const token = editor.session.getTokenAt(0, 0);
+    expect(token).toBeDefined();
+    expect(token!.value).toEqual(invalidTokenValue);
+    const syntaxError: SyntaxError = {
+      expected: [{ text: 'select', distance: 0 }],
+      loc: { first_line: 1, last_line: 1, first_column: 0, last_column: 7 },
+      text: invalidTokenValue
+    };
+    token!.syntaxError = syntaxError;
+
+    // Listen for the dropdown show event
+    let syntaxDropdownCalled = false;
+    const subscription = huePubSub.subscribe('sql.syntax.dropdown.show', details => {
+      expect(details.range.start.row).toEqual(syntaxError.loc.first_line - 1);
+      expect(details.range.end.row).toEqual(syntaxError.loc.last_line - 1);
+      expect(details.data).toEqual(syntaxError);
+      syntaxDropdownCalled = true;
+    });
+
+    // Trigger right click in the editor
+    editor.container.dispatchEvent(new MouseEvent('contextmenu', { clientX: 1, clientY: 1 }));
+    subscription.remove();
+
+    expect(syntaxDropdownCalled).toBeTruthy();
   });
 });

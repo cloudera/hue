@@ -18,7 +18,7 @@
 '''
 SQL Alchemy offers native connections to databases via dialects https://docs.sqlalchemy.org/en/latest/dialects/.
 
-When the dialect of a paricular datavase is installed on the Hue API server, any of its URL connection strings should work.
+When the dialect of a paricular database is installed on the Hue API server, any of its URL connection strings should work.
 
 e.g.
 mysql://root:root@localhost:3306/hue

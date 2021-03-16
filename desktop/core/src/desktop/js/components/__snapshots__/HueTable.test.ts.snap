@@ -36,7 +36,9 @@ exports[`HueTable.vue should render a sticky table with header and column css 1`
         />
       </tr>
     </thead>
-    <tbody>
+    <tbody
+      class=""
+    >
       
       <tr>
         
@@ -176,7 +178,9 @@ exports[`HueTable.vue should render a table 1`] = `
         />
       </tr>
     </thead>
-    <tbody>
+    <tbody
+      class=""
+    >
       
       <tr>
         
@@ -360,7 +364,9 @@ exports[`HueTable.vue should render a table with a custom component for a cell 1
         />
       </tr>
     </thead>
-    <tbody>
+    <tbody
+      class=""
+    >
       
       <tr>
         
@@ -446,7 +452,9 @@ exports[`HueTable.vue should render a table with adapter 1`] = `
         />
       </tr>
     </thead>
-    <tbody>
+    <tbody
+      class=""
+    >
       
       <tr>
         
@@ -586,7 +594,9 @@ exports[`HueTable.vue should render a table with array rows 1`] = `
         />
       </tr>
     </thead>
-    <tbody>
+    <tbody
+      class=""
+    >
       
       <tr>
         

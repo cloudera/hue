@@ -14,7 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import axios, { AxiosError, AxiosTransformer } from 'axios';
+import axios, {
+  AxiosError,
+  AxiosRequestConfig,
+  AxiosResponse,
+  AxiosTransformer,
+  CancelToken
+} from 'axios';
 import qs from 'qs';
 import huePubSub from 'utils/huePubSub';
 
@@ -29,6 +35,22 @@ export interface DefaultApiResponse {
   responseText?: string;
   statusText?: string;
   traceback?: string;
+}
+
+export interface ApiFetchOptions<T, E = string> extends AxiosRequestConfig {
+  silenceErrors?: boolean;
+  ignoreSuccessErrors?: boolean;
+  transformResponse?: AxiosTransformer;
+  handleSuccess?: (
+    response: T & DefaultApiResponse,
+    resolve: (val: T) => void,
+    reject: (err: unknown) => void
+  ) => void;
+  handleError?: (
+    errorResponse: AxiosError<E>,
+    resolve: (val: T) => void,
+    reject: (err: unknown) => void
+  ) => void;
 }
 
 export const successResponseIsError = (responseData?: DefaultApiResponse): boolean => {
@@ -77,74 +99,79 @@ export const extractErrorMessage = (
   return UNKNOWN_ERROR_MESSAGE;
 };
 
+const notifyError = <T>(
+  message: string,
+  response: unknown,
+  options?: Pick<ApiFetchOptions<T>, 'silenceErrors'>
+): void => {
+  if (!options || !options.silenceErrors) {
+    hueUtils.logError(response);
+    if (message.indexOf('AuthorizationException') === -1) {
+      huePubSub.publish('hue.error', message);
+    }
+  }
+};
+
+const handleErrorResponse = <T>(
+  err: AxiosError<DefaultApiResponse>,
+  reject: (reason?: unknown) => void,
+  options?: Pick<ApiFetchOptions<T>, 'silenceErrors'>
+): void => {
+  const errorMessage = extractErrorMessage(err.response && err.response.data);
+  reject(errorMessage);
+  notifyError(errorMessage, (err && err.response) || err, options);
+};
+
+const handleResponse = <T>(
+  response: AxiosResponse<T & DefaultApiResponse>,
+  resolve: (value?: T) => void,
+  reject: (reason?: unknown) => void,
+  options?: ApiFetchOptions<T>
+): void => {
+  if (options && options.handleSuccess) {
+    options.handleSuccess(response.data, resolve, reason => {
+      reject(reason);
+      notifyError(String(reason), response.data);
+    });
+  } else if ((!options || !options.ignoreSuccessErrors) && successResponseIsError(response.data)) {
+    const errorMessage = extractErrorMessage(response && response.data);
+    reject(errorMessage);
+    notifyError(errorMessage, response);
+  } else {
+    resolve(response.data);
+  }
+};
+
+const getCancelToken = (): { cancelToken: CancelToken; cancel: () => void } => {
+  const cancelTokenSource = axios.CancelToken.source();
+  return { cancelToken: cancelTokenSource.token, cancel: cancelTokenSource.cancel };
+};
+
 export const post = <T, U = unknown, E = string>(
   url: string,
   data?: U,
-  options?: {
-    silenceErrors?: boolean;
-    ignoreSuccessErrors?: boolean;
-    transformResponse?: AxiosTransformer;
-    handleSuccess?: (
-      response: T & DefaultApiResponse,
-      resolve: (val: T) => void,
-      reject: (err: unknown) => void
-    ) => void;
-    handleError?: (
-      errorResponse: AxiosError<E>,
-      resolve: (val: T) => void,
-      reject: (err: unknown) => void
-    ) => void;
-  }
+  options?: ApiFetchOptions<T>
 ): CancellablePromise<T> =>
   new CancellablePromise((resolve, reject, onCancel) => {
-    const notifyError = (message: string, response: unknown): void => {
-      if (!options || !options.silenceErrors) {
-        hueUtils.logError(response);
-        if (message.indexOf('AuthorizationException') === -1) {
-          huePubSub.publish('hue.error', message);
-        }
-      }
-    };
-
-    const handleErrorResponse = (err: AxiosError<DefaultApiResponse>): void => {
-      const errorMessage = extractErrorMessage(err.response && err.response.data);
-      reject(errorMessage);
-      notifyError(errorMessage, (err && err.response) || err);
-    };
-
-    const cancelTokenSource = axios.CancelToken.source();
+    const { cancelToken, cancel } = getCancelToken();
     let completed = false;
 
     axios
       .post<T & DefaultApiResponse>(url, qs.stringify(data), {
-        cancelToken: cancelTokenSource.token,
-        transformResponse: options && options.transformResponse
+        cancelToken,
+        ...options
       })
       .then(response => {
-        if (options && options.handleSuccess) {
-          options.handleSuccess(response.data, resolve, reason => {
-            reject(reason);
-            notifyError(String(reason), response.data);
-          });
-        } else if (
-          (!options || !options.ignoreSuccessErrors) &&
-          successResponseIsError(response.data)
-        ) {
-          const errorMessage = extractErrorMessage(response && response.data);
-          reject(errorMessage);
-          notifyError(errorMessage, response);
-        } else {
-          resolve(response.data);
-        }
+        handleResponse(response, resolve, reject, options);
       })
       .catch((err: AxiosError) => {
         if (options && options.handleError) {
           options.handleError(err, resolve, reason => {
-            handleErrorResponse(err);
+            handleErrorResponse(err, reject, options);
             notifyError(String(reason), err);
           });
         } else {
-          handleErrorResponse(err);
+          handleErrorResponse(err, reject, options);
         }
       })
       .finally(() => {
@@ -153,10 +180,57 @@ export const post = <T, U = unknown, E = string>(
 
     onCancel(() => {
       if (!completed) {
-        cancelTokenSource.cancel();
+        cancel();
       }
     });
   });
+
+export const get = <T, U = unknown>(
+  url: string,
+  data: U,
+  options?: ApiFetchOptions<T>
+): CancellablePromise<T> =>
+  new CancellablePromise((resolve, reject, onCancel) => {
+    const { cancelToken, cancel } = getCancelToken();
+    let completed = false;
+
+    axios
+      .get<T & DefaultApiResponse>(url, {
+        cancelToken,
+        params: data
+      })
+      .then(response => {
+        handleResponse(response, resolve, reject, options);
+      })
+      .catch((err: AxiosError) => {
+        handleErrorResponse(err, reject, options);
+      })
+      .finally(() => {
+        completed = true;
+      });
+
+    onCancel(() => {
+      if (!completed) {
+        cancel();
+      }
+    });
+  });
+
+export const upload = async <T>(
+  url: string,
+  data: FormData,
+  progressCallback?: (progress: number) => void
+): Promise<T> => {
+  const response = await axios.post<T>(url, data, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+    onUploadProgress: progressEvent => {
+      if (progressCallback) {
+        progressCallback(Math.round((progressEvent.loaded * 100) / progressEvent.total));
+      }
+    }
+  });
+  return response.data;
+};
 
 export const cancelActiveRequest = (request?: JQuery.jqXHR): void => {
   if (request && request.readyState < 4) {

@@ -22,11 +22,11 @@ import { markdown } from 'markdown';
 import 'apps/editor/components/ko.executableLogs';
 import 'apps/editor/components/ko.snippetEditorActions';
 import 'apps/editor/components/resultChart/ko.resultChart';
-import 'apps/editor/components/ko.queryHistory';
 
 import './components/ExecutableActionsKoBridge.vue';
 import './components/ExecutableProgressBarKoBridge.vue';
 import './components/EditorResizerKoBridge.vue';
+import './components/QueryHistoryTableKoBridge.vue';
 import './components/aceEditor/AceEditorKoBridge.vue';
 import './components/executionAnalysis/ExecutionAnalysisPanelKoBridge.vue';
 import './components/presentationMode/PresentationModeKoBridge.vue';
@@ -52,8 +52,6 @@ import {
   ACTIVE_STATEMENT_CHANGED_EVENT,
   REFRESH_STATEMENT_LOCATIONS_EVENT
 } from 'ko/bindings/ace/aceLocationHandler';
-import { EXECUTE_ACTIVE_EXECUTABLE_EVENT } from './components/ExecutableActions.vue';
-import { ADD_TO_HISTORY_EVENT } from 'apps/editor/components/ko.queryHistory';
 import { findEditorConnector, getLastKnownConfig } from 'config/hueConfig';
 import { cancelActiveRequest } from 'api/apiUtils';
 import { getOptimizer } from 'catalog/optimizer/optimizer';
@@ -67,6 +65,7 @@ import {
 window.SqlExecutable = SqlExecutable;
 window.Executor = Executor;
 
+const ADD_TO_HISTORY_EVENT = 'query.history.add';
 export const CURRENT_QUERY_TAB_SWITCHED_EVENT = 'current.query.tab.switched';
 
 export const DIALECT = {
@@ -194,6 +193,8 @@ const getDefaultSnippetProperties = snippetType => {
 
   return properties;
 };
+
+const EXECUTE_ACTIVE_EXECUTABLE_EVENT = 'executable.active.executable';
 
 const ERROR_REGEX = /line ([0-9]+)(:([0-9]+))?/i;
 

@@ -15,6 +15,7 @@
 // limitations under the License.
 
 export interface Page {
+  pageNumber: number;
   offset: number;
   limit: number;
 }
