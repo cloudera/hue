@@ -504,7 +504,7 @@ from notebook.conf import ENABLE_SQL_INDEXER
             window.clearInterval(self.checkDownloadInterval);
             try {
               var cookieContent = $.cookie('download-' + self.snippet.id());
-              var result = JSON.parse(cookieContent.substr(1, cookieContent.length - 2).replace(/\\"/g, '"').replace(/\\054/g, ','));
+              var result = JSON.parse(cookieContent.replace(/\\"/g, '"').replace(/\\054/g, ','));
               self.downloadTruncated(result.truncated);
               self.downloadCounter(result.row_counter);
               self.isDownloading(false);

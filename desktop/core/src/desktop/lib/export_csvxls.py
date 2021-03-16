@@ -30,7 +30,7 @@ import six
 import sys
 import tablib
 
-from django.http import StreamingHttpResponse, HttpResponse
+from django.http import HttpResponse
 from django.utils.encoding import smart_str
 from django.utils.http import urlquote
 from desktop.lib import i18n
@@ -146,7 +146,7 @@ def make_response(generator, format, name, encoding=None, user_agent=None): #TOD
   """
   content_type = FORMAT_TO_CONTENT_TYPE.get(format, 'application/octet-stream')
   if format == 'csv':
-    resp = StreamingHttpResponse(generator, content_type=content_type)
+    resp = HttpResponse(generator, content_type=content_type)
     try:
       del resp['Content-Length']
     except KeyError:
