@@ -21,6 +21,9 @@ import json
 import logging
 import threading
 
+from django.utils.translation import ugettext as _
+
+from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.rest.http_client import HttpClient
 from desktop.lib.rest.resource import Resource
 from beeswax.server.dbms import QueryServerException
@@ -41,12 +44,15 @@ def get_api(user, url):
 
 
 def _get_impala_server_url(session):
-  properties = session.get_properties()
   http_addr = ""
   if COORDINATOR_URL.get():
     http_addr = COORDINATOR_URL.get()
   else:
+    if not session:
+      raise PopupException(_('No active Thrift session with Impala Coordinator, please run a query first.'))
+    properties = session.get_properties()
     http_addr = properties.get('coordinator_host', properties.get('http_addr'))
+
   http_addr = http_addr.replace('http://', '').replace('https://', '')
   return ('https://' if get_webserver_certificate_file() else 'http://') + http_addr
 

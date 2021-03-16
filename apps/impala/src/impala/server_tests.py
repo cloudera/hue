@@ -19,12 +19,13 @@
 import logging
 import sys
 
-from nose.tools import assert_equal, assert_not_equal, assert_true, assert_false
+from nose.tools import assert_equal, assert_not_equal, assert_true, assert_false, assert_raises
 
+from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.django_test_util import make_logged_in_client
 from useradmin.models import User
 
-from impala.server import ImpalaDaemonApi
+from impala.server import ImpalaDaemonApi, _get_impala_server_url
 
 if sys.version_info[0] > 2:
   from unittest.mock import patch, Mock, MagicMock
@@ -40,6 +41,10 @@ class TestImpalaDaemonApi():
   def setUp(self):
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
     self.user = User.objects.get(username="test")
+
+  def test_get_impala_server_url_when_no_session(self):
+    assert_raises(PopupException, _get_impala_server_url, session=None)
+
 
   def test_digest_auth(self):
 
