@@ -44,4 +44,4 @@ jobs:
 
     - name: run tests
       run: |
-        PYTHONWARNINGS=always ./build/env/bin/hue test unit --with-xunit --with-cover
+        PYTHONWARNINGS=default,ignore:::ldap,ignore:::ldap.*,ignore:::useradmin.*,ignore:::useradmin,ignore:::useradmin.ldap_test ./build/env/bin/hue test unit --with-xunit --with-cover --logging-filter=-nose,-ldap

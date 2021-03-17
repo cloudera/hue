@@ -795,6 +795,7 @@ class TestUserAdminLdap(BaseUserAdminTests):
     class LdapTestConnectionError(LdapTestConnection):
       def find_users(self, user, find_by_dn=False):
         raise ldap.LDAPError('No such object')
+
     ldap_access.CACHED_LDAP_CONN = LdapTestConnectionError()
 
     c = make_logged_in_client('test', is_superuser=True)

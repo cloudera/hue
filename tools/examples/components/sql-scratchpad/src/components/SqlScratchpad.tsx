@@ -22,6 +22,7 @@ interface SqlScratchpadState {
   executor?: Executor;
 }
 
+
 export class SqlScratchpad extends React.Component<{}, SqlScratchpadState> {
   state = {
     activeExecutable: undefined,
