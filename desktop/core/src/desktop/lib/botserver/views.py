@@ -39,7 +39,7 @@ from django.views.decorators.csrf import csrf_exempt
 LOG = logging.getLogger(__name__)
 
 try:
-  from prettytable import PrettyTable
+  from prettytable import PrettyTable, PLAIN_COLUMNS
 except ImportError:
   LOG.warn('slack server: prettytable module is not installed')
 
@@ -155,6 +155,7 @@ def _make_result_table(result):
     meta.append(field['name'])
   
   table = PrettyTable()
+  table.set_style(PLAIN_COLUMNS)
   table.field_names = meta
   table.add_rows(result['data'])
   return table
