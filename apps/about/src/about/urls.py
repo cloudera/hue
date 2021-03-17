@@ -19,14 +19,14 @@ import sys
 
 from about import views as about_views
 
-if sys.version_info[0] < 3:
-  from django.conf.urls import url
+if sys.version_info[0] > 2:
+  from django.urls import re_path
 else:
-  from django.urls import re_path as url
+  from django.conf.urls import url as re_path
 
 urlpatterns = [
-  url(r'^$', about_views.admin_wizard, name='index'),
-  url(r'^admin_wizard$', about_views.admin_wizard, name='admin_wizard'),
+  re_path(r'^$', about_views.admin_wizard, name='index'),
+  re_path(r'^admin_wizard$', about_views.admin_wizard, name='admin_wizard'),
 
-  url(r'^update_preferences$', about_views.update_preferences, name='update_preferences'),
+  re_path(r'^update_preferences$', about_views.update_preferences, name='update_preferences'),
 ]

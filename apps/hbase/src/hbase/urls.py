@@ -19,14 +19,14 @@ import sys
 
 from hbase import views as hbase_views
 
-if sys.version_info[0] < 3:
-  from django.conf.urls import url
+if sys.version_info[0] > 2:
+  from django.urls import re_path
 else:
-  from django.urls import re_path as url
+  from django.conf.urls import url as re_path
 
 urlpatterns = [
-  url(r'^$', hbase_views.app, name='index'),
-  url(r'api/(?P<url>.+)$', hbase_views.api_router),
+  re_path(r'^$', hbase_views.app, name='index'),
+  re_path(r'api/(?P<url>.+)$', hbase_views.api_router),
 
-  url(r'^install_examples$', hbase_views.install_examples, name='install_examples'),
+  re_path(r'^install_examples$', hbase_views.install_examples, name='install_examples'),
 ]

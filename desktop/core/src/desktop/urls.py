@@ -50,10 +50,10 @@ from desktop.configuration import api as desktop_configuration_api
 from desktop.lib.vcs import api as desktop_lib_vcs_api
 from desktop.settings import is_oidc_configured
 
-if sys.version_info[0] < 3:
-  from django.conf.urls import include, url
+if sys.version_info[0] > 2:
+  from django.urls import include, re_path
 else:
-  from django.urls import include, re_path as url
+  from django.conf.urls import include, url as re_path
 
 # Django expects handler404 and handler500 to be defined.
 # django.conf.urls provides them. But we want to override them.
@@ -65,168 +65,168 @@ handler500 = 'desktop.views.serve_500_error'
 
 # Some django-wide URLs
 dynamic_patterns = [
-  url(r'^hue/accounts/login', desktop_auth_views.dt_login, name='desktop_auth_views_dt_login'),
-  url(r'^accounts/login/?$', desktop_auth_views.dt_login), # Deprecated
-  url(r'^accounts/logout/?$', desktop_auth_views.dt_logout, {'next_page': '/'}),
-  url(r'^profile$', desktop_auth_views.profile),
-  url(r'^login/oauth/?$', desktop_auth_views.oauth_login),
-  url(r'^login/oauth_authenticated/?$', desktop_auth_views.oauth_authenticated),
-  url(r'^hue/oidc_failed', desktop_auth_views.oidc_failed),
+  re_path(r'^hue/accounts/login', desktop_auth_views.dt_login, name='desktop_auth_views_dt_login'),
+  re_path(r'^accounts/login/?$', desktop_auth_views.dt_login), # Deprecated
+  re_path(r'^accounts/logout/?$', desktop_auth_views.dt_logout, {'next_page': '/'}),
+  re_path(r'^profile$', desktop_auth_views.profile),
+  re_path(r'^login/oauth/?$', desktop_auth_views.oauth_login),
+  re_path(r'^login/oauth_authenticated/?$', desktop_auth_views.oauth_authenticated),
+  re_path(r'^hue/oidc_failed', desktop_auth_views.oidc_failed),
 ]
 
 if USE_NEW_EDITOR.get():
   dynamic_patterns += [
-    url(r'^home/?$', desktop_views.home2, name='desktop_views_home2'),
-    url(r'^home2$', desktop_views.home, name='desktop_views_home'),
-    url(r'^home_embeddable$', desktop_views.home_embeddable),
+    re_path(r'^home/?$', desktop_views.home2, name='desktop_views_home2'),
+    re_path(r'^home2$', desktop_views.home, name='desktop_views_home'),
+    re_path(r'^home_embeddable$', desktop_views.home_embeddable),
   ]
 else:
   dynamic_patterns += [
-    url(r'^home$', desktop_views.home, name='desktop_views_home'),
-    url(r'^home2$', desktop_views.home2, name='desktop_views_home2')
+    re_path(r'^home$', desktop_views.home, name='desktop_views_home'),
+    re_path(r'^home2$', desktop_views.home2, name='desktop_views_home2')
   ]
 
 dynamic_patterns += [
-  url(r'^logs$', desktop_views.log_view, name="desktop.views.log_view"),
-  url(r'^desktop/log_analytics$', desktop_views.log_analytics),
-  url(r'^desktop/log_js_error$', desktop_views.log_js_error),
-  url(r'^desktop/dump_config$', desktop_views.dump_config, name="desktop.views.dump_config"),
-  url(r'^desktop/download_logs$', desktop_views.download_log_view),
-  url(r'^desktop/get_debug_level', desktop_views.get_debug_level),
-  url(r'^desktop/set_all_debug', desktop_views.set_all_debug),
-  url(r'^desktop/reset_all_debug', desktop_views.reset_all_debug),
-  url(r'^bootstrap.js$', desktop_views.bootstrap), # unused
+  re_path(r'^logs$', desktop_views.log_view, name="desktop.views.log_view"),
+  re_path(r'^desktop/log_analytics$', desktop_views.log_analytics),
+  re_path(r'^desktop/log_js_error$', desktop_views.log_js_error),
+  re_path(r'^desktop/dump_config$', desktop_views.dump_config, name="desktop.views.dump_config"),
+  re_path(r'^desktop/download_logs$', desktop_views.download_log_view),
+  re_path(r'^desktop/get_debug_level', desktop_views.get_debug_level),
+  re_path(r'^desktop/set_all_debug', desktop_views.set_all_debug),
+  re_path(r'^desktop/reset_all_debug', desktop_views.reset_all_debug),
+  re_path(r'^bootstrap.js$', desktop_views.bootstrap), # unused
 
-  url(r'^desktop/status_bar/?$', desktop_views.status_bar),
-  url(r'^desktop/debug/is_alive$', desktop_views.is_alive),
-  url(r'^desktop/debug/is_idle$', desktop_views.is_idle),
-  url(r'^desktop/debug/threads$', desktop_views.threads, name="desktop.views.threads"),
-  url(r'^desktop/debug/memory$', desktop_views.memory),
-  url(r'^desktop/debug/check_config$', desktop_views.check_config, name="desktop.views.check_config"),
-  url(r'^desktop/debug/check_config_ajax$', desktop_views.check_config_ajax),
-  url(r'^desktop/log_frontend_event$', desktop_views.log_frontend_event),
+  re_path(r'^desktop/status_bar/?$', desktop_views.status_bar),
+  re_path(r'^desktop/debug/is_alive$', desktop_views.is_alive),
+  re_path(r'^desktop/debug/is_idle$', desktop_views.is_idle),
+  re_path(r'^desktop/debug/threads$', desktop_views.threads, name="desktop.views.threads"),
+  re_path(r'^desktop/debug/memory$', desktop_views.memory),
+  re_path(r'^desktop/debug/check_config$', desktop_views.check_config, name="desktop.views.check_config"),
+  re_path(r'^desktop/debug/check_config_ajax$', desktop_views.check_config_ajax),
+  re_path(r'^desktop/log_frontend_event$', desktop_views.log_frontend_event),
 
   # Catch-up gist
-  url(r'^hue/gist/?$', desktop_api2.gist_get),
+  re_path(r'^hue/gist/?$', desktop_api2.gist_get),
 
   # Mobile
-  url(r'^assist_m', desktop_views.assist_m),
+  re_path(r'^assist_m', desktop_views.assist_m),
 
   # Hue 4
-  url(r'^hue.*/?$', desktop_views.hue, name='desktop_views_hue'),
-  url(r'^403$', desktop_views.path_forbidden),
-  url(r'^404$', desktop_views.not_found),
-  url(r'^500$', desktop_views.server_error),
+  re_path(r'^hue.*/?$', desktop_views.hue, name='desktop_views_hue'),
+  re_path(r'^403$', desktop_views.path_forbidden),
+  re_path(r'^404$', desktop_views.not_found),
+  re_path(r'^500$', desktop_views.server_error),
 
   # KO components, change to doc?name=ko_editor or similar
-  url(r'^ko_editor', desktop_views.ko_editor),
-  url(r'^ko_metastore', desktop_views.ko_metastore),
+  re_path(r'^ko_editor', desktop_views.ko_editor),
+  re_path(r'^ko_metastore', desktop_views.ko_metastore),
 
   # JS that needs to be mako
-  url(r'^desktop/globalJsConstants.js', desktop_views.global_js_constants),
+  re_path(r'^desktop/globalJsConstants.js', desktop_views.global_js_constants),
 
-  url(r'^desktop/topo/(?P<location>\w+)', desktop_views.topo),
+  re_path(r'^desktop/topo/(?P<location>\w+)', desktop_views.topo),
 
   # Web workers
-  url(r'^desktop/workers/aceSqlLocationWorker.js', desktop_views.ace_sql_location_worker),
-  url(r'^desktop/workers/aceSqlSyntaxWorker.js', desktop_views.ace_sql_syntax_worker),
+  re_path(r'^desktop/workers/aceSqlLocationWorker.js', desktop_views.ace_sql_location_worker),
+  re_path(r'^desktop/workers/aceSqlSyntaxWorker.js', desktop_views.ace_sql_syntax_worker),
 
-  url(r'^dynamic_bundle/(?P<config>\w+)/(?P<bundle_name>.+)', desktop_views.dynamic_bundle),
+  re_path(r'^dynamic_bundle/(?P<config>\w+)/(?P<bundle_name>.+)', desktop_views.dynamic_bundle),
 
   # Unsupported browsers
-  url(r'^boohoo$', desktop_views.unsupported, name='desktop_views_unsupported'),
+  re_path(r'^boohoo$', desktop_views.unsupported, name='desktop_views_unsupported'),
 
   # Top level web page!
-  url(r'^$', desktop_views.index, name="desktop_views.index"),
+  re_path(r'^$', desktop_views.index, name="desktop_views.index"),
 ]
 
 dynamic_patterns += [
   # Tags
-  url(r'^desktop/api/tag/add_tag$', desktop_api.add_tag),
-  url(r'^desktop/api/tag/remove_tag$', desktop_api.remove_tag),
-  url(r'^desktop/api/doc/tag$', desktop_api.tag),
-  url(r'^desktop/api/doc/update_tags$', desktop_api.update_tags),
-  url(r'^desktop/api/doc/get$', desktop_api.get_document),
+  re_path(r'^desktop/api/tag/add_tag$', desktop_api.add_tag),
+  re_path(r'^desktop/api/tag/remove_tag$', desktop_api.remove_tag),
+  re_path(r'^desktop/api/doc/tag$', desktop_api.tag),
+  re_path(r'^desktop/api/doc/update_tags$', desktop_api.update_tags),
+  re_path(r'^desktop/api/doc/get$', desktop_api.get_document),
 
   # Permissions
-  url(r'^desktop/api/doc/update_permissions', desktop_api.update_permissions),
+  re_path(r'^desktop/api/doc/update_permissions', desktop_api.update_permissions),
 ]
 
 dynamic_patterns += [
-  url(r'^desktop/api2/doc/open?$', desktop_api2.open_document),  # To keep before get_document
-  url(r'^desktop/api2/docs/?$', desktop_api2.search_documents),  # search documents for current user
-  url(r'^desktop/api2/doc/?$', desktop_api2.get_document),  # get doc/dir by path or UUID
+  re_path(r'^desktop/api2/doc/open?$', desktop_api2.open_document),  # To keep before get_document
+  re_path(r'^desktop/api2/docs/?$', desktop_api2.search_documents),  # search documents for current user
+  re_path(r'^desktop/api2/doc/?$', desktop_api2.get_document),  # get doc/dir by path or UUID
 
-  url(r'^desktop/api2/doc/move/?$', desktop_api2.move_document),
-  url(r'^desktop/api2/doc/mkdir/?$', desktop_api2.create_directory),
-  url(r'^desktop/api2/doc/update/?$', desktop_api2.update_document),
-  url(r'^desktop/api2/doc/delete/?$', desktop_api2.delete_document),
-  url(r'^desktop/api2/doc/copy/?$', desktop_api2.copy_document),
-  url(r'^desktop/api2/doc/restore/?$', desktop_api2.restore_document),
-  url(r'^desktop/api2/doc/share/link/?$', desktop_api2.share_document_link),
-  url(r'^desktop/api2/doc/share/?$', desktop_api2.share_document),
+  re_path(r'^desktop/api2/doc/move/?$', desktop_api2.move_document),
+  re_path(r'^desktop/api2/doc/mkdir/?$', desktop_api2.create_directory),
+  re_path(r'^desktop/api2/doc/update/?$', desktop_api2.update_document),
+  re_path(r'^desktop/api2/doc/delete/?$', desktop_api2.delete_document),
+  re_path(r'^desktop/api2/doc/copy/?$', desktop_api2.copy_document),
+  re_path(r'^desktop/api2/doc/restore/?$', desktop_api2.restore_document),
+  re_path(r'^desktop/api2/doc/share/link/?$', desktop_api2.share_document_link),
+  re_path(r'^desktop/api2/doc/share/?$', desktop_api2.share_document),
 
-  url(r'^desktop/api2/get_config/?$', desktop_api2.get_config),
-  url(r'^desktop/api2/get_hue_config/?$', desktop_api2.get_hue_config),
-  url(r'^desktop/api2/context/namespaces/(?P<interface>[\w\-]+)/?$', desktop_api2.get_context_namespaces),
-  url(r'^desktop/api2/context/computes/(?P<interface>[\w\-]+)/?$', desktop_api2.get_context_computes),
-  url(r'^desktop/api2/context/clusters/(?P<interface>[\w\-]+)/?$', desktop_api2.get_context_clusters),
-  url(r'^desktop/api2/user_preferences(?:/(?P<key>\w+))?/?$', desktop_api2.user_preferences, name="desktop.api2.user_preferences"),
+  re_path(r'^desktop/api2/get_config/?$', desktop_api2.get_config),
+  re_path(r'^desktop/api2/get_hue_config/?$', desktop_api2.get_hue_config),
+  re_path(r'^desktop/api2/context/namespaces/(?P<interface>[\w\-]+)/?$', desktop_api2.get_context_namespaces),
+  re_path(r'^desktop/api2/context/computes/(?P<interface>[\w\-]+)/?$', desktop_api2.get_context_computes),
+  re_path(r'^desktop/api2/context/clusters/(?P<interface>[\w\-]+)/?$', desktop_api2.get_context_clusters),
+  re_path(r'^desktop/api2/user_preferences(?:/(?P<key>\w+))?/?$', desktop_api2.user_preferences, name="desktop.api2.user_preferences"),
 
-  url(r'^desktop/api2/doc/export/?$', desktop_api2.export_documents),
-  url(r'^desktop/api2/doc/import/?$', desktop_api2.import_documents),
+  re_path(r'^desktop/api2/doc/export/?$', desktop_api2.export_documents),
+  re_path(r'^desktop/api2/doc/import/?$', desktop_api2.import_documents),
 
-  url(r'^desktop/api2/gist/create/?$', desktop_api2.gist_create),
-  url(r'^desktop/api2/gist/open/?$', desktop_api2.gist_get),
+  re_path(r'^desktop/api2/gist/create/?$', desktop_api2.gist_create),
+  re_path(r'^desktop/api2/gist/open/?$', desktop_api2.gist_get),
 
 
-  url(r'^desktop/api/search/entities/?$', desktop_api2.search_entities),
-  url(r'^desktop/api/search/entities_interactive/?$', desktop_api2.search_entities_interactive),
+  re_path(r'^desktop/api/search/entities/?$', desktop_api2.search_entities),
+  re_path(r'^desktop/api/search/entities_interactive/?$', desktop_api2.search_entities_interactive),
 ]
 
 dynamic_patterns += [
-  url(r'^editor', notebook_views.editor),
+  re_path(r'^editor', notebook_views.editor),
 ]
 
 # Default Configurations
 dynamic_patterns += [
-  url(r'^desktop/api/configurations/?$', desktop_configuration_api.default_configurations),
-  url(r'^desktop/api/configurations/user/?$', desktop_configuration_api.app_configuration_for_user),
-  url(r'^desktop/api/configurations/delete/?$', desktop_configuration_api.delete_default_configuration),
+  re_path(r'^desktop/api/configurations/?$', desktop_configuration_api.default_configurations),
+  re_path(r'^desktop/api/configurations/user/?$', desktop_configuration_api.app_configuration_for_user),
+  re_path(r'^desktop/api/configurations/delete/?$', desktop_configuration_api.delete_default_configuration),
 ]
 
 dynamic_patterns += [
-  url(r'^desktop/api/users/autocomplete', useradmin_views.list_for_autocomplete, name='useradmin_views_list_for_autocomplete'),
-  url(r'^desktop/api/users/?$', useradmin_views.get_users_by_id)
+  re_path(r'^desktop/api/users/autocomplete', useradmin_views.list_for_autocomplete, name='useradmin_views_list_for_autocomplete'),
+  re_path(r'^desktop/api/users/?$', useradmin_views.get_users_by_id)
 ]
 
 dynamic_patterns += [
-  url(r'^desktop/api/vcs/contents/?$', desktop_lib_vcs_api.contents),
-  url(r'^desktop/api/vcs/authorize/?$', desktop_lib_vcs_api.authorize),
+  re_path(r'^desktop/api/vcs/contents/?$', desktop_lib_vcs_api.contents),
+  re_path(r'^desktop/api/vcs/authorize/?$', desktop_lib_vcs_api.authorize),
 ]
 
 # Metrics specific
 if METRICS.ENABLE_WEB_METRICS.get():
   dynamic_patterns += [
-    url(r'^desktop/metrics/?', include('desktop.lib.metrics.urls'))
+    re_path(r'^desktop/metrics/?', include('desktop.lib.metrics.urls'))
   ]
 
 dynamic_patterns += [
-  url(r'^desktop/connectors/?', include('desktop.lib.connectors.urls'))
+  re_path(r'^desktop/connectors/?', include('desktop.lib.connectors.urls'))
 ]
 
 if ANALYTICS.IS_ENABLED.get():
   dynamic_patterns += [
-    url(r'^desktop/analytics/?', include('desktop.lib.analytics.urls'))
+    re_path(r'^desktop/analytics/?', include('desktop.lib.analytics.urls'))
   ]
 
 dynamic_patterns += [
-  url(r'^scheduler/', include('desktop.lib.scheduler.urls'))
+  re_path(r'^scheduler/', include('desktop.lib.scheduler.urls'))
 ]
 
 if ENABLE_PROMETHEUS.get():
   dynamic_patterns += [
-    url('', include('django_prometheus.urls')),
+    re_path('', include('django_prometheus.urls')),
   ]
 
 
@@ -234,11 +234,11 @@ static_patterns = []
 
 # SAML specific
 if settings.SAML_AUTHENTICATION:
-  static_patterns.append(url(r'^saml2/', include('libsaml.urls')))
+  static_patterns.append(re_path(r'^saml2/', include('libsaml.urls')))
 
 
 if settings.OAUTH_AUTHENTICATION:
-  static_patterns.append(url(r'^oauth/', include('liboauth.urls')))
+  static_patterns.append(re_path(r'^oauth/', include('liboauth.urls')))
 
 # Root each app at /appname if they have a "urls" module
 app_urls_patterns = []
@@ -249,11 +249,11 @@ for app in appmanager.DESKTOP_MODULES:
     else:
       namespace = None
     if namespace or app in appmanager.DESKTOP_APPS:
-      app_urls_patterns.append(url('^' + re.escape(app.name) + '/', include((app.urls, app.name), namespace=namespace)))
+      app_urls_patterns.append(re_path('^' + re.escape(app.name) + '/', include((app.urls, app.name), namespace=namespace)))
       app.urls_imported = True
 
 static_patterns.append(
-    url(r'^%s(?P<path>.*)$' % re.escape(settings.STATIC_URL.lstrip('/')),
+    re_path(r'^%s(?P<path>.*)$' % re.escape(settings.STATIC_URL.lstrip('/')),
       serve,
       {'document_root': settings.STATIC_ROOT})
 )
@@ -266,16 +266,16 @@ urlpatterns.extend(static_patterns)
 
 if settings.DEBUG and ENABLE_DJANGO_DEBUG_TOOL.get():
   urlpatterns += [
-    url(r'^__debug__/', include(debug_toolbar.urls)),
+    re_path(r'^__debug__/', include(debug_toolbar.urls)),
   ]
 
 if is_oidc_configured():
   urlpatterns += [
-    url(r'^oidc/', include('mozilla_django_oidc.urls')),
+    re_path(r'^oidc/', include('mozilla_django_oidc.urls')),
   ]
 
 # Slack botserver URLs
 if SLACK.IS_ENABLED.get():
   urlpatterns += [
-    url(r'^slack/', include('desktop.lib.botserver.urls')),
+    re_path(r'^slack/', include('desktop.lib.botserver.urls')),
   ]

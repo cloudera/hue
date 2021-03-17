@@ -73,11 +73,11 @@ from desktop.views import check_config, home, generate_configspec, load_confs, c
 if sys.version_info[0] > 2:
   from io import StringIO as string_io
   from unittest.mock import patch, Mock
-  from django.urls import re_path as url
+  from django.urls import re_path
 else:
   from cStringIO import StringIO as string_io
   from mock import patch, Mock
-  from django.conf.urls import url
+  from django.conf.urls import url as re_path
 
 
 LOG = logging.getLogger(__name__)
@@ -404,8 +404,8 @@ def test_error_handling():
 
   # Add an error view
   error_url_pat = [
-      url('^500_internal_error$', error_raising_view),
-      url('^popup_exception$', popup_exception_view)
+      re_path('^500_internal_error$', error_raising_view),
+      re_path('^popup_exception$', popup_exception_view)
   ]
   desktop.urls.urlpatterns.extend(error_url_pat)
   try:

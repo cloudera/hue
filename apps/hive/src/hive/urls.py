@@ -17,10 +17,10 @@
 
 import sys
 
-if sys.version_info[0] < 3:
-  from django.conf.urls import url
+if sys.version_info[0] > 2:
+  from django.urls import re_path
 else:
-  from django.urls import re_path as url
+  from django.conf.urls import url as re_path
 
 
 urlpatterns = [
