@@ -70,7 +70,9 @@ urlpatterns += [
   re_path(r'^api/autocomplete/?$', beeswax_api.autocomplete, name='api_autocomplete_databases'),
   re_path(r'^api/autocomplete/(?P<database>\w+)/?$', beeswax_api.autocomplete, name='api_autocomplete_tables'),
   re_path(r'^api/autocomplete/(?P<database>\w+)/(?P<table>\w+)/?$', beeswax_api.autocomplete, name='api_autocomplete_columns'),
-  re_path(r'^api/autocomplete/(?P<database>\w+)/(?P<table>\w+)/(?P<column>\w+)/?$', beeswax_api.autocomplete, name='api_autocomplete_column'),
+  re_path(
+    r'^api/autocomplete/(?P<database>\w+)/(?P<table>\w+)/(?P<column>\w+)/?$', beeswax_api.autocomplete, name='api_autocomplete_column'
+  ),
   re_path(
     r'^api/autocomplete/(?P<database>\w+)/(?P<table>\w+)/(?P<column>\w+)/(?P<nested>.+)/?$',
     beeswax_api.autocomplete,
@@ -107,8 +109,12 @@ urlpatterns += [
   re_path(r'^api/table/(?P<database>\w+)/(?P<table>\w+)/?$', beeswax_api.describe_table, name='describe_table'),
   re_path(r'^api/table/(?P<database>\w+)/(?P<table>\w+)/indexes/?$', beeswax_api.get_indexes, name='get_indexes'),
   re_path(r'^api/table/(?P<database>\w+)/(?P<table>\w+)/sample/?$', beeswax_api.get_sample_data, name='get_sample_data'),
-  re_path(r'^api/table/(?P<database>\w+)/(?P<table>\w+)/(?P<column>\w+)/sample/?$', beeswax_api.get_sample_data, name='get_sample_data_column'),
-  re_path(r'^api/table/(?P<database>\w+)/(?P<table>\w+)/stats(?:/(?P<column>\w+))?/?$', beeswax_api.get_table_stats, name='get_table_stats'),
+  re_path(
+    r'^api/table/(?P<database>\w+)/(?P<table>\w+)/(?P<column>\w+)/sample/?$', beeswax_api.get_sample_data, name='get_sample_data_column'
+  ),
+  re_path(
+    r'^api/table/(?P<database>\w+)/(?P<table>\w+)/stats(?:/(?P<column>\w+))?/?$', beeswax_api.get_table_stats, name='get_table_stats'
+  ),
   re_path(
     r'^api/table/(?P<database>\w+)/(?P<table>\w+)/terms/(?P<column>\w+)(?:/(?P<prefix>\w+))?/?$',
     beeswax_api.get_top_terms,

@@ -32,7 +32,9 @@ urlpatterns = [
 urlpatterns += [
   re_path(r'^api/autocomplete/databases/?$', sqoop_api.autocomplete, name='autocomplete_databases'),
   re_path(r'^api/autocomplete/databases/(?P<database>.+)/tables/?$', sqoop_api.autocomplete, name='autocomplete_tables'),
-  re_path(r'^api/autocomplete/databases/(?P<database>.+)/tables/(?P<table>.+)/columns/?$', sqoop_api.autocomplete, name='autocomplete_fields'),
+  re_path(
+    r'^api/autocomplete/databases/(?P<database>.+)/tables/(?P<table>.+)/columns/?$', sqoop_api.autocomplete, name='autocomplete_fields'
+  ),
   re_path(r'^api/driver/?$', sqoop_api.driver, name='driver'),
   re_path(r'^api/connectors', sqoop_api.connectors, name='connectors'),
   re_path(r'^api/connectors/(?P<connector_id>\d+)/?$', sqoop_api.connector, name='connector'),

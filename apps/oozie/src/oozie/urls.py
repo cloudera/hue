@@ -73,7 +73,9 @@ urlpatterns = [
   re_path(r'^clone_bundle/(?P<bundle>\d+)$', oozie_views_editor.clone_bundle, name='clone_bundle'),
   re_path(r'^delete_bundle$', oozie_views_editor.delete_bundle, name='delete_bundle'),
   re_path(r'^restore_bundle$', oozie_views_editor.restore_bundle, name='restore_bundle'),
-  re_path(r'^create_bundled_coordinator/(?P<bundle>\d+)$', oozie_views_editor.create_bundled_coordinator, name='create_bundled_coordinator'),
+  re_path(
+    r'^create_bundled_coordinator/(?P<bundle>\d+)$', oozie_views_editor.create_bundled_coordinator, name='create_bundled_coordinator'
+  ),
   re_path(
     r'^edit_bundled_coordinator/(?P<bundle>\d+)/(?P<bundled_coordinator>\d+)$',
     oozie_views_editor.edit_bundled_coordinator,
@@ -165,7 +167,9 @@ urlpatterns += [
     oozie_views_dashboard.rerun_oozie_coordinator,
     name='rerun_oozie_coord'
   ),
-  re_path(r'^rerun_oozie_bundle/(?P<job_id>[-\w]+)/(?P<app_path>.+?)$', oozie_views_dashboard.rerun_oozie_bundle, name='rerun_oozie_bundle'),
+  re_path(
+    r'^rerun_oozie_bundle/(?P<job_id>[-\w]+)/(?P<app_path>.+?)$', oozie_views_dashboard.rerun_oozie_bundle, name='rerun_oozie_bundle'
+  ),
   re_path(r'^sync_coord_workflow/(?P<job_id>[-\w]+)$', oozie_views_dashboard.sync_coord_workflow, name='sync_coord_workflow'),
   re_path(
     r'^manage_oozie_jobs/(?P<job_id>[-\w]+)/(?P<action>(start|suspend|resume|kill|rerun|change|ignore))$',

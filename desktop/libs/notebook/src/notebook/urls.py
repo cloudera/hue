@@ -110,7 +110,9 @@ urlpatterns += [
     notebook_api.autocomplete,
     name='api_autocomplete_column'
   ),
-  re_path(r'^api/sample/(?P<server>[\w_\-/]+)/(?P<database>[^/?]*)/(?P<table>\w+)/?$', notebook_api.get_sample_data, name='api_sample_data'),
+  re_path(
+    r'^api/sample/(?P<server>[\w_\-/]+)/(?P<database>[^/?]*)/(?P<table>\w+)/?$', notebook_api.get_sample_data, name='api_sample_data'
+  ),
   re_path(
     r'^api/sample/(?P<server>[\w_\-/]+)/(?P<database>[^/?]*)/(?P<table>\w+)/(?P<column>\w+)/?$',
     notebook_api.get_sample_data,
@@ -122,5 +124,7 @@ urlpatterns += [
 urlpatterns += [
   re_path(r'^api/describe/(?P<database>[^/]*)/?$', notebook_api.describe, name='api_describe_database'),
   re_path(r'^api/describe/(?P<database>[^/]*)/(?P<table>[\w_\-]+)/?$', notebook_api.describe, name='api_describe_table'),
-  re_path(r'^api/describe/(?P<database>[^/]*)/(?P<table>\w+)/stats(?:/(?P<column>\w+))?/?$', notebook_api.describe, name='api_describe_column'),
+  re_path(
+    r'^api/describe/(?P<database>[^/]*)/(?P<table>\w+)/stats(?:/(?P<column>\w+))?/?$', notebook_api.describe, name='api_describe_column'
+  ),
 ]

@@ -65,7 +65,9 @@ urlpatterns += [
   re_path(r'^api/navigator/list_tags/?$', metadata_catalog_api.list_tags, name='list_tags'),
   re_path(r'^api/navigator/suggest/?$', metadata_catalog_api.suggest, name='suggest'),
   re_path(r'^api/navigator/update_properties/?$', metadata_catalog_api.update_properties, name='update_properties'),
-  re_path(r'^api/navigator/delete_metadata_properties/?$', metadata_catalog_api.delete_metadata_properties, name='delete_metadata_properties'),
+  re_path(
+    r'^api/navigator/delete_metadata_properties/?$', metadata_catalog_api.delete_metadata_properties, name='delete_metadata_properties'
+  ),
   re_path(r'^api/navigator/lineage/?$', metadata_catalog_api.get_lineage, name='get_lineage'),
 ]
 
