@@ -19,6 +19,7 @@
 from __future__ import absolute_import
 import ldap
 import sys
+import warnings
 
 from django.conf import settings
 from django.db.utils import DatabaseError
@@ -794,7 +795,10 @@ class TestUserAdminLdap(BaseUserAdminTests):
     # Set up LDAP tests to use a LdapTestConnection instead of an actual LDAP connection
     class LdapTestConnectionError(LdapTestConnection):
       def find_users(self, user, find_by_dn=False):
-        raise ldap.LDAPError('No such object')
+        with warnings.catch_warnings():  # Hide GH false positive check from LDAPError exception.
+          warnings.simplefilter("ignore")
+          raise ldap.LDAPError('No such object')
+
     ldap_access.CACHED_LDAP_CONN = LdapTestConnectionError()
 
     c = make_logged_in_client('test', is_superuser=True)
