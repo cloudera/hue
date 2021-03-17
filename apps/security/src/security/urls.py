@@ -50,7 +50,9 @@ urlpatterns += [
   re_path(r'^api/hive/fetch_hive_path', security_api_hive.fetch_hive_path, name='fetch_hive_path'),
 
   re_path(r'^api/hive/list_sentry_roles_by_group', security_api_hive.list_sentry_roles_by_group, name='list_sentry_roles_by_group'),
-  re_path(r'^api/hive/list_sentry_privileges_by_role', security_api_hive.list_sentry_privileges_by_role, name='list_sentry_privileges_by_role'),
+  re_path(
+    r'^api/hive/list_sentry_privileges_by_role', security_api_hive.list_sentry_privileges_by_role, name='list_sentry_privileges_by_role'
+  ),
   re_path(
     r'^api/hive/list_sentry_privileges_for_provider$',
     security_api_hive.list_sentry_privileges_for_provider,

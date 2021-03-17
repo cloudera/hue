@@ -40,7 +40,9 @@ urlpatterns += [
   re_path(r'^api/servers/?$', rdbms_api.servers, name='api_servers'),
   re_path(r'^api/servers/(?P<server>\w+)/databases/?$', rdbms_api.databases, name='api_databases'),
   re_path(r'^api/servers/(?P<server>\w+)/databases/(?P<database>.+?)/tables/?$', rdbms_api.tables, name='api_tables'),
-  re_path(r'^api/servers/(?P<server>\w+)/databases/(?P<database>.+?)/tables/(?P<table>\w+)/columns/?$', rdbms_api.columns, name='api_columns'),
+  re_path(
+    r'^api/servers/(?P<server>\w+)/databases/(?P<database>.+?)/tables/(?P<table>\w+)/columns/?$', rdbms_api.columns, name='api_columns'
+  ),
   re_path(r'^api/query(?:/(?P<design_id>\d+))?/?$', rdbms_api.save_query, name='api_save_query'),
   re_path(r'^api/query/(?P<design_id>\d+)/get$', rdbms_api.fetch_saved_query, name='api_fetch_saved_query'),
   re_path(r'^api/execute(?:/(?P<design_id>\d+))?/?$', rdbms_api.execute_query, name='api_execute_query'),

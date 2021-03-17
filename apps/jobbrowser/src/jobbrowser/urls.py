@@ -34,7 +34,9 @@ urlpatterns = [
   re_path(r'^jobs/(?P<job>\w+)/kill$', jobbrowser_views.kill_job, name='kill_job'),
   re_path(r'^jobs/(?P<job>\w+)/single_logs$', jobbrowser_views.job_single_logs, name='jobbrowser.views.job_single_logs'),
   re_path(r'^jobs/(?P<job>\w+)/tasks$', jobbrowser_views.tasks, name='jobbrowser.views.tasks'),
-  re_path(r'^jobs/(?P<job>\w+)/tasks/(?P<taskid>\w+)$', jobbrowser_views.single_task, name='jobbrowser.views.single_task'), # TODO s/single// ?
+  re_path(
+    r'^jobs/(?P<job>\w+)/tasks/(?P<taskid>\w+)$', jobbrowser_views.single_task, name='jobbrowser.views.single_task'
+  ),                                                                                                                 # TODO s/single// ?
   re_path(r'^jobs/(?P<job>\w+)/tasks/(?P<taskid>\w+)/attempts/(?P<attemptid>\w+)$',
   jobbrowser_views.single_task_attempt, name='single_task_attempt'),
   re_path(r'^jobs/(?P<job>\w+)/tasks/(?P<taskid>\w+)/attempts/(?P<attemptid>\w+)/counters$',
@@ -43,7 +45,9 @@ urlpatterns = [
   jobbrowser_views.single_task_attempt_logs, name='single_task_attempt_logs'),
   re_path(r'^jobs/(\w+)/tasks/(\w+)/attempts/(?P<attemptid>\w+)/kill$', jobbrowser_views.kill_task_attempt, name='kill_task_attempt'),
   re_path(r'^trackers/(?P<trackerid>.+)$', jobbrowser_views.single_tracker, name='single_tracker'),
-  re_path(r'^container/(?P<node_manager_http_address>.+)/(?P<containerid>.+)$', jobbrowser_views.container, name='jobbrowser.views.container'),
+  re_path(
+    r'^container/(?P<node_manager_http_address>.+)/(?P<containerid>.+)$', jobbrowser_views.container, name='jobbrowser.views.container'
+  ),
 
   # MR2 specific
   re_path(r'^jobs/(?P<job>\w+)/job_attempt_logs/(?P<attempt_index>\d+)$', jobbrowser_views.job_attempt_logs, name='job_attempt_logs'),
