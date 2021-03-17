@@ -121,7 +121,7 @@ def handle_on_link_shared(channel_id, message_ts, links):
       raise PopupException(_("Cannot unfurl link"), detail=response["error"])
 
 
-def query_result(request, notebook):
+def query_result(request, notebook, max_rows):
   snippet = notebook['snippets'][0]
   snippet['statement'] = notebook['snippets'][0]['statement_raw']
 
@@ -130,18 +130,31 @@ def query_result(request, notebook):
   history_uuid = query_execute['history_uuid']
   status = _check_status(request, operation_id=history_uuid)
   if status['query_status']['status'] == 'available':
-    response = _fetch_result_data(request, operation_id=history_uuid)
-    return response['result']
+    res = _fetch_result_data(request, operation_id=history_uuid, rows=max_rows)
+
+    # Make result pivot table
+    result = []
+    meta = res['result']['meta']
+    data = res['result']['data']
+
+    for col in range(len(meta)):
+      pivot_row = []
+      pivot_row.append(meta[col]['name'])
+      for row_data in data:
+        # Replace non-breaking space HTML entity with whitespace
+        if(isinstance(row_data[col], str)):
+          row_data[col] = row_data[col].replace('&nbsp;', ' ') 
+        pivot_row.append(row_data[col])
+
+      result.append(pivot_row)
+
+    return result
 
   return 'Query result has expired or could not be found'
 
 
 def _make_result_table(result):
-  meta = []
-  for field in result['meta']:
-    meta.append(field['name'])
-
-  return tabulate(result['data'], headers=meta, tablefmt="plain")
+  return tabulate(result, tablefmt="plain")
 
 
 def _make_unfurl_payload(url, id_type, doc, doc_type):
@@ -155,11 +168,14 @@ def _make_unfurl_payload(url, id_type, doc, doc_type):
   request = MockRequest(user=user)
 
   if id_type == 'editor':
+    # Max rows allowed in result preview table
+    max_rows = 2
+
     try:
       status = _check_status(request, operation_id=doc_data['uuid'])
       if status['query_status']['status'] == 'available':
-        fetch_result = query_result(request, json.loads(doc.data))
-        unfurl_result = _make_result_table(fetch_result) if isinstance(fetch_result, dict) else fetch_result
+        fetch_result = query_result(request, json.loads(doc.data), max_rows)
+        unfurl_result = _make_result_table(fetch_result) if isinstance(fetch_result, list) else fetch_result
     except:
       unfurl_result = 'Query result has expired or could not be found'
   else:
