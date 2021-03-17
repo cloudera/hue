@@ -19,15 +19,15 @@ import sys
 
 from desktop.lib.scheduler import api
 
-if sys.version_info[0] < 3:
-  from django.conf.urls import url
+if sys.version_info[0] > 2:
+  from django.urls import re_path
 else:
-  from django.urls import re_path as url
+  from django.conf.urls import url as re_path
 
 
 urlpatterns = [
-  url(r'^api/schedule/new/?$', api.get_schedule, name='scheduler.api.new_schedule'),
-  url(r'^api/schedule/edit/?$', api.get_schedule, name='scheduler.api.edit_schedule'),
-  url(r'^api/schedule/submit/(?P<doc_id>[-\w]+)?$', api.submit_schedule, name='scheduler.api.submit_schedule'),
-  url(r'^api/schedule/list/?$', api.list_schedules, name='scheduler.api.list_schedules'),
+  re_path(r'^api/schedule/new/?$', api.get_schedule, name='scheduler.api.new_schedule'),
+  re_path(r'^api/schedule/edit/?$', api.get_schedule, name='scheduler.api.edit_schedule'),
+  re_path(r'^api/schedule/submit/(?P<doc_id>[-\w]+)?$', api.submit_schedule, name='scheduler.api.submit_schedule'),
+  re_path(r'^api/schedule/list/?$', api.list_schedules, name='scheduler.api.list_schedules'),
 ]
