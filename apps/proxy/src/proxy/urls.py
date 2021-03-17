@@ -19,12 +19,12 @@ import sys
 
 from proxy import views as proxy_views
 
-if sys.version_info[0] < 3:
-  from django.conf.urls import url
+if sys.version_info[0] > 2:
+  from django.urls import re_path
 else:
-  from django.urls import re_path as url
+  from django.conf.urls import url as re_path
 
 urlpatterns = [
   # Prefix the names of your views with the app name.
-  url(r'^(?P<host>[^/]+)/(?P<port>\d+)(?P<path>/.*)$', proxy_views.proxy, name="proxy.views.proxy"),
+  re_path(r'^(?P<host>[^/]+)/(?P<port>\d+)(?P<path>/.*)$', proxy_views.proxy, name="proxy.views.proxy"),
 ]

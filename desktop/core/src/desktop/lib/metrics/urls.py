@@ -19,11 +19,11 @@ import sys
 
 from desktop.lib.metrics import views
 
-if sys.version_info[0] < 3:
-  from django.conf.urls import url
+if sys.version_info[0] > 2:
+  from django.urls import re_path
 else:
-  from django.urls import re_path as url
+  from django.conf.urls import url as re_path
 
 urlpatterns = [
-  url(r'^$', views.index, name='desktop.lib.metrics.views.index'),
+  re_path(r'^$', views.index, name='desktop.lib.metrics.views.index'),
 ]
