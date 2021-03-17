@@ -19,6 +19,7 @@ import logging
 import json
 from urllib.parse import urlsplit
 from pprint import pprint
+from tabulate import tabulate
 
 from desktop import conf
 from desktop.conf import ENABLE_GIST_PREVIEW
@@ -37,11 +38,6 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt
 
 LOG = logging.getLogger(__name__)
-
-try:
-  from prettytable import PrettyTable
-except ImportError:
-  LOG.warn('slack server: prettytable module is not installed')
 
 SLACK_VERIFICATION_TOKEN = conf.SLACK.SLACK_VERIFICATION_TOKEN.get()
 SLACK_BOT_USER_TOKEN = conf.SLACK.SLACK_BOT_USER_TOKEN.get()
@@ -139,15 +135,13 @@ def query_result(request, notebook):
 
   return 'Query result has expired or could not be found'
 
+
 def _make_result_table(result):
   meta = []
   for field in result['meta']:
     meta.append(field['name'])
 
-  table = PrettyTable()
-  table.field_names = meta
-  table.add_rows(result['data'])
-  return table
+  return tabulate(result['data'], headers=meta, tablefmt="plain")
 
 
 def _make_unfurl_payload(url, id_type, doc, doc_type):
