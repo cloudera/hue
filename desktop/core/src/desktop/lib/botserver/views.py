@@ -105,7 +105,7 @@ def handle_on_link_shared(channel_id, message_ts, links):
     try:
       if path == '/hue/editor' and id_type == 'editor':
         doc = Document2.objects.get(id=qid)
-        doc_type = 'Editor'
+        doc_type = 'Query'
       elif path == '/hue/gist' and id_type == 'uuid' and ENABLE_GIST_PREVIEW.get():
         doc = _get_gist_document(uuid=qid)
         doc_type = 'Gist'
@@ -121,7 +121,7 @@ def handle_on_link_shared(channel_id, message_ts, links):
       raise PopupException(_("Cannot unfurl link"), detail=response["error"])
 
 
-def query_result(request, notebook, max_rows):
+def _query_result(request, notebook, max_rows):
   snippet = notebook['snippets'][0]
   snippet['statement'] = notebook['snippets'][0]['statement_raw']
 
@@ -131,30 +131,29 @@ def query_result(request, notebook, max_rows):
   status = _check_status(request, operation_id=history_uuid)
   if status['query_status']['status'] == 'available':
     res = _fetch_result_data(request, operation_id=history_uuid, rows=max_rows)
+    return res['result']
 
-    # Make result pivot table
-    result = []
-    meta = res['result']['meta']
-    data = res['result']['data']
-
-    for col in range(len(meta)):
-      pivot_row = []
-      pivot_row.append(meta[col]['name'])
-      for row_data in data:
-        # Replace non-breaking space HTML entity with whitespace
-        if(isinstance(row_data[col], str)):
-          row_data[col] = row_data[col].replace('&nbsp;', ' ') 
-        pivot_row.append(row_data[col])
-
-      result.append(pivot_row)
-
-    return result
-
-  return 'Query result has expired or could not be found'
+  return None
 
 
 def _make_result_table(result):
-  return tabulate(result, tablefmt="plain")
+  # Make result pivot table
+  table = []
+  meta = result['meta']
+  data = result['data']
+
+  for idx, column in enumerate(meta):
+    pivot_row = []
+    pivot_row.append(column['name'])
+    for row_data in data:
+      # Replace non-breaking space HTML entity with whitespace
+      if isinstance(row_data[idx], str):
+        row_data[idx] = row_data[idx].replace('&nbsp;', ' ') 
+      pivot_row.append(row_data[idx])
+
+    table.append(pivot_row)
+
+  return tabulate(table, tablefmt="plain")
 
 
 def _make_unfurl_payload(url, id_type, doc, doc_type):
@@ -162,22 +161,23 @@ def _make_unfurl_payload(url, id_type, doc, doc_type):
   statement = doc_data['snippets'][0]['statement_raw'] if id_type == 'editor' else doc_data['statement_raw']
   dialect = doc_data['dialect'] if id_type == 'editor' else doc.extra
   created_by = doc.owner.get_full_name() or doc.owner.username
+  name = doc.name or dialect
 
   # Mock request for query execution and fetch result
   user = rewrite_user(User.objects.get(username=doc.owner.username))
   request = MockRequest(user=user)
 
   if id_type == 'editor':
-    # Max rows allowed in result preview table
     max_rows = 2
+    no_result_msg = 'Query result has expired or could not be found'
 
     try:
       status = _check_status(request, operation_id=doc_data['uuid'])
       if status['query_status']['status'] == 'available':
-        fetch_result = query_result(request, json.loads(doc.data), max_rows)
-        unfurl_result = _make_result_table(fetch_result) if isinstance(fetch_result, list) else fetch_result
+        fetch_result = _query_result(request, json.loads(doc.data), max_rows)
+        unfurl_result = _make_result_table(fetch_result) if fetch_result is not None else no_result_msg
     except:
-      unfurl_result = 'Query result has expired or could not be found'
+      unfurl_result = no_result_msg
   else:
     unfurl_result = 'Result is not available for Gist'
 
@@ -189,7 +189,7 @@ def _make_unfurl_payload(url, id_type, doc, doc_type):
           "type": "section",
           "text": {
             "type": "mrkdwn",
-            "text": "\n*<{}|Hue - SQL {}>*".format(url, doc_type)
+            "text": "\n*<{}|Open {} {} in Hue - SQL Editor>*".format(url, name, doc_type)
           }
         },
         {
