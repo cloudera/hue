@@ -630,7 +630,7 @@ def get_history(request):
         'data': {
             'statement': statement[:1001] if statement else '',
             'lastExecuted': notebook['snippets'][0].get('lastExecuted', -1),
-            'status': notebook['snippets'][0]['status'],
+            'status': notebook['snippets'][0].get('status', ''),
             'parentSavedQueryUuid': notebook.get('parentSavedQueryUuid', '')
         } if notebook['snippets'] else {},
         'absoluteUrl': doc.get_absolute_url(),
