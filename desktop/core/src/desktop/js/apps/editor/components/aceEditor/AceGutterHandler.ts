@@ -14,11 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { EXECUTABLE_UPDATED_TOPIC, ExecutableUpdatedEvent } from 'apps/editor/execution/events';
 import { Ace } from 'ext/ace';
 
 import AceAnchoredRange from './AceAnchoredRange';
 import { ACTIVE_STATEMENT_CHANGED_EVENT } from './AceLocationHandler';
-import { EXECUTABLE_UPDATED_EVENT } from 'apps/editor/execution/executable';
 import Executor from 'apps/editor/execution/executor';
 import SqlExecutable from 'apps/editor/execution/sqlExecutable';
 import SubscriptionTracker, { Disposable } from 'components/utils/SubscriptionTracker';
@@ -72,7 +72,7 @@ export default class AceGutterHandler implements Disposable {
     this.subTracker.addDisposable(activeStatementAnchor);
 
     if (this.executor) {
-      this.subTracker.subscribe(EXECUTABLE_UPDATED_EVENT, (executable: SqlExecutable) => {
+      this.subTracker.subscribe<ExecutableUpdatedEvent>(EXECUTABLE_UPDATED_TOPIC, executable => {
         if (executable.executor === this.executor) {
           let anchor = this.trackedAnchors.get(executable.id);
           if (!anchor) {
@@ -89,7 +89,7 @@ export default class AceGutterHandler implements Disposable {
           anchor.removeGutterCss();
           anchor.removeMarkerRowCss();
 
-          const statement = executable.parsedStatement;
+          const statement = (executable as SqlExecutable).parsedStatement;
           const leadingEmptyLineCount = getLeadingEmptyLineCount(statement);
           anchor.move(statement.location, leadingEmptyLineCount);
 

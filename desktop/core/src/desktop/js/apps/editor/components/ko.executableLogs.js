@@ -19,11 +19,13 @@ import * as ko from 'knockout';
 import 'ko/bindings/ko.publish';
 
 import componentUtils from 'ko/components/componentUtils';
-import { EXECUTABLE_UPDATED_EVENT } from 'apps/editor/execution/executable';
 import DisposableComponent from 'ko/components/DisposableComponent';
 import I18n from 'utils/i18n';
-import { RESULT_UPDATED_EVENT } from 'apps/editor/execution/executionResult';
-import { LOGS_UPDATED_EVENT } from 'apps/editor/execution/executionLogs';
+import {
+  EXECUTABLE_LOGS_UPDATED_TOPIC,
+  EXECUTABLE_RESULT_UPDATED_TOPIC,
+  EXECUTABLE_UPDATED_TOPIC
+} from '../execution/events';
 
 export const NAME = 'executable-logs';
 
@@ -114,7 +116,7 @@ class ExecutableLogs extends DisposableComponent {
     this.errors = ko.observableArray();
     this.logs = ko.observable();
 
-    this.subscribe(EXECUTABLE_UPDATED_EVENT, executable => {
+    this.subscribe(EXECUTABLE_UPDATED_TOPIC, executable => {
       if (this.activeExecutable() === executable) {
         this.updateFromExecutable(executable);
       }
@@ -122,13 +124,13 @@ class ExecutableLogs extends DisposableComponent {
 
     this.subscribe(this.activeExecutable, this.updateFromExecutable.bind(this));
 
-    this.subscribe(RESULT_UPDATED_EVENT, executionResult => {
+    this.subscribe(EXECUTABLE_RESULT_UPDATED_TOPIC, executionResult => {
       if (this.activeExecutable() === executionResult.executable) {
         this.updateFromResult(executionResult);
       }
     });
 
-    this.subscribe(LOGS_UPDATED_EVENT, executionLogs => {
+    this.subscribe(EXECUTABLE_LOGS_UPDATED_TOPIC, executionLogs => {
       if (this.activeExecutable() === executionLogs.executable) {
         this.updateFromLogs(executionLogs);
       }

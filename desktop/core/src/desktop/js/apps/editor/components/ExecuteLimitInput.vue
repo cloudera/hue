@@ -33,13 +33,12 @@
 </template>
 
 <script lang="ts">
+  import { EXECUTABLE_UPDATED_TOPIC, ExecutableUpdatedEvent } from 'apps/editor/execution/events';
   import { defineComponent, PropType, ref, toRefs, watch } from 'vue';
 
   import SqlExecutable from 'apps/editor/execution/sqlExecutable';
   import SubscriptionTracker from 'components/utils/SubscriptionTracker';
   import I18n from 'utils/i18n';
-
-  import { EXECUTABLE_UPDATED_EVENT } from 'apps/editor/execution/executable';
 
   export default defineComponent({
     name: 'ExecuteLimitInput',
@@ -61,7 +60,7 @@
           null;
       };
 
-      subTracker.subscribe(EXECUTABLE_UPDATED_EVENT, updatedExecutable => {
+      subTracker.subscribe<ExecutableUpdatedEvent>(EXECUTABLE_UPDATED_TOPIC, updatedExecutable => {
         if (executable.value && executable.value.id === updatedExecutable.id) {
           updateFromExecutable(updatedExecutable);
         }

@@ -16,6 +16,7 @@
 
 import * as ko from 'knockout';
 import $ from 'jquery';
+import { EXECUTABLE_RESULT_UPDATED_TOPIC, EXECUTABLE_UPDATED_TOPIC } from '../../execution/events';
 
 import {
   leafletMapChartTransformer,
@@ -27,8 +28,8 @@ import {
 } from './chartTransformers';
 import { attachTracker } from 'apps/editor/components/executableStateHandler';
 import { REDRAW_CHART_EVENT } from 'apps/editor/events';
-import { EXECUTABLE_UPDATED_EVENT, ExecutionStatus } from 'apps/editor/execution/executable';
-import { RESULT_TYPE, RESULT_UPDATED_EVENT } from 'apps/editor/execution/executionResult';
+import { ExecutionStatus } from 'apps/editor/execution/executable';
+import { RESULT_TYPE } from 'apps/editor/execution/executionResult';
 import { CURRENT_QUERY_TAB_SWITCHED_EVENT } from 'apps/editor/snippet';
 import componentUtils from 'ko/components/componentUtils';
 import DisposableComponent from 'ko/components/DisposableComponent';
@@ -564,7 +565,7 @@ class ResultChart extends DisposableComponent {
     this.cleanedStringMeta = ko.observableArray();
     this.cleanedNumericMeta = ko.observableArray();
 
-    this.subscribe(EXECUTABLE_UPDATED_EVENT, executable => {
+    this.subscribe(EXECUTABLE_UPDATED_TOPIC, executable => {
       if (this.activeExecutable() === executable) {
         this.updateFromExecutable(executable);
       }
@@ -581,7 +582,7 @@ class ResultChart extends DisposableComponent {
       }
     };
 
-    this.subscribe(RESULT_UPDATED_EVENT, executionResult => {
+    this.subscribe(EXECUTABLE_RESULT_UPDATED_TOPIC, executionResult => {
       if (this.activeExecutable() === executionResult.executable) {
         handleResultChange();
       }

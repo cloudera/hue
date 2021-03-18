@@ -16,6 +16,12 @@
 
 import $ from 'jquery';
 
+import {
+  EXECUTABLE_TRANSITIONED_TOPIC,
+  EXECUTABLE_UPDATED_TOPIC,
+  ExecutableTransitionedEvent,
+  ExecutableUpdatedEvent
+} from 'apps/editor/execution/events';
 import { Cancellable } from 'api/cancellablePromise';
 import {
   checkExecutionStatus,
@@ -33,7 +39,7 @@ import ExecutionLogs, {
   ExecutionError,
   ExecutionLogsRaw
 } from 'apps/editor/execution/executionLogs';
-import hueUtils, { UUID } from 'utils/hueUtils';
+import { UUID } from 'utils/hueUtils';
 import Executor from 'apps/editor/execution/executor';
 
 /**
@@ -54,9 +60,6 @@ export enum ExecutionStatus {
   canceling = 'canceling',
   closed = 'closed'
 }
-
-export const EXECUTABLE_UPDATED_EVENT = 'hue.executable.updated';
-export const EXECUTABLE_STATUS_TRANSITION_EVENT = 'hue.executable.status.transitioned';
 
 export interface ExecutableRaw {
   executeEnded: number;
@@ -102,7 +105,7 @@ export default abstract class Executable {
     const oldStatus = this.status;
     this.status = status;
     if (oldStatus !== status) {
-      huePubSub.publish(EXECUTABLE_STATUS_TRANSITION_EVENT, {
+      huePubSub.publish<ExecutableTransitionedEvent>(EXECUTABLE_TRANSITIONED_TOPIC, {
         executable: this,
         oldStatus: oldStatus,
         newStatus: status
@@ -123,10 +126,10 @@ export default abstract class Executable {
   notify(sync?: boolean): void {
     window.clearTimeout(this.notifyThrottle);
     if (sync) {
-      huePubSub.publish(EXECUTABLE_UPDATED_EVENT, this);
+      huePubSub.publish<ExecutableUpdatedEvent>(EXECUTABLE_UPDATED_TOPIC, this);
     } else {
       this.notifyThrottle = window.setTimeout(() => {
-        huePubSub.publish(EXECUTABLE_UPDATED_EVENT, this);
+        huePubSub.publish<ExecutableUpdatedEvent>(EXECUTABLE_UPDATED_TOPIC, this);
       }, 1);
     }
   }
@@ -441,7 +444,9 @@ export default abstract class Executable {
       result: {
         handle: this.handle
       },
+      connector: this.executor.connector(),
       executor: this.executor.toJs(),
+      defaultLimit: (this.executor.defaultLimit && this.executor.defaultLimit()) || null,
       status: this.status,
       id: id || UUID(),
       statement_raw: this.getRawStatement(),
@@ -455,9 +460,9 @@ export default abstract class Executable {
     };
 
     const notebook = {
-      type: this.executor.connector().id,
+      type: `query-${this.executor.connector().id}`,
       snippets: [snippet],
-      uuid: hueUtils.UUID(),
+      uuid: UUID(),
       name: '',
       isSaved: false,
       sessions: [session],
