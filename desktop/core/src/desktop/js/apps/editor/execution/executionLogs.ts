@@ -15,10 +15,12 @@
 // limitations under the License.
 
 import { ExecutionJob, fetchLogs } from 'apps/editor/execution/api';
+import {
+  EXECUTABLE_LOGS_UPDATED_TOPIC,
+  ExecutableLogsUpdatedEvent
+} from 'apps/editor/execution/events';
 import huePubSub from 'utils/huePubSub';
 import Executable, { ExecutionStatus } from './executable';
-
-export const LOGS_UPDATED_EVENT = 'hue.executable.logs.updated';
 
 export interface ExecutionError {
   row: number;
@@ -43,7 +45,7 @@ export default class ExecutionLogs {
   }
 
   notify(): void {
-    huePubSub.publish(LOGS_UPDATED_EVENT, this);
+    huePubSub.publish<ExecutableLogsUpdatedEvent>(EXECUTABLE_LOGS_UPDATED_TOPIC, this);
   }
 
   reset(): void {
@@ -79,7 +81,7 @@ export default class ExecutionLogs {
       this.jobs = [];
     }
 
-    huePubSub.publish(LOGS_UPDATED_EVENT, this);
+    huePubSub.publish<ExecutableLogsUpdatedEvent>(EXECUTABLE_LOGS_UPDATED_TOPIC, this);
 
     if (!finalFetch) {
       const delay = this.executable.getExecutionTime() > 45000 ? 5000 : 1000;

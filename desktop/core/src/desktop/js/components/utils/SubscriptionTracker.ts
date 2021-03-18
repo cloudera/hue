@@ -48,10 +48,10 @@ export default class SubscriptionTracker {
     });
   }
 
-  subscribe(
-    subscribable: string | KnockoutSubscribable<unknown>,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    callback: (...args: any[]) => any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  subscribe<T = any>(
+    subscribable: string | KnockoutSubscribable<T>,
+    callback: (event: T) => void
   ): void {
     if (typeof subscribable === 'string') {
       const pubSub = huePubSub.subscribe(subscribable, callback);
@@ -91,7 +91,7 @@ export default class SubscriptionTracker {
         return;
       }
       vueRef.value = valueOrNull(observable());
-      this.subscribe(observable, (newVal?: T) => {
+      this.subscribe<T | undefined | null>(observable, (newVal?: T | null) => {
         vueRef.value = valueOrNull(newVal);
       });
     });

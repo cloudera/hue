@@ -15,8 +15,8 @@
 // limitations under the License.
 
 import * as ko from 'knockout';
-import { RESULT_UPDATED_EVENT } from 'apps/editor/execution/executionResult';
 import huePubSub from 'utils/huePubSub';
+import { EXECUTABLE_RESULT_UPDATED_TOPIC } from '../execution/events';
 
 export const trackResult = (activeExecutable, onChange) => {
   if (!activeExecutable) {
@@ -39,7 +39,7 @@ export const trackResult = (activeExecutable, onChange) => {
     return { dispose: () => {} };
   }
 
-  const updateSub = huePubSub.subscribe(RESULT_UPDATED_EVENT, executionResult => {
+  const updateSub = huePubSub.subscribe(EXECUTABLE_RESULT_UPDATED_TOPIC, executionResult => {
     if (executionResult === executable.result) {
       onChange(executionResult);
     }

@@ -55,6 +55,7 @@
 </template>
 
 <script lang="ts">
+  import { EXECUTABLE_UPDATED_TOPIC, ExecutableUpdatedEvent } from 'apps/editor/execution/events';
   import { defineComponent, PropType, ref, toRefs, watch } from 'vue';
 
   import SqlExecutable from 'apps/editor/execution/sqlExecutable';
@@ -64,7 +65,7 @@
   import I18n from 'utils/i18n';
 
   import { Session } from 'apps/editor/execution/api';
-  import { EXECUTABLE_UPDATED_EVENT, ExecutionStatus } from 'apps/editor/execution/executable';
+  import { ExecutionStatus } from 'apps/editor/execution/executable';
   import sessionManager from 'apps/editor/execution/sessionManager';
 
   const EXECUTE_ACTIVE_EXECUTABLE_EVENT = 'executable.active.executable';
@@ -137,7 +138,7 @@
         { immediate: true }
       );
 
-      subTracker.subscribe(EXECUTABLE_UPDATED_EVENT, updatedExecutable => {
+      subTracker.subscribe<ExecutableUpdatedEvent>(EXECUTABLE_UPDATED_TOPIC, updatedExecutable => {
         if (executable.value && executable.value.id === updatedExecutable.id) {
           updateFromExecutable(updatedExecutable);
         }

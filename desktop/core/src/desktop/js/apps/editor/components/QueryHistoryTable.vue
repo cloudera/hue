@@ -99,6 +99,10 @@
   import { fetchHistory, FetchHistoryResponse } from '../api';
   import { ExecutionStatus } from '../execution/executable';
   import { CancellablePromise } from 'api/cancellablePromise';
+  import {
+    EXECUTABLE_TRANSITIONED_TOPIC,
+    ExecutableTransitionedEvent
+  } from 'apps/editor/execution/events';
   import { Connector } from 'config/types';
   import HueButton from 'components/HueButton.vue';
   import { Column } from 'components/HueTable';
@@ -124,7 +128,6 @@
     uuid: string;
   }
 
-  const ADD_TO_HISTORY_EVENT = 'query.history.add';
   const IGNORE_NEXT_UNLOAD_EVENT = 'ignore.next.unload';
 
   const trimEllipsis = (str: string): string =>
@@ -235,25 +238,26 @@
       watch(connector, () => debouncedUpdate(), { immediate: true });
       watch(searchFilter, () => debouncedUpdate());
 
-      subTracker.subscribe(
-        ADD_TO_HISTORY_EVENT,
-        (details: {
-          absoluteUrl?: string;
-          lastExecuted: number;
-          name: string;
-          statement: string;
-          status: ExecutionStatus;
-          uuid: string;
-        }) => {
-          if (!history.value.some(entry => entry.uuid === details.uuid)) {
+      subTracker.subscribe<ExecutableTransitionedEvent>(
+        EXECUTABLE_TRANSITIONED_TOPIC,
+        ({ newStatus, executable }) => {
+          if (
+            (newStatus === ExecutionStatus.available ||
+              newStatus === ExecutionStatus.failed ||
+              newStatus === ExecutionStatus.success) &&
+            executable.history &&
+            executable.handle &&
+            executable.executor.connector().id === connector.value?.id &&
+            !history.value.some(entry => entry.uuid === executable.history!.uuid)
+          ) {
             history.value = [
               {
-                absoluteUrl: details.absoluteUrl,
-                lastExecuted: details.lastExecuted,
-                name: details.name,
-                query: details.statement,
-                status: details.status,
-                uuid: details.uuid
+                absoluteUrl: undefined,
+                lastExecuted: executable.executeStarted,
+                name: executable.executor.snippet?.name() || '',
+                query: executable.handle.statement!,
+                status: executable.status,
+                uuid: executable.history.uuid!
               },
               ...history.value
             ];

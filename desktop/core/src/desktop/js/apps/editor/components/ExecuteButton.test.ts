@@ -14,11 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { EXECUTABLE_UPDATED_TOPIC, ExecutableUpdatedEvent } from 'apps/editor/execution/events';
 import SqlExecutable from 'apps/editor/execution/sqlExecutable';
 import huePubSub from 'utils/huePubSub';
 import { nextTick } from 'vue';
 import { mount, shallowMount } from '@vue/test-utils';
-import { EXECUTABLE_UPDATED_EVENT, ExecutionStatus } from 'apps/editor/execution/executable';
+import Executable, { ExecutionStatus } from 'apps/editor/execution/executable';
 import sessionManager from 'apps/editor/execution/sessionManager';
 import ExecuteButton from './ExecuteButton.vue';
 import { noop } from 'utils/hueUtils';
@@ -112,7 +113,10 @@ describe('ExecuteButton.vue', () => {
 
     expect(executeCalled).toBeTruthy();
     mockExecutable.status = ExecutionStatus.running;
-    huePubSub.publish(EXECUTABLE_UPDATED_EVENT, mockExecutable);
+    huePubSub.publish<ExecutableUpdatedEvent>(
+      EXECUTABLE_UPDATED_TOPIC,
+      mockExecutable as Executable
+    );
 
     await nextTick();
 

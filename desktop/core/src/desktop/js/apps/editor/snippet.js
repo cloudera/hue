@@ -43,11 +43,7 @@ import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
 import sessionManager from 'apps/editor/execution/sessionManager';
 import SqlExecutable from 'apps/editor/execution/sqlExecutable';
 import { HIDE_FIXED_HEADERS_EVENT, REDRAW_FIXED_HEADERS_EVENT } from 'apps/editor/events';
-import {
-  EXECUTABLE_STATUS_TRANSITION_EVENT,
-  EXECUTABLE_UPDATED_EVENT,
-  ExecutionStatus
-} from 'apps/editor/execution/executable';
+import { ExecutionStatus } from 'apps/editor/execution/executable';
 import {
   ACTIVE_STATEMENT_CHANGED_EVENT,
   REFRESH_STATEMENT_LOCATIONS_EVENT
@@ -60,12 +56,12 @@ import {
   ASSIST_GET_SOURCE_EVENT,
   ASSIST_SET_SOURCE_EVENT
 } from 'ko/components/assist/events';
+import { EXECUTABLE_UPDATED_TOPIC } from './execution/events';
 
 // TODO: Remove for ENABLE_NOTEBOOK_2. Temporary here for debug
 window.SqlExecutable = SqlExecutable;
 window.Executor = Executor;
 
-const ADD_TO_HISTORY_EVENT = 'query.history.add';
 export const CURRENT_QUERY_TAB_SWITCHED_EVENT = 'current.query.tab.switched';
 
 export const DIALECT = {
@@ -627,30 +623,9 @@ export default class Snippet {
       }
     }
 
-    huePubSub.subscribe(EXECUTABLE_UPDATED_EVENT, executable => {
+    huePubSub.subscribe(EXECUTABLE_UPDATED_TOPIC, executable => {
       if (this.activeExecutable() === executable) {
         this.updateFromExecutable(executable);
-      }
-    });
-
-    huePubSub.subscribe(EXECUTABLE_STATUS_TRANSITION_EVENT, transitionDetails => {
-      if (this.activeExecutable() === transitionDetails.executable) {
-        if (
-          (transitionDetails.newStatus === ExecutionStatus.available ||
-            transitionDetails.newStatus === ExecutionStatus.failed ||
-            transitionDetails.newStatus === ExecutionStatus.success) &&
-          this.activeExecutable().history &&
-          this.activeExecutable().handle
-        ) {
-          huePubSub.publish(ADD_TO_HISTORY_EVENT, {
-            absoluteUrl: undefined,
-            statement: this.activeExecutable().handle.statement,
-            lastExecuted: this.activeExecutable().executeStarted,
-            status: this.activeExecutable().status,
-            name: this.parentNotebook.name(),
-            uuid: this.activeExecutable().history.uuid
-          });
-        }
       }
     });
 

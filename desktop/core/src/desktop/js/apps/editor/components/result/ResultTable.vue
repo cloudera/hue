@@ -48,18 +48,16 @@
 </template>
 
 <script lang="ts">
+  import {
+    EXECUTABLE_RESULT_UPDATED_TOPIC,
+    EXECUTABLE_UPDATED_TOPIC,
+    ExecutableResultUpdatedEvent
+  } from 'apps/editor/execution/events';
   import { defineComponent, PropType } from 'vue';
 
   import { ResultMeta } from 'apps/editor/execution/api';
-  import Executable, {
-    EXECUTABLE_UPDATED_EVENT,
-    ExecutionStatus
-  } from 'apps/editor/execution/executable';
-  import ExecutionResult, {
-    RESULT_UPDATED_EVENT,
-    ResultRow,
-    ResultType
-  } from 'apps/editor/execution/executionResult';
+  import Executable, { ExecutionStatus } from 'apps/editor/execution/executable';
+  import ExecutionResult, { ResultRow, ResultType } from 'apps/editor/execution/executionResult';
   import { Column } from 'components/HueTable';
   import HueTable from 'components/HueTable.vue';
   import SubscriptionTracker from 'components/utils/SubscriptionTracker';
@@ -149,17 +147,20 @@
     },
 
     mounted(): void {
-      this.subTracker.subscribe(EXECUTABLE_UPDATED_EVENT, (executable: Executable) => {
+      this.subTracker.subscribe<ExecutableUpdatedEvent>(EXECUTABLE_UPDATED_TOPIC, executable => {
         if (this.executable && this.executable.id === executable.id) {
           this.updateFromExecutable(executable);
         }
       });
 
-      this.subTracker.subscribe(RESULT_UPDATED_EVENT, (executionResult: ExecutionResult) => {
-        if (this.executable && this.executable.id === executionResult.executable.id) {
-          this.handleResultChange();
+      this.subTracker.subscribe<ExecutableResultUpdatedEvent>(
+        EXECUTABLE_RESULT_UPDATED_TOPIC,
+        (executionResult: ExecutionResult) => {
+          if (this.executable && this.executable.id === executionResult.executable.id) {
+            this.handleResultChange();
+          }
         }
-      });
+      );
     },
 
     unmounted(): void {

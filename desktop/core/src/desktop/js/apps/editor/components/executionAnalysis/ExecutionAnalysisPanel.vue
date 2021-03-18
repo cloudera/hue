@@ -46,19 +46,19 @@
 </template>
 
 <script lang="ts">
+  import {
+    EXECUTABLE_LOGS_UPDATED_TOPIC,
+    EXECUTABLE_UPDATED_TOPIC,
+    ExecutableLogsUpdatedEvent,
+    ExecutableUpdatedEvent
+  } from 'apps/editor/execution/events';
   import { debounce } from 'lodash';
   import { defineComponent, computed, onBeforeUnmount, ref, reactive } from 'vue';
 
   import { ExecutionJob } from 'apps/editor/execution/api';
-  import Executable, {
-    EXECUTABLE_UPDATED_EVENT,
-    ExecutionStatus
-  } from 'apps/editor/execution/executable';
+  import Executable, { ExecutionStatus } from 'apps/editor/execution/executable';
   import SqlExecutable from 'apps/editor/execution/sqlExecutable';
-  import ExecutionLogs, {
-    ExecutionError,
-    LOGS_UPDATED_EVENT
-  } from 'apps/editor/execution/executionLogs';
+  import { ExecutionError } from 'apps/editor/execution/executionLogs';
   import HueLink from 'components/HueLink.vue';
   import LogsPanel from 'components/LogsPanel.vue';
   import SubscriptionTracker from 'components/utils/SubscriptionTracker';
@@ -115,11 +115,14 @@
 
       updateFromExecutable(props.executable);
 
-      subTracker.subscribe(EXECUTABLE_UPDATED_EVENT, updateFromExecutable);
+      subTracker.subscribe<ExecutableUpdatedEvent>(EXECUTABLE_UPDATED_TOPIC, updateFromExecutable);
 
-      subTracker.subscribe(LOGS_UPDATED_EVENT, (executionLogs: ExecutionLogs) => {
-        updateFromExecutable(executionLogs.executable);
-      });
+      subTracker.subscribe<ExecutableLogsUpdatedEvent>(
+        EXECUTABLE_LOGS_UPDATED_TOPIC,
+        executionLogs => {
+          updateFromExecutable(executionLogs.executable);
+        }
+      );
 
       return {
         analysisAvailable,
