@@ -41,6 +41,7 @@ from desktop import appmanager
 from desktop.auth.backend import is_admin, create_user
 from desktop.conf import APP_BLACKLIST, ENABLE_ORGANIZATIONS, ENABLE_PROMETHEUS
 from desktop.lib.django_test_util import make_logged_in_client
+from desktop.lib.i18n import smart_unicode
 from desktop.lib.test_utils import grant_access
 from desktop.views import home
 from hadoop import pseudo_hdfs4
@@ -55,10 +56,8 @@ from useradmin.models import HuePermission, GroupPermission, UserProfile, get_pr
 from useradmin.hue_password_policy import reset_password_policy
 
 if sys.version_info[0] > 2:
-  from django.utils.encoding import smart_text as smart_unicode
   from unittest.mock import patch, Mock
 else:
-  from django.utils.encoding import smart_unicode
   from mock import patch, Mock
 
 
