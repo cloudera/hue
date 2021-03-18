@@ -29,10 +29,11 @@
 </template>
 
 <script lang="ts">
+  import { EXECUTABLE_UPDATED_TOPIC, ExecutableUpdatedEvent } from 'apps/editor/execution/events';
   import { defineComponent, PropType, ref, toRefs, watch } from 'vue';
 
   import SubscriptionTracker from 'components/utils/SubscriptionTracker';
-  import Executable, { EXECUTABLE_UPDATED_EVENT, ExecutionStatus } from '../execution/executable';
+  import Executable, { ExecutionStatus } from '../execution/executable';
 
   export default defineComponent({
     name: 'ExecutableProgressBar',
@@ -73,7 +74,7 @@
         { immediate: true }
       );
 
-      subTracker.subscribe(EXECUTABLE_UPDATED_EVENT, updated => {
+      subTracker.subscribe<ExecutableUpdatedEvent>(EXECUTABLE_UPDATED_TOPIC, updated => {
         if (executable.value && executable.value.id === updated.id) {
           updateFromExecutable(updated);
         }
@@ -129,15 +130,18 @@
 
       .executable-progress-bar {
         background-color: $fluid-white;
+
         @include ease-transition(height);
 
         @include keyframes(pulsate) {
           0% {
             margin-left: 0;
           }
+
           50% {
             margin-left: 30px;
           }
+
           100% {
             margin-left: 0;
           }

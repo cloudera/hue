@@ -14,12 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { EXECUTABLE_UPDATED_TOPIC, ExecutableUpdatedEvent } from 'apps/editor/execution/events';
 import { nextTick } from 'vue';
 import { shallowMount, mount } from '@vue/test-utils';
-import Executable, {
-  EXECUTABLE_UPDATED_EVENT,
-  ExecutionStatus
-} from 'apps/editor/execution/executable';
+import Executable, { ExecutionStatus } from 'apps/editor/execution/executable';
 import ExecutableProgressBar from './ExecutableProgressBar.vue';
 import huePubSub from 'utils/huePubSub';
 
@@ -49,7 +47,10 @@ describe('ExecutableProgressBar.vue', () => {
 
     mockExecutable.status = ExecutionStatus.failed;
     mockExecutable.progress = 10;
-    huePubSub.publish(EXECUTABLE_UPDATED_EVENT, mockExecutable);
+    huePubSub.publish<ExecutableUpdatedEvent>(
+      EXECUTABLE_UPDATED_TOPIC,
+      mockExecutable as Executable
+    );
     await nextTick();
 
     expect(progressDiv.style['width']).toEqual('100%');
@@ -75,7 +76,10 @@ describe('ExecutableProgressBar.vue', () => {
 
     mockExecutable.status = ExecutionStatus.running;
     mockExecutable.progress = 10;
-    huePubSub.publish(EXECUTABLE_UPDATED_EVENT, mockExecutable);
+    huePubSub.publish<ExecutableUpdatedEvent>(
+      EXECUTABLE_UPDATED_TOPIC,
+      mockExecutable as Executable
+    );
     await nextTick();
 
     expect(progressDiv.style['width']).toEqual('10%');

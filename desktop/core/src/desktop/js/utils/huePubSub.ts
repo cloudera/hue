@@ -18,7 +18,9 @@
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-type listener = (data: any) => void;
+interface Listener<T> {
+  (data: T): void;
+}
 
 enum PubSubState {
   RUNNING,
@@ -27,7 +29,7 @@ enum PubSubState {
 
 const topics: {
   [topic: string]: {
-    listener: listener;
+    listener: Listener<any>;
     app?: string;
     state: PubSubState;
   }[];
@@ -39,7 +41,11 @@ export interface HueSubscription {
   remove: () => void;
 }
 
-const subscribe = (topic: string, listener: listener, app?: string): HueSubscription => {
+const subscribe = <T = any>(
+  topic: string,
+  listener: Listener<T>,
+  app?: string
+): HueSubscription => {
   if (!hOP.call(topics, topic)) {
     topics[topic] = [];
   }
@@ -63,7 +69,7 @@ const removeAll = (topic: string): void => {
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-const publish = (topic: string, info?: any): void => {
+const publish = <T = any>(topic: string, info?: T): void => {
   if (!hOP.call(topics, topic)) {
     return;
   }
@@ -75,7 +81,11 @@ const publish = (topic: string, info?: any): void => {
   });
 };
 
-const subscribeOnce = (topic: string, listener: listener, app: string): HueSubscription => {
+const subscribeOnce = <T = any>(
+  topic: string,
+  listener: Listener<T>,
+  app: string
+): HueSubscription => {
   const ephemeral = subscribe(
     topic,
     arg => {

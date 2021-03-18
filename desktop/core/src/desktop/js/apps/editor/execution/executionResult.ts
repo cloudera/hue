@@ -21,14 +21,16 @@ import {
   ResultMeta,
   ResultSizeApiResponse
 } from 'apps/editor/execution/api';
+import {
+  EXECUTABLE_RESULT_UPDATED_TOPIC,
+  ExecutableResultUpdatedEvent
+} from 'apps/editor/execution/events';
 import { Observable } from 'knockout';
 import * as ko from 'knockout';
 
 import huePubSub from 'utils/huePubSub';
 import { sleep } from 'utils/hueUtils';
 import Executable, { ExecutionStatus } from './executable';
-
-export const RESULT_UPDATED_EVENT = 'hue.executable.result.updated';
 
 export const RESULT_TYPE = {
   TABLE: 'table'
@@ -200,6 +202,6 @@ export default class ExecutionResult {
   }
 
   notify(): void {
-    huePubSub.publish(RESULT_UPDATED_EVENT, this);
+    huePubSub.publish<ExecutableResultUpdatedEvent>(EXECUTABLE_RESULT_UPDATED_TOPIC, this);
   }
 }
