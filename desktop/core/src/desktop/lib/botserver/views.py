@@ -120,13 +120,13 @@ def handle_on_link_shared(channel_id, message_ts, links):
     user = rewrite_user(User.objects.get(username=doc.owner.username))
     request = MockRequest(user=user)
 
-    payload, file_status = _make_unfurl_payload(request, item['url'], id_type, doc, doc_type)
-    response = slack_client.chat_unfurl(channel=channel_id, ts=message_ts, unfurls=payload)
+    payload = _make_unfurl_payload(request, item['url'], id_type, doc, doc_type)
+    response = slack_client.chat_unfurl(channel=channel_id, ts=message_ts, unfurls=payload['payload'])
     if not response['ok']:
       raise PopupException(_("Cannot unfurl link"), detail=response["error"])
     
     # Generate and upload result xlsx file only if result available
-    if file_status:
+    if payload['file_status']:
       notebook = json.loads(doc.data)
       snippet = notebook['snippets'][0]
       snippet['statement'] = notebook['snippets'][0]['statement_raw']
@@ -186,10 +186,11 @@ def _make_unfurl_payload(request, url, id_type, doc, doc_type):
   created_by = doc.owner.get_full_name() or doc.owner.username
   name = doc.name or dialect
 
+  file_status = False
+
   if id_type == 'editor':
     max_rows = 2
     no_result_msg = 'Query result has expired or could not be found'
-
     try:
       status = _check_status(request, operation_id=doc_data['uuid'])
       if status['query_status']['status'] == 'available':
@@ -199,13 +200,10 @@ def _make_unfurl_payload(request, url, id_type, doc, doc_type):
           file_status = True
         else:
           unfurl_result = no_result_msg
-          file_status = False
     except:
       unfurl_result = no_result_msg
-      file_status = False
   else:
     unfurl_result = 'Result is not available for Gist'
-    file_status = False
 
   payload = {
     url: {
@@ -252,7 +250,7 @@ def _make_unfurl_payload(request, url, id_type, doc, doc_type):
     }
   }
 
-  return payload, file_status
+  return {'payload': payload, 'file_status': file_status}
 
 
 def say_hi_user(channel_id, user_id):
