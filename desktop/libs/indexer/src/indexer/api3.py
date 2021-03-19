@@ -20,6 +20,7 @@ standard_library.install_aliases()
 
 from builtins import zip
 from past.builtins import basestring
+import csv
 import json
 import logging
 import urllib.error
@@ -27,6 +28,7 @@ import sys
 
 from django.urls import reverse
 from django.views.decorators.http import require_POST
+from django.core.files.storage import FileSystemStorage
 
 LOG = logging.getLogger(__name__)
 
@@ -48,14 +50,14 @@ from notebook.models import MockedDjangoRequest, escape_rows
 
 from indexer.controller import CollectionManagerController
 from indexer.file_format import HiveFormat
-from indexer.fields import Field
+from indexer.fields import Field, guess_field_type_from_samples
 from indexer.indexers.envelope import _envelope_job
 from indexer.indexers.base import get_api
 from indexer.indexers.flink_sql import FlinkIndexer
 from indexer.indexers.morphline import MorphlineIndexer, _create_solr_collection
 from indexer.indexers.phoenix_sql import PhoenixIndexer
 from indexer.indexers.rdbms import run_sqoop, _get_api
-from indexer.indexers.sql import _create_database, _create_table
+from indexer.indexers.sql import _create_database, _create_table, _create_table_from_local
 from indexer.models import _save_pipeline
 from indexer.solr_client import SolrClient, MAX_UPLOAD_SIZE
 from indexer.indexers.flume import FlumeIndexer
@@ -86,6 +88,7 @@ try:
 except ImportError as e:
   LOG.warning('Solr Search interface is not enabled')
 
+csv_data = []
 
 def _escape_white_space_characters(s, inverse=False):
   MAPPINGS = {
@@ -117,7 +120,16 @@ def _convert_format(format_dict, inverse=False):
 def guess_format(request):
   file_format = json.loads(request.POST.get('fileFormat', '{}'))
 
-  if file_format['inputFormat'] == 'file':
+  if file_format['inputFormat'] == 'localfile':
+    format_ = {
+      "quoteChar": "\"",
+      "recordSeparator": '\\n',
+      "type": "csv",
+      "hasHeader": True,
+      "fieldSeparator": ","
+    }
+
+  elif file_format['inputFormat'] == 'file':
     path = urllib_unquote(file_format["path"])
     indexer = MorphlineIndexer(request.user, request.fs)
     if not request.fs.isfile(path):
@@ -208,11 +220,50 @@ def guess_format(request):
   format_['status'] = 0
   return JsonResponse(format_)
 
+def decode_utf8(input_iterator):
+  for l in input_iterator:
+    yield l.decode('utf-8')
 
 def guess_field_types(request):
   file_format = json.loads(request.POST.get('fileFormat', '{}'))
 
-  if file_format['inputFormat'] == 'file':
+  if file_format['inputFormat'] == 'localfile':
+    upload_file = request.FILES['inputfile']
+    fs = FileSystemStorage()
+    name = fs.save(upload_file.name, upload_file)
+    reader = csv.reader(decode_utf8(upload_file))
+
+    sample = []
+    column_row = []
+
+    for count, row in enumerate(reader):
+      if count == 0:
+        column_row = row
+      elif count <= 5:
+        sample.append(row)
+        csv_data.append(row)
+      else:
+        csv_data.append(row)
+
+    field_type_guesses = []
+    for col in range(len(column_row)):
+      column_samples = [sample_row[col] for sample_row in sample if len(sample_row) > col]
+
+      field_type_guess = guess_field_type_from_samples(column_samples)
+      field_type_guesses.append(field_type_guess)
+
+    columns = [
+      Field(column_row[i], field_type_guesses[i]).to_dict()
+      for i in range(len(column_row))
+    ]
+
+    format_ = {
+      'file_url': fs.url(name),
+      'columns': columns,
+      'sample': sample
+    }
+
+  elif file_format['inputFormat'] == 'file':
     indexer = MorphlineIndexer(request.user, request.fs)
     path = urllib_unquote(file_format["path"])
     stream = request.fs.open(path)
@@ -493,12 +544,21 @@ def importer_submit(request):
     else:
       job_handle = job_nb.execute(request, batch=False)
   else:
-    job_handle = _create_table(
-      request,
-      source,
-      destination,
-      start_time
-    )
+    if source['inputFormat'] == 'localfile':
+      job_handle = _create_table_from_local(
+        request,
+        source,
+        destination,
+        csv_data,
+        start_time
+      )
+    else:
+      job_handle = _create_table(
+        request,
+        source,
+        destination,
+        start_time
+      )
 
   request.audit = {
     'operation': 'EXPORT',
