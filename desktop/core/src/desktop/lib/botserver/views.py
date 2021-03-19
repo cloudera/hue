@@ -176,7 +176,7 @@ def _make_result_table(result):
 
     table.append(pivot_row)
 
-  return tabulate(table, tablefmt="plain")
+  return tabulate(table, headers=['Columns({})'.format(idx+1), '', ''], tablefmt="simple")
 
 
 def _make_unfurl_payload(request, url, id_type, doc, doc_type):
