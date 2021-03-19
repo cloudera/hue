@@ -266,7 +266,53 @@ class SQLIndexer(object):
         is_task=True
     )
 
+  def create_table_from_local_file(self, source, destination, csv_data, start_time=-1):
+    if '.' in destination['name']:
+      database, table_name = destination['name'].split('.', 1)
+    else:
+      database = 'default'
+      table_name = destination['name']
+    final_table_name = table_name
 
+    # source_type = source['sourceType']
+    source_type = 'hive'
+    # editor_type = '50'  # destination['sourceType']
+    # editor_type = destination['sourceType']
+    editor_type = 'hive'
+
+    columns = destination['columns']
+
+    sql = '''CREATE TABLE IF NOT EXISTS %(table_name)s (
+%(columns)s
+);
+''' % {
+          'database': database,
+          'table_name': table_name,
+          'columns': ',\n'.join(['  `%(name)s` %(type)s' % col for col in columns]),
+          'primary_keys': ', '.join(destination.get('indexerPrimaryKey'))
+      }
+
+    for csv_row in csv_data:
+      sql += '''
+          INSERT INTO %(table_name)s VALUES %(csv_row)s;
+          ''' % {
+                  'table_name': table_name,
+                  'csv_row': tuple(csv_row)
+                }
+
+    on_success_url = reverse('metastore:describe_table', kwargs={'database': database, 'table': final_table_name}) + \
+        '?source_type=' + source_type
+
+    return make_notebook(
+        name=_('Creating table %(database)s.%(table)s') % {'database': database, 'table': final_table_name},
+        editor_type=editor_type,
+        statement=sql.strip(),
+        status='ready',
+        database=database,
+        on_success_url=on_success_url,
+        last_executed=start_time,
+        is_task=True
+    )
 
 def _create_database(request, source, destination, start_time):
   database = destination['name']
@@ -306,6 +352,14 @@ def _create_database(request, source, destination, start_time):
 
 def _create_table(request, source, destination, start_time=-1):
   notebook = SQLIndexer(user=request.user, fs=request.fs).create_table_from_a_file(source, destination, start_time)
+
+  if request.POST.get('show_command'):
+    return {'status': 0, 'commands': notebook.get_str()}
+  else:
+    return notebook.execute(request, batch=False)
+
+def _create_table_from_local(request, source, destination, csv_data, start_time=-1):
+  notebook = SQLIndexer(user=request.user, fs=request.fs).create_table_from_local_file(source, destination, csv_data, start_time)
 
   if request.POST.get('show_command'):
     return {'status': 0, 'commands': notebook.get_str()}
