@@ -24,7 +24,7 @@
   from impala import impala_flags
   from notebook.conf import ENABLE_SQL_INDEXER
 
-  from indexer.conf import ENABLE_NEW_INDEXER, ENABLE_SQOOP, ENABLE_KAFKA, CONFIG_INDEXER_LIBS_PATH, ENABLE_SCALABLE_INDEXER, ENABLE_ALTUS, ENABLE_ENVELOPE, ENABLE_FIELD_EDITOR
+  from indexer.conf import ENABLE_NEW_INDEXER, ENABLE_SQOOP, ENABLE_KAFKA, CONFIG_INDEXER_LIBS_PATH, ENABLE_SCALABLE_INDEXER, ENABLE_ALTUS, ENABLE_ENVELOPE, ENABLE_FIELD_EDITOR, ENABLE_DIRECT_UPLOAD
 
   if sys.version_info[0] > 2:
     from django.utils.translation import gettext as _
@@ -234,6 +234,17 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
             <!-- /ko -->
           </div>
 
+          <div data-bind="visible: createWizard.source.inputFormat() == 'localfile'">
+              <form method="post" action="" enctype="multipart/form-data" id="uploadform">
+                <div >
+                    <input type="file" id="inputfile" name="inputfile" accept=".csv">
+                    <input type="button" class="button" value="Upload" id="but_upload">
+                </div>
+                <label for="path" class="control-label"><div>${ _('Path') }</div>
+                  <input type="text" id="file_path" data-bind="value: createWizard.source.path">
+            </form>
+          </div>
+
           <!-- ko if: createWizard.source.inputFormat() == 'rdbms' -->
 
             <!-- ko if: createWizard.source.rdbmsMode() -->
@@ -441,7 +452,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
     </div>
 
     <!-- ko if: createWizard.source.show() && createWizard.source.inputFormat() != 'manual' -->
-    <div class="card step" data-bind="visible: createWizard.source.inputFormat() == 'file' || createWizard.source.inputFormat() == 'stream'">
+    <div class="card step" data-bind="visible: createWizard.source.inputFormat() == 'file' || createWizard.source.inputFormat() == 'localfile' || createWizard.source.inputFormat() == 'stream'">
       <!-- ko if: createWizard.isGuessingFormat -->
       <h4>${_('Guessing format...')} <i class="fa fa-spinner fa-spin"></i></h4>
       <!-- /ko -->
@@ -449,7 +460,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
       <h4>${_('Format')}</h4>
       <div class="card-body">
         <label data-bind="visible: (createWizard.prefill.source_type().length == 0 || createWizard.prefill.target_type() == 'index') &&
-            (createWizard.source.inputFormat() == 'file' || createWizard.source.inputFormat() == 'stream')">
+            (createWizard.source.inputFormat() == 'file' || createWizard.source.inputFormat() == 'localfile' || createWizard.source.inputFormat() == 'stream')">
           <div>${_('File Type')}</div>
           <select data-bind="selectize: $root.createWizard.fileTypes, value: $root.createWizard.fileTypeName,
               optionsText: 'description', optionsValue: 'name'"></select>
@@ -1760,7 +1771,10 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
           % if ENABLE_ENVELOPE.get():
           {'value': 'connector', 'name': 'Connectors'},
           % endif
-          {'value': 'manual', 'name': 'Manually'}
+          {'value': 'manual', 'name': 'Manually'},
+          % if ENABLE_DIRECT_UPLOAD.get():
+          {'value': 'localfile', 'name': 'LocalFile'}
+          % endif
           ##{'value': 'text', 'name': 'Paste Text'},
       ]);
       self.inputFormatsManual = ko.observableArray([
@@ -1776,7 +1790,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
       // File
       self.path = ko.observable('');
       self.path.subscribe(function(val) {
-        if (val) {
+        if (val && self.inputFormat() != 'localfile') {
           wizard.guessFormat();
           wizard.destination.nonDefaultLocation(val);
         }
@@ -2136,6 +2150,9 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
       });
 
       self.show = ko.pureComputed(function() {
+        if (self.inputFormat() === 'localfile') {
+          return self.path().length > 0;
+        }
         if (self.inputFormat() === 'file') {
           return self.path().length > 0;
         }
@@ -3138,6 +3155,54 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
       hueUtils.waitForRendered('.step-indicator li:first-child .caption', function(el){ return el.width() < $('#importerComponents').find('.content-panel-inner').width()/2 }, resizeElements);
 
       $(window).on('resize', resizeElements);
+
+      document.getElementById('inputfile').onchange = function () {
+        upload();
+        };
+        function upload() {
+          var fd = new FormData();
+          fd.append('fileFormat', ko.mapping.toJSON(viewModel.createWizard.source));
+            $.ajax({
+              url:"/indexer/api/indexer/guess_format",
+              type: 'post',
+              data: fd,
+              contentType:false,
+              cache: false,
+              processData:false,
+              beforeSend: function (){
+                viewModel.createWizard.isGuessingFormat(true);
+              },
+              success:function (resp) {
+                var newFormat = ko.mapping.fromJS(new FileType(resp['type'], resp));
+                viewModel.createWizard.source.format(newFormat);
+                viewModel.createWizard.isGuessingFormat(false);
+              }
+            });
+        };
+
+      $("#but_upload").click(function() {
+          var fd = new FormData();
+          var files = $('#inputfile')[0].files[0];
+          fd.append('inputfile', files);
+          fd.append('fileFormat', ko.mapping.toJSON(viewModel.createWizard.source));
+  
+          $.ajax({
+              url: '/indexer/api/indexer/guess_field_types',
+              type: 'post',
+              data: fd,
+              contentType: false,
+              processData: false,
+              beforeSend: function(){
+                viewModel.createWizard.isGuessingFieldTypes(true);
+              },
+              success: function(response){
+                viewModel.createWizard.loadSampleData(response);
+                viewModel.createWizard.isGuessingFieldTypes(false);
+                viewModel.createWizard.source.path(response['file_url']);
+                document.getElementById("file_path").value = response['file_url'];
+              },
+          });
+      });
 
       $('.importer-droppable').droppable({
         accept: ".draggableText",
