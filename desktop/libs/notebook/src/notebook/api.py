@@ -39,10 +39,11 @@ from indexer.file_format import HiveFormat
 from indexer.fields import Field
 from metadata.conf import OPTIMIZER
 
+from notebook.conf import EXAMPLES
 from notebook.connectors.base import Notebook, QueryExpired, SessionExpired, QueryError, _get_snippet_name, patch_snippet_for_connector
 from notebook.connectors.hiveserver2 import HS2Api
 from notebook.decorators import api_error_handler, check_document_access_permission, check_document_modify_permission
-from notebook.models import escape_rows, make_notebook, upgrade_session_properties, get_api, MockRequest
+from notebook.models import escape_rows, make_notebook, upgrade_session_properties, get_api, _get_dialect_example
 
 if sys.version_info[0] > 2:
   from urllib.parse import unquote as urllib_unquote
@@ -63,6 +64,7 @@ def create_notebook(request):
   editor_type = request.POST.get('type', 'notebook')
   gist_id = request.POST.get('gist')
   directory_uuid = request.POST.get('directory_uuid')
+  is_blank = request.POST.get('blank', 'false') == 'true'
 
   if gist_id:
     gist_doc = _get_gist_document(uuid=gist_id)
@@ -77,6 +79,12 @@ def create_notebook(request):
     )
   else:
     editor = Notebook()
+
+    if EXAMPLES.AUTO_OPEN.get() and not is_blank:
+      document = _get_dialect_example(dialect=editor_type)
+      if document:
+        editor = Notebook(document=document)
+        editor = upgrade_session_properties(request, editor)
 
   data = editor.get_data()
 
@@ -127,15 +135,14 @@ def _execute_notebook(request, notebook, snippet):
   response = {'status': -1}
   result = None
   history = None
+  active_executable = None
 
   historify = (notebook['type'] != 'notebook' or snippet.get('wasBatchExecuted')) and not notebook.get('skipHistorify')
 
   try:
     try:
       sessions = notebook.get('sessions') and notebook['sessions'] # Session reference for snippet execution without persisting it
-
       active_executable = json.loads(request.POST.get('executable', '{}')) # Editor v2
-
       # TODO: Use statement, database etc. from active_executable
 
       if historify:
@@ -178,11 +185,14 @@ def _execute_notebook(request, notebook, snippet):
           _snippet['result']['handle'] = response['handle']
           _snippet['result']['statements_count'] = response['handle'].get('statements_count', 1)
           _snippet['result']['statement_id'] = response['handle'].get('statement_id', 0)
-          _snippet['result']['handle']['statement'] = response['handle'].get('statement', snippet['statement']).strip() # For non HS2, as non multi query yet
+          _snippet['result']['handle']['statement'] = response['handle'].get(
+              'statement', snippet['statement']
+          ).strip() # For non HS2, as non multi query yet
         else:
           _snippet['status'] = 'failed'
 
-        if history: # If _historify failed, history will be None. If we get Atomic block exception, something underneath interpreter.execute() crashed and is not handled.
+        if history: # If _historify failed, history will be None.
+          # If we get Atomic block exception, something underneath interpreter.execute() crashed and is not handled.
           history.update_data(notebook)
           history.save()
 
@@ -313,15 +323,14 @@ def fetch_result_data(request):
       snippet['result']['handle']['guid'] if snippet['result'].get('handle') and snippet['result']['handle'].get('guid') else None
     )
 
-    response = _fetch_result_data(request.user, notebook, snippet, operation_id, rows=rows, start_over=start_over)
+    response = _fetch_result_data(request, notebook, snippet, operation_id, rows=rows, start_over=start_over)
     response['status'] = 0
 
     return JsonResponse(response)
 
 
-def _fetch_result_data(user, notebook=None, snippet=None, operation_id=None, rows=100, start_over=False, nulls_only=False):
-  snippet = _get_snippet(user, notebook, snippet, operation_id)
-  request = MockRequest(user)
+def _fetch_result_data(request, notebook=None, snippet=None, operation_id=None, rows=100, start_over=False, nulls_only=False):
+  snippet = _get_snippet(request.user, notebook, snippet, operation_id)
 
   response = {
     'result': get_api(request, snippet).fetch_result(notebook, snippet, rows, start_over)
@@ -475,7 +484,9 @@ def _save_notebook(notebook, user):
     notebook_doc = Document2.objects.get(id=notebook['id'])
   else:
     notebook_doc = Document2.objects.create(name=notebook['name'], uuid=notebook['uuid'], type=notebook_type, owner=user)
-    Document.objects.link(notebook_doc, owner=notebook_doc.owner, name=notebook_doc.name, description=notebook_doc.description, extra=notebook_type)
+    Document.objects.link(
+        notebook_doc, owner=notebook_doc.owner, name=notebook_doc.name, description=notebook_doc.description, extra=notebook_type
+    )
     save_as = True
 
     if notebook.get('directoryUuid'):
@@ -540,7 +551,8 @@ def _historify(notebook, user):
 
   # Link history of saved query
   if notebook['isSaved']:
-    parent_doc = Document2.objects.get(uuid=notebook.get('parentSavedQueryUuid') or notebook['uuid']) # From previous history query or initial saved query
+    # From previous history query or initial saved query
+    parent_doc = Document2.objects.get(uuid=notebook.get('parentSavedQueryUuid') or notebook['uuid'])
     notebook['parentSavedQueryUuid'] = parent_doc.uuid
     history_doc.dependencies.add(parent_doc)
 
@@ -556,7 +568,7 @@ def _historify(notebook, user):
   notebook['uuid'] = history_doc.uuid
   _clear_sessions(notebook)
   if ENABLE_CONNECTORS.get():
-    history_doc.connector_id = int(notebook['type'])
+    history_doc.connector_id = int(notebook['type'].split('-')[1])
   history_doc.update_data(notebook)
   history_doc.search = _get_statement(notebook)
   history_doc.save()
@@ -566,7 +578,17 @@ def _historify(notebook, user):
 
 def _get_statement(notebook):
   if notebook['snippets'] and len(notebook['snippets']) > 0:
-    return Notebook.statement_with_variables(notebook['snippets'][0])
+    snippet = notebook['snippets'][0]
+    try:
+      if snippet.get('executor', {}).get('executables', []):  # With Connectors/Editor 2
+        executable = snippet['executor']['executables'][0]
+        if executable.get('handle'):
+          return executable['handle']['statement']
+        else:
+          return executable['parsedStatement']['statement']
+      return Notebook.statement_with_variables(snippet)
+    except KeyError as e:
+      LOG.warning('Could not get statement from query history: %s' % e)
   return ''
 
 @require_GET
@@ -608,7 +630,7 @@ def get_history(request):
         'data': {
             'statement': statement[:1001] if statement else '',
             'lastExecuted': notebook['snippets'][0].get('lastExecuted', -1),
-            'status':  notebook['snippets'][0]['status'],
+            'status': notebook['snippets'][0].get('status', ''),
             'parentSavedQueryUuid': notebook.get('parentSavedQueryUuid', '')
         } if notebook['snippets'] else {},
         'absoluteUrl': doc.get_absolute_url(),
@@ -724,9 +746,10 @@ def autocomplete(request, server=None, database=None, table=None, column=None, n
   # Passed by check_document_access_permission but unused by APIs
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
+  action = request.POST.get('operation', 'schema')
 
   try:
-    autocomplete_data = get_api(request, snippet).autocomplete(snippet, database, table, column, nested)
+    autocomplete_data = get_api(request, snippet).autocomplete(snippet, database, table, column, nested, action)
     response.update(autocomplete_data)
   except QueryExpired as e:
     LOG.warn('Expired query seen: %s' % e)
@@ -1005,8 +1028,9 @@ def describe(request, database, table=None, column=None):
   response = {'status': -1, 'message': ''}
   notebook = json.loads(request.POST.get('notebook', '{}'))
   source_type = request.POST.get('source_type', '')
-  snippet = {'type': source_type}
+  connector = json.loads(request.POST.get('connector', '{}'))
 
+  snippet = {'type': source_type, 'connector': connector}
   patch_snippet_for_connector(snippet)
 
   describe = get_api(request, snippet).describe(notebook, snippet, database, table, column=column)

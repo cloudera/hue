@@ -35,7 +35,6 @@ sf_right_sidebar:
 sf_left_sidebar:
   - Sidebar-2
 categories:
-  - Querying
 
 ---
 In the latest Hue available in the [master][1] branch, we're excited to offer a preview of our entirely revamped and redesigned query editors for Hive and Impala.  These query editors will be officially available in the next major Hue 3.10 release.
@@ -310,7 +309,7 @@ Hue's new query editors are a huge leap forward in enriching and unifying the SQ
  [4]: http://squirrel-sql.sourceforge.net/
  [5]: https://gethue.com/bay-area-bike-share-data-analysis-with-spark-notebook-part-2/
  [6]: https://phoenix.apache.org
- [7]: https://msdn.microsoft.com/en-us/sqlserver/aa937724.aspx
+ [7]: https://docs.microsoft.com/en-us/sql/connect/jdbc/microsoft-jdbc-driver-for-sql-server
  [8]: http://my.vertica.com/download/vertica/client-drivers/
  [9]: https://phoenix.apache.org/download.html
  [10]: http://Presto JDBC Driver Download

@@ -1,0 +1,21 @@
+{{- if .Values.alerting.enabled -}}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    prometheus: hue
+    role: alert-rules
+  name: hue
+spec:
+  groups:
+    - name: hue-pod-monitor.alert.rules
+      rules:
+      - alert: hue_pods_are_down
+        expr: count(up{job="hue"})==0 #Update the rule according to alerting requirements
+        for: 30m #Change this based on your SLA
+        labels:
+          severity: High
+        annotations:
+          summary: Hue pods are down
+          impact: Users might not be able to query via Hue Web UI
+{{ end }}

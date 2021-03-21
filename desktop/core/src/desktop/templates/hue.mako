@@ -22,6 +22,7 @@
   from desktop.views import _ko, commonshare, login_modal
   from desktop.lib.i18n import smart_unicode
   from desktop.models import PREFERENCE_IS_WELCOME_TOUR_SEEN, hue_version, get_cluster_config
+  from desktop.webpack_utils import get_hue_bundles
 
   from dashboard.conf import IS_ENABLED as IS_DASHBOARD_ENABLED
   from filebrowser.conf import SHOW_UPLOAD_BUTTON
@@ -116,7 +117,7 @@ ${ hueIcons.symbols() }
 <input style="display:none" readonly autocomplete="false" type="password" name="fakepasswordremembered"/>
 
 <div class="hue-page">
-  <div class="hue-sidebar collapsed" data-bind="component: { name: 'hue-sidebar', params: {  } }"></div>
+  <hue-sidebar-web-component style="flex: 1 1 auto"></hue-sidebar-web-component>
 
   <div class="main-page">
     % if banner_message or conf.CUSTOM.BANNER_TOP_HTML.get():
@@ -138,9 +139,6 @@ ${ hueIcons.symbols() }
             <select data-bind="options: clusters, optionsText: 'name', value: 'id'" class="input-small" style="margin-top:8px">
             </select>
           % endif
-          <!-- ko if: window.ENABLE_NOTEBOOK_2 -->
-            <!-- ko component: 'quick-query-action' --><!-- /ko -->
-          <!-- /ko -->
           <!-- ko component: 'hue-history-panel' --><!-- /ko -->
           <!-- ko if: hasJobBrowser -->
             <!-- ko component: { name: 'hue-job-browser-links', params: { onePageViewModel: onePageViewModel }} --><!-- /ko -->
@@ -277,13 +275,9 @@ ${ hueIcons.symbols() }
 </div>
 ${ commonshare() | n,unicode }
 
-${ render_bundle('vendors~hue~notebook~tableBrowser') | n,unicode }
-${ render_bundle('vendors~hue~notebook') | n,unicode }
-${ render_bundle('vendors~hue') | n,unicode }
-${ render_bundle('hue~notebook') | n,unicode }
-${ render_bundle('hue~notebook~tableBrowser') | n,unicode }
-${ render_bundle('hue~tableBrowser') | n,unicode }
-${ render_bundle('hue') | n,unicode }
+% for bundle in get_hue_bundles('hue'):
+  ${ render_bundle(bundle) | n,unicode }
+% endfor
 
 <script src="${ static('desktop/js/polyfills.js') }"></script>
 <script src="${ static('desktop/ext/js/tether.js') }"></script>
@@ -296,13 +290,6 @@ ${ render_bundle('hue') | n,unicode }
 <script src="${ static('desktop/js/bootstrap-tooltip.js') }"></script>
 <script src="${ static('desktop/js/bootstrap-typeahead-touchscreen.js') }"></script>
 <script src="${ static('desktop/ext/js/bootstrap-better-typeahead.min.js') }"></script>
-
-<script src="${ static('desktop/js/ace/ace.js') }"></script>
-<script src="${ static('desktop/js/ace/mode-impala.js') }"></script>
-<script src="${ static('desktop/js/ace/mode-hive.js') }"></script>
-<script src="${ static('desktop/js/ace/ext-language_tools.js') }"></script>
-<script src="${ static('desktop/js/ace.extended.js') }"></script>
-<script>ace.config.set("basePath", "${ static('desktop/js/ace') }");</script>
 
 <script src="${ static('desktop/js/share2.vm.js') }"></script>
 

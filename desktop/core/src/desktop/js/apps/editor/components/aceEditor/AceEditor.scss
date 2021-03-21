@@ -1,0 +1,363 @@
+@import '../../../../components/styles/colors.scss';
+@import '../../../../components/styles/mixins.scss';
+
+.ace-editor-component {
+  height: 100%;
+  width: 100%;
+  text-align: left;
+  color: $fluid-black;
+
+  .ace-editor {
+    height: 100%;
+  }
+
+  .hue-ace-syntax-error {
+    position: absolute;
+    border-bottom: 1px dotted $hue-error-color;
+    border-radius: 0 !important;
+  }
+
+  .hue-ace-syntax-warning {
+    position: absolute;
+    border-bottom: 1px dotted $hue-warning-color;
+    border-radius: 0 !important;
+  }
+
+  .ace-hue {
+    .ace_gutter-cell {
+      border-right: 1px solid transparent;
+
+      &.ace-active-gutter-decoration {
+        background-color: $hue-primary-color-light;
+        border-right: 1px solid $hue-primary-color-dark;
+      }
+
+      &.ace-executing-gutter-decoration {
+        background-color: $hue-primary-color-light;
+        border-right: 1px solid $hue-primary-color-dark;
+
+        @include animation(execute-pulse 2s infinite ease-in-out);
+
+        @include keyframes(execute-pulse) {
+          0% {
+            background-color: rgba(0, 140, 255, 0.1);
+          }
+
+          50% {
+            background-color: rgba(0, 140, 255, 0.4);
+            color: $fluid-gray-700;
+          }
+
+          100% {
+            background-color: rgba(0, 140, 255, 0.1);
+          }
+        }
+      }
+
+      &.ace-failed-gutter-decoration {
+        background-color: $fluid-red-050;
+        border-right: 1px solid $fluid-red-700;
+      }
+
+      &.ace-completed-gutter-decoration {
+        background-color: $fluid-green-050;
+        border-right: 1px solid $fluid-green-400;
+      }
+
+      &.ace_error {
+        background-color: $fluid-red-050;
+        border-right: 1px solid $fluid-red-700;
+        border-left: none;
+      }
+    }
+
+    .hue-ace-location {
+      position: absolute;
+      background-color: $hue-primary-color-light;
+      border: 1px solid $hue-primary-color-light;
+      border-radius: 1px;
+      margin-left: -1px;
+      margin-top: -1px;
+    }
+
+    .ace_marker-layer {
+      .ace-failed-marker {
+        position: absolute;
+        width: 100% !important;
+        margin-left: -3px;
+      }
+
+      .ace-failed-marker,
+      .ace_error-line {
+        background-color: $fluid-red-050 !important;
+        opacity: 0.5;
+        z-index: 6;
+      }
+    }
+  }
+
+  .ace-hue-dark {
+    .ace_gutter-cell {
+      border-right: 1px solid transparent;
+
+      &.ace-active-gutter-decoration {
+        background-color: $fluid-slate-700;
+        color: $fluid-slate-100;
+        border-right: 1px solid $fluid-slate-600;
+      }
+
+      &.ace_error {
+        background-color: $fluid-red-050;
+        border-right: 1px solid $fluid-red-700;
+        border-left: none;
+      }
+    }
+
+    .hue-ace-location {
+      position: absolute;
+      background-color: $fluid-slate-700;
+      border: 1px solid $fluid-slate-700;
+      border-radius: 1px;
+      margin-left: -1px;
+      margin-top: -1px;
+    }
+
+    .ace_marker-layer {
+      .ace-failed-marker {
+        position: absolute;
+        width: 100% !important;
+        margin-left: -3px;
+      }
+
+      .ace-failed-marker,
+      .ace_error-line {
+        background-color: $fluid-red-050 !important;
+        opacity: 0.5;
+        z-index: 6;
+      }
+    }
+  }
+
+  .hue-ace-autocompleter {
+    @include display-flex;
+
+    position: fixed;
+    z-index: 999;
+    max-height: 250px;
+    align-items: flex-start;
+  }
+
+  .autocompleter-suggestions,
+  .autocompleter-details {
+    @include display-flex;
+    @include flex(0 0 300px);
+    @include flex-direction(column);
+    @include box-shadow(2px, 0, 8px, rgba(0, 0, 0, 0.18));
+
+    width: 300px;
+    max-height: 250px;
+    overflow: hidden;
+    border: 1px solid $fluid-gray-300;
+    border-radius: 2px;
+    background-color: $fluid-white;
+  }
+
+  .autocompleter-suggestions {
+    z-index: 1002;
+  }
+
+  .autocompleter-details {
+    z-index: 1001;
+    margin-left: 5px;
+  }
+
+  .autocompleter-header {
+    @include flex(0 0 20px);
+
+    position: relative;
+    padding: 5px;
+    background-color: $fluid-gray-040;
+    line-height: 20px;
+    font-size: 14px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+
+    .popular {
+      color: $fluid-orange-300;
+      margin-top: 3px;
+      float: right;
+    }
+  }
+
+  .autocompleter-header-popularity {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 19px;
+    height: 19px;
+  }
+
+  .autocompleter-spinner {
+    position: relative;
+    float: right;
+    width: 15px;
+    margin-top: 1px;
+  }
+
+  .autocompleter-categories {
+    display: inline-block;
+    float: left;
+  }
+
+  .autocompleter-categories > div {
+    display: inline-block;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    padding: 0 5px;
+  }
+
+  .autocompleter-categories > div.active {
+    display: inline-block;
+    border-bottom: 2px solid $fluid-blue-400;
+    cursor: default;
+  }
+
+  .autocompleter-entries {
+    max-height: 225px;
+    position: relative;
+    overflow-y: auto;
+  }
+
+  .autocompleter-suggestion {
+    height: 19px;
+    clear: both;
+    background-color: $fluid-white;
+    padding: 3px;
+    cursor: pointer;
+    position: relative;
+    font: 12px normal Roboto Mono, Menlo, Monaco, Consolas, "Courier New", monospace;
+    direction: ltr;
+    line-height: 18px;
+  }
+
+  .autocompleter-suggestion:hover {
+    background-color: $fluid-gray-200;
+  }
+
+  .autocompleter-suggestion.selected {
+    background-color: $fluid-gray-300;
+  }
+
+  .autocompleter-suggestion-value {
+    width: 85%;
+    margin-left: 3px;
+    margin-right: 6px;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .autocompleter-suggestion-value b {
+    font-weight: bolder;
+  }
+
+  .autocompleter-suggestion-meta {
+    position: absolute;
+    background-color: inherit;
+    z-index: 1;
+    right: 0;
+    top: 3px;
+    padding-right: 3px;
+    color: $fluid-gray-700;
+    max-width: 65px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow-x: hidden;
+  }
+
+  .autocompleter-dot {
+    display: inline-block;
+    margin-top: 5px;
+    margin-right: 5px;
+    width: 8px;
+    height: 8px;
+    border-radius: 4px;
+  }
+
+  .autocompleter-details-contents {
+    max-height: 225px;
+    position: relative;
+    overflow-y: auto;
+  }
+
+  .autocompleter-details-contents-inner {
+    padding: 7px;
+  }
+
+  .autocompleter-details-contents .details-attribute,
+  .autocompleter-details-contents .details-popularity {
+    color: $fluid-gray-700;
+    display: inline-block;
+  }
+
+  .autocompleter-details-contents .details-popularity .progress {
+    display: inline-block;
+    border-radius: 2px;
+    height: 10px;
+    width: 80px;
+  }
+
+  .autocompleter-details-contents .details-popularity .progress .bar {
+    background-color: $fluid-blue-400;
+  }
+
+  .autocompleter-details-contents .details-comment,
+  .autocompleter-details-contents .details-description {
+    font-size: 14px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    color: $fluid-gray-700;
+  }
+
+  .autocompleter-details-contents .details-header {
+    font-size: 14px;
+    font-weight: bold;
+    margin: 2px 0;
+  }
+
+  .autocompleter-details-contents .details-no-comment {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    font-size: 13px;
+    color: $fluid-gray-700;
+    font-style: italic;
+  }
+
+  .autocompleter-details-contents .details-comment * {
+    font-size: 13px !important;
+    line-height: 14px !important;
+    white-space: pre;
+  }
+
+  .autocompleter-details-contents .details-code {
+    background-color: $fluid-gray-040;
+    padding: 3px;
+    color: $fluid-gray-700;
+    font: 12px normal Roboto Mono, Menlo, Monaco, Consolas, "Courier New", monospace;
+    direction: ltr;
+  }
+
+  .fn-details {
+    max-width: 600px;
+    white-space: normal;
+    overflow-y: auto;
+    height: 100%;
+    padding: 8px;
+  }
+
+  .fn-sig {
+    white-space: pre;
+    font-family: monospace;
+  }
+}

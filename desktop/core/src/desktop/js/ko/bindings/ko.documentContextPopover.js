@@ -39,11 +39,11 @@ import huePubSub from 'utils/huePubSub';
  * @type {{init: ko.bindingHandlers.documentContextPopover.init}}
  */
 ko.bindingHandlers.documentContextPopover = {
-  init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+  init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
     ko.bindingHandlers.click.init(
       element,
       () => {
-        return function() {
+        return function () {
           const options = valueAccessor();
 
           apiHelper

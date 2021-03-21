@@ -24,6 +24,7 @@ from desktop.auth.backend import is_admin
 from desktop.conf import USE_NEW_EDITOR
 from desktop.models import hue_version
 from desktop.lib.i18n import smart_unicode
+from desktop.webpack_utils import get_hue_bundles
 
 home_url = url('desktop_views_home')
 if USE_NEW_EDITOR.get():
@@ -134,7 +135,7 @@ if USE_NEW_EDITOR.get():
 
   ${ commonHeaderFooterComponents.header_i18n_redirection() }
 
-  % if user.is_authenticated():
+  % if user.is_authenticated:
   <%
     global_constants_url = '/desktop/globalJsConstants.js?v=' + hue_version()
   %>
@@ -145,17 +146,9 @@ if USE_NEW_EDITOR.get():
   <script src="${ static('desktop/js/hue.errorcatcher.js') }"></script>
   % endif
 
-  % if section == "login":
-    ${ render_bundle('login', config='LOGIN') | n,unicode }
-  %else:
-    ${ render_bundle('vendors~hue~notebook~tableBrowser') | n,unicode }
-    ${ render_bundle('vendors~hue~notebook') | n,unicode }
-    ${ render_bundle('vendors~hue') | n,unicode }
-    ${ render_bundle('hue~notebook') | n,unicode }
-    ${ render_bundle('hue~notebook~tableBrowser') | n,unicode }
-    ${ render_bundle('hue~tableBrowser') | n,unicode }
-    ${ render_bundle('hue') | n,unicode }
-  % endif
+  % for bundle in get_hue_bundles('login' if section == 'login' else 'hue', 'LOGIN' if section == 'login' else 'DEFAULT'):
+    ${ render_bundle(bundle, config='LOGIN' if section == 'login' else 'DEFAULT') | n,unicode }
+  % endfor
 
   <script src="${ static('desktop/js/bootstrap-tooltip.js') }"></script>
   <script src="${ static('desktop/js/bootstrap-typeahead-touchscreen.js') }"></script>
@@ -165,24 +158,13 @@ if USE_NEW_EDITOR.get():
   <script src="${ static('desktop/ext/js/moment-timezone-with-data.min.js') }" type="text/javascript" charset="utf-8"></script>
   <script src="${ static('desktop/ext/js/tzdetect.js') }" type="text/javascript" charset="utf-8"></script>
 
-% if user.is_authenticated():
-
-  <script src="${ static('desktop/js/ace/ace.js') }"></script>
-  <script src="${ static('desktop/js/ace/mode-impala.js') }"></script>
-  <script src="${ static('desktop/js/ace/mode-hive.js') }"></script>
-  <script src="${ static('desktop/js/ace/ext-language_tools.js') }"></script>
-  <script src="${ static('desktop/js/ace.extended.js') }"></script>
-
-  <script>
-    ace.config.set("basePath", "${ static('desktop/js/ace') }");
-  </script>
-
+% if user.is_authenticated:
   ${ hueAceAutocompleter.hueAceAutocompleter() }
 %endif
 
   ${ commonHeaderFooterComponents.header_pollers(user, is_s3_enabled, apps) }
 
-% if user.is_authenticated():
+% if user.is_authenticated:
   <script src="${ static('desktop/ext/js/localforage.min.js') }"></script>
 
   <script type="text/javascript">
@@ -241,7 +223,7 @@ ${ hueIcons.symbols() }
 <div class="navigator">
   <div class="pull-right">
 
-  % if user.is_authenticated() and section != 'login':
+  % if user.is_authenticated and section != 'login':
   <ul class="nav nav-pills">
     <li class="divider-vertical"></li>
     % if 'filebrowser' in apps:
@@ -317,7 +299,7 @@ ${ hueIcons.symbols() }
       <ul class="dropdown-menu pull-right">
       % if view_profile:
       <li>
-        <a href="${ url('useradmin.views.edit_user', username=user.username) }"><i class="fa fa-fw fa-key"></i>
+        <a href="${ url('useradmin:useradmin.views.edit_user', username=user.username) }"><i class="fa fa-fw fa-key"></i>
           % if is_ldap_setup:
             ${_('View Profile')}
           % else:
@@ -326,7 +308,7 @@ ${ hueIcons.symbols() }
         </a>
       </li>
         % if is_admin(user):
-          <li><a href="${ url('useradmin.views.list_users') }"><i class="fa fa-fw fa-group"></i> ${_('Manage Users')}</a></li>
+          <li><a href="${ url('useradmin:useradmin.views.list_users') }"><i class="fa fa-fw fa-group"></i> ${_('Manage Users')}</a></li>
         % endif
       % endif
       </ul>
@@ -347,7 +329,7 @@ ${ hueIcons.symbols() }
         <use xlink:href="#hi-logo"></use>
       </svg>
     </a>
-    % if user.is_authenticated() and section != 'login':
+    % if user.is_authenticated and section != 'login':
      <ul class="nav nav-pills pull-left">
        <li><a title="${_('My documents')}" data-rel="navigator-tooltip" data-bind="hueLink: '${ home_url }'" style="padding-bottom:2px!important"><i class="fa fa-home" style="font-size: 19px"></i></a></li>
        <%

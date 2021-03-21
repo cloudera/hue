@@ -147,6 +147,7 @@
 'ARCHIVE'                            { return 'ARCHIVE'; }
 'ASC'                                { return 'ASC'; }
 'AST'                                { return 'AST'; }
+'AT'                                 { return 'AT'; }
 'AVRO'                               { return 'AVRO'; }
 'BUCKET'                             { return 'BUCKET'; }
 'BUCKETS'                            { return 'BUCKETS'; }
@@ -164,6 +165,7 @@
 'COMPUTE'                            { return 'COMPUTE'; }
 'CONCATENATE'                        { return 'CONCATENATE'; }
 'COST'                               { return 'COST'; }
+'CRON'                               { return 'CRON'; }
 'CURRENT_DATE'                       { return 'CURRENT_DATE'; }
 'CURRENT_TIMESTAMP'                  { return 'CURRENT_TIMESTAMP'; }
 'CURRENT_USER'                       { return 'CURRENT_USER'; }
@@ -181,12 +183,17 @@
 'DETAIL'                             { return 'DETAIL'; }
 'DIRECTORY'                          { this.begin('hdfs'); return 'DIRECTORY'; }
 'DISABLE'                            { return 'DISABLE'; }
+'DISABLED'                           { return 'DISABLED'; }
 'DISTRIBUTE'                         { return 'DISTRIBUTE'; }
 'DISTRIBUTED'                        { return 'DISTRIBUTED'; }
 DOUBLE\s+PRECISION                   { return 'DOUBLE_PRECISION'; }
 'ENABLE'                             { return 'ENABLE'; }
+'ENABLED'                            { return 'ENABLED'; }
 'ESCAPED'                            { return 'ESCAPED'; }
+'EVERY'                              { return 'EVERY'; }
 'EXCHANGE'                           { return 'EXCHANGE'; }
+'EXECUTE'                            { return 'EXECUTE'; }
+'EXECUTED'                           { return 'EXECUTED'; }
 'EXPLAIN'                            { parser.determineCase(yytext); return 'EXPLAIN'; }
 'EXPORT'                             { parser.determineCase(yytext); return 'EXPORT'; }
 'EXPRESSION'                         { return 'EXPRESSION'; }
@@ -216,6 +223,7 @@ DOUBLE\s+PRECISION                   { return 'DOUBLE_PRECISION'; }
 'LOCATION'                           { this.begin('hdfs'); return 'LOCATION'; }
 'LOCK'                               { return 'LOCK'; }
 'LOCKS'                              { return 'LOCKS'; }
+'MANAGEDLOCATION'                    { this.begin('hdfs'); return 'MANAGEDLOCATION'; }
 'MATCHED'                            { return 'MATCHED'; }
 'MATERIALIZED'                       { return 'MATERIALIZED'; }
 'MERGE'                              { return 'MERGE'; }
@@ -228,6 +236,7 @@ DOUBLE\s+PRECISION                   { return 'DOUBLE_PRECISION'; }
 'NOSCAN'                             { return 'NOSCAN'; }
 'NOVALIDATE'                         { return 'NOVALIDATE'; }
 'OFFLINE'                            { return 'OFFLINE'; }
+'OFFSET'                             { return 'OFFSET'; }
 'ONLY'                               { return 'ONLY'; }
 'OPERATOR'                           { return 'OPERATOR'; }
 'OPTION'                             { return 'OPTION'; }
@@ -244,6 +253,7 @@ OVERWRITE\s+DIRECTORY                { this.begin('hdfs'); return 'OVERWRITE_DIR
 'PRIVILEGES'                         { return 'PRIVILEGES'; }
 'PURGE'                              { return 'PURGE'; }
 'QUARTER'                            { return 'QUARTER'; }
+'QUERY'                              { return 'QUERY'; }
 'RCFILE'                             { return 'RCFILE'; }
 'REBUILD'                            { return 'REBUILD'; }
 'RECOVER'                            { return 'RECOVER'; }
@@ -257,6 +267,7 @@ OVERWRITE\s+DIRECTORY                { this.begin('hdfs'); return 'OVERWRITE_DIR
 'REWRITE'                            { return 'REWRITE'; }
 'ROLE'                               { return 'ROLE'; }
 'ROLES'                              { return 'ROLES'; }
+'SCHEDULED'                          { return 'SCHEDULED'; }
 'SCHEMA'                             { return 'SCHEMA'; }
 'SCHEMAS'                            { return 'SCHEMAS'; }
 'SECOND'                             { return 'SECOND'; }
@@ -289,6 +300,7 @@ STORED\s+AS\s+DIRECTORIES            { return 'STORED_AS_DIRECTORIES'; }
 'UNARCHIVE'                          { return 'UNARCHIVE'; }
 'UNIONTYPE'                          { return 'UNIONTYPE'; }
 'UNIQUE'                             { return 'UNIQUE'; }
+'UNSET'                              { return 'UNSET'; }
 'USE'                                { parser.determineCase(yytext); parser.addStatementTypeLocation('USE', yylloc); return 'USE'; }
 'VECTORIZATION'                      { return 'VECTORIZATION'; }
 'VIEW'                               { return 'VIEW'; }

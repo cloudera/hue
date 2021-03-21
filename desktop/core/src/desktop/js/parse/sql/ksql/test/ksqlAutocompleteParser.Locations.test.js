@@ -19,13 +19,13 @@ import ksqlAutocompleteParser from '../ksqlAutocompleteParser';
 // prettier-ignore-start
 describe('ksqlAutocompleteParser.js locations', () => {
   beforeAll(() => {
-    ksqlAutocompleteParser.yy.parseError = function(msg) {
+    ksqlAutocompleteParser.yy.parseError = function (msg) {
       throw Error(msg);
     };
   });
 
   const assertAutoComplete = testDefinition => {
-    const debug = true;
+    const debug = false;
     expect(
       ksqlAutocompleteParser.parseSql(
         testDefinition.beforeCursor,
@@ -35,7 +35,7 @@ describe('ksqlAutocompleteParser.js locations', () => {
     ).toEqualDefinition(testDefinition);
   };
 
-  const assertLocations = function(options) {
+  const assertLocations = function (options) {
     assertAutoComplete({
       beforeCursor: options.beforeCursor,
       afterCursor: options.afterCursor || '',
@@ -63,6 +63,14 @@ describe('ksqlAutocompleteParser.js locations', () => {
           type: 'function',
           location: { first_line: 1, last_line: 1, first_column: 8, last_column: 10 },
           function: 'cos'
+        },
+        {
+          type: 'functionArgument',
+          location: { first_line: 1, last_line: 1, first_column: 12, last_column: 13 },
+          function: 'cos',
+          argumentPosition: 0,
+          identifierChain: [{ name: 'cos' }],
+          expression: { types: ['NUMBER'], text: '1' }
         },
         {
           type: 'alias',
@@ -1039,6 +1047,14 @@ describe('ksqlAutocompleteParser.js locations', () => {
             function: 'cos'
           },
           {
+            type: 'functionArgument',
+            location: { first_line: 1, last_line: 1, first_column: 17, last_column: 22 },
+            function: 'cos',
+            argumentPosition: 0,
+            identifierChain: [{ name: 'cos' }],
+            expression: { types: ['COLREF'], columnReference: [{ name: 'boo' }, { name: 'a' }] }
+          },
+          {
             type: 'table',
             location: { first_line: 1, last_line: 1, first_column: 17, last_column: 20 },
             identifierChain: [{ name: 'db1' }, { name: 'foo' }]
@@ -1279,6 +1295,14 @@ describe('ksqlAutocompleteParser.js locations', () => {
           type: 'function',
           location: { first_line: 1, last_line: 1, first_column: 8, last_column: 12 },
           function: 'count'
+        },
+        {
+          type: 'functionArgument',
+          location: { first_line: 1, last_line: 1, first_column: 14, last_column: 15 },
+          function: 'count',
+          argumentPosition: 0,
+          identifierChain: [{ name: 'count' }],
+          expression: { text: '*' }
         },
         {
           type: 'table',

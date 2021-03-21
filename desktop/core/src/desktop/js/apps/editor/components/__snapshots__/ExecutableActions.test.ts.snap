@@ -1,0 +1,10 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ExecutableActions.vue should render 1`] = `
+<div
+  class="snippet-execute-actions"
+>
+  <execute-button-stub />
+  <execute-limit-input-stub />
+</div>
+`;

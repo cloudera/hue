@@ -39,8 +39,7 @@ sf_caption_position:
 slide_template:
   - default
 categories:
-  - Administration
-  - Development
+  - Dev / API
 
 ---
 <p id="docs-internal-guid-63e96778-7525-df72-d153-e369f8395313">
@@ -74,7 +73,7 @@ categories:
   def sync(self, request):
     user = request.user
 
-    if not user or not user.is_authenticated():
+    if not user or not user.is_authenticated:
       return
 
     if not User.objects.filter(username=user.username, userprofile__creation_method=str(UserProfile.CreationMethod.EXTERNAL)).exists():

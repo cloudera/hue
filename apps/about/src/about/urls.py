@@ -15,12 +15,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from django.conf.urls import url
+import sys
+
 from about import views as about_views
 
-urlpatterns = [
-  url(r'^$', about_views.admin_wizard, name='index'),
-  url(r'^admin_wizard$', about_views.admin_wizard, name='admin_wizard'),
+if sys.version_info[0] > 2:
+  from django.urls import re_path
+else:
+  from django.conf.urls import url as re_path
 
-  url(r'^update_preferences$', about_views.update_preferences, name='update_preferences'),
+urlpatterns = [
+  re_path(r'^$', about_views.admin_wizard, name='index'),
+  re_path(r'^admin_wizard$', about_views.admin_wizard, name='admin_wizard'),
+
+  re_path(r'^update_preferences$', about_views.update_preferences, name='update_preferences'),
 ]

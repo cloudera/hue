@@ -19,7 +19,7 @@ import d3v3 from 'd3v3';
 
 import nv from 'ext/nv.d3.1.1.15b.custom';
 
-nv.models.growingPie = function() {
+nv.models.growingPie = function () {
   'use strict';
   //============================================================
   // Public Variables with Default Settings
@@ -28,13 +28,13 @@ nv.models.growingPie = function() {
   const margin = { top: 0, right: 0, bottom: 0, left: 0 };
   let width = 500,
     height = 500,
-    getX = function(d) {
+    getX = function (d) {
       return d.x;
     },
-    getY = function(d) {
+    getY = function (d) {
       return d.y;
     },
-    getDescription = function(d) {
+    getDescription = function (d) {
       return d.description;
     },
     id = Math.floor(Math.random() * 10000), //Create semi-unique ID in case user doesn't select one
@@ -62,7 +62,7 @@ nv.models.growingPie = function() {
   //============================================================
 
   function chart(selection) {
-    selection.each(function(data) {
+    selection.each(function (data) {
       let availableWidth = width - margin.left - margin.right,
         availableHeight = height - margin.top - margin.bottom,
         radius = Math.min(availableWidth, availableHeight) / 2,
@@ -112,12 +112,12 @@ nv.models.growingPie = function() {
         arcRadius = radius - radius / 5;
       }
 
-      const arcNormal = function() {
+      const arcNormal = function () {
         updateVariables();
         return d3v3.svg.arc().outerRadius(arcRadius);
       };
 
-      const arcOver = function() {
+      const arcOver = function () {
         updateVariables();
         return d3v3.svg.arc().outerRadius(arcRadius + 10);
       };
@@ -146,28 +146,20 @@ nv.models.growingPie = function() {
         .data(pie)
         .classed('selected', false);
 
-      const pieLabels = wrap
-        .select('.nv-pieLabels')
-        .selectAll('.nv-label')
-        .data(pie);
+      const pieLabels = wrap.select('.nv-pieLabels').selectAll('.nv-label').data(pie);
 
       slices.exit().remove();
       pieLabels.exit().remove();
 
-      selectSlices = function(selected) {
+      selectSlices = function (selected) {
         $(selected).each((cnt, item) => {
-          slices.each(function(d) {
+          slices.each(function (d) {
             if (
               (typeof d.data.obj.from != 'undefined' && d.data.obj.from === item) ||
               d.data.obj.value === item
             ) {
               d3v3.select(this).classed('selected', true);
-              d3v3
-                .select(this)
-                .select('path')
-                .transition()
-                .duration(100)
-                .attr('d', arcOver());
+              d3v3.select(this).select('path').transition().duration(100).attr('d', arcOver());
             }
           });
         });
@@ -177,13 +169,8 @@ nv.models.growingPie = function() {
         .enter()
         .append('g')
         .attr('class', 'nv-slice')
-        .on('mouseover', function(d, i) {
-          d3v3
-            .select(this)
-            .select('path')
-            .transition()
-            .duration(100)
-            .attr('d', arcOver());
+        .on('mouseover', function (d, i) {
+          d3v3.select(this).select('path').transition().duration(100).attr('d', arcOver());
           d3v3.select(this).classed('hover', true);
           dispatch.elementMouseover({
             label: getX(d.data),
@@ -194,14 +181,9 @@ nv.models.growingPie = function() {
             id: id
           });
         })
-        .on('mouseout', function(d, i) {
+        .on('mouseout', function (d, i) {
           if (!d3v3.select(this).classed('selected')) {
-            d3v3
-              .select(this)
-              .select('path')
-              .transition()
-              .duration(100)
-              .attr('d', arcNormal());
+            d3v3.select(this).select('path').transition().duration(100).attr('d', arcNormal());
           }
           d3v3.select(this).classed('hover', false);
           dispatch.elementMouseout({
@@ -212,13 +194,8 @@ nv.models.growingPie = function() {
             id: id
           });
         })
-        .on('click', function(d, i) {
-          d3v3
-            .select(this)
-            .select('path')
-            .transition()
-            .duration(100)
-            .attr('d', arcOver());
+        .on('click', function (d, i) {
+          d3v3.select(this).select('path').transition().duration(100).attr('d', arcOver());
           dispatch.elementClick({
             label: getX(d.data),
             value: getY(d.data),
@@ -229,13 +206,8 @@ nv.models.growingPie = function() {
           });
           d3v3.event.stopPropagation();
         })
-        .on('dblclick', function(d, i) {
-          d3v3
-            .select(this)
-            .select('path')
-            .transition()
-            .duration(100)
-            .attr('d', arcNormal());
+        .on('dblclick', function (d, i) {
+          d3v3.select(this).select('path').transition().duration(100).attr('d', arcNormal());
           dispatch.elementDblClick({
             label: getX(d.data),
             value: getY(d.data),
@@ -255,15 +227,11 @@ nv.models.growingPie = function() {
           return d.data.color || color(d, i);
         });
 
-      ae.append('path').each(function(d) {
+      ae.append('path').each(function (d) {
         this._current = d;
       });
 
-      slices
-        .select('path')
-        .transition()
-        .attr('d', arcNormal())
-        .attrTween('d', arcTween);
+      slices.select('path').transition().attr('d', arcNormal()).attrTween('d', arcTween);
 
       if (showLabels) {
         // This does the normal label
@@ -281,7 +249,7 @@ nv.models.growingPie = function() {
           .enter()
           .append('g')
           .classed('nv-label', true)
-          .each(function(d) {
+          .each(function (d) {
             if (d.value > 0) {
               const group = d3v3.select(this);
 
@@ -327,7 +295,7 @@ nv.models.growingPie = function() {
         const labelLocationHash = {};
         const avgHeight = 14;
         const avgWidth = 140;
-        const createHashKey = function(coordinates) {
+        const createHashKey = function (coordinates) {
           return (
             Math.floor(coordinates[0] / avgWidth) * avgWidth +
             ',' +
@@ -399,7 +367,7 @@ nv.models.growingPie = function() {
         }
         const i = d3v3.interpolate(this._current, a);
         this._current = i(0);
-        return function(t) {
+        return function (t) {
           return arcNormal()(i(t));
         };
       }
@@ -415,7 +383,7 @@ nv.models.growingPie = function() {
   chart.dispatch = dispatch;
   chart.options = nv.utils.optionsFunc.bind(chart);
 
-  chart.margin = function(_) {
+  chart.margin = function (_) {
     if (!arguments.length) {
       return margin;
     }
@@ -426,7 +394,7 @@ nv.models.growingPie = function() {
     return chart;
   };
 
-  chart.width = function(_) {
+  chart.width = function (_) {
     if (!arguments.length) {
       return width;
     }
@@ -434,7 +402,7 @@ nv.models.growingPie = function() {
     return chart;
   };
 
-  chart.height = function(_) {
+  chart.height = function (_) {
     if (!arguments.length) {
       return height;
     }
@@ -442,12 +410,12 @@ nv.models.growingPie = function() {
     return chart;
   };
 
-  chart.values = function() {
+  chart.values = function () {
     nv.log('pie.values() is no longer supported.');
     return chart;
   };
 
-  chart.x = function(_) {
+  chart.x = function (_) {
     if (!arguments.length) {
       return getX;
     }
@@ -455,7 +423,7 @@ nv.models.growingPie = function() {
     return chart;
   };
 
-  chart.y = function(_) {
+  chart.y = function (_) {
     if (!arguments.length) {
       return getY;
     }
@@ -463,7 +431,7 @@ nv.models.growingPie = function() {
     return chart;
   };
 
-  chart.description = function(_) {
+  chart.description = function (_) {
     if (!arguments.length) {
       return getDescription;
     }
@@ -471,7 +439,7 @@ nv.models.growingPie = function() {
     return chart;
   };
 
-  chart.showLabels = function(_) {
+  chart.showLabels = function (_) {
     if (!arguments.length) {
       return showLabels;
     }
@@ -479,7 +447,7 @@ nv.models.growingPie = function() {
     return chart;
   };
 
-  chart.labelSunbeamLayout = function(_) {
+  chart.labelSunbeamLayout = function (_) {
     if (!arguments.length) {
       return labelSunbeamLayout;
     }
@@ -487,7 +455,7 @@ nv.models.growingPie = function() {
     return chart;
   };
 
-  chart.donutLabelsOutside = function(_) {
+  chart.donutLabelsOutside = function (_) {
     if (!arguments.length) {
       return donutLabelsOutside;
     }
@@ -495,7 +463,7 @@ nv.models.growingPie = function() {
     return chart;
   };
 
-  chart.pieLabelsOutside = function(_) {
+  chart.pieLabelsOutside = function (_) {
     if (!arguments.length) {
       return pieLabelsOutside;
     }
@@ -503,7 +471,7 @@ nv.models.growingPie = function() {
     return chart;
   };
 
-  chart.labelType = function(_) {
+  chart.labelType = function (_) {
     if (!arguments.length) {
       return labelType;
     }
@@ -512,7 +480,7 @@ nv.models.growingPie = function() {
     return chart;
   };
 
-  chart.donut = function(_) {
+  chart.donut = function (_) {
     if (!arguments.length) {
       return donut;
     }
@@ -520,7 +488,7 @@ nv.models.growingPie = function() {
     return chart;
   };
 
-  chart.donutRatio = function(_) {
+  chart.donutRatio = function (_) {
     if (!arguments.length) {
       return donutRatio;
     }
@@ -528,7 +496,7 @@ nv.models.growingPie = function() {
     return chart;
   };
 
-  chart.startAngle = function(_) {
+  chart.startAngle = function (_) {
     if (!arguments.length) {
       return startAngle;
     }
@@ -536,7 +504,7 @@ nv.models.growingPie = function() {
     return chart;
   };
 
-  chart.endAngle = function(_) {
+  chart.endAngle = function (_) {
     if (!arguments.length) {
       return endAngle;
     }
@@ -544,7 +512,7 @@ nv.models.growingPie = function() {
     return chart;
   };
 
-  chart.id = function(_) {
+  chart.id = function (_) {
     if (!arguments.length) {
       return id;
     }
@@ -552,7 +520,7 @@ nv.models.growingPie = function() {
     return chart;
   };
 
-  chart.color = function(_) {
+  chart.color = function (_) {
     if (!arguments.length) {
       return color;
     }
@@ -560,7 +528,7 @@ nv.models.growingPie = function() {
     return chart;
   };
 
-  chart.valueFormat = function(_) {
+  chart.valueFormat = function (_) {
     if (!arguments.length) {
       return valueFormat;
     }
@@ -568,7 +536,7 @@ nv.models.growingPie = function() {
     return chart;
   };
 
-  chart.labelThreshold = function(_) {
+  chart.labelThreshold = function (_) {
     if (!arguments.length) {
       return labelThreshold;
     }
@@ -576,7 +544,7 @@ nv.models.growingPie = function() {
     return chart;
   };
 
-  chart.selectSlices = function(args) {
+  chart.selectSlices = function (args) {
     if (!arguments.length) {
       return selectSlices;
     }

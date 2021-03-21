@@ -1,0 +1,32 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SearchInput.vue should render 1`] = `
+<div
+  class="hue-search-input"
+>
+  <div>
+    <i
+      class="magnify-icon fa fa-fw fa-search"
+    />
+    <form
+      autocomplete="off"
+    >
+      <input
+        autocapitalize="off"
+        autocomplete="do-not-autocomplete"
+        autocorrect="off"
+        class="hue-search-input-el magnify-icon-input"
+        placeholder="Search..."
+        spellcheck="false"
+        type="text"
+      />
+      <input
+        autocomplete="do-not-autocomplete"
+        class="hue-search-input-overlay magnify-icon-input"
+        disabled=""
+        type="text"
+      />
+    </form>
+  </div>
+</div>
+`;

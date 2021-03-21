@@ -1,0 +1,28 @@
+{
+  "name": "vue3-webcomponent-wrapper",
+  "version": "0.1.4",
+  "description": "Wrap and register a Vue 3 component as a custom element.",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cloudera/hue.git",
+    "directory": "tools/vue3-webcomponent-wrapper"
+  },
+  "keywords": [
+    "Vue3",
+    "Web",
+    "Component",
+    "Hue"
+  ],
+  "author": "Sreenath Somarajapuram <somarajapuram@gmail.com>",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/cloudera/hue/issues",
+    "email" : "somarajapuram@gmail.com"
+  },
+  "homepage": "https://github.com/cloudera/hue/tree/master/tools/vue3-webcomponent-wrapper#readme",
+  "devDependencies": {}
+}

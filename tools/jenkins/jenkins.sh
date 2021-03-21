@@ -45,8 +45,6 @@ build_sqoop
 
 make apps
 
-build/env/bin/hue runpylint > PYLINT.txt
-
 rm -f JAVASCRIPTLINT.txt
 for FILE in $(find . -name *.js);
 do

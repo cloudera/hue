@@ -16,8 +16,12 @@
 # limitations under the License.
 
 import logging
+import sys
 
-from django.conf.urls import url
+if sys.version_info[0] > 2:
+  from django.urls import re_path
+else:
+  from django.conf.urls import url as re_path
 
 LOG = logging.getLogger(__name__)
 
@@ -37,18 +41,18 @@ except ImportError:
 
 if djangosaml2_views is not None:
   urlpatterns = [
-    url(r'^logout/$', djangosaml2_views.logout, name='saml2_logout')
+    re_path(r'^logout/$', djangosaml2_views.logout, name='saml2_logout')
   ]
 
   urlpatterns += [
-    url(r'^ls/$', libsaml_views.logout_service, name='saml2_ls'),
-    url(r'^acs/$', libsaml_views.assertion_consumer_service, name='saml2_acs'),
-    url(r'^login/$', libsaml_views.login, name='saml2_login'),
-    url(r'^metadata/$', libsaml_views.metadata, name='saml2_metadata'),
-    url(r'^test/$', libsaml_views.echo_attributes)
+    re_path(r'^ls/$', libsaml_views.logout_service, name='saml2_ls'),
+    re_path(r'^acs/$', libsaml_views.assertion_consumer_service, name='saml2_acs'),
+    re_path(r'^login/$', libsaml_views.login, name='saml2_login'),
+    re_path(r'^metadata/$', libsaml_views.metadata, name='saml2_metadata'),
+    re_path(r'^test/$', libsaml_views.echo_attributes)
   ]
 
   if logout_service_post is not None:
     urlpatterns += [
-      url(r'^ls/post/$', libsaml_views.logout_service_post, name='saml2_ls_post')
+      re_path(r'^ls/post/$', libsaml_views.logout_service_post, name='saml2_ls_post')
     ]

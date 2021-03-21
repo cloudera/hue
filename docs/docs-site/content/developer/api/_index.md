@@ -2,145 +2,52 @@
 title: "API"
 date: 2019-03-13T18:28:09-07:00
 draft: false
-weight: 5
+weight: 4
 ---
 
-Hue can easily be extended to natively support other databases or be enriched via other data catalogs. Some components of Hue like the SQL parsers or Editor Scratchpad can also be imported independently as dependencies into your own apps.
+# REST
+
+The user interface communicates (e.g. submit an SQL query, list some S3 files in a buck...) with the API server via a REST API which will then perform the operation with the remote services. Currently this API is private and subject to change but can already be reused for prove of concepts until the proper public API is released.
+
+In general we want to authenticate with a username and password, retrieve a `session` and [CSRF](https://docs.djangoproject.com/en/3.1/ref/csrf/) cookies and provide them in the follow-up calls so that Hue knows who we are and won't block you.
+
+**Note** The REST API will be properly public with versioning in [Hue 5](https://github.com/cloudera/hue/projects/5).
 
 
-## SQL Editor
+## Quickstart
 
-The [parsers](/developer/parsers/) are the flagship part of Hue and power extremely advanced autocompletes and other [SQL functionalities](/user/querying/#autocomplete). They are running on the client side and comes with just a few megabytes of JavaScript that are cached by the browser. This provides a very reactive experience to the end user and allows to import them as classic JavaScript modules for your own development needs.
+Hue is based on the [Django Web Framework](https://www.djangoproject.com/). Django comes with user authentication system. Django uses sessions and middleware to hook the authentication system into request object. Hue uses stock auth form which uses *username* and *password* and *csrftoken* form variables to authenticate.
 
-While the dynamic content like the list of tables, columns is obviously fetched via [remote endpoints](#sql-querying), all the SQL knowledge of the statements is available.
+### Curl
 
-See the currently shipped [SQL dialects](https://github.com/cloudera/hue/tree/master/desktop/core/src/desktop/js/parse/sql).
+First get the `CSRF` token:
 
-### npm package
+    curl -i -X GET https://demo.gethue.com/hue/accounts/login/?fromModal=true -o /dev/null -D -
 
-What if I only want to use only the autocomplete as a JavaScript module in my own app?
+It is important to note the `csrftoken` and `sessionid` values from the response:
 
-Importing the Parser can be simply done as a npm package. Here is an example on how to use the parser in a Node.js demo app. There are two ways to get the module:
+    set-cookie: csrftoken=XUFgN1WPZNlaJtBeBDtBvwzrOFqRXIaMlNJv4mdvsS2bIE2Lb8LRmCh5cPUBnBdk; expires=Mon, 13-Sep-2021 20:43:47 GMT; httponly; Max-Age=31449600; Path=/
+    set-cookie: sessionid=9cdltfee1q1zmt8b7slsjcomtxzgvgfz; expires=Mon, 14-Sep-2020 21:43:47 GMT; httponly; Max-Age=3600; Path=/
 
-* npm registry
+Then authenticate with the credendials and provide the `csrftoken` and `sessionid`  as well (note: `CRSF` currently needs to be repeated twice):
 
-    npm install gethue
+    curl -i -X POST https://demo.gethue.com/hue/accounts/login/?fromModal=true -d 'username=demo&password=demo' -o /dev/null -D - --cookie "csrftoken=XUFgN1WPZNlaJtBeBDtBvwzrOFqRXIaMlNJv4mdvsS2bIE2Lb8LRmCh5cPUBnBdk;sessionid=9cdltfee1q1zmt8b7slsjcomtxzgvgfz" -H "X-CSRFToken: XUFgN1WPZNlaJtBeBDtBvwzrOFqRXIaMlNJv4mdvsS2bIE2Lb8LRmCh5cPUBnBdk"
 
-Will install the latest from https://www.npmjs.com/package/gethue. Then import the parser you need with something like below and run it on an SQL statement:
+Then you can perform any operation as the `demo` user by providing the latest `CSRF` and the `sessionid` tokens with these parameters:
 
-    import sqlAutocompleteParser from 'gethue/parse/sql/hive/hiveAutocompleteParser';
+    --cookie "csrftoken=tkuKwiyRsEmt7zCqIfym4GCwPxAPQfnTm4Y97gUSszkCRih067sC2GA2mCrH6Lmu;sessionid=z6pjze6j6zrv3uoe2hxa8dfbhbn9bynp" -H "X-CSRFToken: tkuKwiyRsEmt7zCqIfym4GCwPxAPQfnTm4Y97gUSszkCRih067sC2GA2mCrH6Lmu"
 
-    const beforeCursor = 'SELECT col1, col2, tbl2.col3 FROM tbl; '; // Note extra space at end
-    const afterCursor = '';
-    const dialect = 'hive';
-    const debug = false;
+Here for example we list all the databases of the `hive` connector:
 
-    console.log(
-      JSON.stringify(
-        sqlAutocompleteParser.parseSql(beforeCursor, afterCursor, dialect, debug),
-        null,
-        2
-      )
-    );
+    curl -X POST https://demo.gethue.com/notebook/api/autocomplete/ --data 'snippet={"type":"hive"}' --cookie "csrftoken=XUFgN1WPZNlaJtBeBDtBvwzrOFqRXIaMlNJv4mdvsS2bIE2Lb8LRmCh5cPUBnBdk;sessionid=9cdltfee1q1zmt8b7slsjcomtxzgvgfz" -H "X-CSRFToken: XUFgN1WPZNlaJtBeBDtBvwzrOFqRXIaMlNJv4mdvsS2bIE2Lb8LRmCh5cPUBnBdk"
 
-Which then will output keywords suggestions and all the known locations:
+    {"status": 0, "databases": ["a0817", "arunso", "ath", "athlete", "beingdatum_db", "bharath_practice", "chungu", "darth", "default", "demo", "diwakar", "emp", "hadooptest", "hebe", "hello", "hivedataset", "hivemap", "hivetesting", "hr_db", "icedb", "lib", "libdemo", "lti", "m", "m1", "movie", "movie1", "movielens", "mscda", "my_database", "mydb", "mydemo", "noo", "prizesh", "rajeev", "ram", "retail", "ruban", "sept9", "sept9_2020", "student", "test", "test21", "test123", "ticktick", "userdb", "vidu"]}
 
-    { locations:
-      [ { type: 'statement', location: [Object] },
-        { type: 'statementType',
-          location: [Object],
-          identifier: 'SELECT' },
-        { type: 'selectList', missing: false, location: [Object] },
-        { type: 'column',
-          location: [Object],
-          identifierChain: [Array],
-          qualified: false,
-          tables: [Array] },
-        { type: 'column',
-          location: [Object],
-          identifierChain: [Array],
-          qualified: false,
-          tables: [Array] },
-        { type: 'column',
-          location: [Object],
-          identifierChain: [Array],
-          qualified: false,
-          tables: [Array] },
-        { type: 'table', location: [Object], identifierChain: [Array] },
-        { type: 'whereClause', missing: true, location: [Object] },
-        { type: 'limitClause', missing: true, location: [Object] } ],
-      lowerCase: false,
-      suggestKeywords:
-      [ { value: 'ABORT', weight: -1 },
-        { value: 'ALTER', weight: -1 },
-        { value: 'ANALYZE TABLE', weight: -1 },
-        { value: 'CREATE', weight: -1 },
-        { value: 'DELETE', weight: -1 },
-        { value: 'DESCRIBE', weight: -1 },
-        { value: 'DROP', weight: -1 },
-        { value: 'EXPLAIN', weight: -1 },
-        { value: 'EXPORT', weight: -1 },
-        { value: 'FROM', weight: -1 },
-        { value: 'GRANT', weight: -1 },
-        { value: 'IMPORT', weight: -1 },
-        { value: 'INSERT', weight: -1 },
-        { value: 'LOAD', weight: -1 },
-        { value: 'MERGE', weight: -1 },
-        { value: 'MSCK', weight: -1 },
-        { value: 'RELOAD FUNCTION', weight: -1 },
-        { value: 'RESET', weight: -1 },
-        { value: 'REVOKE', weight: -1 },
-        { value: 'SELECT', weight: -1 },
-        { value: 'SET', weight: -1 },
-        { value: 'SHOW', weight: -1 },
-        { value: 'TRUNCATE', weight: -1 },
-        { value: 'UPDATE', weight: -1 },
-        { value: 'USE', weight: -1 },
-        { value: 'WITH', weight: -1 } ],
-      definitions: [] }
+**Note** The `cookie` and `CSRF` tokens are omitted in the following API description to keep it simpler. Those parameters will be integrated into one in the future.
 
-* Local dependency
+### Python
 
-Checkout Hue and cd the [demo app](https://github.com/cloudera/hue/tree/master/tools/parser/hue_dep)
-
-    cd tools/parser/hue_dep
-
-    npm install
-    npm run webpack
-    npm run app
-
-In `package.json` there's a dependency on Hue:
-
-    "dependencies": {
-      "hue": "file:../../.."
-    },
-
-Now let's import the Hive parser:
-
-    import sqlAutocompleteParser from 'hue/desktop/core/src/desktop/js/parse/sql/hive/hiveAutocompleteParser';
-
-### Scratchpad
-
-The lightweight SQL Editor also called "Quick Query" comes as a [Web component](https://github.com/cloudera/hue/blob/master/desktop/core/src/desktop/js/ko/components/contextPopover/ko.quickQueryContext.js).
-
-!["Mini SQL Editor component"](https://cdn.gethue.com/uploads/2020/02/quick-query-component.jpg)
-
-
-## REST
-
-REST APIs are not all public yet but this is work in progress in [HUE-1450](https://issues.cloudera.org/browse/HUE-1450).
-
-Hue is Ajax based and has a REST API used by the browser to communicate (e.g. submit a query or workflow,
-list some S3 files, export a document...). Currently this API is private and subject to change but
-can be easily reused. You would need to GET */accounts/login* to get the CSRF token
-and POST it back along *username* and *password* and reuse the *sessionid* cookie in next
-communication calls.
-
-### Quickstart
-
-Hue is based on the Django Web Framework. Django comes with user authentication system. Django uses sessions and middleware to hook the authentication system into request object. Hue uses stock auth form which uses *username* and *password* and *csrftoken* form variables to authenticate.
-
-In this code snippet, we will use well-known python *requests* library. We will first acquire *csrftoken* by GET *login_url* and then create a dictionary of form data which contains *username*, *password* and *csrftoken* and the *next_url* and another dictionary for header which contains the *Referer* url and an empty dictionary for the cookies. After the POST request to *login_url* we will check the reponse code, which should be *r.status_code == 200*.
+In this code snippet, we will use well-known python *requests* library. We will first acquire *csrftoken* by GET *login_url* and then create a dictionary of form data which contains *username*, *password* and *csrftoken* and the *next_url* and another dictionary for header which contains the *Referer* url and an empty dictionary for the cookies. After the POST request to *login_url* we will check the response code, which should be *r.status_code == 200*.
 
 Once the request is successful then capture headers and cookies for subsequent requests. Subsequent *request.session* calls can be made by providing *cookies=session.cookies* and *headers=session.headers*.
 
@@ -169,13 +76,306 @@ Once the request is successful then capture headers and cookies for subsequent r
     print(response.status_code)
     print(response.text)
 
-### Data Catalog
+### jQuery
+
+Login to a Hue and open up the browser developer console and just type the JavaScript snippets, e.g.:
+
+    $.post("/notebook/api/autocomplete/", {
+      "snippet": ko.mapping.toJSON({
+          type: "hive"
+      })
+    }, function(data) {
+      console.log(ko.mapping.toJSON(data));
+    });
+
+## Authentication
+
+**Note** There is currently no error on bad authentication but instead a 302 redirect to the login page, e.g.:
+
+    [12/Sep/2020 10:12:44 -0700] middleware   INFO     Redirecting to login page: /hue/useradmin/users/edit/romain
+    [12/Sep/2020 10:12:44 -0700] access       INFO     127.0.0.1 -anon- - "POST /hue/useradmin/users/edit/romain HTTP/1.1" - (mem: 169mb)-- login redirection
+    [12/Sep/2020 10:12:44 -0700] access       INFO     127.0.0.1 -anon- - "POST /hue/useradmin/users/edit/romain HTTP/1.1" returned in 0ms 302 0 (mem: 169mb)
+
+**Note** The public API should be simpler with only one POST call and will return back only one token
+
+### Login
+
+    curl -v -X POST demo.gethue.com/hue/accounts/login/ -d 'username=demo&password=demo'
+
+    ...
+    * We are completely uploaded and fine
+    * TLSv1.3 (IN), TLS handshake, Newsession Ticket (4):
+    * TLSv1.3 (IN), TLS handshake, Newsession Ticket (4):
+    * old SSL session ID is stale, removing
+    * Connection state changed (MAX_CONCURRENT_STREAMS == 128)!
+    < HTTP/2 302
+    < server: nginx/1.19.0
+    < date: Sat, 12 Sep 2020 17:53:18 GMT
+    < content-type: text/html; charset=utf-8
+    < content-length: 0
+    < set-cookie: hue-balancer=1599933199.854.37.877815; Expires=Mon, 14-Sep-20 17:53:18 GMT; Max-Age=172800; Path=/; Secure; HttpOnly
+    < x-xss-protection: 1; mode=block
+    < content-security-policy: script-src 'self' 'unsafe-inline' 'unsafe-eval' *.google-analytics.com *.doubleclick.net data:;img-src 'self' *.google-analytics.com *.doubleclick.net http://*.tile.osm.org *.tile.osm.org *.gstatic.com data:;style-src 'self' 'unsafe-inline' fonts.googleapis.com;connect-src 'self';frame-src *;child-src 'self' data: *.vimeo.com;object-src 'none'
+    < x-content-type-options: nosniff
+    < content-language: en-us
+    < vary: Cookie, Accept-Language
+    < location: /
+    < x-frame-options: SAMEORIGIN
+    < set-cookie: csrftoken=zfOhD8roDLI7mEgakmBDCy7LDMvkEE2z3uUTIyyVnurhqLZhluhjO76K541MRwAw; expires=Sat, 11-Sep-2021 17:53:18 GMT; httponly; Max-Age=31449600; Path=/
+    < set-cookie: sessionid=tzx37xo7izrdfs35o30grdf9u0b2999q; expires=Sat, 12-Sep-2020 18:53:18 GMT; httponly; Max-Age=3600; Path=/
+    < strict-transport-security: max-age=15724800; includeSubDomains
+    <
+    * Connection #0 to host demo.gethue.com left intact
+
+**Note** In certain cases an initial GET is needed in order to retrieve the CSRF token, which can then be provided in the POST with the credentials.
+
+### Logout
+
+    curl -v -X POST https://demo.gethue.com/hue/accounts/logout/
+
+## SQL Querying
+
+### Execute a Query
+
+Now that we are logged-in, here is how to execute a `SHOW TABLES` SQL query via the `hive` connector. You could repeat the steps with any query you want, e.g. `SELECT * FROM web_logs LIMIT 100`.
+
+Until Editor v2 is out [HUE-8768](https://issues.cloudera.org/browse/HUE-8768), the API is pretty complicated but still functional:
+
+For a `SHOW TABLES`, first we send the query statement:
+
+    curl -X POST https://demo.gethue.com/notebook/api/execute/hive --data 'executable={"statement":"SHOW TABLES","database":"default"}&notebook={"type":"query","snippets":[{"id":1,"statement_raw":"SHOW TABLES","type":"hive","variables":[]}],"name":"","isSaved":false,"sessions":[]}&snippet={"id":1,"type":"hive","result":{},"statement":"SHOW TABLES","properties":{}}'
+
+    {"status": 0, "history_id": 17880, "handle": {"statement_id": 0, "session_type": "hive", "has_more_statements": false, "guid": "EUI32vrfTkSOBXET6Eaa+A==\n", "previous_statement_hash": "3070952e55d733fb5bef249277fb8674989e40b6f86c5cc8b39cc415", "log_context": null, "statements_count": 1, "end": {"column": 10, "row": 0}, "session_id": 63, "start": {"column": 0, "row": 0}, "secret": "RuiF0LEkRn+Yok/gjXWSqg==\n", "has_result_set": true, "session_guid": "c845bb7688dca140:859a5024fb284ba2", "statement": "SHOW TABLES", "operation_type": 0, "modified_row_count": null}, "history_uuid": "63ce87ba-ca0f-4653-8aeb-e9f5c1781b78"}
+
+Then check the operation status until it is available for fetching its result:
+
+    curl -X POST https://demo.gethue.com/notebook/api/check_status --data 'notebook={"type":"hive"}&snippet={"history_id": 17886,"type":"hive","result":{"handle":{"guid": "0J6PwGcSQaCJjagzYUBHzA==\n","secret": "uiP3IS4fR/mxkLJER5wRCg==\n","has_result_set": true}},"status":""}'
+
+    {"status": 0, "query_status": {"status": "available", "has_result_set": true}}
+
+And now ask for the resultset of the statement:
+
+    curl -X POST https://demo.gethue.com/notebook/api/fetch_result_data --data 'notebook={"type":"hive"}&snippet={"history_id": 17886,"type":"hive","result":{"handle":{"guid": "0J6PwGcSQaCJjagzYUBHzA==\n","secret": "uiP3IS4fR/mxkLJER5wRCg==\n","has_result_set": true}},"status":""}'
+
+    {"status": 0, "result": {"has_more": true, "type": "table", "meta": [{"comment": "from deserializer", "type": "STRING_TYPE", "name": "tab_name"}], "data": [["adavi"], ["adavi1"], ["adavi2"], ["ambs_feed"], ["apx_adv_deduction_data_process_total"], ["avro_table"], ["avro_table1"], ["bb"], ["bharath_info1"], ["bucknew"], ["bucknew1"], ["chungu"], ["cricket3"], ["cricket4"], ["cricket5_view"], ["cricketer"], ["cricketer_view"], ["cricketer_view1"], ["demo1"], ["demo12345"], ["dummy"], ["embedded"], ["emp"], ["emp1_sept9"], ["emp_details"], ["emp_sept"], ["emp_tbl1"], ["emp_tbl2"], ["empdtls"], ["empdtls_ext"], ["empdtls_ext_v2"], ["employee"], ["employee1"], ["employee_ins"], ["empppp"], ["events"], ["final"], ["flight_data"], ["gopalbhar"], ["guruhive_internaltable"], ["hell"], ["info1"], ["lost_messages"], ["mnewmyak"], ["mortality"], ["mscda"], ["myak"], ["mysample"], ["mysample1"], ["mysample2"], ["network"], ["ods_t_exch_recv_rel_wfz_stat_szy"], ["olympicdata"], ["p_table"], ["partition_cricket"], ["partitioned_user"], ["s"], ["sample"], ["sample_07"], ["sample_08"], ["score"], ["stg_t_exch_recv_rel_wfz_stat_szy"], ["stocks"], ["students"], ["studentscores"], ["studentscores2"], ["t1"], ["table_name"], ["tablex"], ["tabley"], ["temp"], ["test1"], ["test2"], ["test21"], ["test_info"], ["topage"], ["txnrecords"], ["u_data"], ["udata"], ["user_session"], ["user_test"], ["v_empdtls"], ["v_empdtls_ext"], ["v_empdtls_ext_v2"], ["web_logs"]], "isEscaped": true}}
+
+And if we wanted to get the execution log for this statement:
+
+    curl -X POST https://demo.gethue.com/notebook/api/get_logs --data 'notebook={"type":"hive","sessions":[]}&snippet={"history_id": 17886,"type":"hive","result":{"handle":{"guid": "0J6PwGcSQaCJjagzYUBHzA==\n","secret": "uiP3IS4fR/mxkLJER5wRCg==\n","has_result_set": true}},"status":"","properties":{},"sessions":[]}'
+
+    {"status": 0, "progress": 5, "jobs": [], "logs": "", "isFullLogs": false}
+
+### Listing Databases
+
+    $.post("/notebook/api/autocomplete/", {
+      "snippet": ko.mapping.toJSON({
+          type: "hive"
+      })
+    }, function(data) {
+      console.log(ko.mapping.toJSON(data));
+    });
+
+### Listing Tables
+
+    $.post("/notebook/api/autocomplete/<DB>", {
+      "snippet": ko.mapping.toJSON({
+          type: "hive"
+      })
+    }, function(data) {
+      console.log(ko.mapping.toJSON(data));
+    });
+
+### Table details and Columns
+
+    $.post("/notebook/api/autocomplete/<DB>/<TABLE>", {
+      "snippet": ko.mapping.toJSON({
+          type: "hive"
+      })
+    }, function(data) {
+      console.log(ko.mapping.toJSON(data));
+    });
+
+### Column details
+
+    $.post("/notebook/api/autocomplete/<DB>/<TABLE>/<COL1>", {
+      "snippet": ko.mapping.toJSON({
+          type: "hive"
+      })
+    }, function(data) {
+      console.log(ko.mapping.toJSON(data));
+    });
+
+For nested columns:
+
+    $.post("/notebook/api/autocomplete/<DB>/<TABLE>/<COL1>/<COL2>", {
+      "snippet": ko.mapping.toJSON({
+          type: "hive"
+      })
+    }, function(data) {
+      console.log(ko.mapping.toJSON(data));
+    });
+
+### Listing Functions
+
+Default functions:
+
+    $.post("/notebook/api/autocomplete/", {
+      "snippet": ko.mapping.toJSON({
+          type: "hive"
+      }),
+      "operation": "functions"
+    }, function(data) {
+      console.log(ko.mapping.toJSON(data));
+    });
+
+For a specific database:
+
+    $.post("/notebook/api/autocomplete/<DB>", {
+      "snippet": ko.mapping.toJSON({
+          type: "hive"
+      }),
+      "operation": "functions"
+    }, function(data) {
+      console.log(ko.mapping.toJSON(data));
+    });
+
+For a specific function/UDF details (e.g. trunc):
+
+    $.post("/notebook/api/autocomplete/<function_name>", {
+      "snippet": ko.mapping.toJSON({
+          type: "hive"
+      }),
+      "operation": "function"
+    }, function(data) {
+      console.log(ko.mapping.toJSON(data));
+    });
+
+## File Browsing
+
+### List
+
+Hue's [File Browser](https://docs.gethue.com/user/browsing/#data) offer uploads, downloads and listing of data in HDFS, S3, ADLS storages.
+
+Here is how to list the content of a path, here the S3 bucket `S3A://gethue-demo`:
+
+    curl -X GET "https://demo.gethue.com/filebrowser/view=S3A://gethue-demo?pagesize=45&pagenum=1&filter=&sortby=name&descending=false&format=json"
+
+    {
+      ...........
+      "files": [
+      {
+      "humansize": "0\u00a0bytes",
+      "url": "/filebrowser/view=s3a%3A%2F%2Fdemo-hue",
+      "stats": {
+      "size": 0,
+      "aclBit": false,
+      "group": "",
+      "user": "",
+      "mtime": null,
+      "path": "s3a://demo-hue",
+      "atime": null,
+      "mode": 16895
+      },
+      "name": "demo-hue",
+      "mtime": "",
+      "rwx": "drwxrwxrwx",
+      "path": "s3a://demo-hue",
+      "is_sentry_managed": false,
+      "type": "dir",
+      "mode": "40777"
+      },
+      {
+      "humansize": "0\u00a0bytes",
+      "url": "/filebrowser/view=S3A%3A%2F%2F",
+      "stats": {
+      "size": 0,
+      "aclBit": false,
+      "group": "",
+      "user": "",
+      "mtime": null,
+      "path": "S3A://",
+      "atime": null,
+      "mode": 16895
+      },
+      "name": ".",
+      "mtime": "",
+      "rwx": "drwxrwxrwx",
+      "path": "S3A://",
+      "is_sentry_managed": false,
+      "type": "dir",
+      "mode": "40777"
+      }
+      ],
+      ...........
+    }
+
+### Get file content
+
+How to get the file content and its metadata. Here with the public file of demo.gethue.com [s3a://demo-hue/web_log_data/index_data.csv](https://demo.gethue.com/hue/filebrowser/view=s3a%3A%2F%2Fdemo-hue%2Fweb_log_data%2Findex_data.csv):
+
+**Note** It needs the `XMLHttpRequest` header to return the data in json:
+
+    curl  -X GET "https://demo.gethue.com/filebrowser/view=s3a://demo-hue/web_log_data/index_data.csv?offset=0&length=204800&compression=none&mode=text" -H "X-requested-with: XMLHttpRequest"
+
+    {
+      "show_download_button": true,
+      "is_embeddable": false,
+      "editable": false,
+      "mtime": "October 31, 2016 03:34 PM",
+      "rwx": "-rw-rw-rw-",
+      "path": "s3a://demo-hue/web_log_data/index_data.csv",
+      "stats": {
+      "size": 6199593,
+      "aclBit": false,
+      ...............
+      "contents": "code,protocol,request,app,user_agent_major,region_code,country_code,id,city,subapp,latitude,method,client_ip,  user_agent_family,bytes,referer,country_name,extension,url,os_major,longitude,device_family,record,user_agent,time,os_family,country_code3
+        200,HTTP/1.1,GET /metastore/table/default/sample_07 HTTP/1.1,metastore,,00,SG,8836e6ce-9a21-449f-a372-9e57641389b3,Singapore,table,1.2931000000000097,GET,128.199.234.236,Other,1041,-,Singapore,,/metastore/table/default/sample_07,,103.85579999999999,Other,"demo.gethue.com:80 128.199.234.236 - - [04/May/2014:06:35:49 +0000] ""GET /metastore/table/default/sample_07 HTTP/1.1"" 200 1041 ""-"" ""Mozilla/5.0 (compatible; phpservermon/3.0.1; +http://www.phpservermonitor.org)""
+        ",Mozilla/5.0 (compatible; phpservermon/3.0.1; +http://www.phpservermonitor.org),2014-05-04T06:35:49Z,Other,SGP
+        200,HTTP/1.1,GET /metastore/table/default/sample_07 HTTP/1.1,metastore,,00,SG,6ddf6e38-7b83-423c-8873-39842dca2dbb,Singapore,table,1.2931000000000097,GET,128.199.234.236,Other,1041,-,Singapore,,/metastore/table/default/sample_07,,103.85579999999999,Other,"demo.gethue.com:80 128.199.234.236 - - [04/May/2014:06:35:50 +0000] ""GET /metastore/table/default/sample_07 HTTP/1.1"" 200 1041 ""-"" ""Mozilla/5.0 (compatible; phpservermon/3.0.1; +http://www.phpservermonitor.org)""
+        ",Mozilla/5.0 (compatible; phpservermon/3.0.1; +http://www.phpservermonitor.org),2014-05-04T06:35:50Z,Other,SGP
+      ...............
+    }
+
+## Data Importer
+
+### File import
+
+First guessing the format of the file `s3a://demo-hue/web_log_data/index_data.csv`:
+
+    curl -X POST https://demo.gethue.com/indexer/api/indexer/guess_format  --data 'fileFormat={"inputFormat":"file","path":"s3a://demo-hue/web_log_data/index_data.csv"}'
+
+    {"status": 0, "fieldSeparator": ",", "hasHeader": true, "quoteChar": "\"", "recordSeparator": "\\n", "type": "csv"}
+
+Then getting some data sample as well as the column types (column names will be picked from the header line if present):
+
+    curl -X POST https://demo.gethue.com/indexer/api/indexer/guess_field_types  --data 'fileFormat={"inputFormat":"file","path":"s3a://demo-hue/web_log_data/index_data.csv","format":{"type":"csv","fieldSeparator":",","recordSeparator":"\\n","quoteChar":"\"","hasHeader":true,"status":0}}'
+
+    {
+      "sample": [["200", "HTTP/1.1", "GET /metastore/table/default/sample_07 HTTP/1.1", "metastore", "", "00", "SG", "8836e6ce-9a21-449f-a372-9e57641389b3", "Singapore", "table", "1.2931000000000097", "GET", "128.199.234.236", "Other", "1041", "-", "Singapore", "", "/metastore/table/default/sample_07", "", "103.85579999999999", "Other", "demo.gethue.com:80 128.199.234.236 - - [04/May/2014:06:35:49 +0000] \"GET /metastore/table/default/sample_07 HTTP/1.1\" 200 1041 \"-\" \"Mozilla/5.0 (compatible; phpservermon/3.0.1; +http://www.phpservermonitor.org)\"\n", "Mozilla/5.0 (compatible; phpservermon/3.0.1; +http://www.phpservermonitor.org)", "2014-05-04T06:35:49Z", "Other", "SGP"],
+      ....
+      "columns": [{"operations": [], "comment": "", "nested": [], "name": "code", "level": 0, "keyType": "string", "required": false, "precision": 10, "keep": true, "isPartition": false, "length": 100, "partitionValue": "", "multiValued": false, "unique": false, "type": "long", "showProperties": false, "scale": 0}, {"operations": [], "comment": "", "nested": [], "name": "protocol", "level": 0, "keyType": "string", "required": false, "precision": 10, "keep": true, "isPartition": false, "length": 100, "partitionValue": "", "multiValued": false, "unique": false, "type": "string", "showProperties": false, "scale": 0},
+      .....
+    }
+
+Then we submit via `https://demo.gethue.com/indexer/api/importer/submit` and provide the `source` and `destination` parameters. We get back an `operation id` (i.e. some SQL Editor query history id).
+
+If the `show_command` parameter is given, the API call will instead return the generated SQL queries that will import the data.
+
+    {"status": 0, "history_id": 17820, "handle": {"statement_id": 0, "session_type": "hive", "has_more_statements": true, "guid": "uu6K3SSWSY6mx/fbh0nm2w==\n", "previous_statement_hash": "4bee3a62b3c7142c60475021469483bff81ba09bd07b8e527179e617", "log_context": null, "statements_count": 4, "end": {"column": 53, "row": 0}, "session_id": 55, "start": {"column": 0, "row": 0}, "secret": "8mKu1bhdRtWXu82DXjDZdg==\n", "has_result_set": false, "session_guid": "fd4c667f3a5e4507:0335af7716db3d9e", "statement": "DROP TABLE IF EXISTS `default`.`hue__tmp_index_data`", "operation_type": 0, "modified_row_count": null}, "history_uuid": "bf5804f5-6f12-47a8-8ba6-0ed7032ebe93"}
+
+## Connectors
+
+### List
+
+Get the list of configured [connectors](/administrator/configuration/connectors/):
+
+    curl -L -X POST demo.gethue.com/desktop/connectors/api/instances
+
+## Data Catalog
 
 The [metadata API](https://github.com/cloudera/hue/tree/master/desktop/libs/metadata) is powering the external [Catalog integrations](/user/browsing/#data-catalogs).
 
-Additional catalogs can be integrated via some [connectors](/developer/connectors/#data-catalog).
-
-#### Searching for entities
+### Searching for entities
 
     $.post("/metadata/api/catalog/search_entities_interactive/", {
         query_s: ko.mapping.toJSON("*sample"),
@@ -195,7 +395,7 @@ Searching for entities with the dummy backend:
         console.log(ko.mapping.toJSON(data));
     });
 
-#### Finding an entity in order to get its id
+### Finding an entity in order to get its id
 
     $.get("/metadata/api/navigator/find_entity", {
         type: "table",
@@ -216,7 +416,7 @@ Adding/updating a comment with the dummy backend:
         console.log(ko.mapping.toJSON(data));
     });
 
-#### Adding a tag with the dummy backend
+### Adding a tag with the dummy backend
 
     $.post("/metadata/api/catalog/add_tags/", {
       id: "22",
@@ -226,7 +426,7 @@ Adding/updating a comment with the dummy backend:
         console.log(ko.mapping.toJSON(data));
     });
 
-#### Deleting a key/value property
+### Deleting a key/value property
 
     $.post("/metadata/api/catalog/delete_metadata_properties/", {
        "id": "32",
@@ -235,7 +435,7 @@ Adding/updating a comment with the dummy backend:
        console.log(ko.mapping.toJSON(data));
     });
 
-#### Deleting a key/value property
+### Deleting a key/value property
 
     $.post("/metadata/api/catalog/delete_metadata_properties/", {
       "id": "32",
@@ -245,14 +445,14 @@ Adding/updating a comment with the dummy backend:
     });
 
 
-#### Getting the model mapping
+### Getting the model mapping
 
     $.get("/metadata/api/catalog/models/properties/mappings/", function(data) {
       console.log(ko.mapping.toJSON(data));
     });
 
 
-#### Getting a namespace
+### Getting a namespace
 
     $.post("/metadata/api/catalog/namespace/", {
       namespace: 'huecatalog'
@@ -260,7 +460,7 @@ Adding/updating a comment with the dummy backend:
       console.log(ko.mapping.toJSON(data));
     });
 
-#### Creating a namespace
+### Creating a namespace
 
     $.post("/metadata/api/catalog/namespace/create/", {
       "namespace": "huecatalog",
@@ -270,7 +470,7 @@ Adding/updating a comment with the dummy backend:
     });
 
 
-#### Creating a namespace property
+### Creating a namespace property
 
     $.post("/metadata/api/catalog/namespace/property/create/", {
       "namespace": "huecatalog",
@@ -288,8 +488,7 @@ Adding/updating a comment with the dummy backend:
       console.log(ko.mapping.toJSON(data));
     });
 
-
-#### Map a namespace property to a class
+### Map a namespace property to a class
 
     $.post("/metadata/api/catalog/namespace/property/map/", {
       "class": "hv_view",
@@ -301,68 +500,45 @@ Adding/updating a comment with the dummy backend:
       console.log(ko.mapping.toJSON(data));
     });
 
-### SQL Querying
 
-#### Listing Databases
 
-    $.post("/notebook/api/autocomplete/", {
-      "snippet": ko.mapping.toJSON({
-          type: "hive"
-      })
-    }, function(data) {
-      console.log(ko.mapping.toJSON(data));
-    });
+# SDK
 
-#### Listing Tables
-
-    $.post("/notebook/api/autocomplete/<DB>", {
-      "snippet": ko.mapping.toJSON({
-          type: "hive"
-      })
-    }, function(data) {
-      console.log(ko.mapping.toJSON(data));
-    });
-
-#### Table details and Columns
-
-    $.post("/notebook/api/autocomplete/<DB>/<TABLE>", {
-      "snippet": ko.mapping.toJSON({
-          type: "hive"
-      })
-    }, function(data) {
-      console.log(ko.mapping.toJSON(data));
-    });
-
-#### Column details
-
-    $.post("/notebook/api/autocomplete/<DB>/<TABLE>/<COL1>", {
-      "snippet": ko.mapping.toJSON({
-          type: "hive"
-      })
-    }, function(data) {
-      console.log(ko.mapping.toJSON(data));
-    });
-
-For nested columns:
-
-    $.post("/notebook/api/autocomplete/<DB>/<TABLE>/<COL1>/<COL2>", {
-      "snippet": ko.mapping.toJSON({
-          type: "hive"
-      })
-    }, function(data) {
-      console.log(ko.mapping.toJSON(data));
-    });
-
-### SQL Risk Optimization
-### Data Browsing
-### Workflow scheduling
-
-## Python
+Here is some overview about using the Python commands an shell and some examples below:
 
 * [Hue API: Execute some builtin or shell commands](http://gethue.com/hue-api-execute-some-builtin-commands/).
 * [How to manage the Hue database with the shell](http://gethue.com/how-to-manage-the-hue-database-with-the-shell/).
 
-### Count the documents of a user
+## Python
+
+### Making a user admin
+
+Via the Hue shell:
+
+    build/env/bin/hue shell
+
+Then type something similar to:
+
+    from django.contrib.auth.models import User
+
+    a = User.objects.get(username='hdfs')
+    a.is_staff = True
+    a.is_superuser = True
+    a.set_password('my_secret')
+    a.save()
+
+### Changing user password
+
+In the Hue shell:
+
+    from django.contrib.auth.models import User
+
+    user = User.objects.get(username='example')
+    user.set_password('some password')
+    user.save()
+
+
+### Counting user documents
 
 On the command line:
 
@@ -436,201 +612,3 @@ Then use the Python code to access a certain user information:
       u'desktop.DocumentPermission_groups': 0L,
       u'desktop.DocumentPermission_users': 0L,
       u'desktop.Document_tags': 18524L})
-
-
-### Creating an App
-
-Building a brand new application is more work but is ideal for creating a custom solution.
-
-**Note** It is now more recommended to integrate external services (e.g. integrate a new SQL Datatase with the Editor, add a new visualization...) to the core Hue APIs instead of building brand new application. This page gives good content in both cases. Feel free to contact the community for advice.
-
-#### Overview
-
-Hue leverages the browser to provide users with an environment for exploring
-and analyzing data.
-
-Build on top of the Hue SDK to enable your application to interact efficiently with
-Hadoop and the other Hue services.
-
-By building on top of Hue SDK, you get, out of the box:
-
-+ Configuration Management
-+ Hadoop interoperability
-+ Supervision of subprocesses
-+ A collaborative UI
-+ Basic user administration and authorization
-
-This document will orient you with the general structure of Hue
-and will walk you through adding a new application using the SDK.
-
-#### Creating the app
-
-Run "create_desktop_app" to Set up a New Source Tree
-
-    ./build/env/bin/hue create_desktop_app calculator
-    find calculator -type f
-    calculator/setup.py                                 # distutils setup file
-    calculator/src/calculator/__init__.py               # main src module
-    calculator/src/calculator/forms.py
-    calculator/src/calculator/models.py
-    calculator/src/calculator/settings.py               # app metadata setting
-    calculator/src/calculator/urls.py                   # url mapping
-    calculator/src/calculator/views.py                  # app business logic
-    calculator/src/calculator/templates/index.mako
-    calculator/src/calculator/templates/shared_components.mako
-
-    # Static resources
-    calculator/src/static/calculator/art/calculator.png # logo
-    calculator/src/static/calculator/css/calculator.css
-    calculator/src/static/calculator/js/calculator.js
-
-
-<div class="note">
-  Some apps are blacklisted on certain versions of CDH (such as the 'Spark' app) due to
-  certain incompatibilities, which prevent them loading from in Hue.
-  Check the hue.ini 'app_blacklist' parameter for details.
-</div>
-
-#### Install SDK Application
-
-As you'll discover if you look at calculator's <tt>setup.py</tt>,
-Hue uses a distutils <tt>entrypoint</tt> to
-register applications.  By installing the calculator
-package into Hue's python virtual environment,
-you'll install a new app.  The "app_reg.py" tool manages
-the applications that are installed. Note that in the following example, the value after the
-"--install" option is the path to the root directory of the application you want to install. In this
-example, it is a relative path to "/Users/philip/src/hue/calculator".
-
-        ./build/env/bin/python tools/app_reg/app_reg.py --install calculator --relative-paths
-        === Installing app at calculator
-        Updating registry with calculator (version 0.1)
-        --- Making egg-info for calculator
-
-
-<div class="note">
-  If you'd like to customize the build process, you can modify (or even complete
-  rewrite) your own `Makefile`, as long as it supports the set of required
-  targets. Please see `Makefile.sdk` for the required targets and their
-  semantics.
-</div>
-
-Congrats, you've added a new app!
-
-<div class="note">
-  What was that all about?
-  <a href="http://pypi.python.org/pypi/virtualenv">virtualenv</a>
-  is a way to isolate python environments in your system, and isolate
-  incompatible versions of dependencies.  Hue uses the system python, and
-  that's about all.  It installs its own versions of dependencies.
-
-  <a href="http://peak.telecommunity.com/DevCenter/PkgResources#entry-points">Entry Points</a>
-  are a way for packages to optionally hook up with other packages.
-</div>
-
-You can now browse the new application.
-
-    # If you haven't killed the old process, do so now.
-    build/env/bin/hue runserver
-
-And then visit <a href="http://localhost:8000">http://localhost:8000/</a> to check it out!
-You should see the app in the left menu.
-
-#### Customizing
-
-Now that your app has been installed, you'll want to customize it.
-As you may have guessed, we're going to build a small calculator
-application.  Edit `calculator/src/calculator/templates/index.mako`
-to include a simple form and a Knockout viewmodel:
-
-
-    <%!from desktop.views import commonheader, commonfooter %>
-    <%namespace name="shared" file="shared_components.mako" />
-
-    %if not is_embeddable:
-    ${commonheader("Calculator", "calculator", user, "100px") | n,unicode}
-    %endif
-
-    ## Main body
-    <div class="container-fluid calculator-components">
-      <div class="row">
-        <div class="span6 offset3 margin-top-30 text-center">
-          <form class="form-inline">
-            <input type="text" class="input-mini margin-right-10" placeholder="A" data-bind="value: a">
-            <!-- ko foreach: operations -->
-            <label class="radio margin-left-5">
-              <input type="radio" name="op" data-bind="checkedValue: $data, checked: $parent.chosenOperation" /><span data-bind="text: $data"></span>
-            </label>
-            <!-- /ko -->
-            <input type="text" class="input-mini margin-left-10" placeholder="B" data-bind="value: b">
-            <button class="btn" data-bind="click: calculate">Calculate</button>
-          </form>
-
-          <h2 data-bind="visible: result() !== null">The result is <strong data-bind="text: result"></strong></h2>
-        </div>
-      </div>
-    </div>
-
-    <script>
-      (function() {
-        var CalculatorViewModel = function () {
-          var self = this;
-
-          self.operations = ko.observableArray(['+', '-', '*', '/']);
-
-          self.a = ko.observable();
-          self.b = ko.observable();
-          self.chosenOperation = ko.observable('+');
-          self.result = ko.observable(null);
-
-          self.calculate = function () {
-            var a = parseFloat(self.a());
-            var b = parseFloat(self.b());
-            var result = null;
-            switch (self.chosenOperation()) {
-              case '+':
-                result = a + b;
-                break;
-              case '-':
-                result = a - b;
-                break;
-              case '*':
-                result = a * b;
-                break;
-              case '/':
-                result = a / b;
-            }
-            self.result(result);
-          }
-        };
-        $(document).ready(function () {
-          ko.applyBindings(new CalculatorViewModel(), $('.calculator-components')[0]);
-        });
-      })();
-    </script>
-
-    %if not is_embeddable:
-    ${commonfooter(messages) | n,unicode}
-    %endif
-
-The template language here is <a href="http://www.makotemplates.org/docs/">Mako</a>,
-which is flexible and powerful.  If you use the "`.html`" extension, Hue
-will render your page using
-<a href="https://docs.djangoproject.com/en/1.11/#the-template-layer">Django templates</a>
-instead.
-
-Note that we use Knockout.js to do the heavy lifting of this app.
-
-Let's edit `calculator/src/calculator/views.py` to simply render the page:
-
-    #!/usr/bin/env python
-
-    from desktop.lib.django_util import render
-
-    def index(request):
-      return render('index.mako', request, {
-        'is_embeddable': request.GET.get('is_embeddable', False),
-      })
-
-
-You can now go and try the calculator.

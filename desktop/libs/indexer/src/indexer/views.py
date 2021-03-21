@@ -34,6 +34,12 @@ from indexer.indexers.morphline_operations import OPERATORS
 LOG = logging.getLogger(__name__)
 
 
+HIVE_PRIMITIVE_TYPES = (
+  "string", "tinyint", "smallint", "int", "bigint", "boolean", "float", "double", "decimal", "timestamp", "date", "char", "varchar"
+)
+HIVE_TYPES = HIVE_PRIMITIVE_TYPES + ("array", "map", "struct")
+
+
 def collections(request, is_redirect=False):
   if not request.user.has_hue_permission(action="access", app='indexer'):
     raise PopupException(_('Missing permission.'), error_code=403)
@@ -76,17 +82,11 @@ def indexer(request):
   return render('indexer.mako', request, {
       'is_embeddable': request.GET.get('is_embeddable', False),
       'indexes_json': json.dumps(indexes),
-      'fields_json' : json.dumps([field.name for field in FIELD_TYPES]),
-      'operators_json' : json.dumps([operator.to_dict() for operator in OPERATORS]),
-      'file_types_json' : json.dumps([format_.format_info() for format_ in get_file_indexable_format_types()]),
-      'default_field_type' : json.dumps(Field().to_dict())
+      'fields_json': json.dumps([field.name for field in FIELD_TYPES]),
+      'operators_json': json.dumps([operator.to_dict() for operator in OPERATORS]),
+      'file_types_json': json.dumps([format_.format_info() for format_ in get_file_indexable_format_types()]),
+      'default_field_type': json.dumps(Field().to_dict())
   })
-
-
-HIVE_PRIMITIVE_TYPES = \
-    ("string", "tinyint", "smallint", "int", "bigint", "boolean",
-      "float", "double", "decimal", "timestamp", "date", "char", "varchar")
-HIVE_TYPES = HIVE_PRIMITIVE_TYPES + ("array", "map", "struct")
 
 
 def importer(request):

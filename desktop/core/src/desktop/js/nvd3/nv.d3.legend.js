@@ -18,7 +18,7 @@ import d3v3 from 'd3v3';
 
 import nv from 'ext/nv.d3.1.1.15b.custom';
 
-nv.models.legend = function() {
+nv.models.legend = function () {
   'use strict';
   //============================================================
   // Public Variables with Default Settings
@@ -27,7 +27,7 @@ nv.models.legend = function() {
   const margin = { top: 5, right: 0, bottom: 5, left: 0 };
   let width = 400,
     height = 20,
-    getKey = function(d) {
+    getKey = function (d) {
       return d.key;
     },
     color = nv.utils.defaultColor(),
@@ -46,7 +46,7 @@ nv.models.legend = function() {
   //============================================================
 
   function chart(selection) {
-    selection.each(function(data) {
+    selection.each(function (data) {
       const availableWidth = width - margin.left - margin.right,
         container = d3v3.select(this);
 
@@ -54,11 +54,7 @@ nv.models.legend = function() {
       // Setup containers and skeleton of chart
 
       const wrap = container.selectAll('g.nv-legend').data([data]);
-      wrap
-        .enter()
-        .append('g')
-        .attr('class', 'nvd3 nv-legend')
-        .append('g');
+      wrap.enter().append('g').attr('class', 'nvd3 nv-legend').append('g');
       const g = wrap.select('g');
 
       wrap.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
@@ -178,7 +174,7 @@ nv.models.legend = function() {
       // NEW ALIGNING CODE, TODO: clean up
       if (align) {
         const seriesWidths = [];
-        series.each(function() {
+        series.each(function () {
           const legendText = d3v3.select(this).select('text');
           let nodeTextLength;
           try {
@@ -257,13 +253,8 @@ nv.models.legend = function() {
           newxpos = 5,
           maxwidth = 0,
           xpos;
-        series.attr('transform', function() {
-          const length =
-            d3v3
-              .select(this)
-              .select('text')
-              .node()
-              .getComputedTextLength() + 28;
+        series.attr('transform', function () {
+          const length = d3v3.select(this).select('text').node().getComputedTextLength() + 28;
           xpos = newxpos;
 
           if (width < margin.left + margin.right + xpos + length) {
@@ -299,7 +290,7 @@ nv.models.legend = function() {
   chart.dispatch = dispatch;
   chart.options = nv.utils.optionsFunc.bind(chart);
 
-  chart.margin = function(_) {
+  chart.margin = function (_) {
     if (!arguments.length) {
       return margin;
     }
@@ -310,7 +301,7 @@ nv.models.legend = function() {
     return chart;
   };
 
-  chart.width = function(_) {
+  chart.width = function (_) {
     if (!arguments.length) {
       return width;
     }
@@ -318,7 +309,7 @@ nv.models.legend = function() {
     return chart;
   };
 
-  chart.height = function(_) {
+  chart.height = function (_) {
     if (!arguments.length) {
       return height;
     }
@@ -326,7 +317,7 @@ nv.models.legend = function() {
     return chart;
   };
 
-  chart.key = function(_) {
+  chart.key = function (_) {
     if (!arguments.length) {
       return getKey;
     }
@@ -334,7 +325,7 @@ nv.models.legend = function() {
     return chart;
   };
 
-  chart.color = function(_) {
+  chart.color = function (_) {
     if (!arguments.length) {
       return color;
     }
@@ -342,7 +333,7 @@ nv.models.legend = function() {
     return chart;
   };
 
-  chart.align = function(_) {
+  chart.align = function (_) {
     if (!arguments.length) {
       return align;
     }
@@ -350,7 +341,7 @@ nv.models.legend = function() {
     return chart;
   };
 
-  chart.rightAlign = function(_) {
+  chart.rightAlign = function (_) {
     if (!arguments.length) {
       return rightAlign;
     }
@@ -358,7 +349,7 @@ nv.models.legend = function() {
     return chart;
   };
 
-  chart.updateState = function(_) {
+  chart.updateState = function (_) {
     if (!arguments.length) {
       return updateState;
     }
@@ -366,7 +357,7 @@ nv.models.legend = function() {
     return chart;
   };
 
-  chart.radioButtonMode = function(_) {
+  chart.radioButtonMode = function (_) {
     if (!arguments.length) {
       return radioButtonMode;
     }

@@ -1,15 +1,34 @@
 ---
-title: "Autocompletes"
+title: "SQL Parsers"
 date: 2019-03-13T18:28:09-07:00
 draft: false
 weight: 2
 ---
 
-This guide goes you through the steps necessary to create an autocompleter for any [SQL dialect](/administrator/configuration/connectors/#databases) in Hue. The major benefits are:
+The parsers are the flagship part of Hue and power extremely advanced autocompletes and other [SQL functionalities](/user/querying/#autocomplete). They are running on the client side and comes with just a few megabytes of JavaScript that are cached by the browser. This provides a very reactive experience to the end user and allows to [import them](#reusing-a-parser-in-your-project) as classic JavaScript modules for your own development needs.
+
+While the dynamic content like the list of tables, columns is obviously fetched via [remote endpoints](/administrator/configuration/connectors/), all the SQL knowledge of the statements is available.
+
+The main dialects are:
+
+*  Apache Hive
+*  Apache Impala
+*  Presto
+*  Apache Calcite
+
+But there are more! See all the currently shipped [SQL dialects](https://github.com/cloudera/hue/tree/master/desktop/core/src/desktop/js/parse/sql).
+
+This guide takes you through the steps necessary to create an autocompleter for any [SQL dialect](/administrator/configuration/connectors/#databases) in Hue. The major benefits are:
 
 * Proposing only valid syntax in the autocomplete
 * Getting the list of tables, columns, UDFs... automatically
 * Suggesting fixes
+* Diffing, formatting... queries
+
+**Looking at quick code examples?**
+
+- Adding `SHOW` syntax to Flink SQL [GH-1399](https://github.com/cloudera/hue/issues/1399)
+- Adding a Dask SQL parser and connector [GH-1480](https://github.com/cloudera/hue/issues/1480)
 
 ## Parser Theory
 
@@ -17,7 +36,7 @@ There are several parsers in Hue already (e.g. one for Impala, one for Hive..) a
 
 Building a dedicated work is more effort but it then allows a very rich end user experience, e.g.:
 
-* Handle invalid/imcomplete queries and propose suggestions/fixes
+* Handle invalid/incomplete queries and propose suggestions/fixes
 * date_column = <Date compatible UDF ...>
 * Language reference or data samples just by pointing the cursor on SQL identifiers
 * Leverage the parser for risk alerts (e.g. adding automatic LIMIT) or proper re-formatting
@@ -30,7 +49,7 @@ The parsers provide one function, parseSql, that accepts the text before the cur
 
 As an example:
 
-    sqlParserRepository.getAutocompleter('impala').then(parser => {
+    sqlParserRepository.getAutocompleteParser('impala').then(parser => {
       console.log(parser.parseSql('SELECT * FROM customers'));
     });
 
@@ -72,11 +91,43 @@ Here’s a list of some of the different types of suggestions the parser can ide
 
 Parsers are generated and added to the repository using the command generateParsers.js under tools/jison/. To for instance generate all the Impala parsers you would run the following command in the hue folder:
 
-    node tools/jison/generateParsers.js impala
+    cd tools/jison
+    node generateParsers.js impala
 
 In reality two parsers are generated per dialect, one for syntax and one for autocomplete. The syntax parsers is a subset of the autocomplete parser with no error recovery and without the autocomplete specific grammar.
 
 All the jison grammar files can be found [here](https://github.com/cloudera/hue/tree/master/desktop/core/src/desktop/js/parse/jison/sql) and the generated parsers are also committed together with their tests [here](https://github.com/cloudera/hue/tree/master/desktop/core/src/desktop/js/parse/sql).
+
+Parsers are sharing a maximum of the common syntax via some modules so that it is easy to improve the specificness of any of them while not starting from sratch.
+
+e.g. in [structure.json](https://github.com/cloudera/hue/blob/master/desktop/core/src/desktop/js/parse/jison/sql/hive/structure.json):
+
+    {
+      "lexer": "sql.jisonlex",
+      "autocomplete": [
+        "../generic/autocomplete_header.jison",
+        "abort/abort_transactions.jison",
+        "common/table_constraint.jison",
+        "alter/alter_common.jison",
+        "alter/alter_database.jison",
+        "alter/alter_index.jison",
+        "alter/alter_materialized_view.jison",
+        "alter/alter_table.jison",
+        "alter/alter_view.jison",
+        "analyze/analyze_table.jison",
+        ...
+      ],
+      "syntax": [
+        "../generic/syntax_header.jison",
+        "abort/abort_transactions.jison",
+        "common/table_constraint.jison",
+        "alter/alter_common.jison",
+        "alter/alter_database.jison",
+        "alter/alter_index.jison",
+        "alter/alter_materialized_view.jison",
+        ...
+      ]
+    }
 
 ### The grammar
 
@@ -97,7 +148,7 @@ This would be able to parse a statement like 'SELECT a, b, c FROM some_table' (d
 
 To turn this into an autocompleter we add the notion of a cursor. Often, the user has the cursor somewhere in the statement. In the previous section, we were assuming that the query was already typed and the user had not mouse cursor within it.
 
-The cursor is represented as an obscure character that is unlikely to be used in a statement. Currently '\u2020' was picked, the dagger, identified as 'CURSOR' in the lexer. The actual parsed string is therefore beforeCursor + ‘\u2020’ + afterCursor.
+The cursor is represented as an obscure character that is unlikely to be used in a statement. Currently '\u2020' was picked, the dagger, identified as 'CURSOR' in the lexer. The actual parsed string is therefore beforeCursor + '\u2020' + afterCursor.
 
 For the statement above we’d add an extra rule with an _EDIT postfix like this:
 
@@ -113,7 +164,15 @@ For the statement above we’d add an extra rule with an _EDIT postfix like this
       | 'SELECT' ColumnList_EDIT 'FROM' Identifier --> { suggestColumns: { table: $4 } }
       ;
 
-So for example if a cursor without any text is encountered, it will tell us to suggest the ‘SELECT’ keyword etc.
+So for example if a cursor without any text is encountered, it will tell us to suggest the 'SELECT' keyword etc.
+
+### Why an extra space
+
+The extra space is just for the documentation to show the complete output with locations, it should indeed be clarified a bit. The reason for the extra space is that the parser ignores partial words, consider the following where | denotes the cursor:
+
+    SELECT * FROM som|
+
+The parser will treat this as "SELECT * FROM |" and it leaves it up to the editor logic to filter any tables, starting with "som".
 
 ## Tutorial: Creating a parser
 
@@ -131,16 +190,18 @@ and edit your hue config desktop/conf/pseudo-distributed.ini to contain:
 
     [notebook]
     [[interpreters]]
-      [[[postgresql]]]
-        name = postgresql
-        interface=sqlalchemy
-        options='{"url": "postgresql://hue:hue@host:31335/hue"}'
+    [[[postgresql]]]
+    name = postgresql
+    interface=sqlalchemy
+    options='{"url": "postgresql://hue:hue@localhost:31335/hue"}'
 
 Our generateParsers tool can take an existing dialect and setup the source code for a new parsers based on that.
 
 In the hue folder run:
 
-    node tools/jison/generateParsers.js -new generic postgresql
+    cd tools/jison
+    npm install
+    node generateParsers.js -new generic postgresql
 
 After the -new argument you specify an existing dialect to clone first and then the name of the new parser.
 
@@ -148,7 +209,8 @@ Once executed the tool has cloned the generic parser with tests and generated a 
 
 To regenerate the parsers after changes to the jison files run:
 
-    node tools/jison/generateParsers.js postgresql
+    cd tools/jison
+    node generateParsers.js postgresql
 
 The tool will report any problems with the grammar. Note that it might still generate a parser if the grammar isn’t ambiguous but it’s likely that there will be test failures.
 
@@ -239,7 +301,7 @@ For the next one we’ll add some keyword suggestions after the user has typed R
       }
     ;
 
-Again, run `node tools/jison/generateParsers.js postgresql` then `npm run test -- postgresqlAutocompleteParser.test.js` and the tests should both be green.
+Again, run `cd  tools/jison/; node generateParsers.js postgresql` then `npm run test -- postgresqlAutocompleteParser.test.js` and the tests should both be green.
 
 We also want the autocompleter to suggest the keyword REINDEX when the user hasn’t typed anything, to do that let’s first add the following test with the other new ones in `postgresqlAutocompleteParser.test.js`:
 
@@ -326,12 +388,10 @@ In the KSQL case we have:
 
 And cf. above [prerequisites](#prerequisites), any interpreter snippet with `ksql` will pick-up the new highlighter:
 
-      [[[ksql]]]
-        name = KSQL Analytics
-        interface=ksql
+    [[[ksql]]]
+    name=KSQL Analytics
+    interface=ksql
 
-Note: after [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) we will be able to have multiple interpreters on the same dialect (e.g. pointing to two different databases of the same type).
+## Reusing a parser in your project
 
-## API: Exporting a parser
-
-Parsers generated by Hue are JavaScript modules. This makes it easy to import a parser into your own apps (e.g. Webapp, Node.Js...). How to do it is described in depth in the [API section](/developer/api/#sql-autocompletion).
+The parsers ship as a pluggable [component](/developer/components/parsers).

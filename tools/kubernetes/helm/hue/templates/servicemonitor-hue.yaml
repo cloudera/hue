@@ -15,5 +15,5 @@ spec:
     - default
   selector:
     matchLabels:
-      app: hue
+      pod: hue
 {{- end -}}

@@ -18,7 +18,7 @@
 '''
 SQL Alchemy offers native connections to databases via dialects https://docs.sqlalchemy.org/en/latest/dialects/.
 
-When the dialect of a paricular datavase is installed on the Hue API server, any of its URL connection strings should work.
+When the dialect of a paricular database is installed on the Hue API server, any of its URL connection strings should work.
 
 e.g.
 mysql://root:root@localhost:3306/hue
@@ -66,8 +66,7 @@ from string import Template
 from django.core.cache import caches
 from django.utils.translation import ugettext as _
 from sqlalchemy import create_engine, inspect, Table, MetaData
-from sqlalchemy.exc import OperationalError
-from sqlalchemy.types import NullType
+from sqlalchemy.exc import OperationalError, UnsupportedCompilationError, CompileError
 
 from desktop.lib import export_csvxls
 from desktop.lib.i18n import force_unicode
@@ -80,8 +79,10 @@ from notebook.models import escape_rows
 if sys.version_info[0] > 2:
   from urllib.parse import quote_plus as urllib_quote_plus
   from past.builtins import long
+  from io import StringIO
 else:
   from urllib import quote_plus as urllib_quote_plus
+  from cStringIO import StringIO
 
 
 ENGINES = {}
@@ -104,6 +105,8 @@ def query_error_handler(func):
         raise e
     except AuthenticationRequired:
       raise
+    except QueryExpired:
+      raise
     except Exception as e:
       message = force_unicode(e)
       if 'Invalid query handle' in message or 'Invalid OperationHandle' in message:
@@ -123,13 +126,16 @@ class SqlAlchemyApi(Api):
     if interpreter.get('dialect_properties'):
       self.backticks = interpreter['dialect_properties']['sql_identifier_quote']
     else:
-      self.backticks = '"' if re.match('^(postgresql://|awsathena|elasticsearch)', self.options.get('url', '')) else '`'
+      self.backticks = '"' if re.match('^(postgresql://|awsathena|elasticsearch|phoenix)', self.options.get('url', '')) else '`'
 
-  def _get_engine(self):
-    engine_key = ENGINE_KEY % {
+  def _get_engine_key(self):
+    return ENGINE_KEY % {
       'username': self.user.username,
       'connector_name': self.interpreter['name']
     }
+
+  def _get_engine(self):
+    engine_key = self._get_engine_key()
 
     if engine_key not in ENGINES:
       ENGINES[engine_key] = self._create_engine()
@@ -177,12 +183,26 @@ class SqlAlchemyApi(Api):
         'username': self.user.username
       })
 
+    if self.options.get('credentials_json'):
+      self.options['credentials_info'] = json.loads(
+          self.options.pop('credentials_json')
+      )
+
+    # Enables various SqlAlchemy args to be passed along for both Hive & Presto connectors
+    # Refer to SqlAlchemy pyhive for more details
+    if self.options.get('connect_args'):
+      self.options['connect_args'] = json.loads(
+          self.options.pop('connect_args')
+      )
+
     options = self.options.copy()
     options.pop('session', None)
     options.pop('url', None)
     options.pop('has_ssh', None)
     options.pop('has_impersonation', None)
     options.pop('ssh_server_host', None)
+
+    options['pool_pre_ping'] = not url.startswith('phoenix://')  # Should be moved to dialect when connectors always on
 
     return create_engine(url, **options)
 
@@ -194,6 +214,20 @@ class SqlAlchemyApi(Api):
 
     return None
 
+
+  def _create_connection(self, engine):
+    connection = None
+    try:
+      connection = engine.connect()
+    except Exception as e:
+      engine_key = self._get_engine_key()
+      ENGINES.pop(engine_key, None)
+
+      raise AuthenticationRequired(message='Could not establish connection to datasource: %s' % e)
+
+    return connection
+
+
   @query_error_handler
   def execute(self, notebook, snippet):
     guid = uuid.uuid4().hex
@@ -203,16 +237,25 @@ class SqlAlchemyApi(Api):
       self.options['session'] = session
 
     engine = self._get_engine()
-    connection = engine.connect()
+    connection = self._create_connection(engine)
     statement = snippet['statement']
 
-    if self.options['url'].startswith('presto://') or \
-        self.interpreter.get('dialect_properties') and self.interpreter['dialect_properties']['trim_statement_semicolon']:
+    if self.interpreter['dialect_properties'].get('trim_statement_semicolon', True):
       statement = statement.strip().rstrip(';')
+
+    if self.interpreter['dialect_properties'].get('has_use_statement') and snippet.get('database'):
+      connection.execute(
+        'USE %(sql_identifier_quote)s%(database)s%(sql_identifier_quote)s' % {
+          'sql_identifier_quote': self.interpreter['dialect_properties']['sql_identifier_quote'],
+          'database': snippet['database'],
+        }
+      )
 
     result = connection.execute(statement)
 
+    logs = [message for message in result.cursor.fetch_logs()] if result.cursor and hasattr(result.cursor, 'fetch_logs') else []
     cache = {
+      'logs': logs,
       'connection': connection,
       'result': result,
       'meta': [
@@ -239,6 +282,34 @@ class SqlAlchemyApi(Api):
       }
     }
 
+
+  @query_error_handler
+  def explain(self, notebook, snippet):
+    session = self._get_session(notebook, snippet)
+    if session is not None:
+      self.options['session'] = session
+
+    engine = self._get_engine()
+    connection = self._create_connection(engine)
+    statement = snippet['statement']
+
+    explanation = ''
+
+    if statement:
+      if self.options['url'].startswith('bigquery://'):
+        explanation = ''
+      else:
+        result = connection.execute('EXPLAIN '+ statement)
+
+        explanation = "\n".join("{}: {},".format(k, v) for row in result for k, v in row.items())
+
+    return {
+      'status': 0,
+      'explanation': explanation,
+      'statement': statement
+    }
+
+
   @query_error_handler
   def check_status(self, notebook, snippet):
     guid = snippet['result']['handle']['guid']
@@ -247,7 +318,10 @@ class SqlAlchemyApi(Api):
     response = {'status': 'canceled'}
 
     if connection:
-      if snippet['result']['handle']['has_result_set']:
+      cursor = connection['result'].cursor
+      if self.options['url'].startswith('presto://') and cursor and cursor.poll():
+        response['status'] = 'running'
+      elif snippet['result']['handle']['has_result_set']:
         response['status'] = 'available'
       else:
         response['status'] = 'success'
@@ -255,6 +329,26 @@ class SqlAlchemyApi(Api):
       raise QueryExpired()
 
     return response
+
+
+  @query_error_handler
+  def progress(self, notebook, snippet, logs=''):
+    progress = 50
+    if self.options['url'].startswith('presto://'):
+      guid = snippet['result']['handle']['guid']
+      handle = CONNECTIONS.get(guid)
+      stats = None
+      progress = 100
+      try:
+        if handle and handle['result'].cursor:
+          stats = handle['result'].cursor.poll()
+      except AssertionError as e:
+        LOG.warn('Query probably not running anymore: %s' % e)
+      if stats:
+        stats = stats.get('stats', {})
+        progress = stats.get('completedSplits', 0) * 100 // stats.get('totalSplits', 1)
+    return progress
+
 
   @query_error_handler
   def fetch_result(self, notebook, snippet, rows, start_over):
@@ -275,6 +369,7 @@ class SqlAlchemyApi(Api):
       'type': 'table'
     }
 
+
   def _assign_types(self, results, meta):
     result = results and results[0]
     if result:
@@ -292,6 +387,7 @@ class SqlAlchemyApi(Api):
         else:
           meta[index]['type'] = 'STRING_TYPE'
 
+
   @query_error_handler
   def fetch_result_metadata(self):
     pass
@@ -304,8 +400,10 @@ class SqlAlchemyApi(Api):
 
   @query_error_handler
   def get_log(self, notebook, snippet, startFrom=None, size=None):
-    return ''
-
+    guid = snippet['result']['handle']['guid']
+    cache = CONNECTIONS.get(guid)
+    if cache:
+      return '\n'.join(cache['logs'])
 
   @query_error_handler
   def close_statement(self, notebook, snippet):
@@ -328,24 +426,34 @@ class SqlAlchemyApi(Api):
 
 
   @query_error_handler
-  def autocomplete(self, snippet, database=None, table=None, column=None, nested=None):
+  def autocomplete(self, snippet, database=None, table=None, column=None, nested=None, operation=None):
+    if snippet['type'] == 'phoenix':
+      if database:
+        database = database.upper()
+      if table:
+        table = table.upper()
     engine = self._get_engine()
     inspector = inspect(engine)
 
     assist = Assist(inspector, engine, backticks=self.backticks)
     response = {'status': -1}
 
-    if database is None:
-      response['databases'] = [db or 'NULL' for db in assist.get_databases()]
+    if operation == 'functions':
+      response['functions'] = []
+    elif operation == 'function':
+      response['function'] = {}
+    elif database is None:
+      response['databases'] = [db or '' for db in assist.get_databases()]
     elif table is None:
       tables_meta = []
-      database = self._fix_phoenix_empty_database(database)
-      for t in assist.get_tables(database):
+      for t in assist.get_table_names(database):
         t = self._fix_bigquery_db_prefixes(t)
         tables_meta.append({'name': t, 'type': 'Table', 'comment': ''})
+      for t in assist.get_view_names(database):
+        t = self._fix_bigquery_db_prefixes(t)
+        tables_meta.append({'name': t, 'type': 'View', 'comment': ''})
       response['tables_meta'] = tables_meta
     elif column is None:
-      database = self._fix_phoenix_empty_database(database)
       columns = assist.get_columns(database, table)
 
       response['columns'] = [col['name'] for col in columns]
@@ -355,7 +463,7 @@ class SqlAlchemyApi(Api):
           'default': col.get('default'),
           'name': col.get('name'),
           'nullable': col.get('nullable'),
-          'type': str(col.get('type')) if not isinstance(col.get('type'), NullType) else 'Null',
+          'type': self._get_column_type_name(col),
         }
         for col in columns
       ]
@@ -374,7 +482,7 @@ class SqlAlchemyApi(Api):
     engine = self._get_engine()
     inspector = inspect(engine)
 
-    assist = Assist(inspector, engine, backticks=self.backticks)
+    assist = Assist(inspector, engine, backticks=self.backticks, api=self)
     response = {'status': -1, 'result': {}}
 
     metadata, sample_data = assist.get_sample_data(database, table, column=column, operation=operation)
@@ -386,7 +494,7 @@ class SqlAlchemyApi(Api):
       columns = assist.get_columns(database, table)
       response['full_headers'] = [{
           'name': col.get('name'),
-          'type': str(col.get('type')) if not isinstance(col.get('type'), NullType) else 'Null',
+          'type': self._get_column_type_name(col),
           'comment': ''
         } for col in columns
       ]
@@ -413,28 +521,40 @@ class SqlAlchemyApi(Api):
     })
 
 
-  def _fix_phoenix_empty_database(self, database):
-    return None if self.options['url'].startswith('phoenix://') and database == 'NULL' else database
+  def _get_column_type_name(self, col):
+    try:
+      name = str(col.get('type'))
+    except (UnsupportedCompilationError, CompileError):
+      name = col.get('type').__visit_name__.lower()
+
+    return name
 
 
   def _fix_bigquery_db_prefixes(self, table_or_column):
     if self.options['url'].startswith('bigquery://'):
-      table_or_column = table_or_column.rsplit('.', 1)[1]
+      table_or_column = table_or_column.rsplit('.', 1)[-1]
     return table_or_column
 
 
 class Assist(object):
 
-  def __init__(self, db, engine, backticks):
+  def __init__(self, db, engine, backticks, api=None):
     self.db = db
     self.engine = engine
     self.backticks = backticks
+    self.api = api
 
   def get_databases(self):
     return self.db.get_schema_names()
 
-  def get_tables(self, database, table_names=[]):
+  def get_table_names(self, database, table_names=[]):
     return self.db.get_table_names(database)
+
+  def get_view_names(self, database, view_names=[]):
+    return self.db.get_view_names(database)
+
+  def get_tables(self, database, table_names=[]):
+    return self.get_table_names(database) + self.get_view_names(database)
 
   def get_columns(self, database, table):
     return self.db.get_columns(table, database)
@@ -456,7 +576,7 @@ class Assist(object):
           'backticks': self.backticks
       })
 
-    connection = self.engine.connect()
+    connection = self.api._create_connection(self.engine)
     try:
       result = connection.execute(statement)
       return result.cursor.description, result.fetchall()

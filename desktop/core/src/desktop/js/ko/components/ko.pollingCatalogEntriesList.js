@@ -98,7 +98,7 @@ class PollingCatalogEntriesList {
     const self = this;
     window.clearTimeout(self.pollTimeout);
 
-    const pollInternal = function() {
+    const pollInternal = function () {
       self.pollCount++;
       if (self.catalogEntry()) {
         self.lastPollSourceMetaPromise = self
@@ -108,14 +108,14 @@ class PollingCatalogEntriesList {
             refreshCache: self.pollCount > 0,
             cancellable: true
           })
-          .done(sourceMeta => {
+          .then(sourceMeta => {
             if (sourceMeta.notFound) {
               self.pollForSourceMeta();
             } else {
               self.catalogEntryExists(true);
             }
           })
-          .fail(() => {
+          .catch(() => {
             self.pollForSourceMeta();
           });
       }
@@ -145,7 +145,7 @@ class PollingCatalogEntriesList {
         connector: { id: ko.unwrap(self.sourceType) }, // TODO: Use connectors in polling catalog entries list
         path: ko.unwrap(self.path)
       })
-      .done(catalogEntry => {
+      .then(catalogEntry => {
         self.catalogEntry(catalogEntry);
         self.pollForSourceMeta();
       });

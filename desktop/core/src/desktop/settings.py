@@ -35,16 +35,16 @@ import django_opentracing
 from django.utils.translation import ugettext_lazy as _
 
 import desktop.redaction
-from desktop.lib.paths import get_desktop_root
+
+from desktop.lib.paths import get_desktop_root, get_run_root
 from desktop.lib.python_util import force_dict_to_strings
-from desktop.conf import has_channels
 
 from aws.conf import is_enabled as is_s3_enabled
 from azure.conf import is_abfs_enabled
 
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), '..', '..', '..'))
-
 
 HUE_DESKTOP_VERSION = pkg_resources.get_distribution("desktop").version or "Unknown"
 NICE_NAME = "Hue"
@@ -95,7 +95,7 @@ LANGUAGES = [
   ('ja', _('Japanese')),
   ('ko', _('Korean')),
   ('pt', _('Portuguese')),
-  ('pt_BR', _('Brazilian Portuguese')),
+  ('pt-br', _('Brazilian Portuguese')),
   ('zh-CN', _('Simplified Chinese')),
 ]
 
@@ -129,7 +129,7 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'desktop', 'libs', 'liboauth', 'src', 'liboauth', 'static'),
 )
 
-STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.CachedStaticFilesStorage'
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
 
 # For Django admin interface
 STATIC_URL = '/static/'
@@ -143,7 +143,7 @@ GTEMPLATE_LOADERS = (
   'django.template.loaders.app_directories.Loader'
 )
 
-MIDDLEWARE_CLASSES = [
+MIDDLEWARE = [
     # The order matters
     'desktop.middleware.MetricsMiddleware',
     'desktop.middleware.EnsureSafeMethodMiddleware',
@@ -155,7 +155,7 @@ MIDDLEWARE_CLASSES = [
     'desktop.middleware.SpnegoMiddleware',
     'desktop.middleware.HueRemoteUserMiddleware',
     'django.middleware.locale.LocaleMiddleware',
-    'babeldjango.middleware.LocaleMiddleware',
+    'django_babel.middleware.LocaleMiddleware',
     'desktop.middleware.AjaxMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -169,14 +169,13 @@ MIDDLEWARE_CLASSES = [
     'django.middleware.csrf.CsrfViewMiddleware',
 
     'django.middleware.http.ConditionalGetMiddleware',
-    #@TODO@ Prakash to check FailedLoginMiddleware working or not?
     #'axes.middleware.FailedLoginMiddleware',
     'desktop.middleware.MimeTypeJSFileFixStreamingMiddleware',
     'crequest.middleware.CrequestMiddleware',
 ]
 
 # if os.environ.get(ENV_DESKTOP_DEBUG):
-#   MIDDLEWARE_CLASSES.append('desktop.middleware.HtmlValidationMiddleware')
+#   MIDDLEWARE.append('desktop.middleware.HtmlValidationMiddleware')
 #   logging.debug("Will try to validate generated HTML.")
 
 ROOT_URLCONF = 'desktop.urls'
@@ -195,14 +194,13 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'django.contrib.staticfiles',
 
-    'django.contrib.admin',
     'django_extensions',
 
     # 'debug_toolbar',
     #'south', # database migration tool
 
     # i18n support
-    'babeldjango',
+    'django_babel',
 
     # Desktop injects all the other installed apps into here magically.
     'desktop',
@@ -277,7 +275,7 @@ AUTH_PROFILE_MODULE = None
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/" # For djangosaml2 bug.
 
-PYLINTRC = get_desktop_root('.pylintrc')
+PYLINTRC = get_run_root('.pylintrc')
 
 # Custom CSRF Failure View
 CSRF_FAILURE_VIEW = 'desktop.views.csrf_failure'
@@ -356,6 +354,12 @@ SERVER_EMAIL = desktop.conf.DJANGO_SERVER_EMAIL.get()
 EMAIL_BACKEND = desktop.conf.DJANGO_EMAIL_BACKEND.get()
 EMAIL_SUBJECT_PREFIX = 'Hue %s - ' % desktop.conf.CLUSTER_ID.get()
 
+# Permissive CORS
+if desktop.conf.CORS_ENABLED.get():
+  INSTALLED_APPS.append('corsheaders')
+  MIDDLEWARE.append('corsheaders.middleware.CorsMiddleware')
+  MIDDLEWARE.remove('django.middleware.csrf.CsrfViewMiddleware')
+  CORS_ALLOW_ALL_ORIGINS = True
 
 # Configure database
 if os.getenv('DESKTOP_DB_CONFIG'):
@@ -375,32 +379,48 @@ else:
   logging.debug("DESKTOP_DB_TEST_USER SET: %s" % test_user)
 
   default_db = {
-    "ENGINE" : desktop.conf.DATABASE.ENGINE.get(),
-    "NAME" : desktop.conf.DATABASE.NAME.get(),
-    "USER" : desktop.conf.DATABASE.USER.get(),
-    "SCHEMA" : desktop.conf.DATABASE.SCHEMA.get(),
-    "PASSWORD" : desktop.conf.get_database_password(),
-    "HOST" : desktop.conf.DATABASE.HOST.get(),
-    "PORT" : str(desktop.conf.DATABASE.PORT.get()),
+    "ENGINE": desktop.conf.DATABASE.ENGINE.get(),
+    "NAME": desktop.conf.DATABASE.NAME.get(),
+    "USER": desktop.conf.DATABASE.USER.get(),
+    "SCHEMA": desktop.conf.DATABASE.SCHEMA.get(),
+    "PASSWORD": desktop.conf.get_database_password(),
+    "HOST": desktop.conf.DATABASE.HOST.get(),
+    "PORT": str(desktop.conf.DATABASE.PORT.get()),
     "OPTIONS": force_dict_to_strings(desktop.conf.DATABASE.OPTIONS.get()),
     # DB used for tests
-    "TEST_NAME" : test_name,
-    "TEST_USER" : test_user,
+    "TEST_NAME": test_name,
+    "TEST_USER": test_user,
     # Wrap each request in a transaction.
-    "ATOMIC_REQUESTS" : True,
-    "CONN_MAX_AGE" : desktop.conf.DATABASE.CONN_MAX_AGE.get(),
+    "ATOMIC_REQUESTS": True,
+    "CONN_MAX_AGE": desktop.conf.DATABASE.CONN_MAX_AGE.get(),
   }
 
 DATABASES = {
   'default': default_db
 }
 
+if desktop.conf.QUERY_DATABASE.HOST.get():
+  DATABASES['query'] = {
+    'ENGINE': desktop.conf.QUERY_DATABASE.ENGINE.get(),
+    'HOST': desktop.conf.QUERY_DATABASE.HOST.get(),
+    'NAME': desktop.conf.QUERY_DATABASE.NAME.get(),
+    'USER': desktop.conf.QUERY_DATABASE.USER.get(),
+    'PASSWORD': desktop.conf.QUERY_DATABASE.PASSWORD.get(),
+    'OPTIONS': desktop.conf.QUERY_DATABASE.OPTIONS.get(),
+    'PORT': desktop.conf.QUERY_DATABASE.PORT.get(),
+    "SCHEMA": desktop.conf.QUERY_DATABASE.SCHEMA.get(),
+  }
+
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache', # TODO: Parameterize here for all the caches
         'LOCATION': 'unique-hue'
     },
+    'axes_cache': {
+        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+    },
 }
+AXES_CACHE = 'axes_cache'
 CACHES_HIVE_DISCOVERY_KEY = 'hive_discovery'
 CACHES[CACHES_HIVE_DISCOVERY_KEY] = {
     'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
@@ -423,9 +443,10 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = desktop.conf.SESSION.EXPIRE_AT_BROWSER_CLOSE.g
 # HTTP only
 SESSION_COOKIE_HTTPONLY = desktop.conf.SESSION.HTTP_ONLY.get()
 
+CSRF_COOKIE_AGE = None if desktop.conf.SESSION.CSRF_COOKIE_AGE.get() == 0 else desktop.conf.SESSION.CSRF_COOKIE_AGE.get()
 CSRF_COOKIE_SECURE = desktop.conf.SESSION.SECURE.get()
 CSRF_COOKIE_HTTPONLY = desktop.conf.SESSION.HTTP_ONLY.get()
-CSRF_COOKIE_NAME='csrftoken'
+CSRF_COOKIE_NAME = 'csrftoken'
 
 TRUSTED_ORIGINS = []
 if desktop.conf.SESSION.TRUSTED_ORIGINS.get():
@@ -435,7 +456,9 @@ if desktop.conf.SESSION.TRUSTED_ORIGINS.get():
 if desktop.conf.KNOX.KNOX_PROXYHOSTS.get(): # The hosts provided here don't have port. Add default knox port
   if desktop.conf.KNOX.KNOX_PORTS.get():
     hostport = []
-    ports = [host.split(':')[1] for host in desktop.conf.KNOX.KNOX_PROXYHOSTS.get() if len(host.split(':')) > 1] # In case the ports are in hostname
+    ports = [  # In case the ports are in hostname
+        host.split(':')[1] for host in desktop.conf.KNOX.KNOX_PROXYHOSTS.get() if len(host.split(':')) > 1
+    ]
     for port in ports + desktop.conf.KNOX.KNOX_PORTS.get():
       if port == '80':
         port = '' # Default port needs to be empty
@@ -489,7 +512,7 @@ if EMAIL_BACKEND == 'sendgrid_backend.SendgridBackend':
   SENDGRID_SANDBOX_MODE_IN_DEBUG = DEBUG
 
 
-if has_channels():
+if desktop.conf.has_channels():
   INSTALLED_APPS.append('channels')
   ASGI_APPLICATION = 'desktop.routing.application'
   CHANNEL_LAYERS = {
@@ -501,7 +524,8 @@ if has_channels():
     },
   }
 
-# Used for securely creating sessions. Should be unique and not shared with anybody. Changing auth backends will invalidate all open sessions.
+# Used for securely creating sessions. Should be unique and not shared with anybody.
+# Changing auth backends will invalidate all open sessions.
 SECRET_KEY = desktop.conf.get_secret_key()
 if SECRET_KEY:
   SECRET_KEY += str(AUTHENTICATION_BACKENDS)
@@ -533,7 +557,7 @@ if SAML_AUTHENTICATION:
 
 # Middleware classes.
 for middleware in desktop.conf.MIDDLEWARE.get():
-  MIDDLEWARE_CLASSES.append(middleware)
+  MIDDLEWARE.append(middleware)
 
 
 # OpenID Connect
@@ -546,7 +570,7 @@ if is_oidc_configured():
     # when multi-backend auth, standard login URL '/hue/accounts/login' is used.
     LOGIN_URL = '/oidc/authenticate/'
   SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-  MIDDLEWARE_CLASSES.append('mozilla_django_oidc.middleware.SessionRefresh')
+  MIDDLEWARE.append('mozilla_django_oidc.middleware.SessionRefresh')
   OIDC_RENEW_ID_TOKEN_EXPIRY_SECONDS = 15 * 60
   OIDC_RP_SIGN_ALGO = 'RS256'
   OIDC_RP_CLIENT_ID = desktop.conf.OIDC.OIDC_RP_CLIENT_ID.get()
@@ -567,15 +591,15 @@ if is_oidc_configured():
   OIDC_USERNAME_ATTRIBUTE = desktop.conf.OIDC.OIDC_USERNAME_ATTRIBUTE.get()
 
 # OAuth
-OAUTH_AUTHENTICATION='liboauth.backend.OAuthBackend' in AUTHENTICATION_BACKENDS
+OAUTH_AUTHENTICATION = 'liboauth.backend.OAuthBackend' in AUTHENTICATION_BACKENDS
 if OAUTH_AUTHENTICATION:
-    INSTALLED_APPS.append('liboauth')
-    LOGIN_URL = '/oauth/accounts/login'
-    SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+  INSTALLED_APPS.append('liboauth')
+  LOGIN_URL = '/oauth/accounts/login'
+  SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 # URL Redirection white list.
 if desktop.conf.REDIRECT_WHITELIST.get():
-  MIDDLEWARE_CLASSES.append('desktop.middleware.EnsureSafeRedirectURLMiddleware')
+  MIDDLEWARE.append('desktop.middleware.EnsureSafeRedirectURLMiddleware')
 
 # Enable X-Forwarded-Host header if the load balancer requires it
 USE_X_FORWARDED_HOST = desktop.conf.USE_X_FORWARDED_HOST.get()
@@ -586,10 +610,10 @@ if desktop.conf.SECURE_PROXY_SSL_HEADER.get():
 
 # Add last activity tracking and idle session timeout
 if 'useradmin' in [app.name for app in appmanager.DESKTOP_APPS]:
-  MIDDLEWARE_CLASSES.append('useradmin.middleware.LastActivityMiddleware')
+  MIDDLEWARE.append('useradmin.middleware.LastActivityMiddleware')
 
 if desktop.conf.SESSION.CONCURRENT_USER_SESSION_LIMIT.get():
-  MIDDLEWARE_CLASSES.append('useradmin.middleware.ConcurrentUserSessionMiddleware')
+  MIDDLEWARE.append('useradmin.middleware.ConcurrentUserSessionMiddleware')
 
 LOAD_BALANCER_COOKIE = 'ROUTEID'
 
@@ -632,7 +656,8 @@ if desktop.conf.SSL_CACERTS.get() and os.environ.get('REQUESTS_CA_BUNDLE') is No
   os.environ['REQUESTS_CA_BUNDLE'] = desktop.conf.SSL_CACERTS.get()
 
 # Preventing local build failure by not validating the default value of REQUESTS_CA_BUNDLE
-if os.environ.get('REQUESTS_CA_BUNDLE') and os.environ.get('REQUESTS_CA_BUNDLE') != desktop.conf.SSL_CACERTS.config.default and not os.path.isfile(os.environ['REQUESTS_CA_BUNDLE']):
+if os.environ.get('REQUESTS_CA_BUNDLE') and os.environ.get('REQUESTS_CA_BUNDLE') != desktop.conf.SSL_CACERTS.config.default \
+    and not os.path.isfile(os.environ['REQUESTS_CA_BUNDLE']):
   raise Exception(_('SSL Certificate pointed by REQUESTS_CA_BUNDLE does not exist: %s') % os.environ['REQUESTS_CA_BUNDLE'])
 
 # Instrumentation
@@ -649,8 +674,8 @@ if not desktop.conf.DATABASE_LOGGING.get():
     from django.db.backends.utils import CursorWrapper
 
     BaseDatabaseWrapper.make_debug_cursor = lambda self, cursor: CursorWrapper(cursor, self)
-
   disable_database_logging()
+
 
 ############################################################
 # Searching saved documents in Oracle returns following error:
@@ -675,8 +700,8 @@ def show_toolbar(request):
   return DEBUG and desktop.conf.ENABLE_DJANGO_DEBUG_TOOL.get() and is_user_allowed
 
 if DEBUG and desktop.conf.ENABLE_DJANGO_DEBUG_TOOL.get():
-  idx = MIDDLEWARE_CLASSES.index('desktop.middleware.ClusterMiddleware')
-  MIDDLEWARE_CLASSES.insert(idx + 1, 'debug_panel.middleware.DebugPanelMiddleware')
+  idx = MIDDLEWARE.index('desktop.middleware.ClusterMiddleware')
+  MIDDLEWARE.insert(idx + 1, 'debug_panel.middleware.DebugPanelMiddleware')
 
   INSTALLED_APPS += (
       'debug_toolbar',
@@ -743,8 +768,8 @@ if desktop.conf.TASK_SERVER.ENABLED.get() or desktop.conf.TASK_SERVER.BEAT_ENABL
 
 PROMETHEUS_EXPORT_MIGRATIONS = False # Needs to be there even when enable_prometheus is not enabled
 if desktop.conf.ENABLE_PROMETHEUS.get():
-  MIDDLEWARE_CLASSES.insert(0, 'django_prometheus.middleware.PrometheusBeforeMiddleware')
-  MIDDLEWARE_CLASSES.append('django_prometheus.middleware.PrometheusAfterMiddleware')
+  MIDDLEWARE.insert(0, 'django_prometheus.middleware.PrometheusBeforeMiddleware')
+  MIDDLEWARE.append('django_prometheus.middleware.PrometheusAfterMiddleware')
 
   if 'mysql' in DATABASES['default']['ENGINE']:
     DATABASES['default']['ENGINE'] = DATABASES['default']['ENGINE'].replace('django.db.backends', 'django_prometheus.db.backends')
@@ -762,20 +787,35 @@ if desktop.conf.TRACING.ENABLED.get():
   OPENTRACING_TRACER_CALLABLE = __name__ + '.tracer'
 
   def tracer():
-      from jaeger_client import Config
-      config = Config(
-          config={
-              'sampler': {
-                  'type': 'const',
-                  'param': 1,
-              },
-          },
-          # metrics_factory=PrometheusMetricsFactory(namespace='hue-api'),
-          service_name='hue-api',
-          validate=True,
-      )
-      return config.initialize_tracer()
+    from jaeger_client import Config
+    config = Config(
+      config={
+        'sampler': {
+          'type': 'const',
+          'param': 1,
+        },
+      },
+      # metrics_factory=PrometheusMetricsFactory(namespace='hue-api'),
+      service_name='hue-api',
+      validate=True,
+    )
+    return config.initialize_tracer()
 
-  OPENTRACING_TRACED_ATTRIBUTES = ['META'] # Only valid if OPENTRACING_TRACE_ALL == True
+  OPENTRACING_TRACED_ATTRIBUTES = ['META']  # Only valid if OPENTRACING_TRACE_ALL == True
   if desktop.conf.TRACING.TRACE_ALL.get():
-    MIDDLEWARE_CLASSES.insert(0, 'django_opentracing.OpenTracingMiddleware')
+    MIDDLEWARE.insert(0, 'django_opentracing.OpenTracingMiddleware')
+
+MODULES_TO_PATCH = (
+    'django.contrib.staticfiles.storage',
+    'django.core.cache.backends.filebased',
+    'django.core.cache.utils',
+    'django.db.backends.utils',
+    'django.utils.cache',
+)
+
+try:
+  import hashlib
+  hashlib.md5()
+except ValueError:
+  from desktop.monkey_patches import monkey_patch_md5
+  monkey_patch_md5(MODULES_TO_PATCH)

@@ -16,18 +16,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import print_function
 import json
 import logging
 
-from django.http import Http404
-from django.utils.html import escape
 from django.utils.translation import ugettext as _
-from django.views.decorators.http import require_POST
 
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.i18n import force_unicode
 from metadata.manager_client import ManagerApi
+from notebook.models import _get_notebook_api
 
 from kafka.conf import has_kafka_api
 from kafka.kafka_client import KafkaApi, KafkaApiException
@@ -63,7 +60,9 @@ def error_handler(view_fn):
 def list_topics(request):
   return JsonResponse({
     'status': 0,
-    'topics': [{'name': topic} for topic in get_topics()]
+    'topics': [
+      {'name': topic} for topic in get_topics(request.user)
+    ]
   })
 
 
@@ -99,17 +98,26 @@ def create_topic(request):
   })
 
 
-def get_topics():
+def get_topics(user):
   if has_kafka_api():
     return KafkaApi().topics()
   else:
-    try:
-      manager = ManagerApi()
-      broker_host = manager.get_kafka_brokers().split(',')[0].split(':')[0]
-      return [name for name in list(manager.get_kafka_topics(broker_host).keys()) if not name.startswith('__')]
-    except Exception as e:
-      print(e)
-      return ["traffic", "hueAccessLogs"]
+    data = {
+      'snippet': {},
+      'database': 'topics'
+    }
+
+    return [
+      topic['name']
+      for topic in _get_notebook_api(user, connector_id=56).autocomplete(**data)['tables_meta']
+      if not topic['name'].startswith('__')
+    ]
+
+
+def get_topic_data(user, name):
+  data = _get_notebook_api(user, connector_id=56).get_sample_data(snippet={})
+  print(data)
+  return data
 
 
 def get_topic(name):

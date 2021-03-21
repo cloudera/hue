@@ -100,9 +100,8 @@ def test_proxy_get():
   """
   Proxying test.
   """
-  client = Client()
   # All apps require login.
-  client.login(username="test", password="test")
+  client = make_logged_in_client(username="test", is_superuser=True)
   httpd, finish = run_test_server()
   try:
     # Test the proxying
@@ -128,9 +127,7 @@ def test_proxy_post():
   """
   Proxying test, using POST.
   """
-  client = Client()
-  # All apps require login.
-  client.login(username="test", password="test")
+  client = make_logged_in_client(username="test", is_superuser=True)
   httpd, finish = run_test_server()
   try:
     # Test the proxying

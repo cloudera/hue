@@ -29,7 +29,7 @@ import {
 import huePubSub from 'utils/huePubSub';
 
 ko.bindingHandlers.timelineChart = {
-  init: function(element, valueAccessor) {
+  init: function (element, valueAccessor) {
     if (valueAccessor().type && valueAccessor().type() === 'line') {
       window.setTimeout(() => {
         lineChartBuilder(element, valueAccessor(), true);
@@ -42,13 +42,11 @@ ko.bindingHandlers.timelineChart = {
       $(element).data('type', 'bar');
     }
   },
-  update: function(element, valueAccessor) {
+  update: function (element, valueAccessor) {
     const _options = valueAccessor();
     if (valueAccessor().type && valueAccessor().type() !== $(element).data('type')) {
       if ($(element).find('svg').length > 0) {
-        $(element)
-          .find('svg')
-          .remove();
+        $(element).find('svg').remove();
       }
       if (valueAccessor().type() === 'line') {
         window.setTimeout(() => {
@@ -83,7 +81,7 @@ ko.bindingHandlers.timelineChart = {
             }
           })
           .call(_chart);
-        _d3.selectAll('g.nv-x.nv-axis g text').each(function(d) {
+        _d3.selectAll('g.nv-x.nv-axis g text').each(function (d) {
           insertLinebreaks(_chart, d, this);
         });
         huePubSub.publish('charts.state');

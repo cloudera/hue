@@ -21,7 +21,7 @@ import huePubSub from 'utils/huePubSub';
 import hueUtils from 'utils/hueUtils';
 
 ko.bindingHandlers.dockable = {
-  init: function(element, valueAccessor) {
+  init: function (element, valueAccessor) {
     const options = valueAccessor() || {};
     const scrollable = options.scrollable ? options.scrollable : window;
     const triggerAdjust = options.triggerAdjust || 0;

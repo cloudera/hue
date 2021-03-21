@@ -18,7 +18,7 @@ import $ from 'jquery';
 import * as ko from 'knockout';
 
 ko.bindingHandlers.fetchMore = {
-  init: function(element, valueAccessor) {
+  init: function (element, valueAccessor) {
     const options = valueAccessor();
     const $element = $(element);
 

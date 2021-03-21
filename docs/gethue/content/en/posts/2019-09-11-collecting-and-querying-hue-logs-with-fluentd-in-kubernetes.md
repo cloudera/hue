@@ -37,8 +37,8 @@ sf_caption_position:
 ampforwp-amp-on-off:
   - default
 categories:
-  - Administration
-  - Version 4.6
+  - Version 4
+# - Version 4.6
 
 ---
 Hue is getting easy to run with its [Docker][1] container and Kubernetes [Helm package][2]. Then when the service is up, let&#8217;s see how we can retrieve and analyse the logs.

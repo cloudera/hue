@@ -15,12 +15,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from django.conf.urls import url
+import sys
+
 from hbase import views as hbase_views
 
-urlpatterns = [
-  url(r'^$', hbase_views.app, name='index'),
-  url(r'api/(?P<url>.+)$', hbase_views.api_router),
+if sys.version_info[0] > 2:
+  from django.urls import re_path
+else:
+  from django.conf.urls import url as re_path
 
-  url(r'^install_examples$', hbase_views.install_examples, name='install_examples'),
+urlpatterns = [
+  re_path(r'^$', hbase_views.app, name='index'),
+  re_path(r'api/(?P<url>.+)$', hbase_views.api_router),
+
+  re_path(r'^install_examples$', hbase_views.install_examples, name='install_examples'),
 ]

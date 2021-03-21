@@ -80,14 +80,7 @@ const hasAttributes = (node, attributes) => {
   if (typeof attributes === 'string') {
     attributes = [attributes];
   }
-  return attributes.every(
-    attribute =>
-      node.attr(attribute) &&
-      node
-        .attr(attribute)
-        .value()
-        .trim()
-  );
+  return attributes.every(attribute => node.attr(attribute) && node.attr(attribute).value().trim());
 };
 
 /**

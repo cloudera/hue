@@ -76,13 +76,13 @@ except ImportError as e:
   impala_settings = None
 
 try:
-  from jobbrowser.views import get_job
-  from jobbrowser.conf import ENABLE_QUERY_BROWSER, ENABLE_HIVE_QUERY_BROWSER
   from jobbrowser.apis.query_api import _get_api
+  from jobbrowser.conf import ENABLE_QUERY_BROWSER, ENABLE_HIVE_QUERY_BROWSER
+  from jobbrowser.views import get_job
   has_query_browser = ENABLE_QUERY_BROWSER.get()
   has_hive_query_browser = ENABLE_HIVE_QUERY_BROWSER.get()
   has_jobbrowser = True
-except (AttributeError, ImportError) as e:
+except (AttributeError, ImportError, RuntimeError) as e:
   LOG.warn("Job Browser app is not enabled")
   has_jobbrowser = False
   has_query_browser = False
@@ -178,7 +178,7 @@ class HS2Api(Api):
 
   @query_error_handler
   def create_session(self, lang='hive', properties=None):
-    application = 'beeswax' if lang == 'hive' or lang =='llap' else lang
+    application = 'beeswax' if lang == 'hive' or lang == 'llap' else lang
 
     if has_session_pool():
       session = Session.objects.get_tez_session(self.user, application, MAX_NUMBER_OF_SESSIONS.get())
@@ -339,14 +339,18 @@ class HS2Api(Api):
     if status.value in (QueryHistory.STATE.failed.value, QueryHistory.STATE.expired.value):
       if operation.errorMessage and 'transition from CANCELED to ERROR' in operation.errorMessage:  # Hive case on canceled query
         raise QueryExpired()
-      elif operation.errorMessage and re.search('Cannot validate serde: org.apache.hive.hcatalog.data.JsonSerDe', str(operation.errorMessage)):
+      elif operation.errorMessage and re.search(
+          'Cannot validate serde: org.apache.hive.hcatalog.data.JsonSerDe', str(operation.errorMessage)
+          ):
         raise QueryError(message=operation.errorMessage + _('. Is hive-hcatalog-core.jar registered?'))
       else:
         raise QueryError(operation.errorMessage)
 
-    response['status'] = 'running' if status.value in (QueryHistory.STATE.running.value, QueryHistory.STATE.submitted.value) else 'available'
+    response['status'] = 'running' if status.value in (
+        QueryHistory.STATE.running.value, QueryHistory.STATE.submitted.value
+      ) else 'available'
     if operation.hasResultSet is not None:
-      response['has_result_set']= operation.hasResultSet  # HIVE-12442 - With LLAP & HIVE_CLI_SERVICE_PROTOCOL_V8, hasResultSet can change after get_operation_status
+      response['has_result_set'] = operation.hasResultSet  # HIVE-12442 - With LLAP hasResultSet can change after get_operation_status
 
     return response
 
@@ -369,10 +373,11 @@ class HS2Api(Api):
         'has_more': results.has_more,
         'data': results.rows(),
         'meta': [{
-          'name': column.name,
-          'type': column.type,
-          'comment': column.comment
-        } for column in results.data_table.cols()],
+            'name': column.name,
+            'type': column.type,
+            'comment': column.comment
+          } for column in results.data_table.cols()
+        ],
         'type': 'table'
     }
 
@@ -484,7 +489,7 @@ class HS2Api(Api):
 
       jobs = [{
           'name': job.get('job_id', ''),
-          'url': reverse('jobbrowser.views.single_job', kwargs={'job': job.get('job_id', '')}) if has_jobbrowser else '',
+          'url': reverse('jobbrowser:jobbrowser.views.single_job', kwargs={'job': job.get('job_id', '')}) if has_jobbrowser else '',
           'started': job.get('started', False),
           'finished': job.get('finished', False)
         }
@@ -504,7 +509,9 @@ class HS2Api(Api):
       if isinstance(guid, str):
         guid = guid.encode('utf-8')
       query_id = unpack_guid_base64(guid)
-      progress = min(self.progress(notebook, snippet, logs), 99) if snippet['status'] != 'available' and snippet['status'] != 'success' else 100
+      progress = min(
+          self.progress(notebook, snippet, logs), 99
+        ) if snippet['status'] != 'available' and snippet['status'] != 'success' else 100
       jobs = [{
         'name': query_id,
         'url': '/hue/jobbrowser#!id=%s' % query_id,
@@ -517,7 +524,7 @@ class HS2Api(Api):
 
 
   @query_error_handler
-  def autocomplete(self, snippet, database=None, table=None, column=None, nested=None):
+  def autocomplete(self, snippet, database=None, table=None, column=None, nested=None, operation=None):
     db = self._get_db(snippet, interpreter=self.interpreter)
     query = None
 
@@ -531,7 +538,7 @@ class HS2Api(Api):
       query = self._get_current_statement(notebook, snippet)['statement']
       database, table = '', ''
 
-    resp = _autocomplete(db, database, table, column, nested, query=query, cluster=self.interpreter)
+    resp = _autocomplete(db, database, table, column, nested, query=query, cluster=self.interpreter, operation=operation)
 
     if resp.get('error'):
       resp['message'] = resp.pop('error')
@@ -556,19 +563,24 @@ class HS2Api(Api):
     response = self._get_current_statement(notebook, snippet)
     session = self._get_session(notebook, snippet['type'])
 
-    query = self._prepare_hql_query(snippet, response.pop('statement'), session)
+    statement = response.pop('statement')
+    explanation = ''
 
-    try:
-      db.use(query.database)
+    query = self._prepare_hql_query(snippet, statement, session)
 
-      explanation = db.explain(query)
-    except QueryServerException as ex:
-      raise QueryError(ex.message)
+    if statement:
+      try:
+        db.use(query.database)
+
+        explanation = db.explain(query).textual
+        statement = query.get_query_statement(0)
+      except QueryServerException as ex:
+        explanation = str(ex.message)
 
     return {
       'status': 0,
-      'explanation': explanation.textual,
-      'statement': query.get_query_statement(0),
+      'explanation': explanation,
+      'statement': statement,
     }
 
 
@@ -582,7 +594,9 @@ class HS2Api(Api):
 
     upload(target_file, handle, self.request.user, db, self.request.fs, max_rows=max_rows, max_bytes=max_bytes)
 
-    return '/filebrowser/view=%s' % urllib_quote(urllib_quote(target_file.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS)) # Quote twice, because of issue in the routing on client
+    return '/filebrowser/view=%s' % urllib_quote(
+        urllib_quote(target_file.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS)
+    ) # Quote twice, because of issue in the routing on client
 
 
   def export_data_as_table(self, notebook, snippet, destination, is_temporary=False, location=None):
@@ -603,7 +617,9 @@ class HS2Api(Api):
 
     db.use(query.database)
 
-    hql = 'CREATE %sTABLE `%s`.`%s` %sAS %s' % ('TEMPORARY ' if is_temporary else '', database, table, "LOCATION '%s' " % location if location else '', query.hql_query)
+    hql = 'CREATE %sTABLE `%s`.`%s` %sAS %s' % (
+        'TEMPORARY ' if is_temporary else '', database, table, "LOCATION '%s' " % location if location else '', query.hql_query
+    )
     success_url = reverse('metastore:describe_table', kwargs={'database': database, 'table': table})
 
     return hql, success_url
@@ -856,7 +872,8 @@ DROP TABLE IF EXISTS `%(table)s`;
       LOG.debug("Attempting to get Impala query profile at server_url %s for query ID: %s" % (server_url, query_id))
 
       fragment = self._get_impala_query_profile(server_url, query_id=query_id)
-      total_records_re = "Coordinator Fragment F\d\d.+?RowsReturned: \d+(?:.\d+[KMB])? \((?P<total_records>\d+)\).*?(Averaged Fragment F\d\d)"
+      total_records_re = \
+          "Coordinator Fragment F\d\d.+?RowsReturned: \d+(?:.\d+[KMB])? \((?P<total_records>\d+)\).*?(Averaged Fragment F\d\d)"
       total_records_match = re.search(total_records_re, fragment, re.MULTILINE | re.DOTALL)
 
     if total_records_match:
@@ -904,12 +921,12 @@ DROP TABLE IF EXISTS `%(table)s`;
 
 
   def describe_column(self, notebook, snippet, database=None, table=None, column=None):
-    db = self._get_db(snippet, self.interpreter)
+    db = self._get_db(snippet, interpreter=self.interpreter)
     return db.get_table_columns_stats(database, table, column)
 
 
   def describe_table(self, notebook, snippet, database=None, table=None):
-    db = self._get_db(snippet, self.interpreter)
+    db = self._get_db(snippet, interpreter=self.interpreter)
     tb = db.get_table(database, table)
 
     return {

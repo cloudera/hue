@@ -26,7 +26,7 @@ import * as ko from 'knockout';
  *
  */
 ko.bindingHandlers.hueSpinner = {
-  update: function(element, valueAccessor) {
+  update: function (element, valueAccessor) {
     const value = ko.unwrap(valueAccessor());
 
     const options = {

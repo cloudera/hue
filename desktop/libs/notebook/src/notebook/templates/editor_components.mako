@@ -23,6 +23,8 @@ from desktop import conf
 from desktop.auth.backend import is_admin
 from desktop.lib.i18n import smart_unicode
 from desktop.views import _ko, antixss
+from desktop.webpack_utils import get_hue_bundles
+
 from metadata.conf import has_optimizer, OPTIMIZER
 
 from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_BATCH_EXECUTE, ENABLE_EXTERNAL_STATEMENT, ENABLE_PRESENTATION
@@ -81,14 +83,15 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
       $('#queryBuilder').hide();
       $('#queryBuilderAlert').show();
     }
-  }, 500, 'editor' + (window.location.getParameter('type') ? '-' + window.location.getParameter('type') : ''));
+  }, 500, 'editor' + (hueUtils.getParameter('type') ? '-' + hueUtils.getParameter('type') : ''));
 
 </script>
 <!-- End query builder imports -->
 % endif
 
-${ render_bundle('vendors~notebook') | n,unicode }
-${ render_bundle('notebook') | n,unicode }
+% for bundle in get_hue_bundles('notebook'):
+  ${ render_bundle(bundle) | n,unicode }
+% endfor
 
 <!--[if IE 9]>
   <script src="${ static('desktop/ext/js/classList.min.js') }" type="text/javascript" charset="utf-8"></script>
@@ -282,12 +285,14 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         </li>
         <li class="divider"></li>
         <!-- ko if: $root.canSave -->
+        <!-- ko if: sharingEnabled -->
         <li>
           <a class="share-link pointer" data-bind="click: prepareShareModal,
               css: {'isShared': isShared()}">
             <i class="fa fa-fw fa-users"></i> ${ _('Share') }
           </a>
         </li>
+        <!-- /ko -->
         <!-- /ko -->
         <li>
           <a class="pointer" data-bind="publish: {'context.panel.visible': true}">
@@ -916,8 +921,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 <script type="text/html" id="snippet-header-statement-type${ suffix }">
   % if ENABLE_EXTERNAL_STATEMENT.get():
   <!-- ko if: isSqlDialect() -->
-    <span class="editor-header-title">${ _('Type') }</span>
-    <div data-bind="component: { name: 'hue-drop-down', params: { value: statementType, entries: statementTypes, linkTitle: '${ _ko('Statement type') }' } }" style="display: inline-block"></div>
+    <div data-bind="component: { name: 'hue-drop-down', params: { titleName: '${ _ko('Type') }', value: statementType, entries: statementTypes, linkTitle: '${ _ko('Statement type') }' } }" style="display: inline-block"></div>
   <!-- /ko -->
   % endif
 </script>
@@ -2106,6 +2110,12 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       presto: {
         placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
         aceMode: 'ace/mode/presto',
+        snippetIcon: 'fa-database',
+        sqlDialect: true
+      },
+      dasksql: {
+        placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
+        aceMode: 'ace/mode/dasksql',
         snippetIcon: 'fa-database',
         sqlDialect: true
       },

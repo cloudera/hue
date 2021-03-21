@@ -15,27 +15,30 @@
 // limitations under the License.
 
 import $ from 'jquery';
+import ace from 'ext/aceHelper';
 
-import AssistStorageEntry from 'ko/components/assist/assistStorageEntry';
+import { DIALECT } from 'apps/editor/snippet';
 import dataCatalog from 'catalog/dataCatalog';
-import hueDebug from 'utils/hueDebug';
-import huePubSub from 'utils/huePubSub';
-import I18n from 'utils/i18n';
+import AssistStorageEntry from 'ko/components/assist/assistStorageEntry';
 import sqlStatementsParser from 'parse/sqlStatementsParser';
 import sqlUtils from 'sql/sqlUtils';
-import stringDistance from 'sql/stringDistance';
-import { DIALECT } from 'apps/notebook2/snippet';
 import {
   POST_FROM_LOCATION_WORKER_EVENT,
   POST_FROM_SYNTAX_WORKER_EVENT,
   POST_TO_LOCATION_WORKER_EVENT,
   POST_TO_SYNTAX_WORKER_EVENT
 } from 'sql/sqlWorkerHandler';
+import stringDistance from 'sql/stringDistance';
+import hueDebug from 'utils/hueDebug';
+import huePubSub from 'utils/huePubSub';
+import I18n from 'utils/i18n';
+import { getFromLocalStorage } from 'utils/storageUtils';
 
 // TODO: depends on Ace, sqlStatementsParser
 
 export const REFRESH_STATEMENT_LOCATIONS_EVENT = 'editor.refresh.statement.locations';
 export const ACTIVE_STATEMENT_CHANGED_EVENT = 'editor.active.statement.changed';
+export const CURSOR_POSITION_CHANGED_EVENT = 'editor.cursor.position.changed';
 
 const STATEMENT_COUNT_AROUND_ACTIVE = 10;
 
@@ -62,11 +65,11 @@ class AceLocationHandler {
     self.attachSqlWorker();
     self.attachMouseListeners();
 
-    self.dialect = () => (window.ENABLE_NOTEBOOK_2 ? self.snippet.dialect() : self.snippet.type());
+    self.dialect = () => self.snippet.type();
 
     self.verifyThrottle = -1;
 
-    const updateDatabaseIndex = function(databaseList) {
+    const updateDatabaseIndex = function (databaseList) {
       self.databaseIndex = {};
       databaseList.forEach(database => {
         self.databaseIndex[database.toLowerCase()] = true;
@@ -95,19 +98,19 @@ class AceLocationHandler {
     const activeMarkers = [];
     let keepLastMarker = false;
 
-    const hideContextTooltip = function() {
+    const hideContextTooltip = function () {
       clearTimeout(tooltipTimeout);
       contextTooltip.hide();
     };
 
-    const clearActiveMarkers = function() {
+    const clearActiveMarkers = function () {
       hideContextTooltip();
       while (activeMarkers.length > keepLastMarker ? 1 : 0) {
         self.editor.session.removeMarker(activeMarkers.shift());
       }
     };
 
-    const markLocation = function(parseLocation) {
+    const markLocation = function (parseLocation) {
       let range;
       if (parseLocation.type === 'function') {
         // Todo: Figure out why functions need an extra char at the end
@@ -196,10 +199,10 @@ class AceLocationHandler {
                           return identifier.name;
                         })
                       })
-                      .done(entry => {
+                      .then(entry => {
                         entry
                           .getSourceMeta({ cachedOnly: true, silenceErrors: true })
-                          .done(sourceMeta => {
+                          .then(sourceMeta => {
                             if (sourceMeta && sourceMeta.extended_columns) {
                               sourceMeta.extended_columns.every(col => {
                                 if (col.name.toLowerCase() === colName) {
@@ -209,7 +212,13 @@ class AceLocationHandler {
                                 return true;
                               });
                             }
+                          })
+                          .catch(() => {
+                            // Ignore
                           });
+                      })
+                      .catch(err => {
+                        // Ignore
                       });
                   }
                 }
@@ -317,7 +326,7 @@ class AceLocationHandler {
       self.editor.off('input', inputListener);
     });
 
-    const mouseoutListener = function() {
+    const mouseoutListener = function () {
       clearActiveMarkers();
       clearTimeout(tooltipTimeout);
       contextTooltip.hide();
@@ -330,7 +339,7 @@ class AceLocationHandler {
       self.editor.container.removeEventListener('mouseout', mouseoutListener);
     });
 
-    const onContextMenu = function(e) {
+    const onContextMenu = function (e) {
       const selectionRange = self.editor.selection.getRange();
       huePubSub.publish('context.popover.hide');
       huePubSub.publish('sql.syntax.dropdown.hide');
@@ -377,23 +386,24 @@ class AceLocationHandler {
               .resolveCatalogEntry({
                 temporaryOnly: self.snippet.autocompleteSettings.temporaryOnly
               })
-              .done(entry => {
+              .then(entry => {
                 huePubSub.publish('context.popover.show', {
                   data: {
                     type: 'catalogEntry',
                     catalogEntry: entry
                   },
                   pinEnabled: true,
+                  connector: self.snippet.connector(),
                   source: source
                 });
               })
-              .fail(() => {
+              .catch(() => {
                 token.notFound = true;
               });
           } else if (token.parseLocation && !token.notFound) {
             // Asterisk, function etc.
             if (token.parseLocation.type === 'file') {
-              AssistStorageEntry.getEntry(token.parseLocation.path).done(entry => {
+              AssistStorageEntry.getEntry(token.parseLocation.path).then(entry => {
                 entry.open(true);
                 huePubSub.publish('context.popover.show', {
                   data: {
@@ -401,6 +411,7 @@ class AceLocationHandler {
                     storageEntry: entry,
                     editorLocation: token.parseLocation.location
                   },
+                  connector: self.snippet.connector(),
                   pinEnabled: true,
                   source: source
                 });
@@ -408,6 +419,7 @@ class AceLocationHandler {
             } else {
               huePubSub.publish('context.popover.show', {
                 data: token.parseLocation,
+                connector: self.snippet.connector(),
                 sourceType: self.dialect(),
                 namespace: self.snippet.namespace(),
                 compute: self.snippet.compute(),
@@ -418,7 +430,7 @@ class AceLocationHandler {
             }
           } else if (token.syntaxError) {
             huePubSub.publish('sql.syntax.dropdown.show', {
-              snippet: self.snippet,
+              editorId: self.snippet.id(),
               data: token.syntaxError,
               editor: self.editor,
               range: range,
@@ -448,7 +460,7 @@ class AceLocationHandler {
     let lastKnownStatements = [];
     let activeStatement;
 
-    const isPointInside = function(parseLocation, editorPosition) {
+    const isPointInside = function (parseLocation, editorPosition) {
       const row = editorPosition.row + 1; // ace positioning has 0 based rows while the parser has 1
       const column = editorPosition.column;
       return (
@@ -483,7 +495,7 @@ class AceLocationHandler {
     };
 
     let lastExecutingStatement = null;
-    const updateActiveStatement = function(cursorChange) {
+    const updateActiveStatement = function (cursorChange) {
       if (!self.snippet.isSqlDialect()) {
         return;
       }
@@ -514,7 +526,7 @@ class AceLocationHandler {
         }
       }
 
-      if (cursorChange && activeStatement && !window.ENABLE_NOTEBOOK_2) {
+      if (cursorChange && activeStatement) {
         // Don't update when cursor stays in the same statement
         if (isPointInside(activeStatement.location, cursorLocation)) {
           return;
@@ -594,7 +606,7 @@ class AceLocationHandler {
       }
     };
 
-    const parseForStatements = function() {
+    const parseForStatements = function () {
       if (self.snippet.isSqlDialect()) {
         try {
           const lastChangeTime = self.editor.lastChangeTime;
@@ -617,7 +629,6 @@ class AceLocationHandler {
     let cursorChangePaused = false; // On change the cursor is also moved, this limits the calls while typing
 
     let lastStart;
-    let lastEnd;
     let lastCursorPosition;
     const changeSelectionListener = self.editor.on('changeSelection', () => {
       if (cursorChangePaused) {
@@ -631,21 +642,19 @@ class AceLocationHandler {
           lastCursorPosition.row !== newCursorPosition.row ||
           lastCursorPosition.column !== newCursorPosition.column
         ) {
-          self.snippet.aceCursorPosition(newCursorPosition);
+          huePubSub.publish(CURSOR_POSITION_CHANGED_EVENT, {
+            editorId: self.snippet.id(),
+            position: newCursorPosition
+          });
           lastCursorPosition = newCursorPosition;
         }
 
         // The active statement is initially the top one in the selection, batch execution updates this.
         const newStart = self.editor.getSelectionRange().start;
-        const newEnd = self.editor.getSelectionRange().end;
-        if (
-          (self.snippet.isSqlDialect() && (!lastStart || !equalPositions(lastStart, newStart))) ||
-          (window.ENABLE_NOTEBOOK_2 && (!lastEnd || !equalPositions(lastEnd, newEnd)))
-        ) {
+        if (self.snippet.isSqlDialect() && (!lastStart || !equalPositions(lastStart, newStart))) {
           window.clearTimeout(updateThrottle);
           updateActiveStatement(true);
           lastStart = newStart;
-          lastEnd = newEnd;
         }
       }, 100);
     });
@@ -664,8 +673,8 @@ class AceLocationHandler {
       }
     });
 
-    const locateSubscription = huePubSub.subscribe(REFRESH_STATEMENT_LOCATIONS_EVENT, snippet => {
-      if (snippet === self.snippet) {
+    const locateSubscription = huePubSub.subscribe(REFRESH_STATEMENT_LOCATIONS_EVENT, editorId => {
+      if (editorId === self.snippet.id()) {
         cursorChangePaused = true;
         window.clearTimeout(changeThrottle);
         window.clearTimeout(updateThrottle);
@@ -743,7 +752,7 @@ class AceLocationHandler {
     const markerId = self.editor.getSession().addMarker(range, clazz);
     const marker = self.editor.getSession().$backMarkers[markerId];
     marker.token = token;
-    marker.dispose = function() {
+    marker.dispose = function () {
       range.start.detach();
       range.end.detach();
       delete marker.token.syntaxError;
@@ -777,11 +786,7 @@ class AceLocationHandler {
         return;
       }
 
-      const suppressedRules = window.apiHelper.getFromTotalStorage(
-        'hue.syntax.checker',
-        'suppressedRules',
-        {}
-      );
+      const suppressedRules = getFromLocalStorage('hue.syntax.checker.suppressedRules', {});
       if (
         e.data.syntaxError &&
         e.data.syntaxError.ruleId &&
@@ -839,7 +844,7 @@ class AceLocationHandler {
       }
     });
 
-    huePubSub.publish('editor.refresh.statement.locations', self.snippet);
+    huePubSub.publish(REFRESH_STATEMENT_LOCATIONS_EVENT, self.snippet.id());
   }
 
   detachSqlSyntaxWorker() {
@@ -866,8 +871,8 @@ class AceLocationHandler {
         silenceErrors: true,
         cachedOnly: true
       })
-      .done(deferred.resolve)
-      .fail(() => {
+      .then(deferred.resolve)
+      .catch(() => {
         deferred.reject([]);
       });
     return deferred;
@@ -885,7 +890,7 @@ class AceLocationHandler {
       });
       $.when
         .apply($, tablePromises)
-        .done(function() {
+        .done(function () {
           let joined = [];
           for (let i = 0; i < arguments.length; i++) {
             joined = joined.concat(arguments[i]);
@@ -962,14 +967,14 @@ class AceLocationHandler {
       }
     });
 
-    const resolvePathFromTables = function(location) {
+    const resolvePathFromTables = function (location) {
       const promise = $.Deferred();
       if (
         location.type === 'column' &&
         typeof location.tables !== 'undefined' &&
         location.identifierChain.length === 1
       ) {
-        const findIdentifierChainInTable = function(tablesToGo) {
+        const findIdentifierChainInTable = function (tablesToGo) {
           const nextTable = tablesToGo.shift();
           if (typeof nextTable.subQuery === 'undefined') {
             dataCatalog
@@ -984,7 +989,7 @@ class AceLocationHandler {
                 cachedOnly: true,
                 silenceErrors: true
               })
-              .done(entries => {
+              .then(entries => {
                 const containsColumn = entries.some(entry => {
                   return sqlUtils.identifierEquals(entry.name, location.identifierChain[0].name);
                 });
@@ -1001,7 +1006,7 @@ class AceLocationHandler {
                   promise.resolve();
                 }
               })
-              .fail(promise.resolve);
+              .catch(promise.resolve);
           } else if (tablesToGo.length > 0) {
             findIdentifierChainInTable(tablesToGo);
           } else {
@@ -1023,7 +1028,7 @@ class AceLocationHandler {
       return promise;
     };
 
-    const verify = function() {
+    const verify = function () {
       if (tokensToVerify.length === 0) {
         return;
       }
@@ -1073,7 +1078,7 @@ class AceLocationHandler {
 
           self
             .fetchPossibleValues(token)
-            .done(possibleValues => {
+            .done(async possibleValues => {
               // Tokens might change while making api calls
               if (!token.parseLocation) {
                 self.verifyThrottle = window.setTimeout(verify, VERIFY_DELAY);
@@ -1092,8 +1097,8 @@ class AceLocationHandler {
               const uniqueIndex = {};
               const uniqueValues = [];
               for (let i = 0; i < possibleValues.length; i++) {
-                possibleValues[i].name = sqlUtils.backTickIfNeeded(
-                  self.dialect(),
+                possibleValues[i].name = await sqlUtils.backTickIfNeeded(
+                  self.snippet.connector(),
                   possibleValues[i].name
                 );
                 const nameLower = possibleValues[i].name.toLowerCase();
@@ -1292,7 +1297,7 @@ class AceLocationHandler {
             .getSession()
             .getTokenAt(location.location.first_line - 1, location.location.first_column + 1);
         }
-        if (token && token.value && /^\s*\$\{\s*$/.test(token.value)) {
+        if (token && token.value && /^\s*\${\s*$/.test(token.value)) {
           token = null;
         }
         if (token && token.value) {

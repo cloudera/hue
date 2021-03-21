@@ -21,13 +21,13 @@
   from desktop.auth.backend import is_admin, is_hue_admin
   from desktop.conf import APP_SWITCHER_ALTUS_BASE_URL, APP_SWITCHER_MOW_BASE_URL, CUSTOM_DASHBOARD_URL, \
       DISPLAY_APP_SWITCHER, IS_K8S_ONLY, IS_MULTICLUSTER_ONLY, USE_DEFAULT_CONFIGURATION, USE_NEW_SIDE_PANELS, \
-      VCS, ENABLE_GIST, ENABLE_LINK_SHARING, has_channels
+      VCS, ENABLE_GIST, ENABLE_LINK_SHARING, has_channels, has_connectors
   from desktop.models import hue_version, _get_apps, get_cluster_config
 
   from beeswax.conf import DOWNLOAD_BYTES_LIMIT, DOWNLOAD_ROW_LIMIT, LIST_PARTITIONS_LIMIT, CLOSE_SESSIONS
   from dashboard.conf import HAS_SQL_ENABLED
   from jobbrowser.conf import ENABLE_HISTORY_V2
-  from filebrowser.conf import SHOW_UPLOAD_BUTTON
+  from filebrowser.conf import SHOW_UPLOAD_BUTTON, REMOTE_STORAGE_HOME
   from indexer.conf import ENABLE_NEW_INDEXER
   from metadata.conf import has_catalog, has_readonly_catalog, has_optimizer, has_workload_analytics, OPTIMIZER, get_optimizer_url, \
       get_catalog_url, get_optimizer_mode
@@ -46,6 +46,8 @@
   window.AUTOCOMPLETE_TIMEOUT = ${ conf.EDITOR_AUTOCOMPLETE_TIMEOUT.get() };
 
   window.BANNER_TOP_HTML = '${ conf.CUSTOM.BANNER_TOP_HTML.get() }';
+
+  window.DISABLE_LOCAL_STORAGE = '${ conf.DISABLE_LOCAL_STORAGE.get() }' === 'True';
 
   window.CACHEABLE_TTL = {
     default: ${ conf.CUSTOM.CACHEABLE_TTL.get() },
@@ -81,7 +83,7 @@
   window.HAS_SQL_DASHBOARD = '${ HAS_SQL_ENABLED.get() }' === 'True';
   window.CUSTOM_DASHBOARD_URL = '${ CUSTOM_DASHBOARD_URL.get() }';
 
-  window.DROPZONE_HOME_DIR = '${ user.get_home_directory() if not user.is_anonymous() else "" }';
+  window.DROPZONE_HOME_DIR = '${ user.get_home_directory() if not user.is_anonymous else "" }';
 
   window.DOWNLOAD_ROW_LIMIT = ${ DOWNLOAD_ROW_LIMIT.get() if hasattr(DOWNLOAD_ROW_LIMIT, 'get') and DOWNLOAD_ROW_LIMIT.get() >= 0 else 'undefined' };
   window.DOWNLOAD_BYTES_LIMIT = ${ DOWNLOAD_BYTES_LIMIT.get() if hasattr(DOWNLOAD_BYTES_LIMIT, 'get') and DOWNLOAD_BYTES_LIMIT.get() >= 0 else 'undefined' };
@@ -93,6 +95,7 @@
   window.ENABLE_DOWNLOAD = '${ conf.ENABLE_DOWNLOAD.get() }' === 'True';
   window.ENABLE_NEW_CREATE_TABLE = '${ hasattr(ENABLE_NEW_CREATE_TABLE, 'get') and ENABLE_NEW_CREATE_TABLE.get()}' === 'True';
   window.ENABLE_NOTEBOOK_2 = '${ ENABLE_NOTEBOOK_2.get() }' === 'True';
+  window.ENABLE_PREDICT = '${ OPTIMIZER.ENABLE_PREDICT.get() }' === 'True';
   window.ENABLE_SQL_INDEXER = '${ ENABLE_SQL_INDEXER.get() }' === 'True';
 
   window.ENABLE_QUERY_BUILDER = '${ ENABLE_QUERY_BUILDER.get() }' === 'True';
@@ -112,7 +115,7 @@
   window.AUTO_UPLOAD_OPTIMIZER_STATS = '${ OPTIMIZER.AUTO_UPLOAD_STATS.get() }' === 'True';
 
   window.HAS_GIST = '${ ENABLE_GIST.get() }' === 'True';
-  window.HAS_LINK_SHARING = '${ ENABLE_LINK_SHARING.get() }' === 'True';
+  window.HAS_CONNECTORS = '${ has_connectors() }' === 'True';
 
   ## In the past was has_workload_analytics()
   window.HAS_WORKLOAD_ANALYTICS = '${ ENABLE_QUERY_ANALYSIS.get() }' === 'True';
@@ -155,7 +158,6 @@
     'Active namespace': '${ _('Active namespace') }',
     'Add a description...': '${ _('Add a description...') }',
     'Add filter': '${ _('Add filter') }',
-    'Add more...': '${ _('Add more...') }',
     'Add privilege': '${ _('Add privilege') }',
     'Add properties...': '${ _('Add properties...') }',
     'Add table': '${ _('Add table') }',
@@ -163,6 +165,8 @@
     'Add': '${ _('Add') }',
     'Admin': '${ _('Admin') }',
     'Administration': '${ _('Administration') }',
+    'Administer Server': '${ _('Administer Server') }',
+    'Administer Users': '${ _('Administer Users') }',
     'aggregate': '${ _('aggregate') }',
     'Aggregate': '${ _('Aggregate') }',
     'alias': '${ _('alias') }',
@@ -260,6 +264,7 @@
     'Done.': '${ _('Done.') }',
     'Drop a SQL file here': '${_('Drop a SQL file here')}',
     'Drop iPython/Zeppelin notebooks here': '${_('Drop iPython/Zeppelin notebooks here')}',
+    'Edit list...': '${ _('Edit list...') }',
     'Edit Profile': '${ _('Edit Profile') }',
     'Edit tags': '${ _('Edit tags') }',
     'Edit this privilege': '${ _('Edit this privilege') }',
@@ -655,7 +660,7 @@
     # TODO remove
     # Code moved from assist.mako
     try:
-      home_dir = user.get_home_directory()
+      home_dir = REMOTE_STORAGE_HOME.get() if hasattr(REMOTE_STORAGE_HOME, 'get') and REMOTE_STORAGE_HOME.get() else user.get_home_directory()
       if not request.fs.isdir(home_dir):
         home_dir = '/'
     except:

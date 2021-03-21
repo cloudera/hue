@@ -269,7 +269,7 @@ Configure Hue for SAML Authentication
 
 The Service Provider (Hue) and the Identity Provider use a metadata file to confirm each other's identity. Hue stores metadata from the SAML server, and the IdP stores metadata from Hue server.
 
-In Configure Hue at the Command Line, you must copy the metadata from your IdP's SAML server and store it in an XML file on every ost with a Hue server.
+In Configure Hue at the Command Line, you must copy the metadata from your IdP's SAML server and store it in an XML file on every host with a Hue server.
 Important: Read the documentation of your Identity Provider for details on how to procure the XML of the SAML server metadata.
 
 Configure Hue at the Command Line
@@ -597,6 +597,49 @@ When idle_session_timeout is set, users will automatically be logged out after N
 
 [Read more about it here](http://gethue.com/introducing-the-new-login-modal-and-idle-session-timeout/).
 
+### Login
+
+In the section:
+
+    [desktop]
+    [[auth]]
+
+Users will expire after they have not logged in for 'n' amount of seconds. A negative number means that users will never expire.
+
+    expires_after=-1
+
+Apply 'expires_after' to superusers.
+
+    expire_superusers=true
+
+Users will automatically be logged out after 'n' seconds of inactivity. A negative number means that idle sessions will not be timed out.
+
+    idle_session_timeout=-1
+
+Force users to change password on first login with desktop.auth.backend.AllowFirstUserDjangoBackend
+
+    change_default_password=false
+
+Number of login attempts allowed before a record is created for failed logins
+
+    login_failure_limit=3
+
+After number of allowed login attempts are exceeded, do we lock out this IP and optionally user agent?
+
+    login_lock_out_at_failure=false
+
+If set, defines period of inactivity in hours after which failed logins will be forgotten. A value of 0 or None will disable this check. Default: None
+
+    login_cooloff_time=None
+
+If True, lock out based on an IP address AND a user agent. This means requests from different user agents but from the same IP are treated differently.
+
+    login_lock_out_use_user_agent=false
+
+If True, lock out based on IP and user
+
+    login_lock_out_by_combination_user_and_ip=false
+
 ### Auditing
 
 Read more about [Auditing User Administration Operations with Hue and Cloudera Navigator](http://gethue.com/auditing-user-administration-operations-with-hue-and-cloudera-navigator-2/).
@@ -611,7 +654,29 @@ If set, limits the number of concurrent user sessions. 1 represents 1 browser se
 
 [Read more about it here](http://gethue.com/restrict-number-of-concurrent-sessions-per-user/).
 
-## Customize the UI
+## Query execution timeouts
+
+i.e. if the SQL query takes more than 30 seconds, it might timeout without it:
+
+    504 Gateway Time-out 504 Gateway Time-out nginx/1.17.10
+
+One solution is to  execute long blocking or resource intensive operations in tasks outside of the server. This is particularly useful for querying databases other than Hive or Impala that uses the SqlAlchemy interface which is blocking until the query actually finishes.
+
+Read more in the [Task Server section](/administrator/administration/reference/#task-server) of the Reference Guide.
+
+An alternative is to increase the NGINX timeouts from 30s to more minutes:
+
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: '900'
+    nginx.ingress.kubernetes.io/proxy-read-timeout: '900'
+    nginx.ingress.kubernetes.io/proxy-send-timeout: '900'
+
+## Customization
+
+### Language
+
+The user language is auto-detected and can also be manually overriden as a [per user basis](/user/concept/#changing-the-language).
+
+If text strings are not all translated from English, feel free to improve the `django.po` files of the corresponding language and [recompile them](/developer/development/#internationalization). Those translation mappings are located across the project in [locale](https://github.com/cloudera/hue/tree/master/desktop/core/src/desktop/locale) directories.
 
 ### Maps look and feel
 
@@ -657,42 +722,43 @@ Read more about it in [Hue with a custom logo](http://gethue.com/hue-with-a-cust
 
 By default Hue stores the [saved documents](/user/concept/#documents) in its database. This features aims at pointing to any source versioning systems like GitHub, BitBucket... to open and save queries.
 
-**Note** This feature is experiemental and tracked in [HUE-951](https://issues.cloudera.org/browse/HUE-951).
+**Note** This feature is experimental and tracked in [HUE-951](https://issues.cloudera.org/browse/HUE-951).
 
     [desktop]
 
     [[vcs]]
 
     ## [[[git-read-only]]]
-        ## Base URL to Remote Server
-        # remote_url=https://github.com/cloudera/hue/tree/master
+    ## Base URL to Remote Server
+    # remote_url=https://github.com/cloudera/hue/tree/master
 
-        ## Base URL to Version Control API
-        # api_url=https://api.github.com
+    ## Base URL to Version Control API
+    # api_url=https://api.github.com
+
     ## [[[github]]]
+    ## Base URL to Remote Server
+    # remote_url=https://github.com/cloudera/hue/tree/master
 
-        ## Base URL to Remote Server
-        # remote_url=https://github.com/cloudera/hue/tree/master
+    ## Base URL to Version Control API
+    # api_url=https://api.github.com
 
-        ## Base URL to Version Control API
-        # api_url=https://api.github.com
+    # These will be necessary when you want to write back to the repository.
+    ## Client ID for Authorized Application
+    # client_id=
 
-        # These will be necessary when you want to write back to the repository.
-        ## Client ID for Authorized Application
-        # client_id=
+    ## Client Secret for Authorized Application
+    # client_secret=
 
-        ## Client Secret for Authorized Application
-        # client_secret=
     ## [[[svn]]
-        ## Base URL to Remote Server
-        # remote_url=https://github.com/cloudera/hue/tree/master
+    ## Base URL to Remote Server
+    # remote_url=https://github.com/cloudera/hue/tree/master
 
-        ## Base URL to Version Control API
-        # api_url=https://api.github.com
+    ## Base URL to Version Control API
+    # api_url=https://api.github.com
 
-        # These will be necessary when you want to write back to the repository.
-        ## Client ID for Authorized Application
-        # client_id=
+    # These will be necessary when you want to write back to the repository.
+    ## Client ID for Authorized Application
+    # client_id=
 
-        ## Client Secret for Authorized Application
-        # client_secret=
+    ## Client Secret for Authorized Application
+    # client_secret=

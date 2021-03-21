@@ -11,15 +11,19 @@ data:
     host={{ .Values.hue.database.host }}
     port={{ .Values.hue.database.port }}
     user={{ .Values.hue.database.user }}
+{{- if .Values.hue.database.password_script }}
+    password_script={{ .Values.hue.database.password_script }}
+{{- else }}
     password={{ .Values.hue.database.password }}
+{{- end }}
     name={{ .Values.hue.database.name }}
 
     [aws]
     [[aws_accounts]]
     [[[default]]]
-    access_key_id={{ .Values.aws.awsAccessKeyId }}
-    secret_access_key={{ .Values.aws.awsSecretAccessKey }}
-    region={{ .Values.aws.awsRegion }}
+    access_key_id={{ .Values.aws.accessKeyId }}
+    secret_access_key={{ .Values.aws.secretAccessKey }}
+    region={{ .Values.aws.region }}
 
     [notebook]
     [[interpreters]]

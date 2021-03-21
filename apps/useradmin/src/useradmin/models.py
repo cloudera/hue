@@ -33,9 +33,9 @@ check a permission. Thirdly, you may wish to do so manually, by using something 
 Permissions may be granted to groups, but not, currently, to users. A user's abilities is the union of all permissions the group
 has access to.
 
-Note that Django itself has a notion of users, groups, and permissions. We re-use Django's notion of users and groups, but ignore its notion of
-permissions. The permissions notion in Django is strongly tied to what models you may or may not edit, and there are elaborations to
-manipulate this row by row. This does not map nicely onto actions which may not relate to database models.
+Note that Django itself has a notion of users, groups, and permissions. We re-use Django's notion of users and groups, but ignore its
+notion of permissions. The permissions notion in Django is strongly tied to what models you may or may not edit, and there are
+elaborations to manipulate this row by row. This does not map nicely onto actions which may not relate to database models.
 """
 import collections
 import json
@@ -82,7 +82,7 @@ class UserProfile(models.Model):
     HUE = 1
     EXTERNAL = 2
 
-  user = models.OneToOneField(User, unique=True)
+  user = models.OneToOneField(User, on_delete=models.CASCADE, unique=True)
   home_directory = models.CharField(editable=True, max_length=1024, null=True)
   creation_method = models.CharField(editable=True, null=False, max_length=64, default=CreationMethod.HUE.name)
   first_login = models.BooleanField(default=True, verbose_name=_t('First Login'), help_text=_t('If this is users first login.'))
@@ -111,7 +111,7 @@ class UserProfile(models.Model):
     if self.user.is_superuser:
       return True
     if ENABLE_CONNECTORS.get() and app in ('jobbrowser', 'metastore', 'filebrowser', 'indexer', 'useradmin', 'notebook'):
-      if app == 'useradmin' and action == 'superuser':
+      if app == 'useradmin' and action in ('superuser', 'access_view:useradmin:edit_user'):  # Not implemented yet
         return False
       else:
         return True
@@ -168,7 +168,7 @@ def group_has_permission(group, perm):
 def group_permissions(group):
   return HuePermission.objects.filter(grouppermission__group=group).all()
 
-# Create a user profile for the given user
+
 def create_profile_for_user(user):
   p = UserProfile()
   p.user = user
@@ -322,7 +322,7 @@ def install_sample_user(django_user=None):
 
   if ENABLE_ORGANIZATIONS.get():
     lookup = {'email': django_username}
-    django_username_short = django_user.username_short
+    django_username_short = django_user.username_short if django_user else 'hue'
   else:
     lookup = {'username': django_username}
     django_username_short = django_username

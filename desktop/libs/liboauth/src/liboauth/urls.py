@@ -15,11 +15,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from django.conf.urls import url
+import sys
+
 from liboauth import views as liboauth_views
 
+if sys.version_info[0] > 2:
+  from django.urls import re_path
+else:
+  from django.conf.urls import url as re_path
+
 urlpatterns = [
-       url(r'^accounts/login/$', liboauth_views.show_login_page, name='show_oauth_login'),
-       url(r'^social_login/oauth/?$', liboauth_views.oauth_login, name='oauth_login'),
-       url(r'^social_login/oauth_authenticated/?$', liboauth_views.oauth_authenticated, name='oauth_authenticated'),
+       re_path(r'^accounts/login/$', liboauth_views.show_login_page, name='show_oauth_login'),
+       re_path(r'^social_login/oauth/?$', liboauth_views.oauth_login, name='oauth_login'),
+       re_path(r'^social_login/oauth_authenticated/?$', liboauth_views.oauth_authenticated, name='oauth_authenticated'),
 ]

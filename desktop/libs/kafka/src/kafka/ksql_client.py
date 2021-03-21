@@ -103,8 +103,8 @@ class KSqlApi(object):
 
   def ksql(self, statement):
     response = self.client.ksql(statement)
-    print(response)
-    return response[0]
+    LOG.debug('ksqlDB response: %s' % response)
+    return response[0] if response else {'@type': 'queries', 'queries': []}  # INSERTs return empty currently
 
 
   def query(self, statement, channel_name=None):
@@ -128,38 +128,47 @@ class KSqlApi(object):
             message_data={'status': 'running', 'query_id': 1}
         )
 
-      for line in result:
-        # columns = line.keys()
-        # data.append([line[col] for col in columns])
-        if 'finalMessage' in line:
+      try:
+        for line in result:
+          # columns = line.keys()
+          # data.append([line[col] for col in columns])
+          if 'finalMessage' in line:
+            if has_channels() and channel_name:  # Send results via WS and empty results
+              _send_to_channel(
+                  channel_name,
+                  message_type='task.result',
+                  message_data={'status': 'finalMessage', 'query_id': 1}
+              )
+            break
+          elif 'header' in line:
+            continue
+          else:
+            line = line.strip()
+
+          if is_select:
+            try:
+              data_line = json.loads(line)
+            except ValueError as e:
+              data_line = json.loads(line[:-1])  # Most probably record is not JSON
+            if data_line.get('@type') == 'statement_error':
+              raise KSqlApiException(data_line['message'])
+            if data_line['row']:  # If limit not reached
+              data.append(data_line['row']['columns'])
+          else:
+            data.append([line])
+
           if has_channels() and channel_name:  # Send results via WS and empty results
             _send_to_channel(
                 channel_name,
                 message_type='task.result',
-                message_data={'status': 'finalMessage', 'query_id': 1}
+                message_data={'data': data, 'meta': metadata, 'query_id': 1}
             )
-          break
-        elif 'header' in line:
-          continue
+            data = []  # TODO: special message when end of stream
+      except RuntimeError as e:
+        if 'generator raised StopIteration' in str(e):
+          return data, metadata
         else:
-          line = line.strip()[:-1]
-
-        if is_select:
-          data_line = json.loads(line)
-          if data_line.get('@type') == 'statement_error':
-            raise KSqlApiException(data_line['message'])
-          if data_line['row']:  # If limit not reached
-            data.append(data_line['row']['columns'])
-        else:
-          data.append([line])
-
-        if has_channels() and channel_name:  # Send results via WS and empty results
-          _send_to_channel(
-              channel_name,
-              message_type='task.result',
-              message_data={'data': data, 'meta': metadata, 'query_id': 1}
-          )
-          data = []  # TODO: special message when end of stream
+          raise e
     else:
       data, metadata = self._decode_result(
         self.ksql(statement)

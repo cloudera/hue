@@ -18,7 +18,7 @@ import impalaAutocompleteParser from '../impalaAutocompleteParser';
 
 describe('impalaAutocompleteParser.js INSERT statements', () => {
   beforeAll(() => {
-    impalaAutocompleteParser.yy.parseError = function(msg) {
+    impalaAutocompleteParser.yy.parseError = function (msg) {
       throw Error(msg);
     };
   });
@@ -468,6 +468,18 @@ describe('impalaAutocompleteParser.js INSERT statements', () => {
             { alias: 't1', columns: [{ type: 'NUMBER' }] },
             { alias: 't2', columns: [{ type: 'NUMBER' }] }
           ]
+        }
+      });
+    });
+
+    it('should handle "INSERT INTO TABLE boo.t1(a, b) PARTITION (a) VALUES (1, 2);|"', () => {
+      assertAutoComplete({
+        beforeCursor: 'INSERT INTO TABLE boo.t1 (a, b) PARTITION (a) VALUES (1, 2);',
+        afterCursor: '',
+        noErrors: true,
+        containsKeywords: ['SELECT'],
+        expectedResult: {
+          lowerCase: false
         }
       });
     });

@@ -32,6 +32,7 @@ from builtins import object
 from importlib import import_module
 
 import logging
+import sys
 LOG = logging.getLogger(__name__)
 
 try:
@@ -46,10 +47,11 @@ import requests
 
 import django.contrib.auth.backends
 from django.contrib import auth
-from django.core.urlresolvers import reverse
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.http import HttpResponseRedirect
 from django.forms import ValidationError
+from django.urls import reverse
+
 try:
   from django_auth_ldap.backend import LDAPBackend
   from django_auth_ldap.config import LDAPSearch
@@ -69,8 +71,9 @@ from desktop import metrics
 from desktop.conf import AUTH, LDAP, OIDC, ENABLE_ORGANIZATIONS
 from desktop.settings import LOAD_BALANCER_COOKIE
 
+from filebrowser.conf import REMOTE_STORAGE_HOME
 from useradmin import ldap_access
-from useradmin.models import get_profile, get_default_user_group, UserProfile, User
+from useradmin.models import get_profile, get_default_user_group, install_sample_user, UserProfile, User
 from useradmin.organization import get_organization
 
 
@@ -136,7 +139,7 @@ def is_admin(user):
   if hasattr(user, 'is_superuser') and not ENABLE_ORGANIZATIONS.get():
     is_admin = user.is_superuser
 
-  if not is_admin and user.is_authenticated():
+  if not is_admin and user.is_authenticated:
     try:
       user = rewrite_user(user)
       is_admin = user.is_admin if ENABLE_ORGANIZATIONS.get() else user.has_hue_permission(action="superuser", app="useradmin")
@@ -165,8 +168,9 @@ class DefaultUserAugmentor(object):
   def get_groups(self):
     return self._get_profile().get_groups()
 
-  def get_home_directory(self):
-    return self._get_profile().home_directory
+  def get_home_directory(self, force_home=False):
+    return REMOTE_STORAGE_HOME.get() if hasattr(REMOTE_STORAGE_HOME, 'get') and REMOTE_STORAGE_HOME.get() and not force_home \
+        else self._get_profile().home_directory
 
   def has_hue_permission(self, action, app):
     return self._get_profile().has_hue_permission(action=action, app=app)
@@ -270,11 +274,19 @@ class AllowFirstUserDjangoBackend(django.contrib.auth.backends.ModelBackend):
   Allows the first user in, but otherwise delegates to Django's
   ModelBackend.
   """
-  def authenticate(self, username=None, email=None, password=None):
-    if email is not None:
-      username = email
+  def authenticate(self, *args, **kwargs):
+    if sys.version_info[0] > 2:
+      request = args[0]
+    else:
+      request = None
+
+    password = kwargs['password']
+
+    if 'email' in kwargs:
+      username = kwargs['email']
+    else:
+      username = kwargs['username']
     username = force_username_case(username)
-    request = None
 
     user = super(AllowFirstUserDjangoBackend, self).authenticate(request, username=username, password=password)
 
@@ -304,7 +316,10 @@ class AllowFirstUserDjangoBackend(django.contrib.auth.backends.ModelBackend):
 
   def is_first_login_ever(self):
     """ Return true if no one has ever logged in."""
-    return User.objects.count() == 0
+    if ENABLE_ORGANIZATIONS.get():  # Tmp
+      return False
+    else:
+      return User.objects.exclude(id=install_sample_user().id).count() == 0
 
 
 class ImpersonationBackend(django.contrib.auth.backends.ModelBackend):
@@ -312,11 +327,19 @@ class ImpersonationBackend(django.contrib.auth.backends.ModelBackend):
   Authenticate with a proxy user username/password but then login as another user.
   Does not support a multiple backends setup.
   """
-  def authenticate(self, username=None, password=None, login_as=None):
+  def authenticate(self, *args, **kwargs):
+    if sys.version_info[0] > 2:
+      request = args[0]
+    else:
+      request = None
+
+    username = kwargs['username']
+    password = kwargs['password']
+    login_as = kwargs['login_as']
+
     if not login_as:
       return
 
-    request = None
     authenticated = super(ImpersonationBackend, self).authenticate(request, username, password)
 
     if not authenticated:
@@ -400,7 +423,7 @@ class PamBackend(DesktopBackendBase):
 
     if pam.authenticate(username, password, AUTH.PAM_SERVICE.get()):
       is_super = False
-      if User.objects.count() == 0:
+      if User.objects.exclude(id=install_sample_user().id).count() == 0:
         is_super = True
 
       try:
@@ -556,7 +579,10 @@ class LdapBackend(object):
     try:
       allowed_group = self.check_ldap_access_groups(server, username)
       if allowed_group:
-        user = self._backend.authenticate(username, password)
+        if sys.version_info[0] > 2:
+          user = self._backend.authenticate(request, username=username, password=password)
+        else:
+          user = self._backend.authenticate(username=username, password=password)
       else:
         LOG.warn("%s not in an allowed login group" % username)
         return None
@@ -639,7 +665,7 @@ class SpnegoDjangoBackend(django.contrib.auth.backends.ModelBackend):
     username = self.clean_username(username)
     username = force_username_case(username)
     is_super = False
-    if User.objects.count() == 0:
+    if User.objects.exclude(id=install_sample_user().id).count() == 0:
       is_super = True
 
     try:
@@ -685,7 +711,7 @@ class KnoxSpnegoDjangoBackend(django.contrib.auth.backends.ModelBackend):
     username = self.clean_username(username, request)
     username = force_username_case(username)
     is_super = False
-    if User.objects.count() == 0:
+    if User.objects.exclude(id=install_sample_user().id).count() == 0:
       is_super = True
 
     try:
@@ -729,7 +755,7 @@ class RemoteUserDjangoBackend(django.contrib.auth.backends.RemoteUserBackend):
     username = self.clean_username(remote_user)
     username = force_username_case(username)
     is_super = False
-    if User.objects.count() == 0:
+    if User.objects.exclude(id=install_sample_user().id).count() == 0:
       is_super = True
 
     try:
@@ -795,7 +821,7 @@ class OIDCBackend(OIDCAuthenticationBackend):
 
     if verified_id:
       self.save_refresh_tokens(refresh_token)
-      user =  self.get_or_create_user(access_token, id_token, verified_id)
+      user = self.get_or_create_user(access_token, id_token, verified_id)
       user = rewrite_user(user)
       return user
 

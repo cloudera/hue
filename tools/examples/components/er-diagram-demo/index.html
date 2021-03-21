@@ -1,0 +1,16 @@
+<html>
+  <head>
+    <title>er-diagram demo</title>
+    <script type = "text/javascript" src="node_modules/gethue/web/er-diagram.js"></script>
+    <script type = "text/javascript" src="data.js"></script>
+    <script type = "text/javascript">
+      window.onload = function (){
+        document.getElementById("erd").entities = data.entities;
+        document.getElementById("erd").relations = data.relations;
+      };
+    </script>
+  </head>
+  <body>
+    <er-diagram id="erd"></er-diagram>
+  </body>
+</html>

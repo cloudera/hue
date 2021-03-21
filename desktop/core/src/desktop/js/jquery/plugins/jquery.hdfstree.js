@@ -42,7 +42,7 @@ const pluginName = 'jHueHdfsTree',
     initialPath: '/',
     isS3: false,
     withTopPadding: true,
-    onPathChange: function() {},
+    onPathChange: function () {},
     createFolder: true,
     labels: {
       CREATE_FOLDER: 'Create folder',
@@ -74,7 +74,7 @@ function Plugin(element, options) {
   this.init();
 }
 
-Plugin.prototype.init = function(optionalPath) {
+Plugin.prototype.init = function (optionalPath) {
   const _this = this;
 
   if (typeof optionalPath != 'undefined') {
@@ -296,10 +296,10 @@ Plugin.prototype.init = function(optionalPath) {
                 name: _folderName.val(),
                 path: currentPath
               },
-              beforeSend: function(xhr) {
+              beforeSend: function (xhr) {
                 xhr.setRequestHeader('X-Requested-With', 'Hue'); // need to override the default one because otherwise Django returns HTTP 500
               },
-              success: function(xhr, status) {
+              success: function (xhr, status) {
                 if (status == 'success') {
                   _createFolderDetails.slideUp();
                   const _newFolder = currentPath + '/' + _folderName.val();
@@ -353,19 +353,19 @@ Plugin.prototype.init = function(optionalPath) {
   });
 };
 
-Plugin.prototype.setOptions = function(options) {
+Plugin.prototype.setOptions = function (options) {
   this.options = $.extend({}, defaults, options);
 };
 
-$.fn[pluginName] = function(options) {
-  return this.each(function() {
+$.fn[pluginName] = function (options) {
+  return this.each(function () {
     if (!$.data(this, 'plugin_' + pluginName)) {
       $.data(this, 'plugin_' + pluginName, new Plugin(this, options));
     }
   });
 };
 
-$[pluginName] = function(options) {
+$[pluginName] = function (options) {
   if (typeof console != 'undefined') {
     console.warn('$(elem).jHueHdfsTree() is a preferred call method.');
   }

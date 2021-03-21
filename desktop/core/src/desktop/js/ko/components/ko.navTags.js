@@ -68,7 +68,7 @@ class NavTags {
     self.readOnly =
       !window.USER_HAS_METADATA_WRITE_PERM || !!params.readOnly || window.HAS_READ_ONLY_CATALOG;
 
-    self.getSelectizeTags = function(query, callback) {
+    self.getSelectizeTags = function (query, callback) {
       callback(
         $.map(self.allTags(), tag => {
           return { value: tag, text: tag };
@@ -98,23 +98,23 @@ class NavTags {
     const currentTagsPromise = ko
       .unwrap(self.catalogEntry)
       .getNavigatorMeta()
-      .done(navigatorMeta => {
+      .then(navigatorMeta => {
         self.currentTags((navigatorMeta && navigatorMeta.tags) || []);
       })
-      .fail(() => {
+      .catch(() => {
         self.hasErrors(true);
       });
 
     const allTagsPromise = dataCatalog
       .getAllNavigatorTags({ silenceErrors: true })
-      .done(tagList => {
+      .then(tagList => {
         self.allTags(Object.keys(tagList));
       })
-      .fail(() => {
+      .catch(() => {
         self.allTags([]);
       });
 
-    $.when(currentTagsPromise, allTagsPromise).always(() => {
+    Promise.all([currentTagsPromise, allTagsPromise]).finally(() => {
       self.loading(false);
     });
   }
@@ -148,29 +148,25 @@ class NavTags {
     const addTagsPromise =
       tagsToAdd.length > 0
         ? ko.unwrap(self.catalogEntry).addNavigatorTags(tagsToAdd)
-        : $.Deferred()
-            .resolve()
-            .promise();
+        : Promise.resolve();
 
     const deleteTagsPromise =
       tagsToRemove.length > 0
         ? ko.unwrap(self.catalogEntry).deleteNavigatorTags(tagsToRemove)
-        : $.Deferred()
-            .resolve()
-            .promise();
+        : Promise.resolve();
 
-    $.when(addTagsPromise, deleteTagsPromise)
-      .done(() => {
+    Promise.all([addTagsPromise, deleteTagsPromise])
+      .then(() => {
         if (tagsToAdd.length || tagsToRemove.length) {
           dataCatalog.updateAllNavigatorTags(tagsToAdd, tagsToRemove);
           ko.unwrap(self.catalogEntry).save();
         }
         self.loadTags();
       })
-      .fail(() => {
+      .catch(() => {
         self.hasErrors(true);
       })
-      .always(() => {
+      .finally(() => {
         self.loading(false);
       });
   }

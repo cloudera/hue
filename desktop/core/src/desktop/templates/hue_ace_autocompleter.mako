@@ -576,10 +576,7 @@ from desktop.views import _ko
           autocompleterDoneSub.remove();
         });
 
-        var autocompleterShowSub = huePubSub.subscribe('hue.ace.autocompleter.show', function (data) {
-          if (data.editor !== self.editor()) {
-            return;
-          }
+        var onShowAutocomplete = function (data) {
           var session = self.editor().getSession();
           var pos = self.editor().getCursorPosition();
           var line = session.getLine(pos.row);
@@ -604,18 +601,23 @@ from desktop.views import _ko
           } else {
             afterAutocomp();
           }
-        });
+        };
+
+        self.editor().on('showAutocomplete', onShowAutocomplete)
 
         self.disposeFunctions.push(function () {
-          autocompleterShowSub.remove();
-        });
+          self.editor().off('showAutocomplete', onShowAutocomplete);
+        })
 
-        var autocompleterHideSub = huePubSub.subscribe('hue.ace.autocompleter.hide', function () {
+        var onHideAutocomplete = function () {
           self.detach();
-        });
+        };
+        self.editor().on('hideAutocomplete', onHideAutocomplete)
+        var autocompleterHideSub = huePubSub.subscribe('hue.ace.autocompleter.hide', onHideAutocomplete);
 
         self.disposeFunctions.push(function () {
           autocompleterHideSub.remove();
+          self.editor().off('hideAutocomplete', onHideAutocomplete);
         });
       }
 
@@ -736,9 +738,11 @@ from desktop.views import _ko
         } else {
           self.loading(true);
           self.loadTimeout = window.setTimeout(function () {
-            self.activePromises.push(self.catalogEntry.getComment({ silenceErrors: true, cancellable: true }).done(self.comment).always(function () {
+            var commentPromise = self.catalogEntry.getComment({ silenceErrors: true, cancellable: true });
+            self.activePromises.push(commentPromise);
+            commentPromise.then(self.comment).finally(function () {
               self.loading(false);
-            }));
+            });
           }, COMMENT_LOAD_DELAY);
         }
 

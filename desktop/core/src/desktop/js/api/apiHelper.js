@@ -24,58 +24,12 @@ import {
   simplePost,
   successResponseIsError
 } from './apiUtils';
+import * as URLS from './urls';
 import apiQueueManager from 'api/apiQueueManager';
-import CancellablePromise from 'api/cancellablePromise';
+import CancellableJqPromise from 'api/cancellableJqPromise';
 import hueDebug from 'utils/hueDebug';
 import huePubSub from 'utils/huePubSub';
-import hueUtils from 'utils/hueUtils';
-import { EXECUTION_STATUS } from 'apps/notebook2/execution/executable';
-
-const AUTOCOMPLETE_API_PREFIX = '/notebook/api/autocomplete/';
-const SAMPLE_API_PREFIX = '/notebook/api/sample/';
-const EXECUTE_API_PREFIX = '/notebook/api/execute/';
-const DOCUMENTS_API = '/desktop/api2/doc/';
-const DOCUMENTS_SEARCH_API = '/desktop/api2/docs/';
-const GET_HUE_CONFIG_URL = '/desktop/api2/get_hue_config';
-const FETCH_CONFIG = '/desktop/api2/get_config/';
-const HDFS_API_PREFIX = '/filebrowser/view=' + encodeURIComponent('/');
-const ADLS_API_PREFIX = '/filebrowser/view=' + encodeURIComponent('adl:/');
-const ABFS_API_PREFIX = '/filebrowser/view=' + encodeURIComponent('ABFS://');
-const GIT_API_PREFIX = '/desktop/api/vcs/contents/';
-const S3_API_PREFIX = '/filebrowser/view=' + encodeURIComponent('S3A://');
-const IMPALA_INVALIDATE_API = '/impala/api/invalidate';
-const CONFIG_SAVE_API = '/desktop/api/configurations/save/';
-const CONFIG_APPS_API = '/desktop/api/configurations';
-const SOLR_COLLECTIONS_API = '/indexer/api/indexes/list/';
-const SOLR_FIELDS_API = '/indexer/api/index/list/';
-const DASHBOARD_TERMS_API = '/dashboard/get_terms';
-const DASHBOARD_STATS_API = '/dashboard/get_stats';
-const FORMAT_SQL_API = '/notebook/api/format';
-const GIST_API = '/desktop/api2/gist/';
-const TOPO_URL = '/desktop/topo/';
-
-const SEARCH_API = '/desktop/api/search/entities';
-const INTERACTIVE_SEARCH_API = '/desktop/api/search/entities_interactive';
-
-const HBASE_API_PREFIX = '/hbase/api/';
-const SAVE_TO_FILE = '/filebrowser/save';
-
-const NAV_URLS = {
-  ADD_TAGS: '/metadata/api/catalog/add_tags',
-  DELETE_TAGS: '/metadata/api/catalog/delete_tags',
-  FIND_ENTITY: '/metadata/api/catalog/find_entity',
-  LIST_TAGS: '/metadata/api/catalog/list_tags',
-  UPDATE_PROPERTIES: '/metadata/api/catalog/update_properties'
-};
-
-const NAV_OPT_URLS = {
-  TOP_AGGS: '/metadata/api/optimizer/top_aggs',
-  TOP_COLUMNS: '/metadata/api/optimizer/top_columns',
-  TOP_FILTERS: '/metadata/api/optimizer/top_filters',
-  TOP_JOINS: '/metadata/api/optimizer/top_joins',
-  TOP_TABLES: '/metadata/api/optimizer/top_tables',
-  TABLE_DETAILS: '/metadata/api/optimizer/table_details'
-};
+import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
 
 export const LINK_SHARING_PERMS = {
   READ: 'read',
@@ -83,44 +37,25 @@ export const LINK_SHARING_PERMS = {
   OFF: 'off'
 };
 
-/**
- * Wrapper around the response from the Query API
- *
- * @param {string} sourceType
- * @param {Object} response
- *
- * @constructor
- */
-class QueryResult {
-  constructor(sourceType, compute, response) {
-    this.id = hueUtils.UUID();
-    this.type = response.result && response.result.type ? response.result.type : sourceType;
-    this.compute = compute;
-    this.status = response.status || 'running';
-    this.result = response.result || {};
-    this.result.type = 'table';
-  }
-}
-
 class ApiHelper {
   constructor() {
     this.queueManager = apiQueueManager;
     this.cancelActiveRequest = cancelActiveRequest; // TODO: Remove when job_browser.mako is in webpack
 
     huePubSub.subscribe('assist.clear.git.cache', () => {
-      $.totalStorage(this.getAssistCacheIdentifier({ sourceType: 'git' }), {});
+      setInLocalStorage(this.getAssistCacheIdentifier({ sourceType: 'git' }), {});
     });
 
     huePubSub.subscribe('assist.clear.collections.cache', () => {
-      $.totalStorage(this.getAssistCacheIdentifier({ sourceType: 'collections' }), {});
+      setInLocalStorage(this.getAssistCacheIdentifier({ sourceType: 'collections' }), {});
     });
 
     huePubSub.subscribe('assist.clear.hbase.cache', () => {
-      $.totalStorage(this.getAssistCacheIdentifier({ sourceType: 'hbase' }), {});
+      setInLocalStorage(this.getAssistCacheIdentifier({ sourceType: 'hbase' }), {});
     });
 
     huePubSub.subscribe('assist.clear.document.cache', () => {
-      $.totalStorage(this.getAssistCacheIdentifier({ sourceType: 'document' }), {});
+      setInLocalStorage(this.getAssistCacheIdentifier({ sourceType: 'document' }), {});
     });
 
     const clearAllCaches = () => {
@@ -132,14 +67,14 @@ class ApiHelper {
         sourceType: 'impala',
         clearAll: true
       });
-      $.totalStorage(this.getAssistCacheIdentifier({ sourceType: 'hdfs' }), {});
-      $.totalStorage(this.getAssistCacheIdentifier({ sourceType: 'adls' }), {});
-      $.totalStorage(this.getAssistCacheIdentifier({ sourceType: 'abfs' }), {});
-      $.totalStorage(this.getAssistCacheIdentifier({ sourceType: 'git' }), {});
-      $.totalStorage(this.getAssistCacheIdentifier({ sourceType: 's3' }), {});
-      $.totalStorage(this.getAssistCacheIdentifier({ sourceType: 'collections' }), {});
-      $.totalStorage(this.getAssistCacheIdentifier({ sourceType: 'hbase' }), {});
-      $.totalStorage(this.getAssistCacheIdentifier({ sourceType: 'document' }), {});
+      setInLocalStorage(this.getAssistCacheIdentifier({ sourceType: 'hdfs' }), {});
+      setInLocalStorage(this.getAssistCacheIdentifier({ sourceType: 'adls' }), {});
+      setInLocalStorage(this.getAssistCacheIdentifier({ sourceType: 'abfs' }), {});
+      setInLocalStorage(this.getAssistCacheIdentifier({ sourceType: 'git' }), {});
+      setInLocalStorage(this.getAssistCacheIdentifier({ sourceType: 's3' }), {});
+      setInLocalStorage(this.getAssistCacheIdentifier({ sourceType: 'collections' }), {});
+      setInLocalStorage(this.getAssistCacheIdentifier({ sourceType: 'hbase' }), {});
+      setInLocalStorage(this.getAssistCacheIdentifier({ sourceType: 'document' }), {});
     };
 
     huePubSub.subscribe('assist.clear.all.caches', clearAllCaches);
@@ -153,7 +88,7 @@ class ApiHelper {
   }
 
   clearStorageCache(sourceType) {
-    $.totalStorage(this.getAssistCacheIdentifier({ sourceType: sourceType }), {});
+    setInLocalStorage(this.getAssistCacheIdentifier({ sourceType: sourceType }), {});
   }
 
   hasExpired(timestamp, cacheType) {
@@ -178,7 +113,7 @@ class ApiHelper {
    */
   fetchCached(options) {
     const cacheIdentifier = this.getAssistCacheIdentifier(options);
-    const cachedData = $.totalStorage(cacheIdentifier) || {};
+    const cachedData = getFromLocalStorage(cacheIdentifier) || {};
     const cachedId = options.hash ? options.url + options.hash : options.url;
 
     if (
@@ -195,7 +130,7 @@ class ApiHelper {
           data: data
         };
         try {
-          $.totalStorage(cacheIdentifier, cachedData);
+          setInLocalStorage(cacheIdentifier, cachedData);
         } catch (e) {}
       });
     } else {
@@ -208,85 +143,13 @@ class ApiHelper {
   }
 
   /**
-   * @param {string} sourceType
-   * @returns {string}
-   */
-  getTotalStorageUserPrefix(sourceType) {
-    return sourceType + '_' + window.LOGGED_USERNAME + '_' + window.location.hostname;
-  }
-
-  /**
    * @param {object} options
    * @param {string} options.sourceType
    * @param {string} [options.cacheType] - Default value 'default'
    * @returns {string}
    */
   getAssistCacheIdentifier(options) {
-    return (
-      'hue.assist.' +
-      (options.cacheType || 'default') +
-      '.' +
-      this.getTotalStorageUserPrefix(options.sourceType)
-    );
-  }
-
-  /**
-   *
-   * @param {string} owner - 'assist', 'viewModelA' etc.
-   * @param {string} id
-   * @param {*} [value] - Optional, undefined and null will remove the value
-   */
-  setInTotalStorage(owner, id, value) {
-    try {
-      const cachedData =
-        $.totalStorage('hue.user.settings.' + this.getTotalStorageUserPrefix(owner)) || {};
-      if (typeof value !== 'undefined' && value !== null) {
-        cachedData[id] = value;
-        $.totalStorage('hue.user.settings.' + this.getTotalStorageUserPrefix(owner), cachedData, {
-          secure: window.location.protocol.indexOf('https') > -1
-        });
-      } else if (cachedData[id]) {
-        delete cachedData[id];
-        $.totalStorage('hue.user.settings.' + this.getTotalStorageUserPrefix(owner), cachedData, {
-          secure: window.location.protocol.indexOf('https') > -1
-        });
-      }
-    } catch (e) {}
-  }
-
-  /**
-   *
-   * @param {string} owner - 'assist', 'viewModelA' etc.
-   * @param {string} id
-   * @param {*} [defaultValue]
-   * @returns {*}
-   */
-  getFromTotalStorage(owner, id, defaultValue) {
-    const cachedData =
-      $.totalStorage('hue.user.settings.' + this.getTotalStorageUserPrefix(owner)) || {};
-    return typeof cachedData[id] !== 'undefined' ? cachedData[id] : defaultValue;
-  }
-
-  /**
-   * @param {string} owner - 'assist', 'viewModelA' etc.
-   * @param {string} id
-   * @param {Observable} observable
-   * @param {*} [defaultValue] - Optional default value to use if not in total storage initially
-   */
-  withTotalStorage(owner, id, observable, defaultValue, noInit) {
-    const cachedValue = this.getFromTotalStorage(owner, id, defaultValue);
-
-    if (!noInit && cachedValue !== 'undefined') {
-      observable(cachedValue);
-    }
-
-    observable.subscribe(newValue => {
-      if (owner === 'assist' && id === 'assist_panel_visible') {
-        huePubSub.publish('assist.forceRender');
-      }
-      this.setInTotalStorage(owner, id, newValue);
-    });
-    return observable;
+    return 'hue.assist.' + (options.cacheType || 'default') + '.' + options.sourceType;
   }
 
   /**
@@ -296,7 +159,7 @@ class ApiHelper {
    */
   saveSnippetToFile(data, options) {
     $.post(
-      SAVE_TO_FILE,
+      URLS.SAVE_TO_FILE_API,
       data,
       result => {
         if (typeof options.successCallback !== 'undefined') {
@@ -344,7 +207,7 @@ class ApiHelper {
    * @param {boolean} [options.silenceErrors]
    */
   fetchTopo(options) {
-    const url = TOPO_URL + options.location;
+    const url = URLS.TOPO_URL + options.location;
     return simpleGet(url, undefined, options);
   }
 
@@ -360,13 +223,13 @@ class ApiHelper {
   fetchStoragePreview(options) {
     let url;
     if (options.type === 's3') {
-      url = S3_API_PREFIX;
+      url = URLS.S3_API_PREFIX;
     } else if (options.type === 'adls') {
-      url = ADLS_API_PREFIX;
+      url = URLS.ADLS_API_PREFIX;
     } else if (options.type === 'abfs') {
-      url = ABFS_API_PREFIX;
+      url = URLS.ABFS_API_PREFIX;
     } else {
-      url = HDFS_API_PREFIX;
+      url = URLS.HDFS_API_PREFIX;
     }
 
     const clonedPath = options.path.concat();
@@ -415,7 +278,7 @@ class ApiHelper {
       options.pathParts.shift();
     }
     let url =
-      HDFS_API_PREFIX +
+      URLS.HDFS_API_PREFIX +
       encodeURI(options.pathParts.join('/')) +
       '?format=json&sortby=name&descending=false&pagesize=' +
       (options.pageSize || 500) +
@@ -482,7 +345,7 @@ class ApiHelper {
   fetchAdlsPath(options) {
     options.pathParts.shift();
     let url =
-      ADLS_API_PREFIX +
+      URLS.ADLS_API_PREFIX +
       encodeURI(options.pathParts.join('/')) +
       '?format=json&sortby=name&descending=false&pagesize=' +
       (options.pageSize || 500) +
@@ -548,7 +411,7 @@ class ApiHelper {
    */
   fetchAbfsPath(options) {
     let url =
-      ABFS_API_PREFIX +
+      URLS.ABFS_API_PREFIX +
       encodeURI(options.pathParts.join('/')) +
       '?format=json&sortby=name&descending=false&pagesize=' +
       (options.pageSize || 500) +
@@ -611,7 +474,7 @@ class ApiHelper {
    */
   fetchGitContents(options) {
     const url =
-      GIT_API_PREFIX +
+      URLS.GIT_API_PREFIX +
       '?path=' +
       encodeURI(options.pathParts.join('/')) +
       '&fileType=' +
@@ -675,7 +538,7 @@ class ApiHelper {
   fetchS3Path(options) {
     options.pathParts.shift(); // remove the trailing /
     let url =
-      S3_API_PREFIX +
+      URLS.S3_API_PREFIX +
       encodeURI(options.pathParts.join('/')) +
       '?format=json&sortby=name&descending=false&pagesize=' +
       (options.pageSize || 500) +
@@ -729,17 +592,13 @@ class ApiHelper {
 
   async fetchFavoriteApp(options) {
     return new Promise((resolve, reject) => {
-      simpleGet('/desktop/api2/user_preferences/default_app')
-        .done(resolve)
-        .fail(reject);
+      simpleGet('/desktop/api2/user_preferences/default_app').done(resolve).fail(reject);
     });
   }
 
   async setFavoriteAppAsync(options) {
     return new Promise((resolve, reject) => {
-      simplePost('/desktop/api2/user_preferences/default_app', options)
-        .done(resolve)
-        .fail(reject);
+      simplePost('/desktop/api2/user_preferences/default_app', options).done(resolve).fail(reject);
     });
   }
 
@@ -761,7 +620,7 @@ class ApiHelper {
     }
     $.ajax({
       dataType: 'json',
-      url: DASHBOARD_TERMS_API,
+      url: URLS.DASHBOARD_TERMS_API,
       type: 'POST',
       data: {
         collection: ko.mapping.toJSON({
@@ -806,7 +665,7 @@ class ApiHelper {
     }
     $.ajax({
       dataType: 'json',
-      url: DASHBOARD_STATS_API,
+      url: URLS.DASHBOARD_STATS_API,
       type: 'POST',
       data: {
         collection: ko.mapping.toJSON({
@@ -853,7 +712,7 @@ class ApiHelper {
     if (options.parent.name !== '') {
       suffix = 'getTableList/' + options.parent.name;
     }
-    const url = HBASE_API_PREFIX + suffix;
+    const url = URLS.HBASE_API_PREFIX + suffix;
     const fetchFunction = storeInCache => {
       if (options.timeout === 0) {
         assistErrorCallback(options)({ status: -1 });
@@ -950,12 +809,12 @@ class ApiHelper {
    * @param {boolean} [options.silenceErrors]
    */
   fetchConfigurations(options) {
-    simpleGet(CONFIG_APPS_API, {}, options);
+    simpleGet(URLS.CONFIG_APPS_API, {}, options);
   }
 
   saveGlobalConfiguration(options) {
     simplePost(
-      CONFIG_APPS_API,
+      URLS.CONFIG_APPS_API,
       {
         configuration: ko.mapping.toJSON(options.configuration)
       },
@@ -977,7 +836,7 @@ class ApiHelper {
    */
   saveConfiguration(options) {
     simplePost(
-      CONFIG_SAVE_API,
+      URLS.CONFIG_SAVE_API,
       {
         app: options.app,
         properties: ko.mapping.toJSON(options.properties),
@@ -1006,11 +865,11 @@ class ApiHelper {
       id += options.type;
     }
 
-    let promise = this.queueManager.getQueued(DOCUMENTS_API, id);
+    let promise = this.queueManager.getQueued(URLS.DOCUMENTS_API, id);
     const firstInQueue = typeof promise === 'undefined';
     if (firstInQueue) {
       promise = $.Deferred();
-      this.queueManager.addToQueue(promise, DOCUMENTS_API, id);
+      this.queueManager.addToQueue(promise, URLS.DOCUMENTS_API, id);
     }
 
     promise.done(options.successCallback).fail(assistErrorCallback(options));
@@ -1028,7 +887,7 @@ class ApiHelper {
     }
 
     $.ajax({
-      url: DOCUMENTS_API,
+      url: URLS.DOCUMENTS_API,
       data: data,
       traditional: true,
       success: data => {
@@ -1055,7 +914,7 @@ class ApiHelper {
    */
   searchDocuments(options) {
     return $.ajax({
-      url: DOCUMENTS_SEARCH_API,
+      url: URLS.DOCUMENTS_SEARCH_API,
       data: {
         uuid: options.uuid,
         text: options.query,
@@ -1081,12 +940,12 @@ class ApiHelper {
    * @param {boolean} [options.silenceErrors]
    * @param {boolean} [options.fetchContents]
    *
-   * @return {CancellablePromise}
+   * @return {CancellableJqPromise}
    */
   fetchDocument(options) {
     const deferred = $.Deferred();
     const request = $.ajax({
-      url: DOCUMENTS_API,
+      url: URLS.DOCUMENTS_API,
       data: {
         uuid: options.uuid,
         data: !!options.fetchContents,
@@ -1109,7 +968,7 @@ class ApiHelper {
         errorCallback: deferred.reject
       })
     );
-    return new CancellablePromise(deferred, request);
+    return new CancellableJqPromise(deferred, request);
   }
 
   /**
@@ -1124,9 +983,7 @@ class ApiHelper {
    */
   async fetchDocumentAsync(options) {
     return new Promise((resolve, reject) => {
-      this.fetchDocument(options)
-        .done(resolve)
-        .fail(reject);
+      this.fetchDocument(options).done(resolve).fail(reject);
     });
   }
 
@@ -1161,7 +1018,7 @@ class ApiHelper {
    */
   createDocumentsFolder(options) {
     simplePost(
-      DOCUMENTS_API + 'mkdir',
+      URLS.DOCUMENTS_API + 'mkdir',
       {
         parent_uuid: ko.mapping.toJSON(options.parentUuid),
         name: ko.mapping.toJSON(options.name)
@@ -1181,7 +1038,7 @@ class ApiHelper {
    */
   updateDocument(options) {
     simplePost(
-      DOCUMENTS_API + 'update',
+      URLS.DOCUMENTS_API + 'update',
       {
         uuid: ko.mapping.toJSON(options.uuid),
         name: options.name
@@ -1201,7 +1058,7 @@ class ApiHelper {
    */
   uploadDocument(options) {
     $.ajax({
-      url: DOCUMENTS_API + 'import',
+      url: URLS.DOCUMENTS_API + 'import',
       type: 'POST',
       success: data => {
         if (!successResponseIsError(data)) {
@@ -1236,7 +1093,7 @@ class ApiHelper {
    */
   moveDocument(options) {
     simplePost(
-      DOCUMENTS_API + 'move',
+      URLS.DOCUMENTS_API + 'move',
       {
         source_doc_uuid: ko.mapping.toJSON(options.sourceId),
         destination_doc_uuid: ko.mapping.toJSON(options.destinationId)
@@ -1256,7 +1113,7 @@ class ApiHelper {
    */
   deleteDocument(options) {
     simplePost(
-      DOCUMENTS_API + 'delete',
+      URLS.DOCUMENTS_API + 'delete',
       {
         uuid: ko.mapping.toJSON(options.uuid),
         skip_trash: ko.mapping.toJSON(options.skipTrash || false)
@@ -1275,7 +1132,7 @@ class ApiHelper {
    */
   copyDocument(options) {
     simplePost(
-      DOCUMENTS_API + 'copy',
+      URLS.DOCUMENTS_API + 'copy',
       {
         uuid: ko.mapping.toJSON(options.uuid)
       },
@@ -1293,7 +1150,7 @@ class ApiHelper {
    */
   restoreDocument(options) {
     simplePost(
-      DOCUMENTS_API + 'restore',
+      URLS.DOCUMENTS_API + 'restore',
       {
         uuids: ko.mapping.toJSON(options.uuids)
       },
@@ -1314,21 +1171,21 @@ class ApiHelper {
   clearDbCache(options) {
     const cacheIdentifier = this.getAssistCacheIdentifier(options);
     if (options.clearAll) {
-      $.totalStorage(cacheIdentifier, {});
+      setInLocalStorage(cacheIdentifier, {});
     } else {
-      let url = AUTOCOMPLETE_API_PREFIX;
+      let url = URLS.AUTOCOMPLETE_API_PREFIX;
       if (options.databaseName) {
-        url += options.databaseName;
+        url += options.databaseName + '/';
       }
       if (options.tableName) {
-        url += '/' + options.tableName;
+        url += options.tableName + '/';
       }
       if (options.fields) {
         url += options.fields.length > 0 ? '/' + options.fields.join('/') : '';
       }
-      const cachedData = $.totalStorage(cacheIdentifier) || {};
+      const cachedData = getFromLocalStorage(cacheIdentifier) || {};
       delete cachedData[url];
-      $.totalStorage(cacheIdentifier, cachedData);
+      getFromLocalStorage(cacheIdentifier, cachedData);
     }
   }
 
@@ -1359,75 +1216,14 @@ class ApiHelper {
         data.table = options.path[1];
       }
 
-      const request = simplePost(IMPALA_INVALIDATE_API, data, options)
+      const request = simplePost(URLS.IMPALA_INVALIDATE_API, data, options)
         .done(deferred.resolve)
         .fail(deferred.reject);
 
-      return new CancellablePromise(deferred, request);
+      return new CancellableJqPromise(deferred, request);
     }
 
     return deferred.resolve().promise();
-  }
-
-  /**
-   * @param {Object} options
-   * @param {string} options.sourceType
-   * @param {ContextCompute} options.compute
-   * @param {boolean} [options.silenceErrors]
-   * @param {number} [options.timeout]
-   *
-   * @param {string[]} [options.path] - The path to fetch
-   *
-   * @return {CancellablePromise}
-   */
-  fetchSourceMetadata(options) {
-    const deferred = $.Deferred();
-
-    const isQuery = options.sourceType.indexOf('-query') !== -1;
-    const sourceType = isQuery ? options.sourceType.replace('-query', '') : options.sourceType;
-
-    const request = $.ajax({
-      type: 'POST',
-      url: AUTOCOMPLETE_API_PREFIX + (isQuery ? options.path.slice(1) : options.path).join('/'),
-      data: {
-        notebook: {},
-        snippet: ko.mapping.toJSON({
-          type: sourceType,
-          source: isQuery ? 'query' : 'data'
-        }),
-        cluster: ko.mapping.toJSON(options.compute ? options.compute : '""')
-      },
-      timeout: options.timeout
-    })
-      .done(data => {
-        data.notFound =
-          data.status === 0 &&
-          data.code === 500 &&
-          data.error &&
-          (data.error.indexOf('Error 10001') !== -1 ||
-            data.error.indexOf('AnalysisException') !== -1);
-        data.hueTimestamp = Date.now();
-
-        // TODO: Display warning in autocomplete when an entity can't be found
-        // Hive example: data.error: [...] SemanticException [Error 10001]: Table not found default.foo
-        // Impala example: data.error: [...] AnalysisException: Could not resolve path: 'default.foo'
-        if (!data.notFound && successResponseIsError(data)) {
-          assistErrorCallback({
-            silenceErrors: options.silenceErrors,
-            errorCallback: deferred.reject
-          })(data);
-        } else {
-          deferred.resolve(data);
-        }
-      })
-      .fail(
-        assistErrorCallback({
-          silenceErrors: options.silenceErrors,
-          errorCallback: deferred.reject
-        })
-      );
-
-    return new CancellablePromise(deferred, request);
   }
 
   updateSourceMetadata(options) {
@@ -1470,57 +1266,6 @@ class ApiHelper {
   }
 
   /**
-   * Fetches the analysis for the given source and path
-   *
-   * @param {Object} options
-   * @param {boolean} [options.silenceErrors]
-   *
-   * @param {ContextCompute} options.compute
-   * @param {string} options.sourceType
-   * @param {string[]} options.path
-   *
-   * @return {CancellablePromise}
-   */
-  fetchAnalysis(options) {
-    const deferred = $.Deferred();
-
-    let url = '/notebook/api/describe/' + options.path[0];
-
-    if (options.path.length > 1) {
-      url += '/' + options.path[1] + '/';
-    }
-
-    if (options.path.length > 2) {
-      url += 'stats/' + options.path.slice(2).join('/');
-    }
-
-    const data = {
-      format: 'json',
-      cluster: JSON.stringify(options.compute),
-      source_type: options.sourceType
-    };
-
-    const request = simplePost(url, data, {
-      silenceErrors: options.silenceErrors,
-      successCallback: response => {
-        if (options.path.length === 1) {
-          if (response.data) {
-            response.data.hueTimestamp = Date.now();
-            deferred.resolve(response.data);
-          } else {
-            deferred.reject();
-          }
-        } else {
-          deferred.resolve(response);
-        }
-      },
-      errorCallback: deferred.reject
-    });
-
-    return new CancellablePromise(deferred, request);
-  }
-
-  /**
    * Fetches the partitions for the given path
    *
    * @param {Object} options
@@ -1529,7 +1274,7 @@ class ApiHelper {
    * @param {string[]} options.path
    * @param {ContextCompute} options.compute
    *
-   * @return {CancellablePromise}
+   * @return {CancellableJqPromise}
    */
   fetchPartitions(options) {
     const deferred = $.Deferred();
@@ -1573,133 +1318,7 @@ class ApiHelper {
         }
       });
 
-    return new CancellablePromise(deferred, request);
-  }
-
-  /**
-   * Refreshes the analysis for the given source and path
-   *
-   * @param {Object} options
-   * @param {boolean} [options.silenceErrors]
-   *
-   * @param {string} options.sourceType
-   * @param {ContextCompute} options.compute
-   * @param {string[]} options.path
-   *
-   * @return {CancellablePromise}
-   */
-  refreshAnalysis(options) {
-    if (options.path.length === 1) {
-      return this.fetchAnalysis(options);
-    }
-    const deferred = $.Deferred();
-
-    const promises = [];
-
-    const pollForAnalysis = (url, delay) => {
-      window.setTimeout(() => {
-        promises.push(
-          simplePost(url, undefined, {
-            silenceErrors: options.silenceErrors,
-            successCallback: data => {
-              promises.pop();
-              if (data.isSuccess) {
-                promises.push(
-                  this.fetchAnalysis(options)
-                    .done(deferred.resolve)
-                    .fail(deferred.reject)
-                );
-              } else if (data.isFailure) {
-                deferred.reject(data);
-              } else {
-                pollForAnalysis(url, 1000);
-              }
-            },
-            errorCallback: deferred.reject
-          })
-        );
-      }, delay);
-    };
-
-    const url =
-      '/' +
-      (options.sourceType === 'hive' ? 'beeswax' : options.sourceType) +
-      '/api/analyze/' +
-      options.path.join('/') +
-      '/';
-
-    promises.push(
-      simplePost(url, undefined, {
-        silenceErrors: options.silenceErrors,
-        successCallback: data => {
-          promises.pop();
-          if (data.status === 0 && data.watch_url) {
-            pollForAnalysis(data.watch_url, 500);
-          } else {
-            deferred.reject();
-          }
-        },
-        errorCallback: deferred.reject
-      })
-    );
-
-    return new CancellablePromise(deferred, undefined, promises);
-  }
-
-  /**
-   * Checks the status for the given snippet ID
-   * Note: similar to notebook and search check_status.
-   *
-   * @param {Object} options
-   * @param {Object} options.notebookJson
-   * @param {Object} options.snippetJson
-   * @param {boolean} [options.silenceErrors]
-   *
-   * @return {CancellablePromise}
-   */
-  whenAvailable(options) {
-    const deferred = $.Deferred();
-    const cancellablePromises = [];
-
-    let waitTimeout = -1;
-
-    deferred.fail(() => {
-      window.clearTimeout(waitTimeout);
-    });
-
-    const waitForAvailable = () => {
-      const request = simplePost(
-        '/notebook/api/check_status',
-        {
-          notebook: options.notebookJson,
-          snippet: options.snippetJson,
-          cluster: ko.mapping.toJSON(options.compute ? options.compute : '""')
-        },
-        {
-          silenceErrors: options.silenceErrors
-        }
-      )
-        .done(response => {
-          if (response && response.query_status && response.query_status.status) {
-            const status = response.query_status.status;
-            if (status === 'available') {
-              deferred.resolve(response.query_status);
-            } else if (status === 'running' || status === 'starting' || status === 'waiting') {
-              waitTimeout = window.setTimeout(() => {
-                waitForAvailable();
-              }, 500);
-            } else {
-              deferred.reject(response.query_status);
-            }
-          }
-        })
-        .fail(deferred.reject);
-
-      cancellablePromises.push(new CancellablePromise(request, request));
-    };
-
-    waitForAvailable();
-    return new CancellablePromise(deferred, undefined, cancellablePromises);
+    return new CancellableJqPromise(deferred, request);
   }
 
   clearNotebookHistory(options) {
@@ -1717,43 +1336,6 @@ class ApiHelper {
       editorMode: options.editorMode
     };
     return simplePost('/notebook/api/notebook/close', data);
-  }
-
-  /**
-   * Creates a new session
-   *
-   * @param {Object} options
-   * @param {String} options.type
-   * @param {Array<SessionProperty>} [options.properties] - Default []
-   * @return {Promise<Session>}
-   */
-  async createSession(options) {
-    return new Promise((resolve, reject) => {
-      const data = {
-        session: JSON.stringify({ type: options.type, properties: options.properties || [] })
-      };
-      $.post({
-        url: '/notebook/api/create_session',
-        data: data
-      })
-        .done(data => {
-          if (data.status === 401) {
-            resolve({ auth: true, message: data.message });
-          } else if (successResponseIsError(data)) {
-            reject(assistErrorCallback(options)(data));
-          } else {
-            resolve(data.session);
-          }
-        })
-        .fail(assistErrorCallback(options));
-    });
-  }
-
-  closeSession(options) {
-    const data = {
-      session: JSON.stringify(options.session)
-    };
-    return simplePost('/notebook/api/close_session', data, options);
   }
 
   async checkStatus(options) {
@@ -1813,9 +1395,7 @@ class ApiHelper {
       editorMode: options.editorMode
     };
     return new Promise((resolve, reject) => {
-      simplePost('/notebook/api/notebook/save', data)
-        .then(resolve)
-        .catch(reject);
+      simplePost('/notebook/api/notebook/save', data).then(resolve).catch(reject);
     });
   }
 
@@ -1840,97 +1420,11 @@ class ApiHelper {
   }
 
   /**
-   * @typedef {Object} ExecutionHandle
-   * @property {string} guid
-   * @property {boolean} has_more_statements
-   * @property {boolean} has_result_set
-   * @property {Object} log_context
-   * @property {number} modified_row_count
-   * @property {number} operation_type
-   * @property {string} previous_statement_hash
-   * @property {string} secret
-   * @property {string} session_guid
-   * @property {string} statement
-   * @property {number} statement_id
-   * @property {number} statements_count
-   */
-
-  /**
-   * API function to execute an SqlExecutable
-   *
-   * @param {Object} options
-   * @param {boolean} [options.silenceErrors]
-   * @param {SqlExecutable} options.executable
-   * @param {Session} options.session
-   *
-   * @return {Promise<ExecutionHandle>}
-   */
-  async executeStatement(options) {
-    const executable = options.executable;
-    const url = EXECUTE_API_PREFIX + executable.executor.connector().dialect;
-
-    const promise = new Promise(async (resolve, reject) => {
-      let data = {};
-      if (executable.executor.snippet) {
-        // V1
-        // TODO: Refactor away the snippet, it currently works because snippet.statement is a computed from
-        // the active executable, but we n
-        data = {
-          notebook: await executable.executor.snippet.parentNotebook.toJson(),
-          snippet: executable.executor.snippet.toContextJson()
-        };
-      } else {
-        data = await executable.toContext();
-      }
-
-      data.executable = executable.toJson();
-
-      simplePost(url, data, options)
-        .done(response => {
-          const executeResponse = {};
-          if (response.handle) {
-            executeResponse.handle = response.handle;
-            executeResponse.handle.result = response.result;
-          } else {
-            reject('No handle in execute response');
-            return;
-          }
-          if (response.history_id) {
-            executeResponse.history = {
-              id: response.history_id,
-              uuid: response.history_uuid,
-              parentUuid: response.history_parent_uuid
-            };
-          }
-          resolve(executeResponse);
-        })
-        .fail(reject);
-    });
-
-    executable.addCancellable({
-      cancel: async () => {
-        try {
-          const handle = await promise;
-          if (options.executable.handle !== handle) {
-            options.executable.handle = handle;
-          }
-          await this.cancelStatement(options);
-        } catch (err) {
-          console.warn('Failed cancelling statement');
-          console.warn(err);
-        }
-      }
-    });
-
-    return promise;
-  }
-
-  /**
    *
    * @param {Object} options
    * @param {Snippet} options.snippet
    *
-   * @return {CancellablePromise<string>}
+   * @return {CancellableJqPromise<string>}
    */
   async explainAsync(options) {
     const data = {
@@ -1954,7 +1448,7 @@ class ApiHelper {
    * @param {name} options.name
    * @param {description} options.description
    *
-   * @return {CancellablePromise<string>}
+   * @return {CancellableJqPromise<string>}
    */
   async createGistAsync(options) {
     const data = {
@@ -1964,7 +1458,7 @@ class ApiHelper {
       description: options.description
     };
     return new Promise((resolve, reject) => {
-      simplePost(GIST_API + 'create', data, options)
+      simplePost(URLS.GIST_API + 'create', data, options)
         .done(response => {
           resolve(response.link);
         })
@@ -1973,391 +1467,16 @@ class ApiHelper {
   }
 
   /**
-   *
-   * @param {Object} options
-   * @param {boolean} [options.silenceErrors]
-   * @param {Executable} options.executable
-   *
-   * @return {CancellablePromise<string>}
-   */
-  checkExecutionStatus(options) {
-    const deferred = $.Deferred();
-
-    const request = $.post({
-      url: '/notebook/api/check_status',
-      data: {
-        operationId: options.executable.operationId
-      }
-    })
-      .done(response => {
-        if (response && response.query_status) {
-          deferred.resolve(response.query_status);
-        } else if (response && response.status === -3) {
-          deferred.resolve({ status: EXECUTION_STATUS.expired });
-        } else {
-          deferred.resolve({ status: EXECUTION_STATUS.failed, message: response.message });
-        }
-      })
-      .fail(err => {
-        deferred.reject(assistErrorCallback(options)(err));
-      });
-
-    return new CancellablePromise(deferred, request);
-  }
-
-  /**
-   *
-   * @param {Object} options
-   * @param {boolean} [options.silenceErrors]
-   * @param {Executable} options.executable
-   * @param {number} [options.from]
-   * @param {Object[]} [options.jobs]
-   * @param {string} options.fullLog
-   *
-   * @return {Promise<?>}
-   */
-  fetchLogs(options) {
-    return new Promise(async (resolve, reject) => {
-      const data = await options.executable.toContext();
-      data.full_log = options.fullLog;
-      data.jobs = options.jobs && JSON.stringify(options.jobs);
-      data.from = options.from || 0;
-      data.operationId = options.executable.operationId;
-      const request = simplePost('/notebook/api/get_logs', data, options)
-        .done(response => {
-          resolve({
-            logs: (response.status === 1 && response.message) || response.logs || '',
-            jobs: response.jobs || [],
-            isFullLogs: response.isFullLogs
-          });
-        })
-        .fail(reject);
-
-      options.executable.addCancellable({
-        cancel: () => {
-          cancelActiveRequest(request);
-        }
-      });
-    });
-  }
-
-  /**
-   *
-   * @param {Object} options
-   * @param {boolean} [options.silenceErrors]
-   * @param {SqlExecutable} options.executable
-   *
-   * @return {Promise}
-   */
-  async cancelStatement(options) {
-    return new Promise(async (resolve, reject) => {
-      simplePost('/notebook/api/cancel_statement', await options.executable.toContext(), options)
-        .done(resolve)
-        .fail(reject);
-    });
-  }
-
-  /**
-   * @typedef {Object} ResultResponseMeta
-   * @property {string} comment
-   * @property {string} name
-   * @property {string} type
-   */
-
-  /**
-   * @typedef {Object} ResultResponse
-   * @property {Object[]} data
-   * @property {boolean} has_more
-   * @property {boolean} isEscaped
-   * @property {ResultResponseMeta[]} meta
-   * @property {string} type
-   */
-
-  /**
-   *
-   * @param {Object} options
-   * @param {boolean} [options.silenceErrors]
-   * @param {SqlExecutable} options.executable
-   * @param {number} options.rows
-   * @param {boolean} options.startOver
-   *
-   * @return {Promise<ResultResponse>}
-   */
-  async fetchResults(options) {
-    return new Promise(async (resolve, reject) => {
-      const data = await options.executable.toContext();
-      data.rows = options.rows;
-      data.startOver = !!options.startOver;
-
-      const request = simplePost(
-        '/notebook/api/fetch_result_data',
-        data,
-        {
-          silenceErrors: options.silenceErrors,
-          dataType: 'text'
-        },
-        options
-      )
-        .done(response => {
-          const data = JSON.bigdataParse(response);
-          resolve(data.result);
-        })
-        .fail(reject);
-
-      options.executable.addCancellable({
-        cancel: () => {
-          cancelActiveRequest(request);
-        }
-      });
-    });
-  }
-
-  /**
-   *
-   * @param {Object} options
-   * @param {boolean} [options.silenceErrors]
-   * @param {Executable} options.executable
-   *
-   * @return {Promise<ResultResponse>}
-   */
-  async fetchResultSize2(options) {
-    return new Promise(async (resolve, reject) => {
-      const request = simplePost(
-        '/notebook/api/fetch_result_size',
-        await options.executable.toContext(),
-        options
-      )
-        .done(response => {
-          resolve(response.result);
-        })
-        .fail(reject);
-
-      options.executable.addCancellable({
-        cancel: () => {
-          cancelActiveRequest(request);
-        }
-      });
-    });
-  }
-
-  /**
-   *
-   * @param {Object} options
-   * @param {boolean} [options.silenceErrors]
-   * @param {SqlExecutable} options.executable
-   *
-   * @return {Promise}
-   */
-  async closeStatement(options) {
-    return new Promise(async (resolve, reject) => {
-      simplePost(
-        '/notebook/api/close_statement',
-        {
-          operationId: options.executable.operationId
-        },
-        options
-      )
-        .done(resolve)
-        .fail(reject);
-    });
-  }
-
-  /**
-   * Fetches samples for the given source and path
-   *
-   * @param {Object} options
-   * @param {boolean} [options.silenceErrors]
-   *
-   * @param {string} options.sourceType
-   * @param {ContextCompute} options.compute
-   * @param {number} [options.sampleCount] - Default 100
-   * @param {string[]} options.path
-   * @param {string} [options.operation] - Default 'default'
-   *
-   * @return {CancellablePromise}
-   */
-  fetchSample(options) {
-    const deferred = $.Deferred();
-
-    const cancellablePromises = [];
-
-    let notebookJson = null;
-    let snippetJson = null;
-
-    const cancelQuery = () => {
-      if (notebookJson) {
-        simplePost(
-          '/notebook/api/cancel_statement',
-          {
-            notebook: notebookJson,
-            snippet: snippetJson,
-            cluster: ko.mapping.toJSON(options.compute ? options.compute : '""')
-          },
-          { silenceErrors: options.silenceErrors }
-        );
-      }
-    };
-
-    simplePost(
-      SAMPLE_API_PREFIX + options.path.join('/'),
-      {
-        notebook: {},
-        snippet: JSON.stringify({
-          type: options.sourceType,
-          compute: options.compute
-        }),
-        async: true,
-        operation: '"' + (options.operation || 'default') + '"',
-        cluster: ko.mapping.toJSON(options.compute ? options.compute : '""')
-      },
-      {
-        silenceErrors: options.silenceErrors
-      }
-    )
-      .done(sampleResponse => {
-        const queryResult = new QueryResult(options.sourceType, options.compute, sampleResponse);
-
-        notebookJson = JSON.stringify({ type: options.sourceType });
-        snippetJson = JSON.stringify(queryResult);
-
-        if (sampleResponse && sampleResponse.rows) {
-          // Sync results
-          const data = { data: sampleResponse.rows, meta: sampleResponse.full_headers };
-          data.hueTimestamp = Date.now();
-          deferred.resolve(data);
-        } else {
-          cancellablePromises.push(
-            this.whenAvailable({
-              notebookJson: notebookJson,
-              snippetJson: snippetJson,
-              compute: options.compute,
-              silenceErrors: options.silenceErrors
-            })
-              .done(resultStatus => {
-                if (resultStatus) {
-                  $.extend(true, queryResult.result, {
-                    handle: resultStatus
-                  });
-                }
-                const resultRequest = simplePost(
-                  '/notebook/api/fetch_result_data',
-                  {
-                    notebook: notebookJson,
-                    snippet: JSON.stringify(queryResult),
-                    rows: options.sampleCount || 100,
-                    startOver: 'false'
-                  },
-                  {
-                    silenceErrors: options.silenceErrors
-                  }
-                )
-                  .done(sampleResponse => {
-                    const data = (sampleResponse && sampleResponse.result) || {
-                      data: [],
-                      meta: []
-                    };
-                    data.hueTimestamp = Date.now();
-                    deferred.resolve(data);
-
-                    if (
-                      window.CLOSE_SESSIONS[options.sourceType] &&
-                      queryResult.result.handle &&
-                      queryResult.result.handle.session_id
-                    ) {
-                      this.closeSession({
-                        session: {
-                          type: options.sourceType,
-                          id: queryResult.result.handle.session_id
-                        }
-                      });
-                    }
-                  })
-                  .fail(deferred.reject);
-
-                cancellablePromises.push(resultRequest, resultRequest);
-              })
-              .fail(deferred.reject)
-          );
-        }
-      })
-      .fail(deferred.reject);
-
-    cancellablePromises.push({
-      cancel: cancelQuery
-    });
-
-    return new CancellablePromise(deferred, undefined, cancellablePromises);
-  }
-
-  /**
-   * Fetches a navigator entity for the given source and path
-   *
-   * @param {Object} options
-   * @param {boolean} [options.silenceErrors]
-   *
-   * @param {boolean} [options.isView] - Default false
-   * @param {string[]} options.path
-   *
-   * @return {CancellablePromise}
-   */
-  fetchNavigatorMetadata(options) {
-    const deferred = $.Deferred();
-    let url = NAV_URLS.FIND_ENTITY;
-
-    if (options.path.length === 1) {
-      url += '?type=database&name=' + options.path[0];
-    } else if (options.path.length === 2) {
-      url +=
-        (options.isView ? '?type=view' : '?type=table') +
-        '&database=' +
-        options.path[0] +
-        '&name=' +
-        options.path[1];
-    } else if (options.path.length === 3) {
-      url +=
-        '?type=field&database=' +
-        options.path[0] +
-        '&table=' +
-        options.path[1] +
-        '&name=' +
-        options.path[2];
-    } else {
-      return new CancellablePromise($.Deferred().reject());
-    }
-
-    const request = simplePost(
-      url,
-      {
-        notebook: {},
-        snippet: ko.mapping.toJSON({
-          type: 'nav'
-        })
-      },
-      {
-        silenceErrors: options.silenceErrors,
-        successCallback: data => {
-          data = data.entity || data;
-          data.hueTimestamp = Date.now();
-          deferred.resolve(data);
-        },
-        errorCallback: deferred.reject
-      }
-    );
-
-    return new CancellablePromise(deferred, request);
-  }
-
-  /**
    * Updates Navigator properties and custom metadata for the given entity
    *
    * @param {Object} options
    * @param {string} options.identity - The identifier for the Navigator entity to update
    * @param {Object} [options.properties]
-   * @param {Object} [options.modifiedCustomMetadata]
-   * @param {string[]} [options.deletedCustomMetadataKeys]
+   * @param {Object.<string|string>|undefined} [options.modifiedCustomMetadata]
+   * @param {string[]|undefined} [options.deletedCustomMetadataKeys]
    * @param {boolean} [options.silenceErrors]
    *
-   * @return {Promise}
+   * @return {JQueryPromise}
    */
   updateNavigatorProperties(options) {
     const data = { id: ko.mapping.toJSON(options.identity) };
@@ -2371,21 +1490,21 @@ class ApiHelper {
     if (options.deletedCustomMetadataKeys) {
       data.deletedCustomMetadataKeys = ko.mapping.toJSON(options.deletedCustomMetadataKeys);
     }
-    return simplePost(NAV_URLS.UPDATE_PROPERTIES, data, options);
+    return simplePost(URLS.NAV_API.UPDATE_PROPERTIES, data, options);
   }
 
   /**
    * Lists all available navigator tags
    *
    * @param {Object} options
-   * @param {boolean} [options.silenceErrors]
+   * @param {boolean|undefined} [options.silenceErrors]
    *
-   * @return {CancellablePromise}
+   * @return {CancellableJqPromise}
    */
   fetchAllNavigatorTags(options) {
     const deferred = $.Deferred();
 
-    const request = simplePost(NAV_URLS.LIST_TAGS, undefined, {
+    const request = simplePost(URLS.NAV_API.LIST_TAGS, undefined, {
       silenceErrors: options.silenceErrors,
       successCallback: data => {
         if (data && data.tags) {
@@ -2397,18 +1516,18 @@ class ApiHelper {
       errorCallback: deferred.reject
     });
 
-    return new CancellablePromise(deferred, request);
+    return new CancellableJqPromise(deferred, request);
   }
 
   addNavTags(entityId, tags) {
-    return simplePost(NAV_URLS.ADD_TAGS, {
+    return simplePost(URLS.NAV_API.ADD_TAGS, {
       id: ko.mapping.toJSON(entityId),
       tags: ko.mapping.toJSON(tags)
     });
   }
 
   deleteNavTags(entityId, tags) {
-    return simplePost(NAV_URLS.DELETE_TAGS, {
+    return simplePost(URLS.NAV_API.DELETE_TAGS, {
       id: ko.mapping.toJSON(entityId),
       tags: ko.mapping.toJSON(tags)
     });
@@ -2419,7 +1538,7 @@ class ApiHelper {
    * @param {boolean} [options.silenceErrors]
    * @param {ContextCompute} options.compute
    * @param {string} options.queryId
-   * @return {CancellablePromise}
+   * @return {CancellableJqPromise}
    */
   fetchQueryExecutionAnalysis(options) {
     //var url = '/metadata/api/workload_analytics/get_impala_query/';
@@ -2430,7 +1549,7 @@ class ApiHelper {
 
     const cancellablePromises = [];
 
-    const promise = new CancellablePromise(deferred, undefined, cancellablePromises);
+    const promise = new CancellableJqPromise(deferred, undefined, cancellablePromises);
 
     const pollForAnalysis = () => {
       if (tries === 10) {
@@ -2494,7 +1613,7 @@ class ApiHelper {
       }
     );
 
-    return new CancellablePromise(deferred, request);
+    return new CancellableJqPromise(deferred, request);
   }
 
   fetchQueryExecutionStatistics(options) {
@@ -2520,7 +1639,7 @@ class ApiHelper {
       }
     );
 
-    return new CancellablePromise(deferred, request);
+    return new CancellableJqPromise(deferred, request);
   }
 
   /**
@@ -2558,7 +1677,7 @@ class ApiHelper {
 
   async fetchHueConfigAsync(options) {
     return new Promise((resolve, reject) => {
-      $.get(GET_HUE_CONFIG_URL)
+      $.get(URLS.GET_HUE_CONFIG_API)
         .done(response => {
           if (!response && response.status === -1) {
             reject(response.message);
@@ -2570,13 +1689,9 @@ class ApiHelper {
     });
   }
 
-  getClusterConfig(data) {
-    return $.post(FETCH_CONFIG, data);
-  }
-
   fetchHueDocsInteractive(query) {
     const deferred = $.Deferred();
-    const request = $.post(INTERACTIVE_SEARCH_API, {
+    const request = $.post(URLS.INTERACTIVE_SEARCH_API, {
       query_s: ko.mapping.toJSON(query),
       limit: 50,
       sources: '["documents"]'
@@ -2589,12 +1704,12 @@ class ApiHelper {
         }
       })
       .fail(deferred.reject);
-    return new CancellablePromise(deferred, request);
+    return new CancellableJqPromise(deferred, request);
   }
 
   fetchNavEntitiesInteractive(options) {
     const deferred = $.Deferred();
-    const request = $.post(INTERACTIVE_SEARCH_API, {
+    const request = $.post(URLS.INTERACTIVE_SEARCH_API, {
       query_s: ko.mapping.toJSON(options.query),
       field_facets: ko.mapping.toJSON(options.facets || []),
       limit: 50,
@@ -2608,14 +1723,14 @@ class ApiHelper {
         }
       })
       .fail(deferred.reject);
-    return new CancellablePromise(deferred, request);
+    return new CancellableJqPromise(deferred, request);
   }
 
   searchEntities(options) {
     const deferred = $.Deferred();
 
     const request = simplePost(
-      SEARCH_API,
+      URLS.SEARCH_API,
       {
         query_s: ko.mapping.toJSON(options.query),
         limit: options.limit || 100,
@@ -2629,7 +1744,7 @@ class ApiHelper {
       }
     );
 
-    return new CancellablePromise(deferred, request);
+    return new CancellableJqPromise(deferred, request);
   }
 
   /**
@@ -2642,7 +1757,7 @@ class ApiHelper {
     const deferred = $.Deferred();
 
     const request = simplePost(
-      FORMAT_SQL_API,
+      URLS.FORMAT_SQL_API,
       {
         statements: options.statements
       },
@@ -2653,7 +1768,7 @@ class ApiHelper {
       }
     );
 
-    return new CancellablePromise(deferred, request);
+    return new CancellableJqPromise(deferred, request);
   }
 
   /**
@@ -2669,7 +1784,7 @@ class ApiHelper {
     const deferred = $.Deferred();
 
     const request = simplePost(
-      GIST_API + 'create',
+      URLS.GIST_API + 'create',
       {
         statement: options.statement,
         doc_type: options.doc_type,
@@ -2683,7 +1798,7 @@ class ApiHelper {
       }
     );
 
-    return new CancellablePromise(deferred, request);
+    return new CancellableJqPromise(deferred, request);
   }
 }
 

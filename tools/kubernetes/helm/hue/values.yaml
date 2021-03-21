@@ -12,6 +12,7 @@ hue:
     port: 5432
     user: "hue"
     password: "hue"
+    #password_script=echo ${DATABASE_PASSWORD}
     name: "hue"
     storageName: "microk8s-hostpath"
   interpreters: |
@@ -34,6 +35,9 @@ hue:
     celery_result_backend=redis://redis:6379/0
 balancer:
   enabled: true
+api:
+  enabled: false
+  domain: api.gethue.com
 workers:
   enabled: false
   replicas: 1
@@ -43,9 +47,11 @@ websocket:
   enabled: false
   replicas: 1
 monitoring:
-  enabled: true
+  enabled: false
+alerting:
+  enabled: false
 tracing:
-  enabled: true
+  enabled: false
 cron:
   enabled: false
   emailStats: "0 13 * * WED,SUN"
@@ -63,6 +69,18 @@ aws:
   accessKeyId: ""
   secretAccessKey: ""
   awsRegion: "us-east-1"
+hive:
+  site: |
+    <!--
+    <property>
+      <name>hive.support.concurrency</name>
+      <value>false</value>
+      <description>Whether hive supports concurrency or not. A zookeeper instance must be up and running for the default hive lock manager to support read-write locks.</description>
+    </property>
+    -->
 
 ## Pod Annotations
 # podAnnotations: {}
+
+## Pod Labels
+# podLabels: {}

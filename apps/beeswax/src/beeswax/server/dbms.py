@@ -38,6 +38,7 @@ from desktop.settings import CACHES_HIVE_DISCOVERY_KEY
 from indexer.file_format import HiveFormat
 from libzookeeper import conf as libzookeeper_conf
 
+from azure.abfs import abfspath
 from beeswax.conf import HIVE_SERVER_HOST, HIVE_SERVER_PORT, HIVE_SERVER_HOST, HIVE_HTTP_THRIFT_PORT, HIVE_METASTORE_HOST, \
     HIVE_METASTORE_PORT, LIST_PARTITIONS_LIMIT, SERVER_CONN_TIMEOUT, \
     AUTH_USERNAME, AUTH_PASSWORD, APPLY_NATURAL_SORT_MAX, QUERY_PARTITIONS_LIMIT, HIVE_DISCOVERY_HIVESERVER2_ZNODE, \
@@ -118,17 +119,21 @@ def get_query_server_config(name='beeswax', connector=None):
       activeEndpoint = cache.get('llap')
       if activeEndpoint is None:
         if HIVE_DISCOVERY_LLAP.get():
-          LOG.debug("Checking zookeeper for Hive Server Interactive endpoint")
+          LOG.debug("Checking zookeeper for discovering Hive LLAP server endpoint")
           zk = KazooClient(hosts=libzookeeper_conf.ENSEMBLE.get(), read_only=True)
           zk.start()
           if HIVE_DISCOVERY_LLAP_HA.get():
             znode = "{0}/instances".format(HIVE_DISCOVERY_LLAP_ZNODE.get())
-            LOG.debug("Setting up LLAP with the following node {0}".format(znode))
+            LOG.debug("Setting up Hive LLAP HA with the following node {0}".format(znode))
             if zk.exists(znode):
               hiveservers = zk.get_children(znode)
+              if not hiveservers:
+                raise PopupException(_('There is no running Hive LLAP server available'))
+              LOG.info("Available Hive LLAP servers: {0}".format(hiveservers))
               for server in hiveservers:
-                llap_servers= json.loads(zk.get("{0}/{1}".format(znode, server))[0])["internal"][0]
+                llap_servers = json.loads(zk.get("{0}/{1}".format(znode, server))[0])["internal"][0]
                 if llap_servers["api"] == "activeEndpoint":
+                  LOG.info("Selecting Hive LLAP server: {0}".format(llap_servers))
                   cache.set(
                     "llap",
                     json.dumps({
@@ -138,11 +143,11 @@ def get_query_server_config(name='beeswax', connector=None):
                       CACHE_TIMEOUT.get()
                   )
             else:
-              LOG.error("LLAP Endpoint not found, reverting to HiveServer2")
+              LOG.error("Hive LLAP endpoint not found, reverting to config values")
               cache.set("llap", json.dumps({"host": HIVE_SERVER_HOST.get(), "port": HIVE_HTTP_THRIFT_PORT.get()}), CACHE_TIMEOUT.get())
           else:
             znode = "{0}".format(HIVE_DISCOVERY_LLAP_ZNODE.get())
-            LOG.debug("Setting up LLAP with the following node {0}".format(znode))
+            LOG.debug("Setting up Hive LLAP with the following node {0}".format(znode))
             if zk.exists(znode):
               hiveservers = zk.get_children(znode)
               for server in hiveservers:
@@ -155,9 +160,11 @@ def get_query_server_config(name='beeswax', connector=None):
                 )
           zk.stop()
         else:
-          LOG.debug("Zookeeper Discovery not enabled, reverting to config values")
+          LOG.debug("Zookeeper discovery not enabled, reverting to config values")
           cache.set("llap", json.dumps({"host": LLAP_SERVER_HOST.get(), "port": LLAP_SERVER_THRIFT_PORT.get()}), CACHE_TIMEOUT.get())
+
       activeEndpoint = json.loads(cache.get("llap"))
+
     elif name != 'hms' and name != 'impala':
       activeEndpoint = cache.get("hiveserver2")
       if activeEndpoint is None:
@@ -165,12 +172,14 @@ def get_query_server_config(name='beeswax', connector=None):
           zk = KazooClient(hosts=libzookeeper_conf.ENSEMBLE.get(), read_only=True)
           zk.start()
           znode = HIVE_DISCOVERY_HIVESERVER2_ZNODE.get()
-          LOG.info("Selecting up HiveServer via the following node {0}".format(znode))
+          LOG.info("Selecting up Hive server via the following node {0}".format(znode))
           if zk.exists(znode):
             hiveservers = zk.get_children(znode)
-            LOG.info("Available HiveServers: {0}".format(hiveservers))
+            LOG.info("Available Hive Servers: {0}".format(hiveservers))
+            if not hiveservers:
+              raise PopupException(_('There is no running Hive server available'))
             server_to_use = 0  # if CONF.HIVE_SPREAD.get() randint(0, len(hiveservers)-1) else 0
-            LOG.info("Selected HiveServer {0}: {1}".format(server_to_use, hiveservers[server_to_use]))
+            LOG.info("Selected Hive server {0}: {1}".format(server_to_use, hiveservers[server_to_use]))
             cache.set(
               "hiveserver2",
               json.dumps({
@@ -183,6 +192,7 @@ def get_query_server_config(name='beeswax', connector=None):
           zk.stop()
         else:
           cache.set("hiveserver2", json.dumps({"host": HIVE_SERVER_HOST.get(), "port": HIVE_HTTP_THRIFT_PORT.get()}))
+
       activeEndpoint = json.loads(cache.get("hiveserver2"))
 
     if name == 'impala':
@@ -222,7 +232,7 @@ def get_query_server_config(name='beeswax', connector=None):
           'max_number_of_sessions': MAX_NUMBER_OF_SESSIONS.get()
         }
 
-    if name == 'sparksql': # Extends Hive as very similar
+    if name == 'sparksql':  # Extends Hive as very similar
       from spark.conf import SQL_SERVER_HOST as SPARK_SERVER_HOST, SQL_SERVER_PORT as SPARK_SERVER_PORT, USE_SASL as SPARK_USE_SASL
 
       query_server.update({
@@ -266,14 +276,14 @@ def get_query_server_config_via_connector(connector):
   return {
       'dialect': connector['dialect'],
       'server_name': full_connector_name,
-      'server_host': (connector['compute']['options'] if 'compute' in connector else connector['options'])['server_host'],
-      'server_port': int((connector['compute']['options'] if 'compute' in connector else connector['options'])['server_port']),
+      'server_host': server_host,
+      'server_port': server_port,
       'principal': 'TODO',
       'auth_username': AUTH_USERNAME.get(),
       'auth_password': AUTH_PASSWORD.get(),
 
       'impersonation_enabled': impersonation_enabled,
-      'use_sasl': connector['dialect'] in ('hive',),
+      'use_sasl': connector['options'].get('use_sasl', 'true') == 'true',
       'SESSION_TIMEOUT_S': 15 * 60,
       'querycache_rows': 1000,
       'QUERY_TIMEOUT_S': 15 * 60,
@@ -305,7 +315,8 @@ class HiveServer2Dbms(object):
   def __init__(self, client, server_type):
     self.client = client
     self.server_type = server_type
-    self.server_name = self.client.query_server['server_name']
+    self.server_name = self.client.query_server.get('dialect') if self.client.query_server['server_name'].isdigit() \
+        else self.client.query_server['server_name']
 
 
   @classmethod
@@ -351,29 +362,63 @@ class HiveServer2Dbms(object):
 
 
   def get_tables_meta(self, database='default', table_names='*', table_types=None):
-    database = database.lower() # Impala is case sensitive
+    database = database.lower()  # Impala is case sensitive
 
-    if self.server_name == 'beeswax':
+    if self.server_name in ('beeswax', 'sparksql'):
       identifier = self.to_matching_wildcard(table_names)
     else:
-      identifier = None
-    tables = self.client.get_tables_meta(database, identifier, table_types)
+      identifier = None  # Impala
+
+    if self.server_name == 'sparksql':
+      tables = self._get_tables_via_sparksql(database, identifier)
+    else:
+      tables = self.client.get_tables_meta(database, identifier)
+
     if len(tables) <= APPLY_NATURAL_SORT_MAX.get():
       tables = apply_natural_sort(tables, key='name')
     return tables
 
 
   def get_tables(self, database='default', table_names='*', table_types=None):
-    database = database.lower() # Impala is case sensitive
+    database = database.lower()  # Impala is case sensitive
 
-    if self.server_name == 'beeswax':
+    if self.server_name in ('beeswax', 'sparksql'):
       identifier = self.to_matching_wildcard(table_names)
     else:
       identifier = None
+
     tables = self.client.get_tables(database, identifier, table_types)
+
     if len(tables) <= APPLY_NATURAL_SORT_MAX.get():
       tables = apply_natural_sort(tables)
     return tables
+
+
+  def _get_tables_via_sparksql(self, database, table_names='*'):
+    hql = "SHOW TABLES IN %s" % database
+    if table_names != '*':
+      identifier = self.to_matching_wildcard(table_names)
+      hql += " LIKE '%s'" % (identifier)
+
+    query = hql_query(hql)
+    timeout = SERVER_CONN_TIMEOUT.get()
+
+    handle = self.execute_and_wait(query, timeout_sec=timeout)
+
+    if handle:
+      result = self.fetch(handle, rows=5000)
+      self.close(handle)
+
+      # We get back: database | tableName | isTemporary
+      return [{
+          'name': row[1],
+          'type': 'VIEW' if row[2] else 'TABLE',
+          'comment': ''
+        }
+        for row in result.rows()
+      ]
+    else:
+      return []
 
 
   def get_table(self, database, table_name):
@@ -381,7 +426,11 @@ class HiveServer2Dbms(object):
       return self.client.get_table(database, table_name)
     except QueryServerException as e:
       LOG.debug("Seems like %s.%s could be a Kudu table" % (database, table_name))
-      if 'java.lang.ClassNotFoundException' in e.message and [prop for prop in self.get_table_properties(database, table_name, property_name='storage_handler').rows() if 'KuduStorageHandler' in prop[0]]:
+      if 'java.lang.ClassNotFoundException' in e.message and [
+            prop
+            for prop in self.get_table_properties(database, table_name, property_name='storage_handler').rows()
+            if 'KuduStorageHandler' in prop[0]
+        ]:
         query_server = get_query_server_config('impala')
         db = get(self.client.user, query_server)
         table = db.get_table(database, table_name)
@@ -486,9 +535,11 @@ class HiveServer2Dbms(object):
 
 
   def fetch(self, query_handle, start_over=False, rows=None):
-    no_start_over_support = [config_variable for config_variable in self.get_default_configuration(False)
-                                             if config_variable.key == 'support_start_over'
-                                               and config_variable.value == 'false']
+    no_start_over_support = [
+        config_variable
+        for config_variable in self.get_default_configuration(False)
+        if config_variable.key == 'support_start_over' and config_variable.value == 'false'
+    ]
     if no_start_over_support:
       start_over = False
 
@@ -725,7 +776,12 @@ class HiveServer2Dbms(object):
     if prefix:
       prefix_match = "WHERE CAST(%(column)s AS STRING) LIKE '%(prefix)s%%'" % {'column': column, 'prefix': prefix}
 
-    hql = 'SELECT %(column)s, COUNT(*) AS ct FROM `%(database)s`.`%(table)s` %(prefix_match)s GROUP BY %(column)s ORDER BY ct DESC LIMIT %(limit)s' % {
+    hql = '''
+      SELECT %(column)s, COUNT(*) AS ct
+      FROM `%(database)s`.`%(table)s` %(prefix_match)s
+      GROUP BY %(column)s
+      ORDER BY ct DESC
+      LIMIT %(limit)s''' % {
         'database': database, 'table': table, 'column': column, 'prefix_match': prefix_match, 'limit': limit,
     }
 
@@ -751,7 +807,10 @@ class HiveServer2Dbms(object):
 
   def load_data(self, database, table, form_data, design, generate_ddl_only=False):
     hql = "LOAD DATA INPATH"
-    hql += " '%(path)s'" % form_data
+    source_path = "%(path)s" % form_data
+    if source_path.lower().startswith("abfs"): #this is to check if its using an ABFS path
+      source_path = abfspath(source_path)
+    hql += " '%s'" % source_path
     if form_data['overwrite']:
       hql += " OVERWRITE"
     hql += " INTO TABLE "
@@ -1007,7 +1066,11 @@ class HiveServer2Dbms(object):
     query_history.set_to_running()
     query_history.save()
 
-    LOG.debug("Updated QueryHistory id %s user %s statement_number: %s" % (query_history.id, self.client.user, query_history.statement_number))
+    LOG.debug(
+      "Updated QueryHistory id %s user %s statement_number: %s" % (
+        query_history.id, self.client.user, query_history.statement_number
+      )
+    )
 
     return query_history
 
@@ -1087,18 +1150,46 @@ class HiveServer2Dbms(object):
     return self.client.get_configuration()
 
 
-  def get_functions(self, prefix=None):
-    filter = '"%s.*"' % prefix if prefix else '".*"'
-    hql = 'SHOW FUNCTIONS %s' % filter
+  def get_functions(self, prefix=None, database=None):
+    '''
+    Not using self.client.get_functions() as pretty limited. More comments there.
+    '''
+    result = None
+
+    function_filter = "'%s*'" % prefix if prefix else ''
+
+    if self.client.query_server['dialect'] == 'impala':
+      if database is None:
+        database = '_impala_builtins'
+
+    hql = 'SHOW FUNCTIONS %(function_filter)s %(database_filter)s' % {
+      'function_filter': "'%s*'" % prefix if prefix else '',
+      'database_filter': (' IN %s' % database) if database else ''
+    }
 
     query = hql_query(hql)
-    handle = self.execute_and_wait(query, timeout_sec=15.0)
+    handle = self.execute_and_wait(query, timeout_sec=5.0)
 
     if handle:
-      result = self.fetch(handle, rows=5000)
+      rows = self.fetch(handle, rows=1000).rows()
       self.close(handle)
 
-    return result
+    return rows
+
+
+  def get_function(self, name):
+    hql = 'DESCRIBE FUNCTION EXTENDED `%(name)s`' % {
+      'name': name,
+    }
+
+    query = hql_query(hql)
+    handle = self.execute_and_wait(query, timeout_sec=5.0)
+
+    if handle:
+      rows = self.fetch(handle, rows=100).rows()
+      self.close(handle)
+
+    return rows
 
 
   def get_query_metadata(self, query):
@@ -1118,7 +1209,29 @@ class HiveServer2Dbms(object):
     return self.client.explain(query)
 
 
-  def getStatus(self):
+  def get_primary_keys(self, database_name, table_name, catalog_name=None):
+
+    return self.client.get_primary_keys(
+      database_name=database_name,
+      table_name=table_name,
+      catalog_name=catalog_name
+    )
+
+
+  def get_foreign_keys(self, parent_catalog_name=None, parent_database_name=None, parent_table_name=None, foreign_catalog_name=None,
+      foreign_database_name=None, foreign_table_name=None):
+
+    return self.client.get_foreign_keys(
+      parent_catalog_name=parent_catalog_name,
+      parent_database_name=parent_database_name,
+      parent_table_name=parent_table_name,
+      foreign_catalog_name=foreign_catalog_name,
+      foreign_database_name=foreign_database_name,
+      foreign_table_name=foreign_table_name
+    )
+
+
+  def get_status(self):
     return self.client.getStatus()
 
 
@@ -1154,7 +1267,7 @@ class SubQueryTable(object):
     for col in cols:
       col.name = re.sub('^t\.', '', col.name)
       col.type = HiveFormat.FIELD_TYPE_TRANSLATE.get(col.type, 'string')
-    self.cols =  cols
+    self.cols = cols
     self.hdfs_link = None
     self.comment = None
     self.is_impala_only = False

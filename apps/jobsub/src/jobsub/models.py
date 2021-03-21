@@ -18,8 +18,8 @@
 from builtins import str
 import logging
 
-from django.core import urlresolvers
 from django.db import models
+from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
 from desktop.lib.parameterization import find_parameters, bind_parameters
@@ -37,7 +37,7 @@ class JobDesign(models.Model):
 
   Contains CMS information for "job designs".
   """
-  owner = models.ForeignKey(User)
+  owner = models.ForeignKey(User, on_delete=models.CASCADE)
   name = models.CharField(max_length=40)
   description = models.CharField(max_length=1024)
   last_modified = models.DateTimeField(auto_now=True)
@@ -47,16 +47,16 @@ class JobDesign(models.Model):
   data = models.TextField()
 
   def edit_url(self):
-    return urlresolvers.reverse("jobsub.views.edit_design", kwargs=dict(id=self.id))
+    return reverse("jobsub.views.edit_design", kwargs=dict(id=self.id))
 
   def clone_url(self):
-    return urlresolvers.reverse("jobsub.views.clone_design", kwargs=dict(id=self.id))
+    return reverse("jobsub:jobsub.views.clone_design", kwargs=dict(id=self.id))
 
   def delete_url(self):
-    return urlresolvers.reverse("jobsub.views.delete_design", kwargs=dict(id=self.id))
+    return reverse("jobsub:jobsub.views.delete_design", kwargs=dict(id=self.id))
 
   def submit_url(self):
-    return urlresolvers.reverse("jobsub.views.submit_design", kwargs=dict(id=self.id))
+    return reverse("jobsub.views.submit_design", kwargs=dict(id=self.id))
 
   def clone(self):
     clone_kwargs = dict([(field.name, getattr(self, field.name)) for field in self._meta.fields if field.name != 'id']);
@@ -98,7 +98,7 @@ class OozieAction(models.Model):
   reference. See
   https://docs.djangoproject.com/en/dev/topics/db/models/#multi-table-inheritance
   """
-  PARAM_FIELDS = ( )    # Nothing is parameterized by default
+  PARAM_FIELDS = ()    # Nothing is parameterized by default
 
   # This allows the code to easily figure out which subclass to access
   action_type = models.CharField(max_length=64, blank=False)
@@ -129,7 +129,7 @@ class OozieDesign(models.Model):
   stored in the Oozie*Action models.
   """
   # Generic stuff
-  owner = models.ForeignKey(User)
+  owner = models.ForeignKey(User, on_delete=models.CASCADE)
   name = models.CharField(max_length=64, blank=False,
       help_text=_('Name of the design, which must be unique per user.'))
   description = models.CharField(max_length=1024, blank=True)
@@ -138,7 +138,7 @@ class OozieDesign(models.Model):
   # Action. Avoid using `root_action' directly, because it only gives you the
   # intermediate table (i.e. OozieAction). You want to use `get_root_action()'
   # most of the time.
-  root_action = models.ForeignKey(OozieAction)
+  root_action = models.ForeignKey(OozieAction, on_delete=models.CASCADE)
 
   def get_root_action(self):
     """Return the concrete action object, not just a generic OozieAction"""
@@ -260,7 +260,7 @@ class JobHistory(models.Model):
 
   Contains informatin on submitted jobs/workflows.
   """
-  owner = models.ForeignKey(User)
+  owner = models.ForeignKey(User, on_delete=models.CASCADE)
   submission_date = models.DateTimeField(auto_now=True)
   job_id = models.CharField(max_length=128)
-  design = models.ForeignKey(OozieDesign)
+  design = models.ForeignKey(OozieDesign, on_delete=models.CASCADE)

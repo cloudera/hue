@@ -18,14 +18,14 @@ import $ from 'jquery';
 import * as ko from 'knockout';
 
 ko.bindingHandlers.verticalSlide = {
-  init: function(element, valueAccessor) {
+  init: function (element, valueAccessor) {
     if (ko.utils.unwrapObservable(valueAccessor())) {
       $(element).show();
     } else {
       $(element).hide();
     }
   },
-  update: function(element, valueAccessor) {
+  update: function (element, valueAccessor) {
     if (ko.utils.unwrapObservable(valueAccessor())) {
       $(element).slideDown('fast');
     } else {

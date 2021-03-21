@@ -20,14 +20,14 @@ import * as ko from 'knockout';
 import componentUtils from './componentUtils';
 import I18n from 'utils/i18n';
 
-export const NAME = 'hue-drop-down';
+export const HUE_DROP_DOWN_COMPONENT = 'hue-drop-down';
 
 const TEMPLATE = `
   <!-- ko if: !menuOnly && (!dropDownVisible() || !searchable) -->
   <a class="inactive-action hue-drop-down-active" href="javascript:void(0)" data-bind="toggle: dropDownVisible, css: { 'blue': dropDownVisible }">
     <!-- ko if: icon --><i class="fa" data-bind="css: icon"></i><!-- /ko -->
     <!-- ko if: !noLabel && value -->
-    <span class="hue-drop-down-selected" data-bind="text: value() && typeof value()[labelAttribute] !== 'undefined' ? value()[labelAttribute] : value(), visible: ! dropDownVisible() || !searchable, attr: { 'title': value() && typeof value()[labelAttribute] !== 'undefined' ? value()[labelAttribute] : value() }" ></span>
+    <span class="hue-drop-down-selected" data-bind="text: value() && typeof value()[labelAttribute] !== 'undefined' ? value()[labelAttribute] : value(), visible: ! dropDownVisible() || !searchable, attr: { 'title': titleTooltip }" ></span>
     <!-- /ko -->
     <i class="fa fa-caret-down"></i>
   </a>
@@ -63,7 +63,7 @@ const TEMPLATE = `
 `;
 
 ko.bindingHandlers.dropDownKeyUp = {
-  init: function(element, valueAccessor) {
+  init: function (element, valueAccessor) {
     const options = valueAccessor();
     const onEsc = options.onEsc;
     const onEnter = options.onEnter;
@@ -72,7 +72,7 @@ ko.bindingHandlers.dropDownKeyUp = {
 
     const keyUpTarget = options.keyUpTarget || window;
 
-    const keyUp = function(e) {
+    const keyUp = function (e) {
       const $element = $(element);
       const $dropDownMenu = $element.find('.dropdown-menu');
       const $currentActive = $element.find('.hue-inner-drop-down > .active');
@@ -160,12 +160,13 @@ class HueDropDown {
     self.labelAttribute = params.labelAttribute || 'label';
     self.icon = params.icon;
     self.value = params.value;
+    self.titleName = params.titleName;
     self.entries = params.entries;
     self.searchable = params.searchable || false;
     self.foreachVisible = params.foreachVisible || false;
     self.linkTitle = params.linkTitle || I18n('Selected entry');
     self.fixedPosition = !!params.fixedPosition;
-    self.onSelect = params.onSelect || function() {};
+    self.onSelect = params.onSelect || function () {};
 
     self.inputPlaceHolder = ko.pureComputed(() => {
       return self.value() && typeof self.value() === 'object'
@@ -173,18 +174,30 @@ class HueDropDown {
         : self.value();
     });
 
-    const closeOnOutsideClick = function(e) {
+    self.titleTooltip = ko.pureComputed(() => {
+      const title =
+        self.value() && typeof self.value()[self.labelAttribute] !== 'undefined'
+          ? self.value()[self.labelAttribute]
+          : self.value();
+
+      if (typeof self.titleName == 'undefined') {
+        return title;
+      }
+      return self.titleName + ' ' + title;
+    });
+
+    const closeOnOutsideClick = function (e) {
       const $input = $(element).find('.hue-drop-down-input');
       if (!$input.is($(e.target))) {
         self.dropDownVisible(false);
       }
     };
 
-    self.onEsc = function() {
+    self.onEsc = function () {
       self.dropDownVisible(false);
     };
 
-    self.onEnter = function(value) {
+    self.onEnter = function (value) {
       const previous = self.value();
       self.value(value);
       self.onSelect(value, previous);
@@ -201,9 +214,7 @@ class HueDropDown {
 
     self.filter.subscribe(() => {
       self.filterEdited(true);
-      $(element)
-        .find('.hue-inner-drop-down > .active')
-        .removeClass('.active');
+      $(element).find('.hue-inner-drop-down > .active').removeClass('.active');
     });
 
     self.dropDownVisible.subscribe(newValue => {
@@ -212,9 +223,7 @@ class HueDropDown {
         window.setTimeout(() => {
           self.filter('');
           $(window).on('click', closeOnOutsideClick);
-          $(element)
-            .find('.hue-drop-down-input')
-            .focus();
+          $(element).find('.hue-drop-down-input').focus();
         }, 0);
 
         // Right align the dropdown when outside the right edge
@@ -234,9 +243,7 @@ class HueDropDown {
           }
         }
       } else {
-        $(element)
-          .find('.hue-inner-drop-down > .active')
-          .removeClass('.active');
+        $(element).find('.hue-inner-drop-down > .active').removeClass('.active');
         $(window).off('click', closeOnOutsideClick);
       }
     });
@@ -258,9 +265,9 @@ class HueDropDown {
 }
 
 componentUtils.registerComponent(
-  NAME,
+  HUE_DROP_DOWN_COMPONENT,
   {
-    createViewModel: function(params, componentInfo) {
+    createViewModel: function (params, componentInfo) {
       return new HueDropDown(params, componentInfo.element);
     }
   },

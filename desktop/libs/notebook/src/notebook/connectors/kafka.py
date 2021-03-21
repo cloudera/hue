@@ -19,7 +19,6 @@ from __future__ import absolute_import
 
 import logging
 
-from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
 from desktop.lib.i18n import force_unicode
@@ -44,14 +43,14 @@ def query_error_handler(func):
 class KafkaApi(Api):
 
   @query_error_handler
-  def autocomplete(self, snippet, database=None, table=None, column=None, nested=None):
+  def autocomplete(self, snippet, database=None, table=None, column=None, nested=None, operation=None):
     response = {}
 
     try:
       if database is None:
         response['databases'] = ['default']
       elif table is None:
-        response['tables_meta'] = get_topics()
+        response['tables_meta'] = get_topics(self.user)
       else:
         response = {
           u'status': 0,
@@ -92,7 +91,12 @@ class KafkaApi(Api):
           u'partition_keys': [
             {u'type': u'string', u'name': u'date'}
           ],
-          u'columns': [u'_version_', u'app', u'bytes', u'city', u'client_ip', u'code', u'country_code', u'country_code3', u'country_name', u'device_family', u'extension', u'latitude', u'longitude', u'method', u'os_family', u'os_major', u'protocol', u'record', u'referer', u'region_code', u'request', u'subapp', u'time', u'url', u'user_agent', u'user_agent_family', u'user_agent_major', u'id', u'date'],
+          u'columns': [
+            u'_version_', u'app', u'bytes', u'city', u'client_ip', u'code', u'country_code', u'country_code3',
+            u'country_name', u'device_family', u'extension', u'latitude', u'longitude', u'method', u'os_family',
+            u'os_major', u'protocol', u'record', u'referer', u'region_code', u'request', u'subapp', u'time', u'url',
+            u'user_agent', u'user_agent_family', u'user_agent_major', u'id', u'date'
+          ],
           u'is_view': False
         }
 

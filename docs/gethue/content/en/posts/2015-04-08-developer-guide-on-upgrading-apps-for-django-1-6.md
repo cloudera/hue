@@ -37,7 +37,7 @@ sf_remove_promo_bar:
 sf_detail_image:
   - 2346
 categories:
-  - Development
+  - Dev / API
 
 ---
 The upcoming Hue 3.8 internals have gone through some major upgrades to improve performance, robustness, and security. The major change stems from upgrading [Django][1] from 1.4.5 to 1.6.10, which comes with a significant amount performance enhancements, bug fixes, and the removal of deprecated features.
@@ -92,13 +92,13 @@ We recommend that developers migrate over to returning objects. Hue itself shoul
 
 Django’s `django.core.urlresolvers.reverse` (and therefore the `url` function in mako scripts) now automatically escapes arguments. So so uses of these functions should be changed from:
 
-<pre><code class="python"><a href="${ url('useradmin.views.edit_user', username=urllib.quote(user.username)) }">...</a>
+<pre><code class="python"><a href="${ url('useradmin:useradmin.views.edit_user', username=urllib.quote(user.username)) }">...</a>
 
 </code></pre>
 
 To:
 
-<pre><code class="python"><a href="${ url('useradmin.views.edit_user', username=user.username) }">...</a>
+<pre><code class="python"><a href="${ url('useradmin:useradmin.views.edit_user', username=user.username) }">...</a>
 
 </code></pre>
 

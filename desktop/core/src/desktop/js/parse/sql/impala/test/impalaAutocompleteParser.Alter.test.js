@@ -18,7 +18,7 @@ import impalaAutocompleteParser from '../impalaAutocompleteParser';
 
 describe('impalaAutocompleteParser.js ALTER statements', () => {
   beforeAll(() => {
-    impalaAutocompleteParser.yy.parseError = function(msg) {
+    impalaAutocompleteParser.yy.parseError = function (msg) {
       throw Error(msg);
     };
   });
@@ -126,7 +126,7 @@ describe('impalaAutocompleteParser.js ALTER statements', () => {
       assertAutoComplete({
         beforeCursor: 'ALTER ',
         afterCursor: '',
-        containsKeywords: ['TABLE'],
+        containsKeywords: ['TABLE', 'DATABASE'],
         expectedResult: {
           lowerCase: false
         }

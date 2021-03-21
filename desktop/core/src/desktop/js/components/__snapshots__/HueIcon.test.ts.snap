@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`HueIcon.vue should render 1`] = `
+<svg
+  class="hue-icon"
+>
+  <use
+    xlink:href="#hi-some-icon"
+  />
+</svg>
+`;

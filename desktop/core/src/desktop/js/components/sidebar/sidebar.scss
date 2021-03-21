@@ -1,0 +1,498 @@
+// Licensed to Cloudera, Inc. under one
+// or more contributor license agreements.  See the NOTICE file
+// distributed with this work for additional information
+// regarding copyright ownership.  Cloudera, Inc. licenses this file
+// to you under the Apache License, Version 2.0 (the
+// 'License'); you may not use this file except in compliance
+// with the License.  You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an 'AS IS' BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+@import '../styles/colors';
+@import '../styles/variables';
+@import './variables';
+
+@mixin sidebar-active-side-indicator {
+  background-color: $sidebar-selection-color;
+  content: ' ';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: $sidebar-indicator-width;
+}
+
+.sidebar,
+.sidebar-drawers {
+  // Not all products set the same defaults as we do in thunderhead.
+  // We'll set the most basic ones here.
+  font-size: $font-size-base;
+  color: $text-color;
+  line-height: $line-height-base;
+  -webkit-font-smoothing: antialiased;
+}
+
+.sidebar {
+  width: $sidebar-width;
+  height: 100%;
+  transition: all $sidebar-animation-duration-base;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  background-color: $sidebar-bg-color;
+  z-index: $sidebar-z-index;
+  position: relative;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='248' height='196' viewBox='0 0 248 196'%3E%3Cdefs%3E%3Cpath id='6zd0wr4qxa' d='M0 0H248V196H0z'/%3E%3C/defs%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg%3E%3Cg%3E%3Cg transform='translate(-125 -842) translate(125 270) translate(0 572)'%3E%3Cmask id='4w2gcddqub' fill='%23fff'%3E%3Cuse xlink:href='%236zd0wr4qxa'/%3E%3C/mask%3E%3Cuse fill='%23132329' xlink:href='%236zd0wr4qxa'/%3E%3Cg mask='url(%234w2gcddqub)' opacity='.503'%3E%3Cg%3E%3Cpath fill='%2319323C' d='M117.744 164.685L0 282.43 42.867 282.43 160.612 164.685z' transform='translate(53 -87)'/%3E%3Cpath fill='%23224452' d='M282.73 0L117.913 164.685 160.612 164.685 42.868 282.429 349.591 282.459 349.591 0.002z' transform='translate(53 -87)'/%3E%3Cg%3E%3Cpath fill='%23224452' d='M148.278 0L146.067 0 28.322 117.745 30.533 117.745zM141.346 0L23.602 117.745 25.813 117.745 143.558 0zM35.253 117.745L152.998 0 150.786 0 33.041 117.745zM39.973 117.745L157.718 0 155.507 0 37.762 117.745zM136.626 0L18.881 117.745 21.092 117.745 138.838 0zM122.466 0L4.721 117.745 6.933 117.745 124.677 0zM117.746 0L0 117.745 2.212 117.745 119.956 0zM127.187 0L9.441 117.745 11.653 117.745 129.398 0zM131.907 0L14.161 117.745 16.372 117.745 134.118 0z' transform='translate(53 -87) translate(13.957 108.673)'/%3E%3C/g%3E%3C/g%3E%3C/g%3E%3C/g%3E%3C/g%3E%3C/g%3E%3C/g%3E%3C/svg%3E%0A");
+  background-position: bottom;
+  background-repeat: no-repeat;
+
+  a {
+    color: $sidebar-default-text-color;
+  }
+}
+
+.sidebar-drawers {
+  a {
+    cursor: pointer;
+    text-decoration: none;
+
+    &[target='_blank']:not(.no-external-icon)::after {
+      content: url('data:image/svg+xml; utf8, <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"><path fill="%235a656d" fill-rule="evenodd" d="M13 3v2h4.586l-6.293 6.293 1.415 1.414L19 6.414V11h2V3h-8zM3 3v18h18v-6h-2v4H5V5h4V3H3z"/></svg>');
+      padding-left: 4px;
+      vertical-align: middle;
+    }
+  }
+
+  .sidebar-right-drawer.open {
+    left: $sidebar-width;
+    transition: all $animation-duration-slow ease-out;
+  }
+}
+
+.sidebar-base-btn {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  display: inline;
+  margin: 0;
+  padding: 0;
+
+  &:hover,
+  &:focus {
+    text-decoration: none;
+    outline: none;
+  }
+}
+
+.sidebar-base-link {
+  cursor: pointer;
+
+  &:hover,
+  &:focus,
+    // CDP less has some very specific style we'll need to override
+  &:focus:not(:hover):not(.ant-btn) {
+    text-decoration: none;
+    outline: none;
+  }
+}
+
+.sidebar-header {
+  height: $sidebar-header-height;
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  color: $fluid-white;
+  padding: 0 0 0 $fluid-spacing-m;
+  font-size: 16px;
+
+  & > a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+.sidebar-app-switcher-trigger {
+  transition: font-size $sidebar-animation-duration-base;
+  margin-right: $fluid-spacing-xxs;
+  flex-shrink: 0;
+  font-size: 20px;
+  color: $sidebar-default-text-color;
+  line-height: 1;
+
+  svg {
+    vertical-align: -3px;
+  }
+}
+
+.sidebar-header-product-icon-logo {
+  width: 40px;
+  height: 40px;
+}
+
+.sidebar-header-product-text-logo {
+  margin-left: $fluid-spacing-xxs;
+  white-space: nowrap;
+  overflow: hidden;
+  height: 40px;
+}
+
+.sidebar-body {
+  flex: auto;
+  overflow: hidden auto;
+  padding-top: $fluid-spacing-m;
+  position: relative;
+
+  > div {
+    // Prevent jumping contents when scrollbar is visible
+    min-width: 56px;
+  }
+
+  // avoid moving context by 1px when the overflow indicators are shown
+  border-top: 1px solid transparent;
+  border-bottom: 1px solid transparent;
+
+  &.sidebar-body-overflow-top {
+    border-top: 1px solid $sidebar-overflow-indicator-color;
+  }
+
+  &.sidebar-body-overflow-bottom {
+    border-bottom: 1px solid $sidebar-overflow-indicator-color;
+  }
+}
+
+.sidebar-sidebar-section-name,
+.sidebar-sidebar-item,
+.sidebar-sidebar-spacer {
+  height: $sidebar-item-height;
+  width: $sidebar-width;
+  display: flex;
+  align-items: center;
+  color: $sidebar-default-text-color;
+  padding-left: $fluid-spacing-m;
+}
+
+.sidebar-sidebar-section-name {
+  opacity: 1;
+  margin-top: $fluid-spacing-s;
+  white-space: nowrap;
+}
+
+.sidebar-sidebar-item {
+  position: relative;
+
+  &.sidebar-active::before {
+    @include sidebar-active-side-indicator;
+  }
+
+  &.sidebar-active {
+    color: $sidebar-selection-color;
+    font-weight: 500;
+  }
+
+  &:hover:not(.sidebar-active) {
+    color: $sidebar-hover-color;
+  }
+
+  &:focus:not(:hover):not(.sidebar-active),
+  &:hover:focus:not(.sidebar-active) {
+    color: $sidebar-hover-color;
+    outline: none;
+  }
+
+  span {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+}
+
+.sidebar-sidebar-item-icon {
+  height: 20px;
+  width: 20px;
+  display: flex;
+  justify-content: center;
+  margin-right: $fluid-spacing-xs;
+  transition-duration: $sidebar-animation-duration-base;
+  // using the `all` syntax seemed to cause the icon color change to be delayed
+  // compared to the rest of the icon.
+  transition-property: height, width, flex, margin;
+
+  i,
+  svg {
+    transition: font-size $sidebar-animation-duration-base;
+    font-size: $font-size-xl !important;
+  }
+}
+
+.sidebar-sidebar-item-tooltip {
+  position: fixed;
+  background-color: $sidebar-bg-color;
+  overflow: hidden;
+  width: 233px;
+  z-index: 1002;
+  opacity: 0;
+
+  // when displaying accordion items in a tooltip, they could overlaps the bottom of the page
+  // in which case we introduce a scrollbar on the items, which works best when this is flex.
+  display: flex;
+  flex-direction: column;
+  color: $sidebar-hover-color;
+  transition: opacity $sidebar-animation-duration-base;
+
+  &.sidebar-sidebar-item-tooltip-visible {
+    opacity: 1;
+  }
+
+  .sidebar-sidebar-item-accordion-sub-item {
+    width: $sidebar-width;
+    margin-left: $fluid-spacing-s;
+  }
+}
+
+.sidebar-sidebar-item-tooltip-primary {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  padding-left: 5px;
+
+  &.sidebar-active {
+    color: $sidebar-selection-color;
+    font-weight: 500;
+  }
+
+  &.sidebar-tooltip-user-header {
+    height: 40px;
+    padding-top: 10px;
+
+    .sidebar-tooltip-username,
+    .sidebar-user-icon {
+      margin-left: 10px;
+    }
+
+    .sidebar-user-icon {
+      width: 30px;
+      height: 30px;
+      font-size: 18px;
+    }
+  }
+}
+
+.sidebar-accordion-item {
+  position: relative;
+
+  &.sidebar-active::before {
+    @include sidebar-active-side-indicator;
+  }
+}
+
+.sidebar-accordion-item-btn-open {
+  color: $sidebar-hover-color;
+}
+
+.sidebar-accordion-collapse-icon {
+  position: absolute;
+  top: 13px;
+  left: 6px;
+  transition: transform $sidebar-animation-duration-base;
+
+  svg {
+    display: block;
+  }
+}
+
+.sidebar-accordion-collapse-icon-open {
+  transform: rotate(90deg);
+}
+
+.sidebar-accordion-items {
+  height: 0;
+  transition: height $sidebar-animation-duration-base;
+  overflow: hidden;
+
+  .sidebar-sidebar-spacer {
+    height: 5px;
+  }
+}
+
+.sidebar-sidebar-item-tooltip-accordion-items {
+  overflow-x: hidden;
+  border-top: 1px solid transparent;
+
+  .sidebar-sidebar-spacer {
+    height: 5px;
+  }
+}
+
+.sidebar-sidebar-item-tooltip-accordion-items-overflow-top {
+  border-top: 1px solid $sidebar-overflow-indicator-color;
+}
+
+.sidebar-sidebar-item-tooltip-extra-hover-area {
+  position: fixed;
+  cursor: pointer;
+  width: 30px;
+  height: 80px;
+  transform: rotate(339deg);
+  transform-origin: 100% 0;
+  z-index: 1001;
+}
+
+.sidebar-sidebar-item-accordion-sub-item {
+  width: $sidebar-width - 52px;
+  font-size: $font-size-sm + 1px;
+  margin-left: 52px;
+  display: flex;
+  align-items: center;
+  height: 32px;
+  color: $sidebar-default-text-color;
+
+  &:hover,
+  &:focus {
+    color: $sidebar-hover-color;
+  }
+}
+
+.sidebar-sidebar-item-accordion-sub-item-active {
+  color: $sidebar-selection-color;
+  font-weight: 500;
+}
+
+.sidebar-footer-bottom-row {
+  display: flex;
+  align-items: center;
+  margin-top: 12px;
+}
+
+.sidebar-footer-version-number {
+  margin-left: $fluid-spacing-m;
+  color: $sidebar-default-text-color;
+  flex-grow: 1;
+  font-size: $font-size-sm;
+  overflow: hidden;
+}
+
+.sidebar-footer-collapse-btn {
+  display: flex;
+  flex-shrink: 0;
+  flex-grow: 1;
+  align-items: center;
+  justify-content: flex-end;
+  height: 52px;
+  padding: 0 16px;
+
+  svg,
+  img {
+    height: 24px;
+    width: 24px;
+    transition: all $sidebar-animation-duration-base;
+    transition-delay: $sidebar-animation-duration-base;
+  }
+}
+
+.sidebar-footer-bottom-color-line {
+  height: 4px;
+  background-color: $sidebar-selection-color;
+}
+
+.sidebar-user-icon {
+  background-color: $sidebar-selection-color;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $sidebar-bg-color;
+  text-transform: uppercase;
+}
+
+.sidebar-collapsed {
+  width: $sidebar-collapsed-width;
+
+  .sidebar-header {
+    padding: 0 0 0 11px;
+    position: relative;
+    background: linear-gradient(to bottom right, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0.1) 50%), $sidebar-selection-color;
+  }
+
+  .sidebar-header-logo {
+    display: none;
+  }
+
+  .sidebar-app-switcher-trigger {
+    font-size: 32px;
+    color: $sidebar-bg-color;
+
+    svg {
+      vertical-align: -4px;
+    }
+  }
+
+  .sidebar-sidebar-section-name {
+    width: 0;
+    overflow: hidden;
+  }
+
+  .sidebar-sidebar-item {
+    padding-left: 0;
+    justify-content: center;
+
+    // make <button> and <a> behave the same
+    width: 100%;
+
+    span {
+      opacity: 0;
+      display: none;
+    }
+  }
+
+  .sidebar-sidebar-item-icon {
+    height: 24px;
+    width: 24px;
+    flex: 0 0 $sidebar-collapsed-width;
+    margin: 0;
+
+    svg {
+      font-size: 24px !important;
+    }
+  }
+
+  .sidebar-accordion-collapse-icon {
+    display: none;
+  }
+
+  .sidebar-accordion-items {
+    display: none;
+  }
+
+  .sidebar-footer-version-number {
+    display: none;
+  }
+
+  .sidebar-footer-collapse-btn {
+    svg,
+    img {
+      height: 24px;
+      width: 24px;
+      transform: rotate(180deg);
+    }
+  }
+
+  .sidebar-user-icon {
+    width: 24px;
+    height: 24px;
+    font-size: 16px;
+  }
+
+  .sidebar-right-drawer.open {
+    left: $sidebar-collapsed-width;
+  }
+}

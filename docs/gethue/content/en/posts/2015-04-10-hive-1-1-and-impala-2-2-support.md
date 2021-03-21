@@ -35,7 +35,6 @@ sf_caption_position:
 sf_remove_promo_bar:
   - 1
 categories:
-  - Querying
 
 ---
 [Hive][1] did a big jump by finally graduating to its 1.0 version version. It is even 1.1 now (equivalent to 0.14). Hue’s Hive and [Impala][2] Editor have been updated to take advantages of a series of their new features.

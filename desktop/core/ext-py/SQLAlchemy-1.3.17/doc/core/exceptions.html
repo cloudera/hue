@@ -1,0 +1,532 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        
+        <title>
+            
+    
+    Core Exceptions
+ &mdash;
+    SQLAlchemy 1.3 Documentation
+
+        </title>
+
+        
+            <!-- begin iterate through site-imported + sphinx environment css_files -->
+                <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+                <link rel="stylesheet" href="../_static/docs.css" type="text/css" />
+                <link rel="stylesheet" href="../_static/changelog.css" type="text/css" />
+                <link rel="stylesheet" href="../_static/sphinx_paramlinks.css" type="text/css" />
+            <!-- end iterate through site-imported + sphinx environment css_files -->
+        
+
+        
+
+    
+
+    <!-- begin layout.mako headers -->
+
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+        <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="top" title="SQLAlchemy 1.3 Documentation" href="../index.html" />
+        <link rel="up" title="Core API Basics" href="api_basics.html" />
+        <link rel="next" title="Core Internals" href="internals.html" />
+        <link rel="prev" title="Deprecated Event Interfaces" href="interfaces.html" />
+    <!-- end layout.mako headers -->
+
+
+    </head>
+    <body>
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="docs-container">
+
+
+
+
+
+<div id="docs-top-navigation-container" class="body-background">
+<div id="docs-header">
+    <div id="docs-version-header">
+        Release: <span class="version-num">1.3.17</span>
+
+
+        | Release Date: May 13, 2020
+
+    </div>
+
+    <h1>SQLAlchemy 1.3 Documentation</h1>
+
+</div>
+</div>
+
+<div id="docs-body-container">
+
+    <div id="fixed-sidebar" class="withsidebar">
+
+
+        <div id="docs-sidebar-popout">
+            <h3><a href="../index.html">SQLAlchemy 1.3 Documentation</a></h3>
+            <p id="sidebar-topnav">
+                <a href="../contents.html">Contents</a> |
+                <a href="../genindex.html">Index</a>
+            </p>
+
+            <div id="sidebar-search">
+                <form class="search" action="../search.html" method="get">
+                  <label>
+                  Search terms:
+                  <input type="text" placeholder="search..." name="q" size="12" />
+                  </label>
+                  <input type="hidden" name="check_keywords" value="yes" />
+                  <input type="hidden" name="area" value="default" />
+                </form>
+            </div>
+
+        </div>
+
+        <div id="docs-sidebar">
+
+        <div id="sidebar-banner">
+            
+        </div>
+
+        <div id="docs-sidebar-inner">
+
+        
+        <h3>
+            <a href="index.html" title="SQLAlchemy Core">SQLAlchemy Core</a>
+        </h3>
+
+        <ul>
+<li><span class="link-container"><a class="reference external" href="tutorial.html">SQL Expression Language Tutorial</a></span></li>
+<li><span class="link-container"><a class="reference external" href="expression_api.html">SQL Statements and Expressions API</a></span></li>
+<li><span class="link-container"><a class="reference external" href="schema.html">Schema Definition Language</a></span></li>
+<li><span class="link-container"><a class="reference external" href="types.html">Column and Data Types</a></span></li>
+<li><span class="link-container"><a class="reference external" href="engines_connections.html">Engine and Connection Use</a></span></li>
+<li><span class="link-container"><a class="reference external" href="api_basics.html">Core API Basics</a></span><ul>
+<li><span class="link-container"><a class="reference external" href="event.html">Events</a></span></li>
+<li><span class="link-container"><a class="reference external" href="inspection.html">Runtime Inspection API</a></span></li>
+<li><span class="link-container"><a class="reference external" href="interfaces.html">Deprecated Event Interfaces</a></span></li>
+<li class="selected"><span class="link-container"><strong>Core Exceptions</strong><a class="paramlink headerlink reference internal" href="#">¶</a></span></li>
+<li><span class="link-container"><a class="reference external" href="internals.html">Core Internals</a></span></li>
+</ul>
+</li>
+</ul>
+
+
+
+        </div>
+
+        </div>
+
+    </div>
+
+    
+
+    <div id="docs-body" class="withsidebar" >
+        
+<div class="section" id="module-sqlalchemy.exc">
+<span id="core-exceptions"></span><span id="core-exceptions-toplevel"></span><h1>Core Exceptions<a class="headerlink" href="#module-sqlalchemy.exc" title="Permalink to this headline">¶</a></h1>
+<p>Exceptions used with SQLAlchemy.</p>
+<p>The base exception class is <a class="reference internal" href="#sqlalchemy.exc.SQLAlchemyError" title="sqlalchemy.exc.SQLAlchemyError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">SQLAlchemyError</span></code></a>.  Exceptions which are
+raised as a result of DBAPI exceptions are all subclasses of
+<a class="reference internal" href="#sqlalchemy.exc.DBAPIError" title="sqlalchemy.exc.DBAPIError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">DBAPIError</span></code></a>.</p>
+<dl class="py exception">
+<dt id="sqlalchemy.exc.AmbiguousForeignKeysError">
+<em class="property">exception </em><code class="sig-prename descclassname">sqlalchemy.exc.</code><code class="sig-name descname">AmbiguousForeignKeysError</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">arg</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.exc.AmbiguousForeignKeysError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raised when more than one foreign key matching can be located
+between two selectables during a join.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="sqlalchemy.exc.ArgumentError">
+<em class="property">exception </em><code class="sig-prename descclassname">sqlalchemy.exc.</code><code class="sig-name descname">ArgumentError</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">arg</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.exc.ArgumentError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raised when an invalid or conflicting function argument is supplied.</p>
+<p>This error generally corresponds to construction time state errors.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="sqlalchemy.exc.CircularDependencyError">
+<em class="property">exception </em><code class="sig-prename descclassname">sqlalchemy.exc.</code><code class="sig-name descname">CircularDependencyError</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">message</span></em>, <em class="sig-param"><span class="n">cycles</span></em>, <em class="sig-param"><span class="n">edges</span></em>, <em class="sig-param"><span class="n">msg</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">code</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.exc.CircularDependencyError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raised by topological sorts when a circular dependency is detected.</p>
+<p>There are two scenarios where this error occurs:</p>
+<ul class="simple">
+<li><p>In a Session flush operation, if two objects are mutually dependent
+on each other, they can not be inserted or deleted via INSERT or
+DELETE statements alone; an UPDATE will be needed to post-associate
+or pre-deassociate one of the foreign key constrained values.
+The <code class="docutils literal notranslate"><span class="pre">post_update</span></code> flag described at <a class="reference internal" href="../orm/relationship_persistence.html#post-update"><span class="std std-ref">Rows that point to themselves / Mutually Dependent Rows</span></a> can resolve
+this cycle.</p></li>
+<li><p>In a <a class="reference internal" href="metadata.html#sqlalchemy.schema.MetaData.sorted_tables" title="sqlalchemy.schema.MetaData.sorted_tables"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MetaData.sorted_tables</span></code></a> operation, two
+<a class="reference internal" href="constraints.html#sqlalchemy.schema.ForeignKey" title="sqlalchemy.schema.ForeignKey"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a>
+or <a class="reference internal" href="constraints.html#sqlalchemy.schema.ForeignKeyConstraint" title="sqlalchemy.schema.ForeignKeyConstraint"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKeyConstraint</span></code></a> objects mutually refer to each
+other.  Apply the <code class="docutils literal notranslate"><span class="pre">use_alter=True</span></code> flag to one or both,
+see <a class="reference internal" href="constraints.html#use-alter"><span class="std std-ref">Creating/Dropping Foreign Key Constraints via ALTER</span></a>.</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="sqlalchemy.exc.CompileError">
+<em class="property">exception </em><code class="sig-prename descclassname">sqlalchemy.exc.</code><code class="sig-name descname">CompileError</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">arg</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.exc.CompileError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raised when an error occurs during SQL compilation</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="sqlalchemy.exc.DBAPIError">
+<em class="property">exception </em><code class="sig-prename descclassname">sqlalchemy.exc.</code><code class="sig-name descname">DBAPIError</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">statement</span></em>, <em class="sig-param"><span class="n">params</span></em>, <em class="sig-param"><span class="n">orig</span></em>, <em class="sig-param"><span class="n">hide_parameters</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">connection_invalidated</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">code</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ismulti</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.exc.DBAPIError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raised when the execution of a database operation fails.</p>
+<p>Wraps exceptions raised by the DB-API underlying the
+database operation.  Driver-specific implementations of the standard
+DB-API exception types are wrapped by matching sub-types of SQLAlchemy’s
+<a class="reference internal" href="#sqlalchemy.exc.DBAPIError" title="sqlalchemy.exc.DBAPIError"><code class="xref py py-class docutils literal notranslate"><span class="pre">DBAPIError</span></code></a> when possible.  DB-API’s <code class="docutils literal notranslate"><span class="pre">Error</span></code> type maps to
+<a class="reference internal" href="#sqlalchemy.exc.DBAPIError" title="sqlalchemy.exc.DBAPIError"><code class="xref py py-class docutils literal notranslate"><span class="pre">DBAPIError</span></code></a> in SQLAlchemy, otherwise the names are identical.  Note
+that there is no guarantee that different DB-API implementations will
+raise the same exception type for any given error condition.</p>
+<p><a class="reference internal" href="#sqlalchemy.exc.DBAPIError" title="sqlalchemy.exc.DBAPIError"><code class="xref py py-class docutils literal notranslate"><span class="pre">DBAPIError</span></code></a> features <a class="reference internal" href="#sqlalchemy.exc.StatementError.statement" title="sqlalchemy.exc.StatementError.statement"><code class="xref py py-attr docutils literal notranslate"><span class="pre">StatementError.statement</span></code></a>
+and <a class="reference internal" href="#sqlalchemy.exc.StatementError.params" title="sqlalchemy.exc.StatementError.params"><code class="xref py py-attr docutils literal notranslate"><span class="pre">StatementError.params</span></code></a> attributes which supply context
+regarding the specifics of the statement which had an issue, for the
+typical case when the error was raised within the context of
+emitting a SQL statement.</p>
+<p>The wrapped exception object is available in the
+<a class="reference internal" href="#sqlalchemy.exc.StatementError.orig" title="sqlalchemy.exc.StatementError.orig"><code class="xref py py-attr docutils literal notranslate"><span class="pre">StatementError.orig</span></code></a> attribute. Its type and properties are
+DB-API implementation specific.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="sqlalchemy.exc.DataError">
+<em class="property">exception </em><code class="sig-prename descclassname">sqlalchemy.exc.</code><code class="sig-name descname">DataError</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">statement</span></em>, <em class="sig-param"><span class="n">params</span></em>, <em class="sig-param"><span class="n">orig</span></em>, <em class="sig-param"><span class="n">hide_parameters</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">connection_invalidated</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">code</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ismulti</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.exc.DataError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wraps a DB-API DataError.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="sqlalchemy.exc.DatabaseError">
+<em class="property">exception </em><code class="sig-prename descclassname">sqlalchemy.exc.</code><code class="sig-name descname">DatabaseError</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">statement</span></em>, <em class="sig-param"><span class="n">params</span></em>, <em class="sig-param"><span class="n">orig</span></em>, <em class="sig-param"><span class="n">hide_parameters</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">connection_invalidated</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">code</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ismulti</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.exc.DatabaseError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wraps a DB-API DatabaseError.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="sqlalchemy.exc.DisconnectionError">
+<em class="property">exception </em><code class="sig-prename descclassname">sqlalchemy.exc.</code><code class="sig-name descname">DisconnectionError</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">arg</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.exc.DisconnectionError" title="Permalink to this definition">¶</a></dt>
+<dd><p>A disconnect is detected on a raw DB-API connection.</p>
+<p>This error is raised and consumed internally by a connection pool.  It can
+be raised by the <a class="reference internal" href="events.html#sqlalchemy.events.PoolEvents.checkout" title="sqlalchemy.events.PoolEvents.checkout"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PoolEvents.checkout()</span></code></a>
+event so that the host pool
+forces a retry; the exception will be caught three times in a row before
+the pool gives up and raises <a class="reference internal" href="#sqlalchemy.exc.InvalidRequestError" title="sqlalchemy.exc.InvalidRequestError"><code class="xref py py-class docutils literal notranslate"><span class="pre">InvalidRequestError</span></code></a>
+regarding the connection attempt.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="sqlalchemy.exc.DontWrapMixin">
+<em class="property">class </em><code class="sig-prename descclassname">sqlalchemy.exc.</code><code class="sig-name descname">DontWrapMixin</code><a class="headerlink" href="#sqlalchemy.exc.DontWrapMixin" title="Permalink to this definition">¶</a></dt>
+<dd><p>A mixin class which, when applied to a user-defined Exception class,
+will not be wrapped inside of <a class="reference internal" href="#sqlalchemy.exc.StatementError" title="sqlalchemy.exc.StatementError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">StatementError</span></code></a> if the error is
+emitted within the process of executing a statement.</p>
+<p>E.g.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy.exc</span> <span class="k">import</span> <span class="n">DontWrapMixin</span>
+
+<span class="k">class</span> <span class="nc">MyCustomException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">,</span> <span class="n">DontWrapMixin</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+<span class="k">class</span> <span class="nc">MySpecialType</span><span class="p">(</span><span class="n">TypeDecorator</span><span class="p">):</span>
+    <span class="n">impl</span> <span class="o">=</span> <span class="n">String</span>
+
+    <span class="k">def</span> <span class="nf">process_bind_param</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">dialect</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="s1">&#39;invalid&#39;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MyCustomException</span><span class="p">(</span><span class="s2">&quot;invalid!&quot;</span><span class="p">)</span></pre></div>
+</div>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="sqlalchemy.exc.IdentifierError">
+<em class="property">exception </em><code class="sig-prename descclassname">sqlalchemy.exc.</code><code class="sig-name descname">IdentifierError</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">arg</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.exc.IdentifierError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raised when a schema name is beyond the max character limit</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="sqlalchemy.exc.IntegrityError">
+<em class="property">exception </em><code class="sig-prename descclassname">sqlalchemy.exc.</code><code class="sig-name descname">IntegrityError</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">statement</span></em>, <em class="sig-param"><span class="n">params</span></em>, <em class="sig-param"><span class="n">orig</span></em>, <em class="sig-param"><span class="n">hide_parameters</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">connection_invalidated</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">code</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ismulti</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.exc.IntegrityError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wraps a DB-API IntegrityError.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="sqlalchemy.exc.InterfaceError">
+<em class="property">exception </em><code class="sig-prename descclassname">sqlalchemy.exc.</code><code class="sig-name descname">InterfaceError</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">statement</span></em>, <em class="sig-param"><span class="n">params</span></em>, <em class="sig-param"><span class="n">orig</span></em>, <em class="sig-param"><span class="n">hide_parameters</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">connection_invalidated</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">code</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ismulti</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.exc.InterfaceError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wraps a DB-API InterfaceError.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="sqlalchemy.exc.InternalError">
+<em class="property">exception </em><code class="sig-prename descclassname">sqlalchemy.exc.</code><code class="sig-name descname">InternalError</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">statement</span></em>, <em class="sig-param"><span class="n">params</span></em>, <em class="sig-param"><span class="n">orig</span></em>, <em class="sig-param"><span class="n">hide_parameters</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">connection_invalidated</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">code</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ismulti</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.exc.InternalError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wraps a DB-API InternalError.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="sqlalchemy.exc.InvalidRequestError">
+<em class="property">exception </em><code class="sig-prename descclassname">sqlalchemy.exc.</code><code class="sig-name descname">InvalidRequestError</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">arg</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.exc.InvalidRequestError" title="Permalink to this definition">¶</a></dt>
+<dd><p>SQLAlchemy was asked to do something it can’t do.</p>
+<p>This error generally corresponds to runtime state errors.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="sqlalchemy.exc.InvalidatePoolError">
+<em class="property">exception </em><code class="sig-prename descclassname">sqlalchemy.exc.</code><code class="sig-name descname">InvalidatePoolError</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">arg</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.exc.InvalidatePoolError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raised when the connection pool should invalidate all stale connections.</p>
+<p>A subclass of <a class="reference internal" href="#sqlalchemy.exc.DisconnectionError" title="sqlalchemy.exc.DisconnectionError"><code class="xref py py-class docutils literal notranslate"><span class="pre">DisconnectionError</span></code></a> that indicates that the
+disconnect situation encountered on the connection probably means the
+entire pool should be invalidated, as the database has been restarted.</p>
+<p>This exception will be handled otherwise the same way as
+<a class="reference internal" href="#sqlalchemy.exc.DisconnectionError" title="sqlalchemy.exc.DisconnectionError"><code class="xref py py-class docutils literal notranslate"><span class="pre">DisconnectionError</span></code></a>, allowing three attempts to reconnect
+before giving up.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 1.2.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="sqlalchemy.exc.NoForeignKeysError">
+<em class="property">exception </em><code class="sig-prename descclassname">sqlalchemy.exc.</code><code class="sig-name descname">NoForeignKeysError</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">arg</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.exc.NoForeignKeysError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raised when no foreign keys can be located between two selectables
+during a join.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="sqlalchemy.exc.NoInspectionAvailable">
+<em class="property">exception </em><code class="sig-prename descclassname">sqlalchemy.exc.</code><code class="sig-name descname">NoInspectionAvailable</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">arg</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.exc.NoInspectionAvailable" title="Permalink to this definition">¶</a></dt>
+<dd><p>A subject passed to <code class="xref py py-func docutils literal notranslate"><span class="pre">inspect()</span></code> produced
+no context for inspection.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="sqlalchemy.exc.NoReferenceError">
+<em class="property">exception </em><code class="sig-prename descclassname">sqlalchemy.exc.</code><code class="sig-name descname">NoReferenceError</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">arg</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.exc.NoReferenceError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raised by <code class="docutils literal notranslate"><span class="pre">ForeignKey</span></code> to indicate a reference cannot be resolved.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="sqlalchemy.exc.NoReferencedColumnError">
+<em class="property">exception </em><code class="sig-prename descclassname">sqlalchemy.exc.</code><code class="sig-name descname">NoReferencedColumnError</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">message</span></em>, <em class="sig-param"><span class="n">tname</span></em>, <em class="sig-param"><span class="n">cname</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.exc.NoReferencedColumnError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raised by <code class="docutils literal notranslate"><span class="pre">ForeignKey</span></code> when the referred <code class="docutils literal notranslate"><span class="pre">Column</span></code> cannot be
+located.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="sqlalchemy.exc.NoReferencedTableError">
+<em class="property">exception </em><code class="sig-prename descclassname">sqlalchemy.exc.</code><code class="sig-name descname">NoReferencedTableError</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">message</span></em>, <em class="sig-param"><span class="n">tname</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.exc.NoReferencedTableError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raised by <code class="docutils literal notranslate"><span class="pre">ForeignKey</span></code> when the referred <code class="docutils literal notranslate"><span class="pre">Table</span></code> cannot be
+located.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="sqlalchemy.exc.NoSuchColumnError">
+<em class="property">exception </em><code class="sig-prename descclassname">sqlalchemy.exc.</code><code class="sig-name descname">NoSuchColumnError</code><a class="headerlink" href="#sqlalchemy.exc.NoSuchColumnError" title="Permalink to this definition">¶</a></dt>
+<dd><p>A nonexistent column is requested from a <code class="docutils literal notranslate"><span class="pre">RowProxy</span></code>.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="sqlalchemy.exc.NoSuchModuleError">
+<em class="property">exception </em><code class="sig-prename descclassname">sqlalchemy.exc.</code><code class="sig-name descname">NoSuchModuleError</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">arg</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.exc.NoSuchModuleError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raised when a dynamically-loaded module (usually a database dialect)
+of a particular name cannot be located.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="sqlalchemy.exc.NoSuchTableError">
+<em class="property">exception </em><code class="sig-prename descclassname">sqlalchemy.exc.</code><code class="sig-name descname">NoSuchTableError</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">arg</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.exc.NoSuchTableError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Table does not exist or is not visible to a connection.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="sqlalchemy.exc.NotSupportedError">
+<em class="property">exception </em><code class="sig-prename descclassname">sqlalchemy.exc.</code><code class="sig-name descname">NotSupportedError</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">statement</span></em>, <em class="sig-param"><span class="n">params</span></em>, <em class="sig-param"><span class="n">orig</span></em>, <em class="sig-param"><span class="n">hide_parameters</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">connection_invalidated</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">code</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ismulti</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.exc.NotSupportedError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wraps a DB-API NotSupportedError.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="sqlalchemy.exc.ObjectNotExecutableError">
+<em class="property">exception </em><code class="sig-prename descclassname">sqlalchemy.exc.</code><code class="sig-name descname">ObjectNotExecutableError</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">target</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.exc.ObjectNotExecutableError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raised when an object is passed to .execute() that can’t be
+executed as SQL.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 1.1.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="sqlalchemy.exc.OperationalError">
+<em class="property">exception </em><code class="sig-prename descclassname">sqlalchemy.exc.</code><code class="sig-name descname">OperationalError</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">statement</span></em>, <em class="sig-param"><span class="n">params</span></em>, <em class="sig-param"><span class="n">orig</span></em>, <em class="sig-param"><span class="n">hide_parameters</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">connection_invalidated</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">code</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ismulti</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.exc.OperationalError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wraps a DB-API OperationalError.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="sqlalchemy.exc.ProgrammingError">
+<em class="property">exception </em><code class="sig-prename descclassname">sqlalchemy.exc.</code><code class="sig-name descname">ProgrammingError</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">statement</span></em>, <em class="sig-param"><span class="n">params</span></em>, <em class="sig-param"><span class="n">orig</span></em>, <em class="sig-param"><span class="n">hide_parameters</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">connection_invalidated</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">code</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ismulti</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.exc.ProgrammingError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wraps a DB-API ProgrammingError.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="sqlalchemy.exc.ResourceClosedError">
+<em class="property">exception </em><code class="sig-prename descclassname">sqlalchemy.exc.</code><code class="sig-name descname">ResourceClosedError</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">arg</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.exc.ResourceClosedError" title="Permalink to this definition">¶</a></dt>
+<dd><p>An operation was requested from a connection, cursor, or other
+object that’s in a closed state.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="sqlalchemy.exc.SADeprecationWarning">
+<em class="property">exception </em><code class="sig-prename descclassname">sqlalchemy.exc.</code><code class="sig-name descname">SADeprecationWarning</code><a class="headerlink" href="#sqlalchemy.exc.SADeprecationWarning" title="Permalink to this definition">¶</a></dt>
+<dd><p>Issued once per usage of a deprecated API.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="sqlalchemy.exc.SAPendingDeprecationWarning">
+<em class="property">exception </em><code class="sig-prename descclassname">sqlalchemy.exc.</code><code class="sig-name descname">SAPendingDeprecationWarning</code><a class="headerlink" href="#sqlalchemy.exc.SAPendingDeprecationWarning" title="Permalink to this definition">¶</a></dt>
+<dd><p>Issued once per usage of a deprecated API.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="sqlalchemy.exc.SAWarning">
+<em class="property">exception </em><code class="sig-prename descclassname">sqlalchemy.exc.</code><code class="sig-name descname">SAWarning</code><a class="headerlink" href="#sqlalchemy.exc.SAWarning" title="Permalink to this definition">¶</a></dt>
+<dd><p>Issued at runtime.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="sqlalchemy.exc.SQLAlchemyError">
+<em class="property">exception </em><code class="sig-prename descclassname">sqlalchemy.exc.</code><code class="sig-name descname">SQLAlchemyError</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">arg</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.exc.SQLAlchemyError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generic error class.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="sqlalchemy.exc.StatementError">
+<em class="property">exception </em><code class="sig-prename descclassname">sqlalchemy.exc.</code><code class="sig-name descname">StatementError</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">message</span></em>, <em class="sig-param"><span class="n">statement</span></em>, <em class="sig-param"><span class="n">params</span></em>, <em class="sig-param"><span class="n">orig</span></em>, <em class="sig-param"><span class="n">hide_parameters</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">code</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ismulti</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.exc.StatementError" title="Permalink to this definition">¶</a></dt>
+<dd><p>An error occurred during execution of a SQL statement.</p>
+<p><a class="reference internal" href="#sqlalchemy.exc.StatementError" title="sqlalchemy.exc.StatementError"><code class="xref py py-class docutils literal notranslate"><span class="pre">StatementError</span></code></a> wraps the exception raised
+during execution, and features <a class="reference internal" href="#sqlalchemy.exc.StatementError.statement" title="sqlalchemy.exc.StatementError.statement"><code class="xref py py-attr docutils literal notranslate"><span class="pre">statement</span></code></a>
+and <a class="reference internal" href="#sqlalchemy.exc.StatementError.params" title="sqlalchemy.exc.StatementError.params"><code class="xref py py-attr docutils literal notranslate"><span class="pre">params</span></code></a> attributes which supply context regarding
+the specifics of the statement which had an issue.</p>
+<p>The wrapped exception object is available in
+the <a class="reference internal" href="#sqlalchemy.exc.StatementError.orig" title="sqlalchemy.exc.StatementError.orig"><code class="xref py py-attr docutils literal notranslate"><span class="pre">orig</span></code></a> attribute.</p>
+<dl class="py attribute">
+<dt id="sqlalchemy.exc.StatementError.orig">
+<em class="property">attribute </em><a class="reference internal" href="#sqlalchemy.exc.StatementError"><code class="docutils literal notranslate"><span class="pre">sqlalchemy.exc.StatementError.</span></code></a><code class="sig-name descname">orig</code><em class="property"> = None</em><a class="headerlink" href="#sqlalchemy.exc.StatementError.orig" title="Permalink to this definition">¶</a></dt>
+<dd><p>The DBAPI exception object.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="sqlalchemy.exc.StatementError.params">
+<em class="property">attribute </em><a class="reference internal" href="#sqlalchemy.exc.StatementError"><code class="docutils literal notranslate"><span class="pre">sqlalchemy.exc.StatementError.</span></code></a><code class="sig-name descname">params</code><em class="property"> = None</em><a class="headerlink" href="#sqlalchemy.exc.StatementError.params" title="Permalink to this definition">¶</a></dt>
+<dd><p>The parameter list being used when this exception occurred.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="sqlalchemy.exc.StatementError.statement">
+<em class="property">attribute </em><a class="reference internal" href="#sqlalchemy.exc.StatementError"><code class="docutils literal notranslate"><span class="pre">sqlalchemy.exc.StatementError.</span></code></a><code class="sig-name descname">statement</code><em class="property"> = None</em><a class="headerlink" href="#sqlalchemy.exc.StatementError.statement" title="Permalink to this definition">¶</a></dt>
+<dd><p>The string SQL statement being invoked when this exception occurred.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt id="sqlalchemy.exc.TimeoutError">
+<em class="property">exception </em><code class="sig-prename descclassname">sqlalchemy.exc.</code><code class="sig-name descname">TimeoutError</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">arg</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.exc.TimeoutError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raised when a connection pool times out on getting a connection.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="sqlalchemy.exc.UnboundExecutionError">
+<em class="property">exception </em><code class="sig-prename descclassname">sqlalchemy.exc.</code><code class="sig-name descname">UnboundExecutionError</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">arg</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.exc.UnboundExecutionError" title="Permalink to this definition">¶</a></dt>
+<dd><p>SQL was attempted without a database connection to execute it on.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="sqlalchemy.exc.UnreflectableTableError">
+<em class="property">exception </em><code class="sig-prename descclassname">sqlalchemy.exc.</code><code class="sig-name descname">UnreflectableTableError</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">arg</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.exc.UnreflectableTableError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Table exists but can’t be reflected for some reason.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 1.2.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="sqlalchemy.exc.UnsupportedCompilationError">
+<em class="property">exception </em><code class="sig-prename descclassname">sqlalchemy.exc.</code><code class="sig-name descname">UnsupportedCompilationError</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">compiler</span></em>, <em class="sig-param"><span class="n">element_type</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.exc.UnsupportedCompilationError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raised when an operation is not supported by the given compiler.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="../faq/sqlexpressions.html#faq-sql-expression-string"><span class="std std-ref">How do I render SQL expressions as strings, possibly with bound parameters inlined?</span></a></p>
+<p><a class="reference internal" href="../errors.html#error-l7de"><span class="std std-ref">Compiler StrSQLCompiler can’t render element of type &lt;element type&gt;</span></a></p>
+</div>
+</dd></dl>
+
+</div>
+
+    </div>
+
+</div>
+
+<div id="docs-bottom-navigation" class="docs-navigation-links, withsidebar">
+        Previous:
+        <a href="interfaces.html" title="previous chapter">Deprecated Event Interfaces</a>
+        Next:
+        <a href="internals.html" title="next chapter">Core Internals</a>
+
+    <div id="docs-copyright">
+        &copy; <a href="../copyright.html">Copyright</a> 2007-2020, the SQLAlchemy authors and contributors.
+        Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 3.0.3.
+    </div>
+</div>
+
+</div>
+
+
+
+        
+        
+
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+          URL_ROOT:    '../',
+          VERSION:     '1.3.17',
+          COLLAPSE_MODINDEX: false,
+          FILE_SUFFIX: '.html'
+      };
+    </script>
+
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+
+    <!-- begin iterate through sphinx environment script_files -->
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    <!-- end iterate through sphinx environment script_files -->
+
+    <script type="text/javascript" src="../_static/detectmobile.js"></script>
+    <script type="text/javascript" src="../_static/init.js"></script>
+
+
+    </body>
+</html>
+
+

@@ -793,15 +793,15 @@ ${ commonshare() | n,unicode }
 
     $("#navigatorHide").on("click", function () {
       hideNavigator();
-      $.totalStorage("huePigNavigatorHidden", true);
+      hueUtils.hueLocalStorage("huePigNavigatorHidden", true);
     });
 
     $("#navigatorShow").on("click", function () {
       showNavigator();
-      $.totalStorage("huePigNavigatorHidden", null);
+      hueUtils.hueLocalStorage("huePigNavigatorHidden", null);
     });
 
-    if ($.totalStorage("huePigNavigatorHidden") != null && $.totalStorage("huePigNavigatorHidden")) {
+    if (hueUtils.hueLocalStorage("huePigNavigatorHidden") != null && hueUtils.hueLocalStorage("huePigNavigatorHidden")) {
       hideNavigator();
     }
 
@@ -1025,9 +1025,9 @@ ${ commonshare() | n,unicode }
           connector: { id: 'hive' },
           path: ['default'],
           silenceErrors: true
-        }).done(function (childEntries) {
+        }).then(function (childEntries) {
           availableTables = $.map(childEntries, function (entry) { return entry.name }).join(' ');
-        });
+        }).catch(function() {});
       });
     % endif
 

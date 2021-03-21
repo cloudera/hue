@@ -16,11 +16,11 @@
 
 import $ from 'jquery';
 
-const NominatimAPI = function(options) {
+const NominatimAPI = function (options) {
   this.BASE_URL = 'http://nominatim.openstreetmap.org/search?format=json';
   this.limit = options && options.limit ? options.limit : 1;
 
-  this.lookupCity = function(city, callback) {
+  this.lookupCity = function (city, callback) {
     $.getJSON(
       this.BASE_URL + '&city=' + city + '&limit=' + this.limit + '&json_callback=?',
       data => {
@@ -29,7 +29,7 @@ const NominatimAPI = function(options) {
     );
   };
 
-  this.lookupAddress = function(address, callback) {
+  this.lookupAddress = function (address, callback) {
     $.getJSON(
       this.BASE_URL + '&q=' + address + '&limit=' + this.limit + '&json_callback=?',
       data => {
@@ -2265,7 +2265,7 @@ const HueGeo = {
       'sub-region-code': '014'
     }
   ],
-  getCountryFromName: function(name) {
+  getCountryFromName: function (name) {
     for (let i = 0; i < this.ISO_3166.length; i++) {
       if (this.ISO_3166[i].name.toLowerCase().indexOf(name.toLowerCase()) > -1) {
         return this.ISO_3166[i];
@@ -2273,7 +2273,7 @@ const HueGeo = {
     }
     return null;
   },
-  getCountryFromCode: function(code) {
+  getCountryFromCode: function (code) {
     for (let i = 0; i < this.ISO_3166.length; i++) {
       if (
         code.toLowerCase().indexOf(this.ISO_3166[i].alpha2.toLowerCase()) > -1 ||
@@ -2284,15 +2284,15 @@ const HueGeo = {
     }
     return null;
   },
-  getISOAlpha2: function(code) {
+  getISOAlpha2: function (code) {
     const _country = HueGeo.getCountryFromCode(code);
     return _country ? _country.alpha2 : 'AQ';
   },
-  getISOAlpha3: function(code) {
+  getISOAlpha3: function (code) {
     const _country = HueGeo.getCountryFromCode(code);
     return _country ? _country.alpha3 : 'ATA';
   },
-  getCity: function(city, callback) {
+  getCity: function (city, callback) {
     const api = new NominatimAPI();
     api.lookupCity(city, rawdata => {
       if (rawdata.length > 1) {
@@ -2302,7 +2302,7 @@ const HueGeo = {
       }
     });
   },
-  getCityCoordinates: function(city, callback) {
+  getCityCoordinates: function (city, callback) {
     const api = new NominatimAPI();
     api.lookupCity(city, rawdata => {
       if (rawdata.length > 1) {
@@ -2312,7 +2312,7 @@ const HueGeo = {
       }
     });
   },
-  getAddressFromCoordinates: function(lat, lng, callback) {
+  getAddressFromCoordinates: function (lat, lng, callback) {
     const api = new NominatimAPI();
     api.lookupAddress(lat + ',' + lng, rawdata => {
       if (rawdata.length > 1) {
@@ -2323,7 +2323,7 @@ const HueGeo = {
     });
   },
 
-  getAddressCoordinates: function(address, callback) {
+  getAddressCoordinates: function (address, callback) {
     const api = new NominatimAPI();
     api.lookupAddress(address, rawdata => {
       if (rawdata.length > 1) {

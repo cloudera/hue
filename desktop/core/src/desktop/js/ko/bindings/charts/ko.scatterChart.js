@@ -20,7 +20,7 @@ import * as ko from 'knockout';
 import nv from 'ext/nv.d3.1.1.15b.custom';
 
 ko.bindingHandlers.scatterChart = {
-  update: function(element, valueAccessor) {
+  update: function (element, valueAccessor) {
     const options = valueAccessor();
     let _datum = options.transformer(options.datum);
     window.setTimeout(() => {
@@ -29,9 +29,7 @@ ko.bindingHandlers.scatterChart = {
         $(element).find('svg').length > 0 &&
         (_datum.length === 0 || _datum[0].values.length === 0)
       ) {
-        $(element)
-          .find('svg')
-          .empty();
+        $(element).find('svg').empty();
       }
       if (
         _datum.length > 0 &&
@@ -39,9 +37,7 @@ ko.bindingHandlers.scatterChart = {
         (isNaN(_datum[0].values[0].x) || isNaN(_datum[0].values[0].y))
       ) {
         _datum = [];
-        $(element)
-          .find('svg')
-          .empty();
+        $(element).find('svg').empty();
       }
 
       if ($(element).is(':visible')) {

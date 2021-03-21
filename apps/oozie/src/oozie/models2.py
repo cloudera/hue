@@ -58,9 +58,9 @@ from oozie.utils import utc_datetime_format, UTC_TIME_FORMAT, convert_to_server_
 from oozie.importlib.workflows import generate_v2_graph_nodes, MalformedWfDefException, InvalidTagWithNamespaceException
 
 if sys.version_info[0] > 2:
-    from django.utils.encoding import force_text as force_unicode
+  from django.utils.encoding import force_text as force_unicode
 else:
-    from django.utils.encoding import force_unicode
+  from django.utils.encoding import force_unicode
 
 WORKFLOW_DEPTH_LIMIT = 24
 LOG = logging.getLogger(__name__)
@@ -241,13 +241,28 @@ class Workflow(Job):
 
       self.data = json.dumps({
           'layout': [{
-              "size":12, "rows":[
-                  {"widgets":[{"size":12, "name":"Start", "id":"3f107997-04cc-8733-60a9-a4bb62cebffc", "widgetType":"start-widget", "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span12"}]},
-                  {"widgets":[{"size":12, "name":"End", "id":"33430f0f-ebfa-c3ec-f237-3e77efa03d0a", "widgetType":"end-widget", "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span12"}]},
-                  {"widgets":[{"size":12, "name":"Kill", "id":"17c9c895-5a16-7443-bb81-f34b30b21548", "widgetType":"kill-widget", "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span12"}]}
+              "size": 12, "rows": [
+                  {
+                    "widgets": [{
+                      "size": 12, "name": "Start", "id": "3f107997-04cc-8733-60a9-a4bb62cebffc", "widgetType": "start-widget",
+                      "properties": {}, "offset": 0, "isLoading": False, "klass": "card card-widget span12"
+                    }]
+                  },
+                  {
+                    "widgets": [{
+                      "size": 12, "name": "End", "id": "33430f0f-ebfa-c3ec-f237-3e77efa03d0a", "widgetType": "end-widget",
+                      "properties": {}, "offset": 0, "isLoading": False, "klass": "card card-widget span12"
+                    }]
+                  },
+                  {
+                    "widgets": [{
+                      "size": 12, "name": "Kill", "id": "17c9c895-5a16-7443-bb81-f34b30b21548", "widgetType": "kill-widget",
+                      "properties": {}, "offset": 0, "isLoading": False, "klass": "card card-widget span12"
+                    }]
+                  }
               ],
-              "drops":[ "temp"],
-              "klass":"card card-home card-column span12"
+              "drops": ["temp"],
+              "klass": "card card-home card-column span12"
           }],
           'workflow': workflow
       })
@@ -278,7 +293,8 @@ class Workflow(Job):
     try:
       _get_hierarchy_from_adj_list(adj_list, adj_list['start']['ok_to'], node_hierarchy)
     except WorkflowDepthReached:
-      LOG.warn("The Workflow: %s with id: %s, has reached the maximum allowed depth for Graph display " % (oozie_workflow.appName, oozie_workflow.id))
+      LOG.warn("The Workflow: %s with id: %s, has reached the maximum allowed depth for Graph display " \
+        % (oozie_workflow.appName, oozie_workflow.id))
       # Hide graph same as when total nodes > 30
       return {}
 
@@ -408,7 +424,8 @@ class Workflow(Job):
 
     for node in self.nodes:
       if 'document' in node.data['type']:
-        for param in node.data['properties']['arguments'] if node.data['type'] == 'java-document' else node.data['properties']['parameters']:
+        for param in node.data['properties']['arguments'] \
+        if node.data['type'] == 'java-document' else node.data['properties']['parameters']:
           if param['value'] and '=' in param['value']:
             name, val = param['value'].split('=', 1)
             parameters[name] = val
@@ -436,7 +453,7 @@ class Workflow(Job):
 
     if self.document is not None:
       _data['workflow']['id'] = self.document.id
-      _data['workflow']['dependencies'] = list(self.document.dependencies.values('uuid', ))
+      _data['workflow']['dependencies'] = list(self.document.dependencies.values('uuid'))
     else:
       _data['workflow']['dependencies'] = []
 
@@ -681,19 +698,33 @@ def _create_workflow_layout(nodes, adj_list, nodes_uuid_set, size=12):
     if type(node) == list and len(node) == 1:
       node = node[0]
     if type(node) != list:
-      _append_to_wf_rows(wf_rows, nodes_uuid_set, row_id=adj_list[node]['uuid'],
-        row = {"widgets":[{"size":size, "name": adj_list[node]['node_type'], "id":  adj_list[node]['uuid'], "widgetType": _get_widget_type(adj_list[node]['node_type']), "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span%s" % size, "columns":[]}]})
+      _append_to_wf_rows(
+        wf_rows, nodes_uuid_set, row_id=adj_list[node]['uuid'],
+        row={
+          "widgets": [{
+            "size": size, "name": adj_list[node]['node_type'], "id": adj_list[node]['uuid'],
+            "widgetType": _get_widget_type(adj_list[node]['node_type']), "properties": {},
+            "offset": 0, "isLoading": False, "klass": "card card-widget span%s" % size, "columns": []
+          }]
+        }
+      )
     else:
       if adj_list[node[0]]['node_type'] in ('fork', 'decision'):
-        _append_to_wf_rows(wf_rows, nodes_uuid_set, row_id=adj_list[node[0]]['uuid'],
-          row = {"widgets":[{"size":size, "name": adj_list[node[0]]['name'], "id":  adj_list[node[0]]['uuid'], "widgetType": _get_widget_type(adj_list[node[0]]['node_type']), "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span%s" % size, "columns":[]}]})
+        _append_to_wf_rows(
+          wf_rows, nodes_uuid_set, row_id=adj_list[node[0]]['uuid'],
+          row={
+            "widgets": [{
+              "size": size, "name": adj_list[node[0]]['name'], "id": adj_list[node[0]]['uuid'],
+              "widgetType": _get_widget_type(adj_list[node[0]]['node_type']), "properties": {},
+              "offset": 0, "isLoading": False, "klass": "card card-widget span%s" % size, "columns": []
+            }]
+          }
+        )
 
         wf_rows.append({
           "id": str(uuid.uuid4()),
-          "widgets":[
-
-          ],
-          "columns":[
+          "widgets": [],
+          "columns": [
              {
                 "id": str(uuid.uuid4()),
                 "size": (math.floor(size / len(node[1]))),
@@ -701,15 +732,21 @@ def _create_workflow_layout(nodes, adj_list, nodes_uuid_set, size=12):
                    [{
                       "id": str(uuid.uuid4()),
                       "widgets": c['widgets'],
-                      "columns":c.get('columns') or []
+                      "columns": c.get('columns') or []
                     } for c in col],
-                "klass":"card card-home card-column span%s" % (math.floor(size / len(node[1])))
+                "klass": "card card-home card-column span%s" % (math.floor(size / len(node[1])))
              }
              for col in [_create_workflow_layout(item, adj_list, nodes_uuid_set, size) for item in node[1]]
           ]
         })
         if adj_list[node[0]]['node_type'] == 'fork':
-          wf_rows.append({"widgets":[{"size":size, "name": adj_list[node[2]]['name'], "id":  adj_list[node[2]]['uuid'], "widgetType": _get_widget_type(adj_list[node[2]]['node_type']), "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span%s" % size, "columns":[]}]})
+          wf_rows.append({
+            "widgets": [{
+              "size": size, "name": adj_list[node[2]]['name'], "id": adj_list[node[2]]['uuid'],
+              "widgetType": _get_widget_type(adj_list[node[2]]['node_type']), "properties": {},
+              "offset": 0, "isLoading": False, "klass": "card card-widget span%s" % size, "columns": []
+            }]
+          })
       else:
         wf_rows.append(_create_workflow_layout(node, adj_list, nodes_uuid_set, size))
   return wf_rows
@@ -810,9 +847,8 @@ class Node(object):
                  % (len(links), len(self.data['children']), links, self.data['children']))
         self.data['children'] = links
 
-    if self.data['type'] == AltusAction.TYPE or \
-          (('altus' in mapping.get('cluster', '') and (self.data['type'] == SparkDocumentAction.TYPE or self.data['type'] == 'spark-document'))) or \
-          mapping.get('auto-cluster'):
+    if self.data['type'] == AltusAction.TYPE or (('altus' in mapping.get('cluster', '') and (self.data['type'] == SparkDocumentAction.TYPE \
+    or self.data['type'] == 'spark-document'))) or mapping.get('auto-cluster'):
       shell_command_name = self.data['name'] + '.sh'
       self.data['properties']['shell_command'] = shell_command_name
       self.data['properties']['env_var'] = []
@@ -1094,7 +1130,8 @@ class Action(object):
   @classmethod
   def get_fields(cls):
     credentials = [cls.DEFAULT_CREDENTIALS] if hasattr(cls, 'DEFAULT_CREDENTIALS') and cls.DEFAULT_CREDENTIALS else []
-    return [(f['name'], f['value']) for f in cls.FIELDS.values()] + [('sla', WorkflowConfiguration.SLA_DEFAULT), ('credentials', credentials)]
+    return [(f['name'], f['value']) for f in cls.FIELDS.values()] + \
+      [('sla', WorkflowConfiguration.SLA_DEFAULT), ('credentials', credentials)]
 
 
 class StartNode(Action):
@@ -1394,7 +1431,8 @@ class HiveServer2Action(Action):
           'name': 'arguments',
           'label': _('Arguments'),
           'value': [],
-          'help_text': _('Arguments for beeline. E.g. --showHeader=true, -Djavax.net.ssl.trustStore=/etc/cdep-ssl-conf/CA_STANDARD/truststore.jks'),
+          'help_text': _('Arguments for beeline. E.g. --showHeader=true, '
+            '-Djavax.net.ssl.trustStore=/etc/cdep-ssl-conf/CA_STANDARD/truststore.jks'),
           'type': []
      },
      'jdbc_url': {
@@ -1408,8 +1446,9 @@ class HiveServer2Action(Action):
           'name': 'password',
           'label': _('Password'),
           'value': '',
-          'help_text': _('The password element must contain the password of the current user. However, the password is only used if Hive Server 2 is backed by '
-                         'something requiring a password (e.g. LDAP); non-secured Hive Server 2 or Kerberized Hive Server 2 don\'t require a password.'),
+          'help_text': _('The password element must contain the password of the current user. However, the password is only used if Hive '
+            'Server 2 is backed by something requiring a password (e.g. LDAP); non-secured Hive Server 2 or Kerberized Hive Server 2 '
+            'don\'t require a password.'),
           'type': ''
      },
      # Common
@@ -1562,7 +1601,8 @@ class SqoopAction(Action):
           'name': 'command',
           'label': _('Sqoop command'),
           'value': 'import  --connect jdbc:hsqldb:file:db.hsqldb --table TT --target-dir hdfs://localhost:8020/user/foo -m 1',
-          'help_text': _('The full %(type)s command. Either put it here or split it by spaces and insert the parts as multiple parameters below.') % {'type': TYPE},
+          'help_text': _('The full %(type)s command. Either put it here or split it by spaces and insert the parts as multiple '
+            'parameters below.') % {'type': TYPE},
           'type': 'textarea'
      },
      'arguments': {
@@ -2330,8 +2370,9 @@ class HiveDocumentAction(Action):
           'name': 'password',
           'label': _('Password'),
           'value': '',
-          'help_text': _('The password element must contain the password of the current user. However, the password is only used if Hive Server 2 is backed by '
-                         'something requiring a password (e.g. LDAP); non-secured Hive Server 2 or Kerberized Hive Server 2 don\'t require a password.'),
+          'help_text': _('The password element must contain the password of the current user. However, the password is only used if Hive '
+            'Server 2 is backed by something requiring a password (e.g. LDAP); non-secured Hive Server 2 or Kerberized Hive Server 2 '
+            'don\'t require a password.'),
           'type': ''
      },
      'files': {
@@ -3063,7 +3104,9 @@ def import_workflow_from_hue_3_7(old_wf):
 
   [<Start: start>, <Pig: Pig>, [<Kill: kill>], [<End: end>]]
   [<Start: start>, <Java: TeraGenWorkflow>, <Java: TeraSort>, [<Kill: kill>], [<End: end>]]
-  [<Start: start>, [<Fork: fork-34>, [[<Mapreduce: Sleep-1>, <Mapreduce: Sleep-10>], [<Mapreduce: Sleep-5>, [<Fork: fork-38>, [[<Mapreduce: Sleep-3>], [<Mapreduce: Sleep-4>]], <Join: join-39>]]], <Join: join-35>], [<Kill: kill>], [<End: end>]]
+  [<Start: start>, [<Fork: fork-34>, [[<Mapreduce: Sleep-1>, <Mapreduce: Sleep-10>], 
+  [<Mapreduce: Sleep-5>, [<Fork: fork-38>, [[<Mapreduce: Sleep-3>], [<Mapreduce: Sleep-4>]], 
+  <Join: join-39>]]], <Join: join-35>], [<Kill: kill>], [<End: end>]]
   """
 
   uuids = {}
@@ -3114,17 +3157,25 @@ def import_workflow_from_hue_3_7(old_wf):
       if type(node) == list and len(node) == 1:
         node = node[0]
       if type(node) != list:
-        wf_rows.append({"widgets":[{"size":size, "name": node.name.title(), "id":  uuids[node.id], "widgetType": "%s-widget" % node.node_type, "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span%s" % size, "columns":[]}]})
+        wf_rows.append({
+          "widgets": [{
+            "size": size, "name": node.name.title(), "id": uuids[node.id], "widgetType": "%s-widget" % node.node_type,
+            "properties": {}, "offset": 0, "isLoading": False, "klass": "card card-widget span%s" % size, "columns": []
+          }]
+        })
       else:
         if node[0].node_type == 'fork':
-          wf_rows.append({"widgets":[{"size":size, "name": 'Fork', "id":  uuids[node[0].id], "widgetType": "%s-widget" % node[0].node_type, "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span%s" % size, "columns":[]}]})
+          wf_rows.append({
+            "widgets": [{
+              "size": size, "name": 'Fork', "id": uuids[node[0].id], "widgetType": "%s-widget" % node[0].node_type,
+              "properties": {}, "offset": 0, "isLoading": False, "klass": "card card-widget span%s" % size, "columns": []
+            }]
+          })
 
           wf_rows.append({
             "id": str(uuid.uuid4()),
-            "widgets":[
-
-            ],
-            "columns":[
+            "widgets": [],
+            "columns": [
                {
                   "id": str(uuid.uuid4()),
                   "size": (math.floor(size / len(node[1]))),
@@ -3132,22 +3183,27 @@ def import_workflow_from_hue_3_7(old_wf):
                      [{
                         "id": str(uuid.uuid4()),
                         "widgets": c['widgets'],
-                        "columns":[]
+                        "columns": []
                       }
                     for c in col] if type(col) == list else [{
                         "id": str(uuid.uuid4()),
                         "widgets": col['widgets'],
-                        "columns":[]
+                        "columns": []
                       }
                    ]
                   ,
-                  "klass":"card card-home card-column span%s" % (math.floor(size / len(node[1])))
+                  "klass": "card card-home card-column span%s" % (math.floor(size / len(node[1])))
                }
                for col in _create_layout(node[1], size)
             ]
           })
 
-          wf_rows.append({"widgets":[{"size":size, "name": 'Join', "id":  uuids[node[2].id], "widgetType": "%s-widget" % node[2].node_type, "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span%s" % size, "columns":[]}]})
+          wf_rows.append({
+            "widgets": [{
+              "size": size, "name": 'Join', "id": uuids[node[2].id], "widgetType": "%s-widget" % node[2].node_type,
+              "properties": {}, "offset": 0, "isLoading": False, "klass": "card card-widget span%s" % size, "columns": []
+            }]
+          })
         else:
           wf_rows.append(_create_layout(node, size))
 
@@ -3290,7 +3346,9 @@ def import_workflow_from_hue_3_7(old_wf):
             "name": '%s-%s' % (node.node_type.split('-')[0], uuids[node.id][:4]),
             "type": "%s-widget" % node.node_type,
             "properties": properties,
-            "children":[{('to' if link.name in ('ok', 'start') else link.name): uuids[link.child.get_full_node().id]} for link in node.get_children_links()]
+            "children": [{
+                ('to' if link.name in ('ok', 'start') else link.name): uuids[link.child.get_full_node().id]
+              } for link in node.get_children_links()]
         })
       else:
         _dig_nodes(node)
@@ -3344,7 +3402,7 @@ class Coordinator(Job):
               'credentials': [],
               'parameters': [
                   {'name': 'oozie.use.system.libpath', 'value': True},
-                  {'name': 'start_date', 'value':  datetime.today().strftime('%Y-%m-%dT%H:%M')},
+                  {'name': 'start_date', 'value': datetime.today().strftime('%Y-%m-%dT%H:%M')},
                   {'name': 'end_date', 'value': (datetime.today() + timedelta(days=7)).strftime('%Y-%m-%dT%H:%M')}
               ],
               'sla': WorkflowConfiguration.SLA_DEFAULT
@@ -3471,7 +3529,8 @@ class Coordinator(Job):
 
   @property
   def frequency(self):
-    return '${coord:%(unit)s(%(number)d)}' % {'unit': self.data['properties']['frequency_unit'], 'number': self.data['properties']['frequency_number']}
+    return '${coord:%(unit)s(%(number)d)}' % {'unit': self.data['properties']['frequency_unit'],
+      'number': self.data['properties']['frequency_number']}
 
   @property
   def cron_frequency(self):
@@ -3498,7 +3557,9 @@ class Coordinator(Job):
       mapping = {}
 
     tmpl = "editor2/gen/coordinator.xml.mako"
-    return re.sub(re.compile('\s*\n+', re.MULTILINE), '\n', django_mako.render_to_string(tmpl, {'coord': self, 'mapping': mapping})).encode('utf-8', 'xmlcharrefreplace')
+    return re.sub(
+      re.compile('\s*\n+', re.MULTILINE), '\n', django_mako.render_to_string(tmpl, {'coord': self, 'mapping': mapping})
+    ).encode('utf-8', 'xmlcharrefreplace')
 
   def clear_workflow_params(self):
     # Repopulated in the config properties
@@ -3506,7 +3567,8 @@ class Coordinator(Job):
 
   @property
   def properties(self):
-    props = [{'name': dataset['workflow_variable'], 'value': dataset['dataset_variable']} for dataset in self.data['variables'] if dataset['dataset_type'] == 'parameter']
+    props = [{'name': dataset['workflow_variable'], 'value': dataset['dataset_variable']} \
+      for dataset in self.data['variables'] if dataset['dataset_type'] == 'parameter']
     props += self.data['properties']['parameters']
     return props
 
@@ -3775,11 +3837,17 @@ def _save_workflow(workflow, layout, user, fs=None):
   if workflow.get('id'):
     workflow_doc = Document2.objects.get(id=workflow['id'])
   else:
-    workflow_doc = Document2.objects.create(name=workflow['name'], uuid=workflow['uuid'], type='oozie-workflow2', owner=user, description=workflow['properties']['description'])
-    Document.objects.link(workflow_doc, owner=workflow_doc.owner, name=workflow_doc.name, description=workflow_doc.description, extra='workflow2')
+    workflow_doc = Document2.objects.create(
+      name=workflow['name'], uuid=workflow['uuid'], type='oozie-workflow2', owner=user, description=workflow['properties']['description']
+    )
+    Document.objects.link(
+      workflow_doc, owner=workflow_doc.owner, name=workflow_doc.name, description=workflow_doc.description, extra='workflow2'
+    )
 
   # Excludes all the sub-workflow and Hive dependencies. Contains list of history and coordinator dependencies.
-  workflow_doc.dependencies = workflow_doc.dependencies.exclude(Q(is_history=False) & Q(type__in=['oozie-workflow2', 'query-hive', 'query-java']))
+  workflow_doc.dependencies.set(
+    workflow_doc.dependencies.exclude(Q(is_history=False) & Q(type__in=['oozie-workflow2', 'query-hive', 'query-java']))
+  )
 
   dependencies = \
       [node['properties']['workflow'] for node in workflow['nodes'] if node['type'] == 'subworkflow-widget'] + \
@@ -4066,7 +4134,7 @@ class WorkflowBuilder(object):
         "id": node_id,
         'name': 'sqoop-%s' % node_id[:4],
         "type": "sqoop-document-widget",
-        "properties":{
+        "properties": {
               "statement": "",
               "arguments": [],
               "retry_max": [],
@@ -4074,7 +4142,17 @@ class WorkflowBuilder(object):
               "job_properties": [],
               "prepares": [],
               "credentials": credentials,
-              "sla": [{"value":False, "key":"enabled"}, {"value":"${nominal_time}", "key":"nominal-time"}, {"value":"", "key":"should-start"}, {"value":"${30 * MINUTES}", "key":"should-end"}, {"value":"", "key":"max-duration"}, {"value":"", "key":"alert-events"}, {"value":"", "key":"alert-contact"}, {"value":"", "key":"notification-msg"}, {"value":"", "key":"upstream-apps"}],
+              "sla": [
+                {"value": False, "key": "enabled"},
+                {"value": "${nominal_time}", "key": "nominal-time"},
+                {"value": "", "key": "should-start"},
+                {"value": "${30 * MINUTES}", "key": "should-end"},
+                {"value": "", "key": "max-duration"},
+                {"value": "", "key": "alert-events"},
+                {"value": "", "key": "alert-contact"},
+                {"value": "", "key": "notification-msg"},
+                {"value": "", "key": "upstream-apps"}
+              ],
               "archives": [],
               "files": []
         },
@@ -4102,7 +4180,7 @@ class WorkflowBuilder(object):
         "id": node_id,
         'name': 'distcp-%s' % node_id[:4],
         "type": "distcp-document-widget",
-        "properties":{
+        "properties": {
               "source_path": "",
               "destination_path": "",
               "arguments": [],
@@ -4113,7 +4191,17 @@ class WorkflowBuilder(object):
               "prepares": [],
               "distcp_parameters": [],
               "credentials": credentials,
-              "sla": [{"value":False, "key":"enabled"}, {"value":"${nominal_time}", "key":"nominal-time"}, {"value":"", "key":"should-start"}, {"value":"${30 * MINUTES}", "key":"should-end"}, {"value":"", "key":"max-duration"}, {"value":"", "key":"alert-events"}, {"value":"", "key":"alert-contact"}, {"value":"", "key":"notification-msg"}, {"value":"", "key":"upstream-apps"}],
+              "sla": [
+                {"value": False, "key": "enabled"},
+                {"value": "${nominal_time}", "key": "nominal-time"},
+                {"value": "", "key": "should-start"},
+                {"value": "${30 * MINUTES}", "key": "should-end"},
+                {"value": "", "key": "max-duration"},
+                {"value": "", "key": "alert-events"},
+                {"value": "", "key": "alert-contact"},
+                {"value": "", "key": "notification-msg"},
+                {"value": "", "key": "upstream-apps"}
+              ],
               "archives": []
         },
         "children": [
@@ -4154,7 +4242,7 @@ class WorkflowBuilder(object):
         "id": node_id,
         'name': 'shell-%s' % node_id[:4],
         "type": "shell-document-widget",
-        "properties":{
+        "properties": {
               "command_path": "",
               "env_var": [],
               "arguments": [],
@@ -4165,7 +4253,17 @@ class WorkflowBuilder(object):
               "capture_output": False,
               "prepares": [],
               "credentials": credentials,
-              "sla": [{"value":False, "key":"enabled"}, {"value":"${nominal_time}", "key":"nominal-time"}, {"value":"", "key":"should-start"}, {"value":"${30 * MINUTES}", "key":"should-end"}, {"value":"", "key":"max-duration"}, {"value":"", "key":"alert-events"}, {"value":"", "key":"alert-contact"}, {"value":"", "key":"notification-msg"}, {"value":"", "key":"upstream-apps"}],
+              "sla": [
+                {"value": False, "key": "enabled"},
+                {"value": "${nominal_time}", "key": "nominal-time"},
+                {"value": "", "key": "should-start"},
+                {"value": "${30 * MINUTES}", "key": "should-end"},
+                {"value": "", "key": "max-duration"},
+                {"value": "", "key": "alert-events"},
+                {"value": "", "key": "alert-contact"},
+                {"value": "", "key": "notification-msg"},
+                {"value": "", "key": "upstream-apps"}
+              ],
               "archives": []
         },
         "children": [
@@ -4191,7 +4289,7 @@ class WorkflowBuilder(object):
         "id": node_id,
         'name': 'mapreduce-%s' % node_id[:4],
         "type": "mapreduce-document-widget",
-        "properties":{
+        "properties": {
               "jar_path": "",
               "arguments": [],
               "java_opts": [],
@@ -4200,7 +4298,17 @@ class WorkflowBuilder(object):
               "job_properties": [],
               "prepares": [],
               "credentials": credentials,
-              "sla": [{"value":False, "key":"enabled"}, {"value":"${nominal_time}", "key":"nominal-time"}, {"value":"", "key":"should-start"}, {"value":"${30 * MINUTES}", "key":"should-end"}, {"value":"", "key":"max-duration"}, {"value":"", "key":"alert-events"}, {"value":"", "key":"alert-contact"}, {"value":"", "key":"notification-msg"}, {"value":"", "key":"upstream-apps"}],
+              "sla": [
+                {"value": False, "key": "enabled"},
+                {"value": "${nominal_time}", "key": "nominal-time"},
+                {"value": "", "key": "should-start"},
+                {"value": "${30 * MINUTES}", "key": "should-end"},
+                {"value": "", "key": "max-duration"},
+                {"value": "", "key": "alert-events"},
+                {"value": "", "key": "alert-contact"},
+                {"value": "", "key": "notification-msg"},
+                {"value": "", "key": "upstream-apps"}
+              ],
               "archives": []
         },
         "children": [
@@ -4235,7 +4343,7 @@ class WorkflowBuilder(object):
         "id": node_id,
         'name': 'pig-%s' % node_id[:4],
         "type": "pig-document-widget",
-        "properties":{
+        "properties": {
               "job_xml": [],
               "jar_path": "",
               "java_opts": [],
@@ -4244,7 +4352,17 @@ class WorkflowBuilder(object):
               "job_properties": [],
               "prepares": [],
               "credentials": credentials,
-              "sla": [{"value":False, "key":"enabled"}, {"value":"${nominal_time}", "key":"nominal-time"}, {"value":"", "key":"should-start"}, {"value":"${30 * MINUTES}", "key":"should-end"}, {"value":"", "key":"max-duration"}, {"value":"", "key":"alert-events"}, {"value":"", "key":"alert-contact"}, {"value":"", "key":"notification-msg"}, {"value":"", "key":"upstream-apps"}],
+              "sla": [
+                {"value": False, "key": "enabled"},
+                {"value": "${nominal_time}", "key": "nominal-time"},
+                {"value": "", "key": "should-start"},
+                {"value": "${30 * MINUTES}", "key": "should-end"},
+                {"value": "", "key": "max-duration"},
+                {"value": "", "key": "alert-events"},
+                {"value": "", "key": "alert-contact"},
+                {"value": "", "key": "notification-msg"},
+                {"value": "", "key": "upstream-apps"}
+              ],
               "archives": []
         },
         "children": [
@@ -4263,7 +4381,7 @@ class WorkflowBuilder(object):
         "id": node_id,
         'name': 'java-%s' % node_id[:4],
         "type": "java-document-widget" if is_document_node else "java-widget",
-        "properties":{
+        "properties": {
               "job_xml": [],
               "jar_path": "",
               "java_opts": [],
@@ -4273,7 +4391,17 @@ class WorkflowBuilder(object):
               "capture_output": False,
               "prepares": [],
               "credentials": credentials,
-              "sla": [{"value":False, "key":"enabled"}, {"value":"${nominal_time}", "key":"nominal-time"}, {"value":"", "key":"should-start"}, {"value":"${30 * MINUTES}", "key":"should-end"}, {"value":"", "key":"max-duration"}, {"value":"", "key":"alert-events"}, {"value":"", "key":"alert-contact"}, {"value":"", "key":"notification-msg"}, {"value":"", "key":"upstream-apps"}],
+              "sla": [
+                {"value": False, "key": "enabled"},
+                {"value": "${nominal_time}", "key": "nominal-time"},
+                {"value": "", "key": "should-start"},
+                {"value": "${30 * MINUTES}", "key": "should-end"},
+                {"value": "", "key": "max-duration"},
+                {"value": "", "key": "alert-events"},
+                {"value": "", "key": "alert-contact"},
+                {"value": "", "key": "notification-msg"},
+                {"value": "", "key": "upstream-apps"}
+              ],
               "archives": []
         },
         "children": [

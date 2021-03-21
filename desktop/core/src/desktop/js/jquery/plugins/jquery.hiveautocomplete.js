@@ -18,6 +18,7 @@ import $ from 'jquery';
 
 import contextCatalog from 'catalog/contextCatalog';
 import dataCatalog from 'catalog/dataCatalog';
+import { hueLocalStorage } from 'utils/storageUtils';
 
 /*
  * jHue generic autocomplete plugin
@@ -30,9 +31,9 @@ const pluginName = 'jHueGenericAutocomplete',
     home: '/',
     skipColumns: false,
     skipTables: false,
-    onEnter: function() {},
-    onBlur: function() {},
-    onPathChange: function() {},
+    onEnter: function () {},
+    onBlur: function () {},
+    onPathChange: function () {},
     pathChangeLevel: '',
     smartTooltip: '',
     smartTooltipThreshold: 10, // needs 10 up/down or click actions and no tab to activate the smart tooltip
@@ -83,7 +84,7 @@ function Plugin(element, options) {
   this.init();
 }
 
-Plugin.prototype.init = function() {
+Plugin.prototype.init = function () {
   const self = this;
   const $el = $(self.element);
 
@@ -146,14 +147,13 @@ Plugin.prototype.init = function() {
   function smartTooltipMaker() {
     if (
       self.options.smartTooltip !== '' &&
-      typeof $.totalStorage !== 'undefined' &&
-      $.totalStorage('jHueGenericAutocompleteTooltip') !== -1
+      hueLocalStorage('jHueGenericAutocompleteTooltip') !== -1
     ) {
       let cnt = 0;
-      if ($.totalStorage('jHueGenericAutocompleteTooltip')) {
-        cnt = $.totalStorage('jHueGenericAutocompleteTooltip') + 1;
+      if (hueLocalStorage('jHueGenericAutocompleteTooltip')) {
+        cnt = hueLocalStorage('jHueGenericAutocompleteTooltip') + 1;
       }
-      $.totalStorage('jHueGenericAutocompleteTooltip', cnt);
+      hueLocalStorage('jHueGenericAutocompleteTooltip', cnt);
       if (cnt >= self.options.smartTooltipThreshold) {
         $el
           .tooltip({
@@ -166,7 +166,7 @@ Plugin.prototype.init = function() {
         window.setTimeout(() => {
           $el.tooltip('hide');
         }, 10000);
-        $.totalStorage('jHueGenericAutocompleteTooltip', -1);
+        hueLocalStorage('jHueGenericAutocompleteTooltip', -1);
       }
     }
   }
@@ -179,12 +179,12 @@ Plugin.prototype.init = function() {
   });
 
   let validateTimeout = -1;
-  const onPathChange = function(path) {
+  const onPathChange = function (path) {
     window.clearTimeout(validateTimeout);
     self.options.onPathChange(path);
   };
 
-  const validateAndSet = function() {
+  const validateAndSet = function () {
     const path = $el.val().split('.');
     if (path.length > 1) {
       window.clearTimeout(validateTimeout);
@@ -199,7 +199,7 @@ Plugin.prototype.init = function() {
               compute: compute,
               path: path
             })
-            .done(childEntries => {
+            .then(childEntries => {
               if (
                 childEntries.some(childEntry => {
                   return childEntry.name === target;
@@ -207,7 +207,8 @@ Plugin.prototype.init = function() {
               ) {
                 onPathChange($el.val());
               }
-            });
+            })
+            .catch(() => {});
         });
       }, 500);
     }
@@ -215,7 +216,7 @@ Plugin.prototype.init = function() {
 
   let _hiveAutocompleteSelectedIndex = -1;
   let _filterTimeout = -1;
-  $el.keyup(function(e) {
+  $el.keyup(function (e) {
     window.clearTimeout(_filterTimeout);
     validateAndSet();
     if ($.inArray(e.keyCode, [17, 38, 40, 13, 32, 191]) === -1) {
@@ -230,23 +231,12 @@ Plugin.prototype.init = function() {
         const $jHueGenericAutocompleteLi = $('#jHueGenericAutocomplete ul li');
         $jHueGenericAutocompleteLi.show();
         if (path !== '') {
-          $jHueGenericAutocompleteLi.each(function() {
+          $jHueGenericAutocompleteLi.each(function () {
             if (self.options.searchEverywhere) {
-              if (
-                $(this)
-                  .text()
-                  .trim()
-                  .toLowerCase()
-                  .indexOf(path.toLowerCase()) === -1
-              ) {
+              if ($(this).text().trim().toLowerCase().indexOf(path.toLowerCase()) === -1) {
                 $(this).hide();
               }
-            } else if (
-              $(this)
-                .text()
-                .trim()
-                .indexOf(path) !== 0
-            ) {
+            } else if ($(this).text().trim().indexOf(path) !== 0) {
               $(this).hide();
             }
           });
@@ -321,7 +311,7 @@ Plugin.prototype.init = function() {
   }
   let _currentFiles = [];
 
-  self.getDatabases = function(callback) {
+  self.getDatabases = function (callback) {
     const self = this;
     $.when(self.namespaceDeferred, self.computeDeferred).done((namespace, compute) => {
       dataCatalog
@@ -331,17 +321,18 @@ Plugin.prototype.init = function() {
           compute: compute,
           path: []
         })
-        .done(dbEntries => {
+        .then(dbEntries => {
           callback(
             $.map(dbEntries, entry => {
               return entry.name;
             })
           );
-        });
+        })
+        .catch(() => {});
     });
   };
 
-  self.getTables = function(database, callback) {
+  self.getTables = function (database, callback) {
     const self = this;
     $.when(self.namespaceDeferred, self.computeDeferred).done((namespace, compute) => {
       dataCatalog
@@ -351,13 +342,13 @@ Plugin.prototype.init = function() {
           connector: { id: self.options.apiHelperType },
           path: [database]
         })
-        .done(entry => {
-          entry.getSourceMeta().done(callback);
+        .then(entry => {
+          entry.getSourceMeta().then(callback);
         });
     });
   };
 
-  self.getColumns = function(database, table, callback) {
+  self.getColumns = function (database, table, callback) {
     const self = this;
     $.when(self.namespaceDeferred, self.computeDeferred).done((namespace, compute) => {
       dataCatalog
@@ -367,8 +358,8 @@ Plugin.prototype.init = function() {
           connector: { id: self.options.apiHelperType },
           path: [database, table]
         })
-        .done(entry => {
-          entry.getSourceMeta().done(callback);
+        .then(entry => {
+          entry.getSourceMeta().then(callback);
         });
     });
   };
@@ -463,44 +454,25 @@ Plugin.prototype.init = function() {
           .css('top', $el.offset().top + $el.outerHeight() - 1)
           .css('left', $el.offset().left)
           .width($el.outerWidth() - 4);
-        $jHueGenericAutocomplete
-          .find('ul')
-          .empty()
-          .html(_currentFiles.join(''));
-        $jHueGenericAutocomplete.find('li').on('click', function(e) {
+        $jHueGenericAutocomplete.find('ul').empty().html(_currentFiles.join(''));
+        $jHueGenericAutocomplete.find('li').on('click', function (e) {
           smartTooltipMaker();
           e.preventDefault();
-          const item = $(this)
-            .text()
-            .trim();
+          const item = $(this).text().trim();
 
           if (
-            $(this)
-              .html()
-              .indexOf('search') > -1 ||
-            $(this)
-              .html()
-              .indexOf('cog') > -1 ||
-            $(this)
-              .html()
-              .indexOf('database') > -1
+            $(this).html().indexOf('search') > -1 ||
+            $(this).html().indexOf('cog') > -1 ||
+            $(this).html().indexOf('database') > -1
           ) {
             if (
-              $(this)
-                .html()
-                .indexOf('search') > -1 &&
-              $(this)
-                .html()
-                .indexOf('search-plus') === -1
+              $(this).html().indexOf('search') > -1 &&
+              $(this).html().indexOf('search-plus') === -1
             ) {
               $el.val('collections.' + item);
             } else if (
-              $(this)
-                .html()
-                .indexOf('cog') > -1 &&
-              $(this)
-                .html()
-                .indexOf('cogs') === -1
+              $(this).html().indexOf('cog') > -1 &&
+              $(this).html().indexOf('cogs') === -1
             ) {
               $el.val('configs.' + item);
             } else {
@@ -517,11 +489,7 @@ Plugin.prototype.init = function() {
             self.options.onEnter($el);
           }
 
-          if (
-            $(this)
-              .html()
-              .indexOf('database') > -1
-          ) {
+          if ($(this).html().indexOf('database') > -1) {
             if (self.options.skipTables) {
               $el.val(item);
               $('#jHueGenericAutocomplete').hide();
@@ -539,11 +507,7 @@ Plugin.prototype.init = function() {
             }
           }
 
-          if (
-            $(this)
-              .html()
-              .indexOf('table') > -1
-          ) {
+          if ($(this).html().indexOf('table') > -1) {
             if ($el.val().indexOf('.') > -1) {
               if ($el.val().match(/\./gi).length === 1) {
                 $el.val($el.val().substring(0, $el.val().lastIndexOf('.') + 1) + item);
@@ -570,11 +534,7 @@ Plugin.prototype.init = function() {
             }
           }
 
-          if (
-            $(this)
-              .html()
-              .indexOf('columns') > -1
-          ) {
+          if ($(this).html().indexOf('columns') > -1) {
             if ($el.val().match(/\./gi).length > 1) {
               $el.val($el.val().substring(0, $el.val().lastIndexOf('.') + 1) + item);
             } else {
@@ -591,17 +551,11 @@ Plugin.prototype.init = function() {
         }, 100);
       }
     }
-    $el
-      .parent()
-      .find('.fa-spinner')
-      .hide();
+    $el.parent().find('.fa-spinner').hide();
   }
 
   function showAutocomplete() {
-    $el
-      .parent()
-      .find('.fa-spinner')
-      .show();
+    $el.parent().find('.fa-spinner').show();
     let path = $el.val();
     if (self.options.startingPath !== '') {
       path = self.options.startingPath + path;
@@ -669,31 +623,15 @@ Plugin.prototype.init = function() {
     const possibleMatches = [];
     for (let i = 0; i < _currentFiles.length; i++) {
       if (
-        ($(_currentFiles[i])
-          .text()
-          .trim()
-          .indexOf(lastChars) === 0 ||
-          lastChars === '') &&
-        $(_currentFiles[i])
-          .text()
-          .trim() !== '..'
+        ($(_currentFiles[i]).text().trim().indexOf(lastChars) === 0 || lastChars === '') &&
+        $(_currentFiles[i]).text().trim() !== '..'
       ) {
         possibleMatches.push(_currentFiles[i]);
       }
     }
     if (possibleMatches.length === 1) {
-      $el.val(
-        $el.val() +
-          $(possibleMatches[0])
-            .text()
-            .trim()
-            .substr(lastChars.length)
-      );
-      if (
-        $(possibleMatches[0])
-          .html()
-          .indexOf('folder') > -1
-      ) {
+      $el.val($el.val() + $(possibleMatches[0]).text().trim().substr(lastChars.length));
+      if ($(possibleMatches[0]).html().indexOf('folder') > -1) {
         $el.val($el.val() + '/');
         showAutocomplete();
       }
@@ -701,11 +639,7 @@ Plugin.prototype.init = function() {
       // finds the longest common prefix
       const possibleMatchesPlain = [];
       for (let z = 0; z < possibleMatches.length; z++) {
-        possibleMatchesPlain.push(
-          $(possibleMatches[z])
-            .text()
-            .trim()
-        );
+        possibleMatchesPlain.push($(possibleMatches[z]).text().trim());
       }
       const arr = possibleMatchesPlain.slice(0).sort();
       const word1 = arr[0];
@@ -720,12 +654,12 @@ Plugin.prototype.init = function() {
   }
 };
 
-Plugin.prototype.setOptions = function(options) {
+Plugin.prototype.setOptions = function (options) {
   this.options = $.extend({}, defaults, options);
 };
 
-$.fn[pluginName] = function(options) {
-  return this.each(function() {
+$.fn[pluginName] = function (options) {
+  return this.each(function () {
     if (!$.data(this, 'plugin_' + pluginName)) {
       $.data(this, 'plugin_' + pluginName, new Plugin(this, options));
     } else {
@@ -734,7 +668,7 @@ $.fn[pluginName] = function(options) {
   });
 };
 
-$[pluginName] = function(options) {
+$[pluginName] = function (options) {
   if (typeof console !== 'undefined') {
     console.warn('$(elem).jHueGenericAutocomplete() is a preferred call method.');
   }

@@ -15,11 +15,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from django.conf.urls import url
+import sys
+
 from kafka import kafka_api as kafka_kafka_api
 
+if sys.version_info[0] > 2:
+  from django.urls import re_path
+else:
+  from django.conf.urls import url as re_path
+
 urlpatterns = [
-  url(r'^api/topics/list/$', kafka_kafka_api.list_topics, name='list_topics'),
-  url(r'^api/topic/list/$', kafka_kafka_api.list_topic, name='list_topic'),
-  url(r'^api/topic/create/$', kafka_kafka_api.create_topic, name='create_topic'),
+  re_path(r'^api/topics/list/$', kafka_kafka_api.list_topics, name='list_topics'),
+  re_path(r'^api/topic/list/$', kafka_kafka_api.list_topic, name='list_topic'),
+  re_path(r'^api/topic/create/$', kafka_kafka_api.create_topic, name='create_topic'),
 ]

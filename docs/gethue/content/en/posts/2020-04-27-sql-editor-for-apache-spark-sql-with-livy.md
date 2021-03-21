@@ -39,12 +39,15 @@ sf_remove_promo_bar:
 ampforwp-amp-on-off:
   - default
 categories:
-  - Querying
-  - Version 4.8
+  - Version 4
+  - Spark SQL
+#  - Version 4.8
 
 ---
 
 ## Spark SQL
+
+**Update December 2020** [Executing Spark SQL via the Spark Thrift Server](https://gethue.com/blog/querying-spark-sql-with-spark-thrift-server-and-hue-editor/)
 
 [Spark SQL](https://spark.apache.org/docs/latest/sql-programming-guide.html) is convenient for embedding clean data querying logic within your Spark apps. Hue brings an Editor so that it is easier to develop your SQL snippets.
 

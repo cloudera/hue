@@ -22,7 +22,6 @@ import json
 
 from subprocess import call
 
-from django.core.cache import cache
 from django.utils.translation import ugettext as _
 
 from desktop.lib.rest.http_client import RestException, HttpClient
@@ -71,9 +70,10 @@ class KafkaApi(object):
   def create_topic(self, name, partitions=1, replication_factor=1):
     # Create/delete topics are not available in the REST API.
     # Here only works with hack if command is available on the Hue host.
-    try:      
+    try:
       return call(
-        'kafka-topics --zookeeper %(zookeeper)s --create --if-not-exists --topic %(name)s --partitions %(partitions)s --replication-factor %(replication_factor)s' % {
+        'kafka-topics --zookeeper %(zookeeper)s --create --if-not-exists --topic %(name)s --partitions %(partitions)s '
+        '--replication-factor %(replication_factor)s' % {
            'zookeeper': zkensemble(),
            'name': name,
            'partitions': partitions,

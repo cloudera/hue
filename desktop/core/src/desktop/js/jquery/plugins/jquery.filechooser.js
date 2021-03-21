@@ -20,120 +20,123 @@ import qq from 'ext/fileuploader.custom';
 
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
+import { hueLocalStorage } from 'utils/storageUtils';
 
 /*
  * jHue fileChooser plugin
  */
 
-const pluginName = 'jHueFileChooser',
-  defaults = {
-    initialPath: '',
-    forceRefresh: false,
-    errorRedirectPath: '',
-    createFolder: true,
-    uploadFile: true,
-    selectFolder: false,
-    suppressErrors: false,
-    displayOnlyFolders: false,
-    showExtraHome: false,
-    extraHomeProperties: {},
-    filterExtensions: '',
-    labels: {
-      BACK: 'Back',
-      SELECT_FOLDER: 'Select this folder',
-      CREATE_FOLDER: 'Create folder',
-      FOLDER_NAME: 'Folder name',
-      CANCEL: 'Cancel',
-      FILE_NOT_FOUND: 'The file has not been found',
-      UPLOAD_FILE: 'Upload a file',
-      FAILED: 'Failed',
-      HOME: 'Home'
-    },
-    filesystems: ['hdfs'],
-    filesysteminfo: {
-      '': {
-        scheme: '',
-        root: '/',
-        home: '/?default_to_home',
-        icon: {
-          brand: 'fa-files-o',
-          home: 'fa-home'
-        },
-        label: {
-          home: 'home',
-          name: 'HDFS'
-        }
+const pluginName = 'jHueFileChooser';
+
+const defaults = {
+  initialPath: '',
+  forceRefresh: false,
+  errorRedirectPath: '',
+  createFolder: true,
+  uploadFile: true,
+  selectFolder: false,
+  suppressErrors: false,
+  displayOnlyFolders: false,
+  showExtraHome: false,
+  extraHomeProperties: {},
+  filterExtensions: '',
+  labels: {
+    BACK: 'Back',
+    SELECT_FOLDER: 'Select this folder',
+    CREATE_FOLDER: 'Create folder',
+    FOLDER_NAME: 'Folder name',
+    CANCEL: 'Cancel',
+    FILE_NOT_FOUND: 'The file has not been found',
+    UPLOAD_FILE: 'Upload a file',
+    FAILED: 'Failed',
+    HOME: 'Home'
+  },
+  filesystems: ['hdfs'],
+  filesysteminfo: {
+    '': {
+      scheme: '',
+      root: '/',
+      home: '/?default_to_home',
+      icon: {
+        brand: 'fa-files-o',
+        home: 'fa-home'
       },
-      hdfs: {
-        scheme: '',
-        root: '/',
-        home: '/?default_to_home',
-        icon: {
-          brand: 'fa-files-o',
-          home: 'fa-home'
-        },
-        label: {
-          home: 'home',
-          name: 'HDFS'
-        }
-      },
-      s3a: {
-        scheme: 's3a',
-        root: 's3a://',
-        home: 's3a://',
-        icon: {
-          brand: 'fa-cubes',
-          home: 'fa-cubes'
-        },
-        label: {
-          home: '',
-          name: 'S3'
-        }
-      },
-      adl: {
-        scheme: 'adl',
-        root: 'adl:/',
-        home: 'adl:/',
-        icon: {
-          svg: {
-            brand: '#hi-adls',
-            home: '#hi-adls'
-          },
-          brand: 'fa-windows',
-          home: 'fa-windows'
-        },
-        label: {
-          home: '',
-          name: 'ADLS'
-        }
-      },
-      abfs: {
-        scheme: 'abfs',
-        root: 'abfs://',
-        home: 'abfs://',
-        icon: {
-          svg: {
-            brand: '#hi-adls',
-            home: '#hi-adls'
-          },
-          brand: 'fa-windows',
-          home: 'fa-windows'
-        },
-        label: {
-          home: '',
-          name: 'ABFS'
-        }
+      label: {
+        home: 'home',
+        name: 'HDFS'
       }
     },
-    fsSelected: 'hdfs',
-    user: '',
-    onNavigate: function() {},
-    onFileChoose: function() {},
-    onFolderChoose: function() {},
-    onFolderChange: function() {},
-    onError: function() {}
+    hdfs: {
+      scheme: '',
+      root: '/',
+      home: '/?default_to_home',
+      icon: {
+        brand: 'fa-files-o',
+        home: 'fa-home'
+      },
+      label: {
+        home: 'home',
+        name: 'HDFS'
+      }
+    },
+    s3a: {
+      scheme: 's3a',
+      root: 's3a://',
+      home: 's3a://',
+      icon: {
+        brand: 'fa-cubes',
+        home: 'fa-cubes'
+      },
+      label: {
+        home: '',
+        name: 'S3'
+      }
+    },
+    adl: {
+      scheme: 'adl',
+      root: 'adl:/',
+      home: 'adl:/',
+      icon: {
+        svg: {
+          brand: '#hi-adls',
+          home: '#hi-adls'
+        },
+        brand: 'fa-windows',
+        home: 'fa-windows'
+      },
+      label: {
+        home: '',
+        name: 'ADLS'
+      }
+    },
+    abfs: {
+      scheme: 'abfs',
+      root: 'abfs://',
+      home: '/?default_abfs_home',
+      icon: {
+        svg: {
+          brand: '#hi-adls',
+          home: '#hi-adls'
+        },
+        brand: 'fa-windows',
+        home: 'fa-windows'
+      },
+      label: {
+        home: '',
+        name: 'ABFS'
+      }
+    }
   },
-  STORAGE_PREFIX = 'hueFileBrowserLastPathForUser_';
+  fsSelected: 'hdfs',
+  user: '',
+  onNavigate: function () {},
+  onFileChoose: function () {},
+  onFolderChoose: function () {},
+  onFolderChange: function () {},
+  onError: function () {}
+};
+
+const STORAGE_PREFIX = 'hueFileBrowserLastPathForUser_';
 
 const DEFAULT_I18n = {
   BACK: I18n('Back'),
@@ -158,7 +161,7 @@ function Plugin(element, options) {
   this.init();
 }
 
-Plugin.prototype.setOptions = function(options) {
+Plugin.prototype.setOptions = function (options) {
   const self = this;
   self.options = $.extend({}, defaults, { user: window.LOGGED_USERNAME }, options);
   self.options.labels = $.extend({}, defaults.labels, DEFAULT_I18n, options ? options.labels : {});
@@ -168,9 +171,7 @@ Plugin.prototype.setOptions = function(options) {
     self.options.fsSelected = scheme;
   }
 
-  $(self.element)
-    .find('.filechooser-services li')
-    .removeClass('active');
+  $(self.element).find('.filechooser-services li').removeClass('active');
   $(self.element)
     .find('.filechooser-services li[data-fs="' + self.options.fsSelected + '"]')
     .addClass('active');
@@ -179,16 +180,20 @@ Plugin.prototype.setOptions = function(options) {
     if (initialPath != '') {
       self.navigateTo(self.options.initialPath);
     } else if (
-      $.totalStorage(STORAGE_PREFIX + self.options.user + self.options.fsSelected) != null
+      hueLocalStorage(STORAGE_PREFIX + self.options.user + self.options.fsSelected) != null
     ) {
-      self.navigateTo($.totalStorage(STORAGE_PREFIX + self.options.user + self.options.fsSelected));
+      self.navigateTo(
+        hueLocalStorage(STORAGE_PREFIX + self.options.user + self.options.fsSelected)
+      );
     } else {
       self.navigateTo('/?default_to_home');
     }
   } else if (initialPath != '') {
     self.navigateTo(self.options.initialPath);
-  } else if ($.totalStorage(STORAGE_PREFIX + self.options.user + self.options.fsSelected) != null) {
-    self.navigateTo($.totalStorage(STORAGE_PREFIX + self.options.user + self.options.fsSelected));
+  } else if (
+    hueLocalStorage(STORAGE_PREFIX + self.options.user + self.options.fsSelected) != null
+  ) {
+    self.navigateTo(hueLocalStorage(STORAGE_PREFIX + self.options.user + self.options.fsSelected));
   }
 };
 
@@ -209,7 +214,7 @@ function getFs(scheme) {
   }
 }
 
-Plugin.prototype.setFileSystems = function(filesystems) {
+Plugin.prototype.setFileSystems = function (filesystems) {
   const self = this;
   let filters, filesystemsFiltered;
   self.options.filesystems = [];
@@ -233,9 +238,7 @@ Plugin.prototype.setFileSystems = function(filesystems) {
 
   $(self.element).data('fs', filesystemsFiltered);
   if (filesystemsFiltered.length > 1) {
-    const $ul = $('<ul>')
-      .addClass('nav nav-list')
-      .css('border', 'none');
+    const $ul = $('<ul>').addClass('nav nav-list').css('border', 'none');
     filesystemsFiltered.forEach(fs => {
       const filesysteminfo = self.options.filesysteminfo;
       const $li = $('<li>')
@@ -246,13 +249,11 @@ Plugin.prototype.setFileSystems = function(filesystems) {
             (filesysteminfo[fs] ? filesysteminfo[fs].label.name : fs.toUpperCase()) +
             '</a>'
         );
-      $li.on('click', function() {
-        $(this)
-          .siblings()
-          .removeClass('active');
+      $li.on('click', function () {
+        $(this).siblings().removeClass('active');
         $(this).addClass('active');
         self.options.fsSelected = fs;
-        const storedPath = $.totalStorage(
+        const storedPath = hueLocalStorage(
           STORAGE_PREFIX + self.options.user + self.options.fsSelected
         );
         if (storedPath !== null) {
@@ -267,10 +268,7 @@ Plugin.prototype.setFileSystems = function(filesystems) {
       });
       $li.appendTo($ul);
     });
-    $(self.element)
-      .find('.filechooser-services')
-      .empty()
-      .width(80);
+    $(self.element).find('.filechooser-services').empty().width(80);
     $(self.element)
       .find('.filechooser-tree')
       .width(480)
@@ -283,7 +281,7 @@ Plugin.prototype.setFileSystems = function(filesystems) {
 };
 
 //TODO: refactor this method to template
-Plugin.prototype.navigateTo = function(path) {
+Plugin.prototype.navigateTo = function (path) {
   const _parent = this;
   $(_parent.element)
     .find('.filechooser-tree')
@@ -295,26 +293,20 @@ Plugin.prototype.navigateTo = function(path) {
     path = path.substring(0, index);
   }
   $.getJSON('/filebrowser/view=' + encodeURIComponent(path) + pageSize, data => {
-    $(_parent.element)
-      .find('.filechooser-tree')
-      .empty();
+    $(_parent.element).find('.filechooser-tree').empty();
 
     path = data.current_dir_path || path; // use real path.
-    const _flist = $('<ul>')
-      .addClass('unstyled')
-      .css({
-        height: '260px',
-        'overflow-y': 'auto'
-      });
-    const $homeBreadcrumb = $('<ul>')
-      .addClass('hue-breadcrumbs')
-      .css({
-        padding: '0',
-        marginLeft: '0',
-        float: 'left',
-        'white-space': 'nowrap'
-      });
-    const _home = $('<li>');
+    const _flist = $('<ul>').addClass('unstyled').css({
+      height: '260px',
+      'overflow-y': 'auto'
+    });
+    const $homeBreadcrumb = $('<ul>').addClass('hue-breadcrumbs').css({
+      padding: '0',
+      marginLeft: '0',
+      float: 'left',
+      'white-space': 'nowrap'
+    });
+    const _home = $('<li>').css({ 'padding-top': '6px' });
     //var filesysteminfo = self.options.filesysteminfo;
     const fs = _parent.options.filesysteminfo[_parent.options.fsSelected || 'hdfs'];
     const el = fs.icon.svg
@@ -331,10 +323,7 @@ Plugin.prototype.navigateTo = function(path) {
     _homelink.appendTo(_home);
     _home.appendTo($homeBreadcrumb);
 
-    $('<span>')
-      .addClass('divider')
-      .css('margin-right', '20px')
-      .appendTo(_home);
+    $('<span>').addClass('divider').css('margin-right', '20px').appendTo(_home);
 
     if (data.error || (data.title != null && data.title == 'Error')) {
       $homeBreadcrumb.appendTo($(_parent.element).find('.filechooser-tree'));
@@ -371,21 +360,22 @@ Plugin.prototype.navigateTo = function(path) {
         });
       _previousLink.appendTo($(_parent.element).find('.filechooser-tree'));
     } else {
-      if (data.type == 'file') {
+      if (data.type === 'file') {
         _parent.navigateTo(data.view.dirname);
         return;
       }
-      $.totalStorage(STORAGE_PREFIX + _parent.options.user + _parent.options.fsSelected, path);
+      hueLocalStorage(STORAGE_PREFIX + _parent.options.user + _parent.options.fsSelected, path);
+
       _parent.previousPath = path;
       _parent.options.onNavigate(_parent.previousPath);
 
       const $search = $('<div>')
         .html(
-          '<i class="fa fa-refresh inactive-action pointer" style="position: absolute; top: 3px; margin-left: -16px"></i> <i class="fa fa-search inactive-action pointer" style="position: absolute; top: 3px"></i><input type="text" class="small-search" style="display: none; width: 0; padding: 2px; padding-left: 20px">'
+          '<i class="fa fa-refresh inactive-action pointer" style="position: absolute; top: 8px; margin-left: -18px"></i> <i class="fa fa-search inactive-action pointer" style="position: absolute; top: 8px"></i><input type="text" class="small-search" style="display: none; width: 0; padding: 2px; padding-left: 20px">'
         )
         .css({
           position: 'absolute',
-          right: '20px',
+          right: '10px',
           'background-color': '#FFF'
         });
 
@@ -406,15 +396,15 @@ Plugin.prototype.navigateTo = function(path) {
       const tog = v => (v ? 'addClass' : 'removeClass');
       $searchInput.addClass('clearable');
       $searchInput
-        .on('input', function() {
+        .on('input', function () {
           $searchInput[tog(this.value)]('x');
         })
-        .on('mousemove', function(e) {
+        .on('mousemove', function (e) {
           $searchInput[tog(this.offsetWidth - 18 < e.clientX - this.getBoundingClientRect().left)](
             'onX'
           );
         })
-        .on('click', function(e) {
+        .on('click', function (e) {
           if (this.offsetWidth - 18 < e.clientX - this.getBoundingClientRect().left) {
             $searchInput.removeClass('x onX').val('');
           }
@@ -450,19 +440,18 @@ Plugin.prototype.navigateTo = function(path) {
 
       $search.appendTo($(_parent.element).find('.filechooser-tree'));
 
-      const $scrollingBreadcrumbs = $('<ul>')
-        .addClass('hue-breadcrumbs editable-breadcrumbs')
-        .css({
-          padding: '0',
-          marginLeft: '10px',
-          marginBottom: '0',
-          paddingRight: '10px',
-          float: 'left',
-          width: '300px',
-          'overflow-x': 'scroll',
-          'overflow-y': 'hidden',
-          'white-space': 'nowrap'
-        });
+      const $scrollingBreadcrumbs = $('<ul>').addClass('hue-breadcrumbs editable-breadcrumbs').css({
+        padding: '5px 4px',
+        border: '1px solid #CCC',
+        'border-radius': '3px',
+        marginLeft: '10px',
+        marginBottom: '0',
+        float: 'left',
+        width: '300px',
+        'overflow-x': 'scroll',
+        'overflow-y': 'hidden',
+        'white-space': 'nowrap'
+      });
 
       if (ko && ko.bindingHandlers.delayedOverflow) {
         ko.bindingHandlers.delayedOverflow.init($scrollingBreadcrumbs[0]);
@@ -483,10 +472,7 @@ Plugin.prototype.navigateTo = function(path) {
             _parent.navigateTo(_parent.options.extraHomeProperties.path);
           });
         _extraHomelink.appendTo(_extraHome);
-        $('<span>')
-          .addClass('divider')
-          .css('margin-right', '20px')
-          .appendTo(_extraHome);
+        $('<span>').addClass('divider').css('margin-right', '20px').appendTo(_extraHome);
         _extraHome.appendTo($scrollingBreadcrumbs);
       }
 
@@ -495,7 +481,7 @@ Plugin.prototype.navigateTo = function(path) {
         .val(path)
         .hide();
 
-      $scrollingBreadcrumbs.click(function(e) {
+      $scrollingBreadcrumbs.click(function (e) {
         if ($(e.target).is('ul') || $(e.target).hasClass('spacer')) {
           $(this).hide();
           $hdfsAutocomplete.show().focus();
@@ -512,20 +498,12 @@ Plugin.prototype.navigateTo = function(path) {
           const _crumb = $('<li>');
           const _crumbLink = $('<a>');
           const _crumbLabel = crumb.label != null && crumb.label != '' ? crumb.label : '/';
-          _crumbLink
-            .attr('href', 'javascript:void(0)')
-            .text(_crumbLabel)
-            .appendTo(_crumb);
+          _crumbLink.attr('href', 'javascript:void(0)').text(_crumbLabel).appendTo(_crumb);
           if (cnt < _bLength - 1) {
             if (cnt > 0) {
-              $('<span>')
-                .addClass('divider')
-                .text('/')
-                .appendTo(_crumb);
+              $('<span>').addClass('divider').text('/').appendTo(_crumb);
             } else {
-              $('<span>')
-                .html('&nbsp;')
-                .appendTo(_crumb);
+              $('<span>').html('&nbsp;').appendTo(_crumb);
             }
           }
           _crumb.click(() => {
@@ -544,32 +522,26 @@ Plugin.prototype.navigateTo = function(path) {
         home: '/user/' + _parent.options.user + '/',
         skipEnter: true,
         skipKeydownEvents: true,
-        onEnter: function(el) {
+        onEnter: function (el) {
           const _url = el.val();
           _parent.options.onFolderChange(_url);
           _parent.navigateTo(_url);
           $('#jHueHdfsAutocomplete').hide();
         },
-        onBlur: function() {
+        onBlur: function () {
           $hdfsAutocomplete.hide();
           $scrollingBreadcrumbs.show();
         },
         smartTooltip: _parent.options.labels.SMART_TOOLTIP
       });
 
-      $('<div>')
-        .addClass('clearfix')
-        .appendTo($(_parent.element).find('.filechooser-tree'));
+      $('<div>').addClass('clearfix').appendTo($(_parent.element).find('.filechooser-tree'));
 
       const resizeBreadcrumbs = window.setInterval(() => {
         if ($homeBreadcrumb.is(':visible') && $homeBreadcrumb.width() > 0) {
           window.clearInterval(resizeBreadcrumbs);
           $scrollingBreadcrumbs.width(
-            $(_parent.element)
-              .find('.filechooser-tree')
-              .width() -
-              $homeBreadcrumb.width() -
-              65
+            $(_parent.element).find('.filechooser-tree').width() - $homeBreadcrumb.width() - 65
           );
         }
       }, 100);
@@ -591,10 +563,7 @@ Plugin.prototype.navigateTo = function(path) {
         let _addFile = file.name !== '.';
         if (_parent.options.filterExtensions != '' && file.type == 'file') {
           const _allowedExtensions = _parent.options.filterExtensions.split(',');
-          const _fileExtension = file.name
-            .split('.')
-            .pop()
-            .toLowerCase();
+          const _fileExtension = file.name.split('.').pop().toLowerCase();
           _addFile = _allowedExtensions.indexOf(_fileExtension) > -1;
         }
         if (_addFile) {
@@ -648,18 +617,11 @@ Plugin.prototype.navigateTo = function(path) {
       $searchInput.jHueDelayedInput(() => {
         const filter = $searchInput.val().toLowerCase();
         let results = 0;
-        $(_parent.element)
-          .find('.filechooser-tree .no-results')
-          .hide();
+        $(_parent.element).find('.filechooser-tree .no-results').hide();
         $(_parent.element)
           .find('.filechooser-tree .file-list-item')
-          .each(function() {
-            if (
-              $(this)
-                .text()
-                .toLowerCase()
-                .indexOf(filter) > -1
-            ) {
+          .each(function () {
+            if ($(this).text().toLowerCase().indexOf(filter) > -1) {
               $(this).show();
               results++;
             } else {
@@ -667,9 +629,7 @@ Plugin.prototype.navigateTo = function(path) {
             }
           });
         if (results == 0) {
-          $(_parent.element)
-            .find('.filechooser-tree .no-results')
-            .show();
+          $(_parent.element).find('.filechooser-tree .no-results').show();
         }
       }, 300);
 
@@ -687,9 +647,7 @@ Plugin.prototype.navigateTo = function(path) {
         initUploader(path, _parent, _uploadFileBtn, _parent.options.labels);
       }
       if (_parent.options.selectFolder) {
-        _selectFolderBtn = $('<a>')
-          .addClass('btn')
-          .text(_parent.options.labels.SELECT_FOLDER);
+        _selectFolderBtn = $('<a>').addClass('btn').text(_parent.options.labels.SELECT_FOLDER);
         if (_parent.options.uploadFile) {
           _selectFolderBtn.css('margin-top', '10px');
         }
@@ -701,9 +659,7 @@ Plugin.prototype.navigateTo = function(path) {
       }
       $('<span> </span>').appendTo(_actions);
       if (_parent.options.createFolder) {
-        _createFolderBtn = $('<a>')
-          .addClass('btn')
-          .text(_parent.options.labels.CREATE_FOLDER);
+        _createFolderBtn = $('<a>').addClass('btn').text(_parent.options.labels.CREATE_FOLDER);
         if (_parent.options.uploadFile) {
           _createFolderBtn.css('margin-top', '10px');
         }
@@ -745,7 +701,7 @@ Plugin.prototype.navigateTo = function(path) {
                 name: _folderName.val(),
                 path: path
               },
-              success: function(xhr, status) {
+              success: function (xhr, status) {
                 if (status == 'success') {
                   _parent.navigateTo(path);
                   if (_uploadFileBtn) {
@@ -755,7 +711,7 @@ Plugin.prototype.navigateTo = function(path) {
                   _createFolderDetails.slideUp();
                 }
               },
-              error: function(xhr) {
+              error: function (xhr) {
                 $(document).trigger('error', xhr.responseText);
               }
             });
@@ -777,9 +733,7 @@ Plugin.prototype.navigateTo = function(path) {
       }
 
       window.setTimeout(() => {
-        $(_parent.element)
-          .parent()
-          .scrollTop(0);
+        $(_parent.element).parent().scrollTop(0);
         $scrollingBreadcrumbs.animate({
           scrollLeft: $scrollingBreadcrumbs.width()
         });
@@ -812,7 +766,7 @@ function initUploader(path, _parent, el, labels) {
       dest: path,
       fileFieldLabel: 'hdfs_file'
     },
-    onComplete: function(id, fileName, responseJSON) {
+    onComplete: function (id, fileName, responseJSON) {
       num_of_pending_uploads--;
       if (responseJSON.status == -1) {
         $(document).trigger('error', responseJSON.data);
@@ -821,7 +775,7 @@ function initUploader(path, _parent, el, labels) {
         huePubSub.publish('assist.' + getFs(getScheme(path)) + '.refresh');
       }
     },
-    onSubmit: function(id, fileName) {
+    onSubmit: function (id, fileName) {
       num_of_pending_uploads++;
     },
     template:
@@ -848,7 +802,7 @@ function initUploader(path, _parent, el, labels) {
   });
 }
 
-Plugin.prototype.init = function() {
+Plugin.prototype.init = function () {
   const self = this;
   $(self.element)
     .empty()
@@ -867,17 +821,19 @@ Plugin.prototype.init = function() {
     if (initialPath != '') {
       self.navigateTo(self.options.initialPath);
     } else if (
-      $.totalStorage(STORAGE_PREFIX + self.options.user + self.options.fsSelected) != null
+      hueLocalStorage(STORAGE_PREFIX + self.options.user + self.options.fsSelected) != null
     ) {
-      self.navigateTo($.totalStorage(STORAGE_PREFIX + self.options.user + self.options.fsSelected));
+      self.navigateTo(
+        hueLocalStorage(STORAGE_PREFIX + self.options.user + self.options.fsSelected)
+      );
     } else {
       self.navigateTo('/?default_to_home');
     }
   });
 };
 
-$.fn[pluginName] = function(options) {
-  return this.each(function() {
+$.fn[pluginName] = function (options) {
+  return this.each(function () {
     if (!$.data(this, 'plugin_' + pluginName)) {
       $.data(this, 'plugin_' + pluginName, new Plugin(this, options));
     } else {

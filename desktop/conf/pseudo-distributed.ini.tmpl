@@ -71,7 +71,7 @@
   ## gunicorn_work_class=eventlet
 
   # The number of Gunicorn worker processes. If not specified, it uses: (number of CPU * 2) + 1.
-  ## gunicorn_number_of_workers=None
+  ## gunicorn_number_of_workers=1
 
   # Webserver runs as this user
   ## server_user=hue
@@ -207,6 +207,10 @@
   # e.g. Query result in Editors and Dashboards, file in File Browser...
   ## enable_download=true
 
+  # Global setting to enable or disable document sharing.
+  # Note that this does not affect currently shared documents.
+  ## enable_sharing=true
+
   # Choose whether to enable the new SQL syntax checker or not
   ## enable_sql_syntax_check=true
 
@@ -235,6 +239,9 @@
 
   # Timeout in seconds for REST calls.
   ## rest_conn_timeout=120
+
+  # To set to true when using a decoupled UI.
+  ## cors_enabled=false
 
   # A json file containing a list of log redaction rules for cleaning sensitive data
   # from log files. It is defined as:
@@ -309,6 +316,11 @@
 
   # Turn on the direct link sharing of saved document.
   ## enable_link_sharing=true
+
+  # Hue uses Localstorage to keep the users settings and database preferences.
+  # Please make this value true in case local storage should not be used
+  # default value is false
+  ## disable_local_storage = false
 
   # Administrators
   # ----------------
@@ -714,11 +726,13 @@
     # Kerberos principal name for Hue
     ## hue_principal=hue/hostname.foo.com
     # Frequency in seconds with which Hue will renew its keytab
-    ## keytab_reinit_frequency=3600
+    ## REINIT_FREQUENCY=3600
     # Path to keep Kerberos credentials cached
     ## ccache_path=/var/run/hue/hue_krb5_ccache
     # Path to kinit
     ## kinit_path=/path/to/kinit
+    # Set to false if renew_lifetime in krb5.conf is set to 0m
+    ## krb5_renewlifetime_enabled=true
 
     # Mutual authentication from the server, attaches HTTP GSSAPI/Kerberos Authentication to the given Request object
     ## mutual_authentication="OPTIONAL" or "REQUIRED" or "DISABLED"
@@ -805,6 +819,19 @@
    ## collection_interval=30000
 
 
+  # Configuration options for Slack
+  # ------------------------------------------------------------------------
+  [[slack]]
+    # Slack credentials
+    ## slack_client_id=
+    ## slack_client_secret=
+    ## slack_verification_token=
+    ## slack_bot_user_token=
+
+    # Enables Slack application API endpoints
+    ## is_enabled=true
+
+
   # Configuration options for the request Tracing
   # ------------------------------------------------------------------------
   [[tracing]]
@@ -871,8 +898,8 @@
   ## Flag to turn on the Presentation mode of the editor.
   # enable_presentation=true
 
-  ## Flag to enable the SQL query builder of the table assist.
-  # enable_query_builder=true
+  ## Flag to enable the SQL query builder of the table assist (deprecated).
+  # enable_query_builder=false
 
   ## Flag to enable the creation of a coordinator for the current SQL query.
   # enable_query_scheduling=false
@@ -924,7 +951,12 @@
     #   interface=sqlalchemy
     #   options='{"url": "druid://host:8082/druid/v2/sql/"}'
 
-    # [[[sql]]]
+    # [[[sparksql]]]
+    #   name = Spark Sql
+    #   interface=sqlalchemy
+    #   options='{"url": "hive://user:password@localhost:10000/database"}'
+
+    # [[[sparksql]]]
     #   name=SparkSql
     #   interface=livy
 
@@ -1009,21 +1041,44 @@
     # # options='{"url": "presto://localhost:8080/hive/default", "has_impersonation": true}'
     # ## Kerberos.
     # # options='{"url": "presto://localhost:8080/hive/default?KerberosKeytabPath=/path/to/keytab&KerberosPrincipal=principal&KerberosRemoteServiceName=service&protocol=https"'
+    # ## LDAPS enabled over HTTPS.
+    # # options='{"url": "presto://username:password@localhost:8443/tpch/default","connect_args":"{\"protocol\": \"https\"}"}'
+    # ## Presto Session properties along with HTTPS.
+    # # options='{"url": "presto://username:password@localhost:8443/tpch/default","connect_args":"{\"protocol\": \"https\", \"session_props\": {\"query_max_run_time\": \"1m\"}}"}'
+    # ## Presto Session properties when HTTPS is not enabled.
+    # # options='{"url": "presto://username:password@localhost:8080/tpch/default","connect_args":"{\"session_props\": {\"query_max_run_time\": \"1m\"}}"}'
+
+    # [[[dasksql]]]
+    # name=Dask-SQL
+    # interface=sqlalchemy
+    # ## Specific options for connecting to the dask-sql server.
+    # ## Please note, that dask-sql uses the presto protocol.
+    # # options='{"url": "presto://localhost:8080/catalog/default"}'
 
     # [[[clickhouse]]]
-    #   name=ClickHouse
-    #   interface=jdbc
-    #   ## Specific options for connecting to the ClickHouse server.
-    #   ## The JDBC driver clickhouse-jdbc.jar and its related jars need to be in the CLASSPATH environment variable.
-    #   options='{"url": "jdbc:clickhouse://localhost:8123", "driver": "ru.yandex.clickhouse.ClickHouseDriver", "user": "readonly", "password": ""}'
+    # name=ClickHouse
+    # interface=sqlalchemy
+    # e.g. clickhouse://user:password@example.com:8124/test?protocol=https
+    # options='{"url": "clickhouse://localhost:8123"}'
 
     # [[[vertica]]]
-    #   name=Vertica
-    #   interface=jdbc
-    #   ## Specific options for connecting to a Vertica server.
-    #   ## The JDBC driver vertica-jdbc-*.jar and its related jars need to be in the CLASSPATH environment variable.
-    #   ## If 'user' and 'password' are omitted, they will be prompted in the UI.
-    #   options='{"url": "jdbc:vertica://localhost:5434", "driver": "com.vertica.jdbc.Driver"}'
+    # name=Vertica
+    # interface=jdbc
+    # ## Specific options for connecting to a Vertica server.
+    # ## The JDBC driver vertica-jdbc-*.jar and its related jars need to be in the CLASSPATH environment variable.
+    # ## If 'user' and 'password' are omitted, they will be prompted in the UI.
+    # options='{"url": "jdbc:vertica://localhost:5434", "driver": "com.vertica.jdbc.Driver"}'
+
+    ## Define which query and table examples can be automatically setup for the available dialects.
+    # [[examples]]
+    ## If installing the examples automatically at startup.
+    # auto_load=false
+    ## If automatically loading the dialect example at Editor opening.
+    # auto_open=false
+    ## Names of the saved queries to install. All if empty.
+    # queries=
+    ## Names of the tables to install. All if empty.
+    # tables=
 
 
 ###########################################################################
@@ -1097,6 +1152,9 @@
 
       # Directory of the Hadoop configuration
       ## hadoop_conf_dir=$HADOOP_CONF_DIR when set or '/etc/hadoop/conf'
+
+      # Whether Hue should list this HDFS cluster. For historical reason there is no way to disable HDFS.
+      ## is_enabled=true
 
   # Configuration for YARN (MR2)
   # ------------------------------------------------------------------------
@@ -1286,6 +1344,8 @@
   # Flag to force all metadata calls (e.g. list tables, table or column details...) to happen via HiveServer2 if available instead of Impala.
   ## force_hs2_metadata=false
 
+  # Choose whether to show the table ERD component. Default false
+  ## show_table_erd=false
 
 ###########################################################################
 # Settings to configure Impala
@@ -1297,6 +1357,10 @@
 
   # Port of the Impala Server
   ## server_port=21050
+
+  # Endpoint of the Impala Proxy Server, for example: '/endpoint'
+  # Note that SERVER_PORT will be used when set.
+  ## proxy_endpoint=
 
   # URL of the Impala Coordinator Server.
   ## coordinator_url=localhost:25000
@@ -1333,11 +1397,13 @@
   ## auth_password=
 
   # Username and password for Impala Daemon Web interface for getting Impala queries in JobBrowser
-  # Set when webserver_htpassword_user and webserver_htpassword_password are set for Impala
   ## daemon_api_username=
   ## daemon_api_password=
   # Execute this script to produce the password to avoid entering in clear text
   ## daemon_api_password_script=
+  # Set to 'digest' when webserver_htpassword_user and webserver_htpassword_password are set for Impala, or set to
+  # 'basic' if webserver_require_ldap is set
+  ## daemon_api_auth_scheme=digest
 
   # A comma-separated list of white-listed Impala configuration properties that users are authorized to set.
   ## config_whitelist=debug_action,explain_level,mem_limit,optimize_partition_key_scans,query_timeout_s,request_pool
@@ -1347,6 +1413,9 @@
 
   # Use SASL framework to establish connection to host.
   ## use_sasl=true
+
+  # Use Thrift over HTTP for the transport mode.
+  ## use_thrift_http=false
 
   [[ssl]]
     # SSL communication enabled for this server.
@@ -1439,6 +1508,9 @@
 
   # Redirect client to WebHdfs or S3 for file download. Note: Turning this on will override notebook/redirect_whitelist for user selected file downloads on WebHdfs & S3.
   ## redirect_download=false
+
+  # Optionally set this if you want a different home directory path. e.g. s3a://gethue.
+  ## remote_storage_home=s3a://gethue
 
 
 ###########################################################################
@@ -1602,9 +1674,18 @@
   # Show the Impala query section for listing and showing more troubleshooting information.
   ## enable_query_browser=true
 
-  # Show the Hive query section for listing and showing more troubleshooting information.
+  # Show the Hive section for listing the query history and providing more troubleshooting information.
   ## enable_hive_query_browser=false
 
+  # Show the Queries section for listing Hive/Impala query history and providing more troubleshooting information.
+  ## enable_queries_list=false
+
+  # Use the proxy API instead of the ORM to access the query_store.
+  ## use_proxy=true
+
+  [[query_store]]
+    # URL of Query Store API server.
+    ##server_url=http://localhost:8080/
 
 ###########################################################################
 # Settings to configure Sentry / Security App.
@@ -1649,6 +1730,9 @@
 [useradmin]
   # Default home directory permissions
   ## home_dir_permissions=0755
+
+  # Disable to use umask from hdfs else new user home directory would be created with the permissions from home_dir_permissions
+  ## use_home_dir_permissions=true
 
   # The name of the default user group that users will be a member of
   ## default_user_group=default
@@ -1886,6 +1970,9 @@
   # Signed certificate to send along with encrypted metadata.
   ## cert_file=
 
+  # If your computer and another computer that you are communicating with are not in synch regarding the computer clock, then here you can state how big a difference you are prepared to accept in milliseconds.
+  ## accepted_time_diff=0
+
   # Path to a file containing the password private key.
   ## key_file_password=/path/key
 
@@ -1912,6 +1999,12 @@
 
   # Performs the logout or not.
   ## logout_enabled=true
+
+  # Comma separated list of group names which are all required to complete the authentication. e.g. admin,sales.
+  ## required_groups=
+
+  # Name of the SAML attribute containing the list of groups the user belongs to.
+  ## required_groups_attribute=groups
 
 
 ###########################################################################

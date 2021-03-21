@@ -289,8 +289,8 @@ ${ layout.menubar(section='sla', dashboard=True) }
       }
     });
 
-    if (window.location.getParameter('id') !== '') {
-      $("input[name='job_name']").val(window.location.getParameter('id').replace(/(<([^>]+)>)/ig, ""));
+    if (hueUtils.getParameter('id') !== '') {
+      $("input[name='job_name']").val(hueUtils.getParameter('id').replace(/(<([^>]+)>)/ig, ""));
       slaVM.performSearch();
     }
   });

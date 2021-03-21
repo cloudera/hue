@@ -16,7 +16,6 @@
 # limitations under the License.
 
 from builtins import str
-import json
 import logging
 
 from django.utils.translation import ugettext as _
@@ -24,8 +23,7 @@ from django.utils.translation import ugettext as _
 from desktop import appmanager
 from desktop.auth.backend import is_hue_admin
 from desktop.auth.decorators import admin_required
-from desktop.lib.django_util import JsonResponse, render, login_notrequired
-from desktop.log.access import access_log_level
+from desktop.lib.django_util import JsonResponse, render
 from desktop.models import Settings, hue_version
 from desktop.views import collect_usage
 

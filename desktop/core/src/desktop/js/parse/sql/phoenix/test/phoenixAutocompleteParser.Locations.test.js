@@ -19,13 +19,13 @@ import phoenixAutocompleteParser from '../phoenixAutocompleteParser';
 // prettier-ignore-start
 describe('phoenixAutocompleteParser.js locations', () => {
   beforeAll(() => {
-    phoenixAutocompleteParser.yy.parseError = function(msg) {
+    phoenixAutocompleteParser.yy.parseError = function (msg) {
       throw Error(msg);
     };
   });
 
   const assertAutoComplete = testDefinition => {
-    const debug = true;
+    const debug = false;
     expect(
       phoenixAutocompleteParser.parseSql(
         testDefinition.beforeCursor,
@@ -35,7 +35,7 @@ describe('phoenixAutocompleteParser.js locations', () => {
     ).toEqualDefinition(testDefinition);
   };
 
-  const assertLocations = function(options) {
+  const assertLocations = function (options) {
     assertAutoComplete({
       beforeCursor: options.beforeCursor,
       afterCursor: options.afterCursor || '',
@@ -63,6 +63,73 @@ describe('phoenixAutocompleteParser.js locations', () => {
           type: 'function',
           location: { first_line: 1, last_line: 1, first_column: 8, last_column: 10 },
           function: 'cos'
+        },
+        {
+          type: 'functionArgument',
+          location: { first_line: 1, last_line: 1, first_column: 12, last_column: 13 },
+          function: 'cos',
+          argumentPosition: 0,
+          identifierChain: [{ name: 'cos' }],
+          expression: { types: ['NUMBER'], text: '1' }
+        },
+        {
+          type: 'alias',
+          source: 'column',
+          alias: 'foo',
+          location: { first_line: 1, last_line: 1, first_column: 18, last_column: 21 },
+          parentLocation: { first_line: 1, last_line: 1, first_column: 8, last_column: 14 }
+        },
+        {
+          type: 'table',
+          location: { first_line: 1, last_line: 1, first_column: 27, last_column: 36 },
+          identifierChain: [{ name: 'customers' }]
+        },
+        {
+          type: 'whereClause',
+          missing: true,
+          location: { first_line: 1, last_line: 1, first_column: 36, last_column: 36 }
+        },
+        {
+          type: 'alias',
+          location: { first_line: 1, last_line: 1, first_column: 46, last_column: 49 },
+          alias: 'foo',
+          source: 'column',
+          parentLocation: { first_line: 1, last_line: 1, first_column: 8, last_column: 14 }
+        },
+        {
+          type: 'limitClause',
+          missing: true,
+          location: { first_line: 1, last_line: 1, first_column: 49, last_column: 49 }
+        }
+      ]
+    });
+  });
+
+  it('should report locations for "select cos(1) as foo from customers order by foo;"', () => {
+    assertLocations({
+      beforeCursor: 'select cos(1) as foo from "customers" order by foo; ',
+      expectedLocations: [
+        {
+          type: 'statement',
+          location: { first_line: 1, last_line: 1, first_column: 1, last_column: 49 }
+        },
+        {
+          type: 'selectList',
+          missing: false,
+          location: { first_line: 1, last_line: 1, first_column: 8, last_column: 21 }
+        },
+        {
+          type: 'function',
+          location: { first_line: 1, last_line: 1, first_column: 8, last_column: 10 },
+          function: 'cos'
+        },
+        {
+          type: 'functionArgument',
+          location: { first_line: 1, last_line: 1, first_column: 12, last_column: 13 },
+          function: 'cos',
+          argumentPosition: 0,
+          identifierChain: [{ name: 'cos' }],
+          expression: { types: ['NUMBER'], text: '1' }
         },
         {
           type: 'alias',
@@ -1039,6 +1106,14 @@ describe('phoenixAutocompleteParser.js locations', () => {
             function: 'cos'
           },
           {
+            type: 'functionArgument',
+            location: { first_line: 1, last_line: 1, first_column: 17, last_column: 22 },
+            function: 'cos',
+            argumentPosition: 0,
+            identifierChain: [{ name: 'cos' }],
+            expression: { types: ['COLREF'], columnReference: [{ name: 'boo' }, { name: 'a' }] }
+          },
+          {
             type: 'table',
             location: { first_line: 1, last_line: 1, first_column: 17, last_column: 20 },
             identifierChain: [{ name: 'db1' }, { name: 'foo' }]
@@ -1279,6 +1354,14 @@ describe('phoenixAutocompleteParser.js locations', () => {
           type: 'function',
           location: { first_line: 1, last_line: 1, first_column: 8, last_column: 12 },
           function: 'count'
+        },
+        {
+          type: 'functionArgument',
+          location: { first_line: 1, last_line: 1, first_column: 14, last_column: 15 },
+          function: 'count',
+          argumentPosition: 0,
+          identifierChain: [{ name: 'count' }],
+          expression: { text: '*' }
         },
         {
           type: 'table',

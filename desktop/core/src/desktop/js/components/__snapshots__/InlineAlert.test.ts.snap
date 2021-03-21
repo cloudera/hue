@@ -1,0 +1,73 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`InlineAlert.vue should render 1`] = `
+<div
+  class="inline-alert ea-success"
+>
+  <!--v-if-->
+  <em
+    class="fa alert-icon alert-color fa-check-circle"
+  />
+  <div
+    class="inline-alert-title"
+  >
+    Success!
+  </div>
+  <span
+    class="inline-alert-message"
+  >
+    Test Message
+  </span>
+  <!--v-if-->
+</div>
+`;
+
+exports[`InlineAlert.vue should render with more-less button 1`] = `
+<div
+  class="inline-alert ea-success"
+>
+  <!--v-if-->
+  <em
+    class="fa alert-icon alert-color fa-check-circle"
+  />
+  <div
+    class="inline-alert-title"
+  >
+    Success!
+  </div>
+  <span
+    class="inline-alert-message"
+  >
+    Test Message
+  </span>
+  <a
+    class="more-less-button"
+  >
+    More details
+  </a>
+</div>
+`;
+
+exports[`InlineAlert.vue show close 1`] = `
+<div
+  class="inline-alert ea-success"
+>
+  <em
+    class="inline-alert-close fa fa-times alert-color"
+  />
+  <em
+    class="fa alert-icon alert-color fa-check-circle"
+  />
+  <div
+    class="inline-alert-title"
+  >
+    Success!
+  </div>
+  <span
+    class="inline-alert-message"
+  >
+    Test Message
+  </span>
+  <!--v-if-->
+</div>
+`;

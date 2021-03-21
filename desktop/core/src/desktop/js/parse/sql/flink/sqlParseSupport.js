@@ -14,51 +14,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { SqlFunctions } from 'sql/sqlFunctions';
-import stringDistance from 'sql/stringDistance';
+import { matchesType } from 'sql/reference/typeUtils';
+import {
+  initSharedAutocomplete,
+  initSyntaxParser,
+  identifierEquals,
+  equalIgnoreCase,
+  SIMPLE_TABLE_REF_SUGGESTIONS
+} from 'parse/sql/sqlParseUtils';
 
-const identifierEquals = (a, b) =>
-  a &&
-  b &&
-  a
-    .replace(/^\s*`/, '')
-    .replace(/`\s*$/, '')
-    .toLowerCase() ===
-    b
-      .replace(/^\s*`/, '')
-      .replace(/`\s*$/, '')
-      .toLowerCase();
+const initSqlParser = function (parser) {
+  initSharedAutocomplete(parser);
 
-// endsWith polyfill from hue_utils.js, needed as workers live in their own js environment
-if (!String.prototype.endsWith) {
-  String.prototype.endsWith = function(searchString, position) {
-    const subjectString = this.toString();
-    if (
-      typeof position !== 'number' ||
-      !isFinite(position) ||
-      Math.floor(position) !== position ||
-      position > subjectString.length
-    ) {
-      position = subjectString.length;
-    }
-    position -= searchString.length;
-    const lastIndex = subjectString.lastIndexOf(searchString, position);
-    return lastIndex !== -1 && lastIndex === position;
-  };
-}
-
-const equalIgnoreCase = (a, b) => a && b && a.toLowerCase() === b.toLowerCase();
-
-const SIMPLE_TABLE_REF_SUGGESTIONS = [
-  'suggestJoinConditions',
-  'suggestAggregateFunctions',
-  'suggestFilters',
-  'suggestGroupBys',
-  'suggestOrderBys'
-];
-
-const initSqlParser = function(parser) {
-  parser.prepareNewStatement = function() {
+  parser.prepareNewStatement = function () {
     linkTablePrimaries();
     parser.commitLocations();
 
@@ -71,21 +39,21 @@ const initSqlParser = function(parser) {
     prioritizeSuggestions();
   };
 
-  parser.yy.parseError = function(message, error) {
+  parser.yy.parseError = function (message, error) {
     parser.yy.errors.push(error);
     return message;
   };
 
-  parser.addCommonTableExpressions = function(identifiers) {
+  parser.addCommonTableExpressions = function (identifiers) {
     parser.yy.result.commonTableExpressions = identifiers;
     parser.yy.latestCommonTableExpressions = identifiers;
   };
 
-  parser.isInSubquery = function() {
+  parser.isInSubquery = function () {
     return !!parser.yy.primariesStack.length;
   };
 
-  parser.pushQueryState = function() {
+  parser.pushQueryState = function () {
     parser.yy.resultStack.push(parser.yy.result);
     parser.yy.locationsStack.push(parser.yy.locations);
     parser.yy.selectListAliasesStack.push(parser.yy.selectListAliases);
@@ -105,7 +73,7 @@ const initSqlParser = function(parser) {
     }
   };
 
-  parser.popQueryState = function(subQuery) {
+  parser.popQueryState = function (subQuery) {
     linkTablePrimaries();
     parser.commitLocations();
 
@@ -128,7 +96,7 @@ const initSqlParser = function(parser) {
     parser.yy.selectListAliases = parser.yy.selectListAliasesStack.pop();
   };
 
-  parser.suggestSelectListAliases = function() {
+  parser.suggestSelectListAliases = function () {
     if (
       parser.yy.selectListAliases &&
       parser.yy.selectListAliases.length > 0 &&
@@ -140,7 +108,7 @@ const initSqlParser = function(parser) {
     }
   };
 
-  parser.mergeSuggestKeywords = function() {
+  parser.mergeSuggestKeywords = function () {
     let result = [];
     Array.prototype.slice.call(arguments).forEach(suggestion => {
       if (typeof suggestion !== 'undefined' && typeof suggestion.suggestKeywords !== 'undefined') {
@@ -153,7 +121,7 @@ const initSqlParser = function(parser) {
     return {};
   };
 
-  parser.suggestValueExpressionKeywords = function(valueExpression, extras) {
+  parser.suggestValueExpressionKeywords = function (valueExpression, extras) {
     const expressionKeywords = parser.getValueExpressionKeywords(valueExpression, extras);
     parser.suggestKeywords(expressionKeywords.suggestKeywords);
     if (expressionKeywords.suggestColRefKeywords) {
@@ -166,7 +134,7 @@ const initSqlParser = function(parser) {
     }
   };
 
-  parser.getSelectListKeywords = function(excludeAsterisk) {
+  parser.getSelectListKeywords = function (excludeAsterisk) {
     const keywords = [{ value: 'CASE', weight: 450 }, 'FALSE', 'TRUE', 'NULL'];
     if (!excludeAsterisk) {
       keywords.push({ value: '*', weight: 10000 });
@@ -174,7 +142,7 @@ const initSqlParser = function(parser) {
     return keywords;
   };
 
-  parser.getValueExpressionKeywords = function(valueExpression, extras) {
+  parser.getValueExpressionKeywords = function (valueExpression, extras) {
     const types = valueExpression.lastType ? valueExpression.lastType.types : valueExpression.types;
     // We could have valueExpression.columnReference to suggest based on column type
     let keywords = [
@@ -212,28 +180,19 @@ const initSqlParser = function(parser) {
         }
       };
     }
-    if (
-      typeof SqlFunctions === 'undefined' ||
-      SqlFunctions.matchesType(parser.yy.activeDialect, ['BOOLEAN'], types)
-    ) {
+    if (matchesType(parser.yy.activeDialect, ['BOOLEAN'], types)) {
       keywords = keywords.concat(['AND', 'OR']);
     }
-    if (
-      typeof SqlFunctions === 'undefined' ||
-      SqlFunctions.matchesType(parser.yy.activeDialect, ['NUMBER'], types)
-    ) {
+    if (matchesType(parser.yy.activeDialect, ['NUMBER'], types)) {
       keywords = keywords.concat(['+', '-', '*', '/', '%', 'DIV']);
     }
-    if (
-      typeof SqlFunctions === 'undefined' ||
-      SqlFunctions.matchesType(parser.yy.activeDialect, ['STRING'], types)
-    ) {
+    if (matchesType(parser.yy.activeDialect, ['STRING'], types)) {
       keywords = keywords.concat(['LIKE', 'NOT LIKE', 'REGEXP', 'RLIKE']);
     }
     return { suggestKeywords: keywords };
   };
 
-  parser.getTypeKeywords = function() {
+  parser.getTypeKeywords = function () {
     return [
       'BIGINT',
       'BOOLEAN',
@@ -250,21 +209,24 @@ const initSqlParser = function(parser) {
     ];
   };
 
-  parser.getColumnDataTypeKeywords = function() {
+  parser.getColumnDataTypeKeywords = function () {
     return parser.getTypeKeywords();
   };
 
-  parser.addColRefIfExists = function(valueExpression) {
+  parser.addColRefIfExists = function (valueExpression) {
     if (valueExpression.columnReference) {
       parser.yy.result.colRef = { identifierChain: valueExpression.columnReference };
     }
   };
 
-  parser.selectListNoTableSuggest = function(selectListEdit, hasDistinctOrAll) {
+  parser.selectListNoTableSuggest = function (selectListEdit, hasDistinctOrAll) {
     if (selectListEdit.cursorAtStart) {
       let keywords = parser.getSelectListKeywords();
       if (!hasDistinctOrAll) {
-        keywords = keywords.concat([{ value: 'ALL', weight: 2 }, { value: 'DISTINCT', weight: 2 }]);
+        keywords = keywords.concat([
+          { value: 'ALL', weight: 2 },
+          { value: 'DISTINCT', weight: 2 }
+        ]);
       }
       parser.suggestKeywords(keywords);
     } else {
@@ -285,52 +247,18 @@ const initSqlParser = function(parser) {
     }
   };
 
-  parser.suggestJoinConditions = function(details) {
+  parser.suggestJoinConditions = function (details) {
     parser.yy.result.suggestJoinConditions = details || {};
     if (parser.yy.latestTablePrimaries && !parser.yy.result.suggestJoinConditions.tablePrimaries) {
       parser.yy.result.suggestJoinConditions.tablePrimaries = parser.yy.latestTablePrimaries.concat();
     }
   };
 
-  parser.suggestJoins = function(details) {
+  parser.suggestJoins = function (details) {
     parser.yy.result.suggestJoins = details || {};
   };
 
-  parser.valueExpressionSuggest = function(oppositeValueExpression, operator) {
-    if (oppositeValueExpression && oppositeValueExpression.columnReference) {
-      parser.suggestValues();
-      parser.yy.result.colRef = { identifierChain: oppositeValueExpression.columnReference };
-    }
-    parser.suggestColumns();
-    parser.suggestFunctions();
-    let keywords = [
-      { value: 'CASE', weight: 450 },
-      { value: 'FALSE', weight: 450 },
-      { value: 'NULL', weight: 450 },
-      { value: 'TRUE', weight: 450 }
-    ];
-    if (typeof oppositeValueExpression === 'undefined' || typeof operator === 'undefined') {
-      keywords = keywords.concat(['EXISTS', 'NOT']);
-    }
-    if (oppositeValueExpression && oppositeValueExpression.types[0] === 'NUMBER') {
-      parser.applyTypeToSuggestions(['NUMBER']);
-    }
-    parser.suggestKeywords(keywords);
-  };
-
-  parser.applyTypeToSuggestions = function(types) {
-    if (types[0] === 'BOOLEAN') {
-      return;
-    }
-    if (parser.yy.result.suggestFunctions && !parser.yy.result.suggestFunctions.types) {
-      parser.yy.result.suggestFunctions.types = types;
-    }
-    if (parser.yy.result.suggestColumns && !parser.yy.result.suggestColumns.types) {
-      parser.yy.result.suggestColumns.types = types;
-    }
-  };
-
-  parser.findCaseType = function(whenThenList) {
+  parser.findCaseType = function (whenThenList) {
     const types = {};
     whenThenList.caseTypes.forEach(valueExpression => {
       valueExpression.types.forEach(type => {
@@ -343,34 +271,16 @@ const initSqlParser = function(parser) {
     return { types: ['T'] };
   };
 
-  parser.findReturnTypes = function(functionName) {
-    return typeof SqlFunctions === 'undefined'
-      ? ['T']
-      : SqlFunctions.getReturnTypes(parser.yy.activeDialect, functionName.toLowerCase());
-  };
-
-  parser.applyArgumentTypesToSuggestions = function(functionName, position) {
-    const foundArguments =
-      typeof SqlFunctions === 'undefined'
-        ? ['T']
-        : SqlFunctions.getArgumentTypes(
-            parser.yy.activeDialect,
-            functionName.toLowerCase(),
-            position
-          );
-    if (foundArguments.length === 0 && parser.yy.result.suggestColumns) {
-      delete parser.yy.result.suggestColumns;
-      delete parser.yy.result.suggestKeyValues;
-      delete parser.yy.result.suggestValues;
-      delete parser.yy.result.suggestFunctions;
-      delete parser.yy.result.suggestIdentifiers;
-      delete parser.yy.result.suggestKeywords;
-    } else {
-      parser.applyTypeToSuggestions(foundArguments);
+  parser.applyArgumentTypesToSuggestions = function (functionName, position) {
+    if (parser.yy.result.suggestFunctions || parser.yy.result.suggestColumns) {
+      parser.yy.result.udfArgument = {
+        name: functionName.toLowerCase(),
+        position: position
+      };
     }
   };
 
-  parser.commitLocations = function() {
+  parser.commitLocations = function () {
     if (parser.yy.locations.length === 0) {
       return;
     }
@@ -591,7 +501,7 @@ const initSqlParser = function(parser) {
     }
   };
 
-  const prioritizeSuggestions = function() {
+  const prioritizeSuggestions = function () {
     parser.yy.result.lowerCase = parser.yy.lowerCase || false;
 
     const cteIndex = {};
@@ -735,7 +645,7 @@ const initSqlParser = function(parser) {
     }
   };
 
-  parser.identifyPartials = function(beforeCursor, afterCursor) {
+  parser.identifyPartials = function (beforeCursor, afterCursor) {
     const beforeMatch = beforeCursor.match(/[0-9a-zA-Z_]*$/);
     const afterMatch = afterCursor.match(/^[0-9a-zA-Z_]*(?:\((?:[^)]*\))?)?/);
     return {
@@ -744,7 +654,7 @@ const initSqlParser = function(parser) {
     };
   };
 
-  const addCleanTablePrimary = function(tables, tablePrimary) {
+  const addCleanTablePrimary = function (tables, tablePrimary) {
     if (tablePrimary.alias) {
       tables.push({ alias: tablePrimary.alias, identifierChain: tablePrimary.identifierChain });
     } else {
@@ -752,7 +662,7 @@ const initSqlParser = function(parser) {
     }
   };
 
-  parser.expandIdentifierChain = function(options) {
+  parser.expandIdentifierChain = function (options) {
     const wrapper = options.wrapper;
     const anyOwner = options.anyOwner;
     const isColumnWrapper = options.isColumnWrapper;
@@ -917,7 +827,7 @@ const initSqlParser = function(parser) {
     wrapper.linked = true;
   };
 
-  const filterTablePrimariesForOwner = function(tablePrimaries, owner) {
+  const filterTablePrimariesForOwner = function (tablePrimaries, owner) {
     const result = [];
     tablePrimaries.forEach(primary => {
       if (typeof owner === 'undefined' && typeof primary.owner === 'undefined') {
@@ -929,7 +839,7 @@ const initSqlParser = function(parser) {
     return result;
   };
 
-  const convertTablePrimariesToSuggestions = function(tablePrimaries) {
+  const convertTablePrimariesToSuggestions = function (tablePrimaries) {
     const tables = [];
     const identifiers = [];
     tablePrimaries.forEach(tablePrimary => {
@@ -972,7 +882,7 @@ const initSqlParser = function(parser) {
     parser.yy.result.suggestColumns.linked = true;
   };
 
-  const linkTablePrimaries = function() {
+  const linkTablePrimaries = function () {
     if (!parser.yy.cursorFound || typeof parser.yy.latestTablePrimaries === 'undefined') {
       return;
     }
@@ -1062,42 +972,14 @@ const initSqlParser = function(parser) {
     }
   };
 
-  parser.getSubQuery = function(cols) {
-    const columns = [];
-    cols.selectList.forEach(col => {
-      const result = {};
-      if (col.alias) {
-        result.alias = col.alias;
-      }
-      if (col.valueExpression && col.valueExpression.columnReference) {
-        result.identifierChain = col.valueExpression.columnReference;
-      } else if (col.asterisk) {
-        result.identifierChain = [{ asterisk: true }];
-      }
-      if (
-        col.valueExpression &&
-        col.valueExpression.types &&
-        col.valueExpression.types.length === 1
-      ) {
-        result.type = col.valueExpression.types[0];
-      }
-
-      columns.push(result);
-    });
-
-    return {
-      columns: columns
-    };
-  };
-
-  parser.addTablePrimary = function(ref) {
+  parser.addTablePrimary = function (ref) {
     if (typeof parser.yy.latestTablePrimaries === 'undefined') {
       parser.yy.latestTablePrimaries = [];
     }
     parser.yy.latestTablePrimaries.push(ref);
   };
 
-  parser.suggestFileFormats = function() {
+  parser.suggestFileFormats = function () {
     parser.suggestKeywords([
       'AVRO',
       'KUDU',
@@ -1109,7 +991,7 @@ const initSqlParser = function(parser) {
     ]);
   };
 
-  parser.getKeywordsForOptionalsLR = function(optionals, keywords, override) {
+  parser.getKeywordsForOptionalsLR = function (optionals, keywords, override) {
     let result = [];
 
     for (let i = 0; i < optionals.length; i++) {
@@ -1126,7 +1008,7 @@ const initSqlParser = function(parser) {
     return result;
   };
 
-  parser.suggestDdlAndDmlKeywords = function(extraKeywords) {
+  parser.suggestDdlAndDmlKeywords = function (extraKeywords) {
     let keywords = [
       'ALTER',
       'CREATE',
@@ -1151,7 +1033,7 @@ const initSqlParser = function(parser) {
     parser.suggestKeywords(keywords);
   };
 
-  parser.checkForSelectListKeywords = function(selectList) {
+  parser.checkForSelectListKeywords = function (selectList) {
     if (selectList.length === 0) {
       return;
     }
@@ -1179,7 +1061,7 @@ const initSqlParser = function(parser) {
     }
   };
 
-  parser.checkForKeywords = function(expression) {
+  parser.checkForKeywords = function (expression) {
     if (expression) {
       if (expression.suggestKeywords && expression.suggestKeywords.length > 0) {
         parser.suggestKeywords(expression.suggestKeywords);
@@ -1191,7 +1073,7 @@ const initSqlParser = function(parser) {
     }
   };
 
-  parser.createWeightedKeywords = function(keywords, weight) {
+  parser.createWeightedKeywords = function (keywords, weight) {
     const result = [];
     keywords.forEach(keyword => {
       if (typeof keyword.weight !== 'undefined') {
@@ -1204,7 +1086,7 @@ const initSqlParser = function(parser) {
     return result;
   };
 
-  parser.suggestKeywords = function(keywords) {
+  parser.suggestKeywords = function (keywords) {
     const weightedKeywords = [];
     if (keywords.length === 0) {
       return;
@@ -1225,11 +1107,11 @@ const initSqlParser = function(parser) {
     parser.yy.result.suggestKeywords = weightedKeywords;
   };
 
-  parser.suggestColRefKeywords = function(colRefKeywords) {
+  parser.suggestColRefKeywords = function (colRefKeywords) {
     parser.yy.result.suggestColRefKeywords = colRefKeywords;
   };
 
-  parser.suggestTablesOrColumns = function(identifier) {
+  parser.suggestTablesOrColumns = function (identifier) {
     if (typeof parser.yy.latestTablePrimaries == 'undefined') {
       parser.suggestTables({ identifierChain: [{ name: identifier }] });
       return;
@@ -1244,11 +1126,11 @@ const initSqlParser = function(parser) {
     }
   };
 
-  parser.suggestFunctions = function(details) {
+  parser.suggestFunctions = function (details) {
     parser.yy.result.suggestFunctions = details || {};
   };
 
-  parser.suggestAggregateFunctions = function() {
+  parser.suggestAggregateFunctions = function () {
     const primaries = [];
     const aliases = {};
     parser.yy.latestTablePrimaries.forEach(primary => {
@@ -1267,19 +1149,19 @@ const initSqlParser = function(parser) {
     parser.yy.result.suggestAggregateFunctions = { tablePrimaries: primaries };
   };
 
-  parser.suggestAnalyticFunctions = function() {
+  parser.suggestAnalyticFunctions = function () {
     parser.yy.result.suggestAnalyticFunctions = true;
   };
 
-  parser.suggestSetOptions = function() {
+  parser.suggestSetOptions = function () {
     parser.yy.result.suggestSetOptions = true;
   };
 
-  parser.suggestIdentifiers = function(identifiers) {
+  parser.suggestIdentifiers = function (identifiers) {
     parser.yy.result.suggestIdentifiers = identifiers;
   };
 
-  parser.suggestColumns = function(details) {
+  parser.suggestColumns = function (details) {
     if (typeof details === 'undefined') {
       details = { identifierChain: [] };
     } else if (typeof details.identifierChain === 'undefined') {
@@ -1288,101 +1170,27 @@ const initSqlParser = function(parser) {
     parser.yy.result.suggestColumns = details;
   };
 
-  parser.suggestGroupBys = function(details) {
+  parser.suggestGroupBys = function (details) {
     parser.yy.result.suggestGroupBys = details || {};
   };
 
-  parser.suggestOrderBys = function(details) {
+  parser.suggestOrderBys = function (details) {
     parser.yy.result.suggestOrderBys = details || {};
   };
 
-  parser.suggestFilters = function(details) {
+  parser.suggestFilters = function (details) {
     parser.yy.result.suggestFilters = details || {};
   };
 
-  parser.suggestKeyValues = function(details) {
+  parser.suggestKeyValues = function (details) {
     parser.yy.result.suggestKeyValues = details || {};
   };
 
-  parser.suggestTables = function(details) {
+  parser.suggestTables = function (details) {
     parser.yy.result.suggestTables = details || {};
   };
 
-  const adjustLocationForCursor = function(location) {
-    // columns are 0-based and lines not, so add 1 to cols
-    const newLocation = {
-      first_line: location.first_line,
-      last_line: location.last_line,
-      first_column: location.first_column + 1,
-      last_column: location.last_column + 1
-    };
-    if (parser.yy.cursorFound) {
-      if (
-        parser.yy.cursorFound.first_line === newLocation.first_line &&
-        parser.yy.cursorFound.last_column <= newLocation.first_column
-      ) {
-        let additionalSpace = parser.yy.partialLengths.left + parser.yy.partialLengths.right;
-        additionalSpace -= parser.yy.partialCursor ? 1 : 3; // For some reason the normal cursor eats 3 positions.
-        newLocation.first_column = newLocation.first_column + additionalSpace;
-        newLocation.last_column = newLocation.last_column + additionalSpace;
-      }
-    }
-    return newLocation;
-  };
-
-  parser.addFunctionLocation = function(location, functionName) {
-    // Remove trailing '(' from location
-    const adjustedLocation = {
-      first_line: location.first_line,
-      last_line: location.last_line,
-      first_column: location.first_column,
-      last_column: location.last_column - 1
-    };
-    parser.yy.locations.push({
-      type: 'function',
-      location: adjustLocationForCursor(adjustedLocation),
-      function: functionName.toLowerCase()
-    });
-  };
-
-  parser.addStatementLocation = function(location) {
-    // Don't report lonely cursor as a statement
-    if (
-      location.first_line === location.last_line &&
-      Math.abs(location.last_column - location.first_column) === 1
-    ) {
-      return;
-    }
-    let adjustedLocation;
-    if (
-      parser.yy.cursorFound &&
-      parser.yy.cursorFound.last_line === location.last_line &&
-      parser.yy.cursorFound.first_column >= location.first_column &&
-      parser.yy.cursorFound.last_column <= location.last_column
-    ) {
-      const additionalSpace = parser.yy.partialLengths.left + parser.yy.partialLengths.right;
-      adjustedLocation = {
-        first_line: location.first_line,
-        last_line: location.last_line,
-        first_column: location.first_column + 1,
-        last_column: location.last_column + additionalSpace - (parser.yy.partialCursor ? 0 : 2)
-      };
-    } else {
-      adjustedLocation = {
-        first_line: location.first_line,
-        last_line: location.last_line,
-        first_column: location.first_column + 1,
-        last_column: location.last_column + 1
-      };
-    }
-
-    parser.yy.locations.push({
-      type: 'statement',
-      location: adjustedLocation
-    });
-  };
-
-  parser.firstDefined = function() {
+  parser.firstDefined = function () {
     for (let i = 0; i + 1 < arguments.length; i += 2) {
       if (arguments[i]) {
         return arguments[i + 1];
@@ -1390,296 +1198,7 @@ const initSqlParser = function(parser) {
     }
   };
 
-  parser.addClauseLocation = function(type, precedingLocation, locationIfPresent, isCursor) {
-    let location;
-    if (isCursor) {
-      if (parser.yy.partialLengths.left === 0 && parser.yy.partialLengths.right === 0) {
-        location = {
-          type: type,
-          missing: true,
-          location: adjustLocationForCursor({
-            first_line: precedingLocation.last_line,
-            first_column: precedingLocation.last_column,
-            last_line: precedingLocation.last_line,
-            last_column: precedingLocation.last_column
-          })
-        };
-      } else {
-        location = {
-          type: type,
-          missing: false,
-          location: {
-            first_line: locationIfPresent.last_line,
-            first_column: locationIfPresent.last_column - 1,
-            last_line: locationIfPresent.last_line,
-            last_column:
-              locationIfPresent.last_column -
-              1 +
-              parser.yy.partialLengths.right +
-              parser.yy.partialLengths.left
-          }
-        };
-      }
-    } else {
-      location = {
-        type: type,
-        missing: !locationIfPresent,
-        location: adjustLocationForCursor(
-          locationIfPresent || {
-            first_line: precedingLocation.last_line,
-            first_column: precedingLocation.last_column,
-            last_line: precedingLocation.last_line,
-            last_column: precedingLocation.last_column
-          }
-        )
-      };
-    }
-    if (parser.isInSubquery()) {
-      location.subquery = true;
-    }
-    parser.yy.locations.push(location);
-  };
-
-  parser.addStatementTypeLocation = function(identifier, location, additionalText) {
-    // Don't add if already there except for SELECT
-    if (identifier !== 'SELECT' && parser.yy.allLocations) {
-      for (let i = parser.yy.allLocations.length - 1; i >= 0; i--) {
-        if (parser.yy.allLocations[i] && parser.yy.allLocations[i].type === 'statement') {
-          break;
-        }
-        if (parser.yy.allLocations[i] && parser.yy.allLocations[i].type === 'statementType') {
-          return;
-        }
-      }
-    }
-    const loc = {
-      type: 'statementType',
-      location: adjustLocationForCursor(location),
-      identifier: identifier
-    };
-    if (typeof additionalText !== 'undefined') {
-      switch (identifier) {
-        case 'ALTER':
-          if (/ALTER\s+VIEW/i.test(additionalText)) {
-            loc.identifier = 'ALTER VIEW';
-          } else {
-            loc.identifier = 'ALTER TABLE';
-          }
-          break;
-        case 'COMPUTE':
-          loc.identifier = 'COMPUTE STATS';
-          break;
-        case 'CREATE':
-          if (/CREATE\s+VIEW/i.test(additionalText)) {
-            loc.identifier = 'CREATE VIEW';
-          } else if (/CREATE\s+TABLE/i.test(additionalText)) {
-            loc.identifier = 'CREATE TABLE';
-          } else if (/CREATE\s+DATABASE/i.test(additionalText)) {
-            loc.identifier = 'CREATE DATABASE';
-          } else if (/CREATE\s+ROLE/i.test(additionalText)) {
-            loc.identifier = 'CREATE ROLE';
-          } else if (/CREATE\s+FUNCTION/i.test(additionalText)) {
-            loc.identifier = 'CREATE FUNCTION';
-          } else {
-            loc.identifier = 'CREATE TABLE';
-          }
-          break;
-        case 'DROP':
-          if (/DROP\s+VIEW/i.test(additionalText)) {
-            loc.identifier = 'DROP VIEW';
-          } else if (/DROP\s+TABLE/i.test(additionalText)) {
-            loc.identifier = 'DROP TABLE';
-          } else if (/DROP\s+DATABASE/i.test(additionalText)) {
-            loc.identifier = 'DROP DATABASE';
-          } else if (/DROP\s+ROLE/i.test(additionalText)) {
-            loc.identifier = 'DROP ROLE';
-          } else if (/DROP\s+STATS/i.test(additionalText)) {
-            loc.identifier = 'DROP STATS';
-          } else if (/DROP\s+FUNCTION/i.test(additionalText)) {
-            loc.identifier = 'DROP FUNCTION';
-          } else {
-            loc.identifier = 'DROP TABLE';
-          }
-          break;
-        case 'INVALIDATE':
-          loc.identifier = 'INVALIDATE METADATA';
-          break;
-        case 'LOAD':
-          loc.identifier = 'LOAD DATA';
-          break;
-        case 'TRUNCATE':
-          loc.identifier = 'TRUNCATE TABLE';
-          break;
-        default:
-      }
-    }
-    parser.yy.locations.push(loc);
-  };
-
-  parser.addFileLocation = function(location, path) {
-    parser.yy.locations.push({
-      type: 'file',
-      location: adjustLocationForCursor(location),
-      path: path
-    });
-  };
-
-  parser.addDatabaseLocation = function(location, identifierChain) {
-    parser.yy.locations.push({
-      type: 'database',
-      location: adjustLocationForCursor(location),
-      identifierChain: identifierChain
-    });
-  };
-
-  parser.addTableLocation = function(location, identifierChain) {
-    parser.yy.locations.push({
-      type: 'table',
-      location: adjustLocationForCursor(location),
-      identifierChain: identifierChain
-    });
-  };
-
-  parser.addColumnAliasLocation = function(location, alias, parentLocation) {
-    const aliasLocation = {
-      type: 'alias',
-      source: 'column',
-      alias: alias,
-      location: adjustLocationForCursor(location),
-      parentLocation: adjustLocationForCursor(parentLocation)
-    };
-    if (
-      parser.yy.locations.length &&
-      parser.yy.locations[parser.yy.locations.length - 1].type === 'column'
-    ) {
-      const closestColumn = parser.yy.locations[parser.yy.locations.length - 1];
-      if (
-        closestColumn.location.first_line === aliasLocation.parentLocation.first_line &&
-        closestColumn.location.last_line === aliasLocation.parentLocation.last_line &&
-        closestColumn.location.first_column === aliasLocation.parentLocation.first_column &&
-        closestColumn.location.last_column === aliasLocation.parentLocation.last_column
-      ) {
-        parser.yy.locations[parser.yy.locations.length - 1].alias = alias;
-      }
-    }
-    parser.yy.locations.push(aliasLocation);
-  };
-
-  parser.addTableAliasLocation = function(location, alias, identifierChain) {
-    parser.yy.locations.push({
-      type: 'alias',
-      source: 'table',
-      alias: alias,
-      location: adjustLocationForCursor(location),
-      identifierChain: identifierChain
-    });
-  };
-
-  parser.addSubqueryAliasLocation = function(location, alias) {
-    parser.yy.locations.push({
-      type: 'alias',
-      source: 'subquery',
-      alias: alias,
-      location: adjustLocationForCursor(location)
-    });
-  };
-
-  parser.addAsteriskLocation = function(location, identifierChain) {
-    parser.yy.locations.push({
-      type: 'asterisk',
-      location: adjustLocationForCursor(location),
-      identifierChain: identifierChain
-    });
-  };
-
-  parser.addVariableLocation = function(location, value) {
-    if (/\${[^}]*}/.test(value)) {
-      parser.yy.locations.push({
-        type: 'variable',
-        location: adjustLocationForCursor(location),
-        value: value
-      });
-    }
-  };
-
-  parser.addColumnLocation = function(location, identifierChain) {
-    const isVariable =
-      identifierChain.length && /\${[^}]*}/.test(identifierChain[identifierChain.length - 1].name);
-    if (isVariable) {
-      parser.yy.locations.push({
-        type: 'variable',
-        location: adjustLocationForCursor(location),
-        value: identifierChain[identifierChain.length - 1].name
-      });
-    } else {
-      parser.yy.locations.push({
-        type: 'column',
-        location: adjustLocationForCursor(location),
-        identifierChain: identifierChain,
-        qualified: identifierChain.length > 1
-      });
-    }
-  };
-
-  parser.addCteAliasLocation = function(location, alias) {
-    parser.yy.locations.push({
-      type: 'alias',
-      source: 'cte',
-      alias: alias,
-      location: adjustLocationForCursor(location)
-    });
-  };
-
-  parser.addUnknownLocation = function(location, identifierChain) {
-    const isVariable =
-      identifierChain.length && /\${[^}]*}/.test(identifierChain[identifierChain.length - 1].name);
-    let loc;
-    if (isVariable) {
-      loc = {
-        type: 'variable',
-        location: adjustLocationForCursor(location),
-        value: identifierChain[identifierChain.length - 1].name
-      };
-    } else {
-      loc = {
-        type: 'unknown',
-        location: adjustLocationForCursor(location),
-        identifierChain: identifierChain,
-        qualified: identifierChain.length > 1
-      };
-    }
-    parser.yy.locations.push(loc);
-    return loc;
-  };
-
-  parser.addNewDatabaseLocation = function(location, identifierChain) {
-    parser.yy.definitions.push({
-      type: 'database',
-      location: adjustLocationForCursor(location),
-      identifierChain: identifierChain
-    });
-  };
-
-  parser.addNewTableLocation = function(location, identifierChain, colSpec) {
-    const columns = [];
-    if (colSpec) {
-      colSpec.forEach(col => {
-        columns.push({
-          identifierChain: [col.identifier], // TODO: Complex
-          type: col.type,
-          location: adjustLocationForCursor(col.location)
-        });
-      });
-    }
-    parser.yy.definitions.push({
-      type: 'table',
-      location: adjustLocationForCursor(location),
-      identifierChain: identifierChain,
-      columns: columns
-    });
-  };
-
-  parser.addColRefToVariableIfExists = function(left, right) {
+  parser.addColRefToVariableIfExists = function (left, right) {
     if (
       left &&
       left.columnReference &&
@@ -1689,7 +1208,7 @@ const initSqlParser = function(parser) {
       right.columnReference.length &&
       parser.yy.locations.length > 1
     ) {
-      const addColRefToVariableLocation = function(variableValue, colRef) {
+      const addColRefToVariableLocation = function (variableValue, colRef) {
         // See if colref is actually an alias
         if (colRef.length === 1 && colRef[0].name) {
           parser.yy.locations.some(location => {
@@ -1719,26 +1238,26 @@ const initSqlParser = function(parser) {
     }
   };
 
-  parser.suggestDatabases = function(details) {
+  parser.suggestDatabases = function (details) {
     parser.yy.result.suggestDatabases = details || {};
   };
 
-  parser.suggestHdfs = function(details) {
+  parser.suggestHdfs = function (details) {
     parser.yy.result.suggestHdfs = details || {};
   };
 
-  parser.suggestValues = function(details) {
+  parser.suggestValues = function (details) {
     parser.yy.result.suggestValues = details || {};
   };
 
-  parser.determineCase = function(text) {
+  parser.determineCase = function (text) {
     if (!parser.yy.caseDetermined) {
       parser.yy.lowerCase = text.toLowerCase() === text;
       parser.yy.caseDetermined = true;
     }
   };
 
-  parser.handleQuotedValueWithCursor = function(lexer, yytext, yylloc, quoteChar) {
+  parser.handleQuotedValueWithCursor = function (lexer, yytext, yylloc, quoteChar) {
     if (yytext.indexOf('\u2020') !== -1 || yytext.indexOf('\u2021') !== -1) {
       parser.yy.partialCursor = yytext.indexOf('\u2021') !== -1;
       const cursorIndex = parser.yy.partialCursor
@@ -1771,7 +1290,7 @@ const initSqlParser = function(parser) {
   /**
    * Main parser function
    */
-  parser.parseSql = function(beforeCursor, afterCursor, debug) {
+  parser.parseSql = function (beforeCursor, afterCursor, debug) {
     // Jison counts CRLF as two lines in the locations
     beforeCursor = beforeCursor.replace(/\r\n|\n\r/gm, '\n');
     afterCursor = afterCursor.replace(/\r\n|\n\r/gm, '\n');
@@ -1798,7 +1317,7 @@ const initSqlParser = function(parser) {
     // Fix for parser bug when switching lexer states
     if (!lexerModified) {
       const originalSetInput = parser.lexer.setInput;
-      parser.lexer.setInput = function(input, yy) {
+      parser.lexer.setInput = function (input, yy) {
         return originalSetInput.bind(parser.lexer)(input, yy);
       };
       lexerModified = true;
@@ -1938,280 +1457,6 @@ const initSqlParser = function(parser) {
     });
 
     return result;
-  };
-};
-
-const SYNTAX_PARSER_NOOP_FUNCTIONS = [
-  'addAsteriskLocation',
-  'addClauseLocation',
-  'addColRefIfExists',
-  'addColRefToVariableIfExists',
-  'addColumnAliasLocation',
-  'addColumnLocation',
-  'addCommonTableExpressions',
-  'addCteAliasLocation',
-  'addDatabaseLocation',
-  'addFileLocation',
-  'addFunctionLocation',
-  'addNewDatabaseLocation',
-  'addNewTableLocation',
-  'addStatementLocation',
-  'addStatementTypeLocation',
-  'addSubqueryAliasLocation',
-  'addTableAliasLocation',
-  'addTableLocation',
-  'addTablePrimary',
-  'addUnknownLocation',
-  'addVariableLocation',
-  'applyArgumentTypesToSuggestions',
-  'applyTypeToSuggestions',
-  'checkForKeywords',
-  'checkForSelectListKeywords',
-  'commitLocations',
-  'firstDefined',
-  'getSelectListKeywords',
-  'getSubQuery',
-  'getValueExpressionKeywords',
-  'identifyPartials',
-  'popQueryState',
-  'prepareNewStatement',
-  'pushQueryState',
-  'selectListNoTableSuggest',
-  'suggestAggregateFunctions',
-  'suggestAnalyticFunctions',
-  'suggestColRefKeywords',
-  'suggestColumns',
-  'suggestDatabases',
-  'suggestDdlAndDmlKeywords',
-  'suggestFileFormats',
-  'suggestFilters',
-  'suggestFunctions',
-  'suggestGroupBys',
-  'suggestHdfs',
-  'suggestIdentifiers',
-  'suggestJoinConditions',
-  'suggestJoins',
-  'suggestKeyValues',
-  'suggestKeywords',
-  'suggestOrderBys',
-  'suggestSelectListAliases',
-  'suggestTables',
-  'suggestTablesOrColumns',
-  'suggestValueExpressionKeywords',
-  'suggestValues',
-  'valueExpressionSuggest'
-];
-
-const SYNTAX_PARSER_NOOP = function() {};
-
-const initSyntaxParser = function(parser) {
-  // Noop functions for compatibility with the autocomplete parser as the grammar is shared
-  SYNTAX_PARSER_NOOP_FUNCTIONS.forEach(noopFn => {
-    parser[noopFn] = SYNTAX_PARSER_NOOP;
-  });
-
-  parser.yy.locations = [{}];
-
-  parser.determineCase = function(text) {
-    if (!parser.yy.caseDetermined) {
-      parser.yy.lowerCase = text.toLowerCase() === text;
-      parser.yy.caseDetermined = true;
-    }
-  };
-
-  parser.getKeywordsForOptionalsLR = function() {
-    return [];
-  };
-
-  parser.mergeSuggestKeywords = function() {
-    return {};
-  };
-
-  parser.getTypeKeywords = function() {
-    return [];
-  };
-
-  parser.getColumnDataTypeKeywords = function() {
-    return [];
-  };
-
-  parser.findCaseType = function() {
-    return { types: ['T'] };
-  };
-
-  parser.findReturnTypes = function() {
-    return ['T'];
-  };
-
-  parser.expandIdentifierChain = function() {
-    return [];
-  };
-
-  parser.createWeightedKeywords = function() {
-    return [];
-  };
-
-  parser.handleQuotedValueWithCursor = function(lexer, yytext, yylloc, quoteChar) {
-    if (yytext.indexOf('\u2020') !== -1 || yytext.indexOf('\u2021') !== -1) {
-      parser.yy.partialCursor = yytext.indexOf('\u2021') !== -1;
-      const cursorIndex = parser.yy.partialCursor
-        ? yytext.indexOf('\u2021')
-        : yytext.indexOf('\u2020');
-      parser.yy.cursorFound = {
-        first_line: yylloc.first_line,
-        last_line: yylloc.last_line,
-        first_column: yylloc.first_column + cursorIndex,
-        last_column: yylloc.first_column + cursorIndex + 1
-      };
-      const remainder = yytext.substring(cursorIndex + 1);
-      const remainingQuotes = (lexer.upcomingInput().match(new RegExp(quoteChar, 'g')) || [])
-        .length;
-      if (remainingQuotes > 0 && (remainingQuotes & 1) !== 0) {
-        parser.yy.missingEndQuote = false;
-        lexer.input();
-      } else {
-        parser.yy.missingEndQuote = true;
-        lexer.unput(remainder);
-      }
-      lexer.popState();
-      return true;
-    }
-    return false;
-  };
-
-  parser.yy.parseError = function(str, hash) {
-    parser.yy.error = hash;
-  };
-
-  const IGNORED_EXPECTED = {
-    ';': true,
-    '.': true,
-    EOF: true,
-    UNSIGNED_INTEGER: true,
-    UNSIGNED_INTEGER_E: true,
-    REGULAR_IDENTIFIER: true,
-    CURSOR: true,
-    PARTIAL_CURSOR: true,
-    HDFS_START_QUOTE: true,
-    HDFS_PATH: true,
-    HDFS_END_QUOTE: true,
-    COMPARISON_OPERATOR: true, // TODO: Expand in results when found
-    ARITHMETIC_OPERATOR: true, // TODO: Expand in results when found
-    VARIABLE_REFERENCE: true,
-    BACKTICK: true,
-    VALUE: true,
-    PARTIAL_VALUE: true,
-    SINGLE_QUOTE: true,
-    DOUBLE_QUOTE: true
-  };
-
-  const CLEAN_EXPECTED = {
-    BETWEEN_AND: 'AND',
-    OVERWRITE_DIRECTORY: 'OVERWRITE',
-    STORED_AS_DIRECTORIES: 'STORED',
-    LIKE_PARQUET: 'LIKE',
-    PARTITION_VALUE: 'PARTITION'
-  };
-
-  parser.parseSyntax = function(beforeCursor, afterCursor, debug) {
-    parser.yy.caseDetermined = false;
-    parser.yy.error = undefined;
-
-    parser.yy.latestTablePrimaries = [];
-    parser.yy.subQueries = [];
-    parser.yy.selectListAliases = [];
-    parser.yy.latestTablePrimaries = [];
-
-    parser.yy.activeDialect = 'generic';
-
-    // TODO: Find a way around throwing an exception when the parser finds a syntax error
-    try {
-      parser.yy.error = false;
-      parser.parse(beforeCursor + afterCursor);
-    } catch (err) {
-      if (debug) {
-        console.warn(err);
-        console.warn(err.stack);
-        console.warn(parser.yy.error);
-      }
-    }
-
-    if (
-      parser.yy.error &&
-      (parser.yy.error.loc.last_column < beforeCursor.length ||
-        !beforeCursor.endsWith(parser.yy.error.text))
-    ) {
-      const weightedExpected = [];
-
-      const addedExpected = {};
-
-      const isLowerCase =
-        (parser.yy.caseDetermined && parser.yy.lowerCase) ||
-        parser.yy.error.text.toLowerCase() === parser.yy.error.text;
-
-      if (
-        parser.yy.error.expected.length === 2 &&
-        parser.yy.error.expected.indexOf("';'") !== -1 &&
-        parser.yy.error.expected.indexOf("'EOF'") !== -1
-      ) {
-        parser.yy.error.expected = [];
-        parser.yy.error.expectedStatementEnd = true;
-        return parser.yy.error;
-      }
-      for (let i = 0; i < parser.yy.error.expected.length; i++) {
-        let expected = parser.yy.error.expected[i];
-        // Strip away the surrounding ' chars
-        expected = expected.substring(1, expected.length - 1);
-        // TODO: Only suggest alphanumeric?
-        if (expected === 'REGULAR_IDENTIFIER') {
-          parser.yy.error.expectedIdentifier = true;
-          if (/^<[a-z]+>/.test(parser.yy.error.token)) {
-            const text = '`' + parser.yy.error.text + '`';
-            weightedExpected.push({
-              text: text,
-              distance: stringDistance(parser.yy.error.text, text, true)
-            });
-            parser.yy.error.possibleReserved = true;
-          }
-        } else if (!IGNORED_EXPECTED[expected] && /[a-z_]+/i.test(expected)) {
-          if (/^<[a-z]+>/.test(expected)) {
-            continue;
-          }
-          expected = CLEAN_EXPECTED[expected] || expected;
-          if (expected === parser.yy.error.text.toUpperCase()) {
-            // Can happen when the lexer entry for a rule contains multiple words like 'stored' in 'stored as parquet'
-            return false;
-          }
-          const text = isLowerCase ? expected.toLowerCase() : expected;
-          if (text && !addedExpected[text]) {
-            addedExpected[text] = true;
-            weightedExpected.push({
-              text: text,
-              distance: stringDistance(parser.yy.error.text, text, true)
-            });
-          }
-        }
-      }
-      if (weightedExpected.length === 0) {
-        parser.yy.error.expected = [];
-        parser.yy.error.incompleteStatement = true;
-        return parser.yy.error;
-      }
-      weightedExpected.sort((a, b) => {
-        if (a.distance === b.distance) {
-          return a.text.localeCompare(b.text);
-        }
-        return a.distance - b.distance;
-      });
-      parser.yy.error.expected = weightedExpected;
-      parser.yy.error.incompleteStatement = true;
-      return parser.yy.error;
-    } else if (parser.yy.error) {
-      parser.yy.error.expected = [];
-      parser.yy.error.incompleteStatement = true;
-      return parser.yy.error;
-    }
-    return false;
   };
 };
 

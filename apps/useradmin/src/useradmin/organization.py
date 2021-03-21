@@ -32,7 +32,7 @@ LOG = logging.getLogger(__name__)
 
 def get_user_request_organization():
   request = CrequestMiddleware.get_request()
-  return request.user.organization if request and hasattr(request, 'user') and request.user.is_authenticated() else None
+  return request.user.organization if request and hasattr(request, 'user') and request.user.is_authenticated else None
 
 
 def _fitered_queryset(queryset, by_owner=False):
@@ -41,7 +41,7 @@ def _fitered_queryset(queryset, by_owner=False):
   # Avoid infinite recursion on very first retrieval of the user
   if ENABLE_ORGANIZATIONS.get() and \
       request and hasattr(request, 'user') and hasattr(request.user, '_wrapped') and type(request.user._wrapped) is not object and \
-      request.user.is_authenticated():
+      request.user.is_authenticated:
     if by_owner:
       filters = {'owner__organization': request.user.organization}
     else:
@@ -53,14 +53,18 @@ def _fitered_queryset(queryset, by_owner=False):
 
 
 def get_organization(email, is_multi_user=False):
-  domain = email.split('@')[1] if is_multi_user else email
-
-  if domain:
-    organization, created = Organization.objects.get_or_create(name=domain, domain=domain, is_multi_user=is_multi_user)
-    LOG.info("Materializing organization %s in the database, is_multi_user=%s" % (domain, is_multi_user))
+  if email is None:
+    organization = Organization.objects.first()
+    LOG.warn('Returning first organization: %s' % organization)
   else:
-    LOG.warn('No organization domain found for email %s' % email)  # For Backends without emails or when organization enabled by default
-    organization = None
+    domain = email.split('@')[1] if is_multi_user else email
+
+    if domain:
+      organization, created = Organization.objects.get_or_create(name=domain, domain=domain, is_multi_user=is_multi_user)
+      LOG.info("Materializing organization %s in the database, is_multi_user=%s" % (domain, is_multi_user))
+    else:
+      LOG.warn('No organization domain found for email %s' % email)  # For Backends without emails or when organization enabled by default
+      organization = None
 
   return organization
 
@@ -99,6 +103,9 @@ if ENABLE_ORGANIZATIONS.get():
     def __str__(self):
       return self.name or self.domain
 
+    def natural_key(self):
+      return (self.name,)
+
 
 class OrganizationGroupManager(models.Manager):
 
@@ -107,14 +114,11 @@ class OrganizationGroupManager(models.Manager):
     queryset = super(OrganizationGroupManager, self).get_queryset()
     return _fitered_queryset(queryset)
 
-  def natural_key(self):
-    return (self.organization, self.name,)
-
 
 if ENABLE_ORGANIZATIONS.get():
   class OrganizationGroup(models.Model):
     name = models.CharField(_t('name'), max_length=80, unique=False)
-    organization = models.ForeignKey(Organization)
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
 
     permissions = models.ManyToManyField(
         'HuePermission',
@@ -138,6 +142,9 @@ if ENABLE_ORGANIZATIONS.get():
 
     def __str__(self):
       return '%s @ %s' % (self.name, self.organization)
+
+    def natural_key(self):
+      return (self.organization, self.name,)
 
 
 class UserManager(BaseUserManager):

@@ -17,7 +17,7 @@
 import globalSearchParser from './globalSearchParser';
 
 describe('globalSearchParser.js', () => {
-  const testParser = function(beforeCursor, afterCursor, expectedResult) {
+  const testParser = function (beforeCursor, afterCursor, expectedResult) {
     const result = globalSearchParser.parseGlobalSearch(beforeCursor, afterCursor, true);
 
     expect(result).toEqual(expectedResult);

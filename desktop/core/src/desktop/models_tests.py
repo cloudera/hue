@@ -18,7 +18,7 @@
 
 from builtins import object
 import json
-
+import sys
 from datetime import datetime
 
 from nose.plugins.skip import SkipTest
@@ -31,12 +31,13 @@ from beeswax.design import hql_query
 from notebook.models import import_saved_beeswax_query
 from useradmin.models import get_default_user_group, User
 
+from desktop.conf import has_connectors
 from desktop.converters import DocumentConverter
 from desktop.lib.connectors.models import Connector
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.fs import ProxyFS
 from desktop.lib.test_utils import grant_access
-from desktop.models import Directory, Document2, Document, Document2Permission
+from desktop.models import Directory, Document2, Document, Document2Permission, ClusterConfig
 
 try:
   from oozie.models2 import Workflow
@@ -44,10 +45,42 @@ try:
 except RuntimeError:
   has_oozie = False
 
+if sys.version_info[0] > 2:
+  from unittest.mock import patch, Mock
+else:
+  from mock import patch, Mock
+
 
 class MockFs(object):
   def __init__(self):
     pass
+
+
+class TestClusterConfig(object):
+
+  def setUp(self):
+    self.client = make_logged_in_client(username="test", groupname="test", recreate=True, is_superuser=False)
+    self.user = User.objects.get(username="test")
+
+  def test_get_fs(self):
+    if not has_connectors():
+      raise SkipTest
+
+    with patch('desktop.models.appmanager.get_apps_dict') as get_apps_dict:
+      with patch('desktop.models.fsmanager.is_enabled_and_has_access') as is_enabled_and_has_access:
+        # filebrowser
+
+        ClusterConfig(user=self.user)
+
+
+  def test_get_main_quick_action(self):
+    with patch('desktop.models.get_user_preferences') as get_user_preferences:
+      get_user_preferences.return_value = json.dumps({'app': 'editor', 'interpreter': 1})
+      apps = {'editor': {'interpreters': [{'type': 1, 'name': 'SQL'}, {'type': 2, 'name': 'Stream SQL'}]}}
+
+      main_app = ClusterConfig(user=self.user, apps=apps).get_main_quick_action(apps=apps)
+
+      assert_true({'type': 1, 'name': 'SQL'}, main_app)
 
 
 class TestDocument2(object):
@@ -129,7 +162,10 @@ class TestDocument2(object):
 
 
   def test_directory_create_and_rename(self):
-    response = self.client.post('/desktop/api2/doc/mkdir', {'parent_uuid': json.dumps(self.home_dir.uuid), 'name': json.dumps('test_mkdir')})
+    response = self.client.post(
+        '/desktop/api2/doc/mkdir',
+        {'parent_uuid': json.dumps(self.home_dir.uuid), 'name': json.dumps('test_mkdir')}
+    )
     data = json.loads(response.content)
 
     assert_equal(0, data['status'], data)
@@ -177,7 +213,7 @@ class TestDocument2(object):
     assert_equal('/test_mv_file_dst/query1.sql', data['document']['path'])
 
     # Verify that last_modified is intact
-    doc = Document2.objects.get(id = doc.id)
+    doc = Document2.objects.get(id=doc.id)
     assert_equal(orig_last_modified.strftime('%Y-%m-%dT%H:%M:%S'), doc.last_modified.strftime('%Y-%m-%dT%H:%M:%S'))
 
   def test_file_copy(self):
@@ -450,7 +486,10 @@ class TestDocument2(object):
   def test_validate_immutable_user_directories(self):
     # Test that home and Trash directories cannot be recreated or modified
     test_dir = Directory.objects.create(name='test_dir', owner=self.user, parent_directory=self.home_dir)
-    response = self.client.post('/desktop/api2/doc/mkdir', {'parent_uuid': json.dumps(test_dir.uuid), 'name': json.dumps(Document2.TRASH_DIR)})
+    response = self.client.post(
+        '/desktop/api2/doc/mkdir',
+        {'parent_uuid': json.dumps(test_dir.uuid), 'name': json.dumps(Document2.TRASH_DIR)}
+    )
     data = json.loads(response.content)
     assert_equal(-1, data['status'], data)
     assert_equal('Cannot create or modify directory with name: .Trash', data['message'])
@@ -626,7 +665,9 @@ class TestDocument2Permissions(object):
     self.default_group = get_default_user_group()
 
     self.client = make_logged_in_client(username="perm_user", groupname=self.default_group.name, recreate=True, is_superuser=False)
-    self.client_not_me = make_logged_in_client(username="not_perm_user", groupname=self.default_group.name, recreate=True, is_superuser=False)
+    self.client_not_me = make_logged_in_client(
+        username="not_perm_user", groupname=self.default_group.name, recreate=True, is_superuser=False
+    )
 
     self.user = User.objects.get(username="perm_user")
     self.user_not_me = User.objects.get(username="not_perm_user")
@@ -1005,14 +1046,26 @@ class TestDocument2Permissions(object):
 
   def test_search_documents(self):
     owned_dir = Directory.objects.create(name='test_dir', owner=self.user, parent_directory=self.home_dir)
-    owned_query = Document2.objects.create(name='query1.sql', type='query-hive', owner=self.user, data={}, parent_directory=owned_dir)
-    owned_history = Document2.objects.create(name='history.sql', type='query-hive', owner=self.user, data={}, is_history=True, parent_directory=owned_dir)
-    owned_workflow = Document2.objects.create(name='test.wf', type='oozie-workflow2', owner=self.user, data={}, parent_directory=owned_dir)
+    owned_query = Document2.objects.create(
+        name='query1.sql', type='query-hive', owner=self.user, data={}, parent_directory=owned_dir
+    )
+    owned_history = Document2.objects.create(
+        name='history.sql', type='query-hive', owner=self.user, data={}, is_history=True, parent_directory=owned_dir
+    )
+    owned_workflow = Document2.objects.create(
+        name='test.wf', type='oozie-workflow2', owner=self.user, data={}, parent_directory=owned_dir
+    )
 
     other_home_dir = Document2.objects.get_home_directory(user=self.user_not_me)
-    not_shared = Document2.objects.create(name='other_query1.sql', type='query-hive', owner=self.user_not_me, data={}, parent_directory=other_home_dir)
-    shared_1 = Document2.objects.create(name='other_query2.sql', type='query-hive', owner=self.user_not_me, data={}, parent_directory=other_home_dir)
-    shared_2 = Document2.objects.create(name='other_query3.sql', type='query-hive', owner=self.user_not_me, data={}, parent_directory=other_home_dir)
+    not_shared = Document2.objects.create(
+        name='other_query1.sql', type='query-hive', owner=self.user_not_me, data={}, parent_directory=other_home_dir
+    )
+    shared_1 = Document2.objects.create(
+        name='other_query2.sql', type='query-hive', owner=self.user_not_me, data={}, parent_directory=other_home_dir
+    )
+    shared_2 = Document2.objects.create(
+        name='other_query3.sql', type='query-hive', owner=self.user_not_me, data={}, parent_directory=other_home_dir
+    )
 
     shared_1.share(user=self.user_not_me, name='read', users=[self.user], groups=[])
     shared_2.share(user=self.user_not_me, name='read', users=[], groups=[self.default_group])
@@ -1278,7 +1331,9 @@ class TestDocument2ImportExport(object):
   def test_export_documents_with_dependencies(self):
     query1 = Document2.objects.create(name='query1.sql', type='query-hive', owner=self.user, data={}, parent_directory=self.home_dir)
     query2 = Document2.objects.create(name='query2.sql', type='query-hive', owner=self.user, data={}, parent_directory=self.home_dir)
-    query3 = Document2.objects.create(name='query3.sql', type='query-hive', owner=self.user, data={}, parent_directory=self.home_dir, is_history=True)
+    query3 = Document2.objects.create(
+        name='query3.sql', type='query-hive', owner=self.user, data={}, parent_directory=self.home_dir, is_history=True
+    )
     workflow = Document2.objects.create(name='test.wf', type='oozie-workflow2', owner=self.user, data={}, parent_directory=self.home_dir)
     workflow.dependencies.add(query1)
     workflow.dependencies.add(query2)
@@ -1330,7 +1385,9 @@ class TestDocument2ImportExport(object):
 
     # Test that exporting to a file includes the date and number of documents in the filename
     response = self.client.get('/desktop/api2/doc/export/', {'documents': json.dumps([workflow.id, workflow2.id])})
-    assert_equal(response['Content-Disposition'], 'attachment; filename="hue-documents-%s-(4).json"' % datetime.today().strftime('%Y-%m-%d'))
+    assert_equal(
+        response['Content-Disposition'], 'attachment; filename="hue-documents-%s-(4).json"' % datetime.today().strftime('%Y-%m-%d')
+    )
 
     # Test that exporting single file gets the name of the document in the filename
     response = self.client.get('/desktop/api2/doc/export/', {'documents': json.dumps([workflow.id])})

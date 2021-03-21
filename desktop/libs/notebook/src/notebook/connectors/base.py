@@ -53,6 +53,9 @@ class AuthenticationRequired(Exception):
     super(AuthenticationRequired, self).__init__()
     self.message = message
 
+  def __str__(self):
+    return 'AuthenticationRequired: %s' % self.message
+
 class OperationTimeout(Exception):
   def __str__(self):
     return 'OperationTimeout'
@@ -138,7 +141,7 @@ class Notebook(object):
         p2 = match.group(2)
         variable = variables[p2]
         value = smart_str(variable['value'])
-        return smart_str(p1) + smart_str(value if value is not None else variable['meta'].get('placeholder',''))
+        return smart_str(p1) + smart_str(value if value is not None else variable['meta'].get('placeholder', ''))
 
       return re.sub(
           "([^\\\\])\\$" + (
@@ -176,7 +179,7 @@ class Notebook(object):
     _data['snippets'].append(self._make_snippet({
         u'type': u'java',
         u'status': u'running',
-        u'properties':  {
+        u'properties': {
           u'files': files,
           u'class': clazz,
           u'app_jar': app_jar,
@@ -194,7 +197,7 @@ class Notebook(object):
     _data['snippets'].append(self._make_snippet({
         u'type': u'sqoop1',
         u'status': u'running',
-        u'properties':  {
+        u'properties': {
           u'files': files,
           u'arguments': arguments,
           u'archives': [],
@@ -211,7 +214,7 @@ class Notebook(object):
     _data['snippets'].append(self._make_snippet({
         u'type': u'spark',
         u'status': u'running',
-        u'properties':  {
+        u'properties': {
           u'files': files,
           u'class': clazz,
           u'app_jar': jars,
@@ -224,7 +227,8 @@ class Notebook(object):
 
     self.data = json.dumps(_data)
 
-  def add_shell_snippet(self, shell_command, arguments=None, archives=None, files=None, env_var=None, last_executed=None, capture_output=True):
+  def add_shell_snippet(self, shell_command, arguments=None, archives=None, files=None, env_var=None, last_executed=None,
+        capture_output=True):
     _data = json.loads(self.data)
 
     if arguments is None:
@@ -239,7 +243,7 @@ class Notebook(object):
     _data['snippets'].append(self._make_snippet({
         u'type': u'shell',
         u'status': u'running',
-        u'properties':  {
+        u'properties': {
           u'files': files,
           u'shell_command': shell_command,
           u'arguments': arguments,
@@ -300,7 +304,7 @@ class Notebook(object):
     handle = self.execute(request, batch=False)
 
     if handle['status'] != 0:
-      raise QueryError(e, message='SQL statement failed.', handle=handle)
+      raise QueryError(message='SQL statement failed.', handle=handle)
 
     operation_id = handle['history_uuid']
     curr = time.time()
@@ -312,7 +316,7 @@ class Notebook(object):
       if handle['status'] == 0 and handle['query_status']['status'] not in ('waiting', 'running'):
         if include_results and handle['query_status']['status'] == 'available':
           handle.update(
-            self.fetch_result_data(request.user, operation_id=operation_id)
+            self.fetch_result_data(request, operation_id=operation_id)
           )
           # TODO: close
         return handle
@@ -340,10 +344,10 @@ class Notebook(object):
 
     return _check_status(request, operation_id=operation_id)
 
-  def fetch_result_data(self, user, operation_id):
+  def fetch_result_data(self, request, operation_id):
     from notebook.api import _fetch_result_data
 
-    return _fetch_result_data(user, operation_id=operation_id, rows=100, start_over=False, nulls_only=True)
+    return _fetch_result_data(request, operation_id=operation_id, rows=100, start_over=False, nulls_only=True)
 
 
 def get_interpreter(connector_type, user=None):
@@ -465,11 +469,14 @@ def get_api(request, snippet):
     else:
       from notebook.connectors.jdbc import JdbcApi
       return JdbcApi(request.user, interpreter=interpreter)
+  elif interface == 'sqlflow':
+    from notebook.connectors.sqlflow import SqlFlowApi
+    return SqlFlowApi(request.user, interpreter=interpreter)
   elif interface == 'teradata':
-    from notebook.connectors.jdbc import JdbcApiTeradata
+    from notebook.connectors.jdbc_teradata import JdbcApiTeradata
     return JdbcApiTeradata(request.user, interpreter=interpreter)
   elif interface == 'athena':
-    from notebook.connectors.jdbc import JdbcApiAthena
+    from notebook.connectors.jdbc_athena import JdbcApiAthena
     return JdbcApiAthena(request.user, interpreter=interpreter)
   elif interface == 'presto':
     from notebook.connectors.jdbc_presto import JdbcApiPresto
@@ -550,7 +557,7 @@ class Api(object):
   def get_log(self, notebook, snippet, startFrom=None, size=None):
     return 'No logs'
 
-  def autocomplete(self, snippet, database=None, table=None, column=None, nested=None):
+  def autocomplete(self, snippet, database=None, table=None, column=None, nested=None, operation=None):
     return {}
 
   def progress(self, notebook, snippet, logs=None):
@@ -561,6 +568,13 @@ class Api(object):
 
   def get_sample_data(self, snippet, database=None, table=None, column=None, is_async=False, operation=None):
     raise NotImplementedError()
+
+  def explain(self, notebook, snippet):
+    return {
+      'status': 0,
+      'explanation': '',
+      'statement': '',
+    }
 
   def export_data_as_hdfs_file(self, snippet, target_file, overwrite):
     raise NotImplementedError()

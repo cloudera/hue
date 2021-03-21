@@ -16,9 +16,10 @@
 
 import $ from 'jquery';
 import * as ko from 'knockout';
+import { hueLocalStorage } from 'utils/storageUtils';
 
 ko.bindingHandlers.logResizer = {
-  init: function(element, valueAccessor) {
+  init: function (element, valueAccessor) {
     const options = ko.unwrap(valueAccessor()),
       $resizer = $(element),
       $parent = $resizer.parents(options.parent),
@@ -26,7 +27,7 @@ ko.bindingHandlers.logResizer = {
       onStart = options.onStart,
       onResize = options.onResize;
 
-    const initialHeight = $.totalStorage('hue.editor.logs.size') || 80;
+    const initialHeight = hueLocalStorage('hue.editor.logs.size') || 80;
 
     window.setTimeout(() => {
       $target.css('height', initialHeight + 'px');
@@ -34,22 +35,22 @@ ko.bindingHandlers.logResizer = {
 
     $resizer.draggable({
       axis: 'y',
-      start: function() {
+      start: function () {
         if (onStart) {
           onStart();
         }
       },
-      drag: function(event, ui) {
+      drag: function (event, ui) {
         let currentHeight = ui.offset.top - $target.offset().top - 20;
         if (options.minHeight && currentHeight < options.minHeight) {
           currentHeight = options.minHeight;
         }
-        $.totalStorage('hue.editor.logs.size', currentHeight);
+        hueLocalStorage('hue.editor.logs.size', currentHeight);
         $target.css('height', currentHeight + 'px');
         ui.offset.top = 0;
         ui.position.top = 0;
       },
-      stop: function(event, ui) {
+      stop: function (event, ui) {
         ui.offset.top = 0;
         ui.position.top = 0;
         if (onResize) {

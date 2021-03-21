@@ -37,7 +37,8 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_POST
 
 from metadata.conf import has_catalog
-from metadata.catalog_api import search_entities as metadata_search_entities, _highlight, search_entities_interactive as metadata_search_entities_interactive
+from metadata.catalog_api import search_entities as metadata_search_entities, _highlight, \
+  search_entities_interactive as metadata_search_entities_interactive
 from notebook.connectors.altus import SdxApi, AnalyticDbApi, DataEngApi, DataWarehouse2Api
 from notebook.connectors.base import Notebook, get_interpreter
 from notebook.models import Analytics
@@ -45,7 +46,7 @@ from useradmin.models import User, Group
 
 from desktop import appmanager
 from desktop.auth.backend import is_admin
-from desktop.conf import ENABLE_CONNECTORS, ENABLE_GIST_PREVIEW, get_clusters, IS_K8S_ONLY
+from desktop.conf import ENABLE_CONNECTORS, ENABLE_GIST_PREVIEW, get_clusters, IS_K8S_ONLY, ENABLE_SHARING
 from desktop.lib.conf import BoundContainer, GLOBAL_CONFIG, is_anonymous
 from desktop.lib.django_util import JsonResponse, login_notrequired, render
 from desktop.lib.exceptions_renderable import PopupException
@@ -54,6 +55,7 @@ from desktop.lib.i18n import smart_str, force_unicode
 from desktop.lib.paths import get_desktop_root
 from desktop.models import Document2, Document, Directory, FilesystemException, uuid_default, \
   UserPreferences, get_user_preferences, set_user_preferences, get_cluster_config, __paginate, _get_gist_document
+from desktop.views import serve_403_error
 
 if sys.version_info[0] > 2:
   from io import StringIO as string_io
@@ -83,6 +85,7 @@ def api_error_handler(func):
 @api_error_handler
 def get_config(request):
   config = get_cluster_config(request.user)
+  config['hue_config']['is_admin'] = is_admin(request.user);
   config['clusters'] = list(get_clusters(request.user).values())
   config['documents'] = {
     'types': list(Document2.objects.documents(user=request.user).order_by().values_list('type', flat=True).distinct())
@@ -186,7 +189,8 @@ def get_context_namespaces(request, interface):
         sdx_namespaces = SdxApi(request.user).list_namespaces()
 
       # Adding "fake" namespace for cluster without one
-      sdx_namespaces.extend([_cluster for _cluster in adb_clusters if not _cluster.get('namespaceCrn') or (IS_K8S_ONLY.get() and 'TERMINAT' not in _cluster['status'])])
+      sdx_namespaces.extend([_cluster for _cluster in adb_clusters if not _cluster.get('namespaceCrn') or \
+        (IS_K8S_ONLY.get() and 'TERMINAT' not in _cluster['status'])])
 
       namespaces.extend([{
           'id': namespace.get('crn', 'None'),
@@ -677,6 +681,9 @@ def share_document(request):
 
   Example of input: {'read': {'user_ids': [1, 2, 3], 'group_ids': [1, 2, 3]}}
   """
+  if not is_admin(request.user) and not ENABLE_SHARING.get():
+    return serve_403_error(request)
+
   uuid = request.POST.get('uuid')
   perms_dict = request.POST.get('data')
 
@@ -716,6 +723,9 @@ def share_document_link(request):
 
   Example of input: {"uuid": "xxxx", "perm": "read" / "write" / "off"}
   """
+  if not is_admin(request.user) and not ENABLE_SHARING.get():
+    return serve_403_error(request)
+
   uuid = request.POST.get('uuid')
   perm = request.POST.get('perm')
 
@@ -766,7 +776,9 @@ def export_documents(request):
 
   if doc_ids:
     doc_ids = ','.join(map(str, doc_ids))
-    management.call_command('dumpdata', 'desktop.Document2', primary_keys=doc_ids, indent=2, use_natural_foreign_keys=True, verbosity=2, stdout=f)
+    management.call_command(
+      'dumpdata', 'desktop.Document2', primary_keys=doc_ids, indent=2, use_natural_foreign_keys=True, verbosity=2, stdout=f
+    )
 
   if request.GET.get('format') == 'json':
     return JsonResponse(f.getvalue(), safe=False)
@@ -852,7 +864,7 @@ def import_documents(request):
   stdout = string_io()
   try:
     with transaction.atomic(): # We wrap both commands to commit loaddata & sync
-      management.call_command('loaddata', f.name, verbosity=3, traceback=True, stdout=stdout, commit=False) # We need to use commit=False because commit=True will close the connection and make Document.objects.sync fail.
+      management.call_command('loaddata', f.name, verbosity=3, traceback=True, stdout=stdout)
       Document.objects.sync()
 
     if request.POST.get('redirect'):
@@ -1150,8 +1162,8 @@ def _create_or_update_document_with_owner(doc, owner, uuids_map):
     history_deps_list = []
     for index, (uuid, version, is_history) in enumerate(doc['fields']['dependencies']):
       if not uuid in list(uuids_map.keys()) and not is_history and \
-              not Document2.objects.filter(uuid=uuid, version=version).exists():
-          raise PopupException(_('Cannot import document, dependency with UUID: %s not found.') % uuid)
+      not Document2.objects.filter(uuid=uuid, version=version).exists():
+        raise PopupException(_('Cannot import document, dependency with UUID: %s not found.') % uuid)
       elif is_history:
         history_deps_list.insert(0, index) # Insert in decreasing order to facilitate delete
         LOG.warn('History dependency with UUID: %s ignored while importing document %s' % (uuid, doc['fields']['name']))

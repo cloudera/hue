@@ -17,40 +17,40 @@
 import $ from 'jquery';
 import * as ko from 'knockout';
 
-ko.bindingHandlers.numberFormat = (function() {
+ko.bindingHandlers.numberFormat = (function () {
   let that;
   return (that = {
-    init: function(element, valueAccessor) {
+    init: function (element, valueAccessor) {
       that.format(element, valueAccessor);
     },
-    update: function(element, valueAccessor) {
+    update: function (element, valueAccessor) {
       that.format(element, valueAccessor);
     },
-    format: function(element, valueAccessor) {
+    format: function (element, valueAccessor) {
       const value = valueAccessor();
       const unwrapped = ko.unwrap(value);
       $(element).text(that.human(unwrapped.value, unwrapped.unit));
     },
-    human: function(value, unit) {
+    human: function (value, unit) {
       let fn;
       if (unit === 1) {
-        fn = function(value) {
+        fn = function (value) {
           return ko.bindingHandlers.simplesize.humanSize(value) + '/s';
         };
       } else if (unit === 3) {
         fn = ko.bindingHandlers.bytesize.humanSize;
       } else if (unit === 4) {
-        fn = function(value) {
+        fn = function (value) {
           return ko.bindingHandlers.bytesize.humanSize(value) + '/s';
         };
       } else if (unit === 5) {
         fn = ko.bindingHandlers.duration.humanTime;
       } else if (unit === 8) {
-        fn = function(value) {
+        fn = function (value) {
           return ko.bindingHandlers.duration.humanTime(value * 1000000);
         };
       } else if (unit === 9) {
-        fn = function(value) {
+        fn = function (value) {
           return ko.bindingHandlers.duration.humanTime(value * 1000000000);
         };
       } else {

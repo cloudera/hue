@@ -41,6 +41,7 @@ from desktop import appmanager
 from desktop.auth.backend import is_admin, create_user
 from desktop.conf import APP_BLACKLIST, ENABLE_ORGANIZATIONS, ENABLE_PROMETHEUS
 from desktop.lib.django_test_util import make_logged_in_client
+from desktop.lib.i18n import smart_unicode
 from desktop.lib.test_utils import grant_access
 from desktop.views import home
 from hadoop import pseudo_hdfs4
@@ -55,10 +56,8 @@ from useradmin.models import HuePermission, GroupPermission, UserProfile, get_pr
 from useradmin.hue_password_policy import reset_password_policy
 
 if sys.version_info[0] > 2:
-  from django.utils.encoding import smart_text as smart_unicode
   from unittest.mock import patch, Mock
 else:
-  from django.utils.encoding import smart_unicode
   from mock import patch, Mock
 
 
@@ -109,13 +108,14 @@ class LdapTestConnection(object):
     if find_by_dn:
       data = [attrs for attrs in list(self._instance.users.values()) if attrs['dn'] == username_pattern]
     else:
-      username_pattern = "^%s$" % username_pattern.replace('.','\\.').replace('*', '.*')
+      username_pattern = "^%s$" % username_pattern.replace('.', '\\.').replace('*', '.*')
       username_fsm = re.compile(username_pattern, flags=re.I)
       usernames = [username for username in list(self._instance.users.keys()) if username_fsm.match(username)]
       data = [self._instance.users.get(username) for username in usernames]
     return data
 
-  def find_groups(self, groupname_pattern, search_attr=None, group_name_attr=None, group_member_attr=None, group_filter=None, find_by_dn=False, scope=ldap.SCOPE_SUBTREE):
+  def find_groups(self, groupname_pattern, search_attr=None, group_name_attr=None,
+                  group_member_attr=None, group_filter=None, find_by_dn=False, scope=ldap.SCOPE_SUBTREE):
     """ Return all groups in the system with parents and children """
     if find_by_dn:
       data = [attrs for attrs in list(self._instance.groups.values()) if attrs['dn'] == groupname_pattern]
@@ -124,7 +124,7 @@ class LdapTestConnection(object):
         sub_data = [attrs for attrs in list(self._instance.groups.values()) if attrs['dn'].endswith(data[0]['dn'])]
         data.extend(sub_data)
     else:
-      groupname_pattern = "^%s$" % groupname_pattern.replace('.','\\.').replace('*', '.*')
+      groupname_pattern = "^%s$" % groupname_pattern.replace('.', '\\.').replace('*', '.*')
       groupnames = [username for username in list(self._instance.groups.keys()) if re.match(groupname_pattern, username)]
       data = [self._instance.groups.get(groupname) for groupname in groupnames]
     return data
@@ -177,66 +177,114 @@ class LdapTestConnection(object):
 
   class Data(object):
     def __init__(self):
+      long_username = create_long_username()
       self.users = {
-        'moe': {'dn': 'uid=moe,ou=People,dc=example,dc=com', 'username':'moe', 'first':'Moe', 'email':'moe@stooges.com', 'groups': ['cn=TestUsers,ou=Groups,dc=example,dc=com']},
-        'lårry': {'dn': 'uid=lårry,ou=People,dc=example,dc=com', 'username':'lårry', 'first':'Larry', 'last':'Stooge', 'email':'larry@stooges.com', 'groups': ['cn=TestUsers,ou=Groups,dc=example,dc=com', 'cn=Test Administrators,cn=TestUsers,ou=Groups,dc=example,dc=com']},
-        'curly': {'dn': 'uid=curly,ou=People,dc=example,dc=com', 'username':'curly', 'first':'Curly', 'last':'Stooge', 'email':'curly@stooges.com', 'groups': ['cn=TestUsers,ou=Groups,dc=example,dc=com', 'cn=Test Administrators,cn=TestUsers,ou=Groups,dc=example,dc=com']},
-        'Rock': {'dn': 'uid=Rock,ou=People,dc=example,dc=com', 'username':'Rock', 'first':'rock', 'last':'man', 'email':'rockman@stooges.com', 'groups': ['cn=Test Administrators,cn=TestUsers,ou=Groups,dc=example,dc=com']},
-        'nestedguy': {'dn': 'uid=nestedguy,ou=People,dc=example,dc=com', 'username':'nestedguy', 'first':'nested', 'last':'guy', 'email':'nestedguy@stooges.com', 'groups': ['cn=NestedGroup,ou=Groups,dc=example,dc=com']},
-        'otherguy': {'dn': 'uid=otherguy,ou=People,dc=example,dc=com', 'username':'otherguy', 'first':'Other', 'last':'Guy', 'email':'other@guy.com'},
-        'posix_person': {'dn': 'uid=posix_person,ou=People,dc=example,dc=com', 'username': 'posix_person', 'first': 'pos', 'last': 'ix', 'email': 'pos@ix.com'},
-        'posix_person2': {'dn': 'uid=posix_person2,ou=People,dc=example,dc=com', 'username': 'posix_person2', 'first': 'pos', 'last': 'ix', 'email': 'pos@ix.com'},
-        'user with space': {'dn': 'uid=user with space,ou=People,dc=example,dc=com', 'username': 'user with space', 'first': 'user', 'last': 'space', 'email': 'user@space.com'},
-        'spaceless': {'dn': 'uid=user without space,ou=People,dc=example,dc=com', 'username': 'spaceless', 'first': 'user', 'last': 'space', 'email': 'user@space.com'},
-        'test_toolongusernametoolongusername': {'dn': 'uid=test_toolongusernametoolongusername,ou=People,dc=example,dc=com', 'username': 'test_toolongusernametoolongusername', 'first': 'toolong', 'last': 'username', 'email': 'toolong@username.com'},
-        'test_longfirstname': {'dn': 'uid=test_longfirstname,ou=People,dc=example,dc=com', 'username': 'test_longfirstname', 'first': 'test_longfirstname_test_longfirstname', 'last': 'username', 'email': 'toolong@username.com'},}
+        'moe': {
+          'dn': 'uid=moe,ou=People,dc=example,dc=com', 'username': 'moe', 'first': 'Moe', 'email': 'moe@stooges.com',
+          'groups': ['cn=TestUsers,ou=Groups,dc=example,dc=com']
+        },
+        'lårry': {
+          'dn': 'uid=lårry,ou=People,dc=example,dc=com', 'username': 'lårry', 'first': 'Larry', 'last': 'Stooge',
+          'email': 'larry@stooges.com',
+          'groups': ['cn=TestUsers,ou=Groups,dc=example,dc=com', 'cn=Test Administrators,cn=TestUsers,ou=Groups,dc=example,dc=com']
+        },
+        'curly': {
+          'dn': 'uid=curly,ou=People,dc=example,dc=com', 'username': 'curly', 'first': 'Curly', 'last': 'Stooge',
+          'email': 'curly@stooges.com',
+          'groups': ['cn=TestUsers,ou=Groups,dc=example,dc=com', 'cn=Test Administrators,cn=TestUsers,ou=Groups,dc=example,dc=com']
+        },
+        'Rock': {
+          'dn': 'uid=Rock,ou=People,dc=example,dc=com', 'username': 'Rock', 'first': 'rock', 'last': 'man', 'email': 'rockman@stooges.com',
+          'groups': ['cn=Test Administrators,cn=TestUsers,ou=Groups,dc=example,dc=com']
+        },
+        'nestedguy': {
+          'dn': 'uid=nestedguy,ou=People,dc=example,dc=com', 'username': 'nestedguy', 'first': 'nested', 'last': 'guy',
+          'email': 'nestedguy@stooges.com', 'groups': ['cn=NestedGroup,ou=Groups,dc=example,dc=com']
+        },
+        'otherguy': {
+          'dn': 'uid=otherguy,ou=People,dc=example,dc=com', 'username': 'otherguy', 'first': 'Other', 'last': 'Guy',
+          'email': 'other@guy.com'
+        },
+        'posix_person': {
+          'dn': 'uid=posix_person,ou=People,dc=example,dc=com', 'username': 'posix_person', 'first': 'pos', 'last': 'ix',
+          'email': 'pos@ix.com'
+        },
+        'posix_person2': {
+          'dn': 'uid=posix_person2,ou=People,dc=example,dc=com', 'username': 'posix_person2', 'first': 'pos', 'last': 'ix',
+          'email': 'pos@ix.com'
+        },
+        'user with space': {
+          'dn': 'uid=user with space,ou=People,dc=example,dc=com', 'username': 'user with space', 'first': 'user', 'last': 'space',
+          'email': 'user@space.com'
+        },
+        'spaceless': {
+          'dn': 'uid=user without space,ou=People,dc=example,dc=com', 'username': 'spaceless', 'first': 'user', 'last': 'space',
+          'email': 'user@space.com'
+        },
+        long_username: {
+          'dn': 'uid=' + long_username + ',ou=People,dc=example,dc=com', 'username': long_username, 'first': 'toolong', 'last': 'username',
+          'email': 'toolong@username.com'
+        },
+        'test_longfirstname': {
+          'dn': 'uid=test_longfirstname,ou=People,dc=example,dc=com', 'username': 'test_longfirstname',
+          'first': 'test_longfirstname_test_longfirstname', 'last': 'username', 'email': 'toolong@username.com'
+        },
+      }
 
       self.groups = {
         'TestUsers': {
           'dn': 'cn=TestUsers,ou=Groups,dc=example,dc=com',
-          'name':'TestUsers',
-          'members':['uid=moe,ou=People,dc=example,dc=com','uid=lårry,ou=People,dc=example,dc=com','uid=curly,ou=People,dc=example,dc=com','uid=test_toolongusernametoolongusername,ou=People,dc=example,dc=com'],
-          'posix_members':[]},
+          'name': 'TestUsers',
+          'members': [
+            'uid=moe,ou=People,dc=example,dc=com', 'uid=lårry,ou=People,dc=example,dc=com',
+            'uid=curly,ou=People,dc=example,dc=com', 'uid=' + long_username + ',ou=People,dc=example,dc=com'
+          ],
+          'posix_members': []},
         'Test Administrators': {
           'dn': 'cn=Test Administrators,cn=TestUsers,ou=Groups,dc=example,dc=com',
-          'name':'Test Administrators',
-          'members':['uid=Rock,ou=People,dc=example,dc=com','uid=lårry,ou=People,dc=example,dc=com','uid=curly,ou=People,dc=example,dc=com','uid=test_toolongusernametoolongusername,ou=People,dc=example,dc=com'],
-          'posix_members':[]},
+          'name': 'Test Administrators',
+          'members': [
+            'uid=Rock,ou=People,dc=example,dc=com', 'uid=lårry,ou=People,dc=example,dc=com',
+            'uid=curly,ou=People,dc=example,dc=com', 'uid=' + long_username + ',ou=People,dc=example,dc=com'
+          ],
+          'posix_members': []},
         'OtherGroup': {
           'dn': 'cn=OtherGroup,cn=TestUsers,ou=Groups,dc=example,dc=com',
-          'name':'OtherGroup',
-          'members':[],
-          'posix_members':[]},
+          'name': 'OtherGroup',
+          'members': [],
+          'posix_members': []},
         'NestedGroups': {
           'dn': 'cn=NestedGroups,ou=Groups,dc=example,dc=com',
-          'name':'NestedGroups',
-          'members':['cn=NestedGroup,ou=Groups,dc=example,dc=com'],
-          'posix_members':[]
+          'name': 'NestedGroups',
+          'members': ['cn=NestedGroup,ou=Groups,dc=example,dc=com'],
+          'posix_members': []
         },
         'NestedGroup': {
           'dn': 'cn=NestedGroup,ou=Groups,dc=example,dc=com',
-          'name':'NestedGroup',
-          'members':['uid=nestedguy,ou=People,dc=example,dc=com'],
-          'posix_members':[]
+          'name': 'NestedGroup',
+          'members': ['uid=nestedguy,ou=People,dc=example,dc=com'],
+          'posix_members': []
         },
         'NestedPosixGroups': {
           'dn': 'cn=NestedPosixGroups,ou=Groups,dc=example,dc=com',
-          'name':'NestedPosixGroups',
-          'members':['cn=PosixGroup,ou=Groups,dc=example,dc=com'],
-          'posix_members':[]
+          'name': 'NestedPosixGroups',
+          'members': ['cn=PosixGroup,ou=Groups,dc=example,dc=com'],
+          'posix_members': []
         },
         'PosixGroup': {
           'dn': 'cn=PosixGroup,ou=Groups,dc=example,dc=com',
-          'name':'PosixGroup',
-          'members':[],
-          'posix_members':['posix_person','lårry']},
+          'name': 'PosixGroup',
+          'members': [],
+          'posix_members': ['posix_person', 'lårry']},
         'PosixGroup1': {
           'dn': 'cn=PosixGroup1,cn=PosixGroup,ou=Groups,dc=example,dc=com',
-          'name':'PosixGroup1',
-          'members':[],
-          'posix_members':['posix_person2']},
+          'name': 'PosixGroup1',
+          'members': [],
+          'posix_members': ['posix_person2']},
         }
 
+def create_long_username():
+  return "A" * 151
 
 def test_invalid_username():
   BAD_NAMES = ('-foo', 'foo:o', 'foo o', ' foo')
@@ -396,7 +444,7 @@ class TestUserAdmin(BaseUserAdminTests):
     c.post('/useradmin/groups/edit/test-group', dict(
         name="test-group",
         members=[User.objects.get(username="test").pk],
-        permissions=[HuePermission.objects.get(app='useradmin',action='access').pk],
+        permissions=[HuePermission.objects.get(app='useradmin', action='access').pk],
         save="Save"
       ),
       follow=True
@@ -466,7 +514,7 @@ class TestUserAdmin(BaseUserAdminTests):
 
     # Check that we have access now
     response = c1.get('/useradmin/users')
-    assert_true(get_profile(test_user).has_hue_permission('access','useradmin'))
+    assert_true(get_profile(test_user).has_hue_permission('access', 'useradmin'))
     assert_true(b'Users' in response.content)
 
     # Make sure we can't modify permissions
@@ -483,7 +531,7 @@ class TestUserAdmin(BaseUserAdminTests):
       follow=True
     )
     assert_true(len(GroupPermission.objects.all()) == 0)
-    assert_false(get_profile(test_user).has_hue_permission('access','useradmin'))
+    assert_false(get_profile(test_user).has_hue_permission('access', 'useradmin'))
 
     # We should no longer have access to the app
     response = c1.get('/useradmin/users')
@@ -549,7 +597,7 @@ class TestUserAdmin(BaseUserAdminTests):
       # Change the name of the default group, and try deleting again
       resets.append(useradmin.conf.DEFAULT_USER_GROUP.set_for_testing('new_default'))
 
-      response = c.post('/useradmin/groups/delete' , {'group_names': ['test_default']})
+      response = c.post('/useradmin/groups/delete', {'group_names': ['test_default']})
       assert_false(Group.objects.filter(name='test_default').exists())
       assert_true(Group.objects.filter(name='new_default').exists())
     finally:
@@ -798,7 +846,7 @@ class TestUserAdmin(BaseUserAdminTests):
           is_active=True
         )
       )
-      assert_true(b"You cannot remove" in response.content,  "Shouldn't be able to remove the last superuser")
+      assert_true(b"You cannot remove" in response.content, "Shouldn't be able to remove the last superuser")
       # Shouldn't be able to delete oneself
       response = c.post('/useradmin/users/delete', {u'user_ids': [user.id], 'is_delete': True})
       assert_true(b"You cannot remove yourself" in response.content, "Shouldn't be able to delete the last superuser")
@@ -828,7 +876,9 @@ class TestUserAdmin(BaseUserAdminTests):
         )
       )
       assert_equal(
-        [UserChangeForm.GENERIC_VALIDATION_ERROR], response.context[0]["form"]["password_old"].errors, "Should have complained about old password"
+        [UserChangeForm.GENERIC_VALIDATION_ERROR],
+        response.context[0]["form"]["password_old"].errors,
+        "Should have complained about old password"
       )
       # Good now
       response = c.post('/useradmin/users/edit/test', dict(
@@ -847,17 +897,26 @@ class TestUserAdmin(BaseUserAdminTests):
       # Change it back!
       response = c.post('/hue/accounts/login/', dict(username="test", password="foo"), follow=True)
 
-      response = c.post('/useradmin/users/edit/test', dict(username="test", first_name="Tom", last_name="Tester", password1="test", password2="test", password_old="foo", is_active=True, is_superuser=True))
+      response = c.post(
+        '/useradmin/users/edit/test',
+        dict(
+          username="test", first_name="Tom", last_name="Tester", password1="test",
+          password2="test", password_old="foo", is_active=True, is_superuser=True
+        )
+      )
       response = c.post('/hue/accounts/login/', dict(username="test", password="test"), follow=True)
 
       assert_true(User.objects.get(username="test").check_password("test"))
-      assert_true(make_logged_in_client(username = "test", password = "test"), "Check that we can still login.")
+      assert_true(make_logged_in_client(username="test", password="test"), "Check that we can still login.")
 
       # Check new user form for default group
       group = get_default_user_group()
       response = c.get('/useradmin/users/new')
       assert_true(response)
-      assert_true(('<option value="%s" selected>%s</option>' % (group.id, group.name)) in (response.content if isinstance(response.content, str) else response.content.decode()))
+      assert_true(
+        ('<option value="%s" selected>%s</option>' % (group.id, group.name)) in \
+        (response.content if isinstance(response.content, str) else response.content.decode())
+      )
 
       # Create a new regular user (duplicate name)
       response = c.post('/useradmin/users/new', dict(username="test", password1="test", password2="test"))
@@ -904,9 +963,9 @@ class TestUserAdmin(BaseUserAdminTests):
 
       # Regular user should be able to modify oneself
       response = c_reg.post('/useradmin/users/edit/%s' % (FUNNY_NAME_QUOTED,), dict(
-          username = FUNNY_NAME,
-          first_name = "Hello",
-          is_active = True,
+          username=FUNNY_NAME,
+          first_name="Hello",
+          is_active=True,
           groups=[group.id for group in test_user.groups.all()]
           ),
           follow=True
@@ -924,9 +983,9 @@ class TestUserAdmin(BaseUserAdminTests):
       c_su = make_logged_in_client()
       # Inactivate FUNNY_NAME
       c_su.post('/useradmin/users/edit/%s' % (FUNNY_NAME_QUOTED,), dict(
-          username = FUNNY_NAME,
-          first_name = "Hello",
-          is_active = False)
+          username=FUNNY_NAME,
+          first_name="Hello",
+          is_active=False)
       )
       # Now make sure FUNNY_NAME can't log back in
       response = c_reg.get('/useradmin/users/edit/%s' % (FUNNY_NAME_QUOTED,))
@@ -1013,8 +1072,12 @@ class TestUserAdmin(BaseUserAdminTests):
 
     # Now the autocomplete has access to all the users and groups
     c1 = make_logged_in_client('user_test_list_for_autocomplete', is_superuser=False, groupname='group_test_list_for_autocomplete')
-    c2_same_group = make_logged_in_client('user_test_list_for_autocomplete2', is_superuser=False, groupname='group_test_list_for_autocomplete')
-    c3_other_group = make_logged_in_client('user_test_list_for_autocomplete3', is_superuser=False, groupname='group_test_list_for_autocomplete_other_group')
+    c2_same_group = make_logged_in_client(
+      'user_test_list_for_autocomplete2', is_superuser=False, groupname='group_test_list_for_autocomplete'
+    )
+    c3_other_group = make_logged_in_client(
+      'user_test_list_for_autocomplete3', is_superuser=False, groupname='group_test_list_for_autocomplete_other_group'
+    )
 
 
     # c1 users should list only 'user_test_list_for_autocomplete2' and group should not list 'group_test_list_for_autocomplete_other_group'
@@ -1063,9 +1126,13 @@ class TestUserAdmin(BaseUserAdminTests):
     content = json.loads(response.content)
 
     users = [smart_unicode(user['username']) for user in content['users']]
-    assert_equal([u'test', u'user_test_list_for_autocomplete', u'user_test_list_for_autocomplete2', u'user_test_list_for_autocomplete3'], users)
+    assert_equal(
+      [u'test', u'user_test_list_for_autocomplete', u'user_test_list_for_autocomplete2', u'user_test_list_for_autocomplete3'], users
+    )
 
-    c5_autocomplete_filter_by_groupname = make_logged_in_client('user_doesnt_match_autocomplete_filter',is_superuser=False,groupname='group_test_list_for_autocomplete')
+    c5_autocomplete_filter_by_groupname = make_logged_in_client(
+      'user_doesnt_match_autocomplete_filter', is_superuser=False, groupname='group_test_list_for_autocomplete'
+    )
 
     # superuser should get all users & groups which match the autocomplete filter case insensitive
     response = c4_super_user.get('/desktop/api/users/autocomplete', {'include_myself': True, 'filter': 'Test_list_for_autocomplete'})
@@ -1074,7 +1141,7 @@ class TestUserAdmin(BaseUserAdminTests):
     users = [smart_unicode(user['username']) for user in content['users']]
     groups = [smart_unicode(user['name']) for user in content['groups']]
 
-    assert_equal([ u'user_test_list_for_autocomplete', u'user_test_list_for_autocomplete2', u'user_test_list_for_autocomplete3'],  users)
+    assert_equal([u'user_test_list_for_autocomplete', u'user_test_list_for_autocomplete2', u'user_test_list_for_autocomplete3'], users)
     assert_equal([u'group_test_list_for_autocomplete', u'group_test_list_for_autocomplete_other_group'], groups)
 
   def test_language_preference(self):
@@ -1108,7 +1175,16 @@ class TestUserAdmin(BaseUserAdminTests):
         language="en-us><script>alert('Hacked')</script>"
         )
     )
-    assert_true(b'Select a valid choice. en-us&gt;&lt;script&gt;alert(&#39;Hacked&#39;)&lt;/script&gt; is not one of the available choices.' in response.content)
+    if sys.version_info[0] < 3:
+      assert_true(
+        b'Select a valid choice. en-us&gt;&lt;script&gt;alert(&#39;Hacked&#39;)&lt;/script&gt; '\
+        b'is not one of the available choices.' in response.content
+      )
+    else:
+      assert_true(
+        b'Select a valid choice. en-us&gt;&lt;script&gt;alert(&#x27;Hacked&#x27;)&lt;/script&gt; '\
+        b'is not one of the available choices.' in response.content
+      )
     # Hue 4 Admin
     response = edit_user.post('/useradmin/users/edit/admin', dict(
         username="admin",
@@ -1130,7 +1206,16 @@ class TestUserAdmin(BaseUserAdminTests):
         language="en-us><script>alert('Hacked')</script>"
         )
     )
-    assert_true(b'Select a valid choice. en-us&gt;&lt;script&gt;alert(&#39;Hacked&#39;)&lt;/script&gt; is not one of the available choices.' in response.content)
+    if sys.version_info[0] < 3:
+      assert_true(
+        b'Select a valid choice. en-us&gt;&lt;script&gt;alert(&#39;Hacked&#39;)&lt;/script&gt; '\
+        b'is not one of the available choices.' in response.content
+      )
+    else:
+      assert_true(
+        b'Select a valid choice. en-us&gt;&lt;script&gt;alert(&#x27;Hacked&#x27;)&lt;/script&gt; '\
+        b'is not one of the available choices.' in response.content
+      )
     # Hue 4, User with access to useradmin app
     response = edit_user.post('/useradmin/users/edit/edit_user', dict(
         username="edit_user",
@@ -1182,7 +1267,10 @@ class TestUserAdminWithHadoop(BaseUserAdminTests):
       assert_false(cluster.fs.exists('/user/test2'))
       response = c.post('/useradmin/users/new', dict(username="test2", password1='test', password2='test'))
       assert_false(cluster.fs.exists('/user/test2'))
-      response = c.post('/useradmin/users/edit/%s' % "test2", dict(username="test2", password1='test', password2='test', password_old="test", ensure_home_directory=True))
+      response = c.post(
+        '/useradmin/users/edit/%s' % "test2",
+        dict(username="test2", password1='test', password2='test', password_old="test", ensure_home_directory=True)
+      )
       assert_true(cluster.fs.exists('/user/test2'))
       dir_stat = cluster.fs.stats('/user/test2')
       assert_equal('test2', dir_stat.user)
@@ -1210,7 +1298,9 @@ class TestUserAdminWithHadoop(BaseUserAdminTests):
       if cluster.fs.exists('/user/test3'):
         cluster.fs.do_as_superuser(cluster.fs.rmtree, '/user/test3')
       assert_false(cluster.fs.exists('/user/test3'))
-      response = c.post('/useradmin/users/new', dict(username="test3@ad.sec.cloudera.com", password1='test', password2='test', ensure_home_directory=True))
+      response = c.post(
+        '/useradmin/users/new', dict(username="test3@ad.sec.cloudera.com", password1='test', password2='test', ensure_home_directory=True)
+      )
       assert_false(cluster.fs.exists('/user/test3@ad.sec.cloudera.com'))
       assert_true(cluster.fs.exists('/user/test3'))
 

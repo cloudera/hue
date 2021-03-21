@@ -16,6 +16,7 @@
 <%!
 from desktop import conf
 from desktop.lib.i18n import smart_unicode
+from desktop.webpack_utils import get_hue_bundles
 from django.utils.translation import ugettext as _
 from metadata.conf import has_optimizer, OPTIMIZER
 
@@ -112,7 +113,9 @@ if USE_NEW_EDITOR.get():
     }
   </script>
 
-  ${ render_bundle('hue') | n,unicode }
+  % for bundle in get_hue_bundles('hue'):
+    ${ render_bundle(bundle) | n,unicode }
+  % endfor
 
   <script src="${ static('desktop/ext/js/jquery/plugins/jquery.touchSwipe.min.js') }"></script>
   <script src="${ static('desktop/js/bootstrap-typeahead-touchscreen.js') }"></script>
@@ -120,14 +123,6 @@ if USE_NEW_EDITOR.get():
   <script src="${ static('desktop/ext/js/moment-with-locales.min.js') }"></script>
   <script src="${ static('desktop/ext/js/moment-timezone-with-data.min.js') }" type="text/javascript" charset="utf-8"></script>
   <script src="${ static('desktop/ext/js/tzdetect.js') }" type="text/javascript" charset="utf-8"></script>
-  <script src="${ static('desktop/js/ace/ace.js') }"></script>
-  <script src="${ static('desktop/js/ace/mode-impala.js') }"></script>
-  <script src="${ static('desktop/js/ace/mode-hive.js') }"></script>
-  <script src="${ static('desktop/js/ace/ext-language_tools.js') }"></script>
-  <script src="${ static('desktop/js/ace.extended.js') }"></script>
-  <script>
-    ace.config.set("basePath", "${ static('desktop/js/ace') }");
-  </script>
 
   <script type="text/javascript">
 
@@ -162,7 +157,7 @@ if USE_NEW_EDITOR.get():
     }
 
     // sets global apiHelper TTL
-    $.totalStorage('hue.cacheable.ttl', ${conf.CUSTOM.CACHEABLE_TTL.get()});
+    hueUtils.hueLocalStorage('hue.cacheable.ttl', ${conf.CUSTOM.CACHEABLE_TTL.get()});
 
     var IDLE_SESSION_TIMEOUT = -1;
 

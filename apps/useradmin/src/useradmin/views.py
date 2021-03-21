@@ -26,7 +26,7 @@ import json
 
 LOG = logging.getLogger(__name__)
 
-from axes.decorators import FAILURE_LIMIT, LOCK_OUT_AT_FAILURE
+from axes.conf import settings
 from axes.models import AccessAttempt
 from axes.utils import reset
 try:
@@ -44,11 +44,11 @@ from django.utils.translation import get_language, ugettext as _
 
 import desktop.conf
 from desktop.auth.backend import is_admin
-from desktop.conf import LDAP, ENABLE_ORGANIZATIONS, ENABLE_CONNECTORS
+from desktop.conf import LDAP, ENABLE_ORGANIZATIONS, ENABLE_CONNECTORS, ENABLE_SHARING
 from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.models import _get_apps
-from desktop.views import antixss
+from desktop.views import antixss, serve_403_error
 from hadoop.fs.exceptions import WebHdfsException
 
 from useradmin import ldap_access
@@ -130,6 +130,8 @@ def list_for_autocomplete(request):
     groups = Group.objects.filter(name__icontains=autocomplete_filter).order_by('name')
     if request.GET.get('only_mygroups'):
       groups = request.user.groups.filter(name__icontains=autocomplete_filter).order_by('name')
+  elif not ENABLE_SHARING.get():
+    return serve_403_error(request)
   else:
     usergroups = request.user.groups.all()
     # Get all users in the usergroups he belongs to and then filter by username
@@ -154,6 +156,9 @@ def list_for_autocomplete(request):
 
 
 def get_users_by_id(request):
+  if not is_admin(request.user) and not ENABLE_SHARING.get():
+    return serve_403_error(request)
+
   userids = json.loads(request.GET.get('userids', "[]"))
   userids = userids[:100]
   users = User.objects.filter(id__in=userids).order_by('email' if ENABLE_ORGANIZATIONS.get() else 'username')
@@ -173,7 +178,7 @@ def massage_users_for_json(users, extended=False):
       'last_name': user.last_name,
       'email': user.email,
       'last_login': user.last_login,
-      'editURL': reverse('useradmin.views.edit_user', kwargs={'username': user.username})
+      'editURL': reverse('useradmin:useradmin.views.edit_user', kwargs={'username': user.username})
     }
     if extended:
       appendable['groups'] = massage_groups_for_json(user.groups.all())
@@ -193,7 +198,7 @@ def massage_groups_for_json(groups):
 
 def is_user_locked_out(username):
   attempts = AccessAttempt.objects.filter(username=username)
-  return any(attempt.failures_since_start >= FAILURE_LIMIT and LOCK_OUT_AT_FAILURE for attempt in attempts)
+  return any(attempt.failures_since_start >= settings.AXES_FAILURE_LIMIT and settings.AXES_LOCK_OUT_AT_FAILURE for attempt in attempts)
 
 
 def delete_user(request):
@@ -232,10 +237,10 @@ def delete_user(request):
   is_embeddable = request.GET.get('is_embeddable', request.POST.get('is_embeddable', False))
 
   if is_embeddable:
-    return JsonResponse({'url': '/hue' + reverse(list_users)})
+    return JsonResponse({'url': '/hue' + reverse('useradmin:useradmin.views.list_users')})
   else:
     request.info(_('The users were %s.') % action_text)
-    return redirect(reverse(list_users))
+    return redirect(reverse('useradmin:useradmin.views.list_users'))
 
 
 def delete_group(request):
@@ -264,10 +269,10 @@ def delete_group(request):
       is_embeddable = request.GET.get('is_embeddable', request.POST.get('is_embeddable', False))
 
       if is_embeddable:
-        return JsonResponse({'url': '/hue' + reverse(list_groups)})
+        return JsonResponse({'url': '/hue' + reverse('useradmin:useradmin.views.list_groups')})
       else:
         request.info(_('The groups were deleted.'))
-        return redirect(reverse(list_groups))
+        return redirect(reverse('useradmin:useradmin.views.list_groups'))
     except Group.DoesNotExist:
       raise PopupException(_("Group not found."), error_code=404)
   else:
@@ -395,17 +400,17 @@ def edit_user(request, username=None):
         if is_admin(request.user):
           return redirect(reverse('about:index'))
         else:
-          return redirect(reverse('desktop_views_home'))
+          return JsonResponse({'url': '/hue'})
       elif is_admin(request.user):
         if is_embeddable:
-          return JsonResponse({'url': '/hue' + reverse(list_users)})
+          return JsonResponse({'url': '/hue' + reverse('useradmin:useradmin.views.list_users')})
         else:
-          return redirect(reverse(list_users))
+          return redirect(reverse('useradmin:useradmin.views.list_users'))
       else:
         if is_embeddable:
-          return JsonResponse({'url': '/hue' + reverse(edit_user, kwargs={'username': username})})
+          return JsonResponse({'url': '/hue' + reverse('useradmin:useradmin.views.edit_user', kwargs={'username': username})})
         else:
-          return redirect(reverse(edit_user, kwargs={'username': username}))
+          return redirect(reverse('useradmin:useradmin.views.edit_user', kwargs={'username': username}))
   else:
     # Initialize form values
     default_user_group = get_default_user_group()
@@ -427,7 +432,9 @@ def edit_user(request, username=None):
     })
   else:
     if request.method == 'POST' and is_embeddable:
-      return JsonResponse({'status': -1, 'errors': [{'id': f.id_for_label, 'message': list(map(antixss, f.errors))} for f in form if f.errors]})
+      return JsonResponse({'status': -1,
+                           'errors': [{'id': f.id_for_label, 'message': list(map(antixss, f.errors))} for f in form if
+                                      f.errors]})
     else:
       return render('edit_user.mako', request, {
         'form': form,
@@ -488,7 +495,7 @@ def edit_group(request, name=None):
         }
 
       if is_embeddable:
-        return JsonResponse({'url': '/hue' + reverse(list_groups)})
+        return JsonResponse({'url': '/hue' + reverse('useradmin:useradmin.views.list_groups')})
       else:
         request.info(_('Group information updated'))
         return redirect('/useradmin/groups')
@@ -543,10 +550,10 @@ def edit_permission(request, app=None, priv=None):
       }
 
       if is_embeddable:
-        return JsonResponse({'url': '/hue' + reverse(list_permissions)})
+        return JsonResponse({'url': '/hue' + reverse('useradmin:useradmin.views.list_permissions')})
       else:
         request.info(_('Permission information updated'))
-        return redirect(reverse(list_permissions))
+        return redirect(reverse('useradmin:useradmin.views.list_permissions'))
   else:
     form = PermissionsEditForm(instance=instance)
   if request.method == 'POST' and is_embeddable:
@@ -622,7 +629,7 @@ def add_ldap_users(request):
         if is_embeddable:
           return JsonResponse({'status': 0})
         else:
-          return redirect(reverse(list_users))
+          return redirect(reverse('useradmin:useradmin.views.list_users'))
   else:
     form = AddLdapUsersForm()
 
@@ -698,9 +705,9 @@ def add_ldap_groups(request):
           request.warn(_('Failed to import following users: %s') % ', '.join(unique_users))
 
         if is_embeddable:
-          return JsonResponse({'url': '/hue' + reverse(list_groups)})
+          return JsonResponse({'url': '/hue' + reverse('useradmin:useradmin.views.list_groups')})
         else:
-          return redirect(reverse(list_groups))
+          return redirect(reverse('useradmin:useradmin.views.list_groups'))
 
       else:
         errors = form._errors.setdefault('groupname_pattern', ErrorList())
@@ -760,9 +767,9 @@ def sync_ldap_users_groups(request):
         request.warn(_('Failed to import following users: %s') % ', '.join(unique_users))
 
       if is_embeddable:
-        return JsonResponse({'url': '/hue' + reverse(list_users)})
+        return JsonResponse({'url': '/hue' + reverse('useradmin:useradmin.views.list_users')})
       else:
-        return redirect(reverse(list_users))
+        return redirect(reverse('useradmin:useradmin.views.list_users'))
   else:
     form = SyncLdapUsersGroupsForm()
 
@@ -882,7 +889,7 @@ def sync_unix_users_and_groups(min_uid, max_uid, min_gid, max_gid, check_shell):
     members = group.gr_mem
     for member in members:
       if member not in user_groups:
-        user_groups[member] = [ hue_group ]
+        user_groups[member] = [hue_group]
       else:
         user_groups[member].append(hue_group)
 
@@ -919,7 +926,7 @@ def _check_remove_last_super(user_obj):
     return
 
   # Is there any other active superuser left?
-  all_active_su = User.objects.filter(is_superuser__exact = True, is_active__exact = True)
+  all_active_su = User.objects.filter(is_superuser__exact=True, is_active__exact=True)
   num_active_su = all_active_su.count()
 
   if num_active_su < 1:
@@ -1084,14 +1091,16 @@ def _import_ldap_members(connection, group, ldap_info, count=0, max_count=1, fai
     LOG.debug("Importing posix user %s into group %s" % (smart_str(posix_member), smart_str(group.name)))
     user_info = None
     try:
-      user_info = connection.find_users(posix_member, search_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), user_name_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), find_by_dn=False)
+      user_info = connection.find_users(posix_member, search_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(),
+                                        user_name_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), find_by_dn=False)
     except LdapSearchException as e:
       LOG.warn("Failed to find LDAP users: %s" % e)
 
     if user_info:
       users = _import_ldap_users_info(connection, user_info, failed_users=failed_users)
       if users:
-        LOG.debug("Adding member %s represented as users (should be a single user) %s to group %s" % (smart_str(posix_member), smart_str(users), smart_str(group.name)))
+        LOG.debug("Adding member %s represented as users (should be a single user) %s to group %s" % (
+        smart_str(posix_member), smart_str(users), smart_str(group.name)))
         group.user_set.add(*users)
 
 
@@ -1120,7 +1129,8 @@ def _sync_ldap_members(connection, group, ldap_info, count=0, max_count=1, faile
       user = ldap_access.get_ldap_user(username=user_info['username'])
       group.user_set.add(user)
     except User.DoesNotExist:
-      LOG.warn("Synchronizing user %s with group %s failed. User does not exist." % (smart_str(user_info['dn']), smart_str(group.name)))
+      LOG.warn("Synchronizing user %s with group %s failed. User does not exist." % (
+      smart_str(user_info['dn']), smart_str(group.name)))
 
   for group_info in groups_info:
     LOG.debug("Synchronizing group %s" % smart_str(group_info['dn']))
@@ -1135,7 +1145,8 @@ def _sync_ldap_members(connection, group, ldap_info, count=0, max_count=1, faile
     LOG.debug("Synchronizing posix user %s with group %s" % (smart_str(posix_member), smart_str(group.name)))
     users_info = []
     try:
-      users_info = connection.find_users(posix_member, search_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), user_name_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), find_by_dn=False)
+      users_info = connection.find_users(posix_member, search_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(),
+                                         user_name_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), find_by_dn=False)
     except LdapSearchException as e:
       LOG.warn("Failed to find LDAP users: %s" % e)
 
@@ -1144,7 +1155,8 @@ def _sync_ldap_members(connection, group, ldap_info, count=0, max_count=1, faile
         user = ldap_access.get_ldap_user(username=user_info['username'])
         group.user_set.add(user)
       except User.DoesNotExist:
-        LOG.warn("Synchronizing posix user %s with group %s failed. User does not exist." % (smart_str(posix_member), smart_str(group.name)))
+        LOG.warn("Synchronizing posix user %s with group %s failed. User does not exist." % (
+        smart_str(posix_member), smart_str(group.name)))
 
 
 def _import_ldap_nested_groups(connection, groupname_pattern, import_members=False, recursive_import_members=False,
@@ -1259,7 +1271,8 @@ def _import_ldap_suboordinate_groups(connection, groupname_pattern, import_membe
 
       for member in members:
         LOG.debug("Importing user %s" % smart_str(member))
-        group.user_set.add( *( _import_ldap_users(connection, member, import_by_dn=True, failed_users=failed_users) or [] ) )
+        group.user_set.add(
+          *(_import_ldap_users(connection, member, import_by_dn=True, failed_users=failed_users) or []))
 
     # Sync users
     if sync_users:
@@ -1299,21 +1312,26 @@ def _import_ldap_suboordinate_groups(connection, groupname_pattern, import_membe
           # which are defined by 'uid'.
           user_info = None
           try:
-            user_info = connection.find_users(posix_member, search_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), user_name_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), find_by_dn=False)
+            user_info = connection.find_users(posix_member, search_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(),
+                                              user_name_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(),
+                                              find_by_dn=False)
           except LdapSearchException as e:
             LOG.warn("Failed to find LDAP user: %s" % e)
 
           if user_info:
             users = _import_ldap_users_info(connection, user_info, import_by_dn=False, failed_users=failed_users)
             if users:
-              LOG.debug("Adding member %s represented as users (should be a single user) %s to group %s" % (smart_str(posix_member), smart_str(users), smart_str(group.name)))
+              LOG.debug("Adding member %s represented as users (should be a single user) %s to group %s" % (
+              smart_str(posix_member), smart_str(users), smart_str(group.name)))
               group.user_set.add(*users)
 
       if sync_users:
         for posix_member in posix_members:
           user_info = []
           try:
-            user_info = connection.find_users(posix_member, search_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), user_name_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), find_by_dn=False)
+            user_info = connection.find_users(posix_member, search_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(),
+                                              user_name_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(),
+                                              find_by_dn=False)
           except LdapSearchException as e:
             LOG.warn("Failed to find LDAP user: %s" % e)
 
@@ -1364,4 +1382,4 @@ def _import_ldap_groups(connection, groupname_pattern, import_members=False, rec
 
 
 def _get_failed_operation_text(username, operation):
-    return '%(username)s is not allowed to perform %(operation)s' % {'username': username, 'operation': operation}
+  return '%(username)s is not allowed to perform %(operation)s' % {'username': username, 'operation': operation}

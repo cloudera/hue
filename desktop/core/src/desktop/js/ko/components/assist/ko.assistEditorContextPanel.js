@@ -24,6 +24,7 @@ import componentUtils from 'ko/components/componentUtils';
 import dataCatalog from 'catalog/dataCatalog';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
+import DataCatalogEntry from 'catalog/DataCatalogEntry';
 
 const TEMPLATE =
   ASSIST_TABLE_TEMPLATES +
@@ -82,7 +83,7 @@ const TEMPLATE =
               <i class="hue-warning fa fa-fw muted valign-middle fa-warning"></i>
               <!-- ko with: catalogEntry -->
               <!-- ko if: typeof reload !== 'undefined' -->
-              <span data-bind="text: getDisplayName()"></span> <a class="inactive-action" href="javascript: void(0);" data-bind="click: reload"><i class="fa fa-refresh" data-bind="css: { 'fa-spin': reloading }"></i></a>
+              <span data-bind="text: getDisplayName(true)"></span> <a class="inactive-action" href="javascript: void(0);" data-bind="click: reload"><i class="fa fa-refresh" data-bind="css: { 'fa-spin': reloading }"></i></a>
               <!-- /ko -->
               <!-- /ko -->
             </span>
@@ -115,9 +116,9 @@ const TEMPLATE =
           <li>
             <div class="risk-list-title" data-bind="css: { 'risk-list-high' : risk === 'high', 'risk-list-normal':  risk !== 'high' }, tooltip: { title: risk + ' ' + riskTables }"><span data-bind="text: riskAnalysis"></span></div>
             <div class="risk-list-description" data-bind="text: riskRecommendation"></div>
-            <div class="risk-quickfix" data-bind="visible: (riskId === 17 || riskId === 22) && $parent.activeEditor() && $parent.activeLocations()" style="display:none;">
+            <div class="risk-quickfix" data-bind="visible: (riskId === 17 || riskId === 18 || riskId === 22) && $parent.activeEditor() && $parent.activeLocations()" style="display:none;">
               <a href="javascript:void(0);" data-bind="click: function () { $parent.addFilter(riskId); hueAnalytics.convert('optimizer', 'addFilter/' + riskId); }">${I18n(
-                'Add filter'
+                'Fix me'
               )}</a>
             </div>
           </li>
@@ -419,7 +420,7 @@ class AssistEditorContextPanel {
                     path: [database],
                     definition: { type: 'database' }
                   })
-                  .done(catalogEntry => {
+                  .then(catalogEntry => {
                     databaseIndex[database] = new AssistDbEntry(
                       catalogEntry,
                       null,
@@ -431,7 +432,7 @@ class AssistEditorContextPanel {
                     updateTables = true;
                     dbDeferred.resolve(databaseIndex[database]);
                   })
-                  .fail(() => {
+                  .catch(() => {
                     dbDeferred.reject();
                   });
               }
@@ -440,7 +441,7 @@ class AssistEditorContextPanel {
                 .done(dbEntry => {
                   dbEntry.catalogEntry
                     .getChildren({ silenceErrors: true })
-                    .done(tableEntries => {
+                    .then(tableEntries => {
                       const tableName =
                         location.identifierChain[location.identifierChain.length - 1].name;
                       const found = tableEntries.some(tableEntry => {
@@ -467,74 +468,69 @@ class AssistEditorContextPanel {
                       });
 
                       if (!found) {
-                        const missingEntry = new AssistDbEntry(
-                          {
-                            path: [dbEntry.catalogEntry.name, tableName],
-                            name: tableName,
-                            isTableOrView: () => true,
-                            getType: () => 'table',
-                            hasPossibleChildren: () => true,
-                            getSourceMeta: () =>
-                              $.Deferred()
-                                .resolve({ notFound: true })
-                                .promise(),
-                            getDisplayName: () => dbEntry.catalogEntry.name + '.' + tableName,
-                            reloading: ko.observable(false),
-                            reload: function() {
-                              const self = this;
-                              if (self.reloading()) {
-                                return;
-                              }
-                              self.reloading(true);
-                              huePubSub.subscribeOnce('data.catalog.entry.refreshed', data => {
-                                data.entry.getSourceMeta({ silenceErrors: true }).always(() => {
-                                  self.reloading(false);
-                                });
-                              });
-                              dataCatalog
-                                .getEntry({
-                                  namespace: activeLocations.namespace,
-                                  compute: activeLocations.compute,
-                                  connector: activeLocations.connector,
-                                  path: []
-                                })
-                                .done(sourceEntry => {
-                                  sourceEntry
-                                    .getChildren()
-                                    .done(dbEntries => {
-                                      let clearPromise;
-                                      // Clear the database first if it exists without cascade
-                                      const hasDb = dbEntries.some(dbEntry => {
-                                        if (
-                                          dbEntry.name.toLowerCase() === self.path[0].toLowerCase()
-                                        ) {
-                                          clearPromise = dbEntry.clearCache({
-                                            invalidate: 'invalidate',
-                                            cascade: false
-                                          });
-                                          return true;
-                                        }
+                        const catalogEntry = new DataCatalogEntry({
+                          path: [dbEntry.catalogEntry.name, tableName],
+                          dataCatalog: dbEntry.catalogEntry.dataCatalog,
+                          namespace: dbEntry.catalogEntry.namespace,
+                          compute: dbEntry.catalogEntry.namespace
+                        });
+
+                        catalogEntry.reloading = ko.observable(false);
+                        catalogEntry.reload = function () {
+                          const self = this;
+                          if (self.reloading()) {
+                            return;
+                          }
+                          self.reloading(true);
+                          huePubSub.subscribeOnce('data.catalog.entry.refreshed', data => {
+                            data.entry.getSourceMeta({ silenceErrors: true }).finally(() => {
+                              self.reloading(false);
+                            });
+                          });
+                          dataCatalog
+                            .getEntry({
+                              namespace: activeLocations.namespace,
+                              compute: activeLocations.compute,
+                              connector: activeLocations.connector,
+                              path: []
+                            })
+                            .then(sourceEntry => {
+                              sourceEntry
+                                .getChildren()
+                                .then(dbEntries => {
+                                  let clearPromise;
+                                  // Clear the database first if it exists without cascade
+                                  const hasDb = dbEntries.some(dbEntry => {
+                                    if (dbEntry.name.toLowerCase() === self.path[0].toLowerCase()) {
+                                      clearPromise = dbEntry.clearCache({
+                                        invalidate: 'invalidate',
+                                        cascade: false
                                       });
-                                      if (!hasDb) {
-                                        // If the database is missing clear the source without cascade
-                                        clearPromise = sourceEntry.clearCache({
-                                          invalidate: 'invalidate',
-                                          cascade: false
-                                        });
-                                      }
-                                      clearPromise.fail(() => {
-                                        self.reloading(false);
-                                      });
-                                    })
-                                    .fail(() => {
-                                      self.reloading(false);
+                                      return true;
+                                    }
+                                  });
+                                  if (!hasDb) {
+                                    // If the database is missing clear the source without cascade
+                                    clearPromise = sourceEntry.clearCache({
+                                      invalidate: 'invalidate',
+                                      cascade: false
                                     });
+                                  }
+                                  clearPromise.catch(() => {
+                                    self.reloading(false);
+                                  });
                                 })
-                                .fail(() => {
+                                .catch(() => {
                                   self.reloading(false);
                                 });
-                            }
-                          },
+                            })
+                            .catch(() => {
+                              self.reloading(false);
+                            });
+                        };
+
+                        const missingEntry = new AssistDbEntry(
+                          catalogEntry,
                           dbEntry,
                           assistDbSource,
                           this.filter,
@@ -553,9 +549,9 @@ class AssistEditorContextPanel {
                         tableDeferred.resolve(missingEntry);
                       }
                     })
-                    .fail(tableDeferred.reject);
+                    .catch(tableDeferred.reject);
                 })
-                .fail(tableDeferred.reject);
+                .catch(tableDeferred.reject);
             }
           }
         });
@@ -664,9 +660,10 @@ class AssistEditorContextPanel {
         }
 
         if (
+          riskId === 22 &&
           location.type === 'whereClause' &&
           !location.subquery &&
-          (location.missing || riskId === 22)
+          location.missing
         ) {
           this.activeEditor().moveCursorToPosition({
             row: location.location.last_line - 1,
@@ -697,6 +694,54 @@ class AssistEditorContextPanel {
 
           return false;
         }
+
+        if (
+          riskId === 17 &&
+          location.type === 'limitClause' &&
+          !location.subquery &&
+          location.missing
+        ) {
+          this.activeEditor().moveCursorToPosition({
+            row: location.location.last_line - 1,
+            column: location.location.last_column - 1
+          });
+          this.activeEditor().clearSelection();
+
+          if (/\S$/.test(this.activeEditor().getTextBeforeCursor())) {
+            this.activeEditor().session.insert(this.activeEditor().getCursorPosition(), ' ');
+          }
+
+          const operation = 'LIMIT';
+          this.activeEditor().session.insert(
+            this.activeEditor().getCursorPosition(),
+            isLowerCase ? operation.toLowerCase() : operation
+          );
+          this.activeEditor().focus();
+
+          window.setTimeout(() => {
+            this.activeEditor().execCommand('startAutocomplete');
+          }, 1);
+
+          return false;
+        }
+
+        if (riskId === 18 && location.type === 'asterisk' && !location.subquery) {
+          this.activeEditor().moveCursorToPosition({
+            row: location.location.last_line - 1,
+            column: location.location.last_column - 1
+          });
+
+          this.activeEditor().clearSelection();
+          this.activeEditor().removeTextBeforeCursor(1);
+          this.activeEditor().focus();
+
+          window.setTimeout(() => {
+            this.activeEditor().execCommand('startAutocomplete');
+          }, 1);
+
+          return false;
+        }
+
         return true;
       });
     }

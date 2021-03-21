@@ -1,0 +1,54 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Paginator.vue should render 1`] = `
+<div
+  class="hue-paginator"
+>
+  <div
+    class="page-status"
+  >
+    1-25 of 500
+  </div>
+   Rows per page: 
+  <dropdown-menu-stub
+    link="true"
+    text="25"
+  />
+  <div
+    class="navigation-actions"
+  >
+    <a
+      class="disabled"
+      href="javascript: void(0);"
+    >
+      <hue-icon-stub
+        type="hi-chevron-left-limit"
+      />
+    </a>
+    <a
+      class="disabled"
+      href="javascript: void(0);"
+    >
+      <hue-icon-stub
+        type="hi-chevron-left"
+      />
+    </a>
+    <a
+      class=""
+      href="javascript: void(0);"
+    >
+      <hue-icon-stub
+        type="hi-chevron-right"
+      />
+    </a>
+    <a
+      class=""
+      href="javascript: void(0);"
+    >
+      <hue-icon-stub
+        type="hi-chevron-right-limit"
+      />
+    </a>
+  </div>
+</div>
+`;

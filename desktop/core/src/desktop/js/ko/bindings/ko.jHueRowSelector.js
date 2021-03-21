@@ -18,7 +18,7 @@ import $ from 'jquery';
 import * as ko from 'knockout';
 
 ko.bindingHandlers.jHueRowSelector = {
-  init: function(element) {
+  init: function (element) {
     $(element).jHueRowSelector();
   }
 };

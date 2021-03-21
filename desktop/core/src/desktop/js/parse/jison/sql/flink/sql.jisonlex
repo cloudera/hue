@@ -48,6 +48,7 @@
 'DATABASE'                                 { return 'DATABASE'; }
 'DECIMAL'                                  { return 'DECIMAL'; }
 'DESC'                                     { return 'DESC'; }
+'DESCRIBE'                                 { parser.determineCase(yytext); parser.addStatementTypeLocation('DESCRIBE', yylloc); return 'DESCRIBE'; }
 'DISTINCT'                                 { return 'DISTINCT'; }
 'DIV'                                      { return 'ARITHMETIC_OPERATOR'; }
 'DOUBLE'                                   { return 'DOUBLE'; }

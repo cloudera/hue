@@ -129,12 +129,12 @@
     });
 
     function smartTooltipMaker() {
-      if (self.options.smartTooltip !== "" && typeof $.totalStorage !== "undefined" && $.totalStorage("jHueGenericAutocompleteTooltip") !== -1) {
+      if (self.options.smartTooltip !== "" && hueUtils && hueUtils.hueLocalStorage && hueUtils.hueLocalStorage("jHueGenericAutocompleteTooltip") !== -1) {
         var cnt = 0;
-        if ($.totalStorage("jHueGenericAutocompleteTooltip")) {
-          cnt = $.totalStorage("jHueGenericAutocompleteTooltip") + 1;
+        if (hueUtils.hueLocalStorage("jHueGenericAutocompleteTooltip")) {
+          cnt = hueUtils.hueLocalStorage("jHueGenericAutocompleteTooltip") + 1;
         }
-        $.totalStorage("jHueGenericAutocompleteTooltip", cnt);
+        hueUtils.hueLocalStorage("jHueGenericAutocompleteTooltip", cnt);
         if (cnt >= self.options.smartTooltipThreshold) {
           $el.tooltip({
             animation: true,
@@ -145,7 +145,7 @@
           window.setTimeout(function () {
             $el.tooltip("hide");
           }, 10000);
-          $.totalStorage("jHueGenericAutocompleteTooltip", -1);
+          hueUtils.hueLocalStorage("jHueGenericAutocompleteTooltip", -1);
         }
       }
     }
@@ -167,11 +167,11 @@
         validateTimeout = window.setTimeout(function () {
           $.when(self.namespaceDeferred, self.computeDeferred).done(function (namespace, compute) {
             var target = path.pop();
-            dataCatalog.getChildren({ connector: connector, namespace: namespace, compute: compute, path: path }).done(function (childEntries) {
+            dataCatalog.getChildren({ connector: connector, namespace: namespace, compute: compute, path: path }).then(function (childEntries) {
               if (childEntries.some(function (childEntry) { return childEntry.name === target })) {
                 onPathChange($el.val());
               }
-            });
+            }).catch(function() {});
           });
         }, 500);
       }
@@ -273,9 +273,9 @@
     self.getDatabases = function (callback) {
       var self = this;
       $.when(self.namespaceDeferred, self.computeDeferred).done(function (namespace, compute) {
-        dataCatalog.getChildren({ connector: { id: self.options.apiHelperType }, namespace: namespace, compute: compute, path: [] }).done(function (dbEntries) {
+        dataCatalog.getChildren({ connector: { id: self.options.apiHelperType }, namespace: namespace, compute: compute, path: [] }).then(function (dbEntries) {
           callback($.map(dbEntries, function (entry) { return entry.name }));
-        });
+        }).catch(function() {});
       })
     };
 
@@ -287,8 +287,8 @@
     self.getTables = function (database, callback) {
       var self = this;
       $.when(self.namespaceDeferred, self.computeDeferred).done(function (namespace, compute) {
-        dataCatalog.getEntry({ connector: connector, namespace: namespace, compute: compute, path: [ database ] }).done(function (entry) {
-          entry.getSourceMeta().done(callback)
+        dataCatalog.getEntry({ connector: connector, namespace: namespace, compute: compute, path: [ database ] }).then(function (entry) {
+          entry.getSourceMeta().then(callback)
         });
       });
     };
@@ -296,8 +296,8 @@
     self.getColumns = function (database, table, callback) {
       var self = this;
       $.when(self.namespaceDeferred, self.computeDeferred).done(function (namespace, compute) {
-        dataCatalog.getEntry({ connector: connector, namespace: namespace, compute: compute, path: [ database, table ] }).done(function (entry) {
-          entry.getSourceMeta().done(callback)
+        dataCatalog.getEntry({ connector: connector, namespace: namespace, compute: compute, path: [ database, table ] }).then(function (entry) {
+          entry.getSourceMeta().then(callback)
         });
       });
     };

@@ -39,7 +39,6 @@ sf_caption_position:
 slide_template:
   - default
 categories:
-  - Querying
 ---
 
 [In Thailand][1], a brand new application that enables viewing data in MySQL, PostgreSQL, Oracle and Sqlite has been committed.

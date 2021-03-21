@@ -28,6 +28,7 @@ from useradmin.organization import _fitered_queryset, get_user_request_organizat
 from desktop.conf import CONNECTORS, ENABLE_ORGANIZATIONS
 from desktop.lib.connectors.types import get_connectors_types
 from desktop.lib.exceptions_renderable import PopupException
+from desktop.lib.i18n import smart_unicode
 
 
 LOG = logging.getLogger(__name__)
@@ -40,6 +41,12 @@ class BaseConnector(models.Model):
   name = models.CharField(default='', max_length=255)
   description = models.TextField(default='')
   dialect = models.CharField(max_length=32, db_index=True, help_text=_t('Type of connector, e.g. hive, mysql... '))
+  interface = models.CharField(
+      max_length=32,
+      db_index=True,
+      help_text=_t('Type of interface, e.g. sqlalchemy, hiveserver2... '),
+      default='sqlalchemy'
+  )
   settings = models.TextField(default='{}')
   last_modified = models.DateTimeField(auto_now=True, db_index=True, verbose_name=_t('Time last modified'))
 
@@ -59,6 +66,7 @@ class BaseConnector(models.Model):
       'name': self.name,
       'description': self.description,
       'dialect': self.dialect,
+      'interface': self.interface,
       'settings': self.settings,
       'last_modified': self.last_modified
     }
@@ -72,8 +80,8 @@ if ENABLE_ORGANIZATIONS.get():
       queryset = super(ConnectorManager, self).get_queryset()
       return _fitered_queryset(queryset)
 
-    def natural_key(self):
-      return (self.organization, self.name,)
+    def get_by_natural_key(self, dialect, interface, organization):
+      return self.get(dialect=dialect, interface=interface, organization__name=organization)
 
   class Connector(BaseConnector):
     organization = models.ForeignKey('useradmin.Organization', on_delete=models.CASCADE)
@@ -91,11 +99,25 @@ if ENABLE_ORGANIZATIONS.get():
 
     def __str__(self):
       return '%s (%s) @ %s' % (self.name, self.dialect, self.organization)
+
+    def natural_key(self):
+      return (self.dialect, self.interface) + self.organization.natural_key()
 else:
-  class Connector(BaseConnector): pass
+  class ConnectorManager(models.Manager):
+
+    def get_by_natural_key(self, dialect, interface):
+      return self.get(dialect=dialect, interface=interface)
+
+  class Connector(BaseConnector):
+
+    objects = ConnectorManager()
+
+    def natural_key(self):
+      # Note: duplicates are still possible without key on the name
+      return (self.dialect, self.interface)
 
 
-def _get_installed_connectors(category=None, categories=None, dialect=None, interface=None, user=None):
+def _get_installed_connectors(category=None, categories=None, dialect=None, interface=None, user=None, connector_id=None):
   from desktop.auth.backend import is_admin
 
   connectors_objects = Connector.objects.all()
@@ -103,17 +125,19 @@ def _get_installed_connectors(category=None, categories=None, dialect=None, inte
   if user is not None and not is_admin(user):  # Apply Permissions
     connectors_objects = connectors_objects.filter(huepermission__in=user.get_permissions())
 
+  connectors_objects = connectors_objects.order_by('id')
+
   connector_instances = [
       {
         'id': connector.id,
         'nice_name': connector.name,
         'description': connector.description,
         'dialect': connector.dialect,
-        'interface': None,
+        'interface': connector.interface,
         'settings': json.loads(connector.settings),
         'is_demo': False,
       }
-      for connector in connectors_objects
+      for connector in connectors_objects if connector_id is None or connector_id == connector.id
   ]
   connectors = []
 
@@ -136,18 +160,26 @@ def _get_installed_connectors(category=None, categories=None, dialect=None, inte
   if interface is not None:
     connectors = [connector for connector in connectors if connector['interface'] == interface]
 
+  if connector_id and user and not connectors:
+    raise ConnectorNotFoundException(_('Connector %s not found for user %s') % (connector_id, user))
+
   return connectors
 
 
 def _augment_connector_properties(connector):
   '''
-  Add the connector properties based on the dialect type to each connector.
+  Add the connector properties based on the dialect + interface matching to each connector.
   The connector type must exist in desktop/core/src/desktop/lib/connectors/types.py.
   '''
 
   connector_types = []
+  connector_type = None
 
   for connector_type in get_connectors_types():
+    if connector_type['dialect'] == connector['dialect'] and connector['interface'] and \
+        connector_type.get('interface') == connector.get('interface'):
+      connector_types.insert(0, connector_type)
+      break
     if connector_type['dialect'] == connector['dialect']:
       connector_types.insert(0, connector_type)
     elif connector['interface'] and connector_type.get('interface') == connector['interface']:
@@ -173,7 +205,7 @@ def _create_connector_examples():
   skipped = []
 
   for connector in _get_connector_examples():
-    name ='%(nice_name)s (%(dialect)s)' % connector
+    name = '%(nice_name)s (%(dialect)s)' % connector
     if not Connector.objects.filter(name=connector['nice_name']).exists():
       connector = Connector.objects.create(
         name=connector['nice_name'],
@@ -181,7 +213,7 @@ def _create_connector_examples():
         dialect=connector['dialect'],
         settings=json.dumps(connector['settings'])
       )
-      result.append(name)
+      added.append(name)
     else:
       skipped.append(name)
 
@@ -192,7 +224,7 @@ def _get_connector_examples():
   return [
     {
       'id': i,
-      'nice_name':  CONNECTORS.get()[i].NICE_NAME.get() or i,
+      'nice_name': CONNECTORS.get()[i].NICE_NAME.get() or i,
       'description': '',
       'dialect': CONNECTORS.get()[i].DIALECT.get(),
       'interface': CONNECTORS.get()[i].INTERFACE.get(),
@@ -201,3 +233,14 @@ def _get_connector_examples():
     }
     for i in CONNECTORS.get()
   ]
+
+
+class ConnectorNotFoundException(Exception):
+  def __init__(self, message=None):
+    self.message = message or _('No error message, please check the logs.')
+
+  def __str__(self):
+    return str(self.message)
+
+  def __unicode__(self):
+    return smart_unicode(self.message)

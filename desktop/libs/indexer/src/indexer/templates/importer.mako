@@ -29,12 +29,12 @@
 
 <%namespace name="actionbar" file="actionbar.mako" />
 
-%if not is_embeddable:
+% if not is_embeddable:
 ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
 
 <link rel="stylesheet" href="${ static('notebook/css/notebook.css') }">
 <link rel="stylesheet" href="${ static('notebook/css/notebook-layout.css') }">
-%endif
+% endif
 
 <link rel="stylesheet" href="${ static('indexer/css/importer.css') }" type="text/css">
 
@@ -80,11 +80,11 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
   </div>
 </div>
 
-%if not is_embeddable:
+% if not is_embeddable:
 <a title="${_('Toggle Assist')}" class="pointer show-assist" data-bind="visible: !$root.isLeftPanelVisible() && $root.assistAvailable(), click: function() { $root.isLeftPanelVisible(true); }">
   <i class="fa fa-chevron-right"></i>
 </a>
-%endif
+% endif
 
 <div class="main-content">
   <div class="vertical-full container-fluid" data-bind="style: { 'padding-left' : $root.isLeftPanelVisible() ? '0' : '20px' }">
@@ -443,13 +443,16 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
       <!-- ko ifnot: createWizard.isGuessingFormat -->
       <h4>${_('Format')}</h4>
       <div class="card-body">
-        <label data-bind="visible: (createWizard.prefill.source_type().length == 0 || createWizard.prefill.target_type() == 'index') && (createWizard.source.inputFormat() == 'file' || createWizard.source.inputFormat() == 'stream')">
+        <label data-bind="visible: (createWizard.prefill.source_type().length == 0 || createWizard.prefill.target_type() == 'index') &&
+            (createWizard.source.inputFormat() == 'file' || createWizard.source.inputFormat() == 'stream')">
           <div>${_('File Type')}</div>
-          <select data-bind="selectize: $root.createWizard.fileTypes, value: $root.createWizard.fileTypeName, optionsText: 'description', optionsValue: 'name'"></select>
+          <select data-bind="selectize: $root.createWizard.fileTypes, value: $root.createWizard.fileTypeName,
+              optionsText: 'description', optionsValue: 'name'"></select>
         </label>
         <span class="inline-labels" data-bind="with: createWizard.source.format, visible: createWizard.source.show">
           <span data-bind="foreach: getArguments()">
-            <!-- ko template: {name: 'arg-' + $data.type, data: {description: $data.description, value: $parent[$data.name]}}--><!-- /ko -->
+            <!-- ko template: { name: 'arg-' + $data.type, data: {description: $data.description, value: $parent[$data.name]} }-->
+            <!-- /ko -->
           </span>
         </span>
       </div>
@@ -528,7 +531,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
             <input type="text" class="form-control name input-xxlarge" id="collectionName" data-bind="value: name, filechooser: name, filechooserOptions: { linkMarkup: true, skipInitialPathIfEmpty: true, openOnFocus: true, selectFolder: true, displayOnlyFolders: true, uploadFile: false}" placeholder="${ _('Name') }" title="${ _('Directory must not exist in the path') }">
             <!-- /ko -->
 
-            <!-- ko if: outputFormat() == 'index' -->
+            <!-- ko if: ['index', 'big-table', 'stream-table'].indexOf(outputFormat()) != -1 -->
             <label for="collectionName" class="control-label "><div>${ _('Name') }</div></label>
             <input type="text" class="form-control input-xlarge" id="collectionName" data-bind="value: name, valueUpdate: 'afterkeydown'" placeholder="${ _('Name') }">
             <!-- /ko -->
@@ -562,7 +565,6 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
             <!-- /ko -->
 
             <!-- ko if: outputFormat() == 'flume' -->
-
             <h4>${ _('Sink') }</h4>
             <div class="row-fluid">
               <div>
@@ -606,7 +608,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
       </div>
 
 
-        <!-- ko if: outputFormat() == 'table' && $root.createWizard.source.inputFormat() != 'rdbms' -->
+        <!-- ko if: ['table'].indexOf(outputFormat()) != -1 && $root.createWizard.source.inputFormat() != 'rdbms' -->
         <div class="card step">
           <h4>${_('Properties')}</h4>
           <div class="card-body">
@@ -692,7 +694,6 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
             </div>
 
             <label class="control-label"><div>${ _('Partitions') }</div>
-
               <!-- ko if: tableFormat() != 'kudu' && $root.createWizard.source.inputFormat() != 'rdbms' -->
               <div class="inline-table">
                 <div class="form-inline" data-bind="foreach: partitionColumns">
@@ -756,16 +757,23 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
         </div>
         <!-- /ko -->
 
-        <!-- ko if: outputFormat() == 'index' -->
+        <!-- ko if: ['index', 'big-table'].indexOf(outputFormat()) != -1 -->
         <div class="card step">
           <h4>${_('Properties')}</h4>
           <div class="card-body">
             % if ENABLE_SCALABLE_INDEXER.get():
             <div class="control-group">
               <label class="checkbox inline-block" title="${ _('Execute a cluster job to index a large dataset.') }" data-bind="visible: $root.createWizard.source.inputFormat() == 'file'">
-                <input type="checkbox" data-bind="checked: indexerRunJob"> ${_('Index with a job')}
+                <input type="checkbox" data-bind="checked: indexerRunJob">
+                  <!-- ko if: outputFormat() == 'index' -->
+                    ${_('Index with a job')}
+                  <!-- /ko -->
+                  <!-- ko if: outputFormat() == 'big-table' -->
+                    ${_('Load data')}
+                  <!-- /ko -->
               </label>
 
+              <!-- ko if: outputFormat() == 'index' -->
               <label for="path" class="control-label" data-bind="visible: indexerRunJob"><div>${ _('Libs') }</div>
                 <input type="text" class="form-control path filechooser-input input-xlarge" data-bind="value: indexerJobLibPath, filechooser: indexerJobLibPath, filechooserOptions: { linkMarkup: true, skipInitialPathIfEmpty: true }, valueUpdate: 'afterkeydown'">
               </label>
@@ -773,6 +781,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
                 <a data-bind="hueLink: '/filebrowser/view=' + indexerJobLibPath()" title="${ _('Open') }" style="font-size: 14px" class="margin-left-10">
                   <i class="fa fa-external-link-square"></i>
                 </a>
+              <!-- /ko -->
               <!-- /ko -->
             </div>
             % endif
@@ -783,6 +792,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
               </label>
             </div>
 
+            <!-- ko if: ['index'].indexOf(outputFormat()) != -1 -->
             <div class="control-group">
               <label for="kuduDefaultField" class="control-label"><div>${ _('Default field') }</div>
                 <select id="kuduDefaultField" data-bind="selectize: columns, selectedOptions: indexerDefaultField, selectedObjects: indexerDefaultFieldObject, optionsValue: 'name', optionsText: 'name', innerSubscriber: 'name'" size="1" multiple="false"></select>
@@ -824,6 +834,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
                 </label>
               </div>
             </span>
+            <!-- /ko -->
           </div>
         </div>
         <!-- /ko -->
@@ -934,7 +945,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
         </div>
         <!-- /ko -->
 
-        <!-- ko if: ['table', 'index', 'hbase'].indexOf(outputFormat()) != -1 -->
+        <!-- ko if: ['table', 'index', 'hbase', 'big-table', 'stream-table'].indexOf(outputFormat()) != -1 -->
           <div class="card step">
             <h4>
               <!-- ko if: fieldEditorEnabled -->
@@ -979,17 +990,23 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
                   mode: sourceType
                 }}"></div>
               <!-- /ko -->
+
               <!-- ko ifnot: useFieldEditor -->
               <!-- ko if: $root.createWizard.source.inputFormat() === 'manual' -->
+
                 <form class="form-inline inline-table" data-bind="foreach: columns">
-                  <!-- ko if: $parent.outputFormat() == 'table' -->
-                    <a class="pointer pull-right margin-top-20" data-bind="click: function() { $parent.columns.remove($data); }"><i class="fa fa-minus"></i></a>
+                  <!-- ko if: ['table'].indexOf(outputFormat()) != -1 -->
+                    <a class="pointer pull-right margin-top-20" data-bind="click: function() { $parent.columns.remove($data); }">
+                      <i class="fa fa-minus"></i>
+                    </a>
                     <div data-bind="template: { name: 'table-field-template', data: $data }" class="margin-top-10 field inline-block"></div>
                     <div class="clearfix"></div>
                   <!-- /ko -->
 
                   <!-- ko if: $parent.outputFormat() == 'index' -->
-                    <a class="pointer pull-right margin-top-20" data-bind="click: function() { $parent.columns.remove($data); }"><i class="fa fa-minus"></i></a>
+                    <a class="pointer pull-right margin-top-20" data-bind="click: function() { $parent.columns.remove($data); }">
+                      <i class="fa fa-minus"></i>
+                    </a>
                     <div data-bind="template: { name: 'index-field-template', data: $data }, css: { 'disabled': !keep() }" class="margin-top-10 field inline-block index-field"></div>
                     <div class="clearfix"></div>
                   <!-- /ko -->
@@ -998,17 +1015,18 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
                 <div class="clearfix"></div>
 
                 <!-- ko if: outputFormat() == 'table' || outputFormat() == 'index' -->
-                  <a data-bind="click: function() { columns.push($root.loadDefaultField({})); }" class="pointer" title="${_('Add Field')}"><i class="fa fa-plus"></i> ${_('Add Field')}</a>
+                  <a data-bind="click: function() { columns.push($root.loadDefaultField({})); }" class="pointer" title="${_('Add Field')}">
+                  <i class="fa fa-plus"></i> ${_('Add Field')}</a>
                 <!-- /ko -->
               <!-- /ko -->
 
-              <!-- ko ifnot: $root.createWizard.source.inputFormat() === 'manual' -->
+              <!-- ko if: $root.createWizard.source.inputFormat() !== 'manual' -->
               <form class="form-inline inline-table" data-bind="foreachVisible: { data: columns, minHeight: 54, container: MAIN_SCROLLABLE }">
-                <!-- ko if: $parent.outputFormat() == 'table' && $root.createWizard.source.inputFormat() != 'rdbms' -->
+                <!-- ko if: ['table', 'big-table', 'stream-table'].indexOf($parent.outputFormat()) != -1 && $root.createWizard.source.inputFormat() != 'rdbms' -->
                   <div data-bind="template: { name: 'table-field-template', data: $data }" class="margin-top-10 field"></div>
                 <!-- /ko -->
 
-                <!-- ko if: (['file', 'table', 'hbase'].indexOf($parent.outputFormat()) != -1 && $root.createWizard.source.inputFormat() == 'rdbms') || $parent.outputFormat() == 'index' -->
+                <!-- ko if: ['index'].indexOf($parent.outputFormat()) != -1 || (['file', 'table', 'hbase'].indexOf($parent.outputFormat()) != -1 && $root.createWizard.source.inputFormat() == 'rdbms') -->
                   <div data-bind="template: { name: 'index-field-template', data: $data }, css: { 'disabled': !keep() }" class="margin-top-10 field index-field"></div>
                 <!-- /ko -->
               </form>
@@ -1321,11 +1339,13 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
 
     <label class="control-group" data-bind="visible: createWizard.source.kafkaSelectedTopics">
       <label class="control-label"><div>${ _('Schema') }</div>
-        <label class="radio margin-right-10">
-          <input type="radio" name="kafkaSchemaManual" value="manual" data-bind="checked: createWizard.source.kafkaSchemaManual" /> ${_('Manual')}
-        </label>
         <label class="radio">
-          <input type="radio" name="kafkaSchemaManual" value="detect" data-bind="checked: createWizard.source.kafkaSchemaManual" /> ${_('Guess')}
+          <input type="radio" name="kafkaSchemaManual" value="detect" data-bind="checked: createWizard.source.kafkaSchemaManual" />
+          ${_('Guess')}
+        </label>
+        <label class="radio margin-right-10">
+          <input type="radio" name="kafkaSchemaManual" value="manual" data-bind="checked: createWizard.source.kafkaSchemaManual" />
+          ${_('Manual')}
         </label>
       </label>
 
@@ -1342,11 +1362,13 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
       </label>
       <br/>
       <label class="control-label"><div>${ _('Field names') }</div>
-        <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.kafkaFieldNames" placeholder="${ _('The list of fields to consume, e.g. orders,returns') }">
+        <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.kafkaFieldNames"
+          placeholder="${ _('The list of fields to consume, e.g. orders,returns') }">
       </label>
       <br/>
       <label class="control-label"><div>${ _('Field types') }</div>
-        <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.kafkaFieldTypes" placeholder="${ _('The list of field typs, e.g. string,int') }">
+        <input type="text" class="input-xxlarge"
+          data-bind="value: createWizard.source.kafkaFieldTypes" placeholder="${ _('The list of field typs, e.g. string,int') }">
       </label>
       <br/>
       <label class="control-label" data-bind="visible: createWizard.source.hasStreamSelected"><div></div>
@@ -1637,44 +1659,54 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
 
           var statementCols = [];
           var temporaryColumns = [];
+
+          var deferreds = []; // TODO: Move to async/await when in webpack
+
           sampleCols.forEach(function (sampleCol) {
-            statementCols.push(sqlUtils.backTickIfNeeded(self.sourceType, sampleCol.name()));
-            var col = {
-              name: sampleCol.name(),
-              type: sampleCol.type()
-            };
-            temporaryColumns.push(col);
-            var colNameSub = sampleCol.name.subscribe(function () {
-              refreshTemporaryTable(self.sampleCols())
-            });
-            var colTypeSub = sampleCol.type.subscribe(function () {
-              refreshTemporaryTable(self.sampleCols())
+            var deferred = $.Deferred();
+            deferreds.push(deferred);
+            sqlUtils.backTickIfNeeded({ id: self.sourceType, dialect: self.sourceType }, sampleCol.name()).then(function (value) {
+              statementCols.push(value);
+              var col = {
+                name: sampleCol.name(),
+                type: sampleCol.type()
+              };
+              temporaryColumns.push(col);
+              var colNameSub = sampleCol.name.subscribe(function () {
+                refreshTemporaryTable(self.sampleCols())
+              });
+              var colTypeSub = sampleCol.type.subscribe(function () {
+                refreshTemporaryTable(self.sampleCols())
+              });
+              sampleColSubDisposals.push(function () {
+                colNameSub.dispose();
+                colTypeSub.dispose();
+              })
+              deferred.resolve();
+            }).catch(deferred.reject);
+          });
+
+          $.when.apply($, deferreds).done(function () {
+            var statement = 'SELECT ';
+            statement += statementCols.join(',\n    ');
+            statement += '\n FROM ' + sqlUtils.backTickIfNeeded({ id: self.sourceType, dialect: self.sourceType }, tableName) + ';';
+            if (!wizard.destination.fieldEditorValue() || wizard.destination.fieldEditorValue() === lastStatement) {
+              wizard.destination.fieldEditorValue(statement);
+            }
+            lastStatement = statement;
+            wizard.destination.fieldEditorPlaceHolder('${ _('Example: SELECT') }' + ' * FROM ' + sqlUtils.backTickIfNeeded({ id: self.sourceType, dialect: self.sourceType }, tableName));
+
+            var handle = dataCatalog.addTemporaryTable({
+              namespace: self.namespace(),
+              compute: self.compute(),
+              connector: { id: self.sourceType }, // TODO: Migrate importer to connectors
+              name: tableName,
+              columns: temporaryColumns,
+              sample: self.sample()
             });
             sampleColSubDisposals.push(function () {
-              colNameSub.dispose();
-              colTypeSub.dispose();
+              handle.delete();
             })
-          });
-
-          var statement = 'SELECT ';
-          statement += statementCols.join(',\n    ');
-          statement += '\n FROM ' + sqlUtils.backTickIfNeeded(self.sourceType, tableName) + ';';
-          if (!wizard.destination.fieldEditorValue() || wizard.destination.fieldEditorValue() === lastStatement) {
-            wizard.destination.fieldEditorValue(statement);
-          }
-          lastStatement = statement;
-          wizard.destination.fieldEditorPlaceHolder('${ _('Example: SELECT') }' + ' * FROM ' + sqlUtils.backTickIfNeeded(self.sourceType, tableName));
-
-          var handle = dataCatalog.addTemporaryTable({
-            namespace: self.namespace(),
-            compute: self.compute(),
-            connector: { id: self.sourceType }, // TODO: Migrate importer to connectors
-            name: tableName,
-            columns: temporaryColumns,
-            sample: self.sample()
-          });
-          sampleColSubDisposals.push(function () {
-            handle.delete();
           })
         }, 500)
       };
@@ -1999,21 +2031,21 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
       self.kafkaSelectedTopics.subscribe(function(newValue) {
         if (newValue) {
           viewModel.createWizard.guessFieldTypes();
-          self.kafkaFieldNames($.totalStorage('pai' + '_kafka_topics_' + newValue + '_kafkaFieldNames'));
-          self.kafkaFieldTypes($.totalStorage('pai' + '_kafka_topics_' + newValue + '_kafkaFieldTypes'));
+          self.kafkaFieldNames(hueUtils.hueLocalStorage('pai' + '_kafka_topics_' + newValue + '_kafkaFieldNames'));
+          self.kafkaFieldTypes(hueUtils.hueLocalStorage('pai' + '_kafka_topics_' + newValue + '_kafkaFieldTypes'));
         }
       });
-      self.kafkaSchemaManual = ko.observable('manual');
+      self.kafkaSchemaManual = ko.observable('detect');
       self.kafkaFieldType = ko.observable('delimited');
       self.kafkaFieldDelimiter = ko.observable(',');
       self.kafkaFieldNames = ko.observable('');
       self.kafkaFieldNames.subscribe(function(newValue) {
-        $.totalStorage('pai' + '_kafka_topics_' + self.kafkaSelectedTopics() + '_kafkaFieldNames', newValue);
+        hueUtils.hueLocalStorage('pai' + '_kafka_topics_' + self.kafkaSelectedTopics() + '_kafkaFieldNames', newValue);
         viewModel.createWizard.guessFieldTypes();
       });
       self.kafkaFieldTypes = ko.observable('');
       self.kafkaFieldTypes.subscribe(function(newValue) {
-        $.totalStorage('pai' + '_kafka_topics_' + self.kafkaSelectedTopics() + '_kafkaFieldTypes', newValue);
+        hueUtils.hueLocalStorage('pai' + '_kafka_topics_' + self.kafkaSelectedTopics() + '_kafkaFieldTypes', newValue);
         viewModel.createWizard.guessFieldTypes();
       });
       self.kafkaFieldSchemaPath = ko.observable('');
@@ -2146,11 +2178,11 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
               connector: { id: self.sourceType }, // TODO: Use connectors in the importer
               namespace: wizard.namespace(),
               path: self.outputFormat() === 'table' ? [self.databaseName(), self.tableName()] : [],
-            }).done(function (catalogEntry) {
-              catalogEntry.getSourceMeta({ silenceErrors: true }).done(function (sourceMeta) {
+            }).then(function (catalogEntry) {
+              catalogEntry.getSourceMeta({ silenceErrors: true }).then(function (sourceMeta) {
                 self.isTargetExisting(self.outputFormat() === 'table' ? !sourceMeta.notFound : (sourceMeta.databases || []).indexOf(self.databaseName()) >= 0);
                 self.isTargetChecking(false);
-              }).fail(function () {
+              }).catch(function () {
                 self.isTargetExisting(false);
                 self.isTargetChecking(false);
               })
@@ -2222,11 +2254,13 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
           {'name': '${ _("Search index") }', 'value': 'index'},
           % endif
           {'name': '${ _("Database") }', 'value': 'database'},
+          % if ENABLE_KAFKA.get():
+          {'name': '${ _("Stream Table") }', 'value': 'stream-table'},
+          {'name': '${ _("Stream Topic") }', 'value': 'stream'},
+          {'name': '${ _("Phoenix Table") }', 'value': 'big-table'},
+          % endif
           % if ENABLE_SQOOP.get() or ENABLE_KAFKA.get():
           {'name': '${ _("Folder") }', 'value': 'file'},
-          % endif
-          % if ENABLE_KAFKA.get():
-          {'name': '${ _("Stream") }', 'value': 'stream'},
           % endif
           % if ENABLE_ALTUS.get():
           {'name': '${ _("Altus SDX") }', 'value': 'altus'},
@@ -2237,22 +2271,39 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
       ]);
       self.outputFormats = ko.pureComputed(function() {
         return $.grep(self.outputFormatsList(), function(format) {
-          if (format.value === 'database' && wizard.source.inputFormat() !== 'manual' && (wizard.source.inputFormat() !== 'rdbms' || !wizard.source.rdbmsAllTablesSelected())) {
+          if (
+              format.value === 'database' &&
+              wizard.source.inputFormat() !== 'manual' &&
+              (wizard.source.inputFormat() !== 'rdbms' || !wizard.source.rdbmsAllTablesSelected())) {
             return false;
           }
-          if (format.value === 'file' && ['manual', 'rdbms', 'stream'].indexOf(wizard.source.inputFormat()) === -1) {
+          if (format.value === 'file' && (
+              wizard.source.inputFormat() === 'stream' ||
+              ['manual', 'rdbms', 'stream'].indexOf(wizard.source.inputFormat()) === -1)) {
             return false;
           }
-          if (format.value === 'index' && ['file', 'query', 'stream', 'manual'].indexOf(wizard.source.inputFormat()) === -1) {
+          if (format.value === 'index' && (
+              wizard.source.inputFormat() === 'stream' ||
+              ['file', 'query', 'stream', 'manual'].indexOf(wizard.source.inputFormat()) === -1)) {
             return false;
           }
-          if (format.value === 'table' && (wizard.source.inputFormat() === 'table' || (wizard.source.inputFormat() === 'rdbms' && wizard.source.rdbmsAllTablesSelected()))) {
+          if (format.value === 'table' &&
+              wizard.source.inputFormat() === 'stream' ||
+              (wizard.source.inputFormat() === 'table' || (
+                wizard.source.inputFormat() === 'rdbms' && wizard.source.rdbmsAllTablesSelected()))) {
             return false;
           }
           if (format.value === 'altus' && ['table'].indexOf(wizard.source.inputFormat()) === -1) {
             return false;
           }
-          if (format.value === 'stream' && ['file', 'stream'].indexOf(wizard.source.inputFormat()) === -1) {
+          if (format.value === 'stream' &&
+              (wizard.source.inputFormat() === 'stream' || ['file', 'stream'].indexOf(wizard.source.inputFormat()) === -1)) {
+            return false;
+          }
+          if (format.value === 'stream-table' && ['stream'].indexOf(wizard.source.inputFormat()) === -1) {
+            return false;
+          }
+          if (format.value === 'big-table' && ['file'].indexOf(wizard.source.inputFormat()) === -1) {
             return false;
           }
           if (format.value === 'hbase' && (wizard.source.inputFormat() !== 'rdbms' || wizard.source.rdbmsAllTablesSelected())) {
@@ -2267,7 +2318,8 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
         }
       });
       wizard.prefill.target_type.subscribe(function(newValue) {
-        setTimeout(function() { // target_type gets updated by the router (onePageViewModelModel.js) and delaying allow the notification to go through
+        // Target_type gets updated by the router (onePageViewModelModel.js) and delaying allow the notification to go through
+        setTimeout(function() {
           self.outputFormat(newValue || 'table');
         },0);
         if (newValue === 'database') {
@@ -2644,11 +2696,14 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
             || (self.source.inputFormat() === 'stream' && self.destination.outputFormat() === 'table' && self.destination.tableFormat() === 'kudu')
           ;
         }
-        var isValidTable = self.destination.outputFormat() !== 'table' || (
+        var isValidTable = ((self.destination.outputFormat() !== 'table' || (
           self.destination.tableFormat() !== 'kudu' || (
               $.grep(self.destination.kuduPartitionColumns(), function(partition) {
                 return partition.columns().length > 0
-              }).length === self.destination.kuduPartitionColumns().length && self.destination.primaryKeys().length > 0
+              }
+            ).length === self.destination.kuduPartitionColumns().length && self.destination.primaryKeys().length > 0
+          ) && (self.destination.outputFormat() !== 'big-table' || self.destination.primaryKeys().length > 0)
+        )
           )
         );
         var validIndexFields = self.destination.outputFormat() !== 'index' || ($.grep(self.destination.columns(), function(column) {
@@ -2784,7 +2839,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
         $(".jHueNotify").remove();
 
         self.indexingStarted(true);
-%if not is_embeddable:
+% if not is_embeddable:
         viewModel.isLoading(true);
         self.isIndexing(true);
 
@@ -2808,7 +2863,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
             self.jobId(resp.handle.id);
             $('#importerNotebook').html($('#importerNotebook-progress').html());
 
-            self.editorVM = new EditorViewModel(resp.history_uuid, '', {
+            self.editorVM = new window.NotebookViewModel(resp.history_uuid, '', {
               user: '${ user.username }',
               userId: ${ user.id },
               languages: [{name: "Java", type: "java"}, {name: "Hive SQL", type: "hive"}], // TODO reuse
@@ -2859,14 +2914,14 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
                       var match = snippet.statement_raw().match(/CREATE TABLE `([^`]+)`/i);
                       if (match) {
                         var db = match[1];
-                        dataCatalog.getEntry({ connector: snippet.connector(), namespace: self.namespace(), compute: self.compute(), path: [ db ]}).done(function (dbEntry) {
-                          dbEntry.clearCache({ silenceErrors: true }).done(function () {
+                        dataCatalog.getEntry({ connector: snippet.connector(), namespace: self.namespace(), compute: self.compute(), path: [ db ]}).then(function (dbEntry) {
+                          dbEntry.clearCache({ silenceErrors: true }).then(function () {
                             huePubSub.publish('open.link', self.editorVM.selectedNotebook().onSuccessUrl());
                           })
                         });
                       } else {
-                        dataCatalog.getEntry({ connector: snippet.connector(), namespace: self.namespace(), compute: self.compute(), path: []}).done(function (sourceEntry) {
-                          sourceEntry.clearCache({ silenceErrors: true }).done(function () {
+                        dataCatalog.getEntry({ connector: snippet.connector(), namespace: self.namespace(), compute: self.compute(), path: []}).then(function (sourceEntry) {
+                          sourceEntry.clearCache({ silenceErrors: true }).then(function () {
                             huePubSub.publish('open.link', self.editorVM.selectedNotebook().onSuccessUrl());
                           })
                         });
@@ -3000,13 +3055,16 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
       var self = this;
 
       self.apiHelper = window.apiHelper;
-      self.sourceType = window.location.getParameter('sourceType', true) || '${ source_type }';
-      self.namespaceId = window.location.getParameter('namespace', true);
-      self.computeId =  window.location.getParameter('compute', true);
+      self.sourceType = hueUtils.getParameter('sourceType', true) || '${ source_type }';
+      self.namespaceId = hueUtils.getParameter('namespace', true);
+      self.computeId =  hueUtils.getParameter('compute', true);
 
       self.assistAvailable = ko.observable(true);
       self.isLeftPanelVisible = ko.observable();
-      self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
+      window.hueUtils.withLocalStorage('assist.assist_panel_visible', self.isLeftPanelVisible, true);
+      self.isLeftPanelVisible.subscribe(function () {
+        huePubSub.publish('assist.forceRender');
+      });
       self.loadDefaultField = loadDefaultField;
 
       self.createWizard = new CreateWizard(self);

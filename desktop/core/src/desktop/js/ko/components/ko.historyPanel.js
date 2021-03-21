@@ -18,7 +18,7 @@ import $ from 'jquery';
 import * as ko from 'knockout';
 
 import dataCatalog from 'catalog/dataCatalog';
-import EditorViewModel from 'apps/notebook/editorViewModel';
+import NotebookViewModel from 'apps/notebook/NotebookViewModel';
 import componentUtils from './componentUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
@@ -169,10 +169,13 @@ class HistoryPanel {
       self.historyPanelVisible(false);
     });
 
-    self.editorViewModel = new EditorViewModel(null, '', {
+    self.editorViewModel = new NotebookViewModel(null, '', {
       user: window.LOGGED_USERNAME,
       userId: window.LOGGED_USER_ID,
-      languages: [{ name: 'Java', type: 'java' }, { name: 'Hive SQL', type: 'hive' }], // TODO reuse
+      languages: [
+        { name: 'Java', type: 'java' },
+        { name: 'Hive SQL', type: 'hive' }
+      ], // TODO reuse
       snippetViewSettings: {
         hive: {
           placeHolder: I18n('Example: SELECT * FROM tablename, or press CTRL + space'),
@@ -207,7 +210,7 @@ class HistoryPanel {
     self.$toggleElement;
     const $container = $('body');
 
-    self.reposition = function() {
+    self.reposition = function () {
       self.top(self.$toggleElement.offset().top + self.$toggleElement.height() + 15 + 'px');
       self.left($container.offset().left + $container.width() - 630 + 'px');
     };
@@ -278,7 +281,7 @@ class HistoryPanel {
                       connector: snippet.connector(),
                       path: []
                     })
-                    .done(entry => {
+                    .then(entry => {
                       entry.clearCache({ cascade: true, silenceErrors: true });
                     });
                 } else if (notebook.onSuccessUrl()) {

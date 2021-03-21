@@ -41,11 +41,11 @@ LOG = logging.getLogger(__name__)
 
 class MorphlineIndexer(object):
 
-  def __init__(self, username, fs=None, jt=None, solr_client=None):
+  def __init__(self, user, fs=None, jt=None, solr_client=None):
     self.fs = fs
     self.jt = jt
-    self.username = username
-    self.user = User.objects.get(username=username) # To clean
+    self.user = user
+    self.username = user.username
     self.solr_client = solr_client if solr_client is not None else SolrClient(self.user)
 
   def _upload_workspace(self, morphline):
@@ -86,7 +86,7 @@ class MorphlineIndexer(object):
       api = get_api(request, snippet)
 
       destination = '__hue_%s' % notebook_data['uuid'][:4]
-      location = '/user/%s/__hue-%s' % (request.user,  notebook_data['uuid'][:4])
+      location = '/user/%s/__hue-%s' % (request.user, notebook_data['uuid'][:4])
       sql, _success_url = api.export_data_as_table(notebook_data, snippet, destination, is_temporary=True, location=location)
       input_path = '${nameNode}%s' % location
 
@@ -189,13 +189,13 @@ class MorphlineIndexer(object):
       "collection_name": collection_name,
       "fields": self.get_field_list(data['columns'], is_converting_types=True),
       "num_base_fields": len(data['columns']),
-      "uuid_name" : uuid_name,
+      "uuid_name": uuid_name,
       "get_regex": MorphlineIndexer._get_regex_for_type,
       "format_settings": data['format'],
       "format_class": get_file_format_class(data['format']['type']),
       "get_kept_args": get_checked_args,
-      "grok_dictionaries_location" : grok_dicts_loc if self.fs and self.fs.exists(grok_dicts_loc) else None,
-      "geolite_db_location" : geolite_loc if self.fs and self.fs.exists(geolite_loc) else None,
+      "grok_dictionaries_location": grok_dicts_loc if self.fs and self.fs.exists(grok_dicts_loc) else None,
+      "geolite_db_location": geolite_loc if self.fs and self.fs.exists(geolite_loc) else None,
       "zk_host": self.solr_client.get_zookeeper_host() ## offline test?
     }
 
@@ -205,3 +205,45 @@ class MorphlineIndexer(object):
     morphline = lookup.get_template("morphline_template.conf").render(**properties)
 
     return morphline
+
+
+def _create_solr_collection(user, fs, client, destination, index_name, kwargs):
+  unique_key_field = destination['indexerPrimaryKey'] and destination['indexerPrimaryKey'][0] or None
+  df = destination['indexerDefaultField'] and destination['indexerDefaultField'][0] or None
+
+  indexer = MorphlineIndexer(user, fs)
+  fields = indexer.get_field_list(destination['columns'])
+  skip_fields = [field['name'] for field in fields if not field['keep']]
+
+  kwargs['fieldnames'] = ','.join([field['name'] for field in fields])
+  for field in fields:
+    for operation in field['operations']:
+      if operation['type'] == 'split':
+        field['multiValued'] = True # Solr requires multiValued to be set when splitting
+        kwargs['f.%(name)s.split' % field] = 'true'
+        kwargs['f.%(name)s.separator' % field] = operation['settings']['splitChar'] or ','
+
+  if skip_fields:
+    kwargs['skip'] = ','.join(skip_fields)
+    fields = [field for field in fields if field['name'] not in skip_fields]
+
+  if not unique_key_field:
+    unique_key_field = 'hue_id'
+    fields += [{"name": unique_key_field, "type": "string"}]
+    kwargs['rowid'] = unique_key_field
+
+  if not destination['hasHeader']:
+    kwargs['header'] = 'false'
+  else:
+    kwargs['skipLines'] = 1
+
+  if not client.exists(index_name):
+    client.create_index(
+        name=index_name,
+        config_name=destination.get('indexerConfigSet'),
+        fields=fields,
+        unique_key_field=unique_key_field,
+        df=df,
+        shards=destination['indexerNumShards'],
+        replication=destination['indexerReplicationFactor']
+    )

@@ -32,7 +32,6 @@ sf_caption_position:
   - caption-right
 categories:
   - Version 4
-  - Querying
 tags:
   - autocomplete
   - metadata

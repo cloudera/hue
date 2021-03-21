@@ -1,0 +1,105 @@
+/*
+ Licensed to Cloudera, Inc. under one
+ or more contributor license agreements.  See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership.  Cloudera, Inc. licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+*/
+
+// All standard colors --------------------------------------
+
+$fluid-blue-050:                  #edf7ff;
+$fluid-blue-100:                  #bee2ff;
+$fluid-blue-200:                  #90ceff;
+$fluid-blue-300:                  #61bbff;
+$fluid-blue-400:                  #31a2ff;
+$fluid-blue-500:                  #008cff;
+$fluid-blue-600:                  #0074d2;
+$fluid-blue-700:                  #005ba6;
+$fluid-blue-800:                  #004379;
+$fluid-blue-900:                  #002b4d;
+
+$fluid-gray-040:                  #fafbfc;
+$fluid-gray-050:                  #f4f5f6;
+$fluid-gray-100:                  #f1f2f3;
+$fluid-gray-200:                  #eaebec;
+$fluid-gray-300:                  #d6d8db;
+$fluid-gray-400:                  #adb2b6;
+$fluid-gray-500:                  #989ea4;
+$fluid-gray-600:                  #838b92;
+$fluid-gray-700:                  #5a656d;
+$fluid-gray-800:                  #333e47;
+$fluid-gray-900:                  #1b2329;
+
+$fluid-slate-050:                 #f4f7f9;
+$fluid-slate-100:                 #cbdae0;
+$fluid-slate-200:                 #a2bbc5;
+$fluid-slate-300:                 #789aa8;
+$fluid-slate-400:                 #517989;
+$fluid-slate-500:                 #305868;
+$fluid-slate-600:                 #224452;
+$fluid-slate-700:                 #19323c;
+$fluid-slate-800:                 #132329;
+$fluid-slate-900:                 #0b1316;
+
+$fluid-green-050:                 #e5ffe5;
+$fluid-green-100:                 #caffca;
+$fluid-green-200:                 #acfbac;
+$fluid-green-300:                 #8cf28c;
+$fluid-green-400:                 #6be36b;
+$fluid-green-500:                 #4ccf4c;
+$fluid-green-600:                 #2fae2f;
+$fluid-green-700:                 #188618;
+$fluid-green-800:                 #0a5f0a;
+$fluid-green-900:                 #023c02;
+
+$fluid-orange-050:                #fff3e5;
+$fluid-orange-100:                #ffd9ac;
+$fluid-orange-200:                #ffbe73;
+$fluid-orange-300:                #ffa139;
+$fluid-orange-400:                #ff8400;
+$fluid-orange-500:                #f96702;
+$fluid-orange-600:                #ca4f01;
+$fluid-orange-700:                #9b3801;
+$fluid-orange-800:                #6c2500;
+$fluid-orange-900:                #3d1300;
+
+$fluid-red-050:                   #ffecec;
+$fluid-red-100:                   #ffc9c9;
+$fluid-red-200:                   #fea7a7;
+$fluid-red-300:                   #fe8484;
+$fluid-red-400:                   #fe6161;
+$fluid-red-500:                   #fe3f3f;
+$fluid-red-600:                   #ce2626;
+$fluid-red-700:                   #9e1414;
+$fluid-red-800:                   #6e0707;
+$fluid-red-900:                   #3d0000;
+
+$fluid-black:                     #000;
+$fluid-white:                     #fff;
+
+$hue-primary-color-dark:          #0b7fad;
+$hue-primary-color-light:         #dbe8f1;
+$hue-trunk:                       #9678d3;
+
+$hue-action-primary:              $fluid-blue-500;
+$hue-action-primary-hover:        $fluid-blue-700;
+$hue-action-danger:               $fluid-red-500;
+$hue-action-danger-hover:         $fluid-red-700;
+$hue-action-disabled:             $fluid-gray-200;
+
+$hue-border-color:                $fluid-gray-300;
+$hue-disabled-color:              $fluid-gray-200;
+
+$hue-error-color:                 $fluid-red-500;
+$hue-warning-color:               $fluid-orange-400;

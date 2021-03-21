@@ -1,0 +1,134 @@
+#!/usr/bin/env python
+# Licensed to Cloudera, Inc. under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  Cloudera, Inc. licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import os, sys
+from os import walk
+import os.path
+import subprocess
+import logging
+
+script_dir = os.path.dirname(os.path.realpath(__file__))
+lib_dir = '%s/lib' % script_dir
+#sys.argv.append("--cm-managed")
+if 'NO_CM' in os.environ.keys():
+  if 'HUE_CONF_DIR' in os.environ.keys():
+    if not 'HUE_CONF_DIR_ORIG' in os.environ.keys():
+      os.environ['HUE_CONF_DIR_ORIG'] = os.environ.get('HUE_CONF_DIR')
+
+if not os.path.isdir(lib_dir):
+  print("The lib directory is missing.  Please download the entire package and not just the script_runner file")
+  print("git clone https://github.com/cmconner156/hue_scripts.git /opt/hue_scripts")
+  print("or")
+  print("cd /opt && rm -Rf hue_scripts && wget https://github.com/cmconner156/hue_scripts/archive/master.zip && unzip master.zip && mv hue_scripts-master hue_scripts && rm -f master.zip")
+  exit(1)
+
+if not os.environ["USER"] == "root":
+  print("This script must be run as root")
+  sys.exit(1)
+
+sys.path.insert(0, lib_dir)
+
+try:
+  from cm_environment import set_cm_environment, reload_with_cm_env
+except ImportError as e:
+  print("Unable to load cm_environment please send following to support:")
+  print("sys.path: %s" % sys.path)
+  print("All files in script_dir: %s" % script_dir)
+  files = []
+  for (dirpath, dirnames, filenames) in walk(script_dir):
+    for file in filenames:
+      if file == "script_runner" or "lib" in dirpath:
+        print("%s/%s" % (dirpath, file))
+        files.append(file)
+
+  exit(1)
+
+hue_config = set_cm_environment()
+hue_path = hue_config['hue_path']
+hue_bin_dir = hue_config['hue_bin_dir']
+HUE_CONF_DIR = hue_config['HUE_CONF_DIR']
+parcel_dir = hue_config['parcel_dir']
+parcel_name = hue_config['parcel_name']
+
+if not "SKIP_RELOAD" in os.environ.keys():
+  reload_with_cm_env()
+
+if 'NO_CM' in os.environ.keys():
+  if 'HUE_CONF_DIR_ORIG' in os.environ.keys():
+    HUE_CONF_DIR = os.environ.get('HUE_CONF_DIR_ORIG')
+    os.environ['HUE_CONF_DIR'] = HUE_CONF_DIR
+
+activate_file = hue_bin_dir + "/activate_this.py"
+hue_bin = hue_bin_dir + "/hue"
+
+import os; activate_this=os.path.join(os.path.dirname(os.path.realpath(activate_file)), 'activate_this.py'); exec(compile(open(activate_this).read(), activate_this, 'exec'), dict(__file__=activate_this)); del activate_this
+
+with open(hue_bin, 'rU') as f:
+  for line in f:
+     if "__requires__" in line:
+       desktop_ver = line.split("'")
+
+__requires__ = desktop_ver[1]
+
+import sys
+from pkg_resources import load_entry_point
+from django.conf import settings
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'desktop.settings')
+
+from custom_commands.settings import *
+settings.INSTALLED_APPS.append('custom_commands')
+
+from desktop.conf import DATABASE as desktop_database
+logging.info("Using the following config make sure it looks correct")
+
+try:
+  import platform
+  logging.info("Python Version: %s" % platform.python_version())
+  logging.info("OS Version: %s %s" % (platform.linux_distribution()[0], platform.linux_distribution()[1]))
+except:
+  pass
+logging.info("HUE_CONF_DIR: %s" % HUE_CONF_DIR)
+logging.info("parcel_dir: %s" % parcel_dir)
+logging.info("parcel_name: %s" % parcel_name)
+logging.info("hue_bin_dir: %s" % hue_bin_dir)
+logging.info("DB Engine: %s" % desktop_database.ENGINE.get())
+logging.info("DB Name: %s" % desktop_database.NAME.get())
+logging.info("DB User: %s" % desktop_database.USER.get())
+logging.info("DB Host: %s" % desktop_database.HOST.get())
+logging.info("DB Port: %s" % str(desktop_database.PORT.get()))
+if hue_config['LD_LIBRARY_PATH'] is not None:
+  logging.info("LD_LIBRARY_PATH: %s" % hue_config["LD_LIBRARY_PATH"])
+
+if __name__ == '__main__':
+#    sys.argv.remove("--cm-managed")
+    try:
+        sys.exit(
+            load_entry_point('desktop', 'console_scripts', 'hue')()
+        )
+    except UnboundLocalError, e:
+        logging.info("Command failed because of bug in older versions of CDH: %s" % e)
+        logging.info("Patching and re-running")
+        patch_file = "%s/patches/fix_cm_config_file.patch" % script_dir
+        patch_cmd = ["patch", "-p1"]
+        patch_file_in = open(patch_file)
+        os.chdir(hue_path)
+        subprocess.call(patch_cmd, stdin=patch_file_in)
+        os.chdir(script_dir)
+        sys.exit(
+            load_entry_point('desktop', 'console_scripts', 'hue')()
+        )

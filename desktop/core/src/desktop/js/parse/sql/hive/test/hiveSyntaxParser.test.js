@@ -17,7 +17,7 @@
 import hiveSyntaxParser from '../hiveSyntaxParser';
 
 describe('hiveSyntaxParser.js', () => {
-  const expectedToStrings = function(expected) {
+  const expectedToStrings = function (expected) {
     return expected.map(ex => ex.text);
   };
 
@@ -71,6 +71,12 @@ describe('hiveSyntaxParser.js', () => {
 
   it('should not find errors for "SELECT *"', () => {
     const result = hiveSyntaxParser.parseSyntax('SELECT *', '');
+
+    expect(result).toBeFalsy();
+  });
+
+  it('should not throw exceptions for "SELECT cos(1) from test"', () => {
+    const result = hiveSyntaxParser.parseSyntax('SELECT cos(1) from test', '', true);
 
     expect(result).toBeFalsy();
   });
@@ -221,7 +227,7 @@ describe('hiveSyntaxParser.js', () => {
     expect(result).toBeTruthy();
   });
 
-  const expectEqualIds = function(beforeA, afterA, beforeB, afterB) {
+  const expectEqualIds = function (beforeA, afterA, beforeB, afterB) {
     const resultA = hiveSyntaxParser.parseSyntax(beforeA, afterA);
     const resultB = hiveSyntaxParser.parseSyntax(beforeB, afterB);
 
@@ -230,7 +236,7 @@ describe('hiveSyntaxParser.js', () => {
     expect(resultA.ruleId).toEqual(resultB.ruleId);
   };
 
-  const expectNonEqualIds = function(beforeA, afterA, beforeB, afterB) {
+  const expectNonEqualIds = function (beforeA, afterA, beforeB, afterB) {
     const resultA = hiveSyntaxParser.parseSyntax(beforeA, afterA);
     const resultB = hiveSyntaxParser.parseSyntax(beforeB, afterB);
 

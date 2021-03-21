@@ -79,7 +79,9 @@ class ProxyFS(object):
       if not filebrowser_action:
         return True
       user = rewrite_user(User.objects.get(username=self.getuser()))
-      return user.is_authenticated() and user.is_active and (is_admin(user) or not filebrowser_action or user.has_hue_permission(action=filebrowser_action, app="filebrowser"))
+      return user.is_authenticated and user.is_active and \
+        (is_admin(user) or not filebrowser_action or user.has_hue_permission(action=filebrowser_action, app="filebrowser"))
+
     except User.DoesNotExist:
       LOG.exception('proxyfs.has_access()')
       return False
@@ -132,7 +134,7 @@ class ProxyFS(object):
 
   def do_as_superuser(self, fn, *args, **kwargs):
     scheme = self._get_scheme(args[0])
-    fs = self._fs_dict[scheme](self._name)
+    fs = self._fs_dict[scheme](self._name, user=DEFAULT_USER)
     user = fs.superuser if fs.superuser else DEFAULT_USER
     return self.do_as_user(user, fn, *args, **kwargs)
 

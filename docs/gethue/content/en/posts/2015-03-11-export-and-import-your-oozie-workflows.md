@@ -35,11 +35,9 @@ sf_caption_position:
 sf_remove_promo_bar:
   - 1
 categories:
-  - Scheduling
 
 ---
-<span style="color: #ff0000;"><em>August 7th 2015 update: this post is now deprecated as of Hue 3.9: <a style="color: #ff0000;" href="https://gethue.com/exporting-and-importing-oozie-workflows/">https://gethue.com/exporting-and-importing-oozie-workflows/</a></em></span>
-
+<span style="color: #ff0000;"><em>August 7th 2015 update: this post is now deprecated as of Hue 3.9:</em></span> [Exporting and importing Oozie workflows directly from the UI](https://gethue.com/exporting-and-importing-oozie-workflows/)
 &nbsp;
 
 There is no handy way to import and export your Oozie workflows until Hue 4 and [HUE-1660][1], but here is a manual workaround possible since Hue 3.8/CDH5.4 and its new Oozie Editor.
@@ -50,11 +48,8 @@ The previous methods were very error prone as they required to insert data in mu
 
 **Export all workflows**
 
-<pre><code class="bash">
+    ./build/env/bin/hue dumpdata desktop.Document2 --indent 2 -natural-foreign --natural-primary > data.json
 
-./build/env/bin/hue dumpdata desktop.Document2 -indent 2 -natural > data.json
-
-</code></pre>
 
 &nbsp;
 
@@ -62,15 +57,11 @@ The previous methods were very error prone as they required to insert data in mu
 
 20000013 is the id you can see in the URL of the dashboard.
 
-<pre><code class="bash">
-
-./build/env/bin/hue dumpdata desktop.Document2 -indent 2 -pks=20000013 -natural > data.json
-
-</code></pre>
+    ./build/env/bin/hue dumpdata desktop.Document2 --indent 2 -natural-foreign --natural-primary --pks=20000013 > data.json
 
 You can specify more than one id:
 
-<pre><code class="bash">-pks=20000013,20000014,20000015</code></pre>
+    --pks=20000013,20000014,20000015
 
 &nbsp;
 
@@ -78,9 +69,7 @@ You can specify more than one id:
 
 Then
 
-<pre><code class="bash">./build/env/bin/hue loaddata data.json
-
-</code></pre>
+    /build/env/bin/hue loaddata data.json
 
 &nbsp;
 
@@ -88,7 +77,7 @@ Then
 
 Until we hit Hue 4, this step is required in order to make the imported documents appear:
 
-<pre><code class="bash">./build/env/bin/hue sync_documents</code></pre>
+    ./build/env/bin/hue sync_documents
 
 &nbsp;
 
@@ -102,15 +91,15 @@ And that's it, the dashboards with the same IDs will be refreshed with the impo
 
 If the document with the same id already exists in the database, just set its id to null in data.json and it will be inserted as a new document.
 
-<pre><code class="bash">vim data.json</code></pre>
+    vim data.json
 
 then change
 
-<pre><code class="bash">"pk": 16,</code></pre>
+    "pk": 16,
 
 to
 
-<pre><code class="bash">"pk": null,</code></pre>
+    "pk": null,
 
 &nbsp;
 
@@ -118,21 +107,19 @@ to
 
 If using CM, export this variable in order to point to the correct database:
 
-<pre><code class="bash">HUE_CONF_DIR=/var/run/cloudera-scm-agent/process/-hue-HUE_SERVER-id
+    HUE_CONF_DIR=/var/run/cloudera-scm-agent/process/-hue-HUE_SERVER-id
 
-echo $HUE_CONF_DIR
+    echo $HUE_CONF_DIR
 
-export HUE_CONF_DIR</code></pre>
+    export HUE_CONF_DIR
 
 Where <id> is the most recent ID in that process directory for hue-HUE_SERVER.
 
 or even quicker
 
-<pre><code class="bash">
+    export HUE_CONF_DIR="/var/run/cloudera-scm-agent/process/\`ls -alrt /var/run/cloudera-scm-agent/process | grep HUE | tail -1 | awk '{print $9}'\`"
 
-export HUE_CONF_DIR="/var/run/cloudera-scm-agent/process/\`ls -alrt /var/run/cloudera-scm-agent/process | grep HUE | tail -1 | awk '{print $9}'\`"
 
-</code></pre>
 
 &nbsp;
 

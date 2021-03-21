@@ -42,11 +42,11 @@ import huePubSub from 'utils/huePubSub';
  * @type {{init: ko.bindingHandlers.sqlContextPopover.init}}
  */
 ko.bindingHandlers.sqlContextPopover = {
-  init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+  init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
     ko.bindingHandlers.click.init(
       element,
       () => {
-        return function() {
+        return function () {
           const options = valueAccessor();
 
           // TODO: Use connector for SQL context popover
@@ -60,7 +60,7 @@ ko.bindingHandlers.sqlContextPopover = {
               dialect: options.sourceType
             };
           }
-          dataCatalog.getEntry(options).done(entry => {
+          dataCatalog.getEntry(options).then(entry => {
             const $source = $(element);
             const offset = $source.offset();
             if (options.offset) {

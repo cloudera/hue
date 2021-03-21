@@ -1,27 +1,26 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ko.deleteDocModal.js should render component 1`] = `
-"<html><head></head><body><div id=\\"deleteEntriesModal\\" data-bind=\\"descendantsComplete: descendantsComplete, component: { name: 'delete-entry', params: params }\\" data-keyboard=\\"true\\" class=\\"modal hide fade\\" tabindex=\\"-1\\">
-  <!-- ko with: activeEntry -->
+"<html><head></head><body class=\\"modal-open\\"><div id=\\"deleteEntriesModal\\" data-bind=\\"descendantsComplete: descendantsComplete, component: { name: 'delete-entry', params: params }\\" data-keyboard=\\"true\\" class=\\"modal hide fade in\\" tabindex=\\"-1\\" aria-hidden=\\"false\\">
   <div class=\\"modal-header\\">
     <button type=\\"button\\" class=\\"close\\" data-dismiss=\\"modal\\" aria-label=\\"Close\\"><span aria-hidden=\\"true\\">×</span></button>
-    <!-- ko if: entriesToDelete().length === 0 -->
-    <h2 class=\\"modal-title\\">The trash is empty</h2>
+    <!-- ko if: entriesToDelete().length === 0 --><!-- /ko -->
+    <!-- ko if: entriesToDelete().length > 0 -->
+    <h2 class=\\"modal-title\\"> Do you really want to delete the following document(s)? </h2>
     <!-- /ko -->
-    <!-- ko if: entriesToDelete().length > 0 --><!-- /ko -->
   </div>
   <div class=\\"modal-body\\">
-    <div class=\\"doc-browser-empty animated\\" style=\\"display: none;\\" data-bind=\\"visible: entriesToDelete().length > 0 &amp;&amp; selectedDocsWithDependents().length === 0\\">
+    <div class=\\"doc-browser-empty animated\\" style=\\"\\" data-bind=\\"visible: entriesToDelete().length > 0 &amp;&amp; selectedDocsWithDependents().length === 0\\">
       <i class=\\"fa fa-spinner fa-spin fa-2x\\"></i>
     </div>
     <ul data-bind=\\"foreach: selectedDocsWithDependents()\\"></ul>
   </div>
   <div class=\\"modal-footer\\">
-    <!-- ko if: entriesToDelete().length === 0 -->
-    <input type=\\"button\\" class=\\"btn\\" data-dismiss=\\"modal\\" value=\\"Close\\">
+    <!-- ko if: entriesToDelete().length === 0 --><!-- /ko -->
+    <!-- ko if: entriesToDelete().length > 0 -->
+    <input type=\\"button\\" class=\\"btn\\" data-dismiss=\\"modal\\" value=\\"Cancel\\">
+    <input type=\\"submit\\" data-bind=\\"click: function() { if (isTrash() || isTrashed()) { removeDocuments(true) } else { moveToTrash() } }, disable: deletingEntries\\" class=\\"btn btn-danger disable-feedback\\" value=\\"Yes\\">
     <!-- /ko -->
-    <!-- ko if: entriesToDelete().length > 0 --><!-- /ko -->
   </div>
-  <!-- /ko -->
-</div></body></html>"
+</div><div class=\\"modal-backdrop fade in\\"></div></body></html>"
 `;

@@ -16,7 +16,7 @@
 
 import * as ko from 'knockout';
 
-ko.observableArrayDefault = function() {
+ko.observableArrayDefault = function () {
   const prop = arguments[0],
     defValue = arguments[1] || null;
   return ko.observableArray(typeof prop != 'undefined' && prop != null ? prop : defValue);

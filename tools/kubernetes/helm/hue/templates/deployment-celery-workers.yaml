@@ -19,7 +19,7 @@ spec:
         - name: celery-worker
           image: {{ .Values.image.registry }}/hue:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          command: ['./build/env/bin/celery', 'worker', '-A', 'desktop', '-l', 'info']
+          command: ['./build/env/bin/hue', 'runcelery', 'worker', '--loglevel', 'info']
           resources:
             requests:
               # memory: "400Mi"

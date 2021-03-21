@@ -39,9 +39,7 @@ sf_remove_promo_bar:
 ampforwp-amp-on-off:
   - default
 categories:
-  - Browsing
   - Version 4
-  - Scheduling
 
 ---
 Two popular medium improvements are coming in the [Job Browser][1] to ease the monitoring of submitted jobs.

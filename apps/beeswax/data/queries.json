@@ -161,5 +161,145 @@
       "file_resources": [],
       "settings": []
     }
+  },
+  {
+    "name": "Airline Flight Data",
+    "desc": "One time flights data analysis - ORC format",
+    "dialects": ["hive"],
+    "type": "0",
+    "auto_load_only": true,
+    "data": {
+      "query": {
+        "query": "-- Query 1\r\n\r\nWITH flightpath AS (\r\nSELECT\r\na.uniquecarrier auq,\r\na.flightnum afn,\r\nb.uniquecarrier buq,\r\nb.flightnum bfn,\r\nc.uniquecarrier cuq,\r\nc.flightnum cfn,\r\na.origin a_origin,\r\na.dest a_dest,\r\nb.dest b_dest,\r\nc.dest c_dest,\r\na.year,\r\na.month,\r\na.dayofmonth adom,\r\nb.dayofmonth bdom,\r\nc.dayofmonth cdom,\r\na.deptime adt,\r\na.arrtime aat,\r\nb.deptime bdt,\r\nb.arrtime bat,\r\nc.deptime cdt,\r\nc.arrtime cat,\r\na.tailnum a_tailnum,\r\nb.tailnum b_tailnum,\r\nc.tailnum c_tailnum,\r\nc.arrtime - a.deptime flighttime\r\nFROM\r\nflights A,\r\nflights B,\r\nflights C\r\nWHERE\r\n1 = 1\r\nAND b.year = a.year\r\nAND c.year = a.year\r\nAND b.month = a.month\r\nAND c.month = a.month\r\nAND a.dest = b.origin\r\nAND b.dest = c.origin\r\n)\r\nSELECT\r\nfp.*\r\nFROM\r\nflightpath fp\r\nWHERE\r\n1 = 1\r\nAND a_origin = 'JFK'\r\nAND (\r\na_dest = 'LAS'\r\nOR b_dest = 'LAS'\r\nOR c_dest = 'LAS'\r\n)\r\nAND year = 2000\r\nAND month = 1\r\nAND adom = bdom\r\nAND bdom = cdom\r\nAND floor(bdt / 100) - floor(aat / 100) > 1\r\nAND floor(bdt / 100) - floor(aat / 100) < 3\r\nORDER BY\r\nflighttime desc\r\n;\r\n\r\n\r\n-- Query 2\r\n\r\nSELECT flights.month month, avg(flights.depdelay) avgdelay\r\nFROM flights\r\nLEFT JOIN planes ON flights.tailnum = planes.tailnum\r\nWHERE planes.manufacturer LIKE 'AIRBUS%'\r\nAND flights.origin = 'JFK'\r\nGROUP BY flights.month\r\nORDER BY flights.month\r\n;\r\n\r\n\r\n-- Query 3\r\n\r\nSELECT airport,\r\norigin,\r\ncity,\r\ncountry,\r\nflightnum,\r\ndeptime,\r\ndepdelay\r\nFROM airports\r\nLEFT JOIN flights ON airports.iata=flights.origin\r\nWHERE flights.origin='SFO'\r\nAND month=8\r\nAND dayofmonth=6\r\nORDER BY deptime ASC\r\n;\r\n\r\n\r\n-- Query 4\r\n\r\nSELECT month,\r\ncount(*),\r\navg(depdelay),\r\nmax(depdelay),\r\navg(taxiout),\r\navg(cancelled),\r\navg(weatherdelay),\r\nmax(weatherdelay),\r\navg(nasdelay),\r\nmax(nasdelay),\r\navg(securitydelay),\r\nmax(securitydelay),\r\navg(lateaircraftdelay),\r\nmax(lateaircraftdelay),\r\navg(airtime),\r\navg(actualelapsedtime),\r\navg(distance)\r\nFROM flights\r\nGROUP BY month\r\nORDER BY month\r\n;\r\n\r\n\r\n-- Query 5\r\n-- Select airport with highest avg delay\r\n\r\nSELECT origin,\r\navg(depdelay+weatherdelay+lateaircraftdelay) AS total_delay_avg\r\nFROM flights\r\nWHERE depdelay IS NOT NULL and weatherdelay IS NOT NULL and lateaircraftdelay IS NOT NULL\r\nGROUP BY origin\r\nORDER BY total_delay_avg DESC\r\n;\r\n\r\n\r\n-- Query 6\r\n-- Select delays by month at that airport with highest avg delays\r\n\r\nSELECT month,\r\navg(depdelay+weatherdelay+lateaircraftdelay) AS total_delay_avg\r\nFROM flights\r\nWHERE origin='GCC'\r\nAND depdelay IS NOT NULL\r\nAND weatherdelay IS NOT NULL\r\nAND lateaircraftdelay IS NOT NULL\r\nGROUP BY month\r\nORDER BY total_delay_avg DESC\r\n;\r\n\r\n\r\n-- Query 7\r\n-- Get number of flights with delays that are too long\r\n\r\nSELECT count(flightnum)\r\nFROM flights\r\nWHERE depdelay >\r\n(SELECT 3*stddev(depdelay)\r\nFROM flights_s3)\r\nAND weatherdelay >\r\n(SELECT 3*stddev(weatherdelay)\r\nFROM flights_s3)\r\nAND lateaircraftdelay >\r\n(SELECT 3*stddev(lateaircraftdelay)\r\nFROM flights_s3)\r\n;\r\n\r\n\r\n-- Query 8\r\n-- Get number of flights with delays that are too long\r\n\r\nSELECT count(flightnum)\r\nFROM flights\r\nWHERE depdelay >\r\n(SELECT 3*stddev(depdelay)\r\nFROM flights)\r\nAND weatherdelay >\r\n(SELECT 3*stddev(weatherdelay)\r\nFROM flights)\r\nAND lateaircraftdelay >\r\n(SELECT 3*stddev(lateaircraftdelay)\r\nFROM flights)\r\n;\r\n\r\n\r\n-- Query 9\r\n-- Select several combinations of two delay type columns and total_delay to see which combinations of \r\n-- two delay factors are most likely to lead to the highest delay\r\n\r\nSELECT flightnum,\r\norigin,\r\n(depdelay+weatherdelay) AS dep_and_weather,\r\n(depdelay+lateaircraftdelay) AS dep_and_late_arrival,\r\n(weatherdelay+lateaircraftdelay) AS weather_and_late_arrival,\r\n(depdelay+weatherdelay+lateaircraftdelay) AS total_delay\r\nFROM flights\r\nWHERE depdelay IS NOT NULL\r\nAND weatherdelay IS NOT NULL\r\nAND lateaircraftdelay IS NOT NULL\r\n;\r\n",
+        "type": 0,
+        "email_notify": false,
+        "is_parameterized": false,
+        "database": "airline_ontime_orc"
+      },
+      "functions": [],
+      "VERSION": "0.4.1",
+      "file_resources": [],
+      "settings": []
+    }
+  },
+  {
+    "name": "Airline Flight Data",
+    "desc": "One time flights data analysis - Parquet format",
+    "dialects": ["hive"],
+    "type": "0",
+    "auto_load_only": true,
+    "data": {
+      "query": {
+        "query": "-- Query 1\r\n\r\nWITH flightpath AS (\r\nSELECT\r\na.uniquecarrier auq,\r\na.flightnum afn,\r\nb.uniquecarrier buq,\r\nb.flightnum bfn,\r\nc.uniquecarrier cuq,\r\nc.flightnum cfn,\r\na.origin a_origin,\r\na.dest a_dest,\r\nb.dest b_dest,\r\nc.dest c_dest,\r\na.year,\r\na.month,\r\na.dayofmonth adom,\r\nb.dayofmonth bdom,\r\nc.dayofmonth cdom,\r\na.deptime adt,\r\na.arrtime aat,\r\nb.deptime bdt,\r\nb.arrtime bat,\r\nc.deptime cdt,\r\nc.arrtime cat,\r\na.tailnum a_tailnum,\r\nb.tailnum b_tailnum,\r\nc.tailnum c_tailnum,\r\nc.arrtime - a.deptime flighttime\r\nFROM\r\nflights A,\r\nflights B,\r\nflights C\r\nWHERE\r\n1 = 1\r\nAND b.year = a.year\r\nAND c.year = a.year\r\nAND b.month = a.month\r\nAND c.month = a.month\r\nAND a.dest = b.origin\r\nAND b.dest = c.origin\r\n)\r\nSELECT\r\nfp.*\r\nFROM\r\nflightpath fp\r\nWHERE\r\n1 = 1\r\nAND a_origin = 'JFK'\r\nAND (\r\na_dest = 'LAS'\r\nOR b_dest = 'LAS'\r\nOR c_dest = 'LAS'\r\n)\r\nAND year = 2000\r\nAND month = 1\r\nAND adom = bdom\r\nAND bdom = cdom\r\nAND floor(bdt / 100) - floor(aat / 100) > 1\r\nAND floor(bdt / 100) - floor(aat / 100) < 3\r\nORDER BY\r\nflighttime desc\r\n;\r\n\r\n\r\n-- Query 2\r\n\r\nSELECT flights.month month, avg(flights.depdelay) avgdelay\r\nFROM flights\r\nLEFT JOIN planes ON flights.tailnum = planes.tailnum\r\nWHERE planes.manufacturer LIKE 'AIRBUS%'\r\nAND flights.origin = 'JFK'\r\nGROUP BY flights.month\r\nORDER BY flights.month\r\n;\r\n\r\n\r\n-- Query 3\r\n\r\nSELECT airport,\r\norigin,\r\ncity,\r\ncountry,\r\nflightnum,\r\ndeptime,\r\ndepdelay\r\nFROM airports\r\nLEFT JOIN flights ON airports.iata=flights.origin\r\nWHERE flights.origin='SFO'\r\nAND month=8\r\nAND dayofmonth=6\r\nORDER BY deptime ASC\r\n;\r\n\r\n\r\n-- Query 4\r\n\r\nSELECT month,\r\ncount(*),\r\navg(depdelay),\r\nmax(depdelay),\r\navg(taxiout),\r\navg(cancelled),\r\navg(weatherdelay),\r\nmax(weatherdelay),\r\navg(nasdelay),\r\nmax(nasdelay),\r\navg(securitydelay),\r\nmax(securitydelay),\r\navg(lateaircraftdelay),\r\nmax(lateaircraftdelay),\r\navg(airtime),\r\navg(actualelapsedtime),\r\navg(distance)\r\nFROM flights\r\nGROUP BY month\r\nORDER BY month\r\n;\r\n\r\n\r\n-- Query 5\r\n-- Select airport with highest avg delay\r\n\r\nSELECT origin,\r\navg(depdelay+weatherdelay+lateaircraftdelay) AS total_delay_avg\r\nFROM flights\r\nWHERE depdelay IS NOT NULL and weatherdelay IS NOT NULL and lateaircraftdelay IS NOT NULL\r\nGROUP BY origin\r\nORDER BY total_delay_avg DESC\r\n;\r\n\r\n\r\n-- Query 6\r\n-- Select delays by month at that airport with highest avg delays\r\n\r\nSELECT month,\r\navg(depdelay+weatherdelay+lateaircraftdelay) AS total_delay_avg\r\nFROM flights\r\nWHERE origin='GCC'\r\nAND depdelay IS NOT NULL\r\nAND weatherdelay IS NOT NULL\r\nAND lateaircraftdelay IS NOT NULL\r\nGROUP BY month\r\nORDER BY total_delay_avg DESC\r\n;\r\n\r\n\r\n-- Query 7\r\n-- Get number of flights with delays that are too long\r\n\r\nSELECT count(flightnum)\r\nFROM flights\r\nWHERE depdelay >\r\n(SELECT 3*stddev(depdelay)\r\nFROM flights_s3)\r\nAND weatherdelay >\r\n(SELECT 3*stddev(weatherdelay)\r\nFROM flights_s3)\r\nAND lateaircraftdelay >\r\n(SELECT 3*stddev(lateaircraftdelay)\r\nFROM flights_s3)\r\n;\r\n\r\n\r\n-- Query 8\r\n-- Get number of flights with delays that are too long\r\n\r\nSELECT count(flightnum)\r\nFROM flights\r\nWHERE depdelay >\r\n(SELECT 3*stddev(depdelay)\r\nFROM flights)\r\nAND weatherdelay >\r\n(SELECT 3*stddev(weatherdelay)\r\nFROM flights)\r\nAND lateaircraftdelay >\r\n(SELECT 3*stddev(lateaircraftdelay)\r\nFROM flights)\r\n;\r\n\r\n\r\n-- Query 9\r\n-- Select several combinations of two delay type columns and total_delay to see which combinations of \r\n-- two delay factors are most likely to lead to the highest delay\r\n\r\nSELECT flightnum,\r\norigin,\r\n(depdelay+weatherdelay) AS dep_and_weather,\r\n(depdelay+lateaircraftdelay) AS dep_and_late_arrival,\r\n(weatherdelay+lateaircraftdelay) AS weather_and_late_arrival,\r\n(depdelay+weatherdelay+lateaircraftdelay) AS total_delay\r\nFROM flights\r\nWHERE depdelay IS NOT NULL\r\nAND weatherdelay IS NOT NULL\r\nAND lateaircraftdelay IS NOT NULL\r\n;\r\n",
+        "type": 0,
+        "email_notify": false,
+        "is_parameterized": false,
+        "database": "airline_ontime_parquet"
+      },
+      "functions": [],
+      "VERSION": "0.4.1",
+      "file_resources": [],
+      "settings": []
+    }
+  },
+  {
+    "name": "Airline Flight Data",
+    "desc": "One time flights data analysis - Parquet format",
+    "dialects": ["impala"],
+    "type": "1",
+    "auto_load_only": true,
+    "data": {
+      "query": {
+        "query": "-- Query 1\r\n\r\nWITH flightpath AS (\r\nSELECT\r\na.uniquecarrier auq,\r\na.flightnum afn,\r\nb.uniquecarrier buq,\r\nb.flightnum bfn,\r\nc.uniquecarrier cuq,\r\nc.flightnum cfn,\r\na.origin a_origin,\r\na.dest a_dest,\r\nb.dest b_dest,\r\nc.dest c_dest,\r\na.year,\r\na.month,\r\na.dayofmonth adom,\r\nb.dayofmonth bdom,\r\nc.dayofmonth cdom,\r\na.deptime adt,\r\na.arrtime aat,\r\nb.deptime bdt,\r\nb.arrtime bat,\r\nc.deptime cdt,\r\nc.arrtime cat,\r\na.tailnum a_tailnum,\r\nb.tailnum b_tailnum,\r\nc.tailnum c_tailnum,\r\nc.arrtime - a.deptime flighttime\r\nFROM\r\nflights A,\r\nflights B,\r\nflights C\r\nWHERE\r\n1 = 1\r\nAND b.year = a.year\r\nAND c.year = a.year\r\nAND b.month = a.month\r\nAND c.month = a.month\r\nAND a.dest = b.origin\r\nAND b.dest = c.origin\r\n)\r\nSELECT\r\nfp.*\r\nFROM\r\nflightpath fp\r\nWHERE\r\n1 = 1\r\nAND a_origin = 'JFK'\r\nAND (\r\na_dest = 'LAS'\r\nOR b_dest = 'LAS'\r\nOR c_dest = 'LAS'\r\n)\r\nAND year = 2000\r\nAND month = 1\r\nAND adom = bdom\r\nAND bdom = cdom\r\nAND floor(bdt / 100) - floor(aat / 100) > 1\r\nAND floor(bdt / 100) - floor(aat / 100) < 3\r\nORDER BY\r\nflighttime desc\r\n;\r\n\r\n\r\n-- Query 2\r\n\r\nSELECT flights.month month, avg(flights.depdelay) avgdelay\r\nFROM flights\r\nLEFT JOIN planes ON flights.tailnum = planes.tailnum\r\nWHERE planes.manufacturer LIKE 'AIRBUS%'\r\nAND flights.origin = 'JFK'\r\nGROUP BY flights.month\r\nORDER BY flights.month\r\n;\r\n\r\n\r\n-- Query 3\r\n\r\nSELECT airport,\r\norigin,\r\ncity,\r\ncountry,\r\nflightnum,\r\ndeptime,\r\ndepdelay\r\nFROM airports\r\nLEFT JOIN flights ON airports.iata=flights.origin\r\nWHERE flights.origin='SFO'\r\nAND month=8\r\nAND dayofmonth=6\r\nORDER BY deptime ASC\r\n;\r\n\r\n\r\n-- Query 4\r\n\r\nSELECT month,\r\ncount(*),\r\navg(depdelay),\r\nmax(depdelay),\r\navg(taxiout),\r\navg(cancelled),\r\navg(weatherdelay),\r\nmax(weatherdelay),\r\navg(nasdelay),\r\nmax(nasdelay),\r\navg(securitydelay),\r\nmax(securitydelay),\r\navg(lateaircraftdelay),\r\nmax(lateaircraftdelay),\r\navg(airtime),\r\navg(actualelapsedtime),\r\navg(distance)\r\nFROM flights\r\nGROUP BY month\r\nORDER BY month\r\n;\r\n\r\n\r\n-- Query 5\r\n-- Select airport with highest avg delay\r\n\r\nSELECT origin,\r\navg(depdelay+weatherdelay+lateaircraftdelay) AS total_delay_avg\r\nFROM flights\r\nWHERE depdelay IS NOT NULL and weatherdelay IS NOT NULL and lateaircraftdelay IS NOT NULL\r\nGROUP BY origin\r\nORDER BY total_delay_avg DESC\r\n;\r\n\r\n\r\n-- Query 6\r\n-- Select delays by month at that airport with highest avg delays\r\n\r\nSELECT month,\r\navg(depdelay+weatherdelay+lateaircraftdelay) AS total_delay_avg\r\nFROM flights\r\nWHERE origin='GCC'\r\nAND depdelay IS NOT NULL\r\nAND weatherdelay IS NOT NULL\r\nAND lateaircraftdelay IS NOT NULL\r\nGROUP BY month\r\nORDER BY total_delay_avg DESC\r\n;\r\n\r\n\r\n-- Query 7\r\n-- Get number of flights with delays that are too long\r\n\r\nSELECT count(flightnum)\r\nFROM flights\r\nWHERE depdelay >\r\n(SELECT 3*stddev(depdelay)\r\nFROM flights_s3)\r\nAND weatherdelay >\r\n(SELECT 3*stddev(weatherdelay)\r\nFROM flights_s3)\r\nAND lateaircraftdelay >\r\n(SELECT 3*stddev(lateaircraftdelay)\r\nFROM flights_s3)\r\n;\r\n\r\n\r\n-- Query 8\r\n-- Get number of flights with delays that are too long\r\n\r\nSELECT count(flightnum)\r\nFROM flights\r\nWHERE depdelay >\r\n(SELECT 3*stddev(depdelay)\r\nFROM flights)\r\nAND weatherdelay >\r\n(SELECT 3*stddev(weatherdelay)\r\nFROM flights)\r\nAND lateaircraftdelay >\r\n(SELECT 3*stddev(lateaircraftdelay)\r\nFROM flights)\r\n;\r\n\r\n\r\n-- Query 9\r\n-- Select several combinations of two delay type columns and total_delay to see which combinations of \r\n-- two delay factors are most likely to lead to the highest delay\r\n\r\nSELECT flightnum,\r\norigin,\r\n(depdelay+weatherdelay) AS dep_and_weather,\r\n(depdelay+lateaircraftdelay) AS dep_and_late_arrival,\r\n(weatherdelay+lateaircraftdelay) AS weather_and_late_arrival,\r\n(depdelay+weatherdelay+lateaircraftdelay) AS total_delay\r\nFROM flights\r\nWHERE depdelay IS NOT NULL\r\nAND weatherdelay IS NOT NULL\r\nAND lateaircraftdelay IS NOT NULL\r\n;\r\n",
+        "type": 0,
+        "email_notify": false,
+        "is_parameterized": false,
+        "database": "airline_ontime_parquet"
+      },
+      "functions": [],
+      "VERSION": "0.4.1",
+      "file_resources": [],
+      "settings": []
+    }
+  },
+  {
+    "name": "US City Population",
+    "desc": "Small samples of number of inhabitants in some US cities",
+    "dialects": ["phoenix"],
+    "type": "2",
+    "auto_load_only": false,
+    "data": {
+      "query": {
+        "query": "\nCREATE TABLE IF NOT EXISTS us_population (\n  state CHAR(2) NOT NULL,\n  city VARCHAR NOT NULL,\n  population BIGINT\n  CONSTRAINT my_pk PRIMARY KEY (state, city)\n);\n\n\nUPSERT INTO us_population VALUES ('NY','New York',8143197);\nUPSERT INTO us_population VALUES ('CA','Los Angeles',3844829);\nUPSERT INTO us_population VALUES ('IL','Chicago',2842518);\nUPSERT INTO us_population VALUES ('TX','Houston',2016582);\nUPSERT INTO us_population VALUES ('PA','Philadelphia',1463281);\nUPSERT INTO us_population VALUES ('AZ','Phoenix',1461575);\nUPSERT INTO us_population VALUES ('TX','San Antonio',1256509);\nUPSERT INTO us_population VALUES ('CA','San Diego',1255540);\nUPSERT INTO us_population VALUES ('TX','Dallas',1213825);\nUPSERT INTO us_population VALUES ('CA','San Jose',91233);\n\nSELECT\n  state as \"State\",\n  count(city) as \"City Count\",\n  sum(population) as \"Population Sum\"\nFROM\n  us_population\nGROUP BY\n  state\nORDER BY\n  sum(population) DESC\n;",
+        "type": 0,
+        "email_notify": false,
+        "is_parameterized": false,
+        "database": ""
+      },
+      "functions": [],
+      "VERSION": "0.4.1",
+      "file_resources": [],
+      "settings": []
+    }
+  },
+  {
+    "name": "Query and live display a live stream of data",
+    "desc": "Simple select of auto generated data or via the user table backed by a Kafka topic",
+    "dialects": ["flink"],
+    "type": "2",
+    "auto_load_only": false,
+    "data": {
+      "query": {
+        "query": "\nCREATE TABLE datagen (\n  f_sequence INT,\n  f_random INT,\n  f_random_str STRING,\n  ts AS localtimestamp,\n  WATERMARK FOR ts AS ts\n) WITH (\n  'connector' = 'datagen',\n  'rows-per-second'='5',\n  'fields.f_sequence.kind'='sequence',\n  'fields.f_sequence.start'='1',\n  'fields.f_sequence.end'='1000',\n  'fields.f_random.min'='1',\n  'fields.f_random.max'='1000',\n  'fields.f_random_str.length'='10'\n)\n;\n\nSELECT *\nFROM datagen\nLIMIT 50\n;\n\n\n\nCREATE TABLE user_behavior (\n  user_id BIGINT,\n  item_id BIGINT,\n  category_id BIGINT,\n  behavior STRING,\n  ts TIMESTAMP(3),\n  proctime AS PROCTIME(),   -- generates processing-time attribute using computed column\n  WATERMARK FOR ts AS ts - INTERVAL '5' SECOND  -- defines watermark on ts column, marks ts as event-time attribute\n) WITH (\n  'connector' = 'kafka',  -- using kafka connector\n  'topic' = 'user_behavior',  -- kafka topic\n  'scan.startup.mode' = 'earliest-offset',  -- reading from the beginning\n  'properties.bootstrap.servers' = 'kafka:9094',  -- kafka broker address\n  'format' = 'json'  -- the data format is json\n)\n;\n\nSELECT * \nFROM user_behavior \nLIMIT 50\n;\n\n\nSELECT\n  HOUR(TUMBLE_START(ts, INTERVAL '1' HOUR)) as hour_of_day,\n  COUNT(*) as buy_cnt\nFROM\n  user_behavior\nWHERE\n  behavior = 'buy'\nGROUP BY\n  TUMBLE(ts, INTERVAL '1' HOUR)\n;\n  ",
+        "type": 0,
+        "email_notify": false,
+        "is_parameterized": false,
+        "database": ""
+      },
+      "functions": [],
+      "VERSION": "0.4.1",
+      "file_resources": [],
+      "settings": []
+    }
+  },
+  {
+    "name": "Query and live display a live stream of data",
+    "desc": "List Kafka topics or a user table backed by a Kafka topic",
+    "dialects": ["ksql"],
+    "type": "2",
+    "auto_load_only": false,
+    "data": {
+      "query": {
+        "query": "\nSHOW TOPICS\n;\n\n\nCREATE STREAM user_behavior (\n  user_id BIGINT,\n  item_id BIGINT,\n  category_id BIGINT,\n  behavior STRING,\n  ts STRING\n) WITH (kafka_topic='user_behavior', value_format='json', partitions=1)\n;\n\n\nSELECT *\nFROM user_behavior\nEMIT CHANGES\nLIMIT 5\n;\n\n\nINSERT INTO user_behavior (\n  user_id ,\n  item_id ,\n  category_id ,\n  behavior ,\n  ts\n)\nVALUES\n(1, 10, 20, 'buy', '1602998392')\n;\n",
+        "type": 0,
+        "email_notify": false,
+        "is_parameterized": false,
+        "database": ""
+      },
+      "functions": [],
+      "VERSION": "0.4.1",
+      "file_resources": [],
+      "settings": []
+    }
+  },
+  {
+    "name": "New York Taxi dataset Analysis",
+    "desc": "Regular SELECTs with custom Python UDF and create Machine Learning Model",
+    "dialects": ["dasksql"],
+    "type": "2",
+    "auto_load_only": false,
+    "data": {
+      "query": {
+        "query": "\nSELECT *\nFROM \"schema\".\"nyc-taxi\"\nLIMIT 100\n;\n\nSELECT\n    FLOOR(trip_distance / 5) * 5 AS \"distance\",\n    AVG(tip_amount) AS \"given tip\",\n    AVG(predict_price(total_amount, trip_distance, passenger_count)) AS \"predicted tip\"\nFROM \"nyc-taxi\"\nWHERE\n    trip_distance > 0 AND trip_distance < 50\nGROUP BY\n    FLOOR(trip_distance / 5) * 5\n;\n\nCREATE MODEL fare_estimator WITH (\n    model_class = 'sklearn.ensemble.GradientBoostingClassifier',\n    wrap_predict = True,\n    target_column = 'fare_amount'\n) AS (\n    SELECT trip_distance, fare_amount\n    FROM \"nyc-taxi\"\n    LIMIT 100\n)\n;\n",
+        "type": 0,
+        "email_notify": false,
+        "is_parameterized": false,
+        "database": ""
+      },
+      "functions": [],
+      "VERSION": "0.4.1",
+      "file_resources": [],
+      "settings": []
+    }
   }
 ]

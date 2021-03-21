@@ -120,6 +120,10 @@
       <path d="M470.2,480l-56.3-56.3a134,134,0,0,0,25.7-82.1c-1.6-71.8-59.9-130.2-131.7-131.7-76.7-1.7-139.4,61-137.7,137.7,1.6,72,60.3,130.4,132.3,131.7a134,134,0,0,0,82.5-26.5l56.2,56.2a13.7,13.7,0,0,0,19.3,0l9.7-9.7A13.7,13.7,0,0,0,470.2,480ZM305,448.3A103.8,103.8,0,1,1,408.7,344.5,103.9,103.9,0,0,1,305,448.3Z"></path>
     </symbol>
 
+    <symbol id="hi-filter" viewBox="0 0 20 20">
+      <path d="M1.667 7.5h16.666V5.833H1.667V7.5zm2.5 3.333h11.666V9.166H4.167v1.667zM7.5 14.167h5V12.5h-5v1.667z" transform="translate(-355 -82) translate(355 76) translate(0 6)"></path>
+    </symbol>
+
     <symbol id="hi-folder" viewBox="0 0 640 640">
       <path d="M599,586H41A41,41,0,0,1,0,545V95A41,41,0,0,1,41,54H246a41,41,0,0,1,41,41v58l312,0a41,41,0,0,1,41,41V545A41,41,0,0,1,599,586ZM41,86a9,9,0,0,0-9,9V545a9,9,0,0,0,9,9H599a9,9,0,0,0,9-9V194a9,9,0,0,0-9-9H287a32,32,0,0,1-32-32V95a9,9,0,0,0-9-9H41Z"></path>
     </symbol>
@@ -461,6 +465,41 @@
 
     <symbol id="hi-heart" viewBox="0 0 1024 1024">
       <path d="M886.250667 552.490667 512 927.957333l-374.229333-375.466667C79.786667 505.429333 42.666667 433.536 42.666667 352.896 42.666667 211.029333 157.290667 96.042667 298.666667 96.042667c89.088 0 167.488 45.717333 213.333333 114.986667 45.845333-69.269333 124.245333-114.986667 213.333333-114.986667 141.376 0 256 114.986667 256 256.832C981.333333 433.536 944.213333 505.429333 886.250667 552.490667zM832.341333 458.858667l-138.858667 0-53.888-197.610667-20.586667 5.610667-20.117333-7.104-93.226667 317.034667-101.077333-252.672-20.245333 6.741333-19.989333-7.509333-50.794667 135.509333L192.341333 458.858667l0 42.666667 128 0 19.989333 7.509333 44.672-119.168 107.114667 267.754667 40.469333-13.504-3.477333-8.661333 3.349333 1.173333 85.76-291.562667 44.202667 162.090667 20.586667-5.610667 149.333333 0L832.341333 458.858667z"></path>
+    </symbol>
+
+    <symbol id="hi-chevron-left-limit" viewBox="0 0 24 24">
+      <path d="M18.41 16.59L13.82 12l4.59-4.59L17 6l-6 6 6 6zM6 6h2v12H6z"></path>
+    </symbol>
+
+    <symbol id="hi-chevron-left" viewBox="0 0 24 24">
+      <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"></path>
+    </symbol>
+
+    <symbol id="hi-chevron-right" viewBox="0 0 24 24">
+      <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path>
+    </symbol>
+
+    <symbol id="hi-chevron-right-limit" viewBox="0 0 24 24">
+      <path d="M5.59 7.41L10.18 12l-4.59 4.59L7 18l6-6-6-6zM16 6h2v12h-2z"></path>
+    </symbol>
+
+    <symbol id="hi-status-error" viewBox="0 0 24 24">
+      <path fill="#D9150C" d="M10 0C4.478 0 0 4.478 0 10s4.478 10 10 10 10-4.478 10-10S15.522 0 10 0z" transform="translate(-143 -246) translate(77 121) translate(2) translate(0 120) translate(64 5) translate(2 2)"></path>
+      <path fill="#FFF" d="M10 13.75c.69 0 1.25.56 1.25 1.25s-.56 1.25-1.25 1.25-1.25-.56-1.25-1.25.56-1.25 1.25-1.25zM11 4v8H9V4h2z" transform="translate(-143 -246) translate(77 121) translate(2) translate(0 120) translate(64 5) translate(2 2)"></path>
+    </symbol>
+
+    <symbol id="hi-status-success" viewBox="0 0 24 24">
+      <path fill="#3A870E" d="M9.675 15.899L5.413 11.637 4 13.052 9.656 18.709 20.974 7.399 19.574 6z" transform="translate(-143 -164) translate(77 121) translate(2) translate(0 38) translate(64 5)"></path>
+    </symbol>
+
+    <symbol id="hi-status-stopped" viewBox="0 0 24 24">
+      <path fill="#D9150C" d="M8.272 3L3 8.272 3 15.728 8.272 21 15.728 21 21 15.728 21 8.272 15.728 3z" transform="translate(-143 -410) translate(77 121) translate(2) translate(0 284) translate(64 5)"></path>
+      <path fill="#FFF" d="M15.707 9.707L14.293 8.293 12 10.586 9.707 8.293 8.293 9.707 10.586 12 8.293 14.293 9.707 15.707 12 13.414 14.293 15.707 15.707 14.293 13.414 12z" transform="translate(-143 -410) translate(77 121) translate(2) translate(0 284) translate(64 5)"></path>
+    </symbol>
+
+    <symbol id="hi-status-warning" viewBox="0 0 24 24">
+      <path fill="#FFA319" d="M10 0L0 20 20 20z" transform="translate(-143 -492) translate(77 121) translate(2) translate(0 366) translate(64 5) translate(2 2)"></path>
+      <path fill="#260D00" d="M10 13.75c-.69 0-1.25.56-1.25 1.25s.56 1.25 1.25 1.25 1.25-.56 1.25-1.25-.56-1.25-1.25-1.25zM9 12h2V7H9v5z" transform="translate(-143 -492) translate(77 121) translate(2) translate(0 366) translate(64 5) translate(2 2)"></path>
     </symbol>
 
     <defs>

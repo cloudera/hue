@@ -565,6 +565,10 @@ var Collection = function (vm, collection) {
     self.activeCompute(context.namespaces[0].computes[0]);
   });
 
+  self.simpleAceDatabase = ko.pureComputed(function () {
+    return self.name().split('.')[0];
+  });
+
   self.engine = ko.observable(typeof collection.engine != "undefined" && collection.engine != null ? collection.engine : "solr");
   self.engine.subscribe(function() {
     self.name(null);
@@ -1098,7 +1102,7 @@ var Collection = function (vm, collection) {
     return self.fields();
   });
 
-  self.selectedDocument = ko.observable({uuid: window.location.getParameter('uuid'), statement_id: parseInt(window.location.getParameter('statement')) || 0});
+  self.selectedDocument = ko.observable({uuid: hueUtils.getParameter('uuid'), statement_id: parseInt(hueUtils.getParameter('statement')) || 0});
 
   self.newQDefinitionName = ko.observable("");
 
@@ -1135,8 +1139,8 @@ var Collection = function (vm, collection) {
 
     vm.selectedQDefinition(qdefinition);
     if (window.location.hash.indexOf("collection") == -1) {
-      if (location.getParameter("collection") != "") {
-        hueUtils.changeURL("?collection=" + location.getParameter("collection") + "&qd=" + qdef.uuid());
+      if (hueUtils.getParameter("collection") != "") {
+        hueUtils.changeURL("?collection=" + hueUtils.getParameter("collection") + "&qd=" + qdef.uuid());
       }
       else {
         window.location.hash = "qd=" + qdef.uuid();
@@ -1173,8 +1177,8 @@ var Collection = function (vm, collection) {
     vm.query.start(0);
     vm.query.selectedMultiq([]);
     if (window.location.hash.indexOf("collection") == -1) {
-      if (location.getParameter("collection") != "") {
-        hueUtils.changeURL("?collection=" + location.getParameter("collection"));
+      if (hueUtils.getParameter("collection") != "") {
+        hueUtils.changeURL("?collection=" + hueUtils.getParameter("collection"));
       }
       else {
         window.location.hash = "";
@@ -2034,6 +2038,17 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
 
   var self = this;
 
+  self.sharingEnabled = ko.observable(false);
+
+  var updateFromConfig = function (hueConfig) {
+    self.sharingEnabled(
+      hueConfig && (hueConfig.hue_config.is_admin || hueConfig.hue_config.enable_sharing)
+    );
+  };
+
+  updateFromConfig(window.getLastKnownConfig());
+  huePubSub.subscribe('cluster.config.set.config', updateFromConfig);
+
   self.collectionJson = collection_json;
   self.queryJson = query_json;
   self.initialJson = initial_json;
@@ -2042,7 +2057,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
   self.hasNewAdd = ko.observable(!!has_new_add_method);
   self.isQueryBuilder = ko.observable(false);
 
-  if ($.totalStorage('hue.enable.gridster') === false) {
+  if (hueUtils.hueLocalStorage('hue.enable.gridster') === false) {
     self.isGridster(false);
   }
 
@@ -2425,10 +2440,10 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
           || ko.toJSON(_prop.selectedMultiq()) != ko.mapping.toJSON(self.query.selectedMultiq())) {
           self.selectedQDefinition().hasChanged(true);
         }
-      } else if (location.getParameter("collection") != "") {
+      } else if (hueUtils.getParameter("collection") != "") {
         var firstQuery = self.query.qs()[0].q();
-        if (firstQuery != location.getParameter("q")) {
-          hueUtils.changeURL("?collection=" + location.getParameter("collection") + (firstQuery ? "&q=" + firstQuery : ""));
+        if (firstQuery != hueUtils.getParameter("q")) {
+          hueUtils.changeURL("?collection=" + hueUtils.getParameter("collection") + (firstQuery ? "&q=" + firstQuery : ""));
         }
       }
 
@@ -2764,7 +2779,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
         if (self.additionalMustache != null && typeof self.additionalMustache == "function") {
           self.additionalMustache(item);
         }
-        doc.content = Mustache.render(_mustacheTmpl, item);
+        doc.content = window.Mustache.render(_mustacheTmpl, item);
       }
       return doc;
     }

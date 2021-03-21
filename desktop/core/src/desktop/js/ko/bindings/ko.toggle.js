@@ -26,12 +26,12 @@ import * as ko from 'knockout';
  * @type {{init: ko.bindingHandlers.toggle.init}}
  */
 ko.bindingHandlers.toggle = {
-  init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+  init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
     const value = valueAccessor();
     ko.bindingHandlers.click.init(
       element,
       () => {
-        return function() {
+        return function () {
           value(!value());
         };
       },

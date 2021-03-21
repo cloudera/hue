@@ -18,7 +18,7 @@ import $ from 'jquery';
 import * as ko from 'knockout';
 
 ko.bindingHandlers.blurHide = {
-  init: function(element, valueAccessor) {
+  init: function (element, valueAccessor) {
     const $el = $(element);
     const prop = valueAccessor();
     $el.on('blur', () => {
@@ -29,7 +29,7 @@ ko.bindingHandlers.blurHide = {
       }
     });
   },
-  update: function(element, valueAccessor) {
+  update: function (element, valueAccessor) {
     const $el = $(element);
     const prop = valueAccessor();
     if (ko.isObservable(prop) && prop()) {

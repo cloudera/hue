@@ -21,7 +21,6 @@ import logging
 import json
 import posixpath
 
-from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
 from desktop.lib.i18n import force_unicode
@@ -64,12 +63,14 @@ class FlinkSqlApi(Api):
     Api.__init__(self, user, interpreter=interpreter)
 
     self.options = interpreter['options']
-    self.db = FlinkSqlClient(user=user, api_url=self.options['api_url'])
+    api_url = self.options['url']
+
+    self.db = FlinkSqlClient(user=user, api_url=api_url)
 
 
   @query_error_handler
   def create_session(self, lang=None, properties=None):
-    session = self.db.create_session()
+    session = self._get_session()
 
     response = {
       'type': lang,
@@ -85,18 +86,21 @@ class FlinkSqlApi(Api):
     }
 
     if session_key not in SESSIONS:
-      SESSIONS[session_key] = self.create_session()
+      SESSIONS[session_key] = self.db.create_session()
 
     try:
-      self.db.session_heartbeat(session_id=SESSIONS[session_key]['id'])
+      self.db.session_heartbeat(session_id=SESSIONS[session_key]['session_id'])
     except Exception as e:
       if 'Session: %(id)s does not exist' % SESSIONS[session_key] in str(e):
         LOG.warn('Session: %(id)s does not exist, opening a new one' % SESSIONS[session_key])
-        SESSIONS[session_key] = self.create_session()
+        SESSIONS[session_key] = self.db.create_session()
       else:
         raise e
 
+    SESSIONS[session_key]['id'] = SESSIONS[session_key]['session_id']
+
     return SESSIONS[session_key]
+
 
   @query_error_handler
   def execute(self, notebook, snippet):
@@ -106,7 +110,9 @@ class FlinkSqlApi(Api):
     session_id = session['id']
     job_id = None
 
-    resp = self.db.execute_statement(session_id=session_id, statement=snippet['statement'])
+    statement = snippet['statement'].strip().rstrip(';')
+
+    resp = self.db.execute_statement(session_id=session_id, statement=statement)
 
     if resp['statement_types'][0] == 'SELECT':
       job_id = resp['results'][0]['data'][0][0]
@@ -130,7 +136,8 @@ class FlinkSqlApi(Api):
             'comment': ''
           }
           for col in description
-        ] if has_result_set else [],
+        ]
+        if has_result_set else [],
         'type': 'table'
       }
     }
@@ -141,30 +148,31 @@ class FlinkSqlApi(Api):
     global n
     response = {}
     session = self._get_session()
-    statement_id = snippet['result']['handle']['guid']
 
     status = 'expired'
 
-    if session:
-      if not statement_id:  # Sync result
-        status = 'available'
-      else:
-        try:
-          resp = self.db.fetch_status(session['id'], statement_id)
-          if resp.get('status') == 'RUNNING':
-            status = 'streaming'
-            response['result'] = self.fetch_result(notebook, snippet, n, False)
-          elif resp.get('status') == 'FINISHED':
-            status = 'available'
-          elif resp.get('status') == 'FAILED':
-            status = 'failed'
-          elif resp.get('status') == 'CANCELED':
-            status = 'expired'
-        except Exception as e:
-          if '%s does not exist in current session' % statement_id in str(e):
-            LOG.warn('Job: %s does not exist' % statement_id)
-          else:
-            raise e
+    if snippet.get('result'):
+      statement_id = snippet['result']['handle']['guid']
+      if session:
+        if not statement_id:  # Sync result
+          status = 'available'
+        else:
+          try:
+            resp = self.db.fetch_status(session['id'], statement_id)
+            if resp.get('status') == 'RUNNING':
+              status = 'streaming'
+              response['result'] = self.fetch_result(notebook, snippet, n, False)
+            elif resp.get('status') == 'FINISHED':
+              status = 'available'
+            elif resp.get('status') == 'FAILED':
+              status = 'failed'
+            elif resp.get('status') == 'CANCELED':
+              status = 'expired'
+          except Exception as e:
+            if '%s does not exist in current session' % statement_id in str(e):
+              LOG.warn('Job: %s does not exist' % statement_id)
+            else:
+              raise e
 
     response['status'] = status
 
@@ -199,70 +207,44 @@ class FlinkSqlApi(Api):
 
 
   @query_error_handler
-  def autocomplete(self, snippet, database=None, table=None, column=None, nested=None):
+  def autocomplete(self, snippet, database=None, table=None, column=None, nested=None, operation=None):
     response = {}
 
-    try:
-      if database is None:
-        response['databases'] = self.show_databases()
-      elif table is None:
-        response['tables_meta'] = self.show_tables(database)
-      elif column is None:
-        columns = self.get_columns(database, table)
-        response['columns'] = [col['name'] for col in columns]
-        response['extended_columns'] = [{
-            'comment': col.get('comment'),
-            'name': col.get('name'),
-            'type': col['type']
-          }
-          for col in columns
-        ]
-      else:
-        response = {}
-
-    except Exception as e:
-      LOG.warn('Autocomplete data fetching error: %s' % e)
-      response['code'] = 500
-      response['error'] = str(e)
+    if database is None:
+      response['databases'] = self._show_databases()
+    elif table is None:
+      response['tables_meta'] = self._show_tables(database)
+    elif column is None:
+      columns = self._get_columns(database, table)
+      response['columns'] = [col['name'] for col in columns]
+      response['extended_columns'] = [{
+          'comment': col.get('comment'),
+          'name': col.get('name'),
+          'type': col['type']
+        }
+        for col in columns
+      ]
 
     return response
 
 
-  def show_databases(self):
-    session = self._get_session()
-    session_id = session['id']
+  @query_error_handler
+  def get_sample_data(self, snippet, database=None, table=None, column=None, is_async=False, operation=None):
+    if operation == 'hello':
+      snippet['statement'] = "SELECT 'Hello World!'"
 
-    resp = self.db.execute_statement(session_id=session_id, statement='SHOW DATABASES')
+    notebook = {}
+    sample = self.execute(notebook, snippet)
 
-    return [db[0] for db in resp['results'][0]['data']]
+    response = {
+      'status': 0,
+      'result': {}
+    }
 
+    response['rows'] = sample['result']['data']
+    response['full_headers'] = sample['result']['meta']
 
-  def show_tables(self, database):
-    session = self._get_session()
-    session_id = session['id']
-
-    resp = self.db.execute_statement(session_id=session_id, statement='USE %(database)s' % {'database': database})
-    resp = self.db.execute_statement(session_id=session_id, statement='SHOW TABLES')
-
-    return [table[0] for table in resp['results'][0]['data']]
-
-
-  def get_columns(self, database, table):
-    session = self._get_session()
-    session_id = session['id']
-
-    resp = self.db.execute_statement(session_id=session_id, statement='USE %(database)s' % {'database': database})
-    resp = self.db.execute_statement(session_id=session_id, statement='DESCRIBE %(table)s' % {'table': table})
-
-    columns = json.loads(resp['results'][0]['data'][0][0])['columns']
-
-    return [{
-        'name': col['field_name'],
-        'type': col['field_type'],  # Types to unify
-        'comment': '',
-      }
-      for col in columns
-    ]
+    return response
 
 
   def cancel(self, notebook, snippet):
@@ -281,8 +263,46 @@ class FlinkSqlApi(Api):
 
 
   def close_session(self, session):
+    # Avoid closing session on page refresh or editor close for now
+    pass
+    # session = self._get_session()
+    # self.db.close_session(session['id'])
+
+
+  def _show_databases(self):
     session = self._get_session()
-    self.db.close_session(session['id'])
+    session_id = session['id']
+
+    resp = self.db.execute_statement(session_id=session_id, statement='SHOW DATABASES')
+
+    return [db[0] for db in resp['results'][0]['data']]
+
+
+  def _show_tables(self, database):
+    session = self._get_session()
+    session_id = session['id']
+
+    resp = self.db.execute_statement(session_id=session_id, statement='USE %(database)s' % {'database': database})
+    resp = self.db.execute_statement(session_id=session_id, statement='SHOW TABLES')
+
+    return [table[0] for table in resp['results'][0]['data']]
+
+
+  def _get_columns(self, database, table):
+    session = self._get_session()
+    session_id = session['id']
+
+    resp = self.db.execute_statement(session_id=session_id, statement='USE %(database)s' % {'database': database})
+    resp = self.db.execute_statement(session_id=session_id, statement='DESCRIBE %(table)s' % {'table': table})
+    columns = resp['results'][0]['data']
+
+    return [{
+        'name': col[0],
+        'type': col[1],  # Types to unify
+        'comment': '',
+      }
+      for col in columns
+    ]
 
 
 class FlinkSqlClient():

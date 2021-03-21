@@ -18,17 +18,14 @@ import $ from 'jquery';
 import * as ko from 'knockout';
 
 ko.bindingHandlers.multiCheckForeachVisible = {
-  init: function(element, valueAccessor, allBindings, clickedEntry, bindingContext) {
+  init: function (element, valueAccessor, allBindings, clickedEntry, bindingContext) {
     const $element = $(element);
     const parentContext = bindingContext.$parentContext;
 
     const selectedAttr = valueAccessor().selectedAttr;
     const entries = valueAccessor().entries;
 
-    $element
-      .attr('unselectable', 'on')
-      .css('user-select', 'none')
-      .on('selectstart', false);
+    $element.attr('unselectable', 'on').css('user-select', 'none').on('selectstart', false);
 
     $element.on('click', e => {
       if (e.shiftKey && parentContext.$multiCheckLastEntry) {
@@ -62,5 +59,5 @@ ko.bindingHandlers.multiCheckForeachVisible = {
       $element.off('click');
     });
   },
-  update: function() {}
+  update: function () {}
 };

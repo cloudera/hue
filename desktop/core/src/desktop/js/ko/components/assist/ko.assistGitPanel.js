@@ -16,11 +16,11 @@
 
 import * as ko from 'knockout';
 
-import apiHelper from 'api/apiHelper';
 import AssistGitEntry from 'ko/components/assist/assistGitEntry';
 import componentUtils from 'ko/components/componentUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
+import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
 
 const TEMPLATE = `
   <script type="text/html" id="git-details-title">
@@ -94,12 +94,8 @@ class AssistGitPanel {
     const self = this;
 
     self.selectedGitEntry = ko.observable();
-    self.reload = function() {
-      const lastKnownPath = apiHelper.getFromTotalStorage(
-        'assist',
-        'currentGitPath',
-        window.USER_HOME_DIR
-      );
+    self.reload = function () {
+      const lastKnownPath = getFromLocalStorage('assist.currentGitPath', window.USER_HOME_DIR);
       const parts = lastKnownPath.split('/');
       parts.shift();
 
@@ -119,7 +115,7 @@ class AssistGitPanel {
 
     huePubSub.subscribe('assist.selectGitEntry', entry => {
       self.selectedGitEntry(entry);
-      apiHelper.setInTotalStorage('assist', 'currentGitPath', entry.path);
+      setInLocalStorage('assist.currentGitPath', entry.path);
     });
 
     huePubSub.subscribe('assist.git.refresh', () => {

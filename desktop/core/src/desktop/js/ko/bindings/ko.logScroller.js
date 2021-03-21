@@ -20,7 +20,7 @@ import * as ko from 'knockout';
 import hueUtils from 'utils/hueUtils';
 
 ko.bindingHandlers.logScroller = {
-  init: function(element, valueAccessor, allBindings) {
+  init: function (element, valueAccessor, allBindings) {
     const $element = $(element);
 
     $element.on('scroll', () => {

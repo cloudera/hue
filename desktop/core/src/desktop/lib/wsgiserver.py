@@ -101,6 +101,7 @@ number of requests and their responses, so we run a nested loop:
 
 
 from future import standard_library
+from future.utils import raise_
 standard_library.install_aliases()
 from builtins import hex
 from builtins import range
@@ -654,7 +655,7 @@ class HTTPRequest(object):
         # exc_info tuple."
         if self.sent_headers:
             try:
-                raise exc_info[0], exc_info[1], exc_info[2]
+                raise_(exc_info[0], exc_info[1], exc_info[2])
             finally:
                 exc_info = None
 

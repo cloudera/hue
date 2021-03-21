@@ -17,6 +17,7 @@
 from builtins import object
 import logging
 import posixpath
+import sys
 
 from desktop.conf import TIME_ZONE
 from desktop.conf import DEFAULT_USER
@@ -77,8 +78,8 @@ class OozieApi(object):
 
   def _get_params(self):
     if self.security_enabled:
-      return { 'doAs': self.user, 'timezone': TIME_ZONE.get() }
-    return { 'user.name': DEFAULT_USER, 'doAs': self.user, 'timezone': TIME_ZONE.get() }
+      return {'doAs': self.user, 'timezone': TIME_ZONE.get()}
+    return {'user.name': DEFAULT_USER, 'doAs': self.user, 'timezone': TIME_ZONE.get()}
 
   def _get_oozie_properties(self, properties=None):
     defaults = {
@@ -176,7 +177,10 @@ class OozieApi(object):
     """
     params = self._get_params()
     params['show'] = 'definition'
-    return self._root.get('job/%s' % (jobid,), params)
+    job_def = self._root.get('job/%s' % (jobid,), params)
+    if sys.version_info[0] > 2:
+      job_def = job_def.decode()
+    return job_def
 
 
   def get_job_log(self, jobid, logfilter=None):
@@ -194,7 +198,10 @@ class OozieApi(object):
         raise ValueError('"%s" is not a valid filter for job logs' % (key,))
       filter_list.append('%s=%s' % (key, val))
     params['logfilter'] = ';'.join(filter_list)
-    return self._root.get('job/%s' % (jobid,), params)
+    log = self._root.get('job/%s' % (jobid,), params)
+    if sys.version_info[0] > 2:
+      log = log.decode()
+    return log
 
 
   def get_job_graph(self, jobid, format='svg'):
@@ -239,7 +246,7 @@ class OozieApi(object):
     if parameters is not None:
       params.update(parameters)
 
-    return self._root.put('job/%s' % jobid, params,  data=config_gen(properties), contenttype=_XML_CONTENT_TYPE)
+    return self._root.put('job/%s' % jobid, params, data=config_gen(properties), contenttype=_XML_CONTENT_TYPE)
 
   def submit_workflow(self, application_path, properties=None):
     """

@@ -37,7 +37,6 @@ sf_caption_position:
 sf_remove_promo_bar:
   - 1
 categories:
-  - Administration
   - Hue 3.11
   - Programming
   - SDK
@@ -71,7 +70,7 @@ def login_djangosite():
  cookies = session.cookies
  headers = session.headers
 
- r=session.get('http://localhost:8888/metastore/databases/default/metadata', 
+ r=session.get('http://localhost:8888/metastore/databases/default/metadata',
  cookies=session.cookies, headers=session.headers)
  print r.status_code
 

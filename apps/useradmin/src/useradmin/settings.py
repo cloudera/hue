@@ -14,11 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-DJANGO_APPS = [ "useradmin" ]
+DJANGO_APPS = ["useradmin"]
 NICE_NAME = "User Admin"
 REQUIRES_HADOOP = False
 ICON = "useradmin/art/icon_useradmin_48.png"
 MENU_INDEX = 60
+IS_URL_NAMESPACED = True
 
 PERMISSION_ACTIONS = (
   ("access_view:useradmin:edit_user", "Access to profile page on User Admin"),

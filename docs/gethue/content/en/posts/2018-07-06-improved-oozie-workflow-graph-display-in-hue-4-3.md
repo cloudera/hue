@@ -39,9 +39,7 @@ sf_remove_promo_bar:
 ampforwp-amp-on-off:
   - default
 categories:
-  - Browsing
   - Version 4
-  - Scheduling
 
 ---
 <span style="font-weight: 400;">Hello Job Scheduler/Oozie users,</span>

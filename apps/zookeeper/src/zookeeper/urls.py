@@ -15,16 +15,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from django.conf.urls import url
+import sys
+
 from zookeeper import views as zookeeper_views
 
+if sys.version_info[0] > 2:
+  from django.urls import re_path
+else:
+  from django.conf.urls import url as re_path
+
 urlpatterns = [
-  url(r'^$', zookeeper_views.index, name='index'),
-  url(r'view/(?P<id>\w+)$', zookeeper_views.view, name='view'),
-  url(r'clients/(?P<id>\w+)/(?P<host>.+)$', zookeeper_views.clients, name='clients'),
-  url(r'tree/(?P<id>\w+)/(?P<path>.+)$', zookeeper_views.tree, name='tree'),
-  url(r'create/(?P<id>\w+)/(?P<path>.*)$', zookeeper_views.create, name='create'),
-  url(r'delete/(?P<id>\w+)/(?P<path>.*)$', zookeeper_views.delete, name='delete'),
-  url(r'edit/base64/(?P<id>\w+)/(?P<path>.*)$', zookeeper_views.edit_as_base64, name='edit_as_base64'),
-  url(r'edit/text/(?P<id>\w+)/(?P<path>.*)$', zookeeper_views.edit_as_text, name='edit_as_text'),
+  re_path(r'^$', zookeeper_views.index, name='index'),
+  re_path(r'view/(?P<id>\w+)$', zookeeper_views.view, name='view'),
+  re_path(r'clients/(?P<id>\w+)/(?P<host>.+)$', zookeeper_views.clients, name='clients'),
+  re_path(r'tree/(?P<id>\w+)/(?P<path>.+)$', zookeeper_views.tree, name='tree'),
+  re_path(r'create/(?P<id>\w+)/(?P<path>.*)$', zookeeper_views.create, name='create'),
+  re_path(r'delete/(?P<id>\w+)/(?P<path>.*)$', zookeeper_views.delete, name='delete'),
+  re_path(r'edit/base64/(?P<id>\w+)/(?P<path>.*)$', zookeeper_views.edit_as_base64, name='edit_as_base64'),
+  re_path(r'edit/text/(?P<id>\w+)/(?P<path>.*)$', zookeeper_views.edit_as_text, name='edit_as_text'),
 ]

@@ -17,7 +17,7 @@
 import $ from 'jquery';
 import * as ko from 'knockout';
 
-import apiHelper from 'api/apiHelper';
+import { ASSIST_SET_DATABASE_EVENT } from './assist/events';
 import componentUtils from './componentUtils';
 import contextCatalog, {
   CONTEXT_CATALOG_REFRESHED_EVENT,
@@ -26,7 +26,7 @@ import contextCatalog, {
 import dataCatalog from 'catalog/dataCatalog';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
-import { ASSIST_SET_DATABASE_EVENT } from './assist/events';
+import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
 
 export const CONTEXT_SELECTOR_COMPONENT = 'hue-context-selector';
 
@@ -81,10 +81,7 @@ const TEMPLATE = `
     <!-- /ko -->
 
     <!-- ko if: availableDatabases().length > 0 && !hideDatabases-->
-    <!-- ko ifnot: hideLabels --><span class="editor-header-title">${I18n(
-      'Database'
-    )}</span><!-- /ko -->
-    <div data-bind="component: { name: 'hue-drop-down', params: { value: database, entries: availableDatabases, foreachVisible: true, searchable: true, linkTitle: '${I18n(
+    <div data-bind="component: { name: 'hue-drop-down', params: { titleName: 'Database', value: database, entries: availableDatabases, foreachVisible: true, searchable: true, linkTitle: '${I18n(
       'Active database'
     )}' } }" style="display: inline-block"></div>
     <!-- /ko -->
@@ -104,7 +101,7 @@ const TYPES_INDEX = {
     hide: 'hideClusters',
     lastPromise: 'lastClustersPromise',
     contextCatalogFn: 'getClusters',
-    totalStorageId: 'lastSelectedCluster',
+    localStorageId: 'lastSelectedCluster',
     onSelect: 'onClusterSelect'
   },
   compute: {
@@ -114,7 +111,7 @@ const TYPES_INDEX = {
     hide: 'hideComputes',
     lastPromise: 'lastComputesPromise',
     contextCatalogFn: 'getComputes',
-    totalStorageId: 'lastSelectedCompute',
+    localStorageId: 'lastSelectedCompute',
     onSelect: 'onComputeSelect'
   },
   namespace: {
@@ -124,7 +121,7 @@ const TYPES_INDEX = {
     hide: 'hideNamespaces',
     lastPromise: 'lastNamespacesPromise',
     contextCatalogFn: 'getNamespaces',
-    totalStorageId: 'lastSelectedNamespace',
+    localStorageId: 'lastSelectedNamespace',
     onSelect: 'onNamespaceSelect'
   }
 };
@@ -172,7 +169,7 @@ const TYPES = Object.keys(TYPES_INDEX).map(key => {
  * @param {function} [params.onNamespaceSelect] - Callback when a new namespace is selected (after initial set)
  * @constructor
  */
-const HueContextSelector = function(params) {
+const HueContextSelector = function (params) {
   const self = this;
   if (!params.connector || !ko.unwrap(params.connector)) {
     throw new Error('No connector with type provided');
@@ -189,11 +186,11 @@ const HueContextSelector = function(params) {
     self[type.available] = ko.observableArray();
     self[type.hide] = params[type.hide] || !self[type.name];
     self[type.lastPromise] = undefined;
-    self[type.onSelect] = function(selectedVal, previousVal) {
+    self[type.onSelect] = function (selectedVal, previousVal) {
       if (params[type.onSelect]) {
         params[type.onSelect](selectedVal, previousVal);
       }
-      apiHelper.setInTotalStorage('contextSelector', type.totalStorageId, selectedVal);
+      setInLocalStorage('contextSelector.' + type.localStorageId, selectedVal);
 
       if (selectedVal && type === TYPES_INDEX.compute) {
         self.setMatchingNamespace(selectedVal);
@@ -216,7 +213,7 @@ const HueContextSelector = function(params) {
 
   let refreshThrottle = -1;
 
-  const refresh = function(connectorId) {
+  const refresh = function (connectorId) {
     if (!connectorId || ko.unwrap(self.connector).id === connectorId) {
       window.clearTimeout(refreshThrottle);
       refreshThrottle = window.setTimeout(() => {
@@ -262,7 +259,7 @@ const HueContextSelector = function(params) {
   });
 };
 
-HueContextSelector.prototype.setMatchingNamespace = function(compute) {
+HueContextSelector.prototype.setMatchingNamespace = function (compute) {
   const self = this;
   if (self[TYPES_INDEX.namespace.name]) {
     // Select the first corresponding namespace when a compute is selected (unless selected)
@@ -274,11 +271,7 @@ HueContextSelector.prototype.setMatchingNamespace = function(compute) {
         const found = self[TYPES_INDEX.namespace.available]().some(namespace => {
           if (compute.namespace === namespace.id) {
             self[TYPES_INDEX.namespace.name](namespace);
-            apiHelper.setInTotalStorage(
-              'contextSelector',
-              TYPES_INDEX.namespace.totalStorageId,
-              namespace
-            );
+            setInLocalStorage('contextSelector.' + TYPES_INDEX.namespace.localStorageId, namespace);
             return true;
           }
         });
@@ -293,7 +286,7 @@ HueContextSelector.prototype.setMatchingNamespace = function(compute) {
   }
 };
 
-HueContextSelector.prototype.setMatchingCompute = function(namespace) {
+HueContextSelector.prototype.setMatchingCompute = function (namespace) {
   const self = this;
   if (self[TYPES_INDEX.compute.name]) {
     // Select the first corresponding compute when a namespace is selected (unless selected)
@@ -306,11 +299,7 @@ HueContextSelector.prototype.setMatchingCompute = function(namespace) {
         const found = self[TYPES_INDEX.compute.available]().some(compute => {
           if (namespace.id === compute.namespace) {
             self[TYPES_INDEX.compute.name](compute);
-            apiHelper.setInTotalStorage(
-              'contextSelector',
-              TYPES_INDEX.compute.totalStorageId,
-              namespace
-            );
+            setInLocalStorage('contextSelector.' + TYPES_INDEX.compute.localStorageId, namespace);
             return true;
           }
         });
@@ -325,7 +314,7 @@ HueContextSelector.prototype.setMatchingCompute = function(namespace) {
   }
 };
 
-HueContextSelector.prototype.reload = function(type) {
+HueContextSelector.prototype.reload = function (type) {
   const self = this;
   if (self[type.name]) {
     self[type.loading](true);
@@ -358,14 +347,8 @@ HueContextSelector.prototype.reload = function(type) {
           });
         }
 
-        if (
-          !self[type.name]() &&
-          apiHelper.getFromTotalStorage('contextSelector', type.totalStorageId)
-        ) {
-          const lastSelected = apiHelper.getFromTotalStorage(
-            'contextSelector',
-            type.totalStorageId
-          );
+        if (!self[type.name]() && getFromLocalStorage('contextSelector.' + type.localStorageId)) {
+          const lastSelected = getFromLocalStorage('contextSelector.' + type.localStorageId);
           const found = available.some(other => {
             if (other.id === lastSelected.id) {
               self[type.name](other);
@@ -401,13 +384,11 @@ HueContextSelector.prototype.reload = function(type) {
         self[type.loading](false);
       });
   } else {
-    self[type.lastPromise] = $.Deferred()
-      .resolve()
-      .promise();
+    self[type.lastPromise] = $.Deferred().resolve().promise();
   }
 };
 
-HueContextSelector.prototype.reloadDatabases = function() {
+HueContextSelector.prototype.reloadDatabases = function () {
   const self = this;
   if (self.database && !self.hideDatabases) {
     self.loadingDatabases(true);
@@ -429,26 +410,26 @@ HueContextSelector.prototype.reloadDatabases = function() {
               path: [],
               definition: { type: 'source' }
             })
-            .done(sourceEntry => {
+            .then(sourceEntry => {
               sourceEntry
                 .getChildren({ silenceErrors: true })
-                .done(databaseEntries => {
+                .then(databaseEntries => {
                   const databaseNames = [];
                   databaseEntries.forEach(databaseEntry => {
                     databaseNames.push(databaseEntry.name);
                   });
                   self.availableDatabases(databaseNames);
                 })
-                .fail(() => {
+                .catch(() => {
                   self.availableDatabases([]);
                 })
-                .always(() => {
-                  let lastSelectedDb = apiHelper.getFromTotalStorage(
+                .finally(() => {
+                  let lastSelectedDb = getFromLocalStorage(
                     'assist_' +
                       ko.unwrap(self.connector).id +
                       '_' +
-                      self[TYPES_INDEX.namespace.name]().id,
-                    'lastSelectedDb'
+                      self[TYPES_INDEX.namespace.name]().id +
+                      '.lastSelectedDb'
                   );
 
                   const updateAssist = lastSelectedDb !== '';
@@ -490,7 +471,7 @@ HueContextSelector.prototype.reloadDatabases = function() {
   }
 };
 
-HueContextSelector.prototype.dispose = function() {
+HueContextSelector.prototype.dispose = function () {
   const self = this;
   while (self.disposals.length) {
     self.disposals.pop()();

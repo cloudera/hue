@@ -37,8 +37,8 @@ sf_caption_position:
 ampforwp-amp-on-off:
   - default
 categories:
-  - Administration
-  - Version 4.8
+  - Version 4
+#  - Version 4.8
 
 ---
 Hello, Hue administrators,

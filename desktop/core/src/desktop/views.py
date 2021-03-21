@@ -16,6 +16,7 @@
 # limitations under the License.
 
 from future import standard_library
+
 standard_library.install_aliases()
 import json
 import logging
@@ -33,7 +34,7 @@ import validate
 from django.http import HttpResponseRedirect
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
-from django.shortcuts import render_to_response
+from django.shortcuts import render as django_render
 from django.http import HttpResponse
 from django.http.response import StreamingHttpResponse
 from django.urls import reverse
@@ -63,6 +64,8 @@ from desktop.lib.thread_util import dump_traceback
 from desktop.log.access import access_log_level, access_warn, AccessInfo
 from desktop.log import set_all_debug as _set_all_debug, reset_all_debug as _reset_all_debug, get_all_debug as _get_all_debug
 from desktop.models import Settings, hue_version, _get_apps, UserPreferences
+from libsaml.conf import REQUIRED_GROUPS, REQUIRED_GROUPS_ATTRIBUTE
+from useradmin.models import get_profile
 
 if sys.version_info[0] > 2:
   from io import StringIO as string_io
@@ -76,10 +79,44 @@ LOG = logging.getLogger(__name__)
 def is_alive(request):
   return HttpResponse('')
 
+def samlgroup_check(request):
+  if 'SAML2Backend' in desktop.auth.forms.get_backend_names():
+    if REQUIRED_GROUPS.get():
+      try:
+        userprofile = get_profile(request.user)
+      except:
+        return False
+
+      json_data = json.loads(userprofile.json_data)
+      if not json_data:
+        LOG.info("Empty userprofile data for %s user" % (request.user.username))
+        return False
+
+      if not json_data.get('saml_attributes', False):
+        LOG.info("Empty saml_attributes data for %s user" % request.user.username)
+        return False
+
+      if not json_data['saml_attributes'].get(REQUIRED_GROUPS_ATTRIBUTE.get(), False):
+        LOG.info("Missing %s in SAMLResponse for %s user" % (REQUIRED_GROUPS_ATTRIBUTE.get(), request.user.username))
+        return False
+
+      saml_group_found = set(REQUIRED_GROUPS.get()).issubset(
+                         set(json_data['saml_attributes'].get(REQUIRED_GROUPS_ATTRIBUTE.get())))
+      if not saml_group_found:
+        LOG.info("User %s not found in required SAML groups, %s" % (request.user.username, REQUIRED_GROUPS.get()))
+        return False
+  return True
 
 def hue(request):
   current_app, other_apps, apps_list = _get_apps(request.user, '')
   clusters = list(get_clusters(request.user).values())
+
+  user_permitted = request.session.get('samlgroup_permitted_flag')
+
+  if (not user_permitted) and (not samlgroup_check(request)):
+    return render('403.mako', request, {
+      'is_embeddable': True
+    })
 
   return render('hue.mako', request, {
     'apps': apps_list,
@@ -246,7 +283,7 @@ def download_log_view(request):
         LOG.exception("Couldn't construct zip file to write logs")
         return log_view(request)
 
-  return render_to_response("logs.mako", dict(log=[_("No logs found.")], is_embeddable=request.GET.get('is_embeddable', False)))
+  return django_render(request, "logs.mako", dict(log=[_("No logs found.")], is_embeddable=request.GET.get('is_embeddable', False)))
 
 
 def bootstrap(request):
@@ -392,6 +429,7 @@ def csrf_failure(request, reason=None):
   access_warn(request, reason)
   return render("403_csrf.mako", request, dict(uri=request.build_absolute_uri()), status=403)
 
+@login_notrequired
 def serve_403_error(request, *args, **kwargs):
   """Registered handler for 403. We just return a simple error"""
   access_warn(request, "403 access forbidden")
@@ -516,7 +554,8 @@ def get_banner_message(request):
       LOG.warn('User %s is bypassing the load balancer' % request.user.username)
 
     if message:
-      banner_message = '<div style="padding: 4px; text-align: center; background-color: #003F6C; height: 24px; color: #DBE8F1">%s</div>' % message
+      banner_message = '<div style="padding: 4px; text-align: center; background-color: #003F6C; height: 24px; color: #DBE8F1">%s</div>' \
+          % message
 
   return banner_message
 
@@ -663,7 +702,7 @@ def collect_validation_messages(conf, error_list):
     'hadoop_mapred_home': [('hadoop', 'yarn_clusters', 'default'), ('hadoop', 'yarn_clusters', 'ha')],
     'hadoop_conf_dir': [('hadoop', 'yarn_clusters', 'default'), ('hadoop', 'yarn_clusters', 'ha')],
     'ssl_cacerts': [('beeswax', 'ssl'), ('impala', 'ssl')],
-    'remote_data_dir': [('liboozie', )],
+    'remote_data_dir': [('liboozie',)],
     'shell': [()],
   }
 

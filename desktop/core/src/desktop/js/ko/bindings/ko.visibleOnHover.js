@@ -18,7 +18,7 @@ import $ from 'jquery';
 import * as ko from 'knockout';
 
 ko.bindingHandlers.visibleOnHover = {
-  init: function(element, valueAccessor) {
+  init: function (element, valueAccessor) {
     const options = valueAccessor();
     const $element = $(element);
 
@@ -32,7 +32,7 @@ ko.bindingHandlers.visibleOnHover = {
     );
     let inside = false;
 
-    const show = function() {
+    const show = function () {
       if (options.childrenOnly) {
         $element.children(selector).fadeTo('fast', 1);
       } else {
@@ -41,7 +41,7 @@ ko.bindingHandlers.visibleOnHover = {
       window.clearTimeout(hideTimeout);
     };
 
-    const hide = function() {
+    const hide = function () {
       if (!inside) {
         window.clearTimeout(showTimeout);
         hideTimeout = window.setTimeout(() => {
@@ -76,7 +76,7 @@ ko.bindingHandlers.visibleOnHover = {
       }
     });
   },
-  update: function(element, valueAccessor) {
+  update: function (element, valueAccessor) {
     if (ko.utils.unwrapObservable(valueAccessor().override)) {
       ko.utils.domData.set(element, 'visibleOnHover.override', true);
       ko.utils.domData.get(element, 'visibleOnHover.show')();

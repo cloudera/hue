@@ -27,8 +27,8 @@ const defaultOptions = {
   setProjection: setProjection,
   projection: 'equirectangular',
   dataType: 'json',
-  onClick: function() {},
-  done: function() {},
+  onClick: function () {},
+  done: function () {},
   legendData: [],
   fills: {
     defaultFill: '#ABDDA4'
@@ -38,7 +38,7 @@ const defaultOptions = {
     hideAntarctica: true,
     borderWidth: 1,
     borderColor: '#FDFDFD',
-    popupTemplate: function(geography, data) {
+    popupTemplate: function (geography, data) {
       return '<div class="hoverinfo"><strong>' + geography.properties.name + '</strong></div>';
     },
     popupOnHover: true,
@@ -53,7 +53,7 @@ const defaultOptions = {
     borderWidth: 2,
     borderColor: '#FFFFFF',
     popupOnHover: true,
-    popupTemplate: function(geography, data) {
+    popupTemplate: function (geography, data) {
       return '<div class="hoverinfo"><strong>' + data.name + '</strong></div>';
     },
     fillOpacity: 0.75,
@@ -264,7 +264,7 @@ function handleGeographyConfig() {
   if (options.highlightOnHover || options.popupOnHover) {
     svg
       .selectAll('.datamaps-subunit')
-      .on('mouseover', function(d) {
+      .on('mouseover', function (d) {
         const $this = d3.select(this);
 
         if (options.highlightOnHover) {
@@ -292,7 +292,7 @@ function handleGeographyConfig() {
           self.updatePopup($this, d, options, svg);
         }
       })
-      .on('mouseout', function() {
+      .on('mouseout', function () {
         const $this = d3.select(this);
 
         if (options.highlightOnHover) {
@@ -339,10 +339,7 @@ function addLegend(layer, data, options) {
 
   html += '</dl>';
 
-  d3.select(this.options.element)
-    .append('div')
-    .attr('class', 'datamaps-legend')
-    .html(html);
+  d3.select(this.options.element).append('div').attr('class', 'datamaps-legend').html(html);
 }
 
 function handleArcs(layer, data, options) {
@@ -397,7 +394,7 @@ function handleArcs(layer, data, options) {
     })
     .transition()
     .delay(100)
-    .style('fill', function() {
+    .style('fill', function () {
       /*
          Thank you Jake Archibald, this is awesome.
          Source: http://jakearchibald.com/2013/animated-line-drawing-svg/
@@ -413,11 +410,7 @@ function handleArcs(layer, data, options) {
       return 'none';
     });
 
-  arcs
-    .exit()
-    .transition()
-    .style('opacity', 0)
-    .remove();
+  arcs.exit().transition().style('opacity', 0).remove();
 }
 
 function handleLabels(layer, options) {
@@ -522,7 +515,7 @@ function handleBubbles(layer, data, options) {
       const fillColor = fillData[datum.fillKey];
       return fillColor || fillData.defaultFill;
     })
-    .on('mouseover', function(datum) {
+    .on('mouseover', function (datum) {
       const $this = d3.select(this);
 
       if (options.highlightOnHover) {
@@ -546,7 +539,7 @@ function handleBubbles(layer, data, options) {
         self.updatePopup($this, datum, options, svg);
       }
     })
-    .on('mouseout', function(datum) {
+    .on('mouseout', function (datum) {
       const $this = d3.select(this);
 
       if (options.highlightOnHover) {
@@ -565,12 +558,7 @@ function handleBubbles(layer, data, options) {
       return datum.radius;
     });
 
-  bubbles
-    .exit()
-    .transition()
-    .delay(options.exitDelay)
-    .attr('r', 0)
-    .remove();
+  bubbles.exit().transition().delay(options.exitDelay).attr('r', 0).remove();
 
   function datumHasCoords(datum) {
     return (
@@ -632,7 +620,7 @@ function Datamap(options) {
 }
 
 // actually draw the features(states & countries)
-Datamap.prototype.draw = function() {
+Datamap.prototype.draw = function () {
   //save off in a closure
   const self = this;
   const options = self.options;
@@ -666,7 +654,7 @@ Datamap.prototype.draw = function() {
       //allow for csv or json data types
       d3[self.options.dataType](self.options.dataUrl, data => {
         //in the case of csv, transform data to object
-        if (self.options.dataType === 'csv' && (data && data.slice)) {
+        if (self.options.dataType === 'csv' && data && data.slice) {
           const tmpData = {};
           for (let i = 0; i < data.length; i++) {
             tmpData[data[i].id] = data[i];
@@ -697,12 +685,12 @@ Datamap.prototype.draw = function() {
  ***************************************/
 
 //convert lat/lng coords to X / Y coords
-Datamap.prototype.latLngToXY = function(lat, lng) {
+Datamap.prototype.latLngToXY = function (lat, lng) {
   return this.projection([lng, lat]);
 };
 
 //add <g> layer to root SVG
-Datamap.prototype.addLayer = function(className, id, first) {
+Datamap.prototype.addLayer = function (className, id, first) {
   let layer;
   if (first) {
     layer = this.svg.insert('g', ':first-child');
@@ -712,7 +700,7 @@ Datamap.prototype.addLayer = function(className, id, first) {
   return layer.attr('id', id || '').attr('class', className || '');
 };
 
-Datamap.prototype.updateChoropleth = function(data) {
+Datamap.prototype.updateChoropleth = function (data) {
   const svg = this.svg;
   for (const subunit in data) {
     if (data.hasOwnProperty(subunit)) {
@@ -742,10 +730,10 @@ Datamap.prototype.updateChoropleth = function(data) {
   }
 };
 
-Datamap.prototype.updatePopup = function(element, d, options) {
+Datamap.prototype.updatePopup = function (element, d, options) {
   const self = this;
   element.on('mousemove', null);
-  element.on('mousemove', function() {
+  element.on('mousemove', function () {
     const position = d3.mouse(this);
     const svgHeight = d3.select(self.svg[0][0].parentNode)[0][0].offsetHeight || -1;
     d3.select(self.svg[0][0].parentNode)
@@ -766,14 +754,12 @@ Datamap.prototype.updatePopup = function(element, d, options) {
     }
   });
 
-  d3.select(self.svg[0][0].parentNode)
-    .select('.datamaps-hoverover')
-    .style('display', 'block');
+  d3.select(self.svg[0][0].parentNode).select('.datamaps-hoverover').style('display', 'block');
 };
 
-Datamap.prototype.addPlugin = function(name, pluginFn) {
+Datamap.prototype.addPlugin = function (name, pluginFn) {
   if (typeof Datamap.prototype[name] === 'undefined') {
-    Datamap.prototype[name] = function(data, options, callback, createNewLayer) {
+    Datamap.prototype[name] = function (data, options, callback, createNewLayer) {
       let layer;
       if (typeof createNewLayer === 'undefined') {
         createNewLayer = false;
@@ -803,7 +789,7 @@ Datamap.prototype.addPlugin = function(name, pluginFn) {
   }
 };
 
-jQuery.fn.datamaps = function(options, callback) {
+jQuery.fn.datamaps = function (options, callback) {
   options = options || {};
   options.element = this[0];
   const datamap = new Datamap(options);

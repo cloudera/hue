@@ -67,7 +67,7 @@ class TestInstallExamples():
               }
             ]
 
-            resp = self.client.post(reverse('notebook:install_examples'), {'db_name': 'default'})
+            resp = self.client.post(reverse('notebook:install_examples'), {'db_name': 'default', 'dialect': 'mysql'})
             data = json.loads(resp.content)
 
             assert_equal(0, data['status'], data)

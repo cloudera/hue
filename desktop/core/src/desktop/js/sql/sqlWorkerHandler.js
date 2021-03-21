@@ -16,30 +16,28 @@
 
 import $ from 'jquery';
 
-import dataCatalog from 'catalog/dataCatalog';
 import huePubSub from 'utils/huePubSub';
 import { resolveCatalogEntry } from 'sql/sqlUtils';
+import { applyCancellable } from '../catalog/catalogUtils';
 
 export const POST_TO_LOCATION_WORKER_EVENT = 'ace.sql.location.worker.post';
 export const POST_FROM_LOCATION_WORKER_EVENT = 'ace.sql.location.worker.message';
 export const POST_TO_SYNTAX_WORKER_EVENT = 'ace.sql.syntax.worker.post';
 export const POST_FROM_SYNTAX_WORKER_EVENT = 'ace.sql.syntax.worker.message';
 
-const attachEntryResolver = function(location, connector, namespace, compute) {
-  location.resolveCatalogEntry = function(options) {
+const attachEntryResolver = function (location, connector, namespace, compute) {
+  location.resolveCatalogEntry = function (options) {
     if (!options) {
       options = {};
     }
     if (location.resolvePathPromise && !location.resolvePathPromise.cancelled) {
-      dataCatalog.applyCancellable(location.resolvePathPromise, options);
+      applyCancellable(location.resolvePathPromise, options);
       return location.resolvePathPromise;
     }
 
     if (!location.identifierChain && !location.colRef && !location.colRef.identifierChain) {
       if (!location.resolvePathPromise) {
-        location.resolvePathPromise = $.Deferred()
-          .reject()
-          .promise();
+        location.resolvePathPromise = $.Deferred().reject().promise();
       }
       return location.resolvePathPromise;
     }
@@ -65,10 +63,10 @@ const attachEntryResolver = function(location, connector, namespace, compute) {
 let registered = false;
 
 export default {
-  registerWorkers: function() {
+  registerWorkers: function () {
     if (!registered && window.Worker) {
       // It can take a while before the worker is active
-      const whenWorkerIsReady = function(worker, message) {
+      const whenWorkerIsReady = function (worker, message) {
         message.hueBaseUrl = window.HUE_BASE_URL;
         if (!worker.isReady) {
           window.clearTimeout(worker.pingTimeout);
@@ -77,7 +75,8 @@ export default {
             whenWorkerIsReady(worker, message);
           }, 500);
         } else {
-          worker.postMessage(message);
+          // To JSON and back as Vue creates proxy objects with methods which are not serializable
+          worker.postMessage(JSON.parse(JSON.stringify(message)));
         }
       };
 
@@ -88,7 +87,7 @@ export default {
           window.HUE_VERSION +
           '.1'
       );
-      aceSqlSyntaxWorker.onmessage = function(e) {
+      aceSqlSyntaxWorker.onmessage = function (e) {
         if (e.data.ping) {
           aceSqlSyntaxWorker.isReady = true;
         } else {
@@ -107,7 +106,7 @@ export default {
           window.HUE_VERSION +
           '.1'
       );
-      aceSqlLocationWorker.onmessage = function(e) {
+      aceSqlLocationWorker.onmessage = function (e) {
         if (e.data.ping) {
           aceSqlLocationWorker.isReady = true;
         } else {

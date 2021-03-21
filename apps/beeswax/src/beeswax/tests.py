@@ -117,7 +117,7 @@ def _make_query(client, query, submission_type="Execute",
   return res
 
 def random_generator(size=8, chars=string.ascii_uppercase + string.digits):
-    return ''.join(random.choice(chars) for _ in range(size))
+  return ''.join(random.choice(chars) for _ in range(size))
 
 def get_csv(client, result_response):
   """Get the csv for a query result"""
@@ -158,6 +158,7 @@ INFO  : OK"""
 
   def test_install_examples(self):
     with patch('beeswax.management.commands.beeswax_install_examples.Command') as Command:
+      grant_access("test_hive", "default", "beeswax")
       resp = self.client.get('/beeswax/install_examples')
       assert_true('POST request is required.' in json.loads(resp.content)['message'])
 
@@ -218,9 +219,12 @@ for x in sys.stdin:
 
   def test_query_with_setting(self):
     table_name = 'test_query_with_setting'
-    response = _make_query(self.client, "CREATE TABLE `%(db)s`.`%(table_name)s` AS SELECT foo+1 FROM test WHERE foo=4" % {'db': self.db_name, 'table_name': table_name},
-      settings=[("mapred.job.name", "test_query_with_setting"),
-        ("hive.exec.compress.output", "true")], local=False, database=self.db_name) # Run on MR, because that's how we check it worked.
+    response = _make_query(
+      self.client,
+      "CREATE TABLE `%(db)s`.`%(table_name)s` AS SELECT foo+1 FROM test WHERE foo=4" % {'db': self.db_name, 'table_name': table_name},
+      settings=[("mapred.job.name", "test_query_with_setting"), ("hive.exec.compress.output", "true")],
+      local=False, database=self.db_name
+    ) # Run on MR, because that's how we check it worked.
     response = wait_for_query_to_finish(self.client, response, max=180.0)
     # Check that we actually got a compressed output
     table = self.db.get_table(database=self.db_name, table_name=table_name)
@@ -232,12 +236,12 @@ for x in sys.stdin:
 
     raise SkipTest
     # And check that the name is right...
-    assert_true("test_query_with_setting" in [ x.profile.name for x in self.cluster.jt.all_jobs().jobs ])
+    assert_true("test_query_with_setting" in [x.profile.name for x in self.cluster.jt.all_jobs().jobs])
 
     # While we're at it, check that we're running jobs as the correct user on MR.
     assert_equal("test",
-      [ x.profile for x in self.cluster.jt.all_jobs().jobs
-        if x.profile.name == "test_query_with_setting" ][0].user)
+      [x.profile for x in self.cluster.jt.all_jobs().jobs
+        if x.profile.name == "test_query_with_setting"][0].user)
 
 
   def test_lazy_query_status_update(self):
@@ -417,10 +421,11 @@ for x in sys.stdin:
     execution_engines = get_available_execution_engines()
 
     for engine in execution_engines:
-      response = _make_query(self.client, "SELECT my_sqrt(foo), my_float(foo) FROM test where foo=4 GROUP BY foo", # Force MR job with GROUP BY
-        udfs=[('my_sqrt', 'org.apache.hadoop.hive.ql.udf.UDFSqrt'),
-              ('my_float', 'org.apache.hadoop.hive.ql.udf.UDFToFloat')],
-        local=False, database=self.db_name, settings=[('hive.execution.engine', engine)])
+      response = _make_query(
+        self.client, "SELECT my_sqrt(foo), my_float(foo) FROM test where foo=4 GROUP BY foo", # Force MR job with GROUP BY
+        udfs=[('my_sqrt', 'org.apache.hadoop.hive.ql.udf.UDFSqrt'), ('my_float', 'org.apache.hadoop.hive.ql.udf.UDFToFloat')],
+        local=False, database=self.db_name, settings=[('hive.execution.engine', engine)]
+      )
       response = wait_for_query_to_finish(self.client, response, max=60.0)
       content = fetch_query_result_data(self.client, response)
 
@@ -558,7 +563,9 @@ for x in sys.stdin:
       ], content['parameters'], content)
 
     # Now fill it out
-    response = _make_query(self.client, "SELECT foo FROM test WHERE foo='$x' and bar='$y'", params=[('x', '1'), ('y', '2')], database=self.db_name)
+    response = _make_query(
+      self.client, "SELECT foo FROM test WHERE foo='$x' and bar='$y'", params=[('x', '1'), ('y', '2')], database=self.db_name
+    )
     content = json.loads(response.content)
     assert_true('watch_url' in content, content)
     query_history = QueryHistory.get(content['id'])
@@ -567,7 +574,10 @@ for x in sys.stdin:
     assert_equal("SELECT foo FROM test WHERE foo='1' and bar='2'", query_history.query)
 
     # Check that error handling is reasonable
-    response = _make_query(self.client, "SELECT foo FROM test WHERE foo='$x' and bar='$y'", params=[('x', "'_this_is_not SQL "), ('y', '2')], database=self.db_name)
+    response = _make_query(
+      self.client, "SELECT foo FROM test WHERE foo='$x' and bar='$y'",
+      params=[('x', "'_this_is_not SQL "), ('y', '2')], database=self.db_name
+    )
     content = json.loads(response.content)
     assert_true("FAILED: ParseException" in content.get('message'), content)
 
@@ -593,7 +603,10 @@ for x in sys.stdin:
     response = _make_query(c, CREATE_TABLE, database=self.db_name)
     wait_for_query_to_finish(c, response)
 
-    response = _make_query(c, "SELECT SUM(foo) FROM `%(db)s`.`test_explain`" % {'db': self.db_name}, settings=[('hive.explain.user', 'false')], submission_type="Explain") # Need to prefix database in Explain
+    response = _make_query(
+      c, "SELECT SUM(foo) FROM `%(db)s`.`test_explain`" % {'db': self.db_name},
+      settings=[('hive.explain.user', 'false')], submission_type="Explain"
+    ) # Need to prefix database in Explain
     explanation = json.loads(response.content)['explanation']
     assert_true('STAGE DEPENDENCIES:' in explanation, explanation)
     assert_true('STAGE PLANS:' in explanation, explanation)
@@ -804,7 +817,7 @@ for x in sys.stdin:
     raise SkipTest # sqlite does not support concurrent transaction
 
     PARALLEL_TASKS = 2
-    responses = [ None ] * PARALLEL_TASKS
+    responses = [None] * PARALLEL_TASKS
     threads = []
     # Protects responses
     lock = threading.Lock()
@@ -824,8 +837,8 @@ for x in sys.stdin:
     for i in range(PARALLEL_TASKS):
       csv = get_csv(self.client, responses[i])
       # We get 3 rows: Column header, and 2 rows of results in double quotes
-      answer = [ int(data.strip('"')) for data in csv.split()[1:] ]
-      assert_equal( [ i + 1, i + 2 ], answer)
+      answer = [int(data.strip('"')) for data in csv.split()[1:]]
+      assert_equal([i + 1, i + 2], answer)
 
 
   def test_data_export_limit_clause(self):
@@ -1487,7 +1500,7 @@ for x in sys.stdin:
     ]
 
     def write_file(filename, raw_fields, delim, do_gzip=False):
-      lines = [ delim.join(row) for row in raw_fields ]
+      lines = [delim.join(row) for row in raw_fields]
       data = '\n'.join(lines)
       if do_gzip:
         sio = string_io()
@@ -1566,7 +1579,7 @@ for x in sys.stdin:
       ['a', 'b', 'c'],
       ['a,a', 'b,b', 'c,c'],
       ['a,"a', 'b,"b', 'c,"c'],
-    ] )
+    ])
 
     # Test column definition
     resp = self.client.post('/beeswax/create/import_wizard/%s' % self.db_name, {
@@ -1636,7 +1649,7 @@ for x in sys.stdin:
     resp = self.client.get(on_success_url_show_table)
     cols = resp.context[0]['table'].cols
     assert_equal(len(cols), 3)
-    assert_equal([ col.name for col in cols ], [ 'col_a', 'col_b', 'col_c' ])
+    assert_equal([col.name for col in cols], ['col_a', 'col_b', 'col_c'])
     resp = self.client.get(reverse('beeswax:get_sample_data', kwargs={'database': self.db_name, 'table': 'test_create_import'}))
     rows = json.loads(resp.content)['rows']
     flat_rows = sum(rows, [])
@@ -1762,7 +1775,8 @@ for x in sys.stdin:
 
     history = beeswax.models.QueryHistory.objects.latest('id')
     assert_equal('beeswax', history.server_name)
-    assert_equal(HIVE_SERVER_HOST.get(), history.server_host)
+    assert_true(history.server_host in [HIVE_SERVER_HOST.get(), 'localhost'])
+
 
     query_server = history.get_query_server_config()
     assert_equal('beeswax', query_server['server_name'])
@@ -1934,7 +1948,8 @@ for x in sys.stdin:
       # Retrieve stats before analyze
       resp = self.client.get(reverse('beeswax:get_table_stats', kwargs={'database': self.db_name, 'table': 'test'}))
       stats = json.loads(resp.content)['stats']
-      assert_true(any([stat for stat in stats if stat['data_type'] == 'numRows' and stat['comment'] == '0']), resp.content)
+      assert_true(any([stat for stat in stats if stat['data_type'] == 'numFiles' and stat['comment'] == '1']), resp.content)
+
 
       resp = self.client.get(reverse('beeswax:get_table_stats', kwargs={'database': self.db_name, 'table': 'test', 'column': 'foo'}))
       stats = json.loads(resp.content)['stats']
@@ -1958,7 +1973,9 @@ for x in sys.stdin:
       response = wait_for_query_to_finish(self.client, response, max=120.0)
       assert_true(response, response)
 
-      response = self.client.post(reverse("beeswax:analyze_table", kwargs={'database': self.db_name, 'table': 'test', 'columns': True}), follow=True)
+      response = self.client.post(
+        reverse("beeswax:analyze_table", kwargs={'database': self.db_name, 'table': 'test', 'columns': True}), follow=True
+      )
       response = wait_for_query_to_finish(self.client, response, max=120.0)
       assert_true(response, response)
 
@@ -2001,7 +2018,9 @@ for x in sys.stdin:
 
     assert_equal([[255, 1], [254, 1], [253, 1], [252, 1]], terms[:4])
 
-    resp = self.client.get(reverse("beeswax:get_top_terms", kwargs={'database': self.db_name, 'table': 'test', 'column': 'foo', 'prefix': '10'}))
+    resp = self.client.get(
+      reverse("beeswax:get_top_terms", kwargs={'database': self.db_name, 'table': 'test', 'column': 'foo', 'prefix': '10'})
+    )
 
     content = json.loads(resp.content)
     assert_true('terms' in content, 'Failed to get terms: %s' % (content,))
@@ -2009,7 +2028,9 @@ for x in sys.stdin:
 
     assert_equal([[109, 1], [108, 1], [107, 1], [106, 1]], terms[:4])
 
-    resp = self.client.get(reverse("beeswax:get_top_terms", kwargs={'database': self.db_name, 'table': 'test', 'column': 'foo', 'prefix': '10'}) + '?limit=2')
+    resp = self.client.get(
+      reverse("beeswax:get_top_terms", kwargs={'database': self.db_name, 'table': 'test', 'column': 'foo', 'prefix': '10'}) + '?limit=2'
+    )
 
     content = json.loads(resp.content)
     assert_true('terms' in content, 'Failed to get terms: %s' % (content,))
@@ -2039,7 +2060,9 @@ for x in sys.stdin:
     assert_equal({'comment': '', 'type': 'array<struct<bar:int,baz:string>>', 'name': 'foo'}, extended_columns[0])
 
     # Autocomplete nested fields for a given column
-    resp = self.client.get(reverse("beeswax:api_autocomplete_column", kwargs={'database': self.db_name, 'table': 'nested_table', 'column': 'foo'}))
+    resp = self.client.get(
+      reverse("beeswax:api_autocomplete_column", kwargs={'database': self.db_name, 'table': 'nested_table', 'column': 'foo'})
+    )
     json_resp = json.loads(resp.content)
     assert_false('error' in json_resp, 'Failed to autocomplete nested type: %s' % json_resp.get('error'))
 
@@ -2048,7 +2071,9 @@ for x in sys.stdin:
     assert_equal("struct", json_resp["item"]["type"])
 
     # Autocomplete nested fields for a given nested type
-    resp = self.client.get(reverse("beeswax:api_autocomplete_nested", kwargs={'database': self.db_name, 'table': 'nested_table', 'column': 'foo', 'nested': 'item'}))
+    resp = self.client.get(reverse(
+      "beeswax:api_autocomplete_nested", kwargs={'database': self.db_name, 'table': 'nested_table', 'column': 'foo', 'nested': 'item'}
+    ))
     json_resp = json.loads(resp.content)
     assert_false('error' in json_resp, 'Failed to autocomplete nested type: %s' % json_resp.get('error'))
 
@@ -2310,7 +2335,10 @@ def test_hive_site_host_pattern_local_host():
         return tmpdir
 
     thrift_uris = 'thrift://%s:9999' % hostname
-    xml = hive_site_xml(is_local=False, use_sasl=False, thrift_uris=thrift_uris, kerberos_principal='test/_HOST@TEST.COM', hs2_kerberos_principal='test/_HOST@TEST.COM')
+    xml = hive_site_xml(
+      is_local=False, use_sasl=False, thrift_uris=thrift_uris, kerberos_principal='test/_HOST@TEST.COM',
+      hs2_kerberos_principal='test/_HOST@TEST.COM'
+    )
     open_file(os.path.join(tmpdir, 'hive-site.xml'), 'w').write(xml)
 
     beeswax.hive_site.reset()
@@ -2372,7 +2400,8 @@ def test_search_log_line():
     """
   assert_true(search_log_line('FAILED: Parse Error', logs))
 
-  logs = "12/08/22 20:50:14 ERROR ql.Driver: FAILED: Parse Error: line 1:31 cannot recognize input near '''' '_this_is_not' 'SQL' in constant'"
+  logs = "12/08/22 20:50:14 ERROR ql.Driver: FAILED: Parse Error: line 1:31 cannot recognize input "\
+    "near '''' '_this_is_not' 'SQL' in constant'"
   assert_true(search_log_line('FAILED: Parse Error', logs))
 
   logs = """
@@ -2419,14 +2448,20 @@ LOCATION '/user/admin/alltypes/alltypes';
 USE functional;
 ALTER TABLE alltypes ADD IF NOT EXISTS PARTITION(year=2009, month=1);
 ALTER TABLE alltypes ADD IF NOT EXISTS PARTITION(year=2009, month=2);"""
-  assert_equal(['CREATE DATABASE IF NOT EXISTS functional',
-                'DROP TABLE IF EXISTS functional.alltypes',
-                "CREATE EXTERNAL TABLE IF NOT EXISTS functional.alltypes (\nid int COMMENT 'Add a comment',\nbool_col boolean,\ntinyint_col tinyint,\nsmallint_col smallint,\nint_col int,\nbigint_col bigint,\nfloat_col float,\ndouble_col double,\ndate_string_col string,\nstring_col string,\ntimestamp_col timestamp)\nPARTITIONED BY (year int, month int)\nROW FORMAT delimited fields terminated by ','  escaped by '\\\\'\nSTORED AS TEXTFILE\nLOCATION '/user/admin/alltypes/alltypes'",
-                'USE functional',
-                'ALTER TABLE alltypes ADD IF NOT EXISTS PARTITION(year=2009, month=1)',
-                'ALTER TABLE alltypes ADD IF NOT EXISTS PARTITION(year=2009, month=2)'
-              ],
-              hql_query(query).statements, hql_query(query).statements)
+  assert_equal(
+    [
+      'CREATE DATABASE IF NOT EXISTS functional',
+      'DROP TABLE IF EXISTS functional.alltypes',
+      "CREATE EXTERNAL TABLE IF NOT EXISTS functional.alltypes (\nid int COMMENT 'Add a comment',\nbool_col boolean,\ntinyint_col "\
+        "tinyint,\nsmallint_col smallint,\nint_col int,\nbigint_col bigint,\nfloat_col float,\ndouble_col double,\ndate_string_col "\
+        "string,\nstring_col string,\ntimestamp_col timestamp)\nPARTITIONED BY (year int, month int)\nROW FORMAT delimited fields "\
+        "terminated by ','  escaped by '\\\\'\nSTORED AS TEXTFILE\nLOCATION '/user/admin/alltypes/alltypes'",
+      'USE functional',
+      'ALTER TABLE alltypes ADD IF NOT EXISTS PARTITION(year=2009, month=1)',
+      'ALTER TABLE alltypes ADD IF NOT EXISTS PARTITION(year=2009, month=2)'
+    ],
+    hql_query(query).statements, hql_query(query).statements
+  )
 
 
 class MockHiveServerTable(HiveServerTable):
@@ -2462,7 +2497,9 @@ class MockHiveServerTable(HiveServerTable):
             {'comment': None, 'col_name': '# Storage Information', 'data_type': None},
             {'comment': None, 'col_name': 'SerDe Library:      ', 'data_type': 'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe'},
             {'comment': None, 'col_name': 'InputFormat:        ', 'data_type': 'org.apache.hadoop.mapred.TextInputFormat'},
-            {'comment': None, 'col_name': 'OutputFormat:       ', 'data_type': 'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'},
+            {
+              'comment': None, 'col_name': 'OutputFormat:       ', 'data_type': 'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'
+            },
             {'comment': None, 'col_name': 'Compressed:         ', 'data_type': 'No                  '},
             {'comment': None, 'col_name': 'Num Buckets:        ', 'data_type': '-1                  '},
             {'comment': None, 'col_name': 'Bucket Columns:     ', 'data_type': '[]                  '},
@@ -2690,9 +2727,14 @@ class TestHiveServer2API(object):
     data = [1] * 8 * 8
     nulls = '\x01\x23\x45\x67\x89\xab\xcd\xef'
 
-    assert_equal([None, 1, 1, 1, 1, 1, 1, 1, None, None, 1, 1, 1, None, 1, 1, None, 1, None, 1, 1, 1, None, 1, None, None, None, 1, 1, None, None, 1, None, 1, 1,
-                  None, 1, 1, 1, None, None, None, 1, None, 1, None, 1, None, None, 1, None, None, 1, 1, None, None, None, None, None, None, 1, None, None, None],
-                 HiveServerTColumnValue2.set_nulls(data, nulls))
+    assert_equal(
+      [
+        None, 1, 1, 1, 1, 1, 1, 1, None, None, 1, 1, 1, None, 1, 1, None, 1, None, 1, 1, 1, None, 1, None, None, None, 1, 1, None, None, 1,
+        None, 1, 1, None, 1, 1, 1, None, None, None, 1, None, 1, None, 1, None, None, 1, None, None, 1, 1, None, None, None, None, None,
+        None, 1, None, None, None
+      ],
+      HiveServerTColumnValue2.set_nulls(data, nulls)
+    )
 
 
   def test_column_detect_if_values_nulls(self):
@@ -2837,7 +2879,10 @@ class TestWithMockedServer(object):
     design_obj = hql_query('SELECT')
 
     # Save his own query
-    saved_design = _save_design(user=self.user, design=design, type_=HQL, design_obj=design_obj, explicit_save=True, name='test_save_design', desc='test_save_design desc')
+    saved_design = _save_design(
+      user=self.user, design=design, type_=HQL, design_obj=design_obj,
+      explicit_save=True, name='test_save_design', desc='test_save_design desc'
+    )
     assert_equal('test_save_design', saved_design.name)
     assert_equal('test_save_design desc', saved_design.desc)
     assert_equal('test_save_design', saved_design.doc.get().name)
@@ -2845,7 +2890,10 @@ class TestWithMockedServer(object):
     assert_false(saved_design.doc.get().is_historic())
 
     # Execute it as auto
-    saved_design = _save_design(user=self.user, design=design, type_=HQL, design_obj=design_obj, explicit_save=False, name='test_save_design', desc='test_save_design desc')
+    saved_design = _save_design(
+      user=self.user, design=design, type_=HQL, design_obj=design_obj,
+      explicit_save=False, name='test_save_design', desc='test_save_design desc'
+    )
     assert_equal('test_save_design (new)', saved_design.name)
     assert_equal('test_save_design desc', saved_design.desc)
     assert_equal('test_save_design (new)', saved_design.doc.get().name)
@@ -2854,7 +2902,10 @@ class TestWithMockedServer(object):
 
     # not_me user can't modify it
     try:
-      _save_design(user=self.user_not_me, design=design, type_=HQL, design_obj=design_obj, explicit_save=True, name='test_save_design', desc='test_save_design desc')
+      _save_design(
+        user=self.user_not_me, design=design, type_=HQL, design_obj=design_obj,
+        explicit_save=True, name='test_save_design', desc='test_save_design desc'
+      )
       assert_true(False, 'not_me is not allowed')
     except PopupException:
       pass
@@ -2862,13 +2913,19 @@ class TestWithMockedServer(object):
     saved_design.doc.get().share_to_default()
 
     try:
-      _save_design(user=self.user_not_me, design=design, type_=HQL, design_obj=design_obj, explicit_save=True, name='test_save_design', desc='test_save_design desc')
+      _save_design(
+        user=self.user_not_me, design=design, type_=HQL, design_obj=design_obj,
+        explicit_save=True, name='test_save_design', desc='test_save_design desc'
+      )
       assert_true(False, 'not_me is not allowed')
     except PopupException:
       pass
 
     # not_me can execute it as auto
-    saved_design = _save_design(user=self.user_not_me, design=design, type_=HQL, design_obj=design_obj, explicit_save=False, name='test_save_design', desc='test_save_design desc')
+    saved_design = _save_design(
+      user=self.user_not_me, design=design, type_=HQL, design_obj=design_obj,
+      explicit_save=False, name='test_save_design', desc='test_save_design desc'
+    )
     assert_equal('test_save_design (new)', saved_design.name)
     assert_equal('test_save_design desc', saved_design.desc)
     assert_equal('test_save_design (new)', saved_design.doc.get().name)
@@ -2878,7 +2935,10 @@ class TestWithMockedServer(object):
     # not_me can save as a new design
     design = SavedQuery(owner=self.user_not_me, type=HQL)
 
-    saved_design = _save_design(user=self.user_not_me, design=design, type_=HQL, design_obj=design_obj, explicit_save=True, name='test_save_design', desc='test_save_design desc')
+    saved_design = _save_design(
+      user=self.user_not_me, design=design, type_=HQL, design_obj=design_obj,
+      explicit_save=True, name='test_save_design', desc='test_save_design desc'
+    )
     assert_equal('test_save_design', saved_design.name)
     assert_equal('test_save_design desc', saved_design.desc)
     assert_equal('test_save_design', saved_design.doc.get().name)
@@ -2895,19 +2955,28 @@ class TestWithMockedServer(object):
     design_obj = hql_query('SELECT')
 
     # Save query
-    saved_design = _save_design(user=self.user, design=design, type_=HQL, design_obj=design_obj,
-                                explicit_save=True, name='This__design__name__contains___sixty__five___characters___exactly', desc='test_save_design desc')
+    saved_design = _save_design(
+      user=self.user, design=design, type_=HQL, design_obj=design_obj, explicit_save=True,
+      name='This__design__name__contains___sixty__five___characters___exactly', desc='test_save_design desc'
+    )
     len_after = len(saved_design.name)
     assert_equal(len_after, 64)
-    saved_design = _save_design(user=self.user, design=design, type_=HQL, design_obj=design_obj,
-                                explicit_save=False, name='This__design__name__contains___sixty__five___characters___exactly', desc='test_save_design desc')
+    saved_design = _save_design(
+      user=self.user, design=design, type_=HQL, design_obj=design_obj, explicit_save=False,
+      name='This__design__name__contains___sixty__five___characters___exactly', desc='test_save_design desc'
+    )
     # Above design name is already 64 characters, so saved_design name shouldn't exceed the limit
     len_after = len(saved_design.name)
     assert_equal(len_after, 64)
 
   def test_get_history_xss(self):
     sql = 'SELECT count(sample_07.salary) FROM sample_07;"><iFrAME>src="javascript:alert(\'Hue has an xss\');"></iFraME>'
-    sql_escaped = b'SELECT count(sample_07.salary) FROM sample_07;&quot;&gt;&lt;iFrAME&gt;src=&quot;javascript:alert(&#39;Hue has an xss&#39;);&quot;&gt;&lt;/iFraME&gt;'
+    if sys.version_info[0] < 3:
+      sql_escaped = b'SELECT count(sample_07.salary) FROM sample_07;&quot;&gt;&lt;iFrAME&gt;'\
+        b'src=&quot;javascript:alert(&#39;Hue has an xss&#39;);&quot;&gt;&lt;/iFraME&gt;'
+    else:
+      sql_escaped = b'SELECT count(sample_07.salary) FROM sample_07;&quot;&gt;&lt;iFrAME&gt;'\
+        b'src=&quot;javascript:alert(&#x27;Hue has an xss&#x27;);&quot;&gt;&lt;/iFraME&gt;'
 
     response = _make_query(self.client, sql, submission_type='Save', name='My Name 1', desc='My Description')
     content = json.loads(response.content)
@@ -3480,13 +3549,13 @@ def test_ssl_validate():
 
 
 def test_to_matching_wildcard():
-    match_fn = dbms.HiveServer2Dbms.to_matching_wildcard
+  match_fn = dbms.HiveServer2Dbms.to_matching_wildcard
 
-    assert_equal(match_fn(None), '*')
-    assert_equal(match_fn(''), '*')
-    assert_equal(match_fn('*'), '*')
-    assert_equal(match_fn('test'), '*test*')
-    assert_equal(match_fn('test*'), '*test*')
+  assert_equal(match_fn(None), '*')
+  assert_equal(match_fn(''), '*')
+  assert_equal(match_fn('*'), '*')
+  assert_equal(match_fn('test'), '*test*')
+  assert_equal(match_fn('test*'), '*test*')
 
 
 def test_apply_natural_sort():
@@ -3522,14 +3591,19 @@ def test_hiveserver2_jdbc_url():
     beeswax.hive_site.get_conf()[hive_site._CNF_HIVESERVER2_TRUSTSTORE_PATH] = '/path/to/truststore.jks'
     beeswax.hive_site.get_conf()[hive_site._CNF_HIVESERVER2_TRUSTSTORE_PASSWORD] = 'password'
     url = hiveserver2_jdbc_url()
-    assert_equal(url, 'jdbc:hive2://server-with-ssl-enabled.com:10000/default;ssl=true;sslTrustStore=/path/to/truststore.jks;trustStorePassword=password')
+    assert_equal(
+      url,
+      'jdbc:hive2://server-with-ssl-enabled.com:10000/default;ssl=true;sslTrustStore=/path/to/truststore.jks;trustStorePassword=password'
+    )
 
     beeswax.hive_site.reset()
     beeswax.hive_site.get_conf()[hive_site._CNF_HIVESERVER2_USE_SSL] = 'TRUE'
     hadoop.ssl_client_site.reset()
     hadoop.ssl_client_site.get_conf()[ssl_client_site._CNF_TRUSTORE_LOCATION] = '/etc/ssl-conf/CA_STANDARD/truststore.jks'
     url = hiveserver2_jdbc_url() # Pick-up trustore from ssl-client.xml
-    assert_equal(url, 'jdbc:hive2://server-with-ssl-enabled.com:10000/default;ssl=true;sslTrustStore=/etc/ssl-conf/CA_STANDARD/truststore.jks')
+    assert_equal(
+      url, 'jdbc:hive2://server-with-ssl-enabled.com:10000/default;ssl=true;sslTrustStore=/etc/ssl-conf/CA_STANDARD/truststore.jks'
+    )
 
     beeswax.hive_site.get_conf()[hive_site._CNF_HIVESERVER2_USE_SSL] = 'FALSE'
     url = hiveserver2_jdbc_url()
@@ -3542,7 +3616,7 @@ def test_hiveserver2_jdbc_url():
     beeswax.hive_site.reset()
     hadoop.ssl_client_site.reset()
     for reset in resets:
-        reset()
+      reset()
 
 def test_sasl_auth_in_large_download():
   db = None
@@ -3563,14 +3637,15 @@ def test_sasl_auth_in_large_download():
   # Create a big table
   table_info = {'db': 'default', 'table_name': 'dummy_'+random_generator().lower()}
   drop_sql = "DROP TABLE IF EXISTS %(db)s.%(table_name)s" % table_info
-  create_sql = "CREATE TABLE IF NOT EXISTS %(db)s.%(table_name)s (w0 CHAR(8),w1 CHAR(8),w2 CHAR(8),w3 CHAR(8),w4 CHAR(8),w5 CHAR(8),w6 CHAR(8),w7 CHAR(8),w8 CHAR(8),w9 CHAR(8))" % table_info
+  create_sql = "CREATE TABLE IF NOT EXISTS %(db)s.%(table_name)s (w0 CHAR(8),w1 CHAR(8),w2 CHAR(8),w3 CHAR(8),w4 "\
+    "CHAR(8),w5 CHAR(8),w6 CHAR(8),w7 CHAR(8),w8 CHAR(8),w9 CHAR(8))" % table_info
   hql = string_io()
   hql.write("INSERT INTO %(db)s.%(table_name)s VALUES " % (table_info))
   for i in range(max_rows-1):
     w = random_generator(size=7)
-    hql.write("('%s0','%s1','%s2','%s3','%s4','%s5','%s6','%s7','%s8','%s9')," % (w,w,w,w,w,w,w,w,w,w))
+    hql.write("('%s0','%s1','%s2','%s3','%s4','%s5','%s6','%s7','%s8','%s9')," % (w, w, w, w, w, w, w, w, w, w))
   w = random_generator(size=7)
-  hql.write("('%s0','%s1','%s2','%s3','%s4','%s5','%s6','%s7','%s8','%s9')" % (w,w,w,w,w,w,w,w,w,w))
+  hql.write("('%s0','%s1','%s2','%s3','%s4','%s5','%s6','%s7','%s8','%s9')" % (w, w, w, w, w, w, w, w, w, w))
 
   try:
     db = dbms.get(user, get_query_server_config())
@@ -3602,7 +3677,7 @@ def test_sasl_auth_in_large_download():
     if 'Invalid OperationHandle' in ex.message and 'EXECUTE_STATEMENT' in ex.message:
       failed = True
   except:
-      failed = True
+    failed = True
 
   # Fetch large data set is successful because SASL_MAX_BUFFER > RESULT_DATA
   assert_false(failed)
@@ -3616,7 +3691,7 @@ def test_sasl_auth_in_large_download():
     if 'Invalid OperationHandle' in ex.message and 'EXECUTE_STATEMENT' in ex.message:
       failed = True
   except:
-      failed = True
+    failed = True
 
   # Fetch large data set fails because SASL_MAX_BUFFER < RESULT_DATA In your log file you will see following log lines
   # thrift_util  INFO     Thrift exception; retrying: Error in sasl_decode (-1) SASL(-1): generic failure: Unable to find a callback: 32775
@@ -3634,5 +3709,5 @@ def test_sasl_auth_in_large_download():
     if 'Invalid OperationHandle' in ex.message and 'EXECUTE_STATEMENT' in ex.message:
       failed = True
   except:
-      failed = True
+    failed = True
   assert_false(failed)

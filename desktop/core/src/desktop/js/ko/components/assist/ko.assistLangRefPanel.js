@@ -20,7 +20,7 @@ import * as ko from 'knockout';
 import componentUtils from 'ko/components/componentUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
-import { CONFIG_REFRESHED_EVENT, filterEditorConnectors } from 'utils/hueConfig';
+import { CONFIG_REFRESHED_EVENT, filterEditorConnectors } from 'config/hueConfig';
 import { simpleGet } from 'api/apiUtils';
 import { ASSIST_LANG_REF_PANEL_SHOW_TOPIC_EVENT } from './events';
 
@@ -231,10 +231,7 @@ class AssistLangRefPanel {
             match = true;
           } else if (
             loadedTopic.body() &&
-            loadedTopic
-              .body()
-              .toLowerCase()
-              .indexOf(lowerCaseQuery) !== -1
+            loadedTopic.body().toLowerCase().indexOf(lowerCaseQuery) !== -1
           ) {
             loadedTopic.weight = 0;
             loadedTopic.titleMatch(undefined);
@@ -263,18 +260,14 @@ class AssistLangRefPanel {
     });
 
     this.selectedTopic.subscribe(() => {
-      $(element)
-        .find('.assist-docs-details')
-        .scrollTop(0);
+      $(element).find('.assist-docs-details').scrollTop(0);
     });
 
     this.query.subscribe(() => {
-      $(element)
-        .find('.assist-docs-topics')
-        .scrollTop(0);
+      $(element).find('.assist-docs-topics').scrollTop(0);
     });
 
-    const scrollToSelectedTopic = function() {
+    const scrollToSelectedTopic = function () {
       const topics = $(element).find('.assist-docs-topics');
       if (topics.find('.blue').length) {
         topics.scrollTop(
@@ -286,7 +279,7 @@ class AssistLangRefPanel {
       }
     };
 
-    const scrollToAnchor = function(anchorId) {
+    const scrollToAnchor = function (anchorId) {
       if (!anchorId) {
         return;
       }

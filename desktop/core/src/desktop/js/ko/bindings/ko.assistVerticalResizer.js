@@ -17,16 +17,16 @@
 import $ from 'jquery';
 import * as ko from 'knockout';
 
-import apiHelper from 'api/apiHelper';
 import huePubSub from 'utils/huePubSub';
+import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
 
 ko.bindingHandlers.assistVerticalResizer = {
-  init: function(element, valueAccessor) {
+  init: function (element, valueAccessor) {
     const $container = $(element);
     const options = ko.unwrap(valueAccessor());
     const panelDefinitions = options.panels;
 
-    const checkForElements = function() {
+    const checkForElements = function () {
       const $allPanels = $container.children('.assist-inner-panel');
       const $allExtras = $container.children('.assist-fixed-height');
       if (
@@ -47,7 +47,7 @@ ko.bindingHandlers.assistVerticalResizer = {
     });
   },
 
-  updateWhenRendered: function(element, valueAccessor) {
+  updateWhenRendered: function (element, valueAccessor) {
     const options = ko.unwrap(valueAccessor());
     const panelDefinitions = options.panels;
 
@@ -68,7 +68,7 @@ ko.bindingHandlers.assistVerticalResizer = {
       return;
     }
     if (panelDefinitions().length === 1) {
-      const adjustHeightSingle = function() {
+      const adjustHeightSingle = function () {
         $allPanels.height($container.innerHeight() - allExtrasHeight);
       };
 
@@ -85,7 +85,7 @@ ko.bindingHandlers.assistVerticalResizer = {
       return;
     }
 
-    const panelRatios = apiHelper.getFromTotalStorage('assist', 'innerPanelRatios', {});
+    const panelRatios = getFromLocalStorage('assist.innerPanelRatios', {});
 
     let totalRatios = 0;
     $.each($allPanels, (idx, panel) => {
@@ -109,7 +109,7 @@ ko.bindingHandlers.assistVerticalResizer = {
     let containerTop = $container.offset().top;
 
     // Resizes all containers according to the set ratios
-    const resizeByRatio = function() {
+    const resizeByRatio = function () {
       if (totalHeight === $container.innerHeight()) {
         return;
       }
@@ -166,7 +166,7 @@ ko.bindingHandlers.assistVerticalResizer = {
     $allExtras.show();
     $allPanels.show();
 
-    const fitPanelHeights = function($panelsToResize, desiredTotalHeight) {
+    const fitPanelHeights = function ($panelsToResize, desiredTotalHeight) {
       let currentHeightOfPanels = 0;
 
       let noMoreSpace = true;
@@ -225,7 +225,7 @@ ko.bindingHandlers.assistVerticalResizer = {
 
       $resizer.draggable({
         axis: 'y',
-        drag: function(event, ui) {
+        drag: function (event, ui) {
           const limitAfter = totalHeight - requiredSpaceAfter;
           const position = ui.offset.top - containerTop;
           if (position > limitBefore && position < limitAfter) {
@@ -242,7 +242,7 @@ ko.bindingHandlers.assistVerticalResizer = {
           ui.offset.top = 0;
           ui.position.top = 0;
         },
-        stop: function(event, ui) {
+        stop: function (event, ui) {
           ui.offset.top = 0;
           ui.position.top = 0;
           let totalHeightForPanels = 0;
@@ -253,7 +253,7 @@ ko.bindingHandlers.assistVerticalResizer = {
             panelRatios[panelDefinitions()[idx].type] =
               $(panel).outerHeight(true) / totalHeightForPanels;
           });
-          apiHelper.setInTotalStorage('assist', 'innerPanelRatios', panelRatios);
+          setInLocalStorage('assist.innerPanelRatios', panelRatios);
         }
       });
     });

@@ -15,9 +15,9 @@
 // limitations under the License.
 
 import huePubSub from 'utils/huePubSub';
-import { EXECUTABLE_UPDATED_EVENT } from 'apps/notebook2/execution/executable';
 import { ACTIVE_STATEMENT_CHANGED_EVENT } from 'ko/bindings/ace/aceLocationHandler';
 import AceAnchoredRange from 'ko/bindings/ace/aceAnchoredRange';
+import { EXECUTABLE_UPDATED_TOPIC } from '../../../apps/editor/execution/events';
 
 // TODO: depends on Ace
 
@@ -73,7 +73,7 @@ export default class AceGutterHandler {
     });
 
     if (this.executor) {
-      const executableSub = huePubSub.subscribe(EXECUTABLE_UPDATED_EVENT, executable => {
+      const executableSub = huePubSub.subscribe(EXECUTABLE_UPDATED_TOPIC, executable => {
         if (executable.executor === this.executor) {
           if (executable.lost) {
             if (executable.observerState.aceAnchor) {

@@ -13,14 +13,16 @@ A recommended setup consists in:
 
 Typical setups range from 2 to 5 Hue servers, e.g. 3 Hue servers, 300+ unique users, peaks at 125 users/hour with 300 queries
 
-In practice ~50 users / Hue peak time is the rule of thumb. This is accounting for the worse case scenarios and it will go much higher with the upcoming Task Server [HUE-8738](https://issues.cloudera.org/browse/HUE-8738) and Gunicorn [HUE-8739](https://issues.cloudera.org/browse/HUE-8739) integrations. Most of the scale issues are actually related to resource intensive operations like large download of query results or when an RPC call from Hue to a service is slow (e.g. submitting a query hangs when Hive is slow), not by the number of users.
+In practice ~50 users / Hue peak time is the rule of thumb. This is accounting for the worse case scenarios and it will go much higher with the upcoming [Task Server](#task-server) and Gunicorn integrations. Most of the scale issues are actually related to resource intensive operations like large download of query results or when an RPC call from Hue to a service is slow (e.g. submitting a query hangs when Hive is slow), not by the number of users.
 
 ![Reference Architecture](/images/hue_architecture.png)
 
 
-## General Performance
+## Performance
 
-* Hue must be behing a load balancer proxying static files. e.g. NGINX is used for the containers, Cloudera Hue ships with HTTPD.
+### General
+
+* Hue must be behind a load balancer proxying static files. e.g. NGINX is used for the containers, Cloudera Hue ships with HTTPD.
 * Adding more Hue instances behind the load balancer will increase performances by 50 concurrent users.
 * Database backend should be such as MySql/Postgres/Oracle. Hue does not work on SQLite as it makes concurrent write calls to the database.
 * Check the number of documents in the Hue database. If they are too many (more than 100 000), delete the old records:
@@ -41,7 +43,7 @@ e.g.
     [24/Jul/2019 14:17:32 +0000] resource     DEBUG    GET /jobs Got response in 151ms: {"total":0,"offset":1,"len":1,"coordinatorjobs":[]}
     [24/Jul/2019 14:17:32 +0000] access       INFO     127.0.0.1 romain - "POST /jobbrowser/api/jobs HTTP/1.1" returned in 157ms (mem: 164mb)
 
-## Query Editor Performance
+### Query Editor
 
 * Compare performance of the Hive Query Editor in Hue with the exact same query in a beeline shell against the exact same HiveServer2 instance that Hue is pointing to. This will determine if Hue needs to be investigated or HiveServer2 needs to be investigated.
 * Check the logging configuration for HiveServer2 by going to Hive service Configuration in Cloudera Manager. Search for HiveServer2 Logging Threshold and make sure that it is not set to DEBUG or TRACE. If it is, drop the logging level to INFO at a minimum.
@@ -55,10 +57,10 @@ Hue is often run with:
 
 * Cherrypy with [NGINX](http://gethue.com/using-nginx-to-speed-up-hue-3-8-0/) (recommended)
 * Cherrypy with HTTPD (built-in when using Cloudera Manager) (recommended)
-* Gunicorn is coming with [HUE-8739](https://issues.cloudera.org/browse/HUE-8739)
+* Gunicorn
 * [Apache mod Python](http://gethue.com/how-to-run-hue-with-the-apache-server/)
 
-## Hive and Impala queries life cycle
+## Queries life cycle
 
 But what happens to the query results? How long are they kept? Why do they disappear sometimes? Why are some Impala queries are still “in flight” even if they are completed?   Each query is using some resources in Impala or HiveServer2. When the users submit a lot of queries, they are going to add up and crash the servers if nothing is done. Here are the latest settings that you can tweak:
 
@@ -281,10 +283,10 @@ Here is one way to do it with [NGINX](http://gethue.com/using-nginx-to-speed-up-
 
 ## Task Server
 
-** Not supported yet**
+**Beta Feature**
 
 The task server is currently a work in progress to outsource all the blocking or resource intensive operations
-outside of the API server. Follow [HUE-8738](https://issues.cloudera.org/browse/HUE-8738) for more information
+outside of the API server. Follow [#1526](https://github.com/cloudera/hue/issues/1526) for more information
 on when first usable task will be released.
 
 Until then, here is how to try the task server service.

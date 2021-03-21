@@ -31,7 +31,7 @@ ${ layout.menubar(section='users') }
     <h1 class="card-heading simple">${_('Hue Users - Add/Sync LDAP user')}</h1>
     <br/>
 
-    <form id="syncForm" action="${ url('useradmin.views.add_ldap_users') }" method="POST" class="form form-horizontal" autocomplete="off">
+    <form id="syncForm" action="${ url('useradmin:useradmin.views.add_ldap_users') }" method="POST" class="form form-horizontal" autocomplete="off">
       ${ csrf_token(request) | n,unicode }
       % if is_embeddable:
         <input type="hidden" value="true" name="is_embeddable" />
@@ -52,7 +52,7 @@ ${ layout.menubar(section='users') }
         % else:
           <input type="submit" class="btn btn-primary disable-feedback" value="${_('Add/Sync user')}"/>
         % endif
-        <a href="${ url('useradmin.views.list_users') }" class="btn">${_('Cancel')}</a>
+        <a href="${ url('useradmin:useradmin.views.list_users') }" class="btn">${_('Cancel')}</a>
       </div>
     </form>
   </div>
@@ -64,7 +64,7 @@ ${ layout.menubar(section='users') }
     $addLdapUsersComponents.find("#id_groups").jHueSelector({
       selectAllLabel: "${_('Select all')}",
       searchPlaceholder: "${_('Search')}",
-      noChoicesFound: "${_('No groups found.')} <a href='${url('useradmin.views.edit_group')}'>${_('Create a new group now')} &raquo;</a>",
+      noChoicesFound: "${_('No groups found.')} <a href='${url('useradmin:useradmin.views.edit_group')}'>${_('Create a new group now')} &raquo;</a>",
       width: 618,
       height: 240
     });
@@ -76,7 +76,7 @@ ${ layout.menubar(section='users') }
           renderUseradminErrors(data.errors);
         }
         else if (data && data.status === 0) {
-          huePubSub.publish('open.link', '${ url('useradmin.views.list_users') }');
+          huePubSub.publish('open.link', '${ url('useradmin:useradmin.views.list_users') }');
           $.jHueNotify.info("${ _('User added/synced correctly') }");
         }
       },

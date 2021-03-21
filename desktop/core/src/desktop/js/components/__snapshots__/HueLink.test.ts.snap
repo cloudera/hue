@@ -1,0 +1,29 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`HueLink.vue should not pass href attribute to the a element 1`] = `
+<a
+  href="http://gethue.com"
+>
+  
+  
+</a>
+`;
+
+exports[`HueLink.vue should pass attributes to the a element 1`] = `
+<a
+  href="javascript:void(0);"
+  target="_blank"
+>
+  
+  
+</a>
+`;
+
+exports[`HueLink.vue should render a Link 1`] = `
+<a
+  href="javascript:void(0);"
+>
+  
+  
+</a>
+`;

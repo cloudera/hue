@@ -1,0 +1,19 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`DropdownDrawer.vue should render dropdown drawer with slots 1`] = `
+<div
+  class="hue-dropdown-drawer"
+  style="position: fixed;"
+>
+  <!--v-if-->
+</div>
+`;
+
+exports[`DropdownDrawer.vue should render empty dropdown drawer 1`] = `
+<div
+  class="hue-dropdown-drawer"
+  style="position: fixed;"
+>
+  <!--v-if-->
+</div>
+`;

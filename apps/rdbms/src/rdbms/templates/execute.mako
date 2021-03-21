@@ -430,7 +430,7 @@ ${ commonshare() | n,unicode }
       $(".CodeMirror-spinner").remove();
       $("<i class='fa fa-spinner fa-spin CodeMirror-spinner'></i>").css("top", pos.top + "px").css("left", (pos.left - 4) + "px").appendTo('body');
 
-      if ($.totalStorage('rdbms_tables_' + viewModel.server().name() + "_" + viewModel.database()) == null) {
+      if (hueUtils.hueLocalStorage('rdbms_tables_' + viewModel.server().name() + "_" + viewModel.database()) == null) {
         CodeMirror.showHint(cm, AUTOCOMPLETE_SET);
         rdbms_getTables(viewModel.server().name(), viewModel.database(), function () {
         }); // if preload didn't work, tries again
@@ -663,14 +663,14 @@ ${ commonshare() | n,unicode }
 
   function checkLastDatabase(server, database) {
     var key = "hueRdbmsLastDatabase-" + server;
-    if (database != $.totalStorage(key)) {
-      $.totalStorage(key, database);
+    if (database != hueUtils.hueLocalStorage(key)) {
+      hueUtils.hueLocalStorage(key, database);
     }
   }
 
   function getLastDatabase(server) {
     var key = "hueRdbmsLastDatabase-" + server;
-    return $.totalStorage(key);
+    return hueUtils.hueLocalStorage(key);
   }
 
   $(".chosen-server").chosen({
@@ -687,7 +687,7 @@ ${ commonshare() | n,unicode }
     if (value != null){
       var key = 'hueRdbmsLastDatabase-' + viewModel.server().name();
       viewModel.selectedDatabase(viewModel.databases.indexOf(value.selected));
-      $.totalStorage(key, value.selected);
+      hueUtils.hueLocalStorage(key, value.selected);
     }
   });
 

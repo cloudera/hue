@@ -37,8 +37,6 @@ sf_remove_promo_bar:
 slide_template:
   - default
 categories:
-  - Administration
-  - Browsing
 ---
 
 You can now view Snappy compressed <a href="http://avro.apache.org/" target="_blank" rel="noopener noreferrer">Avro</a> files in Hue through the [File Browser][1]! Here is a quick guide on how to get setup with Snappy and Avro.

@@ -15,13 +15,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from django.conf.urls import url
+import sys
 
 from desktop.lib.analytics import views, api
 
+if sys.version_info[0] > 2:
+  from django.urls import re_path
+else:
+  from django.conf.urls import url as re_path
+
 
 urlpatterns = [
-  url(r'^$', views.index, name='desktop.lib.analytics.views.index'),
+  re_path(r'^$', views.index, name='desktop.lib.analytics.views.index'),
 
-  url(r'^api/admin_stats/?$', api.admin_stats, name='analytics.api.admin_stats'),
+  re_path(r'^api/admin_stats/?$', api.admin_stats, name='analytics.api.admin_stats'),
 ]

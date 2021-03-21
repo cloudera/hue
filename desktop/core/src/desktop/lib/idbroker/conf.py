@@ -19,15 +19,15 @@ import logging
 
 from hadoop.core_site import get_conf
 
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy as _t
 
 LOG = logging.getLogger(__name__)
 
-_CNF_CAB_ADDRESS='fs.%s.ext.cab.address' # http://host:8444/gateway
-_CNF_CAB_ADDRESS_DT_PATH='fs.%s.ext.cab.dt.path' # dt
-_CNF_CAB_ADDRESS_PATH='fs.%s.ext.cab.path' # aws-cab
-_CNF_CAB_USERNAME='fs.%s.ext.cab.username' # when not using kerberos
-_CNF_CAB_PASSWORD='fs.%s.ext.cab.password'
+_CNF_CAB_ADDRESS = 'fs.%s.ext.cab.address' # http://host:8444/gateway
+_CNF_CAB_ADDRESS_DT_PATH = 'fs.%s.ext.cab.dt.path' # dt
+_CNF_CAB_ADDRESS_PATH = 'fs.%s.ext.cab.path' # aws-cab
+_CNF_CAB_USERNAME = 'fs.%s.ext.cab.username' # when not using kerberos
+_CNF_CAB_PASSWORD = 'fs.%s.ext.cab.password'
 SUPPORTED_FS = {'s3a': 's3a', 'adl': 'azure', 'abfs': 'azure', 'azure': 'azure', 'gs': 'gs'}
 
 def validate_fs(fs=None):
@@ -72,6 +72,6 @@ def config_validator():
         raise ValueError('Failed to obtain IDBroker Token')
     except Exception as e:
       LOG.exception('Failed to obtain IDBroker Token')
-      res.append(('idbroker', _('Failed to obtain IDBroker Token, check your IDBroker configuration.')))
+      res.append(('idbroker', _t('Failed to obtain IDBroker Token, check your IDBroker configuration.')))
 
   return res

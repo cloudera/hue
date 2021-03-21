@@ -35,8 +35,7 @@ sf_caption_position:
 sf_remove_promo_bar:
   - 1
 categories:
-  - News
-  - Querying
+#  - News
 
 ---
 ## [Interactive Spark in your Browser - Scala by the Bay][1]

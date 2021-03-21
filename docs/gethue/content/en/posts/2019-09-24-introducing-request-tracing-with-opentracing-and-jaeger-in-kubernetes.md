@@ -37,9 +37,8 @@ sf_caption_position:
 ampforwp-amp-on-off:
   - default
 categories:
-  - Administration
-  - Querying
-  - Version 4.6
+  - Version 4
+# - Version 4.6
 
 ---
 Hue is getting easy to run with its [Docker][1] container and Kubernetes [Helm package][2]. Recent blog posts describes how to get access to [logs][3] and [metrics][4]. Even in a non distributed world it can get noisy to know how much time is being spent where in each user request.

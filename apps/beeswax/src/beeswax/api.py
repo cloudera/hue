@@ -103,11 +103,15 @@ def autocomplete(request, database=None, table=None, column=None, nested=None):
   return JsonResponse(response)
 
 
-def _autocomplete(db, database=None, table=None, column=None, nested=None, query=None, cluster=None):
+def _autocomplete(db, database=None, table=None, column=None, nested=None, query=None, cluster=None, operation='schema'):
   response = {}
 
   try:
-    if database is None:
+    if operation == 'functions':
+      response['functions'] = _get_functions(db, database)
+    elif operation == 'function':
+      response['function'] = _get_function(db, database)
+    elif database is None:
       response['databases'] = db.get_databases()
     elif table is None:
       tables_meta = db.get_tables_meta(database=database)
@@ -123,7 +127,7 @@ def _autocomplete(db, database=None, table=None, column=None, nested=None, query
       cols_extended = massage_columns_for_json(table.cols)
 
       if table.is_impala_only: # Expand Kudu table information
-        if db.client.query_server['server_name'] != 'impala':
+        if db.client.query_server['dialect'] != 'impala':
           query_server = get_query_server_config('impala', connector=cluster)
           db = dbms.get(db.client.user, query_server, cluster=cluster)
 
@@ -166,11 +170,54 @@ def _autocomplete(db, database=None, table=None, column=None, nested=None, query
     response['code'] = 500
     response['error'] = str(e)
   except Exception as e:
-    LOG.warn('Autocomplete data fetching error: %s' % e)
+    LOG.exception('Autocomplete data fetching error')
     response['code'] = 500
     response['error'] = str(e)
 
   return response
+
+
+def _get_functions(db, database=None):
+  data = []
+
+  functions = db.get_functions(prefix=database)
+  if functions:
+    rows = escape_rows(functions, nulls_only=True)
+
+    if db.client.query_server['dialect'] == 'impala':
+      data = [{
+          'name': row[1].split('(', 1)[0],
+          'signature': '(' + row[1].split('(', 1)[1],
+          'return_type': row[0],
+          'is_builtin': row[2],
+          'is_persistent': row[3]
+        }
+        for row in rows
+      ]
+    else:
+      data = [{'name': row[0]} for row in rows]
+
+  return data
+
+
+def _get_function(db, name):
+  data = {}
+
+  if db.client.query_server['dialect'] == 'hive' or db.client.query_server['dialect'] == 'beeswax':
+    functions = db.get_function(name=name)
+    rows = escape_rows(functions, nulls_only=True)
+
+    full_description = '\n'.join([col for row in rows for col in row])
+    signature, description = full_description.split(' - ', 1)
+    name = name.split('(', 1)[0]
+
+    data = {
+      'name': name,
+      'signature': signature,
+      'description': description,
+    }
+
+  return data
 
 
 @error_handler
@@ -186,10 +233,10 @@ def parameters(request, design_id=None):
     parameterization_form = parameterization_form_cls(prefix="parameterization")
 
     response['parameters'] = [{'parameter': field.html_name, 'name': field.name} for field in parameterization_form]
-    response['status']= 0
+    response['status'] = 0
   else:
     response['parameters'] = []
-    response['status']= 0
+    response['status'] = 0
 
   return JsonResponse(response)
 
@@ -285,7 +332,7 @@ def massage_job_urls_for_json(jobs):
   for job in jobs:
     massaged_jobs.append({
       'name': job,
-      'url': reverse('jobbrowser.views.single_job', kwargs={'job': job})
+      'url': reverse('jobbrowser:jobbrowser.views.single_job', kwargs={'job': job})
     })
   return massaged_jobs
 
@@ -386,7 +433,7 @@ def execute(request, design_id=None):
         'functions': query_form.functions.errors,
       }
   except RuntimeError as e:
-    response['message']= str(e)
+    response['message'] = str(e)
 
   return JsonResponse(response)
 
@@ -623,12 +670,17 @@ def save_results_hive_table(request, query_history_id):
         return JsonResponse(response)
 
       try:
-        query_history = db.create_table_as_a_select(request, query_history, form.target_database, form.cleaned_data['target_table'], result_meta)
+        query_history = db.create_table_as_a_select(
+          request, query_history, form.target_database, form.cleaned_data['target_table'], result_meta
+        )
         response['id'] = query_history.id
         response['query'] = query_history.query
         response['type'] = 'hive-table'
         response['path'] = form.cleaned_data['target_table']
-        response['success_url'] = reverse('metastore:describe_table', kwargs={'database': form.target_database, 'table': form.cleaned_data['target_table']})
+        response['success_url'] = reverse(
+          'metastore:describe_table',
+          kwargs={'database': form.target_database, 'table': form.cleaned_data['target_table']}
+        )
         response['watch_url'] = reverse(get_app_name(request) + ':api_watch_query_refresh_json', kwargs={'id': query_history.id})
       except Exception as ex:
         error_msg, log = expand_exception(ex, db)

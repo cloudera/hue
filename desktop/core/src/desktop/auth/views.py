@@ -14,6 +14,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import json
 
 from future import standard_library
 standard_library.install_aliases()
@@ -27,13 +28,13 @@ import logging
 import sys
 from datetime import datetime
 
-from axes.decorators import watch_login
+from axes.decorators import axes_dispatch
 import django.contrib.auth.views
-from django.core import urlresolvers
 from django.core.exceptions import SuspiciousOperation
 from django.contrib.auth import login, get_backends, authenticate
 from django.contrib.sessions.models import Session
 from django.http import HttpResponseRedirect
+from django.urls import reverse
 from django.utils.translation import ugettext as _
 
 from hadoop.fs.exceptions import WebHdfsException
@@ -45,9 +46,11 @@ from desktop.auth import forms as auth_forms
 from desktop.auth.backend import OIDCBackend
 from desktop.auth.forms import ImpersonationAuthenticationForm, OrganizationUserCreationForm, OrganizationAuthenticationForm
 from desktop.conf import OAUTH, ENABLE_ORGANIZATIONS
+from desktop.lib import fsmanager
 from desktop.lib.django_util import render, login_notrequired, JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.log.access import access_log, access_warn, last_access_map
+from desktop.views import samlgroup_check
 from desktop.settings import LOAD_BALANCER_COOKIE
 
 
@@ -63,7 +66,7 @@ LOG = logging.getLogger(__name__)
 def get_current_users():
   """Return dictionary of User objects and
   a dictionary of the user's IP address and last access time"""
-  current_users = { }
+  current_users = {}
   for session in Session.objects.all():
     try:
       uid = session.get_decoded().get(django.contrib.auth.SESSION_KEY)
@@ -90,14 +93,14 @@ def first_login_ever():
 
 
 # We want unique method name to represent HUE-3 vs HUE-4 method call.
-# This is required because of urlresolvers.reverse('desktop.auth.views.dt_login') below which needs uniqueness to work correctly.
+# This is required because of reverse('desktop.auth.views.dt_login') below which needs uniqueness to work correctly.
 @login_notrequired
 def dt_login_old(request, from_modal=False):
   return dt_login(request, from_modal)
 
 
 @login_notrequired
-@watch_login
+@axes_dispatch
 def dt_login(request, from_modal=False):
   if request.method == 'GET':
     redirect_to = request.GET.get('next', '/')
@@ -144,14 +147,15 @@ def dt_login(request, from_modal=False):
 
         if request.session.test_cookie_worked():
           request.session.delete_test_cookie()
-
+        if request.fs is None:
+          request.fs = fsmanager.get_filesystem(request.fs_ref)
         try:
           ensure_home_directory(request.fs, user)
         except (IOError, WebHdfsException) as e:
           LOG.error('Could not create home directory at login for %s.' % user, exc_info=e)
 
         if require_change_password(userprofile):
-          return HttpResponseRedirect(urlresolvers.reverse('useradmin.views.edit_user', kwargs={'username': user.username}))
+          return HttpResponseRedirect('/hue' + reverse('useradmin:useradmin.views.edit_user', kwargs={'username': user.username}))
 
         userprofile.first_login = False
         userprofile.last_activity = datetime.now()
@@ -178,15 +182,17 @@ def dt_login(request, from_modal=False):
     first_user_form = None
     auth_form = AuthenticationForm()
     # SAML/OIDC user is already authenticated in djangosaml2.views.login
-    if hasattr(request,'fs') and (
+    if hasattr(request, 'fs') and (
         'KnoxSpnegoDjangoBackend' in backend_names or 'SpnegoDjangoBackend' in backend_names or 'OIDCBackend' in backend_names or
         'SAML2Backend' in backend_names
-      ) and request.user.is_authenticated():
+      ) and request.user.is_authenticated:
+      if request.fs is None:
+        request.fs = fsmanager.get_filesystem(request.fs_ref)
       try:
         ensure_home_directory(request.fs, request.user)
       except (IOError, WebHdfsException) as e:
         LOG.error('Could not create home directory for %s user %s.' % ('OIDC' if 'OIDCBackend' in backend_names else 'SAML', request.user))
-    if request.user.is_authenticated() and not from_modal:
+    if request.user.is_authenticated and not from_modal:
       return HttpResponseRedirect(redirect_to)
 
   if is_active_directory and not is_ldap_option_selected and \
@@ -197,12 +203,14 @@ def dt_login(request, from_modal=False):
   if not from_modal:
     request.session.set_test_cookie()
 
+  request.session['samlgroup_permitted_flag'] = samlgroup_check(request)
+
   renderable_path = 'login.mako'
   if from_modal:
     renderable_path = 'login_modal.mako'
 
   response = render(renderable_path, request, {
-    'action': urlresolvers.reverse('desktop_auth_views_dt_login'),
+    'action': reverse('desktop_auth_views_dt_login'),
     'form': first_user_form or auth_form,
     'next': redirect_to,
     'first_login_ever': is_first_login_ever,
@@ -212,7 +220,7 @@ def dt_login(request, from_modal=False):
     'user': request.user
   })
 
-  if not request.user.is_authenticated():
+  if not request.user.is_authenticated:
     response.delete_cookie(LOAD_BALANCER_COOKIE) # Note: might be re-balanced to another Hue on login.
 
   return response
@@ -230,7 +238,7 @@ def dt_logout(request, next_page=None):
   # Close Impala session on logout
   session_app = "impala"
   if request.user.has_hue_permission(action='access', app=session_app):
-    session = {"type": session_app, "sourceMethod":" dt_logout"}
+    session = {"type": session_app, "sourceMethod": " dt_logout"}
     try:
       get_api(request, session).close_session(session)
     except PopupException as e:
@@ -252,7 +260,7 @@ def dt_logout(request, next_page=None):
   if len([backend for backend in backends if hasattr(backend, 'logout')]) == len(backends):
     LOG.warn("Failed to log out from all backends for user: %s" % (username))
 
-  response = django.contrib.auth.views.logout(request, next_page)
+  response = django.contrib.auth.views.LogoutView.as_view(next_page=next_page)(request)
   response.delete_cookie(LOAD_BALANCER_COOKIE)
   return response
 
@@ -304,7 +312,7 @@ def oauth_authenticated(request):
 
   resp, content = client.request(OAUTH.ACCESS_TOKEN_URL.get(), "GET")
   if resp['status'] != '200':
-      raise Exception(_("Invalid response from OAuth provider: %s") % resp)
+    raise Exception(_("Invalid response from OAuth provider: %s") % resp)
 
   access_token = dict(cgi.parse_qsl(content))
 
@@ -317,7 +325,7 @@ def oauth_authenticated(request):
 
 @login_notrequired
 def oidc_failed(request):
-  if request.user.is_authenticated():
+  if request.user.is_authenticated:
     return HttpResponseRedirect('/')
   access_warn(request, "401 Unauthorized by oidc")
   return render("oidc_failed.mako", request, dict(uri=request.build_absolute_uri()), status=401)

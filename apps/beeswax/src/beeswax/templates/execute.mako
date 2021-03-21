@@ -1117,7 +1117,7 @@ ${ commonshare() | n,unicode }
 <script type="text/javascript">
 
 // avoid blinking of the panels
-var leftPanelWidth = $.totalStorage("${app_name}_left_panel_width") != null ? $.totalStorage("${app_name}_left_panel_width") : 250;
+var leftPanelWidth = hueUtils.hueLocalStorage("${app_name}_left_panel_width") != null ? hueUtils.hueLocalStorage("${app_name}_left_panel_width") : 250;
 $(".left-panel").css("width", leftPanelWidth + "px");
 $(".content-panel").css("left", leftPanelWidth + 20 + "px");
 
@@ -1169,8 +1169,6 @@ var autocompleter = new AceAutocompleteWrapper({
   optEnabled: false,
   timeout: AUTOCOMPLETE_TIMEOUT
 });
-
-var totalStorageUserPrefix = apiHelper.getTotalStorageUserPrefix(snippetType);
 
 var truncateOutput = function (obj) {
   //default to 20 characters (column output displays first 21 chars so we need to consider the length of both column name and type
@@ -1709,9 +1707,9 @@ $(document).ready(function () {
   });
 
   % if not (design and design.id) and not ( query_history and query_history.id ):
-    if ($.totalStorage(totalStorageUserPrefix + "${app_name}_temp_query") != null && $.totalStorage(totalStorageUserPrefix + "${app_name}_temp_query") != "") {
+    if (hueUtils.hueLocalStorage("${app_name}_temp_query") != null && hueUtils.hueLocalStorage("${app_name}_temp_query") != "") {
       viewModel.queryEditorBlank(true);
-      codeMirror.setValue($.totalStorage(totalStorageUserPrefix + "${app_name}_temp_query"));
+      codeMirror.setValue(hueUtils.hueLocalStorage("${app_name}_temp_query"));
     }
   % endif
 
@@ -2089,7 +2087,7 @@ function addResults(viewModel, dataTable, startRow, nextRow) {
 
 function resultsTable(e, data) {
   $("#results .dataTables_wrapper").animate({opacity: '1'}, 50);
-  $.totalStorage(totalStorageUserPrefix + "${app_name}_temp_query", null);
+  hueUtils.hueLocalStorage("${app_name}_temp_query", null);
   if (viewModel.design.results.columns().length > 0) {
     if (!dataTable) {
       if (viewModel.design.results.columns().length < 500) {
@@ -2369,7 +2367,7 @@ function tryCancelQuery() {
 }
 
 function createNewQuery() {
-  $.totalStorage(totalStorageUserPrefix + "${app_name}_temp_query", null);
+  hueUtils.hueLocalStorage("${app_name}_temp_query", null);
   location.href="${ url(app_name + ':execute_query') }";
 }
 
@@ -2765,7 +2763,7 @@ function cacheQueryTextEvents() {
     if (typeof codeMirror != "undefined") {
       codeMirror.on("change", function () {
         $(".query").val(codeMirror.getValue());
-        $.totalStorage(totalStorageUserPrefix + "${app_name}_temp_query", codeMirror.getValue());
+        hueUtils.hueLocalStorage("${app_name}_temp_query", codeMirror.getValue());
       });
       window.clearInterval(_waitForCodemirrorInit);
     }

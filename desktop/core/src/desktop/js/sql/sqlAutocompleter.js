@@ -32,12 +32,12 @@ class SqlAutocompleter {
     this.editor = options.editor;
     this.fixedPrefix =
       options.fixedPrefix ||
-      function() {
+      function () {
         return '';
       };
     this.fixedPostfix =
       options.fixedPostfix ||
-      function() {
+      function () {
         return '';
       };
     this.suggestions = new AutocompleteResults(options);
@@ -75,7 +75,7 @@ class SqlAutocompleter {
               }
             }) + this.fixedPostfix();
           sqlParserRepository
-            .getAutocompleter(this.snippet.dialect())
+            .getAutocompleteParser(this.snippet.dialect())
             .then(autocompleteParser => {
               resolve(autocompleteParser.parseSql(beforeCursor, afterCursor));
             })
@@ -95,7 +95,7 @@ class SqlAutocompleter {
   async parseAll() {
     return new Promise((resolve, reject) => {
       sqlParserRepository
-        .getAutocompleter(this.snippet.dialect())
+        .getAutocompleteParser(this.snippet.dialect())
         .then(autocompleteParser => {
           resolve(
             autocompleteParser.parseSql(
@@ -122,7 +122,7 @@ class SqlAutocompleter {
             locations &&
             this.snippet.ace().lastChangeTime !== locations.editorChangeTime
           ) {
-            huePubSub.publish('editor.refresh.statement.locations', this.snippet);
+            huePubSub.publish('editor.refresh.statement.locations', this.snippet.id());
           }
         },
         this.snippet

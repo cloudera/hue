@@ -16,6 +16,7 @@
 
 import $ from 'jquery';
 import * as ko from 'knockout';
+import * as storageUtilsMock from './storageUtils';
 
 import HdfsAutocompleter from './hdfsAutocompleter';
 describe('hdfsAutocompleter.js', () => {
@@ -28,18 +29,17 @@ describe('hdfsAutocompleter.js', () => {
   const snippet = {
     type: ko.observable(),
     database: ko.observable('database_one'),
-    isSqlDialect: function() {
+    isSqlDialect: function () {
       return true;
     },
-    getContext: function() {
+    getContext: function () {
       return ko.mapping.fromJS(null);
     }
   };
 
   beforeAll(() => {
-    $.totalStorage = function(key, value) {
-      return null;
-    };
+    jest.spyOn(storageUtilsMock, 'getFromLocalStorage').mockImplementation(() => null);
+    jest.spyOn(storageUtilsMock, 'setInLocalStorage').mockImplementation(() => null);
 
     jest.spyOn($, 'ajax').mockImplementation(options => {
       const firstUrlPart = options.url.split('?')[0];
@@ -50,7 +50,7 @@ describe('hdfsAutocompleter.js', () => {
       response.status = 0;
       options.success(response);
       return {
-        fail: function() {
+        fail: function () {
           return {
             always: $.noop
           };
@@ -73,7 +73,7 @@ describe('hdfsAutocompleter.js', () => {
     ajaxHelper.responseForUrls = {};
   });
 
-  const createCallbackSpyForValues = function(values) {
+  const createCallbackSpyForValues = function (values) {
     const spy = {
       cb: value => {
         expect(value).toEqualAutocompleteValues(values);
@@ -82,7 +82,7 @@ describe('hdfsAutocompleter.js', () => {
     return spyOn(spy, 'cb').and.callThrough();
   };
 
-  const assertAutoComplete = function(testDefinition) {
+  const assertAutoComplete = function (testDefinition) {
     ajaxHelper.responseForUrls = testDefinition.serverResponses;
     const callback = createCallbackSpyForValues(testDefinition.expectedSuggestions);
     subject.autocomplete(testDefinition.beforeCursor, testDefinition.afterCursor, callback);

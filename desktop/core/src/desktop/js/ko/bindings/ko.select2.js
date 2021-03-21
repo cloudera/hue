@@ -20,7 +20,7 @@ import * as ko from 'knockout';
 // TODO: Depends on Role
 
 ko.bindingHandlers.select2 = {
-  init: function(element, valueAccessor, allBindingsAccessor, viewModel) {
+  init: function (element, valueAccessor, allBindingsAccessor, viewModel) {
     const options = ko.toJS(valueAccessor()) || {};
     const $element = $(element);
 
@@ -34,7 +34,7 @@ ko.bindingHandlers.select2 = {
       });
       options.val = valueObservable();
 
-      const refreshSelect2Data = function() {
+      const refreshSelect2Data = function () {
         $element.select2(
           'data',
           $.map(optionsObservable(), value => {
@@ -144,7 +144,7 @@ ko.bindingHandlers.select2 = {
         $('.select2-input')
           .off('keyup')
           .data('type', options.type)
-          .on('keyup', function(e) {
+          .on('keyup', function (e) {
             if (e.keyCode === 13) {
               const _isArray = options.update instanceof Array;
               const _newVal = $(this).val();
@@ -205,19 +205,15 @@ ko.bindingHandlers.select2 = {
       .attr('onfocus', 'this.removeAttribute("readonly");')
       .wrap('<form autocomplete="off">');
   },
-  update: function(element, valueAccessor, allBindingsAccessor) {
+  update: function (element, valueAccessor, allBindingsAccessor) {
     if (typeof allBindingsAccessor().visible != 'undefined') {
       if (
         (typeof allBindingsAccessor().visible == 'boolean' && allBindingsAccessor().visible) ||
         (typeof allBindingsAccessor().visible == 'function' && allBindingsAccessor().visible())
       ) {
-        $(element)
-          .select2('container')
-          .show();
+        $(element).select2('container').show();
       } else {
-        $(element)
-          .select2('container')
-          .hide();
+        $(element).select2('container').hide();
       }
     }
     if (typeof valueAccessor().update != 'undefined') {

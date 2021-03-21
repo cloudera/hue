@@ -19,7 +19,7 @@ import * as ko from 'knockout';
 
 import apiHelper from 'api/apiHelper';
 import huePubSub from 'utils/huePubSub';
-import { findBrowserConnector, GET_KNOWN_CONFIG_EVENT, getRootFilePath } from 'utils/hueConfig';
+import { findBrowserConnector, GET_KNOWN_CONFIG_EVENT, getRootFilePath } from 'config/hueConfig';
 
 const PAGE_SIZE = 100;
 
@@ -63,11 +63,14 @@ class AssistStorageEntry {
     self.path = '';
     if (self.parent !== null) {
       self.path = self.parent.path;
-      if (self.parent.path !== '/') {
+      if (self.parent.path !== '/' && !/\/$/.test(self.path)) {
         self.path += '/';
       }
     }
+
     self.path += self.definition.name;
+    self.abfsPath = (/^\//.test(self.path) ? 'abfs:/' : 'abfs://') + self.path;
+
     self.currentPage = 1;
     self.hasMorePages = true;
     self.preview = ko.observable();
@@ -344,7 +347,7 @@ class AssistStorageEntry {
    *
    * @param {string} path - The path, can include the type i.e. '/tmp' or 's3:/tmp'.
    * @param {string} [type] - Optional type, if not specified here or in the path 'hdfs' will be used.
-   * @return {Promise}
+   * @return {JQueryPromise<AssistStorageEntry>}
    */
   static getEntry(path, type) {
     const deferred = $.Deferred();

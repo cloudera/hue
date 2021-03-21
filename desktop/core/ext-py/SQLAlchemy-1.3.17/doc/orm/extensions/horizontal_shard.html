@@ -1,0 +1,399 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        
+        <title>
+            
+    
+    Horizontal Sharding
+ &mdash;
+    SQLAlchemy 1.3 Documentation
+
+        </title>
+
+        
+            <!-- begin iterate through site-imported + sphinx environment css_files -->
+                <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+                <link rel="stylesheet" href="../../_static/docs.css" type="text/css" />
+                <link rel="stylesheet" href="../../_static/changelog.css" type="text/css" />
+                <link rel="stylesheet" href="../../_static/sphinx_paramlinks.css" type="text/css" />
+            <!-- end iterate through site-imported + sphinx environment css_files -->
+        
+
+        
+
+    
+
+    <!-- begin layout.mako headers -->
+
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+        <link rel="copyright" title="Copyright" href="../../copyright.html" />
+    <link rel="top" title="SQLAlchemy 1.3 Documentation" href="../../index.html" />
+        <link rel="up" title="ORM Extensions" href="index.html" />
+        <link rel="next" title="Hybrid Attributes" href="hybrid.html" />
+        <link rel="prev" title="Ordering List" href="orderinglist.html" />
+    <!-- end layout.mako headers -->
+
+
+    </head>
+    <body>
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="docs-container">
+
+
+
+
+
+<div id="docs-top-navigation-container" class="body-background">
+<div id="docs-header">
+    <div id="docs-version-header">
+        Release: <span class="version-num">1.3.17</span>
+
+
+        | Release Date: May 13, 2020
+
+    </div>
+
+    <h1>SQLAlchemy 1.3 Documentation</h1>
+
+</div>
+</div>
+
+<div id="docs-body-container">
+
+    <div id="fixed-sidebar" class="withsidebar">
+
+
+        <div id="docs-sidebar-popout">
+            <h3><a href="../../index.html">SQLAlchemy 1.3 Documentation</a></h3>
+            <p id="sidebar-topnav">
+                <a href="../../contents.html">Contents</a> |
+                <a href="../../genindex.html">Index</a>
+            </p>
+
+            <div id="sidebar-search">
+                <form class="search" action="../../search.html" method="get">
+                  <label>
+                  Search terms:
+                  <input type="text" placeholder="search..." name="q" size="12" />
+                  </label>
+                  <input type="hidden" name="check_keywords" value="yes" />
+                  <input type="hidden" name="area" value="default" />
+                </form>
+            </div>
+
+        </div>
+
+        <div id="docs-sidebar">
+
+        <div id="sidebar-banner">
+            
+        </div>
+
+        <div id="docs-sidebar-inner">
+
+        
+        <h3>
+            <a href="../index.html" title="SQLAlchemy ORM">SQLAlchemy ORM</a>
+        </h3>
+
+        <ul>
+<li><span class="link-container"><a class="reference external" href="../tutorial.html">Object Relational Tutorial</a></span></li>
+<li><span class="link-container"><a class="reference external" href="../mapper_config.html">Mapper Configuration</a></span></li>
+<li><span class="link-container"><a class="reference external" href="../relationships.html">Relationship Configuration</a></span></li>
+<li><span class="link-container"><a class="reference external" href="../loading_objects.html">Loading Objects</a></span></li>
+<li><span class="link-container"><a class="reference external" href="../session.html">Using the Session</a></span></li>
+<li><span class="link-container"><a class="reference external" href="../extending.html">Events and Internals</a></span></li>
+<li><span class="link-container"><a class="reference external" href="index.html">ORM Extensions</a></span><ul>
+<li><span class="link-container"><a class="reference external" href="associationproxy.html">Association Proxy</a></span></li>
+<li><span class="link-container"><a class="reference external" href="automap.html">Automap</a></span></li>
+<li><span class="link-container"><a class="reference external" href="baked.html">Baked Queries</a></span></li>
+<li><span class="link-container"><a class="reference external" href="declarative/index.html">Declarative</a></span></li>
+<li><span class="link-container"><a class="reference external" href="mutable.html">Mutation Tracking</a></span></li>
+<li><span class="link-container"><a class="reference external" href="orderinglist.html">Ordering List</a></span></li>
+<li class="selected"><span class="link-container"><strong>Horizontal Sharding</strong><a class="paramlink headerlink reference internal" href="#">¶</a></span><ul>
+<li><span class="link-container"><a class="reference external" href="#api-documentation">API Documentation</a></span></li>
+</ul>
+</li>
+<li><span class="link-container"><a class="reference external" href="hybrid.html">Hybrid Attributes</a></span></li>
+<li><span class="link-container"><a class="reference external" href="indexable.html">Indexable</a></span></li>
+<li><span class="link-container"><a class="reference external" href="instrumentation.html">Alternate Class Instrumentation</a></span></li>
+</ul>
+</li>
+<li><span class="link-container"><a class="reference external" href="../examples.html">ORM Examples</a></span></li>
+</ul>
+
+
+
+        </div>
+
+        </div>
+
+    </div>
+
+    
+
+    <div id="docs-body" class="withsidebar" >
+        
+<div class="section" id="module-sqlalchemy.ext.horizontal_shard">
+<span id="horizontal-sharding"></span><span id="horizontal-sharding-toplevel"></span><h1>Horizontal Sharding<a class="headerlink" href="#module-sqlalchemy.ext.horizontal_shard" title="Permalink to this headline">¶</a></h1>
+<p>Horizontal sharding support.</p>
+<p>Defines a rudimental ‘horizontal sharding’ system which allows a Session to
+distribute queries and persistence operations across multiple databases.</p>
+<p>For a usage example, see the <a class="reference internal" href="../examples.html#examples-sharding"><span class="std std-ref">Horizontal Sharding</span></a> example included in
+the source distribution.</p>
+<div class="section" id="api-documentation">
+<h2>API Documentation<a class="headerlink" href="#api-documentation" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="sqlalchemy.ext.horizontal_shard.ShardedSession">
+<em class="property">class </em><code class="sig-prename descclassname">sqlalchemy.ext.horizontal_shard.</code><code class="sig-name descname">ShardedSession</code><span class="sig-paren">(</span><em class="sig-param">shard_chooser</em>, <em class="sig-param">id_chooser</em>, <em class="sig-param">query_chooser</em>, <em class="sig-param">shards=None</em>, <em class="sig-param">query_cls=&lt;class 'sqlalchemy.ext.horizontal_shard.ShardedQuery'&gt;</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.ext.horizontal_shard.ShardedSession" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">sqlalchemy.orm.session.Session</span></code></a></p>
+<dl class="py method">
+<dt id="sqlalchemy.ext.horizontal_shard.ShardedSession.__init__">
+<em class="property">method </em><a class="reference internal" href="#sqlalchemy.ext.horizontal_shard.ShardedSession"><code class="docutils literal notranslate"><span class="pre">sqlalchemy.ext.horizontal_shard.ShardedSession.</span></code></a><code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">shard_chooser</em>, <em class="sig-param">id_chooser</em>, <em class="sig-param">query_chooser</em>, <em class="sig-param">shards=None</em>, <em class="sig-param">query_cls=&lt;class 'sqlalchemy.ext.horizontal_shard.ShardedQuery'&gt;</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.ext.horizontal_shard.ShardedSession.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a ShardedSession.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span class="target" id="sqlalchemy.ext.horizontal_shard.ShardedSession.params.shard_chooser"></span><strong>shard_chooser</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.ext.horizontal_shard.ShardedSession.params.shard_chooser">¶</a> – A callable which, passed a Mapper, a mapped
+instance, and possibly a SQL clause, returns a shard ID.  This id
+may be based off of the attributes present within the object, or on
+some round-robin scheme. If the scheme is based on a selection, it
+should set whatever state on the instance to mark it in the future as
+participating in that shard.</p></li>
+<li><p><span class="target" id="sqlalchemy.ext.horizontal_shard.ShardedSession.params.id_chooser"></span><strong>id_chooser</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.ext.horizontal_shard.ShardedSession.params.id_chooser">¶</a> – A callable, passed a query and a tuple of identity
+values, which should return a list of shard ids where the ID might
+reside.  The databases will be queried in the order of this listing.</p></li>
+<li><p><span class="target" id="sqlalchemy.ext.horizontal_shard.ShardedSession.params.query_chooser"></span><strong>query_chooser</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.ext.horizontal_shard.ShardedSession.params.query_chooser">¶</a> – For a given Query, returns the list of shard_ids
+where the query should be issued.  Results from all shards returned
+will be combined together into a single listing.</p></li>
+<li><p><span class="target" id="sqlalchemy.ext.horizontal_shard.ShardedSession.params.shards"></span><strong>shards</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.ext.horizontal_shard.ShardedSession.params.shards">¶</a> – A dictionary of string shard names
+to <a class="reference internal" href="../../core/connections.html#sqlalchemy.engine.Engine" title="sqlalchemy.engine.Engine"><code class="xref py py-class docutils literal notranslate"><span class="pre">Engine</span></code></a> objects.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sqlalchemy.ext.horizontal_shard.ShardedSession.connection">
+<em class="property">method </em><a class="reference internal" href="#sqlalchemy.ext.horizontal_shard.ShardedSession"><code class="docutils literal notranslate"><span class="pre">sqlalchemy.ext.horizontal_shard.ShardedSession.</span></code></a><code class="sig-name descname">connection</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">mapper</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">instance</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">shard_id</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.ext.horizontal_shard.ShardedSession.connection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a <a class="reference internal" href="../../core/connections.html#sqlalchemy.engine.Connection" title="sqlalchemy.engine.Connection"><code class="xref py py-class docutils literal notranslate"><span class="pre">Connection</span></code></a> object corresponding to this
+<a class="reference internal" href="../session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> object’s transactional state.</p>
+<p>If this <a class="reference internal" href="../session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> is configured with <code class="docutils literal notranslate"><span class="pre">autocommit=False</span></code>,
+either the <a class="reference internal" href="../../core/connections.html#sqlalchemy.engine.Connection" title="sqlalchemy.engine.Connection"><code class="xref py py-class docutils literal notranslate"><span class="pre">Connection</span></code></a> corresponding to the current
+transaction is returned, or if no transaction is in progress, a new
+one is begun and the <a class="reference internal" href="../../core/connections.html#sqlalchemy.engine.Connection" title="sqlalchemy.engine.Connection"><code class="xref py py-class docutils literal notranslate"><span class="pre">Connection</span></code></a>
+returned (note that no
+transactional state is established with the DBAPI until the first
+SQL statement is emitted).</p>
+<p>Alternatively, if this <a class="reference internal" href="../session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> is configured with
+<code class="docutils literal notranslate"><span class="pre">autocommit=True</span></code>, an ad-hoc <a class="reference internal" href="../../core/connections.html#sqlalchemy.engine.Connection" title="sqlalchemy.engine.Connection"><code class="xref py py-class docutils literal notranslate"><span class="pre">Connection</span></code></a> is returned
+using <a class="reference internal" href="../../core/connections.html#sqlalchemy.engine.Engine.connect" title="sqlalchemy.engine.Engine.connect"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Engine.connect()</span></code></a> on the underlying
+<a class="reference internal" href="../../core/connections.html#sqlalchemy.engine.Engine" title="sqlalchemy.engine.Engine"><code class="xref py py-class docutils literal notranslate"><span class="pre">Engine</span></code></a>.</p>
+<p>Ambiguity in multi-bind or unbound <a class="reference internal" href="../session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> objects can be
+resolved through any of the optional keyword arguments.   This
+ultimately makes usage of the <a class="reference internal" href="#sqlalchemy.ext.horizontal_shard.ShardedSession.get_bind" title="sqlalchemy.ext.horizontal_shard.ShardedSession.get_bind"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_bind()</span></code></a> method for resolution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span class="target" id="sqlalchemy.ext.horizontal_shard.ShardedSession.connection.params.bind"></span><strong>bind</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.ext.horizontal_shard.ShardedSession.connection.params.bind">¶</a> – Optional <a class="reference internal" href="../../core/connections.html#sqlalchemy.engine.Engine" title="sqlalchemy.engine.Engine"><code class="xref py py-class docutils literal notranslate"><span class="pre">Engine</span></code></a> to be used as the bind.  If
+this engine is already involved in an ongoing transaction,
+that connection will be used.  This argument takes precedence
+over <code class="docutils literal notranslate"><span class="pre">mapper</span></code>, <code class="docutils literal notranslate"><span class="pre">clause</span></code>.</p></li>
+<li><p><span class="target" id="sqlalchemy.ext.horizontal_shard.ShardedSession.connection.params.mapper"></span><strong>mapper</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.ext.horizontal_shard.ShardedSession.connection.params.mapper">¶</a> – Optional <a class="reference internal" href="../mapping_api.html#sqlalchemy.orm.mapper" title="sqlalchemy.orm.mapper"><code class="xref py py-func docutils literal notranslate"><span class="pre">mapper()</span></code></a> mapped class, used to identify
+the appropriate bind.  This argument takes precedence over
+<code class="docutils literal notranslate"><span class="pre">clause</span></code>.</p></li>
+<li><p><span class="target" id="sqlalchemy.ext.horizontal_shard.ShardedSession.connection.params.clause"></span><strong>clause</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.ext.horizontal_shard.ShardedSession.connection.params.clause">¶</a> – A <a class="reference internal" href="../../core/sqlelement.html#sqlalchemy.sql.expression.ClauseElement" title="sqlalchemy.sql.expression.ClauseElement"><code class="xref py py-class docutils literal notranslate"><span class="pre">ClauseElement</span></code></a> (i.e.
+<a class="reference internal" href="../../core/selectable.html#sqlalchemy.sql.expression.select" title="sqlalchemy.sql.expression.select"><code class="xref py py-func docutils literal notranslate"><span class="pre">select()</span></code></a>,
+<a class="reference internal" href="../../core/sqlelement.html#sqlalchemy.sql.expression.text" title="sqlalchemy.sql.expression.text"><code class="xref py py-func docutils literal notranslate"><span class="pre">text()</span></code></a>,
+etc.) which will be used to locate a bind, if a bind
+cannot otherwise be identified.</p></li>
+<li><p><span class="target" id="sqlalchemy.ext.horizontal_shard.ShardedSession.connection.params.close_with_result"></span><strong>close_with_result</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.ext.horizontal_shard.ShardedSession.connection.params.close_with_result">¶</a> – Passed to <a class="reference internal" href="../../core/connections.html#sqlalchemy.engine.Engine.connect" title="sqlalchemy.engine.Engine.connect"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Engine.connect()</span></code></a>,
+indicating the <a class="reference internal" href="../../core/connections.html#sqlalchemy.engine.Connection" title="sqlalchemy.engine.Connection"><code class="xref py py-class docutils literal notranslate"><span class="pre">Connection</span></code></a> should be considered
+“single use”, automatically closing when the first result set is
+closed.  This flag only has an effect if this <a class="reference internal" href="../session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> is
+configured with <code class="docutils literal notranslate"><span class="pre">autocommit=True</span></code> and does not already have a
+transaction in progress.</p></li>
+<li><p><span class="target" id="sqlalchemy.ext.horizontal_shard.ShardedSession.connection.params.execution_options"></span><strong>execution_options</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.ext.horizontal_shard.ShardedSession.connection.params.execution_options">¶</a> – <p>a dictionary of execution options that will
+be passed to <a class="reference internal" href="../../core/connections.html#sqlalchemy.engine.Connection.execution_options" title="sqlalchemy.engine.Connection.execution_options"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Connection.execution_options()</span></code></a>, <strong>when the
+connection is first procured only</strong>.   If the connection is already
+present within the <a class="reference internal" href="../session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a>, a warning is emitted and
+the arguments are ignored.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.9.9.</span></p>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="../session_transaction.html#session-transaction-isolation"><span class="std std-ref">Setting Transaction Isolation Levels</span></a></p>
+</div>
+</p></li>
+<li><p><span class="target" id="sqlalchemy.ext.horizontal_shard.ShardedSession.connection.params.**kw"></span><strong>**kw</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.ext.horizontal_shard.ShardedSession.connection.params.**kw">¶</a> – Additional keyword arguments are sent to <a class="reference internal" href="#sqlalchemy.ext.horizontal_shard.ShardedSession.get_bind" title="sqlalchemy.ext.horizontal_shard.ShardedSession.get_bind"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_bind()</span></code></a>,
+allowing additional arguments to be passed to custom
+implementations of <a class="reference internal" href="#sqlalchemy.ext.horizontal_shard.ShardedSession.get_bind" title="sqlalchemy.ext.horizontal_shard.ShardedSession.get_bind"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_bind()</span></code></a>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sqlalchemy.ext.horizontal_shard.ShardedSession.get_bind">
+<em class="property">method </em><a class="reference internal" href="#sqlalchemy.ext.horizontal_shard.ShardedSession"><code class="docutils literal notranslate"><span class="pre">sqlalchemy.ext.horizontal_shard.ShardedSession.</span></code></a><code class="sig-name descname">get_bind</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">mapper</span></em>, <em class="sig-param"><span class="n">shard_id</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">instance</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">clause</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.ext.horizontal_shard.ShardedSession.get_bind" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a “bind” to which this <a class="reference internal" href="../session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> is bound.</p>
+<p>The “bind” is usually an instance of <a class="reference internal" href="../../core/connections.html#sqlalchemy.engine.Engine" title="sqlalchemy.engine.Engine"><code class="xref py py-class docutils literal notranslate"><span class="pre">Engine</span></code></a>,
+except in the case where the <a class="reference internal" href="../session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> has been
+explicitly bound directly to a <a class="reference internal" href="../../core/connections.html#sqlalchemy.engine.Connection" title="sqlalchemy.engine.Connection"><code class="xref py py-class docutils literal notranslate"><span class="pre">Connection</span></code></a>.</p>
+<p>For a multiply-bound or unbound <a class="reference internal" href="../session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a>, the
+<code class="docutils literal notranslate"><span class="pre">mapper</span></code> or <code class="docutils literal notranslate"><span class="pre">clause</span></code> arguments are used to determine the
+appropriate bind to return.</p>
+<p>Note that the “mapper” argument is usually present
+when <a class="reference internal" href="../session_api.html#sqlalchemy.orm.session.Session.get_bind" title="sqlalchemy.orm.session.Session.get_bind"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Session.get_bind()</span></code></a> is called via an ORM
+operation such as a <a class="reference internal" href="../session_api.html#sqlalchemy.orm.session.Session.query" title="sqlalchemy.orm.session.Session.query"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Session.query()</span></code></a>, each
+individual INSERT/UPDATE/DELETE operation within a
+<a class="reference internal" href="../session_api.html#sqlalchemy.orm.session.Session.flush" title="sqlalchemy.orm.session.Session.flush"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Session.flush()</span></code></a>, call, etc.</p>
+<p>The order of resolution is:</p>
+<ol class="arabic simple">
+<li><p>if mapper given and session.binds is present,
+locate a bind based first on the mapper in use, then
+on the mapped class in use, then on any base classes that are
+present in the <code class="docutils literal notranslate"><span class="pre">__mro__</span></code> of the mapped class, from more specific
+superclasses to more general.</p></li>
+<li><p>if clause given and session.binds is present,
+locate a bind based on <a class="reference internal" href="../../core/metadata.html#sqlalchemy.schema.Table" title="sqlalchemy.schema.Table"><code class="xref py py-class docutils literal notranslate"><span class="pre">Table</span></code></a> objects
+found in the given clause present in session.binds.</p></li>
+<li><p>if session.bind is present, return that.</p></li>
+<li><p>if clause given, attempt to return a bind
+linked to the <a class="reference internal" href="../../core/metadata.html#sqlalchemy.schema.MetaData" title="sqlalchemy.schema.MetaData"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetaData</span></code></a> ultimately
+associated with the clause.</p></li>
+<li><p>if mapper given, attempt to return a bind
+linked to the <a class="reference internal" href="../../core/metadata.html#sqlalchemy.schema.MetaData" title="sqlalchemy.schema.MetaData"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetaData</span></code></a> ultimately
+associated with the <a class="reference internal" href="../../core/metadata.html#sqlalchemy.schema.Table" title="sqlalchemy.schema.Table"><code class="xref py py-class docutils literal notranslate"><span class="pre">Table</span></code></a> or other
+selectable to which the mapper is mapped.</p></li>
+<li><p>No bind can be found, <a class="reference internal" href="../../core/exceptions.html#sqlalchemy.exc.UnboundExecutionError" title="sqlalchemy.exc.UnboundExecutionError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">UnboundExecutionError</span></code></a>
+is raised.</p></li>
+</ol>
+<p>Note that the <a class="reference internal" href="../session_api.html#sqlalchemy.orm.session.Session.get_bind" title="sqlalchemy.orm.session.Session.get_bind"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Session.get_bind()</span></code></a> method can be overridden on
+a user-defined subclass of <a class="reference internal" href="../session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> to provide any kind
+of bind resolution scheme.  See the example at
+<a class="reference internal" href="../persistence_techniques.html#session-custom-partitioning"><span class="std std-ref">Custom Vertical Partitioning</span></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span class="target" id="sqlalchemy.ext.horizontal_shard.ShardedSession.get_bind.params.mapper"></span><strong>mapper</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.ext.horizontal_shard.ShardedSession.get_bind.params.mapper">¶</a> – Optional <a class="reference internal" href="../mapping_api.html#sqlalchemy.orm.mapper" title="sqlalchemy.orm.mapper"><code class="xref py py-func docutils literal notranslate"><span class="pre">mapper()</span></code></a> mapped class or instance of
+<a class="reference internal" href="../mapping_api.html#sqlalchemy.orm.Mapper" title="sqlalchemy.orm.Mapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapper</span></code></a>.   The bind can be derived from a
+<a class="reference internal" href="../mapping_api.html#sqlalchemy.orm.Mapper" title="sqlalchemy.orm.Mapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapper</span></code></a>
+first by consulting the “binds” map associated with this
+<a class="reference internal" href="../session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a>, and secondly by consulting the
+<a class="reference internal" href="../../core/metadata.html#sqlalchemy.schema.MetaData" title="sqlalchemy.schema.MetaData"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetaData</span></code></a>
+associated with the <a class="reference internal" href="../../core/metadata.html#sqlalchemy.schema.Table" title="sqlalchemy.schema.Table"><code class="xref py py-class docutils literal notranslate"><span class="pre">Table</span></code></a> to which the
+<a class="reference internal" href="../mapping_api.html#sqlalchemy.orm.Mapper" title="sqlalchemy.orm.Mapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapper</span></code></a>
+is mapped for a bind.</p></li>
+<li><p><span class="target" id="sqlalchemy.ext.horizontal_shard.ShardedSession.get_bind.params.clause"></span><strong>clause</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.ext.horizontal_shard.ShardedSession.get_bind.params.clause">¶</a> – A <a class="reference internal" href="../../core/sqlelement.html#sqlalchemy.sql.expression.ClauseElement" title="sqlalchemy.sql.expression.ClauseElement"><code class="xref py py-class docutils literal notranslate"><span class="pre">ClauseElement</span></code></a> (i.e.
+<a class="reference internal" href="../../core/selectable.html#sqlalchemy.sql.expression.select" title="sqlalchemy.sql.expression.select"><code class="xref py py-func docutils literal notranslate"><span class="pre">select()</span></code></a>,
+<a class="reference internal" href="../../core/sqlelement.html#sqlalchemy.sql.expression.text" title="sqlalchemy.sql.expression.text"><code class="xref py py-func docutils literal notranslate"><span class="pre">text()</span></code></a>,
+etc.).  If the <code class="docutils literal notranslate"><span class="pre">mapper</span></code> argument is not present or could not
+produce a bind, the given expression construct will be searched
+for a bound element, typically a <a class="reference internal" href="../../core/metadata.html#sqlalchemy.schema.Table" title="sqlalchemy.schema.Table"><code class="xref py py-class docutils literal notranslate"><span class="pre">Table</span></code></a>
+associated with
+bound <a class="reference internal" href="../../core/metadata.html#sqlalchemy.schema.MetaData" title="sqlalchemy.schema.MetaData"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetaData</span></code></a>.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="../persistence_techniques.html#session-partitioning"><span class="std std-ref">Partitioning Strategies (e.g. multiple database backends per Session)</span></a></p>
+<p><a class="reference internal" href="../session_api.html#sqlalchemy.orm.session.Session.params.binds" title="sqlalchemy.orm.session.Session"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">Session.binds</span></code></a></p>
+<p><a class="reference internal" href="../session_api.html#sqlalchemy.orm.session.Session.bind_mapper" title="sqlalchemy.orm.session.Session.bind_mapper"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Session.bind_mapper()</span></code></a></p>
+<p><a class="reference internal" href="../session_api.html#sqlalchemy.orm.session.Session.bind_table" title="sqlalchemy.orm.session.Session.bind_table"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Session.bind_table()</span></code></a></p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="sqlalchemy.ext.horizontal_shard.ShardedQuery">
+<em class="property">class </em><code class="sig-prename descclassname">sqlalchemy.ext.horizontal_shard.</code><code class="sig-name descname">ShardedQuery</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.ext.horizontal_shard.ShardedQuery" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../query.html#sqlalchemy.orm.query.Query" title="sqlalchemy.orm.query.Query"><code class="xref py py-class docutils literal notranslate"><span class="pre">sqlalchemy.orm.query.Query</span></code></a></p>
+<dl class="py method">
+<dt id="sqlalchemy.ext.horizontal_shard.ShardedQuery.set_shard">
+<em class="property">method </em><a class="reference internal" href="#sqlalchemy.ext.horizontal_shard.ShardedQuery"><code class="docutils literal notranslate"><span class="pre">sqlalchemy.ext.horizontal_shard.ShardedQuery.</span></code></a><code class="sig-name descname">set_shard</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">shard_id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.ext.horizontal_shard.ShardedQuery.set_shard" title="Permalink to this definition">¶</a></dt>
+<dd><p>return a new query, limited to a single shard ID.</p>
+<p>all subsequent operations with the returned query will
+be against the single shard regardless of other state.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+    </div>
+
+</div>
+
+<div id="docs-bottom-navigation" class="docs-navigation-links, withsidebar">
+        Previous:
+        <a href="orderinglist.html" title="previous chapter">Ordering List</a>
+        Next:
+        <a href="hybrid.html" title="next chapter">Hybrid Attributes</a>
+
+    <div id="docs-copyright">
+        &copy; <a href="../../copyright.html">Copyright</a> 2007-2020, the SQLAlchemy authors and contributors.
+        Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 3.0.3.
+    </div>
+</div>
+
+</div>
+
+
+
+        
+        
+
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+          URL_ROOT:    '../../',
+          VERSION:     '1.3.17',
+          COLLAPSE_MODINDEX: false,
+          FILE_SUFFIX: '.html'
+      };
+    </script>
+
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+
+    <!-- begin iterate through sphinx environment script_files -->
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <!-- end iterate through sphinx environment script_files -->
+
+    <script type="text/javascript" src="../../_static/detectmobile.js"></script>
+    <script type="text/javascript" src="../../_static/init.js"></script>
+
+
+    </body>
+</html>
+
+

@@ -23,13 +23,14 @@ import I18n from 'utils/i18n';
 // TODO: Depends on Dropzone
 
 ko.bindingHandlers.dropzone = {
-  init: function(element, valueAccessor) {
+  init: function (element, valueAccessor) {
     const value = ko.unwrap(valueAccessor());
     if (value.disabled) {
       return;
     }
     const options = {
       autoDiscover: false,
+      timeout: 300000,
       maxFilesize: 5000000,
       previewsContainer: '#progressStatusContent',
       previewTemplate:
@@ -44,14 +45,14 @@ ko.bindingHandlers.dropzone = {
         '</div>' +
         '<div class="progress-row-bar" data-dz-uploadprogress></div>' +
         '</div>',
-      sending: function() {
+      sending: function () {
         $('.hoverMsg').addClass('hide');
         $('#progressStatus').removeClass('hide');
         $('#progressStatusBar').removeClass('hide');
         $('#progressStatus .progress-row').remove();
         $('#progressStatusBar div').css('width', '0');
       },
-      uploadprogress: function(file, progress) {
+      uploadprogress: function (file, progress) {
         $('[data-dz-name]').each((cnt, item) => {
           if ($(item).text() === file.name) {
             $(item)
@@ -59,25 +60,19 @@ ko.bindingHandlers.dropzone = {
               .find('[data-dz-uploadprogress]')
               .width(progress.toFixed() + '%');
             if (progress.toFixed() === '100') {
-              $(item)
-                .parents('.progress-row')
-                .find('[data-dz-remove]')
-                .hide();
-              $(item)
-                .parents('.progress-row')
-                .find('[data-dz-uploaded]')
-                .show();
+              $(item).parents('.progress-row').find('[data-dz-remove]').hide();
+              $(item).parents('.progress-row').find('[data-dz-uploaded]').show();
             }
           }
         });
       },
-      totaluploadprogress: function(progress) {
+      totaluploadprogress: function (progress) {
         $('#progressStatusBar div').width(progress.toFixed() + '%');
       },
-      canceled: function() {
+      canceled: function () {
         $.jHueNotify.info(I18n('The upload has been canceled'));
       },
-      complete: function(file) {
+      complete: function (file) {
         if (file.xhr.response !== '') {
           const response = JSON.parse(file.xhr.response);
           if (response && response.status != null) {
@@ -95,7 +90,7 @@ ko.bindingHandlers.dropzone = {
           }
         }
       },
-      queuecomplete: function() {
+      queuecomplete: function () {
         window.setTimeout(() => {
           $('#progressStatus').addClass('hide');
           $('#progressStatusBar').addClass('hide');

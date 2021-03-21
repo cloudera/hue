@@ -18,13 +18,14 @@ import $ from 'jquery';
 import * as ko from 'knockout';
 
 import huePubSub from 'utils/huePubSub';
+import { hueLocalStorage } from 'utils/storageUtils';
 
 ko.bindingHandlers.splitFlexDraggable = {
-  init: function(element, valueAccessor) {
+  init: function (element, valueAccessor) {
     const options = ko.unwrap(valueAccessor());
     let sidePanelWidth =
-      $.totalStorage(options.appName + '_' + options.orientation + '_panel_width') != null
-        ? $.totalStorage(options.appName + '_' + options.orientation + '_panel_width')
+      hueLocalStorage(options.appName + '_' + options.orientation + '_panel_width') != null
+        ? hueLocalStorage(options.appName + '_' + options.orientation + '_panel_width')
         : 290;
 
     const $resizer = $(element);
@@ -33,18 +34,18 @@ ko.bindingHandlers.splitFlexDraggable = {
 
     const isLeft = options.orientation === 'left';
 
-    const onPosition = options.onPosition || function() {};
+    const onPosition = options.onPosition || function () {};
 
     let containerWidth = $container.width();
     $sidePanel.css('flex-basis', sidePanelWidth + 'px');
     $resizer.draggable({
       axis: 'x',
       containment: $container,
-      start: function() {
+      start: function () {
         sidePanelWidth = $sidePanel.width();
         containerWidth = $container.width();
       },
-      drag: function(event, ui) {
+      drag: function (event, ui) {
         const flexBasis =
           Math.min(
             Math.max(sidePanelWidth + (isLeft ? ui.position.left : -ui.position.left), 200),
@@ -54,9 +55,9 @@ ko.bindingHandlers.splitFlexDraggable = {
         onPosition(flexBasis);
         ui.position.left = 0;
       },
-      stop: function() {
+      stop: function () {
         sidePanelWidth = $sidePanel.width();
-        $.totalStorage(
+        hueLocalStorage(
           options.appName + '_' + options.orientation + '_panel_width',
           sidePanelWidth
         );
@@ -65,7 +66,7 @@ ko.bindingHandlers.splitFlexDraggable = {
       }
     });
 
-    const positionPanels = function() {
+    const positionPanels = function () {
       if (options.sidePanelVisible()) {
         $sidePanel.css('flex-basis', Math.max(sidePanelWidth, 200) + 'px');
         onPosition();

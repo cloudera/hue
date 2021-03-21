@@ -17,7 +17,7 @@ from __future__ import absolute_import
 
 import logging
 
-from django.utils.translation import ugettext_lazy as _, ugettext as _t
+from django.utils.translation import ugettext_lazy as _t
 
 from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_password_from_script
 from desktop.lib.idbroker import conf as conf_idbroker
@@ -115,7 +115,7 @@ AZURE_ACCOUNTS = UnspecifiedConfigSection(
         type=coerce_password_from_script,
         default=None,
         private=True,
-        help=_("Execute this script to produce the ADLS client secret.")),
+        help=_t("Execute this script to produce the ADLS client secret.")),
       TENANT_ID=Config(
         key="tenant_id",
         type=str,
@@ -126,7 +126,7 @@ AZURE_ACCOUNTS = UnspecifiedConfigSection(
         type=coerce_password_from_script,
         default=None,
         private=True,
-        help=_("Execute this script to produce the ADLS tenant id.")),
+        help=_t("Execute this script to produce the ADLS tenant id.")),
     )
   )
 )
@@ -146,18 +146,20 @@ ABFS_CLUSTERS = UnspecifiedConfigSection(
 )
 
 def is_adls_enabled():
-  return ('default' in list(AZURE_ACCOUNTS.keys()) and AZURE_ACCOUNTS['default'].get_raw() and AZURE_ACCOUNTS['default'].CLIENT_ID.get() or (conf_idbroker.is_idbroker_enabled('azure') and has_azure_metadata())) and 'default' in list(ADLS_CLUSTERS.keys())
+  return ('default' in list(AZURE_ACCOUNTS.keys()) and AZURE_ACCOUNTS['default'].get_raw() and AZURE_ACCOUNTS['default'].CLIENT_ID.get() \
+    or (conf_idbroker.is_idbroker_enabled('azure') and has_azure_metadata())) and 'default' in list(ADLS_CLUSTERS.keys())
 
 def is_abfs_enabled():
-  return ('default' in list(AZURE_ACCOUNTS.keys()) and AZURE_ACCOUNTS['default'].get_raw() and AZURE_ACCOUNTS['default'].CLIENT_ID.get() or (conf_idbroker.is_idbroker_enabled('azure') and has_azure_metadata())) and 'default' in list(ABFS_CLUSTERS.keys())
+  return ('default' in list(AZURE_ACCOUNTS.keys()) and AZURE_ACCOUNTS['default'].get_raw() and AZURE_ACCOUNTS['default'].CLIENT_ID.get() \
+    or (conf_idbroker.is_idbroker_enabled('azure') and has_azure_metadata())) and 'default' in list(ABFS_CLUSTERS.keys())
 
 def has_adls_access(user):
   from desktop.auth.backend import is_admin
-  return user.is_authenticated() and user.is_active and (is_admin(user) or user.has_hue_permission(action="adls_access", app="filebrowser"))
+  return user.is_authenticated and user.is_active and (is_admin(user) or user.has_hue_permission(action="adls_access", app="filebrowser"))
 
 def has_abfs_access(user):
   from desktop.auth.backend import is_admin
-  return user.is_authenticated() and user.is_active and (is_admin(user) or user.has_hue_permission(action="abfs_access", app="filebrowser"))
+  return user.is_authenticated and user.is_active and (is_admin(user) or user.has_hue_permission(action="abfs_access", app="filebrowser"))
 
 def azure_metadata():
   global AZURE_METADATA
@@ -166,7 +168,7 @@ def azure_metadata():
     client = http_client.HttpClient(META_DATA_URL, logger=LOG)
     root = resource.Resource(client)
     try:
-      AZURE_METADATA = root.get('/compute', params={'api-version':'2019-06-04', 'format':'json'}, headers={'Metadata': 'true'})
+      AZURE_METADATA = root.get('/compute', params={'api-version': '2019-06-04', 'format': 'json'}, headers={'Metadata': 'true'})
     except Exception as e:
       AZURE_METADATA = False
   return AZURE_METADATA

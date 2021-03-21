@@ -18,11 +18,11 @@ import $ from 'jquery';
 import * as ko from 'knockout';
 
 ko.bindingHandlers.slideVisible = {
-  init: function(element, valueAccessor) {
+  init: function (element, valueAccessor) {
     const value = valueAccessor();
     $(element).toggle(ko.unwrap(value));
   },
-  update: function(element, valueAccessor, allBindings) {
+  update: function (element, valueAccessor, allBindings) {
     const value = valueAccessor();
     const onComplete = ko.unwrap(allBindings()).onComplete;
     ko.unwrap(value)

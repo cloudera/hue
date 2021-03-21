@@ -41,7 +41,6 @@ sf_custom_excerpt:
     2019年3月更新: この記事は Hue in Docker（日本語版記事未公開）のアップデート版です
     現在、Hueで遊ぶ方法は demo.gethue.com にアクセスするか 仮想マシンをダウンロードすることです。しかしこれらには多くの制約があります。代わりにDockerを使用するとはるかに良い体験ができます:
 categories:
-  - Administration
   - Cloud
   - Video
 
@@ -58,7 +57,7 @@ Dockerは、Hueの開発を素早く開始したり、Hueを現在のクラス�
 
 <div id="attachment_3664" style="width: 1034px" class="wp-caption alignleft">
   <img class="size-large wp-image-3664" src="https://cdn.gethue.com/uploads/2015/12/Screenshot-2015-12-18-16.47.46-1024x724.jpg" alt="Hue Running in Kitematic" width="1024" height="724" data-wp-pid="3664" />
-  
+
   <p class="wp-caption-text">
     Hue Running in Kitematic
   </p>

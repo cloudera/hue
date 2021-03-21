@@ -1,0 +1,443 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        
+        <title>
+            
+    
+    Configuring a Version Counter
+ &mdash;
+    SQLAlchemy 1.3 Documentation
+
+        </title>
+
+        
+            <!-- begin iterate through site-imported + sphinx environment css_files -->
+                <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+                <link rel="stylesheet" href="../_static/docs.css" type="text/css" />
+                <link rel="stylesheet" href="../_static/changelog.css" type="text/css" />
+                <link rel="stylesheet" href="../_static/sphinx_paramlinks.css" type="text/css" />
+            <!-- end iterate through site-imported + sphinx environment css_files -->
+        
+
+        
+
+    
+
+    <!-- begin layout.mako headers -->
+
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+        <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="top" title="SQLAlchemy 1.3 Documentation" href="../index.html" />
+        <link rel="up" title="Mapper Configuration" href="mapper_config.html" />
+        <link rel="next" title="Class Mapping API" href="mapping_api.html" />
+        <link rel="prev" title="Non-Traditional Mappings" href="nonstandard_mappings.html" />
+    <!-- end layout.mako headers -->
+
+
+    </head>
+    <body>
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="docs-container">
+
+
+
+
+
+<div id="docs-top-navigation-container" class="body-background">
+<div id="docs-header">
+    <div id="docs-version-header">
+        Release: <span class="version-num">1.3.17</span>
+
+
+        | Release Date: May 13, 2020
+
+    </div>
+
+    <h1>SQLAlchemy 1.3 Documentation</h1>
+
+</div>
+</div>
+
+<div id="docs-body-container">
+
+    <div id="fixed-sidebar" class="withsidebar">
+
+
+        <div id="docs-sidebar-popout">
+            <h3><a href="../index.html">SQLAlchemy 1.3 Documentation</a></h3>
+            <p id="sidebar-topnav">
+                <a href="../contents.html">Contents</a> |
+                <a href="../genindex.html">Index</a>
+            </p>
+
+            <div id="sidebar-search">
+                <form class="search" action="../search.html" method="get">
+                  <label>
+                  Search terms:
+                  <input type="text" placeholder="search..." name="q" size="12" />
+                  </label>
+                  <input type="hidden" name="check_keywords" value="yes" />
+                  <input type="hidden" name="area" value="default" />
+                </form>
+            </div>
+
+        </div>
+
+        <div id="docs-sidebar">
+
+        <div id="sidebar-banner">
+            
+        </div>
+
+        <div id="docs-sidebar-inner">
+
+        
+        <h3>
+            <a href="index.html" title="SQLAlchemy ORM">SQLAlchemy ORM</a>
+        </h3>
+
+        <ul>
+<li><span class="link-container"><a class="reference external" href="tutorial.html">Object Relational Tutorial</a></span></li>
+<li><span class="link-container"><a class="reference external" href="mapper_config.html">Mapper Configuration</a></span><ul>
+<li><span class="link-container"><a class="reference external" href="mapping_styles.html">Types of Mappings</a></span></li>
+<li><span class="link-container"><a class="reference external" href="scalar_mapping.html">Mapping Columns and Expressions</a></span></li>
+<li><span class="link-container"><a class="reference external" href="inheritance.html">Mapping Class Inheritance Hierarchies</a></span></li>
+<li><span class="link-container"><a class="reference external" href="nonstandard_mappings.html">Non-Traditional Mappings</a></span></li>
+<li class="selected"><span class="link-container"><strong>Configuring a Version Counter</strong><a class="paramlink headerlink reference internal" href="#">¶</a></span><ul>
+<li><span class="link-container"><a class="reference external" href="#simple-version-counting">Simple Version Counting</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#custom-version-counters-types">Custom Version Counters / Types</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#server-side-version-counters">Server Side Version Counters</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#programmatic-or-conditional-version-counters">Programmatic or Conditional Version Counters</a></span></li>
+</ul>
+</li>
+<li><span class="link-container"><a class="reference external" href="mapping_api.html">Class Mapping API</a></span></li>
+</ul>
+</li>
+<li><span class="link-container"><a class="reference external" href="relationships.html">Relationship Configuration</a></span></li>
+<li><span class="link-container"><a class="reference external" href="loading_objects.html">Loading Objects</a></span></li>
+<li><span class="link-container"><a class="reference external" href="session.html">Using the Session</a></span></li>
+<li><span class="link-container"><a class="reference external" href="extending.html">Events and Internals</a></span></li>
+<li><span class="link-container"><a class="reference external" href="extensions/index.html">ORM Extensions</a></span></li>
+<li><span class="link-container"><a class="reference external" href="examples.html">ORM Examples</a></span></li>
+</ul>
+
+
+
+        </div>
+
+        </div>
+
+    </div>
+
+    
+
+    <div id="docs-body" class="withsidebar" >
+        
+<div class="section" id="configuring-a-version-counter">
+<span id="mapper-version-counter"></span><h1>Configuring a Version Counter<a class="headerlink" href="#configuring-a-version-counter" title="Permalink to this headline">¶</a></h1>
+<p>The <a class="reference internal" href="mapping_api.html#sqlalchemy.orm.Mapper" title="sqlalchemy.orm.Mapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapper</span></code></a> supports management of a <a class="reference internal" href="../glossary.html#term-version-id-column"><span class="xref std std-term">version id column</span></a>, which
+is a single table column that increments or otherwise updates its value
+each time an <code class="docutils literal notranslate"><span class="pre">UPDATE</span></code> to the mapped table occurs.  This value is checked each
+time the ORM emits an <code class="docutils literal notranslate"><span class="pre">UPDATE</span></code> or <code class="docutils literal notranslate"><span class="pre">DELETE</span></code> against the row to ensure that
+the value held in memory matches the database value.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Because the versioning feature relies upon comparison of the <strong>in memory</strong>
+record of an object, the feature only applies to the <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session.flush" title="sqlalchemy.orm.session.Session.flush"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Session.flush()</span></code></a>
+process, where the ORM flushes individual in-memory rows to the database.
+It does <strong>not</strong> take effect when performing
+a multirow UPDATE or DELETE using <a class="reference internal" href="query.html#sqlalchemy.orm.query.Query.update" title="sqlalchemy.orm.query.Query.update"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Query.update()</span></code></a> or <a class="reference internal" href="query.html#sqlalchemy.orm.query.Query.delete" title="sqlalchemy.orm.query.Query.delete"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Query.delete()</span></code></a>
+methods, as these methods only emit an UPDATE or DELETE statement but otherwise
+do not have direct access to the contents of those rows being affected.</p>
+</div>
+<p>The purpose of this feature is to detect when two concurrent transactions
+are modifying the same row at roughly the same time, or alternatively to provide
+a guard against the usage of a “stale” row in a system that might be re-using
+data from a previous transaction without refreshing (e.g. if one sets <code class="docutils literal notranslate"><span class="pre">expire_on_commit=False</span></code>
+with a <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a>, it is possible to re-use the data from a previous
+transaction).</p>
+<div class="topic">
+<p class="topic-title first">Concurrent transaction updates</p>
+<p>When detecting concurrent updates within transactions, it is typically the
+case that the database’s transaction isolation level is below the level of
+<a class="reference internal" href="../glossary.html#term-repeatable-read"><span class="xref std std-term">repeatable read</span></a>; otherwise, the transaction will not be exposed
+to a new row value created by a concurrent update which conflicts with
+the locally updated value.  In this case, the SQLAlchemy versioning
+feature will typically not be useful for in-transaction conflict detection,
+though it still can be used for cross-transaction staleness detection.</p>
+<p>The database that enforces repeatable reads will typically either have locked the
+target row against a concurrent update, or is employing some form
+of multi version concurrency control such that it will emit an error
+when the transaction is committed.  SQLAlchemy’s version_id_col is an alternative
+which allows version tracking to occur for specific tables within a transaction
+that otherwise might not have this isolation level set.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference external" href="http://www.postgresql.org/docs/9.1/static/transaction-iso.html#XACT-REPEATABLE-READ">Repeatable Read Isolation Level</a> - PostgreSQL’s implementation of repeatable read, including a description of the error condition.</p>
+</div>
+</div>
+<div class="section" id="simple-version-counting">
+<h2>Simple Version Counting<a class="headerlink" href="#simple-version-counting" title="Permalink to this headline">¶</a></h2>
+<p>The most straightforward way to track versions is to add an integer column
+to the mapped table, then establish it as the <code class="docutils literal notranslate"><span class="pre">version_id_col</span></code> within the
+mapper options:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">User</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;user&#39;</span>
+
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">version_id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">__mapper_args__</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;version_id_col&quot;</span><span class="p">:</span> <span class="n">version_id</span>
+    <span class="p">}</span></pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>It is <strong>strongly recommended</strong> that the <code class="docutils literal notranslate"><span class="pre">version_id</span></code> column
+be made NOT NULL.  The versioning feature <strong>does not support</strong> a NULL
+value in the versioning column.</p>
+</div>
+<p>Above, the <code class="docutils literal notranslate"><span class="pre">User</span></code> mapping tracks integer versions using the column
+<code class="docutils literal notranslate"><span class="pre">version_id</span></code>.   When an object of type <code class="docutils literal notranslate"><span class="pre">User</span></code> is first flushed, the
+<code class="docutils literal notranslate"><span class="pre">version_id</span></code> column will be given a value of “1”.   Then, an UPDATE
+of the table later on will always be emitted in a manner similar to the
+following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">UPDATE</span> <span class="n">user</span> <span class="n">SET</span> <span class="n">version_id</span><span class="o">=</span><span class="p">:</span><span class="n">version_id</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="p">:</span><span class="n">name</span>
+<span class="n">WHERE</span> <span class="n">user</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="p">:</span><span class="n">user_id</span> <span class="n">AND</span> <span class="n">user</span><span class="o">.</span><span class="n">version_id</span> <span class="o">=</span> <span class="p">:</span><span class="n">user_version_id</span>
+<span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;new name&quot;</span><span class="p">,</span> <span class="s2">&quot;version_id&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;user_id&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;user_version_id&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span></pre></div>
+</div>
+<p>The above UPDATE statement is updating the row that not only matches
+<code class="docutils literal notranslate"><span class="pre">user.id</span> <span class="pre">=</span> <span class="pre">1</span></code>, it also is requiring that <code class="docutils literal notranslate"><span class="pre">user.version_id</span> <span class="pre">=</span> <span class="pre">1</span></code>, where “1”
+is the last version identifier we’ve been known to use on this object.
+If a transaction elsewhere has modified the row independently, this version id
+will no longer match, and the UPDATE statement will report that no rows matched;
+this is the condition that SQLAlchemy tests, that exactly one row matched our
+UPDATE (or DELETE) statement.  If zero rows match, that indicates our version
+of the data is stale, and a <a class="reference internal" href="exceptions.html#sqlalchemy.orm.exc.StaleDataError" title="sqlalchemy.orm.exc.StaleDataError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">StaleDataError</span></code></a> is raised.</p>
+</div>
+<div class="section" id="custom-version-counters-types">
+<span id="custom-version-counter"></span><h2>Custom Version Counters / Types<a class="headerlink" href="#custom-version-counters-types" title="Permalink to this headline">¶</a></h2>
+<p>Other kinds of values or counters can be used for versioning.  Common types include
+dates and GUIDs.   When using an alternate type or counter scheme, SQLAlchemy
+provides a hook for this scheme using the <code class="docutils literal notranslate"><span class="pre">version_id_generator</span></code> argument,
+which accepts a version generation callable.  This callable is passed the value of the current
+known version, and is expected to return the subsequent version.</p>
+<p>For example, if we wanted to track the versioning of our <code class="docutils literal notranslate"><span class="pre">User</span></code> class
+using a randomly generated GUID, we could do this (note that some backends
+support a native GUID type, but we illustrate here using a simple string):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">uuid</span>
+
+<span class="k">class</span> <span class="nc">User</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;user&#39;</span>
+
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">version_uuid</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">32</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">__mapper_args__</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;version_id_col&#39;</span><span class="p">:</span><span class="n">version_uuid</span><span class="p">,</span>
+        <span class="s1">&#39;version_id_generator&#39;</span><span class="p">:</span><span class="k">lambda</span> <span class="n">version</span><span class="p">:</span> <span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span>
+    <span class="p">}</span></pre></div>
+</div>
+<p>The persistence engine will call upon <code class="docutils literal notranslate"><span class="pre">uuid.uuid4()</span></code> each time a
+<code class="docutils literal notranslate"><span class="pre">User</span></code> object is subject to an INSERT or an UPDATE.  In this case, our
+version generation function can disregard the incoming value of <code class="docutils literal notranslate"><span class="pre">version</span></code>,
+as the <code class="docutils literal notranslate"><span class="pre">uuid4()</span></code> function
+generates identifiers without any prerequisite value.  If we were using
+a sequential versioning scheme such as numeric or a special character system,
+we could make use of the given <code class="docutils literal notranslate"><span class="pre">version</span></code> in order to help determine the
+subsequent value.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="../core/custom_types.html#custom-guid-type"><span class="std std-ref">Backend-agnostic GUID Type</span></a></p>
+</div>
+</div>
+<div class="section" id="server-side-version-counters">
+<span id="server-side-version-counter"></span><h2>Server Side Version Counters<a class="headerlink" href="#server-side-version-counters" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">version_id_generator</span></code> can also be configured to rely upon a value
+that is generated by the database.  In this case, the database would need
+some means of generating new identifiers when a row is subject to an INSERT
+as well as with an UPDATE.   For the UPDATE case, typically an update trigger
+is needed, unless the database in question supports some other native
+version identifier.  The PostgreSQL database in particular supports a system
+column called <a class="reference external" href="http://www.postgresql.org/docs/9.1/static/ddl-system-columns.html">xmin</a>
+which provides UPDATE versioning.  We can make use
+of the PostgreSQL <code class="docutils literal notranslate"><span class="pre">xmin</span></code> column to version our <code class="docutils literal notranslate"><span class="pre">User</span></code>
+class as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="n">FetchedValue</span>
+
+<span class="k">class</span> <span class="nc">User</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;user&#39;</span>
+
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">xmin</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="s2">&quot;xmin&quot;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">system</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">server_default</span><span class="o">=</span><span class="n">FetchedValue</span><span class="p">())</span>
+
+    <span class="n">__mapper_args__</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;version_id_col&#39;</span><span class="p">:</span> <span class="n">xmin</span><span class="p">,</span>
+        <span class="s1">&#39;version_id_generator&#39;</span><span class="p">:</span> <span class="kc">False</span>
+    <span class="p">}</span></pre></div>
+</div>
+<p>With the above mapping, the ORM will rely upon the <code class="docutils literal notranslate"><span class="pre">xmin</span></code> column for
+automatically providing the new value of the version id counter.</p>
+<div class="topic">
+<p class="topic-title first">creating tables that refer to system columns</p>
+<p>In the above scenario, as <code class="docutils literal notranslate"><span class="pre">xmin</span></code> is a system column provided by PostgreSQL,
+we use the <code class="docutils literal notranslate"><span class="pre">system=True</span></code> argument to mark it as a system-provided
+column, omitted from the <code class="docutils literal notranslate"><span class="pre">CREATE</span> <span class="pre">TABLE</span></code> statement.</p>
+</div>
+<p>The ORM typically does not actively fetch the values of database-generated
+values when it emits an INSERT or UPDATE, instead leaving these columns as
+“expired” and to be fetched when they are next accessed, unless the <code class="docutils literal notranslate"><span class="pre">eager_defaults</span></code>
+<a class="reference internal" href="mapping_api.html#sqlalchemy.orm.mapper" title="sqlalchemy.orm.mapper"><code class="xref py py-func docutils literal notranslate"><span class="pre">mapper()</span></code></a> flag is set.  However, when a
+server side version column is used, the ORM needs to actively fetch the newly
+generated value.  This is so that the version counter is set up <em>before</em>
+any concurrent transaction may update it again.   This fetching is also
+best done simultaneously within the INSERT or UPDATE statement using <a class="reference internal" href="../glossary.html#term-RETURNING"><span class="xref std std-term">RETURNING</span></a>,
+otherwise if emitting a SELECT statement afterwards, there is still a potential
+race condition where the version counter may change before it can be fetched.</p>
+<p>When the target database supports RETURNING, an INSERT statement for our <code class="docutils literal notranslate"><span class="pre">User</span></code> class will look
+like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">INSERT</span> <span class="n">INTO</span> <span class="s2">&quot;user&quot;</span> <span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="n">VALUES</span> <span class="p">(</span><span class="o">%</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="n">s</span><span class="p">)</span> <span class="n">RETURNING</span> <span class="s2">&quot;user&quot;</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;user&quot;</span><span class="o">.</span><span class="n">xmin</span>
+<span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;ed&#39;</span><span class="p">}</span></pre></div>
+</div>
+<p>Where above, the ORM can acquire any newly generated primary key values along
+with server-generated version identifiers in one statement.   When the backend
+does not support RETURNING, an additional SELECT must be emitted for <strong>every</strong>
+INSERT and UPDATE, which is much less efficient, and also introduces the possibility of
+missed version counters:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">INSERT</span> <span class="n">INTO</span> <span class="s2">&quot;user&quot;</span> <span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="n">VALUES</span> <span class="p">(</span><span class="o">%</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="n">s</span><span class="p">)</span>
+<span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;ed&#39;</span><span class="p">}</span>
+
+<span class="n">SELECT</span> <span class="s2">&quot;user&quot;</span><span class="o">.</span><span class="n">version_id</span> <span class="n">AS</span> <span class="n">user_version_id</span> <span class="n">FROM</span> <span class="s2">&quot;user&quot;</span> <span class="n">where</span>
+<span class="s2">&quot;user&quot;</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="p">:</span><span class="n">param_1</span>
+<span class="p">{</span><span class="s2">&quot;param_1&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span></pre></div>
+</div>
+<p>It is <em>strongly recommended</em> that server side version counters only be used
+when absolutely necessary and only on backends that support <a class="reference internal" href="../glossary.html#term-RETURNING"><span class="xref std std-term">RETURNING</span></a>,
+e.g. PostgreSQL, Oracle, SQL Server (though SQL Server has
+<a class="reference external" href="http://blogs.msdn.com/b/sqlprogrammability/archive/2008/07/11/update-with-output-clause-triggers-and-sqlmoreresults.aspx">major caveats</a> when triggers are used), Firebird.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.9.0: </span>Support for server side version identifier tracking.</p>
+</div>
+</div>
+<div class="section" id="programmatic-or-conditional-version-counters">
+<h2>Programmatic or Conditional Version Counters<a class="headerlink" href="#programmatic-or-conditional-version-counters" title="Permalink to this headline">¶</a></h2>
+<p>When <code class="docutils literal notranslate"><span class="pre">version_id_generator</span></code> is set to False, we can also programmatically
+(and conditionally) set the version identifier on our object in the same way
+we assign any other mapped attribute.  Such as if we used our UUID example, but
+set <code class="docutils literal notranslate"><span class="pre">version_id_generator</span></code> to <code class="docutils literal notranslate"><span class="pre">False</span></code>, we can set the version identifier
+at our choosing:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">uuid</span>
+
+<span class="k">class</span> <span class="nc">User</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;user&#39;</span>
+
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">version_uuid</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">32</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">__mapper_args__</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;version_id_col&#39;</span><span class="p">:</span><span class="n">version_uuid</span><span class="p">,</span>
+        <span class="s1">&#39;version_id_generator&#39;</span><span class="p">:</span> <span class="kc">False</span>
+    <span class="p">}</span>
+
+<span class="n">u1</span> <span class="o">=</span> <span class="n">User</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;u1&#39;</span><span class="p">,</span> <span class="n">version_uuid</span><span class="o">=</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span>
+
+<span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">u1</span><span class="p">)</span>
+
+<span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+<span class="n">u1</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;u2&#39;</span>
+<span class="n">u1</span><span class="o">.</span><span class="n">version_uuid</span> <span class="o">=</span> <span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span>
+
+<span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span></pre></div>
+</div>
+<p>We can update our <code class="docutils literal notranslate"><span class="pre">User</span></code> object without incrementing the version counter
+as well; the value of the counter will remain unchanged, and the UPDATE
+statement will still check against the previous value.  This may be useful
+for schemes where only certain classes of UPDATE are sensitive to concurrency
+issues:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># will leave version_uuid unchanged</span>
+<span class="n">u1</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;u3&#39;</span>
+<span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span></pre></div>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.9.0: </span>Support for programmatic and conditional version identifier tracking.</p>
+</div>
+</div>
+</div>
+
+    </div>
+
+</div>
+
+<div id="docs-bottom-navigation" class="docs-navigation-links, withsidebar">
+        Previous:
+        <a href="nonstandard_mappings.html" title="previous chapter">Non-Traditional Mappings</a>
+        Next:
+        <a href="mapping_api.html" title="next chapter">Class Mapping API</a>
+
+    <div id="docs-copyright">
+        &copy; <a href="../copyright.html">Copyright</a> 2007-2020, the SQLAlchemy authors and contributors.
+        Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 3.0.3.
+    </div>
+</div>
+
+</div>
+
+
+
+        
+        
+
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+          URL_ROOT:    '../',
+          VERSION:     '1.3.17',
+          COLLAPSE_MODINDEX: false,
+          FILE_SUFFIX: '.html'
+      };
+    </script>
+
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+
+    <!-- begin iterate through sphinx environment script_files -->
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    <!-- end iterate through sphinx environment script_files -->
+
+    <script type="text/javascript" src="../_static/detectmobile.js"></script>
+    <script type="text/javascript" src="../_static/init.js"></script>
+
+
+    </body>
+</html>
+
+

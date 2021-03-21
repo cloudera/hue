@@ -27,9 +27,9 @@ from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.conf import USE_NEW_EDITOR
-from desktop.models import Directory, Document, Document2, Document2Permission
+from desktop.models import Directory, Document2, Document2Permission
 from hadoop import cluster
-from notebook.models import import_saved_beeswax_query, make_notebook
+from notebook.models import import_saved_beeswax_query, make_notebook, MockRequest, _get_example_directory
 from useradmin.models import get_default_user_group, install_sample_user, User
 
 from beeswax.design import hql_query
@@ -56,18 +56,26 @@ class Command(BaseCommand):
       db_name = args[1] if len(args) > 1 else 'default'
       user = User.objects.get(username=pwd.getpwuid(os.getuid()).pw_name)
       request = None
+      self.queries = None
+      self.tables = None
+      interpreter = None
     else:
       dialect = options['dialect']
       db_name = options.get('db_name', 'default')
       interpreter = options.get('interpreter')  # Only when connectors are enabled. Later will deprecate `dialect`.
       user = options['user']
-      request = options['request']
+      request = options.get('request', MockRequest(user=user))
+      self.queries = options.get('queries')
+      self.tables = options.get('tables')  # Optional whitelist of table names
 
-    tables = 'tables_standard.json' if dialect not in ('hive', 'impala') else (
-        'tables_transactional.json' if has_concurrency_support() else 'tables.json'
+    tables = \
+        'tables.json' if dialect not in ('hive', 'impala') else (
+        'tables_transactional.json' if has_concurrency_support() else
+        'tables_standard.json'
     )
     exception = None
 
+    LOG.info('Installing %s samples %s in DB %s owned by user %s' % (dialect, tables, db_name, user))
 
     self.successes = []
     self.errors = []
@@ -76,6 +84,7 @@ class Command(BaseCommand):
       self.install_queries(sample_user, dialect, interpreter=interpreter)
       self.install_tables(user, dialect, db_name, tables, interpreter=interpreter, request=request)
     except Exception as ex:
+      LOG.exception('Dialect %s sample install' % dialect)
       exception = ex
 
     if exception is not None:
@@ -101,18 +110,20 @@ class Command(BaseCommand):
     table_list = [table_dict for table_dict in table_list if dialect in table_dict.get('dialects', [dialect])]
 
     if not table_list:
-      raise InstallException(_('No %s tables are available as samples') % dialect)
+      self.successes.append(_('No %s tables are available as samples') % dialect)
+      return
 
     for table_dict in table_list:
-      full_name = '%s.%s' % (db_name, table_dict['table_name'])
-      try:
-        table = SampleTable(table_dict, dialect, db_name, interpreter=interpreter, request=request)
-        if table.install(django_user):
-          self.successes.append(_('Table %s installed.') % full_name)
-      except Exception as ex:
-        msg = str(ex)
-        LOG.error(msg)
-        self.errors.append(_('Could not install table %s: %s') % (full_name, msg))
+      if self.tables is None or table_dict['table_name'] in self.tables:
+        full_name = '%s.%s' % (db_name, table_dict['table_name'])
+        try:
+          table = SampleTable(table_dict, dialect, db_name, interpreter=interpreter, request=request)
+          if table.install(django_user):
+            self.successes.append(_('Table %s installed.') % full_name)
+        except Exception as ex:
+          msg = str(ex)
+          LOG.error(msg)
+          self.errors.append(_('Could not install table %s: %s') % (full_name, msg))
 
 
   def install_queries(self, django_user, dialect, interpreter=None):
@@ -123,11 +134,19 @@ class Command(BaseCommand):
     # Filter query list to HiveServer2 vs other interfaces
     app_type = HQL if dialect == 'hive' else IMPALA if dialect == 'impala' else RDBMS
     design_list = [d for d in design_list if int(d['type']) == app_type]
+
     if app_type == RDBMS:
       design_list = [d for d in design_list if dialect in d['dialects']]
 
+    if not self.queries:  # Manual install
+      design_list = [d for d in design_list if not d.get('auto_load_only')]
+
+    if self.queries:  # Automated install
+      design_list = [d for d in design_list if d['name'] in self.queries]
+
     if not design_list:
-      raise InstallException(_('No %s queries are available as samples') % dialect)
+      self.successes.append(_('No %s queries are available as samples') % dialect)
+      return
 
     for design_dict in design_list:
       design = SampleQuery(design_dict)
@@ -151,6 +170,7 @@ class SampleTable(object):
     else:
       self.partition_files = None
       self.filename = data_dict['data_file']
+    self._contents_file = None
     self.create_sql = data_dict['create_sql'].strip()
     self.insert_sql = data_dict.get('insert_sql')
     self.dialect = dialect
@@ -159,6 +179,7 @@ class SampleTable(object):
     self.request = request
     self.columns = data_dict.get('columns')
     self.is_transactional = data_dict.get('transactional')
+    self.is_multi_inserts = data_dict.get('is_multi_inserts')
 
     # Sanity check
     self._data_dir = LOCAL_EXAMPLES_DATA_DIR.get()
@@ -167,27 +188,29 @@ class SampleTable(object):
         filepath = os.path.join(self._data_dir, filename)
         self.partition_files[partition_spec] = filepath
         self._check_file_contents(filepath)
-    else:
+    elif self.filename:
       self._contents_file = os.path.join(self._data_dir, self.filename)
       self._check_file_contents(self._contents_file)
 
 
   def install(self, django_user):
-    if has_concurrency_support() and not self.is_transactional:
-      LOG.info('Skipping table %s as non transactional' % self.name)
-      return
-    if not (has_concurrency_support() and self.is_transactional) and not cluster.get_hdfs():
-      raise PopupException('Requiring a File System to load its data')
+    if self.dialect in ('hive', 'impala'):
+      if has_concurrency_support() and not self.is_transactional:
+        LOG.info('Skipping table %s as non transactional' % self.name)
+        return
+      if not (has_concurrency_support() and self.is_transactional) and not cluster.get_hdfs():
+        raise PopupException('Requiring a File System to load its data')
 
     self.create(django_user)
 
     if self.partition_files:
       for partition_spec, filepath in list(self.partition_files.items()):
         self.load_partition(django_user, partition_spec, filepath, columns=self.columns)
-    else:
+    elif self._contents_file:
       self.load(django_user)
 
     return True
+
 
   def create(self, django_user):
     """
@@ -216,19 +239,25 @@ class SampleTable(object):
 
 
   def load(self, django_user):
-    if has_concurrency_support() and self.is_transactional:
+    inserts = []
+
+    if (self.dialect not in ('hive', 'impala') or has_concurrency_support()) and self.is_transactional:
       with open(self._contents_file) as f:
         if self.insert_sql:
-          hql = self.insert_sql
+          sql_insert = self.insert_sql
         else:
-          hql = """
+          sql_insert = """
             INSERT INTO TABLE %(tablename)s
             VALUES %(values)s
             """
-        hql = hql % {
-          'tablename': self.name,
-          'values': self._get_sql_insert_values(f)
-        }
+        values = self._get_sql_insert_values(f)
+        for value in values:
+          inserts.append(
+            sql_insert % {
+              'tablename': self.name,
+              'values': value
+            }
+          )
     else:
       # Upload data to HDFS home of user then load (aka move) it into the Hive table (in the Hive metastore in HDFS).
       hdfs_root_destination = self._get_hdfs_root_destination(django_user)
@@ -240,12 +269,14 @@ class SampleTable(object):
           'tablename': self.name,
           'filename': hdfs_file_destination
         }
+      inserts.append(hql)
 
-    self._load_data_to_table(django_user, hql)
+    for insert in inserts:
+      self._load_data_to_table(django_user, insert)
 
 
   def load_partition(self, django_user, partition_spec, filepath, columns):
-    if has_concurrency_support() and self.is_transactional:
+    if (self.dialect not in ('hive', 'impala') or has_concurrency_support()) and self.is_transactional:
       with open(filepath) as f:
         hql = \
           """
@@ -255,7 +286,7 @@ class SampleTable(object):
           """ % {
             'tablename': self.name,
             'partition_spec': partition_spec,
-            'values': self._get_sql_insert_values(f, columns)
+            'values': ''.join(self._get_sql_insert_values(f, columns))
           }
     else:
       # Upload data found at filepath to HDFS home of user, the load intto a specific partition
@@ -341,18 +372,21 @@ class SampleTable(object):
     )
     job.execute_and_wait(self.request)
 
+
   def _get_sql_insert_values(self, f, columns=None):
     data = f.read()
     dialect = csv.Sniffer().sniff(data)
     reader = csv.reader(data.splitlines(), delimiter=dialect.delimiter)
 
     rows = [
-      ', '.join(
-        col if is_number(col, i, columns) else "'%s'" % col.replace("'", "\\'") for i, col in enumerate(row)
-      ) for row in reader
+      '(%s)' % ', '.join(
+        col if is_number(col, i, columns) else "'%s'" % col.replace("'", "\\'")
+        for i, col in enumerate(row)
+      )
+      for row in reader
     ]
 
-    return ', '.join('(%s)' % row for row in rows)
+    return rows if self.is_multi_inserts else [', '.join(rows)]
 
 
 def is_number(col, i, columns):
@@ -381,39 +415,39 @@ class SampleQuery(object):
       query = SavedQuery.objects.get(owner=django_user, name=self.name, type=self.type)
     except SavedQuery.DoesNotExist:
       query = SavedQuery(owner=django_user, name=self.name, type=self.type, desc=self.desc)
-      # The data field needs to be a string. The sample file writes it
-      # as json (without encoding into a string) for readability.
+      # The data field needs to be a string. The sample file writes it as json (without encoding into a string) for readability.
       query.data = json.dumps(self.data)
       query.save()
       LOG.info('Successfully installed sample design: %s' % (self.name,))
 
     if USE_NEW_EDITOR.get():
-      # Get or create sample user directories
-      home_dir = Directory.objects.get_home_directory(django_user)
-      examples_dir, created = Directory.objects.get_or_create(
-        parent_directory=home_dir,
-        owner=django_user,
-        name=Document2.EXAMPLES_DIR
-      )
+      examples_dir = _get_example_directory(django_user)
 
       document_type = self._document_type(self.type, interpreter)
+      notebook = import_saved_beeswax_query(query, interpreter=interpreter)
+
       try:
-        # Don't overwrite
+        # Could move PK from a uuid in queries.json at some point to handle name changes without duplicating.
+        # And move to a simpler json format at some point.
         doc2 = Document2.objects.get(owner=django_user, name=self.name, type=document_type, is_history=False)
-        # If document exists but has been trashed, recover from Trash
-        if doc2.parent_directory != examples_dir:
+
+        if doc2.parent_directory != examples_dir:  # Recover from Trash or if moved
           doc2.parent_directory = examples_dir
-          doc2.save()
+
+        data = json.loads(doc2.data)
+        data['uuid'] = doc2.uuid
+        doc2.data = json.dumps(data)  # Refresh content
+
+        doc2.save()
       except Document2.DoesNotExist:
-        # Create document from saved query
-        notebook = import_saved_beeswax_query(query, interpreter=interpreter)
+        # Create new example
         data = notebook.get_data()
         data['isSaved'] = True
         uuid = data.get('uuid')
         data = json.dumps(data)
 
         doc2 = Document2.objects.create(
-          uuid=uuid,
+          uuid=uuid,  # Must the same as in the notebook data
           owner=django_user,
           parent_directory=examples_dir,
           name=self.name,
@@ -422,9 +456,11 @@ class SampleQuery(object):
           data=data
         )
 
+        # TODO: FK to connector object
+
       # Share with default group
       examples_dir.share(django_user, Document2Permission.READ_PERM, groups=[get_default_user_group()])
-      LOG.info('Successfully installed sample query: %s' % (self.name,))
+      LOG.info('Successfully installed sample query: %s' % doc2)
 
 
   def _document_type(self, type, interpreter=None):
@@ -433,6 +469,6 @@ class SampleQuery(object):
     elif type == IMPALA:
       return 'query-impala'
     elif interpreter:
-      return 'query-%(type)s' % interpreter
+      return 'query-%(dialect)s' % interpreter
     else:
       return None

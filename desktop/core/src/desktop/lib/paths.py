@@ -43,7 +43,7 @@ def __get_root(*append):
   Returns the root directory of the project.
   """
   if append is None:
-    append = [ ]
+    append = []
   path = os.path.join(
               os.path.dirname(__file__),
               "..", "..", "..", "..", "..",
@@ -91,7 +91,7 @@ def get_run_root(*append):
 
 def get_hadoop_conf_dir_default_config():
   from hadoop.conf import HDFS_CLUSTERS, get_hadoop_conf_dir_default
-  if list(HDFS_CLUSTERS.keys()):
+  if list(HDFS_CLUSTERS.keys()) and HDFS_CLUSTERS[list(HDFS_CLUSTERS.keys())[0]].IS_ENABLED.get():
     yarn_site_path = HDFS_CLUSTERS[list(HDFS_CLUSTERS.keys())[0]].HADOOP_CONF_DIR.get()
   else:
     yarn_site_path = get_hadoop_conf_dir_default()

@@ -16,12 +16,19 @@
 
 import * as ko from 'knockout';
 
-import apiHelper from 'api/apiHelper';
 import componentUtils from 'ko/components/componentUtils';
+import { HUE_DROP_DOWN_COMPONENT } from 'ko/components/ko.dropDown';
+import sqlReferenceRepository from 'sql/reference/sqlReferenceRepository';
+import {
+  CLEAR_UDF_CACHE_EVENT,
+  DESCRIBE_UDF_EVENT,
+  getUdfCategories,
+  UDF_DESCRIBED_EVENT
+} from 'sql/reference/sqlUdfRepository';
+import { CONFIG_REFRESHED_EVENT, filterEditorConnectors } from 'config/hueConfig';
 import huePubSub from 'utils/huePubSub';
-import { PigFunctions, SqlFunctions } from 'sql/sqlFunctions';
 import I18n from 'utils/i18n';
-import { CONFIG_REFRESHED_EVENT, filterEditorConnectors } from 'utils/hueConfig';
+import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
 
 export const NAME = 'assist-functions-panel';
 // prettier-ignore
@@ -30,114 +37,165 @@ const TEMPLATE = `
     <div class="assist-flex-panel">
       <div class="assist-flex-header">
         <div class="assist-inner-header">
-          <div class="function-dialect-dropdown" data-bind="component: { name: 'hue-drop-down', params: { fixedPosition: true, value: activeDialect, entries: availableDialects, linkTitle: '${I18n(
-            'Selected dialect'
-          )}' } }" style="display: inline-block"></div>
+          <div class="function-dialect-dropdown" style="display: inline-block" data-bind="
+              component: {
+                name: '${ HUE_DROP_DOWN_COMPONENT }',
+                params: {
+                  fixedPosition: true,
+                  value: activeConnectorUdfs,
+                  entries: availableConnectorUdfs,
+                  linkTitle: '${I18n('Selected type')}'
+                 }
+              }
+            "></div>
+            <div class="pull-right" style="margin-right: 15px;" data-bind="with: activeConnectorUdfs">
+               <!-- ko ifnot: loading -->
+                 <a class="inactive-action" href="javascript:void(0)" data-bind="click: refresh" title="${I18n('Refresh')}">
+                   <i class="pointer fa fa-refresh"></i>
+                 </a>
+               <!-- /ko -->
+               <!-- ko if: loading -->
+                 <i class="fa fa-refresh fa-spin blue"></i>
+               <!-- /ko -->
+            </div>
         </div>
       </div>
-      <div class="assist-flex-search">
-        <div class="assist-filter">
-          <form autocomplete="off">
-            <input class="clearable" type="text" ${ window.PREVENT_AUTOFILL_INPUT_ATTRS } placeholder="Filter..." data-bind="clearable: query, value: query, valueUpdate: 'afterkeydown'">
-          </form>
-        </div>
-      </div>
-      <div data-bind="css: { 'assist-flex-fill': !selectedFunction(), 'assist-flex-half': selectedFunction() }">
-        <!-- ko ifnot: query -->
-        <ul class="assist-function-categories" data-bind="foreach: activeCategories">
-          <li>
-            <a class="black-link" href="javascript: void(0);" data-bind="toggle: open"><i class="fa fa-fw" data-bind="css: { 'fa-chevron-right': !open(), 'fa-chevron-down': open }"></i> <span data-bind="text: name"></span></a>
-            <ul class="assist-functions" data-bind="slideVisible: open, foreach: functions">
-              <li data-bind="tooltip: { title: description, placement: 'left', delay: 1000 }">
-                <a class="assist-field-link" href="javascript: void(0);" data-bind="draggableText: { text: draggable, meta: { type: 'function' } }, css: { 'blue': $parents[1].selectedFunction() === $data }, multiClick: { click: function () { $parents[1].selectedFunction($data); }, dblClick: function () { huePubSub.publish('editor.insert.at.cursor', { text: draggable }); } }, text: signature"></a>
-              </li>
-            </ul>
-          </li>
-        </ul>
+      <!-- ko with: activeConnectorUdfs -->
+        <!-- ko hueSpinner: { spin: loading, center: true, size: 'large' } --><!-- /ko -->
+        <!-- ko ifnot: loading -->
+          <div class="assist-flex-search">
+            <div class="assist-filter">
+              <form autocomplete="off">
+                <input class="clearable" type="text" ${ window.PREVENT_AUTOFILL_INPUT_ATTRS } placeholder="Filter..." data-bind="clearable: query, value: query, valueUpdate: 'afterkeydown'">
+              </form>
+            </div>
+          </div>
+          <div data-bind="css: { 'assist-flex-fill': !selectedFunction(), 'assist-flex-half': selectedFunction() }">
+            <!-- ko ifnot: query -->
+              <ul class="assist-function-categories" data-bind="foreach: categories">
+                <li>
+                  <a class="black-link" href="javascript: void(0);" data-bind="toggle: open"><i class="fa fa-fw" data-bind="css: { 'fa-chevron-right': !open(), 'fa-chevron-down': open }"></i> <span data-bind="text: name"></span></a>
+                  <ul class="assist-functions" data-bind="slideVisible: open, foreach: functions">
+                    <li data-bind="tooltip: { title: description, placement: 'left', delay: 1000 }">
+                      <a class="assist-field-link" href="javascript: void(0);" data-bind="draggableText: { text: draggable, meta: { type: 'function' } }, css: { 'blue': $parents[1].selectedFunction() === $data }, multiClick: { click: function () { $parents[1].selectedFunction($data); }, dblClick: function () { huePubSub.publish('editor.insert.at.cursor', { text: draggable }); } }, text: signature"></a>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            <!-- /ko -->
+            <!-- ko if: query -->
+              <!-- ko if: filteredFunctions().length > 0 -->
+              <ul class="assist-functions" data-bind="foreach: filteredFunctions">
+                <li data-bind="tooltip: { title: description, placement: 'left', delay: 1000 }">
+                  <a class="assist-field-link" href="javascript: void(0);" data-bind="draggableText: { text: draggable, meta: { type: 'function' } }, css: { 'blue': $parent.selectedFunction() === $data }, multiClick: { click: function () { $parent.selectedFunction($data); }, dblClick: function () { huePubSub.publish('editor.insert.at.cursor', { text: draggable }); } }, html: signatureMatch"></a>
+                </li>
+              </ul>
+              <!-- /ko -->
+              <!-- ko if: filteredFunctions().length === 0 -->
+              <ul class="assist-functions">
+                <li class="assist-no-entries">${I18n('No results found.')}</li>
+              </ul>
+              <!-- /ko -->
+            <!-- /ko -->
+          </div>
+          <!-- ko if: selectedFunction -->
+            <div class="assist-flex-half assist-function-details" data-bind="with: selectedFunction">
+              <!-- ko hueSpinner: { spin: !loaded(), center: true, size: 'large' } --><!-- /ko -->
+              <!-- ko if: loaded -->
+              <div class="assist-panel-close"><button class="close" data-bind="click: function() { $parent.selectedFunction(null); }">&times;</button></div>
+              <div class="assist-function-signature blue" data-bind="draggableText: { text: draggable, meta: { type: 'function' } }, text: signature, event: { 'dblclick': function () { huePubSub.publish('editor.insert.at.cursor', { text: draggable }); } }"></div>
+              <!-- ko if: description -->
+              <div data-bind="html: descriptionMatch"></div>
+              <!-- /ko -->
+              <!-- /ko -->
+            </div>
+          <!-- /ko -->
         <!-- /ko -->
-        <!-- ko if: query -->
-        <!-- ko if: filteredFunctions().length > 0 -->
-        <ul class="assist-functions" data-bind="foreach: filteredFunctions">
-          <li data-bind="tooltip: { title: description, placement: 'left', delay: 1000 }">
-            <a class="assist-field-link" href="javascript: void(0);" data-bind="draggableText: { text: draggable, meta: { type: 'function' } }, css: { 'blue': $parent.selectedFunction() === $data }, multiClick: { click: function () { $parent.selectedFunction($data); }, dblClick: function () { huePubSub.publish('editor.insert.at.cursor', { text: draggable }); } }, html: signatureMatch"></a>
-          </li>
-        </ul>
-        <!-- /ko -->
-        <!-- ko if: filteredFunctions().length === 0 -->
-        <ul class="assist-functions">
-          <li class="assist-no-entries">${I18n('No results found.')}</li>
-        </ul>
-        <!-- /ko -->
-        <!-- /ko -->
-      </div>
-      <!-- ko if: selectedFunction -->
-      <div class="assist-flex-half assist-function-details" data-bind="with: selectedFunction">
-        <div class="assist-panel-close"><button class="close" data-bind="click: function() { $parent.selectedFunction(null); }">&times;</button></div>
-        <div class="assist-function-signature blue" data-bind="draggableText: { text: draggable, meta: { type: 'function' } }, text: signature, event: { 'dblclick': function () { huePubSub.publish('editor.insert.at.cursor', { text: draggable }); } }"></div>
-        <!-- ko if: description -->
-        <div data-bind="html: descriptionMatch"></div>
-        <!-- /ko -->
-      </div>
       <!-- /ko -->
     </div>
   </div>
 `;
 
-class AssistFunctionsPanel {
-  constructor(params) {
-    this.categories = {};
+class ConnectorUdfCategories {
+  constructor(connector) {
+    this.connector = connector;
+    this.loading = ko.observable(true);
+    this.initialized = false;
 
-    this.connector = params.connector;
+    this.label = this.connector.displayName;
 
-    this.activeDialect = ko.observable();
-    this.availableDialects = ko.observableArray();
+    this.categories = ko.observableArray([]);
 
     this.query = ko.observable().extend({ rateLimit: 400 });
+
     this.selectedFunction = ko.observable();
 
-    const selectedFunctionPeDialect = {};
-
-    this.selectedFunction.subscribe(newFunction => {
-      if (newFunction) {
-        selectedFunctionPeDialect[this.activeDialect()] = newFunction;
-        if (!newFunction.category.open()) {
-          newFunction.category.open(true);
+    this.selectedFunction.subscribe(selectedUdf => {
+      if (selectedUdf) {
+        if (!selectedUdf.category.open()) {
+          selectedUdf.category.open(true);
+        }
+        if (!selectedUdf.loaded()) {
+          huePubSub.publish(DESCRIBE_UDF_EVENT, {
+            connector: this.connector,
+            udfName: selectedUdf.name
+          });
         }
       }
     });
 
-    this.activeCategories = ko.observableArray();
+    huePubSub.subscribe(UDF_DESCRIBED_EVENT, details => {
+      // TODO: Show UDFs from databases in the assist functions panel
+      if (!details.database && details.connector.id === this.connector.id) {
+        this.categories().some(category =>
+          category.functions.some(udf => {
+            if (udf.name === details.udf.name) {
+              udf.loaded(details.udf.described);
+              udf.signature(details.udf.signature);
+              udf.signatureMatch(details.udf.signature);
+              udf.description(details.udf.description);
+              udf.descriptionMatch(details.udf.description);
+              udf.loaded(details.udf.described);
+              return true;
+            }
+          })
+        );
+      }
+    });
 
     this.filteredFunctions = ko.pureComputed(() => {
       const result = [];
+      if (this.loading()) {
+        return result;
+      }
       const lowerCaseQuery = this.query().toLowerCase();
       const replaceRegexp = new RegExp('(' + lowerCaseQuery + ')', 'i');
-      this.activeCategories().forEach(category => {
+      this.categories().forEach(category => {
         category.functions.forEach(fn => {
-          if (fn.signature.toLowerCase().indexOf(lowerCaseQuery) === 0) {
+          if (fn.signature().toLowerCase().indexOf(lowerCaseQuery) === 0) {
             fn.weight = 2;
-            fn.signatureMatch(fn.signature.replace(replaceRegexp, '<b>$1</b>'));
-            fn.descriptionMatch(fn.description);
+            fn.signatureMatch(fn.signature().replace(replaceRegexp, '<b>$1</b>'));
+            fn.descriptionMatch(fn.description());
             result.push(fn);
-          } else if (fn.signature.toLowerCase().indexOf(lowerCaseQuery) !== -1) {
+          } else if (fn.signature().toLowerCase().indexOf(lowerCaseQuery) !== -1) {
             fn.weight = 1;
-            fn.signatureMatch(fn.signature.replace(replaceRegexp, '<b>$1</b>'));
-            fn.descriptionMatch(fn.description);
+            fn.signatureMatch(fn.signature().replace(replaceRegexp, '<b>$1</b>'));
+            fn.descriptionMatch(fn.description());
             result.push(fn);
           } else if (
-            fn.description &&
-            fn.description.toLowerCase().indexOf(lowerCaseQuery) !== -1
+            fn.description() &&
+            fn.description().toLowerCase().indexOf(lowerCaseQuery) !== -1
           ) {
-            fn.signatureMatch(fn.signature);
-            fn.descriptionMatch(fn.description.replace(replaceRegexp, '<b>$1</b>'));
+            fn.signatureMatch(fn.signature());
+            fn.descriptionMatch(fn.description().replace(replaceRegexp, '<b>$1</b>'));
             fn.weight = 0;
             result.push(fn);
           } else {
-            if (fn.signatureMatch() !== fn.signature) {
-              fn.signatureMatch(fn.signature);
+            if (fn.signatureMatch() !== fn.signature()) {
+              fn.signatureMatch(fn.signature());
             }
-            if (fn.descriptionMatch() !== fn.desciption) {
-              fn.descriptionMatch(fn.description);
+            if (fn.descriptionMatch() !== fn.description()) {
+              fn.descriptionMatch(fn.description());
             }
           }
         });
@@ -146,86 +204,32 @@ class AssistFunctionsPanel {
         if (a.weight !== b.weight) {
           return b.weight - a.weight;
         }
-        return a.signature.localeCompare(b.signature);
+        return a.signature().localeCompare(b.signature());
       });
       return result;
     });
-
-    this.activeDialect.subscribe(newDialect => {
-      if (newDialect) {
-        this.selectedFunction(selectedFunctionPeDialect[newDialect]);
-        this.activeCategories(this.categories[newDialect]);
-        apiHelper.setInTotalStorage('assist', 'function.panel.active.dialect', newDialect);
-      }
-    });
-
-    const updateDialect = dialect => {
-      this.availableDialects().every(availableDialect => {
-        if (availableDialect.toLowerCase() === dialect) {
-          if (this.activeDialect() !== availableDialect) {
-            this.activeDialect(availableDialect);
-          }
-          return false;
-        }
-        return true;
-      });
-    };
-
-    this.connector.subscribe(connector => {
-      if (connector) {
-        updateDialect(connector.dialect);
-      }
-    });
-
-    const configUpdated = () => {
-      const lastActiveDialect =
-        this.activeDialect() ||
-        apiHelper.getFromTotalStorage('assist', 'function.panel.active.dialect');
-
-      const uniqueDialects = {};
-
-      const configuredDialects = filterEditorConnectors(connector => {
-        const isMatch =
-          !uniqueDialects[connector.dialect] &&
-          (connector.dialect === 'hive' ||
-            connector.dialect === 'impala' ||
-            connector.dialect === 'pig');
-        uniqueDialects[connector.dialect] = true;
-        return isMatch;
-      }).map(connector => connector.dialect);
-      configuredDialects.sort();
-      this.availableDialects(configuredDialects);
-
-      this.availableDialects().forEach(dialect => {
-        this.initFunctions(dialect);
-      });
-
-      if (
-        lastActiveDialect &&
-        this.availableDialects().find(dialect => dialect === lastActiveDialect)
-      ) {
-        this.activeDialect(lastActiveDialect);
-      } else {
-        this.activeDialect(
-          this.availableDialects().length ? this.availableDialects()[0] : undefined
-        );
-      }
-      if (this.connector()) {
-        updateDialect(this.connector().dialect);
-      }
-    };
-
-    configUpdated();
-    huePubSub.subscribe(CONFIG_REFRESHED_EVENT, configUpdated);
   }
 
-  initFunctions(dialect) {
-    this.categories[dialect] = [];
-    const functions =
-      dialect === 'pig'
-        ? PigFunctions.CATEGORIZED_FUNCTIONS
-        : SqlFunctions.CATEGORIZED_FUNCTIONS[dialect.toLowerCase()];
+  async init() {
+    if (this.initialized) {
+      return;
+    }
+    await this.getUdfs();
+    this.initialized = true;
+  }
 
+  async refresh() {
+    this.loading(true);
+    huePubSub.publish(CLEAR_UDF_CACHE_EVENT, {
+      connector: this.connector,
+      callback: this.getUdfs.bind(this)
+    });
+  }
+
+  async getUdfs() {
+    this.loading(true);
+    const categories = [];
+    const functions = await getUdfCategories(sqlReferenceRepository, this.connector);
     functions.forEach(category => {
       const koCategory = {
         name: category.name,
@@ -233,19 +237,92 @@ class AssistFunctionsPanel {
         functions: Object.keys(category.functions).map(key => {
           const fn = category.functions[key];
           return {
+            name: fn.name,
             draggable: fn.draggable,
-            signature: fn.signature,
+            signature: ko.observable(fn.signature),
             signatureMatch: ko.observable(fn.signature),
-            description: fn.description,
-            descriptionMatch: ko.observable(fn.description)
+            description: ko.observable(fn.description),
+            descriptionMatch: ko.observable(fn.description),
+            loaded: ko.observable(fn.described)
           };
         })
       };
       koCategory.functions.forEach(fn => {
         fn.category = koCategory;
       });
-      this.categories[dialect].push(koCategory);
+      categories.push(koCategory);
     });
+    this.categories(categories);
+    this.loading(false);
+  }
+}
+
+class AssistFunctionsPanel {
+  constructor(params) {
+    this.categories = {};
+
+    this.activeConnector = params.activeConnector;
+
+    this.availableConnectorUdfs = ko.observableArray();
+    this.activeConnectorUdfs = ko.observable();
+
+    this.activeConnectorUdfs.subscribe(async activeConnectorUdfs => {
+      await activeConnectorUdfs.init();
+      setInLocalStorage(
+        'assist.function.panel.active.connector.type',
+        activeConnectorUdfs.connector.type
+      );
+    });
+
+    const setCategoriesFromConnector = connector => {
+      this.availableConnectorUdfs().some(availableConnectorUdfs => {
+        if (availableConnectorUdfs.connector.type === connector.type) {
+          this.activeConnectorUdfs(availableConnectorUdfs);
+          return true;
+        }
+      });
+    };
+
+    this.activeConnector.subscribe(connector => {
+      if (connector) {
+        setCategoriesFromConnector(connector);
+      }
+    });
+
+    const configUpdated = () => {
+      const lastActiveConnectorType =
+        (this.activeConnector() && this.activeConnector().type) ||
+        getFromLocalStorage('assist.function.panel.active.connector.type');
+
+      const availableConnectorUdfs = filterEditorConnectors(
+        connector => connector.dialect && sqlReferenceRepository.hasUdfCategories(connector.dialect)
+      ).map(connector => new ConnectorUdfCategories(connector));
+
+      availableConnectorUdfs.sort((a, b) =>
+        a.connector.displayName.localeCompare(b.connector.displayName)
+      );
+
+      this.availableConnectorUdfs(availableConnectorUdfs);
+
+      let activeConnectorUdfs;
+
+      if (lastActiveConnectorType) {
+        activeConnectorUdfs = this.availableConnectorUdfs().find(
+          connectorUdf => connectorUdf.connector.type === lastActiveConnectorType
+        );
+      }
+
+      if (!activeConnectorUdfs && this.availableConnectorUdfs().length) {
+        activeConnectorUdfs = this.availableConnectorUdfs()[0];
+      }
+
+      this.activeConnectorUdfs(activeConnectorUdfs);
+
+      setCategoriesFromConnector(this.activeConnector());
+    };
+
+    configUpdated();
+    huePubSub.subscribe(CONFIG_REFRESHED_EVENT, configUpdated);
   }
 }
 

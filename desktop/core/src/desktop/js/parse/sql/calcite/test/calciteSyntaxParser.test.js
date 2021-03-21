@@ -17,7 +17,7 @@
 import calciteSyntaxParser from '../calciteSyntaxParser';
 
 describe('calciteSyntaxParser.js', () => {
-  const expectedToStrings = function(expected) {
+  const expectedToStrings = function (expected) {
     return expected.map(ex => ex.text);
   };
 
@@ -139,7 +139,8 @@ describe('calciteSyntaxParser.js', () => {
       'DROP',
       'TRUNCATE',
       'UPDATE',
-      'WITH'
+      'WITH',
+      'DESCRIBE'
     ]);
   });
 
@@ -157,7 +158,8 @@ describe('calciteSyntaxParser.js', () => {
       'drop',
       'truncate',
       'update',
-      'with'
+      'with',
+      'describe'
     ]);
   });
 
@@ -168,7 +170,7 @@ describe('calciteSyntaxParser.js', () => {
     expect(result.expectedStatementEnd).toBeTruthy();
   });
 
-  const expectEqualIds = function(beforeA, afterA, beforeB, afterB) {
+  const expectEqualIds = function (beforeA, afterA, beforeB, afterB) {
     const resultA = calciteSyntaxParser.parseSyntax(beforeA, afterA);
     const resultB = calciteSyntaxParser.parseSyntax(beforeB, afterB);
 
@@ -177,7 +179,7 @@ describe('calciteSyntaxParser.js', () => {
     expect(resultA.ruleId).toEqual(resultB.ruleId);
   };
 
-  const expectNonEqualIds = function(beforeA, afterA, beforeB, afterB) {
+  const expectNonEqualIds = function (beforeA, afterA, beforeB, afterB) {
     const resultA = calciteSyntaxParser.parseSyntax(beforeA, afterA);
     const resultB = calciteSyntaxParser.parseSyntax(beforeB, afterB);
 

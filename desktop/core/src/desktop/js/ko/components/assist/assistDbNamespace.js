@@ -17,10 +17,11 @@
 import $ from 'jquery';
 import * as ko from 'knockout';
 
-import apiHelper from 'api/apiHelper';
-import AssistDbEntry from 'ko/components/assist/assistDbEntry';
+import { ASSIST_ACTIVE_DB_CHANGED_EVENT } from './events';
 import dataCatalog from 'catalog/dataCatalog';
+import AssistDbEntry from 'ko/components/assist/assistDbEntry';
 import huePubSub from 'utils/huePubSub';
+import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
 
 class AssistDbNamespace {
   /**
@@ -108,8 +109,16 @@ class AssistDbNamespace {
 
     self.selectedDatabase.subscribe(() => {
       const db = self.selectedDatabase();
+      if (db) {
+        huePubSub.publish(ASSIST_ACTIVE_DB_CHANGED_EVENT, {
+          connector: this.connector,
+          namespace: this.namespace,
+          database: db.name
+        });
+      }
+
       if (window.HAS_OPTIMIZER && db && !db.popularityIndexSet && !self.nonSqlType) {
-        db.catalogEntry.loadOptimizerPopularityForChildren({ silenceErrors: true }).done(() => {
+        db.catalogEntry.loadOptimizerPopularityForChildren({ silenceErrors: true }).then(() => {
           const applyPopularity = () => {
             db.entries().forEach(entry => {
               if (
@@ -147,18 +156,16 @@ class AssistDbNamespace {
         }
         if (!self.navigationSettings.rightAssist) {
           const entry = self.selectedDatabase().catalogEntry;
-          apiHelper.setInTotalStorage(
-            'assist_' + entry.getConnector().id + '_' + entry.namespace.id,
-            'lastSelectedDb',
+          setInLocalStorage(
+            'assist_' + entry.getConnector().id + '_' + entry.namespace.id + '.lastSelectedDb',
             entry.name
           );
           huePubSub.publish('assist.database.set', entry);
         }
       } else {
-        apiHelper.setInTotalStorage(
-          'assist_' + self.connector.id + '_' + self.namespace.id,
-          'lastSelectedDb',
-          ''
+        setInLocalStorage(
+          'assist_' + self.connector.id + '_' + self.namespace.id + '.lastSelectedDb',
+          null
         );
       }
     };
@@ -180,9 +187,8 @@ class AssistDbNamespace {
         self.selectedDatabaseChanged();
         return;
       }
-      let lastSelectedDb = apiHelper.getFromTotalStorage(
-        'assist_' + self.sourceType + '_' + self.namespace.id,
-        'lastSelectedDb'
+      let lastSelectedDb = getFromLocalStorage(
+        'assist_' + self.sourceType + '_' + self.namespace.id + '.lastSelectedDb'
       );
 
       if (!lastSelectedDb && lastSelectedDb !== '') {
@@ -219,11 +225,11 @@ class AssistDbNamespace {
           path: [],
           definition: { type: 'source' }
         })
-        .done(catalogEntry => {
+        .then(catalogEntry => {
           self.catalogEntry = catalogEntry;
           self.catalogEntry
             .getChildren({ silenceErrors: self.navigationSettings.rightAssist })
-            .done(databaseEntries => {
+            .then(databaseEntries => {
               self.dbIndex = {};
               let hasNavMeta = false;
               const dbs = [];
@@ -247,7 +253,9 @@ class AssistDbNamespace {
               });
 
               if (!hasNavMeta && !self.nonSqlType) {
-                self.catalogEntry.loadNavigatorMetaForChildren({ silenceErrors: true });
+                try {
+                  self.catalogEntry.loadNavigatorMetaForChildren({ silenceErrors: true });
+                } catch (err) {}
               }
               self.databases(dbs);
 
@@ -255,10 +263,10 @@ class AssistDbNamespace {
                 callback();
               }
             })
-            .fail(() => {
+            .catch(() => {
               self.hasErrors(true);
             })
-            .always(() => {
+            .finally(() => {
               self.loaded(true);
               self.loadedDeferred.resolve();
               self.loading(false);

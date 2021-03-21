@@ -37,8 +37,7 @@ sf_remove_promo_bar:
 slide_template:
   - default
 categories:
-  - Administration
-  - Development
+  - Dev / API
 ---
 
 Hue is a lightweight Web server that lets you [use Hadoop][1] directly from your browser. Hue is just a ‘view on top of any Hadoop distribution’ and can be installed on any machine.

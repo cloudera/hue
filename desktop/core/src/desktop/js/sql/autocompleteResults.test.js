@@ -17,51 +17,59 @@
 import $ from 'jquery';
 
 import ApiHelper from 'api/apiHelper';
+import * as CatalogApi from 'catalog/api';
+import * as apiUtils from 'sql/reference/apiUtils';
+import { CancellablePromise } from '../api/cancellablePromise';
 import AutocompleteResults from './autocompleteResults';
 import dataCatalog from 'catalog/dataCatalog';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import LOTS_OF_PARSE_RESULTS from './test/lotsOfParseResults';
+import * as sqlUdfRepository from 'sql/reference/sqlUdfRepository';
+import sqlReferenceRepository from 'sql/reference/sqlReferenceRepository';
+import { sleep } from '../utils/hueUtils';
 
 describe('AutocompleteResults.js', () => {
   const failResponse = {
     status: 500
   };
 
-  jest.spyOn(ApiHelper, 'fetchSourceMetadata').mockImplementation(options => {
-    const deferred = $.Deferred();
+  jest.spyOn(CatalogApi, 'fetchSourceMetadata').mockImplementation(options => {
     if (Math.random() < 0.5) {
-      deferred.resolve(failResponse);
-    } else if (options.path.length === 0) {
-      deferred.resolve(JSON.parse('{"status": 0, "databases": ["default"]}'));
-    } else if (options.path.length === 1) {
-      deferred.resolve(
+      return CancellablePromise.reject(failResponse);
+    }
+    if (options.entry.path.length === 0) {
+      return CancellablePromise.resolve(JSON.parse('{"status": 0, "databases": ["default"]}'));
+    }
+    if (options.entry.path.length === 1) {
+      return CancellablePromise.resolve(
         JSON.parse(
           '{"status": 0, "tables_meta": [{"comment": "comment", "type": "Table", "name": "foo"}, {"comment": null, "type": "View", "name": "bar_view"}, {"comment": null, "type": "Table", "name": "bar"}]}'
         )
       );
-    } else if (options.path.length === 2) {
-      deferred.resolve(
+    }
+    if (options.entry.path.length === 2) {
+      return CancellablePromise.resolve(
         JSON.parse(
           '{"status": 0, "support_updates": false, "hdfs_link": "/filebrowser/view=/user/hive/warehouse/customers", "extended_columns": [{"comment": "", "type": "int", "name": "id"}, {"comment": "", "type": "string", "name": "name"}, {"comment": "", "type": "struct<email_format:string,frequency:string,categories:struct<promos:boolean,surveys:boolean>>", "name": "email_preferences"}, {"comment": "", "type": "map<string,struct<street_1:string,street_2:string,city:string,state:string,zip_code:string>>", "name": "addresses"}, {"comment": "", "type": "array<struct<order_id:string,order_date:string,items:array<struct<product_id:int,sku:string,name:string,price:double,qty:int>>>>", "name": "orders"}], "columns": ["id", "name", "email_preferences", "addresses", "orders"], "partition_keys": []}'
         )
       );
-    } else if (options.path.length === 3) {
-      deferred.resolve(
+    }
+    if (options.entry.path.length === 3) {
+      return CancellablePromise.resolve(
         JSON.parse(
           '{"status": 0, "comment": "", "type": "struct", "name": "email_preferences", "fields": [{"type": "string", "name": "email_format"}, {"type": "string", "name": "frequency"}, {"fields": [{"type": "boolean", "name": "promos"}, {"type": "boolean", "name": "surveys"}], "type": "struct", "name": "categories"}]}'
         )
       );
-    } else if (options.path.length > 3) {
-      deferred.resolve(
+    }
+    if (options.entry.path.length > 3) {
+      return CancellablePromise.resolve(
         JSON.parse(
           '{"status": 0, "fields": [{"type": "boolean", "name": "promos"}, {"type": "boolean", "name": "surveys"}], "type": "struct", "name": "categories"}'
         )
       );
-    } else {
-      deferred.reject();
     }
-    return deferred.promise();
+    return CancellablePromise.reject();
   });
 
   jest.spyOn(ApiHelper, 'fetchHdfsPath').mockImplementation(options => {
@@ -227,36 +235,38 @@ describe('AutocompleteResults.js', () => {
     return deferred.promise();
   });
 
+  jest.spyOn(apiUtils, 'fetchUdfs').mockImplementation(() => Promise.resolve([]));
+
   const subject = new AutocompleteResults({
     snippet: {
       autocompleteSettings: {
         temporaryOnly: false
       },
-      type: function() {
+      type: function () {
         return 'hive';
       },
-      connector: function() {
-        return { id: 'hive' };
+      connector: function () {
+        return { id: 'hive', dialect: 'hive' };
       },
-      database: function() {
+      database: function () {
         return 'default';
       },
-      namespace: function() {
+      namespace: function () {
         return { id: 'defaultNamespace' };
       },
-      compute: function() {
+      compute: function () {
         return { id: 'defaultCompute' };
       },
-      whenContextSet: function() {
+      whenContextSet: function () {
         return $.Deferred().resolve();
       }
     },
-    editor: function() {
+    editor: function () {
       return {
-        getTextBeforeCursor: function() {
+        getTextBeforeCursor: function () {
           return 'foo';
         },
-        getTextAfterCursor: function() {
+        getTextAfterCursor: function () {
           return 'bar';
         }
       };
@@ -264,6 +274,24 @@ describe('AutocompleteResults.js', () => {
   });
 
   describe('Test a whole lot of different parse results', () => {
+    const LOADING_OBSERVABLES = [
+      'loadingKeywords',
+      'loadingFunctions',
+      'loadingDatabases',
+      'loadingTables',
+      'loadingColumns',
+      'loadingValues',
+      'loadingPaths',
+      'loadingJoins',
+      'loadingJoinConditions',
+      'loadingAggregateFunctions',
+      'loadingGroupBys',
+      'loadingOrderBys',
+      'loadingFilters',
+      'loadingPopularTables',
+      'loadingPopularColumns'
+    ];
+
     beforeEach(() => {
       dataCatalog.disableCache();
       window.AUTOCOMPLETE_TIMEOUT = 1;
@@ -277,8 +305,8 @@ describe('AutocompleteResults.js', () => {
       dataCatalog.enableCache();
     });
 
-    LOTS_OF_PARSE_RESULTS.forEach(parseResult => {
-      it('should handle parse result no. ' + parseResult.index, () => {
+    for (const parseResult of LOTS_OF_PARSE_RESULTS) {
+      it('should handle parse result no. ' + parseResult.index, async () => {
         if (parseResult.suggestKeywords) {
           const cleanedKeywords = [];
           parseResult.suggestKeywords.forEach(keyword => {
@@ -291,27 +319,35 @@ describe('AutocompleteResults.js', () => {
           parseResult.suggestKeywords = cleanedKeywords;
         }
         try {
-          subject.update(parseResult);
+          await subject.update(parseResult);
         } catch (e) {
           fail('Got exception');
           console.error(e);
         }
         if (subject.loading()) {
-          fail('Still loading, missing ajax spec?');
+          LOADING_OBSERVABLES.forEach(observable => {
+            if (subject[observable]()) {
+              fail('Still loading (' + observable + '() == true), missing ajax spec?');
+            }
+          });
         }
 
         expect(subject.loading()).toBeFalsy();
       });
-    });
+    }
   });
 
-  it('should handle parse results with keywords', () => {
+  it('should handle parse results with keywords', async () => {
     subject.entries([]);
 
     expect(subject.filtered().length).toBe(0);
-    subject.update({
+
+    await subject.update({
       lowerCase: true,
-      suggestKeywords: [{ value: 'BAR', weight: 1 }, { value: 'FOO', weight: 2 }]
+      suggestKeywords: [
+        { value: 'BAR', weight: 1 },
+        { value: 'FOO', weight: 2 }
+      ]
     });
 
     expect(subject.filtered().length).toBe(2);
@@ -322,13 +358,16 @@ describe('AutocompleteResults.js', () => {
     expect(subject.filtered()[1].value).toBe('bar');
   });
 
-  it('should handle parse results with identifiers', () => {
+  it('should handle parse results with identifiers', async () => {
     subject.entries([]);
 
     expect(subject.filtered().length).toBe(0);
-    subject.update({
+    await subject.update({
       lowerCase: false,
-      suggestIdentifiers: [{ name: 'foo', type: 'alias' }, { name: 'bar', type: 'table' }]
+      suggestIdentifiers: [
+        { name: 'foo', type: 'alias' },
+        { name: 'bar', type: 'table' }
+      ]
     });
 
     expect(subject.filtered().length).toBe(2);
@@ -339,18 +378,100 @@ describe('AutocompleteResults.js', () => {
     expect(subject.filtered()[1].value).toBe('foo');
   });
 
-  it('should handle parse results with functions', () => {
+  it('should handle parse results with functions', async () => {
     subject.entries([]);
 
+    const spy = spyOn(sqlUdfRepository, 'getUdfsWithReturnTypes').and.callFake(async () =>
+      Promise.resolve([
+        {
+          name: 'count',
+          returnTypes: ['BIGINT'],
+          arguments: [[{ type: 'T' }]],
+          signature: 'count(col)',
+          draggable: 'count()',
+          description: 'some desc'
+        }
+      ])
+    );
+
     expect(subject.filtered().length).toBe(0);
-    subject.update({
+
+    await subject.update({
       lowerCase: false,
       suggestFunctions: {}
     });
 
-    expect(subject.filtered().length).toBeGreaterThan(0);
+    await sleep(0);
+
+    expect(spy).toHaveBeenCalled();
+
+    expect(subject.filtered().length).toEqual(1);
     expect(subject.filtered()[0].details.arguments).toBeDefined();
     expect(subject.filtered()[0].details.signature).toBeDefined();
     expect(subject.filtered()[0].details.description).toBeDefined();
+  });
+
+  it('should handle parse results with udf argument keywords', async () => {
+    subject.entries([]);
+
+    const spy = spyOn(sqlUdfRepository, 'getArgumentDetailsForUdf').and.callFake(async () =>
+      Promise.resolve([{ type: 'T', keywords: ['a', 'b'] }])
+    );
+
+    expect(subject.filtered().length).toBe(0);
+
+    await subject.update({
+      lowerCase: false,
+      udfArgument: {
+        name: 'someudf',
+        position: 1
+      }
+    });
+
+    await sleep(0);
+
+    expect(spy).toHaveBeenCalled();
+
+    expect(subject.filtered().length).toEqual(2);
+    expect(subject.filtered()[0].value).toEqual('a');
+    expect(subject.filtered()[1].value).toEqual('b');
+  });
+
+  it('should handle parse results set options', async () => {
+    subject.entries([]);
+
+    const spy = spyOn(sqlReferenceRepository, 'getSetOptions').and.callFake(
+      async dialect =>
+        new Promise(resolve => {
+          expect(dialect).toEqual(subject.snippet.connector().dialect);
+          resolve({
+            OPTION_1: {
+              description: 'Desc 1',
+              type: 'Integer',
+              default: 'Some default'
+            },
+            OPTION_2: {
+              description: 'Desc 2',
+              type: 'Integer',
+              default: 'Some default'
+            }
+          });
+        })
+    );
+
+    expect(subject.filtered().length).toBe(0);
+
+    await subject.update({
+      lowerCase: false,
+      suggestSetOptions: {}
+    });
+
+    await sleep(0);
+
+    expect(spy).toHaveBeenCalled();
+
+    expect(subject.filtered().length).toEqual(2);
+    expect(subject.filtered()[0].details.description).toBeDefined();
+    expect(subject.filtered()[1].details.type).toBeDefined();
   });
 });

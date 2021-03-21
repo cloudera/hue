@@ -18,7 +18,7 @@ import solrFormulaParser from './solrFormulaParser';
 
 describe('solrFormulaParser.js', () => {
   describe('autocomplete', () => {
-    const testAutocomplete = function(beforeCursor, afterCursor, expectedResult) {
+    const testAutocomplete = function (beforeCursor, afterCursor, expectedResult) {
       const result = solrFormulaParser.autocompleteSolrFormula(beforeCursor, afterCursor, true);
       if (!expectedResult.locations) {
         delete result.locations;
@@ -108,7 +108,7 @@ describe('solrFormulaParser.js', () => {
   });
 
   describe('parse', () => {
-    const testParse = function(expression, expectedResult) {
+    const testParse = function (expression, expectedResult) {
       const result = solrFormulaParser.parseSolrFormula(expression);
 
       expect(result).toBeTruthy();

@@ -56,6 +56,17 @@ var Bundle = function (vm, bundle) {
 var BundleEditorViewModel = function (bundle_json, coordinators_json, can_edit_json) {
   var self = this;
 
+  self.sharingEnabled = ko.observable(false);
+
+  var updateFromConfig = function (hueConfig) {
+    self.sharingEnabled(
+      hueConfig && (hueConfig.hue_config.is_admin || hueConfig.hue_config.enable_sharing)
+    );
+  };
+
+  updateFromConfig(window.getLastKnownConfig());
+  huePubSub.subscribe('cluster.config.set.config', updateFromConfig);
+
   self.canEdit = ko.mapping.fromJS(can_edit_json);
   self.isEditing = ko.observable(bundle_json.id == null);
   self.isEditing.subscribe(function (newVal) {

@@ -81,7 +81,11 @@ class QueryApi(Api):
         'progress': job['progress'],
         'isRunning': job['start_time'] > job['end_time'],
         'canWrite': job in jobs['in_flight_queries'],
-        'duration': self._time_in_ms_groups(re.search(r"\s*(([\d.]*)([a-z]*))(([\d.]*)([a-z]*))?(([\d.]*)([a-z]*))?", job['duration'], re.MULTILINE).groups()),
+        'duration': self._time_in_ms_groups(
+            re.search(r"\s*(([\d.]*)([a-z]*))(([\d.]*)([a-z]*))?(([\d.]*)([a-z]*))?",
+            job['duration'],
+            re.MULTILINE
+        ).groups()),
         'submitted': job['start_time'],
         # Extra specific
         'rows_fetched': job['rows_fetched'],
@@ -129,7 +133,9 @@ class QueryApi(Api):
     app = apps.get('apps')[0]
     progress_groups = re.search(r"([\d\.\,]+)%", app.get('progress'))
     app.update({
-      'progress': float(progress_groups.group(1)) if progress_groups and progress_groups.group(1) else 100 if self._api_status(app.get('status')) in ['SUCCEEDED', 'FAILED'] else 1,
+      'progress': float(progress_groups.group(1)) \
+          if progress_groups and progress_groups.group(1) else 100 \
+            if self._api_status(app.get('status')) in ['SUCCEEDED', 'FAILED'] else 1,
       'type': 'queries',
       'doc_url': "%s/query_plan?query_id=%s" % (self.api.url, appid),
       'properties': {
@@ -148,7 +154,6 @@ class QueryApi(Api):
     message = {'message': '', 'status': 0}
 
     if action.get('action') == 'kill':
-
       for _id in appid:
         result = self.api.kill(_id)
         if result.get('error'):
@@ -204,38 +209,38 @@ class QueryApi(Api):
     try:
       query['metrics'] = self._metrics(appid)
     except Exception as e:
-      query['metrics'] = {'nodes' : {}}
+      query['metrics'] = {'nodes': {}}
       LOG.exception('Could not parse profile: %s' % e)
 
     if query.get('plan_json'):
-      def get_exchange_icon (o):
+      def get_exchange_icon(o):
         if re.search(r'broadcast', o['label_detail'], re.IGNORECASE):
-          return { 'svg': 'hi-broadcast' }
+          return {'svg': 'hi-broadcast'}
         elif re.search(r'hash', o['label_detail'], re.IGNORECASE):
-          return { 'svg': 'hi-random' }
+          return {'svg': 'hi-random'}
         else:
-          return { 'svg': 'hi-exchange' }
-      def get_sigma_icon (o):
+          return {'svg': 'hi-exchange'}
+      def get_sigma_icon(o):
         if re.search(r'streaming', o['label_detail'], re.IGNORECASE):
-          return { 'svg': 'hi-sigma' }
+          return {'svg': 'hi-sigma'}
         else:
-          return { 'svg': 'hi-sigma' }
+          return {'svg': 'hi-sigma'}
       mapping = {
-        'TOP-N': { 'type': 'TOPN', 'icon': { 'svg': 'hi-filter' } },
-        'SORT': { 'type': 'SORT', 'icon': { 'svg': 'hi-sort' } },
-        'MERGING-EXCHANGE': {'type': 'EXCHANGE', 'icon': { 'fn': get_exchange_icon } },
-        'EXCHANGE': { 'type': 'EXCHANGE', 'icon': { 'fn': get_exchange_icon } },
-        'SCAN HDFS': { 'type': 'SCAN_HDFS', 'icon': { 'svg': 'hi-copy' } },
-        'SCAN KUDU': { 'type': 'SCAN_KUDU', 'icon': { 'svg': 'hi-table' } },
-        'SCAN HBASE': { 'type': 'SCAN_HBASE', 'icon': { 'font': 'fa-th-large' } },
-        'HASH JOIN': { 'type': 'HASH_JOIN', 'icon': { 'svg': 'hi-join' } },
-        'AGGREGATE': { 'type': 'AGGREGATE', 'icon': { 'fn': get_sigma_icon } },
-        'NESTED LOOP JOIN': { 'type': 'LOOP_JOIN', 'icon': { 'svg': 'hi-nested-loop' } },
-        'SUBPLAN': { 'type': 'SUBPLAN', 'icon': { 'svg': 'hi-map' } },
-        'UNNEST': { 'type': 'UNNEST', 'icon': { 'svg': 'hi-unnest' } },
-        'SINGULAR ROW SRC': { 'type': 'SINGULAR', 'icon': { 'svg': 'hi-vertical-align' } },
-        'ANALYTIC': { 'type': 'SINGULAR', 'icon': { 'svg': 'hi-timeline' } },
-        'UNION': { 'type': 'UNION', 'icon': { 'svg': 'hi-merge' } }
+        'TOP-N': {'type': 'TOPN', 'icon': {'svg': 'hi-filter'}},
+        'SORT': {'type': 'SORT', 'icon': {'svg': 'hi-sort'}},
+        'MERGING-EXCHANGE': {'type': 'EXCHANGE', 'icon': {'fn': get_exchange_icon}},
+        'EXCHANGE': {'type': 'EXCHANGE', 'icon': {'fn': get_exchange_icon}},
+        'SCAN HDFS': {'type': 'SCAN_HDFS', 'icon': {'svg': 'hi-copy'}},
+        'SCAN KUDU': {'type': 'SCAN_KUDU', 'icon': {'svg': 'hi-table'}},
+        'SCAN HBASE': {'type': 'SCAN_HBASE', 'icon': {'font': 'fa-th-large'}},
+        'HASH JOIN': {'type': 'HASH_JOIN', 'icon': {'svg': 'hi-join'}},
+        'AGGREGATE': {'type': 'AGGREGATE', 'icon': {'fn': get_sigma_icon}},
+        'NESTED LOOP JOIN': {'type': 'LOOP_JOIN', 'icon': {'svg': 'hi-nested-loop'}},
+        'SUBPLAN': {'type': 'SUBPLAN', 'icon': {'svg': 'hi-map'}},
+        'UNNEST': {'type': 'UNNEST', 'icon': {'svg': 'hi-unnest'}},
+        'SINGULAR ROW SRC': {'type': 'SINGULAR', 'icon': {'svg': 'hi-vertical-align'}},
+        'ANALYTIC': {'type': 'SINGULAR', 'icon': {'svg': 'hi-timeline'}},
+        'UNION': {'type': 'UNION', 'icon': {'svg': 'hi-merge'}}
       }
       def process(node, mapping=mapping):
         node['id'], node['name'] = node['label'].split(':')
@@ -286,25 +291,28 @@ class QueryApi(Api):
     filter_list = []
     if filters.get("text"):
       filter_names = {
-        'user':'effective_user',
-        'id':'query_id',
-        'name':'state',
-        'type':'stmt_type',
-        'status':'status'
+        'user': 'effective_user',
+        'id': 'query_id',
+        'name': 'state',
+        'type': 'stmt_type',
+        'status': 'status'
       }
 
       def make_lambda(name, value):
         return lambda app: app[name] == value
 
       for key, name in list(filter_names.items()):
-          text_filter = re.search(r"\s*("+key+")\s*:([^ ]+)", filters.get("text"))
-          if text_filter and text_filter.group(1) == key:
-            filter_list.append(make_lambda(name, text_filter.group(2).strip()))
+        text_filter = re.search(r"\s*("+key+")\s*:([^ ]+)", filters.get("text"))
+        if text_filter and text_filter.group(1) == key:
+          filter_list.append(make_lambda(name, text_filter.group(2).strip()))
     if filters.get("time"):
       time_filter = filters.get("time")
       period_ms = self._time_in_ms(float(time_filter.get("time_value")), time_filter.get("time_unit")[0:1])
       current_ms = time.time() * 1000.0
-      filter_list.append(lambda app: current_ms - (time.mktime(datetime.strptime(app['start_time'][:26], '%Y-%m-%d %H:%M:%S.%f').timetuple()) * 1000) < period_ms)
+      filter_list.append(
+          lambda app: current_ms - (time.mktime(datetime.strptime(app['start_time'][:26], '%Y-%m-%d %H:%M:%S.%f').timetuple()) * 1000)
+            < period_ms
+      )
     if filters.get("states"):
       filter_list.append(lambda app: self._api_status_filter(app['state']).lower() in filters.get("states"))
 

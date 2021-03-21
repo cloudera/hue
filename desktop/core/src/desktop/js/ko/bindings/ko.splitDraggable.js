@@ -18,23 +18,24 @@ import $ from 'jquery';
 import * as ko from 'knockout';
 
 import huePubSub from 'utils/huePubSub';
+import { hueLocalStorage } from 'utils/storageUtils';
 
 ko.bindingHandlers.splitDraggable = {
-  init: function(element, valueAccessor) {
+  init: function (element, valueAccessor) {
     const options = ko.unwrap(valueAccessor());
     let leftPanelWidth =
-      $.totalStorage(options.appName + '_left_panel_width') != null
-        ? Math.max($.totalStorage(options.appName + '_left_panel_width'), 250)
+      hueLocalStorage(options.appName + '_left_panel_width') != null
+        ? Math.max(hueLocalStorage(options.appName + '_left_panel_width'), 250)
         : 250;
     let rightPanelWidth =
-      $.totalStorage(options.appName + '_right_panel_width') != null
-        ? Math.max($.totalStorage(options.appName + '_right_panel_width'), 250)
+      hueLocalStorage(options.appName + '_right_panel_width') != null
+        ? Math.max(hueLocalStorage(options.appName + '_right_panel_width'), 250)
         : 290;
 
     const containerSelector = options.containerSelector || '.panel-container';
     const contentPanelSelector = options.contentPanelSelector || '.content-panel';
 
-    const onPosition = options.onPosition || function() {};
+    const onPosition = options.onPosition || function () {};
 
     const hasLeftPanel = !!options.leftPanelVisible;
     const hasRightPanel = !!options.rightPanelVisible;
@@ -47,7 +48,7 @@ ko.bindingHandlers.splitDraggable = {
     const $contentPanel = $(contentPanelSelector);
     const $container = $(containerSelector);
 
-    const positionPanels = function() {
+    const positionPanels = function () {
       if (isRightPanel) {
         const oppositeWidth =
           hasLeftPanel && ko.unwrap(options.leftPanelVisible)
@@ -116,7 +117,7 @@ ko.bindingHandlers.splitDraggable = {
     $resizer.draggable({
       axis: 'x',
       containment: $container,
-      drag: function(event, ui) {
+      drag: function (event, ui) {
         if (isRightPanel) {
           ui.position.left = Math.min($container.width() - 200, ui.position.left);
         } else {
@@ -152,11 +153,11 @@ ko.bindingHandlers.splitDraggable = {
           onPosition();
         }, 10);
       },
-      stop: function() {
+      stop: function () {
         if (isRightPanel) {
-          $.totalStorage(options.appName + '_right_panel_width', rightPanelWidth);
+          hueLocalStorage(options.appName + '_right_panel_width', rightPanelWidth);
         } else {
-          $.totalStorage(options.appName + '_left_panel_width', leftPanelWidth);
+          hueLocalStorage(options.appName + '_left_panel_width', leftPanelWidth);
         }
         window.setTimeout(positionPanels, 100);
         huePubSub.publish('split.panel.resized');

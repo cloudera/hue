@@ -15,8 +15,8 @@
 // limitations under the License.
 
 import $ from 'jquery';
-
-import hueUtils from 'utils/hueUtils';
+import { escapeOutput } from 'utils/hueUtils';
+import { hueLocalStorage } from 'utils/storageUtils';
 
 /*
  * jHue HDFS autocomplete plugin
@@ -26,9 +26,9 @@ import hueUtils from 'utils/hueUtils';
 const pluginName = 'jHueHdfsAutocomplete',
   defaults = {
     home: '/',
-    onEnter: function() {},
-    onBlur: function() {},
-    onPathChange: function() {},
+    onEnter: function () {},
+    onBlur: function () {},
+    onPathChange: function () {},
     smartTooltip: '',
     smartTooltipThreshold: 10, // needs 10 up/down or click actions and no tab to activate the smart tooltip
     showOnFocus: false,
@@ -48,7 +48,7 @@ function Plugin(element, options) {
   this.init();
 }
 
-Plugin.prototype.init = function() {
+Plugin.prototype.init = function () {
   const _this = this;
   const _el = $(_this.element);
   _el.addClass('jHueAutocompleteElement');
@@ -106,16 +106,12 @@ Plugin.prototype.init = function() {
   });
 
   function smartTooltipMaker() {
-    if (
-      _this.options.smartTooltip != '' &&
-      typeof $.totalStorage != 'undefined' &&
-      $.totalStorage('jHueHdfsAutocompleteTooltip') != -1
-    ) {
+    if (_this.options.smartTooltip !== '' && hueLocalStorage('jHueHdfsAutocompleteTooltip') != -1) {
       let cnt = 0;
-      if ($.totalStorage('jHueHdfsAutocompleteTooltip') != null) {
-        cnt = $.totalStorage('jHueHdfsAutocompleteTooltip') + 1;
+      if (hueLocalStorage('jHueHdfsAutocompleteTooltip') != null) {
+        cnt = hueLocalStorage('jHueHdfsAutocompleteTooltip') + 1;
       }
-      $.totalStorage('jHueHdfsAutocompleteTooltip', cnt);
+      hueLocalStorage('jHueHdfsAutocompleteTooltip', cnt);
       if (cnt >= _this.options.smartTooltipThreshold) {
         _el
           .tooltip({
@@ -128,7 +124,7 @@ Plugin.prototype.init = function() {
         window.setTimeout(() => {
           _el.tooltip('hide');
         }, 10000);
-        $.totalStorage('jHueHdfsAutocompleteTooltip', -1);
+        hueLocalStorage('jHueHdfsAutocompleteTooltip', -1);
       }
     }
   }
@@ -158,7 +154,7 @@ Plugin.prototype.init = function() {
 
   let _hdfsAutocompleteSelectedIndex = -1;
   let _filterTimeout = -1;
-  _el.keyup(function(e) {
+  _el.keyup(function (e) {
     window.clearTimeout(_filterTimeout);
     if ($.inArray(e.keyCode, [38, 40, 13, 32, 191]) == -1) {
       _hdfsAutocompleteSelectedIndex = -1;
@@ -168,13 +164,8 @@ Plugin.prototype.init = function() {
           path = path.substr(path.lastIndexOf('/') + 1);
         }
         $('#jHueHdfsAutocomplete ul li').show();
-        $('#jHueHdfsAutocomplete ul li').each(function() {
-          if (
-            $(this)
-              .text()
-              .trim()
-              .indexOf(path) != 0
-          ) {
+        $('#jHueHdfsAutocomplete ul li').each(function () {
+          if ($(this).text().trim().indexOf(path) != 0) {
             $(this).hide();
           }
         });
@@ -201,12 +192,9 @@ Plugin.prototype.init = function() {
         .eq(_hdfsAutocompleteSelectedIndex)
         .addClass('active');
       $('#jHueHdfsAutocomplete .popover-content').scrollTop(
-        $('#jHueHdfsAutocomplete ul li:visible')
-          .eq(_hdfsAutocompleteSelectedIndex)
-          .prevAll().length *
-          $('#jHueHdfsAutocomplete ul li:visible')
-            .eq(_hdfsAutocompleteSelectedIndex)
-            .outerHeight()
+        $('#jHueHdfsAutocomplete ul li:visible').eq(_hdfsAutocompleteSelectedIndex).prevAll()
+          .length *
+          $('#jHueHdfsAutocomplete ul li:visible').eq(_hdfsAutocompleteSelectedIndex).outerHeight()
       );
     }
     if ((e.keyCode == 32 && e.ctrlKey) || e.keyCode == 191) {
@@ -215,9 +203,7 @@ Plugin.prototype.init = function() {
     }
     if (e.keyCode == 13) {
       if (_hdfsAutocompleteSelectedIndex > -1) {
-        $('#jHueHdfsAutocomplete ul li:visible')
-          .eq(_hdfsAutocompleteSelectedIndex)
-          .click();
+        $('#jHueHdfsAutocomplete ul li:visible').eq(_hdfsAutocompleteSelectedIndex).click();
       } else {
         _this.options.onEnter($(this));
       }
@@ -265,11 +251,11 @@ Plugin.prototype.init = function() {
             }
             _currentFiles.push(
               '<li class="hdfsAutocompleteItem" data-value="' +
-                hueUtils.escapeOutput(item.name) +
+                escapeOutput(item.name) +
                 '"><i class="fa ' +
                 ico +
                 '"></i> ' +
-                hueUtils.escapeOutput(item.name) +
+                escapeOutput(item.name) +
                 '</li>'
             );
           }
@@ -279,18 +265,13 @@ Plugin.prototype.init = function() {
             .css('top', _el.offset().top + _el.outerHeight() - 1)
             .css('left', _el.offset().left)
             .width(_el.outerWidth() - 4);
-          $('#jHueHdfsAutocomplete')
-            .find('ul')
-            .empty()
-            .html(_currentFiles.join(''));
+          $('#jHueHdfsAutocomplete').find('ul').empty().html(_currentFiles.join(''));
           $('#jHueHdfsAutocomplete')
             .find('li')
-            .on('click', function(e) {
+            .on('click', function (e) {
               smartTooltipMaker();
               e.preventDefault();
-              const item = $(this)
-                .text()
-                .trim();
+              const item = $(this).text().trim();
               if (item == '..') {
                 // one folder up
                 path = path.substring(0, path.lastIndexOf('/'));
@@ -298,11 +279,7 @@ Plugin.prototype.init = function() {
                 path = path + (path.charAt(path.length - 1) == '/' ? '' : '/') + item;
               }
               _el.val(base + path);
-              if (
-                $(this)
-                  .html()
-                  .indexOf('folder') > -1
-              ) {
+              if ($(this).html().indexOf('folder') > -1) {
                 _el.val(_el.val() + '/');
                 _this.options.onPathChange(_el.val());
                 showHdfsAutocomplete();
@@ -332,31 +309,15 @@ Plugin.prototype.init = function() {
     const possibleMatches = [];
     for (let i = 0; i < _currentFiles.length; i++) {
       if (
-        ($(_currentFiles[i])
-          .text()
-          .trim()
-          .indexOf(lastChars) == 0 ||
-          lastChars == '') &&
-        $(_currentFiles[i])
-          .text()
-          .trim() != '..'
+        ($(_currentFiles[i]).text().trim().indexOf(lastChars) == 0 || lastChars == '') &&
+        $(_currentFiles[i]).text().trim() != '..'
       ) {
         possibleMatches.push(_currentFiles[i]);
       }
     }
     if (possibleMatches.length == 1) {
-      _el.val(
-        _el.val() +
-          $(possibleMatches[0])
-            .text()
-            .trim()
-            .substr(lastChars.length)
-      );
-      if (
-        $(possibleMatches[0])
-          .html()
-          .indexOf('folder') > -1
-      ) {
+      _el.val(_el.val() + $(possibleMatches[0]).text().trim().substr(lastChars.length));
+      if ($(possibleMatches[0]).html().indexOf('folder') > -1) {
         _el.val(_el.val() + '/');
         showHdfsAutocomplete();
       }
@@ -364,11 +325,7 @@ Plugin.prototype.init = function() {
       // finds the longest common prefix
       const possibleMatchesPlain = [];
       for (let z = 0; z < possibleMatches.length; z++) {
-        possibleMatchesPlain.push(
-          $(possibleMatches[z])
-            .text()
-            .trim()
-        );
+        possibleMatchesPlain.push($(possibleMatches[z]).text().trim());
       }
       const arr = possibleMatchesPlain.slice(0).sort();
       const word1 = arr[0];
@@ -384,12 +341,12 @@ Plugin.prototype.init = function() {
   }
 };
 
-Plugin.prototype.setOptions = function(options) {
+Plugin.prototype.setOptions = function (options) {
   this.options = $.extend({}, defaults, options);
 };
 
-$.fn[pluginName] = function(options) {
-  return this.each(function() {
+$.fn[pluginName] = function (options) {
+  return this.each(function () {
     if (!$.data(this, 'plugin_' + pluginName)) {
       $.data(this, 'plugin_' + pluginName, new Plugin(this, options));
     } else {
@@ -398,7 +355,7 @@ $.fn[pluginName] = function(options) {
   });
 };
 
-$[pluginName] = function(options) {
+$[pluginName] = function (options) {
   if (typeof console != 'undefined') {
     console.warn('$(elem).jHueHdfsAutocomplete() is a preferred call method.');
   }

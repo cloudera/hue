@@ -503,6 +503,17 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
     huePubSub.publish('oozie.draggable.section.change', newVal);
   });
 
+  self.sharingEnabled = ko.observable(false);
+
+  var updateFromConfig = function (hueConfig) {
+    self.sharingEnabled(
+      hueConfig && (hueConfig.hue_config.is_admin || hueConfig.hue_config.enable_sharing)
+    );
+  };
+
+  updateFromConfig(window.getLastKnownConfig());
+  huePubSub.subscribe('cluster.config.set.config', updateFromConfig);
+
   self.canEdit = ko.mapping.fromJS(can_edit_json);
   self.isEditing = ko.observable(workflow_json.id == null);
   self.isEditing.subscribe(function (newVal) {
@@ -1275,6 +1286,12 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
           $painter = $workflowWidgets;
           heightCorrection = $workflowWidgets.scrollTop();
           widthCorrection = $workflowWidgets.scrollLeft();
+        }
+       var $jobBrowserGraphTab = $('#workflow-page-graph');
+        if ($jobBrowserGraphTab.length > 0) {
+          $painter = $jobBrowserGraphTab;
+          heightCorrection = $jobBrowserGraphTab.scrollTop();
+          widthCorrection = $jobBrowserGraphTab.scrollLeft();
         }
 
         var _fromCenter = {

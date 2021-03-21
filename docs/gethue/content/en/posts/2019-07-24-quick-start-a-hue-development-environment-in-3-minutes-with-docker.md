@@ -39,7 +39,6 @@ sf_remove_promo_bar:
 ampforwp-amp-on-off:
   - default
 categories:
-  - Administration
   - Version 4
   # - Version 4.5
 
@@ -48,45 +47,33 @@ Looking at simplifying the usage of Databases and Datawarehouses or learning how
 
 Typically the development is made [natively][1] but here is a new way to quickly get started with Docker:
 
-&nbsp;
+    git clone https://github.com/cloudera/hue.git
 
-<pre><code class="bash">git clone https://github.com/cloudera/hue.git
+    cd hue
 
-cd hue
+    cp desktop/conf/pseudo-distributed.ini.tmpl desktop/conf/pseudo-distributed.ini
 
-cp desktop/conf/pseudo-distributed.ini.tmpl desktop/conf/pseudo-distributed.ini
+Then edit the `[[database]]` section to specify a proper database, here MySql:
 
-</code></pre>
+    host=127.0.0.1 # Not localhost if Docker
+    engine=mysql
+    user=hue
+    password=hue
+    name=huedb
 
-Then edit the [[database]] section to specify a proper database, here MySql:
 
-<div>
-<pre><code class="bash">
-host=127.0.0.1 # Not localhost if Docker
-engine=mysql
-user=hue
-password=hue
-name=huedb
-</code></pre>
-</div>
+Then map the local Hue source code into the running container (so that local edits are seen in the running Hue):
 
-<div>
-</div>
+    sudo docker run -it -v $PWD/apps:/usr/share/hue/apps -v $PWD/desktop:/usr/share/hue/desktop -v $PWD/desktop/conf/pseudo-distributed.ini:/usr/share/hue/desktop/conf/z-hue.ini --network="host" gethue/hue
 
-<div>
-  Then map the local Hue source code into the running container (so that local edits are seen in the running Hue):
-</div>
-
-<pre><code class="bash">sudo docker run -it -v $PWD/apps:/usr/share/hue/apps -v $PWD/desktop:/usr/share/hue/desktop -v $PWD/desktop/conf/pseudo-distributed.ini:/usr/share/hue/desktop/conf/z-hue.ini --network="host" gethue/hue</code></pre>
-
-Then open-up <http://127.0.0.1:8888>!
+And open-up <http://127.0.0.1:8888>!
 
 <a href="https://cdn.gethue.com/uploads/2017/12/Screen-Shot-2017-11-15-at-3.34.20-PM.png"><img src="https://cdn.gethue.com/uploads/2017/12/Screen-Shot-2017-11-15-at-3.34.20-PM.png" /></a>
 
 
 Note: code updates won&#8217;t be seen after the Docker container runs. For this Hue would need to be [started][3] in dev server mode by replacing the line by
 
-<pre><code class="bash">./build/env/bin/hue runserver 0.0.0.0:8888</code></pre>
+    ./build/env/bin/hue runserver 0.0.0.0:8888
 
 and it will auto-restart on Python code changes. For JavaScript, those would need to be [compiled][4].
 

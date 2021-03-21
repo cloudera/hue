@@ -19,8 +19,9 @@ import * as ko from 'knockout';
 import huePubSub from 'utils/huePubSub';
 
 ko.bindingHandlers.appAwareTemplateContextMenu = {
-  init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+  init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
     viewModel.$currentApp = ko.observable('');
+    viewModel.$containerContext = valueAccessor().containerContext || bindingContext;
     huePubSub.publish('get.current.app.name', viewModel.$currentApp);
     huePubSub.subscribe('set.current.app.name', viewModel.$currentApp);
     ko.bindingHandlers.templateContextMenu.init(

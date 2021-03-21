@@ -17,7 +17,7 @@
 import flinkSyntaxParser from '../flinkSyntaxParser';
 
 describe('flinkSyntaxParser.js', () => {
-  const expectedToStrings = function(expected) {
+  const expectedToStrings = function (expected) {
     return expected.map(ex => ex.text);
   };
 
@@ -135,11 +135,13 @@ describe('flinkSyntaxParser.js', () => {
       'ALTER',
       'INSERT',
       'CREATE',
+      'SHOW',
       'USE',
       'DROP',
       'TRUNCATE',
       'UPDATE',
-      'WITH'
+      'WITH',
+      'DESCRIBE'
     ]);
   });
 
@@ -153,11 +155,13 @@ describe('flinkSyntaxParser.js', () => {
       'alter',
       'insert',
       'create',
+      'show',
       'use',
       'drop',
       'truncate',
       'update',
-      'with'
+      'with',
+      'describe'
     ]);
   });
 
@@ -168,7 +172,7 @@ describe('flinkSyntaxParser.js', () => {
     expect(result.expectedStatementEnd).toBeTruthy();
   });
 
-  const expectEqualIds = function(beforeA, afterA, beforeB, afterB) {
+  const expectEqualIds = function (beforeA, afterA, beforeB, afterB) {
     const resultA = flinkSyntaxParser.parseSyntax(beforeA, afterA);
     const resultB = flinkSyntaxParser.parseSyntax(beforeB, afterB);
 
@@ -177,7 +181,7 @@ describe('flinkSyntaxParser.js', () => {
     expect(resultA.ruleId).toEqual(resultB.ruleId);
   };
 
-  const expectNonEqualIds = function(beforeA, afterA, beforeB, afterB) {
+  const expectNonEqualIds = function (beforeA, afterA, beforeB, afterB) {
     const resultA = flinkSyntaxParser.parseSyntax(beforeA, afterA);
     const resultB = flinkSyntaxParser.parseSyntax(beforeB, afterB);
 
@@ -204,5 +208,40 @@ describe('flinkSyntaxParser.js', () => {
     );
 
     expectNonEqualIds('slelect ', '', 'select * form ', '');
+  });
+
+  it('should not find errors for "DESCRIBE tbl"', () => {
+    const result = flinkSyntaxParser.parseSyntax('DESCRIBE tbl;', '');
+    expect(result).toBeFalsy();
+  });
+
+  it('should not find errors for "DESCRIBE db.tbl"', () => {
+    const result = flinkSyntaxParser.parseSyntax('DESCRIBE db.tbl;', '');
+    expect(result).toBeFalsy();
+  });
+
+  it('should not find errors for "DESCRIBE ctlg.db.tbl"', () => {
+    const result = flinkSyntaxParser.parseSyntax('DESCRIBE ctlg.db.tbl;', '');
+    expect(result).toBeFalsy();
+  });
+
+  it('should find errors for "DESCRIBE fake.ctlg.db.tbl"', () => {
+    const result = flinkSyntaxParser.parseSyntax('DESCRIBE fake.ctlg.db.tbl;', '');
+    expect(result.incompleteStatement).toBeTruthy();
+  });
+
+  it('should report incomplete statement for "DESCRIBE"', () => {
+    const result = flinkSyntaxParser.parseSyntax('DESCRIBE', '');
+    expect(result.incompleteStatement).toBeTruthy();
+  });
+
+  it('should report incomplete statement for "DESCRIBE db.;"', () => {
+    const result = flinkSyntaxParser.parseSyntax('DESCRIBE db.;', '');
+    expect(result.incompleteStatement).toBeTruthy();
+  });
+
+  it('should report incomplete statement for "DESCRIBE ctlg.db.;"', () => {
+    const result = flinkSyntaxParser.parseSyntax('DESCRIBE ctlg.db.;', '');
+    expect(result.incompleteStatement).toBeTruthy();
   });
 });

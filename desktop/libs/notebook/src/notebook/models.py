@@ -31,17 +31,17 @@ from datetime import timedelta
 from django.contrib.sessions.models import Session
 from django.db.models import Count
 from django.db.models.functions import Trunc
-from django.urls import reverse
 from django.utils.html import escape
 from django.utils.translation import ugettext as _
 
-
 from desktop.conf import has_connectors, TASK_SERVER
+from desktop.lib.connectors.models import _get_installed_connectors
 from desktop.lib.i18n import smart_unicode
 from desktop.lib.paths import SAFE_CHARACTERS_URI
-from desktop.models import Document2
-from useradmin.models import User
+from desktop.models import Directory, Document2
+from useradmin.models import User, install_sample_user
 
+from notebook.conf import EXAMPLES, get_ordered_interpreters
 from notebook.connectors.base import Notebook, get_api as _get_api, get_interpreter
 
 if sys.version_info[0] > 2:
@@ -70,7 +70,8 @@ def escape_rows(rows, nulls_only=False, encoding=None):
         elif field is None:
           escaped_field = 'NULL'
         else:
-          escaped_field = smart_unicode(field, errors='replace', encoding=encoding) # Prevent error when getting back non utf8 like charset=iso-8859-1
+          # Prevent error when getting back non utf8 like charset=iso-8859-1
+          escaped_field = smart_unicode(field, errors='replace', encoding=encoding)
           if not nulls_only:
             escaped_field = escape(escaped_field).replace(' ', '&nbsp;')
         escaped_row.append(escaped_field)
@@ -88,7 +89,8 @@ def make_notebook(
     namespace=None, compute=None, is_presentation_mode=False):
   '''
   skip_historify: do not add the task to the query history. e.g. SQL Dashboard
-  is_task / isManaged: true when being a managed by Hue operation (include_managed=True in document), e.g. exporting query result, dropping some tables
+  is_task / isManaged: true when being a managed by Hue operation (include_managed=True in document),
+  e.g. exporting query result, dropping some tables
   '''
   from notebook.connectors.hiveserver2 import HS2Api
 
@@ -160,11 +162,15 @@ def make_notebook(
          'database': database,
          'namespace': namespace if namespace else {},
          'compute': compute if compute else {},
-         'result': {'handle':{}},
+         'result': {'handle': {}},
          'variables': []
       }
     ] if not is_notebook else []
   }
+
+  if has_connectors():  # To improve
+    data['dialect'] = interpreter['dialect']
+    data['type'] = '%s-%s' % (editor_type, editor_connector)  # e.g. 'flink-' + editor_connector
 
   if snippet_properties:
     data['snippets'][0]['properties'].update(snippet_properties)
@@ -221,7 +227,7 @@ def make_notebook2(name='Browse', description='', is_saved=False, snippets=None)
          'properties': _snippet['properties'],
          'name': name,
          'database': _snippet.get('database'),
-         'result': {'handle':{}},
+         'result': {'handle': {}},
          'variables': []
       } for _snippet in _snippets
     ]
@@ -230,6 +236,46 @@ def make_notebook2(name='Browse', description='', is_saved=False, snippets=None)
   editor.data = json.dumps(data)
 
   return editor
+
+
+def _get_notebook_api(user, connector_id, interpreter=None):
+  '''
+  Helper utils until the API gets simplified.
+  '''
+  notebook_json = """
+    {
+      "selectedSnippet": "hive",
+      "showHistory": false,
+      "description": "Test Query",
+      "name": "Test Query",
+      "sessions": [
+          {
+              "type": "hive",
+              "properties": [],
+              "id": null
+          }
+      ],
+      "type": "hive",
+      "id": null,
+      "snippets": [{"id":"2b7d1f46-17a0-30af-efeb-33d4c29b1055","type":"%(connector_id)s","status":"running",\
+         "statement":"select * from web_logs","properties":{"settings":[],"variables":[],"files":[],"functions":[]},\
+          "result":{"id":"b424befa-f4f5-8799-a0b4-79753f2552b1","type":"table",\
+          "handle":{"log_context":null,"statements_count":1,\
+          "end":{"column":21,"row":0},"statement_id":0,"has_more_statements":false,\
+          "start":{"column":0,"row":0},"secret":"rVRWw7YPRGqPT7LZ/TeFaA==an","has_result_set":true,\
+          "statement":"select * from web_logs","operation_type":0,"modified_row_count":null,"guid":"7xm6+epkRx6dyvYvGNYePA==an"}},\
+          "lastExecuted": 1462554843817,"database":"default"}],
+      "uuid": "d9efdee1-ef25-4d43-b8f9-1a170f69a05a"
+  }
+  """ % {
+    'connector_id': connector_id,
+  }
+  snippet = json.loads(notebook_json)['snippets'][0]
+  snippet['interpreter'] = interpreter
+
+  request = MockRequest(user)
+
+  return get_api(request, snippet)
 
 
 class MockedDjangoRequest(object):
@@ -347,123 +393,123 @@ def import_saved_mapreduce_job(wf):
 
 
 def import_saved_shell_job(wf):
-    snippet_properties = {}
-    node = wf.start.get_child('to')
+  snippet_properties = {}
+  node = wf.start.get_child('to')
 
-    snippet_properties['command_path'] = node.command
+  snippet_properties['command_path'] = node.command
 
-    snippet_properties['arguments'] = []
-    snippet_properties['env_var'] = []
-    try:
-      params = json.loads(node.params)
-      if params:
-        for param in params:
-          if param['type'] == 'argument':
-            snippet_properties['arguments'].append(param['value'])
-          else:
-            snippet_properties['env_var'].append(param['value'])
-    except ValueError as e:
-      LOG.warn('Failed to parse parameters for shell job design "%s".' % wf.name)
+  snippet_properties['arguments'] = []
+  snippet_properties['env_var'] = []
+  try:
+    params = json.loads(node.params)
+    if params:
+      for param in params:
+        if param['type'] == 'argument':
+          snippet_properties['arguments'].append(param['value'])
+        else:
+          snippet_properties['env_var'].append(param['value'])
+  except ValueError as e:
+    LOG.warn('Failed to parse parameters for shell job design "%s".' % wf.name)
 
-    snippet_properties['hadoopProperties'] = []
-    try:
-      properties = json.loads(node.job_properties)
-      if properties:
-        for prop in properties:
-          snippet_properties['hadoopProperties'].append("%s=%s" % (prop.get('name'), prop.get('value')))
-    except ValueError as e:
-      LOG.warn('Failed to parse job properties for shell job design "%s".' % wf.name)
+  snippet_properties['hadoopProperties'] = []
+  try:
+    properties = json.loads(node.job_properties)
+    if properties:
+      for prop in properties:
+        snippet_properties['hadoopProperties'].append("%s=%s" % (prop.get('name'), prop.get('value')))
+  except ValueError as e:
+    LOG.warn('Failed to parse job properties for shell job design "%s".' % wf.name)
 
-    snippet_properties['files'] = []
-    try:
-      files = json.loads(node.files)
-      for filepath in files:
-        snippet_properties['files'].append({'type': 'file', 'path': filepath})
-    except ValueError as e:
-      LOG.warn('Failed to parse files for shell job design "%s".' % wf.name)
+  snippet_properties['files'] = []
+  try:
+    files = json.loads(node.files)
+    for filepath in files:
+      snippet_properties['files'].append({'type': 'file', 'path': filepath})
+  except ValueError as e:
+    LOG.warn('Failed to parse files for shell job design "%s".' % wf.name)
 
-    snippet_properties['archives'] = []
-    try:
-      archives = json.loads(node.archives)
-      for archive in archives:
-        snippet_properties['archives'].append(archive['name'])
-    except ValueError as e:
-      LOG.warn('Failed to parse archives for shell job design "%s".' % wf.name)
+  snippet_properties['archives'] = []
+  try:
+    archives = json.loads(node.archives)
+    for archive in archives:
+      snippet_properties['archives'].append(archive['name'])
+  except ValueError as e:
+    LOG.warn('Failed to parse archives for shell job design "%s".' % wf.name)
 
-    snippet_properties['capture_output'] = node.capture_output
+  snippet_properties['capture_output'] = node.capture_output
 
-    notebook = make_notebook(
-        name=wf.name,
-        description=wf.description,
-        editor_type='shell',
-        statement='',
-        status='ready',
-        snippet_properties=snippet_properties,
-        is_saved=True
-    )
+  notebook = make_notebook(
+      name=wf.name,
+      description=wf.description,
+      editor_type='shell',
+      statement='',
+      status='ready',
+      snippet_properties=snippet_properties,
+      is_saved=True
+  )
 
-    # Remove functions, settings from snippet properties
-    data = notebook.get_data()
-    data['snippets'][0]['properties'].pop('functions')
-    data['snippets'][0]['properties'].pop('settings')
+  # Remove functions, settings from snippet properties
+  data = notebook.get_data()
+  data['snippets'][0]['properties'].pop('functions')
+  data['snippets'][0]['properties'].pop('settings')
 
-    notebook.data = json.dumps(data)
-    return notebook
+  notebook.data = json.dumps(data)
+  return notebook
 
 
 def import_saved_java_job(wf):
-    snippet_properties = {}
-    node = wf.start.get_child('to')
+  snippet_properties = {}
+  node = wf.start.get_child('to')
 
-    snippet_properties['app_jar'] = node.jar_path
-    snippet_properties['class'] = node.main_class
-    snippet_properties['args'] = node.args if node.args else ''
-    snippet_properties['java_opts'] = node.java_opts if node.java_opts else ''
+  snippet_properties['app_jar'] = node.jar_path
+  snippet_properties['class'] = node.main_class
+  snippet_properties['args'] = node.args if node.args else ''
+  snippet_properties['java_opts'] = node.java_opts if node.java_opts else ''
 
-    snippet_properties['hadoopProperties'] = []
-    try:
-      properties = json.loads(node.job_properties)
-      if properties:
-        for prop in properties:
-          snippet_properties['hadoopProperties'].append("%s=%s" % (prop.get('name'), prop.get('value')))
-    except ValueError as e:
-      LOG.warn('Failed to parse job properties for Java job design "%s".' % wf.name)
+  snippet_properties['hadoopProperties'] = []
+  try:
+    properties = json.loads(node.job_properties)
+    if properties:
+      for prop in properties:
+        snippet_properties['hadoopProperties'].append("%s=%s" % (prop.get('name'), prop.get('value')))
+  except ValueError as e:
+    LOG.warn('Failed to parse job properties for Java job design "%s".' % wf.name)
 
-    snippet_properties['files'] = []
-    try:
-      files = json.loads(node.files)
-      for filepath in files:
-        snippet_properties['files'].append({'type': 'file', 'path': filepath})
-    except ValueError as e:
-      LOG.warn('Failed to parse files for Java job design "%s".' % wf.name)
+  snippet_properties['files'] = []
+  try:
+    files = json.loads(node.files)
+    for filepath in files:
+      snippet_properties['files'].append({'type': 'file', 'path': filepath})
+  except ValueError as e:
+    LOG.warn('Failed to parse files for Java job design "%s".' % wf.name)
 
-    snippet_properties['archives'] = []
-    try:
-      archives = json.loads(node.archives)
-      for archive in archives:
-        snippet_properties['archives'].append(archive['name'])
-    except ValueError as e:
-      LOG.warn('Failed to parse archives for Java job design "%s".' % wf.name)
+  snippet_properties['archives'] = []
+  try:
+    archives = json.loads(node.archives)
+    for archive in archives:
+      snippet_properties['archives'].append(archive['name'])
+  except ValueError as e:
+    LOG.warn('Failed to parse archives for Java job design "%s".' % wf.name)
 
-    snippet_properties['capture_output'] = node.capture_output
+  snippet_properties['capture_output'] = node.capture_output
 
-    notebook = make_notebook(
-        name=wf.name,
-        description=wf.description,
-        editor_type='java',
-        statement='',
-        status='ready',
-        snippet_properties=snippet_properties,
-        is_saved=True
-    )
+  notebook = make_notebook(
+      name=wf.name,
+      description=wf.description,
+      editor_type='java',
+      statement='',
+      status='ready',
+      snippet_properties=snippet_properties,
+      is_saved=True
+  )
 
-    # Remove functions, settings from snippet properties
-    data = notebook.get_data()
-    data['snippets'][0]['properties'].pop('functions')
-    data['snippets'][0]['properties'].pop('settings')
+  # Remove functions, settings from snippet properties
+  data = notebook.get_data()
+  data['snippets'][0]['properties'].pop('functions')
+  data['snippets'][0]['properties'].pop('settings')
 
-    notebook.data = json.dumps(data)
-    return notebook
+  notebook.data = json.dumps(data)
+  return notebook
 
 
 def _convert_type(btype, bdata):
@@ -496,6 +542,27 @@ def _get_editor_type(editor_id):
   return document.type.rsplit('-', 1)[-1]
 
 
+def _get_example_directory(user):
+  home_dir = Directory.objects.get_home_directory(user)
+  examples_dir, created = Directory.objects.get_or_create(
+    parent_directory=home_dir,
+    owner=user,
+    name=Document2.EXAMPLES_DIR
+  )
+  return examples_dir
+
+def _get_dialect_example(dialect):
+  sample_user = install_sample_user()
+  examples_dir = _get_example_directory(sample_user)
+
+  return Document2.objects.filter(
+      owner=sample_user,
+      type='query-%s' % dialect,
+      is_history=False,
+      parent_directory=examples_dir
+  ).first()
+
+
 class ApiWrapper():
   def __init__(self, request, snippet):
     self.request = request
@@ -509,6 +576,8 @@ class ApiWrapper():
         def _method(*args, **kwargs):
           return attr(*args, **dict(kwargs, postdict=self.request.POST, user_id=self.request.user.id))
         return _method
+      else:
+        LOG.debug('Skipping Task Server call %s' % name)
     return getattr(self.api, name)
 
 
@@ -543,19 +612,38 @@ class Analytics(object):
     stats.append(('Last modified', '1 day'))
     stats.append(('Users', User.objects.filter(last_login__gte=one_day).count()))
     stats.append(('Sessions', Session.objects.filter(expire_date__gte=one_day).count()))
-    stats.append(('Executed queries', Document2.objects.filter(last_modified__gte=one_day, is_history=True, type__startswith='query-').count()))
+    stats.append(('Executed queries', Document2.objects.filter(
+        last_modified__gte=one_day, is_history=True, type__startswith='query-').count()
+      )
+    )
 
     stats.append(('\nLast modified', '1 week'))
     stats.append(('Users', User.objects.filter(last_login__gte=one_week).count()))
     stats.append(('Sessions', Session.objects.filter(expire_date__gte=one_week).count()))
-    stats.append(('Executed queries', Document2.objects.filter(last_modified__gte=one_week, is_history=True, type__startswith='query-').count()))
-    stats.append(('Saved queries', Document2.objects.filter(last_modified__gte=one_week, is_history=False, type__startswith='query-').count()))
+    stats.append(('Executed queries', Document2.objects.filter(
+        last_modified__gte=one_week, is_history=True, type__startswith='query-').count()
+      )
+    )
+    stats.append(('Saved queries', Document2.objects.filter(
+        last_modified__gte=one_week, is_history=False, type__startswith='query-').count()
+      )
+    )
 
     stats.append(('\nAll', ''))
     stats.append(('Active users 30 days', User.objects.filter(last_login__gte=one_month).count()))
     stats.append(('Sessions 30 days', Session.objects.filter(expire_date__gte=one_month).count()))
-    stats.append(('Executed queries 30 days', Document2.objects.filter(last_modified__gte=one_month, is_history=True, type__startswith='query-').count()))
+    stats.append(('Executed queries 30 days', Document2.objects.filter(
+        last_modified__gte=one_month, is_history=True, type__startswith='query-').count()
+      )
+    )
     stats.append(('Active users 90 days', User.objects.filter(last_login__gte=three_months).count()))
+
+    stats.append(('\nDialect executions', ''))
+    queries = Document2.objects.filter(type__startswith='query-', is_trashed=False, is_managed=False)
+    last_month_qdialects = queries.filter(
+      last_modified__gte=one_month
+    ).values('type').annotate(c=Count('type')).values('type', 'c').order_by('-c')
+    stats.append(('30 days', ', '.join(['%(type)s: %(c)s' % d for d in last_month_qdialects])))
 
     return stats
 
@@ -569,7 +657,7 @@ class Analytics(object):
 
     stats.append({
       'name': 'user',
-      'value': '%s - %s' % (user_id, user.username),'description': _('User info')
+      'value': '%s - %s' % (user_id, user.username), 'description': _('User info')
     })
     query_executions = queries.filter(is_history=True, type__startswith='query-')
     stats.append({
@@ -587,7 +675,10 @@ class Analytics(object):
       'value': query_executions.filter(last_modified__gte=one_month).count(),
       'description': _('Query executions 30 days total')
     })
-    last_month_daily = queries.filter(last_modified__gte=one_month).annotate(day=Trunc('last_modified', 'day')).values('day').annotate(c=Count('day')).values('day', 'c').order_by('day')
+    last_month_daily = queries.filter(
+        last_modified__gte=one_month).annotate(
+          day=Trunc('last_modified', 'day')
+        ).values('day').annotate(c=Count('day')).values('day', 'c').order_by('day')
     stats.append({
       'name': 'query_executions_30_days_histogram',
       'value': last_month_daily,
@@ -618,7 +709,10 @@ class Analytics(object):
       'value': executions.exclude(owner=query.owner).count(),
       'description': _('Executions by others')
     })
-    last_month_daily = executions.filter(last_modified__gte=one_month).annotate(day=Trunc('last_modified', 'day')).values('day').annotate(c=Count('day')).values('day', 'c').order_by('day')
+    last_month_daily = executions.filter(
+        last_modified__gte=one_month).annotate(
+          day=Trunc('last_modified', 'day')
+        ).values('day').annotate(c=Count('day')).values('day', 'c').order_by('day')
     stats.append({
       'name': 'executions_30_days_histogram',
       'value': last_month_daily,
@@ -630,6 +724,70 @@ class Analytics(object):
 
 
 class MockRequest():
-  def __init__(self, user, ):
+  def __init__(self, user, fs=None, jt=None):
     self.user = user
+    self.fs = fs
+    self.jt = jt
     self.POST = {}
+    self.GET = {}
+
+def install_custom_examples():
+  if EXAMPLES.AUTO_LOAD.get():
+    from desktop.auth.backend import rewrite_user
+    from beeswax.management.commands import beeswax_install_examples
+    from useradmin.models import install_sample_user
+
+    user = rewrite_user(
+      install_sample_user()
+    )
+
+    if has_connectors():
+      interpreters = [
+        {
+          'type': connector['id'],
+          'dialect': connector['dialect']
+        }
+        for connector in _get_installed_connectors(category='editor')
+      ]
+    else:
+      interpreters = [
+        {
+          'type': interpreter['dialect'],
+          'dialect': interpreter['dialect']
+        }
+        for interpreter in get_ordered_interpreters(user)
+        # Only for hive/impala currently, would also need to port to Notebook install examples.
+        if interpreter['dialect'] in ('hive', 'impala')
+      ]
+
+    queries = EXAMPLES.QUERIES.get()
+    tables = EXAMPLES.TABLES.get()  # No-op. Only for the saved query samples, not the tables currently.
+
+    LOG.info('Installing custom examples queries: %(queries)s, tables: %(tables)s for dialects %(dialects)s '
+      'belonging to user %(user)s' % {
+        'queries': queries,
+        'tables': tables,
+        'dialects': [interpreter['dialect'] for interpreter in interpreters],
+        'user': user
+      }
+    )
+
+    result = []
+
+    for interpreter in interpreters:
+      successes, errors = beeswax_install_examples.Command().handle(
+          dialect=interpreter['dialect'],
+          user=user,
+          interpreter=interpreter,
+          queries=queries,
+          tables=tables,
+          request=None
+      )
+      LOG.info('Dialect %(dialect)s installed samples: %(successes)s, %(errors)s,' % {
+        'dialect': interpreter['dialect'],
+        'successes': successes,
+        'errors': errors,
+      })
+      result.append((successes, errors))
+
+    return result

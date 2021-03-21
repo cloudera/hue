@@ -52,6 +52,10 @@ const TEMPLATE = `
 
 componentUtils.registerComponent('create-directory', undefined, TEMPLATE).then(() => {
   huePubSub.subscribe(SHOW_EVENT, docViewModel => {
+    if (docViewModel.isTrash() || docViewModel.isTrashed() || !docViewModel.canModify()) {
+      return;
+    }
+
     let $createDirectoryModal = $('#createDirectoryModal');
     if ($createDirectoryModal.length > 0) {
       ko.cleanNode($createDirectoryModal[0]);
@@ -71,5 +75,7 @@ componentUtils.registerComponent('create-directory', undefined, TEMPLATE).then((
     $('body').append($createDirectoryModal);
 
     ko.applyBindings(data, $createDirectoryModal[0]);
+
+    $createDirectoryModal.modal('show');
   });
 });

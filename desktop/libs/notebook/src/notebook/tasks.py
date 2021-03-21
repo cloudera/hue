@@ -14,11 +14,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, unicode_literals
 
+from __future__ import absolute_import, unicode_literals
 from future import standard_library
 standard_library.install_aliases()
+
 from builtins import next, object
+
+import codecs
 import csv
 import datetime
 import json
@@ -43,7 +46,7 @@ from desktop.settings import CACHES_CELERY_KEY, CACHES_CELERY_QUERY_RESULT_KEY
 from useradmin.models import User
 
 from notebook.api import _get_statement
-from notebook.conf import  ENABLE_NOTEBOOK_2
+from notebook.conf import ENABLE_NOTEBOOK_2
 from notebook.connectors.base import get_api, QueryExpired, ExecutionWrapper, QueryError
 from notebook.models import make_notebook, MockedDjangoRequest, Notebook
 from notebook.sql_utils import get_current_statement
@@ -91,7 +94,7 @@ class ExecutionWrapperCallback(object):
     self.meta['handle'] = handle_without_data
 
   def on_log(self, log):
-    self.f_log.write(log)
+    self.f_log.write(log.encode('utf-8'))
     self.f_log.flush()
 
   def on_status(self, status):
@@ -114,7 +117,7 @@ def download_to_file(notebook, snippet, file_format='csv', max_rows=-1, **kwargs
 
   meta = {'row_counter': 0, 'handle': {}, 'status': '', 'truncated': False}
 
-  with storage.open(_log_key(notebook, snippet), 'w') as f_log:
+  with storage.open(_log_key(notebook, snippet), 'wb') as f_log:
     result_wrapper = ExecutionWrapper(
         api,
         notebook,
@@ -128,16 +131,17 @@ def download_to_file(notebook, snippet, file_format='csv', max_rows=-1, **kwargs
     )
     response = export_csvxls.create_generator(content_generator, file_format)
 
-    with storage.open(result_key, 'w') as f:
+    with storage.open(result_key, 'wb') as f:
       for chunk in response:
-        f.write(chunk)
+        f.write(chunk.encode('utf-8'))
 
     if TASK_SERVER.RESULT_CACHE.get():
-      with storage.open(result_key, 'r') as f:
-        delimiter = ',' if sys.version_info[0] > 2 else ','.encode('utf-8')
-        csv_reader = csv.reader(f, delimiter=delimiter)
-        caches[CACHES_CELERY_QUERY_RESULT_KEY].set(result_key, [row for row in csv_reader], 60 * 5)
-        LOG.info('Caching results %s.' % result_key)
+      with storage.open(result_key, 'rb') as store:
+        with codecs.getreader('utf-8')(store) as text_file:
+          delimiter = ',' if sys.version_info[0] > 2 else ','.encode('utf-8')
+          csv_reader = csv.reader(text_file, delimiter=delimiter)
+          caches[CACHES_CELERY_QUERY_RESULT_KEY].set(result_key, [row for row in csv_reader], 60 * 5)
+          LOG.info('Caching results %s.' % result_key)
 
     meta['row_counter'] = content_generator.row_counter
     meta['truncated'] = content_generator.is_truncated
@@ -179,7 +183,7 @@ def run_sync_query(doc_id, user):
   editor_type = snippet['type']
   sql = _get_statement(notebook)
   request = MockedDjangoRequest(user=user)
-  last_executed=time.mktime(datetime.datetime.now().timetuple()) * 1000
+  last_executed = time.mktime(datetime.datetime.now().timetuple()) * 1000
 
   notebook = make_notebook(
       name='Scheduled query %s at %s' % (query_document.name, last_executed),
@@ -218,14 +222,15 @@ def download(*args, **kwargs):
   return export_csvxls.file_reader(  # TODO: Convert csv to excel if needed
     storage.open(
       _result_key(task_id),
-      'r'
+      'rb'
     )
   )
 
 
 # Why we need this:
 # 1) There is no way in celery to differentiate between a task that was submitted, but not yet started and a task that has been GCed.
-# 2) The client will keep checking for data until the query is expired. The new definition for expired in this case is a task that has been GCed.
+# 2) The client will keep checking for data until the query is expired. The new definition for expired in this case is a task
+#    that has been GCed.
 def _patch_status(notebook):
   result = download_to_file.AsyncResult(notebook['uuid'])
   result.backend.store_result(notebook['uuid'], None, "SUBMITTED")
@@ -287,17 +292,17 @@ def get_log(notebook, snippet, startFrom=None, size=None, postdict=None, user_id
     return ''
   else:
     if not startFrom:
-      with storage.open(_log_key(notebook, snippet), 'r') as f:
+      with storage.open(_log_key(notebook, snippet), 'rb') as f:
         return f.read()
     else:
       count = 0
       output = string_io()
-      with storage.open(_log_key(notebook, snippet), 'r') as f:
+      with storage.open(_log_key(notebook, snippet), 'rb') as f:
         for line in f:
           count += 1
           if count <= startFrom:
             continue
-          output.write(line)
+          output.write(line.decode('utf-8'))
       return output.getvalue()
 
 
@@ -402,7 +407,7 @@ def _get_data(task_id):
     headers = csv_reader[0] if csv_reader else []  # TODO check size
     csv_reader = csv_reader[1:] if csv_reader else []
   else:
-    f = storage.open(result_key)
+    f = storage.open(result_key, 'rb')
     delimiter = ',' if sys.version_info[0] > 2 else ','.encode('utf-8')
     csv_reader = csv.reader(f, delimiter=delimiter)
     headers = next(csv_reader, [])
@@ -488,7 +493,12 @@ def _cleanup(notebook, snippet):
 
 def _get_query_key(notebook, snippet):
   if ENABLE_NOTEBOOK_2.get():
-    query_key = snippet['executor']['executables'][0].get('history', {}).get('uuid')
+    if snippet.get('executable'):
+      query_key = snippet['executable']['id']
+    elif snippet.get('executor'):
+      query_key = snippet['executor']['executables'][0].get('history', {}).get('uuid')
+    else:
+      query_key = notebook['uuid']  # get_logs()
   else:
     query_key = notebook['uuid']
 

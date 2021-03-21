@@ -35,8 +35,6 @@ sf_caption_position:
 sf_remove_promo_bar:
   - 1
 categories:
-  - Browsing
-  - Querying
 ---
 
 With the latest Hue release, the metastore offers better controls over partitioned Hive tables. Partitioning Hive tables is a great strategy to [improve query performance][1] for Hive-managed tables by avoiding full-table scans.

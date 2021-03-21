@@ -37,9 +37,8 @@ sf_caption_position:
 ampforwp-amp-on-off:
   - default
 categories:
-  - Administration
-  - Querying
   - Version 4
+  - Dev / API
   # - Version 4.5
 
 ---
@@ -57,7 +56,7 @@ The parsers provide one function, `parseSql`, that accepts the text before the c
 
 As an example:
 
-<pre><code class="javascript">sqlParserRepository.getAutocompleter('impala').then(parser =&gt; {
+<pre><code class="javascript">sqlParserRepository.getAutocompleteParser('impala').then(parser =&gt; {
     console.log(parser.parseSql('SELECT * FROM customers'));
   });
 </code></pre>

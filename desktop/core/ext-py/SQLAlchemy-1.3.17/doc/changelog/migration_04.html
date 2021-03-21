@@ -1,0 +1,971 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        
+        <title>
+            
+    
+    What’s new in SQLAlchemy 0.4?
+ &mdash;
+    SQLAlchemy 1.3 Documentation
+
+        </title>
+
+        
+            <!-- begin iterate through site-imported + sphinx environment css_files -->
+                <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+                <link rel="stylesheet" href="../_static/docs.css" type="text/css" />
+                <link rel="stylesheet" href="../_static/changelog.css" type="text/css" />
+                <link rel="stylesheet" href="../_static/sphinx_paramlinks.css" type="text/css" />
+            <!-- end iterate through site-imported + sphinx environment css_files -->
+        
+
+        
+
+    
+
+    <!-- begin layout.mako headers -->
+
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+        <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="top" title="SQLAlchemy 1.3 Documentation" href="../index.html" />
+        <link rel="up" title="Changes and Migration" href="index.html" />
+        <link rel="prev" title="What’s new in SQLAlchemy 0.5?" href="migration_05.html" />
+    <!-- end layout.mako headers -->
+
+
+    </head>
+    <body>
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="docs-container">
+
+
+
+
+
+<div id="docs-top-navigation-container" class="body-background">
+<div id="docs-header">
+    <div id="docs-version-header">
+        Release: <span class="version-num">1.3.17</span>
+
+
+        | Release Date: May 13, 2020
+
+    </div>
+
+    <h1>SQLAlchemy 1.3 Documentation</h1>
+
+</div>
+</div>
+
+<div id="docs-body-container">
+
+    <div id="fixed-sidebar" class="withsidebar">
+
+
+        <div id="docs-sidebar-popout">
+            <h3><a href="../index.html">SQLAlchemy 1.3 Documentation</a></h3>
+            <p id="sidebar-topnav">
+                <a href="../contents.html">Contents</a> |
+                <a href="../genindex.html">Index</a>
+            </p>
+
+            <div id="sidebar-search">
+                <form class="search" action="../search.html" method="get">
+                  <label>
+                  Search terms:
+                  <input type="text" placeholder="search..." name="q" size="12" />
+                  </label>
+                  <input type="hidden" name="check_keywords" value="yes" />
+                  <input type="hidden" name="area" value="default" />
+                </form>
+            </div>
+
+        </div>
+
+        <div id="docs-sidebar">
+
+        <div id="sidebar-banner">
+            
+        </div>
+
+        <div id="docs-sidebar-inner">
+
+        
+        <h3>
+            <a href="index.html" title="Changes and Migration">Changes and Migration</a>
+        </h3>
+
+        <ul>
+<li><span class="link-container"><a class="reference external" href="migration_13.html">What’s New in SQLAlchemy 1.3?</a></span></li>
+<li><span class="link-container"><a class="reference external" href="changelog_13.html">1.3 Changelog</a></span></li>
+<li><span class="link-container"><a class="reference external" href="changelog_12.html">1.2 Changelog</a></span></li>
+<li><span class="link-container"><a class="reference external" href="changelog_11.html">1.1 Changelog</a></span></li>
+<li><span class="link-container"><a class="reference external" href="changelog_10.html">1.0 Changelog</a></span></li>
+<li><span class="link-container"><a class="reference external" href="changelog_09.html">0.9 Changelog</a></span></li>
+<li><span class="link-container"><a class="reference external" href="changelog_08.html">0.8 Changelog</a></span></li>
+<li><span class="link-container"><a class="reference external" href="changelog_07.html">0.7 Changelog</a></span></li>
+<li><span class="link-container"><a class="reference external" href="changelog_06.html">0.6 Changelog</a></span></li>
+<li><span class="link-container"><a class="reference external" href="changelog_05.html">0.5 Changelog</a></span></li>
+<li><span class="link-container"><a class="reference external" href="changelog_04.html">0.4 Changelog</a></span></li>
+<li><span class="link-container"><a class="reference external" href="changelog_03.html">0.3 Changelog</a></span></li>
+<li><span class="link-container"><a class="reference external" href="changelog_02.html">0.2 Changelog</a></span></li>
+<li><span class="link-container"><a class="reference external" href="changelog_01.html">0.1 Changelog</a></span></li>
+<li><span class="link-container"><a class="reference external" href="migration_12.html">What’s New in SQLAlchemy 1.2?</a></span></li>
+<li><span class="link-container"><a class="reference external" href="migration_11.html">What’s New in SQLAlchemy 1.1?</a></span></li>
+<li><span class="link-container"><a class="reference external" href="migration_10.html">What’s New in SQLAlchemy 1.0?</a></span></li>
+<li><span class="link-container"><a class="reference external" href="migration_09.html">What’s New in SQLAlchemy 0.9?</a></span></li>
+<li><span class="link-container"><a class="reference external" href="migration_08.html">What’s New in SQLAlchemy 0.8?</a></span></li>
+<li><span class="link-container"><a class="reference external" href="migration_07.html">What’s New in SQLAlchemy 0.7?</a></span></li>
+<li><span class="link-container"><a class="reference external" href="migration_06.html">What’s New in SQLAlchemy 0.6?</a></span></li>
+<li><span class="link-container"><a class="reference external" href="migration_05.html">What’s new in SQLAlchemy 0.5?</a></span></li>
+<li class="selected"><span class="link-container"><strong>What’s new in SQLAlchemy 0.4?</strong><a class="paramlink headerlink reference internal" href="#">¶</a></span><ul>
+<li><span class="link-container"><a class="reference external" href="#first-things-first">First Things First</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#module-imports">Module Imports</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#object-relational-mapping">Object Relational Mapping</a></span><ul>
+<li><span class="link-container"><a class="reference external" href="#querying">Querying</a></span><ul>
+<li><span class="link-container"><a class="reference external" href="#new-query-api">New Query API</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#new-property-based-expression-constructs">New Property-Based Expression Constructs</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#automatic-join-aliasing">Automatic Join Aliasing</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#self-referential-queries">Self-referential Queries</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#query-populate-existing"><code class="docutils literal notranslate"><span class="pre">query.populate_existing()</span></code></a></span></li>
+</ul>
+</li>
+<li><span class="link-container"><a class="reference external" href="#relations">Relations</a></span><ul>
+<li><span class="link-container"><a class="reference external" href="#sql-clauses-embedded-in-updates-inserts">SQL Clauses Embedded in Updates/Inserts</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#self-referential-and-cyclical-eager-loading">Self-referential and Cyclical Eager Loading</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#composite-types">Composite Types</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#dynamic-loader-relations"><code class="docutils literal notranslate"><span class="pre">dynamic_loader()</span></code> relations</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#new-options-undefer-group-eagerload-all">New Options: <code class="docutils literal notranslate"><span class="pre">undefer_group()</span></code>, <code class="docutils literal notranslate"><span class="pre">eagerload_all()</span></code></a></span></li>
+<li><span class="link-container"><a class="reference external" href="#new-collection-api">New Collection API</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#mapped-relations-from-external-tables-subqueries">Mapped Relations from External Tables/Subqueries</a></span></li>
+</ul>
+</li>
+<li><span class="link-container"><a class="reference external" href="#horizontal-scaling-sharding-api">Horizontal Scaling (Sharding) API</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#sessions">Sessions</a></span><ul>
+<li><span class="link-container"><a class="reference external" href="#new-session-create-paradigm-sessioncontext-assignmapper-deprecated">New Session Create Paradigm; SessionContext, assignmapper Deprecated</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#sessions-are-again-weak-referencing-by-default">Sessions are again Weak Referencing By Default</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#auto-transactional-sessions">Auto-Transactional Sessions</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#auto-flushing-sessions">Auto-Flushing Sessions</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#transactional-methods-moved-onto-sessions">Transactional methods moved onto sessions</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#nested-session-transactions-with-savepoint">Nested Session Transactions with SAVEPOINT</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#two-phase-commit-sessions">Two-Phase Commit Sessions</a></span></li>
+</ul>
+</li>
+<li><span class="link-container"><a class="reference external" href="#inheritance">Inheritance</a></span><ul>
+<li><span class="link-container"><a class="reference external" href="#polymorphic-inheritance-with-no-joins-or-unions">Polymorphic Inheritance with No Joins or Unions</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#better-polymorphic-behavior-with-get">Better Polymorphic Behavior with <code class="docutils literal notranslate"><span class="pre">get()</span></code></a></span></li>
+</ul>
+</li>
+<li><span class="link-container"><a class="reference external" href="#types">Types</a></span><ul>
+<li><span class="link-container"><a class="reference external" href="#custom-subclasses-of-sqlalchemy-types-typedecorator">Custom Subclasses of <code class="docutils literal notranslate"><span class="pre">sqlalchemy.types.TypeDecorator</span></code></a></span></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="link-container"><a class="reference external" href="#sql-expressions">SQL Expressions</a></span><ul>
+<li><span class="link-container"><a class="reference external" href="#all-new-deterministic-label-alias-generation">All New, Deterministic Label/Alias Generation</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#generative-select-constructs">Generative select() Constructs</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#new-operator-system">New Operator System</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#all-type-keyword-arguments-renamed-to-type">All <code class="docutils literal notranslate"><span class="pre">type</span></code> Keyword Arguments Renamed to <code class="docutils literal notranslate"><span class="pre">type_</span></code></a></span></li>
+<li><span class="link-container"><a class="reference external" href="#in-function-changed-to-accept-sequence-or-selectable">in_ Function Changed to Accept Sequence or Selectable</a></span></li>
+</ul>
+</li>
+<li><span class="link-container"><a class="reference external" href="#schema-and-reflection">Schema and Reflection</a></span><ul>
+<li><span class="link-container"><a class="reference external" href="#metadata-boundmetadata-dynamicmetadata"><code class="docutils literal notranslate"><span class="pre">MetaData</span></code>, <code class="docutils literal notranslate"><span class="pre">BoundMetaData</span></code>, <code class="docutils literal notranslate"><span class="pre">DynamicMetaData</span></code>…</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#one-step-multi-table-reflection">One Step Multi-Table Reflection</a></span></li>
+</ul>
+</li>
+<li><span class="link-container"><a class="reference external" href="#sql-execution">SQL Execution</a></span><ul>
+<li><span class="link-container"><a class="reference external" href="#engine-connectable-and-bind-to-are-all-now-bind"><code class="docutils literal notranslate"><span class="pre">engine</span></code>, <code class="docutils literal notranslate"><span class="pre">connectable</span></code>, and <code class="docutils literal notranslate"><span class="pre">bind_to</span></code> are all now <code class="docutils literal notranslate"><span class="pre">bind</span></code></a></span></li>
+<li><span class="link-container"><a class="reference external" href="#transactions-nestedtransactions-and-twophasetransactions"><code class="docutils literal notranslate"><span class="pre">Transactions</span></code>, <code class="docutils literal notranslate"><span class="pre">NestedTransactions</span></code> and <code class="docutils literal notranslate"><span class="pre">TwoPhaseTransactions</span></code></a></span></li>
+<li><span class="link-container"><a class="reference external" href="#connection-pool-events">Connection Pool Events</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#oracle-engine-fixed">Oracle Engine Fixed</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#out-parameters-for-oracle">Out Parameters for Oracle</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#connection-bound-metadata-sessions">Connection-bound <code class="docutils literal notranslate"><span class="pre">MetaData</span></code>, <code class="docutils literal notranslate"><span class="pre">Sessions</span></code></a></span></li>
+<li><span class="link-container"><a class="reference external" href="#faster-more-foolproof-resultproxy-objects">Faster, More Foolproof <code class="docutils literal notranslate"><span class="pre">ResultProxy</span></code> Objects</a></span></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+
+
+        </div>
+
+        </div>
+
+    </div>
+
+    
+
+    <div id="docs-body" class="withsidebar" >
+        
+<div class="section" id="what-s-new-in-sqlalchemy-0-4">
+<h1>What’s new in SQLAlchemy 0.4?<a class="headerlink" href="#what-s-new-in-sqlalchemy-0-4" title="Permalink to this headline">¶</a></h1>
+<div class="admonition-about-this-document admonition">
+<p class="admonition-title">About this Document</p>
+<p>This document describes changes between SQLAlchemy version 0.3,
+last released October 14, 2007, and SQLAlchemy version 0.4,
+last released October 12, 2008.</p>
+<p>Document date:  March 21, 2008</p>
+</div>
+<div class="section" id="first-things-first">
+<h2>First Things First<a class="headerlink" href="#first-things-first" title="Permalink to this headline">¶</a></h2>
+<p>If you’re using any ORM features, make sure you import from
+<code class="docutils literal notranslate"><span class="pre">sqlalchemy.orm</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="k">import</span> <span class="o">*</span></pre></div>
+</div>
+<p>Secondly, anywhere you used to say <code class="docutils literal notranslate"><span class="pre">engine=</span></code>,
+<code class="docutils literal notranslate"><span class="pre">connectable=</span></code>, <code class="docutils literal notranslate"><span class="pre">bind_to=</span></code>, <code class="docutils literal notranslate"><span class="pre">something.engine</span></code>,
+<code class="docutils literal notranslate"><span class="pre">metadata.connect()</span></code>, use <code class="docutils literal notranslate"><span class="pre">bind</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">myengine</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="s1">&#39;sqlite://&#39;</span><span class="p">)</span>
+
+<span class="n">meta</span> <span class="o">=</span> <span class="n">MetaData</span><span class="p">(</span><span class="n">myengine</span><span class="p">)</span>
+
+<span class="n">meta2</span> <span class="o">=</span> <span class="n">MetaData</span><span class="p">()</span>
+<span class="n">meta2</span><span class="o">.</span><span class="n">bind</span> <span class="o">=</span> <span class="n">myengine</span>
+
+<span class="n">session</span> <span class="o">=</span> <span class="n">create_session</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">myengine</span><span class="p">)</span>
+
+<span class="n">statement</span> <span class="o">=</span> <span class="n">select</span><span class="p">([</span><span class="n">table</span><span class="p">],</span> <span class="n">bind</span><span class="o">=</span><span class="n">myengine</span><span class="p">)</span></pre></div>
+</div>
+<p>Got those ?  Good!  You’re now (95%) 0.4 compatible.  If
+you’re using 0.3.10, you can make these changes immediately;
+they’ll work there too.</p>
+</div>
+<div class="section" id="module-imports">
+<h2>Module Imports<a class="headerlink" href="#module-imports" title="Permalink to this headline">¶</a></h2>
+<p>In 0.3, “<code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">sqlachemy</span> <span class="pre">import</span> <span class="pre">*</span></code>” would import all of
+sqlachemy’s sub-modules into your namespace. Version 0.4 no
+longer imports sub-modules into the namespace. This may mean
+you need to add extra imports into your code.</p>
+<p>In 0.3, this code worked:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="o">*</span>
+
+<span class="k">class</span> <span class="nc">UTCDateTime</span><span class="p">(</span><span class="n">types</span><span class="o">.</span><span class="n">TypeDecorator</span><span class="p">):</span>
+    <span class="k">pass</span></pre></div>
+</div>
+<p>In 0.4, one must do:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="n">types</span>
+
+<span class="k">class</span> <span class="nc">UTCDateTime</span><span class="p">(</span><span class="n">types</span><span class="o">.</span><span class="n">TypeDecorator</span><span class="p">):</span>
+    <span class="k">pass</span></pre></div>
+</div>
+</div>
+<div class="section" id="object-relational-mapping">
+<h2>Object Relational Mapping<a class="headerlink" href="#object-relational-mapping" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="querying">
+<h3>Querying<a class="headerlink" href="#querying" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="new-query-api">
+<h4>New Query API<a class="headerlink" href="#new-query-api" title="Permalink to this headline">¶</a></h4>
+<p>Query is standardized on the generative interface (old
+interface is still there, just deprecated).   While most of
+the generative interface is available in 0.3, the 0.4 Query
+has the inner guts to match the generative outside, and has
+a lot more tricks.  All result narrowing is via <code class="docutils literal notranslate"><span class="pre">filter()</span></code>
+and <code class="docutils literal notranslate"><span class="pre">filter_by()</span></code>, limiting/offset is either through array
+slices or <code class="docutils literal notranslate"><span class="pre">limit()</span></code>/<code class="docutils literal notranslate"><span class="pre">offset()</span></code>, joining is via
+<code class="docutils literal notranslate"><span class="pre">join()</span></code> and <code class="docutils literal notranslate"><span class="pre">outerjoin()</span></code> (or more manually, through
+<code class="docutils literal notranslate"><span class="pre">select_from()</span></code> as well as manually-formed criteria).</p>
+<p>To avoid deprecation warnings, you must make some changes to
+your 03 code</p>
+<p>User.query.get_by( **kwargs )</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">User</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span></pre></div>
+</div>
+<p>User.query.select_by( **kwargs )</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">User</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span></pre></div>
+</div>
+<p>User.query.select()</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">User</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">xxx</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span></pre></div>
+</div>
+</div>
+<div class="section" id="new-property-based-expression-constructs">
+<h4>New Property-Based Expression Constructs<a class="headerlink" href="#new-property-based-expression-constructs" title="Permalink to this headline">¶</a></h4>
+<p>By far the most palpable difference within the ORM is that
+you can now construct your query criterion using class-based
+attributes directly.  The “.c.” prefix is no longer needed
+when working with mapped classes:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">User</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">and_</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;fred&#39;</span><span class="p">,</span> <span class="n">User</span><span class="o">.</span><span class="n">id</span> <span class="o">&gt;</span> <span class="mi">17</span><span class="p">))</span></pre></div>
+</div>
+<p>While simple column-based comparisons are no big deal, the
+class attributes have some new “higher level” constructs
+available, including what was previously only available in
+<code class="docutils literal notranslate"><span class="pre">filter_by()</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># comparison of scalar relations to an instance</span>
+<span class="nb">filter</span><span class="p">(</span><span class="n">Address</span><span class="o">.</span><span class="n">user</span> <span class="o">==</span> <span class="n">user</span><span class="p">)</span>
+
+<span class="c1"># return all users who contain a particular address</span>
+<span class="nb">filter</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">addresses</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">address</span><span class="p">))</span>
+
+<span class="c1"># return all users who *dont* contain the address</span>
+<span class="nb">filter</span><span class="p">(</span><span class="o">~</span><span class="n">User</span><span class="o">.</span><span class="n">address</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">address</span><span class="p">))</span>
+
+<span class="c1"># return all users who contain a particular address with</span>
+<span class="c1"># the email_address like &#39;%foo%&#39;</span>
+<span class="nb">filter</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">addresses</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">Address</span><span class="o">.</span><span class="n">email_address</span><span class="o">.</span><span class="n">like</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%f</span><span class="s1">oo%&#39;</span><span class="p">)))</span>
+
+<span class="c1"># same, email address equals &#39;foo@bar.com&#39;.  can fall back to keyword</span>
+<span class="c1"># args for simple comparisons</span>
+<span class="nb">filter</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">addresses</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">email_address</span> <span class="o">=</span> <span class="s1">&#39;foo@bar.com&#39;</span><span class="p">))</span>
+
+<span class="c1"># return all Addresses whose user attribute has the username &#39;ed&#39;</span>
+<span class="nb">filter</span><span class="p">(</span><span class="n">Address</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">has</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;ed&#39;</span><span class="p">))</span>
+
+<span class="c1"># return all Addresses whose user attribute has the username &#39;ed&#39;</span>
+<span class="c1"># and an id &gt; 5 (mixing clauses with kwargs)</span>
+<span class="nb">filter</span><span class="p">(</span><span class="n">Address</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">has</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">id</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;ed&#39;</span><span class="p">))</span></pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">Column</span></code> collection remains available on mapped
+classes in the <code class="docutils literal notranslate"><span class="pre">.c</span></code> attribute.  Note that property-based
+expressions are only available with mapped properties of
+mapped classes.  <code class="docutils literal notranslate"><span class="pre">.c</span></code> is still used to access columns in
+regular tables and selectable objects produced from SQL
+Expressions.</p>
+</div>
+<div class="section" id="automatic-join-aliasing">
+<h4>Automatic Join Aliasing<a class="headerlink" href="#automatic-join-aliasing" title="Permalink to this headline">¶</a></h4>
+<p>We’ve had join() and outerjoin() for a while now:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Order</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;items&#39;</span><span class="p">)</span><span class="o">...</span></pre></div>
+</div>
+<p>Now you can alias them:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Order</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;items&#39;</span><span class="p">,</span> <span class="n">aliased</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span>
+   <span class="nb">filter</span><span class="p">(</span><span class="n">Item</span><span class="o">.</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;item 1&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;items&#39;</span><span class="p">,</span> <span class="n">aliased</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Item</span><span class="o">.</span><span class="n">name</span><span class="o">==</span><span class="s1">&#39;item 3&#39;</span><span class="p">)</span></pre></div>
+</div>
+<p>The above will create two joins from orders-&gt;items using
+aliases.  the <code class="docutils literal notranslate"><span class="pre">filter()</span></code> call subsequent to each will
+adjust its table criterion to that of the alias.  To get at
+the <code class="docutils literal notranslate"><span class="pre">Item</span></code> objects, use <code class="docutils literal notranslate"><span class="pre">add_entity()</span></code> and target each
+join with an <code class="docutils literal notranslate"><span class="pre">id</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Order</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;items&#39;</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="s1">&#39;j1&#39;</span><span class="p">,</span> <span class="n">aliased</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span>
+<span class="nb">filter</span><span class="p">(</span><span class="n">Item</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;item 1&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;items&#39;</span><span class="p">,</span> <span class="n">aliased</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="s1">&#39;j2&#39;</span><span class="p">)</span><span class="o">.</span>
+<span class="nb">filter</span><span class="p">(</span><span class="n">Item</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;item 3&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">add_entity</span><span class="p">(</span><span class="n">Item</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="s1">&#39;j1&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">add_entity</span><span class="p">(</span><span class="n">Item</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="s1">&#39;j2&#39;</span><span class="p">)</span></pre></div>
+</div>
+<p>Returns tuples in the form: <code class="docutils literal notranslate"><span class="pre">(Order,</span> <span class="pre">Item,</span> <span class="pre">Item)</span></code>.</p>
+</div>
+<div class="section" id="self-referential-queries">
+<h4>Self-referential Queries<a class="headerlink" href="#self-referential-queries" title="Permalink to this headline">¶</a></h4>
+<p>So query.join() can make aliases now.  What does that give
+us ?  Self-referential queries !   Joins can be done without
+any <code class="docutils literal notranslate"><span class="pre">Alias</span></code> objects:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># standard self-referential TreeNode mapper with backref</span>
+<span class="n">mapper</span><span class="p">(</span><span class="n">TreeNode</span><span class="p">,</span> <span class="n">tree_nodes</span><span class="p">,</span> <span class="n">properties</span><span class="o">=</span><span class="p">{</span>
+    <span class="s1">&#39;children&#39;</span><span class="p">:</span><span class="n">relation</span><span class="p">(</span><span class="n">TreeNode</span><span class="p">,</span> <span class="n">backref</span><span class="o">=</span><span class="n">backref</span><span class="p">(</span><span class="s1">&#39;parent&#39;</span><span class="p">,</span> <span class="n">remote_side</span><span class="o">=</span><span class="n">tree_nodes</span><span class="o">.</span><span class="n">id</span><span class="p">))</span>
+<span class="p">})</span>
+
+<span class="c1"># query for node with child containing &quot;bar&quot; two levels deep</span>
+<span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">TreeNode</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;children&quot;</span><span class="p">,</span> <span class="s2">&quot;children&quot;</span><span class="p">],</span> <span class="n">aliased</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;bar&#39;</span><span class="p">)</span></pre></div>
+</div>
+<p>To add criterion for each table along the way in an aliased
+join, you can use <code class="docutils literal notranslate"><span class="pre">from_joinpoint</span></code> to keep joining against
+the same line of aliases:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># search for the treenode along the path &quot;n1/n12/n122&quot;</span>
+
+<span class="c1"># first find a Node with name=&quot;n122&quot;</span>
+<span class="n">q</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Node</span><span class="p">)</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;n122&#39;</span><span class="p">)</span>
+
+<span class="c1"># then join to parent with &quot;n12&quot;</span>
+<span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;parent&#39;</span><span class="p">,</span> <span class="n">aliased</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;n12&#39;</span><span class="p">)</span>
+
+<span class="c1"># join again to the next parent with &#39;n1&#39;.  use &#39;from_joinpoint&#39;</span>
+<span class="c1"># so we join from the previous point, instead of joining off the</span>
+<span class="c1"># root table</span>
+<span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;parent&#39;</span><span class="p">,</span> <span class="n">aliased</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">from_joinpoint</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;n1&#39;</span><span class="p">)</span>
+
+<span class="n">node</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">first</span><span class="p">()</span></pre></div>
+</div>
+</div>
+<div class="section" id="query-populate-existing">
+<h4><code class="docutils literal notranslate"><span class="pre">query.populate_existing()</span></code><a class="headerlink" href="#query-populate-existing" title="Permalink to this headline">¶</a></h4>
+<p>The eager version of <code class="docutils literal notranslate"><span class="pre">query.load()</span></code> (or
+<code class="docutils literal notranslate"><span class="pre">session.refresh()</span></code>).  Every instance loaded from the
+query, including all eagerly loaded items, get refreshed
+immediately if already present in the session:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Blah</span><span class="p">)</span><span class="o">.</span><span class="n">populate_existing</span><span class="p">()</span><span class="o">.</span><span class="n">all</span><span class="p">()</span></pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="relations">
+<h3>Relations<a class="headerlink" href="#relations" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="sql-clauses-embedded-in-updates-inserts">
+<h4>SQL Clauses Embedded in Updates/Inserts<a class="headerlink" href="#sql-clauses-embedded-in-updates-inserts" title="Permalink to this headline">¶</a></h4>
+<p>For inline execution of SQL clauses, embedded right in the
+UPDATE or INSERT, during a <code class="docutils literal notranslate"><span class="pre">flush()</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">myobject</span><span class="o">.</span><span class="n">foo</span> <span class="o">=</span> <span class="n">mytable</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">value</span> <span class="o">+</span> <span class="mi">1</span>
+
+<span class="n">user</span><span class="o">.</span><span class="n">pwhash</span> <span class="o">=</span> <span class="n">func</span><span class="o">.</span><span class="n">md5</span><span class="p">(</span><span class="n">password</span><span class="p">)</span>
+
+<span class="n">order</span><span class="o">.</span><span class="n">hash</span> <span class="o">=</span> <span class="n">text</span><span class="p">(</span><span class="s2">&quot;select hash from hashing_table&quot;</span><span class="p">)</span></pre></div>
+</div>
+<p>The column-attribute is set up with a deferred loader after
+the operation, so that it issues the SQL to load the new
+value when you next access.</p>
+</div>
+<div class="section" id="self-referential-and-cyclical-eager-loading">
+<h4>Self-referential and Cyclical Eager Loading<a class="headerlink" href="#self-referential-and-cyclical-eager-loading" title="Permalink to this headline">¶</a></h4>
+<p>Since our alias-fu has improved, <code class="docutils literal notranslate"><span class="pre">relation()</span></code> can join
+along the same table *any number of times*; you tell it how
+deep you want to go.  Lets show the self-referential
+<code class="docutils literal notranslate"><span class="pre">TreeNode</span></code> more clearly:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nodes</span> <span class="o">=</span> <span class="n">Table</span><span class="p">(</span><span class="s1">&#39;nodes&#39;</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span>
+     <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+     <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;parent_id&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s1">&#39;nodes.id&#39;</span><span class="p">)),</span>
+     <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">30</span><span class="p">)))</span>
+
+<span class="k">class</span> <span class="nc">TreeNode</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+<span class="n">mapper</span><span class="p">(</span><span class="n">TreeNode</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">properties</span><span class="o">=</span><span class="p">{</span>
+    <span class="s1">&#39;children&#39;</span><span class="p">:</span><span class="n">relation</span><span class="p">(</span><span class="n">TreeNode</span><span class="p">,</span> <span class="n">lazy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">join_depth</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="p">})</span></pre></div>
+</div>
+<p>So what happens when we say:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">create_session</span><span class="p">()</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">TreeNode</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span></pre></div>
+</div>
+<p>?  A join along aliases, three levels deep off the parent:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span>
+<span class="n">nodes_3</span><span class="o">.</span><span class="n">id</span> <span class="n">AS</span> <span class="n">nodes_3_id</span><span class="p">,</span> <span class="n">nodes_3</span><span class="o">.</span><span class="n">parent_id</span> <span class="n">AS</span> <span class="n">nodes_3_parent_id</span><span class="p">,</span> <span class="n">nodes_3</span><span class="o">.</span><span class="n">name</span> <span class="n">AS</span> <span class="n">nodes_3_name</span><span class="p">,</span>
+<span class="n">nodes_2</span><span class="o">.</span><span class="n">id</span> <span class="n">AS</span> <span class="n">nodes_2_id</span><span class="p">,</span> <span class="n">nodes_2</span><span class="o">.</span><span class="n">parent_id</span> <span class="n">AS</span> <span class="n">nodes_2_parent_id</span><span class="p">,</span> <span class="n">nodes_2</span><span class="o">.</span><span class="n">name</span> <span class="n">AS</span> <span class="n">nodes_2_name</span><span class="p">,</span>
+<span class="n">nodes_1</span><span class="o">.</span><span class="n">id</span> <span class="n">AS</span> <span class="n">nodes_1_id</span><span class="p">,</span> <span class="n">nodes_1</span><span class="o">.</span><span class="n">parent_id</span> <span class="n">AS</span> <span class="n">nodes_1_parent_id</span><span class="p">,</span> <span class="n">nodes_1</span><span class="o">.</span><span class="n">name</span> <span class="n">AS</span> <span class="n">nodes_1_name</span><span class="p">,</span>
+<span class="n">nodes</span><span class="o">.</span><span class="n">id</span> <span class="n">AS</span> <span class="n">nodes_id</span><span class="p">,</span> <span class="n">nodes</span><span class="o">.</span><span class="n">parent_id</span> <span class="n">AS</span> <span class="n">nodes_parent_id</span><span class="p">,</span> <span class="n">nodes</span><span class="o">.</span><span class="n">name</span> <span class="n">AS</span> <span class="n">nodes_name</span>
+<span class="n">FROM</span> <span class="n">nodes</span> <span class="n">LEFT</span> <span class="n">OUTER</span> <span class="n">JOIN</span> <span class="n">nodes</span> <span class="n">AS</span> <span class="n">nodes_1</span> <span class="n">ON</span> <span class="n">nodes</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">nodes_1</span><span class="o">.</span><span class="n">parent_id</span>
+<span class="n">LEFT</span> <span class="n">OUTER</span> <span class="n">JOIN</span> <span class="n">nodes</span> <span class="n">AS</span> <span class="n">nodes_2</span> <span class="n">ON</span> <span class="n">nodes_1</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">nodes_2</span><span class="o">.</span><span class="n">parent_id</span>
+<span class="n">LEFT</span> <span class="n">OUTER</span> <span class="n">JOIN</span> <span class="n">nodes</span> <span class="n">AS</span> <span class="n">nodes_3</span> <span class="n">ON</span> <span class="n">nodes_2</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">nodes_3</span><span class="o">.</span><span class="n">parent_id</span>
+<span class="n">ORDER</span> <span class="n">BY</span> <span class="n">nodes</span><span class="o">.</span><span class="n">oid</span><span class="p">,</span> <span class="n">nodes_1</span><span class="o">.</span><span class="n">oid</span><span class="p">,</span> <span class="n">nodes_2</span><span class="o">.</span><span class="n">oid</span><span class="p">,</span> <span class="n">nodes_3</span><span class="o">.</span><span class="n">oid</span></pre></div>
+</div>
+<p>Notice the nice clean alias names too.  The joining doesn’t
+care if it’s against the same immediate table or some other
+object which then cycles back to the beginning.  Any kind
+of chain of eager loads can cycle back onto itself when
+<code class="docutils literal notranslate"><span class="pre">join_depth</span></code> is specified.  When not present, eager
+loading automatically stops when it hits a cycle.</p>
+</div>
+<div class="section" id="composite-types">
+<h4>Composite Types<a class="headerlink" href="#composite-types" title="Permalink to this headline">¶</a></h4>
+<p>This is one from the Hibernate camp.  Composite Types let
+you define a custom datatype that is composed of more than
+one column (or one column, if you wanted).   Lets define a
+new type, <code class="docutils literal notranslate"><span class="pre">Point</span></code>.  Stores an x/y coordinate:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Point</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">y</span>
+    <span class="k">def</span> <span class="nf">__composite_values__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span>
+    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">other</span><span class="o">.</span><span class="n">x</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="ow">and</span> <span class="n">other</span><span class="o">.</span><span class="n">y</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span>
+    <span class="k">def</span> <span class="nf">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__eq__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span></pre></div>
+</div>
+<p>The way the <code class="docutils literal notranslate"><span class="pre">Point</span></code> object is defined is specific to a
+custom type; constructor takes a list of arguments, and the
+<code class="docutils literal notranslate"><span class="pre">__composite_values__()</span></code> method produces a sequence of
+those arguments.  The order will match up to our mapper, as
+we’ll see in a moment.</p>
+<p>Let’s create a table of vertices storing two points per row:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vertices</span> <span class="o">=</span> <span class="n">Table</span><span class="p">(</span><span class="s1">&#39;vertices&#39;</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span>
+    <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+    <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;x1&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">),</span>
+    <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;y1&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">),</span>
+    <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;x2&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">),</span>
+    <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;y2&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">),</span>
+    <span class="p">)</span></pre></div>
+</div>
+<p>Then, map it !  We’ll create a <code class="docutils literal notranslate"><span class="pre">Vertex</span></code> object which
+stores two <code class="docutils literal notranslate"><span class="pre">Point</span></code> objects:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Vertex</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="n">start</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">end</span> <span class="o">=</span> <span class="n">end</span>
+
+<span class="n">mapper</span><span class="p">(</span><span class="n">Vertex</span><span class="p">,</span> <span class="n">vertices</span><span class="p">,</span> <span class="n">properties</span><span class="o">=</span><span class="p">{</span>
+    <span class="s1">&#39;start&#39;</span><span class="p">:</span><span class="n">composite</span><span class="p">(</span><span class="n">Point</span><span class="p">,</span> <span class="n">vertices</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">x1</span><span class="p">,</span> <span class="n">vertices</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">y1</span><span class="p">),</span>
+    <span class="s1">&#39;end&#39;</span><span class="p">:</span><span class="n">composite</span><span class="p">(</span><span class="n">Point</span><span class="p">,</span> <span class="n">vertices</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">x2</span><span class="p">,</span> <span class="n">vertices</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">y2</span><span class="p">)</span>
+<span class="p">})</span></pre></div>
+</div>
+<p>Once you’ve set up your composite type, it’s usable just
+like any other type:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">v</span> <span class="o">=</span> <span class="n">Vertex</span><span class="p">(</span><span class="n">Point</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">Point</span><span class="p">(</span><span class="mi">26</span><span class="p">,</span><span class="mi">15</span><span class="p">))</span>
+<span class="n">session</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+<span class="n">session</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+
+<span class="c1"># works in queries too</span>
+<span class="n">q</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Vertex</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Vertex</span><span class="o">.</span><span class="n">start</span> <span class="o">==</span> <span class="n">Point</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span></pre></div>
+</div>
+<p>If you’d like to define the way the mapped attributes
+generate SQL clauses when used in expressions, create your
+own <code class="docutils literal notranslate"><span class="pre">sqlalchemy.orm.PropComparator</span></code> subclass, defining any
+of the common operators (like <code class="docutils literal notranslate"><span class="pre">__eq__()</span></code>, <code class="docutils literal notranslate"><span class="pre">__le__()</span></code>,
+etc.), and send it in to <code class="docutils literal notranslate"><span class="pre">composite()</span></code>.  Composite types
+work as primary keys too, and are usable in <code class="docutils literal notranslate"><span class="pre">query.get()</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># a Document class which uses a composite Version</span>
+<span class="c1"># object as primary key</span>
+<span class="n">document</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">Version</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">))</span></pre></div>
+</div>
+</div>
+<div class="section" id="dynamic-loader-relations">
+<h4><code class="docutils literal notranslate"><span class="pre">dynamic_loader()</span></code> relations<a class="headerlink" href="#dynamic-loader-relations" title="Permalink to this headline">¶</a></h4>
+<p>A <code class="docutils literal notranslate"><span class="pre">relation()</span></code> that returns a live <code class="docutils literal notranslate"><span class="pre">Query</span></code> object for
+all read operations.  Write operations are limited to just
+<code class="docutils literal notranslate"><span class="pre">append()</span></code> and <code class="docutils literal notranslate"><span class="pre">remove()</span></code>, changes to the collection are
+not visible until the session is flushed.  This feature is
+particularly handy with an “autoflushing” session which will
+flush before each query.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mapper</span><span class="p">(</span><span class="n">Foo</span><span class="p">,</span> <span class="n">foo_table</span><span class="p">,</span> <span class="n">properties</span><span class="o">=</span><span class="p">{</span>
+    <span class="s1">&#39;bars&#39;</span><span class="p">:</span><span class="n">dynamic_loader</span><span class="p">(</span><span class="n">Bar</span><span class="p">,</span> <span class="n">backref</span><span class="o">=</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="o">&lt;</span><span class="n">other</span> <span class="n">relation</span><span class="p">()</span> <span class="n">opts</span><span class="o">&gt;</span><span class="p">)</span>
+<span class="p">})</span>
+
+<span class="n">session</span> <span class="o">=</span> <span class="n">create_session</span><span class="p">(</span><span class="n">autoflush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">foo</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Foo</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+
+<span class="n">foo</span><span class="o">.</span><span class="n">bars</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Bar</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;lala&#39;</span><span class="p">))</span>
+
+<span class="k">for</span> <span class="n">bar</span> <span class="ow">in</span> <span class="n">foo</span><span class="o">.</span><span class="n">bars</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Bar</span><span class="o">.</span><span class="n">name</span><span class="o">==</span><span class="s1">&#39;lala&#39;</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">bar</span><span class="p">)</span>
+
+<span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span></pre></div>
+</div>
+</div>
+<div class="section" id="new-options-undefer-group-eagerload-all">
+<h4>New Options: <code class="docutils literal notranslate"><span class="pre">undefer_group()</span></code>, <code class="docutils literal notranslate"><span class="pre">eagerload_all()</span></code><a class="headerlink" href="#new-options-undefer-group-eagerload-all" title="Permalink to this headline">¶</a></h4>
+<p>A couple of query options which are handy.
+<code class="docutils literal notranslate"><span class="pre">undefer_group()</span></code> marks a whole group of “deferred”
+columns as undeferred:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mapper</span><span class="p">(</span><span class="n">Class</span><span class="p">,</span> <span class="n">table</span><span class="p">,</span> <span class="n">properties</span><span class="o">=</span><span class="p">{</span>
+    <span class="s1">&#39;foo&#39;</span> <span class="p">:</span> <span class="n">deferred</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">foo</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="s1">&#39;group1&#39;</span><span class="p">),</span>
+    <span class="s1">&#39;bar&#39;</span> <span class="p">:</span> <span class="n">deferred</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">bar</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="s1">&#39;group1&#39;</span><span class="p">),</span>
+    <span class="s1">&#39;bat&#39;</span> <span class="p">:</span> <span class="n">deferred</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">bat</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="s1">&#39;group1&#39;</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Class</span><span class="p">)</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">undefer_group</span><span class="p">(</span><span class="s1">&#39;group1&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span></pre></div>
+</div>
+<p>and <code class="docutils literal notranslate"><span class="pre">eagerload_all()</span></code> sets a chain of attributes to be
+eager in one pass:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mapper</span><span class="p">(</span><span class="n">Foo</span><span class="p">,</span> <span class="n">foo_table</span><span class="p">,</span> <span class="n">properties</span><span class="o">=</span><span class="p">{</span>
+   <span class="s1">&#39;bar&#39;</span><span class="p">:</span><span class="n">relation</span><span class="p">(</span><span class="n">Bar</span><span class="p">)</span>
+<span class="p">})</span>
+<span class="n">mapper</span><span class="p">(</span><span class="n">Bar</span><span class="p">,</span> <span class="n">bar_table</span><span class="p">,</span> <span class="n">properties</span><span class="o">=</span><span class="p">{</span>
+   <span class="s1">&#39;bat&#39;</span><span class="p">:</span><span class="n">relation</span><span class="p">(</span><span class="n">Bat</span><span class="p">)</span>
+<span class="p">})</span>
+<span class="n">mapper</span><span class="p">(</span><span class="n">Bat</span><span class="p">,</span> <span class="n">bat_table</span><span class="p">)</span>
+
+<span class="c1"># eager load bar and bat</span>
+<span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Foo</span><span class="p">)</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">eagerload_all</span><span class="p">(</span><span class="s1">&#39;bar.bat&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span></pre></div>
+</div>
+</div>
+<div class="section" id="new-collection-api">
+<h4>New Collection API<a class="headerlink" href="#new-collection-api" title="Permalink to this headline">¶</a></h4>
+<p>Collections are no longer proxied by an
+{{{InstrumentedList}}} proxy, and access to members, methods
+and attributes is direct.   Decorators now intercept objects
+entering and leaving the collection, and it is now possible
+to easily write a custom collection class that manages its
+own membership.  Flexible decorators also replace the named
+method interface of custom collections in 0.3, allowing any
+class to be easily adapted to use as a collection container.</p>
+<p>Dictionary-based collections are now much easier to use and
+fully <code class="docutils literal notranslate"><span class="pre">dict</span></code>-like.  Changing <code class="docutils literal notranslate"><span class="pre">__iter__</span></code> is no longer
+needed for <code class="docutils literal notranslate"><span class="pre">dict``s,</span> <span class="pre">and</span> <span class="pre">new</span> <span class="pre">built-in</span> <span class="pre">``dict</span></code> types cover
+many needs:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># use a dictionary relation keyed by a column</span>
+<span class="n">relation</span><span class="p">(</span><span class="n">Item</span><span class="p">,</span> <span class="n">collection_class</span><span class="o">=</span><span class="n">column_mapped_collection</span><span class="p">(</span><span class="n">items</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">keyword</span><span class="p">))</span>
+<span class="c1"># or named attribute</span>
+<span class="n">relation</span><span class="p">(</span><span class="n">Item</span><span class="p">,</span> <span class="n">collection_class</span><span class="o">=</span><span class="n">attribute_mapped_collection</span><span class="p">(</span><span class="s1">&#39;keyword&#39;</span><span class="p">))</span>
+<span class="c1"># or any function you like</span>
+<span class="n">relation</span><span class="p">(</span><span class="n">Item</span><span class="p">,</span> <span class="n">collection_class</span><span class="o">=</span><span class="n">mapped_collection</span><span class="p">(</span><span class="k">lambda</span> <span class="n">entity</span><span class="p">:</span> <span class="n">entity</span><span class="o">.</span><span class="n">a</span> <span class="o">+</span> <span class="n">entity</span><span class="o">.</span><span class="n">b</span><span class="p">))</span></pre></div>
+</div>
+<p>Existing 0.3 <code class="docutils literal notranslate"><span class="pre">dict</span></code>-like and freeform object derived
+collection classes will need to be updated for the new API.
+In most cases this is simply a matter of adding a couple
+decorators to the class definition.</p>
+</div>
+<div class="section" id="mapped-relations-from-external-tables-subqueries">
+<h4>Mapped Relations from External Tables/Subqueries<a class="headerlink" href="#mapped-relations-from-external-tables-subqueries" title="Permalink to this headline">¶</a></h4>
+<p>This feature quietly appeared in 0.3 but has been improved
+in 0.4 thanks to better ability to convert subqueries
+against a table into subqueries against an alias of that
+table; this is key for eager loading, aliased joins in
+queries, etc.  It reduces the need to create mappers against
+select statements when you just need to add some extra
+columns or subqueries:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mapper</span><span class="p">(</span><span class="n">User</span><span class="p">,</span> <span class="n">users</span><span class="p">,</span> <span class="n">properties</span><span class="o">=</span><span class="p">{</span>
+       <span class="s1">&#39;fullname&#39;</span><span class="p">:</span> <span class="n">column_property</span><span class="p">((</span><span class="n">users</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">firstname</span> <span class="o">+</span> <span class="n">users</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">lastname</span><span class="p">)</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="s1">&#39;fullname&#39;</span><span class="p">)),</span>
+       <span class="s1">&#39;numposts&#39;</span><span class="p">:</span> <span class="n">column_property</span><span class="p">(</span>
+            <span class="n">select</span><span class="p">([</span><span class="n">func</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="mi">1</span><span class="p">)],</span> <span class="n">users</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">id</span><span class="o">==</span><span class="n">posts</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">user_id</span><span class="p">)</span><span class="o">.</span><span class="n">correlate</span><span class="p">(</span><span class="n">users</span><span class="p">)</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="s1">&#39;posts&#39;</span><span class="p">)</span>
+       <span class="p">)</span>
+    <span class="p">})</span></pre></div>
+</div>
+<p>a typical query looks like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span> <span class="p">(</span><span class="n">SELECT</span> <span class="n">count</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="n">FROM</span> <span class="n">posts</span> <span class="n">WHERE</span> <span class="n">users</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">posts</span><span class="o">.</span><span class="n">user_id</span><span class="p">)</span> <span class="n">AS</span> <span class="n">count</span><span class="p">,</span>
+<span class="n">users</span><span class="o">.</span><span class="n">firstname</span> <span class="o">||</span> <span class="n">users</span><span class="o">.</span><span class="n">lastname</span> <span class="n">AS</span> <span class="n">fullname</span><span class="p">,</span>
+<span class="n">users</span><span class="o">.</span><span class="n">id</span> <span class="n">AS</span> <span class="n">users_id</span><span class="p">,</span> <span class="n">users</span><span class="o">.</span><span class="n">firstname</span> <span class="n">AS</span> <span class="n">users_firstname</span><span class="p">,</span> <span class="n">users</span><span class="o">.</span><span class="n">lastname</span> <span class="n">AS</span> <span class="n">users_lastname</span>
+<span class="n">FROM</span> <span class="n">users</span> <span class="n">ORDER</span> <span class="n">BY</span> <span class="n">users</span><span class="o">.</span><span class="n">oid</span></pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="horizontal-scaling-sharding-api">
+<h3>Horizontal Scaling (Sharding) API<a class="headerlink" href="#horizontal-scaling-sharding-api" title="Permalink to this headline">¶</a></h3>
+<p>[browser:/sqlalchemy/trunk/examples/sharding/attribute_shard
+.py]</p>
+</div>
+<div class="section" id="sessions">
+<h3>Sessions<a class="headerlink" href="#sessions" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="new-session-create-paradigm-sessioncontext-assignmapper-deprecated">
+<h4>New Session Create Paradigm; SessionContext, assignmapper Deprecated<a class="headerlink" href="#new-session-create-paradigm-sessioncontext-assignmapper-deprecated" title="Permalink to this headline">¶</a></h4>
+<p>That’s right, the whole shebang is being replaced with two
+configurational functions.  Using both will produce the most
+0.1-ish feel we’ve had since 0.1 (i.e., the least amount of
+typing).</p>
+<p>Configure your own <code class="docutils literal notranslate"><span class="pre">Session</span></code> class right where you define
+your <code class="docutils literal notranslate"><span class="pre">engine</span></code> (or anywhere):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="n">create_engine</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="k">import</span> <span class="n">sessionmaker</span>
+
+<span class="n">engine</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="s1">&#39;myengine://&#39;</span><span class="p">)</span>
+<span class="n">Session</span> <span class="o">=</span> <span class="n">sessionmaker</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">engine</span><span class="p">,</span> <span class="n">autoflush</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">transactional</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># use the new Session() freely</span>
+<span class="n">sess</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
+<span class="n">sess</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">someobject</span><span class="p">)</span>
+<span class="n">sess</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span></pre></div>
+</div>
+<p>If you need to post-configure your Session, say with an
+engine, add it later with <code class="docutils literal notranslate"><span class="pre">configure()</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Session</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">create_engine</span><span class="p">(</span><span class="o">...</span><span class="p">))</span></pre></div>
+</div>
+<p>All the behaviors of <code class="docutils literal notranslate"><span class="pre">SessionContext</span></code> and the <code class="docutils literal notranslate"><span class="pre">query</span></code>
+and <code class="docutils literal notranslate"><span class="pre">__init__</span></code> methods of <code class="docutils literal notranslate"><span class="pre">assignmapper</span></code> are moved into
+the new <code class="docutils literal notranslate"><span class="pre">scoped_session()</span></code> function, which is compatible
+with both <code class="docutils literal notranslate"><span class="pre">sessionmaker</span></code> as well as <code class="docutils literal notranslate"><span class="pre">create_session()</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="k">import</span> <span class="n">scoped_session</span><span class="p">,</span> <span class="n">sessionmaker</span>
+
+<span class="n">Session</span> <span class="o">=</span> <span class="n">scoped_session</span><span class="p">(</span><span class="n">sessionmaker</span><span class="p">(</span><span class="n">autoflush</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">transactional</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="n">Session</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">engine</span><span class="p">)</span>
+
+<span class="n">u</span> <span class="o">=</span> <span class="n">User</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;wendy&#39;</span><span class="p">)</span>
+
+<span class="n">sess</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
+<span class="n">sess</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+<span class="n">sess</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+<span class="c1"># Session constructor is thread-locally scoped.  Everyone gets the same</span>
+<span class="c1"># Session in the thread when scope=&quot;thread&quot;.</span>
+<span class="n">sess2</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
+<span class="k">assert</span> <span class="n">sess</span> <span class="ow">is</span> <span class="n">sess2</span></pre></div>
+</div>
+<p>When using a thread-local <code class="docutils literal notranslate"><span class="pre">Session</span></code>, the returned class
+has all of <code class="docutils literal notranslate"><span class="pre">Session's</span></code> interface implemented as
+classmethods, and “assignmapper“‘s functionality is
+available using the <code class="docutils literal notranslate"><span class="pre">mapper</span></code> classmethod.  Just like the
+old <code class="docutils literal notranslate"><span class="pre">objectstore</span></code> days….</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># &quot;assignmapper&quot;-like functionality available via ScopedSession.mapper</span>
+<span class="n">Session</span><span class="o">.</span><span class="n">mapper</span><span class="p">(</span><span class="n">User</span><span class="p">,</span> <span class="n">users_table</span><span class="p">)</span>
+
+<span class="n">u</span> <span class="o">=</span> <span class="n">User</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;wendy&#39;</span><span class="p">)</span>
+
+<span class="n">Session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span></pre></div>
+</div>
+</div>
+<div class="section" id="sessions-are-again-weak-referencing-by-default">
+<h4>Sessions are again Weak Referencing By Default<a class="headerlink" href="#sessions-are-again-weak-referencing-by-default" title="Permalink to this headline">¶</a></h4>
+<p>The weak_identity_map flag is now set to <code class="docutils literal notranslate"><span class="pre">True</span></code> by default
+on Session.  Instances which are externally deferenced and
+fall out of scope are removed from the session
+automatically.   However, items which have “dirty” changes
+present will remain strongly referenced until those changes
+are flushed at which case the object reverts to being weakly
+referenced (this works for ‘mutable’ types, like picklable
+attributes, as well).  Setting weak_identity_map to
+<code class="docutils literal notranslate"><span class="pre">False</span></code> restores the old strong-referencing behavior for
+those of you using the session like a cache.</p>
+</div>
+<div class="section" id="auto-transactional-sessions">
+<h4>Auto-Transactional Sessions<a class="headerlink" href="#auto-transactional-sessions" title="Permalink to this headline">¶</a></h4>
+<p>As you might have noticed above, we are calling <code class="docutils literal notranslate"><span class="pre">commit()</span></code>
+on <code class="docutils literal notranslate"><span class="pre">Session</span></code>.  The flag <code class="docutils literal notranslate"><span class="pre">transactional=True</span></code> means the
+<code class="docutils literal notranslate"><span class="pre">Session</span></code> is always in a transaction, <code class="docutils literal notranslate"><span class="pre">commit()</span></code>
+persists permanently.</p>
+</div>
+<div class="section" id="auto-flushing-sessions">
+<h4>Auto-Flushing Sessions<a class="headerlink" href="#auto-flushing-sessions" title="Permalink to this headline">¶</a></h4>
+<p>Also, <code class="docutils literal notranslate"><span class="pre">autoflush=True</span></code> means the <code class="docutils literal notranslate"><span class="pre">Session</span></code> will
+<code class="docutils literal notranslate"><span class="pre">flush()</span></code> before each <code class="docutils literal notranslate"><span class="pre">query</span></code> as well as when you call
+<code class="docutils literal notranslate"><span class="pre">flush()</span></code> or <code class="docutils literal notranslate"><span class="pre">commit()</span></code>.  So now this will work:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Session</span> <span class="o">=</span> <span class="n">sessionmaker</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">engine</span><span class="p">,</span> <span class="n">autoflush</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">transactional</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">u</span> <span class="o">=</span> <span class="n">User</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;wendy&#39;</span><span class="p">)</span>
+
+<span class="n">sess</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
+<span class="n">sess</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+
+<span class="c1"># wendy is flushed, comes right back from a query</span>
+<span class="n">wendy</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">User</span><span class="p">)</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;wendy&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">one</span><span class="p">()</span></pre></div>
+</div>
+</div>
+<div class="section" id="transactional-methods-moved-onto-sessions">
+<h4>Transactional methods moved onto sessions<a class="headerlink" href="#transactional-methods-moved-onto-sessions" title="Permalink to this headline">¶</a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">commit()</span></code> and <code class="docutils literal notranslate"><span class="pre">rollback()</span></code>, as well as <code class="docutils literal notranslate"><span class="pre">begin()</span></code> are
+now directly on <code class="docutils literal notranslate"><span class="pre">Session</span></code>.  No more need to use
+<code class="docutils literal notranslate"><span class="pre">SessionTransaction</span></code> for anything (it remains in the
+background).</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Session</span> <span class="o">=</span> <span class="n">sessionmaker</span><span class="p">(</span><span class="n">autoflush</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">transactional</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="n">sess</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
+<span class="n">sess</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
+
+<span class="c1"># use the session</span>
+
+<span class="n">sess</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span> <span class="c1"># commit transaction</span></pre></div>
+</div>
+<p>Sharing a <code class="docutils literal notranslate"><span class="pre">Session</span></code> with an enclosing engine-level (i.e.
+non-ORM) transaction is easy:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Session</span> <span class="o">=</span> <span class="n">sessionmaker</span><span class="p">(</span><span class="n">autoflush</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">transactional</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="n">conn</span> <span class="o">=</span> <span class="n">engine</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+<span class="n">trans</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
+<span class="n">sess</span> <span class="o">=</span> <span class="n">Session</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">conn</span><span class="p">)</span>
+
+<span class="c1"># ... session is transactional</span>
+
+<span class="c1"># commit the outermost transaction</span>
+<span class="n">trans</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span></pre></div>
+</div>
+</div>
+<div class="section" id="nested-session-transactions-with-savepoint">
+<h4>Nested Session Transactions with SAVEPOINT<a class="headerlink" href="#nested-session-transactions-with-savepoint" title="Permalink to this headline">¶</a></h4>
+<p>Available at the Engine and ORM level.  ORM docs so far:</p>
+<p><a class="reference external" href="http://www.sqlalchemy.org/docs/04/session.html#unitofwork_managing">http://www.sqlalchemy.org/docs/04/session.html#unitofwork_managing</a></p>
+</div>
+<div class="section" id="two-phase-commit-sessions">
+<h4>Two-Phase Commit Sessions<a class="headerlink" href="#two-phase-commit-sessions" title="Permalink to this headline">¶</a></h4>
+<p>Available at the Engine and ORM level.  ORM docs so far:</p>
+<p><a class="reference external" href="http://www.sqlalchemy.org/docs/04/session.html#unitofwork_managing">http://www.sqlalchemy.org/docs/04/session.html#unitofwork_managing</a></p>
+</div>
+</div>
+<div class="section" id="inheritance">
+<h3>Inheritance<a class="headerlink" href="#inheritance" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="polymorphic-inheritance-with-no-joins-or-unions">
+<h4>Polymorphic Inheritance with No Joins or Unions<a class="headerlink" href="#polymorphic-inheritance-with-no-joins-or-unions" title="Permalink to this headline">¶</a></h4>
+<p>New docs for inheritance:  <a class="reference external" href="http://www.sqlalchemy.org/docs/04">http://www.sqlalchemy.org/docs/04</a>
+/mappers.html#advdatamapping_mapper_inheritance_joined</p>
+</div>
+<div class="section" id="better-polymorphic-behavior-with-get">
+<h4>Better Polymorphic Behavior with <code class="docutils literal notranslate"><span class="pre">get()</span></code><a class="headerlink" href="#better-polymorphic-behavior-with-get" title="Permalink to this headline">¶</a></h4>
+<p>All classes within a joined-table inheritance hierarchy get
+an <code class="docutils literal notranslate"><span class="pre">_instance_key</span></code> using the base class, i.e.
+<code class="docutils literal notranslate"><span class="pre">(BaseClass,</span> <span class="pre">(1,</span> <span class="pre">),</span> <span class="pre">None)</span></code>.  That way when you call
+<code class="docutils literal notranslate"><span class="pre">get()</span></code> a <code class="docutils literal notranslate"><span class="pre">Query</span></code> against the base class, it can locate
+subclass instances in the current identity map without
+querying the database.</p>
+</div>
+</div>
+<div class="section" id="types">
+<h3>Types<a class="headerlink" href="#types" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="custom-subclasses-of-sqlalchemy-types-typedecorator">
+<h4>Custom Subclasses of <code class="docutils literal notranslate"><span class="pre">sqlalchemy.types.TypeDecorator</span></code><a class="headerlink" href="#custom-subclasses-of-sqlalchemy-types-typedecorator" title="Permalink to this headline">¶</a></h4>
+<p>There is a <a class="reference external" href="http://www.sqlalchemy.org/docs/04/types.html#types_custom">New API</a> for subclassing a TypeDecorator.
+Using the 0.3 API causes compilation errors in some cases.</p>
+</div>
+</div>
+</div>
+<div class="section" id="sql-expressions">
+<h2>SQL Expressions<a class="headerlink" href="#sql-expressions" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="all-new-deterministic-label-alias-generation">
+<h3>All New, Deterministic Label/Alias Generation<a class="headerlink" href="#all-new-deterministic-label-alias-generation" title="Permalink to this headline">¶</a></h3>
+<p>All the “anonymous” labels and aliases use a simple
+&lt;name&gt;_&lt;number&gt; format now.  SQL is much easier to read and
+is compatible with plan optimizer caches.  Just check out
+some of the examples in the tutorials:
+<a class="reference external" href="http://www.sqlalchemy.org/docs/04/ormtutorial.html">http://www.sqlalchemy.org/docs/04/ormtutorial.html</a>
+<a class="reference external" href="http://www.sqlalchemy.org/docs/04/sqlexpression.html">http://www.sqlalchemy.org/docs/04/sqlexpression.html</a></p>
+</div>
+<div class="section" id="generative-select-constructs">
+<h3>Generative select() Constructs<a class="headerlink" href="#generative-select-constructs" title="Permalink to this headline">¶</a></h3>
+<p>This is definitely the way to go with <code class="docutils literal notranslate"><span class="pre">select()</span></code>.  See htt
+p://www.sqlalchemy.org/docs/04/sqlexpression.html#sql_transf
+orm .</p>
+</div>
+<div class="section" id="new-operator-system">
+<h3>New Operator System<a class="headerlink" href="#new-operator-system" title="Permalink to this headline">¶</a></h3>
+<p>SQL operators and more or less every SQL keyword there is
+are now abstracted into the compiler layer.  They now act
+intelligently and are type/backend aware, see:
+<a class="reference external" href="http://www.sqlalchemy.org/docs/04/sqlexpression.html#sql_operators">http://www.sqlalchemy.org/docs/04/sqlexpression.html#sql_operators</a></p>
+</div>
+<div class="section" id="all-type-keyword-arguments-renamed-to-type">
+<h3>All <code class="docutils literal notranslate"><span class="pre">type</span></code> Keyword Arguments Renamed to <code class="docutils literal notranslate"><span class="pre">type_</span></code><a class="headerlink" href="#all-type-keyword-arguments-renamed-to-type" title="Permalink to this headline">¶</a></h3>
+<p>Just like it says:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">b</span> <span class="o">=</span> <span class="n">bindparam</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="n">type_</span><span class="o">=</span><span class="n">String</span><span class="p">)</span></pre></div>
+</div>
+</div>
+<div class="section" id="in-function-changed-to-accept-sequence-or-selectable">
+<h3>in_ Function Changed to Accept Sequence or Selectable<a class="headerlink" href="#in-function-changed-to-accept-sequence-or-selectable" title="Permalink to this headline">¶</a></h3>
+<p>The in_ function now takes a sequence of values or a
+selectable as its sole argument. The previous API of passing
+in values as positional arguments still works, but is now
+deprecated. This means that</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">my_table</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">my_table</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">in_</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">my_table</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">my_table</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">in_</span><span class="p">(</span><span class="o">*</span><span class="n">listOfIds</span><span class="p">)</span></pre></div>
+</div>
+<p>should be changed to</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">my_table</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">my_table</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">in_</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>
+<span class="n">my_table</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">my_table</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">in_</span><span class="p">(</span><span class="n">listOfIds</span><span class="p">)</span></pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="schema-and-reflection">
+<h2>Schema and Reflection<a class="headerlink" href="#schema-and-reflection" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="metadata-boundmetadata-dynamicmetadata">
+<h3><code class="docutils literal notranslate"><span class="pre">MetaData</span></code>, <code class="docutils literal notranslate"><span class="pre">BoundMetaData</span></code>, <code class="docutils literal notranslate"><span class="pre">DynamicMetaData</span></code>…<a class="headerlink" href="#metadata-boundmetadata-dynamicmetadata" title="Permalink to this headline">¶</a></h3>
+<p>In the 0.3.x series, <code class="docutils literal notranslate"><span class="pre">BoundMetaData</span></code> and
+<code class="docutils literal notranslate"><span class="pre">DynamicMetaData</span></code> were deprecated in favor of <code class="docutils literal notranslate"><span class="pre">MetaData</span></code>
+and <code class="docutils literal notranslate"><span class="pre">ThreadLocalMetaData</span></code>.  The older names have been
+removed in 0.4.  Updating is simple:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>+-------------------------------------+-------------------------+
+|If You Had                           | Now Use                 |
++=====================================+=========================+
+| ``MetaData``                        | ``MetaData``            |
++-------------------------------------+-------------------------+
+| ``BoundMetaData``                   | ``MetaData``            |
++-------------------------------------+-------------------------+
+| ``DynamicMetaData`` (with one       | ``MetaData``            |
+| engine or threadlocal=False)        |                         |
++-------------------------------------+-------------------------+
+| ``DynamicMetaData``                 | ``ThreadLocalMetaData`` |
+| (with different engines per thread) |                         |
++-------------------------------------+-------------------------+</pre></div>
+</div>
+<p>The seldom-used <code class="docutils literal notranslate"><span class="pre">name</span></code> parameter to <code class="docutils literal notranslate"><span class="pre">MetaData</span></code> types has
+been removed.  The <code class="docutils literal notranslate"><span class="pre">ThreadLocalMetaData</span></code> constructor now
+takes no arguments.  Both types can now be bound to an
+<code class="docutils literal notranslate"><span class="pre">Engine</span></code> or a single <code class="docutils literal notranslate"><span class="pre">Connection</span></code>.</p>
+</div>
+<div class="section" id="one-step-multi-table-reflection">
+<h3>One Step Multi-Table Reflection<a class="headerlink" href="#one-step-multi-table-reflection" title="Permalink to this headline">¶</a></h3>
+<p>You can now load table definitions and automatically create
+<code class="docutils literal notranslate"><span class="pre">Table</span></code> objects from an entire database or schema in one
+pass:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">metadata</span> <span class="o">=</span> <span class="n">MetaData</span><span class="p">(</span><span class="n">myengine</span><span class="p">,</span> <span class="n">reflect</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">metadata</span><span class="o">.</span><span class="n">tables</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+<span class="go">[&#39;table_a&#39;, &#39;table_b&#39;, &#39;table_c&#39;, &#39;...&#39;]</span></pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">MetaData</span></code> also gains a <code class="docutils literal notranslate"><span class="pre">.reflect()</span></code> method enabling
+finer control over the loading process, including
+specification of a subset of available tables to load.</p>
+</div>
+</div>
+<div class="section" id="sql-execution">
+<h2>SQL Execution<a class="headerlink" href="#sql-execution" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="engine-connectable-and-bind-to-are-all-now-bind">
+<h3><code class="docutils literal notranslate"><span class="pre">engine</span></code>, <code class="docutils literal notranslate"><span class="pre">connectable</span></code>, and <code class="docutils literal notranslate"><span class="pre">bind_to</span></code> are all now <code class="docutils literal notranslate"><span class="pre">bind</span></code><a class="headerlink" href="#engine-connectable-and-bind-to-are-all-now-bind" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="transactions-nestedtransactions-and-twophasetransactions">
+<h3><code class="docutils literal notranslate"><span class="pre">Transactions</span></code>, <code class="docutils literal notranslate"><span class="pre">NestedTransactions</span></code> and <code class="docutils literal notranslate"><span class="pre">TwoPhaseTransactions</span></code><a class="headerlink" href="#transactions-nestedtransactions-and-twophasetransactions" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="connection-pool-events">
+<h3>Connection Pool Events<a class="headerlink" href="#connection-pool-events" title="Permalink to this headline">¶</a></h3>
+<p>The connection pool now fires events when new DB-API
+connections are created, checked out and checked back into
+the pool.   You can use these to execute session-scoped SQL
+setup statements on fresh connections, for example.</p>
+</div>
+<div class="section" id="oracle-engine-fixed">
+<h3>Oracle Engine Fixed<a class="headerlink" href="#oracle-engine-fixed" title="Permalink to this headline">¶</a></h3>
+<p>In 0.3.11, there were bugs in the Oracle Engine on how
+Primary Keys are handled.  These bugs could cause programs
+that worked fine with other engines, such as sqlite, to fail
+when using the Oracle Engine.  In 0.4, the Oracle Engine has
+been reworked, fixing these Primary Key problems.</p>
+</div>
+<div class="section" id="out-parameters-for-oracle">
+<h3>Out Parameters for Oracle<a class="headerlink" href="#out-parameters-for-oracle" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">result</span> <span class="o">=</span> <span class="n">engine</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;begin foo(:x, :y, :z); end;&quot;</span><span class="p">,</span> <span class="n">bindparams</span><span class="o">=</span><span class="p">[</span><span class="n">bindparam</span><span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">Numeric</span><span class="p">),</span> <span class="n">outparam</span><span class="p">(</span><span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="n">Numeric</span><span class="p">),</span> <span class="n">outparam</span><span class="p">(</span><span class="s1">&#39;z&#39;</span><span class="p">,</span> <span class="n">Numeric</span><span class="p">)]),</span> <span class="n">x</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">result</span><span class="o">.</span><span class="n">out_parameters</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;y&#39;</span><span class="p">:</span><span class="mi">10</span><span class="p">,</span> <span class="s1">&#39;z&#39;</span><span class="p">:</span><span class="mi">75</span><span class="p">}</span></pre></div>
+</div>
+</div>
+<div class="section" id="connection-bound-metadata-sessions">
+<h3>Connection-bound <code class="docutils literal notranslate"><span class="pre">MetaData</span></code>, <code class="docutils literal notranslate"><span class="pre">Sessions</span></code><a class="headerlink" href="#connection-bound-metadata-sessions" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">MetaData</span></code> and <code class="docutils literal notranslate"><span class="pre">Session</span></code> can be explicitly bound to a
+connection:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conn</span> <span class="o">=</span> <span class="n">engine</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+<span class="n">sess</span> <span class="o">=</span> <span class="n">create_session</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">conn</span><span class="p">)</span></pre></div>
+</div>
+</div>
+<div class="section" id="faster-more-foolproof-resultproxy-objects">
+<h3>Faster, More Foolproof <code class="docutils literal notranslate"><span class="pre">ResultProxy</span></code> Objects<a class="headerlink" href="#faster-more-foolproof-resultproxy-objects" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+</div>
+
+    </div>
+
+</div>
+
+<div id="docs-bottom-navigation" class="docs-navigation-links, withsidebar">
+        Previous:
+        <a href="migration_05.html" title="previous chapter">What’s new in SQLAlchemy 0.5?</a>
+
+    <div id="docs-copyright">
+        &copy; <a href="../copyright.html">Copyright</a> 2007-2020, the SQLAlchemy authors and contributors.
+        Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 3.0.3.
+    </div>
+</div>
+
+</div>
+
+
+
+        
+        
+
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+          URL_ROOT:    '../',
+          VERSION:     '1.3.17',
+          COLLAPSE_MODINDEX: false,
+          FILE_SUFFIX: '.html'
+      };
+    </script>
+
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+
+    <!-- begin iterate through sphinx environment script_files -->
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    <!-- end iterate through sphinx environment script_files -->
+
+    <script type="text/javascript" src="../_static/detectmobile.js"></script>
+    <script type="text/javascript" src="../_static/init.js"></script>
+
+
+    </body>
+</html>
+
+

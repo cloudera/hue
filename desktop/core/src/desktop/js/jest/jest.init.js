@@ -18,10 +18,12 @@
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 
-import 'apps/notebook2/execution/sessionManager';
+import 'apps/editor/execution/sessionManager';
 import './jquery.setup';
 import './sqlTestUtils';
 
+import 'ext/bootstrap.2.3.2.min';
+import axios from 'axios';
 import $ from 'jquery';
 import * as ko from 'knockout';
 import komapping from 'knockout.mapping';
@@ -103,8 +105,18 @@ Object.keys(globalVars).forEach(key => {
 });
 
 $.ajaxSetup({
-  beforeSend: function() {
+  beforeSend: function () {
     console.warn('actual jQuery ajax called');
     console.trace();
   }
+});
+
+axios.interceptors.request.use(config => {
+  console.warn('Actual axios ajax request made to url: ' + config.url);
+  console.trace();
+  return config;
+});
+
+process.on('unhandledRejection', err => {
+  fail(err);
 });

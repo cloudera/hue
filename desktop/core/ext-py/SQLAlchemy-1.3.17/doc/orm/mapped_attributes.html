@@ -1,0 +1,669 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        
+        <title>
+            
+    
+    Changing Attribute Behavior
+ &mdash;
+    SQLAlchemy 1.3 Documentation
+
+        </title>
+
+        
+            <!-- begin iterate through site-imported + sphinx environment css_files -->
+                <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+                <link rel="stylesheet" href="../_static/docs.css" type="text/css" />
+                <link rel="stylesheet" href="../_static/changelog.css" type="text/css" />
+                <link rel="stylesheet" href="../_static/sphinx_paramlinks.css" type="text/css" />
+            <!-- end iterate through site-imported + sphinx environment css_files -->
+        
+
+        
+
+    
+
+    <!-- begin layout.mako headers -->
+
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+        <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="top" title="SQLAlchemy 1.3 Documentation" href="../index.html" />
+        <link rel="up" title="Mapping Columns and Expressions" href="scalar_mapping.html" />
+        <link rel="next" title="Composite Column Types" href="composites.html" />
+        <link rel="prev" title="SQL Expressions as Mapped Attributes" href="mapped_sql_expr.html" />
+    <!-- end layout.mako headers -->
+
+
+    </head>
+    <body>
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="docs-container">
+
+
+
+
+
+<div id="docs-top-navigation-container" class="body-background">
+<div id="docs-header">
+    <div id="docs-version-header">
+        Release: <span class="version-num">1.3.17</span>
+
+
+        | Release Date: May 13, 2020
+
+    </div>
+
+    <h1>SQLAlchemy 1.3 Documentation</h1>
+
+</div>
+</div>
+
+<div id="docs-body-container">
+
+    <div id="fixed-sidebar" class="withsidebar">
+
+
+        <div id="docs-sidebar-popout">
+            <h3><a href="../index.html">SQLAlchemy 1.3 Documentation</a></h3>
+            <p id="sidebar-topnav">
+                <a href="../contents.html">Contents</a> |
+                <a href="../genindex.html">Index</a>
+            </p>
+
+            <div id="sidebar-search">
+                <form class="search" action="../search.html" method="get">
+                  <label>
+                  Search terms:
+                  <input type="text" placeholder="search..." name="q" size="12" />
+                  </label>
+                  <input type="hidden" name="check_keywords" value="yes" />
+                  <input type="hidden" name="area" value="default" />
+                </form>
+            </div>
+
+        </div>
+
+        <div id="docs-sidebar">
+
+        <div id="sidebar-banner">
+            
+        </div>
+
+        <div id="docs-sidebar-inner">
+
+        
+        <h3>
+            <a href="index.html" title="SQLAlchemy ORM">SQLAlchemy ORM</a>
+        </h3>
+
+        <ul>
+<li><span class="link-container"><a class="reference external" href="tutorial.html">Object Relational Tutorial</a></span></li>
+<li><span class="link-container"><a class="reference external" href="mapper_config.html">Mapper Configuration</a></span><ul>
+<li><span class="link-container"><a class="reference external" href="mapping_styles.html">Types of Mappings</a></span></li>
+<li><span class="link-container"><a class="reference external" href="scalar_mapping.html">Mapping Columns and Expressions</a></span><ul>
+<li><span class="link-container"><a class="reference external" href="mapping_columns.html">Mapping Table Columns</a></span></li>
+<li><span class="link-container"><a class="reference external" href="mapped_sql_expr.html">SQL Expressions as Mapped Attributes</a></span></li>
+<li class="selected"><span class="link-container"><strong>Changing Attribute Behavior</strong><a class="paramlink headerlink reference internal" href="#">¶</a></span><ul>
+<li><span class="link-container"><a class="reference external" href="#simple-validators">Simple Validators</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#using-custom-datatypes-at-the-core-level">Using Custom Datatypes at the Core Level</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#using-descriptors-and-hybrids">Using Descriptors and Hybrids</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#synonyms">Synonyms</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#operator-customization">Operator Customization</a></span></li>
+</ul>
+</li>
+<li><span class="link-container"><a class="reference external" href="composites.html">Composite Column Types</a></span></li>
+</ul>
+</li>
+<li><span class="link-container"><a class="reference external" href="inheritance.html">Mapping Class Inheritance Hierarchies</a></span></li>
+<li><span class="link-container"><a class="reference external" href="nonstandard_mappings.html">Non-Traditional Mappings</a></span></li>
+<li><span class="link-container"><a class="reference external" href="versioning.html">Configuring a Version Counter</a></span></li>
+<li><span class="link-container"><a class="reference external" href="mapping_api.html">Class Mapping API</a></span></li>
+</ul>
+</li>
+<li><span class="link-container"><a class="reference external" href="relationships.html">Relationship Configuration</a></span></li>
+<li><span class="link-container"><a class="reference external" href="loading_objects.html">Loading Objects</a></span></li>
+<li><span class="link-container"><a class="reference external" href="session.html">Using the Session</a></span></li>
+<li><span class="link-container"><a class="reference external" href="extending.html">Events and Internals</a></span></li>
+<li><span class="link-container"><a class="reference external" href="extensions/index.html">ORM Extensions</a></span></li>
+<li><span class="link-container"><a class="reference external" href="examples.html">ORM Examples</a></span></li>
+</ul>
+
+
+
+        </div>
+
+        </div>
+
+    </div>
+
+    
+
+    <div id="docs-body" class="withsidebar" >
+        
+<div class="section" id="changing-attribute-behavior">
+<h1>Changing Attribute Behavior<a class="headerlink" href="#changing-attribute-behavior" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="simple-validators">
+<span id="id1"></span><h2>Simple Validators<a class="headerlink" href="#simple-validators" title="Permalink to this headline">¶</a></h2>
+<p>A quick way to add a “validation” routine to an attribute is to use the
+<a class="reference internal" href="#sqlalchemy.orm.validates" title="sqlalchemy.orm.validates"><code class="xref py py-func docutils literal notranslate"><span class="pre">validates()</span></code></a> decorator. An attribute validator can raise
+an exception, halting the process of mutating the attribute’s value, or can
+change the given value into something different. Validators, like all
+attribute extensions, are only called by normal userland code; they are not
+issued when the ORM is populating the object:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="k">import</span> <span class="n">validates</span>
+
+<span class="k">class</span> <span class="nc">EmailAddress</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;address&#39;</span>
+
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">email</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">)</span>
+
+    <span class="nd">@validates</span><span class="p">(</span><span class="s1">&#39;email&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">validate_email</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">address</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="s1">&#39;@&#39;</span> <span class="ow">in</span> <span class="n">address</span>
+        <span class="k">return</span> <span class="n">address</span></pre></div>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 1.0.0: </span>- validators are no longer triggered within
+the flush process when the newly fetched values for primary key
+columns as well as some python- or server-side defaults are fetched.
+Prior to 1.0, validators may be triggered in those cases as well.</p>
+</div>
+<p>Validators also receive collection append events, when items are added to a
+collection:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="k">import</span> <span class="n">validates</span>
+
+<span class="k">class</span> <span class="nc">User</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="c1"># ...</span>
+
+    <span class="n">addresses</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;Address&quot;</span><span class="p">)</span>
+
+    <span class="nd">@validates</span><span class="p">(</span><span class="s1">&#39;addresses&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">validate_address</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">address</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="s1">&#39;@&#39;</span> <span class="ow">in</span> <span class="n">address</span><span class="o">.</span><span class="n">email</span>
+        <span class="k">return</span> <span class="n">address</span></pre></div>
+</div>
+<p>The validation function by default does not get emitted for collection
+remove events, as the typical expectation is that a value being discarded
+doesn’t require validation.  However, <a class="reference internal" href="#sqlalchemy.orm.validates" title="sqlalchemy.orm.validates"><code class="xref py py-func docutils literal notranslate"><span class="pre">validates()</span></code></a> supports reception
+of these events by specifying <code class="docutils literal notranslate"><span class="pre">include_removes=True</span></code> to the decorator.  When
+this flag is set, the validation function must receive an additional boolean
+argument which if <code class="docutils literal notranslate"><span class="pre">True</span></code> indicates that the operation is a removal:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="k">import</span> <span class="n">validates</span>
+
+<span class="k">class</span> <span class="nc">User</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="c1"># ...</span>
+
+    <span class="n">addresses</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;Address&quot;</span><span class="p">)</span>
+
+    <span class="nd">@validates</span><span class="p">(</span><span class="s1">&#39;addresses&#39;</span><span class="p">,</span> <span class="n">include_removes</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">validate_address</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">is_remove</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">is_remove</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;not allowed to remove items from the collection&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="s1">&#39;@&#39;</span> <span class="ow">in</span> <span class="n">address</span><span class="o">.</span><span class="n">email</span>
+            <span class="k">return</span> <span class="n">address</span></pre></div>
+</div>
+<p>The case where mutually dependent validators are linked via a backref
+can also be tailored, using the <code class="docutils literal notranslate"><span class="pre">include_backrefs=False</span></code> option; this option,
+when set to <code class="docutils literal notranslate"><span class="pre">False</span></code>, prevents a validation function from emitting if the
+event occurs as a result of a backref:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="k">import</span> <span class="n">validates</span>
+
+<span class="k">class</span> <span class="nc">User</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="c1"># ...</span>
+
+    <span class="n">addresses</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;Address&quot;</span><span class="p">,</span> <span class="n">backref</span><span class="o">=</span><span class="s1">&#39;user&#39;</span><span class="p">)</span>
+
+    <span class="nd">@validates</span><span class="p">(</span><span class="s1">&#39;addresses&#39;</span><span class="p">,</span> <span class="n">include_backrefs</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">validate_address</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">address</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="s1">&#39;@&#39;</span> <span class="ow">in</span> <span class="n">address</span><span class="o">.</span><span class="n">email</span>
+        <span class="k">return</span> <span class="n">address</span></pre></div>
+</div>
+<p>Above, if we were to assign to <code class="docutils literal notranslate"><span class="pre">Address.user</span></code> as in <code class="docutils literal notranslate"><span class="pre">some_address.user</span> <span class="pre">=</span> <span class="pre">some_user</span></code>,
+the <code class="docutils literal notranslate"><span class="pre">validate_address()</span></code> function would <em>not</em> be emitted, even though an append
+occurs to <code class="docutils literal notranslate"><span class="pre">some_user.addresses</span></code> - the event is caused by a backref.</p>
+<p>Note that the <a class="reference internal" href="#sqlalchemy.orm.validates" title="sqlalchemy.orm.validates"><code class="xref py py-func docutils literal notranslate"><span class="pre">validates()</span></code></a> decorator is a convenience function built on
+top of attribute events.   An application that requires more control over
+configuration of attribute change behavior can make use of this system,
+described at <a class="reference internal" href="events.html#sqlalchemy.orm.events.AttributeEvents" title="sqlalchemy.orm.events.AttributeEvents"><code class="xref py py-class docutils literal notranslate"><span class="pre">AttributeEvents</span></code></a>.</p>
+<dl class="py function">
+<dt id="sqlalchemy.orm.validates">
+<em class="property">function </em><code class="sig-prename descclassname">sqlalchemy.orm.</code><code class="sig-name descname">validates</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">names</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.orm.validates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decorate a method as a ‘validator’ for one or more named properties.</p>
+<p>Designates a method as a validator, a method which receives the
+name of the attribute as well as a value to be assigned, or in the
+case of a collection, the value to be added to the collection.
+The function can then raise validation exceptions to halt the
+process from continuing (where Python’s built-in <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>
+and <code class="docutils literal notranslate"><span class="pre">AssertionError</span></code> exceptions are reasonable choices), or can
+modify or replace the value before proceeding. The function should
+otherwise return the given value.</p>
+<p>Note that a validator for a collection <strong>cannot</strong> issue a load of that
+collection within the validation routine - this usage raises
+an assertion to avoid recursion overflows.  This is a reentrant
+condition which is not supported.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span class="target" id="sqlalchemy.orm.validates.params.*names"></span><strong>*names</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.orm.validates.params.*names">¶</a> – list of attribute names to be validated.</p></li>
+<li><p><span class="target" id="sqlalchemy.orm.validates.params.include_removes"></span><strong>include_removes</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.orm.validates.params.include_removes">¶</a> – if True, “remove” events will be
+sent as well - the validation function must accept an additional
+argument “is_remove” which will be a boolean.</p></li>
+<li><p><span class="target" id="sqlalchemy.orm.validates.params.include_backrefs"></span><strong>include_backrefs</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.orm.validates.params.include_backrefs">¶</a> – <p>defaults to <code class="docutils literal notranslate"><span class="pre">True</span></code>; if <code class="docutils literal notranslate"><span class="pre">False</span></code>, the
+validation function will not emit if the originator is an attribute
+event related via a backref.  This can be used for bi-directional
+<a class="reference internal" href="#sqlalchemy.orm.validates" title="sqlalchemy.orm.validates"><code class="xref py py-func docutils literal notranslate"><span class="pre">validates()</span></code></a> usage where only one validator should emit per
+attribute operation.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.9.0.</span></p>
+</div>
+</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#simple-validators"><span class="std std-ref">Simple Validators</span></a> - usage examples for <a class="reference internal" href="#sqlalchemy.orm.validates" title="sqlalchemy.orm.validates"><code class="xref py py-func docutils literal notranslate"><span class="pre">validates()</span></code></a></p>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="using-custom-datatypes-at-the-core-level">
+<h2>Using Custom Datatypes at the Core Level<a class="headerlink" href="#using-custom-datatypes-at-the-core-level" title="Permalink to this headline">¶</a></h2>
+<p>A non-ORM means of affecting the value of a column in a way that suits
+converting data between how it is represented in Python, vs. how it is
+represented in the database, can be achieved by using a custom datatype that is
+applied to the mapped <a class="reference internal" href="../core/metadata.html#sqlalchemy.schema.Table" title="sqlalchemy.schema.Table"><code class="xref py py-class docutils literal notranslate"><span class="pre">Table</span></code></a> metadata.     This is more common in the
+case of some style of encoding / decoding that occurs both as data goes to the
+database and as it is returned; read more about this in the Core documentation
+at <a class="reference internal" href="../core/custom_types.html#types-typedecorator"><span class="std std-ref">Augmenting Existing Types</span></a>.</p>
+</div>
+<div class="section" id="using-descriptors-and-hybrids">
+<span id="mapper-hybrids"></span><h2>Using Descriptors and Hybrids<a class="headerlink" href="#using-descriptors-and-hybrids" title="Permalink to this headline">¶</a></h2>
+<p>A more comprehensive way to produce modified behavior for an attribute is to
+use <a class="reference internal" href="../glossary.html#term-descriptors"><span class="xref std std-term">descriptors</span></a>.  These are commonly used in Python using the <code class="docutils literal notranslate"><span class="pre">property()</span></code>
+function. The standard SQLAlchemy technique for descriptors is to create a
+plain descriptor, and to have it read/write from a mapped attribute with a
+different name. Below we illustrate this using Python 2.6-style properties:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">EmailAddress</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;email_address&#39;</span>
+
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># name the attribute with an underscore,</span>
+    <span class="c1"># different from the column name</span>
+    <span class="n">_email</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="s2">&quot;email&quot;</span><span class="p">,</span> <span class="n">String</span><span class="p">)</span>
+
+    <span class="c1"># then create an &quot;.email&quot; attribute</span>
+    <span class="c1"># to get/set &quot;._email&quot;</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">email</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_email</span>
+
+    <span class="nd">@email</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">email</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">email</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_email</span> <span class="o">=</span> <span class="n">email</span></pre></div>
+</div>
+<p>The approach above will work, but there’s more we can add. While our
+<code class="docutils literal notranslate"><span class="pre">EmailAddress</span></code> object will shuttle the value through the <code class="docutils literal notranslate"><span class="pre">email</span></code>
+descriptor and into the <code class="docutils literal notranslate"><span class="pre">_email</span></code> mapped attribute, the class level
+<code class="docutils literal notranslate"><span class="pre">EmailAddress.email</span></code> attribute does not have the usual expression semantics
+usable with <a class="reference internal" href="query.html#sqlalchemy.orm.query.Query" title="sqlalchemy.orm.query.Query"><code class="xref py py-class docutils literal notranslate"><span class="pre">Query</span></code></a>. To provide these, we instead use the
+<a class="reference internal" href="extensions/hybrid.html#module-sqlalchemy.ext.hybrid" title="sqlalchemy.ext.hybrid"><code class="xref py py-mod docutils literal notranslate"><span class="pre">hybrid</span></code></a> extension as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy.ext.hybrid</span> <span class="k">import</span> <span class="n">hybrid_property</span>
+
+<span class="k">class</span> <span class="nc">EmailAddress</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;email_address&#39;</span>
+
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">_email</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="s2">&quot;email&quot;</span><span class="p">,</span> <span class="n">String</span><span class="p">)</span>
+
+    <span class="nd">@hybrid_property</span>
+    <span class="k">def</span> <span class="nf">email</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_email</span>
+
+    <span class="nd">@email</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">email</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">email</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_email</span> <span class="o">=</span> <span class="n">email</span></pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">.email</span></code> attribute, in addition to providing getter/setter behavior when we have an
+instance of <code class="docutils literal notranslate"><span class="pre">EmailAddress</span></code>, also provides a SQL expression when used at the class level,
+that is, from the <code class="docutils literal notranslate"><span class="pre">EmailAddress</span></code> class directly:</p>
+<div class="highlight-python+sql notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="kn">import</span> <span class="n">Session</span>
+<span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
+
+<a href='#' class='sql_link'>sql</a><span class="n">address</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">EmailAddress</span><span class="p">)</span><span class="o">.</span>\
+                 <span class="nb">filter</span><span class="p">(</span><span class="n">EmailAddress</span><span class="o">.</span><span class="n">email</span> <span class="o">==</span> <span class="s1">&#39;address@example.com&#39;</span><span class="p">)</span><span class="o">.</span>\
+                 <span class="n">one</span><span class="p">()</span>
+<div class='popup_sql'>SELECT address.email AS address_email, address.id AS address_id
+FROM address
+WHERE address.email = ?
+(&#39;address@example.com&#39;,)
+</div>
+<span class="n">address</span><span class="o">.</span><span class="n">email</span> <span class="o">=</span> <span class="s1">&#39;otheraddress@example.com&#39;</span>
+<a href='#' class='sql_link'>sql</a><span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+<div class='popup_sql'>UPDATE address SET email=? WHERE address.id = ?
+(&#39;otheraddress@example.com&#39;, 1)
+COMMIT
+</div></pre></div>
+</div>
+<p>The <a class="reference internal" href="extensions/hybrid.html#sqlalchemy.ext.hybrid.hybrid_property" title="sqlalchemy.ext.hybrid.hybrid_property"><code class="xref py py-class docutils literal notranslate"><span class="pre">hybrid_property</span></code></a> also allows us to change the behavior of the
+attribute, including defining separate behaviors when the attribute is
+accessed at the instance level versus at the class/expression level, using the
+<a class="reference internal" href="extensions/hybrid.html#sqlalchemy.ext.hybrid.hybrid_property.expression" title="sqlalchemy.ext.hybrid.hybrid_property.expression"><code class="xref py py-meth docutils literal notranslate"><span class="pre">hybrid_property.expression()</span></code></a> modifier. Such as, if we wanted to add a
+host name automatically, we might define two sets of string manipulation
+logic:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">EmailAddress</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;email_address&#39;</span>
+
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">_email</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="s2">&quot;email&quot;</span><span class="p">,</span> <span class="n">String</span><span class="p">)</span>
+
+    <span class="nd">@hybrid_property</span>
+    <span class="k">def</span> <span class="nf">email</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the value of _email up until the last twelve</span>
+<span class="sd">        characters.&quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_email</span><span class="p">[:</span><span class="o">-</span><span class="mi">12</span><span class="p">]</span>
+
+    <span class="nd">@email</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">email</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">email</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set the value of _email, tacking on the twelve character</span>
+<span class="sd">        value @example.com.&quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_email</span> <span class="o">=</span> <span class="n">email</span> <span class="o">+</span> <span class="s2">&quot;@example.com&quot;</span>
+
+    <span class="nd">@email</span><span class="o">.</span><span class="n">expression</span>
+    <span class="k">def</span> <span class="nf">email</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Produce a SQL expression that represents the value</span>
+<span class="sd">        of the _email column, minus the last twelve characters.&quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="n">func</span><span class="o">.</span><span class="n">substr</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_email</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">func</span><span class="o">.</span><span class="n">length</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_email</span><span class="p">)</span> <span class="o">-</span> <span class="mi">12</span><span class="p">)</span></pre></div>
+</div>
+<p>Above, accessing the <code class="docutils literal notranslate"><span class="pre">email</span></code> property of an instance of <code class="docutils literal notranslate"><span class="pre">EmailAddress</span></code>
+will return the value of the <code class="docutils literal notranslate"><span class="pre">_email</span></code> attribute, removing or adding the
+hostname <code class="docutils literal notranslate"><span class="pre">&#64;example.com</span></code> from the value. When we query against the <code class="docutils literal notranslate"><span class="pre">email</span></code>
+attribute, a SQL function is rendered which produces the same effect:</p>
+<div class="highlight-python+sql notranslate"><div class="highlight"><pre><span></span><a href='#' class='sql_link'>sql</a><span class="n">address</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">EmailAddress</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">EmailAddress</span><span class="o">.</span><span class="n">email</span> <span class="o">==</span> <span class="s1">&#39;address&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">one</span><span class="p">()</span>
+<div class='popup_sql'>SELECT address.email AS address_email, address.id AS address_id
+FROM address
+WHERE substr(address.email, ?, length(address.email) - ?) = ?
+(0, 12, &#39;address&#39;)
+</div></pre></div>
+</div>
+<p>Read more about Hybrids at <a class="reference internal" href="extensions/hybrid.html"><span class="std std-ref">Hybrid Attributes</span></a>.</p>
+</div>
+<div class="section" id="synonyms">
+<span id="id2"></span><h2>Synonyms<a class="headerlink" href="#synonyms" title="Permalink to this headline">¶</a></h2>
+<p>Synonyms are a mapper-level construct that allow any attribute on a class
+to “mirror” another attribute that is mapped.</p>
+<p>In the most basic sense, the synonym is an easy way to make a certain
+attribute available by an additional name:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MyClass</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;my_table&#39;</span>
+
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">job_status</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+
+    <span class="n">status</span> <span class="o">=</span> <span class="n">synonym</span><span class="p">(</span><span class="s2">&quot;job_status&quot;</span><span class="p">)</span></pre></div>
+</div>
+<p>The above class <code class="docutils literal notranslate"><span class="pre">MyClass</span></code> has two attributes, <code class="docutils literal notranslate"><span class="pre">.job_status</span></code> and
+<code class="docutils literal notranslate"><span class="pre">.status</span></code> that will behave as one attribute, both at the expression
+level:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">MyClass</span><span class="o">.</span><span class="n">job_status</span> <span class="o">==</span> <span class="s1">&#39;some_status&#39;</span><span class="p">)</span>
+<span class="go">my_table.job_status = :job_status_1</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">MyClass</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s1">&#39;some_status&#39;</span><span class="p">)</span>
+<span class="go">my_table.job_status = :job_status_1</span></pre></div>
+</div>
+<p>and at the instance level:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">m1</span> <span class="o">=</span> <span class="n">MyClass</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m1</span><span class="o">.</span><span class="n">status</span><span class="p">,</span> <span class="n">m1</span><span class="o">.</span><span class="n">job_status</span>
+<span class="go">(&#39;x&#39;, &#39;x&#39;)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m1</span><span class="o">.</span><span class="n">job_status</span> <span class="o">=</span> <span class="s1">&#39;y&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m1</span><span class="o">.</span><span class="n">status</span><span class="p">,</span> <span class="n">m1</span><span class="o">.</span><span class="n">job_status</span>
+<span class="go">(&#39;y&#39;, &#39;y&#39;)</span></pre></div>
+</div>
+<p>The <a class="reference internal" href="#sqlalchemy.orm.synonym" title="sqlalchemy.orm.synonym"><code class="xref py py-func docutils literal notranslate"><span class="pre">synonym()</span></code></a> can be used for any kind of mapped attribute that
+subclasses <a class="reference internal" href="internals.html#sqlalchemy.orm.interfaces.MapperProperty" title="sqlalchemy.orm.interfaces.MapperProperty"><code class="xref py py-class docutils literal notranslate"><span class="pre">MapperProperty</span></code></a>, including mapped columns and relationships,
+as well as synonyms themselves.</p>
+<p>Beyond a simple mirror, <a class="reference internal" href="#sqlalchemy.orm.synonym" title="sqlalchemy.orm.synonym"><code class="xref py py-func docutils literal notranslate"><span class="pre">synonym()</span></code></a> can also be made to reference
+a user-defined <a class="reference internal" href="../glossary.html#term-descriptor"><span class="xref std std-term">descriptor</span></a>.  We can supply our
+<code class="docutils literal notranslate"><span class="pre">status</span></code> synonym with a <code class="docutils literal notranslate"><span class="pre">&#64;property</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MyClass</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;my_table&#39;</span>
+
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">job_status</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;Status: &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span>
+
+    <span class="n">job_status</span> <span class="o">=</span> <span class="n">synonym</span><span class="p">(</span><span class="s2">&quot;status&quot;</span><span class="p">,</span> <span class="n">descriptor</span><span class="o">=</span><span class="n">job_status</span><span class="p">)</span></pre></div>
+</div>
+<p>When using Declarative, the above pattern can be expressed more succinctly
+using the <a class="reference internal" href="extensions/declarative/api.html#sqlalchemy.ext.declarative.synonym_for" title="sqlalchemy.ext.declarative.synonym_for"><code class="xref py py-func docutils literal notranslate"><span class="pre">synonym_for()</span></code></a> decorator:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy.ext.declarative</span> <span class="k">import</span> <span class="n">synonym_for</span>
+
+<span class="k">class</span> <span class="nc">MyClass</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;my_table&#39;</span>
+
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+
+    <span class="nd">@synonym_for</span><span class="p">(</span><span class="s2">&quot;status&quot;</span><span class="p">)</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">job_status</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;Status: &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span></pre></div>
+</div>
+<p>While the <a class="reference internal" href="#sqlalchemy.orm.synonym" title="sqlalchemy.orm.synonym"><code class="xref py py-func docutils literal notranslate"><span class="pre">synonym()</span></code></a> is useful for simple mirroring, the use case
+of augmenting attribute behavior with descriptors is better handled in modern
+usage using the <a class="reference internal" href="#mapper-hybrids"><span class="std std-ref">hybrid attribute</span></a> feature, which
+is more oriented towards Python descriptors.   Technically, a <a class="reference internal" href="#sqlalchemy.orm.synonym" title="sqlalchemy.orm.synonym"><code class="xref py py-func docutils literal notranslate"><span class="pre">synonym()</span></code></a>
+can do everything that a <a class="reference internal" href="extensions/hybrid.html#sqlalchemy.ext.hybrid.hybrid_property" title="sqlalchemy.ext.hybrid.hybrid_property"><code class="xref py py-class docutils literal notranslate"><span class="pre">hybrid_property</span></code></a> can do, as it also supports
+injection of custom SQL capabilities, but the hybrid is more straightforward
+to use in more complex situations.</p>
+<dl class="py function">
+<dt id="sqlalchemy.orm.synonym">
+<em class="property">function </em><code class="sig-prename descclassname">sqlalchemy.orm.</code><code class="sig-name descname">synonym</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">map_column</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">descriptor</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">comparator_factory</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">doc</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">info</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.orm.synonym" title="Permalink to this definition">¶</a></dt>
+<dd><p>Denote an attribute name as a synonym to a mapped property,
+in that the attribute will mirror the value and expression behavior
+of another attribute.</p>
+<p>e.g.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MyClass</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;my_table&#39;</span>
+
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">job_status</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+
+    <span class="n">status</span> <span class="o">=</span> <span class="n">synonym</span><span class="p">(</span><span class="s2">&quot;job_status&quot;</span><span class="p">)</span></pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span class="target" id="sqlalchemy.orm.synonym.params.name"></span><strong>name</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.orm.synonym.params.name">¶</a> – the name of the existing mapped property.  This
+can refer to the string name ORM-mapped attribute
+configured on the class, including column-bound attributes
+and relationships.</p></li>
+<li><p><span class="target" id="sqlalchemy.orm.synonym.params.descriptor"></span><strong>descriptor</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.orm.synonym.params.descriptor">¶</a> – a Python <a class="reference internal" href="../glossary.html#term-descriptor"><span class="xref std std-term">descriptor</span></a> that will be used
+as a getter (and potentially a setter) when this attribute is
+accessed at the instance level.</p></li>
+<li><p><span class="target" id="sqlalchemy.orm.synonym.params.map_column"></span><strong>map_column</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.orm.synonym.params.map_column">¶</a> – <p><strong>For classical mappings and mappings against
+an existing Table object only</strong>.  if <code class="docutils literal notranslate"><span class="pre">True</span></code>, the <a class="reference internal" href="#sqlalchemy.orm.synonym" title="sqlalchemy.orm.synonym"><code class="xref py py-func docutils literal notranslate"><span class="pre">synonym()</span></code></a>
+construct will locate the <a class="reference internal" href="../core/metadata.html#sqlalchemy.schema.Column" title="sqlalchemy.schema.Column"><code class="xref py py-class docutils literal notranslate"><span class="pre">Column</span></code></a>
+object upon the mapped
+table that would normally be associated with the attribute name of
+this synonym, and produce a new <a class="reference internal" href="internals.html#sqlalchemy.orm.ColumnProperty" title="sqlalchemy.orm.ColumnProperty"><code class="xref py py-class docutils literal notranslate"><span class="pre">ColumnProperty</span></code></a> that instead
+maps this <a class="reference internal" href="../core/metadata.html#sqlalchemy.schema.Column" title="sqlalchemy.schema.Column"><code class="xref py py-class docutils literal notranslate"><span class="pre">Column</span></code></a>
+to the alternate name given as the “name”
+argument of the synonym; in this way, the usual step of redefining
+the mapping of the <a class="reference internal" href="../core/metadata.html#sqlalchemy.schema.Column" title="sqlalchemy.schema.Column"><code class="xref py py-class docutils literal notranslate"><span class="pre">Column</span></code></a>
+to be under a different name is
+unnecessary. This is usually intended to be used when a
+<a class="reference internal" href="../core/metadata.html#sqlalchemy.schema.Column" title="sqlalchemy.schema.Column"><code class="xref py py-class docutils literal notranslate"><span class="pre">Column</span></code></a>
+is to be replaced with an attribute that also uses a
+descriptor, that is, in conjunction with the
+<a class="reference internal" href="#sqlalchemy.orm.synonym.params.descriptor" title="sqlalchemy.orm.synonym"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">synonym.descriptor</span></code></a> parameter:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">my_table</span> <span class="o">=</span> <span class="n">Table</span><span class="p">(</span>
+    <span class="s2">&quot;my_table&quot;</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span>
+    <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+    <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;job_status&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+<span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">MyClass</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_job_status_descriptor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;Status: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">_job_status</span>
+
+
+<span class="n">mapper</span><span class="p">(</span>
+    <span class="n">MyClass</span><span class="p">,</span> <span class="n">my_table</span><span class="p">,</span> <span class="n">properties</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;job_status&quot;</span><span class="p">:</span> <span class="n">synonym</span><span class="p">(</span>
+            <span class="s2">&quot;_job_status&quot;</span><span class="p">,</span> <span class="n">map_column</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">descriptor</span><span class="o">=</span><span class="n">MyClass</span><span class="o">.</span><span class="n">_job_status_descriptor</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">)</span></pre></div>
+</div>
+<p>Above, the attribute named <code class="docutils literal notranslate"><span class="pre">_job_status</span></code> is automatically
+mapped to the <code class="docutils literal notranslate"><span class="pre">job_status</span></code> column:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">j1</span> <span class="o">=</span> <span class="n">MyClass</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">j1</span><span class="o">.</span><span class="n">_job_status</span> <span class="o">=</span> <span class="s2">&quot;employed&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">j1</span><span class="o">.</span><span class="n">job_status</span>
+<span class="go">Status: employed</span></pre></div>
+</div>
+<p>When using Declarative, in order to provide a descriptor in
+conjunction with a synonym, use the
+<a class="reference internal" href="extensions/declarative/api.html#sqlalchemy.ext.declarative.synonym_for" title="sqlalchemy.ext.declarative.synonym_for"><code class="xref py py-func docutils literal notranslate"><span class="pre">synonym_for()</span></code></a> helper.  However,
+note that the <a class="reference internal" href="#mapper-hybrids"><span class="std std-ref">hybrid properties</span></a> feature
+should usually be preferred, particularly when redefining attribute
+behavior.</p>
+</p></li>
+<li><p><span class="target" id="sqlalchemy.orm.synonym.params.info"></span><strong>info</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.orm.synonym.params.info">¶</a> – <p>Optional data dictionary which will be populated into the
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">InspectionAttr.info</span></code> attribute of this object.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 1.0.0.</span></p>
+</div>
+</p></li>
+<li><p><span class="target" id="sqlalchemy.orm.synonym.params.comparator_factory"></span><strong>comparator_factory</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.orm.synonym.params.comparator_factory">¶</a> – <p>A subclass of <a class="reference internal" href="internals.html#sqlalchemy.orm.PropComparator" title="sqlalchemy.orm.PropComparator"><code class="xref py py-class docutils literal notranslate"><span class="pre">PropComparator</span></code></a>
+that will provide custom comparison behavior at the SQL expression
+level.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For the use case of providing an attribute which redefines both
+Python-level and SQL-expression level behavior of an attribute,
+please refer to the Hybrid attribute introduced at
+<a class="reference internal" href="#mapper-hybrids"><span class="std std-ref">Using Descriptors and Hybrids</span></a> for a more effective technique.</p>
+</div>
+</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#synonyms"><span class="std std-ref">Synonyms</span></a> - Overview of synonyms</p>
+<p><a class="reference internal" href="extensions/declarative/api.html#sqlalchemy.ext.declarative.synonym_for" title="sqlalchemy.ext.declarative.synonym_for"><code class="xref py py-func docutils literal notranslate"><span class="pre">synonym_for()</span></code></a> - a helper oriented towards Declarative</p>
+<p><a class="reference internal" href="#mapper-hybrids"><span class="std std-ref">Using Descriptors and Hybrids</span></a> - The Hybrid Attribute extension provides an
+updated approach to augmenting attribute behavior more flexibly
+than can be achieved with synonyms.</p>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="operator-customization">
+<span id="custom-comparators"></span><h2>Operator Customization<a class="headerlink" href="#operator-customization" title="Permalink to this headline">¶</a></h2>
+<p>The “operators” used by the SQLAlchemy ORM and Core expression language
+are fully customizable.  For example, the comparison expression
+<code class="docutils literal notranslate"><span class="pre">User.name</span> <span class="pre">==</span> <span class="pre">'ed'</span></code> makes usage of an operator built into Python
+itself called <code class="docutils literal notranslate"><span class="pre">operator.eq</span></code> - the actual SQL construct which SQLAlchemy
+associates with such an operator can be modified.  New
+operations can be associated with column expressions as well.   The operators
+which take place for column expressions are most directly redefined at the
+type level -  see the
+section <a class="reference internal" href="../core/custom_types.html#types-operators"><span class="std std-ref">Redefining and Creating New Operators</span></a> for a description.</p>
+<p>ORM level functions like <a class="reference internal" href="mapping_columns.html#sqlalchemy.orm.column_property" title="sqlalchemy.orm.column_property"><code class="xref py py-func docutils literal notranslate"><span class="pre">column_property()</span></code></a>, <a class="reference internal" href="relationship_api.html#sqlalchemy.orm.relationship" title="sqlalchemy.orm.relationship"><code class="xref py py-func docutils literal notranslate"><span class="pre">relationship()</span></code></a>,
+and <a class="reference internal" href="composites.html#sqlalchemy.orm.composite" title="sqlalchemy.orm.composite"><code class="xref py py-func docutils literal notranslate"><span class="pre">composite()</span></code></a> also provide for operator redefinition at the ORM
+level, by passing a <a class="reference internal" href="internals.html#sqlalchemy.orm.PropComparator" title="sqlalchemy.orm.PropComparator"><code class="xref py py-class docutils literal notranslate"><span class="pre">PropComparator</span></code></a> subclass to the <code class="docutils literal notranslate"><span class="pre">comparator_factory</span></code>
+argument of each function.  Customization of operators at this level is a
+rare use case.  See the documentation at <a class="reference internal" href="internals.html#sqlalchemy.orm.PropComparator" title="sqlalchemy.orm.PropComparator"><code class="xref py py-class docutils literal notranslate"><span class="pre">PropComparator</span></code></a>
+for an overview.</p>
+</div>
+</div>
+
+    </div>
+
+</div>
+
+<div id="docs-bottom-navigation" class="docs-navigation-links, withsidebar">
+        Previous:
+        <a href="mapped_sql_expr.html" title="previous chapter">SQL Expressions as Mapped Attributes</a>
+        Next:
+        <a href="composites.html" title="next chapter">Composite Column Types</a>
+
+    <div id="docs-copyright">
+        &copy; <a href="../copyright.html">Copyright</a> 2007-2020, the SQLAlchemy authors and contributors.
+        Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 3.0.3.
+    </div>
+</div>
+
+</div>
+
+
+
+        
+        
+
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+          URL_ROOT:    '../',
+          VERSION:     '1.3.17',
+          COLLAPSE_MODINDEX: false,
+          FILE_SUFFIX: '.html'
+      };
+    </script>
+
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+
+    <!-- begin iterate through sphinx environment script_files -->
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    <!-- end iterate through sphinx environment script_files -->
+
+    <script type="text/javascript" src="../_static/detectmobile.js"></script>
+    <script type="text/javascript" src="../_static/init.js"></script>
+
+
+    </body>
+</html>
+
+

@@ -224,6 +224,7 @@ class MultiPartUpload(object):
             h = handler.XmlHandler(self, self)
             xml.sax.parseString(body, h)
             return self._parts
+        raise Exception("Error %d in multipart upload request - %s" % (response.status, body))
 
     def upload_part_from_file(self, fp, part_num, headers=None, replace=True,
                               cb=None, num_cb=10, md5=None, size=None):

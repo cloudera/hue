@@ -20,7 +20,7 @@ import * as ko from 'knockout';
 import huePubSub from 'utils/huePubSub';
 
 ko.bindingHandlers.assistFileDraggable = {
-  init: function(element, valueAccessor, allBindings, boundEntry) {
+  init: function (element, valueAccessor, allBindings, boundEntry) {
     const $element = $(element);
 
     let dragStartY = -1;
@@ -45,9 +45,7 @@ ko.bindingHandlers.assistFileDraggable = {
           );
         }
 
-        const $helper = $('.assist-file-entry-drag')
-          .clone()
-          .appendTo($container);
+        const $helper = $('.assist-file-entry-drag').clone().appendTo($container);
         $helper.find('.drag-text').text(boundEntry.definition().name);
         $helper
           .find('i')

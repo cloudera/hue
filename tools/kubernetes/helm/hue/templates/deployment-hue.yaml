@@ -17,12 +17,31 @@ spec:
     metadata:
       labels:
         pod: hue
+{{- with .Values.podLabels }}
+{{ toYaml . | indent 8 }}
+{{- end }}
       annotations:
-        checksum/config: {{ include (print $.Template.BasePath "/configmap-hue-extra.yaml") . | sha256sum }}
+        checksum/config: {{ include (print $.Template.BasePath "/configmap-hue.yaml") . | sha256sum }}
+        checksum/config-extra: {{ include (print $.Template.BasePath "/configmap-hue-extra.yaml") . | sha256sum }}
+        checksum/config-hive: {{ include (print $.Template.BasePath "/configmap-hive.yaml") . | sha256sum }}
 {{- with .Values.podAnnotations }}
 {{ toYaml . | indent 8 }}
 {{- end }}
     spec:
+{{ if eq .Values.hue.database.engine "postgresql_psycopg2" }}
+      initContainers:
+        - name: hue-init
+          image: {{ .Values.image.registry }}/hue:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args:
+            - /bin/sh
+            - -c
+            - >
+              set -x;
+              while [ $(curl -s --connect-timeout 1 {{ .Values.hue.database.host }}:{{ .Values.hue.database.port }} || echo $?) -ne 52 ]; do
+                sleep 1;
+              done
+{{ end }}
       containers:
       - name: hue
         image: {{ .Values.image.registry }}/hue:{{ .Values.image.tag }}
@@ -40,6 +59,9 @@ spec:
         - name: config-volume-extra
           mountPath: /usr/share/hue/desktop/conf/zz-hue.ini
           subPath: hue-ini
+        - name: hive-config-volume
+          mountPath: /etc/hive/conf/hive-site.xml
+          subPath: hive-site
         readinessProbe:
           httpGet:
             path: /desktop/debug/is_alive
@@ -69,6 +91,9 @@ spec:
         - name: config-volume-extra
           configMap:
             name: hue-config-extra
+        - name: hive-config-volume
+          configMap:
+            name: hive-config
 {{ if .Values.balancer.enabled }}
         - name: nginx-config
           configMap:

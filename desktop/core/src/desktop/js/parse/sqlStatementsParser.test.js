@@ -17,7 +17,7 @@
 import sqlStatementsParser from './sqlStatementsParser';
 
 describe('sqlStatementsParser.js', () => {
-  const stringifySplitResult = function(result) {
+  const stringifySplitResult = function (result) {
     let s = '[';
     let first = true;
     result.forEach(entry => {
@@ -46,7 +46,7 @@ describe('sqlStatementsParser.js', () => {
     return s;
   };
 
-  const testParser = function(input, expectedOutput) {
+  const testParser = function (input, expectedOutput) {
     try {
       expectedOutput.forEach(entry => {
         entry.type = 'statement';

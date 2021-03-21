@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -18,8 +19,8 @@
 from __future__ import absolute_import
 
 import logging
+import json
 
-from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
 from desktop.lib.i18n import force_unicode
@@ -79,11 +80,12 @@ class KSqlApi(Api):
           'has_more': False,
           'data': data if has_result_set else [],
           'meta': [{
-            'name': col['name'],
-            'type': col['type'],
-            'comment': ''
-          } for col in description
-        ] if has_result_set else [],
+              'name': col['name'],
+              'type': col['type'],
+              'comment': ''
+            }
+            for col in description
+          ] if has_result_set else [],
         'type': 'table'
       }
     }
@@ -95,7 +97,7 @@ class KSqlApi(Api):
 
 
   @query_error_handler
-  def autocomplete(self, snippet, database=None, table=None, column=None, nested=None):
+  def autocomplete(self, snippet, database=None, table=None, column=None, nested=None, operation=None):
     response = {}
 
     db = self._get_db()
@@ -128,6 +130,51 @@ class KSqlApi(Api):
 
     return response
 
+  @query_error_handler
+  def get_sample_data(self, snippet, database=None, table=None, column=None, is_async=False, operation=None):
+    notebook = {}
+
+    snippet = {
+      'statement': 'PRINT user_behavior FROM BEGINNING LIMIT 10'  # From beginning in case no new data is coming
+    }
+    sample = self.execute(notebook, snippet)['result']['data']
+
+    # 'result': {'has_more': False, 'data':
+    # [
+    #    Key format --> JSON or SESSION(KAFKA_STRING) or HOPPING(KAFKA_STRING) or TUMBLING(KAFKA_STRING) or KAFKA_STRING
+    #   ['Key format: ¯\\_(ツ)_/¯ - no data processed'],
+    #   ['Value format: JSON or KAFKA_STRING']
+    #   [
+    #     'rowtime: 2020/10/22 05:25:10.639 Z, '
+    #     'key: <null>, '
+    #     'value: {"user_id": "952483", "item_id":"310884", "category_id": "4580532", "behavior": "pv", "ts": "2017-11-27 00:00:00"}'
+    #   ]
+    # ]
+    # 'meta': [{'name': 'Row', 'type': 'STRING', 'comment': ''}], 'type': 'table'}
+
+    response = {
+      'status': 0,
+      'result': {}
+    }
+    print(sample[2:12])
+    print(sample[2:12][0])
+    print(sample[2:12][0][0].rsplit(', value: ', 1))
+    response['rows'] = [
+      list(json.loads(row[0].rsplit(', value: ', 1)[1]).values())
+      for row in sample[2:12]
+    ]
+
+    columns = json.loads(sample[2][0].rsplit(', value: ', 1)[1]).keys()
+
+    response['full_headers'] = [{
+        'name': col,
+        'type': 'string',
+        'comment': ''
+      } for col in columns
+    ]
+
+    print(response)
+    return response
 
   def fetch_result(self, notebook, snippet, rows, start_over):
     """Only called at the end of a live query."""

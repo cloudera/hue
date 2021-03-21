@@ -55,7 +55,9 @@ ${ commonheader(_("Welcome to Hue"), "login", user, request, "50px", True, True)
     ${ csrf_token(request) | n,unicode }
 
     <div class="logo">
-      <svg style="height: 80px; width: 200px;"><use xlink:href="#hi-logo"></use></svg>
+      <a href="https://gethue.com">
+        <svg style="height: 80px; width: 200px;"><use xlink:href="#hi-logo"></use></svg>
+      </a>
     </div>
 
     <h3>Query. Explore. Repeat.</h3>
@@ -107,7 +109,7 @@ ${ commonheader(_("Welcome to Hue"), "login", user, request, "50px", True, True)
         % if 'AllowAllBackend' in backend_names or backend_names == ['OAuthBackend']:
           hide
         % endif
-        % if form['password'].errors or (login_errors and ('username' in form and not form['username'].errors) and not form['password'].errors):
+        % if form['password'].errors or (login_errors and 'username' in form.fields and not form['username'].errors and not form['password'].errors):
           error
         % endif
       ">
@@ -135,7 +137,7 @@ ${ commonheader(_("Welcome to Hue"), "login", user, request, "50px", True, True)
     </div>
     % endif
 
-    % if login_errors and ('username' in form and not form['username'].errors) and not form['password'].errors:
+    % if login_errors and 'username' in form.fields and not form['username'].errors and not form['password'].errors:
       % if form.errors:
         % for error in form.errors:
          ${ form.errors[error] | unicode,n }
@@ -159,7 +161,7 @@ ${ commonheader(_("Welcome to Hue"), "login", user, request, "50px", True, True)
   </form>
 
   % if CUSTOM.LOGIN_SPLASH_HTML.get():
-  <div class="alert alert-info" id="login-splash">
+  <div id="login-splash">
     ${ CUSTOM.LOGIN_SPLASH_HTML.get() | n,unicode }
   </div>
   % endif
@@ -170,7 +172,6 @@ ${ commonheader(_("Welcome to Hue"), "login", user, request, "50px", True, True)
   % if CUSTOM.LOGO_SVG.get():
     ${ _('Powered by') } <img src="${ static('desktop/art/hue-login-logo.png') }" width="40" style="vertical-align: middle"  alt="${ _('Hue logo') }"> -
   % endif
-  ${ _('Hue and the Hue logo are trademarks of Cloudera, Inc.') }
   </trademark-banner>
 </div>
 
@@ -180,6 +181,13 @@ ${ commonheader(_("Welcome to Hue"), "login", user, request, "50px", True, True)
       window.setTimeout(function () {
         $(".logo").find("img").addClass("waiting");
       }, 1000);
+    });
+
+    $(document).keypress(function (event) {
+        var keycode = event.keyCode ? event.keyCode : event.which;
+        if(keycode == '13') {
+          $("[type=submit]").click();
+        }
     });
 
     %if 'AllowAllBackend' in backend_names:

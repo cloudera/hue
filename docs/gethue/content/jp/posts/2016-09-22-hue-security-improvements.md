@@ -25,9 +25,9 @@ sf_background_image_size:
 sf_custom_excerpt:
   - |
     HUEの管理者の皆さん、こんにちは。
-    
+
     最近、HUEに多くのセキュリティオプションが追加されました。 これらは可能な限りデフォルトでオンになっています。
-    
+
     このドキュメントではいくつかの修正点について説明し、Hueの管理者が、HUEをインストールを実行して管理できるようにします。
 sf_author_info:
   - 1
@@ -46,7 +46,6 @@ sf_caption_position:
 sf_remove_promo_bar:
   - 1
 categories:
-  - Administration
   - Hue 3.12
   - Security
 
@@ -81,7 +80,7 @@ secure_content_security_policy="default-src 'self' 'unsafe-eval' 'unsafe-inline'
 </pre>
 
 [<img class="aligncenter wp-image-4500 size-large" src="https://cdn.gethue.com/uploads/2016/09/block-content-1024x400.png" alt="block-content" width="1024" height="400" data-wp-pid="4500" />
-  
+
 ][1] ブロックされた画像コンテンツの例
 
 ### Server: header
@@ -120,7 +119,7 @@ secure_browser_xss_filter=true
 </pre>
 
 [
-  
+
 ][2] [<img class="aligncenter wp-image-4499 size-full" src="https://cdn.gethue.com/uploads/2016/09/security-response-header.png" alt="security-response-header" width="640" height="199" data-wp-pid="4499" />][2]
 
 <p style="text-align: center;">
@@ -159,7 +158,7 @@ _* .example.com_のワイルドカード証明書は、これらのドメイン�
 ### 任意のホストヘッダーの受け入れの修正
 
 Hueでは任意のホストヘッダ受け入れを修正しました。これで、Hueサーバーが提供できるホスト/ドメイン名を設定できます。
-  
+
 allowed_hosts=&#8221;host.domain,host2.domain,host3.domain&#8221;
 
 <pre><code class="bash">[desktop]

@@ -39,8 +39,8 @@ sf_remove_promo_bar:
 ampforwp-amp-on-off:
   - default
 categories:
-  - Version 4.7
-  - Querying
+  - Version 4
+#  - Version 4.7
 
 ---
 

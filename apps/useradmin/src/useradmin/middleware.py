@@ -28,6 +28,7 @@ from django.contrib.sessions.models import Session
 from django.db import DatabaseError
 from django.db.models import Q
 from django.utils.translation import ugettext as _
+from django.utils.deprecation import MiddlewareMixin
 
 from desktop.auth.views import dt_logout
 from desktop.conf import AUTH, LDAP, SESSION
@@ -41,7 +42,7 @@ from useradmin.views import import_ldap_users
 LOG = logging.getLogger(__name__)
 
 
-class LdapSynchronizationMiddleware(object):
+class LdapSynchronizationMiddleware(MiddlewareMixin):
   """
   Synchronize against LDAP authority.
   """
@@ -55,7 +56,7 @@ class LdapSynchronizationMiddleware(object):
     if request.method == "GET":
       server = request.GET.get('server')
 
-    if not user or not user.is_authenticated():
+    if not user or not user.is_authenticated:
       return
 
     if not User.objects.filter(username=user.username, userprofile__creation_method=UserProfile.CreationMethod.EXTERNAL.name).exists():
@@ -75,7 +76,7 @@ class LdapSynchronizationMiddleware(object):
       request.session.modified = True
 
 
-class LastActivityMiddleware(object):
+class LastActivityMiddleware(MiddlewareMixin):
   """
   Middleware to track the last activity of a user and automatically log out the user after a specified period of inactivity
   """
@@ -83,7 +84,7 @@ class LastActivityMiddleware(object):
   def process_request(self, request):
     user = request.user
 
-    if not user or not user.is_authenticated():
+    if not user or not user.is_authenticated:
       return
 
     profile = get_profile(user)
@@ -118,7 +119,7 @@ class LastActivityMiddleware(object):
     else:
       return math.floor((dt.microseconds + (dt.seconds + dt.days * 24 * 3600) * 10**6) / 10**6)
 
-class ConcurrentUserSessionMiddleware(object):
+class ConcurrentUserSessionMiddleware(MiddlewareMixin):
   """
   Middleware that remove concurrent user sessions when configured
   """
@@ -128,11 +129,13 @@ class ConcurrentUserSessionMiddleware(object):
     except AttributeError: # When the request does not store user. We care only about the login request which does store the user.
       return response
 
-    if request.user.is_authenticated() and request.session.modified and request.user.id: # request.session.modified checks if a user just logged in
+    # request.session.modified checks if a user just logged in
+    if request.user.is_authenticated and request.session.modified and request.user.id:
       limit = SESSION.CONCURRENT_USER_SESSION_LIMIT.get()
       if limit:
         count = 1
-        for session in Session.objects.filter(~Q(session_key=request.session.session_key), expire_date__gte=datetime.now()).order_by('-expire_date'):
+        for session in Session.objects.filter(~Q(session_key=request.session.session_key),
+            expire_date__gte=datetime.now()).order_by('-expire_date'):
           data = session.get_decoded()
           if data.get('_auth_user_id') == str(request.user.id):
             if count >= limit:

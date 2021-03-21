@@ -148,7 +148,7 @@ class GlobalSearch {
           window.HAS_CATALOG ? 'Search data and saved documents...' : 'Search saved documents...'
         ),
         querySpec: self.querySpec,
-        onClear: function() {
+        onClear: function () {
           self.selectedIndex(null);
           self.searchResultVisible(false);
         },
@@ -171,7 +171,7 @@ class GlobalSearch {
       })
       .extend({ deferred: true });
 
-    const deferredCloseIfVisible = function() {
+    const deferredCloseIfVisible = function () {
       window.setTimeout(() => {
         if (self.searchResultVisible()) {
           self.close();
@@ -198,7 +198,7 @@ class GlobalSearch {
       }
     });
 
-    self.autocompleteFromEntries = function(lastNonPartial, partial) {
+    self.autocompleteFromEntries = function (lastNonPartial, partial) {
       let result = undefined;
       const partialLower = partial.toLowerCase();
       self.searchResultCategories().every(category => {
@@ -325,16 +325,16 @@ class GlobalSearch {
     });
   }
 
-  initializeFacetValues() {
-    const self = this;
-    dataCatalog.getAllNavigatorTags({ silenceErrors: true }).done(facets => {
+  async initializeFacetValues() {
+    try {
+      const facets = await dataCatalog.getAllNavigatorTags({ silenceErrors: true });
       const facetValues = self.knownFacetValues();
       facetValues['tags'] = facets;
       facetValues['tag'] = facets;
       if (window.HAS_READ_ONLY_CATALOG) {
         facetValues['classification'] = facets;
       }
-    });
+    } catch (err) {}
   }
 
   cancelRunningRequests() {

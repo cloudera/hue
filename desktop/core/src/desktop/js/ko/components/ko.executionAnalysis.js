@@ -163,11 +163,11 @@ class ExecutionAnalysis {
         compute: compute,
         queryId: queryId
       })
-      .done(response => {
+      .then(response => {
         const analysis = response.query;
         self.analysis(analysis);
       })
-      .always(() => {
+      .finally(() => {
         self.loading(false);
       });
   }
@@ -220,21 +220,17 @@ class ExecutionAnalysis {
     $heatmap.height((Math.trunc((data.data.length - 1) / cols) + 1) * (blockWidth + blockGap));
 
     // Attribute functions
-    const x = function(d, i) {
+    const x = function (d, i) {
       return (i % cols) * (blockWidth + blockGap) + 1;
     };
-    const y = function(d, i) {
+    const y = function (d, i) {
       return Math.trunc(i / cols) * (blockWidth + blockGap) + 1;
     };
-    const c = function(d) {
+    const c = function (d) {
       return colorScale(d[3]);
     };
 
-    d3.select('.heatmap')
-      .selectAll('.box')
-      .data([])
-      .exit()
-      .remove();
+    d3.select('.heatmap').selectAll('.box').data([]).exit().remove();
     d3.select('.heatmap')
       .selectAll('.box')
       .data(data.data)

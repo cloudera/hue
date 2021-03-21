@@ -37,15 +37,15 @@ class LdapGroup(models.Model):
   Groups that come from LDAP originally will have an LdapGroup
   record generated at creation time.
   """
-  group = models.ForeignKey(Group, related_name="group")
+  group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="group")
 
 
 class GroupPermission(models.Model):
   """
   Represents the permissions a group has.
   """
-  group = models.ForeignKey(Group)
-  hue_permission = models.ForeignKey("HuePermission")
+  group = models.ForeignKey(Group, on_delete=models.CASCADE)
+  hue_permission = models.ForeignKey("HuePermission", on_delete=models.CASCADE)
 
 
 class BasePermission(models.Model):
@@ -53,8 +53,8 @@ class BasePermission(models.Model):
   Set of non-object specific permissions that an app supports.
 
   Currently only assign permissions to groups (not users or roles).
-  Could someday support external permissions of Apache Ranger permissions, AWS IAM... This could be done via subclasses or creating new types
-  of connectors.
+  Could someday support external permissions of Apache Ranger permissions, AWS IAM...
+  This could be done via subclasses or creating new types of connectors.
   """
   app = models.CharField(max_length=30)
   action = models.CharField(max_length=100)
@@ -74,7 +74,7 @@ class BasePermission(models.Model):
 
 
 class ConnectorPermission(BasePermission):
-  connector = models.ForeignKey(Connector)
+  connector = models.ForeignKey(Connector, on_delete=models.CASCADE)
 
   class Meta(object):
     abstract = True
@@ -93,7 +93,7 @@ if ENABLE_ORGANIZATIONS.get():
       return _fitered_queryset(queryset)
 
   class OrganizationConnectorPermission(ConnectorPermission):
-    organization = models.ForeignKey(Organization)
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
 
     objects = OrganizationConnectorPermissionManager()
 

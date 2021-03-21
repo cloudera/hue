@@ -18,13 +18,13 @@ import impalaAutocompleteParser from '../impalaAutocompleteParser';
 
 describe('impalaAutocompleteParser.js locations', () => {
   beforeAll(() => {
-    impalaAutocompleteParser.yy.parseError = function(msg) {
+    impalaAutocompleteParser.yy.parseError = function (msg) {
       throw Error(msg);
     };
   });
 
   const assertAutoComplete = testDefinition => {
-    const debug = true;
+    const debug = false;
     expect(
       impalaAutocompleteParser.parseSql(
         testDefinition.beforeCursor,
@@ -34,7 +34,7 @@ describe('impalaAutocompleteParser.js locations', () => {
     ).toEqualDefinition(testDefinition);
   };
 
-  const assertLocations = function(options) {
+  const assertLocations = function (options) {
     assertAutoComplete({
       beforeCursor: options.beforeCursor,
       afterCursor: options.afterCursor || '',
@@ -409,6 +409,14 @@ describe('impalaAutocompleteParser.js locations', () => {
           type: 'function',
           location: { first_line: 1, last_line: 1, first_column: 8, last_column: 10 },
           function: 'cos'
+        },
+        {
+          type: 'functionArgument',
+          location: { first_line: 1, last_line: 1, first_column: 12, last_column: 13 },
+          function: 'cos',
+          argumentPosition: 0,
+          identifierChain: [{ name: 'cos' }],
+          expression: { types: ['NUMBER'], text: '1' }
         },
         {
           type: 'alias',
@@ -1642,6 +1650,14 @@ describe('impalaAutocompleteParser.js locations', () => {
             function: 'cos'
           },
           {
+            type: 'functionArgument',
+            location: { first_line: 1, last_line: 1, first_column: 17, last_column: 22 },
+            function: 'cos',
+            argumentPosition: 0,
+            identifierChain: [{ name: 'cos' }],
+            expression: { types: ['COLREF'], columnReference: [{ name: 'boo' }, { name: 'a' }] }
+          },
+          {
             type: 'table',
             location: { first_line: 1, last_line: 1, first_column: 17, last_column: 20 },
             identifierChain: [{ name: 'db1' }, { name: 'foo' }]
@@ -1899,6 +1915,14 @@ describe('impalaAutocompleteParser.js locations', () => {
           function: 'count'
         },
         {
+          type: 'functionArgument',
+          location: { first_line: 1, last_line: 1, first_column: 14, last_column: 15 },
+          function: 'count',
+          argumentPosition: 0,
+          identifierChain: [{ name: 'count' }],
+          expression: { text: '*' }
+        },
+        {
           type: 'table',
           location: { first_line: 1, last_line: 1, first_column: 22, last_column: 31 },
           identifierChain: [{ name: 'testTable' }]
@@ -2080,6 +2104,14 @@ describe('impalaAutocompleteParser.js locations', () => {
           function: 'round'
         },
         {
+          type: 'functionArgument',
+          location: { first_line: 1, last_line: 1, first_column: 22, last_column: 27 },
+          function: 'round',
+          argumentPosition: 0,
+          identifierChain: [{ name: 'ROUND' }],
+          expression: { types: ['COLREF'], columnReference: [{ name: 'tmp' }, { name: 'r' }] }
+        },
+        {
           type: 'subQuery',
           location: { first_line: 1, last_line: 1, first_column: 22, last_column: 25 },
           identifierChain: [{ subQuery: 'tmp' }]
@@ -2090,6 +2122,14 @@ describe('impalaAutocompleteParser.js locations', () => {
           identifierChain: [{ name: 'r' }],
           tables: [{ subQuery: 'tmp' }],
           qualified: true
+        },
+        {
+          type: 'functionArgument',
+          location: { first_line: 1, last_line: 1, first_column: 29, last_column: 30 },
+          function: 'round',
+          argumentPosition: 1,
+          identifierChain: [{ name: 'ROUND' }],
+          expression: { types: ['NUMBER'], text: '2' }
         },
         {
           type: 'alias',
@@ -2222,6 +2262,14 @@ describe('impalaAutocompleteParser.js locations', () => {
           type: 'function',
           location: { first_line: 1, last_line: 1, first_column: 178, last_column: 181 },
           function: 'year'
+        },
+        {
+          type: 'functionArgument',
+          location: { first_line: 1, last_line: 1, first_column: 183, last_column: 194 },
+          function: 'year',
+          argumentPosition: 0,
+          identifierChain: [{ name: 'YEAR' }],
+          expression: { types: ['COLREF'], columnReference: [{ name: 'tran' }, { name: 'tran_d' }] }
         },
         {
           type: 'table',

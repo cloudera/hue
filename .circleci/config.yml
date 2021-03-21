@@ -8,7 +8,7 @@ jobs:
     docker:
       # specify the version you desire here
       # - image: circleci/python:3.8.0
-      - image: gethue/hue:latest
+      - image: gethue/hue:latest-py2
 
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
@@ -70,9 +70,15 @@ jobs:
             cd /usr/share/hue
             # make npm-install # Not available
             cp ~/repo/.babelrc .
+            cp ~/repo/tsconfig.json .
             cp ~/repo/jest.config.js .
+            cp ~/repo/.pylintrc .
 
             cp ~/repo/webpack.config*.js .
+            rm package.json
+            cp ~/repo/package.json .
+            rm package-lock.json
+            cp ~/repo/package-lock.json .
             npm install
             npm i eslint-plugin-jest@latest --save-dev # Seems to not be found otherwise
             npm run webpack
@@ -89,9 +95,10 @@ jobs:
             cd ~/repo
 
             # Installs to move to image building
-            curl -O https://dl.google.com/go/go1.11.linux-amd64.tar.gz
-            tar -xvf go1.11.linux-amd64.tar.gz
-            go/bin/go get -u github.com/raviqqe/muffet
+            curl -O https://dl.google.com/go/go1.15.linux-amd64.tar.gz
+            tar -xvf go1.15.linux-amd64.tar.gz
+            export GO111MODULE=on
+            go/bin/go get -u github.com/raviqqe/muffet@v1.5.7
 
             curl --output hugo_0.69.0_Linux-64bit.tar.gz -L https://github.com/gohugoio/hugo/releases/download/v0.69.0/hugo_0.69.0_Linux-64bit.tar.gz
             tar -xvf hugo_0.69.0_Linux-64bit.tar.gz
@@ -108,7 +115,15 @@ jobs:
           command: |
             cd ~/repo
 
-            ./tools/ci/check_for_invalid_characters.sh
+            /usr/share/hue/build/env/bin/pip install pylint==1.7.5 pylint-django==0.7.2 configparser==4.0.2
+            ./tools/ci/check_for_python_lint.sh /usr/share/hue
+
+      - run:
+          name: run commit title format check
+          command: |
+            cd ~/repo
+
+            ./tools/ci/check_for_commit_message.sh
 
       - run:
           name: run js lint
@@ -120,13 +135,27 @@ jobs:
 
             npm run lint
 
+      - run:
+          name: run npm license checker
+          command: |
+            cd /usr/share/hue
+
+            npm run check-license
+
+      - run:
+          name: run npm absolute path detection
+          command: |
+            cd /usr/share/hue
+
+            npm run check-absolute-paths
+
       # Run tests
       - run:
           name: run python API tests
           command: |
             cd /usr/share/hue
 
-            ./build/env/bin/hue test unit --with-xunit --with-cover
+            PYTHONWARNINGS=always ./build/env/bin/hue test unit --with-xunit --with-cover
 
       - run:
           name: run js tests
@@ -135,6 +164,7 @@ jobs:
 
             # https://jestjs.io/docs/en/troubleshooting.html#tests-are-extremely-slow-on-docker-andor-continuous-integration-ci-server
             sed -i 's/"test": "jest"/"test": "jest --runInBand"/g' package.json
+
             npm run test
 
       - store_artifacts:
@@ -163,7 +193,7 @@ jobs:
 
   build-py3.6:
     docker:
-      - image: gethue/hue:latest # Should be circleci/python:3.6 at some point
+      - image: gethue/hue:latest-py2 # Should be circleci/python:3.6 at some point
 
     working_directory: ~/repo
 
@@ -173,7 +203,7 @@ jobs:
       # Download and cache dependencies
       # - restore_cache:
       #     keys:
-      #       - v1-dependencies-{{ checksum "desktop/core/requirements_py3.txt" }}
+      #       - v1-dependencies-{{ checksum "desktop/core/requirements.txt" }}
       #       # fallback to using the latest cache if no exact match is found
       #       - v1-dependencies-
 
@@ -188,7 +218,7 @@ jobs:
       - run:
           name: run tests
           command: |
-            ./build/env/bin/hue test unit --with-xunit --with-cover
+            PYTHONWARNINGS=always ./build/env/bin/hue test unit --with-xunit --with-cover
 
       # - run:
       #     name: install dependencies
@@ -199,12 +229,12 @@ jobs:
       # - save_cache:
       #     paths:
       #       - ./build/venv
-      #     key: v1-dependencies-{{ checksum "esktop/core/requirements_py3.txt" }}
+      #     key: v1-dependencies-{{ checksum "esktop/core/requirements.txt" }}
 
 
   build-py3.8:
     docker:
-      - image: gethue/hue:latest # Should be circleci/python:3.x at some point
+      - image: gethue/hue:latest-py2 # Should be circleci/python:3.x at some point
 
     working_directory: ~/repo
 
@@ -222,7 +252,7 @@ jobs:
       - run:
           name: run tests
           command: |
-            ./build/env/bin/hue test unit --with-xunit --with-cover
+            PYTHONWARNINGS=always ./build/env/bin/hue test unit --with-xunit --with-cover
 
 
 workflows:

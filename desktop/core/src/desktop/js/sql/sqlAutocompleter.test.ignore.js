@@ -70,7 +70,7 @@ xdescribe('sqlAutocomplete.js', () => {
     jasmine.Ajax.uninstall();
   });
 
-  const createSubject = function(dialect, textBeforeCursor, textAfterCursor, positionStatement) {
+  const createSubject = function (dialect, textBeforeCursor, textAfterCursor, positionStatement) {
     const editor = ace.edit();
     editor.setValue(textBeforeCursor);
     const actualCursorPosition = editor.getCursorPosition();
@@ -82,24 +82,24 @@ xdescribe('sqlAutocomplete.js', () => {
         autocompleteSettings: {
           temporaryOnly: false
         },
-        type: function() {
+        type: function () {
           return dialect;
         },
-        database: function() {
+        database: function () {
           return 'default';
         },
-        namespace: function() {
+        namespace: function () {
           return { id: 'defaultNamespace' };
         },
-        compute: function() {
+        compute: function () {
           return { id: 'defaultCompute' };
         },
-        whenContextSet: function() {
+        whenContextSet: function () {
           return $.Deferred().resolve();
         },
         positionStatement: ko.observable(positionStatement)
       },
-      editor: function() {
+      editor: function () {
         return {};
       }
     });

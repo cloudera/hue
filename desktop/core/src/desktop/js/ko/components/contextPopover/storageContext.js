@@ -52,7 +52,7 @@ class StorageContext {
           originalType: currentEntry.originalType,
           isActive: currentEntry === self.storageEntry(),
           storageEntry: currentEntry,
-          makeActive: function() {
+          makeActive: function () {
             self.storageEntry(this.storageEntry);
           }
         });
@@ -80,7 +80,7 @@ class StorageContext {
 
   goHome() {
     const self = this;
-    AssistStorageEntry.getEntry(window.USER_HOME_DIR, self.storageEntry().type).done(
+    AssistStorageEntry.getEntry(window.USER_HOME_DIR, self.storageEntry().type).then(
       self.storageEntry
     );
   }

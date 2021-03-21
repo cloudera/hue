@@ -40,7 +40,7 @@ import 'parse/parserTypeDefs';
 import 'utils/customIntervals';
 import 'utils/json.bigDataParse';
 import apiHelper from 'api/apiHelper';
-import CancellablePromise from 'api/cancellablePromise';
+import CancellableJqPromise from 'api/cancellableJqPromise';
 import { DOCUMENT_TYPE_I18n, DOCUMENT_TYPES } from 'doc/docSupport';
 import contextCatalog from 'catalog/contextCatalog';
 import dataCatalog from 'catalog/dataCatalog';
@@ -55,49 +55,31 @@ import I18n from 'utils/i18n';
 import MultiLineEllipsisHandler from 'utils/multiLineEllipsisHandler';
 
 import sqlUtils from 'sql/sqlUtils';
-import { PigFunctions, SqlSetOptions, SqlFunctions } from 'sql/sqlFunctions';
 import sqlWorkerHandler from 'sql/sqlWorkerHandler';
+
+import 'components/sidebar/HueSidebarWebComponent';
 
 import 'ko/components/assist/assistViewModel';
 import OnePageViewModel from 'onePageViewModel';
-import SideBarViewModel from 'sideBarViewModel';
 import SidePanelViewModel from 'sidePanelViewModel';
 import TopNavViewModel from 'topNavViewModel';
 
 // TODO: Remove from global scope
-import EditorViewModel from 'apps/notebook/editorViewModel'; // In history, indexer, importer, editor etc.
-import EditorViewModel2 from 'apps/notebook2/editorViewModel'; // In history, indexer, importer, editor etc.
+import NotebookViewModel from 'apps/notebook/NotebookViewModel'; // In history, indexer, importer, editor etc.
 import HdfsAutocompleter from 'utils/hdfsAutocompleter';
 import SqlAutocompleter from 'sql/sqlAutocompleter';
 import sqlStatementsParser from 'parse/sqlStatementsParser'; // In search.ko and notebook.ko
 import HueFileEntry from 'doc/hueFileEntry';
 import HueDocument from 'doc/hueDocument';
-import { refreshConfig } from 'utils/hueConfig';
+import { getLastKnownConfig, refreshConfig } from 'config/hueConfig';
 import { simpleGet } from 'api/apiUtils'; // In analytics.mako, metrics.mako, threads.mako
-
-// import all the other Vue SFCs here
-// and then create as many instances of Vue as needed.
-// NOTE: given the nature of the project, Vue should be referenced after the page load
-//
-// import Vue from 'vue';
-// import TrademarkBanner from 'vue/components/login/TrademarkBanner.vue';
-// window.addEventListener('DOMContentLoaded', () => {
-//   new Vue({
-//     el: '#vue-element-id',
-//     components: {
-//       TrademarkBanner
-//     },
-//     data: {
-//       message: 'Hello VueHue!'
-//     }
-//   });
-// });
+import Mustache from 'mustache'; // In hbase/templates/app.mako, jobsub.templates.js, search.ko.js, search.util.js
 
 // TODO: Migrate away
 window._ = _;
 window.apiHelper = apiHelper;
 window.simpleGet = simpleGet;
-window.CancellablePromise = CancellablePromise;
+window.CancellableJqPromise = CancellableJqPromise;
 window.contextCatalog = contextCatalog;
 window.d3 = d3;
 window.d3v3 = d3v3;
@@ -105,12 +87,9 @@ window.dataCatalog = dataCatalog;
 window.DOCUMENT_TYPE_I18n = DOCUMENT_TYPE_I18n;
 window.DOCUMENT_TYPES = DOCUMENT_TYPES;
 window.Dropzone = Dropzone;
-if (window.ENABLE_NOTEBOOK_2) {
-  window.EditorViewModel = EditorViewModel2;
-} else {
-  window.EditorViewModel = EditorViewModel;
-}
+window.NotebookViewModel = NotebookViewModel;
 window.filesize = filesize;
+window.getLastKnownConfig = getLastKnownConfig;
 window.HdfsAutocompleter = HdfsAutocompleter;
 window.hueAnalytics = hueAnalytics;
 window.HueColors = HueColors;
@@ -124,14 +103,12 @@ window.hueUtils = hueUtils;
 window.I18n = I18n;
 window.localforage = localforage;
 window.MultiLineEllipsisHandler = MultiLineEllipsisHandler;
+window.Mustache = Mustache;
 window.nv = nv;
 window.page = page({ decodeURLComponents: false });
-window.PigFunctions = PigFunctions;
 window.qq = qq;
 window.sprintf = sprintf;
 window.SqlAutocompleter = SqlAutocompleter;
-window.SqlFunctions = SqlFunctions;
-window.SqlSetOptions = SqlSetOptions;
 window.sqlStatementsParser = sqlStatementsParser;
 window.sqlUtils = sqlUtils;
 window.sqlWorkerHandler = sqlWorkerHandler;
@@ -152,12 +129,6 @@ $(document).ready(async () => {
 
   const topNavViewModel = new TopNavViewModel(onePageViewModel);
   ko.applyBindings(topNavViewModel, $('.top-nav')[0]);
-
-  const sidebarViewModel = new SideBarViewModel(onePageViewModel, topNavViewModel);
-  ko.applyBindings(sidebarViewModel, $('.hue-sidebar')[0]);
-  if (window.IS_MULTICLUSTER_ONLY) {
-    ko.applyBindings(sidebarViewModel, $('.hue-sidebar-container')[0]);
-  }
 
   $(document).on('hideHistoryModal', e => {
     $('#clearNotificationHistoryModal').modal('hide');

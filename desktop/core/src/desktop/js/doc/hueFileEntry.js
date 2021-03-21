@@ -21,6 +21,7 @@ import apiHelper from 'api/apiHelper';
 import huePubSub from 'utils/huePubSub';
 import HueDocument from 'doc/hueDocument';
 import { DOCUMENT_TYPE_I18n, DOCUMENT_TYPES } from 'doc/docSupport';
+import { SHOW_DELETE_DOC_MODAL_EVENT } from 'ko/components/ko.deleteDocModal';
 
 const SORTS = {
   defaultAsc: (a, b) => {
@@ -99,16 +100,10 @@ class HueFileEntry {
           return (
             (typeFilter === 'all' || entryType === typeFilter || entryType === 'directory') &&
             (!filter ||
-              entry
-                .definition()
-                .name.toLowerCase()
-                .indexOf(filter) !== -1 ||
+              entry.definition().name.toLowerCase().indexOf(filter) !== -1 ||
               (DOCUMENT_TYPE_I18n[entryType] &&
                 DOCUMENT_TYPE_I18n[entryType].toLowerCase().indexOf(filter) !== -1) ||
-              entry
-                .definition()
-                .description.toLowerCase()
-                .indexOf(filter) !== -1)
+              entry.definition().description.toLowerCase().indexOf(filter) !== -1)
           );
         });
       }
@@ -333,12 +328,6 @@ class HueFileEntry {
     }
   }
 
-  showNewDirectoryModal() {
-    if (!this.isTrash() && !this.isTrashed() && this.canModify()) {
-      $('#createDirectoryModal').modal('show');
-    }
-  }
-
   showRenameDirectoryModal() {
     let selectedEntry = this;
     if (!selectedEntry.selected()) {
@@ -389,10 +378,7 @@ class HueFileEntry {
     }
     const copyNext = () => {
       if (self.selectedEntries().length > 0) {
-        const nextUuid = self
-          .selectedEntries()
-          .shift()
-          .definition().uuid;
+        const nextUuid = self.selectedEntries().shift().definition().uuid;
         apiHelper.copyDocument({
           uuid: nextUuid,
           successCallback: () => {
@@ -507,7 +493,7 @@ class HueFileEntry {
       uuid: owner.uuid,
       query: query,
       type: self.serverTypeFilter().type,
-      successCallback: function(data) {
+      successCallback: function (data) {
         resultEntry.hasErrors(false);
         const newEntries = [];
 
@@ -628,14 +614,17 @@ class HueFileEntry {
 
   emptyTrash() {
     if (this.trashEntry()) {
+      const openConfirmation = () => {
+        this.trashEntry()
+          .entries()
+          .forEach(entry => entry.selected(true));
+        huePubSub.publish(SHOW_DELETE_DOC_MODAL_EVENT, this.trashEntry());
+      };
+
       if (!this.trashEntry().loaded()) {
-        this.trashEntry().load(function() {
-          this.entriesToDelete(this.trashEntry().entries());
-          $('#deleteEntriesModal').modal('show');
-        });
+        this.trashEntry().load(openConfirmation);
       } else {
-        this.entriesToDelete(this.trashEntry().entries());
-        $('#deleteEntriesModal').modal('show');
+        openConfirmation();
       }
     }
   }
@@ -653,13 +642,6 @@ class HueFileEntry {
     }
   }
 
-  showDeleteConfirmation() {
-    if (this.selectedEntries().length > 0 && (this.superuser || !this.sharedWithMeSelected())) {
-      this.entriesToDelete(this.selectedEntries());
-      $('#deleteEntriesModal').modal('show');
-    }
-  }
-
   removeDocuments(deleteForever) {
     const self = this;
     if (self.entriesToDelete().indexOf(self) !== -1) {
@@ -668,10 +650,7 @@ class HueFileEntry {
 
     const deleteNext = () => {
       if (self.entriesToDelete().length > 0) {
-        const nextUuid = self
-          .entriesToDelete()
-          .shift()
-          .definition().uuid;
+        const nextUuid = self.entriesToDelete().shift().definition().uuid;
         apiHelper.deleteDocument({
           uuid: nextUuid,
           skipTrash: deleteForever,
@@ -829,7 +808,7 @@ class HueFileEntry {
     const self = this;
     if (name && self.app === 'documents') {
       apiHelper.createDocumentsFolder({
-        successCallback: function() {
+        successCallback: function () {
           huePubSub.publish('assist.document.refresh');
           self.load();
         },
@@ -844,7 +823,7 @@ class HueFileEntry {
     const self = this;
     if (name && self.app === 'documents') {
       apiHelper.updateDocument({
-        successCallback: function() {
+        successCallback: function () {
           huePubSub.publish('assist.document.refresh');
           self.load();
         },

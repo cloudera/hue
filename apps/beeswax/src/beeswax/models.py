@@ -64,14 +64,15 @@ class QueryHistory(models.Model):
                  (librdbms_dbms.MYSQL, 'MySQL'), (librdbms_dbms.POSTGRESQL, 'PostgreSQL'),
                  (librdbms_dbms.SQLITE, 'sqlite'), (librdbms_dbms.ORACLE, 'oracle'))
 
-  owner = models.ForeignKey(User, db_index=True)
+  owner = models.ForeignKey(User, on_delete=models.CASCADE, db_index=True)
   query = models.TextField()
 
   last_state = models.IntegerField(db_index=True)
   has_results = models.BooleanField(default=False)          # If true, this query will eventually return tabular results.
   submission_date = models.DateTimeField(auto_now_add=True)
   # In case of multi statements in a query, these are the id of the currently running statement
-  server_id = models.CharField(max_length=1024, null=True)  # Aka secret, only query in the "submitted" state is allowed to have no server_id
+  # Aka secret, only query in the "submitted" state is allowed to have no server_id
+  server_id = models.CharField(max_length=1024, null=True)
   server_guid = models.CharField(max_length=1024, null=True, default=None)
   statement_number = models.SmallIntegerField(default=0)    # The index of the currently running statement
   operation_type = models.SmallIntegerField(null=True)
@@ -84,7 +85,8 @@ class QueryHistory(models.Model):
   server_type = models.CharField(max_length=128, help_text=_('Type of the query server.'), default=BEESWAX, choices=SERVER_TYPE)
   query_type = models.SmallIntegerField(help_text=_('Type of the query.'), default=HQL, choices=((HQL, 'HQL'), (IMPALA, 'IMPALA')))
 
-  design = models.ForeignKey('SavedQuery', to_field='id', null=True) # Some queries (like read/create table) don't have a design
+  # Some queries (like read/create table) don't have a design
+  design = models.ForeignKey('SavedQuery', on_delete=models.CASCADE, to_field='id', null=True)
   notify = models.BooleanField(default=False)                        # Notify on completion
 
   is_redacted = models.BooleanField(default=False)
@@ -220,14 +222,14 @@ def make_query_context(type, info):
 class HiveServerQueryHistory(QueryHistory):
   # Map from (thrift) server state
   STATE_MAP = {
-    TOperationState.INITIALIZED_STATE : QueryHistory.STATE.submitted,
-    TOperationState.RUNNING_STATE     : QueryHistory.STATE.running,
-    TOperationState.FINISHED_STATE    : QueryHistory.STATE.available,
-    TOperationState.CANCELED_STATE    : QueryHistory.STATE.failed,
-    TOperationState.CLOSED_STATE      : QueryHistory.STATE.expired,
-    TOperationState.ERROR_STATE       : QueryHistory.STATE.failed,
-    TOperationState.UKNOWN_STATE      : QueryHistory.STATE.failed,
-    TOperationState.PENDING_STATE     : QueryHistory.STATE.submitted,
+    TOperationState.INITIALIZED_STATE: QueryHistory.STATE.submitted,
+    TOperationState.RUNNING_STATE: QueryHistory.STATE.running,
+    TOperationState.FINISHED_STATE: QueryHistory.STATE.available,
+    TOperationState.CANCELED_STATE: QueryHistory.STATE.failed,
+    TOperationState.CLOSED_STATE: QueryHistory.STATE.expired,
+    TOperationState.ERROR_STATE: QueryHistory.STATE.failed,
+    TOperationState.UKNOWN_STATE: QueryHistory.STATE.failed,
+    TOperationState.PENDING_STATE: QueryHistory.STATE.submitted,
   }
 
   node_type = HIVE_SERVER2
@@ -266,7 +268,7 @@ class SavedQuery(models.Model):
   TYPES_MAPPING = {'beeswax': HQL, 'hql': HQL, 'impala': IMPALA, 'rdbms': RDBMS, 'spark': SPARK}
 
   type = models.IntegerField(null=False)
-  owner = models.ForeignKey(User, db_index=True)
+  owner = models.ForeignKey(User, on_delete=models.CASCADE, db_index=True)
   # Data is a json of dictionary. See the beeswax.design module.
   data = models.TextField(max_length=65536)
   name = models.CharField(max_length=80)
@@ -457,7 +459,7 @@ class Session(models.Model):
   """
   A sessions is bound to a user and an application (e.g. Bob with the Impala application).
   """
-  owner = models.ForeignKey(User, db_index=True)
+  owner = models.ForeignKey(User, on_delete=models.CASCADE, db_index=True)
   status_code = models.PositiveSmallIntegerField()  # ttypes.TStatusCode
   secret = models.TextField(max_length='100')
   guid = models.TextField(max_length='100')
@@ -485,7 +487,8 @@ class Session(models.Model):
 
 
 class QueryHandle(object):
-  def __init__(self, secret=None, guid=None, operation_type=None, has_result_set=None, modified_row_count=None, log_context=None, session_guid=None, session_id=None):
+  def __init__(self, secret=None, guid=None, operation_type=None,
+   has_result_set=None, modified_row_count=None, log_context=None, session_guid=None, session_id=None):
     self.secret = secret
     self.guid = guid
     self.operation_type = operation_type
@@ -521,11 +524,17 @@ class HiveServerQueryHandle(QueryHandle):
   def get_rpc_handle(self):
     secret, guid = self.get_decoded(self.secret, self.guid)
 
-    operation = getattr(TOperationType, TOperationType._NAMES_TO_VALUES.get(self.operation_type, 'EXECUTE_STATEMENT'))
-    return TOperationHandle(operationId=THandleIdentifier(guid=guid, secret=secret),
-                            operationType=operation,
-                            hasResultSet=self.has_result_set,
-                            modifiedRowCount=self.modified_row_count)
+    operation = getattr(
+      TOperationType,
+      TOperationType._VALUES_TO_NAMES.get(self.operation_type, 'EXECUTE_STATEMENT')
+    )
+
+    return TOperationHandle(
+        operationId=THandleIdentifier(guid=guid, secret=secret),
+        operationType=operation,
+        hasResultSet=self.has_result_set,
+        modifiedRowCount=self.modified_row_count
+    )
 
   @classmethod
   def get_decoded(cls, secret, guid):

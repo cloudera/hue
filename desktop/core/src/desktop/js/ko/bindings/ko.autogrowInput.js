@@ -18,7 +18,7 @@ import $ from 'jquery';
 import * as ko from 'knockout';
 
 ko.bindingHandlers.autogrowInput = {
-  init: function(element, valueAccessor) {
+  init: function (element, valueAccessor) {
     const o = $.extend(
       {
         minWidth: 0,
@@ -43,7 +43,7 @@ ko.bindingHandlers.autogrowInput = {
     });
     let val = '';
 
-    const check = function() {
+    const check = function () {
       if (val === (val = input.val())) {
         return;
       }

@@ -21,7 +21,6 @@ import json
 import sys
 
 from collections import OrderedDict
-from datetime import datetime
 from nose.plugins.attrib import attr
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_equal, assert_true, assert_false
@@ -39,13 +38,14 @@ from desktop.models import Directory, Document, Document2
 from hadoop import cluster as originalCluster
 from useradmin.models import User
 
+import notebook.conf
 import notebook.connectors.hiveserver2
 
 from notebook.api import _historify
 from notebook.connectors.base import Notebook, QueryError, Api, QueryExpired
 from notebook.decorators import api_error_handler
 from notebook.conf import get_ordered_interpreters, INTERPRETERS_SHOWN_ON_WHEEL, INTERPRETERS
-from notebook.models import Analytics
+
 
 if sys.version_info[0] > 2:
   from unittest.mock import patch, Mock
@@ -77,7 +77,14 @@ class TestApi(object):
         ],
         "type": "query-hive",
         "id": 50010,
-        "snippets": [{"id":"2b7d1f46-17a0-30af-efeb-33d4c29b1055","type":"hive","status":"running","statement_raw":"select * from default.web_logs where app = '${app_name}';","variables":[{"name":"app_name","value":"metastore"}],"statement":"select * from default.web_logs where app = 'metastore';","properties":{"settings":[],"files":[],"functions":[]},"result":{"id":"b424befa-f4f5-8799-a0b4-79753f2552b1","type":"table","handle":{"log_context":null,"statements_count":1,"end":{"column":21,"row":0},"statement_id":0,"has_more_statements":false,"start":{"column":0,"row":0},"secret":"rVRWw7YPRGqPT7LZ/TeFaA==an","has_result_set":true,"statement":"select * from default.web_logs where app = 'metastore';","operation_type":0,"modified_row_count":null,"guid":"7xm6+epkRx6dyvYvGNYePA==an"}},"lastExecuted": 1462554843817,"database":"default"}],
+        "snippets": [{"id":"2b7d1f46-17a0-30af-efeb-33d4c29b1055","type":"hive","status":"running","statement_raw":""" \
+        """"select * from default.web_logs where app = '${app_name}';","variables":[{"name":"app_name","value":"metastore"}],""" \
+        """"statement":"select * from default.web_logs where app = 'metastore';","properties":{"settings":[],"files":[],""" \
+        """"functions":[]},"result":{"id":"b424befa-f4f5-8799-a0b4-79753f2552b1","type":"table","handle":{"log_context":null,""" \
+        """"statements_count":1,"end":{"column":21,"row":0},"statement_id":0,"has_more_statements":false,""" \
+        """"start":{"column":0,"row":0},"secret":"rVRWw7YPRGqPT7LZ/TeFaA==an","has_result_set":true,"statement":""" \
+        """"select * from default.web_logs where app = 'metastore';","operation_type":0,"modified_row_count":null,""" \
+        """"guid":"7xm6+epkRx6dyvYvGNYePA==an"}},"lastExecuted": 1462554843817,"database":"default"}],
         "uuid": "5982a274-de78-083c-2efc-74f53dce744c",
         "isSaved": false,
         "parentUuid": null
@@ -125,7 +132,15 @@ class TestApi(object):
         ],
         "type": "query-hive",
         "id": null,
-        "snippets": [{"id":"2b7d1f46-17a0-30af-efeb-33d4c29b1055","type":"hive","status":"running","statement_raw":"select * from default.web_logs where app = '${app_name}';","variables":[{"name":"app_name","value":"metastore"}],"statement":"select * from default.web_logs where app = 'metastore';","properties":{"settings":[],"files":[],"functions":[]},"result":{"id":"b424befa-f4f5-8799-a0b4-79753f2552b1","type":"table","handle":{"log_context":null,"statements_count":1,"end":{"column":21,"row":0},"statement_id":0,"has_more_statements":false,"start":{"column":0,"row":0},"secret":"rVRWw7YPRGqPT7LZ/TeFaA==an","has_result_set":true,"statement":"select * from default.web_logs where app = 'metastore';","operation_type":0,"modified_row_count":null,"guid":"7xm6+epkRx6dyvYvGNYePA==an"}},"lastExecuted": 1462554843817,"database":"default"}],
+        "snippets": [{"id":"2b7d1f46-17a0-30af-efeb-33d4c29b1055","type":"hive","status":"running","statement_raw":""" \
+        """"select * from default.web_logs where app = '${app_name}';","variables":""" \
+        """[{"name":"app_name","value":"metastore"}],"statement":""" \
+        """"select * from default.web_logs where app = 'metastore';","properties":{"settings":[],"files":[],"functions":[]},""" \
+        """"result":{"id":"b424befa-f4f5-8799-a0b4-79753f2552b1","type":"table","handle":{"log_context":null,""" \
+        """"statements_count":1,"end":{"column":21,"row":0},"statement_id":0,"has_more_statements":false,""" \
+        """"start":{"column":0,"row":0},"secret":"rVRWw7YPRGqPT7LZ/TeFaA==an","has_result_set":true,""" \
+        """"statement":"select * from default.web_logs where app = 'metastore';","operation_type":0,""" \
+        """"modified_row_count":null,"guid":"7xm6+epkRx6dyvYvGNYePA==an"}},"lastExecuted": 1462554843817,"database":"default"}],
         "uuid": "d9efdee1-ef25-4d43-b8f9-1a170f69a05a"
     }
     """
@@ -269,7 +284,9 @@ class TestApi(object):
           ],
           "type": "query-hive",
           "id": null,
-          "snippets": [{"id": "e069ef32-5c95-4507-b961-e79c090b5abf","type":"hive","status":"ready","database":"default","statement":"select * from web_logs","statement_raw":"select * from web_logs","variables":[],"properties":{"settings":[],"files":[],"functions":[]},"result":{}}],
+          "snippets": [{"id": "e069ef32-5c95-4507-b961-e79c090b5abf","type":"hive","status":"ready","database":"default",""" \
+          """"statement":"select * from web_logs","statement_raw":"select * from web_logs","variables":[],"properties":""" \
+          """{"settings":[],"files":[],"functions":[]},"result":{}}],
           "uuid": "8a20da5f-b69c-4843-b17d-dea5c74c41d1"
       }
       """
@@ -376,6 +393,35 @@ FROM déclenché c, c.addresses a"""
 
       data = json.loads(response.content)
       assert_equal(data, {'status': 0})  # We get back empty instead of failure with QueryExpired to silence end user messages
+
+
+  def test_autocomplete_functions(self):
+    # Note: better test would be to mock autocomplete() and not get_api() with hive and mysql dialects
+
+    with patch('notebook.api.get_api') as get_api:
+      get_api.return_value = Mock(
+        autocomplete=Mock(
+          return_value={
+            'functions': [
+              {'name': 'f1'}, {'name': 'f2'}, {'name': 'f3'}
+            ]
+          }
+        )
+      )
+
+      response = self.client.post(reverse('notebook:api_autocomplete_databases'), {
+          'snippet': json.dumps({'type': 'hive', 'properties': {}}),
+          'operation': 'functions'
+      })
+
+      assert_equal(response.status_code, 200)
+      data = json.loads(response.content)
+      assert_equal(data['status'], 0)
+
+      assert_equal(
+        data['functions'],
+        [{'name': 'f1'}, {'name': 'f2'}, {'name': 'f3'}]
+      )
 
 
 class MockedApi(Api):
@@ -493,7 +539,13 @@ class TestNotebookApiMocked(object):
         ],
         "type": "query-hive",
         "id": null,
-        "snippets": [{"id":"2b7d1f46-17a0-30af-efeb-33d4c29b1055","type":"hive","status":"running","statement":"select * from web_logs","properties":{"settings":[],"variables":[],"files":[],"functions":[]},"result":{"id":"b424befa-f4f5-8799-a0b4-79753f2552b1","type":"table","handle":{"log_context":null,"statements_count":1,"end":{"column":21,"row":0},"statement_id":0,"has_more_statements":false,"start":{"column":0,"row":0},"secret":"rVRWw7YPRGqPT7LZ/TeFaA==an","has_result_set":true,"statement":"select * from web_logs","operation_type":0,"modified_row_count":null,"guid":"7xm6+epkRx6dyvYvGNYePA==an"}},"lastExecuted": 1462554843817,"database":"default"}],
+        "snippets": [{"id":"2b7d1f46-17a0-30af-efeb-33d4c29b1055","type":"hive","status":"running","statement":""" \
+        """"select * from web_logs","properties":{"settings":[],"variables":[],"files":[],"functions":[]},""" \
+        """"result":{"id":"b424befa-f4f5-8799-a0b4-79753f2552b1","type":"table","handle":""" \
+        """{"log_context":null,"statements_count":1,"end":{"column":21,"row":0},"statement_id":0,""" \
+        """"has_more_statements":false,"start":{"column":0,"row":0},"secret":"rVRWw7YPRGqPT7LZ/TeFaA==an",""" \
+        """"has_result_set":true,"statement":"select * from web_logs","operation_type":0,"modified_row_count":""" \
+        """null,"guid":"7xm6+epkRx6dyvYvGNYePA==an"}},"lastExecuted": 1462554843817,"database":"default"}],
         "uuid": "d9efdee1-ef25-4d43-b8f9-1a170f69a05a"
     }
     """
@@ -547,7 +599,7 @@ class TestNotebookApiMocked(object):
 
     data = json.loads(response.content)
     assert_equal(-1, data['status'], data)
-    assert_equal('The destination is not a empty directory!', data['message'], data)
+    assert_equal('The destination is not an empty directory!', data['message'], data)
 
 
   def test_download_result(self):
@@ -566,7 +618,13 @@ class TestNotebookApiMocked(object):
         ],
         "type": "query-hive",
         "id": null,
-        "snippets": [{"id":"2b7d1f46-17a0-30af-efeb-33d4c29b1055","type":"hive","status":"running","statement":"select * from web_logs","properties":{"settings":[],"variables":[],"files":[],"functions":[]},"result":{"id":"b424befa-f4f5-8799-a0b4-79753f2552b1","type":"table","handle":{"log_context":null,"statements_count":1,"end":{"column":21,"row":0},"statement_id":0,"has_more_statements":false,"start":{"column":0,"row":0},"secret":"rVRWw7YPRGqPT7LZ/TeFaA==an","has_result_set":true,"statement":"select * from web_logs","operation_type":0,"modified_row_count":null,"guid":"7xm6+epkRx6dyvYvGNYePA==an"}},"lastExecuted": 1462554843817,"database":"default"}],
+        "snippets": [{"id":"2b7d1f46-17a0-30af-efeb-33d4c29b1055","type":"hive","status":"running","statement":""" \
+        """"select * from web_logs","properties":{"settings":[],"variables":[],"files":[],"functions":[]},""" \
+        """"result":{"id":"b424befa-f4f5-8799-a0b4-79753f2552b1","type":"table","handle":{"log_context":null,""" \
+        """"statements_count":1,"end":{"column":21,"row":0},"statement_id":0,"has_more_statements":false,""" \
+        """"start":{"column":0,"row":0},"secret":"rVRWw7YPRGqPT7LZ/TeFaA==an","has_result_set":true,"statement":"""\
+        """"select * from web_logs","operation_type":0,"modified_row_count":null,"guid":"7xm6+epkRx6dyvYvGNYePA==an"}},""" \
+        """"lastExecuted": 1462554843817,"database":"default"}],
         "uuid": "d9efdee1-ef25-4d43-b8f9-1a170f69a05a"
     }
     """
@@ -582,56 +640,63 @@ class TestNotebookApiMocked(object):
 def test_get_interpreters_to_show():
   default_interpreters = OrderedDict((
       ('hive', {
-          'name': 'Hive', 'interface': 'hiveserver2', 'type': 'hive', 'is_sql': True, 'options': {}, 'dialect_properties': None, 'is_catalog': False, 'category': 'editor', 'dialect': 'hive'
+          'name': 'Hive', 'interface': 'hiveserver2', 'type': 'hive', 'is_sql': True, 'options': {}, 'dialect_properties': {},
+          'is_catalog': False, 'category': 'editor', 'dialect': 'hive'
       }),
       ('spark', {
-          'name': 'Scala', 'interface': 'livy', 'type': 'spark', 'is_sql': False, 'options': {}, 'dialect_properties': None, 'is_catalog': False, 'category': 'editor', 'dialect': 'scala'
+          'name': 'Scala', 'interface': 'livy', 'type': 'spark', 'is_sql': False, 'options': {}, 'dialect_properties': {},
+          'is_catalog': False, 'category': 'editor', 'dialect': 'scala'
       }),
       ('pig', {
-          'name': 'Pig', 'interface': 'pig', 'type': 'pig', 'is_sql': False, 'options': {}, 'dialect_properties': None, 'is_catalog': False, 'category': 'editor', 'dialect': 'pig'
+          'name': 'Pig', 'interface': 'pig', 'type': 'pig', 'is_sql': False, 'options': {}, 'dialect_properties': {},
+          'is_catalog': False, 'category': 'editor', 'dialect': 'pig'
       }),
       ('java', {
-          'name': 'Java', 'interface': 'oozie', 'type': 'java', 'is_sql': False, 'options': {}, 'dialect_properties': None, 'is_catalog': False, 'category': 'editor', 'dialect': 'java'
+          'name': 'Java', 'interface': 'oozie', 'type': 'java', 'is_sql': False, 'options': {}, 'dialect_properties': {},
+          'is_catalog': False, 'category': 'editor', 'dialect': 'java'
       })
     ))
 
   expected_interpreters = OrderedDict((
       ('java', {
-        'name': 'Java', 'interface': 'oozie', 'type': 'java', 'is_sql': False, 'options': {}, 'dialect_properties': None, 'is_catalog': False, 'category': 'editor', 'dialect': 'java'
+        'name': 'Java', 'interface': 'oozie', 'type': 'java', 'is_sql': False, 'options': {}, 'dialect_properties': {},
+        'is_catalog': False, 'category': 'editor', 'dialect': 'java'
       }),
       ('pig', {
-        'name': 'Pig', 'interface': 'pig', 'is_sql': False, 'type': 'pig', 'options': {}, 'dialect_properties': None, 'is_catalog': False, 'category': 'editor', 'dialect': 'pig'
+        'name': 'Pig', 'interface': 'pig', 'is_sql': False, 'type': 'pig', 'options': {}, 'dialect_properties': {},
+        'is_catalog': False, 'category': 'editor', 'dialect': 'pig'
       }),
       ('hive', {
-          'name': 'Hive', 'interface': 'hiveserver2', 'is_sql': True, 'type': 'hive', 'options': {}, 'dialect_properties': None, 'is_catalog': False, 'category': 'editor', 'dialect': 'hive'
+          'name': 'Hive', 'interface': 'hiveserver2', 'is_sql': True, 'type': 'hive', 'options': {}, 'dialect_properties': {},
+          'is_catalog': False, 'category': 'editor', 'dialect': 'hive'
       }),
       ('spark', {
-          'name': 'Scala', 'interface': 'livy', 'type': 'spark', 'is_sql': False, 'options': {}, 'dialect_properties': None, 'is_catalog': False, 'category': 'editor', 'dialect': 'scala'
+          'name': 'Scala', 'interface': 'livy', 'type': 'spark', 'is_sql': False, 'options': {}, 'dialect_properties': {},
+          'is_catalog': False, 'category': 'editor', 'dialect': 'scala'
       })
     ))
 
   try:
-    resets = [INTERPRETERS.set_for_testing(default_interpreters), APP_BLACKLIST.set_for_testing('')]
+    resets = [
+      INTERPRETERS.set_for_testing(default_interpreters),
+      APP_BLACKLIST.set_for_testing(''),
+      ENABLE_CONNECTORS.set_for_testing(False)
+    ]
     appmanager.DESKTOP_MODULES = []
     appmanager.DESKTOP_APPS = None
     appmanager.load_apps(APP_BLACKLIST.get())
+    notebook.conf.INTERPRETERS_CACHE = None
 
-    interpreters_shown_on_wheel_unset = get_ordered_interpreters()
+    # 'get_interpreters_to_show should return the same as get_interpreters when interpreters_shown_on_wheel is unset'
     assert_equal(
-      list(default_interpreters.values()),
-      interpreters_shown_on_wheel_unset,
-      'get_interpreters_to_show should return the same as get_interpreters when interpreters_shown_on_wheel is unset. expected: %s, actual: %s' % (
-          list(default_interpreters.values()), interpreters_shown_on_wheel_unset
-      )
+      list(default_interpreters.values()), get_ordered_interpreters()
     )
 
     resets.append(INTERPRETERS_SHOWN_ON_WHEEL.set_for_testing('java,pig'))
+
     assert_equal(
-      list(expected_interpreters.values()),
-      get_ordered_interpreters(),
-      'get_interpreters_to_show did not return interpreters in the correct order expected: %s, actual: %s' % (
-          list(expected_interpreters.values()), get_ordered_interpreters()
-      )
+      list(expected_interpreters.values()), get_ordered_interpreters(),
+      'get_interpreters_to_show did not return interpreters in the correct order expected'
     )
   finally:
     for reset in resets:
@@ -639,6 +704,108 @@ def test_get_interpreters_to_show():
     appmanager.DESKTOP_MODULES = []
     appmanager.DESKTOP_APPS = None
     appmanager.load_apps(APP_BLACKLIST.get())
+    notebook.conf.INTERPRETERS_CACHE = None
+
+
+def test_get_ordered_interpreters():
+  default_interpreters = OrderedDict((
+    ('hive', {
+        'name': 'Hive', 'interface': 'hiveserver2', 'type': 'hive', 'is_sql': True, 'options': {}, 'dialect_properties': None,
+        'is_catalog': False, 'category': 'editor', 'dialect': 'hive'
+    }),
+    ('impala', {
+        'name': 'Impala', 'interface': 'hiveserver2', 'type': 'impala', 'is_sql': True, 'options': {}, 'dialect_properties': None,
+        'is_catalog': False, 'category': 'editor', 'dialect': 'impala'
+    }),
+    ('spark', {
+        'name': 'Scala', 'interface': 'livy', 'type': 'spark', 'is_sql': False, 'options': {}, 'dialect_properties': None,
+        'is_catalog': False, 'category': 'editor', 'dialect': 'scala'
+    }),
+    ('pig', {
+        'name': 'Pig', 'interface': 'pig', 'type': 'pig', 'is_sql': False, 'options': {}, 'dialect_properties': None,
+        'is_catalog': False, 'category': 'editor', 'dialect': 'pig'
+    }),
+    ('java', {
+        'name': 'Java', 'interface': 'oozie', 'type': 'java', 'is_sql': False, 'options': {}, 'dialect_properties': None,
+        'is_catalog': False, 'category': 'editor', 'dialect': 'java'
+    })
+  ))
+
+  try:
+    resets = [APP_BLACKLIST.set_for_testing('')]
+    appmanager.DESKTOP_MODULES = []
+    appmanager.DESKTOP_APPS = None
+    appmanager.load_apps(APP_BLACKLIST.get())
+
+    with patch('notebook.conf.is_cm_managed') as is_cm_managed:
+      with patch('notebook.conf.appmanager.get_apps_dict') as get_apps_dict:
+        with patch('notebook.conf.has_connectors') as has_connectors:
+          get_apps_dict.return_value = {'hive': {}}
+          has_connectors.return_value = False
+          notebook.conf.INTERPRETERS_CACHE = None
+
+          is_cm_managed.return_value = False
+
+          # No CM --> Verbatim
+          INTERPRETERS.set_for_testing(
+            OrderedDict((
+              ('phoenix', {
+                  'name': 'Phoenix', 'interface': 'sqlalchemy', 'dialect': 'phoenix'
+              }),)
+            )
+          )
+          assert_equal(
+            [interpreter['dialect'] for interpreter in get_ordered_interpreters()],
+            ['phoenix']
+          )
+          assert_equal(  # Check twice because of cache
+            [interpreter['dialect'] for interpreter in get_ordered_interpreters()],
+            ['phoenix']
+          )
+
+          is_cm_managed.return_value = True
+          notebook.conf.INTERPRETERS_CACHE = None
+
+          # CM --> Append []
+          INTERPRETERS.set_for_testing(
+            OrderedDict(()
+            )
+          )
+
+          assert_equal(
+            [interpreter['dialect'] for interpreter in get_ordered_interpreters()],
+            ['hive']
+          )
+          assert_equal(  # Check twice
+            [interpreter['dialect'] for interpreter in get_ordered_interpreters()],
+            ['hive']
+          )
+
+          notebook.conf.INTERPRETERS_CACHE = None
+
+          # CM --> Append [Phoenix]
+          INTERPRETERS.set_for_testing(
+            OrderedDict((
+              ('phoenix', {
+                  'name': 'Phoenix', 'interface': 'sqlalchemy', 'dialect': 'phoenix'
+              }),)
+            )
+          )
+          assert_equal(
+            [interpreter['dialect'] for interpreter in get_ordered_interpreters()],
+            ['hive', 'phoenix']
+          )
+          assert_equal(  # Check twice
+            [interpreter['dialect'] for interpreter in get_ordered_interpreters()],
+            ['hive', 'phoenix']
+          )
+  finally:
+    for reset in resets:
+      reset()
+    appmanager.DESKTOP_MODULES = []
+    appmanager.DESKTOP_APPS = None
+    appmanager.load_apps(APP_BLACKLIST.get())
+    notebook.conf.INTERPRETERS_CACHE = None
 
 
 class TestQueriesMetrics(object):
@@ -655,23 +822,6 @@ class TestQueriesMetrics(object):
       c = Client()
       response = c.get('/metrics')
       assert_true(b'hue_queries_numbers 12500.0' in response.content, response.content)
-
-
-class TestAnalytics(object):
-
-  def setUp(self):
-    self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
-    self.user = User.objects.get(username="test")
-
-  def test_basic_stats(self):
-    try:
-      doc, created = Document2.objects.get_or_create(name='test_query_stats', type='query-hive', owner=self.user, data={})
-
-      Analytics.admin_stats()
-      Analytics.user_stats(user=self.user)
-      Analytics.query_stats(query=doc)
-    finally:
-      doc.delete()
 
 
 class TestEditor(object):

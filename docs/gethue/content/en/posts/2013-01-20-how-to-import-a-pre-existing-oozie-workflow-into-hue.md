@@ -39,7 +39,6 @@ sf_caption_position:
 slide_template:
   - default
 categories:
-  - Scheduling
 
 ---
 [Hue][1] is an open-source web interface for Apache Hadoop packaged with CDH that focuses on improving the overall experience for the average user. The [Apache Oozie][2] application in Hue provides an easy-to-use interface to build workflows and coordinators. Basic management of workflows and coordinators is available through the dashboards with operations such as killing, suspending, or resuming a job.

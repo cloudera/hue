@@ -37,7 +37,6 @@ sf_caption_position:
 ampforwp-amp-on-off:
   - default
 categories:
-  - Administration
 
 ---
 ### How to count the documents of a user? {#how-to-count-documents-of-a-user}
@@ -81,7 +80,7 @@ And finally launch the shell by:
 
 Then use the Python code to access a certain user information:
 
-<pre><code class="hljs powershell">Python &lt;span class="hljs-number">2.7&lt;/span>.&lt;span class="hljs-number">6&lt;/span> (default, Oct &lt;span class="hljs-number">26&lt;/span> &lt;span class="hljs-number">2016&lt;/span>, &lt;span class="hljs-number">20&lt;/span>:&lt;span class="hljs-number">30&lt;/span>:&lt;span class="hljs-number">19&lt;/span>) 
+<pre><code class="hljs powershell">Python &lt;span class="hljs-number">2.7&lt;/span>.&lt;span class="hljs-number">6&lt;/span> (default, Oct &lt;span class="hljs-number">26&lt;/span> &lt;span class="hljs-number">2016&lt;/span>, &lt;span class="hljs-number">20&lt;/span>:&lt;span class="hljs-number">30&lt;/span>:&lt;span class="hljs-number">19&lt;/span>)
 Type &lt;span class="hljs-string">"copyright"&lt;/span>, &lt;span class="hljs-string">"credits"&lt;/span> or &lt;span class="hljs-string">"license"&lt;/span> &lt;span class="hljs-keyword">for&lt;/span> more information.
 
 IPython &lt;span class="hljs-number">5.2&lt;/span>.&lt;span class="hljs-number">0&lt;/span> -- An enhanced Interactive Python.

@@ -18,7 +18,7 @@ import $ from 'jquery';
 import * as ko from 'knockout';
 
 ko.bindingHandlers.slider = {
-  init: function(element, valueAccessor) {
+  init: function (element, valueAccessor) {
     const _el = $(element);
     const _options = $.extend(valueAccessor(), {});
     _el.slider({
@@ -56,7 +56,7 @@ ko.bindingHandlers.slider = {
       }
     });
   },
-  update: function(element, valueAccessor) {
+  update: function (element, valueAccessor) {
     $.extend(valueAccessor(), {});
   }
 };

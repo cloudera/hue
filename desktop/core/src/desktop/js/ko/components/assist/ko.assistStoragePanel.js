@@ -16,12 +16,13 @@
 
 import * as ko from 'knockout';
 
-import apiHelper from 'api/apiHelper';
 import AssistStorageEntry from './assistStorageEntry';
+import apiHelper from 'api/apiHelper';
 import componentUtils from 'ko/components/componentUtils';
+import { getRootFilePath } from 'config/hueConfig';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
-import { getRootFilePath } from 'utils/hueConfig';
+import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
 
 // prettier-ignore
 const TEMPLATE = `
@@ -65,8 +66,8 @@ const TEMPLATE = `
       <!-- /ko -->
       <!-- ko if: source.type === 'abfs' && path !== '/' && window.SHOW_UPLOAD_BUTTON -->
       <a class="inactive-action" data-bind="dropzone: {
-            url: '/filebrowser/upload/file?dest=' + 'abfs:/' + path,
-            params: { dest: 'abfs:/' + path },
+            url: '/filebrowser/upload/file?dest=' + abfsPath,
+            params: { dest: abfsPath },
             paramName: 'hdfs_file',
             onError: function(x, e){ $(document).trigger('error', e); },
             onComplete: function () { huePubSub.publish('assist.storage.refresh'); } }" title="${I18n(
@@ -184,7 +185,7 @@ class AssistStoragePanel {
   constructor(options) {
     this.sources = ko.observableArray(options.sources);
 
-    const lastSourceType = apiHelper.getFromTotalStorage('assist', 'lastStorageSource', 'hdfs');
+    const lastSourceType = getFromLocalStorage('assist.lastStorageSource', 'hdfs');
 
     let foundLastSource = this.sources().find(source => source.type === lastSourceType);
 
@@ -202,7 +203,7 @@ class AssistStoragePanel {
     this.activeSource.subscribe(newValue => {
       if (newValue) {
         this.rootPath = getRootFilePath(this.activeSource());
-        apiHelper.setInTotalStorage('assist', 'lastStorageSource', newValue.type);
+        setInLocalStorage('assist.lastStorageSource', newValue.type);
         this.selectedStorageEntry(undefined);
         this.reload();
       }
@@ -210,7 +211,7 @@ class AssistStoragePanel {
 
     huePubSub.subscribe('assist.selectStorageEntry', entry => {
       this.selectedStorageEntry(entry);
-      apiHelper.setInTotalStorage('assist', 'currentStoragePath_' + entry.type, entry.path);
+      setInLocalStorage('assist.currentStoragePath_' + entry.source.type, entry.path);
     });
 
     huePubSub.subscribe('assist.storage.refresh', () => {
@@ -224,7 +225,7 @@ class AssistStoragePanel {
           ? '/'
           : window.USER_HOME_DIR;
       this.loadPath(path);
-      apiHelper.setInTotalStorage('assist', 'currentStoragePath_' + this.activeSource().type, path);
+      setInLocalStorage('assist.currentStoragePath_' + this.activeSource().type, path);
     });
 
     this.init();
@@ -258,9 +259,8 @@ class AssistStoragePanel {
 
   reload() {
     this.loadPath(
-      apiHelper.getFromTotalStorage(
-        'assist',
-        'currentStoragePath_' + this.activeSource().type,
+      getFromLocalStorage(
+        'assist.currentStoragePath_' + this.activeSource().type,
         this.activeSource().type === 'hdfs' ? window.USER_HOME_DIR : '/'
       )
     );

@@ -24,8 +24,8 @@ const Topic = require('./Topic');
 const libxml = require('libxmljs');
 const extractorUtils = require('./extractorUtils');
 
-const outputPath = './desktop/core/src/desktop/static/desktop/docs/hive/';
-const mako = './desktop/core/src/desktop/templates/sql_doc_index.mako';
+const outputPath = '../../desktop/core/src/desktop/static/desktop/docs/hive/';
+const mako = '../../desktop/core/src/desktop/templates/sql_doc_index.mako';
 
 const jsonHandler = require('./jsonHandler');
 
@@ -52,13 +52,7 @@ const convertToPre = (element, fragments) => {
       }
       break;
     case 'code':
-      if (
-        element.attr('class') &&
-        element
-          .attr('class')
-          .value()
-          .indexOf('value') !== -1
-      ) {
+      if (element.attr('class') && element.attr('class').value().indexOf('value') !== -1) {
         fragments.push('<span class="hue-doc-varname">');
         element.childNodes().forEach(node => {
           convertToPre(node, fragments);
@@ -74,13 +68,7 @@ const convertToPre = (element, fragments) => {
 };
 
 const adaptElement = element => {
-  if (
-    element.attr('class') &&
-    element
-      .attr('class')
-      .value()
-      .indexOf('syntaxhighlighter') !== -1
-  ) {
+  if (element.attr('class') && element.attr('class').value().indexOf('syntaxhighlighter') !== -1) {
     const fragments = ['<div class="hue-doc-codeblock">'];
     element.childNodes().forEach(childNode => {
       convertToPre(childNode, fragments);
@@ -89,12 +77,7 @@ const adaptElement = element => {
     const replacement = fragments.join('');
     element.replace(libxml.parseHtmlFragment(replacement).root());
   } else if (element.attr('class')) {
-    if (
-      element
-        .attr('class')
-        .value()
-        .indexOf('admonition') !== -1
-    ) {
+    if (element.attr('class').value().indexOf('admonition') !== -1) {
       element.attr({ class: 'hue-doc-note-hive' });
     } else {
       element.attr('class').remove();
@@ -103,13 +86,7 @@ const adaptElement = element => {
 
   switch (element.name()) {
     case 'a':
-      if (
-        element.attr('href') &&
-        element
-          .attr('href')
-          .value()
-          .indexOf('/links') == 0
-      ) {
+      if (element.attr('href') && element.attr('href').value().indexOf('/links') === 0) {
         // Internal link
         let ref = element
           .attr('href')

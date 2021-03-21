@@ -16,14 +16,14 @@
 
 import * as ko from 'knockout';
 
-ko.extenders.numeric = function(target, config) {
+ko.extenders.numeric = function (target, config) {
   const precision = typeof config.precision === 'undefined' ? config : config.precision;
   const roundingMultiplier = Math.pow(10, precision);
 
   const result = ko
     .computed({
       read: target,
-      write: function(newValue) {
+      write: function (newValue) {
         const current = target();
         const newValueAsNum = isNaN(newValue) ? 0 : parseFloat(+newValue);
         let valueToWrite = Math.round(newValueAsNum * roundingMultiplier) / roundingMultiplier;

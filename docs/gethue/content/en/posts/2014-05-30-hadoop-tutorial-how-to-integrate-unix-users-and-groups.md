@@ -37,7 +37,6 @@ sf_remove_promo_bar:
 slide_template:
   - default
 categories:
-  - Administration
 ---
 
 Hue allows you to authenticate with several services like your company [LDAP][1], [OAuth][2], [OpenId][3], [SAML][4] etc. This blog post covers how to integrate with linux account names in Hue by synchronizing with the underlying system.

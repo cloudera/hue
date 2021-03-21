@@ -22,6 +22,7 @@ standard_library.install_aliases()
 from builtins import zip
 from builtins import range
 from builtins import object
+from builtins import str
 import json
 import logging
 import os
@@ -243,6 +244,7 @@ class TestFileBrowserWithHadoop(object):
   def setUp(self):
     self.c = make_logged_in_client(username='test', is_superuser=False)
     grant_access('test', 'test', 'filebrowser')
+    grant_access('test', 'test', 'jobbrowser')
     add_to_group('test')
     self.user = User.objects.get(username='test')
 
@@ -1150,7 +1152,7 @@ alert("XSS")
       timeout_time = time() + 25
       end_time = time()
       while timeout_time > end_time:
-        resp2 = self.c.post('/jobbrowser/api/job/workflows', {'interface': '"workflows"', 'app_id': responseid}) #error here
+        resp2 = self.c.post('/jobbrowser/api/job/workflows', {'interface': '"workflows"', 'app_id': responseid})
         response2 = json.loads(resp2.content)
         if response2['app']['status'] != 'RUNNING':
           assert_equal(response2['app']['status'] , 'SUCCEEDED', response2)

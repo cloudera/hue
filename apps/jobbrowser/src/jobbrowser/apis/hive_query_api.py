@@ -17,94 +17,136 @@
 from builtins import filter
 
 import logging
-import re
+from logging import exception
 
 from datetime import datetime
 from django.utils.translation import ugettext as _
 
+from beeswax.models import QueryHistory
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.python_util import current_ms_from_utc
+from desktop.lib.rest.http_client import HttpClient
+from desktop.lib.rest.resource import Resource
+from notebook.models import _get_notebook_api, make_notebook, MockRequest
+
 
 from jobbrowser.apis.base_api import Api
+from jobbrowser.conf import QUERY_STORE
+from jobbrowser.models import HiveQuery
 
 
 LOG = logging.getLogger(__name__)
 
-
 class HiveQueryApi(Api):
+  HEADERS = {'X-Requested-By': 'das'}
 
   def __init__(self, user, cluster=None):
-    self.user=user
-    self.cluster=cluster
+    self.user = user
+    self.cluster = cluster
+    self.api = HiveQueryClient()
 
   def apps(self, filters):
-    jobs = []
+    queries = self.api.get_queries(filters)
 
     apps = {
-      'apps': [],
-      'total': 0
+      "apps": {
+        "queries": [{
+            "details": None,
+            "dags": [],
+            "id": query.id,
+            "queryId": query.query_id,
+            "startTime": query.start_time,
+            "query": query.query.replace('\r\n', ' ')[:60] + ('...' if len(query.query) > 60 else ''),
+            "highlightedQuery": None,
+            "endTime": query.end_time,
+            "elapsedTime": query.elapsed_time,
+            "status": query.status,
+            "queueName": query.queue_name,
+            "userId": query.user_id,
+            "requestUser": query.request_user,
+            "cpuTime": query.cpu_time,
+            "physicalMemory": query.physical_memory,
+            "virtualMemory": query.virtual_memory,
+            "dataRead": query.data_read,
+            "dataWritten": query.data_written,
+            "operationId": query.operation_id,
+            "clientIpAddress": query.client_ip_address,
+            "hiveInstanceAddress": query.hive_instance_address,
+            "hiveInstanceType": query.hive_instance_type,
+            "sessionId": query.session_id,
+            "logId": query.log_id,
+            "threadId": query.thread_id,
+            "executionMode": query.execution_mode,
+            "tablesRead": query.tables_read,
+            "tablesWritten": query.tables_written,
+            "databasesUsed": query.databases_used,
+            "domainId": query.domain_id,
+            "llapAppId": query.llap_app_id,
+            "usedCBO": query.used_cbo,
+            "createdAt": query.created_at
+          }
+          for query in queries
+        ],
+        "meta": {
+            "limit": filters['limit'],
+            "offset": filters['offset'],
+            "size": self.api.get_query_count(filters)
+          }
+      }
     }
-
-    apps['total'] = len(apps['apps'])
 
     return apps
 
   def app(self, appid):
-    sql_query = 'SELECT * FROM default.business_unit LIMIT 100'
+    query = self.api.get_query(query_id=appid)
 
-    job = HiveQueryClient().get_query_analysis(sql_query=sql_query)
-
-    if not job:
+    if not query:
       raise PopupException(_('Could not find query id %s' % appid))
 
-    app = {
-      'id': job['id'],
-      'name': sql_query[:60] + ('...' if len(sql_query) > 60 else ''),
-      'status': self._get_status(job),
-      'apiStatus': self._api_status(self._get_status(job)),
-      'type': 'hive-query',
-      'user': self.user.username,
-      'queue': 'queue',
-      'progress': '100',
-      'isRunning': False,
-      'canWrite': False,
-      'duration': 1,
-      'submitted': 1,
-      'properties': {
-        'plan': {
-          'stmt': sql_query,
-          'plan': '''Explain
-OPTIMIZED SQL: SELECT `id`, `head`, `creator`, `created_date`
-FROM `default`.`business_unit`
-LIMIT 100
-STAGE DEPENDENCIES:
-Stage-0 is a root stage
-STAGE PLANS:
-Stage: Stage-0
-Fetch Operator
-limit: 100
-Processor Tree:
-TableScan
-alias: business_unit
-GatherStats: false
-Select Operator
-expressions: id (type: int), head (type: int), creator (type: string), created_date (type: date)
-outputColumnNames: _col0, _col1, _col2, _col3
-Limit
-Number of rows: 100
-ListSink
-''', #.replace('\n', ' '),
-          'perf': ''
-        }
-      }
+    params = {
+      'extended': 'true',
+      'queryId': query.query_id
     }
+
+    client = HttpClient(QUERY_STORE.SERVER_URL.get())
+    resource = Resource(client)
+    app = resource.get('api/hive/query', params=params, headers=self.HEADERS)
 
     return app
 
-  def action(self, appid, action):
-    message = {'message': '', 'status': 0}
+  def action(self, query_ids, action):
+    message = {'actions': {}, 'status': 0}
 
-    return message;
+    if action.get('action') == 'kill':
+      for query_id in query_ids:
+        action_details = {}
+
+        try:
+          self.kill_query(query_id)
+          action_details['status'] = 0
+          action_details['message'] = _('kill action performed')
+        except Exception as ex:
+          LOG.error(ex)
+          message['status'] = -1
+          action_details['status'] = -1
+          action_details['message'] = _('kill action failed : %s' % str(ex))
+
+        message['actions'][query_id] = action_details;
+
+    return message
+
+  def kill_query(self, query_id):
+    kill_sql = 'KILL QUERY "%s";' % query_id
+    job = make_notebook(
+        name=_('Kill query %s') % query_id,
+        editor_type='hive',
+        statement=kill_sql,
+        status='ready',
+        on_success_url='assist.db.refresh',
+        is_task=False,
+    )
+
+    job.execute_and_wait(MockRequest(user=self.user))
 
   def logs(self, appid, app_type, log_name=None, is_embeddable=False):
     return {'logs': ''}
@@ -114,11 +156,8 @@ ListSink
 
     return message;
 
-  def _get_status(self, job):
-    return 'RUNNING' if job['status'] != 'FINISHED' else "FINISHED"
-
   def _api_status(self, status):
-    if status == 'FINISHED':
+    if status == 'SUCCESS':
       return 'SUCCEEDED'
     elif status == 'EXCEPTION':
       return 'FAILED'
@@ -130,12 +169,35 @@ ListSink
 
 class HiveQueryClient():
 
-  def get_query_analysis(self, sql_query):
-    return {
-      'id': 'dev_20200417220345_3cf5e2a4-a3c9-4056-8bf7-76fb8a75f360',
-      'queryText': sql_query,
-      'status': 'FINISHED'
-    }
+  def _get_all_queries(self):
+    return HiveQuery.objects.using('query').order_by('-start_time')
+
+  def _get_queries(self, filters):
+    queries = self._get_all_queries()
+    queries = queries.filter(start_time__gte=filters['startTime'], end_time__lte=filters['endTime'])
+    if filters['text']:
+      queries = queries.filter(query__icontains=filters['text'])
+
+    for facet in filters['facets']:
+      queries = queries.filter(**{facet['field']+'__in': facet['values']})
+
+    return queries
+
+  def get_query_count(self, filters):
+    filtered_query_list = self._get_queries(filters)
+
+    return len(filtered_query_list)
+
+  def get_queries(self, filters):
+    filtered_query_list = self._get_queries(filters)
+    paginated_query_list = filtered_query_list[filters['offset']:filters['offset'] + filters['limit']]
+
+    return paginated_query_list
+
+  def get_query(self, query_id):
+    return HiveQuery.objects.using('query').get(query_id=query_id)
+
+  def get_query_analysis(self, query_id): pass
 
   # EXPLAIN with row count
   # CBO COST

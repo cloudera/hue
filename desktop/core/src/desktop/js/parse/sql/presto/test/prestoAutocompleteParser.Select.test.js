@@ -17,7 +17,7 @@
 import prestoAutocompleteParser from '../prestoAutocompleteParser';
 describe('prestoAutocompleteParser.js SELECT statements', () => {
   beforeAll(() => {
-    prestoAutocompleteParser.yy.parseError = function(msg) {
+    prestoAutocompleteParser.yy.parseError = function (msg) {
       throw Error(msg);
     };
   });
@@ -360,6 +360,14 @@ describe('prestoAutocompleteParser.js SELECT statements', () => {
               function: 'count'
             },
             {
+              type: 'functionArgument',
+              location: { first_line: 1, last_line: 1, first_column: 14, last_column: 15 },
+              function: 'count',
+              argumentPosition: 0,
+              identifierChain: [{ name: 'count' }],
+              expression: { text: '*' }
+            },
+            {
               type: 'table',
               location: { first_line: 1, last_line: 1, first_column: 18, last_column: 21 },
               identifierChain: [{ name: 'autocomp_test' }]
@@ -375,6 +383,14 @@ describe('prestoAutocompleteParser.js SELECT statements', () => {
               type: 'function',
               location: { first_line: 1, last_line: 1, first_column: 29, last_column: 32 },
               function: 'avg'
+            },
+            {
+              type: 'functionArgument',
+              location: { first_line: 1, last_line: 1, first_column: 34, last_column: 36 },
+              function: 'avg',
+              argumentPosition: 0,
+              identifierChain: [{ name: 'avg' }],
+              expression: { types: ['COLREF'], columnReference: [{ name: 'id' }] }
             },
             {
               type: 'column',
@@ -983,7 +999,7 @@ describe('prestoAutocompleteParser.js SELECT statements', () => {
           subQueries: [
             {
               alias: 'ttaSum',
-              columns: [{ alias: 'total', type: 'DOUBLE' }]
+              columns: [{ alias: 'total', type: 'UDFREF', udfRef: 'sum' }]
             }
           ],
           suggestIdentifiers: [
@@ -2278,6 +2294,14 @@ describe('prestoAutocompleteParser.js SELECT statements', () => {
               function: 'customudf'
             },
             {
+              type: 'functionArgument',
+              location: { first_line: 1, last_line: 1, first_column: 21, last_column: 24 },
+              function: 'customudf',
+              argumentPosition: 0,
+              identifierChain: [{ name: 'db' }, { name: 'customUdf' }],
+              expression: { types: ['COLREF'], columnReference: [{ name: 'col' }] }
+            },
+            {
               type: 'column',
               location: { first_line: 1, last_line: 1, first_column: 21, last_column: 24 },
               identifierChain: [{ name: 'col' }],
@@ -2311,11 +2335,14 @@ describe('prestoAutocompleteParser.js SELECT statements', () => {
         containsKeywords: ['CASE'],
         expectedResult: {
           lowerCase: false,
-          suggestFunctions: { types: ['T'] },
+          suggestFunctions: {},
           suggestColumns: {
-            types: ['T'],
             source: 'select',
             tables: [{ identifierChain: [{ name: 'bar' }] }]
+          },
+          udfArgument: {
+            name: 'customudf',
+            position: 1
           }
         }
       });
@@ -2328,11 +2355,14 @@ describe('prestoAutocompleteParser.js SELECT statements', () => {
         containsKeywords: ['CASE'],
         expectedResult: {
           lowerCase: false,
-          suggestFunctions: { types: ['T'] },
+          suggestFunctions: {},
           suggestColumns: {
-            types: ['T'],
             source: 'select',
             tables: [{ identifierChain: [{ name: 'bar' }] }]
+          },
+          udfArgument: {
+            name: 'customudf',
+            position: 2
           }
         }
       });
@@ -2436,11 +2466,14 @@ describe('prestoAutocompleteParser.js SELECT statements', () => {
         } else {
           const expectedResult = {
             lowerCase: false,
-            suggestFunctions: { types: aggregateFunction.types || ['T'] },
+            suggestFunctions: {},
             suggestColumns: {
               source: 'select',
-              types: aggregateFunction.types || ['T'],
               tables: [{ identifierChain: [{ name: 'testTable' }] }]
+            },
+            udfArgument: {
+              name: aggregateFunction.name.toLowerCase(),
+              position: 1
             }
           };
           assertAutoComplete({
@@ -2464,11 +2497,14 @@ describe('prestoAutocompleteParser.js SELECT statements', () => {
           doesNotContainKeywords: ['ALL'],
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: { types: ['T'] },
+            suggestFunctions: {},
             suggestColumns: {
               source: 'select',
-              types: ['T'],
               tables: [{ identifierChain: [{ name: 'testTable' }] }]
+            },
+            udfArgument: {
+              name: binaryFunction.name.toLowerCase(),
+              position: 1
             }
           }
         });
@@ -2485,11 +2521,14 @@ describe('prestoAutocompleteParser.js SELECT statements', () => {
           containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: { types: ['T'] },
+            suggestFunctions: {},
             suggestColumns: {
               source: 'select',
-              types: ['T'],
               tables: [{ identifierChain: [{ name: 'testTable' }] }]
+            },
+            udfArgument: {
+              name: binaryFunction.name.toLowerCase(),
+              position: 2
             }
           }
         });
@@ -2507,11 +2546,14 @@ describe('prestoAutocompleteParser.js SELECT statements', () => {
           doesNotContainKeywords: ['ALL'],
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: { types: ['T'] },
+            suggestFunctions: {},
             suggestColumns: {
               source: 'select',
-              types: ['T'],
               tables: [{ identifierChain: [{ name: 'testTable' }] }]
+            },
+            udfArgument: {
+              name: binaryFunction.name.toLowerCase(),
+              position: 1
             }
           }
         });
@@ -3470,7 +3512,10 @@ describe('prestoAutocompleteParser.js SELECT statements', () => {
         lowerCase: false,
         suggestColumns: {
           source: 'select',
-          identifierChain: [{ name: 'testFoo', keySet: true }, { name: 'testBar', keySet: true }],
+          identifierChain: [
+            { name: 'testFoo', keySet: true },
+            { name: 'testBar', keySet: true }
+          ],
           tables: [{ identifierChain: [{ name: 'testTable' }] }]
         },
         suggestKeywords: ['*']
@@ -3519,6 +3564,14 @@ describe('prestoAutocompleteParser.js SELECT statements', () => {
               type: 'function',
               location: { first_line: 1, last_line: 1, first_column: 37, last_column: 43 },
               function: 'explode'
+            },
+            {
+              type: 'functionArgument',
+              location: { first_line: 1, last_line: 1, first_column: 45, last_column: 54 },
+              function: 'explode',
+              argumentPosition: 0,
+              identifierChain: [{ name: 'explode' }],
+              expression: { types: ['COLREF'], columnReference: [{ name: 'testArray' }] }
             },
             {
               type: 'column',
@@ -3665,10 +3718,13 @@ describe('prestoAutocompleteParser.js SELECT statements', () => {
         containsKeywords: ['CASE'],
         expectedResult: {
           lowerCase: false,
-          suggestFunctions: { types: ['ARRAY'] },
+          suggestFunctions: {},
           suggestColumns: {
-            types: ['ARRAY'],
             tables: [{ identifierChain: [{ name: 'testTable' }] }]
+          },
+          udfArgument: {
+            name: 'posexplode',
+            position: 1
           }
         }
       });
@@ -3781,6 +3837,17 @@ describe('prestoAutocompleteParser.js SELECT statements', () => {
               function: 'explode'
             },
             {
+              type: 'functionArgument',
+              location: { first_line: 6, last_line: 6, first_column: 24, last_column: 38 },
+              function: 'explode',
+              argumentPosition: 0,
+              identifierChain: [{ name: 'EXPLODE' }],
+              expression: {
+                types: ['COLREF'],
+                columnReference: [{ name: 'tt2' }, { name: 'testArrayA' }]
+              }
+            },
+            {
               type: 'table',
               location: { first_line: 6, last_line: 6, first_column: 24, last_column: 27 },
               identifierChain: [{ name: 'testTable2' }]
@@ -3796,6 +3863,17 @@ describe('prestoAutocompleteParser.js SELECT statements', () => {
               type: 'function',
               location: { first_line: 7, last_line: 7, first_column: 16, last_column: 22 },
               function: 'explode'
+            },
+            {
+              type: 'functionArgument',
+              location: { first_line: 7, last_line: 7, first_column: 24, last_column: 38 },
+              function: 'explode',
+              argumentPosition: 0,
+              identifierChain: [{ name: 'EXPLODE' }],
+              expression: {
+                types: ['COLREF'],
+                columnReference: [{ name: 'tt2' }, { name: 'testArrayB' }]
+              }
             },
             {
               type: 'table',
@@ -3891,7 +3969,10 @@ describe('prestoAutocompleteParser.js SELECT statements', () => {
         afterCursor: ' FROM customers LATERAL VIEW explode(baa) boo;',
         expectedResult: {
           lowerCase: false,
-          suggestIdentifiers: [{ name: 'key', type: 'alias' }, { name: 'value', type: 'alias' }]
+          suggestIdentifiers: [
+            { name: 'key', type: 'alias' },
+            { name: 'value', type: 'alias' }
+          ]
         }
       });
     });
@@ -3902,7 +3983,10 @@ describe('prestoAutocompleteParser.js SELECT statements', () => {
         afterCursor: ' FROM customers LATERAL VIEW posexplode(baa) boo;',
         expectedResult: {
           lowerCase: false,
-          suggestIdentifiers: [{ name: 'pos', type: 'alias' }, { name: 'val', type: 'alias' }]
+          suggestIdentifiers: [
+            { name: 'pos', type: 'alias' },
+            { name: 'val', type: 'alias' }
+          ]
         }
       });
     });
@@ -4037,7 +4121,10 @@ describe('prestoAutocompleteParser.js SELECT statements', () => {
               { identifierChain: [{ name: 'tableTwo' }], alias: 'baa' }
             ]
           },
-          suggestIdentifiers: [{ name: 'boo.', type: 'alias' }, { name: 'baa.', type: 'alias' }]
+          suggestIdentifiers: [
+            { name: 'boo.', type: 'alias' },
+            { name: 'baa.', type: 'alias' }
+          ]
         }
       });
     });
@@ -4080,7 +4167,8 @@ describe('prestoAutocompleteParser.js SELECT statements', () => {
           lowerCase: false,
           suggestColumns: {
             source: 'where',
-            types: ['DOUBLE'],
+            types: ['UDFREF'],
+            udfRef: 'cos',
             identifierChain: [{ name: 'bla' }],
             tables: [{ identifierChain: [{ name: 'tbl2' }] }]
           }
@@ -4228,11 +4316,14 @@ describe('prestoAutocompleteParser.js SELECT statements', () => {
         containsKeywords: ['CASE'],
         expectedResult: {
           lowerCase: false,
-          suggestFunctions: { types: ['DECIMAL', 'DOUBLE'] },
+          suggestFunctions: {},
           suggestColumns: {
             source: 'select',
-            types: ['DECIMAL', 'DOUBLE'],
             tables: [{ identifierChain: [{ name: 'testTable' }] }]
+          },
+          udfArgument: {
+            name: 'cos',
+            position: 1
           }
         }
       });
@@ -4245,22 +4336,35 @@ describe('prestoAutocompleteParser.js SELECT statements', () => {
         containsKeywords: ['CASE'],
         expectedResult: {
           lowerCase: false,
-          suggestFunctions: { types: ['DOUBLE'] },
+          suggestFunctions: {},
           suggestColumns: {
             source: 'select',
-            types: ['DOUBLE'],
             tables: [{ identifierChain: [{ name: 'testTable' }] }]
+          },
+          udfArgument: {
+            name: 'ceiling',
+            position: 1
           }
         }
       });
     });
 
-    it('should not suggest columns for "SELECT cos(1, | FROM testTable"', () => {
+    it('should suggest arg ref for "SELECT cos(1, | FROM testTable"', () => {
       assertAutoComplete({
         beforeCursor: 'SELECT cos(1, ',
         afterCursor: ' FROM testTable',
         expectedResult: {
-          lowerCase: false
+          lowerCase: false,
+          suggestColumns: {
+            source: 'select',
+            tables: [{ identifierChain: [{ name: 'testTable' }] }]
+          },
+          suggestFunctions: {},
+          suggestKeywords: ['CASE', 'FALSE', 'NULL', 'TRUE', 'EXISTS', 'INTERVAL', 'NOT'],
+          udfArgument: {
+            name: 'cos',
+            position: 2
+          }
         }
       });
     });
@@ -4272,11 +4376,14 @@ describe('prestoAutocompleteParser.js SELECT statements', () => {
         containsKeywords: ['CASE'],
         expectedResult: {
           lowerCase: false,
-          suggestFunctions: { types: ['T'] },
+          suggestFunctions: {},
           suggestColumns: {
             source: 'select',
-            types: ['T'],
             tables: [{ identifierChain: [{ name: 'testTable' }] }]
+          },
+          udfArgument: {
+            name: 'greatest',
+            position: 5
           }
         }
       });
@@ -4289,11 +4396,14 @@ describe('prestoAutocompleteParser.js SELECT statements', () => {
         containsKeywords: ['CASE'],
         expectedResult: {
           lowerCase: false,
-          suggestFunctions: { types: ['T'] },
+          suggestFunctions: {},
           suggestColumns: {
             source: 'select',
-            types: ['T'],
             tables: [{ identifierChain: [{ name: 'testTable' }] }]
+          },
+          udfArgument: {
+            name: 'greatest',
+            position: 2
           }
         }
       });
@@ -4306,22 +4416,35 @@ describe('prestoAutocompleteParser.js SELECT statements', () => {
         containsKeywords: ['CASE'],
         expectedResult: {
           lowerCase: false,
-          suggestFunctions: { types: ['DECIMAL', 'DOUBLE'] },
+          suggestFunctions: {},
           suggestColumns: {
             source: 'select',
-            types: ['DECIMAL', 'DOUBLE'],
             tables: [{ identifierChain: [{ name: 'testTable' }] }]
+          },
+          udfArgument: {
+            name: 'log',
+            position: 2
           }
         }
       });
     });
 
-    it('should not suggest columns for "SELECT log(a, b, | FROM testTable"', () => {
+    it('should suggest columns with arg ref for "SELECT log(a, b, | FROM testTable"', () => {
       assertAutoComplete({
         beforeCursor: 'SELECT log(a, b, ',
         afterCursor: ' FROM testTable',
         expectedResult: {
-          lowerCase: false
+          lowerCase: false,
+          suggestColumns: {
+            source: 'select',
+            tables: [{ identifierChain: [{ name: 'testTable' }] }]
+          },
+          suggestFunctions: {},
+          suggestKeywords: ['CASE', 'FALSE', 'NULL', 'TRUE', 'EXISTS', 'INTERVAL', 'NOT'],
+          udfArgument: {
+            name: 'log',
+            position: 3
+          }
         }
       });
     });
@@ -4904,7 +5027,10 @@ describe('prestoAutocompleteParser.js SELECT statements', () => {
               { identifierChain: [{ name: 'bar' }] }
             ]
           },
-          suggestIdentifiers: [{ name: 'bla.', type: 'alias' }, { name: 'bar.', type: 'table' }]
+          suggestIdentifiers: [
+            { name: 'bla.', type: 'alias' },
+            { name: 'bar.', type: 'table' }
+          ]
         }
       });
     });
@@ -5856,7 +5982,7 @@ describe('prestoAutocompleteParser.js SELECT statements', () => {
           suggestFunctions: {},
           suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'testTable' }] }] },
           suggestColumns: { tables: [{ identifierChain: [{ name: 'testTable' }] }] },
-          suggestColumnAliases: [{ name: 'boo', types: ['BIGINT'] }]
+          suggestColumnAliases: [{ name: 'boo', udfRef: 'count', types: ['UDFREF'] }]
         }
       });
     });
@@ -6989,7 +7115,10 @@ describe('prestoAutocompleteParser.js SELECT statements', () => {
             types: ['COLREF'],
             tables: [{ identifierChain: [{ name: 'foo' }] }, { identifierChain: [{ name: 'bar' }] }]
           },
-          suggestIdentifiers: [{ name: 'foo.', type: 'table' }, { name: 'bar.', type: 'table' }],
+          suggestIdentifiers: [
+            { name: 'foo.', type: 'table' },
+            { name: 'bar.', type: 'table' }
+          ],
           colRef: { identifierChain: [{ name: 'bar' }, { name: 'bla' }] }
         }
       });
@@ -7009,7 +7138,10 @@ describe('prestoAutocompleteParser.js SELECT statements', () => {
             types: ['COLREF'],
             tables: [{ identifierChain: [{ name: 'foo' }] }, { identifierChain: [{ name: 'bar' }] }]
           },
-          suggestIdentifiers: [{ name: 'foo.', type: 'table' }, { name: 'bar.', type: 'table' }],
+          suggestIdentifiers: [
+            { name: 'foo.', type: 'table' },
+            { name: 'bar.', type: 'table' }
+          ],
           colRef: { identifierChain: [{ name: 'bar' }, { name: 'bla' }] }
         }
       });
@@ -7314,7 +7446,10 @@ describe('prestoAutocompleteParser.js SELECT statements', () => {
               { identifierChain: [{ subQuery: 'bar' }] }
             ]
           },
-          suggestIdentifiers: [{ name: 'tt.', type: 'alias' }, { name: 'bar.', type: 'sub-query' }],
+          suggestIdentifiers: [
+            { name: 'tt.', type: 'alias' },
+            { name: 'bar.', type: 'sub-query' }
+          ],
           subQueries: [
             {
               alias: 'bar',
@@ -7651,7 +7786,7 @@ describe('prestoAutocompleteParser.js SELECT statements', () => {
                   columns: [
                     { identifierChain: [{ name: 'testTable' }, { name: 'a' }], type: 'COLREF' },
                     { identifierChain: [{ name: 'testTable' }, { name: 'b' }], type: 'COLREF' },
-                    { alias: 'bla', type: 'DOUBLE' }
+                    { alias: 'bla', type: 'UDFREF', udfRef: 'abs' }
                   ]
                 }
               ]

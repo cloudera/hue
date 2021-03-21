@@ -41,42 +41,28 @@ slide_template:
 sf_page_title_image:
   - 222
 categories:
-  - Administration
-  - Development
+  - Dev / API
 
 ---
 When going on the Home page (/home) in Hue 3.0, this error could appear:
 
-<pre><code class="bash">MultipleObjectsReturned: get() returned more than one DocumentPermission - it returned 2! Lookup parameters were {'perms': 'read', 'doc': <Document: saved query Sample: Job loss sample>}</code></pre>
+    MultipleObjectsReturned: get() returned more than one DocumentPermission - it returned 2! Lookup parameters were {'perms': 'read', 'doc': <Document: saved query Sample: Job loss sample>}
 
 This is fixed in Hue 3.6 and here is a way to repair it:
 
-1. Backup the Hue <a href="http://gethue.tumblr.com/post/75496233379/how-to-manage-the-hue-database-with-the-shell" target="_blank" rel="noopener noreferrer">database</a>
+1. Backup the Hue <a href="https://docs.gethue.com/administrator/administration/database/" target="_blank" rel="noopener noreferrer">database</a>.
 
-2. Run the cleanup script
+2. Run the cleanup script:
 
-<pre><code class="python">
+    from desktop.models import DocumentPermission, Document
 
-from desktop.models import DocumentPermission, Document
-
-for document in Document.objects.all():
-
-try:
-
-perm, created = DocumentPermission.objects.get_or_create(doc=document, perms=DocumentPermission.READ_PERM)
-
-except DocumentPermission.MultipleObjectsReturned, ex:
-
-\# We can delete duplicate perms of a document
-
-dups = DocumentPermission.objects.filter(doc=document, perms=DocumentPermission.READ_PERM)
-
-perm = dups[0]
-
-for dup in dups[1:]:
-
-print 'Deleting duplicate %s' % dup
-
-dup.delete()
-
-</code></pre>
+    for document in Document.objects.all():
+      try:
+        perm, created = DocumentPermission.objects.get_or_create(doc=document, perms=DocumentPermission.READ_PERM)
+      except DocumentPermission.MultipleObjectsReturned:
+        # We can delete duplicate perms of a document
+        dups = DocumentPermission.objects.filter(doc=document, perms=DocumentPermission.READ_PERM)
+        perm = dups[0]
+        for dup in dups[1:]:
+          print('Deleting duplicate %s' % dup)
+          dup.delete()

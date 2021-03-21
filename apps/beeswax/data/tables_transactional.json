@@ -1,21 +1,24 @@
 [
   {
     "data_file": "sample_07.csv",
-    "create_sql": "CREATE TABLE `sample_07` (\n  `code` string ,\n  `description` string ,\n  `total_emp` int ,\n  `salary` int )\nSTORED AS parquet\nTBLPROPERTIES ('transactional'='true', 'transactional_properties'='insert_only')\n",
+    "create_sql": "CREATE TABLE `sample_07` (\n  `code` string ,\n  `description` string ,\n  `total_emp` int ,\n  `salary` int )\nSTORED AS parquet\n",
     "table_name": "sample_07",
-    "transactional": true
+    "transactional": true,
+    "dialects": ["hive", "impala"]
   },
   {
     "data_file": "sample_08.csv",
-    "create_sql": "CREATE TABLE `sample_08` (\n  `code` string ,\n  `description` string ,\n  `total_emp` int ,\n  `salary` int )\nSTORED AS parquet\nTBLPROPERTIES ('transactional'='true', 'transactional_properties'='insert_only')\n",
+    "create_sql": "CREATE TABLE `sample_08` (\n  `code` string ,\n  `description` string ,\n  `total_emp` int ,\n  `salary` int )\nSTORED AS parquet\n",
     "table_name": "sample_08",
-    "transactional": true
+    "transactional": true,
+    "dialects": ["hive", "impala"]
   },
   {
     "data_file": "customers.parquet",
     "create_sql": "CREATE TABLE `customers` (\n `id` INT,\n `name` STRING,\n `email_preferences` STRUCT<`email_format`:STRING, `frequency`:STRING, `categories`:STRUCT<`promos`:BOOLEAN, `surveys`:BOOLEAN>>,\n `addresses` MAP<STRING, STRUCT<`street_1`:STRING, `street_2`:STRING, `city`:STRING, `state`:STRING, `zip_code`:STRING>>,\n `orders` ARRAY<STRUCT<`order_id`:STRING, `order_date`:STRING, `items`:ARRAY<STRUCT<`product_id`:INT, `sku`:STRING, `name`:STRING, `price`:DOUBLE, `qty`:INT>>>>)\nSTORED AS PARQUET\nTBLPROPERTIES ('transactional'='false')\n",
     "table_name": "customers",
-    "transactional": false
+    "transactional": false,
+    "dialects": ["hive", "impala"]
   },
   {
     "partition_files": {
@@ -27,6 +30,7 @@
     "create_sql": "CREATE TABLE `web_logs`  (  `_version_` bigint,   `app` string,   `bytes` int,   `city` string,   `client_ip` string,   `code` smallint,   `country_code` string,   `country_code3` string,   `country_name` string,   `device_family` string,   `extension` string,   `latitude` float,   `longitude` float,   `method` string,   `os_family` string,   `os_major` string,   `protocol` string,   `record` string,   `referer` string,   `region_code` string,   `request` string,   `subapp` string,   `time` string,   `url` string,   `user_agent` string,   `user_agent_family` string,   `user_agent_major` string,   `id` string)\nPARTITIONED BY (  `date` string  )\nSTORED AS parquet\nTBLPROPERTIES ('transactional'='true', 'transactional_properties'='insert_only')",
     "table_name": "web_logs",
     "columns": [{"name": "_version_", "type": "bigint"}, {"name": "app", "type": "string"}, {"name": "bytes", "type": "int"}, {"name": "city", "type": "string"}, {"name": "client_ip", "type": "string"}, {"name": "code", "type": "smallint"}, {"name": "country_code", "type": "string"}, {"name": "country_code3", "type": "string"}, {"name": "country_name", "type": "string"}, {"name": "device_family", "type": "string"}, {"name": "extension", "type": "string"}, {"name": "latitude", "type": "float"}, {"name": "longitude", "type": "float"}, {"name": "method", "type": "string"}, {"name": "os_family", "type": "string"}, {"name": "os_major", "type": "string"}, {"name": "protocol", "type": "string"}, {"name": "record", "type": "string"}, {"name": "referer", "type": "string"}, {"name": "region_code", "type": "string"}, {"name": "request", "type": "string"}, {"name": "subapp", "type": "string"}, {"name": "time", "type": "string"}, {"name": "url", "type": "string"}, {"name": "user_agent", "type": "string"}, {"name": "user_agent_family", "type": "string"}, {"name": "user_agent_major", "type": "string"}, {"name": "id", "type": "string"}, {"name": "date", "type": "string"}],
-    "transactional": true
+    "transactional": true,
+    "dialects": ["hive", "impala"]
   }
 ]

@@ -16,14 +16,15 @@
 
 import $ from 'jquery';
 import * as ko from 'knockout';
+import { hueLocalStorage } from 'utils/storageUtils';
 
 // TODO: Depends on Ace
 
 ko.bindingHandlers.highlight = {
-  init: function(element) {
+  init: function (element) {
     $(element).addClass('ace-highlight');
   },
-  update: function(element, valueAccessor) {
+  update: function (element, valueAccessor) {
     const options = $.extend(
       {
         dialect: 'hive',
@@ -58,14 +59,14 @@ ko.bindingHandlers.highlight = {
             Rules = impalaRules.ImpalaHighlightRules;
           }
 
-          config.loadModule(['theme', $.totalStorage('hue.ace.theme') || 'ace/theme/hue']);
+          config.loadModule(['theme', hueLocalStorage('hue.ace.theme') || 'ace/theme/hue']);
 
           const Text = text.Text;
 
           const tok = new Tokenizer(new Rules().getRules());
           const lines = value.split('\n');
 
-          const renderSimpleLine = function(txt, stringBuilder, tokens) {
+          const renderSimpleLine = function (txt, stringBuilder, tokens) {
             let screenColumn = 0;
             let token = tokens[0];
             let value = token.value;
@@ -136,9 +137,7 @@ ko.bindingHandlers.highlight = {
           if (options.enableOverflow) {
             $(element).css({ overflow: 'auto' });
           }
-          $(element)
-            .find('.ace_invisible_space')
-            .remove();
+          $(element).find('.ace_invisible_space').remove();
         }
       );
     }

@@ -24,7 +24,7 @@ import hueUtils from 'utils/hueUtils';
 import I18n from 'utils/i18n';
 
 ko.bindingHandlers.pieChart = {
-  init: function(element, valueAccessor) {
+  init: function (element, valueAccessor) {
     window.setTimeout(() => {
       const _options = valueAccessor();
       let _data = _options.transformer(_options.data);
@@ -32,27 +32,16 @@ ko.bindingHandlers.pieChart = {
       $(element).css('marginRight', 'auto');
       if (typeof _options.maxWidth != 'undefined') {
         const _max = _options.maxWidth * 1;
-        $(element).width(
-          Math.min(
-            $(element)
-              .parent()
-              .width(),
-            _max
-          )
-        );
+        $(element).width(Math.min($(element).parent().width(), _max));
       }
 
       if ($(element).find('svg').length > 0 && _data.length === 0) {
-        $(element)
-          .find('svg')
-          .empty();
+        $(element).find('svg').empty();
       }
 
       if (_data.length > 0 && isNaN(_data[0].value)) {
         _data = [];
-        $(element)
-          .find('svg')
-          .empty();
+        $(element).find('svg').empty();
       }
 
       if ($(element).is(':visible')) {
@@ -121,14 +110,7 @@ ko.bindingHandlers.pieChart = {
               .on('resize', () => {
                 if (typeof _options.maxWidth != 'undefined') {
                   const _max = _options.maxWidth * 1;
-                  $(element).width(
-                    Math.min(
-                      $(element)
-                        .parent()
-                        .width(),
-                      _max
-                    )
-                  );
+                  $(element).width(Math.min($(element).parent().width(), _max));
                 }
                 $(element).height($(element).width());
                 _chart.update();
@@ -152,7 +134,7 @@ ko.bindingHandlers.pieChart = {
       }
     }, 0);
   },
-  update: function(element, valueAccessor) {
+  update: function (element, valueAccessor) {
     const _options = valueAccessor();
     const _data = _options.transformer(_options.data);
     const _chart = $(element).data('chart');

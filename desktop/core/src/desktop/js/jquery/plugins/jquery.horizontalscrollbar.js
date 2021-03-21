@@ -38,9 +38,7 @@ function initWhenReady(el) {
     return;
   }
 
-  const colWidth = $(el)
-    .find('thead tr th')
-    .outerWidth();
+  const colWidth = $(el).find('thead tr th').outerWidth();
 
   let wrapperWidth = $wrapper.width();
   let wrapperScrollWidth = $wrapper[0].scrollWidth;
@@ -61,7 +59,7 @@ function initWhenReady(el) {
     $scrollbar.draggable({
       axis: 'x',
       containment: 'parent',
-      start: function() {
+      start: function () {
         $wrapper = $(el).parents('.dataTables_wrapper');
         wrapperScrollWidth = $wrapper[0].scrollWidth;
         wrapperWidth = $wrapper.width();
@@ -83,7 +81,7 @@ function initWhenReady(el) {
       }
     });
 
-    $wrapper.bind('mousewheel', function(e) {
+    $wrapper.bind('mousewheel', function (e) {
       const _deltaX = e.deltaX * e.deltaFactor,
         _deltaY = e.deltaY;
 
@@ -144,15 +142,11 @@ function initWhenReady(el) {
   }
 }
 
-Plugin.prototype.init = function() {
+Plugin.prototype.init = function () {
   const el = this.element;
 
-  const checkWidth = function() {
-    if (
-      $(el)
-        .parents('.dataTables_wrapper')
-        .width() > 0
-    ) {
+  const checkWidth = function () {
+    if ($(el).parents('.dataTables_wrapper').width() > 0) {
       initWhenReady(el);
     } else {
       window.setTimeout(checkWidth, 100);
@@ -162,8 +156,8 @@ Plugin.prototype.init = function() {
   checkWidth();
 };
 
-$.fn[pluginName] = function(options) {
-  return this.each(function() {
+$.fn[pluginName] = function (options) {
+  return this.each(function () {
     $.data(this, 'plugin_' + pluginName, new Plugin(this, options));
   });
 };

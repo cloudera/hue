@@ -16,7 +16,7 @@
 
 import * as ko from 'knockout';
 
-ko.observableDefault = function() {
+ko.observableDefault = function () {
   const prop = arguments[0],
     defValue = arguments[1] || null;
   return ko.observable(typeof prop != 'undefined' && prop != null ? prop : defValue);

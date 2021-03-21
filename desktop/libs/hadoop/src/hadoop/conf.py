@@ -76,7 +76,7 @@ HDFS_CLUSTERS = UnspecifiedConfigSection(
           help="The equivalent of fs.defaultFS (aka fs.default.name)",
           default="hdfs://localhost:8020"
       ),
-      LOGICAL_NAME = Config(
+      LOGICAL_NAME=Config(
           "logical_name",
           default="",
           type=str,
@@ -117,11 +117,20 @@ HDFS_CLUSTERS = UnspecifiedConfigSection(
           default='/tmp',
           type=str
       ),
-      HADOOP_CONF_DIR = Config(
-        key="hadoop_conf_dir",
-        dynamic_default=get_hadoop_conf_dir_default,
-        help=_t("Directory of the Hadoop configuration) Defaults to the environment variable HADOOP_CONF_DIR when set, or '/etc/hadoop/conf'.")
-      )
+      HADOOP_CONF_DIR=Config(
+          key="hadoop_conf_dir",
+          dynamic_default=get_hadoop_conf_dir_default,
+          help=
+            "Directory of the Hadoop configuration. Defaults to the environment variable HADOOP_CONF_DIR when set, "
+            "or '/etc/hadoop/conf'.",
+          type=str
+      ),
+      IS_ENABLED=Config(
+          'is_enabled',
+          help="Whether Hue should list this HDFS cluster. For historical reason there is no way to disable HDFS.",
+          default=True,  # True here for backward compatibility
+          type=coerce_bool
+      ),
     )
   )
 )

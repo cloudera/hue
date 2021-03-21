@@ -16,7 +16,7 @@
 
 import * as ko from 'knockout';
 
-import apiHelper from 'api/apiHelper';
+import { withLocalStorage } from 'utils/storageUtils';
 
 class AssistInnerPanel {
   /**
@@ -25,7 +25,7 @@ class AssistInnerPanel {
    * @param {number} options.minHeight
    * @param {string} options.icon
    * @param {boolean} [options.rightAlignIcon] - Default false
-   * @param {boolean} options.visible
+   * @param {boolean} [options.visible]
    * @param {Object} panelData - component data
    * @constructor
    */
@@ -39,14 +39,8 @@ class AssistInnerPanel {
     self.rightAlignIcon = !!options.rightAlignIcon;
     self.iconSvg = options.iconSvg;
 
-    self.visible = ko.observable(options.visible || true);
-    apiHelper.withTotalStorage(
-      'assist',
-      'showingPanel_' + self.type,
-      self.visible,
-      false,
-      options.visible
-    );
+    self.visible = ko.observable(!!options.visible);
+    withLocalStorage('assist.showingPanel_' + self.type, self.visible, false, options.visible);
 
     self.templateName =
       'assist-' +

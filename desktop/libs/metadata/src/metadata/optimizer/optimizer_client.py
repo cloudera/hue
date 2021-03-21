@@ -72,7 +72,11 @@ def check_privileges(view_func):
 
       if kwargs.get('db_tables'):
         for db_table in kwargs['db_tables']:
-          objects.append({'server': get_hive_sentry_provider(), 'db': _get_table_name(db_table)['database'], 'table': _get_table_name(db_table)['table']})
+          objects.append({
+            'server': get_hive_sentry_provider(),
+            'db': _get_table_name(db_table)['database'],
+            'table': _get_table_name(db_table)['table']
+          })
       else:
         objects = [{'server': get_hive_sentry_provider()}]
         if kwargs.get('database_name'):
@@ -82,7 +86,9 @@ def check_privileges(view_func):
 
       filtered = list(checker.filter_objects(objects, action))
       if len(filtered) != len(objects):
-        raise MissingSentryPrivilegeException({'pre_filtering': objects, 'post_filtering': filtered, 'diff': len(objects) - len(filtered)})
+        raise MissingSentryPrivilegeException(
+          {'pre_filtering': objects, 'post_filtering': filtered, 'diff': len(objects) - len(filtered)}
+        )
 
     return view_func(*args, **kwargs)
   return wraps(view_func)(decorate)
@@ -121,7 +127,7 @@ class OptimizerClient(object):
 
 
   def get_tenant(self, cluster_id='default'):
-    return self._call('getTenant', {'clusterId' : cluster_id})
+    return self._call('getTenant', {'clusterId': cluster_id})
 
 
   def upload(self, data, data_type='queries', source_platform='generic', workload_id=None):
@@ -169,7 +175,7 @@ class OptimizerClient(object):
         f_queries.close()
 
       parameters = {
-          'tenant' : self._tenant_id,
+          'tenant': self._tenant_id,
           'fileLocation': f_queries.name,
           'sourcePlatform': source_platform,
       }
@@ -187,14 +193,15 @@ class OptimizerClient(object):
 
 
   def upload_status(self, workload_id):
-    return self._call('uploadStatus', {'tenant' : self._tenant_id, 'workloadId': workload_id})
+    return self._call('uploadStatus', {'tenant': self._tenant_id, 'workloadId': workload_id})
 
   # Sentry permissions work bottom to top.
   # @check_privileges
-  def top_tables(self, workfloadId=None, database_name='default', page_size=1000, startingToken=None):
+  def top_tables(self, workfloadId=None, database_name='default', page_size=1000, startingToken=None, connector=None):
     return self._call(
       'getTopTables', {
-        'tenant' : self._tenant_id,
+        'tenant': self._tenant_id,
+        'connector': connector,
         'dbName': database_name.lower(),
         'pageSize': page_size,
         'startingToken': startingToken
@@ -203,10 +210,11 @@ class OptimizerClient(object):
 
 
   @check_privileges
-  def table_details(self, database_name, table_name, page_size=100, startingToken=None):
+  def table_details(self, database_name, table_name, page_size=100, startingToken=None, connector=None):
     return self._call(
       'getTablesDetail', {
-        'tenant' : self._tenant_id,
+        'tenant': self._tenant_id,
+        'connector': connector,
         'dbName': database_name.lower(),
         'tableName': table_name.lower(),
         'pageSize': page_size,
@@ -215,10 +223,11 @@ class OptimizerClient(object):
     )
 
 
-  def query_compatibility(self, source_platform, target_platform, query, page_size=100, startingToken=None):
+  def query_compatibility(self, source_platform, target_platform, query, page_size=100, startingToken=None, connector=None):
     return self._call(
       'getQueryCompatible', {
-        'tenant' : self._tenant_id,
+        'tenant': self._tenant_id,
+        'connector': connector,
         'query': query,
         'sourcePlatform': source_platform,
         'targetPlatform': target_platform,
@@ -227,10 +236,11 @@ class OptimizerClient(object):
     )
 
 
-  def query_risk(self, query, source_platform, db_name, page_size=100, startingToken=None):
+  def query_risk(self, query, source_platform, db_name, page_size=100, startingToken=None, connector=None):
     response = self._call(
       'getQueryRisk', {
-        'tenant' : self._tenant_id,
+        'tenant': self._tenant_id,
+        'connector': connector,
         'query': _clean_query(query),
         'dbName': db_name,
         'sourcePlatform': source_platform,
@@ -250,17 +260,45 @@ class OptimizerClient(object):
       'noDDL': response.get('noDDL', []),
     }
 
-  def similar_queries(self, source_platform, query, page_size=100, startingToken=None):
+
+  def predict(self, before_cursor, after_cursor, connector):
+    response = self._call(
+      'predict', {
+        'tenant': self._tenant_id,
+        'connector': connector,
+        'before_cursor': before_cursor,
+        'after_cursor': after_cursor,
+      }
+    )
+
+    predictions = response.get('predictions', [])
+
+    return {
+      'statement': predictions[0]['statement']
+    }
+
+
+  def similar_queries(self, source_platform, query, page_size=100, startingToken=None, connector=None):
     if is_admin(self.user):
-      return self._call('getSimilarQueries', {'tenant' : self._tenant_id, 'sourcePlatform': source_platform, 'query': query, 'pageSize': page_size, 'startingToken': startingToken})
+      return self._call(
+        'getSimilarQueries', {
+          'tenant': self._tenant_id,
+          'connector': connector,
+          'sourcePlatform': source_platform,
+          'query': query,
+          'pageSize': page_size,
+          'startingToken': startingToken
+        }
+      )
     else:
       raise PopupException(_('Call not supported'))
 
 
   @check_privileges
-  def top_filters(self, db_tables=None, page_size=100, startingToken=None):
+  def top_filters(self, db_tables=None, page_size=100, startingToken=None, connector=None):
     args = {
-      'tenant' : self._tenant_id,
+      'tenant': self._tenant_id,
+      'connector': connector,
       'pageSize': page_size,
       'startingToken': startingToken
     }
@@ -271,9 +309,10 @@ class OptimizerClient(object):
 
 
   @check_privileges
-  def top_aggs(self, db_tables=None, page_size=100, startingToken=None):
+  def top_aggs(self, db_tables=None, page_size=100, startingToken=None, connector=None):
     args = {
-      'tenant' : self._tenant_id,
+      'tenant': self._tenant_id,
+      'connector': connector,
       'pageSize': page_size,
       'startingToken': startingToken
     }
@@ -297,9 +336,10 @@ class OptimizerClient(object):
 
 
   @check_privileges
-  def top_columns(self, db_tables=None, page_size=100, startingToken=None):
+  def top_columns(self, db_tables=None, page_size=100, startingToken=None, connector=None):
     args = {
-      'tenant' : self._tenant_id,
+      'tenant': self._tenant_id,
+      'connector': connector,
       'pageSize': page_size,
       'startingToken': startingToken
     }
@@ -315,9 +355,10 @@ class OptimizerClient(object):
 
 
   @check_privileges
-  def top_joins(self, db_tables=None, page_size=100, startingToken=None):
+  def top_joins(self, db_tables=None, page_size=100, startingToken=None, connector=None):
     args = {
-      'tenant' : self._tenant_id,
+      'tenant': self._tenant_id,
+      'connector': connector,
       'pageSize': page_size,
       'startingToken': startingToken
     }
@@ -336,9 +377,10 @@ class OptimizerClient(object):
     return results
 
 
-  def top_databases(self, page_size=100, startingToken=None):
+  def top_databases(self, page_size=100, startingToken=None, connector=None):
     args = {
-      'tenant' : self._tenant_id,
+      'tenant': self._tenant_id,
+      'connector': connector,
       'pageSize': page_size,
       'startingToken': startingToken
     }
@@ -379,30 +421,30 @@ def _get_table_name(path):
 
 
 def _secure_results(results, user, action='SELECT'):
-    if OPTIMIZER.APPLY_SENTRY_PERMISSIONS.get():
-      checker = get_checker(user=user)
+  if OPTIMIZER.APPLY_SENTRY_PERMISSIONS.get():
+    checker = get_checker(user=user)
 
-      def getkey(result):
-        key = {'server': get_hive_sentry_provider()}
+    def getkey(result):
+      key = {'server': get_hive_sentry_provider()}
 
-        if 'dbName' in result:
-          key['db'] = result['dbName']
-        elif 'database' in result:
-          key['db'] = result['database']
-        if 'tableName' in result:
-          key['table'] = result['tableName']
-        elif 'table' in result:
-          key['table'] = result['table']
-        if 'columnName' in result:
-          key['column'] = result['columnName']
-        elif 'column' in result:
-          key['column'] = result['column']
+      if 'dbName' in result:
+        key['db'] = result['dbName']
+      elif 'database' in result:
+        key['db'] = result['database']
+      if 'tableName' in result:
+        key['table'] = result['tableName']
+      elif 'table' in result:
+        key['table'] = result['table']
+      if 'columnName' in result:
+        key['column'] = result['columnName']
+      elif 'column' in result:
+        key['column'] = result['column']
 
-        return key
+      return key
 
-      return checker.filter_objects(results, action, key=getkey)
-    else:
-      return results
+    return checker.filter_objects(results, action, key=getkey)
+  else:
+    return results
 
 
 def _clean_query(query):

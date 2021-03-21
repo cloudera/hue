@@ -23,7 +23,7 @@ export const NAME = 'tooltip';
 
 registerBinding(NAME, {
   after: ['attr'],
-  update: function(element, valueAccessor) {
+  update: function (element, valueAccessor) {
     const local = ko.utils.unwrapObservable(valueAccessor());
     const options = {
       container: 'body'

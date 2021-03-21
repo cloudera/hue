@@ -16,8 +16,8 @@
 
 import $ from 'jquery';
 
-import apiHelper from 'api/apiHelper';
 import huePubSub from 'utils/huePubSub';
+import { setInLocalStorage } from 'utils/storageUtils';
 
 const HALF_SIZE_LIMIT_X = 130;
 const HALF_SIZE_LIMIT_Y = 100;
@@ -37,7 +37,7 @@ class ResizeHelper {
     let rightX, leftX, leftDiff, rightDiff, topY, bottomY, topDiff, bottomDiff;
     let redrawHeaders = false;
 
-    const initOriginalValues = function(attempt) {
+    const initOriginalValues = function (attempt) {
       if (attempt > 20) {
         return;
       }
@@ -67,18 +67,18 @@ class ResizeHelper {
 
     initOriginalValues(0);
 
-    self.saveSize = function() {
-      apiHelper.setInTotalStorage('assist', 'popover.size', {
+    self.saveSize = function () {
+      setInLocalStorage('assist.popover.size', {
         width: $('.hue-popover').width(),
         height: $('.hue-popover').height()
       });
     };
 
-    self.resizeStart = function(event, ui) {
+    self.resizeStart = function (event, ui) {
       preventHideCallback(true);
     };
 
-    self.resizeStop = function(event, ui) {
+    self.resizeStop = function (event, ui) {
       if (redrawHeaders) {
         huePubSub.publish('table.extender.redraw', 'sampleTab');
         redrawHeaders = false;
@@ -94,7 +94,7 @@ class ResizeHelper {
       self.saveSize();
     };
 
-    const resizeTopBottomHorizontal = function(event, ui) {
+    const resizeTopBottomHorizontal = function (event, ui) {
       leftX = ui.position.left;
       rightX = ui.position.left + ui.size.width;
 
@@ -118,7 +118,7 @@ class ResizeHelper {
       $('.hue-popover-arrow').css('margin-left', (leftDiff + rightDiff) / 2 + leftAdjust() + 'px');
     };
 
-    const resizeLeftRightVertical = function(event, ui) {
+    const resizeLeftRightVertical = function (event, ui) {
       if (!redrawHeaders && ui.originalPosition.top !== ui.position.top) {
         redrawHeaders = true;
         huePubSub.publish('table.extender.hide', 'sampleTab');
@@ -149,14 +149,14 @@ class ResizeHelper {
     switch (orientation) {
       case 'top':
         self.resizableHandles = 'w, nw, n, ne, e';
-        self.resize = function(event, ui) {
+        self.resize = function (event, ui) {
           resizeTopBottomHorizontal(event, ui);
           // TODO: Implement resize height limits when popover is above
         };
         break;
       case 'right':
         self.resizableHandles = 'n, ne, e, se, s';
-        self.resize = function(event, ui) {
+        self.resize = function (event, ui) {
           resizeLeftRightVertical(event, ui);
           if (ui.size.width < 350) {
             ui.size.width = 350;
@@ -166,7 +166,7 @@ class ResizeHelper {
         break;
       case 'bottom':
         self.resizableHandles = 'e, se, s, sw, w';
-        self.resize = function(event, ui) {
+        self.resize = function (event, ui) {
           resizeTopBottomHorizontal(event, ui);
           if (ui.size.height < 200) {
             ui.size.height = 200;
@@ -176,7 +176,7 @@ class ResizeHelper {
         break;
       case 'left':
         self.resizableHandles = 's, sw, w, nw, n';
-        self.resize = function(event, ui) {
+        self.resize = function (event, ui) {
           resizeLeftRightVertical(event, ui);
           // TODO: Implement resize width limits when popover is on the left
         };

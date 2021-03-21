@@ -21,7 +21,8 @@ import logging
 import sys
 
 from nose.tools import assert_equal, assert_not_equal, assert_true, assert_false, raises
-from sqlalchemy.types import NullType
+from sqlalchemy.exc import UnsupportedCompilationError
+from sqlalchemy.types import NullType, ARRAY, JSON, VARCHAR
 
 from desktop.auth.backend import rewrite_user
 from desktop.lib.django_test_util import make_logged_in_client
@@ -76,7 +77,8 @@ class TestApi(object):
     interpreter = {
       'name': 'hive',
       'options': {
-        'url': 'awsathena+rest://XXXXXXXXXXXXXXX:XXXXXXXXXXXXXXXXXXX@athena.us-west-2.amazonaws.com:443/default?s3_staging_dir=s3://gethue-athena/scratch'
+        'url': 'awsathena+rest://XXXXXXXXXXXXXXX:XXXXXXXXXXXXXXXXXXX@athena.us-west-2.amazonaws.com:443/default?'
+            's3_staging_dir=s3://gethue-athena/scratch'
       }
     }
 
@@ -179,6 +181,44 @@ class TestApi(object):
       SqlAlchemyApi(self.user, interpreter)._create_engine()
 
 
+  @raises(AuthenticationRequired)
+  def test_create_connection_error(self):
+    interpreter = {
+      'name': 'hive',
+      'options': {
+        'url': 'mysql://${USER}:${PASSWORD}@hue:3306/hue'
+      }
+    }
+
+    with patch('notebook.connectors.sql_alchemy.create_engine') as create_engine:
+      engine = SqlAlchemyApi(self.user, interpreter)._create_engine()
+      SqlAlchemyApi(self.user, interpreter)._create_connection(engine)
+
+  def test_create_connection(self):
+    interpreter = {
+      'name': 'hive',
+      'options': {
+        'url': 'mysql://${USER}:${PASSWORD}@hue:3306/hue',
+        'session': {
+          'properties': [
+            {
+              'name': 'user',
+              'value': 'test_user'
+            },
+            {
+              'name': 'password',
+              'value': 'test_pass'
+            }
+          ]
+        }
+      }
+    }
+
+    with patch('notebook.connectors.sql_alchemy.create_engine') as create_engine:
+      engine = SqlAlchemyApi(self.user, interpreter)._create_engine()
+      SqlAlchemyApi(self.user, interpreter)._create_connection(engine)
+
+
   def test_create_engine_with_impersonation(self):
     interpreter = {
       'name': 'hive',
@@ -192,7 +232,7 @@ class TestApi(object):
     with patch('notebook.connectors.sql_alchemy.create_engine') as create_engine:
       engine = SqlAlchemyApi(self.user, interpreter)._create_engine()
 
-      create_engine.assert_called_with('presto://hue:8080/hue')
+      create_engine.assert_called_with('presto://hue:8080/hue', pool_pre_ping=True)
 
 
     interpreter['options']['has_impersonation'] = True  # On
@@ -200,7 +240,29 @@ class TestApi(object):
     with patch('notebook.connectors.sql_alchemy.create_engine') as create_engine:
       engine = SqlAlchemyApi(self.user, interpreter)._create_engine()
 
-      create_engine.assert_called_with('presto://test@hue:8080/hue')
+      create_engine.assert_called_with('presto://test@hue:8080/hue', pool_pre_ping=True)
+
+
+  def test_explain(self):
+
+    with patch('notebook.connectors.sql_alchemy.SqlAlchemyApi._create_connection') as _create_connection:
+      with patch('notebook.connectors.sql_alchemy.SqlAlchemyApi._create_engine') as _create_engine:
+        with patch('notebook.connectors.sql_alchemy.SqlAlchemyApi._get_session') as _get_session:
+
+          result = [{"id": 1}, {"select_type": "SIMPLE"}, {"Extra": "No tables used"}]
+          
+          execute = Mock(return_value=result)
+          _create_connection.return_value = Mock(
+            execute=execute
+          )
+          notebook = {}
+          snippet = {'statement': 'SELECT 1;'}
+
+          explanation = 'id: 1,\nselect_type: SIMPLE,\nExtra: No tables used,'
+
+          response = SqlAlchemyApi(self.user, self. interpreter).explain(notebook, snippet)
+
+        assert_equal(explanation, response['explanation'])
 
 
   def test_check_status(self):
@@ -233,6 +295,24 @@ class TestApi(object):
             [{'name': 'col1', 'type': 'STRING_TYPE', 'comment': ''}]
           )
 
+
+  def test_get_tables(self):
+    snippet = MagicMock()
+
+    with patch('notebook.connectors.sql_alchemy.create_engine') as create_engine:
+      with patch('notebook.connectors.sql_alchemy.inspect') as inspect:
+        with patch('notebook.connectors.sql_alchemy.Assist.get_table_names') as get_table_names:
+          with patch('notebook.connectors.sql_alchemy.Assist.get_view_names') as get_view_names:
+            get_table_names.return_value = ['table1']
+            get_view_names.return_value = ['view1']
+
+            response = SqlAlchemyApi(self.user, self.interpreter).autocomplete(snippet, database='database1')
+            assert_equal(response['tables_meta'][0]['name'], 'table1')
+            assert_equal(response['tables_meta'][1]['name'], 'view1')
+            assert_equal(response['tables_meta'][0]['type'], 'Table')
+            assert_equal(response['tables_meta'][1]['type'], 'View')
+
+
   def test_get_sample_data_table(self):
     snippet = Mock()
 
@@ -252,33 +332,51 @@ class TestApi(object):
       'options': {
         'url': 'presto://hue:8080/hue',
         'session': {},
-      }
+      },
+      'dialect_properties': {},
     }
 
-    with patch('notebook.connectors.sql_alchemy.SqlAlchemyApi._create_engine') as _create_engine:
-      with patch('notebook.connectors.sql_alchemy.SqlAlchemyApi._get_session') as _get_session:
-        execute = Mock(return_value=Mock(cursor=None))
-        _create_engine.return_value = Mock(
-          connect=Mock(
-            return_value=Mock(
-              execute=execute
-            )
+    with patch('notebook.connectors.sql_alchemy.SqlAlchemyApi._create_connection') as _create_connection:
+      with patch('notebook.connectors.sql_alchemy.SqlAlchemyApi._create_engine') as _create_engine:
+        with patch('notebook.connectors.sql_alchemy.SqlAlchemyApi._get_session') as _get_session:
+          execute = Mock(return_value=Mock(cursor=None))
+          _create_connection.return_value = Mock(
+            execute=execute
           )
-        )
-        notebook = {}
-        snippet = {'statement': 'SELECT 1;'}
+          notebook = {}
+          snippet = {'statement': 'SELECT 1;'}
 
-        # Trim
-        engine = SqlAlchemyApi(self.user, interpreter).execute(notebook, snippet)
+          # Trim
+          engine = SqlAlchemyApi(self.user, interpreter).execute(notebook, snippet)
 
-        execute.assert_called_with('SELECT 1')
+          execute.assert_called_with('SELECT 1')
 
-        # No Trim
-        interpreter['options']['url'] = 'mysql://hue:3306/hue'
+          # No Trim
+          interpreter['options']['url'] = 'mysql://hue:3306/hue'
+          interpreter['dialect_properties']['trim_statement_semicolon'] = False
+          interpreter['dialect_properties']['sql_identifier_quote'] = '`'
 
-        engine = SqlAlchemyApi(self.user, interpreter).execute(notebook, snippet)
+          engine = SqlAlchemyApi(self.user, interpreter).execute(notebook, snippet)
 
-        execute.assert_called_with('SELECT 1;')
+          execute.assert_called_with('SELECT 1;')
+
+
+  def test_get_log(self):
+    notebook = Mock()
+    snippet = MagicMock()
+
+    with patch('notebook.connectors.sql_alchemy.CONNECTIONS') as CONNECTIONS:
+      log = [
+        'INFO  : Compiling command(queryId=hive_20210217124246_d3ac774b-cdca-48d2-bfca-f23951ee2097): SELECT 1',
+        'INFO  : Semantic Analysis Completed (retrial = false)',
+        'INFO  : Completed compiling command(queryId=hive_20210217124246_d3ac774b-cdca-48d2-bfca-f23951ee2097); Time taken: 0.092 seconds',
+        'INFO  : Completed executing command(queryId=hive_20210217124246_d3ac774b-cdca-48d2-bfca-f23951ee2097); Time taken: 0.006 seconds',
+        'INFO  : OK'
+      ]
+      CONNECTIONS.get.return_value = {'logs': log}
+
+      data = SqlAlchemyApi(self.user, self.interpreter).get_log(notebook, snippet)
+      assert_equal(data, '\n'.join(log))
 
 
 class TestDialects(object):
@@ -302,13 +400,13 @@ class TestDialects(object):
 
 
   def test_backticks_without_connectors(self):
-    interpreter = {'name': 'hive', 'options': {'url': 'phoenix://'}}
+    interpreter = {'name': 'hive', 'options': {'url': 'hive://'}}
     data = SqlAlchemyApi(self.user, interpreter).get_browse_query(snippet=Mock(), database='db1', table='table1')
 
     assert_equal(data, 'SELECT *\nFROM `db1`.`table1`\nLIMIT 1000\n')
 
 
-    interpreter = {'name': 'hive', 'options': {'url': 'postgresql://'}}
+    interpreter = {'name': 'postgresql', 'options': {'url': 'postgresql://'}}
     data = SqlAlchemyApi(self.user, interpreter).get_browse_query(snippet=Mock(), database='db1', table='table1')
 
     assert_equal(data, 'SELECT *\nFROM "db1"."table1"\nLIMIT 1000\n')
@@ -327,15 +425,15 @@ class TestAutocomplete(object):
       'options': {'url': 'phoenix://'}
     }
 
-    snippet = Mock()
+    snippet = MagicMock()
     with patch('notebook.connectors.sql_alchemy.create_engine') as create_engine:
       with patch('notebook.connectors.sql_alchemy.inspect') as inspect:
         with patch('notebook.connectors.sql_alchemy.Assist') as Assist:
-          Assist.return_value=Mock(get_databases=Mock(return_value=['SYSTEM', None]))
+          Assist.return_value = Mock(get_databases=Mock(return_value=['SYSTEM', None]))
 
           data = SqlAlchemyApi(self.user, interpreter).autocomplete(snippet)
 
-          assert_equal(data['databases'], ['SYSTEM', 'NULL'])
+          assert_equal(data['databases'], ['SYSTEM', ''])
 
   def test_columns_with_null_type(self):
     interpreter = {
@@ -343,7 +441,7 @@ class TestAutocomplete(object):
       'options': {'url': 'phoenix://'}
     }
 
-    snippet = Mock()
+    snippet = MagicMock()
     with patch('notebook.connectors.sql_alchemy.create_engine') as create_engine:
       with patch('notebook.connectors.sql_alchemy.inspect') as inspect:
         with patch('notebook.connectors.sql_alchemy.Assist') as Assist:
@@ -364,12 +462,12 @@ class TestAutocomplete(object):
           col2.__getitem__.side_effect = col2_dict
           col2.get = col2_dict
 
-          Assist.return_value=Mock(get_columns=Mock(return_value=[col1, col2]), get_keys=Mock(return_value={}))
+          Assist.return_value = Mock(get_columns=Mock(return_value=[col1, col2]), get_keys=Mock(return_value={}))
 
           data = SqlAlchemyApi(self.user, interpreter).autocomplete(snippet, database='database', table='table')
 
           assert_equal(data['columns'], ['col1', 'col2'])
-          assert_equal([col['type'] for col in data['extended_columns']], ['string', 'Null'])
+          assert_equal([col['type'] for col in data['extended_columns']], ['string', 'null'])
 
   def test_get_keys(self):
 
@@ -391,3 +489,41 @@ class TestAutocomplete(object):
 
       assert_true(keys['primary_keys'])  # For some reason could not mock two level to get some colum names
       assert_equal(keys['foreign_keys'][0]['to'], 'db2.table2.col2')
+
+
+class TestUtils():
+
+  def setUp(self):
+    self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
+
+    self.user = rewrite_user(User.objects.get(username="test"))
+    self.interpreter = {
+      'name': 'hive',
+      'options': {
+        'url': 'mysql://hue:localhost@hue:3306/hue'
+      },
+    }
+
+  def test_get_column_type_name_complex(self):
+    api = SqlAlchemyApi(self.user, self.interpreter)
+
+    with patch('notebook.connectors.sql_alchemy.str') as str:
+      str.side_effect = UnsupportedCompilationError(None, None)
+
+      assert_equal(api._get_column_type_name({'type': VARCHAR}), 'varchar')  # Not complex but not testable otherwise
+      assert_equal(api._get_column_type_name({'type': NullType}), 'null')
+      assert_equal(api._get_column_type_name({'type': ARRAY}), 'array')
+      assert_equal(api._get_column_type_name({'type': JSON}), 'json')
+
+
+  def test_fix_bigquery_db_prefixes(self):
+    interpreter = {
+      'name': 'bigquery',
+      'options': {
+        'url': 'bigquery://'
+      },
+    }
+    api = SqlAlchemyApi(self.user, interpreter)
+
+    assert_equal(api._fix_bigquery_db_prefixes('table'), 'table')
+    assert_equal(api._fix_bigquery_db_prefixes('db.table'), 'table')

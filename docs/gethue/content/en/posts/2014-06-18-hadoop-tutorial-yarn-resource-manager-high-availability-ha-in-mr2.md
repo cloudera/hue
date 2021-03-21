@@ -37,8 +37,6 @@ sf_remove_promo_bar:
 slide_template:
   - default
 categories:
-  - Administration
-  - Browsing
 
 ---
 Similarly to the [JobTracker High Availability configuration for MR1][1], Hue supports (since today’s date in master or Hue 3.7 or CDH5.1) more than one Resource Manager in case the Resource Manager goes down.
