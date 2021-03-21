@@ -29,7 +29,8 @@ from desktop.models import Document2, _get_gist_document
 from desktop.auth.backend import rewrite_user
 
 from notebook.api import _fetch_result_data, _check_status, _execute_notebook
-from notebook.models import MockRequest
+from notebook.models import MockRequest, get_api
+from notebook.connectors.base import _get_snippet_name
 
 from useradmin.models import User
 
@@ -115,11 +116,33 @@ def handle_on_link_shared(channel_id, message_ts, links):
       msg = "Document with {key}={value} does not exist".format(key='uuid' if id_type == 'uuid' else 'id', value=qid)
       raise PopupException(_(msg))
 
-    payload = _make_unfurl_payload(item['url'], id_type, doc, doc_type)
-    response = slack_client.chat_unfurl(channel=channel_id, ts=message_ts, unfurls=payload)
+    # Mock request for query execution and fetch result
+    user = rewrite_user(User.objects.get(username=doc.owner.username))
+    request = MockRequest(user=user)
+
+    payload = _make_unfurl_payload(request, item['url'], id_type, doc, doc_type)
+    response = slack_client.chat_unfurl(channel=channel_id, ts=message_ts, unfurls=payload['payload'])
     if not response['ok']:
       raise PopupException(_("Cannot unfurl link"), detail=response["error"])
+    
+    # Generate and upload result xlsx file only if result available
+    if payload['file_status']:
+      notebook = json.loads(doc.data)
+      snippet = notebook['snippets'][0]
+      snippet['statement'] = notebook['snippets'][0]['statement_raw']
+      file_format = 'xlsx'
+      file_name = _get_snippet_name(notebook)
 
+      content_generator = get_api(request, snippet).download(notebook, snippet, file_format='xls')
+
+      response = slack_client.files_upload(
+        channels=channel_id, 
+        file=next(content_generator), 
+        thread_ts=message_ts,
+        filetype=file_format,
+        filename='{}.{}'.format(file_name, file_format),
+        initial_comment='Here is your result file!'
+        )
 
 def _query_result(request, notebook, max_rows):
   snippet = notebook['snippets'][0]
@@ -153,31 +176,30 @@ def _make_result_table(result):
 
     table.append(pivot_row)
 
-  return tabulate(table, tablefmt="plain")
+  return tabulate(table, headers=['Columns({})'.format(idx+1), '', ''], tablefmt="simple")
 
 
-def _make_unfurl_payload(url, id_type, doc, doc_type):
+def _make_unfurl_payload(request, url, id_type, doc, doc_type):
   doc_data = json.loads(doc.data)
   statement = doc_data['snippets'][0]['statement_raw'] if id_type == 'editor' else doc_data['statement_raw']
   dialect = doc_data['dialect'] if id_type == 'editor' else doc.extra
   created_by = doc.owner.get_full_name() or doc.owner.username
   name = doc.name or dialect
 
-  # Mock request for query execution and fetch result
-  user = rewrite_user(User.objects.get(username=doc.owner.username))
-  request = MockRequest(user=user)
+  file_status = False
 
   if id_type == 'editor':
     max_rows = 2
-    no_result_msg = 'Query result has expired or could not be found'
-
+    unfurl_result = 'Query result has expired or could not be found'
     try:
       status = _check_status(request, operation_id=doc_data['uuid'])
       if status['query_status']['status'] == 'available':
         fetch_result = _query_result(request, json.loads(doc.data), max_rows)
-        unfurl_result = _make_result_table(fetch_result) if fetch_result is not None else no_result_msg
+        if fetch_result is not None:
+          unfurl_result = _make_result_table(fetch_result)
+          file_status = True
     except:
-      unfurl_result = no_result_msg
+      pass
   else:
     unfurl_result = 'Result is not available for Gist'
 
@@ -226,7 +248,7 @@ def _make_unfurl_payload(url, id_type, doc, doc_type):
     }
   }
 
-  return payload
+  return {'payload': payload, 'file_status': file_status}
 
 
 def say_hi_user(channel_id, user_id):
