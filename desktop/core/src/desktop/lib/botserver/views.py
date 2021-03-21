@@ -190,7 +190,7 @@ def _make_unfurl_payload(request, url, id_type, doc, doc_type):
 
   if id_type == 'editor':
     max_rows = 2
-    no_result_msg = 'Query result has expired or could not be found'
+    unfurl_result = 'Query result has expired or could not be found'
     try:
       status = _check_status(request, operation_id=doc_data['uuid'])
       if status['query_status']['status'] == 'available':
@@ -198,10 +198,8 @@ def _make_unfurl_payload(request, url, id_type, doc, doc_type):
         if fetch_result is not None:
           unfurl_result = _make_result_table(fetch_result)
           file_status = True
-        else:
-          unfurl_result = no_result_msg
     except:
-      unfurl_result = no_result_msg
+      pass
   else:
     unfurl_result = 'Result is not available for Gist'
 
