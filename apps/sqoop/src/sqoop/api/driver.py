@@ -19,8 +19,7 @@ from __future__ import absolute_import
 import json
 import logging
 import socket
-
-from django.utils.translation import ugettext as _
+import sys
 
 from sqoop import client, conf
 from desktop.lib.django_util import JsonResponse
@@ -28,6 +27,11 @@ from desktop.lib.exceptions import StructuredException
 from desktop.lib.rest.http_client import RestException
 from sqoop.api.exception import handle_rest_exception
 from django.views.decorators.cache import never_cache
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 __all__ = ['driver']
 

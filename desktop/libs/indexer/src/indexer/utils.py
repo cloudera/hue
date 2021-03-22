@@ -34,7 +34,6 @@ import uuid
 from dateutil.parser import parse
 
 from django.conf import settings
-from django.utils.translation import ugettext as _
 
 from desktop.lib.i18n import force_unicode, smart_str
 
@@ -43,7 +42,9 @@ from indexer.models import DATE_FIELD_TYPES, TEXT_FIELD_TYPES, INTEGER_FIELD_TYP
 
 if sys.version_info[0] > 2:
   from io import StringIO as string_io
+  from django.utils.translation import gettext as _
 else:
+  from django.utils.translation import ugettext as _
   from StringIO import StringIO as string_io
 
 LOG = logging.getLogger(__name__)

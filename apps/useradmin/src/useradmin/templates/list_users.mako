@@ -14,13 +14,18 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
+import sys
 from django.template.defaultfilters import date, time
-from django.utils.translation import ugettext as _
 
 from desktop.auth.backend import is_admin
 from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.lib.django_util import USERNAME_RE_RULE
 from desktop.views import commonheader, commonfooter, antixss
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 %>
 
 <%namespace name="actionbar" file="actionbar.mako" />

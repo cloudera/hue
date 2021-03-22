@@ -18,9 +18,9 @@ from builtins import filter
 
 import logging
 from logging import exception
+import sys
 
 from datetime import datetime
-from django.utils.translation import ugettext as _
 
 from beeswax.models import QueryHistory
 from desktop.lib.exceptions_renderable import PopupException
@@ -33,6 +33,11 @@ from notebook.models import _get_notebook_api, make_notebook, MockRequest
 from jobbrowser.apis.base_api import Api
 from jobbrowser.conf import QUERY_STORE
 from jobbrowser.models import HiveQuery
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

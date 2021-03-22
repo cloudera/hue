@@ -17,8 +17,7 @@
 
 from builtins import str
 import logging
-
-from django.utils.translation import ugettext as _
+import sys
 
 from desktop import appmanager
 from desktop.auth.backend import is_hue_admin
@@ -26,6 +25,11 @@ from desktop.auth.decorators import admin_required
 from desktop.lib.django_util import JsonResponse, render
 from desktop.models import Settings, hue_version
 from desktop.views import collect_usage
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 def admin_wizard(request):

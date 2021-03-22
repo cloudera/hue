@@ -14,13 +14,19 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
+  import sys
+
   from desktop.lib.django_util import extract_field_data
   from desktop.views import commonheader, commonfooter, commonshare, _ko
   from beeswax import conf as beeswax_conf
   from desktop import conf
   from desktop.conf import USE_NEW_EDITOR
-  from django.utils.translation import ugettext as _
   from notebook.conf import ENABLE_QUERY_BUILDER
+
+  if sys.version_info[0] > 2:
+    from django.utils.translation import gettext as _
+  else:
+    from django.utils.translation import ugettext as _
 %>
 
 <%namespace name="comps" file="beeswax_components.mako" />

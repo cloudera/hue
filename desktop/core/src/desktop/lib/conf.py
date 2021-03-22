@@ -79,7 +79,6 @@ import subprocess
 import sys
 
 from django.utils.encoding import smart_str
-from django.utils.translation import ugettext_lazy as _t
 from configobj import ConfigObj, ConfigObjError
 
 from desktop.lib.paths import get_desktop_root, get_build_dir
@@ -88,6 +87,11 @@ try:
   from collections import OrderedDict
 except ImportError:
   from ordereddict import OrderedDict # Python 2.6
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext_lazy as _t
+else:
+  from django.utils.translation import ugettext_lazy as _t
 
 
 # Magical object for use as a "symbol"

@@ -19,8 +19,7 @@
 import json
 import logging
 import re
-
-from django.utils.translation import ugettext as _
+import sys
 
 from desktop.lib.exceptions_renderable import raise_popup_exception
 from desktop.lib.rest import resource
@@ -28,6 +27,11 @@ from desktop.lib.rest.http_client import HttpClient, RestException
 
 from metadata.conf import CATALOG, get_catalog_search_cluster
 from metadata.catalog.base import CatalogAuthException, CatalogApiException, CatalogEntityDoesNotExistException, Api
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 LOG = logging.getLogger(__name__)
 

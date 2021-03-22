@@ -14,7 +14,8 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-from django.utils.translation import ugettext as _
+import sys
+
 from django.template.defaultfilters import escape, escapejs
 
 from desktop import conf
@@ -24,6 +25,11 @@ from desktop.views import _ko
 from beeswax.conf import LIST_PARTITIONS_LIMIT
 from indexer.conf import ENABLE_NEW_INDEXER
 from metadata.conf import has_optimizer, OPTIMIZER
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 %>
 
 <%def name="header_i18n_redirection()">

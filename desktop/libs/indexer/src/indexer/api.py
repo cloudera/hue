@@ -21,8 +21,7 @@ import itertools
 import json
 import logging
 import re
-
-from django.utils.translation import ugettext as _
+import sys
 
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
@@ -30,6 +29,11 @@ from desktop.lib.exceptions_renderable import PopupException
 from indexer.controller import CollectionManagerController
 from indexer.solr_client import SolrClient
 from indexer.utils import fields_from_log, field_values_from_separated_file, get_type_from_morphline_type, get_field_types
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

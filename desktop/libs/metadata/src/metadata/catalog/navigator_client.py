@@ -19,11 +19,11 @@
 import json
 import logging
 import re
+import sys
 
 from itertools import islice
 
 from django.core.cache import cache
-from django.utils.translation import ugettext as _
 
 from desktop.lib.rest import resource
 from desktop.lib.rest.unsecure_http_client import UnsecureHttpClient
@@ -36,6 +36,11 @@ from libsentry.sentry_site import get_hive_sentry_provider
 from metadata.conf import NAVIGATOR, get_navigator_auth_password, get_navigator_auth_username
 from metadata.catalog.base import CatalogAuthException, CatalogApiException, CatalogEntityDoesNotExistException, Api
 from metadata.metadata_sites import get_navigator_hue_server_name
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 LOG = logging.getLogger(__name__)
 VERSION = 'v9'

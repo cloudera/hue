@@ -23,6 +23,7 @@ import re
 import json
 import socket
 import datetime
+import sys
 
 from django.conf import settings
 from django.core import serializers
@@ -37,7 +38,6 @@ from django.template.context import RequestContext
 from django.template.loader import render_to_string as django_render_to_string
 from django.urls import reverse
 from django.utils.http import urlencode # this version is unicode-friendly
-from django.utils.translation import ungettext, ugettext
 from django.utils.timezone import get_current_timezone
 
 import desktop.conf
@@ -45,6 +45,11 @@ import desktop.lib.thrift_util
 from desktop.lib import django_mako
 from desktop.lib.json_utils import JSONEncoderForHTML
 from desktop.monkey_patches import monkey_patch_request_context_init
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import ngettext as _t, gettext as _
+else:
+  from django.utils.translation import ungettext as _t, ugettext as _
 
 
 LOG = logging.getLogger(__name__)
@@ -422,13 +427,13 @@ def timesince(d=None, now=None, abbreviate=False, separator=','):
     )
   else:
     chunks = (
-      (60 * 60 * 24 * 365, lambda n: ungettext('year', 'years', n)),
-      (60 * 60 * 24 * 30, lambda n: ungettext('month', 'months', n)),
-      (60 * 60 * 24 * 7, lambda n: ungettext('week', 'weeks', n)),
-      (60 * 60 * 24, lambda n: ungettext('day', 'days', n)),
-      (60 * 60, lambda n: ungettext('hour', 'hours', n)),
-      (60, lambda n: ungettext('minute', 'minutes', n)),
-      (1, lambda n: ungettext('second', 'seconds', n)),
+      (60 * 60 * 24 * 365, lambda n: _t('year', 'years', n)),
+      (60 * 60 * 24 * 30, lambda n: _t('month', 'months', n)),
+      (60 * 60 * 24 * 7, lambda n: _t('week', 'weeks', n)),
+      (60 * 60 * 24, lambda n: _t('day', 'days', n)),
+      (60 * 60, lambda n: _t('hour', 'hours', n)),
+      (60, lambda n: _t('minute', 'minutes', n)),
+      (1, lambda n: _t('second', 'seconds', n)),
     )
 
   # Convert datetime.date to datetime.datetime for comparison.
@@ -449,26 +454,26 @@ def timesince(d=None, now=None, abbreviate=False, separator=','):
   if since <= 0:
     # d is in the future compared to now, stop processing.
     if abbreviate:
-      return u'0' + ugettext('s')
+      return u'0' + _('s')
     else:
-      return u'0 ' + ugettext('seconds')
+      return u'0 ' + _('seconds')
   for i, (seconds, name) in enumerate(chunks):
     count = since // seconds
     if count != 0:
       break
   if abbreviate:
-    s = ugettext('%(number)d%(type)s') % {'number': count, 'type': name(count)}
+    s = _('%(number)d%(type)s') % {'number': count, 'type': name(count)}
   else:
-    s = ugettext('%(number)d %(type)s') % {'number': count, 'type': name(count)}
+    s = _('%(number)d %(type)s') % {'number': count, 'type': name(count)}
   if i + 1 < len(chunks):
     # Now get the second item
     seconds2, name2 = chunks[i + 1]
     count2 = (since - (seconds * count)) // seconds2
     if count2 != 0:
       if abbreviate:
-        s += ugettext('%(separator)s %(number)d%(type)s') % {'separator': separator, 'number': count2, 'type': name2(count2)}
+        s += _('%(separator)s %(number)d%(type)s') % {'separator': separator, 'number': count2, 'type': name2(count2)}
       else:
-        s += ugettext('%(separator)s %(number)d %(type)s') % {'separator': separator, 'number': count2, 'type': name2(count2)}
+        s += _('%(separator)s %(number)d %(type)s') % {'separator': separator, 'number': count2, 'type': name2(count2)}
   return s
 
 

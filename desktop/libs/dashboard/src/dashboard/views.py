@@ -18,10 +18,10 @@
 import json
 import logging
 import re
+import sys
 
 from django.urls import reverse
 from django.utils.html import escape
-from django.utils.translation import ugettext as _
 
 from desktop.conf import USE_NEW_EDITOR
 from desktop.lib.django_util import JsonResponse, render
@@ -37,6 +37,11 @@ from dashboard.decorators import allow_owner_only
 from dashboard.conf import get_engines
 from dashboard.controller import DashboardController, can_edit_index
 from dashboard.models import Collection2
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

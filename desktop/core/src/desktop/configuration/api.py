@@ -17,11 +17,11 @@
 
 import json
 import logging
+import sys
 
 from django.contrib.auth.models import Group, User
 from django.db import transaction
 from django.db.models import Q
-from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST
 
 from desktop.lib.django_util import JsonResponse
@@ -31,6 +31,11 @@ from desktop.models import DefaultConfiguration
 
 from notebook.connectors.hiveserver2 import HiveConfiguration, ImpalaConfiguration
 from notebook.connectors.spark_shell import SparkConfiguration
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 try:
   from oozie.models2 import WorkflowConfiguration as OozieWorkflowConfiguration

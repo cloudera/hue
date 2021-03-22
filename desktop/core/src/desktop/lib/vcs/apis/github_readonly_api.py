@@ -24,7 +24,6 @@ import re
 import sys
 
 from django.http import HttpResponseBadRequest
-from django.utils.translation import ugettext as _
 
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.rest.http_client import HttpClient, RestException
@@ -37,9 +36,11 @@ from desktop.lib.vcs.github_client import GithubClientException
 if sys.version_info[0] > 2:
   import urllib.request, urllib.error
   from urllib.parse import unquote as urllib_unquote, urlsplit as lib_urlsplit, urlunsplit as lib_urlunsplit
+  from django.utils.translation import gettext as _
 else:
   from urllib import unquote as urllib_unquote
   from urlparse import urlsplit as lib_urlsplit, urlunsplit as lib_urlunsplit
+  from django.utils.translation import ugettext as _
 
 LOG = logging.getLogger(__name__)
 

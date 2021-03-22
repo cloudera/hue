@@ -40,7 +40,6 @@ from django.forms.utils import ErrorList
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.utils.encoding import smart_str
-from django.utils.translation import get_language, ugettext as _
 
 import desktop.conf
 from desktop.auth.backend import is_admin
@@ -60,6 +59,9 @@ from useradmin.models import HuePermission, UserProfile, LdapGroup, get_profile,
 
 if sys.version_info[0] > 2:
   unicode = str
+  from django.utils.translation import get_language, gettext as _
+else:
+  from django.utils.translation import get_language, ugettext as _
 
 if ENABLE_ORGANIZATIONS.get():
   from useradmin.forms import OrganizationUserChangeForm as UserChangeForm, OrganizationSuperUserChangeForm as SuperUserChangeForm

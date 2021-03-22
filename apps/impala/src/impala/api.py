@@ -21,8 +21,8 @@ import base64
 import logging
 import json
 import struct
+import sys
 
-from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST
 
 from beeswax.api import error_handler
@@ -41,6 +41,11 @@ from impala.server import get_api as get_impalad_api, _get_impala_server_url
 from libanalyze import analyze as analyzer, rules
 
 from notebook.models import make_notebook
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

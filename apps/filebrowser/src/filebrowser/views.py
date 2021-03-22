@@ -43,7 +43,6 @@ from django.shortcuts import redirect
 from functools import partial
 from django.utils.http import http_date
 from django.utils.html import escape
-from django.utils.translation import ugettext as _
 
 from aws.s3.s3fs import S3FileSystemException, S3ListAllBucketsException
 from desktop import appmanager
@@ -84,6 +83,7 @@ if sys.version_info[0] > 2:
   from builtins import str as new_str
   from avro import datafile, io
   from gzip import decompress as decompress_gzip
+  from django.utils.translation import gettext as _
 else:
   from cStringIO import StringIO as string_io
   from urllib import quote as urllib_quote
@@ -93,6 +93,7 @@ else:
   import parquet
   from avro import datafile, io
   from gzip import GzipFile
+  from django.utils.translation import ugettext as _
 
 
 DEFAULT_CHUNK_SIZE_BYTES = 1024 * 4 # 4KB

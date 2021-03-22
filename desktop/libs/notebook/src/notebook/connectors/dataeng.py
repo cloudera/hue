@@ -17,15 +17,20 @@
 
 import logging
 import re
+import sys
 
 from django.urls import reverse
-from django.utils.translation import ugettext as _
 
 from metadata.workload_analytics_client import WorkfloadAnalyticsClient
 
 from notebook.connectors.altus import DataEngApi as AltusDataEngApi
 from notebook.connectors.base import Api, QueryError
 from jobbrowser.apis.data_eng_api import RUNNING_STATES
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

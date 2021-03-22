@@ -26,7 +26,6 @@ import urllib.error
 import sys
 
 from django.urls import reverse
-from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST
 
 LOG = logging.getLogger(__name__)
@@ -65,10 +64,12 @@ from indexer.indexers.flume import FlumeIndexer
 if sys.version_info[0] > 2:
   from io import StringIO as string_io
   from urllib.parse import urlparse, unquote as urllib_unquote
+  from django.utils.translation import gettext as _
 else:
   from StringIO import StringIO as string_io
   from urllib import unquote as urllib_unquote
   from urlparse import urlparse
+  from django.utils.translation import ugettext as _
 
 try:
   from beeswax.server import dbms

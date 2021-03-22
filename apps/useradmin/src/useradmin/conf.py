@@ -18,8 +18,14 @@
 Configuration options for the "user admin" application
 """
 
+import sys
+
 from desktop.lib.conf import Config, ConfigSection, coerce_bool
-from django.utils.translation import ugettext_lazy as _
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext_lazy as _
+else:
+  from django.utils.translation import ugettext_lazy as _
 
 HOME_DIR_PERMISSIONS = Config(
     key="home_dir_permissions",

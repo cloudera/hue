@@ -14,12 +14,16 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
+import sys
 import time
 from django.template.defaultfilters import timesince
 from desktop.views import commonheader, commonfooter
-from django.utils.translation import ugettext as _
 from beeswax import models
 from beeswax.views import collapse_whitespace
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 %>
 
 <%namespace name="actionbar" file="actionbar.mako" />

@@ -17,18 +17,23 @@
 
 import logging
 import json
+import sys
 import time
 
 from collections import defaultdict
 
 from django.utils import html
-from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_GET, require_POST
 
 import desktop.conf
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.i18n import force_unicode
 from desktop.models import Document, DocumentTag, Document2, Directory
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

@@ -41,14 +41,15 @@ from desktop.log.access import access_warn
 import hadoop.confparse
 from liboozie.utils import parse_timestamp, format_time, catch_unicode_time
 
-from django.utils.translation import ugettext as _
 from django.urls import reverse
 
 from desktop.auth.backend import is_admin
 
 if sys.version_info[0] > 2:
   from io import BytesIO as string_io
+  from django.utils.translation import gettext as _
 else:
+  from django.utils.translation import ugettext as _
   from cStringIO import StringIO as string_io
 
 LOG = logging.getLogger(__name__)

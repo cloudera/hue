@@ -16,14 +16,18 @@
 # limitations under the License.
 
 import os.path
-
-from django.utils.translation import ugettext as _, ugettext_lazy as _t
+import sys
 
 from desktop.lib.conf import Config, coerce_bool
 from desktop.lib import paths
 from liboozie.conf import get_oozie_status
 
 from oozie.settings import NICE_NAME
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _, gettext_lazy as _t
+else:
+  from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
 
 DEFINITION_XSLT_DIR = Config(

@@ -14,10 +14,15 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
+import sys
 from django.http import HttpRequest
-from django.utils.translation import ugettext as _
 from django.template.defaultfilters import escape, escapejs
 from desktop.lib.i18n import smart_unicode
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 %>
 
 

@@ -22,13 +22,17 @@ s/<old_value>/<new_value>/
 This will rewrite the configurations if any changes are required.
 """
 import logging
+import sys
 
 import os, glob, string
 import desktop.conf
 import desktop.log
 from desktop.lib.paths import get_desktop_root
 from django.core.management.base import BaseCommand, CommandError
-from django.utils.translation import ugettext as _
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 LOG = logging.getLogger(__name__)
 

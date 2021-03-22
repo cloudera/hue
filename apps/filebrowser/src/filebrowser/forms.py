@@ -26,7 +26,6 @@ import urllib.request, urllib.error
 from django import forms
 from django.forms import FileField, CharField, BooleanField, Textarea
 from django.forms.formsets import formset_factory, BaseFormSet
-from django.utils.translation import ugettext_lazy as _
 
 from aws.s3 import S3A_ROOT, normpath as s3_normpath
 from azure.abfs.__init__ import ABFS_ROOT, normpath as abfs_normpath
@@ -38,8 +37,10 @@ from filebrowser.lib import rwx
 
 if sys.version_info[0] > 2:
   from urllib.parse import unquote as urllib_unquote
+  from django.utils.translation import gettext_lazy as _
 else:
   from urllib import unquote as urllib_unquote
+  from django.utils.translation import ugettext_lazy as _
 
 
 logger = logging.getLogger(__name__)

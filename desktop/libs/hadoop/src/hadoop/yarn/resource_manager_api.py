@@ -19,9 +19,8 @@ from builtins import object
 import json
 import logging
 import posixpath
+import sys
 import threading
-
-from django.utils.translation import ugettext as _
 
 from desktop.conf import DEFAULT_USER
 from desktop.lib.exceptions_renderable import PopupException
@@ -30,6 +29,11 @@ from desktop.lib.rest.http_client import HttpClient
 from desktop.lib.rest.resource import Resource
 
 from hadoop import cluster
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

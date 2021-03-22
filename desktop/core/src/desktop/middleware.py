@@ -25,6 +25,7 @@ import mimetypes
 import os.path
 import re
 import socket
+import sys
 import tempfile
 import time
 import traceback
@@ -42,7 +43,6 @@ from django.core import exceptions
 from django.http import HttpResponseNotAllowed, HttpResponseForbidden
 from django.urls import resolve
 from django.http import HttpResponseRedirect, HttpResponse
-from django.utils.translation import ugettext as _
 from django.utils.http import urlquote, is_safe_url
 from django.utils.deprecation import MiddlewareMixin
 
@@ -62,6 +62,11 @@ from desktop.lib.exceptions import StructuredException
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.log import get_audit_logger
 from desktop.log.access import access_log, log_page_hit, access_warn
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

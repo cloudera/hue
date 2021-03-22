@@ -15,7 +15,11 @@
 ## limitations under the License.
 
 <%!
-from django.utils.translation import ugettext as _
+import sys
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 from security.conf import HIVE_V1, HIVE_V2, SOLR_V2
 
 def is_selected(section, matcher):

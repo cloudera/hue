@@ -42,7 +42,6 @@ import sys
 
 from django.core import serializers
 from django.utils.encoding import smart_str
-from django.utils.translation import ugettext as _
 
 from desktop.models import Document
 
@@ -50,6 +49,11 @@ from oozie.conf import DEFINITION_XSLT_DIR, DEFINITION_XSLT2_DIR
 from oozie.models import Workflow, Node, Link, Start, End,\
                          Decision, DecisionEnd, Fork, Join,\
                          Kill
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 LOG = logging.getLogger(__name__)
 

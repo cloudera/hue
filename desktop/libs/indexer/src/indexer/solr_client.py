@@ -21,8 +21,7 @@ import logging
 import json
 import os
 import shutil
-
-from django.utils.translation import ugettext as _
+import sys
 
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_str
@@ -31,6 +30,11 @@ from libzookeeper.models import ZookeeperClient
 
 from indexer.conf import CORE_INSTANCE_DIR, get_solr_ensemble
 from indexer.utils import copy_configs
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

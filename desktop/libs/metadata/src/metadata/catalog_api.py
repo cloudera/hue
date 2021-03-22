@@ -20,12 +20,12 @@ from builtins import next
 import json
 import logging
 import re
+import sys
 
 from collections import OrderedDict
 
 from django.http import Http404
 from django.utils.html import escape
-from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST
 
 from desktop.lib.django_util import JsonResponse
@@ -34,6 +34,11 @@ from desktop.lib.i18n import force_unicode, smart_str
 from metadata.catalog.base import get_api
 from metadata.catalog.navigator_client import CatalogApiException, CatalogEntityDoesNotExistException, CatalogAuthException
 from metadata.conf import has_catalog, CATALOG, has_catalog_file_search, NAVIGATOR
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

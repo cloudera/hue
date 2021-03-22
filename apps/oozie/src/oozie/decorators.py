@@ -17,9 +17,9 @@
 
 import json
 import logging
+import sys
 
 from django.utils.functional import wraps
-from django.utils.translation import ugettext as _
 
 from desktop.conf import USE_NEW_EDITOR
 from desktop.lib.exceptions_renderable import PopupException
@@ -28,6 +28,11 @@ from desktop.models import Document, Document2
 from oozie.models import Job, Node, Dataset
 
 from desktop.auth.backend import is_admin
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

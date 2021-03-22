@@ -20,14 +20,18 @@ from __future__ import absolute_import
 import logging
 import json
 import posixpath
-
-from django.utils.translation import ugettext as _
+import sys
 
 from desktop.lib.i18n import force_unicode
 from desktop.lib.rest.http_client import HttpClient, RestException
 from desktop.lib.rest.resource import Resource
 
 from notebook.connectors.base import Api, QueryError
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

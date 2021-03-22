@@ -22,11 +22,15 @@ import datetime
 import time
 
 from django.core.management.base import BaseCommand, CommandError
-from django.utils.translation import ugettext_lazy as _t, ugettext as _
 
 from django.contrib.auth.models import User
 
 import desktop.conf
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext_lazy as _t, gettext as _
+else:
+  from django.utils.translation import ugettext_lazy as _t, ugettext as _
 
 logging.basicConfig()
 LOG = logging.getLogger(__name__)

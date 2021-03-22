@@ -18,11 +18,15 @@
 import json
 import logging
 from lxml import etree
-
-from django.utils.translation import ugettext as _
+import sys
 
 from oozie.models import Coordinator, BundledCoordinator
 from oozie.utils import oozie_to_django_datetime
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

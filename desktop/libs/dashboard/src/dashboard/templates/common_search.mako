@@ -15,12 +15,17 @@
 ## limitations under the License.
 
 <%!
-from django.utils.translation import ugettext as _
+import sys
 
 from desktop import conf
 from desktop.views import commonheader, commonfooter, _ko, commonshare
 
 from dashboard.conf import USE_GRIDSTER, USE_NEW_ADD_METHOD, HAS_REPORT_ENABLED, HAS_WIDGET_FILTER, HAS_TREE_WIDGET
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 %>
 
 <%namespace name="dashboard" file="common_dashboard.mako" />

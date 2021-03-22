@@ -20,12 +20,14 @@ import logging
 import os
 import sys
 
-from django.utils.translation import ugettext_lazy as _t, ugettext as _
-
 from desktop.conf import default_ssl_validate
 from desktop.lib.conf import Config, validate_thrift_transport, coerce_bool
 from hbase.hbase_site import get_thrift_transport
 
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext_lazy as _t, gettext as _
+else:
+  from django.utils.translation import ugettext_lazy as _t, ugettext as _
 
 LOG = logging.getLogger(__name__)
 

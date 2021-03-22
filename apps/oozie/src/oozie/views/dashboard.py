@@ -22,13 +22,13 @@ import json
 import logging
 import os
 import re
+import sys
 import time
 import urllib.request, urllib.parse, urllib.error
 
 from django.forms.formsets import formset_factory
 from django.http import HttpResponse
 from django.utils.functional import wraps
-from django.utils.translation import ugettext as _
 from django.urls import reverse
 from django.shortcuts import redirect
 
@@ -58,6 +58,11 @@ from oozie.settings import DJANGO_APPS
 from oozie.utils import convert_to_server_timezone
 
 from desktop.auth.backend import is_admin
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 def get_history():
   if ENABLE_V2.get():

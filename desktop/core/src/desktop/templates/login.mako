@@ -15,12 +15,17 @@
 ## limitations under the License.
 
 <%!
-  from django.utils.translation import ugettext as _
+  import sys
 
   from useradmin.hue_password_policy import is_password_policy_enabled, get_password_hint
 
   from desktop.conf import CUSTOM, ENABLE_ORGANIZATIONS
   from desktop.views import commonheader, commonfooter
+
+  if sys.version_info[0] > 2:
+    from django.utils.translation import gettext as _
+  else:
+    from django.utils.translation import ugettext as _
 %>
 
 <%namespace name="hueIcons" file="/hue_icons.mako" />

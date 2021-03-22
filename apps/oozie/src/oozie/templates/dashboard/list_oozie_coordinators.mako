@@ -16,8 +16,12 @@
 ## limitations under the License.
 
 <%!
+  import sys
   from desktop.views import commonheader, commonfooter
-  from django.utils.translation import ugettext as _
+  if sys.version_info[0] > 2:
+    from django.utils.translation import gettext as _
+  else:
+    from django.utils.translation import ugettext as _
   from oozie.conf import ENABLE_OOZIE_BACKEND_FILTERING
 %>
 

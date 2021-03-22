@@ -22,8 +22,6 @@ import logging
 import sys
 import uuid
 
-from django.utils.translation import ugettext as _
-
 from desktop.conf import ENABLE_DOWNLOAD
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
@@ -47,9 +45,11 @@ from dashboard.models import Collection2, augment_solr_response, pairwise2, augm
   NESTED_FACET_FORM, COMPARE_FACET, QUERY_FACET, extract_solr_exception_message
 
 if sys.version_info[0] > 2:
-    from django.utils.encoding import force_str
+  from django.utils.encoding import force_str
+  from django.utils.translation import gettext as _
 else:
-    from django.utils.encoding import force_unicode as force_str
+  from django.utils.encoding import force_unicode as force_str
+  from django.utils.translation import ugettext as _
 
 LOG = logging.getLogger(__name__)
 

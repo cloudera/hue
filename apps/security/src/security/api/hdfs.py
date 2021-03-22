@@ -18,12 +18,16 @@
 from __future__ import print_function
 from builtins import str
 import json
-
-from django.utils.translation import ugettext as _
+import sys
 
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from filebrowser.views import display, listdir_paged
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 def _get_acl_name(acl):

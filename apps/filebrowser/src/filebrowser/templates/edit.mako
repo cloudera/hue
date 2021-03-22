@@ -16,10 +16,16 @@
 
 <%!
   import datetime
+  import sys
+
   from django.template.defaultfilters import urlencode, stringformat, date, filesizeformat, time
   from filebrowser.views import truncate
   from desktop.views import commonheader, commonfooter
-  from django.utils.translation import ugettext as _
+
+  if sys.version_info[0] > 2:
+    from django.utils.translation import gettext as _
+  else:
+    from django.utils.translation import ugettext as _
 %>
 
 <%

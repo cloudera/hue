@@ -19,6 +19,7 @@ from builtins import str
 import json
 import logging
 import shutil
+import sys
 import time
 
 from django.urls import reverse
@@ -30,7 +31,6 @@ from django.shortcuts import redirect
 from django.template.defaultfilters import strip_tags
 from functools import partial
 from django.utils.http import http_date
-from django.utils.translation import ugettext as _, activate as activate_translation
 
 from desktop.lib.django_util import JsonResponse, render, extract_field_data
 from desktop.lib.exceptions_renderable import PopupException
@@ -59,6 +59,11 @@ from oozie.forms import WorkflowForm, CoordinatorForm, DatasetForm,\
                         ImportWorkflowForm, ImportCoordinatorForm
 
 from desktop.auth.backend import is_admin
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _, activate as activate_translation
+else:
+  from django.utils.translation import ugettext as _, activate as activate_translation
 
 LOG = logging.getLogger(__name__)
 

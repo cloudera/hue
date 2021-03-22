@@ -32,8 +32,6 @@ import uuid
 
 import django_opentracing
 
-from django.utils.translation import ugettext_lazy as _
-
 import desktop.redaction
 
 from desktop.lib.paths import get_desktop_root, get_run_root
@@ -42,6 +40,10 @@ from desktop.lib.python_util import force_dict_to_strings
 from aws.conf import is_enabled as is_s3_enabled
 from azure.conf import is_abfs_enabled
 
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext_lazy as _
+else:
+  from django.utils.translation import ugettext_lazy as _
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), '..', '..', '..'))

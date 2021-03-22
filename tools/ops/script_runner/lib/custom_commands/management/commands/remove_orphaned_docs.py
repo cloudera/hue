@@ -17,6 +17,7 @@
 # limitations under the License.
 
 import os
+import sys
 import time
 import uuid
 
@@ -24,7 +25,6 @@ from importlib import import_module
 
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
-from django.utils.translation import ugettext_lazy as _t, ugettext as _
 from datetime import date, timedelta
 from django.db.utils import DatabaseError
 import desktop.conf
@@ -39,6 +39,11 @@ import logging.handlers
 
 
 import desktop.conf
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext_lazy as _t, gettext as _
+else:
+  from django.utils.translation import ugettext_lazy as _t, ugettext as _
 
 LOG = logging.getLogger(__name__)
 

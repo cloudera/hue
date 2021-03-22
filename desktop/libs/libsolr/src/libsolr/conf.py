@@ -20,8 +20,6 @@ standard_library.install_aliases()
 import logging
 import sys
 
-from django.utils.translation import ugettext_lazy as _t
-
 from desktop.lib.conf import Config, coerce_bool
 from desktop.conf import default_ssl_validate
 from libzookeeper.conf import ENSEMBLE
@@ -29,7 +27,9 @@ from libzookeeper.conf import ENSEMBLE
 if sys.version_info[0] > 2:
   from urllib.parse import urlparse
   new_str = str
+  from django.utils.translation import gettext_lazy as _t
 else:
+  from django.utils.translation import ugettext_lazy as _t
   from urlparse import urlparse
 
 LOG = logging.getLogger(__name__)

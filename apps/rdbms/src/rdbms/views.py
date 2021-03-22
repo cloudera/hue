@@ -17,10 +17,10 @@
 
 import logging
 import json
+import sys
 
 from functools import wraps
 
-from django.utils.translation import ugettext as _
 from django.urls import reverse
 
 from desktop.context_processors import get_app_name
@@ -32,6 +32,11 @@ from librdbms.design import SQLdesign
 
 from beeswax import models as beeswax_models
 from beeswax.views import safe_get_design
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

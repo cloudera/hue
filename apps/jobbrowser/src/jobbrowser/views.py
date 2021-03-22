@@ -34,7 +34,6 @@ from urllib.parse import quote_plus
 
 from django.http import HttpResponseRedirect
 from django.utils.functional import wraps
-from django.utils.translation import ugettext as _
 from django.urls import reverse
 
 from desktop.auth.backend import is_admin
@@ -51,6 +50,10 @@ from hadoop import cluster
 from hadoop.yarn.clients import get_log_client
 from hadoop.yarn import resource_manager_api as resource_manager_api
 
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 LOG = logging.getLogger(__name__)
 
