@@ -229,7 +229,7 @@ class Config(object):
                       % (key, type, default, pytype(default)))
 
     if type == bool:
-      LOG.warn("%s is of type bool. Resetting it as type 'coerce_bool'."
+      LOG.warning("%s is of type bool. Resetting it as type 'coerce_bool'."
                " Please fix it permanently" % (key,))
       type = coerce_bool
 

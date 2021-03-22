@@ -290,7 +290,7 @@ class Collection2(object):
       schema_fields = api.fields(name)
       schema_fields = schema_fields['schema']['fields']
     except Exception as e:
-      LOG.warn('/luke call did not succeed: %s' % e)
+      LOG.warning('/luke call did not succeed: %s' % e)
       try:
         fields = api.schema_fields(name)
         schema_fields = Collection2._make_luke_from_schema_fields(fields)
@@ -1006,7 +1006,7 @@ def extract_solr_exception_message(e):
     msg = message['error'].get('msg')
     response['error'] = msg if msg else message['error']['trace']
   except ValueError as e:
-    LOG.warn('Failed to parse json response: %s' % force_unicode(e))
+    LOG.warning('Failed to parse json response: %s' % force_unicode(e))
     response['error'] = force_unicode(e)
   except Exception as e:
     LOG.exception('Failed to extract json message: %s' % force_unicode(e))

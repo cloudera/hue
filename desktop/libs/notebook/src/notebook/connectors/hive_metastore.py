@@ -41,7 +41,7 @@ try:
   from beeswax.server import dbms
   from beeswax.server.dbms import get_query_server_config, QueryServerException
 except ImportError as e:
-  LOG.warn('Hive and HiveMetastoreServer interfaces are not enabled: %s' % e)
+  LOG.warning('Hive and HiveMetastoreServer interfaces are not enabled: %s' % e)
   hive_settings = None
 
 

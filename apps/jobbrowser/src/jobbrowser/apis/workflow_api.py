@@ -38,7 +38,7 @@ try:
   has_oozie_installed = True
   OOZIE_JOBS_COUNT_LIMIT = OOZIE_JOBS_COUNT.get()
 except Exception as e:
-  LOG.warn('Some applications are not enabled for Job Browser v2: %s' % e)
+  LOG.warning('Some applications are not enabled for Job Browser v2: %s' % e)
   has_oozie_installed = False
   OOZIE_JOBS_COUNT_LIMIT = 100
 

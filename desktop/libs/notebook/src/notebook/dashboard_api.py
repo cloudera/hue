@@ -669,7 +669,7 @@ class SQLDashboardApi(DashboardApi):
       duration['timedelta'] = timedelta(days=365)
 
     if not duration['sql_trunc']:
-      LOG.warn('Duration %s not converted to SQL buckets.' % duration)
+      LOG.warning('Duration %s not converted to SQL buckets.' % duration)
 
     return duration
 

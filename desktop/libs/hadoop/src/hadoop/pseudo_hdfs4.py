@@ -170,7 +170,7 @@ class PseudoHdfs4(object):
   def fs(self):
     if self._fs is None:
       if self._dfs_http_address is None:
-        LOG.warn("Attempt to access uninitialized filesystem")
+        LOG.warning("Attempt to access uninitialized filesystem")
         return None
       self._fs = hadoop.fs.webhdfs.WebHdfs("http://%s/webhdfs/v1" % (self._dfs_http_address,), self.fs_default_name)
     return self._fs
@@ -620,4 +620,3 @@ def main():
   IPShellEmbed()()
 
   cluster.stop()
-

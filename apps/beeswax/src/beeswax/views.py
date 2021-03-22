@@ -444,7 +444,7 @@ def execute_query(request, design_id=None, query_history_id=None):
     except QueryServerException as e:
       if 'Invalid query handle' in e.message or 'Invalid OperationHandle' in e.message:
         query_history.save_state(QueryHistory.STATE.expired)
-        LOG.warn("Invalid query handle", exc_info=sys.exc_info())
+        LOG.warning("Invalid query handle", exc_info=sys.exc_info())
         action = 'editor-expired-results'
       else:
         raise e
@@ -878,7 +878,7 @@ def _list_designs(user, querydict, page_size, prefix="", is_trashed=False):
       sort_dir, sort_attr = '', sort_key
 
     if sort_attr not in SORT_ATTR_TRANSLATION:
-      LOG.warn('Bad parameter to list_designs: sort=%s' % (sort_key,))
+      LOG.warning('Bad parameter to list_designs: sort=%s' % (sort_key,))
       sort_dir, sort_attr = DEFAULT_SORT
   else:
     sort_dir, sort_attr = DEFAULT_SORT
@@ -1072,7 +1072,7 @@ def _list_query_history(user, querydict, page_size, prefix=""):
   d_type = querydict.get(prefix + 'type')
   if d_type:
     if d_type not in list(SavedQuery.TYPES_MAPPING.keys()):
-      LOG.warn('Bad parameter to list_query_history: type=%s' % (d_type,))
+      LOG.warning('Bad parameter to list_query_history: type=%s' % (d_type,))
     else:
       db_queryset = db_queryset.filter(design__type=SavedQuery.TYPES_MAPPING[d_type])
 
@@ -1089,7 +1089,7 @@ def _list_query_history(user, querydict, page_size, prefix=""):
       sort_dir, sort_attr = '-', sort_key[1:]
 
     if sort_attr not in SORT_ATTR_TRANSLATION:
-      LOG.warn('Bad parameter to list_query_history: sort=%s' % (sort_key,))
+      LOG.warning('Bad parameter to list_query_history: sort=%s' % (sort_key,))
       sort_dir, sort_attr = DEFAULT_SORT
   else:
     sort_dir, sort_attr = DEFAULT_SORT

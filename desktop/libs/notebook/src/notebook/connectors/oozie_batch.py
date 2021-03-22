@@ -43,7 +43,7 @@ try:
   from oozie.views.dashboard import check_job_access_permission, check_job_edition_permission
   from oozie.views.editor2 import _submit_workflow
 except Exception as e:
-  LOG.warn('Oozie application is not enabled: %s' % e)
+  LOG.warning('Oozie application is not enabled: %s' % e)
 
 
 class OozieApi(Api):
@@ -109,7 +109,7 @@ class OozieApi(Api):
         if results:
           response['status'] = 'available'
         else:
-          LOG.warn('No log result could be matched for %s' % job_id)
+          LOG.warning('No log result could be matched for %s' % job_id)
       else:
         response['status'] = 'failed'
 

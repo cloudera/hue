@@ -34,7 +34,7 @@ try:
   from simple_salesforce.api import Salesforce
   from simple_salesforce.exceptions import SalesforceRefusedRequest
 except ImportError:
-  LOG.warn('simple_salesforce module not found')
+  LOG.warning('simple_salesforce module not found')
 
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
@@ -74,17 +74,17 @@ else:
 try:
   from beeswax.server import dbms
 except ImportError as e:
-  LOG.warn('Hive and HiveServer2 interfaces are not enabled')
+  LOG.warning('Hive and HiveServer2 interfaces are not enabled')
 
 try:
   from filebrowser.views import detect_parquet
 except ImportError as e:
-  LOG.warn('File Browser interface is not enabled')
+  LOG.warning('File Browser interface is not enabled')
 
 try:
   from search.conf import SOLR_URL
 except ImportError as e:
-  LOG.warn('Solr Search interface is not enabled')
+  LOG.warning('Solr Search interface is not enabled')
 
 
 def _escape_white_space_characters(s, inverse=False):
@@ -263,7 +263,7 @@ def guess_field_types(request):
       try:
         sample = db.fetch_result(notebook, snippet, 4, start_over=True)['rows'][:4]
       except Exception as e:
-        LOG.warn('Skipping sample data as query handle might be expired: %s' % e)
+        LOG.warning('Skipping sample data as query handle might be expired: %s' % e)
         sample = [[], [], [], [], []]
       columns = db.autocomplete(snippet=snippet, database='', table='')
       columns = [
@@ -595,7 +595,7 @@ def _small_indexing(user, fs, client, source, destination, index_name):
     try:
       client.delete_index(index_name, keep_config=False)
     except Exception as e2:
-      LOG.warn('Error while cleaning-up config of failed collection creation %s: %s' % (index_name, e2))
+      LOG.warning('Error while cleaning-up config of failed collection creation %s: %s' % (index_name, e2))
     raise e
 
   return {
