@@ -144,6 +144,9 @@ def handle_on_link_shared(channel_id, message_ts, links):
         initial_comment='Here is your result file!'
         )
 
+    delattr(user, 'has_hue_permission')
+
+
 def _query_result(request, notebook, max_rows):
   snippet = notebook['snippets'][0]
   snippet['statement'] = notebook['snippets'][0]['statement_raw']
