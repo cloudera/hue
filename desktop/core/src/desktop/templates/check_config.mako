@@ -15,10 +15,15 @@
 ## limitations under the License.
 
 <%!
-from django.utils.translation import ugettext as _
+import sys
 
 from desktop.conf import has_connectors
 from desktop.auth.backend import is_hue_admin
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 %>
 
 % if is_hue_admin(user):

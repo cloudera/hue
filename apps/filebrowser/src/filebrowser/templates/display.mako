@@ -21,12 +21,13 @@
   from filebrowser.views import truncate
   from desktop.lib.paths import SAFE_CHARACTERS_URI_COMPONENTS
   from desktop.views import commonheader, commonfooter
-  from django.utils.translation import ugettext as _
 
   if sys.version_info[0] > 2:
     from urllib.parse import quote as urllib_quote
+    from django.utils.translation import gettext as _
   else:
     from urllib import quote as urllib_quote
+    from django.utils.translation import ugettext as _
 %>
 <%
   path_enc = urllib_quote(path.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS)

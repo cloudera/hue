@@ -14,11 +14,17 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
+import re
+import sys
+
 from desktop.lib.conf import BoundConfig
 from desktop.lib.i18n import smart_unicode
 from desktop.views import commonheader, commonfooter
-from django.utils.translation import ugettext as _
-import re
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 %>
 
 <%namespace name="actionbar" file="actionbar.mako" />

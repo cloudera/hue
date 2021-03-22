@@ -15,9 +15,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import sys
 from django import forms
-from django.utils.translation import ugettext_lazy as _t
-
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext_lazy as _t
+else:
+  from django.utils.translation import ugettext_lazy as _t
 
 class SQLForm(forms.Form):
   query = forms.CharField(label=_t("Query Editor"),

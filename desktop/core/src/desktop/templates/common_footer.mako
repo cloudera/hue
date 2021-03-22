@@ -14,11 +14,16 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
+import sys
 from django.http import HttpRequest
-from django.utils.translation import ugettext as _
 
 from desktop.lib.i18n import smart_unicode
 from desktop.views import login_modal
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 %>
 
 <%namespace name="commonHeaderFooterComponents" file="/common_header_footer_components.mako" />

@@ -1,12 +1,18 @@
 # encoding: utf-8
 import datetime
+import sys
+
 from django.contrib.auth.models import User
-from django.utils.translation import ugettext as _
 from south.db import db
 from south.v2 import DataMigration
 from django.db import models
 from oozie.importlib.jobdesigner import convert_jobsub_design
 from oozie.models import Workflow, Kill, Start, End
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 class Migration(DataMigration):

@@ -21,10 +21,9 @@ from builtins import str
 import collections
 import logging
 import json
+import sys
 import threading
 import uuid
-
-from django.utils.translation import ugettext as _
 
 from beeswax.design import hql_query
 from beeswax.server import dbms
@@ -35,6 +34,11 @@ from desktop.lib.exceptions_renderable import raise_popup_exception, PopupExcept
 from desktop.lib import django_mako
 
 from useradmin.models import install_sample_user
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

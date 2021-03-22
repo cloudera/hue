@@ -26,16 +26,21 @@ import json
 import logging
 import os
 import re
+import sys
 import urllib.parse
 
 import django.http
 from django import forms
 from django.forms import ValidationError
-from django.utils.translation import ugettext as _
 
 from notebook.sql_utils import split_statements, strip_trailing_semicolon
 from desktop.lib.django_forms import BaseSimpleFormSet, MultiForm
 from hadoop.cluster import get_hdfs
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

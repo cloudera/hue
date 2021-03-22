@@ -21,7 +21,6 @@ import json
 import sys
 
 from django.urls import reverse
-from django.utils.translation import ugettext as _
 
 from desktop.conf import DEFAULT_USER
 from desktop.lib.paths import get_desktop_root, SAFE_CHARACTERS_URI_COMPONENTS, SAFE_CHARACTERS_URI
@@ -31,8 +30,10 @@ from notebook.connectors.base import Notebook
 if sys.version_info[0] > 2:
   import urllib.request, urllib.error
   from urllib.parse import quote as urllib_quote
+  from django.utils.translation import gettext as _
 else:
   from urllib import quote as urllib_quote
+  from django.utils.translation import ugettext as _
 
 def compress_files_in_hdfs(request, file_names, upload_path, archive_name):
 

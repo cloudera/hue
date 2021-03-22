@@ -18,10 +18,10 @@
 from builtins import object
 import json
 import logging
+import sys
 import time
 
 from django.urls import reverse
-from django.utils.translation import ugettext as _
 
 from desktop.lib.i18n import smart_str
 from desktop.lib.view_util import format_duration_in_millis
@@ -30,6 +30,11 @@ from oozie.models import Workflow, Pig
 from oozie.views.api import get_log as get_workflow_logs
 from oozie.views.editor import _submit_workflow
 from desktop.auth.backend import is_admin
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

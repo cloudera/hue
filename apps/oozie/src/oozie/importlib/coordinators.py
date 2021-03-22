@@ -19,13 +19,18 @@ import json
 import logging
 import os
 from lxml import etree
+import sys
 
 from django.core import serializers
-from django.utils.translation import ugettext as _
 
 from oozie import conf
 from oozie.models import Workflow, Dataset, DataInput, DataOutput
 from oozie.utils import oozie_to_django_datetime, oozie_to_hue_frequency
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

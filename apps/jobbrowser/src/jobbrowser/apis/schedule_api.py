@@ -18,14 +18,18 @@
 from builtins import object
 import logging
 import json
-
-from django.utils.translation import ugettext as _
+import sys
 
 from liboozie.oozie_api import get_oozie
 from liboozie.utils import format_time
 
 from jobbrowser.apis.base_api import Api, MockDjangoRequest
 from jobbrowser.apis.workflow_api import _manage_oozie_job, _filter_oozie_jobs
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

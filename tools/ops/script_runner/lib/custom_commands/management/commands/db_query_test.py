@@ -24,11 +24,15 @@ import re
 import logging
 
 from django.core.management.base import BaseCommand, CommandError
-from django.utils.translation import ugettext_lazy as _t, ugettext as _
 from django.db.backends.oracle.base import Oracle_datetime
 from django.db import connection
 
 import desktop.conf
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext_lazy as _t, gettext as _
+else:
+  from django.utils.translation import ugettext_lazy as _t, ugettext as _
 
 LOG = logging.getLogger(__name__)
 

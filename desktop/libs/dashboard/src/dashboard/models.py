@@ -29,10 +29,10 @@ import json
 import logging
 import numbers
 import re
+import sys
 
 from django.urls import reverse
 from django.utils.html import escape
-from django.utils.translation import ugettext as _
 
 from desktop.lib.i18n import smart_unicode, smart_str, force_unicode
 from desktop.models import get_data_link, Document2
@@ -40,6 +40,10 @@ from notebook.connectors.base import Notebook, _get_snippet_name
 
 from dashboard.dashboard_api import get_engine
 
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 LOG = logging.getLogger(__name__)
 

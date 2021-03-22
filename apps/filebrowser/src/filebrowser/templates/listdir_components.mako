@@ -16,12 +16,18 @@
 
 <%!
 import datetime
+import sys
+
 from django.template.defaultfilters import urlencode, stringformat, filesizeformat, date, time, escape
 from desktop.lib.django_util import reverse_with_get, extract_field_data
 from django.utils.encoding import smart_str
-from django.utils.translation import ugettext as _
 
 from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 %>
 
 <%namespace name="edit" file="editor_components.mako" />

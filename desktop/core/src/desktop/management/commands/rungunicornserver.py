@@ -27,10 +27,14 @@ import gunicorn.app.base
 from desktop import conf
 from django.core.management.base import BaseCommand
 from django.core.wsgi import get_wsgi_application
-from django.utils.translation import ugettext as _
 
 from gunicorn import util
 from gunicorn.six import iteritems
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 GUNICORN_SERVER_HELP = r"""
   Run Hue using the Gunicorn WSGI server in asynchronous mode.

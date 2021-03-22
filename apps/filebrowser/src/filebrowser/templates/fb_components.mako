@@ -19,14 +19,15 @@ import sys
 from desktop.lib.paths import SAFE_CHARACTERS_URI_COMPONENTS
 
 from django.template.defaultfilters import urlencode, stringformat, date, filesizeformat, time
-from django.utils.translation import ugettext as _
 
 from aws.conf import get_default_region
 
 if sys.version_info[0] > 2:
   from urllib.parse import quote as urllib_quote
+  from django.utils.translation import gettext as _
 else:
   from urllib import quote as urllib_quote
+  from django.utils.translation import ugettext as _
 %>
 
 <%def name="breadcrumbs(path, breadcrumbs, from_listdir=False)">

@@ -18,10 +18,10 @@
 from builtins import object
 import logging
 import re
+import sys
 import thrift
 
 from django.utils.encoding import smart_str, force_unicode
-from django.utils.translation import ugettext as _
 
 import hadoop.cluster
 
@@ -35,6 +35,11 @@ from beeswax.conf import SERVER_CONN_TIMEOUT
 from beeswax.server.hive_server2_lib import ResultCompatible
 from beeswax.models import HiveServerQueryHandle, QueryHistory
 from beeswax.server.dbms import Table, DataTable
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

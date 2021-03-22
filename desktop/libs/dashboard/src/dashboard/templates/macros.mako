@@ -19,12 +19,12 @@ import sys
 
 from itertools import izip
 
-from django.utils.translation import ugettext as _
-
 if sys.version_info[0] > 2:
   from urllib.parse import quote as urllib_quote
+  from django.utils.translation import gettext as _
 else:
   from urllib import quote as urllib_quote
+  from django.utils.translation import ugettext as _
 
 
 # <http://github.com/mzsanford/twitter-text-java>

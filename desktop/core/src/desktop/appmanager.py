@@ -23,11 +23,14 @@ import sys
 import traceback
 import pkg_resources
 
-from django.utils.translation import ugettext as _
-
 import desktop
 
 from desktop.lib.paths import get_desktop_root
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 # Directories where apps and libraries are to be found

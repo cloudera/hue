@@ -17,10 +17,9 @@
 
 import logging
 import os
+import sys
 
 from subprocess import CalledProcessError
-
-from django.utils.translation import ugettext_lazy as _t
 
 from desktop.conf import AUTH_USERNAME as DEFAULT_AUTH_USERNAME, CLUSTER_ID as DEFAULT_CLUSTER_ID
 from desktop.lib.conf import Config, ConfigSection, coerce_bool, coerce_password_from_script
@@ -28,6 +27,12 @@ from desktop.lib.paths import get_config_root, get_desktop_root
 
 from metadata.settings import DJANGO_APPS
 from metadata.catalog import atlas_flags
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext_lazy as _t
+else:
+  from django.utils.translation import ugettext_lazy as _t
+
 
 OPTIMIZER_AUTH_PASSWORD = None
 NAVIGATOR_AUTH_PASSWORD = None

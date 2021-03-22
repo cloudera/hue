@@ -25,8 +25,6 @@ import itertools
 import logging
 import sys
 
-from django.utils.translation import ugettext as _
-
 from desktop.lib import i18n
 
 from indexer.argument import CheckboxArgument, TextDelimiterArgument
@@ -37,7 +35,9 @@ from indexer.indexers.morphline_operations import get_operator
 if sys.version_info[0] > 2:
   from io import StringIO as string_io
   from past.builtins import long
+  from django.utils.translation import gettext as _
 else:
+  from django.utils.translation import ugettext as _
   from StringIO import StringIO as string_io
 
 LOG = logging.getLogger(__name__)

@@ -37,7 +37,6 @@ import subprocess
 import sys
 
 from django.utils.encoding import smart_str
-from django.utils.translation import ugettext as _
 
 from desktop.lib import i18n
 
@@ -48,9 +47,11 @@ from hadoop.fs.exceptions import PermissionDeniedException
 if sys.version_info[0] > 2:
   from django.utils.encoding import force_str
   from urllib.parse import urlsplit as lib_urlsplit
+  from django.utils.translation import gettext as _
 else:
   from django.utils.encoding import force_unicode as force_str
   from urlparse import urlsplit as lib_urlsplit
+  from django.utils.translation import ugettext as _
 
 LOG = logging.getLogger(__name__)
 

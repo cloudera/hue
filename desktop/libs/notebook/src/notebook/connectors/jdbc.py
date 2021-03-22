@@ -19,13 +19,16 @@ from builtins import object
 import logging
 import sys
 
-from django.utils.translation import ugettext as _
-
 from beeswax import data_export
 from desktop.lib.i18n import force_unicode, smart_str
 from librdbms.jdbc import Jdbc, query_and_fetch
 
 from notebook.connectors.base import Api, QueryError, AuthenticationRequired, _get_snippet_name
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

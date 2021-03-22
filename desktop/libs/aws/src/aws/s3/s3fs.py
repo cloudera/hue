@@ -31,8 +31,6 @@ from boto.s3.connection import Location
 from boto.s3.key import Key
 from boto.s3.prefix import Prefix
 
-from django.utils.translation import ugettext as _
-
 from aws import s3
 from aws.conf import get_default_region, get_locations, PERMISSION_ACTION_S3
 from aws.s3 import normpath, s3file, translate_s3_error, S3A_ROOT
@@ -41,9 +39,11 @@ from aws.s3.s3stat import S3Stat
 if sys.version_info[0] > 2:
   import urllib.request, urllib.error
   from urllib.parse import quote as urllib_quote, urlparse as lib_urlparse
+  from django.utils.translation import gettext as _
 else:
   from urllib import quote as urllib_quote
   from urlparse import urlparse as lib_urlparse
+  from django.utils.translation import ugettext as _
 
 DEFAULT_READ_SIZE = 1024 * 1024  # 1MB
 BUCKET_NAME_PATTERN = re.compile("^((?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9_\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9_\-]*[A-Za-z0-9]))$")

@@ -20,12 +20,16 @@ from builtins import object
 import json
 import logging
 import math
+import sys
 import types
-
-from django.utils.translation import ugettext as _
 
 from desktop.lib import export_csvxls
 from beeswax import common, conf
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

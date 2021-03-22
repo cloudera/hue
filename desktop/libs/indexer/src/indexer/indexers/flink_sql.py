@@ -19,7 +19,6 @@ import sys
 import uuid
 
 from django.urls import reverse
-from django.utils.translation import ugettext as _
 
 from notebook.models import make_notebook
 from useradmin.models import User
@@ -29,7 +28,9 @@ from desktop.lib.exceptions_renderable import PopupException
 
 if sys.version_info[0] > 2:
   from urllib.parse import urlparse, unquote as urllib_unquote
+  from django.utils.translation import gettext as _
 else:
+  from django.utils.translation import ugettext as _
   from urllib import unquote as urllib_unquote
   from urlparse import urlparse
 

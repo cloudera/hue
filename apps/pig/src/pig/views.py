@@ -20,10 +20,10 @@ standard_library.install_aliases()
 from builtins import str
 import json
 import logging
+import sys
 import urllib.request, urllib.parse, urllib.error
 
 from django.urls import reverse
-from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 
 from desktop.lib.django_util import JsonResponse, render
@@ -39,6 +39,11 @@ from pig import api
 from pig.management.commands import pig_setup
 from pig.models import get_workflow_output, hdfs_link, PigScript,\
   create_or_update_script, get_scripts
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

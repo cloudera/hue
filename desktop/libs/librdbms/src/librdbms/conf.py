@@ -15,11 +15,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from django.utils.translation import ugettext_lazy as _t, ugettext as _
+import sys
+
 from desktop.lib.conf import Config, UnspecifiedConfigSection,\
                              ConfigSection, coerce_json_dict,\
                              coerce_password_from_script
 from desktop.conf import coerce_database
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext_lazy as _t, gettext as _
+else:
+  from django.utils.translation import ugettext_lazy as _t, ugettext as _
 
 
 DATABASES = UnspecifiedConfigSection(

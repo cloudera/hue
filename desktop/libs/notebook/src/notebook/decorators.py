@@ -20,11 +20,11 @@ import json
 import logging
 import math
 import re
+import sys
 
 from django.forms import ValidationError
 from django.http import Http404
 from django.utils.functional import wraps
-from django.utils.translation import ugettext as _
 
 from dashboard.models import extract_solr_exception_message
 from desktop.lib.django_util import JsonResponse
@@ -37,6 +37,11 @@ from notebook.conf import check_has_missing_permission, ENABLE_NOTEBOOK_2
 from notebook.connectors.base import QueryExpired, QueryError, SessionExpired, AuthenticationRequired, OperationTimeout, \
   OperationNotSupported
 from notebook.models import _get_editor_type
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

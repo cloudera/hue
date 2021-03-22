@@ -17,13 +17,17 @@
 
 from builtins import object
 import logging
+import sys
 
 from django import forms
 
 from desktop.lib.django_forms import MultiForm
 from jobsub import models
 
-from django.utils.translation import ugettext as _
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 LOG = logging.getLogger(__name__)
 

@@ -17,9 +17,9 @@
 
 import json
 import logging
+import sys
 
 from django.utils.encoding import smart_str
-from django.utils.translation import ugettext as _
 from hadoop.yarn import resource_manager_api
 
 from desktop.lib.django_util import JsonResponse
@@ -27,6 +27,11 @@ from desktop.lib.exceptions import MessageException
 from desktop.lib.exceptions_renderable import PopupException
 from jobbrowser.conf import MAX_JOB_FETCH, LOG_OFFSET
 from jobbrowser.views import job_executor_logs, job_single_logs
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

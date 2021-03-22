@@ -39,7 +39,6 @@ from django.http import HttpResponse
 from django.http.response import StreamingHttpResponse
 from django.urls import reverse
 from django.shortcuts import redirect
-from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST
 from configobj import ConfigObj, get_extra_values, ConfigObjError
 from wsgiref.util import FileWrapper
@@ -69,8 +68,10 @@ from useradmin.models import get_profile
 
 if sys.version_info[0] > 2:
   from io import StringIO as string_io
+  from django.utils.translation import gettext as _
 else:
   from StringIO import StringIO as string_io
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

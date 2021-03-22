@@ -22,8 +22,8 @@ import logging
 import numbers
 import os
 import shutil
+import sys
 
-from django.utils.translation import ugettext as _
 import tablib
 
 from desktop.lib.exceptions_renderable import PopupException
@@ -35,6 +35,11 @@ from search.conf import SOLR_URL, SECURITY_ENABLED
 from indexer.conf import CORE_INSTANCE_DIR
 from indexer.utils import copy_configs, field_values_from_log, field_values_from_separated_file
 from indexer.solr_client import SolrClient
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

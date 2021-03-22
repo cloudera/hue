@@ -16,17 +16,21 @@
 # limitations under the License.
 
 import logging
+import sys
 
 from datetime import datetime
 from dateutil import parser
 
 from django.utils import timezone
-from django.utils.translation import ugettext as _
 
 from notebook.connectors.altus import DataWarehouse2Api
 
 from jobbrowser.apis.base_api import Api
 
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

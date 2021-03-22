@@ -22,11 +22,16 @@
 #
 
 <%!
+  import sys
   from desktop import conf
-  from django.utils.translation import ugettext as _
 
   from dashboard.conf import HAS_REPORT_ENABLED, USE_GRIDSTER, USE_NEW_ADD_METHOD
   from desktop.views import _ko
+
+  if sys.version_info[0] > 2:
+    from django.utils.translation import gettext as _
+  else:
+    from django.utils.translation import ugettext as _
 %>
 
 <%def name="import_layout(with_deferred=False)">

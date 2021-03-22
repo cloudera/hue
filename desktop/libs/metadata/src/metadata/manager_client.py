@@ -25,7 +25,6 @@ import logging
 import sys
 
 from django.core.cache import cache
-from django.utils.translation import ugettext as _
 
 from desktop.lib.rest.http_client import RestException, HttpClient
 from desktop.lib.rest.resource import Resource
@@ -36,7 +35,9 @@ from metadata.conf import MANAGER, get_navigator_auth_username, get_navigator_au
 
 if sys.version_info[0] > 2:
   from urllib.parse import quote as urllib_quote
+  from django.utils.translation import gettext as _
 else:
+  from django.utils.translation import ugettext as _
   from urllib import quote as urllib_quote
 
 LOG = logging.getLogger(__name__)

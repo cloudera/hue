@@ -25,11 +25,15 @@ else:
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.files.uploadhandler import FileUploadHandler, SkipFile, StopFutureHandlers, StopUpload, UploadFileException
-from django.utils.translation import ugettext as _
 
 from desktop.lib import fsmanager
 from azure.abfs.__init__ import parse_uri
 from azure.abfs.abfs import ABFSFileSystemException
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 DEFAULT_WRITE_SIZE = 30 * 1000 * 1000 # TODO: set in configuration
 

@@ -18,11 +18,11 @@
 from builtins import object
 import json
 import logging
+import sys
 
 from django.urls import reverse
 from django.db.models import Q
 from django.shortcuts import redirect
-from django.utils.translation import ugettext as _
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.http import require_POST
 
@@ -45,6 +45,11 @@ from notebook.connectors.spark_shell import SparkApi
 from notebook.decorators import check_editor_access_permission, check_document_access_permission, check_document_modify_permission
 from notebook.management.commands.notebook_setup import Command
 from notebook.models import make_notebook, _get_editor_type, get_api, _get_dialect_example
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

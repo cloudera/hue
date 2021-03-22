@@ -21,7 +21,11 @@ from desktop import conf
 from desktop import supervisor
 import os
 import sys
-from django.utils.translation import ugettext as _
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 SERVER_HELP = r"""
   Run Hue using either the CherryPy server or the Spawning server, based on

@@ -19,12 +19,12 @@ from builtins import object
 import errno
 import logging
 import os
+import sys
 import time
 
 from string import Template
 
 from django.utils.functional import wraps
-from django.utils.translation import ugettext as _
 
 from beeswax.hive_site import get_hive_site_content
 from desktop.lib.exceptions_renderable import PopupException
@@ -42,6 +42,11 @@ from hadoop.fs.hadoopfs import Hdfs
 from liboozie.conf import REMOTE_DEPLOYMENT_DIR, USE_LIBPATH_FOR_JARS
 from liboozie.credentials import Credentials
 from liboozie.oozie_api import get_oozie
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

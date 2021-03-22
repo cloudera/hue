@@ -16,8 +16,7 @@
 # limitations under the License.
 
 import logging
-
-from django.utils.translation import ugettext as _
+import sys
 
 from desktop.conf import CLUSTER_ID, has_connectors
 from desktop.lib.exceptions_renderable import PopupException
@@ -31,6 +30,11 @@ from beeswax.server.dbms import HiveServer2Dbms, QueryServerException, QueryServ
 
 from impala import conf
 from impala.impala_flags import get_hs2_http_port
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

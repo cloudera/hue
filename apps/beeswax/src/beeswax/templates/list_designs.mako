@@ -17,14 +17,15 @@
     import sys
     import time
     from django.template.defaultfilters import timesince
-    from django.utils.translation import ugettext as _
 
     from desktop.views import commonheader, commonfooter
 
     if sys.version_info[0] > 2:
       from django.utils.encoding import force_str
+      from django.utils.translation import gettext as _
     else:
       from django.utils.encoding import force_unicode as force_str
+      from django.utils.translation import ugettext as _
 %>
 
 <%namespace name="actionbar" file="actionbar.mako" />

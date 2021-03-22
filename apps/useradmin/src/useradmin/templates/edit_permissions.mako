@@ -16,16 +16,16 @@
 <%!
 import sys
 
-from django.utils.translation import ugettext as _
-
 from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.views import commonheader, commonfooter
 
 if sys.version_info[0] > 2:
   from urllib.parse import quote as urllib_quote
   unicode = str
+  from django.utils.translation import gettext as _
 else:
   from urllib import quote as urllib_quote
+  from django.utils.translation import ugettext as _
 %>
 
 <%namespace name="layout" file="layout.mako" />

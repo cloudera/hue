@@ -23,7 +23,6 @@ import json
 import sys
 
 from django.urls import reverse
-from django.utils.translation import ugettext as _
 
 from notebook.connectors.altus import AnalyticDbApi
 from notebook.connectors.base import Api, QueryError
@@ -31,7 +30,9 @@ from notebook.connectors.base import Api, QueryError
 if sys.version_info[0] > 2:
   import urllib.request, urllib.error
   from urllib.parse import quote as urllib_quote, quote_plus as urllib_quote_plus
+  from django.utils.translation import gettext as _
 else:
+  from django.utils.translation import ugettext as _
   from urllib import quote as urllib_quote, quote_plus as urllib_quote_plus
 
 LOG = logging.getLogger(__name__)

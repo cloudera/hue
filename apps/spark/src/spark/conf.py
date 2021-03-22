@@ -19,12 +19,15 @@ import logging
 import os
 import sys
 
-from django.utils.translation import ugettext_lazy as _t, ugettext as _
-
 from desktop.conf import default_ssl_validate
 from desktop.lib.conf import Config, coerce_bool
 from spark.settings import NICE_NAME
 from beeswax.conf import get_use_sasl_default
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext_lazy as _t, gettext as _
+else:
+  from django.utils.translation import ugettext_lazy as _t, ugettext as _
 
 
 LOG = logging.getLogger(__name__)

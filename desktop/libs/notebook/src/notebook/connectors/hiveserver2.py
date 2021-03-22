@@ -28,7 +28,6 @@ import struct
 import sys
 
 from django.urls import reverse
-from django.utils.translation import ugettext as _
 
 from desktop.auth.backend import is_admin
 from desktop.conf import USE_DEFAULT_CONFIGURATION, has_connectors
@@ -46,7 +45,9 @@ from notebook.connectors.base import Api, QueryError, QueryExpired, OperationTim
 
 if sys.version_info[0] > 2:
   from urllib.parse import quote as urllib_quote, unquote as urllib_unquote
+  from django.utils.translation import gettext as _
 else:
+  from django.utils.translation import ugettext as _
   from urllib import quote as urllib_quote, unquote as urllib_unquote
 
 LOG = logging.getLogger(__name__)

@@ -19,6 +19,7 @@ from future import standard_library
 standard_library.install_aliases()
 
 import logging
+import sys
 
 LOG = logging.getLogger(__name__)
 
@@ -34,7 +35,6 @@ from django.contrib.auth import login, get_backends, authenticate
 from django.contrib.sessions.models import Session
 from django.http import HttpResponseRedirect
 from django.urls import reverse
-from django.utils.translation import ugettext as _
 from hadoop.fs.exceptions import WebHdfsException
 from useradmin.models import User
 from useradmin.views import ensure_home_directory
@@ -47,6 +47,11 @@ from desktop.log.access import access_warn, last_access_map
 
 import liboauth.conf
 from liboauth.backend import OAuthBackend
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 @login_notrequired

@@ -22,15 +22,20 @@ from past.builtins import basestring
 import json
 import logging
 import re
+import sys
 import urllib.parse
 from datetime import datetime
 from dateutil import tz
 from dateutil import parser
 
 from django.utils.formats import localize_input
-from django.utils.translation import ugettext as _
 from desktop.lib.parameterization import find_variables
 from liboozie.oozie_api import get_oozie, DEFAULT_USER
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

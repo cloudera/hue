@@ -17,13 +17,13 @@
 # limitations under the License.
 
 import os
+import sys
 import time
 
 from importlib import import_module
 
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
-from django.utils.translation import ugettext_lazy as _t, ugettext as _
 from beeswax.models import SavedQuery
 from beeswax.models import Session
 from datetime import date, timedelta
@@ -35,6 +35,11 @@ import logging
 import logging.handlers
 
 import desktop.conf
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext_lazy as _t, gettext as _
+else:
+  from django.utils.translation import ugettext_lazy as _t, ugettext as _
 
 LOG = logging.getLogger(__name__)
 

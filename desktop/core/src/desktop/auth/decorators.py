@@ -18,13 +18,18 @@
 
 import json
 import logging
+import sys
 
 from django.utils.functional import wraps
-from django.utils.translation import ugettext as _
 
 from desktop.auth.backend import is_admin, is_hue_admin
 from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.lib.exceptions_renderable import PopupException
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

@@ -18,9 +18,8 @@
 from builtins import range, object
 import logging
 import re
+import sys
 import time
-
-from django.utils.translation import ugettext as _
 
 from desktop.conf import USE_DEFAULT_CONFIGURATION
 from desktop.lib.exceptions_renderable import PopupException
@@ -30,6 +29,11 @@ from desktop.models import DefaultConfiguration
 
 from notebook.data_export import download as spark_download
 from notebook.connectors.base import Api, QueryError, SessionExpired, _get_snippet_session
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

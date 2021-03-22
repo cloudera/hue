@@ -29,7 +29,6 @@ from django.db.models import Q
 from django.http import HttpResponse, QueryDict
 from django.shortcuts import redirect
 from django.utils.html import escape
-from django.utils.translation import ugettext as _
 from django.urls import reverse
 
 from desktop.appmanager import get_apps_dict
@@ -56,6 +55,11 @@ from beeswax.server import dbms
 from beeswax.server.dbms import expand_exception, get_query_server_config, QueryServerException
 
 from desktop.auth.backend import is_admin
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

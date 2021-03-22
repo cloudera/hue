@@ -26,7 +26,6 @@ import sys
 
 from django.urls import reverse
 from django.db.models import Q
-from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_GET, require_POST
 import opentracing.tracer
 
@@ -48,7 +47,9 @@ from notebook.models import escape_rows, make_notebook, upgrade_session_properti
 
 if sys.version_info[0] > 2:
   from urllib.parse import unquote as urllib_unquote
+  from django.utils.translation import gettext as _
 else:
+  from django.utils.translation import ugettext as _
   from urllib import unquote as urllib_unquote
 
 

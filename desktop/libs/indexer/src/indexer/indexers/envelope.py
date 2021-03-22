@@ -17,9 +17,9 @@
 from builtins import object
 import logging
 import os
+import sys
 
 from django.urls import reverse
-from django.utils.translation import ugettext as _
 
 from hadoop.fs.hadoopfs import Hdfs
 from indexer.conf import CONFIG_JARS_LIBS_PATH, config_morphline_path
@@ -28,6 +28,11 @@ from notebook.models import make_notebook
 from useradmin.models import User
 
 from desktop.lib.exceptions_renderable import PopupException
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

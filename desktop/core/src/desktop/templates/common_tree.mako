@@ -22,7 +22,11 @@
 #
 
 <%!
-  from django.utils.translation import ugettext as _
+  import sys
+  if sys.version_info[0] > 2:
+    from django.utils.translation import gettext as _
+  else:
+    from django.utils.translation import ugettext as _
 %>
 
 <%def name="import_templates(itemClick=None, iconClick=None, itemDblClick=None, itemSelected=None, iconModifier=None, styleModifier=None, styleModifierPullRight=None, showMore=None, anchorProperty=None, strikedProperty=None, itemChecked=None, component='')">

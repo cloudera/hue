@@ -28,16 +28,21 @@ See http://docs.djangoproject.com/en/1.2/topics/http/file-uploads/
 from builtins import object
 import errno
 import logging
+import sys
 import time
 
 from django.core.files.uploadhandler import FileUploadHandler, StopFutureHandlers, StopUpload, UploadFileException, SkipFile
-from django.utils.translation import ugettext as _
 
 from desktop.lib import fsmanager
 
 import hadoop.cluster
 from hadoop.conf import UPLOAD_CHUNK_SIZE
 from hadoop.fs.exceptions import WebHdfsException
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

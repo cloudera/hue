@@ -15,13 +15,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import sys
+
 from django.core.management.base import BaseCommand, CommandError
-from django.utils.translation import ugettext_lazy as _t, ugettext as _
 
 from desktop.conf import LDAP
 
 from useradmin import ldap_access
 from useradmin.views import import_ldap_users
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext_lazy as _t, gettext as _
+else:
+  from django.utils.translation import ugettext_lazy as _t, ugettext as _
 
 
 class Command(BaseCommand):

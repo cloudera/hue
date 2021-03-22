@@ -29,8 +29,6 @@ import sys
 
 from itertools import groupby
 
-from django.utils.translation import ugettext as _
-
 from dashboard.facet_builder import _compute_range_facet
 from dashboard.models import Collection2
 from desktop.lib.exceptions_renderable import PopupException
@@ -46,7 +44,9 @@ if sys.version_info[0] > 2:
   from urllib.parse import quote as urllib_quote
   from urllib.parse import unquote as urllib_unquote
   new_str = str
+  from django.utils.translation import gettext as _
 else:
+  from django.utils.translation import ugettext as _
   from urllib import quote as urllib_quote
   from urllib import unquote as urllib_unquote
   new_str = unicode

@@ -21,8 +21,8 @@ import json
 import logging
 import re
 import csv
+import sys
 
-from django.utils.translation import ugettext as _
 from django.utils.encoding import smart_str
 
 from desktop.lib import thrift_util
@@ -32,6 +32,10 @@ from hbase import conf
 from hbase.hbase_site import get_server_principal, get_server_authentication, is_using_thrift_ssl, is_using_thrift_http, get_thrift_transport
 from hbase.server.hbase_lib import get_thrift_type, get_client_type
 
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 LOG = logging.getLogger(__name__)
 

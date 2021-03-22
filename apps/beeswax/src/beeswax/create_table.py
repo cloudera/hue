@@ -26,10 +26,10 @@ import json
 import logging
 import math
 import re
+import sys
 
 from django.urls import reverse
 from django.http import QueryDict
-from django.utils.translation import ugettext as _
 
 from aws.s3.s3fs import S3FileSystemException
 from desktop.context_processors import get_app_name
@@ -48,6 +48,11 @@ from beeswax.forms import CreateTableForm, ColumnTypeFormSet,\
 from beeswax.server import dbms
 from beeswax.server.dbms import QueryServerException
 from beeswax.views import execute_directly
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

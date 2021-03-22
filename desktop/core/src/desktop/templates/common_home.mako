@@ -14,11 +14,16 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-  from django.utils.translation import ugettext as _
+  import sys 
 
   from desktop.views import commonheader, commonfooter, _ko
   from desktop import conf
   from desktop.auth.backend import is_admin
+
+  if sys.version_info[0] > 2:
+    from django.utils.translation import gettext as _
+  else:
+    from django.utils.translation import ugettext as _
 %>
 
 <%namespace name="docBrowser" file="/document_browser.mako" />

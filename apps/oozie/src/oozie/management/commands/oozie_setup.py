@@ -19,11 +19,11 @@ import json
 import logging
 import os
 from lxml import etree
+import sys
 
 from django.core import management
 from django.core.management.base import BaseCommand
 from django.db import transaction
-from django.utils.translation import ugettext as _
 
 from desktop.conf import USE_NEW_EDITOR
 from desktop.models import Directory, Document, Document2, Document2Permission
@@ -38,6 +38,11 @@ from oozie.models import Workflow, Coordinator, Bundle
 from oozie.importlib.workflows import import_workflow_root
 from oozie.importlib.coordinators import import_coordinator_root
 from oozie.importlib.bundles import import_bundle_root
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

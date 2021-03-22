@@ -18,10 +18,9 @@
 from builtins import str
 
 import logging
+import sys
 
 from django.core.management.base import BaseCommand
-from django.utils.translation import ugettext as _
-
 
 from desktop.lib import django_mako
 from beeswax.server import dbms
@@ -30,6 +29,11 @@ from beeswax.server.dbms import get_query_server_config
 from beeswax.design import hql_query
 from beeswax import hive_site
 from useradmin.models import install_sample_user
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

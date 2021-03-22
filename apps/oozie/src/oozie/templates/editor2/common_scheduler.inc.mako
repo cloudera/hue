@@ -15,9 +15,13 @@
 ## limitations under the License.
 
 <%!
+import sys
 from builtins import range
 from desktop.views import _ko
-from django.utils.translation import ugettext as _
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 %>
 
 <%namespace name="utils" file="../utils.inc.mako" />

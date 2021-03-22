@@ -15,6 +15,10 @@
 ## limitations under the License.
 
 <%!
+import sys
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
   from django.utils.translation import ugettext as _
 %>
 

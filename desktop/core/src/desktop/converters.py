@@ -18,16 +18,21 @@
 from builtins import object
 import json
 import logging
+import sys
 import time
 
 from django.db import transaction
-from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.models import Document, DocumentPermission, DocumentTag, Document2, Directory, Document2Permission
 from notebook.api import _historify
 from notebook.models import import_saved_beeswax_query, import_saved_java_job, import_saved_mapreduce_job, \
   import_saved_pig_script, import_saved_shell_job
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

@@ -24,12 +24,11 @@ import logging
 import math
 import os
 import re
+import sys
 import time
 import urllib.parse
 
 from lxml import html
-
-from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.rest.http_client import HttpClient
@@ -39,10 +38,12 @@ from desktop.lib.view_util import big_filesizeformat, format_duration_in_millis
 from hadoop import cluster
 from hadoop.yarn.clients import get_log_client
 
-
-
 from jobbrowser.models import format_unixtime_ms
 
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 LOG = logging.getLogger(__name__)
 

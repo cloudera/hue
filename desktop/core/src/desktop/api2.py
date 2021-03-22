@@ -32,7 +32,6 @@ from django.db import transaction
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.utils.html import escape
-from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_POST
 
@@ -59,8 +58,10 @@ from desktop.views import serve_403_error
 
 if sys.version_info[0] > 2:
   from io import StringIO as string_io
+  from django.utils.translation import gettext as _
 else:
   from StringIO import StringIO as string_io
+  from django.utils.translation import ugettext as _
 
 LOG = logging.getLogger(__name__)
 

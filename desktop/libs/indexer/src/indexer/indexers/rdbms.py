@@ -17,10 +17,10 @@
 
 import json
 import logging
+import sys
 import uuid
 
 from django.urls import reverse
-from django.utils.translation import ugettext as _
 
 from librdbms.conf import DATABASES, get_database_password, get_server_choices, get_connector_name
 from librdbms.jdbc import Jdbc
@@ -32,6 +32,11 @@ from useradmin.models import User
 
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.i18n import smart_str
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

@@ -20,12 +20,14 @@ import sys
 
 import beeswax.hive_site
 
-from django.utils.translation import ugettext_lazy as _t, ugettext as _
-
 from desktop.conf import has_connectors
 from desktop.lib.exceptions import StructuredThriftTransportException
 from beeswax.settings import NICE_NAME
 
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext_lazy as _t, gettext as _
+else:
+  from django.utils.translation import ugettext_lazy as _t, ugettext as _
 
 LOG = logging.getLogger(__name__)
 

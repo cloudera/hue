@@ -15,10 +15,15 @@
 ## limitations under the License.
 
 <%!
-from django.utils.translation import ugettext as _
+import sys
 
 from desktop.views import commonheader_m, commonfooter_m, _ko
 from desktop import conf
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 %>
 
 <%namespace name="common_search" file="common_search.mako" />

@@ -17,9 +17,9 @@
 from builtins import object
 import logging
 import os
+import sys
 
 from django.urls import reverse
-from django.utils.translation import ugettext as _
 
 from libzookeeper.conf import zkensemble
 from indexer.conf import config_morphline_path
@@ -27,6 +27,11 @@ from metadata.manager_client import ManagerApi
 from useradmin.models import User
 
 from desktop.lib.exceptions_renderable import PopupException
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

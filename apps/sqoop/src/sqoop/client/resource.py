@@ -15,11 +15,15 @@
 # limitations under the License.
 
 import json
-
-from django.utils.translation import ugettext as _
+import sys
 
 from desktop.lib.python_util import force_dict_to_strings
 from desktop.lib.rest.resource import Resource
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 class SqoopResource(Resource):

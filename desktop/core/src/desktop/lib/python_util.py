@@ -23,11 +23,15 @@ import select
 import socket
 import sys
 
-from django.utils.translation import ugettext as _
 from desktop import conf
 from desktop.lib.i18n import smart_str
 
 from codecs import BOM_UTF8, BOM_UTF16_BE, BOM_UTF16_LE, BOM_UTF32_BE, BOM_UTF32_LE
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 BOMS = (
     (BOM_UTF8, "UTF-8"),

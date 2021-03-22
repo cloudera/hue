@@ -33,7 +33,6 @@ import time
 import urllib.request, urllib.error
 
 from django.utils.encoding import smart_str
-from django.utils.translation import ugettext as _
 
 import hadoop.conf
 import desktop.conf
@@ -48,9 +47,11 @@ from hadoop.hdfs_site import get_nn_sentry_prefixes, get_umask_mode, get_supergr
 
 if sys.version_info[0] > 2:
   from urllib.parse import unquote as urllib_quote, urlparse
+  from django.utils.translation import gettext as _
 else:
   from urllib import unquote as urllib_quote
   from urlparse import urlparse
+  from django.utils.translation import ugettext as _
 
 
 DEFAULT_HDFS_SUPERUSER = desktop.conf.DEFAULT_HDFS_SUPERUSER.get()

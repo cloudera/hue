@@ -20,6 +20,7 @@ from builtins import object
 import json
 import logging
 import os
+import sys
 import time
 import uuid
 
@@ -27,7 +28,6 @@ from tempfile import NamedTemporaryFile
 
 from django.core.cache import cache
 from django.utils.functional import wraps
-from django.utils.translation import ugettext as _
 
 from desktop.auth.backend import is_admin
 from desktop.lib.exceptions_renderable import PopupException
@@ -38,6 +38,11 @@ from libsentry.sentry_site import get_hive_sentry_provider
 from libsentry.privilege_checker import get_checker, MissingSentryPrivilegeException
 
 from metadata.conf import OPTIMIZER, get_optimizer_url
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

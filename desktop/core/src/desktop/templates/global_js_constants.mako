@@ -15,7 +15,7 @@
 ## limitations under the License.
 
 <%!
-  from django.utils.translation import ugettext as _
+  import sys
 
   from desktop import conf
   from desktop.auth.backend import is_admin, is_hue_admin
@@ -35,6 +35,11 @@
   from metastore.views import has_write_access
   from notebook.conf import ENABLE_NOTEBOOK_2, ENABLE_QUERY_ANALYSIS, ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_SQL_INDEXER, \
       get_ordered_interpreters, SHOW_NOTEBOOKS
+  
+  if sys.version_info[0] > 2:
+    from django.utils.translation import gettext as _
+  else:
+    from django.utils.translation import ugettext as _
 %>
 
 <%namespace name="sqlDocIndex" file="/sql_doc_index.mako" />

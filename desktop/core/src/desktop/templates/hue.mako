@@ -15,7 +15,7 @@
 ## limitations under the License.
 
 <%!
-  from django.utils.translation import ugettext as _
+  import sys
 
   from desktop import conf
   from desktop.conf import IS_MULTICLUSTER_ONLY, has_multi_clusters
@@ -32,6 +32,11 @@
 
   from desktop.auth.backend import is_admin
   from webpack_loader.templatetags.webpack_loader import render_bundle
+
+  if sys.version_info[0] > 2:
+    from django.utils.translation import gettext as _
+  else:
+    from django.utils.translation import ugettext as _
 %>
 
 <%namespace name="hueIcons" file="/hue_icons.mako" />

@@ -15,8 +15,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import sys
+
 from django import forms
-from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
 from desktop.lib.django_forms import simple_formset_factory, DependencyAwareForm
 from desktop.lib.django_forms import ChoiceOrOtherField, MultiForm, SubmitButton
@@ -24,6 +25,11 @@ from filebrowser.forms import PathField
 
 from beeswax import common
 from beeswax.models import SavedQuery
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _, gettext_lazy as _t
+else:
+  from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
 
 class DbForm(forms.Form):

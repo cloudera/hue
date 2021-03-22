@@ -19,8 +19,7 @@ import errno
 import logging
 import os.path
 import random
-
-from django.utils.translation import ugettext as _
+import sys
 
 from hadoop import confparse
 
@@ -28,6 +27,11 @@ from desktop.lib import security_util
 from desktop.lib.exceptions_renderable import PopupException
 
 from libsentry.conf import SENTRY_CONF_DIR, HOSTNAME, PORT
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

@@ -19,9 +19,9 @@ from __future__ import absolute_import
 import json
 import logging
 import socket
+import sys
 
 from django.utils.encoding import smart_str
-from django.utils.translation import ugettext as _
 
 from sqoop import client, conf
 from sqoop.client.exception import SqoopException
@@ -32,6 +32,11 @@ from desktop.lib.rest.http_client import RestException
 from sqoop.api.exception import handle_rest_exception
 from sqoop.api.utils import list_to_dict
 from django.views.decorators.cache import never_cache
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 __all__ = ['get_links', 'create_link', 'update_link', 'link', 'links', 'link_clone', 'link_delete']
 

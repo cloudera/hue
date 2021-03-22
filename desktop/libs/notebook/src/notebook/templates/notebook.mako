@@ -14,11 +14,15 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
+  import sys
   from desktop.auth.backend import is_admin
   from desktop.conf import ENABLE_CONNECTORS
   from desktop.views import commonfooter, commonshare
 
-  from django.utils.translation import ugettext as _
+  if sys.version_info[0] > 2:
+    from django.utils.translation import gettext as _
+  else:
+    from django.utils.translation import ugettext as _
 %>
 
 <%namespace name="configKoComponents" file="/config_ko_components.mako" />

@@ -15,8 +15,12 @@
 ## limitations under the License.
 
 <%!
+import sys
 from desktop.lib.i18n import smart_unicode
-from django.utils.translation import ugettext as _
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 %>
 
 <%def name="sqlSyntaxDropdown()">

@@ -14,7 +14,7 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-from django.utils.translation import ugettext as _
+import sys
 from webpack_loader.templatetags.webpack_loader import render_bundle
 
 from metadata.conf import has_optimizer, OPTIMIZER
@@ -25,6 +25,11 @@ from desktop.conf import USE_NEW_EDITOR
 from desktop.models import hue_version
 from desktop.lib.i18n import smart_unicode
 from desktop.webpack_utils import get_hue_bundles
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 home_url = url('desktop_views_home')
 if USE_NEW_EDITOR.get():

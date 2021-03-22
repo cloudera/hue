@@ -19,10 +19,9 @@
 from builtins import object
 import logging
 import json
+import sys
 
 from subprocess import call
-
-from django.utils.translation import ugettext as _
 
 from desktop.lib.rest.http_client import RestException, HttpClient
 from desktop.lib.rest.resource import Resource
@@ -30,6 +29,11 @@ from desktop.lib.i18n import smart_unicode
 
 from kafka.conf import KAFKA
 from libzookeeper.conf import zkensemble
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

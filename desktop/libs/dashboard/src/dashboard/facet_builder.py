@@ -26,6 +26,7 @@ import logging
 import math
 import numbers
 import re
+import sys
 import urllib.request, urllib.parse, urllib.error
 
 from datetime import datetime, timedelta
@@ -34,7 +35,10 @@ from math import log
 from time import mktime
 from dateutil.relativedelta import *
 
-from django.utils.translation import ugettext as _
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

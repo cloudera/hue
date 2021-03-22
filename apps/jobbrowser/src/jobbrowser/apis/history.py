@@ -16,11 +16,10 @@
 # limitations under the License.
 
 import logging
+import sys
 
 from datetime import datetime
 from dateutil import parser
-
-from django.utils.translation import ugettext as _
 
 from desktop.models import Document2
 from notebook.api import _get_statement
@@ -28,6 +27,11 @@ from notebook.models import Notebook
 
 from jobbrowser.apis.base_api import Api
 from jobbrowser.conf import MAX_JOB_FETCH
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

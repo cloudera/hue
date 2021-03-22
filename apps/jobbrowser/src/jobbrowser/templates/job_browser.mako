@@ -14,7 +14,7 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%
-from django.utils.translation import ugettext as _
+import sys
 
 from desktop.conf import CUSTOM, IS_K8S_ONLY
 from desktop.views import commonheader, commonfooter, _ko
@@ -26,6 +26,11 @@ from notebook.conf import ENABLE_QUERY_SCHEDULING
 from jobbrowser.conf import DISABLE_KILLING_JOBS, MAX_JOB_FETCH, ENABLE_QUERY_BROWSER, ENABLE_HIVE_QUERY_BROWSER, ENABLE_QUERIES_LIST, ENABLE_HISTORY_V2
 
 from webpack_loader.templatetags.webpack_loader import render_bundle
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 %>
 
 <%

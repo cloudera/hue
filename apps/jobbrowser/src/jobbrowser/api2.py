@@ -17,11 +17,11 @@
 
 import json
 import logging
+import sys
 
 from urllib.request import Request, urlopen
 
 from django.http import HttpResponse
-from django.utils.translation import ugettext as _
 
 from desktop.lib.i18n import smart_unicode
 from desktop.lib.django_util import JsonResponse
@@ -31,6 +31,11 @@ from jobbrowser.apis.base_api import get_api
 from jobbrowser.apis.query_store import query_store_proxy, stream_download_bundle
 
 from jobbrowser.conf import DISABLE_KILLING_JOBS, USE_PROXY
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 LOG = logging.getLogger(__name__)
 

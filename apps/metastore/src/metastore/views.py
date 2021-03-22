@@ -20,13 +20,13 @@ standard_library.install_aliases()
 from builtins import str
 import json
 import logging
+import sys
 import urllib.request, urllib.parse, urllib.error
 
 from django.db.models import Q
 from django.urls import reverse
 from django.shortcuts import redirect
 from django.utils.functional import wraps
-from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_http_methods
 
 from desktop.conf import has_connectors
@@ -49,6 +49,11 @@ from metastore.forms import LoadDataForm, DbForm
 from metastore.settings import DJANGO_APPS
 
 from desktop.auth.backend import is_admin
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

@@ -16,7 +16,7 @@
 
 <%!
 import logging
-from django.utils.translation import ugettext as _
+import sys
 
 from desktop import conf
 from desktop.lib.i18n import smart_unicode
@@ -24,6 +24,11 @@ from desktop.views import _ko
 
 from beeswax.conf import DOWNLOAD_ROW_LIMIT, DOWNLOAD_BYTES_LIMIT
 from notebook.conf import ENABLE_SQL_INDEXER
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 %>
 
 

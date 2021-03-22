@@ -14,10 +14,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.import logging
 
+import sys
+
 from builtins import object
-from django.utils.translation import ugettext as _
 
 from indexer.argument import TextArgument, CheckboxArgument, MappingArgument
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 class Operator(object):
