@@ -3,9 +3,9 @@ import React, { FC } from 'react';
 import hiveSyntaxParser from 'gethue/lib/parsers/hiveSyntaxParser';
 import hiveAutocompleteParser from 'gethue/lib/parsers/hiveAutocompleteParser';
 import Executor from 'gethue/lib/execution/executor';
-import SqlExecutable from 'gethue/src/apps/editor/execution/sqlExecutable';
-import { SetOptions, SqlReferenceProvider, UdfCategory } from 'gethue/src/sql/reference/types'
-import { ActiveStatementChangedEvent } from 'gethue/src/apps/editor/components/aceEditor/types';
+import SqlExecutable from 'gethue/apps/editor/execution/sqlExecutable';
+import { SetOptions, SqlReferenceProvider, UdfCategory } from 'gethue/sql/reference/types'
+import { ActiveStatementChangedEvent } from 'gethue/apps/editor/components/aceEditor/types';
 
 const sqlReferenceProvider: SqlReferenceProvider = {
   async getReservedKeywords(dialect: string): Promise<Set<string>> {
@@ -60,7 +60,7 @@ export const QueryEditor: FC<QueryEditorProps> = React.memo(({ executor, id, set
     executor.update(activeStatementChangedEvent.detail, false);
     setActiveExecutable(executor.activeExecutable);
   })
-  
+
   //nodeElement.addEventListener('value-changed', event => {
   //  // event.detail contains the value
   //})

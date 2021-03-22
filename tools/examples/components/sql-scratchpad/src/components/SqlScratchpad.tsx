@@ -3,12 +3,12 @@ import React from 'react';
 import hueComponents from 'gethue/lib/components/QueryEditorWebComponents';
 import hueConfig from 'gethue/lib/config/hueConfig';
 import Executor from 'gethue/lib/execution/executor';
+import SqlExecutable from 'gethue/apps/editor/execution/sqlExecutable';
 
 import { QueryEditor } from './QueryEditor';
 import { ExecuteButton } from './ExecuteButton';
 import { ExecuteProgress } from './ExecuteProgress';
 import { ResultTable } from './ResultTable';
-import SqlExecutable from 'gethue/src/apps/editor/execution/sqlExecutable';
 import {ExecuteLimit} from "./ExecuteLimit";
 
 const HUE_BASE_URL = 'http://localhost:8888'
