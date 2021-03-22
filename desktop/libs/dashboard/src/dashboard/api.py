@@ -47,9 +47,9 @@ from dashboard.models import Collection2, augment_solr_response, pairwise2, augm
   NESTED_FACET_FORM, COMPARE_FACET, QUERY_FACET, extract_solr_exception_message
 
 if sys.version_info[0] > 2:
-    from django.utils.encoding import force_text as force_unicode
+    from django.utils.encoding import force_str
 else:
-    from django.utils.encoding import force_unicode
+    from django.utils.encoding import force_unicode as force_str
 
 LOG = logging.getLogger(__name__)
 
@@ -77,7 +77,7 @@ def search(request):
     except Exception as e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
-      response['error'] = force_unicode(e)
+      response['error'] = force_str(e)
   else:
     response['error'] = _('There is no collection to search.')
 
@@ -105,7 +105,7 @@ def query_suggest(request):
     result['response'] = response
     result['status'] = 0
   except Exception as e:
-    result['message'] = force_unicode(e)
+    result['message'] = force_str(e)
 
   return JsonResponse(result)
 
@@ -131,7 +131,7 @@ def index_fields_dynamic(request):
     ]
     result['status'] = 0
   except Exception as e:
-    result['message'] = force_unicode(e)
+    result['message'] = force_str(e)
 
   return JsonResponse(result)
 
@@ -150,7 +150,7 @@ def nested_documents(request):
     result['status'] = 0
   except Exception as e:
     LOG.exception('Failed to list nested documents')
-    result['message'] = force_unicode(e)
+    result['message'] = force_str(e)
     result['has_nested_documents'] = False
 
   return JsonResponse(result)
@@ -177,7 +177,7 @@ def get_document(request):
       result['status'] = 1
 
   except Exception as e:
-    result['message'] = force_unicode(e)
+    result['message'] = force_str(e)
 
   return JsonResponse(result)
 
@@ -218,9 +218,9 @@ def update_document(request):
       result['message'] = json.loads(e.message)['error']['msg']
     except:
       LOG.exception('Failed to parse json response')
-      result['message'] = force_unicode(e)
+      result['message'] = force_str(e)
   except Exception as e:
-    result['message'] = force_unicode(e)
+    result['message'] = force_str(e)
 
   return JsonResponse(result)
 
@@ -243,7 +243,7 @@ def get_stats(request):
 
   except Exception as e:
     LOG.exception('Failed to get stats for field')
-    result['message'] = force_unicode(e)
+    result['message'] = force_str(e)
     if 'not currently supported' in result['message']:
       result['status'] = 1
       result['message'] = _('This field type does not support stats')
@@ -281,7 +281,7 @@ def get_terms(request):
     result['message'] = ''
 
   except Exception as e:
-    result['message'] = force_unicode(e)
+    result['message'] = force_str(e)
     if 'not currently supported' in result['message']:
       result['status'] = 1
       result['message'] = _('This field does not support stats')
@@ -362,7 +362,7 @@ def get_timeline(request):
     result['status'] = 0
     result['message'] = ''
   except Exception as e:
-    result['message'] = force_unicode(e)
+    result['message'] = force_str(e)
 
   return JsonResponse(result)
 
@@ -385,7 +385,7 @@ def new_facet(request):
     result['facet'] = _create_facet(collection, request.user, facet_id, facet_label, facet_field, widget_type, window_size)
     result['status'] = 0
   except Exception as e:
-    result['message'] = force_unicode(e)
+    result['message'] = force_str(e)
 
   return JsonResponse(result)
 
@@ -570,7 +570,7 @@ def get_range_facet(request):
     result['status'] = 0
 
   except Exception as e:
-    result['message'] = force_unicode(e)
+    result['message'] = force_str(e)
 
   return JsonResponse(result)
 
@@ -590,7 +590,7 @@ def get_collection(request):
     result['status'] = 0
 
   except Exception as e:
-    result['message'] = force_unicode(e)
+    result['message'] = force_str(e)
 
   return JsonResponse(result)
 
@@ -610,6 +610,6 @@ def get_collections(request):
       result['status'] = 0
       result['collection'] = [json.loads(request.POST.get('collection'))['name']]
     else:
-      result['message'] = force_unicode(e)
+      result['message'] = force_str(e)
 
   return JsonResponse(result)

@@ -46,10 +46,10 @@ from hadoop.fs import normpath, SEEK_SET, SEEK_CUR, SEEK_END
 from hadoop.fs.exceptions import PermissionDeniedException
 
 if sys.version_info[0] > 2:
-  from django.utils.encoding import force_text as force_unicode
+  from django.utils.encoding import force_str
   from urllib.parse import urlsplit as lib_urlsplit
 else:
-  from django.utils.encoding import force_unicode
+  from django.utils.encoding import force_unicode as force_str
   from urlparse import urlsplit as lib_urlsplit
 
 LOG = logging.getLogger(__name__)
@@ -78,7 +78,7 @@ def encode_fs_path(path):
 
 def decode_fs_path(path):
   """decode_fs_path(bytestring) -> unicode path"""
-  return force_unicode(path, HDFS_ENCODING, errors='strict')
+  return force_str(path, HDFS_ENCODING, errors='strict')
 
 
 def _coerce_exceptions(function):
@@ -91,8 +91,8 @@ def _coerce_exceptions(function):
     try:
       return function(*args, **kwargs)
     except Exception as e:
-      e.msg = force_unicode(e.msg, errors='replace')
-      e.stack = force_unicode(e.stack, errors='replace')
+      e.msg = force_str(e.msg, errors='replace')
+      e.stack = force_str(e.stack, errors='replace')
       LOG.exception("Exception in Hadoop FS call " + function.__name__)
       if e.clazz == HADOOP_ACCESSCONTROLEXCEPTION:
         raise PermissionDeniedException(e.msg, e)

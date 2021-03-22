@@ -61,10 +61,10 @@ from oozie.timezones import TIMEZONES
 
 if sys.version_info[0] > 2:
   from io import BytesIO as string_io
-  from django.utils.encoding import force_text as force_unicode
+  from django.utils.encoding import force_str
 else:
   from cStringIO import StringIO as string_io
-  from django.utils.encoding import force_unicode
+  from django.utils.encoding import force_unicode as force_str
 
 
 LOG = logging.getLogger(__name__)
@@ -173,8 +173,8 @@ class Job(models.Model):
     return self.deployment_dir != '' and fs.exists(self.deployment_dir)
 
   def __str__(self):
-    res = '%s - %s' % (force_unicode(self.name), self.owner)
-    return force_unicode(res)
+    res = '%s - %s' % (force_str(self.name), self.owner)
+    return force_str(res)
 
   def get_full_node(self):
     try:
@@ -588,7 +588,7 @@ class Workflow(Job):
       mapping = {}
     tmpl = 'editor/gen/workflow.xml.mako'
     xml = re.sub(re.compile('\s*\n+', re.MULTILINE), '\n', django_mako.render_to_string(tmpl, {'workflow': self, 'mapping': mapping}))
-    return force_unicode(xml)
+    return force_str(xml)
 
   def compress(self, mapping=None, fp=string_io()):
     metadata = {
@@ -1895,7 +1895,7 @@ class Bundle(Job):
       mapping = {}
     tmpl = "editor/gen/bundle.xml.mako"
 
-    return force_unicode(
+    return force_str(
               re.sub(re.compile('\s*\n+', re.MULTILINE), '\n', django_mako.render_to_string(tmpl, {
                 'bundle': self,
                 'mapping': mapping

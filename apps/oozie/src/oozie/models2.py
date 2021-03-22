@@ -58,9 +58,9 @@ from oozie.utils import utc_datetime_format, UTC_TIME_FORMAT, convert_to_server_
 from oozie.importlib.workflows import generate_v2_graph_nodes, MalformedWfDefException, InvalidTagWithNamespaceException
 
 if sys.version_info[0] > 2:
-  from django.utils.encoding import force_text as force_unicode
+  from django.utils.encoding import force_str
 else:
-  from django.utils.encoding import force_unicode
+  from django.utils.encoding import force_unicode as force_str
 
 WORKFLOW_DEPTH_LIMIT = 24
 LOG = logging.getLogger(__name__)
@@ -93,7 +93,7 @@ class Job(object):
     }))
 
   def __str__(self):
-    return '%s' % force_unicode(self.name)
+    return '%s' % force_str(self.name)
 
   def deployment_dir(self):
     return None
@@ -497,7 +497,7 @@ class Workflow(Job):
       'node_mapping': node_mapping,
       'workflow_mapping': workflow_mapping
     }))
-    return force_unicode(xml.strip())
+    return force_str(xml.strip())
 
   def get_absolute_url(self):
     return reverse('oozie:edit_workflow') + '?workflow=%s' % self.id if self.document else ''
@@ -3754,7 +3754,7 @@ class Bundle(Job):
 
     mapping.update(dict(list(self.get_coordinator_docs().values('uuid', 'name'))))
     tmpl = "editor2/gen/bundle.xml.mako"
-    return force_unicode(
+    return force_str(
               re.sub(re.compile('\s*\n+', re.MULTILINE), '\n', django_mako.render_to_string(tmpl, {
                 'bundle': self,
                 'mapping': mapping
