@@ -24,9 +24,9 @@ import sys
 import traceback
 
 if sys.version_info[0] > 2:
-  from django.utils.encoding import force_text as force_unicode
+  from django.utils.encoding import force_str
 else:
-  from django.utils.encoding import force_unicode
+  from django.utils.encoding import force_unicode as force_str
 
 import desktop.lib.django_util
 
@@ -64,9 +64,9 @@ class PopupException(Exception):
 
   def response(self, request):
     data = {
-      'title': force_unicode(self.title),
-      'message': force_unicode(self.message),
-      'detail': force_unicode(self.detail) if self.detail else None,
+      'title': force_str(self.title),
+      'message': force_str(self.message),
+      'detail': force_str(self.detail) if self.detail else None,
       'traceback': self.traceback,
       'is_embeddable': request.GET.get('is_embeddable', False)
     }

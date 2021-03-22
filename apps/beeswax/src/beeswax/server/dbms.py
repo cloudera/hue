@@ -53,9 +53,9 @@ from beeswax.models import QueryHistory, QUERY_TYPES
 
 
 if sys.version_info[0] > 2:
-  from django.utils.encoding import force_text as force_unicode
+  from django.utils.encoding import force_str
 else:
-  from django.utils.encoding import force_unicode
+  from django.utils.encoding import force_unicode as force_str
 
 
 LOG = logging.getLogger(__name__)
@@ -1292,5 +1292,5 @@ def expand_exception(exc, db, handle=None):
   if not exc.args or not exc.args[0]:
     error_message = _("Unknown exception.")
   else:
-    error_message = force_unicode(exc.args[0], strings_only=True, errors='replace')
+    error_message = force_str(exc.args[0], strings_only=True, errors='replace')
   return error_message, log

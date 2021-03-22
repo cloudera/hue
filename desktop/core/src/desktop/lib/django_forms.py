@@ -40,10 +40,10 @@ from desktop.lib.i18n import smart_str
 if sys.version_info[0] > 2:
   import urllib.request, urllib.error
   from urllib.parse import quote_plus as urllib_quote_plus
-  from django.utils.encoding import force_text as force_unicode
+  from django.utils.encoding import force_str
 else:
   from urllib import quote_plus as urllib_quote_plus
-  from django.utils.encoding import force_unicode
+  from django.utils.encoding import force_unicode as force_str
 
 LOG = logging.getLogger(__name__)
 
@@ -352,7 +352,7 @@ class SubmitButton(Input):
 
     if value != '':
       # Only add the 'value' attribute if a value is non-empty.
-      final_attrs['value'] = force_unicode(value)
+      final_attrs['value'] = force_str(value)
     return mark_safe(u'<button%s>%s</button>' % (flatatt(final_attrs), getattr(self, "label", "Submit")))
 
 
