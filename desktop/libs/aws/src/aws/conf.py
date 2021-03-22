@@ -140,7 +140,7 @@ def get_region(conf=None):
 
   # If the parsed out region is not in the list of supported regions, fallback to the default
   if region not in get_locations():
-    LOG.warn("Region, %s, not found in the list of supported regions: %s" % (region, ', '.join(get_locations())))
+    LOG.warning("Region, %s, not found in the list of supported regions: %s" % (region, ', '.join(get_locations())))
     region = ''
 
   REGION_CACHED = region

@@ -88,7 +88,7 @@ def error_handler(view_fn):
 
       if re.search('database is locked|Invalid query handle|not JSON serializable', message, re.IGNORECASE):
         response['status'] = 2 # Frontend will not display this type of error
-        LOG.warn('error_handler silencing the exception: %s' % e)
+        LOG.warning('error_handler silencing the exception: %s' % e)
       return JsonResponse(response)
   return decorator
 

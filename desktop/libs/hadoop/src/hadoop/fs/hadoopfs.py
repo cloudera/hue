@@ -486,7 +486,7 @@ class FileUpload(object):
 
     self.closed = True
     if stderr:
-      LOG.warn("HDFS FileUpload (cmd='%s', env='%s') outputted stderr:\n%s" %
+      LOG.warning("HDFS FileUpload (cmd='%s', env='%s') outputted stderr:\n%s" %
                    (repr(self.subprocess_cmd), repr(self.subprocess_env), stderr))
     if stdout:
       LOG.info("HDFS FileUpload (cmd='%s', env='%s') outputted stdout:\n%s" %

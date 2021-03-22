@@ -389,7 +389,7 @@ def alter_table(request, database, table):
 
     # Cannot modify both name and comment at same time, name will get precedence
     if new_table_name and comment:
-      LOG.warn('Cannot alter both table name and comment at the same time, will perform rename.')
+      LOG.warning('Cannot alter both table name and comment at the same time, will perform rename.')
 
     table_obj = db.alter_table(database, table, new_table_name=new_table_name, comment=comment)
 

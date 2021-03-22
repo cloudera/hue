@@ -150,7 +150,7 @@ def get_next_ha_yarncluster(current_user=None):
               LOG.info('RM %s has failed back to %s server' % (MR_NAME_CACHE, name))
               rm.from_failover = True
             MR_NAME_CACHE = name
-            LOG.warn('Picking RM HA: %s' % name)
+            LOG.warning('Picking RM HA: %s' % name)
             return (config, rm)
           else:
             LOG.info('RM %s is not RUNNING, skipping it: %s' % (name, cluster_info))

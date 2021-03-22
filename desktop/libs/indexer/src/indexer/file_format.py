@@ -596,7 +596,7 @@ class CSVFormat(FileFormat):
       fields = [Field(header[i], types[i]) for i in range(len(header))]
     else:
       # likely failed to guess correctly
-      LOG.warn("Guess field types failed - number of headers didn't match number of predicted types.")
+      LOG.warning("Guess field types failed - number of headers didn't match number of predicted types.")
       fields = []
 
     return fields

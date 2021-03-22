@@ -61,7 +61,7 @@ LOG = logging.getLogger(__name__)
 try:
   from beeswax.hive_site import hiveserver2_impersonation_enabled
 except:
-  LOG.warn('Hive is not enabled')
+  LOG.warning('Hive is not enabled')
   def hiveserver2_impersonation_enabled(): return True
 
 from jobbrowser.conf import LOG_OFFSET, SHARE_JOBS
@@ -83,7 +83,7 @@ def check_job_permission(view_func):
     try:
       job = get_job(request, job_id=jobid)
     except ApplicationNotRunning as e:
-      LOG.warn('Job %s has not yet been accepted by the RM, will poll for status.' % jobid)
+      LOG.warning('Job %s has not yet been accepted by the RM, will poll for status.' % jobid)
       return job_not_assigned(request, jobid, request.path)
 
     if not SHARE_JOBS.get() and not is_admin(request.user) \
@@ -315,7 +315,7 @@ def kill_job(request, job):
     try:
       job = api.get_job(jobid=job.jobId)
     except Exception as e:
-      LOG.warn('Failed to get job with ID %s: %s' % (job.jobId, e))
+      LOG.warning('Failed to get job with ID %s: %s' % (job.jobId, e))
     else:
       if job.status not in ["RUNNING", "QUEUED"]:
         if request.GET.get("next"):

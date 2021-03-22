@@ -109,7 +109,7 @@ class DocumentConverter(object):
           self.failed_doc_ids.append(doc.id)
           LOG.exception('Failed to import SavedQuery document id: %d' % doc.id)
     except ImportError:
-      LOG.warn('Cannot convert Saved Query documents: beeswax app is not installed')
+      LOG.warning('Cannot convert Saved Query documents: beeswax app is not installed')
 
 
   def _convert_query_histories(self):
@@ -145,7 +145,7 @@ class DocumentConverter(object):
           self.failed_doc_ids.append(doc.id)
           LOG.exception('Failed to import history document id: %d' % doc.id)
     except ImportError as e:
-      LOG.warn('Cannot convert history documents: beeswax app is not installed')
+      LOG.warning('Cannot convert history documents: beeswax app is not installed')
 
 
   def _convert_job_designs(self):
@@ -191,7 +191,7 @@ class DocumentConverter(object):
           self.failed_doc_ids.append(doc.id)
           LOG.exception('Failed to import Job Designer document id: %d' % doc.id)
     except ImportError as e:
-      LOG.warn('Cannot convert Job Designer documents: oozie app is not installed')
+      LOG.warning('Cannot convert Job Designer documents: oozie app is not installed')
 
 
   def _convert_pig_scripts(self):
@@ -220,7 +220,7 @@ class DocumentConverter(object):
           self.failed_doc_ids.append(doc.id)
           LOG.exception('Failed to import Pig document id: %d' % doc.id)
     except ImportError as e:
-      LOG.warn('Cannot convert Pig documents: pig app is not installed')
+      LOG.warning('Cannot convert Pig documents: pig app is not installed')
 
 
   def _get_unconverted_docs(self, content_type, only_history=False):

@@ -39,7 +39,7 @@ try:
   from oozie.conf import OOZIE_JOBS_COUNT
   from oozie.views.dashboard import list_oozie_coordinator, get_oozie_job_log, massaged_oozie_jobs_for_json, has_job_edition_permission
 except Exception as e:
-  LOG.warn('Some application are not enabled: %s' % e)
+  LOG.warning('Some application are not enabled: %s' % e)
 
 
 class ScheduleApi(Api):

@@ -60,7 +60,7 @@ def get_next_available_server(client_class, username, failed_host=None, componen
   attempted_hosts = []
 
   while has_next:
-    LOG.warn('Could not connect to Sentry server %s, attempting to fetch next available client.' % current_host)
+    LOG.warning('Could not connect to Sentry server %s, attempting to fetch next available client.' % current_host)
     next_server = get_sentry_server(current_host=current_host)
     time.sleep(1)
     try:

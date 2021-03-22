@@ -57,7 +57,7 @@ LOG = logging.getLogger(__name__)
 try:
   from search.conf import EMPTY_QUERY, SECURITY_ENABLED, SOLR_URL
 except ImportError as e:
-  LOG.warn('Solr Search is not enabled')
+  LOG.warning('Solr Search is not enabled')
 
 
 def utf_quoter(what):
@@ -565,7 +565,7 @@ class SolrApi(object):
         return False
     except RestException as e:
       if 'already exists' in e.message:
-        LOG.warn("Could not create collection.", exc_info=True)
+        LOG.warning("Could not create collection.", exc_info=True)
         return False
       else:
         raise PopupException(e, title=_('Error while accessing Solr'))

@@ -423,7 +423,7 @@ class DocumentManager(models.Manager):
       doc.tags.add(tag)
       return doc
     else:
-      LOG.warn('Object %s already has documents: %s' % (content_object, content_object.doc.all()))
+      LOG.warning('Object %s already has documents: %s' % (content_object, content_object.doc.all()))
       return content_object.doc.all()[0]
 
   def sync(self, doc2_only=True):
@@ -784,7 +784,7 @@ class Document(models.Model):
       else:
         return staticfiles_storage.url('desktop/art/icon_hue_48.png')
     except Exception as e:
-      LOG.warn(force_unicode(e))
+      LOG.warning(force_unicode(e))
       return staticfiles_storage.url('desktop/art/icon_hue_48.png')
 
   def share(self, users, groups, name='read'):
@@ -1284,7 +1284,7 @@ class Document2(models.Model):
       else:
         url = reverse('oozie:edit_workflow') + '?workflow=' + str(self.id)
     except NoReverseMatch:
-      LOG.warn('Could not perform reverse lookup for type %s, app may be blacklisted.' % self.type)
+      LOG.warning('Could not perform reverse lookup for type %s, app may be blacklisted.' % self.type)
     return url
 
   def to_dict(self):
@@ -2213,7 +2213,7 @@ def get_user_preferences(user, key=None):
       return None
     except UserPreferences.MultipleObjectsReturned:
       for dup in UserPreferences.objects.filter(user=user, key=key)[1:]:
-        LOG.warn('Deleting UserPreferences duplicate %s' % dup)
+        LOG.warning('Deleting UserPreferences duplicate %s' % dup)
         dup.delete()
       x = UserPreferences.objects.get(user=user, key=key)
       return {key: x.value}

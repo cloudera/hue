@@ -834,7 +834,7 @@ def is_thrift_struct(o):
 # Same in resource.py for not losing the trace class
 def log_if_slow_call(duration, message):
   if duration >= math.floor(WARN_LEVEL_CALL_DURATION_MS / 1000):
-    LOG.warn('SLOW: %.2f - %s' % (duration, message))
+    LOG.warning('SLOW: %.2f - %s' % (duration, message))
   elif duration >= math.floor(INFO_LEVEL_CALL_DURATION_MS / 1000):
     LOG.info('SLOW: %.2f - %s' % (duration, message))
   else:

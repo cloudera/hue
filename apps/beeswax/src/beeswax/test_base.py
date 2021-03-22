@@ -353,7 +353,7 @@ def verify_history(client, fragment, design=None, reverse=False, server_name='be
     except KeyError:
       pass
 
-  LOG.warn('Cannot find history size. Response context clobbered')
+  LOG.warning('Cannot find history size. Response context clobbered')
   return -1
 
 
@@ -478,7 +478,7 @@ class BeeswaxSampleProvider(object):
       cls._make_table(table_info['name'], CREATE_TABLE % table_info, data_file % 2)
 
       if is_live_cluster():
-        LOG.warn('HUE-2884: We cannot create Hive UTF8 tables when live cluster testing at the moment')
+        LOG.warning('HUE-2884: We cannot create Hive UTF8 tables when live cluster testing at the moment')
       else:
         # Create a "test_utf8" table.
         table_info = {'db': cls.db_name, 'name': 'test_utf8', 'comment': cls.get_i18n_table_comment()}

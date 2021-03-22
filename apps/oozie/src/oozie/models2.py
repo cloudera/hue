@@ -294,7 +294,7 @@ class Workflow(Job):
     try:
       _get_hierarchy_from_adj_list(adj_list, adj_list['start']['ok_to'], node_hierarchy)
     except WorkflowDepthReached:
-      LOG.warn("The Workflow: %s with id: %s, has reached the maximum allowed depth for Graph display " \
+      LOG.warning("The Workflow: %s with id: %s, has reached the maximum allowed depth for Graph display " \
         % (oozie_workflow.appName, oozie_workflow.id))
       # Hide graph same as when total nodes > 30
       return {}
@@ -844,7 +844,7 @@ class Node(object):
     if self.data['type'] == 'fork':
       links = [link for link in self.data['children'] if link['to'] in node_mapping]
       if len(links) != len(self.data['children']):
-        LOG.warn('Fork has some children links that do not exist, ignoring them: links %s, existing links %s, links %s, existing links %s' \
+        LOG.warning('Fork has some children links that do not exist, ignoring them: links %s, existing links %s, links %s, existing links %s' \
                  % (len(links), len(self.data['children']), links, self.data['children']))
         self.data['children'] = links
 
@@ -3118,8 +3118,8 @@ def import_workflow_from_hue_3_7(old_wf):
 
   [<Start: start>, <Pig: Pig>, [<Kill: kill>], [<End: end>]]
   [<Start: start>, <Java: TeraGenWorkflow>, <Java: TeraSort>, [<Kill: kill>], [<End: end>]]
-  [<Start: start>, [<Fork: fork-34>, [[<Mapreduce: Sleep-1>, <Mapreduce: Sleep-10>], 
-  [<Mapreduce: Sleep-5>, [<Fork: fork-38>, [[<Mapreduce: Sleep-3>], [<Mapreduce: Sleep-4>]], 
+  [<Start: start>, [<Fork: fork-34>, [[<Mapreduce: Sleep-1>, <Mapreduce: Sleep-10>],
+  [<Mapreduce: Sleep-5>, [<Fork: fork-38>, [[<Mapreduce: Sleep-3>], [<Mapreduce: Sleep-4>]],
   <Join: join-39>]]], <Join: join-35>], [<Kill: kill>], [<End: end>]]
   """
 

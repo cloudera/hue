@@ -95,7 +95,7 @@ class CollectionManagerController(object):
       for name in solr_cores:
         solr_cores[name]['isCoreOnly'] = True
     except Exception as e:
-      LOG.warn('No Zookeeper servlet running on Solr server: %s' % e)
+      LOG.warning('No Zookeeper servlet running on Solr server: %s' % e)
 
     solr_cores.update(solr_collections)
     solr_cores.update(solr_aliases)
@@ -109,7 +109,7 @@ class CollectionManagerController(object):
       autocomplete['configs'] = api.configs()
 
     except Exception as e:
-      LOG.warn('No Zookeeper servlet running on Solr server: %s' % e)
+      LOG.warning('No Zookeeper servlet running on Solr server: %s' % e)
 
     return autocomplete
 
@@ -120,7 +120,7 @@ class CollectionManagerController(object):
       field_data = api.fields(collection_or_core_name)
       fields = self._format_flags(field_data['schema']['fields'])
     except Exception as e:
-      LOG.warn('/luke call did not succeed: %s' % e)
+      LOG.warning('/luke call did not succeed: %s' % e)
       try:
         fields = api.schema_fields(collection_or_core_name)
         fields = Collection2._make_luke_from_schema_fields(fields)

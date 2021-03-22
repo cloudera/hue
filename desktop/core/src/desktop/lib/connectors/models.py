@@ -151,7 +151,7 @@ def _get_installed_connectors(category=None, categories=None, dialect=None, inte
     if full_connector:
       connectors.append(full_connector)
     else:
-      LOG.warn('Skipping connector %(id)s as connector dialect %(dialect)s or interface %(interface)s are not installed' % (
+      LOG.warning('Skipping connector %(id)s as connector dialect %(dialect)s or interface %(interface)s are not installed' % (
           {'id': connector['id'], 'dialect': connector['dialect'], 'interface': connector['interface']}
         )
       )

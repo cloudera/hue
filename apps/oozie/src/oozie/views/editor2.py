@@ -86,7 +86,7 @@ def open_old_workflow(request):
     _workflow = import_workflow_from_hue_3_7(workflow)
     return _edit_workflow(request, None, _workflow)
   except Exception as e:
-    LOG.warn('Could not open old worklow: %s' % smart_str(e))
+    LOG.warning('Could not open old worklow: %s' % smart_str(e))
     return old_edit_workflow(request, workflow=workflow.id)
 
 
@@ -531,7 +531,7 @@ def edit_coordinator(request):
       except Document2.DoesNotExist as e:
         document = None
         coordinator.data['properties']['workflow'] = ''
-        LOG.warn("Workflow with uuid %s doesn't exist: %s" % (scheduled_uuid, e))
+        LOG.warning("Workflow with uuid %s doesn't exist: %s" % (scheduled_uuid, e))
 
       if document and document.is_trashed:
         raise PopupException(_('Your workflow %s has been trashed!') % (document.name if document.name else ''))

@@ -74,7 +74,7 @@ def strip_scheme(path):
   assert_not_equal(filesystem, '', 'File System must be Specified')
   path = filesystem + '/' + file_path
   return path
-  
+
 def strip_path(path):
   """
   Return only the end of a path given another path
@@ -147,7 +147,7 @@ def abfspath(path, fs_defaultfs = None):
     try:
       fs_defaultfs = get_default_abfs_fs()
     except:
-      LOG.warn("Configuration for ABFS is not set, may run into errors")
+      LOG.warning("Configuration for ABFS is not set, may run into errors")
       return path
   filesystem, dir_name = ("","")
   try:
@@ -166,7 +166,7 @@ def abfspath(path, fs_defaultfs = None):
 
 def get_home_dir_for_ABFS():
   """
-  Attempts to go to the directory set by the user in the configuration file. If not defaults to abfs:// 
+  Attempts to go to the directory set by the user in the configuration file. If not defaults to abfs://
   """
   try:
     filesystem = parse_uri(get_default_abfs_fs())[0]

@@ -34,7 +34,7 @@ def _deprecation_check(arg0):
     to_use = os.path.join(os.path.dirname(arg0), 'hue')
     msg = "Warning: '%s' has been deprecated. Please use '%s' instead." % (arg0, to_use)
     print(msg, file=sys.stderr)
-    LOG.warn(msg)
+    LOG.warning(msg)
 
 def reload_with_cm_env(cm_managed):
   try:

@@ -46,7 +46,7 @@ def zkensemble():
       if clusters['default'].HOST_PORTS.get() != 'localhost:2181':
         return '%s' % clusters['default'].HOST_PORTS.get()
     except:
-      LOG.warn('Could not get zookeeper ensemble from the zookeeper app')
+      LOG.warning('Could not get zookeeper ensemble from the zookeeper app')
 
   if 'search' in settings.INSTALLED_APPS:
     try:
@@ -54,7 +54,7 @@ def zkensemble():
       parsed = urlparse(SOLR_URL.get())
       return "%s:2181" % (parsed.hostname or 'localhost')
     except:
-      LOG.warn('Could not get zookeeper ensemble from the search app')
+      LOG.warning('Could not get zookeeper ensemble from the search app')
 
   return "localhost:2181"
 

@@ -157,7 +157,7 @@ class DataAdapter(object):
 
       # For result sets with high num of columns, fetch in smaller batches to avoid serialization cost
       if self.num_cols > 100:
-        LOG.warn('The query results contain %d columns and may take long time to download, reducing fetch size to 100.' % self.num_cols)
+        LOG.warning('The query results contain %d columns and may take long time to download, reducing fetch size to 100.' % self.num_cols)
         self.fetch_size = 100
 
     if self.has_more and not self.is_truncated:
@@ -167,13 +167,13 @@ class DataAdapter(object):
       for row in results.rows():
         num_bytes = self._getsizeofascii(row)
         if self.limit_rows and self.row_counter + 1 > self.max_rows:
-          LOG.warn('The query results exceeded the maximum row limit of %d and has been truncated to first %d rows.' % (
+          LOG.warning('The query results exceeded the maximum row limit of %d and has been truncated to first %d rows.' % (
               self.max_rows, self.row_counter)
           )
           self.is_truncated = True
           break
         if self.limit_bytes and self.bytes_counter + num_bytes > self.max_bytes:
-          LOG.warn('The query results exceeded the maximum bytes limit of %d and has been truncated to first %d rows.' % (
+          LOG.warning('The query results exceeded the maximum bytes limit of %d and has been truncated to first %d rows.' % (
               self.max_bytes, self.row_counter)
           )
           self.is_truncated = True

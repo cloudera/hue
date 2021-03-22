@@ -121,7 +121,7 @@ def get_sentry_server(current_host=None):
         LOG.debug("Current Sentry host, %s, index is: %d." % (current_host, current_idx))
         next_idx = (current_idx + 1) % len(servers)
       except ValueError as e:
-        LOG.warn("Current host: %s not found in list of servers: %s" % (current_host, ','.join(hosts)))
+        LOG.warning("Current host: %s not found in list of servers: %s" % (current_host, ','.join(hosts)))
 
     server = servers[next_idx]
     LOG.debug("Returning Sentry host, %s, at next index: %d." % (server['hostname'], next_idx))

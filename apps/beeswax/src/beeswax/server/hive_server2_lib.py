@@ -180,7 +180,7 @@ class HiveServerTable(Table):
       end_cols_index = list(map(itemgetter('col_name'), rows[col_row_index:])).index('')
     except ValueError as e:
       end_cols_index = 5000
-      LOG.warn('Could not guess end column index, so defaulting to %s: %s' % (end_cols_index, e))
+      LOG.warning('Could not guess end column index, so defaulting to %s: %s' % (end_cols_index, e))
     return [{
           'col_name': prop['col_name'].strip() if prop['col_name'] else prop['col_name'],
           'data_type': prop['data_type'].strip() if prop['data_type'] else prop['data_type'],
@@ -1321,7 +1321,7 @@ class HiveServerTableCompatible(HiveServerTable):
       self.is_impala_only = 'org.apache.hadoop.hive.kudu.KuduSerDe' in str(hive_table.properties) or \
         'org.apache.kudu.mapreduce.KuduTableOutputFormat' in str(hive_table.properties) # Deprecated since CDP
     except Exception as e:
-      LOG.warn('Autocomplete data fetching error: %s' % e)
+      LOG.warning('Autocomplete data fetching error: %s' % e)
       self.is_impala_only = False
 
   @property

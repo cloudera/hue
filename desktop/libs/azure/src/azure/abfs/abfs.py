@@ -374,7 +374,7 @@ class ABFS(object):
   # --------------------------------
   def append(self, path, data, offset=0):
     if not data:
-      LOG.warn("There is no data to append to")
+      LOG.warning("There is no data to append to")
       return
     self._append(path, data)
     return self.flush(path, {'position' : int(len(data)) + int(offset)})
@@ -385,7 +385,7 @@ class ABFS(object):
     """
     path = Init_ABFS.strip_scheme(path)
     if params is None:
-      LOG.warn("Params not specified, Append will take longer")
+      LOG.warning("Params not specified, Append will take longer")
       resp = self._stats(path)
       params = {'position' : int(resp['Content-Length']) + offset, 'action' : 'append'}
     else:
@@ -405,10 +405,10 @@ class ABFS(object):
     """
     path = Init_ABFS.strip_scheme(path)
     if params is None:
-      LOG.warn("Params not specified")
+      LOG.warning("Params not specified")
       params = {'position' : 0}
     if 'position' not in params:
-      LOG.warn("Position is not specified")
+      LOG.warning("Position is not specified")
       params['position'] = 0
     params['action'] = 'flush'
     if headers is None:

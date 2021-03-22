@@ -203,7 +203,7 @@ class WebHdfs(Hdfs):
     except WebHdfsException as e:
       exceptions = ['IllegalArgumentException', 'UnsupportedOperationException']
       if any(x in e.message for x in exceptions):
-        LOG.warn('WebHDFS operation GETTRASHROOT is not implemented, returning default trash path: %s' % trash_path)
+        LOG.warning('WebHDFS operation GETTRASHROOT is not implemented, returning default trash path: %s' % trash_path)
       else:
         raise e
     return trash_path
@@ -712,7 +712,7 @@ class WebHdfs(Hdfs):
       return self._root.get(path, params, headers)
     except WebHdfsException as ex:
       if ex.code == 500 or ex.code == 400:
-        LOG.warn('Failed to check access to path %s, CHECKACCESS operation may not be supported.' % path)
+        LOG.warning('Failed to check access to path %s, CHECKACCESS operation may not be supported.' % path)
         return None
       else:
         raise ex

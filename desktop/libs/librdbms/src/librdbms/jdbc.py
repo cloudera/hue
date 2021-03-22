@@ -30,7 +30,7 @@ LOG = logging.getLogger(__name__)
 try:
   from py4j.java_gateway import JavaGateway, JavaObject
 except:
-  LOG.warn('Failed to import py4j')
+  LOG.warning('Failed to import py4j')
 
 
 def query_and_fetch(db, statement, n=None):

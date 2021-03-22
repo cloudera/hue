@@ -27,7 +27,7 @@ import urllib.request, urllib.parse, urllib.error
 try:
   import httplib2
 except ImportError:
-  LOG.warn('httplib2 module not found')
+  LOG.warning('httplib2 module not found')
 
 import django.contrib.auth.views
 from django.core.exceptions import SuspiciousOperation

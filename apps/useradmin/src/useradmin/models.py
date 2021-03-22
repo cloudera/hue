@@ -357,7 +357,7 @@ def install_sample_user(django_user=None):
         LOG.info('Installed a user "%s"' % lookup)
 
     if user.username != django_username and not ENABLE_ORGANIZATIONS.get():
-      LOG.warn('Sample user does not have username "%s", will attempt to modify the username.' % django_username)
+      LOG.warning('Sample user does not have username "%s", will attempt to modify the username.' % django_username)
       with transaction.atomic():
         user = User.objects.get(id=SAMPLE_USER_ID)
         user.username = django_username

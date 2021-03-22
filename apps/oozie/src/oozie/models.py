@@ -580,7 +580,7 @@ class Workflow(Job):
         workflow.delete(skip_trash=True)
         return graph, node_list
     except Exception as e:
-      LOG.warn('Workflow %s could not be converted to a graph: %s' % (oozie_workflow.id, e))
+      LOG.warning('Workflow %s could not be converted to a graph: %s' % (oozie_workflow.id, e))
 
     return None, []
 
@@ -1532,7 +1532,7 @@ class Coordinator(Job):
     if mapping is None:
       mapping = {}
     tmpl = "editor/gen/coordinator.xml.mako"
-    return re.sub(re.compile('\s*\n+', re.MULTILINE), '\n', 
+    return re.sub(re.compile('\s*\n+', re.MULTILINE), '\n',
       django_mako.render_to_string(tmpl, {'coord': self, 'mapping': mapping})).encode('utf-8', 'xmlcharrefreplace')
 
   def clone(self, new_owner=None):

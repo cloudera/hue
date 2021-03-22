@@ -91,7 +91,7 @@ class SolrClient(object):
 
     except Exception as e:
       msg = _('Solr server could not be contacted properly: %s') % e
-      LOG.warn(msg)
+      LOG.warning(msg)
       raise PopupException(msg, detail=smart_str(e))
 
     return sorted(indexes, key=lambda index: index['name'])
@@ -285,7 +285,7 @@ class SolrClient(object):
         if not zc.path_exists(root_node):
           zc.copy_path(root_node, config_root_path)
         else:
-          LOG.warn('Config %s already existing.' % name)
+          LOG.warning('Config %s already existing.' % name)
       except Exception as e:
         if zc.path_exists(root_node):
           zc.delete_path(root_node)

@@ -55,7 +55,7 @@ class TestJobsubWithHadoop(OozieServerProvider):
       except Exception as e:
         # chmod failure likely do to async processing of resource deletion.
         # If the directory has improper permissions, should fail later in the test case.
-        LOG.warn("Received the following exception while change mode attempt %d of /tmp: %s" % (i, str(e)))
+        LOG.warning("Received the following exception while change mode attempt %d of /tmp: %s" % (i, str(e)))
         time.sleep(1)
 
     self.design = self.create_design()

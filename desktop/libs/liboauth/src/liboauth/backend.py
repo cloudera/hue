@@ -37,11 +37,11 @@ import liboauth.metrics
 try:
   import httplib2
 except ImportError:
-  LOG.warn('httplib2 module not found')
+  LOG.warning('httplib2 module not found')
 try:
   import oauth2 as oauth
 except ImportError:
-  LOG.warn('oauth2 module not found')
+  LOG.warning('oauth2 module not found')
   oauth = None
 
 if sys.version_info[0] > 2:

@@ -48,7 +48,7 @@ def ha_error_handler(func):
       if not is_ha_enabled():
         raise PopupException(_('Failed to connect to Sentry server %s, and Sentry HA is not enabled.') % args[0].client.host, detail=e)
       else:
-        LOG.warn("Failed to connect to Sentry server %s, will attempt to find next available host." % args[0].client.host)
+        LOG.warning("Failed to connect to Sentry server %s, will attempt to find next available host." % args[0].client.host)
         server, attempts = get_next_available_server(client_class=SentryClient, username=args[0].client.username, failed_host=args[0].client.host, component=args[0].client.component)
         if server is not None:
           args[0].client = create_client(SentryClient, args[0].client.username, server, args[0].client.component)

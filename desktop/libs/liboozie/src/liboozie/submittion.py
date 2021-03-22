@@ -316,7 +316,7 @@ class Submission(object):
       if self._do_as(self.user.username , self.fs.exists, path):
         self._do_as(self.user.username , self.fs.rmtree, path)
     except Exception as ex:
-      LOG.warn("Failed to clean up workflow deployment directory for "
+      LOG.warning("Failed to clean up workflow deployment directory for "
                "%s (owner %s). Caused by: %s",
                self.job.name, self.user, ex)
 

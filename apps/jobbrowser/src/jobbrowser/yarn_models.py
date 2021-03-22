@@ -153,7 +153,7 @@ class SparkJob(Application):
       self.trackingUrl = actual_url
       LOG.debug("SparkJob tracking URL: %s" % self.trackingUrl)
     except Exception as e:
-      LOG.warn("Failed to resolve Spark Job's actual tracking URL: %s" % e)
+      LOG.warning("Failed to resolve Spark Job's actual tracking URL: %s" % e)
     finally:
       if resp is not None:
         resp.close()
@@ -163,7 +163,7 @@ class SparkJob(Application):
     try:
       response = function(*args, **kwargs)
     except Exception as e:
-      LOG.warn('Spark resolve tracking URL returned a failed response: %s' % e)
+      LOG.warning('Spark resolve tracking URL returned a failed response: %s' % e)
     return response
 
   def _get_metrics(self):
@@ -227,7 +227,7 @@ class Job(object):
     for attr in list(attrs.keys()):
       if attr == 'acls':
         # 'acls' are actually not available in the API
-        LOG.warn('Not using attribute: %s' % attrs[attr])
+        LOG.warning('Not using attribute: %s' % attrs[attr])
       else:
         setattr(self, attr, attrs[attr])
 
@@ -349,7 +349,7 @@ class YarnV2Job(Job):
     for attr in list(attrs.keys()):
       if attr == 'acls':
         # 'acls' are actually not available in the API
-        LOG.warn('Not using attribute: %s' % attrs[attr])
+        LOG.warning('Not using attribute: %s' % attrs[attr])
       else:
         setattr(self, attr, attrs[attr])
 
@@ -716,4 +716,3 @@ class Container(object):
     setattr(self, 'maxMapTasks', None)
     setattr(self, 'maxReduceTasks', None)
     setattr(self, 'taskReports', None)
-

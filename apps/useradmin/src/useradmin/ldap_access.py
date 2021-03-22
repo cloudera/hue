@@ -30,7 +30,7 @@ try:
   import ldap.filter
   from ldap import SCOPE_SUBTREE
 except ImportError:
-  LOG.warn('ldap module not found')
+  LOG.warning('ldap module not found')
   SCOPE_SUBTREE = None
 import re
 
@@ -244,7 +244,7 @@ class LdapConnection(object):
 
           # Skip unnamed entries.
           if user_name_attr not in data:
-            LOG.warn('Could not find %s in ldap attributes' % user_name_attr)
+            LOG.warning('Could not find %s in ldap attributes' % user_name_attr)
             continue
 
           ldap_info = {
@@ -255,12 +255,12 @@ class LdapConnection(object):
           if 'givenName' in data:
             first_name = smart_str(data['givenName'][0])
             if len(first_name) > 30:
-              LOG.warn('First name is truncated to 30 characters for [<User: %s>].' % ldap_info['username'])
+              LOG.warning('First name is truncated to 30 characters for [<User: %s>].' % ldap_info['username'])
             ldap_info['first'] = first_name[:30]
           if 'sn' in data:
             last_name = smart_str(data['sn'][0])
             if len(last_name) > 30:
-              LOG.warn('Last name is truncated to 30 characters for [<User: %s>].' % ldap_info['username'])
+              LOG.warning('Last name is truncated to 30 characters for [<User: %s>].' % ldap_info['username'])
             ldap_info['last'] = last_name[:30]
           if 'mail' in data:
             ldap_info['email'] = smart_str(data['mail'][0])
@@ -285,7 +285,7 @@ class LdapConnection(object):
 
           # Skip unnamed entries.
           if group_name_attr not in data:
-            LOG.warn('Could not find %s in ldap attributes' % group_name_attr)
+            LOG.warning('Could not find %s in ldap attributes' % group_name_attr)
             continue
 
           group_name = data[group_name_attr][0]
@@ -302,14 +302,14 @@ class LdapConnection(object):
           if group_member_attr in data and group_member_attr.lower() != 'memberuid':
             ldap_info['members'] = data[group_member_attr]
           else:
-            LOG.warn('Skipping import of non-posix users from group %s since group_member_attr '
+            LOG.warning('Skipping import of non-posix users from group %s since group_member_attr '
                      'is memberUid or group did not contain any members' % group_name)
             ldap_info['members'] = []
 
           if 'posixgroup' in (item.lower() for item in data['objectClass']) and 'memberUid' in data:
             ldap_info['posix_members'] = data['memberUid']
           else:
-            LOG.warn('Skipping import of posix users from group %s since posixGroup '
+            LOG.warning('Skipping import of posix users from group %s since posixGroup '
                      'not an objectClass or no memberUids found' % group_name)
             ldap_info['posix_members'] = []
 
@@ -376,7 +376,7 @@ class LdapConnection(object):
       else:
         return []
     except ldap.LDAPError as e:
-      LOG.warn("LDAP Error: %s" % e)
+      LOG.warning("LDAP Error: %s" % e)
 
     return None
 

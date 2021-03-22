@@ -68,4 +68,4 @@ class Command(BaseCommand):
       except Exception as e:
         msg = 'Failed to create user directories for user %s: %s' % (user.username, str(e))
         self.stdout.write(msg)
-        LOG.warn(msg)
+        LOG.warning(msg)

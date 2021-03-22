@@ -49,7 +49,7 @@ LOG = logging.getLogger(__name__)
 try:
   from beeswax.server import dbms
 except ImportError as e:
-  LOG.warn('Hive and HiveServer2 interfaces are not enabled')
+  LOG.warning('Hive and HiveServer2 interfaces are not enabled')
 
 
 class SQLIndexer(object):

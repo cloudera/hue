@@ -243,9 +243,9 @@ def dt_logout(request, next_page=None):
     try:
       get_api(request, session).close_session(session)
     except PopupException as e:
-      LOG.warn("Error closing %s session: %s" % (session_app, e.message.encode('utf-8')))
+      LOG.warning("Error closing %s session: %s" % (session_app, e.message.encode('utf-8')))
     except Exception as e:
-      LOG.warn("Error closing %s session: %s" % (session_app, e))
+      LOG.warning("Error closing %s session: %s" % (session_app, e))
 
   backends = get_backends()
   if backends:
@@ -256,10 +256,10 @@ def dt_logout(request, next_page=None):
           if response:
             return response
         except Exception as e:
-          LOG.warn('Potential error on logout for user: %s with exception: %s' % (username, e))
+          LOG.warning('Potential error on logout for user: %s with exception: %s' % (username, e))
 
   if len([backend for backend in backends if hasattr(backend, 'logout')]) == len(backends):
-    LOG.warn("Failed to log out from all backends for user: %s" % (username))
+    LOG.warning("Failed to log out from all backends for user: %s" % (username))
 
   response = django.contrib.auth.views.LogoutView.as_view(next_page=next_page)(request)
   response.delete_cookie(LOAD_BALANCER_COOKIE)

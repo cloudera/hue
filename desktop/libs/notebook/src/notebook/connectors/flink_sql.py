@@ -96,7 +96,7 @@ class FlinkSqlApi(Api):
       self.db.session_heartbeat(session_id=SESSIONS[session_key]['session_id'])
     except Exception as e:
       if 'Session: %(id)s does not exist' % SESSIONS[session_key] in str(e):
-        LOG.warn('Session: %(id)s does not exist, opening a new one' % SESSIONS[session_key])
+        LOG.warning('Session: %(id)s does not exist, opening a new one' % SESSIONS[session_key])
         SESSIONS[session_key] = self.db.create_session()
       else:
         raise e
@@ -174,7 +174,7 @@ class FlinkSqlApi(Api):
               status = 'expired'
           except Exception as e:
             if '%s does not exist in current session' % statement_id in str(e):
-              LOG.warn('Job: %s does not exist' % statement_id)
+              LOG.warning('Job: %s does not exist' % statement_id)
             else:
               raise e
 

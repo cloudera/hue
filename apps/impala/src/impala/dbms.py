@@ -179,7 +179,7 @@ class ImpalaDbms(HiveServer2Dbms):
         unique_values = set(histogram.split(', '))
         results = list(unique_values)
       except IndexError as e:
-        LOG.warn('Failed to get histogram results, result set has unexpected format: %s' % smart_str(e))
+        LOG.warning('Failed to get histogram results, result set has unexpected format: %s' % smart_str(e))
       finally:
         self.close(handle)
 
