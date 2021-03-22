@@ -65,7 +65,7 @@ try:
   from beeswax.server.dbms import get_query_server_config, QueryServerException
   from beeswax.views import parse_out_jobs, parse_out_queries
 except ImportError as e:
-  LOG.warn('Hive and HiveServer2 interfaces are not enabled: %s' % e)
+  LOG.warning('Hive and HiveServer2 interfaces are not enabled: %s' % e)
   hive_settings = None
 
 try:
@@ -73,7 +73,7 @@ try:
   from impala.conf import CONFIG_WHITELIST as impala_settings
   from impala.server import get_api as get_impalad_api, ImpalaDaemonApiException, _get_impala_server_url
 except ImportError as e:
-  LOG.warn("Impala app is not enabled")
+  LOG.warning("Impala app is not enabled")
   impala_settings = None
 
 try:
@@ -84,7 +84,7 @@ try:
   has_hive_query_browser = ENABLE_HIVE_QUERY_BROWSER.get()
   has_jobbrowser = True
 except (AttributeError, ImportError, RuntimeError) as e:
-  LOG.warn("Job Browser app is not enabled")
+  LOG.warning("Job Browser app is not enabled")
   has_jobbrowser = False
   has_query_browser = False
   has_hive_query_browser = False
@@ -217,7 +217,7 @@ class HS2Api(Api):
       decoded_guid = session.get_handle().sessionId.guid
       response['session_id'] = unpack_guid(decoded_guid)
     except Exception as e:
-      LOG.warn('Failed to decode session handle: %s' % e)
+      LOG.warning('Failed to decode session handle: %s' % e)
 
     if lang == 'impala' and session:
       http_addr = _get_impala_server_url(session)
@@ -665,7 +665,7 @@ DROP TABLE IF EXISTS `%(table)s`;
     if not isinstance(properties, list) or \
       not all(isinstance(prop, dict) for prop in properties) or \
       not all('key' in prop for prop in properties) or not all('value' in prop for prop in properties):
-      LOG.warn('Current properties are not formatted correctly, will replace with defaults.')
+      LOG.warning('Current properties are not formatted correctly, will replace with defaults.')
       return upgraded_properties
 
     valid_props_dict = dict((prop["key"], prop) for prop in upgraded_properties)
@@ -705,7 +705,7 @@ DROP TABLE IF EXISTS `%(table)s`;
     if not settings:
       session = self._get_session(notebook, 'hive')
       if not session:
-        LOG.warn('Cannot get jobs, failed to find active HS2 session for user: %s' % self.user.username)
+        LOG.warning('Cannot get jobs, failed to find active HS2 session for user: %s' % self.user.username)
       elif session.get('configuration') and session['configuration'].get('hive.execution.engine'):
         return session['configuration'].get('hive.execution.engine')
       else:
@@ -769,7 +769,7 @@ DROP TABLE IF EXISTS `%(table)s`;
     except KeyError:
       raise Exception('Operation has no valid handle attached')
     except binascii.Error:
-      LOG.warn('Handle already base 64 decoded')
+      LOG.warning('Handle already base 64 decoded')
 
     for key in list(handle.keys()):
       if key not in ('log_context', 'secret', 'has_result_set', 'operation_type', 'modified_row_count', 'guid'):
@@ -894,9 +894,9 @@ DROP TABLE IF EXISTS `%(table)s`;
       try:
         guid = unpack_guid_base64(snippet['result']['handle']['guid'])
       except Exception as e:
-        LOG.warn('Failed to decode operation handle guid: %s' % e)
+        LOG.warning('Failed to decode operation handle guid: %s' % e)
     else:
-      LOG.warn('Snippet does not contain a valid result handle, cannot extract Impala query ID.')
+      LOG.warning('Snippet does not contain a valid result handle, cannot extract Impala query ID.')
     return guid
 
 

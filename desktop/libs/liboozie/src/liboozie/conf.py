@@ -103,7 +103,7 @@ def config_validator(user):
   try:
     from oozie.conf import REMOTE_SAMPLE_DIR
   except Exception as e:
-    LOG.warn('Config check failed because Oozie app not installed: %s' % e)
+    LOG.warning('Config check failed because Oozie app not installed: %s' % e)
     return res
 
   apps = appmanager.get_apps_dict(user)

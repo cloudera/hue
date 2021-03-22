@@ -321,7 +321,7 @@ def test_yarn_configurations(user):
   try:
     from jobbrowser.api import get_api # Required for cluster HA testing
   except Exception as e:
-    LOG.warn('Jobbrowser is disabled, skipping test_yarn_configurations')
+    LOG.warning('Jobbrowser is disabled, skipping test_yarn_configurations')
     return result
 
   try:

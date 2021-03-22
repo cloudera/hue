@@ -52,7 +52,7 @@ def zkensemble_path():
     if parsed.port == 9983: # Standalone Solr cloud
       return ''
   except:
-    LOG.warn('Failed to get Zookeeper ensemble path')
+    LOG.warning('Failed to get Zookeeper ensemble path')
 
   return '/solr'
 

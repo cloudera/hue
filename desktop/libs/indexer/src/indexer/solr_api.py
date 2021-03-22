@@ -140,7 +140,7 @@ def delete_indexes(request):
       elif index['type'] == 'alias':
         client.delete_alias(index['name'])
       else:
-        LOG.warn('We could not delete: %s' % index)
+        LOG.warning('We could not delete: %s' % index)
 
     response['status'] = 0
     response['message'] = _('Indexes removed!')

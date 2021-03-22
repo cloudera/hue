@@ -667,7 +667,7 @@ class Api(object):
       try:
         self.close_statement(notebook, snippet)  # Close all the time past multi queries
       except:
-        LOG.warn('Could not close previous multiquery query')
+        LOG.warning('Could not close previous multiquery query')
 
     return resp
 

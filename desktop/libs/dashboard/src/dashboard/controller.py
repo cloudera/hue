@@ -85,7 +85,7 @@ class DashboardController(object):
           doc2.delete()
       result['status'] = 0
     except Exception as e:
-      LOG.warn('Error deleting collection: %s' % e)
+      LOG.warning('Error deleting collection: %s' % e)
       result['message'] = str(e)
 
     return result

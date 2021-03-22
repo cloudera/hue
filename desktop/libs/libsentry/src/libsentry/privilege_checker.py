@@ -116,7 +116,7 @@ class PrivilegeChecker(object):
           if self._is_object_action_authorized_v1(hierarchy=self.privilege_hierarchy_v1, object=authorizable, action=action):
             yield object
         except KeyError as e:
-          LOG.warn('Skipping %s: %s' % (authorizable, e))
+          LOG.warning('Skipping %s: %s' % (authorizable, e))
 
     if v2_authorizables:
       for (object, authorizable) in v2_authorizables:
@@ -124,7 +124,7 @@ class PrivilegeChecker(object):
           if self._is_object_action_authorized_v2(hierarchy=self.privilege_hierarchy_v2, object=authorizable, action=action):
             yield object
         except KeyError as e:
-          LOG.warn('Skipping %s: %s' % (authorizable, e))
+          LOG.warning('Skipping %s: %s' % (authorizable, e))
 
 
   def _to_sentry_authorizables(self, objects, key):

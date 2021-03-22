@@ -105,7 +105,7 @@ class KafkaApi(Api):
         }
 
     except Exception as e:
-      LOG.warn('Autocomplete data fetching error: %s' % e)
+      LOG.warning('Autocomplete data fetching error: %s' % e)
       response['code'] = 500
       response['error'] = e.message
 
