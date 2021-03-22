@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 
-import SqlExecutable from 'gethue/src/apps/editor/execution/sqlExecutable';
+import SqlExecutable from 'gethue/apps/editor/execution/sqlExecutable';
 
 export interface ExecuteLimitProps {
   activeExecutable?: SqlExecutable

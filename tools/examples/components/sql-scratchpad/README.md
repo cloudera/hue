@@ -5,7 +5,7 @@ create a SQL Scratchpad.
 
 It's based on a clean create-react-app project, relevant changes are:
 
-- gethue dependency in package.json, note that this can also be pulled in from the npm repo by specifing a version > 4.9)
+- gethue dependency in package.json, tested with version 4.9.3
 - "components" folder with React wrappers around the Hue web components
 - App.tsx using the React wrappers
 
@@ -18,14 +18,28 @@ We wrap the web components to be able to set certain attributes/properties on th
   [desktop]
     cors_enabled=true
 ```
-2. Make sure Hue has a "hue" user with the password "hue" (this will be improved soon)
-3. Go to the Hue root folder `cd ../../../../`
+2. Go to the example project `cd tools/examples/components/sql-scratchpad`
+3. `npm install`
+4. `npm start`
+5. Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+
+To kill it press `ctrl-c` in the terminal
+
+## To use this project while developing the Hue NPM package,
+
+1. In the SQL Scratchpad project change the "gethue" dependency in `package.json` to 
+   ```
+   "gethue": "file:../../../../npm_dist",
+   ```
+2. Go to the Hue root folder `cd ../../../../`
 4. `npm install`
-5. `npm run webpack-npm`
+5. `npm run dev-webpack-npm`
 6. Go to the example project `cd tools/examples/components/sql-scratchpad`
 7. `npm install`
 8. `npm start`
-9. Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+
+It will monitor changes of the related Hue sources and update npm_dist when needed, if the 
+SQL Scratchpad project doesn't pick up the changes a restart of the app might be needed.
 
 ## Base project creation steps (for reference)
 
