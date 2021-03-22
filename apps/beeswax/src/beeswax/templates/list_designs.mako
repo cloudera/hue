@@ -22,9 +22,9 @@
     from desktop.views import commonheader, commonfooter
 
     if sys.version_info[0] > 2:
-      from django.utils.encoding import force_text as force_unicode
+      from django.utils.encoding import force_str
     else:
-      from django.utils.encoding import force_unicode
+      from django.utils.encoding import force_unicode as force_str
 %>
 
 <%namespace name="actionbar" file="actionbar.mako" />
@@ -110,11 +110,11 @@ ${ layout.menubar(section='saved queries') }
               data-clone-url="${ url(app_name + ':clone_design', design_id=design.id) }" data-row-selector-exclude="true"></div>
           </td>
           <td>
-            <a href="${ url(app_name + ':execute_design', design_id=design.id) }" data-row-selector="true">${ force_unicode(design.name) }</a>
+            <a href="${ url(app_name + ':execute_design', design_id=design.id) }" data-row-selector="true">${ force_str(design.name) }</a>
           </td>
           <td>
           % if design.desc:
-            ${ force_unicode(design.desc) }
+            ${ force_str(design.desc) }
           % endif
           </td>
           <td>${ design.owner.username }</td>
