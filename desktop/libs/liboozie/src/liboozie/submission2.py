@@ -274,7 +274,7 @@ python altus.py
                   auth_key_id=ALTUS.AUTH_KEY_ID.get(),
                   auth_key_secret=ALTUS.AUTH_KEY_SECRET.get().replace('\\n', '\n')
               )
-            
+
           self._create_file(deployment_dir, 'altus.py', shell_script)
 
           ext_py_lib_path = os.path.join(get_desktop_root(), 'core', 'ext-py')
@@ -595,7 +595,7 @@ STORED AS TEXTFILE %s""" % (self.properties.get('send_result_path'), '\n\n\n'.jo
       if self._do_as(self.user.username , self.fs.exists, path):
         self._do_as(self.user.username , self.fs.rmtree, path)
     except Exception as ex:
-      LOG.warn("Failed to clean up workflow deployment directory for %s (owner %s). Caused by: %s", self.job.name, self.user, ex)
+      LOG.warning("Failed to clean up workflow deployment directory for %s (owner %s). Caused by: %s", self.job.name, self.user, ex)
 
   def _is_workflow(self):
     from oozie.models2 import Workflow
@@ -697,9 +697,9 @@ def _exec(service, command, parameters=None):
     raise e
 
 
-try:    
+try:
   handle = _exec('%(service)s', '%(command)s', arguments)
-  
+
   if 'create' in '%(command)s':
     handle = _exec('%(service)s', 'listJobs', {'clusterCrn': handle['cluster']['crn']})
 
@@ -707,13 +707,13 @@ try:
     job = handle['jobs'].pop(0)
     status = 'QUEUED'
     print 'Job submitted: %%(jobId)s' %% job
-  
+
     while status in ('QUEUED', 'RUNNING', 'SUBMITTING'):
       time.sleep(5)
-  
+
       print 'Checking status...'
       status = _exec('%(service)s', 'describeJob', {'jobId': job['jobId']})['job']['status']
-  
+
     if status != 'COMPLETED':
       raise Exception('Job %%s failed %%s' %% (job['jobId'], status))
     else:
@@ -724,7 +724,7 @@ except Exception, e:
 
 """ % {
       'service': service,
-      'hostname': hostname,      
+      'hostname': hostname,
       'command': command,
       'arguments': repr(arguments),
       'auth_key_id': auth_key_id,

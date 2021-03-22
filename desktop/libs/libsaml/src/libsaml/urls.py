@@ -29,7 +29,7 @@ try:
   from djangosaml2 import views as djangosaml2_views
   from libsaml import views as libsaml_views
 except ImportError:
-  LOG.warn('djangosaml2 module not found')
+  LOG.warning('djangosaml2 module not found')
   djangosaml2_views = None
 
 try:

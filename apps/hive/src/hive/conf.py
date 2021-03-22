@@ -84,12 +84,12 @@ def config_validator(user):
         if is_s3_enabled():
           fs.do_as_user(user, fs.stats, warehouse)
         else:
-          LOG.warn("Warehouse is in S3, but no credential available.")
+          LOG.warning("Warehouse is in S3, but no credential available.")
       elif fs_scheme == 'abfs':
         if is_abfs_enabled():
           fs.do_as_user(user, fs.stats, warehouse)
         else:
-          LOG.warn("Warehouse is in ABFS, but no credential available.")
+          LOG.warning("Warehouse is in ABFS, but no credential available.")
       else:
         fs.do_as_superuser(fs.stats, warehouse)
   except Exception:

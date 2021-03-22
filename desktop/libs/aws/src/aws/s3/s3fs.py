@@ -109,7 +109,7 @@ class S3FileSystem(object):
       resp = self._s3_connection.make_request('HEAD', name)
       return resp.getheader('x-amz-bucket-region')
     except Exception as e:
-      LOG.warn('Failed to fetch bucket "%s" location with "%s"' % (name, e.message or e.reason))
+      LOG.warning('Failed to fetch bucket "%s" location with "%s"' % (name, e.message or e.reason))
       return None
 
   def _get_or_create_bucket(self, name):
@@ -528,7 +528,7 @@ class S3FileSystem(object):
       else:
         self.open(path)
     except Exception as e:
-      LOG.warn('S3 check_access encountered error verifying %s permission at path "%s": %s' % (permission, path, str(e)))
+      LOG.warning('S3 check_access encountered error verifying %s permission at path "%s": %s' % (permission, path, str(e)))
       return False
     return True
 

@@ -304,7 +304,7 @@ class SparkApi(Api):
     spark_ui_url = self.SPARK_UI_RE.search(logs)
 
     if not spark_ui_url:
-      LOG.warn('Could not find the Spark UI URL in the session logs.')
+      LOG.warning('Could not find the Spark UI URL in the session logs.')
       return []
     else:
       spark_ui_url = spark_ui_url.group(1)

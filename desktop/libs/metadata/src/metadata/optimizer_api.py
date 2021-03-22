@@ -51,7 +51,7 @@ try:
 
   from metastore.views import _get_db
 except ImportError as e:
-  LOG.warn("Hive lib not enabled")
+  LOG.warning("Hive lib not enabled")
 
 
 def error_handler(view_fn):

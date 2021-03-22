@@ -38,7 +38,7 @@ def validate_fs(fs=None):
   if fs in SUPPORTED_FS:
     return SUPPORTED_FS[fs]
   else:
-    LOG.warn('Selected FS %s is not supported by Hue IDBroker client' % fs)
+    LOG.warning('Selected FS %s is not supported by Hue IDBroker client' % fs)
     return None
 
 def get_cab_address(fs=None):

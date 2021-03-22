@@ -344,7 +344,7 @@ class SqlAlchemyApi(Api):
         if handle and handle['result'].cursor:
           stats = handle['result'].cursor.poll()
       except AssertionError as e:
-        LOG.warn('Query probably not running anymore: %s' % e)
+        LOG.warning('Query probably not running anymore: %s' % e)
       if stats:
         stats = stats.get('stats', {})
         progress = stats.get('completedSplits', 0) * 100 // stats.get('totalSplits', 1)

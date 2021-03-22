@@ -21,7 +21,7 @@ LOG = logging.getLogger(__name__)
 try:
   import gcs_oauth2_boto_plugin
 except ImportError:
-  LOG.warn('gcs_oauth2_boto_plugin module not found')
+  LOG.warning('gcs_oauth2_boto_plugin module not found')
 import json
 
 from aws.s3.s3fs import S3FileSystem

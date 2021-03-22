@@ -148,7 +148,7 @@ class HDFSfileUploadHandler(FileUploadHandler):
     self.request = request
     fs = fsmanager.get_filesystem('default')
     if not fs:
-      LOG.warn('No HDFS set for HDFS upload')
+      LOG.warning('No HDFS set for HDFS upload')
     else:
       fs.setuser(request.user.username)
       FileUploadHandler.chunk_size = fs.get_upload_chuck_size(self._destination) if self._destination else UPLOAD_CHUNK_SIZE.get()

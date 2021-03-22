@@ -2314,7 +2314,7 @@ def config_validator(user):
     if not _is_oozie_mail_enabled(user):
       res.append(('OOZIE_EMAIL_SERVER', new_str(_('Email notifications is disabled for Workflows and Jobs as SMTP server is localhost.'))))
   except Exception as e:
-    LOG.warn('Config check failed because Oozie app not installed %s' % e)
+    LOG.warning('Config check failed because Oozie app not installed %s' % e)
 
   from notebook.models import make_notebook
   from notebook.api import _save_notebook
