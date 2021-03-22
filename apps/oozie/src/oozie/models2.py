@@ -35,7 +35,6 @@ from xml.sax.saxutils import escape
 
 from django.urls import reverse
 from django.db.models import Q
-from django.utils.translation import ugettext as _
 
 from desktop.conf import USE_DEFAULT_CONFIGURATION
 from desktop.lib import django_mako
@@ -59,8 +58,10 @@ from oozie.importlib.workflows import generate_v2_graph_nodes, MalformedWfDefExc
 
 if sys.version_info[0] > 2:
   from django.utils.encoding import force_str
+  from django.utils.translation import gettext as _
 else:
   from django.utils.encoding import force_unicode as force_str
+  from django.utils.translation import ugettext as _
 
 WORKFLOW_DEPTH_LIMIT = 24
 LOG = logging.getLogger(__name__)

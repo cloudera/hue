@@ -15,12 +15,17 @@
 ## limitations under the License.
 
 <%!
+import sys
+
 from django.template.defaultfilters import urlencode
 from desktop.views import commonheader, commonfooter
-from django.utils.translation import ugettext as _
 
 from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
 
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 %>
 
 <%namespace name="actionbar" file="actionbar.mako" />

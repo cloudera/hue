@@ -16,10 +16,14 @@
 from __future__ import absolute_import
 
 import logging
+import sys
 
 from hadoop.core_site import get_conf
 
-from django.utils.translation import ugettext_lazy as _t
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext_lazy as _t
+else:
+  from django.utils.translation import ugettext_lazy as _t
 
 LOG = logging.getLogger(__name__)
 

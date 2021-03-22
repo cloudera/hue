@@ -14,10 +14,14 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%
+  import sys
   from jobbrowser.views import get_state_link
   from django.template.defaultfilters import urlencode
   from desktop.views import commonheader, commonfooter
-  from django.utils.translation import ugettext as _
+  if sys.version_info[0] > 2:
+    from django.utils.translation import gettext as _
+  else:
+    from django.utils.translation import ugettext as _
 %>
 <%namespace name="actionbar" file="actionbar.mako" />
 <%namespace name="components" file="jobbrowser_components.mako" />

@@ -15,16 +15,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import sys
+
 from crequest.middleware import CrequestMiddleware
 
 from django.db import connection, models, transaction
-from django.utils.translation import ugettext_lazy as _t
 
 from desktop.conf import ENABLE_ORGANIZATIONS, ENABLE_CONNECTORS
 from desktop.lib.connectors.models import Connector
 
 from useradmin.organization import _fitered_queryset, get_user_request_organization
 
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext_lazy as _t
+else:
+  from django.utils.translation import ugettext_lazy as _t
 
 if ENABLE_ORGANIZATIONS.get():
   from useradmin.organization import OrganizationGroup as Group, Organization

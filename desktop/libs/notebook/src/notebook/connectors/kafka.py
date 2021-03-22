@@ -18,13 +18,17 @@
 from __future__ import absolute_import
 
 import logging
-
-from django.utils.translation import ugettext as _
+import sys
 
 from desktop.lib.i18n import force_unicode
 from kafka.kafka_api import get_topics
 
 from notebook.connectors.base import Api, QueryError
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

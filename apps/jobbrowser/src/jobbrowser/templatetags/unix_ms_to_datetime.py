@@ -19,8 +19,12 @@ from __future__ import division
 import datetime
 import django
 import math
+import sys
 
-from django.utils.translation import ugettext as _
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 register = django.template.Library()
 

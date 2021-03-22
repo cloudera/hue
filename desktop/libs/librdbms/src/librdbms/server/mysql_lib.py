@@ -16,6 +16,7 @@
 # limitations under the License.
 
 import logging
+import sys
 
 try:
     import MySQLdb as Database
@@ -32,10 +33,14 @@ if (version < (1,2,1) or (version[:3] == (1, 2, 1) and
     from django.core.exceptions import ImproperlyConfigured
     raise ImproperlyConfigured("MySQLdb-1.2.1p2 or newer is required; you have %s" % Database.__version__)
 
-from django.utils.translation import ugettext as _
 from MySQLdb.converters import FIELD_TYPE
 
 from librdbms.server.rdbms_base_lib import BaseRDBMSDataTable, BaseRDBMSResult, BaseRDMSClient
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

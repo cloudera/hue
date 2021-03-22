@@ -23,7 +23,6 @@ import sys
 
 from operator import itemgetter
 
-from django.utils.translation import ugettext as _
 from TCLIService import TCLIService
 from TCLIService.ttypes import TOpenSessionReq, TGetTablesReq, TFetchResultsReq, TStatusCode, TGetResultSetMetadataReq, \
   TGetColumnsReq, TTypeId, TExecuteStatementReq, TGetOperationStatusReq, TFetchOrientation, \
@@ -38,6 +37,11 @@ from beeswax.hive_site import hiveserver2_use_ssl
 from beeswax.conf import CONFIG_WHITELIST, LIST_PARTITIONS_LIMIT
 from beeswax.models import Session, HiveServerQueryHandle, HiveServerQueryHistory
 from beeswax.server.dbms import Table, DataTable, QueryServerException, InvalidSessionQueryServerException
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

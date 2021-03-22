@@ -15,7 +15,7 @@
 ## limitations under the License.
 
 <%!
-  from django.utils.translation import ugettext as _
+  import sys
 
   from desktop import conf
   from desktop.views import commonheader, commonfooter, commonshare, commonimportexport, _ko
@@ -25,6 +25,11 @@
   from notebook.conf import ENABLE_SQL_INDEXER
 
   from indexer.conf import ENABLE_NEW_INDEXER, ENABLE_SQOOP, ENABLE_KAFKA, CONFIG_INDEXER_LIBS_PATH, ENABLE_SCALABLE_INDEXER, ENABLE_ALTUS, ENABLE_ENVELOPE, ENABLE_FIELD_EDITOR
+
+  if sys.version_info[0] > 2:
+    from django.utils.translation import gettext as _
+  else:
+    from django.utils.translation import ugettext as _
 %>
 
 <%namespace name="actionbar" file="actionbar.mako" />

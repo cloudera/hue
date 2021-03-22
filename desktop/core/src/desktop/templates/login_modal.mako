@@ -15,8 +15,14 @@
 ## limitations under the License.
 
 <%!
+  import sys
   from desktop import conf
-  from django.utils.translation import ugettext as _
+
+  if sys.version_info[0] > 2:
+    from django.utils.translation import gettext as _
+  else:
+    from django.utils.translation import ugettext as _
+
   from useradmin.hue_password_policy import is_password_policy_enabled, get_password_hint
 %>
 

@@ -64,7 +64,6 @@ import textwrap
 from string import Template
 
 from django.core.cache import caches
-from django.utils.translation import ugettext as _
 from sqlalchemy import create_engine, inspect, Table, MetaData
 from sqlalchemy.exc import OperationalError, UnsupportedCompilationError, CompileError
 
@@ -80,7 +79,9 @@ if sys.version_info[0] > 2:
   from urllib.parse import quote_plus as urllib_quote_plus
   from past.builtins import long
   from io import StringIO
+  from django.utils.translation import gettext as _
 else:
+  from django.utils.translation import ugettext as _
   from urllib import quote_plus as urllib_quote_plus
   from cStringIO import StringIO
 

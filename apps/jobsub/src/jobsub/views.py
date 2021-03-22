@@ -27,9 +27,8 @@ is a "job submission".  Submissions can be "watched".
 
 from builtins import str
 import logging
+import sys
 import time as py_time
-
-from django.utils.translation import ugettext as _
 
 from desktop import appmanager
 from desktop.lib.django_util import render, render_json
@@ -44,6 +43,11 @@ from oozie.utils import model_to_dict, format_dict_field_values,\
                         sanitize_node_dict
 
 from desktop.auth.backend import is_admin
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 LOG = logging.getLogger(__name__)
 MAX_DESIGNS = 250

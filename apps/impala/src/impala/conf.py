@@ -20,8 +20,6 @@ import os
 import socket
 import sys
 
-from django.utils.translation import ugettext_lazy as _t, ugettext as _
-
 from desktop.conf import default_ssl_cacerts, default_ssl_validate, AUTH_USERNAME as DEFAULT_AUTH_USERNAME, \
     AUTH_PASSWORD as DEFAULT_AUTH_PASSWORD, has_connectors
 from desktop.lib.conf import ConfigSection, Config, coerce_bool, coerce_csv, coerce_password_from_script
@@ -31,6 +29,10 @@ from desktop.lib.paths import get_desktop_root
 from impala.impala_flags import get_max_result_cache_size, is_impersonation_enabled, is_kerberos_enabled, is_webserver_spnego_enabled
 from impala.settings import NICE_NAME
 
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext_lazy as _t, gettext as _
+else:
+  from django.utils.translation import ugettext_lazy as _t, ugettext as _
 
 LOG = logging.getLogger(__name__)
 

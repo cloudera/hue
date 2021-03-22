@@ -17,8 +17,7 @@
 
 import logging
 import json
-
-from django.utils.translation import ugettext as _
+import sys
 
 from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.exceptions_renderable import PopupException
@@ -29,6 +28,11 @@ from indexer.fields import FIELD_TYPES, Field
 from indexer.file_format import get_file_indexable_format_types
 from indexer.management.commands import indexer_setup
 from indexer.indexers.morphline_operations import OPERATORS
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

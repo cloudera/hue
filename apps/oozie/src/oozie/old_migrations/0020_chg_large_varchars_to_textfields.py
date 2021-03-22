@@ -1,9 +1,15 @@
 # encoding: utf-8
 import datetime
-from django.utils.translation import ugettext as _
+import sys
+
 from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 class Migration(SchemaMigration):
 

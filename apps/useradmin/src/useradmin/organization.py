@@ -16,15 +16,20 @@
 # limitations under the License.
 
 import logging
+import sys
 import uuid
 
 from crequest.middleware import CrequestMiddleware
 
 from django.contrib.auth.models import models, AbstractUser, BaseUserManager
 from django.utils.functional import SimpleLazyObject
-from django.utils.translation import ugettext_lazy as _t
 
 from desktop.conf import ENABLE_ORGANIZATIONS
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext_lazy as _t
+else:
+  from django.utils.translation import ugettext_lazy as _t
 
 
 LOG = logging.getLogger(__name__)

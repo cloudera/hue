@@ -24,11 +24,12 @@ from django.core.management.base import CommandError, BaseCommand
 from mako.template import Template
 
 import logging
-from django.utils.translation import ugettext as _
 
 if sys.version_info[0] > 2:
   open_file = open
+  from django.utils.translation import gettext as _
 else:
+  from django.utils.translation import ugettext as _
   open_file = file
 
 LOG = logging.getLogger(__name__)

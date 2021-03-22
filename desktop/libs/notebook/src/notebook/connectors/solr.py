@@ -17,8 +17,7 @@
 
 from builtins import object
 import logging
-
-from django.utils.translation import ugettext as _
+import sys
 
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode
@@ -26,6 +25,11 @@ from indexer.solr_client import SolrClient
 
 from notebook.connectors.base import Api, QueryError
 from notebook.models import escape_rows
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

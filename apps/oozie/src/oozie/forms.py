@@ -18,13 +18,13 @@
 from builtins import object
 import logging
 from datetime import datetime, timedelta
+import sys
 from time import mktime, struct_time
 
 from django import forms
 from django.core.exceptions import ValidationError
 from django.forms.widgets import TextInput
 from functools import partial
-from django.utils.translation import ugettext_lazy as _t
 
 from desktop.lib.django_forms import MultiForm, SplitDateTimeWidget
 from desktop.models import Document
@@ -33,6 +33,11 @@ from oozie.conf import ENABLE_CRON_SCHEDULING
 from oozie.models import Workflow, Node, Java, Mapreduce, Streaming, Coordinator,\
   Dataset, DataInput, DataOutput, Pig, Link, Hive, Sqoop, Ssh, Shell, DistCp, Fs,\
   Email, SubWorkflow, Generic, Bundle, BundledCoordinator
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext_lazy as _t
+else:
+  from django.utils.translation import ugettext_lazy as _t
 
 
 LOG = logging.getLogger(__name__)

@@ -19,10 +19,10 @@
 from builtins import map
 import json
 import logging
+import sys
 
 from django.http import Http404
 from django.urls import reverse
-from django.utils.translation import ugettext as _
 
 from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.exceptions_renderable import PopupException
@@ -35,6 +35,11 @@ from zookeeper.rest import ZooKeeper
 from zookeeper.utils import get_cluster_or_404
 
 from desktop.auth.backend import is_admin
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 def _get_global_overview():

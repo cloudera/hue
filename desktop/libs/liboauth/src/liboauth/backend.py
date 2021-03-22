@@ -27,8 +27,6 @@ import sys
 
 LOG = logging.getLogger(__name__)
 
-from django.utils.translation import ugettext as _
-
 from desktop.auth.backend import force_username_case, DesktopBackendBase
 
 from useradmin.models import get_profile, get_default_user_group, UserProfile, User
@@ -48,7 +46,9 @@ except ImportError:
 
 if sys.version_info[0] > 2:
   from urllib.parse import urlencode as lib_urlencode
+  from django.utils.translation import gettext as _
 else:
+  from django.utils.translation import ugettext as _
   from urllib import urlencode as lib_urlencode
 
 

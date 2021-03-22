@@ -17,6 +17,7 @@
 
 import logging
 import json
+import sys
 from urllib.parse import urlsplit
 from pprint import pprint
 from tabulate import tabulate
@@ -35,8 +36,12 @@ from notebook.connectors.base import _get_snippet_name
 from useradmin.models import User
 
 from django.http import HttpResponse
-from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 LOG = logging.getLogger(__name__)
 

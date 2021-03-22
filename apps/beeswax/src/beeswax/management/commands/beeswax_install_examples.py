@@ -20,10 +20,10 @@ import csv
 import logging
 import json
 import os
+import sys
 import pwd
 
 from django.core.management.base import BaseCommand
-from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.conf import USE_NEW_EDITOR
@@ -38,6 +38,10 @@ from beeswax.hive_site import has_concurrency_support
 from beeswax.models import SavedQuery, HQL, IMPALA, RDBMS
 from beeswax.server import dbms
 
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 LOG = logging.getLogger(__name__)
 

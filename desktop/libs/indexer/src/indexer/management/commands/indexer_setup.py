@@ -20,14 +20,19 @@ from builtins import zip
 import itertools
 import logging
 import os
+import sys
 
 from django.core.management.base import BaseCommand
-from django.utils.translation import ugettext as _
 
 from useradmin.models import install_sample_user
 
 from indexer import utils
 from indexer.solr_client import SolrClient
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

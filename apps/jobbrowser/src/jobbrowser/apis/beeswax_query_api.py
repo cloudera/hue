@@ -18,15 +18,19 @@ from builtins import filter
 
 import logging
 import re
+import sys
 
 from datetime import datetime
 
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.python_util import current_ms_from_utc
 
-from django.utils.translation import ugettext as _
-
 from jobbrowser.apis.base_api import Api
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 LOG = logging.getLogger(__name__)
 

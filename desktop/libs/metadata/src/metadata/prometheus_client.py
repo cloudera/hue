@@ -18,15 +18,20 @@
 
 from builtins import object
 import logging
+import sys
 
 from django.core.cache import cache
-from django.utils.translation import ugettext as _
 
 from desktop.lib.rest.http_client import RestException, HttpClient
 from desktop.lib.rest.resource import Resource
 from desktop.lib.i18n import smart_unicode
 
 from metadata.conf import PROMETHEUS
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

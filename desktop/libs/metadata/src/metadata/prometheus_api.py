@@ -18,15 +18,20 @@
 
 import json
 import logging
+import sys
 
 from django.utils.html import escape
-from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST
 
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.i18n import force_unicode
 
 from metadata.prometheus_client import PrometheusApi
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

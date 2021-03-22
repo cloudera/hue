@@ -21,17 +21,21 @@ from __future__ import absolute_import
 import logging
 import json
 import os
+import sys
 
 import sqlflow
 from sqlflow.rows import Rows
-
-from django.utils.translation import ugettext as _
 
 from desktop.lib.i18n import force_unicode
 
 from notebook.connectors.base import Api, QueryError
 from notebook.decorators import ssh_error_handler, rewrite_ssh_api_url
 from notebook.models import escape_rows
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

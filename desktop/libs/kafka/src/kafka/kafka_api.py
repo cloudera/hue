@@ -18,8 +18,7 @@
 
 import json
 import logging
-
-from django.utils.translation import ugettext as _
+import sys
 
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.i18n import force_unicode
@@ -28,6 +27,11 @@ from notebook.models import _get_notebook_api
 
 from kafka.conf import has_kafka_api
 from kafka.kafka_client import KafkaApi, KafkaApiException
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

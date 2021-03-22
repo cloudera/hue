@@ -22,12 +22,12 @@ from builtins import object
 import logging
 import math
 from datetime import datetime
+import sys
 
 from django.contrib import messages
 from django.contrib.sessions.models import Session
 from django.db import DatabaseError
 from django.db.models import Q
-from django.utils.translation import ugettext as _
 from django.utils.deprecation import MiddlewareMixin
 
 from desktop.auth.views import dt_logout
@@ -37,6 +37,11 @@ from desktop.lib.security_util import get_localhost_name
 from useradmin import ldap_access
 from useradmin.models import UserProfile, get_profile, User
 from useradmin.views import import_ldap_users
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

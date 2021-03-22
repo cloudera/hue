@@ -14,13 +14,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+import sys
+
 from django.core.management.base import BaseCommand
-from django.utils.translation import ugettext_lazy as _t
 
 from desktop.conf import LDAP
 
 from useradmin import ldap_access
 from useradmin.views import sync_ldap_users_and_groups
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext_lazy as _t
+else:
+  from django.utils.translation import ugettext_lazy as _t
 
 class Command(BaseCommand):
   """

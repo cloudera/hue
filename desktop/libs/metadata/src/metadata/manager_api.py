@@ -19,10 +19,10 @@
 import json
 import logging
 import os
+import sys
 
 from django.http import Http404
 from django.utils.html import escape
-from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST
 
 from desktop.auth.backend import is_admin
@@ -34,6 +34,11 @@ from indexer.conf import config_morphline_path
 from metadata.catalog.navigator_client import CatalogApiException
 from metadata.conf import has_catalog
 from metadata.manager_client import ManagerApi
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

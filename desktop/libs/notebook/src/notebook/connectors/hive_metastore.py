@@ -16,10 +16,9 @@
 # limitations under the License.
 
 import logging
+import sys
 
 from django.urls import reverse
-from django.utils.translation import ugettext as _
-
 
 from desktop.lib.exceptions import StructuredException
 from desktop.lib.exceptions_renderable import PopupException
@@ -27,6 +26,11 @@ from desktop.lib.i18n import force_unicode, smart_str
 from desktop.lib.rest.http_client import RestException
 
 from notebook.connectors.base import Api, QueryError, QueryExpired, OperationTimeout, OperationNotSupported
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

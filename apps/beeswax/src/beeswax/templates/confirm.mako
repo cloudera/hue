@@ -15,7 +15,12 @@
 ## limitations under the License.
 
 <%!
-from django.utils.translation import ugettext as _
+import sys
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 %>
 
 <form action="{{ url }}" method="POST">>

@@ -17,9 +17,8 @@
 
 from builtins import object
 import logging
+import sys
 import threading
-
-from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions import StructuredThriftTransportException
 from desktop.lib.exceptions_renderable import PopupException
@@ -27,6 +26,11 @@ from desktop.lib.exceptions_renderable import PopupException
 from libsentry.client import SentryClient
 from libsentry.sentry_ha import get_next_available_server, create_client
 from libsentry.sentry_site import get_sentry_server, is_ha_enabled
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

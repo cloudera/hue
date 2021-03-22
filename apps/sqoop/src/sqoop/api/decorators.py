@@ -18,8 +18,8 @@
 from __future__ import absolute_import
 import json
 import logging
+import sys
 
-from django.utils.translation import ugettext as _
 from django.utils.functional import wraps
 
 from desktop.lib.django_util import render
@@ -27,6 +27,11 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.rest.http_client import RestException
 from sqoop.api.exception import handle_rest_exception
 from sqoop import client, conf
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 __all__ = ['get_job_or_exception']

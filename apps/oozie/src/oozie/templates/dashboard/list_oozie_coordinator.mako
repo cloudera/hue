@@ -19,14 +19,15 @@
   import sys
   from desktop.lib.paths import SAFE_CHARACTERS_URI_COMPONENTS
   from desktop.views import commonheader, commonfooter, _ko
-  from django.utils.translation import ugettext as _
   
   from oozie.conf import ENABLE_V2
 
   if sys.version_info[0] > 2:
     from urllib.parse import quote as urllib_quote
+    from django.utils.translation import gettext as _
   else:
     from urllib import quote as urllib_quote
+    from django.utils.translation import ugettext as _
 %>
 
 <%namespace name="layout" file="../navigation-bar.mako" />

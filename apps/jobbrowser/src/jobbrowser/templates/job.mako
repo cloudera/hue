@@ -18,13 +18,18 @@
 
 <%!
   import os
+  import sys
   from hadoop.fs.exceptions import WebHdfsException
   from jobbrowser.views import format_counter_name
   from desktop.lib.view_util import location_to_url
   from desktop.views import commonheader, commonfooter
   from django.template.defaultfilters import urlencode
-  from django.utils.translation import ugettext as _
   from six import iteritems
+
+  if sys.version_info[0] > 2:
+    from django.utils.translation import gettext as _
+  else:
+    from django.utils.translation import ugettext as _
 %>
 <%def name="task_table(dom_id, tasks)">
     <table id="${ dom_id }" class="taskTable table table-condensed">

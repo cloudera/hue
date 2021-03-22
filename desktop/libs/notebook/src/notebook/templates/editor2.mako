@@ -14,13 +14,17 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
+  import sys
   from desktop import conf
   from desktop.views import _ko, antixss
   from desktop.webpack_utils import get_hue_bundles
-  from django.utils.translation import ugettext as _
   from metadata.conf import OPTIMIZER
   from notebook.conf import ENABLE_QUERY_SCHEDULING, ENABLE_EXTERNAL_STATEMENT, ENABLE_PRESENTATION
   from webpack_loader.templatetags.webpack_loader import render_bundle
+  if sys.version_info[0] > 2:
+    from django.utils.translation import gettext as _
+  else:
+    from django.utils.translation import ugettext as _
 %>
 
 <%namespace name="configKoComponents" file="/config_ko_components.mako" />

@@ -18,11 +18,11 @@
 import json
 import logging
 import os
+import sys
 
 from django.core import management
 from django.core.management.base import BaseCommand
 from django.db import transaction
-from django.utils.translation import ugettext as _
 
 from desktop.conf import USE_NEW_EDITOR
 from desktop.lib import paths
@@ -34,6 +34,11 @@ from notebook.models import make_notebook
 from useradmin.models import get_default_user_group, install_sample_user
 
 from pig.conf import LOCAL_SAMPLE_DIR, REMOTE_SAMPLE_DIR
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

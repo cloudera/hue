@@ -40,6 +40,7 @@ elaborations to manipulate this row by row. This does not map nicely onto action
 import collections
 import json
 import logging
+import sys
 
 from datetime import datetime
 from enum import Enum
@@ -49,7 +50,6 @@ from django.contrib.auth import models as auth_models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.core.cache import cache
 from django.utils import timezone as dtz
-from django.utils.translation import ugettext_lazy as _t
 
 from desktop import appmanager
 from desktop.conf import ENABLE_ORGANIZATIONS, ENABLE_CONNECTORS
@@ -60,6 +60,11 @@ from desktop.monkey_patches import monkey_patch_username_validator
 
 from useradmin.conf import DEFAULT_USER_GROUP
 from useradmin.permissions import HuePermission, GroupPermission, LdapGroup
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext_lazy as _t
+else:
+  from django.utils.translation import ugettext_lazy as _t
 
 if ENABLE_ORGANIZATIONS.get():
   from useradmin.organization import OrganizationUser as User, OrganizationGroup as Group, get_organization, Organization

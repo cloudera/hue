@@ -16,13 +16,16 @@
 # limitations under the License.
 
 import logging
-
-from django.utils.translation import ugettext as _
+import sys
 
 from spark.livy_client import get_api
 
 from jobbrowser.apis.base_api import Api
 
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 LOG = logging.getLogger(__name__)
 

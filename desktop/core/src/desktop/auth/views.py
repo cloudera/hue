@@ -35,7 +35,6 @@ from django.contrib.auth import login, get_backends, authenticate
 from django.contrib.sessions.models import Session
 from django.http import HttpResponseRedirect
 from django.urls import reverse
-from django.utils.translation import ugettext as _
 
 from hadoop.fs.exceptions import WebHdfsException
 from notebook.connectors.base import get_api
@@ -56,8 +55,10 @@ from desktop.settings import LOAD_BALANCER_COOKIE
 
 if sys.version_info[0] > 2:
   from urllib.parse import urlencode as urllib_urlencode
+  from django.utils.translation import gettext as _
 else:
   from urllib import urlencode as urllib_urlencode
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

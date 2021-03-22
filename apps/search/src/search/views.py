@@ -16,8 +16,7 @@
 
 from builtins import str
 import logging
-
-from django.utils.translation import ugettext as _
+import sys
 
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
@@ -26,6 +25,11 @@ from indexer.management.commands import indexer_setup
 from search.management.commands import search_setup
 
 from desktop.auth.backend import is_admin
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)

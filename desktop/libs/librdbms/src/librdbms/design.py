@@ -22,12 +22,17 @@ The HQLdesign class can (de)serialize a design to/from a QueryDict.
 from builtins import object
 import json
 import logging
+import sys
 
 import django.http
-from django.utils.translation import ugettext as _
 
 from beeswax.design import normalize_form_dict, denormalize_form_dict, split_statements
 from notebook.sql_utils import strip_trailing_semicolon
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 LOG = logging.getLogger(__name__)
 

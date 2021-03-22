@@ -19,8 +19,7 @@ from __future__ import absolute_import
 import json
 import logging
 import socket
-
-from django.utils.translation import ugettext as _
+import sys
 
 from sqoop import client, conf
 from sqoop.api.decorators import get_connector_or_exception
@@ -30,6 +29,11 @@ from desktop.lib.rest.http_client import RestException
 from sqoop.api.exception import handle_rest_exception
 from sqoop.api.utils import list_to_dict
 from django.views.decorators.cache import never_cache
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 __all__ = ['get_connectors', 'connectors', 'connector']
 

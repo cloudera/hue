@@ -16,11 +16,16 @@
 # limitations under the License.
 
 import logging
+import sys
 
 from django.db import connection, models, transaction
 from django.db.models import Q
 from django.db.models.query import QuerySet
-from django.utils.translation import ugettext as _, ugettext_lazy as _t
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _, gettext_lazy as _t
+else:
+  from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
 
 # TODO: ORM queries

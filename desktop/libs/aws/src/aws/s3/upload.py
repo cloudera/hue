@@ -33,12 +33,15 @@ else:
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.files.uploadhandler import FileUploadHandler, SkipFile, StopFutureHandlers, StopUpload, UploadFileException
-from django.utils.translation import ugettext as _
 
 from desktop.lib.fsmanager import get_client
 from aws.s3 import parse_uri
 from aws.s3.s3fs import S3FileSystemException
 
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 DEFAULT_WRITE_SIZE = 1024 * 1024 * 50  # TODO: set in configuration (currently 50 MiB)
 
