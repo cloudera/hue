@@ -51,7 +51,7 @@ const executorLibConfig = Object.assign({}, defaultConfig, {
       patterns: [
         { from: './package.json', to: `${DIST_DIR}/package.json` },
         { from: './NPM-README.md', to: `${DIST_DIR}/README.md` },
-        { from: JS_ROOT, to: `${DIST_DIR}/src` },
+        { from: JS_ROOT, to: `${DIST_DIR}` },
         {
           from: `${JS_ROOT}/apps/editor/execution/executor.d.ts`,
           to: `${DIST_DIR}/lib/execution`
