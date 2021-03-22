@@ -81,7 +81,7 @@ class ImpalaServerClient(HiveServerClient):
     try:
       self.close_operation(operation_handle)
     except QueryServerException as e:
-      LOG.warn('Failed to close operation for query handle, query may be invalid or already closed.')
+      LOG.warning('Failed to close operation for query handle, query may be invalid or already closed.')
 
     resp = self.call(self._client.GetExecSummary, req)
 
@@ -99,7 +99,7 @@ class ImpalaServerClient(HiveServerClient):
     try:
       self.close_operation(operation_handle)
     except QueryServerException as e:
-      LOG.warn('Failed to close operation for query handle, query may be invalid or already closed.')
+      LOG.warning('Failed to close operation for query handle, query may be invalid or already closed.')
 
     resp = self.call(self._client.GetRuntimeProfile, req)
 

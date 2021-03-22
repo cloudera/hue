@@ -60,7 +60,7 @@ def _fitered_queryset(queryset, by_owner=False):
 def get_organization(email, is_multi_user=False):
   if email is None:
     organization = Organization.objects.first()
-    LOG.warn('Returning first organization: %s' % organization)
+    LOG.warning('Returning first organization: %s' % organization)
   else:
     domain = email.split('@')[1] if is_multi_user else email
 
@@ -68,7 +68,7 @@ def get_organization(email, is_multi_user=False):
       organization, created = Organization.objects.get_or_create(name=domain, domain=domain, is_multi_user=is_multi_user)
       LOG.info("Materializing organization %s in the database, is_multi_user=%s" % (domain, is_multi_user))
     else:
-      LOG.warn('No organization domain found for email %s' % email)  # For Backends without emails or when organization enabled by default
+      LOG.warning('No organization domain found for email %s' % email)  # For Backends without emails or when organization enabled by default
       organization = None
 
   return organization

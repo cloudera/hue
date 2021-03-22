@@ -146,6 +146,6 @@ class TestOrganizationSingleUser(unittest.TestCase):
         User.objects.filter(groups__in=Group.objects.all()).values_list('username', flat=True)
       )
     except FieldError as e:
-      LOG.warn('Test currently skipped')
+      LOG.warning('Test currently skipped')
 
     self.client2.get('/useradmin/groups/edit/default')

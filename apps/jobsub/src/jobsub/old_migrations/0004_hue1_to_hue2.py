@@ -172,7 +172,7 @@ def hue1_to_hue2_data_migration():
     elif jd.type == 'streaming':
       job_design_migration_for_streaming(jd)
     else:
-      LOG.warn("Unknown JobDesign type '%s' in the old table. Row id: %s" %
+      LOG.warning("Unknown JobDesign type '%s' in the old table. Row id: %s" %
                (jd.type, jd.id))
 
 

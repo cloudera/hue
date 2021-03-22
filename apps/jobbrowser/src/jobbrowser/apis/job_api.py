@@ -251,7 +251,7 @@ class YarnApi(Api):
       else:
         logs = None
     except PopupException as e:
-      LOG.warn('No task attempt found for logs: %s' % smart_str(e))
+      LOG.warning('No task attempt found for logs: %s' % smart_str(e))
     return {'logs': logs, 'logsList': logs_list}
 
 
@@ -426,7 +426,7 @@ class YarnMapReduceTaskApi(Api):
       response = job_attempt_logs_json(MockDjangoRequest(self.user), job=self.app_id, name=log_name, is_embeddable=is_embeddable)
       logs = json.loads(response.content)['log']
     except PopupException as e:
-      LOG.warn('No task attempt found for default logs: %s' % e)
+      LOG.warning('No task attempt found for default logs: %s' % e)
       logs = ''
     return {'progress': 0, 'logs': logs}
 

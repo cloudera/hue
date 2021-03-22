@@ -90,7 +90,7 @@ class XxdTest(unittest.TestCase):
     try:
       subprocess.check_output('type xxd', shell=True)
     except subprocess.CalledProcessError as e:
-      LOG.warn('xxd not found')
+      LOG.warning('xxd not found')
       raise SkipTest
     # /dev/random tends to hang on Linux, so we use python instead.
     # It's inefficient, but it's not terrible.
