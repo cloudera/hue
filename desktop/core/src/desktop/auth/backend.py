@@ -38,11 +38,11 @@ LOG = logging.getLogger(__name__)
 try:
   import ldap
 except ImportError:
-  LOG.warn('ldap module not found')
+  LOG.warning('ldap module not found')
 try:
   import pam
 except ImportError:
-  LOG.warn('pam module not found')
+  LOG.warning('pam module not found')
 import requests
 
 import django.contrib.auth.backends
@@ -56,7 +56,7 @@ try:
   from django_auth_ldap.backend import LDAPBackend
   from django_auth_ldap.config import LDAPSearch
 except ImportError:
-  LOG.warn('django_auth_ldap module not found')
+  LOG.warning('django_auth_ldap module not found')
   class LDAPSearch: pass
   class LDAPSearch: pass
 from liboauth.metrics import oauth_authentication_time
@@ -64,7 +64,7 @@ try:
   from mozilla_django_oidc.auth import OIDCAuthenticationBackend, default_username_algo
   from mozilla_django_oidc.utils import absolutify, import_from_settings
 except ImportError:
-  LOG.warn('mozilla_django_oidc module not found')
+  LOG.warning('mozilla_django_oidc module not found')
   class OIDCAuthenticationBackend: pass
 
 from desktop import metrics
@@ -112,7 +112,7 @@ def rewrite_user(user):
   We currently only re-write specific attributes, though this could be generalized.
   """
   if user is None:
-    LOG.warn('Failed to rewrite user, user is None.')
+    LOG.warning('Failed to rewrite user, user is None.')
   else:
     augment = get_user_augmentation_class()(user)
     for attr in ('get_groups', 'get_home_directory', 'has_hue_permission', 'get_permissions'):
@@ -484,13 +484,13 @@ class LdapBackend(object):
   def add_ldap_config(self, ldap_config):
     ldap_url = ldap_config.LDAP_URL.get()
     if ldap_url is None:
-      LOG.warn("Could not find LDAP URL required for authentication.")
+      LOG.warning("Could not find LDAP URL required for authentication.")
       return None
     else:
       setattr(self._backend.settings, 'SERVER_URI', ldap_config.LDAP_URL.get())
 
     if ldap_url.lower().startswith('ldaps') and ldap_config.USE_START_TLS.get():
-      LOG.warn("Cannot configure LDAP with SSL and enable STARTTLS.")
+      LOG.warning("Cannot configure LDAP with SSL and enable STARTTLS.")
 
     if ldap_config.SEARCH_BIND_AUTHENTICATION.get():
       # New Search/Bind Auth
@@ -573,7 +573,7 @@ class LdapBackend(object):
       if existing_profile.creation_method == UserProfile.CreationMethod.EXTERNAL.name:
         is_super = User.objects.get(**username_filter_kwargs).is_superuser
     elif not LDAP.CREATE_USERS_ON_LOGIN.get():
-      LOG.warn("Create users when they login with their LDAP credentials is turned off")
+      LOG.warning("Create users when they login with their LDAP credentials is turned off")
       return None
 
     try:
@@ -584,10 +584,10 @@ class LdapBackend(object):
         else:
           user = self._backend.authenticate(username=username, password=password)
       else:
-        LOG.warn("%s not in an allowed login group" % username)
+        LOG.warning("%s not in an allowed login group" % username)
         return None
     except ImproperlyConfigured as detail:
-      LOG.warn("LDAP was not properly configured: %s", detail)
+      LOG.warning("LDAP was not properly configured: %s", detail)
       return None
 
     if user is not None and user.is_active:
@@ -620,10 +620,10 @@ class LdapBackend(object):
       try:
         user_info = connection.find_users(username, find_by_dn=False)
       except Exception as e:
-        LOG.warn("Failed to find LDAP user: %s" % e)
+        LOG.warning("Failed to find LDAP user: %s" % e)
 
       if not user_info:
-        LOG.warn("Could not get LDAP details for users with pattern %s" % username)
+        LOG.warning("Could not get LDAP details for users with pattern %s" % username)
         return False
 
       ldap_info = user_info[0]
@@ -927,7 +927,7 @@ class OIDCBackend(OIDCAuthenticationBackend):
       else:
         LOG.error("OpenID Connect logout failed: %s" % resp.content)
     else:
-      LOG.warn("OpenID Connect tokens are not available, logout skipped!")
+      LOG.warning("OpenID Connect tokens are not available, logout skipped!")
     return None
 
   # def filter_users_by_claims(self, claims):

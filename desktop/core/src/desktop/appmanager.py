@@ -264,7 +264,7 @@ def load_apps(app_blacklist):
     if sdk_app.name not in app_blacklist:
       # TODO: Remove once pig and jobsub have been migrated to editor
       if 'oozie' in app_blacklist and sdk_app.name in ('pig', 'jobsub'):
-        LOG.warn('%s depends on oozie which is blacklisted, will skip loading %s app.' % (sdk_app.name, sdk_app.name))
+        LOG.warning('%s depends on oozie which is blacklisted, will skip loading %s app.' % (sdk_app.name, sdk_app.name))
       else:
         m = sdk_app.load()
         dmi = DesktopModuleInfo(m)

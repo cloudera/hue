@@ -158,7 +158,7 @@ class Supervisor(threading.Thread):
           self.state = Supervisor.FINISHED
           return
         if exitcode != 0:
-          LOG.warn("Exit code for %s: %d" % (proc_str, exitcode))
+          LOG.warning("Exit code for %s: %d" % (proc_str, exitcode))
           self.state = Supervisor.ERROR
         et = time.time()
 
@@ -188,7 +188,7 @@ def shutdown(sups):
   global SHOULD_STOP
   SHOULD_STOP = True
 
-  LOG.warn("Supervisor shutting down!")
+  LOG.warning("Supervisor shutting down!")
 
   for pid in CHILD_PIDS:
     try:
@@ -196,7 +196,7 @@ def shutdown(sups):
     except OSError:
       pass
 
-  LOG.warn("Waiting for children to exit for %d seconds..." % WAIT_FOR_DEATH)
+  LOG.warning("Waiting for children to exit for %d seconds..." % WAIT_FOR_DEATH)
   t = time.time()
   still_alive = False
   while time.time() < t + WAIT_FOR_DEATH:
@@ -207,7 +207,7 @@ def shutdown(sups):
     if not still_alive:
       break
   if still_alive:
-    LOG.warn("Children have not exited after %d seconds. Killing them with SIGKILL." %
+    LOG.warning("Children have not exited after %d seconds. Killing them with SIGKILL." %
              WAIT_FOR_DEATH)
     for pid in CHILD_PIDS:
       try:

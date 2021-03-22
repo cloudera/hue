@@ -546,13 +546,13 @@ def get_banner_message(request):
       url = request.build_absolute_uri("/hue")
       link = '<a href="%s" style="color: #FFF; font-weight: bold">%s</a>' % (url, url)
       message = _('You are accessing an older version of Hue, please switch to the latest version: %s.') % link
-      LOG.warn('User %s is using Hue 3 UI' % request.user.username)
+      LOG.warning('User %s is using Hue 3 UI' % request.user.username)
 
     if HUE_LOAD_BALANCER.get() and HUE_LOAD_BALANCER.get() != [''] and \
       (not forwarded_host or not any(forwarded_host in lb for lb in HUE_LOAD_BALANCER.get())):
       message = _('You are accessing a non-optimized Hue, please switch to one of the available addresses: %s') % \
         (", ".join(['<a href="%s" style="color: #FFF; font-weight: bold">%s</a>' % (host, host) for host in HUE_LOAD_BALANCER.get()]))
-      LOG.warn('User %s is bypassing the load balancer' % request.user.username)
+      LOG.warning('User %s is bypassing the load balancer' % request.user.username)
 
     if message:
       banner_message = '<div style="padding: 4px; text-align: center; background-color: #003F6C; height: 24px; color: #DBE8F1">%s</div>' \
@@ -629,7 +629,7 @@ def _get_config_errors(request, cache=True):
         continue
 
       if not callable(validator):
-        LOG.warn("Auto config validation: %s.%s is not a function" % (module.conf.__name__, CONFIG_VALIDATOR))
+        LOG.warning("Auto config validation: %s.%s is not a function" % (module.conf.__name__, CONFIG_VALIDATOR))
         continue
 
       try:
@@ -651,7 +651,7 @@ def _get_config_errors(request, cache=True):
     _CONFIG_ERROR_LIST = error_list
 
   if _CONFIG_ERROR_LIST:
-    LOG.warn("Errors in config : %s" % _CONFIG_ERROR_LIST)
+    LOG.warning("Errors in config : %s" % _CONFIG_ERROR_LIST)
 
   return _CONFIG_ERROR_LIST
 
@@ -724,14 +724,14 @@ def collect_validation_messages(conf, error_list):
         hierarchy_sections_string += "[" * the_section.depth + section + "]" * the_section.depth + " "
         parent = the_section
     except KeyError as ex:
-      LOG.warn("Section %s not found: %s" % (section, str(ex)))
+      LOG.warning("Section %s not found: %s" % (section, str(ex)))
 
     the_value = ''
     try:
       # the_value may be a section or a value
       the_value = the_section[name]
     except KeyError as ex:
-      LOG.warn("Error in accessing Section or Value %s: %s" % (name, str(ex)))
+      LOG.warning("Error in accessing Section or Value %s: %s" % (name, str(ex)))
 
     section_or_value = 'keyvalue'
     if isinstance(the_value, dict):

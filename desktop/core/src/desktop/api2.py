@@ -851,7 +851,7 @@ def import_documents(request):
       # Replace illegal characters
       if '/' in doc['fields']['name']:
         new_name = doc['fields']['name'].replace('/', '-')
-        LOG.warn("Found illegal slash in document named: %s, renaming to: %s." % (doc['fields']['name'], new_name))
+        LOG.warning("Found illegal slash in document named: %s, renaming to: %s." % (doc['fields']['name'], new_name))
         doc['fields']['name'] = new_name
 
       # Set last modified date to now
@@ -1112,7 +1112,7 @@ def _copy_document_with_owner(doc, owner, uuids_map):
     doc['fields']['parent_directory'] = [uuids_map[parent_uuid], 1, False]
   else:
     if parent_uuid is not None:
-      LOG.warn('Could not find parent directory with UUID: %s in JSON import, will set parent to home directory' %
+      LOG.warning('Could not find parent directory with UUID: %s in JSON import, will set parent to home directory' %
                 parent_uuid)
     doc['fields']['parent_directory'] = [home_dir.uuid, home_dir.version, home_dir.is_history]
 
@@ -1120,7 +1120,7 @@ def _copy_document_with_owner(doc, owner, uuids_map):
   idx = 0
   for dep_uuid, dep_version, dep_is_history in doc['fields']['dependencies']:
     if dep_uuid not in list(uuids_map.keys()):
-      LOG.warn('Could not find dependency UUID: %s in JSON import, may cause integrity errors if not found.' % dep_uuid)
+      LOG.warning('Could not find dependency UUID: %s in JSON import, may cause integrity errors if not found.' % dep_uuid)
     else:
       if uuids_map[dep_uuid] is None:
         uuids_map[dep_uuid] = uuid_default()
@@ -1145,7 +1145,7 @@ def _create_or_update_document_with_owner(doc, owner, uuids_map):
     create_new = True
 
   if create_new:
-    LOG.warn('Could not find document with UUID: %s, will create a new document on import.', doc['fields']['uuid'])
+    LOG.warning('Could not find document with UUID: %s, will create a new document on import.', doc['fields']['uuid'])
     doc['pk'] = None
     doc['fields']['version'] = 1
 
@@ -1154,7 +1154,7 @@ def _create_or_update_document_with_owner(doc, owner, uuids_map):
     uuid, version, is_history = doc['fields']['parent_directory']
     if uuid not in list(uuids_map.keys()) and \
             not Document2.objects.filter(uuid=uuid, version=version, is_history=is_history).exists():
-      LOG.warn('Could not find parent document with UUID: %s, will set parent to home directory' % uuid)
+      LOG.warning('Could not find parent document with UUID: %s, will set parent to home directory' % uuid)
       doc['fields']['parent_directory'] = [home_dir.uuid, home_dir.version, home_dir.is_history]
 
   # Verify that dependencies exist, raise critical error if any dependency not found
@@ -1167,7 +1167,7 @@ def _create_or_update_document_with_owner(doc, owner, uuids_map):
         raise PopupException(_('Cannot import document, dependency with UUID: %s not found.') % uuid)
       elif is_history:
         history_deps_list.insert(0, index) # Insert in decreasing order to facilitate delete
-        LOG.warn('History dependency with UUID: %s ignored while importing document %s' % (uuid, doc['fields']['name']))
+        LOG.warning('History dependency with UUID: %s ignored while importing document %s' % (uuid, doc['fields']['name']))
 
     # Delete history dependencies not found in the DB
     for index in history_deps_list:

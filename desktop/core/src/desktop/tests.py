@@ -225,7 +225,7 @@ def test_log_view():
   URL = reverse(views.log_view)
 
   LOG = logging.getLogger(__name__)
-  LOG.warn('une voix m’a réveillé')
+  LOG.warning('une voix m’a réveillé')
 
   # UnicodeDecodeError: 'ascii' codec can't decode byte... should not happen
   response = c.get(URL)
@@ -236,7 +236,7 @@ def test_log_view():
   URL = reverse(views.log_view)
 
   LOG = logging.getLogger(__name__)
-  LOG.warn('Got response: PK\x03\x04\n\x00\x00\x08\x00\x00\xad\x0cN?\x00\x00\x00\x00')
+  LOG.warning('Got response: PK\x03\x04\n\x00\x00\x08\x00\x00\xad\x0cN?\x00\x00\x00\x00')
 
   # DjangoUnicodeDecodeError: 'utf8' codec can't decode byte 0xad in position 75: invalid start byte... should not happen
   response = c.get(URL)
@@ -248,7 +248,7 @@ def test_download_log_view():
   URL = reverse(views.download_log_view)
 
   LOG = logging.getLogger(__name__)
-  LOG.warn(u'une voix m’a réveillé')
+  LOG.warning(u'une voix m’a réveillé')
 
   # UnicodeDecodeError: 'ascii' codec can't decode byte... should not happen
   response = c.get(URL)
@@ -1519,7 +1519,7 @@ def test_db_migrations_mysql():
   try:
     subprocess.check_output('type mysql', shell=True)
   except subprocess.CalledProcessError as e:
-    LOG.warn('mysql not found')
+    LOG.warning('mysql not found')
     raise SkipTest
   for version in versions:
     file_name = 'hue_' + version + '_mysql.sql'
@@ -1547,7 +1547,7 @@ def test_db_migrations_mysql():
       )
       call_command('migrate', '--fake-initial', '--database=%(SCHEMA)s' % DATABASES[name])
     except subprocess.CalledProcessError as e:
-      LOG.warn('stderr: {}'.format(e.output))
+      LOG.warning('stderr: {}'.format(e.output))
       raise e
     finally:
       del DATABASES[name]

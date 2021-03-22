@@ -111,7 +111,7 @@ def location_to_url(location, strict=True, is_embeddable=False):
   try:
     filebrowser_path = reverse("filebrowser:filebrowser.views.view", kwargs=dict(path=path))
   except Exception as e:
-    LOG.warn('No table filesystem link: %s' % e)
+    LOG.warning('No table filesystem link: %s' % e)
     return None
 
   if is_embeddable and not filebrowser_path.startswith('/hue'):

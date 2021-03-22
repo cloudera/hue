@@ -117,7 +117,7 @@ class Command(BaseCommand):
         self.deleteRecordsBase = 999  #number of documents to delete in a batch
                                       #to avoid Non Fatal Exception: DatabaseError: too many SQL variables
 
-        LOG.warn("HUE_CONF_DIR: %s" % os.environ['HUE_CONF_DIR'])
+        LOG.warning("HUE_CONF_DIR: %s" % os.environ['HUE_CONF_DIR'])
         LOG.info("DB Engine: %s" % desktop.conf.DATABASE.ENGINE.get())
         LOG.info("DB Name: %s" % desktop.conf.DATABASE.NAME.get())
         LOG.info("DB User: %s" % desktop.conf.DATABASE.USER.get())
