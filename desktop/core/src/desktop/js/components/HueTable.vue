@@ -37,7 +37,7 @@
             :class="cellClass(column.headerCssClass, colIndex)"
             scope="col"
           >
-            {{ column.label || column.key }}
+            {{ typeof column.label !== 'undefined' ? column.label : column.key }}
           </th>
           <!-- To fill the blank space to the right when table width is smaller than available horizontal space -->
           <th class="column-flush" scope="col" />
