@@ -92,15 +92,12 @@ def parse_events(event):
 
 def handle_on_message(channel_id, bot_id, text, user_id):
   # Ignore bot's own message since that will cause an infinite loop of messages if we respond.
-  if bot_id:
+  if bot_id is not None:
     return HttpResponse(status=200)
   
-  if slack_client:
+  if slack_client is not None:
     if text and 'hello hue' in text.lower():
-      response = say_hi_user(channel_id, user_id)
-
-      if not response['ok']:
-        raise PopupException(_("Error posting message"), detail=response["error"])
+      send_hi_user(channel_id, user_id)
 
 
 def handle_on_link_shared(channel_id, message_ts, links):
@@ -126,28 +123,38 @@ def handle_on_link_shared(channel_id, message_ts, links):
     request = MockRequest(user=user)
 
     payload = _make_unfurl_payload(request, item['url'], id_type, doc, doc_type)
-    response = slack_client.chat_unfurl(channel=channel_id, ts=message_ts, unfurls=payload['payload'])
-    if not response['ok']:
-      raise PopupException(_("Cannot unfurl link"), detail=response["error"])
+    try:
+      slack_client.chat_unfurl(channel=channel_id, ts=message_ts, unfurls=payload['payload'])
+    except Exception as e:
+      raise PopupException(_("Cannot unfurl link"), detail=e)
     
     # Generate and upload result xlsx file only if result available
     if payload['file_status']:
-      notebook = json.loads(doc.data)
-      snippet = notebook['snippets'][0]
-      snippet['statement'] = notebook['snippets'][0]['statement_raw']
-      file_format = 'xlsx'
-      file_name = _get_snippet_name(notebook)
+      send_result_file(request, channel_id, message_ts, doc, 'xls')
 
-      content_generator = get_api(request, snippet).download(notebook, snippet, file_format='xls')
 
-      response = slack_client.files_upload(
-        channels=channel_id, 
-        file=next(content_generator), 
-        thread_ts=message_ts,
-        filetype=file_format,
-        filename='{}.{}'.format(file_name, file_format),
-        initial_comment='Here is your result file!'
-        )
+def send_result_file(request, channel_id, message_ts, doc, file_format):
+  notebook = json.loads(doc.data)
+  snippet = notebook['snippets'][0]
+  snippet['statement'] = notebook['snippets'][0]['statement_raw']
+
+  content_generator = get_api(request, snippet).download(notebook, snippet, file_format)
+
+  file_format = 'xlsx'
+  file_name = _get_snippet_name(notebook)
+
+  try:
+    slack_client.files_upload(
+      channels=channel_id,
+      file=next(content_generator), 
+      thread_ts=message_ts,
+      filetype=file_format,
+      filename='{}.{}'.format(file_name, file_format),
+      initial_comment='Here is your result file!'
+    )
+  except Exception as e:
+    raise PopupException(_("Cannot upload result file"), detail=e)
+
 
 def _query_result(request, notebook, max_rows):
   snippet = notebook['snippets'][0]
@@ -256,10 +263,13 @@ def _make_unfurl_payload(request, url, id_type, doc, doc_type):
   return {'payload': payload, 'file_status': file_status}
 
 
-def say_hi_user(channel_id, user_id):
+def send_hi_user(channel_id, user_id):
   """
   Sends Hi<user_id> message in a specific channel.
 
   """
   bot_message = 'Hi <@{}> :wave:'.format(user_id)
-  return slack_client.api_call(api_method='chat.postMessage', json={'channel': channel_id, 'text': bot_message})
+  try:
+    slack_client.api_call(api_method='chat.postMessage', json={'channel': channel_id, 'text': bot_message})
+  except Exception as e:
+    raise PopupException(_("Error posting message"), detail=e)
