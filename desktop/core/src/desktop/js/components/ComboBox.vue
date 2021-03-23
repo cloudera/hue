@@ -28,6 +28,7 @@
     (option as { label: string }).label || (option as string);
 
   export default defineComponent({
+    name: 'ComboBox',
     components: { DropdownMenuOptions, TypeaheadInput },
     props: {
       modelValue: {

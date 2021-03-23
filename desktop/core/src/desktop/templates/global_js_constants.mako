@@ -20,7 +20,7 @@
   from desktop import conf
   from desktop.auth.backend import is_admin, is_hue_admin
   from desktop.conf import APP_SWITCHER_ALTUS_BASE_URL, APP_SWITCHER_MOW_BASE_URL, CUSTOM_DASHBOARD_URL, \
-      DISPLAY_APP_SWITCHER, IS_K8S_ONLY, IS_MULTICLUSTER_ONLY, USE_DEFAULT_CONFIGURATION, USE_NEW_SIDE_PANELS, \
+      DISPLAY_APP_SWITCHER, IS_K8S_ONLY, IS_MULTICLUSTER_ONLY, USE_DEFAULT_CONFIGURATION, USE_NEW_ASSIST_PANEL, \
       VCS, ENABLE_GIST, ENABLE_LINK_SHARING, has_channels, has_connectors
   from desktop.models import hue_version, _get_apps, get_cluster_config
 
@@ -672,7 +672,7 @@
       home_dir = '/'
   %>
 
-  window.USE_NEW_SIDE_PANELS = '${ USE_NEW_SIDE_PANELS.get() }' === 'True'
+  window.USE_NEW_ASSIST_PANEL = '${ USE_NEW_ASSIST_PANEL.get() }' === 'True'
   window.USER_HOME_DIR = '${ home_dir }';
 
   var userGroups = [];
