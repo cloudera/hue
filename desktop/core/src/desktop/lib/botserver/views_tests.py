@@ -121,8 +121,8 @@ class TestBotServer(unittest.TestCase):
               assert_raises(PopupException, handle_on_link_shared, "channel", "12.1", [{"url": inv_gist_url}])
 
               # Document does not exist
-              document2_objects_get.side_effect = PopupException('message')
-              _get_gist_document.side_effect = PopupException('message')
+              document2_objects_get.side_effect = PopupException('Query document does not exist')
+              _get_gist_document.side_effect = PopupException('Gist does not exist')
 
               qhistory_url = "https://demo.gethue.com/hue/editor?editor=109644"
               gist_url = "https://demo.gethue.com/hue/gist?uuid=6d1c407b-d999-4dfd-ad23-d3a46c19a427"
@@ -130,5 +130,5 @@ class TestBotServer(unittest.TestCase):
               assert_raises(PopupException, handle_on_link_shared, "channel", "12.1", [{"url": gist_url}])
 
               # chat_unfurl exception
-              chat_unfurl.side_effect = PopupException('message')
+              chat_unfurl.side_effect = PopupException('Cannot unfurl link')
               assert_raises(PopupException, handle_on_link_shared, "channel", "12.1", links)
