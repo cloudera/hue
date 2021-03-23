@@ -32,13 +32,14 @@ import tablib
 
 from django.http import StreamingHttpResponse, HttpResponse
 from django.utils.encoding import smart_str
-from django.utils.http import urlquote
 from desktop.lib import i18n
 
 if sys.version_info[0] > 2:
   from io import BytesIO as string_io
+  from urllib.parse import quote
 else:
   from StringIO import StringIO as string_io
+  from django.utils.http import urlquote as quote
 
 
 LOG = logging.getLogger(__name__)
@@ -164,7 +165,7 @@ def make_response(generator, format, name, encoding=None, user_agent=None): #TOD
     format = format.encode('ascii')
     resp['Content-Disposition'] = b'attachment; filename="%s.%s"' % (name, format)
   except UnicodeEncodeError:
-    name = urlquote(name)
+    name = quote(name)
     if user_agent is not None and 'Firefox' in user_agent:
       # Preserving non-ASCII filename. See RFC https://tools.ietf.org/html/rfc6266#appendix-D, only FF works
       resp['Content-Disposition'] = 'attachment; filename*="%s.%s"' % (name, format)

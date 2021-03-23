@@ -43,7 +43,6 @@ from django.core import exceptions
 from django.http import HttpResponseNotAllowed, HttpResponseForbidden
 from django.urls import resolve
 from django.http import HttpResponseRedirect, HttpResponse
-from django.utils.http import urlquote
 from django.utils.deprecation import MiddlewareMixin
 
 from hadoop import cluster
@@ -66,9 +65,10 @@ from desktop.log.access import access_log, log_page_hit, access_warn
 if sys.version_info[0] > 2:
   from django.utils.translation import gettext as _
   from django.utils.http import url_has_allowed_host_and_scheme
+  from urllib.parse import quote
 else:
   from django.utils.translation import ugettext as _
-  from django.utils.http import is_safe_url as url_has_allowed_host_and_scheme
+  from django.utils.http import is_safe_url as url_has_allowed_host_and_scheme, urlquote as quote
 
 
 LOG = logging.getLogger(__name__)
@@ -384,11 +384,11 @@ class LoginAndPermissionMiddleware(MiddlewareMixin):
           'url': "%s?%s=%s" % (
               settings.LOGIN_URL,
               REDIRECT_FIELD_NAME,
-              urlquote('/hue' + request.get_full_path().replace('is_embeddable=true', '').replace('&&', '&'))
+              quote('/hue' + request.get_full_path().replace('is_embeddable=true', '').replace('&&', '&'))
           )
         }) # Remove embeddable so redirect from & to login works. Login page is not embeddable
       else:
-        return HttpResponseRedirect("%s?%s=%s" % (settings.LOGIN_URL, REDIRECT_FIELD_NAME, urlquote(request.get_full_path())))
+        return HttpResponseRedirect("%s?%s=%s" % (settings.LOGIN_URL, REDIRECT_FIELD_NAME, quote(request.get_full_path())))
 
   def process_response(self, request, response):
     if hasattr(request, 'ts') and hasattr(request, 'view_func'):
