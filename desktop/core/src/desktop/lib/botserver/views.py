@@ -23,7 +23,6 @@ from pprint import pprint
 from tabulate import tabulate
 
 from desktop import conf
-from desktop.conf import ENABLE_GIST_PREVIEW
 from desktop.lib.django_util import login_notrequired, JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.models import Document2, _get_gist_document
@@ -109,7 +108,7 @@ def handle_on_link_shared(channel_id, message_ts, links):
       if path == '/hue/editor' and id_type == 'editor':
         doc = Document2.objects.get(id=qid)
         doc_type = 'Query'
-      elif path == '/hue/gist' and id_type == 'uuid' and ENABLE_GIST_PREVIEW.get():
+      elif path == '/hue/gist' and id_type == 'uuid':
         doc = _get_gist_document(uuid=qid)
         doc_type = 'Gist'
       else:
