@@ -43,7 +43,7 @@ from django.core import exceptions
 from django.http import HttpResponseNotAllowed, HttpResponseForbidden
 from django.urls import resolve
 from django.http import HttpResponseRedirect, HttpResponse
-from django.utils.http import urlquote, is_safe_url
+from django.utils.http import urlquote
 from django.utils.deprecation import MiddlewareMixin
 
 from hadoop import cluster
@@ -65,8 +65,10 @@ from desktop.log.access import access_log, log_page_hit, access_warn
 
 if sys.version_info[0] > 2:
   from django.utils.translation import gettext as _
+  from django.utils.http import url_has_allowed_host_and_scheme
 else:
   from django.utils.translation import ugettext as _
+  from django.utils.http import is_safe_url as url_has_allowed_host_and_scheme
 
 
 LOG = logging.getLogger(__name__)
@@ -837,7 +839,7 @@ class EnsureSafeRedirectURLMiddleware(MiddlewareMixin):
       if any(regexp.match(location) for regexp in redirection_patterns):
         return response
 
-      if is_safe_url(location, allowed_hosts={request.get_host()}):
+      if url_has_allowed_host_and_scheme(location, allowed_hosts={request.get_host()}):
         return response
 
       if request.path in ['/oidc/authenticate/', '/oidc/callback/', '/oidc/logout/', '/hue/oidc_failed/']:
