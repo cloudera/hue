@@ -105,8 +105,8 @@ def handle_on_link_shared(channel_id, message_ts, links):
     id_type, qid = urlsplit(item['url'])[3].split('=')
 
     try:
-      if path == '/hue/editor' and id_type == 'editor' and qid.isdigit():
-        doc = Document2.objects.get(id=qid)
+      if path == '/hue/editor' and id_type == 'editor':
+        doc = Document2.objects.get(id=qid) if qid.isdigit() else Document2.objects.get(uuid=qid)
         doc_type = 'Query'
       elif path == '/hue/gist' and id_type == 'uuid':
         doc = _get_gist_document(uuid=qid)
@@ -120,7 +120,7 @@ def handle_on_link_shared(channel_id, message_ts, links):
       msg = "Document with {key}={value} does not exist".format(key='uuid' if id_type == 'uuid' else 'id', value=qid)
       raise PopupException(_(msg))
     except User.DoesNotExist:
-      raise PopupException(_('Could not find user with username: {}').format(doc.owner.username))
+      raise PopupException(_('Could not find the user'))
 
     # Mock request for query execution and fetch result
     user = rewrite_user(user)
