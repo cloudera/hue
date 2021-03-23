@@ -86,8 +86,6 @@ class AssistPanel {
       errorLoadingTablePreview: I18n('There was a problem loading the index preview')
     };
 
-    self.tabsEnabled = window.USE_NEW_SIDE_PANELS;
-
     self.availablePanels = ko.observableArray();
     self.visiblePanel = ko.observable();
 
@@ -125,136 +123,134 @@ class AssistPanel {
           });
         }
 
-        if (self.tabsEnabled) {
-          if (appConfig.browser && appConfig.browser.interpreters) {
-            const storageBrowsers = appConfig.browser.interpreters.filter(
-              interpreter =>
-                interpreter.type === 'adls' ||
-                interpreter.type === 'hdfs' ||
-                interpreter.type === 's3' ||
-                interpreter.type === 'abfs'
-            );
+        if (appConfig.browser && appConfig.browser.interpreters) {
+          const storageBrowsers = appConfig.browser.interpreters.filter(
+            interpreter =>
+              interpreter.type === 'adls' ||
+              interpreter.type === 'hdfs' ||
+              interpreter.type === 's3' ||
+              interpreter.type === 'abfs'
+          );
 
-            if (storageBrowsers.length) {
-              panels.push(
-                new AssistInnerPanel({
-                  panelData: {
-                    name: 'hue-assist-storage-panel',
-                    params: {
-                      sources: storageBrowsers
-                    }
-                  },
-                  name: I18n('Files'),
-                  type: 'files',
-                  icon: 'fa-files-o',
-                  minHeight: 50
-                })
-              );
-            }
-
-            if (appConfig.browser.interpreter_names.indexOf('indexes') !== -1) {
-              const solrPanel = new AssistInnerPanel({
-                panelData: {
-                  name: 'hue-assist-db-panel',
-                  params: $.extend(
-                    {
-                      i18n: i18nCollections,
-                      isSolr: true
-                    },
-                    params.sql
-                  )
-                },
-                name: I18n('Indexes'),
-                type: 'solr',
-                icon: 'fa-search-plus',
-                minHeight: 75
-              });
-              panels.push(solrPanel);
-              huePubSub.subscribe(ASSIST_SHOW_SOLR_EVENT, () => {
-                if (self.visiblePanel() !== solrPanel) {
-                  self.visiblePanel(solrPanel);
-                }
-              });
-            }
-
-            if (appConfig.browser.interpreter_names.indexOf('kafka') !== -1) {
-              const streamsPanel = new AssistInnerPanel({
-                panelData: {
-                  name: 'hue-assist-db-panel',
-                  params: $.extend(
-                    {
-                      i18n: i18nCollections,
-                      isStreams: true
-                    },
-                    params.sql
-                  )
-                },
-                name: I18n('Streams'),
-                type: 'kafka',
-                icon: 'fa-sitemap',
-                minHeight: 75
-              });
-              panels.push(streamsPanel);
-            }
-
-            if (appConfig.browser.interpreter_names.indexOf('hbase') !== -1) {
-              panels.push(
-                new AssistInnerPanel({
-                  panelData: {
-                    name: 'hue-assist-hbase-panel',
-                    params: {}
-                  },
-                  name: I18n('HBase'),
-                  type: 'hbase',
-                  icon: 'fa-th-large',
-                  minHeight: 50
-                })
-              );
-            }
-          }
-
-          const documentsPanel = new AssistInnerPanel({
-            panelData: {
-              name: 'hue-assist-documents-panel',
-              params: {
-                user: params.user
-              }
-            },
-            name: I18n('Documents'),
-            type: 'documents',
-            icon: 'fa-files-o',
-            iconSvg: '#hi-documents',
-            minHeight: 50,
-            rightAlignIcon: true,
-            visible:
-              params.visibleAssistPanels && params.visibleAssistPanels.indexOf('documents') !== -1
-          });
-
-          panels.push(documentsPanel);
-
-          huePubSub.subscribe(ASSIST_SHOW_DOC_EVENT, docType => {
-            huePubSub.publish(SHOW_LEFT_ASSIST_EVENT);
-            if (self.visiblePanel() !== documentsPanel) {
-              self.visiblePanel(documentsPanel);
-            }
-            huePubSub.publish('assist.documents.set.type.filter', docType);
-          });
-
-          if (window.HAS_GIT) {
+          if (storageBrowsers.length) {
             panels.push(
               new AssistInnerPanel({
                 panelData: {
-                  name: 'hue-assist-git-panel',
-                  params: {}
+                  name: 'hue-assist-storage-panel',
+                  params: {
+                    sources: storageBrowsers
+                  }
                 },
-                name: I18n('Git'),
-                type: 'git',
-                icon: 'fa-github',
-                minHeight: 50,
-                rightAlignIcon: true
+                name: I18n('Files'),
+                type: 'files',
+                icon: 'fa-files-o',
+                minHeight: 50
               })
             );
           }
+
+          if (appConfig.browser.interpreter_names.indexOf('indexes') !== -1) {
+            const solrPanel = new AssistInnerPanel({
+              panelData: {
+                name: 'hue-assist-db-panel',
+                params: $.extend(
+                  {
+                    i18n: i18nCollections,
+                    isSolr: true
+                  },
+                  params.sql
+                )
+              },
+              name: I18n('Indexes'),
+              type: 'solr',
+              icon: 'fa-search-plus',
+              minHeight: 75
+            });
+            panels.push(solrPanel);
+            huePubSub.subscribe(ASSIST_SHOW_SOLR_EVENT, () => {
+              if (self.visiblePanel() !== solrPanel) {
+                self.visiblePanel(solrPanel);
+              }
+            });
+          }
+
+          if (appConfig.browser.interpreter_names.indexOf('kafka') !== -1) {
+            const streamsPanel = new AssistInnerPanel({
+              panelData: {
+                name: 'hue-assist-db-panel',
+                params: $.extend(
+                  {
+                    i18n: i18nCollections,
+                    isStreams: true
+                  },
+                  params.sql
+                )
+              },
+              name: I18n('Streams'),
+              type: 'kafka',
+              icon: 'fa-sitemap',
+              minHeight: 75
+            });
+            panels.push(streamsPanel);
+          }
+
+          if (appConfig.browser.interpreter_names.indexOf('hbase') !== -1) {
+            panels.push(
+              new AssistInnerPanel({
+                panelData: {
+                  name: 'hue-assist-hbase-panel',
+                  params: {}
+                },
+                name: I18n('HBase'),
+                type: 'hbase',
+                icon: 'fa-th-large',
+                minHeight: 50
+              })
+            );
+          }
+        }
+
+        const documentsPanel = new AssistInnerPanel({
+          panelData: {
+            name: 'hue-assist-documents-panel',
+            params: {
+              user: params.user
+            }
+          },
+          name: I18n('Documents'),
+          type: 'documents',
+          icon: 'fa-files-o',
+          iconSvg: '#hi-documents',
+          minHeight: 50,
+          rightAlignIcon: true,
+          visible:
+            params.visibleAssistPanels && params.visibleAssistPanels.indexOf('documents') !== -1
+        });
+
+        panels.push(documentsPanel);
+
+        huePubSub.subscribe(ASSIST_SHOW_DOC_EVENT, docType => {
+          huePubSub.publish(SHOW_LEFT_ASSIST_EVENT);
+          if (self.visiblePanel() !== documentsPanel) {
+            self.visiblePanel(documentsPanel);
+          }
+          huePubSub.publish('assist.documents.set.type.filter', docType);
+        });
+
+        if (window.HAS_GIT) {
+          panels.push(
+            new AssistInnerPanel({
+              panelData: {
+                name: 'hue-assist-git-panel',
+                params: {}
+              },
+              name: I18n('Git'),
+              type: 'git',
+              icon: 'fa-github',
+              minHeight: 50,
+              rightAlignIcon: true
+            })
+          );
         }
 
         self.availablePanels(panels);
