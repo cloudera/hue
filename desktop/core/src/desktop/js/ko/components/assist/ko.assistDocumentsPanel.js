@@ -21,7 +21,8 @@ import { ASSIST_DOC_HIGHLIGHT_EVENT, ASSIST_SHOW_DOC_EVENT } from './events';
 import { DOCUMENT_TYPES } from 'doc/docSupport';
 import HueFileEntry from 'doc/hueFileEntry';
 import componentUtils from 'ko/components/componentUtils';
-import { CONFIG_REFRESHED_EVENT, getLastKnownConfig } from 'config/hueConfig';
+import { CONFIG_REFRESHED_TOPIC } from 'config/events';
+import { getLastKnownConfig } from 'config/hueConfig';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
@@ -249,7 +250,7 @@ class AssistDocumentsPanel {
     };
 
     updateFromConfig(getLastKnownConfig());
-    huePubSub.subscribe(CONFIG_REFRESHED_EVENT, updateFromConfig);
+    huePubSub.subscribe(CONFIG_REFRESHED_TOPIC, updateFromConfig);
 
     self.highlightTypeFilter = ko.observable(false);
 

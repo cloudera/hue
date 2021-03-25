@@ -17,17 +17,17 @@
 import $ from 'jquery';
 import * as ko from 'knockout';
 
-import AssistInnerPanel from 'ko/components/assist/assistInnerPanel';
-import componentUtils from 'ko/components/componentUtils';
-import huePubSub from 'utils/huePubSub';
-import I18n from 'utils/i18n';
-import { GET_KNOWN_CONFIG_EVENT, CONFIG_REFRESHED_EVENT } from 'config/hueConfig';
 import {
   ASSIST_SHOW_DOC_EVENT,
   ASSIST_SHOW_SOLR_EVENT,
   ASSIST_SHOW_SQL_EVENT,
   SHOW_LEFT_ASSIST_EVENT
 } from './events';
+import { GET_KNOWN_CONFIG_TOPIC } from 'config/events';
+import AssistInnerPanel from 'ko/components/assist/assistInnerPanel';
+import componentUtils from 'ko/components/componentUtils';
+import huePubSub from 'utils/huePubSub';
+import I18n from 'utils/i18n';
 import { withLocalStorage } from 'utils/storageUtils';
 
 const TEMPLATE = `
@@ -93,7 +93,7 @@ class AssistPanel {
     withLocalStorage('assist.last.open.panel', self.lastOpenPanelType);
 
     // TODO: Support dynamic config changes
-    huePubSub.publish(GET_KNOWN_CONFIG_EVENT, clusterConfig => {
+    huePubSub.publish(GET_KNOWN_CONFIG_TOPIC, clusterConfig => {
       if (clusterConfig && clusterConfig['app_config']) {
         const panels = [];
         const appConfig = clusterConfig['app_config'];

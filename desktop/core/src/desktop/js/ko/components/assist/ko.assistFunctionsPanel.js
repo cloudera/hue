@@ -16,6 +16,8 @@
 
 import * as ko from 'knockout';
 
+import { CONFIG_REFRESHED_TOPIC } from 'config/events';
+import { filterEditorConnectors } from 'config/hueConfig';
 import componentUtils from 'ko/components/componentUtils';
 import { HUE_DROP_DOWN_COMPONENT } from 'ko/components/ko.dropDown';
 import sqlReferenceRepository from 'sql/reference/sqlReferenceRepository';
@@ -25,7 +27,6 @@ import {
   getUdfCategories,
   UDF_DESCRIBED_EVENT
 } from 'sql/reference/sqlUdfRepository';
-import { CONFIG_REFRESHED_EVENT, filterEditorConnectors } from 'config/hueConfig';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
@@ -322,7 +323,7 @@ class AssistFunctionsPanel {
     };
 
     configUpdated();
-    huePubSub.subscribe(CONFIG_REFRESHED_EVENT, configUpdated);
+    huePubSub.subscribe(CONFIG_REFRESHED_TOPIC, configUpdated);
   }
 }
 

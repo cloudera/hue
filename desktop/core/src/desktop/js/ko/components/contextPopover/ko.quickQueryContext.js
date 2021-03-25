@@ -23,12 +23,13 @@ import { SIMPLE_RESULT_GRID_COMPONENT } from 'apps/editor/components/resultGrid/
 
 import 'apps/editor/components/ExecutableActionsKoBridge.vue';
 
-import componentUtils from 'ko/components/componentUtils';
-import DisposableComponent from 'ko/components/DisposableComponent';
 import Executor from 'apps/editor/execution/executor';
 import SqlExecutable from 'apps/editor/execution/sqlExecutable';
+import { CONFIG_REFRESHED_TOPIC } from 'config/events';
+import { filterEditorConnectors } from 'config/hueConfig';
+import componentUtils from 'ko/components/componentUtils';
+import DisposableComponent from 'ko/components/DisposableComponent';
 import sqlStatementsParser from 'parse/sqlStatementsParser';
-import { CONFIG_REFRESHED_EVENT, filterEditorConnectors } from 'config/hueConfig';
 
 export const NAME = 'quick-query-context';
 
@@ -136,7 +137,7 @@ class QuickQueryContext extends DisposableComponent {
     );
 
     this.updateFromConfig();
-    this.subscribe(CONFIG_REFRESHED_EVENT, this.updateFromConfig.bind(this));
+    this.subscribe(CONFIG_REFRESHED_TOPIC, this.updateFromConfig.bind(this));
 
     let refreshExecutableThrottle = -1;
     const refreshExecutable = () => {

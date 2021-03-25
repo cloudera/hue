@@ -20,7 +20,8 @@ import * as ko from 'knockout';
 import * as propsMappers from './propsMappers';
 import MetastoreSource from 'apps/tableBrowser/metastoreSource';
 import dataCatalog from 'catalog/dataCatalog';
-import { findEditorConnector, GET_KNOWN_CONFIG_EVENT } from 'config/hueConfig';
+import { GET_KNOWN_CONFIG_TOPIC } from 'config/events';
+import { findEditorConnector } from 'config/hueConfig';
 import huePubSub from 'utils/huePubSub';
 import hueUtils from 'utils/hueUtils';
 import { getFromLocalStorage, withLocalStorage } from 'utils/storageUtils';
@@ -89,7 +90,7 @@ class MetastoreViewModel {
     this.loading = ko.pureComputed(() => !this.source() || this.source().loading());
 
     // TODO: Support dynamic config changes
-    huePubSub.publish(GET_KNOWN_CONFIG_EVENT, clusterConfig => {
+    huePubSub.publish(GET_KNOWN_CONFIG_TOPIC, clusterConfig => {
       const initialSourceType = options.sourceType || 'hive';
 
       if (clusterConfig && clusterConfig.app_config && clusterConfig.app_config.catalogs) {

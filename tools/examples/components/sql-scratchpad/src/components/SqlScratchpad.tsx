@@ -36,7 +36,7 @@ export class SqlScratchpad extends React.Component<{}, SqlScratchpadState> {
   componentDidMount() {
     console.info('Refreshing config');
 
-    hueConfig.refreshConfig(HUE_BASE_URL).then(() => {
+    hueConfig.refreshConfig().then(() => {
       const connector = hueConfig.findEditorConnector(() => true); // Returns the first connector
 
       this.setState({
