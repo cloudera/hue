@@ -68,7 +68,7 @@ export default class EditorViewModel {
     this.sharingEnabled = ko.pureComputed(
       () =>
         this.config() &&
-        (this.config().hue_config.is_admin || this.config().hue_config.sharing_enabled)
+        (this.config().hue_config.is_admin || this.config().hue_config.enable_sharing)
     );
 
     huePubSub.publish(GET_KNOWN_CONFIG_EVENT, this.config);
