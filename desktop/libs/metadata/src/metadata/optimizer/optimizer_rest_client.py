@@ -50,7 +50,11 @@ class OptimizerRestClient(OptimizerClient):
 
 
   def _call(self, path, data):
-    return self._root.post(path, data=json.dumps(data), contenttype=_JSON_CONTENT_TYPE)
+    try:
+      return self._root.post(path, data=json.dumps(data), contenttype=_JSON_CONTENT_TYPE)
+    except:
+      LOG.exception('Error calling Optimize service')
+      return {}
 
 
 class MockApiLib():

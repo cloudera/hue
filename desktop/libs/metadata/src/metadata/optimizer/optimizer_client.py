@@ -279,7 +279,7 @@ class OptimizerClient(object):
     predictions = response.get('predictions', [])
 
     return {
-      'statement': predictions[0]['statement']
+      'statement': predictions and predictions[0]['statement']
     }
 
 
