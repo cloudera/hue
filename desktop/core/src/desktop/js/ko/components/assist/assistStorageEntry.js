@@ -19,7 +19,7 @@ import * as ko from 'knockout';
 
 import apiHelper from 'api/apiHelper';
 import huePubSub from 'utils/huePubSub';
-import { findBrowserConnector, GET_KNOWN_CONFIG_EVENT, getRootFilePath } from 'config/hueConfig';
+import { findBrowserConnector, getRootFilePath } from 'config/hueConfig';
 
 const PAGE_SIZE = 100;
 

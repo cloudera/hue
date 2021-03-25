@@ -30,9 +30,10 @@ import ResizeHelper from './resizeHelper';
 import StorageContext from './storageContext';
 import contextCatalog from 'catalog/contextCatalog';
 import dataCatalog from 'catalog/dataCatalog';
+import { GET_KNOWN_CONFIG_TOPIC } from 'config/events';
+import { findEditorConnector } from 'config/hueConfig';
 import { ASSIST_KEY_COMPONENT } from 'ko/components/assist/ko.assistKey';
 import componentUtils from 'ko/components/componentUtils';
-import { findEditorConnector, GET_KNOWN_CONFIG_EVENT } from 'config/hueConfig';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import { getFromLocalStorage } from 'utils/storageUtils';
@@ -913,7 +914,7 @@ class SqlContextContentsGlobalSearch {
     let connectorId = params.data.sourceType && params.data.sourceType.toLowerCase();
 
     if (!connectorId || connectorId === 'hive') {
-      huePubSub.publish(GET_KNOWN_CONFIG_EVENT, clusterConfig => {
+      huePubSub.publish(GET_KNOWN_CONFIG_TOPIC, clusterConfig => {
         if (clusterConfig) {
           const defaultEditor = clusterConfig['default_sql_interpreter'];
           if (!connectorId || (connectorId === 'hive' && defaultEditor === 'impala')) {

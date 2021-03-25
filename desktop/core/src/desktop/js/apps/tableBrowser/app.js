@@ -22,7 +22,7 @@ import huePubSub from 'utils/huePubSub';
 import MetastoreViewModel from 'apps/tableBrowser/metastoreViewModel';
 import hueUtils from 'utils/hueUtils';
 import I18n from 'utils/i18n';
-import { GET_KNOWN_CONFIG_EVENT, CONFIG_REFRESHED_EVENT } from 'config/hueConfig';
+import { CONFIG_REFRESHED_TOPIC, GET_KNOWN_CONFIG_TOPIC } from 'config/events';
 
 import 'components/er-diagram/webcomp';
 
@@ -135,8 +135,8 @@ huePubSub.subscribe('app.dom.loaded', app => {
     viewModel.appConfig(config && config['app_config']);
   };
 
-  huePubSub.publish(GET_KNOWN_CONFIG_EVENT, configUpdated);
-  huePubSub.subscribe(CONFIG_REFRESHED_EVENT, configUpdated);
+  huePubSub.publish(GET_KNOWN_CONFIG_TOPIC, configUpdated);
+  huePubSub.subscribe(CONFIG_REFRESHED_TOPIC, configUpdated);
 
   if (hueUtils.getParameter('refresh') === 'true') {
     // TODO: Use connectors in the table browser

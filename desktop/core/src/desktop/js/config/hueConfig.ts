@@ -16,29 +16,42 @@
 
 import { post } from 'api/utils';
 import {
+  CONFIG_REFRESHED_TOPIC,
+  ConfigRefreshedEvent,
+  GET_KNOWN_CONFIG_TOPIC,
+  GetKnownConfigEvent,
+  REFRESH_CONFIG_TOPIC
+} from './events';
+import {
   AppType,
   BrowserInterpreter,
   DashboardInterpreter,
   EditorInterpreter,
   HueConfig,
-  Interpreter
+  Interpreter,
+  SchedulerInterpreter
 } from './types';
 import huePubSub from 'utils/huePubSub';
 
-const FETCH_CONFIG_API = '/desktop/api2/get_config/';
+interface InterpreterMap {
+  [AppType.browser]: BrowserInterpreter;
+  [AppType.editor]: EditorInterpreter;
+  [AppType.dashboard]: DashboardInterpreter;
+  [AppType.scheduler]: SchedulerInterpreter;
+  [AppType.sdkapps]: Interpreter;
+}
 
-export const REFRESH_CONFIG_EVENT = 'cluster.config.refresh.config';
-export const CONFIG_REFRESHED_EVENT = 'cluster.config.set.config';
-export const GET_KNOWN_CONFIG_EVENT = 'cluster.config.get.config';
+type ConnectorTest<T extends keyof InterpreterMap> = (connector: InterpreterMap[T]) => boolean;
+
+const FETCH_CONFIG_API = '/desktop/api2/get_config/';
 
 let lastConfigPromise: Promise<HueConfig> | undefined;
 let lastKnownConfig: HueConfig | undefined;
 
-export const refreshConfig = async (hueBaseUrl?: string): Promise<HueConfig> => {
+export const refreshConfig = async (): Promise<HueConfig> => {
   lastConfigPromise = new Promise<HueConfig>(async (resolve, reject) => {
     try {
-      const url = hueBaseUrl ? hueBaseUrl + FETCH_CONFIG_API : FETCH_CONFIG_API;
-      const apiResponse = await post<HueConfig>(url, {}, { silenceErrors: true });
+      const apiResponse = await post<HueConfig>(FETCH_CONFIG_API, {}, { silenceErrors: true });
       if (apiResponse.status == 0) {
         lastKnownConfig = apiResponse;
         resolve(lastKnownConfig);
@@ -53,10 +66,10 @@ export const refreshConfig = async (hueBaseUrl?: string): Promise<HueConfig> => 
 
   lastConfigPromise
     .then(config => {
-      huePubSub.publish(CONFIG_REFRESHED_EVENT, config);
+      huePubSub.publish<ConfigRefreshedEvent>(CONFIG_REFRESHED_TOPIC, config);
     })
     .catch(() => {
-      huePubSub.publish(CONFIG_REFRESHED_EVENT);
+      huePubSub.publish<ConfigRefreshedEvent>(CONFIG_REFRESHED_TOPIC);
     });
 
   return lastConfigPromise;
@@ -64,7 +77,9 @@ export const refreshConfig = async (hueBaseUrl?: string): Promise<HueConfig> => 
 
 export const getLastKnownConfig = (): HueConfig | undefined => lastKnownConfig;
 
-const getInterpreters = (appType: AppType): Interpreter[] => {
+export const getConfig = async (): Promise<HueConfig> => getLastKnownConfig() || refreshConfig();
+
+const getInterpreters = <T extends keyof InterpreterMap>(appType: T): InterpreterMap[T][] => {
   if (!lastKnownConfig || !lastKnownConfig.app_config) {
     return [];
   }
@@ -77,28 +92,38 @@ const getInterpreters = (appType: AppType): Interpreter[] => {
     console.warn(`No interpreters configured for type ${appType}`);
     return [];
   }
-  return appConfig.interpreters;
+  return appConfig.interpreters as InterpreterMap[T][];
 };
 
+const findConnector = <T extends keyof InterpreterMap>(
+  appType: T,
+  connectorTest: ConnectorTest<T>
+): InterpreterMap[T] | undefined => getInterpreters(appType).find(connectorTest);
+
+const filterConnector = <T extends keyof InterpreterMap>(
+  appType: T,
+  connectorTest: ConnectorTest<T>
+): InterpreterMap[T][] => getInterpreters(appType).filter(connectorTest);
+
 export const findDashboardConnector = (
-  connectorTest: (connector: Interpreter) => boolean
-): DashboardInterpreter | undefined =>
-  (getInterpreters(AppType.dashboard) as DashboardInterpreter[]).find(connectorTest);
+  connectorTest: ConnectorTest<AppType.dashboard>
+): DashboardInterpreter | undefined => findConnector(AppType.dashboard, connectorTest);
 
 export const findBrowserConnector = (
-  connectorTest: (connector: Interpreter) => boolean
-): BrowserInterpreter | undefined =>
-  (getInterpreters(AppType.browser) as BrowserInterpreter[]).find(connectorTest);
+  connectorTest: ConnectorTest<AppType.browser>
+): BrowserInterpreter | undefined => findConnector(AppType.browser, connectorTest);
 
 export const findEditorConnector = (
-  connectorTest: (connector: Interpreter) => boolean
-): EditorInterpreter | undefined =>
-  (getInterpreters(AppType.editor) as EditorInterpreter[]).find(connectorTest);
+  connectorTest: ConnectorTest<AppType.editor>
+): EditorInterpreter | undefined => findConnector(AppType.editor, connectorTest);
+
+export const filterBrowserConnectors = (
+  connectorTest: ConnectorTest<AppType.browser>
+): BrowserInterpreter[] => filterConnector(AppType.browser, connectorTest);
 
 export const filterEditorConnectors = (
-  connectorTest: (connector: Interpreter) => boolean
-): EditorInterpreter[] | undefined =>
-  (getInterpreters(AppType.editor) as EditorInterpreter[]).filter(connectorTest);
+  connectorTest: ConnectorTest<AppType.editor>
+): EditorInterpreter[] => filterConnector(AppType.editor, connectorTest);
 
 const rootPathRegex = /.*%3A%2F%2F(.+)$/;
 
@@ -118,10 +143,10 @@ export const getRootFilePath = (connector: BrowserInterpreter): string => {
   return '';
 };
 
-huePubSub.subscribe(REFRESH_CONFIG_EVENT, refreshConfig);
+huePubSub.subscribe(REFRESH_CONFIG_TOPIC, refreshConfig);
 
-// TODO: Replace GET_KNOWN_CONFIG_EVENT pubSub with sync getKnownConfig const
-huePubSub.subscribe(GET_KNOWN_CONFIG_EVENT, (callback?: (appConfig: HueConfig) => void) => {
+// TODO: Replace GET_KNOWN_CONFIG_TOPIC pubSub with sync getKnownConfig const
+huePubSub.subscribe<GetKnownConfigEvent>(GET_KNOWN_CONFIG_TOPIC, (callback?) => {
   if (lastConfigPromise && callback) {
     lastConfigPromise.then(callback).catch(callback);
   }

@@ -28,12 +28,8 @@ import {
   ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT,
   GET_ACTIVE_SNIPPET_CONNECTOR_EVENT
 } from 'apps/editor/events';
-import {
-  CONFIG_REFRESHED_EVENT,
-  GET_KNOWN_CONFIG_EVENT,
-  findEditorConnector,
-  getLastKnownConfig
-} from 'config/hueConfig';
+import { CONFIG_REFRESHED_TOPIC, GET_KNOWN_CONFIG_TOPIC } from 'config/events';
+import { findEditorConnector, getLastKnownConfig } from 'config/hueConfig';
 import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
 
 export default class EditorViewModel {
@@ -71,8 +67,8 @@ export default class EditorViewModel {
         (this.config().hue_config.is_admin || this.config().hue_config.enable_sharing)
     );
 
-    huePubSub.publish(GET_KNOWN_CONFIG_EVENT, this.config);
-    huePubSub.subscribe(CONFIG_REFRESHED_EVENT, this.config);
+    huePubSub.publish(GET_KNOWN_CONFIG_TOPIC, this.config);
+    huePubSub.subscribe(CONFIG_REFRESHED_TOPIC, this.config);
 
     this.activeConnector = ko.pureComputed(() => {
       if (this.editorMode()) {
