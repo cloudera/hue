@@ -147,7 +147,7 @@ def make_response(generator, format, name, encoding=None, user_agent=None): #TOD
   """
   content_type = FORMAT_TO_CONTENT_TYPE.get(format, 'application/octet-stream')
   if format == 'csv':
-    resp = StreamingHttpResponse(generator, content_type=content_type)
+    resp = StreamingHttpResponse(next(generator), content_type=content_type)
     try:
       del resp['Content-Length']
     except KeyError:

@@ -384,14 +384,14 @@ def download(request):
   file_name = _get_snippet_name(notebook)
 
   content_generator = get_api(request, snippet).download(notebook, snippet, file_format=file_format)
-  response = export_csvxls.make_response(content_generator, file_format, file_name, user_agent=user_agent)
+  response = export_csvxls.make_response(export_csvxls.create_generator(content_generator, file_format), file_format, file_name, user_agent=user_agent)
 
   if snippet['id']:
     response.set_cookie(
       'download-%s' % snippet['id'],
       json.dumps({
-        'truncated': 'false',
-        'row_counter': '0'
+        'truncated': content_generator.is_truncated,
+        'row_counter': content_generator.row_counter
       }),
       max_age=DOWNLOAD_COOKIE_AGE
     )

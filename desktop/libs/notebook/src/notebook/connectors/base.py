@@ -557,7 +557,7 @@ class Api(object):
     max_bytes = conf.DOWNLOAD_BYTES_LIMIT.get()
 
     content_generator = data_export.DataAdapter(result_wrapper, max_rows=max_rows, max_bytes=max_bytes)
-    return export_csvxls.create_generator(content_generator, file_format)
+    return content_generator
 
   def get_log(self, notebook, snippet, startFrom=None, size=None):
     return 'No logs'
