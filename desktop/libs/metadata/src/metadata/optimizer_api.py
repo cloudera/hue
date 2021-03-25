@@ -134,7 +134,7 @@ def top_tables(request):
       'column_count': table['columnCount'],
       'total': table['total'],
     }
-    for table in data['results']
+    for table in data.get('results', [])
   ]
 
   response['top_tables'] = tables
