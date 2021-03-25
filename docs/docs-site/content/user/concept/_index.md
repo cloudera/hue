@@ -45,13 +45,13 @@ This assistant content depends on the context of the application selected and wi
 
 ### Sample popup
 
-This popup offers a quick way to see sample of the data and other statistics on databases, tables, and columns. You can open the popup from the SQL Assist or with a right-click on any SQL object (table, column, function…). In this release, it also opens faster and caches the data.
+This popup offers a quick way to see sample of the data and other statistics on databases, tables, and columns. You can open the popup from the SQL Assist or with a right-click on any SQL object (table, column, function…).
 
 ![Sample popup Navigation](https://cdn.gethue.com/uploads/2018/05/SQL_Context_Navigation.gif)
 
 ## Documents
 
-Similarly to Google Documents, any document (e.g. SQL Query, Workflow, Dashboard...) opened in the Hue apps can be saved.
+Similarly to Google Documents, any document (e.g. SQL Query, Workflow, Dashboard...) opened in the Hue apps can be shared with other users or groups.
 
 ### Sharing
 
@@ -65,6 +65,14 @@ Two types of sharing permissions exist:
 Shared documents will show-up with a little blue icon.
 
 ![Sharing](https://cdn.gethue.com/uploads/2019/04/editor_sharing.png)
+
+Along with document sharing, there is another query sharing option via links which is quicker and easier - ![Public Links/Gist Sharing](https://gethue.com/blog/2020-03-04-datawarehouse-database-sql-collaboration-and-sharing-with-link-and-gist/)
+
+### Share to Slack
+Currently in **Beta**
+
+This integration increases the collaboration with others via Slack. It expands the ability to share query links or gists to the desired slack channels which then unfurls in a rich preview for other members to view.
+
 
 ### Import / Export
 
