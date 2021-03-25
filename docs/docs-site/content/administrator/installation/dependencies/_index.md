@@ -138,6 +138,8 @@ Tip: if you run into building kerberos extension issue and see message `krb5-con
 * Xcode command line tools
 * [Homebrew](https://brew.sh)
 
+For a step-by-step guide with Python 3, Big Sur and M1-based macs see section below.
+
 Install Dependencies via Homebrew
 
     brew install mysql@5.7 maven gmp openssl libffi
@@ -171,6 +173,92 @@ On macOS 10.14.x
 On macOS 10.15.x
 
     sudo ln -s /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/* /usr/local/include/
+
+### macOS Big Sur on M1 or Intel with Python 3
+
+This is a verified step-by-step guide on how to get up and running on a fresh installation of macOS Big Sur, tested on both M1 and Intel based MacBook Pro.
+
+1. Clone the Hue repo
+   
+    `git clone https://github.com/cloudera/hue.git`
+
+2. Install Brew if not already installed
+
+   `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"`
+
+3. Install postgres (unless you prefer something else)
+
+   `brew install postgres`
+
+4. Start Postgres
+
+   `brew services start postgresql`
+
+5. Create the hue database and set permissions
+
+   ```
+   createdb hue_d --lc-collate='en_US.UTF-8' -T "template0"
+   psql -s hue_d
+   hue_d=# create user hue_u with password 'huepassword';
+   hue_d=# grant all privileges on database hue_d to hue_u;
+   hue_d=# \q
+   ```
+
+6. Install gmp, openssl and libffi (Note some might be installed from postgres)
+
+   `brew install gmp openssl libffi`
+
+7. Install python, tested with the "macOS 64-bit installer" 3.7.9 direct download from python.org.
+   - For M1 Macs 3.7.9 from python.org is the only one that works and none of the homebrew version work at the time of writing.
+
+   - For Intel Macs, other 3.x Python versions as well as Homebrew might work.
+
+   `https://www.python.org/ftp/python/3.7.9/python-3.7.9-macosx10.9.pkg`
+
+8. Install mysql client
+
+   `brew install mysql`
+
+9. Install node and npm (unless already present)
+
+   `brew install node`
+
+10. In the cloned hue folder run:
+
+    ```
+    export PYTHON_VER=python3.7
+    export SKIP_PYTHONDEV_CHECK=true
+    export CFLAGS="-I$(xcrun --show-sdk-path)/usr/include/sasl"
+    export LDFLAGS="-L/usr/local/opt/libffi/lib -L/usr/local/opt/openssl@1.1/lib"
+    export CPPFLAGS="-L/usr/local/opt/libffi/lib/include -L/usr/local/opt/openssl@1.1/lib/include"
+
+    make apps
+    ```
+
+11. Configure Hue to your liking, edit
+
+    `desktop/conf/pseudo-distributed.ini`
+
+    For postgres according to step 5 above set:
+
+    ```
+    [[database]]
+      engine=postgresql_psycopg2
+      host=localhost
+      port=5432
+      user=hue_u
+      password=huepassword
+      name=hue_d
+    ```
+
+12. If you use postgres as configured in the previous step you'll need to add the psycopg2 lib manually
+
+    `./build/env/bin/pip install psycopg2-binary`
+
+12. Start Hue (note that export from step 10 above needs to be active)
+
+    `./build/env/bin/hue runserver 0.0.0.0:8888`
+
 
 ## NodeJs
 
