@@ -18,11 +18,11 @@ import * as ko from 'knockout';
 
 import huePubSub from 'utils/huePubSub';
 import {
-  CONFIG_REFRESHED_EVENT,
-  findEditorConnector,
-  GET_KNOWN_CONFIG_EVENT,
-  REFRESH_CONFIG_EVENT
-} from 'config/hueConfig';
+  CONFIG_REFRESHED_TOPIC,
+  GET_KNOWN_CONFIG_TOPIC,
+  REFRESH_CONFIG_TOPIC
+} from 'config/events';
+import { findEditorConnector } from 'config/hueConfig';
 import { withLocalStorage } from 'utils/storageUtils';
 
 class TopNavViewModel {
@@ -54,11 +54,11 @@ class TopNavViewModel {
       );
     };
 
-    huePubSub.publish(GET_KNOWN_CONFIG_EVENT, configUpdated);
-    huePubSub.subscribe(CONFIG_REFRESHED_EVENT, configUpdated);
+    huePubSub.publish(GET_KNOWN_CONFIG_TOPIC, configUpdated);
+    huePubSub.subscribe(CONFIG_REFRESHED_TOPIC, configUpdated);
 
     huePubSub.subscribe('hue.new.default.app', () => {
-      huePubSub.publish(REFRESH_CONFIG_EVENT);
+      huePubSub.publish(REFRESH_CONFIG_TOPIC);
     });
   }
 }

@@ -31,15 +31,15 @@ import {
 } from './events';
 import { ASSIST_KEY_COMPONENT } from './ko.assistKey';
 import dataCatalog from 'catalog/dataCatalog';
-import AssistDbSource from 'ko/components/assist/assistDbSource';
-import componentUtils from 'ko/components/componentUtils';
-import huePubSub from 'utils/huePubSub';
+import { CONFIG_REFRESHED_TOPIC } from 'config/events';
 import {
-  CONFIG_REFRESHED_EVENT,
   filterEditorConnectors,
   findDashboardConnector,
   findEditorConnector
 } from 'config/hueConfig';
+import AssistDbSource from 'ko/components/assist/assistDbSource';
+import componentUtils from 'ko/components/componentUtils';
+import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
 
@@ -865,7 +865,7 @@ class AssistDbPanel {
       this.sources(sources);
     };
 
-    huePubSub.subscribe(CONFIG_REFRESHED_EVENT, updateFromConfig);
+    huePubSub.subscribe(CONFIG_REFRESHED_TOPIC, updateFromConfig);
     updateFromConfig();
   }
 }
