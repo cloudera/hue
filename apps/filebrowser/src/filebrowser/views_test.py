@@ -39,7 +39,7 @@ from avro import schema, datafile, io
 from aws.s3.s3fs import S3FileSystemException
 from aws.s3.s3test_utils import get_test_bucket
 
-from azure.conf import is_abfs_enabled, is_adls_enabled
+from azure.conf import is_abfs_enabled, is_adls_enabled, ABFS_CLUSTERS
 from django.urls import reverse
 from django.utils.encoding import smart_str
 from nose.plugins.attrib import attr
@@ -56,7 +56,8 @@ from hadoop.conf import UPLOAD_CHUNK_SIZE
 from hadoop.fs.webhdfs import WebHdfs
 from useradmin.models import User, Group
 
-from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE, MAX_SNAPPY_DECOMPRESSION_SIZE
+from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE, MAX_SNAPPY_DECOMPRESSION_SIZE,\
+  REMOTE_STORAGE_HOME
 from filebrowser.lib.rwx import expand_mode
 from filebrowser.views import snappy_installed
 
@@ -1467,3 +1468,54 @@ class TestADLSAccessPermissions(object):
       assert_equal(200, response.status_code)
     finally:
       remove_from_group(self.user.username, 'has_adls')
+
+class TestFileChooserRedirect(object):
+
+  def setUp(self):
+    self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
+    grant_access('test', 'test', 'filebrowser')
+    add_to_group('test')
+
+    self.user = User.objects.get(username="test")
+
+  def test_hdfs_redirect(self):
+    with patch('desktop.lib.fs.proxyfs.ProxyFS.isdir') as is_dir:
+      is_dir.return_value = True
+
+      # HDFS - default_to_home
+      response = self.client.get('/filebrowser/view=%2F?default_to_home')
+      LOG.info("Response: %s" % response.status_code)
+      assert_equal(302, response.status_code)
+      assert_equal('/filebrowser/view=%2Fuser%2Ftest', response.url)
+
+      # ABFS - default_abfs_home
+      response = self.client.get('/filebrowser/view=%2F?default_abfs_home')
+      LOG.info("Response: %s" % response.status_code)
+      assert_equal(302, response.status_code)
+      assert_equal('/filebrowser/view=abfs%3A%2F%2F', response.url)
+
+      reset = ABFS_CLUSTERS['default'].FS_DEFAULTFS.set_for_testing(
+                  'abfs://data-container@mystorage.dfs.core.windows.net'
+              )
+      try:
+        response = self.client.get('/filebrowser/view=%2F?default_abfs_home')
+        LOG.info("Response: %s" % response.status_code)
+        assert_equal(302, response.status_code)
+        assert_equal('/filebrowser/view=abfs%3A%2F%2Fdata-container', response.url)
+      finally:
+        reset()
+
+      # S3A - default_s3_home
+      response = self.client.get('/filebrowser/view=%2F?default_s3_home')
+      LOG.info("Response: %s" % response.status_code)
+      assert_equal(302, response.status_code)
+      assert_equal('/filebrowser/view=s3a%3A%2F%2F', response.url)
+
+      reset = REMOTE_STORAGE_HOME.set_for_testing('s3a://my_bucket')
+      try:
+        response = self.client.get('/filebrowser/view=%2F?default_s3_home')
+        LOG.info("Response: %s" % response.status_code)
+        assert_equal(302, response.status_code)
+        assert_equal('/filebrowser/view=s3a%3A%2F%2Fmy_bucket', response.url)
+      finally:
+        reset()
