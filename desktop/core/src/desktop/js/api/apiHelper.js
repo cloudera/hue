@@ -1642,39 +1642,6 @@ class ApiHelper {
     return new CancellableJqPromise(deferred, request);
   }
 
-  /**
-   * @param {Object} options
-   * @param {boolean} [options.silenceErrors]
-   * @param {Connector} options.connector
-   * @return {Promise}
-   */
-  fetchContextNamespaces(options) {
-    const url = '/desktop/api2/context/namespaces/' + options.connector.id;
-    return simpleGet(url, undefined, options);
-  }
-
-  /**
-   * @param {Object} options
-   * @param {boolean} [options.silenceErrors]
-   * @param {Connector} options.connector
-   * @return {Promise}
-   */
-  fetchContextComputes(options) {
-    const url = '/desktop/api2/context/computes/' + options.connector.id;
-    return simpleGet(url, undefined, options);
-  }
-
-  /**
-   * @param {Object} options
-   * @param {boolean} [options.silenceErrors]
-   * @param {Connector} options.connector
-   * @return {Promise}
-   */
-  fetchContextClusters(options) {
-    const url = '/desktop/api2/context/clusters/' + options.connector.id;
-    return simpleGet(url, undefined, options);
-  }
-
   async fetchHueConfigAsync(options) {
     return new Promise((resolve, reject) => {
       $.get(URLS.GET_HUE_CONFIG_API)

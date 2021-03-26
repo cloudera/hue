@@ -2587,7 +2587,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
       self.computeSetDeferred = $.Deferred();
 
       // TODO: Use connectors in the importer
-      contextCatalog.getNamespaces({ connector: { id: vm.sourceType } }).done(function (context) {
+      contextCatalog.getNamespaces({ connector: { id: vm.sourceType } }).then(function (context) {
         self.namespaces(context.namespaces);
         if (!vm.namespaceId || !context.namespaces.some(function (namespace) {
           if (namespace.id === vm.namespaceId) {
@@ -2622,7 +2622,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
           }
         })
         self.computeSetDeferred.resolve();
-      });
+      }).catch();
 
       self.fileType = ko.observable();
       self.fileType.subscribe(function (newType) {

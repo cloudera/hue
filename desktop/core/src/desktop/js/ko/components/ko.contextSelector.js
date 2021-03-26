@@ -19,11 +19,9 @@ import * as ko from 'knockout';
 
 import { ASSIST_SET_DATABASE_EVENT } from './assist/events';
 import componentUtils from './componentUtils';
-import contextCatalog, {
-  CONTEXT_CATALOG_REFRESHED_EVENT,
-  NAMESPACES_REFRESHED_EVENT
-} from 'catalog/contextCatalog';
+import contextCatalog from 'catalog/contextCatalog';
 import dataCatalog from 'catalog/dataCatalog';
+import { CONTEXT_CATALOG_REFRESHED_TOPIC, NAMESPACES_REFRESHED_TOPIC } from 'catalog/events';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
@@ -222,8 +220,8 @@ const HueContextSelector = function (params) {
     }
   };
 
-  const namespaceRefreshSub = huePubSub.subscribe(NAMESPACES_REFRESHED_EVENT, refresh);
-  const contextCatalogRefreshSub = huePubSub.subscribe(CONTEXT_CATALOG_REFRESHED_EVENT, refresh);
+  const namespaceRefreshSub = huePubSub.subscribe(NAMESPACES_REFRESHED_TOPIC, refresh);
+  const contextCatalogRefreshSub = huePubSub.subscribe(CONTEXT_CATALOG_REFRESHED_TOPIC, refresh);
   self.disposals.push(() => {
     window.clearTimeout(refreshThrottle);
     namespaceRefreshSub.remove();
@@ -321,7 +319,7 @@ HueContextSelector.prototype.reload = function (type) {
     self[type.lastPromise] = contextCatalog[type.contextCatalogFn]({
       connector: ko.unwrap(self.connector)
     })
-      .done(available => {
+      .then(available => {
         // Namespaces response differs slightly from the others
         if (type === TYPES_INDEX.namespace) {
           available = available.namespaces;
@@ -380,7 +378,8 @@ HueContextSelector.prototype.reload = function (type) {
           self.setMatchingCompute(self[type.name]());
         }
       })
-      .always(() => {
+      .catch()
+      .finally(() => {
         self[type.loading](false);
       });
   } else {
