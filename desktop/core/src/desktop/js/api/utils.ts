@@ -187,7 +187,7 @@ export const post = <T, U = unknown, E = string>(
 
 export const get = <T, U = unknown>(
   url: string,
-  data: U,
+  data?: U,
   options?: ApiFetchOptions<T>
 ): CancellablePromise<T> =>
   new CancellablePromise((resolve, reject, onCancel) => {

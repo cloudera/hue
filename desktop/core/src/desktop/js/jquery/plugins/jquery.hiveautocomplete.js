@@ -16,7 +16,7 @@
 
 import $ from 'jquery';
 
-import contextCatalog from 'catalog/contextCatalog';
+import { getNamespaces } from 'catalog/contextCatalog';
 import dataCatalog from 'catalog/dataCatalog';
 import { hueLocalStorage } from 'utils/storageUtils';
 
@@ -59,13 +59,15 @@ function Plugin(element, options) {
   if (self.options.namespace) {
     self.namespaceDeferred.resolve(self.options.namespace);
   } else {
-    contextCatalog.getNamespaces({ connector: { id: options.apiHelperType } }).done(context => {
-      if (context.namespaces && context.namespaces.length) {
-        self.namespaceDeferred.resolve(context.namespaces[0]);
-      } else {
-        self.namespaceDeferred.reject();
-      }
-    });
+    getNamespaces({ connector: { id: options.apiHelperType } })
+      .then(context => {
+        if (context.namespaces && context.namespaces.length) {
+          self.namespaceDeferred.resolve(context.namespaces[0]);
+        } else {
+          self.namespaceDeferred.reject();
+        }
+      })
+      .catch();
   }
   self.namespaceDeferred.done(namespace => {
     if (

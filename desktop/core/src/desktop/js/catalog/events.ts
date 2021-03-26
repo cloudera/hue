@@ -14,11 +14,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { HueConfig } from './types';
+export const REFRESH_CONTEXT_CATALOG_TOPIC = 'context.catalog.refresh';
 
-export const REFRESH_CONFIG_TOPIC = 'cluster.config.refresh.config';
-export const CONFIG_REFRESHED_TOPIC = 'cluster.config.set.config';
-export type ConfigRefreshedEvent = HueConfig | undefined;
+export const CONTEXT_CATALOG_REFRESHED_TOPIC = 'context.catalog.refreshed';
 
-export const GET_KNOWN_CONFIG_TOPIC = 'cluster.config.get.config';
-export type GetKnownConfigEvent = (appConfig?: HueConfig) => void;
+export const NAMESPACES_REFRESHED_TOPIC = 'context.catalog.namespaces.refreshed';
+export type NamespacesRefreshedEvent = string;
