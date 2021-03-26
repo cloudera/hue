@@ -176,6 +176,7 @@ Plugin.prototype.setOptions = function (options) {
     .find('.filechooser-services li[data-fs="' + self.options.fsSelected + '"]')
     .addClass('active');
 
+  console.log("initialPath: " + initialPath);
   if (self.options.forceRefresh) {
     if (initialPath != '') {
       self.navigateTo(self.options.initialPath);
@@ -223,6 +224,7 @@ Plugin.prototype.setFileSystems = function (filesystems) {
       self.options.filesystems.push(k);
     }
   });
+  console.log("setFileSystems: " + filesystems);
   self.options.filesystems.sort();
   if (self.options.filesystemsFilter) {
     filters = self.options.filesystemsFilter.reduce((filters, fs) => {
@@ -253,6 +255,7 @@ Plugin.prototype.setFileSystems = function (filesystems) {
         $(this).siblings().removeClass('active');
         $(this).addClass('active');
         self.options.fsSelected = fs;
+        console.log("self.options.fsSelected: " + fs);
         const storedPath = hueLocalStorage(
           STORAGE_PREFIX + self.options.user + self.options.fsSelected
         );
@@ -282,6 +285,7 @@ Plugin.prototype.setFileSystems = function (filesystems) {
 
 //TODO: refactor this method to template
 Plugin.prototype.navigateTo = function (path) {
+  console.log("Plugin.prototype.navigateTo: " + path);
   const _parent = this;
   $(_parent.element)
     .find('.filechooser-tree')
@@ -295,6 +299,7 @@ Plugin.prototype.navigateTo = function (path) {
   $.getJSON('/filebrowser/view=' + encodeURIComponent(path) + pageSize, data => {
     $(_parent.element).find('.filechooser-tree').empty();
 
+    console.log("data.current_dir_path: " + data.current_dir_path);
     path = data.current_dir_path || path; // use real path.
     const _flist = $('<ul>').addClass('unstyled').css({
       height: '260px',
@@ -817,6 +822,7 @@ Plugin.prototype.init = function () {
         self.options.fsSelected = scheme;
       }
       self.setFileSystems(data.filesystems);
+      console.log("get_filesystems: " + data.filesystems);
     }
     if (initialPath != '') {
       self.navigateTo(self.options.initialPath);
