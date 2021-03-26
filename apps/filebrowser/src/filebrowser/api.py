@@ -47,6 +47,7 @@ def get_filesystems(request):
   filesystems = {}
   for k in fsmanager.get_filesystems(request.user):
     filesystems[k] = True
+    LOG.info('get file systeams: %s' % k)
 
   response['status'] = 0
   response['filesystems'] = filesystems
