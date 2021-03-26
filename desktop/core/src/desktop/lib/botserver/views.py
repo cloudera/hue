@@ -103,24 +103,29 @@ def handle_on_link_shared(channel_id, message_ts, links):
   for item in links:
     path = urlsplit(item['url'])[2]
     id_type, qid = urlsplit(item['url'])[3].split('=')
+    query_id = {'id': qid} if qid.isdigit() else {'uuid': qid}
 
     try:
       if path == '/hue/editor' and id_type == 'editor':
-        doc = Document2.objects.get(id=qid) if qid.isdigit() else Document2.objects.get(uuid=qid)
+        doc = Document2.objects.get(**query_id)
         doc_type = 'Query'
       elif path == '/hue/gist' and id_type == 'uuid':
         doc = _get_gist_document(uuid=qid)
+      elif path == '/hue/gist' and id_type == 'uuid':
+        doc = _get_gist_document(**query_id)
         doc_type = 'Gist'
       else:
         raise PopupException(_("Cannot unfurl link"))
-      
-      user = User.objects.get(username=doc.owner.username)
-      doc.can_read_or_exception(user)
     except Document2.DoesNotExist:
       msg = "Document with {key}={value} does not exist".format(key='uuid' if id_type == 'uuid' else 'id', value=qid)
       raise PopupException(_(msg))
+    
+    try:
+      user = User.objects.get(username=doc.owner)
     except User.DoesNotExist:
       raise PopupException(_('Could not find the user'))
+
+    doc.can_read_or_exception(user)
 
     # Mock request for query execution and fetch result
     user = rewrite_user(user)
