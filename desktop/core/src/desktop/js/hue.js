@@ -58,6 +58,7 @@ import sqlUtils from 'sql/sqlUtils';
 import sqlWorkerHandler from 'sql/sqlWorkerHandler';
 
 import 'components/sidebar/HueSidebarWebComponent';
+import 'components/assist/AssistPanelWebComponent';
 
 import 'ko/components/assist/assistViewModel';
 import OnePageViewModel from 'onePageViewModel';
