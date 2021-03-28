@@ -77,62 +77,89 @@ class TestBotServer(unittest.TestCase):
       with patch('desktop.lib.botserver.views._make_unfurl_payload') as mock_unfurl_payload:
         with patch('desktop.lib.botserver.views._get_gist_document') as _get_gist_document:
           with patch('desktop.lib.botserver.views.send_result_file') as send_result_file:
+            with patch('desktop.lib.botserver.views.slack_email_prefix') as email_prefix:
 
-            client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
-            user = User.objects.get(username="test")
-            client_not_me = make_logged_in_client(username="test_not_me", groupname="default", recreate=True, is_superuser=False)
-            user_not_me = User.objects.get(username="test_not_me")
+              # Slack user email: test@example.com
+              client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
+              user = User.objects.get(username="test")
+              # Other slack user email: test_not_me@example.com
+              client_not_me = make_logged_in_client(username="test_not_me", groupname="default", recreate=True, is_superuser=False)
+              user_not_me = User.objects.get(username="test_not_me")
 
-            channel_id = "channel"
-            message_ts = "12.1"
+              channel_id = "channel"
+              message_ts = "12.1"
+              user_id = "<@user_id>"
 
-            # qhistory link
-            links = [{"url": "https://demo.gethue.com/hue/editor?editor=12345"}]
-            doc_data = {
-              "dialect": "mysql",
-              "snippets": [{
-                "database": "hue",
-                "statement_raw": "SELECT 5000",
-              }]
-            }
-            doc = Document2.objects.create(id=12345, data=json.dumps(doc_data), owner=user)
-            mock_unfurl_payload.return_value = {
-              'payload': {},
-              'file_status': True,
-            }
-            handle_on_link_shared(channel_id, message_ts, links)
-            assert_true(chat_unfurl.called)
-            assert_true(send_result_file.called)
+              # Query link
+              links = [{"url": "https://demo.gethue.com/hue/editor?editor=12345"}]
+              doc_data = {
+                "dialect": "mysql",
+                "snippets": [{
+                  "database": "hue",
+                  "statement_raw": "SELECT 5000",
+                }]
+              }
+              doc = Document2.objects.create(id=12345, data=json.dumps(doc_data), owner=user)
+              mock_unfurl_payload.return_value = {
+                'payload': {},
+                'file_status': True,
+              }
 
-            assert_true(doc.can_read_or_exception(user))
-            assert_raises(PopupException, doc.can_read_or_exception, user=user_not_me)
+              # Other user sends link to unfurl without read permission
+              email_prefix.return_value = 'test_not_me'
 
-            # gist link
-            doc_data = {"statement_raw": "SELECT 98765"}
-            _get_gist_document.return_value = Mock(data=json.dumps(doc_data), owner=user, extra='mysql')
-            links = [{"url": "http://demo.gethue.com/hue/gist?uuid=random"}]
+              assert_raises(PopupException, handle_on_link_shared, "channel", "12.1", links, "<@user_id>")
+              assert_false(chat_unfurl.called)
+              assert_false(send_result_file.called)
 
-            mock_unfurl_payload.return_value = {
-              'payload': {},
-              'file_status': False,
-            }
-            handle_on_link_shared(channel_id, message_ts, links)
-            assert_true(chat_unfurl.called)
+              # User doesn't exist and read perm is also not set for link
+              email_prefix.return_value = 'test_user_not_exist'
 
-            # Cannot unfurl link with invalid links
-            inv_qhistory_url = "https://demo.gethue.com/hue/editor/?type=4"
-            inv_gist_url = "http://demo.gethue.com/hue/gist?uuids/=xyz"
-            assert_raises(PopupException, handle_on_link_shared, "channel", "12.1", [{"url": inv_qhistory_url}])
-            assert_raises(PopupException, handle_on_link_shared, "channel", "12.1", [{"url": inv_gist_url}])
+              assert_raises(PopupException, handle_on_link_shared, "channel", "12.1", links, "<@user_id>")
+              assert_false(chat_unfurl.called)
+              assert_false(send_result_file.called)
 
-            # Document does not exist
-            _get_gist_document.side_effect = PopupException('Gist does not exist')
+              # Other user sends link which has read perm
+              email_prefix.return_value = 'test_not_me'
+              doc.share_link(user, perm='read') # Some user has set read perm to shared link
 
-            qhistory_url = "https://demo.gethue.com/hue/editor?editor=109644"
-            gist_url = "https://demo.gethue.com/hue/gist?uuid=6d1c407b-d999-4dfd-ad23-d3a46c19a427"
-            assert_raises(PopupException, handle_on_link_shared, "channel", "12.1", [{"url": qhistory_url}])
-            assert_raises(PopupException, handle_on_link_shared, "channel", "12.1", [{"url": gist_url}])
+              handle_on_link_shared(channel_id, message_ts, links, user_id)
+              assert_true(chat_unfurl.called)
+              assert_true(send_result_file.called)
 
-            # chat_unfurl exception
-            chat_unfurl.side_effect = PopupException('Cannot unfurl link')
-            assert_raises(PopupException, handle_on_link_shared, "channel", "12.1", links)
+              # Doc owner sends link to unfurl
+              email_prefix.return_value = 'test'
+              handle_on_link_shared(channel_id, message_ts, links, user_id)
+
+              assert_true(chat_unfurl.called)
+              assert_true(send_result_file.called)
+             
+              # Gist link
+              doc_data = {"statement_raw": "SELECT 98765"}
+              _get_gist_document.return_value = Mock(data=json.dumps(doc_data), owner=user, extra='mysql')
+              links = [{"url": "http://demo.gethue.com/hue/gist?uuid=random"}]
+
+              mock_unfurl_payload.return_value = {
+                'payload': {},
+                'file_status': False,
+              }
+              handle_on_link_shared(channel_id, message_ts, links, user_id)
+              assert_true(chat_unfurl.called)
+
+              # Cannot unfurl link with invalid links
+              inv_qhistory_url = "https://demo.gethue.com/hue/editor/?type=4"
+              inv_gist_url = "http://demo.gethue.com/hue/gist?uuids/=xyz"
+              assert_raises(PopupException, handle_on_link_shared, "channel", "12.1", [{"url": inv_qhistory_url}], "<@user_id>")
+              assert_raises(PopupException, handle_on_link_shared, "channel", "12.1", [{"url": inv_gist_url}], "<@user_id>")
+
+              # Document does not exist
+              _get_gist_document.side_effect = PopupException('Gist does not exist')
+
+              qhistory_url = "https://demo.gethue.com/hue/editor?editor=109644"
+              gist_url = "https://demo.gethue.com/hue/gist?uuid=6d1c407b-d999-4dfd-ad23-d3a46c19a427"
+              assert_raises(PopupException, handle_on_link_shared, "channel", "12.1", [{"url": qhistory_url}], "<@user_id>")
+              assert_raises(PopupException, handle_on_link_shared, "channel", "12.1", [{"url": gist_url}], "<@user_id>")
+
+              # chat_unfurl exception
+              chat_unfurl.side_effect = PopupException('Cannot unfurl link')
+              assert_raises(PopupException, handle_on_link_shared, "channel", "12.1", links, "<@user_id>")

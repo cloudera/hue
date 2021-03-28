@@ -82,11 +82,13 @@ def parse_events(event):
 
   """
   channel_id = event.get('channel')
+  user_id = event.get('user')
+
   if event.get('type') == 'message':
-    handle_on_message(channel_id, event.get('bot_id'), event.get('text'), event.get('user'))
+    handle_on_message(channel_id, event.get('bot_id'), event.get('text'), user_id)
 
   if event.get('type') == 'link_shared':
-    handle_on_link_shared(channel_id, event.get('message_ts'), event.get('links'))
+    handle_on_link_shared(channel_id, event.get('message_ts'), event.get('links'), user_id)
 
 
 def handle_on_message(channel_id, bot_id, text, user_id):
@@ -99,7 +101,7 @@ def handle_on_message(channel_id, bot_id, text, user_id):
       send_hi_user(channel_id, user_id)
 
 
-def handle_on_link_shared(channel_id, message_ts, links):
+def handle_on_link_shared(channel_id, message_ts, links, user_id):
   for item in links:
     path = urlsplit(item['url'])[2]
     id_type, qid = urlsplit(item['url'])[3].split('=')
@@ -119,13 +121,21 @@ def handle_on_link_shared(channel_id, message_ts, links):
     except Document2.DoesNotExist:
       msg = "Document with {key}={value} does not exist".format(key='uuid' if id_type == 'uuid' else 'id', value=qid)
       raise PopupException(_(msg))
-    
-    try:
-      user = User.objects.get(username=doc.owner)
-    except User.DoesNotExist:
-      raise PopupException(_('Could not find the user'))
 
-    doc.can_read_or_exception(user)
+    try:
+      user = User.objects.get(username=slack_email_prefix(user_id))
+      check_link_perm = False
+    except User.DoesNotExist:
+      user = User.objects.get(username=doc.owner)
+      check_link_perm = True
+    
+    if doc_type != 'Gist':
+      if check_link_perm:
+        perm = doc._massage_permissions()
+        if not perm['link_sharing_on'] and (not perm['link_read'] or not perm['link_write']):
+          raise PopupException(_("No read permission to access the document"))
+      else:
+        doc.can_read_or_exception(user)
 
     # Mock request for query execution and fetch result
     user = rewrite_user(user)
@@ -140,6 +150,15 @@ def handle_on_link_shared(channel_id, message_ts, links):
     # Generate and upload result xlsx file only if result available
     if payload['file_status']:
       send_result_file(request, channel_id, message_ts, doc, 'xls')
+
+
+def slack_email_prefix(user_id):
+  try:
+    slack_user = slack_client.users_info(user=user_id)
+  except Exception as e:
+    raise PopupException(_("Cannot find slack user info"), detail=e)
+
+  return slack_user['user']['profile']['email'].split('@')[0]
 
 
 def send_result_file(request, channel_id, message_ts, doc, file_format):
