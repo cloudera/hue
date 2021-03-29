@@ -21,6 +21,36 @@
     <div id="hueIconSprites">
       <svg version="1.1" xmlns="http://www.w3.org/2000/svg" style="display: none;">
         <defs>
+          <symbol id="hueChevronLeftSymbol" viewBox="0 0 24 24">
+            <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
+          </symbol>
+
+          <symbol id="hueChevronLeftLimitSymbol" viewBox="0 0 24 24">
+            <path d="M18.41 16.59L13.82 12l4.59-4.59L17 6l-6 6 6 6zM6 6h2v12H6z" />
+          </symbol>
+
+          <symbol id="hueChevronRightSymbol" viewBox="0 0 24 24">
+            <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" />
+          </symbol>
+
+          <symbol id="hueChevronRightLimitSymbol" viewBox="0 0 24 24">
+            <path d="M5.59 7.41L10.18 12l-4.59 4.59L7 18l6-6-6-6zM16 6h2v12h-2z" />
+          </symbol>
+
+          <symbol id="hueColumnSymbol" viewBox="0 0 24 24">
+            <!-- "View Column" from Google Fonts, Apache 2.0 license -->
+            <path d="M0 0h24v24H0V0z" fill="none" />
+            <path d="M4 5v13h17V5H4zm10 2v9h-3V7h3zM6 7h3v9H6V7zm13 9h-3V7h3v9z" />
+          </symbol>
+
+          <symbol id="hueConnectorSymbol" viewBox="0 0 24 24">
+            <!-- "Storage" from Google Fonts, Apache 2.0 license -->
+            <path d="M0 0h24v24H0V0z" fill="none" />
+            <path
+              d="M2 20h20v-4H2v4zm2-3h2v2H4v-2zM2 4v4h20V4H2zm4 3H4V5h2v2zm-4 7h20v-4H2v4zm2-3h2v2H4v-2z"
+            />
+          </symbol>
+
           <symbol id="hueDatabaseSymbol" viewBox="0 0 24 24">
             <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
               <g id="system-icons/database" fill="#000000">
@@ -32,7 +62,7 @@
             </g>
           </symbol>
 
-          <symbol id="hueSpinnerLarge" viewBox="0 0 64 64">
+          <symbol id="hueSpinnerLargeSymbol" viewBox="0 0 64 64">
             <path
               stroke-width="4"
               fill="none"
@@ -42,13 +72,28 @@
             />
           </symbol>
 
-          <symbol id="hueSpinnerSmall" viewBox="0 0 24 24">
+          <symbol id="hueSpinnerSmallSymbol" viewBox="0 0 24 24">
             <path
               stroke-width="1"
               fill="none"
               stroke="currentColor"
               fill-rule="evenodd"
               d="M21,12 C21,16.971 16.971,21 12,21 C7.029,21 3,16.971 3,12 C3,7.029 7.029,3 12,3"
+            />
+          </symbol>
+
+          <symbol id="hueTableSymbol" viewBox="0 0 16 16">
+            <g transform="scale(0.875) translate(1,1)">
+              <path
+                d="M18.349 2H5.634C4.728 2 4 2.728 4 3.634v12.732C4 17.272 4.728 18 5.634 18h12.732c.906 0 1.634-.728 1.634-1.634V3.634C19.982 2.728 19.254 2 18.349 2zm-12.715.941h12.732c.373 0 .693.302.693.693V5.25H4.94V3.634c0-.39.302-.693.693-.693zM9.86 13.134v-3.036h4.12v3.036H9.86zm4.12.941v2.984H9.86v-2.984h4.12zm0-7.902v3.001H9.86v-3h4.12zM8.919 9.174H4.941v-3H8.92v3zm0 .924v3.036H4.941v-3.036H8.92zm5.984 0h4.138v3.036h-4.138v-3.036zm0-.924v-3h4.138v3h-4.138zM4.941 16.35v-2.274H8.92v2.984H5.634c-.39-.018-.693-.32-.693-.71zm13.408.692h-3.446v-2.966h4.138v2.291c0 .373-.302.675-.692.675z"
+                transform="translate(-57 -261) translate(0 31) translate(53 228)"
+              />
+            </g>
+          </symbol>
+
+          <symbol id="hueViewSymbol" viewBox="0 0 24 24">
+            <path
+              d="M12,5 C18,5 22,12.5 22,12.5 C22,12.5 17,20 12,20 C7,20 2,12.5 2,12.5 C2,12.5 6,5 12,5 Z M12,7 C8.496,7 5.633,10.59 4.408,12.41 C6.055,14.53 9.313,18 12,18 C14.688,18 17.948,14.526 19.596,12.406 C18.378,10.585 15.532,7 12,7 Z M12,8 C14.209,8 16,9.791 16,12 C16,14.209 14.209,16 12,16 C9.791,16 8,14.209 8,12 C8,10.984 8.391,10.068 9.014,9.363 C9.01,9.408 9,9.453 9,9.5 C9,10.328 9.671,11 10.5,11 C11.329,11 12,10.328 12,9.5 C12,8.877 11.62,8.344 11.08,8.116 C11.376,8.047 11.682,8 12,8 Z"
             />
           </symbol>
         </defs>
