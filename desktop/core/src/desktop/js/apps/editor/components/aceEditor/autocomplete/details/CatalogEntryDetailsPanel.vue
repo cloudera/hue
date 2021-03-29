@@ -19,15 +19,10 @@
 <template>
   <div>
     <div class="autocompleter-header">
-      <i
-        class="fa fa-fw"
-        :class="{
-          'fa-database': details.isDatabase(),
-          'fa-eye': details.isView(),
-          'fa-table': details.isTable(),
-          'fa-columns': details.isField()
-        }"
-      />
+      <DatabaseIcon v-if="details.isDatabase()" />
+      <ViewIcon v-else-if="details.isView()" />
+      <TableIcon v-else-if="details.isTable()" />
+      <ColumnIcon v-else-if="details.isField()" />
       <span>{{ details.getTitle() }}</span>
       <div
         v-if="suggestion.popular && suggestion.relativePopularity"
@@ -67,19 +62,25 @@
 <script lang="ts">
   import { defineComponent, PropType } from 'vue';
 
-  import { CancellablePromise } from 'api/cancellablePromise';
-
   import { Suggestion } from '../AutocompleteResults';
+  import { CancellablePromise } from 'api/cancellablePromise';
   import DataCatalogEntry from 'catalog/DataCatalogEntry';
-  import I18n from 'utils/i18n';
-
   import Spinner from 'components/Spinner.vue';
+  import ColumnIcon from 'components/icons/ColumnIcon';
+  import DatabaseIcon from 'components/icons/DatabaseIcon';
+  import TableIcon from 'components/icons/TableIcon';
+  import ViewIcon from 'components/icons/ViewIcon';
+  import I18n from 'utils/i18n';
 
   const COMMENT_LOAD_DELAY = 1500;
 
   export default defineComponent({
     name: 'CatalogEntryDetailsPanel',
     components: {
+      ColumnIcon,
+      TableIcon,
+      ViewIcon,
+      DatabaseIcon,
       Spinner
     },
 
