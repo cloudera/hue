@@ -14,6 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { findEditorConnector } from '../../../config/hueConfig';
+import { AppType, EditorInterpreter, HueConfig } from '../../../config/types';
 import Executor, { ExecutorOptions } from '../execution/executor';
 
 export interface HueComponentConfig {
@@ -21,8 +23,10 @@ export interface HueComponentConfig {
 }
 
 declare const _default: {
-  configure: (config: HueComponentConfig) => void;
-  createExecutor: (options: ExecutorOptions) => Executor;
+  configure(config: HueComponentConfig): void;
+  createExecutor(options: ExecutorOptions): Executor;
+  findEditorConnector(connectorTest: (connector: EditorInterpreter) => boolean): EditorInterpreter | undefined,
+  refreshConfig(): Promise<HueConfig>
 };
 
 export default _default;

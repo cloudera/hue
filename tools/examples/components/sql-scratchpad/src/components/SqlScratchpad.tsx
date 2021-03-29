@@ -4,16 +4,19 @@ import hueComponents from 'gethue/lib/components/QueryEditorWebComponents';
 import hueConfig from 'gethue/lib/config/hueConfig';
 import Executor from 'gethue/lib/execution/executor';
 import SqlExecutable from 'gethue/apps/editor/execution/sqlExecutable';
+import { ContextSelector } from './ContextSelector';
 
 import { QueryEditor } from './QueryEditor';
 import { ExecuteButton } from './ExecuteButton';
 import { ExecuteProgress } from './ExecuteProgress';
 import { ResultTable } from './ResultTable';
-import {ExecuteLimit} from "./ExecuteLimit";
+import { ExecuteLimit } from './ExecuteLimit';
 
-const HUE_BASE_URL = 'http://localhost:8888'
 
-hueComponents.configure({
+const { configure, createExecutor, findEditorConnector, refreshConfig } = hueComponents;
+const HUE_BASE_URL = 'http://localhost:8888';
+
+configure({
   baseUrl: HUE_BASE_URL
 });
 
@@ -36,11 +39,11 @@ export class SqlScratchpad extends React.Component<{}, SqlScratchpadState> {
   componentDidMount() {
     console.info('Refreshing config');
 
-    hueConfig.refreshConfig().then(() => {
-      const connector = hueConfig.findEditorConnector(() => true); // Returns the first connector
+    refreshConfig().then(() => {
+      const connector = findEditorConnector(() => true); // Returns the first connector
 
       this.setState({
-        executor: hueComponents.createExecutor({
+        executor: createExecutor({
           compute: (() => ({ id: 'default' })) as KnockoutObservable<any>,
           connector: (() => connector) as KnockoutObservable<any>,
           database: (() => 'default') as KnockoutObservable<any>,
@@ -62,7 +65,9 @@ export class SqlScratchpad extends React.Component<{}, SqlScratchpadState> {
     const executor = this.state.executor;
     if (executor) {
       return <React.Fragment>
+
         <div className="ace-editor">
+          <ContextSelector />
           <QueryEditor executor={executor} setActiveExecutable={this.setActiveExecutable} />
         </div>
         <div className="executable-progress-bar">

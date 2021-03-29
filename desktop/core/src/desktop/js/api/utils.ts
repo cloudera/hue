@@ -156,6 +156,7 @@ export const post = <T, U = unknown, E = string>(
     const { cancelToken, cancel } = getCancelToken();
     let completed = false;
 
+    console.log('posting from utils.ts, baseurl: ' + axios.defaults.baseURL);
     axios
       .post<T & DefaultApiResponse>(url, qs.stringify(data), {
         cancelToken,
