@@ -50,13 +50,7 @@
       </div>
     </div>
     <div class="query-history-table-container">
-      <Spinner
-        :spin="loadingHistory"
-        :center="true"
-        :size="'large'"
-        :overlay="true"
-        :label="I18n('Loading...')"
-      />
+      <Spinner :spin="loadingHistory" :center="true" :size="'xlarge'" :overlay="true" />
       <div class="query-history-table-scrollable">
         <HueTable
           :clickable-rows="true"
