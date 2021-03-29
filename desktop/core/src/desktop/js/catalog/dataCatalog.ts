@@ -61,13 +61,13 @@ export interface GetEntryOptions {
   temporaryOnly?: boolean;
 }
 
-interface GetMultiTableEntryOptions {
+export interface GetMultiTableEntryOptions {
   namespace: Namespace;
   compute: Compute;
   paths: string[][];
 }
 
-interface AddTemporaryTableOptions {
+export interface AddTemporaryTableOptions {
   name: string;
   namespace: Namespace;
   compute: Compute;

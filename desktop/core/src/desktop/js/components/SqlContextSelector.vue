@@ -1,6 +1,11 @@
 <template>
+  <ul v-if="listView && connectors.length > 1">
+    <li v-for="connector in connectors" :key="connector.id">
+      <div @click="connectorSelected(connector)"><ConnectorIcon /> {{ connector.displayName }}</div>
+    </li>
+  </ul>
   <DropdownMenu
-    :if="connectors.length > 1"
+    v-if="!listView && connectors.length > 1"
     :link="true"
     :text="modelValue?.connector.name || I18n('Source')"
   >
@@ -19,6 +24,7 @@
 
   import DropdownMenuButton from './dropdown/DropdownMenuButton.vue';
   import DropdownMenu from './dropdown/DropdownMenu.vue';
+  import ConnectorIcon from './icons/ConnectorIcon';
   import { SqlContext } from './SqlContextSelector';
   import SubscriptionTracker from './utils/SubscriptionTracker';
   import { EditorInterpreter } from 'config/types';
@@ -29,16 +35,28 @@
 
   export default defineComponent({
     name: 'SqlContextSelector',
-    components: { DropdownMenuButton, DropdownMenu },
+    components: { ConnectorIcon, DropdownMenuButton, DropdownMenu },
     props: {
+      allowNull: {
+        type: Boolean,
+        default: false
+      },
       modelValue: {
         type: Object as PropType<SqlContext | null>,
+        default: null
+      },
+      listView: {
+        type: Boolean,
+        default: false
+      },
+      filterDialect: {
+        type: String as PropType<string | null>,
         default: null
       }
     },
     emits: ['update:model-value'],
     setup(props, { emit }) {
-      const { modelValue } = toRefs(props);
+      const { modelValue, allowNull, filterDialect } = toRefs(props);
       const subTracker = new SubscriptionTracker();
       const connectors = ref<EditorInterpreter[]>([]);
 
@@ -58,9 +76,12 @@
       };
 
       const updateConnectors = () => {
-        connectors.value = filterEditorConnectors(connector => connector.is_sql);
+        connectors.value = filterEditorConnectors(
+          connector =>
+            connector.is_sql && (!filterDialect.value || connector.dialect === filterDialect.value)
+        );
 
-        let updatedConnector: EditorInterpreter | undefined = undefined;
+        let updatedConnector: EditorInterpreter | null = null;
         // Set the activeConnector to 1. updated version, 2. same dialect, 3. first connector
         if (modelValue.value) {
           updatedConnector =
@@ -69,9 +90,14 @@
               connector => connector.dialect === modelValue.value!.connector.dialect
             );
         }
-        if (!updatedConnector && connectors.value.length) {
+        if (!allowNull.value && !updatedConnector && connectors.value.length) {
           updatedConnector = connectors.value[0];
         }
+
+        if (!updatedConnector && connectors.value.length === 1) {
+          updatedConnector = connectors.value[0];
+        }
+
         connectorSelected(updatedConnector || null);
       };
 
