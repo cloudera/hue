@@ -89,6 +89,8 @@
 
 <body>
 
+<hue-icons-web-component></hue-icons-web-component>
+
 % if is_demo:
   <ul class="side-labels unstyled">
     <li class="feedback"><a href="javascript:showClassicWidget()"><i class="fa fa-envelope-o"></i> ${_('Feedback')}</a></li>

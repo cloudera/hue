@@ -57,6 +57,7 @@ import MultiLineEllipsisHandler from 'utils/multiLineEllipsisHandler';
 import sqlUtils from 'sql/sqlUtils';
 import sqlWorkerHandler from 'sql/sqlWorkerHandler';
 
+import 'components/icons/HueIconsWebComponent';
 import 'components/sidebar/HueSidebarWebComponent';
 import 'components/assist/AssistPanelWebComponent';
 
