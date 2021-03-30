@@ -62,6 +62,22 @@
             </g>
           </symbol>
 
+          <symbol id="hueDropDownSymbol" viewBox="0 0 24 24">
+            <polygon points="6 9 12 15 18 9" />
+          </symbol>
+
+          <symbol id="hueDropLeftSymbol" viewBox="0 0 24 24">
+            <polygon points="15 6 9 11.9988 15 18" />
+          </symbol>
+
+          <symbol id="hueDropRightSymbol" viewBox="0 0 24 24">
+            <polygon points="9 6 9 18 15 11.9988" />
+          </symbol>
+
+          <symbol id="hueDropUpSymbol" viewBox="0 0 24 24">
+            <polygon points="12.0001 9 6 15.0001 17.999 15.0001" />
+          </symbol>
+
           <symbol id="hueSpinnerLargeSymbol" viewBox="0 0 64 64">
             <path
               stroke-width="4"
