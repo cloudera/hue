@@ -44,6 +44,15 @@ class TestBotServer(unittest.TestCase):
   def setUpClass(cls):
     if not conf.SLACK.IS_ENABLED.get():
       raise SkipTest
+  
+  def setUp(self):
+    # Slack user email: test@example.com
+    self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
+    self.user = User.objects.get(username="test")
+
+    # Other slack user email: test_not_me@example.com
+    self.client_not_me = make_logged_in_client(username="test_not_me", groupname="default", recreate=True, is_superuser=False)
+    self.user_not_me = User.objects.get(username="test_not_me")
 
   def test_send_hi_user(self):
     with patch('desktop.lib.botserver.views.slack_client.api_call') as api_call:
@@ -71,19 +80,12 @@ class TestBotServer(unittest.TestCase):
 
       handle_on_message("channel", None, "hello hue test", "user_id")
       assert_true(say_hi_user.called)
-
+  
   def test_handle_query_history_link(self):
     with patch('desktop.lib.botserver.views.slack_client.chat_unfurl') as chat_unfurl:
       with patch('desktop.lib.botserver.views._make_unfurl_payload') as mock_unfurl_payload:
         with patch('desktop.lib.botserver.views.send_result_file') as send_result_file:
           with patch('desktop.lib.botserver.views.slack_client.users_info') as users_info:
-
-            # Slack user email: test@example.com
-            client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
-            user = User.objects.get(username="test")
-            # Other slack user email: test_not_me@example.com
-            client_not_me = make_logged_in_client(username="test_not_me", groupname="default", recreate=True, is_superuser=False)
-            user_not_me = User.objects.get(username="test_not_me")
 
             channel_id = "channel"
             message_ts = "12.1"
@@ -97,24 +99,11 @@ class TestBotServer(unittest.TestCase):
                 "statement_raw": "SELECT 5000",
               }]
             }
-            doc = Document2.objects.create(id=12345, data=json.dumps(doc_data), owner=user)
+            doc = Document2.objects.create(id=12345, data=json.dumps(doc_data), owner=self.user)
             mock_unfurl_payload.return_value = {
               'payload': {},
               'file_status': True,
             }
-
-            # Slack user is not Hue user
-            users_info.return_value = {
-              "ok": True,
-              "user": {
-                "profile": {
-                  "email": "test_user_not_exist@example.com"
-                }
-              }
-            }
-            assert_raises(PopupException, handle_on_link_shared, "channel", "12.1", links, "<@user_id>")
-            assert_false(chat_unfurl.called)
-            assert_false(send_result_file.called)
 
             # Slack user is Hue user but without read access sends link
             users_info.return_value = {
@@ -126,19 +115,9 @@ class TestBotServer(unittest.TestCase):
               }
             }
             assert_raises(PopupException, handle_on_link_shared, "channel", "12.1", links, "<@user_id>")
-            assert_false(chat_unfurl.called)
-            assert_false(send_result_file.called)
 
             # Slack user is Hue user with read access sends link
-            users_info.return_value = {
-              "ok": True,
-              "user": {
-                "profile": {
-                  "email": "test_not_me@example.com"
-                }
-              }
-            }
-            doc.update_permission(user, is_link_on=True)
+            doc.update_permission(self.user, is_link_on=True)
             handle_on_link_shared(channel_id, message_ts, links, user_id)
 
             assert_true(chat_unfurl.called)
@@ -159,39 +138,19 @@ class TestBotServer(unittest.TestCase):
           with patch('desktop.lib.botserver.views.slack_client.users_info') as users_info:
             with patch('desktop.lib.botserver.views.send_result_file') as send_result_file:
 
-              # Slack user email: test@example.com
-              client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
-              user = User.objects.get(username="test")
-              # Other slack user email: test_not_me@example.com
-              client_not_me = make_logged_in_client(username="test_not_me", groupname="default", recreate=True, is_superuser=False)
-              user_not_me = User.objects.get(username="test_not_me")
-
               channel_id = "channel"
               message_ts = "12.1"
               user_id = "<@user_id>"
 
               doc_data = {"statement_raw": "SELECT 98765"}
               links = [{"url": "http://demo.gethue.com/hue/gist?uuid=some_uuid"}]
-              _get_gist_document.return_value = Mock(data=json.dumps(doc_data), owner=user, extra='mysql')
+              _get_gist_document.return_value = Mock(data=json.dumps(doc_data), owner=self.user, extra='mysql')
               mock_unfurl_payload.return_value = {
                 'payload': {},
                 'file_status': False,
               }
 
-              # Slack user is not Hue user
-              users_info.return_value = {
-                "ok": True,
-                "user": {
-                  "profile": {
-                    "email": "test_user_not_exist@example.com"
-                  }
-                }
-              }
-              assert_raises(PopupException, handle_on_link_shared, "channel", "12.1", links, "<@user_id>")
-              assert_false(chat_unfurl.called)
-              assert_false(send_result_file.called)
-
-              # Slack user is Hue user sends link
+              # Slack user who is Hue user sends link
               users_info.return_value = {
                 "ok": True,
                 "user": {
@@ -211,6 +170,25 @@ class TestBotServer(unittest.TestCase):
 
               assert_raises(PopupException, handle_on_link_shared, "channel", "12.1", [{"url": gist_url}], "<@user_id>")
 
-              # Cannot unfurl link with invalid gist link
+              # Cannot unfurl with invalid gist link
               inv_gist_url = "http://demo.gethue.com/hue/gist?uuids/=invalid_link"
               assert_raises(PopupException, handle_on_link_shared, "channel", "12.1", [{"url": inv_gist_url}], "<@user_id>")
+
+  def test_slack_user_not_hue_user(self):
+    with patch('desktop.lib.botserver.views.slack_client.users_info') as users_info:
+      with patch('desktop.lib.botserver.views._get_gist_document') as _get_gist_document:
+        
+        # Can be checked similarly with query link too
+        doc_data = {"statement_raw": "SELECT 98765"}
+        links = [{"url": "http://demo.gethue.com/hue/gist?uuid=some_uuid"}]
+        _get_gist_document.return_value = Mock(data=json.dumps(doc_data), owner=self.user, extra='mysql')
+
+        users_info.return_value = {
+          "ok": True,
+          "user": {
+            "profile": {
+              "email": "test_user_not_exist@example.com"
+            }
+          }
+        }
+        assert_raises(PopupException, handle_on_link_shared, "channel", "12.1", links, "<@user_id>")

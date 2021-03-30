@@ -117,8 +117,7 @@ def handle_on_link_shared(channel_id, message_ts, links, user_id):
       else:
         raise PopupException(_("Cannot unfurl link"))
     except Document2.DoesNotExist:
-      key, value = next(iter(query_id.items()))
-      msg = "Document with {key} = {value} does not exist".format(key=key, value=value)
+      msg = "Document with {} does not exist".format(query_id)
       raise PopupException(_(msg))
 
     # Permission check for Slack user to be Hue user
