@@ -45,13 +45,13 @@ This assistant content depends on the context of the application selected and wi
 
 ### Sample popup
 
-This popup offers a quick way to see sample of the data and other statistics on databases, tables, and columns. You can open the popup from the SQL Assist or with a right-click on any SQL object (table, column, function…). In this release, it also opens faster and caches the data.
+This popup offers a quick way to see sample of the data and other statistics on databases, tables, and columns. You can open the popup from the SQL Assist or with a right-click on any SQL object (table, column, function…).
 
 ![Sample popup Navigation](https://cdn.gethue.com/uploads/2018/05/SQL_Context_Navigation.gif)
 
 ## Documents
 
-Similarly to Google Documents, any document (e.g. SQL Query, Workflow, Dashboard...) opened in the Hue apps can be saved.
+Similarly to Google Documents, any document (e.g. SQL Query, Workflow, Dashboard...) opened in the Hue apps can be shared with other users or groups.
 
 ### Sharing
 
@@ -65,6 +65,56 @@ Two types of sharing permissions exist:
 Shared documents will show-up with a little blue icon.
 
 ![Sharing](https://cdn.gethue.com/uploads/2019/04/editor_sharing.png)
+
+Along with document sharing, there is another query sharing option via links which is quicker and easier - **Public Links & Gist Sharing**
+
+#### Public Links
+
+Public links are the same as in Google documents which helps in quickly sharing parameterized saved reports, customer analyses links. They only require the recipient to have a Hue login. People can then reuse the queries on their own by executing them to see the results, fork and adapt them.
+
+- No need to select groups or list of individual users
+- Read, write permissions
+- Linked documents won't show up in your home
+- Can be turned off globally
+- Can be combined with traditional user/group sharing
+
+Here is the sharing popup with the public link option on the top when globally enabled:
+
+![Public Link](https://cdn.gethue.com/uploads/2020/03/editor_sharing_popup.png)
+
+#### Gist Sharing - SQL Snippet
+
+Answering a question via a query result? Showing some weird data to a slack channel? Gist are a great quick way to quickly share SQL snippets, with a direct link to the SQL editor.
+
+- Works with an SQL snippet: one or more statements
+- The link automatically point to the editor and the SQL content
+- The query is displayed in the friendlier ![presentation mode](https://docs.gethue.com/user/querying/#presentation)
+- Slack unfurling will show a mini preview (can be turned off globally)
+- Gists are stored in a Gist directory in your home
+
+Here is an example:
+
+Select a portion of statements to quick share with a Slack channel:
+
+![Get Sharable Link](https://cdn.gethue.com/uploads/2020/03/editor_sharing_gist_menu.png)
+
+The link to the SQL fragment is automatically generated:
+
+![Gist](https://cdn.gethue.com/uploads/2020/03/editor_sharing_gist_popup.png)
+
+Just paste the link in the Slack channel and users will get a mini preview:
+
+![Gist in Slack](https://cdn.gethue.com/uploads/2020/03/editor_gist_slack.png)
+
+Clicking on the link will open-up the SQL selection:
+
+![Click Gist](https://cdn.gethue.com/uploads/2020/03/editor_gist_open_presentation_mode.png)
+
+### Share to Slack
+Currently in **Beta**
+
+This integration increases the collaboration with others via Slack. It expands the ability to share query links or gists to the desired Slack channels which then unfurls in a rich preview for other members to view.
+
 
 ### Import / Export
 
