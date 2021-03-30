@@ -28,13 +28,13 @@ import {
   REFRESH_CONTEXT_CATALOG_TOPIC
 } from './events';
 
-interface GetOptions {
+export interface GetOptions {
   connector: IdentifiableInterpreter;
   clearCache?: boolean;
   silenceErrors?: boolean;
 }
 
-interface ConnectorNamespaces {
+export interface ConnectorNamespaces {
   dynamic?: boolean;
   hueTimestamp: number;
   namespaces: Namespace[];

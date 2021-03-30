@@ -24,6 +24,9 @@
     @click="onEntryClick"
   >
     <span>
+      <DropRightIcon v-if="showFirstLevelArrows && !open" />
+      <DropDownIcon v-else-if="showFirstLevelArrows && open" />
+
       <DatabaseIcon v-if="entry.isDatabase()" />
       <ViewIcon v-else-if="entry.isView()" />
       <TableIcon v-else-if="entry.isTable()" />
@@ -39,7 +42,10 @@
     </ul>
     <ul v-if="!loadingChildren && children && children.length">
       <li v-for="childEntry in children" :key="childEntry.getQualifiedPath()">
-        <SqlAssistEntry :entry="childEntry" />
+        <SqlAssistEntry
+          :entry="childEntry"
+          :show-first-level-arrows="root && showFirstLevelArrows"
+        />
       </li>
     </ul>
   </div>
@@ -50,6 +56,8 @@
 
   import ColumnIcon from '../icons/ColumnIcon';
   import DatabaseIcon from '../icons/DatabaseIcon';
+  import DropDownIcon from '../icons/DropDownIcon';
+  import DropRightIcon from '../icons/DropRightIcon';
   import TableIcon from '../icons/TableIcon';
   import ViewIcon from '../icons/ViewIcon';
   import Spinner from '../Spinner.vue';
@@ -57,13 +65,25 @@
 
   export default defineComponent({
     name: 'SqlAssistEntry',
-    components: { ColumnIcon, ViewIcon, TableIcon, DatabaseIcon, Spinner },
+    components: {
+      DropDownIcon,
+      DropRightIcon,
+      ColumnIcon,
+      ViewIcon,
+      TableIcon,
+      DatabaseIcon,
+      Spinner
+    },
     props: {
       entry: {
         type: Object as PropType<DataCatalogEntry>,
         required: true
       },
       root: {
+        type: Boolean,
+        default: false
+      },
+      showFirstLevelArrows: {
         type: Boolean,
         default: false
       }

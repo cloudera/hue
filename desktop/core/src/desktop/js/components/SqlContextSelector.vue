@@ -20,7 +20,7 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent, PropType, ref, toRefs } from 'vue';
+  import { defineComponent, onMounted, PropType, ref, toRefs } from 'vue';
 
   import DropdownMenuButton from './dropdown/DropdownMenuButton.vue';
   import DropdownMenu from './dropdown/DropdownMenu.vue';
@@ -41,22 +41,22 @@
         type: Boolean,
         default: false
       },
-      modelValue: {
-        type: Object as PropType<SqlContext | null>,
+      fixedDialect: {
+        type: String as PropType<string | null>,
         default: null
       },
       listView: {
         type: Boolean,
         default: false
       },
-      filterDialect: {
-        type: String as PropType<string | null>,
+      modelValue: {
+        type: Object as PropType<SqlContext | null>,
         default: null
       }
     },
     emits: ['update:model-value'],
     setup(props, { emit }) {
-      const { modelValue, allowNull, filterDialect } = toRefs(props);
+      const { modelValue, allowNull, fixedDialect } = toRefs(props);
       const subTracker = new SubscriptionTracker();
       const connectors = ref<EditorInterpreter[]>([]);
 
@@ -78,7 +78,7 @@
       const updateConnectors = () => {
         connectors.value = filterEditorConnectors(
           connector =>
-            connector.is_sql && (!filterDialect.value || connector.dialect === filterDialect.value)
+            connector.is_sql && (!fixedDialect.value || connector.dialect === fixedDialect.value)
         );
 
         let updatedConnector: EditorInterpreter | null = null;
@@ -101,7 +101,10 @@
         connectorSelected(updatedConnector || null);
       };
 
-      getConfig().then(updateConnectors);
+      onMounted(() => {
+        getConfig().then(updateConnectors);
+      });
+
       subTracker.subscribe<ConfigRefreshedEvent>(CONFIG_REFRESHED_TOPIC, updateConnectors);
 
       return { connectors, connectorSelected, I18n };

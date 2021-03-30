@@ -31,6 +31,7 @@
     <SqlContextSelector
       v-if="!activeSqlContext"
       v-model="activeSqlContext"
+      :fixed-dialect="fixedDialect"
       :list-view="true"
       :allow-null="true"
     />
@@ -53,12 +54,18 @@
         </div>
       </li>
     </ul>
-    <SqlAssistEntry v-if="rootEntry" :entry="rootEntry" :root="true" />
+
+    <SqlAssistEntry
+      v-if="rootEntry"
+      :entry="rootEntry"
+      :root="true"
+      :show-first-level-arrows="showFirstLevelArrows"
+    />
   </div>
 </template>
 
 <script lang="ts">
-  import { defineComponent, ref, toRefs, watch } from 'vue';
+  import { defineComponent, PropType, ref, toRefs, watch } from 'vue';
 
   import './SqlAssistPanel.scss';
   import SqlAssistEntry from './SqlAssistEntry.vue';
@@ -83,8 +90,16 @@
       SqlContextSelector
     },
     props: {
+      fixedDialect: {
+        type: String as PropType<string | null>,
+        default: null
+      },
+      showFirstLevelArrows: {
+        type: Boolean as PropType<boolean>,
+        default: false
+      },
       useBreadcrumbs: {
-        type: Boolean,
+        type: Boolean as PropType<boolean>,
         default: true
       }
     },
