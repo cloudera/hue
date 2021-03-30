@@ -19,7 +19,7 @@
 <template>
   <div class="hue-assist-panel">
     <HueIcons />
-    <SqlAssistPanel :use-breadcrumbs="true" />
+    <SqlAssistPanel :use-breadcrumbs="true" :show-first-level-arrows="false" />
   </div>
 </template>
 
