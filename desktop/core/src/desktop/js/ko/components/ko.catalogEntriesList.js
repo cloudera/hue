@@ -17,11 +17,11 @@
 import $ from 'jquery';
 import * as ko from 'knockout';
 
+import { ASSIST_KEY_COMPONENT } from './assist/ko.assistKey';
 import componentUtils from './componentUtils';
 import huePubSub from 'utils/huePubSub';
+import { noop } from 'utils/hueUtils';
 import I18n from 'utils/i18n';
-
-import { ASSIST_KEY_COMPONENT } from './assist/ko.assistKey';
 
 export const NAME = 'catalog-entries-list';
 
@@ -465,41 +465,43 @@ class CatalogEntriesList {
         const joinsPromise = self
           .catalogEntry()
           .getTopJoins({ silenceErrors: true, cancellable: true });
-        joinsPromise.then(topJoins => {
-          if (topJoins && topJoins.values && topJoins.values.length) {
-            entriesAddedDeferred.then(entries => {
-              const entriesIndex = {};
-              entries.forEach(entry => {
-                entriesIndex[entry.catalogEntry().path.join('.').toLowerCase()] = {
-                  joinColumnIndex: {},
-                  entry: entry
-                };
-              });
-              topJoins.values.forEach(topJoin => {
-                topJoin.joinCols.forEach(topJoinCols => {
-                  if (topJoinCols.columns.length === 2) {
-                    if (entriesIndex[topJoinCols.columns[0].toLowerCase()]) {
-                      entriesIndex[topJoinCols.columns[0].toLowerCase()].joinColumnIndex[
-                        topJoinCols.columns[1].toLowerCase()
-                      ] = topJoinCols.columns[1];
-                    } else if (entriesIndex[topJoinCols.columns[1].toLowerCase()]) {
-                      entriesIndex[topJoinCols.columns[1].toLowerCase()].joinColumnIndex[
-                        topJoinCols.columns[0].toLowerCase()
-                      ] = topJoinCols.columns[0];
+        joinsPromise
+          .then(topJoins => {
+            if (topJoins && topJoins.values && topJoins.values.length) {
+              entriesAddedDeferred.then(entries => {
+                const entriesIndex = {};
+                entries.forEach(entry => {
+                  entriesIndex[entry.catalogEntry().path.join('.').toLowerCase()] = {
+                    joinColumnIndex: {},
+                    entry: entry
+                  };
+                });
+                topJoins.values.forEach(topJoin => {
+                  topJoin.joinCols.forEach(topJoinCols => {
+                    if (topJoinCols.columns.length === 2) {
+                      if (entriesIndex[topJoinCols.columns[0].toLowerCase()]) {
+                        entriesIndex[topJoinCols.columns[0].toLowerCase()].joinColumnIndex[
+                          topJoinCols.columns[1].toLowerCase()
+                        ] = topJoinCols.columns[1];
+                      } else if (entriesIndex[topJoinCols.columns[1].toLowerCase()]) {
+                        entriesIndex[topJoinCols.columns[1].toLowerCase()].joinColumnIndex[
+                          topJoinCols.columns[0].toLowerCase()
+                        ] = topJoinCols.columns[0];
+                      }
                     }
+                  });
+                });
+                Object.keys(entriesIndex).forEach(key => {
+                  if (Object.keys(entriesIndex[key].joinColumnIndex).length) {
+                    entriesIndex[key].entry.joinColumns(
+                      Object.keys(entriesIndex[key].joinColumnIndex)
+                    );
                   }
                 });
               });
-              Object.keys(entriesIndex).forEach(key => {
-                if (Object.keys(entriesIndex[key].joinColumnIndex).length) {
-                  entriesIndex[key].entry.joinColumns(
-                    Object.keys(entriesIndex[key].joinColumnIndex)
-                  );
-                }
-              });
-            });
-          }
-        });
+            }
+          })
+          .catch(noop);
         self.cancellablePromises.push(joinsPromise);
       }
 
@@ -519,42 +521,45 @@ class CatalogEntriesList {
           .loadOptimizerPopularityForChildren({ silenceErrors: true, cancellable: true })
           .then(popularEntries => {
             if (popularEntries.length) {
-              childPromise.then(() => {
-                const entryIndex = {};
-                self.entries().forEach(entry => {
-                  entryIndex[entry.catalogEntry().name] = entry;
-                });
+              childPromise
+                .then(() => {
+                  const entryIndex = {};
+                  self.entries().forEach(entry => {
+                    entryIndex[entry.catalogEntry().name] = entry;
+                  });
 
-                let totalCount = 0;
-                const popularityToApply = [];
-                popularEntries.forEach(popularEntry => {
-                  if (
-                    entryIndex[popularEntry.name] &&
-                    popularEntry.optimizerPopularity &&
-                    popularEntry.optimizerPopularity.selectColumn &&
-                    popularEntry.optimizerPopularity.selectColumn.columnCount > 0
-                  ) {
-                    totalCount += popularEntry.optimizerPopularity.selectColumn.columnCount;
-                    popularityToApply.push(() => {
-                      entryIndex[popularEntry.name].popularity(
-                        Math.round(
-                          (100 * popularEntry.optimizerPopularity.selectColumn.columnCount) /
-                            totalCount
-                        )
-                      );
-                    });
+                  let totalCount = 0;
+                  const popularityToApply = [];
+                  popularEntries.forEach(popularEntry => {
+                    if (
+                      entryIndex[popularEntry.name] &&
+                      popularEntry.optimizerPopularity &&
+                      popularEntry.optimizerPopularity.selectColumn &&
+                      popularEntry.optimizerPopularity.selectColumn.columnCount > 0
+                    ) {
+                      totalCount += popularEntry.optimizerPopularity.selectColumn.columnCount;
+                      popularityToApply.push(() => {
+                        entryIndex[popularEntry.name].popularity(
+                          Math.round(
+                            (100 * popularEntry.optimizerPopularity.selectColumn.columnCount) /
+                              totalCount
+                          )
+                        );
+                      });
+                    }
+                  });
+                  const foundPopularEntries = popularityToApply.length !== 0;
+                  while (popularityToApply.length) {
+                    popularityToApply.pop()();
                   }
-                });
-                const foundPopularEntries = popularityToApply.length !== 0;
-                while (popularityToApply.length) {
-                  popularityToApply.pop()();
-                }
-                if (foundPopularEntries) {
-                  self.entries().sort(entrySort);
-                }
-              });
+                  if (foundPopularEntries) {
+                    self.entries().sort(entrySort);
+                  }
+                })
+                .catch(noop);
             }
           })
+          .catch(noop)
       );
 
       if (self.catalogEntry().isTableOrView() || self.catalogEntry().isComplex()) {
@@ -596,6 +601,7 @@ class CatalogEntriesList {
                     }
                   }
                 })
+                .catch(noop)
                 .finally(() => {
                   self.loadingSamples(false);
                   firstSampleFetch = false;
