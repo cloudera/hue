@@ -112,30 +112,22 @@ def handle_on_link_shared(channel_id, message_ts, links, user_id):
         doc = Document2.objects.get(**query_id)
         doc_type = 'Query'
       elif path == '/hue/gist' and id_type == 'uuid':
-        doc = _get_gist_document(uuid=qid)
-      elif path == '/hue/gist' and id_type == 'uuid':
         doc = _get_gist_document(**query_id)
         doc_type = 'Gist'
       else:
         raise PopupException(_("Cannot unfurl link"))
     except Document2.DoesNotExist:
-      msg = "Document with {key}={value} does not exist".format(key='uuid' if id_type == 'uuid' else 'id', value=qid)
+      key, value = next(iter(query_id.items()))
+      msg = "Document with {key} = {value} does not exist".format(key=key, value=value)
       raise PopupException(_(msg))
 
+    # Permission check for Slack user to be Hue user
     try:
       user = User.objects.get(username=slack_email_prefix(user_id))
-      check_link_perm = False
     except User.DoesNotExist:
-      user = User.objects.get(username=doc.owner)
-      check_link_perm = True
-    
-    if doc_type != 'Gist':
-      if check_link_perm:
-        perm = doc._massage_permissions()
-        if not perm['link_sharing_on'] and (not perm['link_read'] or not perm['link_write']):
-          raise PopupException(_("No read permission to access the document"))
-      else:
-        doc.can_read_or_exception(user)
+      raise PopupException(_("Slack user has no permission to access the document"))
+
+    doc.can_read_or_exception(user)
 
     # Mock request for query execution and fetch result
     user = rewrite_user(user)
@@ -157,8 +149,9 @@ def slack_email_prefix(user_id):
     slack_user = slack_client.users_info(user=user_id)
   except Exception as e:
     raise PopupException(_("Cannot find slack user info"), detail=e)
-
-  return slack_user['user']['profile']['email'].split('@')[0]
+  
+  if slack_user['ok']:
+    return slack_user['user']['profile']['email'].split('@')[0]
 
 
 def send_result_file(request, channel_id, message_ts, doc, file_format):
