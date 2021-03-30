@@ -633,7 +633,7 @@ class ProxyMiddleware(object):
     return username
 
 
-class SpnegoMiddleware(object):
+class SpnegoMiddleware(MiddlewareMixin):
   """
   Based on the WSGI SPNEGO middlware class posted here:
   http://code.activestate.com/recipes/576992/
@@ -647,7 +647,7 @@ class SpnegoMiddleware(object):
       LOG.info('Unloading SpnegoMiddleware')
       raise exceptions.MiddlewareNotUsed
 
-  def __call__(self, request):
+  def process_request(self, request):
     """
     The process_request() method needs to communicate some state to the
     process_response() method. The two options for this are to return an
@@ -754,8 +754,7 @@ class SpnegoMiddleware(object):
         request.META['Return-401'] = ''
       return
 
-    response = self.get_response(request)
-
+  def process_response(self, request, response):
     if 'GSS-String' in request.META:
       response['WWW-Authenticate'] = request.META['GSS-String']
     elif 'Return-401' in request.META:
@@ -763,7 +762,6 @@ class SpnegoMiddleware(object):
         status=401)
       response['WWW-Authenticate'] = 'Negotiate'
       response.status = 401
-
     return response
 
   def clean_host(self, pattern):
