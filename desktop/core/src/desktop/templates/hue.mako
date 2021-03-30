@@ -77,6 +77,7 @@
   <link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-fileupload.css') }" >
 
   ${ commonHeaderFooterComponents.header_i18n_redirection() }
+  ${ commonHeaderFooterComponents.ajax_interceptors() }
   <%
     global_constants_url = '/desktop/globalJsConstants.js?v=' + hue_version()
   %>
@@ -170,7 +171,9 @@ ${ hueIcons.symbols() }
         <a href="javascript:void(0);" style="z-index: 1002; display: none;" title="${_('Show Assist')}" class="pointer side-panel-toggle show-left-side-panel" data-bind="visible: !leftAssistVisible(), toggle: leftAssistVisible"><i class="fa fa-chevron-right"></i></a>
         <a href="javascript:void(0);" style="display: none; opacity: 0;" title="${_('Hide Assist')}" class="pointer side-panel-toggle hide-left-side-panel" data-bind="visible: leftAssistVisible, toggle: leftAssistVisible"><i class="fa fa-chevron-left"></i></a>
         <!-- ko if: window.USE_NEW_ASSIST_PANEL -->
+% if conf.USE_NEW_ASSIST_PANEL.get():
           <assist-panel-web-component></assist-panel-web-component>
+% endif
         <!-- /ko -->
         <!-- ko ifnot: window.USE_NEW_ASSIST_PANEL -->
         <div class="assist" data-bind="component: {
