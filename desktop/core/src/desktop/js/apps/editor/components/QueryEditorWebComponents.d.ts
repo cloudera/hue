@@ -14,15 +14,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import Executor, { ExecutorOptions } from '../execution/executor';
+import { ConnectorNamespaces, GetOptions } from 'catalog/contextCatalog';
+import { findEditorConnector } from 'config/hueConfig';
+import { EditorInterpreter, HueConfig } from 'config/types';
+import Executor, { ExecutorOptions } from 'apps/editor/execution/executor';
 
 export interface HueComponentConfig {
   baseUrl?: string;
 }
 
 declare const _default: {
-  configure: (config: HueComponentConfig) => void;
-  createExecutor: (options: ExecutorOptions) => Executor;
+  configure(config: HueComponentConfig): void;
+  createExecutor(options: ExecutorOptions): Executor;
+  findEditorConnector(
+    connectorTest: (connector: EditorInterpreter) => boolean
+  ): EditorInterpreter | undefined;
+  getNamespaces(options: GetOptions): Promise<ConnectorNamespaces>;
+  refreshConfig(hueBaseUrl?: string): Promise<HueConfig>;
 };
 
 export default _default;
