@@ -102,6 +102,7 @@ const TEMPLATE = `
             <input id="shareDocUserInput" placeholder="${ I18n('Type a username or a group name') }" type="text" data-bind="
                 autocomplete: {
                   source: shareAutocompleteUserSource.bind($data),
+                  select: function(event,ui) { onShareAutocompleteSelectEnter(event,ui);},
                   itemTemplate: 'user-search-autocomp-item',
                   noMatchTemplate: 'user-search-autocomp-no-match',
                   valueObservable: searchInput,
