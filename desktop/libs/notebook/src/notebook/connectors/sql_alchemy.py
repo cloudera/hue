@@ -65,7 +65,7 @@ from string import Template
 
 from django.core.cache import caches
 from sqlalchemy import create_engine, inspect, Table, MetaData
-from sqlalchemy.exc import OperationalError, UnsupportedCompilationError, CompileError, ProgrammingError
+from sqlalchemy.exc import OperationalError, UnsupportedCompilationError, CompileError, ProgrammingError, NoSuchTableError
 
 from desktop.lib import export_csvxls
 from desktop.lib.i18n import force_unicode
@@ -473,7 +473,7 @@ class SqlAlchemyApi(Api):
         for col in columns
       ]
 
-      if not self.options['url'].startswith('bigquery://'):
+      if not self.options['url'].startswith('phoenix://'):
         response.update(assist.get_keys(database, table))
     else:
       columns = assist.get_columns(database, table)
@@ -564,7 +564,10 @@ class Assist(object):
     return self.get_table_names(database) + self.get_view_names(database)
 
   def get_columns(self, database, table):
-    return self.db.get_columns(table, database)
+    try:
+      return self.db.get_columns(table, database)
+    except NoSuchTableError:
+      return []
 
   def get_sample_data(self, database, table, column=None, operation=None):
     if operation == 'hello':
