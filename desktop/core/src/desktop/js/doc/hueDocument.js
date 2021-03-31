@@ -43,6 +43,7 @@ class HueDocument {
 
     this.userMap = {};
     this.idToUserMap = {};
+    this.selectedUserOrGroup = null;
     this.groupMap = {};
     this.items = [];
 
@@ -64,24 +65,30 @@ class HueDocument {
         perms.link_sharing_on)
     );
   }
-
+  onShareAutocompleteSelectEnter(event, selectedItem) {
+    const self = this;
+    self.selectedUserOrGroup = selectedItem.item;
+  }
   onShareAutocompleteUserEnter() {
     const self = this;
     const searchAutoCompInput = $('#shareDocUserInput').val();
-    const selectedUserOrGroup = self.userMap[searchAutoCompInput]
-      ? self.userMap[searchAutoCompInput]
-      : self.groupMap[searchAutoCompInput];
-    if (selectedUserOrGroup != null) {
-      if (typeof selectedUserOrGroup.username !== 'undefined') {
-        this.definition().perms[self.selectedPerm()].users.push(selectedUserOrGroup);
-      } else {
-        this.definition().perms[self.selectedPerm()].groups.push(selectedUserOrGroup);
+    if (self.selectedUserOrGroup && self.selectedUserOrGroup.value === searchAutoCompInput) {
+      const selectedValue =
+        self.selectedUserOrGroup.type === 'user'
+          ? self.userMap[searchAutoCompInput]
+          : self.groupMap[searchAutoCompInput];
+      if (selectedValue != null) {
+        if (typeof selectedValue.username !== 'undefined') {
+          this.definition().perms[self.selectedPerm()].users.push(selectedValue);
+        } else {
+          this.definition().perms[self.selectedPerm()].groups.push(selectedValue);
+        }
+        this.persistPerms();
       }
-      this.persistPerms();
     }
+    self.selectedUserOrGroup = null;
     $('#shareDocUserInput').val('');
   }
-
   shareAutocompleteUserSource(request, callback) {
     const self = this;
     const successCallback = jsonUserGroups => {
@@ -95,7 +102,8 @@ class HueDocument {
             icon: 'fa fa-user',
             label: highLightedLabel
           },
-          value: label
+          value: label,
+          type: 'user'
         });
         self.idToUserMap[user.id] = user;
       });
@@ -110,7 +118,8 @@ class HueDocument {
             icon: 'fa fa-users',
             label: highLightedLabel
           },
-          value: group.name
+          value: group.name,
+          type: 'group'
         });
       });
 
