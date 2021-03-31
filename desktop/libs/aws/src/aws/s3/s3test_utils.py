@@ -16,7 +16,6 @@
 from __future__ import absolute_import
 
 from builtins import range
-import logging
 import os
 import random
 import string
@@ -26,8 +25,10 @@ from nose.plugins.skip import SkipTest
 
 import aws
 
-from contextlib import contextmanager
+from aws import conf as aws_conf
 from aws.s3 import parse_uri, join
+from contextlib import contextmanager
+from desktop.lib.fsmanager import get_client
 
 
 def get_test_bucket():
@@ -52,7 +53,11 @@ class S3TestBase(unittest.TestCase):
       return
 
     cls.path_prefix = 'test-hue/%s' % generate_id(size=16)
-    cls.s3_connection = aws.get_client('default').get_s3_connection()
+
+    if aws_conf.IS_SELF_SIGNING_ENABLED.get():
+      cls.s3_connection = get_client(name='default', fs='s3a', user='hue')._s3_connection
+    else:
+      cls.s3_connection = aws.get_client('default').get_s3_connection()  # Probably broken nowadays
     cls.bucket = cls.s3_connection.get_bucket(cls.bucket_name, validate=True)
 
   @classmethod

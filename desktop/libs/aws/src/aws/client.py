@@ -15,44 +15,53 @@
 # limitations under the License.
 from __future__ import absolute_import
 
-from builtins import str
-from builtins import object
+from builtins import str, object
 import logging
 import os
-
-import boto.s3.connection
+import boto
 
 from aws import conf as aws_conf
-from aws.s3.s3fs import S3FileSystemException
-from aws.s3.s3fs import S3FileSystem
+from aws.s3.s3connection import RazUrlConnection, BotoUrlConnection
+from aws.s3.s3fs import S3FileSystem, S3FileSystemException
 
+from desktop.conf import RAZ
 from desktop.lib.idbroker import conf as conf_idbroker
 from desktop.lib.idbroker.client import IDBroker
 
 LOG = logging.getLogger(__name__)
+
 
 HTTP_SOCKET_TIMEOUT_S = 60
 
 
 def get_credential_provider(identifier, user):
   client_conf = aws_conf.AWS_ACCOUNTS[identifier] if identifier in aws_conf.AWS_ACCOUNTS else None
-  return CredentialProviderIDBroker(IDBroker.from_core_site('s3a', user)) if conf_idbroker.is_idbroker_enabled('s3a') else CredentialProviderConf(client_conf)
+  return CredentialProviderIDBroker(IDBroker.from_core_site('s3a', user)) if conf_idbroker.is_idbroker_enabled('s3a') \
+      else CredentialProviderConf(client_conf)
 
 
 def _make_client(identifier, user):
-  client_conf = aws_conf.AWS_ACCOUNTS[identifier] if identifier in aws_conf.AWS_ACCOUNTS else None
+  if RAZ.IS_ENABLED.get() and not aws_conf.IS_SELF_SIGNING_ENABLED.get():
+    s3_client = RazUrlConnection()  # Note: AWS configuration is fully skipped
+    s3_client_expiration = None
+  else:
+    client_conf = aws_conf.AWS_ACCOUNTS[identifier] if identifier in aws_conf.AWS_ACCOUNTS else None
 
-  client = Client.from_config(client_conf, get_credential_provider(identifier, user))
-  return S3FileSystem(client.get_s3_connection(), client.expiration) # It would be nice if the connection is lazy loaded
+    s3_client_builder = Client.from_config(client_conf, get_credential_provider(identifier, user))
+    s3_client = s3_client_builder.get_s3_connection()
+    s3_client_expiration = s3_client_builder.expiration
+
+  return S3FileSystem(s3_client, s3_client_expiration)
 
 
 class CredentialProviderConf(object):
   def __init__(self, conf):
-    self._conf=conf
+    self._conf = conf
 
   def validate(self):
     credentials = self.get_credentials()
-    if None in (credentials.get('AccessKeyId'), credentials.get('SecretAccessKey')) and not credentials.get('AllowEnvironmentCredentials') and not aws_conf.has_iam_metadata():
+    if None in (credentials.get('AccessKeyId'), credentials.get('SecretAccessKey')) and not credentials.get('AllowEnvironmentCredentials') \
+        and not aws_conf.has_iam_metadata():
       raise ValueError('Can\'t create AWS client, credential is not configured')
     return True
 
@@ -75,7 +84,7 @@ class CredentialProviderConf(object):
 
 class CredentialProviderIDBroker(object):
   def __init__(self, idbroker):
-    self.idbroker=idbroker
+    self.idbroker = idbroker
     self.credentials = None
 
   def validate(self):
@@ -139,7 +148,7 @@ class Client(object):
       )
 
   def get_s3_connection(self):
-
+    """S3 connection can actually be seen as a S3Client. A true new client would be a Boto3Client."""
     kwargs = {
       'aws_access_key_id': self._access_key_id,
       'aws_secret_access_key': self._secret_access_key,
@@ -166,8 +175,7 @@ class Client(object):
         kwargs.update({'host': self._host})
         connection = boto.s3.connection.S3Connection(**kwargs)
       elif self._region:
-        connection = boto.s3.connect_to_region(self._region,
-                                             **kwargs)
+        connection = boto.s3.connect_to_region(self._region, **kwargs)
       else:
         kwargs.update({'host': 's3.amazonaws.com'})
         connection = boto.s3.connection.S3Connection(**kwargs)
@@ -176,10 +184,13 @@ class Client(object):
       raise S3FileSystemException('Failed to construct S3 Connection, check configurations for aws.')
 
     if connection is None:
-      # If no connection, attemt to fallback to IAM instance metadata
+      # If no connection, attempt to fallback to IAM instance metadata
       connection = boto.connect_s3()
 
       if connection is None:
         raise S3FileSystemException('Can not construct S3 Connection for region %s' % self._region)
+
+    if aws_conf.IS_SELF_SIGNING_ENABLED.get():
+      connection = BotoUrlConnection(connection)
 
     return connection

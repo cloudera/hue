@@ -3,6 +3,7 @@ asn1crypto==0.24.0
 avro-python3==1.8.2
 Babel==2.5.1
 boto==2.46.1
+# boto3==1.17.41  # Last Py2 is 1.17
 celery[redis]==4.4.5  # For Python 3.8
 cffi==1.13.2
 channels==3.0.3
