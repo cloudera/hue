@@ -87,14 +87,13 @@ Now under Hue open `desktop/conf/pseudo-distributed.ini` file in a text editor, 
         hive_server_host=localhost
         # Port where HiveServer2 Thrift server runs on.
         hive_server_port=10000
-
-    thrift_version=7
+        thrift_version=7
 
 2. Below the `[[interpreters]]` of `[notebook]`, add:
 
-    [[[hive]]]
-    name=Hive
-    interface=hiveserver2
+        [[[hive]]]
+        name=Hive
+        interface=hiveserver2
 
 And restart Hue, open the Editors and start typing your first queries!
 
