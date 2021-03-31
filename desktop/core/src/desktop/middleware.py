@@ -404,7 +404,7 @@ class JsonMessage(object):
     return json.dumps(self.kwargs)
 
 
-class AuditLoggingMiddleware(object):
+class AuditLoggingMiddleware(MiddlewareMixin):
 
   def __init__(self, get_response):
     self.get_response = get_response
@@ -414,9 +414,7 @@ class AuditLoggingMiddleware(object):
       LOG.info('Unloading AuditLoggingMiddleware')
       raise exceptions.MiddlewareNotUsed
 
-  def __call__(self, request):
-    response = self.get_response(request)
-
+  def process_response(self, request, response):
     response['audited'] = False
     try:
       if hasattr(request, 'audit') and request.audit is not None:
@@ -475,7 +473,7 @@ except Exception as ex:
   _has_tidylib = False
 
 
-class HtmlValidationMiddleware(object):
+class HtmlValidationMiddleware(MiddlewareMixin):
   """
   If configured, validate output html for every response.
   """
@@ -515,8 +513,7 @@ class HtmlValidationMiddleware(object):
       'wrap': 0,
     }
 
-  def __call__(self, request):
-    response = self.get_response(request)
+  def process_response(self, request, response):
 
     if not _has_tidylib or not self._is_html(request, response):
       return response
@@ -573,7 +570,7 @@ class HtmlValidationMiddleware(object):
         200 <= response.status_code < 300
 
 
-class ProxyMiddleware(object):
+class ProxyMiddleware(MiddlewareMixin):
 
   def __init__(self, get_response):
     self.get_response = get_response
@@ -581,7 +578,10 @@ class ProxyMiddleware(object):
       LOG.info('Unloading ProxyMiddleware')
       raise exceptions.MiddlewareNotUsed
 
-  def __call__(self, request):
+  def process_response(self, request, response):
+    return response
+
+  def process_request(self, request):
     view_func = resolve(request.path)[0]
     if view_func in DJANGO_VIEW_AUTH_WHITELIST:
       return
@@ -614,10 +614,6 @@ class ProxyMiddleware(object):
       except:
         LOG.exception('Unexpected error when authenticating')
         return
-
-    response = self.get_response(request)
-
-    return response
 
   def clean_username(self, username, request):
     """
@@ -872,7 +868,7 @@ class MetricsMiddleware(MiddlewareMixin):
     return response
 
 
-class ContentSecurityPolicyMiddleware(object):
+class ContentSecurityPolicyMiddleware(MiddlewareMixin):
   def __init__(self, get_response):
     self.get_response = get_response
     self.secure_content_security_policy = SECURE_CONTENT_SECURITY_POLICY.get()
@@ -880,16 +876,14 @@ class ContentSecurityPolicyMiddleware(object):
       LOG.info('Unloading ContentSecurityPolicyMiddleware')
       raise exceptions.MiddlewareNotUsed
 
-  def __call__(self, request):
-    response = self.get_response(request)
-
+  def process_response(self, request, response):
     if self.secure_content_security_policy and not 'Content-Security-Policy' in response:
       response["Content-Security-Policy"] = self.secure_content_security_policy
 
     return response
 
 
-class MimeTypeJSFileFixStreamingMiddleware(object):
+class MimeTypeJSFileFixStreamingMiddleware(MiddlewareMixin):
   """
   Middleware to detect and fix ".js" mimetype. SLES 11SP4 as example OS which detect js file
   as "text/x-js" and if strict X-Content-Type-Options=nosniff is set then browser fails to
@@ -902,9 +896,7 @@ class MimeTypeJSFileFixStreamingMiddleware(object):
       LOG.info('Unloading MimeTypeJSFileFixStreamingMiddleware')
       raise exceptions.MiddlewareNotUsed
 
-  def __call__(self, request):
-    response = self.get_response(request)
-
+  def process_response(self, request, response):
     if request.path_info.endswith('.js'):
       response['Content-Type'] = "application/javascript"
 
