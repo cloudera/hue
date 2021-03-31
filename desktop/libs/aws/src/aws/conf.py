@@ -20,7 +20,6 @@ import os
 import re
 import sys
 
-
 import requests
 
 from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_bool, coerce_password_from_script
@@ -160,6 +159,14 @@ HAS_IAM_DETECTION = Config(
   key='has_iam_detection',
   default=False,
   type=coerce_bool
+)
+
+IS_SELF_SIGNING_ENABLED = Config(
+  key='is_self_signing_enabled',
+  help=_('Skip boto and use self signed URL and requests to make the calls to S3. Used for testing the RAZ integration.'),
+  type=coerce_bool,
+  private=True,
+  default=False,
 )
 
 AWS_ACCOUNTS = UnspecifiedConfigSection(
