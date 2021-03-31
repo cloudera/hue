@@ -213,8 +213,8 @@ def _make_result_table(result):
 
 def _make_unfurl_payload(request, url, id_type, doc, doc_type):
   doc_data = json.loads(doc.data)
-  statement = doc_data['snippets'][0]['statement_raw'] if id_type == 'editor' else doc_data['statement_raw']
-  dialect = doc_data['dialect'] if id_type == 'editor' else doc.extra
+  statement = doc_data['snippets'][0]['statement_raw'] if id_type == 'editor' else doc_data.get('statement_raw')
+  dialect = doc_data.get('dialect') or doc_data.get('type') if id_type == 'editor' else doc.extra
   created_by = doc.owner.get_full_name() or doc.owner.username
   name = doc.name or dialect
 
