@@ -83,11 +83,10 @@ Now under Hue open `desktop/conf/pseudo-distributed.ini` file in a text editor, 
 
 1. Directly below the `[[beeswax]]` line, add the following:
 
-    # Host where HiveServer2 is running.
-    hive_server_host=localhost
-
-    # Port where HiveServer2 Thrift server runs on.
-    hive_server_port=10000
+        # Host where HiveServer2 is running.
+        hive_server_host=localhost
+        # Port where HiveServer2 Thrift server runs on.
+        hive_server_port=10000
 
     thrift_version=7
 
