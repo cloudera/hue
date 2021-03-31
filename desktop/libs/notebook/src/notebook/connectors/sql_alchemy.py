@@ -472,7 +472,9 @@ class SqlAlchemyApi(Api):
         }
         for col in columns
       ]
-      response.update(assist.get_keys(database, table))
+
+      if not self.options['url'].startswith('bigquery://'):
+        response.update(assist.get_keys(database, table))
     else:
       columns = assist.get_columns(database, table)
       response['name'] = next((col['name'] for col in columns if column == col['name']), '')
