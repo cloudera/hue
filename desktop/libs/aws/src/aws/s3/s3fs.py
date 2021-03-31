@@ -168,6 +168,8 @@ class S3FileSystem(object):
     bucket_name, key_name = s3.parse_uri(path)[:2]
     bucket = self._get_bucket(bucket_name)
     try:
+      print('_get_key')
+      print(key_name)
       return bucket.get_key(key_name, validate=validate)
     except BotoClientError as e:
       raise S3FileSystemException(_('Failed to access path at "%s": %s') % (path, e.reason))
@@ -191,6 +193,8 @@ class S3FileSystem(object):
       return S3Stat.for_s3_root()
 
     try:
+      print('path:')
+      print(path)
       key = self._get_key(path, validate=True)
     except BotoClientError as e:
       raise S3FileSystemException(_('Failed to access path "%s": %s') % (path, e.reason))
@@ -202,6 +206,8 @@ class S3FileSystem(object):
       else:
         raise S3FileSystemException(_('Failed to access path "%s": %s') % (path, e.reason))
     except Exception as e: # SSL errors show up here, because they've been remapped in boto
+      import traceback
+      print(traceback.print_exc())
       raise S3FileSystemException(_('Failed to access path "%s": %s') % (path, str(e)))
     if key is None:
       key = self._get_key(path, validate=False)
@@ -214,7 +220,7 @@ class S3FileSystem(object):
       return S3Stat.from_key(key, is_dir=is_directory_name, fs=fs)
     else:
       key.name = S3FileSystem._append_separator(key.name)
-      ls = key.bucket.get_all_keys(prefix=key.name, max_keys=1)
+      ls = key.bucket.get_all_keys(prefix=key.name, max_keys=1)  # Not sure possible via signed request
       if len(ls) > 0:
         return S3Stat.from_key(key, is_dir=True, fs=fs)
     return None

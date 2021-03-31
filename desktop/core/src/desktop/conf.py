@@ -2075,6 +2075,33 @@ CONNECTORS = UnspecifiedConfigSection(
 )
 
 
+
+RAZ = ConfigSection(
+  key='raz',
+  help=_("""Configuration for RAZ service integration"""),
+  members=dict(
+    IS_ENABLED=Config(
+      key='is_enabled',
+      help=_('Turns on the integration as ready to use'),
+      type=coerce_bool,
+      default=False,
+    ),
+    API_URL=Config(
+        key='api_url',
+        help=_('Endpoint to contact'),
+        type=str,
+        default='https://localhost:8080',
+    ),
+    API_AUTHENTICATION=Config(
+        key='api_authentication',
+        help=_('How to authenticate against: KERBEROS or JWT (not supported yet)'),
+        type=coerce_str_lowercase,
+        default='kerberos',
+    ),
+  )
+)
+
+
 QUERY_DATABASE = ConfigSection(
   key='query_database',
   help=_("""Configuration options for specifying the Query History Database."""),
