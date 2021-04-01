@@ -117,14 +117,14 @@ def handle_on_link_shared(channel_id, message_ts, links, user_id):
       else:
         raise PopupException(_("Cannot unfurl link"))
     except Document2.DoesNotExist:
-      msg = "Document with {} does not exist".format(query_id)
+      msg = "Document with {key} does not exist".format(key=query_id)
       raise PopupException(_(msg))
 
     # Permission check for Slack user to be Hue user
     try:
       user = User.objects.get(username=slack_email_prefix(user_id))
     except User.DoesNotExist:
-      raise PopupException(_("Slack user has no permission to access the document"))
+      raise PopupException(_("Slack user does not have access to the query"))
 
     doc.can_read_or_exception(user)
 
@@ -147,7 +147,7 @@ def slack_email_prefix(user_id):
   try:
     slack_user = slack_client.users_info(user=user_id)
   except Exception as e:
-    raise PopupException(_("Cannot find slack user info"), detail=e)
+    raise PopupException(_("Cannot find query owner in Slack"), detail=e)
   
   if slack_user['ok']:
     return slack_user['user']['profile']['email'].split('@')[0]
