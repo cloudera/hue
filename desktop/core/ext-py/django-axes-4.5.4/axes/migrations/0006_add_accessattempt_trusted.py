@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='accessattempt',
             name='trusted',
-            field=models.BooleanField(default=False),
+            field=models.BooleanField(db_index=True, default=False),
         ),
     ]
     
