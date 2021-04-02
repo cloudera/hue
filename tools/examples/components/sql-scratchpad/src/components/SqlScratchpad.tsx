@@ -22,6 +22,8 @@ interface SqlScratchpadState {
   executor?: Executor;
 }
 
+type KnockoutObservable<T> = () => T;
+
 export class SqlScratchpad extends React.Component<{}, SqlScratchpadState> {
   state = {
     activeExecutable: undefined,
