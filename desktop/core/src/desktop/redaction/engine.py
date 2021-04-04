@@ -19,6 +19,7 @@ from builtins import object
 import json
 import re
 
+from django.utils.encoding import smart_str
 
 class RedactionEngine(object):
   """
@@ -106,7 +107,7 @@ class RedactionRule(object):
     """
 
     if message and (self.trigger is None or self.trigger.search(message)):
-      return self.regex.sub(self.replace, message)
+      return self.regex.sub(smart_str(self.replace), message)
     else:
       return message
 
