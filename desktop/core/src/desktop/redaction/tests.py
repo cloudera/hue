@@ -19,6 +19,8 @@ from future import standard_library
 standard_library.install_aliases()
 from builtins import zip, range, object
 
+from django.utils.encoding import smart_str
+
 import json
 import logging
 import os
@@ -331,6 +333,22 @@ class TestRedactionLogFilter(object):
 
     for message, redacted_message in messages:
       assert_equal(redacted_message, policy.redact(message))
+
+  def test_unicode_strings(self):
+    path = get_path('real-1.json')
+    policy = parse_redaction_policy_from_file(path)
+
+    messages = [
+      ("äöüß 123-45-6789", "äöüß XXX-XX-XXXX"),
+      ("你好阿基尔 1234234534654576", "你好阿基尔 XXXXXXXXXXXXXXXX"),
+      ("ã 你好 1234,2345,3456,4576", "ã 你好 XXXX-XXXX-XXXX-XXXX"),
+    ]
+
+    for message, redacted_message in messages:
+      message_to_redact = smart_str(message)
+      self.logger.debug("Message to redact : %s " % message_to_redact)
+      self.logger.debug("Message after redact : %s " % policy.redact(message_to_redact))
+      assert_equal(redacted_message, policy.redact(message_to_redact))
 
   def test_huge_rules(self):
     path = get_path('huge-1.json')
