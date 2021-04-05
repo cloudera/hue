@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import { CancellablePromise } from 'api/cancellablePromise';
-import contextCatalog from 'catalog/contextCatalog';
+import { getNamespaces } from 'catalog/contextCatalog';
 import { OptimizerMeta, TableSourceMeta } from 'catalog/DataCatalogEntry';
 import { TopAggs, TopColumns, TopFilters, TopJoins, TopJoinValue } from 'catalog/MultiTableEntry';
 import ApiStrategy from 'catalog/optimizer/ApiStrategy';
@@ -152,8 +152,7 @@ export default class SqlAnalyzer implements Optimizer {
     const path = options.paths[0].join('.');
 
     return new CancellablePromise<TopJoins>((resolve, reject, onCancel) => {
-      contextCatalog
-        .getNamespaces({ connector: this.connector, silenceErrors: !options.silenceErrors })
+      getNamespaces({ connector: this.connector, ...options })
         .then(async (result: { namespaces: Namespace[] }) => {
           if (!result.namespaces.length || !result.namespaces[0].computes.length) {
             reject('No namespace or compute found');

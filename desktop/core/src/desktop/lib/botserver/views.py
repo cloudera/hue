@@ -82,11 +82,13 @@ def parse_events(event):
 
   """
   channel_id = event.get('channel')
+  user_id = event.get('user')
+
   if event.get('type') == 'message':
-    handle_on_message(channel_id, event.get('bot_id'), event.get('text'), event.get('user'))
+    handle_on_message(channel_id, event.get('bot_id'), event.get('text'), user_id)
 
   if event.get('type') == 'link_shared':
-    handle_on_link_shared(channel_id, event.get('message_ts'), event.get('links'))
+    handle_on_link_shared(channel_id, event.get('message_ts'), event.get('links'), user_id)
 
 
 def handle_on_message(channel_id, bot_id, text, user_id):
@@ -99,26 +101,35 @@ def handle_on_message(channel_id, bot_id, text, user_id):
       send_hi_user(channel_id, user_id)
 
 
-def handle_on_link_shared(channel_id, message_ts, links):
+def handle_on_link_shared(channel_id, message_ts, links, user_id):
   for item in links:
     path = urlsplit(item['url'])[2]
     id_type, qid = urlsplit(item['url'])[3].split('=')
+    query_id = {'id': qid} if qid.isdigit() else {'uuid': qid}
 
     try:
       if path == '/hue/editor' and id_type == 'editor':
-        doc = Document2.objects.get(id=qid)
+        doc = Document2.objects.get(**query_id)
         doc_type = 'Query'
       elif path == '/hue/gist' and id_type == 'uuid':
-        doc = _get_gist_document(uuid=qid)
+        doc = _get_gist_document(**query_id)
         doc_type = 'Gist'
       else:
         raise PopupException(_("Cannot unfurl link"))
     except Document2.DoesNotExist:
-      msg = "Document with {key}={value} does not exist".format(key='uuid' if id_type == 'uuid' else 'id', value=qid)
+      msg = "Document with {key} does not exist".format(key=query_id)
       raise PopupException(_(msg))
 
+    # Permission check for Slack user to be Hue user
+    try:
+      user = User.objects.get(username=slack_email_prefix(user_id))
+    except User.DoesNotExist:
+      raise PopupException(_("Slack user does not have access to the query"))
+
+    doc.can_read_or_exception(user)
+
     # Mock request for query execution and fetch result
-    user = rewrite_user(User.objects.get(username=doc.owner.username))
+    user = rewrite_user(user)
     request = MockRequest(user=user)
 
     payload = _make_unfurl_payload(request, item['url'], id_type, doc, doc_type)
@@ -130,6 +141,16 @@ def handle_on_link_shared(channel_id, message_ts, links):
     # Generate and upload result xlsx file only if result available
     if payload['file_status']:
       send_result_file(request, channel_id, message_ts, doc, 'xls')
+
+
+def slack_email_prefix(user_id):
+  try:
+    slack_user = slack_client.users_info(user=user_id)
+  except Exception as e:
+    raise PopupException(_("Cannot find query owner in Slack"), detail=e)
+  
+  if slack_user['ok']:
+    return slack_user['user']['profile']['email'].split('@')[0]
 
 
 def send_result_file(request, channel_id, message_ts, doc, file_format):
@@ -192,8 +213,8 @@ def _make_result_table(result):
 
 def _make_unfurl_payload(request, url, id_type, doc, doc_type):
   doc_data = json.loads(doc.data)
-  statement = doc_data['snippets'][0]['statement_raw'] if id_type == 'editor' else doc_data['statement_raw']
-  dialect = doc_data['dialect'] if id_type == 'editor' else doc.extra
+  statement = doc_data['snippets'][0]['statement_raw'] or 'No statement' if id_type == 'editor' else doc_data.get('statement_raw', '')
+  dialect = doc_data.get('dialect') or doc_data.get('type', '') if id_type == 'editor' else doc.extra
   created_by = doc.owner.get_full_name() or doc.owner.username
   name = doc.name or dialect
 

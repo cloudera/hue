@@ -57,7 +57,9 @@ import MultiLineEllipsisHandler from 'utils/multiLineEllipsisHandler';
 import sqlUtils from 'sql/sqlUtils';
 import sqlWorkerHandler from 'sql/sqlWorkerHandler';
 
+import 'components/icons/HueIconsWebComponent';
 import 'components/sidebar/HueSidebarWebComponent';
+import 'components/assist/AssistPanelWebComponent';
 
 import 'ko/components/assist/assistViewModel';
 import OnePageViewModel from 'onePageViewModel';

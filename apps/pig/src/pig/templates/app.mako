@@ -1021,7 +1021,7 @@ ${ commonshare() | n,unicode }
     % if autocomplete_base_url != '':
       var apiHelper = window.apiHelper;
       var connector = { id: 'hive' };
-      contextCatalog.getNamespaces({ connector: connector }).done(function (context) {
+      contextCatalog.getNamespaces({ connector: connector }).then(function (context) {
         // TODO: Namespace and compute selection
         dataCatalog.getChildren({
           namespace: context.namespaces[0],
@@ -1032,7 +1032,7 @@ ${ commonshare() | n,unicode }
         }).then(function (childEntries) {
           availableTables = $.map(childEntries, function (entry) { return entry.name }).join(' ');
         }).catch(function() {});
-      });
+      }).catch();
     % endif
 
     function showHiveAutocomplete(databaseName) {

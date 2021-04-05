@@ -27,21 +27,18 @@
       'spinner-blackout': blackout
     }"
   >
-    <div :style="{ width: center && inline ? '100%' : null }" :class="{ 'spinner-center': center }">
-      <i
-        class="fa fa-spinner fa-spin"
-        :class="{
-          'spinner-large': size === 'large',
-          'spinner-xlarge': size === 'xlarge'
-        }"
-      />
-      <span
-        v-if="label"
-        :class="{
-          'spinner-large': size === 'large',
-          'spinner-xlarge': size === 'xlarge'
-        }"
-      >
+    <div
+      class="spinner-inner"
+      :style="{ width: center && inline ? '100%' : null }"
+      :class="{
+        'spinner-center': center,
+        'spinner-large': size === 'large',
+        'spinner-xlarge': size === 'xlarge'
+      }"
+    >
+      <SpinnerLargeIcon v-if="size === 'large' || size === 'xlarge'" class="spinner-spin" />
+      <SpinnerSmallIcon v-else class="spinner-spin" />
+      <span v-if="label">
         {{ label }}
       </span>
     </div>
@@ -52,9 +49,12 @@
   import { defineComponent } from 'vue';
 
   import './Spinner.scss';
+  import SpinnerLargeIcon from './icons/SpinnerLargeIcon';
+  import SpinnerSmallIcon from './icons/SpinnerSmallIcon';
 
   export default defineComponent({
     name: 'Spinner',
+    components: { SpinnerSmallIcon, SpinnerLargeIcon },
     props: {
       spin: {
         type: Boolean,

@@ -20,27 +20,41 @@ import {
   DashboardInterpreter,
   EditorInterpreter,
   HueConfig,
-  Interpreter
+  Interpreter,
+  SchedulerInterpreter
 } from './types';
 
-export declare const REFRESH_CONFIG_EVENT = 'cluster.config.refresh.config';
-export declare const CONFIG_REFRESHED_EVENT = 'cluster.config.set.config';
-export declare const GET_KNOWN_CONFIG_EVENT = 'cluster.config.get.config';
+interface InterpreterMap {
+  [AppType.browser]: BrowserInterpreter;
+  [AppType.editor]: EditorInterpreter;
+  [AppType.dashboard]: DashboardInterpreter;
+  [AppType.scheduler]: SchedulerInterpreter;
+  [AppType.sdkapps]: Interpreter;
+}
+
+declare type ConnectorTest<T extends keyof InterpreterMap> = (
+  connector: InterpreterMap[T]
+) => boolean;
 
 export declare const refreshConfig: () => Promise<HueConfig>;
 export declare const getLastKnownConfig: () => HueConfig | undefined;
+export declare const getConfig: () => Promise<HueConfig>;
+
 export declare const findDashboardConnector: (
-  connectorTest: (connector: Interpreter) => boolean
+  connectorTest: ConnectorTest<AppType.dashboard>
 ) => DashboardInterpreter | undefined;
 export declare const findBrowserConnector: (
-  connectorTest: (connector: Interpreter) => boolean
+  connectorTest: ConnectorTest<AppType.browser>
 ) => BrowserInterpreter | undefined;
 export declare const findEditorConnector: (
-  connectorTest: (connector: Interpreter) => boolean
+  connectorTest: ConnectorTest<AppType.editor>
 ) => EditorInterpreter | undefined;
+export declare const filterBrowserConnectors: (
+  connectorTest: ConnectorTest<AppType.browser>
+) => BrowserInterpreter[];
 export declare const filterEditorConnectors: (
-  connectorTest: (connector: Interpreter) => boolean
-) => EditorInterpreter[] | undefined;
+  connectorTest: ConnectorTest<AppType.editor>
+) => EditorInterpreter[];
 
 /**
  * This takes the initial path from the "browser" config, used in cases where the users can't access '/'
@@ -49,15 +63,12 @@ export declare const filterEditorConnectors: (
 export declare const getRootFilePath: (connector: BrowserInterpreter) => string;
 
 declare const _default: {
-  refreshConfig: (hueBaseUrl?: string) => Promise<HueConfig>;
-  getInterpreters: (appType: AppType) => Interpreter[];
+  refreshConfig: () => Promise<HueConfig>;
+  getInterpreters: <T extends keyof InterpreterMap>(appType: T) => InterpreterMap[T][];
   getLastKnownConfig: () => HueConfig;
   getRootFilePath: (connector: BrowserInterpreter) => string;
-  findBrowserConnector: (connectorTest: (connector: Interpreter) => boolean) => BrowserInterpreter;
-  findDashboardConnector: (
-    connectorTest: (connector: Interpreter) => boolean
-  ) => DashboardInterpreter;
-  findEditorConnector: (connectorTest: (connector: Interpreter) => boolean) => EditorInterpreter;
+  findBrowserConnector: (connectorTest: ConnectorTest<AppType.browser>) => BrowserInterpreter;
+  findDashboardConnector: (connectorTest: ConnectorTest<AppType.dashboard>) => DashboardInterpreter;
+  findEditorConnector: (connectorTest: ConnectorTest<AppType.editor>) => EditorInterpreter;
 };
-
 export default _default;

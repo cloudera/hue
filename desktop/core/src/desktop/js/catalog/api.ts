@@ -15,7 +15,13 @@
 // limitations under the License.
 
 import { Cancellable, CancellablePromise } from 'api/cancellablePromise';
-import { DefaultApiResponse, extractErrorMessage, post, successResponseIsError } from 'api/utils';
+import {
+  DefaultApiResponse,
+  extractErrorMessage,
+  get,
+  post,
+  successResponseIsError
+} from 'api/utils';
 import { closeSession, ExecutionHandle } from 'apps/editor/execution/api';
 import DataCatalogEntry, {
   Analysis,
@@ -28,6 +34,7 @@ import DataCatalogEntry, {
 } from 'catalog/DataCatalogEntry';
 import { hueWindow } from 'types/types';
 import { sleep, UUID } from 'utils/hueUtils';
+import { Cluster, Compute, Connector, Namespace } from '../config/types';
 
 interface AnalyzeResponse {
   status: number;
@@ -165,6 +172,30 @@ export const fetchDescribe = ({
     } catch (err) {
       reject(err || 'Describe failed');
     }
+  });
+
+export const fetchClusters = (
+  connector: Connector,
+  silenceErrors?: boolean
+): CancellablePromise<Record<string, Cluster[]>> =>
+  get(`/desktop/api2/context/clusters/${connector.id}`, undefined, {
+    silenceErrors
+  });
+
+export const fetchComputes = (
+  connector: Connector,
+  silenceErrors?: boolean
+): CancellablePromise<Record<string, Compute[]>> =>
+  get(`/desktop/api2/context/computes/${connector.id}`, undefined, {
+    silenceErrors
+  });
+
+export const fetchNamespaces = (
+  connector: Connector,
+  silenceErrors?: boolean
+): CancellablePromise<Record<string, Namespace[]> & { dynamicClusters?: boolean }> =>
+  get(`/desktop/api2/context/namespaces/${connector.id}`, undefined, {
+    silenceErrors
   });
 
 export const fetchNavigatorMetadata = ({

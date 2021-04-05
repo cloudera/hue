@@ -63,7 +63,8 @@ const executorLibConfig = Object.assign({}, defaultConfig, {
 
 const hueConfigLibConfig = Object.assign({}, defaultConfig, {
   entry: {
-    hueConfig: [`${JS_ROOT}/config/hueConfig.ts`]
+    hueConfig: [`${JS_ROOT}/config/hueConfig.ts`],
+    contextCatalog: [`${JS_ROOT}/catalog/contextCatalog.ts`]
   },
   output: {
     path: `${DIST_DIR}/lib/config`,
@@ -78,6 +79,10 @@ const hueConfigLibConfig = Object.assign({}, defaultConfig, {
       patterns: [
         {
           from: `${JS_ROOT}/config/hueConfig.d.ts`,
+          to: `${DIST_DIR}/lib/config`
+        },
+        {
+          from: `${JS_ROOT}/catalog/contextCatalog.d.ts`,
           to: `${DIST_DIR}/lib/config`
         }
       ]

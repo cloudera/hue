@@ -1739,11 +1739,11 @@ DJANGO_DEBUG_TOOL_USERS = Config(
   help=_('Comma separated list of users that allow to use django debug tool. If it is empty, all users are allowed.')
 )
 
-USE_NEW_SIDE_PANELS = Config( # To remove in Hue 4
-  key='use_new_side_panels',
-  default=True,
+USE_NEW_ASSIST_PANEL = Config(
+  key='use_new_assist_panel',
+  default=False,
   type=coerce_bool,
-  help=_('Choose whether to show extended left and right panels.')
+  help=_('Choose whether to show the new Assist panel or the old.')
 )
 
 USE_DEFAULT_CONFIGURATION = Config(

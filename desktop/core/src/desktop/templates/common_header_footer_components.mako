@@ -61,27 +61,8 @@ else:
   </script>
 </%def>
 
-<%def name="header_pollers(user, is_s3_enabled, apps)">
+<%def name="ajax_interceptors()">
   <script type="text/javascript">
-    Dropzone.autoDiscover = false;
-    moment.locale(window.navigator.userLanguage || window.navigator.language);
-    localeFormat = function (time) {
-      var mTime = time;
-      if (typeof ko !== 'undefined' && ko.isObservable(time)) {
-        mTime = time();
-      }
-      try {
-        mTime = new Date(mTime);
-        if (moment(mTime).isValid()) {
-          return moment.utc(mTime).local().format("L LT Z"); // [Local Date] [Local Time] [Timezone offset]
-        }
-      }
-      catch (e) {
-        return mTime;
-      }
-      return mTime;
-    };
-
     // Catches HTTP 502 errors
     function xhrOnreadystatechange() {
       if (this.readyState === 4 && this.status === 502) {
@@ -120,6 +101,29 @@ else:
       return xhrSend.apply(this, arguments);
     };
     XMLHttpRequest.prototype.isAugmented = true;
+  </script>
+</%def>
+
+<%def name="header_pollers(user, is_s3_enabled, apps)">
+  <script type="text/javascript">
+    Dropzone.autoDiscover = false;
+    moment.locale(window.navigator.userLanguage || window.navigator.language);
+    localeFormat = function (time) {
+      var mTime = time;
+      if (typeof ko !== 'undefined' && ko.isObservable(time)) {
+        mTime = time();
+      }
+      try {
+        mTime = new Date(mTime);
+        if (moment(mTime).isValid()) {
+          return moment.utc(mTime).local().format("L LT Z"); // [Local Date] [Local Time] [Timezone offset]
+        }
+      }
+      catch (e) {
+        return mTime;
+      }
+      return mTime;
+    };
 
     $.fn.dataTableExt.sErrMode = "throw";
 

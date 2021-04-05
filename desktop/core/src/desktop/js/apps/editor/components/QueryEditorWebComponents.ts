@@ -16,23 +16,31 @@
 
 import axios from 'axios';
 
-import AceEditor from './aceEditor/AceEditor.vue';
-import ExecuteButton from 'apps/editor/components/ExecuteButton.vue';
-import ExecuteLimitInput from 'apps/editor/components/ExecuteLimitInput.vue';
 import ExecutableProgressBar from './ExecutableProgressBar.vue';
 import QueryHistoryTable from './QueryHistoryTable.vue';
+import AceEditor from './aceEditor/AceEditor.vue';
 import ResultTable from './result/ResultTable.vue';
 import Executor, { ExecutorOptions } from '../execution/executor';
-import 'utils/json.bigDataParse';
+import ExecuteButton from 'apps/editor/components/ExecuteButton.vue';
+import ExecuteLimitInput from 'apps/editor/components/ExecuteLimitInput.vue';
+import SqlAssistPanel from 'components/assist/SqlAssistPanel.vue';
+import HueIcons from 'components/icons/HueIcons.vue';
+import SqlContextSelector from 'components/SqlContextSelector.vue';
+import { getNamespaces } from 'catalog/contextCatalog';
+import { findEditorConnector, refreshConfig } from 'config/hueConfig';
 import { wrap } from 'vue/webComponentWrap';
+import 'utils/json.bigDataParse';
 import { hueWindow } from 'types/types';
 
+wrap('hue-icons', HueIcons);
 wrap('query-editor', AceEditor);
 wrap('query-editor-execute-button', ExecuteButton);
 wrap('query-editor-history-table', QueryHistoryTable);
 wrap('query-editor-limit-input', ExecuteLimitInput);
 wrap('query-editor-progress-bar', ExecutableProgressBar);
 wrap('query-editor-result-table', ResultTable);
+wrap('sql-assist-panel', SqlAssistPanel);
+wrap('sql-context-selector', SqlContextSelector);
 
 export interface HueComponentConfig {
   baseUrl?: string;
@@ -47,4 +55,10 @@ const configure = (config: HueComponentConfig): void => {
 
 const createExecutor = (options: ExecutorOptions): Executor => new Executor(options);
 
-export default { configure, createExecutor };
+export default {
+  configure,
+  createExecutor,
+  findEditorConnector,
+  getNamespaces,
+  refreshConfig
+};

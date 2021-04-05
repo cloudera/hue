@@ -559,11 +559,11 @@ var Collection = function (vm, collection) {
   self.activeNamespace = ko.observable();
   self.activeCompute = ko.observable();
 
-  contextCatalog.getNamespaces({ connector: { id: collection.engine || 'solr' } }).done(function (context) {
+  contextCatalog.getNamespaces({ connector: { id: collection.engine || 'solr' } }).then(function (context) {
     // TODO: Namespace selection
     self.activeNamespace(context.namespaces[0]);
     self.activeCompute(context.namespaces[0].computes[0]);
-  });
+  }).catch();
 
   self.simpleAceDatabase = ko.pureComputed(function () {
     return self.name().split('.')[0];

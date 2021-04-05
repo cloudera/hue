@@ -49,6 +49,7 @@
     var MARGIN = 4;
 
     _this.options.message = _this.options.message.replace(/(<([^>]+)>)/ig, ''); // escape HTML messages
+    _this.options.message = hueUtils.deXSS(_this.options.message); // escape XSS messages
 
     if (_this.options.message !== '' && $(".jHueNotify .message").last().text() !== _this.options.message) {
 

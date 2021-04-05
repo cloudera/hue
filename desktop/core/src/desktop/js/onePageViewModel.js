@@ -19,10 +19,10 @@ import _ from 'lodash';
 import * as ko from 'knockout';
 import page from 'page';
 
+import { CONFIG_REFRESHED_TOPIC, GET_KNOWN_CONFIG_TOPIC } from 'config/events';
 import hueUtils from 'utils/hueUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
-import { CONFIG_REFRESHED_EVENT, GET_KNOWN_CONFIG_EVENT } from 'config/hueConfig';
 
 class OnePageViewModel {
   constructor() {
@@ -820,8 +820,8 @@ class OnePageViewModel {
       page();
     };
 
-    huePubSub.publish(GET_KNOWN_CONFIG_EVENT, configUpdated);
-    huePubSub.subscribe(CONFIG_REFRESHED_EVENT, configUpdated);
+    huePubSub.publish(GET_KNOWN_CONFIG_TOPIC, configUpdated);
+    huePubSub.subscribe(CONFIG_REFRESHED_TOPIC, configUpdated);
 
     huePubSub.subscribe('open.link', href => {
       if (href) {

@@ -51,7 +51,8 @@
   import {
     EXECUTABLE_RESULT_UPDATED_TOPIC,
     EXECUTABLE_UPDATED_TOPIC,
-    ExecutableResultUpdatedEvent
+    ExecutableResultUpdatedEvent,
+    ExecutableUpdatedEvent
   } from 'apps/editor/execution/events';
   import { defineComponent, PropType } from 'vue';
 

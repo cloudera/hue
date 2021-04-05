@@ -20,7 +20,7 @@
   from desktop import conf
   from desktop.auth.backend import is_admin, is_hue_admin
   from desktop.conf import APP_SWITCHER_ALTUS_BASE_URL, APP_SWITCHER_MOW_BASE_URL, CUSTOM_DASHBOARD_URL, \
-      DISPLAY_APP_SWITCHER, IS_K8S_ONLY, IS_MULTICLUSTER_ONLY, USE_DEFAULT_CONFIGURATION, USE_NEW_SIDE_PANELS, \
+      DISPLAY_APP_SWITCHER, IS_K8S_ONLY, IS_MULTICLUSTER_ONLY, USE_DEFAULT_CONFIGURATION, USE_NEW_ASSIST_PANEL, \
       VCS, ENABLE_GIST, ENABLE_LINK_SHARING, has_channels, has_connectors
   from desktop.models import hue_version, _get_apps, get_cluster_config
 
@@ -35,7 +35,7 @@
   from metastore.views import has_write_access
   from notebook.conf import ENABLE_NOTEBOOK_2, ENABLE_QUERY_ANALYSIS, ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_SQL_INDEXER, \
       get_ordered_interpreters, SHOW_NOTEBOOKS
-  
+
   if sys.version_info[0] > 2:
     from django.utils.translation import gettext as _
   else:
@@ -120,6 +120,7 @@
   window.AUTO_UPLOAD_OPTIMIZER_STATS = '${ OPTIMIZER.AUTO_UPLOAD_STATS.get() }' === 'True';
 
   window.HAS_GIST = '${ ENABLE_GIST.get() }' === 'True';
+  window.HAS_LINK_SHARING = '${ ENABLE_LINK_SHARING.get() }' === 'True';
   window.HAS_CONNECTORS = '${ has_connectors() }' === 'True';
 
   ## In the past was has_workload_analytics()
@@ -672,7 +673,7 @@
       home_dir = '/'
   %>
 
-  window.USE_NEW_SIDE_PANELS = '${ USE_NEW_SIDE_PANELS.get() }' === 'True'
+  window.USE_NEW_ASSIST_PANEL = '${ USE_NEW_ASSIST_PANEL.get() }' === 'True'
   window.USER_HOME_DIR = '${ home_dir }';
 
   var userGroups = [];
