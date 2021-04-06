@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -18,6 +19,8 @@
 from future import standard_library
 standard_library.install_aliases()
 from builtins import zip, range, object
+
+from django.utils.encoding import smart_str
 
 import json
 import logging
@@ -332,6 +335,22 @@ class TestRedactionLogFilter(object):
     for message, redacted_message in messages:
       assert_equal(redacted_message, policy.redact(message))
 
+  def test_unicode_strings(self):
+    path = get_path('real-1.json')
+    policy = parse_redaction_policy_from_file(path)
+
+    messages = [
+      ("äöüß 123-45-6789", "äöüß XXX-XX-XXXX"),
+      ("你好阿基尔 1234234534654576", "你好阿基尔 XXXXXXXXXXXXXXXX"),
+      ("ã 你好 1234,2345,3456,4576", "ã 你好 XXXX-XXXX-XXXX-XXXX"),
+    ]
+
+    for message, redacted_message in messages:
+      message_to_redact = smart_str(message)
+      self.logger.debug("Message to redact : %s " % message_to_redact)
+      self.logger.debug("Message after redact : %s " % policy.redact(message_to_redact))
+      assert_equal(redacted_message, policy.redact(message_to_redact))
+
   def test_huge_rules(self):
     path = get_path('huge-1.json')
     policy = parse_redaction_policy_from_file(path)
@@ -421,28 +440,27 @@ class TestRedactionLogFilter(object):
     assert_equal(errors, [])
 
 def byte_range(first, last):
-    return list(range(first, last+1))
+  return list(range(first, last+1))
 
 first_values = byte_range(0x00, 0x7F) + byte_range(0xC2, 0xF4)
 trailing_values = byte_range(0x80, 0xBF)
 
 def random_utf8_char():
-    first = random.choice(first_values)
-    if first <= 0x7F:
-        value = bytearray([first])
-    elif first <= 0xDF:
-        value = bytearray([first, random.choice(trailing_values)])
-    elif first == 0xE0:
-        value = bytearray([first, random.choice(byte_range(0xA0, 0xBF)), random.choice(trailing_values)])
-    elif first == 0xED:
-        value = bytearray([first, random.choice(byte_range(0x80, 0x9F)), random.choice(trailing_values)])
-    elif first <= 0xEF:
-        value = bytearray([first, random.choice(trailing_values), random.choice(trailing_values)])
-    elif first == 0xF0:
-        value = bytearray([first, random.choice(byte_range(0x90, 0xBF)), random.choice(trailing_values), random.choice(trailing_values)])
-    elif first <= 0xF3:
-        value = bytearray([first, random.choice(trailing_values), random.choice(trailing_values), random.choice(trailing_values)])
-    elif first == 0xF4:
-        value = bytearray([first, random.choice(byte_range(0x80, 0x8F)), random.choice(trailing_values), random.choice(trailing_values)])
-
-    return value.decode('utf8')
+  first = random.choice(first_values)
+  if first <= 0x7F:
+    value = bytearray([first])
+  elif first <= 0xDF:
+    value = bytearray([first, random.choice(trailing_values)])
+  elif first == 0xE0:
+    value = bytearray([first, random.choice(byte_range(0xA0, 0xBF)), random.choice(trailing_values)])
+  elif first == 0xED:
+    value = bytearray([first, random.choice(byte_range(0x80, 0x9F)), random.choice(trailing_values)])
+  elif first <= 0xEF:
+    value = bytearray([first, random.choice(trailing_values), random.choice(trailing_values)])
+  elif first == 0xF0:
+    value = bytearray([first, random.choice(byte_range(0x90, 0xBF)), random.choice(trailing_values), random.choice(trailing_values)])
+  elif first <= 0xF3:
+    value = bytearray([first, random.choice(trailing_values), random.choice(trailing_values), random.choice(trailing_values)])
+  elif first == 0xF4:
+    value = bytearray([first, random.choice(byte_range(0x80, 0x8F)), random.choice(trailing_values), random.choice(trailing_values)])
+  return value.decode('utf8')
