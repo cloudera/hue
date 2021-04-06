@@ -1,3 +1,4 @@
+apache-ranger==0.0.3
 asn1crypto==0.24.0
 avro-python3==1.8.2
 Babel==2.5.1
