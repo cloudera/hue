@@ -101,6 +101,14 @@ export default abstract class Executable {
     this.logs = new ExecutionLogs(this);
   }
 
+  getLogs(): ExecutionLogs | undefined {
+    return this.logs;
+  }
+
+  getResult(): ExecutionResult | undefined {
+    return this.result;
+  }
+
   setStatus(status: ExecutionStatus): void {
     const oldStatus = this.status;
     this.status = status;
@@ -117,6 +125,10 @@ export default abstract class Executable {
   setProgress(progress: number): void {
     this.progress = progress;
     this.notify();
+  }
+
+  getExecutionStatus(): ExecutionStatus {
+    return this.status;
   }
 
   getExecutionTime(): number {
