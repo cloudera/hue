@@ -1,6 +1,7 @@
-import React, { FC } from 'react';
+import React, { FC, useEffect, useRef } from 'react';
 
 import SqlExecutable from 'gethue/apps/editor/execution/sqlExecutable';
+import { setWebCompProp } from './utils';
 
 export interface ExecuteProgressProps {
   activeExecutable?: SqlExecutable
@@ -10,19 +11,18 @@ interface ProgressBarElement extends HTMLElement {
   executable?: SqlExecutable;
 }
 
-export const ExecuteProgress: FC<ExecuteProgressProps> = React.memo(({ activeExecutable }) => {
-  const newNode = document.createElement('query-editor-progress-bar');
-  newNode.setAttribute('executable', '');
-  (newNode as ProgressBarElement).executable = activeExecutable;
+export const ExecuteProgress: FC<ExecuteProgressProps> = ({ activeExecutable }) => {
+  const containerElement = useRef<HTMLDivElement | null>(null);
 
-  return <div
-    ref={
-      (element: HTMLDivElement | null) => {
-        if (element) {
-          element.innerHTML = '';
-          element.appendChild(newNode)
-        }
-      }
+  useEffect(() => {
+    setWebCompProp<ProgressBarElement>(containerElement.current?.firstElementChild, 'executable', activeExecutable);
+  }, [activeExecutable, containerElement]);
+
+  useEffect(() => {
+    if (containerElement.current) {
+      containerElement.current.innerHTML = '<query-editor-progress-bar />';
     }
-  />
-});
+  }, [containerElement]);
+
+  return <div ref={ containerElement }/>
+};

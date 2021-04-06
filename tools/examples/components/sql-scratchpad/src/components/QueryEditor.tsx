@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useEffect, useRef } from 'react';
 
 import hiveSyntaxParser from 'gethue/lib/parsers/hiveSyntaxParser';
 import hiveAutocompleteParser from 'gethue/lib/parsers/hiveAutocompleteParser';
@@ -6,6 +6,7 @@ import Executor from 'gethue/lib/execution/executor';
 import SqlExecutable from 'gethue/apps/editor/execution/sqlExecutable';
 import { SetOptions, SqlReferenceProvider, UdfCategory } from 'gethue/sql/reference/types'
 import { ActiveStatementChangedEvent } from 'gethue/apps/editor/components/aceEditor/types';
+import { setWebCompProp } from './utils';
 
 const sqlReferenceProvider: SqlReferenceProvider = {
   async getReservedKeywords(dialect: string): Promise<Set<string>> {
@@ -43,52 +44,30 @@ interface QueryEditorProps {
   setActiveExecutable(executable: SqlExecutable): void;
 }
 
-export const QueryEditor: FC<QueryEditorProps> = React.memo(({ executor, id, setActiveExecutable }) => {
-  const nodeElement = document.createElement('query-editor') as QueryEditorElement;
-  nodeElement.setAttribute('hue-base-url', 'http://localhost:8888');
-  nodeElement.setAttribute('executor', '');
-  nodeElement.setAttribute('sql-parser-provider', '');
-  nodeElement.setAttribute('sql-reference-provider', '');
+export const QueryEditor: FC<QueryEditorProps> = ({ setActiveExecutable, executor, id }) => {
+  const containerElement = useRef<HTMLDivElement | null>(null);
 
-  nodeElement.setAttribute('id', id || 'some-id');
-  nodeElement.executor = executor;
-  nodeElement['sql-parser-provider'] = sqlAutocompleteProvider;
-  nodeElement['sql-reference-provider'] = sqlReferenceProvider;
-
-  nodeElement.addEventListener('active-statement-changed', event => {
-    const activeStatementChangedEvent = event as ActiveStatementChangedEvent;
-    executor.update(activeStatementChangedEvent.detail, false);
-    setActiveExecutable(executor.activeExecutable);
-  })
-
-  //nodeElement.addEventListener('value-changed', event => {
-  //  // event.detail contains the value
-  //})
-
-  // nodeElement.addEventListener('create-new-doc', () => {
-  //   // Triggered when the user presses ctrl+n
-  // })
-
-  // nodeElement.addEventListener('save-doc', () => {
-  //   // Triggered when the user presses ctrl+s
-  // })
-
-  // nodeElement.addEventListener('ace-created', event => {
-  //   // event.detail contains the Ace editor instance
-  // })
-
-  // nodeElement.addEventListener('cursor-changed', event => {
-  //   // event.detail contains the cursor position
-  // })
-
-  return <div className={ 'query-editor-wrapper' }
-    ref={
-      element => {
-        if (element) {
-          element.innerHTML = '';
-          element.append(nodeElement);
-        }
-      }
+  useEffect(() => {
+    if (containerElement.current) {
+      const queryEditorElement = document.createElement('query-editor');
+      setWebCompProp<QueryEditorElement>(queryEditorElement, 'executor', executor);
+      setWebCompProp<QueryEditorElement>(queryEditorElement, 'id', id || 'some-id');
+      setWebCompProp<QueryEditorElement>(queryEditorElement, 'sql-parser-provider', sqlAutocompleteProvider);
+      setWebCompProp<QueryEditorElement>(queryEditorElement, 'sql-reference-provider', sqlReferenceProvider);
+      containerElement.current.innerHTML = '';
+      containerElement.current?.appendChild(queryEditorElement);
     }
-  />;
-});
+  }, [containerElement, executor, id]);
+
+  useEffect(() => {
+    if (containerElement.current?.firstChild) {
+      containerElement.current.firstChild.addEventListener('active-statement-changed', event => {
+        const activeStatementChangedEvent = event as ActiveStatementChangedEvent;
+        executor.update(activeStatementChangedEvent.detail, false);
+        setActiveExecutable(executor.activeExecutable);
+      })
+    }
+  }, [setActiveExecutable, containerElement, executor])
+
+  return <div ref={ containerElement }/>
+};
