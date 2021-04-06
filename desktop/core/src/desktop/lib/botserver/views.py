@@ -243,7 +243,7 @@ def _make_unfurl_payload(request, url, id_type, doc, doc_type):
           "type": "section",
           "text": {
             "type": "mrkdwn",
-            "text": "\n*<{}|Open {} {} in Hue - SQL Editor>*".format(url, name, doc_type)
+            "text": "\n*<{}|Open {} {} in Hue | Created by: {}>*".format(url, name, doc_type, created_by),
           }
         },
         {
@@ -255,19 +255,6 @@ def _make_unfurl_payload(request, url, id_type, doc, doc_type):
             "type": "mrkdwn",
             "text": "*Statement:*\n```{}```".format(statement if len(statement) < 150 else (statement[:150] + '...'))
           }
-        },
-        {
-          "type": "section",
-          "fields": [
-            {
-              "type": "mrkdwn",
-              "text": "*Dialect:*\n{}".format(dialect)
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Created by:*\n{}".format(created_by)
-            }
-          ]
         },
         {
           "type": "section",
