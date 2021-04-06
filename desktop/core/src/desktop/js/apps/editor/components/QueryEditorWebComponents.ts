@@ -27,7 +27,9 @@ import SqlAssistPanel from 'components/assist/SqlAssistPanel.vue';
 import HueIcons from 'components/icons/HueIcons.vue';
 import SqlContextSelector from 'components/SqlContextSelector.vue';
 import { getNamespaces } from 'catalog/contextCatalog';
+import dataCatalog from 'catalog/dataCatalog';
 import { findEditorConnector, refreshConfig } from 'config/hueConfig';
+import { Connector } from 'config/types';
 import { wrap } from 'vue/webComponentWrap';
 import 'utils/json.bigDataParse';
 import { hueWindow } from 'types/types';
@@ -55,7 +57,13 @@ const configure = (config: HueComponentConfig): void => {
 
 const createExecutor = (options: ExecutorOptions): Executor => new Executor(options);
 
+const clearContextCatalogCache = async (connector: Connector): Promise<void> => {
+  await getNamespaces({ connector, clearCache: true });
+};
+
 export default {
+  dataCatalog,
+  clearContextCatalogCache,
   configure,
   createExecutor,
   findEditorConnector,
