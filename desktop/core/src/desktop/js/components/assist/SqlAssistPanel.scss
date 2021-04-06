@@ -55,6 +55,8 @@
       line-height: 30px;
 
       > div:first-child {
+        @include nowrap-ellipsis;
+
         padding-left: 12px;
 
         > span:first-child {
