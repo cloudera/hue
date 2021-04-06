@@ -46,8 +46,8 @@
       <ChevronLeftIcon /> <DatabaseIcon /> {{ rootEntry.name }}
     </div>
 
-    <spinner :spin="activeSqlContext && loadingDatabases" :center="true" :size="'xlarge'" />
-    <ul v-if="activeSqlContext && !loadingDatabases && !rootEntry">
+    <spinner :spin="activeSqlContext && loading" :center="true" :size="'xlarge'" />
+    <ul v-if="activeSqlContext && !loading && !rootEntry">
       <li v-for="database in databases" :key="database.name">
         <div role="button" tabindex="0" @click="onDatabaseClick(database)">
           <DatabaseIcon /> {{ database.name }}
@@ -68,6 +68,7 @@
   import { defineComponent, PropType, ref, toRefs, watch } from 'vue';
 
   import './SqlAssistPanel.scss';
+  import SubscriptionTracker from '../utils/SubscriptionTracker';
   import SqlAssistEntry from './SqlAssistEntry.vue';
   import ChevronLeftIcon from '../icons/ChevronLeftIcon';
   import ConnectorIcon from '../icons/ConnectorIcon';
@@ -105,38 +106,45 @@
     },
     setup(props) {
       const { useBreadcrumbs } = toRefs(props);
+      const subTracker = new SubscriptionTracker();
       const activeSqlContext = ref<SqlContext | null>(null);
       const rootEntry = ref<DataCatalogEntry | null>(null);
-      const loadingDatabases = ref(false);
+      const loading = ref(false);
       const databases = ref<DataCatalogEntry[]>([]);
 
-      watch(activeSqlContext, async sqlContext => {
+      const refresh = async (sqlContext: SqlContext): Promise<void> => {
         if (sqlContext) {
-          loadingDatabases.value = true;
+          loading.value = true;
           try {
             const sourceEntry = await dataCatalog.getEntry({
               path: [],
               ...sqlContext
             });
             if (useBreadcrumbs.value) {
+              rootEntry.value = null;
               databases.value = await sourceEntry.getChildren();
             } else {
+              databases.value = [];
               rootEntry.value = sourceEntry;
             }
           } catch {}
-          loadingDatabases.value = false;
+          loading.value = false;
         }
-      });
+      };
+
+      watch(activeSqlContext, refresh);
 
       const onDatabaseClick = (database: DataCatalogEntry): void => {
         rootEntry.value = database;
       };
 
+      subTracker.subscribe('data.catalog.entry.refreshed', refresh);
+
       return {
         rootEntry,
         activeSqlContext,
         databases,
-        loadingDatabases,
+        loading,
         onDatabaseClick,
         I18n
       };
