@@ -38,7 +38,7 @@ from .utils import (
 from .compat import (
     Callable, Mapping,
     cookielib, urlunparse, urlsplit, urlencode, str, bytes,
-    is_py2, chardet, builtin_str, basestring)
+    is_py2, builtin_str, basestring)
 from .compat import json as complexjson
 from .status_codes import codes
 
@@ -55,6 +55,8 @@ REDIRECT_STATI = (
 DEFAULT_REDIRECT_LIMIT = 30
 CONTENT_CHUNK_SIZE = 10 * 1024
 ITER_CHUNK_SIZE = 512
+
+from desktop.lib.python_util import check_encoding
 
 
 class RequestEncodingMixin(object):
@@ -726,8 +728,19 @@ class Response(object):
 
     @property
     def apparent_encoding(self):
-        """The apparent encoding, provided by the chardet library."""
-        return chardet.detect(self.content)['encoding']
+        try:
+            import chardet
+            chardet_version = chardet.__version__
+            major, minor, patch = chardet_version.split('.')[:3]
+            major, minor, patch = int(major), int(minor), int(patch)
+            # chardet >= 3.0.2, < 3.1.0
+            assert major == 3
+            assert minor < 1
+            assert patch >= 2
+        except (ImportError, AssertionError) as e:
+            return check_encoding(self.content)
+        else:
+            return chardet.detect(self.content)['encoding']
 
     def iter_content(self, chunk_size=1, decode_unicode=False):
         """Iterates over the response data.  When stream=True is set on the
