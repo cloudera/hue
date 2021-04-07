@@ -228,22 +228,13 @@ def guess_field_types(request):
   file_format = json.loads(request.POST.get('fileFormat', '{}'))
 
   if file_format['inputFormat'] == 'localfile':
-    upload_file = request.FILES['inputfile']
-    fs = FileSystemStorage()
-    name = fs.save(upload_file.name, upload_file)
-    reader = csv.reader(decode_utf8(upload_file))
 
-    sample = []
-    column_row = []
+    if len(csv_data) <= 5:
+      sample = csv_data[1:]
+    else:
+      sample = csv_data[1:5]
 
-    for count, row in enumerate(reader):
-      if count == 0:
-        column_row = row
-      elif count <= 5:
-        sample.append(row)
-        csv_data.append(row)
-      else:
-        csv_data.append(row)
+    column_row = csv_data[0]
 
     field_type_guesses = []
     for count, col in enumerate(column_row):
@@ -258,7 +249,6 @@ def guess_field_types(request):
     ]
 
     format_ = {
-      'file_url': fs.url(name),
       'columns': columns,
       'sample': sample
     }
@@ -549,7 +539,7 @@ def importer_submit(request):
         request,
         source,
         destination,
-        csv_data,
+        csv_data[1:],
         start_time
       )
     else:
@@ -737,3 +727,18 @@ def save_pipeline(request):
   response['message'] = request.POST.get('editorMode') == 'true' and _('Query saved successfully') or _('Notebook saved successfully')
 
   return JsonResponse(response)
+
+
+def upload_local_file(request):
+
+  upload_file = request.FILES['inputfile']
+  fs = FileSystemStorage()
+  name = fs.save(upload_file.name, upload_file)
+  reader = csv.reader(decode_utf8(upload_file))
+
+  csv_data.clear()
+
+  for row in reader:
+    csv_data.append(row)
+
+  return JsonResponse({'file_url': fs.url(name)})
