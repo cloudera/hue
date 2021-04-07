@@ -110,10 +110,10 @@ def handle_on_link_shared(channel_id, message_ts, links, user_id):
     try:
       if path == '/hue/editor' and id_type == 'editor':
         doc = Document2.objects.get(**query_id)
-        doc_type = 'Query'
+        doc_type = 'query'
       elif path == '/hue/gist' and id_type == 'uuid':
         doc = _get_gist_document(**query_id)
-        doc_type = 'Gist'
+        doc_type = 'gist'
       else:
         raise PopupException(_("Cannot unfurl link"))
     except Document2.DoesNotExist:
@@ -215,7 +215,6 @@ def _make_unfurl_payload(request, url, id_type, doc, doc_type):
   doc_data = json.loads(doc.data)
   statement = doc_data['snippets'][0]['statement_raw'] or 'No statement' if id_type == 'editor' else doc_data.get('statement_raw', '')
   dialect = doc_data.get('dialect') or doc_data.get('type', '') if id_type == 'editor' else doc.extra
-  name = doc.name or dialect
 
   file_status = False
 
@@ -236,7 +235,7 @@ def _make_unfurl_payload(request, url, id_type, doc, doc_type):
 
   payload_data = {
     'url': url,
-    'name': name,
+    'name': doc.name,
     'doc_type': doc_type,
     'dialect': dialect,
     'user': doc.owner.get_full_name() or doc.owner.username,
@@ -252,7 +251,7 @@ def _make_unfurl_payload(request, url, id_type, doc, doc_type):
           "type": "section",
           "text": {
             "type": "mrkdwn",
-            "text": "\n*<{url}|Open {name} {doc_type} in Hue | Dialect: {dialect} | Created by: {user}>*".format(**payload_data),
+            "text": "\n*<{url}|Open {name} {doc_type} of {dialect} dialect created by {user} in Hue>*".format(**payload_data),
           }
         },
         {
