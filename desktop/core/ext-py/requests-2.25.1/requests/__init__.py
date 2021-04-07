@@ -41,12 +41,11 @@ is at <https://requests.readthedocs.io>.
 """
 
 import urllib3
-import chardet
 import warnings
 from .exceptions import RequestsDependencyWarning
 
 
-def check_compatibility(urllib3_version, chardet_version):
+def check_compatibility(urllib3_version):
     urllib3_version = urllib3_version.split('.')
     assert urllib3_version != ['dev']  # Verify urllib3 isn't installed from git.
 
@@ -82,10 +81,10 @@ def _check_cryptography(cryptography_version):
 
 # Check imported dependencies for compatibility.
 try:
-    check_compatibility(urllib3.__version__, chardet.__version__)
+    check_compatibility(urllib3.__version__)
 except (AssertionError, ValueError):
     warnings.warn("urllib3 ({}) or chardet ({}) doesn't match a supported "
-                  "version!".format(urllib3.__version__, chardet.__version__),
+                  "version!".format(urllib3.__version__),
                   RequestsDependencyWarning)
 
 # Attempt to enable urllib3's fallback for SNI support
