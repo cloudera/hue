@@ -246,15 +246,15 @@ def guess_field_types(request):
         csv_data.append(row)
 
     field_type_guesses = []
-    for col in range(len(column_row)):
-      column_samples = [sample_row[col] for sample_row in sample if len(sample_row) > col]
+    for count, col in enumerate(column_row):
+      column_samples = [sample_row[count] for sample_row in sample if len(sample_row) > count]
 
       field_type_guess = guess_field_type_from_samples(column_samples)
       field_type_guesses.append(field_type_guess)
 
     columns = [
-      Field(column_row[i], field_type_guesses[i]).to_dict()
-      for i in range(len(column_row))
+      Field(column_row[count], field_type_guesses[count]).to_dict()
+      for count, col in enumerate(column_row)
     ]
 
     format_ = {
