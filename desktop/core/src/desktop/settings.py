@@ -360,9 +360,10 @@ EMAIL_SUBJECT_PREFIX = 'Hue %s - ' % desktop.conf.CLUSTER_ID.get()
 # Permissive CORS
 if desktop.conf.CORS_ENABLED.get():
   INSTALLED_APPS.append('corsheaders')
-  MIDDLEWARE.append('corsheaders.middleware.CorsMiddleware')
+  MIDDLEWARE.insert(0, 'corsheaders.middleware.CorsMiddleware')
   MIDDLEWARE.remove('django.middleware.csrf.CsrfViewMiddleware')
   CORS_ALLOW_ALL_ORIGINS = True
+  CORS_ORIGIN_ALLOW_ALL = True  # Old Py2 way
 
 # Configure database
 if os.getenv('DESKTOP_DB_CONFIG'):
