@@ -46,11 +46,11 @@ class TestBotServer(unittest.TestCase):
       raise SkipTest
   
   def setUp(self):
-    # Slack user email: test@example.com
+    # Slack user display name: test
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
     self.user = User.objects.get(username="test")
 
-    # Other slack user email: test_not_me@example.com
+    # Other slack user display name: test_not_me
     self.client_not_me = make_logged_in_client(username="test_not_me", groupname="default", recreate=True, is_superuser=False)
     self.user_not_me = User.objects.get(username="test_not_me")
 
@@ -110,7 +110,7 @@ class TestBotServer(unittest.TestCase):
               "ok": True,
               "user": {
                 "profile": {
-                  "email": "test_not_me@example.com"
+                  "display_name": "test_not_me"
                 }
               }
             }
@@ -155,7 +155,7 @@ class TestBotServer(unittest.TestCase):
                 "ok": True,
                 "user": {
                   "profile": {
-                    "email": "test_not_me@example.com"
+                    "display_name": "test_not_me"
                   }
                 }
               }
@@ -187,7 +187,7 @@ class TestBotServer(unittest.TestCase):
           "ok": True,
           "user": {
             "profile": {
-              "email": "test_user_not_exist@example.com"
+              "display_name": "test_user_not_exist"
             }
           }
         }

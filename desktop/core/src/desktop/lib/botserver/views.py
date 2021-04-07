@@ -122,7 +122,7 @@ def handle_on_link_shared(channel_id, message_ts, links, user_id):
 
     # Permission check for Slack user to be Hue user
     try:
-      user = User.objects.get(username=slack_email_prefix(user_id))
+      user = User.objects.get(username=slack_display_name(user_id))
     except User.DoesNotExist:
       raise PopupException(_("Slack user does not have access to the query"))
 
@@ -143,14 +143,14 @@ def handle_on_link_shared(channel_id, message_ts, links, user_id):
       send_result_file(request, channel_id, message_ts, doc, 'xls')
 
 
-def slack_email_prefix(user_id):
+def slack_display_name(user_id):
   try:
     slack_user = slack_client.users_info(user=user_id)
   except Exception as e:
     raise PopupException(_("Cannot find query owner in Slack"), detail=e)
   
   if slack_user['ok']:
-    return slack_user['user']['profile']['email'].split('@')[0]
+    return slack_user['user']['profile']['display_name']
 
 
 def send_result_file(request, channel_id, message_ts, doc, file_format):
