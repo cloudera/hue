@@ -110,10 +110,10 @@ def handle_on_link_shared(channel_id, message_ts, links, user_id):
     try:
       if path == '/hue/editor' and id_type == 'editor':
         doc = Document2.objects.get(**query_id)
-        doc_type = 'Query'
+        doc_type = 'query'
       elif path == '/hue/gist' and id_type == 'uuid':
         doc = _get_gist_document(**query_id)
-        doc_type = 'Gist'
+        doc_type = 'gist'
       else:
         raise PopupException(_("Cannot unfurl link"))
     except Document2.DoesNotExist:
@@ -169,7 +169,7 @@ def send_result_file(request, channel_id, message_ts, doc, file_format):
       file=next(content_generator), 
       thread_ts=message_ts,
       filetype=file_format,
-      filename='{}.{}'.format(file_name, file_format),
+      filename='{name}.{format}'.format(name=file_name, format=file_format),
       initial_comment='Here is your result file!'
     )
   except Exception as e:
@@ -208,15 +208,13 @@ def _make_result_table(result):
 
     table.append(pivot_row)
 
-  return tabulate(table, headers=['Columns({})'.format(idx+1), '', ''], tablefmt="simple")
+  return tabulate(table, headers=['Columns({count})'.format(count=idx+1), '', ''], tablefmt="simple")
 
 
 def _make_unfurl_payload(request, url, id_type, doc, doc_type):
   doc_data = json.loads(doc.data)
   statement = doc_data['snippets'][0]['statement_raw'] or 'No statement' if id_type == 'editor' else doc_data.get('statement_raw', '')
   dialect = doc_data.get('dialect') or doc_data.get('type', '') if id_type == 'editor' else doc.extra
-  created_by = doc.owner.get_full_name() or doc.owner.username
-  name = doc.name or dialect
 
   file_status = False
 
@@ -235,6 +233,16 @@ def _make_unfurl_payload(request, url, id_type, doc, doc_type):
   else:
     unfurl_result = 'Result is not available for Gist'
 
+  payload_data = {
+    'url': url,
+    'name': doc.name,
+    'doc_type': doc_type,
+    'dialect': dialect,
+    'user': doc.owner.get_full_name() or doc.owner.username,
+    'query': statement if len(statement) < 150 else (statement[:150] + '...'),
+    'result': unfurl_result,
+  }
+
   payload = {
     url: {
       "color": "#025BA6",
@@ -243,7 +251,7 @@ def _make_unfurl_payload(request, url, id_type, doc, doc_type):
           "type": "section",
           "text": {
             "type": "mrkdwn",
-            "text": "\n*<{}|Open {} {} in Hue - SQL Editor>*".format(url, name, doc_type)
+            "text": "\n*<{url}|Open {name} {doc_type} of {dialect} dialect created by {user} in Hue>*".format(**payload_data),
           }
         },
         {
@@ -253,27 +261,14 @@ def _make_unfurl_payload(request, url, id_type, doc, doc_type):
           "type": "section",
           "text": {
             "type": "mrkdwn",
-            "text": "*Statement:*\n```{}```".format(statement if len(statement) < 150 else (statement[:150] + '...'))
+            "text": "*Statement:*\n```{query}```".format(**payload_data)
           }
-        },
-        {
-          "type": "section",
-          "fields": [
-            {
-              "type": "mrkdwn",
-              "text": "*Dialect:*\n{}".format(dialect)
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Created by:*\n{}".format(created_by)
-            }
-          ]
         },
         {
           "type": "section",
           "text": {
             "type": "mrkdwn",
-            "text": "*Query result:*\n```{}```".format(unfurl_result),
+            "text": "*Query result:*\n```{result}```".format(**payload_data),
           }
 				}
       ]
@@ -288,7 +283,7 @@ def send_hi_user(channel_id, user_id):
   Sends Hi<user_id> message in a specific channel.
 
   """
-  bot_message = 'Hi <@{}> :wave:'.format(user_id)
+  bot_message = 'Hi <@{user}> :wave:'.format(user=user_id)
   try:
     slack_client.api_call(api_method='chat.postMessage', json={'channel': channel_id, 'text': bot_message})
   except Exception as e:
