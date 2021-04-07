@@ -3185,7 +3185,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
           var files = $('#inputfile')[0].files[0];
           fd.append('inputfile', files);
           fd.append('fileFormat', ko.mapping.toJSON(viewModel.createWizard.source));
-  
+          ## $.post ??
           $.ajax({
               url: '/indexer/api/indexer/guess_field_types',
               type: 'post',
