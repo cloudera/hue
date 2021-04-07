@@ -238,10 +238,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
               <form method="post" action="" enctype="multipart/form-data" id="uploadform">
                 <div >
                     <input type="file" id="inputfile" name="inputfile" accept=".csv">
-                    <input type="button" class="button" value="Upload" id="but_upload">
                 </div>
-                <label for="path" class="control-label"><div>${ _('Path') }</div>
-                  <input type="text" id="file_path" data-bind="value: createWizard.source.path">
             </form>
           </div>
 
@@ -1790,7 +1787,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
       // File
       self.path = ko.observable('');
       self.path.subscribe(function(val) {
-        if (val && self.inputFormat() != 'localfile') {
+        if (val) {
           wizard.guessFormat();
           wizard.destination.nonDefaultLocation(val);
         }
@@ -3161,48 +3158,27 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
         };
         function upload() {
           var fd = new FormData();
-          fd.append('fileFormat', ko.mapping.toJSON(viewModel.createWizard.source));
+          var files = $('#inputfile')[0].files[0];
+          fd.append('inputfile', files);
+          var file_size = files.size;
+          if (file_size < 30*1000) {
             $.ajax({
-              url:"/indexer/api/indexer/guess_format",
+              url:"/indexer/api/indexer/upload_local_file",
               type: 'post',
               data: fd,
               contentType:false,
               cache: false,
               processData:false,
-              beforeSend: function (){
-                viewModel.createWizard.isGuessingFormat(true);
-              },
-              success:function (resp) {
-                var newFormat = ko.mapping.fromJS(new FileType(resp['type'], resp));
-                viewModel.createWizard.source.format(newFormat);
-                viewModel.createWizard.isGuessingFormat(false);
-              }
-            });
-        };
-
-      $("#but_upload").click(function() {
-          var fd = new FormData();
-          var files = $('#inputfile')[0].files[0];
-          fd.append('inputfile', files);
-          fd.append('fileFormat', ko.mapping.toJSON(viewModel.createWizard.source));
-          ## $.post ??
-          $.ajax({
-              url: '/indexer/api/indexer/guess_field_types',
-              type: 'post',
-              data: fd,
-              contentType: false,
-              processData: false,
-              beforeSend: function(){
-                viewModel.createWizard.isGuessingFieldTypes(true);
-              },
-              success: function(response){
-                viewModel.createWizard.loadSampleData(response);
-                viewModel.createWizard.isGuessingFieldTypes(false);
+              success:function (response) {
                 viewModel.createWizard.source.path(response['file_url']);
-                document.getElementById("file_path").value = response['file_url'];
-              },
-          });
-      });
+              }
+            
+            });
+          }
+          else {
+            alert("As of now File size must be less than 30KB");
+          }
+        };
 
       $('.importer-droppable').droppable({
         accept: ".draggableText",
