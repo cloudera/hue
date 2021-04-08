@@ -132,6 +132,7 @@ const MetaLabels = {
 
 const HIVE_DIALECT = 'hive';
 const IMPALA_DIALECT = 'impala';
+const PHOENIX_DIALECT = 'phoenix';
 
 const locateSubQuery = (subQueries: SubQuery[], subQueryName: string): SubQuery | undefined => {
   if (subQueries) {
@@ -2125,7 +2126,8 @@ class AutocompleteResults {
 
       if (remainingPath.length > 0) {
         let path = remainingPath.shift();
-        if (path) {
+        // path == '' needed for phoenix empty db
+        if (path || (this.dialect() === PHOENIX_DIALECT && path === '')) {
           fetchedPath.push(path);
         }
         // Parser sometimes knows if it's a map or array.
