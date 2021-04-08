@@ -17,6 +17,7 @@
 import * as ko from 'knockout';
 
 import 'ko/bindings/ko.publish';
+import { format } from 'sql-formatter';
 
 import apiHelper from 'api/apiHelper';
 import componentUtils from 'ko/components/componentUtils';
@@ -165,30 +166,22 @@ class SnippetEditorActions {
     }
 
     hueAnalytics.log('notebook', 'format');
-    apiHelper
-      .formatSql({
-        statements:
-          this.snippet.ace().getSelectedText() !== ''
-            ? this.snippet.ace().getSelectedText()
-            : this.snippet.statement_raw()
-      })
-      .done(data => {
-        if (data.status === 0) {
-          if (this.snippet.ace().getSelectedText() !== '') {
-            this.snippet
-              .ace()
-              .session.replace(
-                this.snippet.ace().session.selection.getRange(),
-                data.formatted_statements
-              );
-          } else {
-            this.snippet.statement_raw(data.formatted_statements);
-            this.snippet.ace().setValue(this.snippet.statement_raw(), 1);
-          }
-        } else {
-          this.snippet.handleAjaxError(data);
-        }
-      });
+
+    const formatted_statements = format(
+      this.snippet.ace().getSelectedText() !== ''
+        ? this.snippet.ace().getSelectedText()
+        : this.snippet.statement_raw(),
+      { uppercase: true, linesBetweenQueries: 2, indentQuerySeparator: true }
+    );
+
+    if (this.snippet.ace().getSelectedText() !== '') {
+      this.snippet
+        .ace()
+        .session.replace(this.snippet.ace().session.selection.getRange(), formatted_statements);
+    } else {
+      this.snippet.statement_raw(formatted_statements);
+      this.snippet.ace().setValue(this.snippet.statement_raw(), 1);
+    }
   }
 
   dispose() {}
