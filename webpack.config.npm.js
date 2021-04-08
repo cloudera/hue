@@ -93,7 +93,10 @@ const hueConfigLibConfig = Object.assign({}, defaultConfig, {
 const webComponentsConfig = Object.assign({}, defaultConfig, {
   entry: {
     ErDiagram: [`${JS_ROOT}/components/er-diagram/webcomp.ts`],
-    QueryEditorWebComponents: [`${JS_ROOT}/apps/editor/components/QueryEditorWebComponents.ts`]
+    QueryEditorWebComponents: [`${JS_ROOT}/apps/editor/components/QueryEditorWebComponents.ts`],
+    SqlScratchpadWebComponent: [
+      `${JS_ROOT}/apps/editor/components/sqlScratchpad/SqlScratchpadWebComponent.ts`
+    ]
   },
   output: {
     path: `${DIST_DIR}/lib/components`,
@@ -107,6 +110,10 @@ const webComponentsConfig = Object.assign({}, defaultConfig, {
       patterns: [
         {
           from: `${JS_ROOT}/apps/editor/components/QueryEditorWebComponents.d.ts`,
+          to: `${DIST_DIR}/lib/components`
+        },
+        {
+          from: `${JS_ROOT}/apps/editor/components/sqlScratchpad/SqlScratchpadWebComponent.d.ts`,
           to: `${DIST_DIR}/lib/components`
         }
       ]
