@@ -59,11 +59,13 @@ const clearContextCatalogCache = async (connector: Connector): Promise<void> => 
 };
 
 export default {
-  dataCatalog,
   clearContextCatalogCache,
   configure,
   createExecutor,
+  dataCatalog,
   findEditorConnector,
   getNamespaces,
-  refreshConfig
+  refreshConfig,
+  setBaseUrl,
+  setBearerToken
 };
