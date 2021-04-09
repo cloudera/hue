@@ -217,10 +217,12 @@ def _make_unfurl_payload(request, url, id_type, doc, doc_type):
   dialect = doc_data.get('dialect') or doc_data.get('type', '') if id_type == 'editor' else doc.extra
 
   file_status = False
+  result_section = None
 
   if id_type == 'editor':
     max_rows = 2
     unfurl_result = 'Query result has expired or could not be found'
+
     try:
       status = _check_status(request, operation_id=doc_data['uuid'])
       if status['query_status']['status'] == 'available':
@@ -230,8 +232,14 @@ def _make_unfurl_payload(request, url, id_type, doc, doc_type):
           file_status = True
     except:
       pass
-  else:
-    unfurl_result = 'Result is not available for Gist'
+
+    result_section = {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "*Query result:*\n```{result}```".format(result=unfurl_result),
+      }
+    }
 
   payload_data = {
     'url': url,
@@ -240,7 +248,6 @@ def _make_unfurl_payload(request, url, id_type, doc, doc_type):
     'dialect': dialect,
     'user': doc.owner.get_full_name() or doc.owner.username,
     'query': statement if len(statement) < 150 else (statement[:150] + '...'),
-    'result': unfurl_result,
   }
 
   payload = {
@@ -264,16 +271,12 @@ def _make_unfurl_payload(request, url, id_type, doc, doc_type):
             "text": "*Statement:*\n```{query}```".format(**payload_data)
           }
         },
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": "*Query result:*\n```{result}```".format(**payload_data),
-          }
-				}
       ]
     }
   }
+
+  if result_section is not None:
+    payload[url]['blocks'].append(result_section)
 
   return {'payload': payload, 'file_status': file_status}
 
