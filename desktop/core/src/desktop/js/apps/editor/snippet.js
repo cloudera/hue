@@ -14,6 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { EXECUTE_ACTIVE_EXECUTABLE_TOPIC } from 'apps/editor/components/events';
 import $ from 'jquery';
 import * as ko from 'knockout';
 import komapping from 'knockout.mapping';
@@ -189,8 +190,6 @@ const getDefaultSnippetProperties = snippetType => {
 
   return properties;
 };
-
-const EXECUTE_ACTIVE_EXECUTABLE_EVENT = 'executable.active.executable';
 
 const ERROR_REGEX = /line ([0-9]+)(:([0-9]+))?/i;
 
@@ -814,7 +813,7 @@ export default class Snippet {
 
   execute() {
     // From ctrl + enter
-    huePubSub.publish(EXECUTE_ACTIVE_EXECUTABLE_EVENT, this.activeExecutable());
+    huePubSub.publish(EXECUTE_ACTIVE_EXECUTABLE_TOPIC, this.activeExecutable());
   }
 
   fetchExecutionAnalysis() {
