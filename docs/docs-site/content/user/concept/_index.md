@@ -88,7 +88,7 @@ Answering a question via a query result? Showing some weird data to a slack chan
 
 - Works with an SQL snippet: one or more statements
 - The link automatically point to the editor and the SQL content
-- The query is displayed in the friendlier ![presentation mode](https://docs.gethue.com/user/querying/#presentation)
+- The query is displayed in the friendlier [presentation mode](https://docs.gethue.com/user/querying/#presentation)
 - Slack unfurling will show a mini preview (can be turned off globally)
 - Gists are stored in a Gist directory in your home
 
@@ -110,15 +110,96 @@ Clicking on the link will open-up the SQL selection:
 
 ![Click Gist](https://cdn.gethue.com/uploads/2020/03/editor_gist_open_presentation_mode.png)
 
-### Share to Slack
-Currently in **Beta**
-
-This integration increases the collaboration with others via Slack. It expands the ability to share query links or gists to the desired Slack channels which then unfurls in a rich preview for other members to view.
-
-
 ### Import / Export
 
 Via the Home page, saved documents can be exported for backups or transferring to another Hue.
+
+## Slack
+Currently in **Beta**
+
+This integration increases the collaboration with other users via Slack.
+
+### Architectural View
+![Share to Slack Architecture]()
+
+One of the flows for sharing query/gist links, the main bot logic lies on top of the Hue server listening to the events posted by the Hue App from Slack to an endpoint, processing those events sending a greeting message when someone says 'Hello Hue' such as generating a rich preview to unfurl for the links shared in the Slack channels and using Slack API methods for sending these responses back to Slack.
+
+The 'Smart Quering Assistance' block on top of Hue server which driving the other flow for SQL Assistance is currently a work in progress for replying to users asking questions on how to find certain data tables or to query them.
+
+### Manual Slack App Installation
+Steps/flow to be followed by the upstream Hue user to set up their own Hue Slack app for their workspace.
+
+#### Creating your app
+1. Go to https://api.slack.com/apps and click **"Create New App"**.
+2. Pick an app name, i.e. **"Hue App"** and a workspace that you'll be installing it to.
+3. Click **"Create App"**. This will leave you on the **"Basic Information"** screen for your new app.
+4. Scroll down to **"Display Information"** and fill it out.
+
+#### Subscribe to Events
+5. Scroll back up to **"Add features and functionality"**.
+6. Click **“Event Subscription”** and turn on **“Enable Events”** 
+7. Add an **Events Request URL** where Slack will POST events when triggered _https://\<hue-instance-domain\>/slack/events/_
+8. Subscribe to the following **bot events**:
+
+| **Bot Events** | **Why do we need it?** |
+|    :---:     |     :---     |
+| link_shared   | Add link previews for your specified Hue instance domain (eg. demo.gethue.com) in Slack messages.<br/><br/>\*Requires and itself adds **link:read** OAuth scope
+| message.channels     | Send a simple “ Hi \<@user id\>” greeting message to user messaging “Hello Hue”.<br/><br/>\*Requires and itself adds **channels:history** OAuth scope
+
+9. Go to “App Unfurl Domains” and add your Hue instance domain (eg. demo.gethue.com). More info about [registering a domain here.](https://api.slack.com/reference/messaging/link-unfurling#configuring_domains)
+
+#### Add OAuth Scopes
+10. Navigate to the **"OAuth & Permissions"** page and scroll down to **"Scopes"**
+11. Under **"Bot Token Scopes"**, subscribe to the following:
+
+| **Permission Scopes** | **Why do we need it?** |
+|    :---:     |     :---     |
+| channels:history   | \*Required by **message.channels** bot event
+| chat:write     | Sending messages as Hue App such as greeting message
+| files:write   | Uploading the query result file in link message thread
+| links:read  | \*Required by **link_shared** bot event
+| links:write   | To show link preview in Slack messages from registered domains
+| users:read  | To view the email prefix name of the user who sent the link to check the read permission on Hue queries.
+| users:read.email | users:read is required with users:read.email together to read the email for above reason
+
+#### Updating your hue.ini config file
+Paste this in your hue.ini file under `[desktop]` section
+
+```
+[[slack]]
+is_enabled=true
+slack_verification_token=<your-slack-verification-token>
+slack_bot_user_token=<your-slack-bot-user-token>
+```
+12. Set Slack API endpoint flag to true
+13. Go to the **"OAuth & Permissions"** page, copy the **“Bot User OAuth Token”** and update **slack_bot_user_token**
+14. Similarly, go to the **"Basic Information"** page, copy the **“Verification Token”** and update **slack_verification_token**
+
+Now add the Slack app in your desired channels and send some query/gist links!
+
+### Share to Slack
+This feature expands the ability to share query links or gists to the desired Slack channels which then unfurls in a rich preview for other users. It even gives the user result file for the query if it has not expired.
+
+Open Hue, run some query and copy its link
+
+![Run Query in Hue]()
+
+Paste it in the Slack channel for others to get a rich link preview
+
+![Query Link Preview]()
+
+Slack currently does not support markdown tables and potential improvements with inline preview will come when Hue supports result caching via [query tasks](https://docs.gethue.com/administrator/administration/reference/#task-server)
+
+After evaluating a lot of possible fixes ( like uploading result image, truncating columns which doesn't look good, pivoting table, uploading result file etc.) and seeing their tradeoffs, we chose to have few sample rows but keep all columns by pivoting the result table and to compensate for the loss of rows, Hue app gives the result file in the message thread.
+
+Users can share the SQL gists too!
+
+![Gist Link]()
+
+![Gist Link Preview]()
+
+#### Security
+Keeping in mind the security aspect, those Slack users who are Hue users and have the read permissions to access the query and its result will get this rich preview and result file after sharing the link. This mapping is currently done by checking the email prefix for Hue username.
 
 ## Settings
 
