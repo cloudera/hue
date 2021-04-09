@@ -101,11 +101,15 @@ def samlgroup_check(request):
         LOG.info("Missing %s in SAMLResponse for %s user" % (REQUIRED_GROUPS_ATTRIBUTE.get(), request.user.username))
         return False
 
-      saml_group_found = set(REQUIRED_GROUPS.get()).issubset(
+      # Earlier we had AND condition, It means user has to be there in all given groups.
+      # Now we are doing OR condition, which means user must be in one of the given groups.
+      saml_group_found = set(REQUIRED_GROUPS.get()).intersection(
                          set(json_data['saml_attributes'].get(REQUIRED_GROUPS_ATTRIBUTE.get())))
       if not saml_group_found:
         LOG.info("User %s not found in required SAML groups, %s" % (request.user.username, REQUIRED_GROUPS.get()))
         return False
+
+      LOG.info("User %s found in the required SAML groups %s" % (request.user.username, ",".join(saml_group_found)))
   return True
 
 def hue(request):
