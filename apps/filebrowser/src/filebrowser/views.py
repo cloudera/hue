@@ -44,7 +44,7 @@ from functools import partial
 from django.utils.http import http_date
 from django.utils.html import escape
 
-from aws.s3.s3fs import S3FileSystemException, S3ListAllBucketsException
+from aws.s3.s3fs import S3FileSystemException, S3ListAllBucketsException, get_s3_home_directory
 from desktop import appmanager
 from desktop.auth.backend import is_admin
 from desktop.lib import i18n
@@ -212,6 +212,14 @@ def view(request, path):
   if 'default_abfs_home' in request.GET:
     from azure.abfs.__init__ import get_home_dir_for_ABFS
     home_dir_path = get_home_dir_for_ABFS()
+    if request.fs.isdir(home_dir_path):
+      return format_preserving_redirect(
+          request,
+          '/filebrowser/view=' + urllib_quote(home_dir_path.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS)
+      )
+
+  if 'default_s3_home' in request.GET:
+    home_dir_path = get_s3_home_directory()
     if request.fs.isdir(home_dir_path):
       return format_preserving_redirect(
           request,
