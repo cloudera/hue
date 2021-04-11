@@ -317,7 +317,7 @@ class SqlAlchemyApi(Api):
 
   @query_error_handler
   def check_status(self, notebook, snippet):
-    guid = snippet['result']['handle']['guid']
+    guid = snippet.get('result', {}).get('handle', {}).get('guid')
     connection = CONNECTIONS.get(guid)
 
     response = {'status': 'canceled'}
