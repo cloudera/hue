@@ -603,3 +603,52 @@ def test_create_ddl_with_abfs():
   finally:
     finish()
   assert_true(u"\'abfs://my-data@yingstorage.dfs.core.windows.net/test_data/cars.csv\'" in sql)
+
+
+def test_create_table_from_local():
+  source = {
+    'path': '',
+  }
+  destination = {
+    'name': 'default.test1',
+    'columns': [
+      {'name': 'date', 'type': 'timestamp'},
+      {'name': 'hour', 'type': 'bigint'},
+      {'name': 'minute', 'type': 'bigint'},
+      {'name': 'dep', 'type': 'bigint'},
+      {'name': 'arr', 'type': 'bigint'},
+      {'name': 'dep_delay', 'type': 'bigint'},
+      {'name': 'arr_delay', 'type': 'bigint'},
+      {'name': 'carrier', 'type': 'string'},
+      {'name': 'flight', 'type': 'bigint'},
+      {'name': 'dest', 'type': 'string'},
+      {'name': 'plane', 'type': 'string'},
+      {'name': 'cancelled', 'type': 'boolean'},
+      {'name': 'time', 'type': 'bigint'},
+      {'name': 'dist', 'type': 'bigint'},
+    ],
+    'indexerPrimaryKey': []
+  }
+  request = MockRequest(fs=MockFs())
+  sql = SQLIndexer(user=request.user, fs=request.fs).create_table_from_local_file(source, destination).get_str()
+
+  statement = '''USE default;
+
+CREATE TABLE IF NOT EXISTS test1 (
+  `date` timestamp,
+  `hour` bigint,
+  `minute` bigint,
+  `dep` bigint,
+  `arr` bigint,
+  `dep_delay` bigint,
+  `arr_delay` bigint,
+  `carrier` string,
+  `flight` bigint,
+  `dest` string,
+  `plane` string,
+  `cancelled` boolean,
+  `time` bigint,
+  `dist` bigint
+);'''
+
+  assert_equal(statement, sql)
