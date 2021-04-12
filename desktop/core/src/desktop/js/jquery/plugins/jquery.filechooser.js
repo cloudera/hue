@@ -82,7 +82,7 @@ const defaults = {
     s3a: {
       scheme: 's3a',
       root: 's3a://',
-      home: 's3a://',
+      home: '/?default_s3_home',
       icon: {
         brand: 'fa-cubes',
         home: 'fa-cubes'
@@ -810,6 +810,20 @@ Plugin.prototype.init = function () {
       '<div class="filechooser-container" style="position: relative"><div class="filechooser-services" style="position: absolute"></div><div class="filechooser-tree" style="width: 560px"></div></div>'
     );
   $.post('/filebrowser/api/get_filesystems', data => {
+    let initialHome = '/';
+    if (self.options.initialPath == '') {
+      if (
+        Object.keys(data.filesystems).length > 1 &&
+        Object.keys(data.filesystems).indexOf('hdfs') != -1
+      ) {
+        initialHome = '/?default_to_home';
+        self.options.fsSelected = 'hdfs';
+      } else {
+        const _scheme = Object.keys(data.filesystems)[0];
+        initialHome = defaults.filesysteminfo[_scheme]['home'];
+        self.options.fsSelected = _scheme;
+      }
+    }
     const initialPath = $.trim(self.options.initialPath);
     const scheme = initialPath && initialPath.substring(0, initialPath.indexOf(':'));
     if (data && data.status === 0) {
@@ -827,7 +841,7 @@ Plugin.prototype.init = function () {
         hueLocalStorage(STORAGE_PREFIX + self.options.user + self.options.fsSelected)
       );
     } else {
-      self.navigateTo('/?default_to_home');
+      self.navigateTo(initialHome);
     }
   });
 };
