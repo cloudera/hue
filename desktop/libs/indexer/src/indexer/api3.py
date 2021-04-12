@@ -228,37 +228,27 @@ def guess_field_types(request):
   file_format = json.loads(request.POST.get('fileFormat', '{}'))
 
   if file_format['inputFormat'] == 'localfile':
-    upload_file = request.FILES['inputfile']
-    fs = FileSystemStorage()
-    name = fs.save(upload_file.name, upload_file)
-    reader = csv.reader(decode_utf8(upload_file))
 
-    sample = []
-    column_row = []
+    if len(csv_data) <= 5:
+      sample = csv_data[1:]
+    else:
+      sample = csv_data[1:5]
 
-    for count, row in enumerate(reader):
-      if count == 0:
-        column_row = row
-      elif count <= 5:
-        sample.append(row)
-        csv_data.append(row)
-      else:
-        csv_data.append(row)
+    column_row = csv_data[0]
 
     field_type_guesses = []
-    for col in range(len(column_row)):
-      column_samples = [sample_row[col] for sample_row in sample if len(sample_row) > col]
+    for count, col in enumerate(column_row):
+      column_samples = [sample_row[count] for sample_row in sample if len(sample_row) > count]
 
       field_type_guess = guess_field_type_from_samples(column_samples)
       field_type_guesses.append(field_type_guess)
 
     columns = [
-      Field(column_row[i], field_type_guesses[i]).to_dict()
-      for i in range(len(column_row))
+      Field(column_row[count], field_type_guesses[count]).to_dict()
+      for count, col in enumerate(column_row)
     ]
 
     format_ = {
-      'file_url': fs.url(name),
       'columns': columns,
       'sample': sample
     }
@@ -549,7 +539,7 @@ def importer_submit(request):
         request,
         source,
         destination,
-        csv_data,
+        csv_data[1:],
         start_time
       )
     else:
@@ -737,3 +727,18 @@ def save_pipeline(request):
   response['message'] = request.POST.get('editorMode') == 'true' and _('Query saved successfully') or _('Notebook saved successfully')
 
   return JsonResponse(response)
+
+
+def upload_local_file(request):
+
+  upload_file = request.FILES['inputfile']
+  fs = FileSystemStorage()
+  name = fs.save(upload_file.name, upload_file)
+  reader = csv.reader(decode_utf8(upload_file))
+
+  csv_data.clear()
+
+  for row in reader:
+    csv_data.append(row)
+
+  return JsonResponse({'file_url': fs.url(name)})

@@ -40,6 +40,11 @@ from useradmin.views import sync_ldap_users, sync_ldap_groups, import_ldap_users
     add_ldap_users, add_ldap_groups, sync_ldap_users_groups
 from useradmin.tests import BaseUserAdminTests, LdapTestConnection, reset_all_groups, reset_all_users, create_long_username
 
+if sys.version_info[0] > 2:
+  from unittest.mock import patch, Mock, MagicMock
+else:
+  from mock import patch, Mock, MagicMock
+
 
 def get_multi_ldap_config():
   return {'multi_ldap_conf': {
@@ -792,10 +797,7 @@ class TestUserAdminLdap(BaseUserAdminTests):
 
   def test_ldap_exception_handling(self):
     # Set up LDAP tests to use a LdapTestConnection instead of an actual LDAP connection
-    class LdapTestConnectionError(LdapTestConnection):
-      def find_users(self, user, find_by_dn=False):
-        raise ldap.LDAPError('No such object')
-    ldap_access.CACHED_LDAP_CONN = LdapTestConnectionError()
+    ldap_access.CACHED_LDAP_CONN = LdapTestConnection()
 
     c = make_logged_in_client('test', is_superuser=True)
 
@@ -806,12 +808,14 @@ class TestUserAdminLdap(BaseUserAdminTests):
     reset.append(desktop.conf.LDAP.LDAP_SERVERS.set_for_testing(get_multi_ldap_config()))
 
     try:
-      response = c.post(
-        reverse('useradmin:useradmin.views.add_ldap_users'),
-        dict(server='multi_ldap_conf', username_pattern='moe', password1='test', password2='test'),
-        follow=True
-      )
-      assert_true(b'There was an error when communicating with LDAP' in response.content, response)
+      with patch('useradmin.test_ldap.LdapTestConnection.find_users') as find_users:
+        find_users.side_effect = ldap.LDAPError('No such object')
+        response = c.post(
+          reverse('useradmin:useradmin.views.add_ldap_users'),
+          dict(server='multi_ldap_conf', username_pattern='moe', password1='test', password2='test'),
+          follow=True
+        )
+        assert_true(b'There was an error when communicating with LDAP' in response.content, response)
     finally:
       for finish in reset:
         finish()

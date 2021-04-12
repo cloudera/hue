@@ -23,6 +23,7 @@ import axios, {
 } from 'axios';
 import qs from 'qs';
 import huePubSub from 'utils/huePubSub';
+import { hueWindow } from '../types/types';
 
 import { CancellablePromise } from './cancellablePromise';
 import hueUtils from 'utils/hueUtils';
@@ -52,6 +53,36 @@ export interface ApiFetchOptions<T, E = string> extends AxiosRequestConfig {
     reject: (err: unknown) => void
   ) => void;
 }
+
+const axiosInstance = axios.create();
+
+let baseUrl = (window as hueWindow).HUE_BASE_URL;
+let bearerToken: string | undefined;
+
+axiosInstance.interceptors.request.use(config => {
+  if (baseUrl) {
+    config.baseURL = baseUrl;
+  }
+  if (bearerToken) {
+    config.headers['Authorization'] = `Bearer ${bearerToken}`;
+  }
+  return config;
+});
+
+axiosInstance.interceptors.response.use(response => {
+  if (response.data?.token) {
+    bearerToken = response.data.token;
+  }
+  return response;
+});
+
+export const setBaseUrl = (newBaseUrl: string): void => {
+  baseUrl = newBaseUrl;
+};
+
+export const setBearerToken = (newBearerToken: string): void => {
+  bearerToken = newBearerToken;
+};
 
 export const successResponseIsError = (responseData?: DefaultApiResponse): boolean => {
   return (
@@ -156,7 +187,7 @@ export const post = <T, U = unknown, E = string>(
     const { cancelToken, cancel } = getCancelToken();
     let completed = false;
 
-    axios
+    axiosInstance
       .post<T & DefaultApiResponse>(url, qs.stringify(data), {
         cancelToken,
         ...options
@@ -194,7 +225,7 @@ export const get = <T, U = unknown>(
     const { cancelToken, cancel } = getCancelToken();
     let completed = false;
 
-    axios
+    axiosInstance
       .get<T & DefaultApiResponse>(url, {
         cancelToken,
         params: data
@@ -221,7 +252,7 @@ export const upload = async <T>(
   data: FormData,
   progressCallback?: (progress: number) => void
 ): Promise<T> => {
-  const response = await axios.post<T>(url, data, {
+  const response = await axiosInstance.post<T>(url, data, {
     headers: { 'Content-Type': 'multipart/form-data' },
     onUploadProgress: progressEvent => {
       if (progressCallback) {
@@ -230,10 +261,4 @@ export const upload = async <T>(
     }
   });
   return response.data;
-};
-
-export const cancelActiveRequest = (request?: JQuery.jqXHR): void => {
-  if (request && request.readyState < 4) {
-    request.abort();
-  }
 };
