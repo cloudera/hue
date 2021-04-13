@@ -59,6 +59,11 @@ Plugin.prototype.show = function () {
     return;
   }
 
+  if (/^(504|upstream connect error)/.test(this.options.message)) {
+    console.warn(this.options.message);
+    return;
+  }
+
   if (
     _this.options.message !== '' &&
     $('.jHueNotify .message').last().text() !== _this.options.message
