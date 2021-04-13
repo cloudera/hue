@@ -18,6 +18,7 @@ import { ConnectorNamespaces, GetOptions } from 'catalog/contextCatalog';
 import { findEditorConnector } from 'config/hueConfig';
 import { EditorInterpreter, HueConfig } from 'config/types';
 import Executor, { ExecutorOptions } from 'apps/editor/execution/executor';
+import { DataCatalog } from 'catalog/dataCatalog';
 
 export interface HueComponentConfig {
   baseUrl?: string;
@@ -25,7 +26,10 @@ export interface HueComponentConfig {
 
 declare const _default: {
   configure(config: HueComponentConfig): void;
+  setBaseUrl(baseUrl: string): void;
+  setBearerToken(bearerToken: string): void;
   createExecutor(options: ExecutorOptions): Executor;
+  dataCatalog: DataCatalog;
   findEditorConnector(
     connectorTest: (connector: EditorInterpreter) => boolean
   ): EditorInterpreter | undefined;

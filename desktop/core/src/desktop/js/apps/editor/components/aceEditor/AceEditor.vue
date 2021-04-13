@@ -36,6 +36,7 @@
 
   import ace, { getAceMode } from 'ext/aceHelper';
   import { Ace } from 'ext/ace';
+  import { EXECUTE_ACTIVE_EXECUTABLE_TOPIC } from '../events';
 
   import { attachPredictTypeahead } from './acePredict';
   import AceAutocomplete from './autocomplete/AceAutocomplete.vue';
@@ -236,8 +237,7 @@
             aceLocationHandler.refreshStatementLocations();
             if (editor && executor.value.activeExecutable) {
               triggerChange();
-              await executor.value.activeExecutable.reset();
-              await executor.value.activeExecutable.execute();
+              huePubSub.publish(EXECUTE_ACTIVE_EXECUTABLE_TOPIC, executor.value.activeExecutable);
             }
           }
         });
