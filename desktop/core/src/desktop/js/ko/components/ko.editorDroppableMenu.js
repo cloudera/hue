@@ -66,7 +66,11 @@ class EditorDroppableMenu extends DisposableComponent {
     this.identifier = ko.observable('');
 
     this.meta.subscribe(async meta => {
-      if (meta && meta.database && meta.table) {
+      if (
+        meta &&
+        ((meta.connector.dialect === 'phoenix' && meta.database === '') || meta.database) &&
+        meta.table
+      ) {
         this.identifier(
           (await sqlUtils.backTickIfNeeded(meta.connector, meta.database)) +
             '.' +
@@ -117,7 +121,12 @@ class EditorDroppableMenu extends DisposableComponent {
         }
         editor.moveCursorToPosition(position);
         const before = editor.getTextBeforeCursor();
-        if (meta.database && meta.table && !meta.column && /.*;|^\s*$/.test(before)) {
+        if (
+          ((meta.connector.dialect === 'phoenix' && meta.database === '') || meta.database) &&
+          meta.table &&
+          !meta.column &&
+          /.*;|^\s*$/.test(before)
+        ) {
           this.menu.show(e);
         } else {
           if (/\S+$/.test(before) && before.charAt(before.length - 1) !== '.') {
