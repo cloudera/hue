@@ -120,7 +120,7 @@ Currently in **Beta**
 This integration increases the collaboration with other users via Slack.
 
 ### Architectural View
-![Share to Slack Architecture]()
+![Share to Slack Architecture](https://cdn.gethue.com/uploads/2021/04/share_to_slack_architecture.png)
 
 One of the flows for sharing query/gist links, the main bot logic lies on top of the Hue server listening to the events posted by the Hue App from Slack to an endpoint, processing those events sending a greeting message when someone says 'Hello Hue' such as generating a rich preview to unfurl for the links shared in the Slack channels and using Slack API methods for sending these responses back to Slack.
 
@@ -182,11 +182,11 @@ This feature expands the ability to share query links or gists to the desired Sl
 
 Open Hue, run some query and copy its link
 
-![Run Query in Hue]()
+![Run Query in Hue](https://cdn.gethue.com/uploads/2021/04/run_query_in_hue.png)
 
 Paste it in the Slack channel for others to get a rich link preview
 
-![Query Link Preview]()
+![Query Link Preview](https://cdn.gethue.com/uploads/2021/04/query_link_preview.png)
 
 Slack currently does not support markdown tables and potential improvements with inline preview will come when Hue supports result caching via [query tasks](https://docs.gethue.com/administrator/administration/reference/#task-server)
 
@@ -194,9 +194,9 @@ After evaluating a lot of possible fixes ( like uploading result image, truncati
 
 Users can share the SQL gists too!
 
-![Gist Link]()
+![Gist Link]( https://cdn.gethue.com/uploads/2021/04/gist_link.png)
 
-![Gist Link Preview]()
+![Gist Link Preview]( https://cdn.gethue.com/uploads/2021/04/gist_link_preview.png)
 
 #### Security
 Keeping in mind the security aspect, those Slack users who are Hue users and have the read permissions to access the query and its result will get this rich preview and result file after sharing the link. This mapping is currently done by checking the email prefix for Hue username.
