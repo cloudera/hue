@@ -57,7 +57,7 @@ What could be better than improving the collaboration by using one of the best c
 
 Although currently in **beta**, this app integration expands the ability to share query links or gists to the desired Slack channels which then unfurls in a rich preview for other users. It even gives you the result file if the result has not expired.
 
-![Share to Slack Architecture]()
+![Share to Slack Architecture](https://cdn.gethue.com/uploads/2021/04/share_to_slack_architecture.png)
 
 The main bot logic lies on top of the Hue server listening to the events posted by the Hue App from Slack to an endpoint, processing the data accordingly and using Slack API methods for sending the desired response.
 
@@ -65,25 +65,25 @@ To manually set-up the Hue App, follow the steps mentioned in the [link here]()
 
 Now, open Hue, run some query and copy its link
 
-![Run Query in Hue]()
+![Run Query in Hue](https://cdn.gethue.com/uploads/2021/04/run_query_in_hue.png)
 
 Paste it in the Slack channel and see the unfurl magic!
 
-![Query Link Preview]()
+![Query Link Preview](https://cdn.gethue.com/uploads/2021/04/query_link_preview.png)
 
 ### Wonder why the query result (if available) is shown in this way?
 
-Slack currently does not support markdown tables and potential improvements with inline preview will come when Hue supports result caching via [query tasks](https://docs.gethue.com/administrator/administration/reference/#task-server)
+Slack currently does not support markdown tables and potential improvements with inline preview will come when Hue supports result caching via [query tasks](https://docs.gethue.com/administrator/administration/reference/#task-server).
 
-After evaluating a lot of possible fixes ( like uploading result image, truncating columns which doesn't look good, pivoting table, uploading result file etc.) and seeing their tradeoffs, we chose to have few sample rows but keep all columns by pivoting the result table and to compensate for the loss of rows, Hue app gives the result file in the message thread.
+After evaluating a lot of possible fixes ( like uploading result image, truncating columns which doesn't look good, pivoting table, [uploading result file](https://github.com/slackapi/python-slack-sdk/issues/991) etc.) and seeing their tradeoffs, we chose to have few sample rows but keep all columns by pivoting the result table and to compensate for the loss of rows, Hue app gives the result file in the message thread.
 
-![Message Thread with Result File]()
+![Message Thread with Result File](https://cdn.gethue.com/uploads/2021/04/message_thread_with_result_file.png)
 
 Users can share the SQL gists too!
 
-![Gist Link]()
+![Gist Link](https://cdn.gethue.com/uploads/2021/04/gist_link.png)
 
-![Gist Link Preview]()
+![Gist Link Preview](https://cdn.gethue.com/uploads/2021/04/gist_link_preview.png)
 
 Keeping in mind the security aspect, those Slack users who are Hue users and have the read permissions to access the query and its result will get this rich preview and result file after sharing the link. This mapping is currently done by checking the email prefix for Hue username.
 
@@ -103,4 +103,4 @@ Any feedback or question? Feel free to comment here or on the <a href="https:/
 
 Onwards!
 
-~ Harsh and Romain from the Hue Team
+~ Harsh from the Hue Team
