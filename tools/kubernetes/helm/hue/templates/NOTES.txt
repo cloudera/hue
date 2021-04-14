@@ -6,7 +6,8 @@ To check the status of your installation run:
 
 
 Get the recommended URL below and start executing queries:
-{{- if ne .Values.ingress.type "nginx-ssl" -}}
+
+{{ if ne .Values.ingress.type "nginx-ssl" }}
   export WEB_HOST=$(kubectl get node -o jsonpath="{.items[0].metadata.name}")
 {{- end -}}
 
