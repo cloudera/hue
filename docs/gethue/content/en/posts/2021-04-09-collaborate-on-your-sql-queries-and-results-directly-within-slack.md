@@ -61,9 +61,9 @@ Although currently in **beta**, this app integration expands the ability to shar
 
 The main bot logic lies on top of the Hue server listening to the events posted by the Hue App from Slack to an endpoint, processing the data accordingly and using Slack API methods for sending the desired response.
 
-To manually set-up the Hue App, follow the steps mentioned in the [link here]()
+To manually set-up the Hue App, follow the steps mentioned in the [link here](https://docs.gethue.com/administrator/configuration/server/#manual-slack-app-installation)
 
-Now, open Hue, run some query and copy its link
+Now, open Hue, run some query and copy its link:
 
 ![Run Query in Hue](https://cdn.gethue.com/uploads/2021/04/run_query_in_hue.png)
 
@@ -71,7 +71,7 @@ Paste it in the Slack channel and see the unfurl magic!
 
 ![Query Link Preview](https://cdn.gethue.com/uploads/2021/04/query_link_preview.png)
 
-### Wonder why the query result (if available) is shown in this way?
+### Wonder why result is shown like this?
 
 Slack currently does not support markdown tables and potential improvements with inline preview will come when Hue supports result caching via [query tasks](https://docs.gethue.com/administrator/administration/reference/#task-server).
 
@@ -85,7 +85,11 @@ Users can share the SQL gists too!
 
 ![Gist Link Preview](https://cdn.gethue.com/uploads/2021/04/gist_link_preview.png)
 
-Keeping in mind the security aspect, those Slack users who are Hue users and have the read permissions to access the query and its result will get this rich preview and result file after sharing the link. This mapping is currently done by checking the email prefix for Hue username.
+### Read access
+
+Keeping in mind the security aspect, those Slack users who are Hue users and have the read permissions to access the query and its result will get this rich preview and result file after sharing the link. This mapping is currently done by checking the email prefix and its host for Hue username.
+
+For example, some person ‘Alice’ having a Hue account with username ‘alice’ can have read access from some Slack account only if the email prefix of that slack user is same and Hue username and the email host is same in the Hue domain i.e. **alice@gethue.com slack user** can only access **Hue user ‘alice’** on **‘demo.gethue.com’**.
 
 ### What's coming up next?
 
