@@ -2697,7 +2697,8 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
         );
       });
       self.readyToIndex = ko.pureComputed(function () {
-        var validFields = self.destination.columns().length || self.destination.outputFormat() === 'database';
+        console.log('--> readyToIndex');
+        var validFields = self.destination.columns().length || self.destination.outputFormat() === 'database' || self.destination.tableFormat() == 'parquet';
         var validTableColumns = self.destination.outputFormat() !== 'table' || ($.grep(self.destination.columns(), function(column) {
             return column.name().length === 0;
           }).length === 0

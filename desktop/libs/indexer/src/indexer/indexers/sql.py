@@ -21,6 +21,7 @@ import logging
 import sys
 import urllib.request, urllib.error
 import uuid
+import os
 
 from collections import OrderedDict
 
@@ -178,28 +179,41 @@ class SQLIndexer(object):
     # tbl_properties that don't exist in previous versions can safely be added without error.
     tbl_properties['transactional'] = 'false'
 
-    sql += django_mako.render_to_string("gen/create_table_statement.mako", {
-        'table': {
-            'name': table_name,
-            'comment': comment,
-            'row_format': row_format,
-            'field_terminator': field_delimiter,
-            'collection_terminator': collection_delimiter if source_type == 'hive' else None,
-            'map_key_terminator': map_delimiter if source_type == 'hive' else None,
-            'serde_name': serde_name,
-            'serde_properties': serde_properties,
-            'file_format': file_format,
-            'external': external or load_data and table_format in ('parquet', 'orc', 'kudu'),
-            'path': external_path,
-            'primary_keys': primary_keys if table_format == 'kudu' and not load_data else [],
-            'tbl_properties': tbl_properties
-         },
-        'columns': columns,
-        'partition_columns': partition_columns,
-        'kudu_partition_columns': kudu_partition_columns,
-        'database': database
-      }
-    )
+    if table_format == 'parquet':
+        parquent_path = source['path']
+        parquent_location = os.path.dirname(parquent_path)
+        sql += '''\n\nCREATE EXTERNAL TABLE `%(database)s`.`%(table_name)s`
+          LIKE PARQUET '%(parquet_path)s'
+          STORED AS PARQUET
+          LOCATION '%(parquent_location)s';''' % {
+            'database': database,
+            'table_name': table_name,
+            'parquet_path': parquent_path,
+            'parquent_location': parquent_location
+        }
+    else:
+      sql += django_mako.render_to_string("gen/create_table_statement.mako", {
+          'table': {
+              'name': table_name,
+              'comment': comment,
+              'row_format': row_format,
+              'field_terminator': field_delimiter,
+              'collection_terminator': collection_delimiter if source_type == 'hive' else None,
+              'map_key_terminator': map_delimiter if source_type == 'hive' else None,
+              'serde_name': serde_name,
+              'serde_properties': serde_properties,
+              'file_format': file_format,
+              'external': external or load_data and table_format in ('parquet', 'orc', 'kudu'),
+              'path': external_path,
+              'primary_keys': primary_keys if table_format == 'kudu' and not load_data else [],
+              'tbl_properties': tbl_properties
+           },
+          'columns': columns,
+          'partition_columns': partition_columns,
+          'kudu_partition_columns': kudu_partition_columns,
+          'database': database
+        }
+      )
 
     if table_format in ('text', 'json', 'csv', 'regexp') and not external and load_data:
       form_data = {
