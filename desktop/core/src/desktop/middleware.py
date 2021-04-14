@@ -809,6 +809,7 @@ class HueRemoteUserMiddleware(RemoteUserMiddleware):
     if not 'desktop.auth.backend.RemoteUserDjangoBackend' in AUTH.BACKEND.get():
       LOG.info('Unloading HueRemoteUserMiddleware')
       raise exceptions.MiddlewareNotUsed
+    super().__init__(get_response)
     self.header = AUTH.REMOTE_USER_HEADER.get()
 
 
