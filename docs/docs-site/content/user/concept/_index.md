@@ -122,6 +122,8 @@ This integration increases the collaboration with other users via Slack.
 ### Share to Slack
 This feature expands the ability to share query links or gists to the desired Slack channels which then unfurls in a rich preview for other users. It even gives the user result file for the query if it has not expired.
 
+To manually set-up the Hue App, follow the steps mentioned in the [link here](https://docs.gethue.com/administrator/configuration/server/#manual-slack-app-installation)
+
 Open Hue, run some query and copy its link:
 
 ![Run Query in Hue](https://cdn.gethue.com/uploads/2021/04/run_query_in_hue.png)
@@ -143,7 +145,9 @@ Users can share the SQL gists too!
 ![Gist Link Preview](https://cdn.gethue.com/uploads/2021/04/gist_link_preview.png)
 
 #### Security
-Keeping in mind the security aspect, those Slack users who are Hue users and have the read permissions to access the query and its result will get this rich preview and result file after sharing the link. This mapping is currently done by checking the email prefix for Hue username.
+Keeping in mind the security aspect, those Slack users who are Hue users and have the read permissions to access the query and its result will get this rich preview and result file after sharing the link. This mapping is currently done by checking the email prefix and its host for Hue username.
+
+For example, some person ‘Alice’ having a Hue account with username ‘alice’ can have read access from some Slack account only if the email prefix of that slack user is same and Hue username and the email host is same in the Hue domain i.e. **alice@gethue.com slack user** can only access **Hue user ‘alice’** on **‘demo.gethue.com’** 
 
 ## Settings
 
