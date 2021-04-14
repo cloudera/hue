@@ -11,6 +11,7 @@ configobj==5.0.6
 cryptography==3.3.2
 django-auth-ldap==2.3.0
 Django==3.1.8
+daphne==3.0.2
 django-axes==5.13.0
 django-celery-beat==1.4.0
 django_celery_results==1.0.4
