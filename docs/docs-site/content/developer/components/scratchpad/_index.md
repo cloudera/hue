@@ -3,7 +3,7 @@ title: "SQL Scratchpad"
 draft: false
 ---
 
-The lightweight SQL Editor also called "SQL Scratchpad Query" comes as its own `<sql-scratchpad />` Web component.
+The lightweight SQL Editor also called "SQL Scratchpad" comes as its own `<sql-scratchpad />` Web component.
 
 It is in **beta** and now is a great time to give it a try and [send feedback](https://github.com/cloudera/hue/issues)!
 
