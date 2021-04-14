@@ -5,7 +5,7 @@ The Hue project gladly welcomes [pull requests](https://github.com/cloudera/hue/
 
 This document contains instructions on how to get involved in Hue improvement.
 
-In any case, feel free to ask here, on the [forum](https://discourse.gethue.com/) or [@gethue](https://twitter.com/gethue).
+In any case, feel free to ask here in a [discussion](https://github.com/cloudera/hue/discussions).
 
 # What to improve
 
@@ -13,15 +13,12 @@ Here is some inspiration on which areas we would love to have some contributions
 
 1. Updating a small piece of [documentation](https://docs.gethue.com)
 2. High level [Roadmap](/docs/ROADMAP.md)
-3. Check [Github issues](https://github.com/cloudera/hue/issues) or [the bug tracking system](https://issues.cloudera.org/browse/HUE)
-4. Improving or creating SQL [autocompletes](https://docs.gethue.com/developer/parsers/) or [connectors](https://docs.gethue.com/developer/sdk/) are great projects
+3. Check [Github issues](https://github.com/cloudera/hue/issues).
+4. Improving [SQL Components](https://docs.gethue.com/developer/components/), [SQL autocompletes](https://docs.gethue.com/developer/parsers/) or [SQL connectors](https://docs.gethue.com/developer/sdk/) are great projects
 
 # Submitting an improvement
 
-Here are some examples of changes:
-
-* [Pull request 842](https://github.com/cloudera/hue/pull/842)
-* [HUE-8802 [search] Deleting an index throws a js exception](https://issues.cloudera.org/browse/HUE-8802)
+Here is an example of change: [Pull request 842](https://github.com/cloudera/hue/pull/842)
 
 ## Building
 
