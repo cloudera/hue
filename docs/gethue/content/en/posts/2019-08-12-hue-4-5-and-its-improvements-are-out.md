@@ -68,7 +68,7 @@ They are several ways to give it a spin!
     ```
     helm repo add gethue https://helm.gethue.com
     helm repo update
-    helm install gethue/hue
+    helm install hue gethue/hue
     ```
 
 <a href="https://cdn.gethue.com/uploads/2019/08/hue_4.5.png"><img src="https://cdn.gethue.com/uploads/2019/08/hue_4.5.png" /></a>
