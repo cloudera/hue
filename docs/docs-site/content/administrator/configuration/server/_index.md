@@ -766,7 +766,7 @@ By default Hue stores the [saved documents](/user/concept/#documents) in its dat
 ## Slack
 Currently in **Beta**
 
-This integration increases the collaboration with other users via Slack.
+This [integration](/user/concept/#share-to-slack) increases the collaboration with other users via Slack.
 
 ### Architectural View
 ![Share to Slack Architecture](https://cdn.gethue.com/uploads/2021/04/share_to_slack_architecture.png)
