@@ -17,7 +17,7 @@ Assuming you have a Kubernetes cluster configured with Helm installed and images
 
     helm repo add gethue https://helm.gethue.com
     helm repo update
-    helm install gethue/hue
+    helm install hue gethue/hue
 
 or run:
 
