@@ -555,9 +555,9 @@ def _preprocess_nodes(workflow, transformed_root, workflow_definition_root, node
           full_node.credentials = [{"name": cred, "value": True} for cred in action_el.attrib['cred'].split(',')];
 
   for full_node in nodes:
-    if full_node.node_type is 'start':
+    if full_node.node_type == 'start':
       full_node.name = 'start'
-    elif full_node.node_type is 'subworkflow':
+    elif full_node.node_type == 'subworkflow':
       app_path = None
       for action_el in workflow_definition_root:
         if 'name' in action_el.attrib and action_el.attrib['name'] == full_node.name:
@@ -621,7 +621,7 @@ def _save_nodes(workflow, nodes):
   Save nodes, but skip kill nodes because we create a single kill node to use.
   """
   for node in nodes:
-    if node.node_type is 'kill':
+    if node.node_type == 'kill':
       continue
 
     try:
