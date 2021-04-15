@@ -14,13 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import axios from 'axios';
-
 import ExecutableProgressBar from './ExecutableProgressBar.vue';
 import QueryHistoryTable from './QueryHistoryTable.vue';
 import AceEditor from './aceEditor/AceEditor.vue';
 import ResultTable from './result/ResultTable.vue';
 import Executor, { ExecutorOptions } from '../execution/executor';
+import { setBaseUrl, setBearerToken } from 'api/utils';
 import ExecuteButton from 'apps/editor/components/ExecuteButton.vue';
 import ExecuteLimitInput from 'apps/editor/components/ExecuteLimitInput.vue';
 import SqlAssistPanel from 'components/assist/SqlAssistPanel.vue';
@@ -32,7 +31,6 @@ import { findEditorConnector, refreshConfig } from 'config/hueConfig';
 import { Connector } from 'config/types';
 import { wrap } from 'vue/webComponentWrap';
 import 'utils/json.bigDataParse';
-import { hueWindow } from 'types/types';
 
 wrap('hue-icons', HueIcons);
 wrap('query-editor', AceEditor);
@@ -46,13 +44,12 @@ wrap('sql-context-selector', SqlContextSelector);
 
 export interface HueComponentConfig {
   baseUrl?: string;
+  bearerToken?: string;
 }
 
-const configure = (config: HueComponentConfig): void => {
-  if (config.baseUrl) {
-    axios.defaults.baseURL = config.baseUrl;
-    (window as hueWindow).HUE_BASE_URL = config.baseUrl;
-  }
+const configure = ({ baseUrl, bearerToken }: HueComponentConfig): void => {
+  baseUrl && setBaseUrl(baseUrl);
+  bearerToken && setBearerToken(bearerToken);
 };
 
 const createExecutor = (options: ExecutorOptions): Executor => new Executor(options);
@@ -62,11 +59,13 @@ const clearContextCatalogCache = async (connector: Connector): Promise<void> => 
 };
 
 export default {
-  dataCatalog,
   clearContextCatalogCache,
   configure,
   createExecutor,
+  dataCatalog,
   findEditorConnector,
   getNamespaces,
-  refreshConfig
+  refreshConfig,
+  setBaseUrl,
+  setBearerToken
 };

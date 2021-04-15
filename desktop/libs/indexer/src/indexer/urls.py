@@ -81,6 +81,8 @@ urlpatterns += [
 
   re_path(r'^api/importer/submit', indexer_api3.importer_submit, name='importer_submit'),
   re_path(r'^api/importer/save/?$', indexer_api3.save_pipeline, name='save_pipeline'),
+  
+  re_path(r'^api/indexer/upload_local_file/?$', indexer_api3.upload_local_file, name='upload_local_file'),
 ]
 
 urlpatterns += [
