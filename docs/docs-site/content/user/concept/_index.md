@@ -122,7 +122,7 @@ This integration increases the collaboration with other users via Slack.
 ### Share to Slack
 This feature expands the ability to share query links or gists to the desired Slack channels which then unfurls in a rich preview for other users. It even gives the user result file for the query if it has not expired.
 
-To manually set-up the Hue App, follow the steps mentioned in the [bot setup](/administrator/configuration/server/#manual-slack-app-installation) described in the admin section
+To manually set-up the Hue App, follow the steps mentioned in the [bot setup](/administrator/configuration/server/#manual-slack-app-installation) described in the Admin section.
 
 Open Hue, run some query and copy its link:
 
