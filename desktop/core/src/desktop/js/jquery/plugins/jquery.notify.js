@@ -59,8 +59,8 @@ Plugin.prototype.show = function () {
     return;
   }
 
-  if (/^(504|upstream connect error)/.test(this.options.message)) {
-    console.warn(this.options.message);
+  if (/^(504|upstream connect error|Gateway Time-out)/.test(_this.options.message.trim())) {
+    console.warn(_this.options.message);
     return;
   }
 
