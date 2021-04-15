@@ -88,7 +88,7 @@ Answering a question via a query result? Showing some weird data to a slack chan
 
 - Works with an SQL snippet: one or more statements
 - The link automatically point to the editor and the SQL content
-- The query is displayed in the friendlier ![presentation mode](https://docs.gethue.com/user/querying/#presentation)
+- The query is displayed in the friendlier [presentation mode](/user/querying/#presentation)
 - Slack unfurling will show a mini preview (can be turned off globally)
 - Gists are stored in a Gist directory in your home
 
@@ -110,15 +110,44 @@ Clicking on the link will open-up the SQL selection:
 
 ![Click Gist](https://cdn.gethue.com/uploads/2020/03/editor_gist_open_presentation_mode.png)
 
-### Share to Slack
-Currently in **Beta**
-
-This integration increases the collaboration with others via Slack. It expands the ability to share query links or gists to the desired Slack channels which then unfurls in a rich preview for other members to view.
-
-
 ### Import / Export
 
 Via the Home page, saved documents can be exported for backups or transferring to another Hue.
+
+## Slack
+Currently in **Beta**
+
+This integration increases the collaboration with other users via Slack.
+
+### Share to Slack
+This feature expands the ability to share query links or gists to the desired Slack channels which then unfurls in a rich preview for other users. It even gives the user result file for the query if it has not expired.
+
+To manually set-up the Hue App, follow the steps mentioned in the [bot setup](/administrator/configuration/server/#manual-slack-app-installation) described in the Admin section.
+
+Open Hue, run some query and copy its link:
+
+![Run Query in Hue](https://cdn.gethue.com/uploads/2021/04/run_query_in_hue.png)
+
+Paste it in the Slack channel for others to get a rich link preview:
+
+![Query Link Preview](https://cdn.gethue.com/uploads/2021/04/query_link_preview.png)
+
+Slack currently does not support markdown tables and potential improvements with inline preview will come when Hue supports result caching via [query tasks](/administrator/administration/reference/#task-server)
+
+After evaluating a lot of possible fixes ( like uploading result image, truncating columns which doesn't look good, pivoting table, uploading result file etc.) and seeing their tradeoffs, we chose to have few sample rows but keep all columns by pivoting the result table and to compensate for the loss of rows, Hue app gives the result file in the message thread.
+
+![Message Thread with Result File](https://cdn.gethue.com/uploads/2021/04/message_thread_with_result_file.png)
+
+Users can share the SQL gists too!
+
+![Gist Link](https://cdn.gethue.com/uploads/2021/04/gist_link.png)
+
+![Gist Link Preview](https://cdn.gethue.com/uploads/2021/04/gist_link_preview.png)
+
+#### Security
+Keeping in mind the security aspect, those Slack users who are Hue users and have the read permissions to access the query and its result will get this rich preview and result file after sharing the link. This mapping is currently done by checking the email prefix and its host for Hue username.
+
+For example, some person ‘Alice’ having a Hue account with username ‘alice’ can have read access from some Slack account only if the email prefix of that slack user is same and Hue username and the email host is same in the Hue domain i.e. **alice@gethue.com slack user** can only access **Hue user ‘alice’** on **‘demo.gethue.com’** 
 
 ## Settings
 
