@@ -88,7 +88,7 @@ Answering a question via a query result? Showing some weird data to a slack chan
 
 - Works with an SQL snippet: one or more statements
 - The link automatically point to the editor and the SQL content
-- The query is displayed in the friendlier [presentation mode](https://docs.gethue.com/user/querying/#presentation)
+- The query is displayed in the friendlier [presentation mode](/user/querying/#presentation)
 - Slack unfurling will show a mini preview (can be turned off globally)
 - Gists are stored in a Gist directory in your home
 
@@ -122,7 +122,7 @@ This integration increases the collaboration with other users via Slack.
 ### Share to Slack
 This feature expands the ability to share query links or gists to the desired Slack channels which then unfurls in a rich preview for other users. It even gives the user result file for the query if it has not expired.
 
-To manually set-up the Hue App, follow the steps mentioned in the [link here](https://docs.gethue.com/administrator/configuration/server/#manual-slack-app-installation)
+To manually set-up the Hue App, follow the steps mentioned in the [bot setup](/administrator/configuration/server/#manual-slack-app-installation) described in the admin section
 
 Open Hue, run some query and copy its link:
 
@@ -132,7 +132,7 @@ Paste it in the Slack channel for others to get a rich link preview:
 
 ![Query Link Preview](https://cdn.gethue.com/uploads/2021/04/query_link_preview.png)
 
-Slack currently does not support markdown tables and potential improvements with inline preview will come when Hue supports result caching via [query tasks](https://docs.gethue.com/administrator/administration/reference/#task-server)
+Slack currently does not support markdown tables and potential improvements with inline preview will come when Hue supports result caching via [query tasks](/administrator/administration/reference/#task-server)
 
 After evaluating a lot of possible fixes ( like uploading result image, truncating columns which doesn't look good, pivoting table, uploading result file etc.) and seeing their tradeoffs, we chose to have few sample rows but keep all columns by pivoting the result table and to compensate for the loss of rows, Hue app gives the result file in the message thread.
 
