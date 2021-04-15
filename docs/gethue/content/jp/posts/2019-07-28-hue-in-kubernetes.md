@@ -57,7 +57,7 @@ Helm をインストールした後にシェルで次の3つの手順を実行�
 
 <pre><code class="bash">helm repo add gethue https://helm.gethue.com
 helm repo update
-helm install gethue/hue
+helm install hue gethue/hue
 </pre>
 
 [<img class="aligncenter size-full wp-image-5131" src="https://cdn.gethue.com/uploads/2017/12/Screen-Shot-2017-11-15-at-3.34.20-PM.png" alt="" width="512" height="457" />][5]
