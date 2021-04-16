@@ -61,7 +61,7 @@ Although currently in **beta**, this app integration expands the ability to shar
 
 The main bot logic lies on top of the Hue server listening to the events posted by the Hue App from Slack to an endpoint, processing the data accordingly and using Slack API methods for sending the desired response.
 
-To manually set-up the Hue App, follow the steps mentioned in the [link here](https://docs.gethue.com/administrator/configuration/server/#manual-slack-app-installation)
+To manually set-up the Hue App, follow these steps mentioned in the [Hue docs](https://docs.gethue.com/administrator/configuration/server/#manual-slack-app-installation)
 
 Now, open Hue, run some query and copy its link:
 
@@ -75,7 +75,7 @@ Paste it in the Slack channel and see the unfurl magic!
 
 Slack currently does not support markdown tables and potential improvements with inline preview will come when Hue supports result caching via [query tasks](https://docs.gethue.com/administrator/administration/reference/#task-server).
 
-After evaluating a lot of possible fixes ( like uploading result image, truncating columns which doesn't look good, pivoting table, [uploading result file](https://github.com/slackapi/python-slack-sdk/issues/991) etc.) and seeing their tradeoffs, we chose to have few sample rows but keep all columns by pivoting the result table and to compensate for the loss of rows, Hue app gives the result file in the message thread.
+After evaluating a lot of possible fixes (like uploading result image, truncating columns which doesn't look good, pivoting table, [uploading result file](https://github.com/slackapi/python-slack-sdk/issues/991) etc.) and seeing their tradeoffs, we chose to have few sample rows but keep all columns by pivoting the result table and to compensate for the loss of rows, Hue app gives the result file in the message thread.
 
 ![Message Thread with Result File](https://cdn.gethue.com/uploads/2021/04/message_thread_with_result_file.png)
 
@@ -89,7 +89,7 @@ Users can share the SQL gists too!
 
 Keeping in mind the security aspect, those Slack users who are Hue users and have the read permissions to access the query and its result will get this rich preview and result file after sharing the link. This mapping is currently done by checking the email prefix and its host for Hue username.
 
-For example, some person ‘Alice’ having a Hue account with username ‘alice’ can have read access from some Slack account only if the email prefix of that slack user is same and Hue username and the email host is same in the Hue domain i.e. **alice@gethue.com slack user** can only access **Hue user ‘alice’** on **‘demo.gethue.com’**.
+For example, some person ‘Alice’ having a Hue account with username ‘alice’ can have read access from some Slack account only if the email prefix of that slack user is same and Hue username and the email host is same in the Hue domain i.e. **alice@gethue.com slack user** can only access **Hue user ‘alice’** on **‘hue.gethue.com’**.
 
 ### What's coming up next?
 
@@ -97,6 +97,18 @@ In the follow-ups, promoting the Share to Slack from the Hue side where users ca
 
 Also stay tuned for more such functionalities such as replying to users asking questions on how to find certain data tables or to query them and also send results for scheduled queries in certain Slack channels!
 
+### Try it out!
+
+Get your hands on this beta feature by:
+
+Running some queries on the [demo live instance](https://demo.gethue.com/).
+
+Joining the [demo Slack workspace](https://join.slack.com/t/hue-bot-dev/shared_invite/zt-opqwvv68-eQFeios8FzFbmqQJ5wBNzg) to see the app in action or by using the following **demo Slack account credentials** to share some query links in the **demo workspace**.
+
+```
+Slack account email: demo@gethue.com
+Slack account password: demohuedemo
+```
 Till then, run some queries, copy those links and share ‘em all!
 
 </br>
