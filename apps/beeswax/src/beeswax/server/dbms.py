@@ -605,9 +605,9 @@ class HiveServer2Dbms(object):
     else:
       if operation == 'distinct':
         hql = "SELECT DISTINCT %s FROM `%s`.`%s` LIMIT %s;" % (column, database, table.name, limit)
-      if operation == 'max':
+      elif operation == 'max':
         hql = "SELECT max(%s) FROM `%s`.`%s`;" % (column, database, table.name)
-      if operation == 'min':
+      elif operation == 'min':
         hql = "SELECT min(%s) FROM `%s`.`%s`;" % (column, database, table.name)
       else:
         hql = "SELECT %s FROM `%s`.`%s` LIMIT %s;" % (column, database, table.name, limit)
