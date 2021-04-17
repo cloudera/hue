@@ -4,9 +4,53 @@ Release History
 dev
 ---
 
+-   \[Short description of non-trivial change.\]
+
+2.25.1 (2020-12-16)
+-------------------
+
 **Bugfixes**
 
--   \[Short description of non-trivial change.\]
+- Requests now treats `application/json` as `utf8` by default. Resolving
+  inconsistencies between `r.text` and `r.json` output. (#5673)
+
+**Dependencies**
+
+- Requests now supports chardet v4.x.
+
+2.25.0 (2020-11-11)
+------------------
+
+**Improvements**
+
+- Added support for NETRC environment variable. (#5643)
+
+**Dependencies**
+
+- Requests now supports urllib3 v1.26.
+
+**Deprecations**
+
+- Requests v2.25.x will be the last release series with support for Python 3.5.
+- The `requests[security]` extra is officially deprecated and will be removed
+  in Requests v2.26.0.
+
+2.24.0 (2020-06-17)
+-------------------
+
+**Improvements**
+
+- pyOpenSSL TLS implementation is now only used if Python
+  either doesn't have an `ssl` module or doesn't support
+  SNI. Previously pyOpenSSL was unconditionally used if available.
+  This applies even if pyOpenSSL is installed via the
+  `requests[security]` extra (#5443)
+
+- Redirect resolution should now only occur when
+  `allow_redirects` is True. (#5492)
+
+- No longer perform unnecessary Content-Length calculation for
+  requests that won't use it. (#5496)
 
 2.23.0 (2020-02-19)
 -------------------

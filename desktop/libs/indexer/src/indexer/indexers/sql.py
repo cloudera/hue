@@ -17,6 +17,7 @@
 from future import standard_library
 standard_library.install_aliases()
 from builtins import object
+import csv
 import logging
 import sys
 import urllib.request, urllib.error
@@ -33,6 +34,7 @@ from useradmin.models import User
 
 from desktop.lib import django_mako
 from desktop.lib.exceptions_renderable import PopupException
+from desktop.settings import BASE_DIR
 
 if sys.version_info[0] > 2:
   from urllib.parse import urlparse, unquote as urllib_unquote
@@ -266,7 +268,7 @@ class SQLIndexer(object):
         is_task=True
     )
 
-  def create_table_from_local_file(self, source, destination, csv_data, start_time=-1):
+  def create_table_from_local_file(self, source, destination, start_time=-1):
     if '.' in destination['name']:
       database, table_name = destination['name'].split('.', 1)
     else:
@@ -292,13 +294,20 @@ class SQLIndexer(object):
           'primary_keys': ', '.join(destination.get('indexerPrimaryKey'))
       }
 
-    for csv_row in csv_data:
-      sql += '''
-          INSERT INTO %(table_name)s VALUES %(csv_row)s;
-          ''' % {
-                  'table_name': table_name,
-                  'csv_row': tuple(csv_row)
-                }
+    path = source['path']
+    if path:
+      with open(BASE_DIR + path, 'r') as local_file:
+        reader = csv.reader(local_file)
+        list_of_tuples = list(map(tuple, reader))
+
+        if source['format']['hasHeader']:
+          list_of_tuples = list_of_tuples[1:]
+
+        csv_rows = str(list_of_tuples)[1:-1]
+        sql += '''INSERT INTO %(table_name)s VALUES %(csv_rows)s;'''% {
+            'table_name': table_name,
+            'csv_rows': csv_rows
+          }
 
     on_success_url = reverse('metastore:describe_table', kwargs={'database': database, 'table': final_table_name}) + \
         '?source_type=' + source_type
@@ -358,8 +367,8 @@ def _create_table(request, source, destination, start_time=-1):
   else:
     return notebook.execute(request, batch=False)
 
-def _create_table_from_local(request, source, destination, csv_data, start_time=-1):
-  notebook = SQLIndexer(user=request.user, fs=request.fs).create_table_from_local_file(source, destination, csv_data, start_time)
+def _create_table_from_local(request, source, destination, start_time=-1):
+  notebook = SQLIndexer(user=request.user, fs=request.fs).create_table_from_local_file(source, destination, start_time)
 
   if request.POST.get('show_command'):
     return {'status': 0, 'commands': notebook.get_str()}

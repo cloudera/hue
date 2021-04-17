@@ -3161,23 +3161,17 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
           var files = $('#inputfile')[0].files[0];
           fd.append('inputfile', files);
           var file_size = files.size;
-          if (file_size < 30*1000) {
-            $.ajax({
-              url:"/indexer/api/indexer/upload_local_file",
-              type: 'post',
-              data: fd,
-              contentType:false,
-              cache: false,
-              processData:false,
-              success:function (response) {
-                viewModel.createWizard.source.path(response['file_url']);
-              }
-            
-            });
-          }
-          else {
-            alert("As of now File size must be less than 30KB");
-          }
+          $.ajax({
+            url:"/indexer/api/indexer/upload_local_file",
+            type: 'post',
+            data: fd,
+            contentType:false,
+            cache: false,
+            processData:false,
+            success:function (response) {
+              viewModel.createWizard.source.path(response['local_file_url']);
+            }
+          });
         };
 
       $('.importer-droppable').droppable({

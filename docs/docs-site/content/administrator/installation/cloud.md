@@ -21,7 +21,7 @@ To start a full Hue service:
 
     helm repo add gethue https://helm.gethue.com
     helm repo update
-    helm install gethue/hue
+    helm install hue gethue/hue
 
 The [Kubernetes Guide](https://github.com/cloudera/hue/tree/testing/tools/kubernetes) shows how to run the services via Helm or native YAML configs.
 
