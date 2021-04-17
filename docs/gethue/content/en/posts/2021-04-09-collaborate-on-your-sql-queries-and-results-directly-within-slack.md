@@ -61,13 +61,13 @@ Although currently in **beta**, this app integration expands the ability to shar
 
 The main bot logic lies on top of the Hue server listening to the events posted by the Hue App from Slack to an endpoint, processing the data accordingly and using Slack API methods for sending the desired response.
 
-To manually set-up the Hue App, follow these steps mentioned in the [Hue docs](https://docs.gethue.com/administrator/configuration/server/#manual-slack-app-installation)
+To set-up the SQL Assistant App, follow these steps mentioned in the [Hue docs](https://docs.gethue.com/administrator/configuration/server/#manual-slack-app-installation)
 
-Now, open Hue, run some query and copy its link:
+Now, open Editor, run some query and copy its link:
 
-![Run Query in Hue](https://cdn.gethue.com/uploads/2021/04/run_query_in_hue.png)
+![Run Query in Editor](https://cdn.gethue.com/uploads/2021/04/run_query_in_hue.png)
 
-Paste it in the Slack channel and see the unfurl magic!
+Paste it in the Slack channel and see the unfurling magic!
 
 ![Query Link Preview](https://cdn.gethue.com/uploads/2021/04/query_link_preview.png)
 
@@ -89,7 +89,7 @@ Users can share the SQL gists too!
 
 Keeping in mind the security aspect, those Slack users who are Hue users and have the read permissions to access the query and its result will get this rich preview and result file after sharing the link. This mapping is currently done by checking the email prefix and its host for Hue username.
 
-For example, some person ‘Alice’ having a Hue account with username ‘alice’ can have read access from some Slack account only if the email prefix of that slack user is same and Hue username and the email host is same in the Hue domain i.e. **alice@gethue.com slack user** can only access **Hue user ‘alice’** on **‘hue.gethue.com’**.
+For example, some person ‘Alice’ having a Hue account with username ‘alice’ can have read access from some Slack account only if it's the same email address from the same domain. i.e. **alice@gethue.com slack user** can only access **Hue user ‘alice’** on **‘hue.gethue.com’**.
 
 ### What's coming up next?
 
@@ -101,14 +101,13 @@ Also stay tuned for more such functionalities such as replying to users asking q
 
 Get your hands on this beta feature by:
 
-Running some queries on the [demo live instance](https://demo.gethue.com/).
+Running some queries on the [demo live editor](https://demo.gethue.com/).
 
-Joining the [demo Slack workspace](https://join.slack.com/t/hue-bot-dev/shared_invite/zt-opqwvv68-eQFeios8FzFbmqQJ5wBNzg) to see the app in action or by using the following **demo Slack account credentials** to share some query links in the **demo workspace**.
+Joining the [demo Slack workspace](https://join.slack.com/t/hue-bot-dev/shared_invite/zt-opqwvv68-eQFeios8FzFbmqQJ5wBNzg) to see the app in action or by using the following credentials:
 
-```
-Slack account email: demo@gethue.com
-Slack account password: demohuedemo
-```
+    Slack account email: demo@gethue.com
+    Slack account password: gethue
+
 Till then, run some queries, copy those links and share ‘em all!
 
 </br>
