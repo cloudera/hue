@@ -35,7 +35,7 @@ sf_caption_position:
 sf_remove_promo_bar:
   - 1
 categories:
-  - Dev / API
+  - Development
 
 ---
 <span style="font-weight: 400;">Livy is an </span>[<span style="font-weight: 400;">open source REST interface</span>][1] <span style="font-weight: 400;">for interacting with Apache Spark from anywhere. It supports executing snippets of Python, Scala, R code or programs in a Spark Context that runs locally or in YARN.</span>

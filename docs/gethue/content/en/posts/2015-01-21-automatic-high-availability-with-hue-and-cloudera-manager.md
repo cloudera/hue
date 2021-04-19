@@ -37,7 +37,7 @@ sf_remove_promo_bar:
 slide_template:
   - default
 categories:
-  - Dev / API
+  - Development
 
 ---
 <span style="color: #ff0000;"><em>December 8th 2015 update: this post is now deprecated as of Hue 3.9: <a style="color: #ff0000;" href="https://gethue.com/automatic-high-availability-and-load-balancing-of-hue-in-cloudera-manager-with-monitoring/">https://gethue.com/automatic-high-availability-and-load-balancing-of-hue-in-cloudera-manager-with-monitoring/</a></em></span>
