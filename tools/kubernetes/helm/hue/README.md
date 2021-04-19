@@ -9,7 +9,7 @@ This is an Helm chart to easily start a Hue service.
 
 View the configuration [values.yaml](values.yaml), edit if needed and run:
 
-    helm install hue -n hue
+    helm install hue hue
 
 [values.yaml](values.yaml) contains the most important parameters in the `hue` section with for example which database to use. The `ini`
 section let you add any extra [regular parameter](https://docs.gethue.com//administrator/configuration/server/).
@@ -32,7 +32,7 @@ and open-up http://localhost:8888
 
 ## Uninstall
 
-    helm delete hue --purge
+    helm delete hue
 
 ## Ingress
 
@@ -55,3 +55,16 @@ Follow https://kubernetes.github.io/ingress-nginx/deploy/#using-helm
 And set `ingress.create=true` and `ingress.type=nginx` in [values.yaml](values.yaml).
 
 For SSL, one option is to check `jetstack/cert-manager`.
+
+## Using a local registry
+
+e.g. with microk8s and helm3:
+
+    docker build . -t localhost:32000/hue:latest -f tools/docker/hue/Dockerfile
+    docker build . -t localhost:32000/nginx:latest -f tools/docker/nginx/Dockerfile --build-arg registry=localhost:32000 --build-arg tag=latest
+
+    docker push localhost:32000/hue:latest
+    docker push localhost:32000/nginx:latest
+
+    helm install hue hue --set image.registry=localhost:32000
+    helm delete hue

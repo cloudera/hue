@@ -51,7 +51,7 @@ Kubernetes
 
     helm repo add gethue https://helm.gethue.com
     helm repo update
-    helm install gethue/hue
+    helm install hue gethue/hue
 
 Read more about configurations at [tools/kubernetes](tools/kubernetes/).
 
