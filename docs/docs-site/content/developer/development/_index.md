@@ -532,7 +532,7 @@ In a nutshell, front-end development is using:
 
 * [Vue.js](https://vuejs.org/) to script the custom interactions
 * TypeScript
-* [Bootstrap](http://twitter.github.com/bootstrap/) to layout your app
+* [Bootstrap](https://getbootstrap.com/) to layout your app
 * [Mako](http://www.makotemplates.org/) is the templating language (currently being removed in favor of Vue.js))
 
 ### Javascript
@@ -565,7 +565,7 @@ and possibly fix any issues it might report.
 
 ### CSS / LESS
 
-Hue uses [Bootstrap](http://twitter.github.com/bootstrap/) version 2.0 CSS
+Hue uses [Bootstrap](https://getbootstrap.com/) version 2.0 CSS
 styles and layouts. They are highly reusable and flexible. Your app doesn't
 have to use these styles, but if you do, it'll save you some time and make your
 app look at home in Hue.

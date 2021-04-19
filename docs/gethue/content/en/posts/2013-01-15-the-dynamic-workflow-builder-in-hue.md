@@ -87,7 +87,7 @@ Hue will be seeing a slew of updates in the near future. The workflow editor its
 
 Have any suggestions? Feel free to tell us what you think through [hue-user][9].
 
- [1]: http://cloudera.github.com/hue/
+ [1]: https://gethue.com
  [2]: http://hadoop.apache.com/
  [3]: http://hadoop.apache.org/
  [4]: http://oozie.apache.org/
