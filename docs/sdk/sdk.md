@@ -513,14 +513,14 @@ creating an application for the Hue is a matter of creating a standard HTML
 application.
 
 In a nutshell, front-end development in Hue is using
-[Bootstrap](http://twitter.github.com/bootstrap/) and
+[Bootstrap](https://getbootstrap.com/) and
 [Knockout js](http://knockoutjs.com/) to layout your app and script the custom
 interactions.
 
 
 ## CSS Styles
 
-Hue uses [Bootstrap](http://twitter.github.com/bootstrap/) version 2.0 CSS
+Hue uses [Bootstrap](https://getbootstrap.com/) version 2.0 CSS
 styles and layouts. They are highly reusable and flexible. Your app doesn't
 have to use these styles, but if you do, it'll save you some time and make your
 app look at home in Hue.
@@ -651,7 +651,7 @@ and possibly fix any issues it might report.
 After changing the CSS in a .less file, rebuilding with:
 
     npm run less
-    
+
 Or run in watch mode that will generate the .css on any change to the .less files:
 
     npm run less-dev
@@ -893,7 +893,7 @@ Hadoop.
 ### On the Front-End
 
 Hue provides a front-end framework based on
-[Bootstrap](http://twitter.github.com/bootstrap/) and
+[Bootstrap](https://getbootstrap.com/) and
 [Knockout js](http://knockoutjs.com/).
 
 

@@ -157,7 +157,7 @@ Importing a workflow is pretty straightforward. All it requires is the workflow 
 
     Have any suggestions? Feel free to tell us what you think via [hue-user][13].
 
- [1]: http://cloudera.github.com/hue/
+ [1]: https://gethue.com
  [2]: http://oozie.apache.org/
  [3]: http://blog.cloudera.com/blog/2013/03/whats-new-in-hue-2-2/
  [4]: http://www.cloudera.com/wp-content/uploads/2013/03/oozie-workflow-editor-import.png
