@@ -43,7 +43,7 @@ categories:
 
 ---
 <p id="docs-internal-guid-624d5ce4-a420-2c73-133c-afd4d943f32f">
-  <a href="http://cloudera.github.com/hue/">Hue</a> is the web interface that improves the <a href="http://hadoop.apache.com/">Apache Hadoop</a> user experience. It’s a Django driven application and manages users accordingly. In this tutorial, we’ll be exploring the different options available for altering passwords in Hue using the default authentication backend (<a href="https://github.com/cloudera/hue/blob/branch-3.0/desktop/conf.dist/hue.ini#L95">AllowFirstUserBackend</a>).
+  <a href="https://gethue.com">Hue</a> is the web interface that improves the <a href="http://hadoop.apache.com/">Apache Hadoop</a> user experience. It’s a Django driven application and manages users accordingly. In this tutorial, we’ll be exploring the different options available for altering passwords in Hue using the default authentication backend (<a href="https://github.com/cloudera/hue/blob/branch-3.0/desktop/conf.dist/hue.ini#L95">AllowFirstUserBackend</a>).
 </p>
 
 # User Interface

@@ -172,10 +172,10 @@ The next [2.3][24] release will target users who wish to better leverage the m
 
 Many past feature and [bugs][28] were discussed on the [hue-user][29] list, so feel free to chime in! A [Hue meetup group][30] was created and it would be a pleasure to meet you in person and see how analyzing your data with Hadoop could be made easier.
 
- [1]: http://cloudera.github.com/hue/
+ [1]: https://gethue.com
  [2]: http://hadoop.apache.org/
  [3]: https://ccp.cloudera.com/display/CDH4DOC/New+Features+in+CDH4
- [4]: http://cloudera.github.com/hue/docs-2.2.0/release-notes/release-notes-2.2.0.html
+ [4]: https://gethue.com
  [5]: http://archive.cloudera.com/cdh4/cdh/4/oozie/
  [6]: http://blog.cloudera.com/blog/2013/01/dynamic-workflow-builder-in-hue/
  [7]: http://www.cloudera.com/wp-content/uploads/2013/02/hue1.png

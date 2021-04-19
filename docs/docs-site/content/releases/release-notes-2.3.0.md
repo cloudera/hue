@@ -11,7 +11,7 @@ tags: ['skipIndexing']
 
 Hue 2.3.0 is compatible with CDH4.2 (Cloudera's Distribution Including Apache Hadoop 4.2).
 
-Website: http://cloudera.github.com/hue
+Website: https://gethue.com
 
 
 Notable Features
