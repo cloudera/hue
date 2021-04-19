@@ -3,7 +3,7 @@ Hue v2.3.0, released April 15th, 2013
 
 Hue 2.3.0 is compatible with CDH4.2 (Cloudera's Distribution Including Apache Hadoop 4.2).
 
-Website: http://cloudera.github.com/hue
+Website: https://gethue.com
 
 
 Notable Features

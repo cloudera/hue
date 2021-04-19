@@ -83,7 +83,7 @@ Please see the [release notes][3] for more information and the <a href="http:
 
  [1]: https://cdn.gethue.com/downloads/releases/2.5.0/hue-2.5.0.tgz
  [2]: http://nightly.cloudera.com/cdh4/
- [3]: http://cloudera.github.com/hue/docs-2.5.0/release-notes/release-notes-2.5.0.html
+ [3]: https://gethue.com
  [4]: https://issues.cloudera.org/browse/HUE-1135
  [5]: https://issues.cloudera.org/browse/HUE-1115
  [6]: https://issues.cloudera.org/browse/HUE-641
