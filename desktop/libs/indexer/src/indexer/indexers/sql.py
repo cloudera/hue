@@ -284,7 +284,7 @@ class SQLIndexer(object):
 
     columns = destination['columns']
 
-    sql = '''CREATE TABLE IF NOT EXISTS %(table_name)s (
+    sql = '''\n\nCREATE TABLE IF NOT EXISTS %(table_name)s (
 %(columns)s
 );
 ''' % {
@@ -303,11 +303,17 @@ class SQLIndexer(object):
         if source['format']['hasHeader']:
           list_of_tuples = list_of_tuples[1:]
 
-        csv_rows = str(list_of_tuples)[1:-1]
-        sql += '''INSERT INTO %(table_name)s VALUES %(csv_rows)s;'''% {
-            'table_name': table_name,
-            'csv_rows': csv_rows
-          }
+        list_of_tuples = list_of_tuples[:10000]
+
+        for count in range(1 + len(list_of_tuples)//1000):
+          temp_list = list_of_tuples[count*1000:(count+1)*1000]
+          if(len(temp_list)==0):
+            break
+          csv_rows = str(temp_list)[1:-1]
+          sql += '''\n\nINSERT INTO %(table_name)s VALUES %(csv_rows)s;'''% {
+              'table_name': table_name,
+              'csv_rows': csv_rows
+            }
 
     on_success_url = reverse('metastore:describe_table', kwargs={'database': database, 'table': final_table_name}) + \
         '?source_type=' + source_type

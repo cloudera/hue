@@ -653,6 +653,8 @@ def default_database_options():
     return {'threaded': True}
   elif DATABASE.ENGINE.get().endswith('sqlite3'):
     return {'timeout': 30}
+  elif DATABASE.ENGINE.get().endswith('mysql'):
+    return {'init_command': 'SET GLOBAL max_allowed_packet=100000000'}
   else:
     return {}
 
