@@ -878,7 +878,7 @@ Push to the CDN:
 
 ### Docker
 
-Docker image are at https://hub.docker.com/u/gethue/:
+Docker images are at https://hub.docker.com/u/gethue/:
 
     docker build https://github.com/cloudera/hue.git#release-4.9.0 -t gethue/hue:4.9.0 -f tools/docker/hue/Dockerfile
     docker tag gethue/hue:4.9.0 gethue/hue:latest
@@ -891,6 +891,24 @@ Docker image are at https://hub.docker.com/u/gethue/:
     docker tag gethue/nginx:4.9.0 gethue/nginx:latest
     docker push gethue/nginx
     docker push gethue/nginx:4.9.0
+
+
+### Kubernetes / Helm package
+
+To build the chart, use the package command from the Helm root directory:
+
+    cd hue/tools/kubernetes/helm/
+    helm package hue
+
+Then to publish it to the outside via the current Apache server:
+
+    scp hue-1.0.1.tgz root@101.200.100.200:/var/www/helm.gethue.com
+
+Then connect to the server and index the package:
+
+    ssh root@101.200.100.200
+    cd /var/www/helm.gethue.com
+    helm repo index .
 
 ### Documentation
 
