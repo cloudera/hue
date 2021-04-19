@@ -264,6 +264,7 @@ def guess_field_types(request):
     path = urllib_unquote(file_format["path"])
     stream = request.fs.open(path)
     encoding = check_encoding(stream.read(10000))
+    LOG.debug('File %s encoding is %s' % (path, encoding))
     stream.seek(0)
     _convert_format(file_format["format"], inverse=True)
 
@@ -447,10 +448,13 @@ def importer_submit(request):
   destination['ouputFormat'] = outputFormat  # Workaround a very weird bug
   start_time = json.loads(request.POST.get('start_time', '-1'))
 
+  file_encoding = None
   if source['inputFormat'] == 'file':
     if source['path']:
       path = urllib_unquote(source['path'])
       source['path'] = request.fs.netnormpath(path)
+      stream = request.fs.open(path)
+      file_encoding = check_encoding(stream.read(10000))
 
   if destination['ouputFormat'] in ('database', 'table'):
     destination['nonDefaultLocation'] = request.fs.netnormpath(destination['nonDefaultLocation']) \
@@ -552,7 +556,8 @@ def importer_submit(request):
         request,
         source,
         destination,
-        start_time
+        start_time,
+        file_encoding
       )
 
   request.audit = {
