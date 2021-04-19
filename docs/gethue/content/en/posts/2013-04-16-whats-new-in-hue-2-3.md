@@ -60,7 +60,7 @@ Here’s the new features list:
 
 We would like to thank everybody who worked on this release. New features and [feedback][7] are continuously being integrated!
 
- [1]: http://cloudera.github.com/hue
+ [1]: https://gethue.com
  [2]: http://cloudera.github.io/hue/docs-2.3.0/index.html
  [3]: http://blog.cloudera.com/blog/2013/03/whats-new-in-hue-2-2/
  [4]: http://pig.apache.org/

@@ -85,6 +85,6 @@ L'&eacute;quipe de Hue</p>
 [6]: https://issues.cloudera.org/browse/HUE-1150
 [7]: https://issues.cloudera.org/browse/HUE-1256
 [8]: https://issues.cloudera.org/browse/HUE-1321
-[9]: http://cloudera.github.com/hue/docs-2.5.0/release-notes/release-notes-2.5.0.html
+[9]: https://gethue.com
 [10]: https://gethue.com/
 [11]: http://groups.google.com/a/cloudera.org/group/hue-user

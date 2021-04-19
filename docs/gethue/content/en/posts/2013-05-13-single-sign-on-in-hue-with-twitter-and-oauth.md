@@ -43,7 +43,7 @@ categories:
 
 ---
 <p id="docs-internal-guid-55127576-85f6-b214-bad6-7ce289139d16">
-  <span>This post talks about</span><a href="http://cloudera.github.com/hue/"><span>Hue</span></a><span>, an open source web-based interface that makes</span><a href="http://hadoop.apache.org/"><span>Apache Hadoop</span></a><span> easier to use.</span>
+  <span>This post talks about</span><a href="https://gethue.com"><span>Hue</span></a><span>, an open source web-based interface that makes</span><a href="http://hadoop.apache.org/"><span>Apache Hadoop</span></a><span> easier to use.</span>
 </p>
 
 <span>Hue’s target is the Hadoop user experience and lets users focus on big data processing. In the previous posts we focused on some </span>[new features][1] <span>and how to quickly analyze your </span>[data][2] <span>with the Hive editor.</span>
