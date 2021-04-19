@@ -82,5 +82,5 @@ Hue 3.0 brings a browser for ZooKeeper and 245 commits. The tech stack was upgra
         The Hue team
 
  [1]: https://cdn.gethue.com/downloads/releases/3.0.0/hue-3.0.0.tgz
- [2]: http://cloudera.github.com/hue/docs-3.0.0/release-notes/release-notes-3.0.0.html
+ [2]: https://gethue.com
  [3]: http://groups.google.com/a/cloudera.org/group/hue-user

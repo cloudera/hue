@@ -70,7 +70,7 @@ categories:
 
 <span> </span>
 
-Please see the <a href="http://cloudera.github.com/hue/docs-2.4.0/release-notes/release-notes-2.4.0.html" target="_blank" rel="noopener noreferrer">release notes</a> for more information and the <a href="http://cloudera.github.io/hue/docs-2.4.0/" target="_blank" rel="noopener noreferrer">documentation</a>.
+Please see the <a href="https://gethue.com" target="_blank" rel="noopener noreferrer">release notes</a> for more information and the <a href="http://cloudera.github.io/hue/docs-2.4.0/" target="_blank" rel="noopener noreferrer">documentation</a>.
 
 <span>The github website has also been updated with screenshots:</span><http://gethue.com><span>.</span>
 

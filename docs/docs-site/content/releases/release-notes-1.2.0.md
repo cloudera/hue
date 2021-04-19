@@ -145,4 +145,4 @@ List of All Bugs Fixed
 
 Project Information
 -------------------
-Homepage: http://cloudera.github.com/hue/
+Homepage: https://gethue.com
