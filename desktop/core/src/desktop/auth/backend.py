@@ -750,7 +750,7 @@ class RemoteUserDjangoBackend(django.contrib.auth.backends.RemoteUserBackend):
   """
   Delegates to Django's RemoteUserBackend and requires HueRemoteUserMiddleware
   """
-  def authenticate(self, remote_user=None):
+  def authenticate(self, request=None, remote_user=None):
     username = self.clean_username(remote_user)
     username = force_username_case(username)
     is_super = False
