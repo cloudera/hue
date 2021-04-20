@@ -39,7 +39,7 @@ sf_caption_position:
 slide_template:
   - default
 categories:
-  - Dev / API
+  - Development
 
 ---
 _Last update on March 9 2016_
