@@ -558,7 +558,10 @@ class Assist(object):
     return self.db.get_table_names(database)
 
   def get_view_names(self, database, view_names=[]):
-    return self.db.get_view_names(database)
+    try:
+      return self.db.get_view_names(database)
+    except NotImplementedError:
+      return []
 
   def get_tables(self, database, table_names=[]):
     return self.get_table_names(database) + self.get_view_names(database)
