@@ -35,7 +35,7 @@ sf_caption_position:
 slide_template:
   - default
 categories:
-  - Dev / API
+  - Development
 
 ---
 Hue has been shipping SAML 2.0 authentication for quite some time. SAML 2.0 is an alternative to [LDAP][1] which lets you provide [single sign on][2] (SSO) in your company so that users can use the same login/password in all the systems. Unfortunately our support for SAML 2.0 was limited to a few small use cases.
