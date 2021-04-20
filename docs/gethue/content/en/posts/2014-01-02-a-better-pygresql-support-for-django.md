@@ -37,7 +37,7 @@ sf_right_sidebar:
 sf_caption_position:
   - caption-right
 categories:
-  - Dev / API
+  - Development
 
 ---
 <p id="docs-internal-guid-4b2195c3-54dc-08d4-5d6f-c137c78b95a2">

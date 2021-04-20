@@ -37,7 +37,7 @@ sf_remove_promo_bar:
 sf_detail_image:
   - 2346
 categories:
-  - Dev / API
+  - Development
 
 ---
 The upcoming Hue 3.8 internals have gone through some major upgrades to improve performance, robustness, and security. The major change stems from upgrading [Django][1] from 1.4.5 to 1.6.10, which comes with a significant amount performance enhancements, bug fixes, and the removal of deprecated features.

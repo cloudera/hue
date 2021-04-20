@@ -35,7 +35,7 @@ sf_caption_position:
 slide_template:
   - default
 categories:
-  - Dev / API
+  - Development
 
 ---
 Hue 3.6 ships with <a href="https://issues.cloudera.org/browse/HUE-2223" target="_blank" rel="noopener noreferrer">a bug</a> in the Beeswax and Impala apps that might round some big numbers on the query result panels.
