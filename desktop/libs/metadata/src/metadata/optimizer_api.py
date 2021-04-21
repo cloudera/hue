@@ -369,11 +369,9 @@ def top_columns(request):
 
   data = api.top_columns(db_tables=db_tables, connector=connector)
 
-  if data:
-    response['status'] = 0
-    response['values'] = data
-  else:
-    response['message'] = 'Optimizer: %s' % data
+  response['status'] = 0
+  response['values'] = data or []
+  response['message'] = 'Optimizer: %s' % data
 
   return JsonResponse(response)
 
