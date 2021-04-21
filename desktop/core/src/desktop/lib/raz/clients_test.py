@@ -34,6 +34,8 @@ class S3RazClientLiveTest(unittest.TestCase):
 
     url = S3RazClient().get_url()
 
+    assert_true('AWSAccessKeyId=' in url)
+    assert_true('Signature=' in url)
     assert_true('Expires=' in url)
 
 
@@ -53,5 +55,6 @@ class S3RazClientLiveTest(unittest.TestCase):
     assert_true('AWSAccessKeyId=' in url)
     assert_true('Signature=' in url)
     assert_true('Expires=' in url)
+
 
   def test_check_acccess_s3_list_file_no_access(self): pass

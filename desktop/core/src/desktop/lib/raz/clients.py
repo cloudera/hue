@@ -36,7 +36,7 @@ class S3RazClient():
 
     self.ranger = RangerRazS3(RAZ.API_URL.get(), auth)
 
-  def get_url(self, bucket, path, perm='read'):
+  def get_url(self, bucket=None, path=None, perm='read'):
     # No GET/POST spec?
     # e.g. get_url('<storage_account?>', '<bucket>', '<relative_path>', 'read')
     return self.ranger.get_dsas_token(bucket, path, perm)
