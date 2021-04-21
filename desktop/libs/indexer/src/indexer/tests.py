@@ -71,12 +71,12 @@ class TestImporter(object):
       get_filesystem.return_value = Mock()
 
       resp = self.client.get(reverse('indexer:importer'))
-      assert_true(b"{'value': 'file', 'name': 'File'}" in resp.content)
+      assert_true(b"{'value': 'file', 'name': 'Remote File'}" in resp.content)
 
       get_filesystem.return_value = None
 
       resp = self.client.get(reverse('indexer:importer'))
-      assert_false(b"{'value': 'file', 'name': 'File'}" in resp.content)
+      assert_false(b"{'value': 'file', 'name': 'Remote File'}" in resp.content)
 
 
 class TestIndexerWithSolr(object):
