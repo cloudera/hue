@@ -237,7 +237,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
           <div data-bind="visible: createWizard.source.inputFormat() == 'localfile'">
               <form method="post" action="" enctype="multipart/form-data" id="uploadform">
                 <div >
-                    <input type="file" id="inputfile" name="inputfile" accept=".csv">
+                    <input type="file" id="inputfile" name="inputfile" style="margin-left: 130px" accept=".csv">
                 </div>
             </form>
           </div>
@@ -1726,7 +1726,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
 
 
       self.sampleCols.subscribe(refreshTemporaryTable);
-      self.inputFormat = ko.observable(wizard.prefill.source_type() ? wizard.prefill.source_type() : 'file');
+      self.inputFormat = ko.observable(wizard.prefill.source_type() ? wizard.prefill.source_type() : 'localfile');
 
       self.inputFormat.subscribe(function(val) {
         wizard.destination.columns.removeAll();
@@ -1749,8 +1749,11 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
         }
       });
       self.inputFormatsAll = ko.observableArray([
+          % if ENABLE_DIRECT_UPLOAD.get():
+          {'value': 'localfile', 'name': 'Small Local File'},
+          % endif
           % if request.fs:
-          {'value': 'file', 'name': 'File'},
+          {'value': 'file', 'name': 'Remote File'},
           % endif
           % if ENABLE_SQOOP.get():
           {'value': 'rdbms', 'name': 'External Database'},
@@ -1769,9 +1772,6 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
           {'value': 'connector', 'name': 'Connectors'},
           % endif
           {'value': 'manual', 'name': 'Manually'},
-          % if ENABLE_DIRECT_UPLOAD.get():
-          {'value': 'localfile', 'name': 'LocalFile'}
-          % endif
           ##{'value': 'text', 'name': 'Paste Text'},
       ]);
       self.inputFormatsManual = ko.observableArray([

@@ -229,7 +229,7 @@ def guess_field_types(request):
   file_format = json.loads(request.POST.get('fileFormat', '{}'))
 
   if file_format['inputFormat'] == 'localfile':
-    path = file_format['path']
+    path = urllib_unquote(file_format['path'])
 
     with open(BASE_DIR + path, 'r') as local_file:
 
