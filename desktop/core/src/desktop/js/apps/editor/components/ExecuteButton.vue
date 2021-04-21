@@ -56,7 +56,7 @@
 
 <script lang="ts">
   import { EXECUTABLE_UPDATED_TOPIC, ExecutableUpdatedEvent } from 'apps/editor/execution/events';
-  import { defineComponent, nextTick, PropType, ref, toRefs, watch } from 'vue';
+  import { defineComponent, PropType, ref, toRefs, watch } from 'vue';
 
   import SqlExecutable from 'apps/editor/execution/sqlExecutable';
   import HueButton from 'components/HueButton.vue';
