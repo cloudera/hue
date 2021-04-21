@@ -640,7 +640,7 @@ Then give Hue the information about the database source:
 
 Alternative:
 
-The [Drill JDBC driver](http://maprdocs.mapr.com/home/Hue/ConfigureHuewithDrill.html) can be used.
+The Drill JDBC driver can be used.
 
     [[[drill]]]
       name=Drill JDBC
