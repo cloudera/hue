@@ -14,6 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import dataCatalog from 'catalog/dataCatalog';
 import { ExecuteApiResponse, executeStatement } from 'apps/editor/execution/api';
 import Executable, { ExecutableRaw } from 'apps/editor/execution/executable';
 import { ExecutionError } from 'apps/editor/execution/executionLogs';
@@ -99,6 +100,38 @@ export default class SqlExecutable extends Executable {
   }
 
   async internalExecute(): Promise<ExecuteApiResponse> {
+    if (this.parsedStatement && /CREATE|DROP/i.test(this.parsedStatement.firstToken)) {
+      let match = this.parsedStatement.statement.match(
+        /(?:CREATE|DROP)\s+TABLE\s+(?:IF\s+(?:NOT\s+)?EXISTS\s+)?(?:`([^`]+)`|([^;\s]+))\..*/i
+      );
+      const path: Array<string> = [];
+      if (match) {
+        path.push(match[1] || match[2]); // group 1 backticked db name, group 2 regular db name
+      } else {
+        match = this.parsedStatement.statement.match(
+          /(?:CREATE|DROP)\s+(?:DATABASE|SCHEMA)\s+(?:IF\s+(?:NOT\s+)?EXISTS\s+)?(?:`([^`]+)`|([^;\s]+))/i
+        );
+        if (match) {
+          path.push(match[1] || match[2]); // group 1 backticked db name, group 2 regular db name
+        } else if (this.database) {
+          path.push(this.database);
+        }
+      }
+      if (path.length) {
+        window.setTimeout(() => {
+          dataCatalog
+            .getEntry({
+              namespace: this.executor.namespace(),
+              compute: this.executor.compute(),
+              connector: this.executor.connector(),
+              path: path
+            })
+            .then(entry => {
+              entry.clearCache({ cascade: true, silenceErrors: true });
+            });
+        }, 5000);
+      }
+    }
     return await executeStatement({
       executable: this,
       silenceErrors: true
