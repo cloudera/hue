@@ -20,7 +20,7 @@
   <div class="result-grid" :class="{ 'grayed-out': grayedOut }">
     <HueTable
       v-if="rows.length"
-      :columns="tableColumns"
+      :columns="columns"
       :rows="rows"
       :sticky-header="true"
       :sticky-first-column="true"
@@ -48,15 +48,15 @@
 </template>
 
 <script lang="ts">
+  import { computed, defineComponent, PropType, ref, toRefs, watch } from 'vue';
+
+  import './ResultTable.scss';
   import {
     EXECUTABLE_RESULT_UPDATED_TOPIC,
     EXECUTABLE_UPDATED_TOPIC,
     ExecutableResultUpdatedEvent,
     ExecutableUpdatedEvent
   } from 'apps/editor/execution/events';
-  import { defineComponent, PropType } from 'vue';
-
-  import { ResultMeta } from 'apps/editor/execution/api';
   import Executable, { ExecutionStatus } from 'apps/editor/execution/executable';
   import ExecutionResult, { ResultRow, ResultType } from 'apps/editor/execution/executionResult';
   import { Column } from 'components/HueTable';
@@ -70,192 +70,160 @@
     components: {
       HueTable
     },
-
     props: {
       executable: {
         type: Object as PropType<Executable>,
         required: true
       }
     },
-
-    setup() {
+    setup(props) {
+      const { executable } = toRefs(props);
       const subTracker = new SubscriptionTracker();
-      return { subTracker };
-    },
+      const grayedOut = ref(false);
+      const fetchedOnce = ref(false);
+      const hasResultSet = ref(false);
+      const streaming = ref(false);
+      const hasMore = ref(false);
 
-    data() {
-      return {
-        grayedOut: false,
-        fetchedOnce: false,
-        hasResultSet: false,
-        streaming: false,
-        hasMore: false,
-        rows: [] as ResultRow[],
-        meta: [] as ResultMeta[],
+      const rows = ref<ResultRow[]>([]);
+      const columns = ref<Column<ResultRow>[]>([]);
 
-        status: null as ExecutionStatus | null,
-        type: ResultType.Table,
-        images: [] as string[],
-        lastFetchedRows: [] as ResultRow[],
-        lastRenderedResult: null as ExecutionResult | null
-      };
-    },
+      const lastRenderedResult = ref<ExecutionResult | null>(null);
+      const status = ref<ExecutionStatus | null>(null);
+      const type = ref(ResultType.Table);
 
-    computed: {
-      hasEmptyResult(): boolean {
-        return (
-          !this.rows.length &&
-          this.hasResultSet &&
-          this.status === ExecutionStatus.available &&
-          this.fetchedOnce
-        );
-      },
-
-      hasEmptySuccessResult(): boolean {
-        return (
-          !this.rows.length &&
-          !this.hasResultSet &&
-          this.status === ExecutionStatus.available &&
-          this.fetchedOnce
-        );
-      },
-
-      isExecuting(): boolean {
-        return this.status === ExecutionStatus.running;
-      },
-
-      isExpired(): boolean {
-        return this.status === ExecutionStatus.expired && !this.rows.length;
-      },
-
-      isStreaming(): boolean {
-        return this.streaming && !this.rows.length && this.status !== ExecutionStatus.running;
-      },
-
-      tableColumns(): Column<ResultRow>[] {
-        return this.meta.map(({ name }, index) => ({
-          label: name,
-          key: index,
-          htmlValue: true
-        }));
-      }
-    },
-
-    watch: {
-      executable(): void {
-        this.handleResultChange();
-      }
-    },
-
-    mounted(): void {
-      this.subTracker.subscribe<ExecutableUpdatedEvent>(EXECUTABLE_UPDATED_TOPIC, executable => {
-        if (this.executable && this.executable.id === executable.id) {
-          this.updateFromExecutable(executable);
-        }
-      });
-
-      this.subTracker.subscribe<ExecutableResultUpdatedEvent>(
-        EXECUTABLE_RESULT_UPDATED_TOPIC,
-        (executionResult: ExecutionResult) => {
-          if (this.executable && this.executable.id === executionResult.executable.id) {
-            this.handleResultChange();
-          }
-        }
+      const hasEmptyResult = computed<boolean>(
+        () =>
+          !rows.value.length &&
+          hasResultSet.value &&
+          status.value === ExecutionStatus.available &&
+          fetchedOnce.value
       );
-    },
 
-    unmounted(): void {
-      this.subTracker.dispose();
-    },
+      const hasEmptySuccessResult = computed<boolean>(
+        () =>
+          !rows.value.length &&
+          !hasResultSet.value &&
+          status.value === ExecutionStatus.available &&
+          fetchedOnce.value
+      );
 
-    methods: {
-      I18n,
-      handleResultChange(): void {
-        if (this.executable && this.executable.result) {
-          const refresh = this.lastRenderedResult !== this.executable.result;
-          this.updateFromExecutionResult(this.executable.result, refresh);
-          this.lastRenderedResult = this.executable.result;
-        } else {
-          this.resetResultData();
+      const isExecuting = computed<boolean>(() => status.value === ExecutionStatus.running);
+
+      const isExpired = computed<boolean>(
+        () => !rows.value.length && status.value === ExecutionStatus.expired
+      );
+
+      const isStreaming = computed<boolean>(
+        () => !rows.value.length && streaming.value && status.value !== ExecutionStatus.running
+      );
+
+      const resetResultData = (): void => {
+        type.value = ResultType.Table;
+
+        fetchedOnce.value = false;
+        streaming.value = false;
+        hasMore.value = false;
+
+        rows.value = [];
+        columns.value = [];
+      };
+
+      const updateFromExecutable = (executable: Executable): void => {
+        status.value = executable.status;
+        hasResultSet.value = !!(executable.handle && executable.handle.has_result_set);
+        if (!hasResultSet.value) {
+          resetResultData();
         }
-      },
+      };
 
-      async onScrollToEnd(): Promise<void> {
-        if (this.hasMore && !this.grayedOut && this.executable && this.executable.result) {
-          this.grayedOut = true;
-          try {
-            await this.executable.result.fetchRows({ rows: 100 });
-          } catch (e) {}
-          defer(() => {
-            // Allow executable events to finish before enabling the result scroll again
-            this.grayedOut = false;
-          });
-        }
-      },
-
-      resetResultData(): void {
-        this.type = ResultType.Table;
-
-        this.fetchedOnce = false;
-        this.streaming = false;
-        this.hasMore = false;
-
-        this.images = [];
-        this.lastFetchedRows = [];
-        this.rows = [];
-        this.meta = [];
-      },
-
-      updateFromExecutable(executable: Executable): void {
-        this.status = executable.status;
-        this.hasResultSet = !!(executable.handle && executable.handle.has_result_set);
-        if (!this.hasResultSet) {
-          this.resetResultData();
-        }
-      },
-
-      updateFromExecutionResult(executionResult: ExecutionResult, refresh?: boolean): void {
+      const updateFromExecutionResult = (
+        executionResult: ExecutionResult,
+        refresh?: boolean
+      ): void => {
         if (refresh) {
-          this.resetResultData();
+          resetResultData();
         }
 
         if (executionResult) {
-          this.fetchedOnce = executionResult.fetchedOnce;
-          this.hasMore = executionResult.hasMore;
-          this.type = executionResult.type || ResultType.Table;
-          this.streaming = executionResult.streaming;
+          fetchedOnce.value = executionResult.fetchedOnce;
+          hasMore.value = executionResult.hasMore;
+          type.value = executionResult.type || ResultType.Table;
+          streaming.value = executionResult.streaming;
 
-          if (!this.meta.length && executionResult.meta.length) {
-            this.meta = executionResult.meta;
+          if (!columns.value.length && executionResult.meta.length) {
+            columns.value = executionResult.meta.map(({ name }, index) => ({
+              label: name,
+              key: index,
+              htmlValue: true
+            }));
           }
 
           if (refresh) {
-            this.rows = [...executionResult.rows];
+            rows.value = executionResult.rows;
           } else if (
             executionResult.lastRows.length &&
-            this.rows.length !== executionResult.rows.length
+            rows.value.length !== executionResult.rows.length
           ) {
-            this.rows.push(...executionResult.lastRows);
+            rows.value.push(...executionResult.lastRows);
           }
-          this.lastFetchedRows = executionResult.lastRows;
         }
-      }
+      };
+
+      const handleResultChange = (): void => {
+        const result = executable.value?.result;
+        if (result) {
+          const refresh = lastRenderedResult.value !== executable.value.result;
+          updateFromExecutionResult(result as ExecutionResult, refresh);
+          lastRenderedResult.value = result;
+        } else {
+          resetResultData();
+        }
+      };
+
+      const onScrollToEnd = async (): Promise<void> => {
+        if (hasMore.value && !grayedOut.value && executable.value && executable.value.result) {
+          grayedOut.value = true;
+          try {
+            await executable.value.result.fetchRows({ rows: 100 });
+          } catch (e) {}
+          defer(() => {
+            // Allow executable events to finish before enabling the result scroll again
+            grayedOut.value = false;
+          });
+        }
+      };
+
+      watch(executable, handleResultChange);
+
+      subTracker.subscribe<ExecutableUpdatedEvent>(EXECUTABLE_UPDATED_TOPIC, updatedExecutable => {
+        if (executable.value?.id === updatedExecutable.id) {
+          updateFromExecutable(updatedExecutable);
+        }
+      });
+
+      subTracker.subscribe<ExecutableResultUpdatedEvent>(
+        EXECUTABLE_RESULT_UPDATED_TOPIC,
+        (executionResult: ExecutionResult) => {
+          if (executable.value?.id === executionResult.executable.id) {
+            handleResultChange();
+          }
+        }
+      );
+
+      return {
+        I18n,
+        columns,
+        grayedOut,
+        hasEmptyResult,
+        hasEmptySuccessResult,
+        isExecuting,
+        isExpired,
+        isStreaming,
+        onScrollToEnd,
+        rows,
+        subTracker
+      };
     }
   });
 </script>
-
-<style lang="scss" scoped>
-  .result-grid {
-    position: relative;
-    height: 100%;
-    width: 100%;
-
-    &.grayed-out {
-      opacity: 0.5;
-
-      ::v-deep(.hue-table-container) {
-        overflow: hidden !important;
-      }
-    }
-  }
-</style>
