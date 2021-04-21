@@ -35,10 +35,13 @@
     <div v-else-if="isExpired">
       <h1 class="empty">{{ I18n('Results have expired, rerun the query if needed.') }}</h1>
     </div>
+    <div v-else-if="isFailed">
+      <h1 class="empty">{{ I18n('Execution failed!') }}</h1>
+    </div>
     <div v-else-if="hasEmptyResult">
       <h1 class="empty">{{ I18n('Empty result.') }}</h1>
     </div>
-    <div v-else-if="isStreaming">
+    <div v-else-if="isWaitingForStream">
       <h1 class="empty">{{ I18n('Waiting for streaming data...') }}</h1>
     </div>
     <div v-else-if="!rows.length && (!executable || !executable.result)">
@@ -114,7 +117,11 @@
         () => !rows.value.length && status.value === ExecutionStatus.expired
       );
 
-      const isStreaming = computed<boolean>(
+      const isFailed = computed<boolean>(
+        () => !rows.value.length && status.value === ExecutionStatus.failed
+      );
+
+      const isWaitingForStream = computed<boolean>(
         () => !rows.value.length && streaming.value && status.value !== ExecutionStatus.running
       );
 
@@ -219,7 +226,8 @@
         hasEmptySuccessResult,
         isExecuting,
         isExpired,
-        isStreaming,
+        isFailed,
+        isWaitingForStream,
         onScrollToEnd,
         rows,
         subTracker
