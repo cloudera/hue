@@ -766,6 +766,12 @@ SLACK = ConfigSection(
         private=True,
         dynamic_default=get_slack_bot_user_token,
       ),
+      SHARE_FROM_EDITOR=Config(
+      key='share_from_editor',
+      help=_('Enables direct sharing from Editor to Slack'),
+      type=coerce_bool,
+      default=False,
+      ),
   )
 )
 
