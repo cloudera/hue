@@ -26,6 +26,8 @@ const BATCHABLE_STATEMENT_TYPES = /ALTER|WITH|REFRESH|CREATE|DELETE|DROP|GRANT|I
 
 const SELECT_END_REGEX = /([^;]*)([;]?[^;]*)/;
 const ERROR_REGEX = /line ([0-9]+)(:([0-9]+))?/i;
+const TABLE_DDL_REGEX = /(?:CREATE|DROP)\s+(?:TABLE|VIEW)\s+(?:IF\s+(?:NOT\s+)?EXISTS\s+)?(?:`([^`]+)`|([^;\s]+))\..*/i;
+const DB_DDL_REGEX = /(?:CREATE|DROP)\s+(?:DATABASE|SCHEMA)\s+(?:IF\s+(?:NOT\s+)?EXISTS\s+)?(?:`([^`]+)`|([^;\s]+))/i;
 
 export interface SqlExecutableRaw extends ExecutableRaw {
   database: string;
@@ -101,16 +103,12 @@ export default class SqlExecutable extends Executable {
 
   async internalExecute(): Promise<ExecuteApiResponse> {
     if (this.parsedStatement && /CREATE|DROP/i.test(this.parsedStatement.firstToken)) {
-      let match = this.parsedStatement.statement.match(
-        /(?:CREATE|DROP)\s+TABLE\s+(?:IF\s+(?:NOT\s+)?EXISTS\s+)?(?:`([^`]+)`|([^;\s]+))\..*/i
-      );
+      let match = this.parsedStatement.statement.match(TABLE_DDL_REGEX);
       const path: Array<string> = [];
       if (match) {
         path.push(match[1] || match[2]); // group 1 backticked db name, group 2 regular db name
       } else {
-        match = this.parsedStatement.statement.match(
-          /(?:CREATE|DROP)\s+(?:DATABASE|SCHEMA)\s+(?:IF\s+(?:NOT\s+)?EXISTS\s+)?(?:`([^`]+)`|([^;\s]+))/i
-        );
+        match = this.parsedStatement.statement.match(DB_DDL_REGEX);
         if (match) {
           path.push(match[1] || match[2]); // group 1 backticked db name, group 2 regular db name
         } else if (this.database) {
@@ -128,7 +126,8 @@ export default class SqlExecutable extends Executable {
             })
             .then(entry => {
               entry.clearCache({ cascade: true, silenceErrors: true });
-            });
+            })
+            .catch();
         }, 5000);
       }
     }
