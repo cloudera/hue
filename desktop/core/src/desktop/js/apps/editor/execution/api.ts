@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { extractErrorMessage, post, successResponseIsError } from 'api/utils';
+import { DefaultApiResponse, extractErrorMessage, post, successResponseIsError } from 'api/utils';
 import Executable, { ExecutableContext, ExecutionStatus } from 'apps/editor/execution/executable';
 import { ResultType } from 'apps/editor/execution/executionResult';
 
@@ -317,21 +317,25 @@ export const fetchResults = async (options: {
   rows: number;
   startOver?: boolean;
   silenceErrors?: boolean;
-}): Promise<ResultApiResponse> => {
+}): Promise<ResultApiResponse | undefined> => {
   const data = (await options.executable.toContext()) as FetchResultData;
   data.rows = options.rows;
   data.startOver = options.startOver;
 
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  const transformResponse = (response: unknown) => JSON.bigdataParse(response).result;
+  const transformResponse = (response: unknown) => JSON.bigdataParse(response);
 
-  const responsePromise = post<ResultApiResponse>(FETCH_RESULT_DATA_API, data, {
-    silenceErrors: !!options.silenceErrors,
-    transformResponse
-  });
+  const response = await post<DefaultApiResponse & { result?: ResultApiResponse }>(
+    FETCH_RESULT_DATA_API,
+    data,
+    {
+      silenceErrors: !!options.silenceErrors,
+      transformResponse
+    }
+  );
 
-  return responsePromise;
+  return response.result;
 };
 
 export const fetchResultSize = async (
