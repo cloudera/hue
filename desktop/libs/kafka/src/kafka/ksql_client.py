@@ -189,6 +189,10 @@ class KSqlApi(object):
     return data, metadata
 
 
+  def cancel(self, notebook, snippet):
+    return {'status': -1}
+
+
   def _decode_result(self, result):
     columns = []
     data = []
