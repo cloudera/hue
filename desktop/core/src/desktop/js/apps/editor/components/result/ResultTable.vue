@@ -201,6 +201,9 @@
       };
 
       const onScrollToEnd = async (): Promise<void> => {
+        if (streaming.value) {
+          return;
+        }
         if (hasMore.value && !grayedOut.value && executable.value && executable.value.result) {
           grayedOut.value = true;
           try {
