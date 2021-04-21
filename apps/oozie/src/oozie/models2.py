@@ -36,6 +36,8 @@ from xml.sax.saxutils import escape
 from django.urls import reverse
 from django.db.models import Q
 
+from azure.abfs.__init__ import abfspath
+
 from desktop.conf import USE_DEFAULT_CONFIGURATION
 from desktop.lib import django_mako
 from desktop.lib.exceptions_renderable import PopupException
@@ -993,6 +995,11 @@ class Node(object):
       self.data['properties']['archives'] = []
 
 
+    for i, f in enumerate(self.data['properties']['files']):
+      file_path = f['value']
+      if file_path.lower().startswith("abfs"):
+        file_path = abfspath(file_path)
+        self.data['properties']['files'][i] = {'value': file_path}
 
     data = {
       'node': self.data,
