@@ -308,7 +308,7 @@ class SQLIndexer(object):
           'primary_keys': ', '.join(destination.get('indexerPrimaryKey'))
       }
 
-    path = source['path']
+    path = urllib_unquote(source['path'])
     if path:
       with open(BASE_DIR + path, 'r') as local_file:
         reader = csv.reader(local_file)
