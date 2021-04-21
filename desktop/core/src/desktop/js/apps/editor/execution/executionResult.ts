@@ -155,7 +155,9 @@ export default class ExecutionResult {
       startOver: !!(options && options.startOver)
     });
 
-    this.handleResultResponse(resultResponse);
+    if (resultResponse) {
+      this.handleResultResponse(resultResponse);
+    }
   }
 
   handleResultResponse(resultResponse: ResultApiResponse): void {
