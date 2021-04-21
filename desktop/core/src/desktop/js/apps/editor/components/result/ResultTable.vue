@@ -166,13 +166,25 @@
             }));
           }
 
+          const addRows = (existingRows: ResultRow[], newRows: ResultRow[]) => {
+            newRows.forEach(row => {
+              if (streaming.value) {
+                existingRows.unshift(row);
+              } else {
+                existingRows.push(row);
+              }
+            });
+          };
+
           if (refresh) {
-            rows.value = executionResult.rows;
+            const existingRows: ResultRow[] = [];
+            addRows(existingRows, executionResult.rows);
+            rows.value = existingRows;
           } else if (
             executionResult.lastRows.length &&
             rows.value.length !== executionResult.rows.length
           ) {
-            rows.value.push(...executionResult.lastRows);
+            addRows(rows.value, executionResult.lastRows);
           }
         }
       };
