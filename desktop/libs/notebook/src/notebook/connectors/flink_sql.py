@@ -198,13 +198,13 @@ class FlinkSqlApi(Api):
 
     return {
         'has_more': bool(next_result),
-        'data': resp['results'][0]['data'],  # No escaping...
+        'data': resp and resp['results'][0]['data'] or [],  # No escaping...
         'meta': [{
             'name': column['name'],
             'type': column['type'],
             'comment': ''
           }
-          for column in resp['results'][0]['columns']
+          for column in resp['results'][0]['columns'] if resp
         ],
         'type': 'table'
     }
