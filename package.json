@@ -1,6 +1,6 @@
 {
   "name": "gethue",
-  "version": "4.9.7",
+  "version": "4.9.8",
   "description": "Hue is an Open source SQL Query Editor for Databases/Warehouses",
   "keywords": [
     "Query Editor",
@@ -161,6 +161,7 @@
     "webpack-npm": "webpack --config webpack.config.npm.js",
     "publish-gethue": "make sql-all-parsers && npm run webpack-npm && cd npm_dist && npm publish",
     "dev": "webpack --watch --config webpack.config.js -d",
+    "dev-login": "webpack --config webpack.config.login.js --watch -d",
     "dev-workers": "webpack --config webpack.config.workers.js --watch -d",
     "dev-webpack-npm": "webpack --config webpack.config.npm.js --watch -d",
     "less": "./node_modules/.bin/grunt less",
