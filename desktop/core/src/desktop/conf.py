@@ -1178,7 +1178,13 @@ AUTH = ConfigSection(
       help=_("If behind_reverse_proxy is True, it will look for the IP address from this header. Default: HTTP_X_FORWARDED_FOR"),
       type=str,
       default="HTTP_X_FORWARDED_FOR",
-    )
+    ),
+    AUTO_LOGIN_ENABLED=Config(
+      key="auto_login_enabled",
+      help=_("If True, will auto log any request as a `hue` user that needs to exist."),
+      type=coerce_bool,
+      default=False,
+    ),
 ))
 
 
