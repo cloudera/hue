@@ -85,9 +85,11 @@ class UrlKey(Key):
 class UrlBucket(Bucket):
 
   def list(self, prefix='', delimiter='', marker='', headers=None, encoding_type=None):
-    LOG.debug('prefix')
-    LOG.debug(prefix)
-    return self.get_all_keys()  # TODO: unsure yet how to generate URL with key prefix filtering
+    params = {
+      'prefix': prefix,
+      'delimiter': delimiter
+    }
+    return self.get_all_keys(**params)
 
 
   def get_key(self, key_name, headers=None, version_id=None, response_headers=None, validate=True):
@@ -95,7 +97,6 @@ class UrlBucket(Bucket):
     kwargs = {'bucket': self.name, 'key': key_name}
 
     tmp_url = self.connection.generate_url(3000, 'GET', **kwargs)
-    # tmp_url = self.generate_url(1000, 'GET', self.name, key_name, headers, version_id, response_headers, validate)
 
     response = requests.get(tmp_url)
     LOG.debug(response)
@@ -107,8 +108,7 @@ class UrlBucket(Bucket):
 
 
   def get_all_keys(self, headers=None, **params):
-    # delimiter=/&prefix=data/
-    kwargs = {'bucket': self.name, 'key': ''} # data/
+    kwargs = {'bucket': self.name, 'key': '', 'response_headers': params}
 
     tmp_url = self.connection.generate_url(3000, 'GET', **kwargs)
 
@@ -160,11 +160,12 @@ class BotoUrlConnection():
     response = requests.get(tmp_url)
 
     LOG.debug('get_all_buckets')
+    print(tmp_url)
     LOG.debug(response)
     LOG.debug(response.content)
 
     rs = ResultSet([('Bucket', self.connection.bucket_class)])
-    h = boto.handler.XmlHandler(rs, self.connection)
+    h = boto.handler.XmlHandler(rs, None)
     xml.sax.parseString(response.content, h)
     LOG.debug(rs)
 
