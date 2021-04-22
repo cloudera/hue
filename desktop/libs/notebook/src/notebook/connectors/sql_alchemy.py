@@ -598,7 +598,11 @@ class Assist(object):
 
   def get_keys(self, database, table):
     meta = MetaData()
-    metaTable = Table(table, meta, schema=database, autoload=True, autoload_with=self.engine)
+    try:
+      metaTable = Table(table, meta, schema=database, autoload=True, autoload_with=self.engine)
+    except ProgrammingError:
+      LOG.debug("Table %s.%s could not be found and this is probably expected" % (database, table))
+      return {}
 
     return {
       'foreign_keys': [{
