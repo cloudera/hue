@@ -15,31 +15,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
-import json
-import sys
+from desktop import conf
 
-from desktop.lib.botserver.slack_client import slack_client
-from desktop.decorators import api_error_handler
-from desktop.lib.django_util import JsonResponse
+SLACK_VERIFICATION_TOKEN = conf.SLACK.SLACK_VERIFICATION_TOKEN.get()
+SLACK_BOT_USER_TOKEN = conf.SLACK.SLACK_BOT_USER_TOKEN.get()
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-
-LOG = logging.getLogger(__name__)
-
-@api_error_handler
-def get_channels(request):
-
-  try:
-    response = slack_client.users_conversations()
-  except Exception as e:
-    raise PopupException(_('Error fetching channels where bot is present'), detail=e)
-
-  bot_channels = [channel.get('name') for channel in response.get('channels')]
-
-  return JsonResponse({
-    'channels': bot_channels,
-  })
+slack_client = None
+if conf.SLACK.IS_ENABLED.get():
+  from slack_sdk import WebClient
+  slack_client = WebClient(token=SLACK_BOT_USER_TOKEN)
