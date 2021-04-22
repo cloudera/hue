@@ -15,17 +15,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
+import json
 import sys
 
-from desktop.lib.botserver import views, api
+from desktop.lib.botserver.slack_client import slack_client
+from desktop.decorators import api_error_handler
+from desktop.lib.django_util import JsonResponse
 
 if sys.version_info[0] > 2:
-  from django.urls import re_path
+  from django.utils.translation import gettext as _
 else:
-  from django.conf.urls import url as re_path
+  from django.utils.translation import ugettext as _
 
-urlpatterns = [
-  re_path(r'^events/', views.slack_events, name='desktop.lib.botserver.views.slack_events'),
+LOG = logging.getLogger(__name__)
 
-  re_path(r'^api/channels/get/?$', api.get_channels, name='botserver.api.get_channels'),
-]
+@api_error_handler
+def get_channels(request):
+
+  try:
+    response = slack_client.users_conversations()
+  except Exception as e:
+    raise PopupException(_('Error fetching channels where bot is present'), detail=e)
+
+  bot_channels = [channel.get('name') for channel in response.get('channels')]
+
+  return JsonResponse({
+    'channels': bot_channels,
+  })

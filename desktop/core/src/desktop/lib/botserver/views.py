@@ -19,10 +19,9 @@ import logging
 import json
 import sys
 from urllib.parse import urlsplit
-from pprint import pprint
 from tabulate import tabulate
 
-from desktop import conf
+from desktop.lib.botserver.slack_client import slack_client, SLACK_VERIFICATION_TOKEN
 from desktop.lib.django_util import login_notrequired, JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.models import Document2, _get_gist_document
@@ -43,14 +42,6 @@ else:
   from django.utils.translation import ugettext as _
 
 LOG = logging.getLogger(__name__)
-
-SLACK_VERIFICATION_TOKEN = conf.SLACK.SLACK_VERIFICATION_TOKEN.get()
-SLACK_BOT_USER_TOKEN = conf.SLACK.SLACK_BOT_USER_TOKEN.get()
-
-slack_client = None
-if conf.SLACK.IS_ENABLED.get():
-  from slack_sdk import WebClient
-  slack_client = WebClient(token=SLACK_BOT_USER_TOKEN)
 
 
 @login_notrequired
