@@ -358,7 +358,7 @@ class LoginAndPermissionMiddleware(MiddlewareMixin):
           log_page_hit(request, view_func, level=access_log_level)
         return None
 
-    if desktop.conf.CORS_ENABLED.get():
+    if AUTH.AUTO_LOGIN_ENABLED.get():
       user = authenticate(request, username='hue', password='hue')
       if user is not None:
         login(request, user)
