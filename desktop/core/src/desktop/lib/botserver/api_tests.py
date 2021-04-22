@@ -64,7 +64,6 @@ class TestApi(object):
 
       response = self.client.post(reverse('botserver.api.get_channels'))
       data = json.loads(response.content)
-      print(data)
 
       assert_equal(200, response.status_code)
       assert_equal(['channel-1', 'channel-2'], data.get('channels'))
