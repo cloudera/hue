@@ -31,10 +31,14 @@ from desktop.lib.raz.clients import S3RazClient
 LOG = logging.getLogger(__name__)
 
 
-# Note: Connection means more "Client" but we follow boto2 terminology
+# Note: Connection means more "Client" but we currently follow boto2 terminology
+# To split in 3 modules at some point s3_url_client, s3_raz_client, s3_self_signing_client,
 
 
 class UrlConnection():
+  """
+  Share the unmarshalling from XML to boto Python objects from the requests calls.
+  """
 
   def get_all_buckets(self, response):
     LOG.debug('get_all_buckets')
@@ -52,11 +56,10 @@ class RazUrlConnection():
   def __init__(self):
     self.raz = S3RazClient()
 
-  def _generate_url(self, bucket_name=None, object_name=None, expiration=3600):
-    self.raz.get_url(bucket_name, object_name)
-
   def get_all_buckets(self, headers=None):
     url = self._generate_url()
+    # call
+    # unmarshall via UrlConnection
 
   def get_bucket(self, bucket_name, validate=True, headers=None):
     pass
@@ -67,8 +70,19 @@ class RazUrlConnection():
   def get_all_keys(self, headers=None, **params):
     pass
 
+  def _generate_url(self, bucket_name=None, object_name=None, expiration=3600):
+    self.raz.get_url(bucket_name, object_name)
+
 
 class UrlKey(Key):
+
+  def open_read(self, headers=None, query_args='', override_num_retries=None, response_headers=None):
+
+    # Similar to Bucket.get_key()
+    # data = self.resp.read(self.BufferSize)
+    # For seek: headers={"Range": "bytes=%d-" % pos}
+
+    return
 
   def _generate_url(self, action='GET', **kwargs):
     LOG.debug(kwargs)
@@ -93,6 +107,8 @@ class UrlBucket(Bucket):
 
 
   def get_key(self, key_name, headers=None, version_id=None, response_headers=None, validate=True):
+    # Note: in current FS API we get file even if we don't need the content, hence why it can be slow.
+    # To check if we should give a length in read() to mitigate.
     LOG.debug('key name: %s' % key_name)
     kwargs = {'bucket': self.name, 'key': key_name}
 
@@ -105,7 +121,7 @@ class UrlBucket(Bucket):
     response.getheader = response.headers.get
     response.getheaders = lambda: response.headers
 
-    # Copy from boto2 bucket.py _get_key_internal()
+    # Copied from boto2 bucket.py _get_key_internal()
     if response.status_code / 100 == 2:
       k = self.key_class(self)
       provider = self.connection.provider
@@ -172,7 +188,7 @@ class BotoUrlConnection():
     self.connection = connection
     self.expiration = 3600
 
-    self.connection.make_request = None  # We make sure we never call directly
+    self.connection.make_request = None  # We make sure we never call via regular boto connection directly
     self.connection.set_bucket_class(UrlBucket)  # We use our bucket class to override any direct call to S3
 
 
