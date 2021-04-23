@@ -128,7 +128,8 @@ class UrlBucket(Bucket):
       k.handle_restore_headers(response)
       k.handle_addl_headers(response.getheaders())
     else:
-      k  = None
+      # Currently needed as 404 on directories via stats_key()
+      k = self.key_class(self, key_name)
 
     return k
 
