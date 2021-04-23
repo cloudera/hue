@@ -804,6 +804,7 @@ Steps/flow to be followed by the upstream Hue user to set up their own Hue Slack
 | **Permission Scopes** | **Why do we need it?** |
 |    :---:     |     :---     |
 | channels:history   | \*Required by **message.channels** bot event
+| channels:read   | Get list of channels where bot is present
 | chat:write     | Sending messages as Hue App such as greeting message
 | files:write   | Uploading the query result file in link message thread
 | links:read  | \*Required by **link_shared** bot event
