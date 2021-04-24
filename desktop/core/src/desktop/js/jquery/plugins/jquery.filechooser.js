@@ -165,8 +165,10 @@ Plugin.prototype.setOptions = function (options) {
   const self = this;
   self.options = $.extend({}, defaults, { user: window.LOGGED_USERNAME }, options);
   self.options.labels = $.extend({}, defaults.labels, DEFAULT_I18n, options ? options.labels : {});
-  const initialPath = $.trim(self.options.initialPath);
-  const scheme = initialPath && initialPath.substring(0, initialPath.indexOf(':'));
+  const targetPath = $.trim(self.previousPath)
+    ? $.trim(self.previousPath)
+    : $.trim(self.options.initialPath);
+  const scheme = targetPath && targetPath.substring(0, targetPath.indexOf(':'));
   if (scheme && scheme.length) {
     self.options.fsSelected = scheme;
   }
@@ -177,8 +179,8 @@ Plugin.prototype.setOptions = function (options) {
     .addClass('active');
 
   if (self.options.forceRefresh) {
-    if (initialPath != '') {
-      self.navigateTo(self.options.initialPath);
+    if (targetPath != '') {
+      self.navigateTo(targetPath);
     } else if (
       hueLocalStorage(STORAGE_PREFIX + self.options.user + self.options.fsSelected) != null
     ) {
@@ -188,8 +190,8 @@ Plugin.prototype.setOptions = function (options) {
     } else {
       self.navigateTo('/?default_to_home');
     }
-  } else if (initialPath != '') {
-    self.navigateTo(self.options.initialPath);
+  } else if (targetPath != '') {
+    self.navigateTo(targetPath);
   } else if (
     hueLocalStorage(STORAGE_PREFIX + self.options.user + self.options.fsSelected) != null
   ) {
