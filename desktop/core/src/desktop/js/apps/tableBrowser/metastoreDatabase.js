@@ -14,6 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import sqlAnalyzerRepository from 'catalog/analyzer/sqlAnalyzerRepository';
 import $ from 'jquery';
 import * as ko from 'knockout';
 
@@ -148,8 +149,11 @@ class MetastoreDatabase {
         }
         if (sqlAnalyzerEnabled) {
           this.loadingTablePopularity(true);
+          const sqlAnalyzer = sqlAnalyzerRepository.getSqlAnalyzer(
+            this.catalogEntry.getConnector()
+          );
           this.catalogEntry
-            .loadSqlAnalyzerPopularityForChildren()
+            .loadSqlAnalyzerPopularityForChildren({ sqlAnalyzer })
             .then(() => {
               this.tables().forEach(table => {
                 table.sqlAnalyzerStats(table.catalogEntry.sqlAnalyzerPopularity);

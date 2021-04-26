@@ -14,6 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import sqlAnalyzerRepository from 'catalog/analyzer/sqlAnalyzerRepository';
 import $ from 'jquery';
 import * as ko from 'knockout';
 
@@ -157,8 +158,12 @@ class MetastoreTable {
             )
           );
 
+          const sqlAnalyzer = sqlAnalyzerRepository.getSqlAnalyzer(
+            this.catalogEntry.getConnector()
+          );
+
           this.catalogEntry
-            .getSqlAnalyzerMeta()
+            .getSqlAnalyzerMeta({ sqlAnalyzer })
             .then(sqlAnalyzerMeta => {
               this.sqlAnalyzerDetails(sqlAnalyzerMeta);
 
@@ -201,8 +206,9 @@ class MetastoreTable {
         this.loadingViewSql(true);
       }
 
+      const sqlAnalyzer = sqlAnalyzerRepository.getSqlAnalyzer(this.catalogEntry.getConnector());
       this.catalogEntry
-        .getTopJoins({ silenceErrors: true })
+        .getTopJoins({ silenceErrors: true, sqlAnalyzer })
         .then(topJoins => {
           if (topJoins && topJoins.values) {
             const joins = [];

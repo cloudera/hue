@@ -37,10 +37,9 @@ import MultiTableEntry, {
   TopFilters,
   TopJoins
 } from 'catalog/MultiTableEntry';
-import { sqlAnalyzerRepository } from 'catalog/analyzer/sqlAnalyzerRepository';
 import { Compute, Connector, Namespace } from 'config/types';
 import { hueWindow } from 'types/types';
-import { SqlAnalyzerMode } from './analyzer/types';
+import { SqlAnalyzer, SqlAnalyzerMode } from './analyzer/types';
 
 export interface TimestampedData {
   hueTimestamp?: number;
@@ -380,11 +379,12 @@ export class DataCatalog {
    * Loads SQL Analyzer popularity for multiple tables in one go.
    */
   loadSqlAnalyzerPopularityForTables(options: {
-    namespace: Namespace;
+    cancellable?: boolean;
     compute: Compute;
+    namespace: Namespace;
     paths: string[][];
     silenceErrors?: boolean;
-    cancellable?: boolean;
+    sqlAnalyzer: SqlAnalyzer;
   }): CancellablePromise<DataCatalogEntry[]> {
     const cancellablePromises: Cancellable[] = [];
     const popularEntries: DataCatalogEntry[] = [];
@@ -438,9 +438,7 @@ export class DataCatalog {
           return;
         }
 
-        const sqlAnalyzer = sqlAnalyzerRepository.getSqlAnalyzer(this.connector);
-
-        const fetchPromise = sqlAnalyzer.fetchPopularity({
+        const fetchPromise = options.sqlAnalyzer.fetchPopularity({
           silenceErrors: true,
           paths: pathsToLoad
         });
