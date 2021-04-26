@@ -14,6 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import sqlAnalyzerRepository from 'catalog/analyzer/sqlAnalyzerRepository';
 import $ from 'jquery';
 import * as ko from 'knockout';
 
@@ -118,34 +119,37 @@ class AssistDbNamespace {
       }
 
       if (window.HAS_SQL_ANALYZER && db && !db.popularityIndexSet && !self.nonSqlType) {
-        db.catalogEntry.loadSqlAnalyzerPopularityForChildren({ silenceErrors: true }).then(() => {
-          const applyPopularity = () => {
-            db.entries().forEach(entry => {
-              if (
-                entry.catalogEntry.sqlAnalyzerPopularity &&
-                entry.catalogEntry.sqlAnalyzerPopularity.popularity >= 5
-              ) {
-                entry.popularity(entry.catalogEntry.sqlAnalyzerPopularity.popularity);
-              }
-            });
-          };
+        const sqlAnalyzer = sqlAnalyzerRepository.getSqlAnalyzer(db.catalogEntry.getConnector());
+        db.catalogEntry
+          .loadSqlAnalyzerPopularityForChildren({ silenceErrors: true, sqlAnalyzer })
+          .then(() => {
+            const applyPopularity = () => {
+              db.entries().forEach(entry => {
+                if (
+                  entry.catalogEntry.sqlAnalyzerPopularity &&
+                  entry.catalogEntry.sqlAnalyzerPopularity.popularity >= 5
+                ) {
+                  entry.popularity(entry.catalogEntry.sqlAnalyzerPopularity.popularity);
+                }
+              });
+            };
 
-          if (db.loading()) {
-            const subscription = db.loading.subscribe(() => {
-              subscription.dispose();
-              applyPopularity();
-            });
-          } else if (db.entries().length === 0) {
-            const subscription = db.entries.subscribe(newEntries => {
-              if (newEntries.length > 0) {
+            if (db.loading()) {
+              const subscription = db.loading.subscribe(() => {
                 subscription.dispose();
                 applyPopularity();
-              }
-            });
-          } else {
-            applyPopularity();
-          }
-        });
+              });
+            } else if (db.entries().length === 0) {
+              const subscription = db.entries.subscribe(newEntries => {
+                if (newEntries.length > 0) {
+                  subscription.dispose();
+                  applyPopularity();
+                }
+              });
+            } else {
+              applyPopularity();
+            }
+          });
       }
     });
 

@@ -14,6 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import sqlAnalyzerRepository from 'catalog/analyzer/sqlAnalyzerRepository';
 import $ from 'jquery';
 import * as ko from 'knockout';
 
@@ -403,25 +404,28 @@ class AssistDbEntry {
       (self.catalogEntry.isTable() || self.catalogEntry.isDatabase()) &&
       !self.assistDbNamespace.nonSqlType
     ) {
-      self.catalogEntry.loadSqlAnalyzerPopularityForChildren({ silenceErrors: true }).then(() => {
-        loadEntriesDeferred.done(() => {
-          if (!self.hasErrors()) {
-            self.entries().forEach(entry => {
-              if (entry.catalogEntry.sqlAnalyzerPopularity) {
-                if (entry.catalogEntry.sqlAnalyzerPopularity.popularity) {
-                  entry.popularity(entry.catalogEntry.sqlAnalyzerPopularity.popularity);
-                } else if (entry.catalogEntry.sqlAnalyzerPopularity.column_count) {
-                  entry.popularity(entry.catalogEntry.sqlAnalyzerPopularity.column_count);
-                } else if (entry.catalogEntry.sqlAnalyzerPopularity.selectColumn) {
-                  entry.popularity(
-                    entry.catalogEntry.sqlAnalyzerPopularity.selectColumn.columnCount
-                  );
+      const sqlAnalyzer = sqlAnalyzerRepository.getSqlAnalyzer(self.catalogEntry.getConnector());
+      self.catalogEntry
+        .loadSqlAnalyzerPopularityForChildren({ silenceErrors: true, sqlAnalyzer })
+        .then(() => {
+          loadEntriesDeferred.done(() => {
+            if (!self.hasErrors()) {
+              self.entries().forEach(entry => {
+                if (entry.catalogEntry.sqlAnalyzerPopularity) {
+                  if (entry.catalogEntry.sqlAnalyzerPopularity.popularity) {
+                    entry.popularity(entry.catalogEntry.sqlAnalyzerPopularity.popularity);
+                  } else if (entry.catalogEntry.sqlAnalyzerPopularity.column_count) {
+                    entry.popularity(entry.catalogEntry.sqlAnalyzerPopularity.column_count);
+                  } else if (entry.catalogEntry.sqlAnalyzerPopularity.selectColumn) {
+                    entry.popularity(
+                      entry.catalogEntry.sqlAnalyzerPopularity.selectColumn.columnCount
+                    );
+                  }
                 }
-              }
-            });
-          }
+              });
+            }
+          });
         });
-      });
     }
 
     self.catalogEntry

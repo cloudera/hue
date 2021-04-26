@@ -14,6 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { SqlAnalyzerProvider } from '../../../../../catalog/analyzer/types';
 import {
   ACTIVE_STATEMENT_CHANGED_EVENT,
   GET_ACTIVE_LOCATIONS_EVENT,
@@ -30,6 +31,18 @@ import AutocompleteResults from './AutocompleteResults';
 import { SqlReferenceProvider } from 'sql/reference/types';
 import huePubSub from 'utils/huePubSub';
 
+interface SqlAutocompleterOptions {
+  editorId: string;
+  executor: Executor;
+  temporaryOnly?: boolean;
+  editor: Ace.Editor;
+  fixedPrefix?: () => string;
+  fixedPostfix?: () => string;
+  autocompleteParser: AutocompleteParser;
+  sqlReferenceProvider: SqlReferenceProvider;
+  sqlAnalyzerProvider: SqlAnalyzerProvider;
+}
+
 export default class SqlAutocompleter implements Disposable {
   editor: Ace.Editor;
   executor: Executor;
@@ -44,28 +57,30 @@ export default class SqlAutocompleter implements Disposable {
 
   onPartial?: (partial: string) => void;
 
-  constructor(options: {
-    editorId: string;
-    executor: Executor;
-    temporaryOnly?: boolean;
-    editor: Ace.Editor;
-    fixedPrefix?: () => string;
-    fixedPostfix?: () => string;
-    autocompleteParser: AutocompleteParser;
-    sqlReferenceProvider: SqlReferenceProvider;
-  }) {
-    this.editorId = options.editorId;
-    this.editor = options.editor;
-    this.executor = options.executor;
-    this.fixedPrefix = options.fixedPrefix || (() => '');
-    this.fixedPostfix = options.fixedPrefix || (() => '');
-    this.autocompleteParser = options.autocompleteParser;
+  constructor({
+    editorId,
+    executor,
+    temporaryOnly = false,
+    editor,
+    fixedPrefix,
+    fixedPostfix,
+    autocompleteParser,
+    sqlReferenceProvider,
+    sqlAnalyzerProvider
+  }: SqlAutocompleterOptions) {
+    this.editorId = editorId;
+    this.editor = editor;
+    this.executor = executor;
+    this.fixedPrefix = fixedPrefix || (() => '');
+    this.fixedPostfix = fixedPostfix || (() => '');
+    this.autocompleteParser = autocompleteParser;
 
     this.autocompleteResults = new AutocompleteResults({
-      sqlReferenceProvider: options.sqlReferenceProvider,
-      executor: options.executor,
-      editor: this.editor,
-      temporaryOnly: !!options.temporaryOnly
+      sqlReferenceProvider,
+      sqlAnalyzerProvider,
+      executor,
+      editor,
+      temporaryOnly
     });
 
     this.subTracker.subscribe(

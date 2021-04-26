@@ -83,12 +83,14 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent, PropType } from 'vue';
+  import { defineComponent, PropType, toRefs } from 'vue';
 
   import { Ace } from 'ext/ace';
   import ace from 'ext/aceHelper';
   import { AutocompleteParser } from 'parse/types';
   import { Connector } from 'config/types';
+  import NoopSqlAnalyzer from 'catalog/analyzer/NoopSqlAnalyzer';
+  import { SqlAnalyzerProvider } from 'catalog/analyzer/types';
 
   import { Category, CategoryId, CategoryInfo, extractCategories } from './Category';
   import Executor from 'apps/editor/execution/executor';
@@ -137,6 +139,10 @@
         type: Object as PropType<SqlReferenceProvider>,
         required: true
       },
+      sqlAnalyzerProvider: {
+        type: Object as PropType<SqlAnalyzerProvider | undefined>,
+        default: undefined
+      },
       editor: {
         type: Object as PropType<Ace.Editor>,
         required: true
@@ -156,9 +162,28 @@
       }
     },
     setup(props) {
+      const {
+        autocompleteParser,
+        editor,
+        editorId,
+        executor,
+        sqlAnalyzerProvider,
+        sqlReferenceProvider,
+        temporaryOnly
+      } = toRefs(props);
       const subTracker = new SubscriptionTracker();
 
-      const autocompleter = new SqlAutocompleter(props);
+      const autocompleter = new SqlAutocompleter({
+        autocompleteParser: autocompleteParser.value,
+        editor: editor.value,
+        editorId: editorId.value,
+        executor: executor.value,
+        sqlAnalyzerProvider: sqlAnalyzerProvider.value || {
+          getSqlAnalyzer: () => new NoopSqlAnalyzer()
+        },
+        sqlReferenceProvider: sqlReferenceProvider.value,
+        temporaryOnly: temporaryOnly.value
+      });
 
       const autocompleteResults = autocompleter.autocompleteResults;
 

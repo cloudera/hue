@@ -51,7 +51,7 @@ import {
 } from 'ko/bindings/ace/aceLocationHandler';
 import { findEditorConnector, getLastKnownConfig } from 'config/hueConfig';
 import { cancelActiveRequest } from 'api/apiUtils';
-import { sqlAnalyzerRepository } from 'catalog/analyzer/sqlAnalyzerRepository';
+import sqlAnalyzerRepository from 'catalog/analyzer/sqlAnalyzerRepository';
 import {
   ASSIST_GET_DATABASE_EVENT,
   ASSIST_GET_SOURCE_EVENT,
