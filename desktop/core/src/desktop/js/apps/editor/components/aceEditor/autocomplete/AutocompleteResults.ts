@@ -17,6 +17,7 @@
 import { Category, CategoryInfo } from './Category';
 import { CancellablePromise } from 'api/cancellablePromise';
 import Executor from 'apps/editor/execution/executor';
+import { SqlAnalyzer, SqlAnalyzerProvider } from 'catalog/analyzer/types';
 import DataCatalogEntry, {
   FieldSample,
   FieldSourceMeta,
@@ -148,6 +149,7 @@ class AutocompleteResults {
   temporaryOnly: boolean;
   activeDatabase: string;
   sqlReferenceProvider: SqlReferenceProvider;
+  sqlAnalyzer?: SqlAnalyzer;
 
   parseResult!: AutocompleteParseResult;
   subTracker = new SubscriptionTracker();
@@ -157,11 +159,13 @@ class AutocompleteResults {
 
   constructor(options: {
     sqlReferenceProvider: SqlReferenceProvider;
+    sqlAnalyzerProvider?: SqlAnalyzerProvider;
     executor: Executor;
     editor: Ace.Editor;
     temporaryOnly: boolean;
   }) {
     this.sqlReferenceProvider = options.sqlReferenceProvider;
+    this.sqlAnalyzer = options.sqlAnalyzerProvider?.getSqlAnalyzer(options.executor.connector());
     this.executor = options.executor;
     this.editor = options.editor;
     this.temporaryOnly = options.temporaryOnly;
@@ -1251,7 +1255,7 @@ class AutocompleteResults {
 
   async handleJoins(): Promise<Suggestion[]> {
     const suggestJoins = this.parseResult.suggestJoins;
-    if (!(<hueWindow>window).HAS_SQL_ANALYZER || !suggestJoins) {
+    if (!(<hueWindow>window).HAS_SQL_ANALYZER || !suggestJoins || !this.sqlAnalyzer) {
       return [];
     }
 
@@ -1278,8 +1282,9 @@ class AutocompleteResults {
       const topJoins = await new Promise<TopJoins>((resolve, reject) => {
         this.onCancelFunctions.push(reject);
         const topJoinsPromise = multiTableEntry.getTopJoins({
+          cancellable: true,
           silenceErrors: true,
-          cancellable: true
+          sqlAnalyzer: this.sqlAnalyzer!
         });
         this.cancellablePromises.push(topJoinsPromise);
         topJoinsPromise.then(resolve).catch(reject);
@@ -1371,7 +1376,7 @@ class AutocompleteResults {
 
   async handleJoinConditions(): Promise<Suggestion[]> {
     const suggestJoinConditions = this.parseResult.suggestJoinConditions;
-    if (!(<hueWindow>window).HAS_SQL_ANALYZER || !suggestJoinConditions) {
+    if (!(<hueWindow>window).HAS_SQL_ANALYZER || !suggestJoinConditions || !this.sqlAnalyzer) {
       return [];
     }
 
@@ -1399,8 +1404,9 @@ class AutocompleteResults {
       const topJoins = await new Promise<TopJoins>((resolve, reject) => {
         this.onCancelFunctions.push(reject);
         const topJoinsPromise = multiTableEntry.getTopJoins({
+          cancellable: true,
           silenceErrors: true,
-          cancellable: true
+          sqlAnalyzer: this.sqlAnalyzer!
         });
         this.cancellablePromises.push(topJoinsPromise);
         topJoinsPromise.then(resolve).catch(reject);
@@ -1461,7 +1467,8 @@ class AutocompleteResults {
     if (
       !(<hueWindow>window).HAS_SQL_ANALYZER ||
       !suggestAggregateFunctions ||
-      !suggestAggregateFunctions.tables.length
+      !suggestAggregateFunctions.tables.length ||
+      !this.sqlAnalyzer
     ) {
       return [];
     }
@@ -1490,8 +1497,9 @@ class AutocompleteResults {
       const topAggs = await new Promise<TopAggs>((resolve, reject) => {
         this.onCancelFunctions.push(reject);
         const topAggsDeferred = multiTableEntry.getTopAggs({
+          cancellable: true,
           silenceErrors: true,
-          cancellable: true
+          sqlAnalyzer: this.sqlAnalyzer!
         });
         this.cancellablePromises.push(topAggsDeferred);
         topAggsDeferred.then(resolve).catch(reject);
@@ -1590,6 +1598,9 @@ class AutocompleteResults {
     suggestSpec: CommonPopularSuggestion,
     columnsPromise: Promise<Suggestion[]>
   ): Promise<Suggestion[]> {
+    if (!this.sqlAnalyzer) {
+      return [];
+    }
     const paths: string[][] = [];
     suggestSpec.tables.forEach(table => {
       if (table.identifierChain) {
@@ -1613,7 +1624,8 @@ class AutocompleteResults {
           .loadSqlAnalyzerPopularityForTables({
             namespace: this.executor.namespace(),
             compute: this.executor.compute(),
-            paths: paths,
+            paths,
+            sqlAnalyzer: this.sqlAnalyzer!,
             silenceErrors: true,
             cancellable: true
           });
@@ -1713,7 +1725,7 @@ class AutocompleteResults {
 
   async handleFilters(): Promise<Suggestion[]> {
     const suggestFilters = this.parseResult.suggestFilters;
-    if (!(<hueWindow>window).HAS_SQL_ANALYZER || !suggestFilters) {
+    if (!(<hueWindow>window).HAS_SQL_ANALYZER || !suggestFilters || !this.sqlAnalyzer) {
       return [];
     }
 
@@ -1741,8 +1753,9 @@ class AutocompleteResults {
       const topFilters = await new Promise<TopFilters>((resolve, reject) => {
         this.onCancelFunctions.push(reject);
         const topFiltersPromise = multiTableEntry.getTopFilters({
+          cancellable: true,
           silenceErrors: true,
-          cancellable: true
+          sqlAnalyzer: this.sqlAnalyzer!
         });
         this.cancellablePromises.push(topFiltersPromise);
         topFiltersPromise.then(resolve).catch(reject);
@@ -1800,7 +1813,7 @@ class AutocompleteResults {
 
   async handlePopularTables(tablesPromise: Promise<Suggestion[]>): Promise<Suggestion[]> {
     const suggestTables = this.parseResult.suggestTables;
-    if (!(<hueWindow>window).HAS_SQL_ANALYZER || !suggestTables) {
+    if (!(<hueWindow>window).HAS_SQL_ANALYZER || !suggestTables || !this.sqlAnalyzer) {
       return [];
     }
 
@@ -1829,8 +1842,9 @@ class AutocompleteResults {
       const childEntries = await new Promise<DataCatalogEntry[]>((resolve, reject) => {
         this.onCancelFunctions.push(reject);
         const popularityPromise = entry.loadSqlAnalyzerPopularityForChildren({
+          cancellable: true,
           silenceErrors: true,
-          cancellable: true
+          sqlAnalyzer: this.sqlAnalyzer!
         });
         this.cancellablePromises.push(popularityPromise);
         popularityPromise.then(resolve).catch(reject);
@@ -1869,7 +1883,12 @@ class AutocompleteResults {
   async handlePopularColumns(columnsPromise: Promise<Suggestion[]>): Promise<Suggestion[]> {
     const suggestColumns = this.parseResult.suggestColumns;
 
-    if (!(<hueWindow>window).HAS_SQL_ANALYZER || !suggestColumns || !suggestColumns.source) {
+    if (
+      !(<hueWindow>window).HAS_SQL_ANALYZER ||
+      !suggestColumns ||
+      !suggestColumns.source ||
+      !this.sqlAnalyzer
+    ) {
       return [];
     }
 
@@ -1905,7 +1924,8 @@ class AutocompleteResults {
           .loadSqlAnalyzerPopularityForTables({
             namespace: this.executor.namespace(),
             compute: this.executor.compute(),
-            paths: paths,
+            paths,
+            sqlAnalyzer: this.sqlAnalyzer!,
             silenceErrors: true,
             cancellable: true
           });

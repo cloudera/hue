@@ -17,11 +17,10 @@
 import { noop } from 'lodash';
 
 import DataCatalogEntry from 'catalog/DataCatalogEntry';
-import { PopularityOptions } from './analyzer/types';
+import { PopularityOptions, SqlAnalyzer } from './analyzer/types';
 import { CatalogGetOptions, DataCatalog, TimestampedData } from './dataCatalog';
 import { CancellablePromise } from 'api/cancellablePromise';
 import { applyCancellable } from 'catalog/catalogUtils';
-import { sqlAnalyzerRepository } from 'catalog/analyzer/sqlAnalyzerRepository';
 import { UdfDetails } from 'sql/reference/types';
 import { Connector } from 'config/types';
 import { hueWindow } from 'types/types';
@@ -226,8 +225,9 @@ class MultiTableEntry {
   /**
    * Gets the top aggregate UDFs for the entry. It will fetch it if not cached or if the refresh option is set.
    */
-  getTopAggs(options?: CatalogGetOptions): CancellablePromise<TopAggs> {
-    const sqlAnalyzer = sqlAnalyzerRepository.getSqlAnalyzer(this.dataCatalog.connector);
+  getTopAggs(
+    options: CatalogGetOptions & { sqlAnalyzer: SqlAnalyzer }
+  ): CancellablePromise<TopAggs> {
     return genericSqlAnalyzerGet<TopAggs>(
       this,
       options,
@@ -238,15 +238,16 @@ class MultiTableEntry {
       val => {
         this.topAggs = val;
       },
-      sqlAnalyzer.fetchTopAggs.bind(sqlAnalyzer)
+      options.sqlAnalyzer.fetchTopAggs.bind(options.sqlAnalyzer)
     );
   }
 
   /**
    * Gets the top columns for the entry. It will fetch it if not cached or if the refresh option is set.
    */
-  getTopColumns(options?: CatalogGetOptions): CancellablePromise<TopColumns> {
-    const sqlAnalyzer = sqlAnalyzerRepository.getSqlAnalyzer(this.dataCatalog.connector);
+  getTopColumns(
+    options: CatalogGetOptions & { sqlAnalyzer: SqlAnalyzer }
+  ): CancellablePromise<TopColumns> {
     return genericSqlAnalyzerGet<TopColumns>(
       this,
       options,
@@ -257,15 +258,16 @@ class MultiTableEntry {
       val => {
         this.topColumns = val;
       },
-      sqlAnalyzer.fetchTopColumns.bind(sqlAnalyzer)
+      options.sqlAnalyzer.fetchTopColumns.bind(options.sqlAnalyzer)
     );
   }
 
   /**
    * Gets the top filters for the entry. It will fetch it if not cached or if the refresh option is set.
    */
-  getTopFilters(options?: CatalogGetOptions): CancellablePromise<TopFilters> {
-    const sqlAnalyzer = sqlAnalyzerRepository.getSqlAnalyzer(this.dataCatalog.connector);
+  getTopFilters(
+    options: CatalogGetOptions & { sqlAnalyzer: SqlAnalyzer }
+  ): CancellablePromise<TopFilters> {
     return genericSqlAnalyzerGet<TopFilters>(
       this,
       options,
@@ -276,15 +278,16 @@ class MultiTableEntry {
       val => {
         this.topFilters = val;
       },
-      sqlAnalyzer.fetchTopFilters.bind(sqlAnalyzer)
+      options.sqlAnalyzer.fetchTopFilters.bind(options.sqlAnalyzer)
     );
   }
 
   /**
    * Gets the top joins for the entry. It will fetch it if not cached or if the refresh option is set.
    */
-  getTopJoins(options?: CatalogGetOptions): CancellablePromise<TopJoins> {
-    const sqlAnalyzer = sqlAnalyzerRepository.getSqlAnalyzer(this.dataCatalog.connector);
+  getTopJoins(
+    options: CatalogGetOptions & { sqlAnalyzer: SqlAnalyzer }
+  ): CancellablePromise<TopJoins> {
     return genericSqlAnalyzerGet<TopJoins>(
       this,
       options,
@@ -295,7 +298,7 @@ class MultiTableEntry {
       val => {
         this.topJoins = val;
       },
-      sqlAnalyzer.fetchTopJoins.bind(sqlAnalyzer)
+      options.sqlAnalyzer.fetchTopJoins.bind(options.sqlAnalyzer)
     );
   }
 }
