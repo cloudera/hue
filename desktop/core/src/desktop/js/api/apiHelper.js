@@ -107,7 +107,7 @@ class ApiHelper {
    * @param {string} [options.hash] - Optional hash to use as well as the url
    * @param {Function} options.fetchFunction
    * @param {Function} options.successCallback
-   * @param {string} [options.cacheType] - Possible values 'default'|'optimizer'. Default value 'default'
+   * @param {string} [options.cacheType] - Possible values 'default'|'sqlAnalyzer'. Default value 'default'
    * @param {Object} [options.editor] - Ace editor
    * @param {Object} [options.promise] - Optional promise that will be resolved if cached data exists
    */
@@ -1164,7 +1164,7 @@ class ApiHelper {
    * @param {string} options.sourceType
    * @param {string} [options.databaseName]
    * @param {string} [options.tableName]
-   * @param {string} [options.cacheType] - Possible values 'default', 'optimizer. Default value 'default'
+   * @param {string} [options.cacheType] - Possible values 'default', 'sqlAnalyzer'. Default value 'default'
    * @param {string[]} [options.fields]
    * @param {boolean} [options.clearAll]
    */

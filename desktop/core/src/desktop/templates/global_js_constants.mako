@@ -56,7 +56,7 @@
 
   window.CACHEABLE_TTL = {
     default: ${ conf.CUSTOM.CACHEABLE_TTL.get() },
-    optimizer: ${ OPTIMIZER.CACHEABLE_TTL.get() or 0 }
+    sqlAnalyzer: ${ OPTIMIZER.CACHEABLE_TTL.get() or 0 }
   };
 
   window.DEV = '${ conf.DEV.get() }' === 'True';
@@ -115,10 +115,9 @@
   window.CATALOG_URL = '${ get_catalog_url() or "" }'
   window.HAS_READ_ONLY_CATALOG = '${ has_readonly_catalog(request.user) }' === 'True' || '${ has_write_access(request.user) }' === 'False';
 
-  window.HAS_OPTIMIZER = '${ has_optimizer() }' === 'True';
-  window.OPTIMIZER_MODE = '${ get_optimizer_mode() }';
-  window.OPTIMIZER_URL = '${ get_optimizer_url() }'
-  window.AUTO_UPLOAD_OPTIMIZER_STATS = '${ OPTIMIZER.AUTO_UPLOAD_STATS.get() }' === 'True';
+  window.HAS_SQL_ANALYZER = '${ has_optimizer() }' === 'True';
+  window.SQL_ANALYZER_MODE = '${ get_optimizer_mode() }';
+  window.AUTO_UPLOAD_SQL_ANALYZER_STATS = '${ OPTIMIZER.AUTO_UPLOAD_STATS.get() }' === 'True';
 
   window.HAS_GIST = '${ ENABLE_GIST.get() }' === 'True';
   window.SHARE_TO_SLACK = '${ conf.SLACK.SHARE_FROM_EDITOR.get() }' === 'True';
@@ -602,7 +601,7 @@
     'Updated: ': '${ _('Updated: ') }',
     'Upload a file': '${_('Upload a file')}',
     'Upload file': '${_('Upload file')}',
-    'Upload optimizer history': '${ _('Upload optimizer history') }',
+    'Upload SQL Analyzer history': '${ _('Upload SQL Analyzer history') }',
     'uploaded successfully': '${ _('uploaded successfully') }',
     'USA': '${ _('USA') }',
     'used by': '${ _('used by') }',

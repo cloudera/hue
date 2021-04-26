@@ -1478,7 +1478,7 @@ class AutocompleteResults {
 
   async handleJoins() {
     const suggestJoins = this.parseResult.suggestJoins;
-    if (!window.HAS_OPTIMIZER || !suggestJoins) {
+    if (!window.HAS_SQL_ANALYZER || !suggestJoins) {
       return [];
     }
     this.loadingJoins(true);
@@ -1537,7 +1537,7 @@ class AutocompleteResults {
             const tableParts = table.split('.');
             if (!existingTables[tableParts[tableParts.length - 1]]) {
               tablesAdded = true;
-              const identifier = this.convertOptimizerQualifiedIdentifier(
+              const identifier = this.convertSqlAnalyzerQualifiedIdentifier(
                 table,
                 suggestJoins.tables
               );
@@ -1561,13 +1561,13 @@ class AutocompleteResults {
                 suggestionString += this.parseResult.lowerCase ? ' and ' : ' AND ';
               }
               suggestionString +=
-                this.convertOptimizerQualifiedIdentifier(
+                this.convertSqlAnalyzerQualifiedIdentifier(
                   joinColPair.columns[0],
                   suggestJoins.tables,
                   this.dialect()
                 ) +
                 ' = ' +
-                this.convertOptimizerQualifiedIdentifier(
+                this.convertSqlAnalyzerQualifiedIdentifier(
                   joinColPair.columns[1],
                   suggestJoins.tables,
                   this.dialect()
@@ -1602,7 +1602,7 @@ class AutocompleteResults {
 
   async handleJoinConditions() {
     const suggestJoinConditions = this.parseResult.suggestJoinConditions;
-    if (!window.HAS_OPTIMIZER || !suggestJoinConditions) {
+    if (!window.HAS_SQL_ANALYZER || !suggestJoinConditions) {
       return [];
     }
     this.loadingJoinConditions(true);
@@ -1654,12 +1654,12 @@ class AutocompleteResults {
                 suggestionString += this.parseResult.lowerCase ? ' and ' : ' AND ';
               }
               suggestionString +=
-                this.convertOptimizerQualifiedIdentifier(
+                this.convertSqlAnalyzerQualifiedIdentifier(
                   joinColPair.columns[0],
                   suggestJoinConditions.tables
                 ) +
                 ' = ' +
-                this.convertOptimizerQualifiedIdentifier(
+                this.convertSqlAnalyzerQualifiedIdentifier(
                   joinColPair.columns[1],
                   suggestJoinConditions.tables
                 );
@@ -1692,7 +1692,7 @@ class AutocompleteResults {
   async handleAggregateFunctions() {
     const suggestAggregateFunctions = this.parseResult.suggestAggregateFunctions;
     if (
-      !window.HAS_OPTIMIZER ||
+      !window.HAS_SQL_ANALYZER ||
       !suggestAggregateFunctions ||
       !suggestAggregateFunctions.tables.length
     ) {
@@ -1821,7 +1821,7 @@ class AutocompleteResults {
     return aggregateFunctionsSuggestions;
   }
 
-  async handlePopularGroupByOrOrderBy(optimizerAttribute, suggestSpec, columnsPromise) {
+  async handlePopularGroupByOrOrderBy(sqlAnalyzerAttribute, suggestSpec, columnsPromise) {
     const paths = [];
     suggestSpec.tables.forEach(table => {
       if (table.identifierChain) {
@@ -1842,7 +1842,7 @@ class AutocompleteResults {
         this.onCancelFunctions.push(reject);
         const popularityPromise = dataCatalog
           .getCatalog(this.snippet.connector())
-          .loadOptimizerPopularityForTables({
+          .loadSqlAnalyzerPopularityForTables({
             namespace: this.snippet.namespace(),
             compute: this.snippet.compute(),
             paths: paths,
@@ -1860,8 +1860,8 @@ class AutocompleteResults {
         : '';
 
       entries.forEach(entry => {
-        if (entry.optimizerPopularity[optimizerAttribute]) {
-          totalColumnCount += entry.optimizerPopularity[optimizerAttribute].columnCount;
+        if (entry.sqlAnalyzerPopularity[sqlAnalyzerAttribute]) {
+          totalColumnCount += entry.sqlAnalyzerPopularity[sqlAnalyzerAttribute].columnCount;
           matchedEntries.push(entry);
         }
       });
@@ -1869,20 +1869,21 @@ class AutocompleteResults {
       if (totalColumnCount > 0) {
         const suggestions = [];
         matchedEntries.forEach(entry => {
-          const filterValue = this.createOptimizerIdentifierForColumn(
-            entry.optimizerPopularity[optimizerAttribute],
+          const filterValue = this.createSqlAnalyzerIdentifierForColumn(
+            entry.sqlAnalyzerPopularity[sqlAnalyzerAttribute],
             suggestSpec.tables
           );
           suggestions.push({
             value: prefix + filterValue,
             filterValue: filterValue,
-            meta: optimizerAttribute === 'groupByColumn' ? META_I18n.groupBy : META_I18n.orderBy,
+            meta: sqlAnalyzerAttribute === 'groupByColumn' ? META_I18n.groupBy : META_I18n.orderBy,
             category:
-              optimizerAttribute === 'groupByColumn'
+              sqlAnalyzerAttribute === 'groupByColumn'
                 ? CATEGORIES.POPULAR_GROUP_BY
                 : CATEGORIES.POPULAR_ORDER_BY,
             weightAdjust: Math.round(
-              (100 * entry.optimizerPopularity[optimizerAttribute].columnCount) / totalColumnCount
+              (100 * entry.sqlAnalyzerPopularity[sqlAnalyzerAttribute].columnCount) /
+                totalColumnCount
             ),
             popular: ko.observable(true),
             hasCatalogEntry: false,
@@ -1911,7 +1912,7 @@ class AutocompleteResults {
 
   async handleGroupBys(columnsPromise) {
     const suggestGroupBys = this.parseResult.suggestGroupBys;
-    if (!window.HAS_OPTIMIZER || !suggestGroupBys) {
+    if (!window.HAS_SQL_ANALYZER || !suggestGroupBys) {
       return [];
     }
     this.loadingGroupBys(true);
@@ -1926,7 +1927,7 @@ class AutocompleteResults {
 
   async handleOrderBys(columnsDeferred) {
     const suggestOrderBys = this.parseResult.suggestOrderBys;
-    if (!window.HAS_OPTIMIZER || !suggestOrderBys) {
+    if (!window.HAS_SQL_ANALYZER || !suggestOrderBys) {
       return [];
     }
     this.loadingOrderBys(true);
@@ -1941,7 +1942,7 @@ class AutocompleteResults {
 
   async handleFilters() {
     const suggestFilters = this.parseResult.suggestFilters;
-    if (!window.HAS_OPTIMIZER || !suggestFilters) {
+    if (!window.HAS_SQL_ANALYZER || !suggestFilters) {
       return [];
     }
     this.loadingFilters(true);
@@ -1990,7 +1991,7 @@ class AutocompleteResults {
                         ? suggestFilters.prefix.toLowerCase()
                         : suggestFilters.prefix) + ' '
                     : '';
-                  compVal += this.createOptimizerIdentifier(
+                  compVal += this.createSqlAnalyzerIdentifier(
                     value.tableName,
                     grp.columnName,
                     suggestFilters.tables
@@ -2032,7 +2033,7 @@ class AutocompleteResults {
 
   async handlePopularTables(tablesPromise) {
     const suggestTables = this.parseResult.suggestTables;
-    if (!window.HAS_OPTIMIZER || !suggestTables) {
+    if (!window.HAS_SQL_ANALYZER || !suggestTables) {
       return [];
     }
 
@@ -2062,7 +2063,7 @@ class AutocompleteResults {
 
       const childEntries = await new Promise((resolve, reject) => {
         this.onCancelFunctions.push(reject);
-        const popularityPromise = entry.loadOptimizerPopularityForChildren({
+        const popularityPromise = entry.loadSqlAnalyzerPopularityForChildren({
           silenceErrors: true,
           cancellable: true
         });
@@ -2074,9 +2075,9 @@ class AutocompleteResults {
       const popularityIndex = {};
 
       childEntries.forEach(childEntry => {
-        if (childEntry.optimizerPopularity && childEntry.optimizerPopularity.popularity) {
+        if (childEntry.sqlAnalyzerPopularity && childEntry.sqlAnalyzerPopularity.popularity) {
           popularityIndex[childEntry.name] = true;
-          totalPopularity += childEntry.optimizerPopularity.popularity;
+          totalPopularity += childEntry.sqlAnalyzerPopularity.popularity;
         }
       });
 
@@ -2085,7 +2086,7 @@ class AutocompleteResults {
         tableSuggestions.forEach(suggestion => {
           if (popularityIndex[suggestion.details.name]) {
             suggestion.relativePopularity = Math.round(
-              (100 * suggestion.details.optimizerPopularity.popularity) / totalPopularity
+              (100 * suggestion.details.sqlAnalyzerPopularity.popularity) / totalPopularity
             );
             if (suggestion.relativePopularity >= 5) {
               suggestion.popular(true);
@@ -2103,7 +2104,7 @@ class AutocompleteResults {
   async handlePopularColumns(columnsPromise) {
     const suggestColumns = this.parseResult.suggestColumns;
 
-    if (!window.HAS_OPTIMIZER || !suggestColumns || !suggestColumns.source) {
+    if (!window.HAS_SQL_ANALYZER || !suggestColumns || !suggestColumns.source) {
       return [];
     }
 
@@ -2139,7 +2140,7 @@ class AutocompleteResults {
         this.onCancelFunctions.push(reject);
         const popularityPromise = dataCatalog
           .getCatalog(this.snippet.connector())
-          .loadOptimizerPopularityForTables({
+          .loadSqlAnalyzerPopularityForTables({
             namespace: this.snippet.namespace(),
             compute: this.snippet.compute(),
             paths: paths,
@@ -2165,7 +2166,10 @@ class AutocompleteResults {
       const popularityIndex = {};
 
       popularEntries.forEach(popularEntry => {
-        if (popularEntry.optimizerPopularity && popularEntry.optimizerPopularity[valueAttribute]) {
+        if (
+          popularEntry.sqlAnalyzerPopularity &&
+          popularEntry.sqlAnalyzerPopularity[valueAttribute]
+        ) {
           popularityIndex[popularEntry.getQualifiedPath()] = true;
         }
       });
@@ -2179,13 +2183,13 @@ class AutocompleteResults {
       columnSuggestions.forEach(suggestion => {
         if (suggestion.hasCatalogEntry && popularityIndex[suggestion.details.getQualifiedPath()]) {
           matchedSuggestions.push(suggestion);
-          totalColumnCount += suggestion.details.optimizerPopularity[valueAttribute].columnCount;
+          totalColumnCount += suggestion.details.sqlAnalyzerPopularity[valueAttribute].columnCount;
         }
       });
       if (totalColumnCount > 0) {
         matchedSuggestions.forEach(matchedSuggestion => {
           matchedSuggestion.relativePopularity = Math.round(
-            (100 * matchedSuggestion.details.optimizerPopularity[valueAttribute].columnCount) /
+            (100 * matchedSuggestion.details.sqlAnalyzerPopularity[valueAttribute].columnCount) /
               totalColumnCount
           );
           if (matchedSuggestion.relativePopularity >= 5) {
@@ -2200,8 +2204,8 @@ class AutocompleteResults {
     return [];
   }
 
-  createOptimizerIdentifier(optimizerTableName, optimizerColumnName, tables) {
-    let path = optimizerTableName + '.' + optimizerColumnName.split('.').pop();
+  createSqlAnalyzerIdentifier(sqlAnalyzerTableName, sqlAnalyzerColumnName, tables) {
+    let path = sqlAnalyzerTableName + '.' + sqlAnalyzerColumnName.split('.').pop();
     for (let i = 0; i < tables.length; i++) {
       let tablePath = '';
       if (tables[i].identifierChain.length === 2) {
@@ -2224,39 +2228,43 @@ class AutocompleteResults {
     return path;
   }
 
-  createOptimizerIdentifierForColumn(optimizerColumn, tables) {
+  createSqlAnalyzerIdentifierForColumn(sqlAnalyzerColumn, tables) {
     for (let i = 0; i < tables.length; i++) {
       if (
-        optimizerColumn.dbName &&
-        (optimizerColumn.dbName !== this.activeDatabase ||
-          optimizerColumn.dbName !== tables[i].identifierChain[0].name)
+        sqlAnalyzerColumn.dbName &&
+        (sqlAnalyzerColumn.dbName !== this.activeDatabase ||
+          sqlAnalyzerColumn.dbName !== tables[i].identifierChain[0].name)
       ) {
         continue;
       }
       if (
-        optimizerColumn.tableName &&
+        sqlAnalyzerColumn.tableName &&
         hueUtils.equalIgnoreCase(
-          optimizerColumn.tableName,
+          sqlAnalyzerColumn.tableName,
           tables[i].identifierChain[tables[i].identifierChain.length - 1].name
         ) &&
         tables[i].alias
       ) {
-        return tables[i].alias + '.' + optimizerColumn.columnName;
+        return tables[i].alias + '.' + sqlAnalyzerColumn.columnName;
       }
     }
 
-    if (optimizerColumn.dbName && optimizerColumn.dbName !== this.activeDatabase) {
+    if (sqlAnalyzerColumn.dbName && sqlAnalyzerColumn.dbName !== this.activeDatabase) {
       return (
-        optimizerColumn.dbName + '.' + optimizerColumn.tableName + '.' + optimizerColumn.columnName
+        sqlAnalyzerColumn.dbName +
+        '.' +
+        sqlAnalyzerColumn.tableName +
+        '.' +
+        sqlAnalyzerColumn.columnName
       );
     }
     if (tables.length > 1) {
-      return optimizerColumn.tableName + '.' + optimizerColumn.columnName;
+      return sqlAnalyzerColumn.tableName + '.' + sqlAnalyzerColumn.columnName;
     }
-    return optimizerColumn.columnName;
+    return sqlAnalyzerColumn.columnName;
   }
 
-  convertOptimizerQualifiedIdentifier(qualifiedIdentifier, tables, type) {
+  convertSqlAnalyzerQualifiedIdentifier(qualifiedIdentifier, tables, type) {
     const aliases = [];
     let tablesHasDefaultDatabase = false;
     tables.forEach(table => {
