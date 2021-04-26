@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import NoopSqlAnalyzer from './NoopSqlAnalyzer';
-import MixedSqlAnalyzer from './MixedSqlAnalyzer';
+import CombinedSqlAnalyser from './CombinedSqlAnalyser';
 import { Connector } from 'config/types';
 import { hueWindow } from 'types/types';
 import { SqlAnalyzer, SqlAnalyzerProvider, SqlAnalyzerMode } from './types';
@@ -28,12 +28,12 @@ const createSqlAnalyzer = (connector: Connector): SqlAnalyzer => {
     (<hueWindow>window).SQL_ANALYZER_MODE === SqlAnalyzerMode.local ||
     (<hueWindow>window).SQL_ANALYZER_MODE === SqlAnalyzerMode.api
   ) {
-    return new MixedSqlAnalyzer(connector);
+    return new CombinedSqlAnalyser(connector);
   }
   return new NoopSqlAnalyzer();
 };
 
-export const sqlAnalyzerRepository: SqlAnalyzerProvider = {
+const sqlAnalyzerRepository: SqlAnalyzerProvider = {
   getSqlAnalyzer: (connector: Connector): SqlAnalyzer => {
     let sqlAnalyzer = sqlAnalyzerInstances[connector.id];
     if (!sqlAnalyzer) {
@@ -43,3 +43,5 @@ export const sqlAnalyzerRepository: SqlAnalyzerProvider = {
     return sqlAnalyzer;
   }
 };
+
+export default sqlAnalyzerRepository;
