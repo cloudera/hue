@@ -142,7 +142,7 @@ export default class EditorViewModel {
       () => this.selectedNotebook() && this.selectedNotebook().isHidingCode()
     );
     this.successUrl = ko.observable(options.success_url); // Deprecated
-    this.isOptimizerEnabled = ko.observable(options.is_optimizer_enabled);
+    this.isSqlAnalyzerEnabled = ko.observable(options.is_optimizer_enabled);
     this.isNavigatorEnabled = ko.observable(options.is_navigator_enabled);
 
     this.CoordinatorEditorViewModel = CoordinatorEditorViewModel; // TODO: Remove usage of global variables
@@ -177,7 +177,7 @@ export default class EditorViewModel {
       }
     });
 
-    this.isRightPanelAvailable = ko.observable(options.assistAvailable && HAS_OPTIMIZER);
+    this.isRightPanelAvailable = ko.observable(options.assistAvailable && window.HAS_SQL_ANALYZER);
     this.isRightPanelVisible = ko.observable(
       getFromLocalStorage('assist.right_assist_panel_visible', true)
     );

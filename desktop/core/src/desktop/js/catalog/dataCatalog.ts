@@ -24,7 +24,7 @@ import DataCatalogEntry, {
   ExtendedColumn,
   FieldSample,
   NavigatorMeta,
-  OptimizerMeta,
+  SqlAnalyzerMeta,
   Partitions,
   Sample,
   SourceMeta,
@@ -37,9 +37,10 @@ import MultiTableEntry, {
   TopFilters,
   TopJoins
 } from 'catalog/MultiTableEntry';
-import { getOptimizer, LOCAL_STRATEGY } from 'catalog/optimizer/optimizer';
+import { sqlAnalyzerRepository } from 'catalog/analyzer/sqlAnalyzerRepository';
 import { Compute, Connector, Namespace } from 'config/types';
 import { hueWindow } from 'types/types';
+import { SqlAnalyzerMode } from './analyzer/types';
 
 export interface TimestampedData {
   hueTimestamp?: number;
@@ -84,8 +85,8 @@ interface StoreEntry {
   partitions?: Partitions;
   sample?: Sample;
   navigatorMeta?: NavigatorMeta;
-  optimizerMeta?: OptimizerMeta;
-  optimizerPopularity?: OptimizerPopularity;
+  sqlAnalyzerMeta?: SqlAnalyzerMeta;
+  sqlAnalyzerPopularity?: SqlAnalyzerPopularity;
 }
 
 interface StoreMultiTableEntry {
@@ -96,7 +97,7 @@ interface StoreMultiTableEntry {
   topFilters?: TopFilters;
 }
 
-export interface OptimizerResponsePopularity {
+export interface SqlAnalyzerResponsePopularity {
   name?: string;
   columnCount: number;
   dbName?: string;
@@ -104,31 +105,31 @@ export interface OptimizerResponsePopularity {
   columnName?: string;
 }
 
-export interface OptimizerResponseValues {
-  filterColumns?: OptimizerResponsePopularity[];
-  groupbyColumns?: OptimizerResponsePopularity[];
-  joinColumns?: OptimizerResponsePopularity[];
-  orderbyColumns?: OptimizerResponsePopularity[];
-  selectColumns?: OptimizerResponsePopularity[];
+export interface SqlAnalyzerResponseValues {
+  filterColumns?: SqlAnalyzerResponsePopularity[];
+  groupbyColumns?: SqlAnalyzerResponsePopularity[];
+  joinColumns?: SqlAnalyzerResponsePopularity[];
+  orderbyColumns?: SqlAnalyzerResponsePopularity[];
+  selectColumns?: SqlAnalyzerResponsePopularity[];
 }
 
-export interface OptimizerResponse extends TimestampedData {
-  top_tables?: OptimizerResponsePopularity[];
-  values?: OptimizerResponseValues;
+export interface SqlAnalyzerResponse extends TimestampedData {
+  top_tables?: SqlAnalyzerResponsePopularity[];
+  values?: SqlAnalyzerResponseValues;
 }
 
-export interface OptimizerPopularitySubType {
-  filterColumn?: OptimizerResponsePopularity;
-  groupByColumn?: OptimizerResponsePopularity;
-  joinColumn?: OptimizerResponsePopularity;
-  orderByColumn?: OptimizerResponsePopularity;
-  selectColumn?: OptimizerResponsePopularity;
+export interface SqlAnalyzerPopularitySubType {
+  filterColumn?: SqlAnalyzerResponsePopularity;
+  groupByColumn?: SqlAnalyzerResponsePopularity;
+  joinColumn?: SqlAnalyzerResponsePopularity;
+  orderByColumn?: SqlAnalyzerResponsePopularity;
+  selectColumn?: SqlAnalyzerResponsePopularity;
 }
 
-export interface OptimizerPopularity
+export interface SqlAnalyzerPopularity
   extends TimestampedData,
-    OptimizerResponsePopularity,
-    OptimizerPopularitySubType {
+    SqlAnalyzerResponsePopularity,
+    SqlAnalyzerPopularitySubType {
   column_count?: number;
   popularity?: number;
   relativePopularity?: number;
@@ -208,19 +209,19 @@ const mergeEntry = (dataCatalogEntry: DataCatalogEntry, storeEntry: StoreEntry):
       dataCatalogEntry.navigatorMeta
     );
   }
-  if (dataCatalogEntry.getConnector().optimizer !== LOCAL_STRATEGY) {
+  if (dataCatalogEntry.getConnector().optimizer !== SqlAnalyzerMode.local) {
     const confTtl = (<hueWindow>window).CACHEABLE_TTL || {};
-    if (storeEntry.optimizerMeta && isFresh(storeEntry.optimizerMeta, confTtl.optimizer)) {
-      dataCatalogEntry.optimizerMeta = storeEntry.optimizerMeta;
-      dataCatalogEntry.optimizerMetaPromise = CancellablePromise.resolve(
-        dataCatalogEntry.optimizerMeta
+    if (storeEntry.sqlAnalyzerMeta && isFresh(storeEntry.sqlAnalyzerMeta, confTtl.sqlAnalyzer)) {
+      dataCatalogEntry.sqlAnalyzerMeta = storeEntry.sqlAnalyzerMeta;
+      dataCatalogEntry.sqlAnalyzerMetaPromise = CancellablePromise.resolve(
+        dataCatalogEntry.sqlAnalyzerMeta
       );
     }
     if (
-      storeEntry.optimizerPopularity &&
-      isFresh(storeEntry.optimizerPopularity, confTtl.optimizer)
+      storeEntry.sqlAnalyzerPopularity &&
+      isFresh(storeEntry.sqlAnalyzerPopularity, confTtl.sqlAnalyzer)
     ) {
-      dataCatalogEntry.optimizerPopularity = storeEntry.optimizerPopularity;
+      dataCatalogEntry.sqlAnalyzerPopularity = storeEntry.sqlAnalyzerPopularity;
     }
   }
 };
@@ -233,25 +234,25 @@ const mergeMultiTableEntry = (
   storeEntry: StoreMultiTableEntry
 ): void => {
   if (
-    multiTableEntry.getConnector().optimizer === LOCAL_STRATEGY ||
+    multiTableEntry.getConnector().optimizer === SqlAnalyzerMode.local ||
     storeEntry.version !== DATA_CATALOG_VERSION
   ) {
     return;
   }
   const confTtl = (<hueWindow>window).CACHEABLE_TTL || {};
-  if (storeEntry.topAggs && isFresh(storeEntry.topAggs, confTtl.optimizer)) {
+  if (storeEntry.topAggs && isFresh(storeEntry.topAggs, confTtl.sqlAnalyzer)) {
     multiTableEntry.topAggs = storeEntry.topAggs;
     multiTableEntry.topAggsPromise = CancellablePromise.resolve(multiTableEntry.topAggs);
   }
-  if (storeEntry.topColumns && isFresh(storeEntry.topColumns, confTtl.optimizer)) {
+  if (storeEntry.topColumns && isFresh(storeEntry.topColumns, confTtl.sqlAnalyzer)) {
     multiTableEntry.topColumns = storeEntry.topColumns;
     multiTableEntry.topColumnsPromise = CancellablePromise.resolve(multiTableEntry.topColumns);
   }
-  if (storeEntry.topFilters && isFresh(storeEntry.topFilters, confTtl.optimizer)) {
+  if (storeEntry.topFilters && isFresh(storeEntry.topFilters, confTtl.sqlAnalyzer)) {
     multiTableEntry.topFilters = storeEntry.topFilters;
     multiTableEntry.topFiltersPromise = CancellablePromise.resolve(multiTableEntry.topFilters);
   }
-  if (storeEntry.topJoins && isFresh(storeEntry.topJoins, confTtl.optimizer)) {
+  if (storeEntry.topJoins && isFresh(storeEntry.topJoins, confTtl.sqlAnalyzer)) {
     multiTableEntry.topJoins = storeEntry.topJoins;
     multiTableEntry.topJoinsPromise = CancellablePromise.resolve(multiTableEntry.topJoins);
   }
@@ -300,14 +301,14 @@ export class DataCatalog {
   }
 
   /**
-   * Returns true if the catalog can have Optimizer metadata
+   * Returns true if the catalog can have SQL Analyzer metadata
    */
-  canHaveOptimizerMeta(): boolean {
+  canHaveSqlAnalyzerMeta(): boolean {
     return !!(
-      (<hueWindow>window).HAS_OPTIMIZER &&
+      (<hueWindow>window).HAS_SQL_ANALYZER &&
       this.connector &&
       this.connector.optimizer &&
-      this.connector.optimizer !== 'off'
+      this.connector.optimizer !== SqlAnalyzerMode.off
     );
   }
 
@@ -364,19 +365,21 @@ export class DataCatalog {
       partitions: dataCatalogEntry.partitions,
       sample: dataCatalogEntry.sample,
       navigatorMeta: dataCatalogEntry.navigatorMeta,
-      optimizerMeta:
-        this.connector.optimizer !== LOCAL_STRATEGY ? dataCatalogEntry.optimizerMeta : undefined,
-      optimizerPopularity:
-        this.connector.optimizer !== LOCAL_STRATEGY
-          ? dataCatalogEntry.optimizerPopularity
+      sqlAnalyzerMeta:
+        this.connector.optimizer !== SqlAnalyzerMode.local
+          ? dataCatalogEntry.sqlAnalyzerMeta
+          : undefined,
+      sqlAnalyzerPopularity:
+        this.connector.optimizer !== SqlAnalyzerMode.local
+          ? dataCatalogEntry.sqlAnalyzerPopularity
           : undefined
     });
   }
 
   /**
-   * Loads Navigator Optimizer popularity for multiple tables in one go.
+   * Loads SQL Analyzer popularity for multiple tables in one go.
    */
-  loadOptimizerPopularityForTables(options: {
+  loadSqlAnalyzerPopularityForTables(options: {
     namespace: Namespace;
     compute: Compute;
     paths: string[][];
@@ -396,15 +399,15 @@ export class DataCatalog {
             compute: options.compute,
             path: path
           });
-          if (tableEntry.optimizerPopularityForChildrenPromise) {
-            const existingPopularEntries = await tableEntry.optimizerPopularityForChildrenPromise;
+          if (tableEntry.sqlAnalyzerPopularityForChildrenPromise) {
+            const existingPopularEntries = await tableEntry.sqlAnalyzerPopularityForChildrenPromise;
             popularEntries.push(...existingPopularEntries);
-          } else if (tableEntry.definition && tableEntry.definition.optimizerLoaded) {
+          } else if (tableEntry.definition && tableEntry.definition.sqlAnalyzerLoaded) {
             const childPromise = tableEntry.getChildren({ ...options, silenceErrors: true });
             cancellablePromises.push(childPromise);
             const childEntries = await childPromise;
             childEntries.forEach(childEntry => {
-              if (childEntry.optimizerPopularity) {
+              if (childEntry.sqlAnalyzerPopularity) {
                 popularEntries.push(childEntry);
               }
             });
@@ -435,9 +438,9 @@ export class DataCatalog {
           return;
         }
 
-        const optimizer = getOptimizer(this.connector);
+        const sqlAnalyzer = sqlAnalyzerRepository.getSqlAnalyzer(this.connector);
 
-        const fetchPromise = optimizer.fetchPopularity({
+        const fetchPromise = sqlAnalyzer.fetchPopularity({
           silenceErrors: true,
           paths: pathsToLoad
         });
@@ -445,9 +448,11 @@ export class DataCatalog {
 
         try {
           const data = await fetchPromise;
-          const perTable: { [path: string]: OptimizerResponse } = {};
+          const perTable: { [path: string]: SqlAnalyzerResponse } = {};
 
-          const splitOptimizerValuesPerTable = (listName: keyof OptimizerResponseValues): void => {
+          const splitSqlAnalyzerValuesPerTable = (
+            listName: keyof SqlAnalyzerResponseValues
+          ): void => {
             const values = data.values && data.values[listName];
             if (values) {
               values.forEach(column => {
@@ -469,11 +474,11 @@ export class DataCatalog {
           };
 
           if (data.values) {
-            splitOptimizerValuesPerTable('filterColumns');
-            splitOptimizerValuesPerTable('groupbyColumns');
-            splitOptimizerValuesPerTable('joinColumns');
-            splitOptimizerValuesPerTable('orderbyColumns');
-            splitOptimizerValuesPerTable('selectColumns');
+            splitSqlAnalyzerValuesPerTable('filterColumns');
+            splitSqlAnalyzerValuesPerTable('groupbyColumns');
+            splitSqlAnalyzerValuesPerTable('joinColumns');
+            splitSqlAnalyzerValuesPerTable('orderbyColumns');
+            splitSqlAnalyzerValuesPerTable('selectColumns');
           }
 
           const tablePromises: Promise<void>[] = Object.keys(perTable).map(
@@ -485,7 +490,7 @@ export class DataCatalog {
                     compute: options.compute,
                     path: path
                   });
-                  const applyPromise = entry.applyOptimizerResponseToChildren(perTable[path], {
+                  const applyPromise = entry.applySqlAnalyzerResponseToChildren(perTable[path], {
                     ...options,
                     silenceErrors: true
                   });
@@ -547,7 +552,7 @@ export class DataCatalog {
         path: [],
         definition: {
           index: 0,
-          optimizerLoaded: true,
+          sqlAnalyzerLoaded: true,
           type: 'source'
         }
       });
@@ -574,7 +579,7 @@ export class DataCatalog {
           path: [database],
           definition: {
             index: 0,
-            optimizerLoaded: true,
+            sqlAnalyzerLoaded: true,
             type: 'database'
           }
         });
@@ -612,7 +617,7 @@ export class DataCatalog {
           comment: '',
           index: existingTemporaryTables.length,
           name: options.name,
-          optimizerLoaded: true,
+          sqlAnalyzerLoaded: true,
           type: 'table'
         }
       });
@@ -791,8 +796,8 @@ export class DataCatalog {
     if (
       !cacheEnabled ||
       (confTtl.default && confTtl.default <= 0) ||
-      (confTtl.optimizer && confTtl.optimizer <= 0) ||
-      multiTableEntry.getConnector().optimizer === LOCAL_STRATEGY
+      (confTtl.sqlAnalyzer && confTtl.sqlAnalyzer <= 0) ||
+      multiTableEntry.getConnector().optimizer === SqlAnalyzerMode.local
     ) {
       return;
     }

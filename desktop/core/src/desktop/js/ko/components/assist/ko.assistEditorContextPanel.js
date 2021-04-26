@@ -117,7 +117,7 @@ const TEMPLATE =
             <div class="risk-list-title" data-bind="css: { 'risk-list-high' : risk === 'high', 'risk-list-normal':  risk !== 'high' }, tooltip: { title: risk + ' ' + riskTables }"><span data-bind="text: riskAnalysis"></span></div>
             <div class="risk-list-description" data-bind="text: riskRecommendation"></div>
             <div class="risk-quickfix" data-bind="visible: (riskId === 17 || riskId === 18 || riskId === 22) && $parent.activeEditor() && $parent.activeLocations()" style="display:none;">
-              <a href="javascript:void(0);" data-bind="click: function () { $parent.addFilter(riskId); hueAnalytics.convert('optimizer', 'addFilter/' + riskId); }">${I18n(
+              <a href="javascript:void(0);" data-bind="click: function () { $parent.addFilter(riskId); hueAnalytics.convert('sqlAnalyzer', 'addFilter/' + riskId); }">${I18n(
                 'Fix me'
               )}</a>
             </div>
@@ -203,7 +203,7 @@ class AssistEditorContextPanel {
     this.connector = params.connector;
 
     this.showRisks = ko.pureComputed(() => {
-      if (!window.HAS_OPTIMIZER || this.isSolr()) {
+      if (!window.HAS_SQL_ANALYZER || this.isSolr()) {
         return false;
       }
       if (this.connector().dialect_properties) {
@@ -240,7 +240,7 @@ class AssistEditorContextPanel {
 
     this.isMissingStats = ko.pureComputed(
       () =>
-        window.AUTO_UPLOAD_OPTIMIZER_STATS &&
+        window.AUTO_UPLOAD_SQL_ANALYZER_STATS &&
         this.activeRisks().noStats &&
         this.activeRisks().noStats.length > 0
     );

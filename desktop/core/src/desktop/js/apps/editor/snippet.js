@@ -51,7 +51,7 @@ import {
 } from 'ko/bindings/ace/aceLocationHandler';
 import { findEditorConnector, getLastKnownConfig } from 'config/hueConfig';
 import { cancelActiveRequest } from 'api/apiUtils';
-import { getOptimizer } from 'catalog/optimizer/optimizer';
+import { sqlAnalyzerRepository } from 'catalog/analyzer/sqlAnalyzerRepository';
 import {
   ASSIST_GET_DATABASE_EVENT,
   ASSIST_GET_SOURCE_EVENT,
@@ -92,7 +92,7 @@ export const STATUS = {
   starting: 'starting',
   success: 'success',
   waiting: 'waiting',
-  withOptimizerReport: 'with-optimizer-report'
+  withSqlAnalyzerReport: 'with-sql-analyzer-report'
 };
 
 const STATUS_FOR_BUTTONS = {
@@ -250,9 +250,9 @@ export default class Snippet {
     this.aceErrorsHolder = ko.observableArray([]);
     this.aceWarningsHolder = ko.observableArray([]);
 
-    this.aceErrors = ko.pureComputed(() => (this.showOptimizer() ? this.aceErrorsHolder() : []));
+    this.aceErrors = ko.pureComputed(() => (this.showSqlAnalyzer() ? this.aceErrorsHolder() : []));
     this.aceWarnings = ko.pureComputed(() =>
-      this.showOptimizer() ? this.aceWarningsHolder() : []
+      this.showSqlAnalyzer() ? this.aceWarningsHolder() : []
     );
 
     this.availableSnippets = this.parentVm.availableSnippets();
@@ -528,10 +528,10 @@ export default class Snippet {
       COMPATIBILITY_TARGET_PLATFORMS[this.dialect()]
     );
 
-    this.showOptimizer = ko.observable(getFromLocalStorage('editor.show.optimizer', false));
-    this.showOptimizer.subscribe(newValue => {
+    this.showSqlAnalyzer = ko.observable(getFromLocalStorage('editor.show.sql.analyzer', false));
+    this.showSqlAnalyzer.subscribe(newValue => {
       if (newValue !== null) {
-        setInLocalStorage('editor.show.optimizer', newValue);
+        setInLocalStorage('editor.show.sql.analyzer', newValue);
       }
     });
 
@@ -585,14 +585,14 @@ export default class Snippet {
 
     this.activeExecutable = ko.observable();
 
-    // TODO: User connector instead of compute, namespace, sourceType, isOptimizerEnabled, isSqlEngine
+    // TODO: User connector instead of compute, namespace, sourceType, isSqlAnalyzerEnabled, isSqlEngine
     this.executor = new Executor({
       compute: this.compute,
       database: this.database,
       connector: this.connector,
       namespace: this.namespace,
       defaultLimit: this.defaultLimit,
-      isOptimizerEnabled: this.parentVm.isOptimizerEnabled(),
+      isSqlAnalyzerEnabled: this.parentVm.isSqlAnalyzerEnabled(),
       snippet: this,
       isSqlEngine: this.isSqlDialect
     });
@@ -634,8 +634,8 @@ export default class Snippet {
 
     huePubSub.publish(REFRESH_STATEMENT_LOCATIONS_EVENT, this);
 
-    // TODO: Add optimizer check per connector?
-    if (window.HAS_OPTIMIZER && !this.parentVm.isNotificationManager()) {
+    // TODO: Add SQL Analyzer check per connector?
+    if (window.HAS_SQL_ANALYZER && !this.parentVm.isNotificationManager()) {
       let lastComplexityRequest;
       let lastCheckedComplexityStatement;
       const knownResponses = [];
@@ -726,7 +726,8 @@ export default class Snippet {
           return true;
         });
         if (unknownResponse) {
-          lastComplexityRequest = getOptimizer(this.connector())
+          lastComplexityRequest = sqlAnalyzerRepository
+            .getSqlAnalyzer(this.connector())
             .analyzeRisk({
               notebookJson: await this.parentNotebook.toContextJson(),
               snippetJson: this.toContextJson()
@@ -859,7 +860,8 @@ export default class Snippet {
   async getSimilarQueries() {
     hueAnalytics.log('notebook', 'get_query_similarity');
 
-    getOptimizer(this.connector())
+    sqlAnalyzerRepository
+      .getSqlAnalyzer(this.connector())
       .analyzeSimilarity({
         notebookJson: await this.parentNotebook.toContextJson(),
         snippetJson: this.toContextJson(),
@@ -986,7 +988,8 @@ export default class Snippet {
     this.hasSuggestion(null);
     const positionStatement = this.positionStatement();
 
-    this.lastCompatibilityRequest = getOptimizer(this.connector())
+    this.lastCompatibilityRequest = sqlAnalyzerRepository
+      .getSqlAnalyzer(this.connector())
       .analyzeCompatibility({
         notebookJson: await this.parentNotebook.toContextJson(),
         snippetJson: this.toContextJson(),
@@ -1014,7 +1017,7 @@ export default class Snippet {
               col:
                 match === null ? null : typeof match[3] !== 'undefined' ? parseInt(match[3]) : null
             });
-            this.status(STATUS.withOptimizerReport);
+            this.status(STATUS.withSqlAnalyzerReport);
           }
           if (this.suggestion().parseError()) {
             const match = ERROR_REGEX.exec(this.suggestion().parseError());
@@ -1024,9 +1027,9 @@ export default class Snippet {
               col:
                 match === null ? null : typeof match[3] !== 'undefined' ? parseInt(match[3]) : null
             });
-            this.status(STATUS.withOptimizerReport);
+            this.status(STATUS.withSqlAnalyzerReport);
           }
-          this.showOptimizer(true);
+          this.showSqlAnalyzer(true);
           this.hasSuggestion(true);
         } else {
           $(document).trigger('error', data.message);

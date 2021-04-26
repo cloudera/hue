@@ -222,37 +222,37 @@
   </div>
 </script>
 
-<script type="text/html" id="editor-optimizer-alerts">
-  <!-- ko if: window.HAS_OPTIMIZER && (dialect() == 'impala' || dialect() == 'hive') && ! $root.isPresentationMode() -->
-  <div class="optimizer-container" data-bind="css: { 'active': showOptimizer }">
+<script type="text/html" id="editor-sql-analyzer-alerts">
+  <!-- ko if: window.HAS_SQL_ANALYZER && (dialect() == 'impala' || dialect() == 'hive') && ! $root.isPresentationMode() -->
+  <div class="sql-analyzer-container" data-bind="css: { 'active': showSqlAnalyzer }">
     <!-- ko if: hasSuggestion() -->
     <!-- ko with: suggestion() -->
     <!-- ko if: parseError -->
     <!-- ko if: $parent.compatibilityTargetPlatform().value === $parent.dialect() && $parent.compatibilitySourcePlatform().value === $parent.dialect() -->
-    <div class="optimizer-icon error" data-bind="click: function(){ $parent.showOptimizer(! $parent.showOptimizer()) }, attr: { 'title': $parent.showOptimizer() ? '${ _ko('Close Validator') }' : '${ _ko('Open Validator') }'}">
+    <div class="sql-analyzer-icon error" data-bind="click: function(){ $parent.showSqlAnalyzer(! $parent.showSqlAnalyzer()) }, attr: { 'title': $parent.showSqlAnalyzer() ? '${ _ko('Close Validator') }' : '${ _ko('Open Validator') }'}">
       <i class="fa fa-exclamation"></i>
     </div>
-    <!-- ko if: $parent.showOptimizer -->
-    <span class="optimizer-explanation alert-error alert-neutral">${ _('The query has a parse error.') }</span>
+    <!-- ko if: $parent.showSqlAnalyzer -->
+    <span class="sql-analyzer-explanation alert-error alert-neutral">${ _('The query has a parse error.') }</span>
     <!-- /ko -->
     <!-- /ko -->
     ## Oracle, MySQL compatibility... as they return a parseError and not encounteredString.
           <!-- ko if: $parent.compatibilityTargetPlatform().value !== $parent.dialect() || $parent.dialect() !== $parent.compatibilitySourcePlatform().value -->
-    <div class="optimizer-icon warning" data-bind="click: function(){ $parent.showOptimizer(! $parent.showOptimizer()) }, attr: { 'title': $parent.showOptimizer() ? '${ _ko('Close Validator') }' : '${ _ko('Open Validator') }'}">
+    <div class="sql-analyzer-icon warning" data-bind="click: function(){ $parent.showSqlAnalyzer(! $parent.showSqlAnalyzer()) }, attr: { 'title': $parent.showSqlAnalyzer() ? '${ _ko('Close Validator') }' : '${ _ko('Open Validator') }'}">
       <i class="fa fa-exclamation"></i>
     </div>
-    <!-- ko if: $parent.showOptimizer -->
-    <span class="optimizer-explanation alert-warning alert-neutral">${ _('This ') } <span data-bind="text: $parent.compatibilitySourcePlatform().name"></span> ${ _(' query is not compatible with ') } <span data-bind="text: $parent.compatibilityTargetPlatform().name"></span>.</span>
+    <!-- ko if: $parent.showSqlAnalyzer -->
+    <span class="sql-analyzer-explanation alert-warning alert-neutral">${ _('This ') } <span data-bind="text: $parent.compatibilitySourcePlatform().name"></span> ${ _(' query is not compatible with ') } <span data-bind="text: $parent.compatibilityTargetPlatform().name"></span>.</span>
     <!-- /ko -->
     <!-- /ko -->
     <!-- /ko -->
     <!-- ko if: !parseError() && ($parent.compatibilityTargetPlatform().value !== $parent.dialect() || $parent.compatibilitySourcePlatform().value !== $parent.dialect()) -->
     <!-- ko if: queryError.encounteredString().length == 0 -->
-    <div class="optimizer-icon success" data-bind="click: function(){ $parent.showOptimizer(! $parent.showOptimizer()) }, attr: { 'title': $parent.showOptimizer() ? '${ _ko('Close Validator') }' : '${ _ko('Open Validator') }'}">
+    <div class="sql-analyzer-icon success" data-bind="click: function(){ $parent.showSqlAnalyzer(! $parent.showSqlAnalyzer()) }, attr: { 'title': $parent.showSqlAnalyzer() ? '${ _ko('Close Validator') }' : '${ _ko('Open Validator') }'}">
       <i class="fa fa-check"></i>
     </div>
-    <!-- ko if: $parent.showOptimizer -->
-    <span class="optimizer-explanation alert-success alert-neutral">
+    <!-- ko if: $parent.showSqlAnalyzer -->
+    <span class="sql-analyzer-explanation alert-success alert-neutral">
               ${ _('The ') } <div data-bind="component: { name: 'hue-drop-down', params: { value: $parent.compatibilitySourcePlatform, entries: $parent.compatibilitySourcePlatforms, labelAttribute: 'name' } }" style="display: inline-block"></div>
       <!-- ko if: $parent.compatibilitySourcePlatform().value === $parent.dialect() -->
       ${ _(' query is compatible with ') } <span data-bind="text: $parent.compatibilityTargetPlatform().name"></span>.
@@ -265,11 +265,11 @@
     <!-- /ko -->
     <!-- /ko -->
     <!-- ko ifnot: queryError.encounteredString().length == 0 -->
-    <div class="optimizer-icon warning" data-bind="click: function(){ $parent.showOptimizer(! $parent.showOptimizer()) }, attr: { 'title': $parent.showOptimizer() ? '${ _ko('Close Validator') }' : '${ _ko('Open Validator') }'}">
+    <div class="sql-analyzer-icon warning" data-bind="click: function(){ $parent.showSqlAnalyzer(! $parent.showSqlAnalyzer()) }, attr: { 'title': $parent.showSqlAnalyzer() ? '${ _ko('Close Validator') }' : '${ _ko('Open Validator') }'}">
       <i class="fa fa-exclamation"></i>
     </div>
-    <!-- ko if: $parent.showOptimizer -->
-    <span class="optimizer-explanation alert-warning alert-neutral">${ _('This query is not compatible with ') } <span data-bind="text: $parent.compatibilityTargetPlatform().name"></span>.</span>
+    <!-- ko if: $parent.showSqlAnalyzer -->
+    <span class="sql-analyzer-explanation alert-warning alert-neutral">${ _('This query is not compatible with ') } <span data-bind="text: $parent.compatibilityTargetPlatform().name"></span>.</span>
     <!-- /ko -->
     <!-- /ko -->
     <!-- /ko -->
@@ -277,23 +277,23 @@
     <!-- /ko -->
     <!-- ko if: ! hasSuggestion() && topRisk() -->
     <!-- ko if: topRisk().risk === 'low' -->
-    <div class="optimizer-icon success" data-bind="click: function () { huePubSub.publish('assist.highlight.risk.suggestions'); }, tooltip: { placement: 'bottom' }" title="${ _('Some low risks were detected, see the assistant for details.') }">
+    <div class="sql-analyzer-icon success" data-bind="click: function () { huePubSub.publish('assist.highlight.risk.suggestions'); }, tooltip: { placement: 'bottom' }" title="${ _('Some low risks were detected, see the assistant for details.') }">
       <i class="fa fa-check"></i>
     </div>
     <!-- /ko -->
     <!-- ko if: topRisk().risk == 'medium' -->
-    <div class="optimizer-icon warning" data-bind="click: function () { huePubSub.publish('assist.highlight.risk.suggestions'); }, tooltip: { placement: 'bottom' }" title="${ _('Some medium risks were detected, see the assistant for details.') }">
+    <div class="sql-analyzer-icon warning" data-bind="click: function () { huePubSub.publish('assist.highlight.risk.suggestions'); }, tooltip: { placement: 'bottom' }" title="${ _('Some medium risks were detected, see the assistant for details.') }">
       <i class="fa fa-exclamation"></i>
     </div>
     <!-- /ko -->
     <!-- ko if: topRisk().risk == 'high' -->
-    <div class="optimizer-icon error" data-bind="click: function () { huePubSub.publish('assist.highlight.risk.suggestions'); }, tooltip: { placement: 'bottom' }" title="${ _('Some high risks were detected, see the assistant for details.') }">
+    <div class="sql-analyzer-icon error" data-bind="click: function () { huePubSub.publish('assist.highlight.risk.suggestions'); }, tooltip: { placement: 'bottom' }" title="${ _('Some high risks were detected, see the assistant for details.') }">
       <i class="fa fa-exclamation"></i>
     </div>
     <!-- /ko -->
     <!-- /ko -->
     <!-- ko if: hasSuggestion() == '' && ! topRisk() -->
-    <div class="optimizer-icon success" data-bind="click: function () { huePubSub.publish('assist.highlight.risk.suggestions'); }, tooltip: { placement: 'bottom' }" title="${ _('Query validated, no issues found.') }">
+    <div class="sql-analyzer-icon success" data-bind="click: function () { huePubSub.publish('assist.highlight.risk.suggestions'); }, tooltip: { placement: 'bottom' }" title="${ _('Query validated, no issues found.') }">
       <i class="fa fa-check"></i>
     </div>
     <!-- /ko -->
@@ -551,7 +551,7 @@
           },
           css: {'blue': $data.showLogs}
         " title="${ _('Toggle Logs') }"><i class="fa fa-fw" data-bind="css: { 'fa-caret-right': !$data.showLogs(), 'fa-caret-down': $data.showLogs() }"></i></a>
-    <div class="snippet-progress-container" data-bind="visible: status() != 'canceled' && status() != 'with-optimizer-report'">
+    <div class="snippet-progress-container" data-bind="visible: status() != 'canceled' && status() != 'with-sql-analyzer-report'">
       <!-- ko component: { name: 'executable-progress-bar', params: { activeExecutable: activeExecutable } } --><!-- /ko -->
     </div>
     <div class="snippet-error-container alert alert-error" style="margin-bottom: 0" data-bind="visible: errors().length > 0">
@@ -899,7 +899,7 @@
         <div class="editor-settings-drawer">
           <!-- ko template: 'editor-snippet-settings' --><!-- /ko -->
         </div>
-  ##      <!-- ko template: { name: 'editor-optimizer-alerts' } --><!-- /ko -->
+  ##      <!-- ko template: { name: 'editor-sql-analyzer-alerts' } --><!-- /ko -->
         <div class="editor-code-editor">
           <!-- ko template: { name: 'editor-code-editor' } --><!-- /ko -->
         </div>
@@ -1282,9 +1282,9 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 
   window.NOTEBOOKS_JSON = ${ notebooks_json | n,unicode };
 
-  window.OPTIMIZER_AUTO_UPLOAD_QUERIES = '${ OPTIMIZER.AUTO_UPLOAD_QUERIES.get() }' === 'True';
+  window.SQL_ANALYZER_AUTO_UPLOAD_QUERIES = '${ OPTIMIZER.AUTO_UPLOAD_QUERIES.get() }' === 'True';
 
-  window.OPTIMIZER_AUTO_UPLOAD_DDL = '${ OPTIMIZER.AUTO_UPLOAD_DDL.get() }' === 'True';
+  window.SQL_ANALYZER_AUTO_UPLOAD_DDL = '${ OPTIMIZER.AUTO_UPLOAD_DDL.get() }' === 'True';
 
-  window.OPTIMIZER_QUERY_HISTORY_UPLOAD_LIMIT = ${ OPTIMIZER.QUERY_HISTORY_UPLOAD_LIMIT.get() };
+  window.SQL_ANALYZER_QUERY_HISTORY_UPLOAD_LIMIT = ${ OPTIMIZER.QUERY_HISTORY_UPLOAD_LIMIT.get() };
 </script>

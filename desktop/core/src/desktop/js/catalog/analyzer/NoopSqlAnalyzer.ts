@@ -15,30 +15,30 @@
 // limitations under the License.
 
 import { CancellablePromise } from 'api/cancellablePromise';
-import { OptimizerMeta } from 'catalog/DataCatalogEntry';
+import { SqlAnalyzerMeta } from 'catalog/DataCatalogEntry';
 import { TopAggs, TopColumns, TopFilters, TopJoins } from 'catalog/MultiTableEntry';
 import {
   CompatibilityOptions,
   MetaOptions,
-  Optimizer,
-  OptimizerRisk,
+  SqlAnalyzer,
+  AnalyzerRisk,
   PopularityOptions,
   PredictOptions,
   PredictResponse,
   RiskOptions,
   SimilarityOptions
-} from 'catalog/optimizer/optimizer';
+} from 'catalog/analyzer/types';
 
-import { OptimizerResponse } from 'catalog/dataCatalog';
+import { SqlAnalyzerResponse } from 'catalog/dataCatalog';
 
-export default class NoopSqlAnalyzer implements Optimizer {
+export default class NoopSqlAnalyzer implements SqlAnalyzer {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   analyzeCompatibility(options: CompatibilityOptions): CancellablePromise<unknown> {
     return CancellablePromise.reject('analyzeCompatibility is not Implemented');
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  analyzeRisk(options: RiskOptions): CancellablePromise<OptimizerRisk> {
+  analyzeRisk(options: RiskOptions): CancellablePromise<AnalyzerRisk> {
     return CancellablePromise.reject('analyzeRisk is not Implemented');
   }
 
@@ -48,12 +48,12 @@ export default class NoopSqlAnalyzer implements Optimizer {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  fetchOptimizerMeta(options: MetaOptions): CancellablePromise<OptimizerMeta> {
-    return CancellablePromise.reject('fetchOptimizerMeta is not Implemented');
+  fetchSqlAnalyzerMeta(options: MetaOptions): CancellablePromise<SqlAnalyzerMeta> {
+    return CancellablePromise.reject('fetchSqlAnalyzerMeta is not Implemented');
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  fetchPopularity(options: PopularityOptions): CancellablePromise<OptimizerResponse> {
+  fetchPopularity(options: PopularityOptions): CancellablePromise<SqlAnalyzerResponse> {
     return CancellablePromise.reject('analyzeCompatibility is not Implemented');
   }
 

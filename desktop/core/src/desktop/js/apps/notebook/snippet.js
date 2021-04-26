@@ -212,7 +212,7 @@ class Snippet {
     });
 
     self.connector = ko.pureComputed(() => {
-      // To support optimizer changes in editor v2
+      // To support SQL Analyzer changes in editor v2
       return {
         optimizer: self.type() === 'hive' || self.type() === 'impala' ? 'api' : 'off',
         type: self.type(),
@@ -261,10 +261,10 @@ class Snippet {
     self.aceWarningsHolder = ko.observableArray([]);
 
     self.aceErrors = ko.pureComputed(() => {
-      return self.showOptimizer() ? self.aceErrorsHolder() : [];
+      return self.showSqlAnalyzer() ? self.aceErrorsHolder() : [];
     });
     self.aceWarnings = ko.pureComputed(() => {
-      return self.showOptimizer() ? self.aceWarningsHolder() : [];
+      return self.showSqlAnalyzer() ? self.aceWarningsHolder() : [];
     });
 
     self.availableSnippets = vm.availableSnippets();
@@ -1456,14 +1456,14 @@ class Snippet {
     });
     self.compatibilityTargetPlatform = ko.observable(COMPATIBILITY_TARGET_PLATFORMS[self.type()]);
 
-    self.showOptimizer = ko.observable(getFromLocalStorage('editor.show.optimizer', false));
-    self.showOptimizer.subscribe(newValue => {
+    self.showSqlAnalyzer = ko.observable(getFromLocalStorage('editor.show.sql.analyzer', false));
+    self.showSqlAnalyzer.subscribe(newValue => {
       if (newValue !== null) {
-        setInLocalStorage('editor.show.optimizer', newValue);
+        setInLocalStorage('editor.show.sql.analyzer', newValue);
       }
     });
 
-    if (HAS_OPTIMIZER && !vm.isNotificationManager()) {
+    if (window.HAS_SQL_ANALYZER && !vm.isNotificationManager()) {
       let lastComplexityRequest;
       let lastCheckedComplexityStatement;
       const knownResponses = [];
@@ -1868,7 +1868,7 @@ class Snippet {
             } else if (!notebook.unloaded()) {
               self.checkStatus();
             }
-            if (vm.isOptimizerEnabled()) {
+            if (vm.isSqlAnalyzerEnabled()) {
               huePubSub.publish('editor.upload.query', data.history_id);
             }
           } else {
@@ -2104,7 +2104,7 @@ class Snippet {
                     ? parseInt(match[3])
                     : null
               });
-              self.status('with-optimizer-report');
+              self.status('with-sql-analyzer-report');
             }
             if (self.suggestion().parseError()) {
               const match = ERROR_REGEX.exec(self.suggestion().parseError());
@@ -2118,9 +2118,9 @@ class Snippet {
                     ? parseInt(match[3])
                     : null
               });
-              self.status('with-optimizer-report');
+              self.status('with-sql-analyzer-report');
             }
-            self.showOptimizer(true);
+            self.showSqlAnalyzer(true);
             self.hasSuggestion(true);
           } else {
             $(document).trigger('error', data.message);

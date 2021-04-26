@@ -117,15 +117,15 @@ class AssistDbNamespace {
         });
       }
 
-      if (window.HAS_OPTIMIZER && db && !db.popularityIndexSet && !self.nonSqlType) {
-        db.catalogEntry.loadOptimizerPopularityForChildren({ silenceErrors: true }).then(() => {
+      if (window.HAS_SQL_ANALYZER && db && !db.popularityIndexSet && !self.nonSqlType) {
+        db.catalogEntry.loadSqlAnalyzerPopularityForChildren({ silenceErrors: true }).then(() => {
           const applyPopularity = () => {
             db.entries().forEach(entry => {
               if (
-                entry.catalogEntry.optimizerPopularity &&
-                entry.catalogEntry.optimizerPopularity.popularity >= 5
+                entry.catalogEntry.sqlAnalyzerPopularity &&
+                entry.catalogEntry.sqlAnalyzerPopularity.popularity >= 5
               ) {
-                entry.popularity(entry.catalogEntry.optimizerPopularity.popularity);
+                entry.popularity(entry.catalogEntry.sqlAnalyzerPopularity.popularity);
               }
             });
           };

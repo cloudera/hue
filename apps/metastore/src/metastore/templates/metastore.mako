@@ -692,7 +692,7 @@ ${ components.menubar(is_embeddable) }
 <script type="text/html" id="metastore-queries-tab">
   <br/>
   <i class="fa fa-spinner fa-spin" data-bind="visible: $root.loadingQueries"></i>
-  <table data-bind="visible: ! loadingQueries() && $data.optimizerDetails().queryList().length > 0" class="table table-condensed">
+  <table data-bind="visible: ! loadingQueries() && $data.sqlAnalyzerDetails().queryList().length > 0" class="table table-condensed">
     <thead>
     <tr>
       <th width="10%">${ _('Id') }</th>
@@ -704,11 +704,11 @@ ${ components.menubar(is_embeddable) }
       <th width="10%">${ _('Impala Compatible') }</th>
     </tr>
     </thead>
-    <tbody data-bind="hueach: { data: $data.optimizerDetails().queryList(), itemHeight: 32, scrollable: '${ MAIN_SCROLLABLE }', scrollableOffset: 200 }">
+    <tbody data-bind="hueach: { data: $data.sqlAnalyzerDetails().queryList(), itemHeight: 32, scrollable: '${ MAIN_SCROLLABLE }', scrollableOffset: 200 }">
     <tr>
       <td data-bind="text: qid"></td>
       <td style="height: 10px; width: 70px; margin-top:5px;" data-bind="attr: {'title': queryCount()}">
-        <div class="progress bar" style="background-color: #0B7FAD" data-bind="style: { 'width' : Math.round(queryCount() / $parent.optimizerDetails().queryCount() * 100) + '%' }"></div>
+        <div class="progress bar" style="background-color: #0B7FAD" data-bind="style: { 'width' : Math.round(queryCount() / $parent.sqlAnalyzerDetails().queryCount() * 100) + '%' }"></div>
       </td>
       <td><code data-bind="text: queryChar"></code></td>
       <td><code data-bind="text: query().substring(0, 100) + '...'"></code></td>
@@ -718,7 +718,7 @@ ${ components.menubar(is_embeddable) }
     </tr>
     </tbody>
   </table>
-  <div data-bind="visible: ! loadingQueries() && $data.optimizerDetails().queryList().length == 0" class="empty-message">
+  <div data-bind="visible: ! loadingQueries() && $data.sqlAnalyzerDetails().queryList().length == 0" class="empty-message">
     ${ _('No queries found for the current table.') }
   </div>
 </script>
@@ -807,7 +807,7 @@ ${ components.menubar(is_embeddable) }
         <!-- ko template: 'metastore-sample-tab' --><!-- /ko -->
       <!-- /ko -->
 
-      <!-- ko if: $root.optimizerEnabled() && $root.currentTab() === 'queries' -->
+      <!-- ko if: $root.sqlAnalyzerEnabled() && $root.currentTab() === 'queries' -->
         <!-- ko template: { name: 'metastore-queries-tab', data: $root.database().table() } --><!-- /ko -->
       <!-- /ko -->
 
