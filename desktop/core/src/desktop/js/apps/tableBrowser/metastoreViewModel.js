@@ -31,10 +31,9 @@ class MetastoreViewModel {
    * @param {Object} options
    * @param {string} options.user
    * @param {Number} [options.partitionsLimit]
-   * @param {boolean} [options.optimizerEnabled]
+   * @param {boolean} [options.sqlAnalyzerEnabled]
    * @param {boolean} [options.navigatorEnabled]
    * @param {String} options.sourceType
-   * @param {String} options.optimizerUrl
    * @param {String} options.navigatorUrl
    * @constructor
    */
@@ -46,7 +45,7 @@ class MetastoreViewModel {
     this.isLeftPanelVisible.subscribe(() => {
       huePubSub.publish('assist.forceRender');
     });
-    this.optimizerEnabled = ko.observable(options.optimizerEnabled || false);
+    this.sqlAnalyzerEnabled = ko.observable(options.sqlAnalyzerEnabled || false);
     this.navigatorEnabled = ko.observable(options.navigatorEnabled || false);
     this.appConfig = ko.observable();
 
@@ -134,7 +133,6 @@ class MetastoreViewModel {
       huePubSub.publish('meta.navigator.enabled', newValue);
     });
 
-    this.optimizerUrl = ko.observable(options.optimizerUrl);
     this.navigatorUrl = ko.observable(options.navigatorUrl);
 
     this.currentTab = ko.observable('');

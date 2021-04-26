@@ -81,11 +81,11 @@ if USE_NEW_EDITOR.get():
   <script type="text/javascript">
     var LOGGED_USERNAME = '${ user.username }';
     var IS_S3_ENABLED = '${ is_s3_enabled }' === 'True';
-    var HAS_OPTIMIZER = '${ has_optimizer() }' === 'True';
+    var HAS_SQL_ANALYZER = '${ has_optimizer() }' === 'True';
 
     var CACHEABLE_TTL = {
       default: ${ conf.CUSTOM.CACHEABLE_TTL.get() },
-      optimizer: ${ OPTIMIZER.CACHEABLE_TTL.get() }
+      sqlAnalyzer: ${ OPTIMIZER.CACHEABLE_TTL.get() }
     };
 
     var AUTOCOMPLETE_TIMEOUT = ${ conf.EDITOR_AUTOCOMPLETE_TIMEOUT.get() };

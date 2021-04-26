@@ -23,7 +23,7 @@ import {
   fetchSourceMetadata
 } from 'catalog/api';
 import MultiTableEntry, { TopAggs, TopFilters, TopJoins } from 'catalog/MultiTableEntry';
-import { getOptimizer } from './optimizer/optimizer';
+import { sqlAnalyzerRepository } from './analyzer/sqlAnalyzerRepository';
 import * as ko from 'knockout';
 
 import apiHelper from 'api/apiHelper';
@@ -35,9 +35,9 @@ import I18n from 'utils/i18n';
 import {
   CatalogGetOptions,
   DataCatalog,
-  OptimizerPopularity,
-  OptimizerResponse,
-  OptimizerResponsePopularity,
+  SqlAnalyzerPopularity,
+  SqlAnalyzerResponse,
+  SqlAnalyzerResponsePopularity,
   TimestampedData
 } from './dataCatalog';
 
@@ -47,7 +47,7 @@ export interface BaseDefinition extends TimestampedData {
   index?: number;
   type?: string;
   isMapValue?: boolean;
-  optimizerLoaded?: boolean;
+  sqlAnalyzerLoaded?: boolean;
   partitionKey?: boolean;
   primaryKey?: boolean;
   foreignKey?: KeySpecification;
@@ -218,7 +218,7 @@ export interface Sample {
   type: string;
 }
 
-export interface OptimizerMeta extends TimestampedData {
+export interface SqlAnalyzerMeta extends TimestampedData {
   hueTimestamp?: number;
 }
 
@@ -258,10 +258,10 @@ export default class DataCatalogEntry {
   navigatorMeta?: NavigatorMeta;
   navigatorMetaForChildrenPromise?: CancellablePromise<DataCatalogEntry[]>;
   navigatorMetaPromise?: CancellablePromise<NavigatorMeta>;
-  optimizerMeta?: OptimizerMeta;
-  optimizerMetaPromise?: CancellablePromise<OptimizerMeta>;
-  optimizerPopularity?: OptimizerPopularity;
-  optimizerPopularityForChildrenPromise?: CancellablePromise<DataCatalogEntry[]>;
+  sqlAnalyzerMeta?: SqlAnalyzerMeta;
+  sqlAnalyzerMetaPromise?: CancellablePromise<SqlAnalyzerMeta>;
+  sqlAnalyzerPopularity?: SqlAnalyzerPopularity;
+  sqlAnalyzerPopularityForChildrenPromise?: CancellablePromise<DataCatalogEntry[]>;
   partitions?: Partitions;
   partitionsPromise?: CancellablePromise<Partitions>;
   sample?: Sample;
@@ -313,10 +313,10 @@ export default class DataCatalogEntry {
     this.navigatorMeta = undefined;
     this.navigatorMetaForChildrenPromise = undefined;
     this.navigatorMetaPromise = undefined;
-    this.optimizerMeta = undefined;
-    this.optimizerMetaPromise = undefined;
-    this.optimizerPopularity = undefined;
-    this.optimizerPopularityForChildrenPromise = undefined;
+    this.sqlAnalyzerMeta = undefined;
+    this.sqlAnalyzerMetaPromise = undefined;
+    this.sqlAnalyzerPopularity = undefined;
+    this.sqlAnalyzerPopularityForChildrenPromise = undefined;
     this.partitions = undefined;
     this.partitionsPromise = undefined;
     this.sample = undefined;
@@ -334,7 +334,7 @@ export default class DataCatalogEntry {
         .then(parent => {
           if (parent) {
             parent.navigatorMetaForChildrenPromise = undefined;
-            parent.optimizerPopularityForChildrenPromise = undefined;
+            parent.sqlAnalyzerPopularityForChildrenPromise = undefined;
           }
         })
         .catch(err => {
@@ -355,8 +355,8 @@ export default class DataCatalogEntry {
       options = {};
     }
 
-    if (this.definition && this.definition.optimizerLoaded) {
-      delete this.definition.optimizerLoaded;
+    if (this.definition && this.definition.sqlAnalyzerLoaded) {
+      delete this.definition.sqlAnalyzerLoaded;
     }
 
     this.reset();
@@ -424,12 +424,12 @@ export default class DataCatalogEntry {
   /**
    * Helper function to reload the nav opt metadata for the given entry
    */
-  private reloadOptimizerMeta(options?: ReloadOptions): CancellablePromise<OptimizerMeta> {
-    const optimizer = getOptimizer(this.getConnector());
-    if (this.dataCatalog.canHaveOptimizerMeta()) {
-      this.optimizerMetaPromise = new CancellablePromise<OptimizerMeta>(
+  private reloadSqlAnalyzerMeta(options?: ReloadOptions): CancellablePromise<SqlAnalyzerMeta> {
+    const sqlAnalyzer = sqlAnalyzerRepository.getSqlAnalyzer(this.getConnector());
+    if (this.dataCatalog.canHaveSqlAnalyzerMeta()) {
+      this.sqlAnalyzerMetaPromise = new CancellablePromise<SqlAnalyzerMeta>(
         async (resolve, reject, onCancel) => {
-          const fetchPromise = optimizer.fetchOptimizerMeta({
+          const fetchPromise = sqlAnalyzer.fetchSqlAnalyzerMeta({
             path: this.path,
             silenceErrors: options && options.silenceErrors
           });
@@ -438,8 +438,8 @@ export default class DataCatalogEntry {
           });
 
           try {
-            this.optimizerMeta = await fetchPromise;
-            resolve(this.optimizerMeta);
+            this.sqlAnalyzerMeta = await fetchPromise;
+            resolve(this.sqlAnalyzerMeta);
           } catch (err) {
             reject(err || 'Fetch failed');
             return;
@@ -448,9 +448,9 @@ export default class DataCatalogEntry {
         }
       );
     } else {
-      this.optimizerMetaPromise = CancellablePromise.reject();
+      this.sqlAnalyzerMetaPromise = CancellablePromise.reject();
     }
-    return applyCancellable(this.optimizerMetaPromise, options);
+    return applyCancellable(this.sqlAnalyzerMetaPromise, options);
   }
 
   private reloadPartitions(options?: ReloadOptions): CancellablePromise<Partitions> {
@@ -812,14 +812,14 @@ export default class DataCatalogEntry {
   /**
    * Helper function used when loading navopt metdata for children
    */
-  applyOptimizerResponseToChildren(
-    response: OptimizerResponse,
+  applySqlAnalyzerResponseToChildren(
+    response: SqlAnalyzerResponse,
     options?: { silenceErrors?: boolean }
   ): CancellablePromise<DataCatalogEntry[]> {
     if (!this.definition) {
       this.definition = {};
     }
-    this.definition.optimizerLoaded = true;
+    this.definition.sqlAnalyzerLoaded = true;
     this.saveLater();
 
     return new CancellablePromise<DataCatalogEntry[]>(async (resolve, reject, onCancel) => {
@@ -843,16 +843,16 @@ export default class DataCatalogEntry {
             }
             const matchingChild = entriesByName[topTable.name.toLowerCase()];
             if (matchingChild) {
-              matchingChild.optimizerPopularity = topTable;
+              matchingChild.sqlAnalyzerPopularity = topTable;
               matchingChild.saveLater();
               updatedIndex[matchingChild.getQualifiedPath()] = matchingChild;
             }
           });
         } else if (this.isTableOrView() && response.values) {
-          const addOptimizerPopularity = (
-            columns: OptimizerResponsePopularity[] | undefined,
+          const addSqlAnalyzerPopularity = (
+            columns: SqlAnalyzerResponsePopularity[] | undefined,
             type: keyof Pick<
-              OptimizerPopularity,
+              SqlAnalyzerPopularity,
               'filterColumn' | 'groupByColumn' | 'joinColumn' | 'orderByColumn' | 'selectColumn'
             >
           ) => {
@@ -863,10 +863,10 @@ export default class DataCatalogEntry {
                 }
                 const matchingChild = entriesByName[column.columnName.toLowerCase()];
                 if (matchingChild) {
-                  if (!matchingChild.optimizerPopularity) {
-                    matchingChild.optimizerPopularity = { column_count: 0, columnCount: 0 };
+                  if (!matchingChild.sqlAnalyzerPopularity) {
+                    matchingChild.sqlAnalyzerPopularity = { column_count: 0, columnCount: 0 };
                   }
-                  matchingChild.optimizerPopularity[type] = column;
+                  matchingChild.sqlAnalyzerPopularity[type] = column;
                   matchingChild.saveLater();
                   updatedIndex[matchingChild.getQualifiedPath()] = matchingChild;
                 }
@@ -874,11 +874,11 @@ export default class DataCatalogEntry {
             }
           };
 
-          addOptimizerPopularity(response.values.filterColumns, 'filterColumn');
-          addOptimizerPopularity(response.values.groupbyColumns, 'groupByColumn');
-          addOptimizerPopularity(response.values.joinColumns, 'joinColumn');
-          addOptimizerPopularity(response.values.orderbyColumns, 'orderByColumn');
-          addOptimizerPopularity(response.values.selectColumns, 'selectColumn');
+          addSqlAnalyzerPopularity(response.values.filterColumns, 'filterColumn');
+          addSqlAnalyzerPopularity(response.values.groupbyColumns, 'groupByColumn');
+          addSqlAnalyzerPopularity(response.values.joinColumns, 'joinColumn');
+          addSqlAnalyzerPopularity(response.values.orderbyColumns, 'orderByColumn');
+          addSqlAnalyzerPopularity(response.values.selectColumns, 'selectColumn');
         }
         const popularEntries: DataCatalogEntry[] = [];
         Object.keys(updatedIndex).forEach(path => {
@@ -892,29 +892,29 @@ export default class DataCatalogEntry {
   }
 
   /**
-   * Loads nav opt popularity for the children of this entry.
+   * Loads SQL Analyzer popularity for the children of this entry.
    */
-  loadOptimizerPopularityForChildren(
+  loadSqlAnalyzerPopularityForChildren(
     options?: CatalogGetOptions
   ): CancellablePromise<DataCatalogEntry[]> {
     if (
-      this.optimizerPopularityForChildrenPromise &&
-      this.optimizerPopularityForChildrenPromise.cancelled
+      this.sqlAnalyzerPopularityForChildrenPromise &&
+      this.sqlAnalyzerPopularityForChildrenPromise.cancelled
     ) {
-      this.optimizerPopularityForChildrenPromise = undefined;
+      this.sqlAnalyzerPopularityForChildrenPromise = undefined;
     }
     options = forceSilencedErrors(options);
 
-    if (!this.dataCatalog.canHaveOptimizerMeta()) {
+    if (!this.dataCatalog.canHaveSqlAnalyzerMeta()) {
       return CancellablePromise.reject();
     }
 
-    if (this.optimizerPopularityForChildrenPromise && !shouldReload(options)) {
-      return applyCancellable(this.optimizerPopularityForChildrenPromise, options);
+    if (this.sqlAnalyzerPopularityForChildrenPromise && !shouldReload(options)) {
+      return applyCancellable(this.sqlAnalyzerPopularityForChildrenPromise, options);
     }
 
-    if (this.definition && this.definition.optimizerLoaded && !shouldReload(options)) {
-      this.optimizerPopularityForChildrenPromise = new CancellablePromise<DataCatalogEntry[]>(
+    if (this.definition && this.definition.sqlAnalyzerLoaded && !shouldReload(options)) {
+      this.sqlAnalyzerPopularityForChildrenPromise = new CancellablePromise<DataCatalogEntry[]>(
         async (resolve, reject, onCancel) => {
           const childPromise = this.getChildren(options);
           onCancel(() => {
@@ -922,30 +922,30 @@ export default class DataCatalogEntry {
           });
           try {
             const children = await childPromise;
-            resolve(children.filter(child => child.optimizerPopularity));
+            resolve(children.filter(child => child.sqlAnalyzerPopularity));
           } catch (err) {
             reject(err);
           }
         }
       );
     } else if (this.isDatabase() || this.isTableOrView()) {
-      this.optimizerPopularityForChildrenPromise = new CancellablePromise<DataCatalogEntry[]>(
+      this.sqlAnalyzerPopularityForChildrenPromise = new CancellablePromise<DataCatalogEntry[]>(
         async (resolve, reject, onCancel) => {
           const cancellablePromises: Cancellable[] = [];
           onCancel(() => {
             cancellablePromises.forEach(cancellable => cancellable.cancel());
           });
 
-          const optimizer = getOptimizer(this.dataCatalog.connector);
-          const popularityPromise = optimizer.fetchPopularity({
+          const sqlAnalyzer = sqlAnalyzerRepository.getSqlAnalyzer(this.dataCatalog.connector);
+          const popularityPromise = sqlAnalyzer.fetchPopularity({
             ...options,
             paths: [this.path]
           });
           cancellablePromises.push(popularityPromise);
 
           try {
-            const optimzerResponse = await popularityPromise;
-            const applyPromise = this.applyOptimizerResponseToChildren(optimzerResponse, options);
+            const analyzerResponse = await popularityPromise;
+            const applyPromise = this.applySqlAnalyzerResponseToChildren(analyzerResponse, options);
             cancellablePromises.push(applyPromise);
             const entries = await applyPromise;
             resolve(entries);
@@ -955,10 +955,10 @@ export default class DataCatalogEntry {
         }
       );
     } else {
-      this.optimizerPopularityForChildrenPromise = CancellablePromise.resolve([]);
+      this.sqlAnalyzerPopularityForChildrenPromise = CancellablePromise.resolve([]);
     }
 
-    return applyCancellable(this.optimizerPopularityForChildrenPromise);
+    return applyCancellable(this.sqlAnalyzerPopularityForChildrenPromise);
   }
 
   /**
@@ -1579,24 +1579,24 @@ export default class DataCatalogEntry {
   }
 
   /**
-   * Gets the Nav Opt metadata for the entry. It will fetch it if not cached or if the refresh option is set.
+   * Gets the SQL Analyzer metadata for the entry. It will fetch it if not cached or if the refresh option is set.
    */
-  getOptimizerMeta(options?: CatalogGetOptions): CancellablePromise<OptimizerMeta> {
-    if (this.optimizerMetaPromise && this.optimizerMetaPromise.cancelled) {
-      this.optimizerMetaPromise = undefined;
+  getSqlAnalyzerMeta(options?: CatalogGetOptions): CancellablePromise<SqlAnalyzerMeta> {
+    if (this.sqlAnalyzerMetaPromise && this.sqlAnalyzerMetaPromise.cancelled) {
+      this.sqlAnalyzerMetaPromise = undefined;
     }
     options = forceSilencedErrors(options);
 
-    if (!this.dataCatalog.canHaveOptimizerMeta() || !this.isTableOrView()) {
+    if (!this.dataCatalog.canHaveSqlAnalyzerMeta() || !this.isTableOrView()) {
       return CancellablePromise.reject();
     }
-    if (!this.optimizerMetaPromise && cachedOnly(options)) {
+    if (!this.sqlAnalyzerMetaPromise && cachedOnly(options)) {
       return CancellablePromise.reject();
     }
-    if (!this.optimizerMetaPromise || shouldReload(options)) {
-      return this.reloadOptimizerMeta(options);
+    if (!this.sqlAnalyzerMetaPromise || shouldReload(options)) {
+      return this.reloadSqlAnalyzerMeta(options);
     }
-    return applyCancellable(this.optimizerMetaPromise, options);
+    return applyCancellable(this.sqlAnalyzerMetaPromise, options);
   }
 
   /**

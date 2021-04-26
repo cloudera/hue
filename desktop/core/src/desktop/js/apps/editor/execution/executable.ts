@@ -256,7 +256,7 @@ export default abstract class Executable {
         }
       }
 
-      if (this.executor.isOptimizerEnabled && this.history) {
+      if (this.executor.isSqlAnalyzerEnabled && this.history) {
         huePubSub.publish('editor.upload.query', this.history.id);
       }
 
