@@ -39,9 +39,8 @@ huePubSub.subscribe('app.dom.loaded', app => {
 
   const options = {
     user: window.LOGGED_USERNAME,
-    optimizerEnabled: window.HAS_OPTIMIZER,
+    sqlAnalyzerEnabled: window.HAS_SQL_ANALYZER,
     navigatorEnabled: window.HAS_CATALOG,
-    optimizerUrl: window.OPTIMIZER_URL,
     navigatorUrl: window.CATALOG_URL
   };
 

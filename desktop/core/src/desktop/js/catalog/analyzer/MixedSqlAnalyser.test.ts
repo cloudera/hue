@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import { Connector } from 'config/types';
-import SqlAnalyzer from './SqlAnalyzer';
+import MixedSqlAnalyzer from './MixedSqlAnalyzer';
 
 const connectorA: Connector = {
   buttonName: '',
@@ -29,7 +29,7 @@ const connectorA: Connector = {
 describe('SqlAnalyzer.ts', () => {
   describe('checkMissingLimit', () => {
     it('Should detect a missing LIMIT', async () => {
-      const isMissingLimit = await new SqlAnalyzer(connectorA).checkMissingLimit(
+      const isMissingLimit = await new MixedSqlAnalyzer(connectorA).checkMissingLimit(
         'SELECT * FROM employee',
         'hive'
       );
@@ -38,7 +38,7 @@ describe('SqlAnalyzer.ts', () => {
     });
 
     it('Should avoid warning from a missing LIMIT in SELECT without a table', async () => {
-      const isMissingLimit = await new SqlAnalyzer(connectorA).checkMissingLimit(
+      const isMissingLimit = await new MixedSqlAnalyzer(connectorA).checkMissingLimit(
         'SELECT 1',
         'hive'
       );
@@ -47,7 +47,7 @@ describe('SqlAnalyzer.ts', () => {
     });
 
     it('Should not warning from a missing LIMIT in CREATE', async () => {
-      const isMissingLimit = await new SqlAnalyzer(connectorA).checkMissingLimit(
+      const isMissingLimit = await new MixedSqlAnalyzer(connectorA).checkMissingLimit(
         'CREATE TABLE a (a int)',
         'hive'
       );
@@ -58,7 +58,7 @@ describe('SqlAnalyzer.ts', () => {
 
   describe('checkSelectStar', () => {
     it('Should detect a SELECT *', async () => {
-      const isSelectStar = await new SqlAnalyzer(connectorA).checkSelectStar(
+      const isSelectStar = await new MixedSqlAnalyzer(connectorA).checkSelectStar(
         'SELECT * FROM employee',
         'hive'
       );
@@ -66,7 +66,7 @@ describe('SqlAnalyzer.ts', () => {
       expect(isSelectStar).toBeTruthy();
     });
     it('Should not warning from a non SELECT *', async () => {
-      const isSelectStar = await new SqlAnalyzer(connectorA).checkSelectStar(
+      const isSelectStar = await new MixedSqlAnalyzer(connectorA).checkSelectStar(
         'SELECT name FROM employee',
         'hive'
       );

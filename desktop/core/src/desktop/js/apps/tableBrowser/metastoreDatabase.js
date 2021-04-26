@@ -25,7 +25,7 @@ class MetastoreDatabase {
   /**
    * @param {object} options
    * @param {DataCatalogEntry} options.catalogEntry
-   * @param {observable} options.optimizerEnabled
+   * @param {observable} options.sqlAnalyzerEnabled
    * @param {MetastoreViewModel} options.metastoreViewModel;
    * @constructor
    */
@@ -99,13 +99,13 @@ class MetastoreDatabase {
     this.catalogEntry.clearCache().then(() => {
       this.load(
         () => {},
-        this.metastoreViewModel.optimizerEnabled(),
+        this.metastoreViewModel.sqlAnalyzerEnabled(),
         this.metastoreViewModel.navigatorEnabled()
       );
     });
   }
 
-  load(callback, optimizerEnabled, navigatorEnabled) {
+  load(callback, sqlAnalyzerEnabled, navigatorEnabled) {
     if (navigatorEnabled) {
       this.loadingComment(true);
       this.catalogEntry
@@ -128,8 +128,8 @@ class MetastoreDatabase {
               new MetastoreTable({
                 database: this,
                 catalogEntry: tableEntry,
-                optimizerEnabled: optimizerEnabled,
-                navigatorEnabled: navigatorEnabled
+                sqlAnalyzerEnabled,
+                navigatorEnabled
               })
           )
         );
@@ -146,13 +146,13 @@ class MetastoreDatabase {
               this.loadingTableComments(false);
             });
         }
-        if (optimizerEnabled) {
+        if (sqlAnalyzerEnabled) {
           this.loadingTablePopularity(true);
           this.catalogEntry
-            .loadOptimizerPopularityForChildren()
+            .loadSqlAnalyzerPopularityForChildren()
             .then(() => {
               this.tables().forEach(table => {
-                table.optimizerStats(table.catalogEntry.optimizerPopularity);
+                table.sqlAnalyzerStats(table.catalogEntry.sqlAnalyzerPopularity);
               });
             })
             .finally(() => {

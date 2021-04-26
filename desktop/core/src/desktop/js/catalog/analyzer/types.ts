@@ -14,14 +14,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import NoopSqlAnalyzer from './NoopSqlAnalyzer';
-import SqlAnalyzer from 'catalog/optimizer/SqlAnalyzer';
 import { CancellablePromise } from 'api/cancellablePromise';
-import { OptimizerResponse } from 'catalog/dataCatalog';
-import { OptimizerMeta } from 'catalog/DataCatalogEntry';
-import { TopAggs, TopColumns, TopFilters, TopJoins } from 'catalog/MultiTableEntry';
-import { Connector } from 'config/types';
-import { hueWindow } from 'types/types';
+import { Connector } from '../../config/types';
+import { SqlAnalyzerResponse } from '../dataCatalog';
+import { SqlAnalyzerMeta } from '../DataCatalogEntry';
+import { TopAggs, TopColumns, TopFilters, TopJoins } from '../MultiTableEntry';
+
+export enum SqlAnalyzerMode {
+  local = 'local',
+  api = 'api',
+  off = 'off'
+}
+
+export interface SqlAnalyzerProvider {
+  getSqlAnalyzer(connector: Connector): SqlAnalyzer;
+}
 
 export interface CompatibilityOptions {
   notebookJson: string;
@@ -45,7 +52,7 @@ export interface RiskHint {
   riskRecommendation: string;
 }
 
-export interface OptimizerRisk {
+export interface AnalyzerRisk {
   status: number;
   message: string;
   query_complexity: {
@@ -81,40 +88,15 @@ export interface PredictResponse {
   prediction?: string;
 }
 
-export interface Optimizer {
-  analyzeRisk(options: RiskOptions): CancellablePromise<OptimizerRisk>;
+export interface SqlAnalyzer {
+  analyzeRisk(options: RiskOptions): CancellablePromise<AnalyzerRisk>;
   analyzeSimilarity(options: SimilarityOptions): CancellablePromise<unknown>;
   analyzeCompatibility(options: CompatibilityOptions): CancellablePromise<unknown>;
-  fetchPopularity(options: PopularityOptions): CancellablePromise<OptimizerResponse>;
+  fetchPopularity(options: PopularityOptions): CancellablePromise<SqlAnalyzerResponse>;
   fetchTopAggs(options: PopularityOptions): CancellablePromise<TopAggs>;
   fetchTopColumns(options: PopularityOptions): CancellablePromise<TopColumns>;
   fetchTopFilters(options: PopularityOptions): CancellablePromise<TopFilters>;
   fetchTopJoins(options: PopularityOptions): CancellablePromise<TopJoins>;
-  fetchOptimizerMeta(options: MetaOptions): CancellablePromise<OptimizerMeta>;
+  fetchSqlAnalyzerMeta(options: MetaOptions): CancellablePromise<SqlAnalyzerMeta>;
   predict(options: PredictOptions): CancellablePromise<PredictResponse>;
 }
-
-const optimizerInstances: { [connectorId: string]: Optimizer | undefined } = {};
-
-export const LOCAL_STRATEGY = 'local';
-export const API_STRATEGY = 'api';
-
-const createOptimizer = (connector: Connector): Optimizer => {
-  // TODO: Remove window.OPTIMIZER_MODE and hardcoded { optimizer: 'api' } when 'connector.optimizer_mode' works.
-  if (
-    (<hueWindow>window).OPTIMIZER_MODE === LOCAL_STRATEGY ||
-    (<hueWindow>window).OPTIMIZER_MODE === API_STRATEGY
-  ) {
-    return new SqlAnalyzer(connector);
-  }
-  return new NoopSqlAnalyzer();
-};
-
-export const getOptimizer = (connector: Connector): Optimizer => {
-  let optimizer = optimizerInstances[connector.id];
-  if (!optimizer) {
-    optimizer = createOptimizer(connector);
-    optimizerInstances[connector.id] = optimizer;
-  }
-  return optimizer;
-};
