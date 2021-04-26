@@ -161,7 +161,7 @@ class MetastoreSource {
                 () => {
                   setState(previousState);
                 },
-                this.metastoreViewModel.optimizerEnabled(),
+                this.metastoreViewModel.sqlAnalyzerEnabled(),
                 this.metastoreViewModel.navigatorEnabled()
               );
               return true;
@@ -199,7 +199,7 @@ class MetastoreSource {
                 metastoreViewModel: this.metastoreViewModel,
                 sourceType: this.type,
                 navigatorEnabled: this.metastoreViewModel.navigatorEnabled,
-                optimizerEnabled: this.metastoreViewModel.optimizerEnabled,
+                sqlAnalyzerEnabled: this.metastoreViewModel.sqlAnalyzerEnabled,
                 namespace: namespace
               })
           )

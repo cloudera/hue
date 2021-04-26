@@ -16,46 +16,46 @@
 
 import { CancellablePromise } from 'api/cancellablePromise';
 import { getNamespaces } from 'catalog/contextCatalog';
-import { OptimizerMeta, TableSourceMeta } from 'catalog/DataCatalogEntry';
+import { SqlAnalyzerMeta, TableSourceMeta } from 'catalog/DataCatalogEntry';
 import { TopAggs, TopColumns, TopFilters, TopJoins, TopJoinValue } from 'catalog/MultiTableEntry';
-import ApiStrategy from 'catalog/optimizer/ApiStrategy';
+import ApiSqlAnalyzer from './ApiSqlAnalyzer';
 import {
-  API_STRATEGY,
   CompatibilityOptions,
   MetaOptions,
-  Optimizer,
-  OptimizerRisk,
+  SqlAnalyzer,
+  AnalyzerRisk,
   PopularityOptions,
   PredictOptions,
   PredictResponse,
   RiskHint,
   RiskOptions,
-  SimilarityOptions
-} from 'catalog/optimizer/optimizer';
+  SimilarityOptions,
+  SqlAnalyzerMode
+} from 'catalog/analyzer/types';
 
-import dataCatalog, { OptimizerResponse } from 'catalog/dataCatalog';
+import dataCatalog, { SqlAnalyzerResponse } from 'catalog/dataCatalog';
 import sqlParserRepository from 'parse/sql/sqlParserRepository';
 import { Connector, Namespace } from 'config/types';
 import { hueWindow } from 'types/types';
 import I18n from 'utils/i18n';
 
-export default class SqlAnalyzer implements Optimizer {
-  apiStrategy: ApiStrategy;
+export default class MixedSqlAnalyzer implements SqlAnalyzer {
+  apiAnalyzer: ApiSqlAnalyzer;
   connector: Connector;
 
   constructor(connector: Connector) {
-    this.apiStrategy = new ApiStrategy(connector);
+    this.apiAnalyzer = new ApiSqlAnalyzer(connector);
     this.connector = connector;
   }
 
-  analyzeRisk(options: RiskOptions): CancellablePromise<OptimizerRisk> {
-    return new CancellablePromise<OptimizerRisk>(async (resolve, reject, onCancel) => {
+  analyzeRisk(options: RiskOptions): CancellablePromise<AnalyzerRisk> {
+    return new CancellablePromise<AnalyzerRisk>(async (resolve, reject, onCancel) => {
       if (!this.connector.dialect) {
         reject();
         return;
       }
 
-      const apiPromise = this.apiStrategy.analyzeRisk({ ...options, silenceErrors: true });
+      const apiPromise = this.apiAnalyzer.analyzeRisk({ ...options, silenceErrors: true });
 
       onCancel(() => {
         apiPromise.cancel();
@@ -147,7 +147,7 @@ export default class SqlAnalyzer implements Optimizer {
   }
 
   fetchTopJoins(options: PopularityOptions): CancellablePromise<TopJoins> {
-    const apiPromise = this.apiStrategy.fetchTopJoins(options);
+    const apiPromise = this.apiAnalyzer.fetchTopJoins(options);
 
     const path = options.paths[0].join('.');
 
@@ -200,55 +200,55 @@ export default class SqlAnalyzer implements Optimizer {
   }
 
   analyzeCompatibility(options: CompatibilityOptions): CancellablePromise<unknown> {
-    if ((<hueWindow>window).OPTIMIZER_MODE === API_STRATEGY) {
-      return this.apiStrategy.analyzeCompatibility(options);
+    if ((<hueWindow>window).SQL_ANALYZER_MODE === SqlAnalyzerMode.api) {
+      return this.apiAnalyzer.analyzeCompatibility(options);
     }
     return CancellablePromise.reject('analyzeCompatibility is not Implemented');
   }
 
   analyzeSimilarity(options: SimilarityOptions): CancellablePromise<unknown> {
-    if ((<hueWindow>window).OPTIMIZER_MODE === API_STRATEGY) {
-      return this.apiStrategy.analyzeSimilarity(options);
+    if ((<hueWindow>window).SQL_ANALYZER_MODE === SqlAnalyzerMode.api) {
+      return this.apiAnalyzer.analyzeSimilarity(options);
     }
     return CancellablePromise.reject('analyzeSimilarity is not Implemented');
   }
 
-  fetchOptimizerMeta(options: MetaOptions): CancellablePromise<OptimizerMeta> {
-    if ((<hueWindow>window).OPTIMIZER_MODE === API_STRATEGY) {
-      return this.apiStrategy.fetchOptimizerMeta(options);
+  fetchSqlAnalyzerMeta(options: MetaOptions): CancellablePromise<SqlAnalyzerMeta> {
+    if ((<hueWindow>window).SQL_ANALYZER_MODE === SqlAnalyzerMode.api) {
+      return this.apiAnalyzer.fetchSqlAnalyzerMeta(options);
     }
-    return CancellablePromise.reject('fetchOptimizerMeta is not Implemented');
+    return CancellablePromise.reject('fetchSqlAnalyzerMeta is not Implemented');
   }
 
-  fetchPopularity(options: PopularityOptions): CancellablePromise<OptimizerResponse> {
-    if ((<hueWindow>window).OPTIMIZER_MODE === API_STRATEGY) {
-      return this.apiStrategy.fetchPopularity(options);
+  fetchPopularity(options: PopularityOptions): CancellablePromise<SqlAnalyzerResponse> {
+    if ((<hueWindow>window).SQL_ANALYZER_MODE === SqlAnalyzerMode.api) {
+      return this.apiAnalyzer.fetchPopularity(options);
     }
     return CancellablePromise.reject('fetchPopularity is not Implemented');
   }
 
   fetchTopAggs(options: PopularityOptions): CancellablePromise<TopAggs> {
-    if ((<hueWindow>window).OPTIMIZER_MODE === API_STRATEGY) {
-      return this.apiStrategy.fetchTopAggs(options);
+    if ((<hueWindow>window).SQL_ANALYZER_MODE === SqlAnalyzerMode.api) {
+      return this.apiAnalyzer.fetchTopAggs(options);
     }
     return CancellablePromise.reject('fetchTopAggs is not Implemented');
   }
 
   fetchTopColumns(options: PopularityOptions): CancellablePromise<TopColumns> {
-    if ((<hueWindow>window).OPTIMIZER_MODE === API_STRATEGY) {
-      return this.apiStrategy.fetchTopColumns(options);
+    if ((<hueWindow>window).SQL_ANALYZER_MODE === SqlAnalyzerMode.api) {
+      return this.apiAnalyzer.fetchTopColumns(options);
     }
     return CancellablePromise.reject('fetchTopColumns is not Implemented');
   }
 
   fetchTopFilters(options: PopularityOptions): CancellablePromise<TopFilters> {
-    if ((<hueWindow>window).OPTIMIZER_MODE === API_STRATEGY) {
-      return this.apiStrategy.fetchTopFilters(options);
+    if ((<hueWindow>window).SQL_ANALYZER_MODE === SqlAnalyzerMode.api) {
+      return this.apiAnalyzer.fetchTopFilters(options);
     }
     return CancellablePromise.reject('fetchTopFilters is not Implemented');
   }
 
   predict(options: PredictOptions): CancellablePromise<PredictResponse> {
-    return this.apiStrategy.predict(options);
+    return this.apiAnalyzer.predict(options);
   }
 }

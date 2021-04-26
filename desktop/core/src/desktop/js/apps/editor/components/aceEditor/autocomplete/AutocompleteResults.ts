@@ -23,7 +23,7 @@ import DataCatalogEntry, {
   SourceMeta,
   TableSourceMeta
 } from 'catalog/DataCatalogEntry';
-import { OptimizerPopularity, OptimizerPopularitySubType } from 'catalog/dataCatalog';
+import { SqlAnalyzerPopularity, SqlAnalyzerPopularitySubType } from 'catalog/dataCatalog';
 import MultiTableEntry, {
   TopAggs,
   TopAggValue,
@@ -1251,7 +1251,7 @@ class AutocompleteResults {
 
   async handleJoins(): Promise<Suggestion[]> {
     const suggestJoins = this.parseResult.suggestJoins;
-    if (!(<hueWindow>window).HAS_OPTIMIZER || !suggestJoins) {
+    if (!(<hueWindow>window).HAS_SQL_ANALYZER || !suggestJoins) {
       return [];
     }
 
@@ -1308,7 +1308,7 @@ class AutocompleteResults {
             const tableParts = table.split('.');
             if (!existingTables.has(tableParts[tableParts.length - 1])) {
               tablesAdded = true;
-              const identifier = this.convertOptimizerQualifiedIdentifier(
+              const identifier = this.convertSqlAnalyzerQualifiedIdentifier(
                 table,
                 suggestJoins.tables
               );
@@ -1332,12 +1332,12 @@ class AutocompleteResults {
                 suggestionString += this.parseResult.lowerCase ? ' and ' : ' AND ';
               }
               suggestionString +=
-                this.convertOptimizerQualifiedIdentifier(
+                this.convertSqlAnalyzerQualifiedIdentifier(
                   joinColPair.columns[0],
                   suggestJoins.tables
                 ) +
                 ' = ' +
-                this.convertOptimizerQualifiedIdentifier(
+                this.convertSqlAnalyzerQualifiedIdentifier(
                   joinColPair.columns[1],
                   suggestJoins.tables
                 );
@@ -1371,7 +1371,7 @@ class AutocompleteResults {
 
   async handleJoinConditions(): Promise<Suggestion[]> {
     const suggestJoinConditions = this.parseResult.suggestJoinConditions;
-    if (!(<hueWindow>window).HAS_OPTIMIZER || !suggestJoinConditions) {
+    if (!(<hueWindow>window).HAS_SQL_ANALYZER || !suggestJoinConditions) {
       return [];
     }
 
@@ -1421,12 +1421,12 @@ class AutocompleteResults {
                 suggestionString += this.parseResult.lowerCase ? ' and ' : ' AND ';
               }
               suggestionString +=
-                this.convertOptimizerQualifiedIdentifier(
+                this.convertSqlAnalyzerQualifiedIdentifier(
                   joinColPair.columns[0],
                   suggestJoinConditions.tables
                 ) +
                 ' = ' +
-                this.convertOptimizerQualifiedIdentifier(
+                this.convertSqlAnalyzerQualifiedIdentifier(
                   joinColPair.columns[1],
                   suggestJoinConditions.tables
                 );
@@ -1459,7 +1459,7 @@ class AutocompleteResults {
   async handleAggregateFunctions(): Promise<Suggestion[]> {
     const suggestAggregateFunctions = this.parseResult.suggestAggregateFunctions;
     if (
-      !(<hueWindow>window).HAS_OPTIMIZER ||
+      !(<hueWindow>window).HAS_SQL_ANALYZER ||
       !suggestAggregateFunctions ||
       !suggestAggregateFunctions.tables.length
     ) {
@@ -1586,7 +1586,7 @@ class AutocompleteResults {
   }
 
   async handlePopularGroupByOrOrderBy(
-    optimizerAttribute: keyof OptimizerPopularitySubType,
+    sqlAnalyzerAttribute: keyof SqlAnalyzerPopularitySubType,
     suggestSpec: CommonPopularSuggestion,
     columnsPromise: Promise<Suggestion[]>
   ): Promise<Suggestion[]> {
@@ -1610,7 +1610,7 @@ class AutocompleteResults {
         this.onCancelFunctions.push(reject);
         const popularityPromise = dataCatalog
           .getCatalog(this.executor.connector())
-          .loadOptimizerPopularityForTables({
+          .loadSqlAnalyzerPopularityForTables({
             namespace: this.executor.namespace(),
             compute: this.executor.compute(),
             paths: paths,
@@ -1628,10 +1628,10 @@ class AutocompleteResults {
         : '';
 
       entries.forEach(entry => {
-        if (!entry.optimizerPopularity) {
+        if (!entry.sqlAnalyzerPopularity) {
           return;
         }
-        const popularity = entry.optimizerPopularity[optimizerAttribute];
+        const popularity = entry.sqlAnalyzerPopularity[sqlAnalyzerAttribute];
         if (popularity) {
           totalColumnCount += popularity.columnCount;
           matchedEntries.push(entry);
@@ -1642,20 +1642,21 @@ class AutocompleteResults {
         const suggestions: Suggestion[] = [];
         matchedEntries.forEach(entry => {
           const popularity =
-            entry.optimizerPopularity && entry.optimizerPopularity[optimizerAttribute];
+            entry.sqlAnalyzerPopularity && entry.sqlAnalyzerPopularity[sqlAnalyzerAttribute];
           if (!popularity) {
             return;
           }
-          const filterValue = this.createOptimizerIdentifierForColumn(
+          const filterValue = this.createSqlAnalyzerIdentifierForColumn(
             popularity,
             suggestSpec.tables
           );
           suggestions.push({
             value: prefix + filterValue,
             filterValue: filterValue,
-            meta: optimizerAttribute === 'groupByColumn' ? MetaLabels.GroupBy : MetaLabels.OrderBy,
+            meta:
+              sqlAnalyzerAttribute === 'groupByColumn' ? MetaLabels.GroupBy : MetaLabels.OrderBy,
             category:
-              optimizerAttribute === 'groupByColumn'
+              sqlAnalyzerAttribute === 'groupByColumn'
                 ? Category.PopularGroupBy
                 : Category.PopularOrderBy,
             weightAdjust: Math.round((100 * popularity.columnCount) / totalColumnCount),
@@ -1687,7 +1688,7 @@ class AutocompleteResults {
 
   async handleGroupBys(columnsPromise: Promise<Suggestion[]>): Promise<Suggestion[]> {
     const suggestGroupBys = this.parseResult.suggestGroupBys;
-    if (!(<hueWindow>window).HAS_OPTIMIZER || !suggestGroupBys) {
+    if (!(<hueWindow>window).HAS_SQL_ANALYZER || !suggestGroupBys) {
       return [];
     }
 
@@ -1700,7 +1701,7 @@ class AutocompleteResults {
 
   async handleOrderBys(columnsPromise: Promise<Suggestion[]>): Promise<Suggestion[]> {
     const suggestOrderBys = this.parseResult.suggestOrderBys;
-    if (!(<hueWindow>window).HAS_OPTIMIZER || !suggestOrderBys) {
+    if (!(<hueWindow>window).HAS_SQL_ANALYZER || !suggestOrderBys) {
       return [];
     }
     return await this.handlePopularGroupByOrOrderBy(
@@ -1712,7 +1713,7 @@ class AutocompleteResults {
 
   async handleFilters(): Promise<Suggestion[]> {
     const suggestFilters = this.parseResult.suggestFilters;
-    if (!(<hueWindow>window).HAS_OPTIMIZER || !suggestFilters) {
+    if (!(<hueWindow>window).HAS_SQL_ANALYZER || !suggestFilters) {
       return [];
     }
 
@@ -1759,7 +1760,7 @@ class AutocompleteResults {
                         ? suggestFilters.prefix.toLowerCase()
                         : suggestFilters.prefix) + ' '
                     : '';
-                  compVal += this.createOptimizerIdentifier(
+                  compVal += this.createSqlAnalyzerIdentifier(
                     value.tableName,
                     grp.columnName,
                     suggestFilters.tables
@@ -1799,7 +1800,7 @@ class AutocompleteResults {
 
   async handlePopularTables(tablesPromise: Promise<Suggestion[]>): Promise<Suggestion[]> {
     const suggestTables = this.parseResult.suggestTables;
-    if (!(<hueWindow>window).HAS_OPTIMIZER || !suggestTables) {
+    if (!(<hueWindow>window).HAS_SQL_ANALYZER || !suggestTables) {
       return [];
     }
 
@@ -1827,7 +1828,7 @@ class AutocompleteResults {
 
       const childEntries = await new Promise<DataCatalogEntry[]>((resolve, reject) => {
         this.onCancelFunctions.push(reject);
-        const popularityPromise = entry.loadOptimizerPopularityForChildren({
+        const popularityPromise = entry.loadSqlAnalyzerPopularityForChildren({
           silenceErrors: true,
           cancellable: true
         });
@@ -1839,9 +1840,9 @@ class AutocompleteResults {
       const popularityIndex = new Set<string>();
 
       childEntries.forEach(childEntry => {
-        if (childEntry.optimizerPopularity && childEntry.optimizerPopularity.popularity) {
+        if (childEntry.sqlAnalyzerPopularity && childEntry.sqlAnalyzerPopularity.popularity) {
           popularityIndex.add(childEntry.name);
-          totalPopularity += <number>childEntry.optimizerPopularity.popularity;
+          totalPopularity += <number>childEntry.sqlAnalyzerPopularity.popularity;
         }
       });
 
@@ -1851,7 +1852,7 @@ class AutocompleteResults {
           const details = <DataCatalogEntry>suggestion.details;
           if (popularityIndex.has(details.name)) {
             const popularity =
-              (details.optimizerPopularity && details.optimizerPopularity.popularity) || 0;
+              (details.sqlAnalyzerPopularity && details.sqlAnalyzerPopularity.popularity) || 0;
             suggestion.relativePopularity = Math.round((100 * popularity) / totalPopularity);
             if (suggestion.relativePopularity >= 5) {
               suggestion.popular = true;
@@ -1868,7 +1869,7 @@ class AutocompleteResults {
   async handlePopularColumns(columnsPromise: Promise<Suggestion[]>): Promise<Suggestion[]> {
     const suggestColumns = this.parseResult.suggestColumns;
 
-    if (!(<hueWindow>window).HAS_OPTIMIZER || !suggestColumns || !suggestColumns.source) {
+    if (!(<hueWindow>window).HAS_SQL_ANALYZER || !suggestColumns || !suggestColumns.source) {
       return [];
     }
 
@@ -1901,7 +1902,7 @@ class AutocompleteResults {
         this.onCancelFunctions.push(reject);
         const popularityPromise = dataCatalog
           .getCatalog(this.executor.connector())
-          .loadOptimizerPopularityForTables({
+          .loadSqlAnalyzerPopularityForTables({
             namespace: this.executor.namespace(),
             compute: this.executor.compute(),
             paths: paths,
@@ -1913,7 +1914,10 @@ class AutocompleteResults {
       });
 
       let valueAttribute:
-        | keyof Pick<OptimizerPopularitySubType, 'selectColumn' | 'groupByColumn' | 'orderByColumn'>
+        | keyof Pick<
+            SqlAnalyzerPopularitySubType,
+            'selectColumn' | 'groupByColumn' | 'orderByColumn'
+          >
         | undefined;
       switch (suggestColumns.source) {
         case 'select':
@@ -1931,8 +1935,8 @@ class AutocompleteResults {
       popularEntries.forEach(popularEntry => {
         if (
           valueAttribute &&
-          popularEntry.optimizerPopularity &&
-          popularEntry.optimizerPopularity[valueAttribute]
+          popularEntry.sqlAnalyzerPopularity &&
+          popularEntry.sqlAnalyzerPopularity[valueAttribute]
         ) {
           popularityIndex.add(popularEntry.getQualifiedPath());
         }
@@ -1950,7 +1954,7 @@ class AutocompleteResults {
           return;
         }
         const popularity =
-          details.optimizerPopularity && details.optimizerPopularity[valueAttribute];
+          details.sqlAnalyzerPopularity && details.sqlAnalyzerPopularity[valueAttribute];
         if (
           popularity &&
           suggestion.hasCatalogEntry &&
@@ -1963,10 +1967,10 @@ class AutocompleteResults {
       if (totalColumnCount > 0) {
         matchedSuggestions.forEach(matchedSuggestion => {
           const details = <DataCatalogEntry>matchedSuggestion.details;
-          if (!details.optimizerPopularity || !valueAttribute) {
+          if (!details.sqlAnalyzerPopularity || !valueAttribute) {
             return;
           }
-          const popularity = details.optimizerPopularity[valueAttribute];
+          const popularity = details.sqlAnalyzerPopularity[valueAttribute];
           if (!popularity) {
             return;
           }
@@ -1984,12 +1988,12 @@ class AutocompleteResults {
     return [];
   }
 
-  createOptimizerIdentifier(
-    optimizerTableName: string,
-    optimizerColumnName: string,
+  createSqlAnalyzerIdentifier(
+    sqlAnalyzerTableName: string,
+    sqlAnalyzerColumnName: string,
     tables: ParsedTable[]
   ): string {
-    let path = optimizerTableName + '.' + optimizerColumnName.split('.').pop();
+    let path = sqlAnalyzerTableName + '.' + sqlAnalyzerColumnName.split('.').pop();
     for (let i = 0; i < tables.length; i++) {
       let tablePath = '';
       if (tables[i].identifierChain.length === 2) {
@@ -2010,42 +2014,49 @@ class AutocompleteResults {
     return path;
   }
 
-  createOptimizerIdentifierForColumn(
-    optimizerColumn: OptimizerPopularity,
+  createSqlAnalyzerIdentifierForColumn(
+    sqlAnalyzerColumn: SqlAnalyzerPopularity,
     tables: ParsedTable[]
   ): string {
     for (let i = 0; i < tables.length; i++) {
       if (
-        optimizerColumn.dbName &&
-        (optimizerColumn.dbName !== this.activeDatabase ||
-          optimizerColumn.dbName !== tables[i].identifierChain[0].name)
+        sqlAnalyzerColumn.dbName &&
+        (sqlAnalyzerColumn.dbName !== this.activeDatabase ||
+          sqlAnalyzerColumn.dbName !== tables[i].identifierChain[0].name)
       ) {
         continue;
       }
       if (
-        optimizerColumn.tableName &&
+        sqlAnalyzerColumn.tableName &&
         hueUtils.equalIgnoreCase(
-          optimizerColumn.tableName,
+          sqlAnalyzerColumn.tableName,
           tables[i].identifierChain[tables[i].identifierChain.length - 1].name
         ) &&
         tables[i].alias
       ) {
-        return tables[i].alias + '.' + optimizerColumn.columnName;
+        return tables[i].alias + '.' + sqlAnalyzerColumn.columnName;
       }
     }
 
-    if (optimizerColumn.dbName && optimizerColumn.dbName !== this.activeDatabase) {
+    if (sqlAnalyzerColumn.dbName && sqlAnalyzerColumn.dbName !== this.activeDatabase) {
       return (
-        optimizerColumn.dbName + '.' + optimizerColumn.tableName + '.' + optimizerColumn.columnName
+        sqlAnalyzerColumn.dbName +
+        '.' +
+        sqlAnalyzerColumn.tableName +
+        '.' +
+        sqlAnalyzerColumn.columnName
       );
     }
     if (tables.length > 1) {
-      return optimizerColumn.tableName + '.' + optimizerColumn.columnName;
+      return sqlAnalyzerColumn.tableName + '.' + sqlAnalyzerColumn.columnName;
     }
-    return optimizerColumn.columnName || '';
+    return sqlAnalyzerColumn.columnName || '';
   }
 
-  convertOptimizerQualifiedIdentifier(qualifiedIdentifier: string, tables: ParsedTable[]): string {
+  convertSqlAnalyzerQualifiedIdentifier(
+    qualifiedIdentifier: string,
+    tables: ParsedTable[]
+  ): string {
     const aliases: { qualifiedName: string; alias: string }[] = [];
     let tablesHasDefaultDatabase = false;
     tables.forEach(table => {

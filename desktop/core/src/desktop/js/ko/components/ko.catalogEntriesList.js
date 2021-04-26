@@ -518,7 +518,7 @@ class CatalogEntriesList {
       self.cancellablePromises.push(
         self
           .catalogEntry()
-          .loadOptimizerPopularityForChildren({ silenceErrors: true, cancellable: true })
+          .loadSqlAnalyzerPopularityForChildren({ silenceErrors: true, cancellable: true })
           .then(popularEntries => {
             if (popularEntries.length) {
               childPromise
@@ -533,15 +533,15 @@ class CatalogEntriesList {
                   popularEntries.forEach(popularEntry => {
                     if (
                       entryIndex[popularEntry.name] &&
-                      popularEntry.optimizerPopularity &&
-                      popularEntry.optimizerPopularity.selectColumn &&
-                      popularEntry.optimizerPopularity.selectColumn.columnCount > 0
+                      popularEntry.sqlAnalyzerPopularity &&
+                      popularEntry.sqlAnalyzerPopularity.selectColumn &&
+                      popularEntry.sqlAnalyzerPopularity.selectColumn.columnCount > 0
                     ) {
-                      totalCount += popularEntry.optimizerPopularity.selectColumn.columnCount;
+                      totalCount += popularEntry.sqlAnalyzerPopularity.selectColumn.columnCount;
                       popularityToApply.push(() => {
                         entryIndex[popularEntry.name].popularity(
                           Math.round(
-                            (100 * popularEntry.optimizerPopularity.selectColumn.columnCount) /
+                            (100 * popularEntry.sqlAnalyzerPopularity.selectColumn.columnCount) /
                               totalCount
                           )
                         );

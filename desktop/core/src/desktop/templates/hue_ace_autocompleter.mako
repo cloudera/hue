@@ -752,8 +752,8 @@ else:
           }, COMMENT_LOAD_DELAY);
         }
 
-        if (self.catalogEntry.optimizerPopularity && self.catalogEntry.optimizerPopularity.relativePopularity) {
-          self.popularity(self.catalogEntry.optimizerPopularity.relativePopularity);
+        if (self.catalogEntry.sqlAnalyzerPopularity && self.catalogEntry.sqlAnalyzerPopularity.relativePopularity) {
+          self.popularity(self.catalogEntry.sqlAnalyzerPopularity.relativePopularity);
         }
       }
 
