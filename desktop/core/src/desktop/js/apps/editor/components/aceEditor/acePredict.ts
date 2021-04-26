@@ -17,18 +17,24 @@
 import { Ace } from 'ext/ace';
 
 import { CancellablePromise } from 'api/cancellablePromise';
-import { sqlAnalyzerRepository } from 'catalog/analyzer/sqlAnalyzerRepository';
-import { PredictResponse } from 'catalog/analyzer/types';
+import { PredictResponse, SqlAnalyzerProvider } from 'catalog/analyzer/types';
 import { Disposable } from 'components/utils/SubscriptionTracker';
 import { Connector } from 'config/types';
-import { defer } from 'utils/hueUtils';
+import { defer, noop } from 'utils/hueUtils';
 
 type ActivePredict = { text: string; element: HTMLElement };
 
-export const attachPredictTypeahead = (editor: Ace.Editor, connector: Connector): Disposable => {
+export const attachPredictTypeahead = (
+  editor: Ace.Editor,
+  connector: Connector,
+  sqlAnalyzerProvider: SqlAnalyzerProvider
+): Disposable => {
+  if (!sqlAnalyzerProvider) {
+    return { dispose: noop };
+  }
   let activePredict: { text: string; element: HTMLElement } | undefined;
 
-  const sqlAnalyzer = sqlAnalyzerRepository.getSqlAnalyzer(connector);
+  const sqlAnalyzer = sqlAnalyzerProvider.getSqlAnalyzer(connector);
 
   const addPredictElement = (text: string): ActivePredict => {
     const element = document.createElement('div');
