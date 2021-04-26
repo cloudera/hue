@@ -17,10 +17,11 @@
 import { noop } from 'lodash';
 
 import DataCatalogEntry from 'catalog/DataCatalogEntry';
+import { PopularityOptions } from './analyzer/types';
 import { CatalogGetOptions, DataCatalog, TimestampedData } from './dataCatalog';
 import { CancellablePromise } from 'api/cancellablePromise';
 import { applyCancellable } from 'catalog/catalogUtils';
-import { getOptimizer, PopularityOptions } from 'catalog/optimizer/optimizer';
+import { sqlAnalyzerRepository } from 'catalog/analyzer/sqlAnalyzerRepository';
 import { UdfDetails } from 'sql/reference/types';
 import { Connector } from 'config/types';
 import { hueWindow } from 'types/types';
@@ -78,12 +79,12 @@ export interface TopColumns extends TimestampedData {
 }
 
 const fetchAndSave = <T>(
-  optimizerFunction: (option: PopularityOptions) => CancellablePromise<T>,
+  sqlAnalyzerFunction: (option: PopularityOptions) => CancellablePromise<T>,
   setFunction: (val: T) => void,
   entry: DataCatalogEntry | MultiTableEntry,
   apiOptions?: { silenceErrors?: boolean; refreshAnalysis?: boolean }
 ): CancellablePromise<T> => {
-  const promise = optimizerFunction({
+  const promise = sqlAnalyzerFunction({
     paths: (<MultiTableEntry>entry).paths, // Set for MultiTableEntry
     silenceErrors: apiOptions && apiOptions.silenceErrors
   });
@@ -97,22 +98,22 @@ const fetchAndSave = <T>(
 };
 
 /**
- * Helper function to reload a Optimizer multi table attribute, like topAggs or topFilters
+ * Helper function to reload a SQL Analyzer multi table attribute, like topAggs or topFilters
  */
-const genericOptimizerReload = <T>(
+const genericSqlAnalyzerReload = <T>(
   multiTableEntry: MultiTableEntry,
   options: { silenceErrors?: boolean } | undefined,
   promiseSetter: (promise?: CancellablePromise<T>) => void,
   dataAttributeSetter: (val: T) => void,
-  optimizerFunction: (option: PopularityOptions) => CancellablePromise<T>
+  sqlAnalyzerFunction: (option: PopularityOptions) => CancellablePromise<T>
 ): CancellablePromise<T> => {
   const promise = new CancellablePromise<T>((resolve, reject, onCancel) => {
-    if (!multiTableEntry.dataCatalog.canHaveOptimizerMeta()) {
+    if (!multiTableEntry.dataCatalog.canHaveSqlAnalyzerMeta()) {
       reject();
       return;
     }
     const fetchPromise = fetchAndSave(
-      optimizerFunction,
+      sqlAnalyzerFunction,
       dataAttributeSetter,
       multiTableEntry,
       options
@@ -136,9 +137,9 @@ const genericOptimizerReload = <T>(
 };
 
 /**
- * Helper function to get a Optimizer multi table attribute, like topAggs or topFilters
+ * Helper function to get a SQL Analyzer multi table attribute, like topAggs or topFilters
  */
-const genericOptimizerGet = <T>(
+const genericSqlAnalyzerGet = <T>(
   multiTableEntry: MultiTableEntry,
   options: CatalogGetOptions | undefined,
   promiseSetter: (promise?: CancellablePromise<T>) => void,
@@ -152,7 +153,7 @@ const genericOptimizerGet = <T>(
   }
 
   if (!promise || !DataCatalog.cacheEnabled() || (options && options.refreshCache)) {
-    promise = genericOptimizerReload<T>(
+    promise = genericSqlAnalyzerReload<T>(
       multiTableEntry,
       options,
       promiseSetter,
@@ -226,8 +227,8 @@ class MultiTableEntry {
    * Gets the top aggregate UDFs for the entry. It will fetch it if not cached or if the refresh option is set.
    */
   getTopAggs(options?: CatalogGetOptions): CancellablePromise<TopAggs> {
-    const optimizer = getOptimizer(this.dataCatalog.connector);
-    return genericOptimizerGet<TopAggs>(
+    const sqlAnalyzer = sqlAnalyzerRepository.getSqlAnalyzer(this.dataCatalog.connector);
+    return genericSqlAnalyzerGet<TopAggs>(
       this,
       options,
       promise => {
@@ -237,7 +238,7 @@ class MultiTableEntry {
       val => {
         this.topAggs = val;
       },
-      optimizer.fetchTopAggs.bind(optimizer)
+      sqlAnalyzer.fetchTopAggs.bind(sqlAnalyzer)
     );
   }
 
@@ -245,8 +246,8 @@ class MultiTableEntry {
    * Gets the top columns for the entry. It will fetch it if not cached or if the refresh option is set.
    */
   getTopColumns(options?: CatalogGetOptions): CancellablePromise<TopColumns> {
-    const optimizer = getOptimizer(this.dataCatalog.connector);
-    return genericOptimizerGet<TopColumns>(
+    const sqlAnalyzer = sqlAnalyzerRepository.getSqlAnalyzer(this.dataCatalog.connector);
+    return genericSqlAnalyzerGet<TopColumns>(
       this,
       options,
       promise => {
@@ -256,7 +257,7 @@ class MultiTableEntry {
       val => {
         this.topColumns = val;
       },
-      optimizer.fetchTopColumns.bind(optimizer)
+      sqlAnalyzer.fetchTopColumns.bind(sqlAnalyzer)
     );
   }
 
@@ -264,8 +265,8 @@ class MultiTableEntry {
    * Gets the top filters for the entry. It will fetch it if not cached or if the refresh option is set.
    */
   getTopFilters(options?: CatalogGetOptions): CancellablePromise<TopFilters> {
-    const optimizer = getOptimizer(this.dataCatalog.connector);
-    return genericOptimizerGet<TopFilters>(
+    const sqlAnalyzer = sqlAnalyzerRepository.getSqlAnalyzer(this.dataCatalog.connector);
+    return genericSqlAnalyzerGet<TopFilters>(
       this,
       options,
       promise => {
@@ -275,7 +276,7 @@ class MultiTableEntry {
       val => {
         this.topFilters = val;
       },
-      optimizer.fetchTopFilters.bind(optimizer)
+      sqlAnalyzer.fetchTopFilters.bind(sqlAnalyzer)
     );
   }
 
@@ -283,8 +284,8 @@ class MultiTableEntry {
    * Gets the top joins for the entry. It will fetch it if not cached or if the refresh option is set.
    */
   getTopJoins(options?: CatalogGetOptions): CancellablePromise<TopJoins> {
-    const optimizer = getOptimizer(this.dataCatalog.connector);
-    return genericOptimizerGet<TopJoins>(
+    const sqlAnalyzer = sqlAnalyzerRepository.getSqlAnalyzer(this.dataCatalog.connector);
+    return genericSqlAnalyzerGet<TopJoins>(
       this,
       options,
       promise => {
@@ -294,7 +295,7 @@ class MultiTableEntry {
       val => {
         this.topJoins = val;
       },
-      optimizer.fetchTopJoins.bind(optimizer)
+      sqlAnalyzer.fetchTopJoins.bind(sqlAnalyzer)
     );
   }
 }

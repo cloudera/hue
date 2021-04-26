@@ -16,26 +16,26 @@
 
 import { CancellablePromise } from 'api/cancellablePromise';
 import { extractErrorMessage, post, successResponseIsError } from 'api/utils';
-import { OptimizerResponse, TimestampedData } from 'catalog/dataCatalog';
-import { OptimizerMeta } from 'catalog/DataCatalogEntry';
+import { SqlAnalyzerResponse, TimestampedData } from 'catalog/dataCatalog';
+import { SqlAnalyzerMeta } from 'catalog/DataCatalogEntry';
 import { TopAggs, TopColumns, TopFilters, TopJoins } from 'catalog/MultiTableEntry';
 import {
   CompatibilityOptions,
   MetaOptions,
-  Optimizer,
-  OptimizerRisk,
+  SqlAnalyzer,
+  AnalyzerRisk,
   PopularityOptions,
   PredictOptions,
   PredictResponse,
   RiskOptions,
   SimilarityOptions
-} from 'catalog/optimizer/optimizer';
+} from 'catalog/analyzer/types';
 import { Connector } from 'config/types';
 
 /**
  * Fetches the popularity for various aspects of the given tables
  */
-const genericOptimizerMultiTableFetch = <T extends TimestampedData>(
+const genericSqlAnalyzerMultiTableFetch = <T extends TimestampedData>(
   { silenceErrors, paths, connector }: PopularityOptions & { connector: Connector },
   url: string
 ): CancellablePromise<T> => {
@@ -72,7 +72,7 @@ const TOP_JOINS_URL = '/metadata/api/optimizer/top_joins';
 const TOP_TABLES_URL = '/metadata/api/optimizer/top_tables';
 const TABLE_DETAILS_URL = '/metadata/api/optimizer/table_details';
 
-export default class ApiStrategy implements Optimizer {
+export default class ApiSqlAnalyzer implements SqlAnalyzer {
   connector: Connector;
 
   constructor(connector: Connector) {
@@ -103,8 +103,8 @@ export default class ApiStrategy implements Optimizer {
     notebookJson,
     snippetJson,
     silenceErrors
-  }: RiskOptions): CancellablePromise<OptimizerRisk> {
-    return post<OptimizerRisk>(
+  }: RiskOptions): CancellablePromise<AnalyzerRisk> {
+    return post<AnalyzerRisk>(
       RISK_URL,
       {
         connector: JSON.stringify(this.connector),
@@ -136,7 +136,7 @@ export default class ApiStrategy implements Optimizer {
   fetchPopularity({
     paths,
     silenceErrors
-  }: PopularityOptions): CancellablePromise<OptimizerResponse> {
+  }: PopularityOptions): CancellablePromise<SqlAnalyzerResponse> {
     let url, data;
 
     if (paths.length === 1 && paths[0].length === 1) {
@@ -153,7 +153,7 @@ export default class ApiStrategy implements Optimizer {
       };
     }
 
-    return post<OptimizerResponse>(url, data, {
+    return post<SqlAnalyzerResponse>(url, data, {
       silenceErrors,
       handleSuccess: (response, resolve, reject) => {
         if (successResponseIsError(response)) {
@@ -167,35 +167,35 @@ export default class ApiStrategy implements Optimizer {
   }
 
   fetchTopAggs(options: PopularityOptions): CancellablePromise<TopAggs> {
-    return genericOptimizerMultiTableFetch<TopAggs>(
+    return genericSqlAnalyzerMultiTableFetch<TopAggs>(
       { ...options, connector: this.connector },
       TOP_AGGS_URL
     );
   }
 
   fetchTopColumns(options: PopularityOptions): CancellablePromise<TopColumns> {
-    return genericOptimizerMultiTableFetch<TopColumns>(
+    return genericSqlAnalyzerMultiTableFetch<TopColumns>(
       { ...options, connector: this.connector },
       TOP_COLUMNS_URL
     );
   }
 
   fetchTopFilters(options: PopularityOptions): CancellablePromise<TopFilters> {
-    return genericOptimizerMultiTableFetch<TopFilters>(
+    return genericSqlAnalyzerMultiTableFetch<TopFilters>(
       { ...options, connector: this.connector },
       TOP_FILTERS_URL
     );
   }
 
   fetchTopJoins(options: PopularityOptions): CancellablePromise<TopJoins> {
-    return genericOptimizerMultiTableFetch<TopJoins>(
+    return genericSqlAnalyzerMultiTableFetch<TopJoins>(
       { ...options, connector: this.connector },
       TOP_JOINS_URL
     );
   }
 
-  fetchOptimizerMeta({ path, silenceErrors }: MetaOptions): CancellablePromise<OptimizerMeta> {
-    return post<OptimizerMeta>(
+  fetchSqlAnalyzerMeta({ path, silenceErrors }: MetaOptions): CancellablePromise<SqlAnalyzerMeta> {
+    return post<SqlAnalyzerMeta>(
       TABLE_DETAILS_URL,
       {
         connector: JSON.stringify(this.connector),
@@ -204,7 +204,11 @@ export default class ApiStrategy implements Optimizer {
       },
       {
         silenceErrors,
-        handleSuccess: (response: { status: number; details?: OptimizerMeta }, resolve, reject) => {
+        handleSuccess: (
+          response: { status: number; details?: SqlAnalyzerMeta },
+          resolve,
+          reject
+        ) => {
           if (response.status === 0 && response.details) {
             response.details.hueTimestamp = Date.now();
             resolve(response.details);

@@ -32,13 +32,13 @@ class MetastoreTable {
    * @param {Object} options
    * @param {MetastoreDatabase} options.database
    * @param {DataCatalogEntry} options.catalogEntry
-   * @param {observable} options.optimizerEnabled
+   * @param {observable} options.sqlAnalyzerEnabled
    * @param {observable} options.navigatorEnabled
    * @constructor
    */
   constructor(options) {
     this.database = options.database;
-    this.optimizerEnabled = options.optimizerEnabled;
+    this.sqlAnalyzerEnabled = options.sqlAnalyzerEnabled;
     this.navigatorEnabled = options.navigatorEnabled;
     this.catalogEntry = options.catalogEntry;
 
@@ -47,8 +47,8 @@ class MetastoreTable {
     this.isModel = ko.observable(this.catalogEntry.isModel());
     this.viewSql = ko.observable();
 
-    this.optimizerStats = ko.observable();
-    this.optimizerDetails = ko.observable();
+    this.sqlAnalyzerStats = ko.observable();
+    this.sqlAnalyzerDetails = ko.observable();
     this.topJoins = ko.observableArray();
     this.navigatorMeta = ko.observable();
     this.relationshipsDetails = ko.observable();
@@ -158,12 +158,12 @@ class MetastoreTable {
           );
 
           this.catalogEntry
-            .getOptimizerMeta()
-            .then(optimizerMeta => {
-              this.optimizerDetails(optimizerMeta);
+            .getSqlAnalyzerMeta()
+            .then(sqlAnalyzerMeta => {
+              this.sqlAnalyzerDetails(sqlAnalyzerMeta);
 
               const topColIndex = {};
-              optimizerMeta.topCols.forEach(topCol => {
+              sqlAnalyzerMeta.topCols.forEach(topCol => {
                 topColIndex[topCol.name] = topCol;
               });
 

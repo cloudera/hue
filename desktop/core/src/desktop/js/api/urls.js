@@ -62,15 +62,3 @@ export const NAV_API = {
   LIST_TAGS: '/metadata/api/catalog/list_tags',
   UPDATE_PROPERTIES: '/metadata/api/catalog/update_properties'
 };
-
-export const OPTIMIZER_API = {
-  COMPATIBILITY: '/notebook/api/optimizer/statement/compatibility',
-  RISK: '/notebook/api/optimizer/statement/risk',
-  SIMILARITY: '/notebook/api/optimizer/statement/similarity',
-  TOP_AGGS: '/metadata/api/optimizer/top_aggs',
-  TOP_COLUMNS: '/metadata/api/optimizer/top_columns',
-  TOP_FILTERS: '/metadata/api/optimizer/top_filters',
-  TOP_JOINS: '/metadata/api/optimizer/top_joins',
-  TOP_TABLES: '/metadata/api/optimizer/top_tables',
-  TABLE_DETAILS: '/metadata/api/optimizer/table_details'
-};

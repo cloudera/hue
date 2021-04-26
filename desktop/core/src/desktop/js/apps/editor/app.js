@@ -509,8 +509,8 @@ huePubSub.subscribe('app.dom.loaded', app => {
 
     huePubSub.subscribe('editor.create.new', newKeyHandler, HUE_PUB_SUB_EDITOR_ID);
 
-    if (viewModel.isOptimizerEnabled()) {
-      if (window.OPTIMIZER_AUTO_UPLOAD_QUERIES) {
+    if (viewModel.isSqlAnalyzerEnabled()) {
+      if (window.SQL_ANALYZER_AUTO_UPLOAD_QUERIES) {
         huePubSub.subscribe(
           'editor.upload.query',
           query_id => {
@@ -520,7 +520,7 @@ huePubSub.subscribe('app.dom.loaded', app => {
         );
       }
 
-      if (window.OPTIMIZER_AUTO_UPLOAD_DDL) {
+      if (window.SQL_ANALYZER_AUTO_UPLOAD_DDL) {
         huePubSub.subscribe(
           'editor.upload.table.stats',
           options => {
@@ -530,7 +530,7 @@ huePubSub.subscribe('app.dom.loaded', app => {
         );
       }
 
-      if (window.OPTIMIZER_QUERY_HISTORY_UPLOAD_LIMIT !== 0) {
+      if (window.SQL_ANALYZER_QUERY_HISTORY_UPLOAD_LIMIT !== 0) {
         huePubSub.subscribe(
           'editor.upload.history',
           () => {

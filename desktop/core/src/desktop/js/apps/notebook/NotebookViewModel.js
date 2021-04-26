@@ -186,7 +186,7 @@ export default class NotebookViewModel {
       return self.selectedNotebook() && self.selectedNotebook().isHidingCode();
     });
     self.successUrl = ko.observable(options.success_url); // Deprecated
-    self.isOptimizerEnabled = ko.observable(options.is_optimizer_enabled);
+    self.isSqlAnalyzerEnabled = ko.observable(options.is_optimizer_enabled);
     self.isNavigatorEnabled = ko.observable(options.is_navigator_enabled);
 
     self.CoordinatorEditorViewModel = CoordinatorEditorViewModel;
@@ -299,7 +299,7 @@ export default class NotebookViewModel {
       }
     });
 
-    self.isRightPanelAvailable = ko.observable(options.assistAvailable && HAS_OPTIMIZER);
+    self.isRightPanelAvailable = ko.observable(options.assistAvailable && window.HAS_SQL_ANALYZER);
     self.isRightPanelVisible = ko.observable(
       getFromLocalStorage('assist.right_assist_panel_visible', true)
     );
