@@ -23,7 +23,6 @@ import {
   fetchSourceMetadata
 } from 'catalog/api';
 import MultiTableEntry, { TopAggs, TopFilters, TopJoins } from 'catalog/MultiTableEntry';
-import { sqlAnalyzerRepository } from './analyzer/sqlAnalyzerRepository';
 import * as ko from 'knockout';
 
 import apiHelper from 'api/apiHelper';
@@ -32,6 +31,7 @@ import { Compute, Connector, Namespace } from 'config/types';
 import { hueWindow } from 'types/types';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
+import { SqlAnalyzer } from './analyzer/types';
 import {
   CatalogGetOptions,
   DataCatalog,
@@ -424,14 +424,17 @@ export default class DataCatalogEntry {
   /**
    * Helper function to reload the nav opt metadata for the given entry
    */
-  private reloadSqlAnalyzerMeta(options?: ReloadOptions): CancellablePromise<SqlAnalyzerMeta> {
-    const sqlAnalyzer = sqlAnalyzerRepository.getSqlAnalyzer(this.getConnector());
+  private reloadSqlAnalyzerMeta({
+    cancellable,
+    silenceErrors,
+    sqlAnalyzer
+  }: ReloadOptions & { sqlAnalyzer: SqlAnalyzer }): CancellablePromise<SqlAnalyzerMeta> {
     if (this.dataCatalog.canHaveSqlAnalyzerMeta()) {
       this.sqlAnalyzerMetaPromise = new CancellablePromise<SqlAnalyzerMeta>(
         async (resolve, reject, onCancel) => {
           const fetchPromise = sqlAnalyzer.fetchSqlAnalyzerMeta({
             path: this.path,
-            silenceErrors: options && options.silenceErrors
+            silenceErrors
           });
           onCancel(() => {
             fetchPromise.cancel();
@@ -450,7 +453,7 @@ export default class DataCatalogEntry {
     } else {
       this.sqlAnalyzerMetaPromise = CancellablePromise.reject();
     }
-    return applyCancellable(this.sqlAnalyzerMetaPromise, options);
+    return applyCancellable(this.sqlAnalyzerMetaPromise, { cancellable });
   }
 
   private reloadPartitions(options?: ReloadOptions): CancellablePromise<Partitions> {
@@ -895,7 +898,7 @@ export default class DataCatalogEntry {
    * Loads SQL Analyzer popularity for the children of this entry.
    */
   loadSqlAnalyzerPopularityForChildren(
-    options?: CatalogGetOptions
+    options: CatalogGetOptions & { sqlAnalyzer: SqlAnalyzer }
   ): CancellablePromise<DataCatalogEntry[]> {
     if (
       this.sqlAnalyzerPopularityForChildrenPromise &&
@@ -903,7 +906,7 @@ export default class DataCatalogEntry {
     ) {
       this.sqlAnalyzerPopularityForChildrenPromise = undefined;
     }
-    options = forceSilencedErrors(options);
+    options.silenceErrors = true;
 
     if (!this.dataCatalog.canHaveSqlAnalyzerMeta()) {
       return CancellablePromise.reject();
@@ -936,8 +939,7 @@ export default class DataCatalogEntry {
             cancellablePromises.forEach(cancellable => cancellable.cancel());
           });
 
-          const sqlAnalyzer = sqlAnalyzerRepository.getSqlAnalyzer(this.dataCatalog.connector);
-          const popularityPromise = sqlAnalyzer.fetchPopularity({
+          const popularityPromise = options.sqlAnalyzer.fetchPopularity({
             ...options,
             paths: [this.path]
           });
@@ -1581,11 +1583,13 @@ export default class DataCatalogEntry {
   /**
    * Gets the SQL Analyzer metadata for the entry. It will fetch it if not cached or if the refresh option is set.
    */
-  getSqlAnalyzerMeta(options?: CatalogGetOptions): CancellablePromise<SqlAnalyzerMeta> {
+  getSqlAnalyzerMeta(
+    options: CatalogGetOptions & { sqlAnalyzer: SqlAnalyzer }
+  ): CancellablePromise<SqlAnalyzerMeta> {
     if (this.sqlAnalyzerMetaPromise && this.sqlAnalyzerMetaPromise.cancelled) {
       this.sqlAnalyzerMetaPromise = undefined;
     }
-    options = forceSilencedErrors(options);
+    options.silenceErrors = true;
 
     if (!this.dataCatalog.canHaveSqlAnalyzerMeta() || !this.isTableOrView()) {
       return CancellablePromise.reject();
@@ -1696,7 +1700,9 @@ export default class DataCatalogEntry {
   /**
    * Gets the top aggregate UDFs for the entry if it's a table or view. It will fetch it if not cached or if the refresh option is set.
    */
-  getTopAggs(options?: CatalogGetOptions): CancellablePromise<TopAggs> {
+  getTopAggs(
+    options: CatalogGetOptions & { sqlAnalyzer: SqlAnalyzer }
+  ): CancellablePromise<TopAggs> {
     const promise = new CancellablePromise<TopAggs>(async (resolve, reject, onCancel) => {
       const multiTableEntry = await getMultiTableEntry(this);
       const topAggsPromise = multiTableEntry.getTopAggs(options);
@@ -1713,7 +1719,9 @@ export default class DataCatalogEntry {
    *
    * @return {CancellableJqPromise}
    */
-  getTopFilters(options?: CatalogGetOptions): CancellablePromise<TopFilters> {
+  getTopFilters(
+    options: CatalogGetOptions & { sqlAnalyzer: SqlAnalyzer }
+  ): CancellablePromise<TopFilters> {
     const promise = new CancellablePromise<TopFilters>(async (resolve, reject, onCancel) => {
       const multiTableEntry = await getMultiTableEntry(this);
       const topFiltersPromise = multiTableEntry.getTopFilters(options);
@@ -1728,7 +1736,9 @@ export default class DataCatalogEntry {
   /**
    * Gets the top joins for the entry if it's a table or view. It will fetch it if not cached or if the refresh option is set.
    */
-  getTopJoins(options?: CatalogGetOptions): CancellablePromise<TopJoins> {
+  getTopJoins(
+    options: CatalogGetOptions & { sqlAnalyzer: SqlAnalyzer }
+  ): CancellablePromise<TopJoins> {
     const promise = new CancellablePromise<TopJoins>(async (resolve, reject, onCancel) => {
       const multiTableEntry = await getMultiTableEntry(this);
       const topJoinsPromise = multiTableEntry.getTopJoins(options);

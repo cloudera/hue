@@ -18,6 +18,7 @@ import $ from 'jquery';
 import * as ko from 'knockout';
 
 import apiHelper from 'api/apiHelper';
+import sqlAnalyzerRepository from 'catalog/analyzer/sqlAnalyzerRepository';
 import dataCatalog from 'catalog/dataCatalog';
 import HueColors from 'utils/hueColors';
 import hueUtils from 'utils/hueUtils';
@@ -1483,8 +1484,9 @@ class AutocompleteResults {
     }
     this.loadingJoins(true);
 
+    const sqlAnalyzer = sqlAnalyzerRepository.getSqlAnalyzer(this.snippet.connector());
     const paths = this.tableIdentifierChainsToPaths(suggestJoins.tables);
-    if (!paths.length) {
+    if (!sqlAnalyzer || !paths.length) {
       return [];
     }
 
@@ -1506,9 +1508,10 @@ class AutocompleteResults {
       const topJoins = await new Promise((resolve, reject) => {
         this.onCancelFunctions.push(reject);
         const topJoinsPromise = multiTableEntry.getTopJoins({
-          silenceErrors: true,
           cancellable: true,
-          connector: this.snippet.connector()
+          connector: this.snippet.connector(),
+          silenceErrors: true,
+          sqlAnalyzer
         });
         this.cancellablePromises.push(topJoinsPromise);
         topJoinsPromise.then(resolve).catch(reject);
@@ -1607,8 +1610,9 @@ class AutocompleteResults {
     }
     this.loadingJoinConditions(true);
 
+    const sqlAnalyzer = sqlAnalyzerRepository.getSqlAnalyzer(this.snippet.connector());
     const paths = this.tableIdentifierChainsToPaths(suggestJoinConditions.tables);
-    if (!paths.length) {
+    if (!sqlAnalyzer || !paths.length) {
       return [];
     }
 
@@ -1631,9 +1635,10 @@ class AutocompleteResults {
       const topJoins = await new Promise((resolve, reject) => {
         this.onCancelFunctions.push(reject);
         const topJoinsPromise = multiTableEntry.getTopJoins({
-          silenceErrors: true,
           cancellable: true,
-          connector: this.snippet.connector()
+          connector: this.snippet.connector(),
+          silenceErrors: true,
+          sqlAnalyzer
         });
         this.cancellablePromises.push(topJoinsPromise);
         topJoinsPromise.then(resolve).catch(reject);
@@ -1701,8 +1706,9 @@ class AutocompleteResults {
 
     this.loadingAggregateFunctions(true);
 
+    const sqlAnalyzer = sqlAnalyzerRepository.getSqlAnalyzer(this.snippet.connector());
     const paths = this.tableIdentifierChainsToPaths(suggestAggregateFunctions.tables);
-    if (!paths.length) {
+    if (!sqlAnalyzer || !paths.length) {
       return [];
     }
 
@@ -1725,9 +1731,10 @@ class AutocompleteResults {
       const topAggs = await new Promise((resolve, reject) => {
         this.onCancelFunctions.push(reject);
         const topAggsPromise = multiTableEntry.getTopAggs({
-          silenceErrors: true,
           cancellable: true,
-          connector: this.snippet.connector()
+          connector: this.snippet.connector(),
+          silenceErrors: true,
+          sqlAnalyzer
         });
         this.cancellablePromises.push(topAggsPromise);
         topAggsPromise.then(resolve).catch(reject);
@@ -1840,12 +1847,14 @@ class AutocompleteResults {
     try {
       const entries = await new Promise((resolve, reject) => {
         this.onCancelFunctions.push(reject);
+        const sqlAnalyzer = sqlAnalyzerRepository.getSqlAnalyzer(this.snippet.connector());
         const popularityPromise = dataCatalog
           .getCatalog(this.snippet.connector())
           .loadSqlAnalyzerPopularityForTables({
             namespace: this.snippet.namespace(),
             compute: this.snippet.compute(),
-            paths: paths,
+            paths,
+            sqlAnalyzer,
             silenceErrors: true,
             cancellable: true
           });
@@ -1947,8 +1956,9 @@ class AutocompleteResults {
     }
     this.loadingFilters(true);
 
+    const sqlAnalyzer = sqlAnalyzerRepository.getSqlAnalyzer(this.snippet.connector());
     const paths = this.tableIdentifierChainsToPaths(suggestFilters.tables);
-    if (!paths.length) {
+    if (!sqlAnalyzer || !paths.length) {
       return [];
     }
 
@@ -1971,9 +1981,10 @@ class AutocompleteResults {
       const topFilters = await new Promise((resolve, reject) => {
         this.onCancelFunctions.push(reject);
         const topFiltersPromise = multiTableEntry.getTopFilters({
-          silenceErrors: true,
           cancellable: true,
-          connector: this.snippet.connector()
+          connector: this.snippet.connector(),
+          silenceErrors: true,
+          sqlAnalyzer
         });
         this.cancellablePromises.push(topFiltersPromise);
         topFiltersPromise.then(resolve).catch(reject);
@@ -2063,9 +2074,11 @@ class AutocompleteResults {
 
       const childEntries = await new Promise((resolve, reject) => {
         this.onCancelFunctions.push(reject);
+        const sqlAnalyzer = sqlAnalyzerRepository.getSqlAnalyzer(entry.getConnector());
         const popularityPromise = entry.loadSqlAnalyzerPopularityForChildren({
+          cancellable: true,
           silenceErrors: true,
-          cancellable: true
+          sqlAnalyzer
         });
         this.cancellablePromises.push(popularityPromise);
         popularityPromise.then(resolve).catch(reject);
@@ -2138,12 +2151,14 @@ class AutocompleteResults {
 
       const popularEntries = await new Promise((resolve, reject) => {
         this.onCancelFunctions.push(reject);
+        const sqlAnalyzer = sqlAnalyzerRepository.getSqlAnalyzer(this.snippet.connector());
         const popularityPromise = dataCatalog
           .getCatalog(this.snippet.connector())
           .loadSqlAnalyzerPopularityForTables({
             namespace: this.snippet.namespace(),
             compute: this.snippet.compute(),
-            paths: paths,
+            paths,
+            sqlAnalyzer,
             silenceErrors: true,
             cancellable: true
           });

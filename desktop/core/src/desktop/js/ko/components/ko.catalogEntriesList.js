@@ -14,6 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import sqlAnalyzerRepository from 'catalog/analyzer/sqlAnalyzerRepository';
 import $ from 'jquery';
 import * as ko from 'knockout';
 
@@ -461,10 +462,12 @@ class CatalogEntriesList {
           self.loading(false);
         });
 
+      const sqlAnalyzer = sqlAnalyzerRepository.getSqlAnalyzer(self.catalogEntry().getConnector());
+
       if (self.catalogEntry().isTableOrView()) {
         const joinsPromise = self
           .catalogEntry()
-          .getTopJoins({ silenceErrors: true, cancellable: true });
+          .getTopJoins({ cancellable: true, silenceErrors: true, sqlAnalyzer });
         joinsPromise
           .then(topJoins => {
             if (topJoins && topJoins.values && topJoins.values.length) {
@@ -518,7 +521,11 @@ class CatalogEntriesList {
       self.cancellablePromises.push(
         self
           .catalogEntry()
-          .loadSqlAnalyzerPopularityForChildren({ silenceErrors: true, cancellable: true })
+          .loadSqlAnalyzerPopularityForChildren({
+            cancellable: true,
+            silenceErrors: true,
+            sqlAnalyzer
+          })
           .then(popularEntries => {
             if (popularEntries.length) {
               childPromise

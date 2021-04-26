@@ -39,7 +39,7 @@ import { Connector, Namespace } from 'config/types';
 import { hueWindow } from 'types/types';
 import I18n from 'utils/i18n';
 
-export default class MixedSqlAnalyzer implements SqlAnalyzer {
+export default class CombinedSqlAnalyser implements SqlAnalyzer {
   apiAnalyzer: ApiSqlAnalyzer;
   connector: Connector;
 
