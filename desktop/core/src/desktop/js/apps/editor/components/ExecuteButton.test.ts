@@ -22,7 +22,7 @@ import { mount, shallowMount } from '@vue/test-utils';
 import Executable, { ExecutionStatus } from 'apps/editor/execution/executable';
 import sessionManager from 'apps/editor/execution/sessionManager';
 import ExecuteButton from './ExecuteButton.vue';
-import { noop } from 'utils/hueUtils';
+import noop from 'utils/timing/noop';
 
 describe('ExecuteButton.vue', () => {
   it('should render', () => {

@@ -73,7 +73,7 @@
   import Spinner from 'components/Spinner.vue';
   import { findEditorConnector, getConfig } from 'config/hueConfig';
   import { Compute, Connector, Namespace } from 'config/types';
-  import { UUID } from 'utils/hueUtils';
+  import UUID from 'utils/string/UUID';
 
   export default defineComponent({
     name: 'SqlScratchpad',

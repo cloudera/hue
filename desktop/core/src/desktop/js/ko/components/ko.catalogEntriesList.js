@@ -21,7 +21,7 @@ import * as ko from 'knockout';
 import { ASSIST_KEY_COMPONENT } from './assist/ko.assistKey';
 import componentUtils from './componentUtils';
 import huePubSub from 'utils/huePubSub';
-import { noop } from 'utils/hueUtils';
+import noop from 'utils/timing/noop';
 import I18n from 'utils/i18n';
 
 export const NAME = 'catalog-entries-list';

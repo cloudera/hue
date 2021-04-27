@@ -18,7 +18,7 @@ import * as ko from 'knockout';
 
 import componentUtils from './componentUtils';
 import huePubSub from 'utils/huePubSub';
-import hueUtils from 'utils/hueUtils';
+import html2text from 'utils/html/html2text';
 import I18n from 'utils/i18n';
 
 export const NAME = 'field-samples';
@@ -113,7 +113,7 @@ class FieldSamples {
         self.catalogEntry().getDialect() === 'hive');
 
     self.sampleClick = function (html) {
-      self.onSampleClick(hueUtils.html2text(html));
+      self.onSampleClick(html2text(html));
       huePubSub.publish('context.popover.hide');
     };
 
