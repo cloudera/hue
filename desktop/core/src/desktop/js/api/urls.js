@@ -35,6 +35,8 @@ export const DASHBOARD_TERMS_API = '/dashboard/get_terms';
 export const DASHBOARD_STATS_API = '/dashboard/get_stats';
 export const FORMAT_SQL_API = '/notebook/api/format';
 export const GIST_API = '/desktop/api2/gist/';
+export const GET_SLACK_CHANNELS = '/slack/api/channels/get';
+export const SEND_SLACK_MESSAGE = '/slack/api/message/send';
 export const TOPO_URL = '/desktop/topo/';
 
 export const SEARCH_API = '/desktop/api/search/entities';

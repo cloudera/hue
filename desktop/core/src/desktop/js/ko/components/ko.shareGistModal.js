@@ -17,9 +17,11 @@
 import $ from 'jquery';
 import * as ko from 'knockout';
 
+import ApiHelper from '/api/apiHelper';
 import componentUtils from './componentUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
+import DisposableComponent from 'ko/components/DisposableComponent';
 
 export const SHOW_EVENT = 'show.share.gist.modal';
 export const SHOWN_EVENT = 'share.gist.modal.shown';
@@ -41,11 +43,51 @@ const TEMPLATE = `
         </button>
       </div>
     </div>
+    <!-- ko if: window.SHARE_TO_SLACK -->
+    <label class="checkbox"><input type="checkbox" data-bind="checked: showSlackSection"> ${ I18n('Directly share to Slack') } </input></label>
+    <!-- ko if: showSlackSection -->
+    <form class="form-horizontal">
+      <div class="control-group">
+        <label class="control-label">${I18n('Message body')}</label>
+        <div class="controls">
+          <input type="text" class="input-xlarge" data-bind="value: messageDescription, valueUpdate:'afterkeydown'" placeholder="${ I18n('(Optional)') }"/>
+        </div>
+      </div>
+      <div class="control-group">
+        <label class="control-label">${I18n('Slack Channel')}</label>
+        <div class="controls">
+          <select class="input-xlarge" data-bind="options: channels, optionsCaption: 'Choose...', value: selectedChannel"></select>
+        </div>
+      </div>
+    </form>
+    <button class="btn" type="button" data-dismiss="modal" data-bind="click: postMessage">${I18n('Post Message')}</button>
+  <!-- /ko -->
+  <!-- /ko -->
   </div>
   <div class="modal-footer">
     <a class="btn" data-dismiss="modal">${ I18n('Close') }</a>
   </div>
 `;
+
+class ShareGistModal extends DisposableComponent {
+  constructor(params) {
+    super();
+    this.showSlackSection = ko.observable(false);
+
+    this.link = ko.observable(params.link);
+    this.channels = ko.observableArray(params.channels);
+
+    this.selectedChannel = ko.observable('');
+    this.messageDescription = ko.observable('');
+  }
+
+  async postMessage() {
+    await ApiHelper.sendSlackMessageAsync({
+      channel: this.selectedChannel,
+      message: this.messageDescription() + '\n' + this.link()
+    });
+  }
+}
 
 componentUtils.registerComponent('share-gist-modal', undefined, TEMPLATE).then(() => {
   huePubSub.subscribe(SHOW_EVENT, async params => {
@@ -61,7 +103,7 @@ componentUtils.registerComponent('share-gist-modal', undefined, TEMPLATE).then((
     $('body').append($shareGistModal);
 
     const data = {
-      params: params,
+      params: new ShareGistModal(params),
       descendantsComplete: () => {
         huePubSub.publish(SHOWN_EVENT);
       }

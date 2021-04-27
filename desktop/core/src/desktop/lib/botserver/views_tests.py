@@ -55,32 +55,21 @@ class TestBotServer(unittest.TestCase):
     self.client_not_me = make_logged_in_client(username="test_not_me", groupname="default", recreate=True, is_superuser=False)
     self.user_not_me = User.objects.get(username="test_not_me")
 
-  def test_send_hi_user(self):
-    with patch('desktop.lib.botserver.views.slack_client.api_call') as api_call:
-      api_call.return_value = {
-        "ok": True
-      }
-      send_hi_user("channel", "user_id")
-      api_call.assert_called_with(api_method='chat.postMessage', json={'channel': 'channel', 'text': 'Hi <@user_id> :wave:'})
-
-      api_call.side_effect = PopupException('message')
-      assert_raises(PopupException, send_hi_user, "channel", "user_id")
-
   def test_handle_on_message(self):
-    with patch('desktop.lib.botserver.views.send_hi_user') as say_hi_user:
+    with patch('desktop.lib.botserver.views._send_message') as _send_message:
       
       response = handle_on_message("channel", "bot_id", "text", "user_id")
       assert_equal(response.status_code, 200)
-      assert_false(say_hi_user.called)
+      assert_false(_send_message.called)
       
       handle_on_message("channel", None, None, "user_id")
-      assert_false(say_hi_user.called)
+      assert_false(_send_message.called)
 
       handle_on_message("channel", None, "text", "user_id")
-      assert_false(say_hi_user.called)
+      assert_false(_send_message.called)
 
       handle_on_message("channel", None, "hello hue test", "user_id")
-      assert_true(say_hi_user.called)
+      assert_true(_send_message.called)
   
   def test_handle_query_history_link(self):
     with patch('desktop.lib.botserver.views.slack_client.chat_unfurl') as chat_unfurl:
