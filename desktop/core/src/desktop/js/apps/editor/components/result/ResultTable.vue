@@ -75,8 +75,8 @@
     },
     props: {
       executable: {
-        type: Object as PropType<Executable>,
-        required: true
+        type: Object as PropType<Executable | undefined>,
+        default: undefined
       }
     },
     setup(props) {
@@ -204,7 +204,7 @@
         if (streaming.value) {
           return;
         }
-        if (hasMore.value && !grayedOut.value && executable.value && executable.value.result) {
+        if (hasMore.value && !grayedOut.value && executable.value?.result) {
           grayedOut.value = true;
           try {
             await executable.value.result.fetchRows({ rows: 100 });
