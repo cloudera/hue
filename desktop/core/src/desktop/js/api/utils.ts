@@ -162,12 +162,12 @@ const handleResponse = <T>(
   if (options && options.handleSuccess) {
     options.handleSuccess(response.data, resolve, reason => {
       reject(reason);
-      notifyError(String(reason), response.data);
+      notifyError(String(reason), response.data, options);
     });
   } else if ((!options || !options.ignoreSuccessErrors) && successResponseIsError(response.data)) {
     const errorMessage = extractErrorMessage(response && response.data);
     reject(errorMessage);
-    notifyError(errorMessage, response);
+    notifyError(errorMessage, response, options);
   } else {
     resolve(response.data);
   }
@@ -199,7 +199,7 @@ export const post = <T, U = unknown, E = string>(
         if (options && options.handleError) {
           options.handleError(err, resolve, reason => {
             handleErrorResponse(err, reject, options);
-            notifyError(String(reason), err);
+            notifyError(String(reason), err, options);
           });
         } else {
           handleErrorResponse(err, reject, options);
