@@ -14,8 +14,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { noop } from 'lodash';
-
 import DataCatalogEntry from 'catalog/DataCatalogEntry';
 import { PopularityOptions, SqlAnalyzer } from './analyzer/types';
 import { CatalogGetOptions, DataCatalog, TimestampedData } from './dataCatalog';
@@ -24,6 +22,7 @@ import { applyCancellable } from 'catalog/catalogUtils';
 import { UdfDetails } from 'sql/reference/types';
 import { Connector } from 'config/types';
 import { hueWindow } from 'types/types';
+import noop from 'utils/timing/noop';
 
 export interface TopJoinValue {
   totalTableCount: number;
@@ -203,7 +202,7 @@ class MultiTableEntry {
     if (ttl && ttl.default && ttl.default > 0) {
       window.clearTimeout(this.saveTimeout);
       this.saveTimeout = window.setTimeout(() => {
-        this.save();
+        this.save().catch();
       }, 1000);
     }
   }
