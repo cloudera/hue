@@ -23,8 +23,9 @@ import dataCatalog from 'catalog/dataCatalog';
 import { GET_KNOWN_CONFIG_TOPIC } from 'config/events';
 import { findEditorConnector } from 'config/hueConfig';
 import huePubSub from 'utils/huePubSub';
-import hueUtils from 'utils/hueUtils';
 import { getFromLocalStorage, withLocalStorage } from 'utils/storageUtils';
+import waitForRendered from 'utils/timing/waitForRendered';
+import changeURL from 'utils/url/changeURL';
 
 class MetastoreViewModel {
   /**
@@ -187,19 +188,19 @@ class MetastoreViewModel {
           params.namespace = this.source().namespace().id;
         }
         if (this.source().namespace().database() && this.source().namespace().database().table()) {
-          hueUtils.changeURL(
+          changeURL(
             prefix +
               'table/' +
               this.source().namespace().database().table().catalogEntry.path.join('/'),
             params
           );
         } else if (this.source().namespace().database()) {
-          hueUtils.changeURL(
+          changeURL(
             prefix + 'tables/' + this.source().namespace().database().catalogEntry.name,
             params
           );
         } else {
-          hueUtils.changeURL(prefix + 'databases', params);
+          changeURL(prefix + 'databases', params);
         }
       }
     });
@@ -227,7 +228,7 @@ class MetastoreViewModel {
       if (!col.table.samples.loading()) {
         $('.page-content').scrollTop(0);
         this.currentTab('sample');
-        hueUtils.waitForRendered(
+        waitForRendered(
           '#sampleTable',
           el => el.parent().hasClass('dataTables_wrapper'),
           () => {

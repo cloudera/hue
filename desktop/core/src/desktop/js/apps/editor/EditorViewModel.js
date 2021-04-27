@@ -19,18 +19,20 @@ import * as ko from 'knockout';
 import komapping from 'knockout.mapping';
 
 import apiHelper from 'api/apiHelper';
-import ChartTransformers from 'apps/notebook/chartTransformers';
-import huePubSub from 'utils/huePubSub';
-import hueUtils from 'utils/hueUtils';
-
-import Notebook from 'apps/editor/notebook';
 import {
   ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT,
   GET_ACTIVE_SNIPPET_CONNECTOR_EVENT
 } from 'apps/editor/events';
+import Notebook from 'apps/editor/notebook';
+import ChartTransformers from 'apps/notebook/chartTransformers';
 import { CONFIG_REFRESHED_TOPIC, GET_KNOWN_CONFIG_TOPIC } from 'config/events';
 import { findEditorConnector, getLastKnownConfig } from 'config/hueConfig';
+import huePubSub from 'utils/huePubSub';
 import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
+import UUID from 'utils/string/UUID';
+import changeURL from 'utils/url/changeURL';
+import changeURLParameter from 'utils/url/changeURLParameter';
+import getParameter from 'utils/url/getParameter';
 
 export default class EditorViewModel {
   constructor(editorId, notebooks, options, CoordinatorEditorViewModel, RunningCoordinatorModel) {
@@ -92,8 +94,8 @@ export default class EditorViewModel {
 
     this.activeConnector.subscribe(connector => {
       if (connector) {
-        if (hueUtils.getParameter('type') !== connector.id) {
-          hueUtils.changeURLParameter('type', connector.id);
+        if (getParameter('type') !== connector.id) {
+          changeURLParameter('type', connector.id);
         }
         this.notifyDialectChange(connector.dialect, connector.is_sql);
       }
@@ -261,7 +263,7 @@ export default class EditorViewModel {
 
   changeURL(url) {
     if (!this.isNotificationManager()) {
-      hueUtils.changeURL(url);
+      changeURL(url);
     }
   }
 
@@ -305,10 +307,10 @@ export default class EditorViewModel {
   async init() {
     if (this.editorId) {
       await this.openNotebook(this.editorId);
-    } else if (hueUtils.getParameter('gist') !== '' || hueUtils.getParameter('type') !== '') {
-      await this.newNotebook(hueUtils.getParameter('type'));
-    } else if (hueUtils.getParameter('editor') !== '') {
-      await this.openNotebook(hueUtils.getParameter('editor'));
+    } else if (getParameter('gist') !== '' || getParameter('type') !== '') {
+      await this.newNotebook(getParameter('type'));
+    } else if (getParameter('editor') !== '') {
+      await this.openNotebook(getParameter('editor'));
     } else if (this.notebooks.length > 0) {
       this.loadNotebook(this.notebooks[0]); // Old way of loading json for /browse
     } else {
@@ -363,8 +365,8 @@ export default class EditorViewModel {
     return new Promise((resolve, reject) => {
       $.post('/notebook/api/create_notebook', {
         type: connectorId,
-        directory_uuid: hueUtils.getParameter('directory_uuid'),
-        gist: this.isNotificationManager() ? undefined : hueUtils.getParameter('gist'),
+        directory_uuid: getParameter('directory_uuid'),
+        gist: this.isNotificationManager() ? undefined : getParameter('gist'),
         blank: typeof blank !== 'undefined'
       })
         .then(data => {
@@ -444,7 +446,7 @@ export default class EditorViewModel {
 
   saveAsNotebook() {
     this.selectedNotebook().id(null);
-    this.selectedNotebook().uuid(hueUtils.UUID());
+    this.selectedNotebook().uuid(UUID());
     this.selectedNotebook().parentSavedQueryUuid(null);
     this.selectedNotebook().save(() => {
       huePubSub.publish('assist.document.refresh');

@@ -56,7 +56,7 @@
   import { SqlReferenceProvider } from 'sql/reference/types';
   import { hueWindow } from 'types/types';
   import huePubSub from 'utils/huePubSub';
-  import { defer } from 'utils/hueUtils';
+  import defer from 'utils/timing/defer';
   import I18n from 'utils/i18n';
   import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
 

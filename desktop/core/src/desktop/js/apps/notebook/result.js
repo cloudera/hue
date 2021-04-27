@@ -17,7 +17,7 @@
 import $ from 'jquery';
 import * as ko from 'knockout';
 
-import hueUtils from 'utils/hueUtils';
+import UUID from 'utils/string/UUID';
 
 class Result {
   constructor(snippet, result) {
@@ -32,7 +32,7 @@ class Result {
       }
     );
     self.id = ko.observable(
-      typeof result.id != 'undefined' && result.id != null ? result.id : hueUtils.UUID()
+      typeof result.id != 'undefined' && result.id != null ? result.id : UUID()
     );
     self.type = ko.observable(
       typeof result.type != 'undefined' && result.type != null ? result.type : 'table'

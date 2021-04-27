@@ -63,7 +63,7 @@
   import SectionItem from './SectionItem.vue';
   import SpacerItem from './SpacerItem.vue';
   import { SidebarItem } from './types';
-  import { defer } from 'utils/hueUtils';
+  import defer from 'utils/timing/defer';
 
   export default defineComponent({
     name: 'SidebarBody',

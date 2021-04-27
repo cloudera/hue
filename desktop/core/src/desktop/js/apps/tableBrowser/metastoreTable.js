@@ -19,8 +19,8 @@ import $ from 'jquery';
 import * as ko from 'knockout';
 
 import apiHelper from 'api/apiHelper';
+import deXSS from 'utils/html/deXSS';
 import huePubSub from 'utils/huePubSub';
-import hueUtils from 'utils/hueUtils';
 import MetastoreColumn from 'apps/tableBrowser/metastoreColumn';
 import MetastoreTableSamples from 'apps/tableBrowser/metastoreTableSamples';
 import MetastoreTablePartitions from 'apps/tableBrowser/metastoreTablePartitions';
@@ -107,7 +107,7 @@ class MetastoreTable {
     }
 
     this.commentWithoutNewLines = ko.pureComputed(() =>
-      this.comment() ? hueUtils.deXSS(this.comment().replace(/[\n\r]+/gi, ' ')) : ''
+      this.comment() ? deXSS(this.comment().replace(/[\n\r]+/gi, ' ')) : ''
     );
 
     this.comment.subscribe(newValue => {

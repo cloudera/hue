@@ -19,7 +19,7 @@ import * as ko from 'knockout';
 import * as apiUtils from 'api/utils';
 import AssistLangRefPanel from './ko.assistLangRefPanel';
 import { refreshConfig } from 'config/hueConfig';
-import { sleep } from 'utils/hueUtils';
+import sleep from 'utils/timing/sleep';
 
 describe('ko.assistLangRefPanel.js', () => {
   beforeAll(() => {

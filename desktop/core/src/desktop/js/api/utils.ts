@@ -22,11 +22,11 @@ import axios, {
   CancelToken
 } from 'axios';
 import qs from 'qs';
-import huePubSub from 'utils/huePubSub';
-import { hueWindow } from '../types/types';
 
 import { CancellablePromise } from './cancellablePromise';
-import hueUtils from 'utils/hueUtils';
+import { hueWindow } from 'types/types';
+import huePubSub from 'utils/huePubSub';
+import logError from 'utils/logError';
 
 export interface DefaultApiResponse {
   status: number;
@@ -136,7 +136,7 @@ const notifyError = <T>(
   options?: Pick<ApiFetchOptions<T>, 'silenceErrors'>
 ): void => {
   if (!options || !options.silenceErrors) {
-    hueUtils.logError(response);
+    logError(response);
     if (message.indexOf('AuthorizationException') === -1) {
       huePubSub.publish('hue.error', message);
     }

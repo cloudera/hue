@@ -22,7 +22,9 @@ import './ko.resultDownloadActions';
 import componentUtils from 'ko/components/componentUtils';
 import DisposableComponent from 'ko/components/DisposableComponent';
 import I18n from 'utils/i18n';
-import { defer, sleep, UUID } from 'utils/hueUtils';
+import defer from 'utils/timing/defer';
+import sleep from 'utils/timing/sleep';
+import UUID from 'utils/string/UUID';
 import {
   HIDE_FIXED_HEADERS_EVENT,
   REDRAW_FIXED_HEADERS_EVENT,
