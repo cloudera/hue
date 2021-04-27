@@ -1226,45 +1226,6 @@ class ApiHelper {
     return deferred.resolve().promise();
   }
 
-  updateSourceMetadata(options) {
-    let url;
-    const data = {
-      source_type: options.sourceType
-    };
-    if (options.path.length === 1) {
-      url = '/metastore/databases/' + options.path[0] + '/alter';
-      data.properties = ko.mapping.toJSON(options.properties);
-    } else if (options.path.length === 2) {
-      url = '/metastore/table/' + options.path[0] + '/' + options.path[1] + '/alter';
-      if (options.properties) {
-        if (options.properties.comment) {
-          data.comment = options.properties.comment;
-        }
-        if (options.properties.name) {
-          data.new_table_name = options.properties.name;
-        }
-      }
-    } else if (options.path.length > 2) {
-      url = '/metastore/table/' + options.path[0] + '/' + options.path[1] + '/alter_column';
-      data.column = options.path.slice(2).join('.');
-      if (options.properties) {
-        if (options.properties.comment) {
-          data.comment = options.properties.comment;
-        }
-        if (options.properties.name) {
-          data.new_column_name = options.properties.name;
-        }
-        if (options.properties.type) {
-          data.new_column_type = options.properties.name;
-        }
-        if (options.properties.partitions) {
-          data.partition_spec = ko.mapping.toJSON(options.properties.partitions);
-        }
-      }
-    }
-    return simplePost(url, data, options);
-  }
-
   /**
    * Fetches the partitions for the given path
    *
@@ -1467,73 +1428,6 @@ class ApiHelper {
   }
 
   /**
-   * Updates Navigator properties and custom metadata for the given entity
-   *
-   * @param {Object} options
-   * @param {string} options.identity - The identifier for the Navigator entity to update
-   * @param {Object} [options.properties]
-   * @param {Object.<string|string>|undefined} [options.modifiedCustomMetadata]
-   * @param {string[]|undefined} [options.deletedCustomMetadataKeys]
-   * @param {boolean} [options.silenceErrors]
-   *
-   * @return {JQueryPromise}
-   */
-  updateNavigatorProperties(options) {
-    const data = { id: ko.mapping.toJSON(options.identity) };
-
-    if (options.properties) {
-      data.properties = ko.mapping.toJSON(options.properties);
-    }
-    if (options.modifiedCustomMetadata) {
-      data.modifiedCustomMetadata = ko.mapping.toJSON(options.modifiedCustomMetadata);
-    }
-    if (options.deletedCustomMetadataKeys) {
-      data.deletedCustomMetadataKeys = ko.mapping.toJSON(options.deletedCustomMetadataKeys);
-    }
-    return simplePost(URLS.NAV_API.UPDATE_PROPERTIES, data, options);
-  }
-
-  /**
-   * Lists all available navigator tags
-   *
-   * @param {Object} options
-   * @param {boolean|undefined} [options.silenceErrors]
-   *
-   * @return {CancellableJqPromise}
-   */
-  fetchAllNavigatorTags(options) {
-    const deferred = $.Deferred();
-
-    const request = simplePost(URLS.NAV_API.LIST_TAGS, undefined, {
-      silenceErrors: options.silenceErrors,
-      successCallback: data => {
-        if (data && data.tags) {
-          deferred.resolve(data.tags);
-        } else {
-          deferred.resolve({});
-        }
-      },
-      errorCallback: deferred.reject
-    });
-
-    return new CancellableJqPromise(deferred, request);
-  }
-
-  addNavTags(entityId, tags) {
-    return simplePost(URLS.NAV_API.ADD_TAGS, {
-      id: ko.mapping.toJSON(entityId),
-      tags: ko.mapping.toJSON(tags)
-    });
-  }
-
-  deleteNavTags(entityId, tags) {
-    return simplePost(URLS.NAV_API.DELETE_TAGS, {
-      id: ko.mapping.toJSON(entityId),
-      tags: ko.mapping.toJSON(tags)
-    });
-  }
-
-  /**
    * @param {Object} options
    * @param {boolean} [options.silenceErrors]
    * @param {ContextCompute} options.compute
@@ -1690,27 +1584,6 @@ class ApiHelper {
         }
       })
       .fail(deferred.reject);
-    return new CancellableJqPromise(deferred, request);
-  }
-
-  searchEntities(options) {
-    const deferred = $.Deferred();
-
-    const request = simplePost(
-      URLS.SEARCH_API,
-      {
-        query_s: ko.mapping.toJSON(options.query),
-        limit: options.limit || 100,
-        raw_query: !!options.rawQuery,
-        sources: options.sources ? ko.mapping.toJSON(options.sources) : '["sql"]'
-      },
-      {
-        silenceErrors: options.silenceErrors,
-        successCallback: deferred.resolve,
-        errorCallback: deferred.reject
-      }
-    );
-
     return new CancellableJqPromise(deferred, request);
   }
 
