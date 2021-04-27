@@ -33,7 +33,8 @@ import DataCatalogEntry, {
   SourceMeta
 } from 'catalog/DataCatalogEntry';
 import { hueWindow } from 'types/types';
-import { sleep, UUID } from 'utils/hueUtils';
+import sleep from 'utils/timing/sleep';
+import UUID from 'utils/string/UUID';
 import { Cluster, Compute, Connector, Namespace } from '../config/types';
 
 interface AnalyzeResponse {

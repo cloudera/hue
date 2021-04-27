@@ -20,8 +20,6 @@ import komapping from 'knockout.mapping';
 
 import apiHelper from 'api/apiHelper';
 import ChartTransformers from 'apps/notebook/chartTransformers';
-import huePubSub from 'utils/huePubSub';
-import hueUtils from 'utils/hueUtils';
 
 import Notebook from 'apps/notebook/notebook';
 import Snippet from 'apps/notebook/snippet';
@@ -32,6 +30,11 @@ import {
 import { CONFIG_REFRESHED_TOPIC } from 'config/events';
 import { findEditorConnector, getLastKnownConfig } from 'config/hueConfig';
 import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
+import huePubSub from 'utils/huePubSub';
+import changeURL from 'utils/url/changeURL';
+import changeURLParameter from 'utils/url/changeURLParameter';
+import getParameter from 'utils/url/getParameter';
+import UUID from 'utils/string/UUID';
 
 export default class NotebookViewModel {
   constructor(editor_id, notebooks, options, CoordinatorEditorViewModel, RunningCoordinatorModel) {
@@ -85,7 +88,7 @@ export default class NotebookViewModel {
       }
 
       self.editorMode(newVal !== 'notebook');
-      hueUtils.changeURLParameter('type', newVal);
+      changeURLParameter('type', newVal);
       if (self.editorMode()) {
         self.selectedNotebook().fetchHistory(); // Js error if notebook did not have snippets
       }
@@ -441,21 +444,21 @@ export default class NotebookViewModel {
 
     self.changeURL = function (url) {
       if (!self.isNotificationManager()) {
-        hueUtils.changeURL(url);
+        changeURL(url);
       }
     };
 
     self.init = function () {
       if (editor_id) {
         self.openNotebook(editor_id);
-      } else if (hueUtils.getParameter('gist') !== '') {
-        self.newNotebook(hueUtils.getParameter('type'));
-      } else if (hueUtils.getParameter('editor') !== '') {
-        self.openNotebook(hueUtils.getParameter('editor'));
+      } else if (getParameter('gist') !== '') {
+        self.newNotebook(getParameter('type'));
+      } else if (getParameter('editor') !== '') {
+        self.openNotebook(getParameter('editor'));
       } else if (notebooks.length > 0) {
         self.loadNotebook(notebooks[0]); // Old way of loading json for /browse
-      } else if (hueUtils.getParameter('type') !== '') {
-        self.newNotebook(hueUtils.getParameter('type'));
+      } else if (getParameter('type') !== '') {
+        self.newNotebook(getParameter('type'));
       } else {
         self.newNotebook();
       }
@@ -635,8 +638,8 @@ export default class NotebookViewModel {
         '/notebook/api/create_notebook',
         {
           type: connectorId,
-          directory_uuid: hueUtils.getParameter('directory_uuid'),
-          gist: self.isNotificationManager() ? undefined : hueUtils.getParameter('gist')
+          directory_uuid: getParameter('directory_uuid'),
+          gist: self.isNotificationManager() ? undefined : getParameter('gist')
         },
         data => {
           self.loadNotebook(data.notebook);
@@ -652,8 +655,8 @@ export default class NotebookViewModel {
               snippet.currentQueryTab(queryTab);
             }
             huePubSub.publish('detach.scrolls', self.selectedNotebook().snippets()[0]);
-            if (hueUtils.getParameter('type') === '') {
-              hueUtils.changeURLParameter('type', self.editorType());
+            if (getParameter('type') === '') {
+              changeURLParameter('type', self.editorType());
             }
             if (!self.isNotificationManager()) {
               huePubSub.publish(ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT, self.activeConnector());
@@ -673,7 +676,7 @@ export default class NotebookViewModel {
 
     self.saveAsNotebook = function () {
       self.selectedNotebook().id(null);
-      self.selectedNotebook().uuid(hueUtils.UUID());
+      self.selectedNotebook().uuid(UUID());
       self.selectedNotebook().parentSavedQueryUuid(null);
       self.selectedNotebook().save(() => {
         huePubSub.publish('assist.document.refresh');

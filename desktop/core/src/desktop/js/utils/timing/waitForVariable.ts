@@ -14,19 +14,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import $ from 'jquery';
-
-const hueAnalytics = {
-  log: function (app, page) {
-    if (typeof trackOnGA == 'function') {
-      trackOnGA(app + '/' + page);
-    }
-  },
-  convert: function (app, page) {
-    $.post('/desktop/log_analytics', {
-      page: app + '/' + page
-    });
+const waitForVariable = (
+  variable: unknown,
+  callback: (variable: unknown) => void,
+  timeout?: number
+): void => {
+  if (variable) {
+    callback(variable);
+  } else {
+    window.setTimeout(() => {
+      waitForVariable(variable, callback);
+    }, timeout || 100);
   }
 };
 
-export default hueAnalytics;
+export default waitForVariable;

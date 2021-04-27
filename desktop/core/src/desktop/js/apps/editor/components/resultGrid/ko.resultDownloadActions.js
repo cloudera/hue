@@ -17,12 +17,12 @@
 import $ from 'jquery';
 import * as ko from 'knockout';
 
+import { SHOW_DOWNLOAD_RESULT_MODAL_EVENT } from 'apps/editor/components/resultGrid/ko.resultDownloadModal';
 import componentUtils from 'ko/components/componentUtils';
 import DisposableComponent from 'ko/components/DisposableComponent';
 import I18n from 'utils/i18n';
 import huePubSub from 'utils/huePubSub';
-import hueUtils from 'utils/hueUtils';
-import { SHOW_DOWNLOAD_RESULT_MODAL_EVENT } from 'apps/editor/components/resultGrid/ko.resultDownloadModal';
+import html2text from 'utils/html/html2text';
 
 export const NAME = 'result-download-actions';
 
@@ -134,7 +134,7 @@ class ResultDownloadActions extends DisposableComponent {
       this.meta().forEach((metaCol, idx) => {
         // Skip the row number column
         if (idx > 0) {
-          htmlString += `<th>${hueUtils.html2text(metaCol.name)}</th>`;
+          htmlString += `<th>${html2text(metaCol.name)}</th>`;
         }
       });
       htmlString += '</tr>';
@@ -143,7 +143,7 @@ class ResultDownloadActions extends DisposableComponent {
         row.forEach((cell, idx) => {
           // Skip the row number column
           if (idx > 0) {
-            htmlString += `<td>${hueUtils.html2text(cell)}</td>`;
+            htmlString += `<td>${html2text(cell)}</td>`;
           }
         });
         htmlString += '</tr>';

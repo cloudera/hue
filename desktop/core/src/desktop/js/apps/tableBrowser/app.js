@@ -20,9 +20,11 @@ import * as ko from 'knockout';
 import dataCatalog from 'catalog/dataCatalog';
 import huePubSub from 'utils/huePubSub';
 import MetastoreViewModel from 'apps/tableBrowser/metastoreViewModel';
-import hueUtils from 'utils/hueUtils';
 import I18n from 'utils/i18n';
 import { CONFIG_REFRESHED_TOPIC, GET_KNOWN_CONFIG_TOPIC } from 'config/events';
+import waitForRendered from 'utils/timing/waitForRendered';
+import getParameter from 'utils/url/getParameter';
+import replaceURL from 'utils/url/replaceURL';
 
 import 'components/er-diagram/webcomp';
 
@@ -76,7 +78,7 @@ huePubSub.subscribe('app.dom.loaded', app => {
       const selector = 'samplesTable';
       const bannerTopHeight = window.BANNER_TOP_HTML ? 30 : 0;
       if ($(selector).parents('.dataTables_wrapper').length === 0) {
-        hueUtils.waitForRendered(
+        waitForRendered(
           selector,
           el => el.find('td').length > 0,
           () => {
@@ -137,7 +139,7 @@ huePubSub.subscribe('app.dom.loaded', app => {
   huePubSub.publish(GET_KNOWN_CONFIG_TOPIC, configUpdated);
   huePubSub.subscribe(CONFIG_REFRESHED_TOPIC, configUpdated);
 
-  if (hueUtils.getParameter('refresh') === 'true') {
+  if (getParameter('refresh') === 'true') {
     // TODO: Use connectors in the table browser
     const connector = {
       id: viewModel.source().type,
@@ -158,7 +160,7 @@ huePubSub.subscribe('app.dom.loaded', app => {
         entry.clearCache({
           silenceErrors: true
         });
-        hueUtils.replaceURL('?');
+        replaceURL('?');
       });
   }
 });

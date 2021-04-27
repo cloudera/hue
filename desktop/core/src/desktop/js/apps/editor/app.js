@@ -22,10 +22,11 @@ import 'ext/bootstrap-datepicker.min';
 import 'ext/jquery.hotkeys';
 import 'jquery/plugins/jquery.hdfstree';
 
-import huePubSub from 'utils/huePubSub';
-import hueUtils from 'utils/hueUtils';
-import I18n from 'utils/i18n';
 import sqlWorkerHandler from 'sql/sqlWorkerHandler';
+import huePubSub from 'utils/huePubSub';
+import I18n from 'utils/i18n';
+import scrollbarWidth from 'utils/screen/scrollbarWidth';
+import waitForRendered from 'utils/timing/waitForRendered';
 
 import {
   HIDE_FIXED_HEADERS_EVENT,
@@ -360,7 +361,7 @@ huePubSub.subscribe('app.dom.loaded', app => {
     };
     $(window).data('beforeunload', window.onbeforeunload);
 
-    $('.preview-sample').css('right', 10 + hueUtils.scrollbarWidth() + 'px');
+    $('.preview-sample').css('right', 10 + scrollbarWidth() + 'px');
 
     const saveKeyHandler = () => {
       if (viewModel.canSave()) {
@@ -757,7 +758,7 @@ huePubSub.subscribe('app.dom.loaded', app => {
     huePubSub.subscribe(
       'recalculate.name.description.width',
       () => {
-        hueUtils.waitForRendered(
+        waitForRendered(
           '.editorComponents .hue-title-bar .query-name',
           el => {
             return el.is(':visible');
