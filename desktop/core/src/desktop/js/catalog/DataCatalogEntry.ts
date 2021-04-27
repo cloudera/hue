@@ -14,18 +14,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import * as ko from 'knockout';
+
 import { Cancellable, CancellablePromise } from 'api/cancellablePromise';
 import {
+  addNavTags,
+  deleteNavTags,
   fetchDescribe,
   fetchNavigatorMetadata,
   fetchPartitions,
   fetchSample,
-  fetchSourceMetadata
+  fetchSourceMetadata,
+  searchEntities,
+  updateNavigatorProperties,
+  updateSourceMetadata
 } from 'catalog/api';
 import MultiTableEntry, { TopAggs, TopFilters, TopJoins } from 'catalog/MultiTableEntry';
-import * as ko from 'knockout';
 
-import apiHelper from 'api/apiHelper';
 import { applyCancellable, forceSilencedErrors } from 'catalog/catalogUtils';
 import { Compute, Connector, Namespace } from 'config/types';
 import { hueWindow } from 'types/types';
@@ -764,17 +769,17 @@ export default class DataCatalogEntry {
             });
           };
 
-          const searchPromise = apiHelper.searchEntities({
-            query: query,
+          const searchPromise = searchEntities({
+            query,
             rawQuery: true,
             limit: children.length,
-            silenceErrors: options && options.silenceErrors
+            silenceErrors: options?.silenceErrors
           });
 
           cancellablePromises.push(searchPromise);
 
           searchPromise
-            .done((result: { entities: NavigatorMeta[] }) => {
+            .then(result => {
               if (result && result.entities) {
                 const childEntryIndex: { [name: string]: DataCatalogEntry } = {};
                 children.forEach(childEntry => {
@@ -798,7 +803,8 @@ export default class DataCatalogEntry {
                 });
               }
             })
-            .always(() => {
+            .catch(() => resolve([]))
+            .finally(() => {
               rejectUnknown();
               resolve(children);
             });
@@ -1076,13 +1082,12 @@ export default class DataCatalogEntry {
     }
 
     return new Promise<NavigatorMeta>((resolve, reject) => {
-      apiHelper
-        .updateNavigatorProperties({
-          identity: navigatorMeta.identity,
-          modifiedCustomMetadata: modifiedCustomMetadata,
-          deletedCustomMetadataKeys: deletedCustomMetadataKeys
-        })
-        .done(entity => {
+      updateNavigatorProperties({
+        identity: navigatorMeta.identity,
+        modifiedCustomMetadata,
+        deletedCustomMetadataKeys
+      })
+        .then(entity => {
           if (entity) {
             this.navigatorMeta = entity;
             this.navigatorMetaPromise = CancellablePromise.resolve(entity);
@@ -1091,7 +1096,8 @@ export default class DataCatalogEntry {
           } else {
             reject();
           }
-        });
+        })
+        .catch(reject);
     });
   }
 
@@ -1109,14 +1115,13 @@ export default class DataCatalogEntry {
       }
 
       return new Promise<string>((resolve, reject) => {
-        apiHelper
-          .updateNavigatorProperties({
-            identity: navigatorMeta.identity,
-            properties: {
-              description: comment
-            }
-          })
-          .done(async entity => {
+        updateNavigatorProperties({
+          identity: navigatorMeta.identity,
+          properties: {
+            description: comment
+          }
+        })
+          .then(async entity => {
             if (entity) {
               this.navigatorMeta = entity;
               this.navigatorMetaPromise = CancellablePromise.resolve(entity);
@@ -1131,20 +1136,19 @@ export default class DataCatalogEntry {
               })
               .catch(reject);
           })
-          .fail(reject);
+          .catch(reject);
       });
     }
 
     return new Promise((resolve, reject) => {
-      apiHelper
-        .updateSourceMetadata({
-          sourceType: this.getConnector().id,
-          path: this.path,
-          properties: {
-            comment: comment
-          }
-        })
-        .done(async () => {
+      updateSourceMetadata({
+        entry: this,
+        properties: {
+          comment: comment
+        },
+        silenceErrors: options?.silenceErrors
+      })
+        .then(async () => {
           try {
             await this.reloadSourceMeta(options);
             const comment = await this.getComment(options);
@@ -1156,7 +1160,7 @@ export default class DataCatalogEntry {
             reject(err);
           }
         })
-        .fail(reject);
+        .catch(reject);
     });
   }
 
@@ -1174,9 +1178,8 @@ export default class DataCatalogEntry {
     const navigatorMeta = await this.getNavigatorMeta(apiOptions);
 
     return new Promise((resolve, reject) => {
-      apiHelper
-        .addNavTags(navigatorMeta.identity, tags)
-        .done(entity => {
+      addNavTags(navigatorMeta.identity, tags)
+        .then(entity => {
           if (entity) {
             this.navigatorMeta = entity;
             this.navigatorMetaPromise = CancellablePromise.resolve(entity);
@@ -1186,7 +1189,7 @@ export default class DataCatalogEntry {
             reject();
           }
         })
-        .fail(reject);
+        .catch(reject);
     });
   }
 
@@ -1204,9 +1207,8 @@ export default class DataCatalogEntry {
     const navigatorMeta = await this.getNavigatorMeta(apiOptions);
 
     return new Promise((resolve, reject) => {
-      apiHelper
-        .deleteNavTags(navigatorMeta.identity, tags)
-        .done(entity => {
+      deleteNavTags(navigatorMeta.identity, tags)
+        .then(entity => {
           if (entity) {
             this.navigatorMeta = entity;
             this.navigatorMetaPromise = CancellablePromise.resolve(entity);
@@ -1216,7 +1218,7 @@ export default class DataCatalogEntry {
             reject();
           }
         })
-        .fail(reject);
+        .catch(reject);
     });
   }
 
