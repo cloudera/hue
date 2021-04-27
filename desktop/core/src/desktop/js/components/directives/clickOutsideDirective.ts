@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import { Directive } from 'vue';
-import { defer } from 'utils/hueUtils';
+import defer from 'utils/timing/defer';
 
 interface ClickOutsideHTMLElement extends HTMLElement {
   clickOutsideHandler?: (event: MouseEvent) => void;

@@ -19,10 +19,6 @@ import * as ko from 'knockout';
 import komapping from 'knockout.mapping';
 
 import apiHelper from 'api/apiHelper';
-import hueAnalytics from 'utils/hueAnalytics';
-import huePubSub from 'utils/huePubSub';
-import hueUtils from 'utils/hueUtils';
-
 import Session from 'apps/notebook/session';
 import Snippet from 'apps/notebook/snippet';
 import {
@@ -30,7 +26,10 @@ import {
   ASSIST_IS_DB_PANEL_READY_EVENT,
   ASSIST_SET_DATABASE_EVENT
 } from 'ko/components/assist/events';
+import hueAnalytics from 'utils/hueAnalytics';
+import huePubSub from 'utils/huePubSub';
 import { getFromLocalStorage } from 'utils/storageUtils';
+import UUID from 'utils/string/UUID';
 
 const NOTEBOOK_MAPPING = {
   ignore: [
@@ -70,7 +69,7 @@ class Notebook {
       typeof notebook.id != 'undefined' && notebook.id != null ? notebook.id : null
     );
     self.uuid = ko.observable(
-      typeof notebook.uuid != 'undefined' && notebook.uuid != null ? notebook.uuid : hueUtils.UUID()
+      typeof notebook.uuid != 'undefined' && notebook.uuid != null ? notebook.uuid : UUID()
     );
     self.name = ko.observable(
       typeof notebook.name != 'undefined' && notebook.name != null ? notebook.name : 'My Notebook'
@@ -752,7 +751,7 @@ class Notebook {
           self.history.removeAll();
           if (self.isHistory()) {
             self.id(null);
-            self.uuid(hueUtils.UUID());
+            self.uuid(UUID());
             vm.changeURL(vm.URLS.editor + '?type=' + vm.editorType());
           }
         }

@@ -17,7 +17,7 @@
 import $ from 'jquery';
 import * as ko from 'knockout';
 
-import hueUtils from 'utils/hueUtils';
+import stripHtmlFromFunctions from 'utils/html/stripHtmlForFunctions';
 
 ko.bindingHandlers.fresherEditor = {
   init: function (element, valueAccessor) {
@@ -67,7 +67,7 @@ ko.bindingHandlers.fresherEditor = {
     });
 
     function updateValues() {
-      $('[data-template]')[0].editor.setValue(hueUtils.stripHtmlFromFunctions(_el.html()));
+      $('[data-template]')[0].editor.setValue(stripHtmlFromFunctions(_el.html()));
       valueAccessor().data(_el.html());
     }
 

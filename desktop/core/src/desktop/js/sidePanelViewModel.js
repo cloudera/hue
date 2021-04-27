@@ -22,7 +22,7 @@ import huePubSub from 'utils/huePubSub';
 import { ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT } from 'apps/editor/events';
 import { SHOW_LEFT_ASSIST_EVENT, SHOW_RIGHT_ASSIST_EVENT } from 'ko/components/assist/events';
 import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
-import { defer } from './utils/hueUtils';
+import defer from 'utils/timing/defer';
 
 class SidePanelViewModel {
   constructor() {

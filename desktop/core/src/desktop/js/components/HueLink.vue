@@ -23,7 +23,7 @@
 <script lang="ts">
   import { defineComponent } from 'vue';
 
-  import { onHueLinkClick } from 'utils/hueUtils';
+  import onHueLinkClick from 'utils/html/onHueLinkClick';
 
   interface hueWindow {
     HUE_BASE_URL: string;

@@ -17,7 +17,7 @@
 import $ from 'jquery';
 
 import HueColors from 'utils/hueColors';
-import hueUtils from 'utils/hueUtils';
+import html2text from 'utils/html/html2text';
 
 const isNotNullForCharts = val => val !== 'NULL' && val !== null;
 
@@ -45,7 +45,7 @@ const pieChartTransformer = function (rawDatum) {
           val = 0;
         }
         _data.push({
-          label: hueUtils.html2text(item[_idxLabel]),
+          label: html2text(item[_idxLabel]),
           value: val,
           color: colors[cnt % colors.length],
           obj: item
@@ -132,7 +132,7 @@ const leafletMapChartTransformer = function (rawDatum) {
           _data.push({
             lat: Math.min(Math.max(MIN_LAT, item[_idxLat]), MAX_LAT),
             lng: Math.min(Math.max(MIN_LNG, item[_idxLng]), MAX_LNG),
-            label: hueUtils.html2text(item[_idxLabel]),
+            label: html2text(item[_idxLabel]),
             isHeat: rawDatum.snippet.chartMapType() === 'heat',
             intensity:
               _idxHeat > -1 ? (item[_idxHeat] * 1 != NaN ? item[_idxHeat] * 1 : null) : null,
@@ -188,7 +188,7 @@ const timelineChartTransformer = function (rawDatum) {
           if (isNotNullForCharts(item[_idxLabel]) && isNotNullForCharts(item[_idxValue])) {
             _data.push({
               series: _plottedSerie,
-              x: new Date(moment(hueUtils.html2text(item[_idxLabel])).valueOf()),
+              x: new Date(moment(html2text(item[_idxLabel])).valueOf()),
               y: item[_idxValue] * 1,
               color: colors[_plottedSerie % colors.length],
               obj: item
@@ -257,7 +257,7 @@ const multiSerieChartTransformer = function (rawDatum) {
               if (item[_idxPivot] === val) {
                 if (isNotNullForCharts(item[_idxValue]) && isNotNullForCharts(item[_idxLabel])) {
                   _data.push({
-                    x: _isXDate ? moment(item[_idxLabel]) : hueUtils.html2text(item[_idxLabel]),
+                    x: _isXDate ? moment(item[_idxLabel]) : html2text(item[_idxLabel]),
                     y: item[_idxValue] * 1,
                     color: colors[pivotCnt % colors.length],
                     obj: item
@@ -266,7 +266,7 @@ const multiSerieChartTransformer = function (rawDatum) {
               }
             });
             _datum.push({
-              key: hueUtils.html2text(val),
+              key: html2text(val),
               values: _data
             });
           });
@@ -367,7 +367,7 @@ const multiSerieChartTransformer = function (rawDatum) {
               if (isNotNullForCharts(item[_idxValue]) && isNotNullForCharts(item[_idxLabel])) {
                 _data.push({
                   series: _plottedSerie,
-                  x: _isXDate ? moment(item[_idxLabel]) : hueUtils.html2text(item[_idxLabel]),
+                  x: _isXDate ? moment(item[_idxLabel]) : html2text(item[_idxLabel]),
                   y: item[_idxValue] * 1,
                   color: colors[cnt % colors.length],
                   obj: item

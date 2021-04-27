@@ -23,7 +23,7 @@ import sqlUtils from 'sql/sqlUtils';
 import DisposableComponent from './DisposableComponent';
 import { DRAGGABLE_TEXT_META_EVENT } from 'ko/bindings/ko.draggableText';
 import { INSERT_AT_CURSOR_EVENT } from 'ko/bindings/ace/ko.aceEditor';
-import { sleep } from 'utils/hueUtils';
+import sleep from 'utils/timing/sleep';
 
 export const NAME = 'hue-editor-droppable-menu';
 

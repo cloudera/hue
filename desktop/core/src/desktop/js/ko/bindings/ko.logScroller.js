@@ -17,7 +17,7 @@
 import $ from 'jquery';
 import * as ko from 'knockout';
 
-import hueUtils from 'utils/hueUtils';
+import waitForRendered from 'utils/timing/waitForRendered';
 
 ko.bindingHandlers.logScroller = {
   init: function (element, valueAccessor, allBindings) {
@@ -62,7 +62,7 @@ ko.bindingHandlers.logScroller = {
         window.setTimeout(autoLogScroll, 0);
       });
     } else {
-      hueUtils.waitForRendered(
+      waitForRendered(
         element,
         el => {
           return el.is(':visible');

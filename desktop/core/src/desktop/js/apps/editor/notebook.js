@@ -21,7 +21,7 @@ import komapping from 'knockout.mapping';
 import apiHelper from 'api/apiHelper';
 import hueAnalytics from 'utils/hueAnalytics';
 import huePubSub from 'utils/huePubSub';
-import hueUtils from 'utils/hueUtils';
+import UUID from 'utils/string/UUID';
 import sessionManager from 'apps/editor/execution/sessionManager';
 
 import Snippet, { STATUS as SNIPPET_STATUS } from 'apps/editor/snippet';
@@ -38,7 +38,7 @@ export default class Notebook {
   constructor(vm, notebookRaw) {
     this.parentVm = vm;
     this.id = ko.observable(notebookRaw.id);
-    this.uuid = ko.observable(notebookRaw.uuid || hueUtils.UUID());
+    this.uuid = ko.observable(notebookRaw.uuid || UUID());
     this.name = ko.observable(notebookRaw.name || '');
     this.description = ko.observable(notebookRaw.description || '');
     this.type = ko.observable(notebookRaw.type || 'notebook');
@@ -112,7 +112,7 @@ export default class Notebook {
     huePubSub.subscribe(HISTORY_CLEARED_EVENT, () => {
       if (this.isHistory()) {
         this.id(null);
-        this.uuid(hueUtils.UUID());
+        this.uuid(UUID());
         this.parentVm.changeURL(this.parentVm.URLS.editor + '?type=' + this.parentVm.editorType());
       }
     });

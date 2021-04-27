@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import $ from 'jquery';
-import { escapeOutput } from 'utils/hueUtils';
+import escapeOutput from 'utils/html/escapeOutput';
 import { hueLocalStorage } from 'utils/storageUtils';
 
 /*

@@ -20,7 +20,7 @@ import koMapping from 'knockout.mapping';
 
 import componentUtils from './componentUtils';
 import I18n from 'utils/i18n';
-import hueUtils from 'utils/hueUtils';
+import UUID from 'utils/string/UUID';
 
 export const NAME = 'hue-sentry-privileges';
 
@@ -625,7 +625,7 @@ const _create_ko_privilege = privilege =>
     timestamp: privilege.timestamp,
     roleName: privilege.roleName,
     grantOption: privilege.grantOption,
-    id: hueUtils.UUID()
+    id: UUID()
   });
 
 class SentryPrivilegesViewModel {
