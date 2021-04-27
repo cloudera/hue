@@ -24,7 +24,6 @@ import apiHelper from 'api/apiHelper';
 import dataCatalog from 'catalog/dataCatalog';
 import hueAnalytics from 'utils/hueAnalytics';
 import huePubSub from 'utils/huePubSub';
-import hueUtils from 'utils/hueUtils';
 import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
 import Result from 'apps/notebook/result';
 import Session from 'apps/notebook/session';
@@ -44,6 +43,7 @@ import {
   CURSOR_POSITION_CHANGED_EVENT,
   REFRESH_STATEMENT_LOCATIONS_EVENT
 } from 'ko/bindings/ace/aceLocationHandler';
+import UUID from 'utils/string/UUID';
 
 const NOTEBOOK_MAPPING = {
   ignore: [
@@ -181,7 +181,7 @@ class Snippet {
     const self = this;
 
     self.id = ko.observable(
-      typeof snippet.id != 'undefined' && snippet.id != null ? snippet.id : hueUtils.UUID()
+      typeof snippet.id != 'undefined' && snippet.id != null ? snippet.id : UUID()
     );
     self.name = ko.observable(
       typeof snippet.name != 'undefined' && snippet.name != null ? snippet.name : ''

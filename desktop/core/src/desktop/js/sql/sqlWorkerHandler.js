@@ -14,8 +14,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import $ from 'jquery';
-
 import huePubSub from 'utils/huePubSub';
 import { resolveCatalogEntry } from 'sql/sqlUtils';
 import { applyCancellable } from '../catalog/catalogUtils';
@@ -37,7 +35,7 @@ const attachEntryResolver = function (location, connector, namespace, compute) {
 
     if (!location.identifierChain && !location.colRef && !location.colRef.identifierChain) {
       if (!location.resolvePathPromise) {
-        location.resolvePathPromise = $.Deferred().reject().promise();
+        location.resolvePathPromise = Promise.reject();
       }
       return location.resolvePathPromise;
     }

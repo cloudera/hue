@@ -20,7 +20,7 @@ import * as ko from 'knockout';
 import nv from 'ext/nv.d3.1.1.15b.custom';
 
 import huePubSub from 'utils/huePubSub';
-import hueUtils from 'utils/hueUtils';
+import htmlEncode from 'utils/html/htmlEncode';
 import I18n from 'utils/i18n';
 
 ko.bindingHandlers.pieChart = {
@@ -59,7 +59,7 @@ ko.bindingHandlers.pieChart = {
               .showLabels(true)
               .showLegend(false)
               .tooltipContent((key, y) => {
-                return '<h3>' + hueUtils.htmlEncode(key) + '</h3><p>' + y + '</p>';
+                return '<h3>' + htmlEncode(key) + '</h3><p>' + y + '</p>';
               });
             _chart.noData(_data.message || I18n('No Data Available.'));
             const _d3 =

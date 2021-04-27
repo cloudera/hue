@@ -65,7 +65,7 @@
   import { Column } from 'components/HueTable';
   import HueTable from 'components/HueTable.vue';
   import SubscriptionTracker from 'components/utils/SubscriptionTracker';
-  import { defer } from 'utils/hueUtils';
+  import defer from 'utils/timing/defer';
   import I18n from 'utils/i18n';
 
   export default defineComponent({

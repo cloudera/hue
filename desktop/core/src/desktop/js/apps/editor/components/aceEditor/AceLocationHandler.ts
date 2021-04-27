@@ -44,7 +44,7 @@ import {
   POST_TO_SYNTAX_WORKER_EVENT
 } from 'sql/sqlWorkerHandler';
 import { getFromLocalStorage } from 'utils/storageUtils';
-import { SqlReferenceProvider } from '../../../../sql/reference/types';
+import { SqlReferenceProvider } from 'sql/reference/types';
 
 export const REFRESH_STATEMENT_LOCATIONS_EVENT = 'editor.refresh.statement.locations';
 export const ACTIVE_STATEMENT_CHANGED_EVENT = 'editor.active.statement.changed';

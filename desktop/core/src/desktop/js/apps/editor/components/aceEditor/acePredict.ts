@@ -20,7 +20,8 @@ import { CancellablePromise } from 'api/cancellablePromise';
 import { PredictResponse, SqlAnalyzerProvider } from 'catalog/analyzer/types';
 import { Disposable } from 'components/utils/SubscriptionTracker';
 import { Connector } from 'config/types';
-import { defer, noop } from 'utils/hueUtils';
+import defer from 'utils/timing/defer';
+import noop from 'utils/timing/noop';
 
 type ActivePredict = { text: string; element: HTMLElement };
 
