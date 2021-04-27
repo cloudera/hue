@@ -22,6 +22,7 @@ from urllib.parse import urlsplit
 from tabulate import tabulate
 
 from desktop.lib.botserver.slack_client import slack_client, SLACK_VERIFICATION_TOKEN
+from desktop.lib.botserver.api import _send_message
 from desktop.lib.django_util import login_notrequired, JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.models import Document2, _get_gist_document
@@ -89,7 +90,8 @@ def handle_on_message(channel_id, bot_id, text, user_id):
   
   if slack_client is not None:
     if text and 'hello hue' in text.lower():
-      send_hi_user(channel_id, user_id)
+      bot_message = 'Hi <@{user}> :wave:'.format(user=user_id)
+      _send_message(channel_id, bot_message)
 
 
 def handle_on_link_shared(channel_id, message_ts, links, user_id):
@@ -270,15 +272,3 @@ def _make_unfurl_payload(request, url, id_type, doc, doc_type):
     payload[url]['blocks'].append(result_section)
 
   return {'payload': payload, 'file_status': file_status}
-
-
-def send_hi_user(channel_id, user_id):
-  """
-  Sends Hi<user_id> message in a specific channel.
-
-  """
-  bot_message = 'Hi <@{user}> :wave:'.format(user=user_id)
-  try:
-    slack_client.api_call(api_method='chat.postMessage', json={'channel': channel_id, 'text': bot_message})
-  except Exception as e:
-    raise PopupException(_("Error posting message"), detail=e)
