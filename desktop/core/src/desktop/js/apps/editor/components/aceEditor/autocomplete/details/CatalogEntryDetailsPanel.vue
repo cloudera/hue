@@ -50,7 +50,7 @@
         </div>
 
         <div v-if="loading" class="details-comment">
-          <spinner size="small" inline="true" />
+          <spinner size="small" :inline="true" />
         </div>
         <div v-else-if="comment" class="details-comment">{{ comment }}</div>
         <div v-else class="details-no-comment">{{ I18n('No description') }}</div>
