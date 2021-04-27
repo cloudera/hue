@@ -49,8 +49,6 @@ import apiHelper from 'api/apiHelper';
 import dataCatalog from 'catalog/dataCatalog';
 import { SetDetails, SqlReferenceProvider, UdfDetails } from 'sql/reference/types';
 import { hueWindow } from 'types/types';
-import hueUtils from 'utils/hueUtils';
-import I18n from 'utils/i18n';
 import sqlUtils from 'sql/sqlUtils';
 import { matchesType } from 'sql/reference/typeUtils';
 import { cancelActiveRequest } from 'api/apiUtils';
@@ -61,6 +59,8 @@ import {
   getUdfsWithReturnTypes,
   getReturnTypesForUdf
 } from 'sql/reference/sqlUdfRepository';
+import I18n from 'utils/i18n';
+import equalIgnoreCase from 'utils/string/equalIgnoreCase';
 
 interface ColumnReference {
   type: string;
@@ -137,9 +137,7 @@ const PHOENIX_DIALECT = 'phoenix';
 
 const locateSubQuery = (subQueries: SubQuery[], subQueryName: string): SubQuery | undefined => {
   if (subQueries) {
-    return subQueries.find(knownSubQuery =>
-      hueUtils.equalIgnoreCase(knownSubQuery.alias, subQueryName)
-    );
+    return subQueries.find(knownSubQuery => equalIgnoreCase(knownSubQuery.alias, subQueryName));
   }
 };
 
@@ -703,7 +701,7 @@ class AutocompleteResults {
       try {
         const databases = await databasesPromise;
         const foundDb = databases.find(dbEntry =>
-          hueUtils.equalIgnoreCase(dbEntry.name, suggestTables.identifierChain[0].name)
+          equalIgnoreCase(dbEntry.name, suggestTables.identifierChain[0].name)
         );
         if (foundDb) {
           tableSuggestions = await getTableSuggestions();
@@ -799,7 +797,7 @@ class AutocompleteResults {
       return;
     }
     const cte = commonTableExpressions.find(cte =>
-      hueUtils.equalIgnoreCase(cte.alias, table.identifierChain[0].cte)
+      equalIgnoreCase(cte.alias, table.identifierChain[0].cte)
     );
     if (!cte) {
       return;
@@ -967,7 +965,7 @@ class AutocompleteResults {
               popular: false,
               weightAdjust:
                 types[0].toUpperCase() !== 'T' &&
-                types.some(type => hueUtils.equalIgnoreCase(type, childEntry.getType()))
+                types.some(type => equalIgnoreCase(type, childEntry.getType()))
                   ? 1
                   : 0,
               hasCatalogEntry: true,
@@ -1006,7 +1004,7 @@ class AutocompleteResults {
               popular: false,
               weightAdjust:
                 types[0].toUpperCase() !== 'T' &&
-                types.some(type => hueUtils.equalIgnoreCase(type, fieldType))
+                types.some(type => equalIgnoreCase(type, fieldType))
                   ? 1
                   : 0,
               hasCatalogEntry: false,
@@ -2048,7 +2046,7 @@ class AutocompleteResults {
       }
       if (
         sqlAnalyzerColumn.tableName &&
-        hueUtils.equalIgnoreCase(
+        equalIgnoreCase(
           sqlAnalyzerColumn.tableName,
           tables[i].identifierChain[tables[i].identifierChain.length - 1].name
         ) &&
@@ -2082,7 +2080,7 @@ class AutocompleteResults {
     tables.forEach(table => {
       tablesHasDefaultDatabase =
         tablesHasDefaultDatabase ||
-        hueUtils.equalIgnoreCase(
+        equalIgnoreCase(
           table.identifierChain[0].name.toLowerCase(),
           this.activeDatabase.toLowerCase()
         );
@@ -2255,9 +2253,7 @@ class AutocompleteResults {
         childrenPromise.then(resolve).catch(reject);
       });
 
-      const firstIsDb = databaseEntries.some(dbEntry =>
-        hueUtils.equalIgnoreCase(dbEntry.name, path[0])
-      );
+      const firstIsDb = databaseEntries.some(dbEntry => equalIgnoreCase(dbEntry.name, path[0]));
       if (!firstIsDb) {
         path.unshift(this.activeDatabase);
       }

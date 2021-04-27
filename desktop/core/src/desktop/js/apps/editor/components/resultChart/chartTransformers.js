@@ -17,7 +17,7 @@
 import $ from 'jquery';
 
 import HueColors from 'utils/hueColors';
-import { html2text } from 'utils/hueUtils';
+import html2text from 'utils/html/html2text';
 import { CHART_MAP_TYPE, CHART_SORTING } from 'apps/editor/components/resultChart/ko.resultChart';
 
 // The leaflet map can freeze the browser with numbers outside the map

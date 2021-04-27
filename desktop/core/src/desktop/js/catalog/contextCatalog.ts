@@ -20,7 +20,7 @@ import { fetchClusters, fetchComputes, fetchNamespaces } from './api';
 import { Cluster, Compute, IdentifiableInterpreter, Namespace } from 'config/types';
 import huePubSub from 'utils/huePubSub';
 import { hueWindow } from 'types/types';
-import { noop } from 'utils/hueUtils';
+import noop from 'utils/timing/noop';
 import {
   CONTEXT_CATALOG_REFRESHED_TOPIC,
   NAMESPACES_REFRESHED_TOPIC,

@@ -17,9 +17,10 @@
 import 'ext/bootstrap.2.3.2.min';
 
 import { koSetup } from 'jest/koTestUtils';
-
+import isOverflowing from 'utils/html/isOverflowing';
 import './ko.toggleOverflow';
-import hueUtils from 'utils/hueUtils';
+
+jest.mock('utils/html/isOverflowing');
 
 describe('ko.toggleOverflow.js', () => {
   const setup = koSetup();
@@ -27,7 +28,7 @@ describe('ko.toggleOverflow.js', () => {
   jest.useFakeTimers();
 
   it('should render binding', async () => {
-    jest.spyOn(hueUtils, 'isOverflowing').mockImplementation(() => true);
+    isOverflowing.mockReturnValue(true);
 
     const wrapper = await setup.renderKo(`<div data-bind="toggleOverflow">Some text</div>`, {});
 

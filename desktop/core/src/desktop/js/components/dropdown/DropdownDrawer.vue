@@ -38,7 +38,7 @@
     addClickOutsideHandler,
     removeClickOutsideHandler
   } from 'components/directives/clickOutsideDirective';
-  import { defer } from 'utils/hueUtils';
+  import defer from 'utils/timing/defer';
 
   const isOutsideViewport = (element: Element): { bottom: boolean; right: boolean } => {
     const clientRect = element.getBoundingClientRect();

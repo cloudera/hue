@@ -16,8 +16,8 @@
 
 import $ from 'jquery';
 
+import deXSS from 'utils/html/deXSS';
 import huePubSub from 'utils/huePubSub';
-import hueUtils from 'utils/hueUtils';
 import I18n from 'utils/i18n';
 
 const PLUGIN_NAME = 'jHueTableExtender2';
@@ -552,7 +552,7 @@ Plugin.prototype.drawLockedRow = function (rowNo, force) {
         '<td ' +
         (aoColumns && !aoColumns[idx].bVisible ? 'style="display: none"' : '') +
         '>' +
-        hueUtils.deXSS(col) +
+        deXSS(col) +
         '</td>';
     });
     $clone.html(tHtml);

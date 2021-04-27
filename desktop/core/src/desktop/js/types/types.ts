@@ -64,4 +64,5 @@ export interface hueWindow {
   WS_CHANNEL?: string;
   hueDebug?: HueDebug;
   DISABLE_LOCAL_STORAGE?: boolean;
+  trackOnGA?(track: string): void;
 }
