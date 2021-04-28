@@ -1472,7 +1472,7 @@ class ApiHelper {
    * @param {channel} options.channel
    * @param {message} options.message
    *
-   * @return {CancellableJqPromise<string>}
+   * @return {Promise<void>}
    */
   async sendSlackMessageAsync(options) {
     const data = {
@@ -1480,11 +1480,7 @@ class ApiHelper {
       message: options.message
     };
     return new Promise((resolve, reject) => {
-      simplePost(URLS.SEND_SLACK_MESSAGE, data, options)
-        .done(response => {
-          resolve(response);
-        })
-        .fail(reject);
+      simplePost(URLS.SEND_SLACK_MESSAGE, data, options).done(resolve).fail(reject);
     });
   }
 
@@ -1492,7 +1488,7 @@ class ApiHelper {
    *
    * @param {Object} options
    *
-   * @return {CancellableJqPromise<string>}
+   * @return {Promise<Object>}
    */
   async getSlackChannelsAsync(options) {
     return new Promise((resolve, reject) => {

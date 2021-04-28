@@ -97,6 +97,7 @@ class TestBotServer(unittest.TestCase):
                 users_info.return_value = {
                   "ok": True,
                   "user": {
+                    "is_bot": False,
                     "profile": {
                       "email": "test_not_me@example.com"
                     }
@@ -182,6 +183,7 @@ class TestBotServer(unittest.TestCase):
           users_info.return_value = {
             "ok": True,
             "user": {
+              "is_bot": False,
               "profile": {
                 "email": "test@example.com"
               }
@@ -217,6 +219,18 @@ class TestBotServer(unittest.TestCase):
           chat_unfurl.assert_called_with(channel=channel_id, ts=message_ts, unfurls=gist_preview)
           assert_false(send_result_file.called)
 
+          # Gist link sent directly from Hue to Slack via bot
+          users_info.return_value = {
+            "ok": True,
+            "user": {
+              "is_bot": True,
+            }
+          }
+          handle_on_link_shared(channel_id, message_ts, links, user_id)
+
+          chat_unfurl.assert_called_with(channel=channel_id, ts=message_ts, unfurls=gist_preview)
+          assert_false(send_result_file.called)
+
           # Gist document does not exist
           gist_url = "https://demo.gethue.com/hue/gist?uuid=6d1c407b-d999-4dfd-ad23-d3a46c19a427"
           assert_raises(PopupException, handle_on_link_shared, "channel", "12.1", [{"url": gist_url}], "<@user_id>")
@@ -237,6 +251,7 @@ class TestBotServer(unittest.TestCase):
         users_info.return_value = {
           "ok": True,
           "user": {
+            "is_bot": False,
             "profile": {
               "email": "test_user_not_exist@example.com"
             }

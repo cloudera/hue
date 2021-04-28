@@ -34,13 +34,11 @@ const TEMPLATE = `
   </div>
   <div class="modal-body">
     <div class="row-fluid">
-      <div class="span12">
+      <div class="input-append">
         <form autocomplete="off">
-          <input id="gistLink" class="input-xxlarge" ${ window.PREVENT_AUTOFILL_INPUT_ATTRS } onfocus="this.select()" data-bind="value: link" type="text" placeholder="${ I18n('Link') }"/>
+          <input id="gistLink" style="width: 510px" ${ window.PREVENT_AUTOFILL_INPUT_ATTRS } onfocus="this.select()" data-bind="value: link" type="text" placeholder="${ I18n('Link') }"/>
+          <button class="btn" type="button" data-dismiss="modal" data-clipboard-target="#gistLink" data-bind="clipboard"><i class="fa fa-clipboard"></i></button>
         </form>
-        <button class="btn" type="button" data-dismiss="modal" data-clipboard-target="#gistLink" data-bind="clipboard">
-          <i class="fa fa-clipboard"></i> ${ I18n('Copy') }
-        </button>
       </div>
     </div>
     <!-- ko if: window.SHARE_TO_SLACK -->
@@ -82,10 +80,15 @@ class ShareGistModal extends DisposableComponent {
   }
 
   async postMessage() {
-    await ApiHelper.sendSlackMessageAsync({
-      channel: this.selectedChannel,
-      message: this.messageDescription() + '\n' + this.link()
-    });
+    try {
+      await ApiHelper.sendSlackMessageAsync({
+        channel: this.selectedChannel,
+        message: this.messageDescription() + '\n' + this.link()
+      });
+    } catch (err) {
+      console.warn('Failed posting message in Slack channel');
+      console.error(err);
+    }
   }
 }
 
