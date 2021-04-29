@@ -817,7 +817,7 @@ def test_create_table_from_local():
 
   statement = '''USE default;
 
-CREATE TABLE IF NOT EXISTS test1 (
+CREATE TABLE IF NOT EXISTS default.test1 (
   `date` timestamp,
   `hour` bigint,
   `minute` bigint,
@@ -831,7 +831,6 @@ CREATE TABLE IF NOT EXISTS test1 (
   `plane` string,
   `cancelled` boolean,
   `time` bigint,
-  `dist` bigint
-);'''
+  `dist` bigint);'''
 
   assert_equal(statement, sql)
