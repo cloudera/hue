@@ -789,6 +789,7 @@ def test_create_ddl_with_abfs():
 def test_create_table_from_local():
   source = {
     'path': '',
+    'sourceType': 'hive'
   }
   destination = {
     'name': 'default.test1',
@@ -808,7 +809,8 @@ def test_create_table_from_local():
       {'name': 'time', 'type': 'bigint'},
       {'name': 'dist', 'type': 'bigint'},
     ],
-    'indexerPrimaryKey': []
+    'indexerPrimaryKey': [],
+    'sourceType': 'hive'
   }
   request = MockRequest(fs=MockFs())
   sql = SQLIndexer(user=request.user, fs=request.fs).create_table_from_local_file(source, destination).get_str()
