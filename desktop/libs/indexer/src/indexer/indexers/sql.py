@@ -295,7 +295,13 @@ class SQLIndexer(object):
 
     columns = destination['columns']
 
-    if editor_type == 'hive':
+    if editor_type in ('hive', 'mysql'):
+
+      if editor_type == 'mysql':
+        for col in columns:
+          if col['type'] == 'string':
+            col['type'] = 'VARCHAR(255)'
+
       sql = '''CREATE TABLE IF NOT EXISTS %(database)s.%(table_name)s (
 %(columns)s);
       ''' % {
@@ -316,7 +322,7 @@ class SQLIndexer(object):
 
         csv_rows = str(list_of_tuples)[1:-1]
 
-        if editor_type == 'hive':
+        if editor_type in ('hive', 'mysql'):
           sql += '''\nINSERT INTO %(database)s.%(table_name)s VALUES %(csv_rows)s;
           '''% {
                   'database': database,
