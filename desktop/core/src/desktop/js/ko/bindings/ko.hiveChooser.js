@@ -18,7 +18,7 @@ import $ from 'jquery';
 import * as ko from 'knockout';
 
 ko.bindingHandlers.hiveChooser = {
-  init: function (element, valueAccessor, allBindingsAccessor) {
+  update: function (element, valueAccessor, allBindingsAccessor) {
     const self = $(element);
     let options = ko.unwrap(valueAccessor());
     let complexConfiguration = false;

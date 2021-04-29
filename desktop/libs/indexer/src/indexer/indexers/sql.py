@@ -290,11 +290,8 @@ class SQLIndexer(object):
       table_name = destination['name']
     final_table_name = table_name
 
-    # source_type = source['sourceType']
-    source_type = 'hive'
-    # editor_type = '50'  # destination['sourceType']
-    # editor_type = destination['sourceType']
-    editor_type = 'hive'
+    source_type = source['sourceType']
+    editor_type = destination['sourceType']
 
     columns = destination['columns']
 
