@@ -157,7 +157,9 @@ class SnippetEditorActions {
       description: ''
     });
 
-    huePubSub.publish(SHOW_GIST_MODAL_EVENT, { link: gistLink });
+    const slackChannels = await apiHelper.getSlackChannelsAsync();
+
+    huePubSub.publish(SHOW_GIST_MODAL_EVENT, { link: gistLink, channels: slackChannels });
   }
 
   format() {
