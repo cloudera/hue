@@ -42,23 +42,23 @@ const TEMPLATE = `
       </div>
     </div>
     <!-- ko if: window.SHARE_TO_SLACK -->
-    <label class="checkbox"><input type="checkbox" data-bind="checked: showSlackSection"> ${ I18n('Directly share to Slack') } </input></label>
+    <label class="checkbox"><input type="checkbox" data-bind="checked: showSlackSection"> ${ I18n('Share to Slack') } </input></label>
     <!-- ko if: showSlackSection -->
     <form class="form-horizontal">
       <div class="control-group">
-        <label class="control-label">${I18n('Message body')}</label>
+        <label class="control-label">${ I18n('Message') }</label>
         <div class="controls">
-          <input type="text" class="input-xlarge" data-bind="value: messageDescription, valueUpdate:'afterkeydown'" placeholder="${ I18n('(Optional)') }"/>
+          <input type="text" style="width: 245px" data-bind="value: messageDescription, valueUpdate:'afterkeydown'" placeholder="${ I18n('(Optional)') }"/>
         </div>
       </div>
       <div class="control-group">
-        <label class="control-label">${I18n('Slack Channel')}</label>
+        <label class="control-label">${ I18n('Channel') }</label>
         <div class="controls">
           <select class="input-xlarge" data-bind="options: channels, optionsCaption: 'Choose...', value: selectedChannel"></select>
+          <button class="btn" type="button" data-dismiss="modal" data-bind="click: postMessage">${ I18n('Send') }</button>
         </div>
       </div>
     </form>
-    <button class="btn" type="button" data-dismiss="modal" data-bind="click: postMessage">${I18n('Post Message')}</button>
   <!-- /ko -->
   <!-- /ko -->
   </div>
