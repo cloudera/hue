@@ -789,6 +789,7 @@ def test_create_ddl_with_abfs():
 def test_create_table_from_local():
   source = {
     'path': '',
+    'sourceType': 'hive'
   }
   destination = {
     'name': 'default.test1',
@@ -808,14 +809,15 @@ def test_create_table_from_local():
       {'name': 'time', 'type': 'bigint'},
       {'name': 'dist', 'type': 'bigint'},
     ],
-    'indexerPrimaryKey': []
+    'indexerPrimaryKey': [],
+    'sourceType': 'hive'
   }
   request = MockRequest(fs=MockFs())
   sql = SQLIndexer(user=request.user, fs=request.fs).create_table_from_local_file(source, destination).get_str()
 
   statement = '''USE default;
 
-CREATE TABLE IF NOT EXISTS test1 (
+CREATE TABLE IF NOT EXISTS default.test1 (
   `date` timestamp,
   `hour` bigint,
   `minute` bigint,
@@ -829,7 +831,6 @@ CREATE TABLE IF NOT EXISTS test1 (
   `plane` string,
   `cancelled` boolean,
   `time` bigint,
-  `dist` bigint
-);'''
+  `dist` bigint);'''
 
   assert_equal(statement, sql)

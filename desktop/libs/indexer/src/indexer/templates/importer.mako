@@ -550,6 +550,11 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
             <!-- /ko -->
 
             <!-- ko if: ['table', 'database'].indexOf(outputFormat()) != -1 -->
+            <div data-bind="visible: $parent.createWizard.source.inputFormat() == 'localfile'">
+              <label for="dialectType" class="control-label "><div>${ _('Dialect') }</div>
+                <select  id="dialectType" data-bind="selectize: $parent.createWizard.source.interpreters, value: $parent.createWizard.source.interpreter, optionsText: 'name', optionsValue: 'type'"></select>
+              </label>
+            </div>
             <label for="collectionName" class="control-label "><div>${ _('Name') }</div></label>
             <input type="text" class="input-xxlarge" data-bind="value: name, hiveChooser: name, namespace: namespace, compute: compute, skipColumns: true, skipTables: outputFormat() == 'database', valueUpdate: 'afterkeydown', apiHelperUser: '${ user }', apiHelperType: sourceType, mainScrollable: $(MAIN_SCROLLABLE), attr: { 'placeholder': outputFormat() == 'table' ? '${  _ko('Table name or <database>.<table>') }' : '${  _ko('Database name') }' }" pattern="^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]*$" title="${ _('Only alphanumeric and underscore characters') }">
             <!-- /ko -->
@@ -1635,7 +1640,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
     var Source = function (vm, wizard) {
       var self = this;
 
-      self.sourceType = vm.sourceType;
+      self.sourceType = ko.observable(vm.sourceType);
       self.name = ko.observable('');
       self.sample = ko.observableArray();
       self.sampleCols = ko.observableArray();
@@ -1726,7 +1731,11 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
 
 
       self.sampleCols.subscribe(refreshTemporaryTable);
-      self.inputFormat = ko.observable(wizard.prefill.source_type() ? wizard.prefill.source_type() : 'localfile');
+      % if ENABLE_DIRECT_UPLOAD.get():
+        self.inputFormat = ko.observable(wizard.prefill.source_type() ? wizard.prefill.source_type() : 'localfile');
+      % else:
+        self.inputFormat = ko.observable(wizard.prefill.source_type() ? wizard.prefill.source_type() : 'file');
+      % endif
 
       self.inputFormat.subscribe(function(val) {
         wizard.destination.columns.removeAll();
@@ -1784,6 +1793,15 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
         return self.inputFormatsAll();
       });
 
+      self.interpreters = ko.pureComputed(function() {
+        return window.getLastKnownConfig().app_config.editor.interpreters;
+      });
+      self.interpreter = ko.observable(window.getLastKnownConfig().app_config.editor.default_sql_interpreter);
+      self.interpreter.subscribe(function(val) {
+        self.sourceType(val);
+        wizard.destination.sourceType(val);
+      });
+  
       // File
       self.path = ko.observable('');
       self.path.subscribe(function(val) {
@@ -2184,7 +2202,8 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
 
     var Destination = function (vm, wizard) {
       var self = this;
-      self.apiHelperType = self.sourceType = vm.sourceType;
+      self.apiHelperType = vm.sourceType;
+      self.sourceType = ko.observable(vm.sourceType);
 
       self.name = ko.observable('').extend({ throttle: 500 });
       self.nameChanged = function(name) {

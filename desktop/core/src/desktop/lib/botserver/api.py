@@ -20,6 +20,7 @@ import json
 import sys
 
 from desktop.lib.botserver.slack_client import slack_client
+from desktop.lib.exceptions_renderable import PopupException
 from desktop.decorators import api_error_handler
 from desktop.lib.django_util import JsonResponse
 
@@ -43,3 +44,20 @@ def get_channels(request):
   return JsonResponse({
     'channels': bot_channels,
   })
+
+@api_error_handler
+def send_message(request):
+  channel = request.POST.get('channel')
+  message = request.POST.get('message')
+
+  slack_response = _send_message(channel, message)
+
+  return JsonResponse({
+    'ok': slack_response.get('ok'),
+  })
+
+def _send_message(channel_info, message):
+  try:
+    return slack_client.chat_postMessage(channel=channel_info, text=message)
+  except Exception as e:
+    raise PopupException(_("Error posting message in channel"), detail=e)

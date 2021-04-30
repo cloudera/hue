@@ -1467,6 +1467,40 @@ class ApiHelper {
   }
 
   /**
+   *
+   * @param {Object} options
+   * @param {channel} options.channel
+   * @param {message} options.message
+   *
+   * @return {Promise<void>}
+   */
+  async sendSlackMessageAsync(options) {
+    const data = {
+      channel: options.channel,
+      message: options.message
+    };
+    return new Promise((resolve, reject) => {
+      simplePost(URLS.SEND_SLACK_MESSAGE, data, options).done(resolve).fail(reject);
+    });
+  }
+
+  /**
+   *
+   * @param {Object} options
+   *
+   * @return {Promise<Object>}
+   */
+  async getSlackChannelsAsync(options) {
+    return new Promise((resolve, reject) => {
+      simpleGet(URLS.GET_SLACK_CHANNELS, {}, options)
+        .done(response => {
+          resolve(response.channels);
+        })
+        .fail(reject);
+    });
+  }
+
+  /**
    * Updates Navigator properties and custom metadata for the given entity
    *
    * @param {Object} options

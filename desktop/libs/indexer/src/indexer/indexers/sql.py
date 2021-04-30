@@ -290,26 +290,23 @@ class SQLIndexer(object):
       table_name = destination['name']
     final_table_name = table_name
 
-    # source_type = source['sourceType']
-    source_type = 'hive'
-    # editor_type = '50'  # destination['sourceType']
-    # editor_type = destination['sourceType']
-    editor_type = 'hive'
+    source_type = source['sourceType']
+    editor_type = destination['sourceType']
 
     columns = destination['columns']
 
-    sql = '''CREATE TABLE IF NOT EXISTS %(table_name)s (
-%(columns)s
-);
-''' % {
-          'database': database,
-          'table_name': table_name,
-          'columns': ',\n'.join(['  `%(name)s` %(type)s' % col for col in columns]),
-          'primary_keys': ', '.join(destination.get('indexerPrimaryKey'))
-      }
+    if editor_type == 'hive':
+      sql = '''CREATE TABLE IF NOT EXISTS %(database)s.%(table_name)s (
+%(columns)s);
+      ''' % {
+              'database': database,
+              'table_name': table_name,
+              'columns': ',\n'.join(['  `%(name)s` %(type)s' % col for col in columns]),
+            }
 
     path = urllib_unquote(source['path'])
-    if path:
+
+    if path:                                                     # data insertion
       with open(BASE_DIR + path, 'r') as local_file:
         reader = csv.reader(local_file)
         list_of_tuples = list(map(tuple, reader))
@@ -318,10 +315,14 @@ class SQLIndexer(object):
           list_of_tuples = list_of_tuples[1:]
 
         csv_rows = str(list_of_tuples)[1:-1]
-        sql += '''INSERT INTO %(table_name)s VALUES %(csv_rows)s;'''% {
-            'table_name': table_name,
-            'csv_rows': csv_rows
-          }
+
+        if editor_type == 'hive':
+          sql += '''\nINSERT INTO %(database)s.%(table_name)s VALUES %(csv_rows)s;
+          '''% {
+                  'database': database,
+                  'table_name': table_name,
+                  'csv_rows': csv_rows
+                }
 
     on_success_url = reverse('metastore:describe_table', kwargs={'database': database, 'table': final_table_name}) + \
         '?source_type=' + source_type

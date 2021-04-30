@@ -62,8 +62,22 @@ class TestApi(object):
         }
       }
 
-      response = self.client.post(reverse('botserver.api.get_channels'))
+      response = self.client.get(reverse('botserver.api.get_channels'))
       data = json.loads(response.content)
 
       assert_equal(200, response.status_code)
       assert_equal(['channel-1', 'channel-2'], data.get('channels'))
+
+  def test_send_message(self):
+    with patch('desktop.lib.botserver.api.slack_client.chat_postMessage') as chat_postMessage:
+
+      chat_postMessage.return_value = {
+         "ok": True,
+      }
+
+      response = self.client.post(reverse('botserver.api.send_message'), {'channel': 'channel-1', 'message': 'some message'})
+      data = json.loads(response.content)
+
+      assert_equal(200, response.status_code)
+      chat_postMessage.assert_called_with(channel='channel-1', text='some message')
+      assert_true(data.get('ok'))
