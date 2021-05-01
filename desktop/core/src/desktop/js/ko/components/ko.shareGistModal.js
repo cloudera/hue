@@ -83,7 +83,8 @@ class ShareGistModal extends DisposableComponent {
     try {
       await ApiHelper.sendSlackMessageAsync({
         channel: this.selectedChannel,
-        message: this.messageDescription() + '\n' + this.link()
+        message:
+          '@' + window.LOGGED_USERNAME + ': ' + this.messageDescription() + '\n' + this.link()
       });
     } catch (err) {
       console.warn('Failed posting message in Slack channel');
