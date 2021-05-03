@@ -40,7 +40,12 @@ class UrlConnection():
   """
   Share the unmarshalling from XML to boto Python objects from the requests calls.
   """
-  def _get_all_buckets(self, signed_url):
+
+  def get_all_buckets(self, headers=None):
+    LOG.debug('get_all_buckets: %s' % headers)
+    kwargs = {'action': 'GET'}
+
+    signed_url = self.get_url_request(**kwargs)
     LOG.debug(signed_url)
 
     response = requests.get(signed_url)
@@ -56,26 +61,15 @@ class UrlConnection():
     return rs
 
 
+
 class RazUrlConnection(UrlConnection):
 
   def __init__(self):
     self.raz = S3RazClient()
 
-  def get_all_buckets(self, headers=None):
-    url = self._generate_url()
-    return self._get_all_buckets(url)
-
-  def get_bucket(self, bucket_name, validate=True, headers=None):
-    pass
-
-  def get_key(self, key_name, headers=None, version_id=None, response_headers=None, validate=True):
-    pass
-
-  def get_all_keys(self, headers=None, **params):
-    pass
-
-  def _generate_url(self, bucket_name=None, object_name=None, expiration=3600):
+  def get_url_request(self, bucket_name=None, object_name=None, expiration=3600):
     self.raz.get_url(bucket_name, object_name)
+
 
 
 class UrlKey(Key):
@@ -88,7 +82,7 @@ class UrlKey(Key):
 
     return
 
-  def _generate_url(self, action='GET', **kwargs):
+  def get_url_request(self, action='GET', **kwargs):
     LOG.debug(kwargs)
     tmp_url = None
 
@@ -177,7 +171,7 @@ class UrlBucket(Bucket):
     return rs
 
 
-  def _generate_url(self, action='GET', **kwargs):
+  def get_url_request(self, action='GET', **kwargs):
     LOG.debug(kwargs)
     tmp_url = None
 
@@ -202,33 +196,7 @@ class BotoUrlConnection(UrlConnection):
     self.connection.set_bucket_class(UrlBucket)  # Use our bucket class to keep overriding any direct call to S3 made from list buckets
 
 
-  def get_all_buckets(self, headers=None):
-    LOG.debug('get_all_buckets: %s' % headers)
-    kwargs = {'action': 'GET'}
-
-    signed_url = self._generate_url(**kwargs)
-
-    return self._get_all_buckets(signed_url)
-
-
-  def get_bucket(self, bucket_name, validate=True, headers=None):
-    LOG.debug('get_bucket: %s' % bucket_name)
-    kwargs = {'action': 'GET', 'bucket': bucket_name}
-
-    signed_url = self._generate_url(**kwargs)
-
-    response = requests.get(signed_url)
-
-    LOG.debug(response)
-    LOG.debug(response.content)
-
-    rs = self.connection.bucket_class(self.connection, bucket_name, key_class=UrlKey)  # Using content?
-    LOG.debug(rs)
-
-    return rs
-
-
-  def _generate_url(self, action='GET', **kwargs):
+  def get_url_request(self, action='GET', **kwargs):
     LOG.debug(kwargs)
     tmp_url = None
 
@@ -241,3 +209,20 @@ class BotoUrlConnection(UrlConnection):
         raise S3FileSystemException("Resource does not exist or permission missing : '%s'" % kwargs)
 
     return tmp_url
+
+
+  def get_bucket(self, bucket_name, validate=True, headers=None):
+    LOG.debug('get_bucket: %s' % bucket_name)
+    kwargs = {'action': 'GET', 'bucket': bucket_name}
+
+    signed_url = self.get_url_request(**kwargs)
+
+    response = requests.get(signed_url)
+
+    LOG.debug(response)
+    LOG.debug(response.content)
+
+    rs = self.connection.bucket_class(self.connection, bucket_name, key_class=UrlKey)  # Using content?
+    LOG.debug(rs)
+
+    return rs
