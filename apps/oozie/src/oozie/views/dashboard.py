@@ -32,6 +32,8 @@ from django.utils.functional import wraps
 from django.urls import reverse
 from django.shortcuts import redirect
 
+from azure.abfs.__init__ import abfspath
+
 from desktop.conf import TIME_ZONE
 from desktop.lib import django_mako
 from desktop.lib.django_util import JsonResponse, render
@@ -968,6 +970,16 @@ def _rerun_bundle(request, oozie_id, args, params, properties):
 
 def submit_external_job(request, application_path):
   ParametersFormSet = formset_factory(ParameterForm, extra=0)
+
+  if application_path.startswith('abfs:/') and not application_path.startswith('abfs://'):
+    application_path = application_path.replace("abfs:/", "abfs://")
+  elif application_path.startswith('s3a:/') and not application_path.startswith('s3a://'):
+    application_path = application_path.replace('s3a:/', 's3a://')
+  else:
+    application_path = "/" + application_path
+
+  if application_path.startswith("abfs://"):
+    application_path = abfspath(application_path)
 
   if request.method == 'POST':
     params_form = ParametersFormSet(request.POST)
