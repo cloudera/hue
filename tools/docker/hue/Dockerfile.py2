@@ -46,7 +46,7 @@ RUN rm desktop/conf/*
 COPY desktop/conf.dist desktop/conf
 
 # Need recent version for Ubuntu
-RUN curl -sL https://deb.nodesource.com/setup_10.x | sudo bash - \
+RUN curl -sL https://deb.nodesource.com/setup_14.x | sudo bash - \
   && apt-get install -y nodejs
 
 RUN PREFIX=/usr/share make install
