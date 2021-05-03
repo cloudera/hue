@@ -33,10 +33,10 @@ else:
 class TestBotoUrlConnection():
 
   def test_get_buckets(self):
-    with patch('aws.s3.s3connection.BotoUrlConnection._generate_url') as _generate_url:
+    with patch('aws.s3.s3connection.BotoUrlConnection.get_url_request') as get_url_request:
       with patch('aws.s3.s3connection.requests.get') as requests_get:
 
-        _generate_url.return_value = 'https://gethue-test.s3.amazonaws.com/?AWSAccessKeyId=AKIA23E77ZX2HVY76YGL' + \
+        get_url_request.return_value = 'https://gethue-test.s3.amazonaws.com/?AWSAccessKeyId=AKIA23E77ZX2HVY76YGL' + \
             '&Signature=3lhK%2BwtQ9Q2u5VDIqb4MEpoY3X4%3D&Expires=1617207304'
         requests_get.return_value = Mock(
           content=b'<?xml version="1.0" encoding="UTF-8"?>\n<ListAllMyBucketsResult '
@@ -55,11 +55,11 @@ class TestBotoUrlConnection():
 class TestRazUrlConnection():
 
   def test_get_buckets(self):
-    with patch('aws.s3.s3connection.RazUrlConnection._generate_url') as _generate_url:
+    with patch('aws.s3.s3connection.RazUrlConnection.get_url_request') as get_url_request:
       with patch('aws.s3.s3connection.requests.get') as requests_get:
 
         # TODO: update with potentially slightly different URL/headers
-        _generate_url.return_value = 'https://gethue-test.s3.amazonaws.com/?AWSAccessKeyId=AKIA23E77ZX2HVY76YGL' + \
+        get_url_request.return_value = 'https://gethue-test.s3.amazonaws.com/?AWSAccessKeyId=AKIA23E77ZX2HVY76YGL' + \
             '&Signature=3lhK%2BwtQ9Q2u5VDIqb4MEpoY3X4%3D&Expires=1617207304'
 
         requests_get.return_value = Mock(
