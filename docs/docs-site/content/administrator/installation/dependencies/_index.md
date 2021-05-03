@@ -179,7 +179,7 @@ On macOS 10.15.x
 This is a verified step-by-step guide on how to get up and running on a fresh installation of macOS Big Sur, tested on both M1 and Intel based MacBook Pro.
 
 1. Clone the Hue repo
-   
+
     `git clone https://github.com/cloudera/hue.git`
 
 2. Install Brew if not already installed
@@ -266,7 +266,7 @@ Version 10+ is needed.
 
 e.g. how to install on Ubuntu:
 
-    curl -sL https://deb.nodesource.com/setup_10.x | sudo bash -
+    curl -sL https://deb.nodesource.com/setup_14.x | sudo bash -
     sudo apt-get install -y nodejs
 
 ## Installing Python 2.7

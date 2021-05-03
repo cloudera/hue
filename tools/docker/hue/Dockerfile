@@ -24,7 +24,7 @@ RUN pip3 install --upgrade setuptools
 RUN pip3 install virtualenv
 
 # Need recent version for Ubuntu
-RUN curl -sL https://deb.nodesource.com/setup_10.x | sudo bash - \
+RUN curl -sL https://deb.nodesource.com/setup_14.x | sudo bash - \
   && apt-get install -y nodejs
 
 RUN addgroup hue && useradd -r -u 1001 -g hue hue
