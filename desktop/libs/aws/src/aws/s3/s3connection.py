@@ -26,6 +26,7 @@ from boto.s3.bucketlistresultset import BucketListResultSet
 from boto.s3.prefix import Prefix
 
 from desktop.lib.raz.clients import S3RazClient
+from aws.s3.s3fs import S3FileSystemException
 
 
 LOG = logging.getLogger(__name__)
@@ -39,27 +40,30 @@ class UrlConnection():
   """
   Share the unmarshalling from XML to boto Python objects from the requests calls.
   """
+  def _get_all_buckets(self, signed_url):
+    LOG.debug(signed_url)
 
-  def get_all_buckets(self, response):
-    LOG.debug('get_all_buckets')
+    response = requests.get(signed_url)
+
     LOG.debug(response)
     LOG.debug(response.content)
 
     rs = ResultSet([('Bucket', self.connection.bucket_class)])
-    h = boto.handler.XmlHandler(rs, self.connection)
+    h = boto.handler.XmlHandler(rs, None)
     xml.sax.parseString(response.content, h)
     LOG.debug(rs)
 
+    return rs
 
-class RazUrlConnection():
+
+class RazUrlConnection(UrlConnection):
 
   def __init__(self):
     self.raz = S3RazClient()
 
   def get_all_buckets(self, headers=None):
     url = self._generate_url()
-    # call
-    # unmarshall via UrlConnection
+    return self._get_all_buckets(url)
 
   def get_bucket(self, bucket_name, validate=True, headers=None):
     pass
@@ -86,12 +90,15 @@ class UrlKey(Key):
 
   def _generate_url(self, action='GET', **kwargs):
     LOG.debug(kwargs)
+    tmp_url = None
+
     try:
       # http://boto.cloudhackers.com/en/latest/ref/s3.html#boto.s3.key.Key.generate_url
       tmp_url = self.generate_url(self.expiration, action, **kwargs)
     except BotoClientError as e:
       LOG.error(e)
-      return None
+      if tmp_url is None:
+        raise S3FileSystemException("Resource does not exist or permission missing : '%s'" % kwargs)
 
     return tmp_url
 
@@ -172,38 +179,40 @@ class UrlBucket(Bucket):
 
   def _generate_url(self, action='GET', **kwargs):
     LOG.debug(kwargs)
+    tmp_url = None
+
     try:
       # http://boto.cloudhackers.com/en/latest/ref/s3.html#boto.s3.bucket.Bucket.generate_url
       tmp_url = self.generate_url(self.expiration, action, **kwargs)
     except BotoClientError as e:
       LOG.error(e)
-      return None
+      if tmp_url is None:
+        raise S3FileSystemException("Resource does not exist or permission missing : '%s'" % kwargs)
 
     return tmp_url
 
 
-class BotoUrlConnection():
+class BotoUrlConnection(UrlConnection):
 
   def __init__(self, connection):
     self.connection = connection
     self.expiration = 3600
 
     self.connection.make_request = None  # We make sure we never call via regular boto connection directly
-    self.connection.set_bucket_class(UrlBucket)  # We use our bucket class to override any direct call to S3
+    self.connection.set_bucket_class(UrlBucket)  # We use our bucket class to keep overriding any direct call to S3
 
 
   def get_all_buckets(self, headers=None):
     kwargs = {'action': 'GET'}
+    LOG.debug('get_all_buckets: %s' % kwargs)
     try:
       tmp_url = self._generate_url(**kwargs)
     except BotoClientError as e:
       LOG.error(e)
       return None
 
+    LOG.debug(tmp_url)
     response = requests.get(tmp_url)
-
-    LOG.debug('get_all_buckets')
-    print(tmp_url)
     LOG.debug(response)
     LOG.debug(response.content)
 
@@ -218,27 +227,21 @@ class BotoUrlConnection():
   def get_bucket(self, bucket_name, validate=True, headers=None):
     kwargs = {'action': 'GET', 'bucket': bucket_name}
 
-    tmp_url = self._generate_url(**kwargs)
+    signed_url = self._generate_url(**kwargs)
 
-    response = requests.get(tmp_url)
-
-    LOG.debug('get_bucket')
-    LOG.debug(response)
-    LOG.debug(response.content)
-
-    rs = self.connection.bucket_class(self.connection, bucket_name, key_class=UrlKey)  # Using content?
-    LOG.debug(rs)
-
-    return rs
+    return self._get_all_buckets(signed_url)
 
 
   def _generate_url(self, action='GET', **kwargs):
     LOG.debug(kwargs)
+    tmp_url = None
+
     try:
       # http://boto.cloudhackers.com/en/latest/ref/s3.html#boto.s3.connection.S3Connection.generate_url
       tmp_url = self.connection.generate_url(self.expiration, action, **kwargs)
     except BotoClientError as e:
       LOG.error(e)
-      return None
+      if tmp_url is None:
+        raise S3FileSystemException("Resource does not exist or permission missing : '%s'" % kwargs)
 
     return tmp_url
