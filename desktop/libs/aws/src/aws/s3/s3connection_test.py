@@ -20,14 +20,14 @@ import sys
 from nose.tools import assert_equal, assert_false, assert_true, assert_raises
 
 from aws.client import _make_client
-from aws.s3.s3connection import BotoUrlConnection, UrlBucket
+from aws.s3.s3connection import BotoUrlConnection, UrlBucket, RazUrlConnection
 from aws.s3.s3test_utils import S3TestBase
 
 
 if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock, MagicMock
+  from unittest.mock import patch, Mock
 else:
-  from mock import patch, Mock, MagicMock
+  from mock import patch, Mock
 
 
 class TestBotoUrlConnection():
@@ -47,8 +47,30 @@ class TestBotoUrlConnection():
         )
 
         connection = Mock()
-        connection.bucket_class = UrlBucket
         buckets = BotoUrlConnection(connection=connection).get_all_buckets()
+
+        assert_equal('[<Bucket: demo-gethue>, <Bucket: gethue-test>]', str(buckets))
+
+
+class TestRazUrlConnection():
+
+  def test_get_buckets(self):
+    with patch('aws.s3.s3connection.RazUrlConnection._generate_url') as _generate_url:
+      with patch('aws.s3.s3connection.requests.get') as requests_get:
+
+        # TODO: update with potentially slightly different URL/headers
+        _generate_url.return_value = 'https://gethue-test.s3.amazonaws.com/?AWSAccessKeyId=AKIA23E77ZX2HVY76YGL' + \
+            '&Signature=3lhK%2BwtQ9Q2u5VDIqb4MEpoY3X4%3D&Expires=1617207304'
+
+        requests_get.return_value = Mock(
+          content=b'<?xml version="1.0" encoding="UTF-8"?>\n<ListAllMyBucketsResult '
+            b'xmlns="http://s3.amazonaws.com/doc/2006-03-01/"><Owner><ID>0429b0aed2900f450655928a09e06e7aaac9939bc9141fc5aeeccd8b93b9778f'
+            b'</ID><DisplayName>team</DisplayName></Owner><Buckets><Bucket><Name>demo-gethue</Name><CreationDate>2020-08-22T08:03:18.000Z'
+            b'</CreationDate></Bucket><Bucket><Name>gethue-test</Name><CreationDate>2021-03-31T14:47:14.000Z</CreationDate></Bucket>'
+            b'</Buckets></ListAllMyBucketsResult>'
+        )
+
+        buckets = RazUrlConnection().get_all_buckets()
 
         assert_equal('[<Bucket: demo-gethue>, <Bucket: gethue-test>]', str(buckets))
 
