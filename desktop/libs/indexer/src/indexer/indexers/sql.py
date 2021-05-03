@@ -283,6 +283,17 @@ class SQLIndexer(object):
         is_task=True
     )
 
+  def bool_col_update(self, row, columns):
+    for cnt, col in enumerate(columns):
+      if col['type'] == 'boolean':
+        if row[cnt] in ('T', 't', 'true', 'True', 'TRUE', '1'):
+          row[cnt] = '1'
+        elif row[cnt] in ('F', 'f', 'false', 'False', 'FALSE', '0'):
+          row[cnt] = '0'
+        else:
+          row[cnt] = 'NULL'
+    return row
+
   def create_table_from_local_file(self, source, destination, start_time=-1):
     if '.' in destination['name']:
       database, table_name = destination['name'].split('.', 1)
@@ -336,70 +347,71 @@ CONSTRAINT my_pk PRIMARY KEY (%(primary_keys)s));
                 'database': database,
                 'table_name': table_name,
                 'columns': ',\n'.join(['  `%(name)s` string' % col for col in columns]),
-            }                        #Impala does not implicitly cast between string and numeric or Boolean types.
+            }                                                 # Impala does not implicitly cast between string and numeric or Boolean types.
 
     path = urllib_unquote(source['path'])
 
-    if path:                                                     # data insertion
+    if path:                                                  # data insertion
+
       with open(BASE_DIR + path, 'r') as local_file:
         reader = csv.reader(local_file)
-        _csv_rows = list(map(tuple, reader))
+        csv_rows = []
 
-        if source['format']['hasHeader']:
-          _csv_rows = _csv_rows[1:]
+        for count, row in enumerate(reader):
+          if source['format']['hasHeader'] and count == 0:
+            continue
+          if editor_type == 'impala':                         # for the boolean col updating csv_val to (1,0)
+            row = self.bool_col_update(row, columns)
+          csv_rows.append(tuple(row))
 
-        csv_rows = str(_csv_rows)[1:-1]
+        if csv_rows:
+          csv_rows = str(csv_rows)
+          csv_rows = csv_rows[1:-1]
 
-        if dialect in ('hive', 'mysql'):
-          sql += '''\nINSERT INTO %(database)s.%(table_name)s VALUES %(csv_rows)s;
-          '''% {
-                  'database': database,
-                  'table_name': table_name,
-                  'csv_rows': csv_rows
-                }
-        elif dialect == 'phoenix':
-          for csv_row in _csv_rows:
-            _sql = ', '.join([ "'{0}'".format(col_val) if columns[count]['type'] in ('CHAR(255)', 'timestamp') \
-              else '{0}'.format(col_val) for count, col_val in enumerate(csv_row)])
-
-            sql += '''\nUPSERT INTO %(database)s.%(table_name)s VALUES (%(csv_row)s);
-            ''' % {
+          if editor_type in ('hive', 'mysql'):
+            sql += '''\nINSERT INTO %(database)s.%(table_name)s VALUES %(csv_rows)s;
+            '''% {
                     'database': database,
                     'table_name': table_name,
-                    'csv_row': _sql
+                    'csv_rows': csv_rows
                   }
-        elif dialect == 'impala':
-          sql += '''\nINSERT INTO %(database)s.%(table_name)s_tmp VALUES %(csv_rows)s;
-          '''% {
-                  'database': database,
-                  'table_name': table_name,
-                  'csv_rows': csv_rows
-                }
-          sql += '''\nCREATE TABLE IF NOT EXISTS %(database)s.%(table_name)s
+          elif dialect == 'phoenix':
+            for csv_row in _csv_rows:
+              _sql = ', '.join([ "'{0}'".format(col_val) if columns[count]['type'] in ('CHAR(255)', 'timestamp') \
+                else '{0}'.format(col_val) for count, col_val in enumerate(csv_row)])
+
+              sql += '''\nUPSERT INTO %(database)s.%(table_name)s VALUES (%(csv_row)s);
+              ''' % {
+                      'database': database,
+                      'table_name': table_name,
+                      'csv_row': _sql
+                    }
+          elif editor_type == 'impala':
+            sql += '''\nINSERT INTO %(database)s.%(table_name)s_tmp VALUES %(csv_rows)s;\n\nCREATE TABLE IF NOT EXISTS %(database)s.%(table_name)s
 AS SELECT'''% {
-                'database': database,
-                'table_name': table_name,
+                    'database': database,
+                    'table_name': table_name,
+                    'csv_rows': csv_rows
+                  }
+
+            for count, col in enumerate(columns):
+              if col['type'] == 'boolean':                # casting from string to boolean is not allowed in impala so string -> int -> bool
+                sql += '''\n  CAST ( CAST ( `%(col_name)s` AS TINYINT ) AS boolean ) `%(col_name)s`'''%{
+                'col_name': col['name']
               }
-          for count, col in enumerate(columns):
-            if col['type'] == 'boolean':                              # casting from string to boolean is not allowed in impala
-              col['type'] = 'string'
-            sql += '''\n  CAST ( `%(col_name)s` AS %(col_type)s ) `%(col_name)s`'''%{
-              'col_name': col['name'],
-              'col_type': col['type']
-            }
-            if count != len(columns)-1:
-              sql += ','
+              else:
+                sql += '''\n  CAST ( `%(col_name)s` AS %(col_type)s ) `%(col_name)s`'''%{
+                  'col_name': col['name'],
+                  'col_type': col['type']
+                }
+              if count != len(columns)-1:
+                sql += ','
           
-          sql += '''\nFROM  %(database)s.%(table_name)s_tmp;
-          '''% {
-                  'database': database,
-                  'table_name': table_name,
-                }
-          sql += '''\nDROP TABLE IF EXISTS %(database)s.%(table_name)s_tmp;
-          '''% {
-                  'database': database,
-                  'table_name': table_name,
-                }
+            sql += '''\nFROM  %(database)s.%(table_name)s_tmp;\n\nDROP TABLE IF EXISTS %(database)s.%(table_name)s_tmp;
+            '''% {
+                    'database': database,
+                    'table_name': table_name,
+                  }
 
     on_success_url = reverse('metastore:describe_table', kwargs={'database': database, 'table': final_table_name}) + \
         '?source_type=' + source_type
