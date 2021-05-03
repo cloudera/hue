@@ -26,7 +26,6 @@ from boto.s3.bucketlistresultset import BucketListResultSet
 from boto.s3.prefix import Prefix
 
 from desktop.lib.raz.clients import S3RazClient
-from aws.s3.s3fs import S3FileSystemException
 
 
 LOG = logging.getLogger(__name__)
@@ -75,7 +74,6 @@ class RazUrlConnection(UrlConnection):
 class UrlKey(Key):
 
   def open_read(self, headers=None, query_args='', override_num_retries=None, response_headers=None):
-
     # Similar to Bucket.get_key()
     # data = self.resp.read(self.BufferSize)
     # For seek: headers={"Range": "bytes=%d-" % pos}
@@ -92,7 +90,7 @@ class UrlKey(Key):
     except BotoClientError as e:
       LOG.error(e)
       if tmp_url is None:
-        raise S3FileSystemException("Resource does not exist or permission missing : '%s'" % kwargs)
+        raise IOError("Resource does not exist or permission missing : '%s'" % kwargs)
 
     return tmp_url
 
@@ -108,8 +106,8 @@ class UrlBucket(Bucket):
 
 
   def get_key(self, key_name, headers=None, version_id=None, response_headers=None, validate=True):
-    # Note: in current FS API we get file even if we don't need the content, hence why it can be slow.
-    # To check if we should give a length in read() to mitigate.
+    # Note: in current FS API, this fetches the full file... hence why it can be very slow.
+    # To check if we should give a length in read() to mitigate and just get metadata: HEAD ?
     LOG.debug('key name: %s' % key_name)
     kwargs = {'bucket': self.name, 'key': key_name}
 
@@ -144,6 +142,14 @@ class UrlBucket(Bucket):
       k.handle_encryption_headers(response)
       k.handle_restore_headers(response)
       k.handle_addl_headers(response.getheaders())
+
+      class MockResponse():
+        def __init__(self, resp):
+          self.resp = resp
+        def read(self, size):
+          return self.resp.content
+
+      k.resp = MockResponse(response)
     else:
       # Currently needed as 404 on directories via stats_key()
       k = self.key_class(self, key_name)
@@ -181,7 +187,7 @@ class UrlBucket(Bucket):
     except BotoClientError as e:
       LOG.error(e)
       if tmp_url is None:
-        raise S3FileSystemException("Resource does not exist or permission missing : '%s'" % kwargs)
+        raise IOError("Resource does not exist or permission missing : '%s'" % kwargs)
 
     return tmp_url
 
@@ -206,7 +212,7 @@ class BotoUrlConnection(UrlConnection):
     except BotoClientError as e:
       LOG.error(e)
       if tmp_url is None:
-        raise S3FileSystemException("Resource does not exist or permission missing : '%s'" % kwargs)
+        raise IOError("Resource does not exist or permission missing : '%s'" % kwargs)
 
     return tmp_url
 
