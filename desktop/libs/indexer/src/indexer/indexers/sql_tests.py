@@ -834,3 +834,36 @@ CREATE TABLE IF NOT EXISTS default.test1 (
   `dist` bigint);'''
 
   assert_equal(statement, sql)
+
+
+def test_create_table_from_local_mysql():
+  source = {
+    'path': '/apps/beeswax/data/tables/us_population.csv',
+    'sourceType': 'mysql',
+    'format': {'hasHeader': False}
+  }
+  destination = {
+    'name': 'default.test1',
+    'columns': [
+      {'name': 'field_1', 'type': 'string'},
+      {'name': 'field_2', 'type': 'string'},
+      {'name': 'field_3', 'type': 'bigint'},
+    ],
+    'sourceType': 'mysql'
+  }
+  request = MockRequest(fs=MockFs())
+  sql = SQLIndexer(user=request.user, fs=request.fs).create_table_from_local_file(source, destination).get_str()
+
+  statement = '''USE default;
+
+CREATE TABLE IF NOT EXISTS default.test1 (
+  `field_1` VARCHAR(255),
+  `field_2` VARCHAR(255),
+  `field_3` bigint);
+      
+INSERT INTO default.test1 VALUES ('NY', 'New York', '8143197'), ('CA', 'Los Angeles', '3844829'), \
+('IL', 'Chicago', '2842518'), ('TX', 'Houston', '2016582'), ('PA', 'Philadelphia', '1463281'), \
+('AZ', 'Phoenix', '1461575'), ('TX', 'San Antonio', '1256509'), ('CA', 'San Diego', '1255540'), \
+('TX', 'Dallas', '1213825'), ('CA', 'San Jose', '912332');'''
+
+  assert_equal(statement, sql)
