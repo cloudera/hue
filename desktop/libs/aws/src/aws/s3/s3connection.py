@@ -48,7 +48,7 @@ class UrlConnection():
     LOG.debug(response)
     LOG.debug(response.content)
 
-    rs = ResultSet([('Bucket', self.connection.bucket_class)])
+    rs = ResultSet([('Bucket', UrlBucket)])
     h = boto.handler.XmlHandler(rs, None)
     xml.sax.parseString(response.content, h)
     LOG.debug(rs)
@@ -169,7 +169,7 @@ class UrlBucket(Bucket):
     LOG.debug(response)
     LOG.debug(response.content)
 
-    rs = ResultSet([('Contents', Key), ('CommonPrefixes', Prefix)])  # Or BucketListResultSet?
+    rs = ResultSet([('Contents', UrlKey), ('CommonPrefixes', Prefix)])  # Or BucketListResultSet?
     h = boto.handler.XmlHandler(rs, self)
     xml.sax.parseString(response.content, h)
     LOG.debug(rs)
@@ -199,37 +199,33 @@ class BotoUrlConnection(UrlConnection):
     self.expiration = 3600
 
     self.connection.make_request = None  # We make sure we never call via regular boto connection directly
-    self.connection.set_bucket_class(UrlBucket)  # We use our bucket class to keep overriding any direct call to S3
+    self.connection.set_bucket_class(UrlBucket)  # Use our bucket class to keep overriding any direct call to S3 made from list buckets
 
 
   def get_all_buckets(self, headers=None):
+    LOG.debug('get_all_buckets: %s' % headers)
     kwargs = {'action': 'GET'}
-    LOG.debug('get_all_buckets: %s' % kwargs)
-    try:
-      tmp_url = self._generate_url(**kwargs)
-    except BotoClientError as e:
-      LOG.error(e)
-      return None
-
-    LOG.debug(tmp_url)
-    response = requests.get(tmp_url)
-    LOG.debug(response)
-    LOG.debug(response.content)
-
-    rs = ResultSet([('Bucket', self.connection.bucket_class)])
-    h = boto.handler.XmlHandler(rs, None)
-    xml.sax.parseString(response.content, h)
-    LOG.debug(rs)
-
-    return rs
-
-
-  def get_bucket(self, bucket_name, validate=True, headers=None):
-    kwargs = {'action': 'GET', 'bucket': bucket_name}
 
     signed_url = self._generate_url(**kwargs)
 
     return self._get_all_buckets(signed_url)
+
+
+  def get_bucket(self, bucket_name, validate=True, headers=None):
+    LOG.debug('get_bucket: %s' % bucket_name)
+    kwargs = {'action': 'GET', 'bucket': bucket_name}
+
+    signed_url = self._generate_url(**kwargs)
+
+    response = requests.get(signed_url)
+
+    LOG.debug(response)
+    LOG.debug(response.content)
+
+    rs = self.connection.bucket_class(self.connection, bucket_name, key_class=UrlKey)  # Using content?
+    LOG.debug(rs)
+
+    return rs
 
 
   def _generate_url(self, action='GET', **kwargs):
