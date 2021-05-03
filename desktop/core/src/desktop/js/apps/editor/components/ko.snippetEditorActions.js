@@ -17,7 +17,7 @@
 import * as ko from 'knockout';
 
 import 'ko/bindings/ko.publish';
-import { format } from 'sql-formatter';
+import { format } from '@gethue/sql-formatter';
 
 import apiHelper from 'api/apiHelper';
 import componentUtils from 'ko/components/componentUtils';
