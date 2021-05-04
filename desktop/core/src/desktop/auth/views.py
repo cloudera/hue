@@ -201,9 +201,6 @@ def dt_login(request, from_modal=False):
     # local user login failed, give the right auth_form with 'server' field
     auth_form = auth_forms.LdapAuthenticationForm()
 
-  if not from_modal:
-    request.session.set_test_cookie()
-
   request.session['samlgroup_permitted_flag'] = samlgroup_check(request)
 
   renderable_path = 'login.mako'
