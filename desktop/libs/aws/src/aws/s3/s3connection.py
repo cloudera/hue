@@ -73,6 +73,8 @@ class RazUrlConnection(UrlConnection):
 class UrlKey(Key):
 
   def open_read(self, headers=None, query_args='', override_num_retries=None, response_headers=None):
+    LOG.debug('open_read: %s' % self.name)
+
     # Similar to Bucket.get_key()
     # data = self.resp.read(self.BufferSize)
     # For seek: headers={"Range": "bytes=%d-" % pos}
@@ -89,7 +91,8 @@ class UrlKey(Key):
     except BotoClientError as e:
       LOG.error(e)
       if tmp_url is None:
-        raise IOError("Resource does not exist or permission missing : '%s'" % kwargs)
+        from aws.s3.s3fs import S3FileSystemException
+        raise S3FileSystemException("Resource does not exist or permission missing : '%s'" % kwargs)
 
     return tmp_url
 
