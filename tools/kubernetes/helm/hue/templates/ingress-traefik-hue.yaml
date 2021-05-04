@@ -14,4 +14,13 @@ spec:
         backend:
           serviceName: hue
           servicePort: hue
+  {{- range .Values.ingress.extraHosts }}
+  - host: {{ . | quote }}
+    http:
+      paths:
+      - backend:
+          serviceName: hue-balancer
+          servicePort: 80
+        path: /
+  {{- end }}
 {{- end -}}
