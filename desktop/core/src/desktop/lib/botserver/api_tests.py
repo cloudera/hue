@@ -75,9 +75,9 @@ class TestApi(object):
          "ok": True,
       }
 
-      response = self.client.post(reverse('botserver.api.send_message'), {'channel': 'channel-1', 'message': 'some message'})
+      response = self.client.post(reverse('botserver.api.send_message'), {'channel': 'channel-1', 'message': 'message with link'})
       data = json.loads(response.content)
 
       assert_equal(200, response.status_code)
-      chat_postMessage.assert_called_with(channel='channel-1', text='some message')
+      chat_postMessage.assert_called_with(channel='channel-1', text='@api_user: message with link')
       assert_true(data.get('ok'))
