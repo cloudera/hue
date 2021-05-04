@@ -106,14 +106,12 @@ class UrlBucket(Bucket):
 
 
   def get_key(self, key_name, headers=None, version_id=None, response_headers=None, validate=True):
-    # Note: in current FS API, this fetches the full file... hence why it can be very slow.
-    # To check if we should give a length in read() to mitigate and just get metadata: HEAD ?
     LOG.debug('key name: %s' % key_name)
     kwargs = {'bucket': self.name, 'key': key_name}
 
-    tmp_url = self.connection.generate_url(3000, 'GET', **kwargs)
+    tmp_url = self.connection.generate_url(3000, 'HEAD', **kwargs)
 
-    response = requests.get(tmp_url)
+    response = requests.head(tmp_url)
     LOG.debug(response)
     LOG.debug(response.content)
 
