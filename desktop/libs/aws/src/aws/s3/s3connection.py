@@ -22,7 +22,6 @@ import xml.sax
 from boto.exception import BotoClientError
 from boto.resultset import ResultSet
 from boto.s3.bucket import Bucket, Key
-from boto.s3.bucketlistresultset import BucketListResultSet
 from boto.s3.prefix import Prefix
 
 from desktop.lib.raz.clients import S3RazClient
@@ -66,7 +65,7 @@ class RazUrlConnection(UrlConnection):
   def __init__(self):
     self.raz = S3RazClient()
 
-  def get_url_request(self, bucket_name=None, object_name=None, expiration=3600):
+  def get_url_request(self, action='GET', bucket_name=None, object_name=None, expiration=3600):
     self.raz.get_url(bucket_name, object_name)
 
 
@@ -167,7 +166,7 @@ class UrlBucket(Bucket):
     LOG.debug(response)
     LOG.debug(response.content)
 
-    rs = ResultSet([('Contents', UrlKey), ('CommonPrefixes', Prefix)])  # Or BucketListResultSet?
+    rs = ResultSet([('Contents', UrlKey), ('CommonPrefixes', Prefix)])
     h = boto.handler.XmlHandler(rs, self)
     xml.sax.parseString(response.content, h)
     LOG.debug(rs)
