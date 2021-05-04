@@ -1,5 +1,9 @@
 {{- if and .Values.ingress.create (eq .Values.ingress.type "nginx") -}}
+{{- if semverCompare ">=1.19-0" .Capabilities.KubeVersion.GitVersion }}
+apiVersion: networking.k8s.io/v1
+{{- else }}
 apiVersion: networking.k8s.io/v1beta1
+{{- end }}
 kind: Ingress
 metadata:
   name: hue
@@ -17,17 +21,37 @@ spec:
   - host: {{ .Values.ingress.domain }}
     http:
       paths:
+      {{- if semverCompare ">=1.19-0" .Capabilities.KubeVersion.GitVersion }}
+      - backend:
+          service:
+            name: hue-balancer
+            port:
+              number: 80
+        pathType: ImplementationSpecific
+        path: /
+      {{- else }}
       - backend:
           serviceName: hue-balancer
           servicePort: 80
         path: /
+      {{- end }}
   {{- range .Values.ingress.extraHosts }}
   - host: {{ . | quote }}
     http:
       paths:
+      {{- if semverCompare ">=1.19-0" .Capabilities.KubeVersion.GitVersion }}
+      - backend:
+          service:
+            name: hue-balancer
+            port:
+              number: 80
+        pathType: ImplementationSpecific
+        path: /
+      {{- else }}
       - backend:
           serviceName: hue-balancer
           servicePort: 80
         path: /
+      {{- end }}
   {{- end }}
 {{- end -}}
