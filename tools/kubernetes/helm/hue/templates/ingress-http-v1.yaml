@@ -1,0 +1,39 @@
+{{- if and .Values.ingress.create (eq .Values.ingress.type "nginx") (semverCompare ">=1.19-0" .Capabilities.KubeVersion.GitVersion) -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: hue
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/affinity: "cookie"
+    nginx.ingress.kubernetes.io/session-cookie-name: "hue-balancer-ingress"
+    nginx.ingress.kubernetes.io/session-cookie-expires: "172800"
+    nginx.ingress.kubernetes.io/session-cookie-max-age: "172800"
+{{- with .Values.ingress.annotations }}
+{{ toYaml . | indent 4 }}
+{{- end }}
+spec:
+  rules:
+  - host: {{ .Values.ingress.domain }}
+    http:
+      paths:
+      - backend:
+          service:
+            name: hue-balancer
+            port:
+              number: 80
+        pathType: ImplementationSpecific
+        path: /
+  {{- range .Values.ingress.extraHosts }}
+  - host: {{ . | quote }}
+    http:
+      paths:
+      - backend:
+          service:
+            name: hue-balancer
+            port:
+              number: 80
+        pathType: ImplementationSpecific
+        path: /
+  {{- end }}
+{{- end -}}
