@@ -50,6 +50,7 @@ def send_message(request):
   channel = request.POST.get('channel')
   message = request.POST.get('message')
 
+  message = '@' + (request.user.get_full_name() or request.user.username) + ': ' + message
   slack_response = _send_message(channel, message)
 
   return JsonResponse({
