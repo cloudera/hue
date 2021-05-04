@@ -26,6 +26,15 @@ spec:
           serviceName: hue-balancer
           servicePort: 80
         path: /
+  {{- range .Values.ingress.extraHosts }}
+  - host: {{ . | quote }}
+    http:
+      paths:
+      - backend:
+          serviceName: hue-balancer
+          servicePort: 80
+        path: /
+  {{- end }}
   {{ if .Values.api.enabled }}
   - host: {{ .Values.api.domain }}
     http:
@@ -38,6 +47,9 @@ spec:
   tls:
   - hosts:
     - {{ .Values.ingress.domain }}
+    {{- range .Values.ingress.extraHosts }}
+    - {{ . | quote }}
+    {{- end }}
     {{ if .Values.api.enabled }}
     - {{ .Values.api.domain }}
     {{ end }}
