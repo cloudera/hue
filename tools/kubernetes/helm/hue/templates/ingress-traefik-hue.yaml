@@ -19,8 +19,8 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: hue-balancer
-          servicePort: 80
+          serviceName: hue
+          servicePort: hue
         path: /
   {{- end }}
 {{- end -}}
