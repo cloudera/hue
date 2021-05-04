@@ -65,6 +65,7 @@ ingress:
   domain: "demo.gethue.com"
   # extraHosts:
   # - "demo.hue.com"
+  # annotations: {}
   email: "team@gethue.com"
   loadBalancerIp: "127.0.0.1"
 aws:

@@ -17,6 +17,9 @@ metadata:
     nginx.ingress.kubernetes.io/auth-secret: basic-auth-hue
     nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required'
     {{ end }}
+{{- with .Values.ingress.annotations }}
+{{ toYaml . | indent 4 }}
+{{- end }}
 spec:
   rules:
   - host: {{ .Values.ingress.domain }}
