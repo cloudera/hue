@@ -9,6 +9,9 @@ metadata:
     nginx.ingress.kubernetes.io/session-cookie-name: "hue-balancer-ingress"
     nginx.ingress.kubernetes.io/session-cookie-expires: "172800"
     nginx.ingress.kubernetes.io/session-cookie-max-age: "172800"
+{{- with .Values.ingress.annotations }}
+{{ toYaml . | indent 4 }}
+{{- end }}
 spec:
   rules:
   - host: {{ .Values.ingress.domain }}
