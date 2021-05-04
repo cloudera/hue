@@ -127,7 +127,7 @@ def handle_on_link_shared(channel_id, message_ts, links, user_id):
     # Permission check for Slack user to be Hue user
     try:
       slack_user = slack_user_check(user_id)
-      user = User.objects.get(username=slack_user['user_email_prefix']) if not slack_user['is_bot'] else doc.owner
+      user = User.objects.get(username=slack_user.get('user_email_prefix')) if not slack_user['is_bot'] else doc.owner
     except User.DoesNotExist:
       bot_message = 'Corresponding Hue user not found or does not have access to the query'
       _send_message(channel_id, bot_message)
@@ -151,16 +151,30 @@ def handle_on_link_shared(channel_id, message_ts, links, user_id):
 
 
 def slack_user_check(user_id):
+  """
+  Takes the user_id as input, gets the Slack user email.
+  Return the email prefix of those email whose email domain matches with host_domain
+
+  Eg: Assume host_domain be 'gethue.com',
+  If email is alice@gethue.com, then return 'alice'
+  If email is henry@example.com, then return None
+  
+  """
+
   try:
     slack_user = slack_client.users_info(user=user_id)
   except Exception as e:
     raise PopupException(_("Cannot find query owner in Slack"), detail=e)
   
+  host_domain = '.'.join(conf.HTTP_HOST.get().split('.')[1:])
+
   response = {
     'is_bot': slack_user['user']['is_bot'],
   }
   if not slack_user['user']['is_bot']:
-    response['user_email_prefix'] = slack_user['user']['profile']['email'].split('@')[0]
+    email_prefix, email_domain = slack_user['user']['profile']['email'].split('@')
+    if email_domain == host_domain:
+      response['user_email_prefix'] = email_prefix
 
   return response
 

@@ -92,6 +92,7 @@ class TestBotServer(unittest.TestCase):
                 }
                 doc = Document2.objects.create(data=json.dumps(doc_data), owner=self.user)
                 links = [{"url": "https://demo.gethue.com/hue/editor?editor=" + str(doc.id)}]
+                host_domain = '.'.join(conf.HTTP_HOST.get().split('.')[1:])
 
                 # Slack user is Hue user but without read access sends link
                 users_info.return_value = {
@@ -99,7 +100,7 @@ class TestBotServer(unittest.TestCase):
                   "user": {
                     "is_bot": False,
                     "profile": {
-                      "email": "test_not_me@example.com"
+                      "email": "test_not_me@{domain}".format(domain=host_domain)
                     }
                   }
                 }
@@ -178,6 +179,7 @@ class TestBotServer(unittest.TestCase):
             extra='mysql'
           )
           links = [{"url": "https://demo.gethue.com/hue/gist?uuid=" + gist_doc.uuid}]
+          host_domain = '.'.join(conf.HTTP_HOST.get().split('.')[1:])
 
           # Slack user who is Hue user sends link
           users_info.return_value = {
@@ -185,7 +187,7 @@ class TestBotServer(unittest.TestCase):
             "user": {
               "is_bot": False,
               "profile": {
-                "email": "test@example.com"
+                "email": "test@{domain}".format(domain=host_domain)
               }
             }
           }
@@ -247,13 +249,26 @@ class TestBotServer(unittest.TestCase):
         doc_data = {"statement_raw": "SELECT 98765"}
         links = [{"url": "https://demo.gethue.com/hue/gist?uuid=some_uuid"}]
         _get_gist_document.return_value = Mock(data=json.dumps(doc_data), owner=self.user, extra='mysql')
+        host_domain = '.'.join(conf.HTTP_HOST.get().split('.')[1:])
 
+        # Same domain but diff email prefix
         users_info.return_value = {
           "ok": True,
           "user": {
             "is_bot": False,
             "profile": {
-              "email": "test_user_not_exist@example.com"
+              "email": "test_user_not_exist@{domain}".format(domain=host_domain)
+            }
+          }
+        }
+        assert_raises(PopupException, handle_on_link_shared, "channel", "12.1", links, "<@user_id>")
+
+        # Different domain but same email prefix
+        users_info.return_value = {
+          "ok": True,
+          "user": {
+            "profile": {
+              "email": "test@example.com"
             }
           }
         }
