@@ -39,19 +39,9 @@ class _ReadableS3File(KeyFile):
     key_copy = key.bucket.get_key(key.name, validate=False)
     KeyFile.__init__(self, key_copy)
 
-    self.is_raz = type(key) == UrlKey
-    if self.is_raz:
-      if self.key.resp:
-        self.content = self.key.resp.resp.content
-      else:
-        self.content = ''
-
   def read_url(self):
     return self.getkey().generate_url(get_key_expiry())
 
   @translate_s3_error
   def read(self, length=DEFAULT_READ_SIZE):
-    if self.is_raz:
-      return self.content
-    else:
-      return KeyFile.read(self, length)
+    return KeyFile.read(self, length)
