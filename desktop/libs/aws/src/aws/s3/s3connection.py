@@ -75,11 +75,17 @@ class UrlKey(Key):
   def open_read(self, headers=None, query_args='', override_num_retries=None, response_headers=None):
     LOG.debug('open_read: %s' % self.name)
 
-    # Similar to Bucket.get_key()
+    # Similar to Key.get_key('GET')
     # data = self.resp.read(self.BufferSize)
     # For seek: headers={"Range": "bytes=%d-" % pos}
 
-    return
+    if self.resp is None:
+      self.resp = self.bucket.get_key(key_name=self.name, validate=False, action='GET')
+
+
+  def read(self, size=0):
+    return self.resp.read(size) if self.resp else ''
+
 
   def get_url_request(self, action='GET', **kwargs):
     LOG.debug(kwargs)
@@ -107,13 +113,19 @@ class UrlBucket(Bucket):
     return self.get_all_keys(**params)
 
 
-  def get_key(self, key_name, headers=None, version_id=None, response_headers=None, validate=True):
-    LOG.debug('key name: %s' % key_name)
+  def get_key(self, key_name, headers=None, version_id=None, response_headers=None, validate=True, action='HEAD'):
+    LOG.debug('key name: %s %s' % (self.name, key_name))
     kwargs = {'bucket': self.name, 'key': key_name}
 
-    tmp_url = self.connection.generate_url(3000, 'HEAD', **kwargs)
+    # TODO: if GET --> max length to add
 
-    response = requests.head(tmp_url)
+    tmp_url = self.connection.generate_url(3000, action, **kwargs)
+
+    if action == 'HEAD':
+      response = requests.head(tmp_url)
+    else:
+      response = requests.get(tmp_url)
+
     LOG.debug(response)
     LOG.debug(response.content)
 
