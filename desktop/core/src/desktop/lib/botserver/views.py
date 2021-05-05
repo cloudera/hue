@@ -38,6 +38,7 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
 if sys.version_info[0] > 2:
+  import tldextract
   from django.utils.translation import gettext as _
 else:
   from django.utils.translation import ugettext as _
@@ -162,7 +163,7 @@ def check_slack_user_permission(host_domain, user_id):
   }
   if not slack_user['user']['is_bot']:
     email_prefix, email_domain = slack_user['user']['profile']['email'].split('@')
-    if email_domain == host_domain:
+    if email_domain == tldextract.extract(host_domain).registered_domain:
       response['user_email_prefix'] = email_prefix
 
   return response

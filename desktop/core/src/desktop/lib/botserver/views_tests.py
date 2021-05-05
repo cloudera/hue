@@ -33,6 +33,7 @@ from useradmin.models import User
 
 
 if sys.version_info[0] > 2:
+  import tldextract
   from unittest.mock import patch, Mock
 else:
   from mock import patch, Mock
@@ -56,6 +57,7 @@ class TestBotServer(unittest.TestCase):
     self.user_not_me = User.objects.get(username="test_not_me")
 
     self.host_domain = 'testserver.gethue.com'
+    self.email_domain = tldextract.extract(self.host_domain).registered_domain
 
   def test_handle_on_message(self):
     with patch('desktop.lib.botserver.views._send_message') as _send_message:
@@ -101,7 +103,7 @@ class TestBotServer(unittest.TestCase):
                   "user": {
                     "is_bot": False,
                     "profile": {
-                      "email": "test_not_me@{domain}".format(domain=self.host_domain)
+                      "email": "test_not_me@{domain}".format(domain=self.email_domain)
                     }
                   }
                 }
@@ -187,7 +189,7 @@ class TestBotServer(unittest.TestCase):
             "user": {
               "is_bot": False,
               "profile": {
-                "email": "test@{domain}".format(domain=self.host_domain)
+                "email": "test@{domain}".format(domain=self.email_domain)
               }
             }
           }
@@ -256,7 +258,7 @@ class TestBotServer(unittest.TestCase):
           "user": {
             "is_bot": False,
             "profile": {
-              "email": "test_user_not_exist@{domain}".format(domain=self.host_domain)
+              "email": "test_user_not_exist@{domain}".format(domain=self.email_domain)
             }
           }
         }
