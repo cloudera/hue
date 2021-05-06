@@ -192,10 +192,11 @@ class HttpClient(object):
 
     @return: The result of urllib2.urlopen()
     """
-    # Prepare URL and params
     if urlencode:
       path = urllib_quote(smart_str(path))
+
     url = self._make_url(path, params)
+
     if http_method in ("GET", "DELETE"):
       if data is not None:
         self.logger.warn("GET and DELETE methods do not pass any data. Path '%s'" % path)
@@ -226,8 +227,7 @@ class HttpClient(object):
       if resp.status_code >= 300:
         resp.raise_for_status()
         raise exceptions.HTTPError(response=resp)
-      # Cache request cookie for the next http_client call.
-      self._cookies = resp.cookies
+      self._cookies = resp.cookies  # Cache request cookie for the next http_client call.
       return resp
     except (exceptions.ConnectionError,
             exceptions.HTTPError,
