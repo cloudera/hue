@@ -21,7 +21,7 @@ import os
 import boto
 
 from aws import conf as aws_conf
-from aws.s3.s3connection import RazUrlConnection, BotoUrlConnection
+from aws.s3.s3connection import url_client_connect_to_region, RazSignedUrlS3Connection
 from aws.s3.s3fs import S3FileSystem, S3FileSystemException
 
 from desktop.conf import RAZ
@@ -42,7 +42,7 @@ def get_credential_provider(identifier, user):
 
 def _make_client(identifier, user):
   if RAZ.IS_ENABLED.get() and not aws_conf.IS_SELF_SIGNING_ENABLED.get():
-    s3_client = RazUrlConnection()  # Note: AWS configuration is fully skipped
+    s3_client = RazSignedUrlS3Connection()  # Note: AWS configuration is fully skipped
     s3_client_expiration = None
   else:
     client_conf = aws_conf.AWS_ACCOUNTS[identifier] if identifier in aws_conf.AWS_ACCOUNTS else None
@@ -175,7 +175,10 @@ class Client(object):
         kwargs.update({'host': self._host})
         connection = boto.s3.connection.S3Connection(**kwargs)
       elif self._region:
-        connection = boto.s3.connect_to_region(self._region, **kwargs)
+        if aws_conf.IS_SELF_SIGNING_ENABLED.get():
+          connection = url_client_connect_to_region(self._region, **kwargs)
+        else:
+          connection = boto.s3.connect_to_region(self._region, **kwargs)
       else:
         kwargs.update({'host': 's3.amazonaws.com'})
         connection = boto.s3.connection.S3Connection(**kwargs)
@@ -189,8 +192,5 @@ class Client(object):
 
       if connection is None:
         raise S3FileSystemException('Can not construct S3 Connection for region %s' % self._region)
-
-    if aws_conf.IS_SELF_SIGNING_ENABLED.get():
-      connection = BotoUrlConnection(connection)
 
     return connection
