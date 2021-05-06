@@ -1,4 +1,4 @@
-{{- if and .Values.ingress.create (eq .Values.ingress.type "nginx") -}}
+{{- if and .Values.ingress.create (eq .Values.ingress.type "nginx") (semverCompare "<1.19-0" .Capabilities.KubeVersion.GitVersion) -}}
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
