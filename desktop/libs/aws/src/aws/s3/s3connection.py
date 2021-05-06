@@ -61,7 +61,9 @@ class SignedUrlS3Connection(S3Connection):
                 provider='aws', bucket_class=Bucket, security_token=None,
                 suppress_consec_slashes=True, anon=False,
                 validate_certs=None, profile_name=None):
-    # anon = True # For Raz
+    # For Raz
+    # anon = True
+    # TODO: handle properly how to build a client without any auth without having get_auth_handler() fail
     super(SignedUrlS3Connection, self).__init__(
       aws_access_key_id=aws_access_key_id, aws_secret_access_key=aws_secret_access_key,
                 is_secure=is_secure, port=port, proxy=proxy, proxy_port=proxy_port,
@@ -73,15 +75,13 @@ class SignedUrlS3Connection(S3Connection):
                 validate_certs=validate_certs, profile_name=profile_name)
 
 
-class RazSignedUrlS3Connection(SignedUrlS3Connection):
+class RazS3Connection(SignedUrlS3Connection):
   """
   Class asking a RAZ server presigned Urls for all the operations on S3 resources.
   Some operations can be denied depending on the privileges of the users in Ranger.
 
   Then fill-up the boto Http request with the presigned Url data and let boto executes the request as usual.
   """
-
-
   def make_request(self, method, bucket='', key='', headers=None, data='',
                     query_args=None, sender=None, override_num_retries=None,
                     retry_handler=None):
@@ -108,7 +108,7 @@ class RazSignedUrlS3Connection(SignedUrlS3Connection):
     # TODO:
     # Build a check_access call to Raz, get back presigned Url data and either create a new Boto http_request or
     # update some of its attributes like in SelfSignedUrlS3Connection.
-    #
+
     # e.g.
     # signed_url = self.get_url_request(...)
     # update or recreate `http_request`
@@ -123,9 +123,7 @@ class RazSignedUrlS3Connection(SignedUrlS3Connection):
         'key': key
     }
 
-    # http://boto.cloudhackers.com/en/latest/ref/s3.html#boto.s3.connection.S3Connection.generate_url
-    tmp_url = 'https://s3-us-west-1.amazonaws.com/?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA23E77ZX2HVY76YGL%2F20210506%2Fus-west-1%2Fs3%2Faws4_request&X-Amz-Date=20210506T191959Z&X-Amz-Expires=1000&X-Amz-SignedHeaders=host&X-Amz-Signature=6d83f8ed913bd3316a7185df7c49480300032c381e93356610a07ed474fc21d3'
-    # tmp_url = self.generate_url(1000, method, **kwargs)
+    tmp_url = self.get_url_request(action='GET', bucket_name=bucket, object_name=key)
     LOG.debug(tmp_url)
 
     http_request.path = tmp_url.replace(http_request.protocol + '://' + http_request.host.split(':')[0], '')
