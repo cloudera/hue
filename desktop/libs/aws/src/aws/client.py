@@ -21,7 +21,7 @@ import os
 import boto
 
 from aws import conf as aws_conf
-from aws.s3.s3connection import url_client_connect_to_region, RazSignedUrlS3Connection
+from aws.s3.s3connection import url_client_connect_to_region, RazS3Connection
 from aws.s3.s3fs import S3FileSystem, S3FileSystemException
 
 from desktop.conf import RAZ
@@ -42,7 +42,7 @@ def get_credential_provider(identifier, user):
 
 def _make_client(identifier, user):
   if RAZ.IS_ENABLED.get() and not aws_conf.IS_SELF_SIGNING_ENABLED.get():
-    s3_client = RazSignedUrlS3Connection()  # Note: AWS configuration is fully skipped
+    s3_client = RazS3Connection()  # Note: AWS configuration is fully skipped
     s3_client_expiration = None
   else:
     client_conf = aws_conf.AWS_ACCOUNTS[identifier] if identifier in aws_conf.AWS_ACCOUNTS else None
