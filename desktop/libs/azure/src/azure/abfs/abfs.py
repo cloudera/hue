@@ -33,7 +33,9 @@ from posixpath import join
 from hadoop.hdfs_site import get_umask_mode
 from hadoop.fs.exceptions import WebHdfsException
 
+from desktop.conf import RAZ
 from desktop.lib.rest import http_client, resource
+from desktop.lib.rest.raz_http_client import RazHttpClient
 
 import azure.abfs.__init__ as Init_ABFS
 from azure.abfs.abfsfile import ABFSFile
@@ -121,7 +123,10 @@ class ABFS(object):
     )
 
   def get_client(self, url):
-    return resource.Resource(http_client.HttpClient(url, exc_class=WebHdfsException, logger=LOG))
+    if RAZ.IS_ENABLED.get():
+      return resource.Resource(RazHttpClient())
+    else:
+      return resource.Resource(http_client.HttpClient(url, exc_class=WebHdfsException, logger=LOG))
 
   def _getheaders(self):
     return {
