@@ -17,10 +17,11 @@
 import requests
 import sys
 
-from nose.tools import assert_equal, assert_false, assert_true, assert_raises
+from nose.plugins.skip import SkipTest
+from nose.tools import assert_equal, assert_true
 
 from aws.client import _make_client
-from aws.s3.s3connection import SelfSignedUrlClient, RazSignedUrlClient
+from aws.s3.s3connection import SelfSignedUrlClient, RazSignedUrlClient, SelfSignedUrlS3Connection
 from aws.s3.s3test_utils import S3TestBase
 
 
@@ -30,7 +31,47 @@ else:
   from mock import patch, Mock
 
 
+class TestSelfSignedUrlS3Connection():
+
+  def test_get_file(self):
+    with patch('aws.s3.s3connection.SelfSignedUrlS3Connection.generate_url') as generate_url:
+      with patch('aws.s3.s3connection.SelfSignedUrlS3Connection._mexe') as _mexe:
+        with patch('boto.connection.auth.get_auth_handler') as get_auth_handler:
+
+          generate_url.return_value = 'https://gethue-test.s3.amazonaws.com/gethue/data/customer.csv?' + \
+              'AWSAccessKeyId=AKIA23E77ZX2HVY76YGL' + \
+              '&Signature=3lhK%2BwtQ9Q2u5VDIqb4MEpoY3X4%3D&Expires=1617207304'
+          _mexe.return_value = '[<Bucket: demo-gethue>, <Bucket: gethue-test>]'
+
+          client = SelfSignedUrlS3Connection()
+          http_request = Mock(
+            path='/gethue/data/customer.csv',
+            protocol='https',
+            host='s3.amazonaws.com'
+          )
+          client.build_base_http_request = Mock(return_value=http_request)
+
+          buckets = client.make_request(method='GET', bucket='gethue', key='data/customer.csv',)
+
+          assert_equal('[<Bucket: demo-gethue>, <Bucket: gethue-test>]', buckets)
+          _mexe.assert_called_with(http_request, None, None, retry_handler=None)
+
+          assert_equal('https://gethue-test.s3.amazonaws.com/gethue/data/customer.csv', http_request.path)
+          assert_equal(
+            {
+              'AWSAccessKeyId': 'AKIA23E77ZX2HVY76YGL',
+              'Signature': '3lhK%2BwtQ9Q2u5VDIqb4MEpoY3X4%3D',
+              'Expires': '1617207304'
+            },
+            http_request.headers
+          )
+
+
+
 class TestSelfSignedUrlClient():
+
+  def setUp(self):
+    raise SkipTest()
 
   def test_get_buckets(self):
     with patch('aws.s3.s3connection.SelfSignedUrlClient.get_url_request') as get_url_request:
@@ -53,6 +94,9 @@ class TestSelfSignedUrlClient():
 
 
 class TestRazSignedUrlClient():
+
+  def setUp(self):
+    raise SkipTest()
 
   def test_get_buckets(self):
     with patch('aws.s3.s3connection.RazSignedUrlClient.get_url_request') as get_url_request:
