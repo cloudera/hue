@@ -44,13 +44,13 @@ class S3RazClient():
 
 class AdlsRazClient():
 
-  def __init__(self, storage_account):
+  def __init__(self):
     if RAZ.API_AUTHENTICATION.get() == 'kerberos':
       auth = HTTPKerberosAuth()
     else:
       auth = None
 
-    self.ranger = RangerRazAdls(RAZ.API_URL(), auth)
+    self.ranger = RangerRazAdls(RAZ.API_URL.get(), auth)
 
   def get_url(self, storage_account, container, relative_path, perm='read'):
     # e.g. get_url('<storage_account>', '<container>', '<relative_path>', 'read')
