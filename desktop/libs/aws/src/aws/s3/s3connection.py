@@ -30,7 +30,7 @@ from boto.regioninfo import connect
 from boto.resultset import ResultSet
 from boto.s3 import S3RegionInfo
 from boto.s3.bucket import Bucket, Key
-from boto.s3.connection import S3Connection
+from boto.s3.connection import S3Connection, NoHostProvided
 from boto.s3.prefix import Prefix
 
 from desktop.lib.raz.clients import S3RazClient
@@ -53,16 +53,35 @@ class SignedUrlS3Connection(S3Connection):
   Example of a presigned S3 Url declaring a `list all buckets` call:
   https://s3-us-west-1.amazonaws.com/?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA23E77ZX2HVY76YGL%2F20210505%2Fus-west-1%2Fs3%2Faws4_request&X-Amz-Date=20210505T171457Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=994d0ec2ca19a00aa2925fe62cab0e727591b1951a8a47504b2b9124facbd6cf
   """
-  pass
+  def __init__(self, aws_access_key_id=None, aws_secret_access_key=None,
+                is_secure=True, port=None, proxy=None, proxy_port=None,
+                proxy_user=None, proxy_pass=None,
+                host=NoHostProvided, debug=0, https_connection_factory=None,
+                calling_format=S3Connection.DefaultCallingFormat, path='/',
+                provider='aws', bucket_class=Bucket, security_token=None,
+                suppress_consec_slashes=True, anon=False,
+                validate_certs=None, profile_name=None):
+    # anon = True # For Raz
+    super(SignedUrlS3Connection, self).__init__(
+      aws_access_key_id=aws_access_key_id, aws_secret_access_key=aws_secret_access_key,
+                is_secure=is_secure, port=port, proxy=proxy, proxy_port=proxy_port,
+                proxy_user=proxy_user, proxy_pass=proxy_pass,
+                host=host, debug=debug, https_connection_factory=https_connection_factory,
+                calling_format=calling_format, path=path,
+                provider=provider, bucket_class=bucket_class, security_token=security_token,
+                suppress_consec_slashes=suppress_consec_slashes, anon=anon,
+                validate_certs=validate_certs, profile_name=profile_name)
 
 
-class RazSignedUrlS3Connection(S3Connection):
+class RazSignedUrlS3Connection(SignedUrlS3Connection):
   """
   Class asking a RAZ server presigned Urls for all the operations on S3 resources.
   Some operations can be denied depending on the privileges of the users in Ranger.
 
   Then fill-up the boto Http request with the presigned Url data and let boto executes the request as usual.
   """
+
+
   def make_request(self, method, bucket='', key='', headers=None, data='',
                     query_args=None, sender=None, override_num_retries=None,
                     retry_handler=None):
@@ -95,12 +114,29 @@ class RazSignedUrlS3Connection(S3Connection):
     # update or recreate `http_request`
     # return self._mexe(...)
 
-    return super(RazSignedUrlS3Connection, self).make_request(
-        method, path, headers,
-        data, host, auth_path, sender,
-        override_num_retries=override_num_retries,
-        retry_handler=retry_handler
-    )
+    p = http_request.path.split('/')
+    bucket = (p[1] + '/') or ''
+    key = '/'.join(p[2:]) if len(p) >= 3 else ''
+
+    kwargs = {
+        'bucket': bucket,
+        'key': key
+    }
+
+    # http://boto.cloudhackers.com/en/latest/ref/s3.html#boto.s3.connection.S3Connection.generate_url
+    tmp_url = 'https://s3-us-west-1.amazonaws.com/?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA23E77ZX2HVY76YGL%2F20210506%2Fus-west-1%2Fs3%2Faws4_request&X-Amz-Date=20210506T191959Z&X-Amz-Expires=1000&X-Amz-SignedHeaders=host&X-Amz-Signature=6d83f8ed913bd3316a7185df7c49480300032c381e93356610a07ed474fc21d3'
+    # tmp_url = self.generate_url(1000, method, **kwargs)
+    LOG.debug(tmp_url)
+
+    http_request.path = tmp_url.replace(http_request.protocol + '://' + http_request.host.split(':')[0], '')
+    p, h = http_request.path.split('?')
+    http_request.path = unquote(p)
+    http_request.headers = dict([a.split('=') for a in h.split('&')])
+
+    LOG.debug('Overriden: %s' % http_request)
+
+    return self._mexe(http_request, sender, override_num_retries,
+                      retry_handler=retry_handler)
 
 
   def get_url_request(self, action='GET', bucket_name=None, object_name=None, expiration=3600):
@@ -108,7 +144,7 @@ class RazSignedUrlS3Connection(S3Connection):
     return raz_client.get_url(bucket_name, object_name)
 
 
-class SelfSignedUrlS3Connection(S3Connection):
+class SelfSignedUrlS3Connection(SignedUrlS3Connection):
   """
   Test class self generating presigned Urls so that the Http Client using signed Urls instead
   of direct boto calls to S3 can be tested.
