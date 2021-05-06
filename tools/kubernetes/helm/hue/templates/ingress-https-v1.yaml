@@ -1,5 +1,5 @@
-{{- if and .Values.ingress.create (eq .Values.ingress.type "nginx-ssl") -}}
-apiVersion: networking.k8s.io/v1beta1
+{{- if and .Values.ingress.create (eq .Values.ingress.type "nginx-ssl") (semverCompare ">=1.19-0" .Capabilities.KubeVersion.GitVersion) -}}
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: hue
@@ -13,52 +13,67 @@ metadata:
     nginx.ingress.kubernetes.io/session-cookie-name: "hue-balancer"
     nginx.ingress.kubernetes.io/session-cookie-expires: "172800"
     nginx.ingress.kubernetes.io/session-cookie-max-age: "172800"
-    {{ if .Values.ingress.hasAuth }}
+    {{- if .Values.ingress.hasAuth }}
     nginx.ingress.kubernetes.io/auth-type: basic
     nginx.ingress.kubernetes.io/auth-secret: basic-auth-hue
     nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required'
-    {{ end }}
+    {{- end }}
+{{- with .Values.ingress.annotations }}
+{{ toYaml . | indent 4 }}
+{{- end }}
 spec:
   rules:
   - host: {{ .Values.ingress.domain }}
     http:
       paths:
-      {{ if .Values.websocket.enabled }}
+      {{- if .Values.websocket.enabled }}
       - backend:
-          serviceName: daphne-websocket
-          servicePort: 8001
+          service:
+            name: daphne-websocket
+            port:
+              number: 8001
+        pathType: ImplementationSpecific
         path: /(ws/.*)
-      {{- end -}}
+      {{- end }}
       - backend:
-          serviceName: hue-balancer
-          servicePort: 80
+          service:
+            name: hue-balancer
+            port:
+              number: 80
+        pathType: ImplementationSpecific
         path: /(.*)
   {{- range .Values.ingress.extraHosts }}
   - host: {{ . | quote }}
     http:
       paths:
       - backend:
-          serviceName: hue-balancer
-          servicePort: 80
+          service:
+            name: hue-balancer
+            port:
+              number: 80
+        pathType: ImplementationSpecific
         path: /
   {{- end }}
-  {{ if .Values.api.enabled }}
+  {{- if .Values.api.enabled }}
   - host: {{ .Values.api.domain }}
     http:
       paths:
       - backend:
-          serviceName: hue-api
-          servicePort: 8005
+          service:
+            name: hue-balancer
+            port:
+              number: 80
+        pathType: ImplementationSpecific
         path: /
-  {{ end }}
+  {{- end }}
   tls:
   - hosts:
     - {{ .Values.ingress.domain }}
     {{- range .Values.ingress.extraHosts }}
     - {{ . | quote }}
     {{- end }}
-    {{ if .Values.api.enabled }}
+    {{- if .Values.api.enabled }}
     - {{ .Values.api.domain }}
-    {{ end }}
+    {{- end }}
     secretName: letsencrypt-hue-prod-tls
 {{- end -}}
