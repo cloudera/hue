@@ -129,6 +129,8 @@ def handle_on_link_shared(channel_id, message_ts, links, user_id):
       slack_user = slack_user_check(user_id)
       user = User.objects.get(username=slack_user['user_email_prefix']) if not slack_user['is_bot'] else doc.owner
     except User.DoesNotExist:
+      bot_message = 'Corresponding Hue user not found or does not have access to the query'
+      _send_message(channel_id, bot_message)
       raise PopupException(_("Slack user does not have access to the query"))
 
     doc.can_read_or_exception(user)
