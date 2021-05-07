@@ -1,0 +1,24 @@
+include AUTHORS.rst
+include CHANGELOG.rst
+include CONTRIBUTING.rst
+include LICENSE
+include LICENSE.APACHE
+include LICENSE.BSD
+include LICENSE.PSF
+include README.rst
+
+include pyproject.toml
+
+recursive-include docs *
+recursive-include src/_cffi_src *.py *.c *.h
+prune docs/_build
+recursive-include tests *.py
+exclude vectors
+recursive-exclude vectors *
+
+recursive-exclude .github *
+
+exclude release.py .coveragerc codecov.yml .readthedocs.yml dev-requirements.txt rtd-requirements.txt tox.ini
+
+recursive-exclude .zuul.d *
+recursive-exclude .zuul.playbooks *
