@@ -29,6 +29,7 @@ from desktop.models import Document2, _get_gist_document
 from desktop.auth.backend import rewrite_user
 
 from notebook.api import _fetch_result_data, _check_status, _execute_notebook
+from notebook.conf import get_ordered_interpreters
 from notebook.models import MockRequest, get_api
 from notebook.connectors.base import _get_snippet_name
 
@@ -81,6 +82,59 @@ def parse_events(request, event):
   if event.get('type') == 'link_shared':
     handle_on_link_shared(request.get_host(), channel_id, event.get('message_ts'), event.get('links'), user_id)
 
+  if event.get('type') == 'app_mention':
+    handle_on_app_mention(request, channel_id, user_id, event.get('text'))
+
+
+def handle_on_app_mention(request, channel_id, user_id, text):
+  if text and 'table=' in text:
+    table_name = text.partition('table=')[2]
+
+    slack_user = slack_user_check(user_id)
+    user = get_user(channel_id, slack_user)
+    mock_request = MockRequest(user=rewrite_user(user))
+
+    interpreters = get_ordered_interpreters(user)
+
+    dialect_types = []
+    for interpreter in interpreters:
+      if interpreter['is_sql'] or interpreter['interface'] == 'hms':
+        dialect_types.append(interpreter['type'])
+    
+    links = []
+    for dialect in dialect_types:
+      snippet = { "type": dialect }
+      try:
+        databases = get_api(mock_request, snippet).autocomplete(snippet)
+      except Exception as e:
+        continue
+
+      for db in databases.get('databases', {}):
+        try:
+          tables = get_api(mock_request, snippet).autocomplete(snippet, database=db)
+        except Exception as e:
+          continue
+
+        for table in tables.get('tables_meta', {}):
+          if table['name'] == table_name:
+            table_link = '%(scheme)s://%(host)s/hue/metastore/table/%(database)s/%(table)s?source_type=%(dialect)s' % {
+              'scheme': 'https' if request.is_secure() else 'http',
+              'host': request.get_host(),
+              'database': db,
+              'table': table_name,
+              'dialect': dialect,
+            }
+            links.append(table_link)
+    
+    if links:
+      bot_message = 'Here are the tables I found \n'
+      for link in links:
+        bot_message += link + '\n'
+    else:
+      bot_message = 'Table not found or does not exist'
+    
+    _send_message(channel_id, bot_message)
+
 
 def handle_on_message(channel_id, bot_id, text, user_id):
   # Ignore bot's own message since that will cause an infinite loop of messages if we respond.
@@ -104,6 +158,17 @@ def _send_ephemeral_message(channel_id, user_id, raw_sql_message):
     raise PopupException(_("Error posting ephemeral message"), detail=e)
 
 
+def get_user(channel_id, slack_user):
+  try:
+    user = User.objects.get(username=slack_user.get('user_email_prefix'))
+  except User.DoesNotExist:
+    bot_message = 'Corresponding Hue user not found or does not have access to the query'
+    _send_message(channel_id, bot_message)
+    raise PopupException(_("Slack user does not have access to the query"))
+
+  return user
+
+
 def handle_on_link_shared(host_domain, channel_id, message_ts, links, user_id):
   for item in links:
     path = urlsplit(item['url'])[2]
@@ -123,20 +188,11 @@ def handle_on_link_shared(host_domain, channel_id, message_ts, links, user_id):
       msg = "Document with {key} does not exist".format(key=query_id)
       raise PopupException(_(msg))
 
-    # Permission check for Slack user to be Hue user
-    try:
-      slack_user = check_slack_user_permission(host_domain, user_id)
-      user = User.objects.get(username=slack_user.get('user_email_prefix')) if not slack_user['is_bot'] else doc.owner
-    except User.DoesNotExist:
-      bot_message = 'Corresponding Hue user not found or does not have access to the query'
-      _send_message(channel_id, bot_message)
-      raise PopupException(_("Slack user does not have access to the query"))
-
+    slack_user = slack_user_check(user_id)
+    user = get_user(channel_id, slack_user) if not slack_user['is_bot'] else doc.owner
     doc.can_read_or_exception(user)
 
-    # Mock request for query execution and fetch result
-    user = rewrite_user(user)
-    request = MockRequest(user=user)
+    request = MockRequest(user=rewrite_user(user))
 
     payload = _make_unfurl_payload(request, item['url'], id_type, doc, doc_type)
     try:
