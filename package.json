@@ -43,6 +43,7 @@
     }
   },
   "dependencies": {
+    "@gethue/sql-formatter": "4.0.3",
     "@types/lodash": "^4.14.161",
     "axios": "0.21.1",
     "clipboard": "1.7.1",
@@ -79,7 +80,6 @@
     "selectize": "0.12.6",
     "selectize-plugin-clear": "0.0.3",
     "sprintf-js": "1.1.2",
-    "@gethue/sql-formatter": "4.0.3",
     "vue": "^3.0.5",
     "vue-custom-element": "3.2.14",
     "vue3-datepicker": "^0.2.4"
@@ -133,8 +133,8 @@
     "license-checker": "^25.0.1",
     "load-grunt-tasks": "4.0.0",
     "markdown": "0.5.0",
-    "node-sass": "4.14.1",
     "prettier": "2.0.5",
+    "sass": "1.32.12",
     "sass-loader": "8.0.2",
     "source-map-loader": "1.0.0",
     "style-loader": "^2.0.0",
