@@ -76,8 +76,7 @@
         required: true
       }
     },
-    emits: ['execution-error'],
-    setup(props, { emit }) {
+    setup(props) {
       const subTracker = new SubscriptionTracker();
       onBeforeUnmount(subTracker.dispose.bind(subTracker));
 
@@ -89,20 +88,12 @@
       const jobsAvailable = computed(() => !!jobs.length);
       const jobsWithUrls = computed(() => jobs.filter(job => job.url));
 
-      let notifiedErrors = false;
-
       const debouncedUpdate = debounce((executable: Executable): void => {
         const { status, logs } = executable;
         executionLogs.value = logs.fullLog;
         jobs.splice(0, jobs.length, ...logs.jobs);
         errors.splice(0, errors.length, ...logs.errors);
-
         analysisAvailable.value = status !== ExecutionStatus.ready || !!errors.length;
-
-        if (errors.length && !notifiedErrors) {
-          emit('execution-error');
-        }
-        notifiedErrors = !!errors.length;
       }, 5);
 
       const updateFromExecutable = (executable: Executable): void => {
@@ -131,7 +122,6 @@
         jobsAvailable,
         jobsWithUrls,
         errors,
-        notifiedErrors,
         I18n
       };
     }
