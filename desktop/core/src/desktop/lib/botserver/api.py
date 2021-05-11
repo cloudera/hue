@@ -22,7 +22,7 @@ import sys
 from desktop.lib.botserver.slack_client import slack_client
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.decorators import api_error_handler
-from desktop.lib.django_util import JsonResponse, login_notrequired
+from desktop.lib.django_util import JsonResponse
 
 if sys.version_info[0] > 2:
   from django.utils.translation import gettext as _
@@ -31,7 +31,6 @@ else:
 
 LOG = logging.getLogger(__name__)
 
-@login_notrequired
 @api_error_handler
 def get_channels(request):
 
@@ -46,7 +45,6 @@ def get_channels(request):
     'channels': bot_channels,
   })
 
-@login_notrequired
 @api_error_handler
 def send_message(request):
   channel = request.POST.get('channel')
