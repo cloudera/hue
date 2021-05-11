@@ -777,9 +777,6 @@ export default class Snippet {
     if (executable) {
       this.lastExecuted(executable.executeStarted);
       this.status(executable.status);
-      if (executable.result) {
-        this.currentQueryTab('queryResults');
-      }
       if (this.parentVm.editorMode() && executable.history) {
         this.parentNotebook.id(executable.history.id);
         this.parentNotebook.uuid(executable.history.uuid);
