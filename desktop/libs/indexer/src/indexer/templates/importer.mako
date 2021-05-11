@@ -552,7 +552,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
             <!-- ko if: ['table', 'database'].indexOf(outputFormat()) != -1 -->
             <div data-bind="visible: $parent.createWizard.source.inputFormat() == 'localfile'">
               <label for="dialectType" class="control-label "><div>${ _('Dialect') }</div>
-                <select  id="dialectType" data-bind="selectize: $parent.createWizard.source.interpreters, value: $parent.createWizard.source.interpreter, optionsText: 'name', optionsValue: 'type'"></select>
+                <select  id="dialectType" data-bind="selectize: $parent.createWizard.source.interpreters, value: $parent.createWizard.source.interpreter, optionsText: 'name', optionsValue: 'dialect'"></select>
               </label>
             </div>
             <label for="collectionName" class="control-label "><div>${ _('Name') }</div></label>
@@ -1794,7 +1794,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
       });
 
       self.interpreters = ko.pureComputed(function() {
-        return window.getLastKnownConfig().app_config.catalogs;
+        return window.getLastKnownConfig().app_config.editor.interpreters;
       });
       self.interpreter = ko.observable(vm.sourceType);
       self.interpreter.subscribe(function(val) {
