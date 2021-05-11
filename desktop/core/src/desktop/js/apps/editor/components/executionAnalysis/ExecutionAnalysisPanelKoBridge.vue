@@ -17,11 +17,7 @@
 -->
 
 <template>
-  <ExecutionAnalysisPanel
-    v-if="executable"
-    :executable="executable"
-    @execution-error="onExecutionError"
-  />
+  <ExecutionAnalysisPanel v-if="executable" :executable="executable" />
 </template>
 
 <script lang="ts">
@@ -52,11 +48,6 @@
       subTracker.trackObservable(executableObservable, executable);
 
       return { executable };
-    },
-    methods: {
-      onExecutionError(): void {
-        this.$el.dispatchEvent(new CustomEvent('execution-error', { bubbles: true }));
-      }
     }
   });
 

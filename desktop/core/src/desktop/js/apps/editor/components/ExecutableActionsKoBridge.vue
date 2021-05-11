@@ -21,6 +21,8 @@
     :executable="executable"
     :before-execute="beforeExecute"
     @limit-changed="limitChanged"
+    @execute-failed="$emit('execute-failed', $event)"
+    @execute-successful="$emit('execute-successful', $event)"
   />
 </template>
 
@@ -48,6 +50,7 @@
         default: undefined
       }
     },
+    emits: ['execute-failed', 'execute-successful'],
     setup(props) {
       const subTracker = new SubscriptionTracker();
       const { executableObservable } = toRefs(props);

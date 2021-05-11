@@ -18,7 +18,12 @@
 
 <template>
   <div class="snippet-execute-actions">
-    <ExecuteButton :executable="executable" :before-execute="beforeExecute" />
+    <ExecuteButton
+      :executable="executable"
+      :before-execute="beforeExecute"
+      @execute-successful="$emit('execute-successful', $event)"
+      @execute-failed="$emit('execute-failed', $event)"
+    />
     <ExecuteLimitInput :executable="executable" @limit-changed="$emit('limit-changed', $event)" />
   </div>
 </template>
@@ -46,7 +51,7 @@
         default: undefined
       }
     },
-    emits: ['limit-changed']
+    emits: ['execute-failed', 'execute-successful', 'limit-changed']
   });
 </script>
 

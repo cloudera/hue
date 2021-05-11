@@ -55,19 +55,23 @@
 </template>
 
 <script lang="ts">
-  import { EXECUTABLE_UPDATED_TOPIC, ExecutableUpdatedEvent } from 'apps/editor/execution/events';
   import { defineComponent, PropType, ref, toRefs, watch } from 'vue';
 
+  import { EXECUTE_ACTIVE_EXECUTABLE_TOPIC, ExecuteActiveExecutableEvent } from './events';
+  import { Session } from 'apps/editor/execution/api';
+  import {
+    EXECUTABLE_TRANSITIONED_TOPIC,
+    EXECUTABLE_UPDATED_TOPIC,
+    ExecutableTransitionedEvent,
+    ExecutableUpdatedEvent
+  } from 'apps/editor/execution/events';
+  import { ExecutionStatus } from 'apps/editor/execution/executable';
+  import sessionManager from 'apps/editor/execution/sessionManager';
   import SqlExecutable from 'apps/editor/execution/sqlExecutable';
   import HueButton from 'components/HueButton.vue';
   import SubscriptionTracker from 'components/utils/SubscriptionTracker';
   import huePubSub from 'utils/huePubSub';
   import I18n from 'utils/i18n';
-
-  import { Session } from 'apps/editor/execution/api';
-  import { ExecutionStatus } from 'apps/editor/execution/executable';
-  import sessionManager from 'apps/editor/execution/sessionManager';
-  import { EXECUTE_ACTIVE_EXECUTABLE_TOPIC, ExecuteActiveExecutableEvent } from './events';
 
   const WHITE_SPACE_REGEX = /^\s*$/;
 
@@ -86,7 +90,13 @@
         default: undefined
       }
     },
-    emits: ['execute-started', 'executable-updated', 'execute-stopping'],
+    emits: [
+      'execute-failed',
+      'execute-started',
+      'execute-successful',
+      'executable-updated',
+      'execute-stopping'
+    ],
     setup(props, { emit }) {
       const { executable, beforeExecute } = toRefs(props);
       const subTracker = new SubscriptionTracker();
@@ -156,6 +166,20 @@
           updateFromExecutable(updatedExecutable);
         }
         emit('executable-updated', { executable: updatedExecutable, active });
+      });
+
+      subTracker.subscribe<ExecutableTransitionedEvent>(EXECUTABLE_TRANSITIONED_TOPIC, event => {
+        if (event.executable.id === executable.value?.id) {
+          if (
+            event.newStatus === ExecutionStatus.available ||
+            event.newStatus === ExecutionStatus.streaming ||
+            event.newStatus === ExecutionStatus.success
+          ) {
+            emit('execute-successful', executable.value);
+          } else if (event.newStatus === ExecutionStatus.failed) {
+            emit('execute-failed', executable.value);
+          }
+        }
       });
 
       subTracker.subscribe<ExecuteActiveExecutableEvent>(

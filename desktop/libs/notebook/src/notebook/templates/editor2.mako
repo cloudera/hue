@@ -610,9 +610,15 @@
 <script type ="text/html" id="editor-execution-controls">
   <div class="snippet-actions" style="padding: 5px;">
     <div class="pull-left">
-      <executable-actions-ko-bridge data-bind="vueKoProps: {
+      <executable-actions-ko-bridge data-bind="
+        vueEvents: {
+          'execute-successful': function () { currentQueryTab('queryResults') },
+          'execute-failed': function () { currentQueryTab('executionAnalysis') }
+        },
+        vueKoProps: {
           'executable-observable': activeExecutable,
-          'before-execute': beforeExecute
+          'before-execute': beforeExecute,
+
         }"></executable-actions-ko-bridge>
     </div>
     <!-- ko if: isSqlDialect() && !$root.isPresentationMode() -->
@@ -1037,9 +1043,6 @@
               <execution-analysis-panel-ko-bridge class="execution-analysis-bridge" data-bind="
                 vueKoProps: {
                   'executable-observable': activeExecutable
-                },
-                vueEvents: {
-                  'execution-error': function () { currentQueryTab('executionAnalysis') }
                 }
               "></execution-analysis-panel-ko-bridge>
             </div>
