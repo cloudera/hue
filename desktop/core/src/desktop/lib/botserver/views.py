@@ -87,53 +87,76 @@ def parse_events(request, event):
 
 
 def handle_on_app_mention(request, channel_id, user_id, text):
-  if text and 'table=' in text:
-    table_name = text.partition('table=')[2]
+  if text and 'table' in text:
+    user = get_user(channel_id, slack_user_check(user_id))
 
-    slack_user = slack_user_check(user_id)
-    user = get_user(channel_id, slack_user)
-    mock_request = MockRequest(user=rewrite_user(user))
+    table_name = text.split('table ', 1)[1]
+    if '.' in table_name:
+      database, table = table_name.split('.')
+      search_table(request, channel_id, user, table, database)
+    else:
+      search_table(request, channel_id, user, table_name)
 
-    interpreters = get_ordered_interpreters(user)
 
-    dialect_types = []
-    for interpreter in interpreters:
-      if interpreter['is_sql'] or interpreter['interface'] == 'hms':
-        dialect_types.append(interpreter['type'])
-    
-    links = []
-    for dialect in dialect_types:
-      snippet = { "type": dialect }
+def _get_dialects(user):
+  dialect_types = []
+
+  interpreters = get_ordered_interpreters(user)
+  for interpreter in interpreters:
+    if interpreter['is_sql'] or interpreter['interface'] == 'hms':
+      dialect_types.append(interpreter['type'])
+
+  return dialect_types
+
+
+def search_table(request, channel_id, user, table_name, db_name=None):
+  mock_request = MockRequest(user=rewrite_user(user))
+  dialect_types = _get_dialects(user)
+
+  links = []
+  max_links_count = 3
+  for dialect in dialect_types:
+    snippet = { 'type': dialect }
+    try:
+      databases = get_api(mock_request, snippet).autocomplete(snippet)
+    except Exception as e:
+      continue
+
+    for db in databases.get('databases', []):
+      if db_name and db_name != db:
+        continue
       try:
-        databases = get_api(mock_request, snippet).autocomplete(snippet)
+        tables = get_api(mock_request, snippet).autocomplete(snippet, database=db)
       except Exception as e:
         continue
 
-      for db in databases.get('databases', {}):
-        try:
-          tables = get_api(mock_request, snippet).autocomplete(snippet, database=db)
-        except Exception as e:
-          continue
+      for table in tables.get('tables_meta', []):
+        if table['name'] == table_name:
+          if max_links_count == 0:
+            break
 
-        for table in tables.get('tables_meta', {}):
-          if table['name'] == table_name:
-            table_link = '%(scheme)s://%(host)s/hue/metastore/table/%(database)s/%(table)s?source_type=%(dialect)s' % {
-              'scheme': 'https' if request.is_secure() else 'http',
-              'host': request.get_host(),
-              'database': db,
-              'table': table_name,
-              'dialect': dialect,
-            }
-            links.append(table_link)
-    
-    if links:
-      bot_message = 'Here are the tables I found \n'
-      for link in links:
-        bot_message += link + '\n'
-    else:
-      bot_message = 'Table not found or does not exist'
-    
-    _send_message(channel_id, bot_message)
+          table_link = '%(scheme)s://%(host)s/hue/metastore/table/%(database)s/%(table)s?source_type=%(dialect)s' % {
+            'scheme': 'https' if request.is_secure() else 'http',
+            'host': request.get_host(),
+            'database': db,
+            'table': table_name,
+            'dialect': dialect,
+          }
+          links.append(table_link)
+          max_links_count -= 1
+
+  _send_table_links(channel_id, links)
+
+
+def _send_table_links(channel_id, links):
+  if links:
+    bot_message = 'Here are the tables I found \n'
+    for link in links:
+      bot_message += link + '\n'
+  else:
+    bot_message = 'Table not found or does not exist'
+
+  _send_message(channel_id, bot_message)
 
 
 def handle_on_message(channel_id, bot_id, text, user_id):
