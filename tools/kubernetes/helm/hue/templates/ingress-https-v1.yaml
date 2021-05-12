@@ -60,11 +60,11 @@ spec:
       paths:
       - backend:
           service:
-            name: hue-balancer
+            name: hue-api
             port:
-              number: 80
+              number: 8005
         pathType: ImplementationSpecific
-        path: /
+        path: /(.*)
   {{- end }}
   tls:
   - hosts:
