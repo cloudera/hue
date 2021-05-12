@@ -52,7 +52,7 @@ spec:
       - backend:
           serviceName: hue-api
           servicePort: 8005
-        path: /
+        path: /(.*)
   {{- end }}
   tls:
   - hosts:
