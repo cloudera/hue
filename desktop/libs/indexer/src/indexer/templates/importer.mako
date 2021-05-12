@@ -2213,7 +2213,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
           wizard.computeSetDeferred.done(function () {
             dataCatalog.getEntry({
               compute: wizard.compute(),
-              connector: { id: self.sourceType }, // TODO: Use connectors in the importer
+              connector: { id: self.sourceType() }, // TODO: Use connectors in the importer
               namespace: wizard.namespace(),
               path: self.outputFormat() === 'table' ? [self.databaseName(), self.tableName()] : [],
             }).then(function (catalogEntry) {
