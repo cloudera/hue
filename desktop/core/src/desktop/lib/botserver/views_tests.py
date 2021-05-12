@@ -33,7 +33,6 @@ from useradmin.models import User
 
 
 if sys.version_info[0] > 2:
-  import tldextract
   from unittest.mock import patch, Mock
 else:
   from mock import patch, Mock
@@ -57,7 +56,7 @@ class TestBotServer(unittest.TestCase):
     self.user_not_me = User.objects.get(username="test_not_me")
 
     self.host_domain = 'testserver.gethue.com'
-    self.email_domain = tldextract.extract(self.host_domain).registered_domain
+    self.email_domain = '.'.join(self.host_domain.split('.')[-2:])
 
   def test_handle_on_message(self):
     with patch('desktop.lib.botserver.views._send_message') as _send_message:
@@ -246,32 +245,33 @@ class TestBotServer(unittest.TestCase):
   def test_slack_user_not_hue_user(self):
     with patch('desktop.lib.botserver.views.slack_client.users_info') as users_info:
       with patch('desktop.lib.botserver.views._get_gist_document') as _get_gist_document:
+        with patch('desktop.lib.botserver.views.slack_client.chat_postMessage') as chat_postMessage:
         
-        # Can be checked similarly with query link too
-        doc_data = {"statement_raw": "SELECT 98765"}
-        links = [{"url": "https://demo.gethue.com/hue/gist?uuid=some_uuid"}]
-        _get_gist_document.return_value = Mock(data=json.dumps(doc_data), owner=self.user, extra='mysql')
+          # Can be checked similarly with query link too
+          doc_data = {"statement_raw": "SELECT 98765"}
+          links = [{"url": "https://demo.gethue.com/hue/gist?uuid=some_uuid"}]
+          _get_gist_document.return_value = Mock(data=json.dumps(doc_data), owner=self.user, extra='mysql')
 
-        # Same domain but diff email prefix
-        users_info.return_value = {
-          "ok": True,
-          "user": {
-            "is_bot": False,
-            "profile": {
-              "email": "test_user_not_exist@{domain}".format(domain=self.email_domain)
+          # Same domain but diff email prefix
+          users_info.return_value = {
+            "ok": True,
+            "user": {
+              "is_bot": False,
+              "profile": {
+                "email": "test_user_not_exist@{domain}".format(domain=self.email_domain)
+              }
             }
           }
-        }
-        assert_raises(PopupException, handle_on_link_shared, self.host_domain, "channel", "12.1", links, "<@user_id>")
+          assert_raises(PopupException, handle_on_link_shared, self.host_domain, "channel", "12.1", links, "<@user_id>")
 
-        # Different domain but same email prefix
-        users_info.return_value = {
-          "ok": True,
-          "user": {
-            "is_bot": False,
-            "profile": {
-              "email": "test@example.com"
+          # Different domain but same email prefix
+          users_info.return_value = {
+            "ok": True,
+            "user": {
+              "is_bot": False,
+              "profile": {
+                "email": "test@example.com"
+              }
             }
           }
-        }
-        assert_raises(PopupException, handle_on_link_shared, self.host_domain,"channel", "12.1", links, "<@user_id>")
+          assert_raises(PopupException, handle_on_link_shared, self.host_domain,"channel", "12.1", links, "<@user_id>")

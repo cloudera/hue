@@ -38,7 +38,6 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
 if sys.version_info[0] > 2:
-  import tldextract
   from django.utils.translation import gettext as _
 else:
   from django.utils.translation import ugettext as _
@@ -61,15 +60,14 @@ def slack_events(request):
       return JsonResponse(response_dict, status=200)
     
     if 'event' in slack_message:
-      event_message = slack_message['event']
-      parse_events(request.get_host(), event_message)
+      parse_events(request, slack_message['event'])
   except ValueError as err:
     raise PopupException(_("Response content is not valid JSON"), detail=err)
 
   return HttpResponse(status=200)
 
 
-def parse_events(host_domain, event):
+def parse_events(request, event):
   """
   Parses the event according to its 'type'.
 
@@ -81,7 +79,7 @@ def parse_events(host_domain, event):
     handle_on_message(channel_id, event.get('bot_id'), event.get('text'), user_id)
 
   if event.get('type') == 'link_shared':
-    handle_on_link_shared(host_domain, channel_id, event.get('message_ts'), event.get('links'), user_id)
+    handle_on_link_shared(request.get_host(), channel_id, event.get('message_ts'), event.get('links'), user_id)
 
 
 def handle_on_message(channel_id, bot_id, text, user_id):
@@ -163,7 +161,7 @@ def check_slack_user_permission(host_domain, user_id):
   }
   if not slack_user['user']['is_bot']:
     email_prefix, email_domain = slack_user['user']['profile']['email'].split('@')
-    if email_domain == tldextract.extract(host_domain).registered_domain:
+    if email_domain == '.'.join(host_domain.split('.')[-2:]):
       response['user_email_prefix'] = email_prefix
 
   return response

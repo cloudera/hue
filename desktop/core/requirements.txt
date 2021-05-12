@@ -67,5 +67,4 @@ tablib==0.13.0
 tabulate==0.8.9
 thrift==0.13.0
 thrift-sasl==0.4.2
-tldextract==3.1.0
 git+https://github.com/gethue/django-babel.git
