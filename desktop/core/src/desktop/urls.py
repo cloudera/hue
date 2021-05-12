@@ -277,5 +277,5 @@ if is_oidc_configured():
 # Slack botserver URLs
 if SLACK.IS_ENABLED.get():
   urlpatterns += [
-    re_path(r'^slack/', include('desktop.lib.botserver.urls')),
+    re_path(r'^desktop/slack/', include('desktop.lib.botserver.urls')),
   ]
