@@ -47,13 +47,16 @@ class TestBotServer(unittest.TestCase):
       raise SkipTest
   
   def setUp(self):
-    # Slack user email: test@example.com
+    # Slack user: test
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
     self.user = User.objects.get(username="test")
 
-    # Other slack user email: test_not_me@example.com
+    # Other slack user: test_not_me
     self.client_not_me = make_logged_in_client(username="test_not_me", groupname="default", recreate=True, is_superuser=False)
     self.user_not_me = User.objects.get(username="test_not_me")
+
+    self.host_domain = 'testserver.gethue.com'
+    self.email_domain = '.'.join(self.host_domain.split('.')[-2:])
 
   def test_handle_on_message(self):
     with patch('desktop.lib.botserver.views._send_message') as _send_message:
@@ -99,11 +102,11 @@ class TestBotServer(unittest.TestCase):
                   "user": {
                     "is_bot": False,
                     "profile": {
-                      "email": "test_not_me@example.com"
+                      "email": "test_not_me@{domain}".format(domain=self.email_domain)
                     }
                   }
                 }
-                assert_raises(PopupException, handle_on_link_shared, "channel", "12.1", links, "<@user_id>")
+                assert_raises(PopupException, handle_on_link_shared, self.host_domain, "channel", "12.1", links, "<@user_id>")
 
                 # Slack user is Hue user with read access sends link
                 doc.update_permission(self.user, is_link_on=True)
@@ -115,7 +118,7 @@ class TestBotServer(unittest.TestCase):
                 }
                 result_table.return_value = '  Columns(1)\n------------  ----\n        5000  5000'
 
-                handle_on_link_shared(channel_id, message_ts, links, user_id)
+                handle_on_link_shared(self.host_domain, channel_id, message_ts, links, user_id)
 
                 query_preview = {
                   links[0]['url']: {
@@ -154,11 +157,11 @@ class TestBotServer(unittest.TestCase):
 
                 # Document does not exist
                 qhistory_url = "https://demo.gethue.com/hue/editor?editor=109644"
-                assert_raises(PopupException, handle_on_link_shared, "channel", "12.1", [{"url": qhistory_url}], "<@user_id>")
+                assert_raises(PopupException, handle_on_link_shared, self.host_domain, "channel", "12.1", [{"url": qhistory_url}], "<@user_id>")
 
                 # Cannot unfurl link with invalid query link
                 inv_qhistory_url = "https://demo.gethue.com/hue/editor/?type=4"
-                assert_raises(PopupException, handle_on_link_shared, "channel", "12.1", [{"url": inv_qhistory_url}], "<@user_id>")
+                assert_raises(PopupException, handle_on_link_shared, self.host_domain, "channel", "12.1", [{"url": inv_qhistory_url}], "<@user_id>")
 
   def test_handle_gist_link(self):
     with patch('desktop.lib.botserver.views.slack_client.chat_unfurl') as chat_unfurl:
@@ -185,11 +188,11 @@ class TestBotServer(unittest.TestCase):
             "user": {
               "is_bot": False,
               "profile": {
-                "email": "test@example.com"
+                "email": "test@{domain}".format(domain=self.email_domain)
               }
             }
           }
-          handle_on_link_shared(channel_id, message_ts, links, user_id)
+          handle_on_link_shared(self.host_domain, channel_id, message_ts, links, user_id)
 
           gist_preview = {
             links[0]['url']: {
@@ -226,35 +229,49 @@ class TestBotServer(unittest.TestCase):
               "is_bot": True,
             }
           }
-          handle_on_link_shared(channel_id, message_ts, links, user_id)
+          handle_on_link_shared(self.host_domain, channel_id, message_ts, links, user_id)
 
           chat_unfurl.assert_called_with(channel=channel_id, ts=message_ts, unfurls=gist_preview)
           assert_false(send_result_file.called)
 
           # Gist document does not exist
           gist_url = "https://demo.gethue.com/hue/gist?uuid=6d1c407b-d999-4dfd-ad23-d3a46c19a427"
-          assert_raises(PopupException, handle_on_link_shared, "channel", "12.1", [{"url": gist_url}], "<@user_id>")
+          assert_raises(PopupException, handle_on_link_shared, self.host_domain, "channel", "12.1", [{"url": gist_url}], "<@user_id>")
 
           # Cannot unfurl with invalid gist link
           inv_gist_url = "https://demo.gethue.com/hue/gist?uuids/=invalid_link"
-          assert_raises(PopupException, handle_on_link_shared, "channel", "12.1", [{"url": inv_gist_url}], "<@user_id>")
+          assert_raises(PopupException, handle_on_link_shared, self.host_domain, "channel", "12.1", [{"url": inv_gist_url}], "<@user_id>")
 
   def test_slack_user_not_hue_user(self):
     with patch('desktop.lib.botserver.views.slack_client.users_info') as users_info:
       with patch('desktop.lib.botserver.views._get_gist_document') as _get_gist_document:
+        with patch('desktop.lib.botserver.views.slack_client.chat_postMessage') as chat_postMessage:
         
-        # Can be checked similarly with query link too
-        doc_data = {"statement_raw": "SELECT 98765"}
-        links = [{"url": "https://demo.gethue.com/hue/gist?uuid=some_uuid"}]
-        _get_gist_document.return_value = Mock(data=json.dumps(doc_data), owner=self.user, extra='mysql')
+          # Can be checked similarly with query link too
+          doc_data = {"statement_raw": "SELECT 98765"}
+          links = [{"url": "https://demo.gethue.com/hue/gist?uuid=some_uuid"}]
+          _get_gist_document.return_value = Mock(data=json.dumps(doc_data), owner=self.user, extra='mysql')
 
-        users_info.return_value = {
-          "ok": True,
-          "user": {
-            "is_bot": False,
-            "profile": {
-              "email": "test_user_not_exist@example.com"
+          # Same domain but diff email prefix
+          users_info.return_value = {
+            "ok": True,
+            "user": {
+              "is_bot": False,
+              "profile": {
+                "email": "test_user_not_exist@{domain}".format(domain=self.email_domain)
+              }
             }
           }
-        }
-        assert_raises(PopupException, handle_on_link_shared, "channel", "12.1", links, "<@user_id>")
+          assert_raises(PopupException, handle_on_link_shared, self.host_domain, "channel", "12.1", links, "<@user_id>")
+
+          # Different domain but same email prefix
+          users_info.return_value = {
+            "ok": True,
+            "user": {
+              "is_bot": False,
+              "profile": {
+                "email": "test@example.com"
+              }
+            }
+          }
+          assert_raises(PopupException, handle_on_link_shared, self.host_domain,"channel", "12.1", links, "<@user_id>")

@@ -60,15 +60,14 @@ def slack_events(request):
       return JsonResponse(response_dict, status=200)
     
     if 'event' in slack_message:
-      event_message = slack_message['event']
-      parse_events(event_message)
+      parse_events(request, slack_message['event'])
   except ValueError as err:
     raise PopupException(_("Response content is not valid JSON"), detail=err)
 
   return HttpResponse(status=200)
 
 
-def parse_events(event):
+def parse_events(request, event):
   """
   Parses the event according to its 'type'.
 
@@ -80,7 +79,7 @@ def parse_events(event):
     handle_on_message(channel_id, event.get('bot_id'), event.get('text'), user_id)
 
   if event.get('type') == 'link_shared':
-    handle_on_link_shared(channel_id, event.get('message_ts'), event.get('links'), user_id)
+    handle_on_link_shared(request.get_host(), channel_id, event.get('message_ts'), event.get('links'), user_id)
 
 
 def handle_on_message(channel_id, bot_id, text, user_id):
@@ -105,7 +104,7 @@ def _send_ephemeral_message(channel_id, user_id, raw_sql_message):
     raise PopupException(_("Error posting ephemeral message"), detail=e)
 
 
-def handle_on_link_shared(channel_id, message_ts, links, user_id):
+def handle_on_link_shared(host_domain, channel_id, message_ts, links, user_id):
   for item in links:
     path = urlsplit(item['url'])[2]
     id_type, qid = urlsplit(item['url'])[3].split('=')
@@ -126,8 +125,8 @@ def handle_on_link_shared(channel_id, message_ts, links, user_id):
 
     # Permission check for Slack user to be Hue user
     try:
-      slack_user = slack_user_check(user_id)
-      user = User.objects.get(username=slack_user['user_email_prefix']) if not slack_user['is_bot'] else doc.owner
+      slack_user = check_slack_user_permission(host_domain, user_id)
+      user = User.objects.get(username=slack_user.get('user_email_prefix')) if not slack_user['is_bot'] else doc.owner
     except User.DoesNotExist:
       bot_message = 'Corresponding Hue user not found or does not have access to the query'
       _send_message(channel_id, bot_message)
@@ -150,17 +149,20 @@ def handle_on_link_shared(channel_id, message_ts, links, user_id):
       send_result_file(request, channel_id, message_ts, doc, 'xls')
 
 
-def slack_user_check(user_id):
+def check_slack_user_permission(host_domain, user_id):
+
   try:
     slack_user = slack_client.users_info(user=user_id)
   except Exception as e:
     raise PopupException(_("Cannot find query owner in Slack"), detail=e)
-  
+
   response = {
     'is_bot': slack_user['user']['is_bot'],
   }
   if not slack_user['user']['is_bot']:
-    response['user_email_prefix'] = slack_user['user']['profile']['email'].split('@')[0]
+    email_prefix, email_domain = slack_user['user']['profile']['email'].split('@')
+    if email_domain == '.'.join(host_domain.split('.')[-2:]):
+      response['user_email_prefix'] = email_prefix
 
   return response
 
