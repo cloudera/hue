@@ -25,7 +25,7 @@ from desktop.lib.botserver.slack_client import slack_client, SLACK_VERIFICATION_
 from desktop.lib.botserver.api import _send_message
 from desktop.lib.django_util import login_notrequired, JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.models import Document2, _get_gist_document
+from desktop.models import Document2, _get_gist_document, get_cluster_config
 from desktop.auth.backend import rewrite_user
 
 from notebook.api import _fetch_result_data, _check_status, _execute_notebook
@@ -36,6 +36,7 @@ from notebook.connectors.base import _get_snippet_name
 from useradmin.models import User
 
 from django.http import HttpResponse
+from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 
 if sys.version_info[0] > 2:
@@ -71,7 +72,6 @@ def slack_events(request):
 def parse_events(request, event):
   """
   Parses the event according to its 'type'.
-
   """
   channel_id = event.get('channel')
   user_id = event.get('user')
@@ -83,19 +83,19 @@ def parse_events(request, event):
     handle_on_link_shared(request.get_host(), channel_id, event.get('message_ts'), event.get('links'), user_id)
 
   if event.get('type') == 'app_mention':
-    handle_on_app_mention(request, channel_id, user_id, event.get('text'))
+    handle_on_app_mention(request.get_host(), request.is_secure(), channel_id, user_id, event.get('text'))
 
 
-def handle_on_app_mention(request, channel_id, user_id, text):
+def handle_on_app_mention(host_domain, is_http_secure, channel_id, user_id, text):
   if text and 'table' in text:
-    user = get_user(channel_id, check_slack_user_permission(request.get_host(), user_id))
+    user = get_user(channel_id, check_slack_user_permission(host_domain, user_id))
 
     table_name = text.split('table ', 1)[1]
     if '.' in table_name:
       database, table = table_name.split('.')
-      search_table(request, channel_id, user, table, database)
+      search_table(host_domain, is_http_secure, channel_id, user, table, database)
     else:
-      search_table(request, channel_id, user, table_name)
+      search_table(host_domain, is_http_secure, channel_id, user, table_name)
 
 
 def _get_dialects(user):
@@ -109,11 +109,11 @@ def _get_dialects(user):
   return dialect_types
 
 
-def search_table(request, channel_id, user, table_name, db_name=None):
+def search_table(host_domain, is_http_secure, channel_id, user, table_name, db_name=None):
   mock_request = MockRequest(user=rewrite_user(user))
   dialect_types = _get_dialects(user)
 
-  links = []
+  table_link = []
   max_links_count = 3
   for dialect in dialect_types:
     snippet = { 'type': dialect }
@@ -135,24 +135,33 @@ def search_table(request, channel_id, user, table_name, db_name=None):
           if max_links_count == 0:
             break
 
-          table_link = '%(scheme)s://%(host)s/hue/metastore/table/%(database)s/%(table)s?source_type=%(dialect)s' % {
-            'scheme': 'https' if request.is_secure() else 'http',
-            'host': request.get_host(),
+          link = _make_table_link(host_domain, is_http_secure, db, table_name, dialect)
+          table_link.append({
+            'url': link,
             'database': db,
             'table': table_name,
             'dialect': dialect,
-          }
-          links.append(table_link)
+          })
           max_links_count -= 1
 
-  _send_table_links(channel_id, links)
+  _send_table_links(channel_id, table_link)
 
 
-def _send_table_links(channel_id, links):
-  if links:
+def _make_table_link(host_domain, is_http_secure, db, table, dialect):
+  scheme = 'https' if is_http_secure else 'http'
+  table_link = '{scheme}://{host}/hue'.format(
+    scheme=scheme, 
+    host="127.0.0.1:8000",
+  ) + reverse('metastore:describe_table', kwargs={'database': db, 'table': table}) + '?source_type={type}'.format(type=dialect)
+
+  return table_link
+
+
+def _send_table_links(channel_id, table_links):
+  if table_links:
     bot_message = 'Here are the tables I found \n'
-    for link in links:
-      bot_message += link + '\n'
+    for link in table_links:
+      bot_message += "*<{url}|{db}.{table}>* \n".format(url=link['url'], db=link['database'], table=link['table'])
   else:
     bot_message = 'Table not found or does not exist'
 
@@ -179,17 +188,6 @@ def _send_ephemeral_message(channel_id, user_id, raw_sql_message):
     slack_client.chat_postEphemeral(channel=channel_id, user=user_id, text=raw_sql_message)
   except Exception as e:
     raise PopupException(_("Error posting ephemeral message"), detail=e)
-
-
-def get_user(channel_id, slack_user):
-  try:
-    user = User.objects.get(username=slack_user.get('user_email_prefix'))
-  except User.DoesNotExist:
-    bot_message = 'Corresponding Hue user not found or does not have access to the query'
-    _send_message(channel_id, bot_message)
-    raise PopupException(_("Slack user does not have access to the query"))
-
-  return user
 
 
 def handle_on_link_shared(host_domain, channel_id, message_ts, links, user_id):
@@ -228,8 +226,18 @@ def handle_on_link_shared(host_domain, channel_id, message_ts, links, user_id):
       send_result_file(request, channel_id, message_ts, doc, 'xls')
 
 
-def check_slack_user_permission(host_domain, user_id):
+def get_user(channel_id, slack_user):
+  try:
+    user = User.objects.get(username='demo')
+  except User.DoesNotExist:
+    bot_message = 'Corresponding Hue user not found or does not have access to the query'
+    _send_message(channel_id, bot_message)
+    raise PopupException(_("Slack user does not have access to the query"))
 
+  return user
+
+
+def check_slack_user_permission(host_domain, user_id):
   try:
     slack_user = slack_client.users_info(user=user_id)
   except Exception as e:
