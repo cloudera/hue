@@ -228,7 +228,7 @@ def handle_on_link_shared(host_domain, channel_id, message_ts, links, user_id):
 
 def get_user(channel_id, slack_user):
   try:
-    user = User.objects.get(username='demo')
+    user = User.objects.get(username=slack_user.get('user_email_prefix'))
   except User.DoesNotExist:
     bot_message = 'Corresponding Hue user not found or does not have access to the query'
     _send_message(channel_id, bot_message)
