@@ -27,7 +27,7 @@
     <DropdownDrawer
       :open="open"
       :trigger-element="triggerElement"
-      :close-on-click="true"
+      :close-on-click="closeOnClick"
       @close="closeDrawer"
     >
       <slot :close-panel="closeDrawer" />
@@ -51,6 +51,10 @@
       HueLink
     },
     props: {
+      closeOnClick: {
+        type: Boolean,
+        default: true
+      },
       text: {
         type: String,
         default: ''

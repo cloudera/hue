@@ -93,6 +93,17 @@ def handle_on_message(channel_id, bot_id, text, user_id):
       bot_message = 'Hi <@{user}> :wave:'.format(user=user_id)
       _send_message(channel_id, bot_message)
 
+    if text and 'select 1' in text.lower():
+      raw_sql_message = 'Hi <@{user}>\nInstead of copy/pasting SQL, now you can send Editor links which unfurls in a rich preview!'.format(user=user_id)
+      _send_ephemeral_message(channel_id, user_id, raw_sql_message)
+
+
+def _send_ephemeral_message(channel_id, user_id, raw_sql_message):
+  try:
+    slack_client.chat_postEphemeral(channel=channel_id, user=user_id, text=raw_sql_message)
+  except Exception as e:
+    raise PopupException(_("Error posting ephemeral message"), detail=e)
+
 
 def handle_on_link_shared(channel_id, message_ts, links, user_id):
   for item in links:
@@ -118,6 +129,8 @@ def handle_on_link_shared(channel_id, message_ts, links, user_id):
       slack_user = slack_user_check(user_id)
       user = User.objects.get(username=slack_user['user_email_prefix']) if not slack_user['is_bot'] else doc.owner
     except User.DoesNotExist:
+      bot_message = 'Corresponding Hue user not found or does not have access to the query'
+      _send_message(channel_id, bot_message)
       raise PopupException(_("Slack user does not have access to the query"))
 
     doc.can_read_or_exception(user)

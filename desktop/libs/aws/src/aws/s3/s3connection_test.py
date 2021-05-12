@@ -17,10 +17,11 @@
 import requests
 import sys
 
-from nose.tools import assert_equal, assert_false, assert_true, assert_raises
+from nose.plugins.skip import SkipTest
+from nose.tools import assert_equal, assert_true
 
 from aws.client import _make_client
-from aws.s3.s3connection import BotoUrlConnection, UrlBucket, RazUrlConnection
+from aws.s3.s3connection import SelfSignedUrlClient, RazSignedUrlClient, SelfSignedUrlS3Connection, RazS3Connection
 from aws.s3.s3test_utils import S3TestBase
 
 
@@ -30,13 +31,91 @@ else:
   from mock import patch, Mock
 
 
-class TestBotoUrlConnection():
+class TestSelfSignedUrlS3Connection():
+
+  def test_get_file(self):
+    with patch('aws.s3.s3connection.SelfSignedUrlS3Connection.generate_url') as generate_url:
+      with patch('aws.s3.s3connection.SelfSignedUrlS3Connection._mexe') as _mexe:
+        with patch('boto.connection.auth.get_auth_handler') as get_auth_handler:
+
+          generate_url.return_value = 'https://gethue-test.s3.amazonaws.com/gethue/data/customer.csv?' + \
+              'AWSAccessKeyId=AKIA23E77ZX2HVY76YGL' + \
+              '&Signature=3lhK%2BwtQ9Q2u5VDIqb4MEpoY3X4%3D&Expires=1617207304'
+          _mexe.return_value = '[<Bucket: demo-gethue>, <Bucket: gethue-test>]'
+
+          client = SelfSignedUrlS3Connection()
+          http_request = Mock(
+            path='/gethue/data/customer.csv',
+            protocol='https',
+            host='s3.amazonaws.com'
+          )
+          client.build_base_http_request = Mock(return_value=http_request)
+
+          buckets = client.make_request(method='GET', bucket='gethue', key='data/customer.csv',)
+
+          assert_equal('[<Bucket: demo-gethue>, <Bucket: gethue-test>]', buckets)
+          _mexe.assert_called_with(http_request, None, None, retry_handler=None)
+
+          assert_equal('https://gethue-test.s3.amazonaws.com/gethue/data/customer.csv', http_request.path)
+          assert_equal(
+            {
+              'AWSAccessKeyId': 'AKIA23E77ZX2HVY76YGL',
+              'Signature': '3lhK%2BwtQ9Q2u5VDIqb4MEpoY3X4%3D',
+              'Expires': '1617207304'
+            },
+            http_request.headers
+          )
+
+
+
+class TestRazS3Connection():
+
+  def test_get_file(self):
+    with patch('aws.s3.s3connection.RazS3Connection.get_url_request') as get_url_request:
+      with patch('aws.s3.s3connection.RazS3Connection._mexe') as _mexe:
+        with patch('boto.connection.auth.get_auth_handler') as get_auth_handler:
+
+          get_url_request.return_value = 'https://gethue-test.s3.amazonaws.com/gethue/data/customer.csv?' + \
+              'AWSAccessKeyId=AKIA23E77ZX2HVY76YGL' + \
+              '&Signature=3lhK%2BwtQ9Q2u5VDIqb4MEpoY3X4%3D&Expires=1617207304'
+          _mexe.return_value = '[<Bucket: demo-gethue>, <Bucket: gethue-test>]'
+
+          client = RazS3Connection()
+          http_request = Mock(
+            path='/gethue/data/customer.csv',
+            protocol='https',
+            host='s3.amazonaws.com'
+          )
+          client.build_base_http_request = Mock(return_value=http_request)
+
+          buckets = client.make_request(method='GET', bucket='gethue', key='data/customer.csv',)
+
+          assert_equal('[<Bucket: demo-gethue>, <Bucket: gethue-test>]', buckets)
+          _mexe.assert_called_with(http_request, None, None, retry_handler=None)
+
+          assert_equal('https://gethue-test.s3.amazonaws.com/gethue/data/customer.csv', http_request.path)
+          assert_equal(
+            {
+              'AWSAccessKeyId': 'AKIA23E77ZX2HVY76YGL',
+              'Signature': '3lhK%2BwtQ9Q2u5VDIqb4MEpoY3X4%3D',
+              'Expires': '1617207304'
+            },
+            http_request.headers
+          )
+
+
+# -----------------------------------------------------------------------------------------------------------
+
+class TestSelfSignedUrlClient():
+
+  def setUp(self):
+    raise SkipTest()
 
   def test_get_buckets(self):
-    with patch('aws.s3.s3connection.BotoUrlConnection._generate_url') as _generate_url:
+    with patch('aws.s3.s3connection.SelfSignedUrlClient.get_url_request') as get_url_request:
       with patch('aws.s3.s3connection.requests.get') as requests_get:
 
-        _generate_url.return_value = 'https://gethue-test.s3.amazonaws.com/?AWSAccessKeyId=AKIA23E77ZX2HVY76YGL' + \
+        get_url_request.return_value = 'https://gethue-test.s3.amazonaws.com/?AWSAccessKeyId=AKIA23E77ZX2HVY76YGL' + \
             '&Signature=3lhK%2BwtQ9Q2u5VDIqb4MEpoY3X4%3D&Expires=1617207304'
         requests_get.return_value = Mock(
           content=b'<?xml version="1.0" encoding="UTF-8"?>\n<ListAllMyBucketsResult '
@@ -47,19 +126,22 @@ class TestBotoUrlConnection():
         )
 
         connection = Mock()
-        buckets = BotoUrlConnection(connection=connection).get_all_buckets()
+        buckets = SelfSignedUrlClient(connection=connection).get_all_buckets()
 
         assert_equal('[<Bucket: demo-gethue>, <Bucket: gethue-test>]', str(buckets))
 
 
-class TestRazUrlConnection():
+class TestRazSignedUrlClient():
+
+  def setUp(self):
+    raise SkipTest()
 
   def test_get_buckets(self):
-    with patch('aws.s3.s3connection.RazUrlConnection._generate_url') as _generate_url:
+    with patch('aws.s3.s3connection.RazSignedUrlClient.get_url_request') as get_url_request:
       with patch('aws.s3.s3connection.requests.get') as requests_get:
 
         # TODO: update with potentially slightly different URL/headers
-        _generate_url.return_value = 'https://gethue-test.s3.amazonaws.com/?AWSAccessKeyId=AKIA23E77ZX2HVY76YGL' + \
+        get_url_request.return_value = 'https://gethue-test.s3.amazonaws.com/?AWSAccessKeyId=AKIA23E77ZX2HVY76YGL' + \
             '&Signature=3lhK%2BwtQ9Q2u5VDIqb4MEpoY3X4%3D&Expires=1617207304'
 
         requests_get.return_value = Mock(
@@ -70,12 +152,12 @@ class TestRazUrlConnection():
             b'</Buckets></ListAllMyBucketsResult>'
         )
 
-        buckets = RazUrlConnection().get_all_buckets()
+        buckets = RazSignedUrlClient().get_all_buckets()
 
         assert_equal('[<Bucket: demo-gethue>, <Bucket: gethue-test>]', str(buckets))
 
 
-class TestBotoUrlConnectionIntegration(S3TestBase):
+class TestSelfSignedUrlClientIntegration(S3TestBase):
   #
   # To trigger:
   # TEST_S3_BUCKET=gethue-test ./build/env/bin/hue test specific aws.s3.s3connection_test
@@ -86,21 +168,21 @@ class TestBotoUrlConnectionIntegration(S3TestBase):
 
 
   def setUp(self):
-    super(TestBotoUrlConnectionIntegration, self).setUp()
+    super(TestSelfSignedUrlClientIntegration, self).setUp()
 
     self.c = _make_client(identifier='default', user=None)
     self.connection = self.c._s3_connection.connection
 
 
   def test_list_buckets(self):
-    buckets = BotoUrlConnection(self.connection).get_all_buckets()
+    buckets = SelfSignedUrlClient(self.connection).get_all_buckets()
 
     assert_equal('[<Bucket: demo-gethue>, <Bucket: gethue-test>]', str(buckets))
 
 
   def test_list_file(self):
     kwargs = {'action': 'GET', 'bucket': 'gethue-test', 'key': 'data/query-hive-weblogs.csv'}
-    url = BotoUrlConnection(self.connection).generate_url(**kwargs)
+    url = SelfSignedUrlClient(self.connection).generate_url(**kwargs)
 
     url = 'https://gethue-test.s3.amazonaws.com/data/query-hive-weblogs.csv?AWSAccessKeyId=AKIA23E77ZX2HVY76YGL&Signature=3lhK%2BwtQ9Q2u5VDIqb4MEpoY3X4%3D&Expires=1617207304'
 

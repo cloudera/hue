@@ -637,7 +637,7 @@ def save_coordinator(request):
   if scheduled_id:
     scheduled_doc = Document2.objects.get(uuid=scheduled_id)
     scheduled_doc.can_read_or_exception(request.user)
-    coordinator_doc.dependencies = [scheduled_doc]
+    coordinator_doc.dependencies.set([scheduled_doc])
 
   coordinator_doc1 = coordinator_doc._get_doc1(doc2_type='coordinator2')
   coordinator_doc.update_data(coordinator_data)
@@ -874,7 +874,7 @@ def save_bundle(request):
     dependencies = Document2.objects.filter(type='oozie-coordinator2', uuid__in=[c['coordinator'] for c in bundle_data['coordinators']])
     for doc in dependencies:
       doc._get_doc1(doc2_type='coordinator2').can_read_or_exception(request.user)
-    bundle_doc.dependencies = dependencies
+    bundle_doc.dependencies.set(dependencies)
 
   bundle_doc1 = bundle_doc.doc.get()
   bundle_doc.update_data(bundle_data)

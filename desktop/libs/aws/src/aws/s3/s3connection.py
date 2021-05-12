@@ -17,30 +17,225 @@
 import boto
 import logging
 import requests
+import sys
 import xml.sax
 
+if sys.version_info[0] > 2:
+  from urllib.parse import unquote
+else:
+  from urllib import unquote
+
 from boto.exception import BotoClientError
+from boto.regioninfo import connect
 from boto.resultset import ResultSet
+from boto.s3 import S3RegionInfo
 from boto.s3.bucket import Bucket, Key
-from boto.s3.bucketlistresultset import BucketListResultSet
+from boto.s3.connection import S3Connection, NoHostProvided
 from boto.s3.prefix import Prefix
 
 from desktop.lib.raz.clients import S3RazClient
-from aws.s3.s3fs import S3FileSystemException
 
 
 LOG = logging.getLogger(__name__)
 
 
-# Note: Connection means more "Client" but we currently follow boto2 terminology
-# To split in 3 modules at some point s3_url_client, s3_raz_client, s3_self_signing_client,
+class SignedUrlS3Connection(S3Connection):
+  """
+  Contact S3 via a presigned Url of the resource hence not requiring any S3 credentials.
+
+  This is a client replacing the building of the Http Request of the S3 resource via asking a third party providing for a presigned Urls.
+  The request information is then injected into the regular boto HTTPRequest as the format is the same. Raw calls via the requests
+  lib would work but the unmarshalling back from XML to boto2 Python object is tedious.
+
+  The main logic consists in some light overrides in S3Connection#make_request() and AWSAuthConnection#make_request() so that we
+  send an updated HTTPRequest .
+
+  Example of a presigned S3 Url declaring a `list all buckets` call:
+  https://s3-us-west-1.amazonaws.com/?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA23E77ZX2HVY76YGL%2F20210505%2Fus-west-1%2Fs3%2Faws4_request&X-Amz-Date=20210505T171457Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=994d0ec2ca19a00aa2925fe62cab0e727591b1951a8a47504b2b9124facbd6cf
+  """
+  def __init__(self, aws_access_key_id=None, aws_secret_access_key=None,
+                is_secure=True, port=None, proxy=None, proxy_port=None,
+                proxy_user=None, proxy_pass=None,
+                host=NoHostProvided, debug=0, https_connection_factory=None,
+                calling_format=S3Connection.DefaultCallingFormat, path='/',
+                provider='aws', bucket_class=Bucket, security_token=None,
+                suppress_consec_slashes=True, anon=False,
+                validate_certs=None, profile_name=None):
+    # For Raz
+    # anon = True
+    # TODO: handle properly how to build a client without any auth without having get_auth_handler() fail
+    super(SignedUrlS3Connection, self).__init__(
+      aws_access_key_id=aws_access_key_id, aws_secret_access_key=aws_secret_access_key,
+                is_secure=is_secure, port=port, proxy=proxy, proxy_port=proxy_port,
+                proxy_user=proxy_user, proxy_pass=proxy_pass,
+                host=host, debug=debug, https_connection_factory=https_connection_factory,
+                calling_format=calling_format, path=path,
+                provider=provider, bucket_class=bucket_class, security_token=security_token,
+                suppress_consec_slashes=suppress_consec_slashes, anon=anon,
+                validate_certs=validate_certs, profile_name=profile_name)
 
 
-class UrlConnection():
+class RazS3Connection(SignedUrlS3Connection):
+  """
+  Class asking a RAZ server presigned Urls for all the operations on S3 resources.
+  Some operations can be denied depending on the privileges of the users in Ranger.
+
+  Then fill-up the boto Http request with the presigned Url data and let boto executes the request as usual.
+  """
+  def make_request(self, method, bucket='', key='', headers=None, data='',
+                    query_args=None, sender=None, override_num_retries=None,
+                    retry_handler=None):
+
+    if isinstance(bucket, self.bucket_class):
+        bucket = bucket.name
+    if isinstance(key, Key):
+        key = key.name
+    path = self.calling_format.build_path_base(bucket, key)
+    boto.log.debug('path=%s' % path)
+    auth_path = self.calling_format.build_auth_path(bucket, key)
+    boto.log.debug('auth_path=%s' % auth_path)
+    host = self.calling_format.build_host(self.server_name(), bucket)
+    if query_args:
+        path += '?' + query_args
+        boto.log.debug('path=%s' % path)
+        auth_path += '?' + query_args
+        boto.log.debug('auth_path=%s' % auth_path)
+
+    params = {}
+    http_request = self.build_base_http_request(method, path, auth_path,
+                                                params, headers, data, host)
+
+    # TODO:
+    # Build a check_access call to Raz, get back presigned Url data and either create a new Boto http_request or
+    # update some of its attributes like in SelfSignedUrlS3Connection.
+
+    # e.g.
+    # signed_url = self.get_url_request(...)
+    # update or recreate `http_request`
+    # return self._mexe(...)
+
+    p = http_request.path.split('/')
+    bucket = (p[1] + '/') or ''
+    key = '/'.join(p[2:]) if len(p) >= 3 else ''
+
+    kwargs = {
+        'bucket': bucket,
+        'key': key
+    }
+
+    tmp_url = self.get_url_request(action='GET', bucket_name=bucket, object_name=key)
+    LOG.debug(tmp_url)
+
+    http_request.path = tmp_url.replace(http_request.protocol + '://' + http_request.host.split(':')[0], '')
+    p, h = http_request.path.split('?')
+    http_request.path = unquote(p)
+    http_request.headers = dict([a.split('=') for a in h.split('&')])
+
+    LOG.debug('Overriden: %s' % http_request)
+
+    return self._mexe(http_request, sender, override_num_retries,
+                      retry_handler=retry_handler)
+
+
+  def get_url_request(self, action='GET', bucket_name=None, object_name=None, expiration=3600):
+    raz_client = S3RazClient()
+    return raz_client.get_url(bucket_name, object_name)
+
+
+class SelfSignedUrlS3Connection(SignedUrlS3Connection):
+  """
+  Test class self generating presigned Urls so that the Http Client using signed Urls instead
+  of direct boto calls to S3 can be tested.
+  """
+  def make_request(self, method, bucket='', key='', headers=None, data='',
+                    query_args=None, sender=None, override_num_retries=None,
+                    retry_handler=None):
+    if isinstance(bucket, self.bucket_class):
+        bucket = bucket.name
+    if isinstance(key, Key):
+        key = key.name
+    path = self.calling_format.build_path_base(bucket, key)
+    boto.log.debug('path=%s' % path)
+    auth_path = self.calling_format.build_auth_path(bucket, key)
+    boto.log.debug('auth_path=%s' % auth_path)
+    host = self.calling_format.build_host(self.server_name(), bucket)
+    if query_args:
+        path += '?' + query_args
+        boto.log.debug('path=%s' % path)
+        auth_path += '?' + query_args
+        boto.log.debug('auth_path=%s' % auth_path)
+
+    params = {}
+    http_request = self.build_base_http_request(method, path, auth_path,
+                                                params, headers, data, host)
+
+    # Actual override starts here
+    LOG.debug('Overriding: %s' % http_request)
+
+    p = http_request.path.split('/')
+    bucket = (p[1] + '/') or ''
+    key = '/'.join(p[2:]) if len(p) >= 3 else ''
+
+    kwargs = {
+        'bucket': bucket,
+        'key': key
+    }
+
+    # http://boto.cloudhackers.com/en/latest/ref/s3.html#boto.s3.connection.S3Connection.generate_url
+    tmp_url = self.generate_url(1000, method, **kwargs)
+    LOG.debug(tmp_url)
+
+    http_request.path = tmp_url.replace(http_request.protocol + '://' + http_request.host.split(':')[0], '')
+    p, h = http_request.path.split('?')
+    http_request.path = unquote(p)
+    http_request.headers = dict([a.split('=') for a in h.split('&')])
+
+    LOG.debug('Overriden: %s' % http_request)
+
+    return self._mexe(http_request, sender, override_num_retries,
+                      retry_handler=retry_handler)
+
+
+# Override S3Connection class in connect_to_region of boto/s3/__init__.py
+def url_client_connect_to_region(region_name, **kw_params):
+    if 'host' in kw_params:
+        host = kw_params.pop('host')
+        if host not in ['', None]:
+            region = S3RegionInfo(
+                name='custom',
+                endpoint=host,
+                connection_cls=SelfSignedUrlS3Connection
+            )
+            return region.connect(**kw_params)
+
+    return connect('s3', region_name, region_cls=S3RegionInfo,
+                   connection_cls=SelfSignedUrlS3Connection, **kw_params)
+
+
+
+# --------------------------------------------------------------------------------
+# Deprecated Client: to remove at v1
+#
+# This clients re-implement S3Connection methods via a PreSignedUrl either
+# provided by a RAZ server or another Boto lib. Request to S3 are then made via
+# requests and the raw XML is unmarshalling back to boto2 Python objects.
+#
+# Note: hooking-in the get/generate URL directly into S3Connection#make_request()
+# was found to be simpler and possible as boto itself sends signed Urls.
+# Handling various operations is relatively simple as defined by HTTP action and
+# paths. Most of the security is handled via header parameters.
+# --------------------------------------------------------------------------------
+
+class SignedUrlClient():
   """
   Share the unmarshalling from XML to boto Python objects from the requests calls.
   """
-  def _get_all_buckets(self, signed_url):
+
+  def get_all_buckets(self, headers=None):
+    LOG.debug('get_all_buckets: %s' % headers)
+    kwargs = {'action': 'GET'}
+
+    signed_url = self.get_url_request(**kwargs)
     LOG.debug(signed_url)
 
     response = requests.get(signed_url)
@@ -56,39 +251,35 @@ class UrlConnection():
     return rs
 
 
-class RazUrlConnection(UrlConnection):
+
+class RazSignedUrlClient(SignedUrlClient):
 
   def __init__(self):
     self.raz = S3RazClient()
 
-  def get_all_buckets(self, headers=None):
-    url = self._generate_url()
-    return self._get_all_buckets(url)
-
-  def get_bucket(self, bucket_name, validate=True, headers=None):
-    pass
-
-  def get_key(self, key_name, headers=None, version_id=None, response_headers=None, validate=True):
-    pass
-
-  def get_all_keys(self, headers=None, **params):
-    pass
-
-  def _generate_url(self, bucket_name=None, object_name=None, expiration=3600):
+  def get_url_request(self, action='GET', bucket_name=None, object_name=None, expiration=3600):
     self.raz.get_url(bucket_name, object_name)
+
 
 
 class UrlKey(Key):
 
   def open_read(self, headers=None, query_args='', override_num_retries=None, response_headers=None):
+    LOG.debug('open_read: %s' % self.name)
 
-    # Similar to Bucket.get_key()
+    # Similar to Key.get_key('GET')
     # data = self.resp.read(self.BufferSize)
     # For seek: headers={"Range": "bytes=%d-" % pos}
 
-    return
+    if self.resp is None:
+      self.resp = self.bucket.get_key(key_name=self.name, validate=False, action='GET')
 
-  def _generate_url(self, action='GET', **kwargs):
+
+  def read(self, size=0):
+    return self.resp.read(size) if self.resp else ''
+
+
+  def get_url_request(self, action='GET', **kwargs):
     LOG.debug(kwargs)
     tmp_url = None
 
@@ -98,6 +289,7 @@ class UrlKey(Key):
     except BotoClientError as e:
       LOG.error(e)
       if tmp_url is None:
+        from aws.s3.s3fs import S3FileSystemException
         raise S3FileSystemException("Resource does not exist or permission missing : '%s'" % kwargs)
 
     return tmp_url
@@ -113,15 +305,19 @@ class UrlBucket(Bucket):
     return self.get_all_keys(**params)
 
 
-  def get_key(self, key_name, headers=None, version_id=None, response_headers=None, validate=True):
-    # Note: in current FS API we get file even if we don't need the content, hence why it can be slow.
-    # To check if we should give a length in read() to mitigate.
-    LOG.debug('key name: %s' % key_name)
+  def get_key(self, key_name, headers=None, version_id=None, response_headers=None, validate=True, action='HEAD'):
+    LOG.debug('key name: %s %s' % (self.name, key_name))
     kwargs = {'bucket': self.name, 'key': key_name}
 
-    tmp_url = self.connection.generate_url(3000, 'GET', **kwargs)
+    # TODO: if GET --> max length to add
 
-    response = requests.get(tmp_url)
+    tmp_url = self.connection.generate_url(3000, action, **kwargs)
+
+    if action == 'HEAD':
+      response = requests.head(tmp_url)
+    else:
+      response = requests.get(tmp_url)
+
     LOG.debug(response)
     LOG.debug(response.content)
 
@@ -150,6 +346,14 @@ class UrlBucket(Bucket):
       k.handle_encryption_headers(response)
       k.handle_restore_headers(response)
       k.handle_addl_headers(response.getheaders())
+
+      class MockResponse():
+        def __init__(self, resp):
+          self.resp = resp
+        def read(self, size):
+          return self.resp.content
+
+      k.resp = MockResponse(response)
     else:
       # Currently needed as 404 on directories via stats_key()
       k = self.key_class(self, key_name)
@@ -169,7 +373,7 @@ class UrlBucket(Bucket):
     LOG.debug(response)
     LOG.debug(response.content)
 
-    rs = ResultSet([('Contents', UrlKey), ('CommonPrefixes', Prefix)])  # Or BucketListResultSet?
+    rs = ResultSet([('Contents', UrlKey), ('CommonPrefixes', Prefix)])
     h = boto.handler.XmlHandler(rs, self)
     xml.sax.parseString(response.content, h)
     LOG.debug(rs)
@@ -177,7 +381,7 @@ class UrlBucket(Bucket):
     return rs
 
 
-  def _generate_url(self, action='GET', **kwargs):
+  def get_url_request(self, action='GET', **kwargs):
     LOG.debug(kwargs)
     tmp_url = None
 
@@ -187,12 +391,12 @@ class UrlBucket(Bucket):
     except BotoClientError as e:
       LOG.error(e)
       if tmp_url is None:
-        raise S3FileSystemException("Resource does not exist or permission missing : '%s'" % kwargs)
+        raise IOError("Resource does not exist or permission missing : '%s'" % kwargs)
 
     return tmp_url
 
 
-class BotoUrlConnection(UrlConnection):
+class SelfSignedUrlClient(SignedUrlClient):
 
   def __init__(self, connection):
     self.connection = connection
@@ -202,20 +406,26 @@ class BotoUrlConnection(UrlConnection):
     self.connection.set_bucket_class(UrlBucket)  # Use our bucket class to keep overriding any direct call to S3 made from list buckets
 
 
-  def get_all_buckets(self, headers=None):
-    LOG.debug('get_all_buckets: %s' % headers)
-    kwargs = {'action': 'GET'}
+  def get_url_request(self, action='GET', **kwargs):
+    LOG.debug(kwargs)
+    tmp_url = None
 
-    signed_url = self._generate_url(**kwargs)
+    try:
+      # http://boto.cloudhackers.com/en/latest/ref/s3.html#boto.s3.connection.S3Connection.generate_url
+      tmp_url = self.connection.generate_url(self.expiration, action, **kwargs)
+    except BotoClientError as e:
+      LOG.error(e)
+      if tmp_url is None:
+        raise IOError("Resource does not exist or permission missing : '%s'" % kwargs)
 
-    return self._get_all_buckets(signed_url)
+    return tmp_url
 
 
   def get_bucket(self, bucket_name, validate=True, headers=None):
     LOG.debug('get_bucket: %s' % bucket_name)
     kwargs = {'action': 'GET', 'bucket': bucket_name}
 
-    signed_url = self._generate_url(**kwargs)
+    signed_url = self.get_url_request(**kwargs)
 
     response = requests.get(signed_url)
 
@@ -226,18 +436,3 @@ class BotoUrlConnection(UrlConnection):
     LOG.debug(rs)
 
     return rs
-
-
-  def _generate_url(self, action='GET', **kwargs):
-    LOG.debug(kwargs)
-    tmp_url = None
-
-    try:
-      # http://boto.cloudhackers.com/en/latest/ref/s3.html#boto.s3.connection.S3Connection.generate_url
-      tmp_url = self.connection.generate_url(self.expiration, action, **kwargs)
-    except BotoClientError as e:
-      LOG.error(e)
-      if tmp_url is None:
-        raise S3FileSystemException("Resource does not exist or permission missing : '%s'" % kwargs)
-
-    return tmp_url

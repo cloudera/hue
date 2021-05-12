@@ -14,12 +14,14 @@ spec:
     metadata:
       labels:
         pod: daphne-websocket
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap-hue-extra.yaml") . | sha256sum }}
     spec:
       containers:
         - name: daphne-websocket
           image: {{ .Values.image.registry }}/hue:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          command: ['./build/env/bin/daphne', '-p', '8001', 'core.asgi:application']
+          command: ['./build/env/bin/daphne', '-p', '8001', 'desktop.asgi:application', '--bind', '0.0.0.0']
           resources:
             requests:
               # memory: "64Mi"

@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <dropdown-panel :text="label" :disabled="disabled">
+  <dropdown-panel :text="label" :disabled="disabled" :close-on-click="false">
     <template #default="slotProps">
       <div class="facet-selector">
         <div v-if="facet.values.length > 1" class="facet-select-all">
