@@ -793,7 +793,7 @@ Steps/flow to be followed by the Hue user to set up their own Hue Slack app for 
 | **Bot Events** | **Why do we need it?** |
 |    :---:     |     :---     |
 | link_shared   | Add link previews for your specified Hue instance domain (eg. demo.gethue.com) in Slack messages. <br/><br/> \*Requires and itself adds **link:read** OAuth scope
-| message.channels     | Send a simple “Hi <@user id>” greeting message to user messaging “Hello Hue”. <br/><br/> \*Requires and itself adds **channels:history** OAuth scope
+| message.channels     | Send a simple “Hi \<@user id\>” greeting message to user messaging “Hello Hue”. <br/><br/> \*Requires and itself adds **channels:history** OAuth scope
 
 9. Go to **App Unfurl Domains** and add your Hue instance domain (eg. demo.gethue.com). More info about [registering a domain here.](https://api.slack.com/reference/messaging/link-unfurling#configuring_domains)
 
