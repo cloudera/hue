@@ -88,7 +88,7 @@ def parse_events(request, event):
 
 def handle_on_app_mention(request, channel_id, user_id, text):
   if text and 'table' in text:
-    user = get_user(channel_id, slack_user_check(user_id))
+    user = get_user(channel_id, check_slack_user_permission(request.get_host(), user_id))
 
     table_name = text.split('table ', 1)[1]
     if '.' in table_name:
@@ -211,7 +211,7 @@ def handle_on_link_shared(host_domain, channel_id, message_ts, links, user_id):
       msg = "Document with {key} does not exist".format(key=query_id)
       raise PopupException(_(msg))
 
-    slack_user = slack_user_check(user_id)
+    slack_user = check_slack_user_permission(host_domain, user_id)
     user = get_user(channel_id, slack_user) if not slack_user['is_bot'] else doc.owner
     doc.can_read_or_exception(user)
 
