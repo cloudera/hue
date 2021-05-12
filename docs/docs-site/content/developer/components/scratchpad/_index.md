@@ -5,35 +5,43 @@ draft: false
 
 The lightweight SQL Editor also called "SQL Scratchpad" comes as its own `<sql-scratchpad />` Web component.
 
-It is in **beta** and now is a great time to give it a try and [send feedback](https://github.com/cloudera/hue/issues)!
+The SQL Scratchpad component is in **beta** and rapidly evolving. Now is a great time to give it a try and [send feedback](https://github.com/cloudera/hue/issues)!
 
-Concept:
+UI:
 
-We have the `gethue` dependency in `packages.json` or run `npm install gethue`. Then just load it similarly to:
+We have the `gethue` [dependency](/developer/components/) in `packages.json` or run `npm install gethue`. Then just load it similarly to:
 
-    import sqlScratchpadComp from 'gethue/lib/components/SqlScratchpadWebComponent';
+    <!DOCTYPE html>
+    <html>
 
-    window.onload = async function (){
-      sqlScratchpadComp.setBaseUrl('http://locahost:9000');
-      await sqlScratchpadComp.login('hue', 'hue');
-    |
+    <head>
+      <title>SQL Scratchpad</title>
+      <script type="text/javascript" src="./node_modules/gethue/lib/components/SqlScratchpadWebComponent.js"></script>
+    </head>
 
-In HTML:
+    <body>
+      <div style="position: absolute; height: 100%; width: 100%">
+        <sql-scratchpad api-url="http://localhost:8005" dialect="mysql" />
+      </div>
+    </body>
 
-    <sql-scratchpad dialect="mysql" />
+    </html>
+
+Note: even simpler you could just skip nom and grab the latest via:
+
+    <script type="text/javascript" src="https://cdn.gethue.com/components/SqlScratchpadWebComponent.js"></script>
+
 
 API:
 
-Currently expects a running Hue on http://locahost:9000 with a hue/hue user and this ini setting:
+Above expects a running Hue or [Compose](https://github.com/gethue/compose) APIs on http://locahost:8005.
+
+Note: if using Hue, it currently temporarily requires a hue/hue user and this ini settings:
 
     [desktop]
     cors_enabled=true
 
-!["SQL Scratchpad component"](https://cdn.gethue.com/uploads/2020/02/quick-query-component.jpg)
+    [[auth]]
+    auto_login_enabled=true
 
-
-Notes:
-
-Check the [demo app](https://github.com/cloudera/hue/tree/master/tools/examples/components/sql-scratchpad) about how to integrate it in your own Vue.js, React, JavaScript... projects.
-
-The `SqlScratchpad` in itself composed of other [smaller components](https://github.com/cloudera/hue/tree/master/tools/examples/components/sql-scratchpad/src/components), e.g. QueryEditor, ExecuteButton...
+!["SQL Scratchpad"](https://cdn.gethue.com/uploads/2021/05/sql-scratchpad-v0.5.png)
