@@ -41,12 +41,13 @@ def get_credential_provider(identifier, user):
 
 
 def _make_client(identifier, user):
+  client_conf = aws_conf.AWS_ACCOUNTS[identifier] if identifier in aws_conf.AWS_ACCOUNTS else None
+
   if RAZ.IS_ENABLED.get() and not aws_conf.IS_SELF_SIGNING_ENABLED.get():
-    s3_client = RazS3Connection()  # Note: AWS configuration is fully skipped
+    host = client_conf.HOST.get()
+    s3_client = RazS3Connection(host=host)  # Note: Remaining AWS configuration is fully skipped
     s3_client_expiration = None
   else:
-    client_conf = aws_conf.AWS_ACCOUNTS[identifier] if identifier in aws_conf.AWS_ACCOUNTS else None
-
     s3_client_builder = Client.from_config(client_conf, get_credential_provider(identifier, user))
     s3_client = s3_client_builder.get_s3_connection()
     s3_client_expiration = s3_client_builder.expiration
