@@ -45,18 +45,21 @@ class TestBotServer(unittest.TestCase):
   def setUpClass(cls):
     if not conf.SLACK.IS_ENABLED.get():
       raise SkipTest
-  
-  def setUp(self):
+
     # Slack user: test
-    self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
-    self.user = User.objects.get(username="test")
+    cls.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
+    cls.user = User.objects.get(username="test")
 
     # Other slack user: test_not_me
-    self.client_not_me = make_logged_in_client(username="test_not_me", groupname="default", recreate=True, is_superuser=False)
-    self.user_not_me = User.objects.get(username="test_not_me")
-
+    cls.client_not_me = make_logged_in_client(username="test_not_me", groupname="default", recreate=True, is_superuser=False)
+    cls.user_not_me = User.objects.get(username="test_not_me")
+  
+  def setUp(self):
     self.host_domain = 'testserver.gethue.com'
     self.email_domain = '.'.join(self.host_domain.split('.')[-2:])
+
+    # True for https else http
+    self.is_http_secure = True 
 
   def test_handle_on_message(self):
     with patch('desktop.lib.botserver.views._send_message') as _send_message:
@@ -282,3 +285,70 @@ class TestBotServer(unittest.TestCase):
             }
           }
           assert_raises(PopupException, handle_on_link_shared, self.host_domain, "channel", "12.1", links, "<@user_id>")
+
+  def test_handle_app_mention(self):
+    with patch('desktop.lib.botserver.views.check_slack_user_permission') as check_slack_user_permission:
+      with patch('desktop.lib.botserver.views.search_table') as search_table:
+        with patch('desktop.lib.botserver.views.get_user') as get_user:
+
+          channel_id = "channel"
+          user_id = "<@user_id>"
+
+          # Slack user is Hue user
+          get_user.return_value = self.user
+
+          text = '@hue some message'
+          handle_on_app_mention(self.host_domain, self.is_http_secure, channel_id, user_id, text)
+          assert_false(search_table.called)
+
+          text = '@hue table test_table'
+          handle_on_app_mention(self.host_domain, self.is_http_secure, channel_id, user_id, text)
+
+          search_table.assert_called_with(self.host_domain, self.is_http_secure, channel_id, self.user, 'test_table')
+
+          text = '@hue table test_database.test_table'
+          handle_on_app_mention(self.host_domain, self.is_http_secure, channel_id, user_id, text)
+
+          search_table.assert_called_with(self.host_domain, self.is_http_secure, channel_id, self.user, 'test_table', 'test_database')
+
+  def test_table_links(self):
+    with patch('desktop.lib.botserver.views.get_ordered_interpreters') as get_ordered_interpreters:
+      with patch('desktop.lib.botserver.views.get_api') as get_api:
+        with patch('desktop.lib.botserver.views._send_message') as _send_message:
+
+          channel_id = "channel"
+          user_id = "<@user_id>"
+
+          get_ordered_interpreters.return_value = [{
+            'is_sql': True,
+            'type': 'mysql',
+            'interface': 'sqlalchemy',
+          }]
+
+          get_api.return_value = Mock(
+            autocomplete=Mock(
+              return_value={
+                'databases': ['test_db_1', 'test_db_2'],
+                'tables_meta': [{'name': 'test_table_1'} , {'name': 'test_table_2'}],
+              }
+            )
+          )
+
+          # Table not present
+          search_table(self.host_domain, self.is_http_secure, channel_id, self.user, 'table_not_present')
+          _send_message.assert_called_with("channel", 'Table not found or does not exist')
+
+          # Only table_name
+          search_table(self.host_domain, self.is_http_secure, channel_id, self.user, 'test_table_1')
+          _send_message.assert_called_with(
+            'channel', ('Here are the tables I found \n'
+            '*<https://testserver.gethue.com/hue/metastore/table/test_db_1/test_table_1?source_type=mysql|test_db_1.test_table_1>* \n'
+            '*<https://testserver.gethue.com/hue/metastore/table/test_db_2/test_table_1?source_type=mysql|test_db_2.test_table_1>* \n')
+          )
+
+          # database_name.table_name
+          search_table(self.host_domain, self.is_http_secure, channel_id, self.user, 'test_table_1', 'test_db_1')
+          _send_message.assert_called_with(
+            'channel', ('Here are the tables I found \n'
+            '*<https://testserver.gethue.com/hue/metastore/table/test_db_1/test_table_1?source_type=mysql|test_db_1.test_table_1>* \n')
+          )

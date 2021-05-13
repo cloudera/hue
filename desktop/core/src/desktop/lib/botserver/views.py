@@ -151,7 +151,7 @@ def _make_table_link(host_domain, is_http_secure, db, table, dialect):
   scheme = 'https' if is_http_secure else 'http'
   table_link = '{scheme}://{host}/hue'.format(
     scheme=scheme, 
-    host="127.0.0.1:8000",
+    host=host_domain,
   ) + reverse('metastore:describe_table', kwargs={'database': db, 'table': table}) + '?source_type={type}'.format(type=dialect)
 
   return table_link
