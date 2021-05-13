@@ -313,6 +313,22 @@ class SQLIndexer(object):
               'columns': ',\n'.join(['  `%(name)s` %(type)s' % col for col in columns]),
             }
 
+    elif dialect == 'phoenix':
+
+      for col in columns:
+        if col['type'] == 'string':
+          col['type'] = 'CHAR(255)'
+
+      sql = '''CREATE TABLE IF NOT EXISTS %(database)s.%(table_name)s (
+%(columns)s
+CONSTRAINT my_pk PRIMARY KEY (%(primary_keys)s));
+''' % {
+          'database': database,
+          'table_name': table_name,
+          'columns': ',\n'.join(['  %(name)s %(type)s' % col for col in columns]),
+          'primary_keys': ', '.join(destination.get('indexerPrimaryKey'))
+      }
+
     path = urllib_unquote(source['path'])
 
     if path:                                                     # data insertion
@@ -332,6 +348,17 @@ class SQLIndexer(object):
                   'table_name': table_name,
                   'csv_rows': csv_rows
                 }
+        if dialect == 'phoenix':
+          for csv_row in list_of_tuples:
+            _sql = ', '.join([ "'{0}'".format(col_val) if columns[count]['type'] in ('CHAR(255)', 'timestamp') \
+              else '{0}'.format(col_val) for count, col_val in enumerate(csv_row)])
+
+            sql += '''\nUPSERT INTO %(database)s.%(table_name)s VALUES (%(csv_row)s);
+            ''' % {
+                    'database': database,
+                    'table_name': table_name,
+                    'csv_row': _sql
+                  }
 
     on_success_url = reverse('metastore:describe_table', kwargs={'database': database, 'table': final_table_name}) + \
         '?source_type=' + source_type
