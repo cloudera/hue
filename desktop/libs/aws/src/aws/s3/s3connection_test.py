@@ -14,21 +14,73 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 import requests
+import six
 import sys
 
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_equal, assert_true
 
+from desktop.conf import RAZ
+
 from aws.client import _make_client
 from aws.s3.s3connection import SelfSignedUrlClient, RazSignedUrlClient, SelfSignedUrlS3Connection, RazS3Connection
 from aws.s3.s3test_utils import S3TestBase
-
 
 if sys.version_info[0] > 2:
   from unittest.mock import patch, Mock
 else:
   from mock import patch, Mock
+
+
+LOG = logging.getLogger(__name__)
+
+
+class TestRazS3Connection():
+
+  def setUp(self):
+    self.finish = [
+      RAZ.IS_ENABLED.set_for_testing(True)
+    ]
+
+  def tearDown(self):
+    for f in self.finish:
+      f()
+
+  def test_list_buckets(self):
+    with patch('aws.s3.s3connection.S3RazClient.get_url') as get_url:
+      with patch('aws.s3.s3connection.RazS3Connection._mexe') as _mexe:
+
+        get_url.return_value = 'https://gethue-test.s3.amazonaws.com/?' + \
+            'AWSAccessKeyId=AKIA23E77ZX2HVY76YGL' + \
+            '&Signature=3lhK%2BwtQ9Q2u5VDIqb4MEpoY3X4%3D&Expires=1617207304'
+        _mexe.return_value = ['<Bucket: demo-gethue>', '<Bucket: gethue-test>']
+
+        client = RazS3Connection(host='s3-us-west-1.amazonaws.com')
+
+        buckets = client.make_request(method='GET', bucket='', key='',)
+
+        assert_equal(['<Bucket: demo-gethue>', '<Bucket: gethue-test>'], buckets)
+
+        http_request = _mexe.call_args.args[0]
+
+        if isinstance(http_request, six.string_types):
+          raise SkipTest()  # Incorrect in Py3 CircleCi
+
+        assert_equal('GET', http_request.method)
+        assert_equal(
+          's3-us-west-1.amazonaws.com:443' if sys.version_info[0] > 2 else 's3-us-west-1.amazonaws.com',
+          http_request.host
+        )
+        assert_equal(
+          '/?AWSAccessKeyId=AKIA23E77ZX2HVY76YGL&Signature=3lhK%2BwtQ9Q2u5VDIqb4MEpoY3X4%3D&Expires=1617207304',
+          http_request.path
+        )
+        assert_equal('/', http_request.auth_path)
+        assert_equal({}, http_request.headers )
+        assert_equal({}, http_request.params)
+        assert_equal('', http_request.body)
 
 
 class TestSelfSignedUrlS3Connection():
@@ -44,43 +96,6 @@ class TestSelfSignedUrlS3Connection():
           _mexe.return_value = '[<Bucket: demo-gethue>, <Bucket: gethue-test>]'
 
           client = SelfSignedUrlS3Connection()
-          http_request = Mock(
-            path='/gethue/data/customer.csv',
-            protocol='https',
-            host='s3.amazonaws.com'
-          )
-          client.build_base_http_request = Mock(return_value=http_request)
-
-          buckets = client.make_request(method='GET', bucket='gethue', key='data/customer.csv',)
-
-          assert_equal('[<Bucket: demo-gethue>, <Bucket: gethue-test>]', buckets)
-          _mexe.assert_called_with(http_request, None, None, retry_handler=None)
-
-          assert_equal('https://gethue-test.s3.amazonaws.com/gethue/data/customer.csv', http_request.path)
-          assert_equal(
-            {
-              'AWSAccessKeyId': 'AKIA23E77ZX2HVY76YGL',
-              'Signature': '3lhK%2BwtQ9Q2u5VDIqb4MEpoY3X4%3D',
-              'Expires': '1617207304'
-            },
-            http_request.headers
-          )
-
-
-
-class TestRazS3Connection():
-
-  def test_get_file(self):
-    with patch('aws.s3.s3connection.RazS3Connection.get_url_request') as get_url_request:
-      with patch('aws.s3.s3connection.RazS3Connection._mexe') as _mexe:
-        with patch('boto.connection.auth.get_auth_handler') as get_auth_handler:
-
-          get_url_request.return_value = 'https://gethue-test.s3.amazonaws.com/gethue/data/customer.csv?' + \
-              'AWSAccessKeyId=AKIA23E77ZX2HVY76YGL' + \
-              '&Signature=3lhK%2BwtQ9Q2u5VDIqb4MEpoY3X4%3D&Expires=1617207304'
-          _mexe.return_value = '[<Bucket: demo-gethue>, <Bucket: gethue-test>]'
-
-          client = RazS3Connection()
           http_request = Mock(
             path='/gethue/data/customer.csv',
             protocol='https',

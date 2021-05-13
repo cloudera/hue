@@ -21,10 +21,12 @@ import sys
 import xml.sax
 
 if sys.version_info[0] > 2:
-  from urllib.parse import unquote
+  from urllib.parse import unquote, urlparse as lib_urlparse
 else:
   from urllib import unquote
+  from urlparse import urlparse as lib_urlparse
 
+from boto.connection import HTTPRequest
 from boto.exception import BotoClientError
 from boto.regioninfo import connect
 from boto.resultset import ResultSet
@@ -33,7 +35,9 @@ from boto.s3.bucket import Bucket, Key
 from boto.s3.connection import S3Connection, NoHostProvided
 from boto.s3.prefix import Prefix
 
+from desktop.conf import RAZ
 from desktop.lib.raz.clients import S3RazClient
+from aws.conf import IS_SELF_SIGNING_ENABLED
 
 
 LOG = logging.getLogger(__name__)
@@ -48,7 +52,9 @@ class SignedUrlS3Connection(S3Connection):
   lib would work but the unmarshalling back from XML to boto2 Python object is tedious.
 
   The main logic consists in some light overrides in S3Connection#make_request() and AWSAuthConnection#make_request() so that we
-  send an updated HTTPRequest .
+  send an updated HTTPRequest.
+  https://github.com/boto/boto/blob/develop/boto/s3/connection.py
+  https://github.com/boto/boto/blob/develop/boto/connection.py
 
   Example of a presigned S3 Url declaring a `list all buckets` call:
   https://s3-us-west-1.amazonaws.com/?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA23E77ZX2HVY76YGL%2F20210505%2Fus-west-1%2Fs3%2Faws4_request&X-Amz-Date=20210505T171457Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=994d0ec2ca19a00aa2925fe62cab0e727591b1951a8a47504b2b9124facbd6cf
@@ -61,9 +67,10 @@ class SignedUrlS3Connection(S3Connection):
                 provider='aws', bucket_class=Bucket, security_token=None,
                 suppress_consec_slashes=True, anon=False,
                 validate_certs=None, profile_name=None):
-    # For Raz
-    # anon = True
-    # TODO: handle properly how to build a client without any auth without having get_auth_handler() fail
+
+    # No auth handler with RAZ
+    anon = RAZ.IS_ENABLED.get() and not IS_SELF_SIGNING_ENABLED.get()
+
     super(SignedUrlS3Connection, self).__init__(
       aws_access_key_id=aws_access_key_id, aws_secret_access_key=aws_secret_access_key,
                 is_secure=is_secure, port=port, proxy=proxy, proxy_port=proxy_port,
@@ -80,8 +87,15 @@ class RazS3Connection(SignedUrlS3Connection):
   Class asking a RAZ server presigned Urls for all the operations on S3 resources.
   Some operations can be denied depending on the privileges of the users in Ranger.
 
-  Then fill-up the boto Http request with the presigned Url data and let boto executes the request as usual.
+  Then fill-up the boto HttpRequest with the presigned Url data and lets boto executes the request as usual,
+  so that we get the XML unmarshalling for free.
+
+  Flow:
+    1. signed_url = self.get_signed_url(/bucket/dir/key)
+    2. request = http_request(signed_url)
+    3. return self._mexe(requests)
   """
+
   def make_request(self, method, bucket='', key='', headers=None, data='',
                     query_args=None, sender=None, override_num_retries=None,
                     retry_handler=None):
@@ -94,7 +108,8 @@ class RazS3Connection(SignedUrlS3Connection):
     boto.log.debug('path=%s' % path)
     auth_path = self.calling_format.build_auth_path(bucket, key)
     boto.log.debug('auth_path=%s' % auth_path)
-    host = self.calling_format.build_host(self.server_name(), bucket)
+    # host = self.calling_format.build_host(self.server_name(), bucket)
+    host = self.calling_format.build_host(self.server_name(), '')  # As using signed Url we keep the same hostname as there
     if query_args:
         path += '?' + query_args
         boto.log.debug('path=%s' % path)
@@ -105,31 +120,18 @@ class RazS3Connection(SignedUrlS3Connection):
     http_request = self.build_base_http_request(method, path, auth_path,
                                                 params, headers, data, host)
 
-    # TODO:
-    # Build a check_access call to Raz, get back presigned Url data and either create a new Boto http_request or
-    # update some of its attributes like in SelfSignedUrlS3Connection.
+    # Actual override starts here
+    LOG.debug('Overriding: %s, %s, %s, %s, %s, %s, %s' % (method, path, auth_path, params, headers, data, host))
 
-    # e.g.
-    # signed_url = self.get_url_request(...)
-    # update or recreate `http_request`
-    # return self._mexe(...)
+    signed_url = self.get_signed_url(action='GET', bucket_name=bucket, object_name=key)
+    LOG.debug(signed_url)
 
-    p = http_request.path.split('/')
-    bucket = (p[1] + '/') or ''
-    key = '/'.join(p[2:]) if len(p) >= 3 else ''
+    parsed_url = lib_urlparse(signed_url)
 
-    kwargs = {
-        'bucket': bucket,
-        'key': key
-    }
-
-    tmp_url = self.get_url_request(action='GET', bucket_name=bucket, object_name=key)
-    LOG.debug(tmp_url)
-
-    http_request.path = tmp_url.replace(http_request.protocol + '://' + http_request.host.split(':')[0], '')
-    p, h = http_request.path.split('?')
-    http_request.path = unquote(p)
-    http_request.headers = dict([a.split('=') for a in h.split('&')])
+    # We override instead of re-creating an HTTPRequest
+    http_request.path = parsed_url.path
+    if parsed_url.query:
+      http_request.path += '?' + parsed_url.query
 
     LOG.debug('Overriden: %s' % http_request)
 
@@ -137,7 +139,7 @@ class RazS3Connection(SignedUrlS3Connection):
                       retry_handler=retry_handler)
 
 
-  def get_url_request(self, action='GET', bucket_name=None, object_name=None, expiration=3600):
+  def get_signed_url(self, action='GET', bucket_name=None, object_name=None, expiration=3600):
     raz_client = S3RazClient()
     return raz_client.get_url(bucket_name, object_name)
 
@@ -170,6 +172,7 @@ class SelfSignedUrlS3Connection(SignedUrlS3Connection):
                                                 params, headers, data, host)
 
     # Actual override starts here
+    LOG.debug('Overriding: %s, %s, %s, %s, %s, %s, %s' % (method, path, auth_path, params, headers, data, host))
     LOG.debug('Overriding: %s' % http_request)
 
     p = http_request.path.split('/')
@@ -182,10 +185,10 @@ class SelfSignedUrlS3Connection(SignedUrlS3Connection):
     }
 
     # http://boto.cloudhackers.com/en/latest/ref/s3.html#boto.s3.connection.S3Connection.generate_url
-    tmp_url = self.generate_url(1000, method, **kwargs)
-    LOG.debug(tmp_url)
+    signed_url = self.generate_url(1000, method, **kwargs)
+    LOG.debug(signed_url)
 
-    http_request.path = tmp_url.replace(http_request.protocol + '://' + http_request.host.split(':')[0], '')
+    http_request.path = signed_url.replace(http_request.protocol + '://' + http_request.host.split(':')[0], '')
     p, h = http_request.path.split('?')
     http_request.path = unquote(p)
     http_request.headers = dict([a.split('=') for a in h.split('&')])
@@ -196,7 +199,6 @@ class SelfSignedUrlS3Connection(SignedUrlS3Connection):
                       retry_handler=retry_handler)
 
 
-# Override S3Connection class in connect_to_region of boto/s3/__init__.py
 def url_client_connect_to_region(region_name, **kw_params):
     if 'host' in kw_params:
         host = kw_params.pop('host')
@@ -204,7 +206,7 @@ def url_client_connect_to_region(region_name, **kw_params):
             region = S3RegionInfo(
                 name='custom',
                 endpoint=host,
-                connection_cls=SelfSignedUrlS3Connection
+                connection_cls=SelfSignedUrlS3Connection  # Override S3Connection class in connect_to_region of boto/s3/__init__.py
             )
             return region.connect(**kw_params)
 
@@ -281,18 +283,18 @@ class UrlKey(Key):
 
   def get_url_request(self, action='GET', **kwargs):
     LOG.debug(kwargs)
-    tmp_url = None
+    signed_url = None
 
     try:
       # http://boto.cloudhackers.com/en/latest/ref/s3.html#boto.s3.key.Key.generate_url
-      tmp_url = self.generate_url(self.expiration, action, **kwargs)
+      signed_url = self.generate_url(self.expiration, action, **kwargs)
     except BotoClientError as e:
       LOG.error(e)
-      if tmp_url is None:
+      if signed_url is None:
         from aws.s3.s3fs import S3FileSystemException
         raise S3FileSystemException("Resource does not exist or permission missing : '%s'" % kwargs)
 
-    return tmp_url
+    return signed_url
 
 
 class UrlBucket(Bucket):
@@ -311,12 +313,12 @@ class UrlBucket(Bucket):
 
     # TODO: if GET --> max length to add
 
-    tmp_url = self.connection.generate_url(3000, action, **kwargs)
+    signed_url = self.connection.generate_url(3000, action, **kwargs)
 
     if action == 'HEAD':
-      response = requests.head(tmp_url)
+      response = requests.head(signed_url)
     else:
-      response = requests.get(tmp_url)
+      response = requests.get(signed_url)
 
     LOG.debug(response)
     LOG.debug(response.content)
@@ -364,9 +366,9 @@ class UrlBucket(Bucket):
   def get_all_keys(self, headers=None, **params):
     kwargs = {'bucket': self.name, 'key': '', 'response_headers': params}
 
-    tmp_url = self.connection.generate_url(3000, 'GET', **kwargs)
+    signed_url = self.connection.generate_url(3000, 'GET', **kwargs)
 
-    response = requests.get(tmp_url)
+    response = requests.get(signed_url)
 
     LOG.debug('get_all_keys %s' % kwargs)
     LOG.debug(params)
@@ -383,17 +385,17 @@ class UrlBucket(Bucket):
 
   def get_url_request(self, action='GET', **kwargs):
     LOG.debug(kwargs)
-    tmp_url = None
+    signed_url = None
 
     try:
       # http://boto.cloudhackers.com/en/latest/ref/s3.html#boto.s3.bucket.Bucket.generate_url
-      tmp_url = self.generate_url(self.expiration, action, **kwargs)
+      signed_url = self.generate_url(self.expiration, action, **kwargs)
     except BotoClientError as e:
       LOG.error(e)
-      if tmp_url is None:
+      if signed_url is None:
         raise IOError("Resource does not exist or permission missing : '%s'" % kwargs)
 
-    return tmp_url
+    return signed_url
 
 
 class SelfSignedUrlClient(SignedUrlClient):
@@ -408,17 +410,17 @@ class SelfSignedUrlClient(SignedUrlClient):
 
   def get_url_request(self, action='GET', **kwargs):
     LOG.debug(kwargs)
-    tmp_url = None
+    signed_url = None
 
     try:
       # http://boto.cloudhackers.com/en/latest/ref/s3.html#boto.s3.connection.S3Connection.generate_url
-      tmp_url = self.connection.generate_url(self.expiration, action, **kwargs)
+      signed_url = self.connection.generate_url(self.expiration, action, **kwargs)
     except BotoClientError as e:
       LOG.error(e)
-      if tmp_url is None:
+      if signed_url is None:
         raise IOError("Resource does not exist or permission missing : '%s'" % kwargs)
 
-    return tmp_url
+    return signed_url
 
 
   def get_bucket(self, bucket_name, validate=True, headers=None):
