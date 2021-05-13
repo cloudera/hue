@@ -113,7 +113,7 @@ class RangerRazClient:
   def check_privileges(self, raz_requests, doAsUser=None):
     resp = self.__call_api(
       RangerRazClient.CHECK_PRIVILEGES.format_path(
-        {"serviceType": raz_request.serviceType}
+        {"serviceType": raz_requests.serviceType}
       ),
       query_params=self.__get_query_params(None, doAsUser),
       request_data=raz_requests,
