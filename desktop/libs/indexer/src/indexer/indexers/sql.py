@@ -29,6 +29,7 @@ from django.urls import reverse
 
 from azure.abfs.__init__ import abfspath
 from hadoop.fs.hadoopfs import Hdfs
+from notebook.connectors.base import get_interpreter
 from notebook.models import make_notebook
 from useradmin.models import User
 
@@ -295,9 +296,11 @@ class SQLIndexer(object):
 
     columns = destination['columns']
 
-    if editor_type in ('hive', 'mysql'):
+    dialect = get_interpreter(source_type, self.user)['dialect']
 
-      if editor_type == 'mysql':
+    if dialect in ('hive', 'mysql'):
+
+      if dialect == 'mysql':
         for col in columns:
           if col['type'] == 'string':
             col['type'] = 'VARCHAR(255)'
@@ -322,7 +325,7 @@ class SQLIndexer(object):
 
         csv_rows = str(list_of_tuples)[1:-1]
 
-        if editor_type in ('hive', 'mysql'):
+        if dialect in ('hive', 'mysql'):
           sql += '''\nINSERT INTO %(database)s.%(table_name)s VALUES %(csv_rows)s;
           '''% {
                   'database': database,
