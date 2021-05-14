@@ -266,9 +266,9 @@
   }
 
   .query-b,
-  /deep/ .query-b-deep .query-b,
-  /deep/ .query-b-deep .hue-info-box,
-  /deep/ .query-b-deep .dag-view-container {
+  ::v-deep(.query-b-deep .query-b),
+  ::v-deep(.query-b-deep .hue-info-box),
+  ::v-deep(.query-b-deep .dag-view-container) {
     background-color: $fluid-blue-050;
     border-radius: $hue-panel-border-radius;
   }

@@ -18,7 +18,7 @@
 
 // Mixins
 @mixin hue-bkg($hue) {
-  background-color: hsl($hue, 90, 65);
+  background-color: hsl($hue, 90%, 65%);
 }
 
 @mixin nth-hue-bkg($index, $hue) {

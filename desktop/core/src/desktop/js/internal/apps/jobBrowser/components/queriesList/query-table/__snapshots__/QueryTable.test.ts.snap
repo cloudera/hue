@@ -9,9 +9,9 @@ exports[`QueryTable.vue should render 1`] = `
     class="query-table-actions"
   >
     <search-input-stub
-      modelvalue=""
       placeholder="Query text or Query/DAG/App ID"
       show-magnify="false"
+      value=""
     />
     <hue-button-stub />
     <div
@@ -43,6 +43,7 @@ exports[`QueryTable.vue should render 1`] = `
       <query-kill-button-stub
         queries=""
       />
+      <hue-button-stub />
     </div>
   </div>
   <div

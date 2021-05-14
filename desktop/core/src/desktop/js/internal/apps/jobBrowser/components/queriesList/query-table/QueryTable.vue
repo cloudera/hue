@@ -335,7 +335,7 @@
         this.$emit('reload');
       },
       searchQueries(searchText: string): void {
-        if(searchText !== undefined) {
+        if (searchText !== undefined) {
           this.searchText = searchText;
         }
 

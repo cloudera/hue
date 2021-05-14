@@ -6,7 +6,6 @@ exports[`QueriesSearch.vue should render 1`] = `
     class="input-group"
   >
     <dropdown-panel-stub
-      class="hue-dropdown-menu"
       link="false"
       text="Searches"
     />
