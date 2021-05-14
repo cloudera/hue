@@ -66,6 +66,7 @@ handler500 = 'desktop.views.serve_500_error'
 # Some django-wide URLs
 dynamic_patterns = [
   re_path(r'^hue/accounts/login', desktop_auth_views.dt_login, name='desktop_auth_views_dt_login'),
+  re_path(r'^hue/accounts/logout/?$', desktop_auth_views.dt_logout, {'next_page': '/'}),
   re_path(r'^accounts/login/?$', desktop_auth_views.dt_login), # Deprecated
   re_path(r'^accounts/logout/?$', desktop_auth_views.dt_logout, {'next_page': '/'}),
   re_path(r'^profile$', desktop_auth_views.profile),
