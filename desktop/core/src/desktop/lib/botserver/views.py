@@ -124,19 +124,11 @@ def handle_on_link_shared(host_domain, channel_id, message_ts, links, user_id):
       raise PopupException(_(msg))
 
     # Permission check for Slack user to be Hue user
-    try:
-      slack_user = check_slack_user_permission(host_domain, user_id)
-      user = User.objects.get(username=slack_user.get('user_email_prefix')) if not slack_user['is_bot'] else doc.owner
-    except User.DoesNotExist:
-      bot_message = 'Corresponding Hue user not found or does not have access to the query'
-      _send_message(channel_id, bot_message)
-      raise PopupException(_("Slack user does not have access to the query"))
-
+    slack_user = check_slack_user_permission(host_domain, user_id)
+    user = get_user(channel_id, slack_user) if not slack_user['is_bot'] else doc.owner
     doc.can_read_or_exception(user)
 
-    # Mock request for query execution and fetch result
-    user = rewrite_user(user)
-    request = MockRequest(user=user)
+    request = MockRequest(user=rewrite_user(user))
 
     payload = _make_unfurl_payload(request, item['url'], id_type, doc, doc_type)
     try:
@@ -149,8 +141,16 @@ def handle_on_link_shared(host_domain, channel_id, message_ts, links, user_id):
       send_result_file(request, channel_id, message_ts, doc, 'xls')
 
 
-def check_slack_user_permission(host_domain, user_id):
+def get_user(channel_id, slack_user):
+  try:
+    return User.objects.get(username=slack_user.get('user_email_prefix'))
+  except User.DoesNotExist:
+    bot_message = 'Corresponding Hue user not found or does not have access to the query'
+    _send_message(channel_id, bot_message)
+    raise PopupException(_("Slack user does not have access to the query"), error_code=200)
 
+
+def check_slack_user_permission(host_domain, user_id):
   try:
     slack_user = slack_client.users_info(user=user_id)
   except Exception as e:
