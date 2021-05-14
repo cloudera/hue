@@ -366,6 +366,8 @@ if desktop.conf.CORS_ENABLED.get():
     CORS_ALLOW_ALL_ORIGINS = True
   else:
     CORS_ORIGIN_ALLOW_ALL = True
+  CORS_ALLOW_CREDENTIALS = True  # For when cookie auth
+  SESSION_COOKIE_SAMESITE = None
 
 # Configure database
 if os.getenv('DESKTOP_DB_CONFIG'):
