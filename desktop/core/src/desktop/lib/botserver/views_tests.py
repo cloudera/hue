@@ -45,16 +45,16 @@ class TestBotServer(unittest.TestCase):
   def setUpClass(cls):
     if not conf.SLACK.IS_ENABLED.get():
       raise SkipTest
-  
-  def setUp(self):
+
     # Slack user: test
-    self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
-    self.user = User.objects.get(username="test")
+    cls.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
+    cls.user = User.objects.get(username="test")
 
     # Other slack user: test_not_me
-    self.client_not_me = make_logged_in_client(username="test_not_me", groupname="default", recreate=True, is_superuser=False)
-    self.user_not_me = User.objects.get(username="test_not_me")
+    cls.client_not_me = make_logged_in_client(username="test_not_me", groupname="default", recreate=True, is_superuser=False)
+    cls.user_not_me = User.objects.get(username="test_not_me")
 
+  def setUp(self):
     self.host_domain = 'testserver.gethue.com'
     self.email_domain = '.'.join(self.host_domain.split('.')[-2:])
 
