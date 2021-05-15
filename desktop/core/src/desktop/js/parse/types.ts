@@ -125,12 +125,12 @@ export interface AutocompleteParseResult {
     types?: string[];
     udfRef?: string;
   };
-  suggestCommonTableExpressions: {
+  suggestCommonTableExpressions?: {
     name: string;
     prependFrom: boolean;
     prependQuestionMark: boolean;
   }[];
-  suggestDatabases: {
+  suggestDatabases?: {
     appendDot?: boolean;
     prependFrom?: boolean;
     prependQuestionMark?: boolean;
@@ -151,7 +151,7 @@ export interface AutocompleteParseResult {
     prependJoin?: boolean;
     tables: ParsedTable[];
   };
-  suggestJoinConditions: {
+  suggestJoinConditions?: {
     prependOn?: boolean;
     tables: ParsedTable[];
   };
@@ -177,7 +177,7 @@ export interface AutocompleteParseResult {
     missingEndQuote?: boolean;
     partialQuote?: boolean;
   };
-  udfArgument: {
+  udfArgument?: {
     name: string;
     position: number;
   };
