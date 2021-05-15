@@ -167,7 +167,7 @@ export interface AutocompleteParseResult {
   suggestOrderBys?: CommonPopularSuggestion;
   suggestSetOptions?: boolean;
   suggestTables?: {
-    identifierChain: IdentifierChainEntry[];
+    identifierChain?: IdentifierChainEntry[];
     onlyTables?: boolean;
     onlyViews?: boolean;
     prependFrom?: boolean;
