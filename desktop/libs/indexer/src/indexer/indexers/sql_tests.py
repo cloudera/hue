@@ -787,35 +787,36 @@ def test_create_ddl_with_abfs():
 
 
 def test_create_table_from_local():
-  source = {
-    'path': '',
-    'sourceType': 'hive'
-  }
-  destination = {
-    'name': 'default.test1',
-    'columns': [
-      {'name': 'date', 'type': 'timestamp'},
-      {'name': 'hour', 'type': 'bigint'},
-      {'name': 'minute', 'type': 'bigint'},
-      {'name': 'dep', 'type': 'bigint'},
-      {'name': 'arr', 'type': 'bigint'},
-      {'name': 'dep_delay', 'type': 'bigint'},
-      {'name': 'arr_delay', 'type': 'bigint'},
-      {'name': 'carrier', 'type': 'string'},
-      {'name': 'flight', 'type': 'bigint'},
-      {'name': 'dest', 'type': 'string'},
-      {'name': 'plane', 'type': 'string'},
-      {'name': 'cancelled', 'type': 'boolean'},
-      {'name': 'time', 'type': 'bigint'},
-      {'name': 'dist', 'type': 'bigint'},
-    ],
-    'indexerPrimaryKey': [],
-    'sourceType': 'hive'
-  }
-  request = MockRequest(fs=MockFs())
-  sql = SQLIndexer(user=request.user, fs=request.fs).create_table_from_local_file(source, destination).get_str()
+  with patch('indexer.indexers.sql.get_interpreter') as get_interpreter:
+    get_interpreter.return_value = {'Name': 'Hive', 'dialect': 'hive'}
+    source = {
+      'path': '',
+      'sourceType': 'hive'
+    }
+    destination = {
+      'name': 'default.test1',
+      'columns': [
+        {'name': 'date', 'type': 'timestamp'},
+        {'name': 'hour', 'type': 'bigint'},
+        {'name': 'minute', 'type': 'bigint'},
+        {'name': 'dep', 'type': 'bigint'},
+        {'name': 'arr', 'type': 'bigint'},
+        {'name': 'dep_delay', 'type': 'bigint'},
+        {'name': 'arr_delay', 'type': 'bigint'},
+        {'name': 'carrier', 'type': 'string'},
+        {'name': 'flight', 'type': 'bigint'},
+        {'name': 'dest', 'type': 'string'},
+        {'name': 'plane', 'type': 'string'},
+        {'name': 'cancelled', 'type': 'boolean'},
+        {'name': 'time', 'type': 'bigint'},
+        {'name': 'dist', 'type': 'bigint'},
+      ],
+      'indexerPrimaryKey': [],
+      'sourceType': 'hive'
+    }
+    sql = SQLIndexer(user=Mock(), fs=Mock()).create_table_from_local_file(source, destination).get_str()
 
-  statement = '''USE default;
+    statement = '''USE default;
 
 CREATE TABLE IF NOT EXISTS default.test1 (
   `date` timestamp,
@@ -833,28 +834,29 @@ CREATE TABLE IF NOT EXISTS default.test1 (
   `time` bigint,
   `dist` bigint);'''
 
-  assert_equal(statement, sql)
+    assert_equal(statement, sql)
 
 
 def test_create_table_from_local_mysql():
-  source = {
-    'path': '/apps/beeswax/data/tables/us_population.csv',
-    'sourceType': 'mysql',
-    'format': {'hasHeader': False}
-  }
-  destination = {
-    'name': 'default.test1',
-    'columns': [
-      {'name': 'field_1', 'type': 'string'},
-      {'name': 'field_2', 'type': 'string'},
-      {'name': 'field_3', 'type': 'bigint'},
-    ],
-    'sourceType': 'mysql'
-  }
-  request = MockRequest(fs=MockFs())
-  sql = SQLIndexer(user=request.user, fs=request.fs).create_table_from_local_file(source, destination).get_str()
+  with patch('indexer.indexers.sql.get_interpreter') as get_interpreter:
+    get_interpreter.return_value = {'Name': 'MySQL', 'dialect': 'mysql'}
+    source = {
+      'path': '/apps/beeswax/data/tables/us_population.csv',
+      'sourceType': 'mysql',
+      'format': {'hasHeader': False}
+    }
+    destination = {
+      'name': 'default.test1',
+      'columns': [
+        {'name': 'field_1', 'type': 'string'},
+        {'name': 'field_2', 'type': 'string'},
+        {'name': 'field_3', 'type': 'bigint'},
+      ],
+      'sourceType': 'mysql'
+    }
+    sql = SQLIndexer(user=Mock(), fs=Mock()).create_table_from_local_file(source, destination).get_str()
 
-  statement = '''USE default;
+    statement = '''USE default;
 
 CREATE TABLE IF NOT EXISTS default.test1 (
   `field_1` VARCHAR(255),
@@ -866,4 +868,4 @@ INSERT INTO default.test1 VALUES ('NY', 'New York', '8143197'), ('CA', 'Los Ange
 ('AZ', 'Phoenix', '1461575'), ('TX', 'San Antonio', '1256509'), ('CA', 'San Diego', '1255540'), \
 ('TX', 'Dallas', '1213825'), ('CA', 'San Jose', '912332');'''
 
-  assert_equal(statement, sql)
+    assert_equal(statement, sql)
