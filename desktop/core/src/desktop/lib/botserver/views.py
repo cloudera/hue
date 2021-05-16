@@ -101,7 +101,7 @@ def _send_ephemeral_message(channel_id, user_id, raw_sql_message):
   try:
     slack_client.chat_postEphemeral(channel=channel_id, user=user_id, text=raw_sql_message)
   except Exception as e:
-    raise PopupException(_("Error posting ephemeral message"), detail=e)
+    raise PopupException(_("Error posting ephemeral message"), detail=e, error_code=200)
 
 
 def handle_on_link_shared(host_domain, channel_id, message_ts, links, user_id):
@@ -118,10 +118,10 @@ def handle_on_link_shared(host_domain, channel_id, message_ts, links, user_id):
         doc = _get_gist_document(**query_id)
         doc_type = 'gist'
       else:
-        raise PopupException(_("Cannot unfurl link"))
+        raise PopupException(_("Cannot unfurl link"), error_code=200)
     except Document2.DoesNotExist:
       msg = "Document with {key} does not exist".format(key=query_id)
-      raise PopupException(_(msg))
+      raise PopupException(_(msg), error_code=200)
 
     # Permission check for Slack user to be Hue user
     slack_user = check_slack_user_permission(host_domain, user_id)
@@ -134,7 +134,7 @@ def handle_on_link_shared(host_domain, channel_id, message_ts, links, user_id):
     try:
       slack_client.chat_unfurl(channel=channel_id, ts=message_ts, unfurls=payload['payload'])
     except Exception as e:
-      raise PopupException(_("Cannot unfurl link"), detail=e)
+      raise PopupException(_("Cannot unfurl link"), detail=e, error_code=200)
     
     # Generate and upload result xlsx file only if result available
     if payload['file_status']:
@@ -154,7 +154,7 @@ def check_slack_user_permission(host_domain, user_id):
   try:
     slack_user = slack_client.users_info(user=user_id)
   except Exception as e:
-    raise PopupException(_("Cannot find query owner in Slack"), detail=e)
+    raise PopupException(_("Cannot find query owner in Slack"), detail=e, error_code=200)
 
   response = {
     'is_bot': slack_user['user']['is_bot'],
@@ -187,7 +187,7 @@ def send_result_file(request, channel_id, message_ts, doc, file_format):
       initial_comment='Here is your result file!'
     )
   except Exception as e:
-    raise PopupException(_("Cannot upload result file"), detail=e)
+    raise PopupException(_("Cannot upload result file"), detail=e, error_code=200)
 
 
 def _query_result(request, notebook, max_rows):
