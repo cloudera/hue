@@ -487,8 +487,11 @@ class Session(models.Model):
     guid = self.guid
     if sys.version_info[0] > 2 and not isinstance(self.secret, bytes) and not isinstance(self.guid, bytes):
       # only for py3, after bytes saved, bytes wrapped in a string object
-      secret = ast.literal_eval(secret)
-      guid = ast.literal_eval(guid)
+      try:
+        secret = ast.literal_eval(secret)
+        guid = ast.literal_eval(guid)
+      except SyntaxError:
+        pass
     return secret, guid
 
   def get_properties(self):
