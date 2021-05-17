@@ -776,54 +776,73 @@ One of the flows for sharing query/gist links, the main bot logic lies on top of
 The 'Smart Quering Assistance' block on top of Hue server which driving the other flow for SQL Assistance is currently a work in progress for replying to users asking questions on how to find certain data tables or to query them.
 
 ### Manual Slack App Installation
-Steps/flow to be followed by the Hue user to set up their own Hue Slack app for their workspace.
+Steps to be followed by the Hue user to set up their own Hue Slack app for their workspace.
+
+#### App Manifest (YAML)
+    _metadata:
+      major_version: 1
+      minor_version: 1
+    display_information:
+      name: SQL Assistant
+      description: Share queries, ask where is the data, how to query it.. questions.
+      background_color: "#000000"
+    features:
+      app_home:
+        home_tab_enabled: false
+        messages_tab_enabled: false
+        messages_tab_read_only_enabled: true
+      bot_user:
+        display_name: Hue Bot
+        always_online: true
+      unfurl_domains:
+        - <hue-instance-hostname>
+    oauth_config:
+      scopes:
+        bot:
+          - app_mentions:read
+          - channels:history
+          - channels:read
+          - chat:write
+          - files:write
+          - links:read
+          - links:write
+          - users:read
+          - users:read.email
+    settings:
+      event_subscriptions:
+        request_url: https://<hue-instance-hostname>/desktop/slack/events/
+        bot_events:
+          - app_mention
+          - link_shared
+          - message.channels
+      org_deploy_enabled: false
+      socket_mode_enabled: false
+      is_hosted: false
+
+The latest version of the manifest file is checked-in [here](https://github.com/cloudera/hue/tree/master/tools/slack)
+
+#### Changes needed in the YAML Manifest
+Update with your Hue instance hostname in two locations:
+- Under **unfurl_domains** (e.g. demo.gethue.com)
+- Under **event_subscriptions**, update **request_url** `https://<hue-instance-hostname>/desktop/slack/events/`
+
 
 #### Creating your app
 1. Go to https://api.slack.com/apps and click **Create New App**.
-2. Pick an app name, i.e. **Hue App** and a workspace that you'll be installing it to.
-3. Click **Create App**. This will leave you on the **Basic Information** screen for your new app.
-4. Scroll down to **Display Information** and fill it out.
+2. Choose **From an app manifest** option and workspace that you'll be installing the app and click **Next**.
+3. Choose **YAML** and paste the Manifest code (make sure you do the necessary changes mentioned above) and click **Next**.
+4. Read the review summary and if everything’s correct, click **Create**.
+5. Once the app is created, install it in the workspace.
 
-#### Subscribe to Events
-5. Scroll back up to **Add features and functionality**.
-6. Click **Event Subscription** and turn on **Enable Events** 
-7. Add an **Events Request URL** where Slack will POST events when triggered <br/> `https://<your-hue-domain>/desktop/slack/events/`
-8. Subscribe to the following **bot events**:
-
-| **Bot Events** | **Why do we need it?** |
-|    :---:     |     :---     |
-| link_shared   | Add link previews for your specified Hue instance domain (eg. demo.gethue.com) in Slack messages. <br/><br/> \*Requires and itself adds **link:read** OAuth scope
-| message.channels     | Send a simple “Hi \<@user id\>” greeting message to user messaging “Hello Hue”. <br/><br/> \*Requires and itself adds **channels:history** OAuth scope
-
-9. Go to **App Unfurl Domains** and add your Hue instance domain (eg. demo.gethue.com). More info about [registering a domain here.](https://api.slack.com/reference/messaging/link-unfurling#configuring_domains)
-
-#### Add OAuth Scopes
-10. Navigate to the **OAuth & Permissions** page and scroll down to **Scopes**
-11. Under **Bot Token Scopes**, subscribe to the following:
-
-| **Permission Scopes** | **Why do we need it?** |
-|    :---:     |     :---     |
-| channels:history   | \*Required by **message.channels** bot event
-| channels:read   | Get list of channels where bot is present
-| chat:write     | Sending messages as Hue App
-| files:write   | Uploading the query result file in link message thread
-| links:read  | \*Required by **link_shared** bot event
-| links:write   | To show link preview in Slack messages from registered domains
-| users:read  | To view the email prefix name of the user who sent the link to check the read permission on Hue queries.
-| users:read.email | users:read is required with users:read.email together to read the email for above reason
 
 #### Updating your hue.ini config file
-Paste this in your hue.ini file under `[desktop]` section
+6. Go to the **OAuth & Permissions** page, copy the **Bot User OAuth Token** and update **slack_bot_user_token** (e.g. _xoxb-xxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxx_).
+7. Similarly, go to the **Basic Information** page, copy the **Verification Token** and update **slack_verification_token**.
+8. Paste this in your hue.ini file under `[desktop]` section.
 
-```
-[[slack]]
-is_enabled=true
-slack_verification_token=<your-slack-verification-token>
-slack_bot_user_token=<your-slack-bot-user-token>
-```
+        [[slack]]
+        is_enabled=true
+        slack_verification_token=<your-slack-verification-token>
+        slack_bot_user_token=<your-slack-bot-user-token>
 
-12. Set Slack API endpoint flag to true
-13. Go to the **OAuth & Permissions** page, copy the **Bot User OAuth Token** and update **slack_bot_user_token**
-14. Similarly, go to the **Basic Information** page, copy the **Verification Token** and update **slack_verification_token**
-
-Now add the Slack app in your desired channels and send some query/gist links!
+Now add the Slack app in your desired channels and send some [query/gist links](https://docs.gethue.com/user/concept/#share-to-slack)!
