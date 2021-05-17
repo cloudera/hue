@@ -83,7 +83,3 @@ class PopupException(Exception):
       response.status_code = self.error_code
 
     return response
-
-class SlackBotException(PopupException):
-  def __init__(self, msg, detail=None, error_code=200):
-    PopupException.__init__(self, message=msg, detail=detail, error_code=error_code)

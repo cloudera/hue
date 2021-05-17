@@ -24,7 +24,7 @@ from tabulate import tabulate
 from desktop.lib.botserver.slack_client import slack_client, SLACK_VERIFICATION_TOKEN
 from desktop.lib.botserver.api import _send_message
 from desktop.lib.django_util import login_notrequired, JsonResponse
-from desktop.lib.exceptions_renderable import PopupException, SlackBotException
+from desktop.lib.exceptions_renderable import PopupException
 from desktop.models import Document2, _get_gist_document
 from desktop.auth.backend import rewrite_user
 
@@ -43,6 +43,10 @@ else:
   from django.utils.translation import ugettext as _
 
 LOG = logging.getLogger(__name__)
+
+class SlackBotException(PopupException):
+  def __init__(self, msg, detail=None, error_code=200):
+    PopupException.__init__(self, message=msg, detail=detail, error_code=error_code)
 
 
 @login_notrequired
