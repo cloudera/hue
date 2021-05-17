@@ -180,7 +180,10 @@ class MetastoreViewModel {
     });
 
     huePubSub.subscribe('metastore.url.change', () => {
-      const prefix = '/hue/metastore/';
+      const prefix =
+        window.HUE_BASE_URL && window.HUE_BASE_URL.length
+          ? window.HUE_BASE_URL + '/metastore/'
+          : '/hue/metastore/';
       if (this.source() && this.source().namespace()) {
         const params = {
           source_type: this.source().type
@@ -351,9 +354,14 @@ class MetastoreViewModel {
   }
 
   loadUrl() {
-    const path = window.location.pathname.substr(4) || '/metastore/tables';
+    const path = window.location.pathname.startsWith(window.HUE_BASE_URL)
+      ? window.location.pathname.substr(window.HUE_BASE_URL.length)
+      : window.location.pathname.substr(4) || '/metastore/tables';
     const pathParts = path.split('/');
     if (pathParts[0] === '') {
+      pathParts.shift();
+    }
+    while (pathParts[0] === 'hue') {
       pathParts.shift();
     }
     if (pathParts[0] === 'metastore') {
