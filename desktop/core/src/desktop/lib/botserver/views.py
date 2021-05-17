@@ -78,27 +78,37 @@ def parse_events(request, event):
   """
   channel_id = event.get('channel')
   user_id = event.get('user')
+  message_element = event['blocks'][0]['elements'] if event.get('blocks') else []
 
   if event.get('type') == 'message':
-    handle_on_message(channel_id, event.get('bot_id'), event.get('text'), user_id)
+    handle_on_message(channel_id, event.get('bot_id'), message_element, user_id)
 
   if event.get('type') == 'link_shared':
     handle_on_link_shared(request.get_host(), channel_id, event.get('message_ts'), event.get('links'), user_id)
 
 
-def handle_on_message(channel_id, bot_id, text, user_id):
+def handle_on_message(channel_id, bot_id, elements, user_id):
   # Ignore bot's own message since that will cause an infinite loop of messages if we respond.
   if bot_id is not None:
     return HttpResponse(status=200)
   
-  if slack_client is not None:
-    if text and 'hello hue' in text.lower():
+  for element_block in elements:
+    text = element_block['elements'][0].get('text', '') if element_block.get('elements') else ''
+
+    if 'hello hue' in text.lower():
       bot_message = 'Hi <@{user}> :wave:'.format(user=user_id)
       _send_message(channel_id, bot_message)
 
-    if text and 'select 1' in text.lower():
-      raw_sql_message = 'Hi <@{user}>\nInstead of copy/pasting SQL, now you can send Editor links which unfurls in a rich preview!'.format(user=user_id)
-      _send_ephemeral_message(channel_id, user_id, raw_sql_message)
+    if text.lower().startswith('select'):
+      detect_select_statement(channel_id, user_id, text.lower())
+
+
+def detect_select_statement(channel_id, user_id, statement):
+  if not statement.endswith(';'):
+    statement += ';'
+  
+  raw_sql_message = 'Hi <@{user}>\nLooks like you are copy/pasting SQL, instead now you can send Editor links which unfurls in a rich preview!'.format(user=user_id)
+  _send_ephemeral_message(channel_id, user_id, raw_sql_message)
 
 
 def _send_ephemeral_message(channel_id, user_id, raw_sql_message):
