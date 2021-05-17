@@ -81,13 +81,13 @@ def parse_events(request, event):
   message_element = event['blocks'][0]['elements'] if event.get('blocks') else []
 
   if event.get('type') == 'message':
-    handle_on_message(channel_id, event.get('bot_id'), message_element, user_id)
+    handle_on_message(request.get_host(), request.is_secure(), channel_id, event.get('bot_id'), message_element, user_id)
 
   if event.get('type') == 'link_shared':
     handle_on_link_shared(request.get_host(), channel_id, event.get('message_ts'), event.get('links'), user_id)
 
 
-def handle_on_message(channel_id, bot_id, elements, user_id):
+def handle_on_message(host_domain, is_http_secure, channel_id, bot_id, elements, user_id):
   # Ignore bot's own message since that will cause an infinite loop of messages if we respond.
   if bot_id is not None:
     return HttpResponse(status=200)
@@ -100,22 +100,33 @@ def handle_on_message(channel_id, bot_id, elements, user_id):
       _send_message(channel_id, bot_message)
 
     if text.lower().startswith('select'):
-      detect_select_statement(channel_id, user_id, text.lower())
+      detect_select_statement(host_domain, is_http_secure, channel_id, user_id, text.lower())
 
 
-def detect_select_statement(channel_id, user_id, statement):
-  if not statement.endswith(';'):
-    statement += ';'
-  
-  raw_sql_message = 'Hi <@{user}>\nLooks like you are copy/pasting SQL, instead now you can send Editor links which unfurls in a rich preview!'.format(user=user_id)
-  _send_ephemeral_message(channel_id, user_id, raw_sql_message)
+def detect_select_statement(host_domain, is_http_secure, channel_id, user_id, statement):
+  slack_user = check_slack_user_permission(host_domain, user_id)
+  user = get_user(channel_id, slack_user)
 
+  gist_doc = Document2.objects.create(
+    name='Mysql Query blah',
+    type='gist',
+    owner=user,
+    data=json.dumps({'statement_raw': statement}),
+    extra='mysql',
+    parent_directory=Document2.objects.get_gist_directory(user)
+  )
 
-def _send_ephemeral_message(channel_id, user_id, raw_sql_message):
-  try:
-    slack_client.chat_postEphemeral(channel=channel_id, user=user_id, text=raw_sql_message)
-  except Exception as e:
-    raise SlackBotException(_("Error posting ephemeral message"), detail=e)
+  gist_link = '%(scheme)s://%(host)s/hue/gist?uuid=%(uuid)s' % {
+    'scheme': 'https' if is_http_secure else 'http',
+    'host': host_domain,
+    'uuid': gist_doc.uuid,
+  }
+
+  bot_message = ('Hi <@{user}>\n'
+  'Looks like you are copy/pasting SQL, instead now you can send Editor links which unfurls in a rich preview!\n'
+  'Here is the gist link\n {gist_link}'
+  ).format(user=user_id, gist_link=gist_link)
+  _send_message(channel_id, bot_message)
 
 
 def handle_on_link_shared(host_domain, channel_id, message_ts, links, user_id):
