@@ -25,7 +25,7 @@ from desktop.lib.botserver.slack_client import slack_client, SLACK_VERIFICATION_
 from desktop.lib.botserver.api import _send_message
 from desktop.lib.django_util import login_notrequired, JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.models import Document2, _get_gist_document
+from desktop.models import Document2, _get_gist_document, get_cluster_config
 from desktop.auth.backend import rewrite_user
 
 from notebook.api import _fetch_result_data, _check_status, _execute_notebook
@@ -107,12 +107,14 @@ def detect_select_statement(host_domain, is_http_secure, channel_id, user_id, st
   slack_user = check_slack_user_permission(host_domain, user_id)
   user = get_user(channel_id, slack_user)
 
+  default_dialect = get_cluster_config(rewrite_user(user))['default_sql_interpreter']
+
   gist_doc = Document2.objects.create(
-    name='Mysql Query blah',
+    name='{dialect_name} Query'.format(dialect_name=default_dialect),
     type='gist',
     owner=user,
-    data=json.dumps({'statement_raw': statement}),
-    extra='mysql',
+    data=json.dumps({'statement': statement, 'statement_raw': statement}),
+    extra=default_dialect,
     parent_directory=Document2.objects.get_gist_directory(user)
   )
 
