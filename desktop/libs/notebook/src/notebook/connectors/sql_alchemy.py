@@ -473,8 +473,7 @@ class SqlAlchemyApi(Api):
         for col in columns
       ]
 
-      if not self.options['url'].startswith('phoenix://'):
-        response.update(assist.get_keys(database, table))
+      response.update(assist.get_keys(database, table))
     else:
       columns = assist.get_columns(database, table)
       response['name'] = next((col['name'] for col in columns if column == col['name']), '')
