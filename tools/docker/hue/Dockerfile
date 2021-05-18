@@ -18,44 +18,39 @@ RUN apt-get update -y && apt-get install -y \
   rsync \
   curl \
   sudo \
-  git
-
-RUN pip3 install --upgrade setuptools
-RUN pip3 install virtualenv
-
-# Need recent version for Ubuntu
-RUN curl -sL https://deb.nodesource.com/setup_14.x | sudo bash - \
-  && apt-get install -y nodejs
-
-RUN addgroup hue && useradd -r -u 1001 -g hue hue
+  git && \
+  rm -rf /var/lib/apt/lists/*
 
 ADD . /hue
-WORKDIR /hue
 
-RUN chown -R hue /hue \
-  && mkdir /hue/build \
-  && chown -R hue /hue/build \
-  && mkdir /usr/share/hue \
-  && chown -R hue /usr/share/hue
+RUN pip3 install --upgrade --no-cache-dir setuptools virtualenv pip && \
+  curl -sL https://deb.nodesource.com/setup_14.x | sudo bash - && \
+  apt-get install -y nodejs && \
+  addgroup hue && \
+  useradd -r -u 1001 -g hue hue && \
+  chown -R hue /hue && \
+  mkdir /hue/build && \
+  chown -R hue /hue/build && \
+  mkdir /usr/share/hue && \
+  chown -R hue /usr/share/hue && \
+  rm -r /hue/desktop/conf/* && \
+  cp -r /hue/desktop/conf.dist/* /hue/desktop/conf/ && \
+  cd /hue && \
+  PREFIX=/usr/share PYTHON_VER=python3.6 make install && \
+  chown -R hue /usr/share/hue && \
+  npm cache clean --force && \
+  pip3 cache purge && \
+  rm -rf /var/lib/apt/lists/* && \
+  cp -r /hue/tools/docker/hue/conf3/* /usr/share/hue/desktop/conf/ && \
+  cp /hue/tools/docker/hue/startup.sh /usr/share/hue/startup.sh && \
+  rm -rf /hue && \
+  rm -rf /usr/share/hue/node_modules
 
-# Not doing a `make prod`, so manually getting production ini
-RUN rm desktop/conf/*
-COPY desktop/conf.dist desktop/conf
-
-RUN rm -r desktop/core/ext-py
-
-RUN PREFIX=/usr/share PYTHON_VER=python3.6 make install
-RUN chown -R hue /usr/share/hue
-
-# Only keep install dir
-# Note: get more minimal image by pulling install dir in a stage 2 image
 WORKDIR /usr/share/hue
-RUN rm -rf /hue \
-  && rm -rf node_modules
 
 # Install DB connectors
 # To move to requirements_connectors.txt
-RUN ./build/env/bin/pip install \
+RUN ./build/env/bin/pip install --no-cache-dir \
   psycopg2-binary \
   # Avoid Django 3 pulling
   django_redis==4.11.0 \
@@ -71,14 +66,17 @@ RUN ./build/env/bin/pip install \
   pyasn1==0.4.1 \
   # View some parquet files
   python-snappy==0.5.4 \
-  threadloop  # Needed for Jaeger \
-  thrift-sasl==0.2.1
-
-
-COPY tools/docker/hue/conf3 desktop/conf
-COPY tools/docker/hue/startup.sh .
+  # Needed for Jaeger
+  threadloop \
+  # Fix Can't load plugin: sqlalchemy.dialects:clickhouse
+  sqlalchemy-clickhouse \
+  # sqlalchemy-clickhouse depend on infi.clickhouse_orm
+  # install after sqlalchemy-clickhouse and version == 1.0.4
+  # otherwise Code: 516, Authentication failed will display
+  infi.clickhouse_orm==1.0.4
 
 USER hue
 
 EXPOSE 8888
+
 CMD ["./startup.sh"]
