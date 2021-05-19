@@ -42,8 +42,8 @@
         <ResultTable :executable="activeExecutable" />
       </div>
     </div>
-    <div v-else-if="!loading && !executor">
-      {{ errorMessage || 'Failed loading the SQL Scratchpad!' }}
+    <div v-else-if="!loading && !executor && errorMessage">
+      {{ errorMessage }}
     </div>
   </div>
 </template>
@@ -58,6 +58,7 @@
   import { SqlReferenceProvider } from 'sql/reference/types';
 
   import './SqlScratchpad.scss';
+  import defer from '../../../../utils/timing/defer';
   import AceEditor from '../aceEditor/AceEditor.vue';
   import { ActiveStatementChangedEventDetails } from '../aceEditor/types';
   import ExecutableProgressBar from '../ExecutableProgressBar.vue';
