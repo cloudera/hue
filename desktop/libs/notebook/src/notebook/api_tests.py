@@ -640,39 +640,39 @@ class TestNotebookApiMocked(object):
 def test_get_interpreters_to_show():
   default_interpreters = OrderedDict((
       ('hive', {
-          'name': 'Hive', 'interface': 'hiveserver2', 'type': 'hive', 'is_sql': True, 'options': {}, 'dialect_properties': {},
-          'is_catalog': False, 'category': 'editor', 'dialect': 'hive'
+          'name': 'Hive', 'displayName': 'Hive', 'interface': 'hiveserver2', 'type': 'hive', 'is_sql': True,
+          'options': {}, 'dialect_properties': {}, 'is_catalog': False, 'category': 'editor', 'dialect': 'hive'
       }),
       ('spark', {
-          'name': 'Scala', 'interface': 'livy', 'type': 'spark', 'is_sql': False, 'options': {}, 'dialect_properties': {},
-          'is_catalog': False, 'category': 'editor', 'dialect': 'scala'
+          'name': 'Scala', 'displayName': 'Scala', 'interface': 'livy', 'type': 'spark', 'is_sql': False, 'options': {},
+          'dialect_properties': {}, 'is_catalog': False, 'category': 'editor', 'dialect': 'scala'
       }),
       ('pig', {
-          'name': 'Pig', 'interface': 'pig', 'type': 'pig', 'is_sql': False, 'options': {}, 'dialect_properties': {},
-          'is_catalog': False, 'category': 'editor', 'dialect': 'pig'
+          'name': 'Pig', 'displayName': 'Pig', 'interface': 'pig', 'type': 'pig', 'is_sql': False, 'options': {},
+          'dialect_properties': {}, 'is_catalog': False, 'category': 'editor', 'dialect': 'pig'
       }),
       ('java', {
-          'name': 'Java', 'interface': 'oozie', 'type': 'java', 'is_sql': False, 'options': {}, 'dialect_properties': {},
-          'is_catalog': False, 'category': 'editor', 'dialect': 'java'
+          'name': 'Java', 'displayName': 'Java', 'interface': 'oozie', 'type': 'java', 'is_sql': False, 'options': {},
+          'dialect_properties': {}, 'is_catalog': False, 'category': 'editor', 'dialect': 'java'
       })
     ))
 
   expected_interpreters = OrderedDict((
       ('java', {
-        'name': 'Java', 'interface': 'oozie', 'type': 'java', 'is_sql': False, 'options': {}, 'dialect_properties': {},
-        'is_catalog': False, 'category': 'editor', 'dialect': 'java'
+        'name': 'Java', 'displayName': 'Java', 'interface': 'oozie', 'type': 'java', 'is_sql': False, 'options': {},
+        'dialect_properties': {}, 'is_catalog': False, 'category': 'editor', 'dialect': 'java'
       }),
       ('pig', {
-        'name': 'Pig', 'interface': 'pig', 'is_sql': False, 'type': 'pig', 'options': {}, 'dialect_properties': {},
-        'is_catalog': False, 'category': 'editor', 'dialect': 'pig'
+        'name': 'Pig', 'displayName': 'Pig', 'interface': 'pig', 'is_sql': False, 'type': 'pig', 'options': {},
+        'dialect_properties': {}, 'is_catalog': False, 'category': 'editor', 'dialect': 'pig'
       }),
       ('hive', {
-          'name': 'Hive', 'interface': 'hiveserver2', 'is_sql': True, 'type': 'hive', 'options': {}, 'dialect_properties': {},
-          'is_catalog': False, 'category': 'editor', 'dialect': 'hive'
+          'name': 'Hive', 'displayName': 'Hive', 'interface': 'hiveserver2', 'is_sql': True, 'type': 'hive',
+          'options': {}, 'dialect_properties': {}, 'is_catalog': False, 'category': 'editor', 'dialect': 'hive'
       }),
       ('spark', {
-          'name': 'Scala', 'interface': 'livy', 'type': 'spark', 'is_sql': False, 'options': {}, 'dialect_properties': {},
-          'is_catalog': False, 'category': 'editor', 'dialect': 'scala'
+          'name': 'Scala', 'displayName': 'Scala', 'interface': 'livy', 'type': 'spark', 'is_sql': False, 'options': {},
+          'dialect_properties': {}, 'is_catalog': False, 'category': 'editor', 'dialect': 'scala'
       })
     ))
 
@@ -710,24 +710,24 @@ def test_get_interpreters_to_show():
 def test_get_ordered_interpreters():
   default_interpreters = OrderedDict((
     ('hive', {
-        'name': 'Hive', 'interface': 'hiveserver2', 'type': 'hive', 'is_sql': True, 'options': {}, 'dialect_properties': None,
-        'is_catalog': False, 'category': 'editor', 'dialect': 'hive'
+        'name': 'Hive', 'displayName': 'Hive', 'interface': 'hiveserver2', 'type': 'hive', 'is_sql': True,
+        'options': {}, 'dialect_properties': None, 'is_catalog': False, 'category': 'editor', 'dialect': 'hive'
     }),
     ('impala', {
-        'name': 'Impala', 'interface': 'hiveserver2', 'type': 'impala', 'is_sql': True, 'options': {}, 'dialect_properties': None,
-        'is_catalog': False, 'category': 'editor', 'dialect': 'impala'
+        'name': 'Impala', 'displayName': 'Impala', 'interface': 'hiveserver2', 'type': 'impala', 'is_sql': True,
+        'options': {}, 'dialect_properties': None, 'is_catalog': False, 'category': 'editor', 'dialect': 'impala'
     }),
     ('spark', {
-        'name': 'Scala', 'interface': 'livy', 'type': 'spark', 'is_sql': False, 'options': {}, 'dialect_properties': None,
-        'is_catalog': False, 'category': 'editor', 'dialect': 'scala'
+        'name': 'Scala', 'displayName': 'Scala', 'interface': 'livy', 'type': 'spark', 'is_sql': False, 'options': {},
+        'dialect_properties': None, 'is_catalog': False, 'category': 'editor', 'dialect': 'scala'
     }),
     ('pig', {
-        'name': 'Pig', 'interface': 'pig', 'type': 'pig', 'is_sql': False, 'options': {}, 'dialect_properties': None,
-        'is_catalog': False, 'category': 'editor', 'dialect': 'pig'
+        'name': 'Pig', 'displayName': 'Pig', 'interface': 'pig', 'type': 'pig', 'is_sql': False, 'options': {},
+        'dialect_properties': None, 'is_catalog': False, 'category': 'editor', 'dialect': 'pig'
     }),
     ('java', {
-        'name': 'Java', 'interface': 'oozie', 'type': 'java', 'is_sql': False, 'options': {}, 'dialect_properties': None,
-        'is_catalog': False, 'category': 'editor', 'dialect': 'java'
+        'name': 'Java', 'displayName': 'Java', 'interface': 'oozie', 'type': 'java', 'is_sql': False, 'options': {},
+        'dialect_properties': None, 'is_catalog': False, 'category': 'editor', 'dialect': 'java'
     })
   ))
 

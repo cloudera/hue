@@ -25,7 +25,9 @@ const DOCUMENT_TYPE_I18n = {
   'oozie-bundle2': I18n('Oozie Bundle'),
   'oozie-coordinator2': I18n('Oozie Schedule'),
   'oozie-workflow2': I18n('Oozie Workflow'),
-  'query-hive': I18n('Hive Query'),
+  'query-hive': window.ENABLE_UNIFIED_ANALYTICS
+    ? I18n('Unified Analytics Query')
+    : I18n('Hive Query'),
   'query-impala': I18n('Impala Query'),
   'search-dashboard': I18n('Search Dashboard'),
   'query-mapreduce': I18n('MapReduce Job'),
