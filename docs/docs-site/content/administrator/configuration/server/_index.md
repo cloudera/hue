@@ -776,7 +776,7 @@ One of the flows for sharing query/gist links, the main bot logic lies on top of
 The 'Smart Quering Assistance' block on top of Hue server which driving the other flow for SQL Assistance is currently a work in progress for replying to users asking questions on how to find certain data tables or to query them.
 
 ### Manual Slack App Installation
-Steps to be followed by the Hue user to set up their own Hue Slack app for their workspace.
+Steps to be followed by the Slack workspace admin to set up their own Hue Slack app. The app needs to be created only once, other Hue users can simply [interact](/user/concept/#share-to-slack) with the App in the Slack channels!
 
 #### App Manifest (YAML)
 The latest version of the manifest file is checked-in [here](https://github.com/cloudera/hue/blob/master/tools/slack/manifest.yml)
@@ -786,14 +786,12 @@ Update the two _demo.gethue.com_ with **your Hue instance hostname:**
 - Under **unfurl_domains**
 - Under **event_subscriptions**, in **request_url** `https://<hue-instance-hostname>/desktop/slack/events/`
 
-
 #### Creating your app
 1. Go to https://api.slack.com/apps and click **Create New App**.
 2. Choose **From an app manifest** option and workspace that you'll be installing the app and click **Next**.
 3. Choose **YAML** and paste the Manifest code (make sure you do the necessary changes mentioned above) and click **Next**.
 4. Read the review summary and if everything’s correct, click **Create**.
 5. Once the app is created, install it in the workspace.
-
 
 #### Updating your hue.ini config file
 6. Go to the **OAuth & Permissions** page, copy the **Bot User OAuth Token** and update **slack_bot_user_token** (e.g. _xoxb-xxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxx_).
