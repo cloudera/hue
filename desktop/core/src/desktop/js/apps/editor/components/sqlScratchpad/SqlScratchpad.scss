@@ -19,9 +19,10 @@
 @import '../../../../components/styles/mixins';
 
 .sql-scratchpad {
-  position: relative;
+  font-family: Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
   width: 100%;
   height: 100%;
+  overflow: hidden;
 
   .sql-scratchpad-container {
     @include fillAbsolute;
@@ -30,7 +31,7 @@
     overflow: hidden;
 
     .sql-scratchpad-editor {
-      @include flex(0 1 50%);
+      @include flex(0 0 50%);
     }
 
     .sql-scratchpad-progress {
@@ -39,10 +40,29 @@
 
     .sql-scratchpad-actions {
       @include flex(0 0 25px);
+
+      button,
+      form {
+        display: inline-block;
+      }
     }
 
     .sql-scratchpad-result {
       @include flex(0 1 50%);
+      overflow: hidden;
+
+      h1 {
+        font-size: 18px;
+        color: #888;
+        font-style: italic;
+        margin: 15px 5px;
+      }
+
+      .hue-table-container {
+        height: 100%;
+        width: 100%;
+        overflow: auto;
+      }
     }
   }
 }
