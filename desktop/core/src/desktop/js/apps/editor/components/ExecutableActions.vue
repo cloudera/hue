@@ -33,6 +33,7 @@
   import ExecuteLimitInput from 'apps/editor/components/ExecuteLimitInput.vue';
   import { defineComponent, PropType } from 'vue';
 
+  import './ExecuableActions.scss';
   import SqlExecutable from 'apps/editor/execution/sqlExecutable';
 
   export default defineComponent({
@@ -54,9 +55,3 @@
     emits: ['execute-failed', 'execute-successful', 'limit-changed']
   });
 </script>
-
-<style lang="scss" scoped>
-  .snippet-execute-actions {
-    display: inline-block;
-  }
-</style>
