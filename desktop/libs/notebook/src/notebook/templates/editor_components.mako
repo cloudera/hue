@@ -143,32 +143,9 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           <li class="app-header" style="display:none" data-bind="visible: true">
             <!-- ko if: editorMode -->
               <a data-bind="hueLink: '${ url('notebook:editor') }?type=' + editorType(), attr: { 'title': editorTypeTitle() + '${ _(' Editor') }'}" style="cursor: pointer">
-              <!-- ko template: { name: 'app-icon-template', data: { icon: editorType() } } --><!-- /ko -->
+              <!-- ko template: { name: 'app-icon-template', data: { icon: editorIcon() } } --><!-- /ko -->
 
-              <!-- ko switch: editorType() -->
-                <!-- ko case: 'impala' -->Impala<!-- /ko -->
-                <!-- ko case: 'rdbms' -->DB Query<!-- /ko -->
-                <!-- ko case: 'pig' -->Pig<!-- /ko -->
-                <!-- ko case: 'java' -->Java<!-- /ko -->
-                <!-- ko case: 'spark2' -->Spark<!-- /ko -->
-                <!-- ko case: 'sqoop1' -->Sqoop 1<!-- /ko -->
-                <!-- ko case: 'distcp' -->DistCp<!-- /ko -->
-                <!-- ko case: 'shell' -->Shell<!-- /ko -->
-                <!-- ko case: 'mapreduce' -->MapReduce<!-- /ko -->
-                <!-- ko case: ['beeswax', 'hive'] -->Hive<!-- /ko -->
-                <!-- ko case: 'mapreduce' -->MapReduce<!-- /ko -->
-                <!-- ko case: 'spark' -->Scala<!-- /ko -->
-                <!-- ko case: 'pyspark' -->PySpark<!-- /ko -->
-                <!-- ko case: 'r' -->R<!-- /ko -->
-                <!-- ko case: 'jar' -->Spark Submit Jar<!-- /ko -->
-                <!-- ko case: 'py' -->Spark Submit Python<!-- /ko -->
-                <!-- ko case: 'solr' -->Solr SQL<!-- /ko -->
-                <!-- ko case: 'kafkasql' -->Kafka SQL<!-- /ko -->
-                <!-- ko case: 'markdown' -->Markdown<!-- /ko -->
-                <!-- ko case: 'text' -->Text<!-- /ko -->
-                <!-- ko case: 'clickhouse' -->ClickHouse<!-- /ko -->
-                <!-- ko case: $default --><span data-bind="text: editorTypeTitle()"></span><!-- /ko -->
-              <!-- /ko -->
+              <span data-bind="text: editorTypeTitle"></span>
               <!-- ko component: { name: 'hue-favorite-app', params: { app: 'editor', interpreter: editorType() }} --><!-- /ko -->
               </a>
             <!-- /ko -->

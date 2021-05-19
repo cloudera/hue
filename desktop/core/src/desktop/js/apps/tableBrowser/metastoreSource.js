@@ -33,6 +33,7 @@ class MetastoreSource {
   constructor(options) {
     this.type = options.type;
     this.name = options.name;
+    this.displayName = options.displayName;
     this.metastoreViewModel = options.metastoreViewModel;
 
     this.reloading = ko.observable(false);

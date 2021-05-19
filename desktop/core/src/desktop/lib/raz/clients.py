@@ -39,7 +39,7 @@ class S3RazClient():
   def get_url(self, bucket=None, path=None, perm='read'):
     # No GET/POST spec?
     # e.g. get_url('<storage_account?>', '<bucket>', '<relative_path>', 'read')
-    return self.ranger.get_dsas_token(bucket, path, perm)
+    return self.ranger.get_signed_url(bucket, path, perm)
 
 
 class AdlsRazClient():

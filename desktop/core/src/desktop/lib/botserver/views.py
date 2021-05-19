@@ -25,7 +25,8 @@ from desktop.lib.botserver.slack_client import slack_client, SLACK_VERIFICATION_
 from desktop.lib.botserver.api import _send_message
 from desktop.lib.django_util import login_notrequired, JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.models import Document2, _get_gist_document
+from desktop.models import Document2, _get_gist_document, get_cluster_config
+from desktop.api2 import _gist_create
 from desktop.auth.backend import rewrite_user
 
 from notebook.api import _fetch_result_data, _check_status, _execute_notebook
@@ -43,6 +44,10 @@ else:
   from django.utils.translation import ugettext as _
 
 LOG = logging.getLogger(__name__)
+
+class SlackBotException(PopupException):
+  def __init__(self, msg, detail=None, error_code=200):
+    PopupException.__init__(self, message=msg, detail=detail, error_code=error_code)
 
 
 @login_notrequired
@@ -77,13 +82,13 @@ def parse_events(request, event):
   message_element = event['blocks'][0]['elements'] if event.get('blocks') else []
 
   if event.get('type') == 'message':
-    handle_on_message(channel_id, event.get('bot_id'), message_element, user_id)
+    handle_on_message(request.get_host(), request.is_secure(), channel_id, event.get('bot_id'), message_element, user_id)
 
   if event.get('type') == 'link_shared':
     handle_on_link_shared(request.get_host(), channel_id, event.get('message_ts'), event.get('links'), user_id)
 
 
-def handle_on_message(channel_id, bot_id, elements, user_id):
+def handle_on_message(host_domain, is_http_secure, channel_id, bot_id, elements, user_id):
   # Ignore bot's own message since that will cause an infinite loop of messages if we respond.
   if bot_id is not None:
     return HttpResponse(status=200)
@@ -96,22 +101,22 @@ def handle_on_message(channel_id, bot_id, elements, user_id):
       _send_message(channel_id, bot_message)
 
     if text.lower().startswith('select'):
-      detect_select_statement(channel_id, user_id, text.lower())
+      detect_select_statement(host_domain, is_http_secure, channel_id, user_id, text.lower())
 
 
-def detect_select_statement(channel_id, user_id, statement):
-  if not statement.endswith(';'):
-    statement += ';'
-  
-  raw_sql_message = 'Hi <@{user}>\nLooks like you are copy/pasting SQL, instead now you can send Editor links which unfurls in a rich preview!'.format(user=user_id)
-  _send_ephemeral_message(channel_id, user_id, raw_sql_message)
+def detect_select_statement(host_domain, is_http_secure, channel_id, user_id, statement):
+  slack_user = check_slack_user_permission(host_domain, user_id)
+  user = get_user(channel_id, slack_user)
 
+  default_dialect = get_cluster_config(rewrite_user(user))['default_sql_interpreter']
 
-def _send_ephemeral_message(channel_id, user_id, raw_sql_message):
-  try:
-    slack_client.chat_postEphemeral(channel=channel_id, user=user_id, text=raw_sql_message)
-  except Exception as e:
-    raise PopupException(_("Error posting ephemeral message"), detail=e)
+  gist_response = _gist_create(host_domain, is_http_secure, user, statement, default_dialect)
+
+  bot_message = ('Hi <@{user}>\n'
+  'Looks like you are copy/pasting SQL, instead now you can send Editor links which unfurls in a rich preview!\n'
+  'Here is the gist link\n {gist_link}'
+  ).format(user=user_id, gist_link=gist_response['link'])
+  _send_message(channel_id, bot_message)
 
 
 def handle_on_link_shared(host_domain, channel_id, message_ts, links, user_id):
@@ -128,10 +133,10 @@ def handle_on_link_shared(host_domain, channel_id, message_ts, links, user_id):
         doc = _get_gist_document(**query_id)
         doc_type = 'gist'
       else:
-        raise PopupException(_("Cannot unfurl link"))
+        raise SlackBotException(_("Cannot unfurl link"))
     except Document2.DoesNotExist:
       msg = "Document with {key} does not exist".format(key=query_id)
-      raise PopupException(_(msg))
+      raise SlackBotException(_(msg))
 
     # Permission check for Slack user to be Hue user
     slack_user = check_slack_user_permission(host_domain, user_id)
@@ -144,7 +149,7 @@ def handle_on_link_shared(host_domain, channel_id, message_ts, links, user_id):
     try:
       slack_client.chat_unfurl(channel=channel_id, ts=message_ts, unfurls=payload['payload'])
     except Exception as e:
-      raise PopupException(_("Cannot unfurl link"), detail=e)
+      raise SlackBotException(_("Cannot unfurl link"), detail=e)
     
     # Generate and upload result xlsx file only if result available
     if payload['file_status']:
@@ -157,14 +162,14 @@ def get_user(channel_id, slack_user):
   except User.DoesNotExist:
     bot_message = 'Corresponding Hue user not found or does not have access to the query'
     _send_message(channel_id, bot_message)
-    raise PopupException(_("Slack user does not have access to the query"), error_code=200)
+    raise SlackBotException(_("Slack user does not have access to the query"))
 
 
 def check_slack_user_permission(host_domain, user_id):
   try:
     slack_user = slack_client.users_info(user=user_id)
   except Exception as e:
-    raise PopupException(_("Cannot find query owner in Slack"), detail=e)
+    raise SlackBotException(_("Cannot find query owner in Slack"), detail=e)
 
   response = {
     'is_bot': slack_user['user']['is_bot'],
@@ -197,7 +202,7 @@ def send_result_file(request, channel_id, message_ts, doc, file_format):
       initial_comment='Here is your result file!'
     )
   except Exception as e:
-    raise PopupException(_("Cannot upload result file"), detail=e)
+    raise SlackBotException(_("Cannot upload result file"), detail=e)
 
 
 def _query_result(request, notebook, max_rows):

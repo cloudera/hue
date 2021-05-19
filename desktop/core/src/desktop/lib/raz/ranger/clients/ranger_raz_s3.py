@@ -28,18 +28,26 @@ LOG = logging.getLogger(__name__)
 class RangerRazS3:
   def __init__(self, url, auth):
     self.razClient = RangerRazClient(url, auth)
-    # move `storage_account` into constructor?
 
-  def get_dsas_token(self, storage_account, container, relative_path, action="read"):
+  def get_signed_url(self, region, bucket, relative_path, action="read"):
     req = RangerRazRequest()
+
+    # endpoint_prefix="s3",
+    # service_name="s3",
+    # endpoint=endpoint, # https://s3-us-west-1.amazonaws.com
+    # http_method=self.request.method,
+    # headers=headers,
+    # parameters=allparams,
+    # resource_path=resource_path,
+    # time_offset=0
 
     req.serviceType = "s3"
     req.operation = ResourceAccess(
       # TODO: parameters for S3
       {
         "resource": {
-          "storageaccount": storage_account,
-          "container": container,
+          "storageaccount": region,
+          "container": bucket,
           "relativepath": relative_path,
         },
         "action": action,
@@ -48,6 +56,6 @@ class RangerRazS3:
 
     res = self.razClient.check_privilege(req)
 
-    # TODO: Check if no access inside RangerRazResult and raise exception?
+    # TODO: Check if no access inside RangerRazResult and raise exception, cf. res["operResult"]["result"]=="ALLOWED":
 
-    return res.operResult.additionalInfo["S3_DSAS"]
+    return res.operResult.additionalInfo["S3_SIGN_RESPONSE"]
