@@ -930,12 +930,12 @@ def gist_create(request):
   name = request.POST.get('name', '')
   description = request.POST.get('description', '')
 
-  response = _gist_create(request.get_host(), request.is_secure(), request.user, name, statement, gist_type)
+  response = _gist_create(request.get_host(), request.is_secure(), request.user, statement, gist_type, name)
 
   return JsonResponse(response)
 
 
-def _gist_create(host_domain, is_http_secure, user, name, statement, gist_type):
+def _gist_create(host_domain, is_http_secure, user, statement, gist_type, name=''):
   response = {'status': 0}
 
   statement_raw = statement
