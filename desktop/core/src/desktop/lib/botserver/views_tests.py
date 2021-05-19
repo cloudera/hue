@@ -56,31 +56,77 @@ class TestBotServer(unittest.TestCase):
 
   def setUp(self):
     self.host_domain = 'testserver.gethue.com'
+    self.is_http_secure = True # https if true else http
+
     self.email_domain = '.'.join(self.host_domain.split('.')[-2:])
 
   def test_handle_on_message(self):
     with patch('desktop.lib.botserver.views._send_message') as _send_message:
+      with patch('desktop.lib.botserver.views.detect_select_statement') as detect_select_statement:
       
-      response = handle_on_message("channel", "bot_id", "text", "user_id")
-      assert_equal(response.status_code, 200)
-      assert_false(_send_message.called)
-      
-      handle_on_message("channel", None, None, "user_id")
-      assert_false(_send_message.called)
+        channel_id = "channel"
+        bot_id = "bot_id"
+        user_id = "user_id"
+        message_element = [{
+          'elements': [{
+            'text': 'hello hue test'
+          }]
+        }]
 
-      handle_on_message("channel", None, "text", "user_id")
-      assert_false(_send_message.called)
+        # Bot sending message
+        response = handle_on_message(self.host_domain, self.is_http_secure, channel_id, bot_id, message_element, user_id)
+        assert_equal(response.status_code, 200)
+        assert_false(_send_message.called)
 
-      handle_on_message("channel", None, "hello hue test", "user_id")
-      _send_message.assert_called_with("channel", 'Hi <@user_id> :wave:')
+        # Greeting user
+        handle_on_message(self.host_domain, self.is_http_secure, channel_id, None, message_element, user_id)
+        _send_message.assert_called_with(channel_id, 'Hi <@user_id> :wave:')
 
-    with patch('desktop.lib.botserver.views.slack_client.chat_postEphemeral') as chat_postEphemeral:
-      handle_on_message("channel", None, "test select 1 test", "user_id")
-      chat_postEphemeral.assert_called_with(
-        channel="channel",
-        user="user_id",
-        text='Hi <@user_id>\nInstead of copy/pasting SQL, now you can send Editor links which unfurls in a rich preview!')
-  
+        # Detect SQL
+        message_element = [
+          {
+            'elements': [{
+              'text': 'Hi Team, need help with query',
+            }],
+          },
+          {
+            'elements': [{
+              'text': 'SELECT 1',
+            }],
+          },
+        ]
+
+        handle_on_message(self.host_domain, self.is_http_secure, channel_id, None, message_element, user_id)
+        detect_select_statement.assert_called_with(self.host_domain, self.is_http_secure, channel_id, user_id, 'select 1')
+
+  def test_detect_select_statement(self):
+    with patch('desktop.lib.botserver.views.check_slack_user_permission') as check_slack_user:
+      with patch('desktop.lib.botserver.views.get_user') as get_user:
+        with patch('desktop.lib.botserver.views.get_cluster_config') as get_cluster_config:
+          with patch('desktop.lib.botserver.views._send_message') as _send_message:
+            with patch('desktop.lib.botserver.views._gist_create') as _gist_create:
+
+              channel_id = "channel"
+              user_id = "user_id"
+              statement = 'select 1'
+
+              get_user.return_value = self.user
+
+              get_cluster_config.return_value = {
+                'default_sql_interpreter': 'hive'
+              }
+              _gist_create.return_value = {
+                'link': 'gist_link'
+              }
+
+              detect_select_statement(self.host_domain, self.is_http_secure, channel_id, user_id, statement)
+              _send_message.assert_called_with(
+                channel_id, 
+                ('Hi <@user_id>\n'
+                'Looks like you are copy/pasting SQL, instead now you can send Editor links which unfurls in a rich preview!\n'
+                'Here is the gist link\n gist_link')
+              )
+
   def test_handle_query_history_link(self):
     with patch('desktop.lib.botserver.views.slack_client.chat_unfurl') as chat_unfurl:
       with patch('desktop.lib.botserver.views._check_status') as check_status:
