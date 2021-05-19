@@ -172,7 +172,7 @@ class Client(object):
     try:
       # Use V4 signature support by default
       os.environ['S3_USE_SIGV4'] = 'True'
-      if self._host is not None:
+      if self._host is not None and not aws_conf.IS_SELF_SIGNING_ENABLED.get():
         kwargs.update({'host': self._host})
         connection = boto.s3.connection.S3Connection(**kwargs)
       elif self._region:

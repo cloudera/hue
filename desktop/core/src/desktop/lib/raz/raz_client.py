@@ -83,16 +83,16 @@ class RazClient(object):
     self.requestid = str(uuid.uuid4())
 
   def check_access(self, method, url, params=None, headers=None):
-    o = lib_urlparse(url)
-    url_params = dict([p.split('=') for p in o.query.split('&') if o.query])
+    path = lib_urlparse(url)
+    url_params = dict([p.split('=') for p in path.query.split('&') if path.query])
     params = params if params is not None else {}
     headers = headers if headers is not None else {}
 
     allparams = [raz_signer.StringListStringMapProto(key=key, value=val) for key, val in url_params.items()]
     allparams.extend([raz_signer.StringListStringMapProto(key=key, value=val) for key, val in params.items()])
     headers = [raz_signer.StringStringMapProto(key=key, value=val) for key, val in headers.items()]
-    endpoint = "%s://%s" % (o.scheme, o.netloc)
-    resource_path = o.path.lstrip("/")
+    endpoint = "%s://%s" % (path.scheme, path.netloc)
+    resource_path = path.path.lstrip("/")
 
     LOG.debug(
       "Preparing sign request with http_method: {%s}, header: {%s}, parameters: {%s}, endpoint: {%s}, resource_path: {%s}" %

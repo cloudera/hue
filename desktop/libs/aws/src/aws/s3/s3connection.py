@@ -186,7 +186,7 @@ class SelfSignedUrlS3Connection(SignedUrlS3Connection):
 
     # http://boto.cloudhackers.com/en/latest/ref/s3.html#boto.s3.connection.S3Connection.generate_url
     signed_url = self.generate_url(1000, method, **kwargs)
-    LOG.debug(signed_url)
+    LOG.debug('Generated url: %s' % signed_url)
 
     http_request.path = signed_url.replace(http_request.protocol + '://' + http_request.host.split(':')[0], '')
     p, h = http_request.path.split('?')
@@ -288,6 +288,7 @@ class UrlKey(Key):
     try:
       # http://boto.cloudhackers.com/en/latest/ref/s3.html#boto.s3.key.Key.generate_url
       signed_url = self.generate_url(self.expiration, action, **kwargs)
+      LOG.debug('Generated url: %s' % signed_url)
     except BotoClientError as e:
       LOG.error(e)
       if signed_url is None:
@@ -314,6 +315,7 @@ class UrlBucket(Bucket):
     # TODO: if GET --> max length to add
 
     signed_url = self.connection.generate_url(3000, action, **kwargs)
+    LOG.debug('Generated url: %s' % signed_url)
 
     if action == 'HEAD':
       response = requests.head(signed_url)
@@ -367,6 +369,7 @@ class UrlBucket(Bucket):
     kwargs = {'bucket': self.name, 'key': '', 'response_headers': params}
 
     signed_url = self.connection.generate_url(3000, 'GET', **kwargs)
+    LOG.debug('Generated url: %s' % signed_url)
 
     response = requests.get(signed_url)
 
@@ -390,6 +393,7 @@ class UrlBucket(Bucket):
     try:
       # http://boto.cloudhackers.com/en/latest/ref/s3.html#boto.s3.bucket.Bucket.generate_url
       signed_url = self.generate_url(self.expiration, action, **kwargs)
+      LOG.debug('Generated url: %s' % signed_url)
     except BotoClientError as e:
       LOG.error(e)
       if signed_url is None:
@@ -415,6 +419,7 @@ class SelfSignedUrlClient(SignedUrlClient):
     try:
       # http://boto.cloudhackers.com/en/latest/ref/s3.html#boto.s3.connection.S3Connection.generate_url
       signed_url = self.connection.generate_url(self.expiration, action, **kwargs)
+      LOG.debug('Generated url: %s' % signed_url)
     except BotoClientError as e:
       LOG.error(e)
       if signed_url is None:
