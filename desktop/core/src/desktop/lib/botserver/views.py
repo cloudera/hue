@@ -26,6 +26,7 @@ from desktop.lib.botserver.api import _send_message
 from desktop.lib.django_util import login_notrequired, JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.models import Document2, _get_gist_document, get_cluster_config
+from desktop.api2 import _gist_create
 from desktop.auth.backend import rewrite_user
 
 from notebook.api import _fetch_result_data, _check_status, _execute_notebook
@@ -109,25 +110,12 @@ def detect_select_statement(host_domain, is_http_secure, channel_id, user_id, st
 
   default_dialect = get_cluster_config(rewrite_user(user))['default_sql_interpreter']
 
-  gist_doc = Document2.objects.create(
-    name='{dialect_name} Query'.format(dialect_name=default_dialect),
-    type='gist',
-    owner=user,
-    data=json.dumps({'statement': statement, 'statement_raw': statement}),
-    extra=default_dialect,
-    parent_directory=Document2.objects.get_gist_directory(user)
-  )
-
-  gist_link = '%(scheme)s://%(host)s/hue/gist?uuid=%(uuid)s' % {
-    'scheme': 'https' if is_http_secure else 'http',
-    'host': host_domain,
-    'uuid': gist_doc.uuid,
-  }
+  gist_response = _gist_create(host_domain, is_http_secure, user, statement, default_dialect)
 
   bot_message = ('Hi <@{user}>\n'
   'Looks like you are copy/pasting SQL, instead now you can send Editor links which unfurls in a rich preview!\n'
   'Here is the gist link\n {gist_link}'
-  ).format(user=user_id, gist_link=gist_link)
+  ).format(user=user_id, gist_link=gist_response['link'])
   _send_message(channel_id, bot_message)
 
 
