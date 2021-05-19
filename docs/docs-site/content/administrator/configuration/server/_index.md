@@ -779,52 +779,12 @@ The 'Smart Quering Assistance' block on top of Hue server which driving the othe
 Steps to be followed by the Hue user to set up their own Hue Slack app for their workspace.
 
 #### App Manifest (YAML)
-    _metadata:
-      major_version: 1
-      minor_version: 1
-    display_information:
-      name: SQL Assistant
-      description: Share queries, ask where is the data, how to query it.. questions.
-      background_color: "#000000"
-    features:
-      app_home:
-        home_tab_enabled: false
-        messages_tab_enabled: false
-        messages_tab_read_only_enabled: true
-      bot_user:
-        display_name: Hue Bot
-        always_online: true
-      unfurl_domains:
-        - <hue-instance-hostname>
-    oauth_config:
-      scopes:
-        bot:
-          - app_mentions:read
-          - channels:history
-          - channels:read
-          - chat:write
-          - files:write
-          - links:read
-          - links:write
-          - users:read
-          - users:read.email
-    settings:
-      event_subscriptions:
-        request_url: https://<hue-instance-hostname>/desktop/slack/events/
-        bot_events:
-          - app_mention
-          - link_shared
-          - message.channels
-      org_deploy_enabled: false
-      socket_mode_enabled: false
-      is_hosted: false
-
-The latest version of the manifest file is checked-in [here](https://github.com/cloudera/hue/tree/master/tools/slack)
+The latest version of the manifest file is checked-in [here](https://github.com/cloudera/hue/blob/master/tools/slack/manifest.yml)
 
 #### Changes needed in the YAML Manifest
-Update with your Hue instance hostname in two locations:
-- Under **unfurl_domains** (e.g. demo.gethue.com)
-- Under **event_subscriptions**, update **request_url** `https://<hue-instance-hostname>/desktop/slack/events/`
+Update the two _demo.gethue.com_ with **your Hue instance hostname:**
+- Under **unfurl_domains**
+- Under **event_subscriptions**, in **request_url** `https://<hue-instance-hostname>/desktop/slack/events/`
 
 
 #### Creating your app
@@ -845,4 +805,4 @@ Update with your Hue instance hostname in two locations:
         slack_verification_token=<your-slack-verification-token>
         slack_bot_user_token=<your-slack-bot-user-token>
 
-Now add the Slack app in your desired channels and send some [query/gist links](https://docs.gethue.com/user/concept/#share-to-slack)!
+Now add the Slack app in your desired channels and send some [query/gist links](/user/concept/#share-to-slack)!
