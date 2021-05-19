@@ -90,6 +90,13 @@ export default class EditorViewModel {
       () => this.activeConnector() && this.activeConnector().displayName
     );
 
+    this.editorIcon = ko.pureComputed(() => {
+      const dialect = this.activeConnector()?.dialect;
+      return window.ENABLE_UNIFIED_ANALYTICS && dialect === 'hive'
+        ? 'impala'
+        : dialect || this.editorType();
+    });
+
     this.activeConnector.subscribe(connector => {
       if (connector) {
         if (hueUtils.getParameter('type') !== connector.id) {
