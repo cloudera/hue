@@ -362,8 +362,12 @@ if desktop.conf.CORS_ENABLED.get():
   INSTALLED_APPS.append('corsheaders')
   MIDDLEWARE.insert(0, 'corsheaders.middleware.CorsMiddleware')
   MIDDLEWARE.remove('django.middleware.csrf.CsrfViewMiddleware')
-  CORS_ALLOW_ALL_ORIGINS = True
-  CORS_ORIGIN_ALLOW_ALL = True  # Old Py2 way
+  if sys.version_info[0] > 2:
+    CORS_ALLOW_ALL_ORIGINS = True
+  else:
+    CORS_ORIGIN_ALLOW_ALL = True
+  CORS_ALLOW_CREDENTIALS = True  # For when cookie auth
+  SESSION_COOKIE_SAMESITE = None
 
 # Configure database
 if os.getenv('DESKTOP_DB_CONFIG'):

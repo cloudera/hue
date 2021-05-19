@@ -513,7 +513,7 @@ def listdir_paged(request, path):
     else:
       all_stats = request.fs.listdir_stats(path)
   except S3ListAllBucketsException as e:
-    s3_listing_not_allowed = e.message
+    s3_listing_not_allowed = str(e)
     all_stats = []
 
 
@@ -966,7 +966,7 @@ def detect_gzip(contents):
   if sys.version_info[0] > 2:
     return contents[:2] == b'\x1f\x8b'
   else:
-    return contents[:2] == '\x1f\x8b' 
+    return contents[:2] == '\x1f\x8b'
 
 
 def detect_bz2(contents):

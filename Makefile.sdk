@@ -160,6 +160,8 @@ ext-env-install: ext-eggs $(EXT_PY_ENV_INSTALL_TARGETS)
 	  echo "--- Installing $$i into virtual environment" ; \
 	  $(ENV_EASY_INSTALL) -Z -N $$i 2> /dev/null ; \
 	done
+	@$(ENV_PIP) install --upgrade pip
+	@$(ENV_PIP) install cryptography==3.3.2 future==0.18.2 python-daemon==2.2.4
 
 $(EXT_PY_ENV_INSTALL_TARGETS):
 	@echo '--- Installing $(CUR_EXT_PY) into virtual environment'

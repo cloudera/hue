@@ -270,8 +270,12 @@ AWS_ACCOUNTS = UnspecifiedConfigSection(
 
 
 def is_enabled():
+  from desktop.conf import RAZ  # Must be imported dynamically in order to have proper value
   return ('default' in list(AWS_ACCOUNTS.keys()) and AWS_ACCOUNTS['default'].get_raw() and AWS_ACCOUNTS['default'].ACCESS_KEY_ID.get()) or \
-      has_iam_metadata() or conf_idbroker.is_idbroker_enabled('s3a')
+      has_iam_metadata() or \
+      conf_idbroker.is_idbroker_enabled('s3a') or \
+      RAZ.IS_ENABLED.get() or \
+      IS_SELF_SIGNING_ENABLED.get()
 
 
 def is_ec2_instance():

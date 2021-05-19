@@ -44,6 +44,10 @@ else:
 
 LOG = logging.getLogger(__name__)
 
+class SlackBotException(PopupException):
+  def __init__(self, msg, detail=None, error_code=200):
+    PopupException.__init__(self, message=msg, detail=detail, error_code=error_code)
+
 
 @login_notrequired
 @csrf_exempt
@@ -60,52 +64,61 @@ def slack_events(request):
       return JsonResponse(response_dict, status=200)
     
     if 'event' in slack_message:
-      event_message = slack_message['event']
-      parse_events(event_message)
+      parse_events(request, slack_message['event'])
   except ValueError as err:
     raise PopupException(_("Response content is not valid JSON"), detail=err)
 
   return HttpResponse(status=200)
 
 
-def parse_events(event):
+def parse_events(request, event):
   """
   Parses the event according to its 'type'.
 
   """
   channel_id = event.get('channel')
   user_id = event.get('user')
+  message_element = event['blocks'][0]['elements'] if event.get('blocks') else []
 
   if event.get('type') == 'message':
-    handle_on_message(channel_id, event.get('bot_id'), event.get('text'), user_id)
+    handle_on_message(channel_id, event.get('bot_id'), message_element, user_id)
 
   if event.get('type') == 'link_shared':
-    handle_on_link_shared(channel_id, event.get('message_ts'), event.get('links'), user_id)
+    handle_on_link_shared(request.get_host(), channel_id, event.get('message_ts'), event.get('links'), user_id)
 
 
-def handle_on_message(channel_id, bot_id, text, user_id):
+def handle_on_message(channel_id, bot_id, elements, user_id):
   # Ignore bot's own message since that will cause an infinite loop of messages if we respond.
   if bot_id is not None:
     return HttpResponse(status=200)
   
-  if slack_client is not None:
-    if text and 'hello hue' in text.lower():
+  for element_block in elements:
+    text = element_block['elements'][0].get('text', '') if element_block.get('elements') else ''
+
+    if 'hello hue' in text.lower():
       bot_message = 'Hi <@{user}> :wave:'.format(user=user_id)
       _send_message(channel_id, bot_message)
 
-    if text and 'select 1' in text.lower():
-      raw_sql_message = 'Hi <@{user}>\nInstead of copy/pasting SQL, now you can send Editor links which unfurls in a rich preview!'.format(user=user_id)
-      _send_ephemeral_message(channel_id, user_id, raw_sql_message)
+    if text.lower().startswith('select'):
+      detect_select_statement(channel_id, user_id, text.lower())
+
+
+def detect_select_statement(channel_id, user_id, statement):
+  if not statement.endswith(';'):
+    statement += ';'
+  
+  raw_sql_message = 'Hi <@{user}>\nLooks like you are copy/pasting SQL, instead now you can send Editor links which unfurls in a rich preview!'.format(user=user_id)
+  _send_ephemeral_message(channel_id, user_id, raw_sql_message)
 
 
 def _send_ephemeral_message(channel_id, user_id, raw_sql_message):
   try:
     slack_client.chat_postEphemeral(channel=channel_id, user=user_id, text=raw_sql_message)
   except Exception as e:
-    raise PopupException(_("Error posting ephemeral message"), detail=e)
+    raise SlackBotException(_("Error posting ephemeral message"), detail=e)
 
 
-def handle_on_link_shared(channel_id, message_ts, links, user_id):
+def handle_on_link_shared(host_domain, channel_id, message_ts, links, user_id):
   for item in links:
     path = urlsplit(item['url'])[2]
     id_type, qid = urlsplit(item['url'])[3].split('=')
@@ -119,48 +132,51 @@ def handle_on_link_shared(channel_id, message_ts, links, user_id):
         doc = _get_gist_document(**query_id)
         doc_type = 'gist'
       else:
-        raise PopupException(_("Cannot unfurl link"))
+        raise SlackBotException(_("Cannot unfurl link"))
     except Document2.DoesNotExist:
       msg = "Document with {key} does not exist".format(key=query_id)
-      raise PopupException(_(msg))
+      raise SlackBotException(_(msg))
 
     # Permission check for Slack user to be Hue user
-    try:
-      slack_user = slack_user_check(user_id)
-      user = User.objects.get(username=slack_user['user_email_prefix']) if not slack_user['is_bot'] else doc.owner
-    except User.DoesNotExist:
-      bot_message = 'Corresponding Hue user not found or does not have access to the query'
-      _send_message(channel_id, bot_message)
-      raise PopupException(_("Slack user does not have access to the query"))
-
+    slack_user = check_slack_user_permission(host_domain, user_id)
+    user = get_user(channel_id, slack_user) if not slack_user['is_bot'] else doc.owner
     doc.can_read_or_exception(user)
 
-    # Mock request for query execution and fetch result
-    user = rewrite_user(user)
-    request = MockRequest(user=user)
+    request = MockRequest(user=rewrite_user(user))
 
     payload = _make_unfurl_payload(request, item['url'], id_type, doc, doc_type)
     try:
       slack_client.chat_unfurl(channel=channel_id, ts=message_ts, unfurls=payload['payload'])
     except Exception as e:
-      raise PopupException(_("Cannot unfurl link"), detail=e)
+      raise SlackBotException(_("Cannot unfurl link"), detail=e)
     
     # Generate and upload result xlsx file only if result available
     if payload['file_status']:
       send_result_file(request, channel_id, message_ts, doc, 'xls')
 
 
-def slack_user_check(user_id):
+def get_user(channel_id, slack_user):
+  try:
+    return User.objects.get(username=slack_user.get('user_email_prefix'))
+  except User.DoesNotExist:
+    bot_message = 'Corresponding Hue user not found or does not have access to the query'
+    _send_message(channel_id, bot_message)
+    raise SlackBotException(_("Slack user does not have access to the query"))
+
+
+def check_slack_user_permission(host_domain, user_id):
   try:
     slack_user = slack_client.users_info(user=user_id)
   except Exception as e:
-    raise PopupException(_("Cannot find query owner in Slack"), detail=e)
-  
+    raise SlackBotException(_("Cannot find query owner in Slack"), detail=e)
+
   response = {
     'is_bot': slack_user['user']['is_bot'],
   }
   if not slack_user['user']['is_bot']:
-    response['user_email_prefix'] = slack_user['user']['profile']['email'].split('@')[0]
+    email_prefix, email_domain = slack_user['user']['profile']['email'].split('@')
+    if email_domain == '.'.join(host_domain.split('.')[-2:]):
+      response['user_email_prefix'] = email_prefix
 
   return response
 
@@ -185,7 +201,7 @@ def send_result_file(request, channel_id, message_ts, doc, file_format):
       initial_comment='Here is your result file!'
     )
   except Exception as e:
-    raise PopupException(_("Cannot upload result file"), detail=e)
+    raise SlackBotException(_("Cannot upload result file"), detail=e)
 
 
 def _query_result(request, notebook, max_rows):

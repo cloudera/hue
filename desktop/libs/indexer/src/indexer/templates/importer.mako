@@ -203,7 +203,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
       <h4>${_('Source')}</h4>
       <div class="card-body">
         <div>
-          <div class="control-group" data-bind="visible: createWizard.prefill.target_type().length == 0 || createWizard.prefill.source_type() == 'all'">
+          <div class="control-group" data-bind="visible: ((createWizard.prefill.target_type().length == 0 || createWizard.prefill.source_type() == 'all') && createWizard.source.inputFormats().length > 1)">
             <label for="sourceType" class="control-label"><div>${ _('Type') }</div>
               <select id="sourceType" data-bind="selectize: createWizard.source.inputFormats, value: createWizard.source.inputFormat, optionsText: 'name', optionsValue: 'value'"></select>
             </label>
@@ -533,7 +533,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
         <h4>${_('Destination')}</h4>
         <div class="card-body">
           <div class="control-group">
-            <label for="destinationType" class="control-label" data-bind="visible: $parent.createWizard.prefill.target_type().length == 0"><div>${ _('Type') }</div>
+            <label for="destinationType" class="control-label" data-bind="visible: $parent.createWizard.prefill.target_type().length == 0 && outputFormats().length > 1"><div>${ _('Type') }</div>
               <select id="destinationType" data-bind="selectize: outputFormats, value: outputFormat, optionsValue: 'value', optionsText: 'name'"></select>
             </label>
           </div>
@@ -552,7 +552,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
             <!-- ko if: ['table', 'database'].indexOf(outputFormat()) != -1 -->
             <div data-bind="visible: $parent.createWizard.source.inputFormat() == 'localfile'">
               <label for="dialectType" class="control-label "><div>${ _('Dialect') }</div>
-                <select  id="dialectType" data-bind="selectize: $parent.createWizard.source.interpreters, value: $parent.createWizard.source.interpreter, optionsText: 'name', optionsValue: 'dialect'"></select>
+                <select  id="dialectType" data-bind="selectize: $parent.createWizard.source.interpreters, value: $parent.createWizard.source.interpreter, optionsText: 'name', optionsValue: 'type'"></select>
               </label>
             </div>
             <label for="collectionName" class="control-label "><div>${ _('Name') }</div></label>
@@ -2213,7 +2213,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
           wizard.computeSetDeferred.done(function () {
             dataCatalog.getEntry({
               compute: wizard.compute(),
-              connector: { id: self.sourceType }, // TODO: Use connectors in the importer
+              connector: { id: self.sourceType() }, // TODO: Use connectors in the importer
               namespace: wizard.namespace(),
               path: self.outputFormat() === 'table' ? [self.databaseName(), self.tableName()] : [],
             }).then(function (catalogEntry) {
