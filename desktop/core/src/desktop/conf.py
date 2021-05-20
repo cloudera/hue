@@ -1788,6 +1788,13 @@ IS_K8S_ONLY = Config(
   help=_('Choose whether to pick configs only from [desktop] [[cluster]]')
 )
 
+ENABLE_UNIFIED_ANALYTICS = Config(
+  key='enable_unified_analytics',
+  default=False,
+  type=coerce_bool,
+  help=_('Choose whether Hive represents Unified Analytics or not.')
+)
+
 ENABLE_ORGANIZATIONS = Config(
   key='enable_organizations',
   default=False,

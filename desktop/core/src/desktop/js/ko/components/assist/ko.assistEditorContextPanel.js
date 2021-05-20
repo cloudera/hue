@@ -354,7 +354,7 @@ class AssistEditorContextPanel {
             initialNamespace: activeLocations.namespace,
             connector: activeLocations.connector,
             type: activeLocations.connector.id,
-            name: activeLocations.type,
+            name: activeLocations.connector.displayName,
             navigationSettings: navigationSettings
           }),
           databaseIndex: {},

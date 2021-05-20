@@ -20,7 +20,7 @@ import logging
 import sys
 
 from useradmin.models import update_app_permissions
-from notebook.conf import config_validator, _connector_to_iterpreter
+from notebook.conf import config_validator, _connector_to_interpreter
 
 from desktop.auth.decorators import admin_required
 from desktop.decorators import api_error_handler
@@ -124,7 +124,7 @@ def test_connector(request):
   connector = json.loads(request.POST.get('connector', '{}'))
 
   # Currently only Editor connectors are supported.
-  interpreter = _connector_to_iterpreter(
+  interpreter = _connector_to_interpreter(
       _augment_connector_properties(connector)
   )
   interpreter['type'] = 'hello'  # This is the id of the common health check query

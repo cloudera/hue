@@ -1,4 +1,0 @@
-unittest2
-argparse     # for the http.server module
-importlib
-

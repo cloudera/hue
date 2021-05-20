@@ -49,7 +49,7 @@ from useradmin.organization import _fitered_queryset
 from desktop import appmanager
 from desktop.auth.backend import is_admin
 from desktop.conf import get_clusters, IS_MULTICLUSTER_ONLY, ENABLE_ORGANIZATIONS, ENABLE_PROMETHEUS, \
-    has_connectors, TASK_SERVER, APP_BLACKLIST, ENABLE_SHARING, ENABLE_CONNECTORS
+    has_connectors, TASK_SERVER, APP_BLACKLIST, ENABLE_SHARING, ENABLE_CONNECTORS, ENABLE_UNIFIED_ANALYTICS
 from desktop.lib import fsmanager
 from desktop.lib.connectors.api import _get_installed_connectors
 from desktop.lib.connectors.models import Connector
@@ -1833,7 +1833,7 @@ class ClusterConfig(object):
           'name': interpreter['name'],
           'type': interpreter['type'],  # Connector v1
           'id': interpreter['type'],
-          'displayName': interpreter['name'],
+          'displayName': 'Unified Analytics' if ENABLE_UNIFIED_ANALYTICS.get() and interpreter['dialect'] == 'hive' else  interpreter['name'],
           'buttonName': _('Query'),
           'tooltip': _('%s Query') % interpreter['type'].title(),
           'optimizer': get_optimizer_mode(),
@@ -1889,7 +1889,7 @@ class ClusterConfig(object):
           'name': interpreter['name'],
           'type': interpreter['type'],
           'id': interpreter['type'],
-          'displayName': interpreter['name'],
+          'displayName': 'Unified Analytics' if ENABLE_UNIFIED_ANALYTICS.get() and interpreter['dialect'] == 'hive' else  interpreter['name'],
           'buttonName': _('Query'),
           'tooltip': _('%s Query') % interpreter['type'].title(),
           'page': '/editor/?type=%(type)s' % interpreter,

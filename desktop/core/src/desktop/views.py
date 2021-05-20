@@ -450,8 +450,10 @@ def serve_500_error(request, *args, **kwargs):
         # If (None, None, None), default server error describing why this failed.
         return django.views.debug.technical_500_response(request, *exc_info)
       else:
-        # Could have an empty traceback
-        return render("500.mako", request, {'traceback': traceback.extract_tb(exc_info[2])})
+        tb = traceback.extract_tb(exc_info[2])
+        if request.is_ajax():
+          tb = '\n'.join(tb.format())
+        return render("500.mako", request, {'traceback': tb})
     else:
       # exc_info could be empty
       return render("500.mako", request, {})
