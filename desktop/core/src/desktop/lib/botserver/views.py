@@ -101,10 +101,10 @@ def handle_on_message(host_domain, is_http_secure, channel_id, bot_id, elements,
       _send_message(channel_id, bot_message)
 
     if text.lower().startswith('select'):
-      detect_select_statement(host_domain, is_http_secure, channel_id, user_id, text.lower())
+      handle_select_statement(host_domain, is_http_secure, channel_id, user_id, text.lower())
 
 
-def detect_select_statement(host_domain, is_http_secure, channel_id, user_id, statement):
+def handle_select_statement(host_domain, is_http_secure, channel_id, user_id, statement):
   slack_user = check_slack_user_permission(host_domain, user_id)
   user = get_user(channel_id, slack_user)
 
