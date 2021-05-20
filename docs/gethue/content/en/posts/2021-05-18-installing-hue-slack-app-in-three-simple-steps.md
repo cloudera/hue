@@ -42,25 +42,27 @@ categories:
   - Version 4.10
 
 ---
-Slack recently rolled out its [App Manifest](https://api.slack.com/reference/manifests) beta feature for Slack Apps. With a manifest, you can create an app with a predefined configuration.
+Ever wondered about having a SQL Assistant which can help you to collaborate better with other SQL users in your team? That too in Slack itself!?
 
-Using this feature, the Hue App can now be installed in your Slack workspace in just 3 simple steps!
+This Slack Integration for Hue can fit those shoes for assisting you with your SQL queries in your Slack channels. [Easy to use](https://docs.gethue.com/user/concept/#slack) and now even easy to install for Slack workspace admins in just 3 simple steps!
 
-The latest version of the App Manifest is checked-in the [Hue Repo](https://github.com/cloudera/hue/tree/master/tools/slack).
+Kudos to Slack for recently rolling out its [App Manifest](https://api.slack.com/reference/manifests) beta feature for Slack Apps! With a manifest now, you can create an app with a predefined configuration.
 
-In the shared Manifest, update with your Hue instance hostname at two locations
-- Under **unfurl_domains** (e.g. hue.gethue.com)
-- Under **event_subscriptions**, update **request_url** `https://<hue-instance-hostname>/desktop/slack/events/`
+The latest version of the App Manifest is checked-in the [Hue Repository](https://github.com/cloudera/hue/blob/master/tools/slack/manifest.yml).
 
-Now, it's time to create your own app
+In the shared manifest, Update the two _demo.gethue.com_ with **your Hue instance hostname:**
+- Under **unfurl_domains**
+- Under **event_subscriptions**, in **request_url** `https://<hue-instance-hostname>/desktop/slack/events/`
+
+Now, it's time to create your own app:
 
 1. Go to https://api.slack.com/apps and click **Create New App**.
-2. Choose **From an app manifest** option and workspace that you'll be installing the app and click** Next**.
+2. Choose **From an app manifest** option and workspace that you'll be installing the app and click **Next**.
 3. Choose **YAML** and paste the Manifest code (make sure you do the necessary changes mentioned above) and click **Next**.
 4. Read the review summary and if everything’s correct, click **Create**.
 5. Once the app is created, install it in the workspace!
 
-Completing the last step of the puzzle, it's time to update your hue.ini configuration file
+Completing the last step of plugging it with Hue, it's time to update your hue.ini configuration file:
 
 6. Go to the **OAuth & Permissions page**, copy the **Bot User OAuth Token** and update **slack_bot_user_token** (e.g. xoxb-xxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxx)
 7. Similarly, go to the **Basic Information** page, copy the **Verification Token** and update **slack_verification_token**
@@ -71,9 +73,9 @@ Completing the last step of the puzzle, it's time to update your hue.ini configu
         slack_verification_token=<your-slack-verification-token>
         slack_bot_user_token=<your-slack-bot-user-token>
 
-That’s it! Your own Hue App is ready to go!
+That’s it! Your own Hue App is ready to roll!
 
-Read its [user guide](https://docs.gethue.com/user/concept/#share-to-slack) and [feedback](https://github.com/cloudera/hue/issues) is highly welcomed!
+Read its [user guide](https://docs.gethue.com/user/concept/#share-to-slack) or the [blog](https://gethue.com/blog/2021-04-09-collaborate-on-your-sql-queries-and-results-directly-within-slack/) and stay tuned for upcoming updates.
 
 ### Try it out!
 
@@ -81,19 +83,14 @@ Get your hands on demo Hue App by:
 
 Running some queries on the [demo live editor](https://demo.gethue.com/).
 
-Joining the [demo Slack workspace](https://join.slack.com/t/hue-bot-dev/shared_invite/zt-opqwvv68-eQFeios8FzFbmqQJ5wBNzg) to see the app in action or by using the following credentials:
+Joining the [demo Slack workspace](https://join.slack.com/t/hue-bot-dev/shared_invite/zt-pqep28s6-zd69W73EOWL5pCVDz06OBg) to see the app in action or by using the following credentials:
 
     Slack account email: demo@gethue.com
     Slack account password: gethue
 
-Till then, run some queries, copy those links and share ‘em all!
-
 </br>
 </br>
 
-Any feedback or question? Feel free to comment here or on the <a href="https://discourse.gethue.com/">Forum</a> and <a href="https://docs.gethue.com/quickstart/">quick start</a> SQL querying!
-
-
-Onwards!
+Any [feedback](https://github.com/cloudera/hue/issues) or question is highly welcomed! Feel free to comment here or on the <a href="https://discourse.gethue.com/">Forum</a> and <a href="https://docs.gethue.com/quickstart/">quick start</a> SQL querying!
 
 Harsh from the Hue Team
