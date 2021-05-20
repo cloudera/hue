@@ -62,7 +62,7 @@ class TestBotServer(unittest.TestCase):
 
   def test_handle_on_message(self):
     with patch('desktop.lib.botserver.views._send_message') as _send_message:
-      with patch('desktop.lib.botserver.views.detect_select_statement') as detect_select_statement:
+      with patch('desktop.lib.botserver.views.handle_select_statement') as handle_select_statement:
       
         channel_id = "channel"
         bot_id = "bot_id"
@@ -97,9 +97,9 @@ class TestBotServer(unittest.TestCase):
         ]
 
         handle_on_message(self.host_domain, self.is_http_secure, channel_id, None, message_element, user_id)
-        detect_select_statement.assert_called_with(self.host_domain, self.is_http_secure, channel_id, user_id, 'select 1')
+        handle_select_statement.assert_called_with(self.host_domain, self.is_http_secure, channel_id, user_id, 'select 1')
 
-  def test_detect_select_statement(self):
+  def test_handle_select_statement(self):
     with patch('desktop.lib.botserver.views.check_slack_user_permission') as check_slack_user:
       with patch('desktop.lib.botserver.views.get_user') as get_user:
         with patch('desktop.lib.botserver.views.get_cluster_config') as get_cluster_config:
@@ -119,7 +119,7 @@ class TestBotServer(unittest.TestCase):
                 'link': 'gist_link'
               }
 
-              detect_select_statement(self.host_domain, self.is_http_secure, channel_id, user_id, statement)
+              handle_select_statement(self.host_domain, self.is_http_secure, channel_id, user_id, statement)
               _send_message.assert_called_with(
                 channel_id, 
                 ('Hi <@user_id>\n'
