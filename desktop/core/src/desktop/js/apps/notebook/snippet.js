@@ -208,18 +208,7 @@ class Snippet {
     });
 
     self.isSqlDialect = ko.pureComputed(() => {
-      return vm.getSnippetViewSettings(self.type()).sqlDialect;
-    });
-
-    self.connector = ko.pureComputed(() => {
-      // To support optimizer changes in editor v2
-      return {
-        optimizer: self.type() === 'hive' || self.type() === 'impala' ? 'api' : 'off',
-        type: self.type(),
-        id: self.type(),
-        dialect: self.type(),
-        is_sql: self.isSqlDialect()
-      };
+      return vm.getSnippetViewSettings(self.dialect()).sqlDialect;
     });
 
     self.dialect = ko.pureComputed(() => this.connector().dialect);
