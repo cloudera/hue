@@ -24,7 +24,6 @@ standard_library.install_aliases()
 from thrift.transport import TTransport
 from thrift.transport.TTransport import *
 from thrift.protocol import TBinaryProtocol
-import sasl
 import struct
 import sys
 
