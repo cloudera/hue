@@ -21,7 +21,6 @@
 # as local_settings.py.
 
 from builtins import map, zip
-import datetime
 import gc
 import json
 import logging
@@ -29,8 +28,6 @@ import os
 import pkg_resources
 import sys
 import uuid
-
-import django_opentracing
 
 import desktop.redaction
 

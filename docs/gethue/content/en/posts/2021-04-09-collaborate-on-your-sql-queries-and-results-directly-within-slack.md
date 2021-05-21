@@ -101,12 +101,12 @@ Also stay tuned for more such functionalities such as replying to users asking q
 
 Get your hands on this beta feature by:
 
-Running some queries on the [demo live editor](https://demo.gethue.com/).
+- Running some queries on the [demo live editor](https://demo.gethue.com/).
 
-Joining the [demo Slack workspace](https://join.slack.com/t/hue-bot-dev/shared_invite/zt-opqwvv68-eQFeios8FzFbmqQJ5wBNzg) to see the app in action or by using the following credentials:
+- Logging in to [demo workspace](https://demo-hue.slack.com/) by using the following credentials:
 
-    Slack account email: demo@gethue.com
-    Slack account password: gethue
+      Slack account email: demo@gethue.com
+      Slack account password: gethue
 
 Till then, run some queries, copy those links and share ‘em all!
 
