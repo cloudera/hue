@@ -80,10 +80,10 @@ Read its [user guide](https://docs.gethue.com/user/concept/#share-to-slack) or t
 Get your hands on demo Hue App by:
 
 - Running some queries on the [demo live editor](https://demo.gethue.com/).
-- Logging in to [demo workspace](https://demo-hue.slack.com/) by using the following credentials:
+- Logging in to [demo workspace](https://demo-hue.slack.com/) by using the following Slack account credentials:
 
-      Slack account email: demo@gethue.com
-      Slack account password: gethue
+      email: demo@gethue.com
+      password: gethue
 
 </br>
 </br>
