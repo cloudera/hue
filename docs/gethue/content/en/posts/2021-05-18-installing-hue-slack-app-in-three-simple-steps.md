@@ -50,28 +50,26 @@ Kudos to Slack for recently rolling out its [App Manifest](https://api.slack.com
 
 The latest version of the App Manifest is checked-in the [Hue Repository](https://github.com/cloudera/hue/blob/master/tools/slack/manifest.yml).
 
-In the shared manifest, Update the two _demo.gethue.com_ with **your Hue instance hostname:**
+In the shared manifest, update the two _demo.gethue.com_ with **your Hue instance hostname:**
 - Under **unfurl_domains**
 - Under **event_subscriptions**, in **request_url** `https://<hue-instance-hostname>/desktop/slack/events/`
 
 Now, it's time to create your own app:
-
-1. Go to https://api.slack.com/apps and click **Create New App**.
-2. Choose **From an app manifest** option and workspace that you'll be installing the app and click **Next**.
-3. Choose **YAML** and paste the Manifest code (make sure you do the necessary changes mentioned above) and click **Next**.
-4. Read the review summary and if everything’s correct, click **Create**.
-5. Once the app is created, install it in the workspace!
+- Go to https://api.slack.com/apps and click **Create New App**.
+- Choose **From an app manifest** option and workspace that you'll be installing the app and click **Next**.
+- Choose **YAML** and paste the Manifest code (make sure you do the necessary changes mentioned above) and click **Next**.
+- Read the review summary and if everything’s correct, click **Create**.
+- Once the app is created, install it in the workspace!
 
 Completing the last step of plugging it with Hue, it's time to update your hue.ini configuration file:
+- Go to the **OAuth & Permissions page**, copy the **Bot User OAuth Token** and update **slack_bot_user_token** (e.g. xoxb-xxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxx)
+- Similarly, go to the **Basic Information** page, copy the **Verification Token** and update **slack_verification_token**
+- Paste this in your hue.ini file under `[desktop]` section
 
-6. Go to the **OAuth & Permissions page**, copy the **Bot User OAuth Token** and update **slack_bot_user_token** (e.g. xoxb-xxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxx)
-7. Similarly, go to the **Basic Information** page, copy the **Verification Token** and update **slack_verification_token**
-8. Paste this in your hue.ini file under `[desktop]` section
-
-        [[slack]]
-        is_enabled=true
-        slack_verification_token=<your-slack-verification-token>
-        slack_bot_user_token=<your-slack-bot-user-token>
+      [[slack]]
+      is_enabled=true
+      slack_verification_token=<your-slack-verification-token>
+      slack_bot_user_token=<your-slack-bot-user-token>
 
 That’s it! Your own Hue App is ready to roll!
 
@@ -82,7 +80,6 @@ Read its [user guide](https://docs.gethue.com/user/concept/#share-to-slack) or t
 Get your hands on demo Hue App by:
 
 - Running some queries on the [demo live editor](https://demo.gethue.com/).
-
 - Logging in to [demo workspace](https://demo-hue.slack.com/) by using the following credentials:
 
       Slack account email: demo@gethue.com
