@@ -207,6 +207,18 @@ install-apps:
 install-env:
 	@echo --- Creating new virtual environment
 	$(MAKE) -C $(INSTALL_DIR) virtual-env
+	# Assumes Py2 as Py3 does not have `install` target anyway.
+	# This is needed as somehow Hue commands (app_reg, collectstatic..) import modules with hard uneeded dependencies on those. 
+	# We have two virt-env: $(ENV_PIP) aka /build/hue for build and $(PREFIX)/hue/build/env for destination.
+	@if [ "$(MAKECMDGOALS)" = "install" ]; then \
+	  $(PREFIX)/hue/build/env/bin/pip install cryptography==3.3.2 future==0.18.2 lockfile==0.8 python-daemon==1.5.1 pytz==2021.1 filelock==3.0.12; \
+	fi
+	# Alternative to ext-py directory but only due to the special case below.
+	# Hackish way to get crypto to install with pre-compiled dependencies that now break as of today with Py2.
+	@if [ "$(PYTHON_VER)" = "python2.7" ]; then \
+	  $(ENV_PIP) install --upgrade pip; \
+	  $(ENV_PIP) install cryptography==3.3.2 future==0.18.2 lockfile==0.8 python-daemon==1.5.1 pytz==2021.1 filelock==3.0.12; \
+	fi
 	@echo --- Setting up Desktop core
 	$(MAKE) -C $(INSTALL_DIR)/desktop env-install
 	@echo --- Setting up Applications
@@ -218,18 +230,9 @@ install-env:
 	cp $(ROOT)/.babelrc $(INSTALL_DIR)
 	cp $(ROOT)/tsconfig.json $(INSTALL_DIR)
 	$(MAKE) -C $(INSTALL_DIR) npm-install
-	@if [ "$(PYTHON_VER)" = "python2.7" ]; then \
-          $(ENV_PIP) install --upgrade pip; \
-          # Hackish way to get crypto to install with pre-compiled dependencies that now break as of today with Py2.
-	  $(ENV_PIP) install cryptography==3.3.2 future==0.18.2 lockfile==0.8 python-daemon==1.5.1 pytz==2021.1 filelock==3.0.12; \
-        fi
 	@if [ "$(MAKECMDGOALS)" = "install" ]; then \
-          # Assumes Py2 as Py3 does not have `install` target anyway.
-	  # This is needed as somehow Hue commands import modules with hard uneeded dependencies on those. 
-	  # We have two virt-env: $(ENV_PIP) aka /build/hue for build and $(PREFIX)/hue/build/env for destination.
-	  $(PREFIX)/hue/build/env/bin/pip install cryptography==3.3.2 future==0.18.2 lockfile==0.8 python-daemon==1.5.1 pytz==2021.1 filelock==3.0.12; \
-          $(MAKE) -C $(INSTALL_DIR) create-static; \
-        fi
+	  $(MAKE) -C $(INSTALL_DIR) create-static; \
+	fi
 
 
 ###################################
