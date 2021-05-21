@@ -54,7 +54,7 @@ export interface ApiFetchOptions<T, E = string> extends AxiosRequestConfig {
   ) => void;
 }
 
-const axiosInstance = axios.create();
+const axiosInstance = axios.create({ withCredentials: true });
 
 let baseUrl = (window as hueWindow).HUE_BASE_URL;
 let bearerToken: string | undefined;
