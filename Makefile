@@ -207,10 +207,9 @@ install-apps:
 install-env:
 	@echo --- Creating new virtual environment
 	$(MAKE) -C $(INSTALL_DIR) virtual-env
-	# Assumes Py2 as Py3 does not have `install` target anyway.
 	# This is needed as somehow Hue commands (app_reg, collectstatic..) import modules with hard uneeded dependencies on those.
 	# We have two virt-env: $(ENV_PIP) aka /build/hue for build and $(PREFIX)/hue/build/env for destination.
-	@if [ "$(MAKECMDGOALS)" = "install" ]; then \
+	@if [ "$(PYTHON_VER)" = "python2.7" ] && [ "$(MAKECMDGOALS)" = "install" ]; then \
 	  $(PREFIX)/hue/build/env/bin/pip install $(PIP_MODULES); \
 	fi
 	# Alternative to ext-py directory but only due to the special case below.
