@@ -148,32 +148,44 @@ class AvaticaClient(object):
         self.max_retries = max_retries if max_retries is not None else 3
         self.auth = auth
         self.verify = verify
-        self.connection = None
+        self.session = None
+
+    def __del__(self):
+        """Finalizer. Calls close() to close any open sessions"""
+        self.close()
 
     def connect(self):
-        """This method used to open a persistent TCP connection
-        requests does not require this"""
+        """Open the session on the the first request instead"""
         pass
 
     def close(self):
-        """Also does nothing per requests"""
-        pass
+        if self.session:
+            self.session.close()
+            self.session = None
 
     def _post_request(self, body, headers):
+        # Create the session if we haven't before
+        if not self.session:
+            logger.debug("Creating a new Session")
+            self.session = requests.Session()
+            self.session.headers.update(headers)
+            self.session.stream = True
+            if self.auth is not None:
+                self.session.auth = self.auth
+
         retry_count = self.max_retries
         while True:
-            logger.debug("POST %s %r %r", self.url.geturl(), body, headers)
+            logger.debug("POST %s %r %r", self.url.geturl(), body, self.session.headers)
 
-            requestArgs = {'data': body, 'stream': True, 'headers': headers}
+            requestArgs = {'data': body}
 
-            if self.auth is not None:
-                requestArgs.update(auth=self.auth)
-
+            # Setting verify on the Session is not the same as setting it
+            # as a request arg
             if self.verify is not None:
                 requestArgs.update(verify=self.verify)
 
             try:
-                response = requests.request('post', self.url.geturl(), **requestArgs)
+                response = self.session.post(self.url.geturl(), **requestArgs)
 
             except requests.HTTPError as e:
                 if retry_count > 0:
