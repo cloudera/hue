@@ -14,6 +14,8 @@
 # limitations under the License.
 import sys
 
+import gssapi
+
 from phoenixdb import errors, types
 from phoenixdb.avatica import AvaticaClient
 from phoenixdb.connection import Connection
@@ -177,7 +179,11 @@ def _process_args(
         auth = HTTPSPNEGOAuth(opportunistic_auth=True)
     elif auth is None and authentication is not None:
         if authentication == "SPNEGO":
-            auth = HTTPSPNEGOAuth(opportunistic_auth=True)
+            try:
+                spnego = gssapi.mechs.Mechanism.from_sasl_name("SPNEGO")
+            except AttributeError:
+                spnego = gssapi.OID.from_int_seq("1.3.6.1.5.5.2")
+            auth = HTTPSPNEGOAuth(opportunistic_auth=True, mech=spnego)
         elif authentication == "BASIC" and avatica_user is not None and avatica_password is not None:
             auth = HTTPBasicAuth(avatica_user, avatica_password)
         elif authentication == "DIGEST" and avatica_user is not None and avatica_password is not None:
