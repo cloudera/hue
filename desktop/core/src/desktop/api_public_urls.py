@@ -25,7 +25,21 @@ else:
   from django.conf.urls import url as re_path
 
 
+# New "query" API
+# https://demo.gethue.com/api/query
+#
+# https://demo.gethue.com/api/query/execute/hive
+# https://demo.gethue.com/api/query/status
+# https://demo.gethue.com/api/query/result
+# https://demo.gethue.com/api/query/logs
 urlpatterns = [
-  re_path(r'^query/create_notebook/?$', api_public.create_notebook, name='create_notebook'),
-  # ...
+  re_path(r'^query/create_notebook/?$', api_public.create_notebook, name='api_create_notebook'),
+  re_path(r'^query/autocomplete/?$', api_public.autocomplete, name='api_autocomplete_databases'),
+]
+
+# Compatibility with private API
+# https://demo.gethue.com/api/editor/execute/hive
+urlpatterns += [
+  re_path(r'^editor/create_notebook/?$', api_public.create_notebook, name='api_create_notebook'),
+  re_path(r'^editor/autocomplete/?$', api_public.autocomplete, name='api_autocomplete_databases'),
 ]
