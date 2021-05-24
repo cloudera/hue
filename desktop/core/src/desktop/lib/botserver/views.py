@@ -18,6 +18,7 @@
 import logging
 import json
 import sys
+import os
 from urllib.parse import urlsplit
 from tabulate import tabulate
 
@@ -79,13 +80,63 @@ def parse_events(request, event):
   """
   channel_id = event.get('channel')
   user_id = event.get('user')
-  message_element = event['blocks'][0]['elements'] if event.get('blocks') else []
+  message_element = event['blocks'][0].get('elements', []) if event.get('blocks') else []
 
   if event.get('type') == 'message':
     handle_on_message(request.get_host(), request.is_secure(), channel_id, event.get('bot_id'), message_element, user_id)
 
   if event.get('type') == 'link_shared':
     handle_on_link_shared(request.get_host(), channel_id, event.get('message_ts'), event.get('links'), user_id)
+
+  if event.get('type') == 'app_mention':
+    handle_on_app_mention(request.get_host(), channel_id, user_id, event.get('text'))
+
+
+def handle_on_app_mention(host_domain, channel_id, user_id, text):
+  if text and 'query bank' in text:
+    slack_user = check_slack_user_permission(host_domain, user_id)
+    user = get_user(channel_id, slack_user)
+
+    handle_query_bank(channel_id, user_id)
+
+  
+def handle_query_bank(channel_id, user_id):
+  with open(os.path.join(os.path.dirname(__file__), 'data/queries.json')) as file:
+    data = json.load(file)
+
+    message_block = [
+      {
+        "type": "section",
+        "text": {
+          "type": "mrkdwn",
+          "text": "Hi <@{user}>, here is the list of all saved queries!".format(user=user_id)
+        }
+      },
+      {
+        "type": "divider"
+      },
+    ]
+
+    for query in data:
+      name = {
+        "type": "section",
+        "text": {
+          "type": "mrkdwn",
+          "text": "*Name:* {name}".format(name=query.get('name'))
+        },
+      }
+      message_block.append(name)
+
+      statement = {
+        "type": "section",
+        "text": {
+          "type": "mrkdwn",
+          "text": "*Statement:*\n ```{query}```".format(query=query.get('query'))
+        },
+      }
+      message_block.append(statement)
+
+    _send_message(channel_id, block_element=message_block)
 
 
 def handle_on_message(host_domain, is_http_secure, channel_id, bot_id, elements, user_id):

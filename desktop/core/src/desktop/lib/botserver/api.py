@@ -57,8 +57,8 @@ def send_message(request):
     'ok': slack_response.get('ok'),
   })
 
-def _send_message(channel_info, message):
+def _send_message(channel_info, message=None, block_element=None):
   try:
-    return slack_client.chat_postMessage(channel=channel_info, text=message)
+    return slack_client.chat_postMessage(channel=channel_info, text=message, blocks=block_element)
   except Exception as e:
     raise PopupException(_("Error posting message in channel"), detail=e)
