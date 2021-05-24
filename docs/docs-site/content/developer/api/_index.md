@@ -7,131 +7,128 @@ weight: 4
 
 # REST
 
-The user interface communicates (e.g. submit an SQL query, list some S3 files in a buck...) with the API server via a REST API which will then perform the operation with the remote services. Currently this API is private and subject to change but can already be reused for prove of concepts until the proper public API is released.
+Interact with the API server (e.g. submit a SQL query, list some S3 files in a bucket, search for a table...) with via a REST API.
 
-In general we want to authenticate with a username and password, retrieve a `session` and [CSRF](https://docs.djangoproject.com/en/3.1/ref/csrf/) cookies and provide them in the follow-up calls so that Hue knows who we are and won't block you.
-
-**Note** The REST API will be properly public with versioning in [Hue 5](https://github.com/cloudera/hue/projects/5).
-
+Users authenticate exactly like they do in the current Browser login page.
 
 ## Quickstart
 
-Hue is based on the [Django Web Framework](https://www.djangoproject.com/). Django comes with user authentication system. Django uses sessions and middleware to hook the authentication system into request object. Hue uses stock auth form which uses *username* and *password* and *csrftoken* form variables to authenticate.
+The API can be called directly via REST. Some JavaScript and Python wrappers are not documented yet.
 
 ### Curl
 
-First get the `CSRF` token:
+Calling without credentials:
 
-    curl -i -X GET https://demo.gethue.com/hue/accounts/login/?fromModal=true -o /dev/null -D -
+    curl -X POST -H "Content-Type: application/json" http://localhost:9000/api/query/create_notebook
+    {"detail":"Authentication credentials were not provided."}
 
-It is important to note the `csrftoken` and `sessionid` values from the response:
+Authenticating and getting a [JWT token](https://jwt.io/):
 
-    set-cookie: csrftoken=XUFgN1WPZNlaJtBeBDtBvwzrOFqRXIaMlNJv4mdvsS2bIE2Lb8LRmCh5cPUBnBdk; expires=Mon, 13-Sep-2021 20:43:47 GMT; httponly; Max-Age=31449600; Path=/
-    set-cookie: sessionid=9cdltfee1q1zmt8b7slsjcomtxzgvgfz; expires=Mon, 14-Sep-2020 21:43:47 GMT; httponly; Max-Age=3600; Path=/
+    curl -X POST -H "Content-Type: application/json" -d '{"email": "romain@gethue.com", "password": "romain"}'   http://localhost:9000/api/token/
+    {"refresh":"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTYyMTcyNDYzMSwianRpIjoiOGM0NDRjYzRhN2VhNGMxZDliMGZhNmU1YzUyMjM1MjkiLCJ1c2VyX2lkIjoxfQ.t6t7_eYrNhpGN3-Jz5MDLXM8JtGP7V9Y9lacOTInqqQ","access":"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjIxNjM4NTMxLCJqdGkiOiJhZjgwN2E0ZjBmZDI0ZWMxYWQ2NTUzZjEyMjIyYzU4YyIsInVzZXJfaWQiOjF9.dQ1P3hbzSytp9-o8bWlcOcwrdwRVy95M2Eolph92QMA"}
 
-Then authenticate with the credendials and provide the `csrftoken` and `sessionid`  as well (note: `CRSF` currently needs to be repeated twice):
+Re-using the token when making actual calls:
 
-    curl -i -X POST https://demo.gethue.com/hue/accounts/login/?fromModal=true -d 'username=demo&password=demo' -o /dev/null -D - --cookie "csrftoken=XUFgN1WPZNlaJtBeBDtBvwzrOFqRXIaMlNJv4mdvsS2bIE2Lb8LRmCh5cPUBnBdk;sessionid=9cdltfee1q1zmt8b7slsjcomtxzgvgfz" -H "X-CSRFToken: XUFgN1WPZNlaJtBeBDtBvwzrOFqRXIaMlNJv4mdvsS2bIE2Lb8LRmCh5cPUBnBdk"
-
-Then you can perform any operation as the `demo` user by providing the latest `CSRF` and the `sessionid` tokens with these parameters:
-
-    --cookie "csrftoken=tkuKwiyRsEmt7zCqIfym4GCwPxAPQfnTm4Y97gUSszkCRih067sC2GA2mCrH6Lmu;sessionid=z6pjze6j6zrv3uoe2hxa8dfbhbn9bynp" -H "X-CSRFToken: tkuKwiyRsEmt7zCqIfym4GCwPxAPQfnTm4Y97gUSszkCRih067sC2GA2mCrH6Lmu"
-
-Here for example we list all the databases of the `hive` connector:
-
-    curl -X POST https://demo.gethue.com/notebook/api/autocomplete/ --data 'snippet={"type":"hive"}' --cookie "csrftoken=XUFgN1WPZNlaJtBeBDtBvwzrOFqRXIaMlNJv4mdvsS2bIE2Lb8LRmCh5cPUBnBdk;sessionid=9cdltfee1q1zmt8b7slsjcomtxzgvgfz" -H "X-CSRFToken: XUFgN1WPZNlaJtBeBDtBvwzrOFqRXIaMlNJv4mdvsS2bIE2Lb8LRmCh5cPUBnBdk"
-
-    {"status": 0, "databases": ["a0817", "arunso", "ath", "athlete", "beingdatum_db", "bharath_practice", "chungu", "darth", "default", "demo", "diwakar", "emp", "hadooptest", "hebe", "hello", "hivedataset", "hivemap", "hivetesting", "hr_db", "icedb", "lib", "libdemo", "lti", "m", "m1", "movie", "movie1", "movielens", "mscda", "my_database", "mydb", "mydemo", "noo", "prizesh", "rajeev", "ram", "retail", "ruban", "sept9", "sept9_2020", "student", "test", "test21", "test123", "ticktick", "userdb", "vidu"]}
-
-**Note** The `cookie` and `CSRF` tokens are omitted in the following API description to keep it simpler. Those parameters will be integrated into one in the future.
+    url -X POST -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjIxNjM5NjMxLCJqdGkiOiI0NTY3NTA4MzM5YjY0MjFmYTMzZDJjMzViZWUyMDAyMCIsInVzZXJfaWQiOjF9.qrMNrr69eo38dOsV2aYp8k6WqBeyJZkbSuavxA_o_kM"   http://localhost:9000/api/v1/create_notebook
+    {"status": 0, "notebook": {"name": "My Notebook", "uuid": "1e23314f-b01e-4c18-872f-dc143475f063", "description": "", "type": "notebook", "isSaved": false, "isManaged": false, "skipHistorify": false, "sessions": [], "snippets": [], "directoryUuid": null}}
 
 ### Python
 
-In this code snippet, we will use well-known python *requests* library. We will first acquire *csrftoken* by GET *login_url* and then create a dictionary of form data which contains *username*, *password* and *csrftoken* and the *next_url* and another dictionary for header which contains the *Referer* url and an empty dictionary for the cookies. After the POST request to *login_url* we will check the response code, which should be *r.status_code == 200*.
+In this code snippet, we will use the [requests](https://pypi.org/project/requests/) library:
 
-Once the request is successful then capture headers and cookies for subsequent requests. Subsequent *request.session* calls can be made by providing *cookies=session.cookies* and *headers=session.headers*.
+    pip install requests
 
+And then:
+
+    import json
     import requests
 
-    next_url = "/"
-    login_url = "http://localhost:8888/accounts/login"
-
     session = requests.Session()
-    response = session.get(login_url)
 
     form_data = {
-        'username': '[your Hue username]',
-        'password': '[your Hue password]',
-        'csrfmiddlewaretoken': session.cookies['csrftoken'],
-        'next': next_url
+        'username': 'demo',
+        'password': 'demo',
     }
-    response = session.post(login_url, data=form_data, cookies={}, headers={'Referer': login_url})
 
+    response = session.post("http://localhost:9000/api/token/", data=form_data)
     print('Logged in successfully: %s %s' % (response.status_code == 200, response.status_code))
 
-    cookies = session.cookies
-    headers = session.headers
+    token = json.loads(response.content)['access']
+    print('Token: %s' % token)
 
-    response = session.get('http://localhost:8888/metastore/databases/default/metadata')
+    response = requests.post(
+      'http://localhost:9000/api/query/autocomplete',
+      headers={
+        'Authorization': 'Bearer %s' % token,
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      data={'snippet': json.dumps({"type":"mysql"})}
+    )
     print(response.status_code)
     print(response.text)
 
-### jQuery
+### JavaScript
 
-Login to a Hue and open up the browser developer console and just type the JavaScript snippets, e.g.:
+API from https://www.npmjs.com/package/gethue will be documented soon.
 
-    $.post("/notebook/api/autocomplete/", {
-      "snippet": ko.mapping.toJSON({
-          type: "hive"
-      })
-    }, function(data) {
-      console.log(ko.mapping.toJSON(data));
-    });
+In the meantime, with Axios:
+
+    <script src="https://unpkg.com/axios@0.21.1/dist/axios.min.js"></script>
+
+    <script type="text/javascript">
+      // const API_URL = "https://api.gethue.com"; // http://localhost:8005
+      const API_URL = "/";
+      axios.defaults.baseURL = API_URL;
+
+      axios.post('iam/v1/get/auth-token/', {username: "hue", password: "hue"}).then(function(data) {
+        console.log(data['data']);
+
+        // Util to check if cached token is still valid before asking to auth for a new one
+        axios.post('iam/v1/verify/auth-token/', {token: data['data']['token']});
+
+        axios.defaults.headers.common['Authorization'] = 'Bearer ' + data['data']['token'];
+      }).then(function() {
+        axios.post('editor/v1/query/sqlite', {statement:"SELECT 1000, 1001"}).then(function(data) {
+          console.log(data['data']);
+        });
+
+        axios.post('connectors/v1/types/').then(function(data) {
+          console.log(data['data']);
+        });
+      });
+    </script>
 
 ## Authentication
 
-**Note** There is currently no error on bad authentication but instead a 302 redirect to the login page, e.g.:
+The API only supports JWT but users need to provide the credentials they are using in the regular login form or [authentication backends](/administrator/configuration/server/#authentication). This is consistent and users are free to interact with the service via their Browser or API.
 
-    [12/Sep/2020 10:12:44 -0700] middleware   INFO     Redirecting to login page: /hue/useradmin/users/edit/romain
-    [12/Sep/2020 10:12:44 -0700] access       INFO     127.0.0.1 -anon- - "POST /hue/useradmin/users/edit/romain HTTP/1.1" - (mem: 169mb)-- login redirection
-    [12/Sep/2020 10:12:44 -0700] access       INFO     127.0.0.1 -anon- - "POST /hue/useradmin/users/edit/romain HTTP/1.1" returned in 0ms 302 0 (mem: 169mb)
+- Wrong credentials: there is currently no error on bad authentication but instead a 302 redirect to the login page, e.g.:
 
-**Note** The public API should be simpler with only one POST call and will return back only one token
+    curl -X POST    -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjIxNjM5NjMxLCJqdGkiOiI0NTY3NTA4MzM5YjY0MjFmYTMzZDJjMzViZWUyMDAyMCIsInVzZXJfaWQiOjF9.qrMNrr69eo38dOsV2aYp8k6WqBeyJZkbSuavxA_o_kM"   http://localhost:9000/notebook/execute/v1/create_notebook
+
+    [21/May/2021 16:26:46 -0700] middleware   INFO     Redirecting to login page: /notebook/execute/v1/create_notebook
+    [21/May/2021 16:26:46 -0700] access       INFO     127.0.0.1 -anon- - "POST /notebook/execute/v1/create_notebook HTTP/1.1" - (mem: 172mb)-- login redirection
+    [21/May/2021 16:26:46 -0700] access       INFO     127.0.0.1 -anon- - "POST /notebook/execute/v1/create_notebook HTTP/1.1" returned in 4ms 302 0
+
+- It is possible to submit data in JSON format:
+
+    -H "Content-Type: application/json" -d '{"email": "romain@gethue.com", "password": "romain"}'
 
 ### Login
 
-    curl -v -X POST demo.gethue.com/hue/accounts/login/ -d 'username=demo&password=demo'
+Authenticating and getting a [JWT token](https://jwt.io/):
 
-    ...
-    * We are completely uploaded and fine
-    * TLSv1.3 (IN), TLS handshake, Newsession Ticket (4):
-    * TLSv1.3 (IN), TLS handshake, Newsession Ticket (4):
-    * old SSL session ID is stale, removing
-    * Connection state changed (MAX_CONCURRENT_STREAMS == 128)!
-    < HTTP/2 302
-    < server: nginx/1.19.0
-    < date: Sat, 12 Sep 2020 17:53:18 GMT
-    < content-type: text/html; charset=utf-8
-    < content-length: 0
-    < set-cookie: hue-balancer=1599933199.854.37.877815; Expires=Mon, 14-Sep-20 17:53:18 GMT; Max-Age=172800; Path=/; Secure; HttpOnly
-    < x-xss-protection: 1; mode=block
-    < content-security-policy: script-src 'self' 'unsafe-inline' 'unsafe-eval' *.google-analytics.com *.doubleclick.net data:;img-src 'self' *.google-analytics.com *.doubleclick.net http://*.tile.osm.org *.tile.osm.org *.gstatic.com data:;style-src 'self' 'unsafe-inline' fonts.googleapis.com;connect-src 'self';frame-src *;child-src 'self' data: *.vimeo.com;object-src 'none'
-    < x-content-type-options: nosniff
-    < content-language: en-us
-    < vary: Cookie, Accept-Language
-    < location: /
-    < x-frame-options: SAMEORIGIN
-    < set-cookie: csrftoken=zfOhD8roDLI7mEgakmBDCy7LDMvkEE2z3uUTIyyVnurhqLZhluhjO76K541MRwAw; expires=Sat, 11-Sep-2021 17:53:18 GMT; httponly; Max-Age=31449600; Path=/
-    < set-cookie: sessionid=tzx37xo7izrdfs35o30grdf9u0b2999q; expires=Sat, 12-Sep-2020 18:53:18 GMT; httponly; Max-Age=3600; Path=/
-    < strict-transport-security: max-age=15724800; includeSubDomains
-    <
-    * Connection #0 to host demo.gethue.com left intact
+    curl -X POST -d 'username=demo,password=demo'   http://localhost:9000/api/token/
+    {"refresh":"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTYyMTcyNDYzMSwianRpIjoiOGM0NDRjYzRhN2VhNGMxZDliMGZhNmU1YzUyMjM1MjkiLCJ1c2VyX2lkIjoxfQ.t6t7_eYrNhpGN3-Jz5MDLXM8JtGP7V9Y9lacOTInqqQ","access":"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjIxNjM4NTMxLCJqdGkiOiJhZjgwN2E0ZjBmZDI0ZWMxYWQ2NTUzZjEyMjIyYzU4YyIsInVzZXJfaWQiOjF9.dQ1P3hbzSytp9-o8bWlcOcwrdwRVy95M2Eolph92QMA"}
 
-**Note** In certain cases an initial GET is needed in order to retrieve the CSRF token, which can then be provided in the POST with the credentials.
+### Check token
 
-### Logout
+    curl -X POST -d 'token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjIxNjM4NTMxLCJqdGkiOiJhZjgwN2E0ZjBmZDI0ZWMxYWQ2NTUzZjEyMjIyYzU4YyIsInVzZXJfaWQiOjF9.dQ1P3hbzSytp9-o8bWlcOcwrdwRVy95M2Eolph92QMA'   http://localhost:9000/api/token/verify/
 
-    curl -v -X POST https://demo.gethue.com/hue/accounts/logout/
+### Refresh token
+
+    curl -X POST 'refresh=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTYyMTcyNDYzMSwianRpIjoiOGM0NDRjYzRhN2VhNGMxZDliMGZhNmU1YzUyMjM1MjkiLCJ1c2VyX2lkIjoxfQ.t6t7_eYrNhpGN3-Jz5MDLXM8JtGP7V9Y9lacOTInqqQ'   http://localhost:9000/api/token/refresh/
+
 
 ## SQL Querying
 
@@ -502,16 +499,14 @@ Adding/updating a comment with the dummy backend:
 
 
 
-# SDK
+# Python
 
 Here is some overview about using the Python commands an shell and some examples below:
 
 * [Hue API: Execute some builtin or shell commands](http://gethue.com/hue-api-execute-some-builtin-commands/).
 * [How to manage the Hue database with the shell](http://gethue.com/how-to-manage-the-hue-database-with-the-shell/).
 
-## Python
-
-### Making a user admin
+## Making a user admin
 
 Via the Hue shell:
 
@@ -527,7 +522,7 @@ Then type something similar to:
     a.set_password('my_secret')
     a.save()
 
-### Changing user password
+## Changing user password
 
 In the Hue shell:
 
@@ -538,7 +533,7 @@ In the Hue shell:
     user.save()
 
 
-### Counting user documents
+## Counting user documents
 
 On the command line:
 
