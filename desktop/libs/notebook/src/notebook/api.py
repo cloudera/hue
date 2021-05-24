@@ -743,7 +743,7 @@ def close_statement(request):
 @api_error_handler
 def autocomplete(request, server=None, database=None, table=None, column=None, nested=None):
   response = {'status': -1}
-
+  print(request.POST)
   # Passed by check_document_access_permission but unused by APIs
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
