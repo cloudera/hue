@@ -21,7 +21,7 @@ We have the `gethue` [dependency](/developer/components/) in `packages.json` or 
 
     <body>
       <div style="position: absolute; height: 100%; width: 100%">
-        <sql-scratchpad api-url="http://localhost:8005" dialect="mysql" />
+        <sql-scratchpad api-url="http://localhost:8005" username="demo" password="demo" dialect="mysql" />
       </div>
     </body>
 
