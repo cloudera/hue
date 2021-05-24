@@ -17,7 +17,14 @@
 
 from rest_framework.decorators import api_view
 
+from desktop import api2 as desktop_api
 from notebook import api as notebook_api
+
+
+@api_view(["POST"])
+def get_config(request):
+  django_request = request._request
+  return desktop_api.get_config(django_request)
 
 
 @api_view(["POST"])
@@ -70,12 +77,10 @@ def close_statement(request):
   django_request = request._request
   return notebook_api.close_statement(django_request)
 
-
 @api_view(["POST"])
 def get_logs(request):
   django_request = request._request
   return notebook_api.get_logs(django_request)
-
 
 
 @api_view(["POST"])
