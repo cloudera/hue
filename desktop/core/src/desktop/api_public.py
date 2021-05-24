@@ -23,3 +23,9 @@ from notebook import api as notebook_api
 @api_view(["POST"])
 def create_notebook(request):
   return notebook_api.create_notebook(request)
+
+
+@api_view(["POST"])
+def autocomplete(request, server=None, database=None, table=None, column=None, nested=None):
+  django_request = request._request
+  return notebook_api.autocomplete(django_request, server, database, table, column, nested)

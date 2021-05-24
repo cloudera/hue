@@ -208,9 +208,9 @@ dynamic_patterns += [
 ]
 
 dynamic_patterns += [
-  re_path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
   re_path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
   re_path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
+  re_path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
 
   re_path(r'^api/', include('desktop.api_public_urls')),
 ]
