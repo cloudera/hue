@@ -27,21 +27,11 @@ We have the `gethue` [dependency](/developer/components/) in `packages.json` or 
 
     </html>
 
-Note: even simpler you could just skip nom and grab the latest via:
+Note: even simpler you could just skip npm and grab the latest via:
 
     <script type="text/javascript" src="https://cdn.gethue.com/components/SqlScratchpadWebComponent.js"></script>
 
 
-API:
-
-Above expects a running Hue or [Compose](https://github.com/gethue/compose) APIs on http://locahost:8005.
-
-Note: if using Hue, it currently temporarily requires a hue/hue user and this ini settings:
-
-    [desktop]
-    cors_enabled=true
-
-    [[auth]]
-    auto_login_enabled=true
+Above expects a running Hue or [Compose](https://github.com/gethue/compose) APIs on http://locahost:8005 as the middleware between your Data Warehouse and client.
 
 !["SQL Scratchpad"](https://cdn.gethue.com/uploads/2021/05/sql-scratchpad-v0.5.png)

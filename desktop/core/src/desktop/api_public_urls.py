@@ -38,8 +38,39 @@ urlpatterns = [
 ]
 
 # Compatibility with private API
-# https://demo.gethue.com/api/editor/execute/hive
+# https://demo.gethue.com/notebook/api/editor/execute/hive
 urlpatterns += [
-  re_path(r'^editor/create_notebook/?$', api_public.create_notebook, name='api_create_notebook'),
+  re_path(r'^create_notebook/?$', api_public.create_notebook, name='api_create_notebook'),
+  re_path(r'^create_session/?$', api_public.create_session, name='create_session'),
+  re_path(r'^close_session/?$', api_public.close_session, name='close_session'),
+  re_path(r'^execute(?:/(?P<dialect>.+))?/?$', api_public.execute, name='execute'),
+  re_path(r'^check_status/?$', api_public.check_status, name='check_status'),
+  re_path(r'^fetch_result_data/?$', api_public.fetch_result_data, name='fetch_result_data'),
+  re_path(r'^fetch_result_metadata/?$', api_public.fetch_result_metadata, name='fetch_result_metadata'),
+  re_path(r'^fetch_result_size/?$', api_public.fetch_result_size, name='fetch_result_size'),
+  re_path(r'^cancel_statement/?$', api_public.cancel_statement, name='cancel_statement'),
+  re_path(r'^close_statement/?$', api_public.close_statement, name='close_statement'),
+  re_path(r'^get_logs/?$', api_public.get_logs, name='get_logs'),
+
   re_path(r'^editor/autocomplete/?$', api_public.autocomplete, name='api_autocomplete_databases'),
+  re_path(
+      r"^autocomplete/(?P<database>[^/?]*)/?$",
+      api_public.autocomplete,
+      name="autocomplete_tables",
+  ),
+  re_path(
+      r"^autocomplete/(?P<database>[^/?]*)/(?P<table>[\w_\-]+)/?$",
+      api_public.autocomplete,
+      name="autocomplete_columns",
+  ),
+  re_path(
+      r"^autocomplete/(?P<database>[^/?]*)/(?P<table>[\w_\-]+)/(?P<column>\w+)/?$",
+      api_public.autocomplete,
+      name="autocomplete_column",
+  ),
+  re_path(
+      r"^autocomplete/(?P<database>[^/?]*)/(?P<table>[\w_\-]+)/(?P<column>\w+)/(?P<nested>.+)/?$",
+      api_public.autocomplete,
+      name="autocomplete_nested",
+  ),
 ]
