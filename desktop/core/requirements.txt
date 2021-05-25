@@ -20,7 +20,7 @@ django-cors-headers==3.7.0
 django-crequest==2018.5.11
 django-debug-panel==0.8.3
 django-debug-toolbar==1.11.1
-django-extensions==1.8.0
+django-extensions==3.1.3
 django-ipware==3.0.2
 django-nose==1.4.7
 django_opentracing==1.1.0
