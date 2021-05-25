@@ -17,6 +17,8 @@
 
 from rest_framework.decorators import api_view
 
+from desktop.auth.backend import rewrite_user
+
 from desktop import api2 as desktop_api
 from notebook import api as notebook_api
 
@@ -24,6 +26,9 @@ from notebook import api as notebook_api
 @api_view(["POST"])
 def get_config(request):
   django_request = request._request
+
+  django_request.user = rewrite_user(django_request.user)
+
   return desktop_api.get_config(django_request)
 
 
