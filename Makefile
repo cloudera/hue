@@ -147,6 +147,10 @@ $(BLD_DIR_ENV)/stamp:
 desktop: parent-pom
 # END DEV ONLY >>>>
 desktop: virtual-env
+	@if [ "$(PYTHON_VER)" = "python2.7" ] && [ "$(MAKECMDGOALS)" = "apps" ]; then \
+	  $(ENV_PIP) install --upgrade pip; \
+	  $(ENV_PIP) install $(PIP_MODULES); \
+	fi
 	@$(MAKE) -C desktop
 
 
