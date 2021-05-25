@@ -31,6 +31,11 @@ def get_config(request):
 
   return desktop_api.get_config(django_request)
 
+@api_view(["GET"])
+def get_context_namespaces(request, interface):
+  django_request = request._request
+  return desktop_api.get_context_namespaces(django_request, interface)
+
 
 @api_view(["POST"])
 def create_notebook(request):
