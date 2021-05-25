@@ -50,7 +50,7 @@ let lastKnownConfig: HueConfig | undefined;
 export const refreshConfig = async (viaApi?: boolean): Promise<HueConfig> => {
   lastConfigPromise = new Promise<HueConfig>(async (resolve, reject) => {
     try {
-      const url = viaApi ? URLS.FETCH_CONFIG_API : URLS.FETCH_CONFIG_PRIVATE_API;
+      const url = viaApi ? URLS.FETCH_CONFIG_API : URLS.FETCH_CONFIG_API_PRIVATE;
       const apiResponse = await post<HueConfig>(url, {}, { silenceErrors: true });
       if (apiResponse.status == 0) {
         lastKnownConfig = apiResponse;

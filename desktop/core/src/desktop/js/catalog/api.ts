@@ -57,7 +57,7 @@ interface SampleFetchOptions extends SharedFetchOptions {
 }
 
 const AUTOCOMPLETE_URL_PREFIX = '/api/editor/autocomplete/';
-// const AUTOCOMPLETE_URL_PREFIX = '/notebook/api/autocomplete/';
+
 const CANCEL_STATEMENT_URL = '/notebook/api/cancel_statement';
 const CHECK_STATUS_URL = '/notebook/api/check_status';
 const DESCRIBE_URL = '/notebook/api/describe/';
@@ -195,9 +195,7 @@ export const fetchNamespaces = (
   connector: Connector,
   silenceErrors?: boolean
 ): CancellablePromise<Record<string, Namespace[]> & { dynamicClusters?: boolean }> =>
-  get(`/desktop/api2/context/namespaces/${connector.id}`, undefined, {
-    silenceErrors
-  });
+  get(`/api/iam/get_namespaces/${connector.id}`, undefined, { silenceErrors });
 
 export const fetchNavigatorMetadata = ({
   entry,

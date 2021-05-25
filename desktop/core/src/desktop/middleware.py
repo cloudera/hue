@@ -303,7 +303,7 @@ class LoginAndPermissionMiddleware(MiddlewareMixin):
     if request.path in ['/oidc/authenticate/', '/oidc/callback/', '/oidc/logout/', '/hue/oidc_failed/']:
       return None
 
-    if request.path.startswith('/api/'):
+    if request.path.startswith('/api/') or request.path == '/notebook/api/create_session':
       return None
 
     # Skip views not requiring login
