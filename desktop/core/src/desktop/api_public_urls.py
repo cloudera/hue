@@ -36,6 +36,7 @@ urlpatterns = [
 # e.g. https://demo.gethue.com/notebook/api/execute/hive
 urlpatterns += [
   re_path(r'^iam/get_config/?$', api_public.get_config),
+  re_path(r'^iam/get_namespaces/(?P<interface>[\w\-]+)/?$', api_public.get_context_namespaces),  # To remove
 
   re_path(r'^editor/create_notebook/?$', api_public.create_notebook, name='api_create_notebook'),
   re_path(r'^editor/create_session/?$', api_public.create_session, name='api_create_session'),
