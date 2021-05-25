@@ -70,8 +70,8 @@ axiosInstance.interceptors.request.use(config => {
 });
 
 axiosInstance.interceptors.response.use(response => {
-  if (response.data?.token) {
-    bearerToken = response.data.token;
+  if (response.data?.access) {
+    bearerToken = response.data.access;
   }
   return response;
 });
