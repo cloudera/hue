@@ -14,13 +14,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const AUTOCOMPLETE_API_PREFIX = '/notebook/api/autocomplete/';
+export const AUTOCOMPLETE_API_PREFIX = '/api/editor/autocomplete/';
+// export const AUTOCOMPLETE_API_PREFIX = '/notebook/api/autocomplete/';
 export const SAMPLE_API_PREFIX = '/notebook/api/sample/';
 export const EXECUTE_API_PREFIX = '/notebook/api/execute/';
 export const DOCUMENTS_API = '/desktop/api2/doc/';
 export const DOCUMENTS_SEARCH_API = '/desktop/api2/docs/';
 export const GET_HUE_CONFIG_API = '/desktop/api2/get_hue_config';
-export const FETCH_CONFIG_PRIVATE_API = '/desktop/api2/get_config/';
+// export const FETCH_CONFIG_API = '/desktop/api2/get_config/';
 export const FETCH_CONFIG_API = '/api/iam/get_config/';
 export const HDFS_API_PREFIX = '/filebrowser/view=' + encodeURIComponent('/');
 export const ADLS_API_PREFIX = '/filebrowser/view=' + encodeURIComponent('adl:/');
