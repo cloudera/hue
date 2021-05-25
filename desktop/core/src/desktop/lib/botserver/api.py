@@ -17,12 +17,16 @@
 
 import logging
 import json
+import yaml
 import sys
+import os
+from urllib.parse import quote_plus
 
 from desktop.lib.botserver.slack_client import slack_client
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.decorators import api_error_handler
-from desktop.lib.django_util import JsonResponse
+from desktop.lib.django_util import JsonResponse, login_notrequired
+from desktop.settings import BASE_DIR
 
 if sys.version_info[0] > 2:
   from django.utils.translation import gettext as _
@@ -56,6 +60,27 @@ def send_message(request):
   return JsonResponse({
     'ok': slack_response.get('ok'),
   })
+
+@login_notrequired
+@api_error_handler
+def generate_slack_install_link(request):
+  response = {'status': 0}
+  install_link = 'https://api.slack.com/apps?new_app=1&manifest_yaml='
+
+  hostname = request.POST.get('hostname')
+
+  with open(os.path.join(BASE_DIR, 'tools/slack/manifest.yml')) as manifest:
+    data = yaml.safe_load(manifest)
+
+    data['features']['unfurl_domains'] = [hostname]
+    data['settings']['event_subscriptions']['request_url'] = 'https://' + hostname + '/desktop/slack/events/'
+
+    changed_data = yaml.safe_dump(data)
+    install_link += quote_plus(changed_data)
+
+    response['link'] = install_link
+
+  return JsonResponse(response)
 
 def _send_message(channel_info, message=None, block_element=None):
   try:
