@@ -80,19 +80,19 @@ In the meantime, with Axios:
       const API_URL = "/";
       axios.defaults.baseURL = API_URL;
 
-      axios.post('iam/v1/get/auth-token/', {username: "hue", password: "hue"}).then(function(data) {
+      axios.post('api/iam/token/auth/', {username: "hue", password: "hue"}).then(function(data) {
         console.log(data['data']);
 
         // Util to check if cached token is still valid before asking to auth for a new one
-        axios.post('iam/v1/verify/auth-token/', {token: data['data']['token']});
+        axios.post('api/iam/token/verify/', {token: data['access']});
 
-        axios.defaults.headers.common['Authorization'] = 'Bearer ' + data['data']['token'];
+        axios.defaults.headers.common['Authorization'] = 'Bearer ' + data['access'];
       }).then(function() {
-        axios.post('editor/v1/query/sqlite', {statement:"SELECT 1000, 1001"}).then(function(data) {
+        axios.post('api/query/sqlite', {statement:"SELECT 1000, 1001"}).then(function(data) {
           console.log(data['data']);
         });
 
-        axios.post('connectors/v1/types/').then(function(data) {
+        axios.post('api/connectors/types/').then(function(data) {
           console.log(data['data']);
         });
       });

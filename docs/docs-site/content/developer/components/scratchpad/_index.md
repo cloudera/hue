@@ -34,4 +34,9 @@ Note: even simpler you could just skip npm and grab the latest via:
 
 Above expects a running Hue or [Compose](https://github.com/gethue/compose) APIs on http://locahost:8005 as the middleware between your Data Warehouse and client.
 
+Note: if using Hue, it currently temporarily requires this ini settings:
+
+    [desktop]
+    cors_enabled=true
+
 !["SQL Scratchpad"](https://cdn.gethue.com/uploads/2021/05/sql-scratchpad-v0.5.png)
