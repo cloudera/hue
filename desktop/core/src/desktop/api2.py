@@ -86,7 +86,7 @@ def api_error_handler(func):
 @api_error_handler
 def get_config(request):
   config = get_cluster_config(request.user)
-  config['hue_config']['is_admin'] = is_admin(request.user);
+  config['hue_config']['is_admin'] = is_admin(request.user)
   config['clusters'] = list(get_clusters(request.user).values())
   config['documents'] = {
     'types': list(Document2.objects.documents(user=request.user).order_by().values_list('type', flat=True).distinct())
