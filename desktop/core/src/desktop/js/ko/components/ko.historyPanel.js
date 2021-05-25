@@ -192,7 +192,7 @@ class HistoryPanel {
         phoenix: {
           placeHolder: I18n('Example: SELECT * FROM tablename, or press CTRL + space'),
           aceMode: 'ace/mode/phoenix',
-          snippetImage: window.STATIC_URLS['beeswax/art/icon_beeswax_48.png'],
+          snippetImage: window.STATIC_URLS['rdbms/art/icon_rdbms_48.png'],
           sqlDialect: true
         },
         java: {
