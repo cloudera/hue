@@ -138,15 +138,15 @@ export interface AuthRequest {
   message?: string;
 }
 
-const CANCEL_STATEMENT_API = '/notebook/api/cancel_statement';
-const CHECK_STATUS_API = '/notebook/api/check_status';
-const CLOSE_SESSION_API = '/notebook/api/close_session';
-const CLOSE_STATEMENT_API = '/notebook/api/close_statement';
-const CREATE_SESSION_API = '/notebook/api/create_session';
-const EXECUTE_API_PREFIX = '/notebook/api/execute/';
-const FETCH_RESULT_DATA_API = '/notebook/api/fetch_result_data';
-const FETCH_RESULT_SIZE_API = '/notebook/api/fetch_result_size';
-const GET_LOGS_API = '/notebook/api/get_logs';
+const CANCEL_STATEMENT_API = '/api/editor/cancel_statement';
+const CHECK_STATUS_API = '/api/editor/check_status';
+const CLOSE_SESSION_API = '/api/editor/close_session';
+const CLOSE_STATEMENT_API = '/api/editor/close_statement';
+const CREATE_SESSION_API = '/api/editor/create_session';
+const EXECUTE_API_PREFIX = '/api/editor/execute/';
+const FETCH_RESULT_DATA_API = '/api/editor/fetch_result_data';
+const FETCH_RESULT_SIZE_API = '/api/editor/fetch_result_size';
+const GET_LOGS_API = '/api/editor/get_logs';
 
 export const createSession = async (options: {
   type: string;
