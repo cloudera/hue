@@ -554,11 +554,6 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
               <label for="dialectType" class="control-label "><div>${ _('Dialect') }</div>
                 <select  id="dialectType" data-bind="selectize: $parent.createWizard.source.interpreters, value: $parent.createWizard.source.interpreter, optionsText: 'name', optionsValue: 'type'"></select>
               </label>
-              <div data-bind="visible: dialect() == 'phoenix'">
-                <label for="PhoenixPks" class="control-label"><div>${ _('Primary key') }</div>
-                  <select id="PhoenixPks" data-bind="selectize: columns, selectedOptions: indexerPrimaryKey, selectedObjects: indexerPrimaryKeyObject, optionsValue: 'name', optionsText: 'name', innerSubscriber: 'name'" size="1"></select>
-                </label>
-              </div>
             </div>
             <label for="collectionName" class="control-label "><div>${ _('Name') }</div></label>
             <input type="text" class="input-xxlarge" data-bind="value: name, hiveChooser: name, namespace: namespace, compute: compute, skipColumns: true, skipTables: outputFormat() == 'database', valueUpdate: 'afterkeydown', apiHelperUser: '${ user }', apiHelperType: sourceType, mainScrollable: $(MAIN_SCROLLABLE), attr: { 'placeholder': outputFormat() == 'table' ? '${  _ko('Table name or <database>.<table>') }' : '${  _ko('Database name') }' }" pattern="^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]*$" title="${ _('Only alphanumeric and underscore characters') }">
@@ -709,7 +704,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
               </label>
             </div>
 
-            <div class="control-group" data-bind="visible: tableFormat() == 'kudu'">
+            <div class="control-group" data-bind="visible: (tableFormat() == 'kudu' || $root.createWizard.destination.dialect() == 'phoenix')">
               <label for="kuduPksTable" class="control-label"><div>${ _('Primary keys') }</div>
                 ## At least one selected
                 <select id="kuduPksTable" data-bind="selectize: columns, selectedOptions: primaryKeys, selectedObjects: primaryKeyObjects, optionsValue: 'name', optionsText: 'name', innerSubscriber: 'name'" size="3" multiple="true"></select>
@@ -1805,11 +1800,10 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
       self.interpreter.subscribe(function(val) {
         self.sourceType(val);
         wizard.destination.sourceType(val);
-        for (let i = 0; i < self.interpreters().length; i++) {
-          if (val == self.interpreters()[i]['type']) {
-            wizard.destination.dialect(self.interpreters()[i]['dialect']);
-          }
-        }
+        var dialect = self.interpreters().filter(function(interpreter) {
+          return interpreter['type'] === val;
+        });
+        wizard.destination.dialect(dialect[0]['dialect']);
       });
   
       // File

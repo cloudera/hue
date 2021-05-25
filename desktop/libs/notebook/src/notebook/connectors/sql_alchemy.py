@@ -239,8 +239,8 @@ class SqlAlchemyApi(Api):
 
     engine = self._get_engine()
     connection = self._create_connection(engine)
-    stmt_dict = self._get_current_statement(notebook, snippet)
-    statement = stmt_dict['statement']
+    current_statement = self._get_current_statement(notebook, snippet)
+    statement = current_statement['statement']
 
     if self.interpreter['dialect_properties'].get('has_use_statement') and snippet.get('database'):
       connection.execute(
@@ -280,7 +280,7 @@ class SqlAlchemyApi(Api):
         'type': 'table'
       }
     }
-    response.update(stmt_dict)
+    response.update(current_statement)
 
     return response
 

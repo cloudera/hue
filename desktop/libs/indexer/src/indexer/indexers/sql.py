@@ -326,7 +326,7 @@ CONSTRAINT my_pk PRIMARY KEY (%(primary_keys)s));
           'database': database,
           'table_name': table_name,
           'columns': ',\n'.join(['  %(name)s %(type)s' % col for col in columns]),
-          'primary_keys': ', '.join(destination.get('indexerPrimaryKey'))
+          'primary_keys': ', '.join(destination.get('primaryKeys'))
       }
 
     path = urllib_unquote(source['path'])
@@ -334,12 +334,12 @@ CONSTRAINT my_pk PRIMARY KEY (%(primary_keys)s));
     if path:                                                     # data insertion
       with open(BASE_DIR + path, 'r') as local_file:
         reader = csv.reader(local_file)
-        list_of_tuples = list(map(tuple, reader))
+        _csv_rows = list(map(tuple, reader))
 
         if source['format']['hasHeader']:
-          list_of_tuples = list_of_tuples[1:]
+          _csv_rows = _csv_rows[1:]
 
-        csv_rows = str(list_of_tuples)[1:-1]
+        csv_rows = str(_csv_rows)[1:-1]
 
         if dialect in ('hive', 'mysql'):
           sql += '''\nINSERT INTO %(database)s.%(table_name)s VALUES %(csv_rows)s;
@@ -348,8 +348,8 @@ CONSTRAINT my_pk PRIMARY KEY (%(primary_keys)s));
                   'table_name': table_name,
                   'csv_rows': csv_rows
                 }
-        if dialect == 'phoenix':
-          for csv_row in list_of_tuples:
+        elif dialect == 'phoenix':
+          for csv_row in _csv_rows:
             _sql = ', '.join([ "'{0}'".format(col_val) if columns[count]['type'] in ('CHAR(255)', 'timestamp') \
               else '{0}'.format(col_val) for count, col_val in enumerate(csv_row)])
 

@@ -887,7 +887,7 @@ def test_create_table_from_local_phoenix():
         {'name': 'field_3', 'type': 'bigint'},
       ],
       'sourceType': 'phoenix',
-      'indexerPrimaryKey': ['field_3']
+      'primaryKeys': ['field_3']
     }
     sql = SQLIndexer(user=Mock(), fs=Mock()).create_table_from_local_file(source, destination).get_str()
 
