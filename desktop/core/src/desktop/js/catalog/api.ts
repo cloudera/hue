@@ -56,7 +56,8 @@ interface SampleFetchOptions extends SharedFetchOptions {
   sampleCount?: number;
 }
 
-const AUTOCOMPLETE_URL_PREFIX = '/notebook/api/autocomplete/';
+const AUTOCOMPLETE_URL_PREFIX = '/api/editor/autocomplete/';
+// const AUTOCOMPLETE_URL_PREFIX = '/notebook/api/autocomplete/';
 const CANCEL_STATEMENT_URL = '/notebook/api/cancel_statement';
 const CHECK_STATUS_URL = '/notebook/api/check_status';
 const DESCRIBE_URL = '/notebook/api/describe/';
