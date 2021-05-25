@@ -351,6 +351,14 @@ class TestApi(object):
 
           execute.assert_called_with('SELECT 1')
 
+          # No Trim
+          interpreter['options']['url'] = 'mysql://hue:3306/hue'
+          interpreter['dialect_properties']['sql_identifier_quote'] = '`'
+
+          engine = SqlAlchemyApi(self.user, interpreter).execute(notebook, snippet)
+
+          execute.assert_called_with('SELECT 1')
+
 
   def test_get_log(self):
     notebook = Mock()
