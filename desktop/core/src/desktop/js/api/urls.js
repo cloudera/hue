@@ -44,8 +44,8 @@ export const TOPO_URL = '/desktop/topo/';
 export const SEARCH_API = '/desktop/api/search/entities';
 export const INTERACTIVE_SEARCH_API = '/desktop/api/search/entities_interactive';
 
-export const CREATE_SESSION_API = '/notebook/api/create_session';
-export const CLOSE_SESSION_API = '/notebook/api/close_session';
+export const CREATE_SESSION_API = '/api/editor/create_session'; // Note: dup by api.ts
+export const CLOSE_SESSION_API = '/api/editor/close_session'; // Note: dup by api.ts
 export const FETCH_RESULT_SIZE_API = '/notebook/api/fetch_result_size';
 export const FETCH_RESULT_DATA_API = '/notebook/api/fetch_result_data';
 export const GET_LOGS_API = '/notebook/api/get_logs';
