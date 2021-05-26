@@ -76,11 +76,11 @@ In the meantime, with Axios:
       const API_URL = "/";
       axios.defaults.baseURL = API_URL;
 
-      axios.post('api/iam/token/auth/', {username: "hue", password: "hue"}).then(function(data) {
+      axios.post('api/token/auth/', {username: "hue", password: "hue"}).then(function(data) {
         console.log(data['data']);
 
         // Util to check if cached token is still valid before asking to auth for a new one
-        axios.post('api/iam/token/verify/', {token: data['access']});
+        axios.post('api/token/verify/', {token: data['access']});
 
         axios.defaults.headers.common['Authorization'] = 'Bearer ' + data['access'];
       }).then(function() {
@@ -110,7 +110,7 @@ It is possible to submit data in **JSON format**:
 
     -H "Content-Type: application/json" -d '{"username": "hue", "password": "hue"}'
 
-### Login
+### Authentication
 
 Authenticating and getting a [JWT token](https://jwt.io/):
 
