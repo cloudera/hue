@@ -261,6 +261,7 @@ export default abstract class Executable {
       this.checkStatus();
       this.logs.fetchLogs();
     } catch (err) {
+      console.warn(err);
       this.setStatus(ExecutionStatus.failed);
     }
   }
