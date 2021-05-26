@@ -59,7 +59,6 @@ interface SampleFetchOptions extends SharedFetchOptions {
 }
 
 const ADD_TAGS_URL = '/metadata/api/catalog/add_tags';
-const AUTOCOMPLETE_URL_PREFIX = '/notebook/api/autocomplete/';
 const AUTOCOMPLETE_URL_PREFIX = '/api/editor/autocomplete/';
 const CANCEL_STATEMENT_URL = '/notebook/api/cancel_statement';
 const CHECK_STATUS_URL = '/notebook/api/check_status';
