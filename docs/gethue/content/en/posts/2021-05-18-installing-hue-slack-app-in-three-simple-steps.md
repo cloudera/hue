@@ -61,7 +61,7 @@ Now, it's time to create your own app:
 - Read the review summary and if everything’s correct, click **Create**.
 - Once the app is created, install it in the workspace!
 
-![Slack Installation Modal Flow]()
+![Slack Installation Flow](https://cdn.gethue.com/uploads/2021/05/slack-install.gif)
 
 Completing the last step of plugging it with Hue, it's time to update your hue.ini configuration file:
 - Go to the **OAuth & Permissions page**, copy the **Bot User OAuth Token** and update **slack_bot_user_token** (e.g. xoxb-xxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxx)
