@@ -22,7 +22,7 @@ Calling without credentials:
 
 Authenticating and getting a [JWT token](https://jwt.io/):
 
-    curl -X POST -H "Content-Type: application/json" -d '{"username": "hue", "password": "hue"}' http://localhost:9000/api/token/
+    curl -X POST -H "Content-Type: application/json" -d '{"username": "hue", "password": "hue"}' http://localhost:9000/api/token/auth/
     {"refresh":"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTYyMTcyNDYzMSwianRpIjoiOGM0NDRjYzRhN2VhNGMxZDliMGZhNmU1YzUyMjM1MjkiLCJ1c2VyX2lkIjoxfQ.t6t7_eYrNhpGN3-Jz5MDLXM8JtGP7V9Y9lacOTInqqQ","access":"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjIxNjM4NTMxLCJqdGkiOiJhZjgwN2E0ZjBmZDI0ZWMxYWQ2NTUzZjEyMjIyYzU4YyIsInVzZXJfaWQiOjF9.dQ1P3hbzSytp9-o8bWlcOcwrdwRVy95M2Eolph92QMA"}
 
 Re-using the token when making actual calls:
@@ -43,13 +43,13 @@ And then:
 
     session = requests.Session()
 
-    form_data = {
-        'username': 'demo',
-        'password': 'demo',
+    data = {
+      'username': 'demo',
+      'password': 'demo',
     }
 
-    response = session.post("http://localhost:9000/api/token/", data=form_data)
-    print('Logged in successfully: %s %s' % (response.status_code == 200, response.status_code))
+    response = session.post("http://localhost:9000/api/token/auth", data=data)
+    print('Auth: %s %s' % ('success' if response.status_code == 200 else 'error', response.status_code))
 
     token = json.loads(response.content)['access']
     print('Token: %s' % token)
