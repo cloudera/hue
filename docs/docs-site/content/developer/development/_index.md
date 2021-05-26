@@ -15,7 +15,7 @@ This section goes into greater detail on how to build and reuse the components o
 * The OS specific install instructions are listed in the [install guide](/administrator/installation/dependencies/)
 * Python 3.6+ and Django 3 (or Python 2.7 with Django 1.11)
 * Vue.js 3
-* Node.js ([10.0+](https://deb.nodesource.com/setup_10.x))
+* Node.js ([14.0+](https://deb.nodesource.com/setup_10.x))
 
 ### Build & Start
 
@@ -232,14 +232,6 @@ As usual feel free to send feedback on the [Forum](https://discourse.gethue.c
 
 ## API Server
 
-### From 30,000 feet
-
-![From up on high](/images/from30kfeet.png)
-
-Hue, as a "container" web application, sits in between your Hadoop installation
-and the browser.  It hosts all the Hue Apps, including the built-in ones, and
-ones that you may write yourself.
-
 ### The Hue Server
 
 ![Web Back-end](/images/webbackend.png)
@@ -254,25 +246,6 @@ In addition to the web server, some Hue applications run
 daemon processes "on the side". Some examples are the `Celery Task Server`, `Celery Beat`.
 
 ![Reference Architecture](/images/hue_architecture.png)
-
-### Interacting with external services
-
-![Interacting with Hadoop](/images/interactingwithhadoop.png)
-
-Hue provides some APIs for interacting with external services like Databases of File storages.
-These APIs work by making REST or Thrift calls.
-
-### An Architectural View
-
-![Architecture](/images/architecture.png)
-
-A Hue application may span three tiers: (1) the UI and user interaction in the client's browser, (2) the
-core application logic in the Hue web server, and (3) external services with which applications may interact.
-
-The absolute minimum that you must implement (besides boilerplate), is a "Django [view](https://docs.djangoproject.com/en/1.11/#the-view-layer/)" function that processes the request and the associated template to render the response into HTML.
-
-Many apps will evolve to have a bit of custom JavaScript and CSS styles. Apps that need to talk to an external service
-will pull in the code necessary to talk to that service.
 
 ### File Layout
 
@@ -361,43 +334,6 @@ A `desktop.lib.conf.UnspecifiedConfigSection` object for `filesystems`, such as:
         each=ConfigSection(members=dict(
             nn_host=Config(key='namenode_host', required=True))
 
-An `UnspecifiedConfigSection` is useful when the children of the section are not known.
-When Hue loads your application's configuration, it binds all sub-sections. You can
-access the values by:
-
-    cluster1_val = FS['cluster_1'].nn_host.get()
-    all_clusters = FS.keys()
-    for cluster in all_clusters:
-        val = FS[cluster].nn_host.get()
-
-
-Application can automatically detect configuration problems and alert
-the admin. To take advantage of this feature, create a `config_validator`
-function in your `conf.py`:
-
-    def config_validator(user):
-      """
-      config_validator(user) -> [(config_variable, error_msg)] or None
-      Called by core check_config() view.
-      """
-      res = [ ]
-      if not REQUIRED_PROPERTY.get():
-        res.append((REQUIRED_PROPERTY, "This variable must be set"))
-      if MY_INT_PROPERTY.get() < 0:
-        res.append((MY_INT_PROPERTY, "This must be a non-negative number"))
-      return res
-
-
-<div class="note">
-  You should specify the <code>help="..."</code> argument to all configuration
-  related objects in your <code>conf.py</code>. The examples omit some for the
-  sake of space. But you and your application's users can view all the
-  configuration variables by doing:
-  <pre>
-    $ build/env/bin/hue config_help
-  </pre>
-</div>
-
 
 ### Saving documents
 
@@ -410,37 +346,6 @@ The `Document2` model provides automatically creation, sharing and saving. It pe
 `Document2` is based on [Django Models](https://docs.djangoproject.com/en/1.11/#the-model-layer)
 are Django's Object-Relational Mapping framework.
 
-
-### Walk-through of a Django View
-
-![Django Request](/images/django_request.png)
-
-
-Django is an MVC framework, except that the controller is called a
-"[view](https://docs.djangoproject.com/en/1.11/#the-view-layer)" and
-the "view" is called a "template".  For an application developer, the essential
-flow to understand is how the "urls.py" file provides a mapping between URLs (expressed as a
-regular expression, optionally with captured parameters) and view functions.
-These view functions typically use their arguments (for example, the captured parameters) and
-their request object (which has, for example, the POST and GET parameters) to
-prepare dynamic content to be rendered using a template.
-
-### Templates: Django and Mako
-
-In Hue, the typical pattern for rendering data through a template
-is:
-
-    from desktop.lib.django_util import render
-
-    def view_function(request):
-      return render('view_function.mako', request, dict(greeting="hello"))
-
-The `render()` function chooses a template engine (either Django or Mako) based on the
-extension of the template file (".html" or ".mako"). Mako templates are more powerful,
-in that they allow you to run arbitrary code blocks quite easily, and are more strict (some
-would say finicky); Django templates are simpler, but are less expressive.
-
-
 ### Authentication Backends
 
 Hue exposes a configuration flag ("auth") to configure a custom authentication [backend](https://github.com/cloudera/hue/blob/master/desktop/core/src/desktop/auth/backend.py).
@@ -448,25 +353,6 @@ See [writing an authentication backend](http://docs.djangoproject.com/en/dev/top
 for more details.
 
 In addition to that, backends may support a `manages_passwords_externally()` method, returning True or False, to tell the user manager application whether or not changing passwords within Hue is possible.
-
-### Authorization
-
-Applications may define permission sets for different actions. Administrators
-can assign permissions to user groups in the UserAdmin application. To define
-custom permission sets, modify your app's `settings.py` to create a list of
-`(identifier, description)` tuples:
-
-    PERMISSION_ACTIONS = [
-      ("delete", "Delete really important data"),
-      ("email", "Send email to the entire company"),
-      ("identifier", "Description of the permission")
-    ]
-
-Then you can use this decorator on your view functions to enforce permission:
-
-    @desktop.decorators.hue_permission_required("delete", "my_app_name")
-    def delete_financial_report(request):
-      ...
 
 ### Using and Installing Thrift
 
@@ -477,13 +363,11 @@ Please download from http://thrift.apache.org/.
 The modules using ``Thrift`` have some helper scripts like ``regenerate_thrift.sh``
 for regenerating the code from the interfaces.
 
-
 ### Upgrades
 
 After upgrading the version of Hue, running these two commands will make sure the database has the correct tables and fields.
 
     ./build/env/bin/hue migrate
-
 
 ### Debugging Tips and Tricks
 
