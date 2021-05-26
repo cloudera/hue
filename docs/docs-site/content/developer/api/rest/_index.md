@@ -110,9 +110,9 @@ It is possible to submit data in **JSON format**:
 
     -H "Content-Type: application/json" -d '{"username": "hue", "password": "hue"}'
 
-### Authentication
+### Authenticate
 
-Authenticating and getting a [JWT token](https://jwt.io/):
+Provide login credentials and get a [JWT token](https://jwt.io/):
 
     curl -X POST -d 'username=hue,password=hue' http://localhost:9000/api/token/
     {"refresh":"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTYyMTcyNDYzMSwianRpIjoiOGM0NDRjYzRhN2VhNGMxZDliMGZhNmU1YzUyMjM1MjkiLCJ1c2VyX2lkIjoxfQ.t6t7_eYrNhpGN3-Jz5MDLXM8JtGP7V9Y9lacOTInqqQ","access":"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjIxNjM4NTMxLCJqdGkiOiJhZjgwN2E0ZjBmZDI0ZWMxYWQ2NTUzZjEyMjIyYzU4YyIsInVzZXJfaWQiOjF9.dQ1P3hbzSytp9-o8bWlcOcwrdwRVy95M2Eolph92QMA"}
@@ -130,13 +130,15 @@ Authenticating and getting a [JWT token](https://jwt.io/):
 
 ### Execute a Query
 
-Now that we are logged-in, here is how to execute a `SHOW TABLES` SQL query via the `hive` connector. You could repeat the steps with any query you want, e.g. `SELECT * FROM web_logs LIMIT 100`.
+Now that we are authenticated, here is how to execute a `SHOW TABLES` SQL query via the `hive` connector. You could repeat the steps with any query you want, e.g. `SELECT * FROM web_logs LIMIT 100`.
 
-Until Editor v2 is out [HUE-8768](https://issues.cloudera.org/browse/HUE-8768), the API is pretty complicated but still functional:
+- **hive** represent either the dialect name and will select the connector to the only Hive databases.
+- **hive-1**
+- **1**
 
 For a `SHOW TABLES`, first we send the query statement:
 
-    curl -X POST https://demo.gethue.com/notebook/api/execute/hive --data 'executable={"statement":"SHOW TABLES","database":"default"}&notebook={"type":"query","snippets":[{"id":1,"statement_raw":"SHOW TABLES","type":"hive","variables":[]}],"name":"","isSaved":false,"sessions":[]}&snippet={"id":1,"type":"hive","result":{},"statement":"SHOW TABLES","properties":{}}'
+    curl -X POST http://localhost:9000/api/editor/execute/hive --data 'statement=SHOW TABLES'
 
     {"status": 0, "history_id": 17880, "handle": {"statement_id": 0, "session_type": "hive", "has_more_statements": false, "guid": "EUI32vrfTkSOBXET6Eaa+A==\n", "previous_statement_hash": "3070952e55d733fb5bef249277fb8674989e40b6f86c5cc8b39cc415", "log_context": null, "statements_count": 1, "end": {"column": 10, "row": 0}, "session_id": 63, "start": {"column": 0, "row": 0}, "secret": "RuiF0LEkRn+Yok/gjXWSqg==\n", "has_result_set": true, "session_guid": "c845bb7688dca140:859a5024fb284ba2", "statement": "SHOW TABLES", "operation_type": 0, "modified_row_count": null}, "history_uuid": "63ce87ba-ca0f-4653-8aeb-e9f5c1781b78"}
 
