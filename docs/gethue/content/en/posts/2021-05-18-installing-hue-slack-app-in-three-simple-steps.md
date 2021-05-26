@@ -61,33 +61,34 @@ Now, it's time to create your own app:
 - Read the review summary and if everything’s correct, click **Create**.
 - Once the app is created, install it in the workspace!
 
+![Slack Installation Modal Flow]()
+
 Completing the last step of plugging it with Hue, it's time to update your hue.ini configuration file:
 - Go to the **OAuth & Permissions page**, copy the **Bot User OAuth Token** and update **slack_bot_user_token** (e.g. xoxb-xxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxx)
 - Similarly, go to the **Basic Information** page, copy the **Verification Token** and update **slack_verification_token**
-- Paste this in your hue.ini file under `[desktop]` section
 
-      [[slack]]
-      is_enabled=true
-      slack_verification_token=<your-slack-verification-token>
-      slack_bot_user_token=<your-slack-bot-user-token>
+And paste this in your hue.ini file under `[desktop]` section
+
+    [[slack]]
+    is_enabled=true
+    slack_verification_token=<your-slack-verification-token>
+    slack_bot_user_token=<your-slack-bot-user-token>
 
 That’s it! Your own Hue App is ready to roll!
-
-Read its [user guide](https://docs.gethue.com/user/concept/#share-to-slack) or the [blog](https://gethue.com/blog/2021-04-09-collaborate-on-your-sql-queries-and-results-directly-within-slack/) and stay tuned for upcoming updates.
-
 ### Try it out!
 
-Get your hands on demo Hue App by:
-
-- Running some queries on the [demo live editor](https://demo.gethue.com/).
-- Logging in to [demo workspace](https://demo-hue.slack.com/) by using the following Slack account credentials:
+Log in to the [Slack workspace](https://hue-sql-assistant.slack.com/) to access the demo SQL Assistant by using the following Slack account credentials:
 
       email: demo@gethue.com
       password: gethue
+
+Run some queries on the [demo live editor](https://demo.gethue.com/) and share their links. Read its [user guide](https://docs.gethue.com/user/concept/#share-to-slack) or the [blog](https://gethue.com/blog/2021-04-09-collaborate-on-your-sql-queries-and-results-directly-within-slack/) and stay tuned for upcoming updates.
 
 </br>
 </br>
 
 Any [feedback](https://github.com/cloudera/hue/issues) or question is highly welcomed! Feel free to comment here or on the <a href="https://discourse.gethue.com/">Forum</a> and <a href="https://docs.gethue.com/quickstart/">quick start</a> SQL querying!
+
+Onwards!
 
 Harsh from the Hue Team
