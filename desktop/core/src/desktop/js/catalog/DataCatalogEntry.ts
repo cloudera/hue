@@ -36,6 +36,7 @@ import { Compute, Connector, Namespace } from 'config/types';
 import { hueWindow } from 'types/types';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
+import { executeSingleStatement } from 'apps/editor/execution/api';
 import { SqlAnalyzer } from './analyzer/types';
 import {
   CatalogGetOptions,
@@ -512,6 +513,35 @@ export default class DataCatalogEntry {
       this.saveLater();
     });
     return applyCancellable(this.sourceMetaPromise, options);
+  }
+
+  drop(cascade?: boolean): CancellablePromise<void> {
+    if (!this.isDatabase() && !this.isTableOrView()) {
+      return CancellablePromise.reject('Drop is only possible for a database, table or view.');
+    }
+    const statement = `DROP ${
+      this.isDatabase() ? 'DATABASE' : this.isView() ? 'VIEW' : 'TABLE'
+    } IF EXISTS \`${this.path.join('`.`')}\`${this.isDatabase() && cascade ? ' CASCADE;' : ';'}`;
+
+    return new CancellablePromise<void>((resolve, reject, onCancel) => {
+      const executePromise = executeSingleStatement({
+        database: this.path[0],
+        connector: this.getConnector(),
+        namespace: this.namespace,
+        compute: this.compute,
+        statement
+      });
+      onCancel(() => {
+        executePromise.cancel();
+      });
+
+      executePromise
+        .then(() => {
+          this.clearCache({ cascade: true }).catch();
+          resolve();
+        })
+        .catch(reject);
+    });
   }
 
   /**
