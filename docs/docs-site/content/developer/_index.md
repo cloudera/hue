@@ -8,9 +8,8 @@ pre = "<b>3. </b>"
 
 Those are the main categories of development:
 
-* **[Web application](/developer/development)**: Ramping-up with on the overall Hue development service
-* **[Connector](/developer/connectors)**: Access your own data services or data warehouses
-* **[SQL parsers](/developer/parsers)**: Tokenize SQL queries, build autocompletes
-* **[Components](/developer/components)**: Packaged library of reusable SQL parsers and UI components
+* **[Develop](/developer/development)**: Ramping-up with on the Hue development service and SQL parsers
+* **[Components](/developer/components)**: Packaged library of reusable SQL parsers and SQL Editor
+* **[API](/developer/api)**: Directly interact with the API server via REST
 
 Also check on how to get started on [contribution ideas](https://github.com/cloudera/hue/blob/master/CONTRIBUTING.md).
