@@ -12,7 +12,7 @@ This section goes into greater detail on how to build and reuse the components o
 
 ### Dependencies
 
-* The OS specific install instructions are listed in the [install guide](/administrator/installation/dependencies/)
+* The OS specific packages are listed in the [install guide](/administrator/installation/dependencies/)
 * Python 3.6+ and Django 3 (or Python 2.7 with Django 1.11)
 * Vue.js 3
 * Node.js ([14.0+](https://deb.nodesource.com/setup_10.x))
