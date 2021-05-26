@@ -195,7 +195,7 @@ export const fetchNamespaces = (
   connector: Connector,
   silenceErrors?: boolean
 ): CancellablePromise<Record<string, Namespace[]> & { dynamicClusters?: boolean }> =>
-  get(`/api/iam/get_namespaces/${connector.id}`, undefined, { silenceErrors });
+  get(`/api/get_namespaces/${connector.id}`, undefined, { silenceErrors });
 
 export const fetchNavigatorMetadata = ({
   entry,
