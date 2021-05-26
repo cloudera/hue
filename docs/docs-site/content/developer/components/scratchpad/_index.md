@@ -4,15 +4,30 @@ draft: false
 weight: 1
 ---
 
-The lightweight SQL Editor also called "SQL Scratchpad" comes as its own `<sql-scratchpad />` Web component.
+The shareable lightweight SQL Editor also called "SQL Scratchpad" comes as its own `<sql-scratchpad />` Web component.
 
-The SQL Scratchpad component is in **beta** and rapidly evolving. Now is a great time to give it a try and [send feedback](https://github.com/cloudera/hue/issues)!
+The SQL Scratchpad component is in beta and rapidly evolving. Now is a great time to give it a try and [send feedback](https://github.com/cloudera/hue/issues)!
 
-!["SQL Scratchpad"](https://cdn.gethue.com/uploads/2021/05/sql-scratchpad-v0.5.png)
+## Live Demo
 
-Adding into a Web page:
+The Scratchpad is hosted within this page and points to [demo.gethue.com](https://demo.gethue.com/).
 
-We have the `gethue` [dependency](/developer/components/) in `packages.json` or run `npm install gethue`. Then just load it similarly to:
+{{< rawhtml >}}
+<p>
+  <div style="position: absolute; height: 40%; width: 100%">
+    <sql-scratchpad api-url="https://demo.gethue.com" username="demo" password="demo" dialect="mysql" />
+  </div>
+
+  <script type="text/javascript" src="/js/gethue/components/SqlScratchpadWebComponent.js"></script>
+
+  <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+</p>
+{{< /rawhtml >}}
+
+
+## Importing
+
+First install the NPM [package](/developer/components/) and import the component lib and its HTML element directly into the Web page:
 
     <!DOCTYPE html>
     <html>
@@ -30,14 +45,15 @@ We have the `gethue` [dependency](/developer/components/) in `packages.json` or 
 
     </html>
 
-Note: even simpler you could just skip `npm` and grab the latest via:
+For quick testing, it is possible to skip the `npm install` and directly grab the module via:
 
     <script type="text/javascript" src="https://cdn.gethue.com/components/SqlScratchpadWebComponent.js"></script>
 
+Then make sure `api-url` points to a running Hue or [Compose](https://github.com/gethue/compose) APIs on [http://locahost:8005](http://locahost:8005). The API is the middleware between your Data Warehouse and Web Browser client and will provide the dynamic content like the list of tables and columns and enrich the static autocomplete powered by the [parser](/developer/components/parsers/) selected by the `dialect`.
 
-Above expects a running Hue or [Compose](https://github.com/gethue/compose) APIs on [http://locahost:8005](http://locahost:8005) as the middleware between your Data Warehouse and client.
-
-Note: if using Hue, it currently temporarily requires this ini settings:
+If using Hue as the API, this [ini settings](/administrator/configuration/) is currently required:
 
     [desktop]
     cors_enabled=true
+
+!["SQL Scratchpad"](https://cdn.gethue.com/uploads/2021/05/sql-scratchpad-v0.5.png)

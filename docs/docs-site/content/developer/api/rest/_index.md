@@ -7,7 +7,7 @@ weight: 1
 
 Interact with the API server (e.g. submit a SQL query, list some S3 files in a bucket, search for a table...) with via a REST API.
 
-Users authenticate exactly like they do in the current Browser login page.
+Users authenticate with the same credentials as they would do in the Browser login page.
 
 ## Quickstart
 
