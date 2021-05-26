@@ -9,7 +9,7 @@ GetHue is a collection of various Hue building blocks providing a smart SQL Clou
 
 The parsers are the flagship part of Hue and power extremely advanced autocompletes and other [SQL functionalities](https://docs.gethue.com/user/querying/#autocomplete). They are running on the client side and comes with just a few megabytes of JavaScript that are cached by the browser. This provides a very reactive experience to the end user and allows to [import them](https://docs.gethue.com/developer/parsers#using-hue-parsers-in-your-project) as classic JavaScript modules for your own development needs.
 
-Please refer the [SQL Parser Documentation](https://docs.gethue.com/developer/parsers/), or this [demo app](https://github.com/cloudera/hue/tree/master/tools/examples/api/hue_dep) for more information.
+Please refer the [SQL Parser Documentation](https://docs.gethue.com/developer/development/#sql-parsers), or this [demo app](https://github.com/cloudera/hue/tree/master/tools/examples/api/hue_dep) for more information.
 
 !["Parser Component"](https://cdn.gethue.com/uploads/2020/07/parser_component.png)
 

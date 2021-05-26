@@ -42,8 +42,8 @@ if [ "$?" -eq "0" ];
     sleep 5
 
     muffet http://localhost:1313/ \
-        --exclude "https://issues.cloudera.org*|http://localhost:5555*|https://issues.apache.org/jira*|https://github.com*\
-          |http://demo.gethue.com*|https://twitter.com/gethue|https://github.com*" \
+        --exclude "https://issues.cloudera.org*|http://localhost:8005|http://localhost:5555*|https://issues.apache.org/jira*|https://github.com*\
+          |http://demo.gethue.com*|https://twitter.com/gethue|https://github.com*|https://cdn.gethue.com/downloads/*" \
         --ignore-fragments \
         --timeout 15 \
         --concurrency 10

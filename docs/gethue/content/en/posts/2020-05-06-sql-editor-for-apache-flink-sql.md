@@ -177,7 +177,7 @@ The Flink Dashboard will show the SQL queries running as regular jobs:
 
 There are lot of [future iterations](https://github.com/cloudera/hue/blob/master/docs/designs/apache_flink.md) on this first version to make it production ready but the base is getting there.
 
-One that should be of popular interest would be to improve the [SQL autocomplete](https://ci.apache.org/projects/flink/flink-docs-master/dev/table/sql/queries.html#supported-syntax) which is based on [Apache Calcite](https://calcite.apache.org/docs/reference.html). Hue comes with a SDK for writing better [grammars](https://docs.gethue.com/developer/parsers/) and even ships with a default [Flink SQL dialect](https://github.com/cloudera/hue/tree/master/desktop/core/src/desktop/js/parse/jison/sql/flink).
+One that should be of popular interest would be to improve the [SQL autocomplete](https://ci.apache.org/projects/flink/flink-docs-master/dev/table/sql/queries.html#supported-syntax) which is based on [Apache Calcite](https://calcite.apache.org/docs/reference.html). Hue comes with a SDK for writing better [grammars](https://docs.gethue.com/developer/development/#sql-parsers) and even ships with a default [Flink SQL dialect](https://github.com/cloudera/hue/tree/master/desktop/core/src/desktop/js/parse/jison/sql/flink).
 
 Another one coming soon will be a more user friendly display of the live data in the result grid.
 

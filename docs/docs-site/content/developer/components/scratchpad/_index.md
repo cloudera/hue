@@ -49,7 +49,7 @@ For quick testing, it is possible to skip the `npm install` and directly grab th
 
     <script type="text/javascript" src="https://cdn.gethue.com/components/SqlScratchpadWebComponent.js"></script>
 
-Then make sure `api-url` points to a running Hue or [Compose](https://github.com/gethue/compose) APIs on [http://locahost:8005](http://locahost:8005). The API is the middleware between your Data Warehouse and Web Browser client and will provide the dynamic content like the list of tables and columns and enrich the static autocomplete powered by the [parser](/developer/components/parsers/) selected by the `dialect`.
+Then make sure `api-url` points to a running Hue or [Compose](https://github.com/gethue/compose) APIs on [http://localhost:8005](http://localhost:8005). The API is the middleware between your Data Warehouse and Web Browser client and will provide the dynamic content like the list of tables and columns and enrich the static autocomplete powered by the [parser](/developer/components/parsers/) selected by the `dialect`.
 
 If using Hue as the API, this [ini settings](/administrator/configuration/) is currently required:
 

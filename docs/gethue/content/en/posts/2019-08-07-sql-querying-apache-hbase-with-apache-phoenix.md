@@ -92,7 +92,7 @@ Error: ERROR 505 (42000): Table is read only. (state=42000,code=505)
 0: jdbc:phoenix:&gt; select * from "analytics_demo" where pk = "domain.0" limit 5;
 </code></pre>
 
-**3** Phoenix follows Apache Calcite. Feel free to help improve the [SQL autocomplete](https://docs.gethue.com/developer/parsers/) support for it.
+**3** Phoenix follows Apache Calcite. Feel free to help improve the [SQL autocomplete](https://docs.gethue.com/developer/development/#sql-parsers) support for it.
 
 **4** The UI (and the underlying SQLAlchemy API) cannot distinguish between 'ANY namespace' and 'empty/Default' namespace
 
