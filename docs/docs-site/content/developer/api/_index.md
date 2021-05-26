@@ -24,7 +24,7 @@ Calling without credentials:
 
 Authenticating and getting a [JWT token](https://jwt.io/):
 
-    curl -X POST -H "Content-Type: application/json" -d '{"email": "romain@gethue.com", "password": "romain"}'   http://localhost:9000/api/token/
+    curl -X POST -H "Content-Type: application/json" -d '{"username": "hue", "password": "hue"}' http://localhost:9000/api/token/
     {"refresh":"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTYyMTcyNDYzMSwianRpIjoiOGM0NDRjYzRhN2VhNGMxZDliMGZhNmU1YzUyMjM1MjkiLCJ1c2VyX2lkIjoxfQ.t6t7_eYrNhpGN3-Jz5MDLXM8JtGP7V9Y9lacOTInqqQ","access":"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjIxNjM4NTMxLCJqdGkiOiJhZjgwN2E0ZjBmZDI0ZWMxYWQ2NTUzZjEyMjIyYzU4YyIsInVzZXJfaWQiOjF9.dQ1P3hbzSytp9-o8bWlcOcwrdwRVy95M2Eolph92QMA"}
 
 Re-using the token when making actual calls:
@@ -104,7 +104,7 @@ The API only supports JWT but users need to provide the credentials they are usi
 
 - Wrong credentials: there is currently no error on bad authentication but instead a 302 redirect to the login page, e.g.:
 
-    curl -X POST    -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjIxNjM5NjMxLCJqdGkiOiI0NTY3NTA4MzM5YjY0MjFmYTMzZDJjMzViZWUyMDAyMCIsInVzZXJfaWQiOjF9.qrMNrr69eo38dOsV2aYp8k6WqBeyJZkbSuavxA_o_kM"   http://localhost:9000/notebook/execute/v1/create_notebook
+    curl -X POST -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjIxNjM5NjMxLCJqdGkiOiI0NTY3NTA4MzM5YjY0MjFmYTMzZDJjMzViZWUyMDAyMCIsInVzZXJfaWQiOjF9.qrMNrr69eo38dOsV2aYp8k6WqBeyJZkbSuavxA_o_kM" http://localhost:9000/notebook/execute/v1/create_notebook
 
     [21/May/2021 16:26:46 -0700] middleware   INFO     Redirecting to login page: /notebook/execute/v1/create_notebook
     [21/May/2021 16:26:46 -0700] access       INFO     127.0.0.1 -anon- - "POST /notebook/execute/v1/create_notebook HTTP/1.1" - (mem: 172mb)-- login redirection
@@ -112,22 +112,22 @@ The API only supports JWT but users need to provide the credentials they are usi
 
 - It is possible to submit data in JSON format:
 
-    -H "Content-Type: application/json" -d '{"email": "romain@gethue.com", "password": "romain"}'
+    -H "Content-Type: application/json" -d '{"username": "hue", "password": "hue"}'
 
 ### Login
 
 Authenticating and getting a [JWT token](https://jwt.io/):
 
-    curl -X POST -d 'username=demo,password=demo'   http://localhost:9000/api/token/
+    curl -X POST -d 'username=hue,password=hue' http://localhost:9000/api/token/
     {"refresh":"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTYyMTcyNDYzMSwianRpIjoiOGM0NDRjYzRhN2VhNGMxZDliMGZhNmU1YzUyMjM1MjkiLCJ1c2VyX2lkIjoxfQ.t6t7_eYrNhpGN3-Jz5MDLXM8JtGP7V9Y9lacOTInqqQ","access":"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjIxNjM4NTMxLCJqdGkiOiJhZjgwN2E0ZjBmZDI0ZWMxYWQ2NTUzZjEyMjIyYzU4YyIsInVzZXJfaWQiOjF9.dQ1P3hbzSytp9-o8bWlcOcwrdwRVy95M2Eolph92QMA"}
 
 ### Check token
 
-    curl -X POST -d 'token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjIxNjM4NTMxLCJqdGkiOiJhZjgwN2E0ZjBmZDI0ZWMxYWQ2NTUzZjEyMjIyYzU4YyIsInVzZXJfaWQiOjF9.dQ1P3hbzSytp9-o8bWlcOcwrdwRVy95M2Eolph92QMA'   http://localhost:9000/api/token/verify/
+    curl -X POST -d 'token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjIxNjM4NTMxLCJqdGkiOiJhZjgwN2E0ZjBmZDI0ZWMxYWQ2NTUzZjEyMjIyYzU4YyIsInVzZXJfaWQiOjF9.dQ1P3hbzSytp9-o8bWlcOcwrdwRVy95M2Eolph92QMA' http://localhost:9000/api/token/verify/
 
 ### Refresh token
 
-    curl -X POST 'refresh=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTYyMTcyNDYzMSwianRpIjoiOGM0NDRjYzRhN2VhNGMxZDliMGZhNmU1YzUyMjM1MjkiLCJ1c2VyX2lkIjoxfQ.t6t7_eYrNhpGN3-Jz5MDLXM8JtGP7V9Y9lacOTInqqQ'   http://localhost:9000/api/token/refresh/
+    curl -X POST 'refresh=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTYyMTcyNDYzMSwianRpIjoiOGM0NDRjYzRhN2VhNGMxZDliMGZhNmU1YzUyMjM1MjkiLCJ1c2VyX2lkIjoxfQ.t6t7_eYrNhpGN3-Jz5MDLXM8JtGP7V9Y9lacOTInqqQ' http://localhost:9000/api/token/refresh/
 
 
 ## SQL Querying
@@ -506,7 +506,9 @@ Here is some overview about using the Python commands an shell and some examples
 * [Hue API: Execute some builtin or shell commands](http://gethue.com/hue-api-execute-some-builtin-commands/).
 * [How to manage the Hue database with the shell](http://gethue.com/how-to-manage-the-hue-database-with-the-shell/).
 
-## Making a user admin
+## Users
+
+### Making a user admin
 
 Via the Hue shell:
 
@@ -522,7 +524,7 @@ Then type something similar to:
     a.set_password('my_secret')
     a.save()
 
-## Changing user password
+### Changing user password
 
 In the Hue shell:
 
@@ -533,7 +535,7 @@ In the Hue shell:
     user.save()
 
 
-## Counting user documents
+### Counting user documents
 
 On the command line:
 
