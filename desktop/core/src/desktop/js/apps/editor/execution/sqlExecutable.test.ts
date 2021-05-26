@@ -129,7 +129,7 @@ describe('sqlExecutable.js', () => {
           return logsPromise;
         }
         fail('fail for URL: ' + url);
-        throw new Error('fail for URL: ' + url);
+        throw new Error('Did not find URL: ' + url);
       }
     );
 
