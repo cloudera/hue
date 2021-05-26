@@ -67,8 +67,6 @@ And then:
 
 ### JavaScript
 
-API from https://www.npmjs.com/package/gethue will be documented soon.
-
 In the meantime, with Axios:
 
     <script src="https://unpkg.com/axios@0.21.1/dist/axios.min.js"></script>
@@ -100,7 +98,7 @@ In the meantime, with Axios:
 
 The API only supports JWT but users need to provide the credentials they are using in the regular login form or [authentication backends](/administrator/configuration/server/#authentication). This is consistent and users are free to interact with the service via their Browser or API.
 
-- Wrong credentials: there is currently no error on bad authentication but instead a 302 redirect to the login page, e.g.:
+**Wrong credentials**: there is currently no error on bad authentication but instead a 302 redirect to the login page, e.g.:
 
     curl -X POST -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjIxNjM5NjMxLCJqdGkiOiI0NTY3NTA4MzM5YjY0MjFmYTMzZDJjMzViZWUyMDAyMCIsInVzZXJfaWQiOjF9.qrMNrr69eo38dOsV2aYp8k6WqBeyJZkbSuavxA_o_kM" http://localhost:9000/notebook/execute/v1/create_notebook
 
@@ -108,7 +106,7 @@ The API only supports JWT but users need to provide the credentials they are usi
     [21/May/2021 16:26:46 -0700] access       INFO     127.0.0.1 -anon- - "POST /notebook/execute/v1/create_notebook HTTP/1.1" - (mem: 172mb)-- login redirection
     [21/May/2021 16:26:46 -0700] access       INFO     127.0.0.1 -anon- - "POST /notebook/execute/v1/create_notebook HTTP/1.1" returned in 4ms 302 0
 
-- It is possible to submit data in JSON format:
+It is possible to submit data in **JSON format**:
 
     -H "Content-Type: application/json" -d '{"username": "hue", "password": "hue"}'
 
