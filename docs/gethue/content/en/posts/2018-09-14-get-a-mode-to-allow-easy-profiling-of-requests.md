@@ -52,7 +52,7 @@ categories:
 
 <span style="font-weight: 400;">As the screenshots above, the Django Debug panel captures requests and list them on the left column, and it provides a list of panels on the right column that display various debug information about the each of request/response, like version, time, settings, header, SQL, and static files. And when click on each of the panel, more detail information will display in the middle.</span>
 
-<span style="font-weight: 400;">This tool replies on a Chrome extension, so use Chrome and install </span>[<span style="font-weight: 400;">Django Debug Panel</span>][5] <span style="font-weight: 400;">from Chrome store.</span>
+<span style="font-weight: 400;">This tool replies on a Chrome extension, so use Chrome and install </span><span style="font-weight: 400;">Django Debug Panel</span>] <span style="font-weight: 400;">from Chrome store.</span>
 
 <span style="font-weight: 400;">To enable this debug panel, set following to hue.ini. If you are using Cloudera Manager, put them in Safety Valve.</span>
 
@@ -86,5 +86,4 @@ Reference:
  [2]: https://github.com/recamshak/django-debug-panel
  [3]: https://cdn.gethue.com/uploads/2018/09/image1.png
  [4]: https://cdn.gethue.com/uploads/2018/09/image2.png
- [5]: https://chrome.google.com/webstore/detail/django-debug-panel/nbiajhhibgfgkjegbnflpdccejocmbbn
  [6]: https://issues.cloudera.org/browse/HUE-8139

@@ -328,7 +328,7 @@ for more details, refer to this link: [https://docs.oracle.com/cd/E37670_01/E590
 
 Optional.
 
-Java is only for the [JDBC proxy](/developer/connectors/#jdbc) connector which is not built automatically anymore.
+Java is only for the [JDBC proxy](/developer/development/#connectors) connector which is not built automatically anymore.
 
 **Install Oracle JDK**
 

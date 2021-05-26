@@ -158,7 +158,7 @@ HBaseのようなビッグテーブルにあるライブのKafkaデータをSQL�
 
 これで完成です!
 
-コミュニティとPhoenix/HBase チームに感謝します。特に、[better SQL autocomplete](https://docs.gethue.com/developer/parsers/), [create table wizard](/querying-exploring-the-instacart-dataset-part-1-ingesting-the-data/) 用のコネクタ、いくつかの組み込みSQLの例など、多くの改善を行っているところです。
+コミュニティとPhoenix/HBase チームに感謝します。特に、[better SQL autocomplete](https://docs.gethue.com/developer/development/#sql-parsers), [create table wizard](/querying-exploring-the-instacart-dataset-part-1-ingesting-the-data/) 用のコネクタ、いくつかの組み込みSQLの例など、多くの改善を行っているところです。
 
 試してみたい方は、demo.gethue.comからワンクリックでアクセスできます。
 

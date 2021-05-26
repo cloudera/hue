@@ -77,7 +77,7 @@ Hue を使用する利点の一つは、HDFS / S3 / Azure 用の[ファイルブ
 今後の改善点を紹介します。
 
 * データベース/テーブル/列の自動補完は現在空です
-* SQL文法の自動補完は[拡張できます](https://docs.gethue.com/developer/parsers/)
+* SQL文法の自動補完は[拡張できます](https://docs.gethue.com/developer/development/#sql-parsers)
 * ミニSQLエディターのポップアップを可能にする[SQL Scratchpad](https://docs.gethue.com/developer/api/#scratchpad) モジュールは現在進行中です
 
 
