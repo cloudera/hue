@@ -37,7 +37,17 @@ The default setting is port 8888 on all configured IP addresses.
     http_host=0.0.0.0
     http_port=8888
 
-[Gunicorn](https://gunicorn.org/) support is planned to come in via [HUE-8739](https://issues.cloudera.org/browse/HUE-8739).
+### Gunicorn server
+
+Instead of running CherryPy, [Gunicorn](https://gunicorn.org/) will be launched:
+
+      # Set to true to use CherryPy as the webserver, set to false
+      # to use Gunicorn as the webserver. Defaults to CherryPy if
+      # key is not specified.
+      use_cherrypy_server=false
+
+      # Gunicorn work class: gevent or evenlet, gthread or sync.
+      gunicorn_work_class=sync
 
 ### Specifying the Secret Key
 
@@ -762,7 +772,7 @@ By default Hue stores the [saved documents](/user/concept/#documents) in its dat
 
     ## Client Secret for Authorized Application
     # client_secret=
-    
+
 ## Slack
 Currently in **Beta**
 
