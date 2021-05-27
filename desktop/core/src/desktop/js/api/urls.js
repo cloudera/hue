@@ -15,9 +15,8 @@
 // limitations under the License.
 
 export const AUTOCOMPLETE_API_PREFIX = '/api/editor/autocomplete/';
-// export const AUTOCOMPLETE_API_PREFIX = '/notebook/api/autocomplete/';
 export const SAMPLE_API_PREFIX = '/notebook/api/sample/';
-export const EXECUTE_API_PREFIX = '/notebook/api/execute/';
+export const EXECUTE_API_PREFIX = '/api/editor/execute/'; // Dups with api.ts
 export const DOCUMENTS_API = '/desktop/api2/doc/';
 export const DOCUMENTS_SEARCH_API = '/desktop/api2/docs/';
 export const GET_HUE_CONFIG_API = '/desktop/api2/get_hue_config';
@@ -48,10 +47,10 @@ export const CREATE_SESSION_API = '/api/editor/create_session'; // Note: dup by 
 export const CLOSE_SESSION_API = '/api/editor/close_session'; // Note: dup by api.ts
 export const FETCH_RESULT_SIZE_API = '/notebook/api/fetch_result_size';
 export const FETCH_RESULT_DATA_API = '/notebook/api/fetch_result_data';
-export const GET_LOGS_API = '/notebook/api/get_logs';
+export const GET_LOGS_API = '/api/editor/get_logs';
 export const CANCEL_STATEMENT_API = '/notebook/api/cancel_statement';
 export const CLOSE_STATEMENT_API = '/notebook/api/close_statement';
-export const CHECK_STATUS_API = '/notebook/api/check_status';
+export const CHECK_STATUS_API = '/api/editor/check_status';
 
 export const HBASE_API_PREFIX = '/hbase/api/';
 export const SAVE_TO_FILE_API = '/filebrowser/save';
