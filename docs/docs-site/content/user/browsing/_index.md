@@ -593,7 +593,7 @@ Any job running on the Resource Manager will be automatically listed. The inform
 
 ### Oozie Workflow / Schedules
 
-List submitted workflows, schedules and bundles. See more in details in the [Scheduling](/user/scheduling/) section.
+List submitted workflows, schedules and bundles.
 
 ![Oozie jobs](https://cdn.gethue.com/uploads/2016/04/hue-dash-oozie.png)
 

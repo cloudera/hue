@@ -66,7 +66,7 @@
   import ResultTable from '../result/ResultTable.vue';
   import Executor from '../../execution/executor';
   import SqlExecutable from '../../execution/sqlExecutable';
-  import { AuthType, login } from 'api/auth';
+  import { login } from 'api/auth';
   import { setBaseUrl } from 'api/utils';
   import contextCatalog from 'catalog/contextCatalog';
   import HueIcons from 'components/icons/HueIcons.vue';
@@ -87,29 +87,29 @@
       AceEditor
     },
     props: {
+      apiUrl: {
+        type: String as PropType<string | null>,
+        default: null
+      },
       dialect: {
         type: String as PropType<string | null>,
         default: null
       },
-      auth: {
-        type: String as PropType<AuthType | null>,
-        default: AuthType.jwt
+      username: {
+        type: String as PropType<string | null>,
+        default: null
       },
-      user: {
+      email: {
         type: String as PropType<string | null>,
         default: null
       },
       password: {
         type: String as PropType<string | null>,
         default: null
-      },
-      apiUrl: {
-        type: String as PropType<string | null>,
-        default: null
       }
     },
     setup(props) {
-      const { apiUrl, auth, dialect, pass, user } = toRefs(props);
+      const { apiUrl, dialect, username, email, password } = toRefs(props);
       const activeExecutable = ref<SqlExecutable>(null);
       const executor = ref<Executor>(null);
       const loading = ref<boolean>(true);
@@ -140,9 +140,13 @@
           setBaseUrl(apiUrl.value);
         }
 
-        if (user.value !== null && pass.value !== null) {
+        if (password.value !== null) {
           try {
-            await login(user.value, pass.value, auth.value);
+            await login(
+              username.value ? username.value : '',
+              email.value ? email.value : '',
+              password.value
+            );
           } catch (err) {
             errorMessage.value = 'Login failed!';
             console.error(err);
@@ -151,7 +155,7 @@
         }
 
         try {
-          await getConfig();
+          await getConfig(true);
         } catch (err) {
           errorMessage.value = 'Failed loading the Hue config!';
           console.error(err);

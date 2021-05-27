@@ -35,6 +35,11 @@ desktop.lib.metrics.file_reporter.start_file_reporter()
 
 from django.conf import settings
 from django.views.static import serve
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+    TokenVerifyView,
+)
 
 from notebook import views as notebook_views
 from useradmin import views as useradmin_views
@@ -44,6 +49,7 @@ from desktop import appmanager
 from desktop import views as desktop_views
 from desktop import api as desktop_api
 from desktop import api2 as desktop_api2
+from desktop import api_public_urls
 from desktop.auth import views as desktop_auth_views
 from desktop.conf import METRICS, USE_NEW_EDITOR, ENABLE_DJANGO_DEBUG_TOOL, ANALYTICS, has_connectors, ENABLE_PROMETHEUS, SLACK
 from desktop.configuration import api as desktop_configuration_api
@@ -202,11 +208,18 @@ dynamic_patterns += [
 ]
 
 dynamic_patterns += [
+  re_path('^api/token/auth/?$', TokenObtainPairView.as_view(), name='token_obtain'),
+  re_path('^api/token/verify/?$', TokenVerifyView.as_view(), name='token_verify'),
+  re_path('^api/token/refresh/?$', TokenRefreshView.as_view(), name='token_refresh'),
+
+  re_path(r'^api/', include('desktop.api_public_urls')),
+]
+
+dynamic_patterns += [
   re_path(r'^desktop/api/vcs/contents/?$', desktop_lib_vcs_api.contents),
   re_path(r'^desktop/api/vcs/authorize/?$', desktop_lib_vcs_api.authorize),
 ]
 
-# Metrics specific
 if METRICS.ENABLE_WEB_METRICS.get():
   dynamic_patterns += [
     re_path(r'^desktop/metrics/?', include('desktop.lib.metrics.urls'))

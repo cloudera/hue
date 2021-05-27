@@ -113,7 +113,9 @@ class TestBotServer(unittest.TestCase):
               get_user.return_value = self.user
 
               get_cluster_config.return_value = {
-                'default_sql_interpreter': 'hive'
+                'main_button_action': {
+                  'dialect': 'hive'
+                },
               }
               _gist_create.return_value = {
                 'link': 'gist_link'

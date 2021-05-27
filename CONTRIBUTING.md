@@ -14,7 +14,7 @@ Here is some inspiration on which areas we would love to have some contributions
 1. Updating a small piece of [documentation](https://docs.gethue.com)
 2. High level [Roadmap](/docs/ROADMAP.md)
 3. Check [Github issues](https://github.com/cloudera/hue/issues).
-4. Improving [SQL Components](https://docs.gethue.com/developer/components/), [SQL autocompletes](https://docs.gethue.com/developer/parsers/) or [SQL connectors](https://docs.gethue.com/developer/sdk/) are great projects
+4. Improving [SQL Components](https://docs.gethue.com/developer/components/), [SQL autocompletes](https://docs.gethue.com/developer/development/#sql-parsers) or [SQL connectors](https://docs.gethue.com/developer/sdk/) are great projects
 
 # Submitting an improvement
 

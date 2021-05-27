@@ -21,6 +21,7 @@
 # as local_settings.py.
 
 from builtins import map, zip
+import datetime
 import gc
 import json
 import logging
@@ -211,6 +212,8 @@ INSTALLED_APPS = [
     'django_prometheus',
     'crequest',
     #'django_celery_results',
+    'rest_framework',
+    'rest_framework.authtoken',
 ]
 
 WEBPACK_LOADER = {
@@ -279,6 +282,26 @@ PYLINTRC = get_run_root('.pylintrc')
 
 # Custom CSRF Failure View
 CSRF_FAILURE_VIEW = 'desktop.views.csrf_failure'
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+      'rest_framework.permissions.IsAuthenticated',
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+      'rest_framework_simplejwt.authentication.JWTAuthentication',
+      'rest_framework.authentication.SessionAuthentication',
+    ),
+}
+
+JWT_AUTH = {
+    'JWT_VERIFY': True,
+    'JWT_VERIFY_EXPIRATION': True,
+    'JWT_LEEWAY': 0,
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=86400),
+    'JWT_ALLOW_REFRESH': True,
+    'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=7),
+    'JWT_AUTH_HEADER_PREFIX': 'Bearer',
+}
 
 ############################################################
 # Part 4: Installation of apps
@@ -354,17 +377,16 @@ SERVER_EMAIL = desktop.conf.DJANGO_SERVER_EMAIL.get()
 EMAIL_BACKEND = desktop.conf.DJANGO_EMAIL_BACKEND.get()
 EMAIL_SUBJECT_PREFIX = 'Hue %s - ' % desktop.conf.CLUSTER_ID.get()
 
-# Permissive CORS
-if desktop.conf.CORS_ENABLED.get():
+
+# Permissive CORS for public /api
+if desktop.conf.CORS_ENABLED.get() or True:
   INSTALLED_APPS.append('corsheaders')
   MIDDLEWARE.insert(0, 'corsheaders.middleware.CorsMiddleware')
-  MIDDLEWARE.remove('django.middleware.csrf.CsrfViewMiddleware')
+  CORS_URLS_REGEX = r'^/api/.*$'
   if sys.version_info[0] > 2:
     CORS_ALLOW_ALL_ORIGINS = True
   else:
     CORS_ORIGIN_ALLOW_ALL = True
-  CORS_ALLOW_CREDENTIALS = True  # For when cookie auth
-  SESSION_COOKIE_SAMESITE = None
 
 # Configure database
 if os.getenv('DESKTOP_DB_CONFIG'):
