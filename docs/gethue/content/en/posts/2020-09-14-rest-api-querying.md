@@ -41,7 +41,7 @@ ampforwp-amp-on-off:
 categories:
   - Version 4
 #  - Version 4.8
-  - Dev / API
+  - Development
 
 ---
 Hi Data App Builders,

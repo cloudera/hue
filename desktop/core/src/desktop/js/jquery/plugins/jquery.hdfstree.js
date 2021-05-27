@@ -16,8 +16,8 @@
 
 import jQuery from 'jquery';
 
-import hueUtils from 'utils/hueUtils';
 import I18n from 'utils/i18n';
+import scrollbarWidth from 'utils/screen/scrollbarWidth';
 
 // TODO: don't create multiple jquery instances from chunks
 const $ = window.$ || jQuery;
@@ -113,7 +113,7 @@ Plugin.prototype.init = function (optionalPath) {
       'font-size': '16px',
       'border-bottom': '1px solid #FFF',
       'background-color': '#FFF',
-      width: 560 - hueUtils.scrollbarWidth() + 'px'
+      width: 560 - scrollbarWidth() + 'px'
     });
   }
 

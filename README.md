@@ -8,16 +8,16 @@
 Query. Explore. Share.
 ----------------------
 
-The Hue Editor is a mature open source SQL Assistant for querying any [Databases & Data Warehouses](https://docs.gethue.com/administrator/configuration/connectors/).
+Hue is a mature SQL Assistant for querying any [Databases & Data Warehouses](https://docs.gethue.com/administrator/configuration/connectors/) via the Web:
 
-Many companies and organizations use Hue to quickly answer questions via self-service querying.
+Many companies and organizations use Hue to quickly answer questions via self-service querying e.g.:
 
 * 1000+ customers
 * Top Fortune 500
 
-are executing 1000s of queries daily. It ships in data platforms like Cloudera, Google DataProc, Amazon EMR, Open Data Hub...
+are executing 100s of 1000s of queries daily via its SQL Editor or API.
 
-Hue is also ideal for building your own [Cloud SQL Editor](https://docs.gethue.com/developer/components/) and any contributions are welcome.
+This open source project is also ideal for building your own [Query Editor](https://docs.gethue.com/developer/components/) or [Query Service](https://docs.gethue.com/administrator/installation/cloud/#kubernetes) and contributions are welcome.
 
 Read more on: [gethue.com](http://gethue.com)
 
@@ -51,7 +51,7 @@ Kubernetes
 
     helm repo add gethue https://helm.gethue.com
     helm repo update
-    helm install gethue/hue
+    helm install hue gethue/hue
 
 Read more about configurations at [tools/kubernetes](tools/kubernetes/).
 

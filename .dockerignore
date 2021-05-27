@@ -3,3 +3,5 @@ logs
 node_modules
 .git
 .vscode
+
+desktop/core/ext-py/

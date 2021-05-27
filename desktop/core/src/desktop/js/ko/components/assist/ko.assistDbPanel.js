@@ -588,7 +588,7 @@ class AssistDbPanel {
 
     this.breadcrumb = ko.pureComputed(() => {
       if (this.isStreams && this.selectedSource()) {
-        return this.selectedSource().name;
+        return this.selectedSource().connector.displayName;
       }
       if (!this.isSolr && this.selectedSource()) {
         if (this.selectedSource().selectedNamespace()) {
@@ -599,7 +599,7 @@ class AssistDbPanel {
             return this.selectedSource().selectedNamespace().name;
           }
         }
-        return this.selectedSource().name;
+        return this.selectedSource().connector.displayName;
       }
       return null;
     });
@@ -807,7 +807,7 @@ class AssistDbPanel {
     this.sources([source]);
     this.selectedSource(source);
 
-    source.loadNamespaces().done(() => {
+    source.loadNamespaces().then(() => {
       const namespace = this.selectedSource().selectedNamespace();
       if (namespace) {
         namespace.initDatabases();
@@ -840,7 +840,7 @@ class AssistDbPanel {
           new AssistDbSource({
             i18n: this.i18n,
             type: connector.id, // TODO: Remove redundant
-            name: connector.name, // TODO: Remove redundant
+            name: connector.displayName, // TODO: Remove redundant
             connector: connector,
             nonSqlType: false,
             navigationSettings: navigationSettings

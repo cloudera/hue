@@ -33,6 +33,7 @@ class MetastoreSource {
   constructor(options) {
     this.type = options.type;
     this.name = options.name;
+    this.displayName = options.displayName;
     this.metastoreViewModel = options.metastoreViewModel;
 
     this.reloading = ko.observable(false);
@@ -160,7 +161,7 @@ class MetastoreSource {
                 () => {
                   setState(previousState);
                 },
-                this.metastoreViewModel.optimizerEnabled(),
+                this.metastoreViewModel.sqlAnalyzerEnabled(),
                 this.metastoreViewModel.navigatorEnabled()
               );
               return true;
@@ -198,7 +199,7 @@ class MetastoreSource {
                 metastoreViewModel: this.metastoreViewModel,
                 sourceType: this.type,
                 navigatorEnabled: this.metastoreViewModel.navigatorEnabled,
-                optimizerEnabled: this.metastoreViewModel.optimizerEnabled,
+                sqlAnalyzerEnabled: this.metastoreViewModel.sqlAnalyzerEnabled,
                 namespace: namespace
               })
           )

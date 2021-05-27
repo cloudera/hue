@@ -1,0 +1,8 @@
+build
+logs
+node_modules
+.git
+.vscode
+
+# Needed for local compilation
+#desktop/core/ext-py/

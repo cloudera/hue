@@ -41,7 +41,7 @@ const globalVars = {
   AUTOCOMPLETE_TIMEOUT: 1,
   CACHEABLE_TTL: 1,
   HAS_LINK_SHARING: true,
-  HAS_OPTIMIZER: false,
+  HAS_SQL_ANALYZER: false,
   HUE_I18n: {},
   HUE_BASE_URL: '',
   HUE_CHARTS: {

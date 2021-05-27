@@ -37,7 +37,17 @@ The default setting is port 8888 on all configured IP addresses.
     http_host=0.0.0.0
     http_port=8888
 
-[Gunicorn](https://gunicorn.org/) support is planned to come in via [HUE-8739](https://issues.cloudera.org/browse/HUE-8739).
+### Gunicorn server
+
+Instead of running CherryPy, [Gunicorn](https://gunicorn.org/) will be launched:
+
+      # Set to true to use CherryPy as the webserver, set to false
+      # to use Gunicorn as the webserver. Defaults to CherryPy if
+      # key is not specified.
+      use_cherrypy_server=false
+
+      # Gunicorn work class: gevent or evenlet, gthread or sync.
+      gunicorn_work_class=sync
 
 ### Specifying the Secret Key
 
@@ -762,3 +772,45 @@ By default Hue stores the [saved documents](/user/concept/#documents) in its dat
 
     ## Client Secret for Authorized Application
     # client_secret=
+
+## Slack
+Currently in **Beta**
+
+This [integration](/user/concept/#share-to-slack) helps users to have better collaboration with others via Slack.
+
+### Architectural View
+![Share to Slack Architecture](https://cdn.gethue.com/uploads/2021/04/share_to_slack_architecture.png)
+
+One of the flows for sharing query/gist links, the main bot logic lies on top of the Hue server listening to the events posted by the Hue App from Slack to an endpoint, processing those events such as generating a rich preview to unfurl for the links shared in the Slack channels and using Slack API methods for sending these responses back to Slack.
+
+The 'Smart Quering Assistance' block on top of Hue server which driving the other flow for SQL Assistance is currently a work in progress for replying to users asking questions on how to find certain data tables or to query them.
+
+### Manual Slack App Installation
+Steps to be followed by the Slack workspace admin to set up their own Hue Slack app. The app needs to be created only once, other Hue users can simply [interact](/user/concept/#share-to-slack) with the App in the Slack channels!
+
+#### App Manifest (YAML)
+The latest version of the manifest file is checked-in [here](https://github.com/cloudera/hue/blob/master/tools/slack/manifest.yml)
+
+#### Changes needed in the YAML Manifest
+Update the two _demo.gethue.com_ with **your Hue instance hostname:**
+- Under **unfurl_domains**
+- Under **event_subscriptions**, in **request_url** `https://<hue-instance-hostname>/desktop/slack/events/`
+
+#### Creating your app
+1. Go to https://api.slack.com/apps and click **Create New App**.
+2. Choose **From an app manifest** option and workspace that you'll be installing the app and click **Next**.
+3. Choose **YAML** and paste the Manifest code (make sure you do the necessary changes mentioned above) and click **Next**.
+4. Read the review summary and if everything’s correct, click **Create**.
+5. Once the app is created, install it in the workspace.
+
+#### Updating your hue.ini config file
+6. Go to the **OAuth & Permissions** page, copy the **Bot User OAuth Token** and update **slack_bot_user_token** (e.g. _xoxb-xxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxx_).
+7. Similarly, go to the **Basic Information** page, copy the **Verification Token** and update **slack_verification_token**.
+8. Paste this in your hue.ini file under `[desktop]` section.
+
+        [[slack]]
+        is_enabled=true
+        slack_verification_token=<your-slack-verification-token>
+        slack_bot_user_token=<your-slack-bot-user-token>
+
+Now add the Slack app in your desired channels and send some [query/gist links](/user/concept/#share-to-slack)!

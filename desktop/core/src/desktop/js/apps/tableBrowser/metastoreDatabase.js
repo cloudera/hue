@@ -14,6 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import sqlAnalyzerRepository from 'catalog/analyzer/sqlAnalyzerRepository';
 import $ from 'jquery';
 import * as ko from 'knockout';
 
@@ -25,7 +26,7 @@ class MetastoreDatabase {
   /**
    * @param {object} options
    * @param {DataCatalogEntry} options.catalogEntry
-   * @param {observable} options.optimizerEnabled
+   * @param {observable} options.sqlAnalyzerEnabled
    * @param {MetastoreViewModel} options.metastoreViewModel;
    * @constructor
    */
@@ -99,13 +100,13 @@ class MetastoreDatabase {
     this.catalogEntry.clearCache().then(() => {
       this.load(
         () => {},
-        this.metastoreViewModel.optimizerEnabled(),
+        this.metastoreViewModel.sqlAnalyzerEnabled(),
         this.metastoreViewModel.navigatorEnabled()
       );
     });
   }
 
-  load(callback, optimizerEnabled, navigatorEnabled) {
+  load(callback, sqlAnalyzerEnabled, navigatorEnabled) {
     if (navigatorEnabled) {
       this.loadingComment(true);
       this.catalogEntry
@@ -128,8 +129,8 @@ class MetastoreDatabase {
               new MetastoreTable({
                 database: this,
                 catalogEntry: tableEntry,
-                optimizerEnabled: optimizerEnabled,
-                navigatorEnabled: navigatorEnabled
+                sqlAnalyzerEnabled,
+                navigatorEnabled
               })
           )
         );
@@ -146,13 +147,16 @@ class MetastoreDatabase {
               this.loadingTableComments(false);
             });
         }
-        if (optimizerEnabled) {
+        if (sqlAnalyzerEnabled) {
           this.loadingTablePopularity(true);
+          const sqlAnalyzer = sqlAnalyzerRepository.getSqlAnalyzer(
+            this.catalogEntry.getConnector()
+          );
           this.catalogEntry
-            .loadOptimizerPopularityForChildren()
+            .loadSqlAnalyzerPopularityForChildren({ sqlAnalyzer })
             .then(() => {
               this.tables().forEach(table => {
-                table.optimizerStats(table.catalogEntry.optimizerPopularity);
+                table.sqlAnalyzerStats(table.catalogEntry.sqlAnalyzerPopularity);
               });
             })
             .finally(() => {

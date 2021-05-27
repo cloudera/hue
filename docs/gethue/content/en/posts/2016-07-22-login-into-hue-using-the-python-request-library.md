@@ -37,7 +37,7 @@ sf_caption_position:
 sf_remove_promo_bar:
   - 1
 categories:
-  - Dev / API
+  - Development
 
 ---
 ## **In this little snippet we will show you how to login into HUE using python requests library.**

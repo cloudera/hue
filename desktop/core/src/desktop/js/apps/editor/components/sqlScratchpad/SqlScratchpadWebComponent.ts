@@ -14,6 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import 'regenerator-runtime/runtime';
 import SqlScratchpad from './SqlScratchpad.vue';
 import { wrap } from 'vue/webComponentWrap';
 import { post, setBaseUrl, setBearerToken } from 'api/utils';
@@ -21,6 +22,7 @@ import 'utils/json.bigDataParse';
 
 wrap('sql-scratchpad', SqlScratchpad);
 
+// Dup of auth.ts?
 const login = async (username: string, password: string): Promise<void> =>
   post('iam/v1/get/auth-token/', { username, password });
 

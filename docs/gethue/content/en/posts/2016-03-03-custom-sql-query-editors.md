@@ -313,7 +313,7 @@ Hue's new query editors are a huge leap forward in enriching and unifying the SQ
  [8]: http://my.vertica.com/download/vertica/client-drivers/
  [9]: https://phoenix.apache.org/download.html
  [10]: http://Presto JDBC Driver Download
- [11]: http://maprdocs.mapr.com/home/Hue/ConfigureHuewithDrill.html
+ [11]: https://docs.datafabric.hpe.com/62/Hue/ConfigureHuewithDrill.html
  [12]: https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/connectors/base.py
  [13]: https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/connectors/jdbc.py
  [14]: https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/connectors/rdbms.py

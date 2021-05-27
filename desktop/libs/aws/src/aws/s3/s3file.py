@@ -22,8 +22,10 @@ from boto.s3.keyfile import KeyFile
 
 from aws.conf import get_key_expiry
 from aws.s3 import translate_s3_error
+from aws.s3.s3connection import UrlKey
 
 DEFAULT_READ_SIZE = 1024 * 1024  # 1MB
+
 
 def open(key, mode='r'):
   if mode == 'r':
@@ -34,8 +36,8 @@ def open(key, mode='r'):
 
 class _ReadableS3File(KeyFile):
   def __init__(self, key):
-      key_copy = key.bucket.get_key(key.name, validate=False)
-      KeyFile.__init__(self, key_copy)
+    key_copy = key.bucket.get_key(key.name, validate=False)
+    KeyFile.__init__(self, key_copy)
 
   def read_url(self):
     return self.getkey().generate_url(get_key_expiry())

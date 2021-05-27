@@ -71,6 +71,6 @@ Thanks to File Browser, file operations in HDFS are only a few clicks away. Hueâ
 Thank you for watching, and stay tuned for upcoming episodes! Feel free to ask questions in comments or via theÂ [Hue group][4].
 
  [1]: http://hadoop.apache.org/docs/r1.0.4/hdfs_user_guide.html
- [2]: http://cloudera.github.com/hue
+ [2]: https://gethue.com
  [3]: http://hadoop.apache.org/
  [4]: https://groups.google.com/a/cloudera.org/forum/?fromgroups#%21forum/hue-user

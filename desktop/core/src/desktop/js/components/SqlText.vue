@@ -23,7 +23,6 @@
 </template>
 
 <script lang="ts">
-  import $ from 'jquery';
   import { defineComponent } from 'vue';
 
   import { formatSql } from 'apps/editor/api';
@@ -168,7 +167,7 @@
           );
         });
 
-        const overflowStyle = this.enableOverflow ? ' overflow: initial !important;' : '';
+        const overflowStyle = this.enableOverflow ? ' overflow: auto;' : '';
         //TODO - Move inline styles to CSS class
         this.$el.innerHTML = `
           <div class="ace_editor ace-hue" style="background-color: transparent; ${overflowStyle}">
@@ -177,9 +176,11 @@
         `;
 
         if (this.enableOverflow) {
-          $(this.$el).css({ overflow: 'auto' });
+          this.$el.style.overflow = 'auto';
         }
-        $(this.$el).find('.ace_invisible_space').remove();
+        (this.$el as HTMLElement)
+          .querySelectorAll('.ace_invisible_space')
+          .forEach(el => el.remove());
       }
     }
   });

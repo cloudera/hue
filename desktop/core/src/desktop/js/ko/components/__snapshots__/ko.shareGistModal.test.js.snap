@@ -8,15 +8,14 @@ exports[`ko.shareGistModal.js should render component 1`] = `
   </div>
   <div class=\\"modal-body\\">
     <div class=\\"row-fluid\\">
-      <div class=\\"span12\\">
+      <div class=\\"input-append\\">
         <form autocomplete=\\"off\\">
-          <input id=\\"gistLink\\" class=\\"input-xxlarge\\" autocorrect=\\"off\\" autocomplete=\\"do-not-autocomplete\\" autocapitalize=\\"off\\" spellcheck=\\"false\\" onfocus=\\"this.select()\\" data-bind=\\"value: link\\" type=\\"text\\" placeholder=\\"Link\\">
+          <input id=\\"gistLink\\" style=\\"width: 510px\\" autocorrect=\\"off\\" autocomplete=\\"do-not-autocomplete\\" autocapitalize=\\"off\\" spellcheck=\\"false\\" onfocus=\\"this.select()\\" data-bind=\\"value: link\\" type=\\"text\\" placeholder=\\"Link\\" readonly=\\"readonly\\">
+          <button class=\\"btn\\" type=\\"button\\" data-dismiss=\\"modal\\" data-clipboard-target=\\"#gistLink\\" data-bind=\\"clipboard\\"><i class=\\"fa fa-clipboard\\"></i></button>
         </form>
-        <button class=\\"btn\\" type=\\"button\\" data-dismiss=\\"modal\\" data-clipboard-target=\\"#gistLink\\" data-bind=\\"clipboard\\">
-          <i class=\\"fa fa-clipboard\\"></i> Copy
-        </button>
       </div>
     </div>
+    <!-- ko if: window.SHARE_TO_SLACK --><!-- /ko -->
   </div>
   <div class=\\"modal-footer\\">
     <a class=\\"btn\\" data-dismiss=\\"modal\\">Close</a>

@@ -35,7 +35,7 @@ sf_caption_position:
 slide_template:
   - default
 categories:
-  - Dev / API
+  - Development
 
 ---
 <p id="docs-internal-guid-2d78f639-4c29-7375-9428-f6c418c4470f">

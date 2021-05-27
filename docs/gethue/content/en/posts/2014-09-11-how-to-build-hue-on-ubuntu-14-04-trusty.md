@@ -39,7 +39,7 @@ slide_template:
 ampforwp-amp-on-off:
   - default
 categories:
-  - Dev / API
+  - Development
 
 ---
 _Last Update: January 24th 2018_

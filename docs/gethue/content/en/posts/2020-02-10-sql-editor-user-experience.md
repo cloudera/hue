@@ -62,7 +62,7 @@ This is a lot of components to access via a full blown Hue:
 
 !["Full Hue"](https://cdn.gethue.com/uploads/2019/12/hue4.6.png)
 
-Hue's apps range from [Dashboards](https://docs.gethue.com/user/querying/#dashboard) for light calculation or charting of indexed or SQL data, browser for the Cloud storages of AWS, Azure, Google Cloud, [scheduling workflows](https://docs.gethue.com/user/scheduling/) of jobs, a dataset importer wizard...
+Hue's apps range from [Dashboards](https://docs.gethue.com/user/querying/#dashboard) for light calculation or charting of indexed or SQL data, browser for the Cloud storages of AWS, Azure, Google Cloud, scheduling workflows of jobs, a dataset importer wizard...
 
 However in the case of SQL Data Warehousing, we want to restrict Hue to mostly the Editor and Data Catalog:
 
@@ -391,7 +391,7 @@ Similarly to Google Documents, any query can be shared with other users or group
 
 Hue 5 and an enhanced SQL Cloud Editor are coming in 2020 for an even more modern Data Query Experience. A Data Warehouse dedicated Hue has also just been released in the [Cloudera Cloud Data Warehouse](https://www.cloudera.com/products/data-warehouse.html).
 
-Hue is also getting more pluggable with many [connectors](https://docs.gethue.com/administrator/configuration/connectors/) to the most popular Databases and their dedicated [SQL autocomplete](https://docs.gethue.com/developer/parsers/).
+Hue is also getting more pluggable with many [connectors](https://docs.gethue.com/administrator/configuration/connectors/) to the most popular Databases and their dedicated [SQL autocomplete](https://docs.gethue.com/developer/development/#sql-parsers).
 
 We will deep dive in greater details on the Cloud capabilities of the SQL Cloud Editor in part three of this series of the 10 years of evolution of Hue. Until then, feel free to comment here or on the [Forum](https://discourse.gethue.com/) and [quick start](https://docs.gethue.com/quickstart/) SQL querying!
 

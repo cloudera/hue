@@ -160,7 +160,7 @@ Then just query the Phoenix table `hue_logs` a few times to see latest access lo
 
 Et voila!
 
-Many thanks to the community and the Phoenix/HBase team. And more improvements are on the way with in particular a [better SQL autocomplete](https://docs.gethue.com/developer/parsers/), connector for the [create table wizard](/querying-exploring-the-instacart-dataset-part-1-ingesting-the-data/) and some builtin SQL examples.
+Many thanks to the community and the Phoenix/HBase team. And more improvements are on the way with in particular a [better SQL autocomplete](https://docs.gethue.com/developer/development/#sql-parsers), connector for the [create table wizard](/querying-exploring-the-instacart-dataset-part-1-ingesting-the-data/) and some builtin SQL examples.
 
 And if you are eager to try it, you can even access it in one click on demo.gethue.com!
 

@@ -111,7 +111,7 @@ Hue is maturing quickly and many more features are on their way. Hue will soon h
 
 Have any suggestions? Feel free to tell us what you think through [hue-user][17].
 
- [1]: http://cloudera.github.com/hue/
+ [1]: https://gethue.com
  [2]: http://hadoop.apache.com/
  [3]: http://hadoop.apache.org/
  [4]: http://oozie.apache.org/

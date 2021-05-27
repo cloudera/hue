@@ -17,6 +17,7 @@
 from future import standard_library
 standard_library.install_aliases()
 from builtins import object
+import csv
 import logging
 import sys
 import urllib.request, urllib.error
@@ -28,11 +29,13 @@ from django.urls import reverse
 
 from azure.abfs.__init__ import abfspath
 from hadoop.fs.hadoopfs import Hdfs
+from notebook.connectors.base import get_interpreter
 from notebook.models import make_notebook
 from useradmin.models import User
 
 from desktop.lib import django_mako
 from desktop.lib.exceptions_renderable import PopupException
+from desktop.settings import BASE_DIR
 
 if sys.version_info[0] > 2:
   from urllib.parse import urlparse, unquote as urllib_unquote
@@ -58,7 +61,7 @@ class SQLIndexer(object):
     self.fs = fs
     self.user = user
 
-  def create_table_from_a_file(self, source, destination, start_time=-1):
+  def create_table_from_a_file(self, source, destination, start_time=-1, file_encoding=None):
     if '.' in destination['name']:
       database, table_name = destination['name'].split('.', 1)
     else:
@@ -200,6 +203,13 @@ class SQLIndexer(object):
         'database': database
       }
     )
+    if file_encoding and file_encoding != 'ASCII' and file_encoding != 'utf-8' and not use_temp_table:
+      sql += '\n\nALTER TABLE `%(database)s`.`%(final_table_name)s` ' \
+             'SET serdeproperties ("serialization.encoding"="%(file_encoding)s");' % {
+                 'database': database,
+                 'final_table_name': final_table_name,
+                 'file_encoding': file_encoding
+             }
 
     if table_format in ('text', 'json', 'csv', 'regexp') and not external and load_data:
       form_data = {
@@ -250,6 +260,13 @@ class SQLIndexer(object):
           'database': database,
           'table_name': table_name
       }
+      if file_encoding and file_encoding != 'ASCII' and file_encoding != 'utf-8':
+        sql += '\n\nALTER TABLE `%(database)s`.`%(final_table_name)s` ' \
+               'SET serdeproperties ("serialization.encoding"="%(file_encoding)s");' % {
+            'database': database,
+            'final_table_name': final_table_name,
+            'file_encoding': file_encoding
+        }
 
     on_success_url = reverse(
         'metastore:describe_table', kwargs={'database': database, 'table': final_table_name}
@@ -266,7 +283,7 @@ class SQLIndexer(object):
         is_task=True
     )
 
-  def create_table_from_local_file(self, source, destination, csv_data, start_time=-1):
+  def create_table_from_local_file(self, source, destination, start_time=-1):
     if '.' in destination['name']:
       database, table_name = destination['name'].split('.', 1)
     else:
@@ -274,31 +291,74 @@ class SQLIndexer(object):
       table_name = destination['name']
     final_table_name = table_name
 
-    # source_type = source['sourceType']
-    source_type = 'hive'
-    # editor_type = '50'  # destination['sourceType']
-    # editor_type = destination['sourceType']
-    editor_type = 'hive'
+    source_type = source['sourceType']
+    editor_type = destination['sourceType']
 
     columns = destination['columns']
 
-    sql = '''CREATE TABLE IF NOT EXISTS %(table_name)s (
+    dialect = get_interpreter(source_type, self.user)['dialect']
+
+    if dialect in ('hive', 'mysql'):
+
+      if dialect == 'mysql':
+        for col in columns:
+          if col['type'] == 'string':
+            col['type'] = 'VARCHAR(255)'
+
+      sql = '''CREATE TABLE IF NOT EXISTS %(database)s.%(table_name)s (
+%(columns)s);
+      ''' % {
+              'database': database,
+              'table_name': table_name,
+              'columns': ',\n'.join(['  `%(name)s` %(type)s' % col for col in columns]),
+            }
+
+    elif dialect == 'phoenix':
+
+      for col in columns:
+        if col['type'] == 'string':
+          col['type'] = 'CHAR(255)'
+
+      sql = '''CREATE TABLE IF NOT EXISTS %(database)s.%(table_name)s (
 %(columns)s
-);
+CONSTRAINT my_pk PRIMARY KEY (%(primary_keys)s));
 ''' % {
           'database': database,
           'table_name': table_name,
-          'columns': ',\n'.join(['  `%(name)s` %(type)s' % col for col in columns]),
-          'primary_keys': ', '.join(destination.get('indexerPrimaryKey'))
+          'columns': ',\n'.join(['  %(name)s %(type)s' % col for col in columns]),
+          'primary_keys': ', '.join(destination.get('primaryKeys'))
       }
 
-    for csv_row in csv_data:
-      sql += '''
-          INSERT INTO %(table_name)s VALUES %(csv_row)s;
-          ''' % {
+    path = urllib_unquote(source['path'])
+
+    if path:                                                     # data insertion
+      with open(BASE_DIR + path, 'r') as local_file:
+        reader = csv.reader(local_file)
+        _csv_rows = list(map(tuple, reader))
+
+        if source['format']['hasHeader']:
+          _csv_rows = _csv_rows[1:]
+
+        csv_rows = str(_csv_rows)[1:-1]
+
+        if dialect in ('hive', 'mysql'):
+          sql += '''\nINSERT INTO %(database)s.%(table_name)s VALUES %(csv_rows)s;
+          '''% {
+                  'database': database,
                   'table_name': table_name,
-                  'csv_row': tuple(csv_row)
+                  'csv_rows': csv_rows
                 }
+        elif dialect == 'phoenix':
+          for csv_row in _csv_rows:
+            _sql = ', '.join([ "'{0}'".format(col_val) if columns[count]['type'] in ('CHAR(255)', 'timestamp') \
+              else '{0}'.format(col_val) for count, col_val in enumerate(csv_row)])
+
+            sql += '''\nUPSERT INTO %(database)s.%(table_name)s VALUES (%(csv_row)s);
+            ''' % {
+                    'database': database,
+                    'table_name': table_name,
+                    'csv_row': _sql
+                  }
 
     on_success_url = reverse('metastore:describe_table', kwargs={'database': database, 'table': final_table_name}) + \
         '?source_type=' + source_type
@@ -350,16 +410,16 @@ def _create_database(request, source, destination, start_time):
   return notebook.execute(request, batch=False)
 
 
-def _create_table(request, source, destination, start_time=-1):
-  notebook = SQLIndexer(user=request.user, fs=request.fs).create_table_from_a_file(source, destination, start_time)
+def _create_table(request, source, destination, start_time=-1, file_encoding=None):
+  notebook = SQLIndexer(user=request.user, fs=request.fs).create_table_from_a_file(source, destination, start_time, file_encoding)
 
   if request.POST.get('show_command'):
     return {'status': 0, 'commands': notebook.get_str()}
   else:
     return notebook.execute(request, batch=False)
 
-def _create_table_from_local(request, source, destination, csv_data, start_time=-1):
-  notebook = SQLIndexer(user=request.user, fs=request.fs).create_table_from_local_file(source, destination, csv_data, start_time)
+def _create_table_from_local(request, source, destination, start_time=-1):
+  notebook = SQLIndexer(user=request.user, fs=request.fs).create_table_from_local_file(source, destination, start_time)
 
   if request.POST.get('show_command'):
     return {'status': 0, 'commands': notebook.get_str()}

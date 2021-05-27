@@ -16,8 +16,8 @@
 
 import localforage from 'localforage';
 
-import apiHelper from 'api/apiHelper';
 import { hueWindow } from 'types/types';
+import { fetchAllNavigatorTags } from './api';
 import { DataCatalog } from './dataCatalog';
 
 export interface Tags {
@@ -64,10 +64,9 @@ export default class GeneralDataCatalog {
 
     this.allNavigatorTagsPromise = new Promise((resolve, reject) => {
       const reloadAllTags = () => {
-        apiHelper
-          .fetchAllNavigatorTags({
-            silenceErrors: options && options.silenceErrors
-          })
+        fetchAllNavigatorTags({
+          silenceErrors: options && options.silenceErrors
+        })
           .then(allTags => {
             resolve(allTags);
             if (ttl.default && ttl.default > 0) {
@@ -78,7 +77,7 @@ export default class GeneralDataCatalog {
               });
             }
           })
-          .fail(reject);
+          .catch(reject);
       };
 
       if (

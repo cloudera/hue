@@ -23,7 +23,8 @@ import componentUtils from 'ko/components/componentUtils';
 import DisposableComponent from 'ko/components/DisposableComponent';
 import I18n from 'utils/i18n';
 import huePubSub from 'utils/huePubSub';
-import { defer, sleep } from 'utils/hueUtils';
+import defer from 'utils/timing/defer';
+import sleep from 'utils/timing/sleep';
 import {
   HIDE_FIXED_HEADERS_EVENT,
   REDRAW_FIXED_HEADERS_EVENT,

@@ -49,9 +49,9 @@ const JISON_FOLDER = '../../desktop/core/src/desktop/js/parse/jison/';
 const SQL_PARSER_REPOSITORY_PATH =
   '../../desktop/core/src/desktop/js/parse/sql/sqlParserRepository.ts';
 const SYNTAX_PARSER_IMPORT_TEMPLATE =
-  '  KEY: () => import(/* webpackChunkName: "KEY-parser" */ \'parse/sql/KEY/KEYSyntaxParser\')';
+  '  KEY: () => import(/* webpackChunkName: "KEY-parser" */ \'./KEY/KEYSyntaxParser\')';
 const AUTOCOMPLETE_PARSER_IMPORT_TEMPLATE =
-  '  KEY: () => import(/* webpackChunkName: "KEY-parser" */ \'parse/sql/KEY/KEYAutocompleteParser\')';
+  '  KEY: () => import(/* webpackChunkName: "KEY-parser" */ \'./KEY/KEYAutocompleteParser\')';
 
 const parserDefinitions = {
   globalSearchParser: {

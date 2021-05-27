@@ -42,8 +42,8 @@
         <ResultTable :executable="activeExecutable" />
       </div>
     </div>
-    <div v-else-if="!loading && !executor">
-      Failed loading the SQL Scratchpad!
+    <div v-else-if="!loading && !executor && errorMessage">
+      {{ errorMessage }}
     </div>
   </div>
 </template>
@@ -66,12 +66,14 @@
   import ResultTable from '../result/ResultTable.vue';
   import Executor from '../../execution/executor';
   import SqlExecutable from '../../execution/sqlExecutable';
+  import { login } from 'api/auth';
+  import { setBaseUrl } from 'api/utils';
   import contextCatalog from 'catalog/contextCatalog';
   import HueIcons from 'components/icons/HueIcons.vue';
   import Spinner from 'components/Spinner.vue';
   import { findEditorConnector, getConfig } from 'config/hueConfig';
   import { Compute, Connector, Namespace } from 'config/types';
-  import { UUID } from 'utils/hueUtils';
+  import UUID from 'utils/string/UUID';
 
   export default defineComponent({
     name: 'SqlScratchpad',
@@ -85,16 +87,33 @@
       AceEditor
     },
     props: {
+      apiUrl: {
+        type: String as PropType<string | null>,
+        default: null
+      },
       dialect: {
+        type: String as PropType<string | null>,
+        default: null
+      },
+      username: {
+        type: String as PropType<string | null>,
+        default: null
+      },
+      email: {
+        type: String as PropType<string | null>,
+        default: null
+      },
+      password: {
         type: String as PropType<string | null>,
         default: null
       }
     },
     setup(props) {
-      const { dialect } = toRefs(props);
-      const activeExecutable = ref<SqlExecutable | null>(null);
-      const executor = ref<Executor | null>(null);
+      const { apiUrl, dialect, username, email, password } = toRefs(props);
+      const activeExecutable = ref<SqlExecutable>(null);
+      const executor = ref<Executor>(null);
       const loading = ref<boolean>(true);
+      const errorMessage = ref<string>(null);
       const id = UUID();
 
       const sqlParserProvider: SqlParserProvider = {
@@ -116,11 +135,30 @@
         minLines: null
       };
 
-      const initializeExecutor = async (): Promise<void> => {
+      const initialize = async (): Promise<void> => {
+        if (apiUrl.value) {
+          setBaseUrl(apiUrl.value);
+        }
+
+        if (password.value !== null) {
+          try {
+            await login(
+              username.value ? username.value : '',
+              email.value ? email.value : '',
+              password.value
+            );
+          } catch (err) {
+            errorMessage.value = 'Login failed!';
+            console.error(err);
+            return;
+          }
+        }
+
         try {
-          await getConfig();
-        } catch {
-          console.warn('Failed loading Hue config!');
+          await getConfig(true);
+        } catch (err) {
+          errorMessage.value = 'Failed loading the Hue config!';
+          console.error(err);
           return;
         }
 
@@ -128,7 +166,7 @@
           connector => !dialect.value || connector.dialect === dialect.value
         );
         if (!connector) {
-          console.warn('No connector found!');
+          errorMessage.value = 'No connector found!';
           return;
         }
 
@@ -136,7 +174,7 @@
           const { namespaces } = await contextCatalog.getNamespaces({ connector });
 
           if (!namespaces.length || !namespaces[0].computes.length) {
-            console.warn('No namespaces or computes found!');
+            errorMessage.value = 'No namespaces or computes found!';
             return;
           }
 
@@ -162,14 +200,17 @@
       onMounted(async () => {
         loading.value = true;
         try {
-          await initializeExecutor();
-        } catch {}
+          await initialize();
+        } catch (err) {
+          console.error(err);
+        }
         loading.value = false;
       });
 
       return {
         aceOptions,
         activeExecutable,
+        errorMessage,
         executor,
         id,
         onActiveStatementChanged,

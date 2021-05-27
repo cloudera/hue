@@ -203,7 +203,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
       <h4>${_('Source')}</h4>
       <div class="card-body">
         <div>
-          <div class="control-group" data-bind="visible: createWizard.prefill.target_type().length == 0 || createWizard.prefill.source_type() == 'all'">
+          <div class="control-group" data-bind="visible: ((createWizard.prefill.target_type().length == 0 || createWizard.prefill.source_type() == 'all') && createWizard.source.inputFormats().length > 1)">
             <label for="sourceType" class="control-label"><div>${ _('Type') }</div>
               <select id="sourceType" data-bind="selectize: createWizard.source.inputFormats, value: createWizard.source.inputFormat, optionsText: 'name', optionsValue: 'value'"></select>
             </label>
@@ -237,11 +237,8 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
           <div data-bind="visible: createWizard.source.inputFormat() == 'localfile'">
               <form method="post" action="" enctype="multipart/form-data" id="uploadform">
                 <div >
-                    <input type="file" id="inputfile" name="inputfile" accept=".csv">
-                    <input type="button" class="button" value="Upload" id="but_upload">
+                    <input type="file" id="inputfile" name="inputfile" style="margin-left: 130px" accept=".csv">
                 </div>
-                <label for="path" class="control-label"><div>${ _('Path') }</div>
-                  <input type="text" id="file_path" data-bind="value: createWizard.source.path">
             </form>
           </div>
 
@@ -424,7 +421,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
               <div>
                 <label class="control-label">
                   <div><!-- ko if: $index() === 0 -->${ _('Table') }<!-- /ko --></div>
-                  <input type="text" class="input-xlarge" data-bind="hiveChooser: name, skipInvalids:true, pathChangeLevel: 'table', skipColumns: true, apiHelperUser: '${ user }', namespace: $root.createWizard.source.namespace, compute: $root.createWizard.source.compute, apiHelperType: $root.createWizard.source.sourceType, mainScrollable: $(MAIN_SCROLLABLE)" placeholder="${ _('Table name or <database>.<table>') }">
+                  <input type="text" class="input-xlarge" data-bind="hiveChooser: name, skipInvalids:true, pathChangeLevel: 'table', skipColumns: true, apiHelperUser: '${ user }', namespace: $root.createWizard.source.namespace, compute: $root.createWizard.source.compute, apiHelperType: $root.createWizard.source.sourceType(), mainScrollable: $(MAIN_SCROLLABLE)" placeholder="${ _('Table name or <database>.<table>') }">
                   <a class="pointer pull-right margin-left-5" style="margin-top: 7px" data-bind="click: function() { $root.createWizard.source.tables.remove(this); }, visible: $root.createWizard.source.tables().length > 1"><i class="fa fa-minus"></i></a>
                 </label>
               </div>
@@ -536,7 +533,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
         <h4>${_('Destination')}</h4>
         <div class="card-body">
           <div class="control-group">
-            <label for="destinationType" class="control-label" data-bind="visible: $parent.createWizard.prefill.target_type().length == 0"><div>${ _('Type') }</div>
+            <label for="destinationType" class="control-label" data-bind="visible: $parent.createWizard.prefill.target_type().length == 0 && outputFormats().length > 1"><div>${ _('Type') }</div>
               <select id="destinationType" data-bind="selectize: outputFormats, value: outputFormat, optionsValue: 'value', optionsText: 'name'"></select>
             </label>
           </div>
@@ -553,8 +550,13 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
             <!-- /ko -->
 
             <!-- ko if: ['table', 'database'].indexOf(outputFormat()) != -1 -->
+            <div data-bind="visible: $parent.createWizard.source.inputFormat() == 'localfile'">
+              <label for="dialectType" class="control-label "><div>${ _('Dialect') }</div>
+                <select  id="dialectType" data-bind="selectize: $parent.createWizard.source.interpreters, value: $parent.createWizard.source.interpreter, optionsText: 'name', optionsValue: 'type'"></select>
+              </label>
+            </div>
             <label for="collectionName" class="control-label "><div>${ _('Name') }</div></label>
-            <input type="text" class="input-xxlarge" data-bind="value: name, hiveChooser: name, namespace: namespace, compute: compute, skipColumns: true, skipTables: outputFormat() == 'database', valueUpdate: 'afterkeydown', apiHelperUser: '${ user }', apiHelperType: sourceType, mainScrollable: $(MAIN_SCROLLABLE), attr: { 'placeholder': outputFormat() == 'table' ? '${  _ko('Table name or <database>.<table>') }' : '${  _ko('Database name') }' }" pattern="^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]*$" title="${ _('Only alphanumeric and underscore characters') }">
+            <input type="text" class="input-xxlarge" data-bind="value: name, hiveChooser: name, namespace: namespace, compute: compute, skipColumns: true, skipTables: outputFormat() == 'database', valueUpdate: 'afterkeydown', apiHelperUser: '${ user }', apiHelperType: sourceType(), mainScrollable: $(MAIN_SCROLLABLE), attr: { 'placeholder': outputFormat() == 'table' ? '${  _ko('Table name or <database>.<table>') }' : '${  _ko('Database name') }' }" pattern="^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]*$" title="${ _('Only alphanumeric and underscore characters') }">
             <!-- /ko -->
 
             <!-- ko if: outputFormat() == 'altus' -->
@@ -567,7 +569,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
 
               <label class="control-label "><div>${ _('Database') }</div></label>
               <input type="text" class="form-control input-xlarge" data-bind="value: name" placeholder="${ _('Database') }">
-              <a href="javascript:void(0);" data-bind="sqlContextPopover: { sourceType: $root.createWizard.source.sourceType, namespace: namespace, compute: compute, path: 'default', offset: { top: -3, left: 3 }}">
+              <a href="javascript:void(0);" data-bind="sqlContextPopover: { sourceType: $root.createWizard.source.sourceType(), namespace: namespace, compute: compute, path: 'default', offset: { top: -3, left: 3 }}">
                 <i class="fa fa-info"></i>
               </a>
             <!-- /ko -->
@@ -702,7 +704,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
               </label>
             </div>
 
-            <div class="control-group" data-bind="visible: tableFormat() == 'kudu'">
+            <div class="control-group" data-bind="visible: (tableFormat() == 'kudu' || $root.createWizard.destination.dialect() == 'phoenix')">
               <label for="kuduPksTable" class="control-label"><div>${ _('Primary keys') }</div>
                 ## At least one selected
                 <select id="kuduPksTable" data-bind="selectize: columns, selectedOptions: primaryKeys, selectedObjects: primaryKeyObjects, optionsValue: 'name', optionsText: 'name', innerSubscriber: 'name'" size="3" multiple="true"></select>
@@ -993,7 +995,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
               <div data-bind="component: { name: 'hue-simple-ace-editor-multi', params: {
                   value: fieldEditorValue,
                   placeHolder: fieldEditorPlaceHolder,
-                  autocomplete: { type: sourceType },
+                  autocomplete: { type: sourceType() },
                   lines: 5,
                   aceOptions: {
                     minLines: 10,
@@ -1003,7 +1005,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
                   namespace: namespace,
                   compute: compute,
                   temporaryOnly: true,
-                  mode: sourceType
+                  mode: sourceType()
                 }}"></div>
               <!-- /ko -->
 
@@ -1638,7 +1640,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
     var Source = function (vm, wizard) {
       var self = this;
 
-      self.sourceType = vm.sourceType;
+      self.sourceType = ko.observable(vm.sourceType);
       self.name = ko.observable('');
       self.sample = ko.observableArray();
       self.sampleCols = ko.observableArray();
@@ -1681,7 +1683,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
           sampleCols.forEach(function (sampleCol) {
             var deferred = $.Deferred();
             deferreds.push(deferred);
-            sqlUtils.backTickIfNeeded({ id: self.sourceType, dialect: self.sourceType }, sampleCol.name()).then(function (value) {
+            sqlUtils.backTickIfNeeded({ id: self.sourceType(), dialect: self.sourceType() }, sampleCol.name()).then(function (value) {
               statementCols.push(value);
               var col = {
                 name: sampleCol.name(),
@@ -1705,17 +1707,17 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
           $.when.apply($, deferreds).done(function () {
             var statement = 'SELECT ';
             statement += statementCols.join(',\n    ');
-            statement += '\n FROM ' + sqlUtils.backTickIfNeeded({ id: self.sourceType, dialect: self.sourceType }, tableName) + ';';
+            statement += '\n FROM ' + sqlUtils.backTickIfNeeded({ id: self.sourceType(), dialect: self.sourceType() }, tableName) + ';';
             if (!wizard.destination.fieldEditorValue() || wizard.destination.fieldEditorValue() === lastStatement) {
               wizard.destination.fieldEditorValue(statement);
             }
             lastStatement = statement;
-            wizard.destination.fieldEditorPlaceHolder('${ _('Example: SELECT') }' + ' * FROM ' + sqlUtils.backTickIfNeeded({ id: self.sourceType, dialect: self.sourceType }, tableName));
+            wizard.destination.fieldEditorPlaceHolder('${ _('Example: SELECT') }' + ' * FROM ' + sqlUtils.backTickIfNeeded({ id: self.sourceType(), dialect: self.sourceType() }, tableName));
 
             var handle = dataCatalog.addTemporaryTable({
               namespace: self.namespace(),
               compute: self.compute(),
-              connector: { id: self.sourceType }, // TODO: Migrate importer to connectors
+              connector: { id: self.sourceType() }, // TODO: Migrate importer to connectors
               name: tableName,
               columns: temporaryColumns,
               sample: self.sample()
@@ -1729,7 +1731,11 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
 
 
       self.sampleCols.subscribe(refreshTemporaryTable);
-      self.inputFormat = ko.observable(wizard.prefill.source_type() ? wizard.prefill.source_type() : 'file');
+      % if ENABLE_DIRECT_UPLOAD.get():
+        self.inputFormat = ko.observable(wizard.prefill.source_type() ? wizard.prefill.source_type() : 'localfile');
+      % else:
+        self.inputFormat = ko.observable(wizard.prefill.source_type() ? wizard.prefill.source_type() : 'file');
+      % endif
 
       self.inputFormat.subscribe(function(val) {
         wizard.destination.columns.removeAll();
@@ -1752,8 +1758,11 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
         }
       });
       self.inputFormatsAll = ko.observableArray([
+          % if ENABLE_DIRECT_UPLOAD.get():
+          {'value': 'localfile', 'name': 'Small Local File'},
+          % endif
           % if request.fs:
-          {'value': 'file', 'name': 'File'},
+          {'value': 'file', 'name': 'Remote File'},
           % endif
           % if ENABLE_SQOOP.get():
           {'value': 'rdbms', 'name': 'External Database'},
@@ -1772,9 +1781,6 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
           {'value': 'connector', 'name': 'Connectors'},
           % endif
           {'value': 'manual', 'name': 'Manually'},
-          % if ENABLE_DIRECT_UPLOAD.get():
-          {'value': 'localfile', 'name': 'LocalFile'}
-          % endif
           ##{'value': 'text', 'name': 'Paste Text'},
       ]);
       self.inputFormatsManual = ko.observableArray([
@@ -1787,10 +1793,23 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
         return self.inputFormatsAll();
       });
 
+      self.interpreters = ko.pureComputed(function() {
+        return window.getLastKnownConfig().app_config.editor.interpreters;
+      });
+      self.interpreter = ko.observable(vm.sourceType);
+      self.interpreter.subscribe(function(val) {
+        self.sourceType(val);
+        wizard.destination.sourceType(val);
+        var dialect = self.interpreters().filter(function(interpreter) {
+          return interpreter['type'] === val;
+        });
+        wizard.destination.dialect(dialect[0]['dialect']);
+      });
+  
       // File
       self.path = ko.observable('');
       self.path.subscribe(function(val) {
-        if (val && self.inputFormat() != 'localfile') {
+        if (val) {
           wizard.guessFormat();
           wizard.destination.nonDefaultLocation(val);
         }
@@ -2187,7 +2206,9 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
 
     var Destination = function (vm, wizard) {
       var self = this;
-      self.apiHelperType = self.sourceType = vm.sourceType;
+      self.apiHelperType = vm.sourceType;
+      self.sourceType = ko.observable(vm.sourceType);
+      self.dialect = ko.observable('');
 
       self.name = ko.observable('').extend({ throttle: 500 });
       self.nameChanged = function(name) {
@@ -2197,7 +2218,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
           wizard.computeSetDeferred.done(function () {
             dataCatalog.getEntry({
               compute: wizard.compute(),
-              connector: { id: self.sourceType }, // TODO: Use connectors in the importer
+              connector: { id: self.sourceType() }, // TODO: Use connectors in the importer
               namespace: wizard.namespace(),
               path: self.outputFormat() === 'table' ? [self.databaseName(), self.tableName()] : [],
             }).then(function (catalogEntry) {
@@ -3161,48 +3182,21 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
         };
         function upload() {
           var fd = new FormData();
-          fd.append('fileFormat', ko.mapping.toJSON(viewModel.createWizard.source));
-            $.ajax({
-              url:"/indexer/api/indexer/guess_format",
-              type: 'post',
-              data: fd,
-              contentType:false,
-              cache: false,
-              processData:false,
-              beforeSend: function (){
-                viewModel.createWizard.isGuessingFormat(true);
-              },
-              success:function (resp) {
-                var newFormat = ko.mapping.fromJS(new FileType(resp['type'], resp));
-                viewModel.createWizard.source.format(newFormat);
-                viewModel.createWizard.isGuessingFormat(false);
-              }
-            });
-        };
-
-      $("#but_upload").click(function() {
-          var fd = new FormData();
           var files = $('#inputfile')[0].files[0];
           fd.append('inputfile', files);
-          fd.append('fileFormat', ko.mapping.toJSON(viewModel.createWizard.source));
-  
+          var file_size = files.size;
           $.ajax({
-              url: '/indexer/api/indexer/guess_field_types',
-              type: 'post',
-              data: fd,
-              contentType: false,
-              processData: false,
-              beforeSend: function(){
-                viewModel.createWizard.isGuessingFieldTypes(true);
-              },
-              success: function(response){
-                viewModel.createWizard.loadSampleData(response);
-                viewModel.createWizard.isGuessingFieldTypes(false);
-                viewModel.createWizard.source.path(response['file_url']);
-                document.getElementById("file_path").value = response['file_url'];
-              },
+            url:"/indexer/api/indexer/upload_local_file",
+            type: 'post',
+            data: fd,
+            contentType:false,
+            cache: false,
+            processData:false,
+            success:function (response) {
+              viewModel.createWizard.source.path(response['local_file_url']);
+            }
           });
-      });
+        };
 
       $('.importer-droppable').droppable({
         accept: ".draggableText",

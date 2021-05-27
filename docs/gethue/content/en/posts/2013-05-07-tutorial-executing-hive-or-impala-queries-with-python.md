@@ -37,11 +37,11 @@ sf_right_sidebar:
 sf_caption_position:
   - caption-right
 categories:
-  - Dev / API
+  - Development
 
 ---
 <p id="docs-internal-guid-3030a9d6-8100-9572-805c-bc5817743118">
-  <span>This post talks about Hue, a</span><a href="http://cloudera.github.com/hue"><span>UI</span></a><span> for making Apache Hadoop easier to use.</span>
+  <span>This post talks about Hue, a</span><a href="https://gethue.com"><span>UI</span></a><span> for making Apache Hadoop easier to use.</span>
 </p>
 
 <span>Hue uses a various set of interfaces for communicating with the Hadoop components. This post describes how Hue is implementing the </span>[Apache HiveServer2][1] <span>Thrift API for executing </span>[Hive queries][2] <span>and listing tables. The same interface can also be used for talking to </span>[Cloudera Impala][3]<span>.</span>

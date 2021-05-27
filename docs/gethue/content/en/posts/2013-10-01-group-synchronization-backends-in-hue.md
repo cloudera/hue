@@ -39,11 +39,11 @@ sf_caption_position:
 slide_template:
   - default
 categories:
-  - Dev / API
+  - Development
 
 ---
 <p id="docs-internal-guid-63e96778-7525-df72-d153-e369f8395313">
-  <a href="http://cloudera.github.com/hue/">Hue</a><span>is the turn-key solution for </span><a href="http://hadoop.apache.com/">Apache Hadoop</a><span>. It hides the complexity of the ecosystem including HDFS, Oozie, MapReduce, etc. Hue provides authentication and integrates with </span><a href="http://gethue.tumblr.com/post/62273866476/sso-with-hue-new-saml-backend">SAML</a><span>, </span><a href="http://gethue.tumblr.com/post/48706063756/how-to-manage-permissions-in-hue">LDAP</a><span>, and </span><a href="http://gethue.tumblr.com/post/50341521241/single-sign-on-in-hue-with-twitter-and-oauth">other</a><span> systems. A new feature added in Hue is the ability to synchronize groups with a third party authority provider. In this blog post, we’ll be covering the basics of creating a Group Synchronization Backend.</span>
+  <a href="https://gethue.com">Hue</a><span>is the turn-key solution for </span><a href="http://hadoop.apache.com/">Apache Hadoop</a><span>. It hides the complexity of the ecosystem including HDFS, Oozie, MapReduce, etc. Hue provides authentication and integrates with </span><a href="http://gethue.tumblr.com/post/62273866476/sso-with-hue-new-saml-backend">SAML</a><span>, </span><a href="http://gethue.tumblr.com/post/48706063756/how-to-manage-permissions-in-hue">LDAP</a><span>, and </span><a href="http://gethue.tumblr.com/post/50341521241/single-sign-on-in-hue-with-twitter-and-oauth">other</a><span> systems. A new feature added in Hue is the ability to synchronize groups with a third party authority provider. In this blog post, we’ll be covering the basics of creating a Group Synchronization Backend.</span>
 </p>
 
 <span> </span>

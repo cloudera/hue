@@ -77,7 +77,6 @@
   <link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-fileupload.css') }" >
 
   ${ commonHeaderFooterComponents.header_i18n_redirection() }
-  ${ commonHeaderFooterComponents.ajax_interceptors() }
   <%
     global_constants_url = '/desktop/globalJsConstants.js?v=' + hue_version()
   %>

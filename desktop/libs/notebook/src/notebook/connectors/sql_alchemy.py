@@ -239,10 +239,8 @@ class SqlAlchemyApi(Api):
 
     engine = self._get_engine()
     connection = self._create_connection(engine)
-    statement = snippet['statement']
-
-    if self.interpreter['dialect_properties'].get('trim_statement_semicolon', True):
-      statement = statement.strip().rstrip(';')
+    current_statement = self._get_current_statement(notebook, snippet)
+    statement = current_statement['statement']
 
     if self.interpreter['dialect_properties'].get('has_use_statement') and snippet.get('database'):
       connection.execute(
@@ -270,7 +268,7 @@ class SqlAlchemyApi(Api):
     }
     CONNECTIONS[guid] = cache
 
-    return {
+    response =  {
       'sync': False,
       'has_result_set': result.cursor != None,
       'modified_row_count': 0,
@@ -282,6 +280,9 @@ class SqlAlchemyApi(Api):
         'type': 'table'
       }
     }
+    response.update(current_statement)
+
+    return response
 
 
   @query_error_handler
@@ -317,7 +318,7 @@ class SqlAlchemyApi(Api):
 
   @query_error_handler
   def check_status(self, notebook, snippet):
-    guid = snippet['result']['handle']['guid']
+    guid = snippet.get('result', {}).get('handle', {}).get('guid')
     connection = CONNECTIONS.get(guid)
 
     response = {'status': 'canceled'}
@@ -473,8 +474,7 @@ class SqlAlchemyApi(Api):
         for col in columns
       ]
 
-      if not self.options['url'].startswith('phoenix://'):
-        response.update(assist.get_keys(database, table))
+      response.update(assist.get_keys(database, table))
     else:
       columns = assist.get_columns(database, table)
       response['name'] = next((col['name'] for col in columns if column == col['name']), '')
@@ -558,7 +558,10 @@ class Assist(object):
     return self.db.get_table_names(database)
 
   def get_view_names(self, database, view_names=[]):
-    return self.db.get_view_names(database)
+    try:
+      return self.db.get_view_names(database)
+    except NotImplementedError:
+      return []
 
   def get_tables(self, database, table_names=[]):
     return self.get_table_names(database) + self.get_view_names(database)
@@ -595,7 +598,11 @@ class Assist(object):
 
   def get_keys(self, database, table):
     meta = MetaData()
-    metaTable = Table(table, meta, schema=database, autoload=True, autoload_with=self.engine)
+    try:
+      metaTable = Table(table, meta, schema=database, autoload=True, autoload_with=self.engine)
+    except ProgrammingError:
+      LOG.debug("Table %s.%s could not be found and this is probably expected" % (database, table))
+      return {}
 
     return {
       'foreign_keys': [{

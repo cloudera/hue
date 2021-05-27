@@ -80,7 +80,7 @@ One advantage of using Hue is its [File Browser](https://docs.gethue.com/user/br
 Here are some of the future improvements:
 
 * Database/table/column autocomplete is currently empty
-* SQL grammar autocomplete can [be extended](https://docs.gethue.com/developer/parsers/)
+* SQL grammar autocomplete can [be extended](https://docs.gethue.com/developer/development/#sql-parsers)
 * [SQL Scratchpad](https://docs.gethue.com/developer/api/#scratchpad) module to allow a mini SQL Editor popup is in progress
 
 

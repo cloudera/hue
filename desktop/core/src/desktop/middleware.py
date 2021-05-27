@@ -303,6 +303,9 @@ class LoginAndPermissionMiddleware(MiddlewareMixin):
     if request.path in ['/oidc/authenticate/', '/oidc/callback/', '/oidc/logout/', '/hue/oidc_failed/']:
       return None
 
+    if request.path.startswith('/api/') or request.path == '/notebook/api/create_session':
+      return None
+
     # Skip views not requiring login
 
     # If the view has "opted out" of login required, skip
@@ -358,7 +361,7 @@ class LoginAndPermissionMiddleware(MiddlewareMixin):
           log_page_hit(request, view_func, level=access_log_level)
         return None
 
-    if desktop.conf.CORS_ENABLED.get():
+    if AUTH.AUTO_LOGIN_ENABLED.get():
       user = authenticate(request, username='hue', password='hue')
       if user is not None:
         login(request, user)
@@ -809,6 +812,7 @@ class HueRemoteUserMiddleware(RemoteUserMiddleware):
     if not 'desktop.auth.backend.RemoteUserDjangoBackend' in AUTH.BACKEND.get():
       LOG.info('Unloading HueRemoteUserMiddleware')
       raise exceptions.MiddlewareNotUsed
+    super().__init__(get_response)
     self.header = AUTH.REMOTE_USER_HEADER.get()
 
 

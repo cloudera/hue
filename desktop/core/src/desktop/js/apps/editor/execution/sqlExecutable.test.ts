@@ -15,7 +15,6 @@
 // limitations under the License.
 
 import { CancellablePromise } from 'api/cancellablePromise';
-import { CHECK_STATUS_API, CREATE_SESSION_API, EXECUTE_API_PREFIX, GET_LOGS_API } from 'api/urls';
 
 import Executor from 'apps/editor/execution/executor';
 import SqlExecutable from './sqlExecutable';
@@ -103,14 +102,14 @@ describe('sqlExecutable.js', () => {
     jest.spyOn(ApiUtils, 'post').mockImplementation(
       (url: string): CancellablePromise<unknown> => {
         currentApiHit++;
-        if (url.indexOf(CREATE_SESSION_API) !== -1) {
+        if (url.indexOf('/create_session') !== -1) {
           createSessionApiHit = currentApiHit;
           return new CancellablePromise<unknown>(resolve => {
             resolve({ session: { type: 'foo' } });
           });
-        } else if (url.indexOf(EXECUTE_API_PREFIX) !== -1) {
+        } else if (url.indexOf('/execute') !== -1) {
           executeApiHit = currentApiHit;
-          expect(url).toEqual(EXECUTE_API_PREFIX + 'impala');
+          expect(url).toContain('/execute/impala');
           return new CancellablePromise<unknown>(resolve => {
             resolve({
               handle: {},
@@ -119,17 +118,17 @@ describe('sqlExecutable.js', () => {
               history_parent_uuid: 'some_history_parent_uuid'
             });
           });
-        } else if (url.indexOf(CHECK_STATUS_API) !== -1) {
+        } else if (url.indexOf('/check_status') !== -1) {
           checkStatusApiHit = currentApiHit;
           statusResolve({ query_status: { status: ExecutionStatus.available } });
           return statusPromise;
-        } else if (url.indexOf(GET_LOGS_API) !== -1) {
+        } else if (url.indexOf('/get_logs') !== -1) {
           getLogsApiHit = currentApiHit;
           logsResolve({ status: 0, logs: '' });
           return logsPromise;
         }
         fail('fail for URL: ' + url);
-        throw new Error('fail for URL: ' + url);
+        throw new Error('Did not find URL: ' + url);
       }
     );
 

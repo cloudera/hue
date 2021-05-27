@@ -725,7 +725,7 @@ List of 900+ Commits
 * 88a7c05 HUE-3287 [core] Django 1.11 upgrade  - To upgrade Django 1.7, following changes are needed:
 * 9abf255 HUE-3287 [core] Django 1.11 upgrade  - Removing South-1.0.2 module from desktop/core/ext-py
 * 86742eb HUE-3287 [core] Django 1.11 upgrade  - Upgrading to Django 1.7
-* 1131337 HUE-8139 [desktop] Get a mode to allow easy profiling of requests  * add django-debug-toolbar-1.3.2 and django-debug-panel-0.8.3 (AJAX debug)  * to use debug panel, user need to install https://chrome.google.com/webstore/detail/django-debug-panel/nbiajhhibgfgkjegbnflpdccejocmbbn  * copy static files to desktop/core/src/desktop/static/debug_toolbar/ and desktop/core/src/desktop/templates/debug_toolbar/  * fix django-debug-toolbar v1.3 conflict with sqlparse-0.2.0 https://github.com/jazzband/django-debug-toolbar/issues/856  * add configurations to desktop/core/src/desktop/settings.py and desktop/core/src/desktop/urls.py  * fix 401 for non-superuser at desktop/core/src/desktop/middleware.py  * add enable_django_debug_tool and django_debug_tool_users to hue.ini for configuration control
+* 1131337 HUE-8139 [desktop] Get a mode to allow easy profiling of requests
 * c219e31 HUE-8306 [editor] Add a refresh action for missing entries in the right assist
 * 4a286bf HUE-8301 [editor] Identify column types for variables when a column alias is used
 * 1c75ae4 HUE-8300 [editor] Silence all AuthorizationExceptions in the editor

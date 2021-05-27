@@ -742,30 +742,36 @@ SLACK = ConfigSection(
       help=_('Enables Slack application API endpoints'),
       type=coerce_bool,
       default=False,
-      ),
+    ),
     SLACK_CLIENT_ID=Config(
-        key='slack_client_id',
-        type=str,
-        dynamic_default=get_slack_client_id,
-      ),
+      key='slack_client_id',
+      type=str,
+      dynamic_default=get_slack_client_id,
+    ),
     SLACK_CLIENT_SECRET=Config(
-        key='slack_client_secret',
-        type=str,
-        private=True,
-        dynamic_default=get_slack_client_secret,
-      ),
+      key='slack_client_secret',
+      type=str,
+      private=True,
+      dynamic_default=get_slack_client_secret,
+    ),
     SLACK_VERIFICATION_TOKEN=Config(
-        key='slack_verification_token',
-        type=str,
-        private=True,
-        dynamic_default=get_slack_verification_token,
-      ),
+      key='slack_verification_token',
+      type=str,
+      private=True,
+      dynamic_default=get_slack_verification_token,
+    ),
     SLACK_BOT_USER_TOKEN=Config(
-        key='slack_bot_user_token',
-        type=str,
-        private=True,
-        dynamic_default=get_slack_bot_user_token,
-      ),
+      key='slack_bot_user_token',
+      type=str,
+      private=True,
+      dynamic_default=get_slack_bot_user_token,
+    ),
+    SHARE_FROM_EDITOR=Config(
+      key='share_from_editor',
+      help=_('Enables direct sharing from Editor to Slack'),
+      type=coerce_bool,
+      default=False,
+    ),
   )
 )
 
@@ -1172,7 +1178,13 @@ AUTH = ConfigSection(
       help=_("If behind_reverse_proxy is True, it will look for the IP address from this header. Default: HTTP_X_FORWARDED_FOR"),
       type=str,
       default="HTTP_X_FORWARDED_FOR",
-    )
+    ),
+    AUTO_LOGIN_ENABLED=Config(
+      key="auto_login_enabled",
+      help=_("If True, will auto log any request as a `hue` user that needs to exist."),
+      type=coerce_bool,
+      default=False,
+    ),
 ))
 
 
@@ -1776,6 +1788,13 @@ IS_K8S_ONLY = Config(
   help=_('Choose whether to pick configs only from [desktop] [[cluster]]')
 )
 
+ENABLE_UNIFIED_ANALYTICS = Config(
+  key='enable_unified_analytics',
+  default=False,
+  type=coerce_bool,
+  help=_('Choose whether Hive represents Unified Analytics or not.')
+)
+
 ENABLE_ORGANIZATIONS = Config(
   key='enable_organizations',
   default=False,
@@ -2071,6 +2090,33 @@ CONNECTORS = UnspecifiedConfigSection(
           type=coerce_json_dict,
       ),
     )
+  )
+)
+
+
+
+RAZ = ConfigSection(
+  key='raz',
+  help=_("""Configuration for RAZ service integration"""),
+  members=dict(
+    IS_ENABLED=Config(
+      key='is_enabled',
+      help=_('Turns on the integration as ready to use'),
+      type=coerce_bool,
+      default=False,
+    ),
+    API_URL=Config(
+        key='api_url',
+        help=_('Endpoint to contact'),
+        type=str,
+        default='https://localhost:8080',
+    ),
+    API_AUTHENTICATION=Config(
+        key='api_authentication',
+        help=_('How to authenticate against: KERBEROS or JWT (not supported yet)'),
+        type=coerce_str_lowercase,
+        default='kerberos',
+    ),
   )
 )
 

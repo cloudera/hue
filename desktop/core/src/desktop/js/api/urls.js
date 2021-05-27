@@ -14,13 +14,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const AUTOCOMPLETE_API_PREFIX = '/notebook/api/autocomplete/';
+export const AUTOCOMPLETE_API_PREFIX = '/api/editor/autocomplete/';
 export const SAMPLE_API_PREFIX = '/notebook/api/sample/';
-export const EXECUTE_API_PREFIX = '/notebook/api/execute/';
+export const EXECUTE_API_PREFIX = '/api/editor/execute/'; // Dups with api.ts
 export const DOCUMENTS_API = '/desktop/api2/doc/';
 export const DOCUMENTS_SEARCH_API = '/desktop/api2/docs/';
 export const GET_HUE_CONFIG_API = '/desktop/api2/get_hue_config';
-export const FETCH_CONFIG_API = '/desktop/api2/get_config/';
+export const FETCH_CONFIG_API = '/api/get_config/';
+export const FETCH_CONFIG_API_PRIVATE = '/desktop/api2/get_config/';
 export const HDFS_API_PREFIX = '/filebrowser/view=' + encodeURIComponent('/');
 export const ADLS_API_PREFIX = '/filebrowser/view=' + encodeURIComponent('adl:/');
 export const ABFS_API_PREFIX = '/filebrowser/view=' + encodeURIComponent('ABFS://');
@@ -35,19 +36,21 @@ export const DASHBOARD_TERMS_API = '/dashboard/get_terms';
 export const DASHBOARD_STATS_API = '/dashboard/get_stats';
 export const FORMAT_SQL_API = '/notebook/api/format';
 export const GIST_API = '/desktop/api2/gist/';
+export const GET_SLACK_CHANNELS = '/desktop/slack/api/channels/get';
+export const SEND_SLACK_MESSAGE = '/desktop/slack/api/message/send';
 export const TOPO_URL = '/desktop/topo/';
 
 export const SEARCH_API = '/desktop/api/search/entities';
 export const INTERACTIVE_SEARCH_API = '/desktop/api/search/entities_interactive';
 
-export const CREATE_SESSION_API = '/notebook/api/create_session';
-export const CLOSE_SESSION_API = '/notebook/api/close_session';
+export const CREATE_SESSION_API = '/api/editor/create_session'; // Note: dup by api.ts
+export const CLOSE_SESSION_API = '/api/editor/close_session'; // Note: dup by api.ts
 export const FETCH_RESULT_SIZE_API = '/notebook/api/fetch_result_size';
 export const FETCH_RESULT_DATA_API = '/notebook/api/fetch_result_data';
-export const GET_LOGS_API = '/notebook/api/get_logs';
+export const GET_LOGS_API = '/api/editor/get_logs';
 export const CANCEL_STATEMENT_API = '/notebook/api/cancel_statement';
 export const CLOSE_STATEMENT_API = '/notebook/api/close_statement';
-export const CHECK_STATUS_API = '/notebook/api/check_status';
+export const CHECK_STATUS_API = '/api/editor/check_status';
 
 export const HBASE_API_PREFIX = '/hbase/api/';
 export const SAVE_TO_FILE_API = '/filebrowser/save';
@@ -58,16 +61,4 @@ export const NAV_API = {
   FIND_ENTITY: '/metadata/api/catalog/find_entity',
   LIST_TAGS: '/metadata/api/catalog/list_tags',
   UPDATE_PROPERTIES: '/metadata/api/catalog/update_properties'
-};
-
-export const OPTIMIZER_API = {
-  COMPATIBILITY: '/notebook/api/optimizer/statement/compatibility',
-  RISK: '/notebook/api/optimizer/statement/risk',
-  SIMILARITY: '/notebook/api/optimizer/statement/similarity',
-  TOP_AGGS: '/metadata/api/optimizer/top_aggs',
-  TOP_COLUMNS: '/metadata/api/optimizer/top_columns',
-  TOP_FILTERS: '/metadata/api/optimizer/top_filters',
-  TOP_JOINS: '/metadata/api/optimizer/top_joins',
-  TOP_TABLES: '/metadata/api/optimizer/top_tables',
-  TABLE_DETAILS: '/metadata/api/optimizer/table_details'
 };

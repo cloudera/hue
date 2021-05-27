@@ -25,7 +25,7 @@ from django.test.client import Client
 from django.urls import reverse
 
 from desktop import appmanager
-from desktop.conf import is_oozie_enabled, has_connectors, is_cm_managed
+from desktop.conf import is_oozie_enabled, has_connectors, is_cm_managed, ENABLE_UNIFIED_ANALYTICS
 from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_json_dict, coerce_bool, coerce_csv
 
 if sys.version_info[0] > 2:
@@ -64,7 +64,7 @@ def check_has_missing_permission(user, interpreter, user_apps=None):
          (interpreter in ('java', 'spark2', 'mapreduce', 'shell', 'sqoop1', 'distcp') and 'oozie' not in user_apps)
 
 
-def _connector_to_iterpreter(connector):
+def _connector_to_interpreter(connector):
   return {
       'name': connector['nice_name'],
       'type': connector['name'],  # Aka id
@@ -83,7 +83,7 @@ def get_ordered_interpreters(user=None):
   if has_connectors():
     from desktop.lib.connectors.api import _get_installed_connectors
     interpreters = [
-      _connector_to_iterpreter(connector)
+      _connector_to_interpreter(connector)
       for connector in _get_installed_connectors(categories=['editor', 'catalogs'], user=user)
     ]
   else:
@@ -128,6 +128,7 @@ def get_ordered_interpreters(user=None):
 
   return [{
       "name": i.get('nice_name', i['name']),
+      'displayName': 'Unified Analytics' if ENABLE_UNIFIED_ANALYTICS.get() and i.get('dialect', i['name']).lower() == 'hive' else i.get('nice_name', i['name']),
       "type": i['type'],
       "interface": i['interface'],
       "options": i['options'],
