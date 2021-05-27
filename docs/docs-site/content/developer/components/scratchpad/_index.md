@@ -39,17 +39,20 @@ First install the NPM [package](/developer/components/) and import the component
 
     <body>
       <div style="position: absolute; height: 100%; width: 100%">
-        <sql-scratchpad api-url="http://localhost:8005" username="demo" password="demo" dialect="mysql" />
+        <sql-scratchpad api-url="https://demo.gethue.com" username="demo" password="demo" dialect="mysql" />
       </div>
     </body>
 
     </html>
 
-Then make sure *api-url* points to a running Hue or [Compose](https://github.com/gethue/compose) APIs. The API is the middleware between your Data Warehouse and Web Browser client and will provide the dynamic content like the list of tables and columns and enrich the static autocomplete powered by the [parser](/developer/components/parsers/) selected by the *dialect*.
+Then make sure *api-url* points to a running Hue or [Compose](https://github.com/gethue/compose) APIs. The API is the middleware between your Data Warehouse and Web Browser client and will provide the dynamic content like the list of tables and columns and enrich the autocomplete. The autocomplete is static and powered by the [parser](/developer/components/parsers/) selected by the value of *dialect*.
 
-Specify the credentials for the authentication via *username="demo" password="demo"*. An option to look-up a local JWT token and not require the credentials is coming shortly.
+Specify the credentials for the authentication via *username="demo" password="demo"*.
 
-It is possible to skip the `npm install` and directly grab the module via:
+Options to look-up a local JWT token or go via Login modal and so not requiring the credentials are coming shortly.
+
+
+It is also possible to skip the whole `npm install` and directly grab the module via:
 
     <script type="text/javascript" src="https://unpkg.com/gethue/lib/components/SqlScratchpadWebComponent.js"></script>
 

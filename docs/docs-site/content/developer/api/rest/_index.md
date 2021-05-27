@@ -17,17 +17,20 @@ The API can be called directly via REST. Some JavaScript and Python wrappers are
 
 Calling without credentials:
 
-    curl -X POST -H "Content-Type: application/json" http://localhost:9000/api/query/create_notebook
+    curl -X POST -H "Content-Type: application/json" https://demo.gethue.com/api/query/create_notebook
+
     {"detail":"Authentication credentials were not provided."}
 
 Authenticating and getting a [JWT token](https://jwt.io/):
 
-    curl -X POST -H "Content-Type: application/json" -d '{"username": "hue", "password": "hue"}' http://localhost:9000/api/token/auth/
+    curl -X POST -H "Content-Type: application/json" -d '{"username": "hue", "password": "hue"}' https://demo.gethue.com/api/token/auth/
+
     {"refresh":"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTYyMTcyNDYzMSwianRpIjoiOGM0NDRjYzRhN2VhNGMxZDliMGZhNmU1YzUyMjM1MjkiLCJ1c2VyX2lkIjoxfQ.t6t7_eYrNhpGN3-Jz5MDLXM8JtGP7V9Y9lacOTInqqQ","access":"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjIxNjM4NTMxLCJqdGkiOiJhZjgwN2E0ZjBmZDI0ZWMxYWQ2NTUzZjEyMjIyYzU4YyIsInVzZXJfaWQiOjF9.dQ1P3hbzSytp9-o8bWlcOcwrdwRVy95M2Eolph92QMA"}
 
 Re-using the token when making actual calls:
 
-    url -X POST -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjIxNjM5NjMxLCJqdGkiOiI0NTY3NTA4MzM5YjY0MjFmYTMzZDJjMzViZWUyMDAyMCIsInVzZXJfaWQiOjF9.qrMNrr69eo38dOsV2aYp8k6WqBeyJZkbSuavxA_o_kM"   http://localhost:9000/api/v1/create_notebook
+    url -X POST -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjIxNjM5NjMxLCJqdGkiOiI0NTY3NTA4MzM5YjY0MjFmYTMzZDJjMzViZWUyMDAyMCIsInVzZXJfaWQiOjF9.qrMNrr69eo38dOsV2aYp8k6WqBeyJZkbSuavxA_o_kM"   https://demo.gethue.com/api/v1/create_notebook
+
     {"status": 0, "notebook": {"name": "My Notebook", "uuid": "1e23314f-b01e-4c18-872f-dc143475f063", "description": "", "type": "notebook", "isSaved": false, "isManaged": false, "skipHistorify": false, "sessions": [], "snippets": [], "directoryUuid": null}}
 
 ### Python
@@ -48,14 +51,14 @@ And then:
       'password': 'demo',
     }
 
-    response = session.post("http://localhost:9000/api/token/auth", data=data)
+    response = session.post("https://demo.gethue.com/api/token/auth", data=data)
     print('Auth: %s %s' % ('success' if response.status_code == 200 else 'error', response.status_code))
 
     token = json.loads(response.content)['access']
     print('Token: %s' % token)
 
     response = requests.post(
-      'http://localhost:9000/api/query/autocomplete',
+      'https://demo.gethue.com/api/query/autocomplete',
       headers={
         'Authorization': 'Bearer %s' % token,
         "Content-Type": "application/x-www-form-urlencoded"
@@ -72,8 +75,7 @@ In the meantime, with Axios:
     <script src="https://unpkg.com/axios@0.21.1/dist/axios.min.js"></script>
 
     <script type="text/javascript">
-      // const API_URL = "https://api.gethue.com"; // http://localhost:8005
-      const API_URL = "/";
+      const API_URL = "https://demo.gethue.com";
       axios.defaults.baseURL = API_URL;
 
       axios.post('api/token/auth/', {username: "hue", password: "hue"}).then(function(data) {
@@ -100,7 +102,7 @@ The API only supports JWT but users need to provide the credentials they are usi
 
 **Wrong credentials**: there is currently no error on bad authentication but instead a 302 redirect to the login page, e.g.:
 
-    curl -X POST -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjIxNjM5NjMxLCJqdGkiOiI0NTY3NTA4MzM5YjY0MjFmYTMzZDJjMzViZWUyMDAyMCIsInVzZXJfaWQiOjF9.qrMNrr69eo38dOsV2aYp8k6WqBeyJZkbSuavxA_o_kM" http://localhost:9000/notebook/execute/v1/create_notebook
+    curl -X POST -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjIxNjM5NjMxLCJqdGkiOiI0NTY3NTA4MzM5YjY0MjFmYTMzZDJjMzViZWUyMDAyMCIsInVzZXJfaWQiOjF9.qrMNrr69eo38dOsV2aYp8k6WqBeyJZkbSuavxA_o_kM" https://demo.gethue.com/notebook/execute/v1/create_notebook
 
     [21/May/2021 16:26:46 -0700] middleware   INFO     Redirecting to login page: /notebook/execute/v1/create_notebook
     [21/May/2021 16:26:46 -0700] access       INFO     127.0.0.1 -anon- - "POST /notebook/execute/v1/create_notebook HTTP/1.1" - (mem: 172mb)-- login redirection
@@ -114,16 +116,17 @@ It is possible to submit data in **JSON format**:
 
 Provide login credentials and get a [JWT token](https://jwt.io/):
 
-    curl -X POST -d 'username=hue,password=hue' http://localhost:9000/api/token/
+    curl -X POST -d 'username=hue,password=hue' https://demo.gethue.com/api/token/
+
     {"refresh":"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTYyMTcyNDYzMSwianRpIjoiOGM0NDRjYzRhN2VhNGMxZDliMGZhNmU1YzUyMjM1MjkiLCJ1c2VyX2lkIjoxfQ.t6t7_eYrNhpGN3-Jz5MDLXM8JtGP7V9Y9lacOTInqqQ","access":"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjIxNjM4NTMxLCJqdGkiOiJhZjgwN2E0ZjBmZDI0ZWMxYWQ2NTUzZjEyMjIyYzU4YyIsInVzZXJfaWQiOjF9.dQ1P3hbzSytp9-o8bWlcOcwrdwRVy95M2Eolph92QMA"}
 
 ### Check token
 
-    curl -X POST -d 'token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjIxNjM4NTMxLCJqdGkiOiJhZjgwN2E0ZjBmZDI0ZWMxYWQ2NTUzZjEyMjIyYzU4YyIsInVzZXJfaWQiOjF9.dQ1P3hbzSytp9-o8bWlcOcwrdwRVy95M2Eolph92QMA' http://localhost:9000/api/token/verify/
+    curl -X POST -d 'token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjIxNjM4NTMxLCJqdGkiOiJhZjgwN2E0ZjBmZDI0ZWMxYWQ2NTUzZjEyMjIyYzU4YyIsInVzZXJfaWQiOjF9.dQ1P3hbzSytp9-o8bWlcOcwrdwRVy95M2Eolph92QMA' https://demo.gethue.com/api/token/verify/
 
 ### Refresh token
 
-    curl -X POST 'refresh=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTYyMTcyNDYzMSwianRpIjoiOGM0NDRjYzRhN2VhNGMxZDliMGZhNmU1YzUyMjM1MjkiLCJ1c2VyX2lkIjoxfQ.t6t7_eYrNhpGN3-Jz5MDLXM8JtGP7V9Y9lacOTInqqQ' http://localhost:9000/api/token/refresh/
+    curl -X POST 'refresh=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTYyMTcyNDYzMSwianRpIjoiOGM0NDRjYzRhN2VhNGMxZDliMGZhNmU1YzUyMjM1MjkiLCJ1c2VyX2lkIjoxfQ.t6t7_eYrNhpGN3-Jz5MDLXM8JtGP7V9Y9lacOTInqqQ' https://demo.gethue.com/api/token/refresh/
 
 
 ## SQL Querying
@@ -132,33 +135,81 @@ Provide login credentials and get a [JWT token](https://jwt.io/):
 
 Now that we are authenticated, here is how to execute a `SHOW TABLES` SQL query via the `hive` connector. You could repeat the steps with any query you want, e.g. `SELECT * FROM web_logs LIMIT 100`.
 
-- **hive** represent either the dialect name and will select the connector to the only Hive databases.
-- **hive-1**
-- **1**
+Selecting the Database to query via the **dialect** argument in `/api/editor/execute/<dialect>`:
+- **hive**: select the first configured Hive databases.
+- **1**: select the connector id 1
+- **hive-1**: select the interpreter id 1 and hints that it is a Hive dialect
+- If blank will pick the first interpreter
 
 For a `SHOW TABLES`, first we send the query statement:
 
-    curl -X POST http://localhost:9000/api/editor/execute/hive --data 'statement=SHOW TABLES'
+    curl -X POST https://demo.gethue.com/api/editor/execute/hive --data 'statement=SHOW TABLES'
 
     {"status": 0, "history_id": 17880, "handle": {"statement_id": 0, "session_type": "hive", "has_more_statements": false, "guid": "EUI32vrfTkSOBXET6Eaa+A==\n", "previous_statement_hash": "3070952e55d733fb5bef249277fb8674989e40b6f86c5cc8b39cc415", "log_context": null, "statements_count": 1, "end": {"column": 10, "row": 0}, "session_id": 63, "start": {"column": 0, "row": 0}, "secret": "RuiF0LEkRn+Yok/gjXWSqg==\n", "has_result_set": true, "session_guid": "c845bb7688dca140:859a5024fb284ba2", "statement": "SHOW TABLES", "operation_type": 0, "modified_row_count": null}, "history_uuid": "63ce87ba-ca0f-4653-8aeb-e9f5c1781b78"}
 
-Then check the operation status until it is available for fetching its result:
+Then check the operation (its id is the value of the **history_uuid** from the execute response) status until its result is ready to fetch:
 
-    curl -X POST https://demo.gethue.com/notebook/api/check_status --data 'notebook={"type":"hive"}&snippet={"history_id": 17886,"type":"hive","result":{"handle":{"guid": "0J6PwGcSQaCJjagzYUBHzA==\n","secret": "uiP3IS4fR/mxkLJER5wRCg==\n","has_result_set": true}},"status":""}'
+    curl -X POST https://demo.gethue.com/api/editor/check_status --data 'operationId=63ce87ba-ca0f-4653-8aeb-e9f5c1781b78'
 
     {"status": 0, "query_status": {"status": "available", "has_result_set": true}}
 
 And now ask for the resultset of the statement:
 
-    curl -X POST https://demo.gethue.com/notebook/api/fetch_result_data --data 'notebook={"type":"hive"}&snippet={"history_id": 17886,"type":"hive","result":{"handle":{"guid": "0J6PwGcSQaCJjagzYUBHzA==\n","secret": "uiP3IS4fR/mxkLJER5wRCg==\n","has_result_set": true}},"status":""}'
+    curl -X POST https://demo.gethue.com/api/editor/fetch_result_data --data 'operationId=63ce87ba-ca0f-4653-8aeb-e9f5c1781b78'
 
     {"status": 0, "result": {"has_more": true, "type": "table", "meta": [{"comment": "from deserializer", "type": "STRING_TYPE", "name": "tab_name"}], "data": [["adavi"], ["adavi1"], ["adavi2"], ["ambs_feed"], ["apx_adv_deduction_data_process_total"], ["avro_table"], ["avro_table1"], ["bb"], ["bharath_info1"], ["bucknew"], ["bucknew1"], ["chungu"], ["cricket3"], ["cricket4"], ["cricket5_view"], ["cricketer"], ["cricketer_view"], ["cricketer_view1"], ["demo1"], ["demo12345"], ["dummy"], ["embedded"], ["emp"], ["emp1_sept9"], ["emp_details"], ["emp_sept"], ["emp_tbl1"], ["emp_tbl2"], ["empdtls"], ["empdtls_ext"], ["empdtls_ext_v2"], ["employee"], ["employee1"], ["employee_ins"], ["empppp"], ["events"], ["final"], ["flight_data"], ["gopalbhar"], ["guruhive_internaltable"], ["hell"], ["info1"], ["lost_messages"], ["mnewmyak"], ["mortality"], ["mscda"], ["myak"], ["mysample"], ["mysample1"], ["mysample2"], ["network"], ["ods_t_exch_recv_rel_wfz_stat_szy"], ["olympicdata"], ["p_table"], ["partition_cricket"], ["partitioned_user"], ["s"], ["sample"], ["sample_07"], ["sample_08"], ["score"], ["stg_t_exch_recv_rel_wfz_stat_szy"], ["stocks"], ["students"], ["studentscores"], ["studentscores2"], ["t1"], ["table_name"], ["tablex"], ["tabley"], ["temp"], ["test1"], ["test2"], ["test21"], ["test_info"], ["topage"], ["txnrecords"], ["u_data"], ["udata"], ["user_session"], ["user_test"], ["v_empdtls"], ["v_empdtls_ext"], ["v_empdtls_ext_v2"], ["web_logs"]], "isEscaped": true}}
 
 And if we wanted to get the execution log for this statement:
 
-    curl -X POST https://demo.gethue.com/notebook/api/get_logs --data 'notebook={"type":"hive","sessions":[]}&snippet={"history_id": 17886,"type":"hive","result":{"handle":{"guid": "0J6PwGcSQaCJjagzYUBHzA==\n","secret": "uiP3IS4fR/mxkLJER5wRCg==\n","has_result_set": true}},"status":"","properties":{},"sessions":[]}'
+    curl -X POST https://demo.gethue.com/notebook/api/get_logs --data 'operationId=63ce87ba-ca0f-4653-8aeb-e9f5c1781b78'
 
     {"status": 0, "progress": 5, "jobs": [], "logs": "", "isFullLogs": false}
+
+Same but in Python:
+
+    params = {
+      'statement': 'SELECT 1, 2, 3',
+    }
+
+    response = requests.post(
+      'https://demo.gethue.com/api/editor/execute/mysql',
+      headers={
+        'Authorization': 'Bearer %s' % token,
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      data=params
+    )
+    print(response.status_code)
+    print(response.text)
+
+    resp_content = json.loads(response.text)
+
+    data = {
+      'operationId': resp_content['history_uuid'],
+    }
+
+    response = requests.post(
+      'https://demo.gethue.com/api/editor/check_status',
+      headers={
+        'Authorization': 'Bearer %s' % token,
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      data=data
+    )
+    print(response.status_code)
+    print(response.text)
+
+
+    response = requests.post(
+      'https://demo.gethue.com/api/editor/fetch_result_data',
+      headers={
+        'Authorization': 'Bearer %s' % token,
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      data=data
+    )
+    print(response.status_code)
+    print(response.text)
 
 ### Listing Databases
 
@@ -331,6 +382,17 @@ How to get the file content and its metadata. Here with the public file of demo.
       ...............
     }
 
+### Download a file
+
+    GET http://127.0.0.1:9000/filebrowser/download=s3a://demo-hue/web_log_data/index_data.csv
+
+### Upload a file
+
+    POST http://127.0.0.1:9000/filebrowser/upload/file?dest=s3a://demo-hue
+
+    hdfs_file: (binary)
+    dest: s3a://demo-hue
+
 ## Data Importer
 
 ### File import
@@ -390,7 +452,9 @@ Searching for entities with the dummy backend:
         console.log(ko.mapping.toJSON(data));
     });
 
-### Finding an entity in order to get its id
+### Finding an entity
+
+e.g. in order to get its id:
 
     $.get("/metadata/api/navigator/find_entity", {
         type: "table",
@@ -411,7 +475,7 @@ Adding/updating a comment with the dummy backend:
         console.log(ko.mapping.toJSON(data));
     });
 
-### Adding a tag with the dummy backend
+### Adding a tag
 
     $.post("/metadata/api/catalog/add_tags/", {
       id: "22",
@@ -421,7 +485,7 @@ Adding/updating a comment with the dummy backend:
         console.log(ko.mapping.toJSON(data));
     });
 
-### Deleting a key/value property
+### Deleting a property
 
     $.post("/metadata/api/catalog/delete_metadata_properties/", {
        "id": "32",
@@ -430,22 +494,11 @@ Adding/updating a comment with the dummy backend:
        console.log(ko.mapping.toJSON(data));
     });
 
-### Deleting a key/value property
-
-    $.post("/metadata/api/catalog/delete_metadata_properties/", {
-      "id": "32",
-      "keys": ko.mapping.toJSON(["project", "steward"])
-    }, function(data) {
-      console.log(ko.mapping.toJSON(data));
-    });
-
-
 ### Getting the model mapping
 
     $.get("/metadata/api/catalog/models/properties/mappings/", function(data) {
       console.log(ko.mapping.toJSON(data));
     });
-
 
 ### Getting a namespace
 
@@ -463,7 +516,6 @@ Adding/updating a comment with the dummy backend:
     }, function(data) {
       console.log(ko.mapping.toJSON(data));
     });
-
 
 ### Creating a namespace property
 
@@ -483,7 +535,9 @@ Adding/updating a comment with the dummy backend:
       console.log(ko.mapping.toJSON(data));
     });
 
-### Map a namespace property to a class
+### Map a namespace property
+
+To a class:
 
     $.post("/metadata/api/catalog/namespace/property/map/", {
       "class": "hv_view",
