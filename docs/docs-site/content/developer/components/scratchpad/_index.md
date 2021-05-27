@@ -47,8 +47,7 @@ First install the NPM [package](/developer/components/) and import the component
 
 Then make sure *api-url* points to a running Hue or [Compose](https://github.com/gethue/compose) APIs. The API is the middleware between your Data Warehouse and Web Browser client and will provide the dynamic content like the list of tables and columns and enrich the static autocomplete powered by the [parser](/developer/components/parsers/) selected by the *dialect*.
 
-Specify the credentials for the authentication via *username="demo" password="demo"*. An option to look-up a local JWT token and not require the credentials is coming shortly
-
+Specify the credentials for the authentication via *username="demo" password="demo"*. An option to look-up a local JWT token and not require the credentials is coming shortly.
 
 It is possible to skip the `npm install` and directly grab the module via:
 
