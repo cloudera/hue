@@ -71,7 +71,7 @@ SparkSql は非常に人気があり、Apache Livy を介して SQL クエリを
 
 **動的一覧**
 
-エディタには全ての関数が一覧されているわけではありません。（セッションや企業レベルで登録されているもの、Hue のリリース後に作成されたもの、不足しており[追加可能](https://docs.gethue.com/developer/parsers/)なものなど...)
+エディタには全ての関数が一覧されているわけではありません。（セッションや企業レベルで登録されているもの、Hue のリリース後に作成されたもの、不足しており[追加可能](https://docs.gethue.com/developer/development/#sql-parsers)なものなど...)
 
 現在、エディタはデータベースに関数の完全なリストを問い合わせ、不足している関数を `General` セクションに追加します。
 
@@ -88,7 +88,7 @@ SparkSql は非常に人気があり、Apache Livy を介して SQL クエリを
 
 **独自のパーサーを開発**
 
-パーサーは [Apache Calcite](https://calcite.apache.org/) SQL サブセットをサポートすることを第一の目標とし、より小さな再利用可能なピース [structure.json](https://github.com/cloudera/hue/blob/master/desktop/core/src/desktop/js/parse/jison/sql/generic/structure.json) で抽出されています。[Parser SDK](https://docs.gethue.com/developer/parsers/#structure) にはより詳細な情報があります。
+パーサーは [Apache Calcite](https://calcite.apache.org/) SQL サブセットをサポートすることを第一の目標とし、より小さな再利用可能なピース [structure.json](https://github.com/cloudera/hue/blob/master/desktop/core/src/desktop/js/parse/jison/sql/generic/structure.json) で抽出されています。[Parser SDK](https://docs.gethue.com/developer/development/#sql-parsers#structure) にはより詳細な情報があります。
 
 例えば、`structure.json` は SQL パーサー全体で再利用可能な一般的な文法と特殊な文法のピースで構成されています。
 

@@ -62,7 +62,7 @@ SQL Cloud エディタの上位2つの機能は次の通りです。
 
 !["完全なHue"](https://cdn.gethue.com/uploads/2019/12/hue4.6.png)
 
-Hueのアプリは、インデックス付きまたはSQLでデータの計算やチャートのための[ダッシュボード](https://docs.gethue.com/user/querying/#dashboard) 、AWS、Azure、Google Cloud のクラウドストレージ用のブラウザー、ジョブワークフロー用の[ワークフロースケジューラー](https://docs.gethue.com/user/scheduling/) データセットインポートウィザード...など数多くあります。
+Hueのアプリは、インデックス付きまたはSQLでデータの計算やチャートのための[ダッシュボード](https://docs.gethue.com/user/querying/#dashboard) 、AWS、Azure、Google Cloud のクラウドストレージ用のブラウザー、ジョブワークフロー用の ワークフロースケジューラー データセットインポートウィザード...など数多くあります。
 
 しかし、SQLデータウェアハウスの場合、Hue を主にエディターとデータカタログに制限します。
 
@@ -391,7 +391,7 @@ Google Document と同様に、クエリは他のユーザーやグループと�
 
 2020 年に Hue 5 および拡張された SQL Cloud エディタが登場し、より新しいデータクエリ体験が実現します。[Cloudera Cloud Data Warehouse](https://www.cloudera.com/products/data-warehouse.html) では、データウェアハウス専用の Hue もリリースされました。
 
-Hue は、最もポピュラーなデータベースとそれら専用の[SQL autocomplete](https://docs.gethue.com/developer/parsers/) に多くの [connectors](https://docs.gethue.com/administrator/configuration/connectors/) を使用して、さらにプラガブルになっています。
+Hue は、最もポピュラーなデータベースとそれら専用の[SQL autocomplete](https://docs.gethue.com/developer/development/#sql-parsers) に多くの [connectors](https://docs.gethue.com/administrator/configuration/connectors/) を使用して、さらにプラガブルになっています。
 
 Hue の10年に渡る進化を紹介しているこのシリーズの第3弾では、SQL Cloud エディタの機能についてさらに深く取り上げます。それまでは、この記事や[Forum](https://discourse.gethue.com/) にコメントをお願いします。また、[quick start](https://docs.gethue.com/quickstart/) で SQL のクエリを行なって下さい!
 

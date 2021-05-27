@@ -5,7 +5,7 @@ draft: false
 weight: 2
 ---
 
-Looking at improving or adding a new one? Go check the **[connector API section](/developer/connectors/)**!
+Looking at improving or adding a new one? Go check the **[connector API section](/developer/development/#connectors)**!
 
 ## Databases
 
@@ -28,7 +28,7 @@ Note that USER and PASSWORD can be prompted to the user by using variables like 
 
 Most of the interpreters require to install their SqlAlchemy dialect (e.g. `./build/env/bin/pip install pyhive`) either in the global Python environment or in the Hue virtual environment.
 
-Read about [how to build your own parser](/developer/parsers/) if you are looking at better autocompletes for your the SQL dialects you use.
+Read about [how to build your own parser](/developer/development/#sql-parsers) if you are looking at better autocompletes for your the SQL dialects you use.
 
 **Beta**
 
@@ -318,7 +318,7 @@ With impersonation:
     0: jdbc:phoenix:> select * from "analytics_demo" where pk = "domain.0" limit 5;
     ```
 
-3. Phoenix follows Apache Calcite. Feel free to help improve the [SQL autocomplete](https://docs.gethue.com/developer/parsers/) support for it.
+3. Phoenix follows Apache Calcite. Feel free to help improve the [SQL autocomplete](https://docs.gethue.com/developer/development/#sql-parsers) support for it.
 
 4. The UI (and the underlying SQLAlchemy API) cannot distinguish between 'ANY namespace' and 'empty/Default' namespace
 

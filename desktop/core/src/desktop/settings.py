@@ -285,12 +285,11 @@ CSRF_FAILURE_VIEW = 'desktop.views.csrf_failure'
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
-      # 'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
       'rest_framework.permissions.IsAuthenticated',
-      # 'rest_framework.permissions.AllowAny'
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': (
       'rest_framework_simplejwt.authentication.JWTAuthentication',
+      'rest_framework.authentication.SessionAuthentication',
     ),
 }
 
@@ -301,7 +300,7 @@ JWT_AUTH = {
     'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=86400),
     'JWT_ALLOW_REFRESH': True,
     'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=7),
-     "JWT_AUTH_HEADER_PREFIX": "Bearer",
+    'JWT_AUTH_HEADER_PREFIX': 'Bearer',
 }
 
 ############################################################
@@ -385,6 +384,7 @@ if desktop.conf.CORS_ENABLED.get():
   MIDDLEWARE.remove('django.middleware.csrf.CsrfViewMiddleware')
   if sys.version_info[0] > 2:
     CORS_ALLOW_ALL_ORIGINS = True
+    # CORS_URLS_REGEX = r'^/api/.*$'  # To activate for v1
   else:
     CORS_ORIGIN_ALLOW_ALL = True
   CORS_ALLOW_CREDENTIALS = True  # For when cookie auth
