@@ -330,3 +330,68 @@ class TestBotServer(unittest.TestCase):
             }
           }
           assert_raises(PopupException, handle_on_link_shared, self.host_domain, "channel", "12.1", links, "<@user_id>")
+  
+  def test_handle_on_app_mention(self):
+    with patch('desktop.lib.botserver.views.check_slack_user_permission') as check_slack_user_permission:
+      with patch('desktop.lib.botserver.views.get_user') as get_user:
+        with patch('desktop.lib.botserver.views.handle_query_bank') as handle_query_bank:
+
+          channel_id = "channel"
+          user_id = "<@user_id>"
+
+          text = '@hue some message'
+          handle_on_app_mention(self.host_domain, channel_id, user_id, text)
+
+          assert_false(handle_query_bank.called)
+
+          text = '@hue queries'
+          handle_on_app_mention(self.host_domain, channel_id, user_id, text)
+
+          handle_query_bank.assert_called_with(channel_id, user_id)
+
+  def test_handle_query_bank(self):
+    with patch('desktop.lib.botserver.views.get_all_queries') as get_all_queries:
+      with patch('desktop.lib.botserver.views._send_message') as _send_message:
+
+        channel_id = "channel"
+        user_id = "<@user_id>"
+
+        get_all_queries.return_value = [
+          {
+            "name": "Test Query 1",
+            "data": {
+              "query": {
+                "statement": "SELECT 1"
+              }
+            }
+          },
+          {
+            "name": "Test Query 2",
+            "data": {
+              "query": {
+                "statement": "SELECT 2"
+              }
+            }
+          }
+        ]
+
+        test_query_block = [
+          {
+            'type': 'section',
+            'text': {'type': 'mrkdwn', 'text': 'Hi <@<@user_id>>, here is the list of all saved queries!'}
+          }, 
+          {
+            'type': 'divider'
+          }, 
+          {
+            'type': 'section',
+            'text': {'type': 'mrkdwn', 'text': '*Name:* Test Query 1 \n *Statement:*\n ```SELECT 1```'}
+          },
+          {
+            'type': 'section',
+            'text': {'type': 'mrkdwn', 'text': '*Name:* Test Query 2 \n *Statement:*\n ```SELECT 2```'}
+          }
+        ]
+        
+        handle_query_bank(channel_id, user_id)
+        _send_message.assert_called_with(channel_id, block_element=test_query_block)
