@@ -14,30 +14,36 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import * as ko from 'knockout';
+
 import { Cancellable, CancellablePromise } from 'api/cancellablePromise';
 import {
+  addNavTags,
+  deleteNavTags,
   fetchDescribe,
   fetchNavigatorMetadata,
   fetchPartitions,
   fetchSample,
-  fetchSourceMetadata
+  fetchSourceMetadata,
+  searchEntities,
+  updateNavigatorProperties,
+  updateSourceMetadata
 } from 'catalog/api';
 import MultiTableEntry, { TopAggs, TopFilters, TopJoins } from 'catalog/MultiTableEntry';
-import { getOptimizer } from './optimizer/optimizer';
-import * as ko from 'knockout';
 
-import apiHelper from 'api/apiHelper';
 import { applyCancellable, forceSilencedErrors } from 'catalog/catalogUtils';
 import { Compute, Connector, Namespace } from 'config/types';
 import { hueWindow } from 'types/types';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
+import { executeSingleStatement } from 'apps/editor/execution/api';
+import { SqlAnalyzer } from './analyzer/types';
 import {
   CatalogGetOptions,
   DataCatalog,
-  OptimizerPopularity,
-  OptimizerResponse,
-  OptimizerResponsePopularity,
+  SqlAnalyzerPopularity,
+  SqlAnalyzerResponse,
+  SqlAnalyzerResponsePopularity,
   TimestampedData
 } from './dataCatalog';
 
@@ -47,7 +53,7 @@ export interface BaseDefinition extends TimestampedData {
   index?: number;
   type?: string;
   isMapValue?: boolean;
-  optimizerLoaded?: boolean;
+  sqlAnalyzerLoaded?: boolean;
   partitionKey?: boolean;
   primaryKey?: boolean;
   foreignKey?: KeySpecification;
@@ -218,7 +224,7 @@ export interface Sample {
   type: string;
 }
 
-export interface OptimizerMeta extends TimestampedData {
+export interface SqlAnalyzerMeta extends TimestampedData {
   hueTimestamp?: number;
 }
 
@@ -258,10 +264,10 @@ export default class DataCatalogEntry {
   navigatorMeta?: NavigatorMeta;
   navigatorMetaForChildrenPromise?: CancellablePromise<DataCatalogEntry[]>;
   navigatorMetaPromise?: CancellablePromise<NavigatorMeta>;
-  optimizerMeta?: OptimizerMeta;
-  optimizerMetaPromise?: CancellablePromise<OptimizerMeta>;
-  optimizerPopularity?: OptimizerPopularity;
-  optimizerPopularityForChildrenPromise?: CancellablePromise<DataCatalogEntry[]>;
+  sqlAnalyzerMeta?: SqlAnalyzerMeta;
+  sqlAnalyzerMetaPromise?: CancellablePromise<SqlAnalyzerMeta>;
+  sqlAnalyzerPopularity?: SqlAnalyzerPopularity;
+  sqlAnalyzerPopularityForChildrenPromise?: CancellablePromise<DataCatalogEntry[]>;
   partitions?: Partitions;
   partitionsPromise?: CancellablePromise<Partitions>;
   sample?: Sample;
@@ -313,10 +319,10 @@ export default class DataCatalogEntry {
     this.navigatorMeta = undefined;
     this.navigatorMetaForChildrenPromise = undefined;
     this.navigatorMetaPromise = undefined;
-    this.optimizerMeta = undefined;
-    this.optimizerMetaPromise = undefined;
-    this.optimizerPopularity = undefined;
-    this.optimizerPopularityForChildrenPromise = undefined;
+    this.sqlAnalyzerMeta = undefined;
+    this.sqlAnalyzerMetaPromise = undefined;
+    this.sqlAnalyzerPopularity = undefined;
+    this.sqlAnalyzerPopularityForChildrenPromise = undefined;
     this.partitions = undefined;
     this.partitionsPromise = undefined;
     this.sample = undefined;
@@ -334,7 +340,7 @@ export default class DataCatalogEntry {
         .then(parent => {
           if (parent) {
             parent.navigatorMetaForChildrenPromise = undefined;
-            parent.optimizerPopularityForChildrenPromise = undefined;
+            parent.sqlAnalyzerPopularityForChildrenPromise = undefined;
           }
         })
         .catch(err => {
@@ -355,8 +361,8 @@ export default class DataCatalogEntry {
       options = {};
     }
 
-    if (this.definition && this.definition.optimizerLoaded) {
-      delete this.definition.optimizerLoaded;
+    if (this.definition && this.definition.sqlAnalyzerLoaded) {
+      delete this.definition.sqlAnalyzerLoaded;
     }
 
     this.reset();
@@ -424,22 +430,25 @@ export default class DataCatalogEntry {
   /**
    * Helper function to reload the nav opt metadata for the given entry
    */
-  private reloadOptimizerMeta(options?: ReloadOptions): CancellablePromise<OptimizerMeta> {
-    const optimizer = getOptimizer(this.getConnector());
-    if (this.dataCatalog.canHaveOptimizerMeta()) {
-      this.optimizerMetaPromise = new CancellablePromise<OptimizerMeta>(
+  private reloadSqlAnalyzerMeta({
+    cancellable,
+    silenceErrors,
+    sqlAnalyzer
+  }: ReloadOptions & { sqlAnalyzer: SqlAnalyzer }): CancellablePromise<SqlAnalyzerMeta> {
+    if (this.dataCatalog.canHaveSqlAnalyzerMeta()) {
+      this.sqlAnalyzerMetaPromise = new CancellablePromise<SqlAnalyzerMeta>(
         async (resolve, reject, onCancel) => {
-          const fetchPromise = optimizer.fetchOptimizerMeta({
+          const fetchPromise = sqlAnalyzer.fetchSqlAnalyzerMeta({
             path: this.path,
-            silenceErrors: options && options.silenceErrors
+            silenceErrors
           });
           onCancel(() => {
             fetchPromise.cancel();
           });
 
           try {
-            this.optimizerMeta = await fetchPromise;
-            resolve(this.optimizerMeta);
+            this.sqlAnalyzerMeta = await fetchPromise;
+            resolve(this.sqlAnalyzerMeta);
           } catch (err) {
             reject(err || 'Fetch failed');
             return;
@@ -448,9 +457,9 @@ export default class DataCatalogEntry {
         }
       );
     } else {
-      this.optimizerMetaPromise = CancellablePromise.reject();
+      this.sqlAnalyzerMetaPromise = CancellablePromise.reject();
     }
-    return applyCancellable(this.optimizerMetaPromise, options);
+    return applyCancellable(this.sqlAnalyzerMetaPromise, { cancellable });
   }
 
   private reloadPartitions(options?: ReloadOptions): CancellablePromise<Partitions> {
@@ -504,6 +513,35 @@ export default class DataCatalogEntry {
       this.saveLater();
     });
     return applyCancellable(this.sourceMetaPromise, options);
+  }
+
+  drop(cascade?: boolean): CancellablePromise<void> {
+    if (!this.isDatabase() && !this.isTableOrView()) {
+      return CancellablePromise.reject('Drop is only possible for a database, table or view.');
+    }
+    const statement = `DROP ${
+      this.isDatabase() ? 'DATABASE' : this.isView() ? 'VIEW' : 'TABLE'
+    } IF EXISTS \`${this.path.join('`.`')}\`${this.isDatabase() && cascade ? ' CASCADE;' : ';'}`;
+
+    return new CancellablePromise<void>((resolve, reject, onCancel) => {
+      const executePromise = executeSingleStatement({
+        database: this.path[0],
+        connector: this.getConnector(),
+        namespace: this.namespace,
+        compute: this.compute,
+        statement
+      });
+      onCancel(() => {
+        executePromise.cancel();
+      });
+
+      executePromise
+        .then(() => {
+          this.clearCache({ cascade: true }).catch();
+          resolve();
+        })
+        .catch(reject);
+    });
   }
 
   /**
@@ -761,17 +799,17 @@ export default class DataCatalogEntry {
             });
           };
 
-          const searchPromise = apiHelper.searchEntities({
-            query: query,
+          const searchPromise = searchEntities({
+            query,
             rawQuery: true,
             limit: children.length,
-            silenceErrors: options && options.silenceErrors
+            silenceErrors: options?.silenceErrors
           });
 
           cancellablePromises.push(searchPromise);
 
           searchPromise
-            .done((result: { entities: NavigatorMeta[] }) => {
+            .then(result => {
               if (result && result.entities) {
                 const childEntryIndex: { [name: string]: DataCatalogEntry } = {};
                 children.forEach(childEntry => {
@@ -795,7 +833,8 @@ export default class DataCatalogEntry {
                 });
               }
             })
-            .always(() => {
+            .catch(() => resolve([]))
+            .finally(() => {
               rejectUnknown();
               resolve(children);
             });
@@ -812,14 +851,14 @@ export default class DataCatalogEntry {
   /**
    * Helper function used when loading navopt metdata for children
    */
-  applyOptimizerResponseToChildren(
-    response: OptimizerResponse,
+  applySqlAnalyzerResponseToChildren(
+    response: SqlAnalyzerResponse,
     options?: { silenceErrors?: boolean }
   ): CancellablePromise<DataCatalogEntry[]> {
     if (!this.definition) {
       this.definition = {};
     }
-    this.definition.optimizerLoaded = true;
+    this.definition.sqlAnalyzerLoaded = true;
     this.saveLater();
 
     return new CancellablePromise<DataCatalogEntry[]>(async (resolve, reject, onCancel) => {
@@ -843,16 +882,16 @@ export default class DataCatalogEntry {
             }
             const matchingChild = entriesByName[topTable.name.toLowerCase()];
             if (matchingChild) {
-              matchingChild.optimizerPopularity = topTable;
+              matchingChild.sqlAnalyzerPopularity = topTable;
               matchingChild.saveLater();
               updatedIndex[matchingChild.getQualifiedPath()] = matchingChild;
             }
           });
         } else if (this.isTableOrView() && response.values) {
-          const addOptimizerPopularity = (
-            columns: OptimizerResponsePopularity[] | undefined,
+          const addSqlAnalyzerPopularity = (
+            columns: SqlAnalyzerResponsePopularity[] | undefined,
             type: keyof Pick<
-              OptimizerPopularity,
+              SqlAnalyzerPopularity,
               'filterColumn' | 'groupByColumn' | 'joinColumn' | 'orderByColumn' | 'selectColumn'
             >
           ) => {
@@ -863,10 +902,10 @@ export default class DataCatalogEntry {
                 }
                 const matchingChild = entriesByName[column.columnName.toLowerCase()];
                 if (matchingChild) {
-                  if (!matchingChild.optimizerPopularity) {
-                    matchingChild.optimizerPopularity = { column_count: 0, columnCount: 0 };
+                  if (!matchingChild.sqlAnalyzerPopularity) {
+                    matchingChild.sqlAnalyzerPopularity = { column_count: 0, columnCount: 0 };
                   }
-                  matchingChild.optimizerPopularity[type] = column;
+                  matchingChild.sqlAnalyzerPopularity[type] = column;
                   matchingChild.saveLater();
                   updatedIndex[matchingChild.getQualifiedPath()] = matchingChild;
                 }
@@ -874,11 +913,11 @@ export default class DataCatalogEntry {
             }
           };
 
-          addOptimizerPopularity(response.values.filterColumns, 'filterColumn');
-          addOptimizerPopularity(response.values.groupbyColumns, 'groupByColumn');
-          addOptimizerPopularity(response.values.joinColumns, 'joinColumn');
-          addOptimizerPopularity(response.values.orderbyColumns, 'orderByColumn');
-          addOptimizerPopularity(response.values.selectColumns, 'selectColumn');
+          addSqlAnalyzerPopularity(response.values.filterColumns, 'filterColumn');
+          addSqlAnalyzerPopularity(response.values.groupbyColumns, 'groupByColumn');
+          addSqlAnalyzerPopularity(response.values.joinColumns, 'joinColumn');
+          addSqlAnalyzerPopularity(response.values.orderbyColumns, 'orderByColumn');
+          addSqlAnalyzerPopularity(response.values.selectColumns, 'selectColumn');
         }
         const popularEntries: DataCatalogEntry[] = [];
         Object.keys(updatedIndex).forEach(path => {
@@ -892,29 +931,29 @@ export default class DataCatalogEntry {
   }
 
   /**
-   * Loads nav opt popularity for the children of this entry.
+   * Loads SQL Analyzer popularity for the children of this entry.
    */
-  loadOptimizerPopularityForChildren(
-    options?: CatalogGetOptions
+  loadSqlAnalyzerPopularityForChildren(
+    options: CatalogGetOptions & { sqlAnalyzer: SqlAnalyzer }
   ): CancellablePromise<DataCatalogEntry[]> {
     if (
-      this.optimizerPopularityForChildrenPromise &&
-      this.optimizerPopularityForChildrenPromise.cancelled
+      this.sqlAnalyzerPopularityForChildrenPromise &&
+      this.sqlAnalyzerPopularityForChildrenPromise.cancelled
     ) {
-      this.optimizerPopularityForChildrenPromise = undefined;
+      this.sqlAnalyzerPopularityForChildrenPromise = undefined;
     }
-    options = forceSilencedErrors(options);
+    options.silenceErrors = true;
 
-    if (!this.dataCatalog.canHaveOptimizerMeta()) {
+    if (!this.dataCatalog.canHaveSqlAnalyzerMeta()) {
       return CancellablePromise.reject();
     }
 
-    if (this.optimizerPopularityForChildrenPromise && !shouldReload(options)) {
-      return applyCancellable(this.optimizerPopularityForChildrenPromise, options);
+    if (this.sqlAnalyzerPopularityForChildrenPromise && !shouldReload(options)) {
+      return applyCancellable(this.sqlAnalyzerPopularityForChildrenPromise, options);
     }
 
-    if (this.definition && this.definition.optimizerLoaded && !shouldReload(options)) {
-      this.optimizerPopularityForChildrenPromise = new CancellablePromise<DataCatalogEntry[]>(
+    if (this.definition && this.definition.sqlAnalyzerLoaded && !shouldReload(options)) {
+      this.sqlAnalyzerPopularityForChildrenPromise = new CancellablePromise<DataCatalogEntry[]>(
         async (resolve, reject, onCancel) => {
           const childPromise = this.getChildren(options);
           onCancel(() => {
@@ -922,30 +961,29 @@ export default class DataCatalogEntry {
           });
           try {
             const children = await childPromise;
-            resolve(children.filter(child => child.optimizerPopularity));
+            resolve(children.filter(child => child.sqlAnalyzerPopularity));
           } catch (err) {
             reject(err);
           }
         }
       );
     } else if (this.isDatabase() || this.isTableOrView()) {
-      this.optimizerPopularityForChildrenPromise = new CancellablePromise<DataCatalogEntry[]>(
+      this.sqlAnalyzerPopularityForChildrenPromise = new CancellablePromise<DataCatalogEntry[]>(
         async (resolve, reject, onCancel) => {
           const cancellablePromises: Cancellable[] = [];
           onCancel(() => {
             cancellablePromises.forEach(cancellable => cancellable.cancel());
           });
 
-          const optimizer = getOptimizer(this.dataCatalog.connector);
-          const popularityPromise = optimizer.fetchPopularity({
+          const popularityPromise = options.sqlAnalyzer.fetchPopularity({
             ...options,
             paths: [this.path]
           });
           cancellablePromises.push(popularityPromise);
 
           try {
-            const optimzerResponse = await popularityPromise;
-            const applyPromise = this.applyOptimizerResponseToChildren(optimzerResponse, options);
+            const analyzerResponse = await popularityPromise;
+            const applyPromise = this.applySqlAnalyzerResponseToChildren(analyzerResponse, options);
             cancellablePromises.push(applyPromise);
             const entries = await applyPromise;
             resolve(entries);
@@ -955,10 +993,10 @@ export default class DataCatalogEntry {
         }
       );
     } else {
-      this.optimizerPopularityForChildrenPromise = CancellablePromise.resolve([]);
+      this.sqlAnalyzerPopularityForChildrenPromise = CancellablePromise.resolve([]);
     }
 
-    return applyCancellable(this.optimizerPopularityForChildrenPromise);
+    return applyCancellable(this.sqlAnalyzerPopularityForChildrenPromise);
   }
 
   /**
@@ -1074,13 +1112,12 @@ export default class DataCatalogEntry {
     }
 
     return new Promise<NavigatorMeta>((resolve, reject) => {
-      apiHelper
-        .updateNavigatorProperties({
-          identity: navigatorMeta.identity,
-          modifiedCustomMetadata: modifiedCustomMetadata,
-          deletedCustomMetadataKeys: deletedCustomMetadataKeys
-        })
-        .done(entity => {
+      updateNavigatorProperties({
+        identity: navigatorMeta.identity,
+        modifiedCustomMetadata,
+        deletedCustomMetadataKeys
+      })
+        .then(entity => {
           if (entity) {
             this.navigatorMeta = entity;
             this.navigatorMetaPromise = CancellablePromise.resolve(entity);
@@ -1089,7 +1126,8 @@ export default class DataCatalogEntry {
           } else {
             reject();
           }
-        });
+        })
+        .catch(reject);
     });
   }
 
@@ -1107,14 +1145,13 @@ export default class DataCatalogEntry {
       }
 
       return new Promise<string>((resolve, reject) => {
-        apiHelper
-          .updateNavigatorProperties({
-            identity: navigatorMeta.identity,
-            properties: {
-              description: comment
-            }
-          })
-          .done(async entity => {
+        updateNavigatorProperties({
+          identity: navigatorMeta.identity,
+          properties: {
+            description: comment
+          }
+        })
+          .then(async entity => {
             if (entity) {
               this.navigatorMeta = entity;
               this.navigatorMetaPromise = CancellablePromise.resolve(entity);
@@ -1129,20 +1166,19 @@ export default class DataCatalogEntry {
               })
               .catch(reject);
           })
-          .fail(reject);
+          .catch(reject);
       });
     }
 
     return new Promise((resolve, reject) => {
-      apiHelper
-        .updateSourceMetadata({
-          sourceType: this.getConnector().id,
-          path: this.path,
-          properties: {
-            comment: comment
-          }
-        })
-        .done(async () => {
+      updateSourceMetadata({
+        entry: this,
+        properties: {
+          comment: comment
+        },
+        silenceErrors: options?.silenceErrors
+      })
+        .then(async () => {
           try {
             await this.reloadSourceMeta(options);
             const comment = await this.getComment(options);
@@ -1154,7 +1190,7 @@ export default class DataCatalogEntry {
             reject(err);
           }
         })
-        .fail(reject);
+        .catch(reject);
     });
   }
 
@@ -1172,9 +1208,8 @@ export default class DataCatalogEntry {
     const navigatorMeta = await this.getNavigatorMeta(apiOptions);
 
     return new Promise((resolve, reject) => {
-      apiHelper
-        .addNavTags(navigatorMeta.identity, tags)
-        .done(entity => {
+      addNavTags(navigatorMeta.identity, tags)
+        .then(entity => {
           if (entity) {
             this.navigatorMeta = entity;
             this.navigatorMetaPromise = CancellablePromise.resolve(entity);
@@ -1184,7 +1219,7 @@ export default class DataCatalogEntry {
             reject();
           }
         })
-        .fail(reject);
+        .catch(reject);
     });
   }
 
@@ -1202,9 +1237,8 @@ export default class DataCatalogEntry {
     const navigatorMeta = await this.getNavigatorMeta(apiOptions);
 
     return new Promise((resolve, reject) => {
-      apiHelper
-        .deleteNavTags(navigatorMeta.identity, tags)
-        .done(entity => {
+      deleteNavTags(navigatorMeta.identity, tags)
+        .then(entity => {
           if (entity) {
             this.navigatorMeta = entity;
             this.navigatorMetaPromise = CancellablePromise.resolve(entity);
@@ -1214,7 +1248,7 @@ export default class DataCatalogEntry {
             reject();
           }
         })
-        .fail(reject);
+        .catch(reject);
     });
   }
 
@@ -1579,24 +1613,26 @@ export default class DataCatalogEntry {
   }
 
   /**
-   * Gets the Nav Opt metadata for the entry. It will fetch it if not cached or if the refresh option is set.
+   * Gets the SQL Analyzer metadata for the entry. It will fetch it if not cached or if the refresh option is set.
    */
-  getOptimizerMeta(options?: CatalogGetOptions): CancellablePromise<OptimizerMeta> {
-    if (this.optimizerMetaPromise && this.optimizerMetaPromise.cancelled) {
-      this.optimizerMetaPromise = undefined;
+  getSqlAnalyzerMeta(
+    options: CatalogGetOptions & { sqlAnalyzer: SqlAnalyzer }
+  ): CancellablePromise<SqlAnalyzerMeta> {
+    if (this.sqlAnalyzerMetaPromise && this.sqlAnalyzerMetaPromise.cancelled) {
+      this.sqlAnalyzerMetaPromise = undefined;
     }
-    options = forceSilencedErrors(options);
+    options.silenceErrors = true;
 
-    if (!this.dataCatalog.canHaveOptimizerMeta() || !this.isTableOrView()) {
+    if (!this.dataCatalog.canHaveSqlAnalyzerMeta() || !this.isTableOrView()) {
       return CancellablePromise.reject();
     }
-    if (!this.optimizerMetaPromise && cachedOnly(options)) {
+    if (!this.sqlAnalyzerMetaPromise && cachedOnly(options)) {
       return CancellablePromise.reject();
     }
-    if (!this.optimizerMetaPromise || shouldReload(options)) {
-      return this.reloadOptimizerMeta(options);
+    if (!this.sqlAnalyzerMetaPromise || shouldReload(options)) {
+      return this.reloadSqlAnalyzerMeta(options);
     }
-    return applyCancellable(this.optimizerMetaPromise, options);
+    return applyCancellable(this.sqlAnalyzerMetaPromise, options);
   }
 
   /**
@@ -1696,7 +1732,9 @@ export default class DataCatalogEntry {
   /**
    * Gets the top aggregate UDFs for the entry if it's a table or view. It will fetch it if not cached or if the refresh option is set.
    */
-  getTopAggs(options?: CatalogGetOptions): CancellablePromise<TopAggs> {
+  getTopAggs(
+    options: CatalogGetOptions & { sqlAnalyzer: SqlAnalyzer }
+  ): CancellablePromise<TopAggs> {
     const promise = new CancellablePromise<TopAggs>(async (resolve, reject, onCancel) => {
       const multiTableEntry = await getMultiTableEntry(this);
       const topAggsPromise = multiTableEntry.getTopAggs(options);
@@ -1713,7 +1751,9 @@ export default class DataCatalogEntry {
    *
    * @return {CancellableJqPromise}
    */
-  getTopFilters(options?: CatalogGetOptions): CancellablePromise<TopFilters> {
+  getTopFilters(
+    options: CatalogGetOptions & { sqlAnalyzer: SqlAnalyzer }
+  ): CancellablePromise<TopFilters> {
     const promise = new CancellablePromise<TopFilters>(async (resolve, reject, onCancel) => {
       const multiTableEntry = await getMultiTableEntry(this);
       const topFiltersPromise = multiTableEntry.getTopFilters(options);
@@ -1728,7 +1768,9 @@ export default class DataCatalogEntry {
   /**
    * Gets the top joins for the entry if it's a table or view. It will fetch it if not cached or if the refresh option is set.
    */
-  getTopJoins(options?: CatalogGetOptions): CancellablePromise<TopJoins> {
+  getTopJoins(
+    options: CatalogGetOptions & { sqlAnalyzer: SqlAnalyzer }
+  ): CancellablePromise<TopJoins> {
     const promise = new CancellablePromise<TopJoins>(async (resolve, reject, onCancel) => {
       const multiTableEntry = await getMultiTableEntry(this);
       const topJoinsPromise = multiTableEntry.getTopJoins(options);

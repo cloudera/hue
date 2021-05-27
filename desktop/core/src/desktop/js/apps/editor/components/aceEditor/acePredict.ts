@@ -15,18 +15,27 @@
 // limitations under the License.
 
 import { Ace } from 'ext/ace';
+
+import { CancellablePromise } from 'api/cancellablePromise';
+import { PredictResponse, SqlAnalyzerProvider } from 'catalog/analyzer/types';
 import { Disposable } from 'components/utils/SubscriptionTracker';
 import { Connector } from 'config/types';
-import { getOptimizer, PredictResponse } from 'catalog/optimizer/optimizer';
-import { CancellablePromise } from 'api/cancellablePromise';
-import { defer } from 'utils/hueUtils';
+import defer from 'utils/timing/defer';
+import noop from 'utils/timing/noop';
 
 type ActivePredict = { text: string; element: HTMLElement };
 
-export const attachPredictTypeahead = (editor: Ace.Editor, connector: Connector): Disposable => {
+export const attachPredictTypeahead = (
+  editor: Ace.Editor,
+  connector: Connector,
+  sqlAnalyzerProvider: SqlAnalyzerProvider
+): Disposable => {
+  if (!sqlAnalyzerProvider) {
+    return { dispose: noop };
+  }
   let activePredict: { text: string; element: HTMLElement } | undefined;
 
-  const optimizer = getOptimizer(connector);
+  const sqlAnalyzer = sqlAnalyzerProvider.getSqlAnalyzer(connector);
 
   const addPredictElement = (text: string): ActivePredict => {
     const element = document.createElement('div');
@@ -68,7 +77,7 @@ export const attachPredictTypeahead = (editor: Ace.Editor, connector: Connector)
         removeActivePredict();
       }
       if (editorText.length && !activePredict) {
-        optimizer
+        sqlAnalyzer
           .predict({
             beforeCursor: editor.getTextBeforeCursor(),
             afterCursor: editor.getTextAfterCursor()

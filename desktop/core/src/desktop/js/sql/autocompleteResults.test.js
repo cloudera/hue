@@ -19,7 +19,7 @@ import $ from 'jquery';
 import ApiHelper from 'api/apiHelper';
 import * as CatalogApi from 'catalog/api';
 import * as apiUtils from 'sql/reference/apiUtils';
-import { CancellablePromise } from '../api/cancellablePromise';
+import { CancellablePromise } from 'api/cancellablePromise';
 import AutocompleteResults from './autocompleteResults';
 import dataCatalog from 'catalog/dataCatalog';
 import huePubSub from 'utils/huePubSub';
@@ -27,7 +27,7 @@ import I18n from 'utils/i18n';
 import LOTS_OF_PARSE_RESULTS from './test/lotsOfParseResults';
 import * as sqlUdfRepository from 'sql/reference/sqlUdfRepository';
 import sqlReferenceRepository from 'sql/reference/sqlReferenceRepository';
-import { sleep } from '../utils/hueUtils';
+import sleep from 'utils/timing/sleep';
 
 describe('AutocompleteResults.js', () => {
   const failResponse = {

@@ -17,7 +17,7 @@
 import $ from 'jquery';
 import * as ko from 'knockout';
 
-import hueUtils from 'utils/hueUtils';
+import stripHtmlFromFunctions from 'utils/html/stripHtmlForFunctions';
 
 ko.bindingHandlers.codemirror = {
   init: function (element, valueAccessor) {
@@ -64,7 +64,7 @@ ko.bindingHandlers.codemirror = {
         }
         valueAccessor().data(_value);
         if ($('.widget-html-pill').parent().hasClass('active')) {
-          $('[contenteditable=true]').html(hueUtils.stripHtmlFromFunctions(valueAccessor().data()));
+          $('[contenteditable=true]').html(stripHtmlFromFunctions(valueAccessor().data()));
         }
       }, 100);
     });

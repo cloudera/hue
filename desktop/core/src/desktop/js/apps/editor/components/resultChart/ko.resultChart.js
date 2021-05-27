@@ -34,7 +34,8 @@ import { CURRENT_QUERY_TAB_SWITCHED_EVENT } from 'apps/editor/snippet';
 import componentUtils from 'ko/components/componentUtils';
 import DisposableComponent from 'ko/components/DisposableComponent';
 import hueAnalytics from 'utils/hueAnalytics';
-import { defer, UUID } from 'utils/hueUtils';
+import defer from 'utils/timing/defer';
+import UUID from 'utils/string/UUID';
 import I18n from 'utils/i18n';
 
 export const RESULT_CHART_COMPONENT = 'snippet-result-chart';

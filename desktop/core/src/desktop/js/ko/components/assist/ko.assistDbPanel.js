@@ -807,7 +807,7 @@ class AssistDbPanel {
     this.sources([source]);
     this.selectedSource(source);
 
-    source.loadNamespaces().done(() => {
+    source.loadNamespaces().then(() => {
       const namespace = this.selectedSource().selectedNamespace();
       if (namespace) {
         namespace.initDatabases();

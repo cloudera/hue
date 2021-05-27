@@ -14,8 +14,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import $ from 'jquery';
-
 import {
   EXECUTABLE_TRANSITIONED_TOPIC,
   EXECUTABLE_UPDATED_TOPIC,
@@ -39,7 +37,7 @@ import ExecutionLogs, {
   ExecutionError,
   ExecutionLogsRaw
 } from 'apps/editor/execution/executionLogs';
-import { UUID } from 'utils/hueUtils';
+import UUID from 'utils/string/UUID';
 import Executor from 'apps/editor/execution/executor';
 
 /**
@@ -256,13 +254,14 @@ export default abstract class Executable {
         }
       }
 
-      if (this.executor.isOptimizerEnabled && this.history) {
+      if (this.executor.isSqlAnalyzerEnabled && this.history) {
         huePubSub.publish('editor.upload.query', this.history.id);
       }
 
       this.checkStatus();
       this.logs.fetchLogs();
     } catch (err) {
+      console.warn(err);
       this.setStatus(ExecutionStatus.failed);
     }
   }
@@ -339,9 +338,7 @@ export default abstract class Executable {
         this.executeEnded = Date.now();
         this.setStatus(queryStatus.status);
         if (queryStatus.message) {
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          $.jHueNotify.error(queryStatus.message); // TODO: Inline instead of popup, e.g. ERROR_REGEX in Execute()
+          huePubSub.publish('hue.error', queryStatus.message);
         }
         break;
       default:

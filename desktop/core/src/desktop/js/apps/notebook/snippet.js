@@ -24,7 +24,6 @@ import apiHelper from 'api/apiHelper';
 import dataCatalog from 'catalog/dataCatalog';
 import hueAnalytics from 'utils/hueAnalytics';
 import huePubSub from 'utils/huePubSub';
-import hueUtils from 'utils/hueUtils';
 import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
 import Result from 'apps/notebook/result';
 import Session from 'apps/notebook/session';
@@ -44,6 +43,7 @@ import {
   CURSOR_POSITION_CHANGED_EVENT,
   REFRESH_STATEMENT_LOCATIONS_EVENT
 } from 'ko/bindings/ace/aceLocationHandler';
+import UUID from 'utils/string/UUID';
 
 const NOTEBOOK_MAPPING = {
   ignore: [
@@ -181,7 +181,7 @@ class Snippet {
     const self = this;
 
     self.id = ko.observable(
-      typeof snippet.id != 'undefined' && snippet.id != null ? snippet.id : hueUtils.UUID()
+      typeof snippet.id != 'undefined' && snippet.id != null ? snippet.id : UUID()
     );
     self.name = ko.observable(
       typeof snippet.name != 'undefined' && snippet.name != null ? snippet.name : ''
@@ -250,10 +250,10 @@ class Snippet {
     self.aceWarningsHolder = ko.observableArray([]);
 
     self.aceErrors = ko.pureComputed(() => {
-      return self.showOptimizer() ? self.aceErrorsHolder() : [];
+      return self.showSqlAnalyzer() ? self.aceErrorsHolder() : [];
     });
     self.aceWarnings = ko.pureComputed(() => {
-      return self.showOptimizer() ? self.aceWarningsHolder() : [];
+      return self.showSqlAnalyzer() ? self.aceWarningsHolder() : [];
     });
 
     self.availableSnippets = vm.availableSnippets();
@@ -1445,14 +1445,14 @@ class Snippet {
     });
     self.compatibilityTargetPlatform = ko.observable(COMPATIBILITY_TARGET_PLATFORMS[self.type()]);
 
-    self.showOptimizer = ko.observable(getFromLocalStorage('editor.show.optimizer', false));
-    self.showOptimizer.subscribe(newValue => {
+    self.showSqlAnalyzer = ko.observable(getFromLocalStorage('editor.show.sql.analyzer', false));
+    self.showSqlAnalyzer.subscribe(newValue => {
       if (newValue !== null) {
-        setInLocalStorage('editor.show.optimizer', newValue);
+        setInLocalStorage('editor.show.sql.analyzer', newValue);
       }
     });
 
-    if (HAS_OPTIMIZER && !vm.isNotificationManager()) {
+    if (window.HAS_SQL_ANALYZER && !vm.isNotificationManager()) {
       let lastComplexityRequest;
       let lastCheckedComplexityStatement;
       const knownResponses = [];
@@ -1857,7 +1857,7 @@ class Snippet {
             } else if (!notebook.unloaded()) {
               self.checkStatus();
             }
-            if (vm.isOptimizerEnabled()) {
+            if (vm.isSqlAnalyzerEnabled()) {
               huePubSub.publish('editor.upload.query', data.history_id);
             }
           } else {
@@ -2093,7 +2093,7 @@ class Snippet {
                     ? parseInt(match[3])
                     : null
               });
-              self.status('with-optimizer-report');
+              self.status('with-sql-analyzer-report');
             }
             if (self.suggestion().parseError()) {
               const match = ERROR_REGEX.exec(self.suggestion().parseError());
@@ -2107,9 +2107,9 @@ class Snippet {
                     ? parseInt(match[3])
                     : null
               });
-              self.status('with-optimizer-report');
+              self.status('with-sql-analyzer-report');
             }
-            self.showOptimizer(true);
+            self.showSqlAnalyzer(true);
             self.hasSuggestion(true);
           } else {
             $(document).trigger('error', data.message);
