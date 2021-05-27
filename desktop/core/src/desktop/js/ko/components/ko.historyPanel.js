@@ -195,6 +195,12 @@ class HistoryPanel {
           snippetImage: window.STATIC_URLS['rdbms/art/icon_rdbms_48.png'],
           sqlDialect: true
         },
+        mysql: {
+          placeHolder: I18n('Example: SELECT * FROM tablename, or press CTRL + space'),
+          aceMode: 'ace/mode/mysql',
+          snippetImage: window.STATIC_URLS['rdbms/art/icon_rdbms_48.png'],
+          sqlDialect: true
+        },
         java: {
           snippetIcon: 'fa-file-code-o'
         },
