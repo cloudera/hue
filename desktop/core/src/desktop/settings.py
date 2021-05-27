@@ -379,14 +379,13 @@ EMAIL_SUBJECT_PREFIX = 'Hue %s - ' % desktop.conf.CLUSTER_ID.get()
 
 
 # Permissive CORS for public /api
-if desktop.conf.CORS_ENABLED.get() or True:
-  INSTALLED_APPS.append('corsheaders')
-  MIDDLEWARE.insert(0, 'corsheaders.middleware.CorsMiddleware')
-  CORS_URLS_REGEX = r'^/api/.*$'
-  if sys.version_info[0] > 2:
-    CORS_ALLOW_ALL_ORIGINS = True
-  else:
-    CORS_ORIGIN_ALLOW_ALL = True
+INSTALLED_APPS.append('corsheaders')
+MIDDLEWARE.insert(0, 'corsheaders.middleware.CorsMiddleware')
+CORS_URLS_REGEX = r'^/api/.*$'
+if sys.version_info[0] > 2:
+  CORS_ALLOW_ALL_ORIGINS = True
+else:
+  CORS_ORIGIN_ALLOW_ALL = True
 
 # Configure database
 if os.getenv('DESKTOP_DB_CONFIG'):

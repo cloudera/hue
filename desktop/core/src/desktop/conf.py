@@ -575,13 +575,6 @@ REST_CONN_TIMEOUT = Config(
   type=int,
   help=_('Timeout in seconds for REST calls.'))
 
-CORS_ENABLED = Config(
-  key="cors_enabled",
-  help=_("To set to true when using a decoupled UI."),
-  type=coerce_bool,
-  default=False
-)
-
 
 VCS = UnspecifiedConfigSection(
   "vcs",

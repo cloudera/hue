@@ -19,20 +19,15 @@ There are two ways to import the SQL Scratchpad:
 
 ## Use the published package
 
-1. Setup Hue to allow CORS, in your hue .ini add:
-```
-  [desktop]
-  cors_enabled=true
-```
-2. Go to the example project `cd tools/examples/components/sql-scratchpad`
-3. `npm install`
-4. `npm start`
-5. Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+1. Go to the example project `cd tools/examples/components/sql-scratchpad`
+2. `npm install`
+3. `npm start`
+4. Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
 
 ## Use your local package
 
-1. In the SQL Scratchpad project change the "gethue" dependency in `package.json` to 
+1. In the SQL Scratchpad project change the "gethue" dependency in `package.json` to
    ```
    "gethue": "file:../../../../npm_dist",
    ```
@@ -43,7 +38,7 @@ There are two ways to import the SQL Scratchpad:
 7. `npm install`
 8. `npm start`
 
-It will monitor changes of the related Hue sources and update npm_dist when needed, if the 
+It will monitor changes of the related Hue sources and update npm_dist when needed, if the
 SQL Scratchpad project doesn't pick up the changes a restart of the app might be needed.
 
 
@@ -52,4 +47,3 @@ SQL Scratchpad project doesn't pick up the changes a restart of the app might be
 1. `npx create-react-app sql-scratchpad --template typescript`
 2. Add `"gethue": "file:../../../../npm_dist"` to dependencies in package.json
 3. Add `SKIP_PREFLIGHT_CHECK=true` to .env (required when using local Hue package)
-
