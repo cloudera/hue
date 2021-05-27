@@ -79,5 +79,5 @@ class TestApi(object):
       data = json.loads(response.content)
 
       assert_equal(200, response.status_code)
-      chat_postMessage.assert_called_with(channel='channel-1', text='@api_user: message with link')
+      chat_postMessage.assert_called_with(channel='channel-1', text='@api_user: message with link', blocks=None)
       assert_true(data.get('ok'))
