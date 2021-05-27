@@ -108,7 +108,7 @@ def handle_select_statement(host_domain, is_http_secure, channel_id, user_id, st
   slack_user = check_slack_user_permission(host_domain, user_id)
   user = get_user(channel_id, slack_user)
 
-  default_dialect = get_cluster_config(rewrite_user(user))['default_sql_interpreter']
+  default_dialect = get_cluster_config(rewrite_user(user))['main_button_action']['dialect']
 
   gist_response = _gist_create(host_domain, is_http_secure, user, statement, default_dialect)
 
