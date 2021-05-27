@@ -50,6 +50,14 @@ export default class NotebookViewModel {
     self.isMobile = ko.observable(options.mobile);
     self.isNotificationManager = ko.observable(options.is_notification_manager || false);
     self.editorType = ko.observable(options.editor_type);
+    self.editorIcon = ko.pureComputed(() => {
+      const foundInterpreter = options.languages.find(
+        interpreter => interpreter.type === self.editorType()
+      );
+      return window.ENABLE_UNIFIED_ANALYTICS && foundInterpreter?.dialect === 'hive'
+        ? 'impala'
+        : self.editorType();
+    });
     self.activeConnector = ko.observable();
 
     const updateConnector = id => {
@@ -154,10 +162,10 @@ export default class NotebookViewModel {
       }
     };
     self.editorTypeTitle = ko.pureComputed(() => {
-      const foundInterpreter = $.grep(options.languages, interpreter => {
-        return interpreter.type === self.editorType();
-      });
-      return foundInterpreter.length > 0 ? foundInterpreter[0].name : self.editorType();
+      const foundInterpreter = options.languages.find(
+        interpreter => interpreter.type === self.editorType()
+      );
+      return foundInterpreter?.displayName || foundInterpreter?.name || self.editorType();
     });
     self.autocompleteTimeout = options.autocompleteTimeout;
     self.selectedNotebook = ko.observable();

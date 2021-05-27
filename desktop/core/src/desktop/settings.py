@@ -30,8 +30,6 @@ import pkg_resources
 import sys
 import uuid
 
-import django_opentracing
-
 import desktop.redaction
 
 from desktop.lib.paths import get_desktop_root, get_run_root
@@ -214,6 +212,8 @@ INSTALLED_APPS = [
     'django_prometheus',
     'crequest',
     #'django_celery_results',
+    'rest_framework',
+    'rest_framework.authtoken',
 ]
 
 WEBPACK_LOADER = {
@@ -282,6 +282,27 @@ PYLINTRC = get_run_root('.pylintrc')
 
 # Custom CSRF Failure View
 CSRF_FAILURE_VIEW = 'desktop.views.csrf_failure'
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+      # 'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+      'rest_framework.permissions.IsAuthenticated',
+      # 'rest_framework.permissions.AllowAny'
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+      'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
+
+JWT_AUTH = {
+    'JWT_VERIFY': True,
+    'JWT_VERIFY_EXPIRATION': True,
+    'JWT_LEEWAY': 0,
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=86400),
+    'JWT_ALLOW_REFRESH': True,
+    'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=7),
+     "JWT_AUTH_HEADER_PREFIX": "Bearer",
+}
 
 ############################################################
 # Part 4: Installation of apps

@@ -100,6 +100,7 @@ class MetastoreViewModel {
             sources.push(
               new MetastoreSource({
                 metastoreViewModel: this,
+                displayName: interpreter.displayName,
                 name: interpreter.name,
                 type: interpreter.type
               })
@@ -110,6 +111,7 @@ class MetastoreViewModel {
           sources.push(
             new MetastoreSource({
               metastoreViewModel: this,
+              displayName: initialSourceType,
               name: initialSourceType,
               type: initialSourceType
             })

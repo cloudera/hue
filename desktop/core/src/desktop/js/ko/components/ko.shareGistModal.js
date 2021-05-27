@@ -36,7 +36,7 @@ const TEMPLATE = `
     <div class="row-fluid">
       <div class="input-append">
         <form autocomplete="off">
-          <input id="gistLink" style="width: 510px" ${ window.PREVENT_AUTOFILL_INPUT_ATTRS } onfocus="this.select()" data-bind="value: link" type="text" placeholder="${ I18n('Link') }"/>
+          <input id="gistLink" style="width: 510px" ${ window.PREVENT_AUTOFILL_INPUT_ATTRS } onfocus="this.select()" data-bind="value: link" type="text" placeholder="${ I18n('Link') }" readonly="readonly"/>
           <button class="btn" type="button" data-dismiss="modal" data-clipboard-target="#gistLink" data-bind="clipboard"><i class="fa fa-clipboard"></i></button>
         </form>
       </div>

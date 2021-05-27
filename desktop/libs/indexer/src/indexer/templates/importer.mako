@@ -704,7 +704,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
               </label>
             </div>
 
-            <div class="control-group" data-bind="visible: tableFormat() == 'kudu'">
+            <div class="control-group" data-bind="visible: (tableFormat() == 'kudu' || $root.createWizard.destination.dialect() == 'phoenix')">
               <label for="kuduPksTable" class="control-label"><div>${ _('Primary keys') }</div>
                 ## At least one selected
                 <select id="kuduPksTable" data-bind="selectize: columns, selectedOptions: primaryKeys, selectedObjects: primaryKeyObjects, optionsValue: 'name', optionsText: 'name', innerSubscriber: 'name'" size="3" multiple="true"></select>
@@ -1800,6 +1800,10 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
       self.interpreter.subscribe(function(val) {
         self.sourceType(val);
         wizard.destination.sourceType(val);
+        var dialect = self.interpreters().filter(function(interpreter) {
+          return interpreter['type'] === val;
+        });
+        wizard.destination.dialect(dialect[0]['dialect']);
       });
   
       // File
@@ -2204,6 +2208,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
       var self = this;
       self.apiHelperType = vm.sourceType;
       self.sourceType = ko.observable(vm.sourceType);
+      self.dialect = ko.observable('');
 
       self.name = ko.observable('').extend({ throttle: 500 });
       self.nameChanged = function(name) {

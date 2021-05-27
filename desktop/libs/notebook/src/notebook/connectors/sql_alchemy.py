@@ -239,10 +239,8 @@ class SqlAlchemyApi(Api):
 
     engine = self._get_engine()
     connection = self._create_connection(engine)
-    statement = snippet['statement']
-
-    if self.interpreter['dialect_properties'].get('trim_statement_semicolon', True):
-      statement = statement.strip().rstrip(';')
+    current_statement = self._get_current_statement(notebook, snippet)
+    statement = current_statement['statement']
 
     if self.interpreter['dialect_properties'].get('has_use_statement') and snippet.get('database'):
       connection.execute(
@@ -270,7 +268,7 @@ class SqlAlchemyApi(Api):
     }
     CONNECTIONS[guid] = cache
 
-    return {
+    response =  {
       'sync': False,
       'has_result_set': result.cursor != None,
       'modified_row_count': 0,
@@ -282,6 +280,9 @@ class SqlAlchemyApi(Api):
         'type': 'table'
       }
     }
+    response.update(current_statement)
+
+    return response
 
 
   @query_error_handler
