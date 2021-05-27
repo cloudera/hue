@@ -377,18 +377,16 @@ SERVER_EMAIL = desktop.conf.DJANGO_SERVER_EMAIL.get()
 EMAIL_BACKEND = desktop.conf.DJANGO_EMAIL_BACKEND.get()
 EMAIL_SUBJECT_PREFIX = 'Hue %s - ' % desktop.conf.CLUSTER_ID.get()
 
-# Permissive CORS
-if desktop.conf.CORS_ENABLED.get():
+
+# Permissive CORS for public /api
+if desktop.conf.CORS_ENABLED.get() or True:
   INSTALLED_APPS.append('corsheaders')
   MIDDLEWARE.insert(0, 'corsheaders.middleware.CorsMiddleware')
-  MIDDLEWARE.remove('django.middleware.csrf.CsrfViewMiddleware')
+  CORS_URLS_REGEX = r'^/api/.*$'
   if sys.version_info[0] > 2:
     CORS_ALLOW_ALL_ORIGINS = True
-    # CORS_URLS_REGEX = r'^/api/.*$'  # To activate for v1
   else:
     CORS_ORIGIN_ALLOW_ALL = True
-  CORS_ALLOW_CREDENTIALS = True  # For when cookie auth
-  SESSION_COOKIE_SAMESITE = None
 
 # Configure database
 if os.getenv('DESKTOP_DB_CONFIG'):
