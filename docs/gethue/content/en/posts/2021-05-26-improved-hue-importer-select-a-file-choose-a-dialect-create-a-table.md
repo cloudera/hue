@@ -47,7 +47,7 @@ categories:
 
 If you’ve ever struggled with configuring Hue to allow your users to create new SQL tables from CSV files on their own in the public Cloud, you’ll be happy to learn that this is now much easier.
 
-If you're a pro Hue user, then you might be familiar with the Hue [Importer](https://docs.gethue.com/developer/api/#data-importer). It lets you create tables from a file. Until now, the file had to be available on [HDFS](https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/HdfsDesign.html) or cloud object storage, such as [S3](https://gethue.com/introducing-s3-support-in-hue/) or [ABFS](https://docs.gethue.com/administrator/configuration/connectors/#azure-file-systems). Now you can browse and select files from your computer to create tables with different SQL [dialects](https://docs.gethue.com/administrator/configuration/connectors/) in Hue. Apache Hive, Apache Impala, Apache Phoenix, MySql dialects are supported.
+If you're a pro Hue user, then you might be familiar with the Hue [Importer](https://docs.gethue.com/developer/api/rest/#data-importer). It lets you create tables from a file. Until now, the file had to be available on [HDFS](https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/HdfsDesign.html) or cloud object storage, such as [S3](https://gethue.com/introducing-s3-support-in-hue/) or [ABFS](https://docs.gethue.com/administrator/configuration/connectors/#azure-file-systems). Now you can browse and select files from your computer to create tables with different SQL [dialects](https://docs.gethue.com/administrator/configuration/connectors/) in Hue. Apache Hive, Apache Impala, Apache Phoenix, MySql dialects are supported.
 
 ### Goal
 
