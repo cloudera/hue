@@ -34,6 +34,8 @@ from notebook.api import _fetch_result_data, _check_status, _execute_notebook
 from notebook.models import MockRequest, get_api
 from notebook.connectors.base import _get_snippet_name
 
+from metadata.assistant.queries_utils import get_all_queries
+
 from useradmin.models import User
 
 from django.http import HttpResponse
@@ -93,7 +95,7 @@ def parse_events(request, event):
 
 
 def handle_on_app_mention(host_domain, channel_id, user_id, text):
-  if text and 'query bank' in text:
+  if text and 'queries' in text:
     slack_user = check_slack_user_permission(host_domain, user_id)
     user = get_user(channel_id, slack_user)
 
@@ -101,42 +103,33 @@ def handle_on_app_mention(host_domain, channel_id, user_id, text):
 
   
 def handle_query_bank(channel_id, user_id):
-  with open(os.path.join(os.path.dirname(__file__), 'data/queries.json')) as file:
-    data = json.load(file)
+  data = get_all_queries()
 
-    message_block = [
-      {
-        "type": "section",
-        "text": {
-          "type": "mrkdwn",
-          "text": "Hi <@{user}>, here is the list of all saved queries!".format(user=user_id)
-        }
-      },
-      {
-        "type": "divider"
-      },
-    ]
-
-    for query in data:
-      name = {
-        "type": "section",
-        "text": {
-          "type": "mrkdwn",
-          "text": "*Name:* {name}".format(name=query.get('name'))
-        },
+  message_block = [
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "Hi <@{user}>, here is the list of all saved queries!".format(user=user_id)
       }
-      message_block.append(name)
+    },
+    {
+      "type": "divider"
+    },
+  ]
 
-      statement = {
-        "type": "section",
-        "text": {
-          "type": "mrkdwn",
-          "text": "*Statement:*\n ```{query}```".format(query=query.get('query'))
-        },
-      }
-      message_block.append(statement)
+  for query in data:
+    statement = query['data']['query']['statement']
+    query_element = {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "*Name:* {name} \n *Statement:*\n ```{statement}```".format(name=query['name'], statement=statement)
+      },
+    }
+    message_block.append(query_element)
 
-    _send_message(channel_id, block_element=message_block)
+  _send_message(channel_id, block_element=message_block)
 
 
 def handle_on_message(host_domain, is_http_secure, channel_id, bot_id, elements, user_id):
