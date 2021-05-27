@@ -15,7 +15,6 @@
 // limitations under the License.
 
 import { CancellablePromise } from 'api/cancellablePromise';
-import { CLOSE_SESSION_API } from 'api/urls';
 import { AuthRequest, Session, SessionProperty } from './api';
 
 import * as ExecutionApi from './api';
@@ -145,7 +144,7 @@ describe('sessionManager.ts', () => {
           session.session_id
         );
         expect(options && options.silenceErrors).toBeTruthy();
-        expect(url).toEqual(CLOSE_SESSION_API);
+        expect(url).toContain('/close_session');
         return new CancellablePromise(resolve => {
           resolve();
         });
