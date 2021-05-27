@@ -58,7 +58,6 @@
   import { SqlReferenceProvider } from 'sql/reference/types';
 
   import './SqlScratchpad.scss';
-  import defer from '../../../../utils/timing/defer';
   import AceEditor from '../aceEditor/AceEditor.vue';
   import { ActiveStatementChangedEventDetails } from '../aceEditor/types';
   import ExecutableProgressBar from '../ExecutableProgressBar.vue';
