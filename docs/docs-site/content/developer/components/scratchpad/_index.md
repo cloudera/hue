@@ -10,7 +10,7 @@ The SQL Scratchpad component is in beta and rapidly evolving. Now is a great tim
 
 ## Live Demo
 
-The Scratchpad is hosted within this page and points to [demo.gethue.com](https://demo.gethue.com/).
+The Scratchpad is hosted within this page and points to [demo.gethue.com](https://demo.gethue.com/):
 
 {{< rawhtml >}}
 <p>
@@ -18,7 +18,7 @@ The Scratchpad is hosted within this page and points to [demo.gethue.com](https:
     <sql-scratchpad api-url="https://demo.gethue.com" username="demo" password="demo" dialect="mysql" />
   </div>
 
-  <script type="text/javascript" src="/js/gethue/components/SqlScratchpadWebComponent.js"></script>
+  <script type="text/javascript" src="https://unpkg.com/gethue/lib/components/SqlScratchpadWebComponent.js"></script>
 
   <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
 </p>
@@ -39,21 +39,21 @@ First install the NPM [package](/developer/components/) and import the component
 
     <body>
       <div style="position: absolute; height: 100%; width: 100%">
-        <sql-scratchpad api-url="http://localhost:8005" username="demo" password="demo" dialect="mysql" />
+        <sql-scratchpad api-url="https://demo.gethue.com" username="demo" password="demo" dialect="mysql" />
       </div>
     </body>
 
     </html>
 
-For quick testing, it is possible to skip the `npm install` and directly grab the module via:
+Then make sure *api-url* points to a running Hue or [Compose](https://github.com/gethue/compose) APIs. The API is the middleware between your Data Warehouse and Web Browser client and will provide the dynamic content like the list of tables and columns and enrich the autocomplete. The autocomplete is static and powered by the [parser](/developer/components/parsers/) selected by the value of *dialect*.
 
-    <script type="text/javascript" src="https://cdn.gethue.com/components/SqlScratchpadWebComponent.js"></script>
+Specify the credentials for the authentication via *username="demo" password="demo"*.
 
-Then make sure `api-url` points to a running Hue or [Compose](https://github.com/gethue/compose) APIs on [http://localhost:8005](http://localhost:8005). The API is the middleware between your Data Warehouse and Web Browser client and will provide the dynamic content like the list of tables and columns and enrich the static autocomplete powered by the [parser](/developer/components/parsers/) selected by the `dialect`.
+Options to look-up a local JWT token or go via Login modal and so not requiring the credentials are coming shortly.
 
-If using Hue as the API, this [ini settings](/administrator/configuration/) is currently required:
 
-    [desktop]
-    cors_enabled=true
+It is also possible to skip the whole `npm install` and directly grab the module via:
+
+    <script type="text/javascript" src="https://unpkg.com/gethue/lib/components/SqlScratchpadWebComponent.js"></script>
 
 !["SQL Scratchpad"](https://cdn.gethue.com/uploads/2021/05/sql-scratchpad-v0.5.png)
