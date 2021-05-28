@@ -121,6 +121,7 @@
     setup(props, { emit }) {
       const {
         id,
+        sqlAnalyzerProvider,
         sqlReferenceProvider,
         executor,
         initialCursorPosition,
@@ -514,7 +515,7 @@
         };
 
         if ((<hueWindow>window).ENABLE_PREDICT) {
-          attachPredictTypeahead(editor, executor.value.connector(), this.sqlAnalyzerProvider);
+          attachPredictTypeahead(editor, executor.value.connector(), sqlAnalyzerProvider);
         }
 
         let placeholderVisible = false;
