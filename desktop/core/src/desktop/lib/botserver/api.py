@@ -64,10 +64,9 @@ def send_message(request):
 @login_notrequired
 @api_error_handler
 def generate_slack_install_link(request):
-  response = {'status': 0}
-  install_link = 'https://api.slack.com/apps?new_app=1&manifest_yaml='
+  hostname = request.GET.get('hostname')
 
-  hostname = request.POST.get('hostname')
+  install_link = 'https://api.slack.com/apps?new_app=1&manifest_yaml='
 
   with open(os.path.join(BASE_DIR, 'tools/slack/manifest.yml')) as manifest:
     data = yaml.safe_load(manifest)
@@ -78,9 +77,7 @@ def generate_slack_install_link(request):
     changed_data = yaml.safe_dump(data)
     install_link += quote_plus(changed_data)
 
-    response['link'] = install_link
-
-  return JsonResponse(response)
+  return JsonResponse({'link': install_link})
 
 def _send_message(channel_info, message=None, block_element=None):
   try:

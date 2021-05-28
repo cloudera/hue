@@ -30,5 +30,5 @@ urlpatterns = [
   re_path(r'^api/channels/get/?$', api.get_channels, name='botserver.api.get_channels'),
   re_path(r'^api/message/send/?$', api.send_message, name='botserver.api.send_message'),
 
-  re_path(r'^api/install/', api.generate_slack_install_link, name='botserver.api.slack_install_link'),
+  re_path(r'^api/install/?$', api.generate_slack_install_link, name='botserver.api.slack_install_link'),
 ]
