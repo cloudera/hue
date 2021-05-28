@@ -14,13 +14,13 @@ The Scratchpad is hosted within this page and points to [demo.gethue.com](https:
 
 {{< rawhtml >}}
 <p>
-  <div style="position: absolute; height: 40%; width: 100%">
+  <div style="position: absolute; height: 25%; width: 70%">
     <sql-scratchpad api-url="https://demo.gethue.com" username="demo" password="demo" dialect="mysql" />
   </div>
 
   <script type="text/javascript" src="https://unpkg.com/gethue/lib/components/SqlScratchpadWebComponent.js"></script>
 
-  <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+  <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
 </p>
 {{< /rawhtml >}}
 
