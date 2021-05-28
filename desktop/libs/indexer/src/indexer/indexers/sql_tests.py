@@ -920,3 +920,85 @@ UPSERT INTO default.test1 VALUES ('TX', 'Dallas', 1213825);
 UPSERT INTO default.test1 VALUES ('CA', 'San Jose', 912332);'''
 
     assert_equal(statement, sql)
+
+
+def test_create_table_from_local_impala():
+  with patch('indexer.indexers.sql.get_interpreter') as get_interpreter:
+    get_interpreter.return_value = {'Name': 'Impala', 'dialect': 'impala'}
+    source = {
+      'path': '/apps/beeswax/data/tables/flights.csv',
+      'sourceType': 'impala',
+      'format': {'hasHeader': True}
+    }
+    destination = {
+      'name': 'default.test1',
+      'columns': [
+        {'name': 'date', 'type': 'timestamp'},
+        {'name': 'hour', 'type': 'bigint'},
+        {'name': 'minute', 'type': 'bigint'},
+        {'name': 'dep', 'type': 'bigint'},
+        {'name': 'arr', 'type': 'bigint'},
+        {'name': 'dep_delay', 'type': 'bigint'},
+        {'name': 'arr_delay', 'type': 'bigint'},
+        {'name': 'carrier', 'type': 'string'},
+        {'name': 'flight', 'type': 'bigint'},
+        {'name': 'dest', 'type': 'string'},
+        {'name': 'plane', 'type': 'string'},
+        {'name': 'cancelled', 'type': 'boolean'},
+        {'name': 'time', 'type': 'bigint'},
+        {'name': 'dist', 'type': 'bigint'},
+      ],
+      'sourceType': 'impala'
+    }
+    request = MockRequest(fs=MockFs())
+    sql = SQLIndexer(user=request.user, fs=request.fs).create_table_from_local_file(source, destination).get_str()
+
+    statement = '''USE default;
+
+CREATE TABLE IF NOT EXISTS default.test1_tmp (
+  `date` string,
+  `hour` string,
+  `minute` string,
+  `dep` string,
+  `arr` string,
+  `dep_delay` string,
+  `arr_delay` string,
+  `carrier` string,
+  `flight` string,
+  `dest` string,
+  `plane` string,
+  `cancelled` string,
+  `time` string,
+  `dist` string);
+      
+INSERT INTO default.test1_tmp VALUES \
+('2011-12-14 12:00:00', '13', '4', '1304', '1704', '24', '14', 'WN', '3085', 'PHL', 'N524SW', '1', '159', '1336'), \
+('2011-12-14 12:00:00', '17', '52', '1752', '1943', '12', '8', 'WN', '39', 'PHX', 'N503SW', '1', '155', '1020'), \
+('2011-12-14 12:00:00', '7', '9', '709', '853', '-1', '-12', 'WN', '424', 'PHX', 'N761RR', '1', '152', '1020'), \
+('2011-12-14 12:00:00', '13', '32', '1332', '1514', '17', '4', 'WN', '1098', 'PHX', 'N941WN', '1', '151', '1020'), \
+('2011-12-14 12:00:00', '9', '55', '955', '1141', '5', '-4', 'WN', '1403', 'PHX', 'N472WN', '1', '155', '1020'), \
+('2011-12-14 12:00:00', '16', '13', '1613', '1731', '8', '-4', 'WN', '33', 'SAN', 'N707SA', '1', '185', '1313'), \
+('2011-12-14 12:00:00', '11', '45', '1145', '1257', '5', '-13', 'WN', '1212', 'SAN', 'N279WN', '0', '183', '1313'), \
+('2011-12-14 12:00:00', '20', '16', '2016', '2112', '36', '32', 'WN', '207', 'SAT', 'N929WN', '0', '44', '192');
+
+CREATE TABLE IF NOT EXISTS default.test1
+AS SELECT
+  CAST ( `date` AS timestamp ) `date`,
+  CAST ( `hour` AS bigint ) `hour`,
+  CAST ( `minute` AS bigint ) `minute`,
+  CAST ( `dep` AS bigint ) `dep`,
+  CAST ( `arr` AS bigint ) `arr`,
+  CAST ( `dep_delay` AS bigint ) `dep_delay`,
+  CAST ( `arr_delay` AS bigint ) `arr_delay`,
+  CAST ( `carrier` AS string ) `carrier`,
+  CAST ( `flight` AS bigint ) `flight`,
+  CAST ( `dest` AS string ) `dest`,
+  CAST ( `plane` AS string ) `plane`,
+  CAST ( CAST ( `cancelled` AS TINYINT ) AS boolean ) `cancelled`,
+  CAST ( `time` AS bigint ) `time`,
+  CAST ( `dist` AS bigint ) `dist`
+FROM  default.test1_tmp;
+
+DROP TABLE IF EXISTS default.test1_tmp;'''
+
+    assert_equal(statement, sql)
