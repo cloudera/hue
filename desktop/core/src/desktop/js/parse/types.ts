@@ -119,6 +119,7 @@ export interface AutocompleteParseResult {
   };
   suggestColumnAliases?: ColumnAliasDetails[];
   suggestColumns?: {
+    appendBacktick?: boolean;
     identifierChain?: IdentifierChainEntry[];
     source?: string;
     tables: ParsedTable[];
@@ -126,11 +127,13 @@ export interface AutocompleteParseResult {
     udfRef?: string;
   };
   suggestCommonTableExpressions?: {
+    appendBacktick?: boolean;
     name: string;
     prependFrom: boolean;
     prependQuestionMark: boolean;
   }[];
   suggestDatabases?: {
+    appendBacktick?: boolean;
     appendDot?: boolean;
     prependFrom?: boolean;
     prependQuestionMark?: boolean;
@@ -167,6 +170,7 @@ export interface AutocompleteParseResult {
   suggestOrderBys?: CommonPopularSuggestion;
   suggestSetOptions?: boolean;
   suggestTables?: {
+    appendBacktick?: boolean;
     identifierChain?: IdentifierChainEntry[];
     onlyTables?: boolean;
     onlyViews?: boolean;

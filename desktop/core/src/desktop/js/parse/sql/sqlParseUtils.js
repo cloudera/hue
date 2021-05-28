@@ -65,6 +65,24 @@ export const LOCATION_TYPES = {
   VARIABLE: 'variable'
 };
 
+const APPEND_BACKTICK_SUGGESTIONS = [
+  'suggestColumns',
+  'suggestCommonTableExpressions',
+  'suggestDatabases',
+  'suggestTables'
+];
+
+export const adjustForPartialBackticks = parser => {
+  const partials = parser.yy.partialLengths;
+  if (parser.yy.result && partials.backtickBefore && !partials.backtickAfter) {
+    APPEND_BACKTICK_SUGGESTIONS.forEach(suggestionType => {
+      if (parser.yy.result[suggestionType]) {
+        parser.yy.result[suggestionType].appendBacktick = true;
+      }
+    });
+  }
+};
+
 export const initSharedAutocomplete = parser => {
   parser.SELECT_FIRST_OPTIONAL_KEYWORDS = [
     { value: 'ALL', weight: 2 },
@@ -545,6 +563,20 @@ export const initSharedAutocomplete = parser => {
 
     return {
       columns: columns
+    };
+  };
+
+  const PARTIAL_BEFORE_REGEX = /[0-9a-zA-Z_`]*$/;
+  const PARTIAL_AFTER_REGEX = /^[0-9a-zA-Z_`]*(?:\((?:[^)]*\))?)?/;
+
+  parser.identifyPartials = function (beforeCursor, afterCursor) {
+    const beforeMatch = beforeCursor.match(PARTIAL_BEFORE_REGEX);
+    const afterMatch = afterCursor.match(PARTIAL_AFTER_REGEX);
+    return {
+      left: beforeMatch ? beforeMatch[0].length : 0,
+      right: afterMatch ? afterMatch[0].length : 0,
+      backtickBefore: beforeMatch && beforeMatch[0].indexOf('`') !== -1,
+      backtickAfter: afterMatch && afterMatch[0].indexOf('`') !== -1
     };
   };
 

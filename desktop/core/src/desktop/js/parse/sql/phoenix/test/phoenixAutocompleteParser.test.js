@@ -14,6 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { assertPartials } from 'parse/sql/sharedParserTests';
 import phoenixAutocompleteParser from '../phoenixAutocompleteParser';
 
 describe('phoenixAutocompleteParser.js', () => {
@@ -277,98 +278,7 @@ describe('phoenixAutocompleteParser.js', () => {
 
   describe('partial removal', () => {
     it('should identify part lengths', () => {
-      const limitChars = [
-        ' ',
-        '\n',
-        '\t',
-        '&',
-        '~',
-        '%',
-        '!',
-        '.',
-        ',',
-        '+',
-        '-',
-        '*',
-        '/',
-        '=',
-        '<',
-        '>',
-        ')',
-        '[',
-        ']',
-        ';'
-      ];
-
-      expect(phoenixAutocompleteParser.identifyPartials('', '')).toEqual({ left: 0, right: 0 });
-      expect(phoenixAutocompleteParser.identifyPartials('foo', '')).toEqual({ left: 3, right: 0 });
-      expect(phoenixAutocompleteParser.identifyPartials(' foo', '')).toEqual({ left: 3, right: 0 });
-      expect(phoenixAutocompleteParser.identifyPartials('asdf 1234', '')).toEqual({
-        left: 4,
-        right: 0
-      });
-
-      expect(phoenixAutocompleteParser.identifyPartials('foo', 'bar')).toEqual({
-        left: 3,
-        right: 3
-      });
-
-      expect(phoenixAutocompleteParser.identifyPartials('fo', 'o()')).toEqual({
-        left: 2,
-        right: 3
-      });
-
-      expect(phoenixAutocompleteParser.identifyPartials('fo', 'o(')).toEqual({ left: 2, right: 2 });
-      expect(phoenixAutocompleteParser.identifyPartials('fo', 'o(bla bla)')).toEqual({
-        left: 2,
-        right: 10
-      });
-
-      expect(phoenixAutocompleteParser.identifyPartials('foo ', '')).toEqual({ left: 0, right: 0 });
-      expect(phoenixAutocompleteParser.identifyPartials("foo '", "'")).toEqual({
-        left: 0,
-        right: 0
-      });
-
-      expect(phoenixAutocompleteParser.identifyPartials('foo "', '"')).toEqual({
-        left: 0,
-        right: 0
-      });
-      limitChars.forEach(char => {
-        expect(phoenixAutocompleteParser.identifyPartials('bar foo' + char, '')).toEqual({
-          left: 0,
-          right: 0
-        });
-
-        expect(phoenixAutocompleteParser.identifyPartials('bar foo' + char + 'foofoo', '')).toEqual(
-          {
-            left: 6,
-            right: 0
-          }
-        );
-
-        expect(
-          phoenixAutocompleteParser.identifyPartials('bar foo' + char + 'foofoo ', '')
-        ).toEqual({
-          left: 0,
-          right: 0
-        });
-
-        expect(phoenixAutocompleteParser.identifyPartials('', char + 'foo bar')).toEqual({
-          left: 0,
-          right: 0
-        });
-
-        expect(phoenixAutocompleteParser.identifyPartials('', 'foofoo' + char)).toEqual({
-          left: 0,
-          right: 6
-        });
-
-        expect(phoenixAutocompleteParser.identifyPartials('', ' foofoo' + char)).toEqual({
-          left: 0,
-          right: 0
-        });
-      });
+      assertPartials(phoenixAutocompleteParser);
     });
   });
 });
