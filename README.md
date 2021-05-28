@@ -17,23 +17,19 @@ Many companies and organizations use Hue to quickly answer questions via self-se
 
 are executing 100s of 1000s of queries daily via its SQL Editor or API.
 
-This open source project is also ideal for building your own [Query Editor](https://docs.gethue.com/developer/components/) or [Query Service](https://docs.gethue.com/administrator/installation/cloud/#kubernetes) and contributions are welcome.
-
-Read more on: [gethue.com](http://gethue.com)
+This open source project is also ideal for building your own [Query Editor](https://docs.gethue.com/developer/components/) or [Query Service](https://docs.gethue.com/administrator/installation/cloud/#kubernetes) and contributions are welcome. Read more on [gethue.com](http://gethue.com).
 
 ![Hue Editor](https://cdn.gethue.com/uploads/2021/02/hue-4.9.png)
 
 Getting Started
 ---------------
 
-You can start Hue via three ways described below. Once setup, you would then need to configure Hue to point to the [desired databases](https://docs.gethue.com/administrator/configuration/connectors/) you want to query.
+You can start the server via three ways described below. Once setup, you would then need to configure the [desired databases](https://docs.gethue.com/administrator/configuration/connectors/) you want to query.
 
 Quick Demos:
 
 * Docker Compose: [Impala](https://gethue.com/blog/quickstart-sql-editor-for-apache-impala/), [Flink SQL](https://gethue.com/blog/sql-querying-live-kafka-logs-and-sending-live-updates-with-flink-sql/), [ksqlDB](https://gethue.com/blog/tutorial-query-live-data-stream-with-kafka-sql/), [Phoenix SQL / HBase](https://gethue.com/blog/querying-live-kafka-data-in-apache-hbase-with-phoenix/), [Spark SQL](https://gethue.com/blog/querying-spark-sql-with-spark-thrift-server-and-hue-editor/)
 * Live instance: [demo.gethue.com](https://demo.gethue.com/)
-
-The Forum [is here](https://discourse.gethue.com/) in case you are looking for help.
 
 Docker
 ------
@@ -42,9 +38,7 @@ Start Hue in a single click with the [Docker Guide](https://github.com/cloudera/
 
     docker run -it -p 8888:8888 gethue/hue:latest
 
-Now Hue should be up and running on your default Docker IP on the port 8888 [http://localhost:8888](http://localhost:8888)!
-
-Read more about [configurations](https://github.com/cloudera/hue/tree/master/tools/docker/hue#configuration) then.
+Now Hue should be up and running on your default Docker IP on [http://localhost:8888](http://localhost:8888)!
 
 Kubernetes
 ----------
@@ -58,7 +52,9 @@ Read more about configurations at [tools/kubernetes](tools/kubernetes/).
 Development
 -----------
 
-First install the [dependencies](https://docs.gethue.com/administrator/installation/dependencies/), clone the Hue repo, build and get the development server running.
+For a very Quick Start go with the [Dev Environment Docker](https://docs.gethue.com/developer/development/#dev-docker).
+
+Or install the [dependencies](https://docs.gethue.com/administrator/installation/dependencies/), clone the repository, build and get the server running.
 
     # <install OS dependencies>
     git clone https://github.com/cloudera/hue.git
@@ -70,14 +66,10 @@ Now Hue should be running on [http://localhost:8000](http://localhost:8000)!
 
 Read more in the [development documentation](https://docs.gethue.com/developer/development/).
 
-Note: For a very Quick Start and not even bother with installing a dev environment, go with the [Dev Docker](https://docs.gethue.com/developer/development/#dev-docker)
+Components
+----------
 
-
-Community
------------
-   * How to [contribute](CONTRIBUTING.md)
-   * Help Forum: https://discourse.gethue.com/
-   * High level [roadmap](docs/ROADMAP.md)
+Sql Editor and Sql Parsers [components](https://docs.gethue.com/developer/components/) and REST/Python [APIs](https://docs.gethue.com/developer/api/).
 
 
 License
