@@ -382,6 +382,7 @@ EMAIL_SUBJECT_PREFIX = 'Hue %s - ' % desktop.conf.CLUSTER_ID.get()
 INSTALLED_APPS.append('corsheaders')
 MIDDLEWARE.insert(0, 'corsheaders.middleware.CorsMiddleware')
 CORS_URLS_REGEX = r'^/api/.*$'
+CORS_ALLOW_CREDENTIALS = True
 if sys.version_info[0] > 2:
   CORS_ALLOW_ALL_ORIGINS = True
 else:
