@@ -14,6 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { assertPartials } from 'parse/sql/sharedParserTests';
 import hiveAutocompleteParser from '../hiveAutocompleteParser';
 describe('hiveAutocompleteParser.js', () => {
   beforeAll(() => {
@@ -368,79 +369,7 @@ describe('hiveAutocompleteParser.js', () => {
 
   describe('partial removal', () => {
     it('should identify part lengths', () => {
-      const limitChars = [
-        ' ',
-        '\n',
-        '\t',
-        '&',
-        '~',
-        '%',
-        '!',
-        '.',
-        ',',
-        '+',
-        '-',
-        '*',
-        '/',
-        '=',
-        '<',
-        '>',
-        ')',
-        '[',
-        ']',
-        ';'
-      ];
-
-      expect(hiveAutocompleteParser.identifyPartials('', '')).toEqual({ left: 0, right: 0 });
-      expect(hiveAutocompleteParser.identifyPartials('foo', '')).toEqual({ left: 3, right: 0 });
-      expect(hiveAutocompleteParser.identifyPartials(' foo', '')).toEqual({ left: 3, right: 0 });
-      expect(hiveAutocompleteParser.identifyPartials('asdf 1234', '')).toEqual({
-        left: 4,
-        right: 0
-      });
-
-      expect(hiveAutocompleteParser.identifyPartials('foo', 'bar')).toEqual({ left: 3, right: 3 });
-      expect(hiveAutocompleteParser.identifyPartials('fo', 'o()')).toEqual({ left: 2, right: 3 });
-      expect(hiveAutocompleteParser.identifyPartials('fo', 'o(')).toEqual({ left: 2, right: 2 });
-      expect(hiveAutocompleteParser.identifyPartials('fo', 'o(bla bla)')).toEqual({
-        left: 2,
-        right: 10
-      });
-
-      expect(hiveAutocompleteParser.identifyPartials('foo ', '')).toEqual({ left: 0, right: 0 });
-      expect(hiveAutocompleteParser.identifyPartials("foo '", "'")).toEqual({ left: 0, right: 0 });
-      expect(hiveAutocompleteParser.identifyPartials('foo "', '"')).toEqual({ left: 0, right: 0 });
-      limitChars.forEach(char => {
-        expect(hiveAutocompleteParser.identifyPartials('bar foo' + char, '')).toEqual({
-          left: 0,
-          right: 0
-        });
-
-        expect(hiveAutocompleteParser.identifyPartials('bar foo' + char + 'foofoo', '')).toEqual({
-          left: 6,
-          right: 0
-        });
-
-        expect(hiveAutocompleteParser.identifyPartials('bar foo' + char + 'foofoo ', '')).toEqual({
-          left: 0,
-          right: 0
-        });
-
-        expect(hiveAutocompleteParser.identifyPartials('', char + 'foo bar')).toEqual({
-          left: 0,
-          right: 0
-        });
-
-        expect(hiveAutocompleteParser.identifyPartials('', 'foofoo' + char)).toEqual({
-          left: 0,
-          right: 6
-        });
-
-        expect(hiveAutocompleteParser.identifyPartials('', ' foofoo' + char)).toEqual({
-          left: 0,
-          right: 0
-        });
-      });
+      assertPartials(hiveAutocompleteParser);
     });
   });
 

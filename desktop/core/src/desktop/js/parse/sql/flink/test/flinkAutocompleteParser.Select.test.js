@@ -232,8 +232,9 @@ describe('flinkAutocompleteParser.js SELECT statements', () => {
       afterCursor: '',
       expectedResult: {
         lowerCase: false,
-        suggestTables: {},
+        suggestTables: { appendBacktick: true },
         suggestDatabases: {
+          appendBacktick: true,
           appendDot: true
         }
       }
