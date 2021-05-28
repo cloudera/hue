@@ -1,4 +1,4 @@
-Building blocks providing a smart SQL Cloud Editor based on http://gethue.com/.
+Building blocks providing a smart SQL Cloud Editor based on [gethue.com](https://gethue.com).
 
 # Install
 
@@ -6,7 +6,7 @@ Building blocks providing a smart SQL Cloud Editor based on http://gethue.com/.
 
 # SQL Scratchpad
 
-The shareable lightweight SQL Editor also called "SQL Scratchpad" comes as its own `<sql-scratchpad />` Web component. Read more on its [documentation](https://docs.gethue.com/developer/components/scratchpad/).
+The shareable lightweight SQL Editor also called "SQL Scratchpad" comes as its own `<sql-scratchpad />` Web component. Play with a live demo and read more in its [documentation](https://docs.gethue.com/developer/components/scratchpad/).
 
     <!DOCTYPE html>
     <html>
@@ -18,7 +18,7 @@ The shareable lightweight SQL Editor also called "SQL Scratchpad" comes as its o
 
     <body>
       <div style="position: absolute; height: 100%; width: 100%">
-        <sql-scratchpad api-url="http://localhost:8005" username="demo" password="demo" dialect="mysql" />
+        <sql-scratchpad api-url="https://demo.gethue.com" username="demo" password="demo" dialect="mysql" />
       </div>
     </body>
 
