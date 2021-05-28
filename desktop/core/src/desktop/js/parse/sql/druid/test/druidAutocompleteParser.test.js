@@ -14,6 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { assertPartials } from 'parse/sql/sharedParserTests';
 import druidAutocompleteParser from '../druidAutocompleteParser';
 
 describe('druidAutocompleteParser.js', () => {
@@ -277,94 +278,7 @@ describe('druidAutocompleteParser.js', () => {
 
   describe('partial removal', () => {
     it('should identify part lengths', () => {
-      const limitChars = [
-        ' ',
-        '\n',
-        '\t',
-        '&',
-        '~',
-        '%',
-        '!',
-        '.',
-        ',',
-        '+',
-        '-',
-        '*',
-        '/',
-        '=',
-        '<',
-        '>',
-        ')',
-        '[',
-        ']',
-        ';'
-      ];
-
-      expect(druidAutocompleteParser.identifyPartials('', '')).toEqual({ left: 0, right: 0 });
-      expect(druidAutocompleteParser.identifyPartials('foo', '')).toEqual({ left: 3, right: 0 });
-      expect(druidAutocompleteParser.identifyPartials(' foo', '')).toEqual({ left: 3, right: 0 });
-      expect(druidAutocompleteParser.identifyPartials('asdf 1234', '')).toEqual({
-        left: 4,
-        right: 0
-      });
-
-      expect(druidAutocompleteParser.identifyPartials('foo', 'bar')).toEqual({
-        left: 3,
-        right: 3
-      });
-
-      expect(druidAutocompleteParser.identifyPartials('fo', 'o()')).toEqual({
-        left: 2,
-        right: 3
-      });
-
-      expect(druidAutocompleteParser.identifyPartials('fo', 'o(')).toEqual({ left: 2, right: 2 });
-      expect(druidAutocompleteParser.identifyPartials('fo', 'o(bla bla)')).toEqual({
-        left: 2,
-        right: 10
-      });
-
-      expect(druidAutocompleteParser.identifyPartials('foo ', '')).toEqual({ left: 0, right: 0 });
-      expect(druidAutocompleteParser.identifyPartials("foo '", "'")).toEqual({
-        left: 0,
-        right: 0
-      });
-
-      expect(druidAutocompleteParser.identifyPartials('foo "', '"')).toEqual({
-        left: 0,
-        right: 0
-      });
-      limitChars.forEach(char => {
-        expect(druidAutocompleteParser.identifyPartials('bar foo' + char, '')).toEqual({
-          left: 0,
-          right: 0
-        });
-
-        expect(druidAutocompleteParser.identifyPartials('bar foo' + char + 'foofoo', '')).toEqual({
-          left: 6,
-          right: 0
-        });
-
-        expect(druidAutocompleteParser.identifyPartials('bar foo' + char + 'foofoo ', '')).toEqual({
-          left: 0,
-          right: 0
-        });
-
-        expect(druidAutocompleteParser.identifyPartials('', char + 'foo bar')).toEqual({
-          left: 0,
-          right: 0
-        });
-
-        expect(druidAutocompleteParser.identifyPartials('', 'foofoo' + char)).toEqual({
-          left: 0,
-          right: 6
-        });
-
-        expect(druidAutocompleteParser.identifyPartials('', ' foofoo' + char)).toEqual({
-          left: 0,
-          right: 0
-        });
-      });
+      assertPartials(druidAutocompleteParser);
     });
   });
 });

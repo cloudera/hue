@@ -20,7 +20,8 @@ import {
   initSharedAutocomplete,
   identifierEquals,
   equalIgnoreCase,
-  SIMPLE_TABLE_REF_SUGGESTIONS
+  SIMPLE_TABLE_REF_SUGGESTIONS,
+  adjustForPartialBackticks
 } from 'parse/sql/sqlParseUtils';
 
 const initSqlParser = function (parser) {
@@ -917,15 +918,6 @@ const initSqlParser = function (parser) {
     return expand(expandedChain[0].name, expandedChain);
   };
 
-  parser.identifyPartials = function (beforeCursor, afterCursor) {
-    const beforeMatch = beforeCursor.match(/[0-9a-zA-Z_]*$/);
-    const afterMatch = afterCursor.match(/^[0-9a-zA-Z_]*(?:\((?:[^)]*\))?)?/);
-    return {
-      left: beforeMatch ? beforeMatch[0].length : 0,
-      right: afterMatch ? afterMatch[0].length : 0
-    };
-  };
-
   const addCleanTablePrimary = function (tables, tablePrimary) {
     if (tablePrimary.alias) {
       tables.push({ alias: tablePrimary.alias, identifierChain: tablePrimary.identifierChain });
@@ -1669,6 +1661,7 @@ const initSqlParser = function (parser) {
       linkTablePrimaries();
       parser.commitLocations();
       // Clean up and prioritize
+      adjustForPartialBackticks(parser);
       prioritizeSuggestions();
     } catch (err) {
       if (debug) {

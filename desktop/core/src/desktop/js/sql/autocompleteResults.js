@@ -852,7 +852,12 @@ class AutocompleteResults {
           databaseSuggestions.push({
             value:
               prefix +
-              (await sqlUtils.backTickIfNeeded(this.snippet.connector(), dbEntry.name)) +
+              (await sqlUtils.backTickIfNeeded(
+                this.snippet.connector(),
+                dbEntry.name,
+                undefined,
+                suggestDatabases.appendBacktick
+              )) +
               (suggestDatabases.appendDot ? '.' : ''),
             filterValue: dbEntry.name,
             meta: META_I18n.database,
@@ -920,7 +925,13 @@ class AutocompleteResults {
           }
           tableSuggestions.push({
             value:
-              prefix + (await sqlUtils.backTickIfNeeded(this.snippet.connector(), tableEntry.name)),
+              prefix +
+              (await sqlUtils.backTickIfNeeded(
+                this.snippet.connector(),
+                tableEntry.name,
+                undefined,
+                suggestTables.appendBacktick
+              )),
             filterValue: tableEntry.name,
             tableName: tableEntry.name,
             meta: META_I18n[tableEntry.getType().toLowerCase()],
@@ -1042,7 +1053,12 @@ class AutocompleteResults {
         typeof column.type !== 'undefined' && column.type !== 'COLREF' ? column.type : 'T';
       if (typeof column.alias !== 'undefined') {
         columnSuggestions.push({
-          value: await sqlUtils.backTickIfNeeded(this.snippet.connector(), column.alias),
+          value: await sqlUtils.backTickIfNeeded(
+            this.snippet.connector(),
+            column.alias,
+            undefined,
+            this.parseResult.suggestColumns?.appendBacktick
+          ),
           filterValue: column.alias,
           meta: type,
           category: CATEGORIES.COLUMN,
@@ -1058,7 +1074,9 @@ class AutocompleteResults {
         columnSuggestions.push({
           value: await sqlUtils.backTickIfNeeded(
             this.snippet.connector(),
-            column.identifierChain[column.identifierChain.length - 1].name
+            column.identifierChain[column.identifierChain.length - 1].name,
+            undefined,
+            this.parseResult.suggestColumns?.appendBacktick
           ),
           filterValue: column.identifierChain[column.identifierChain.length - 1].name,
           meta: type,
@@ -1086,7 +1104,12 @@ class AutocompleteResults {
             typeof column.type !== 'undefined' && column.type !== 'COLREF' ? column.type : 'T';
           if (column.alias) {
             columnSuggestions.push({
-              value: await sqlUtils.backTickIfNeeded(connector, column.alias),
+              value: await sqlUtils.backTickIfNeeded(
+                connector,
+                column.alias,
+                undefined,
+                this.parseResult.suggestColumns?.appendBacktick
+              ),
               filterValue: column.alias,
               meta: type,
               category: CATEGORIES.COLUMN,
@@ -1098,7 +1121,9 @@ class AutocompleteResults {
             columnSuggestions.push({
               value: await sqlUtils.backTickIfNeeded(
                 connector,
-                column.identifierChain[column.identifierChain.length - 1].name
+                column.identifierChain[column.identifierChain.length - 1].name,
+                undefined,
+                this.parseResult.suggestColumns?.appendBacktick
               ),
               filterValue: column.identifierChain[column.identifierChain.length - 1].name,
               meta: type,
@@ -1162,7 +1187,12 @@ class AutocompleteResults {
         });
 
         for (const childEntry of childEntries) {
-          let name = await sqlUtils.backTickIfNeeded(this.snippet.connector(), childEntry.name);
+          let name = await sqlUtils.backTickIfNeeded(
+            this.snippet.connector(),
+            childEntry.name,
+            undefined,
+            this.parseResult.suggestColumns?.appendBacktick
+          );
           if (this.dialect() === DIALECT.hive && (childEntry.isArray() || childEntry.isMap())) {
             name += '[]';
           }

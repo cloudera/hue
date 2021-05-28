@@ -14,6 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { assertPartials } from 'parse/sql/sharedParserTests';
 import flinkAutocompleteParser from '../flinkAutocompleteParser';
 
 describe('flinkAutocompleteParser.js', () => {
@@ -277,94 +278,7 @@ describe('flinkAutocompleteParser.js', () => {
 
   describe('partial removal', () => {
     it('should identify part lengths', () => {
-      const limitChars = [
-        ' ',
-        '\n',
-        '\t',
-        '&',
-        '~',
-        '%',
-        '!',
-        '.',
-        ',',
-        '+',
-        '-',
-        '*',
-        '/',
-        '=',
-        '<',
-        '>',
-        ')',
-        '[',
-        ']',
-        ';'
-      ];
-
-      expect(flinkAutocompleteParser.identifyPartials('', '')).toEqual({ left: 0, right: 0 });
-      expect(flinkAutocompleteParser.identifyPartials('foo', '')).toEqual({ left: 3, right: 0 });
-      expect(flinkAutocompleteParser.identifyPartials(' foo', '')).toEqual({ left: 3, right: 0 });
-      expect(flinkAutocompleteParser.identifyPartials('asdf 1234', '')).toEqual({
-        left: 4,
-        right: 0
-      });
-
-      expect(flinkAutocompleteParser.identifyPartials('foo', 'bar')).toEqual({
-        left: 3,
-        right: 3
-      });
-
-      expect(flinkAutocompleteParser.identifyPartials('fo', 'o()')).toEqual({
-        left: 2,
-        right: 3
-      });
-
-      expect(flinkAutocompleteParser.identifyPartials('fo', 'o(')).toEqual({ left: 2, right: 2 });
-      expect(flinkAutocompleteParser.identifyPartials('fo', 'o(bla bla)')).toEqual({
-        left: 2,
-        right: 10
-      });
-
-      expect(flinkAutocompleteParser.identifyPartials('foo ', '')).toEqual({ left: 0, right: 0 });
-      expect(flinkAutocompleteParser.identifyPartials("foo '", "'")).toEqual({
-        left: 0,
-        right: 0
-      });
-
-      expect(flinkAutocompleteParser.identifyPartials('foo "', '"')).toEqual({
-        left: 0,
-        right: 0
-      });
-      limitChars.forEach(char => {
-        expect(flinkAutocompleteParser.identifyPartials('bar foo' + char, '')).toEqual({
-          left: 0,
-          right: 0
-        });
-
-        expect(flinkAutocompleteParser.identifyPartials('bar foo' + char + 'foofoo', '')).toEqual({
-          left: 6,
-          right: 0
-        });
-
-        expect(flinkAutocompleteParser.identifyPartials('bar foo' + char + 'foofoo ', '')).toEqual({
-          left: 0,
-          right: 0
-        });
-
-        expect(flinkAutocompleteParser.identifyPartials('', char + 'foo bar')).toEqual({
-          left: 0,
-          right: 0
-        });
-
-        expect(flinkAutocompleteParser.identifyPartials('', 'foofoo' + char)).toEqual({
-          left: 0,
-          right: 6
-        });
-
-        expect(flinkAutocompleteParser.identifyPartials('', ' foofoo' + char)).toEqual({
-          left: 0,
-          right: 0
-        });
-      });
+      assertPartials(flinkAutocompleteParser);
     });
   });
 });

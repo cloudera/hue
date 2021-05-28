@@ -264,8 +264,12 @@ export default {
   backTickIfNeeded: async (
     connector: Connector,
     identifier: string,
-    sqlReferenceProvider?: SqlReferenceProvider
+    sqlReferenceProvider?: SqlReferenceProvider,
+    forceAppendBacktick?: boolean
   ): Promise<string> => {
+    if (forceAppendBacktick) {
+      return identifier + '`';
+    }
     const quoteChar =
       (connector.dialect_properties && connector.dialect_properties.sql_identifier_quote) || '`';
     if (identifier.indexOf(quoteChar) === 0) {
