@@ -56,7 +56,7 @@
   import { CONFIG_REFRESHED_TOPIC } from 'config/events';
   import { getLastKnownConfig } from 'config/hueConfig';
   import huePubSub from 'utils/huePubSub';
-  import { onHueLinkClick } from 'utils/hueUtils';
+  import onHueLinkClick from 'utils/html/onHueLinkClick';
   import I18n from 'utils/i18n';
   import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
 

@@ -14,6 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { Tags } from './GeneralDataCatalog';
 import { Cancellable, CancellablePromise } from 'api/cancellablePromise';
 import {
   DefaultApiResponse,
@@ -32,9 +33,10 @@ import DataCatalogEntry, {
   SampleMeta,
   SourceMeta
 } from 'catalog/DataCatalogEntry';
+import { Cluster, Compute, Connector, Namespace } from 'config/types';
 import { hueWindow } from 'types/types';
-import { sleep, UUID } from 'utils/hueUtils';
-import { Cluster, Compute, Connector, Namespace } from '../config/types';
+import sleep from 'utils/timing/sleep';
+import UUID from 'utils/string/UUID';
 
 interface AnalyzeResponse {
   status: number;
@@ -56,15 +58,19 @@ interface SampleFetchOptions extends SharedFetchOptions {
   sampleCount?: number;
 }
 
+const ADD_TAGS_URL = '/metadata/api/catalog/add_tags';
 const AUTOCOMPLETE_URL_PREFIX = '/api/editor/autocomplete/';
-
 const CANCEL_STATEMENT_URL = '/notebook/api/cancel_statement';
 const CHECK_STATUS_URL = '/notebook/api/check_status';
+const DELETE_TAGS_URL = '/metadata/api/catalog/delete_tags';
 const DESCRIBE_URL = '/notebook/api/describe/';
 const FETCH_RESULT_DATA_URL = '/notebook/api/fetch_result_data';
 const FIND_ENTITY_URL = '/metadata/api/catalog/find_entity';
+const LIST_TAGS_URL = '/metadata/api/catalog/list_tags';
 const METASTORE_TABLE_URL_PREFIX = '/metastore/table/';
 const SAMPLE_URL_PREFIX = '/notebook/api/sample/';
+const SEARCH_URL = '/desktop/api/search/entities';
+const UPDATE_PROPERTIES_URL = '/metadata/api/catalog/update_properties';
 
 const getEntryUrlPath = (entry: DataCatalogEntry) =>
   entry.path.join('/') + (entry.path.length ? '/' : '');
@@ -246,6 +252,20 @@ export const fetchNavigatorMetadata = ({
     }
   );
 };
+
+export const fetchAllNavigatorTags = ({
+  silenceErrors
+}: Pick<SharedFetchOptions, 'silenceErrors'>): CancellablePromise<Tags> =>
+  post<Tags>(LIST_TAGS_URL, undefined, {
+    silenceErrors,
+    handleSuccess: (response: { tags?: Tags } & DefaultApiResponse, resolve, reject) => {
+      if (successResponseIsError(response)) {
+        reject(extractErrorMessage(response));
+      } else {
+        resolve(response.tags || {});
+      }
+    }
+  });
 
 export const fetchPartitions = ({
   entry,
@@ -553,3 +573,121 @@ export const fetchSourceMetadata = ({
       }
     }
   );
+
+interface SearchOptions {
+  limit?: number;
+  query: string;
+  rawQuery?: boolean;
+  silenceErrors?: boolean;
+  sources?: string[];
+}
+
+type SearchResponse = { entities?: NavigatorMeta[] } | undefined;
+
+export const searchEntities = ({
+  limit,
+  query,
+  rawQuery,
+  silenceErrors,
+  sources
+}: SearchOptions): CancellablePromise<SearchResponse> =>
+  post<SearchResponse>(
+    SEARCH_URL,
+    {
+      query_s: JSON.stringify(query),
+      limit: limit || 100,
+      raw_query: !!rawQuery,
+      sources: (sources && JSON.stringify(sources)) || '["sql"]'
+    },
+    { silenceErrors }
+  );
+
+interface UpdateNavigatorPropertiesOptions {
+  deletedCustomMetadataKeys?: string[];
+  identity: string;
+  modifiedCustomMetadata?: Record<string, string>;
+  properties?: unknown;
+  silenceErrors?: boolean;
+}
+
+export const updateNavigatorProperties = ({
+  deletedCustomMetadataKeys,
+  identity,
+  modifiedCustomMetadata,
+  properties,
+  silenceErrors
+}: UpdateNavigatorPropertiesOptions): CancellablePromise<NavigatorMeta> => {
+  const data: Record<string, string> = { id: JSON.stringify(identity) };
+
+  if (properties) {
+    data.properties = JSON.stringify(properties);
+  }
+  if (modifiedCustomMetadata) {
+    data.modifiedCustomMetadata = JSON.stringify(modifiedCustomMetadata);
+  }
+  if (deletedCustomMetadataKeys) {
+    data.deletedCustomMetadataKeys = JSON.stringify(deletedCustomMetadataKeys);
+  }
+  return post<NavigatorMeta>(UPDATE_PROPERTIES_URL, data, { silenceErrors });
+};
+
+interface UpdateSourceMetadataOptions extends SharedFetchOptions {
+  properties: Record<string, string>;
+}
+
+export const updateSourceMetadata = ({
+  entry,
+  properties,
+  silenceErrors
+}: UpdateSourceMetadataOptions): CancellablePromise<void> => {
+  let url;
+  const data: Record<string, string> = {
+    source_type: entry.getConnector().id
+  };
+  if (entry.path.length === 1) {
+    url = `/metastore/databases/${entry.path[0]}/alter`;
+    data.properties = JSON.stringify(properties);
+  } else if (entry.path.length === 2) {
+    url = `/metastore/table/${entry.path[0]}/${entry.path[1]}/alter`;
+    if (properties?.name) {
+      data.new_table_name = properties.name;
+    }
+  } else if (entry.path.length > 2) {
+    url = `/metastore/table/${entry.path[0]}/${entry.path[1]}/alter_column`;
+    data.column = entry.path.slice(2).join('.');
+    if (properties?.name) {
+      data.new_column_name = properties.name;
+    }
+    if (properties?.type) {
+      data.new_column_type = properties.type;
+    }
+    if (properties?.partitions) {
+      data.partition_spec = JSON.stringify(properties.partitions);
+    }
+  }
+
+  if (properties?.comment) {
+    data.comment = properties.comment;
+  }
+
+  if (!url) {
+    return CancellablePromise.reject();
+  }
+
+  return post<void>(url, data, { silenceErrors });
+};
+
+export const addNavTags = (entityId: string, tags: string[]): CancellablePromise<NavigatorMeta> =>
+  post<NavigatorMeta>(ADD_TAGS_URL, {
+    id: JSON.stringify(entityId),
+    tags: JSON.stringify(tags)
+  });
+
+export const deleteNavTags = (
+  entityId: string,
+  tags: string[]
+): CancellablePromise<NavigatorMeta> =>
+  post<NavigatorMeta>(DELETE_TAGS_URL, {
+    id: JSON.stringify(entityId),
+    tags: JSON.stringify(tags)
+  });

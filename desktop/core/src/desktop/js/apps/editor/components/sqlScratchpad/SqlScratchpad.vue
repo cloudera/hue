@@ -42,8 +42,8 @@
         <ResultTable :executable="activeExecutable" />
       </div>
     </div>
-    <div v-else-if="!loading && !executor">
-      {{ errorMessage || 'Failed loading the SQL Scratchpad!' }}
+    <div v-else-if="!loading && !executor && errorMessage">
+      {{ errorMessage }}
     </div>
   </div>
 </template>
@@ -73,7 +73,7 @@
   import Spinner from 'components/Spinner.vue';
   import { findEditorConnector, getConfig } from 'config/hueConfig';
   import { Compute, Connector, Namespace } from 'config/types';
-  import { UUID } from 'utils/hueUtils';
+  import UUID from 'utils/string/UUID';
 
   export default defineComponent({
     name: 'SqlScratchpad',

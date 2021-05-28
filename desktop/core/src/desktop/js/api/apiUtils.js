@@ -15,7 +15,8 @@
 // limitations under the License.
 
 import $ from 'jquery';
-import hueUtils from 'utils/hueUtils';
+
+import logError from 'utils/logError';
 
 /**
  * @param {Object} [response]
@@ -73,7 +74,7 @@ export const assistErrorCallback = options => {
     }
 
     if (!options || !options.silenceErrors) {
-      hueUtils.logError(errorResponse);
+      logError(errorResponse);
       if (errorMessage && errorMessage.indexOf('AuthorizationException') === -1) {
         $(document).trigger('error', errorMessage);
       }

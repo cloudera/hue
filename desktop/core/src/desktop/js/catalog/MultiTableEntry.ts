@@ -14,16 +14,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { noop } from 'lodash';
-
 import DataCatalogEntry from 'catalog/DataCatalogEntry';
+import { PopularityOptions, SqlAnalyzer } from './analyzer/types';
 import { CatalogGetOptions, DataCatalog, TimestampedData } from './dataCatalog';
 import { CancellablePromise } from 'api/cancellablePromise';
 import { applyCancellable } from 'catalog/catalogUtils';
-import { getOptimizer, PopularityOptions } from 'catalog/optimizer/optimizer';
 import { UdfDetails } from 'sql/reference/types';
 import { Connector } from 'config/types';
 import { hueWindow } from 'types/types';
+import noop from 'utils/timing/noop';
 
 export interface TopJoinValue {
   totalTableCount: number;
@@ -78,12 +77,12 @@ export interface TopColumns extends TimestampedData {
 }
 
 const fetchAndSave = <T>(
-  optimizerFunction: (option: PopularityOptions) => CancellablePromise<T>,
+  sqlAnalyzerFunction: (option: PopularityOptions) => CancellablePromise<T>,
   setFunction: (val: T) => void,
   entry: DataCatalogEntry | MultiTableEntry,
   apiOptions?: { silenceErrors?: boolean; refreshAnalysis?: boolean }
 ): CancellablePromise<T> => {
-  const promise = optimizerFunction({
+  const promise = sqlAnalyzerFunction({
     paths: (<MultiTableEntry>entry).paths, // Set for MultiTableEntry
     silenceErrors: apiOptions && apiOptions.silenceErrors
   });
@@ -97,22 +96,22 @@ const fetchAndSave = <T>(
 };
 
 /**
- * Helper function to reload a Optimizer multi table attribute, like topAggs or topFilters
+ * Helper function to reload a SQL Analyzer multi table attribute, like topAggs or topFilters
  */
-const genericOptimizerReload = <T>(
+const genericSqlAnalyzerReload = <T>(
   multiTableEntry: MultiTableEntry,
   options: { silenceErrors?: boolean } | undefined,
   promiseSetter: (promise?: CancellablePromise<T>) => void,
   dataAttributeSetter: (val: T) => void,
-  optimizerFunction: (option: PopularityOptions) => CancellablePromise<T>
+  sqlAnalyzerFunction: (option: PopularityOptions) => CancellablePromise<T>
 ): CancellablePromise<T> => {
   const promise = new CancellablePromise<T>((resolve, reject, onCancel) => {
-    if (!multiTableEntry.dataCatalog.canHaveOptimizerMeta()) {
+    if (!multiTableEntry.dataCatalog.canHaveSqlAnalyzerMeta()) {
       reject();
       return;
     }
     const fetchPromise = fetchAndSave(
-      optimizerFunction,
+      sqlAnalyzerFunction,
       dataAttributeSetter,
       multiTableEntry,
       options
@@ -136,9 +135,9 @@ const genericOptimizerReload = <T>(
 };
 
 /**
- * Helper function to get a Optimizer multi table attribute, like topAggs or topFilters
+ * Helper function to get a SQL Analyzer multi table attribute, like topAggs or topFilters
  */
-const genericOptimizerGet = <T>(
+const genericSqlAnalyzerGet = <T>(
   multiTableEntry: MultiTableEntry,
   options: CatalogGetOptions | undefined,
   promiseSetter: (promise?: CancellablePromise<T>) => void,
@@ -152,7 +151,7 @@ const genericOptimizerGet = <T>(
   }
 
   if (!promise || !DataCatalog.cacheEnabled() || (options && options.refreshCache)) {
-    promise = genericOptimizerReload<T>(
+    promise = genericSqlAnalyzerReload<T>(
       multiTableEntry,
       options,
       promiseSetter,
@@ -203,7 +202,7 @@ class MultiTableEntry {
     if (ttl && ttl.default && ttl.default > 0) {
       window.clearTimeout(this.saveTimeout);
       this.saveTimeout = window.setTimeout(() => {
-        this.save();
+        this.save().catch();
       }, 1000);
     }
   }
@@ -225,9 +224,10 @@ class MultiTableEntry {
   /**
    * Gets the top aggregate UDFs for the entry. It will fetch it if not cached or if the refresh option is set.
    */
-  getTopAggs(options?: CatalogGetOptions): CancellablePromise<TopAggs> {
-    const optimizer = getOptimizer(this.dataCatalog.connector);
-    return genericOptimizerGet<TopAggs>(
+  getTopAggs(
+    options: CatalogGetOptions & { sqlAnalyzer: SqlAnalyzer }
+  ): CancellablePromise<TopAggs> {
+    return genericSqlAnalyzerGet<TopAggs>(
       this,
       options,
       promise => {
@@ -237,16 +237,17 @@ class MultiTableEntry {
       val => {
         this.topAggs = val;
       },
-      optimizer.fetchTopAggs.bind(optimizer)
+      options.sqlAnalyzer.fetchTopAggs.bind(options.sqlAnalyzer)
     );
   }
 
   /**
    * Gets the top columns for the entry. It will fetch it if not cached or if the refresh option is set.
    */
-  getTopColumns(options?: CatalogGetOptions): CancellablePromise<TopColumns> {
-    const optimizer = getOptimizer(this.dataCatalog.connector);
-    return genericOptimizerGet<TopColumns>(
+  getTopColumns(
+    options: CatalogGetOptions & { sqlAnalyzer: SqlAnalyzer }
+  ): CancellablePromise<TopColumns> {
+    return genericSqlAnalyzerGet<TopColumns>(
       this,
       options,
       promise => {
@@ -256,16 +257,17 @@ class MultiTableEntry {
       val => {
         this.topColumns = val;
       },
-      optimizer.fetchTopColumns.bind(optimizer)
+      options.sqlAnalyzer.fetchTopColumns.bind(options.sqlAnalyzer)
     );
   }
 
   /**
    * Gets the top filters for the entry. It will fetch it if not cached or if the refresh option is set.
    */
-  getTopFilters(options?: CatalogGetOptions): CancellablePromise<TopFilters> {
-    const optimizer = getOptimizer(this.dataCatalog.connector);
-    return genericOptimizerGet<TopFilters>(
+  getTopFilters(
+    options: CatalogGetOptions & { sqlAnalyzer: SqlAnalyzer }
+  ): CancellablePromise<TopFilters> {
+    return genericSqlAnalyzerGet<TopFilters>(
       this,
       options,
       promise => {
@@ -275,16 +277,17 @@ class MultiTableEntry {
       val => {
         this.topFilters = val;
       },
-      optimizer.fetchTopFilters.bind(optimizer)
+      options.sqlAnalyzer.fetchTopFilters.bind(options.sqlAnalyzer)
     );
   }
 
   /**
    * Gets the top joins for the entry. It will fetch it if not cached or if the refresh option is set.
    */
-  getTopJoins(options?: CatalogGetOptions): CancellablePromise<TopJoins> {
-    const optimizer = getOptimizer(this.dataCatalog.connector);
-    return genericOptimizerGet<TopJoins>(
+  getTopJoins(
+    options: CatalogGetOptions & { sqlAnalyzer: SqlAnalyzer }
+  ): CancellablePromise<TopJoins> {
+    return genericSqlAnalyzerGet<TopJoins>(
       this,
       options,
       promise => {
@@ -294,7 +297,7 @@ class MultiTableEntry {
       val => {
         this.topJoins = val;
       },
-      optimizer.fetchTopJoins.bind(optimizer)
+      options.sqlAnalyzer.fetchTopJoins.bind(options.sqlAnalyzer)
     );
   }
 }

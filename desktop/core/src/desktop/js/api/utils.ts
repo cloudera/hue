@@ -22,11 +22,11 @@ import axios, {
   CancelToken
 } from 'axios';
 import qs from 'qs';
-import huePubSub from 'utils/huePubSub';
-import { hueWindow } from '../types/types';
 
 import { CancellablePromise } from './cancellablePromise';
-import hueUtils from 'utils/hueUtils';
+import { hueWindow } from 'types/types';
+import huePubSub from 'utils/huePubSub';
+import logError from 'utils/logError';
 
 export interface DefaultApiResponse {
   status: number;
@@ -54,7 +54,7 @@ export interface ApiFetchOptions<T, E = string> extends AxiosRequestConfig {
   ) => void;
 }
 
-const axiosInstance = axios.create();
+const axiosInstance = axios.create({ withCredentials: true });
 
 let baseUrl = (window as hueWindow).HUE_BASE_URL;
 let bearerToken: string | undefined;
@@ -136,7 +136,7 @@ const notifyError = <T>(
   options?: Pick<ApiFetchOptions<T>, 'silenceErrors'>
 ): void => {
   if (!options || !options.silenceErrors) {
-    hueUtils.logError(response);
+    logError(response);
     if (message.indexOf('AuthorizationException') === -1) {
       huePubSub.publish('hue.error', message);
     }
@@ -162,12 +162,12 @@ const handleResponse = <T>(
   if (options && options.handleSuccess) {
     options.handleSuccess(response.data, resolve, reason => {
       reject(reason);
-      notifyError(String(reason), response.data);
+      notifyError(String(reason), response.data, options);
     });
   } else if ((!options || !options.ignoreSuccessErrors) && successResponseIsError(response.data)) {
     const errorMessage = extractErrorMessage(response && response.data);
     reject(errorMessage);
-    notifyError(errorMessage, response);
+    notifyError(errorMessage, response, options);
   } else {
     resolve(response.data);
   }
@@ -199,7 +199,7 @@ export const post = <T, U = unknown, E = string>(
         if (options && options.handleError) {
           options.handleError(err, resolve, reason => {
             handleErrorResponse(err, reject, options);
-            notifyError(String(reason), err);
+            notifyError(String(reason), err, options);
           });
         } else {
           handleErrorResponse(err, reject, options);

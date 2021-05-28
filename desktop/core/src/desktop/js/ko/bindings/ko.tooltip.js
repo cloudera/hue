@@ -16,8 +16,9 @@
 
 import $ from 'jquery';
 import * as ko from 'knockout';
+
 import { registerBinding } from './bindingUtils';
-import hueUtils from 'utils/hueUtils';
+import escapeOutput from 'utils/html/escapeOutput';
 
 export const NAME = 'tooltip';
 
@@ -36,7 +37,7 @@ registerBinding(NAME, {
     if (options.title) {
       const title = ko.unwrap(options.title); // Not always an observable
       if (typeof title === 'string' && !options.html) {
-        options.title = hueUtils.escapeOutput(title);
+        options.title = escapeOutput(title);
       }
     }
 

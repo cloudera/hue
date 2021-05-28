@@ -32,7 +32,7 @@ describe('ko.fieldSamples.js', () => {
         getChildren: () => CancellablePromise.resolve([]),
         getSample: () => CancellablePromise.reject(),
         loadNavigatorMetaForChildren: () => CancellablePromise.reject(),
-        loadOptimizerPopularityForChildren: () => CancellablePromise.reject(),
+        loadSqlAnalyzerPopularityForChildren: () => CancellablePromise.reject(),
         isTableOrView: () => false,
         getDialect: () => 'impala'
       }

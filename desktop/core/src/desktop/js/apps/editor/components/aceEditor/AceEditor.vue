@@ -23,6 +23,7 @@
       v-if="editor && autocompleteParser"
       :autocomplete-parser="autocompleteParser"
       :sql-reference-provider="sqlReferenceProvider"
+      :sql-analyzer-provider="sqlAnalyzerProvider"
       :editor="editor"
       :editor-id="id"
       :executor="executor"
@@ -33,17 +34,17 @@
 <script lang="ts">
   import { ActiveStatementChangedEventDetails } from 'apps/editor/components/aceEditor/types';
   import { defineComponent, onMounted, PropType, ref, toRefs } from 'vue';
-
   import ace, { getAceMode } from 'ext/aceHelper';
   import { Ace } from 'ext/ace';
-  import { EXECUTE_ACTIVE_EXECUTABLE_TOPIC } from '../events';
 
   import { attachPredictTypeahead } from './acePredict';
   import AceAutocomplete from './autocomplete/AceAutocomplete.vue';
   import AceGutterHandler from './AceGutterHandler';
   import AceLocationHandler, { ACTIVE_STATEMENT_CHANGED_EVENT } from './AceLocationHandler';
+  import { EXECUTE_ACTIVE_EXECUTABLE_TOPIC } from '../events';
   import { formatSql } from 'apps/editor/api';
   import Executor from 'apps/editor/execution/executor';
+  import { SqlAnalyzerProvider } from 'catalog/analyzer/types';
   import SubscriptionTracker from 'components/utils/SubscriptionTracker';
   import {
     AutocompleteParser,
@@ -52,12 +53,12 @@
     SqlParserProvider
   } from 'parse/types';
   import { EditorInterpreter } from 'config/types';
+  import { SqlReferenceProvider } from 'sql/reference/types';
   import { hueWindow } from 'types/types';
   import huePubSub from 'utils/huePubSub';
-  import { defer } from 'utils/hueUtils';
+  import defer from 'utils/timing/defer';
   import I18n from 'utils/i18n';
   import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
-  import { SqlReferenceProvider } from 'sql/reference/types';
 
   // Taken from https://www.cs.tut.fi/~jkorpela/chars/spaces.html
   const UNICODES_TO_REMOVE = /[\u1680\u180E\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u200B\u202F\u205F\u3000\uFEFF]/gi;
@@ -94,6 +95,10 @@
         type: Object as PropType<Ace.Options>,
         required: false,
         default: () => ({})
+      },
+      sqlAnalyzerProvider: {
+        type: Object as PropType<SqlAnalyzerProvider>,
+        default: undefined
       },
       sqlParserProvider: {
         type: Object as PropType<SqlParserProvider>,
@@ -509,7 +514,7 @@
         };
 
         if ((<hueWindow>window).ENABLE_PREDICT) {
-          attachPredictTypeahead(editor, executor.value.connector());
+          attachPredictTypeahead(editor, executor.value.connector(), this.sqlAnalyzerProvider);
         }
 
         let placeholderVisible = false;

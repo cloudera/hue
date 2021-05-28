@@ -20,7 +20,7 @@ import ace from 'ext/aceHelper';
 
 import AceLocationHandler from 'ko/bindings/ace/aceLocationHandler';
 import componentUtils from 'ko/components/componentUtils';
-import { UUID } from 'utils/hueUtils';
+import UUID from 'utils/string/UUID';
 import { hueLocalStorage } from 'utils/storageUtils';
 import SolrFormulaAutocompleter from './solrFormulaAutocompleter';
 import SolrQueryAutocompleter from './solrQueryAutocompleter';

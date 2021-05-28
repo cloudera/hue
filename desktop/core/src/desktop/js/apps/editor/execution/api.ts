@@ -14,9 +14,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import {
+  EXECUTABLE_RESULT_UPDATED_TOPIC,
+  EXECUTABLE_TRANSITIONED_TOPIC,
+  ExecutableResultUpdatedEvent,
+  ExecutableTransitionedEvent
+} from './events';
+import Executor from './executor';
+import SqlExecutable from './sqlExecutable';
 import { DefaultApiResponse, extractErrorMessage, post, successResponseIsError } from 'api/utils';
 import Executable, { ExecutableContext, ExecutionStatus } from 'apps/editor/execution/executable';
-import { ResultType } from 'apps/editor/execution/executionResult';
+import { ResultRow, ResultType } from 'apps/editor/execution/executionResult';
+import { CancellablePromise } from 'api/cancellablePromise';
+import SubscriptionTracker from 'components/utils/SubscriptionTracker';
+import { Compute, Connector, Namespace } from 'config/types';
+import sqlStatementsParser, { ParsedSqlStatement } from 'parse/sqlStatementsParser';
 
 type SessionPropertyValue = string | number | boolean | null | undefined;
 
@@ -258,6 +270,89 @@ export const executeStatement = async (options: ExecuteApiOptions): Promise<Exec
   }
 
   return cleanedResponse;
+};
+
+export const executeSingleStatement = ({
+  database = 'default',
+  connector,
+  namespace,
+  compute,
+  statement
+}: {
+  connector: Connector;
+  namespace: Namespace;
+  compute: Compute;
+  statement: string;
+  database?: string;
+}): CancellablePromise<{ meta?: ResultMeta[]; rows?: ResultRow[] }> => {
+  const subTracker = new SubscriptionTracker();
+
+  const promise = new CancellablePromise<{
+    meta: ResultMeta[];
+    rows: ResultRow[];
+  }>((resolve, reject, onCancel) => {
+    onCancel(() => reject('Cancelled'));
+
+    const executor = new Executor({
+      database: (() => database) as KnockoutObservable<string>,
+      connector: (() => connector) as KnockoutObservable<Connector>,
+      namespace: (() => namespace) as KnockoutObservable<Namespace>,
+      compute: (() => compute) as KnockoutObservable<Compute>
+    });
+
+    let parsedStatement: ParsedSqlStatement | undefined = undefined;
+
+    try {
+      const parsedStatements = sqlStatementsParser.parse(statement);
+      parsedStatement = parsedStatements[0];
+    } catch {}
+
+    if (!parsedStatement) {
+      reject('Failed parsing statement');
+      return;
+    }
+    const sqlExecutable = new SqlExecutable({ executor, database, parsedStatement });
+    executor.setExecutables([sqlExecutable]);
+
+    subTracker.subscribe<ExecutableTransitionedEvent>(
+      EXECUTABLE_TRANSITIONED_TOPIC,
+      ({ executable, newStatus }) => {
+        if (executable.id === sqlExecutable.id && newStatus === ExecutionStatus.failed) {
+          reject('Execution failed.');
+        } else if (
+          executable.isSuccess() &&
+          executable.handle &&
+          !executable.handle.has_result_set
+        ) {
+          resolve();
+        }
+      }
+    );
+
+    subTracker.subscribe<ExecutableResultUpdatedEvent>(
+      EXECUTABLE_RESULT_UPDATED_TOPIC,
+      executionResult => {
+        const { executable, rows, meta } = executionResult;
+        if (executable.id === sqlExecutable.id && rows.length) {
+          resolve({ rows, meta });
+        }
+      }
+    );
+
+    subTracker.addDisposable({
+      dispose() {
+        sqlExecutable.cancel().catch();
+      }
+    });
+
+    sqlExecutable.execute().catch(reject);
+  });
+
+  promise.finally(() => {
+    subTracker.dispose();
+  });
+
+  return promise;
 };
 
 export const cancelStatement = async (options: ExecuteApiOptions): Promise<void> => {
