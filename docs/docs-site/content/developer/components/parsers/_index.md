@@ -4,6 +4,10 @@ draft: false
 weight: 2
 ---
 
+The parsers are the flagship part of Hue and power advanced autocompletes and other [SQL functionalities](/user/querying/#autocomplete).
+
+Refer the [SQL Parser Documentation](/developer/development/#sql-parsers) for how they works and are built.
+
 ## Live Demo
 
 {{< rawhtml >}}
