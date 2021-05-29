@@ -515,7 +515,7 @@
         };
 
         if ((<hueWindow>window).ENABLE_PREDICT) {
-          attachPredictTypeahead(editor, executor.value.connector(), sqlAnalyzerProvider);
+          attachPredictTypeahead(editor, executor.value.connector(), sqlAnalyzerProvider.value);
         }
 
         let placeholderVisible = false;
