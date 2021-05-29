@@ -23,7 +23,7 @@ Calling without credentials:
 
 Authenticating and getting a [JWT token](https://jwt.io/):
 
-    curl -X POST https://demo.gethue.com/api/token/auth/ -H "Content-Type: application/json" -d '{"username": "hue", "password": "hue"}'
+    curl -X POST https://demo.gethue.com/api/token/auth/ -H "Content-Type: application/json" -d '{"username": "demo", "password": "demo"}'
 
     {"refresh":"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTYyMTcyNDYzMSwianRpIjoiOGM0NDRjYzRhN2VhNGMxZDliMGZhNmU1YzUyMjM1MjkiLCJ1c2VyX2lkIjoxfQ.t6t7_eYrNhpGN3-Jz5MDLXM8JtGP7V9Y9lacOTInqqQ","access":"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjIxNjM4NTMxLCJqdGkiOiJhZjgwN2E0ZjBmZDI0ZWMxYWQ2NTUzZjEyMjIyYzU4YyIsInVzZXJfaWQiOjF9.dQ1P3hbzSytp9-o8bWlcOcwrdwRVy95M2Eolph92QMA"}
 
@@ -110,13 +110,13 @@ The API only supports JWT but users need to provide the credentials they are usi
 
 It is possible to submit data in **JSON format**:
 
-    -H "Content-Type: application/json" -d '{"username": "hue", "password": "hue"}'
+    -H "Content-Type: application/json" -d '{"username": "demo", "password": "demo"}'
 
 ### Authenticate
 
 Provide login credentials and get a [JWT token](https://jwt.io/):
 
-    curl -X POST https://demo.gethue.com/api/token/auth -d 'username=hue&password=hue'
+    curl -X POST https://demo.gethue.com/api/token/auth -d 'username=demo&password=demo'
 
     {"refresh":"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTYyMTcyNDYzMSwianRpIjoiOGM0NDRjYzRhN2VhNGMxZDliMGZhNmU1YzUyMjM1MjkiLCJ1c2VyX2lkIjoxfQ.t6t7_eYrNhpGN3-Jz5MDLXM8JtGP7V9Y9lacOTInqqQ","access":"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjIxNjM4NTMxLCJqdGkiOiJhZjgwN2E0ZjBmZDI0ZWMxYWQ2NTUzZjEyMjIyYzU4YyIsInVzZXJfaWQiOjF9.dQ1P3hbzSytp9-o8bWlcOcwrdwRVy95M2Eolph92QMA"}
 
