@@ -78,20 +78,20 @@ Here is how easy it is to integrate it into a Web page. Copy paste the HTML code
 
     <body>
       <div style="position: absolute; height: 100%; width: 100%">
-        <sql-scratchpad api-url="[https://demo.gethue.com](http://localhost:8005)" username="demo" password="demo" dialect="hive" />
+        <sql-scratchpad api-url="https://demo.gethue.com" username="demo" password="demo" dialect="hive" />
       </div>
     </body>
 
     </html>
 
-And “that’s it”. Note that if using Chrome it might require you to serve the file to properly work.
+And “that’s it”!
 
 ![Directly opening the local HTML page with Firefox](https://cdn-images-1.medium.com/max/2000/1*JzVbsWHqzZPI2pEAhG2mwQ.png)
 <br>*Directly opening the local HTML page with Firefox*
 
 The autocomplete is powered by the local parser and will show-up. It obviously can only help with the SQL syntax on its own. In order to get the dynamic content like the list of tables, columns… and execute SQL queries, the component needs to point to a Query API.
 
-For the next steps and integrating deeper the component, have a look to the official registry: https://www.npmjs.com/package/gethue
+For the next steps and integrating deeper the component, have a look to the [NPM Hue registry](https://www.npmjs.com/package/gethue).
 
 **Query Editor API**
 
@@ -99,7 +99,7 @@ To be truly alive, the Editor component needs to talk to the service that can au
 
 This is possible via the new [public REST API](https://docs.gethue.com/developer/api/rest/#execute-a-query) which is much simpler to use than before and follows nowadays standards. It leverages the exact same authentication as the regular login page and only requires to provide a JWT token afterwards.
 
-For example simply ask for an access token:
+For example, simply ask for an access token:
 
     curl -X POST https://demo.gethue.com/api/token/auth -d 'username=demo&password=demo'
 
