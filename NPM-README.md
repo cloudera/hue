@@ -28,8 +28,8 @@ The shareable lightweight SQL Editor also called "SQL Scratchpad" comes as its o
 
 # SQL Parsers
 
-The parsers are the flagship part of Hue and power extremely advanced autocompletes and other [SQL functionalities](https://docs.gethue.com/user/querying/#autocomplete). They are running on the client side and provide a very reactive experience to the end user.
+The parsers are the flagship part of Hue and power extremely advanced autocompletes and other [SQL functionalities](https://docs.gethue.com/user/querying/#autocomplete).
 
-Please refer the [SQL Parser Documentation](https://docs.gethue.com/developer/development/#sql-parsers), or this [demo app](https://github.com/cloudera/hue/tree/master/tools/examples/api/hue_dep) for more information.
+Play with a live demo and read more in their [documentation](https://docs.gethue.com/developer/components/parsers/).
 
 !["Parser Component"](https://cdn.gethue.com/uploads/2020/07/parser_component.png)
