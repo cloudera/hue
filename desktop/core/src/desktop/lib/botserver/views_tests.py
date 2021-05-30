@@ -78,9 +78,52 @@ class TestBotServer(unittest.TestCase):
         assert_equal(response.status_code, 200)
         assert_false(_send_message.called)
 
-        # Greeting user
+        help_block = [
+          {
+            "type": "section",
+            "text": {
+              "type": "mrkdwn",
+              "text": ("Hey <@user_id>, I'm your SQL Assistant! "
+              "I'm here to assist users with their SQL queries and *<https://docs.gethue.com/user/concept/#slack|much more.>*\n"
+              "Here are the few things I can help you with:")
+            }
+          },
+          {
+            "type": "divider"
+          },
+          {
+            "type": "section",
+            "text": {
+              "type": "mrkdwn",
+              "text": "*Share query/gist links* in channel which unfurls in a rich preview, showing query details and result in message thread if available."
+            }
+          },
+          {
+            "type": "section",
+            "text": {
+              "type": "mrkdwn",
+              "text": "Create a gist for your query, select the channel and *share directly from the Hue Editor* window."
+            }
+          },
+          {
+            "type": "section",
+            "text": {
+              "type": "mrkdwn",
+              "text": "*Detect SQL SELECT statements* in the channel and suggests a gist link for improved query discussions."
+            }
+          },
+          {
+            "type": "section",
+            "text": {
+              "type": "mrkdwn",
+              "text": "Type `@Hue queries` to explore a list of important queries from the latest *query bank*."
+            }
+          }
+        ]
+
+        # Help message
         handle_on_message(self.host_domain, self.is_http_secure, channel_id, None, message_element, user_id)
-        _send_message.assert_called_with(channel_id, 'Hi <@user_id> :wave:')
+        _send_message.assert_called_with(channel_id, block_element=help_block)
 
         # Detect SQL
         message_element = [

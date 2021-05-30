@@ -95,13 +95,64 @@ def parse_events(request, event):
 
 
 def handle_on_app_mention(host_domain, channel_id, user_id, text):
+  if text and 'help' in text:
+    msg_block = help_message(user_id)
+    _send_message(channel_id, block_element=msg_block)
+
   if text and 'queries' in text:
     slack_user = check_slack_user_permission(host_domain, user_id)
     user = get_user(channel_id, slack_user)
 
     handle_query_bank(channel_id, user_id)
 
-  
+
+def help_message(user_id):
+  help_message = [
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": ("Hey <@{user}>, I'm your SQL Assistant! "
+        "I'm here to assist users with their SQL queries and *<{docs}|much more.>*\n"
+        "Here are the few things I can help you with:").format(user=user_id, docs='https://docs.gethue.com/user/concept/#slack')
+      }
+    },
+		{
+			"type": "divider"
+		},
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "*Share query/gist links* in channel which unfurls in a rich preview, showing query details and result in message thread if available."
+      }
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "Create a gist for your query, select the channel and *share directly from the Hue Editor* window."
+      }
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "*Detect SQL SELECT statements* in the channel and suggests a gist link for improved query discussions."
+      }
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "Type `@Hue queries` to explore a list of important queries from the latest *query bank*."
+      }
+    }
+  ]
+
+  return help_message
+
+
 def handle_query_bank(channel_id, user_id):
   data = get_all_queries()
 
@@ -141,8 +192,8 @@ def handle_on_message(host_domain, is_http_secure, channel_id, bot_id, elements,
     text = element_block['elements'][0].get('text', '') if element_block.get('elements') else ''
 
     if 'hello hue' in text.lower():
-      bot_message = 'Hi <@{user}> :wave:'.format(user=user_id)
-      _send_message(channel_id, bot_message)
+      msg_block = help_message(user_id)
+      _send_message(channel_id, block_element=msg_block)
 
     if text.lower().startswith('select'):
       handle_select_statement(host_domain, is_http_secure, channel_id, user_id, text.lower())
