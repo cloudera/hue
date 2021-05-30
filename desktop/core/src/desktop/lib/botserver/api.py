@@ -65,13 +65,14 @@ def send_message(request):
 @api_error_handler
 def generate_slack_install_link(request):
   hostname = request.GET.get('hostname')
+  hostname_without_port = hostname.split(':')[0] if ':' in hostname else hostname
 
   install_link = 'https://api.slack.com/apps?new_app=1&manifest_yaml='
 
   with open(os.path.join(BASE_DIR, 'tools/slack/manifest.yml')) as manifest:
     data = yaml.safe_load(manifest)
 
-    data['features']['unfurl_domains'] = [hostname]
+    data['features']['unfurl_domains'] = [hostname_without_port]
     data['settings']['event_subscriptions']['request_url'] = 'https://' + hostname + '/desktop/slack/events/'
 
     changed_data = yaml.safe_dump(data)

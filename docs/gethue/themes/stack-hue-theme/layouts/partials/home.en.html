@@ -160,17 +160,24 @@
     <div class="container">
       <div class="row justify-content-around">
         <div class="col-md-6">
-          <img alt="Image" class="border--round box-shadow-wide" src="img/databases.svg" />
+          <img alt="Image" class="border--round box-shadow-wide" src="img/hue_slack_integration.png" />
         </div>
         <div class="col-md-6 col-lg-5">
-          <div class="switchable__text input-append">
+          <div class="switchable__text">
             <h2>Get your own SQL assistant</h2>
             <p class="lead">
-              Assist users with their SQL queries and have better collaboration with your team.
+              Assist users with their SQL queries and leverage different
+              <a href="/blog/2021-04-09-collaborate-on-your-sql-queries-and-results-directly-within-slack/">features</a>
+              such as rich preview for links, sharing from Editor etc. directly in Slack.
+              <br /> Give your Hue hostname below and
+              <a href="/blog/2021-05-18-installing-hue-slack-app-in-three-simple-steps/">install</a>
+              it in your workspace within seconds...
             </p>
             <form autocomplete="off" onsubmit="return check(event)">
-              <input type="text" id="hostname" placeholder="Hue Instance Hostname" required></input>
-              <button type="submit" class="btn btn--primary btn--lg type--uppercase">Create</button>
+              <input type="text" id="hostname" placeholder="Your hue hostname (e.g. hue.gethue.com:8000)"
+                required></input>
+              <button type="submit" class="btn btn--primary btn--lg type--uppercase">Create my own SQL
+                Assistant</button>
             </form>
             <br /><a href="{{ .Site.Params.docsHost }}/user/concept/#slack">Learn More »</a>
           </div>
@@ -189,6 +196,5 @@
       .then(response => {
         window.location.replace(response['link']);
       });
-
   }
 </script>
