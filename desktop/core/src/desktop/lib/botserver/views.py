@@ -112,7 +112,9 @@ def help_message(user_id):
       "type": "section",
       "text": {
         "type": "mrkdwn",
-        "text": "Hey <@{user}> :wave: I'm your SQL Assistant! I'm here to assist users with their SQL queries and much more.\nHere are the few things I can help you with:".format(user=user_id)
+        "text": ("Hey <@{user}>, I'm your SQL Assistant! "
+        "I'm here to assist users with their SQL queries and *<{docs}|much more.>*\n"
+        "Here are the few things I can help you with:").format(user=user_id, docs='https://docs.gethue.com/user/concept/#slack')
       }
     },
 		{
@@ -122,28 +124,28 @@ def help_message(user_id):
       "type": "section",
       "text": {
         "type": "mrkdwn",
-        "text": "*:link: Rich preview for Query/Gist links:* Share query/gist links in channel which unfurls in a rich preview, showing query details and result in message thread if available."
+        "text": "*Share query/gist links* in channel which unfurls in a rich preview, showing query details and result in message thread if available."
       }
     },
     {
       "type": "section",
       "text": {
         "type": "mrkdwn",
-        "text": "*:page_facing_up: Share directly from Editor:* Create a query gist, select channel and share your query directly from the Hue Editor window. Requires `share_from_editor` flag enabled."
+        "text": "Create a gist for your query, select the channel and *share directly from the Hue Editor* window."
       }
     },
     {
       "type": "section",
       "text": {
         "type": "mrkdwn",
-        "text": "*:eyes: Auto-detect SELECT statements:* Detects SQL SELECT statements in the channel added and suggests a gist link for improved query discussions."
+        "text": "*Detect SQL SELECT statements* in the channel and suggests a gist link for improved query discussions."
       }
     },
     {
       "type": "section",
       "text": {
         "type": "mrkdwn",
-        "text": "*:question: Surfacing Query bank:* Type `@Hue Bot queries` to explore a list of important queries from the latest query bank."
+        "text": "Type `@Hue queries` to explore a list of important queries from the latest *query bank*."
       }
     }
   ]
