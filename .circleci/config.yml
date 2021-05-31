@@ -136,6 +136,13 @@ jobs:
             npm run lint
 
       - run:
+          name: run style lint
+          command: |
+            cd /usr/share/hue
+
+            npm run style-lint
+
+      - run:
           name: run npm license checker
           command: |
             cd /usr/share/hue
