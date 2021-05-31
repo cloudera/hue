@@ -15,7 +15,8 @@
     ["@babel/proposal-class-properties", {
       "loose": true
     }],
-    "@babel/proposal-object-rest-spread",
+    ["@babel/plugin-proposal-private-methods", { "loose": true }],
+    "@babel/proposal-object-rest-spread"
   ],
   "overrides": [{
     "test": "./desktop/core/src/desktop/js/parse/sqlAutocompleteParser.js",
