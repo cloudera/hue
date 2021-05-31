@@ -123,7 +123,7 @@ class RazS3Connection(SignedUrlS3Connection):
     # Actual override starts here
     LOG.debug('Overriding: %s, %s, %s, %s, %s, %s, %s' % (method, path, auth_path, params, headers, data, host))
 
-    signed_url = self.get_signed_url(action='GET', bucket_name=bucket, object_name=key)
+    signed_url = self.get_signed_url(action=method, bucket_name=bucket, object_name=key)
     LOG.debug(signed_url)
 
     parsed_url = lib_urlparse(signed_url)
