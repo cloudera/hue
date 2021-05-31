@@ -120,6 +120,12 @@ jobs:
 
         npm run check-license
 
+    - name: run style lint
+      run: |
+        cd /usr/share/hue
+
+        npm run style-lint
+
     - name: run npm absolute path detection
       run: |
         cd /usr/share/hue
