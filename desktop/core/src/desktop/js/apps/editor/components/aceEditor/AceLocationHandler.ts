@@ -16,6 +16,7 @@
 
 import { Ace } from 'ext/ace';
 import ace from 'ext/aceHelper';
+import KnockoutObservable from '@types/knockout';
 
 import { ActiveStatementChangedEventDetails } from './types';
 import Executor from 'apps/editor/execution/executor';
@@ -693,9 +694,8 @@ export default class AceLocationHandler implements Disposable {
       // Can happen if multiple statements and the cursor is after the last one
       if (!found) {
         precedingStatements.pop();
-        this.activeStatement = this.lastKnownStatements.statements[
-          this.lastKnownStatements.statements.length - 1
-        ];
+        this.activeStatement =
+          this.lastKnownStatements.statements[this.lastKnownStatements.statements.length - 1];
       }
     }
 

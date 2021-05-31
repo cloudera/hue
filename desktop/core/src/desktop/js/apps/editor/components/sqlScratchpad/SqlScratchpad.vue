@@ -51,6 +51,7 @@
 <script lang="ts">
   import { defineComponent, onMounted, PropType, ref, toRefs } from 'vue';
   import { Ace } from 'ext/ace';
+  import KnockoutObservable from '@types/knockout';
 
   import genericAutocompleteParser from 'parse/sql/generic/genericAutocompleteParser';
   import genericSyntaxParser from 'parse/sql/generic/genericSyntaxParser';

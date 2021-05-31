@@ -86,12 +86,12 @@
 
     props: {
       entities: {
-        type: Object as PropType<IEntity[]>,
-        default: []
+        type: Array as PropType<IEntity[]>,
+        default: () => []
       },
       relations: {
-        type: Object as PropType<IRelation[]>,
-        default: []
+        type: Array as PropType<IRelation[]>,
+        default: () => []
       }
     },
 
@@ -140,9 +140,7 @@
       },
       plotRelations(): void {
         const erdEl = this.$refs.erd as HTMLElement;
-        const relationPaths: NodeListOf<HTMLElement> = erdEl.querySelectorAll<HTMLElement>(
-          '.relation-path'
-        );
+        const relationPaths = erdEl.querySelectorAll<HTMLElement>('.relation-path');
         const offset: IPos | undefined = this.getSelectorPosition('.erd-relations');
 
         relationPaths.forEach(element => {

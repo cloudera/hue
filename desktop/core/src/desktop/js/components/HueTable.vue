@@ -74,12 +74,12 @@
     name: 'HueTable',
     props: {
       rows: {
-        type: Object as PropType<Row[]>,
+        type: Array as PropType<Row[]>,
         required: false,
         default: () => []
       },
       columns: {
-        type: Object as PropType<Column<unknown>[]>,
+        type: Array as PropType<Column<unknown>[]>,
         required: false,
         default: () => []
       },

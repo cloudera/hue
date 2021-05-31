@@ -28,6 +28,7 @@
 
 <script lang="ts">
   import { defineComponent, PropType, ref, toRefs } from 'vue';
+  import KnockoutObservable from '@types/knockout';
 
   import ExecutableActions from './ExecutableActions.vue';
   import SqlExecutable from 'apps/editor/execution/sqlExecutable';

@@ -51,7 +51,7 @@
 
       <span>{{ item.displayName }}</span>
 
-      <div style="flex-grow: 1;" />
+      <div style="flex-grow: 1" />
     </button>
 
     <div

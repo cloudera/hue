@@ -16,10 +16,12 @@
  limitations under the License.
 */
 
+@use 'sass:math';
+
 @import './styles/mixins';
 @import './styles/colors';
 
-$spinner-label-ratio: 2 / 3;
+$spinner-label-ratio: math.div(2, 3);
 $spinner-large-size: 25px;
 $spinner-xlarge-size: 50px;
 
@@ -32,6 +34,7 @@ $spinner-xlarge-size: 50px;
 
   &.spinner {
     @include fillAbsolute;
+
     margin: auto 0;
     vertical-align: center;
   }
@@ -39,12 +42,14 @@ $spinner-xlarge-size: 50px;
   &.spinner-overlay {
     @include fillAbsolute;
     @include fade-in;
+
     z-index: 10000;
     background: rgba(255, 255, 255, 0.5);
   }
 
   &.spinner-inline {
     @include fade-in;
+
     display: inline-block;
     position: relative;
   }

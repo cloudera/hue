@@ -178,7 +178,7 @@ const getCancelToken = (): { cancelToken: CancelToken; cancel: () => void } => {
   return { cancelToken: cancelTokenSource.token, cancel: cancelTokenSource.cancel };
 };
 
-export const post = <T, U = unknown, E = string>(
+export const post = <T, U = unknown>(
   url: string,
   data?: U,
   options?: ApiFetchOptions<T>

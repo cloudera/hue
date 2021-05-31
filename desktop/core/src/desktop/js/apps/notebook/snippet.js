@@ -734,7 +734,8 @@ class Snippet {
       } else {
         const re = /(?:^|\W)\${(\w*)\=?([^{}]*)}/g;
         const reComment = /(^\s*--.*)|(\/\*[\s\S]*?\*\/)/gm;
-        const reList = /(?!\s*$)\s*(?:(?:([^,|()\\]*)\(\s*([^,|()\\]*)\)(?:\\[\S\s][^,|()\\]*)?)|([^,|\\]*(?:\\[\S\s][^,|\\]*)*))\s*(?:,|\||$)/g;
+        const reList =
+          /(?!\s*$)\s*(?:(?:([^,|()\\]*)\(\s*([^,|()\\]*)\)(?:\\[\S\s][^,|()\\]*)?)|([^,|\\]*(?:\\[\S\s][^,|\\]*)*))\s*(?:,|\||$)/g;
         const statement = self.statement_raw();
         let matchComment = reComment.exec(statement);
         // if re is n & reComment is m

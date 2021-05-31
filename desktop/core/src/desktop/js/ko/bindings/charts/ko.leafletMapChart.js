@@ -164,19 +164,20 @@ ko.bindingHandlers.leafletMapChart = {
 
               let _onRegionChange = function () {};
 
-              $('#command' + $(element).parents('.card-widget').attr('id')).on('click', function (
-                e
-              ) {
-                $(this).toggleClass('btn-primary');
-                $(this).find('.fa-fw').toggleClass('fa-check-square');
-                if ($(this).hasClass('btn-primary')) {
-                  if (_options.onRegionChange != null) {
-                    _onRegionChange = _options.onRegionChange;
+              $('#command' + $(element).parents('.card-widget').attr('id')).on(
+                'click',
+                function (e) {
+                  $(this).toggleClass('btn-primary');
+                  $(this).find('.fa-fw').toggleClass('fa-check-square');
+                  if ($(this).hasClass('btn-primary')) {
+                    if (_options.onRegionChange != null) {
+                      _onRegionChange = _options.onRegionChange;
+                    }
+                  } else {
+                    _onRegionChange = function () {};
                   }
-                } else {
-                  _onRegionChange = function () {};
                 }
-              });
+              );
 
               ko.utils.domNodeDisposal.addDisposeCallback(element, () => {
                 $('#command' + $(element).parents('.card-widget').attr('id')).off('click');

@@ -28,6 +28,7 @@
     @include fillAbsolute;
     @include display-flex;
     @include flex-direction(column);
+
     overflow: hidden;
 
     .sql-scratchpad-editor {
@@ -49,6 +50,7 @@
 
     .sql-scratchpad-result {
       @include flex(0 1 50%);
+
       overflow: hidden;
 
       h1 {
