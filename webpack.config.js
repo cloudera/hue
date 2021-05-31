@@ -22,43 +22,45 @@ const {
   splitChunksName
 } = require('./desktop/core/src/desktop/js/webpack/configUtils');
 
+process.traceDeprecation = true;
+
 const config = {
   devtool: false,
   entry: {
-    hue: ['./desktop/core/src/desktop/js/hue.js'],
-    editor: ['./desktop/core/src/desktop/js/apps/editor/app.js'],
-    notebook: ['./desktop/core/src/desktop/js/apps/notebook/app.js'],
-    tableBrowser: ['./desktop/core/src/desktop/js/apps/tableBrowser/app.js'],
-    jobBrowser: ['./desktop/core/src/desktop/js/apps/jobBrowser/app.js']
+    hue: { import: './desktop/core/src/desktop/js/hue.js' },
+    editor: { import: './desktop/core/src/desktop/js/apps/editor/app.js', dependOn: 'hue' },
+    notebook: { import: './desktop/core/src/desktop/js/apps/notebook/app.js', dependOn: 'hue' },
+    tableBrowser: {
+      import: './desktop/core/src/desktop/js/apps/tableBrowser/app.js',
+      dependOn: 'hue'
+    },
+    jobBrowser: { import: './desktop/core/src/desktop/js/apps/jobBrowser/app.js', dependOn: 'hue' }
   },
   mode: 'development',
   module: {
     rules: [
+      {
+        test: /\.vue$/,
+        use: 'vue-loader'
+      },
       {
         test: /\.tsx?$/,
         exclude: /node_modules/,
         loader: 'babel-loader'
       },
       { test: /\.js$/, use: ['source-map-loader'], enforce: 'pre' },
-      { test: /\.(html)$/, loader: 'html?interpolate&removeComments=false' },
-      { test: /\.less$/, loader: 'style-loader!css-loader!less-loader' },
-      { test: /\.s[ac]ss$/, loader: 'style-loader!css-loader!sass-loader' },
-      { test: /\.css$/, loader: 'style-loader!css-loader' },
-      { test: /\.(woff2?|ttf|eot|svg)$/, loader: 'file-loader' },
+      {
+        test: /\.(html)$/,
+        use: [{ loader: 'html', options: { interpolater: true, removeComments: false } }]
+      },
+      { test: /\.less$/, use: ['style-loader', 'css-loader', 'less-loader'] },
+      { test: /\.s[ac]ss$/, use: ['style-loader', 'css-loader', 'sass-loader'] },
+      { test: /\.css$/, use: ['style-loader', 'css-loader'] },
+      { test: /\.(woff2?|ttf|eot|svg)$/, use: ['file-loader'] },
       {
         test: /\.jsx?$/,
         exclude: /node_modules/,
-        loader: 'babel-loader'
-      },
-      {
-        test: /\.vue$/,
-        loader: 'vue-loader',
-        options: {
-          shadowMode: true,
-          loaders: {
-            less: ['css-loader', 'less-loader', 'sass-loader']
-          }
-        }
+        use: ['babel-loader']
       }
     ]
   },
@@ -70,15 +72,13 @@ const config = {
       name: splitChunksName,
       maxSize: 1000000,
       hidePathInfo: true
-    },
-    runtimeChunk: {
-      name: 'hue'
     }
   },
   output: {
     path: __dirname + '/desktop/core/src/desktop/static/desktop/js/bundles/hue',
-    filename: '[name]-bundle-[hash].js',
-    chunkFilename: '[name]-chunk-[hash].js'
+    filename: '[name]-bundle-[fullhash].js',
+    chunkFilename: '[name]-chunk-[fullhash].js',
+    clean: true
   },
   performance: {
     maxEntrypointSize: 400 * 1024, // 400kb

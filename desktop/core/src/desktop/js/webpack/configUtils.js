@@ -15,7 +15,6 @@
 // limitations under the License.
 
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
-const CleanObsoleteChunks = require('webpack-clean-obsolete-chunks');
 const RelativeBundleTracker = require('./relativeBundleTracker');
 const RemoveVueAbsolutePathFromMapPlugin = require('./removeVueAbsolutePathFromMapPlugin');
 const webpack = require('webpack');
@@ -29,7 +28,6 @@ const BUNDLES = {
 
 const getPluginConfig = (name, withAnalyzer) => {
   const plugins = [
-    new CleanObsoleteChunks(),
     new webpack.SourceMapDevToolPlugin({
       filename: `${name}/[file].map`,
       publicPath: `/static/desktop/js/bundles/${name}/`,
@@ -65,13 +63,13 @@ const hashCode = str => {
 
 /**
  * @param {webpack.Module} module
- * @param {compilation.Chunk[]} chunks
+ * @param {Set<compilation.Chunk>} chunks
  * @param {string} cacheGroupKey
  * @return {string}
  */
 const splitChunksName = (module, chunks, cacheGroupKey) => {
   let fullName = cacheGroupKey !== 'default' ? cacheGroupKey + '~' : '';
-  fullName += chunks.map(item => item.name).join('~');
+  fullName += [...chunks].map(item => item.name).join('~');
   if (fullName.length > 75) {
     return fullName.slice(0, 65).replace(/~[^~]*$/, '') + '~' + hashCode(fullName);
   }
