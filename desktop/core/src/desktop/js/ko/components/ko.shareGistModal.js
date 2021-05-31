@@ -41,7 +41,7 @@ const TEMPLATE = `
         </form>
       </div>
     </div>
-    <!-- ko if: window.SHARE_TO_SLACK -->
+    <!-- ko if: window.IS_SLACK_ENABLED && window.SHARE_TO_SLACK -->
     <label class="checkbox"><input type="checkbox" data-bind="checked: showSlackSection"> ${ I18n('Share to Slack') } </input></label>
     <!-- ko if: showSlackSection -->
     <form class="form-horizontal">
