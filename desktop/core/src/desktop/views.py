@@ -42,7 +42,7 @@ from django.shortcuts import redirect
 from django.views.decorators.http import require_POST
 from configobj import ConfigObj, get_extra_values, ConfigObjError
 from wsgiref.util import FileWrapper
-from webpack_loader.utils import get_files
+from webpack_loader.utils import get_static
 import django.views.debug
 
 import desktop.conf
@@ -413,10 +413,13 @@ def ace_sql_syntax_worker(request):
 #Redirect to static resources no need for auth. Fails with 401 with Knox.
 @login_notrequired
 def dynamic_bundle(request, config, bundle_name):
-  bundle_name = re.sub(r'-(bundle|chunk).*', '', bundle_name)
-  files = get_files(bundle_name, None, config.upper())
-  if len(files) == 1:
-    return HttpResponseRedirect(files[0]['url'])
+  try:
+    static_path = get_static(bundle_name, config.upper())
+    webpack_app = config if config != 'default' else 'hue'
+    static_path = static_path.replace('static/', 'static/desktop/js/bundles/%s/' % webpack_app)
+    return HttpResponseRedirect(static_path)
+  except Exception as ex:
+    LOG.exception("Failed loading dynamic bundle %s: %s" % (bundle_name, ex))
   return render("404.mako", request, dict(uri=request.build_absolute_uri()), status=404)
 
 def assist_m(request):

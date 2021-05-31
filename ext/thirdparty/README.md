@@ -25,7 +25,7 @@ Checked-in third party dependencies
 |Y|django-crequest|2018.5.11|BSD|https://pypi.org/project/django-crequest/|
 |Y|Django Extensions|1.5.0|New BSD|http://pypi.python.org/pypi/django-extensions/1.5.0|
 |Y|Django_nose (part of basie)|1.3|MIT|http://code.basieproject.org/trunk/apps/django_nose/nose_runner.py|
-|Y|django-webpack-loader|0.5.0|MIT|https://github.com/owais/django-webpack-loader/|
+|Y|django-webpack-loader|1.0.0|MIT|https://github.com/django-webpack/django-webpack-loader|
 |Y|djangosaml2|0.16.4|Apache ||
 |Y|dnspython|1.15.0|ISC|https://pypi.org/project/dnspython/1.15.0/|
 |Y|elementtree|1.2.6-20050316|Python(MIT)|http://effbot.org/downloads#elementtree|
