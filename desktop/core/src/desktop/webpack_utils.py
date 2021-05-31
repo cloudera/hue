@@ -23,7 +23,7 @@ from webpack_loader.utils import get_loader
 def get_hue_bundles(app_name, config='DEFAULT'):
   '''
   Util function to get all bundles related to app_name including vendor bundles
-  similar to get_bundle in https://github.com/owais/django-webpack-loader/blob/master/webpack_loader/loader.py
+  similar to get_bundle in https://github.com/django-webpack/django-webpack-loader/blob/master/webpack_loader/loader.py
   '''
   loader = get_loader(config)
   assets = loader.get_assets()
