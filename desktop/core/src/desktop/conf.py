@@ -763,7 +763,7 @@ SLACK = ConfigSection(
       key='share_from_editor',
       help=_('Enables direct sharing from Editor to Slack'),
       type=coerce_bool,
-      default=False,
+      default=True,
     ),
   )
 )
