@@ -23,7 +23,6 @@ const {
 } = require('./desktop/core/src/desktop/js/webpack/configUtils');
 
 process.traceDeprecation = true;
-
 const config = {
   devtool: false,
   entry: {

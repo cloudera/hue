@@ -23,7 +23,6 @@ import { INSERT_AT_CURSOR_EVENT } from 'ko/bindings/ace/ko.aceEditor';
 import { AutocompleteParser, SqlParserProvider, SyntaxError, SyntaxParser } from 'parse/types';
 import { SetOptions, SqlReferenceProvider, UdfCategory } from 'sql/reference/types';
 import huePubSub from 'utils/huePubSub';
-import { nextTick } from 'vue';
 import AceEditor from './AceEditor.vue';
 
 import impalaSyntaxParser from 'parse/sql/impala/impalaSyntaxParser';
@@ -31,11 +30,11 @@ import impalaAutocompleteParser from 'parse/sql/impala/impalaAutocompleteParser'
 
 const sqlParserProvider: SqlParserProvider = {
   async getAutocompleteParser(): Promise<AutocompleteParser> {
-    return (impalaAutocompleteParser as unknown) as AutocompleteParser;
+    return impalaAutocompleteParser as unknown as AutocompleteParser;
   },
 
   async getSyntaxParser(): Promise<SyntaxParser> {
-    return (impalaSyntaxParser as unknown) as SyntaxParser;
+    return impalaSyntaxParser as unknown as SyntaxParser;
   }
 };
 
@@ -55,7 +54,7 @@ const sqlReferenceProvider: SqlReferenceProvider = {
 };
 
 describe('AceEditor.vue', () => {
-  const mockExecutor = ({
+  const mockExecutor = {
     connector: ko.observable({
       dialect: 'impala',
       id: 'impala'
@@ -67,31 +66,37 @@ describe('AceEditor.vue', () => {
       id: 'foo'
     }),
     database: ko.observable('default')
-  } as unknown) as Executor;
+  } as unknown as Executor;
+
+  let mountedTwice = false;
 
   const shallowMountForEditor = async (
     initialValue?: string
-  ): Promise<{ element: Element; editor: Ace.Editor }> => {
-    spyOn(dataCatalog, 'getChildren').and.returnValue(CancellablePromise.resolve([]));
-
-    const wrapper = shallowMount(AceEditor, {
-      props: {
+  ): Promise<{ element: Element; editor: Ace.Editor }> =>
+    new Promise(resolve => {
+      spyOn(dataCatalog, 'getChildren').and.returnValue(CancellablePromise.resolve([]));
+      const props = {
         initialValue,
         id: 'some-id',
         executor: mockExecutor,
         sqlParserProvider,
         sqlReferenceProvider
+      };
+
+      let wrapper = shallowMount(AceEditor, { props });
+
+      if (!mountedTwice) {
+        // There seems to be a bug in vue-test-utils where the first mount won't trigger the onMounted hook.
+        mountedTwice = true;
+        wrapper = shallowMount(AceEditor, { props });
       }
+
+      wrapper.vm.$nextTick(() => {
+        expect(wrapper.emitted()['ace-created']).toBeTruthy();
+        const editor = (wrapper.emitted()['ace-created'][0] as Ace.Editor[])[0];
+        resolve({ element: wrapper.element, editor });
+      });
     });
-
-    await nextTick();
-
-    expect(wrapper.emitted()['ace-created']).toBeTruthy();
-
-    const editor = (wrapper.emitted()['ace-created'][0] as Ace.Editor[])[0];
-
-    return { element: wrapper.element, editor };
-  };
 
   it('should render', async () => {
     const { element } = await shallowMountForEditor('some query');
