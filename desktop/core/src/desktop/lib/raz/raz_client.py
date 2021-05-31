@@ -69,7 +69,7 @@ class RazToken:
 class RazClient(object):
 
   def __init__(self, raz_url, raz_token, username, service='s3', service_name='cm_s3', cluster_name='myCluster'):
-    self.raz_url = raz_url
+    self.raz_url = raz_url.strip('/')
     self.raz_token = raz_token
     self.username = username
     if service == 's3' or True:  # True until ABFS option
