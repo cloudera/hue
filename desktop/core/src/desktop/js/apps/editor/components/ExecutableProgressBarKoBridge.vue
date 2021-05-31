@@ -22,6 +22,7 @@
 
 <script lang="ts">
   import { defineComponent, PropType, ref, toRefs } from 'vue';
+  import KnockoutObservable from '@types/knockout';
 
   import ExecutableProgressBar from './ExecutableProgressBar.vue';
   import SqlExecutable from 'apps/editor/execution/sqlExecutable';

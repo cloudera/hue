@@ -15,6 +15,7 @@
 // limitations under the License.
 
 import * as ko from 'knockout';
+import KnockoutObservable from '@types/knockout';
 
 import { Cancellable, CancellablePromise } from 'api/cancellablePromise';
 import {

@@ -25,10 +25,6 @@
 
   import onHueLinkClick from 'utils/html/onHueLinkClick';
 
-  interface hueWindow {
-    HUE_BASE_URL: string;
-  }
-
   export default defineComponent({
     name: 'HueLink',
     props: {

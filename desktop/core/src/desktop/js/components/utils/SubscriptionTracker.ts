@@ -14,10 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { onBeforeUnmount, watch } from 'vue';
+import { onBeforeUnmount, Ref, watch } from 'vue';
+import KnockoutObservable from '@types/knockout';
 
 import huePubSub from 'utils/huePubSub';
-import { Ref } from 'vue';
 
 export interface Disposable {
   dispose(): void;

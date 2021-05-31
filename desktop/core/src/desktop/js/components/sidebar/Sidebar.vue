@@ -140,8 +140,8 @@
         default: null
       },
       userDrawerChildren: {
-        type: Object as PropType<SidebarAccordionSubItem[]>,
-        default: []
+        type: Array as PropType<SidebarAccordionSubItem[]>,
+        default: () => []
       },
       useDrawerForHelp: {
         type: Boolean,
@@ -152,8 +152,8 @@
         default: null
       },
       helpDrawerChildren: {
-        type: Object as PropType<SidebarAccordionSubItem[]>,
-        default: []
+        type: Array as PropType<SidebarAccordionSubItem[]>,
+        default: () => []
       },
 
       activeItemName: {
@@ -173,9 +173,7 @@
 
     emits: ['toggle-collapsed', 'header-click'],
 
-    data(
-      props
-    ): {
+    data(props): {
       drawerTopicInternal: string | null;
     } {
       return {

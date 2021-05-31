@@ -14,6 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import KnockoutObservable from '@types/knockout';
+
 import {
   EXECUTABLE_RESULT_UPDATED_TOPIC,
   EXECUTABLE_TRANSITIONED_TOPIC,

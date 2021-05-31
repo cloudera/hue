@@ -287,7 +287,8 @@ const initSqlParser = function (parser) {
   parser.suggestJoinConditions = function (details) {
     parser.yy.result.suggestJoinConditions = details || {};
     if (parser.yy.latestTablePrimaries && !parser.yy.result.suggestJoinConditions.tablePrimaries) {
-      parser.yy.result.suggestJoinConditions.tablePrimaries = parser.yy.latestTablePrimaries.concat();
+      parser.yy.result.suggestJoinConditions.tablePrimaries =
+        parser.yy.latestTablePrimaries.concat();
     }
   };
 

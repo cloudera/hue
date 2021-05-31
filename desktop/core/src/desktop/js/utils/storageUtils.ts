@@ -14,6 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import KnockoutObservable from '@types/knockout';
+
 import { hueWindow } from 'types/types';
 
 type LocalStorageGet = {
