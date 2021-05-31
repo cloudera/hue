@@ -15,6 +15,7 @@
 // limitations under the License.
 
 import $ from 'jquery';
+import KnockoutObservable from '@types/knockout';
 
 type ComplexValueAccessor = () => {
   value?: KnockoutObservable<string>;

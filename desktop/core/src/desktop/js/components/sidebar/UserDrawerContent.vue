@@ -62,9 +62,9 @@
         required: true
       },
       children: {
-        type: Object as PropType<SidebarAccordionSubItem[]>,
+        type: Array as PropType<SidebarAccordionSubItem[]>,
         required: false,
-        default: []
+        default: () => []
       }
     },
 

@@ -22,12 +22,15 @@ import Executor from 'apps/editor/execution/executor';
 import { ParsedSqlStatement } from 'parse/sqlStatementsParser';
 import { VariableIndex } from '../components/variableSubstitution/types';
 
-const BATCHABLE_STATEMENT_TYPES = /ALTER|WITH|REFRESH|CREATE|DELETE|DROP|GRANT|INSERT|INVALIDATE|LOAD|SET|TRUNCATE|UPDATE|UPSERT|USE/i;
+const BATCHABLE_STATEMENT_TYPES =
+  /ALTER|WITH|REFRESH|CREATE|DELETE|DROP|GRANT|INSERT|INVALIDATE|LOAD|SET|TRUNCATE|UPDATE|UPSERT|USE/i;
 
 const SELECT_END_REGEX = /([^;]*)([;]?[^;]*)/;
 const ERROR_REGEX = /line ([0-9]+)(:([0-9]+))?/i;
-const TABLE_DDL_REGEX = /(?:CREATE|DROP)\s+(?:TABLE|VIEW)\s+(?:IF\s+(?:NOT\s+)?EXISTS\s+)?(?:`([^`]+)`|([^;\s]+))\..*/i;
-const DB_DDL_REGEX = /(?:CREATE|DROP)\s+(?:DATABASE|SCHEMA)\s+(?:IF\s+(?:NOT\s+)?EXISTS\s+)?(?:`([^`]+)`|([^;\s]+))/i;
+const TABLE_DDL_REGEX =
+  /(?:CREATE|DROP)\s+(?:TABLE|VIEW)\s+(?:IF\s+(?:NOT\s+)?EXISTS\s+)?(?:`([^`]+)`|([^;\s]+))\..*/i;
+const DB_DDL_REGEX =
+  /(?:CREATE|DROP)\s+(?:DATABASE|SCHEMA)\s+(?:IF\s+(?:NOT\s+)?EXISTS\s+)?(?:`([^`]+)`|([^;\s]+))/i;
 
 export interface SqlExecutableRaw extends ExecutableRaw {
   database: string;
@@ -169,7 +172,7 @@ export default class SqlExecutable extends Executable {
   }
 
   toJs(): SqlExecutableRaw {
-    const executableJs = (super.toJs() as unknown) as SqlExecutableRaw;
+    const executableJs = super.toJs() as unknown as SqlExecutableRaw;
     executableJs.database = this.database;
     executableJs.parsedStatement = this.parsedStatement;
     executableJs.type = 'sqlExecutable';

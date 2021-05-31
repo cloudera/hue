@@ -745,8 +745,9 @@ Datamap.prototype.updatePopup = function (element, d, options) {
         return options.popupTemplate(d, data);
       })
       .style('left', position[0] + 'px');
-    const popupHeight = d3.select(self.svg[0][0].parentNode).select('.datamaps-hoverover')[0][0]
-      .offsetHeight;
+    const popupHeight = d3
+      .select(self.svg[0][0].parentNode)
+      .select('.datamaps-hoverover')[0][0].offsetHeight;
     if (position[1] + 30 + popupHeight > svgHeight) {
       d3.select(self.svg[0][0].parentNode)
         .select('.datamaps-hoverover')

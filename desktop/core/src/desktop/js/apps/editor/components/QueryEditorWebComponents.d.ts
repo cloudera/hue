@@ -15,7 +15,6 @@
 // limitations under the License.
 
 import { ConnectorNamespaces, GetOptions } from 'catalog/contextCatalog';
-import { findEditorConnector } from 'config/hueConfig';
 import { EditorInterpreter, HueConfig } from 'config/types';
 import Executor, { ExecutorOptions } from 'apps/editor/execution/executor';
 import { DataCatalog } from 'catalog/dataCatalog';

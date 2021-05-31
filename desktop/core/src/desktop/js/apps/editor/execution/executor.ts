@@ -14,6 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import KnockoutObservable from '@types/knockout';
+
 import Snippet from 'apps/editor/snippet';
 import Executable, { ExecutableRaw } from 'apps/editor/execution/executable';
 import { syncSqlExecutables } from 'apps/editor/execution/utils';
