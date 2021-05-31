@@ -2,10 +2,17 @@
 
 exports[`DropdownDrawer.vue should render dropdown drawer with slots 1`] = `
 <div
-  class="hue-dropdown-drawer"
+  class="hue-dropdown-drawer open"
   style="position: fixed;"
 >
-  <!--v-if-->
+  <div
+    class="hue-dropdown-drawer-inner"
+    style="top: 100%; left: 0px;"
+  >
+    
+    <stub />
+    
+  </div>
 </div>
 `;
 
