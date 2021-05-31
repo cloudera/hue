@@ -41,6 +41,7 @@ from django.urls import reverse, NoReverseMatch
 
 from dashboard.conf import get_engines, HAS_REPORT_ENABLED, IS_ENABLED as DASHBOARD_ENABLED
 from kafka.conf import has_kafka
+from indexer.conf import ENABLE_DIRECT_UPLOAD
 from metadata.conf import get_optimizer_mode
 from notebook.conf import DEFAULT_LIMIT, SHOW_NOTEBOOKS, get_ordered_interpreters
 from useradmin.models import User, Group, get_organization
@@ -2053,7 +2054,11 @@ class ClusterConfig(object):
         'page': '/security/hive'
       })
 
-    if 'indexer' in self.apps and 'filebrowser' in self.apps and self.user.has_hue_permission(action="access:importer", app="indexer") \
+    if 'indexer' in self.apps and (
+        ('filebrowser' in self.apps and self.user.has_hue_permission(action="access:importer", app="indexer"))
+        or
+        ENABLE_DIRECT_UPLOAD.get()
+        ) \
         and 'importer' not in APP_BLACKLIST.get():
       interpreters.append({
         'type': 'importer',
