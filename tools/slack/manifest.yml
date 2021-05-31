@@ -11,7 +11,7 @@ features:
     messages_tab_enabled: false
     messages_tab_read_only_enabled: true
   bot_user:
-    display_name: Hue Bot
+    display_name: Hue
     always_online: true
   unfurl_domains:
     - demo.gethue.com
