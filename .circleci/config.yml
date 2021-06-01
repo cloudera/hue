@@ -73,6 +73,7 @@ jobs:
             cp ~/repo/tsconfig.json .
             cp ~/repo/jest.config.js .
             cp ~/repo/.pylintrc .
+            cp ~/repo/.stylelintrc .
 
             cp ~/repo/webpack.config*.js .
             rm package.json
