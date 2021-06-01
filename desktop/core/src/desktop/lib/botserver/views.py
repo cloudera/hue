@@ -236,6 +236,9 @@ def handle_on_link_shared(host_domain, channel_id, message_ts, links, user_id):
         _send_message(channel_id, message=err_msg, message_ts=message_ts)
         raise SlackBotException(_("Cannot unfurl link"))
     except Document2.DoesNotExist:
+      err_msg = 'Query document not found or does not exist.'
+      _send_message(channel_id, message=err_msg, message_ts=message_ts)
+
       msg = "Document with {key} does not exist".format(key=query_id)
       raise SlackBotException(_(msg))
 
