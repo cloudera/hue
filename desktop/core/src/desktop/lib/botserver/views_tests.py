@@ -248,12 +248,12 @@ class TestBotServer(unittest.TestCase):
 
                   # Document does not exist
                   qhistory_url = "https://{host_domain}/hue/editor?editor=109644".format(host_domain=self.host_domain)
-                  assert_raises(PopupException, handle_on_link_shared, self.host_domain, "channel", "12.1", [{"url": qhistory_url}], "<@user_id>")
+                  assert_raises(SlackBotException, handle_on_link_shared, self.host_domain, "channel", "12.1", [{"url": qhistory_url}], "<@user_id>")
                   _send_message.assert_called_with('channel', message='Query document not found or does not exist.', message_ts='12.1')
 
                   # Cannot unfurl link with invalid query link
                   inv_qhistory_url = "https://{host_domain}/hue/editor/?type=4".format(host_domain=self.host_domain)
-                  assert_raises(PopupException, handle_on_link_shared, self.host_domain, "channel", "12.1", [{"url": inv_qhistory_url}], "<@user_id>")
+                  assert_raises(SlackBotException, handle_on_link_shared, self.host_domain, "channel", "12.1", [{"url": inv_qhistory_url}], "<@user_id>")
                   _send_message.assert_called_with('channel', message='Could not access the query, please check the link again.', message_ts='12.1')
 
   def test_handle_gist_link(self):
@@ -326,12 +326,12 @@ class TestBotServer(unittest.TestCase):
 
             # Gist document does not exist
             gist_url = "https://{host_domain}/hue/gist?uuid=6d1c407b-d999-4dfd-ad23-d3a46c19a427".format(host_domain=self.host_domain)
-            assert_raises(PopupException, handle_on_link_shared, self.host_domain, "channel", "12.1", [{"url": gist_url}], "<@user_id>")
+            assert_raises(SlackBotException, handle_on_link_shared, self.host_domain, "channel", "12.1", [{"url": gist_url}], "<@user_id>")
             _send_message.assert_called_with('channel', message='Query document not found or does not exist.', message_ts='12.1')
 
             # Cannot unfurl with invalid gist link
             inv_gist_url = "https://{host_domain}/hue/gist?uuids/=invalid_link".format(host_domain=self.host_domain)
-            assert_raises(PopupException, handle_on_link_shared, self.host_domain, "channel", "12.1", [{"url": inv_gist_url}], "<@user_id>")
+            assert_raises(SlackBotException, handle_on_link_shared, self.host_domain, "channel", "12.1", [{"url": inv_gist_url}], "<@user_id>")
             _send_message.assert_called_with('channel', message='Could not access the query, please check the link again.', message_ts='12.1')
 
   def test_slack_user_not_hue_user(self):
@@ -350,7 +350,7 @@ class TestBotServer(unittest.TestCase):
         }
         slack_user = check_slack_user_permission(self.host_domain, self.user_id)
 
-        assert_raises(PopupException, get_user, "channel", slack_user, "12.1")
+        assert_raises(SlackBotException, get_user, "channel", slack_user, "12.1")
         _send_message.assert_called_with('channel', message='Corresponding Hue user not found or does not have access.', message_ts='12.1')
 
         # Different domain but same email prefix
@@ -365,7 +365,7 @@ class TestBotServer(unittest.TestCase):
         }
         slack_user = check_slack_user_permission(self.host_domain, self.user_id)
 
-        assert_raises(PopupException, get_user, "channel", slack_user, "12.1")
+        assert_raises(SlackBotException, get_user, "channel", slack_user, "12.1")
         _send_message.assert_called_with('channel', message='Corresponding Hue user not found or does not have access.', message_ts='12.1')
   
   def test_handle_on_app_mention(self):
