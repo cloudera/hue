@@ -80,8 +80,8 @@ def generate_slack_install_link(request):
 
   return JsonResponse({'link': install_link})
 
-def _send_message(channel_info, message=None, block_element=None):
+def _send_message(channel_info, message=None, block_element=None, message_ts=None):
   try:
-    return slack_client.chat_postMessage(channel=channel_info, text=message, blocks=block_element)
+    return slack_client.chat_postMessage(channel=channel_info, text=message, blocks=block_element, thread_ts=message_ts)
   except Exception as e:
     raise PopupException(_("Error posting message in channel"), detail=e)
