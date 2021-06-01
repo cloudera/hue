@@ -22,7 +22,6 @@ const {
   splitChunksName
 } = require('./desktop/core/src/desktop/js/webpack/configUtils');
 
-process.traceDeprecation = true;
 const config = {
   devtool: false,
   entry: {
@@ -40,31 +39,27 @@ const config = {
     rules: [
       {
         test: /\.vue$/,
+        exclude: /node_modules/,
         use: 'vue-loader'
       },
       {
-        test: /\.tsx?$/,
+        test: /\.(jsx?|tsx?)$/,
         exclude: /node_modules/,
-        loader: 'babel-loader'
+        use: ['source-map-loader', 'babel-loader']
       },
-      { test: /\.js$/, use: ['source-map-loader'], enforce: 'pre' },
       {
-        test: /\.(html)$/,
-        use: [{ loader: 'html', options: { interpolater: true, removeComments: false } }]
-      },
-      { test: /\.less$/, use: ['style-loader', 'css-loader', 'less-loader'] },
-      { test: /\.s[ac]ss$/, use: ['style-loader', 'css-loader', 'sass-loader'] },
-      { test: /\.css$/, use: ['style-loader', 'css-loader'] },
-      { test: /\.(woff2?|ttf|eot|svg)$/, use: ['file-loader'] },
-      {
-        test: /\.jsx?$/,
+        test: /\.scss$/,
         exclude: /node_modules/,
-        use: ['babel-loader']
+        use: ['style-loader', 'css-loader', 'sass-loader']
+      },
+      {
+        test: /\.html$/,
+        exclude: /node_modules/,
+        use: { loader: 'html', options: { interpolater: true, removeComments: false } }
       }
     ]
   },
   optimization: {
-    //minimize: true,
     minimize: false,
     splitChunks: {
       chunks: 'all',

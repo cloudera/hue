@@ -69,7 +69,7 @@ jobs:
 
             cd /usr/share/hue
             # make npm-install # Not available
-            cp ~/repo/.babelrc .
+            cp ~/repo/babel.config.js .
             cp ~/repo/tsconfig.json .
             cp ~/repo/jest.config.js .
             cp ~/repo/.pylintrc .
