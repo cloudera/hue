@@ -15,7 +15,7 @@ exports[`ko.shareGistModal.js should render component 1`] = `
         </form>
       </div>
     </div>
-    <!-- ko if: window.IS_SLACK_ENABLED && window.SHARE_TO_SLACK --><!-- /ko -->
+    <!-- ko if: window.SHARE_TO_SLACK --><!-- /ko -->
   </div>
   <div class=\\"modal-footer\\">
     <a class=\\"btn\\" data-dismiss=\\"modal\\">Close</a>

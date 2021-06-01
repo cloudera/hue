@@ -120,8 +120,7 @@
   window.AUTO_UPLOAD_SQL_ANALYZER_STATS = '${ OPTIMIZER.AUTO_UPLOAD_STATS.get() }' === 'True';
 
   window.HAS_GIST = '${ ENABLE_GIST.get() }' === 'True';
-  window.SHARE_TO_SLACK = '${ conf.SLACK.SHARE_FROM_EDITOR.get() }' === 'True';
-  window.IS_SLACK_ENABLED = '${ conf.SLACK.IS_ENABLED.get() }' === 'True'
+  window.SHARE_TO_SLACK = '${ conf.SLACK.SHARE_FROM_EDITOR.get() }' === 'True' && '${ conf.SLACK.IS_ENABLED.get() }' === 'True';
   window.HAS_LINK_SHARING = '${ ENABLE_LINK_SHARING.get() }' === 'True';
   window.HAS_CONNECTORS = '${ has_connectors() }' === 'True';
 
