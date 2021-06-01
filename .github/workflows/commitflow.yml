@@ -59,6 +59,7 @@ jobs:
         cp tsconfig.json /usr/share/hue
         cp jest.config.js /usr/share/hue
         cp .pylintrc /usr/share/hue
+        cp .stylelintrc /usr/share/hue
 
         cp webpack.config*.js /usr/share/hue
         rm /usr/share/hue/package.json
