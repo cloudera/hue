@@ -81,7 +81,7 @@ class TestApi(object):
       data = json.loads(response.content)
 
       assert_equal(200, response.status_code)
-      chat_postMessage(channel='channel-1', text='@api_user: message with link', blocks=None, thread_ts=None)
+      chat_postMessage.assert_called_with(channel='channel-1', text='@api_user: message with link', blocks=None, thread_ts=None)
       assert_true(data.get('ok'))
   
   def test_generate_slack_install_link(self):
