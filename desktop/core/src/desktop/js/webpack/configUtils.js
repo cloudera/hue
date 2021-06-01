@@ -28,10 +28,13 @@ const BUNDLES = {
 
 const getPluginConfig = (name, withAnalyzer) => {
   const plugins = [
+    new webpack.ProgressPlugin(),
     new webpack.SourceMapDevToolPlugin({
+      exclude: [/-parser-/g],
       filename: `${name}/[file].map`,
       publicPath: `/static/desktop/js/bundles/${name}/`,
-      fileContext: 'public'
+      fileContext: 'public',
+      columns: false
     }),
     new RelativeBundleTracker({
       path: '.',
