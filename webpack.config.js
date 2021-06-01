@@ -23,7 +23,7 @@ const {
 } = require('./desktop/core/src/desktop/js/webpack/configUtils');
 
 const config = {
-  devtool: false,
+  devtool: 'cheap-source-map',
   entry: {
     hue: { import: './desktop/core/src/desktop/js/hue.js' },
     editor: { import: './desktop/core/src/desktop/js/apps/editor/app.js', dependOn: 'hue' },
@@ -72,7 +72,11 @@ const config = {
     path: __dirname + '/desktop/core/src/desktop/static/desktop/js/bundles/hue',
     filename: '[name]-bundle-[fullhash].js',
     chunkFilename: '[name]-chunk-[fullhash].js',
-    clean: true
+    clean: true,
+    devtoolModuleFilenameTemplate(info) {
+      // Prevents absolute paths in the generated sourceMaps
+      return `webpack:///${info.resourcePath.replace(__dirname, '.')}`;
+    }
   },
   performance: {
     maxEntrypointSize: 400 * 1024, // 400kb
