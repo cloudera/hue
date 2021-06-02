@@ -108,8 +108,8 @@ class RazS3Connection(SignedUrlS3Connection):
     boto.log.debug('path=%s' % path)
     auth_path = self.calling_format.build_auth_path(bucket, key)
     boto.log.debug('auth_path=%s' % auth_path)
-    # host = self.calling_format.build_host(self.server_name(), bucket)
-    host = self.calling_format.build_host(self.server_name(), '')  # As using signed Url we keep the same hostname as there
+    host = self.calling_format.build_host(self.server_name(), bucket)
+    #host = self.calling_format.build_host(self.server_name(), '')  # As using signed Url we keep the same hostname as there
     if query_args:
         path += '?' + query_args
         boto.log.debug('path=%s' % path)
@@ -121,17 +121,19 @@ class RazS3Connection(SignedUrlS3Connection):
                                                 params, headers, data, host)
 
     # Actual override starts here
-    LOG.debug('Overriding: %s, %s, %s, %s, %s, %s, %s' % (method, path, auth_path, params, headers, data, host))
+    LOG.debug('http_request: %s, %s, %s, %s, %s, %s, %s' % (method, path, auth_path, params, headers, data, host))
+    LOG.debug('http_request object: %s' % http_request)
 
-    signed_url = self.get_signed_url(action=method, bucket_name=bucket, object_name=key)
-    LOG.debug(signed_url)
+    url = 'https://%(host)s%(path)s' % {'host': host, 'path': path}
 
-    parsed_url = lib_urlparse(signed_url)
+    headers = self.get_signed_url(action=method, url=url)
+    LOG.debug('Raz returned those headers: %s' % headers)
 
-    # We override instead of re-creating an HTTPRequest
-    http_request.path = parsed_url.path
-    if parsed_url.query:
-      http_request.path += '?' + parsed_url.query
+    if headers is not None:
+      # We override instead of re-creating an HTTPRequest
+      http_request.headers.update(headers)
+    else:
+      LOG.error('We got back empty header from Raz for the request %s' % http_request)
 
     LOG.debug('Overriden: %s' % http_request)
 
@@ -139,9 +141,10 @@ class RazS3Connection(SignedUrlS3Connection):
                       retry_handler=retry_handler)
 
 
-  def get_signed_url(self, action='GET', bucket_name=None, object_name=None, expiration=3600):
+  def get_signed_url(self, action='GET', url=None):
     raz_client = S3RazClient()
-    return raz_client.get_url(bucket_name, object_name)
+
+    return raz_client.get_url(action, url)
 
 
 class SelfSignedUrlS3Connection(SignedUrlS3Connection):
