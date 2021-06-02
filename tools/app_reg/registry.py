@@ -19,7 +19,6 @@
 Registry for the applications
 """
 
-from builtins import object
 import glob
 import logging
 import os

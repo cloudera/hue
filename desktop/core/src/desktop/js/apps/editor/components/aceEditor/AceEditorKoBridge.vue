@@ -38,6 +38,7 @@
 
 <script lang="ts">
   import { defineComponent, PropType, ref, toRefs } from 'vue';
+  import KnockoutObservable from '@types/knockout';
 
   import { Ace } from 'ext/ace';
 

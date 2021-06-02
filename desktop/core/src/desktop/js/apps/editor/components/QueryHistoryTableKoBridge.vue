@@ -25,6 +25,7 @@
 
 <script lang="ts">
   import { defineComponent, PropType, ref, toRefs } from 'vue';
+  import KnockoutObservable from '@types/knockout';
 
   import QueryHistoryTable from './QueryHistoryTable.vue';
   import { wrap } from 'vue/webComponentWrap';

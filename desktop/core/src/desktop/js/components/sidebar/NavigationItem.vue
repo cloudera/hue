@@ -27,7 +27,7 @@
       <div v-if="item.iconHtml" class="sidebar-sidebar-item-icon" v-html="item.iconHtml" />
 
       <span>{{ item.displayName }}</span>
-      <div style="flex-grow: 1;" />
+      <div style="flex-grow: 1" />
 
       <BaseNavigationItemTooltip
         v-if="tooltip"

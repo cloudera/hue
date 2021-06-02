@@ -22,6 +22,7 @@
 
 <script lang="ts">
   import { defineComponent, PropType, ref, toRefs } from 'vue';
+  import KnockoutObservable from '@types/knockout';
 
   import { wrap } from 'vue/webComponentWrap';
 

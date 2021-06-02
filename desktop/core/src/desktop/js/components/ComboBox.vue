@@ -55,7 +55,7 @@
       },
       options: {
         type: Array as PropType<Option[]>,
-        default: []
+        default: () => []
       }
     },
     emits: ['update:model-value'],

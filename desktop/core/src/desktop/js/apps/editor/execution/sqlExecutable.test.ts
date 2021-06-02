@@ -99,38 +99,36 @@ describe('sqlExecutable.js', () => {
       statusResolve = resolve;
     });
 
-    jest.spyOn(ApiUtils, 'post').mockImplementation(
-      (url: string): CancellablePromise<unknown> => {
-        currentApiHit++;
-        if (url.indexOf('/create_session') !== -1) {
-          createSessionApiHit = currentApiHit;
-          return new CancellablePromise<unknown>(resolve => {
-            resolve({ session: { type: 'foo' } });
+    jest.spyOn(ApiUtils, 'post').mockImplementation((url: string): CancellablePromise<unknown> => {
+      currentApiHit++;
+      if (url.indexOf('/create_session') !== -1) {
+        createSessionApiHit = currentApiHit;
+        return new CancellablePromise<unknown>(resolve => {
+          resolve({ session: { type: 'foo' } });
+        });
+      } else if (url.indexOf('/execute') !== -1) {
+        executeApiHit = currentApiHit;
+        expect(url).toContain('/execute/impala');
+        return new CancellablePromise<unknown>(resolve => {
+          resolve({
+            handle: {},
+            history_id: 1,
+            history_uuid: 'some-history_uuid',
+            history_parent_uuid: 'some_history_parent_uuid'
           });
-        } else if (url.indexOf('/execute') !== -1) {
-          executeApiHit = currentApiHit;
-          expect(url).toContain('/execute/impala');
-          return new CancellablePromise<unknown>(resolve => {
-            resolve({
-              handle: {},
-              history_id: 1,
-              history_uuid: 'some-history_uuid',
-              history_parent_uuid: 'some_history_parent_uuid'
-            });
-          });
-        } else if (url.indexOf('/check_status') !== -1) {
-          checkStatusApiHit = currentApiHit;
-          statusResolve({ query_status: { status: ExecutionStatus.available } });
-          return statusPromise;
-        } else if (url.indexOf('/get_logs') !== -1) {
-          getLogsApiHit = currentApiHit;
-          logsResolve({ status: 0, logs: '' });
-          return logsPromise;
-        }
-        fail('fail for URL: ' + url);
-        throw new Error('Did not find URL: ' + url);
+        });
+      } else if (url.indexOf('/check_status') !== -1) {
+        checkStatusApiHit = currentApiHit;
+        statusResolve({ query_status: { status: ExecutionStatus.available } });
+        return statusPromise;
+      } else if (url.indexOf('/get_logs') !== -1) {
+        getLogsApiHit = currentApiHit;
+        logsResolve({ status: 0, logs: '' });
+        return logsPromise;
       }
-    );
+      fail('fail for URL: ' + url);
+      throw new Error('Did not find URL: ' + url);
+    });
 
     expect(subject.status).toEqual(ExecutionStatus.ready);
 

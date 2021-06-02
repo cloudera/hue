@@ -14,6 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import KnockoutObservable from '@types/knockout';
+
 const waitForObservable = (
   observable: KnockoutObservable<unknown>,
   callback: (observable: KnockoutObservable<unknown>) => void

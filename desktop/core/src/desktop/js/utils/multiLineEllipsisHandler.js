@@ -45,7 +45,8 @@ class MultiLineEllipsisHandler {
     this.contents = options.text;
     this.element.innerHTML = deXSS(this.contents);
 
-    const linkRegex = /(?:(?:[a-z]+:\/\/)|www\.)[^\s\/]+(?:[.\/]\S+)*[^\s`!()\[\]{};:'".,<>?«»“”‘’]/gi;
+    const linkRegex =
+      /(?:(?:[a-z]+:\/\/)|www\.)[^\s\/]+(?:[.\/]\S+)*[^\s`!()\[\]{};:'".,<>?«»“”‘’]/gi;
 
     this.renderContents = contents => {
       if (options.linkify) {

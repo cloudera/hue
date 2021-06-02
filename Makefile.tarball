@@ -36,7 +36,7 @@ PROD_INCLUDES := \
 	package.json \
 	package-lock.json \
 	webpack.config*.js \
-	.babelrc \
+	babel.config.js \
 	tsconfig.json
 
 # Check for things in BDIST_EXCLUDES in various apps

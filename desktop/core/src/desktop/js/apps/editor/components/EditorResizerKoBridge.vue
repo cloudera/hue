@@ -22,8 +22,8 @@
 
 <script lang="ts">
   import { defineComponent, PropType, ref, toRefs } from 'vue';
-
   import { Ace } from 'ext/ace';
+  import KnockoutObservable from '@types/knockout';
 
   import { wrap } from 'vue/webComponentWrap';
 

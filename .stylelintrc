@@ -1,0 +1,20 @@
+{
+  "extends": "stylelint-config-standard",
+  "plugins": [
+    "stylelint-scss"
+  ],
+  "rules": {
+    "at-rule-no-unknown": null,
+    "max-empty-lines": 4,
+    "no-descending-specificity": null,
+    "no-invalid-position-at-import-rule": null,
+    "number-leading-zero": null,
+    "scss/at-rule-no-unknown": true,
+    "selector-pseudo-element-no-unknown": [
+      true,
+      {
+        "ignorePseudoElements": ["v-deep"]
+      }
+    ]
+  }
+}

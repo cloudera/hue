@@ -23,6 +23,7 @@
 <script lang="ts">
   import { defineComponent, PropType, ref, toRefs } from 'vue';
   import { wrap } from 'vue/webComponentWrap';
+  import KnockoutObservable from '@types/knockout';
 
   import ExecutionAnalysisPanel from './ExecutionAnalysisPanel.vue';
   import SqlExecutable from 'apps/editor/execution/sqlExecutable';

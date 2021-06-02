@@ -85,23 +85,23 @@ def parse_events(request, event):
   message_element = event['blocks'][0].get('elements', []) if event.get('blocks') else []
 
   if event.get('type') == 'message':
-    handle_on_message(request.get_host(), request.is_secure(), channel_id, event.get('bot_id'), message_element, user_id)
+    handle_on_message(request.get_host(), request.is_secure(), channel_id, event.get('bot_id'), message_element, user_id, event.get('ts'))
 
   if event.get('type') == 'link_shared':
     handle_on_link_shared(request.get_host(), channel_id, event.get('message_ts'), event.get('links'), user_id)
 
   if event.get('type') == 'app_mention':
-    handle_on_app_mention(request.get_host(), channel_id, user_id, event.get('text'))
+    handle_on_app_mention(request.get_host(), channel_id, user_id, event.get('text'), event.get('ts'))
 
 
-def handle_on_app_mention(host_domain, channel_id, user_id, text):
+def handle_on_app_mention(host_domain, channel_id, user_id, text, message_ts):
   if text and 'help' in text:
-    msg_block = help_message(user_id)
-    _send_message(channel_id, block_element=msg_block)
+    help_msg_block = help_message(user_id)
+    _send_message(channel_id, block_element=help_msg_block)
 
   if text and 'queries' in text:
     slack_user = check_slack_user_permission(host_domain, user_id)
-    user = get_user(channel_id, slack_user)
+    user = get_user(channel_id, slack_user, message_ts)
 
     handle_query_bank(channel_id, user_id)
 
@@ -183,7 +183,7 @@ def handle_query_bank(channel_id, user_id):
   _send_message(channel_id, block_element=message_block)
 
 
-def handle_on_message(host_domain, is_http_secure, channel_id, bot_id, elements, user_id):
+def handle_on_message(host_domain, is_http_secure, channel_id, bot_id, elements, user_id, message_ts):
   # Ignore bot's own message since that will cause an infinite loop of messages if we respond.
   if bot_id is not None:
     return HttpResponse(status=200)
@@ -192,26 +192,30 @@ def handle_on_message(host_domain, is_http_secure, channel_id, bot_id, elements,
     text = element_block['elements'][0].get('text', '') if element_block.get('elements') else ''
 
     if 'hello hue' in text.lower():
-      msg_block = help_message(user_id)
-      _send_message(channel_id, block_element=msg_block)
+      help_msg_block = help_message(user_id)
+      _send_message(channel_id, block_element=help_msg_block)
 
     if text.lower().startswith('select'):
-      handle_select_statement(host_domain, is_http_secure, channel_id, user_id, text.lower())
+      handle_select_statement(host_domain, is_http_secure, channel_id, user_id, text.lower(), message_ts)
 
 
-def handle_select_statement(host_domain, is_http_secure, channel_id, user_id, statement):
+def handle_select_statement(host_domain, is_http_secure, channel_id, user_id, statement, message_ts):
+  msg = 'Hi <@{user}> \n Looks like you are copy/pasting SQL, instead now you can send Editor links which unfurls in a rich preview!'.format(user=user_id)
+  _send_message(channel_id, message=msg)
+
+  # Check Slack user perms to send gist link
   slack_user = check_slack_user_permission(host_domain, user_id)
-  user = get_user(channel_id, slack_user)
+  user = get_user(channel_id, slack_user, message_ts)
 
+  _make_select_statement_gist(host_domain, is_http_secure, user, channel_id, statement)
+
+
+def _make_select_statement_gist(host_domain, is_http_secure, user, channel_id, statement):
   default_dialect = get_cluster_config(rewrite_user(user))['main_button_action']['dialect']
-
   gist_response = _gist_create(host_domain, is_http_secure, user, statement, default_dialect)
 
-  bot_message = ('Hi <@{user}>\n'
-  'Looks like you are copy/pasting SQL, instead now you can send Editor links which unfurls in a rich preview!\n'
-  'Here is the gist link\n {gist_link}'
-  ).format(user=user_id, gist_link=gist_response['link'])
-  _send_message(channel_id, bot_message)
+  msg = 'Here is the gist link\n {gist_link}'.format(gist_link=gist_response['link'])
+  _send_message(channel_id, message=msg)
 
 
 def handle_on_link_shared(host_domain, channel_id, message_ts, links, user_id):
@@ -228,14 +232,19 @@ def handle_on_link_shared(host_domain, channel_id, message_ts, links, user_id):
         doc = _get_gist_document(**query_id)
         doc_type = 'gist'
       else:
+        err_msg = 'Could not access the query, please check the link again.'
+        _send_message(channel_id, message=err_msg, message_ts=message_ts)
         raise SlackBotException(_("Cannot unfurl link"))
     except Document2.DoesNotExist:
+      err_msg = 'Query document not found or does not exist.'
+      _send_message(channel_id, message=err_msg, message_ts=message_ts)
+
       msg = "Document with {key} does not exist".format(key=query_id)
       raise SlackBotException(_(msg))
 
     # Permission check for Slack user to be Hue user
     slack_user = check_slack_user_permission(host_domain, user_id)
-    user = get_user(channel_id, slack_user) if not slack_user['is_bot'] else doc.owner
+    user = get_user(channel_id, slack_user, message_ts) if not slack_user['is_bot'] else doc.owner
     doc.can_read_or_exception(user)
 
     request = MockRequest(user=rewrite_user(user))
@@ -251,12 +260,12 @@ def handle_on_link_shared(host_domain, channel_id, message_ts, links, user_id):
       send_result_file(request, channel_id, message_ts, doc, 'xls')
 
 
-def get_user(channel_id, slack_user):
+def get_user(channel_id, slack_user, message_ts):
   try:
     return User.objects.get(username=slack_user.get('user_email_prefix'))
   except User.DoesNotExist:
-    bot_message = 'Corresponding Hue user not found or does not have access to the query'
-    _send_message(channel_id, bot_message)
+    err_msg = 'Corresponding Hue user not found or does not have access.'
+    _send_message(channel_id, message=err_msg, message_ts=message_ts)
     raise SlackBotException(_("Slack user does not have access to the query"))
 
 

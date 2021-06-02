@@ -55,10 +55,11 @@ jobs:
         sed -i 's/## has_iam_detection=true/  has_iam_detection=false/g' /usr/share/hue/desktop/conf/pseudo-distributed.ini
 
         # make npm-install # Not available
-        cp .babelrc /usr/share/hue
+        cp babel.config.js /usr/share/hue
         cp tsconfig.json /usr/share/hue
         cp jest.config.js /usr/share/hue
         cp .pylintrc /usr/share/hue
+        cp .stylelintrc /usr/share/hue
 
         cp webpack.config*.js /usr/share/hue
         rm /usr/share/hue/package.json
@@ -119,6 +120,12 @@ jobs:
         cd /usr/share/hue
 
         npm run check-license
+
+    - name: run style lint
+      run: |
+        cd /usr/share/hue
+
+        npm run style-lint
 
     - name: run npm absolute path detection
       run: |

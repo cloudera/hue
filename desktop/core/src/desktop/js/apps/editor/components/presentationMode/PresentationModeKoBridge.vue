@@ -30,6 +30,7 @@
 
 <script lang="ts">
   import { defineComponent, PropType, reactive, ref, toRefs } from 'vue';
+  import KnockoutObservable from '@types/knockout';
 
   import { Variable } from 'apps/editor/components/variableSubstitution/types';
   import { IdentifierLocation } from 'parse/types';
@@ -97,9 +98,7 @@
         );
       },
       onClose(): void {
-        this.$el.dispatchEvent(
-          new CustomEvent<void>('close', { bubbles: true })
-        );
+        this.$el.dispatchEvent(new CustomEvent<void>('close', { bubbles: true }));
       },
       onVariablesChanged(variables: Variable[]): void {
         this.$el.dispatchEvent(

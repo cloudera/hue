@@ -204,5 +204,3 @@ export interface SqlParserProvider {
   getAutocompleteParser(dialect: string): Promise<AutocompleteParser>;
   getSyntaxParser(dialect: string): Promise<SyntaxParser>;
 }
-
-declare const sqlStatementsParser: SqlStatementsParser;

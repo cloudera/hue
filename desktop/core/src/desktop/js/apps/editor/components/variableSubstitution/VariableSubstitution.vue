@@ -126,7 +126,7 @@
       initialVariables: {
         type: Object as PropType<{ [name: string]: Variable }>,
         required: false,
-        default: {}
+        default: () => ({})
       },
       locations: {
         type: Object as PropType<IdentifierLocation[]>,
