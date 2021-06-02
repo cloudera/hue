@@ -91,13 +91,13 @@ class TestApi(object):
     assert_equal(200, response.status_code)
     assert_equal(
       data.get('link'),
-      ('https://api.slack.com/apps?new_app=1&manifest_yaml=_metadata%3A%0A++major_version%3A+1%0A++minor_version%3A+1%0Adisplay'
-      '_information%3A%0A++background_color%3A+%27%23000000%27%0A++description%3A+Share+queries%2C+ask+where+is+the+data%2C+how+to+query+it..'
-      '+questions.%0A++name%3A+SQL+Assistant%0Afeatures%3A%0A++app_home%3A%0A++++home_tab_enabled%3A+false%0A++++messages_tab_enabled%3A+false'
-      '%0A++++messages_tab_read_only_enabled%3A+true%0A++bot_user%3A%0A++++always_online%3A+true%0A++++display_name%3A+Hue+Bot%0A++unfurl_domains'
-      '%3A%0A++-+testserver.gethue.com%0Aoauth_config%3A%0A++scopes%3A%0A++++bot%3A%0A++++-+app_mentions%3Aread%0A++++-+channels%3Ahistory%0A++++-'
-      '+channels%3Aread%0A++++-+chat%3Awrite%0A++++-+files%3Awrite%0A++++-+links%3Aread%0A++++-+links%3Awrite%0A++++-+users%3Aread%0A++++-+users%3Ar'
-      'ead.email%0Asettings%3A%0A++event_subscriptions%3A%0A++++bot_events%3A%0A++++-+app_mention%0A++++-+link_shared%0A++++-+message.channels%0A++++'
-      'request_url%3A+https%3A%2F%2Ftestserver.gethue.com%2Fdesktop%2Fslack%2Fevents%2F%0A++is_hosted%3A+false%0A++org_deploy_enabled%3A+false%0A++so'
-      'cket_mode_enabled%3A+false%0A')
+      ('https://api.slack.com/apps?new_app=1&manifest_yaml=_metadata%3A%0A++major_version%3A+1%0A++minor_version%3A+1%0Adisplay_information'
+      '%3A%0A++background_color%3A+%27%23000000%27%0A++description%3A+Share+queries%2C+ask+where+is+the+data%2C+how+to+query+it..+questions.'
+      '%0A++name%3A+SQL+Assistant%0Afeatures%3A%0A++app_home%3A%0A++++home_tab_enabled%3A+false%0A++++messages_tab_enabled%3A+false%0A++++'
+      'messages_tab_read_only_enabled%3A+true%0A++bot_user%3A%0A++++always_online%3A+true%0A++++display_name%3A+Hue%0A++unfurl_domains%3A%'
+      '0A++-+testserver.gethue.com%0Aoauth_config%3A%0A++scopes%3A%0A++++bot%3A%0A++++-+app_mentions%3Aread%0A++++-+channels%3Ahistory%0A'
+      '++++-+channels%3Aread%0A++++-+chat%3Awrite%0A++++-+files%3Awrite%0A++++-+links%3Aread%0A++++-+links%3Awrite%0A++++-+users%3Aread%0'
+      'A++++-+users%3Aread.email%0Asettings%3A%0A++event_subscriptions%3A%0A++++bot_events%3A%0A++++-+app_mention%0A++++-+link_shared%0A'
+      '++++-+message.channels%0A++++request_url%3A+https%3A%2F%2Ftestserver.gethue.com%2Fdesktop%2Fslack%2Fevents%2F%0A++is_hosted%3A+false%'
+      '0A++org_deploy_enabled%3A+false%0A++socket_mode_enabled%3A+false%0A')
     )
