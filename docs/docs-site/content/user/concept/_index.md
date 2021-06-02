@@ -117,14 +117,17 @@ Via the Home page, saved documents can be exported for backups or transferring t
 ## Slack
 Currently in **Beta**
 
-This integration increases the collaboration with other users via Slack.
+This integration with Hue helps users by assisting them with their SQL queries and have better collaboration/discussion with other users via Slack.
 
-### Share to Slack
-This feature expands the ability to share query links or gists to the desired Slack channels which then unfurls in a rich preview for other users. It even gives the user result file for the query if it has not expired.
+To set-up the Hue App, the **Slack workspace admin** needs to follow these few [steps](/administrator/configuration/server/#manual-slack-app-installation) described in the Admin section.
 
-To manually set-up the Hue App, follow the steps mentioned in the [bot setup](/administrator/configuration/server/#manual-slack-app-installation) described in the Admin section.
+After successfully plugging-in the app with Hue, type `hello hue` or `@Hue help` in the Slack channel to get the list of things the app can assist you with.
 
-Open Hue, run some query and copy its link:
+
+### Sharing Query/Gist links
+Users can share query links or gists in the Slack channels where the app is also present which then unfurls giving a rich preview of details about the query for other users to collaborate/discuss with. App also provides the result file for the query in the message thread if the result is available.
+
+Open Hue Editor, run some query and copy its link:
 
 ![Run Query in Hue](https://cdn.gethue.com/uploads/2021/04/run_query_in_hue.png)
 
@@ -134,20 +137,42 @@ Paste it in the Slack channel for others to get a rich link preview:
 
 Slack currently does not support markdown tables and potential improvements with inline preview will come when Hue supports result caching via [query tasks](/administrator/administration/reference/#task-server)
 
-After evaluating a lot of possible fixes ( like uploading result image, truncating columns which doesn't look good, pivoting table, uploading result file etc.) and seeing their tradeoffs, we chose to have few sample rows but keep all columns by pivoting the result table and to compensate for the loss of rows, Hue app gives the result file in the message thread.
+After evaluating a lot of possible fixes (like uploading result image, truncating columns which did not look good, pivoting result table, [uploading result file](https://github.com/slackapi/python-slack-sdk/issues/991) etc.) and seeing their tradeoffs, we chose to have a few sample rows but keep all the columns by pivoting the result table and to compensate for the loss of rows, Hue app gives the result file in the message thread.
 
 ![Message Thread with Result File](https://cdn.gethue.com/uploads/2021/04/message_thread_with_result_file.png)
 
-Users can share the SQL gists too!
+Users can also share SQL gists links:
 
 ![Gist Link](https://cdn.gethue.com/uploads/2021/04/gist_link.png)
 
 ![Gist Link Preview](https://cdn.gethue.com/uploads/2021/04/gist_link_preview.png)
 
-#### Security
-Keeping in mind the security aspect, those Slack users who are Hue users and have the read permissions to access the query and its result will get this rich preview and result file after sharing the link. This mapping is currently done by checking the email prefix and its host for Hue username.
+### Directly Share from Editor
+To reduce the context-switching even more between Slack and Hue for discussions, users can now directly share their desired queries from the Hue editor in the Slack channels.
+App sends the gist link in the selected channel and leverages the already present link unfurling for gist links to give a rich preview.
 
-For example, some person ‘Alice’ having a Hue account with username ‘alice’ can have read access from some Slack account only if the email prefix of that slack user is same and Hue username and the email host is same in the Hue domain i.e. **alice@gethue.com slack user** can only access **Hue user ‘alice’** on **‘demo.gethue.com’** 
+Simply create a gist, select a channel and share directly from the Editor:
+
+![Share from Editor GIF]()
+
+### Assistance
+
+#### Detecting SQL SELECT statements
+To suggest users to share query links instead of copy/pasting SQL statements for discussions/query doubts, the Hue App detects SELECT statements in the message and gives a quick suggestion to share links along with sending a gist link for the detected SQL which then unfurls giving a rich preview.
+
+In future release, Hue app can improve with better detection and assist more efficiently with detected SQL. For e.g. using parsers to check and extract tables and suggest query optimizations like LIMITS or tables/joins info.
+
+![Detect SQL GIF]()
+
+#### Query Bank
+Type `@Hue queries` in the channel to explore the list of important and most used queries from the latest query bank. This query bank is helpful for sharing complex queries with other users to access.
+
+![Query Bank GIF]()
+
+### Security
+Keeping in mind the security aspect, Slack users needs to be a Hue user to have permission to access the above features from the App. This mapping is currently done by checking Slack users' **email prefix as Hue username** and their **email host is same in Hue instance domain** with which the App is plugged-in.
+
+For example, some persona **Alice** having a Hue account with username **alice** can have read access from some Slack account only if the email prefix of that slack user is same and Hue username and the email host is same in the Hue domain i.e. **alice@gethue.com Slack user** can only access **Hue user alice** on **demo.gethue.com** 
 
 ## Settings
 
