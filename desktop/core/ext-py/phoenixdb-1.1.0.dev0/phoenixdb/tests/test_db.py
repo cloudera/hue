@@ -17,7 +17,7 @@ import unittest
 
 import phoenixdb.cursor
 from phoenixdb.connection import Connection
-from phoenixdb.errors import InternalError
+from phoenixdb.errors import InternalError, ProgrammingError
 from phoenixdb.tests import DatabaseTestCase, TEST_DB_URL
 
 
@@ -172,6 +172,65 @@ class PhoenixDatabaseTest(DatabaseTestCase):
                     {'TABLE_TYPE': 'VIEW'}]))
 
                 self.assertEqual(meta.get_type_info(), [])
+
+            finally:
+                cursor.execute('drop table if exists DEFAULT_TABLE')
+                cursor.execute('drop table if exists A_SCHEMA.A_TABLE')
+                cursor.execute('drop table if exists B_SCHEMA.B_TABLE')
+
+    def test_meta2(self):
+        with self.conn.cursor() as cursor:
+            try:
+                cursor.execute('drop table if exists DEFAULT_TABLE')
+                cursor.execute('drop table if exists A_SCHEMA.A_TABLE')
+                cursor.execute('drop table if exists B_SCHMEA.B_TABLE')
+
+                cursor.execute('''create table DEFAULT_TABLE (ID integer not null, ID2 varchar not null,
+                V1 integer, V2 varchar, constraint PK PRIMARY KEY (ID DESC, ID2 ASC))''')
+                cursor.execute('CREATE INDEX GLOBAL_IDX ON DEFAULT_TABLE (V1) INCLUDE (V2)')
+                cursor.execute('CREATE LOCAL INDEX LOCAL_IDX ON DEFAULT_TABLE (V1)')
+                cursor.execute('create table A_SCHEMA.A_TABLE (ID_A integer primary key)')
+                cursor.execute('create table B_SCHEMA.B_TABLE (ID_B integer primary key)')
+
+                meta = self.conn.meta()
+                self.assertTrue(len(meta.get_primary_keys(table='DEFAULT_TABLE')),
+                                [{'ASC_OR_DESC': '\x00\x00\x00D',
+                                  'COLUMN_NAME': 'ID',
+                                  'COLUMN_SIZE': None,
+                                  'DATA_TYPE': 4,
+                                  'KEY_SEQ': 1,
+                                  'PK_NAME': 'PK',
+                                  'TABLE_CAT': None,
+                                  'TABLE_NAME': 'DEFAULT_TABLE',
+                                  'TABLE_SCHEM': None,
+                                  'TYPE_ID': 4,
+                                  'TYPE_NAME': 'INTEGER',
+                                  'VIEW_CONSTANT': None},
+                                 {'ASC_OR_DESC': '\x00\x00\x00A',
+                                  'COLUMN_NAME': 'ID2',
+                                  'COLUMN_SIZE': None,
+                                  'DATA_TYPE': 12,
+                                  'KEY_SEQ': 2,
+                                  'PK_NAME': 'PK',
+                                  'TABLE_CAT': None,
+                                  'TABLE_NAME': 'DEFAULT_TABLE',
+                                  'TABLE_SCHEM': None,
+                                  'TYPE_ID': 12,
+                                  'TYPE_NAME': 'VARCHAR',
+                                  'VIEW_CONSTANT': None}])
+                self.assertEqual(len(meta.get_primary_keys(schema='A_SCHEMA', table='A_TABLE')), 1)
+                try:
+                    self.assertEqual(len(meta.get_primary_keys(schema='A_SCHEMA', table='B_TABLE')), 0)
+                    self.assertTrue(False)
+                except ProgrammingError:
+                    pass
+
+                self.maxDiff = None
+
+                self.assertEqual(meta.get_index_info(table='NON_EXISTENT'), [])
+
+                self.assertTrue(len(meta.get_index_info(table='DEFAULT_TABLE')) > 1)
+
             finally:
                 cursor.execute('drop table if exists DEFAULT_TABLE')
                 cursor.execute('drop table if exists A_SCHEMA.A_TABLE')
