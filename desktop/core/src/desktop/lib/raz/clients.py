@@ -19,6 +19,7 @@ import logging
 from requests_kerberos import HTTPKerberosAuth
 
 from desktop.conf import RAZ
+from desktop.lib.raz.raz_client import get_raz_client
 from desktop.lib.raz.ranger.clients.ranger_raz_adls import RangerRazAdls
 from desktop.lib.raz.ranger.clients.ranger_raz_s3 import RangerRazS3
 
@@ -28,18 +29,17 @@ LOG = logging.getLogger(__name__)
 
 class S3RazClient():
 
-  def __init__(self, **kwargs):
-    if RAZ.API_AUTHENTICATION.get() == 'kerberos':
-      auth = HTTPKerberosAuth()
-    else:
-      auth = None
+  def get_url(self, action='GET', path=None, perm='read'):
+    c = get_raz_client(
+      raz_url=RAZ.API_URL.get(),
+      username='csso_romain',
+      auth=RAZ.API_AUTHENTICATION.get(),
+      service='s3',
+      service_name='cm_s3',
+      cluster_name='prakashdh62'
+    )
 
-    self.ranger = RangerRazS3(RAZ.API_URL.get(), auth)
-
-  def get_url(self, bucket=None, path=None, perm='read'):
-    # No GET/POST spec?
-    # e.g. get_url('<storage_account?>', '<bucket>', '<relative_path>', 'read')
-    return self.ranger.get_signed_url(bucket, path, perm)
+    return c.check_access(method=action, url=path)
 
 
 class AdlsRazClient():

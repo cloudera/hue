@@ -83,6 +83,8 @@ class RazClient(object):
     self.requestid = str(uuid.uuid4())
 
   def check_access(self, method, url, params=None, headers=None):
+    LOG.debug("Check access: method {%s}, header: {%s}" % (method, headers))
+
     path = lib_urlparse(url)
     url_params = dict([p.split('=') for p in path.query.split('&') if path.query])
     params = params if params is not None else {}
@@ -128,10 +130,11 @@ class RazClient(object):
       }
     }
     headers = {"Content-Type":"application/json", "Accept-Encoding":"gzip,deflate"}
-    rurl = "%s/api/authz/s3/access?delegation=%s" % (self.raz_url, self.raz_token)
+    raz_url = "%s/api/authz/s3/access?delegation=%s" % (self.raz_url, self.raz_token)
+    LOG.debug('Raz url: %s' % raz_url)
 
     LOG.debug("Sending access check headers: {%s} request_data: {%s}" % (headers, request_data))
-    raz_req = requests.post(rurl, headers=headers, json=request_data, verify=False)
+    raz_req = requests.post(raz_url, headers=headers, json=request_data, verify=False)
 
     s3_sign_response = None
     signed_response = None
