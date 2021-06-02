@@ -43,6 +43,7 @@ RUN pip3 install --upgrade --no-cache-dir setuptools virtualenv pip && \
   rm -rf /var/lib/apt/lists/* && \
   cp -r /hue/tools/docker/hue/conf3/* /usr/share/hue/desktop/conf/ && \
   cp /hue/tools/docker/hue/startup.sh /usr/share/hue/startup.sh && \
+  cp /hue/tools/slack/manifest.yml /usr/share/hue/tools/slack/manifest.yml && \
   rm -rf /hue && \
   rm -rf /usr/share/hue/node_modules
 
