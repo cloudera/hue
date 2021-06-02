@@ -658,9 +658,9 @@ def clear_history(request):
   is_notification_manager = request.POST.get('is_notification_manager', 'false') == 'true'
 
   if is_notification_manager:
-    history = Document2.objects.get_tasks_history(user=request.user)
+    history = Document2.objects.get_tasks_history(user=request.user, allow_distinct=False)
   else:
-    history = Document2.objects.get_history(doc_type='query-%s' % doc_type, user=request.user)
+    history = Document2.objects.get_history(doc_type='query-%s' % doc_type, user=request.user, allow_distinct=False)
 
   response['updated'] = history.delete()
   response['message'] = _('History cleared !')

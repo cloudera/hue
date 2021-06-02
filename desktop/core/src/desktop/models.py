@@ -925,7 +925,7 @@ class FilesystemException(Exception):
 
 class Document2QueryMixin(object):
 
-  def documents(self, user, perms='both', include_history=False, include_trashed=False, include_managed=False, include_shared_links=False):
+  def documents(self, user, perms='both', include_history=False, include_trashed=False, include_managed=False, include_shared_links=False, allow_distinct=True):
     """
     Returns all documents that are owned or shared with the user.
     :param perms: both, shared, owned. Defaults to both.
@@ -959,7 +959,10 @@ class Document2QueryMixin(object):
     if not include_trashed:
       docs = docs.exclude(is_trashed=True)
 
-    return docs.defer('description', 'data', 'extra', 'search').distinct().order_by('-last_modified')
+    if allow_distinct:
+      docs = docs.distinct()
+
+    return docs.defer('description', 'data', 'extra', 'search').order_by('-last_modified')
 
 
   def search_documents(self, types=None, search_text=None, order_by=None):
@@ -1028,12 +1031,13 @@ class Document2Manager(models.Manager, Document2QueryMixin):
 
     return latest_doc
 
-  def get_history(self, user, doc_type=None, connector_id=None, include_trashed=False):
+  def get_history(self, user, doc_type=None, connector_id=None, include_trashed=False, allow_distinct=True):
     history = self.documents(
         user,
         perms='owned',
         include_history=True,
-        include_trashed=include_trashed
+        include_trashed=include_trashed,
+        allow_distinct=allow_distinct
     ).filter(is_history=True)
 
     if doc_type is not None:
@@ -1043,13 +1047,14 @@ class Document2Manager(models.Manager, Document2QueryMixin):
 
     return history
 
-  def get_tasks_history(self, user):
+  def get_tasks_history(self, user, allow_distinct=True):
     return self.documents(
         user,
         perms='owned',
         include_history=True,
         include_trashed=False,
-        include_managed=True
+        include_managed=True,
+        allow_distinct=allow_distinct
     ).filter(is_history=True, is_managed=True).exclude(name='pig-app-hue-script').exclude(type='oozie-workflow2')
 
   def get_home_directory(self, user):
