@@ -189,7 +189,7 @@
   function check(event) {
     event.preventDefault();
 
-    const url = 'https://demo.gethue.com/desktop/slack/api/install/?hostname=' + document.getElementById('hostname').value;
+    const url = 'https://demo.gethue.com/api/slack/install/?hostname=' + document.getElementById('hostname').value;
     fetch(url)
       .then(response => response.json())
       .then(response => {
