@@ -246,6 +246,21 @@ class Cursor(object):
             self._connection._id, self._id,
             [self._transform_parameters(p) for p in seq_of_parameters])
 
+    def get_sync_results(self, state):
+        if self._closed:
+            raise ProgrammingError('The cursor is already closed.')
+        if self._id is None:
+            self._set_id(self._connection._client.create_statement(self._connection._id))
+        return self._connection._client.get_sync_results(self._connection._id, self._id, state)
+
+    def fetch(self, signature):
+        if self._closed:
+            raise ProgrammingError('The cursor is already closed.')
+        self._updatecount = -1
+        self._set_signature(signature)
+        frame = self._connection._client.fetch(self._connection._id, self._id, 0, self.itersize)
+        self._set_frame(frame)
+
     def _transform_row(self, row):
         """Transforms a Row into Python values.
 

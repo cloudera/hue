@@ -166,19 +166,45 @@ class PhoenixDialect(DefaultDialect):
     def get_pk_constraint(self, connection, table_name, schema=None, **kw):
         if schema is None:
             schema = ''
-        columns = connection.connect().connection.meta().get_columns(
-            schemaPattern=schema, tableNamePattern=table_name, *kw)
-        pk_columns = [col['COLUMN_NAME'] for col in columns if col['KEY_SEQ'] > 0]
-        return {'constrained_columns': pk_columns}
+        raw = connection.connect().connection.meta().get_primary_keys(
+            schema=schema, table=table_name)
+        cooked = {
+            'constrained_columns': []
+        }
+        if raw:
+            cooked['name'] = raw[0]['PK_NAME']
+            for row in raw:
+                cooked['constrained_columns'].insert(row['KEY_SEQ'] - 1, row['COLUMN_NAME'])
+        return cooked
 
-    def get_indexes(self, conn, table_name, schema=None, **kw):
-        '''This information does not seem to be exposed via Avatica
-        TODO: Implement by directly querying SYSTEM tables ? '''
-        return []
+    def get_indexes(self, connection, table_name, schema=None, **kw):
+        if schema is None:
+            schema = ''
+        raw = connection.connect().connection.meta().get_index_info(schema=schema, table=table_name)
+        # We know that Phoenix returns the rows ordered by INDEX_NAME and ORDINAL_POSITION
+        cooked = []
+        current = None
+        for row in raw:
+            if current is None or row['INDEX_NAME'] != current['name']:
+                current = {
+                    'name': row['INDEX_NAME'],
+                    'unique': not row['NON_UNIQUE'] is False,
+                    'column_names': [],
+                }
+                cooked.append(current)
+            # Phoenix returns the column names in its internal representation here
+            # Remove the default CF prefix
+            canonical_name = row['INDEX_NAME']
+            if canonical_name.startswith('0:'):
+                canonical_name = canonical_name[len(':0')]
+            if canonical_name.startswith(':'):
+                canonical_name = canonical_name[len(':')]
+            current['column_names'].append(canonical_name)
+        return cooked
 
     def get_foreign_keys(self, conn, table_name, schema=None, **kw):
         '''Foreign keys are a foreign concept to Phoenix,
-        but SqlAlchemy cannot parse the DB schema if it's not implemented '''
+        and SqlAlchemy cannot parse the DB schema if it's not implemented '''
         return []
 
     def _map_column(self, raw):
