@@ -58,14 +58,14 @@ necessary requirements::
     python setup.py develop
 
 You can start a Phoenix QueryServer instance on http://localhost:8765 for testing by running
-the following command in the phoenix-queryserver directory::
+the following command in the pohoenix-queryserver-parent directory::
 
     mvn clean verify -am -pl phoenix-queryserver-it -Dtest=foo \
     -Dit.test=QueryServerBasicsIT\#startLocalPQS \
     -Ddo.not.randomize.pqs.port=true -Dstart.unsecure.pqs=true
 
 You can start a secure (https+kerberos) Phoenix QueryServer instance on https://localhost:8765
-for testing by running the following command in the phoenix-queryserver directory::
+for testing by running the following command in the phoenix-queryserver-parent directory::
 
     mvn clean verify -am -pl phoenix-queryserver-it -Dtest=foo \
     -Dit.test=SecureQueryServerPhoenixDBIT\#startLocalPQS \
@@ -77,7 +77,7 @@ up the environment for the tests.
 If you want to use the library without installing the phoenixdb library, you can use
 the `PYTHONPATH` environment variable to point to the library directly::
 
-    cd $PHOENIX_HOME/python
+    cd phoenix-queryserver-parent/python-phoenixdb
     python setup.py build
     cd ~/my_project
     PYTHONPATH=$PHOENIX_HOME/build/lib python my_app.py
@@ -110,8 +110,8 @@ Similarly, tox can be used to run the test suite against multiple Python version
     pyenv global 2.7.14 3.5.5 3.6.4
     PHOENIXDB_TEST_DB_URL='http://localhost:8765' tox
 
-You can use tox and docker to run the tests on all supported python versions without installing the
-environments locally::
+You can use tox and docker to run the tests on supported python versions up to 3.8 without
+installing the environments locally::
 
     docker build -t toxtest .
     docker run --rm  -v `pwd`:/src toxtest
