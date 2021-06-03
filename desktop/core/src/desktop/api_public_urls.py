@@ -18,6 +18,7 @@
 import sys
 
 from desktop import api_public
+from desktop.lib.botserver import api as botserver_api
 
 if sys.version_info[0] > 2:
   from django.urls import re_path
@@ -71,4 +72,9 @@ urlpatterns += [
       api_public.autocomplete,
       name="api_autocomplete_nested",
   ),
+]
+
+# Slack install API for using CORS by default
+urlpatterns = [
+  re_path(r'^slack/install/?$', botserver_api.generate_slack_install_link, name='botserver.api.slack_install_link'),
 ]
