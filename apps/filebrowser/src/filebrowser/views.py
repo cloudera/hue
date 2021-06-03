@@ -258,7 +258,7 @@ def view(request, path):
       return display(request, path)
   except S3FileSystemException as e:
     msg = _("S3 filesystem exception.")
-    if request.is_ajax():
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
       exception = {
         'error': smart_str(e)
       }
@@ -271,7 +271,7 @@ def view(request, path):
     if "Connection refused" in str(e):
       msg += _(" The HDFS REST service is not available. ")
 
-    if request.is_ajax():
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
       exception = {
         'error': msg
       }
@@ -341,7 +341,7 @@ def edit(request, path, form=None):
       breadcrumbs=parse_breadcrumbs(path),
       is_embeddable=request.GET.get('is_embeddable', False),
       show_download_button=SHOW_DOWNLOAD_BUTTON.get())
-  if not request.is_ajax():
+  if not request.headers.get('x-requested-with') == 'XMLHttpRequest':
     data['stats'] = stats;
     data['form'] = form;
   return render("edit.mako", request, data)
@@ -685,7 +685,7 @@ def display(request, path):
     raise PopupException(_("Not a file: '%(path)s'") % {'path': path})
 
   # display inline files just if it's not an ajax request
-  if not request.is_ajax():
+  if not request.headers.get('x-requested-with') == 'XMLHttpRequest':
     if _can_inline_display(path):
       return redirect(reverse('filebrowser:filebrowser_views_download', args=[path]) + '?disposition=inline')
 
@@ -1196,7 +1196,7 @@ def generic_op(form_class, request, op, parameter_names, piggyback=None, templat
         ret["result_error"] = True
 
       ret['user'] = request.user
-      if request.is_ajax():
+      if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         return HttpResponse()
       else:
         return render(template, request, ret)

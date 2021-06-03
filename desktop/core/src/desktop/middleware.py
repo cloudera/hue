@@ -93,7 +93,7 @@ class AjaxMiddleware(MiddlewareMixin):
   GET parameters.
   """
   def process_request(self, request):
-    request.ajax = request.is_ajax() or request.GET.get("format", "") == "json"
+    request.ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest' or request.GET.get("format", "") == "json"
     return None
 
 
@@ -568,7 +568,7 @@ class HtmlValidationMiddleware(MiddlewareMixin):
     return res
 
   def _is_html(self, request, response):
-    return not request.is_ajax() and \
+    return not request.headers.get('x-requested-with') == 'XMLHttpRequest' and \
         'html' in response['Content-Type'] and \
         200 <= response.status_code < 300
 

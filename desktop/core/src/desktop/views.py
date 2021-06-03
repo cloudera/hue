@@ -347,7 +347,7 @@ def threads(request):
   out = string_io()
   dump_traceback(file=out)
 
-  if request.is_ajax():
+  if request.headers.get('x-requested-with') == 'XMLHttpRequest':
     return HttpResponse(out.getvalue(), content_type="text/plain")
   else:
     return render("threads.mako", request, {'text': out.getvalue(), 'is_embeddable': request.GET.get('is_embeddable', False)})
@@ -458,7 +458,7 @@ def serve_500_error(request, *args, **kwargs):
         return django.views.debug.technical_500_response(request, *exc_info)
       else:
         tb = traceback.extract_tb(exc_info[2])
-        if request.is_ajax():
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
           tb = '\n'.join(tb.format())
         return render("500.mako", request, {'traceback': tb})
     else:
