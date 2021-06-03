@@ -123,6 +123,7 @@ To set-up the Hue App, the **Slack workspace admin** needs to follow these few [
 
 After successfully plugging-in the app with Hue, type `hello hue` or `@Hue help` in the Slack channel to get the list of things the app can assist you with.
 
+![SQL Assistant Help GIF](https://cdn.gethue.com/uploads/2021/06/hello_hue.gif)
 
 ### Sharing Query/Gist links
 Users can share query links or gists in the Slack channels where the app is also present which then unfurls giving a rich preview of details about the query for other users to collaborate/discuss with. App also provides the result file for the query in the message thread if the result is available.
@@ -153,7 +154,7 @@ App sends the gist link in the selected channel and leverages the already presen
 
 Simply create a gist, select a channel and share directly from the Editor:
 
-![Share from Editor GIF]()
+![Share from Editor GIF](https://cdn.gethue.com/uploads/2021/06/share_from_editor.gif)
 
 ### Assistance
 
@@ -162,12 +163,12 @@ To suggest users to share query links instead of copy/pasting SQL statements for
 
 In future release, Hue app can improve with better detection and assist more efficiently with detected SQL. For e.g. using parsers to check and extract tables and suggest query optimizations like LIMITS or tables/joins info.
 
-![Detect SQL GIF]()
+![Detect SQL GIF](https://cdn.gethue.com/uploads/2021/06/detect_sql_select.gif)
 
 #### Query Bank
 Type `@Hue queries` in the channel to explore the list of important and most used queries from the latest query bank. This query bank is helpful for sharing complex queries with other users to access.
 
-![Query Bank GIF]()
+![Query Bank GIF](https://cdn.gethue.com/uploads/2021/06/hue_query_bank.gif)
 
 ### Security
 Keeping in mind the security aspect, Slack users needs to be a Hue user to have permission to access the above features from the App. This mapping is currently done by checking Slack users' **email prefix as Hue username** and their **email host is same in Hue instance domain** with which the App is plugged-in.
