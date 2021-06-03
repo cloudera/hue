@@ -41,7 +41,7 @@ def index(request):
       'metric': global_registry().dump_metrics(),
   }
 
-  if request.is_ajax() or request.GET.get("format") == "json":
+  if request.headers.get('x-requested-with') == 'XMLHttpRequest' or request.GET.get("format") == "json":
     return JsonResponse(rep, json_dumps_params={'indent': indent})
   else:
     return render(
