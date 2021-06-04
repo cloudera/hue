@@ -46,7 +46,7 @@ _DEFAULT_USER = DEFAULT_USER.get()
 # FIXME: Should we check hue principal for the default user?
 # FIXME: Caching via username has issues when users get deleted. Need to switch to userid, but bigger change
 def _get_cache_key(fs, identifier, user=_DEFAULT_USER):
-  return fs + ':' + identifier + ':' + user
+  return fs + ':' + identifier + ':' + str(user)
 
 
 def clear_cache():

@@ -107,15 +107,15 @@ class RazS3Connection(SignedUrlS3Connection):
     if isinstance(key, Key):
         key = key.name
     path = self.calling_format.build_path_base(bucket, key)
-    boto.log.debug('path=%s' % path)
+    LOG.debug('path=%s' % path)
     auth_path = self.calling_format.build_auth_path(bucket, key)
-    boto.log.debug('auth_path=%s' % auth_path)
+    LOG.debug('auth_path=%s' % auth_path)
     host = self.calling_format.build_host(self.server_name(), bucket)
     if query_args:
         path += '?' + query_args
-        boto.log.debug('path=%s' % path)
+        LOG.debug('path=%s' % path)
         auth_path += '?' + query_args
-        boto.log.debug('auth_path=%s' % auth_path)
+        LOG.debug('auth_path=%s' % auth_path)
 
     params = {}
     http_request = self.build_base_http_request(method, path, auth_path,
