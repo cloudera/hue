@@ -52,9 +52,11 @@ class TestRazS3Connection():
     with patch('aws.s3.s3connection.S3RazClient.get_url') as get_url:
       with patch('aws.s3.s3connection.RazS3Connection._mexe') as _mexe:
 
-        get_url.return_value = 'https://gethue-test.s3.amazonaws.com/?' + \
-            'AWSAccessKeyId=AKIA23E77ZX2HVY76YGL' + \
-            '&Signature=3lhK%2BwtQ9Q2u5VDIqb4MEpoY3X4%3D&Expires=1617207304'
+        get_url.return_value = {
+            'AWSAccessKeyId': 'AKIA23E77ZX2HVY76YGL',
+            'Signature': '3lhK%2BwtQ9Q2u5VDIqb4MEpoY3X4%3D',
+            'Expires': '1617207304'
+        }
         _mexe.return_value = ['<Bucket: demo-gethue>', '<Bucket: gethue-test>']
 
         client = RazS3Connection(host='s3-us-west-1.amazonaws.com')
@@ -73,12 +75,15 @@ class TestRazS3Connection():
           's3-us-west-1.amazonaws.com:443' if sys.version_info[0] > 2 else 's3-us-west-1.amazonaws.com',
           http_request.host
         )
-        assert_equal(
-          '/?AWSAccessKeyId=AKIA23E77ZX2HVY76YGL&Signature=3lhK%2BwtQ9Q2u5VDIqb4MEpoY3X4%3D&Expires=1617207304',
-          http_request.path
-        )
+        assert_equal('/', http_request.path)
         assert_equal('/', http_request.auth_path)
-        assert_equal({}, http_request.headers )
+        assert_equal({
+            'AWSAccessKeyId': 'AKIA23E77ZX2HVY76YGL',
+            'Signature': '3lhK%2BwtQ9Q2u5VDIqb4MEpoY3X4%3D',
+            'Expires': '1617207304'
+          },
+          http_request.headers
+        )
         assert_equal({}, http_request.params)
         assert_equal('', http_request.body)
 
