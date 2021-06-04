@@ -222,6 +222,8 @@ class HttpClient(object):
     if clear_cookies:
       self._session.cookies.clear()
 
+    request_kwargs['verify'] = self._session.verify
+
     try:
       resp = getattr(self._session, http_method.lower())(url, **request_kwargs)
       if resp.status_code >= 300:
