@@ -14,7 +14,9 @@
   {
     "name": "Escalation Jira analysis",
     "desc": "Investigate quality of escalation responses",
-    "dialects": ["impala"],
+    "dialects": [
+      "impala"
+    ],
     "data": {
       "query": {
         "statement": "SELECT trunc( from_unixtime(cast( createdts / 1000 AS int)), '${bucket}') AS q, -- Q, MONTH\n   count(*) as ct,\n   cast(avg(duration) AS int) avg_day,\n   min(case when cumedist >= 0.33 then duration end) as 33percentile,\n   min(case when cumedist >= 0.50 then duration end) as 50percentile,\n   min(case when cumedist >= 0.80 then duration end) as 80percentile,\n   min(case when cumedist >= 0.90 then duration end) as 90percentile\nFROM\n( select \n    createdts,\n    cast( (resolvedts - createdts) / 1000 / 60 / 60 / 24 AS int) as duration,\n    cume_dist() over (partition by trunc( from_unixtime(cast( createdts / 1000 AS int)), '${bucket}') order by cast( (resolvedts - createdts) / 1000 / 60 / 60 / 24 AS int) asc) as cumedist \n       from jira.ticket \n       WHERE LOWER(componentsasstr) LIKE LOWER('%${component}%')\n        AND resolvedts != 0\n        AND type.value = '${type}'\n        AND createdts >= unix_timestamp('${date}', 'yyyy-MM-dd') * 1000\n        --AND from_unixtime(cast( createdts / 1000 AS int)) >= toun('${date}', 'UTC')\n       -- AND NOT LOWER(title) like '%backport%' \n       -- AND NOT LOWER(title) like '%patch%'\n      ) as t\n\nGROUP BY  q\nORDER BY  q asc\n;"
@@ -24,7 +26,9 @@
   {
     "name": "Escalation Jira analysis: List of escalations",
     "desc": "Investigate quality of escalation responses",
-    "dialects": ["impala"],
+    "dialects": [
+      "impala"
+    ],
     "data": {
       "query": {
         "statement": "SELECT from_unixtime(cast( createdts / 1000 AS int)) as t,\nissuekey,\n       summary, resolutionname, statusname\nFROM jira.ticket\nWHERE LOWER(componentsasstr) LIKE LOWER('%${component}%') --AND resolvedts != 0\n  AND type.value = '${type}'\n  AND createdts >= unix_timestamp('${date}', 'yyyy-MM-dd') * 1000\n  order by createdts desc, issuekey desc\n  ;"
@@ -34,7 +38,9 @@
   {
     "name": "Escalation Jira analysis: TTL before comment, number of comments",
     "desc": "Investigate quality of escalation responses",
-    "dialects": [],
+    "dialects": [
+      "impala"
+    ],
     "data": {
       "query": {
         "statement": "SELECT from_unixtime(cast( createdts / 1000 AS int)) as t,\nissuekey,\n       summary, resolutionname, statusname\nFROM jira.ticket\nWHERE LOWER(componentsasstr) LIKE LOWER('%${component}%') --AND resolvedts != 0\n  AND type.value = '${type}'\n  AND createdts >= unix_timestamp('${date}', 'yyyy-MM-dd') * 1000\n  order by createdts desc, issuekey desc\n  ;"
@@ -45,7 +51,7 @@
     "name": "Escalation Jira analysis: Avg global",
     "desc": "Investigate quality of escalation responses",
     "dialects": [
-      "pheonix"
+      "impala"
     ],
     "data": {
       "query": {
@@ -57,7 +63,7 @@
     "name": "Escalation Jira analysis: Status",
     "desc": "Investigate quality of escalation responses",
     "dialects": [
-      "flink"
+      "impala"
     ],
     "data": {
       "query": {
@@ -69,7 +75,7 @@
     "name": "Jiras with many SFDC tickets",
     "desc": "The objective is to find the JIRAs in Hue where there are multiple SFDC tickets linked",
     "dialects": [
-      "dasksql"
+      "impala"
     ],
     "data": {
       "query": {
