@@ -156,7 +156,7 @@
         }
 
         try {
-          await getConfig(true);
+          await getConfig();
         } catch (err) {
           errorMessage.value = 'Failed loading the Hue config!';
           console.error(err);
