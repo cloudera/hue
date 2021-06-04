@@ -20,6 +20,7 @@ from __future__ import division
 import datetime
 import logging
 import math
+import sys
 
 from django.urls import reverse
 
@@ -88,6 +89,14 @@ def format_duration_in_millis(duration=0):
     output.append("%dm" % minutes)
   output.append("%ds" % seconds)
   return ":".join(output)
+
+def is_ajax(request):
+  if sys.version_info[0] > 2:
+    _is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
+  else:
+    _is_ajax = request.is_ajax()
+  
+  return _is_ajax
 
 def location_to_url(location, strict=True, is_embeddable=False):
   """

@@ -60,6 +60,7 @@ from desktop.lib.django_util import JsonResponse, login_notrequired, render
 from desktop.lib.i18n import smart_str
 from desktop.lib.paths import get_desktop_root
 from desktop.lib.thread_util import dump_traceback
+from desktop.lib.view_util import is_ajax
 from desktop.log.access import access_log_level, access_warn, AccessInfo
 from desktop.log import set_all_debug as _set_all_debug, reset_all_debug as _reset_all_debug, get_all_debug as _get_all_debug
 from desktop.models import Settings, hue_version, _get_apps, UserPreferences
@@ -347,7 +348,7 @@ def threads(request):
   out = string_io()
   dump_traceback(file=out)
 
-  if request.is_ajax():
+  if is_ajax(request):
     return HttpResponse(out.getvalue(), content_type="text/plain")
   else:
     return render("threads.mako", request, {'text': out.getvalue(), 'is_embeddable': request.GET.get('is_embeddable', False)})
@@ -458,7 +459,7 @@ def serve_500_error(request, *args, **kwargs):
         return django.views.debug.technical_500_response(request, *exc_info)
       else:
         tb = traceback.extract_tb(exc_info[2])
-        if request.is_ajax():
+        if is_ajax(request):
           tb = '\n'.join(tb.format())
         return render("500.mako", request, {'traceback': tb})
     else:

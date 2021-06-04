@@ -59,6 +59,7 @@ from desktop.lib import apputil, i18n, fsmanager
 from desktop.lib.django_util import JsonResponse, render, render_json
 from desktop.lib.exceptions import StructuredException
 from desktop.lib.exceptions_renderable import PopupException
+from desktop.lib.view_util import is_ajax
 from desktop.log import get_audit_logger
 from desktop.log.access import access_log, log_page_hit, access_warn
 
@@ -93,7 +94,7 @@ class AjaxMiddleware(MiddlewareMixin):
   GET parameters.
   """
   def process_request(self, request):
-    request.ajax = request.is_ajax() or request.GET.get("format", "") == "json"
+    request.ajax = is_ajax(request) or request.GET.get("format", "") == "json"
     return None
 
 
@@ -568,7 +569,7 @@ class HtmlValidationMiddleware(MiddlewareMixin):
     return res
 
   def _is_html(self, request, response):
-    return not request.is_ajax() and \
+    return not is_ajax(request) and \
         'html' in response['Content-Type'] and \
         200 <= response.status_code < 300
 
