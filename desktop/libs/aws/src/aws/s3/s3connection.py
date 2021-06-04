@@ -59,7 +59,7 @@ class SignedUrlS3Connection(S3Connection):
   Example of a presigned S3 Url declaring a `list all buckets` call:
   https://s3-us-west-1.amazonaws.com/?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA23E77ZX2HVY76YGL%2F20210505%2Fus-west-1%2Fs3%2Faws4_request&X-Amz-Date=20210505T171457Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=994d0ec2ca19a00aa2925fe62cab0e727591b1951a8a47504b2b9124facbd6cf
   """
-  def __init__(self, aws_access_key_id=None, aws_secret_access_key=None,
+  def __init__(self, username, aws_access_key_id=None, aws_secret_access_key=None,
                 is_secure=True, port=None, proxy=None, proxy_port=None,
                 proxy_user=None, proxy_pass=None,
                 host=NoHostProvided, debug=0, https_connection_factory=None,
@@ -67,6 +67,8 @@ class SignedUrlS3Connection(S3Connection):
                 provider='aws', bucket_class=Bucket, security_token=None,
                 suppress_consec_slashes=True, anon=False,
                 validate_certs=None, profile_name=None):
+
+    self.username = username
 
     # No auth handler with RAZ
     anon = RAZ.IS_ENABLED.get() and not IS_SELF_SIGNING_ENABLED.get()
@@ -109,7 +111,6 @@ class RazS3Connection(SignedUrlS3Connection):
     auth_path = self.calling_format.build_auth_path(bucket, key)
     boto.log.debug('auth_path=%s' % auth_path)
     host = self.calling_format.build_host(self.server_name(), bucket)
-    #host = self.calling_format.build_host(self.server_name(), '')  # As using signed Url we keep the same hostname as there
     if query_args:
         path += '?' + query_args
         boto.log.debug('path=%s' % path)
@@ -130,7 +131,6 @@ class RazS3Connection(SignedUrlS3Connection):
     LOG.debug('Raz returned those headers: %s' % headers)
 
     if headers is not None:
-      # We override instead of re-creating an HTTPRequest
       http_request.headers.update(headers)
     else:
       LOG.error('We got back empty header from Raz for the request %s' % http_request)
@@ -142,7 +142,7 @@ class RazS3Connection(SignedUrlS3Connection):
 
 
   def get_signed_url(self, action='GET', url=None):
-    raz_client = S3RazClient()
+    raz_client = S3RazClient(username=self.username)
 
     return raz_client.get_url(action, url)
 

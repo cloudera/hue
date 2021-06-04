@@ -59,7 +59,7 @@ class TestRazS3Connection():
         }
         _mexe.return_value = ['<Bucket: demo-gethue>', '<Bucket: gethue-test>']
 
-        client = RazS3Connection(host='s3-us-west-1.amazonaws.com')
+        client = RazS3Connection(username='test', host='s3-us-west-1.amazonaws.com')
 
         buckets = client.make_request(method='GET', bucket='', key='',)
 
@@ -100,7 +100,7 @@ class TestSelfSignedUrlS3Connection():
               '&Signature=3lhK%2BwtQ9Q2u5VDIqb4MEpoY3X4%3D&Expires=1617207304'
           _mexe.return_value = '[<Bucket: demo-gethue>, <Bucket: gethue-test>]'
 
-          client = SelfSignedUrlS3Connection()
+          client = SelfSignedUrlS3Connection(username='test')
           http_request = Mock(
             path='/gethue/data/customer.csv',
             protocol='https',
