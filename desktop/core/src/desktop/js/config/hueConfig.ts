@@ -47,11 +47,10 @@ type ConnectorTest<T extends keyof InterpreterMap> = (connector: InterpreterMap[
 let lastConfigPromise: Promise<HueConfig> | undefined;
 let lastKnownConfig: HueConfig | undefined;
 
-export const refreshConfig = async (viaApi?: boolean): Promise<HueConfig> => {
+export const refreshConfig = async (): Promise<HueConfig> => {
   lastConfigPromise = new Promise<HueConfig>(async (resolve, reject) => {
     try {
-      const url = viaApi ? URLS.FETCH_CONFIG_API : URLS.FETCH_CONFIG_API_PRIVATE;
-      const apiResponse = await post<HueConfig>(url, {}, { silenceErrors: true });
+      const apiResponse = await post<HueConfig>(URLS.FETCH_CONFIG_API, {}, { silenceErrors: true });
       if (apiResponse.status == 0) {
         lastKnownConfig = apiResponse;
         resolve(lastKnownConfig);
@@ -77,8 +76,7 @@ export const refreshConfig = async (viaApi?: boolean): Promise<HueConfig> => {
 
 export const getLastKnownConfig = (): HueConfig | undefined => lastKnownConfig;
 
-export const getConfig = async (viaApi?: boolean): Promise<HueConfig> =>
-  getLastKnownConfig() || refreshConfig(viaApi);
+export const getConfig = async (): Promise<HueConfig> => getLastKnownConfig() || refreshConfig();
 
 const getInterpreters = <T extends keyof InterpreterMap>(appType: T): InterpreterMap[T][] => {
   if (!lastKnownConfig || !lastKnownConfig.app_config) {
