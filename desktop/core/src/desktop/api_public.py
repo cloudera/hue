@@ -60,13 +60,14 @@ def execute(request, dialect=None):
     params = {
       'statement': django_request.POST.get('statement'),
       'interpreter': '%(type)s' % interpreter,
+      'interpreter_id': '%(type)s' if interpreter['type'].isdigit() else '"%(type)s"' % interpreter,  # When connector off, we expect a string
       'dialect': '%(dialect)s' % interpreter
     }
 
     data = {
-      'notebook': '{"type":"query-%(interpreter)s","snippets":[{"id":%(interpreter)s,"statement_raw":"","type":"%(interpreter)s","status":"","variables":[]}],'
+      'notebook': '{"type":"query-%(interpreter)s","snippets":[{"id":%(interpreter_id)s,"statement_raw":"","type":"%(interpreter)s","status":"","variables":[]}],'
         '"name":"","isSaved":false,"sessions":[]}' % params,
-      'snippet': '{"id":1,"type":"%(interpreter)s","result":{},"statement":"%(statement)s","properties":{}}' % params
+      'snippet': '{"id":%(interpreter_id)s,"type":"%(interpreter)s","result":{},"statement":"%(statement)s","properties":{}}' % params
     }
 
     django_request.POST = QueryDict(mutable=True)
