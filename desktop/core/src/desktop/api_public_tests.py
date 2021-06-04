@@ -16,13 +16,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import sys
+
 from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal, assert_raises
 from django.urls import reverse
 
+from desktop.api_public import get_django_request
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
 
 from useradmin.models import User
+
+if sys.version_info[0] > 2:
+  from unittest.mock import patch, Mock, MagicMock
+else:
+  from mock import patch, Mock, MagicMock
 
 
 class TestEditorApi():
@@ -39,3 +47,13 @@ class TestEditorApi():
 
   def test_urls_exist(self):
     assert_equal(reverse('api:editor_execute', args=['hive']), '/api/editor/execute/hive')
+
+
+  def test_get_django_request(self):
+    request = Mock()
+
+    django_request = get_django_request(request)
+
+    assert_true(
+      hasattr(django_request.user, 'has_hue_permission')
+    )
