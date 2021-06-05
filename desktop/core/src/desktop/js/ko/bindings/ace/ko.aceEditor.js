@@ -17,6 +17,7 @@
 import $ from 'jquery';
 import * as ko from 'knockout';
 import ace from 'ext/aceHelper';
+import { format } from '@gethue/sql-formatter';
 
 import AceLocationHandler, {
   REFRESH_STATEMENT_LOCATIONS_EVENT
@@ -519,37 +520,16 @@ registerBinding(NAME, {
         mac: 'Command-i|Ctrl-i|Ctrl-Shift-f|Command-Shift-f|Ctrl-Shift-l|Cmd-Shift-l'
       },
       exec: function () {
-        if (
-          [
-            'ace/mode/hive',
-            'ace/mode/impala',
-            'ace/mode/sql',
-            'ace/mode/mysql',
-            'ace/mode/pgsql',
-            'ace/mode/sqlite',
-            'ace/mode/oracle'
-          ].indexOf(snippet.getAceMode()) > -1
-        ) {
-          $.post(
-            '/notebook/api/format',
-            {
-              statements:
-                editor.getSelectedText() !== '' ? editor.getSelectedText() : editor.getValue()
-            },
-            data => {
-              if (data.status === 0) {
-                if (editor.getSelectedText() !== '') {
-                  editor.session.replace(
-                    editor.session.selection.getRange(),
-                    data.formatted_statements
-                  );
-                } else {
-                  editor.setValue(data.formatted_statements);
-                  snippet.statement_raw(removeUnicodes(editor.getValue()));
-                }
-              }
-            }
-          );
+        const formatted_statements = format(
+          editor.getSelectedText() !== '' ? editor.getSelectedText() : editor.getValue(),
+          { uppercase: true, linesBetweenQueries: 2, indentQuerySeparator: true }
+        );
+
+        if (editor.getSelectedText() !== '') {
+          editor.session.replace(editor.session.selection.getRange(), formatted_statements);
+        } else {
+          editor.setValue(formatted_statements);
+          snippet.statement_raw(removeUnicodes(editor.getValue()));
         }
       }
     });
