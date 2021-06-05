@@ -55,7 +55,7 @@
           <div class="modal-instance">
             <a class="btn type--uppercase modal-trigger" href="#">
               <span class="btn__text">
-                &#9654; Watch Overview
+                &#9654; Open Sql Scratchpad
               </span>
             </a>
             <br />
@@ -63,8 +63,10 @@
             <br />
             <div class="modal-container">
               <div class="modal-content bg-dark" data-width="60%" data-height="60%">
-                <iframe title="vimeo-player" src="https://player.vimeo.com/video/275808384" width="640" height="360"
-                  frameborder="0" allowfullscreen></iframe>
+                <div style="position: absolute; height: 100%; width: 100%">
+                  <sql-scratchpad api-url="https://demo.gethue.com" username="demo" password="demo" dialect="mysql" />
+                </div>
+                <a href="{{ .Site.Params.docsHost }}/developer/components/scratchpad/">Learn More »</a>
               </div>
               <!--end of modal-content-->
             </div>
@@ -91,11 +93,7 @@
             <p class="lead">
               Hue brings the best
               <a href="{{ .Site.Params.docsHost }}/user/querying/">Querying Experience</a>
-              with the most intelligent autocompletes, query sharing, result charting and download
-              for any database. Enable more of your employees to level-up and perform self service analytics like
-              <a href="/self-service-bi-doing-a-customer-360-by-querying-and-joining-salesforce-marketing-and-log-datasets/"
-                target="_blank">Customer 360s</a>
-              .
+              with the most intelligent Autocompletes and Query Editor components.
             </p>
             <a href="{{ .Site.Params.docsHost }}/user/concept">Learn More »</a>
           </div>
@@ -115,12 +113,11 @@
             <p class="lead">
               Pick one of the multiple interpreters for
               <a href="{{ .Site.Params.docsHost }}/administrator/configuration/connectors/#apache-hive">Apache Hive</a>,
-              <a href="{{ .Site.Params.docsHost }}/administrator/configuration/connectors/#apache-impala">Apache
-                Impala</a>,
+              <a href="{{ .Site.Params.docsHost }}/administrator/configuration/connectors/#apache-impala">
+                Apache Impala
+              </a>,
               <a href="{{ .Site.Params.docsHost }}/administrator/configuration/connectors/#presto">Presto</a>
-              and all the others too: MySQL,
               <a href="/blog/tutorial-query-live-data-stream-with-flink-sql/">Apache Flink SQL</a>,
-              Oracle,
               <a href="/blog/querying-spark-sql-with-spark-thrift-server-and-hue-editor/">SparkSQL</a>,
               <a href="/sql-querying-apache-hbase-with-apache-phoenix/">Apache Phoenix</a>,
               <a href="/blog/tutorial-query-live-data-stream-with-kafka-sql/">ksqlDB</a>,
@@ -166,17 +163,12 @@
           <div class="switchable__text">
             <h2>Install the Slack App!</h2>
             <p class="lead">
-              Assist users with their SQL queries and leverage different
-              <a href="{{ .Site.Params.docsHost }}/user/concept/#slack">features</a>
-              such as rich preview for links, sharing from Editor etc. directly in Slack.
-              <br /> Give your Hue hostname below and
-              <a href="{{ .Site.Params.docsHost }}/administrator/configuration/server/#manual-slack-app-installation">install</a>
-              it in your workspace within seconds...
+              Assist users with their SQL queries and leverage rich preview for links, sharing from Editor etc. directly in Slack.
             </p>
             <form autocomplete="off" onsubmit="return check(event)">
-              <input type="text" id="hostname" placeholder="Your hue hostname (e.g. hue.gethue.com:8000)"
+              <input type="text" id="hostname" placeholder="Your Hue hostname (e.g. hue.gethue.com:8000)"
                 required></input>
-              <button type="submit" class="btn btn--primary btn--lg type--uppercase">Create SQL Assistant</button>
+              <button type="submit" class="btn btn--primary btn--lg type--uppercase">Install</button>
             </form>
             <br /><a href="{{ .Site.Params.docsHost }}/user/concept/#slack">Learn More »</a>
           </div>
@@ -185,6 +177,7 @@
     </div>
   </section>
 </div>
+<script type="text/javascript" src="https://cdn.gethue.com/components/SqlScratchpadWebComponent.js"></script>
 <script>
   function check(event) {
     event.preventDefault();
