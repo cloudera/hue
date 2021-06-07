@@ -776,7 +776,7 @@ By default Hue stores the [saved documents](/user/concept/#documents) in its dat
 ## Slack
 Currently in **Beta**
 
-This [integration](/user/concept/#share-to-slack) helps users to have better collaboration with others via Slack.
+This [integration](/user/concept/#slack) with Hue helps users by assisting them with their SQL queries and have better collaboration/discussion with other users via Slack.
 
 ### Architectural View
 ![Share to Slack Architecture](https://cdn.gethue.com/uploads/2021/04/share_to_slack_architecture.png)
@@ -785,11 +785,20 @@ One of the flows for sharing query/gist links, the main bot logic lies on top of
 
 The 'Smart Quering Assistance' block on top of Hue server which driving the other flow for SQL Assistance is currently a work in progress for replying to users asking questions on how to find certain data tables or to query them.
 
+### Improved Slack App Installation
+Steps to be followed by the **Slack workspace admin** to set up their own Hue Slack app. The app needs to be created only once, other Hue users can simply [interact](/user/concept/#slack) with the App in the Slack channels!
+
+- Go to https://gethue.com/ and in the last section, give your **Hue instance hostname** _(e.g. hue.gethue.com:8000)_.
+- Choose the Slack workspace where you want to install the app and click **Next**.
+- You can review the configuration and simply click **Create**.
+- Once the app is created, install it in the workspace and plug-it with Hue by following this [last step](/administrator/configuration/server/#updating-your-hueini-config-file).
+
+![Easier Installation GIF](https://cdn.gethue.com/uploads/2021/06/easier_installation_slack.gif)
+
 ### Manual Slack App Installation
-Steps to be followed by the Slack workspace admin to set up their own Hue Slack app. The app needs to be created only once, other Hue users can simply [interact](/user/concept/#share-to-slack) with the App in the Slack channels!
 
 #### App Manifest (YAML)
-The latest version of the manifest file is checked-in [here](https://github.com/cloudera/hue/blob/master/tools/slack/manifest.yml)
+The latest version of the manifest file is checked-in [here](https://github.com/cloudera/hue/blob/master/tools/slack/manifest.yml).
 
 #### Changes needed in the YAML Manifest
 Update the two _demo.gethue.com_ with **your Hue instance hostname:**
@@ -798,7 +807,7 @@ Update the two _demo.gethue.com_ with **your Hue instance hostname:**
 
 #### Creating your app
 1. Go to https://api.slack.com/apps and click **Create New App**.
-2. Choose **From an app manifest** option and workspace that you'll be installing the app and click **Next**.
+2. Choose **From an app manifest** option and workspace where you want to install the app and click **Next**.
 3. Choose **YAML** and paste the Manifest code (make sure you do the necessary changes mentioned above) and click **Next**.
 4. Read the review summary and if everything’s correct, click **Create**.
 5. Once the app is created, install it in the workspace.
@@ -813,4 +822,4 @@ Update the two _demo.gethue.com_ with **your Hue instance hostname:**
         slack_verification_token=<your-slack-verification-token>
         slack_bot_user_token=<your-slack-bot-user-token>
 
-Now add the Slack app in your desired channels and send some [query/gist links](/user/concept/#share-to-slack)!
+Now add the Slack app in your desired channels and send some [query/gist links](/user/concept/#slack).
