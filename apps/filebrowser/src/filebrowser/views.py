@@ -47,6 +47,7 @@ from django.utils.html import escape
 from aws.s3.s3fs import S3FileSystemException, S3ListAllBucketsException, get_s3_home_directory
 from desktop import appmanager
 from desktop.auth.backend import is_admin
+from desktop.lib import fsmanager
 from desktop.lib import i18n
 from desktop.lib.conf import coerce_bool
 from desktop.lib.django_util import render, format_preserving_redirect
@@ -208,6 +209,12 @@ def view(request, path):
   decoded_path = unquote_url(path)
   if path != decoded_path:
     path = decoded_path
+
+  if request.path.startswith('/api/') and request.fs is None:
+    request.fs = fsmanager.get_filesystem(request.fs_ref)
+
+    if request.user.is_authenticated and request.fs is not None:
+      request.fs.setuser(request.user.username)
 
   # default_abfs_home is set in jquery.filechooser.js
   if 'default_abfs_home' in request.GET:
@@ -451,6 +458,7 @@ def listdir(request, path):
   data['files'] = [_massage_stats(request, stat_absolute_path(path, stat)) for stat in stats]
   return render('listdir.mako', request, data)
 
+
 def _massage_page(page, paginator):
   try:
     prev_num = page.previous_page_number()
@@ -516,7 +524,6 @@ def listdir_paged(request, path):
   except S3ListAllBucketsException as e:
     s3_listing_not_allowed = str(e)
     all_stats = []
-
 
   # Filter first
   filter_str = request.GET.get('filter', None)
@@ -595,6 +602,7 @@ def listdir_paged(request, path):
       's3_listing_not_allowed': s3_listing_not_allowed
   }
   return render('listdir.mako', request, data)
+
 
 def scheme_absolute_path(root, path):
   splitPath = lib_urlparse(path)
