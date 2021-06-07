@@ -42,7 +42,7 @@ urlpatterns += [
   re_path(r'^editor/create_notebook/?$', api_public.create_notebook, name='api_create_notebook'),
   re_path(r'^editor/create_session/?$', api_public.create_session, name='api_create_session'),
   re_path(r'^editor/close_session/?$', api_public.close_session, name='api_close_session'),
-  re_path(r'^editor/execute(?:/(?P<dialect>.+))?/?$', api_public.execute, name='api_execute'),
+  re_path(r'^editor/execute(?:/(?P<dialect>.+))?/?$', api_public.execute, name='editor_execute'),
   re_path(r'^editor/check_status/?$', api_public.check_status, name='api_check_status'),
   re_path(r'^editor/fetch_result_data/?$', api_public.fetch_result_data, name='api_fetch_result_data'),
   re_path(r'^editor/fetch_result_metadata/?$', api_public.fetch_result_metadata, name='api_fetch_result_metadata'),
@@ -75,6 +75,6 @@ urlpatterns += [
 ]
 
 # Slack install API for using CORS by default
-urlpatterns = [
+urlpatterns += [
   re_path(r'^slack/install/?$', botserver_api.generate_slack_install_link, name='botserver.api.slack_install_link'),
 ]

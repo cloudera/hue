@@ -41,10 +41,11 @@ def test_http_error_rest_exception():
 
 class MockedSession(object):
 
-  def __init__(self, cookies=None):
+  def __init__(self, cookies=None, verify=True):
     self.cookies = cookies or {}
+    self.verify = verify
 
-  def put(self, relpath=None, params=None, data=None, contenttype=None, allow_redirects=False, clear_cookies=False, timeout=REST_CONN_TIMEOUT.get()):
+  def put(self, relpath=None, params=None, data=None, verify=True, contenttype=None, allow_redirects=False, clear_cookies=False, timeout=REST_CONN_TIMEOUT.get()):
     return MockedResponse()
 
 

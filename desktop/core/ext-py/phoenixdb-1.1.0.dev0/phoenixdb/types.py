@@ -221,10 +221,11 @@ JDBC_TO_REP = dict([
     (-16, common_pb2.STRING),  # LONGNVARCHAR
     (2011, common_pb2.STRING),  # NCLOB
     (2009, common_pb2.STRING),  # SQLXML
+    # Returned by Avatica for Arrays in EMPTY resultsets
+    (2000, common_pb2.BYTE_STRING)  # JAVA_OBJECT
     # These are defined by JDBC, but cannot be mapped
     # NULL
     # OTHER
-    # JAVA_OBJECT
     # DISTINCT
     # STRUCT
     # ARRAY 2003 - We are handling this as a special case

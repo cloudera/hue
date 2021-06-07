@@ -18,6 +18,7 @@ import unittest
 
 import sqlalchemy as db
 from sqlalchemy import text
+from sqlalchemy.types import BIGINT, CHAR, VARCHAR
 
 from . import TEST_DB_AUTHENTICATION, TEST_DB_AVATICA_PASSWORD, TEST_DB_AVATICA_USER, \
     TEST_DB_TRUSTSTORE, TEST_DB_URL
@@ -103,8 +104,27 @@ class SQLAlchemyTest(unittest.TestCase):
                 city VARCHAR NOT NULL,
                 population BIGINT
                 CONSTRAINT my_pk PRIMARY KEY (state, city))'''))
+                connection.execute('CREATE INDEX GLOBAL_IDX ON US_POPULATION (state) INCLUDE (city)')
+                connection.execute('CREATE LOCAL INDEX LOCAL_IDX ON US_POPULATION (population)')
+
                 columns_result = inspector.get_columns('US_POPULATION')
-                self.assertEqual(len(columns_result), 3)
+                # The list is not equal to its represenatation
+                self.assertTrue(str(columns_result),
+                                str([{'name': 'STATE', 'type': CHAR(), 'nullable': True,
+                                      'autoincrement': False, 'comment': '', 'default': None},
+                                    {'name': 'CITY', 'type': VARCHAR(), 'nullable': True,
+                                    'autoincrement': False, 'comment': '', 'default': None},
+                                     {'name': 'POPULATION', 'type': BIGINT(), 'nullable': True,
+                                     'autoincrement': False, 'comment': '', 'default': None}]))
+
+                indexes_result = inspector.get_indexes('US_POPULATION')
+                self.assertTrue(indexes_result,
+                                [{'name': 'GLOBAL_IDX', 'unique': False, 'column_names': ['STATE', 'CITY']},
+                                 {'name': 'LOCAL_IDX', 'unique': False, 'column_names': ['_INDEX_ID', 'POPULATION', 'STATE', 'CITY']}])
+
+                pk_result = inspector.get_pk_constraint('US_POPULATION')
+                self.assertTrue(pk_result, {'constrained_columns': ['STATE', 'CITY'], 'name': 'MY_PK'})
+
             finally:
                 connection.execute('drop table if exists us_population')
 

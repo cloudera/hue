@@ -23,6 +23,7 @@ from django.views.decorators.http import require_GET
 
 from desktop.lib.django_util import JsonResponse, login_notrequired, render
 from desktop.lib.metrics.registry import global_registry
+from desktop.lib.view_util import is_ajax
 
 
 LOG = logging.getLogger(__name__)
@@ -41,7 +42,7 @@ def index(request):
       'metric': global_registry().dump_metrics(),
   }
 
-  if request.is_ajax() or request.GET.get("format") == "json":
+  if is_ajax(request) or request.GET.get("format") == "json":
     return JsonResponse(rep, json_dumps_params={'indent': indent})
   else:
     return render(

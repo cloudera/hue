@@ -350,6 +350,8 @@ class TypesTest(DatabaseTestCase):
     def test_array(self):
         self.createTable("phoenixdb_test_tbl1", "CREATE TABLE {table} (id integer primary key, val integer[])")
         with self.conn.cursor() as cursor:
+            cursor.execute("SELECT id, val FROM phoenixdb_test_tbl1 ORDER BY id")
+            self.assertEqual(cursor.fetchall(), [])
             cursor.execute("UPSERT INTO phoenixdb_test_tbl1 VALUES (1, ARRAY[1, 2])")
             cursor.execute("UPSERT INTO phoenixdb_test_tbl1 VALUES (2, ?)", [[2, 3]])
             cursor.execute("UPSERT INTO phoenixdb_test_tbl1 VALUES (3, ?)", [[4]])

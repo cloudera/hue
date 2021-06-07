@@ -58,6 +58,7 @@ from desktop.lib.i18n import smart_str
 from desktop.lib.paths import SAFE_CHARACTERS_URI, SAFE_CHARACTERS_URI_COMPONENTS
 from desktop.lib.tasks.compress_files.compress_utils import compress_files_in_hdfs
 from desktop.lib.tasks.extract_archive.extract_utils import extract_archive_in_hdfs
+from desktop.lib.view_util import is_ajax
 from desktop.views import serve_403_error
 from hadoop.core_site import get_trash_interval
 from hadoop.fs.hadoopfs import Hdfs
@@ -258,7 +259,7 @@ def view(request, path):
       return display(request, path)
   except S3FileSystemException as e:
     msg = _("S3 filesystem exception.")
-    if request.is_ajax():
+    if is_ajax(request):
       exception = {
         'error': smart_str(e)
       }
@@ -271,7 +272,7 @@ def view(request, path):
     if "Connection refused" in str(e):
       msg += _(" The HDFS REST service is not available. ")
 
-    if request.is_ajax():
+    if is_ajax(request):
       exception = {
         'error': msg
       }
@@ -341,9 +342,9 @@ def edit(request, path, form=None):
       breadcrumbs=parse_breadcrumbs(path),
       is_embeddable=request.GET.get('is_embeddable', False),
       show_download_button=SHOW_DOWNLOAD_BUTTON.get())
-  if not request.is_ajax():
-    data['stats'] = stats;
-    data['form'] = form;
+  if not is_ajax(request):
+    data['stats'] = stats
+    data['form'] = form
   return render("edit.mako", request, data)
 
 def save_file(request):
@@ -685,7 +686,7 @@ def display(request, path):
     raise PopupException(_("Not a file: '%(path)s'") % {'path': path})
 
   # display inline files just if it's not an ajax request
-  if not request.is_ajax():
+  if not is_ajax(request):
     if _can_inline_display(path):
       return redirect(reverse('filebrowser:filebrowser_views_download', args=[path]) + '?disposition=inline')
 
@@ -1196,7 +1197,7 @@ def generic_op(form_class, request, op, parameter_names, piggyback=None, templat
         ret["result_error"] = True
 
       ret['user'] = request.user
-      if request.is_ajax():
+      if is_ajax(request):
         return HttpResponse()
       else:
         return render(template, request, ret)

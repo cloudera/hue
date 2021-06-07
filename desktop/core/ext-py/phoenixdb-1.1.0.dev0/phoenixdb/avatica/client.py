@@ -310,6 +310,16 @@ class AvaticaClient(object):
         response.ParseFromString(response_data)
         return response
 
+    def get_sync_results(self, connection_id, statement_id, state):
+        request = requests_pb2.SyncResultsRequest()
+        request.connection_id = connection_id
+        request.statement_id = statement_id
+        request.state.CopyFrom(state)
+        response_data = self._apply(request, 'SyncResultsResponse')
+        syncResultResponse = responses_pb2.SyncResultsResponse()
+        syncResultResponse.ParseFromString(response_data)
+        return syncResultResponse
+
     def connection_sync_dict(self, connection_id, connProps=None):
         conn_props = self.connection_sync(connection_id, connProps)
         return {

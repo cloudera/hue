@@ -45,7 +45,7 @@ def _make_client(identifier, user):
 
   if RAZ.IS_ENABLED.get() and not aws_conf.IS_SELF_SIGNING_ENABLED.get():
     host = client_conf.HOST.get()
-    s3_client = RazS3Connection(host=host)  # Note: Remaining AWS configuration is fully skipped
+    s3_client = RazS3Connection(username=user.username, host=host)  # Note: Remaining AWS configuration is fully skipped
     s3_client_expiration = None
   else:
     s3_client_builder = Client.from_config(client_conf, get_credential_provider(identifier, user))

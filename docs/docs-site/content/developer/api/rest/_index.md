@@ -11,7 +11,16 @@ Users authenticate with the same credentials as they would do in the Browser log
 
 ## Quickstart
 
-The API can be called directly via REST. Some JavaScript and Python wrappers are not documented yet.
+The API can be called directly via REST. Some calls, JavaScript and Python wrappers are not fully documented yet.
+
+Default content type is form data, e.g.:
+
+    -H "Content-Type: application/x-www-form-urlencoded" -d 'username=demo&password=demo'
+
+It is possible to submit data in JSON format:
+
+    -H "Content-Type: application/json" -d '{"username": "demo", "password": "demo"}'
+
 
 ### Curl
 
@@ -107,10 +116,6 @@ The API only supports JWT but users need to provide the credentials they are usi
     [21/May/2021 16:26:46 -0700] middleware   INFO     Redirecting to login page: /notebook/execute/v1/create_notebook
     [21/May/2021 16:26:46 -0700] access       INFO     127.0.0.1 -anon- - "POST /notebook/execute/v1/create_notebook HTTP/1.1" - (mem: 172mb)-- login redirection
     [21/May/2021 16:26:46 -0700] access       INFO     127.0.0.1 -anon- - "POST /notebook/execute/v1/create_notebook HTTP/1.1" returned in 4ms 302 0
-
-It is possible to submit data in **JSON format**:
-
-    -H "Content-Type: application/json" -d '{"username": "demo", "password": "demo"}'
 
 ### Authenticate
 
