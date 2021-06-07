@@ -74,6 +74,10 @@ urlpatterns += [
   ),
 ]
 
+urlpatterns += [
+  re_path(r'^storage/view=(?P<path>.*)$', api_public.view, name='api_storage_view'),
+]
+
 # Slack install API for using CORS by default
 urlpatterns += [
   re_path(r'^slack/install/?$', botserver_api.generate_slack_install_link, name='botserver.api.slack_install_link'),
