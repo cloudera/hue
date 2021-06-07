@@ -19,7 +19,7 @@
     ],
     "data": {
       "query": {
-        "statement": "SELECT trunc( from_unixtime(cast( createdts / 1000 AS int)), '${bucket}') AS q, -- Q, MONTH\n   count(*) as ct,\n   cast(avg(duration) AS int) avg_day,\n   min(case when cumedist >= 0.33 then duration end) as 33percentile,\n   min(case when cumedist >= 0.50 then duration end) as 50percentile,\n   min(case when cumedist >= 0.80 then duration end) as 80percentile,\n   min(case when cumedist >= 0.90 then duration end) as 90percentile\nFROM\n( select \n    createdts,\n    cast( (resolvedts - createdts) / 1000 / 60 / 60 / 24 AS int) as duration,\n    cume_dist() over (partition by trunc( from_unixtime(cast( createdts / 1000 AS int)), '${bucket}') order by cast( (resolvedts - createdts) / 1000 / 60 / 60 / 24 AS int) asc) as cumedist \n       from jira.ticket \n       WHERE LOWER(componentsasstr) LIKE LOWER('%${component}%')\n        AND resolvedts != 0\n        AND type.value = '${type}'\n        AND createdts >= unix_timestamp('${date}', 'yyyy-MM-dd') * 1000\n        --AND from_unixtime(cast( createdts / 1000 AS int)) >= toun('${date}', 'UTC')\n       -- AND NOT LOWER(title) like '%backport%' \n       -- AND NOT LOWER(title) like '%patch%'\n      ) as t\n\nGROUP BY  q\nORDER BY  q asc\n;"
+        "statement": "SELECT trunc( from_unixtime(cast( createdts / 1000 AS int)), '${bucket=MONTH}') AS q, -- Q, MONTH\n   count(*) as ct,\n   cast(avg(duration) AS int) avg_day,\n   min(case when cumedist >= 0.33 then duration end) as 33percentile,\n   min(case when cumedist >= 0.50 then duration end) as 50percentile,\n   min(case when cumedist >= 0.80 then duration end) as 80percentile,\n   min(case when cumedist >= 0.90 then duration end) as 90percentile\nFROM\n( select \n    createdts,\n    cast( (resolvedts - createdts) / 1000 / 60 / 60 / 24 AS int) as duration,\n    cume_dist() over (partition by trunc( from_unixtime(cast( createdts / 1000 AS int)), '${bucket=MONTH}') order by cast( (resolvedts - createdts) / 1000 / 60 / 60 / 24 AS int) asc) as cumedist \n       from jira.ticket \n       WHERE LOWER(componentsasstr) LIKE LOWER('%${component=Hue}%')\n        AND resolvedts != 0\n        AND type.value = '${type=Escalation}'\n        AND createdts >= unix_timestamp('${date=2017-01-01}', 'yyyy-MM-dd') * 1000\n        --AND from_unixtime(cast( createdts / 1000 AS int)) >= toun('${date=2017-01-01}', 'UTC')\n       -- AND NOT LOWER(title) like '%backport%' \n       -- AND NOT LOWER(title) like '%patch%'\n      ) as t\n\nGROUP BY  q\nORDER BY  q asc\n;"
       }
     }
   },
@@ -31,7 +31,7 @@
     ],
     "data": {
       "query": {
-        "statement": "SELECT from_unixtime(cast( createdts / 1000 AS int)) as t,\nissuekey,\n       summary, resolutionname, statusname\nFROM jira.ticket\nWHERE LOWER(componentsasstr) LIKE LOWER('%${component}%') --AND resolvedts != 0\n  AND type.value = '${type}'\n  AND createdts >= unix_timestamp('${date}', 'yyyy-MM-dd') * 1000\n  order by createdts desc, issuekey desc\n  ;"
+        "statement": "SELECT from_unixtime(cast( createdts / 1000 AS int)) as t,\nissuekey,\n       summary, resolutionname, statusname\nFROM jira.ticket\nWHERE LOWER(componentsasstr) LIKE LOWER('%${component=Hue}%') --AND resolvedts != 0\n  AND type.value = '${type=Escalation}'\n  AND createdts >= unix_timestamp('${date=2017-01-01}', 'yyyy-MM-dd') * 1000\n  order by createdts desc, issuekey desc\n  ;"
       }
     }
   },
@@ -43,7 +43,7 @@
     ],
     "data": {
       "query": {
-        "statement": "SELECT from_unixtime(cast( createdts / 1000 AS int)) as t,\nissuekey,\n       summary, resolutionname, statusname\nFROM jira.ticket\nWHERE LOWER(componentsasstr) LIKE LOWER('%${component}%') --AND resolvedts != 0\n  AND type.value = '${type}'\n  AND createdts >= unix_timestamp('${date}', 'yyyy-MM-dd') * 1000\n  order by createdts desc, issuekey desc\n  ;"
+        "statement": "SELECT from_unixtime(cast( createdts / 1000 AS int)) as t,\nissuekey,\n       summary, resolutionname, statusname\nFROM jira.ticket\nWHERE LOWER(componentsasstr) LIKE LOWER('%${component=Hue}%') --AND resolvedts != 0\n  AND type.value = '${type=Escalation}'\n  AND createdts >= unix_timestamp('${date=2017-01-01}', 'yyyy-MM-dd') * 1000\n  order by createdts desc, issuekey desc\n  ;"
       }
     }
   },
@@ -55,7 +55,7 @@
     ],
     "data": {
       "query": {
-        "statement": "SELECT \n avg(tToFirstComment),\n avg(comments)\nFROM (SELECT t.issuekey,\n       t.summary,\n (min(v.createdts) - t.createdts) / 1000 / 60 / 60 / 24 AS tToFirstComment,\n count(v.id) AS comments\nFROM jira.ticket t,\n     t.comments v\nWHERE LOWER(componentsasstr) LIKE LOWER('%${component}%') --AND resolvedts != 0\nfrom_unixtime(cast(t.createdts / 1000 AS int)) >= '${date}'\n  AND type.value = '${type}'\n  AND from_unixtime(cast(t.createdts / 1000 AS int)) >= '${date}'\n  AND NOT LOWER(title) LIKE '%backport%'\nGROUP BY t.issuekey,\n         t.summary,\n         t.createdts,\n         t.resolvedts\n) as c;"
+        "statement": "SELECT \n avg(tToFirstComment),\n avg(comments)\nFROM (SELECT t.issuekey,\n       t.summary,\n (min(v.createdts) - t.createdts) / 1000 / 60 / 60 / 24 AS tToFirstComment,\n count(v.id) AS comments\nFROM jira.ticket t,\n     t.comments v\nWHERE LOWER(componentsasstr) LIKE LOWER('%${component=Hue}%') --AND resolvedts != 0\nfrom_unixtime(cast(t.createdts / 1000 AS int)) >= '${date=2017-01-01}'\n  AND type.value = '${type=Escalation}'\n  AND from_unixtime(cast(t.createdts / 1000 AS int)) >= '${date=2017-01-01}'\n  AND NOT LOWER(title) LIKE '%backport%'\nGROUP BY t.issuekey,\n         t.summary,\n         t.createdts,\n         t.resolvedts\n) as c;"
       }
     }
   },
@@ -67,7 +67,7 @@
     ],
     "data": {
       "query": {
-        "statement": "SELECT t.resolutionname,\n       count(*) AS ct\nFROM jira.ticket t\nWHERE LOWER(componentsasstr) LIKE LOWER('%${component}%') --AND resolvedts != 0\n\n  AND type.value = '${type}'\n  AND from_unixtime(cast(t.createdts / 1000 AS int)) >= '${date}'\n  AND NOT LOWER(title) LIKE '%backport%'\nGROUP BY t.resolutionname\nORDER BY ct DESC\nLIMIT 100;"
+        "statement": "SELECT t.resolutionname,\n       count(*) AS ct\nFROM jira.ticket t\nWHERE LOWER(componentsasstr) LIKE LOWER('%${component=Hue}%') --AND resolvedts != 0\n\n  AND type.value = '${type=Escalation}'\n  AND from_unixtime(cast(t.createdts / 1000 AS int)) >= '${date=2017-01-01}'\n  AND NOT LOWER(title) LIKE '%backport%'\nGROUP BY t.resolutionname\nORDER BY ct DESC\nLIMIT 100;"
       }
     }
   },
@@ -79,7 +79,7 @@
     ],
     "data": {
       "query": {
-        "statement": "SELECT sfdc.jira__c.name ID,\n        sfdc.jira__c.jira_summary__c DESCR,\n         count(jira__c.name) AS TICKETS\nFROM sfdc.cases, sfdc.jira__c, jira.ticket\nWHERE upper(sfdc.cases.component__c) IN ('${component}')\n        AND sfdc.jira__c.case__c = sfdc.cases.id\n        AND jira.ticket.issuekey = sfdc.jira__c.name\n        AND jira.ticket.statusname NOT IN ('Resolved', 'Closed')\n        AND sfdc.jira__c.name NOT LIKE 'CLR%'\nGROUP BY jira__c.name, jira__c.jira_summary__c\nHAVING count(jira__c.name) > 1\nORDER BY count(jira__c.name) DESC\n;"
+        "statement": "SELECT sfdc.jira__c.name ID,\n        sfdc.jira__c.jira_summary__c DESCR,\n         count(jira__c.name) AS TICKETS\nFROM sfdc.cases, sfdc.jira__c, jira.ticket\nWHERE upper(sfdc.cases.component__c) IN ('${component=Hue}')\n        AND sfdc.jira__c.case__c = sfdc.cases.id\n        AND jira.ticket.issuekey = sfdc.jira__c.name\n        AND jira.ticket.statusname NOT IN ('Resolved', 'Closed')\n        AND sfdc.jira__c.name NOT LIKE 'CLR%'\nGROUP BY jira__c.name, jira__c.jira_summary__c\nHAVING count(jira__c.name) > 1\nORDER BY count(jira__c.name) DESC\n;"
       }
     }
   }
