@@ -364,9 +364,7 @@ Here is how to list the content of a path, here the S3 bucket `S3A://gethue-demo
 
 How to get the file content and its metadata. Here with the public file of demo.gethue.com [s3a://demo-hue/web_log_data/index_data.csv](https://demo.gethue.com/hue/filebrowser/view=s3a%3A%2F%2Fdemo-hue%2Fweb_log_data%2Findex_data.csv):
 
-**Note** It needs the `XMLHttpRequest` header to return the data in json:
-
-    curl  -X GET "https://demo.gethue.com/filebrowser/view=s3a://demo-hue/web_log_data/index_data.csv?offset=0&length=204800&compression=none&mode=text" -H "X-requested-with: XMLHttpRequest"
+    curl -X GET https://demo.gethue.com/api/storage/view=s3a://demo-hue/web_log_data/index_data.csv?offset=0&length=204800&compression=none&mode=text
 
     {
       "show_download_button": true,
