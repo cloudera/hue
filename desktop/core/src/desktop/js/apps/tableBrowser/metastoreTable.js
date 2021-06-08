@@ -14,12 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import sqlAnalyzerRepository from 'catalog/analyzer/sqlAnalyzerRepository';
 import $ from 'jquery';
 import * as ko from 'knockout';
 
 import apiHelper from 'api/apiHelper';
+import deXSS from 'utils/html/deXSS';
 import huePubSub from 'utils/huePubSub';
-import hueUtils from 'utils/hueUtils';
 import MetastoreColumn from 'apps/tableBrowser/metastoreColumn';
 import MetastoreTableSamples from 'apps/tableBrowser/metastoreTableSamples';
 import MetastoreTablePartitions from 'apps/tableBrowser/metastoreTablePartitions';
@@ -32,13 +33,13 @@ class MetastoreTable {
    * @param {Object} options
    * @param {MetastoreDatabase} options.database
    * @param {DataCatalogEntry} options.catalogEntry
-   * @param {observable} options.optimizerEnabled
+   * @param {observable} options.sqlAnalyzerEnabled
    * @param {observable} options.navigatorEnabled
    * @constructor
    */
   constructor(options) {
     this.database = options.database;
-    this.optimizerEnabled = options.optimizerEnabled;
+    this.sqlAnalyzerEnabled = options.sqlAnalyzerEnabled;
     this.navigatorEnabled = options.navigatorEnabled;
     this.catalogEntry = options.catalogEntry;
 
@@ -47,8 +48,8 @@ class MetastoreTable {
     this.isModel = ko.observable(this.catalogEntry.isModel());
     this.viewSql = ko.observable();
 
-    this.optimizerStats = ko.observable();
-    this.optimizerDetails = ko.observable();
+    this.sqlAnalyzerStats = ko.observable();
+    this.sqlAnalyzerDetails = ko.observable();
     this.topJoins = ko.observableArray();
     this.navigatorMeta = ko.observable();
     this.relationshipsDetails = ko.observable();
@@ -106,7 +107,7 @@ class MetastoreTable {
     }
 
     this.commentWithoutNewLines = ko.pureComputed(() =>
-      this.comment() ? hueUtils.deXSS(this.comment().replace(/[\n\r]+/gi, ' ')) : ''
+      this.comment() ? deXSS(this.comment().replace(/[\n\r]+/gi, ' ')) : ''
     );
 
     this.comment.subscribe(newValue => {
@@ -157,13 +158,17 @@ class MetastoreTable {
             )
           );
 
+          const sqlAnalyzer = sqlAnalyzerRepository.getSqlAnalyzer(
+            this.catalogEntry.getConnector()
+          );
+
           this.catalogEntry
-            .getOptimizerMeta()
-            .then(optimizerMeta => {
-              this.optimizerDetails(optimizerMeta);
+            .getSqlAnalyzerMeta({ sqlAnalyzer })
+            .then(sqlAnalyzerMeta => {
+              this.sqlAnalyzerDetails(sqlAnalyzerMeta);
 
               const topColIndex = {};
-              optimizerMeta.topCols.forEach(topCol => {
+              sqlAnalyzerMeta.topCols.forEach(topCol => {
                 topColIndex[topCol.name] = topCol;
               });
 
@@ -201,8 +206,9 @@ class MetastoreTable {
         this.loadingViewSql(true);
       }
 
+      const sqlAnalyzer = sqlAnalyzerRepository.getSqlAnalyzer(this.catalogEntry.getConnector());
       this.catalogEntry
-        .getTopJoins({ silenceErrors: true })
+        .getTopJoins({ silenceErrors: true, sqlAnalyzer })
         .then(topJoins => {
           if (topJoins && topJoins.values) {
             const joins = [];

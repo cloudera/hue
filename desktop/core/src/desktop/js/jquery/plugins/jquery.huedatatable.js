@@ -16,8 +16,8 @@
 
 import $ from 'jquery';
 
+import deXSS from 'utils/html/deXSS';
 import huePubSub from 'utils/huePubSub';
-import hueUtils from 'utils/hueUtils';
 
 /*
  * Extension to datatable to programmatically switch off datatable in case of huge tables
@@ -483,7 +483,7 @@ $.fn.hueDataTable = function (oInit) {
                 '<tr class="ht-visible-row ht-visible-row-' +
                 i +
                 '"><td>' +
-                hueUtils.deXSS(data[i][0]) +
+                deXSS(data[i][0]) +
                 '</td><td colspan="' +
                 (aoColumns.length - 1) +
                 '" class="stripe"></td></tr>';
@@ -502,7 +502,7 @@ $.fn.hueDataTable = function (oInit) {
                 '<tr class="ht-visible-row ht-visible-row-' +
                 i +
                 '"><td>' +
-                hueUtils.deXSS(data[i][0]) +
+                deXSS(data[i][0]) +
                 '</td><td colspan="' +
                 (aoColumns.length - 1) +
                 '" class="stripe"></td></tr>';
@@ -520,7 +520,7 @@ $.fn.hueDataTable = function (oInit) {
                     '<td ' +
                     (!aoColumns[j].bVisible ? 'style="display: none"' : '') +
                     '>' +
-                    hueUtils.deXSS(row[j]) +
+                    deXSS(row[j]) +
                     '</td>';
                 }
 
@@ -531,7 +531,7 @@ $.fn.hueDataTable = function (oInit) {
             } else {
               html =
                 '<td>' +
-                hueUtils.deXSS(data[i][0]) +
+                deXSS(data[i][0]) +
                 '</td><td colspan="' +
                 (aoColumns.length - 1) +
                 '" class="stripe"></td>';

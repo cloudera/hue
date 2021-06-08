@@ -75,7 +75,7 @@ SparkSql is very popular and getting a [round of improvements](/blog/quick-task-
 
 **Dynamic listing**
 
-Not all the functions are listed in the editor (some are registered at the session/company level, some have been created after a Hue release, some are missing and [can be added](https://docs.gethue.com/developer/parsers/) etc...).
+Not all the functions are listed in the editor (some are registered at the session/company level, some have been created after a Hue release, some are missing and [can be added](https://docs.gethue.com/developer/development/#sql-parsers) etc...).
 
 Now the editor will ask the Database for its full list of functions and add the missing ones in the `General` section.
 
@@ -92,7 +92,7 @@ Argument positioning is now understood and the constant arguments of popular fun
 
 **Build your own parser**
 
-The parser is being extracted in smaller reusable pieces [structure.json](https://github.com/cloudera/hue/blob/master/desktop/core/src/desktop/js/parse/jison/sql/generic/structure.json) with first goal of supporting [Apache Calcite](https://calcite.apache.org/) SQL subsets. The [Parser SDK](https://docs.gethue.com/developer/parsers/#structure) has more more detailed information.
+The parser is being extracted in smaller reusable pieces [structure.json](https://github.com/cloudera/hue/blob/master/desktop/core/src/desktop/js/parse/jison/sql/generic/structure.json) with first goal of supporting [Apache Calcite](https://calcite.apache.org/) SQL subsets. The [Parser SDK](https://docs.gethue.com/developer/development/#sql-parsers#structure) has more more detailed information.
 
 e.g. `structure.json` is composed of generic and specific grammar pieces that are reusable across SQL parsers.
 

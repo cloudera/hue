@@ -20,7 +20,8 @@ import {
   initSyntaxParser,
   identifierEquals,
   equalIgnoreCase,
-  SIMPLE_TABLE_REF_SUGGESTIONS
+  SIMPLE_TABLE_REF_SUGGESTIONS,
+  adjustForPartialBackticks
 } from 'parse/sql/sqlParseUtils';
 
 const initSqlParser = function (parser) {
@@ -256,7 +257,8 @@ const initSqlParser = function (parser) {
   parser.suggestJoinConditions = function (details) {
     parser.yy.result.suggestJoinConditions = details || {};
     if (parser.yy.latestTablePrimaries && !parser.yy.result.suggestJoinConditions.tablePrimaries) {
-      parser.yy.result.suggestJoinConditions.tablePrimaries = parser.yy.latestTablePrimaries.concat();
+      parser.yy.result.suggestJoinConditions.tablePrimaries =
+        parser.yy.latestTablePrimaries.concat();
     }
   };
 
@@ -649,15 +651,6 @@ const initSqlParser = function (parser) {
         parser.yy.result.suggestCommonTableExpressions = ctes;
       }
     }
-  };
-
-  parser.identifyPartials = function (beforeCursor, afterCursor) {
-    const beforeMatch = beforeCursor.match(/[0-9a-zA-Z_]*$/);
-    const afterMatch = afterCursor.match(/^[0-9a-zA-Z_]*(?:\((?:[^)]*\))?)?/);
-    return {
-      left: beforeMatch ? beforeMatch[0].length : 0,
-      right: afterMatch ? afterMatch[0].length : 0
-    };
   };
 
   const addCleanTablePrimary = function (tables, tablePrimary) {
@@ -1395,6 +1388,7 @@ const initSqlParser = function (parser) {
       linkTablePrimaries();
       parser.commitLocations();
       // Clean up and prioritize
+      adjustForPartialBackticks(parser);
       prioritizeSuggestions();
     } catch (err) {
       if (debug) {

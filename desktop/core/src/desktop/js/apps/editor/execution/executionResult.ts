@@ -29,7 +29,7 @@ import { Observable } from 'knockout';
 import * as ko from 'knockout';
 
 import huePubSub from 'utils/huePubSub';
-import { sleep } from 'utils/hueUtils';
+import sleep from 'utils/timing/sleep';
 import Executable, { ExecutionStatus } from './executable';
 
 export const RESULT_TYPE = {

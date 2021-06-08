@@ -96,7 +96,7 @@ Error: ERROR 505 (42000): Table is read only. (state=42000,code=505)
 0: jdbc:phoenix:&gt; select * from "analytics_demo" where pk = "domain.0" limit 5;
 </code></pre>
 
-**3** Phoenix は Apache Calcite に従っています。[SQL autocomplete](https://docs.gethue.com/developer/parsers/) で改善にご協力ください。
+**3** Phoenix は Apache Calcite に従っています。[SQL autocomplete](https://docs.gethue.com/developer/development/#sql-parsers) で改善にご協力ください。
 
 **4** UI （およびベースとなる SQLAlchemy API) は 'ANY 名前空間' と 'empty/Default' 名前空間を区別することができません。
 

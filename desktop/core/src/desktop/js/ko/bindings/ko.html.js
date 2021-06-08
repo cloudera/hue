@@ -16,7 +16,7 @@
 
 import * as ko from 'knockout';
 
-import hueUtils from 'utils/hueUtils';
+import deXSS from 'utils/html/deXSS';
 
 // we override the default html binding to prevent XSS/JS injection
 const originalHtmlBinding = ko.bindingHandlers.html;
@@ -24,13 +24,13 @@ const originalHtmlBinding = ko.bindingHandlers.html;
 ko.bindingHandlers.html = {
   init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
     const newValueAccessor = function () {
-      return hueUtils.deXSS(ko.unwrap(valueAccessor()));
+      return deXSS(ko.unwrap(valueAccessor()));
     };
     originalHtmlBinding.init(element, newValueAccessor, allBindings, viewModel, bindingContext);
   },
   update: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
     const newValueAccessor = function () {
-      return hueUtils.deXSS(ko.unwrap(valueAccessor()));
+      return deXSS(ko.unwrap(valueAccessor()));
     };
     originalHtmlBinding.update(element, newValueAccessor, allBindings, viewModel, bindingContext);
   }

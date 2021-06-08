@@ -18,7 +18,8 @@ import $ from 'jquery';
 import * as ko from 'knockout';
 
 import apiHelper from 'api/apiHelper';
-import hueUtils from 'utils/hueUtils';
+import escapeOutput from 'utils/html/escapeOutput';
+import highlight from 'utils/html/highlight';
 import huePubSub from 'utils/huePubSub';
 
 export const DOCUMENT_UPDATED_EVENT = 'hue.document.updated';
@@ -94,8 +95,8 @@ class HueDocument {
     const successCallback = jsonUserGroups => {
       self.items = [];
       jsonUserGroups.users.forEach(user => {
-        const label = hueUtils.escapeOutput(self.prettifyUsername(user));
-        const highLightedLabel = hueUtils.highlight(label, request.term);
+        const label = escapeOutput(self.prettifyUsername(user));
+        const highLightedLabel = highlight(label, request.term);
         self.userMap[label] = user;
         self.items.push({
           data: {
@@ -109,10 +110,7 @@ class HueDocument {
       });
       jsonUserGroups.groups.forEach(group => {
         self.groupMap[group.name] = group;
-        const highLightedLabel = hueUtils.highlight(
-          hueUtils.escapeOutput(group.name),
-          request.term
-        );
+        const highLightedLabel = highlight(escapeOutput(group.name), request.term);
         self.items.push({
           data: {
             icon: 'fa fa-users',

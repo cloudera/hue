@@ -14,13 +14,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import sqlAnalyzerRepository from 'catalog/analyzer/sqlAnalyzerRepository';
 import $ from 'jquery';
 import * as ko from 'knockout';
 
 import { ASSIST_KEY_COMPONENT } from './assist/ko.assistKey';
 import componentUtils from './componentUtils';
 import huePubSub from 'utils/huePubSub';
-import { noop } from 'utils/hueUtils';
+import noop from 'utils/timing/noop';
 import I18n from 'utils/i18n';
 
 export const NAME = 'catalog-entries-list';
@@ -461,10 +462,12 @@ class CatalogEntriesList {
           self.loading(false);
         });
 
+      const sqlAnalyzer = sqlAnalyzerRepository.getSqlAnalyzer(self.catalogEntry().getConnector());
+
       if (self.catalogEntry().isTableOrView()) {
         const joinsPromise = self
           .catalogEntry()
-          .getTopJoins({ silenceErrors: true, cancellable: true });
+          .getTopJoins({ cancellable: true, silenceErrors: true, sqlAnalyzer });
         joinsPromise
           .then(topJoins => {
             if (topJoins && topJoins.values && topJoins.values.length) {
@@ -518,7 +521,11 @@ class CatalogEntriesList {
       self.cancellablePromises.push(
         self
           .catalogEntry()
-          .loadOptimizerPopularityForChildren({ silenceErrors: true, cancellable: true })
+          .loadSqlAnalyzerPopularityForChildren({
+            cancellable: true,
+            silenceErrors: true,
+            sqlAnalyzer
+          })
           .then(popularEntries => {
             if (popularEntries.length) {
               childPromise
@@ -533,15 +540,15 @@ class CatalogEntriesList {
                   popularEntries.forEach(popularEntry => {
                     if (
                       entryIndex[popularEntry.name] &&
-                      popularEntry.optimizerPopularity &&
-                      popularEntry.optimizerPopularity.selectColumn &&
-                      popularEntry.optimizerPopularity.selectColumn.columnCount > 0
+                      popularEntry.sqlAnalyzerPopularity &&
+                      popularEntry.sqlAnalyzerPopularity.selectColumn &&
+                      popularEntry.sqlAnalyzerPopularity.selectColumn.columnCount > 0
                     ) {
-                      totalCount += popularEntry.optimizerPopularity.selectColumn.columnCount;
+                      totalCount += popularEntry.sqlAnalyzerPopularity.selectColumn.columnCount;
                       popularityToApply.push(() => {
                         entryIndex[popularEntry.name].popularity(
                           Math.round(
-                            (100 * popularEntry.optimizerPopularity.selectColumn.columnCount) /
+                            (100 * popularEntry.sqlAnalyzerPopularity.selectColumn.columnCount) /
                               totalCount
                           )
                         );

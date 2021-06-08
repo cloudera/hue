@@ -26,7 +26,7 @@
       <div class="date-range-picker-panel">
         <div class="date-range-picker-body">
           <div class="date-range-picker-preset">
-            <div style="border-right: 1px solid gray;">
+            <div style="border-right: 1px solid gray">
               <header>Quick Ranges</header>
               <div class="preset-list">
                 <div v-for="(rangeSet, index) in RANGE_SETS" :key="index" class="preset-column">

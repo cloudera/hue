@@ -19,12 +19,13 @@ import DropdownDrawer from './DropdownDrawer.vue';
 
 describe('DropdownDrawer.vue', () => {
   it('should render empty dropdown drawer', () => {
-    const wrapper = shallowMount(DropdownDrawer);
+    const wrapper = shallowMount(DropdownDrawer, { props: { open: false } });
     expect(wrapper.element).toMatchSnapshot();
   });
 
   it('should render dropdown drawer with slots', () => {
     const wrapper = shallowMount(DropdownDrawer, {
+      props: { open: true },
       slots: {
         default: '<div>Some item</div>'
       }

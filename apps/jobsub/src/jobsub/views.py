@@ -34,6 +34,7 @@ from desktop import appmanager
 from desktop.lib.django_util import render, render_json
 from desktop.lib.exceptions import StructuredException
 from desktop.lib.exceptions_renderable import PopupException
+from desktop.lib.view_util import is_ajax
 from desktop.log.access import access_warn
 from desktop.models import Document
 
@@ -102,7 +103,7 @@ def list_designs(request):
   owner = request.GET.get('owner', '')
   name = request.GET.get('name', '')
 
-  if request.is_ajax():
+  if is_ajax(request):
     return render_json({
       'designs': _list_designs(request, owner, name)
     }, js_safe=True)

@@ -26,6 +26,7 @@ import sys
 from django.urls import reverse
 from django.db.models import Q
 from django.views.decorators.http import require_GET, require_POST
+from rest_framework.decorators import api_view
 import opentracing.tracer
 
 from azure.abfs.__init__ import abfspath
@@ -102,6 +103,7 @@ def create_notebook(request):
   return JsonResponse(response)
 
 
+@api_view(["POST"])  # To fully port when Web Components are decoupled
 @require_POST
 @check_document_access_permission
 @api_error_handler

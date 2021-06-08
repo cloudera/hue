@@ -1,22 +1,35 @@
-# GetHue
-GetHue is a collection of various Hue building blocks providing a smart SQL Cloud Editor. They can be classified into two groups, [SQL Parsers](#sql-parsers) and [UI Components](#ui-components). We have collated them into an NPM package for you to easily use in your own app.
+Building blocks providing a smart SQL Cloud Editor based on [gethue.com](https://gethue.com).
 
 # Install
 
     npm install --save gethue
 
+# SQL Scratchpad
+
+The shareable lightweight SQL Editor also called "SQL Scratchpad" comes as its own `<sql-scratchpad />` Web component. Play with a live demo and read more in its [documentation](https://docs.gethue.com/developer/components/scratchpad/).
+
+    <!DOCTYPE html>
+    <html>
+
+    <head>
+      <title>SQL Scratchpad</title>
+      <script type="text/javascript" src="./node_modules/gethue/lib/components/SqlScratchpadWebComponent.js"></script>
+    </head>
+
+    <body>
+      <div style="position: absolute; height: 100%; width: 100%">
+        <sql-scratchpad api-url="https://demo.gethue.com" username="demo" password="demo" dialect="mysql" />
+      </div>
+    </body>
+
+    </html>
+
+!["SQL Scratchpad"](https://cdn.gethue.com/uploads/2021/05/sql-scratchpad-v0.5.png)
+
 # SQL Parsers
 
-The parsers are the flagship part of Hue and power extremely advanced autocompletes and other [SQL functionalities](https://docs.gethue.com/user/querying/#autocomplete). They are running on the client side and comes with just a few megabytes of JavaScript that are cached by the browser. This provides a very reactive experience to the end user and allows to [import them](https://docs.gethue.com/developer/parsers#using-hue-parsers-in-your-project) as classic JavaScript modules for your own development needs.
+The parsers are the flagship part of Hue and power extremely advanced autocompletes and other [SQL functionalities](https://docs.gethue.com/user/querying/#autocomplete).
 
-Please refer the [SQL Parser Documentation](https://docs.gethue.com/developer/parsers/), or this [demo app](https://github.com/cloudera/hue/tree/master/tools/examples/api/hue_dep) for more information.
+Play with a live demo and read more in their [documentation](https://docs.gethue.com/developer/components/parsers/).
 
 !["Parser Component"](https://cdn.gethue.com/uploads/2020/07/parser_component.png)
-
-# UI Components
-
-Some of the UI elements in Hue are available as generic [Web Components](https://developer.mozilla.org/en-US/docs/Web/Web_Components). They are library/framework agnostic, and can be used in any web project irrespective of what it's built upon - React, Angular, Ember or something else. Internally these components are **created using Vue.js & TypeScript**. So you can even use them as plain Vue component, and take advantage of Vue features.
-
-Please refer the [UI Components Documentation](https://docs.gethue.com/developer/components/) for more information. Page for each component must give you a sound idea on the attributes/props that the components accept, and events they generate. Please refer these [demo apps](https://github.com/cloudera/hue/tree/master/tools/examples/components) for examples on how the components can be used.
-
-!["SQL Scratchpad Component"](https://cdn.gethue.com/uploads/2020/02/quick-query-component.jpg)

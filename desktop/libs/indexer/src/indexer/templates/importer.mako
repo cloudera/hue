@@ -421,7 +421,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
               <div>
                 <label class="control-label">
                   <div><!-- ko if: $index() === 0 -->${ _('Table') }<!-- /ko --></div>
-                  <input type="text" class="input-xlarge" data-bind="hiveChooser: name, skipInvalids:true, pathChangeLevel: 'table', skipColumns: true, apiHelperUser: '${ user }', namespace: $root.createWizard.source.namespace, compute: $root.createWizard.source.compute, apiHelperType: $root.createWizard.source.sourceType, mainScrollable: $(MAIN_SCROLLABLE)" placeholder="${ _('Table name or <database>.<table>') }">
+                  <input type="text" class="input-xlarge" data-bind="hiveChooser: name, skipInvalids:true, pathChangeLevel: 'table', skipColumns: true, apiHelperUser: '${ user }', namespace: $root.createWizard.source.namespace, compute: $root.createWizard.source.compute, apiHelperType: $root.createWizard.source.sourceType(), mainScrollable: $(MAIN_SCROLLABLE)" placeholder="${ _('Table name or <database>.<table>') }">
                   <a class="pointer pull-right margin-left-5" style="margin-top: 7px" data-bind="click: function() { $root.createWizard.source.tables.remove(this); }, visible: $root.createWizard.source.tables().length > 1"><i class="fa fa-minus"></i></a>
                 </label>
               </div>
@@ -556,7 +556,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
               </label>
             </div>
             <label for="collectionName" class="control-label "><div>${ _('Name') }</div></label>
-            <input type="text" class="input-xxlarge" data-bind="value: name, hiveChooser: name, namespace: namespace, compute: compute, skipColumns: true, skipTables: outputFormat() == 'database', valueUpdate: 'afterkeydown', apiHelperUser: '${ user }', apiHelperType: sourceType, mainScrollable: $(MAIN_SCROLLABLE), attr: { 'placeholder': outputFormat() == 'table' ? '${  _ko('Table name or <database>.<table>') }' : '${  _ko('Database name') }' }" pattern="^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]*$" title="${ _('Only alphanumeric and underscore characters') }">
+            <input type="text" class="input-xxlarge" data-bind="value: name, hiveChooser: name, namespace: namespace, compute: compute, skipColumns: true, skipTables: outputFormat() == 'database', valueUpdate: 'afterkeydown', apiHelperUser: '${ user }', apiHelperType: sourceType(), mainScrollable: $(MAIN_SCROLLABLE), attr: { 'placeholder': outputFormat() == 'table' ? '${  _ko('Table name or <database>.<table>') }' : '${  _ko('Database name') }' }" pattern="^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]*$" title="${ _('Only alphanumeric and underscore characters') }">
             <!-- /ko -->
 
             <!-- ko if: outputFormat() == 'altus' -->
@@ -569,7 +569,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
 
               <label class="control-label "><div>${ _('Database') }</div></label>
               <input type="text" class="form-control input-xlarge" data-bind="value: name" placeholder="${ _('Database') }">
-              <a href="javascript:void(0);" data-bind="sqlContextPopover: { sourceType: $root.createWizard.source.sourceType, namespace: namespace, compute: compute, path: 'default', offset: { top: -3, left: 3 }}">
+              <a href="javascript:void(0);" data-bind="sqlContextPopover: { sourceType: $root.createWizard.source.sourceType(), namespace: namespace, compute: compute, path: 'default', offset: { top: -3, left: 3 }}">
                 <i class="fa fa-info"></i>
               </a>
             <!-- /ko -->
@@ -995,7 +995,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
               <div data-bind="component: { name: 'hue-simple-ace-editor-multi', params: {
                   value: fieldEditorValue,
                   placeHolder: fieldEditorPlaceHolder,
-                  autocomplete: { type: sourceType },
+                  autocomplete: { type: sourceType() },
                   lines: 5,
                   aceOptions: {
                     minLines: 10,
@@ -1005,7 +1005,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
                   namespace: namespace,
                   compute: compute,
                   temporaryOnly: true,
-                  mode: sourceType
+                  mode: sourceType()
                 }}"></div>
               <!-- /ko -->
 
@@ -1683,7 +1683,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
           sampleCols.forEach(function (sampleCol) {
             var deferred = $.Deferred();
             deferreds.push(deferred);
-            sqlUtils.backTickIfNeeded({ id: self.sourceType, dialect: self.sourceType }, sampleCol.name()).then(function (value) {
+            sqlUtils.backTickIfNeeded({ id: self.sourceType(), dialect: self.sourceType() }, sampleCol.name()).then(function (value) {
               statementCols.push(value);
               var col = {
                 name: sampleCol.name(),
@@ -1707,17 +1707,17 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
           $.when.apply($, deferreds).done(function () {
             var statement = 'SELECT ';
             statement += statementCols.join(',\n    ');
-            statement += '\n FROM ' + sqlUtils.backTickIfNeeded({ id: self.sourceType, dialect: self.sourceType }, tableName) + ';';
+            statement += '\n FROM ' + sqlUtils.backTickIfNeeded({ id: self.sourceType(), dialect: self.sourceType() }, tableName) + ';';
             if (!wizard.destination.fieldEditorValue() || wizard.destination.fieldEditorValue() === lastStatement) {
               wizard.destination.fieldEditorValue(statement);
             }
             lastStatement = statement;
-            wizard.destination.fieldEditorPlaceHolder('${ _('Example: SELECT') }' + ' * FROM ' + sqlUtils.backTickIfNeeded({ id: self.sourceType, dialect: self.sourceType }, tableName));
+            wizard.destination.fieldEditorPlaceHolder('${ _('Example: SELECT') }' + ' * FROM ' + sqlUtils.backTickIfNeeded({ id: self.sourceType(), dialect: self.sourceType() }, tableName));
 
             var handle = dataCatalog.addTemporaryTable({
               namespace: self.namespace(),
               compute: self.compute(),
-              connector: { id: self.sourceType }, // TODO: Migrate importer to connectors
+              connector: { id: self.sourceType() }, // TODO: Migrate importer to connectors
               name: tableName,
               columns: temporaryColumns,
               sample: self.sample()
@@ -3185,17 +3185,22 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
           var files = $('#inputfile')[0].files[0];
           fd.append('inputfile', files);
           var file_size = files.size;
-          $.ajax({
-            url:"/indexer/api/indexer/upload_local_file",
-            type: 'post',
-            data: fd,
-            contentType:false,
-            cache: false,
-            processData:false,
-            success:function (response) {
-              viewModel.createWizard.source.path(response['local_file_url']);
-            }
-          });
+          if (file_size > 200000) {
+                $.jHueNotify.warn("${ _('File size exceeds the supported size (200 KB).') }");
+              }
+          else {
+            $.ajax({
+              url:"/indexer/api/indexer/upload_local_file",
+              type: 'post',
+              data: fd,
+              contentType:false,
+              cache: false,
+              processData:false,
+              success:function (response) {
+                viewModel.createWizard.source.path(response['local_file_url']);
+              }
+            });
+          }
         };
 
       $('.importer-droppable').droppable({

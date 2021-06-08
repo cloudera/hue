@@ -176,7 +176,7 @@ Flink のダッシュボードは通常のジョブとして SQL のクエリを
 
 この最初のバージョンでは、商用環境の準備をするために数多くの[将来的な繰り返し](https://github.com/cloudera/hue/blob/master/docs/designs/apache_flink.md) がありますが、ベースはそこに到達しています。
 
-[Apache Calcite](https://calcite.apache.org/docs/reference.html) をベースにした[SQL オートコンプリート](https://ci.apache.org/projects/flink/flink-docs-master/dev/table/sql/queries.html#supported-syntax) の改善が注目されています。Hue にはより良い[構文](https://docs.gethue.com/developer/parsers/) and even ships with a default [Flink SQL dialect](https://github.com/cloudera/hue/tree/master/desktop/core/src/desktop/js/parse/jison/sql/flink).
+[Apache Calcite](https://calcite.apache.org/docs/reference.html) をベースにした[SQL オートコンプリート](https://ci.apache.org/projects/flink/flink-docs-master/dev/table/sql/queries.html#supported-syntax) の改善が注目されています。Hue にはより良い[構文](https://docs.gethue.com/developer/development/#sql-parsers) and even ships with a default [Flink SQL dialect](https://github.com/cloudera/hue/tree/master/desktop/core/src/desktop/js/parse/jison/sql/flink).
 
 Another one coming soon will be a more user friendly display of the live data in the result grid.
 

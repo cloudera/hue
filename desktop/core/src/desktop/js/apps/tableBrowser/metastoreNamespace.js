@@ -33,7 +33,7 @@ class MetastoreNamespace {
     this.metastoreViewModel = options.metastoreViewModel;
     this.sourceType = options.sourceType;
     this.navigatorEnabled = options.navigatorEnabled;
-    this.optimizerEnabled = options.optimizerEnabled;
+    this.sqlAnalyzerEnabled = options.sqlAnalyzerEnabled;
 
     this.catalogEntry = ko.observable();
 
@@ -88,7 +88,7 @@ class MetastoreNamespace {
                 databaseEntry =>
                   new MetastoreDatabase({
                     catalogEntry: databaseEntry,
-                    optimizerEnabled: this.optimizerEnabled,
+                    sqlAnalyzerEnabled: this.sqlAnalyzerEnabled,
                     metastoreViewModel: this.metastoreViewModel
                   })
               )
@@ -116,7 +116,7 @@ class MetastoreNamespace {
     if (!metastoreDatabase.loaded()) {
       metastoreDatabase.load(
         callback,
-        this.optimizerEnabled(),
+        this.sqlAnalyzerEnabled(),
         this.navigatorEnabled(),
         this.sourceType
       );

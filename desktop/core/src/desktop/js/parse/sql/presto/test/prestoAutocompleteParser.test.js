@@ -14,6 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { assertPartials } from 'parse/sql/sharedParserTests';
 import prestoAutocompleteParser from '../prestoAutocompleteParser';
 describe('prestoAutocompleteParser.js', () => {
   beforeAll(() => {
@@ -430,93 +431,7 @@ describe('prestoAutocompleteParser.js', () => {
 
   describe('partial removal', () => {
     it('should identify part lengths', () => {
-      const limitChars = [
-        ' ',
-        '\n',
-        '\t',
-        '&',
-        '~',
-        '%',
-        '!',
-        '.',
-        ',',
-        '+',
-        '-',
-        '*',
-        '/',
-        '=',
-        '<',
-        '>',
-        ')',
-        '[',
-        ']',
-        ';'
-      ];
-
-      expect(prestoAutocompleteParser.identifyPartials('', '')).toEqual({ left: 0, right: 0 });
-      expect(prestoAutocompleteParser.identifyPartials('foo', '')).toEqual({ left: 3, right: 0 });
-      expect(prestoAutocompleteParser.identifyPartials(' foo', '')).toEqual({ left: 3, right: 0 });
-      expect(prestoAutocompleteParser.identifyPartials('asdf 1234', '')).toEqual({
-        left: 4,
-        right: 0
-      });
-
-      expect(prestoAutocompleteParser.identifyPartials('foo', 'bar')).toEqual({
-        left: 3,
-        right: 3
-      });
-
-      expect(prestoAutocompleteParser.identifyPartials('fo', 'o()')).toEqual({ left: 2, right: 3 });
-      expect(prestoAutocompleteParser.identifyPartials('fo', 'o(')).toEqual({ left: 2, right: 2 });
-      expect(prestoAutocompleteParser.identifyPartials('fo', 'o(bla bla)')).toEqual({
-        left: 2,
-        right: 10
-      });
-
-      expect(prestoAutocompleteParser.identifyPartials('foo ', '')).toEqual({ left: 0, right: 0 });
-      expect(prestoAutocompleteParser.identifyPartials("foo '", "'")).toEqual({
-        left: 0,
-        right: 0
-      });
-
-      expect(prestoAutocompleteParser.identifyPartials('foo "', '"')).toEqual({
-        left: 0,
-        right: 0
-      });
-
-      limitChars.forEach(char => {
-        expect(prestoAutocompleteParser.identifyPartials('bar foo' + char, '')).toEqual({
-          left: 0,
-          right: 0
-        });
-
-        expect(prestoAutocompleteParser.identifyPartials('bar foo' + char + 'foofoo', '')).toEqual({
-          left: 6,
-          right: 0
-        });
-
-        expect(prestoAutocompleteParser.identifyPartials('bar foo' + char + 'foofoo ', '')).toEqual(
-          {
-            left: 0,
-            right: 0
-          }
-        );
-
-        expect(prestoAutocompleteParser.identifyPartials('', char + 'foo bar')).toEqual({
-          left: 0,
-          right: 0
-        });
-
-        expect(prestoAutocompleteParser.identifyPartials('', 'foofoo' + char)).toEqual({
-          left: 0,
-          right: 6
-        });
-
-        expect(prestoAutocompleteParser.identifyPartials('', ' foofoo' + char)).toEqual({
-          left: 0,
-          right: 0
-        });
-      });
+      assertPartials(prestoAutocompleteParser);
     });
   });
 

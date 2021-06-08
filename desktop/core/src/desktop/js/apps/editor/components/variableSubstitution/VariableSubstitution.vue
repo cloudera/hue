@@ -43,7 +43,7 @@
   import DataCatalogEntry, { FieldSourceMeta } from 'catalog/DataCatalogEntry';
   import ComboBox from 'components/ComboBox.vue';
   import { IdentifierLocation } from 'parse/types';
-  import { noop } from 'utils/hueUtils';
+  import noop from 'utils/timing/noop';
 
   const NAMED_OPTION_REGEX = /^(.+)\(([^)]+)\)$/;
   const LOCATION_VALUE_REGEX = /\${(\w+)=?([^{}]*)}/;
@@ -126,7 +126,7 @@
       initialVariables: {
         type: Object as PropType<{ [name: string]: Variable }>,
         required: false,
-        default: {}
+        default: () => ({})
       },
       locations: {
         type: Object as PropType<IdentifierLocation[]>,

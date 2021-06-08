@@ -262,12 +262,19 @@ This is a verified step-by-step guide on how to get up and running on a fresh in
 
 ## NodeJs
 
-Version 10+ is needed.
-
 e.g. how to install on Ubuntu:
 
     curl -sL https://deb.nodesource.com/setup_14.x | sudo bash -
     sudo apt-get install -y nodejs
+
+For Centos / Red Hat use this source:
+
+    curl -sL https://rpm.nodesource.com/setup_14.x | sudo bash -
+    sudo yum install -y nodejs
+
+Upgrade to npm 7+:
+
+    npm install --global npm
 
 ## Installing Python 2.7
 
@@ -324,7 +331,7 @@ for more details, refer to this link: [https://docs.oracle.com/cd/E37670_01/E590
 
 Optional.
 
-Java is only for the [JDBC proxy](/developer/connectors/#jdbc) connector which is not built automatically anymore.
+Java is only for the [JDBC proxy](/developer/development/#connectors) connector which is not built automatically anymore.
 
 **Install Oracle JDK**
 

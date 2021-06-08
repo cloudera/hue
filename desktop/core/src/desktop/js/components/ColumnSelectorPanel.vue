@@ -31,9 +31,7 @@
     </ul>
 
     <div class="column-selector-actions">
-      <hue-button type="button" @click="apply">
-        Apply
-      </hue-button>
+      <hue-button type="button" @click="apply"> Apply </hue-button>
     </div>
   </div>
 </template>

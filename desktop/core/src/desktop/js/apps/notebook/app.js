@@ -23,9 +23,11 @@ import 'ext/jquery.hotkeys';
 import 'jquery/plugins/jquery.hdfstree';
 
 import huePubSub from 'utils/huePubSub';
-import hueUtils from 'utils/hueUtils';
 import I18n from 'utils/i18n';
 import sqlWorkerHandler from 'sql/sqlWorkerHandler';
+import bootstrapRatios from 'utils/html/bootstrapRatios';
+import scrollbarWidth from 'utils/screen/scrollbarWidth';
+import waitForRendered from 'utils/timing/waitForRendered';
 import NotebookViewModel from './NotebookViewModel';
 import {
   ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT,
@@ -604,7 +606,7 @@ huePubSub.subscribe('app.dom.loaded', app => {
     };
     $(window).data('beforeunload', window.onbeforeunload);
 
-    $('.preview-sample').css('right', 10 + hueUtils.scrollbarWidth() + 'px');
+    $('.preview-sample').css('right', 10 + scrollbarWidth() + 'px');
 
     const saveKeyHandler = () => {
       if (viewModel.canSave()) {
@@ -730,13 +732,13 @@ huePubSub.subscribe('app.dom.loaded', app => {
       const $snippet = $('#snippet_' + snippet.id());
       $snippet
         .find('.table-results .column-side')
-        .width(hueUtils.bootstrapRatios.span3() + '%')
-        .data('newWidth', hueUtils.bootstrapRatios.span3());
+        .width(bootstrapRatios.span3() + '%')
+        .data('newWidth', bootstrapRatios.span3());
       if (snippet.isResultSettingsVisible()) {
         $snippet
           .find('.table-results .grid-side')
-          .data('newWidth', hueUtils.bootstrapRatios.span9())
-          .width(hueUtils.bootstrapRatios.span9() + '%');
+          .data('newWidth', bootstrapRatios.span9())
+          .width(bootstrapRatios.span9() + '%');
       } else {
         $snippet.find('.table-results .grid-side').data('newWidth', 100).width('100%');
       }
@@ -753,9 +755,7 @@ huePubSub.subscribe('app.dom.loaded', app => {
         create: function () {
           const $snip = $('#snippet_' + snippet.id());
           initialPosition = $snip.find('.resize-bar').position().left;
-          $snip
-            .find('.table-results .column-side')
-            .data('newWidth', hueUtils.bootstrapRatios.span3());
+          $snip.find('.table-results .column-side').data('newWidth', bootstrapRatios.span3());
           $snip.find('.meta-filter').width($snip.find('.table-results .column-side').width() - 28);
         },
         drag: function (event, ui) {
@@ -764,9 +764,8 @@ huePubSub.subscribe('app.dom.loaded', app => {
             initialPosition = $snip.find('.resize-bar').position().left;
           }
           ui.position.left = Math.max(150, ui.position.left);
-          const newSpan3Width =
-            (ui.position.left * hueUtils.bootstrapRatios.span3()) / initialPosition;
-          const newSpan9Width = 100 - newSpan3Width - hueUtils.bootstrapRatios.margin();
+          const newSpan3Width = (ui.position.left * bootstrapRatios.span3()) / initialPosition;
+          const newSpan9Width = 100 - newSpan3Width - bootstrapRatios.margin();
           $snip
             .find('.table-results .column-side')
             .width(newSpan3Width + '%')
@@ -899,7 +898,7 @@ huePubSub.subscribe('app.dom.loaded', app => {
           $('.hue-datatable-search').hide();
         }
         if (tab === 'queryHistory') {
-          hueUtils.waitForRendered(
+          waitForRendered(
             $('#queryHistory .history-table'),
             el => {
               return el.is(':visible');
@@ -949,8 +948,8 @@ huePubSub.subscribe('app.dom.loaded', app => {
 
     huePubSub.subscribe('editor.create.new', newKeyHandler, HUE_PUB_SUB_EDITOR_ID);
 
-    if (viewModel.isOptimizerEnabled()) {
-      if (window.OPTIMIZER_AUTO_UPLOAD_QUERIES) {
+    if (viewModel.isSqlAnalyzerEnabled()) {
+      if (window.SQL_ANALYZER_AUTO_UPLOAD_QUERIES) {
         huePubSub.subscribe(
           'editor.upload.query',
           query_id => {
@@ -960,7 +959,7 @@ huePubSub.subscribe('app.dom.loaded', app => {
         );
       }
 
-      if (window.OPTIMIZER_AUTO_UPLOAD_DDL) {
+      if (window.SQL_ANALYZER_AUTO_UPLOAD_DDL) {
         huePubSub.subscribe(
           'editor.upload.table.stats',
           options => {
@@ -970,7 +969,7 @@ huePubSub.subscribe('app.dom.loaded', app => {
         );
       }
 
-      if (window.OPTIMIZER_QUERY_HISTORY_UPLOAD_LIMIT !== 0) {
+      if (window.SQL_ANALYZER_QUERY_HISTORY_UPLOAD_LIMIT !== 0) {
         huePubSub.subscribe(
           'editor.upload.history',
           () => {
@@ -1141,7 +1140,7 @@ huePubSub.subscribe('app.dom.loaded', app => {
     huePubSub.subscribe(
       'editor.redraw.data',
       options => {
-        hueUtils.waitForRendered(
+        waitForRendered(
           '#snippet_' + options.snippet.id() + ' .resultTable',
           el => {
             return el.is(':visible');
@@ -1271,7 +1270,7 @@ huePubSub.subscribe('app.dom.loaded', app => {
     huePubSub.subscribe(
       'editor.grid.shown',
       snippet => {
-        hueUtils.waitForRendered(
+        waitForRendered(
           '#snippet_' + snippet.id() + ' .dataTables_wrapper',
           el => {
             return el.is(':visible');
@@ -1299,7 +1298,7 @@ huePubSub.subscribe('app.dom.loaded', app => {
     huePubSub.subscribe(
       'recalculate.name.description.width',
       () => {
-        hueUtils.waitForRendered(
+        waitForRendered(
           '.editorComponents .hue-title-bar .query-name',
           el => {
             return el.is(':visible');
@@ -1355,7 +1354,7 @@ huePubSub.subscribe('app.dom.loaded', app => {
             .width(
               100 -
                 $snip.find('.table-results .column-side').data('newWidth') -
-                hueUtils.bootstrapRatios.margin() +
+                bootstrapRatios.margin() +
                 '%'
             );
         } else {

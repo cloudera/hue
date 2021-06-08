@@ -89,24 +89,21 @@ Users can share the SQL gists too!
 
 Keeping in mind the security aspect, those Slack users who are Hue users and have the read permissions to access the query and its result will get this rich preview and result file after sharing the link. This mapping is currently done by checking the email prefix and its host for Hue username.
 
-For example, some person ‘Alice’ having a Hue account with username ‘alice’ can have read access from some Slack account only if it's the same email address from the same domain. i.e. **alice@gethue.com slack user** can only access **Hue user ‘alice’** on **‘hue.gethue.com’**.
+For example, some person ‘Alice’ having a Hue account with username ‘alice’ can have read access from some Slack account only if it's the same email address from the same domain. i.e. **alice@gethue.com slack user** can only access **Hue user ‘alice’** on **hue.gethue.com**.
 
 ### What's coming up next?
 
 In the follow-ups, promoting the Share to Slack from the Hue side where users can select the channel to send the link.
 
 Also stay tuned for more such functionalities such as replying to users asking questions on how to find certain data tables or to query them and also send results for scheduled queries in certain Slack channels!
-
 ### Try it out!
 
-Get your hands on this beta feature by:
+Log in to the [Slack workspace](https://hue-sql-assistant.slack.com/) to access the demo SQL Assistant by using the following Slack account credentials:
 
-- Running some queries on the [demo live editor](https://demo.gethue.com/).
+      email: demo@gethue.com
+      password: gethue
 
-- Logging in to [demo workspace](https://demo-hue.slack.com/) by using the following credentials:
-
-      Slack account email: demo@gethue.com
-      Slack account password: gethue
+Read its [user guide](https://docs.gethue.com/user/concept/#share-to-slack) and stay tuned for upcoming updates.
 
 Till then, run some queries, copy those links and share ‘em all!
 
@@ -115,7 +112,6 @@ Till then, run some queries, copy those links and share ‘em all!
 
 Any feedback or question? Feel free to comment here or on the <a href="https://discourse.gethue.com/">Forum</a> and <a href="https://docs.gethue.com/quickstart/">quick start</a> SQL querying!
 
-
 Onwards!
 
-~ Harsh from the Hue Team
+Harsh from the Hue Team

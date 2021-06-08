@@ -1,0 +1,13 @@
+/dist/
+/build/
+/doc/_build/
+/doc/build/
+*.pyc
+*.egg-info/
+.vagrant/
+.tox
+dev-support/artifacts
+dev-support/work
+phoenixdb/.eggs
+phoenixdb/build
+phoenixdb/e

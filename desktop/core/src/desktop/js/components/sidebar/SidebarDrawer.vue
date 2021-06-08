@@ -26,7 +26,7 @@
   import { defineComponent } from 'vue';
 
   import SubscriptionTracker from 'components/utils/SubscriptionTracker';
-  import { defer } from 'utils/hueUtils';
+  import defer from 'utils/timing/defer';
 
   export default defineComponent({
     name: 'SidebarDrawer',

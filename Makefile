@@ -147,9 +147,13 @@ $(BLD_DIR_ENV)/stamp:
 desktop: parent-pom
 # END DEV ONLY >>>>
 desktop: virtual-env
-	@if [ "$(PYTHON_VER)" = "python2.7" ] && [ "$(MAKECMDGOALS)" = "apps" ]; then \
+	# Normally dev only do "make apps", but build system is calling "make apps docs"
+	@if [ "$(PYTHON_VER)" = "python2.7" ] && [ "$(findstring apps,$(MAKECMDGOALS))" = "apps" ]; then \
+	  echo "--- start installing PIP_MODULES"; \
 	  $(ENV_PIP) install --upgrade pip; \
 	  $(ENV_PIP) install $(PIP_MODULES); \
+	  echo "--- done installing PIP_MODULES"; \
+	else echo "--- skip installing PIP_MODULES"; \
 	fi
 	@$(MAKE) -C desktop
 
@@ -230,7 +234,7 @@ install-env:
 	cp $(ROOT)/package.json $(INSTALL_DIR)
 	cp $(ROOT)/package-lock.json $(INSTALL_DIR)
 	cp $(ROOT)/webpack.config*.js $(INSTALL_DIR)
-	cp $(ROOT)/.babelrc $(INSTALL_DIR)
+	cp $(ROOT)/babel.config.js $(INSTALL_DIR)
 	cp $(ROOT)/tsconfig.json $(INSTALL_DIR)
 	$(MAKE) -C $(INSTALL_DIR) npm-install
 	@if [ "$(MAKECMDGOALS)" = "install" ]; then \

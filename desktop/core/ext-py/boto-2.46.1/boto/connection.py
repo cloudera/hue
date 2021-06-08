@@ -372,7 +372,8 @@ class HTTPRequest(object):
                     self.headers[key] = quote(val.encode('utf-8'), safe)
             setattr(self, '_headers_quoted', True)
 
-        self.headers['User-Agent'] = UserAgent
+        if not self.headers.get('User-Agent'):
+          self.headers['User-Agent'] = UserAgent
 
         connection._auth_handler.add_auth(self, **kwargs)
 

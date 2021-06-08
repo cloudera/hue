@@ -47,7 +47,7 @@ const TEMPLATE = `
         <a href="javascript:void(0)" data-bind="click: createGist, css: { 'disabled': !createGistEnabled() }" title="${I18n(
           'Share the query selection via a link'
         )}">
-          <i class="fa fa-fw fa-link"></i> ${I18n('Get shareable link')}
+          <i class="fa fa-fw fa-link"></i> ${I18n('Shareable link')}
         </a>
       </li>
       <!-- /ko -->
@@ -157,7 +157,10 @@ class SnippetEditorActions {
       description: ''
     });
 
-    const slackChannels = await apiHelper.getSlackChannelsAsync();
+    let slackChannels = '';
+    if (window.SHARE_TO_SLACK) {
+      slackChannels = await apiHelper.getSlackChannelsAsync();
+    }
 
     huePubSub.publish(SHOW_GIST_MODAL_EVENT, { link: gistLink, channels: slackChannels });
   }

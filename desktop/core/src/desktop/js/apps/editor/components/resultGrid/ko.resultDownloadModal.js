@@ -20,7 +20,7 @@ import * as ko from 'knockout';
 import componentUtils from 'ko/components/componentUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
-import { UUID } from 'utils/hueUtils';
+import UUID from 'utils/string/UUID';
 
 export const NAME = 'download-result-modal';
 

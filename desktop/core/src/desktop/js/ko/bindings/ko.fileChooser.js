@@ -17,7 +17,7 @@
 import $ from 'jquery';
 import * as ko from 'knockout';
 
-import hueUtils from 'utils/hueUtils';
+import getFileBrowseButton from 'utils/html/getFileBrowseButton';
 
 ko.bindingHandlers.filechooser = {
   init: function (element, valueAccessor, allBindingsAccessor) {
@@ -70,7 +70,7 @@ ko.bindingHandlers.filechooser = {
     }
 
     $element.after(
-      hueUtils.getFileBrowseButton(
+      getFileBrowseButton(
         $element,
         true,
         valueAccessor,

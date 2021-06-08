@@ -15,6 +15,7 @@
 // limitations under the License.
 
 import { post } from 'api/utils';
+import * as URLS from 'api/urls';
 import {
   CONFIG_REFRESHED_TOPIC,
   ConfigRefreshedEvent,
@@ -43,15 +44,13 @@ interface InterpreterMap {
 
 type ConnectorTest<T extends keyof InterpreterMap> = (connector: InterpreterMap[T]) => boolean;
 
-const FETCH_CONFIG_API = '/desktop/api2/get_config/';
-
 let lastConfigPromise: Promise<HueConfig> | undefined;
 let lastKnownConfig: HueConfig | undefined;
 
 export const refreshConfig = async (): Promise<HueConfig> => {
   lastConfigPromise = new Promise<HueConfig>(async (resolve, reject) => {
     try {
-      const apiResponse = await post<HueConfig>(FETCH_CONFIG_API, {}, { silenceErrors: true });
+      const apiResponse = await post<HueConfig>(URLS.FETCH_CONFIG_API, {}, { silenceErrors: true });
       if (apiResponse.status == 0) {
         lastKnownConfig = apiResponse;
         resolve(lastKnownConfig);

@@ -14,6 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { assertPartials } from 'parse/sql/sharedParserTests';
 import impalaAutocompleteParser from '../impalaAutocompleteParser';
 describe('impalaAutocompleteParser.js', () => {
   beforeAll(() => {
@@ -407,92 +408,7 @@ describe('impalaAutocompleteParser.js', () => {
 
   describe('partial removal', () => {
     it('should identify part lengths', () => {
-      const limitChars = [
-        ' ',
-        '\n',
-        '\t',
-        '&',
-        '~',
-        '%',
-        '!',
-        '.',
-        ',',
-        '+',
-        '-',
-        '*',
-        '/',
-        '=',
-        '<',
-        '>',
-        ')',
-        '[',
-        ']',
-        ';'
-      ];
-
-      expect(impalaAutocompleteParser.identifyPartials('', '')).toEqual({ left: 0, right: 0 });
-      expect(impalaAutocompleteParser.identifyPartials('foo', '')).toEqual({ left: 3, right: 0 });
-      expect(impalaAutocompleteParser.identifyPartials(' foo', '')).toEqual({ left: 3, right: 0 });
-      expect(impalaAutocompleteParser.identifyPartials('asdf 1234', '')).toEqual({
-        left: 4,
-        right: 0
-      });
-
-      expect(impalaAutocompleteParser.identifyPartials('foo', 'bar')).toEqual({
-        left: 3,
-        right: 3
-      });
-
-      expect(impalaAutocompleteParser.identifyPartials('fo', 'o()')).toEqual({ left: 2, right: 3 });
-      expect(impalaAutocompleteParser.identifyPartials('fo', 'o(')).toEqual({ left: 2, right: 2 });
-      expect(impalaAutocompleteParser.identifyPartials('fo', 'o(bla bla)')).toEqual({
-        left: 2,
-        right: 10
-      });
-
-      expect(impalaAutocompleteParser.identifyPartials('foo ', '')).toEqual({ left: 0, right: 0 });
-      expect(impalaAutocompleteParser.identifyPartials("foo '", "'")).toEqual({
-        left: 0,
-        right: 0
-      });
-
-      expect(impalaAutocompleteParser.identifyPartials('foo "', '"')).toEqual({
-        left: 0,
-        right: 0
-      });
-      limitChars.forEach(char => {
-        expect(impalaAutocompleteParser.identifyPartials('bar foo' + char, '')).toEqual({
-          left: 0,
-          right: 0
-        });
-
-        expect(impalaAutocompleteParser.identifyPartials('bar foo' + char + 'foofoo', '')).toEqual({
-          left: 6,
-          right: 0
-        });
-
-        expect(impalaAutocompleteParser.identifyPartials('bar foo' + char + 'foofoo ', '')).toEqual(
-          {
-            left: 0,
-            right: 0
-          }
-        );
-
-        expect(impalaAutocompleteParser.identifyPartials('', char + 'foo bar')).toEqual({
-          left: 0,
-          right: 0
-        });
-
-        expect(impalaAutocompleteParser.identifyPartials('', 'foofoo' + char)).toEqual({
-          left: 0,
-          right: 6
-        });
-
-        expect(impalaAutocompleteParser.identifyPartials('', ' foofoo' + char)).toEqual({
-          left: 0,
-          right: 0
-        });
-      });
+      assertPartials(impalaAutocompleteParser);
     });
   });
 });

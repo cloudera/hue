@@ -249,7 +249,7 @@ class AssistDbSource {
         whenLoaded();
       });
     } else {
-      self.loadNamespaces().done(whenLoaded);
+      self.loadNamespaces().then(whenLoaded);
     }
   }
 

@@ -14,35 +14,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { get, post } from 'api/utils';
+import { post } from 'api/utils';
 
-export enum AuthType {
-  hue = 'hue',
-  jwt = 'jwt'
-}
+const JWT_URL = 'api/token/auth/';
 
-const LOGOUT_URL = '/hue/accounts/logout';
-const LOGIN_URL = '/hue/accounts/login';
-
-const JWT_URL = 'iam/v1/get/auth-token/';
-
-export const login = async (
-  username: string,
-  password: string,
-  auth = AuthType.jwt
-): Promise<void> => {
-  if (auth === AuthType.jwt) {
+export const login = async (username: string, email: string, password: string): Promise<void> => {
+  if (email !== '') {
+    return post(JWT_URL, { email, password });
+  } else {
     return post(JWT_URL, { username, password });
   }
-
-  if (auth === AuthType.hue) {
-    await get(LOGOUT_URL);
-    const response = await get<string>(LOGIN_URL);
-    const csrfMatch = response.match(/name='csrfmiddlewaretoken'\s+value='([^']+)'/);
-    if (csrfMatch) {
-      return post(LOGIN_URL, { username, password, csrfmiddlewaretoken: csrfMatch[1] });
-    }
-    throw new Error('No csrf middleware token found!');
-  }
-  throw new Error('Unknown auth method specified!');
 };
