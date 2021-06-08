@@ -865,7 +865,7 @@ SESSION = ConfigSection(
     ),
     ENABLE_TEST_COOKIE=Config(
       key='enable_test_cookie',
-      help=_("Configuration to determine whether test cookie should be added determine whether the user’s browser supports cookies."),
+      help=_("Configuration to determine whether test cookie should be added determine whether the user's browser supports cookies."),
       type=coerce_bool,
       default=True,
     ),
