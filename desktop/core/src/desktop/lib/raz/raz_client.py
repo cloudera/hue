@@ -92,7 +92,7 @@ class RazClient(object):
 
     allparams = [raz_signer.StringListStringMapProto(key=key, value=[val]) for key, val in url_params.items()]
     allparams.extend([raz_signer.StringListStringMapProto(key=key, value=[val]) for key, val in params.items()])
-    headers = [raz_signer.StringStringMapProto(key=key, value=[val]) for key, val in headers.items()]
+    headers = [raz_signer.StringStringMapProto(key=key, value=val) for key, val in headers.items()]
     endpoint = "%s://%s" % (path.scheme, path.netloc)
     resource_path = path.path.lstrip("/")
 
