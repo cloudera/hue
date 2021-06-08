@@ -1,81 +1,85 @@
 [
   {
-    "name": "Sample: Salary Analysis",
-    "desc": "Top salary 2007 above $100k, Salary growth (sorted) from 2007-08",
+    "name": "Sentry",
+    "desc": "Top Hue issues, solutions proposed, usage, related CDH jiras...",
     "dialects": [
-      "postgresql",
-      "mysql",
-      "presto"
+      "impala"
     ],
     "data": {
       "query": {
-        "statement": "SELECT sample_07.description, sample_07.salary\r\nFROM\r\n  sample_07\r\nWHERE\r\n( sample_07.salary > 100000)\r\nORDER BY sample_07.salary DESC\r\nLIMIT 1000;\n\n\nSELECT s07.description, s07.salary, s08.salary,\r\n  s08.salary - s07.salary\r\nFROM\r\n  sample_07 s07 JOIN sample_08 s08\r\nON ( s07.code = s08.code)\r\nWHERE\r\n s07.salary < s08.salary\r\nORDER BY s08.salary-s07.salary DESC\r\nLIMIT 1000;\n"
+        "statement": "use clusterstats;\nSELECT count(DISTINCT(clusterid))\nFROM cluster_config\nWHERE servicetype = 'HDFS'\n  AND configname = 'hdfs_sentry_sync_enable'\n  AND configvalue = 'true';"
       }
     }
   },
   {
-    "name": "Sample: Top salary",
-    "desc": "Top salary 2007 above $100k",
-    "dialects": [],
-    "data": {
-      "query": {
-        "statement": "SELECT sample_07.description, sample_07.salary\r\nFROM\r\n  sample_07\r\nWHERE\r\n( sample_07.salary > 100000)\r\nORDER BY sample_07.salary DESC\r\nLIMIT 1000"
-      }
-    }
-  },
-  {
-    "name": "Sample: Salary growth",
-    "desc": "Salary growth (sorted) from 2007-08",
-    "dialects": [],
-    "data": {
-      "query": {
-        "statement": "SELECT s07.description, s07.salary, s08.salary,\r\n  s08.salary - s07.salary\r\nFROM\r\n  sample_07 s07 JOIN sample_08 s08\r\nON ( s07.code = s08.code)\r\nWHERE\r\n s07.salary < s08.salary\r\nORDER BY s08.salary-s07.salary DESC\r\nLIMIT 1000"
-      }
-    }
-  },
-  {
-    "name": "Sample: Job loss",
-    "desc": "Job loss among the top earners 2007-08",
-    "dialects": [],
-    "data": {
-      "query": {
-        "statement": "SELECT s07.description, s07.total_emp, s08.total_emp, s07.salary\r\nFROM\r\n  sample_07 s07 JOIN \r\n  sample_08 s08\r\nON ( s07.code = s08.code )\r\nWHERE\r\n( s07.total_emp > s08.total_emp\r\n AND s07.salary > 100000 )\r\nORDER BY s07.salary DESC\nLIMIT 1000"
-      }
-    }
-  },
-  {
-    "name": "US City Population",
-    "desc": "Small samples of number of inhabitants in some US cities",
+    "name": "Escalation Jira analysis",
+    "desc": "Investigate quality of escalation responses",
     "dialects": [
-      "pheonix"
+      "impala"
     ],
     "data": {
       "query": {
-        "statement": "\nCREATE TABLE IF NOT EXISTS us_population (\n  state CHAR(2) NOT NULL,\n  city VARCHAR NOT NULL,\n  population BIGINT\n  CONSTRAINT my_pk PRIMARY KEY (state, city)\n);\n\n\nUPSERT INTO us_population VALUES ('NY','New York',8143197);\nUPSERT INTO us_population VALUES ('CA','Los Angeles',3844829);\nUPSERT INTO us_population VALUES ('IL','Chicago',2842518);\nUPSERT INTO us_population VALUES ('TX','Houston',2016582);\nUPSERT INTO us_population VALUES ('PA','Philadelphia',1463281);\nUPSERT INTO us_population VALUES ('AZ','Phoenix',1461575);\nUPSERT INTO us_population VALUES ('TX','San Antonio',1256509);\nUPSERT INTO us_population VALUES ('CA','San Diego',1255540);\nUPSERT INTO us_population VALUES ('TX','Dallas',1213825);\nUPSERT INTO us_population VALUES ('CA','San Jose',91233);\n\nSELECT\n  state as \"State\",\n  count(city) as \"City Count\",\n  sum(population) as \"Population Sum\"\nFROM\n  us_population\nGROUP BY\n  state\nORDER BY\n  sum(population) DESC\n;"
+        "statement": "SELECT trunc( from_unixtime(cast( createdts / 1000 AS int)), '${bucket=MONTH}') AS q, -- Q, MONTH\n   count(*) as ct,\n   cast(avg(duration) AS int) avg_day,\n   min(case when cumedist >= 0.33 then duration end) as 33percentile,\n   min(case when cumedist >= 0.50 then duration end) as 50percentile,\n   min(case when cumedist >= 0.80 then duration end) as 80percentile,\n   min(case when cumedist >= 0.90 then duration end) as 90percentile\nFROM\n( select \n    createdts,\n    cast( (resolvedts - createdts) / 1000 / 60 / 60 / 24 AS int) as duration,\n    cume_dist() over (partition by trunc( from_unixtime(cast( createdts / 1000 AS int)), '${bucket=MONTH}') order by cast( (resolvedts - createdts) / 1000 / 60 / 60 / 24 AS int) asc) as cumedist \n       from jira.ticket \n       WHERE LOWER(componentsasstr) LIKE LOWER('%${component=Hue}%')\n        AND resolvedts != 0\n        AND type.value = '${type=Escalation}'\n        AND createdts >= unix_timestamp('${date=2017-01-01}', 'yyyy-MM-dd') * 1000\n        --AND from_unixtime(cast( createdts / 1000 AS int)) >= toun('${date=2017-01-01}', 'UTC')\n       -- AND NOT LOWER(title) like '%backport%' \n       -- AND NOT LOWER(title) like '%patch%'\n      ) as t\n\nGROUP BY  q\nORDER BY  q asc\n;"
       }
     }
   },
   {
-    "name": "Query and live display a live stream of data",
-    "desc": "Simple select of auto generated data or via the user table backed by a Kafka topic",
+    "name": "Escalation Jira analysis: List of escalations",
+    "desc": "Investigate quality of escalation responses",
     "dialects": [
-      "flink"
+      "impala"
     ],
     "data": {
       "query": {
-        "statement": "\nCREATE TABLE datagen (\n  f_sequence INT,\n  f_random INT,\n  f_random_str STRING,\n  ts AS localtimestamp,\n  WATERMARK FOR ts AS ts\n) WITH (\n  'connector' = 'datagen',\n  'rows-per-second'='5',\n  'fields.f_sequence.kind'='sequence',\n  'fields.f_sequence.start'='1',\n  'fields.f_sequence.end'='1000',\n  'fields.f_random.min'='1',\n  'fields.f_random.max'='1000',\n  'fields.f_random_str.length'='10'\n)\n;\n\nSELECT *\nFROM datagen\nLIMIT 50\n;\n\n\n\nCREATE TABLE user_behavior (\n  user_id BIGINT,\n  item_id BIGINT,\n  category_id BIGINT,\n  behavior STRING,\n  ts TIMESTAMP(3),\n  proctime AS PROCTIME(),   -- generates processing-time attribute using computed column\n  WATERMARK FOR ts AS ts - INTERVAL '5' SECOND  -- defines watermark on ts column, marks ts as event-time attribute\n) WITH (\n  'connector' = 'kafka',  -- using kafka connector\n  'topic' = 'user_behavior',  -- kafka topic\n  'scan.startup.mode' = 'earliest-offset',  -- reading from the beginning\n  'properties.bootstrap.servers' = 'kafka:9094',  -- kafka broker address\n  'format' = 'json'  -- the data format is json\n)\n;\n\nSELECT * \nFROM user_behavior \nLIMIT 50\n;\n\n\nSELECT\n  HOUR(TUMBLE_START(ts, INTERVAL '1' HOUR)) as hour_of_day,\n  COUNT(*) as buy_cnt\nFROM\n  user_behavior\nWHERE\n  behavior = 'buy'\nGROUP BY\n  TUMBLE(ts, INTERVAL '1' HOUR)\n;\n  "
+        "statement": "SELECT from_unixtime(cast( createdts / 1000 AS int)) as t,\nissuekey,\n       summary, resolutionname, statusname\nFROM jira.ticket\nWHERE LOWER(componentsasstr) LIKE LOWER('%${component=Hue}%') --AND resolvedts != 0\n  AND type.value = '${type=Escalation}'\n  AND createdts >= unix_timestamp('${date=2017-01-01}', 'yyyy-MM-dd') * 1000\n  order by createdts desc, issuekey desc\n  ;"
       }
     }
   },
   {
-    "name": "New York Taxi dataset Analysis",
-    "desc": "Regular SELECTs with custom Python UDF and create Machine Learning Model",
+    "name": "Escalation Jira analysis: TTL before comment, number of comments",
+    "desc": "Investigate quality of escalation responses",
     "dialects": [
-      "dasksql"
+      "impala"
     ],
     "data": {
       "query": {
-        "statement": "\nSELECT *\nFROM \"schema\".\"nyc-taxi\"\nLIMIT 100\n;\n\nSELECT\n    FLOOR(trip_distance / 5) * 5 AS \"distance\",\n    AVG(tip_amount) AS \"given tip\",\n    AVG(predict_price(total_amount, trip_distance, passenger_count)) AS \"predicted tip\"\nFROM \"nyc-taxi\"\nWHERE\n    trip_distance > 0 AND trip_distance < 50\nGROUP BY\n    FLOOR(trip_distance / 5) * 5\n;\n\nCREATE MODEL fare_estimator WITH (\n    model_class = 'sklearn.ensemble.GradientBoostingClassifier',\n    wrap_predict = True,\n    target_column = 'fare_amount'\n) AS (\n    SELECT trip_distance, fare_amount\n    FROM \"nyc-taxi\"\n    LIMIT 100\n)\n;\n"
+        "statement": "SELECT from_unixtime(cast( createdts / 1000 AS int)) as t,\nissuekey,\n       summary, resolutionname, statusname\nFROM jira.ticket\nWHERE LOWER(componentsasstr) LIKE LOWER('%${component=Hue}%') --AND resolvedts != 0\n  AND type.value = '${type=Escalation}'\n  AND createdts >= unix_timestamp('${date=2017-01-01}', 'yyyy-MM-dd') * 1000\n  order by createdts desc, issuekey desc\n  ;"
+      }
+    }
+  },
+  {
+    "name": "Escalation Jira analysis: Avg global",
+    "desc": "Investigate quality of escalation responses",
+    "dialects": [
+      "impala"
+    ],
+    "data": {
+      "query": {
+        "statement": "SELECT \n avg(tToFirstComment),\n avg(comments)\nFROM (SELECT t.issuekey,\n       t.summary,\n (min(v.createdts) - t.createdts) / 1000 / 60 / 60 / 24 AS tToFirstComment,\n count(v.id) AS comments\nFROM jira.ticket t,\n     t.comments v\nWHERE LOWER(componentsasstr) LIKE LOWER('%${component=Hue}%') --AND resolvedts != 0\nfrom_unixtime(cast(t.createdts / 1000 AS int)) >= '${date=2017-01-01}'\n  AND type.value = '${type=Escalation}'\n  AND from_unixtime(cast(t.createdts / 1000 AS int)) >= '${date=2017-01-01}'\n  AND NOT LOWER(title) LIKE '%backport%'\nGROUP BY t.issuekey,\n         t.summary,\n         t.createdts,\n         t.resolvedts\n) as c;"
+      }
+    }
+  },
+  {
+    "name": "Escalation Jira analysis: Status",
+    "desc": "Investigate quality of escalation responses",
+    "dialects": [
+      "impala"
+    ],
+    "data": {
+      "query": {
+        "statement": "SELECT t.resolutionname,\n       count(*) AS ct\nFROM jira.ticket t\nWHERE LOWER(componentsasstr) LIKE LOWER('%${component=Hue}%') --AND resolvedts != 0\n\n  AND type.value = '${type=Escalation}'\n  AND from_unixtime(cast(t.createdts / 1000 AS int)) >= '${date=2017-01-01}'\n  AND NOT LOWER(title) LIKE '%backport%'\nGROUP BY t.resolutionname\nORDER BY ct DESC\nLIMIT 100;"
+      }
+    }
+  },
+  {
+    "name": "Jiras with many SFDC tickets",
+    "desc": "The objective is to find the JIRAs in Hue where there are multiple SFDC tickets linked",
+    "dialects": [
+      "impala"
+    ],
+    "data": {
+      "query": {
+        "statement": "SELECT sfdc.jira__c.name ID,\n        sfdc.jira__c.jira_summary__c DESCR,\n         count(jira__c.name) AS TICKETS\nFROM sfdc.cases, sfdc.jira__c, jira.ticket\nWHERE upper(sfdc.cases.component__c) IN ('${component=Hue}')\n        AND sfdc.jira__c.case__c = sfdc.cases.id\n        AND jira.ticket.issuekey = sfdc.jira__c.name\n        AND jira.ticket.statusname NOT IN ('Resolved', 'Closed')\n        AND sfdc.jira__c.name NOT LIKE 'CLR%'\nGROUP BY jira__c.name, jira__c.jira_summary__c\nHAVING count(jira__c.name) > 1\nORDER BY count(jira__c.name) DESC\n;"
       }
     }
   }

@@ -14,30 +14,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { format } from '@gethue/sql-formatter';
 import { ExecutionStatus } from './execution/executable';
 import { CancellablePromise } from 'api/cancellablePromise';
-import { get, post } from 'api/utils';
+import { get } from 'api/utils';
 
-const FORMAT_SQL_API_URL = '/notebook/api/format';
 const HISTORY_API_URL = '/notebook/api/get_history';
-
-interface FormatSqlApiResponse {
-  formatted_statements?: string;
-  status: number;
-}
 
 export const formatSql = async (options: {
   statements: string;
   silenceErrors?: boolean;
 }): Promise<string> => {
   try {
-    const params = new URLSearchParams();
-    params.append('statements', options.statements);
-    const response = await post<FormatSqlApiResponse>(FORMAT_SQL_API_URL, params);
-
-    if (response.status !== -1 && response.formatted_statements) {
-      return response.formatted_statements;
-    }
+    return format(options.statements, {
+      uppercase: true,
+      linesBetweenQueries: 2,
+      indentQuerySeparator: true
+    });
   } catch (err) {
     if (!options.silenceErrors) {
       throw err;

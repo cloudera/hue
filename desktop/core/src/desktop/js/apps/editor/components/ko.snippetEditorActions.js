@@ -47,7 +47,7 @@ const TEMPLATE = `
         <a href="javascript:void(0)" data-bind="click: createGist, css: { 'disabled': !createGistEnabled() }" title="${I18n(
           'Share the query selection via a link'
         )}">
-          <i class="fa fa-fw fa-link"></i> ${I18n('Get shareable link')}
+          <i class="fa fa-fw fa-link"></i> ${I18n('Shareable link')}
         </a>
       </li>
       <!-- /ko -->
