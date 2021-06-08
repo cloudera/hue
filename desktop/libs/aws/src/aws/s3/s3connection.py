@@ -127,7 +127,7 @@ class RazS3Connection(SignedUrlS3Connection):
 
     url = 'https://%(host)s%(path)s' % {'host': host, 'path': path}
 
-    headers = self.get_signed_url(action=method, url=url)
+    headers = self.get_signed_url(action=method, url=url, headers=headers)
     LOG.debug('Raz returned those headers: %s' % headers)
 
     if headers is not None:
@@ -141,10 +141,10 @@ class RazS3Connection(SignedUrlS3Connection):
                       retry_handler=retry_handler)
 
 
-  def get_signed_url(self, action='GET', url=None):
+  def get_signed_url(self, action='GET', url=None, headers=None):
     raz_client = S3RazClient(username=self.username)
 
-    return raz_client.get_url(action, url)
+    return raz_client.get_url(action, url, headers)
 
 
 class SelfSignedUrlS3Connection(SignedUrlS3Connection):
