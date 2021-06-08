@@ -293,15 +293,15 @@ REST_FRAMEWORK = {
     ),
 }
 
-JWT_AUTH = {
-    'JWT_VERIFY': True,
-    'JWT_VERIFY_EXPIRATION': True,
-    'JWT_LEEWAY': 0,
-    'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=86400),
-    'JWT_ALLOW_REFRESH': True,
-    'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=7),
-    'JWT_AUTH_HEADER_PREFIX': 'Bearer',
+SIMPLE_JWT = {
+  'ACCESS_TOKEN_LIFETIME': datetime.timedelta(days=1),
+  'REFRESH_TOKEN_LIFETIME': datetime.timedelta(days=7),
+  'ROTATE_REFRESH_TOKENS': False,
+  'BLACKLIST_AFTER_ROTATION': True,
+  'UPDATE_LAST_LOGIN': False,
+  'AUTH_HEADER_TYPES': ('Bearer',),
 }
+
 
 ############################################################
 # Part 4: Installation of apps

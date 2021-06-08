@@ -18,6 +18,7 @@
 from django.http import QueryDict
 from rest_framework.decorators import api_view
 
+from filebrowser import views as filebrowser_views
 from notebook import api as notebook_api
 from notebook.conf import get_ordered_interpreters
 
@@ -124,6 +125,12 @@ def get_logs(request):
 def autocomplete(request, server=None, database=None, table=None, column=None, nested=None):
   django_request = get_django_request(request)
   return notebook_api.autocomplete(django_request, server, database, table, column, nested)
+
+
+@api_view(["GET"])
+def view(request, path):
+  django_request = get_django_request(request)
+  return filebrowser_views.view(django_request, path)
 
 
 def _get_interpreter_from_dialect(dialect, user):
