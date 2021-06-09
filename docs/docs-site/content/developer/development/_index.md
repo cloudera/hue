@@ -963,7 +963,7 @@ This guide takes you through the steps necessary to create an autocompleter for 
 
 ### Parser Theory
 
-There are several parsers in Hue already (e.g. one for Impala, one for Hive..) and a generic SQL that is used for other dialects. The parsers are written using a [bison](https://www.gnu.org/software/bison/) grammar and are generated with [jison](https://github.com/zaach/jison). They arere 100% Javascript and live on the client side, this gives the performance of a desktop editor in your browser.
+There are several parsers in Hue already (e.g. one for Impala, one for Hive..) and a generic SQL that is used for other dialects. The parsers are written using a [bison](https://www.gnu.org/software/bison/) grammar and are generated with [jison](https://github.com/zaach/jison). They are 100% Javascript and live on the client side, this gives the performance of a desktop editor in your browser.
 
 Building a dedicated work is more effort but it then allows a very rich end user experience, e.g.:
 
