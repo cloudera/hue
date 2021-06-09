@@ -44,7 +44,7 @@ from useradmin.views import ensure_home_directory, require_change_password
 from desktop.auth import forms as auth_forms
 from desktop.auth.backend import OIDCBackend
 from desktop.auth.forms import ImpersonationAuthenticationForm, OrganizationUserCreationForm, OrganizationAuthenticationForm
-from desktop.conf import OAUTH, ENABLE_ORGANIZATIONS
+from desktop.conf import OAUTH, ENABLE_ORGANIZATIONS, SESSION
 from desktop.lib import fsmanager
 from desktop.lib.django_util import render, login_notrequired, JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
@@ -145,7 +145,7 @@ def dt_login(request, from_modal=False):
         userprofile = get_profile(user)
 
         login(request, user)
-
+        # If Test cookie exists , it should be deleted
         if request.session.test_cookie_worked():
           request.session.delete_test_cookie()
         if request.fs is None:
@@ -200,11 +200,12 @@ def dt_login(request, from_modal=False):
       request.method == 'POST' and request.user.username != request.POST.get('username'):
     # local user login failed, give the right auth_form with 'server' field
     auth_form = auth_forms.LdapAuthenticationForm()
-
-  if not from_modal:
+  
+  if not from_modal and SESSION.ENABLE_TEST_COOKIE.get() :
     request.session.set_test_cookie()
 
-  request.session['samlgroup_permitted_flag'] = samlgroup_check(request)
+  if 'SAML2Backend' in backend_names:
+    request.session['samlgroup_permitted_flag'] = samlgroup_check(request)
 
   renderable_path = 'login.mako'
   if from_modal:

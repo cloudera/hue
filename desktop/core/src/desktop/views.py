@@ -460,7 +460,7 @@ def serve_500_error(request, *args, **kwargs):
       else:
         tb = traceback.extract_tb(exc_info[2])
         if is_ajax(request):
-          tb = '\n'.join(tb.format())
+          tb = '\n'.join(tb.format() if sys.version_info[0] > 2 else [str(t) for t in tb])
         return render("500.mako", request, {'traceback': tb})
     else:
       # exc_info could be empty
