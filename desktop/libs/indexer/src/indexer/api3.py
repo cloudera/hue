@@ -20,13 +20,16 @@ standard_library.install_aliases()
 
 from builtins import zip
 from past.builtins import basestring
+import csv
 import json
 import logging
 import urllib.error
 import sys
+import uuid
 
 from django.urls import reverse
 from django.views.decorators.http import require_POST
+from django.core.files.storage import FileSystemStorage
 
 LOG = logging.getLogger(__name__)
 
@@ -41,6 +44,7 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_unicode
 from desktop.lib.python_util import check_encoding
 from desktop.models import Document2
+from desktop.settings import BASE_DIR
 from kafka.kafka_api import get_topics, get_topic_data
 from notebook.connectors.base import get_api, Notebook
 from notebook.decorators import api_error_handler
@@ -48,14 +52,14 @@ from notebook.models import MockedDjangoRequest, escape_rows
 
 from indexer.controller import CollectionManagerController
 from indexer.file_format import HiveFormat
-from indexer.fields import Field
+from indexer.fields import Field, guess_field_type_from_samples
 from indexer.indexers.envelope import _envelope_job
 from indexer.indexers.base import get_api
 from indexer.indexers.flink_sql import FlinkIndexer
 from indexer.indexers.morphline import MorphlineIndexer, _create_solr_collection
 from indexer.indexers.phoenix_sql import PhoenixIndexer
 from indexer.indexers.rdbms import run_sqoop, _get_api
-from indexer.indexers.sql import _create_database, _create_table
+from indexer.indexers.sql import _create_database, _create_table, _create_table_from_local
 from indexer.models import _save_pipeline
 from indexer.solr_client import SolrClient, MAX_UPLOAD_SIZE
 from indexer.indexers.flume import FlumeIndexer
@@ -117,7 +121,16 @@ def _convert_format(format_dict, inverse=False):
 def guess_format(request):
   file_format = json.loads(request.POST.get('fileFormat', '{}'))
 
-  if file_format['inputFormat'] == 'file':
+  if file_format['inputFormat'] == 'localfile':
+    format_ = {
+      "quoteChar": "\"",
+      "recordSeparator": '\\n',
+      "type": "csv",
+      "hasHeader": True,
+      "fieldSeparator": ","
+    }
+
+  elif file_format['inputFormat'] == 'file':
     path = urllib_unquote(file_format["path"])
     indexer = MorphlineIndexer(request.user, request.fs)
     if not request.fs.isfile(path):
@@ -208,15 +221,50 @@ def guess_format(request):
   format_['status'] = 0
   return JsonResponse(format_)
 
+def decode_utf8(input_iterator):
+  for l in input_iterator:
+    yield l.decode('utf-8')
 
 def guess_field_types(request):
   file_format = json.loads(request.POST.get('fileFormat', '{}'))
 
-  if file_format['inputFormat'] == 'file':
+  if file_format['inputFormat'] == 'localfile':
+    path = urllib_unquote(file_format['path'])
+
+    with open(BASE_DIR + path, 'r') as local_file:
+
+      reader = csv.reader(local_file)
+      csv_data = list(reader)
+
+      if file_format['format']['hasHeader']:
+        sample = csv_data[1:5]
+        column_row = csv_data[0]
+      else:
+        sample = csv_data[:4]
+        column_row = ['field_' + str(count+1) for count, col in enumerate(sample[0])] 
+
+      field_type_guesses = []
+      for count, col in enumerate(column_row):
+        column_samples = [sample_row[count] for sample_row in sample if len(sample_row) > count]
+        field_type_guess = guess_field_type_from_samples(column_samples)
+        field_type_guesses.append(field_type_guess)
+
+      columns = [
+        Field(column_row[count], field_type_guesses[count]).to_dict()
+        for count, col in enumerate(column_row)
+      ]
+
+      format_ = {
+        'columns': columns,
+        'sample': sample
+      }
+
+  elif file_format['inputFormat'] == 'file':
     indexer = MorphlineIndexer(request.user, request.fs)
     path = urllib_unquote(file_format["path"])
     stream = request.fs.open(path)
     encoding = check_encoding(stream.read(10000))
+    LOG.debug('File %s encoding is %s' % (path, encoding))
     stream.seek(0)
     _convert_format(file_format["format"], inverse=True)
 
@@ -400,10 +448,13 @@ def importer_submit(request):
   destination['ouputFormat'] = outputFormat  # Workaround a very weird bug
   start_time = json.loads(request.POST.get('start_time', '-1'))
 
+  file_encoding = None
   if source['inputFormat'] == 'file':
     if source['path']:
       path = urllib_unquote(source['path'])
       source['path'] = request.fs.netnormpath(path)
+      stream = request.fs.open(path)
+      file_encoding = check_encoding(stream.read(10000))
 
   if destination['ouputFormat'] in ('database', 'table'):
     destination['nonDefaultLocation'] = request.fs.netnormpath(destination['nonDefaultLocation']) \
@@ -493,12 +544,21 @@ def importer_submit(request):
     else:
       job_handle = job_nb.execute(request, batch=False)
   else:
-    job_handle = _create_table(
-      request,
-      source,
-      destination,
-      start_time
-    )
+    if source['inputFormat'] == 'localfile':
+      job_handle = _create_table_from_local(
+        request,
+        source,
+        destination,
+        start_time
+      )
+    else:
+      job_handle = _create_table(
+        request,
+        source,
+        destination,
+        start_time,
+        file_encoding
+      )
 
   request.audit = {
     'operation': 'EXPORT',
@@ -677,3 +737,16 @@ def save_pipeline(request):
   response['message'] = request.POST.get('editorMode') == 'true' and _('Query saved successfully') or _('Notebook saved successfully')
 
   return JsonResponse(response)
+
+
+def upload_local_file(request):
+
+  upload_file = request.FILES['inputfile']
+  fs = FileSystemStorage()
+  username = request.user.username
+  filename = "%s_%s.%s" % (username, uuid.uuid4(), 'csv')
+  name = fs.save(filename, upload_file)
+
+  local_file_url = fs.url(name)
+
+  return JsonResponse({'local_file_url': local_file_url})

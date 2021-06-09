@@ -31,15 +31,15 @@ import {
 } from './events';
 import { ASSIST_KEY_COMPONENT } from './ko.assistKey';
 import dataCatalog from 'catalog/dataCatalog';
-import AssistDbSource from 'ko/components/assist/assistDbSource';
-import componentUtils from 'ko/components/componentUtils';
-import huePubSub from 'utils/huePubSub';
+import { CONFIG_REFRESHED_TOPIC } from 'config/events';
 import {
-  CONFIG_REFRESHED_EVENT,
   filterEditorConnectors,
   findDashboardConnector,
   findEditorConnector
 } from 'config/hueConfig';
+import AssistDbSource from 'ko/components/assist/assistDbSource';
+import componentUtils from 'ko/components/componentUtils';
+import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
 
@@ -588,7 +588,7 @@ class AssistDbPanel {
 
     this.breadcrumb = ko.pureComputed(() => {
       if (this.isStreams && this.selectedSource()) {
-        return this.selectedSource().name;
+        return this.selectedSource().connector.displayName;
       }
       if (!this.isSolr && this.selectedSource()) {
         if (this.selectedSource().selectedNamespace()) {
@@ -599,7 +599,7 @@ class AssistDbPanel {
             return this.selectedSource().selectedNamespace().name;
           }
         }
-        return this.selectedSource().name;
+        return this.selectedSource().connector.displayName;
       }
       return null;
     });
@@ -807,7 +807,7 @@ class AssistDbPanel {
     this.sources([source]);
     this.selectedSource(source);
 
-    source.loadNamespaces().done(() => {
+    source.loadNamespaces().then(() => {
       const namespace = this.selectedSource().selectedNamespace();
       if (namespace) {
         namespace.initDatabases();
@@ -840,7 +840,7 @@ class AssistDbPanel {
           new AssistDbSource({
             i18n: this.i18n,
             type: connector.id, // TODO: Remove redundant
-            name: connector.name, // TODO: Remove redundant
+            name: connector.displayName, // TODO: Remove redundant
             connector: connector,
             nonSqlType: false,
             navigationSettings: navigationSettings
@@ -865,7 +865,7 @@ class AssistDbPanel {
       this.sources(sources);
     };
 
-    huePubSub.subscribe(CONFIG_REFRESHED_EVENT, updateFromConfig);
+    huePubSub.subscribe(CONFIG_REFRESHED_TOPIC, updateFromConfig);
     updateFromConfig();
   }
 }

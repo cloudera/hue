@@ -1,0 +1,67 @@
+{{- if and .Values.ingress.create (eq .Values.ingress.type "nginx-ssl") (semverCompare "<1.19-0" .Capabilities.KubeVersion.GitVersion) -}}
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: hue
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-hue-prod
+    cert-manager.io/acme-challenge-type: http01
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/affinity: "cookie"
+    nginx.ingress.kubernetes.io/session-cookie-name: "hue-balancer"
+    nginx.ingress.kubernetes.io/session-cookie-expires: "172800"
+    nginx.ingress.kubernetes.io/session-cookie-max-age: "172800"
+    {{- if .Values.ingress.hasAuth }}
+    nginx.ingress.kubernetes.io/auth-type: basic
+    nginx.ingress.kubernetes.io/auth-secret: basic-auth-hue
+    nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required'
+    {{- end }}
+{{- with .Values.ingress.annotations }}
+{{ toYaml . | indent 4 }}
+{{- end }}
+spec:
+  rules:
+  - host: {{ .Values.ingress.domain }}
+    http:
+      paths:
+      {{- if .Values.websocket.enabled }}
+      - backend:
+          serviceName: daphne-websocket
+          servicePort: 8001
+        path: /(ws/.*)
+      {{- end }}
+      - backend:
+          serviceName: hue-balancer
+          servicePort: 80
+        path: /(.*)
+  {{- range .Values.ingress.extraHosts }}
+  - host: {{ . | quote }}
+    http:
+      paths:
+      - backend:
+          serviceName: hue-balancer
+          servicePort: 80
+        path: /
+  {{- end }}
+  {{- if .Values.api.enabled }}
+  - host: {{ .Values.api.domain }}
+    http:
+      paths:
+      - backend:
+          serviceName: hue-api
+          servicePort: 8005
+        path: /(.*)
+  {{- end }}
+  tls:
+  - hosts:
+    - {{ .Values.ingress.domain }}
+    {{- range .Values.ingress.extraHosts }}
+    - {{ . | quote }}
+    {{- end }}
+    {{- if .Values.api.enabled }}
+    - {{ .Values.api.domain }}
+    {{- end }}
+    secretName: letsencrypt-hue-prod-tls
+{{- end -}}

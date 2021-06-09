@@ -214,9 +214,6 @@
   # Choose whether to enable the new SQL syntax checker or not
   ## enable_sql_syntax_check=true
 
-  # Choose whether to show the improved assist panel and the right context panel
-  ## use_new_side_panels=false
-
   # Choose whether to use new charting library across the whole Hue.
   ## use_new_charts=false
 
@@ -239,9 +236,6 @@
 
   # Timeout in seconds for REST calls.
   ## rest_conn_timeout=120
-
-  # To set to true when using a decoupled UI.
-  ## cors_enabled=false
 
   # A json file containing a list of log redaction rules for cleaning sensitive data
   # from log files. It is defined as:
@@ -669,6 +663,10 @@
     # This can have any value that is not used by the other cookie names in your application.
     ## cookie_name=sessionid
 
+    # Configuration to determine whether test cookie should be added determine whether the user's browser supports cookies
+    # Should be disabled if django_session table is growing rapidly , Default value is true
+    ## enable_test_cookie=true
+
     # The cookie containing the users' session ID will expire after this amount of time in seconds.
     # Default is 2 weeks.
     ## ttl=1209600
@@ -831,6 +829,9 @@
     # Enables Slack application API endpoints
     ## is_enabled=true
 
+    # Enables direct sharing from Editor to Slack
+    ## share_from_editor=true
+
 
   # Configuration options for the request Tracing
   # ------------------------------------------------------------------------
@@ -876,6 +877,20 @@
       [[[default]]]
         # The JSON credentials to authenticate to Google Cloud e.g. '{ "type": "service_account", "project_id": .... }'
         # json_credentials=None
+
+
+  ## Configuration for RAZ service integration
+  # ------------------------------------------------------------------------
+  [[raz]]
+  ## Turns on the integration as ready to use
+  # is_enabled=false
+
+  ## Endpoint to contact
+  # api_url=https://localhost:8080
+
+  ## How to authenticate against: KERBEROS or JWT (not supported yet)
+  # api_authentication=KERBEROS
+
 
 ###########################################################################
 # Settings to configure the snippets available in the Notebook
@@ -1635,6 +1650,9 @@
 
   # Flag to turn on Kafka topic ingest.
   ## enable_kafka=false
+
+  # Flag to turn on the direct upload of a small file.
+  ## enable_direct_upload=true
 
 
 ###########################################################################

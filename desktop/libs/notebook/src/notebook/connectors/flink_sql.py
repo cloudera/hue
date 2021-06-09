@@ -198,13 +198,13 @@ class FlinkSqlApi(Api):
 
     return {
         'has_more': bool(next_result),
-        'data': resp['results'][0]['data'],  # No escaping...
+        'data': resp and resp['results'][0]['data'] or [],  # No escaping...
         'meta': [{
             'name': column['name'],
             'type': column['type'],
             'comment': ''
           }
-          for column in resp['results'][0]['columns']
+          for column in resp['results'][0]['columns'] if resp
         ],
         'type': 'table'
     }
@@ -256,7 +256,10 @@ class FlinkSqlApi(Api):
     statement_id = snippet['result']['handle']['guid']
 
     try:
-      self.db.close_statement(session_id=session['id'], job_id=statement_id)
+      if session and statement_id:
+        self.db.close_statement(session_id=session['id'], job_id=statement_id)
+      else:
+        return {'status': -1} # missing operation ids
     except Exception as e:
       if 'does not exist in current session:' in str(e):
         return {'status': -1}  # skipped

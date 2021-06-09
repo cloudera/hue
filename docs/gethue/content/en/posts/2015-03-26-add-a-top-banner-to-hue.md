@@ -33,7 +33,7 @@ sf_right_sidebar:
 sf_caption_position:
   - caption-right
 categories:
-  - Dev / API
+  - Development
 
 ---
 We have already seen <a href="https://gethue.com/how-to-configure-hue-in-your-hadoop-cluster/" target="_blank" rel="noopener noreferrer">in this post</a> how you can configure Hue in your cluster. But did you know that there’s a property that can make a top banner appear in your Hue installation? [<img src="https://cdn.gethue.com/uploads/2015/03/Screenshot-2015-03-23-16.33.12-1024x610.png"  />][1] This is quite useful if you want for instance to show a disclaimer to your users, or to clearly mark a testing or production environment, or if you want to display some dynamic information there. Depending on if you are using <a href="https://gethue.com/hadoop-tutorial-how-to-create-a-real-hadoop-cluster-in-10-minutes/" target="_blank" rel="noopener noreferrer">Cloudera Manager</a> or not, you should either add a safety valve or edit a .ini file to use this feature. For details on how to change the configuration, <a href="https://gethue.com/how-to-configure-hue-in-your-hadoop-cluster/" target="_blank" rel="noopener noreferrer">read here</a>. In the desktop/custom section of the ini file you can find the banner_top_html property:

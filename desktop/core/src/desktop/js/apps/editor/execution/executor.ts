@@ -14,6 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import KnockoutObservable from '@types/knockout';
+
 import Snippet from 'apps/editor/snippet';
 import Executable, { ExecutableRaw } from 'apps/editor/execution/executable';
 import { syncSqlExecutables } from 'apps/editor/execution/utils';
@@ -33,7 +35,7 @@ export interface ExecutorOptions {
   defaultLimit?: KnockoutObservable<number>;
   isSqlEngine?: boolean;
   snippet?: Snippet;
-  isOptimizerEnabled?: boolean;
+  isSqlAnalyzerEnabled?: boolean;
 }
 
 export default class Executor {
@@ -43,7 +45,7 @@ export default class Executor {
   database: KnockoutObservable<string>;
   defaultLimit?: KnockoutObservable<number>;
   isSqlEngine?: boolean;
-  isOptimizerEnabled?: boolean;
+  isSqlAnalyzerEnabled?: boolean;
   executables: Executable[] = [];
   snippet?: Snippet;
   activeExecutable?: Executable;
@@ -55,7 +57,7 @@ export default class Executor {
     this.namespace = options.namespace;
     this.database = options.database;
     this.isSqlEngine = options.isSqlEngine;
-    this.isOptimizerEnabled = options.isOptimizerEnabled;
+    this.isSqlAnalyzerEnabled = options.isSqlAnalyzerEnabled;
     this.executables = [];
     this.defaultLimit = options.defaultLimit;
     this.snippet = options.snippet;

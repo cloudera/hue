@@ -37,7 +37,7 @@
     name: 'ExecutionStatusIcon',
     props: {
       status: {
-        type: Object as PropType<ExecutionStatus | null>,
+        type: String as PropType<ExecutionStatus | null>,
         default: null
       }
     },

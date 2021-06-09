@@ -17,7 +17,8 @@
 import $ from 'jquery';
 import * as ko from 'knockout';
 
-import contextCatalog, { NAMESPACES_REFRESHED_EVENT } from 'catalog/contextCatalog';
+import { getNamespaces } from 'catalog/contextCatalog';
+import { NAMESPACES_REFRESHED_TOPIC } from 'catalog/events';
 import huePubSub from 'utils/huePubSub';
 import MetastoreNamespace from 'apps/tableBrowser/metastoreNamespace';
 import {
@@ -32,6 +33,7 @@ class MetastoreSource {
   constructor(options) {
     this.type = options.type;
     this.name = options.name;
+    this.displayName = options.displayName;
     this.metastoreViewModel = options.metastoreViewModel;
 
     this.reloading = ko.observable(false);
@@ -131,7 +133,7 @@ class MetastoreSource {
         });
     };
 
-    huePubSub.subscribe(NAMESPACES_REFRESHED_EVENT, connectorId => {
+    huePubSub.subscribe(NAMESPACES_REFRESHED_TOPIC, connectorId => {
       if (this.type !== connectorId) {
         return;
       }
@@ -159,7 +161,7 @@ class MetastoreSource {
                 () => {
                   setState(previousState);
                 },
-                this.metastoreViewModel.optimizerEnabled(),
+                this.metastoreViewModel.sqlAnalyzerEnabled(),
                 this.metastoreViewModel.navigatorEnabled()
               );
               return true;
@@ -185,9 +187,8 @@ class MetastoreSource {
 
   loadNamespaces() {
     this.loading(true);
-    contextCatalog
-      .getNamespaces({ connector: this.connector() })
-      .done(context => {
+    getNamespaces({ connector: this.connector() })
+      .then(context => {
         const namespacesWithComputes = context.namespaces.filter(
           namespace => namespace.computes.length
         );
@@ -198,7 +199,7 @@ class MetastoreSource {
                 metastoreViewModel: this.metastoreViewModel,
                 sourceType: this.type,
                 navigatorEnabled: this.metastoreViewModel.navigatorEnabled,
-                optimizerEnabled: this.metastoreViewModel.optimizerEnabled,
+                sqlAnalyzerEnabled: this.metastoreViewModel.sqlAnalyzerEnabled,
                 namespace: namespace
               })
           )
@@ -206,8 +207,8 @@ class MetastoreSource {
         this.namespace(this.namespaces()[0]);
         this.lastLoadNamespacesDeferred.resolve();
       })
-      .fail(this.lastLoadNamespacesDeferred.reject)
-      .always(() => {
+      .catch(this.lastLoadNamespacesDeferred.reject)
+      .finally(() => {
         this.loading(false);
       });
     return this.lastLoadNamespacesDeferred;

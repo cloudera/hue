@@ -37,7 +37,7 @@
             :class="cellClass(column.headerCssClass, colIndex)"
             scope="col"
           >
-            {{ column.label || column.key }}
+            {{ typeof column.label !== 'undefined' ? column.label : column.key }}
           </th>
           <!-- To fill the blank space to the right when table width is smaller than available horizontal space -->
           <th class="column-flush" scope="col" />
@@ -74,12 +74,12 @@
     name: 'HueTable',
     props: {
       rows: {
-        type: Object as PropType<Row[]>,
+        type: Array as PropType<Row[]>,
         required: false,
         default: () => []
       },
       columns: {
-        type: Object as PropType<Column<unknown>[]>,
+        type: Array as PropType<Column<unknown>[]>,
         required: false,
         default: () => []
       },

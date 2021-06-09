@@ -16,7 +16,7 @@
 
 import d3v3 from 'd3v3';
 
-import hueUtils from 'utils/hueUtils';
+import htmlEncode from 'utils/html/htmlEncode';
 import nv from 'ext/nv.d3.1.1.15b.custom';
 
 nv.models.lineWithBrushChart = function () {
@@ -50,19 +50,12 @@ nv.models.lineWithBrushChart = function () {
     tooltip = null,
     displayValuesInLegend = false;
   const tooltipSimple = function (value) {
-      return (
-        '<h3>' +
-        hueUtils.htmlEncode(value.key) +
-        '</h3>' +
-        '<p>' +
-        hueUtils.htmlEncode(value.x) +
-        '</p>'
-      );
+      return '<h3>' + htmlEncode(value.key) + '</h3>' + '<p>' + htmlEncode(value.x) + '</p>';
     },
     tooltipMultiple = function (values) {
       return (
         '<h3>' +
-        hueUtils.htmlEncode(values[0] && values[0].x) +
+        htmlEncode(values[0] && values[0].x) +
         '</h3>' +
         values
           .map(value => {
@@ -70,9 +63,9 @@ nv.models.lineWithBrushChart = function () {
               '<p><span class="circle" style="background-color:' +
               value.color +
               '"></span><b>' +
-              hueUtils.htmlEncode(value.key) +
+              htmlEncode(value.key) +
               '</b> ' +
-              hueUtils.htmlEncode(value.y) +
+              htmlEncode(value.y) +
               '</p>'
             );
           })

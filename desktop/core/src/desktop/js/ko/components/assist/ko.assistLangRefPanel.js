@@ -17,12 +17,13 @@
 import $ from 'jquery';
 import * as ko from 'knockout';
 
+import { ASSIST_LANG_REF_PANEL_SHOW_TOPIC_EVENT } from './events';
+import { simpleGet } from 'api/apiUtils';
+import { CONFIG_REFRESHED_TOPIC } from 'config/events';
+import { filterEditorConnectors } from 'config/hueConfig';
 import componentUtils from 'ko/components/componentUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
-import { CONFIG_REFRESHED_EVENT, filterEditorConnectors } from 'config/hueConfig';
-import { simpleGet } from 'api/apiUtils';
-import { ASSIST_LANG_REF_PANEL_SHOW_TOPIC_EVENT } from './events';
 
 export const NAME = 'assist-language-reference-panel';
 
@@ -177,7 +178,7 @@ class AssistLangRefPanel {
     };
 
     configUpdated();
-    huePubSub.subscribe(CONFIG_REFRESHED_EVENT, configUpdated);
+    huePubSub.subscribe(CONFIG_REFRESHED_TOPIC, configUpdated);
 
     if (this.connector()) {
       updateDialect(this.connector().dialect);

@@ -17,22 +17,28 @@
 -->
 
 <template>
-  <dropdown-panel :text="selectedRange.title" :inline="inline">
+  <dropdown-panel
+    :text="(isCustom && CUSTOM_TITLE) || selectedRange.title"
+    :inline="inline"
+    :close-on-click="false"
+  >
     <template #default="{ closePanel }">
       <div class="date-range-picker-panel">
         <div class="date-range-picker-body">
           <div class="date-range-picker-preset">
-            <div style="border-right: 1px solid gray;">
+            <div style="border-right: 1px solid gray">
               <header>Quick Ranges</header>
               <div class="preset-list">
-                <div v-for="(rangeSet, index) in rangeSets" :key="index" class="preset-column">
+                <div v-for="(rangeSet, index) in RANGE_SETS" :key="index" class="preset-column">
                   <div
                     v-for="range in rangeSet"
                     :key="range.title"
                     class="preset-value"
                     :class="{ selected: range === selectedRange }"
                   >
-                    <hue-link @click="selectedRange = range">{{ range.title }}</hue-link>
+                    <hue-link @click="quickSelect(range, closePanel)">
+                      {{ range.title }}
+                    </hue-link>
                   </div>
                 </div>
               </div>
@@ -43,25 +49,23 @@
             <div>
               <div class="range-header">FROM:</div>
               <datepicker
-                :value="customFrom"
+                v-model="customFrom"
                 :typeable="true"
                 input-class="range-input"
                 calendar-class="range-calendar"
                 format="dd/MM/yyyy"
                 placeholder="DD/MM/YYYY"
-                @selected="setCustomFrom"
               />
             </div>
             <div>
               <div class="range-header">TO:</div>
               <datepicker
-                :value="customTo"
+                v-model="customTo"
                 :typeable="true"
                 input-class="range-input"
                 calendar-class="range-calendar"
                 format="dd/MM/yyyy"
                 placeholder="DD/MM/YYYY"
-                @selected="setCustomTo"
               />
             </div>
           </div>
@@ -76,7 +80,7 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent } from 'vue';
+  import { defineComponent, ref, watch } from 'vue';
 
   import { Range } from './DateRangePicker';
   import { DateTime } from 'luxon';
@@ -137,6 +141,8 @@
 
   const DEFAULT_RANGE = RANGE_SETS[0][0];
 
+  const CUSTOM_TITLE = I18n('Custom Range');
+
   export default defineComponent({
     name: 'DateRangePicker',
     components: {
@@ -145,7 +151,6 @@
       HueButton,
       HueLink
     },
-
     props: {
       inline: {
         type: Boolean,
@@ -153,105 +158,80 @@
         default: false
       }
     },
-
     emits: ['date-range-changed'],
+    setup(props, { emit }) {
+      const selectedRange = ref<Range>(DEFAULT_RANGE);
+      const isCustom = ref<boolean>(false);
+      const customFrom = ref<Date>(new Date(RANGE_NOW.toMillis() - DEFAULT_RANGE.from));
+      const customTo = ref<Date>(new Date(RANGE_NOW.toMillis()));
 
-    setup(): {
-      rangeSets: Range[][];
-
-      customRange: Range;
-    } {
-      return {
-        rangeSets: RANGE_SETS,
-
-        customRange: {
-          title: I18n('Custom Range'),
-          from: RANGE_NOW.toMillis() - DEFAULT_RANGE.from,
-          to: RANGE_NOW.toMillis(),
-          custom: true
+      watch(customFrom, () => {
+        if (customFrom.value.getTime() > customTo.value.getTime()) {
+          customTo.value = customFrom.value;
         }
-      };
-    },
+      });
 
-    data(): {
-      selectedRange: Range;
-    } {
-      return {
-        selectedRange: DEFAULT_RANGE
-      };
-    },
-
-    computed: {
-      customFrom(): number | undefined {
-        if (this.selectedRange.custom) {
-          return this.selectedRange.from;
+      watch(customTo, () => {
+        if (customTo.value.getTime() < customFrom.value.getTime()) {
+          customFrom.value = customTo.value;
         }
-        return undefined;
-      },
+      });
 
-      customTo(): number | undefined {
-        if (this.selectedRange.custom) {
-          return this.selectedRange.to;
-        }
-        return undefined;
-      }
-    },
-
-    methods: {
-      // TODO: Switch to v-model and value prop
-      clear(): void {
-        if (this.selectedRange !== DEFAULT_RANGE) {
-          this.selectedRange = DEFAULT_RANGE;
-          this.notify();
-        }
-      },
-
-      setCustomFrom(from?: Date): void {
-        if (from) {
-          this.customRange.from = from.valueOf();
-          if (this.customRange.from > this.customRange.to) {
-            this.customRange.to = this.customRange.from;
-          }
-          this.selectedRange = this.customRange;
-          this.$forceUpdate();
-        }
-      },
-
-      setCustomTo(to?: Date): void {
-        if (to) {
-          this.customRange.to = to.valueOf();
-          if (this.customRange.to < this.customRange.from) {
-            this.customRange.from = this.customRange.to;
-          }
-          this.selectedRange = this.customRange;
-          this.$forceUpdate();
-        }
-      },
-
-      notify(): void {
+      const notify = (): void => {
         let range: Range;
-        if (this.selectedRange.custom) {
+        if (isCustom.value) {
           range = {
-            title: this.selectedRange.title,
-            from: DateTime.fromMillis(this.selectedRange.from).startOf('day').valueOf(),
-            to: DateTime.fromMillis(this.selectedRange.to).endOf('day').valueOf(),
+            title: CUSTOM_TITLE,
+            from: DateTime.fromJSDate(customFrom.value).startOf('day').valueOf(),
+            to: DateTime.fromJSDate(customTo.value).endOf('day').valueOf(),
             custom: true
           };
         } else {
+          const { title, from, to } = selectedRange.value;
           const now = DateTime.utc().valueOf();
           range = {
-            title: this.selectedRange.title,
-            from: now - this.selectedRange.from,
-            to: now - this.selectedRange.to
+            title,
+            from: now - from,
+            to: now - to
           };
         }
-        this.$emit('date-range-changed', range);
-      },
+        emit('date-range-changed', range);
+      };
 
-      apply(closePanel: () => void): void {
-        this.notify();
+      const clear = (): void => {
+        if (isCustom.value || selectedRange.value !== DEFAULT_RANGE) {
+          customFrom.value = new Date(RANGE_NOW.toMillis() - DEFAULT_RANGE.from);
+          customTo.value = new Date(RANGE_NOW.toMillis());
+          selectedRange.value = DEFAULT_RANGE;
+          isCustom.value = false;
+          notify();
+        }
+      };
+
+      const apply = (closePanel: () => void): void => {
+        isCustom.value = true;
+        notify();
         closePanel();
-      }
+      };
+
+      const quickSelect = (range: Range, closePanel: () => void): void => {
+        isCustom.value = false;
+        selectedRange.value = range;
+        notify();
+        closePanel();
+      };
+
+      return {
+        apply,
+        clear,
+        CUSTOM_TITLE,
+        customFrom,
+        customTo,
+        isCustom,
+        quickSelect,
+        RANGE_SETS,
+        selectedRange
+      };
     }
   });
 </script>

@@ -21,7 +21,8 @@ import { ASSIST_DOC_HIGHLIGHT_EVENT, ASSIST_SHOW_DOC_EVENT } from './events';
 import { DOCUMENT_TYPES } from 'doc/docSupport';
 import HueFileEntry from 'doc/hueFileEntry';
 import componentUtils from 'ko/components/componentUtils';
-import { CONFIG_REFRESHED_EVENT, getLastKnownConfig } from 'config/hueConfig';
+import { CONFIG_REFRESHED_TOPIC } from 'config/events';
+import { getLastKnownConfig } from 'config/hueConfig';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
@@ -70,10 +71,10 @@ const TEMPLATE = `
             <!-- ko if: window.HUE_APPS.indexOf('beeswax') !== -1 -->
               <li>
                 <a title="${I18n(
-                  'Hive Query'
+                    window.ENABLE_UNIFIED_ANALYTICS ? 'Unified Analytics Query' : 'Hive Query'
                 )}" data-bind="click: function() { huePubSub.publish('open.editor.new.query', {type: 'hive', 'directoryUuid': $data.getDirectory()}); }" href="javascript:void(0);">
-                  <!-- ko template: { name: 'app-icon-template', data: { icon: 'hive' } } --><!-- /ko --> ${I18n(
-                    'Hive Query'
+                  <!-- ko template: { name: 'app-icon-template', data: { icon: window.ENABLE_UNIFIED_ANALYTICS ? 'impala' : 'hive' } } --><!-- /ko --> ${I18n(
+                    window.ENABLE_UNIFIED_ANALYTICS ? 'Unified Analytics' : 'Hive'
                   )}
                 </a>
               </li>
@@ -84,7 +85,7 @@ const TEMPLATE = `
                   'Impala Query'
                 )}" class="dropdown-item" data-bind="click: function() { huePubSub.publish('open.editor.new.query', {type: 'impala', 'directoryUuid': $data.getDirectory()}); }" href="javascript:void(0);">
                   <!-- ko template: { name: 'app-icon-template', data: { icon: 'impala' } } --><!-- /ko --> ${I18n(
-                    'Impala Query'
+                    'Impala'
                   )}
                 </a>
             </li>
@@ -249,7 +250,7 @@ class AssistDocumentsPanel {
     };
 
     updateFromConfig(getLastKnownConfig());
-    huePubSub.subscribe(CONFIG_REFRESHED_EVENT, updateFromConfig);
+    huePubSub.subscribe(CONFIG_REFRESHED_TOPIC, updateFromConfig);
 
     self.highlightTypeFilter = ko.observable(false);
 

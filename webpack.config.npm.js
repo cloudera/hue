@@ -19,6 +19,7 @@
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const path = require('path');
+const fs = require('fs');
 const { VueLoaderPlugin } = require('vue-loader');
 
 const DIST_DIR = path.join(__dirname, 'npm_dist');
@@ -33,62 +34,69 @@ const defaultConfig = Object.assign({}, require('./webpack.config'), {
   plugins: []
 });
 
-const executorLibConfig = Object.assign({}, defaultConfig, {
+const rootFiles = new Set();
+
+fs.readdirSync(JS_ROOT).forEach(file => {
+  rootFiles.add(file.replace(/\..+$/, ''));
+});
+
+const relatives = ['./'];
+
+let current = '';
+for (let i = 1; i < 50; i++) {
+  current += '../';
+  relatives.push(current);
+}
+
+const copySourceConfig = {
+  mode: 'production',
   entry: {
-    executor: [`${JS_ROOT}/apps/editor/execution/executor.ts`]
+    pjson: './package.json'
   },
   output: {
-    path: `${DIST_DIR}/lib/execution`,
-    library: '[name]',
-    libraryExport: 'default',
-    libraryTarget: 'umd',
-    umdNamedDefine: true,
-    globalObject: `(typeof self !== 'undefined' ? self : this)`
+    path: `${DIST_DIR}`
+  },
+  optimization: {
+    minimize: false,
+    usedExports: true
   },
   plugins: [
     new CleanWebpackPlugin([DIST_DIR]),
     new CopyWebpackPlugin({
       patterns: [
-        { from: './package.json', to: `${DIST_DIR}/package.json` },
         { from: './NPM-README.md', to: `${DIST_DIR}/README.md` },
-        { from: JS_ROOT, to: `${DIST_DIR}` },
+        { from: './package.json', to: `${DIST_DIR}/package.json` },
         {
-          from: `${JS_ROOT}/apps/editor/execution/executor.d.ts`,
-          to: `${DIST_DIR}/lib/execution`
+          from: JS_ROOT,
+          to: `${DIST_DIR}`,
+          transform: (content, absoluteFrom) => {
+            // This turns all absolute imports to relative (except for npm dependencies) and solves module
+            // resolution issues when the Hue source files are used directly from another project.
+            if (/\.(jsx?|tsx?|vue)$/.test(absoluteFrom)) {
+              const depth = absoluteFrom.slice(JS_ROOT.length + 1).split('/').length - 1;
+              return content
+                .toString()
+                .replace(
+                  /(import\s(?:[\S\s]+?\sfrom\s[^'"]*)?['"])([^.][^'"/]*)([/])/gi,
+                  (all, pre, module, post) =>
+                    `${pre}${rootFiles.has(module) ? relatives[depth] : ''}${module}${post}`
+                );
+            }
+            return content;
+          }
         }
       ]
     })
   ]
-});
-
-const hueConfigLibConfig = Object.assign({}, defaultConfig, {
-  entry: {
-    hueConfig: [`${JS_ROOT}/config/hueConfig.ts`]
-  },
-  output: {
-    path: `${DIST_DIR}/lib/config`,
-    library: '[name]',
-    libraryExport: 'default',
-    libraryTarget: 'umd',
-    umdNamedDefine: true,
-    globalObject: `(typeof self !== 'undefined' ? self : this)`
-  },
-  plugins: [
-    new CopyWebpackPlugin({
-      patterns: [
-        {
-          from: `${JS_ROOT}/config/hueConfig.d.ts`,
-          to: `${DIST_DIR}/lib/config`
-        }
-      ]
-    })
-  ]
-});
+};
 
 const webComponentsConfig = Object.assign({}, defaultConfig, {
   entry: {
     ErDiagram: [`${JS_ROOT}/components/er-diagram/webcomp.ts`],
-    QueryEditorWebComponents: [`${JS_ROOT}/apps/editor/components/QueryEditorWebComponents.ts`]
+    QueryEditorWebComponents: [`${JS_ROOT}/apps/editor/components/QueryEditorWebComponents.ts`],
+    SqlScratchpadWebComponent: [
+      `${JS_ROOT}/apps/editor/components/sqlScratchpad/SqlScratchpadWebComponent.ts`
+    ]
   },
   output: {
     path: `${DIST_DIR}/lib/components`,
@@ -102,6 +110,10 @@ const webComponentsConfig = Object.assign({}, defaultConfig, {
       patterns: [
         {
           from: `${JS_ROOT}/apps/editor/components/QueryEditorWebComponents.d.ts`,
+          to: `${DIST_DIR}/lib/components`
+        },
+        {
+          from: `${JS_ROOT}/apps/editor/components/sqlScratchpad/SqlScratchpadWebComponent.d.ts`,
           to: `${DIST_DIR}/lib/components`
         }
       ]
@@ -181,10 +193,4 @@ const vue3WebCompWrapperConfig = Object.assign({}, defaultConfig, {
   ]
 });
 
-module.exports = [
-  executorLibConfig,
-  hueConfigLibConfig,
-  webComponentsConfig,
-  parserConfig,
-  vue3WebCompWrapperConfig
-];
+module.exports = [copySourceConfig, webComponentsConfig, parserConfig, vue3WebCompWrapperConfig];

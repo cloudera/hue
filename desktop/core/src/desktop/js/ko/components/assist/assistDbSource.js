@@ -17,7 +17,8 @@
 import $ from 'jquery';
 import * as ko from 'knockout';
 
-import contextCatalog, { NAMESPACES_REFRESHED_EVENT } from 'catalog/contextCatalog';
+import { getComputes, getNamespaces } from 'catalog/contextCatalog';
+import { NAMESPACES_REFRESHED_TOPIC } from 'catalog/events';
 import AssistDbNamespace from 'ko/components/assist/assistDbNamespace';
 import huePubSub from 'utils/huePubSub';
 import { getFromLocalStorage } from 'utils/storageUtils';
@@ -27,8 +28,8 @@ class AssistDbSource {
    * @param {Object} options
    * @param {Object} options.i18n
    * @param {string} options.type
-   * @param {ContextNamespace} [options.initialNamespace] - Optional initial namespace to use
-   * @param {ContextCompute} [options.initialCompute] - Optional initial compute to use
+   * @param {Namespace} [options.initialNamespace] - Optional initial namespace to use
+   * @param {Compute} [options.initialCompute] - Optional initial compute to use
    * @param {Connector} options.connector
    * @param {string} options.name
    * @param {boolean} options.nonSqlType - Optional, default false
@@ -107,15 +108,14 @@ class AssistDbSource {
 
     self.hasNamespaces = ko.pureComputed(() => self.namespaces().length > 0);
 
-    huePubSub.subscribe(NAMESPACES_REFRESHED_EVENT, connectorId => {
+    huePubSub.subscribe(NAMESPACES_REFRESHED_TOPIC, connectorId => {
       if (self.connector.id !== connectorId) {
         return;
       }
 
       self.loading(true);
-      contextCatalog
-        .getNamespaces({ connector: self.connector })
-        .done(context => {
+      getNamespaces({ connector: self.connector })
+        .then(context => {
           const newNamespaces = [];
           const existingNamespaceIndex = {};
           self.namespaces().forEach(assistNamespace => {
@@ -142,7 +142,8 @@ class AssistDbSource {
           });
           self.namespaces(newNamespaces);
         })
-        .always(() => {
+        .catch()
+        .finally(() => {
           self.loading(false);
         });
     });
@@ -158,12 +159,11 @@ class AssistDbSource {
     self.loading(true);
 
     if (refresh) {
-      contextCatalog.getComputes({ connector: self.connector, clearCache: true });
+      getComputes({ connector: self.connector, clearCache: true }).catch();
     }
 
-    return contextCatalog
-      .getNamespaces({ connector: self.connector, clearCache: refresh })
-      .done(context => {
+    return getNamespaces({ connector: self.connector, clearCache: refresh })
+      .then(context => {
         const assistNamespaces = [];
         let activeNamespace;
         let activeCompute;
@@ -208,10 +208,10 @@ class AssistDbSource {
           }
         }
       })
-      .fail(() => {
+      .catch(() => {
         self.hasErrors(true);
       })
-      .always(() => {
+      .finally(() => {
         self.loadedDeferred.resolve();
         self.loading(false);
       });
@@ -249,7 +249,7 @@ class AssistDbSource {
         whenLoaded();
       });
     } else {
-      self.loadNamespaces().done(whenLoaded);
+      self.loadNamespaces().then(whenLoaded);
     }
   }
 

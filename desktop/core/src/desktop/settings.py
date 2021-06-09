@@ -30,8 +30,6 @@ import pkg_resources
 import sys
 import uuid
 
-import django_opentracing
-
 import desktop.redaction
 
 from desktop.lib.paths import get_desktop_root, get_run_root
@@ -117,7 +115,8 @@ USE_TZ = False
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
 # Examples: "http://media.lawrence.com/media/", "http://example.com/media/"
-MEDIA_URL = ''
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
 
 
 ############################################################
@@ -213,6 +212,8 @@ INSTALLED_APPS = [
     'django_prometheus',
     'crequest',
     #'django_celery_results',
+    'rest_framework',
+    'rest_framework.authtoken',
 ]
 
 WEBPACK_LOADER = {
@@ -281,6 +282,26 @@ PYLINTRC = get_run_root('.pylintrc')
 
 # Custom CSRF Failure View
 CSRF_FAILURE_VIEW = 'desktop.views.csrf_failure'
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+      'rest_framework.permissions.IsAuthenticated',
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+      'rest_framework_simplejwt.authentication.JWTAuthentication',
+      'rest_framework.authentication.SessionAuthentication',
+    ),
+}
+
+SIMPLE_JWT = {
+  'ACCESS_TOKEN_LIFETIME': datetime.timedelta(days=1),
+  'REFRESH_TOKEN_LIFETIME': datetime.timedelta(days=7),
+  'ROTATE_REFRESH_TOKENS': False,
+  'BLACKLIST_AFTER_ROTATION': True,
+  'UPDATE_LAST_LOGIN': False,
+  'AUTH_HEADER_TYPES': ('Bearer',),
+}
+
 
 ############################################################
 # Part 4: Installation of apps
@@ -356,12 +377,16 @@ SERVER_EMAIL = desktop.conf.DJANGO_SERVER_EMAIL.get()
 EMAIL_BACKEND = desktop.conf.DJANGO_EMAIL_BACKEND.get()
 EMAIL_SUBJECT_PREFIX = 'Hue %s - ' % desktop.conf.CLUSTER_ID.get()
 
-# Permissive CORS
-if desktop.conf.CORS_ENABLED.get():
-  INSTALLED_APPS.append('corsheaders')
-  MIDDLEWARE.append('corsheaders.middleware.CorsMiddleware')
-  MIDDLEWARE.remove('django.middleware.csrf.CsrfViewMiddleware')
+
+# Permissive CORS for public /api
+INSTALLED_APPS.append('corsheaders')
+MIDDLEWARE.insert(0, 'corsheaders.middleware.CorsMiddleware')
+CORS_URLS_REGEX = r'^/api/.*$'
+CORS_ALLOW_CREDENTIALS = True
+if sys.version_info[0] > 2:
   CORS_ALLOW_ALL_ORIGINS = True
+else:
+  CORS_ORIGIN_ALLOW_ALL = True
 
 # Configure database
 if os.getenv('DESKTOP_DB_CONFIG'):

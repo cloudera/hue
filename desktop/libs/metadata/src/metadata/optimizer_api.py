@@ -134,7 +134,7 @@ def top_tables(request):
       'column_count': table['columnCount'],
       'total': table['total'],
     }
-    for table in data['results']
+    for table in data.get('results', [])
   ]
 
   response['top_tables'] = tables
@@ -369,11 +369,9 @@ def top_columns(request):
 
   data = api.top_columns(db_tables=db_tables, connector=connector)
 
-  if data:
-    response['status'] = 0
-    response['values'] = data
-  else:
-    response['message'] = 'Optimizer: %s' % data
+  response['status'] = 0
+  response['values'] = data or []
+  response['message'] = 'Optimizer: %s' % data
 
   return JsonResponse(response)
 

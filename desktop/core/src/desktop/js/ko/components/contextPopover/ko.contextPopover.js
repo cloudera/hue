@@ -28,11 +28,12 @@ import LangRefContext from './langRefContext';
 import PartitionContext, { PARTITION_CONTEXT_TEMPLATE } from './partitionContext';
 import ResizeHelper from './resizeHelper';
 import StorageContext from './storageContext';
-import contextCatalog from 'catalog/contextCatalog';
+import { getNamespaces } from 'catalog/contextCatalog';
 import dataCatalog from 'catalog/dataCatalog';
+import { GET_KNOWN_CONFIG_TOPIC } from 'config/events';
+import { findEditorConnector } from 'config/hueConfig';
 import { ASSIST_KEY_COMPONENT } from 'ko/components/assist/ko.assistKey';
 import componentUtils from 'ko/components/componentUtils';
-import { findEditorConnector, GET_KNOWN_CONFIG_EVENT } from 'config/hueConfig';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import { getFromLocalStorage } from 'utils/storageUtils';
@@ -913,7 +914,7 @@ class SqlContextContentsGlobalSearch {
     let connectorId = params.data.sourceType && params.data.sourceType.toLowerCase();
 
     if (!connectorId || connectorId === 'hive') {
-      huePubSub.publish(GET_KNOWN_CONFIG_EVENT, clusterConfig => {
+      huePubSub.publish(GET_KNOWN_CONFIG_TOPIC, clusterConfig => {
         if (clusterConfig) {
           const defaultEditor = clusterConfig['default_sql_interpreter'];
           if (!connectorId || (connectorId === 'hive' && defaultEditor === 'impala')) {
@@ -931,24 +932,26 @@ class SqlContextContentsGlobalSearch {
         // TODO: Global search results are referring to dialect and not type
         connector = findEditorConnector(connector => connector.dialect === connectorId);
       }
-      contextCatalog.getNamespaces({ connector: connector }).done(context => {
-        dataCatalog
-          .getEntry({
-            namespace: context.namespaces[0],
-            compute: context.namespaces[0].computes[0],
-            connector: connector,
-            path: path,
-            definition: { type: params.data.type.toLowerCase() }
-          })
-          .then(catalogEntry => {
-            catalogEntry.navigatorMeta = params.data;
-            catalogEntry.navigatorMetaPromise = CancellablePromise.resolve(
-              catalogEntry.navigatorMeta
-            );
-            catalogEntry.saveLater();
-            self.contents(new DataCatalogContext({ popover: self, catalogEntry: catalogEntry }));
-          });
-      });
+      getNamespaces({ connector })
+        .then(context => {
+          dataCatalog
+            .getEntry({
+              namespace: context.namespaces[0],
+              compute: context.namespaces[0].computes[0],
+              connector: connector,
+              path: path,
+              definition: { type: params.data.type.toLowerCase() }
+            })
+            .then(catalogEntry => {
+              catalogEntry.navigatorMeta = params.data;
+              catalogEntry.navigatorMetaPromise = CancellablePromise.resolve(
+                catalogEntry.navigatorMeta
+              );
+              catalogEntry.saveLater();
+              self.contents(new DataCatalogContext({ popover: self, catalogEntry: catalogEntry }));
+            });
+        })
+        .catch();
     } else if (self.isDocument) {
       self.contents(new DocumentContext(params.data));
     } else if (self.isPartition) {

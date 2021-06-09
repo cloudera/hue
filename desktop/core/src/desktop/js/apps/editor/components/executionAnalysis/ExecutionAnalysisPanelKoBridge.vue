@@ -17,16 +17,13 @@
 -->
 
 <template>
-  <ExecutionAnalysisPanel
-    v-if="executable"
-    :executable="executable"
-    @execution-error="onExecutionError"
-  />
+  <ExecutionAnalysisPanel v-if="executable" :executable="executable" />
 </template>
 
 <script lang="ts">
   import { defineComponent, PropType, ref, toRefs } from 'vue';
   import { wrap } from 'vue/webComponentWrap';
+  import KnockoutObservable from '@types/knockout';
 
   import ExecutionAnalysisPanel from './ExecutionAnalysisPanel.vue';
   import SqlExecutable from 'apps/editor/execution/sqlExecutable';
@@ -52,11 +49,6 @@
       subTracker.trackObservable(executableObservable, executable);
 
       return { executable };
-    },
-    methods: {
-      onExecutionError(): void {
-        this.$el.dispatchEvent(new CustomEvent('execution-error', { bubbles: true }));
-      }
     }
   });
 

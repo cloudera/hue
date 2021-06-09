@@ -583,6 +583,187 @@ def test_generate_create_empty_kudu_table():
 ;''' in sql, sql)
 
 
+def test_create_ddl_with_nonascii():
+  source = {u'kafkaFieldType': u'delimited', u'rdbmsUsername': u'', u'kafkaFieldTypes': u'',
+            u'selectedTableIndex': 0, u'rdbmsJdbcDriverNames': [], u'tableName': u'',
+            u'sample': [[u'Weihaiwei', u'\u5a01\u6d77\u536b\u5e02', u'Weihai', u'\u5a01\u6d77\u5e02', u'1949-11-01'],
+                        [u'Xingshan', u'\u5174\u5c71\u5e02', u'Hegang', u'\u9e64\u5c97\u5e02', u'1950-03-23'],
+                        [u"Xi'an", u'\u897f\u5b89\u5e02', u'Liaoyuan', u'\u8fbd\u6e90\u5e02', u'1952-04-03'],
+                        [u'Nanzheng', u'\u5357\u90d1\u5e02', u'Hanzhong', u'\u6c49\u4e2d\u5e02', u'1953-10-24'],
+                        [u'Dihua', u'\u8fea\u5316\u5e02', u'?r\xfcmqi', u'\u4e4c\u9c81\u6728\u9f50\u5e02', u'1953-11-20']],
+            u'rdbmsTypes': [], u'isFetchingDatabaseNames': False, u'rdbmsDbIsValid': False, u'query': u'',
+            u'channelSourceSelectedHosts': [], u'table': u'', u'rdbmsAllTablesSelected': False,
+            u'inputFormatsManual': [{u'name': u'Manually', u'value': u'manual'}], u'rdbmsPassword': u'',
+            u'isObjectStore': False, u'tables': [{u'name': u''}], u'streamUsername': u'',
+            u'kafkaSchemaManual': u'detect', u'connectorSelection': u'sfdc', u'namespace':
+              {u'status': u'CREATED', u'computes':
+                [{u'credentials': {}, u'type': u'direct', u'id': u'default', u'name': u'default'}],
+               u'id': u'default', u'name': u'default'}, u'rdbmsIsAllTables': False, u'rdbmsDatabaseNames': [],
+            u'hasStreamSelected': False, u'channelSourcePath': u'/var/log/hue-httpd/access_log',
+            u'channelSourceHosts': [], u'show': True, u'streamObjects': [], u'streamPassword': u'',
+            u'tablesNames': [], u'sampleCols': [{u'operations': [], u'comment': u'', u'unique': False,
+                                                 u'name': u'Before', u'level': 0, u'keyType': u'string',
+                                                 u'required': False, u'precision': 10, u'nested': [],
+                                                 u'isPartition': False, u'length': 100, u'partitionValue': u'',
+                                                 u'multiValued': False, u'keep': True, u'type': u'string',
+                                                 u'showProperties': False, u'scale': 0},
+                                                {u'operations': [], u'comment': u'', u'unique': False,
+                                                 u'name': u'old_Chinese_name', u'level': 0, u'keyType':
+                                                   u'string', u'required': False, u'precision': 10, u'nested': [],
+                                                 u'isPartition': False, u'length': 100, u'partitionValue': u'',
+                                                 u'multiValued': False, u'keep': True, u'type': u'string',
+                                                 u'showProperties': False, u'scale': 0},
+                                                {u'operations': [], u'comment': u'', u'unique': False,
+                                                 u'name': u'After', u'level': 0, u'keyType': u'string',
+                                                 u'required': False, u'precision': 10, u'nested': [],
+                                                 u'isPartition': False, u'length': 100, u'partitionValue': u'',
+                                                 u'multiValued': False, u'keep': True, u'type': u'string',
+                                                 u'showProperties': False, u'scale': 0},
+                                                {u'operations': [], u'comment': u'', u'unique': False,
+                                                 u'name': u'new_Chinese_name', u'level': 0, u'keyType':
+                                                   u'string', u'required': False, u'precision': 10, u'nested': [],
+                                                 u'isPartition': False, u'length': 100, u'partitionValue': u'',
+                                                 u'multiValued': False, u'keep': True, u'type': u'string',
+                                                 u'showProperties': False, u'scale': 0},
+                                                {u'operations': [], u'comment': u'', u'unique': False,
+                                                 u'name': u'Renamed_date', u'level': 0, u'keyType': u'string',
+                                                 u'required': False, u'precision': 10, u'nested': [],
+                                                 u'isPartition': False, u'length': 100, u'partitionValue': u'',
+                                                 u'multiValued': False, u'keep': True, u'type': u'string',
+                                                 u'showProperties': False, u'scale': 0}], u'rdbmsDatabaseName': u'',
+            u'sourceType': u'hive', u'inputFormat': u'file', u'format': {u'status': 0, u'fieldSeparator': u',',
+                                                                         u'hasHeader': True, u'quoteChar': u'"',
+                                                                         u'recordSeparator': u'\\n', u'type': u'csv'},
+            u'connectorList': [{u'name': u'Salesforce', u'value': u'sfdc'}], u'kafkaFieldDelimiter': u',',
+            u'rdbmsPort': u'', u'rdbmsTablesExclude': [], u'isFetchingDriverNames': False, u'publicStreams':
+              [{u'name': u'Kafka Topics', u'value': u'kafka'}, {u'name': u'Flume Agent', u'value': u'flume'}],
+            u'channelSourceTypes': [{u'name': u'Directory or File', u'value': u'directory'},
+                                    {u'name': u'Program', u'value': u'exec'},
+                                    {u'name': u'Syslogs', u'value': u'syslogs'},
+                                    {u'name': u'HTTP', u'value': u'http'}],
+            u'databaseName': u'default', u'inputFormats': [{u'name': u'File', u'value': u'file'},
+                                                           {u'name': u'External Database', u'value': u'rdbms'},
+                                                           {u'name': u'Manually', u'value': u'manual'}],
+            u'path': u'/user/admin/renamed_chinese_cities_gb2312.csv', u'streamToken': u'', u'kafkaFieldNames': u'',
+            u'streamSelection': u'kafka', u'compute': {u'credentials': {}, u'type': u'direct',
+                                                       u'id': u'default', u'name': u'default'},
+            u'name': u'', u'kafkaFieldSchemaPath': u'', u'kafkaTopics': [], u'rdbmsJdbcDriver': u'',
+            u'rdbmsHostname': u'', u'isFetchingTableNames': False, u'rdbmsType': None, u'inputFormatsAll':
+              [{u'name': u'File', u'value': u'file'}, {u'name': u'External Database', u'value': u'rdbms'},
+               {u'name': u'Manually', u'value': u'manual'}], u'rdbmsTableNames': [],
+            u'streamEndpointUrl': u'https://login.salesforce.com/services/Soap/u/42.0', u'kafkaSelectedTopics': u''}
+  destination = {u'isTransactionalVisible': True, u'KUDU_DEFAULT_PARTITION_COLUMN':
+    {u'int_val': 16, u'name': u'HASH', u'columns': [], u'range_partitions':
+      [{u'include_upper_val': u'<=', u'upper_val': 1, u'name': u'VALUES', u'include_lower_val': u'<=',
+        u'lower_val': 0, u'values': [{u'value': u''}]}]}, u'namespaces':
+    [{u'status': u'CREATED', u'computes': [{u'credentials': {}, u'type': u'direct', u'id': u'default', u'name': u'default'}],
+      u'id': u'default', u'name': u'default'}], u'isTargetChecking': False, 'ouputFormat': u'table',
+                 u'tableName': u'renamed_chinese_cities_gb2312', u'outputFormatsList':
+                   [{u'name': u'Table', u'value': u'table'}, {u'name': u'Search index', u'value': u'index'},
+                    {u'name': u'Database', u'value': u'database'}, {u'name': u'Folder', u'value': u'file'},
+                    {u'name': u'HBase Table', u'value': u'hbase'}],
+                 u'fieldEditorPlaceHolder': u'Example: SELECT * FROM [object Promise]', u'indexerDefaultField': [],
+                 u'fieldEditorValue':
+                   u'SELECT Before,\n    old_Chinese_name,\n    After,\n    new_Chinese_name,\n    Renamed_date\n FROM [object Promise];',
+                 u'customRegexp': u'', u'customLineDelimiter': u'\\n', u'isTargetExisting': False,
+                 u'customEnclosedByDelimiter': u"'", u'indexerConfigSets': [], u'sourceType': u'hive',
+                 u'useCustomDelimiters': False, u'apiHelperType': u'hive', u'numMappers': 1,
+                 u'fieldEditorDatabase': u'default', u'namespace': {u'status': u'CREATED', u'computes':
+      [{u'credentials': {}, u'type': u'direct', u'id': u'default', u'name': u'default'}], u'id': u'default', u'name': u'default'},
+                 u'indexerPrimaryKeyObject': [], u'kuduPartitionColumns': [], u'rdbmsFileOutputFormats':
+                   [{u'name': u'text', u'value': u'text'}, {u'name': u'sequence', u'value': u'sequence'},
+                    {u'name': u'avro', u'value': u'avro'}], u'outputFormats': [{u'name': u'Table', u'value': u'table'},
+                                                                               {u'name': u'Search index', u'value': u'index'}],
+                 u'fieldEditorEnabled': False, u'indexerDefaultFieldObject': [],
+                 u'customMapDelimiter': u'', u'partitionColumns': [], u'rdbmsFileOutputFormat': u'text',
+                 u'showProperties': False, u'isTransactional': True, u'useDefaultLocation': True, u'description': u'',
+                 u'customFieldsDelimiter': u',', u'primaryKeyObjects': [], u'customFieldDelimiter': u',',
+                 u'rdbmsSplitByColumn': [], u'existingTargetUrl': u'', u'channelSinkTypes':
+                   [{u'name': u'This topic', u'value': u'kafka'}, {u'name': u'Solr', u'value': u'solr'},
+                    {u'name': u'HDFS', u'value': u'hdfs'}], u'defaultName': u'default.renamed_chinese_cities_gb2312',
+                 u'isTransactionalUpdateEnabled': False, u'importData': True, u'databaseName': u'default',
+                 u'indexerRunJob': False, u'indexerReplicationFactor': 1, u'KUDU_DEFAULT_RANGE_PARTITION_COLUMN':
+                   {u'include_upper_val': u'<=', u'upper_val': 1, u'name': u'VALUES', u'include_lower_val': u'<=',
+                    u'lower_val': 0, u'values': [{u'value': u''}]}, u'primaryKeys': [], u'indexerConfigSet': u'',
+                 u'sqoopJobLibPaths': [{u'path': u''}], u'outputFormat': u'table',
+                 u'nonDefaultLocation': u'/user/admin/renamed_chinese_cities_gb2312.csv',
+                 u'compute': {u'credentials': {}, u'type': u'direct', u'id': u'default', u'name': u'default'},
+                 u'name': u'default.renamed_chinese_cities_gb2312', u'tableFormat': u'text', u'isInsertOnly': True,
+                 u'targetNamespaceId': u'default', u'bulkColumnNames': u'Before,old_Chinese_name,After,new_Chinese_name,Renamed_date',
+                 u'columns': [{u'operations': [], u'comment': u'', u'unique': False, u'name': u'Before', u'level': 0,
+                               u'keyType': u'string', u'required': False, u'precision': 10, u'nested': [],
+                               u'isPartition': False, u'length': 100, u'partitionValue': u'', u'multiValued': False,
+                               u'keep': True, u'type': u'string', u'showProperties': False, u'scale': 0},
+                              {u'operations': [], u'comment': u'', u'unique': False, u'name': u'old_Chinese_name',
+                               u'level': 0, u'keyType': u'string', u'required': False, u'precision': 10, u'nested': [],
+                               u'isPartition': False, u'length': 100, u'partitionValue': u'', u'multiValued': False,
+                               u'keep': True, u'type': u'string', u'showProperties': False, u'scale': 0},
+                              {u'operations': [], u'comment': u'', u'unique': False, u'name': u'After', u'level': 0,
+                               u'keyType': u'string', u'required': False, u'precision': 10, u'nested': [],
+                               u'isPartition': False, u'length': 100, u'partitionValue': u'', u'multiValued': False,
+                               u'keep': True, u'type': u'string', u'showProperties': False, u'scale': 0},
+                              {u'operations': [], u'comment': u'', u'unique': False, u'name': u'new_Chinese_name',
+                               u'level': 0, u'keyType': u'string', u'required': False, u'precision': 10, u'nested': [],
+                               u'isPartition': False, u'length': 100, u'partitionValue': u'', u'multiValued': False,
+                               u'keep': True, u'type': u'string', u'showProperties': False, u'scale': 0},
+                              {u'operations': [], u'comment': u'', u'unique': False, u'name': u'Renamed_date',
+                               u'level': 0, u'keyType': u'string', u'required': False, u'precision': 10, u'nested': [],
+                               u'isPartition': False, u'length': 100, u'partitionValue': u'', u'multiValued': False,
+                               u'keep': True, u'type': u'string', u'showProperties': False, u'scale': 0}],
+                 u'hasHeader': True, u'indexerPrimaryKey': [], u'tableFormats':
+                   [{u'name': u'Text', u'value': u'text'}, {u'name': u'Parquet', u'value': u'parquet'},
+                    {u'name': u'Csv', u'value': u'csv'}, {u'name': u'Avro', u'value': u'avro'},
+                    {u'name': u'Json', u'value': u'json'}, {u'name': u'Regexp', u'value': u'regexp'},
+                    {u'name': u'ORC', u'value': u'orc'}], u'customCollectionDelimiter': u'', u'indexerNumShards': 1,
+                 u'useFieldEditor': False, u'indexerJobLibPath': u'/tmp/smart_indexer_lib'}
+
+  file_encoding = u'gb2312'
+  path = {
+    'isDir': False,
+    'split': ('/user/admin', 'renamed_chinese_cities_gb2312.csv'),
+    'listdir': ['/user/admin/data'],
+    'parent_path': '/user/admin/.scratchdir/03d184ad-dd11-4ae1-aace-378daaa094e5/renamed_chinese_cities_gb2312.csv/..'
+  }
+  request = MockRequest(fs=MockFs(path=path))
+
+  sql = SQLIndexer(user=request.user, fs=request.fs).create_table_from_a_file(source, destination, start_time=-1,
+                                                                              file_encoding=file_encoding).get_str()
+
+  assert_true('''USE default;''' in sql, sql)
+
+  statement = '''CREATE TABLE `default`.`hue__tmp_renamed_chinese_cities_gb2312`
+(
+  `Before` string ,
+  `old_Chinese_name` string ,
+  `After` string ,
+  `new_Chinese_name` string ,
+  `Renamed_date` string ) ROW FORMAT   DELIMITED
+    FIELDS TERMINATED BY ','
+    COLLECTION ITEMS TERMINATED BY '\\002'
+    MAP KEYS TERMINATED BY '\\003'
+  STORED AS TextFile TBLPROPERTIES("skip.header.line.count" = "1", "transactional" = "false")
+;'''
+  assert_true(statement in sql, sql)
+
+  statement = "LOAD DATA INPATH '/user/admin/renamed_chinese_cities_gb2312.csv' " + \
+              "INTO TABLE `default`.`hue__tmp_renamed_chinese_cities_gb2312`;"
+  assert_true(statement in sql, sql)
+
+  statement = '''CREATE TABLE `default`.`renamed_chinese_cities_gb2312`
+        STORED AS TextFile
+TBLPROPERTIES("transactional"="true", "transactional_properties"="insert_only")
+        AS SELECT *
+        FROM `default`.`hue__tmp_renamed_chinese_cities_gb2312`;'''
+  assert_true(statement in sql, sql)
+
+  statement = '''DROP TABLE IF EXISTS `default`.`hue__tmp_renamed_chinese_cities_gb2312`;'''
+  assert_true(statement in sql, sql)
+
+  statement = '''ALTER TABLE `default`.`renamed_chinese_cities_gb2312` ''' + \
+              '''SET serdeproperties ("serialization.encoding"="gb2312");'''
+  assert_true(statement in sql, sql)
+
+
 def test_create_ddl_with_abfs():
   finish = ABFS_CLUSTERS.set_for_testing(
     {
@@ -603,3 +784,221 @@ def test_create_ddl_with_abfs():
   finally:
     finish()
   assert_true(u"\'abfs://my-data@yingstorage.dfs.core.windows.net/test_data/cars.csv\'" in sql)
+
+
+def test_create_table_from_local():
+  with patch('indexer.indexers.sql.get_interpreter') as get_interpreter:
+    get_interpreter.return_value = {'Name': 'Hive', 'dialect': 'hive'}
+    source = {
+      'path': '',
+      'sourceType': 'hive'
+    }
+    destination = {
+      'name': 'default.test1',
+      'columns': [
+        {'name': 'date', 'type': 'timestamp'},
+        {'name': 'hour', 'type': 'bigint'},
+        {'name': 'minute', 'type': 'bigint'},
+        {'name': 'dep', 'type': 'bigint'},
+        {'name': 'arr', 'type': 'bigint'},
+        {'name': 'dep_delay', 'type': 'bigint'},
+        {'name': 'arr_delay', 'type': 'bigint'},
+        {'name': 'carrier', 'type': 'string'},
+        {'name': 'flight', 'type': 'bigint'},
+        {'name': 'dest', 'type': 'string'},
+        {'name': 'plane', 'type': 'string'},
+        {'name': 'cancelled', 'type': 'boolean'},
+        {'name': 'time', 'type': 'bigint'},
+        {'name': 'dist', 'type': 'bigint'},
+      ],
+      'indexerPrimaryKey': [],
+      'sourceType': 'hive'
+    }
+    sql = SQLIndexer(user=Mock(), fs=Mock()).create_table_from_local_file(source, destination).get_str()
+
+    statement = '''USE default;
+
+CREATE TABLE IF NOT EXISTS default.test1 (
+  `date` timestamp,
+  `hour` bigint,
+  `minute` bigint,
+  `dep` bigint,
+  `arr` bigint,
+  `dep_delay` bigint,
+  `arr_delay` bigint,
+  `carrier` string,
+  `flight` bigint,
+  `dest` string,
+  `plane` string,
+  `cancelled` boolean,
+  `time` bigint,
+  `dist` bigint);'''
+
+    assert_equal(statement, sql)
+
+
+def test_create_table_from_local_mysql():
+  with patch('indexer.indexers.sql.get_interpreter') as get_interpreter:
+    get_interpreter.return_value = {'Name': 'MySQL', 'dialect': 'mysql'}
+    source = {
+      'path': '/apps/beeswax/data/tables/us_population.csv',
+      'sourceType': 'mysql',
+      'format': {'hasHeader': False}
+    }
+    destination = {
+      'name': 'default.test1',
+      'columns': [
+        {'name': 'field_1', 'type': 'string'},
+        {'name': 'field_2', 'type': 'string'},
+        {'name': 'field_3', 'type': 'bigint'},
+      ],
+      'sourceType': 'mysql'
+    }
+    sql = SQLIndexer(user=Mock(), fs=Mock()).create_table_from_local_file(source, destination).get_str()
+
+    statement = '''USE default;
+
+CREATE TABLE IF NOT EXISTS default.test1 (
+  `field_1` VARCHAR(255),
+  `field_2` VARCHAR(255),
+  `field_3` bigint);
+      
+INSERT INTO default.test1 VALUES ('NY', 'New York', '8143197'), ('CA', 'Los Angeles', '3844829'), \
+('IL', 'Chicago', '2842518'), ('TX', 'Houston', '2016582'), ('PA', 'Philadelphia', '1463281'), \
+('AZ', 'Phoenix', '1461575'), ('TX', 'San Antonio', '1256509'), ('CA', 'San Diego', '1255540'), \
+('TX', 'Dallas', '1213825'), ('CA', 'San Jose', '912332');'''
+
+    assert_equal(statement, sql)
+
+
+def test_create_table_from_local_phoenix():
+  with patch('indexer.indexers.sql.get_interpreter') as get_interpreter:
+    get_interpreter.return_value = {'Name': 'Phoenix', 'dialect': 'phoenix'}
+    source = {
+      'path': '/apps/beeswax/data/tables/us_population.csv',
+      'sourceType': 'phoenix',
+      'format': {'hasHeader': False}
+    }
+    destination = {
+      'name': 'default.test1',
+      'columns': [
+        {'name': 'field_1', 'type': 'string'},
+        {'name': 'field_2', 'type': 'string'},
+        {'name': 'field_3', 'type': 'bigint'},
+      ],
+      'sourceType': 'phoenix',
+      'primaryKeys': ['field_3']
+    }
+    sql = SQLIndexer(user=Mock(), fs=Mock()).create_table_from_local_file(source, destination).get_str()
+
+    statement = '''USE default;
+
+CREATE TABLE IF NOT EXISTS default.test1 (
+  field_1 CHAR(255),
+  field_2 CHAR(255),
+  field_3 bigint
+CONSTRAINT my_pk PRIMARY KEY (field_3));
+
+UPSERT INTO default.test1 VALUES ('NY', 'New York', 8143197);
+            
+UPSERT INTO default.test1 VALUES ('CA', 'Los Angeles', 3844829);
+            
+UPSERT INTO default.test1 VALUES ('IL', 'Chicago', 2842518);
+            
+UPSERT INTO default.test1 VALUES ('TX', 'Houston', 2016582);
+            
+UPSERT INTO default.test1 VALUES ('PA', 'Philadelphia', 1463281);
+            
+UPSERT INTO default.test1 VALUES ('AZ', 'Phoenix', 1461575);
+            
+UPSERT INTO default.test1 VALUES ('TX', 'San Antonio', 1256509);
+            
+UPSERT INTO default.test1 VALUES ('CA', 'San Diego', 1255540);
+            
+UPSERT INTO default.test1 VALUES ('TX', 'Dallas', 1213825);
+            
+UPSERT INTO default.test1 VALUES ('CA', 'San Jose', 912332);'''
+
+    assert_equal(statement, sql)
+
+
+def test_create_table_from_local_impala():
+  with patch('indexer.indexers.sql.get_interpreter') as get_interpreter:
+    get_interpreter.return_value = {'Name': 'Impala', 'dialect': 'impala'}
+    source = {
+      'path': '/apps/beeswax/data/tables/flights.csv',
+      'sourceType': 'impala',
+      'format': {'hasHeader': True}
+    }
+    destination = {
+      'name': 'default.test1',
+      'columns': [
+        {'name': 'date', 'type': 'timestamp'},
+        {'name': 'hour', 'type': 'bigint'},
+        {'name': 'minute', 'type': 'bigint'},
+        {'name': 'dep', 'type': 'bigint'},
+        {'name': 'arr', 'type': 'bigint'},
+        {'name': 'dep_delay', 'type': 'bigint'},
+        {'name': 'arr_delay', 'type': 'bigint'},
+        {'name': 'carrier', 'type': 'string'},
+        {'name': 'flight', 'type': 'bigint'},
+        {'name': 'dest', 'type': 'string'},
+        {'name': 'plane', 'type': 'string'},
+        {'name': 'cancelled', 'type': 'boolean'},
+        {'name': 'time', 'type': 'bigint'},
+        {'name': 'dist', 'type': 'bigint'},
+      ],
+      'sourceType': 'impala'
+    }
+    request = MockRequest(fs=MockFs())
+    sql = SQLIndexer(user=request.user, fs=request.fs).create_table_from_local_file(source, destination).get_str()
+
+    statement = '''USE default;
+
+CREATE TABLE IF NOT EXISTS default.test1_tmp (
+  `date` string,
+  `hour` string,
+  `minute` string,
+  `dep` string,
+  `arr` string,
+  `dep_delay` string,
+  `arr_delay` string,
+  `carrier` string,
+  `flight` string,
+  `dest` string,
+  `plane` string,
+  `cancelled` string,
+  `time` string,
+  `dist` string);
+      
+INSERT INTO default.test1_tmp VALUES \
+('2011-12-14 12:00:00', '13', '4', '1304', '1704', '24', '14', 'WN', '3085', 'PHL', 'N524SW', '1', '159', '1336'), \
+('2011-12-14 12:00:00', '17', '52', '1752', '1943', '12', '8', 'WN', '39', 'PHX', 'N503SW', '1', '155', '1020'), \
+('2011-12-14 12:00:00', '7', '9', '709', '853', '-1', '-12', 'WN', '424', 'PHX', 'N761RR', '1', '152', '1020'), \
+('2011-12-14 12:00:00', '13', '32', '1332', '1514', '17', '4', 'WN', '1098', 'PHX', 'N941WN', '1', '151', '1020'), \
+('2011-12-14 12:00:00', '9', '55', '955', '1141', '5', '-4', 'WN', '1403', 'PHX', 'N472WN', '1', '155', '1020'), \
+('2011-12-14 12:00:00', '16', '13', '1613', '1731', '8', '-4', 'WN', '33', 'SAN', 'N707SA', '1', '185', '1313'), \
+('2011-12-14 12:00:00', '11', '45', '1145', '1257', '5', '-13', 'WN', '1212', 'SAN', 'N279WN', '0', '183', '1313'), \
+('2011-12-14 12:00:00', '20', '16', '2016', '2112', '36', '32', 'WN', '207', 'SAT', 'N929WN', '0', '44', '192');
+
+CREATE TABLE IF NOT EXISTS default.test1
+AS SELECT
+  CAST ( `date` AS timestamp ) `date`,
+  CAST ( `hour` AS bigint ) `hour`,
+  CAST ( `minute` AS bigint ) `minute`,
+  CAST ( `dep` AS bigint ) `dep`,
+  CAST ( `arr` AS bigint ) `arr`,
+  CAST ( `dep_delay` AS bigint ) `dep_delay`,
+  CAST ( `arr_delay` AS bigint ) `arr_delay`,
+  CAST ( `carrier` AS string ) `carrier`,
+  CAST ( `flight` AS bigint ) `flight`,
+  CAST ( `dest` AS string ) `dest`,
+  CAST ( `plane` AS string ) `plane`,
+  CAST ( CAST ( `cancelled` AS TINYINT ) AS boolean ) `cancelled`,
+  CAST ( `time` AS bigint ) `time`,
+  CAST ( `dist` AS bigint ) `dist`
+FROM  default.test1_tmp;
+
+DROP TABLE IF EXISTS default.test1_tmp;'''
+
+    assert_equal(statement, sql)

@@ -20,8 +20,8 @@
   from desktop import conf
   from desktop.auth.backend import is_admin, is_hue_admin
   from desktop.conf import APP_SWITCHER_ALTUS_BASE_URL, APP_SWITCHER_MOW_BASE_URL, CUSTOM_DASHBOARD_URL, \
-      DISPLAY_APP_SWITCHER, IS_K8S_ONLY, IS_MULTICLUSTER_ONLY, USE_DEFAULT_CONFIGURATION, USE_NEW_SIDE_PANELS, \
-      VCS, ENABLE_GIST, ENABLE_LINK_SHARING, has_channels, has_connectors
+      DISPLAY_APP_SWITCHER, IS_K8S_ONLY, IS_MULTICLUSTER_ONLY, USE_DEFAULT_CONFIGURATION, USE_NEW_ASSIST_PANEL, \
+      VCS, ENABLE_GIST, ENABLE_LINK_SHARING, has_channels, has_connectors, ENABLE_UNIFIED_ANALYTICS
   from desktop.models import hue_version, _get_apps, get_cluster_config
 
   from beeswax.conf import DOWNLOAD_BYTES_LIMIT, DOWNLOAD_ROW_LIMIT, LIST_PARTITIONS_LIMIT, CLOSE_SESSIONS
@@ -35,7 +35,7 @@
   from metastore.views import has_write_access
   from notebook.conf import ENABLE_NOTEBOOK_2, ENABLE_QUERY_ANALYSIS, ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_SQL_INDEXER, \
       get_ordered_interpreters, SHOW_NOTEBOOKS
-  
+
   if sys.version_info[0] > 2:
     from django.utils.translation import gettext as _
   else:
@@ -56,7 +56,7 @@
 
   window.CACHEABLE_TTL = {
     default: ${ conf.CUSTOM.CACHEABLE_TTL.get() },
-    optimizer: ${ OPTIMIZER.CACHEABLE_TTL.get() or 0 }
+    sqlAnalyzer: ${ OPTIMIZER.CACHEABLE_TTL.get() or 0 }
   };
 
   window.DEV = '${ conf.DEV.get() }' === 'True';
@@ -105,6 +105,7 @@
 
   window.ENABLE_QUERY_BUILDER = '${ ENABLE_QUERY_BUILDER.get() }' === 'True';
   window.ENABLE_QUERY_SCHEDULING = '${ ENABLE_QUERY_SCHEDULING.get() }' === 'True';
+  window.ENABLE_UNIFIED_ANALYTICS = '${ ENABLE_UNIFIED_ANALYTICS.get() }' === 'True';
 
   window.ENABLE_HISTORY_V2 = '${ hasattr(ENABLE_HISTORY_V2, 'get') and ENABLE_HISTORY_V2.get() }' === 'True';
 
@@ -114,12 +115,13 @@
   window.CATALOG_URL = '${ get_catalog_url() or "" }'
   window.HAS_READ_ONLY_CATALOG = '${ has_readonly_catalog(request.user) }' === 'True' || '${ has_write_access(request.user) }' === 'False';
 
-  window.HAS_OPTIMIZER = '${ has_optimizer() }' === 'True';
-  window.OPTIMIZER_MODE = '${ get_optimizer_mode() }';
-  window.OPTIMIZER_URL = '${ get_optimizer_url() }'
-  window.AUTO_UPLOAD_OPTIMIZER_STATS = '${ OPTIMIZER.AUTO_UPLOAD_STATS.get() }' === 'True';
+  window.HAS_SQL_ANALYZER = '${ has_optimizer() }' === 'True';
+  window.SQL_ANALYZER_MODE = '${ get_optimizer_mode() }';
+  window.AUTO_UPLOAD_SQL_ANALYZER_STATS = '${ OPTIMIZER.AUTO_UPLOAD_STATS.get() }' === 'True';
 
   window.HAS_GIST = '${ ENABLE_GIST.get() }' === 'True';
+  window.SHARE_TO_SLACK = '${ conf.SLACK.SHARE_FROM_EDITOR.get() }' === 'True' && '${ conf.SLACK.IS_ENABLED.get() }' === 'True';
+  window.HAS_LINK_SHARING = '${ ENABLE_LINK_SHARING.get() }' === 'True';
   window.HAS_CONNECTORS = '${ has_connectors() }' === 'True';
 
   ## In the past was has_workload_analytics()
@@ -599,7 +601,7 @@
     'Updated: ': '${ _('Updated: ') }',
     'Upload a file': '${_('Upload a file')}',
     'Upload file': '${_('Upload file')}',
-    'Upload optimizer history': '${ _('Upload optimizer history') }',
+    'Upload SQL Analyzer history': '${ _('Upload SQL Analyzer history') }',
     'uploaded successfully': '${ _('uploaded successfully') }',
     'USA': '${ _('USA') }',
     'used by': '${ _('used by') }',
@@ -672,7 +674,7 @@
       home_dir = '/'
   %>
 
-  window.USE_NEW_SIDE_PANELS = '${ USE_NEW_SIDE_PANELS.get() }' === 'True'
+  window.USE_NEW_ASSIST_PANEL = '${ USE_NEW_ASSIST_PANEL.get() }' === 'True'
   window.USER_HOME_DIR = '${ home_dir }';
 
   var userGroups = [];

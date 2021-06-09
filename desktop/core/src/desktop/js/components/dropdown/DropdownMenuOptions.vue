@@ -32,7 +32,7 @@
     props: {
       options: {
         type: Array as PropType<Option[]>,
-        default: []
+        default: () => []
       },
       keydownElement: {
         type: Object as PropType<HTMLElement>,

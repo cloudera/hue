@@ -5,6 +5,9 @@ metadata:
   name: hue
   annotations:
     kubernetes.io/ingress.class: traefik
+{{- with .Values.ingress.annotations }}
+{{ toYaml . | indent 4 }}
+{{- end }}
 spec:
   rules:
   - host: {{ .Values.domain }}
@@ -14,4 +17,13 @@ spec:
         backend:
           serviceName: hue
           servicePort: hue
+  {{- range .Values.ingress.extraHosts }}
+  - host: {{ . | quote }}
+    http:
+      paths:
+      - backend:
+          serviceName: hue
+          servicePort: hue
+        path: /
+  {{- end }}
 {{- end -}}

@@ -55,7 +55,7 @@ In a Shell, after installing Helm, just execute these three instructions to boot
 
 <pre><code class="bash">helm repo add gethue https://helm.gethue.com
 helm repo update
-helm install gethue/hue
+helm install hue gethue/hue
 </code></pre>
 
 <a href="https://cdn.gethue.com/uploads/2017/12/Screen-Shot-2017-11-15-at-3.34.20-PM.png"><img src="https://cdn.gethue.com/uploads/2017/12/Screen-Shot-2017-11-15-at-3.34.20-PM.png" /></a>

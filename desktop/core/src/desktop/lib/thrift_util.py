@@ -30,7 +30,6 @@ import socket
 import threading
 import time
 import re
-import sasl
 import struct
 import sys
 
@@ -56,7 +55,15 @@ if sys.version_info[0] > 2:
 else:
   from django.utils.translation import ugettext as _
 
+
 LOG = logging.getLogger(__name__)
+
+
+try:
+  import sasl
+except Exception as e:
+  # Workaround potential version `GLIBCXX_3.4.26' not found
+  LOG.warn('Could not import sasl: %s' % e)
 
 
 # The maximum depth that we will recurse through a "jsonable" structure

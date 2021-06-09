@@ -55,20 +55,24 @@
 </template>
 
 <script lang="ts">
-  import { EXECUTABLE_UPDATED_TOPIC, ExecutableUpdatedEvent } from 'apps/editor/execution/events';
   import { defineComponent, PropType, ref, toRefs, watch } from 'vue';
 
+  import { EXECUTE_ACTIVE_EXECUTABLE_TOPIC, ExecuteActiveExecutableEvent } from './events';
+  import { Session } from 'apps/editor/execution/api';
+  import {
+    EXECUTABLE_TRANSITIONED_TOPIC,
+    EXECUTABLE_UPDATED_TOPIC,
+    ExecutableTransitionedEvent,
+    ExecutableUpdatedEvent
+  } from 'apps/editor/execution/events';
+  import { ExecutionStatus } from 'apps/editor/execution/executable';
+  import sessionManager from 'apps/editor/execution/sessionManager';
   import SqlExecutable from 'apps/editor/execution/sqlExecutable';
   import HueButton from 'components/HueButton.vue';
   import SubscriptionTracker from 'components/utils/SubscriptionTracker';
   import huePubSub from 'utils/huePubSub';
   import I18n from 'utils/i18n';
 
-  import { Session } from 'apps/editor/execution/api';
-  import { ExecutionStatus } from 'apps/editor/execution/executable';
-  import sessionManager from 'apps/editor/execution/sessionManager';
-
-  const EXECUTE_ACTIVE_EXECUTABLE_EVENT = 'executable.active.executable';
   const WHITE_SPACE_REGEX = /^\s*$/;
 
   export default defineComponent({
@@ -86,7 +90,14 @@
         default: undefined
       }
     },
-    setup(props) {
+    emits: [
+      'execute-failed',
+      'execute-started',
+      'execute-successful',
+      'executable-updated',
+      'execute-stopping'
+    ],
+    setup(props, { emit }) {
       const { executable, beforeExecute } = toRefs(props);
       const subTracker = new SubscriptionTracker();
 
@@ -107,7 +118,18 @@
           await beforeExecute.value(executable.value as SqlExecutable);
         }
         await executable.value.reset();
+        emit('execute-started', executable.value);
         executable.value.execute();
+      };
+
+      const stop = async (): Promise<void> => {
+        if (stopping.value || !executable.value) {
+          return;
+        }
+        emit('execute-stopping', executable.value);
+        stopping.value = true;
+        await executable.value.cancelBatchChain(true);
+        stopping.value = false;
       };
 
       const updateFromExecutable = (executable: SqlExecutable): void => {
@@ -139,19 +161,40 @@
       );
 
       subTracker.subscribe<ExecutableUpdatedEvent>(EXECUTABLE_UPDATED_TOPIC, updatedExecutable => {
-        if (executable.value && executable.value.id === updatedExecutable.id) {
+        const active = executable.value && executable.value.id === updatedExecutable.id;
+        if (active) {
           updateFromExecutable(updatedExecutable);
         }
+        emit('executable-updated', { executable: updatedExecutable, active });
       });
 
-      subTracker.subscribe(EXECUTE_ACTIVE_EXECUTABLE_EVENT, eventExecutable => {
-        if (executable.value && executable.value === eventExecutable) {
-          execute();
+      subTracker.subscribe<ExecutableTransitionedEvent>(EXECUTABLE_TRANSITIONED_TOPIC, event => {
+        if (event.executable.id === executable.value?.id) {
+          if (
+            event.newStatus === ExecutionStatus.available ||
+            event.newStatus === ExecutionStatus.streaming ||
+            event.newStatus === ExecutionStatus.success
+          ) {
+            emit('execute-successful', executable.value);
+          } else if (event.newStatus === ExecutionStatus.failed) {
+            emit('execute-failed', executable.value);
+          }
         }
       });
 
+      subTracker.subscribe<ExecuteActiveExecutableEvent>(
+        EXECUTE_ACTIVE_EXECUTABLE_TOPIC,
+        async eventExecutable => {
+          if (executable.value && executable.value.id === eventExecutable.id) {
+            await execute();
+          }
+        }
+      );
+
       return {
+        execute,
         subTracker,
+        stop,
         stopping,
         loadingSession,
         partOfRunningExecution,
@@ -182,28 +225,6 @@
           this.status === ExecutionStatus.streaming ||
           this.waiting
         );
-      }
-    },
-    methods: {
-      async execute(): Promise<void> {
-        huePubSub.publish('hue.ace.autocompleter.hide');
-        if (!this.executable) {
-          return;
-        }
-        if (this.beforeExecute) {
-          await this.beforeExecute(this.executable);
-        }
-        await this.executable.reset();
-        this.executable.execute();
-      },
-
-      async stop(): Promise<void> {
-        if (this.stopping || !this.executable) {
-          return;
-        }
-        this.stopping = true;
-        await this.executable.cancelBatchChain(true);
-        this.stopping = false;
       }
     }
   });

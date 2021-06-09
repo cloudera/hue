@@ -89,6 +89,8 @@
 
 <body>
 
+<hue-icons-web-component></hue-icons-web-component>
+
 % if is_demo:
   <ul class="side-labels unstyled">
     <li class="feedback"><a href="javascript:showClassicWidget()"><i class="fa fa-envelope-o"></i> ${_('Feedback')}</a></li>
@@ -167,6 +169,12 @@ ${ hueIcons.symbols() }
       <div class="left-panel" data-bind="css: { 'side-panel-closed': !leftAssistVisible() }, visibleOnHover: { selector: '.hide-left-side-panel' }">
         <a href="javascript:void(0);" style="z-index: 1002; display: none;" title="${_('Show Assist')}" class="pointer side-panel-toggle show-left-side-panel" data-bind="visible: !leftAssistVisible(), toggle: leftAssistVisible"><i class="fa fa-chevron-right"></i></a>
         <a href="javascript:void(0);" style="display: none; opacity: 0;" title="${_('Hide Assist')}" class="pointer side-panel-toggle hide-left-side-panel" data-bind="visible: leftAssistVisible, toggle: leftAssistVisible"><i class="fa fa-chevron-left"></i></a>
+        <!-- ko if: window.USE_NEW_ASSIST_PANEL -->
+% if conf.USE_NEW_ASSIST_PANEL.get():
+          <assist-panel-web-component></assist-panel-web-component>
+% endif
+        <!-- /ko -->
+        <!-- ko ifnot: window.USE_NEW_ASSIST_PANEL -->
         <div class="assist" data-bind="component: {
             name: 'assist-panel',
             params: {
@@ -180,6 +188,7 @@ ${ hueIcons.symbols() }
               visibleAssistPanels: ['sql']
             }
           }, visible: leftAssistVisible" style="display:none;"></div>
+        <!-- /ko -->
       </div>
 
       <div id="leftResizer" class="resizer" data-bind="visible: leftAssistVisible(), splitFlexDraggable : {

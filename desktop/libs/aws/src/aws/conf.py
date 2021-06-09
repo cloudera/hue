@@ -20,7 +20,6 @@ import os
 import re
 import sys
 
-
 import requests
 
 from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_bool, coerce_password_from_script
@@ -162,6 +161,14 @@ HAS_IAM_DETECTION = Config(
   type=coerce_bool
 )
 
+IS_SELF_SIGNING_ENABLED = Config(
+  key='is_self_signing_enabled',
+  help=_('Skip boto and use self signed URL and requests to make the calls to S3. Used for testing the RAZ integration.'),
+  type=coerce_bool,
+  private=True,
+  default=False,
+)
+
 AWS_ACCOUNTS = UnspecifiedConfigSection(
   'aws_accounts',
   help=_('One entry for each AWS account'),
@@ -263,8 +270,12 @@ AWS_ACCOUNTS = UnspecifiedConfigSection(
 
 
 def is_enabled():
+  from desktop.conf import RAZ  # Must be imported dynamically in order to have proper value
   return ('default' in list(AWS_ACCOUNTS.keys()) and AWS_ACCOUNTS['default'].get_raw() and AWS_ACCOUNTS['default'].ACCESS_KEY_ID.get()) or \
-      has_iam_metadata() or conf_idbroker.is_idbroker_enabled('s3a')
+      has_iam_metadata() or \
+      conf_idbroker.is_idbroker_enabled('s3a') or \
+      RAZ.IS_ENABLED.get() or \
+      IS_SELF_SIGNING_ENABLED.get()
 
 
 def is_ec2_instance():

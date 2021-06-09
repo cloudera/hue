@@ -16,6 +16,8 @@
 
 import $ from 'jquery';
 
+import deXSS from 'utils/html/deXSS';
+
 /*
  * jHue notify plugin
  *
@@ -50,6 +52,12 @@ Plugin.prototype.show = function () {
   const MARGIN = 4;
 
   _this.options.message = _this.options.message.replace(/(<([^>]+)>)/gi, ''); // escape HTML messages
+  _this.options.message = deXSS(_this.options.message); // escape XSS messages
+
+  if (/^(504|upstream connect error|Gateway Time-out)/.test(_this.options.message.trim())) {
+    console.warn(_this.options.message);
+    return;
+  }
 
   if (
     _this.options.message !== '' &&

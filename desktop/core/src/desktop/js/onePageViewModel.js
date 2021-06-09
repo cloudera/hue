@@ -19,10 +19,13 @@ import _ from 'lodash';
 import * as ko from 'knockout';
 import page from 'page';
 
-import hueUtils from 'utils/hueUtils';
+import { CONFIG_REFRESHED_TOPIC, GET_KNOWN_CONFIG_TOPIC } from 'config/events';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
-import { CONFIG_REFRESHED_EVENT, GET_KNOWN_CONFIG_EVENT } from 'config/hueConfig';
+import waitForObservable from 'utils/timing/waitForObservable';
+import waitForVariable from 'utils/timing/waitForVariable';
+import getParameter from 'utils/url/getParameter';
+import getSearchParameter from 'utils/url/getSearchParameter';
 
 class OnePageViewModel {
   constructor() {
@@ -52,7 +55,7 @@ class OnePageViewModel {
     self.changeEditorType = function (type) {
       self.getActiveAppViewModel(viewModel => {
         if (viewModel && viewModel.selectedNotebook) {
-          hueUtils.waitForObservable(viewModel.selectedNotebook, () => {
+          waitForObservable(viewModel.selectedNotebook, () => {
             if (viewModel.editorType() !== type) {
               viewModel.selectedNotebook().selectedSnippet(type);
               if (!window.ENABLE_NOTEBOOK_2) {
@@ -101,17 +104,17 @@ class OnePageViewModel {
     huePubSub.subscribe('open.importer.query', data => {
       self.loadApp('importer');
       self.getActiveAppViewModel(viewModel => {
-        hueUtils.waitForVariable(viewModel.createWizard, () => {
-          hueUtils.waitForVariable(viewModel.createWizard.prefill, () => {
+        waitForVariable(viewModel.createWizard, () => {
+          waitForVariable(viewModel.createWizard.prefill, () => {
             viewModel.createWizard.prefill.source_type(data['source_type']);
             viewModel.createWizard.prefill.target_type(data['target_type']);
             viewModel.createWizard.prefill.target_path(data['target_path']);
             viewModel.createWizard.destination.outputFormat(data['target_type']);
           });
-          hueUtils.waitForVariable(viewModel.createWizard.source.query, () => {
+          waitForVariable(viewModel.createWizard.source.query, () => {
             viewModel.createWizard.source.query({ id: data.id, name: data.name });
           });
-          hueUtils.waitForVariable(viewModel.createWizard.loadSampleData, () => {
+          waitForVariable(viewModel.createWizard.loadSampleData, () => {
             viewModel.createWizard.loadSampleData(data);
           });
         });
@@ -470,7 +473,7 @@ class OnePageViewModel {
 
     page.base(window.HUE_BASE_URL + '/hue');
 
-    const getUrlParameter = name => hueUtils.getParameter(name) || '';
+    const getUrlParameter = name => getParameter(name) || '';
 
     self.lastContext = null;
 
@@ -622,8 +625,8 @@ class OnePageViewModel {
             if (!_params) {
               console.warn('Could not match ' + ctx.path);
             }
-            hueUtils.waitForVariable(viewModel.createWizard, () => {
-              hueUtils.waitForVariable(viewModel.createWizard.prefill, () => {
+            waitForVariable(viewModel.createWizard, () => {
+              waitForVariable(viewModel.createWizard.prefill, () => {
                 viewModel.createWizard.prefill.source_type(_params && _params[1] ? _params[1] : '');
                 viewModel.createWizard.prefill.target_type(_params && _params[2] ? _params[2] : '');
                 viewModel.createWizard.prefill.target_path(_params && _params[3] ? _params[3] : '');
@@ -661,7 +664,7 @@ class OnePageViewModel {
         url: '/notebook',
         app: function (ctx) {
           self.loadApp('notebook');
-          const notebookId = hueUtils.getSearchParameter('?' + ctx.querystring, 'notebook');
+          const notebookId = getSearchParameter('?' + ctx.querystring, 'notebook');
           if (notebookId !== '') {
             self.getActiveAppViewModel(viewModel => {
               self.isLoadingEmbeddable(true);
@@ -820,8 +823,8 @@ class OnePageViewModel {
       page();
     };
 
-    huePubSub.publish(GET_KNOWN_CONFIG_EVENT, configUpdated);
-    huePubSub.subscribe(CONFIG_REFRESHED_EVENT, configUpdated);
+    huePubSub.publish(GET_KNOWN_CONFIG_TOPIC, configUpdated);
+    huePubSub.subscribe(CONFIG_REFRESHED_TOPIC, configUpdated);
 
     huePubSub.subscribe('open.link', href => {
       if (href) {

@@ -1,9 +1,23 @@
 ---
-title: "Cloud"
+title: "Run"
 date: 2019-03-13T18:28:08-07:00
 draft: false
 weight: 3
 ---
+
+## Process
+
+After the installation, you can start Hue on your Hue Server by doing:
+
+    build/env/bin/supervisor
+
+This will start several subprocesses, corresponding to the different Hue
+components. Your Hue installation is now running.
+
+After installation, you can use Hue by navigating to `http://myserver:8888/`.
+
+Next step is to [configure](/administrator/configuration/) the API server and point to external services.
+
 
 ## Docker
 
@@ -21,7 +35,7 @@ To start a full Hue service:
 
     helm repo add gethue https://helm.gethue.com
     helm repo update
-    helm install gethue/hue
+    helm install hue gethue/hue
 
 The [Kubernetes Guide](https://github.com/cloudera/hue/tree/testing/tools/kubernetes) shows how to run the services via Helm or native YAML configs.
 

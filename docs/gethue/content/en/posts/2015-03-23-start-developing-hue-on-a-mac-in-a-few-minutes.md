@@ -35,7 +35,7 @@ sf_caption_position:
 sf_remove_promo_bar:
   - 1
 categories:
-  - Dev / API
+  - Development
 
 ---
 You might have already all the <a href="https://github.com/cloudera/hue#development-prerequisites" target="_blank" rel="noopener noreferrer">pre-requisites</a> installed but we are going to show how to start from a fresh Yosemite (10.10) or El Capitan (10.11) install and end up with running Hue on your Mac in almost no time!

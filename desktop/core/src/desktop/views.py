@@ -42,7 +42,7 @@ from django.shortcuts import redirect
 from django.views.decorators.http import require_POST
 from configobj import ConfigObj, get_extra_values, ConfigObjError
 from wsgiref.util import FileWrapper
-from webpack_loader.utils import get_files
+from webpack_loader.utils import get_static
 import django.views.debug
 
 import desktop.conf
@@ -60,6 +60,7 @@ from desktop.lib.django_util import JsonResponse, login_notrequired, render
 from desktop.lib.i18n import smart_str
 from desktop.lib.paths import get_desktop_root
 from desktop.lib.thread_util import dump_traceback
+from desktop.lib.view_util import is_ajax
 from desktop.log.access import access_log_level, access_warn, AccessInfo
 from desktop.log import set_all_debug as _set_all_debug, reset_all_debug as _reset_all_debug, get_all_debug as _get_all_debug
 from desktop.models import Settings, hue_version, _get_apps, UserPreferences
@@ -101,11 +102,15 @@ def samlgroup_check(request):
         LOG.info("Missing %s in SAMLResponse for %s user" % (REQUIRED_GROUPS_ATTRIBUTE.get(), request.user.username))
         return False
 
-      saml_group_found = set(REQUIRED_GROUPS.get()).issubset(
+      # Earlier we had AND condition, It means user has to be there in all given groups.
+      # Now we are doing OR condition, which means user must be in one of the given groups.
+      saml_group_found = set(REQUIRED_GROUPS.get()).intersection(
                          set(json_data['saml_attributes'].get(REQUIRED_GROUPS_ATTRIBUTE.get())))
       if not saml_group_found:
         LOG.info("User %s not found in required SAML groups, %s" % (request.user.username, REQUIRED_GROUPS.get()))
         return False
+
+      LOG.info("User %s found in the required SAML groups %s" % (request.user.username, ",".join(saml_group_found)))
   return True
 
 def hue(request):
@@ -343,7 +348,7 @@ def threads(request):
   out = string_io()
   dump_traceback(file=out)
 
-  if request.is_ajax():
+  if is_ajax(request):
     return HttpResponse(out.getvalue(), content_type="text/plain")
   else:
     return render("threads.mako", request, {'text': out.getvalue(), 'is_embeddable': request.GET.get('is_embeddable', False)})
@@ -409,10 +414,13 @@ def ace_sql_syntax_worker(request):
 #Redirect to static resources no need for auth. Fails with 401 with Knox.
 @login_notrequired
 def dynamic_bundle(request, config, bundle_name):
-  bundle_name = re.sub(r'-(bundle|chunk).*', '', bundle_name)
-  files = get_files(bundle_name, None, config.upper())
-  if len(files) == 1:
-    return HttpResponseRedirect(files[0]['url'])
+  try:
+    static_path = get_static(bundle_name, config.upper())
+    webpack_app = config if config != 'default' else 'hue'
+    static_path = static_path.replace('static/', 'static/desktop/js/bundles/%s/' % webpack_app)
+    return HttpResponseRedirect(static_path)
+  except Exception as ex:
+    LOG.exception("Failed loading dynamic bundle %s: %s" % (bundle_name, ex))
   return render("404.mako", request, dict(uri=request.build_absolute_uri()), status=404)
 
 def assist_m(request):
@@ -450,8 +458,10 @@ def serve_500_error(request, *args, **kwargs):
         # If (None, None, None), default server error describing why this failed.
         return django.views.debug.technical_500_response(request, *exc_info)
       else:
-        # Could have an empty traceback
-        return render("500.mako", request, {'traceback': traceback.extract_tb(exc_info[2])})
+        tb = traceback.extract_tb(exc_info[2])
+        if is_ajax(request):
+          tb = '\n'.join(tb.format() if sys.version_info[0] > 2 else [str(t) for t in tb])
+        return render("500.mako", request, {'traceback': tb})
     else:
       # exc_info could be empty
       return render("500.mako", request, {})

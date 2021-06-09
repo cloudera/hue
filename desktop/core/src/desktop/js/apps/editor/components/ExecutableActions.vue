@@ -18,7 +18,12 @@
 
 <template>
   <div class="snippet-execute-actions">
-    <ExecuteButton :executable="executable" :before-execute="beforeExecute" />
+    <ExecuteButton
+      :executable="executable"
+      :before-execute="beforeExecute"
+      @execute-successful="$emit('execute-successful', $event)"
+      @execute-failed="$emit('execute-failed', $event)"
+    />
     <ExecuteLimitInput :executable="executable" @limit-changed="$emit('limit-changed', $event)" />
   </div>
 </template>
@@ -28,6 +33,7 @@
   import ExecuteLimitInput from 'apps/editor/components/ExecuteLimitInput.vue';
   import { defineComponent, PropType } from 'vue';
 
+  import './ExecuableActions.scss';
   import SqlExecutable from 'apps/editor/execution/sqlExecutable';
 
   export default defineComponent({
@@ -46,12 +52,6 @@
         default: undefined
       }
     },
-    emits: ['limit-changed']
+    emits: ['execute-failed', 'execute-successful', 'limit-changed']
   });
 </script>
-
-<style lang="scss" scoped>
-  .snippet-execute-actions {
-    display: inline-block;
-  }
-</style>

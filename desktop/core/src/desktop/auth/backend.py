@@ -169,8 +169,7 @@ class DefaultUserAugmentor(object):
     return self._get_profile().get_groups()
 
   def get_home_directory(self, force_home=False):
-    return REMOTE_STORAGE_HOME.get() if hasattr(REMOTE_STORAGE_HOME, 'get') and REMOTE_STORAGE_HOME.get() and not force_home \
-        else self._get_profile().home_directory
+    return self._get_profile().home_directory
 
   def has_hue_permission(self, action, app):
     return self._get_profile().has_hue_permission(action=action, app=app)
@@ -751,7 +750,7 @@ class RemoteUserDjangoBackend(django.contrib.auth.backends.RemoteUserBackend):
   """
   Delegates to Django's RemoteUserBackend and requires HueRemoteUserMiddleware
   """
-  def authenticate(self, remote_user=None):
+  def authenticate(self, request=None, remote_user=None):
     username = self.clean_username(remote_user)
     username = force_username_case(username)
     is_super = False

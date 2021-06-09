@@ -17,6 +17,7 @@
 import * as ko from 'knockout';
 
 import 'ko/bindings/ko.publish';
+import { format } from '@gethue/sql-formatter';
 
 import apiHelper from 'api/apiHelper';
 import componentUtils from 'ko/components/componentUtils';
@@ -46,7 +47,7 @@ const TEMPLATE = `
         <a href="javascript:void(0)" data-bind="click: createGist, css: { 'disabled': !createGistEnabled() }" title="${I18n(
           'Share the query selection via a link'
         )}">
-          <i class="fa fa-fw fa-link"></i> ${I18n('Get shareable link')}
+          <i class="fa fa-fw fa-link"></i> ${I18n('Shareable link')}
         </a>
       </li>
       <!-- /ko -->
@@ -156,7 +157,12 @@ class SnippetEditorActions {
       description: ''
     });
 
-    huePubSub.publish(SHOW_GIST_MODAL_EVENT, { link: gistLink });
+    let slackChannels = '';
+    if (window.SHARE_TO_SLACK) {
+      slackChannels = await apiHelper.getSlackChannelsAsync();
+    }
+
+    huePubSub.publish(SHOW_GIST_MODAL_EVENT, { link: gistLink, channels: slackChannels });
   }
 
   format() {
@@ -165,30 +171,22 @@ class SnippetEditorActions {
     }
 
     hueAnalytics.log('notebook', 'format');
-    apiHelper
-      .formatSql({
-        statements:
-          this.snippet.ace().getSelectedText() !== ''
-            ? this.snippet.ace().getSelectedText()
-            : this.snippet.statement_raw()
-      })
-      .done(data => {
-        if (data.status === 0) {
-          if (this.snippet.ace().getSelectedText() !== '') {
-            this.snippet
-              .ace()
-              .session.replace(
-                this.snippet.ace().session.selection.getRange(),
-                data.formatted_statements
-              );
-          } else {
-            this.snippet.statement_raw(data.formatted_statements);
-            this.snippet.ace().setValue(this.snippet.statement_raw(), 1);
-          }
-        } else {
-          this.snippet.handleAjaxError(data);
-        }
-      });
+
+    const formatted_statements = format(
+      this.snippet.ace().getSelectedText() !== ''
+        ? this.snippet.ace().getSelectedText()
+        : this.snippet.statement_raw(),
+      { uppercase: true, linesBetweenQueries: 2, indentQuerySeparator: true }
+    );
+
+    if (this.snippet.ace().getSelectedText() !== '') {
+      this.snippet
+        .ace()
+        .session.replace(this.snippet.ace().session.selection.getRange(), formatted_statements);
+    } else {
+      this.snippet.statement_raw(formatted_statements);
+      this.snippet.ace().setValue(this.snippet.statement_raw(), 1);
+    }
   }
 
   dispose() {}

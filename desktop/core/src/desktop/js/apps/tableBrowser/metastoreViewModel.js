@@ -20,20 +20,21 @@ import * as ko from 'knockout';
 import * as propsMappers from './propsMappers';
 import MetastoreSource from 'apps/tableBrowser/metastoreSource';
 import dataCatalog from 'catalog/dataCatalog';
-import { findEditorConnector, GET_KNOWN_CONFIG_EVENT } from 'config/hueConfig';
+import { GET_KNOWN_CONFIG_TOPIC } from 'config/events';
+import { findEditorConnector } from 'config/hueConfig';
 import huePubSub from 'utils/huePubSub';
-import hueUtils from 'utils/hueUtils';
 import { getFromLocalStorage, withLocalStorage } from 'utils/storageUtils';
+import waitForRendered from 'utils/timing/waitForRendered';
+import changeURL from 'utils/url/changeURL';
 
 class MetastoreViewModel {
   /**
    * @param {Object} options
    * @param {string} options.user
    * @param {Number} [options.partitionsLimit]
-   * @param {boolean} [options.optimizerEnabled]
+   * @param {boolean} [options.sqlAnalyzerEnabled]
    * @param {boolean} [options.navigatorEnabled]
    * @param {String} options.sourceType
-   * @param {String} options.optimizerUrl
    * @param {String} options.navigatorUrl
    * @constructor
    */
@@ -45,7 +46,7 @@ class MetastoreViewModel {
     this.isLeftPanelVisible.subscribe(() => {
       huePubSub.publish('assist.forceRender');
     });
-    this.optimizerEnabled = ko.observable(options.optimizerEnabled || false);
+    this.sqlAnalyzerEnabled = ko.observable(options.sqlAnalyzerEnabled || false);
     this.navigatorEnabled = ko.observable(options.navigatorEnabled || false);
     this.appConfig = ko.observable();
 
@@ -89,7 +90,7 @@ class MetastoreViewModel {
     this.loading = ko.pureComputed(() => !this.source() || this.source().loading());
 
     // TODO: Support dynamic config changes
-    huePubSub.publish(GET_KNOWN_CONFIG_EVENT, clusterConfig => {
+    huePubSub.publish(GET_KNOWN_CONFIG_TOPIC, clusterConfig => {
       const initialSourceType = options.sourceType || 'hive';
 
       if (clusterConfig && clusterConfig.app_config && clusterConfig.app_config.catalogs) {
@@ -99,6 +100,7 @@ class MetastoreViewModel {
             sources.push(
               new MetastoreSource({
                 metastoreViewModel: this,
+                displayName: interpreter.displayName,
                 name: interpreter.name,
                 type: interpreter.type
               })
@@ -109,6 +111,7 @@ class MetastoreViewModel {
           sources.push(
             new MetastoreSource({
               metastoreViewModel: this,
+              displayName: initialSourceType,
               name: initialSourceType,
               type: initialSourceType
             })
@@ -131,7 +134,6 @@ class MetastoreViewModel {
       huePubSub.publish('meta.navigator.enabled', newValue);
     });
 
-    this.optimizerUrl = ko.observable(options.optimizerUrl);
     this.navigatorUrl = ko.observable(options.navigatorUrl);
 
     this.currentTab = ko.observable('');
@@ -179,7 +181,10 @@ class MetastoreViewModel {
     });
 
     huePubSub.subscribe('metastore.url.change', () => {
-      const prefix = '/hue/metastore/';
+      const prefix =
+        window.HUE_BASE_URL && window.HUE_BASE_URL.length
+          ? window.HUE_BASE_URL + '/metastore/'
+          : '/hue/metastore/';
       if (this.source() && this.source().namespace()) {
         const params = {
           source_type: this.source().type
@@ -188,19 +193,19 @@ class MetastoreViewModel {
           params.namespace = this.source().namespace().id;
         }
         if (this.source().namespace().database() && this.source().namespace().database().table()) {
-          hueUtils.changeURL(
+          changeURL(
             prefix +
               'table/' +
               this.source().namespace().database().table().catalogEntry.path.join('/'),
             params
           );
         } else if (this.source().namespace().database()) {
-          hueUtils.changeURL(
+          changeURL(
             prefix + 'tables/' + this.source().namespace().database().catalogEntry.name,
             params
           );
         } else {
-          hueUtils.changeURL(prefix + 'databases', params);
+          changeURL(prefix + 'databases', params);
         }
       }
     });
@@ -228,7 +233,7 @@ class MetastoreViewModel {
       if (!col.table.samples.loading()) {
         $('.page-content').scrollTop(0);
         this.currentTab('sample');
-        hueUtils.waitForRendered(
+        waitForRendered(
           '#sampleTable',
           el => el.parent().hasClass('dataTables_wrapper'),
           () => {
@@ -350,9 +355,14 @@ class MetastoreViewModel {
   }
 
   loadUrl() {
-    const path = window.location.pathname.substr(4) || '/metastore/tables';
+    const path = window.location.pathname.startsWith(window.HUE_BASE_URL)
+      ? window.location.pathname.substr(window.HUE_BASE_URL.length)
+      : window.location.pathname.substr(4) || '/metastore/tables';
     const pathParts = path.split('/');
     if (pathParts[0] === '') {
+      pathParts.shift();
+    }
+    while (pathParts[0] === 'hue') {
       pathParts.shift();
     }
     if (pathParts[0] === 'metastore') {

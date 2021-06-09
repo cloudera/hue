@@ -122,9 +122,9 @@ Any feedback or question? Feel free to comment here or on the <a href="https:/
 Romain from the Hue Team
 
  [1]: https://docs.gethue.com/user/querying/
- [2]: https://docs.gethue.com/developer/parsers/
+ [2]: https://docs.gethue.com/developer/development/#sql-parsers
  [3]: https://ace.c9.io/
  [4]: https://github.com/cloudera/hue/tree/master/tools/ace-editor/lib/ace/mode
  [5]: https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/templates/editor_components.mako#L2118
- [6]: http://localhost:1313/developer/parsers/#prerequisites
+ [6]: http://localhost:1313/developer/development/#sql-parsers#prerequisites
  [7]: https://issues.cloudera.org/browse/HUE-8758

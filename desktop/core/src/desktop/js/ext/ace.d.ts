@@ -92,7 +92,7 @@ declare namespace Ace {
     useHueAutocompleter: boolean;
   }
 
-  export type OptionValue = string | boolean | number;
+  export type OptionValue = string | boolean | number | null;
 
   export interface Options {
     [option: string]: OptionValue;

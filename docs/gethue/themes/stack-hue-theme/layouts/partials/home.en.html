@@ -11,11 +11,7 @@
           <h3>
             Hue is an open source SQL Assistant for Databases & Data Warehouses
           </h3>
-          <a
-            class="btn btn--primary btn--lg type--uppercase"
-            href="http://demo.gethue.com"
-            target="_blank"
-          >
+          <a class="btn btn--primary btn--lg type--uppercase" href="http://demo.gethue.com" target="_blank">
             <span class="btn__text">
               Try Hue Now
             </span>
@@ -67,14 +63,8 @@
             <br />
             <div class="modal-container">
               <div class="modal-content bg-dark" data-width="60%" data-height="60%">
-                <iframe
-                  title="vimeo-player"
-                  src="https://player.vimeo.com/video/275808384"
-                  width="640"
-                  height="360"
-                  frameborder="0"
-                  allowfullscreen
-                ></iframe>
+                <iframe title="vimeo-player" src="https://player.vimeo.com/video/275808384" width="640" height="360"
+                  frameborder="0" allowfullscreen></iframe>
               </div>
               <!--end of modal-content-->
             </div>
@@ -92,11 +82,8 @@
     <div class="container">
       <div class="row justify-content-around">
         <div class="col-md-6">
-          <img
-            alt="Image"
-            class="border--round box-shadow-wide"
-            src="https://cdn.gethue.com/uploads/2017/07/hue_4_assistant_2.gif"
-          />
+          <img alt="Image" class="border--round box-shadow-wide"
+            src="https://cdn.gethue.com/uploads/2017/07/hue_4_assistant_2.gif" />
         </div>
         <div class="col-md-6 col-lg-5">
           <div class="switchable__text">
@@ -106,11 +93,8 @@
               <a href="{{ .Site.Params.docsHost }}/user/querying/">Querying Experience</a>
               with the most intelligent autocompletes, query sharing, result charting and download
               for any database. Enable more of your employees to level-up and perform self service analytics like
-              <a
-                href="/self-service-bi-doing-a-customer-360-by-querying-and-joining-salesforce-marketing-and-log-datasets/"
-                target="_blank"
-                >Customer 360s</a
-              >
+              <a href="/self-service-bi-doing-a-customer-360-by-querying-and-joining-salesforce-marketing-and-log-datasets/"
+                target="_blank">Customer 360s</a>
               .
             </p>
             <a href="{{ .Site.Params.docsHost }}/user/concept">Learn More »</a>
@@ -131,7 +115,8 @@
             <p class="lead">
               Pick one of the multiple interpreters for
               <a href="{{ .Site.Params.docsHost }}/administrator/configuration/connectors/#apache-hive">Apache Hive</a>,
-              <a href="{{ .Site.Params.docsHost }}/administrator/configuration/connectors/#apache-impala">Apache Impala</a>,
+              <a href="{{ .Site.Params.docsHost }}/administrator/configuration/connectors/#apache-impala">Apache
+                Impala</a>,
               <a href="{{ .Site.Params.docsHost }}/administrator/configuration/connectors/#presto">Presto</a>
               and all the others too: MySQL,
               <a href="/blog/tutorial-query-live-data-stream-with-flink-sql/">Apache Flink SQL</a>,
@@ -139,12 +124,12 @@
               <a href="/blog/querying-spark-sql-with-spark-thrift-server-and-hue-editor/">SparkSQL</a>,
               <a href="/sql-querying-apache-hbase-with-apache-phoenix/">Apache Phoenix</a>,
               <a href="/blog/tutorial-query-live-data-stream-with-kafka-sql/">ksqlDB</a>,
-              <a href="{{ .Site.Params.docsHost }}/administrator/configuration/connectors/#elastic-search">Elastic Search</a>,
-              <a href="/quick-task-how-to-query-apache-druid-analytic-database/">Apache Druid</a>, PostgreSQL, Redshift, BigQuery...
+              <a href="{{ .Site.Params.docsHost }}/administrator/configuration/connectors/#elastic-search">Elastic
+                Search</a>,
+              <a href="/quick-task-how-to-query-apache-druid-analytic-database/">Apache Druid</a>, PostgreSQL, Redshift,
+              BigQuery...
             </p>
-            <a href="{{ .Site.Params.docsHost }}/administrator/configuration/connectors/"
-              >Learn More »</a
-            >
+            <a href="{{ .Site.Params.docsHost }}/administrator/configuration/connectors/">Learn More »</a>
           </div>
         </div>
       </div>
@@ -154,11 +139,8 @@
     <div class="container">
       <div class="row justify-content-around">
         <div class="col-md-6">
-          <img
-            alt="Image"
-            class="border--round box-shadow-wide"
-            src="https://cdn.gethue.com/uploads/2018/04/blog_top_search_.png"
-          />
+          <img alt="Image" class="border--round box-shadow-wide"
+            src="https://cdn.gethue.com/uploads/2018/04/blog_top_search_.png" />
         </div>
         <div class="col-md-6 col-lg-5">
           <div class="switchable__text">
@@ -174,4 +156,44 @@
       </div>
     </div>
   </section>
+  <section class="switchable feature-large switchable--switch bg--secondary">
+    <div class="container">
+      <div class="row justify-content-around">
+        <div class="col-md-6">
+          <img alt="Image" class="border--round box-shadow-wide" src="img/hue_slack_integration.png" />
+        </div>
+        <div class="col-md-6 col-lg-5">
+          <div class="switchable__text">
+            <h2>Install the Slack App!</h2>
+            <p class="lead">
+              Assist users with their SQL queries and leverage different
+              <a href="{{ .Site.Params.docsHost }}/user/concept/#slack">features</a>
+              such as rich preview for links, sharing from Editor etc. directly in Slack.
+              <br /> Give your Hue hostname below and
+              <a href="{{ .Site.Params.docsHost }}/administrator/configuration/server/#manual-slack-app-installation">install</a>
+              it in your workspace within seconds...
+            </p>
+            <form autocomplete="off" onsubmit="return check(event)">
+              <input type="text" id="hostname" placeholder="Your hue hostname (e.g. hue.gethue.com:8000)"
+                required></input>
+              <button type="submit" class="btn btn--primary btn--lg type--uppercase">Create SQL Assistant</button>
+            </form>
+            <br /><a href="{{ .Site.Params.docsHost }}/user/concept/#slack">Learn More »</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 </div>
+<script>
+  function check(event) {
+    event.preventDefault();
+
+    const url = 'https://demo.gethue.com/api/slack/install/?hostname=' + document.getElementById('hostname').value;
+    fetch(url)
+      .then(response => response.json())
+      .then(response => {
+        window.location.replace(response['link']);
+      });
+  }
+</script>

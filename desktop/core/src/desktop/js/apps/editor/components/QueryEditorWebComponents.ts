@@ -14,37 +14,58 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import axios from 'axios';
-
-import AceEditor from './aceEditor/AceEditor.vue';
-import ExecuteButton from 'apps/editor/components/ExecuteButton.vue';
-import ExecuteLimitInput from 'apps/editor/components/ExecuteLimitInput.vue';
 import ExecutableProgressBar from './ExecutableProgressBar.vue';
 import QueryHistoryTable from './QueryHistoryTable.vue';
+import AceEditor from './aceEditor/AceEditor.vue';
 import ResultTable from './result/ResultTable.vue';
 import Executor, { ExecutorOptions } from '../execution/executor';
-import 'utils/json.bigDataParse';
+import { setBaseUrl, setBearerToken } from 'api/utils';
+import ExecuteButton from 'apps/editor/components/ExecuteButton.vue';
+import ExecuteLimitInput from 'apps/editor/components/ExecuteLimitInput.vue';
+import SqlAssistPanel from 'components/assist/SqlAssistPanel.vue';
+import HueIcons from 'components/icons/HueIcons.vue';
+import SqlContextSelector from 'components/SqlContextSelector.vue';
+import { getNamespaces } from 'catalog/contextCatalog';
+import dataCatalog from 'catalog/dataCatalog';
+import { findEditorConnector, refreshConfig } from 'config/hueConfig';
+import { Connector } from 'config/types';
 import { wrap } from 'vue/webComponentWrap';
-import { hueWindow } from 'types/types';
+import 'utils/json.bigDataParse';
 
+wrap('hue-icons', HueIcons);
 wrap('query-editor', AceEditor);
 wrap('query-editor-execute-button', ExecuteButton);
 wrap('query-editor-history-table', QueryHistoryTable);
 wrap('query-editor-limit-input', ExecuteLimitInput);
 wrap('query-editor-progress-bar', ExecutableProgressBar);
 wrap('query-editor-result-table', ResultTable);
+wrap('sql-assist-panel', SqlAssistPanel);
+wrap('sql-context-selector', SqlContextSelector);
 
 export interface HueComponentConfig {
   baseUrl?: string;
+  bearerToken?: string;
 }
 
-const configure = (config: HueComponentConfig): void => {
-  if (config.baseUrl) {
-    axios.defaults.baseURL = config.baseUrl;
-    (window as hueWindow).HUE_BASE_URL = config.baseUrl;
-  }
+const configure = ({ baseUrl, bearerToken }: HueComponentConfig): void => {
+  baseUrl && setBaseUrl(baseUrl);
+  bearerToken && setBearerToken(bearerToken);
 };
 
 const createExecutor = (options: ExecutorOptions): Executor => new Executor(options);
 
-export default { configure, createExecutor };
+const clearContextCatalogCache = async (connector: Connector): Promise<void> => {
+  await getNamespaces({ connector, clearCache: true });
+};
+
+export default {
+  clearContextCatalogCache,
+  configure,
+  createExecutor,
+  dataCatalog,
+  findEditorConnector,
+  getNamespaces,
+  refreshConfig,
+  setBaseUrl,
+  setBearerToken
+};

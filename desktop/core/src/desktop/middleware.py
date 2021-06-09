@@ -43,7 +43,6 @@ from django.core import exceptions
 from django.http import HttpResponseNotAllowed, HttpResponseForbidden
 from django.urls import resolve
 from django.http import HttpResponseRedirect, HttpResponse
-from django.utils.http import urlquote
 from django.utils.deprecation import MiddlewareMixin
 
 from hadoop import cluster
@@ -60,15 +59,17 @@ from desktop.lib import apputil, i18n, fsmanager
 from desktop.lib.django_util import JsonResponse, render, render_json
 from desktop.lib.exceptions import StructuredException
 from desktop.lib.exceptions_renderable import PopupException
+from desktop.lib.view_util import is_ajax
 from desktop.log import get_audit_logger
 from desktop.log.access import access_log, log_page_hit, access_warn
 
 if sys.version_info[0] > 2:
   from django.utils.translation import gettext as _
   from django.utils.http import url_has_allowed_host_and_scheme
+  from urllib.parse import quote
 else:
   from django.utils.translation import ugettext as _
-  from django.utils.http import is_safe_url as url_has_allowed_host_and_scheme
+  from django.utils.http import is_safe_url as url_has_allowed_host_and_scheme, urlquote as quote
 
 
 LOG = logging.getLogger(__name__)
@@ -93,7 +94,7 @@ class AjaxMiddleware(MiddlewareMixin):
   GET parameters.
   """
   def process_request(self, request):
-    request.ajax = request.is_ajax() or request.GET.get("format", "") == "json"
+    request.ajax = is_ajax(request) or request.GET.get("format", "") == "json"
     return None
 
 
@@ -303,6 +304,9 @@ class LoginAndPermissionMiddleware(MiddlewareMixin):
     if request.path in ['/oidc/authenticate/', '/oidc/callback/', '/oidc/logout/', '/hue/oidc_failed/']:
       return None
 
+    if request.path.startswith('/api/') or request.path == '/notebook/api/create_session':
+      return None
+
     # Skip views not requiring login
 
     # If the view has "opted out" of login required, skip
@@ -358,7 +362,7 @@ class LoginAndPermissionMiddleware(MiddlewareMixin):
           log_page_hit(request, view_func, level=access_log_level)
         return None
 
-    if desktop.conf.CORS_ENABLED.get():
+    if AUTH.AUTO_LOGIN_ENABLED.get():
       user = authenticate(request, username='hue', password='hue')
       if user is not None:
         login(request, user)
@@ -384,11 +388,11 @@ class LoginAndPermissionMiddleware(MiddlewareMixin):
           'url': "%s?%s=%s" % (
               settings.LOGIN_URL,
               REDIRECT_FIELD_NAME,
-              urlquote('/hue' + request.get_full_path().replace('is_embeddable=true', '').replace('&&', '&'))
+              quote('/hue' + request.get_full_path().replace('is_embeddable=true', '').replace('&&', '&'))
           )
         }) # Remove embeddable so redirect from & to login works. Login page is not embeddable
       else:
-        return HttpResponseRedirect("%s?%s=%s" % (settings.LOGIN_URL, REDIRECT_FIELD_NAME, urlquote(request.get_full_path())))
+        return HttpResponseRedirect("%s?%s=%s" % (settings.LOGIN_URL, REDIRECT_FIELD_NAME, quote(request.get_full_path())))
 
   def process_response(self, request, response):
     if hasattr(request, 'ts') and hasattr(request, 'view_func'):
@@ -404,7 +408,7 @@ class JsonMessage(object):
     return json.dumps(self.kwargs)
 
 
-class AuditLoggingMiddleware(object):
+class AuditLoggingMiddleware(MiddlewareMixin):
 
   def __init__(self, get_response):
     self.get_response = get_response
@@ -414,9 +418,7 @@ class AuditLoggingMiddleware(object):
       LOG.info('Unloading AuditLoggingMiddleware')
       raise exceptions.MiddlewareNotUsed
 
-  def __call__(self, request):
-    response = self.get_response(request)
-
+  def process_response(self, request, response):
     response['audited'] = False
     try:
       if hasattr(request, 'audit') and request.audit is not None:
@@ -475,7 +477,7 @@ except Exception as ex:
   _has_tidylib = False
 
 
-class HtmlValidationMiddleware(object):
+class HtmlValidationMiddleware(MiddlewareMixin):
   """
   If configured, validate output html for every response.
   """
@@ -515,8 +517,7 @@ class HtmlValidationMiddleware(object):
       'wrap': 0,
     }
 
-  def __call__(self, request):
-    response = self.get_response(request)
+  def process_response(self, request, response):
 
     if not _has_tidylib or not self._is_html(request, response):
       return response
@@ -568,12 +569,12 @@ class HtmlValidationMiddleware(object):
     return res
 
   def _is_html(self, request, response):
-    return not request.is_ajax() and \
+    return not is_ajax(request) and \
         'html' in response['Content-Type'] and \
         200 <= response.status_code < 300
 
 
-class ProxyMiddleware(object):
+class ProxyMiddleware(MiddlewareMixin):
 
   def __init__(self, get_response):
     self.get_response = get_response
@@ -581,7 +582,10 @@ class ProxyMiddleware(object):
       LOG.info('Unloading ProxyMiddleware')
       raise exceptions.MiddlewareNotUsed
 
-  def __call__(self, request):
+  def process_response(self, request, response):
+    return response
+
+  def process_request(self, request):
     view_func = resolve(request.path)[0]
     if view_func in DJANGO_VIEW_AUTH_WHITELIST:
       return
@@ -615,10 +619,6 @@ class ProxyMiddleware(object):
         LOG.exception('Unexpected error when authenticating')
         return
 
-    response = self.get_response(request)
-
-    return response
-
   def clean_username(self, username, request):
     """
     Allows the backend to clean the username, if the backend defines a
@@ -633,7 +633,7 @@ class ProxyMiddleware(object):
     return username
 
 
-class SpnegoMiddleware(object):
+class SpnegoMiddleware(MiddlewareMixin):
   """
   Based on the WSGI SPNEGO middlware class posted here:
   http://code.activestate.com/recipes/576992/
@@ -647,7 +647,7 @@ class SpnegoMiddleware(object):
       LOG.info('Unloading SpnegoMiddleware')
       raise exceptions.MiddlewareNotUsed
 
-  def __call__(self, request):
+  def process_request(self, request):
     """
     The process_request() method needs to communicate some state to the
     process_response() method. The two options for this are to return an
@@ -754,8 +754,7 @@ class SpnegoMiddleware(object):
         request.META['Return-401'] = ''
       return
 
-    response = self.get_response(request)
-
+  def process_response(self, request, response):
     if 'GSS-String' in request.META:
       response['WWW-Authenticate'] = request.META['GSS-String']
     elif 'Return-401' in request.META:
@@ -763,7 +762,6 @@ class SpnegoMiddleware(object):
         status=401)
       response['WWW-Authenticate'] = 'Negotiate'
       response.status = 401
-
     return response
 
   def clean_host(self, pattern):
@@ -815,6 +813,7 @@ class HueRemoteUserMiddleware(RemoteUserMiddleware):
     if not 'desktop.auth.backend.RemoteUserDjangoBackend' in AUTH.BACKEND.get():
       LOG.info('Unloading HueRemoteUserMiddleware')
       raise exceptions.MiddlewareNotUsed
+    super().__init__(get_response)
     self.header = AUTH.REMOTE_USER_HEADER.get()
 
 
@@ -874,7 +873,7 @@ class MetricsMiddleware(MiddlewareMixin):
     return response
 
 
-class ContentSecurityPolicyMiddleware(object):
+class ContentSecurityPolicyMiddleware(MiddlewareMixin):
   def __init__(self, get_response):
     self.get_response = get_response
     self.secure_content_security_policy = SECURE_CONTENT_SECURITY_POLICY.get()
@@ -882,16 +881,14 @@ class ContentSecurityPolicyMiddleware(object):
       LOG.info('Unloading ContentSecurityPolicyMiddleware')
       raise exceptions.MiddlewareNotUsed
 
-  def __call__(self, request):
-    response = self.get_response(request)
-
+  def process_response(self, request, response):
     if self.secure_content_security_policy and not 'Content-Security-Policy' in response:
       response["Content-Security-Policy"] = self.secure_content_security_policy
 
     return response
 
 
-class MimeTypeJSFileFixStreamingMiddleware(object):
+class MimeTypeJSFileFixStreamingMiddleware(MiddlewareMixin):
   """
   Middleware to detect and fix ".js" mimetype. SLES 11SP4 as example OS which detect js file
   as "text/x-js" and if strict X-Content-Type-Options=nosniff is set then browser fails to
@@ -904,9 +901,7 @@ class MimeTypeJSFileFixStreamingMiddleware(object):
       LOG.info('Unloading MimeTypeJSFileFixStreamingMiddleware')
       raise exceptions.MiddlewareNotUsed
 
-  def __call__(self, request):
-    response = self.get_response(request)
-
+  def process_response(self, request, response):
     if request.path_info.endswith('.js'):
       response['Content-Type'] = "application/javascript"
 

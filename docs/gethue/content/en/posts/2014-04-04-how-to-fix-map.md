@@ -35,7 +35,7 @@ sf_caption_position:
 slide_template:
   - default
 categories:
-  - Dev / API
+  - Development
 
 ---
 Hue 3.5 ships with <a href="https://issues.cloudera.org/browse/HUE-2063" target="_blank" rel="noopener noreferrer">a bug</a> in the Map Chart widget that prevents the users to correctly display the map in their browsers.

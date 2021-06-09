@@ -17,11 +17,11 @@
 import $ from 'jquery';
 import * as ko from 'knockout';
 
-import hueUtils from 'utils/hueUtils';
+import isOverflowing from 'utils/html/isOverflowing';
 
 ko.bindingHandlers.toggleOverflow = {
   render: function ($element, options) {
-    if (hueUtils.isOverflowing($element.find('.toggle-overflow'))) {
+    if (isOverflowing($element.find('.toggle-overflow'))) {
       $('<div>')
         .addClass('toggle-overflow-toggle')
         .html('<i class="fa fa-caret-down muted"></i>')

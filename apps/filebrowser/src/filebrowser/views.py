@@ -44,9 +44,10 @@ from functools import partial
 from django.utils.http import http_date
 from django.utils.html import escape
 
-from aws.s3.s3fs import S3FileSystemException, S3ListAllBucketsException
+from aws.s3.s3fs import S3FileSystemException, S3ListAllBucketsException, get_s3_home_directory
 from desktop import appmanager
 from desktop.auth.backend import is_admin
+from desktop.lib import fsmanager
 from desktop.lib import i18n
 from desktop.lib.conf import coerce_bool
 from desktop.lib.django_util import render, format_preserving_redirect
@@ -58,6 +59,7 @@ from desktop.lib.i18n import smart_str
 from desktop.lib.paths import SAFE_CHARACTERS_URI, SAFE_CHARACTERS_URI_COMPONENTS
 from desktop.lib.tasks.compress_files.compress_utils import compress_files_in_hdfs
 from desktop.lib.tasks.extract_archive.extract_utils import extract_archive_in_hdfs
+from desktop.lib.view_util import is_ajax
 from desktop.views import serve_403_error
 from hadoop.core_site import get_trash_interval
 from hadoop.fs.hadoopfs import Hdfs
@@ -208,10 +210,24 @@ def view(request, path):
   if path != decoded_path:
     path = decoded_path
 
+  if request.path.startswith('/api/') and request.fs is None:
+    request.fs = fsmanager.get_filesystem(request.fs_ref)
+
+    if request.user.is_authenticated and request.fs is not None:
+      request.fs.setuser(request.user.username)
+
   # default_abfs_home is set in jquery.filechooser.js
   if 'default_abfs_home' in request.GET:
     from azure.abfs.__init__ import get_home_dir_for_ABFS
     home_dir_path = get_home_dir_for_ABFS()
+    if request.fs.isdir(home_dir_path):
+      return format_preserving_redirect(
+          request,
+          '/filebrowser/view=' + urllib_quote(home_dir_path.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS)
+      )
+
+  if 'default_s3_home' in request.GET:
+    home_dir_path = get_s3_home_directory()
     if request.fs.isdir(home_dir_path):
       return format_preserving_redirect(
           request,
@@ -250,7 +266,7 @@ def view(request, path):
       return display(request, path)
   except S3FileSystemException as e:
     msg = _("S3 filesystem exception.")
-    if request.is_ajax():
+    if is_ajax(request):
       exception = {
         'error': smart_str(e)
       }
@@ -263,7 +279,7 @@ def view(request, path):
     if "Connection refused" in str(e):
       msg += _(" The HDFS REST service is not available. ")
 
-    if request.is_ajax():
+    if is_ajax(request):
       exception = {
         'error': msg
       }
@@ -333,9 +349,9 @@ def edit(request, path, form=None):
       breadcrumbs=parse_breadcrumbs(path),
       is_embeddable=request.GET.get('is_embeddable', False),
       show_download_button=SHOW_DOWNLOAD_BUTTON.get())
-  if not request.is_ajax():
-    data['stats'] = stats;
-    data['form'] = form;
+  if not is_ajax(request):
+    data['stats'] = stats
+    data['form'] = form
   return render("edit.mako", request, data)
 
 def save_file(request):
@@ -442,6 +458,7 @@ def listdir(request, path):
   data['files'] = [_massage_stats(request, stat_absolute_path(path, stat)) for stat in stats]
   return render('listdir.mako', request, data)
 
+
 def _massage_page(page, paginator):
   try:
     prev_num = page.previous_page_number()
@@ -505,9 +522,8 @@ def listdir_paged(request, path):
     else:
       all_stats = request.fs.listdir_stats(path)
   except S3ListAllBucketsException as e:
-    s3_listing_not_allowed = e.message
+    s3_listing_not_allowed = str(e)
     all_stats = []
-
 
   # Filter first
   filter_str = request.GET.get('filter', None)
@@ -586,6 +602,7 @@ def listdir_paged(request, path):
       's3_listing_not_allowed': s3_listing_not_allowed
   }
   return render('listdir.mako', request, data)
+
 
 def scheme_absolute_path(root, path):
   splitPath = lib_urlparse(path)
@@ -677,7 +694,7 @@ def display(request, path):
     raise PopupException(_("Not a file: '%(path)s'") % {'path': path})
 
   # display inline files just if it's not an ajax request
-  if not request.is_ajax():
+  if not is_ajax(request):
     if _can_inline_display(path):
       return redirect(reverse('filebrowser:filebrowser_views_download', args=[path]) + '?disposition=inline')
 
@@ -958,7 +975,7 @@ def detect_gzip(contents):
   if sys.version_info[0] > 2:
     return contents[:2] == b'\x1f\x8b'
   else:
-    return contents[:2] == '\x1f\x8b' 
+    return contents[:2] == '\x1f\x8b'
 
 
 def detect_bz2(contents):
@@ -1188,7 +1205,7 @@ def generic_op(form_class, request, op, parameter_names, piggyback=None, templat
         ret["result_error"] = True
 
       ret['user'] = request.user
-      if request.is_ajax():
+      if is_ajax(request):
         return HttpResponse()
       else:
         return render(template, request, ret)

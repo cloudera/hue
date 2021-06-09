@@ -105,7 +105,7 @@ export interface Connector extends IdentifiableInterpreter {
 }
 
 export interface EditorInterpreter extends IdentifiableInterpreter {
-  dialect_properties: Record<string, unknown> | null;
+  dialect_properties?: Record<string, unknown>;
   is_batchable: boolean;
   is_sql: boolean;
   name: string;

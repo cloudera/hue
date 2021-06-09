@@ -21,11 +21,14 @@
     :executable="executable"
     :before-execute="beforeExecute"
     @limit-changed="limitChanged"
+    @execute-failed="$emit('execute-failed', $event)"
+    @execute-successful="$emit('execute-successful', $event)"
   />
 </template>
 
 <script lang="ts">
   import { defineComponent, PropType, ref, toRefs } from 'vue';
+  import KnockoutObservable from '@types/knockout';
 
   import ExecutableActions from './ExecutableActions.vue';
   import SqlExecutable from 'apps/editor/execution/sqlExecutable';
@@ -48,6 +51,7 @@
         default: undefined
       }
     },
+    emits: ['execute-failed', 'execute-successful'],
     setup(props) {
       const subTracker = new SubscriptionTracker();
       const { executableObservable } = toRefs(props);

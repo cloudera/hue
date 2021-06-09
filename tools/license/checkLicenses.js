@@ -41,7 +41,8 @@ checker.init(
           lowerLicenses.indexOf('apache') === -1 &&
           lowerLicenses.indexOf('isc') === -1 &&
           lowerLicenses.indexOf('unlicense') === -1 &&
-          lowerLicenses.indexOf('cc') === -1
+          lowerLicenses.indexOf('cc') === -1 &&
+          lowerLicenses.indexOf('python-2.0') === -1
         ) {
           console.warn(`Found invalid license in "${packageName}", license: "${licenses}".`);
           process.exitCode = 1;

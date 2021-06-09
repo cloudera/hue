@@ -69,10 +69,11 @@ jobs:
 
             cd /usr/share/hue
             # make npm-install # Not available
-            cp ~/repo/.babelrc .
+            cp ~/repo/babel.config.js .
             cp ~/repo/tsconfig.json .
             cp ~/repo/jest.config.js .
             cp ~/repo/.pylintrc .
+            cp ~/repo/.stylelintrc .
 
             cp ~/repo/webpack.config*.js .
             rm package.json
@@ -134,6 +135,13 @@ jobs:
             cp ~/repo/tools . -r
 
             npm run lint
+
+      - run:
+          name: run style lint
+          command: |
+            cd /usr/share/hue
+
+            npm run style-lint
 
       - run:
           name: run npm license checker

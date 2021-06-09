@@ -86,11 +86,11 @@ DUMP top_25;</pre>
 
 New features like support for [Python UDF][8]s and better integration with Apache Oozie and [File Browser][9] are on the way. As usual, we welcome all [feedback][10]!
 
-[1]: http://cloudera.github.com/hue/
+[1]: https://gethue.com
 [2]: http://hadoop.apache.org/
 [3]: http://blog.cloudera.com/blog/2013/04/demo-analyzing-data-with-hue-and-hive/
 [4]: http://pig.apache.org/
-[5]: http://cloudera.github.io/hue/docs-2.3.0/release-notes/release-notes-2.3.0.html
+[5]: https://gethue.com
 [6]: https://github.com/romainr/yelp-data-analysis#yelp-data-analysis-with-hue
 [7]: http://blog.cloudera.com/2013/04/demo-analyzing-data-with-hue-and-hive/
 [8]: https://issues.cloudera.org/browse/HUE-1136

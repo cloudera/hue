@@ -145,9 +145,9 @@ export default function wrap(
       });
     }
 
-    createEventProxies(
-      eventNames: string[] | undefined
-    ): { [name: string]: (...args: unknown[]) => void } {
+    createEventProxies(eventNames: string[] | undefined): {
+      [name: string]: (...args: unknown[]) => void;
+    } {
       const eventProxies: { [name: string]: (...args: unknown[]) => void } = {};
 
       if (eventNames) {

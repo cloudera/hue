@@ -15,7 +15,6 @@
 // limitations under the License.
 
 import { CancellablePromise } from 'api/cancellablePromise';
-import { CLOSE_SESSION_API } from 'api/urls';
 import { AuthRequest, Session, SessionProperty } from './api';
 
 import * as ExecutionApi from './api';
@@ -135,22 +134,24 @@ describe('sessionManager.ts', () => {
     //     }
     // Close the session
 
-    const postSpy = jest.spyOn(ApiUtils, 'post').mockImplementation(
-      (
-        url: string,
-        data: unknown,
-        options?: { dataType?: string; silenceErrors?: boolean; ignoreSuccessErrors?: boolean }
-      ): CancellablePromise<unknown> => {
-        expect(JSON.parse((data as { session: string }).session).session_id).toEqual(
-          session.session_id
-        );
-        expect(options && options.silenceErrors).toBeTruthy();
-        expect(url).toEqual(CLOSE_SESSION_API);
-        return new CancellablePromise(resolve => {
-          resolve();
-        });
-      }
-    );
+    const postSpy = jest
+      .spyOn(ApiUtils, 'post')
+      .mockImplementation(
+        (
+          url: string,
+          data: unknown,
+          options?: { dataType?: string; silenceErrors?: boolean; ignoreSuccessErrors?: boolean }
+        ): CancellablePromise<unknown> => {
+          expect(JSON.parse((data as { session: string }).session).session_id).toEqual(
+            session.session_id
+          );
+          expect(options && options.silenceErrors).toBeTruthy();
+          expect(url).toContain('/close_session');
+          return new CancellablePromise(resolve => {
+            resolve();
+          });
+        }
+      );
     await sessionManager.closeSession(session);
 
     expect(sessionManager.hasSession('impala')).toBeFalsy();

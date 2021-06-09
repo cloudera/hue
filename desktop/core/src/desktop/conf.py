@@ -575,13 +575,6 @@ REST_CONN_TIMEOUT = Config(
   type=int,
   help=_('Timeout in seconds for REST calls.'))
 
-CORS_ENABLED = Config(
-  key="cors_enabled",
-  help=_("To set to true when using a decoupled UI."),
-  type=coerce_bool,
-  default=False
-)
-
 
 VCS = UnspecifiedConfigSection(
   "vcs",
@@ -742,30 +735,36 @@ SLACK = ConfigSection(
       help=_('Enables Slack application API endpoints'),
       type=coerce_bool,
       default=False,
-      ),
+    ),
     SLACK_CLIENT_ID=Config(
-        key='slack_client_id',
-        type=str,
-        dynamic_default=get_slack_client_id,
-      ),
+      key='slack_client_id',
+      type=str,
+      dynamic_default=get_slack_client_id,
+    ),
     SLACK_CLIENT_SECRET=Config(
-        key='slack_client_secret',
-        type=str,
-        private=True,
-        dynamic_default=get_slack_client_secret,
-      ),
+      key='slack_client_secret',
+      type=str,
+      private=True,
+      dynamic_default=get_slack_client_secret,
+    ),
     SLACK_VERIFICATION_TOKEN=Config(
-        key='slack_verification_token',
-        type=str,
-        private=True,
-        dynamic_default=get_slack_verification_token,
-      ),
+      key='slack_verification_token',
+      type=str,
+      private=True,
+      dynamic_default=get_slack_verification_token,
+    ),
     SLACK_BOT_USER_TOKEN=Config(
-        key='slack_bot_user_token',
-        type=str,
-        private=True,
-        dynamic_default=get_slack_bot_user_token,
-      ),
+      key='slack_bot_user_token',
+      type=str,
+      private=True,
+      dynamic_default=get_slack_bot_user_token,
+    ),
+    SHARE_FROM_EDITOR=Config(
+      key='share_from_editor',
+      help=_('Enables direct sharing from Editor to Slack'),
+      type=coerce_bool,
+      default=True,
+    ),
   )
 )
 
@@ -863,6 +862,12 @@ SESSION = ConfigSection(
             "This can have any value that is not used by the other cookie names in your application."),
       type=str,
       default="sessionid",
+    ),
+    ENABLE_TEST_COOKIE=Config(
+      key='enable_test_cookie',
+      help=_("Configuration to determine whether test cookie should be added determine whether the user's browser supports cookies."),
+      type=coerce_bool,
+      default=True,
     ),
     TTL=Config(
       key='ttl',
@@ -1172,7 +1177,13 @@ AUTH = ConfigSection(
       help=_("If behind_reverse_proxy is True, it will look for the IP address from this header. Default: HTTP_X_FORWARDED_FOR"),
       type=str,
       default="HTTP_X_FORWARDED_FOR",
-    )
+    ),
+    AUTO_LOGIN_ENABLED=Config(
+      key="auto_login_enabled",
+      help=_("If True, will auto log any request as a `hue` user that needs to exist."),
+      type=coerce_bool,
+      default=False,
+    ),
 ))
 
 
@@ -1739,11 +1750,11 @@ DJANGO_DEBUG_TOOL_USERS = Config(
   help=_('Comma separated list of users that allow to use django debug tool. If it is empty, all users are allowed.')
 )
 
-USE_NEW_SIDE_PANELS = Config( # To remove in Hue 4
-  key='use_new_side_panels',
-  default=True,
+USE_NEW_ASSIST_PANEL = Config(
+  key='use_new_assist_panel',
+  default=False,
   type=coerce_bool,
-  help=_('Choose whether to show extended left and right panels.')
+  help=_('Choose whether to show the new Assist panel or the old.')
 )
 
 USE_DEFAULT_CONFIGURATION = Config(
@@ -1774,6 +1785,13 @@ IS_K8S_ONLY = Config(
   default=False,
   type=coerce_bool,
   help=_('Choose whether to pick configs only from [desktop] [[cluster]]')
+)
+
+ENABLE_UNIFIED_ANALYTICS = Config(
+  key='enable_unified_analytics',
+  default=False,
+  type=coerce_bool,
+  help=_('Choose whether Hive represents Unified Analytics or not.')
 )
 
 ENABLE_ORGANIZATIONS = Config(
@@ -2071,6 +2089,33 @@ CONNECTORS = UnspecifiedConfigSection(
           type=coerce_json_dict,
       ),
     )
+  )
+)
+
+
+
+RAZ = ConfigSection(
+  key='raz',
+  help=_("""Configuration for RAZ service integration"""),
+  members=dict(
+    IS_ENABLED=Config(
+      key='is_enabled',
+      help=_('Turns on the integration as ready to use'),
+      type=coerce_bool,
+      default=False,
+    ),
+    API_URL=Config(
+        key='api_url',
+        help=_('Endpoint to contact'),
+        type=str,
+        default='https://localhost:8080',
+    ),
+    API_AUTHENTICATION=Config(
+        key='api_authentication',
+        help=_('How to authenticate against: KERBEROS or JWT (not supported yet)'),
+        type=coerce_str_lowercase,
+        default='kerberos',
+    ),
   )
 )
 

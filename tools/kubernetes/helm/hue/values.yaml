@@ -1,7 +1,7 @@
 image:
    registry: "gethue"
    tag: "latest"
-   pullPolicy: "IfNotPresent"
+   pullPolicy: "Always"
 hue:
   replicas: 2
   database:
@@ -25,7 +25,7 @@ hue:
     secret_key=hue123
     app_blacklist=filebrowser,search,hbase,security,jobbrowser,oozie
     django_debug_mode=false
-    gunicorn_work_class=gevent
+    gunicorn_work_class=sync
     enable_prometheus=true
 
     [[task_server]]
@@ -63,6 +63,9 @@ ingress:
   # type: "nginx-ssl-staging"
   # type: "traefik"
   domain: "demo.gethue.com"
+  # extraHosts:
+  # - "demo.hue.com"
+  # annotations: {}
   email: "team@gethue.com"
   loadBalancerIp: "127.0.0.1"
 aws:

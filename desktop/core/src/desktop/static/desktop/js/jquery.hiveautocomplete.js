@@ -53,13 +53,13 @@
     if (self.options.namespace) {
       self.namespaceDeferred.resolve(self.options.namespace);
     } else {
-      contextCatalog.getNamespaces({ connector: { id: options.apiHelperType } }).done(function (context) {
+      contextCatalog.getNamespaces({ connector: { id: options.apiHelperType } }).then(function (context) {
         if (context.namespaces && context.namespaces.length) {
           self.namespaceDeferred.resolve(context.namespaces[0]);
         } else {
           self.namespaceDeferred.reject();
         }
-      })
+      }).catch();
     }
     self.namespaceDeferred.done(function (namespace) {
       if (!self.options.compute || !namespace.computes.some(function (compute) {

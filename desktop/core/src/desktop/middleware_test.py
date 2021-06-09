@@ -17,9 +17,11 @@
 
 import json
 import os
+import sys
 import tempfile
 
 from django.conf import settings
+from django.test.client import Client
 from nose.tools import assert_equal, assert_false, assert_true
 from nose.plugins.skip import SkipTest
 
@@ -29,6 +31,10 @@ from desktop.conf import AUDIT_EVENT_LOG_DIR
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_permission
 
+if sys.version_info[0] > 2:
+  from unittest.mock import patch, Mock
+else:
+  from mock import patch, Mock
 
 def test_view_perms():
   # Super user
@@ -156,3 +162,42 @@ def test_ensure_safe_redirect_middleware():
     settings.MIDDLEWARE.pop()
     for finish in done:
       finish()
+
+def test_spnego_middleware():
+  done = []
+  orig_backends = settings.AUTHENTICATION_BACKENDS
+  try:
+    # use SpnegoDjangoBackend to enable 'desktop.middleware.SpnegoMiddleware'
+    done.append(desktop.conf.AUTH.BACKEND.set_for_testing(['desktop.auth.backend.SpnegoDjangoBackend']))
+    settings.AUTHENTICATION_BACKENDS = (['desktop.auth.backend.SpnegoDjangoBackend'])
+
+    c = Client()
+    with patch('kerberos.authGSSServerInit') as authGSSServerInit, \
+         patch('kerberos.authGSSServerStep') as authGSSServerStep, \
+         patch('kerberos.authGSSServerResponse') as authGSSServerResponse, \
+         patch('kerberos.authGSSServerClean') as authGSSServerClean, \
+         patch('kerberos.authGSSServerUserName') as authGSSServerUserName:
+      authGSSServerInit.return_value = 1, 'context'
+      authGSSServerStep.return_value = 1
+      authGSSServerResponse.return_value = 'gssstring'
+      authGSSServerClean.return_value = None
+      authGSSServerUserName.return_value = 'spnego_test'
+
+      header = {'HTTP_AUTHORIZATION': 'Negotiate test'}
+      response = c.get("/hue/editor/?type=impala", **header)
+      assert_equal(200, response.status_code)
+      assert_equal(response['WWW-Authenticate'], 'Negotiate %s' % authGSSServerResponse.return_value)
+
+    c = Client()
+    response = c.get("/hue/editor/?type=impala")
+    assert_equal(401, response.status_code)
+
+    c = Client()
+    response = c.get("/desktop/debug/is_alive")
+    assert_equal(200, response.status_code)
+  finally:
+    settings.MIDDLEWARE.pop()
+    for finish in done:
+      finish()
+    settings.AUTHENTICATION_BACKENDS = orig_backends
+

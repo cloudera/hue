@@ -20,15 +20,13 @@ export const SET_OPTIONS: SetOptions = {
   ALLOW_ERASURE_CODED_FILES: {
     description:
       'Use the ALLOW_ERASURE_CODED_FILES query option to enable or disable the support of erasure coded files in Impala. Until Impala is fully tested and certified with erasure coded files, this query option is set to FALSE by default.',
-    type:
-      'Boolean; recognized values are 1 and 0, or true and false; any other value interpreted as false',
+    type: 'Boolean; recognized values are 1 and 0, or true and false; any other value interpreted as false',
     default: 'false (shown as 0 in output of SET statement)'
   },
   APPX_COUNT_DISTINCT: {
     description:
       'Allows multiple COUNT(DISTINCT) operations within a single query, by internally rewriting each COUNT(DISTINCT) to use the NDV() function. The resulting count is approximate rather than precise.',
-    type:
-      'Boolean; recognized values are 1 and 0, or true and false; any other value interpreted as false',
+    type: 'Boolean; recognized values are 1 and 0, or true and false; any other value interpreted as false',
     default: 'false (shown as 0 in output of SET statement)'
   },
   BATCH_SIZE: {
@@ -59,8 +57,7 @@ export const SET_OPTIONS: SetOptions = {
   DEFAULT_JOIN_DISTRIBUTION_MODE: {
     description:
       'This option determines the join distribution that Impala uses when any of the tables involved in a join query is missing statistics.\n\nThe setting DEFAULT_JOIN_DISTRIBUTION_MODE=SHUFFLE is recommended when setting up and deploying new clusters, because it is less likely to result in serious consequences such as spilling or out-of-memory errors if the query plan is based on incomplete information.',
-    type:
-      'Integer; The allowed values are BROADCAST (equivalent to 0) or SHUFFLE (equivalent to 1).',
+    type: 'Integer; The allowed values are BROADCAST (equivalent to 0) or SHUFFLE (equivalent to 1).',
     default: '0'
   },
   DEFAULT_SPILLABLE_BUFFER_SIZE: {
@@ -72,29 +69,25 @@ export const SET_OPTIONS: SetOptions = {
   DISABLE_CODEGEN: {
     description:
       'This is a debug option, intended for diagnosing and working around issues that cause crashes. If a query fails with an "illegal instruction" or other hardware-specific message, try setting DISABLE_CODEGEN=true and running the query again. If the query succeeds only when the DISABLE_CODEGEN option is turned on, submit the problem to Cloudera Support and include that detail in the problem report. Do not otherwise run with this setting turned on, because it results in lower overall performance.',
-    type:
-      'Boolean; recognized values are 1 and 0, or true and false; any other value interpreted as false',
+    type: 'Boolean; recognized values are 1 and 0, or true and false; any other value interpreted as false',
     default: 'false (shown as 0 in output of SET statement)'
   },
   DISABLE_ROW_RUNTIME_FILTERING: {
     description:
       'The DISABLE_ROW_RUNTIME_FILTERING query option reduces the scope of the runtime filtering feature. Queries still dynamically prune partitions, but do not apply the filtering logic to individual rows within partitions.\n\nOnly applies to queries against Parquet tables. For other file formats, Impala only prunes at the level of partitions, not individual rows.',
-    type:
-      'Boolean; recognized values are 1 and 0, or true and false; any other value interpreted as false',
+    type: 'Boolean; recognized values are 1 and 0, or true and false; any other value interpreted as false',
     default: 'false (shown as 0 in output of SET statement)'
   },
   DISABLE_STREAMING_PREAGGREGATIONS: {
     description:
       'Turns off the "streaming preaggregation" optimization that is available in CDH 5.7 / Impala 2.5 and higher. This optimization reduces unnecessary work performed by queries that perform aggregation operations on columns with few or no duplicate values, for example DISTINCT id_column or GROUP BY unique_column. If the optimization causes regressions in existing queries that use aggregation functions, you can turn it off as needed by setting this query option.',
-    type:
-      'Boolean; recognized values are 1 and 0, or true and false; any other value interpreted as false',
+    type: 'Boolean; recognized values are 1 and 0, or true and false; any other value interpreted as false',
     default: 'false (shown as 0 in output of SET statement)'
   },
   DISABLE_UNSAFE_SPILLS: {
     description:
       'Enable this option if you prefer to have queries fail when they exceed the Impala memory limit, rather than write temporary data to disk.\n\nQueries that "spill" to disk typically complete successfully, when in earlier Impala releases they would have failed. However, queries with exorbitant memory requirements due to missing statistics or inefficient join clauses could become so slow as a result that you would rather have them cancelled automatically and reduce the memory usage through standard Impala tuning techniques.',
-    type:
-      'Boolean; recognized values are 1 and 0, or true and false; any other value interpreted as false',
+    type: 'Boolean; recognized values are 1 and 0, or true and false; any other value interpreted as false',
     default: 'false (shown as 0 in output of SET statement)'
   },
   EXEC_SINGLE_NODE_ROWS_THRESHOLD: {
@@ -118,15 +111,13 @@ export const SET_OPTIONS: SetOptions = {
   HBASE_CACHE_BLOCKS: {
     description:
       'Setting this option is equivalent to calling the setCacheBlocks method of the class org.apache.hadoop.hbase.client.Scan, in an HBase Java application. Helps to control the memory pressure on the HBase RegionServer, in conjunction with the HBASE_CACHING query option.',
-    type:
-      'Boolean; recognized values are 1 and 0, or true and false; any other value interpreted as false',
+    type: 'Boolean; recognized values are 1 and 0, or true and false; any other value interpreted as false',
     default: 'false (shown as 0 in output of SET statement)'
   },
   HBASE_CACHING: {
     description:
       'Setting this option is equivalent to calling the setCaching method of the class org.apache.hadoop.hbase.client.Scan, in an HBase Java application. Helps to control the memory pressure on the HBase RegionServer, in conjunction with the HBASE_CACHE_BLOCKS query option.',
-    type:
-      'Boolean; recognized values are 1 and 0, or true and false; any other value interpreted as false',
+    type: 'Boolean; recognized values are 1 and 0, or true and false; any other value interpreted as false',
     default: 'false (shown as 0 in output of SET statement)'
   },
   MAX_ERRORS: {
@@ -179,8 +170,7 @@ export const SET_OPTIONS: SetOptions = {
   },
   NUM_NODES: {
     description: 'Limit the number of nodes that process a query, typically during debugging.',
-    type:
-      'Numeric; Only accepts the values 0 (meaning all nodes) or 1 (meaning all work is done on the coordinator node).',
+    type: 'Numeric; Only accepts the values 0 (meaning all nodes) or 1 (meaning all work is done on the coordinator node).',
     default: '0'
   },
   NUM_SCANNER_THREADS: {
@@ -192,15 +182,13 @@ export const SET_OPTIONS: SetOptions = {
   OPTIMIZE_PARTITION_KEY_SCANS: {
     description:
       'Enables a fast code path for queries that apply simple aggregate functions to partition key columns: MIN(key_column), MAX(key_column), or COUNT(DISTINCT key_column).',
-    type:
-      'Boolean; recognized values are 1 and 0, or true and false; any other value interpreted as false',
+    type: 'Boolean; recognized values are 1 and 0, or true and false; any other value interpreted as false',
     default: 'false (shown as 0 in output of SET statement)'
   },
   PARQUET_ANNOTATE_STRINGS_UTF8: {
     description:
       'Causes Impala INSERT and CREATE TABLE AS SELECT statements to write Parquet files that use the UTF-8 annotation for STRING columns.\n\nBy default, Impala represents a STRING column in Parquet as an unannotated binary field.',
-    type:
-      'Boolean; recognized values are 1 and 0, or true and false; any other value interpreted as false',
+    type: 'Boolean; recognized values are 1 and 0, or true and false; any other value interpreted as false',
     default: 'false (shown as 0 in output of SET statement)'
   },
   PARQUET_FALLBACK_SCHEMA_RESOLUTION: {
@@ -239,8 +227,7 @@ export const SET_OPTIONS: SetOptions = {
   REPLICA_PREFERENCE: {
     description:
       'The REPLICA_PREFERENCE query option lets you distribute the work more evenly if hotspots and bottlenecks persist. It causes the access cost of all replicas of a data block to be considered equal to or worse than the configured value. This allows Impala to schedule reads to suboptimal replicas (e.g. local in the presence of cached ones) in order to distribute the work across more executor nodes.',
-    type:
-      'Numeric (0, 2, 4) or corresponding mnemonic strings (CACHE_LOCAL, DISK_LOCAL, REMOTE). The gaps in the numeric sequence are to accomodate other intermediate values that might be added in the future.',
+    type: 'Numeric (0, 2, 4) or corresponding mnemonic strings (CACHE_LOCAL, DISK_LOCAL, REMOTE). The gaps in the numeric sequence are to accomodate other intermediate values that might be added in the future.',
     default: '0 (equivalent to CACHE_LOCAL)'
   },
   RUNTIME_BLOOM_FILTER_SIZE: {
@@ -276,15 +263,13 @@ export const SET_OPTIONS: SetOptions = {
   S3_SKIP_INSERT_STAGING: {
     description:
       'Speeds up INSERT operations on tables or partitions residing on the Amazon S3 filesystem. The tradeoff is the possibility of inconsistent data left behind if an error occurs partway through the operation.',
-    type:
-      'Boolean; recognized values are 1 and 0, or true and false; any other value interpreted as false',
+    type: 'Boolean; recognized values are 1 and 0, or true and false; any other value interpreted as false',
     default: 'true (shown as 1 in output of SET statement)'
   },
   SCHEDULE_RANDOM_REPLICA: {
     description:
       'The SCHEDULE_RANDOM_REPLICA query option fine-tunes the algorithm for deciding which host processes each HDFS data block. It only applies to tables and partitions that are not enabled for the HDFS caching feature.',
-    type:
-      'Boolean; recognized values are 1 and 0, or true and false; any other value interpreted as false',
+    type: 'Boolean; recognized values are 1 and 0, or true and false; any other value interpreted as false',
     default: 'false (shown as 0 in output of SET statement)'
   },
   SCRATCH_LIMIT: {
@@ -296,22 +281,19 @@ export const SET_OPTIONS: SetOptions = {
   SHUFFLE_DISTINCT_EXPRS: {
     description:
       'The SHUFFLE_DISTINCT_EXPRS query option controls the shuffling behavior when a query has both grouping and distinct expressions. Impala can optionally include the distinct expressions in the hash exchange to spread the data among more nodes. However, this plan requires one more hash exchange phase. It is recommended that you turn off this option if the NDVs of the grouping expressions are high.',
-    type:
-      'Boolean; recognized values are 1 and 0, or true and false; any other value interpreted as false',
+    type: 'Boolean; recognized values are 1 and 0, or true and false; any other value interpreted as false',
     default: 'false (shown as 0 in output of SET statement)'
   },
   SYNC_DDL: {
     description:
       'When enabled, causes any DDL operation such as CREATE TABLE or ALTER TABLE to return only when the changes have been propagated to all other Impala nodes in the cluster by the Impala catalog service. That way, if you issue a subsequent CONNECT statement in impala-shell to connect to a different node in the cluster, you can be sure that other node will already recognize any added or changed tables. (The catalog service automatically broadcasts the DDL changes to all nodes automatically, but without this option there could be a period of inconsistency if you quickly switched to another node, such as by issuing a subsequent query through a load-balancing proxy.)',
-    type:
-      'Boolean; recognized values are 1 and 0, or true and false; any other value interpreted as false',
+    type: 'Boolean; recognized values are 1 and 0, or true and false; any other value interpreted as false',
     default: 'false (shown as 0 in output of SET statement)'
   },
   TIMEZONE: {
     description:
       'The TIMEZONE query option defines the timezone used for conversions between UTC and the local time. If not set, Impala uses the system time zone where the Coordinator Impalad runs. As query options are not sent to the Coordinator immediately, the timezones are validated only when the query runs.',
-    type:
-      'String, can be a canonical code or a time zone name defined in the IANA Time Zone Database. The value is case-sensitive.',
+    type: 'String, can be a canonical code or a time zone name defined in the IANA Time Zone Database. The value is case-sensitive.',
     default: 'Coordinator Impalad system time zone.'
   },
   TOPN_BYTES_LIMIT: {

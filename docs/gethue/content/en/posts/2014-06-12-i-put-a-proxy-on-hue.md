@@ -35,7 +35,7 @@ sf_remove_promo_bar:
 slide_template:
   - default
 categories:
-  - Dev / API
+  - Development
 
 ---
 A Web proxy lets you centralize all the access to a certain URL and prettify the address (e.g. `ec2-54-247-321-151.compute-1.amazonaws.com --> demo.gethue.com`).

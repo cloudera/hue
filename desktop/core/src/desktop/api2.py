@@ -86,7 +86,7 @@ def api_error_handler(func):
 @api_error_handler
 def get_config(request):
   config = get_cluster_config(request.user)
-  config['hue_config']['is_admin'] = is_admin(request.user);
+  config['hue_config']['is_admin'] = is_admin(request.user)
   config['clusters'] = list(get_clusters(request.user).values())
   config['documents'] = {
     'types': list(Document2.objects.documents(user=request.user).order_by().values_list('type', flat=True).distinct())
@@ -720,7 +720,7 @@ def share_document(request):
 @require_POST
 def share_document_link(request):
   """
-  Globally activate of de-activate access to a document for logged-in users.
+  Globally activate or de-activate access to a document for logged-in users.
 
   Example of input: {"uuid": "xxxx", "perm": "read" / "write" / "off"}
   """
@@ -924,37 +924,45 @@ def gist_create(request):
   '''
   Only supporting Editor App currently.
   '''
-  response = {'status': 0}
 
   statement = request.POST.get('statement', '')
   gist_type = request.POST.get('doc_type', 'hive')
   name = request.POST.get('name', '')
   description = request.POST.get('description', '')
 
-  if not name:
-    name = _('%s Query') % gist_type.capitalize()
+  response = _gist_create(request.get_host(), request.is_secure(), request.user, statement, gist_type, name)
+
+  return JsonResponse(response)
+
+
+def _gist_create(host_domain, is_http_secure, user, statement, gist_type, name=''):
+  response = {'status': 0}
+
   statement_raw = statement
   if not statement.strip().startswith('--'):
-    statement = '-- Created by %s\n\n%s' % (request.user.get_full_name() or request.user.username, statement)
+    statement = '-- Created by %s\n\n%s' % (user.get_full_name() or user.username, statement)
+
+  if not name:
+    name = _('%s Query') % gist_type.capitalize()
 
   gist_doc = Document2.objects.create(
     name=name,
     type='gist',
-    owner=request.user,
+    owner=user,
     data=json.dumps({'statement': statement, 'statement_raw': statement_raw}),
     extra=gist_type,
-    parent_directory=Document2.objects.get_gist_directory(request.user)
+    parent_directory=Document2.objects.get_gist_directory(user)
   )
 
   response['id'] = gist_doc.id
   response['uuid'] = gist_doc.uuid
   response['link'] = '%(scheme)s://%(host)s/hue/gist?uuid=%(uuid)s' % {
-    'scheme': 'https' if request.is_secure() else 'http',
-    'host': request.get_host(),
+    'scheme': 'https' if is_http_secure else 'http',
+    'host': host_domain,
     'uuid': gist_doc.uuid,
   }
 
-  return JsonResponse(response)
+  return response
 
 
 @login_notrequired

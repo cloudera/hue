@@ -119,18 +119,21 @@ export interface AutocompleteParseResult {
   };
   suggestColumnAliases?: ColumnAliasDetails[];
   suggestColumns?: {
+    appendBacktick?: boolean;
     identifierChain?: IdentifierChainEntry[];
     source?: string;
     tables: ParsedTable[];
     types?: string[];
     udfRef?: string;
   };
-  suggestCommonTableExpressions: {
+  suggestCommonTableExpressions?: {
+    appendBacktick?: boolean;
     name: string;
     prependFrom: boolean;
     prependQuestionMark: boolean;
   }[];
-  suggestDatabases: {
+  suggestDatabases?: {
+    appendBacktick?: boolean;
     appendDot?: boolean;
     prependFrom?: boolean;
     prependQuestionMark?: boolean;
@@ -151,7 +154,7 @@ export interface AutocompleteParseResult {
     prependJoin?: boolean;
     tables: ParsedTable[];
   };
-  suggestJoinConditions: {
+  suggestJoinConditions?: {
     prependOn?: boolean;
     tables: ParsedTable[];
   };
@@ -167,7 +170,8 @@ export interface AutocompleteParseResult {
   suggestOrderBys?: CommonPopularSuggestion;
   suggestSetOptions?: boolean;
   suggestTables?: {
-    identifierChain: IdentifierChainEntry[];
+    appendBacktick?: boolean;
+    identifierChain?: IdentifierChainEntry[];
     onlyTables?: boolean;
     onlyViews?: boolean;
     prependFrom?: boolean;
@@ -177,7 +181,7 @@ export interface AutocompleteParseResult {
     missingEndQuote?: boolean;
     partialQuote?: boolean;
   };
-  udfArgument: {
+  udfArgument?: {
     name: string;
     position: number;
   };
@@ -200,5 +204,3 @@ export interface SqlParserProvider {
   getAutocompleteParser(dialect: string): Promise<AutocompleteParser>;
   getSyntaxParser(dialect: string): Promise<SyntaxParser>;
 }
-
-declare const sqlStatementsParser: SqlStatementsParser;

@@ -52,9 +52,7 @@
       };
     },
 
-    data(
-      thisComp
-    ): {
+    data(thisComp): {
       newHeight: number;
       startHeight: number;
       startY: number;

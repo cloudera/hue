@@ -53,9 +53,10 @@
   } from 'ko/components/assist/events';
   import { AppType, Connector, HueConfig, Namespace } from 'config/types';
   import { hueWindow } from 'types/types';
-  import { CONFIG_REFRESHED_EVENT, getLastKnownConfig } from 'config/hueConfig';
+  import { CONFIG_REFRESHED_TOPIC } from 'config/events';
+  import { getLastKnownConfig } from 'config/hueConfig';
   import huePubSub from 'utils/huePubSub';
-  import { onHueLinkClick } from 'utils/hueUtils';
+  import onHueLinkClick from 'utils/html/onHueLinkClick';
   import I18n from 'utils/i18n';
   import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
 
@@ -251,7 +252,7 @@
       if (config) {
         this.hueConfigUpdated(config);
       }
-      this.subTracker.subscribe(CONFIG_REFRESHED_EVENT, (refreshedConfig: HueConfig) => {
+      this.subTracker.subscribe(CONFIG_REFRESHED_TOPIC, (refreshedConfig: HueConfig) => {
         this.hueConfigUpdated(refreshedConfig);
       });
       this.subTracker.subscribe(

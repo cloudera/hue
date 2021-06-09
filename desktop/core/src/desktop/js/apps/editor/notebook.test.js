@@ -25,7 +25,7 @@ describe('notebook.js', () => {
     availableSnippets: () => ({}),
     editorMode: () => false,
     getSnippetViewSettings: () => ({ sqlDialect: true }),
-    isOptimizerEnabled: () => false
+    isSqlAnalyzerEnabled: () => false
   };
 
   window.HUE_CHARTS = {

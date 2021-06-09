@@ -27,14 +27,14 @@ The most crucial is to stabilize the querying API, improve the Editor assistant 
 * Phoenix connector
   * to ship
   * to "battle test" ([pyPhoenix](https://github.com/Pirionfr/pyPhoenix#known-issues), reuse [DB 2.0 API](https://phoenix.apache.org/python.html) [PhoenixDB](https://github.com/apache/phoenix/tree/master/python)?)
-  * with Hue Editor API to polish ([dev reference](https://docs.gethue.com/developer/connectors/#sqlalchemy))
+  * with Hue Editor API to polish ([dev reference](https://docs.gethue.com/developer/development/#connectors))
   * all SQL supported?
 * Security support?
 * Install samples?
 
 ### UI
 
-* Calcite SQL Autocomplete subset ([grammar](https://phoenix.apache.org/language/index.html) + [builtins](https://phoenix.apache.org/language/functions.html)) ([dev reference](https://docs.gethue.com/developer/parsers/))
+* Calcite SQL Autocomplete subset ([grammar](https://phoenix.apache.org/language/index.html) + [builtins](https://phoenix.apache.org/language/functions.html)) ([dev reference](https://docs.gethue.com/developer/development/#sql-parsers))
 * Left SQL assist panel
 * Trim the semicolon `;`
 * Right panel UDF/Language references

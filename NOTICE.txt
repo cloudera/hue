@@ -504,7 +504,7 @@ django-openid-auth 0.14 : BSD 3-clause "New" or "Revised" License
 django-opentracing 1.1.0 : BSD 3-clause "New" or "Revised" License
 django-prometheus 1.0.10 : Apache License 2.0
 django-timezone-field 2.1 : BSD 3-clause "New" or "Revised" License
-django-webpack-loader 20181130-snapshot-6fd103d3 : MIT License
+django-webpack-loader 1.0 : MIT License
 djangomako 1.0.1 : MIT License
 dnspython 1.15.0 : ISC License
 doctrine v2.1.0 : (BSD 2-clause "Simplified" License AND Apache License 2.0)

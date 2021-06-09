@@ -1003,8 +1003,11 @@ def extract_solr_exception_message(e):
 
   try:
     message = json.loads(e.message)
-    msg = message['error'].get('msg')
-    response['error'] = msg if msg else message['error']['trace']
+    if 'error' in message:
+      msg = message['error'].get('msg')
+      response['error'] = msg if msg else message['error']['trace']
+    else:
+      response['error'] = message['errors'][0] if message['errors'] else 'Empty errors'
   except ValueError as e:
     LOG.warning('Failed to parse json response: %s' % force_unicode(e))
     response['error'] = force_unicode(e)

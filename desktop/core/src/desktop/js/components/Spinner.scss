@@ -16,17 +16,25 @@
  limitations under the License.
 */
 
+@use 'sass:math';
+
 @import './styles/mixins';
 @import './styles/colors';
 
+$spinner-label-ratio: math.div(2, 3);
+$spinner-large-size: 25px;
+$spinner-xlarge-size: 50px;
+
 .spinner-container {
   @include fade-in;
+
   position: relative;
   z-index: 10000;
 
 
   &.spinner {
     @include fillAbsolute;
+
     margin: auto 0;
     vertical-align: center;
   }
@@ -34,12 +42,14 @@
   &.spinner-overlay {
     @include fillAbsolute;
     @include fade-in;
+
     z-index: 10000;
     background: rgba(255, 255, 255, 0.5);
   }
 
   &.spinner-inline {
     @include fade-in;
+
     display: inline-block;
     position: relative;
   }
@@ -49,28 +59,64 @@
     background-color: $fluid-white;
   }
 
-  .spinner-center {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-  }
+  .spinner-inner {
+    white-space: nowrap;
 
-  .spinner-large {
-    font-size: 26px !important;
-  }
+    .hi {
+      margin-bottom: 0;
+    }
 
-  .spinner-xlarge {
-    font-size: 60px !important;
-  }
+    .spinner-spin {
+      @include keyframes(spin-frames) {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(359deg); }
+      }
 
-  span,
-  i {
-    font-size: 16px;
-    color: $fluid-gray-500;
-  }
+      @include animation('spin-frames 0.8s linear infinite');
 
-  span {
-    margin-left: 5px;
+      color: $hue-primary-color-dark;
+    }
+
+    span {
+      margin-left: 5px;
+      color: $fluid-gray-500;
+    }
+
+    &.spinner-center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    &.spinner-large {
+      font-size: $spinner-large-size;
+
+      .spinner-spin {
+        font-size: $spinner-large-size;
+      }
+
+      span {
+        line-height: $spinner-large-size;
+      }
+    }
+
+    &.spinner-xlarge {
+      font-size: $spinner-xlarge-size;
+
+      .spinner-spin {
+        font-size: $spinner-xlarge-size;
+      }
+
+      span {
+        line-height: $spinner-xlarge-size;
+      }
+    }
+
+    &.spinner-large span,
+    &.spinner-xlarge span {
+      font-size: $spinner-label-ratio * 1em;
+      vertical-align: top;
+    }
   }
 }

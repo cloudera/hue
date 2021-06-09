@@ -24,6 +24,7 @@
     :executor="executor"
     :initial-cursor-position="cursorPosition"
     :initial-value="value"
+    :sql-analyzer-provider="sqlAnalyzerProvider"
     :sql-parser-provider="sqlParserProvider"
     :sql-reference-provider="sqlReferenceProvider"
     @ace-created="aceCreated"
@@ -37,6 +38,7 @@
 
 <script lang="ts">
   import { defineComponent, PropType, ref, toRefs } from 'vue';
+  import KnockoutObservable from '@types/knockout';
 
   import { Ace } from 'ext/ace';
 
@@ -44,6 +46,7 @@
 
   import AceEditor from './AceEditor.vue';
   import Executor from 'apps/editor/execution/executor';
+  import sqlAnalyzerRepository from 'catalog/analyzer/sqlAnalyzerRepository';
   import SubscriptionTracker from 'components/utils/SubscriptionTracker';
   import sqlParserRepository from 'parse/sql/sqlParserRepository';
   import sqlReferenceRepository from 'sql/reference/sqlReferenceRepository';
@@ -90,6 +93,7 @@
       return {
         cursorPosition,
         editorId,
+        sqlAnalyzerProvider: sqlAnalyzerRepository,
         sqlParserProvider: sqlParserRepository,
         sqlReferenceProvider: sqlReferenceRepository,
         value

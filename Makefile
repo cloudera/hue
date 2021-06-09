@@ -147,6 +147,14 @@ $(BLD_DIR_ENV)/stamp:
 desktop: parent-pom
 # END DEV ONLY >>>>
 desktop: virtual-env
+	# Normally dev only do "make apps", but build system is calling "make apps docs"
+	@if [ "$(PYTHON_VER)" = "python2.7" ] && [ "$(findstring apps,$(MAKECMDGOALS))" = "apps" ]; then \
+	  echo "--- start installing PIP_MODULES"; \
+	  $(ENV_PIP) install --upgrade pip; \
+	  $(ENV_PIP) install $(PIP_MODULES); \
+	  echo "--- done installing PIP_MODULES"; \
+	else echo "--- skip installing PIP_MODULES"; \
+	fi
 	@$(MAKE) -C desktop
 
 
@@ -207,6 +215,17 @@ install-apps:
 install-env:
 	@echo --- Creating new virtual environment
 	$(MAKE) -C $(INSTALL_DIR) virtual-env
+	# This is needed as somehow Hue commands (app_reg, collectstatic..) import modules with hard uneeded dependencies on those.
+	# We have two virt-env: $(ENV_PIP) aka /build/hue for build and $(PREFIX)/hue/build/env for destination.
+	@if [ "$(PYTHON_VER)" = "python2.7" ] && [ "$(MAKECMDGOALS)" = "install" ]; then \
+	  $(PREFIX)/hue/build/env/bin/pip install $(PIP_MODULES); \
+	fi
+	# Alternative to ext-py directory but only due to the special case below.
+	# Hackish way to get crypto to install with pre-compiled dependencies that now break as of today with Py2.
+	@if [ "$(PYTHON_VER)" = "python2.7" ]; then \
+	  $(ENV_PIP) install --upgrade pip; \
+	  $(ENV_PIP) install $(PIP_MODULES); \
+	fi
 	@echo --- Setting up Desktop core
 	$(MAKE) -C $(INSTALL_DIR)/desktop env-install
 	@echo --- Setting up Applications
@@ -215,7 +234,7 @@ install-env:
 	cp $(ROOT)/package.json $(INSTALL_DIR)
 	cp $(ROOT)/package-lock.json $(INSTALL_DIR)
 	cp $(ROOT)/webpack.config*.js $(INSTALL_DIR)
-	cp $(ROOT)/.babelrc $(INSTALL_DIR)
+	cp $(ROOT)/babel.config.js $(INSTALL_DIR)
 	cp $(ROOT)/tsconfig.json $(INSTALL_DIR)
 	$(MAKE) -C $(INSTALL_DIR) npm-install
 	@if [ "$(MAKECMDGOALS)" = "install" ]; then \

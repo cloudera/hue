@@ -14,14 +14,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import sqlAnalyzerRepository from 'catalog/analyzer/sqlAnalyzerRepository';
 import $ from 'jquery';
 import * as ko from 'knockout';
 
+import { ASSIST_KEY_COMPONENT } from './assist/ko.assistKey';
 import componentUtils from './componentUtils';
 import huePubSub from 'utils/huePubSub';
+import noop from 'utils/timing/noop';
 import I18n from 'utils/i18n';
-
-import { ASSIST_KEY_COMPONENT } from './assist/ko.assistKey';
 
 export const NAME = 'catalog-entries-list';
 
@@ -461,45 +462,49 @@ class CatalogEntriesList {
           self.loading(false);
         });
 
+      const sqlAnalyzer = sqlAnalyzerRepository.getSqlAnalyzer(self.catalogEntry().getConnector());
+
       if (self.catalogEntry().isTableOrView()) {
         const joinsPromise = self
           .catalogEntry()
-          .getTopJoins({ silenceErrors: true, cancellable: true });
-        joinsPromise.then(topJoins => {
-          if (topJoins && topJoins.values && topJoins.values.length) {
-            entriesAddedDeferred.then(entries => {
-              const entriesIndex = {};
-              entries.forEach(entry => {
-                entriesIndex[entry.catalogEntry().path.join('.').toLowerCase()] = {
-                  joinColumnIndex: {},
-                  entry: entry
-                };
-              });
-              topJoins.values.forEach(topJoin => {
-                topJoin.joinCols.forEach(topJoinCols => {
-                  if (topJoinCols.columns.length === 2) {
-                    if (entriesIndex[topJoinCols.columns[0].toLowerCase()]) {
-                      entriesIndex[topJoinCols.columns[0].toLowerCase()].joinColumnIndex[
-                        topJoinCols.columns[1].toLowerCase()
-                      ] = topJoinCols.columns[1];
-                    } else if (entriesIndex[topJoinCols.columns[1].toLowerCase()]) {
-                      entriesIndex[topJoinCols.columns[1].toLowerCase()].joinColumnIndex[
-                        topJoinCols.columns[0].toLowerCase()
-                      ] = topJoinCols.columns[0];
+          .getTopJoins({ cancellable: true, silenceErrors: true, sqlAnalyzer });
+        joinsPromise
+          .then(topJoins => {
+            if (topJoins && topJoins.values && topJoins.values.length) {
+              entriesAddedDeferred.then(entries => {
+                const entriesIndex = {};
+                entries.forEach(entry => {
+                  entriesIndex[entry.catalogEntry().path.join('.').toLowerCase()] = {
+                    joinColumnIndex: {},
+                    entry: entry
+                  };
+                });
+                topJoins.values.forEach(topJoin => {
+                  topJoin.joinCols.forEach(topJoinCols => {
+                    if (topJoinCols.columns.length === 2) {
+                      if (entriesIndex[topJoinCols.columns[0].toLowerCase()]) {
+                        entriesIndex[topJoinCols.columns[0].toLowerCase()].joinColumnIndex[
+                          topJoinCols.columns[1].toLowerCase()
+                        ] = topJoinCols.columns[1];
+                      } else if (entriesIndex[topJoinCols.columns[1].toLowerCase()]) {
+                        entriesIndex[topJoinCols.columns[1].toLowerCase()].joinColumnIndex[
+                          topJoinCols.columns[0].toLowerCase()
+                        ] = topJoinCols.columns[0];
+                      }
                     }
+                  });
+                });
+                Object.keys(entriesIndex).forEach(key => {
+                  if (Object.keys(entriesIndex[key].joinColumnIndex).length) {
+                    entriesIndex[key].entry.joinColumns(
+                      Object.keys(entriesIndex[key].joinColumnIndex)
+                    );
                   }
                 });
               });
-              Object.keys(entriesIndex).forEach(key => {
-                if (Object.keys(entriesIndex[key].joinColumnIndex).length) {
-                  entriesIndex[key].entry.joinColumns(
-                    Object.keys(entriesIndex[key].joinColumnIndex)
-                  );
-                }
-              });
-            });
-          }
-        });
+            }
+          })
+          .catch(noop);
         self.cancellablePromises.push(joinsPromise);
       }
 
@@ -516,45 +521,52 @@ class CatalogEntriesList {
       self.cancellablePromises.push(
         self
           .catalogEntry()
-          .loadOptimizerPopularityForChildren({ silenceErrors: true, cancellable: true })
+          .loadSqlAnalyzerPopularityForChildren({
+            cancellable: true,
+            silenceErrors: true,
+            sqlAnalyzer
+          })
           .then(popularEntries => {
             if (popularEntries.length) {
-              childPromise.then(() => {
-                const entryIndex = {};
-                self.entries().forEach(entry => {
-                  entryIndex[entry.catalogEntry().name] = entry;
-                });
+              childPromise
+                .then(() => {
+                  const entryIndex = {};
+                  self.entries().forEach(entry => {
+                    entryIndex[entry.catalogEntry().name] = entry;
+                  });
 
-                let totalCount = 0;
-                const popularityToApply = [];
-                popularEntries.forEach(popularEntry => {
-                  if (
-                    entryIndex[popularEntry.name] &&
-                    popularEntry.optimizerPopularity &&
-                    popularEntry.optimizerPopularity.selectColumn &&
-                    popularEntry.optimizerPopularity.selectColumn.columnCount > 0
-                  ) {
-                    totalCount += popularEntry.optimizerPopularity.selectColumn.columnCount;
-                    popularityToApply.push(() => {
-                      entryIndex[popularEntry.name].popularity(
-                        Math.round(
-                          (100 * popularEntry.optimizerPopularity.selectColumn.columnCount) /
-                            totalCount
-                        )
-                      );
-                    });
+                  let totalCount = 0;
+                  const popularityToApply = [];
+                  popularEntries.forEach(popularEntry => {
+                    if (
+                      entryIndex[popularEntry.name] &&
+                      popularEntry.sqlAnalyzerPopularity &&
+                      popularEntry.sqlAnalyzerPopularity.selectColumn &&
+                      popularEntry.sqlAnalyzerPopularity.selectColumn.columnCount > 0
+                    ) {
+                      totalCount += popularEntry.sqlAnalyzerPopularity.selectColumn.columnCount;
+                      popularityToApply.push(() => {
+                        entryIndex[popularEntry.name].popularity(
+                          Math.round(
+                            (100 * popularEntry.sqlAnalyzerPopularity.selectColumn.columnCount) /
+                              totalCount
+                          )
+                        );
+                      });
+                    }
+                  });
+                  const foundPopularEntries = popularityToApply.length !== 0;
+                  while (popularityToApply.length) {
+                    popularityToApply.pop()();
                   }
-                });
-                const foundPopularEntries = popularityToApply.length !== 0;
-                while (popularityToApply.length) {
-                  popularityToApply.pop()();
-                }
-                if (foundPopularEntries) {
-                  self.entries().sort(entrySort);
-                }
-              });
+                  if (foundPopularEntries) {
+                    self.entries().sort(entrySort);
+                  }
+                })
+                .catch(noop);
             }
           })
+          .catch(noop)
       );
 
       if (self.catalogEntry().isTableOrView() || self.catalogEntry().isComplex()) {
@@ -596,6 +608,7 @@ class CatalogEntriesList {
                     }
                   }
                 })
+                .catch(noop)
                 .finally(() => {
                   self.loadingSamples(false);
                   firstSampleFetch = false;

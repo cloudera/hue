@@ -17,7 +17,7 @@
 import $ from 'jquery';
 import * as ko from 'knockout';
 
-import hueUtils from 'utils/hueUtils';
+import deXSS from 'utils/html/deXSS';
 
 const checkOverflow = element =>
   element &&
@@ -43,13 +43,14 @@ class MultiLineEllipsisHandler {
     this.updateOverflowHeight();
 
     this.contents = options.text;
-    this.element.innerHTML = hueUtils.deXSS(this.contents);
+    this.element.innerHTML = deXSS(this.contents);
 
-    const linkRegex = /(?:(?:[a-z]+:\/\/)|www\.)[^\s\/]+(?:[.\/]\S+)*[^\s`!()\[\]{};:'".,<>?«»“”‘’]/gi;
+    const linkRegex =
+      /(?:(?:[a-z]+:\/\/)|www\.)[^\s\/]+(?:[.\/]\S+)*[^\s`!()\[\]{};:'".,<>?«»“”‘’]/gi;
 
     this.renderContents = contents => {
       if (options.linkify) {
-        return hueUtils.deXSS(
+        return deXSS(
           contents.replace(linkRegex, val => {
             return (
               '<a href="' +
@@ -61,7 +62,7 @@ class MultiLineEllipsisHandler {
           })
         );
       }
-      return hueUtils.deXSS(contents);
+      return deXSS(contents);
     };
 
     this.delayedResumeTimeout = window.setTimeout(() => {

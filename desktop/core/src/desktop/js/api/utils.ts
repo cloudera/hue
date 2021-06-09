@@ -22,10 +22,11 @@ import axios, {
   CancelToken
 } from 'axios';
 import qs from 'qs';
-import huePubSub from 'utils/huePubSub';
 
 import { CancellablePromise } from './cancellablePromise';
-import hueUtils from 'utils/hueUtils';
+import { hueWindow } from 'types/types';
+import huePubSub from 'utils/huePubSub';
+import logError from 'utils/logError';
 
 export interface DefaultApiResponse {
   status: number;
@@ -52,6 +53,36 @@ export interface ApiFetchOptions<T, E = string> extends AxiosRequestConfig {
     reject: (err: unknown) => void
   ) => void;
 }
+
+const axiosInstance = axios.create({ withCredentials: true });
+
+let baseUrl = (window as hueWindow).HUE_BASE_URL;
+let bearerToken: string | undefined;
+
+axiosInstance.interceptors.request.use(config => {
+  if (baseUrl) {
+    config.baseURL = baseUrl;
+  }
+  if (bearerToken) {
+    config.headers['Authorization'] = `Bearer ${bearerToken}`;
+  }
+  return config;
+});
+
+axiosInstance.interceptors.response.use(response => {
+  if (response.data?.access) {
+    bearerToken = response.data.access;
+  }
+  return response;
+});
+
+export const setBaseUrl = (newBaseUrl: string): void => {
+  baseUrl = newBaseUrl;
+};
+
+export const setBearerToken = (newBearerToken: string): void => {
+  bearerToken = newBearerToken;
+};
 
 export const successResponseIsError = (responseData?: DefaultApiResponse): boolean => {
   return (
@@ -105,7 +136,7 @@ const notifyError = <T>(
   options?: Pick<ApiFetchOptions<T>, 'silenceErrors'>
 ): void => {
   if (!options || !options.silenceErrors) {
-    hueUtils.logError(response);
+    logError(response);
     if (message.indexOf('AuthorizationException') === -1) {
       huePubSub.publish('hue.error', message);
     }
@@ -131,12 +162,12 @@ const handleResponse = <T>(
   if (options && options.handleSuccess) {
     options.handleSuccess(response.data, resolve, reason => {
       reject(reason);
-      notifyError(String(reason), response.data);
+      notifyError(String(reason), response.data, options);
     });
   } else if ((!options || !options.ignoreSuccessErrors) && successResponseIsError(response.data)) {
     const errorMessage = extractErrorMessage(response && response.data);
     reject(errorMessage);
-    notifyError(errorMessage, response);
+    notifyError(errorMessage, response, options);
   } else {
     resolve(response.data);
   }
@@ -147,7 +178,7 @@ const getCancelToken = (): { cancelToken: CancelToken; cancel: () => void } => {
   return { cancelToken: cancelTokenSource.token, cancel: cancelTokenSource.cancel };
 };
 
-export const post = <T, U = unknown, E = string>(
+export const post = <T, U = unknown>(
   url: string,
   data?: U,
   options?: ApiFetchOptions<T>
@@ -156,7 +187,7 @@ export const post = <T, U = unknown, E = string>(
     const { cancelToken, cancel } = getCancelToken();
     let completed = false;
 
-    axios
+    axiosInstance
       .post<T & DefaultApiResponse>(url, qs.stringify(data), {
         cancelToken,
         ...options
@@ -168,7 +199,7 @@ export const post = <T, U = unknown, E = string>(
         if (options && options.handleError) {
           options.handleError(err, resolve, reason => {
             handleErrorResponse(err, reject, options);
-            notifyError(String(reason), err);
+            notifyError(String(reason), err, options);
           });
         } else {
           handleErrorResponse(err, reject, options);
@@ -187,14 +218,14 @@ export const post = <T, U = unknown, E = string>(
 
 export const get = <T, U = unknown>(
   url: string,
-  data: U,
+  data?: U,
   options?: ApiFetchOptions<T>
 ): CancellablePromise<T> =>
   new CancellablePromise((resolve, reject, onCancel) => {
     const { cancelToken, cancel } = getCancelToken();
     let completed = false;
 
-    axios
+    axiosInstance
       .get<T & DefaultApiResponse>(url, {
         cancelToken,
         params: data
@@ -221,7 +252,7 @@ export const upload = async <T>(
   data: FormData,
   progressCallback?: (progress: number) => void
 ): Promise<T> => {
-  const response = await axios.post<T>(url, data, {
+  const response = await axiosInstance.post<T>(url, data, {
     headers: { 'Content-Type': 'multipart/form-data' },
     onUploadProgress: progressEvent => {
       if (progressCallback) {
@@ -230,10 +261,4 @@ export const upload = async <T>(
     }
   });
   return response.data;
-};
-
-export const cancelActiveRequest = (request?: JQuery.jqXHR): void => {
-  if (request && request.readyState < 4) {
-    request.abort();
-  }
 };

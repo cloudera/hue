@@ -15,7 +15,7 @@ Or [Kubernetes](/administrator/installation/cloud/#kubernetes):
 
     helm repo add gethue https://helm.gethue.com
     helm repo update
-    helm install gethue/hue
+    helm install hue gethue/hue
 
 ## Configure
 
