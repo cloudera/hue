@@ -863,6 +863,12 @@ SESSION = ConfigSection(
       type=str,
       default="sessionid",
     ),
+    ENABLE_TEST_COOKIE=Config(
+      key='enable_test_cookie',
+      help=_("Configuration to determine whether test cookie should be added determine whether the user's browser supports cookies."),
+      type=coerce_bool,
+      default=True,
+    ),
     TTL=Config(
       key='ttl',
       help=_("The cookie containing the users' session ID will expire after this amount of time in seconds."),
