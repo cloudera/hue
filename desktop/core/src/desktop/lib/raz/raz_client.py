@@ -86,7 +86,7 @@ class RazClient(object):
     LOG.debug("Check access: method {%s}, url {%s}, params {%s}, headers {%s}" % (method, url, params, headers))
 
     path = lib_urlparse(url)
-    url_params = dict([p.split('=') for p in path.query.split('&') if path.query])
+    url_params = dict([p.split('=') if '=' in p else (p, '') for p in path.query.split('&') if path.query])  # ?delete, ?prefix=/hue
     params = params if params is not None else {}
     headers = headers if headers is not None else {}
 
@@ -97,7 +97,7 @@ class RazClient(object):
     resource_path = path.path.lstrip("/")
 
     LOG.debug(
-      "Preparing sign request with http_method: {%s}, header: {%s}, parameters: {%s}, endpoint: {%s}, resource_path: {%s}" %
+      "Preparing sign request with http_method: {%s}, headers: {%s}, parameters: {%s}, endpoint: {%s}, resource_path: {%s}" %
       (method, headers, allparams, endpoint, resource_path)
     )
     raz_req = raz_signer.SignRequestProto(
