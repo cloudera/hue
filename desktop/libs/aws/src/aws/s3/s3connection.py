@@ -127,11 +127,11 @@ class RazS3Connection(SignedUrlS3Connection):
 
     url = 'https://%(host)s%(path)s' % {'host': host, 'path': path}
 
-    headers = self.get_signed_url(action=method, url=url, headers=headers)
-    LOG.debug('Raz returned those headers: %s' % headers)
+    raz_headers = self.get_signed_url(action=method, url=url, headers=headers)
+    LOG.debug('Raz returned those headers: %s' % raz_headers)
 
-    if headers is not None:
-      http_request.headers.update(headers)
+    if raz_headers is not None:
+      http_request.headers.update(raz_headers)
     else:
       LOG.error('We got back empty header from Raz for the request %s' % http_request)
 
