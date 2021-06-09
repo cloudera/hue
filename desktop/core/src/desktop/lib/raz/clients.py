@@ -32,7 +32,7 @@ class S3RazClient():
   def __init__(self, username):
     self.username = username
 
-  def get_url(self, action='GET', path=None, perm='read'):
+  def get_url(self, action='GET', path=None, headers=None, perm='read'):
     '''
     Example of headers:
     {
@@ -51,7 +51,7 @@ class S3RazClient():
       service='s3',
     )
 
-    return c.check_access(method=action, url=path)
+    return c.check_access(method=action, url=path, headers=headers)
 
 
 class AdlsRazClient():
