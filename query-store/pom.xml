@@ -34,7 +34,7 @@
     <log4j2.version>2.13.3</log4j2.version>
     <postgres.version>42.2.14</postgres.version>
     <pg-embedded.version>0.7.1</pg-embedded.version>
-    <jetty.version>9.4.31.v20200723</jetty.version>
+    <jetty.version>9.4.39.v20210325</jetty.version>
   </properties>
 
   <modules>
