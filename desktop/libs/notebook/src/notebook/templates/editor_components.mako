@@ -578,7 +578,12 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     </div>
 
     <div data-bind="visible: result.hasResultset() && status() == 'available' && result.data().length == 0 && result.fetchedOnce() && result.explanation().length <= 0, css: resultsKlass" style="display:none;">
-      <pre class="margin-top-10 no-margin-bottom"><i class="fa fa-check muted"></i> ${ _("Done. 0 results.") }</pre>
+      <!-- ko if: result.hasMore -->
+        <pre class="margin-top-10 no-margin-bottom"><i class="fa fa-spin fa-spinner"></i> ${ _('Loading...') }</pre>
+      <!-- /ko -->
+      <!-- ko ifnot: result.hasMore -->
+        <pre class="margin-top-10 no-margin-bottom"><i class="fa fa-check muted"></i> ${ _("Done. 0 results.") }</pre>
+      <!-- /ko -->
     </div>
 
     <div data-bind="visible: status() == 'expired', css: resultsKlass" style="display:none;">
