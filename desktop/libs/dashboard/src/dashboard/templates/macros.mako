@@ -17,12 +17,13 @@
 import re
 import sys
 
-from itertools import izip
 
 if sys.version_info[0] > 2:
+  from itertools import zip
   from urllib.parse import quote as urllib_quote
   from django.utils.translation import gettext as _
 else:
+  from itertools import izip
   from urllib import quote as urllib_quote
   from django.utils.translation import ugettext as _
 
