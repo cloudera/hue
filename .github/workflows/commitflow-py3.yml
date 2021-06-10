@@ -37,10 +37,12 @@ jobs:
     - name: compile
       run: |
         python -m pip install --upgrade pip
-        sudo apt-get install -y python3.8-dev python3.8-venv python3.8-distutils libkrb5-dev libldap2-dev libsasl2-dev libsasl2-modules-gssapi-mit libsnappy-dev # This should not be needed as some point
+        sudo apt-get install -y python3.8-dev python3.8-venv python3.8-distutils asciidoc libkrb5-dev libldap2-dev libsasl2-dev libsasl2-modules-gssapi-mit libsnappy-dev # This should not be needed as some point
 
         export PYTHON_VER=python3.8
         make apps
+
+        make prod
 
     - name: run tests
       run: |

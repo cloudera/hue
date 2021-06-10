@@ -16,14 +16,14 @@ Hue is an open source SQL Cloud Assistant for querying [Databases & Data Warehou
 Here is a summary of the [main improvements](https://gethue.com/categories/version-4.10/) of 4.10 on top of the previous [4.9](https://gethue.com/blog/hue-4-9-sql-dialects-phoenix-dasksql-flink-components/) release:
 
 
-## SQL Editor Component & API
+#### SQL Editor Component & API
 Now build your own SQL Editor in three HTML line by leveraging the [SQL Scratchpad](https://docs.gethue.com/developer/components/scratchpad/) component. The first version of the public [REST API](https://docs.gethue.com/developer/api/rest/) for executing queries was also published.
 
 Read more about the [SQL Scratchpad and REST API](https://gethue.com/blog/2021-05-29-create-own-sql-editor-via-webcomponent-and-public-api/).
 
 ![Adding the component in 3 lines and watching the interaction with the public API of demo.gethue.com](https://cdn-images-1.medium.com/max/2356/1*yXRjYQN_eRUimzlXPl5SwQ.gif)*Adding the component in 3 lines and watching the interaction with the public API of demo.gethue.com*
 
-## Create Table Wizard
+#### Create Table Wizard
 
 Create a Hive, Impala, MySql, Phoenix SQL table via a small file in three clicks. Just upload it via your browser, without the need to have any Storage filesystem like HDFS or S3 configured and follow the wizard.
 
@@ -31,14 +31,14 @@ Read more about the [create table from a small file](https://gethue.com/blog/202
 
 ![Importer direct upload steps](https://cdn.gethue.com/uploads/2021/05/Importer_direct_upload_steps.gif)
 
-## Slack App
+#### Slack App
 Collaborate more via Slack thanks to the rich preview of SQL queries, auto links, query bank and export result to Slack.
 
 [Install the app](https://gethue.com/blog/2021-05-18-installing-hue-slack-app-in-three-simple-steps/) in a few clicks and learn more about the [functionalities of assistance](https://docs.gethue.com/user/concept/#slack).
 
 ![Slack Installation Flow](https://cdn.gethue.com/uploads/2021/05/slack-install.gif)
 
-## Tech stack & Tooling
+#### Tech stack & Tooling
 
 - [Provide your users proper S3 file access without giving them any credential keys](https://gethue.com/blog/2021-04-23-s3-file-access-without-any-credentials-and-signed-urls/)
 - [Distribute your container App as a Package](https://gethue.com/blog/2021-04-19-publish-kubernetes-container-application-via-package-with-helm/)
