@@ -775,7 +775,7 @@ CONNECTOR_TYPES = [
 
   {'nice_name': 'HDFS', 'dialect': 'hdfs', 'interface': 'rest',
     'settings': [
-      {'name': 'server_url', 'value': 'http://localhost:9870/webhdfs/v1'},
+      {'name': 'server_url', 'value': 'http://localhost:50070/webhdfs/v1'},
       {'name': 'default_fs', 'value': 'fs_defaultfs=hdfs://localhost:8020'}
     ],
     'category': 'browsers', 'description': '', 'properties': {}
