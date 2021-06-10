@@ -17,7 +17,6 @@
 import re
 import sys
 
-
 if sys.version_info[0] > 2:
   from itertools import zip
   from urllib.parse import quote as urllib_quote
@@ -30,24 +29,29 @@ else:
 
 # <http://github.com/mzsanford/twitter-text-java>
 
-AT_SIGNS = ur'[@\uff20]'
-UTF_CHARS = ur'a-z0-9_\u00c0-\u00d6\u00d8-\u00f6\u00f8-\u00ff'
-SPACES = ur'[\u0020\u00A0\u1680\u180E\u2002-\u202F\u205F\u2060\u3000]'
+AT_SIGNS = br'[@\uff20]'.decode('raw_unicode_escape')
+UTF_CHARS = br'a-z0-9_\u00c0-\u00d6\u00d8-\u00f6\u00f8-\u00ff'.decode('raw_unicode_escape')
+SPACES = br'[\u0020\u00A0\u1680\u180E\u2002-\u202F\u205F\u2060\u3000]'.decode('raw_unicode_escape')
 
-LIST_PRE_CHARS = ur'([^a-z0-9_]|^)'
-LIST_END_CHARS = ur'([a-z0-9_]{1,20})(/[a-z][a-z0-9\x80-\xFF-]{0,79})?'
+LIST_PRE_CHARS = br'([^a-z0-9_]|^)'.decode('raw_unicode_escape')
+LIST_END_CHARS = br'([a-z0-9_]{1,20})(/[a-z][a-z0-9\x80-\xFF-]{0,79})?'.decode('raw_unicode_escape')
 LIST_REGEX = re.compile(LIST_PRE_CHARS + '(' + AT_SIGNS + '+)' + LIST_END_CHARS, re.IGNORECASE)
 
-USERNAME_REGEX = re.compile(ur'\B' + AT_SIGNS + LIST_END_CHARS, re.IGNORECASE)
-REPLY_REGEX = re.compile(ur'^(?:' + SPACES + ur')*' + AT_SIGNS + ur'([a-z0-9_]{1,20}).*', re.IGNORECASE)
+USERNAME_REGEX = re.compile(br'\B'.decode('raw_unicode_escape') + AT_SIGNS + LIST_END_CHARS, re.IGNORECASE)
+REPLY_REGEX = re.compile(
+  br'^(?:'.decode('raw_unicode_escape') +
+  SPACES + br')*'.decode('raw_unicode_escape') +
+  AT_SIGNS + br'([a-z0-9_]{1,20}).*'.decode('raw_unicode_escape'),
+  re.IGNORECASE
+)
 
-HASHTAG_EXP = ur'(^|[^0-9A-Z&/]+)(#|\uff03)([0-9A-Z_]*[A-Z_]+[%s]*)' % UTF_CHARS
+HASHTAG_EXP = br'(^|[^0-9A-Z&/]+)(#|\uff03)([0-9A-Z_]*[A-Z_]+[%s]*)'.decode('raw_unicode_escape') % UTF_CHARS
 HASHTAG_REGEX = re.compile(HASHTAG_EXP, re.IGNORECASE)
 
-PRE_CHARS = ur'(?:[^/"\':!=]|^|\:)'
-DOMAIN_CHARS = ur'([\.-]|[^\s_\!\.\/])+\.[a-z]{2,}(?::[0-9]+)?'
-PATH_CHARS = ur'(?:[\.,]?[%s!\*\'\(\);:=\+\$/%s#\[\]\-_,~@])' % (UTF_CHARS, '%')
-QUERY_CHARS = ur'[a-z0-9!\*\'\(\);:&=\+\$/%#\[\]\-_\.,~]'
+PRE_CHARS = br'(?:[^/"\':!=]|^|\:)'.decode('raw_unicode_escape')
+DOMAIN_CHARS = br'([\.-]|[^\s_\!\.\/])+\.[a-z]{2,}(?::[0-9]+)?'.decode('raw_unicode_escape')
+PATH_CHARS = br'(?:[\.,]?[%s!\*\'\(\);:=\+\$/%s#\[\]\-_,~@])'.decode('raw_unicode_escape') % (UTF_CHARS, '%')
+QUERY_CHARS = br'[a-z0-9!\*\'\(\);:&=\+\$/%#\[\]\-_\.,~]'.decode('raw_unicode_escape')
 
 PATH_ENDING_CHARS = r'[%s\)=#/]' % UTF_CHARS
 QUERY_ENDING_CHARS = '[a-z0-9_&=#]'
