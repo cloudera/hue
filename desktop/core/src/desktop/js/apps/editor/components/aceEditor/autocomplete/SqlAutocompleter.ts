@@ -14,7 +14,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { SqlAnalyzerProvider } from '../../../../../catalog/analyzer/types';
 import {
   ACTIVE_STATEMENT_CHANGED_EVENT,
   GET_ACTIVE_LOCATIONS_EVENT,
@@ -22,6 +21,7 @@ import {
 } from '../AceLocationHandler';
 import { ActiveStatementChangedEventDetails } from '../types';
 import Executor from 'apps/editor/execution/executor';
+import { SqlAnalyzerProvider } from 'catalog/analyzer/types';
 import SubscriptionTracker, { Disposable } from 'components/utils/SubscriptionTracker';
 import { Ace } from 'ext/ace';
 import { ParsedSqlStatement } from 'parse/sqlStatementsParser';
