@@ -1725,6 +1725,15 @@ class Document2Permission(models.Model):
 def get_cluster_config(user):
   return Cluster(user).get_app_config().get_config()
 
+def get_remote_home_storage():
+  remote_home_storage = REMOTE_STORAGE_HOME.get() if hasattr(REMOTE_STORAGE_HOME, 'get') and REMOTE_STORAGE_HOME.get() else None
+
+  if not remote_home_storage:
+    if get_raz_api_url() and get_raz_default_endpoint():
+      remote_home_storage = 's3a://%(bucket)s' % get_raz_default_endpoint()
+
+  return remote_home_storage
+
 
 class ClusterConfig(object):
   """
@@ -1956,10 +1965,7 @@ class ClusterConfig(object):
       hdfs_connectors.append(_('Files'))
 
 
-    remote_home_storage = REMOTE_STORAGE_HOME.get() if hasattr(REMOTE_STORAGE_HOME, 'get') and REMOTE_STORAGE_HOME.get() else None
-    if not remote_home_storage:
-      if get_raz_api_url.get() and get_raz_default_endpoint():
-        remote_home_storage = 's3a://%(bucket)s' % get_raz_default_endpoint()
+    remote_home_storage = get_remote_home_storage()
 
     for hdfs_connector in hdfs_connectors:
       force_home = remote_home_storage and not remote_home_storage.startswith('/')
