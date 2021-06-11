@@ -352,7 +352,7 @@ CONSTRAINT my_pk PRIMARY KEY (%(primary_keys)s));
     path = urllib_unquote(source['path'])
 
     if path:                                                  # data insertion
-      with open(BASE_DIR + path, 'r') as local_file:
+      with open(path, 'r') as local_file:
         reader = csv.reader(local_file)
         _csv_rows = []
 
