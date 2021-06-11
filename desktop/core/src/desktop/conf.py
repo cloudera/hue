@@ -2094,7 +2094,6 @@ CONNECTORS = UnspecifiedConfigSection(
 )
 
 
-
 RAZ = ConfigSection(
   key='raz',
   help=_("""Configuration for RAZ service integration"""),
@@ -2103,7 +2102,7 @@ RAZ = ConfigSection(
       key='is_enabled',
       help=_('Turns on the integration as ready to use'),
       type=coerce_bool,
-      default=False,
+      dynamic_default=get_raz_api_url,
     ),
     API_URL=Config(
         key='api_url',

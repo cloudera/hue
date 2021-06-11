@@ -123,7 +123,7 @@ def get_raz_api_url():
 
   S3 only. Add check for Azure when supported.
   """
-  return get_conf().get(_CNF_S3A_RAZ_API_URL, 'https://localhost:8080')
+  return get_conf().get(_CNF_S3A_RAZ_API_URL)
 
 def get_raz_cluster_name():
   """
