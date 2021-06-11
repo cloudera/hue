@@ -144,7 +144,7 @@ def get_raz_default_endpoint():
     match = re.search(_CNF_S3A_RAZ_BUCKET_ENDPOINT, key)
     if match:
       return {
-        'region': val,
+        'host': val,
         'bucket': match.group('bucket')
       }
 
