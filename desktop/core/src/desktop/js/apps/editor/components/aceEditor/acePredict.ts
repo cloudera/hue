@@ -28,7 +28,7 @@ type ActivePredict = { text: string; element: HTMLElement };
 export const attachPredictTypeahead = (
   editor: Ace.Editor,
   connector: Connector,
-  sqlAnalyzerProvider: SqlAnalyzerProvider
+  sqlAnalyzerProvider?: SqlAnalyzerProvider
 ): Disposable => {
   if (!sqlAnalyzerProvider) {
     return { dispose: noop };

@@ -516,7 +516,12 @@
         };
 
         if ((<hueWindow>window).ENABLE_PREDICT) {
-          attachPredictTypeahead(editor, executor.value.connector(), sqlAnalyzerProvider.value);
+          try {
+            attachPredictTypeahead(editor, executor.value.connector(), sqlAnalyzerProvider.value);
+          } catch (e) {
+            console.warn('Failed attaching predict typeahead...');
+            console.error(e);
+          }
         }
 
         let placeholderVisible = false;
