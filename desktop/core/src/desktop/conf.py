@@ -28,7 +28,6 @@ from collections import OrderedDict
 
 from django.db import connection
 
-from hadoop.core_site import get_raz_api_url
 from metadata.metadata_sites import get_navigator_audit_log_dir, get_navigator_audit_max_file_size
 
 from desktop import appmanager
@@ -2093,6 +2092,11 @@ CONNECTORS = UnspecifiedConfigSection(
   )
 )
 
+def has_raz_url():
+  """Check if we can guess if Raz is configured"""
+  from hadoop.core_site import get_raz_api_url  # Avoid circular import
+  return get_raz_api_url()
+
 
 RAZ = ConfigSection(
   key='raz',
@@ -2102,13 +2106,13 @@ RAZ = ConfigSection(
       key='is_enabled',
       help=_('Turns on the integration as ready to use'),
       type=coerce_bool,
-      dynamic_default=get_raz_api_url,
+      dynamic_default=has_raz_url,
     ),
     API_URL=Config(
         key='api_url',
         help=_('Endpoint to contact'),
         type=str,
-        dynamic_default=get_raz_api_url,
+        dynamic_default=has_raz_url,
     ),
     API_AUTHENTICATION=Config(
         key='api_authentication',
