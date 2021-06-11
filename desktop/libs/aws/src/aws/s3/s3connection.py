@@ -107,15 +107,15 @@ class RazS3Connection(SignedUrlS3Connection):
     if isinstance(key, Key):
         key = key.name
     path = self.calling_format.build_path_base(bucket, key)
-    boto.log.debug('path=%s' % path)
+    LOG.debug('path=%s' % path)
     auth_path = self.calling_format.build_auth_path(bucket, key)
-    boto.log.debug('auth_path=%s' % auth_path)
+    LOG.debug('auth_path=%s' % auth_path)
     host = self.calling_format.build_host(self.server_name(), bucket)
     if query_args:
         path += '?' + query_args
-        boto.log.debug('path=%s' % path)
+        LOG.debug('path=%s' % path)
         auth_path += '?' + query_args
-        boto.log.debug('auth_path=%s' % auth_path)
+        LOG.debug('auth_path=%s' % auth_path)
 
     params = {}
     http_request = self.build_base_http_request(method, path, auth_path,
@@ -127,11 +127,11 @@ class RazS3Connection(SignedUrlS3Connection):
 
     url = 'https://%(host)s%(path)s' % {'host': host, 'path': path}
 
-    headers = self.get_signed_url(action=method, url=url)
-    LOG.debug('Raz returned those headers: %s' % headers)
+    raz_headers = self.get_signed_url(action=method, url=url, headers=headers)
+    LOG.debug('Raz returned those headers: %s' % raz_headers)
 
-    if headers is not None:
-      http_request.headers.update(headers)
+    if raz_headers is not None:
+      http_request.headers.update(raz_headers)
     else:
       LOG.error('We got back empty header from Raz for the request %s' % http_request)
 
@@ -141,10 +141,10 @@ class RazS3Connection(SignedUrlS3Connection):
                       retry_handler=retry_handler)
 
 
-  def get_signed_url(self, action='GET', url=None):
+  def get_signed_url(self, action='GET', url=None, headers=None):
     raz_client = S3RazClient(username=self.username)
 
-    return raz_client.get_url(action, url)
+    return raz_client.get_url(action, url, headers)
 
 
 class SelfSignedUrlS3Connection(SignedUrlS3Connection):

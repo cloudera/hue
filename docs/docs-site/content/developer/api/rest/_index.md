@@ -305,11 +305,11 @@ For a specific function/UDF details (e.g. trunc):
 
 ### List
 
-Hue's [File Browser](https://docs.gethue.com/user/browsing/#data) offer uploads, downloads and listing of data in HDFS, S3, ADLS storages.
+Hue's [File Browser](https://docs.gethue.com/user/browsing/#data) offer uploads, downloads, operations (create, delete, chmod...) and listing of data in HDFS (hdfs:// or no prefix), S3 (s3a:// prefix), ADLS (adls:// or abfs:// prefixes) storages.
 
-Here is how to list the content of a path, here the S3 bucket `S3A://gethue-demo`:
+Here is how to list the content of a path, here a S3 bucket `s3a://gethue-demo`:
 
-    curl -X GET "https://demo.gethue.com/filebrowser/view=S3A://gethue-demo?pagesize=45&pagenum=1&filter=&sortby=name&descending=false&format=json"
+    curl -X GET "https://demo.gethue.com/api/storage/view=s3a://gethue-demo"
 
     {
       ...........
@@ -360,13 +360,22 @@ Here is how to list the content of a path, here the S3 bucket `S3A://gethue-demo
       ...........
     }
 
-### Get file content
+Some of the parameters:
+ - pagesize=45
+ - pagenum=1
+ - filter=
+ - sortby=name
+ - descending=false
 
-How to get the file content and its metadata. Here with the public file of demo.gethue.com [s3a://demo-hue/web_log_data/index_data.csv](https://demo.gethue.com/hue/filebrowser/view=s3a%3A%2F%2Fdemo-hue%2Fweb_log_data%2Findex_data.csv):
+e.g. pagesize=45&pagenum=1&filter=&sortby=name&descending=false
 
-**Note** It needs the `XMLHttpRequest` header to return the data in json:
+### Preview
 
-    curl  -X GET "https://demo.gethue.com/filebrowser/view=s3a://demo-hue/web_log_data/index_data.csv?offset=0&length=204800&compression=none&mode=text" -H "X-requested-with: XMLHttpRequest"
+How to get the some of the file content and its stats/metadata.
+
+Example with a S3 file:
+
+    curl -X GET https://demo.gethue.com/api/storage/view=s3a://demo-hue/web_log_data/index_data.csv
 
     {
       "show_download_button": true,
@@ -387,11 +396,19 @@ How to get the file content and its metadata. Here with the public file of demo.
       ...............
     }
 
-### Download a file
+Some of the parameters:
+- offset=0
+- length=204800
+- compression=none
+- mode=text
+
+e.g. ?offset=0&length=204800&compression=none&mode=text
+
+### Download
 
     GET http://127.0.0.1:9000/filebrowser/download=s3a://demo-hue/web_log_data/index_data.csv
 
-### Upload a file
+### Upload
 
     POST http://127.0.0.1:9000/filebrowser/upload/file?dest=s3a://demo-hue
 

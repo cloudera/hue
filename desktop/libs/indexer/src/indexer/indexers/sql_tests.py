@@ -23,6 +23,7 @@ import sys
 from nose.tools import assert_equal, assert_true
 
 from desktop.lib.django_test_util import make_logged_in_client
+from desktop.settings import BASE_DIR
 from useradmin.models import User
 
 from azure.conf import ABFS_CLUSTERS
@@ -841,7 +842,7 @@ def test_create_table_from_local_mysql():
   with patch('indexer.indexers.sql.get_interpreter') as get_interpreter:
     get_interpreter.return_value = {'Name': 'MySQL', 'dialect': 'mysql'}
     source = {
-      'path': '/apps/beeswax/data/tables/us_population.csv',
+      'path': BASE_DIR + '/apps/beeswax/data/tables/us_population.csv',
       'sourceType': 'mysql',
       'format': {'hasHeader': False}
     }
@@ -875,7 +876,7 @@ def test_create_table_from_local_phoenix():
   with patch('indexer.indexers.sql.get_interpreter') as get_interpreter:
     get_interpreter.return_value = {'Name': 'Phoenix', 'dialect': 'phoenix'}
     source = {
-      'path': '/apps/beeswax/data/tables/us_population.csv',
+      'path': BASE_DIR + '/apps/beeswax/data/tables/us_population.csv',
       'sourceType': 'phoenix',
       'format': {'hasHeader': False}
     }
@@ -926,7 +927,7 @@ def test_create_table_from_local_impala():
   with patch('indexer.indexers.sql.get_interpreter') as get_interpreter:
     get_interpreter.return_value = {'Name': 'Impala', 'dialect': 'impala'}
     source = {
-      'path': '/apps/beeswax/data/tables/flights.csv',
+      'path': BASE_DIR + '/apps/beeswax/data/tables/flights.csv',
       'sourceType': 'impala',
       'format': {'hasHeader': True}
     }

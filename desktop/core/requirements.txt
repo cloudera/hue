@@ -11,7 +11,7 @@ channels-redis==3.2.0
 configobj==5.0.6
 cryptography==3.3.2
 django-auth-ldap==2.3.0
-Django==3.1.8
+Django==3.2.4
 daphne==3.0.2
 django-axes==5.13.0
 django-celery-beat==1.4.0
@@ -72,3 +72,4 @@ tabulate==0.8.9
 thrift==0.13.0
 thrift-sasl==0.4.2
 git+https://github.com/gethue/django-babel.git
+git+https://github.com/gethue/django-mako.git

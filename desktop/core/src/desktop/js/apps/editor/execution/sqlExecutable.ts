@@ -23,8 +23,7 @@ import { ParsedSqlStatement } from 'parse/sqlStatementsParser';
 import { VariableIndex } from '../components/variableSubstitution/types';
 
 const BATCHABLE_STATEMENT_TYPES =
-  /ALTER|WITH|REFRESH|CREATE|DELETE|DROP|GRANT|INSERT|INVALIDATE|LOAD|SET|TRUNCATE|UPDATE|UPSERT|USE/i;
-
+  /ALTER|ANALYZE|WITH|REFRESH|CREATE|DELETE|DROP|GRANT|INSERT|INVALIDATE|LOAD|SET|TRUNCATE|UPDATE|UPSERT|USE/i;
 const SELECT_END_REGEX = /([^;]*)([;]?[^;]*)/;
 const ERROR_REGEX = /line ([0-9]+)(:([0-9]+))?/i;
 const TABLE_DDL_REGEX =

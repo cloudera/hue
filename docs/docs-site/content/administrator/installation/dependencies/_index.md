@@ -138,43 +138,7 @@ Tip: if you run into building kerberos extension issue and see message `krb5-con
 * Xcode command line tools
 * [Homebrew](https://brew.sh)
 
-For a step-by-step guide with Python 3, Big Sur and M1-based macs see section below.
-
-Install Dependencies via Homebrew
-
-    brew install mysql@5.7 maven gmp openssl libffi
-
-Install Xcode command line tools
-
-    sudo xcode-select --install
-
-Fix openssl errors (required for MacOS 10.11+)
-
-    export LDFLAGS=-L/usr/local/opt/openssl/lib && export CPPFLAGS=-I/usr/local/opt/openssl/include
-
-If `runserver` stops abruptly with a  `"zsh: abort"` message
-
-    export DYLD_FALLBACK_LIBRARY_PATH=/usr/local/opt/openssl/lib
-
-If you are getting `Could not find Python.h` message
-
-    export SKIP_PYTHONDEV_CHECK=true
-
-On macOS 10.15+, install an older version of openssl
-
-    brew uninstall --ignore-dependencies openssl && brew install https://github.com/tebelorg/Tump/releases/download/v1.0.0/openssl.rb
-
-Fix the possible missing Python headers message by installing the MacOS SDK headers
-
-On macOS 10.14.x
-
-    open /Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg
-
-On macOS 10.15.x
-
-    sudo ln -s /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/* /usr/local/include/
-
-### macOS Big Sur on M1 or Intel with Python 3
+#### Big Sur on M1 or Intel with Python 3
 
 This is a verified step-by-step guide on how to get up and running on a fresh installation of macOS Big Sur, tested on both M1 and Intel based MacBook Pro.
 
@@ -259,10 +223,43 @@ This is a verified step-by-step guide on how to get up and running on a fresh in
 
     `./build/env/bin/hue runserver 0.0.0.0:8888`
 
+#### 10.14, 10.15
+
+Install Dependencies via Homebrew
+
+    brew install mysql@5.7 maven gmp openssl libffi
+
+Install Xcode command line tools
+
+    sudo xcode-select --install
+
+Fix openssl errors (required for MacOS 10.11+)
+
+    export LDFLAGS=-L/usr/local/opt/openssl/lib && export CPPFLAGS=-I/usr/local/opt/openssl/include
+
+If `runserver` stops abruptly with a  `"zsh: abort"` message
+
+    export DYLD_FALLBACK_LIBRARY_PATH=/usr/local/opt/openssl/lib
+
+If you are getting `Could not find Python.h` message
+
+    export SKIP_PYTHONDEV_CHECK=true
+
+On macOS 10.15+, install an older version of openssl
+
+    brew uninstall --ignore-dependencies openssl && brew install https://github.com/tebelorg/Tump/releases/download/v1.0.0/openssl.rb
+
+Fix the possible missing Python headers message by installing the MacOS SDK headers
+
+On macOS 10.14.x
+
+    open /Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg
+
+On macOS 10.15.x
+
+    sudo ln -s /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/* /usr/local/include/
 
 ## NodeJs
-
-Version 12+ is needed.
 
 e.g. how to install on Ubuntu:
 
@@ -272,6 +269,11 @@ e.g. how to install on Ubuntu:
 For Centos / Red Hat use this source:
 
     curl -sL https://rpm.nodesource.com/setup_14.x | sudo bash -
+    sudo yum install -y nodejs
+
+Upgrade to npm 7+:
+
+    npm install --global npm
 
 ## Installing Python 2.7
 

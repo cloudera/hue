@@ -720,7 +720,7 @@ How to count the number of commits since the last release:
     git log --oneline --since=2020-01-01 | grep 'release' -n -i
     git log --oneline -449 > commits.txt
 
-    cat commits.txt | sed 's/\(HUE\-[[:digit:]][[:digit:]][[:digit:]][[:digit:]]\)/\[\1\]\(https:\/\/issues.cloudera.org\/browse\/\1\)/' | sed 's/^\(.*\)/* \1/' > commits.md
+    cat commits.txt | sed 's/^\([[:alnum:]]\{10\}\)/\[\1\]\(https:\/\/github.com\/cloudera\/hue\/commit\/\1\)/' | sed 's/^\(.*\)/* \1/' > commits.md
 
 And add them and the authors to the release notes:
 
@@ -730,12 +730,12 @@ And add them and the authors to the release notes:
 
 Pushing the release branch:
 
-    git push origin HEAD:branch-4.9.0
+    git push origin HEAD:branch-4.10.0
 
 Tagging the release:
 
-    git tag -a release-4.9.0 -m "release-4.9.0"
-    git push origin release-4.9.0
+    git tag -a release-4.10.0 -m "release-4.10.0"
+    git push origin release-4.10.0
 
 Draft a new release on https://github.com/cloudera/hue/releases.
 
@@ -745,7 +745,8 @@ Publish Github NPM package and Docker images at https://github.com/orgs/cloudera
 
 Building the tarball release:
 
-    git checkout -b release-4.9.0 release-4.9.0
+    git checkout -b release-4.10.0 release-4.10.0
+    export PYTHON_VER=python3.8
     make prod
 
 You might need to upgrade the [Mysqlclient](https://docs.gethue.com/administrator/installation/dependencies/#mysql--mariadb) if seeing:
@@ -754,27 +755,27 @@ You might need to upgrade the [Mysqlclient](https://docs.gethue.com/administrato
       44 | #include "my_config.h"
           |          ^~~~~~~~~~~~~
 
-Source of the release: https://github.com/cloudera/hue/archive/release-4.9.0.zip
+Source of the release: https://github.com/cloudera/hue/archive/release-4.10.0.zip
 
 Push to the CDN:
 
-    scp hue-4.9.0.tgz root@cdn.gethue.com:/var/www/cdn.gethue.com/downloads
+    scp hue-4.10.0.tgz root@cdn.gethue.com:/var/www/cdn.gethue.com/downloads
 
 ### Docker
 
 Docker images are at https://hub.docker.com/u/gethue/:
 
-    docker build https://github.com/cloudera/hue.git#release-4.9.0 -t gethue/hue:4.9.0 -f tools/docker/hue/Dockerfile
-    docker tag gethue/hue:4.9.0 gethue/hue:latest
+    docker build https://github.com/cloudera/hue.git#release-4.10.0 -t gethue/hue:4.10.0 -f tools/docker/hue/Dockerfile
+    docker tag gethue/hue:4.10.0 gethue/hue:latest
     docker images
     docker login -u gethue
     docker push gethue/hue
-    docker push gethue/hue:4.9.0
+    docker push gethue/hue:4.10.0
 
-    docker build https://github.com/cloudera/hue.git#release-4.9.0 -t gethue/nginx:4.9.0 -f tools/docker/nginx/Dockerfile;
-    docker tag gethue/nginx:4.9.0 gethue/nginx:latest
+    docker build https://github.com/cloudera/hue.git#release-4.10.0 -t gethue/nginx:4.10.0 -f tools/docker/nginx/Dockerfile;
+    docker tag gethue/nginx:4.10.0 gethue/nginx:latest
     docker push gethue/nginx
-    docker push gethue/nginx:4.9.0
+    docker push gethue/nginx:4.10.0
 
 
 ### Kubernetes / Helm package
@@ -963,7 +964,7 @@ This guide takes you through the steps necessary to create an autocompleter for 
 
 ### Parser Theory
 
-There are several parsers in Hue already (e.g. one for Impala, one for Hive..) and a generic SQL that is used for other dialects. The parsers are written using a [bison](https://www.gnu.org/software/bison/) grammar and are generated with [jison](https://github.com/zaach/jison). They arere 100% Javascript and live on the client side, this gives the performance of a desktop editor in your browser.
+There are several parsers in Hue already (e.g. one for Impala, one for Hive..) and a generic SQL that is used for other dialects. The parsers are written using a [bison](https://www.gnu.org/software/bison/) grammar and are generated with [jison](https://github.com/zaach/jison). They are 100% Javascript and live on the client side, this gives the performance of a desktop editor in your browser.
 
 Building a dedicated work is more effort but it then allows a very rich end user experience, e.g.:
 
