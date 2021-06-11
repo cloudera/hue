@@ -25,11 +25,11 @@ import json
 import logging
 import urllib.error
 import sys
+import tempfile
 import uuid
 
 from django.urls import reverse
 from django.views.decorators.http import require_POST
-from django.core.files.storage import FileSystemStorage
 
 LOG = logging.getLogger(__name__)
 
@@ -44,7 +44,6 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_unicode
 from desktop.lib.python_util import check_encoding
 from desktop.models import Document2
-from desktop.settings import BASE_DIR
 from kafka.kafka_api import get_topics, get_topic_data
 from notebook.connectors.base import get_api, Notebook
 from notebook.decorators import api_error_handler
@@ -231,7 +230,7 @@ def guess_field_types(request):
   if file_format['inputFormat'] == 'localfile':
     path = urllib_unquote(file_format['path'])
 
-    with open(BASE_DIR + path, 'r') as local_file:
+    with open(path, 'r') as local_file:
 
       reader = csv.reader(local_file)
       csv_data = list(reader)
@@ -742,11 +741,11 @@ def save_pipeline(request):
 def upload_local_file(request):
 
   upload_file = request.FILES['inputfile']
-  fs = FileSystemStorage()
   username = request.user.username
-  filename = "%s_%s.%s" % (username, uuid.uuid4(), 'csv')
-  name = fs.save(filename, upload_file)
-
-  local_file_url = fs.url(name)
+  filename = "%s_%s" % (username, uuid.uuid4())
+  temp_file = tempfile.NamedTemporaryFile(prefix=filename, suffix='.csv', delete=False)
+  temp_file.write(upload_file.read())
+  local_file_url = temp_file.name
+  temp_file.close()
 
   return JsonResponse({'local_file_url': local_file_url})
