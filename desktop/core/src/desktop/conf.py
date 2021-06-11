@@ -28,6 +28,7 @@ from collections import OrderedDict
 
 from django.db import connection
 
+from hadoop.core_site import get_raz_api_url
 from metadata.metadata_sites import get_navigator_audit_log_dir, get_navigator_audit_max_file_size
 
 from desktop import appmanager
@@ -2108,7 +2109,7 @@ RAZ = ConfigSection(
         key='api_url',
         help=_('Endpoint to contact'),
         type=str,
-        default='https://localhost:8080',
+        dynamic_default=get_raz_api_url,
     ),
     API_AUTHENTICATION=Config(
         key='api_authentication',
