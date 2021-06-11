@@ -105,6 +105,14 @@ def get_default_region():
   return get_region(conf=AWS_ACCOUNTS['default']) if 'default' in AWS_ACCOUNTS else get_region()
 
 
+def get_default_host():
+  '''Returns the S3 host when Raz is configued'''
+
+  if get_raz_api_url():
+    endpoint = get_raz_default_endpoint()
+    if endpoint:
+      return endpoint.get('host')
+
 def get_region(conf=None):
   global REGION_CACHED
 
@@ -112,10 +120,10 @@ def get_region(conf=None):
     return REGION_CACHED
   region = ''
 
-  if conf:
+  if conf or get_default_host():
     # First check the host/endpoint configuration
-    if conf.HOST.get():
-      endpoint = conf.HOST.get()
+    endpoint = get_default_host() or conf.HOST.get()
+    if endpoint:
       if re.search(SUBDOMAIN_ENDPOINT_RE, endpoint, re.IGNORECASE):
         region = re.search(SUBDOMAIN_ENDPOINT_RE, endpoint, re.IGNORECASE).group('region')
       elif re.search(HYPHEN_ENDPOINT_RE, endpoint, re.IGNORECASE):
@@ -169,14 +177,6 @@ IS_SELF_SIGNING_ENABLED = Config(
   default=False,
 )
 
-def get_default_host():
-  '''Returns the S3 host when Raz is configued'''
-
-  if get_raz_api_url():
-    endpoint = get_raz_default_endpoint()
-    if endpoint:
-      return endpoint.get('host')
-
 def get_default_get_environment_credentials():
   '''Allow to check if environment credentials are present or not'''
   return not get_raz_api_url()
@@ -221,12 +221,12 @@ AWS_ACCOUNTS = UnspecifiedConfigSection(
       ALLOW_ENVIRONMENT_CREDENTIALS=Config(
         help=_('Allow to use environment sources of credentials (environment variables, EC2 profile).'),
         key='allow_environment_credentials',
-        dynamic_default=get_default_get_environment_credentials(),
+        default=True,
         type=coerce_bool
       ),
       REGION=Config(
         key='region',
-        dynamic_default=get_default_host,
+        default=None,
         type=str
       ),
       HOST=Config(
