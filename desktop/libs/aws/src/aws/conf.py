@@ -24,7 +24,7 @@ import requests
 
 from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_bool, coerce_password_from_script
 from desktop.lib.idbroker import conf as conf_idbroker
-from hadoop.core_site import get_s3a_access_key, get_s3a_secret_key, get_s3a_session_token
+from hadoop.core_site import get_s3a_access_key, get_s3a_secret_key, get_s3a_session_token, get_raz_api_url, get_raz_default_endpoint
 
 if sys.version_info[0] > 2:
   from django.utils.translation import gettext_lazy as _, gettext as _t
@@ -169,6 +169,19 @@ IS_SELF_SIGNING_ENABLED = Config(
   default=False,
 )
 
+def get_default_host():
+  '''Returns the S3 host when Raz is configued'''
+
+  if get_raz_api_url():
+    endpoint = get_raz_default_endpoint()
+    if endpoint:
+      return endpoint.get('host')
+
+def get_default_get_environment_credentials():
+  '''Allow to check if environment credentials are present or not'''
+  return not get_raz_api_url()
+
+
 AWS_ACCOUNTS = UnspecifiedConfigSection(
   'aws_accounts',
   help=_('One entry for each AWS account'),
@@ -208,12 +221,12 @@ AWS_ACCOUNTS = UnspecifiedConfigSection(
       ALLOW_ENVIRONMENT_CREDENTIALS=Config(
         help=_('Allow to use environment sources of credentials (environment variables, EC2 profile).'),
         key='allow_environment_credentials',
-        default=True,
+        dynamic_default=get_default_get_environment_credentials(),
         type=coerce_bool
       ),
       REGION=Config(
         key='region',
-        default=None,
+        dynamic_default=get_default_host,
         type=str
       ),
       HOST=Config(
