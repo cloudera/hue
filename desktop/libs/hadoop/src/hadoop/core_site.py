@@ -18,6 +18,7 @@
 from __future__ import absolute_import
 import errno
 import logging
+import re
 import sys
 
 from hadoop import conf
@@ -44,6 +45,7 @@ _CNF_S3A_SESSION_TOKEN = 'fs.s3a.session.token'
 
 _CNF_S3A_RAZ_API_URL = 'fs.s3a.ext.raz.rest.host.url'
 _CNF_S3A_RAZ_CLUSTER_NAME = 'fs.s3a.ext.raz.s3.access.cluster.name'
+_CNF_S3A_RAZ_BUCKET_ENDPOINT = 'fs.s3a.bucket.(?P<bucket>[^.]+).endpoint'
 
 _CNF_ADLS_CLIENT_ID = 'dfs.adls.oauth2.client.id'
 _CNF_ADLS_AUTHENTICATION_CODE = 'dfs.adls.oauth2.credential'
@@ -130,6 +132,21 @@ def get_raz_cluster_name():
   S3 only. Add check for Azure when supported.
   """
   return get_conf().get(_CNF_S3A_RAZ_CLUSTER_NAME, '')
+
+def get_raz_default_endpoint():
+  """
+  Get the name of the default S3 bucket of Raz
+
+  S3 only. Add check for Azure when supported.
+  """
+
+  for key, val in get_conf().items():
+    match = re.search(_CNF_S3A_RAZ_BUCKET_ENDPOINT, key)
+    if match:
+      return {
+        'region': val,
+        'bucket': match.group('bucket')
+      }
 
 
 def get_adls_client_id():
