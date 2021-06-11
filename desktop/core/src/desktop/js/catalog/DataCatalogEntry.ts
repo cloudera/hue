@@ -526,7 +526,6 @@ export default class DataCatalogEntry {
 
     return new CancellablePromise<void>((resolve, reject, onCancel) => {
       const executePromise = executeSingleStatement({
-        database: this.path[0],
         connector: this.getConnector(),
         namespace: this.namespace,
         compute: this.compute,
