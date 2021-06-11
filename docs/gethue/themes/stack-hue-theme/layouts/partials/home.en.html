@@ -53,7 +53,7 @@
       <div class="row">
         <div class="col-md-12 text-center">
           <div class="modal-instance">
-            <a class="btn type--uppercase modal-trigger" href="#">
+            <a class="btn type--uppercase modal-trigger" onclick="window.initScratchpad()" href="#">
               <span class="btn__text">
                 &#9654; Open Sql Scratchpad
               </span>
@@ -62,11 +62,14 @@
             <br />
             <br />
             <div class="modal-container">
-              <div class="modal-content bg-dark" data-width="60%" data-height="60%">
-                <div style="position: absolute; height: 100%; width: 100%">
-                  <sql-scratchpad api-url="https://demo.gethue.com" username="demo" password="demo" dialect="mysql" />
+              <div class="modal-content bg-dark scratchpad-modal" data-width="60%" data-height="60%" style="display: flex; flex-direction: column;">
+                <div style="flex: 0 1 100%; position: relative;" id="scratchpadModalContainer">
+                  <div style="padding:10px; color: white;">Loading...</div>
                 </div>
-                <a href="{{ .Site.Params.docsHost }}/developer/components/scratchpad/">Learn More »</a>
+                <div style="flex: 0 0 content">
+                  <a href="{{ .Site.Params.docsHost }}/developer/components/scratchpad/">Learn More »</a>
+                </div>
+
               </div>
               <!--end of modal-content-->
             </div>
@@ -178,7 +181,49 @@
   </section>
 </div>
 <script type="text/javascript" src="https://cdn.gethue.com/components/SqlScratchpadWebComponent.js"></script>
+<style>
+    .sql-scratchpad {
+        background: white;
+        box-sizing: border-box;
+    }
+    .sql-scratchpad-editor,
+    .ace-editor-component,
+    .ace-editor {
+        position: relative;
+    }
+    .modal-container .modal-content.scratchpad-modal {
+        transform: none !important;
+        margin-left: -30%;
+        margin-top: -20%;
+    }
+    .sql-scratchpad-actions * {
+        line-height: 18px;
+        height: 22px;
+        vertical-align: middle;
+    }
+    .sql-scratchpad-actions .limit-input {
+        font-size: 12px;
+        width: 60px;
+        height: 22px !important;
+    }
+    .sql-scratchpad-result {
+        overflow: auto;
+    }
+
+    .sql-scratchpad-result h1 {
+        text-align: center;
+        font-size: 14px;
+    }
+
+</style>
 <script>
+  window.initScratchpad = function () {
+      customElements.whenDefined('sql-scratchpad').then(function () {
+          const containerElement = document.getElementById('scratchpadModalContainer');
+          containerElement.innerHTML = '<sql-scratchpad style="position: absolute; top: 0; right: 0; bottom: 0; left: 0;" api-url="https://demo.gethue.com" username="demo" password="demo" dialect="mysql" />';
+      });
+  }
+
   function check(event) {
     event.preventDefault();
 
