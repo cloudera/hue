@@ -2092,10 +2092,14 @@ CONNECTORS = UnspecifiedConfigSection(
   )
 )
 
-def has_raz_url():
+def _get_raz_url():
   """Check if we can guess if Raz is configured"""
   from hadoop.core_site import get_raz_api_url  # Avoid circular import
   return get_raz_api_url()
+
+def has_raz_url():
+  """Check if we can guess if Raz is configured"""
+  return bool(_get_raz_url())
 
 
 RAZ = ConfigSection(
@@ -2112,7 +2116,7 @@ RAZ = ConfigSection(
         key='api_url',
         help=_('Endpoint to contact'),
         type=str,
-        dynamic_default=has_raz_url,
+        dynamic_default=_get_raz_url,
     ),
     API_AUTHENTICATION=Config(
         key='api_authentication',
