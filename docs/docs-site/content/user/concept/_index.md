@@ -115,11 +115,11 @@ Clicking on the link will open-up the SQL selection:
 Via the Home page, saved documents can be exported for backups or transferring to another Hue.
 
 ## Slack
-Currently in **Beta**
+Currently in **Beta**.
 
 This integration with Hue helps users by assisting them with their SQL queries and have better collaboration/discussion with other users via Slack.
 
-To set-up the Hue App, the **Slack workspace admin** needs to follow these few [steps](/administrator/configuration/server/#manual-slack-app-installation) described in the Admin section.
+To set-up the Hue App, the **Slack workspace admin** needs to follow these few [steps](/administrator/configuration/server/#improved-slack-app-installation) described in the Admin section.
 
 After successfully plugging-in the app with Hue, type `hello hue` or `@Hue help` in the Slack channel to get the list of things the app can assist you with.
 
@@ -136,7 +136,7 @@ Paste it in the Slack channel for others to get a rich link preview:
 
 ![Query Link Preview](https://cdn.gethue.com/uploads/2021/04/query_link_preview.png)
 
-Slack currently does not support markdown tables and potential improvements with inline preview will come when Hue supports result caching via [query tasks](/administrator/administration/reference/#task-server)
+Slack currently does not support markdown tables and potential improvements with inline preview will come when Hue supports result caching via [query tasks](/administrator/administration/reference/#task-server).
 
 After evaluating a lot of possible fixes (like uploading result image, truncating columns which did not look good, pivoting result table, [uploading result file](https://github.com/slackapi/python-slack-sdk/issues/991) etc.) and seeing their tradeoffs, we chose to have a few sample rows but keep all the columns by pivoting the result table and to compensate for the loss of rows, Hue app gives the result file in the message thread.
 
@@ -173,7 +173,7 @@ Type `@Hue queries` in the channel to explore the list of important and most use
 ### Security
 Keeping in mind the security aspect, Slack users needs to be a Hue user to have permission to access the above features from the App. This mapping is currently done by checking Slack users' **email prefix as Hue username** and their **email host is same in Hue instance domain** with which the App is plugged-in.
 
-For example, some persona **Alice** having a Hue account with username **alice** can have read access from some Slack account only if the email prefix of that slack user is same and Hue username and the email host is same in the Hue domain i.e. **alice@gethue.com Slack user** can only access **Hue user alice** on **demo.gethue.com** 
+For example, some persona **Alice** having a Hue account with username **alice** can have read access from some Slack account only if the email prefix of that slack user is same and Hue username and the email host is same in the Hue domain i.e. **alice@gethue.com Slack user** can only access **Hue user alice** on **demo.gethue.com**.
 
 ## Settings
 
