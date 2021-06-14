@@ -783,7 +783,7 @@ This [integration](/user/concept/#slack) with Hue helps users by assisting them 
 
 One of the flows for sharing query/gist links, the main bot logic lies on top of the Hue server listening to the events posted by the Hue App from Slack to an endpoint, processing those events such as generating a rich preview to unfurl for the links shared in the Slack channels and using Slack API methods for sending these responses back to Slack.
 
-The 'Smart Quering Assistance' block on top of Hue server which driving the other flow for SQL Assistance is currently a work in progress for replying to users asking questions on how to find certain data tables or to query them.
+The 'Smart Query Assistance' block on top of Hue server which drives the other flow for SQL Assistance is currently a work in progress for replying to users asking questions on how to find certain data tables or to query them.
 
 ### Improved Slack App Installation
 Steps to be followed by the **Slack workspace admin** to set up their own Hue Slack app. The app needs to be created only once, other Hue users can simply [interact](/user/concept/#slack) with the App in the Slack channels!
