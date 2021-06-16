@@ -53,7 +53,7 @@ class RazToken:
 
   def get_delegation_token(self, user):
     ip_address = socket.gethostbyname(self.raz_hostname)
-    GET_PARAMS = {"op": "GETDELEGATIONTOKEN", "service": "%s:%s" % (ip_address, self.raz_port), "renewer": user}
+    GET_PARAMS = {"op": "GETDELEGATIONTOKEN", "service": "%s:%s" % (ip_address, self.raz_port), "renewer": "hue", "doAs": user}
     r = requests.get(self.raz_url, GET_PARAMS, auth=self.auth_handler, verify=False)
     self.raz_token = json.loads(r.text)['Token']['urlString']
     return self.raz_token
