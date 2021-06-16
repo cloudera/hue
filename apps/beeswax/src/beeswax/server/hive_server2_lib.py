@@ -814,7 +814,7 @@ class HiveServerClient(object):
     req = TGetSchemasReq()
     if schemaName is not None:
       req.schemaName = schemaName
-    if self.query_server.get('dialect') == 'impala':
+    if self.query_server.get('dialect') in ['impala', 'sparksql']:
       req.schemaName = None
 
     (res, session) = self.call(self._client.GetSchemas, req)
