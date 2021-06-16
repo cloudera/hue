@@ -28,6 +28,7 @@ import requests_kerberos
 
 from datetime import datetime, timedelta
 
+from desktop.conf import AUTH_USERNAME
 from desktop.lib.exceptions_renderable import PopupException
 import desktop.lib.raz.signer_protos_pb2 as raz_signer
 
@@ -53,7 +54,7 @@ class RazToken:
 
   def get_delegation_token(self, user):
     ip_address = socket.gethostbyname(self.raz_hostname)
-    GET_PARAMS = {"op": "GETDELEGATIONTOKEN", "service": "%s:%s" % (ip_address, self.raz_port), "renewer": "hue", "doAs": user}
+    GET_PARAMS = {"op": "GETDELEGATIONTOKEN", "service": "%s:%s" % (ip_address, self.raz_port), "renewer": AUTH_USERNAME.get(), "doAs": user}
     r = requests.get(self.raz_url, GET_PARAMS, auth=self.auth_handler, verify=False)
     self.raz_token = json.loads(r.text)['Token']['urlString']
     return self.raz_token
