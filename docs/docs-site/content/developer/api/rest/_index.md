@@ -107,7 +107,9 @@ In the meantime, with Axios:
 
 ## Authentication
 
-The API only supports JWT but users need to provide the credentials they are using in the regular login form or [authentication backends](/administrator/configuration/server/#authentication). This is consistent and users are free to interact with the service via their Browser or API.
+The API authenticates via the [authentication backends](/administrator/configuration/server/#authentication) of the server (same as going via the login page). This is consistent and users are free to interact via their browsers or API.
+
+Then a JWT token is returned and needs to be passed as a bearer in the headers for all the API calls.
 
 **Wrong credentials**: there is currently no error on bad authentication but instead a 302 redirect to the login page, e.g.:
 
@@ -125,11 +127,17 @@ Provide login credentials and get a [JWT token](https://jwt.io/):
 
     {"refresh":"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTYyMTcyNDYzMSwianRpIjoiOGM0NDRjYzRhN2VhNGMxZDliMGZhNmU1YzUyMjM1MjkiLCJ1c2VyX2lkIjoxfQ.t6t7_eYrNhpGN3-Jz5MDLXM8JtGP7V9Y9lacOTInqqQ","access":"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjIxNjM4NTMxLCJqdGkiOiJhZjgwN2E0ZjBmZDI0ZWMxYWQ2NTUzZjEyMjIyYzU4YyIsInVzZXJfaWQiOjF9.dQ1P3hbzSytp9-o8bWlcOcwrdwRVy95M2Eolph92QMA"}
 
+And keep the `access` tokent as the value of the bearer.
+
 ### Check token
+
+The validity (i.e. did it expire?) of an `access` token can be verified:
 
     curl -X POST https://demo.gethue.com/api/token/verify/ -d 'token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjIxNjM4NTMxLCJqdGkiOiJhZjgwN2E0ZjBmZDI0ZWMxYWQ2NTUzZjEyMjIyYzU4YyIsInVzZXJfaWQiOjF9.dQ1P3hbzSytp9-o8bWlcOcwrdwRVy95M2Eolph92QMA'
 
 ### Refresh token
+
+Similarly, an `access` token validity can be extended via a refresh sending the `refresh` token obtained in the initial authentication.
 
     curl -X POST https://demo.gethue.com/api/token/refresh/ -d 'refresh=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTYyMTcyNDYzMSwianRpIjoiOGM0NDRjYzRhN2VhNGMxZDliMGZhNmU1YzUyMjM1MjkiLCJ1c2VyX2lkIjoxfQ.t6t7_eYrNhpGN3-Jz5MDLXM8JtGP7V9Y9lacOTInqqQ'
 
