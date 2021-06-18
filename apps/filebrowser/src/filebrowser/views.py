@@ -142,6 +142,20 @@ def index(request):
   return view(request, path)
 
 
+def _normalize_path(path):
+  decoded_path = unquote_url(path)
+  if path != decoded_path:
+    path = decoded_path
+
+  # Check if protocol missing / and add it back (e.g. Kubernetes ingress can strip double slash)
+  if path.startswith('abfs:/') and not path.startswith('abfs://'):
+    path = path.replace('abfs:/', 'abfs://')
+  if path.startswith('s3a:/') and not path.startswith('s3a://'):
+    path = path.replace('s3a:/', 's3a://')
+
+  return path
+
+
 def download(request, path):
   """
   Downloads a file.
@@ -149,15 +163,8 @@ def download(request, path):
   This is inspired by django.views.static.serve.
   ?disposition={attachment, inline}
   """
-  # check if protocol missing / and add it back
-  if path.startswith('abfs:/') and not path.startswith('abfs://'):
-    path = path.replace('abfs:/', 'abfs://')
-  if path.startswith('s3a:/') and not path.startswith('s3a://'):
-    path = path.replace('s3a:/', 's3a://')
+  path = _normalize_path(path)
 
-  decoded_path = urllib_unquote(path)
-  if path != decoded_path:
-    path = decoded_path
   if not SHOW_DOWNLOAD_BUTTON.get():
     return serve_403_error(request)
   if not request.fs.exists(path):
@@ -206,9 +213,8 @@ def download(request, path):
 
 def view(request, path):
   """Dispatches viewing of a path to either index() or fileview(), depending on type."""
-  decoded_path = unquote_url(path)
-  if path != decoded_path:
-    path = decoded_path
+
+  path = _normalize_path(path)
 
   if request.path.startswith('/api/') and request.fs is None:
     request.fs = fsmanager.get_filesystem(request.fs_ref)
@@ -293,9 +299,8 @@ def _home_trash_path(fs, user, path):
 
 
 def home_relative_view(request, path):
-  decoded_path = urllib_unquote(path)
-  if path != decoded_path:
-    path = decoded_path
+  path = _normalize_path(path)
+
   home_dir_path = request.user.get_home_directory()
   if request.fs.exists(home_dir_path):
     path = '%s%s' % (home_dir_path, path)
@@ -305,9 +310,8 @@ def home_relative_view(request, path):
 
 def edit(request, path, form=None):
   """Shows an edit form for the given path. Path does not necessarily have to exist."""
-  decoded_path = unquote_url(path)
-  if path != decoded_path:
-    path = decoded_path
+  path = _normalize_path(path)
+
   try:
     stats = request.fs.stats(path)
   except IOError as ioe:
@@ -363,9 +367,8 @@ def save_file(request):
   form = EditorForm(request.POST)
   is_valid = form.is_valid()
   path = form.cleaned_data.get('path')
-  decoded_path = unquote_url(path)
-  if path != decoded_path:
-    path = decoded_path
+
+  path = _normalize_path(path)
 
   if request.POST.get('save') == "Save As":
     if not is_valid:
@@ -412,9 +415,8 @@ def listdir(request, path):
 
   Intended to be called via view().
   """
-  decoded_path = urllib_unquote(path)
-  if path != decoded_path:
-    path = decoded_path
+  path = _normalize_path(path)
+
   if not request.fs.isdir(path):
     raise PopupException(_("Not a directory: %(path)s") % {'path': path})
 
@@ -495,9 +497,8 @@ def listdir_paged(request, path):
     filter=?          - Specify a substring filter to search for in
                         the filename field.
   """
-  decoded_path = urllib_unquote(path)
-  if path != decoded_path:
-    path = decoded_path
+  path = _normalize_path(path)
+
   if not request.fs.isdir(path):
     raise PopupException("Not a directory: %s" % (path,))
 
@@ -645,9 +646,8 @@ def stat(request, path):
   Intended for use via AJAX (and hence doesn't provide
   an HTML view).
   """
-  decoded_path = urllib_unquote(path)
-  if path != decoded_path:
-    path = decoded_path
+  path = _normalize_path(path)
+
   if not request.fs.exists(path):
     raise Http404(_("File not found: %(path)s") % {'path': escape(path)})
   stats = request.fs.stats(path)
@@ -655,9 +655,8 @@ def stat(request, path):
 
 
 def content_summary(request, path):
-  decoded_path = urllib_unquote(path)
-  if path != decoded_path:
-    path = decoded_path
+  path = _normalize_path(path)
+  
   if not request.fs.exists(path):
     raise Http404(_("File not found: %(path)s") % {'path': escape(path)})
   response = {'status': -1, 'message': '', 'summary': None}
@@ -680,16 +679,9 @@ def display(request, path):
   with reasonable defaults chosen.
 
   Note that display by length and offset are on bytes, not on characters.
-
-  TODO(philip): Could easily built-in file type detection
-  (perhaps using something similar to file(1)), as well
-  as more advanced binary-file viewing capability (de-serialize
-  sequence files, decompress gzipped text files, etc.).
-  There exists a python-magic package to interface with libmagic.
   """
-  decoded_path = urllib_unquote(path)
-  if path != decoded_path:
-    path = decoded_path
+  path = _normalize_path(path)
+
   if not request.fs.isfile(path):
     raise PopupException(_("Not a file: '%(path)s'") % {'path': path})
 
@@ -822,9 +814,9 @@ def read_contents(codec_type, path, fs, offset, length):
   """
   contents = ''
   fhandle = None
-  decoded_path = urllib_unquote(path)
-  if path != decoded_path:
-    path = decoded_path
+
+  path = _normalize_path(path)
+
   try:
     fhandle = fs.open(path)
     stats = fs.stats(path)
