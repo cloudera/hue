@@ -177,7 +177,7 @@ This is a verified step-by-step guide on how to get up and running on a fresh in
 
    - For M1 Macs, 3.7.9 from python.org is the only one that works and none of the homebrew version work at the time of writing.
 
-   - For Intel Macs, other 3.x Python versions as well as Homebrew might work.
+   - For Intel Macs, other 3.x Python versions as well as Homebrew might work. However, direct download from python.org is preferred and tested.
 
 8. Install mysql client
 
