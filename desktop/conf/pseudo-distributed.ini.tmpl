@@ -368,6 +368,10 @@
     # The service to use when querying PAM.
     ## pam_service=login
 
+    # To use Python unix pwd module to get the username from the entered credentials in Hue if Centrify like PAM service is in use.
+    # This will set the username to what is being returned by the pwd module.
+    ## pam_use_pwd_module=false
+
     # When using the desktop.auth.backend.RemoteUserDjangoBackend, this sets
     # the normalized name of the header that contains the remote user.
     # The HTTP header in the request is converted to a key by converting

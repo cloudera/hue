@@ -30,6 +30,7 @@ User to remain a django.contrib.auth.models.User object.
 
 from builtins import object
 from importlib import import_module
+from pwd import getpwnam
 
 import logging
 import sys
@@ -419,6 +420,10 @@ class PamBackend(DesktopBackendBase):
   @metrics.pam_authentication_time
   def authenticate(self, request=None, username=None, password=None):
     username = force_username_case(username)
+
+    if AUTH.PAM_USE_PWD_MODULE.get():
+      LOG.debug('setting username to %s using pam pwd module for user %s' % (getpwnam(username).pw_name, username))
+      username = getpwnam(username).pw_name
 
     if pam.authenticate(username, password, AUTH.PAM_SERVICE.get()):
       is_super = False
