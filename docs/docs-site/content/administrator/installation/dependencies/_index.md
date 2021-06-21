@@ -173,11 +173,11 @@ This is a verified step-by-step guide on how to get up and running on a fresh in
    `brew install gmp openssl libffi`
 
 7. Install python, tested with the "macOS 64-bit installer" 3.7.9 direct download from python.org.
-   - For M1 Macs 3.7.9 from python.org is the only one that works and none of the homebrew version work at the time of writing.
+`https://www.python.org/ftp/python/3.7.9/python-3.7.9-macosx10.9.pkg`
+
+   - For M1 Macs, 3.7.9 from python.org is the only one that works and none of the homebrew version work at the time of writing.
 
    - For Intel Macs, other 3.x Python versions as well as Homebrew might work.
-
-   `https://www.python.org/ftp/python/3.7.9/python-3.7.9-macosx10.9.pkg`
 
 8. Install mysql client
 
