@@ -354,13 +354,18 @@ class S3FileSystem(object):
         prefix = self._append_separator(key.name)
         keys = key.bucket.list(prefix=prefix)
         to_delete = itertools.chain(keys, to_delete)
-      result = key.bucket.delete_keys(to_delete)
-      if result.errors:
-        msg = "%d errors occurred while attempting to delete the following S3 paths:\n%s" % (
-          len(result.errors), '\n'.join(['%s: %s' % (error.key, error.message) for error in result.errors])
-        )
-        LOG.error(msg)
-        raise S3FileSystemException(msg)
+        result = key.bucket.delete_keys(to_delete)
+        if result.errors:
+          msg = "%d errors occurred while attempting to delete the following S3 paths:\n%s" % (
+            len(result.errors), '\n'.join(['%s: %s' % (error.key, error.message) for error in result.errors])
+          )
+          LOG.error(msg)
+          raise S3FileSystemException(msg)
+      else:
+        # Avoid Raz issues
+        deleted_key = key.bucket.delete_key(next(to_delete))
+        if deleted_key.exists():
+          raise S3FileSystemException('Could not delete key %s' % deleted_key)
 
   @translate_s3_error
   @auth_error_handler
