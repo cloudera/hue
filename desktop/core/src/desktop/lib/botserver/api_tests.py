@@ -85,7 +85,7 @@ class TestApi(object):
       assert_true(data.get('ok'))
   
   def test_generate_slack_install_link(self):
-    response = self.client.get(reverse('botserver.api.slack_install_link') + '/?hostname=' + self.hostname)
+    response = self.client.get(reverse('api:botserver.api.slack_install_link') + '/?hostname=' + self.hostname)
     data = json.loads(response.content)
 
     assert_equal(200, response.status_code)
