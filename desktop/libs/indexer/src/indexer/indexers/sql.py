@@ -357,7 +357,7 @@ CONSTRAINT my_pk PRIMARY KEY (%(primary_keys)s));
         _csv_rows = []
 
         for count, row in enumerate(reader):
-          if source['format']['hasHeader'] and count == 0:
+          if (source['format']['hasHeader'] and count == 0) or not row:
             continue
           if dialect == 'impala':                         # for the boolean col updating csv_val to (1,0)
             row = self.nomalize_booleans(row, columns)
