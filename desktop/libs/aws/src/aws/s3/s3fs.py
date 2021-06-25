@@ -345,27 +345,29 @@ class S3FileSystem(object):
       key = self._get_key(path, validate=False)
 
       if key.exists():
-        to_delete = iter([key])
-      else:
-        to_delete = iter([])
+        to_delete = [key]
+        dir_keys = []
 
-      if self.isdir(path):
-        # add `/` to prevent removing of `s3://b/a_new` trying to remove `s3://b/a`
-        prefix = self._append_separator(key.name)
-        keys = key.bucket.list(prefix=prefix)
-        to_delete = itertools.chain(keys, to_delete)
-        result = key.bucket.delete_keys(to_delete)
-        if result.errors:
-          msg = "%d errors occurred while attempting to delete the following S3 paths:\n%s" % (
-            len(result.errors), '\n'.join(['%s: %s' % (error.key, error.message) for error in result.errors])
-          )
-          LOG.error(msg)
-          raise S3FileSystemException(msg)
-      else:
-        # Avoid Raz issues
-        deleted_key = key.bucket.delete_key(next(to_delete))
-        if deleted_key.exists():
-          raise S3FileSystemException('Could not delete key %s' % deleted_key)
+        if self.isdir(path):
+          # add `/` to prevent removing of `s3://b/a_new` trying to remove `s3://b/a`
+          prefix = self._append_separator(key.name)
+          dir_keys = key.bucket.list(prefix=prefix)
+          to_delete = itertools.chain(dir_keys, to_delete)
+
+        if not dir_keys:
+          # Avoid Raz bulk delete issue
+          deleted_key = key.delete()
+          if deleted_key.exists():
+            raise S3FileSystemException('Could not delete key %s' % deleted_key)
+        else:
+          result = key.bucket.delete_keys(to_delete)
+          if result.errors:
+            msg = "%d errors occurred while attempting to delete the following S3 paths:\n%s" % (
+              len(result.errors), '\n'.join(['%s: %s' % (error.key, error.message) for error in result.errors])
+            )
+            LOG.error(msg)
+            raise S3FileSystemException(msg)
+
 
   @translate_s3_error
   @auth_error_handler
