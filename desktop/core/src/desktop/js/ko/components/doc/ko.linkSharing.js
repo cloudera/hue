@@ -56,9 +56,11 @@ const TEMPLATE = `
         }
       "></div>
     </div>
-    <div class="shared-link">
-      <div id="sharedLinkInput" data-bind="text: link"></div>
-      <button class="btn" data-clipboard-target="#sharedLinkInput" data-bind="clipboard"><i class="fa fa-clipboard"></i></button>
+    <div class="input-append">
+      <form autocomplete="off">
+        <input id="sharedLinkInput" style="width: 520px" ${ window.PREVENT_AUTOFILL_INPUT_ATTRS } onfocus="this.select()" data-bind="value: link" type="text" readonly="readonly"/>
+        <button class="btn" type="button" data-clipboard-target="#sharedLinkInput" data-bind="clipboard"><i class="fa fa-clipboard"></i></button>
+      </form>
     </div>
     <!-- /ko -->
   </div>
