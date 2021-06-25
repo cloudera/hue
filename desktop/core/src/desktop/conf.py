@@ -1086,7 +1086,7 @@ AUTH = ConfigSection(
                   help=_("The service to use when querying PAM. "
                          "The service usually corresponds to a single filename in /etc/pam.d")),
     PAM_USE_PWD_MODULE=Config("pam_use_pwd_module",
-                       help=_("To use python unix pwd module to get the username from the entered credentials in hue if Centrify like pam service is in use. "
+                       help=_("To use Python unix pwd module to get the username from the entered credentials in hue if Centrify like PAM service is in use. "
                               "This will set the username to what is being returned by the pwd module."),
                        type=coerce_bool,
                        default=False),
