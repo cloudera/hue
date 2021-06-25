@@ -22,7 +22,7 @@
     <javac.version>1.8</javac.version>
     <guice.version>4.2.3</guice.version>
     <slf4j.version>1.7.30</slf4j.version>
-    <dropwizard.version>2.0.10</dropwizard.version>
+    <dropwizard.version>2.0.21</dropwizard.version>
     <guava.version>28.1-jre</guava.version>
     <junit.version>4.13</junit.version>
     <jackson.version>2.11.4</jackson.version>
@@ -34,7 +34,7 @@
     <log4j2.version>2.13.3</log4j2.version>
     <postgres.version>42.2.14</postgres.version>
     <pg-embedded.version>0.7.1</pg-embedded.version>
-    <jetty.version>9.4.31.v20200723</jetty.version>
+    <jetty.version>9.4.39.v20210325</jetty.version>
   </properties>
 
   <modules>
