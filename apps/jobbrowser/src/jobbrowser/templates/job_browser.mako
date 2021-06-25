@@ -3248,7 +3248,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           .val(window.CSRF_TOKEN)
           .appendTo($downloadForm);
         $('<input type="hidden" name="cluster" />')
-          .val(ko.mapping.toJSON(vm.compute))
+          .val(ko.mapping.toJSON(vm.cluster))
           .appendTo($downloadForm);
         $('<input type="hidden" name="app_id" />')
           .val(ko.mapping.toJSON(self.id))

@@ -1794,7 +1794,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
       });
 
       self.interpreters = ko.pureComputed(function() {
-        return window.getLastKnownConfig().app_config.editor.interpreters;
+        return window.getLastKnownConfig().app_config.editor.interpreters.filter(function (interpreter) { return interpreter.is_sql });
       });
       self.interpreter = ko.observable(vm.sourceType);
       self.interpreter.subscribe(function(val) {
