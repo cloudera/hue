@@ -15,16 +15,13 @@
 // limitations under the License.
 
 import * as ko from 'knockout';
+import Clipboard from 'clipboard';
 
 ko.bindingHandlers.clipboard = {
   init: (element, valueAccessor) => {
-    if (!window.Clipboard) {
-      console.warn('ko.clipboard.js depends on window.Clipboard');
-      return;
-    }
     const options = valueAccessor() || {};
 
-    const clipboard = new window.Clipboard(element, {
+    const clipboard = new Clipboard(element, {
       target: options.target,
       text: options.text
     });
