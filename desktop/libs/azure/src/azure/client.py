@@ -25,7 +25,9 @@ from azure.active_directory import ActiveDirectory
 from desktop.lib.idbroker import conf as conf_idbroker
 from desktop.lib.idbroker.client import IDBroker
 
+
 LOG = logging.getLogger(__name__)
+
 
 def _make_adls_client(identifier, user):
   client_conf = conf.ADLS_CLUSTERS[identifier]
@@ -41,14 +43,14 @@ def get_credential_provider(identifier, user, version=None):
 
 class CredentialProviderAD(object):
   def __init__(self, ad):
-    self.ad=ad
+    self.ad = ad
 
   def get_credentials(self):
     return self.ad.get_token()
 
 class CredentialProviderIDBroker(object):
   def __init__(self, idbroker):
-    self.idbroker=idbroker
+    self.idbroker = idbroker
 
   def get_credentials(self):
     return self.idbroker.get_cab()
