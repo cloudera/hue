@@ -287,7 +287,7 @@ def is_enabled():
   return ('default' in list(AWS_ACCOUNTS.keys()) and AWS_ACCOUNTS['default'].get_raw() and AWS_ACCOUNTS['default'].ACCESS_KEY_ID.get()) or \
       has_iam_metadata() or \
       conf_idbroker.is_idbroker_enabled('s3a') or \
-      RAZ.IS_ENABLED.get() or \
+      (RAZ.IS_ENABLED.get() and 'default' in list(AWS_ACCOUNTS.keys()) and AWS_ACCOUNTS['default'].get_raw()) or \
       IS_SELF_SIGNING_ENABLED.get()
 
 
