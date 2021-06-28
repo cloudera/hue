@@ -13,15 +13,17 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import errno
 import os
 import logging
 
 from hadoop.fs.hadoopfs import require_open
 from azure.abfs.__init__ import normpath
 
-LOG = logging.getLogger(__name__)
 
+LOG = logging.getLogger(__name__)
 SEEK_SET, SEEK_CUR, SEEK_END = os.SEEK_SET, os.SEEK_CUR, os.SEEK_END
+
 
 class ABFSFile(object):
   """ Represents an open file on ABFS. """
@@ -83,7 +85,7 @@ class ABFSFile(object):
     except:
       resp =''
     return resp
-    
+
   def close(self):
     self.closed = True
 
