@@ -49,6 +49,8 @@ class RazToken:
     self.init_time = datetime.now()
     self.raz_token = None
     o = lib_urlparse(self.raz_url)
+    if not o.netloc:
+      raise PopupException('Could not parse the host of the Raz server %s' % self.raz_url)
     self.raz_hostname, self.raz_port = o.netloc.split(':')
     self.scheme = o.scheme
 
