@@ -24,6 +24,7 @@ from django.utils.encoding import smart_str
 LOG = logging.getLogger(__name__)
 CHAR_TO_OCT = {"---": 0, "--x" : 1, "-w-": 2, "-wx": 3, "r--" : 4, "r-x" : 5, "rw-" : 6,"rwx": 7}
 
+
 class ABFSStat(object):
 
   def __init__(self, isDir, atime, mtime, size, path, owner = '', group = '', mode = None):
@@ -45,28 +46,28 @@ class ABFSStat(object):
       self.mode |= stat.S_IFDIR
     else:
       self.mode |= stat.S_IFREG
-    
+
   def __getitem__(self, key):
     try:
       return getattr(self, key)
     except AttributeError:
       raise KeyError(key)
-  
+
   def __setitem__(self, key, value):
     # What about derivable values?
     setattr(self, key, value)
-    
+
   def __repr__(self):
     return smart_str("<abfsStat %s>" % (self.path,))
-  
+
   @property
   def aclBit(self):
     return False
-  
+
   @classmethod
   def for_root(cls,path):
     return cls(True, 0, 0, 0, path)
-  
+
   @classmethod
   def for_filesystems(cls,headers,resp, scheme):
     return cls(True, headers['date'], resp['lastModified'], 0, scheme + resp['name'])
@@ -108,7 +109,7 @@ class ABFSStat(object):
     except:
       return None
     return octal_permissions
-    
+
   def to_json_dict(self):
     """
     Returns a dictionary for easy serialization
@@ -118,4 +119,3 @@ class ABFSStat(object):
     for k in keys:
       res[k] = self[k]
     return res
-    

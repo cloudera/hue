@@ -52,7 +52,7 @@ else:
 
 LOG = logging.getLogger(__name__)
 
-#Azure has a 30MB block limit on upload.
+# Azure has a 30MB block limit on upload.
 UPLOAD_CHUCK_SIZE = 30 * 1000 * 1000
 
 class ABFSFileSystemException(IOError):
@@ -131,7 +131,7 @@ class ABFS(object):
   def _getheaders(self):
     return {
       "Authorization": self._token_type + " " + self._access_token,
-      "x-ms-version" : "2019-02-02" #note this is required for setaccesscontrols
+      "x-ms-version" : "2019-02-02" # Note: this is required for setaccesscontrols
     }
 
   @property
@@ -149,7 +149,6 @@ class ABFS(object):
     Checks if the path is a directory (note diabled because filebrowser/views is bugged)
     """
     resp = self.stats(path)
-    #LOG.debug("checking directoty or not")
     return resp.isDir
 
   def isfile(self, path):
@@ -224,7 +223,7 @@ class ABFS(object):
     if params is None:
       params = {}
     params["resource"] = "account"
-    res = self._root._invoke("GET", params=params, headers=self._getheaders() )
+    res = self._root._invoke("GET", params=params, headers=self._getheaders())
     resp = self._root._format_response(res)
     for x in resp['filesystems']:
       stats.append(ABFSStat.for_filesystems(res.headers, x, root))
@@ -275,6 +274,7 @@ class ABFS(object):
     Attempts to go to the directory set by the user in the configuration file. If not defaults to abfs://
     """
     return Init_ABFS.get_home_dir_for_ABFS()
+
   # Find or alter information about the URI path
   # --------------------------------
   @staticmethod
@@ -652,7 +652,7 @@ class ABFS(object):
   def filebrowser_action(self):
     return self._filebrowser_action
 
-  #Other Methods to condense stuff
+  # Other Methods to condense stuff
   #----------------------------
   # Write Files on creation
   #----------------------------
