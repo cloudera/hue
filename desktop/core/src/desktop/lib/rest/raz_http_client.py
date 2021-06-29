@@ -15,17 +15,10 @@
 # limitations under the License.
 
 import logging
-import sys
 
 from desktop import conf
 from desktop.lib.raz.clients import AdlsRazClient
 from desktop.lib.rest.http_client import HttpClient
-
-
-if sys.version_info[0] > 2:
-  import urllib.request, urllib.error
-else:
-  from urllib import quote as urllib_quote
 
 
 LOG = logging.getLogger(__name__)
@@ -52,8 +45,8 @@ class RazHttpClient(HttpClient):
 
     token = raz_client.get_url(action=http_method, path=url, headers=headers)
 
-    signed_path = path + ('?' if '?' in url else '&') + token
-
+    signed_path = path + ('?' if '?' in url else '&') + token  # Same as using as params
+    print(111)
     return super(RazHttpClient, self).execute(
         http_method=http_method,
         path=signed_path,
@@ -61,7 +54,7 @@ class RazHttpClient(HttpClient):
         data=data,
         headers=headers,
         allow_redirects=allow_redirects,
-        urlencode=urlencode,
+        urlencode=False,
         files=files,
         stream=stream,
         clear_cookies=clear_cookies,
