@@ -58,8 +58,13 @@ def get_request_session(url, logger):
     with CACHE_SESSION_LOCK:
       CACHE_SESSION[url] = requests.Session()
       logger.debug("Setting request Session")
-      CACHE_SESSION[url].mount(url, requests.adapters.HTTPAdapter(pool_connections=conf.CHERRYPY_SERVER_THREADS.get(),
-                                                                  pool_maxsize=conf.CHERRYPY_SERVER_THREADS.get()))
+      CACHE_SESSION[url].mount(
+        url,
+        requests.adapters.HTTPAdapter(
+          pool_connections=conf.CHERRYPY_SERVER_THREADS.get(),
+          pool_maxsize=conf.CHERRYPY_SERVER_THREADS.get()
+        )
+      )
       logger.debug("Setting session adapter for %s" % url)
 
   return CACHE_SESSION
