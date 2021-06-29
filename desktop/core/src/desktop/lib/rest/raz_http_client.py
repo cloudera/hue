@@ -33,11 +33,6 @@ LOG = logging.getLogger(__name__)
 
 class RazHttpClient(HttpClient):
 
-  def __init__(self):
-    # Note: there is no concept of base_url and credentials anymore
-    # Maybe create here: http_client.HttpClient(url, exc_class=WebHdfsException, logger=LOG)
-    pass
-
   def execute(self, http_method, path, params=None, data=None, headers=None, allow_redirects=False, urlencode=True,
               files=None, stream=False, clear_cookies=False, timeout=conf.REST_CONN_TIMEOUT.get()):
 
