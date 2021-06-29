@@ -124,9 +124,11 @@ class ABFS(object):
 
   def get_client(self, url):
     if RAZ.IS_ENABLED.get():
-      return resource.Resource(RazHttpClient())
+      client = RazHttpClient(url, exc_class=WebHdfsException, logger=LOG)
     else:
-      return resource.Resource(http_client.HttpClient(url, exc_class=WebHdfsException, logger=LOG))
+      client = http_client.HttpClient(url, exc_class=WebHdfsException, logger=LOG)
+
+    return resource.Resource(client)
 
   def _getheaders(self):
     headers = {
