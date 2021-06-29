@@ -129,10 +129,14 @@ class ABFS(object):
       return resource.Resource(http_client.HttpClient(url, exc_class=WebHdfsException, logger=LOG))
 
   def _getheaders(self):
-    return {
-      "Authorization": self._token_type + " " + self._access_token,
+    headers = {
       "x-ms-version" : "2019-02-02" # Note: this is required for setaccesscontrols
     }
+
+    if self._token_type and self._access_token:
+      headers["Authorization"] = self._token_type + " " + self._access_token
+
+    return headers
 
   @property
   def superuser(self):
