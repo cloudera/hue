@@ -76,7 +76,8 @@ class ABFS(object):
       hdfs_supergroup=None,
       access_token=None,
       token_type=None,
-      expiration=None
+      expiration=None,
+      username=None
     ):
     self._url = url
     self._superuser = hdfs_superuser
@@ -96,12 +97,12 @@ class ABFS(object):
     self._is_remote = True
     self._has_trash_support = False
     self._filebrowser_action = PERMISSION_ACTION_ABFS
-
     self.expiration = expiration
-    self._root = self.get_client(url)
+    self._user = username
 
     # To store user info
-    self._thread_local = threading.local()
+    self._thread_local = threading.local()  # Unused
+    self._root = self.get_client(url)
 
     LOG.debug("Initializing ABFS : %s (security: %s, superuser: %s)" % (self._url, self._security_enabled, self._superuser))
 
@@ -119,12 +120,13 @@ class ABFS(object):
         hdfs_supergroup=None,
         access_token=credentials.get('access_token'),
         token_type=credentials.get('token_type'),
-        expiration=int(credentials.get('expires_on')) * 1000 if credentials.get('expires_on') is not None else None
+        expiration=int(credentials.get('expires_on')) * 1000 if credentials.get('expires_on') is not None else None,
+        username=credentials.get('username')
     )
 
   def get_client(self, url):
     if RAZ.IS_ENABLED.get():
-      client = RazHttpClient(url, exc_class=WebHdfsException, logger=LOG)
+      client = RazHttpClient(self._user, url, exc_class=WebHdfsException, logger=LOG)
     else:
       client = http_client.HttpClient(url, exc_class=WebHdfsException, logger=LOG)
 
@@ -192,7 +194,7 @@ class ABFS(object):
       raise IOError
     if dir_name == '':
       return ABFSStat.for_filesystem(self._statsf(file_system, params, **kwargs), path)
-    return ABFSStat.for_single(self._stats(file_system + '/' +dir_name, params, **kwargs), path)
+    return ABFSStat.for_single(self._stats(file_system + '/' + dir_name, params, **kwargs), path)
 
   def listdir_stats(self,path, params=None, **kwargs):
     """
@@ -221,7 +223,7 @@ class ABFS(object):
       dir_stats.append(ABFSStat.for_directory(res.headers, x, root + file_system + "/" + x['name']))
     return dir_stats
 
-  def listfilesystems_stats(self, root = Init_ABFS.ABFS_ROOT, params=None, **kwargs):
+  def listfilesystems_stats(self, root=Init_ABFS.ABFS_ROOT, params=None, **kwargs):
     """
     Lists the stats inside the File Systems, No functionality for params
     """
