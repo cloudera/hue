@@ -48,9 +48,6 @@ class RazHttpClient(HttpClient):
     """
     raz_client = AdlsRazClient(username=self.username)
 
-    container = 'hue'
-    storage_account = 'gethue.dfs.core.windows.net'
-
     url = self._make_url(path, params)
 
     token = raz_client.get_url(action=http_method, path=url, headers=headers)
