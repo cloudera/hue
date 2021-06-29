@@ -44,7 +44,7 @@ def _make_abfs_client(identifier, user):
 def get_credential_provider(identifier, user, version=None):
   from desktop.conf import RAZ
   if RAZ.IS_ENABLED.get():
-    return RazCredentialProvider()
+    return RazCredentialProvider(username=user)
   else:
     client_conf = conf.AZURE_ACCOUNTS[identifier] if identifier in conf.AZURE_ACCOUNTS else None
     return CredentialProviderIDBroker(IDBroker.from_core_site('azure', user)) if conf_idbroker.is_idbroker_enabled('azure') \
@@ -66,6 +66,9 @@ class CredentialProviderIDBroker(object):
     return self.idbroker.get_cab()
 
 class RazCredentialProvider(object):
+  def __init__(self, username):
+    self.username = username
+
   def get_credentials(self):
     # No credentials are required
-    return {}
+    return {'username': self.username}
