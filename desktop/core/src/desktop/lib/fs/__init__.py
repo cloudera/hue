@@ -22,6 +22,7 @@ from builtins import filter
 import posixpath
 import sys
 
+from desktop.lib.fs.proxyfs import ProxyFS  # Imported later from this module
 
 if sys.version_info[0] > 2:
   from urllib.parse import urlparse as lib_urlparse

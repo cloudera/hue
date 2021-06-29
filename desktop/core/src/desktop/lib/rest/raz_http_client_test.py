@@ -38,12 +38,21 @@ class TestRazHttpClient():
           'sig=pJL%2FWyed41tptiwBM5ymYre4qF8wzrO05tS5MCjkutc%3D&st=2015-01-02T01%3A40%3A51Z&se=2015-01-02T02%3A00%3A51Z&sp=r'
         execute.return_value = 'my file'
 
-        client = RazHttpClient()
+        client = RazHttpClient(username='test', base_url='https://gethue.blob.core.windows.net')
         f = client.execute(http_method='GET', path='/gethue/data/customer.csv')
 
         assert_equal('my file', f)
-        get_url.assert_called_with('gethue.dfs.core.windows.net', 'hue', relative_path='/gethue/data/customer.csv', perm='read')
-        execute.assert_called_with(http_method='GET', path='https://gethue.blob.core.windows.net/hue/data/customer.csv?' + \
-          'sv=2014-02-14&sr=b&sig=pJL%2FWyed41tptiwBM5ymYre4qF8wzrO05tS5MCjkutc%3D&' + \
-          'st=2015-01-02T01%3A40%3A51Z&se=2015-01-02T02%3A00%3A51Z&sp=r'
+        get_url.assert_called_with(action='GET', path='https://gethue.blob.core.windows.net/gethue/data/customer.csv', headers=None)
+        execute.assert_called_with(
+            http_method='GET',
+            path='/gethue/data/customer.csv&https://gethue.blob.core.windows.net/hue/data/customer.csv?sv=2014-02-14&sr=b&sig=pJL%2FWyed41tptiwBM5ymYre4qF8wzrO05tS5MCjkutc%3D&st=2015-01-02T01%3A40%3A51Z&se=2015-01-02T02%3A00%3A51Z&sp=r',
+            params=None,
+            data=None,
+            headers=None,
+            allow_redirects=False,
+            urlencode=True,
+            files=None,
+            stream=False,
+            clear_cookies=False,
+            timeout=120
         )
