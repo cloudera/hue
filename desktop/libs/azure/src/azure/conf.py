@@ -155,18 +155,26 @@ def is_adls_enabled():
 
 def is_abfs_enabled():
   from desktop.conf import RAZ  # Must be imported dynamically in order to have proper value
-  
+
   return ('default' in list(AZURE_ACCOUNTS.keys()) and AZURE_ACCOUNTS['default'].get_raw() and AZURE_ACCOUNTS['default'].CLIENT_ID.get() \
     or (conf_idbroker.is_idbroker_enabled('azure') and has_azure_metadata())) and 'default' in list(ABFS_CLUSTERS.keys()) \
     or (RAZ.IS_ENABLED.get() and 'default' in list(ABFS_CLUSTERS.keys()))
 
 def has_adls_access(user):
+  from desktop.conf import RAZ  # Must be imported dynamically in order to have proper value
   from desktop.auth.backend import is_admin
-  return user.is_authenticated and user.is_active and (is_admin(user) or user.has_hue_permission(action="adls_access", app="filebrowser"))
+
+  return user.is_authenticated and user.is_active and (
+    is_admin(user) or user.has_hue_permission(action="adls_access", app="filebrowser") or RAZ.IS_ENABLED.get()
+  )
 
 def has_abfs_access(user):
+  from desktop.conf import RAZ  # Must be imported dynamically in order to have proper value
   from desktop.auth.backend import is_admin
-  return user.is_authenticated and user.is_active and (is_admin(user) or user.has_hue_permission(action="abfs_access", app="filebrowser"))
+
+  return user.is_authenticated and user.is_active and (
+    is_admin(user) or user.has_hue_permission(action="abfs_access", app="filebrowser") or RAZ.IS_ENABLED.get()
+  )
 
 def azure_metadata():
   global AZURE_METADATA
