@@ -75,7 +75,14 @@ class RazClient(object):
     self.raz_url = raz_url.strip('/')
     self.raz_token = raz_token
     self.username = username
-    if service == 's3' or True:  # True until ABFS option
+    self.service = service
+    if self.service == 'adls':
+      self.service_params = {
+        'endpoint_prefix': 'adls',
+        'service_name': 'adls',
+        'serviceType': 'adls'
+      }
+    else:
       self.service_params = {
         'endpoint_prefix': 's3',
         'service_name': 's3',
@@ -139,7 +146,7 @@ class RazClient(object):
     LOG.debug("Sending access check headers: {%s} request_data: {%s}" % (headers, request_data))
     raz_req = requests.post(raz_url, headers=headers, json=request_data, verify=False)
 
-    s3_sign_response = None
+    signed_response_result = None
     signed_response = None
 
     if raz_req.ok:
@@ -156,20 +163,25 @@ class RazClient(object):
 
       if result == "ALLOWED":
         LOG.debug('Received allowed response %s' % raz_req.json())
-        s3_sign_response = raz_req.json()["operResult"]["additionalInfo"]["S3_SIGN_RESPONSE"]
+        signed_response_data = raz_req.json()["operResult"]["additionalInfo"]
+        if self.service == 'adls':
+          LOG.debug("Received SAS %s" % signed_response_data["ADLS_DSAS"])
+          return {'token': signed_response_data["ADLS_DSAS"]}
+        else:
+          signed_response_result = signed_response_data["S3_SIGN_RESPONSE"]
 
-      if s3_sign_response:
-        raz_response_proto = raz_signer.SignResponseProto()
-        signed_response = raz_response_proto.FromString(base64.b64decode(s3_sign_response))
-        LOG.debug("Received signed Response %s" % signed_response)
+          if signed_response_result:
+            raz_response_proto = raz_signer.SignResponseProto()
+            signed_response = raz_response_proto.FromString(base64.b64decode(signed_response_result))
+            LOG.debug("Received signed Response %s" % signed_response)
 
-      # Currently returning signed headers "only"
-      if signed_response:
-        return dict([(i.key, i.value) for i in signed_response.signer_generated_headers])
+          # Signed headers "only"
+          if signed_response:
+            return dict([(i.key, i.value) for i in signed_response.signer_generated_headers])
 
 
 def get_raz_client(raz_url, username, auth='kerberos', service='s3', service_name='cm_s3', cluster_name='myCluster'):
-  if auth == 'kerberos' or True:  # True until ABFS option
+  if auth == 'kerberos' or True:  # True until JWT option
     auth_handler = requests_kerberos.HTTPKerberosAuth(mutual_authentication=requests_kerberos.OPTIONAL)
 
   raz = RazToken(raz_url, auth_handler)
