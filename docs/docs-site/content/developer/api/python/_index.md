@@ -5,12 +5,41 @@ draft: false
 weight: 2
 ---
 
-Here is some overview about using the Python commands an shell and some examples below:
+Leverage the built-in Python shell to interact with the server and the API.
 
-* [Hue API: Execute some builtin or shell commands](http://gethue.com/hue-api-execute-some-builtin-commands/).
-* [How to manage the Hue database with the shell](http://gethue.com/how-to-manage-the-hue-database-with-the-shell/).
+## Storage
 
-## Users
+### S3
+
+Interact directly with S3 by first getting a client:
+
+    from desktop.lib.fsmanager import get_client
+
+    s3fs = get_client('default', 's3a', 'romain')
+
+Then grab a key:
+
+    k = s3fs._get_key('s3a://gethue/')
+    k.exists()
+    s3fs.stats('s3a://gethue/user/gethue/footravel.csv').to_json_dict()
+
+Or perform various FS operations:
+
+    b = s3fs._get_bucket('gethue')
+    list(b.list(prefix='user/gethue/'))
+
+    new_k = b.new_key('user/gethue/data/3')
+    new_k.set_contents_from_string('123')
+
+    # new_k.delete()
+    result = new_k.bucket.delete_keys(new_k)
+
+    k = s3fs._get_key('s3a://gethue/user/gethue')
+
+    s3fs.listdir_stats('s3a://gethue/user/gethue')
+    s3fs.mkdir('s3a://gethue/user/gethue/demo')
+
+## Server
 
 ### Making a user admin
 
