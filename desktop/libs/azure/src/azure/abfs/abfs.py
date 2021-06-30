@@ -195,7 +195,7 @@ class ABFS(object):
 
     if dir_name == '':
       return ABFSStat.for_filesystem(self._statsf(file_system, params, **kwargs), path)
-      
+
     return ABFSStat.for_single(self._stats(file_system + '/' + dir_name, params, **kwargs), path)
 
   def listdir_stats(self, path, params=None, **kwargs):
@@ -334,7 +334,7 @@ class ABFS(object):
     """
     Joins two paths together
     """
-    return Init_ABFS.join(first,*comp_list)
+    return Init_ABFS.join(first, *comp_list)
 
   # Create Files,directories, or File Systems
   # --------------------------------
