@@ -45,6 +45,7 @@ mysqlclient==1.4.6
 nose==1.3.7
 openpyxl==2.6.2
 phoenixdb==1.0.1
+prompt-toolkit==2.0.10
 protobuf==3.17.0
 pyformance==0.3.2
 pylint==2.6.0
@@ -73,3 +74,4 @@ thrift==0.13.0
 thrift-sasl==0.4.2
 git+https://github.com/gethue/django-babel.git
 git+https://github.com/gethue/django-mako.git
+werkzeug==2.0.1  # Should remove it here and from devtools.mk
