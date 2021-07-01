@@ -39,6 +39,14 @@ Or perform various FS operations:
     s3fs.listdir_stats('s3a://gethue/user/gethue')
     s3fs.mkdir('s3a://gethue/user/gethue/demo')
 
+### ADLS
+
+    from desktop.lib.fsmanager import get_client
+
+    fs = get_client('default', 'abfs', 'romain')
+
+    fs.stats('https://gethue.blob.core.windows.net/data')
+
 ## Server
 
 ### Making a user admin
