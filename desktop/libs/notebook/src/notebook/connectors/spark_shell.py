@@ -62,7 +62,7 @@ class SparkApi(Api):
   def get_livy_props(lang, properties=None):
     props = dict([(p['name'], p['value']) for p in SparkConfiguration.PROPERTIES])
     if properties is not None:
-      props.update(dict([(p['name'], p['value']) for p in properties]))
+      props.update(dict([(p['name'], p['value']) for p in properties if 'name' in p.keys() and 'value' in p.keys()]))
 
     # HUE-4761: Hue's session request is causing Livy to fail with "JsonMappingException: Can not deserialize
     # instance of scala.collection.immutable.List out of VALUE_STRING token" due to List type values
