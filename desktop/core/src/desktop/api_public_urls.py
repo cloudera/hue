@@ -75,7 +75,7 @@ urlpatterns += [
 ]
 
 urlpatterns += [
-  re_path(r'^storage/view=(?P<path>.*)$', api_public.view, name='api_storage_view'),
+  re_path(r'^storage/view=(?P<path>.*)$', api_public.storage_view, name='api_storage_view'),
   re_path(r'^storage/download=(?P<path>.*)$', api_public.storage_download, name='api_storage_download'),
 ]
 
