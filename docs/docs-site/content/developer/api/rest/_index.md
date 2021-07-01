@@ -414,16 +414,15 @@ e.g. ?offset=0&length=204800&compression=none&mode=text
 
 ### Download
 
-    curl -X GET http://127.0.0.1:9000/api/storage/download=/user/hue/weblogs.csv
+    curl -X GET https://demo.gethue.com/api/storage/download=/user/hue/weblogs.csv
 
-    curl -X GET http://127.0.0.1:9000/api/storage/download=s3a://demo-hue/web_log_data/index_data.csv
+    curl -X GET https://demo.gethue.com/api/storage/download=s3a://demo-hue/web_log_data/index_data.csv
 
 ### Upload
 
-    POST http://127.0.0.1:9000/filebrowser/upload/file?dest=s3a://demo-hue
+Uploading the local README.md file into HDFS /user/hue:
 
-    hdfs_file: (binary)
-    dest: s3a://demo-hue
+    curl -X POST https://demo.gethue.com/api/storage/upload/file?dest=/user/hue/ --form hdfs_file=@README.md
 
 ## Data Importer
 

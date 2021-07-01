@@ -77,6 +77,7 @@ urlpatterns += [
 urlpatterns += [
   re_path(r'^storage/view=(?P<path>.*)$', api_public.storage_view, name='api_storage_view'),
   re_path(r'^storage/download=(?P<path>.*)$', api_public.storage_download, name='api_storage_download'),
+  re_path(r'^storage/upload/file/?$', api_public.storage_upload_file, name='api_storage_upload_file'),
 ]
 
 # Slack install API for using CORS by default
