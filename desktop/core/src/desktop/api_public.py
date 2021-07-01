@@ -24,6 +24,7 @@ from notebook.conf import get_ordered_interpreters
 
 from desktop import api2 as desktop_api
 from desktop.auth.backend import rewrite_user
+from desktop.lib import fsmanager
 
 
 @api_view(["POST"])
@@ -132,6 +133,11 @@ def view(request, path):
   django_request = get_django_request(request)
   return filebrowser_views.view(django_request, path)
 
+@api_view(["GET"])
+def storage_download(request, path):
+  django_request = get_django_request(request)
+  return filebrowser_views.download(django_request, path)
+
 
 def _get_interpreter_from_dialect(dialect, user):
   if not dialect:
@@ -162,5 +168,12 @@ def get_django_request(request):
   django_request = request._request
 
   django_request.user = rewrite_user(django_request.user)
+
+  # Workaround ClusterMiddleware not being applied
+  if django_request.path.startswith('/api/') and django_request.fs is None:
+    django_request.fs = fsmanager.get_filesystem(django_request.fs_ref)
+
+    if django_request.user.is_authenticated and django_request.fs is not None:
+      django_request.fs.setuser(django_request.user.username)
 
   return django_request

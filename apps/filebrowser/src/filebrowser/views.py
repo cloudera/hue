@@ -216,12 +216,6 @@ def view(request, path):
 
   path = _normalize_path(path)
 
-  if request.path.startswith('/api/') and request.fs is None:
-    request.fs = fsmanager.get_filesystem(request.fs_ref)
-
-    if request.user.is_authenticated and request.fs is not None:
-      request.fs.setuser(request.user.username)
-
   # default_abfs_home is set in jquery.filechooser.js
   if 'default_abfs_home' in request.GET:
     from azure.abfs.__init__ import get_home_dir_for_ABFS
@@ -656,7 +650,7 @@ def stat(request, path):
 
 def content_summary(request, path):
   path = _normalize_path(path)
-  
+
   if not request.fs.exists(path):
     raise Http404(_("File not found: %(path)s") % {'path': escape(path)})
   response = {'status': -1, 'message': '', 'summary': None}
