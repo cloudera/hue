@@ -414,7 +414,9 @@ e.g. ?offset=0&length=204800&compression=none&mode=text
 
 ### Download
 
-    GET http://127.0.0.1:9000/filebrowser/download=s3a://demo-hue/web_log_data/index_data.csv
+    curl -X GET http://127.0.0.1:9000/api/storage/download=/user/hue/weblogs.csv
+
+    curl -X GET http://127.0.0.1:9000/api/storage/download=s3a://demo-hue/web_log_data/index_data.csv
 
 ### Upload
 
