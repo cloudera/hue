@@ -129,7 +129,7 @@ def autocomplete(request, server=None, database=None, table=None, column=None, n
 
 
 @api_view(["GET"])
-def view(request, path):
+def storage_view(request, path):
   django_request = get_django_request(request)
   return filebrowser_views.view(django_request, path)
 
