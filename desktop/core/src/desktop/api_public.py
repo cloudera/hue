@@ -128,6 +128,8 @@ def autocomplete(request, server=None, database=None, table=None, column=None, n
   return notebook_api.autocomplete(django_request, server, database, table, column, nested)
 
 
+# Storage API
+
 @api_view(["GET"])
 def storage_view(request, path):
   django_request = get_django_request(request)
@@ -138,6 +140,13 @@ def storage_download(request, path):
   django_request = get_django_request(request)
   return filebrowser_views.download(django_request, path)
 
+@api_view(["POST"])
+def storage_upload_file(request):
+  django_request = get_django_request(request)
+  return filebrowser_views.upload_file(django_request)
+
+
+# Utils
 
 def _get_interpreter_from_dialect(dialect, user):
   if not dialect:
