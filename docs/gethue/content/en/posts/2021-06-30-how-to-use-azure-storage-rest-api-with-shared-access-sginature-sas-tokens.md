@@ -44,8 +44,6 @@ categories:
 
 ---
 
-Azure Storage sharing: leveraging SAS tokens so that your users don’t need credentials
-
 Example tutorial on how to use the the Azure storage REST API with Shared Access Signatures.
 
 We previously covered a similar methodology for [providing access to S3 data without giving out actual credentials](https://medium.com/data-querying/provide-your-users-proper-s3-file-access-without-giving-them-any-credential-keys-272675631875) via some S3 signed URLs. This time we will explore it on Azure, the Cloud data platform from Microsoft.
@@ -79,15 +77,10 @@ Resource with SAS:
 A bit cryptic at first, here are the meaning of these new parameters:
 
 * sp: the access permission (e.g. READ, WRITE, LIST…)
-
 * st: start time of the link (e.g. 2021–06–30T19:41:46Z)
-
 * se: expiration time of the link (e.g. 2021–07–01T19:41:46Z)
-
 * sv: version of SAS we use (e.g. 2020–02–10)
-
 * sr: the resource type (e.g. “c” for “container”)
-
 * sig: the hash of above and the URI (e.g. NuHOuuzdQN7VRM%2FOpOeqBlawRCA845IY05h9eu1Yte4%3D)
 
 ## Getting the SAS
@@ -98,21 +91,25 @@ Obviously in the real world this would be done via an Authorization Provider lik
 
 Let’s get our two signed URLs:
 
-![Navigating to the resource we want to share](https://cdn-images-1.medium.com/max/2000/1*dd2d-niNu2y1y73H5GKM-g.png)*Navigating to the resource we want to share*
+![Navigating to the resource we want to share](https://cdn-images-1.medium.com/max/2000/1*dd2d-niNu2y1y73H5GKM-g.png)
 
-![And generating a temporary link with the according permissions](https://cdn-images-1.medium.com/max/2000/1*fz3E3vq4GcB-l5j1RHja6Q.png)*And generating a temporary link with the according permissions*
+*Navigating to the resource we want to share*
+
+![And generating a temporary link with the according permissions](https://cdn-images-1.medium.com/max/2000/1*fz3E3vq4GcB-l5j1RHja6Q.png)
+
+*And generating a temporary link with the according permissions*
 
 ### Listing
 
 Here is the URI for listing the test folder:
 
-**https://gethue.blob.core.windows.net/test**?sp=rl&st=2021-06-30T19:41:46Z&se=2021-07-01T19:41:46Z&sv=2020-02-10&sr=c&sig=NuHOuuzdQN7VRM%2FOpOeqBlawRCA845IY05h9eu1Yte4%3D
+    https://gethue.blob.core.windows.net/test?sp=rl&st=2021-06-30T19:41:46Z&se=2021-07-01T19:41:46Z&sv=2020-02-10&sr=c&sig=NuHOuuzdQN7VRM%2FOpOeqBlawRCA845IY05h9eu1Yte4%3D
 
 ### Downloading
 
 Here the URI for accessing the weblogs data file:
 
-**https://gethue.blob.core.windows.net/test/query-hive-weblogs.csv**?sp=rl&st=2021-06-30T19:40:15Z&se=2021-07-01T19:40:15Z&sv=2020-02-10&sr=b&sig=EeNV5VG41mw8TxO2yEEWdAJzNQR5Cl2ZUtWqKEuvasc%3D
+    https://gethue.blob.core.windows.net/test/query-hive-weblogs.csv?sp=rl&st=2021-06-30T19:40:15Z&se=2021-07-01T19:40:15Z&sv=2020-02-10&sr=b&sig=EeNV5VG41mw8TxO2yEEWdAJzNQR5Cl2ZUtWqKEuvasc%3D
 
 ## Making the REST API requests
 
