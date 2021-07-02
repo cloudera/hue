@@ -414,15 +414,22 @@ e.g. ?offset=0&length=204800&compression=none&mode=text
 
 ### Download
 
+Specify a path of the file to download:
+
     curl -X GET https://demo.gethue.com/api/storage/download=/user/hue/weblogs.csv
 
     curl -X GET https://demo.gethue.com/api/storage/download=s3a://demo-hue/web_log_data/index_data.csv
 
+- download: file path from any configured remote file system
+
 ### Upload
 
-Uploading the local README.md file into HDFS /user/hue:
+Upload a local file to a remote destination folder:
 
-    curl -X POST https://demo.gethue.com/api/storage/upload/file?dest=/user/hue/ --form hdfs_file=@README.md
+    curl -X POST https://demo.gethue.com/api/storage/upload/file?dest=s3a://demo-hue/web_log_data/ --form hdfs_file=@README.md
+
+- dest: folder path will be created if it does not exist yet
+- hdfs_file: relative or absolute path to a file. It should be read more like `local_file`, it is not related to HDFS
 
 ## Data Importer
 
