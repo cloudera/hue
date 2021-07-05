@@ -14,33 +14,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import ExecutableProgressBar from './ExecutableProgressBar.vue';
-import QueryHistoryTable from './QueryHistoryTable.vue';
-import AceEditor from './aceEditor/AceEditor.vue';
-import ResultTable from './result/ResultTable.vue';
-import Executor, { ExecutorOptions } from '../execution/executor';
+import 'regenerator-runtime/runtime';
+
+import hueIconsDefined from './HueIcons';
+import queryEditorDefined from './QueryEditor';
+import queryEditorHistoryTableDefined from './QueryEditorHistoryTable';
+import queryEditorExecuteButtonDefined from './QueryEditorExecuteButton';
+import queryEditorLimitInputDefined from './QueryEditorLimitInput';
+import queryEditorResultTableDefined from './QueryEditorResultTable';
+import queryEditorProgressBarDefined from './QueryEditorProgressBar';
+import sqlContextSelectorDefined from './SqlContextSelector';
 import { setBaseUrl, setBearerToken } from 'api/utils';
-import ExecuteButton from 'apps/editor/components/ExecuteButton.vue';
-import ExecuteLimitInput from 'apps/editor/components/ExecuteLimitInput.vue';
-import SqlAssistPanel from 'components/assist/SqlAssistPanel.vue';
-import HueIcons from 'components/icons/HueIcons.vue';
-import SqlContextSelector from 'components/SqlContextSelector.vue';
+import Executor, { ExecutorOptions } from 'apps/editor/execution/executor';
 import { getNamespaces } from 'catalog/contextCatalog';
 import dataCatalog from 'catalog/dataCatalog';
 import { findEditorConnector, refreshConfig } from 'config/hueConfig';
 import { Connector } from 'config/types';
-import { wrap } from 'vue/webComponentWrap';
-import 'utils/json.bigDataParse';
-
-wrap('hue-icons', HueIcons);
-wrap('query-editor', AceEditor);
-wrap('query-editor-execute-button', ExecuteButton);
-wrap('query-editor-history-table', QueryHistoryTable);
-wrap('query-editor-limit-input', ExecuteLimitInput);
-wrap('query-editor-progress-bar', ExecutableProgressBar);
-wrap('query-editor-result-table', ResultTable);
-wrap('sql-assist-panel', SqlAssistPanel);
-wrap('sql-context-selector', SqlContextSelector);
 
 export interface HueComponentConfig {
   baseUrl?: string;
@@ -58,6 +47,19 @@ const clearContextCatalogCache = async (connector: Connector): Promise<void> => 
   await getNamespaces({ connector, clearCache: true });
 };
 
+const isQueryEditorComponentsDefined = async (): Promise<void> => {
+  await Promise.all([
+    hueIconsDefined(),
+    queryEditorDefined(),
+    queryEditorHistoryTableDefined(),
+    queryEditorExecuteButtonDefined(),
+    queryEditorLimitInputDefined(),
+    queryEditorResultTableDefined(),
+    queryEditorProgressBarDefined(),
+    sqlContextSelectorDefined()
+  ]);
+};
+
 export default {
   clearContextCatalogCache,
   configure,
@@ -65,6 +67,7 @@ export default {
   dataCatalog,
   findEditorConnector,
   getNamespaces,
+  isQueryEditorComponentsDefined,
   refreshConfig,
   setBaseUrl,
   setBearerToken
