@@ -26,6 +26,7 @@ import waitForObservable from 'utils/timing/waitForObservable';
 import waitForVariable from 'utils/timing/waitForVariable';
 import getParameter from 'utils/url/getParameter';
 import getSearchParameter from 'utils/url/getSearchParameter';
+import { ASSIST_GET_DATABASE_EVENT, ASSIST_GET_SOURCE_EVENT } from 'ko/components/assist/events';
 
 class OnePageViewModel {
   constructor() {
@@ -443,9 +444,27 @@ class OnePageViewModel {
     };
 
     const openImporter = function (path) {
+      let databasename = '';
+      let interpreter = '';
+      const table = path.substring(path.lastIndexOf(':') + 1, path.lastIndexOf(';'));
       self.loadApp('importer');
+      huePubSub.publish(ASSIST_GET_SOURCE_EVENT, source => {
+        interpreter = source;
+      });
+      huePubSub.publish(ASSIST_GET_DATABASE_EVENT, {
+        connector: { id: interpreter },
+        callback: databaseDef => {
+          databasename = databaseDef.name;
+        }
+      });
       self.getActiveAppViewModel(vm => {
         vm.createWizard.source.path(path);
+        vm.currentStep(2);
+        vm.createWizard.source.interpreter(interpreter);
+        vm.createWizard.destination.name(databasename + '.' + table.substring(0, table.length - 4));
+        window.setTimeout(() => {
+          vm.createWizard.indexFile();
+        }, 500);
       });
     };
 
