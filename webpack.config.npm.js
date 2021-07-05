@@ -93,10 +93,8 @@ const copySourceConfig = {
 const webComponentsConfig = Object.assign({}, defaultConfig, {
   entry: {
     ErDiagram: [`${JS_ROOT}/components/er-diagram/webcomp.ts`],
-    QueryEditorWebComponents: [`${JS_ROOT}/apps/editor/components/QueryEditorWebComponents.ts`],
-    SqlScratchpadWebComponent: [
-      `${JS_ROOT}/apps/editor/components/sqlScratchpad/SqlScratchpadWebComponent.ts`
-    ]
+    QueryEditorWebComponents: [`${JS_ROOT}/webComponents/QueryEditorComponents.ts`],
+    SqlScratchpadWebComponent: [`${JS_ROOT}/webComponents/SqlScratchpad.ts`]
   },
   output: {
     path: `${DIST_DIR}/lib/components`,
@@ -109,11 +107,11 @@ const webComponentsConfig = Object.assign({}, defaultConfig, {
     new CopyWebpackPlugin({
       patterns: [
         {
-          from: `${JS_ROOT}/apps/editor/components/QueryEditorWebComponents.d.ts`,
+          from: `${JS_ROOT}/webComponents/QueryEditorComponents.d.ts`,
           to: `${DIST_DIR}/lib/components`
         },
         {
-          from: `${JS_ROOT}/apps/editor/components/sqlScratchpad/SqlScratchpadWebComponent.d.ts`,
+          from: `${JS_ROOT}/webComponents/SqlScratchpad.d.ts`,
           to: `${DIST_DIR}/lib/components`
         }
       ]

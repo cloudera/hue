@@ -14,10 +14,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-declare const _default: {
-  login(username: string, password: string): Promise<void>;
-  setBaseUrl(baseUrl: string): void;
-  setBearerToken(bearerToken: string): void;
-};
+import 'regenerator-runtime/runtime';
 
-export default _default;
+import SqlContextSelector from 'components/SqlContextSelector.vue';
+import { isDefined, wrap } from 'vue/webComponentWrap';
+
+const NAME = 'sql-context-selector';
+
+wrap(NAME, SqlContextSelector);
+
+const sqlContextSelectorDefined = async (): Promise<void> => await isDefined(NAME);
+
+export default sqlContextSelectorDefined;
