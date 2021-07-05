@@ -29,6 +29,7 @@ import { CancellablePromise } from 'api/cancellablePromise';
 import SubscriptionTracker from 'components/utils/SubscriptionTracker';
 import { Compute, Connector, Namespace } from 'config/types';
 import sqlStatementsParser, { ParsedSqlStatement } from 'parse/sqlStatementsParser';
+import 'utils/json.bigDataParse';
 
 type SessionPropertyValue = string | number | boolean | null | undefined;
 

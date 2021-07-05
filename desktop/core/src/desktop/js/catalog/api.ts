@@ -37,6 +37,7 @@ import { Cluster, Compute, Connector, Namespace } from 'config/types';
 import { hueWindow } from 'types/types';
 import sleep from 'utils/timing/sleep';
 import UUID from 'utils/string/UUID';
+import 'utils/json.bigDataParse';
 
 interface AnalyzeResponse {
   status: number;

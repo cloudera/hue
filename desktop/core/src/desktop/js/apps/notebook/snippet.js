@@ -44,6 +44,7 @@ import {
   REFRESH_STATEMENT_LOCATIONS_EVENT
 } from 'ko/bindings/ace/aceLocationHandler';
 import UUID from 'utils/string/UUID';
+import 'utils/json.bigDataParse';
 
 const NOTEBOOK_MAPPING = {
   ignore: [
