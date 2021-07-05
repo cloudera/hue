@@ -97,7 +97,7 @@
       }, 5);
 
       const updateFromExecutable = (executable: Executable): void => {
-        if (props.executable.id !== executable.id) {
+        if (!props.executable || props.executable.id !== executable.id) {
           return;
         }
         debouncedUpdate.cancel();

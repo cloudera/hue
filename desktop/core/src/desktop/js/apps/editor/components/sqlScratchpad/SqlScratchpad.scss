@@ -47,8 +47,10 @@
       }
     }
 
+    .sql-scratchpad-logs,
     .sql-scratchpad-result {
       @include flex(0 1 50%);
+      position: relative;
       overflow: hidden;
 
       h1 {
