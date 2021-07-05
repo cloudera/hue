@@ -14,7 +14,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { wrap } from 'vue/webComponentWrap';
-import HueIcons from './HueIcons.vue';
+import 'regenerator-runtime/runtime';
 
-wrap('hue-icons-web-component', HueIcons);
+import HueIcons from 'components/icons/HueIcons.vue';
+import { isDefined, wrap } from 'vue/webComponentWrap';
+
+const NAME = 'hue-icons';
+
+wrap(NAME, HueIcons);
+
+const hueIconsDefined = async (): Promise<void> => await isDefined(NAME);
+
+export default hueIconsDefined;

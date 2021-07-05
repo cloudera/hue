@@ -15,8 +15,7 @@
 // limitations under the License.
 
 import { ConnectorNamespaces, GetOptions } from 'catalog/contextCatalog';
-import { findEditorConnector } from 'config/hueConfig';
-import { EditorInterpreter, HueConfig } from 'config/types';
+import { Connector, EditorInterpreter, HueConfig } from 'config/types';
 import Executor, { ExecutorOptions } from 'apps/editor/execution/executor';
 import { DataCatalog } from 'catalog/dataCatalog';
 
@@ -25,16 +24,18 @@ export interface HueComponentConfig {
 }
 
 declare const _default: {
+  clearContextCatalogCache(connector: Connector): Promise<void>;
   configure(config: HueComponentConfig): void;
-  setBaseUrl(baseUrl: string): void;
-  setBearerToken(bearerToken: string): void;
   createExecutor(options: ExecutorOptions): Executor;
   dataCatalog: DataCatalog;
   findEditorConnector(
     connectorTest: (connector: EditorInterpreter) => boolean
   ): EditorInterpreter | undefined;
   getNamespaces(options: GetOptions): Promise<ConnectorNamespaces>;
+  isQueryEditorComponentsDefined(): Promise<void>;
   refreshConfig(hueBaseUrl?: string): Promise<HueConfig>;
+  setBaseUrl(baseUrl: string): void;
+  setBearerToken(bearerToken: string): void;
 };
 
 export default _default;
