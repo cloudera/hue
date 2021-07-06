@@ -6,7 +6,11 @@ exports[`ExecuteButton.vue should render 1`] = `
 >
   
   <hue-button-stub
+    alert="false"
+    borderless="false"
     disabled="true"
+    large="false"
+    primary="false"
     small="true"
     title="Creating session"
   />
@@ -24,7 +28,10 @@ exports[`ExecuteButton.vue should show execute once the session is loaded 1`] = 
   
   <!--v-if-->
   <hue-button-stub
+    alert="false"
+    borderless="false"
     disabled="false"
+    large="false"
     primary="true"
     small="true"
   />

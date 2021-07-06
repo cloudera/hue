@@ -14,7 +14,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { wrap } from 'vue/webComponentWrap';
-import HueIcons from './HueIcons.vue';
+import 'regenerator-runtime/runtime';
 
-wrap('hue-icons-web-component', HueIcons);
+import ExecutionAnalysisPanel from 'apps/editor/components/executionAnalysis/ExecutionAnalysisPanel.vue';
+import { isDefined, wrap } from 'vue/webComponentWrap';
+
+const NAME = 'execution-analysis';
+
+wrap(NAME, ExecutionAnalysisPanel);
+
+const executionAnalysisDefined = async (): Promise<void> => await isDefined(NAME);
+
+export default executionAnalysisDefined;

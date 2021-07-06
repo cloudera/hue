@@ -92,11 +92,12 @@ exports[`AceEditor.vue should render 1`] = `
     </div>
   </div>
   <ace-autocomplete-stub
-    autocomplete-parser="[object Object]"
+    autocompleteparser="[object Object]"
     editor="[object Object]"
-    editor-id="some-id"
+    editorid="some-id"
     executor="[object Object]"
-    sql-reference-provider="[object Object]"
+    sqlreferenceprovider="[object Object]"
+    temporaryonly="false"
   />
 </div>
 `;

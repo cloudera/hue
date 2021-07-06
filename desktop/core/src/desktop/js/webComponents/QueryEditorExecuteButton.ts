@@ -15,19 +15,14 @@
 // limitations under the License.
 
 import 'regenerator-runtime/runtime';
-import SqlScratchpad from './SqlScratchpad.vue';
-import { wrap } from 'vue/webComponentWrap';
-import { post, setBaseUrl, setBearerToken } from 'api/utils';
-import 'utils/json.bigDataParse';
 
-wrap('sql-scratchpad', SqlScratchpad);
+import ExecuteButton from 'apps/editor/components/ExecuteButton.vue';
+import { isDefined, wrap } from 'vue/webComponentWrap';
 
-// Dup of auth.ts?
-const login = async (username: string, password: string): Promise<void> =>
-  post('iam/v1/get/auth-token/', { username, password });
+const NAME = 'query-editor-execute-button';
 
-export default {
-  login,
-  setBaseUrl,
-  setBearerToken
-};
+wrap(NAME, ExecuteButton);
+
+const queryEditorDefined = async (): Promise<void> => await isDefined(NAME);
+
+export default queryEditorDefined;
