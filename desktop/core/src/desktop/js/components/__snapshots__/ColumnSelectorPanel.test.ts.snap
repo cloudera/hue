@@ -21,6 +21,12 @@ exports[`ColumnSelectorPanel.vue should render 1`] = `
     class="column-selector-actions"
   >
     <hue-button-stub
+      alert="false"
+      borderless="false"
+      disabled="false"
+      large="false"
+      primary="false"
+      small="false"
       type="button"
     />
   </div>
@@ -64,6 +70,12 @@ exports[`ColumnSelectorPanel.vue should render with checkboxes 1`] = `
     class="column-selector-actions"
   >
     <hue-button-stub
+      alert="false"
+      borderless="false"
+      disabled="false"
+      large="false"
+      primary="false"
+      small="false"
       type="button"
     />
   </div>
