@@ -167,14 +167,16 @@ def _get_interpreter_from_dialect(dialect, user):
 
 
 def _patch_operation_id_request(django_request):
-  if django_request.POST.get('operationId') and not django_request.POST.get('snippet'):
-    data = {
-      'snippet': '{"type":"1","result":{}}',
-      'operationId': django_request.POST.get('operationId')
-    }
+  data = {}
 
-    django_request.POST = QueryDict(mutable=True)
-    django_request.POST.update(data)
+  if not django_request.POST.get('snippet'):
+    data['snippet'] = '{"type":"mysql","result":{}}'
+
+  if django_request.POST.get('operationId'):
+    data['operationId'] = django_request.POST.get('operationId')
+
+  django_request.POST = QueryDict(mutable=True)
+  django_request.POST.update(data)
 
 
 def get_django_request(request):
