@@ -137,7 +137,7 @@ def dt_login(request, from_modal=False):
     first_user = first_user_form and first_user_form.is_valid()
 
     if first_user or not is_first_login_ever:
-      auth_form = AuthenticationForm(data=request.POST)
+      auth_form = AuthenticationForm(request=request, data=request.POST)
 
       if auth_form.is_valid():
         # Must login by using the AuthenticationForm. It provides 'backend' on the User object.
