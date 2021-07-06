@@ -95,3 +95,8 @@ urlpatterns += [
 urlpatterns += [
   re_path(r'^slack/install/?$', botserver_api.generate_slack_install_link, name='botserver.api.slack_install_link'),
 ]
+
+urlpatterns += [
+  re_path(r'^indexer/guess_format/?$', api_public.guess_format, name='indexer_guess_format'),
+  re_path(r'^indexer/guess_field_types/?$', api_public.guess_field_types, name='indexer_guess_field_types'),
+]
