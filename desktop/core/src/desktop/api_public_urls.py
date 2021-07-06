@@ -51,6 +51,10 @@ urlpatterns += [
   re_path(r'^editor/close_statement/?$', api_public.close_statement, name='api_close_statement'),
   re_path(r'^editor/get_logs/?$', api_public.get_logs, name='api_get_logs'),
 
+  re_path(r'^editor/describe/(?P<database>[^/]*)/?$', api_public.describe, name='api_describe_database'),
+  re_path(r'^editor/describe/(?P<database>[^/]*)/(?P<table>[\w_\-]+)/?$', api_public.describe, name='api_describe_table'),
+  re_path(r'^editor/describe/(?P<database>[^/]*)/(?P<table>\w+)/stats(?:/(?P<column>\w+))?/?$', api_public.describe, name='api_describe_column'),
+
   re_path(r'^editor/autocomplete/?$', api_public.autocomplete, name='api_autocomplete_databases'),
   re_path(
       r"^editor/autocomplete/(?P<database>[^/?]*)/?$",
