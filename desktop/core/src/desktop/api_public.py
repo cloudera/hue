@@ -127,6 +127,10 @@ def autocomplete(request, server=None, database=None, table=None, column=None, n
   django_request = get_django_request(request)
   return notebook_api.autocomplete(django_request, server, database, table, column, nested)
 
+@api_view(["POST"])
+def describe(request, database, table=None, column=None):
+  django_request = get_django_request(request)
+  return notebook_api.describe(django_request, database, table, column)
 
 # Storage API
 
