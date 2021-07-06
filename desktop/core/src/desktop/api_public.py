@@ -123,6 +123,20 @@ def get_logs(request):
 
 
 @api_view(["POST"])
+def get_sample_data(request, server=None, database=None, table=None, column=None):
+  django_request = get_django_request(request)
+
+  data = {
+    'snippet': '{"type":"mysql","result":{}}',
+  }
+
+  django_request.POST = QueryDict(mutable=True)
+  django_request.POST.update(data)
+
+  return notebook_api.get_sample_data(django_request, server, database, table, column)
+
+
+@api_view(["POST"])
 def autocomplete(request, server=None, database=None, table=None, column=None, nested=None):
   django_request = get_django_request(request)
 

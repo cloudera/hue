@@ -76,6 +76,14 @@ urlpatterns += [
       api_public.autocomplete,
       name="editor_autocomplete_nested",
   ),
+
+  # HS2, RDBMS, JDBC
+  re_path(r'^editor/sample/(?P<database>[^/?]*)/(?P<table>[\w_\-]+)/?$', api_public.get_sample_data, name='api_sample_data'),
+  re_path(
+    r'^editor/sample/(?P<database>[^/?]*)/(?P<table>[\w_\-]+)/(?P<column>\w+)/?$',
+    api_public.get_sample_data,
+    name='api_sample_data_column'
+  ),
 ]
 
 urlpatterns += [
