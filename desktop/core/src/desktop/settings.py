@@ -424,6 +424,7 @@ else:
 DATABASES = {
   'default': default_db
 }
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 if desktop.conf.QUERY_DATABASE.HOST.get():
   DATABASES['query'] = {
