@@ -1194,7 +1194,7 @@ class Document2(models.Model):
       db_index=True,
       verbose_name=_t('If managed under the cover by Hue and never by the user')
   )
-  is_trashed = models.NullBooleanField(default=False, db_index=True, verbose_name=_t('True if trashed'))
+  is_trashed = models.BooleanField(null=True, default=False, db_index=True, verbose_name=_t('True if trashed'))
 
   dependencies = models.ManyToManyField('self', symmetrical=False, related_name='dependents', db_index=True)
 
