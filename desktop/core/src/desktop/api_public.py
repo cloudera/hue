@@ -126,12 +126,7 @@ def get_logs(request):
 def get_sample_data(request, server=None, database=None, table=None, column=None):
   django_request = get_django_request(request)
 
-  data = {
-    'snippet': '{"type":"mysql","result":{}}',
-  }
-
-  django_request.POST = QueryDict(mutable=True)
-  django_request.POST.update(data)
+  _patch_operation_id_request(django_request)
 
   return notebook_api.get_sample_data(django_request, server, database, table, column)
 
