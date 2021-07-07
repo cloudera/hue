@@ -172,10 +172,7 @@ def _patch_operation_id_request(django_request):
   if not django_request.POST.get('snippet'):
     data['snippet'] = '{"type":"mysql","result":{}}'
 
-  if django_request.POST.get('operationId'):
-    data['operationId'] = django_request.POST.get('operationId')
-
-  django_request.POST = QueryDict(mutable=True)
+  django_request.POST = django_request.POST.copy() # Makes it mutable along with copying the object
   django_request.POST.update(data)
 
 
