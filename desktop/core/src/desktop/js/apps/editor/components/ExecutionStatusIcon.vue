@@ -25,7 +25,7 @@
 <script lang="ts">
   import { defineComponent, PropType, toRefs, computed } from 'vue';
 
-  import { ExecutionStatus } from '../execution/executable';
+  import { ExecutionStatus } from '../execution/sqlExecutable';
   import I18n from 'utils/i18n';
 
   interface StatusSpec {

@@ -78,7 +78,6 @@
     ExecutableLogsUpdatedEvent,
     ExecutableTransitionedEvent
   } from '../../execution/events';
-  import { ExecutionStatus } from '../../execution/executable';
   import ExecutionLogs from '../../execution/executionLogs';
   import AceEditor from '../aceEditor/AceEditor.vue';
   import { ActiveStatementChangedEventDetails } from '../aceEditor/types';
@@ -88,7 +87,7 @@
   import ExecutionAnalysisPanel from '../executionAnalysis/ExecutionAnalysisPanel.vue';
   import ResultTable from '../result/ResultTable.vue';
   import Executor from '../../execution/executor';
-  import SqlExecutable from '../../execution/sqlExecutable';
+  import SqlExecutable, { ExecutionStatus } from '../../execution/sqlExecutable';
   import { login } from 'api/auth';
   import { setBaseUrl } from 'api/utils';
   import contextCatalog from 'catalog/contextCatalog';

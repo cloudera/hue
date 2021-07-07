@@ -60,7 +60,7 @@
     ExecutableResultUpdatedEvent,
     ExecutableUpdatedEvent
   } from 'apps/editor/execution/events';
-  import Executable, { ExecutionStatus } from 'apps/editor/execution/executable';
+  import SqlExecutable, { ExecutionStatus } from 'apps/editor/execution/sqlExecutable';
   import ExecutionResult, { ResultRow, ResultType } from 'apps/editor/execution/executionResult';
   import { Column } from 'components/HueTable';
   import HueTable from 'components/HueTable.vue';
@@ -75,7 +75,7 @@
     },
     props: {
       executable: {
-        type: Object as PropType<Executable | undefined>,
+        type: Object as PropType<SqlExecutable | undefined>,
         default: undefined
       }
     },
@@ -136,7 +136,7 @@
         columns.value = [];
       };
 
-      const updateFromExecutable = (executable: Executable): void => {
+      const updateFromExecutable = (executable: SqlExecutable): void => {
         status.value = executable.status;
         hasResultSet.value = !!(executable.handle && executable.handle.has_result_set);
         if (!hasResultSet.value) {

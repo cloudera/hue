@@ -91,7 +91,7 @@
   import ExecutionStatusIcon from './ExecutionStatusIcon.vue';
   import './QueryHistoryTable.scss';
   import { fetchHistory, FetchHistoryResponse } from '../api';
-  import { ExecutionStatus } from '../execution/executable';
+  import { ExecutionStatus } from '../execution/sqlExecutable';
   import { CancellablePromise } from 'api/cancellablePromise';
   import {
     EXECUTABLE_TRANSITIONED_TOPIC,
