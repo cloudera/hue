@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import Executable from '../execution/executable';
+import SqlExecutable from '../execution/sqlExecutable';
 
 export const EXECUTE_ACTIVE_EXECUTABLE_TOPIC = 'execute.active.executable';
-export type ExecuteActiveExecutableEvent = Executable;
+export type ExecuteActiveExecutableEvent = SqlExecutable;

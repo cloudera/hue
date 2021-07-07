@@ -20,7 +20,7 @@ import {
   ExecutableLogsUpdatedEvent
 } from 'apps/editor/execution/events';
 import huePubSub from 'utils/huePubSub';
-import Executable, { ExecutionStatus } from './executable';
+import SqlExecutable, { ExecutionStatus } from './sqlExecutable';
 
 export interface ExecutionError {
   row: number;
@@ -34,13 +34,13 @@ export interface ExecutionLogsRaw {
 }
 
 export default class ExecutionLogs {
-  executable: Executable;
+  executable: SqlExecutable;
   fullLog = '';
   logLines = 0;
   jobs: ExecutionJob[] = [];
   errors: ExecutionError[] = [];
 
-  constructor(executable: Executable) {
+  constructor(executable: SqlExecutable) {
     this.executable = executable;
   }
 
