@@ -15,6 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
+
 from django.http import QueryDict
 from rest_framework.decorators import api_view
 
@@ -26,6 +28,9 @@ from notebook.conf import get_ordered_interpreters
 from desktop import api2 as desktop_api
 from desktop.auth.backend import rewrite_user
 from desktop.lib import fsmanager
+
+
+LOG = logging.getLogger(__name__)
 
 
 @api_view(["POST"])
@@ -60,15 +65,18 @@ def execute(request, dialect=None):
 
   if not request.POST.get('notebook'):
     interpreter = _get_interpreter_from_dialect(dialect=dialect, user=django_request.user)
+    LOG.debug("API using interpreter: %(name)s %(dialect)s %(type)s" % interpreter)
+
     params = {
       'statement': django_request.POST.get('statement'),
       'interpreter': '%(type)s' % interpreter,
-      'interpreter_id': '%(type)s' if interpreter['type'].isdigit() else '"%(type)s"' % interpreter,  # When connector off, we expect a string
+      'interpreter_id': ('%(type)s' if interpreter['type'].isdigit() else '"%(type)s"') % interpreter,  # If connectors off, we expect a string
       'dialect': '%(dialect)s' % interpreter
     }
 
     data = {
-      'notebook': '{"type":"query-%(interpreter)s","snippets":[{"id":%(interpreter_id)s,"statement_raw":"","type":"%(interpreter)s","status":"","variables":[]}],'
+      'notebook': '{"type":"query-%(interpreter)s","snippets":[{"id":%(interpreter_id)s,"statement_raw":"",'
+        '"type":"%(interpreter)s","status":"","variables":[]}],'
         '"name":"","isSaved":false,"sessions":[]}' % params,
       'snippet': '{"id":%(interpreter_id)s,"type":"%(interpreter)s","result":{},"statement":"%(statement)s","properties":{}}' % params
     }
