@@ -19,7 +19,7 @@ import sys
 
 from django.urls import reverse
 
-from desktop import api_public
+from desktop.api_public import *
 from notebook.models import make_notebook
 
 if sys.version_info[0] > 2:
@@ -47,7 +47,7 @@ class FlinkIndexer():
 
     source_type = source['sourceType']
 
-    interpreter = api_public._get_interpreter_from_dialect('flink', self.user)
+    interpreter = _get_interpreter_from_dialect('flink', self.user)
     editor_type = interpreter['type']  # destination['sourceType']
 
     columns = destination['columns']
