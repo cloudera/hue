@@ -32,7 +32,7 @@ import {
   SHOW_NORMAL_RESULT_EVENT
 } from 'apps/editor/events';
 import { trackResult } from 'apps/editor/components/executableStateHandler';
-import { ExecutionStatus } from 'apps/editor/execution/executable';
+import { ExecutionStatus } from 'apps/editor/execution/sqlExecutable';
 
 export const SIMPLE_RESULT_GRID_COMPONENT = 'simple-result-grid';
 

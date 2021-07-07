@@ -15,11 +15,10 @@
 // limitations under the License.
 
 import { EXECUTABLE_UPDATED_TOPIC, ExecutableUpdatedEvent } from 'apps/editor/execution/events';
-import SqlExecutable from 'apps/editor/execution/sqlExecutable';
 import huePubSub from 'utils/huePubSub';
 import { nextTick } from 'vue';
 import { mount, shallowMount } from '@vue/test-utils';
-import Executable, { ExecutionStatus } from 'apps/editor/execution/executable';
+import SqlExecutable, { ExecutionStatus } from 'apps/editor/execution/sqlExecutable';
 import sessionManager from 'apps/editor/execution/sessionManager';
 import ExecuteButton from './ExecuteButton.vue';
 import noop from 'utils/timing/noop';
@@ -115,7 +114,7 @@ describe('ExecuteButton.vue', () => {
     mockExecutable.status = ExecutionStatus.running;
     huePubSub.publish<ExecutableUpdatedEvent>(
       EXECUTABLE_UPDATED_TOPIC,
-      mockExecutable as Executable
+      mockExecutable as SqlExecutable
     );
 
     await nextTick();

@@ -14,13 +14,69 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import dataCatalog from 'catalog/dataCatalog';
-import { ExecuteApiResponse, executeStatement } from 'apps/editor/execution/api';
-import Executable, { ExecutableRaw } from 'apps/editor/execution/executable';
-import { ExecutionError } from 'apps/editor/execution/executionLogs';
-import Executor from 'apps/editor/execution/executor';
-import { ParsedSqlStatement } from 'parse/sqlStatementsParser';
 import { VariableIndex } from '../components/variableSubstitution/types';
+import { Cancellable } from 'api/cancellablePromise';
+import {
+  checkExecutionStatus,
+  closeStatement,
+  ExecuteApiResponse,
+  executeStatement,
+  ExecutionHandle,
+  ExecutionHistory
+} from 'apps/editor/execution/api';
+import {
+  EXECUTABLE_TRANSITIONED_TOPIC,
+  EXECUTABLE_UPDATED_TOPIC,
+  ExecutableTransitionedEvent,
+  ExecutableUpdatedEvent
+} from 'apps/editor/execution/events';
+import ExecutionResult from 'apps/editor/execution/executionResult';
+import ExecutionLogs, {
+  ExecutionError,
+  ExecutionLogsRaw
+} from 'apps/editor/execution/executionLogs';
+import Executor from 'apps/editor/execution/executor';
+import sessionManager from 'apps/editor/execution/sessionManager';
+import dataCatalog from 'catalog/dataCatalog';
+import { ParsedSqlStatement } from 'parse/sqlStatementsParser';
+import { hueWindow } from 'types/types';
+import hueAnalytics from 'utils/hueAnalytics';
+import huePubSub from 'utils/huePubSub';
+import UUID from 'utils/string/UUID';
+
+export enum ExecutionStatus {
+  available = 'available',
+  failed = 'failed',
+  success = 'success',
+  expired = 'expired',
+  running = 'running',
+  starting = 'starting',
+  waiting = 'waiting',
+  ready = 'ready',
+  streaming = 'streaming',
+  canceled = 'canceled',
+  canceling = 'canceling',
+  closed = 'closed'
+}
+
+export interface ExecutableRaw {
+  executeEnded: number;
+  executeStarted: number;
+  handle?: ExecutionHandle;
+  history?: ExecutionHistory;
+  id: string;
+  logs: ExecutionLogsRaw;
+  lost: boolean;
+  observerState: { [key: string]: unknown };
+  progress: number;
+  status: ExecutionStatus;
+  type: string;
+}
+
+export interface SqlExecutableRaw extends ExecutableRaw {
+  database: string;
+  parsedStatement: ParsedSqlStatement;
+}
 
 const BATCHABLE_STATEMENT_TYPES =
   /ALTER|ANALYZE|WITH|REFRESH|CREATE|DELETE|DROP|GRANT|INSERT|INVALIDATE|LOAD|SET|TRUNCATE|UPDATE|UPSERT|USE/i;
@@ -30,11 +86,6 @@ const TABLE_DDL_REGEX =
   /(?:CREATE|DROP)\s+(?:TABLE|VIEW)\s+(?:IF\s+(?:NOT\s+)?EXISTS\s+)?(?:`([^`]+)`|([^;\s]+))\..*/i;
 const DB_DDL_REGEX =
   /(?:CREATE|DROP)\s+(?:DATABASE|SCHEMA)\s+(?:IF\s+(?:NOT\s+)?EXISTS\s+)?(?:`([^`]+)`|([^;\s]+))/i;
-
-export interface SqlExecutableRaw extends ExecutableRaw {
-  database: string;
-  parsedStatement: ParsedSqlStatement;
-}
 
 const substituteVariables = (statement: string, variables: VariableIndex): string => {
   if (!Object.keys(variables).length) {
@@ -57,8 +108,26 @@ const substituteVariables = (statement: string, variables: VariableIndex): strin
   );
 };
 
-export default class SqlExecutable extends Executable {
+export default class SqlExecutable {
+  id: string = UUID();
   database: string;
+  executor: Executor;
+  handle?: ExecutionHandle;
+  operationId?: string;
+  history?: ExecutionHistory;
+  status = ExecutionStatus.ready;
+  progress = 0;
+  result?: ExecutionResult;
+  logs: ExecutionLogs;
+  cancellables: Cancellable[] = [];
+  notifyThrottle = -1;
+  executeStarted = 0;
+  executeEnded = 0;
+  previousExecutable?: SqlExecutable;
+  nextExecutable?: SqlExecutable;
+  observerState: { [key: string]: unknown } = {};
+  lost = false;
+  edited = false;
   parsedStatement: ParsedSqlStatement;
 
   constructor(options: {
@@ -66,41 +135,263 @@ export default class SqlExecutable extends Executable {
     database: string;
     parsedStatement: ParsedSqlStatement;
   }) {
-    super(options);
+    this.logs = new ExecutionLogs(this);
+    this.executor = options.executor;
     this.database = options.database;
     this.parsedStatement = options.parsedStatement;
   }
 
-  getRawStatement(): string {
-    return this.parsedStatement.statement;
+  getLogs(): ExecutionLogs | undefined {
+    return this.logs;
   }
 
-  getStatement(): string {
-    let statement = this.getRawStatement();
+  getResult(): ExecutionResult | undefined {
+    return this.result;
+  }
 
-    if (
-      this.parsedStatement.firstToken &&
-      this.parsedStatement.firstToken.toLowerCase() === 'select' &&
-      this.executor.defaultLimit &&
-      !isNaN(this.executor.defaultLimit()) &&
-      this.executor.defaultLimit() > 0 &&
-      /\sfrom\s/i.test(statement) &&
-      !/\slimit\s[0-9]/i.test(statement)
-    ) {
-      const endMatch = statement.match(SELECT_END_REGEX);
-      if (endMatch) {
-        statement = endMatch[1] + ' LIMIT ' + this.executor.defaultLimit();
-        if (endMatch[2]) {
-          statement += endMatch[2];
-        }
+  setStatus(status: ExecutionStatus): void {
+    const oldStatus = this.status;
+    this.status = status;
+    if (oldStatus !== status) {
+      huePubSub.publish<ExecutableTransitionedEvent>(EXECUTABLE_TRANSITIONED_TOPIC, {
+        executable: this,
+        oldStatus: oldStatus,
+        newStatus: status
+      });
+    }
+    this.notify();
+  }
+
+  setProgress(progress: number): void {
+    this.progress = progress;
+    this.notify();
+  }
+
+  getExecutionStatus(): ExecutionStatus {
+    return this.status;
+  }
+
+  getExecutionTime(): number {
+    return (this.executeEnded || Date.now()) - this.executeStarted;
+  }
+
+  notify(sync?: boolean): void {
+    window.clearTimeout(this.notifyThrottle);
+    if (sync) {
+      huePubSub.publish<ExecutableUpdatedEvent>(EXECUTABLE_UPDATED_TOPIC, this);
+    } else {
+      this.notifyThrottle = window.setTimeout(() => {
+        huePubSub.publish<ExecutableUpdatedEvent>(EXECUTABLE_UPDATED_TOPIC, this);
+      }, 1);
+    }
+  }
+
+  isReady(): boolean {
+    return (
+      this.status === ExecutionStatus.ready ||
+      this.status === ExecutionStatus.closed ||
+      this.status === ExecutionStatus.canceled
+    );
+  }
+
+  isRunning(): boolean {
+    return this.status === ExecutionStatus.running || this.status === ExecutionStatus.streaming;
+  }
+
+  isSuccess(): boolean {
+    return this.status === ExecutionStatus.success || this.status === ExecutionStatus.available;
+  }
+
+  isFailed(): boolean {
+    return this.status === ExecutionStatus.failed;
+  }
+
+  isPartOfRunningExecution(): boolean {
+    return (
+      !this.isReady() ||
+      (!!this.previousExecutable && this.previousExecutable.isPartOfRunningExecution())
+    );
+  }
+
+  async cancelBatchChain(wait?: boolean): Promise<void> {
+    if (this.previousExecutable) {
+      this.previousExecutable.nextExecutable = undefined;
+      const cancelPromise = this.previousExecutable.cancelBatchChain(wait);
+      if (wait) {
+        await cancelPromise;
+      }
+      this.previousExecutable = undefined;
+    }
+
+    if (!this.isReady()) {
+      if (wait) {
+        await this.cancel();
+      } else {
+        this.cancel();
       }
     }
 
-    if (this.executor.variables) {
-      statement = substituteVariables(statement, this.executor.variables);
+    if (this.nextExecutable) {
+      this.nextExecutable.previousExecutable = undefined;
+      const cancelPromise = this.nextExecutable.cancelBatchChain(wait);
+      if (wait) {
+        await cancelPromise;
+      }
+      this.nextExecutable = undefined;
+    }
+    this.notify();
+  }
+
+  async execute(): Promise<void> {
+    if (!this.isReady()) {
+      return;
+    }
+    this.edited = false;
+    this.executeStarted = Date.now();
+
+    this.setStatus(ExecutionStatus.running);
+    this.setProgress(0);
+    this.notify(true);
+
+    try {
+      hueAnalytics.log(
+        'notebook',
+        'execute/' + (this.executor.connector() ? this.executor.connector().dialect : '')
+      );
+      try {
+        const response = await this.internalExecute();
+        this.handle = response.handle;
+        this.history = response.history;
+        if (response.history) {
+          this.operationId = response.history.uuid;
+        }
+        if (
+          response.handle.session_id &&
+          response.handle.session_type &&
+          response.handle.session_guid
+        ) {
+          sessionManager.updateSession({
+            type: response.handle.session_type,
+            id: response.handle.session_id,
+            session_id: response.handle.session_guid,
+            properties: []
+          });
+        }
+      } catch (err) {
+        if (err && (err.message || typeof err === 'string')) {
+          const adapted = this.adaptError((err.message && err.message) || err);
+          this.logs.errors.push(adapted);
+          this.logs.notify();
+        }
+        throw err;
+      }
+
+      if (this.handle && this.handle.has_result_set && this.handle.sync) {
+        this.result = new ExecutionResult(this);
+        if (this.handle.sync) {
+          if (this.handle.result) {
+            this.result.handleResultResponse(this.handle.result);
+          }
+          this.result.fetchRows();
+        }
+      }
+
+      if (this.executor.isSqlAnalyzerEnabled && this.history) {
+        huePubSub.publish('editor.upload.query', this.history.id);
+      }
+
+      this.checkStatus();
+      this.logs.fetchLogs();
+    } catch (err) {
+      console.warn(err);
+      this.setStatus(ExecutionStatus.failed);
+    }
+  }
+
+  async checkStatus(statusCheckCount?: number): Promise<void> {
+    if (!this.handle) {
+      return;
     }
 
-    return statement;
+    let checkStatusTimeout = -1;
+
+    let actualCheckCount = statusCheckCount || 0;
+    if (!statusCheckCount) {
+      this.addCancellable({
+        cancel: () => {
+          window.clearTimeout(checkStatusTimeout);
+        }
+      });
+    }
+    actualCheckCount++;
+
+    const queryStatus = await checkExecutionStatus({ executable: this });
+
+    switch (queryStatus.status) {
+      case ExecutionStatus.success:
+        this.executeEnded = Date.now();
+        this.setStatus(queryStatus.status);
+        this.setProgress(99); // TODO: why 99 here (from old code)?
+        break;
+      case ExecutionStatus.available:
+        this.executeEnded = Date.now();
+        this.setStatus(queryStatus.status);
+        this.setProgress(100);
+        if (!this.result && this.handle && this.handle.has_result_set) {
+          this.result = new ExecutionResult(this);
+          this.result.fetchRows();
+        }
+        if (this.nextExecutable) {
+          if (!this.nextExecutable.isReady()) {
+            await this.nextExecutable.reset();
+          }
+          this.nextExecutable.execute();
+        }
+        break;
+      case ExecutionStatus.canceled:
+      case ExecutionStatus.expired:
+        this.executeEnded = Date.now();
+        this.setStatus(queryStatus.status);
+        break;
+      case ExecutionStatus.streaming:
+        if (!queryStatus.result) {
+          return;
+        }
+        if ((<hueWindow>window).WEB_SOCKETS_ENABLED) {
+          huePubSub.publish('editor.ws.query.fetch_result', queryStatus.result);
+        } else {
+          if (!this.result) {
+            this.result = new ExecutionResult(this, true);
+          }
+          this.result.handleResultResponse(queryStatus.result);
+        }
+      case ExecutionStatus.running:
+      case ExecutionStatus.starting:
+      case ExecutionStatus.waiting:
+        this.setStatus(queryStatus.status);
+        checkStatusTimeout = window.setTimeout(
+          () => {
+            this.checkStatus(statusCheckCount);
+          },
+          actualCheckCount > 45 ? 5000 : 1000
+        );
+        break;
+      case ExecutionStatus.failed:
+        this.executeEnded = Date.now();
+        this.setStatus(queryStatus.status);
+        if (queryStatus.message) {
+          huePubSub.publish('hue.error', queryStatus.message);
+        }
+        break;
+      default:
+        this.executeEnded = Date.now();
+        this.setStatus(ExecutionStatus.failed);
+        console.warn('Got unknown status ' + queryStatus.status);
+    }
+  }
+
+  addCancellable(cancellable: Cancellable): void {
+    this.cancellables.push(cancellable);
   }
 
   async internalExecute(): Promise<ExecuteApiResponse> {
@@ -139,12 +430,97 @@ export default class SqlExecutable extends Executable {
     });
   }
 
-  getKey(): string {
-    return this.database + '_' + this.parsedStatement.statement;
+  adaptError(message: string): ExecutionError {
+    const match = ERROR_REGEX.exec(message);
+    if (match) {
+      const row = parseInt(match[1]);
+      const column = (match[3] && parseInt(match[3])) || 0;
+
+      return { message, column: column || 0, row };
+    }
+    return { message, column: 0, row: this.parsedStatement.location.first_line };
   }
 
   canExecuteInBatch(): boolean {
     return this.parsedStatement && BATCHABLE_STATEMENT_TYPES.test(this.parsedStatement.firstToken);
+  }
+
+  getKey(): string {
+    return this.database + '_' + this.parsedStatement.statement;
+  }
+
+  getRawStatement(): string {
+    return this.parsedStatement.statement;
+  }
+
+  getStatement(): string {
+    let statement = this.getRawStatement();
+
+    if (
+      this.parsedStatement.firstToken &&
+      this.parsedStatement.firstToken.toLowerCase() === 'select' &&
+      this.executor.defaultLimit &&
+      !isNaN(this.executor.defaultLimit()) &&
+      this.executor.defaultLimit() > 0 &&
+      /\sfrom\s/i.test(statement) &&
+      !/\slimit\s[0-9]/i.test(statement)
+    ) {
+      const endMatch = statement.match(SELECT_END_REGEX);
+      if (endMatch) {
+        statement = endMatch[1] + ' LIMIT ' + this.executor.defaultLimit();
+        if (endMatch[2]) {
+          statement += endMatch[2];
+        }
+      }
+    }
+
+    if (this.executor.variables) {
+      statement = substituteVariables(statement, this.executor.variables);
+    }
+
+    return statement;
+  }
+
+  toJson(): string {
+    return JSON.stringify({
+      id: this.id,
+      parsedStatement: this.parsedStatement,
+      statement: this.getStatement(),
+      database: this.database
+    });
+  }
+
+  async cancel(): Promise<void> {
+    if (
+      this.cancellables.length &&
+      (this.status === ExecutionStatus.running || this.status === ExecutionStatus.streaming)
+    ) {
+      hueAnalytics.log(
+        'notebook',
+        'cancel/' + (this.executor.connector() ? this.executor.connector().dialect : '')
+      );
+      this.setStatus(ExecutionStatus.canceling);
+      while (this.cancellables.length) {
+        const cancellable = this.cancellables.pop();
+        if (cancellable) {
+          await cancellable.cancel();
+        }
+      }
+      this.setStatus(ExecutionStatus.canceled);
+    }
+  }
+
+  async reset(): Promise<void> {
+    this.result = undefined;
+    this.logs.reset();
+    if (!this.isReady()) {
+      try {
+        await this.close();
+      } catch (err) {}
+    }
+    this.handle = undefined;
+    this.setProgress(0);
+    this.setStatus(ExecutionStatus.ready);
   }
 
   static fromJs(executor: Executor, executableRaw: SqlExecutableRaw): SqlExecutable {
@@ -171,30 +547,95 @@ export default class SqlExecutable extends Executable {
   }
 
   toJs(): SqlExecutableRaw {
-    const executableJs = super.toJs() as unknown as SqlExecutableRaw;
-    executableJs.database = this.database;
-    executableJs.parsedStatement = this.parsedStatement;
-    executableJs.type = 'sqlExecutable';
-    return executableJs;
-  }
-
-  toJson(): string {
-    return JSON.stringify({
+    const state = Object.assign({}, this.observerState);
+    delete state.aceAnchor;
+    return {
+      executeEnded: this.executeEnded,
+      executeStarted: this.executeStarted,
+      handle: this.handle,
+      history: this.history,
       id: this.id,
-      parsedStatement: this.parsedStatement,
-      statement: this.getStatement(),
-      database: this.database
-    });
+      logs: this.logs.toJs(),
+      lost: this.lost,
+      observerState: state,
+      progress: this.progress,
+      status: this.status,
+      type: 'sqlExecutable',
+      database: this.database,
+      parsedStatement: this.parsedStatement
+    };
   }
 
-  adaptError(message: string): ExecutionError {
-    const match = ERROR_REGEX.exec(message);
-    if (match) {
-      const row = parseInt(match[1]);
-      const column = (match[3] && parseInt(match[3])) || 0;
-
-      return { message, column: column || 0, row };
+  async close(): Promise<void> {
+    while (this.cancellables.length) {
+      const nextCancellable = this.cancellables.pop();
+      if (nextCancellable) {
+        try {
+          await nextCancellable.cancel();
+        } catch (err) {
+          console.warn(err);
+        }
+      }
     }
-    return { message, column: 0, row: this.parsedStatement.location.first_line };
+
+    try {
+      await closeStatement({ executable: this, silenceErrors: true });
+    } catch (err) {
+      console.warn('Failed closing statement');
+    }
+    this.setStatus(ExecutionStatus.closed);
   }
+
+  async toContext(id?: string): Promise<ExecutableContext> {
+    const session = await sessionManager.getSession({ type: this.executor.connector().id });
+    if (this.executor.snippet) {
+      return {
+        operationId: this.operationId,
+        snippet: this.executor.snippet.toContextJson(this.getStatement()),
+        notebook: JSON.stringify(await this.executor.snippet.parentNotebook.toJs())
+      };
+    }
+
+    const snippet = {
+      type: this.executor.connector().id,
+      result: {
+        handle: this.handle
+      },
+      connector: this.executor.connector(),
+      executor: this.executor.toJs(),
+      defaultLimit: (this.executor.defaultLimit && this.executor.defaultLimit()) || null,
+      status: this.status,
+      id: id || UUID(),
+      statement_raw: this.getRawStatement(),
+      statement: this.getStatement(),
+      lastExecuted: this.executeStarted,
+      variables: [],
+      compute: this.executor.compute(),
+      namespace: this.executor.namespace(),
+      database: this.database,
+      properties: { settings: [] }
+    };
+
+    const notebook = {
+      type: `query-${this.executor.connector().id}`,
+      snippets: [snippet],
+      uuid: UUID(),
+      name: '',
+      isSaved: false,
+      sessions: [session],
+      editorWsChannel: (<hueWindow>window).WS_CHANNEL
+    };
+
+    return {
+      operationId: this.operationId,
+      snippet: JSON.stringify(snippet),
+      notebook: JSON.stringify(notebook)
+    };
+  }
+}
+
+export interface ExecutableContext {
+  operationId?: string;
+  snippet: string;
+  notebook: string;
 }
