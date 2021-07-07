@@ -423,13 +423,13 @@ Upload a local file to a remote destination folder:
 
 First guessing the format of the file `s3a://demo-hue/web_log_data/index_data.csv`:
 
-    curl -X POST https://demo.gethue.com/indexer/api/indexer/guess_format  --data 'fileFormat={"inputFormat":"file","path":"s3a://demo-hue/web_log_data/index_data.csv"}'
+    curl -X POST https://demo.gethue.com/api/indexer/guess_format  --data 'fileFormat={"inputFormat":"file","path":"s3a://demo-gethue/data/web_logs/index_data.csv"}'
 
     {"status": 0, "fieldSeparator": ",", "hasHeader": true, "quoteChar": "\"", "recordSeparator": "\\n", "type": "csv"}
 
 Then getting some data sample as well as the column types (column names will be picked from the header line if present):
 
-    curl -X POST https://demo.gethue.com/indexer/api/indexer/guess_field_types  --data 'fileFormat={"inputFormat":"file","path":"s3a://demo-hue/web_log_data/index_data.csv","format":{"type":"csv","fieldSeparator":",","recordSeparator":"\\n","quoteChar":"\"","hasHeader":true,"status":0}}'
+    curl -X POST https://demo.gethue.com/api/indexer/guess_field_types  --data 'fileFormat={"inputFormat":"file","path":"s3a://demo-gethue/data/web_logs/index_data.csv","format":{"type":"csv","fieldSeparator":",","recordSeparator":"\\n","quoteChar":"\"","hasHeader":true,"status":0}}'
 
     {
       "sample": [["200", "HTTP/1.1", "GET /metastore/table/default/sample_07 HTTP/1.1", "metastore", "", "00", "SG", "8836e6ce-9a21-449f-a372-9e57641389b3", "Singapore", "table", "1.2931000000000097", "GET", "128.199.234.236", "Other", "1041", "-", "Singapore", "", "/metastore/table/default/sample_07", "", "103.85579999999999", "Other", "demo.gethue.com:80 128.199.234.236 - - [04/May/2014:06:35:49 +0000] \"GET /metastore/table/default/sample_07 HTTP/1.1\" 200 1041 \"-\" \"Mozilla/5.0 (compatible; phpservermon/3.0.1; +http://www.phpservermonitor.org)\"\n", "Mozilla/5.0 (compatible; phpservermon/3.0.1; +http://www.phpservermonitor.org)", "2014-05-04T06:35:49Z", "Other", "SGP"],

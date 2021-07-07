@@ -20,7 +20,6 @@ import json
 import logging
 import sys
 
-from desktop.api_public import *
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.i18n import force_unicode
 from metadata.manager_client import ManagerApi
@@ -112,6 +111,7 @@ def get_topics(user):
       'database': 'topics'
     }
 
+    from desktop.api_public import _get_interpreter_from_dialect   # due to a circular import
     interpreter = _get_interpreter_from_dialect('ksql', user)
     api = _get_notebook_api(user, connector_id=interpreter['type'])
 
@@ -123,6 +123,7 @@ def get_topics(user):
 
 
 def get_topic_data(user, name):
+  from desktop.api_public import _get_interpreter_from_dialect   # due to a circular import
   interpreter = _get_interpreter_from_dialect('ksql', user)
   api = _get_notebook_api(user, connector_id=interpreter['type'])
 
