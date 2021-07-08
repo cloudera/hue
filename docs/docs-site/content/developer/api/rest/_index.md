@@ -113,11 +113,11 @@ Then a JWT token is returned and needs to be passed as a bearer in the headers f
 
 **Wrong credentials**: there is currently no error on bad authentication but instead a 302 redirect to the login page, e.g.:
 
-    curl -X POST https://demo.gethue.com/notebook/execute/query/create_notebook -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjIxNjM5NjMxLCJqdGkiOiI0NTY3NTA4MzM5YjY0MjFmYTMzZDJjMzViZWUyMDAyMCIsInVzZXJfaWQiOjF9.qrMNrr69eo38dOsV2aYp8k6WqBeyJZkbSuavxA_o_kM"
+    curl -X POST https://demo.gethue.com/api/editor/create_notebook -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjIxNjM5NjMxLCJqdGkiOiI0NTY3NTA4MzM5YjY0MjFmYTMzZDJjMzViZWUyMDAyMCIsInVzZXJfaWQiOjF9.qrMNrr69eo38dOsV2aYp8k6WqBeyJZkbSuavxA_o_kM"
 
-    [21/May/2021 16:26:46 -0700] middleware   INFO     Redirecting to login page: /notebook/execute/v1/create_notebook
-    [21/May/2021 16:26:46 -0700] access       INFO     127.0.0.1 -anon- - "POST /notebook/execute/v1/create_notebook HTTP/1.1" - (mem: 172mb)-- login redirection
-    [21/May/2021 16:26:46 -0700] access       INFO     127.0.0.1 -anon- - "POST /notebook/execute/v1/create_notebook HTTP/1.1" returned in 4ms 302 0
+    [21/May/2021 16:26:46 -0700] middleware   INFO     Redirecting to login page: /api/editor/create_notebook
+    [21/May/2021 16:26:46 -0700] access       INFO     127.0.0.1 -anon- - "POST /api/editor/create_notebook HTTP/1.1" - (mem: 172mb)-- login redirection
+    [21/May/2021 16:26:46 -0700] access       INFO     127.0.0.1 -anon- - "POST /api/editor/create_notebook HTTP/1.1" returned in 4ms 302 0
 
 ### Authenticate
 
@@ -174,7 +174,7 @@ And now ask for the resultset of the statement:
 
 And if we wanted to get the execution log for this statement:
 
-    curl -X POST https://demo.gethue.com/notebook/api/get_logs --data 'operationId=63ce87ba-ca0f-4653-8aeb-e9f5c1781b78'
+    curl -X POST https://demo.gethue.com/api/editor/get_logs --data 'operationId=63ce87ba-ca0f-4653-8aeb-e9f5c1781b78'
 
     {"status": 0, "progress": 5, "jobs": [], "logs": "", "isFullLogs": false}
 
@@ -248,19 +248,17 @@ Describe table API:
 
 - **source_type:** select the configured databases (e.g. `hive`) or connector ID (e.g. `1`)
 
+Sample table data API:
+
+    curl -X POST 'https://demo.gethue.com/api/editor/sample/<DB>/<TABLE>/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1ODE1MzU5LCJqdGkiOiIzODM0M2Q3YjRjNGY0NTUxYWJmYmQyZmI4YjUzYjFjZiIsInVzZXJfaWQiOjExMDA3MTR9.fl0h7VooLtWnu9v7FtdLUy3NukwFtUya-LkTzollTig' -H 'Content-Type: application/x-www-form-urlencoded' -d ''
+
 ### Column details
 
     curl -X POST 'https://demo.gethue.com/api/editor/autocomplete/<DB>/<TABLE>/<COL1>/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1NzM2NTA0LCJqdGkiOiJkZDVlYTg5ZTMwMDE0MjRiOGRlYWM4N2RjODFhYjgzZSIsInVzZXJfaWQiOjExMDA3MTR9.8I9BeXQXBWFMGf7J4ss7yhcmAZfcFC6sMRE9RLeOwTM' -H 'Content-Type: application/x-www-form-urlencoded' -d ''
 
-For nested columns:
+Sample column data API:
 
-    $.post("/notebook/api/autocomplete/<DB>/<TABLE>/<COL1>/<COL2>", {
-      "snippet": ko.mapping.toJSON({
-          type: "hive"
-      })
-    }, function(data) {
-      console.log(ko.mapping.toJSON(data));
-    });
+    curl -X POST 'https://demo.gethue.com/api/editor/sample/<DB>/<TABLE>/<COL1>/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1ODE1MzU5LCJqdGkiOiIzODM0M2Q3YjRjNGY0NTUxYWJmYmQyZmI4YjUzYjFjZiIsInVzZXJfaWQiOjExMDA3MTR9.fl0h7VooLtWnu9v7FtdLUy3NukwFtUya-LkTzollTig' -H 'Content-Type: application/x-www-form-urlencoded' -d ''
 
 ### Listing Functions
 
