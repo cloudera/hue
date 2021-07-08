@@ -51,6 +51,8 @@ urlpatterns += [
   re_path(r'^editor/close_statement/?$', api_public.close_statement, name='editor_close_statement'),
   re_path(r'^editor/get_logs/?$', api_public.get_logs, name='editor_get_logs'),
 
+  re_path(r'^editor/get_history/?', api_public.get_history, name='editor_get_history'),
+
   re_path(r'^editor/describe/(?P<database>[^/]*)/?$', api_public.describe, name='editor_describe_database'),
   re_path(r'^editor/describe/(?P<database>[^/]*)/(?P<table>[\w_\-]+)/?$', api_public.describe, name='editor_describe_table'),
   re_path(r'^editor/describe/(?P<database>[^/]*)/(?P<table>\w+)/stats(?:/(?P<column>\w+))?/?$', api_public.describe, name='editor_describe_column'),
