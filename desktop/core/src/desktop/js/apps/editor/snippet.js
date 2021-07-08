@@ -43,9 +43,8 @@ import defer from 'utils/timing/defer';
 import UUID from 'utils/string/UUID';
 import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
 import sessionManager from 'apps/editor/execution/sessionManager';
-import SqlExecutable from 'apps/editor/execution/sqlExecutable';
+import SqlExecutable, { ExecutionStatus } from 'apps/editor/execution/sqlExecutable';
 import { HIDE_FIXED_HEADERS_EVENT, REDRAW_FIXED_HEADERS_EVENT } from 'apps/editor/events';
-import { ExecutionStatus } from 'apps/editor/execution/executable';
 import {
   ACTIVE_STATEMENT_CHANGED_EVENT,
   REFRESH_STATEMENT_LOCATIONS_EVENT

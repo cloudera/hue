@@ -23,9 +23,11 @@ import {
   ExecutableTransitionedEvent
 } from './events';
 import Executor from './executor';
-import SqlExecutable from './sqlExecutable';
 import { DefaultApiResponse, extractErrorMessage, post, successResponseIsError } from 'api/utils';
-import Executable, { ExecutableContext, ExecutionStatus } from 'apps/editor/execution/executable';
+import SqlExecutable, {
+  ExecutableContext,
+  ExecutionStatus
+} from 'apps/editor/execution/sqlExecutable';
 import { ResultRow, ResultType } from 'apps/editor/execution/executionResult';
 import { CancellablePromise } from 'api/cancellablePromise';
 import SubscriptionTracker from 'components/utils/SubscriptionTracker';
@@ -143,7 +145,7 @@ export interface ExecuteStatusApiResponse {
 }
 
 export interface ExecuteApiOptions {
-  executable: Executable;
+  executable: SqlExecutable;
   silenceErrors?: boolean;
 }
 
@@ -410,7 +412,7 @@ export const checkExecutionStatus = async (
 };
 
 export const fetchResults = async (options: {
-  executable: Executable;
+  executable: SqlExecutable;
   rows: number;
   startOver?: boolean;
   silenceErrors?: boolean;
@@ -455,7 +457,7 @@ export const fetchResultSize = async (
 };
 
 export const fetchLogs = async (options: {
-  executable: Executable;
+  executable: SqlExecutable;
   silenceErrors?: boolean;
   fullLog: string;
   jobs?: ExecutionJob[];

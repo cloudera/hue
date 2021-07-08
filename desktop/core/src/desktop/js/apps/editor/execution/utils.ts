@@ -14,7 +14,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import Executable from 'apps/editor/execution/executable';
 import Executor from 'apps/editor/execution/executor';
 import SqlExecutable from 'apps/editor/execution/sqlExecutable';
 import { StatementDetails } from 'parse/types';
@@ -37,7 +36,7 @@ export const syncSqlExecutables = (
     ...statementDetails.followingStatements
   ];
 
-  const existingExecutables: (Executable | undefined)[] = [...executor.executables];
+  const existingExecutables: (SqlExecutable | undefined)[] = [...executor.executables];
 
   const result = {
     all: <SqlExecutable[]>[],

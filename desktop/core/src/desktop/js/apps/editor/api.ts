@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import { format } from '@gethue/sql-formatter';
-import { ExecutionStatus } from './execution/executable';
+import { ExecutionStatus } from './execution/sqlExecutable';
 import { CancellablePromise } from 'api/cancellablePromise';
 import { get } from 'api/utils';
 

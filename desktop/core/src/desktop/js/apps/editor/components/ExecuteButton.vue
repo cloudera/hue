@@ -65,9 +65,8 @@
     ExecutableTransitionedEvent,
     ExecutableUpdatedEvent
   } from 'apps/editor/execution/events';
-  import { ExecutionStatus } from 'apps/editor/execution/executable';
   import sessionManager from 'apps/editor/execution/sessionManager';
-  import SqlExecutable from 'apps/editor/execution/sqlExecutable';
+  import SqlExecutable, { ExecutionStatus } from 'apps/editor/execution/sqlExecutable';
   import HueButton from 'components/HueButton.vue';
   import SubscriptionTracker from 'components/utils/SubscriptionTracker';
   import huePubSub from 'utils/huePubSub';
