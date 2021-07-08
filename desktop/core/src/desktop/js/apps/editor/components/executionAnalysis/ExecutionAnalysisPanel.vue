@@ -56,8 +56,7 @@
   import { defineComponent, computed, onBeforeUnmount, ref, reactive } from 'vue';
 
   import { ExecutionJob } from 'apps/editor/execution/api';
-  import Executable, { ExecutionStatus } from 'apps/editor/execution/executable';
-  import SqlExecutable from 'apps/editor/execution/sqlExecutable';
+  import SqlExecutable, { ExecutionStatus } from 'apps/editor/execution/sqlExecutable';
   import { ExecutionError } from 'apps/editor/execution/executionLogs';
   import HueLink from 'components/HueLink.vue';
   import LogsPanel from 'components/LogsPanel.vue';
@@ -88,7 +87,7 @@
       const jobsAvailable = computed(() => !!jobs.length);
       const jobsWithUrls = computed(() => jobs.filter(job => job.url));
 
-      const debouncedUpdate = debounce((executable: Executable): void => {
+      const debouncedUpdate = debounce((executable: SqlExecutable): void => {
         const { status, logs } = executable;
         executionLogs.value = logs.fullLog;
         jobs.splice(0, jobs.length, ...logs.jobs);
@@ -96,7 +95,7 @@
         analysisAvailable.value = status !== ExecutionStatus.ready || !!errors.length;
       }, 5);
 
-      const updateFromExecutable = (executable: Executable): void => {
+      const updateFromExecutable = (executable: SqlExecutable): void => {
         if (!props.executable || props.executable.id !== executable.id) {
           return;
         }

@@ -28,7 +28,7 @@ import {
 } from './chartTransformers';
 import { attachTracker } from 'apps/editor/components/executableStateHandler';
 import { REDRAW_CHART_EVENT } from 'apps/editor/events';
-import { ExecutionStatus } from 'apps/editor/execution/executable';
+import { ExecutionStatus } from 'apps/editor/execution/sqlExecutable';
 import { RESULT_TYPE } from 'apps/editor/execution/executionResult';
 import { CURRENT_QUERY_TAB_SWITCHED_EVENT } from 'apps/editor/snippet';
 import componentUtils from 'ko/components/componentUtils';

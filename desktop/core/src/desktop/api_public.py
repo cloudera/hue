@@ -125,7 +125,11 @@ def get_logs(request):
 @api_view(["POST"])
 def autocomplete(request, server=None, database=None, table=None, column=None, nested=None):
   django_request = get_django_request(request)
+
+  _patch_operation_id_request(django_request)
+
   return notebook_api.autocomplete(django_request, server, database, table, column, nested)
+
 
 @api_view(["POST"])
 def describe(request, database, table=None, column=None):
@@ -170,7 +174,7 @@ def _patch_operation_id_request(django_request):
   data = {}
 
   if not django_request.POST.get('snippet'):
-    data['snippet'] = '{"type":"mysql","result":{}}'
+    data['snippet'] = '{"type":"1","result":{}}'
 
   django_request.POST = django_request.POST.copy() # Makes it mutable along with copying the object
   django_request.POST.update(data)
