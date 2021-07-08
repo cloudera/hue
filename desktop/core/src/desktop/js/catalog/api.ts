@@ -60,15 +60,15 @@ interface SampleFetchOptions extends SharedFetchOptions {
 
 const ADD_TAGS_URL = '/metadata/api/catalog/add_tags';
 const AUTOCOMPLETE_URL_PREFIX = '/api/editor/autocomplete/';
-const CANCEL_STATEMENT_URL = '/notebook/api/cancel_statement';
-const CHECK_STATUS_URL = '/notebook/api/check_status';
+const CANCEL_STATEMENT_URL = '/api/editor/cancel_statement';
+const CHECK_STATUS_URL = '/api/editor/check_status';
 const DELETE_TAGS_URL = '/metadata/api/catalog/delete_tags';
-const DESCRIBE_URL = '/notebook/api/describe/';
-const FETCH_RESULT_DATA_URL = '/notebook/api/fetch_result_data';
+const DESCRIBE_URL = '/api/editor/describe/';
+const FETCH_RESULT_DATA_URL = '/api/editor/fetch_result_data';
 const FIND_ENTITY_URL = '/metadata/api/catalog/find_entity';
 const LIST_TAGS_URL = '/metadata/api/catalog/list_tags';
 const METASTORE_TABLE_URL_PREFIX = '/metastore/table/';
-const SAMPLE_URL_PREFIX = '/notebook/api/sample/';
+const SAMPLE_URL_PREFIX = '/api/editor/sample/';
 const SEARCH_URL = '/desktop/api/search/entities';
 const UPDATE_PROPERTIES_URL = '/metadata/api/catalog/update_properties';
 
