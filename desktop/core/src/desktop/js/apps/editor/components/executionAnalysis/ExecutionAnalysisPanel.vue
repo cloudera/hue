@@ -72,7 +72,7 @@
     props: {
       executable: {
         type: SqlExecutable,
-        required: true
+        default: undefined
       }
     },
     setup(props) {
