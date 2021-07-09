@@ -192,9 +192,11 @@ def guess_field_types(request):
 # Impala
 
 @api_view(["POST"])
-def analyze_table(request, database, table, columns=None):
+def analyze_table(request, dialect, database, table, columns=None):
   django_request = get_django_request(request)
-  return beeswax_api.analyze_table(django_request, database, table, columns=None)
+
+  if dialect in ["impala", "beeswax"]:
+    return beeswax_api.analyze_table(django_request, database, table, columns=None)
 
 # Utils
 

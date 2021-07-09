@@ -93,7 +93,7 @@ urlpatterns += [
 ]
 
 urlpatterns += [
-  re_path(r'^impala/analyze/(?P<database>\w+)/(?P<table>\w+)(?:/(?P<columns>\w+))?/?$', api_public.analyze_table, name='impala_analyze_table'),
+  re_path(r'^(?P<dialect>.+)/analyze/(?P<database>\w+)/(?P<table>\w+)(?:/(?P<columns>\w+))?/?$', api_public.analyze_table, name='impala_analyze_table'),
 ]
 
 # Slack install API for using CORS by default
