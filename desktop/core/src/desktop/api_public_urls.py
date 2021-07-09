@@ -76,6 +76,13 @@ urlpatterns += [
       api_public.autocomplete,
       name="editor_autocomplete_nested",
   ),
+
+  re_path(r'^editor/sample/(?P<database>[^/?]*)/(?P<table>[\w_\-]+)/?$', api_public.get_sample_data, name='editor_sample_data'),
+  re_path(
+    r'^editor/sample/(?P<database>[^/?]*)/(?P<table>[\w_\-]+)/(?P<column>\w+)/?$',
+    api_public.get_sample_data,
+    name='editor_sample_data_column'
+  ),
 ]
 
 urlpatterns += [
@@ -87,4 +94,9 @@ urlpatterns += [
 # Slack install API for using CORS by default
 urlpatterns += [
   re_path(r'^slack/install/?$', botserver_api.generate_slack_install_link, name='botserver.api.slack_install_link'),
+]
+
+urlpatterns += [
+  re_path(r'^indexer/guess_format/?$', api_public.guess_format, name='indexer_guess_format'),
+  re_path(r'^indexer/guess_field_types/?$', api_public.guess_field_types, name='indexer_guess_field_types'),
 ]
