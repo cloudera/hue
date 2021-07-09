@@ -1,0 +1,8 @@
+[tool.djangodoctor]
+directories = ["apps", "desktop/core/src/desktop/"]
+ignore = [
+	"desktop/core/src/desktop/js/",
+	"desktop/core/src/desktop/old_migrations/",
+	"desktop/core/src/desktop/static/",
+	"desktop/core/src/desktop/test_data/",
+]
