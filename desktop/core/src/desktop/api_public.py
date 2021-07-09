@@ -145,6 +145,13 @@ def describe(request, database, table=None, column=None):
   django_request = get_django_request(request)
   return notebook_api.describe(django_request, database, table, column)
 
+
+@api_view(['GET'])
+def get_history(request):
+  django_request = get_django_request(request)
+  return notebook_api.get_history(django_request)
+
+
 # Storage API
 
 @api_view(["GET"])
