@@ -21,6 +21,7 @@ from django.http import QueryDict
 from rest_framework.decorators import api_view
 
 from filebrowser import views as filebrowser_views
+from indexer import api3 as indexer_api3
 from notebook import api as notebook_api
 from notebook.conf import get_ordered_interpreters
 
@@ -170,6 +171,17 @@ def storage_upload_file(request):
   django_request = get_django_request(request)
   return filebrowser_views.upload_file(django_request)
 
+# Importer API
+
+@api_view(["POST"])
+def guess_format(request):
+  django_request = get_django_request(request)
+  return indexer_api3.guess_format(django_request)
+
+@api_view(["POST"])
+def guess_field_types(request):
+  django_request = get_django_request(request)
+  return indexer_api3.guess_field_types(django_request)
 
 # Utils
 
