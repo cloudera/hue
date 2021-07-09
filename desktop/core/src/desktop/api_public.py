@@ -29,6 +29,8 @@ from desktop import api2 as desktop_api
 from desktop.auth.backend import rewrite_user
 from desktop.lib import fsmanager
 
+from beeswax import api as beeswax_api
+
 
 LOG = logging.getLogger(__name__)
 
@@ -187,6 +189,12 @@ def guess_format(request):
 def guess_field_types(request):
   django_request = get_django_request(request)
   return indexer_api3.guess_field_types(django_request)
+# Impala
+
+@api_view(["POST"])
+def analyze_table(request, database, table, columns=None):
+  django_request = get_django_request(request)
+  return beeswax_api.analyze_table(django_request, database, table, columns=None)
 
 # Utils
 
