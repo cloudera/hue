@@ -35,6 +35,7 @@ import DataCatalogEntry, {
 } from 'catalog/DataCatalogEntry';
 import { Cluster, Compute, Connector, Namespace } from 'config/types';
 import { hueWindow } from 'types/types';
+import 'utils/json.bigDataParse';
 import sleep from 'utils/timing/sleep';
 import UUID from 'utils/string/UUID';
 
