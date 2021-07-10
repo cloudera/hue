@@ -226,11 +226,11 @@ Same but in Python:
 
 ### Listing Databases
 
-    curl -X POST 'https://demo.gethue.com/api/editor/autocomplete/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1NzM2NTA0LCJqdGkiOiJkZDVlYTg5ZTMwMDE0MjRiOGRlYWM4N2RjODFhYjgzZSIsInVzZXJfaWQiOjExMDA3MTR9.8I9BeXQXBWFMGf7J4ss7yhcmAZfcFC6sMRE9RLeOwTM' -H 'Content-Type: application/x-www-form-urlencoded' -d ''
+    curl -X POST 'https://demo.gethue.com/api/editor/autocomplete/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1NzM2NTA0LCJqdGkiOiJkZDVlYTg5ZTMwMDE0MjRiOGRlYWM4N2RjODFhYjgzZSIsInVzZXJfaWQiOjExMDA3MTR9.8I9BeXQXBWFMGf7J4ss7yhcmAZfcFC6sMRE9RLeOwTM' -H 'Content-Type: application/x-www-form-urlencoded'
 
 ### Database details and Tables 
 
-    curl -X POST 'https://demo.gethue.com/api/editor/autocomplete/<DB>/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1NzM2NTA0LCJqdGkiOiJkZDVlYTg5ZTMwMDE0MjRiOGRlYWM4N2RjODFhYjgzZSIsInVzZXJfaWQiOjExMDA3MTR9.8I9BeXQXBWFMGf7J4ss7yhcmAZfcFC6sMRE9RLeOwTM' -H 'Content-Type: application/x-www-form-urlencoded' -d ''
+    curl -X POST 'https://demo.gethue.com/api/editor/autocomplete/<DB>/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1NzM2NTA0LCJqdGkiOiJkZDVlYTg5ZTMwMDE0MjRiOGRlYWM4N2RjODFhYjgzZSIsInVzZXJfaWQiOjExMDA3MTR9.8I9BeXQXBWFMGf7J4ss7yhcmAZfcFC6sMRE9RLeOwTM' -H 'Content-Type: application/x-www-form-urlencoded'
 
 Describe database API:
 
@@ -240,7 +240,7 @@ Describe database API:
 
 ### Table details and Columns
 
-    curl -X POST 'https://demo.gethue.com/api/editor/autocomplete/<DB>/<TABLE>/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1NzM2NTA0LCJqdGkiOiJkZDVlYTg5ZTMwMDE0MjRiOGRlYWM4N2RjODFhYjgzZSIsInVzZXJfaWQiOjExMDA3MTR9.8I9BeXQXBWFMGf7J4ss7yhcmAZfcFC6sMRE9RLeOwTM' -H 'Content-Type: application/x-www-form-urlencoded' -d ''
+    curl -X POST 'https://demo.gethue.com/api/editor/autocomplete/<DB>/<TABLE>/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1NzM2NTA0LCJqdGkiOiJkZDVlYTg5ZTMwMDE0MjRiOGRlYWM4N2RjODFhYjgzZSIsInVzZXJfaWQiOjExMDA3MTR9.8I9BeXQXBWFMGf7J4ss7yhcmAZfcFC6sMRE9RLeOwTM' -H 'Content-Type: application/x-www-form-urlencoded'
     
 Describe table API:
 
@@ -250,27 +250,27 @@ Describe table API:
 
 Analyze API:
 
-    curl -X POST 'https://demo.gethue.com/api/<DIALECT>/analyze/<DB>/<TABLE>/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1ODE1MzU5LCJqdGkiOiIzODM0M2Q3YjRjNGY0NTUxYWJmYmQyZmI4YjUzYjFjZiIsInVzZXJfaWQiOjExMDA3MTR9.fl0h7VooLtWnu9v7FtdLUy3NukwFtUya-LkTzollTig' -H 'Content-Type: application/x-www-form-urlencoded' -d ''
+    curl -X POST 'https://demo.gethue.com/api/<DIALECT>/analyze/<DB>/<TABLE>/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1ODE1MzU5LCJqdGkiOiIzODM0M2Q3YjRjNGY0NTUxYWJmYmQyZmI4YjUzYjFjZiIsInVzZXJfaWQiOjExMDA3MTR9.fl0h7VooLtWnu9v7FtdLUy3NukwFtUya-LkTzollTig' -H 'Content-Type: application/x-www-form-urlencoded'
 
 - Currently supported **dialects:** impala, beeswax (hive)
 
 Sample table data API:
 
-    curl -X POST 'https://demo.gethue.com/api/editor/sample/<DB>/<TABLE>/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1ODE1MzU5LCJqdGkiOiIzODM0M2Q3YjRjNGY0NTUxYWJmYmQyZmI4YjUzYjFjZiIsInVzZXJfaWQiOjExMDA3MTR9.fl0h7VooLtWnu9v7FtdLUy3NukwFtUya-LkTzollTig' -H 'Content-Type: application/x-www-form-urlencoded' -d ''
+    curl -X POST 'https://demo.gethue.com/api/editor/sample/<DB>/<TABLE>/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1ODE1MzU5LCJqdGkiOiIzODM0M2Q3YjRjNGY0NTUxYWJmYmQyZmI4YjUzYjFjZiIsInVzZXJfaWQiOjExMDA3MTR9.fl0h7VooLtWnu9v7FtdLUy3NukwFtUya-LkTzollTig' -H 'Content-Type: application/x-www-form-urlencoded'
 
 ### Column details
 
-    curl -X POST 'https://demo.gethue.com/api/editor/autocomplete/<DB>/<TABLE>/<COL1>/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1NzM2NTA0LCJqdGkiOiJkZDVlYTg5ZTMwMDE0MjRiOGRlYWM4N2RjODFhYjgzZSIsInVzZXJfaWQiOjExMDA3MTR9.8I9BeXQXBWFMGf7J4ss7yhcmAZfcFC6sMRE9RLeOwTM' -H 'Content-Type: application/x-www-form-urlencoded' -d ''
+    curl -X POST 'https://demo.gethue.com/api/editor/autocomplete/<DB>/<TABLE>/<COL1>/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1NzM2NTA0LCJqdGkiOiJkZDVlYTg5ZTMwMDE0MjRiOGRlYWM4N2RjODFhYjgzZSIsInVzZXJfaWQiOjExMDA3MTR9.8I9BeXQXBWFMGf7J4ss7yhcmAZfcFC6sMRE9RLeOwTM' -H 'Content-Type: application/x-www-form-urlencoded'
 
 Analyze API:
 
-    curl -X POST 'https://demo.gethue.com/api/<DIALECT>/analyze/<DB>/<TABLE>/<COL1>/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1ODE1MzU5LCJqdGkiOiIzODM0M2Q3YjRjNGY0NTUxYWJmYmQyZmI4YjUzYjFjZiIsInVzZXJfaWQiOjExMDA3MTR9.fl0h7VooLtWnu9v7FtdLUy3NukwFtUya-LkTzollTig' -H 'Content-Type: application/x-www-form-urlencoded' -d ''
+    curl -X POST 'https://demo.gethue.com/api/<DIALECT>/analyze/<DB>/<TABLE>/<COL1>/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1ODE1MzU5LCJqdGkiOiIzODM0M2Q3YjRjNGY0NTUxYWJmYmQyZmI4YjUzYjFjZiIsInVzZXJfaWQiOjExMDA3MTR9.fl0h7VooLtWnu9v7FtdLUy3NukwFtUya-LkTzollTig' -H 'Content-Type: application/x-www-form-urlencoded'
 
 - Currently supported **dialects:** impala, beeswax (hive)
 
 Sample column data API:
 
-    curl -X POST 'https://demo.gethue.com/api/editor/sample/<DB>/<TABLE>/<COL1>/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1ODE1MzU5LCJqdGkiOiIzODM0M2Q3YjRjNGY0NTUxYWJmYmQyZmI4YjUzYjFjZiIsInVzZXJfaWQiOjExMDA3MTR9.fl0h7VooLtWnu9v7FtdLUy3NukwFtUya-LkTzollTig' -H 'Content-Type: application/x-www-form-urlencoded' -d ''
+    curl -X POST 'https://demo.gethue.com/api/editor/sample/<DB>/<TABLE>/<COL1>/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1ODE1MzU5LCJqdGkiOiIzODM0M2Q3YjRjNGY0NTUxYWJmYmQyZmI4YjUzYjFjZiIsInVzZXJfaWQiOjExMDA3MTR9.fl0h7VooLtWnu9v7FtdLUy3NukwFtUya-LkTzollTig' -H 'Content-Type: application/x-www-form-urlencoded'
 
 ### Listing Functions
 
