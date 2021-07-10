@@ -231,7 +231,8 @@ def guess_field_types(request):
     path = urllib_unquote(file_format['path'])
 
     with open(path, 'r') as local_file:
-
+      encoding = check_encoding(local_file.read(10000))
+      local_file.seek(0)
       reader = csv.reader(local_file)
       csv_data = list(reader)
 
@@ -257,6 +258,10 @@ def guess_field_types(request):
         'columns': columns,
         'sample': sample
       }
+      if 'sample' in format_ and format_['sample']:
+        format_['sample'] = escape_rows(format_['sample'], nulls_only=True, encoding=encoding)
+      for col in format_['columns']:
+        col['name'] = smart_unicode(col['name'], errors='replace', encoding=encoding)
 
   elif file_format['inputFormat'] == 'file':
     indexer = MorphlineIndexer(request.user, request.fs)
