@@ -57,9 +57,10 @@ RUN ./build/env/bin/pip install --no-cache-dir \
   # Avoid Django 3 pulling
   django_redis==4.11.0 \
   flower \
-  # SparkSql show tables
+  # Contains fix for SparkSql show tables
   git+https://github.com/gethue/PyHive \
   # pyhive \
+  impyla==0.17.0 \
   #ksql \
   git+https://github.com/bryanyang0528/ksql-python \
   pydruid \
