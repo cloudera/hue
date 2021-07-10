@@ -17,7 +17,7 @@
 
 import logging
 
-from django.http import QueryDict
+from django.http import QueryDict, HttpResponse
 from rest_framework.decorators import api_view
 
 from filebrowser import views as filebrowser_views
@@ -161,6 +161,16 @@ def get_history(request):
   django_request = get_django_request(request)
   return notebook_api.get_history(django_request)
 
+@api_view(["POST"])
+def analyze_table(request, dialect, database, table, columns=None):
+  django_request = get_django_request(request)
+
+  if dialect in ["impala", "beeswax"]:
+    return beeswax_api.analyze_table(django_request, database, table, columns=None)
+  
+  return HttpResponse(status=204)
+
+
 # Storage API
 
 @api_view(["GET"])
@@ -189,14 +199,7 @@ def guess_format(request):
 def guess_field_types(request):
   django_request = get_django_request(request)
   return indexer_api3.guess_field_types(django_request)
-# Impala
 
-@api_view(["POST"])
-def analyze_table(request, dialect, database, table, columns=None):
-  django_request = get_django_request(request)
-
-  if dialect in ["impala", "beeswax"]:
-    return beeswax_api.analyze_table(django_request, database, table, columns=None)
 
 # Utils
 
