@@ -167,8 +167,8 @@ def analyze_table(request, dialect, database, table, columns=None):
 
   if dialect in ["impala", "beeswax"]:
     return beeswax_api.analyze_table(django_request, database, table, columns=None)
-  
-  return HttpResponse(status=204)
+  else:
+    return HttpResponse(status=204)
 
 
 # Storage API
