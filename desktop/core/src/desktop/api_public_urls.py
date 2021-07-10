@@ -92,6 +92,10 @@ urlpatterns += [
   re_path(r'^storage/upload/file/?$', api_public.storage_upload_file, name='storage_upload_file'),
 ]
 
+urlpatterns += [
+  re_path(r'^(?P<dialect>.+)/analyze/(?P<database>\w+)/(?P<table>\w+)(?:/(?P<columns>\w+))?/?$', api_public.analyze_table, name='dialect_analyze_table'),
+]
+
 # Slack install API for using CORS by default
 urlpatterns += [
   re_path(r'^slack/install/?$', botserver_api.generate_slack_install_link, name='botserver.api.slack_install_link'),

@@ -104,9 +104,9 @@ const performAnalyze = ({
     });
     try {
       const analyzeResponse = await post<DefaultApiResponse & { watch_url?: string }>(
-        `/${
+        `/api/${
           entry.getConnector().id === 'hive' ? 'beeswax' : entry.getConnector().id
-        }/api/analyze/${getEntryUrlPath(entry)}`,
+        }/analyze/${getEntryUrlPath(entry)}`,
         undefined,
         { silenceErrors }
       );
