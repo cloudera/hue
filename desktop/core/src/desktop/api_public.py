@@ -28,6 +28,7 @@ from notebook.conf import get_ordered_interpreters
 from desktop import api2 as desktop_api
 from desktop.auth.backend import rewrite_user
 from desktop.lib import fsmanager
+from desktop.lib.connectors import api as connector_api
 
 from beeswax import api as beeswax_api
 
@@ -199,6 +200,49 @@ def guess_format(request):
 def guess_field_types(request):
   django_request = get_django_request(request)
   return indexer_api3.guess_field_types(django_request)
+
+
+# Connector API
+
+@api_view(["GET"])
+def get_connector_types(request):
+  django_request = get_django_request(request)
+  return connector_api.get_connector_types(django_request)
+
+@api_view(["GET"])
+def get_connectors_instances(request):
+  django_request = get_django_request(request)
+  return connector_api.get_connectors_instances(django_request)
+
+@api_view(["POST"])
+def new_connector(request, dialect, interface):
+  django_request = get_django_request(request)
+  return connector_api.new_connector(django_request, dialect, interface)
+
+@api_view(["GET"])
+def get_connector(request, id):
+  django_request = get_django_request(request)
+  return connector_api.get_connector(django_request, id)
+
+@api_view(["POST"])
+def update_connector(request):
+  django_request = get_django_request(request)
+  return connector_api.update_connector(django_request)
+
+@api_view(["POST"])
+def delete_connector(request):
+  django_request = get_django_request(request)
+  return connector_api.delete_connector(django_request)
+
+@api_view(["POST"])
+def test_connector(request):
+  django_request = get_django_request(request)
+  return connector_api.test_connector(django_request)
+
+@api_view(["POST"])
+def install_connector_examples(request):
+  django_request = get_django_request(request)
+  return connector_api.install_connector_examples(django_request)
 
 
 # Utils
