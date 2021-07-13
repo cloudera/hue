@@ -470,7 +470,119 @@ If the `show_command` parameter is given, the API call will instead return the g
 
 Get the list of configured [connectors](/administrator/configuration/connectors/):
 
-    curl -L -X POST demo.gethue.com/desktop/connectors/api/instances
+    curl -X GET 'https://demo.gethue.com/api/connector/instances' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI2MjM3OTcxLCJqdGkiOiJlYjI1NDg5N2ZlNWI0NjZhODk3MDc5MWFmYjcxOWJiNyIsInVzZXJfaWQiOjExMDA3MTR9.9vfeC9dfmRoYM586GzwnlcCCWcqCciszAhoDFwsSIPs' -H 'Content-Type: application/x-www-form-urlencoded'
+
+### Types
+
+    curl -X GET 'https://demo.gethue.com/api/connector/types' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI2MjM3OTcxLCJqdGkiOiJlYjI1NDg5N2ZlNWI0NjZhODk3MDc5MWFmYjcxOWJiNyIsInVzZXJfaWQiOjExMDA3MTR9.9vfeC9dfmRoYM586GzwnlcCCWcqCciszAhoDFwsSIPs' -H 'Content-Type: application/x-www-form-urlencoded'
+    
+### New connector
+
+    curl -X POST 'https://demo.gethue.com/api/connector/instance/new/<DIALECT>/<INTERFACE>' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI2MjM3OTcxLCJqdGkiOiJlYjI1NDg5N2ZlNWI0NjZhODk3MDc5MWFmYjcxOWJiNyIsInVzZXJfaWQiOjExMDA3MTR9.9vfeC9dfmRoYM586GzwnlcCCWcqCciszAhoDFwsSIPs' -H 'Content-Type: application/x-www-form-urlencoded'
+
+### Get connector
+
+    curl -X GET 'https://demo.gethue.com/api/connector/instance/get/<ID>' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI2MjM3OTcxLCJqdGkiOiJlYjI1NDg5N2ZlNWI0NjZhODk3MDc5MWFmYjcxOWJiNyIsInVzZXJfaWQiOjExMDA3MTR9.9vfeC9dfmRoYM586GzwnlcCCWcqCciszAhoDFwsSIPs' -H 'Content-Type: application/x-www-form-urlencoded'
+
+### Update connector
+
+    curl -X POST 'http://127.0.0.1:8000/api/connector/instance/update' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI2MjM3OTcxLCJqdGkiOiJlYjI1NDg5N2ZlNWI0NjZhODk3MDc5MWFmYjcxOWJiNyIsInVzZXJfaWQiOjExMDA3MTR9.9vfeC9dfmRoYM586GzwnlcCCWcqCciszAhoDFwsSIPs' -H 'Content-Type: application/json' -d '
+    {
+    "connector": {
+        "id": "1",
+        "dialect": "hive",
+        "nice_name": "Hive",
+        "description": "Via SqlAlchemy interface",
+        "category": "editor",
+        "interface": "sqlalchemy",
+        "settings": [
+          {
+            "name": "url",
+            "value": "hive://localhost:10000"
+          },
+          {
+            "name": "has_ssh",
+            "value": false
+          },
+          {
+            "name": "ssh_server_host",
+            "value": "127.0.0.1"
+          }
+        ],
+        "properties": {
+          "is_sql": true,
+          "sql_identifier_quote": "`",
+          "sql_identifier_comment_single": "--",
+          "has_catalog": false,
+          "has_database": true,
+          "has_table": true,
+          "has_live_queries": false,
+          "has_optimizer_risks": true,
+          "has_optimizer_values": true,
+          "has_auto_limit": false,
+          "has_reference_language": true,
+          "has_reference_functions": true,
+          "has_use_statement": true
+        }
+      }
+    }'
+
+- **connector:** Details about the connector to update.
+
+### Delete connector
+
+    curl -X POST 'http://127.0.0.1:8000/api/connector/instance/delete' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI2MjM3OTcxLCJqdGkiOiJlYjI1NDg5N2ZlNWI0NjZhODk3MDc5MWFmYjcxOWJiNyIsInVzZXJfaWQiOjExMDA3MTR9.9vfeC9dfmRoYM586GzwnlcCCWcqCciszAhoDFwsSIPs' -H 'Content-Type: application/json' -d '{"connector": {"id": "1", "name": "hive"}}'
+
+- **connector:** Details about the connector to delete.
+
+### Test connector
+
+    curl -X POST 'http://127.0.0.1:8000/api/connector/instance/test/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI2MjM3OTcxLCJqdGkiOiJlYjI1NDg5N2ZlNWI0NjZhODk3MDc5MWFmYjcxOWJiNyIsInVzZXJfaWQiOjExMDA3MTR9.9vfeC9dfmRoYM586GzwnlcCCWcqCciszAhoDFwsSIPs' -H 'Content-Type: application/json' -d '
+    {
+        "connector": {
+        "id": "1",
+        "dialect": "hive",
+        "nice_name": "Hive",
+        "description": "Via SqlAlchemy interface",
+        "category": "editor",
+        "interface": "sqlalchemy",
+        "settings": [
+          {
+            "name": "url",
+            "value": "hive://localhost:10000"
+          },
+          {
+            "name": "has_ssh",
+            "value": false
+          },
+          {
+            "name": "ssh_server_host",
+            "value": "127.0.0.1"
+          }
+        ],
+        "properties": {
+          "is_sql": true,
+          "sql_identifier_quote": "`",
+          "sql_identifier_comment_single": "--",
+          "has_catalog": false,
+          "has_database": true,
+          "has_table": true,
+          "has_live_queries": false,
+          "has_optimizer_risks": true,
+          "has_optimizer_values": true,
+          "has_auto_limit": false,
+          "has_reference_language": true,
+          "has_reference_functions": true,
+          "has_use_statement": true
+        }
+      }
+    }'
+
+- **connector:** Details about the connector to test.
+
+### Install example
+
+    curl -X POST 'http://127.0.0.1:8000/api/connector/examples/install/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI2MjM3OTcxLCJqdGkiOiJlYjI1NDg5N2ZlNWI0NjZhODk3MDc5MWFmYjcxOWJiNyIsInVzZXJfaWQiOjExMDA3MTR9.9vfeC9dfmRoYM586GzwnlcCCWcqCciszAhoDFwsSIPs' -H 'Content-Type: application/x-www-form-urlencoded'
 
 ## Data Catalog
 
