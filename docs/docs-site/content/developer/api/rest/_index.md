@@ -488,7 +488,7 @@ Get the list of configured [connectors](/administrator/configuration/connectors/
     ...........
     ] }, { "category": "plugins", "category_name": "Plugins", "description": "", "values": [] } ], "categories": [ { "name": "Editor", "type": "editor", "description": "" }, { "name": "Browsers", "type": "browsers", "description": "" }, { "name": "Catalogs", "type": "catalogs", "description": "" }, { "name": "Optimizers", "type": "optimizers", "description": "" }, { "name": "Schedulers", "type": "schedulers", "description": "" }, { "name": "Plugins", "type": "plugins", "description": "" } ] }
     
-### New
+### Create
 
     curl -X POST 'https://demo.gethue.com/api/connector/instance/new/<DIALECT>/<INTERFACE>' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI2MjM3OTcxLCJqdGkiOiJlYjI1NDg5N2ZlNWI0NjZhODk3MDc5MWFmYjcxOWJiNyIsInVzZXJfaWQiOjExMDA3MTR9.9vfeC9dfmRoYM586GzwnlcCCWcqCciszAhoDFwsSIPs' -H 'Content-Type: application/x-www-form-urlencoded'
 
