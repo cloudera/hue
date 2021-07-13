@@ -105,3 +105,16 @@ urlpatterns += [
   re_path(r'^indexer/guess_format/?$', api_public.guess_format, name='indexer_guess_format'),
   re_path(r'^indexer/guess_field_types/?$', api_public.guess_field_types, name='indexer_guess_field_types'),
 ]
+
+urlpatterns += [
+  re_path(r'^connector/types/?$', api_public.get_connector_types, name='connector_get_types'),
+  re_path(r'^connector/instances/?$', api_public.get_connectors_instances, name='connector_get_instances'),
+
+  re_path(r'^connector/instance/new/(?P<dialect>[\w\-]+)/(?P<interface>[\w\-]+)$', api_public.new_connector, name='connector_new'),
+  re_path(r'^connector/instance/get/(?P<id>\d+)$', api_public.get_connector, name='connector_get'),
+  re_path(r'^connector/instance/delete/?$', api_public.delete_connector, name='connector_delete'),
+  re_path(r'^connector/instance/update/?$', api_public.update_connector, name='connector_update'),
+  re_path(r'^connector/instance/test/?$', api_public.test_connector, name='connector_test'),
+
+  re_path(r'^connector/examples/install/?$', api_public.install_connector_examples, name='connector_install_examples'),
+]
