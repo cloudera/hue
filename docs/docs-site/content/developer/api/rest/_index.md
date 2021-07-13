@@ -486,7 +486,7 @@ Get the list of configured [connectors](/administrator/configuration/connectors/
 
 ### Update connector
 
-    curl -X POST 'http://127.0.0.1:8000/api/connector/instance/update' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI2MjM3OTcxLCJqdGkiOiJlYjI1NDg5N2ZlNWI0NjZhODk3MDc5MWFmYjcxOWJiNyIsInVzZXJfaWQiOjExMDA3MTR9.9vfeC9dfmRoYM586GzwnlcCCWcqCciszAhoDFwsSIPs' -H 'Content-Type: application/json' -d '
+    curl -X POST 'https://demo.gethue.com/api/connector/instance/update' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI2MjM3OTcxLCJqdGkiOiJlYjI1NDg5N2ZlNWI0NjZhODk3MDc5MWFmYjcxOWJiNyIsInVzZXJfaWQiOjExMDA3MTR9.9vfeC9dfmRoYM586GzwnlcCCWcqCciszAhoDFwsSIPs' -H 'Content-Type: application/json' -d '
     {
     "connector": {
         "id": "1",
@@ -531,13 +531,13 @@ Get the list of configured [connectors](/administrator/configuration/connectors/
 
 ### Delete connector
 
-    curl -X POST 'http://127.0.0.1:8000/api/connector/instance/delete' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI2MjM3OTcxLCJqdGkiOiJlYjI1NDg5N2ZlNWI0NjZhODk3MDc5MWFmYjcxOWJiNyIsInVzZXJfaWQiOjExMDA3MTR9.9vfeC9dfmRoYM586GzwnlcCCWcqCciszAhoDFwsSIPs' -H 'Content-Type: application/json' -d '{"connector": {"id": "1", "name": "hive"}}'
+    curl -X POST 'https://demo.gethue.com/api/connector/instance/delete' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI2MjM3OTcxLCJqdGkiOiJlYjI1NDg5N2ZlNWI0NjZhODk3MDc5MWFmYjcxOWJiNyIsInVzZXJfaWQiOjExMDA3MTR9.9vfeC9dfmRoYM586GzwnlcCCWcqCciszAhoDFwsSIPs' -H 'Content-Type: application/json' -d '{"connector": {"id": "1", "name": "hive"}}'
 
 - **connector:** Details about the connector to delete.
 
 ### Test connector
 
-    curl -X POST 'http://127.0.0.1:8000/api/connector/instance/test/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI2MjM3OTcxLCJqdGkiOiJlYjI1NDg5N2ZlNWI0NjZhODk3MDc5MWFmYjcxOWJiNyIsInVzZXJfaWQiOjExMDA3MTR9.9vfeC9dfmRoYM586GzwnlcCCWcqCciszAhoDFwsSIPs' -H 'Content-Type: application/json' -d '
+    curl -X POST 'https://demo.gethue.com/api/connector/instance/test/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI2MjM3OTcxLCJqdGkiOiJlYjI1NDg5N2ZlNWI0NjZhODk3MDc5MWFmYjcxOWJiNyIsInVzZXJfaWQiOjExMDA3MTR9.9vfeC9dfmRoYM586GzwnlcCCWcqCciszAhoDFwsSIPs' -H 'Content-Type: application/json' -d '
     {
         "connector": {
         "id": "1",
@@ -582,7 +582,7 @@ Get the list of configured [connectors](/administrator/configuration/connectors/
 
 ### Install example
 
-    curl -X POST 'http://127.0.0.1:8000/api/connector/examples/install/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI2MjM3OTcxLCJqdGkiOiJlYjI1NDg5N2ZlNWI0NjZhODk3MDc5MWFmYjcxOWJiNyIsInVzZXJfaWQiOjExMDA3MTR9.9vfeC9dfmRoYM586GzwnlcCCWcqCciszAhoDFwsSIPs' -H 'Content-Type: application/x-www-form-urlencoded'
+    curl -X POST 'https://demo.gethue.com/api/connector/examples/install/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI2MjM3OTcxLCJqdGkiOiJlYjI1NDg5N2ZlNWI0NjZhODk3MDc5MWFmYjcxOWJiNyIsInVzZXJfaWQiOjExMDA3MTR9.9vfeC9dfmRoYM586GzwnlcCCWcqCciszAhoDFwsSIPs' -H 'Content-Type: application/x-www-form-urlencoded'
 
 ## Data Catalog
 
