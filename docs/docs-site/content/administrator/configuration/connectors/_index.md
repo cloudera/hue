@@ -32,15 +32,22 @@ Read about [how to build your own parser](/developer/development/#sql-parsers) i
 
 **Beta**
 
-Connections can be configured via a UI after [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) is done. The feature require Editor 2 which is also in beta.
+Admins can configure the connectors via the UI after [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) is done. This feature requires Editor v2 which is also in beta.
 
     [desktop]
     enable_connectors=true
 
     [notebook]
     enable_notebook_2=true
+    
+**NOTE:** After enabling the above flags, if `django.db.utils.OperationalError: (1054, "Unknown column 'useradmin_huepermission.connector_id' in 'field list'")` error comes, then try **changing the DB name** in the hue.ini under `[[database]]` because there is no upgrade path and run the migrate command `./build/env/bin/hue migrate`.
+
+Go to `Administer Server` > `Connectors` > `+ Connector` or can directly navigate to `http://127.0.0.1:8000/hue/desktop/connectors`.
 
 !["Connectors"](https://cdn.gethue.com/uploads/2020/12/hue-connectors-create.png)
+
+Connectors are also configuarable via the public [REST APIs](developer/api/rest/#connectors).
+
 
 ### Apache Hive
 
