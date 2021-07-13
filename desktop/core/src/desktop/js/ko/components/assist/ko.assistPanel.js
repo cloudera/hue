@@ -40,7 +40,7 @@ const TEMPLATE = `
     </div>
   </script>
   
-  <div class="assist-panel" data-bind="dropzone: { url: '/filebrowser/upload/file?dest=' + DROPZONE_HOME_DIR, params: {dest: DROPZONE_HOME_DIR}, clickable: false, paramName: 'hdfs_file', onComplete: function(path){ huePubSub.publish('assist.dropzone.complete', path); }, disabled: !window.SHOW_UPLOAD_BUTTON }">
+  <div class="assist-panel" data-bind="dropzone: { url: '/indexer/api/indexer/upload_local_file_drag_and_drop', clickable: false, paramName: 'file', onComplete: function(path){ huePubSub.publish('assist.dropzone.complete', path); }, disabled: !window.SHOW_UPLOAD_BUTTON }">
     <!-- ko if: availablePanels().length > 1 -->
     <div class="assist-panel-switches">
       <!-- ko foreach: availablePanels -->

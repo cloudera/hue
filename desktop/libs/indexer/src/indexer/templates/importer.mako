@@ -3183,7 +3183,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
         function upload() {
           var fd = new FormData();
           var files = $('#inputfile')[0].files[0];
-          fd.append('inputfile', files);
+          fd.append('file', files);
           var file_size = files.size;
           if (file_size > 200000) {
                 $.jHueNotify.warn("${ _('File size exceeds the supported size (200 KB).') }");
