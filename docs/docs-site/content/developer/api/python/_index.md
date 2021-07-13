@@ -7,6 +7,32 @@ weight: 2
 
 Leverage the built-in Python shell to interact with the server and the API.
 
+    build/env/bin/hue shell
+
+If using Cloudera Manager, as a *root* user launch the shell.
+
+Export the configuration directory:
+
+    export HUE_CONF_DIR="/var/run/cloudera-scm-agent/process/`ls -alrt /var/run/cloudera-scm-agent/process | grep HUE_SERVER | tail -1 | awk '{print $9}'`"
+    echo $HUE_CONF_DIR
+    > /var/run/cloudera-scm-agent/process/2061-hue-HUE_SERVER
+
+Get the process id:
+
+    lsof -i :8888|grep -m1 hue|awk '{ print $2 }'
+    > 14850
+
+In order to export all Hue's env variables:
+
+    for line in `strings /proc/$(lsof -i :8888|grep -m1 hue|awk '{ print $2 }')/environ|egrep -v "^HOME=|^TERM=|^PWD="`;do export $line;done
+
+And finally launch the shell by:
+
+    HUE_IGNORE_PASSWORD_SCRIPT_ERRORS=1 /opt/cloudera/parcels/CDH/lib/hue/build/env/bin/hue shell
+    > ALERT: This appears to be a CM Managed environment
+    > ALERT: HUE_CONF_DIR must be set when running hue commands in CM Managed environment
+    > ALERT: Please run 'hue <command> --cm-managed'
+
 ## Storage
 
 ### S3
@@ -47,13 +73,23 @@ Or perform various FS operations:
 
     fs.stats('https://gethue.blob.core.windows.net/data')
 
-## Server
+## Users
 
-### Making a user admin
+### Create
 
-Via the Hue shell:
+    from desktop.auth.backend import create_user
 
-    build/env/bin/hue shell
+    bob = create_user(username='bob', password='secret1', is_superuser=True)
+    alice = create_user(username='alice', password='secret2', is_superuser=False)
+
+### Find or Create
+
+    from desktop.auth.backend import find_or_create_user
+
+    bob = find_or_create_user(username='bob', password='secret1', is_superuser=True)
+    alice = find_or_create_user(username='alice', password='secret2', is_superuser=False)
+
+### Convert to admin
 
 Then type something similar to:
 
@@ -65,9 +101,7 @@ Then type something similar to:
     a.set_password('my_secret')
     a.save()
 
-### Changing user password
-
-In the Hue shell:
+### Changing password
 
     from django.contrib.auth.models import User
 
@@ -75,47 +109,7 @@ In the Hue shell:
     user.set_password('some password')
     user.save()
 
-
-### Counting user documents
-
-On the command line:
-
-    ./build/env/bin/hue shell
-
-If using Cloudera Manager, as a *root* user launch the shell.
-
-Export the configuration directory:
-
-    export HUE_CONF_DIR="/var/run/cloudera-scm-agent/process/`ls -alrt /var/run/cloudera-scm-agent/process | grep HUE_SERVER | tail -1 | awk '{print $9}'`"
-    echo $HUE_CONF_DIR
-    > /var/run/cloudera-scm-agent/process/2061-hue-HUE_SERVER
-
-Get the process id:
-
-    lsof -i :8888|grep -m1 hue|awk '{ print $2 }'
-    > 14850
-
-In order to export all Hue's env variables:
-
-    for line in `strings /proc/$(lsof -i :8888|grep -m1 hue|awk '{ print $2 }')/environ|egrep -v "^HOME=|^TERM=|^PWD="`;do export $line;done
-
-And finally launch the shell by:
-
-    HUE_IGNORE_PASSWORD_SCRIPT_ERRORS=1 /opt/cloudera/parcels/CDH/lib/hue/build/env/bin/hue shell
-    > ALERT: This appears to be a CM Managed environment
-    > ALERT: HUE_CONF_DIR must be set when running hue commands in CM Managed environment
-    > ALERT: Please run 'hue <command> --cm-managed'
-
-Then use the Python code to access a certain user information:
-
-    Python 2.7.6 (default, Oct 26 2016, 20:30:19)
-    Type "copyright", "credits" or "license" for more information.
-
-    IPython 5.2.0 -- An enhanced Interactive Python.
-    ?         -> Introduction and overview of IPython's features.
-    %quickref -> Quick reference.
-    help      -> Python's own help system.
-    object?   -> Details about 'object', use 'object??' for extra details.
+### Counting documents
 
     from django.contrib.auth.models import User
     from desktop.models import Document2
