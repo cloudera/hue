@@ -471,20 +471,32 @@ If the `show_command` parameter is given, the API call will instead return the g
 Get the list of configured [connectors](/administrator/configuration/connectors/):
 
     curl -X GET 'https://demo.gethue.com/api/connector/instances' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI2MjM3OTcxLCJqdGkiOiJlYjI1NDg5N2ZlNWI0NjZhODk3MDc5MWFmYjcxOWJiNyIsInVzZXJfaWQiOjExMDA3MTR9.9vfeC9dfmRoYM586GzwnlcCCWcqCciszAhoDFwsSIPs' -H 'Content-Type: application/x-www-form-urlencoded'
+    
+    {"connectors": [{"category": "editor", "category_name": "Editor", "description": "", "values": []}, {"category": "browsers", "category_name": "Browsers", "description": "", "values": []}, {"category": "catalogs", "category_name": "Catalogs", "description": "", "values": []}, {"category": "optimizers", "category_name": "Optimizers", "description": "", "values": []}, {"category": "schedulers", "category_name": "Schedulers", "description": "", "values": []}, {"category": "plugins", "category_name": "Plugins", "description": "", "values": []}]}
 
 ### Types
 
     curl -X GET 'https://demo.gethue.com/api/connector/types' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI2MjM3OTcxLCJqdGkiOiJlYjI1NDg5N2ZlNWI0NjZhODk3MDc5MWFmYjcxOWJiNyIsInVzZXJfaWQiOjExMDA3MTR9.9vfeC9dfmRoYM586GzwnlcCCWcqCciszAhoDFwsSIPs' -H 'Content-Type: application/x-www-form-urlencoded'
     
-### New connector
+    { "connectors": [ { "category": "editor", "category_name": "Editor", "description": "", "values": [ { "dialect": "hive", "nice_name": "Hive", "description": "Recommended", "category": "editor", "interface": "hiveserver2", "settings": [ { "name": "server_host", "value": "localhost" }, { "name": "server_port", "value": 10000 }, { "name": "is_llap", "value": false }, { "name": "use_sasl", "value": true } ], "properties": { "is_sql": true, "sql_identifier_quote": "`", "sql_identifier_comment_single": "--", "has_catalog": false, "has_database": true, "has_table": true, "has_live_queries": false, "has_optimizer_risks": true, "has_optimizer_values": true, "has_auto_limit": false, "has_reference_language": true, "has_reference_functions": true, "has_use_statement": true } }, 
+    ...........
+    { "category": "browsers", "category_name": "Browsers", "description": "", "values": [ { "nice_name": "HDFS", "dialect": "hdfs", "interface": "rest", "settings": [ { "name": "server_url", "value": "http://localhost:50070/webhdfs/v1" }, { "name": "default_fs", "value": "fs_defaultfs=hdfs://localhost:8020" } ], "category": "browsers", "description": "", "properties": {} }, 
+    ...........
+    { "nice_name": "S3", "dialect": "s3", "settings": [], "category": "browsers", "description": "", "properties": {} }, { "nice_name": "ADLS", "dialect": "adls-v1", "settings": [], "category": "browsers", "description": "", "properties": {} } ] }, { "category": "catalogs", "category_name": "Catalogs", "description": "", "values": [ { "nice_name": "Hive Metastore", "dialect": "hms", "interface": "hiveserver2", "settings": [ { "name": "server_host", "value": "" }, { "name": "server_port", "value": "" } ], "category": "catalogs", "description": "", "properties": {} }, { "nice_name": "Atlas", "dialect": "atlas", "interface": "rest", "settings": [], "category": "catalogs", "description": "", "properties": {} }, 
+    ...........
+    ] }, { "category": "optimizers", "category_name": "Optimizers", "description": "", "values": [ { "nice_name": "Optimizer", "dialect": "optimizer", "settings": [], "category": "optimizers", "description": "", "properties": {} } ] }, { "category": "schedulers", "category_name": "Schedulers", "description": "", "values": [ { "nice_name": "Oozie", "dialect": "oozie", "settings": [], "category": "schedulers", "description": "", "properties": {} }, 
+    ...........
+    ] }, { "category": "plugins", "category_name": "Plugins", "description": "", "values": [] } ], "categories": [ { "name": "Editor", "type": "editor", "description": "" }, { "name": "Browsers", "type": "browsers", "description": "" }, { "name": "Catalogs", "type": "catalogs", "description": "" }, { "name": "Optimizers", "type": "optimizers", "description": "" }, { "name": "Schedulers", "type": "schedulers", "description": "" }, { "name": "Plugins", "type": "plugins", "description": "" } ] }
+    
+### New
 
     curl -X POST 'https://demo.gethue.com/api/connector/instance/new/<DIALECT>/<INTERFACE>' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI2MjM3OTcxLCJqdGkiOiJlYjI1NDg5N2ZlNWI0NjZhODk3MDc5MWFmYjcxOWJiNyIsInVzZXJfaWQiOjExMDA3MTR9.9vfeC9dfmRoYM586GzwnlcCCWcqCciszAhoDFwsSIPs' -H 'Content-Type: application/x-www-form-urlencoded'
 
-### Get connector
+### Get
 
     curl -X GET 'https://demo.gethue.com/api/connector/instance/get/<ID>' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI2MjM3OTcxLCJqdGkiOiJlYjI1NDg5N2ZlNWI0NjZhODk3MDc5MWFmYjcxOWJiNyIsInVzZXJfaWQiOjExMDA3MTR9.9vfeC9dfmRoYM586GzwnlcCCWcqCciszAhoDFwsSIPs' -H 'Content-Type: application/x-www-form-urlencoded'
 
-### Update connector
+### Update
 
     curl -X POST 'https://demo.gethue.com/api/connector/instance/update' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI2MjM3OTcxLCJqdGkiOiJlYjI1NDg5N2ZlNWI0NjZhODk3MDc5MWFmYjcxOWJiNyIsInVzZXJfaWQiOjExMDA3MTR9.9vfeC9dfmRoYM586GzwnlcCCWcqCciszAhoDFwsSIPs' -H 'Content-Type: application/json' -d '
     {
@@ -529,13 +541,13 @@ Get the list of configured [connectors](/administrator/configuration/connectors/
 
 - **connector:** Details about the connector to update.
 
-### Delete connector
+### Delete
 
     curl -X POST 'https://demo.gethue.com/api/connector/instance/delete' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI2MjM3OTcxLCJqdGkiOiJlYjI1NDg5N2ZlNWI0NjZhODk3MDc5MWFmYjcxOWJiNyIsInVzZXJfaWQiOjExMDA3MTR9.9vfeC9dfmRoYM586GzwnlcCCWcqCciszAhoDFwsSIPs' -H 'Content-Type: application/json' -d '{"connector": {"id": "1", "name": "hive"}}'
 
 - **connector:** Details about the connector to delete.
 
-### Test connector
+### Test
 
     curl -X POST 'https://demo.gethue.com/api/connector/instance/test/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI2MjM3OTcxLCJqdGkiOiJlYjI1NDg5N2ZlNWI0NjZhODk3MDc5MWFmYjcxOWJiNyIsInVzZXJfaWQiOjExMDA3MTR9.9vfeC9dfmRoYM586GzwnlcCCWcqCciszAhoDFwsSIPs' -H 'Content-Type: application/json' -d '
     {
