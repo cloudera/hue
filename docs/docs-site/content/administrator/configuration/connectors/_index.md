@@ -46,7 +46,7 @@ Go to `Administer Server` > `Connectors` > `+ Connector` or can directly navigat
 
 !["Connectors"](https://cdn.gethue.com/uploads/2020/12/hue-connectors-create.png)
 
-Connectors are also configuarable via the public [REST APIs](developer/api/rest/#connectors).
+Connectors are also configuarable via the public [REST APIs](/developer/api/rest/#connectors).
 
 
 ### Apache Hive
