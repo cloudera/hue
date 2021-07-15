@@ -63,15 +63,28 @@ then
 	exit 1
 fi
 
+# Using this for splitting the filenames with comma seperator
+IFS=','
+read -a strarr <<< "$FILE_NAMES"
+
 FILE_NAMES=("${FILE_NAMES//,/ }")
 exit_status=0
+failed=0
 
 temp_output_dir=`mktemp -d 2>/dev/null || mktemp -d -t 'mytmpdir'`
 echo 'Created temporary output directory: '$temp_output_dir
 
 set -x
-zip -r "$temp_output_dir/$ARCHIVE_NAME" "${FILE_NAMES[@]}"
-exit_status=$(echo $?)
+for FILE_NAME in "${strarr[@]}"
+do
+	zip -r "$temp_output_dir/$ARCHIVE_NAME" "${FILE_NAME}"
+	exit_status=$(echo $?)
+	if [ $exit_status -ne 0 ]
+	then
+		echo 'Failed to compress file or folder: '$FILE_NAME
+		failed=1
+	fi
+done
 
 set +x
 if [ $exit_status == 0 ]
@@ -92,5 +105,10 @@ fi
 
 rm -rf $temp_output_dir
 echo 'Deleted temporary output directory: '$temp_output_dir
+
+if [ $failed == 1 ]
+then
+  exit_status = $failed
+fi
 
 exit $exit_status
