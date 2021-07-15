@@ -56,7 +56,7 @@ RUN ./build/env/bin/pip install --no-cache-dir \
   psycopg2-binary \
   # Avoid Django 3 pulling
   django_redis==4.11.0 \
-  flower \
+  flower==0.9.7 \
   # Contains fix for SparkSql show tables
   git+https://github.com/gethue/PyHive \
   # pyhive \
