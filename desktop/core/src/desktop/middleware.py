@@ -147,6 +147,10 @@ class ClusterMiddleware(MiddlewareMixin):
 
       if request.fs is not None:
         request.fs.setuser(request.user.username)
+      else:
+        LOG.warning("request.fs user was not set")
+    else:
+      LOG.warning("request.fs was not set")
 
     # Deprecated
     request.jt = None
