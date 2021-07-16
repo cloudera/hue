@@ -116,7 +116,7 @@ Then a JWT token is returned and needs to be passed as a bearer in the headers f
     curl -X POST https://demo.gethue.com/api/editor/create_notebook -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjIxNjM5NjMxLCJqdGkiOiI0NTY3NTA4MzM5YjY0MjFmYTMzZDJjMzViZWUyMDAyMCIsInVzZXJfaWQiOjF9.qrMNrr69eo38dOsV2aYp8k6WqBeyJZkbSuavxA_o_kM"
 
     {"detail":"Given token not valid for any token type","code":"token_not_valid","messages":[{"token_class":"AccessToken","token_type":"access","message":"Token is invalid or expired"}]}
-    
+
     [09/Jul/2021 23:58:40 -0700] access       INFO     demo.gethue.com -anon- - "POST /api/editor/create_notebook HTTP/1.1" returned in 2ms 401 183 (mem: 124mb)
 
 ### Authenticate
@@ -226,51 +226,51 @@ Same but in Python:
 
 ### Listing Databases
 
-    curl -X POST 'https://demo.gethue.com/api/editor/autocomplete/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1NzM2NTA0LCJqdGkiOiJkZDVlYTg5ZTMwMDE0MjRiOGRlYWM4N2RjODFhYjgzZSIsInVzZXJfaWQiOjExMDA3MTR9.8I9BeXQXBWFMGf7J4ss7yhcmAZfcFC6sMRE9RLeOwTM' -H 'Content-Type: application/x-www-form-urlencoded'
+    curl -X POST 'https://demo.gethue.com/api/editor/autocomplete/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1NzM2NTA0LCJqdGkiOiJkZDVlYTg5ZTMwMDE0MjRiOGRlYWM4N2RjODFhYjgzZSIsInVzZXJfaWQiOjExMDA3MTR9.8I9BeXQXBWFMGf7J4ss7yhcmAZfcFC6sMRE9RLeOwTM'
 
-### Database details and Tables 
+### Database details and Tables
 
-    curl -X POST 'https://demo.gethue.com/api/editor/autocomplete/<DB>/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1NzM2NTA0LCJqdGkiOiJkZDVlYTg5ZTMwMDE0MjRiOGRlYWM4N2RjODFhYjgzZSIsInVzZXJfaWQiOjExMDA3MTR9.8I9BeXQXBWFMGf7J4ss7yhcmAZfcFC6sMRE9RLeOwTM' -H 'Content-Type: application/x-www-form-urlencoded'
+    curl -X POST 'https://demo.gethue.com/api/editor/autocomplete/<DB>/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1NzM2NTA0LCJqdGkiOiJkZDVlYTg5ZTMwMDE0MjRiOGRlYWM4N2RjODFhYjgzZSIsInVzZXJfaWQiOjExMDA3MTR9.8I9BeXQXBWFMGf7J4ss7yhcmAZfcFC6sMRE9RLeOwTM'
 
 Describe database API:
 
-    curl -X POST 'https://demo.gethue.com/api/editor/describe/<DB>/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1NzM2NTA0LCJqdGkiOiJkZDVlYTg5ZTMwMDE0MjRiOGRlYWM4N2RjODFhYjgzZSIsInVzZXJfaWQiOjExMDA3MTR9.8I9BeXQXBWFMGf7J4ss7yhcmAZfcFC6sMRE9RLeOwTM' -H 'Content-Type: application/x-www-form-urlencoded' -d 'source_type=mysql'
+    curl -X POST 'https://demo.gethue.com/api/editor/describe/<DB>/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1NzM2NTA0LCJqdGkiOiJkZDVlYTg5ZTMwMDE0MjRiOGRlYWM4N2RjODFhYjgzZSIsInVzZXJfaWQiOjExMDA3MTR9.8I9BeXQXBWFMGf7J4ss7yhcmAZfcFC6sMRE9RLeOwTM' -d 'source_type=mysql'
 
 - **source_type:** select the configured databases (e.g. `hive`) or connector ID (e.g. `1`)
 
 ### Table details and Columns
 
-    curl -X POST 'https://demo.gethue.com/api/editor/autocomplete/<DB>/<TABLE>/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1NzM2NTA0LCJqdGkiOiJkZDVlYTg5ZTMwMDE0MjRiOGRlYWM4N2RjODFhYjgzZSIsInVzZXJfaWQiOjExMDA3MTR9.8I9BeXQXBWFMGf7J4ss7yhcmAZfcFC6sMRE9RLeOwTM' -H 'Content-Type: application/x-www-form-urlencoded'
-    
+    curl -X POST 'https://demo.gethue.com/api/editor/autocomplete/<DB>/<TABLE>/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1NzM2NTA0LCJqdGkiOiJkZDVlYTg5ZTMwMDE0MjRiOGRlYWM4N2RjODFhYjgzZSIsInVzZXJfaWQiOjExMDA3MTR9.8I9BeXQXBWFMGf7J4ss7yhcmAZfcFC6sMRE9RLeOwTM'
+
 Describe table API:
 
-    curl -X POST 'https://demo.gethue.com/api/editor/describe/<DB>/<TABLE>/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1NzM2NTA0LCJqdGkiOiJkZDVlYTg5ZTMwMDE0MjRiOGRlYWM4N2RjODFhYjgzZSIsInVzZXJfaWQiOjExMDA3MTR9.8I9BeXQXBWFMGf7J4ss7yhcmAZfcFC6sMRE9RLeOwTM' -H 'Content-Type: application/x-www-form-urlencoded' -d 'source_type=1'
+    curl -X POST 'https://demo.gethue.com/api/editor/describe/<DB>/<TABLE>/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1NzM2NTA0LCJqdGkiOiJkZDVlYTg5ZTMwMDE0MjRiOGRlYWM4N2RjODFhYjgzZSIsInVzZXJfaWQiOjExMDA3MTR9.8I9BeXQXBWFMGf7J4ss7yhcmAZfcFC6sMRE9RLeOwTM' -d 'source_type=1'
 
 - **source_type:** select the configured databases (e.g. `hive`) or connector ID (e.g. `1`)
 
 Analyze API:
 
-    curl -X POST 'https://demo.gethue.com/api/<DIALECT>/analyze/<DB>/<TABLE>/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1ODE1MzU5LCJqdGkiOiIzODM0M2Q3YjRjNGY0NTUxYWJmYmQyZmI4YjUzYjFjZiIsInVzZXJfaWQiOjExMDA3MTR9.fl0h7VooLtWnu9v7FtdLUy3NukwFtUya-LkTzollTig' -H 'Content-Type: application/x-www-form-urlencoded'
+    curl -X POST 'https://demo.gethue.com/api/<DIALECT>/analyze/<DB>/<TABLE>/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1ODE1MzU5LCJqdGkiOiIzODM0M2Q3YjRjNGY0NTUxYWJmYmQyZmI4YjUzYjFjZiIsInVzZXJfaWQiOjExMDA3MTR9.fl0h7VooLtWnu9v7FtdLUy3NukwFtUya-LkTzollTig'
 
 - Currently supported **dialects:** impala, beeswax (hive)
 
 Sample table data API:
 
-    curl -X POST 'https://demo.gethue.com/api/editor/sample/<DB>/<TABLE>/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1ODE1MzU5LCJqdGkiOiIzODM0M2Q3YjRjNGY0NTUxYWJmYmQyZmI4YjUzYjFjZiIsInVzZXJfaWQiOjExMDA3MTR9.fl0h7VooLtWnu9v7FtdLUy3NukwFtUya-LkTzollTig' -H 'Content-Type: application/x-www-form-urlencoded'
+    curl -X POST 'https://demo.gethue.com/api/editor/sample/<DB>/<TABLE>/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1ODE1MzU5LCJqdGkiOiIzODM0M2Q3YjRjNGY0NTUxYWJmYmQyZmI4YjUzYjFjZiIsInVzZXJfaWQiOjExMDA3MTR9.fl0h7VooLtWnu9v7FtdLUy3NukwFtUya-LkTzollTig'
 
 ### Column details
 
-    curl -X POST 'https://demo.gethue.com/api/editor/autocomplete/<DB>/<TABLE>/<COL1>/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1NzM2NTA0LCJqdGkiOiJkZDVlYTg5ZTMwMDE0MjRiOGRlYWM4N2RjODFhYjgzZSIsInVzZXJfaWQiOjExMDA3MTR9.8I9BeXQXBWFMGf7J4ss7yhcmAZfcFC6sMRE9RLeOwTM' -H 'Content-Type: application/x-www-form-urlencoded'
+    curl -X POST 'https://demo.gethue.com/api/editor/autocomplete/<DB>/<TABLE>/<COL1>/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1NzM2NTA0LCJqdGkiOiJkZDVlYTg5ZTMwMDE0MjRiOGRlYWM4N2RjODFhYjgzZSIsInVzZXJfaWQiOjExMDA3MTR9.8I9BeXQXBWFMGf7J4ss7yhcmAZfcFC6sMRE9RLeOwTM'
 
 Analyze API:
 
-    curl -X POST 'https://demo.gethue.com/api/<DIALECT>/analyze/<DB>/<TABLE>/<COL1>/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1ODE1MzU5LCJqdGkiOiIzODM0M2Q3YjRjNGY0NTUxYWJmYmQyZmI4YjUzYjFjZiIsInVzZXJfaWQiOjExMDA3MTR9.fl0h7VooLtWnu9v7FtdLUy3NukwFtUya-LkTzollTig' -H 'Content-Type: application/x-www-form-urlencoded'
+    curl -X POST 'https://demo.gethue.com/api/<DIALECT>/analyze/<DB>/<TABLE>/<COL1>/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1ODE1MzU5LCJqdGkiOiIzODM0M2Q3YjRjNGY0NTUxYWJmYmQyZmI4YjUzYjFjZiIsInVzZXJfaWQiOjExMDA3MTR9.fl0h7VooLtWnu9v7FtdLUy3NukwFtUya-LkTzollTig'
 
 - Currently supported **dialects:** impala, beeswax (hive)
 
 Sample column data API:
 
-    curl -X POST 'https://demo.gethue.com/api/editor/sample/<DB>/<TABLE>/<COL1>/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1ODE1MzU5LCJqdGkiOiIzODM0M2Q3YjRjNGY0NTUxYWJmYmQyZmI4YjUzYjFjZiIsInVzZXJfaWQiOjExMDA3MTR9.fl0h7VooLtWnu9v7FtdLUy3NukwFtUya-LkTzollTig' -H 'Content-Type: application/x-www-form-urlencoded'
+    curl -X POST 'https://demo.gethue.com/api/editor/sample/<DB>/<TABLE>/<COL1>/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1ODE1MzU5LCJqdGkiOiIzODM0M2Q3YjRjNGY0NTUxYWJmYmQyZmI4YjUzYjFjZiIsInVzZXJfaWQiOjExMDA3MTR9.fl0h7VooLtWnu9v7FtdLUy3NukwFtUya-LkTzollTig'
 
 ### Listing Functions
 
@@ -470,7 +470,131 @@ If the `show_command` parameter is given, the API call will instead return the g
 
 Get the list of configured [connectors](/administrator/configuration/connectors/):
 
-    curl -L -X POST demo.gethue.com/desktop/connectors/api/instances
+    curl -X GET 'https://demo.gethue.com/api/connector/instances' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI2MjM3OTcxLCJqdGkiOiJlYjI1NDg5N2ZlNWI0NjZhODk3MDc5MWFmYjcxOWJiNyIsInVzZXJfaWQiOjExMDA3MTR9.9vfeC9dfmRoYM586GzwnlcCCWcqCciszAhoDFwsSIPs'
+
+    {"connectors": [{"category": "editor", "category_name": "Editor", "description": "", "values": []}, {"category": "browsers", "category_name": "Browsers", "description": "", "values": []}, {"category": "catalogs", "category_name": "Catalogs", "description": "", "values": []}, {"category": "optimizers", "category_name": "Optimizers", "description": "", "values": []}, {"category": "schedulers", "category_name": "Schedulers", "description": "", "values": []}, {"category": "plugins", "category_name": "Plugins", "description": "", "values": []}]}
+
+### Types
+
+    curl -X GET 'https://demo.gethue.com/api/connector/types' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI2MjM3OTcxLCJqdGkiOiJlYjI1NDg5N2ZlNWI0NjZhODk3MDc5MWFmYjcxOWJiNyIsInVzZXJfaWQiOjExMDA3MTR9.9vfeC9dfmRoYM586GzwnlcCCWcqCciszAhoDFwsSIPs'
+
+    { "connectors": [ { "category": "editor", "category_name": "Editor", "description": "", "values": [ { "dialect": "hive", "nice_name": "Hive", "description": "Recommended", "category": "editor", "interface": "hiveserver2", "settings": [ { "name": "server_host", "value": "localhost" }, { "name": "server_port", "value": 10000 }, { "name": "is_llap", "value": false }, { "name": "use_sasl", "value": true } ], "properties": { "is_sql": true, "sql_identifier_quote": "`", "sql_identifier_comment_single": "--", "has_catalog": false, "has_database": true, "has_table": true, "has_live_queries": false, "has_optimizer_risks": true, "has_optimizer_values": true, "has_auto_limit": false, "has_reference_language": true, "has_reference_functions": true, "has_use_statement": true } },
+    ...........
+    { "category": "browsers", "category_name": "Browsers", "description": "", "values": [ { "nice_name": "HDFS", "dialect": "hdfs", "interface": "rest", "settings": [ { "name": "server_url", "value": "http://localhost:50070/webhdfs/v1" }, { "name": "default_fs", "value": "fs_defaultfs=hdfs://localhost:8020" } ], "category": "browsers", "description": "", "properties": {} },
+    ...........
+    { "nice_name": "S3", "dialect": "s3", "settings": [], "category": "browsers", "description": "", "properties": {} }, { "nice_name": "ADLS", "dialect": "adls-v1", "settings": [], "category": "browsers", "description": "", "properties": {} } ] }, { "category": "catalogs", "category_name": "Catalogs", "description": "", "values": [ { "nice_name": "Hive Metastore", "dialect": "hms", "interface": "hiveserver2", "settings": [ { "name": "server_host", "value": "" }, { "name": "server_port", "value": "" } ], "category": "catalogs", "description": "", "properties": {} }, { "nice_name": "Atlas", "dialect": "atlas", "interface": "rest", "settings": [], "category": "catalogs", "description": "", "properties": {} },
+    ...........
+    ] }, { "category": "optimizers", "category_name": "Optimizers", "description": "", "values": [ { "nice_name": "Optimizer", "dialect": "optimizer", "settings": [], "category": "optimizers", "description": "", "properties": {} } ] }, { "category": "schedulers", "category_name": "Schedulers", "description": "", "values": [ { "nice_name": "Oozie", "dialect": "oozie", "settings": [], "category": "schedulers", "description": "", "properties": {} },
+    ...........
+    ] }, { "category": "plugins", "category_name": "Plugins", "description": "", "values": [] } ], "categories": [ { "name": "Editor", "type": "editor", "description": "" }, { "name": "Browsers", "type": "browsers", "description": "" }, { "name": "Catalogs", "type": "catalogs", "description": "" }, { "name": "Optimizers", "type": "optimizers", "description": "" }, { "name": "Schedulers", "type": "schedulers", "description": "" }, { "name": "Plugins", "type": "plugins", "description": "" } ] }
+
+### Create
+
+    curl -X POST 'https://demo.gethue.com/api/connector/instance/new/<DIALECT>/<INTERFACE>' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI2MjM3OTcxLCJqdGkiOiJlYjI1NDg5N2ZlNWI0NjZhODk3MDc5MWFmYjcxOWJiNyIsInVzZXJfaWQiOjExMDA3MTR9.9vfeC9dfmRoYM586GzwnlcCCWcqCciszAhoDFwsSIPs'
+
+### Get
+
+    curl -X GET 'https://demo.gethue.com/api/connector/instance/get/<ID>' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI2MjM3OTcxLCJqdGkiOiJlYjI1NDg5N2ZlNWI0NjZhODk3MDc5MWFmYjcxOWJiNyIsInVzZXJfaWQiOjExMDA3MTR9.9vfeC9dfmRoYM586GzwnlcCCWcqCciszAhoDFwsSIPs'
+
+### Update
+
+    curl -X POST 'https://demo.gethue.com/api/connector/instance/update' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI2MjM3OTcxLCJqdGkiOiJlYjI1NDg5N2ZlNWI0NjZhODk3MDc5MWFmYjcxOWJiNyIsInVzZXJfaWQiOjExMDA3MTR9.9vfeC9dfmRoYM586GzwnlcCCWcqCciszAhoDFwsSIPs' -H 'Content-Type: application/json' -d '
+    {
+    "connector": {
+        "id": "1",
+        "dialect": "hive",
+        "nice_name": "Hive",
+        "description": "Via SqlAlchemy interface",
+        "category": "editor",
+        "interface": "sqlalchemy",
+        "settings": [
+          {
+            "name": "url",
+            "value": "hive://localhost:10000"
+          },
+          {
+            "name": "has_ssh",
+            "value": false
+          },
+          {
+            "name": "ssh_server_host",
+            "value": "127.0.0.1"
+          }
+        ],
+        "properties": {
+          "is_sql": true,
+          "sql_identifier_quote": "`",
+          "sql_identifier_comment_single": "--",
+          "has_catalog": false,
+          "has_database": true,
+          "has_table": true,
+          "has_live_queries": false,
+          "has_optimizer_risks": true,
+          "has_optimizer_values": true,
+          "has_auto_limit": false,
+          "has_reference_language": true,
+          "has_reference_functions": true,
+          "has_use_statement": true
+        }
+      }
+    }'
+
+- **connector:** Details about the connector to update.
+
+### Delete
+
+    curl -X POST 'https://demo.gethue.com/api/connector/instance/delete' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI2MjM3OTcxLCJqdGkiOiJlYjI1NDg5N2ZlNWI0NjZhODk3MDc5MWFmYjcxOWJiNyIsInVzZXJfaWQiOjExMDA3MTR9.9vfeC9dfmRoYM586GzwnlcCCWcqCciszAhoDFwsSIPs' -H 'Content-Type: application/json' -d '{"connector": {"id": "1", "name": "hive"}}'
+
+- **connector:** Details about the connector to delete.
+
+### Test
+
+    curl -X POST 'https://demo.gethue.com/api/connector/instance/test/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI2MjM3OTcxLCJqdGkiOiJlYjI1NDg5N2ZlNWI0NjZhODk3MDc5MWFmYjcxOWJiNyIsInVzZXJfaWQiOjExMDA3MTR9.9vfeC9dfmRoYM586GzwnlcCCWcqCciszAhoDFwsSIPs' -H 'Content-Type: application/json' -d '
+    {
+        "connector": {
+        "id": "1",
+        "dialect": "hive",
+        "nice_name": "Hive",
+        "description": "Via SqlAlchemy interface",
+        "category": "editor",
+        "interface": "sqlalchemy",
+        "settings": [
+          {
+            "name": "url",
+            "value": "hive://localhost:10000"
+          },
+          {
+            "name": "has_ssh",
+            "value": false
+          },
+          {
+            "name": "ssh_server_host",
+            "value": "127.0.0.1"
+          }
+        ],
+        "properties": {
+          "is_sql": true,
+          "sql_identifier_quote": "`",
+          "sql_identifier_comment_single": "--",
+          "has_catalog": false,
+          "has_database": true,
+          "has_table": true,
+          "has_live_queries": false,
+          "has_optimizer_risks": true,
+          "has_optimizer_values": true,
+          "has_auto_limit": false,
+          "has_reference_language": true,
+          "has_reference_functions": true,
+          "has_use_statement": true
+        }
+      }
+    }'
+
+- **connector:** Details about the connector to test.
+
+### Install example
+
+    curl -X POST 'https://demo.gethue.com/api/connector/examples/install/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI2MjM3OTcxLCJqdGkiOiJlYjI1NDg5N2ZlNWI0NjZhODk3MDc5MWFmYjcxOWJiNyIsInVzZXJfaWQiOjExMDA3MTR9.9vfeC9dfmRoYM586GzwnlcCCWcqCciszAhoDFwsSIPs'
 
 ## Data Catalog
 

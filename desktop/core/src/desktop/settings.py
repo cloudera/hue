@@ -282,26 +282,6 @@ PYLINTRC = get_run_root('.pylintrc')
 # Custom CSRF Failure View
 CSRF_FAILURE_VIEW = 'desktop.views.csrf_failure'
 
-REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': [
-      'rest_framework.permissions.IsAuthenticated',
-    ],
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-      'rest_framework_simplejwt.authentication.JWTAuthentication',
-      'rest_framework.authentication.SessionAuthentication',
-    ),
-}
-
-SIMPLE_JWT = {
-  'ACCESS_TOKEN_LIFETIME': datetime.timedelta(days=1),
-  'REFRESH_TOKEN_LIFETIME': datetime.timedelta(days=7),
-  'ROTATE_REFRESH_TOKENS': False,
-  'BLACKLIST_AFTER_ROTATION': True,
-  'UPDATE_LAST_LOGIN': False,
-  'AUTH_HEADER_TYPES': ('Bearer',),
-}
-
-
 ############################################################
 # Part 4: Installation of apps
 ############################################################
@@ -349,6 +329,22 @@ if DEBUG: # For simplification, force all DEBUG when django_debug_mode is True a
 # Part 4a: Django configuration that requires bound Desktop
 # configs.
 ############################################################
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+      'rest_framework.permissions.IsAuthenticated',
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': desktop.conf.AUTH.API_AUTH.get()
+}
+
+SIMPLE_JWT = {
+  'ACCESS_TOKEN_LIFETIME': datetime.timedelta(days=1),
+  'REFRESH_TOKEN_LIFETIME': datetime.timedelta(days=7),
+  'ROTATE_REFRESH_TOKENS': False,
+  'BLACKLIST_AFTER_ROTATION': True,
+  'UPDATE_LAST_LOGIN': False,
+  'AUTH_HEADER_TYPES': ('Bearer',),
+}
 
 if desktop.conf.ENABLE_ORGANIZATIONS.get():
   AUTH_USER_MODEL = 'useradmin.OrganizationUser'

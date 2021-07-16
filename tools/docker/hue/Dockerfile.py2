@@ -63,7 +63,7 @@ RUN ./build/env/bin/pip install \
   psycopg2-binary \
   redis==2.10.6 \
   django_redis \
-  flower \
+  flower==0.9.7 \
   # SparkSql show tables
   git+https://github.com/gethue/PyHive \
   # pyhive \
