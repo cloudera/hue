@@ -456,7 +456,7 @@ def importer_submit(request):
       stream = request.fs.open(path)
       file_encoding = check_encoding(stream.read(10000))
 
-  if destination['ouputFormat'] in ('database', 'table'):
+  if destination['ouputFormat'] in ('database', 'table') and request.fs is not None:
     destination['nonDefaultLocation'] = request.fs.netnormpath(destination['nonDefaultLocation']) \
         if destination['nonDefaultLocation'] else destination['nonDefaultLocation']
 
