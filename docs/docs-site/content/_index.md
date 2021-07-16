@@ -9,15 +9,16 @@ pre = "<b>1. </b>"
 
 <h1>Documentation</h1>
 
-Hue is a mature SQL Assistant for querying any [Databases & Data Warehouses](/administrator/configuration/connectors/) via the Web:
-
-Many companies and organizations use Hue to quickly answer questions via self-service querying e.g.:
+Hue is a mature SQL Assistant for querying Databases & Data Warehouses.
 
 * 1000+ customers
 * Top Fortune 500
 
-are executing 100s of 1000s of queries daily via its SQL Editor or API.
+use Hue to quickly answer questions via self-service querying and are executing 100s of 1000s of queries daily.
 
-This open source project is also ideal for building your own [Query Editor](/developer/components/) or [Query Service](/administrator/installation/cloud/#kubernetes) and contributions are welcome.
+Read more on [gethue.com](http://gethue.com) and
+- Connect to a [database](/administrator/configuration/connectors/)
+- Build your own Editor with the [SQL Scratchpad](/developer/components/scratchpad/)
+- or Query Service by leveraging the [REST API](/developer/api/rest/) and [Kubernetes](/administrator/installation/cloud/#kubernetes)
 
 !["Hue Editor"](https://cdn.gethue.com/uploads/2021/02/hue-4.9.png)
