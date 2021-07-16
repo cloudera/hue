@@ -181,6 +181,14 @@ class RazClient(object):
 
 
 def get_raz_client(raz_url, username, auth='kerberos', service='s3', service_name='cm_s3', cluster_name='myCluster'):
+  if not username:
+    from crequest.middleware import CrequestMiddleware
+    request = CrequestMiddleware.get_request()
+    username = request.user.username if request and hasattr(request, 'user') and request.user.is_authenticated else None
+
+  if not username:
+    raise PopupException('No username set.')
+
   if auth == 'kerberos' or True:  # True until JWT option
     auth_handler = requests_kerberos.HTTPKerberosAuth(mutual_authentication=requests_kerberos.OPTIONAL)
 
