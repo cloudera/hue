@@ -177,7 +177,7 @@
               password.value
             );
           } catch (err) {
-            errorMessage.value = 'Login failed!';
+            errorMessage.value = 'Login failed: ' + err;
             console.error(err);
             return;
           }
