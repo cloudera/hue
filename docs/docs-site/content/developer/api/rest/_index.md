@@ -228,7 +228,7 @@ Same but in Python:
 
     curl -X POST 'https://demo.gethue.com/api/editor/autocomplete/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1NzM2NTA0LCJqdGkiOiJkZDVlYTg5ZTMwMDE0MjRiOGRlYWM4N2RjODFhYjgzZSIsInVzZXJfaWQiOjExMDA3MTR9.8I9BeXQXBWFMGf7J4ss7yhcmAZfcFC6sMRE9RLeOwTM'
 
-### Database details and Tables
+### Database details
 
     curl -X POST 'https://demo.gethue.com/api/editor/autocomplete/<DB>/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1NzM2NTA0LCJqdGkiOiJkZDVlYTg5ZTMwMDE0MjRiOGRlYWM4N2RjODFhYjgzZSIsInVzZXJfaWQiOjExMDA3MTR9.8I9BeXQXBWFMGf7J4ss7yhcmAZfcFC6sMRE9RLeOwTM'
 
@@ -238,7 +238,7 @@ Describe database API:
 
 - **source_type:** select the configured databases (e.g. `hive`) or connector ID (e.g. `1`)
 
-### Table details and Columns
+### Table details
 
     curl -X POST 'https://demo.gethue.com/api/editor/autocomplete/<DB>/<TABLE>/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1NzM2NTA0LCJqdGkiOiJkZDVlYTg5ZTMwMDE0MjRiOGRlYWM4N2RjODFhYjgzZSIsInVzZXJfaWQiOjExMDA3MTR9.8I9BeXQXBWFMGf7J4ss7yhcmAZfcFC6sMRE9RLeOwTM'
 
@@ -307,7 +307,7 @@ For a specific function/UDF details (e.g. trunc):
       console.log(ko.mapping.toJSON(data));
     });
 
-### Get history of executed queries
+### Query history
 
 We can choose a dialect for `doc_type` e.g. impala, mysql, hive, phoenix, etc.
 
