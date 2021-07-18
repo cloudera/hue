@@ -51,7 +51,7 @@ class TestJwtAuthentication():
     with patch('desktop.auth.api_authentications.jwt.decode') as jwt_decode:
 
       jwt_decode.return_value = {
-        "username": "test"
+        "userId": "test"
       }
 
       user, token = JwtAuthentication().authenticate(request=self.request)
@@ -65,7 +65,7 @@ class TestJwtAuthentication():
     with patch('desktop.auth.api_authentications.jwt.decode') as jwt_decode:
 
       jwt_decode.return_value = {
-        "username": "test_new_user"
+        "userId": "test_new_user"
       }
 
       assert_false(User.objects.filter(username="test_new_user").exists())
