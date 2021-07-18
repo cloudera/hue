@@ -4,7 +4,7 @@ avro-python3==1.8.2
 Babel==2.5.1
 boto==2.46.1
 # boto3==1.17.41  # Last Py2 is 1.17
-celery[redis]==4.4.5  # For Python 3.8
+celery[redis]==5.1.2
 cffi==1.14.5
 channels==3.0.3
 channels-redis==3.2.0
@@ -14,8 +14,8 @@ django-auth-ldap==2.3.0
 Django==3.2.4
 daphne==3.0.2
 django-axes==5.13.0
-django-celery-beat==1.4.0
-django_celery_results==1.0.4
+django-celery-beat==2.2.1
+django-celery-results==2.2.0
 django-cors-headers==3.7.0
 django-crequest==2018.5.11
 django-debug-panel==0.8.3
