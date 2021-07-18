@@ -16,9 +16,11 @@
 # limitations under the License.
 
 import logging
+import jwt
 
-from rest_framework import authentication
-from rest_framework import exceptions
+from rest_framework import authentication, exceptions
+
+from desktop.auth.backend import find_or_create_user, ensure_has_a_group, rewrite_user
 
 from useradmin.models import User
 
@@ -33,28 +35,25 @@ class JwtAuthentication(authentication.BaseAuthentication):
       LOG.debug('JwtAuthentication: no authorization header')
       return None
 
-    bearer = authorization_header[len('Bearer '):]
-    if not bearer:
+    access_token = authorization_header[len('Bearer '):]
+    if not access_token:
       LOG.debug('JwtAuthentication: no Bearer value')
       return None
 
-    LOG.debug('JwtAuthentication: got token %s' % bearer)
+    LOG.debug('JwtAuthentication: got access token %s' % access_token)
 
-    # Decode token via jwt module
-    # check expiration, get userId, handle errors
+    try:
+      payload = jwt.decode(access_token, 'secret', algorithms=["HS256"])
+    except jwt.DecodeError:
+      raise exceptions.AuthenticationFailed('JwtAuthentication: Invalid token')
+    except jwt.ExpiredSignatureError:
+      raise exceptions.AuthenticationFailed('JwtAuthentication: Token expired')
+    except Exception as e:
+      raise exceptions.AuthenticationFailed(e)
 
-    # token = '...'
-
-    # cf. below similar to backend.py
-    # user = find_or_create_user(
-    #   username,
-    #   password,
-    #   is_superuser=False
-    # )
-    user = User.objects.get(username='test')
-
-    # ensure_has_a_group(user)
-    # user = rewrite_user(user)
+    user = find_or_create_user(payload['username'], is_superuser=False)
+    ensure_has_a_group(user)
+    user = rewrite_user(user)
 
     # We should persist the token (to reuse for communicating with external services as the user, e.g. Impala)
     # either via a new DB field (might just be cleaner, even if requires a DB migration) or in the json blob.
