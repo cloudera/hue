@@ -51,7 +51,7 @@ class JwtAuthentication(authentication.BaseAuthentication):
     except Exception as e:
       raise exceptions.AuthenticationFailed(e)
 
-    user = find_or_create_user(payload['username'], is_superuser=False)
+    user = find_or_create_user(payload['userId'], is_superuser=False)
     ensure_has_a_group(user)
     user = rewrite_user(user)
 
