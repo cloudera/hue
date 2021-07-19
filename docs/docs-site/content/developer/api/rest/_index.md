@@ -441,7 +441,23 @@ Upload a local file to a remote destination folder:
 
 ### File import
 
-First guessing the format of the file `s3a://demo-hue/web_log_data/index_data.csv`:
+We have 2 options here.
+
+- **Remote file**
+  + In this option we are choosing a file from HDFS/S3 file system.
+  
+
+- **Small Local file**
+  + In this option we can choose a file from local file system.
+
+We need to pass two main parameters `inputFormat` and `path` to the `guess_format` api.
+  - For example:
+    + In remote file, parameters are `inputFormat=file` and `path=s3a://demo-gethue/data/web_logs/index_data.csv`
+    + In small local file, parameter are `inputFormat=localfile`  and `path=/Users/hue/Downloads/test_demo/flights11.csv`
+
+**Note:** Here value of `inputFormat` is constant according to the option we choose and the value of `path` should be from valid file system as explained above.
+
+Now guessing the format of the file:
 
     curl -X POST https://demo.gethue.com/api/indexer/guess_format  --data 'fileFormat={"inputFormat":"file","path":"s3a://demo-gethue/data/web_logs/index_data.csv"}'
 
