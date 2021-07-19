@@ -104,6 +104,7 @@ urlpatterns += [
 urlpatterns += [
   re_path(r'^indexer/guess_format/?$', api_public.guess_format, name='indexer_guess_format'),
   re_path(r'^indexer/guess_field_types/?$', api_public.guess_field_types, name='indexer_guess_field_types'),
+  re_path(r'^indexer/importer/submit', api_public.importer_submit, name='indexer_importer_submit'),
 ]
 
 urlpatterns += [

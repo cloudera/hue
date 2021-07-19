@@ -201,6 +201,10 @@ def guess_field_types(request):
   django_request = get_django_request(request)
   return indexer_api3.guess_field_types(django_request)
 
+@api_view(["POST"])
+def importer_submit(request):
+  django_request = get_django_request(request)
+  return indexer_api3.importer_submit(django_request)
 
 # Connector API
 
