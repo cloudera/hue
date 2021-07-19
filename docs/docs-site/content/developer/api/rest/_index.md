@@ -458,7 +458,7 @@ Then getting some data sample as well as the column types (column names will be 
       .....
     }
 
-Then we submit via `https://demo.gethue.com/indexer/api/importer/submit` and provide the `source` and `destination` parameters. We get back an `operation id` (i.e. some SQL Editor query history id).
+Then we submit via `https://demo.gethue.com/api/indexer/importer/submit` and provide the `source` and `destination` parameters. We get back an `operation id` (i.e. some SQL Editor query history id).
 
 If the `show_command` parameter is given, the API call will instead return the generated SQL queries that will import the data.
 
