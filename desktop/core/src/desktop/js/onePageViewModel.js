@@ -468,6 +468,16 @@ class OnePageViewModel {
       });
     };
 
+    const openImporterFilebrowser = function (path) {
+      self.loadApp('importer');
+      self.getActiveAppViewModel(vm => {
+        vm.createWizard.source.inputFormat('file');
+        window.setTimeout(() => {
+          vm.createWizard.source.path(path);
+        }, 0);
+      });
+    };
+
     self.dropzoneComplete = function (path) {
       if (path.toLowerCase().endsWith('.csv')) {
         openImporter(path);
@@ -477,7 +487,7 @@ class OnePageViewModel {
       $('.dz-drag-hover').removeClass('dz-drag-hover');
     };
 
-    huePubSub.subscribe('open.in.importer', openImporter);
+    huePubSub.subscribe('open.in.importer', openImporterFilebrowser);
 
     huePubSub.subscribe('assist.dropzone.complete', self.dropzoneComplete);
 
