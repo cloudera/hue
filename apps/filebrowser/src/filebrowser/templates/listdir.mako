@@ -123,6 +123,7 @@ ${ fb_components.menubar() }
             </ul>
           </div>
           <button class="btn fileToolbarBtn" title="${_('Copy Path')}" data-bind="enable: selectedFiles().length == 1 && isCurrentDirSelected().length == 0, click: copyPath"><i class="fa fa-fw fa-files-o"></i> ${_('Copy Path')}</button>
+          <button class="btn fileToolbarBtn" title="${_('Open in Importer')}" data-bind="enable: selectedFiles().length == 1 && isCurrentDirSelected().length == 0, click: openInImporter"><i class="fa fa-fw fa-database"></i> ${_('Open in Importer')}</button>
           <button class="btn fileToolbarBtn" title="${_('Restore from trash')}" data-bind="visible: inRestorableTrash(), click: restoreTrashSelected, enable: selectedFiles().length > 0 && isCurrentDirSelected().length == 0"><i class="fa fa-cloud-upload"></i> ${_('Restore')}</button>
           <!-- ko ifnot: inTrash -->
           % if is_trash_enabled:
