@@ -16,9 +16,12 @@
 # limitations under the License.
 
 import logging
+import jwt
 
-from rest_framework import authentication
-from rest_framework import exceptions
+from rest_framework import authentication, exceptions
+
+from desktop.auth.backend import find_or_create_user, ensure_has_a_group, rewrite_user
+from desktop.conf import ENABLE_ORGANIZATIONS
 
 from useradmin.models import User
 
@@ -29,39 +32,41 @@ class JwtAuthentication(authentication.BaseAuthentication):
 
   def authenticate(self, request):
     authorization_header = request.META.get('HTTP_AUTHORIZATION')
+
     if not authorization_header:
       LOG.debug('JwtAuthentication: no authorization header')
       return None
 
-    bearer = authorization_header[len('Bearer '):]
-    if not bearer:
+    header, access_token = authorization_header.split(' ')
+
+    if header != 'Bearer':
+      LOG.debug('JwtAuthentication: no Bearer header')
+      return None
+
+    if not access_token:
       LOG.debug('JwtAuthentication: no Bearer value')
       return None
 
-    LOG.debug('JwtAuthentication: got token %s' % bearer)
+    LOG.debug('JwtAuthentication: got access token %s' % access_token)
 
-    # Decode token via jwt module
-    # check expiration, get userId, handle errors
+    try:
+      payload = jwt.decode(access_token, 'secret', algorithms=["HS256"])
+    except jwt.DecodeError:
+      raise exceptions.AuthenticationFailed('JwtAuthentication: Invalid token')
+    except jwt.ExpiredSignatureError:
+      raise exceptions.AuthenticationFailed('JwtAuthentication: Token expired')
+    except Exception as e:
+      raise exceptions.AuthenticationFailed(e)
 
-    # token = '...'
+    user = find_or_create_user(payload['userId'], is_superuser=False)
+    ensure_has_a_group(user)
+    user = rewrite_user(user)
 
-    # cf. below similar to backend.py
-    # user = find_or_create_user(
-    #   username,
-    #   password,
-    #   is_superuser=False
-    # )
-    user = User.objects.get(username='test')
-
-    # ensure_has_a_group(user)
-    # user = rewrite_user(user)
-
-    # We should persist the token (to reuse for communicating with external services as the user, e.g. Impala)
-    # either via a new DB field (might just be cleaner, even if requires a DB migration) or in the json blob.
-    # if ENABLE_ORGANIZATIONS.get():
-    #   user.token = token
-    # else:
-    #   user.profile.update_data({'token': token})
-    #   user.profile.save()
+    # Persist the token (to reuse for communicating with external services as the user, e.g. Impala)
+    if ENABLE_ORGANIZATIONS.get():
+      user.token = access_token
+    else:
+      user.profile.update_data({'jwt_access_token': access_token})
+      user.profile.save()
 
     return (user, None)
