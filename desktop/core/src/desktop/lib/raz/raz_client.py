@@ -71,16 +71,21 @@ class RazToken:
 
 class RazClient(object):
 
-  def __init__(self, raz_url, raz_token, username, service='s3', service_name='cm_s3', cluster_name='myCluster'):
+  def __init__(self, raz_url, raz_token, username, service='s3', service_name='cm_s3', cluster_name='myCluster', operation={}):
     self.raz_url = raz_url.strip('/')
     self.raz_token = raz_token
     self.username = username
     self.service = service
+
     if self.service == 'adls':
       self.service_params = {
         'endpoint_prefix': 'adls',
         'service_name': 'adls',
         'serviceType': 'adls'
+      }
+      self.client_params = {
+        "clientIpAddress": "12.12.12.12",
+        "clientType": "adls",
       }
     else:
       self.service_params = {
@@ -88,8 +93,14 @@ class RazClient(object):
         'service_name': 's3',
         'serviceType': 's3'
       }
+      self.client_params = {
+        "clientIpAddress": "",
+        "clientType": "",
+      }
+
     self.service_name = service_name
     self.cluster_name = cluster_name
+    self.operation = operation
     self.requestid = str(uuid.uuid4())
 
   def check_access(self, method, url, params=None, headers=None):
@@ -100,47 +111,62 @@ class RazClient(object):
     params = params if params is not None else {}
     headers = headers if headers is not None else {}
 
-    allparams = [raz_signer.StringListStringMapProto(key=key, value=[val]) for key, val in url_params.items()]
-    allparams.extend([raz_signer.StringListStringMapProto(key=key, value=[val]) for key, val in params.items()])
-    headers = [raz_signer.StringStringMapProto(key=key, value=val) for key, val in headers.items()]
-    endpoint = "%s://%s" % (path.scheme, path.netloc)
-    resource_path = path.path.lstrip("/")
-
-    LOG.debug(
-      "Preparing sign request with http_method: {%s}, headers: {%s}, parameters: {%s}, endpoint: {%s}, resource_path: {%s}" %
-      (method, headers, allparams, endpoint, resource_path)
-    )
-    raz_req = raz_signer.SignRequestProto(
-        endpoint_prefix=self.service_params['endpoint_prefix'],
-        service_name=self.service_params['service_name'],
-        endpoint=endpoint,
-        http_method=method,
-        headers=headers,
-        parameters=allparams,
-        resource_path=resource_path,
-        time_offset=0
-    )
-    raz_req_serialized = raz_req.SerializeToString()
-    signed_request = base64.b64encode(raz_req_serialized)
-
     request_data = {
       "requestId": self.requestid,
       "serviceType": self.service_params['serviceType'],
       "serviceName": self.service_name,
       "user": self.username,
       "userGroups": [],
-      "accessTime": "",
-      "clientIpAddress": "",
-      "clientType": "",
+      "clientIpAddress": self.client_params['clientIpAddress'],
+      "clientType": self.client_params['clientType'],
       "clusterName": self.cluster_name,
       "clusterType": "",
-      "sessionId": "",
-      "context": {
-        "S3_SIGN_REQUEST": signed_request
-      }
+      "context": {}
     }
-    headers = {"Content-Type":"application/json", "Accept-Encoding":"gzip,deflate"}
-    raz_url = "%s/api/authz/s3/access?delegation=%s" % (self.raz_url, self.raz_token)
+
+    if self.service == 's3':
+      allparams = [raz_signer.StringListStringMapProto(key=key, value=[val]) for key, val in url_params.items()]
+      allparams.extend([raz_signer.StringListStringMapProto(key=key, value=[val]) for key, val in params.items()])
+      headers = [raz_signer.StringStringMapProto(key=key, value=val) for key, val in headers.items()]
+      endpoint = "%s://%s" % (path.scheme, path.netloc)
+      resource_path = path.path.lstrip("/")
+
+      LOG.debug(
+        "Preparing sign request with http_method: {%s}, headers: {%s}, parameters: {%s}, endpoint: {%s}, resource_path: {%s}" %
+        (method, headers, allparams, endpoint, resource_path)
+      )
+      raz_req = raz_signer.SignRequestProto(
+          endpoint_prefix=self.service_params['endpoint_prefix'],
+          service_name=self.service_params['service_name'],
+          endpoint=endpoint,
+          http_method=method,
+          headers=headers,
+          parameters=allparams,
+          resource_path=resource_path,
+          time_offset=0
+      )
+      raz_req_serialized = raz_req.SerializeToString()
+      signed_request = base64.b64encode(raz_req_serialized)
+
+      request_data.update({
+        "sessionId": "",
+        "accessTime": "",
+        "context": {
+          "S3_SIGN_REQUEST": signed_request
+        }
+      })
+
+      headers = {"Content-Type":"application/json", "Accept-Encoding":"gzip,deflate"}
+      raz_url = "%s/api/authz/s3/access?delegation=%s" % (self.raz_url, self.raz_token)
+
+    else:
+      request_data.update({
+        "operation": self.operation,
+      })
+
+      headers = {"Content-Type":"application/json"}
+      raz_url = "%s/api/authz/adls/access" % (self.raz_url)
+
     LOG.debug('Raz url: %s' % raz_url)
 
     LOG.debug("Sending access check headers: {%s} request_data: {%s}" % (headers, request_data))
@@ -170,13 +196,13 @@ class RazClient(object):
         else:
           signed_response_result = signed_response_data["S3_SIGN_RESPONSE"]
 
-          if signed_response_result:
+          if signed_response_result is not None:
             raz_response_proto = raz_signer.SignResponseProto()
             signed_response = raz_response_proto.FromString(base64.b64decode(signed_response_result))
             LOG.debug("Received signed Response %s" % signed_response)
 
           # Signed headers "only"
-          if signed_response:
+          if signed_response is not None:
             return dict([(i.key, i.value) for i in signed_response.signer_generated_headers])
 
 

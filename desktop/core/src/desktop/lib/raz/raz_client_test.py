@@ -100,10 +100,10 @@ class RazClientTest(unittest.TestCase):
   def setUp(self):
     self.username = 'gethue'
     self.raz_url = 'https://raz.gethue.com:8080'
-    self.resource_url = 'https://gethue-test.s3.amazonaws.com/gethue/data/customer.csv'
+    self.resource_url_s3 = 'https://gethue-test.s3.amazonaws.com/gethue/data/customer.csv'
+    self.resource_url_adls = 'https://gethue.blob.core.windows.net/test'
 
   def test_get_raz_client(self):
-
     with patch('desktop.lib.raz.raz_client.RazToken') as RazToken:
       with patch('desktop.lib.raz.raz_client.requests_kerberos.HTTPKerberosAuth') as HTTPKerberosAuth:
         client = get_raz_client(
@@ -118,18 +118,53 @@ class RazClientTest(unittest.TestCase):
         assert_true(isinstance(client, RazClient))
 
         HTTPKerberosAuth.assert_called()
-        assert_equal(
-          client.raz_url, self.raz_url
-        )
-        assert_equal(
-          client.service_name, 'gethue_s3'
-        )
-        assert_equal(
-          client.cluster_name, 'gethueCluster'
-        )
+        assert_equal(client.raz_url, self.raz_url)
+        assert_equal(client.service_name, 'gethue_s3')
+        assert_equal(client.cluster_name, 'gethueCluster')
 
 
-  def test_check_access(self):
+  def test_check_access_adls(self):
+      raz_token = Mock()
+
+      client = RazClient(
+        self.raz_url, 
+        raz_token, 
+        username=self.username, 
+        service="adls", 
+        service_name="adls", 
+        cluster_name="cl1",
+        operation={
+          "resource": {
+            "storageaccount": "test",
+            "container": "test",
+            "relativepath": "data"
+          },
+          "resourceOwner": "",
+          "action": "read",
+          "accessTypes":["read"]
+        }
+      )
+
+      with patch('desktop.lib.raz.raz_client.requests.post') as requests_post:
+        requests_post.return_value = Mock(
+          json=Mock(return_value=
+          {
+            'operResult': {
+              'result': 'ALLOWED',
+              'additionalInfo': {
+                "ADLS_DSAS": "nulltenantIdnullnullbnullALLOWEDnullnull1.05nSlN7t/QiPJ1OFlCruTEPLibFbAhEYYj5wbJuaeQqs="
+                }
+              }
+            }
+          )
+        )
+
+        resp = client.check_access(method='GET', url=self.resource_url_adls)
+
+        assert_true(resp)
+        assert_equal(resp['token'], "nulltenantIdnullnullbnullALLOWEDnullnull1.05nSlN7t/QiPJ1OFlCruTEPLibFbAhEYYj5wbJuaeQqs=")
+
+  def test_check_access_s3(self):
     raz_token = Mock()
 
     client = RazClient(self.raz_url, raz_token, username=self.username)
@@ -162,11 +197,7 @@ class RazClientTest(unittest.TestCase):
             )
           )
 
-          resp = client.check_access(method='GET', url=self.resource_url)
+          resp = client.check_access(method='GET', url=self.resource_url_s3)
 
-          assert_true(
-            resp
-          )
-          assert_equal(
-            resp['AWSAccessKeyId'], 'AKIA23E77ZX2HVY76YGL'
-          )
+          assert_true(resp)
+          assert_equal(resp['AWSAccessKeyId'], 'AKIA23E77ZX2HVY76YGL')
