@@ -101,7 +101,7 @@ class RazClientTest(unittest.TestCase):
     self.username = 'gethue'
     self.raz_url = 'https://raz.gethue.com:8080'
     self.resource_url_s3 = 'https://gethue-test.s3.amazonaws.com/gethue/data/customer.csv'
-    self.resource_url_adls = 'https://gethue.blob.core.windows.net/test'
+    self.resource_url_adls = 'https://gethuestorageaccount.blob.core.windows.net/demo-gethue-container/demo-dir1/customer.csv'
 
   def test_get_raz_client(self):
     with patch('desktop.lib.raz.raz_client.RazToken') as RazToken:
@@ -126,24 +126,7 @@ class RazClientTest(unittest.TestCase):
   def test_check_access_adls(self):
       raz_token = Mock()
 
-      client = RazClient(
-        self.raz_url, 
-        raz_token, 
-        username=self.username, 
-        service="adls", 
-        service_name="adls", 
-        cluster_name="cl1",
-        operation={
-          "resource": {
-            "storageaccount": "test",
-            "container": "test",
-            "relativepath": "data"
-          },
-          "resourceOwner": "",
-          "action": "read",
-          "accessTypes":["read"]
-        }
-      )
+      client = RazClient(self.raz_url, raz_token, username=self.username, service="adls", service_name="adls", cluster_name="cl1")
 
       with patch('desktop.lib.raz.raz_client.requests.post') as requests_post:
         requests_post.return_value = Mock(

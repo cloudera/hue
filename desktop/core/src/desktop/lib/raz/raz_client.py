@@ -71,7 +71,7 @@ class RazToken:
 
 class RazClient(object):
 
-  def __init__(self, raz_url, raz_token, username, service='s3', service_name='cm_s3', cluster_name='myCluster', operation={}):
+  def __init__(self, raz_url, raz_token, username, service='s3', service_name='cm_s3', cluster_name='myCluster'):
     self.raz_url = raz_url.strip('/')
     self.raz_token = raz_token
     self.username = username
@@ -83,24 +83,15 @@ class RazClient(object):
         'service_name': 'adls',
         'serviceType': 'adls'
       }
-      self.client_params = {
-        "clientIpAddress": "12.12.12.12",
-        "clientType": "adls",
-      }
     else:
       self.service_params = {
         'endpoint_prefix': 's3',
         'service_name': 's3',
         'serviceType': 's3'
       }
-      self.client_params = {
-        "clientIpAddress": "",
-        "clientType": "",
-      }
 
     self.service_name = service_name
     self.cluster_name = cluster_name
-    self.operation = operation
     self.requestid = str(uuid.uuid4())
 
   def check_access(self, method, url, params=None, headers=None):
@@ -111,25 +102,49 @@ class RazClient(object):
     params = params if params is not None else {}
     headers = headers if headers is not None else {}
 
+    endpoint = "%s://%s" % (path.scheme, path.netloc)
+    resource_path = path.path.lstrip("/")
+
     request_data = {
       "requestId": self.requestid,
       "serviceType": self.service_params['serviceType'],
       "serviceName": self.service_name,
       "user": self.username,
       "userGroups": [],
-      "clientIpAddress": self.client_params['clientIpAddress'],
-      "clientType": self.client_params['clientType'],
+      "clientIpAddress": "",
+      "clientType": "",
       "clusterName": self.cluster_name,
       "clusterType": "",
+      "sessionId": "",
+      "accessTime": "",
       "context": {}
     }
+    request_headers = {"Content-Type":"application/json"}
+    raz_url = "%s/api/authz/%s/access" % (self.raz_url, self.service)
 
-    if self.service == 's3':
+
+    if self.service == 'adls':
+      storage_account = path.netloc.split('.')[0]
+      container, relative_path = resource_path.split('/', 1)
+
+      request_data.update({
+        "clientType": "adls",
+        "operation": {
+          "resource": {
+            "storageaccount": storage_account,
+            "container": container,
+            "relativepath": relative_path,
+          },
+          "resourceOwner": "",
+          "action": "read",
+          "accessTypes":["read"]
+        }
+      })
+
+    else:
       allparams = [raz_signer.StringListStringMapProto(key=key, value=[val]) for key, val in url_params.items()]
       allparams.extend([raz_signer.StringListStringMapProto(key=key, value=[val]) for key, val in params.items()])
       headers = [raz_signer.StringStringMapProto(key=key, value=val) for key, val in headers.items()]
-      endpoint = "%s://%s" % (path.scheme, path.netloc)
-      resource_path = path.path.lstrip("/")
 
       LOG.debug(
         "Preparing sign request with http_method: {%s}, headers: {%s}, parameters: {%s}, endpoint: {%s}, resource_path: {%s}" %
@@ -148,29 +163,16 @@ class RazClient(object):
       raz_req_serialized = raz_req.SerializeToString()
       signed_request = base64.b64encode(raz_req_serialized)
 
-      request_data.update({
-        "sessionId": "",
-        "accessTime": "",
-        "context": {
-          "S3_SIGN_REQUEST": signed_request
-        }
-      })
+      request_data["context"] = {
+        "S3_SIGN_REQUEST": signed_request
+      }
 
-      headers = {"Content-Type":"application/json", "Accept-Encoding":"gzip,deflate"}
-      raz_url = "%s/api/authz/s3/access?delegation=%s" % (self.raz_url, self.raz_token)
-
-    else:
-      request_data.update({
-        "operation": self.operation,
-      })
-
-      headers = {"Content-Type":"application/json"}
-      raz_url = "%s/api/authz/adls/access" % (self.raz_url)
+      request_headers["Accept-Encoding"] = {"gzip,deflate"}
+      raz_url = raz_url + "?delegation=%s" % (self.raz_token)
 
     LOG.debug('Raz url: %s' % raz_url)
-
-    LOG.debug("Sending access check headers: {%s} request_data: {%s}" % (headers, request_data))
-    raz_req = requests.post(raz_url, headers=headers, json=request_data, verify=False)
+    LOG.debug("Sending access check headers: {%s} request_data: {%s}" % (request_headers, request_data))
+    raz_req = requests.post(raz_url, headers=request_headers, json=request_data, verify=False)
 
     signed_response_result = None
     signed_response = None
@@ -190,6 +192,7 @@ class RazClient(object):
       if result == "ALLOWED":
         LOG.debug('Received allowed response %s' % raz_req.json())
         signed_response_data = raz_req.json()["operResult"]["additionalInfo"]
+
         if self.service == 'adls':
           LOG.debug("Received SAS %s" % signed_response_data["ADLS_DSAS"])
           return {'token': signed_response_data["ADLS_DSAS"]}
