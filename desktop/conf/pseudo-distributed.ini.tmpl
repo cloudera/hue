@@ -1440,6 +1440,10 @@
   # Use Thrift over HTTP for the transport mode.
   ## use_thrift_http=false
 
+  # Due to IMPALA-10272, the importer fails with READ permissions.
+  # Setting this to True, means setting the scratch directory and its file to 777 so the importer does not fail with permission issue
+  ## user_scratch_dir_permission=false
+
   [[ssl]]
     # SSL communication enabled for this server.
     ## enabled=false

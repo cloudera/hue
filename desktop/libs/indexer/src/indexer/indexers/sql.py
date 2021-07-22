@@ -32,6 +32,7 @@ from hadoop.fs.hadoopfs import Hdfs
 from notebook.connectors.base import get_interpreter
 from notebook.models import make_notebook
 from useradmin.models import User
+from impala.conf import USER_SCRATCH_DIR_PERMISSION
 
 from desktop.lib import django_mako
 from desktop.lib.exceptions_renderable import PopupException
@@ -169,6 +170,8 @@ class SQLIndexer(object):
         user_scratch_dir = self.fs.get_home_dir() + '/.scratchdir/%s' % str(uuid.uuid4()) # Make sure it's unique.
         self.fs.do_as_user(self.user, self.fs.mkdir, user_scratch_dir, 0o0777)
         self.fs.do_as_user(self.user, self.fs.rename, source['path'], user_scratch_dir)
+        if USER_SCRATCH_DIR_PERMISSION.get():
+          self.fs.do_as_user(self.user, self.fs.chmod, user_scratch_dir, 0o0777, True)
         source_path = user_scratch_dir + '/' + source['path'].split('/')[-1]
 
     if external_path.lower().startswith("abfs"): #this is to check if its using an ABFS path
