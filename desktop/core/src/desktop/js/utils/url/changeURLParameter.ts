@@ -26,13 +26,12 @@ const changeURLParameter = (param: string, value: string | null): void => {
       .split('&')
       .forEach(p => {
         if (p.split('=')[0] !== param) {
+          if (newSearch !== '?') {
+            newSearch += '&';
+          }
           newSearch += p;
-          newSearch += '&';
         }
       });
-    if (newSearch !== '?') {
-      newSearch = newSearch.substr(0, newSearch.length -1);
-    }
 
     if (value) {
       newSearch += (newSearch !== '?' ? '&' : '') + param + '=' + value;
