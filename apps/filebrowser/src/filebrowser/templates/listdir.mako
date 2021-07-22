@@ -107,8 +107,8 @@ ${ fb_components.menubar() }
               </li>
               % if not is_trash_enabled:
               <li>
-                <a href="javascript: void(0)" class="delete-link" title="${_('Delete forever')}" data-bind="visible: !inTrash() && selectedFiles().length > 0 && isCurrentDirSelected().length == 0, click: deleteSelected">
-                  <i class="fa fa-fw fa-bolt"></i> ${_('Delete forever')}
+                <a href="javascript: void(0)" class="delete-link" title="${_('Delete')}" data-bind="visible: !inTrash() && selectedFiles().length > 0 && isCurrentDirSelected().length == 0, click: deleteSelected">
+                  <i class="fa fa-fw fa-bolt"></i> ${_('Delete')}
                 </a>
               </li>
               % endif
@@ -184,7 +184,7 @@ ${ fb_components.menubar() }
             <ul class="dropdown-menu pull-right" style="top: auto">
               <li data-bind="visible: !isS3() && !isABFS() || isS3() && !isS3Root() || isABFS() && !isABFSRoot()"><a href="javascript: void(0)" class="create-file-link" title="${_('File')}"><i class="fa fa-file-o"></i> ${_('File')}</a></li>
               <li><a href="javascript: void(0)" class="create-directory-link" title="${_('Directory')}">
-                <i class="fa fa-folder"></i> 
+                <i class="fa fa-folder"></i>
                 <span data-bind="visible: !isS3() && !isABFS() || isS3() && !isS3Root() || isABFS() && !isABFSRoot()">${_('Directory')}</span>
                 <span data-bind="visible: isS3() && isS3Root()">${_('Bucket')}</span>
                 <span data-bind="visible: isABFS() && isABFSRoot()">${_('File System')}</span>
