@@ -123,11 +123,10 @@ class RazClientTest(unittest.TestCase):
         assert_equal(client.cluster_name, 'gethueCluster')
 
   def test_check_access_adls(self):
-      raz_token = Mock()
+    with patch('desktop.lib.raz.raz_client.requests.post') as requests_post:
+      with patch('desktop.lib.raz.raz_client.uuid.uuid4') as uuid:
+        raz_token = "mock_RAZ_token"
 
-      client = RazClient(self.raz_url, raz_token, username=self.username, service="adls", service_name="adls", cluster_name="cl1")
-
-      with patch('desktop.lib.raz.raz_client.requests.post') as requests_post:
         requests_post.return_value = Mock(
           json=Mock(return_value=
           {
@@ -140,9 +139,41 @@ class RazClientTest(unittest.TestCase):
             }
           )
         )
+        uuid.return_value = 'mock_request_id'
+
+        client = RazClient(self.raz_url, raz_token, username=self.username, service="adls", service_name="adls", cluster_name="cl1")
 
         resp = client.check_access(method='GET', url=self.adls_path)
 
+        requests_post.assert_called_with(
+          "https://raz.gethue.com:8080/api/authz/adls/access?delegation=" + raz_token,
+          headers={"Content-Type": "application/json"},
+          json={
+            'requestId': 'mock_request_id', 
+            'serviceType': 'adls', 
+            'serviceName': 'adls', 
+            'user': 'gethue', 
+            'userGroups': [], 
+            'clientIpAddress': '', 
+            'clientType': 'adls', 
+            'clusterName': 'cl1', 
+            'clusterType': '', 
+            'sessionId': '', 
+            'accessTime': '', 
+            'context': {}, 
+            'operation': {
+              'resource': {
+                'storageaccount': 'gethuestorageaccount', 
+                'container': 'demo-gethue-container', 
+                'relativepath': 'demo-dir1/customer.csv'
+              }, 
+              'resourceOwner': '', 
+              'action': 'read', 
+              'accessTypes': ['read']
+            }
+          },
+          verify=False
+        )
         assert_equal(resp['token'], "nulltenantIdnullnullbnullALLOWEDnullnull1.05nSlN7t/QiPJ1OFlCruTEPLibFbAhEYYj5wbJuaeQqs=")
 
   def test_get_raz_client_s3(self):
