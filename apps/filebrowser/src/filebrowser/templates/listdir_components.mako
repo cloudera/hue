@@ -1707,6 +1707,10 @@ else:
         $.jHueNotify.info('${_('Path copied successfully to the clipboard')}');
       }
 
+      self.openInImporter = function () {
+        huePubSub.publish('open.in.importer', self.selectedFile().path);
+      }
+
       self.trashSelected = function () {
         self.skipTrash(false);
         deleteSelected();

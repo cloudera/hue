@@ -342,6 +342,9 @@ class S3FileSystem(object):
     if bucket_name and not key_name:
       self._delete_bucket(bucket_name)
     else:
+      if self.isdir(path):
+        path = self._append_separator(path)  # Really need to make sure we end with a '/'
+
       key = self._get_key(path, validate=False)
 
       if key.exists():
@@ -349,9 +352,7 @@ class S3FileSystem(object):
         dir_keys = []
 
         if self.isdir(path):
-          # add `/` to prevent removing of `s3://b/a_new` trying to remove `s3://b/a`
-          prefix = self._append_separator(key.name)
-          dir_keys = key.bucket.list(prefix=prefix)
+          dir_keys = key.bucket.list(prefix=path)
           to_delete = itertools.chain(dir_keys, to_delete)
 
         if not dir_keys:

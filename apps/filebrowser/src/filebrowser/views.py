@@ -567,9 +567,10 @@ def listdir_paged(request, path):
   if page:
     page.object_list = [_massage_stats(request, stat_absolute_path(path, s)) for s in shown_stats]
 
-  is_trash_enabled = request.fs._get_scheme(path) == 'hdfs' and int(get_trash_interval()) > 0
+  is_hdfs = request.fs._get_scheme(path) == 'hdfs'
+  is_trash_enabled = is_hdfs and int(get_trash_interval()) > 0
+  is_fs_superuser = is_hdfs and _is_hdfs_superuser(request)
 
-  is_fs_superuser = _is_hdfs_superuser(request)
   data = {
       'path': path,
       'breadcrumbs': breadcrumbs,

@@ -458,11 +458,13 @@ Then getting some data sample as well as the column types (column names will be 
       .....
     }
 
-Then we submit via `https://demo.gethue.com/indexer/api/importer/submit` and provide the `source` and `destination` parameters. We get back an `operation id` (i.e. some SQL Editor query history id).
+Then we submit via `https://demo.gethue.com/api/indexer/importer/submit` and provide the `source` and `destination` parameters. We get back an `operation id` (i.e. some SQL Editor query history id).
 
 If the `show_command` parameter is given, the API call will instead return the generated SQL queries that will import the data.
 
-    {"status": 0, "history_id": 17820, "handle": {"statement_id": 0, "session_type": "hive", "has_more_statements": true, "guid": "uu6K3SSWSY6mx/fbh0nm2w==\n", "previous_statement_hash": "4bee3a62b3c7142c60475021469483bff81ba09bd07b8e527179e617", "log_context": null, "statements_count": 4, "end": {"column": 53, "row": 0}, "session_id": 55, "start": {"column": 0, "row": 0}, "secret": "8mKu1bhdRtWXu82DXjDZdg==\n", "has_result_set": false, "session_guid": "fd4c667f3a5e4507:0335af7716db3d9e", "statement": "DROP TABLE IF EXISTS `default`.`hue__tmp_index_data`", "operation_type": 0, "modified_row_count": null}, "history_uuid": "bf5804f5-6f12-47a8-8ba6-0ed7032ebe93"}
+    curl -X  POST https://demo.gethue.com/api/indexer/importer/submit --data 'source={"sourceType":"hive","inputFormat":"localfile","path":"/Users/hue/Downloads/test_demo/flights_13.csv","format":{"hasHeader":true}}&destination={"sourceType":"hive","name":"default.test1","outputFormat":"table","columns":[{"name":"date","type":"timestamp"},{"name":"hour","type":"bigint"},{"name":"minute","type":"bigint"},{"name":"dep","type":"bigint"},{"name":"arr","type":"bigint"},{"name":"dep_delay","type":"bigint"},{"name":"arr_delay","type":"bigint"},{"name":"carrier","type":"string"},{"name":"flight","type":"bigint"},{"name":"dest","type":"string"},{"name":"plane","type":"string"},{"name":"cancelled","type":"boolean"},{"name":"time","type":"bigint"},{"name":"dist","type":"bigint"}], "nonDefaultLocation":""}'
+
+    {"status": 0, "handle": {"secret": "C5vnlrpVTxuOpHZfTrLfmg==", "guid": "8ytLYHTsTlq8vYSiYXoyKQ==", "operation_type": 0, "has_result_set": false, "modified_row_count": null, "log_context": null, "session_guid": "d04b246456e87e61:b86340ae83f6a586", "session_id": 748, "session_type": "hive", "statement_id": 0, "has_more_statements": false, "statements_count": 1, "previous_statement_hash": "94ea45e37bbbbc7bb7e20b5d0efe0db8c9794dd526b5a3386bae3596", "start": {"row": 0, "column": 0}, "end": {"row": 0, "column": 305}, "statement": "CREATE TABLE IF NOT EXISTS default.yuyu11 (\n  `date` timestamp,\n  `hour` bigint,\n  `minute` bigint,\n  `dep` bigint,\n  `arr` bigint,\n  `dep_delay` bigint,\n  `arr_delay` bigint,\n  `carrier` string,\n  `flight` bigint,\n  `dest` string,\n  `plane` string,\n  `cancelled` boolean,\n  `time` bigint,\n  `dist` bigint)"}, "history_id": 2492, "history_uuid": "c60dc4dd-4d39-42fd-85f5-af155d99b626"}
 
 ## Connectors
 
@@ -470,13 +472,13 @@ If the `show_command` parameter is given, the API call will instead return the g
 
 Get the list of configured [connectors](/administrator/configuration/connectors/):
 
-    curl -X GET 'https://demo.gethue.com/api/connector/instances' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI2MjM3OTcxLCJqdGkiOiJlYjI1NDg5N2ZlNWI0NjZhODk3MDc5MWFmYjcxOWJiNyIsInVzZXJfaWQiOjExMDA3MTR9.9vfeC9dfmRoYM586GzwnlcCCWcqCciszAhoDFwsSIPs'
+    curl -X GET https://demo.gethue.com/api/connector/instances
 
     {"connectors": [{"category": "editor", "category_name": "Editor", "description": "", "values": []}, {"category": "browsers", "category_name": "Browsers", "description": "", "values": []}, {"category": "catalogs", "category_name": "Catalogs", "description": "", "values": []}, {"category": "optimizers", "category_name": "Optimizers", "description": "", "values": []}, {"category": "schedulers", "category_name": "Schedulers", "description": "", "values": []}, {"category": "plugins", "category_name": "Plugins", "description": "", "values": []}]}
 
 ### Types
 
-    curl -X GET 'https://demo.gethue.com/api/connector/types' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI2MjM3OTcxLCJqdGkiOiJlYjI1NDg5N2ZlNWI0NjZhODk3MDc5MWFmYjcxOWJiNyIsInVzZXJfaWQiOjExMDA3MTR9.9vfeC9dfmRoYM586GzwnlcCCWcqCciszAhoDFwsSIPs'
+    curl -X GET https://demo.gethue.com/api/connector/types
 
     { "connectors": [ { "category": "editor", "category_name": "Editor", "description": "", "values": [ { "dialect": "hive", "nice_name": "Hive", "description": "Recommended", "category": "editor", "interface": "hiveserver2", "settings": [ { "name": "server_host", "value": "localhost" }, { "name": "server_port", "value": 10000 }, { "name": "is_llap", "value": false }, { "name": "use_sasl", "value": true } ], "properties": { "is_sql": true, "sql_identifier_quote": "`", "sql_identifier_comment_single": "--", "has_catalog": false, "has_database": true, "has_table": true, "has_live_queries": false, "has_optimizer_risks": true, "has_optimizer_values": true, "has_auto_limit": false, "has_reference_language": true, "has_reference_functions": true, "has_use_statement": true } },
     ...........
@@ -490,15 +492,9 @@ Get the list of configured [connectors](/administrator/configuration/connectors/
 
 ### Create
 
-    curl -X POST 'https://demo.gethue.com/api/connector/instance/new/<DIALECT>/<INTERFACE>' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI2MjM3OTcxLCJqdGkiOiJlYjI1NDg5N2ZlNWI0NjZhODk3MDc5MWFmYjcxOWJiNyIsInVzZXJfaWQiOjExMDA3MTR9.9vfeC9dfmRoYM586GzwnlcCCWcqCciszAhoDFwsSIPs'
+How to connect to a HiveServer (dialect=hive) via the SqlAlchemy interface (interface=sqlalchemy):
 
-### Get
-
-    curl -X GET 'https://demo.gethue.com/api/connector/instance/get/<ID>' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI2MjM3OTcxLCJqdGkiOiJlYjI1NDg5N2ZlNWI0NjZhODk3MDc5MWFmYjcxOWJiNyIsInVzZXJfaWQiOjExMDA3MTR9.9vfeC9dfmRoYM586GzwnlcCCWcqCciszAhoDFwsSIPs'
-
-### Update
-
-    curl -X POST 'https://demo.gethue.com/api/connector/instance/update' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI2MjM3OTcxLCJqdGkiOiJlYjI1NDg5N2ZlNWI0NjZhODk3MDc5MWFmYjcxOWJiNyIsInVzZXJfaWQiOjExMDA3MTR9.9vfeC9dfmRoYM586GzwnlcCCWcqCciszAhoDFwsSIPs' -H 'Content-Type: application/json' -d '
+    curl -X POST https://demo.gethue.com/api/connector/instance/new/hive/sqlalchemy -d '
     {
     "connector": {
         "id": "1",
@@ -539,17 +535,60 @@ Get the list of configured [connectors](/administrator/configuration/connectors/
       }
     }'
 
-- **connector:** Details about the connector to update.
+### Get
+
+    curl -X GET https://demo.gethue.com/api/connector/instance/get/<ID>
+
+### Update
+
+    curl -X POST https://demo.gethue.com/api/connector/instance/update -d '
+    {
+    "connector": {
+        "id": "1",
+        "dialect": "hive",
+        "nice_name": "Hive",
+        "description": "Via SqlAlchemy interface",
+        "category": "editor",
+        "interface": "sqlalchemy",
+        "settings": [
+          {
+            "name": "url",
+            "value": "hive://localhost:10000"
+          },
+          {
+            "name": "has_ssh",
+            "value": false
+          },
+          {
+            "name": "ssh_server_host",
+            "value": "127.0.0.1"
+          }
+        ],
+        "properties": {
+          "is_sql": true,
+          "sql_identifier_quote": "`",
+          "sql_identifier_comment_single": "--",
+          "has_catalog": false,
+          "has_database": true,
+          "has_table": true,
+          "has_live_queries": false,
+          "has_optimizer_risks": true,
+          "has_optimizer_values": true,
+          "has_auto_limit": false,
+          "has_reference_language": true,
+          "has_reference_functions": true,
+          "has_use_statement": true
+        }
+      }
+    }'
 
 ### Delete
 
-    curl -X POST 'https://demo.gethue.com/api/connector/instance/delete' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI2MjM3OTcxLCJqdGkiOiJlYjI1NDg5N2ZlNWI0NjZhODk3MDc5MWFmYjcxOWJiNyIsInVzZXJfaWQiOjExMDA3MTR9.9vfeC9dfmRoYM586GzwnlcCCWcqCciszAhoDFwsSIPs' -H 'Content-Type: application/json' -d '{"connector": {"id": "1", "name": "hive"}}'
-
-- **connector:** Details about the connector to delete.
+    curl -X POST 'https://demo.gethue.com/api/connector/instance/delete' -d '{"connector": {"id": "1", "name": "hive"}}'
 
 ### Test
 
-    curl -X POST 'https://demo.gethue.com/api/connector/instance/test/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI2MjM3OTcxLCJqdGkiOiJlYjI1NDg5N2ZlNWI0NjZhODk3MDc5MWFmYjcxOWJiNyIsInVzZXJfaWQiOjExMDA3MTR9.9vfeC9dfmRoYM586GzwnlcCCWcqCciszAhoDFwsSIPs' -H 'Content-Type: application/json' -d '
+    curl -X POST 'https://demo.gethue.com/api/connector/instance/test/' -d '
     {
         "connector": {
         "id": "1",
@@ -590,11 +629,10 @@ Get the list of configured [connectors](/administrator/configuration/connectors/
       }
     }'
 
-- **connector:** Details about the connector to test.
 
-### Install example
+### Examples
 
-    curl -X POST 'https://demo.gethue.com/api/connector/examples/install/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI2MjM3OTcxLCJqdGkiOiJlYjI1NDg5N2ZlNWI0NjZhODk3MDc5MWFmYjcxOWJiNyIsInVzZXJfaWQiOjExMDA3MTR9.9vfeC9dfmRoYM586GzwnlcCCWcqCciszAhoDFwsSIPs'
+    curl -X POST https://demo.gethue.com/api/connector/examples/install/
 
 ## Data Catalog
 
