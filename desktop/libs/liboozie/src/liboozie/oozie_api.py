@@ -246,7 +246,11 @@ class OozieApi(object):
     if parameters is not None:
       params.update(parameters)
 
-    return self._root.put('job/%s' % jobid, params, data=config_gen(properties), contenttype=_XML_CONTENT_TYPE)
+    resp = self._root.put('job/%s' % jobid, params, data=config_gen(properties), contenttype=_XML_CONTENT_TYPE)
+    if sys.version_info[0] > 2:
+      resp = resp.decode()
+
+    return resp
 
   def submit_workflow(self, application_path, properties=None):
     """
