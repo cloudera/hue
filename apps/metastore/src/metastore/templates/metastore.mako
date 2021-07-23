@@ -266,7 +266,7 @@ ${ components.menubar(is_embeddable) }
         <!-- /ko -->
         <!-- ko if: details.properties.format !== 'kudu' -->
         <div>
-          <a href="javascript: void(0);" data-bind="storageContextPopover: { path: hdfs_link.replace('/filebrowser/view=', ''), offset: { left: 5 } }"> ${_('location')}</a>
+          <a data-bind="hueLink: hdfs_link" target="_blank" title="${_('Open data location')}">${_('Location')}</a>
         </div>
       <!-- /ko -->
     </div>
