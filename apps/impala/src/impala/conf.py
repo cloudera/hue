@@ -118,6 +118,14 @@ CONFIG_WHITELIST = Config(
   help=_t('A comma-separated list of white-listed Impala configuration properties that users are authorized to set.')
 )
 
+USER_SCRATCH_DIR_PERMISSION = Config(
+  key="user_scratch_dir_permission",
+  help=_t("Due to IMPALA-10272, the importer fails with READ permissions."
+          "Setting this to True, means setting the scratch directory and its file to 777 so the importer does not fail with permission issue."),
+  type=coerce_bool,
+  default=False
+)
+
 IMPALA_CONF_DIR = Config(
   key='impala_conf_dir',
   help=_t('Impala configuration directory, where impala_flags is located.'),
