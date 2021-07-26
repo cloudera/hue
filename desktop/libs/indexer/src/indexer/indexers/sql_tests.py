@@ -89,14 +89,14 @@ ROW FORMAT   SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
     "quoteChar"     = """,
     "escapeChar"    = "\\\\"
     )
-  STORED AS TextFile TBLPROPERTIES("skip.header.line.count" = "1", "transactional" = "false")
+  STORED AS TextFile TBLPROPERTIES('skip.header.line.count'='1', 'transactional'='false')
 ;
 
 LOAD DATA INPATH 'hdfs:///path/data.csv' INTO TABLE `default`.`hue__tmp_export_table` PARTITION (day='20200101');
 
 CREATE TABLE `default`.`export_table` COMMENT "No comment!"
         STORED AS csv
-TBLPROPERTIES("transactional"="true", "transactional_properties"="insert_only")
+TBLPROPERTIES('transactional'='true', 'transactional_properties'='insert_only')
         AS SELECT *
         FROM `default`.`hue__tmp_export_table`;
 
@@ -216,7 +216,7 @@ ROW FORMAT   DELIMITED
     FIELDS TERMINATED BY ','
     COLLECTION ITEMS TERMINATED BY '\\002'
     MAP KEYS TERMINATED BY '\\003'
-  STORED AS TextFile TBLPROPERTIES("skip.header.line.count" = "1", "transactional" = "false")
+  STORED AS TextFile TBLPROPERTIES('skip.header.line.count'='1', 'transactional'='false')
 ;'''
   assert_true(statement in sql, sql)
 
@@ -334,7 +334,7 @@ def test_generate_create_kudu_table_with_data():
 ROW FORMAT   DELIMITED
     FIELDS TERMINATED BY ','
   STORED AS TextFile LOCATION '/A'
-TBLPROPERTIES("skip.header.line.count" = "1", "transactional" = "false")'''
+TBLPROPERTIES('skip.header.line.count'='1', 'transactional'='false')'''
     assert_true(statement in sql, sql)
 
     assert_true('''CREATE TABLE `default`.`index_data` COMMENT "Big Data"
@@ -342,7 +342,7 @@ TBLPROPERTIES("skip.header.line.count" = "1", "transactional" = "false")'''
         PARTITION BY HASH PARTITIONS 16
         STORED AS kudu
         TBLPROPERTIES(
-        'kudu.num_tablet_replicas' = '1'
+        'kudu.num_tablet_replicas'='1'
         )
         AS SELECT `id`, `business_id`, `date`, `funny`, `stars`, `text`, `type`, `useful`, `user_id`, `name`, '''
         '''`full_address`, `latitude`, `longitude`, `neighborhoods`, `open`, `review_count`, `state`
@@ -429,7 +429,7 @@ def test_generate_create_parquet_table():
     COLLECTION ITEMS TERMINATED BY '\\002'
     MAP KEYS TERMINATED BY '\\003'
   STORED AS TextFile LOCATION '/user/hue/data'
-TBLPROPERTIES("skip.header.line.count" = "1", "transactional" = "false")
+TBLPROPERTIES('skip.header.line.count'='1', 'transactional'='false')
 ;'''
   assert_true(statement in sql, sql)
 
@@ -521,13 +521,13 @@ def test_generate_create_orc_table_transactional():
     COLLECTION ITEMS TERMINATED BY '\\002'
     MAP KEYS TERMINATED BY '\\003'
   STORED AS TextFile LOCATION '/user/hue/data'
-TBLPROPERTIES("skip.header.line.count" = "1", "transactional" = "false")
+TBLPROPERTIES('skip.header.line.count'='1', 'transactional'='false')
 ;'''
   assert_true(statement in sql, sql)
 
   assert_true('''CREATE TABLE `default`.`parquet_table`
         STORED AS orc
-TBLPROPERTIES("transactional"="true", "transactional_properties"="insert_only")
+TBLPROPERTIES('transactional'='true', 'transactional_properties'='insert_only')
         AS SELECT *
         FROM `default`.`hue__tmp_parquet_table`;
 ''' in sql, sql)
@@ -580,7 +580,7 @@ def test_generate_create_empty_kudu_table():
   `vrfcn_city` string ,
   `vrfcn_city_lat` double ,
   `vrfcn_city_lon` double , PRIMARY KEY (acct_client)
-)   STORED AS kudu TBLPROPERTIES("transactional" = "false")
+)   STORED AS kudu TBLPROPERTIES('transactional'='false')
 ;''' in sql, sql)
 
 
@@ -742,7 +742,7 @@ def test_create_ddl_with_nonascii():
     FIELDS TERMINATED BY ','
     COLLECTION ITEMS TERMINATED BY '\\002'
     MAP KEYS TERMINATED BY '\\003'
-  STORED AS TextFile TBLPROPERTIES("skip.header.line.count" = "1", "transactional" = "false")
+  STORED AS TextFile TBLPROPERTIES('skip.header.line.count'='1', 'transactional'='false')
 ;'''
   assert_true(statement in sql, sql)
 
@@ -752,7 +752,7 @@ def test_create_ddl_with_nonascii():
 
   statement = '''CREATE TABLE `default`.`renamed_chinese_cities_gb2312`
         STORED AS TextFile
-TBLPROPERTIES("transactional"="true", "transactional_properties"="insert_only")
+TBLPROPERTIES('transactional'='true', 'transactional_properties'='insert_only')
         AS SELECT *
         FROM `default`.`hue__tmp_renamed_chinese_cities_gb2312`;'''
   assert_true(statement in sql, sql)
@@ -863,7 +863,7 @@ CREATE TABLE IF NOT EXISTS default.test1 (
   `field_1` VARCHAR(255),
   `field_2` VARCHAR(255),
   `field_3` bigint);
-      
+
 INSERT INTO default.test1 VALUES ('NY', 'New York', '8143197'), ('CA', 'Los Angeles', '3844829'), \
 ('IL', 'Chicago', '2842518'), ('TX', 'Houston', '2016582'), ('PA', 'Philadelphia', '1463281'), \
 ('AZ', 'Phoenix', '1461575'), ('TX', 'San Antonio', '1256509'), ('CA', 'San Diego', '1255540'), \
@@ -901,23 +901,23 @@ CREATE TABLE IF NOT EXISTS default.test1 (
 CONSTRAINT my_pk PRIMARY KEY (field_3));
 
 UPSERT INTO default.test1 VALUES ('NY', 'New York', 8143197);
-            
+
 UPSERT INTO default.test1 VALUES ('CA', 'Los Angeles', 3844829);
-            
+
 UPSERT INTO default.test1 VALUES ('IL', 'Chicago', 2842518);
-            
+
 UPSERT INTO default.test1 VALUES ('TX', 'Houston', 2016582);
-            
+
 UPSERT INTO default.test1 VALUES ('PA', 'Philadelphia', 1463281);
-            
+
 UPSERT INTO default.test1 VALUES ('AZ', 'Phoenix', 1461575);
-            
+
 UPSERT INTO default.test1 VALUES ('TX', 'San Antonio', 1256509);
-            
+
 UPSERT INTO default.test1 VALUES ('CA', 'San Diego', 1255540);
-            
+
 UPSERT INTO default.test1 VALUES ('TX', 'Dallas', 1213825);
-            
+
 UPSERT INTO default.test1 VALUES ('CA', 'San Jose', 912332);'''
 
     assert_equal(statement, sql)
@@ -971,7 +971,7 @@ CREATE TABLE IF NOT EXISTS default.test1_tmp (
   `cancelled` string,
   `time` string,
   `dist` string);
-      
+
 INSERT INTO default.test1_tmp VALUES \
 ('2011-12-14 12:00:00', '13', '4', '1304', '1704', '24', '14', 'WN', '3085', 'PHL', 'N524SW', '1', '159', '1336'), \
 ('2011-12-14 12:00:00', '17', '52', '1752', '1943', '12', '8', 'WN', '39', 'PHX', 'N503SW', '1', '155', '1020'), \
