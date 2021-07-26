@@ -45,7 +45,7 @@ class RazHttpClient(HttpClient):
 
     response = raz_client.get_url(action=http_method, path=url, headers=headers)
 
-    signed_path = path + ('?' if '?' not in url else '&') + response['token']  # Same as using as params
+    signed_path = path + ('?' if '?' not in url else '&') + response['token']
 
     return super(RazHttpClient, self).execute(
         http_method=http_method,
