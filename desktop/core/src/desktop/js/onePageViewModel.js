@@ -462,9 +462,9 @@ class OnePageViewModel {
         vm.currentStep(2);
         vm.createWizard.source.interpreter(interpreter);
         vm.createWizard.destination.name(databasename + '.' + table.substring(0, table.length - 4));
-        window.setTimeout(() => {
+        waitForObservable(vm.createWizard.destination.name, () => {
           vm.createWizard.indexFile();
-        }, 500);
+        });
       });
     };
 
