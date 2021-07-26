@@ -316,7 +316,8 @@ def get_table_metadata(request, database, table):
 def describe_table(request, database, table):
   app_name = get_app_name(request)
   cluster = json.loads(request.POST.get('cluster', '{}'))
-  source_type = request.POST.get('source_type', request.GET.get('source_type', 'hive'))
+  source_type = request.POST.get('source_type', request.GET.get('connector_id', request.GET.get('source_type', 'hive')))
+
   db = _get_db(user=request.user, source_type=source_type, cluster=cluster)
 
   try:
