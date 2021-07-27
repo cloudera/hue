@@ -49,7 +49,7 @@ ${ fb_components.menubar() }
   %endif
 </style>
 
-<div id="${ path.startswith('S3A://') and 'filebrowser_s3Components' or path.startswith('abfs://') and 'filebrowser_abfsComponents' or 'filebrowserComponents' }" class="container-fluid filebrowser">
+<div id="${ path.startswith('s3a://') and 'filebrowser_s3Components' or path.startswith('abfs://') and 'filebrowser_abfsComponents' or 'filebrowserComponents' }" class="container-fluid filebrowser">
   <div class="card card-small">
     <div class="actionbar">
     <%actionbar:render>

@@ -1982,7 +1982,7 @@ class ClusterConfig(object):
       })
 
     if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('s3a', self.user):
-      home_path = remote_home_storage if remote_home_storage else 'S3A://'.encode('utf-8')
+      home_path = remote_home_storage if remote_home_storage else 's3a://'.encode('utf-8')
       interpreters.append({
         'type': 's3',
         'displayName': _('S3'),
