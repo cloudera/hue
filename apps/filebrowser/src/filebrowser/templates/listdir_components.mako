@@ -1981,7 +1981,7 @@ else:
           onComplete: function (id, fileName, response) {
             self.pendingUploads(self.pendingUploads() - 1);
             if (response.status != 0) {
-              $(document).trigger('error', "${ _('Error: ') }" + response.data);
+              $(document).trigger('error', "${ _('Error: Upload failed') }");
             }
             else {
               $(document).trigger('info', response.path + "${ _(' uploaded successfully.') }");
