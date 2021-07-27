@@ -652,7 +652,7 @@ registerBinding(NAME, {
 
     const dblClickS3ItemSub = huePubSub.subscribe('assist.dblClickS3Item', assistS3Entry => {
       if ($el.data('last-active-editor')) {
-        editor.session.insert(editor.getCursorPosition(), "'S3A://" + assistS3Entry.path + "'");
+        editor.session.insert(editor.getCursorPosition(), "'s3a://" + assistS3Entry.path + "'");
       }
     });
 
