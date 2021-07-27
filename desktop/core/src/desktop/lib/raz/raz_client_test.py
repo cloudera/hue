@@ -81,10 +81,9 @@ class RazTokenTest(unittest.TestCase):
 
           t = token.renew_delegation_token(user=self.username)
 
-          assert_equal(
+          assert_equal(t,
             'https://gethue-test.s3.amazonaws.com/gethue/data/customer.csv?AWSAccessKeyId=AKIA23E77ZX2HVY76YGL&'
-            'Signature=3lhK%2BwtQ9Q2u5VDIqb4MEpoY3X4%3D&Expires=1617207304',
-            t
+            'Signature=3lhK%2BwtQ9Q2u5VDIqb4MEpoY3X4%3D&Expires=1617207304'
           )
 
           with patch('desktop.lib.raz.raz_client.requests.put') as requests_put:
@@ -100,10 +99,84 @@ class RazClientTest(unittest.TestCase):
   def setUp(self):
     self.username = 'gethue'
     self.raz_url = 'https://raz.gethue.com:8080'
-    self.resource_url = 'https://gethue-test.s3.amazonaws.com/gethue/data/customer.csv'
 
-  def test_get_raz_client(self):
+    self.s3_path = 'https://gethue-test.s3.amazonaws.com/gethue/data/customer.csv'
+    self.adls_path = 'https://gethuestorageaccount.blob.core.windows.net/demo-gethue-container/demo-dir1/customer.csv'
 
+  def test_get_raz_client_adls(self):
+    with patch('desktop.lib.raz.raz_client.RazToken') as RazToken:
+      with patch('desktop.lib.raz.raz_client.requests_kerberos.HTTPKerberosAuth') as HTTPKerberosAuth:
+        client = get_raz_client(
+          raz_url=self.raz_url,
+          username=self.username,
+          auth='kerberos',
+          service='adls',
+          service_name='gethue_adls',
+          cluster_name='gethueCluster'
+        )
+
+        assert_true(isinstance(client, RazClient))
+
+        HTTPKerberosAuth.assert_called()
+        assert_equal(client.raz_url, self.raz_url)
+        assert_equal(client.service_name, 'gethue_adls')
+        assert_equal(client.cluster_name, 'gethueCluster')
+
+  def test_check_access_adls(self):
+    with patch('desktop.lib.raz.raz_client.requests.post') as requests_post:
+      with patch('desktop.lib.raz.raz_client.uuid.uuid4') as uuid:
+        raz_token = "mock_RAZ_token"
+
+        requests_post.return_value = Mock(
+          json=Mock(return_value=
+          {
+            'operResult': {
+              'result': 'ALLOWED',
+              'additionalInfo': {
+                "ADLS_DSAS": "nulltenantIdnullnullbnullALLOWEDnullnull1.05nSlN7t/QiPJ1OFlCruTEPLibFbAhEYYj5wbJuaeQqs="
+                }
+              }
+            }
+          )
+        )
+        uuid.return_value = 'mock_request_id'
+
+        client = RazClient(self.raz_url, raz_token, username=self.username, service="adls", service_name="adls", cluster_name="cl1")
+
+        resp = client.check_access(method='GET', url=self.adls_path)
+
+        requests_post.assert_called_with(
+          "https://raz.gethue.com:8080/api/authz/adls/access?delegation=" + raz_token,
+          headers={"Content-Type": "application/json"},
+          json={
+            'requestId': 'mock_request_id', 
+            'serviceType': 'adls', 
+            'serviceName': 'adls', 
+            'user': 'gethue', 
+            'userGroups': [], 
+            'clientIpAddress': '', 
+            'clientType': 'adls', 
+            'clusterName': 'cl1', 
+            'clusterType': '', 
+            'sessionId': '', 
+            'accessTime': '', 
+            'context': {}, 
+            'operation': {
+              'resource': {
+                'storageaccount': 'gethuestorageaccount', 
+                'container': 'demo-gethue-container', 
+                'relativepath': 'demo-dir1/customer.csv'
+              }, 
+              'resourceOwner': '', 
+              'action': 'read', 
+              'accessTypes': ['read']
+            }
+          },
+          verify=False
+        )
+        assert_equal(resp['token'], "nulltenantIdnullnullbnullALLOWEDnullnull1.05nSlN7t/QiPJ1OFlCruTEPLibFbAhEYYj5wbJuaeQqs=")
+
+  def test_get_raz_client_s3(self):
     with patch('desktop.lib.raz.raz_client.RazToken') as RazToken:
       with patch('desktop.lib.raz.raz_client.requests_kerberos.HTTPKerberosAuth') as HTTPKerberosAuth:
         client = get_raz_client(
@@ -118,18 +191,11 @@ class RazClientTest(unittest.TestCase):
         assert_true(isinstance(client, RazClient))
 
         HTTPKerberosAuth.assert_called()
-        assert_equal(
-          client.raz_url, self.raz_url
-        )
-        assert_equal(
-          client.service_name, 'gethue_s3'
-        )
-        assert_equal(
-          client.cluster_name, 'gethueCluster'
-        )
+        assert_equal(client.raz_url, self.raz_url)
+        assert_equal(client.service_name, 'gethue_s3')
+        assert_equal(client.cluster_name, 'gethueCluster')
 
-
-  def test_check_access(self):
+  def test_check_access_s3(self):
     raz_token = Mock()
 
     client = RazClient(self.raz_url, raz_token, username=self.username)
@@ -162,11 +228,7 @@ class RazClientTest(unittest.TestCase):
             )
           )
 
-          resp = client.check_access(method='GET', url=self.resource_url)
+          resp = client.check_access(method='GET', url=self.s3_path)
 
-          assert_true(
-            resp
-          )
-          assert_equal(
-            resp['AWSAccessKeyId'], 'AKIA23E77ZX2HVY76YGL'
-          )
+          assert_true(resp)
+          assert_equal(resp['AWSAccessKeyId'], 'AKIA23E77ZX2HVY76YGL')
