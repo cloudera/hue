@@ -58,7 +58,10 @@ else:
         %endif
         <li>
           <ul id="editBreadcrumb" class="hue-breadcrumbs editable-breadcrumbs" data-bind="foreach: breadcrumbs" style="padding-right:40px; padding-top: 12px" title="${_('Edit path')}"
-            ><li data-bind="visible: label.slice(-1) == '/'">
+            ><li data-bind="visible: label.slice(-1) == '/' && window.RAZ_IS_ENABLED">
+              <span class="divider" data-bind="text: label"></span>
+            </li
+            ><li data-bind="visible: label.slice(-1) == '/' && !window.RAZ_IS_ENABLED">
               <a data-bind="click: show, attr: {'href': '${url('filebrowser:filebrowser.views.view', path=urlencode(''))}' + url}"><span class="divider" data-bind="text: label"></span></a>
             </li
             ><li data-bind="visible: label.slice(-1) != '/'">
