@@ -248,7 +248,7 @@ ${ hueIcons.symbols() }
               <i class="fa fa-fw fa-file" style="vertical-align: middle"></i>${_('HDFS Browser')}</a>
             </li>
             % if is_s3_enabled:
-            <li><a href="/${apps['filebrowser'].display_name}/view=S3A://">
+            <li><a href="/${apps['filebrowser'].display_name}/view=s3a://">
               <i class="fa fa-fw fa-cubes" style="vertical-align: middle"></i>${_('S3 Browser')}</a>
             </li>
             % endif
@@ -267,7 +267,7 @@ ${ hueIcons.symbols() }
       </li>
       <li class="hideMoreThan1380">
         % if is_s3_enabled:
-          <a title="${_('S3 Browser')}" data-rel="navigator-tooltip" href="/${apps['filebrowser'].display_name}/view=S3A://">
+          <a title="${_('S3 Browser')}" data-rel="navigator-tooltip" href="/${apps['filebrowser'].display_name}/view=s3a://">
             <i class="fa fa-cubes"></i>
           </a>
         % endif
