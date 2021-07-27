@@ -31,7 +31,7 @@ LOG = logging.getLogger(__name__)
 
 
 def big_filesizeformat(bytes):
-  if bytes is None or bytes is "":
+  if bytes is None or bytes == "":
     return "N/A"
 
   assert bytes >= 0

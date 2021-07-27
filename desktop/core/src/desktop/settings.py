@@ -523,6 +523,10 @@ if desktop.conf.DEMO_ENABLED.get():
 else:
   AUTHENTICATION_BACKENDS = tuple(desktop.conf.AUTH.BACKEND.get())
 
+# AxesBackend should be the first backend in the AUTHENTICATION_BACKENDS list.
+if sys.version_info[0] > 2:
+  AUTHENTICATION_BACKENDS = ('axes.backends.AxesBackend',) + AUTHENTICATION_BACKENDS
+
 EMAIL_HOST = desktop.conf.SMTP.HOST.get()
 EMAIL_PORT = desktop.conf.SMTP.PORT.get()
 EMAIL_HOST_USER = desktop.conf.SMTP.USER.get()
@@ -835,6 +839,9 @@ MODULES_TO_PATCH = (
     'django.db.backends.utils',
     'django.utils.cache',
 )
+
+if sys.version_info[0] > 2:
+  MIDDLEWARE.append('axes.middleware.AxesMiddleware')  # AxesMiddleware should be the last middleware in the MIDDLEWARE list.
 
 try:
   import hashlib
