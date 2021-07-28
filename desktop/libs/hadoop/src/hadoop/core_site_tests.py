@@ -58,23 +58,23 @@ def test_core_site():
   </property>
   <property>
     <name>fs.s3a.ext.raz.rest.host.url</name>
-    <value>https://prakashdh67-master10.prakashr.xcu2-8y8x.dev.cldr.work:6082/</value>
+    <value>https://gehue-adls-master:6082/</value>
   </property>
   <property>
     <name>fs.s3a.ext.raz.s3.access.cluster.name</name>
-    <value>prakashdh67</value>
+    <value>gehue-adls</value>
   </property>
   <property>
-    <name>fs.s3a.bucket.prakashmowdev1.endpoint</name>
+    <name>fs.s3a.bucket.gethue-dev.endpoint</name>
     <value>s3.us-west-2.amazonaws.com</value>
   </property>
   <property>    
     <name>fs.azure.ext.raz.rest.host.url</name>    
-    <value>https://prakashdh67-master10.prakashr.xcu2-8y8x.dev.cldr.work:6082/</value>  
+    <value>https://gehue-adls-master:6082/</value>  
   </property> 
   <property>
     <name>fs.azure.ext.raz.adls.access.cluster.name</name>
-    <value>prakashdh67</value>
+    <value>gehue-adls</value>
   </property>
 </configuration>
     """
@@ -86,11 +86,11 @@ def test_core_site():
     )
     core_site.reset()
 
-    assert_equal(core_site.get_raz_api_url(), 'https://prakashdh67-master10.prakashr.xcu2-8y8x.dev.cldr.work:6082/')
-    assert_equal(core_site.get_raz_cluster_name(), 'prakashdh67')
-    assert_equal(core_site.get_raz_default_endpoint(), {'host': 's3.us-west-2.amazonaws.com', 'bucket': 'prakashmowdev1'})
+    assert_equal(core_site.get_raz_api_url(), 'https://gehue-adls-master:6082/')
+    assert_equal(core_site.get_raz_cluster_name(), 'gehue-adls')
+    assert_equal(core_site.get_raz_default_endpoint(), {'host': 's3.us-west-2.amazonaws.com', 'bucket': 'gethue-dev'})
 
-    assert_equal(get_remote_home_storage(), 's3a://prakashmowdev1')
+    assert_equal(get_remote_home_storage(), 's3a://gethue-dev')
     assert_equal(get_region(), 'us-west-2')
   finally:
     core_site.reset()

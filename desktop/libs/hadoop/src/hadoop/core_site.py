@@ -123,8 +123,6 @@ def get_s3a_session_token():
 def get_raz_api_url():
   """
   Get Raz API.
-
-  S3 only. Add check for Azure when supported.
   """
   s3a_raz_url = get_conf().get(_CNF_S3A_RAZ_API_URL)
   adls_raz_url = get_conf().get(_CNF_ADLS_RAZ_API_URL)
@@ -137,8 +135,6 @@ def get_raz_api_url():
 def get_raz_cluster_name():
   """
   Get the name of the Cluster where Raz is running.
-
-  S3 only. Add check for Azure when supported.
   """
   return get_conf().get(_CNF_S3A_RAZ_CLUSTER_NAME, '') or get_conf().get(_CNF_ADLS_RAZ_CLUSTER_NAME, '')
 
