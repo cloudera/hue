@@ -161,7 +161,7 @@ Alternative:
 
 ### Presto
 
-Formerly known as PrestoSQL and now called [Trino](#trino).
+Presto has been forked into [Trino](#trino) and both share the same configuration.
 
 ### Trino
 
@@ -202,7 +202,10 @@ Pass Presto Session Properties without HTTPS enabled:
 
     options='{"url": "presto://username:password@localhost:8080/tpch/default","connect_args":"{\"session_props\": {\"query_max_run_time\": \"1m\"}}"}'
 
-**Note:** Hue does not use trino specific dialect of SQLAlchemy which may lead to a *catalog must be specified* error. This can be solved by setting `protocol.v1.alternate-header-name=Presto` in the Trino's configuration. More details about his can be found at [Trino Blog |  Migrating from PrestoSQL to Trino](https://trino.io/blog/2021/01/04/migrating-from-prestosql-to-trino.html)
+**Note**
+Hue does not use trino specific dialect of SQLAlchemy which may lead to a *catalog must be specified* error. This can be solved by setting `protocol.v1.alternate-header-name=Presto` in the Trino's configuration. More details about his can be found at [Migrating from PrestoSQL to Trino](https://trino.io/blog/2021/01/04/migrating-from-prestosql-to-trino.html)
+
+Also give a try to  https://github.com/dungdm93/sqlalchemy-trino for the 'trino://' and avoiding the [old protocol issue](https://github.com/dropbox/PyHive/issues/378).
 
 Alternative interfaces.
 
