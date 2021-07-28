@@ -1981,7 +1981,7 @@ else:
           onComplete: function (id, fileName, response) {
             self.pendingUploads(self.pendingUploads() - 1);
             if (response.status != 0) {
-              $(document).trigger('error', "${ _('Error: Upload failed') }");
+              $(document).trigger('error', "${ _('Upload Error: No write permission') }");
             }
             else {
               $(document).trigger('info', response.path + "${ _(' uploaded successfully.') }");
