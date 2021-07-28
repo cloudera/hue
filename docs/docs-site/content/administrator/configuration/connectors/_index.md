@@ -426,7 +426,7 @@ Where to get the names? In the 'Resources' panel of Big Query UI:
 
 To restrict to one dataset:
 
-       options='{"url": "bigquery://project-XXXXXX"/dataset_name"}'
+       options='{"url": "bigquery://project-XXXXXX/dataset_name"}'
 
 Supporting additional [connection parameters](https://github.com/mxmzdlv/pybigquery#connection-string-parameters):
 
