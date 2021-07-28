@@ -18,6 +18,7 @@
 import logging
 import re
 import json
+import sys
 
 import django.test.client
 import nose.tools
@@ -25,6 +26,11 @@ import nose.tools
 from useradmin.models import User, Group, Organization
 
 from desktop.conf import ENABLE_ORGANIZATIONS
+
+if sys.version_info[0] > 2:
+  from unittest.mock import Mock
+else:
+  from mock import Mock
 
 
 class Client(django.test.client.Client):
@@ -46,13 +52,14 @@ def assert_ok_response(response):
   return response
 
 
-def make_logged_in_client(username="test", password="test", is_superuser=True, recreate=False, groupname=None, is_admin=False):
+def make_logged_in_client(username="test", password="test", is_superuser=True, recreate=False, groupname=None, is_admin=False, request=None):
   """
   Create a client with a user already logged in.
 
   Sometimes we recreate the user, because some tests like to mess with is_active and such.
   Note: could be combined with backend.create_user and other standart utils.
   """
+  request = Mock()
   try:
     user = User.objects.get(username=username)
     if recreate:
@@ -83,7 +90,7 @@ def make_logged_in_client(username="test", password="test", is_superuser=True, r
       user.save()
 
   c = Client()
-  ret = c.login(username=username, password=password)
+  ret = c.login(username=username, password=password, request=request)
 
   assert ret, "Login failed (user '%s')." % username
   return c

@@ -20,10 +20,16 @@
 # This test uses "nose"-style testing (no need for a TestCase),
 # and nose-style assertions.
 
+import sys
 from nose.tools import *
 
 from django.test.client import Client
 import django
+
+if sys.version_info[0] > 2:
+  from unittest.mock import Mock
+else:
+  from mock import Mock
 
 
 def test_require_login():
@@ -35,7 +41,7 @@ def test_require_login():
   assert_equal("/hue/accounts/login?next=/profile", response["Location"])
 
   # AllowAllBackend should let us in.
-  c.login(username="test", password="test")
+  c.login(request=Mock(), username="test", password="test")
   # And now we shouldn't need to be redirected.
   response = c.get('/', follow=True)
   assert_equal(200, response.status_code)

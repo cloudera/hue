@@ -68,6 +68,10 @@ def test_core_site():
     <name>fs.s3a.bucket.prakashmowdev1.endpoint</name>
     <value>s3.us-west-2.amazonaws.com</value>
   </property>
+  <property>    
+    <name>fs.azure.ext.raz.rest.host.url</name>    
+    <value>https://prakashdh67-master10.prakashr.xcu2-8y8x.dev.cldr.work:6082/</value>  
+  </property> 
 </configuration>
     """
     open_file(os.path.join(hadoop_home, 'core-site.xml'), 'w').write(xml)

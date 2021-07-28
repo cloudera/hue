@@ -236,7 +236,7 @@ class SQLIndexer(object):
         PARTITION BY HASH PARTITIONS 16
         STORED AS %(file_format)s
         TBLPROPERTIES(
-        'kudu.num_tablet_replicas' = '1'
+        'kudu.num_tablet_replicas'='1'
         )""" % {
           'file_format': file_format,
           'primary_keys': ', '.join(primary_keys)
@@ -245,7 +245,7 @@ class SQLIndexer(object):
         columns_list = ['*']
         extra_create_properties = 'STORED AS %(file_format)s' % {'file_format': file_format}
         if is_transactional:
-          extra_create_properties += '\nTBLPROPERTIES("transactional"="true", "transactional_properties"="%s")' % \
+          extra_create_properties += "\nTBLPROPERTIES('transactional'='true', 'transactional_properties'='%s')" % \
               default_transactional_type
 
       sql += '''\n\nCREATE TABLE `%(database)s`.`%(final_table_name)s`%(comment)s
@@ -320,12 +320,11 @@ class SQLIndexer(object):
             col['type'] = 'VARCHAR(255)'
 
       sql = '''CREATE TABLE IF NOT EXISTS %(database)s.%(table_name)s (
-%(columns)s);
-      ''' % {
-              'database': database,
-              'table_name': table_name,
-              'columns': ',\n'.join(['  `%(name)s` %(type)s' % col for col in columns]),
-            }
+%(columns)s);\n''' % {
+        'database': database,
+        'table_name': table_name,
+        'columns': ',\n'.join(['  `%(name)s` %(type)s' % col for col in columns]),
+      }
 
     elif dialect == 'phoenix':
 
@@ -335,8 +334,7 @@ class SQLIndexer(object):
 
       sql = '''CREATE TABLE IF NOT EXISTS %(database)s.%(table_name)s (
 %(columns)s
-CONSTRAINT my_pk PRIMARY KEY (%(primary_keys)s));
-''' % {
+CONSTRAINT my_pk PRIMARY KEY (%(primary_keys)s));\n''' % {
           'database': database,
           'table_name': table_name,
           'columns': ',\n'.join(['  %(name)s %(type)s' % col for col in columns]),
@@ -345,12 +343,11 @@ CONSTRAINT my_pk PRIMARY KEY (%(primary_keys)s));
 
     elif dialect == 'impala':
       sql = '''CREATE TABLE IF NOT EXISTS %(database)s.%(table_name)s_tmp (
-%(columns)s);
-      ''' % {
-                'database': database,
-                'table_name': table_name,
-                'columns': ',\n'.join(['  `%(name)s` string' % col for col in columns]),
-            }                                                 # Impala does not implicitly cast between string and numeric or Boolean types.
+%(columns)s);\n''' % {
+          'database': database,
+          'table_name': table_name,
+          'columns': ',\n'.join(['  `%(name)s` string' % col for col in columns]),
+      }                                                 # Impala does not implicitly cast between string and numeric or Boolean types.
 
     path = urllib_unquote(source['path'])
 
@@ -370,23 +367,21 @@ CONSTRAINT my_pk PRIMARY KEY (%(primary_keys)s));
           csv_rows = str(_csv_rows)[1:-1]
 
           if dialect in ('hive', 'mysql'):
-            sql += '''\nINSERT INTO %(database)s.%(table_name)s VALUES %(csv_rows)s;
-            '''% {
-                    'database': database,
-                    'table_name': table_name,
-                    'csv_rows': csv_rows
-                  }
+            sql += '''\nINSERT INTO %(database)s.%(table_name)s VALUES %(csv_rows)s;\n'''% {
+              'database': database,
+              'table_name': table_name,
+              'csv_rows': csv_rows
+            }
           elif dialect == 'phoenix':
             for csv_row in _csv_rows:
               _sql = ', '.join([ "'{0}'".format(col_val) if columns[count]['type'] in ('CHAR(255)', 'timestamp') \
                 else '{0}'.format(col_val) for count, col_val in enumerate(csv_row)])
 
-              sql += '''\nUPSERT INTO %(database)s.%(table_name)s VALUES (%(csv_row)s);
-            ''' % {
-                    'database': database,
-                    'table_name': table_name,
-                    'csv_row': _sql
-                  }
+              sql += '''\nUPSERT INTO %(database)s.%(table_name)s VALUES (%(csv_row)s);\n''' % {
+                'database': database,
+                'table_name': table_name,
+                'csv_row': _sql
+              }
           elif dialect == 'impala':
              # casting from string to boolean is not allowed in impala so string -> int -> bool
             sql_ = ',\n'.join([
@@ -396,11 +391,11 @@ CONSTRAINT my_pk PRIMARY KEY (%(primary_keys)s));
 
             sql += '''\nINSERT INTO %(database)s.%(table_name)s_tmp VALUES %(csv_rows)s;\n\nCREATE TABLE IF NOT EXISTS %(database)s.%(table_name)s
 AS SELECT\n%(sql_)s\nFROM  %(database)s.%(table_name)s_tmp;\n\nDROP TABLE IF EXISTS %(database)s.%(table_name)s_tmp;'''% {
-                    'database': database,
-                    'table_name': table_name,
-                    'csv_rows': csv_rows,
-                    'sql_': sql_
-                  }
+              'database': database,
+              'table_name': table_name,
+              'csv_rows': csv_rows,
+              'sql_': sql_
+            }
 
     on_success_url = reverse('metastore:describe_table', kwargs={'database': database, 'table': final_table_name}) + \
         '?source_type=' + source_type
