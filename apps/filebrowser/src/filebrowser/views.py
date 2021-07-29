@@ -218,8 +218,8 @@ def view(request, path):
 
   # default_abfs_home is set in jquery.filechooser.js
   if 'default_abfs_home' in request.GET:
-    from azure.abfs.__init__ import get_home_dir_for_ABFS
-    home_dir_path = get_home_dir_for_ABFS()
+    from azure.abfs.__init__ import get_home_dir_for_abfs
+    home_dir_path = get_home_dir_for_abfs()
     if request.fs.isdir(home_dir_path):
       return format_preserving_redirect(
           request,

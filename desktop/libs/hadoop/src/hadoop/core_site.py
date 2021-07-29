@@ -49,6 +49,7 @@ _CNF_S3A_RAZ_BUCKET_ENDPOINT = 'fs.s3a.bucket.(?P<bucket>[^.]+).endpoint'
 
 _CNF_ADLS_RAZ_API_URL = 'fs.azure.ext.raz.rest.host.url'
 _CNF_ADLS_RAZ_CLUSTER_NAME = 'fs.azure.ext.raz.adls.access.cluster.name'
+_CNF_ADLS_RAZ_DEFAULT_FS = 'fs.defaultFS'
 
 _CNF_ADLS_CLIENT_ID = 'dfs.adls.oauth2.client.id'
 _CNF_ADLS_AUTHENTICATION_CODE = 'dfs.adls.oauth2.credential'
@@ -153,6 +154,11 @@ def get_raz_default_endpoint():
         'bucket': match.group('bucket')
       }
 
+def get_raz_default_abfs_fs():
+  """
+  Get the name of the default ADLS container of Raz.
+  """
+  return get_conf().get(_CNF_ADLS_RAZ_DEFAULT_FS)
 
 def get_adls_client_id():
   """

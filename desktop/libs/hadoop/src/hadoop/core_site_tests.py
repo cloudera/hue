@@ -76,6 +76,10 @@ def test_core_site():
     <name>fs.azure.ext.raz.adls.access.cluster.name</name>
     <value>gehue-adls</value>
   </property>
+  <property>
+    <name>fs.defaultFS</name>
+    <value>abfs://data@gethuedevstorage.dfs.core.windows.net/hue-adls</value>
+  </property> 
 </configuration>
     """
     open_file(os.path.join(hadoop_home, 'core-site.xml'), 'w').write(xml)
@@ -89,6 +93,8 @@ def test_core_site():
     assert_equal(core_site.get_raz_api_url(), 'https://gehue-adls-master:6082/')
     assert_equal(core_site.get_raz_cluster_name(), 'gehue-adls')
     assert_equal(core_site.get_raz_default_endpoint(), {'host': 's3.us-west-2.amazonaws.com', 'bucket': 'gethue-dev'})
+
+    assert_equal(core_site.get_raz_default_abfs_fs(), 'abfs://data@gethuedevstorage.dfs.core.windows.net/hue-adls')
 
     assert_equal(get_remote_home_storage(), 's3a://gethue-dev')
     assert_equal(get_region(), 'us-west-2')

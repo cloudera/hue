@@ -164,7 +164,7 @@ def abfspath(path, fs_defaultfs = None):
   LOG.debug("%s" % path)
   return path
 
-def get_home_dir_for_ABFS():
+def get_home_dir_for_abfs():
   """
   Attempts to go to the directory set by the user in the configuration file. If not defaults to abfs://
   """
