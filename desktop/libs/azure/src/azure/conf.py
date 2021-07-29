@@ -75,9 +75,9 @@ def get_default_abfs_url():
   return ABFS_CLUSTERS['default'].WEBHDFS_URL.get()
 
 def get_default_abfs_fs():
-  default_fs = core_site.get_raz_default_abfs_fs()
+  default_fs = core_site.get_default_fs()
   
-  if core_site.get_raz_api_url() and default_fs:
+  if default_fs:
     return default_fs
   else:
     return ABFS_CLUSTERS['default'].FS_DEFAULTFS.get()
