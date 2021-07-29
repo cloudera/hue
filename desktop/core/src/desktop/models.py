@@ -2002,8 +2002,8 @@ class ClusterConfig(object):
       })
 
     if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('abfs', self.user):
-      from azure.abfs.__init__ import get_home_dir_for_ABFS
-      home_path = remote_home_storage if remote_home_storage else get_home_dir_for_ABFS().encode('utf-8')
+      from azure.abfs.__init__ import get_home_dir_for_abfs
+      home_path = remote_home_storage if remote_home_storage else get_home_dir_for_abfs().encode('utf-8')
       interpreters.append({
         'type': 'abfs',
         'displayName': _('ABFS'),

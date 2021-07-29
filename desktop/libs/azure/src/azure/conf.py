@@ -75,7 +75,12 @@ def get_default_abfs_url():
   return ABFS_CLUSTERS['default'].WEBHDFS_URL.get()
 
 def get_default_abfs_fs():
-  return ABFS_CLUSTERS['default'].FS_DEFAULTFS.get()
+  default_fs = core_site.get_default_fs()
+  
+  if default_fs:
+    return default_fs
+  else:
+    return ABFS_CLUSTERS['default'].FS_DEFAULTFS.get()
 
 ADLS_CLUSTERS = UnspecifiedConfigSection(
   "adls_clusters",
