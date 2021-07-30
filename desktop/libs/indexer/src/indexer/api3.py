@@ -524,6 +524,7 @@ def importer_submit(request):
     )
   elif destination['ouputFormat'] == 'big-table':
     args = {
+      'request': request,
       'source': source,
       'destination': destination,
       'start_time': start_time,
