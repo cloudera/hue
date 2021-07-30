@@ -14,18 +14,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.import logging
 
+import csv
 import logging
 import sys
 import uuid
-
 from django.urls import reverse
 
+from notebook.conf import get_ordered_interpreters
 from notebook.models import make_notebook
 
 if sys.version_info[0] > 2:
+  from io import StringIO as string_io
   from urllib.parse import urlparse, unquote as urllib_unquote
   from django.utils.translation import gettext as _
 else:
+  from cStringIO import StringIO as string_io
   from django.utils.translation import ugettext as _
   from urllib import unquote as urllib_unquote
   from urlparse import urlparse
@@ -40,7 +43,7 @@ class PhoenixIndexer():
     self.fs = fs
     self.user = user
 
-  def create_table_from_file(self, source, destination, start_time=-1, dry_run=False):
+  def create_table_from_file(self, request, source, destination, start_time=-1, dry_run=False):
     if '.' in destination['name']:
       database, table_name = destination['name'].split('.', 1)
     else:
@@ -48,8 +51,8 @@ class PhoenixIndexer():
       table_name = destination['name']
     final_table_name = table_name
 
-    source_type = source['sourceType']
-    editor_type = '50'  # destination['sourceType']
+    source_type = [interpreter['type'] for interpreter in get_ordered_interpreters(self.user) if interpreter['dialect'] == 'phoenix'][0]
+    editor_type = source_type
 
     columns = destination['columns']
 
@@ -69,22 +72,26 @@ CONSTRAINT my_pk PRIMARY KEY (%(primary_keys)s)
           'primary_keys': ', '.join(destination.get('indexerPrimaryKey'))
       }
 
-    if destination['indexerRunJob']:
-      sql += '''
-  UPSERT INTO %(table_name)s VALUES ('NY','New York',8143197);
-  UPSERT INTO %(table_name)s VALUES ('CA','Los Angeles',3844829);
-  UPSERT INTO %(table_name)s VALUES ('IL','Chicago',2842518);
-  UPSERT INTO %(table_name)s VALUES ('TX','Houston',2016582);
-  UPSERT INTO %(table_name)s VALUES ('PA','Philadelphia',1463281);
-  UPSERT INTO %(table_name)s VALUES ('AZ','Phoenix',1461575);
-  UPSERT INTO %(table_name)s VALUES ('TX','San Antonio',1256509);
-  UPSERT INTO %(table_name)s VALUES ('CA','San Diego',1255540);
-  UPSERT INTO %(table_name)s VALUES ('TX','Dallas',1213825);
-  UPSERT INTO %(table_name)s VALUES ('CA','San Jose',91233);
-  ''' % {
-          'table_name': table_name,
-        }
+    source_path = urllib_unquote(source['path'])
+    file_obj = request.fs.open(source_path)
+    content = file_obj.read().decode("utf-8")
+    csvfile = string_io(content)
+    reader = csv.reader(csvfile)
 
+    if destination['indexerRunJob']:
+      for count, csv_row in enumerate(reader):
+        if (source['format']['hasHeader'] and count == 0) or not csv_row:
+            continue
+        else:
+          _sql = ', '.join([ "'{0}'".format(col_val) if columns[count]['type'] in ('VARCHAR', 'timestamp') \
+            else '{0}'.format(col_val) for count, col_val in enumerate(csv_row)])
+
+          sql += '''\nUPSERT INTO %(table_name)s VALUES (%(csv_row)s);\n''' % {
+            'database': database,
+            'table_name': table_name,
+            'csv_row': _sql
+          }
+   
     if dry_run:
       return sql
     else:
