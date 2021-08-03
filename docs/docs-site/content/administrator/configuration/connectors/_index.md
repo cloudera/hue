@@ -1011,8 +1011,6 @@ New end points have been added in [HUE-5420](https://issues.cloudera.org/browse/
 
 Hue's file browser can now allow users to explore, manage, and upload data in an ADLS v1 or ADLS v2 (ABFS), in addition to HDFS and S3.
 
-Read more about it in the [ADLS User Documentation](/user/browsing#adls-abfs).
-
 In order to add an Azure account to Hue, you'll need to configure Hue with valid Azure credentials, including the client ID, client secret and tenant ID.
 These keys can securely stored in a script that outputs the actual access key and secret key to stdout to be read by Hue (this is similar to how Hue reads password scripts). In order to use script files, add the following section to your hue.ini configuration file:
 
