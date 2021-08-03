@@ -51,7 +51,7 @@ from useradmin.models import User
 
 import desktop.views
 from desktop import appmanager, metrics
-from desktop.auth.backend import is_admin
+from desktop.auth.backend import is_admin, find_or_create_user, ensure_has_a_group, rewrite_user
 from desktop.conf import AUTH, HTTP_ALLOWED_METHODS, ENABLE_PROMETHEUS, KNOX, DJANGO_DEBUG_MODE, AUDIT_EVENT_LOG_DIR, \
     SERVER_USER, REDIRECT_WHITELIST, SECURE_CONTENT_SECURITY_POLICY, has_connectors
 from desktop.context_processors import get_app_name
@@ -367,6 +367,10 @@ class LoginAndPermissionMiddleware(MiddlewareMixin):
         return None
 
     if AUTH.AUTO_LOGIN_ENABLED.get():
+      user = find_or_create_user(username='hue', password='hue')
+      ensure_has_a_group(user)
+      user = rewrite_user(user)
+
       user = authenticate(request, username='hue', password='hue')
       if user is not None:
         login(request, user)
