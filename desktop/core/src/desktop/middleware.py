@@ -367,9 +367,13 @@ class LoginAndPermissionMiddleware(MiddlewareMixin):
         return None
 
     if AUTH.AUTO_LOGIN_ENABLED.get():
+      # Auto-create the hue/hue user if not already present
       user = find_or_create_user(username='hue', password='hue')
       ensure_has_a_group(user)
       user = rewrite_user(user)
+
+      user.is_active = True
+      user.save()
 
       user = authenticate(request, username='hue', password='hue')
       if user is not None:
