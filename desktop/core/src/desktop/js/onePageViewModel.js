@@ -446,7 +446,10 @@ class OnePageViewModel {
     const openImporter = function (path) {
       let databasename = '';
       let interpreter = '';
-      const table = path.substring(path.lastIndexOf(':') + 1, path.lastIndexOf(';'));
+      const table = path
+        .substring(path.lastIndexOf(':') + 1, path.lastIndexOf(';'))
+        .slice(0, -4)
+        .replace(/[^a-zA-Z0-9]/g, '_');
       self.loadApp('importer');
       huePubSub.publish(ASSIST_GET_SOURCE_EVENT, source => {
         interpreter = source;
@@ -461,7 +464,7 @@ class OnePageViewModel {
         vm.createWizard.source.path(path);
         vm.currentStep(2);
         vm.createWizard.source.interpreter(interpreter);
-        vm.createWizard.destination.name(databasename + '.' + table.substring(0, table.length - 4));
+        vm.createWizard.destination.name(databasename + '.' + table);
         waitForObservable(vm.createWizard.destination.name, () => {
           vm.createWizard.indexFile();
         });
