@@ -1137,7 +1137,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
 <script type="text/html" id="table-field-template">
   <div>
     <label data-bind="visible: level() == 0 || ($parent.type() != 'array' && $parent.type() != 'map')">${ _('Name') }&nbsp;
-      <input type="text" class="input-large" placeholder="${ _('Field name') }" required data-bind="textInput: name">
+      <input type="text" class="input-large" placeholder="${ _('Field name') }" required data-bind="textInput: name" pattern="[a-zA-Z0-9_]+$" title="${ _('Only alphanumeric and underscore characters') }">
     </label>
 
     <label class="margin-left-5">${ _('Type') }&nbsp;
