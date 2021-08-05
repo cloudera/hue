@@ -237,7 +237,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
           <div data-bind="visible: createWizard.source.inputFormat() == 'localfile'">
               <form method="post" action="" enctype="multipart/form-data" id="uploadform">
                 <div >
-                    <input type="file" id="inputfile" name="inputfile" style="margin-left: 130px" accept=".csv">
+                    <input type="file" id="inputfile" name="inputfile" style="margin-left: 130px" accept=".csv, .xlsx">
                 </div>
             </form>
           </div>
