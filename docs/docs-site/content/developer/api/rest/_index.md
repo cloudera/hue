@@ -226,51 +226,51 @@ Same but in Python:
 
 ### Listing Databases
 
-    curl -X POST 'https://demo.gethue.com/api/editor/autocomplete/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1NzM2NTA0LCJqdGkiOiJkZDVlYTg5ZTMwMDE0MjRiOGRlYWM4N2RjODFhYjgzZSIsInVzZXJfaWQiOjExMDA3MTR9.8I9BeXQXBWFMGf7J4ss7yhcmAZfcFC6sMRE9RLeOwTM'
+    curl -X POST https://demo.gethue.com/api/editor/autocomplete/
 
 ### Database details
 
-    curl -X POST 'https://demo.gethue.com/api/editor/autocomplete/<DB>/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1NzM2NTA0LCJqdGkiOiJkZDVlYTg5ZTMwMDE0MjRiOGRlYWM4N2RjODFhYjgzZSIsInVzZXJfaWQiOjExMDA3MTR9.8I9BeXQXBWFMGf7J4ss7yhcmAZfcFC6sMRE9RLeOwTM'
+    curl -X POST https://demo.gethue.com/api/editor/autocomplete/<DB>/
 
 Describe database API:
 
-    curl -X POST 'https://demo.gethue.com/api/editor/describe/<DB>/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1NzM2NTA0LCJqdGkiOiJkZDVlYTg5ZTMwMDE0MjRiOGRlYWM4N2RjODFhYjgzZSIsInVzZXJfaWQiOjExMDA3MTR9.8I9BeXQXBWFMGf7J4ss7yhcmAZfcFC6sMRE9RLeOwTM' -d 'source_type=mysql'
+    curl -X POST https://demo.gethue.com/api/editor/describe/<DB>/ -d 'source_type=mysql'
 
 - **source_type:** select the configured databases (e.g. `hive`) or connector ID (e.g. `1`)
 
 ### Table details
 
-    curl -X POST 'https://demo.gethue.com/api/editor/autocomplete/<DB>/<TABLE>/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1NzM2NTA0LCJqdGkiOiJkZDVlYTg5ZTMwMDE0MjRiOGRlYWM4N2RjODFhYjgzZSIsInVzZXJfaWQiOjExMDA3MTR9.8I9BeXQXBWFMGf7J4ss7yhcmAZfcFC6sMRE9RLeOwTM'
+    curl -X POST https://demo.gethue.com/api/editor/autocomplete/<DB>/<TABLE>/
 
 Describe table API:
 
-    curl -X POST 'https://demo.gethue.com/api/editor/describe/<DB>/<TABLE>/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1NzM2NTA0LCJqdGkiOiJkZDVlYTg5ZTMwMDE0MjRiOGRlYWM4N2RjODFhYjgzZSIsInVzZXJfaWQiOjExMDA3MTR9.8I9BeXQXBWFMGf7J4ss7yhcmAZfcFC6sMRE9RLeOwTM' -d 'source_type=1'
+    curl -X POST https://demo.gethue.com/api/editor/describe/<DB>/<TABLE>/ -d 'source_type=1'
 
 - **source_type:** select the configured databases (e.g. `hive`) or connector ID (e.g. `1`)
 
 Analyze API:
 
-    curl -X POST 'https://demo.gethue.com/api/<DIALECT>/analyze/<DB>/<TABLE>/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1ODE1MzU5LCJqdGkiOiIzODM0M2Q3YjRjNGY0NTUxYWJmYmQyZmI4YjUzYjFjZiIsInVzZXJfaWQiOjExMDA3MTR9.fl0h7VooLtWnu9v7FtdLUy3NukwFtUya-LkTzollTig'
+    curl -X POST https://demo.gethue.com/api/<DIALECT>/analyze/<DB>/<TABLE>/
 
 - Currently supported **dialects:** impala, beeswax (hive)
 
 Sample table data API:
 
-    curl -X POST 'https://demo.gethue.com/api/editor/sample/<DB>/<TABLE>/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1ODE1MzU5LCJqdGkiOiIzODM0M2Q3YjRjNGY0NTUxYWJmYmQyZmI4YjUzYjFjZiIsInVzZXJfaWQiOjExMDA3MTR9.fl0h7VooLtWnu9v7FtdLUy3NukwFtUya-LkTzollTig'
+    curl -X POST https://demo.gethue.com/api/editor/sample/<DB>/<TABLE>/
 
 ### Column details
 
-    curl -X POST 'https://demo.gethue.com/api/editor/autocomplete/<DB>/<TABLE>/<COL1>/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1NzM2NTA0LCJqdGkiOiJkZDVlYTg5ZTMwMDE0MjRiOGRlYWM4N2RjODFhYjgzZSIsInVzZXJfaWQiOjExMDA3MTR9.8I9BeXQXBWFMGf7J4ss7yhcmAZfcFC6sMRE9RLeOwTM'
+    curl -X POST https://demo.gethue.com/api/editor/autocomplete/<DB>/<TABLE>/<COL1>/
 
 Analyze API:
 
-    curl -X POST 'https://demo.gethue.com/api/<DIALECT>/analyze/<DB>/<TABLE>/<COL1>/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1ODE1MzU5LCJqdGkiOiIzODM0M2Q3YjRjNGY0NTUxYWJmYmQyZmI4YjUzYjFjZiIsInVzZXJfaWQiOjExMDA3MTR9.fl0h7VooLtWnu9v7FtdLUy3NukwFtUya-LkTzollTig'
+    curl -X POST https://demo.gethue.com/api/<DIALECT>/analyze/<DB>/<TABLE>/<COL1>/
 
 - Currently supported **dialects:** impala, beeswax (hive)
 
 Sample column data API:
 
-    curl -X POST 'https://demo.gethue.com/api/editor/sample/<DB>/<TABLE>/<COL1>/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1ODE1MzU5LCJqdGkiOiIzODM0M2Q3YjRjNGY0NTUxYWJmYmQyZmI4YjUzYjFjZiIsInVzZXJfaWQiOjExMDA3MTR9.fl0h7VooLtWnu9v7FtdLUy3NukwFtUya-LkTzollTig'
+    curl -X POST https://demo.gethue.com/api/editor/sample/<DB>/<TABLE>/<COL1>/
 
 ### Listing Functions
 
@@ -311,7 +311,7 @@ For a specific function/UDF details (e.g. trunc):
 
 We can choose a dialect for `doc_type` e.g. impala, mysql, hive, phoenix, etc.
 
-    curl -X GET "https://demo.gethue.com/api/editor/get_history?doc_type=hive" -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1OTAzMTUzLCJqdGkiOiI4NmUwNjFhMTg0N2I0ZThjODE5NmU2N2Q1YzJkOWI5NSIsInVzZXJfaWQiOjExMDA3MTR9.CKoG9xq1xu-J7DGgJDuZcIiAGnk5wFyxFHg4YrbKX7E'
+    curl -X GET https://demo.gethue.com/api/editor/get_history?doc_type=hive
 
     {"status": 0, "count": 3, "history": [{"name": "", "id": 2008, "uuid": "5b48c678-1224-4863-b523-3baab82402a7", "type": "query-hive", "data": {"statement": "CREATE TABLE w12( Name STRING, Money BIGINT )", "lastExecuted": 1621502970360, "status": "failed", "parentSavedQueryUuid": ""}, "absoluteUrl": "/editor?editor=2008"}, {"name": "", "id": 2006, "uuid": "1cd32ae0-9b61-46ae-8fd4-72c4255209c3", "type": "query-hive", "data": {"statement": "CREATE TABLE q13( Name STRING, Money BIGINT )", "lastExecuted": 1621498889058, "status": "expired", "parentSavedQueryUuid": ""}, "absoluteUrl": "/editor?editor=2006"}, {"name": "", "id": 2003, "uuid": "e5ec1fa4-1a36-4e42-a814-a685b0142223", "type": "query-hive", "data": {"statement": "CREATE TABLE q11( Name STRING, Money BIGINT );\nINSERT INTO q11 VALUES ('abc', 100);", "lastExecuted": 1621498771619, "status": "expired", "parentSavedQueryUuid": ""}, "absoluteUrl": "/editor?editor=2003"}], "message": "History fetched"}
 
@@ -323,7 +323,7 @@ Hue's [File Browser](https://docs.gethue.com/user/browsing/#data) offer uploads,
 
 Here is how to list the content of a path, here a S3 bucket `s3a://gethue-demo`:
 
-    curl -X GET "https://demo.gethue.com/api/storage/view=s3a://gethue-demo"
+    curl -X GET https://demo.gethue.com/api/storage/view=s3a://gethue-demo
 
     {
       ...........
