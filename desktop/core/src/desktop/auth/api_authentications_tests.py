@@ -103,10 +103,10 @@ class TestJwtAuthentication():
 
   def test_check_token_verification_flag(self):
 
-    # When Verification flag is True for old sample token
+    # When verification flag is True for old sample token
     assert_raises(exceptions.AuthenticationFailed, JwtAuthentication().authenticate, self.request)
 
-    # When Verification flag is False
+    # When verification flag is False
     reset = AUTH.VERIFY_CUSTOM_JWT.set_for_testing(False)
     try:
       user, token = JwtAuthentication().authenticate(request=self.request)

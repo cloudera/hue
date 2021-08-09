@@ -63,6 +63,10 @@ class JwtAuthentication(authentication.BaseAuthentication):
     except Exception as e:
       raise exceptions.AuthenticationFailed(e)
     
+    if payload.get('user') is None:
+      LOG.debug('JwtAuthentication: no user ID in token')
+      return None
+
     LOG.debug('JwtAuthentication: got user ID %s and tenant ID %s' % (payload.get('user'), payload.get('tenantId')))
 
     user = find_or_create_user(payload.get('user'), is_superuser=False)
