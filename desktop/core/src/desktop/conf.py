@@ -1088,6 +1088,12 @@ AUTH = ConfigSection(
           "Custom Authentication backends for the REST API." +
           "Multiple Authentication backends are supported by specifying a comma-separated list in order of priority.")
     ),
+    VERIFY_CUSTOM_JWT=Config(
+        key="verify_custom_jwt",
+        default=True,
+        type=coerce_bool,
+        help=_("Verify custom JWT token (defaults to True).")
+    ),
     USER_AUGMENTOR=Config("user_augmentor",
                    default="desktop.auth.backend.DefaultUserAugmentor",
                    help=_("Class which defines extra accessor methods for User objects.")),
