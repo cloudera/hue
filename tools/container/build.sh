@@ -152,7 +152,17 @@ pull_base_images() {
   docker tag ${REGISTRY}/$COMPILEHUE_VERSION $COMPILEHUE_VERSION
 }
 
+rebuild_base_images() {
+  docker pull registry.access.redhat.com/ubi7/ubi:latest
+  build_huebase
+  build_huelbbase
+  build_huecompilebase
+}
+
 hue_containers_build() {
+  if [ $REBUILD_BASE -gt 0 ]; then
+    rebuild_base_images
+  fi
   pull_base_images
   find_git_state
 

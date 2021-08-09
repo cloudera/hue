@@ -60,12 +60,12 @@ RUN set -eux; \
       yum clean all && \
       rm -rf /var/cache/yum
 
-RUN set -eux; easy_install supervisor pip
+RUN set -eux; curl https://bootstrap.pypa.io/pip/2.7/get-pip.py -s --output get-pip.py && /usr/bin/python get-pip.py -q && /usr/bin/pip install supervisor
 
 RUN curl -s https://files.pythonhosted.org/packages/a1/92/a27986cb7b4bddc7d57781a0e1163d683110907edfca1db3fbce25536492/psycopg2_binary-2.8.3-cp27-cp27mu-manylinux1_x86_64.whl -o /tmp/psycopg2_binary-2.8.3-cp27-cp27mu-manylinux1_x86_64.whl
 
 RUN set -eux ; \
-      curl -sL https://rpm.nodesource.com/setup_10.x | bash - \
+      curl -sL https://rpm.nodesource.com/setup_12.x | bash - \
         && yum install -y nodejs \
         && yum clean all -y
 

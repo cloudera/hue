@@ -87,7 +87,15 @@ pull_qpbase_images() {
   docker tag ${REGISTRY}/$HUEQPBASE_VERSION $HUEQPBASE_VERSION
 }
 
+rebuild_qp_images() {
+  docker pull registry.access.redhat.com/ubi7/ubi:latest
+  build_hueqpbase
+}
+
 hue_qp_build() {
+  if [ $REBUILD_BASE -gt 0 ]; then
+    rebuild_qp_images
+  fi
   pull_qpbase_images
   find_git_state
 
