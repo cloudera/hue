@@ -13,12 +13,12 @@ Hue connects to any database or warehouse via native or SqlAlchemy connectors th
 
     [notebook]
     [[interpreters]]
-
+    
     [[[mysql]]]
     name=MySQL
     interface=sqlalchemy
     options='{"url": "mysql://user:password@localhost:3306/hue"}'
-
+    
     [[[presto]]]
     name = Presto
     interface=sqlalchemy
@@ -36,7 +36,7 @@ Admins can configure the connectors via the UI. This feature requires Editor v2 
 
     [desktop]
     enable_connectors=true
-
+    
     [notebook]
     enable_notebook_2=true
 
@@ -62,7 +62,7 @@ Support is native via a dedicated section.
     # Host where HiveServer2 is running.
     # If Kerberos security is enabled, use fully-qualified domain name (FQDN).
     hive_server_host=localhost
-
+    
     # Port where HiveServer2 Thrift server runs on.
     hive_server_port=10000
 
@@ -87,13 +87,13 @@ When the LLAP interpreter is added, there are 2 ways to enable connectivity (dir
     [[[llap]]]
     name=LLAP
     interface=hiveserver2
-
+    
     [beeswax]
     # Direct Configuration
     llap_server_host = localhost
     llap_server_port = 10500
     llap_server_thrift_port = 10501
-
+    
     # or Service Discovery
     ## hive_discovery_llap = true
     ## hive_discovery_llap_ha = false
@@ -125,7 +125,7 @@ Support is native via a dedicated section.
     [impala]
     # Host of the Impala Server (one of the Impalad)
     server_host=localhost
-
+    
     # Port of the Impala Server
     server_port=21050
 
@@ -161,12 +161,6 @@ Alternative:
 
 ### Presto
 
-Presto has been forked into [Trino](#trino) and both share the same configuration.
-
-### Trino
-
-Formerly known as PrestoSQL (hence still having 'presto' name in several parameters).
-
 The dialect should be added to the Python system or Hue Python virtual environment:
 
     ./build/env/bin/pip install pyhive
@@ -174,7 +168,7 @@ The dialect should be added to the Python system or Hue Python virtual environme
 Then give Hue the information about the database source following the `presto://{trino-coordinator}:{port}/{catalog}/{schema}` format:
 
     [[[presto]]]
-    name = Trino
+    name = Presto
     interface=sqlalchemy
     options='{"url": "presto://localhost:8080/tpch/default"}'
 
@@ -202,33 +196,72 @@ Pass Presto Session Properties without HTTPS enabled:
 
     options='{"url": "presto://username:password@localhost:8080/tpch/default","connect_args":"{\"session_props\": {\"query_max_run_time\": \"1m\"}}"}'
 
-**Note**
-Hue does not use trino specific dialect of SQLAlchemy which may lead to a *catalog must be specified* error. This can be solved by setting `protocol.v1.alternate-header-name=Presto` in the Trino's configuration. More details about his can be found at [Migrating from PrestoSQL to Trino](https://trino.io/blog/2021/01/04/migrating-from-prestosql-to-trino.html)
 
-Also give a try to  https://github.com/dungdm93/sqlalchemy-trino for the 'trino://' and avoiding the [old protocol issue](https://github.com/dropbox/PyHive/issues/378).
+
+### Trino
+
+Trino and [Presto](https://docs.gethue.com/administrator/configuration/connectors/#presto) both share the same configuration before Trino 351.
+
+The dialect should be added to the Python system or Hue Python virtual environment:
+
+    ./build/env/bin/pip install pyhive
+
+Then give Hue the information about the database source following the trino://{trino-coordinator}:{port}/{catalog}/{schema}` format:
+
+    [[[trino]]]
+    name = Trino
+    interface=sqlalchemy
+    options='{"url": "trino://localhost:8080/tpch/default"}'
+
+With impersonation:
+
+    options='{"url": "trino://localhost:8080/tpch/default", "has_impersonation": true}'
+
+With Kerberos:
+
+    options='{"url": "trino://localhost:8080/tpch/default?KerberosKeytabPath=/path/to/keytab&KerberosPrincipal=principal&KerberosRemoteServiceName=service&protocol=https"'
+
+With credentials:
+
+    options='{"url": "trino://username:password@localhost:8080/tpch/default"}'
+
+With LDAPS enabled over HTTPS:
+
+    options='{"url": "trino://username:password@localhost:8443/tpch/default","connect_args":"{\"protocol\": \"https\"}"}'
+
+Pass Trino Session properties along with HTTPS:
+
+    options='{"url": "trino://username:password@localhost:8443/tpch/default","connect_args":"{\"protocol\": \"https\", \"session_props\": {\"query_max_run_time\": \"1m\"}}"}'
+
+Pass Trino Session Properties without HTTPS enabled:
+
+    options='{"url": "trino://username:password@localhost:8080/tpch/default","connect_args":"{\"session_props\": {\"query_max_run_time\": \"1m\"}}"}'
+
+**Note**
+PyHive-0.6.4 support trino specific dialect of SQLAlchemy. If  `Can't load plugin: sqlalchemy.dialects:trino` error occurs, please ensure that PyHive version is at least 0.6.4 and the  `trino.py` file is in the PyHive package. 
 
 Alternative interfaces.
 
 Direct:
 
-    [[[presto]]]
+    [[[trino]]]
     name=Trino
-    interface=presto
-    ## Specific options for connecting to the Presto server.
-    ## To connect to Presto over HTTPS/SSL you will need to construct connection string like below:
-    ## "url": "jdbc:presto://localhost:8080/catalog/schema?SSL=true&SSLTrustStorePath=/path/to/key_file&SSLTrustStorePassword=${password}"
-    ## The JDBC driver presto-jdbc.jar need to be in the CLASSPATH environment variable.
+    interface=trino
+    ## Specific options for connecting to the Trino server.
+    ## To connect to Trino over HTTPS/SSL you will need to construct connection string like below:
+    ## "url": "jdbc:trino://localhost:8080/catalog/schema?SSL=true&SSLTrustStorePath=/path/to/key_file&SSLTrustStorePassword=${password}"
+    ## The JDBC driver trino-jdbc.jar need to be in the CLASSPATH environment variable.
     ## If 'user' and 'password' are omitted, they will be prompted in the UI.
-    options='{"url": "jdbc:presto://localhost:8080/catalog/schema", "driver": "io.prestosql.jdbc.PrestoDriver", "user": "root", "password": "root"}'
+    options='{"url": "jdbc:trino://localhost:8080/catalog/schema", "driver": "io.trino.jdbc.TrinoDriver", "user": "root", "password": "root"}'
 
 JDBC:
 
-The client driver is maintained by the Presto Team and can be downloaded here: https://trino.io/docs/current/installation/jdbc.html
+The client driver is maintained by the Trino Team and can be downloaded here: https://trino.io/docs/current/installation/jdbc.html
 
-    [[[presto]]]
+    [[[trino]]]
     name=Trino JDBC
     interface=jdbc
-    options='{"url": "jdbc:presto://localhost:8080/", "driver": "io.prestosql.jdbc.PrestoDriver"}'
+    options='{"url": "jdbc:trino://localhost:8080/", "driver": "io.trino.jdbc.TrinoDriver"}'
 
 ### Oracle
 
@@ -370,9 +403,9 @@ The dialect currently requires the [Flink SQL Gateway](https://github.com/verver
 Then add a Flink interpreter in the Hue configuration:
 
     [notebook]
-
+    
     [[interpreters]]
-
+    
     [[[flink]]]
     name=Flink
     interface=flink
@@ -438,9 +471,9 @@ Supporting additional [connection parameters](https://github.com/mxmzdlv/pybigqu
 The dialect should be added to the Python system or Hue Python virtual environment:
 
     ./build/env/bin/pip install psycopg2
-
+    
       or
-
+    
     ./build/env/bin/pip install psycopg2-binary
 
 Then give Hue the information about the database source:
@@ -533,7 +566,7 @@ With the HiveServer Thrift (same as the one used by Hive and Impala so more robu
     # Host of the Spark Thrift Server
     # https://spark.apache.org/docs/latest/sql-distributed-sql-engine.html
     sql_server_host=localhost
-
+    
     # Port of the Spark Thrift Server
     sql_server_port=10000
 
@@ -734,10 +767,10 @@ Hue ships the [dynamic dashboards](/user/querying/#dashboard)for exploring datas
     [search]
     # URL of the Solr Server
     solr_url=http://localhost:8983/solr/
-
+    
     # Requires FQDN in solr_url if enabled
     ## security_enabled=false
-
+    
     ## Query sent when no term is entered
     ## empty_query=*:*
 
@@ -910,11 +943,11 @@ Then give Hue the information about the database source:
 Hue supports one HDFS cluster. That cluster should be defined under the `[[[default]]]` sub-section.
 
     [hadoop]
-
+    
     # Configuration for HDFS NameNode
     # ------------------------------------------------------------------------
     [[hdfs_clusters]]
-
+    
     [[[default]]]
     fs_defaultfs=hdfs://hdfs-name-node.com:8020
     webhdfs_url=http://hdfs-name-node.com:20101/webhdfs/v1
@@ -1027,7 +1060,7 @@ The account name used by ADLS / ABFS will need to be configured via the followin
     [[[default]]]
     fs_defaultfs=adl://<account_name>.azuredatalakestore.net
     webhdfs_url=https://<account_name>.azuredatalakestore.net
-
+    
     [[abfs_clusters]]
     [[[default]]]
     fs_defaultfs=abfs://<container_name>@<account_name>.dfs.core.windows.net
@@ -1112,15 +1145,15 @@ In the `[metadata]` section, Hue is supporting Cloudera Navigator and Apache Atl
     interface=atlas
     # Catalog API URL (without version suffix).
     api_url=http://localhost:21000/atlas/v2
-
+    
     # Username of the CM user used for authentication.
     ## server_user=hue
     # Password of the user used for authentication.
     server_password=
-
+    
     # Limits found entities to a specific cluster. When empty the entities from all clusters will be included in the search results.
     ## search_cluster=
-
+    
     # Set to true when authenticating via kerberos instead of username/password
     ## kerberos_enabled=false
 
@@ -1147,15 +1180,15 @@ In the `[[interpreters]]` section:
     [[[pyspark]]]
     name=PySpark
     interface=livy
-
+    
     [[[sparksql]]]
     name=SparkSql
     interface=livy
-
+    
     [[[spark]]]
     name=Scala
     interface=livy
-
+    
     [[[r]]]
     name=R
     interface=livy
@@ -1170,7 +1203,7 @@ And if using Cloudera distribution, make sure you have notebooks enabled:
 
     [desktop]
     app_blacklist=
-
+    
     [notebook]
     show_notebooks=true
 
@@ -1207,7 +1240,7 @@ Livy supports a configuration parameter in the Livy conf:
 Let’s say we want to create a shell running as the user bob, this is particularly useful when multi users are sharing a Notebook server
 
     curl -X POST --data '{"kind": "pyspark", "proxyUser": "bob"}' -H "Content-Type: application/json" localhost:8998/sessions
-
+    
     {"id":0,"state":"starting","kind":"pyspark","proxyUser":"bob","log":[]}
 
 Do not forget to add the user running Hue (your current login in dev or hue in production) in the Hadoop proxy user list (/etc/hadoop/conf/core-site.xml):
@@ -1259,9 +1292,9 @@ under the `[[[default]]]` and `[[[ha]]]` sub-sections.
     # Configuration for YARN (MR2)
     # ------------------------------------------------------------------------
     [[yarn_clusters]]
-
+    
     [[[default]]]
-
+    
     resourcemanager_host=yarn-rm.com
     resourcemanager_api_url=http://yarn-rm.com:8088/
     proxy_api_url=http://yarn-proxy.com:8088/
@@ -1275,10 +1308,10 @@ To have Hue point to a Sentry service and another host, modify these hue.ini pro
     [libsentry]
     # Hostname or IP of server.
     hostname=localhost
-
+    
     # Port the sentry service is running on.
     port=8038
-
+    
     # Sentry configuration directory, where sentry-site.xml is located.
     sentry_conf_dir=/etc/sentry/conf
 
@@ -1314,7 +1347,7 @@ Our users are:
 We synced the Unix users/groups into Hue with these commands:
 
     export HUE_CONF_DIR="/var/run/cloudera-scm-agent/process/`ls -alrt /var/run/cloudera-scm-agent/process | grep HUE | tail -1 | awk '{print $9}'`"
-
+    
     build/env/bin/hue useradmin_sync_with_unix --min-uid=1000
 
 If using the package version and has the CDH repository register, install sentry with:
@@ -1361,12 +1394,12 @@ Here is an example of sentry-site.xml
 ### Apache Knox
 
     [[knox]]
-
+    
     # This is a list of hosts that knox proxy requests can come from
     ## knox_proxyhosts=server1.domain.com,server2.domain.com
-
+    
     # List of Kerberos principal name which is allowed to impersonate others
     ## knox_principal=knox1,knox2
-
+    
     # Comma separated list of strings representing the ports that the Hue server can trust as knox port.
     ## knox_ports=80,8443

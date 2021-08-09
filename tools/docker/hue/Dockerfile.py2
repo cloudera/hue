@@ -65,8 +65,8 @@ RUN ./build/env/bin/pip install \
   django_redis \
   flower==0.9.7 \
   # SparkSql show tables
-  git+https://github.com/gethue/PyHive \
-  # pyhive \
+  # git+https://github.com/gethue/PyHive \
+  pyhive \
   ksql \
   pydruid \
   pybigquery \
