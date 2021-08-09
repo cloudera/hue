@@ -196,8 +196,6 @@ Pass Presto Session Properties without HTTPS enabled:
 
     options='{"url": "presto://username:password@localhost:8080/tpch/default","connect_args":"{\"session_props\": {\"query_max_run_time\": \"1m\"}}"}'
 
-
-
 ### Trino
 
 Trino and [Presto](https://docs.gethue.com/administrator/configuration/connectors/#presto) both share the same configuration before Trino 351.
