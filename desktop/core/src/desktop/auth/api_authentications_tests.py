@@ -22,6 +22,7 @@ from nose.tools import assert_equal, assert_true, assert_false, assert_raises
 from desktop.auth.backend import rewrite_user
 from desktop.auth.api_authentications import JwtAuthentication
 from desktop.lib.django_test_util import make_logged_in_client
+from desktop.conf import AUTH
 
 from rest_framework import exceptions
 
@@ -36,8 +37,8 @@ else:
 
 class TestJwtAuthentication():
   def setUp(self):
-    self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
-    self.user = rewrite_user(User.objects.get(username="test"))
+    self.client = make_logged_in_client(username="test_user", groupname="default", recreate=True, is_superuser=False)
+    self.user = rewrite_user(User.objects.get(username="test_user"))
 
     self.sample_token = "eyJhbGciOiJSUzI1NiJ9.eyJhdWQiOlsid29ya2xvYWQtYXBwIiwicmFuZ2VyIl0sImV4cCI6MTYyNjI1Njg5MywiaWF0IjoxNjI2MjU2NTkzLCJpc3MiOiJDbG91ZGVyYTEiLCJqdGkiOiJpZDEiLCJzdWIiOiJ0ZXN0LXN1YmplY3QiLCJ1c2VyIjoidGVzdF91c2VyIn0.jvyVDxbWTAik0jbdUcIc9ZANNrJZUCWH-Pg7FloRhg0ZYAETd_AO3p5v_ppoMmVcPD2xBSrngA5J3_A_zPBvQ_hdDlpb0_-mCCJfGhC5tju4bI9EE9Akdn2FrrsqrvQQ8cPyGsIlvoIxrK1De4f74MmUaxfN7Hrrcue1PTY4u4IB9cWQqV9vIcX99Od5PUaNekLIee-I8gweqvfGEEsW7qWUM63nh59_TOB3LLq-YcEuaX1h_oiTATeCssjk_ee9RrJGLNyKmC0WJ4UrEWn8a_T3bwCy8CMe0zV5PSuuvPHy0FvnTo2il5SDjGimxKcbpgNiJdfblslu6i35DlfiWg"
     self.request = MagicMock(
@@ -51,7 +52,7 @@ class TestJwtAuthentication():
     with patch('desktop.auth.api_authentications.jwt.decode') as jwt_decode:
 
       jwt_decode.return_value = {
-        "userId": "test"
+        "user": "test_user"
       }
 
       user, token = JwtAuthentication().authenticate(request=self.request)
@@ -65,7 +66,7 @@ class TestJwtAuthentication():
     with patch('desktop.auth.api_authentications.jwt.decode') as jwt_decode:
 
       jwt_decode.return_value = {
-        "userId": "test_new_user"
+        "user": "test_new_user"
       }
 
       assert_false(User.objects.filter(username="test_new_user").exists())
@@ -93,9 +94,23 @@ class TestJwtAuthentication():
   def test_check_user_token_storage(self):
     with patch('desktop.auth.api_authentications.jwt.decode') as jwt_decode:
       jwt_decode.return_value = {
-        "userId": "test"
+        "user": "test_user"
       }
       user, token = JwtAuthentication().authenticate(request=self.request)
 
       assert_true('jwt_access_token' in user.profile.data)
       assert_equal(user.profile.data['jwt_access_token'], self.sample_token)
+
+  def test_check_token_verification_flag(self):
+
+    # When verification flag is True for old sample token
+    assert_raises(exceptions.AuthenticationFailed, JwtAuthentication().authenticate, self.request)
+
+    # When verification flag is False
+    reset = AUTH.VERIFY_CUSTOM_JWT.set_for_testing(False)
+    try:
+      user, token = JwtAuthentication().authenticate(request=self.request)
+
+      assert_equal(user, self.user)
+    finally:
+      reset()
