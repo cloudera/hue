@@ -2330,7 +2330,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
           }
           if (format.value === 'index' && (
               wizard.source.inputFormat() === 'stream' ||
-              ['file', 'query', 'stream', 'manual'].indexOf(wizard.source.inputFormat()) === -1)) {
+              ['file', 'query', 'stream'].indexOf(wizard.source.inputFormat()) === -1)) {
             return false;
           }
           if (format.value === 'table' &&
