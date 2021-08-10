@@ -1092,7 +1092,7 @@ AUTH = ConfigSection(
         key="verify_custom_jwt",
         default=True,
         type=coerce_bool,
-        help=_("Verify custom JWT token (defaults to True).")
+        help=_("Verify custom JWT.")
     ),
     USER_AUGMENTOR=Config("user_augmentor",
                    default="desktop.auth.backend.DefaultUserAugmentor",
