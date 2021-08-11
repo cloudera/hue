@@ -20,6 +20,7 @@ import * as ko from 'knockout';
 
 import huePubSub from 'utils/huePubSub';
 import sqlUtils from 'sql/sqlUtils';
+import { findEditorConnector } from 'config/hueConfig';
 
 const findNameInHierarchy = async (entry, searchCondition) => {
   while (entry && !searchCondition(entry)) {
@@ -55,6 +56,11 @@ class AssistDbEntry {
     self.navigationSettings = navigationSettings;
 
     self.sourceType = assistDbNamespace.sourceType;
+    self.phoenix_connector = findEditorConnector(connector => connector.dialect === 'phoenix');
+    self.importer_url =
+      self.phoenix_connector && self.sourceType === self.phoenix_connector.id
+        ? window.HUE_URLS.IMPORTER_CREATE_PHOENIX_TABLE
+        : window.HUE_URLS.IMPORTER_CREATE_TABLE;
 
     self.expandable = self.catalogEntry.hasPossibleChildren();
 

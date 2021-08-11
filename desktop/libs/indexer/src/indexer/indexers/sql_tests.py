@@ -872,57 +872,6 @@ INSERT INTO default.test1 VALUES ('NY', 'New York', '8143197'), ('CA', 'Los Ange
     assert_equal(statement, sql)
 
 
-def test_create_table_from_local_phoenix():
-  with patch('indexer.indexers.sql.get_interpreter') as get_interpreter:
-    get_interpreter.return_value = {'Name': 'Phoenix', 'dialect': 'phoenix'}
-    source = {
-      'path': BASE_DIR + '/apps/beeswax/data/tables/us_population.csv',
-      'sourceType': 'phoenix',
-      'format': {'hasHeader': False}
-    }
-    destination = {
-      'name': 'default.test1',
-      'columns': [
-        {'name': 'field_1', 'type': 'string'},
-        {'name': 'field_2', 'type': 'string'},
-        {'name': 'field_3', 'type': 'bigint'},
-      ],
-      'sourceType': 'phoenix',
-      'primaryKeys': ['field_3']
-    }
-    sql = SQLIndexer(user=Mock(), fs=Mock()).create_table_from_local_file(source, destination).get_str()
-
-    statement = '''USE default;
-
-CREATE TABLE IF NOT EXISTS default.test1 (
-  field_1 CHAR(255),
-  field_2 CHAR(255),
-  field_3 bigint
-CONSTRAINT my_pk PRIMARY KEY (field_3));
-
-UPSERT INTO default.test1 VALUES ('NY', 'New York', 8143197);
-
-UPSERT INTO default.test1 VALUES ('CA', 'Los Angeles', 3844829);
-
-UPSERT INTO default.test1 VALUES ('IL', 'Chicago', 2842518);
-
-UPSERT INTO default.test1 VALUES ('TX', 'Houston', 2016582);
-
-UPSERT INTO default.test1 VALUES ('PA', 'Philadelphia', 1463281);
-
-UPSERT INTO default.test1 VALUES ('AZ', 'Phoenix', 1461575);
-
-UPSERT INTO default.test1 VALUES ('TX', 'San Antonio', 1256509);
-
-UPSERT INTO default.test1 VALUES ('CA', 'San Diego', 1255540);
-
-UPSERT INTO default.test1 VALUES ('TX', 'Dallas', 1213825);
-
-UPSERT INTO default.test1 VALUES ('CA', 'San Jose', 912332);'''
-
-    assert_equal(statement, sql)
-
-
 def test_create_table_from_local_impala():
   with patch('indexer.indexers.sql.get_interpreter') as get_interpreter:
     get_interpreter.return_value = {'Name': 'Impala', 'dialect': 'impala'}
