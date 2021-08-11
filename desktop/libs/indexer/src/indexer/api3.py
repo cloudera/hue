@@ -238,7 +238,7 @@ def guess_field_types(request):
 
       if file_format['format']['hasHeader']:
         sample = csv_data[1:5]
-        column_row = csv[0]
+        column_row = csv_data[0]
       else:
         sample = csv_data[:4]
         column_row = ['field_' + str(count+1) for count, col in enumerate(sample[0])] 
@@ -762,7 +762,7 @@ def upload_local_file(request):
 
   if xlsx_test[-1] == "xlsx":
     filename = "%s_%s:%s;" % (username, uuid.uuid4(), "".join(xlsx_test[:-1]) + ".csv")
-    temp_file = xlsxreader.readxlsx(file_name=upload_file,return_file_name=filename, delimiter=",", quote_char='"',end_of_record="\n")
+    temp_file = xlsxreader.readxlsx(file_name=upload_file,return_file_name=filename)
 
   else: 
     filename = "%s_%s:%s;" % (username, uuid.uuid4(), upload_file.name)
