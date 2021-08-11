@@ -59,7 +59,7 @@ class PhoenixIndexer():
     # Until we have proper type convertion
     for col in columns:
       if col['type'] == 'string':
-        col['type'] = 'VARCHAR'
+        col['type'] = 'varchar'
 
     sql = '''CREATE TABLE IF NOT EXISTS %(table_name)s (
 %(columns)s
@@ -73,17 +73,21 @@ CONSTRAINT my_pk PRIMARY KEY (%(primary_keys)s)
       }
 
     source_path = urllib_unquote(source['path'])
-    file_obj = request.fs.open(source_path)
-    content = file_obj.read().decode("utf-8")
-    csvfile = string_io(content)
-    reader = csv.reader(csvfile)
+    if source['inputFormat'] == 'file':
+      file_obj = request.fs.open(source_path)
+      content = file_obj.read().decode("utf-8")
+      csvfile = string_io(content)
+      reader = csv.reader(csvfile)
+    else:
+      local_file = open(source_path, 'r')
+      reader = csv.reader(local_file)
 
     if destination['indexerRunJob']:
       for count, csv_row in enumerate(reader):
         if (source['format']['hasHeader'] and count == 0) or not csv_row:
             continue
         else:
-          _sql = ', '.join([ "'{0}'".format(col_val) if columns[count]['type'] in ('VARCHAR', 'timestamp') \
+          _sql = ', '.join([ "'{0}'".format(col_val) if columns[count]['type'] in ('varchar', 'timestamp') \
             else '{0}'.format(col_val) for count, col_val in enumerate(csv_row)])
 
           sql += '''\nUPSERT INTO %(table_name)s VALUES (%(csv_row)s);\n''' % {

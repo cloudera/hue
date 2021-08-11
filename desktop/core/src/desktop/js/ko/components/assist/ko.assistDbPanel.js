@@ -365,7 +365,7 @@ const TEMPLATE =
       <span class="assist-tables-counter">(<span data-bind="text: filteredEntries().length"></span>)</span>
       <!-- ko if: sourceType !== 'solr' && $component.showImporter() -->
       <!-- ko if: typeof databaseName !== 'undefined' -->
-        <a class="inactive-action" data-bind="hueLink: window.HUE_URLS.IMPORTER_CREATE_TABLE + databaseName + '/?sourceType=' + sourceType + '&namespace=' + assistDbNamespace.namespace.id" title="${I18n(
+        <a class="inactive-action" data-bind="hueLink: importer_url + databaseName + '/?sourceType=' + sourceType + '&namespace=' + assistDbNamespace.namespace.id" title="${I18n(
           'Create table'
         )}" href="javascript:void(0)">
           <i class="pointer fa fa-plus" title="${I18n('Create table')}"></i>
