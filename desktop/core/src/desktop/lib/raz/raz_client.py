@@ -206,7 +206,7 @@ class RazClient(object):
     raz_req_serialized = raz_req.SerializeToString()
     signed_request = base64.b64encode(raz_req_serialized)
 
-    request_headers["Accept-Encoding"] = {"gzip,deflate"}
+    request_headers["Accept-Encoding"] = "gzip,deflate"
     request_data["context"] = {
       "S3_SIGN_REQUEST": signed_request
     }
