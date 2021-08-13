@@ -17,6 +17,7 @@
 import json
 import logging
 import os
+import sys
 import tempfile
 
 from pyformance.reporters.reporter import Reporter
@@ -46,7 +47,7 @@ class FileReporter(Reporter):
     # rename the file to the real location.
 
     f = tempfile.NamedTemporaryFile(
-        mode='w',
+        mode='w' if sys.version_info[0] > 2 else 'w+b',
         dir=dirname,
         delete=False)
 
