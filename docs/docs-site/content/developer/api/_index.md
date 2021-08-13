@@ -4,6 +4,6 @@ draft: false
 weight: 4
 ---
 
-Interact with the API via REST, curl or Python.
+Interact with the API via [REST](/developer/api/rest/) or [Python](/developer/api/python/).
 
-JavaScript API from the [NPM package](https://www.npmjs.com/package/gethue) is not documented yet.
+The JavaScript API from the [NPM package](/developer/components/) is not documented yet.
