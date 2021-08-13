@@ -4,9 +4,9 @@ draft: false
 weight: 3
 ---
 
-Some of the UI elements in Hue are available as generic [Web Components](https://developer.mozilla.org/en-US/docs/Web/Web_Components). They are library/framework agnostic, and can be used in any web project irrespective of what its built upon - React, Angular, Ember or something else.
+Some core UI elements are available as generic [Web Components](https://developer.mozilla.org/en-US/docs/Web/Web_Components). They are library/framework agnostic, and can be used in any Web project irrespective of what its built upon - React, Angular, Ember or something else.
 
-They can be imported as classic JavaScript modules for your own development needs.
+They can be simply imported as classic JavaScript modules for your own development needs or just reused as is.
 
 ## Importing
 
@@ -14,7 +14,9 @@ There are two ways to get them:
 
 ### NPM registry
 
-Published as a NPM package in https://www.npmjs.com/package/gethue. You do not need a dependency on a complete local Hue project.
+Published as a NPM package in https://www.npmjs.com/package/gethue.
+
+The recommended way. Versioned, published on the stabdard public JavaSCript module registry NPM, without any dependency on a local Hue project.
 
 To run the [demo app](https://github.com/cloudera/hue/tree/master/tools/examples/api/hue_dep) make the following changes:
 
