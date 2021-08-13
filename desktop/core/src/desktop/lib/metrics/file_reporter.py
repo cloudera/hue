@@ -46,6 +46,7 @@ class FileReporter(Reporter):
     # rename the file to the real location.
 
     f = tempfile.NamedTemporaryFile(
+        mode='w',
         dir=dirname,
         delete=False)
 
