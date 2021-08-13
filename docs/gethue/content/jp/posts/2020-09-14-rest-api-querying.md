@@ -169,9 +169,9 @@ CSRF トークンを取得するには `/accounts/login` ページを GET して
 
 Hue の [File Browser](https://docs.gethue.com/user/browsing/#data) は、HDFS、S3、ADLSストレージへの、データのアップロード、ダウンロード一覧を提供します。
 
-これはパスの内容を一覧する方法です。この例は S3 バケットの `S3A://gethue-demo` です。
+これはパスの内容を一覧する方法です。この例は S3 バケットの `s3a://demo-gethue` です。
 
-    curl -X GET "https://demo.gethue.com/filebrowser/view=S3A://gethue-demo?pagesize=45&pagenum=1&filter=&sortby=name&descending=false&format=json" --cookie "csrftoken=oT8C5cQCbmpuoKcUZ2YaxybfLhtRShEO9UcvRWetx4HVatLuf6qicgJnbEHxfJNI;sessionid=nkblu68xfofabfsjctdwseaubfbkiwlg" -H "X-CSRFToken: oT8C5cQCbmpuoKcUZ2YaxybfLhtRShEO9UcvRWetx4HVatLuf6qicgJnbEHxfJNI"
+    curl -X GET "https://demo.gethue.com/filebrowser/view=s3a://demo-gethue?pagesize=45&pagenum=1&filter=&sortby=name&descending=false&format=json" --cookie "csrftoken=oT8C5cQCbmpuoKcUZ2YaxybfLhtRShEO9UcvRWetx4HVatLuf6qicgJnbEHxfJNI;sessionid=nkblu68xfofabfsjctdwseaubfbkiwlg" -H "X-CSRFToken: oT8C5cQCbmpuoKcUZ2YaxybfLhtRShEO9UcvRWetx4HVatLuf6qicgJnbEHxfJNI"
 
     {
       ...........
@@ -185,14 +185,14 @@ Hue の [File Browser](https://docs.gethue.com/user/browsing/#data) は、HDFS�
       "group": "",
       "user": "",
       "mtime": null,
-      "path": "s3a://demo-hue",
+      "path": "s3a://demo-gethue",
       "atime": null,
       "mode": 16895
       },
       "name": "demo-hue",
       "mtime": "",
       "rwx": "drwxrwxrwx",
-      "path": "s3a://demo-hue",
+      "path": "s3a://demo-gethue",
       "is_sentry_managed": false,
       "type": "dir",
       "mode": "40777"
@@ -222,11 +222,11 @@ Hue の [File Browser](https://docs.gethue.com/user/browsing/#data) は、HDFS�
       ...........
     }
 
-これはファイルの内容とメタデータを取得する方法です。この例は demo.gethue.com [s3a://demo-hue/web_log_data/index_data.csv](https://demo.gethue.com/hue/filebrowser/view=s3a%3A%2F%2Fdemo-hue%2Fweb_log_data%2Findex_data.csv) の公開ファイルです。
+これはファイルの内容とメタデータを取得する方法です。この例は demo.gethue.com [s3a://demo-gethue/data/web_logs/index_data.csv](https://demo.gethue.com/hue/filebrowser/view=s3a%3A%2F%2Fdemo-hue%2Fweb_log_data%2Findex_data.csv) の公開ファイルです。
 
 **注意** JSON でデータを返すには `XMLHttpRequest` ヘッダが必要です。
 
-    curl  -X GET "https://demo.gethue.com/filebrowser/view=s3a://demo-hue/web_log_data/index_data.csv?offset=0&length=204800&compression=none&mode=text" --cookie "csrftoken=oT8C5cQCbmpuoKcUZ2YaxybfLhtRShEO9UcvRWetx4HVatLuf6qicgJnbEHxfJNI;sessionid=nkblu68xfofabfsjctdwseaubfbkiwlg" -H "X-CSRFToken: oT8C5cQCbmpuoKcUZ2YaxybfLhtRShEO9UcvRWetx4HVatLuf6qicgJnbEHxfJNI" -H "X-requested-with: XMLHttpRequest"
+    curl  -X GET "https://demo.gethue.com/filebrowser/view=s3a://demo-gethue/data/web_logs/index_data.csv?offset=0&length=204800&compression=none&mode=text" --cookie "csrftoken=oT8C5cQCbmpuoKcUZ2YaxybfLhtRShEO9UcvRWetx4HVatLuf6qicgJnbEHxfJNI;sessionid=nkblu68xfofabfsjctdwseaubfbkiwlg" -H "X-CSRFToken: oT8C5cQCbmpuoKcUZ2YaxybfLhtRShEO9UcvRWetx4HVatLuf6qicgJnbEHxfJNI" -H "X-requested-with: XMLHttpRequest"
 
     {
       "show_download_button": true,
@@ -234,7 +234,7 @@ Hue の [File Browser](https://docs.gethue.com/user/browsing/#data) は、HDFS�
       "editable": false,
       "mtime": "October 31, 2016 03:34 PM",
       "rwx": "-rw-rw-rw-",
-      "path": "s3a://demo-hue/web_log_data/index_data.csv",
+      "path": "s3a://demo-gethue/data/web_logs/index_data.csv",
       "stats": {
       "size": 6199593,
       "aclBit": false,
