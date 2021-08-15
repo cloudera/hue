@@ -27,7 +27,6 @@ import urllib.error
 import sys
 import tempfile
 import uuid
-import xlsxreader
 from django.urls import reverse
 from django.views.decorators.http import require_POST
 
@@ -758,17 +757,9 @@ def upload_local_file(request):
 
   upload_file = request.FILES['file']
   username = request.user.username
-  xlsx_test = upload_file.name.split(".")
-
-  if xlsx_test[-1] == "xlsx":
-    filename = "%s_%s:%s;" % (username, uuid.uuid4(), "".join(xlsx_test[:-1]) + ".csv")
-    temp_file = xlsxreader.readxlsx(file_name=upload_file,return_file_name=filename)
-
-  else: 
-    filename = "%s_%s:%s;" % (username, uuid.uuid4(), upload_file.name)
-    temp_file = tempfile.NamedTemporaryFile(prefix=filename, suffix='.csv', delete=False)
-    temp_file.write(upload_file.read())
-
+  filename = "%s_%s:%s;" % (username, uuid.uuid4(), upload_file.name)
+  temp_file = tempfile.NamedTemporaryFile(prefix=filename, suffix='.csv', delete=False)
+  temp_file.write(upload_file.read())
   local_file_url = temp_file.name
   temp_file.close()
 
