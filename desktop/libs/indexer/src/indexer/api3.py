@@ -765,4 +765,3 @@ def upload_local_file(request):
   temp_file.close()
 
   return JsonResponse({'local_file_url': local_file_url})
-  
