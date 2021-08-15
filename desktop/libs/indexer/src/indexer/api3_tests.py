@@ -10,40 +10,7 @@ def test_local_file_header_reformatting_with_header():
     username = 'test_user'
     filename = "%s_%s:testbook1.csv;" % (username, uuid.uuid4())
     temp_file = tempfile.NamedTemporaryFile(suffix='.csv', delete=False)
-    temp_file.write(bytes('''test 1,test.2,test_3,test_4
-10/10/10,1:00:00 AM,$30.00,
-"Sunday, October 10, 2021",3:00, 1/8,
-2010-10-10,9:00 AM,99.00%,
-10/10,4:00:00,500,
-10/10/10,9:00:00 AM,2.98E+04,
-10/10/10,00:00.0,50      ,
-10-Oct,988639:00:00,,
-10-Oct-10,10/11/12 3:00 AM,,
-10-Oct-10,10/11/12 9:00,,
-Oct-10,10/10/22 2:00 PM,,
-October-10,10/10/21 15:00,,
-"October 10, 2010",,,
-O,,,
-O-10,scattered,,
-10/10/2010,,scattered,
-10-Oct-2010,,,
-,,,
-,,,
-scattered,,,
-,,scattered,
-,,,
-,,,
-,scattered,,
-,,,
-,,,
-,,,
-scattered,,,scattered
-,,,
-,,,
-,,,
-,,,
-,scattered,,
-''', encoding='utf-8'))
+    temp_file.write(b'test 1,test.2,test_3,test_4\n10/10/10,1:00:00 AM,$30.00,\n"Sunday, October 10, 2021",3:00, 1/8,\n2010-10-10,9:00 AM,99.00%,\n10/10,4:00:00,500,\n10/10/10,9:00:00 AM,2.98E+04,\n10/10/10,00:00.0,50      ,\n10-Oct,988639:00:00,,\n10-Oct-10,10/11/12 3:00 AM,,\n10-Oct-10,10/11/12 9:00,,\nOct-10,10/10/22 2:00 PM,,\n\nOctober-10,10/10/21 15:00,,\n"October 10, 2010",,,\nO,,,\nO-10,scattered,,\n10/10/2010,,scattered,\n10-Oct-2010,,,\n,,,\n,,,\nscattered,,,\n,,scattered,\n,,,\n,,,\n,scattered,,\n,,,\n,,,\n,,,\nscattered,,,scattered\n,,,\n,,,\n,,,\n,,,\n,scattered,,')
     local_file_url = temp_file.name
     temp_file.close()
     data = {'fileFormat':'{"inputFormat":"localfile","path": "%s","format":{"hasHeader":true}}' % local_file_url}
