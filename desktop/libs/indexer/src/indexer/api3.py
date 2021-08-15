@@ -27,6 +27,7 @@ import urllib.error
 import sys
 import tempfile
 import uuid
+
 from django.urls import reverse
 from django.views.decorators.http import require_POST
 
@@ -764,3 +765,4 @@ def upload_local_file(request):
   temp_file.close()
 
   return JsonResponse({'local_file_url': local_file_url})
+  
