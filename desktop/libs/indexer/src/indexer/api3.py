@@ -238,7 +238,7 @@ def guess_field_types(request):
 
       if file_format['format']['hasHeader']:
         sample = csv_data[1:5]
-        column_row = csv_data[0]
+        column_row = [col.replace(' ','_').replace('.','_') for col in csv_data[0]]
       else:
         sample = csv_data[:4]
         column_row = ['field_' + str(count+1) for count, col in enumerate(sample[0])] 
