@@ -99,6 +99,7 @@ class RazClientTest(unittest.TestCase):
   def setUp(self):
     self.username = 'gethue'
     self.raz_url = 'https://raz.gethue.com:8080'
+    self.raz_token = "mock_RAZ_token"
 
     self.s3_path = 'https://gethue-test.s3.amazonaws.com/gethue/data/customer.csv'
     self.adls_path = 'https://gethuestorageaccount.blob.core.windows.net/demo-gethue-container/demo-dir1/customer.csv'
@@ -125,7 +126,6 @@ class RazClientTest(unittest.TestCase):
   def test_check_access_adls(self):
     with patch('desktop.lib.raz.raz_client.requests.post') as requests_post:
       with patch('desktop.lib.raz.raz_client.uuid.uuid4') as uuid:
-        raz_token = "mock_RAZ_token"
 
         requests_post.return_value = Mock(
           json=Mock(return_value=
@@ -141,12 +141,12 @@ class RazClientTest(unittest.TestCase):
         )
         uuid.return_value = 'mock_request_id'
 
-        client = RazClient(self.raz_url, raz_token, username=self.username, service="adls", service_name="adls", cluster_name="cl1")
+        client = RazClient(self.raz_url, self.raz_token, username=self.username, service="adls", service_name="adls", cluster_name="cl1")
 
         resp = client.check_access(method='GET', url=self.adls_path)
 
         requests_post.assert_called_with(
-          "https://raz.gethue.com:8080/api/authz/adls/access?delegation=" + raz_token,
+          "https://raz.gethue.com:8080/api/authz/adls/access?delegation=mock_RAZ_token",
           headers={"Content-Type": "application/json"},
           json={
             'requestId': 'mock_request_id', 
@@ -196,39 +196,63 @@ class RazClientTest(unittest.TestCase):
         assert_equal(client.cluster_name, 'gethueCluster')
 
   def test_check_access_s3(self):
-    raz_token = Mock()
-
-    client = RazClient(self.raz_url, raz_token, username=self.username)
-
     with patch('desktop.lib.raz.raz_client.requests.post') as requests_post:
       with patch('desktop.lib.raz.raz_client.raz_signer.SignResponseProto') as SignResponseProto:
         with patch('desktop.lib.raz.raz_client.base64.b64decode') as b64decode:
-          requests_post.return_value = Mock(
-            json=Mock(return_value=
-              {
-                'operResult': {
-                  'result': 'ALLOWED',
-                  'additionalInfo': {
-                      'S3_SIGN_RESPONSE': 'My signed URL'
+          with patch('desktop.lib.raz.raz_client.uuid.uuid4') as uuid:
+
+            requests_post.return_value = Mock(
+              json=Mock(return_value=
+                {
+                  'operResult': {
+                    'result': 'ALLOWED',
+                    'additionalInfo': {
+                        'S3_SIGN_RESPONSE': 'My signed URL'
+                    }
                   }
                 }
-              }
-            )
-          )
-          b64decode.return_value = 'https://gethue-test.s3.amazonaws.com/gethue/data/customer.csv?AWSAccessKeyId=AKIA23E77ZX2HVY76YGL&' \
-              'Signature=3lhK%2BwtQ9Q2u5VDIqb4MEpoY3X4%3D&Expires=1617207304'
-
-          SignResponseProto.return_value = Mock(
-            FromString=Mock(
-              return_value=Mock(
-                signer_generated_headers=[
-                  Mock(key='AWSAccessKeyId', value='AKIA23E77ZX2HVY76YGL')
-                ]
               )
             )
-          )
+            b64decode.return_value = 'https://gethue-test.s3.amazonaws.com/gethue/data/customer.csv?AWSAccessKeyId=AKIA23E77ZX2HVY76YGL&' \
+                'Signature=3lhK%2BwtQ9Q2u5VDIqb4MEpoY3X4%3D&Expires=1617207304'
 
-          resp = client.check_access(method='GET', url=self.s3_path)
+            SignResponseProto.return_value = Mock(
+              FromString=Mock(
+                return_value=Mock(
+                  signer_generated_headers=[
+                    Mock(key='AWSAccessKeyId', value='AKIA23E77ZX2HVY76YGL')
+                  ]
+                )
+              )
+            )
+            uuid.return_value = 'mock_request_id'
 
-          assert_true(resp)
-          assert_equal(resp['AWSAccessKeyId'], 'AKIA23E77ZX2HVY76YGL')
+            client = RazClient(self.raz_url, self.raz_token, username=self.username)
+
+            resp = client.check_access(method='GET', url=self.s3_path)
+
+            requests_post.assert_called_with(
+              'https://raz.gethue.com:8080/api/authz/s3/access?delegation=mock_RAZ_token', 
+              headers={'Content-Type': 'application/json', 'Accept-Encoding': 'gzip,deflate'}, 
+              json={
+                'requestId': 'mock_request_id',
+                'serviceType': 's3',
+                'serviceName': 'cm_s3',
+                'user': 'gethue',
+                'userGroups': [],
+                'clientIpAddress': '',
+                'clientType': '',
+                'clusterName':
+                'myCluster',
+                'clusterType': '',
+                'sessionId': '',
+                'accessTime': '',
+                'context': {
+                  'S3_SIGN_REQUEST': b'CiRodHRwczovL2dldGh1ZS10ZXN0LnMzLmFtYXpvbmF3cy5jb20QATIYZ2V0aHVlL2RhdGEvY3VzdG9tZXIuY3N2OABCAnMzSgJzMw=='
+                }
+              },
+              verify=False
+            )
+
+            assert_true(resp)
+            assert_equal(resp['AWSAccessKeyId'], 'AKIA23E77ZX2HVY76YGL')
