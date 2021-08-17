@@ -1102,8 +1102,8 @@ AUTH = ConfigSection(
             type=str,
             help=_("Endpoint to fetch the public key from verification server.")
         ),
-        VERIFY_CUSTOM_JWT=Config(
-            key="verify_custom_jwt",
+        VERIFY=Config(
+            key="verify",
             default=True,
             type=coerce_bool,
             help=_("Verify custom JWT signature.")
