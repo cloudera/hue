@@ -835,6 +835,9 @@ class OIDCBackend(OIDCAuthenticationBackend):
       self.save_refresh_tokens(refresh_token)
       user = self.get_or_create_user(access_token, id_token, verified_id)
       user = rewrite_user(user)
+
+      ensure_has_a_group(user)
+      
       return user
 
     return None
