@@ -54,7 +54,7 @@ class JwtAuthentication(authentication.BaseAuthentication):
         access_token,
         'secret',
         algorithms=["RS256"],
-        verify=AUTH.VERIFY_CUSTOM_JWT.get()
+        verify=AUTH.JWT.VERIFY_CUSTOM_JWT.get()
       )
     except jwt.DecodeError:
       raise exceptions.AuthenticationFailed('JwtAuthentication: Invalid token')

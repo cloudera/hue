@@ -334,8 +334,13 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
       'rest_framework.permissions.IsAuthenticated',
     ],
-    'DEFAULT_AUTHENTICATION_CLASSES': desktop.conf.AUTH.API_AUTH.get()
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+          'rest_framework_simplejwt.authentication.JWTAuthentication',
+          'rest_framework.authentication.SessionAuthentication'
+    ]
 }
+if desktop.conf.AUTH.JWT.IS_ENABLED.get():
+  REST_FRAMEWORK['DEFAULT_AUTHENTICATION_CLASSES'].insert(0, 'desktop.auth.api_authentications.JwtAuthentication')
 
 SIMPLE_JWT = {
   'ACCESS_TOKEN_LIFETIME': datetime.timedelta(days=1),

@@ -1078,21 +1078,29 @@ AUTH = ConfigSection(
                         "desktop.auth.backend.AllowAllBackend (allows everyone), " +
                         "desktop.auth.backend.AllowFirstUserDjangoBackend (relies on Django and user manager, after the first login). " +
                         "Multiple Authentication backends are supported by specifying a comma-separated list in order of priority.")),
-    API_AUTH=Config(
-        "api_auth",
-        default=[
-          'rest_framework_simplejwt.authentication.JWTAuthentication',
-          'rest_framework.authentication.SessionAuthentication'],
-        type=coerce_csv,
-        help=_(
-          "Custom Authentication backends for the REST API." +
-          "Multiple Authentication backends are supported by specifying a comma-separated list in order of priority.")
-    ),
-    VERIFY_CUSTOM_JWT=Config(
-        key="verify_custom_jwt",
-        default=True,
-        type=coerce_bool,
-        help=_("Verify custom JWT.")
+    JWT=ConfigSection(
+      key="jwt",
+      help=_("Configuration for Custom JWT Authentication."),
+      members=dict(
+        IS_ENABLED=Config(
+            key='is_enabled',
+            help=_('Turns on Custom JWT Authentication as ready to use.'),
+            type=coerce_bool,
+            default=False,
+        ),
+        KEY_SERVER_URL=Config(
+            key="key_server_url",
+            default=None,
+            type=str,
+            help=_("Endpoint to fetch the public key from verification server.")
+        ),
+        VERIFY_CUSTOM_JWT=Config(
+            key="verify_custom_jwt",
+            default=True,
+            type=coerce_bool,
+            help=_("Verify custom JWT signature.")
+        ),
+      )
     ),
     USER_AUGMENTOR=Config("user_augmentor",
                    default="desktop.auth.backend.DefaultUserAugmentor",
