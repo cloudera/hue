@@ -1078,13 +1078,21 @@ AUTH = ConfigSection(
                         "desktop.auth.backend.AllowAllBackend (allows everyone), " +
                         "desktop.auth.backend.AllowFirstUserDjangoBackend (relies on Django and user manager, after the first login). " +
                         "Multiple Authentication backends are supported by specifying a comma-separated list in order of priority.")),
+    API_AUTH=Config(
+        "api_auth",
+        default=[
+          'rest_framework_simplejwt.authentication.JWTAuthentication',
+          'rest_framework.authentication.SessionAuthentication'],
+        type=coerce_csv,
+        help=_("Multiple Authentication backends are supported by specifying a comma-separated list in order of priority.")
+    ),
     JWT=ConfigSection(
       key="jwt",
       help=_("Configuration for Custom JWT Authentication."),
       members=dict(
         IS_ENABLED=Config(
             key='is_enabled',
-            help=_('Turns on Custom JWT Authentication as ready to use.'),
+            help=_('Adds custom JWT Authentication backend for REST APIs in top priority.'),
             type=coerce_bool,
             default=False,
         ),

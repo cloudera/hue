@@ -48,11 +48,6 @@ class TestJwtAuthentication():
       }
     )
 
-  @classmethod
-  def setUpClass(cls):
-    if not AUTH.JWT.IS_ENABLED.get():
-      raise SkipTest
-
   def test_authenticate_existing_user(self):
     with patch('desktop.auth.api_authentications.jwt.decode') as jwt_decode:
 
