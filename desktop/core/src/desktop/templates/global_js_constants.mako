@@ -139,6 +139,7 @@
 
   window.HUE_URLS = {
     IMPORTER_CREATE_TABLE: '${ 'indexer' in apps and url('indexer:importer_prefill', source_type = 'all', target_type = 'table')}',
+    IMPORTER_CREATE_PHOENIX_TABLE: '${ 'indexer' in apps and url('indexer:importer_prefill', source_type = 'all', target_type = 'big-table')}',
     IMPORTER_CREATE_DATABASE: '${ 'indexer' in apps and url('indexer:importer_prefill', source_type = 'manual', target_type = 'database')}',
     NOTEBOOK_INDEX: '${url('notebook:index')}',
     % if 'pig' in apps:

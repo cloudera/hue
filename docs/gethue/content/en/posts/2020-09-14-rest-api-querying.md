@@ -169,9 +169,9 @@ And if we wanted to get the execution log for this statement:
 
 Hue's [File Browser](https://docs.gethue.com/user/browsing/#data) offer uploads, downloads and listing of data in HDFS, S3, ADLS storages.
 
-Here is how to list the content of a path, here the S3 bucket `S3A://gethue-demo`:
+Here is how to list the content of a path, here the S3 bucket `s3a://demo-gethue`:
 
-    curl -X GET "https://demo.gethue.com/filebrowser/view=S3A://gethue-demo?pagesize=45&pagenum=1&filter=&sortby=name&descending=false&format=json" --cookie "csrftoken=oT8C5cQCbmpuoKcUZ2YaxybfLhtRShEO9UcvRWetx4HVatLuf6qicgJnbEHxfJNI;sessionid=nkblu68xfofabfsjctdwseaubfbkiwlg" -H "X-CSRFToken: oT8C5cQCbmpuoKcUZ2YaxybfLhtRShEO9UcvRWetx4HVatLuf6qicgJnbEHxfJNI"
+    curl -X GET "https://demo.gethue.com/filebrowser/view=s3a://demo-gethue?pagesize=45&pagenum=1&filter=&sortby=name&descending=false&format=json" --cookie "csrftoken=oT8C5cQCbmpuoKcUZ2YaxybfLhtRShEO9UcvRWetx4HVatLuf6qicgJnbEHxfJNI;sessionid=nkblu68xfofabfsjctdwseaubfbkiwlg" -H "X-CSRFToken: oT8C5cQCbmpuoKcUZ2YaxybfLhtRShEO9UcvRWetx4HVatLuf6qicgJnbEHxfJNI"
 
     {
       ...........
@@ -185,14 +185,14 @@ Here is how to list the content of a path, here the S3 bucket `S3A://gethue-demo
       "group": "",
       "user": "",
       "mtime": null,
-      "path": "s3a://demo-hue",
+      "path": "s3a://demo-gethue",
       "atime": null,
       "mode": 16895
       },
       "name": "demo-hue",
       "mtime": "",
       "rwx": "drwxrwxrwx",
-      "path": "s3a://demo-hue",
+      "path": "s3a://demo-gethue",
       "is_sentry_managed": false,
       "type": "dir",
       "mode": "40777"
@@ -222,11 +222,11 @@ Here is how to list the content of a path, here the S3 bucket `S3A://gethue-demo
       ...........
     }
 
-How to get the file content and its metadata. Here with the public file of demo.gethue.com [s3a://demo-hue/web_log_data/index_data.csv](https://demo.gethue.com/hue/filebrowser/view=s3a%3A%2F%2Fdemo-hue%2Fweb_log_data%2Findex_data.csv):
+How to get the file content and its metadata. Here with the public file of demo.gethue.com [s3a://demo-gethue/data/web_logs/index_data.csv](https://demo.gethue.com/hue/filebrowser/view=s3a%3A%2F%2Fdemo-hue%2Fweb_log_data%2Findex_data.csv):
 
 **Note** It needs the `XMLHttpRequest` header to return the data in json:
 
-    curl  -X GET "https://demo.gethue.com/filebrowser/view=s3a://demo-hue/web_log_data/index_data.csv?offset=0&length=204800&compression=none&mode=text" --cookie "csrftoken=oT8C5cQCbmpuoKcUZ2YaxybfLhtRShEO9UcvRWetx4HVatLuf6qicgJnbEHxfJNI;sessionid=nkblu68xfofabfsjctdwseaubfbkiwlg" -H "X-CSRFToken: oT8C5cQCbmpuoKcUZ2YaxybfLhtRShEO9UcvRWetx4HVatLuf6qicgJnbEHxfJNI" -H "X-requested-with: XMLHttpRequest"
+    curl  -X GET "https://demo.gethue.com/filebrowser/view=s3a://demo-gethue/data/web_logs/index_data.csv?offset=0&length=204800&compression=none&mode=text" --cookie "csrftoken=oT8C5cQCbmpuoKcUZ2YaxybfLhtRShEO9UcvRWetx4HVatLuf6qicgJnbEHxfJNI;sessionid=nkblu68xfofabfsjctdwseaubfbkiwlg" -H "X-CSRFToken: oT8C5cQCbmpuoKcUZ2YaxybfLhtRShEO9UcvRWetx4HVatLuf6qicgJnbEHxfJNI" -H "X-requested-with: XMLHttpRequest"
 
     {
       "show_download_button": true,
@@ -234,7 +234,7 @@ How to get the file content and its metadata. Here with the public file of demo.
       "editable": false,
       "mtime": "October 31, 2016 03:34 PM",
       "rwx": "-rw-rw-rw-",
-      "path": "s3a://demo-hue/web_log_data/index_data.csv",
+      "path": "s3a://demo-gethue/data/web_logs/index_data.csv",
       "stats": {
       "size": 6199593,
       "aclBit": false,
