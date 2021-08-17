@@ -797,8 +797,12 @@ class RemoteUserDjangoBackend(django.contrib.auth.backends.RemoteUserBackend):
 
 
 class OIDCBackend(OIDCAuthenticationBackend):
-  def authenticate(self, **kwargs):
-    self.request = kwargs.pop('request', None)
+  def authenticate(self, *args, **kwargs):
+    if sys.version_info[0] > 2:
+      self.request = args[0]
+    else:
+      self.request = None
+
     if not self.request:
       return None
 
