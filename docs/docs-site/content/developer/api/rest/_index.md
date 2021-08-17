@@ -318,7 +318,7 @@ We can choose a dialect for `doc_type` e.g. impala, mysql, hive, phoenix, etc.
 ### Get Configuration
 
     curl -X POST https://demo.gethue.com/api/get_config/
-    
+
     {"app_config": {"editor": {"name": "editor", "displayName": "Editor", "buttonName": "Query", "interpreters": [{"name": "MySQL", "type": "mysql", "id": "mysql", "displayName": "MySQL", "buttonName": "Query", "tooltip": "Mysql Query", "optimizer": "off", "page": "/editor/?type=mysql", "is_sql": true, "is_batchable": true, "dialect": "mysql", "dialect_properties": {}}, {"name": "notebook", "type": "notebook", "displayName": "Notebook", "buttonName": "Notebook", "tooltip": "Notebook", "page": "/notebook", "is_sql": false, "dialect": "notebook"}], "default_limit": 5000, "interpreter_names": ["mysql", "notebook"], "page": "/editor/?type=mysql", "default_sql_interpreter": "mysql"}, "catalogs": [{"name": "MySQL", "type": "mysql", "id": "mysql", "displayName": "MySQL", "buttonName": "Query", "tooltip": "Mysql Query", "page": "/editor/?type=mysql", "is_sql": true, "is_catalog": true}], "browser": {"name": "browser", "displayName": "Browsers", "buttonName": "Browse", "interpreters": [{"type": "hdfs", "displayName": "Files", "buttonName": "Browse", "tooltip": "Files", "page": "/filebrowser/view=%2Fuser%2Fdemo"}, {"type": "tables", "displayName": "Tables", "buttonName": "Browse", "tooltip": "Tables", "page": "/metastore/tables"}, {"type": "yarn", "displayName": "Jobs", "buttonName": "Jobs", "tooltip": "Jobs", "page": "/jobbrowser/"}, {"type": "importer", "displayName": "Importer", "buttonName": "Import", "tooltip": "Importer", "page": "/indexer/importer"}], "interpreter_names": ["hdfs", "tables", "yarn", "importer"]}, "home": {"name": "home", "displayName": "Home", "buttonName": "Documents", "interpreters": [], "page": "/home"}}, "main_button_action": {"name": "MySQL", "type": "mysql", "id": "mysql", "displayName": "MySQL", "buttonName": "Query", "tooltip": "Mysql Query", "optimizer": "off", "page": "/editor/?type=mysql", "is_sql": true, "is_batchable": true, "dialect": "mysql", "dialect_properties": {}}, "button_actions": [{"name": "editor", "displayName": "Editor", "buttonName": "Query", "interpreters": [{"name": "MySQL", "type": "mysql", "id": "mysql", "displayName": "MySQL", "buttonName": "Query", "tooltip": "Mysql Query", "optimizer": "off", "page": "/editor/?type=mysql", "is_sql": true, "is_batchable": true, "dialect": "mysql", "dialect_properties": {}}, {"name": "notebook", "type": "notebook", "displayName": "Notebook", "buttonName": "Notebook", "tooltip": "Notebook", "page": "/notebook", "is_sql": false, "dialect": "notebook"}], "default_limit": 5000, "interpreter_names": ["mysql", "notebook"], "page": "/editor/?type=mysql", "default_sql_interpreter": "mysql"}], "default_sql_interpreter": "mysql", "cluster_type": "direct", "has_computes": false, "hue_config": {"enable_sharing": true, "is_admin": true}, "clusters": [{"id": "default", "name": "default", "type": "direct", "credentials": {}}], "documents": {"types": ["directory", "gist", "query-mysql"]}, "status": 0}
 
 ## File Browsing
@@ -327,9 +327,9 @@ We can choose a dialect for `doc_type` e.g. impala, mysql, hive, phoenix, etc.
 
 Hue's [File Browser](https://docs.gethue.com/user/browsing/#data) offer uploads, downloads, operations (create, delete, chmod...) and listing of data in HDFS (hdfs:// or no prefix), S3 (s3a:// prefix), ADLS (adls:// or abfs:// prefixes) storages.
 
-Here is how to list the content of a path, here a S3 bucket `s3a://gethue-demo`:
+Here is how to list the content of a path, here a S3 bucket `s3a://demo-gethue`:
 
-    curl -X GET https://demo.gethue.com/api/storage/view=s3a://gethue-demo
+    curl -X GET https://demo.gethue.com/api/storage/view=s3a://demo-gethue
 
     {
       ...........
@@ -343,14 +343,14 @@ Here is how to list the content of a path, here a S3 bucket `s3a://gethue-demo`:
       "group": "",
       "user": "",
       "mtime": null,
-      "path": "s3a://demo-hue",
+      "path": "s3a://demo-gethue",
       "atime": null,
       "mode": 16895
       },
       "name": "demo-hue",
       "mtime": "",
       "rwx": "drwxrwxrwx",
-      "path": "s3a://demo-hue",
+      "path": "s3a://demo-gethue",
       "is_sentry_managed": false,
       "type": "dir",
       "mode": "40777"
@@ -395,7 +395,7 @@ How to get the some of the file content and its stats/metadata.
 
 Example with a S3 file:
 
-    curl -X GET https://demo.gethue.com/api/storage/view=s3a://demo-hue/web_log_data/index_data.csv
+    curl -X GET https://demo.gethue.com/api/storage/view=s3a://demo-gethue/data/web_logs/index_data.csv
 
     {
       "show_download_button": true,
@@ -403,7 +403,7 @@ Example with a S3 file:
       "editable": false,
       "mtime": "October 31, 2016 03:34 PM",
       "rwx": "-rw-rw-rw-",
-      "path": "s3a://demo-hue/web_log_data/index_data.csv",
+      "path": "s3a://demo-gethue/data/web_logs/index_data.csv",
       "stats": {
       "size": 6199593,
       "aclBit": false,
@@ -430,7 +430,7 @@ Specify a path of the file to download:
 
     curl -X GET https://demo.gethue.com/api/storage/download=/user/hue/weblogs.csv
 
-    curl -X GET https://demo.gethue.com/api/storage/download=s3a://demo-hue/web_log_data/index_data.csv
+    curl -X GET https://demo.gethue.com/api/storage/download=s3a://demo-gethue/data/web_logs/index_data.csv
 
 - download: file path from any configured remote file system
 
@@ -438,7 +438,7 @@ Specify a path of the file to download:
 
 Upload a local file to a remote destination folder:
 
-    curl -X POST https://demo.gethue.com/api/storage/upload/file?dest=s3a://demo-hue/web_log_data/ --form hdfs_file=@README.md
+    curl -X POST https://demo.gethue.com/api/storage/upload/file?dest=s3a://demo-gethue/web_log_data/ --form hdfs_file=@README.md
 
 - dest: folder path will be created if it does not exist yet
 - hdfs_file: relative or absolute path to a file. It should be read more like `local_file`, it is not related to HDFS
@@ -451,7 +451,7 @@ We have 2 options here.
 
 - **Remote file**
   + In this option we are choosing a file from HDFS/S3 file system.
-  
+
 
 - **Small Local file**
   + In this option we can choose a file from local file system.
