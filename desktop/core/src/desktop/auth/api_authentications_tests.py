@@ -48,73 +48,80 @@ class TestJwtAuthentication():
       }
     )
 
+
   def test_authenticate_existing_user(self):
     with patch('desktop.auth.api_authentications.jwt.decode') as jwt_decode:
+      with patch('desktop.auth.api_authentications.requests.get'):
 
-      jwt_decode.return_value = {
-        "user": "test_user"
-      }
+        jwt_decode.return_value = {
+          "user": "test_user"
+        }
 
-      user, token = JwtAuthentication().authenticate(request=self.request)
+        user, token = JwtAuthentication().authenticate(request=self.request)
 
-      assert_equal(user, self.user)
-      assert_true(user.is_authenticated)
-      assert_false(user.is_superuser)
+        assert_equal(user, self.user)
+        assert_true(user.is_authenticated)
+        assert_false(user.is_superuser)
 
 
   def test_authenticate_new_user(self):
     with patch('desktop.auth.api_authentications.jwt.decode') as jwt_decode:
+      with patch('desktop.auth.api_authentications.requests.get'):
 
-      jwt_decode.return_value = {
-        "user": "test_new_user"
-      }
+        jwt_decode.return_value = {
+          "user": "test_new_user"
+        }
 
-      assert_false(User.objects.filter(username="test_new_user").exists())
+        assert_false(User.objects.filter(username="test_new_user").exists())
 
-      user, token = JwtAuthentication().authenticate(request=self.request)
+        user, token = JwtAuthentication().authenticate(request=self.request)
 
-      assert_true(User.objects.filter(username="test_new_user").exists())
-      assert_equal(User.objects.get(username="test_new_user"), user)
-      assert_true(user.is_authenticated)
-      assert_false(user.is_superuser)
+        assert_true(User.objects.filter(username="test_new_user").exists())
+        assert_equal(User.objects.get(username="test_new_user"), user)
+        assert_true(user.is_authenticated)
+        assert_false(user.is_superuser)
 
 
   def test_failed_authentication(self):
     with patch('desktop.auth.api_authentications.jwt.decode') as jwt_decode:
+      with patch('desktop.auth.api_authentications.requests.get'):
 
-      # Invalid token
-      jwt_decode.side_effect = exceptions.AuthenticationFailed('JwtAuthentication: Invalid token')
-      assert_raises(exceptions.AuthenticationFailed, JwtAuthentication().authenticate, self.request)
+        # Invalid token
+        jwt_decode.side_effect = exceptions.AuthenticationFailed('JwtAuthentication: Invalid token')
+        assert_raises(exceptions.AuthenticationFailed, JwtAuthentication().authenticate, self.request)
 
-      # Expired token
-      jwt_decode.side_effect = exceptions.AuthenticationFailed('JwtAuthentication: Token expired')
-      assert_raises(exceptions.AuthenticationFailed, JwtAuthentication().authenticate, self.request)
+        # Expired token
+        jwt_decode.side_effect = exceptions.AuthenticationFailed('JwtAuthentication: Token expired')
+        assert_raises(exceptions.AuthenticationFailed, JwtAuthentication().authenticate, self.request)
 
 
   def test_check_user_token_storage(self):
     with patch('desktop.auth.api_authentications.jwt.decode') as jwt_decode:
-      jwt_decode.return_value = {
-        "user": "test_user"
-      }
-      user, token = JwtAuthentication().authenticate(request=self.request)
+      with patch('desktop.auth.api_authentications.requests.get'):
+        jwt_decode.return_value = {
+          "user": "test_user"
+        }
+        user, token = JwtAuthentication().authenticate(request=self.request)
 
-      assert_true('jwt_access_token' in user.profile.data)
-      assert_equal(user.profile.data['jwt_access_token'], self.sample_token)
+        assert_true('jwt_access_token' in user.profile.data)
+        assert_equal(user.profile.data['jwt_access_token'], self.sample_token)
+
 
   def test_check_token_verification_flag(self):
+    with patch('desktop.auth.api_authentications.requests.get'):
 
-    # When verification flag is True for old sample token
-    reset = AUTH.JWT.VERIFY.set_for_testing(True)
-    try:
-      assert_raises(exceptions.AuthenticationFailed, JwtAuthentication().authenticate, self.request)
-    finally:
-      reset()
+      # When verification flag is True for old sample token
+      reset = AUTH.JWT.VERIFY.set_for_testing(True)
+      try:
+        assert_raises(exceptions.AuthenticationFailed, JwtAuthentication().authenticate, self.request)
+      finally:
+        reset()
 
-    # When verification flag is False
-    reset = AUTH.JWT.VERIFY.set_for_testing(False)
-    try:
-      user, token = JwtAuthentication().authenticate(request=self.request)
+      # When verification flag is False
+      reset = AUTH.JWT.VERIFY.set_for_testing(False)
+      try:
+        user, token = JwtAuthentication().authenticate(request=self.request)
 
-      assert_equal(user, self.user)
-    finally:
-      reset()
+        assert_equal(user, self.user)
+      finally:
+        reset()
