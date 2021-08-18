@@ -362,12 +362,8 @@
     # Multiple Authentication backend combinations are supported by specifying a comma-separated list in order of priority.
     ## backend=desktop.auth.backend.AllowFirstUserDjangoBackend
 
-    # Custom Authentication backends for the REST API.
-    # Multiple Authentication backends are supported by specifying a comma-separated list in order of priority.
+    # Multiple Authentication backends for REST APIs are supported by specifying a comma-separated list in order of priority.
     ## api_auth=rest_framework_simplejwt.authentication.JWTAuthentication,rest_framework.authentication.SessionAuthentication
-
-    # Verify custom JWT.
-    ## verify_custom_jwt=true
 
     # Class which defines extra accessor methods for User objects.
     ## user_aug=desktop.auth.backend.DefaultUserAugmentor
@@ -436,6 +432,16 @@
 
     # If behind_reverse_proxy is True, it will look for the IP address from this header. Default: HTTP_X_FORWARDED_FOR
     ## reverse_proxy_header=HTTP_X_FORWARDED_FOR
+
+    [[[jwt]]]
+      # Adds custom JWT Authentication backend for REST APIs in top priority.
+      ## is_enabled=false
+
+      # Endpoint to fetch the public key from verification server.
+      ## key_server_url=https://ext_authz:8000
+
+      # Verify custom JWT signature.
+      ## verify=true
 
   # Configuration options for connecting to LDAP and Active Directory
   # -------------------------------------------------------------------
