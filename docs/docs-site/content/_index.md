@@ -17,8 +17,8 @@ Hue is a mature SQL Assistant for querying Databases & Data Warehouses.
 use Hue to quickly answer questions via self-service querying and are executing 100s of 1000s of queries daily.
 
 Read more on [gethue.com](http://gethue.com) and
-- Connect to a [database](/administrator/configuration/connectors/)
-- Build your own Editor with the [SQL Scratchpad](/developer/components/scratchpad/)
+- connect to a [Database](/administrator/configuration/connectors/)
+- build your own Editor with the [SQL Scratchpad](/developer/components/scratchpad/)
 - or Query Service by leveraging the [REST API](/developer/api/rest/) and [Kubernetes](/administrator/installation/cloud/#kubernetes)
 
 !["Hue Editor"](https://cdn.gethue.com/uploads/2021/02/hue-4.9.png)

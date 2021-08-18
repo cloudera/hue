@@ -9,7 +9,7 @@ weight: 2
 
 ### Config file
 
-Hue connects to any database or warehouse via native or SqlAlchemy connectors that need to be added to the [Hue ini file](/administrator/configuration/). Except [impala] and [beeswax] which have a dedicated section, all the other ones should be appended below the [[interpreters]] of [notebook] e.g.:
+Hue connects to any database or warehouse via native Thrift or SqlAlchemy connectors that need to be added to the [Hue ini file](/administrator/configuration/). Except [impala] and [beeswax] which have a dedicated section, all the other ones should be appended below the [[interpreters]] of [notebook] e.g.:
 
     [notebook]
     [[interpreters]]
@@ -30,9 +30,9 @@ Most of the interpreters require to install their SqlAlchemy dialect (e.g. `./bu
 
 Read about [how to build your own parser](/developer/development/#sql-parsers) if you are looking at better autocompletes for your the SQL dialects you use.
 
-### Connectors UI
+### Connectors
 
-Admins can configure the connectors via the UI. This feature requires Editor v2 and is functional despite requiring a bit more polishing.
+Admins can configure the connectors via the UI or [API](/developer/api/rest/#connectors). This feature requires Editor v2 and is quite functional despite not being offically released and on by default.
 
     [desktop]
     enable_connectors=true
@@ -40,13 +40,13 @@ Admins can configure the connectors via the UI. This feature requires Editor v2 
     [notebook]
     enable_notebook_2=true
 
-**NOTE:** After enabling the above flags, if `django.db.utils.OperationalError: (1054, "Unknown column 'useradmin_huepermission.connector_id' in 'field list'")` error comes, then try **changing the DB name** in the hue.ini under `[[database]]` because there is no upgrade path and run the migrate command `./build/env/bin/hue migrate`.
+**NOTE:** After enabling the above flags, if a `django.db.utils.OperationalError: (1054, "Unknown column 'useradmin_huepermission.connector_id' in 'field list'")` error comes, then try **changing the DB name** in the hue.ini under `[[database]]` because there is no upgrade path and run the migrate command `./build/env/bin/hue migrate`.
 
-Go to `Administer Server` > `Connectors` > `+ Connector` or can directly navigate to `http://127.0.0.1:8000/hue/desktop/connectors`.
+Go to `Administer Server` > `Connectors` > `+ Connector` or directly navigate to the page `http://127.0.0.1:8000/hue/desktop/connectors`.
 
 !["Connectors"](https://cdn.gethue.com/uploads/2020/12/hue-connectors-create.png)
 
-Connectors are also configurable via the public [REST APIs](/developer/api/rest/#connectors).
+Connectors are also configurable via the public [REST API](/developer/api/rest/#connectors).
 
 ## Databases
 
@@ -180,7 +180,7 @@ Then give Hue the information about the database source following the `trino://{
     interface=sqlalchemy
     options='{"url": "trino://localhost:8080/tpch/default"}'
 
-**Note**: keep `[[[presto]]]` if not using the [connectors](/administrator/configuration/connectors/#connectors-ui).
+**Note**: keep `[[[presto]]]` if not using the [connectors](/administrator/configuration/connectors/#connectors).
 
 With impersonation:
 
