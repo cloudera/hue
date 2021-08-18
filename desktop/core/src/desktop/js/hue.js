@@ -55,7 +55,6 @@ import I18n from 'utils/i18n';
 import MultiLineEllipsisHandler from 'utils/multiLineEllipsisHandler';
 
 import sqlUtils from 'sql/sqlUtils';
-import sqlWorkerHandler from 'sql/sqlWorkerHandler';
 
 import 'webComponents/HueIcons';
 import 'components/sidebar/HueSidebarWebComponent';
@@ -113,7 +112,6 @@ window.sprintf = sprintf;
 window.SqlAutocompleter = SqlAutocompleter;
 window.sqlStatementsParser = sqlStatementsParser;
 window.sqlUtils = sqlUtils;
-window.sqlWorkerHandler = sqlWorkerHandler;
 
 $(document).ready(async () => {
   await refreshConfig(); // Make sure we have config up front

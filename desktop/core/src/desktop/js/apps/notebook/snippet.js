@@ -37,7 +37,7 @@ import {
   ASSIST_GET_SOURCE_EVENT,
   ASSIST_SET_SOURCE_EVENT
 } from 'ko/components/assist/events';
-import { POST_FROM_LOCATION_WORKER_EVENT } from 'sql/sqlWorkerHandler';
+import { POST_FROM_LOCATION_WORKER_EVENT } from 'sql/workers/events';
 import {
   ACTIVE_STATEMENT_CHANGED_EVENT,
   CURSOR_POSITION_CHANGED_EVENT,
