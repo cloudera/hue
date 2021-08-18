@@ -32,7 +32,7 @@
   import VariableSubstitution from './VariableSubstitution.vue';
   import SubscriptionTracker from 'components/utils/SubscriptionTracker';
   import { IdentifierLocation } from 'parse/types';
-  import { POST_FROM_LOCATION_WORKER_EVENT } from 'sql/sqlWorkerHandler';
+  import { POST_FROM_LOCATION_WORKER_EVENT } from 'sql/workers/events';
   import { wrap } from 'vue/webComponentWrap';
 
   const VariableSubstitutionKoBridge = defineComponent({

@@ -21,7 +21,3 @@
 % for js_file in utils.get_files('sqlSyntaxWebWorker', config='WORKERS'):
   importScripts('${ js_file.get('url') }');
 % endfor
-
-(function () {
-  this.onmessage = WorkerGlobalScope.onSyntaxMessage
-})();
