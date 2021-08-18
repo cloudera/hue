@@ -240,7 +240,9 @@ class TestApi(object):
     with patch('notebook.connectors.sql_alchemy.create_engine') as create_engine:
       engine = SqlAlchemyApi(self.user, interpreter)._create_engine()
 
-      create_engine.assert_called_with('presto://test@hue:8080/hue', pool_pre_ping=True)
+      create_engine.assert_called_with('presto://hue:8080/hue',
+                                       connect_args={'principal_username': 'test'},
+                                       pool_pre_ping=True)
 
 
   def test_explain(self):
@@ -250,7 +252,7 @@ class TestApi(object):
         with patch('notebook.connectors.sql_alchemy.SqlAlchemyApi._get_session') as _get_session:
 
           result = [{"id": 1}, {"select_type": "SIMPLE"}, {"Extra": "No tables used"}]
-          
+
           execute = Mock(return_value=result)
           _create_connection.return_value = Mock(
             execute=execute
