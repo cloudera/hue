@@ -163,72 +163,54 @@ Alternative:
 
 Presto has been forked into [Trino](#trino) and both share the same configuration.
 
+Currently just substitute 'presto' with 'trino' or vice versa.
+
 ### Trino
 
-Formerly known as PrestoSQL (hence still having 'presto' name in several parameters).
+Fork of PrestoSQL (hence still having 'presto' name in several parameters).
 
-The dialect should be added to the Python system or Hue Python virtual environment:
+Install at least the 0.6.2 version of pyhive from https://github.com/gethue/PyHive or https://github.com/dropbox/PyHive
 
     ./build/env/bin/pip install pyhive
 
-Then give Hue the information about the database source following the `presto://{trino-coordinator}:{port}/{catalog}/{schema}` format:
+Then give Hue the information about the database source following the `trino://{trino-coordinator}:{port}/{catalog}/{schema}` format:
 
     [[[presto]]]
     name = Trino
     interface=sqlalchemy
-    options='{"url": "presto://localhost:8080/tpch/default"}'
+    options='{"url": "trino://localhost:8080/tpch/default"}'
+
+**Note**: keep `[[[presto]]]` if not using the [connectors](/administrator/configuration/connectors/#connectors-ui).
 
 With impersonation:
 
-    options='{"url": "presto://localhost:8080/tpch/default", "has_impersonation": true}'
+    options='{"url": "trino://localhost:8080/tpch/default", "has_impersonation": true}'
 
 With Kerberos:
 
-    options='{"url": "presto://localhost:8080/tpch/default?KerberosKeytabPath=/path/to/keytab&KerberosPrincipal=principal&KerberosRemoteServiceName=service&protocol=https"'
+    options='{"url": "trino://localhost:8080/tpch/default?KerberosKeytabPath=/path/to/keytab&KerberosPrincipal=principal&KerberosRemoteServiceName=service&protocol=https"'
 
 With credentials:
 
-    options='{"url": "presto://username:password@localhost:8080/tpch/default"}'
+    options='{"url": "trino://username:password@localhost:8080/tpch/default"}'
 
 With LDAPS enabled over HTTPS:
 
-    options='{"url": "presto://username:password@localhost:8443/tpch/default","connect_args":"{\"protocol\": \"https\"}"}'
+    options='{"url": "trino://username:password@localhost:8443/tpch/default","connect_args":"{\"protocol\": \"https\"}"}'
 
-Pass Presto Session properties along with HTTPS:
+Pass Trino Session properties along with HTTPS:
 
-    options='{"url": "presto://username:password@localhost:8443/tpch/default","connect_args":"{\"protocol\": \"https\", \"session_props\": {\"query_max_run_time\": \"1m\"}}"}'
+    options='{"url": "trino://username:password@localhost:8443/tpch/default","connect_args":"{\"protocol\": \"https\", \"session_props\": {\"query_max_run_time\": \"1m\"}}"}'
 
-Pass Presto Session Properties without HTTPS enabled:
+Pass Trino Session Properties without HTTPS enabled:
 
-    options='{"url": "presto://username:password@localhost:8080/tpch/default","connect_args":"{\"session_props\": {\"query_max_run_time\": \"1m\"}}"}'
+    options='{"url": "trino://username:password@localhost:8080/tpch/default","connect_args":"{\"session_props\": {\"query_max_run_time\": \"1m\"}}"}'
 
 **Note**
-Hue does not use trino specific dialect of SQLAlchemy which may lead to a *catalog must be specified* error. This can be solved by setting `protocol.v1.alternate-header-name=Presto` in the Trino's configuration. More details about his can be found at [Migrating from PrestoSQL to Trino](https://trino.io/blog/2021/01/04/migrating-from-prestosql-to-trino.html)
+In the past Hue did not use trino specific dialect of SQLAlchemy which may lead to a *catalog must be specified* error. This can be solved by setting `protocol.v1.alternate-header-name=Presto` in the Trino's configuration. More details about his can be found at [Migrating from PrestoSQL to Trino](https://trino.io/blog/2021/01/04/migrating-from-prestosql-to-trino.html)
 
 Also give a try to  https://github.com/dungdm93/sqlalchemy-trino for the 'trino://' and avoiding the [old protocol issue](https://github.com/dropbox/PyHive/issues/378).
 
-Alternative interfaces.
-
-Direct:
-
-    [[[presto]]]
-    name=Trino
-    interface=presto
-    ## Specific options for connecting to the Presto server.
-    ## To connect to Presto over HTTPS/SSL you will need to construct connection string like below:
-    ## "url": "jdbc:presto://localhost:8080/catalog/schema?SSL=true&SSLTrustStorePath=/path/to/key_file&SSLTrustStorePassword=${password}"
-    ## The JDBC driver presto-jdbc.jar need to be in the CLASSPATH environment variable.
-    ## If 'user' and 'password' are omitted, they will be prompted in the UI.
-    options='{"url": "jdbc:presto://localhost:8080/catalog/schema", "driver": "io.prestosql.jdbc.PrestoDriver", "user": "root", "password": "root"}'
-
-JDBC:
-
-The client driver is maintained by the Presto Team and can be downloaded here: https://trino.io/docs/current/installation/jdbc.html
-
-    [[[presto]]]
-    name=Trino JDBC
-    interface=jdbc
-    options='{"url": "jdbc:presto://localhost:8080/", "driver": "io.prestosql.jdbc.PrestoDriver"}'
 
 ### Oracle
 
