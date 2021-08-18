@@ -21,7 +21,7 @@ import socket
 import sys
 
 from desktop.conf import default_ssl_cacerts, default_ssl_validate, AUTH_USERNAME as DEFAULT_AUTH_USERNAME, \
-    AUTH_PASSWORD as DEFAULT_AUTH_PASSWORD, has_connectors
+    AUTH_PASSWORD as DEFAULT_AUTH_PASSWORD, has_connectors, AUTH
 from desktop.lib.conf import ConfigSection, Config, coerce_bool, coerce_csv, coerce_password_from_script
 from desktop.lib.exceptions import StructuredThriftTransportException
 from desktop.lib.paths import get_desktop_root
@@ -259,6 +259,10 @@ def get_use_sasl_default():
   """kerberos enabled or password is specified"""
   return is_kerberos_enabled() or AUTH_PASSWORD.get() is not None # Maps closely to legacy behavior
 
+def is_jwt_authentication_enabled():
+  """JWT backend flag enabled or backend set in api auth explicitly"""
+  return AUTH.JWT.IS_ENABLED.get() or 'desktop.auth.api_authentications.JwtAuthentication' in AUTH.API_AUTH.get()
+
 USE_SASL = Config(
   key="use_sasl",
   help=_t("Use SASL framework to establish connection to host."),
@@ -275,6 +279,13 @@ USE_THRIFT_HTTP = Config(
   default=False
 )
 
+USE_THRIFT_HTTP_JWT = Config(
+  key="use_thrift_http_jwt",
+  help=_t("Use Thrift over HTTP for the transport mode with JWT as Bearer header."),
+  private=False,
+  type=coerce_bool,
+  dynamic_default=is_jwt_authentication_enabled
+)
 
 def config_validator(user):
   # dbms is dependent on beeswax.conf, import in method to avoid circular dependency
