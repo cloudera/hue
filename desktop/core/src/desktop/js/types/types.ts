@@ -44,25 +44,26 @@ declare global {
 }
 
 export interface hueWindow {
+  AUTOCOMPLETE_TIMEOUT?: number;
   CACHEABLE_TTL?: { default?: number; sqlAnalyzer?: number };
   CLOSE_SESSIONS?: { [dialect: string]: boolean };
   CUSTOM_DASHBOARD_URL?: string;
+  DISABLE_LOCAL_STORAGE?: boolean;
   ENABLE_PREDICT?: boolean;
+  ENABLE_SQL_SYNTAX_CHECK?: boolean;
   HAS_CATALOG?: boolean;
   HAS_CONNECTORS?: boolean;
   HAS_SQL_ANALYZER?: boolean;
-  AUTOCOMPLETE_TIMEOUT?: number;
-  ENABLE_SQL_SYNTAX_CHECK?: boolean;
   HUE_BASE_URL?: string;
+  HUE_VERSION?: string;
   LOGGED_USERNAME?: string;
-  SQL_ANALYZER_MODE?: string;
   SHOW_ADD_MORE_EDITORS?: boolean;
+  SQL_ANALYZER_MODE?: string;
   USER_IS_ADMIN?: boolean;
   USER_IS_HUE_ADMIN?: boolean;
   USER_VIEW_EDIT_USER_ENABLED?: boolean;
   WEB_SOCKETS_ENABLED?: boolean;
   WS_CHANNEL?: string;
   hueDebug?: HueDebug;
-  DISABLE_LOCAL_STORAGE?: boolean;
   trackOnGA?(track: string): void;
 }

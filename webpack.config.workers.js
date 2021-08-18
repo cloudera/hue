@@ -29,8 +29,8 @@ module.exports = {
   performance: shared.performance,
   resolve: shared.resolve,
   entry: {
-    sqlLocationWebWorker: ['./desktop/core/src/desktop/js/sql/sqlLocationWebWorker.js'],
-    sqlSyntaxWebWorker: ['./desktop/core/src/desktop/js/sql/sqlSyntaxWebWorker.js']
+    sqlLocationWebWorker: ['./desktop/core/src/desktop/js/sql/workers/sqlLocationWebWorker.ts'],
+    sqlSyntaxWebWorker: ['./desktop/core/src/desktop/js/sql/workers/sqlSyntaxWebWorker.ts']
   },
   optimization: {
     minimize: false,

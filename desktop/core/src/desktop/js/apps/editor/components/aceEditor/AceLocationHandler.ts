@@ -43,7 +43,7 @@ import {
   POST_FROM_SYNTAX_WORKER_EVENT,
   POST_TO_LOCATION_WORKER_EVENT,
   POST_TO_SYNTAX_WORKER_EVENT
-} from 'sql/sqlWorkerHandler';
+} from 'sql/workers/events';
 import { getFromLocalStorage } from 'utils/storageUtils';
 import { SqlReferenceProvider } from 'sql/reference/types';
 
