@@ -5,15 +5,19 @@ draft: false
 weight: 1
 ---
 
-Interact with the API server (e.g. submit a SQL query, list some S3 files in a bucket, search for a table...) via a REST API.
+Interact with the Query server (e.g. submit a SQL query, download some S3 files, search for a table...) via a REST API.
 
 Users authenticate with the same credentials as they would do in the Browser login page.
 
 ## Quickstart
 
-The API can be called directly via REST. Some calls, JavaScript and Python wrappers are not fully documented yet.
+The API can be called directly via REST.
 
-Default content type is form data, e.g.:
+First [authenticate](/developer/api/rest/#authentication) with your account credentials and get a token. Then provide the token in all following requests as header, e.g.
+
+    curl -X POST https://demo.gethue.com/api/editor/execute/hive --data 'statement=SHOW TABLES' -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjIxNjM5NjMxLCJqdGkiOiI0NTY3NTA4MzM5YjY0MjFmYTMzZDJjMzViZWUyMDAyMCIsInVzZXJfaWQiOjF9.qrMNrr69eo38dOsV2aYp8k6WqBeyJZkbSuavxA_o_kM"
+
+The default content type is form data, e.g.:
 
     -H "Content-Type: application/x-www-form-urlencoded" -d 'username=demo&password=demo'
 
