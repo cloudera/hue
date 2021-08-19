@@ -29,7 +29,6 @@
 
 <%namespace name="configKoComponents" file="/config_ko_components.mako" />
 <%namespace name="notebookKoComponents" file="/common_notebook_ko_components.mako" />
-<%namespace name="sqlSyntaxDropdown" file="/sql_syntax_dropdown.mako" />
 
 <link rel="stylesheet" href="${ static('notebook/css/editor2.css') }">
 <link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-editable.css') }">
@@ -1040,8 +1039,6 @@
     <!-- /ko -->
   </div>
 </div>
-
-${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 
 <script type="text/javascript">
   window.EDITOR_BINDABLE_ELEMENT = '#editorComponents';
