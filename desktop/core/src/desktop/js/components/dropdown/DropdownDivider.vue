@@ -17,16 +17,13 @@
 -->
 
 <template>
-  <li>
-    <button @click.stop="$emit('click')"><slot /></button>
-  </li>
+  <li class="dropdown-divider">&nbsp;</li>
 </template>
 
 <script lang="ts">
   import { defineComponent } from 'vue';
 
   export default defineComponent({
-    name: 'DropdownMenuButton',
-    emits: ['click']
+    name: 'DropdownDivider'
   });
 </script>

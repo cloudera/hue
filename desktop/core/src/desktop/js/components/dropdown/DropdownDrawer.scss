@@ -48,6 +48,11 @@
       list-style: none;
       font-size: 13px;
 
+      li.dropdown-divider {
+        height: 1px;
+        background-color: $hue-border-color;
+      }
+
       li {
         color: $fluid-gray-800;
 

@@ -18,6 +18,11 @@ import { Ace } from 'ext/ace';
 import ace from 'ext/aceHelper';
 import KnockoutObservable from '@types/knockout';
 
+import {
+  SQL_SYNTAX_DROPDOWN_HIDE_TOPIC,
+  SQL_SYNTAX_DROPDOWN_SHOW_TOPIC,
+  SqlSyntaxDropdownShowEvent
+} from './events';
 import { ActiveStatementChangedEventDetails } from './types';
 import Executor from 'apps/editor/execution/executor';
 import DataCatalogEntry, { TableSourceMeta } from 'catalog/DataCatalogEntry';
@@ -417,7 +422,7 @@ export default class AceLocationHandler implements Disposable {
     const onContextMenu = (e: { clientX: number; clientY: number; preventDefault: () => void }) => {
       const selectionRange = this.editor.selection.getRange();
       huePubSub.publish('context.popover.hide');
-      huePubSub.publish('sql.syntax.dropdown.hide');
+      huePubSub.publish(SQL_SYNTAX_DROPDOWN_HIDE_TOPIC);
       if (selectionRange.isEmpty()) {
         const pointerPosition = this.editor.renderer.screenToTextCoordinates(
           e.clientX + 5,
@@ -514,7 +519,7 @@ export default class AceLocationHandler implements Disposable {
               });
             }
           } else if (token.syntaxError) {
-            huePubSub.publish('sql.syntax.dropdown.show', {
+            huePubSub.publish<SqlSyntaxDropdownShowEvent>(SQL_SYNTAX_DROPDOWN_SHOW_TOPIC, {
               editorId: this.editorId,
               data: token.syntaxError,
               editor: this.editor,

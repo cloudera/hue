@@ -1,34 +1,38 @@
 <template>
   <DropdownDrawer
-    :open="open && options.length"
+    :open="open && options.length > 0"
+    :force-bottom-placement="forceBottomPlacement"
     :trigger-element="keydownElement"
     @close="$emit('close')"
   >
     <ul>
-      <DropdownMenuButton
-        v-for="(option, idx) of options"
-        :key="option.value || option"
-        :class="{ selected: idx === selectedIndex }"
-        @click="onOptionClick(option, idx)"
-      >
-        {{ getLabel(option) }}
-      </DropdownMenuButton>
+      <template v-for="(option, idx) of options" :key="option.value || option.label || option">
+        <DropdownMenuButton
+          v-if="!option.divider"
+          :class="{ selected: idx === selectedIndex }"
+          @click="onOptionClick(option, idx)"
+        >
+          {{ getLabel(option) }}
+        </DropdownMenuButton>
+        <DropdownDivider v-else />
+      </template>
     </ul>
   </DropdownDrawer>
 </template>
 
 <script lang="ts">
   import { defineComponent, PropType } from 'vue';
+  import DropdownDivider from './DropdownDivider.vue';
 
   import DropdownDrawer from './DropdownDrawer.vue';
   import DropdownMenuButton from './DropdownMenuButton.vue';
-  import { Option } from './DropDownMenuOptions';
+  import { Option } from './types';
 
   export const getLabel = (option: Option): string =>
     (option as { label: string }).label || (option as string);
 
   export default defineComponent({
-    components: { DropdownMenuButton, DropdownDrawer },
+    components: { DropdownDivider, DropdownMenuButton, DropdownDrawer },
     props: {
       options: {
         type: Array as PropType<Option[]>,
@@ -39,6 +43,10 @@
         default: null
       },
       open: {
+        type: Boolean,
+        default: false
+      },
+      forceBottomPlacement: {
         type: Boolean,
         default: false
       }
@@ -97,6 +105,7 @@
       onOptionClick(option: Option, index: number) {
         this.selectedIndex = index;
         this.$emit('option-selected', option);
+        this.$emit('close');
       }
     }
   });

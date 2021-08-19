@@ -48,6 +48,7 @@ export interface SyntaxError {
   expectedStatementEnd?: boolean;
   loc: ParsedLocation;
   text: string;
+  ruleId?: string;
 }
 
 export interface IdentifierLocation {
