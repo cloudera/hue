@@ -18,6 +18,7 @@
 import sys
 
 from nose.tools import assert_equal, assert_true, assert_false, assert_raises
+from nose.plugins.skip import SkipTest
 
 from desktop.auth.backend import rewrite_user
 from desktop.auth.api_authentications import JwtAuthentication
@@ -46,7 +47,6 @@ class TestJwtAuthentication():
         "HTTP_AUTHORIZATION": "Bearer " + self.sample_token
       }
     )
-
 
   def test_authenticate_existing_user(self):
     with patch('desktop.auth.api_authentications.jwt.decode') as jwt_decode:
@@ -104,10 +104,14 @@ class TestJwtAuthentication():
   def test_check_token_verification_flag(self):
 
     # When verification flag is True for old sample token
-    assert_raises(exceptions.AuthenticationFailed, JwtAuthentication().authenticate, self.request)
+    reset = AUTH.JWT.VERIFY.set_for_testing(True)
+    try:
+      assert_raises(exceptions.AuthenticationFailed, JwtAuthentication().authenticate, self.request)
+    finally:
+      reset()
 
     # When verification flag is False
-    reset = AUTH.VERIFY_CUSTOM_JWT.set_for_testing(False)
+    reset = AUTH.JWT.VERIFY.set_for_testing(False)
     try:
       user, token = JwtAuthentication().authenticate(request=self.request)
 

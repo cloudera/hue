@@ -22,17 +22,17 @@ import 'ext/bootstrap-datepicker.min';
 import 'ext/jquery.hotkeys';
 import 'jquery/plugins/jquery.hdfstree';
 
-import huePubSub from 'utils/huePubSub';
-import I18n from 'utils/i18n';
-import sqlWorkerHandler from 'sql/sqlWorkerHandler';
-import bootstrapRatios from 'utils/html/bootstrapRatios';
-import scrollbarWidth from 'utils/screen/scrollbarWidth';
-import waitForRendered from 'utils/timing/waitForRendered';
 import NotebookViewModel from './NotebookViewModel';
 import {
   ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT,
   IGNORE_NEXT_UNLOAD_EVENT
 } from 'apps/editor/events';
+import { registerHueWorkers } from 'sql/workers/hueWorkerHandler';
+import huePubSub from 'utils/huePubSub';
+import I18n from 'utils/i18n';
+import bootstrapRatios from 'utils/html/bootstrapRatios';
+import scrollbarWidth from 'utils/screen/scrollbarWidth';
+import waitForRendered from 'utils/timing/waitForRendered';
 import { SHOW_LEFT_ASSIST_EVENT } from 'ko/components/assist/events';
 
 window.Clipboard = Clipboard;
@@ -558,7 +558,7 @@ huePubSub.subscribe('app.dom.loaded', app => {
     ko.applyBindings(viewModel, $(window.EDITOR_BINDABLE_ELEMENT)[0]);
     viewModel.init();
 
-    sqlWorkerHandler.registerWorkers();
+    registerHueWorkers();
 
     viewModel.selectedNotebook.subscribe(newVal => {
       huePubSub.publish('selected.notebook.changed', newVal);
