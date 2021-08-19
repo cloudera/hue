@@ -518,48 +518,13 @@ Get the list of configured [connectors](/administrator/configuration/connectors/
 
 ### Create
 
-How to connect to a HiveServer (dialect=hive) via the SqlAlchemy interface (interface=sqlalchemy):
+First step is to get the config of the connector we want to instantiate. In input we pick a type of connector from the list of above types by specifying its `dialect` and `interface` names.
 
-    curl -X POST https://demo.gethue.com/api/connector/instance/new/hive/sqlalchemy -d '
-    {
-    "connector": {
-        "id": "1",
-        "dialect": "hive",
-        "nice_name": "Hive",
-        "description": "Via SqlAlchemy interface",
-        "category": "editor",
-        "interface": "sqlalchemy",
-        "settings": [
-          {
-            "name": "url",
-            "value": "hive://localhost:10000"
-          },
-          {
-            "name": "has_ssh",
-            "value": false
-          },
-          {
-            "name": "ssh_server_host",
-            "value": "127.0.0.1"
-          }
-        ],
-        "properties": {
-          "is_sql": true,
-          "sql_identifier_quote": "`",
-          "sql_identifier_comment_single": "--",
-          "has_catalog": false,
-          "has_database": true,
-          "has_table": true,
-          "has_live_queries": false,
-          "has_optimizer_risks": true,
-          "has_optimizer_values": true,
-          "has_auto_limit": false,
-          "has_reference_language": true,
-          "has_reference_functions": true,
-          "has_use_statement": true
-        }
-      }
-    }'
+    curl -X POST https://demo.gethue.com/api/connector/instance/new/<DIALECT>/<INTERFACE>
+
+And get back a template that we send to the /update call:
+
+    curl -X POST https://demo.gethue.com/api/connector/instance/new/hive/sqlalchemy -d 'connector={"nice_name":"Hive Docker Local","name":"41","dialect":"hive","interface":"hiveserver2","settings":[{"name":"server_host","value":"localhost"},{"name":"server_port","value":10000},{"name":"is_llap","value":false},{"name":"use_sasl","value":"true"}],"category":"editor","description":"Recommended","dialect_properties":{"is_sql":true,"sql_identifier_quote":"`","sql_identifier_comment_single":"--","has_catalog":false,"has_database":true,"has_table":true,"has_live_queries":false,"has_optimizer_risks":true,"has_optimizer_values":true,"has_auto_limit":false,"has_reference_language":true,"has_reference_functions":true,"has_use_statement":true}}'
 
 ### Get
 
@@ -567,96 +532,23 @@ How to connect to a HiveServer (dialect=hive) via the SqlAlchemy interface (inte
 
 ### Update
 
-    curl -X POST https://demo.gethue.com/api/connector/instance/update -d '
-    {
-    "connector": {
-        "id": "1",
-        "dialect": "hive",
-        "nice_name": "Hive",
-        "description": "Via SqlAlchemy interface",
-        "category": "editor",
-        "interface": "sqlalchemy",
-        "settings": [
-          {
-            "name": "url",
-            "value": "hive://localhost:10000"
-          },
-          {
-            "name": "has_ssh",
-            "value": false
-          },
-          {
-            "name": "ssh_server_host",
-            "value": "127.0.0.1"
-          }
-        ],
-        "properties": {
-          "is_sql": true,
-          "sql_identifier_quote": "`",
-          "sql_identifier_comment_single": "--",
-          "has_catalog": false,
-          "has_database": true,
-          "has_table": true,
-          "has_live_queries": false,
-          "has_optimizer_risks": true,
-          "has_optimizer_values": true,
-          "has_auto_limit": false,
-          "has_reference_language": true,
-          "has_reference_functions": true,
-          "has_use_statement": true
-        }
-      }
-    }'
+This is the same as creating a new connector instance, but as we provide the `id` we will update the existing instance:
+
+    curl -X POST https://demo.gethue.com/api/connector/instance/update -d 'connector={"nice_name":"Hive Docker Local","name":"41","dialect":"hive","interface":"hiveserver2","settings":[{"name":"server_host","value":"localhost"},{"name":"server_port","value":10000},{"name":"is_llap","value":false},{"name":"use_sasl","value":"true"}],"id":"41","category":"editor","description":"Recommended","dialect_properties":{"is_sql":true,"sql_identifier_quote":"`","sql_identifier_comment_single":"--","has_catalog":false,"has_database":true,"has_table":true,"has_live_queries":false,"has_optimizer_risks":true,"has_optimizer_values":true,"has_auto_limit":false,"has_reference_language":true,"has_reference_functions":true,"has_use_statement":true}}'
 
 ### Delete
 
-    curl -X POST 'https://demo.gethue.com/api/connector/instance/delete' -d '{"connector": {"id": "1", "name": "hive"}}'
+    curl -X POST 'https://demo.gethue.com/api/connector/instance/delete' -d '{"connector": {"id": "1"}}'
 
 ### Test
 
-    curl -X POST 'https://demo.gethue.com/api/connector/instance/test/' -d '
-    {
-        "connector": {
-        "id": "1",
-        "dialect": "hive",
-        "nice_name": "Hive",
-        "description": "Via SqlAlchemy interface",
-        "category": "editor",
-        "interface": "sqlalchemy",
-        "settings": [
-          {
-            "name": "url",
-            "value": "hive://localhost:10000"
-          },
-          {
-            "name": "has_ssh",
-            "value": false
-          },
-          {
-            "name": "ssh_server_host",
-            "value": "127.0.0.1"
-          }
-        ],
-        "properties": {
-          "is_sql": true,
-          "sql_identifier_quote": "`",
-          "sql_identifier_comment_single": "--",
-          "has_catalog": false,
-          "has_database": true,
-          "has_table": true,
-          "has_live_queries": false,
-          "has_optimizer_risks": true,
-          "has_optimizer_values": true,
-          "has_auto_limit": false,
-          "has_reference_language": true,
-          "has_reference_functions": true,
-          "has_use_statement": true
-        }
-      }
-    }'
+Check if the connectivity is healthy:
 
+    curl -X POST 'https://demo.gethue.com/api/connector/instance/test/' -d 'connector={"nice_name":"Hive Docker Local","name":"41","dialect":"hive","interface":"hiveserver2","settings":[{"name":"server_host","value":"localhost"},{"name":"server_port","value":10000},{"name":"is_llap","value":false},{"name":"use_sasl","value":"true"}],"id":"41","category":"editor","description":"Recommended","dialect_properties":{"is_sql":true,"sql_identifier_quote":"`","sql_identifier_comment_single":"--","has_catalog":false,"has_database":true,"has_table":true,"has_live_queries":false,"has_optimizer_risks":true,"has_optimizer_values":true,"has_auto_limit":false,"has_reference_language":true,"has_reference_functions":true,"has_use_statement":true}}'
 
 ### Examples
+
+Install or update the connector examples:
 
     curl -X POST https://demo.gethue.com/api/connector/examples/install/
 
