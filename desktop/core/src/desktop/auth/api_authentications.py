@@ -21,7 +21,7 @@ import jwt
 from rest_framework import authentication, exceptions
 
 from desktop.auth.backend import find_or_create_user, ensure_has_a_group, rewrite_user
-from desktop.conf import ENABLE_ORGANIZATIONS
+from desktop.conf import ENABLE_ORGANIZATIONS, AUTH
 
 from useradmin.models import User
 
@@ -50,15 +50,26 @@ class JwtAuthentication(authentication.BaseAuthentication):
     LOG.debug('JwtAuthentication: got access token %s' % access_token)
 
     try:
-      payload = jwt.decode(access_token, 'secret', algorithms=["HS256"])
+      payload = jwt.decode(
+        access_token,
+        'secret',
+        algorithms=["RS256"],
+        verify=AUTH.JWT.VERIFY.get()
+      )
     except jwt.DecodeError:
       raise exceptions.AuthenticationFailed('JwtAuthentication: Invalid token')
     except jwt.ExpiredSignatureError:
       raise exceptions.AuthenticationFailed('JwtAuthentication: Token expired')
     except Exception as e:
       raise exceptions.AuthenticationFailed(e)
+    
+    if payload.get('user') is None:
+      LOG.debug('JwtAuthentication: no user ID in token')
+      return None
 
-    user = find_or_create_user(payload['userId'], is_superuser=False)
+    LOG.debug('JwtAuthentication: got user ID %s and tenant ID %s' % (payload.get('user'), payload.get('tenantId')))
+
+    user = find_or_create_user(payload.get('user'), is_superuser=False)
     ensure_has_a_group(user)
     user = rewrite_user(user)
 

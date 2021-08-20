@@ -72,6 +72,10 @@
       triggerElement: {
         type: Object as PropType<HTMLElement | null>,
         default: null
+      },
+      forceBottomPlacement: {
+        type: Boolean,
+        default: false
       }
     },
     emits: ['close'],
@@ -95,7 +99,7 @@
         await nextTick();
 
         const { bottom, right } = isOutsideViewport(<HTMLElement>this.$refs.innerPanelElement);
-        if (bottom) {
+        if (bottom && !this.forceBottomPlacement) {
           const bottomOffset = this.triggerElement?.offsetHeight || 0;
           // position: relative Prevents fixed element from appearing below the window when at the bottom of the page
           this.parentPosition = { position: 'relative' };

@@ -797,8 +797,12 @@ class RemoteUserDjangoBackend(django.contrib.auth.backends.RemoteUserBackend):
 
 
 class OIDCBackend(OIDCAuthenticationBackend):
-  def authenticate(self, **kwargs):
-    self.request = kwargs.pop('request', None)
+  def authenticate(self, *args, **kwargs):
+    if sys.version_info[0] > 2:
+      self.request = args[0]
+    else:
+      self.request = None
+
     if not self.request:
       return None
 
@@ -835,6 +839,9 @@ class OIDCBackend(OIDCAuthenticationBackend):
       self.save_refresh_tokens(refresh_token)
       user = self.get_or_create_user(access_token, id_token, verified_id)
       user = rewrite_user(user)
+
+      ensure_has_a_group(user)
+      
       return user
 
     return None

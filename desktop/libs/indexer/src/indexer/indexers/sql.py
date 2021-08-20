@@ -326,21 +326,6 @@ class SQLIndexer(object):
         'columns': ',\n'.join(['  `%(name)s` %(type)s' % col for col in columns]),
       }
 
-    elif dialect == 'phoenix':
-
-      for col in columns:
-        if col['type'] == 'string':
-          col['type'] = 'CHAR(255)'
-
-      sql = '''CREATE TABLE IF NOT EXISTS %(database)s.%(table_name)s (
-%(columns)s
-CONSTRAINT my_pk PRIMARY KEY (%(primary_keys)s));\n''' % {
-          'database': database,
-          'table_name': table_name,
-          'columns': ',\n'.join(['  %(name)s %(type)s' % col for col in columns]),
-          'primary_keys': ', '.join(destination.get('primaryKeys'))
-      }
-
     elif dialect == 'impala':
       sql = '''CREATE TABLE IF NOT EXISTS %(database)s.%(table_name)s_tmp (
 %(columns)s);\n''' % {
@@ -372,16 +357,6 @@ CONSTRAINT my_pk PRIMARY KEY (%(primary_keys)s));\n''' % {
               'table_name': table_name,
               'csv_rows': csv_rows
             }
-          elif dialect == 'phoenix':
-            for csv_row in _csv_rows:
-              _sql = ', '.join([ "'{0}'".format(col_val) if columns[count]['type'] in ('CHAR(255)', 'timestamp') \
-                else '{0}'.format(col_val) for count, col_val in enumerate(csv_row)])
-
-              sql += '''\nUPSERT INTO %(database)s.%(table_name)s VALUES (%(csv_row)s);\n''' % {
-                'database': database,
-                'table_name': table_name,
-                'csv_row': _sql
-              }
           elif dialect == 'impala':
              # casting from string to boolean is not allowed in impala so string -> int -> bool
             sql_ = ',\n'.join([

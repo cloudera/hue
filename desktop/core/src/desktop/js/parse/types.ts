@@ -48,6 +48,7 @@ export interface SyntaxError {
   expectedStatementEnd?: boolean;
   loc: ParsedLocation;
   text: string;
+  ruleId?: string;
 }
 
 export interface IdentifierLocation {
@@ -61,7 +62,7 @@ export interface IdentifierLocation {
   value?: string;
   active?: boolean;
   tables?: ParsedTable[];
-  colRef: boolean;
+  colRef: boolean | { identifierChain: IdentifierChainEntry[]; tables: ParsedTable[] };
   argumentPosition?: number;
   identifierChain?: IdentifierChainEntry[];
   expression?: { types: string[]; text: string };
@@ -69,6 +70,7 @@ export interface IdentifierLocation {
   path?: string;
   qualified?: boolean;
   resolveCatalogEntry: (options?: {
+    cachedOnly?: boolean;
     cancellable?: boolean;
     temporaryOnly?: boolean;
   }) => CancellablePromise<DataCatalogEntry>;

@@ -28,6 +28,7 @@
       :editor-id="id"
       :executor="executor"
     />
+    <ace-syntax-dropdown v-if="editor" :editor="editor" :editor-id="id" />
   </div>
 </template>
 
@@ -38,6 +39,7 @@
   import { Ace } from 'ext/ace';
 
   import { attachPredictTypeahead } from './acePredict';
+  import AceSyntaxDropdown from './AceSyntaxDropdown.vue';
   import AceAutocomplete from './autocomplete/AceAutocomplete.vue';
   import AceGutterHandler from './AceGutterHandler';
   import AceLocationHandler, { ACTIVE_STATEMENT_CHANGED_EVENT } from './AceLocationHandler';
@@ -72,6 +74,7 @@
   export default defineComponent({
     name: 'AceEditor',
     components: {
+      AceSyntaxDropdown,
       AceAutocomplete
     },
     props: {

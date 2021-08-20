@@ -5,15 +5,19 @@ draft: false
 weight: 1
 ---
 
-Interact with the API server (e.g. submit a SQL query, list some S3 files in a bucket, search for a table...) via a REST API.
+Interact with the Query server (e.g. submit a SQL query, download some S3 files, search for a table...) via a REST API.
 
 Users authenticate with the same credentials as they would do in the Browser login page.
 
 ## Quickstart
 
-The API can be called directly via REST. Some calls, JavaScript and Python wrappers are not fully documented yet.
+The API can be called directly via REST.
 
-Default content type is form data, e.g.:
+First [authenticate](/developer/api/rest/#authentication) with your account credentials and get a token. Then provide the token in all following requests as header, e.g.
+
+    curl -X POST https://demo.gethue.com/api/editor/execute/hive --data 'statement=SHOW TABLES' -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjIxNjM5NjMxLCJqdGkiOiI0NTY3NTA4MzM5YjY0MjFmYTMzZDJjMzViZWUyMDAyMCIsInVzZXJfaWQiOjF9.qrMNrr69eo38dOsV2aYp8k6WqBeyJZkbSuavxA_o_kM"
+
+The default content type is form data, e.g.:
 
     -H "Content-Type: application/x-www-form-urlencoded" -d 'username=demo&password=demo'
 
@@ -226,51 +230,51 @@ Same but in Python:
 
 ### Listing Databases
 
-    curl -X POST 'https://demo.gethue.com/api/editor/autocomplete/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1NzM2NTA0LCJqdGkiOiJkZDVlYTg5ZTMwMDE0MjRiOGRlYWM4N2RjODFhYjgzZSIsInVzZXJfaWQiOjExMDA3MTR9.8I9BeXQXBWFMGf7J4ss7yhcmAZfcFC6sMRE9RLeOwTM'
+    curl -X POST https://demo.gethue.com/api/editor/autocomplete/
 
 ### Database details
 
-    curl -X POST 'https://demo.gethue.com/api/editor/autocomplete/<DB>/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1NzM2NTA0LCJqdGkiOiJkZDVlYTg5ZTMwMDE0MjRiOGRlYWM4N2RjODFhYjgzZSIsInVzZXJfaWQiOjExMDA3MTR9.8I9BeXQXBWFMGf7J4ss7yhcmAZfcFC6sMRE9RLeOwTM'
+    curl -X POST https://demo.gethue.com/api/editor/autocomplete/<DB>/
 
 Describe database API:
 
-    curl -X POST 'https://demo.gethue.com/api/editor/describe/<DB>/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1NzM2NTA0LCJqdGkiOiJkZDVlYTg5ZTMwMDE0MjRiOGRlYWM4N2RjODFhYjgzZSIsInVzZXJfaWQiOjExMDA3MTR9.8I9BeXQXBWFMGf7J4ss7yhcmAZfcFC6sMRE9RLeOwTM' -d 'source_type=mysql'
+    curl -X POST https://demo.gethue.com/api/editor/describe/<DB>/ -d 'source_type=mysql'
 
 - **source_type:** select the configured databases (e.g. `hive`) or connector ID (e.g. `1`)
 
 ### Table details
 
-    curl -X POST 'https://demo.gethue.com/api/editor/autocomplete/<DB>/<TABLE>/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1NzM2NTA0LCJqdGkiOiJkZDVlYTg5ZTMwMDE0MjRiOGRlYWM4N2RjODFhYjgzZSIsInVzZXJfaWQiOjExMDA3MTR9.8I9BeXQXBWFMGf7J4ss7yhcmAZfcFC6sMRE9RLeOwTM'
+    curl -X POST https://demo.gethue.com/api/editor/autocomplete/<DB>/<TABLE>/
 
 Describe table API:
 
-    curl -X POST 'https://demo.gethue.com/api/editor/describe/<DB>/<TABLE>/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1NzM2NTA0LCJqdGkiOiJkZDVlYTg5ZTMwMDE0MjRiOGRlYWM4N2RjODFhYjgzZSIsInVzZXJfaWQiOjExMDA3MTR9.8I9BeXQXBWFMGf7J4ss7yhcmAZfcFC6sMRE9RLeOwTM' -d 'source_type=1'
+    curl -X POST https://demo.gethue.com/api/editor/describe/<DB>/<TABLE>/ -d 'source_type=1'
 
 - **source_type:** select the configured databases (e.g. `hive`) or connector ID (e.g. `1`)
 
 Analyze API:
 
-    curl -X POST 'https://demo.gethue.com/api/<DIALECT>/analyze/<DB>/<TABLE>/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1ODE1MzU5LCJqdGkiOiIzODM0M2Q3YjRjNGY0NTUxYWJmYmQyZmI4YjUzYjFjZiIsInVzZXJfaWQiOjExMDA3MTR9.fl0h7VooLtWnu9v7FtdLUy3NukwFtUya-LkTzollTig'
+    curl -X POST https://demo.gethue.com/api/<DIALECT>/analyze/<DB>/<TABLE>/
 
 - Currently supported **dialects:** impala, beeswax (hive)
 
 Sample table data API:
 
-    curl -X POST 'https://demo.gethue.com/api/editor/sample/<DB>/<TABLE>/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1ODE1MzU5LCJqdGkiOiIzODM0M2Q3YjRjNGY0NTUxYWJmYmQyZmI4YjUzYjFjZiIsInVzZXJfaWQiOjExMDA3MTR9.fl0h7VooLtWnu9v7FtdLUy3NukwFtUya-LkTzollTig'
+    curl -X POST https://demo.gethue.com/api/editor/sample/<DB>/<TABLE>/
 
 ### Column details
 
-    curl -X POST 'https://demo.gethue.com/api/editor/autocomplete/<DB>/<TABLE>/<COL1>/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1NzM2NTA0LCJqdGkiOiJkZDVlYTg5ZTMwMDE0MjRiOGRlYWM4N2RjODFhYjgzZSIsInVzZXJfaWQiOjExMDA3MTR9.8I9BeXQXBWFMGf7J4ss7yhcmAZfcFC6sMRE9RLeOwTM'
+    curl -X POST https://demo.gethue.com/api/editor/autocomplete/<DB>/<TABLE>/<COL1>/
 
 Analyze API:
 
-    curl -X POST 'https://demo.gethue.com/api/<DIALECT>/analyze/<DB>/<TABLE>/<COL1>/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1ODE1MzU5LCJqdGkiOiIzODM0M2Q3YjRjNGY0NTUxYWJmYmQyZmI4YjUzYjFjZiIsInVzZXJfaWQiOjExMDA3MTR9.fl0h7VooLtWnu9v7FtdLUy3NukwFtUya-LkTzollTig'
+    curl -X POST https://demo.gethue.com/api/<DIALECT>/analyze/<DB>/<TABLE>/<COL1>/
 
 - Currently supported **dialects:** impala, beeswax (hive)
 
 Sample column data API:
 
-    curl -X POST 'https://demo.gethue.com/api/editor/sample/<DB>/<TABLE>/<COL1>/' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1ODE1MzU5LCJqdGkiOiIzODM0M2Q3YjRjNGY0NTUxYWJmYmQyZmI4YjUzYjFjZiIsInVzZXJfaWQiOjExMDA3MTR9.fl0h7VooLtWnu9v7FtdLUy3NukwFtUya-LkTzollTig'
+    curl -X POST https://demo.gethue.com/api/editor/sample/<DB>/<TABLE>/<COL1>/
 
 ### Listing Functions
 
@@ -311,9 +315,15 @@ For a specific function/UDF details (e.g. trunc):
 
 We can choose a dialect for `doc_type` e.g. impala, mysql, hive, phoenix, etc.
 
-    curl -X GET "https://demo.gethue.com/api/editor/get_history?doc_type=hive" -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI1OTAzMTUzLCJqdGkiOiI4NmUwNjFhMTg0N2I0ZThjODE5NmU2N2Q1YzJkOWI5NSIsInVzZXJfaWQiOjExMDA3MTR9.CKoG9xq1xu-J7DGgJDuZcIiAGnk5wFyxFHg4YrbKX7E'
+    curl -X GET https://demo.gethue.com/api/editor/get_history?doc_type=hive
 
     {"status": 0, "count": 3, "history": [{"name": "", "id": 2008, "uuid": "5b48c678-1224-4863-b523-3baab82402a7", "type": "query-hive", "data": {"statement": "CREATE TABLE w12( Name STRING, Money BIGINT )", "lastExecuted": 1621502970360, "status": "failed", "parentSavedQueryUuid": ""}, "absoluteUrl": "/editor?editor=2008"}, {"name": "", "id": 2006, "uuid": "1cd32ae0-9b61-46ae-8fd4-72c4255209c3", "type": "query-hive", "data": {"statement": "CREATE TABLE q13( Name STRING, Money BIGINT )", "lastExecuted": 1621498889058, "status": "expired", "parentSavedQueryUuid": ""}, "absoluteUrl": "/editor?editor=2006"}, {"name": "", "id": 2003, "uuid": "e5ec1fa4-1a36-4e42-a814-a685b0142223", "type": "query-hive", "data": {"statement": "CREATE TABLE q11( Name STRING, Money BIGINT );\nINSERT INTO q11 VALUES ('abc', 100);", "lastExecuted": 1621498771619, "status": "expired", "parentSavedQueryUuid": ""}, "absoluteUrl": "/editor?editor=2003"}], "message": "History fetched"}
+
+### Get Configuration
+
+    curl -X POST https://demo.gethue.com/api/get_config/
+
+    {"app_config": {"editor": {"name": "editor", "displayName": "Editor", "buttonName": "Query", "interpreters": [{"name": "MySQL", "type": "mysql", "id": "mysql", "displayName": "MySQL", "buttonName": "Query", "tooltip": "Mysql Query", "optimizer": "off", "page": "/editor/?type=mysql", "is_sql": true, "is_batchable": true, "dialect": "mysql", "dialect_properties": {}}, {"name": "notebook", "type": "notebook", "displayName": "Notebook", "buttonName": "Notebook", "tooltip": "Notebook", "page": "/notebook", "is_sql": false, "dialect": "notebook"}], "default_limit": 5000, "interpreter_names": ["mysql", "notebook"], "page": "/editor/?type=mysql", "default_sql_interpreter": "mysql"}, "catalogs": [{"name": "MySQL", "type": "mysql", "id": "mysql", "displayName": "MySQL", "buttonName": "Query", "tooltip": "Mysql Query", "page": "/editor/?type=mysql", "is_sql": true, "is_catalog": true}], "browser": {"name": "browser", "displayName": "Browsers", "buttonName": "Browse", "interpreters": [{"type": "hdfs", "displayName": "Files", "buttonName": "Browse", "tooltip": "Files", "page": "/filebrowser/view=%2Fuser%2Fdemo"}, {"type": "tables", "displayName": "Tables", "buttonName": "Browse", "tooltip": "Tables", "page": "/metastore/tables"}, {"type": "yarn", "displayName": "Jobs", "buttonName": "Jobs", "tooltip": "Jobs", "page": "/jobbrowser/"}, {"type": "importer", "displayName": "Importer", "buttonName": "Import", "tooltip": "Importer", "page": "/indexer/importer"}], "interpreter_names": ["hdfs", "tables", "yarn", "importer"]}, "home": {"name": "home", "displayName": "Home", "buttonName": "Documents", "interpreters": [], "page": "/home"}}, "main_button_action": {"name": "MySQL", "type": "mysql", "id": "mysql", "displayName": "MySQL", "buttonName": "Query", "tooltip": "Mysql Query", "optimizer": "off", "page": "/editor/?type=mysql", "is_sql": true, "is_batchable": true, "dialect": "mysql", "dialect_properties": {}}, "button_actions": [{"name": "editor", "displayName": "Editor", "buttonName": "Query", "interpreters": [{"name": "MySQL", "type": "mysql", "id": "mysql", "displayName": "MySQL", "buttonName": "Query", "tooltip": "Mysql Query", "optimizer": "off", "page": "/editor/?type=mysql", "is_sql": true, "is_batchable": true, "dialect": "mysql", "dialect_properties": {}}, {"name": "notebook", "type": "notebook", "displayName": "Notebook", "buttonName": "Notebook", "tooltip": "Notebook", "page": "/notebook", "is_sql": false, "dialect": "notebook"}], "default_limit": 5000, "interpreter_names": ["mysql", "notebook"], "page": "/editor/?type=mysql", "default_sql_interpreter": "mysql"}], "default_sql_interpreter": "mysql", "cluster_type": "direct", "has_computes": false, "hue_config": {"enable_sharing": true, "is_admin": true}, "clusters": [{"id": "default", "name": "default", "type": "direct", "credentials": {}}], "documents": {"types": ["directory", "gist", "query-mysql"]}, "status": 0}
 
 ## File Browsing
 
@@ -321,9 +331,9 @@ We can choose a dialect for `doc_type` e.g. impala, mysql, hive, phoenix, etc.
 
 Hue's [File Browser](https://docs.gethue.com/user/browsing/#data) offer uploads, downloads, operations (create, delete, chmod...) and listing of data in HDFS (hdfs:// or no prefix), S3 (s3a:// prefix), ADLS (adls:// or abfs:// prefixes) storages.
 
-Here is how to list the content of a path, here a S3 bucket `s3a://gethue-demo`:
+Here is how to list the content of a path, here a S3 bucket `s3a://demo-gethue`:
 
-    curl -X GET "https://demo.gethue.com/api/storage/view=s3a://gethue-demo"
+    curl -X GET https://demo.gethue.com/api/storage/view=s3a://demo-gethue
 
     {
       ...........
@@ -337,14 +347,14 @@ Here is how to list the content of a path, here a S3 bucket `s3a://gethue-demo`:
       "group": "",
       "user": "",
       "mtime": null,
-      "path": "s3a://demo-hue",
+      "path": "s3a://demo-gethue",
       "atime": null,
       "mode": 16895
       },
       "name": "demo-hue",
       "mtime": "",
       "rwx": "drwxrwxrwx",
-      "path": "s3a://demo-hue",
+      "path": "s3a://demo-gethue",
       "is_sentry_managed": false,
       "type": "dir",
       "mode": "40777"
@@ -389,7 +399,7 @@ How to get the some of the file content and its stats/metadata.
 
 Example with a S3 file:
 
-    curl -X GET https://demo.gethue.com/api/storage/view=s3a://demo-hue/web_log_data/index_data.csv
+    curl -X GET https://demo.gethue.com/api/storage/view=s3a://demo-gethue/data/web_logs/index_data.csv
 
     {
       "show_download_button": true,
@@ -397,7 +407,7 @@ Example with a S3 file:
       "editable": false,
       "mtime": "October 31, 2016 03:34 PM",
       "rwx": "-rw-rw-rw-",
-      "path": "s3a://demo-hue/web_log_data/index_data.csv",
+      "path": "s3a://demo-gethue/data/web_logs/index_data.csv",
       "stats": {
       "size": 6199593,
       "aclBit": false,
@@ -424,7 +434,7 @@ Specify a path of the file to download:
 
     curl -X GET https://demo.gethue.com/api/storage/download=/user/hue/weblogs.csv
 
-    curl -X GET https://demo.gethue.com/api/storage/download=s3a://demo-hue/web_log_data/index_data.csv
+    curl -X GET https://demo.gethue.com/api/storage/download=s3a://demo-gethue/data/web_logs/index_data.csv
 
 - download: file path from any configured remote file system
 
@@ -432,7 +442,7 @@ Specify a path of the file to download:
 
 Upload a local file to a remote destination folder:
 
-    curl -X POST https://demo.gethue.com/api/storage/upload/file?dest=s3a://demo-hue/web_log_data/ --form hdfs_file=@README.md
+    curl -X POST https://demo.gethue.com/api/storage/upload/file?dest=s3a://demo-gethue/web_log_data/ --form hdfs_file=@README.md
 
 - dest: folder path will be created if it does not exist yet
 - hdfs_file: relative or absolute path to a file. It should be read more like `local_file`, it is not related to HDFS
@@ -445,7 +455,7 @@ We have 2 options here.
 
 - **Remote file**
   + In this option we are choosing a file from HDFS/S3 file system.
-  
+
 
 - **Small Local file**
   + In this option we can choose a file from local file system.
@@ -508,48 +518,13 @@ Get the list of configured [connectors](/administrator/configuration/connectors/
 
 ### Create
 
-How to connect to a HiveServer (dialect=hive) via the SqlAlchemy interface (interface=sqlalchemy):
+First step is to get the config of the connector we want to instantiate. In input we pick a type of connector from the list of above types by specifying its `dialect` and `interface` names.
 
-    curl -X POST https://demo.gethue.com/api/connector/instance/new/hive/sqlalchemy -d '
-    {
-    "connector": {
-        "id": "1",
-        "dialect": "hive",
-        "nice_name": "Hive",
-        "description": "Via SqlAlchemy interface",
-        "category": "editor",
-        "interface": "sqlalchemy",
-        "settings": [
-          {
-            "name": "url",
-            "value": "hive://localhost:10000"
-          },
-          {
-            "name": "has_ssh",
-            "value": false
-          },
-          {
-            "name": "ssh_server_host",
-            "value": "127.0.0.1"
-          }
-        ],
-        "properties": {
-          "is_sql": true,
-          "sql_identifier_quote": "`",
-          "sql_identifier_comment_single": "--",
-          "has_catalog": false,
-          "has_database": true,
-          "has_table": true,
-          "has_live_queries": false,
-          "has_optimizer_risks": true,
-          "has_optimizer_values": true,
-          "has_auto_limit": false,
-          "has_reference_language": true,
-          "has_reference_functions": true,
-          "has_use_statement": true
-        }
-      }
-    }'
+    curl -X POST https://demo.gethue.com/api/connector/instance/new/<DIALECT>/<INTERFACE>
+
+And get back a template that we send to the /update call:
+
+    curl -X POST https://demo.gethue.com/api/connector/instance/new/hive/sqlalchemy -d 'connector={"nice_name":"Hive Docker Local","name":"41","dialect":"hive","interface":"hiveserver2","settings":[{"name":"server_host","value":"localhost"},{"name":"server_port","value":10000},{"name":"is_llap","value":false},{"name":"use_sasl","value":"true"}],"category":"editor","description":"Recommended","dialect_properties":{"is_sql":true,"sql_identifier_quote":"`","sql_identifier_comment_single":"--","has_catalog":false,"has_database":true,"has_table":true,"has_live_queries":false,"has_optimizer_risks":true,"has_optimizer_values":true,"has_auto_limit":false,"has_reference_language":true,"has_reference_functions":true,"has_use_statement":true}}'
 
 ### Get
 
@@ -557,96 +532,23 @@ How to connect to a HiveServer (dialect=hive) via the SqlAlchemy interface (inte
 
 ### Update
 
-    curl -X POST https://demo.gethue.com/api/connector/instance/update -d '
-    {
-    "connector": {
-        "id": "1",
-        "dialect": "hive",
-        "nice_name": "Hive",
-        "description": "Via SqlAlchemy interface",
-        "category": "editor",
-        "interface": "sqlalchemy",
-        "settings": [
-          {
-            "name": "url",
-            "value": "hive://localhost:10000"
-          },
-          {
-            "name": "has_ssh",
-            "value": false
-          },
-          {
-            "name": "ssh_server_host",
-            "value": "127.0.0.1"
-          }
-        ],
-        "properties": {
-          "is_sql": true,
-          "sql_identifier_quote": "`",
-          "sql_identifier_comment_single": "--",
-          "has_catalog": false,
-          "has_database": true,
-          "has_table": true,
-          "has_live_queries": false,
-          "has_optimizer_risks": true,
-          "has_optimizer_values": true,
-          "has_auto_limit": false,
-          "has_reference_language": true,
-          "has_reference_functions": true,
-          "has_use_statement": true
-        }
-      }
-    }'
+This is the same as creating a new connector instance, but as we provide the `id` we will update the existing instance:
+
+    curl -X POST https://demo.gethue.com/api/connector/instance/update -d 'connector={"nice_name":"Hive Docker Local","name":"41","dialect":"hive","interface":"hiveserver2","settings":[{"name":"server_host","value":"localhost"},{"name":"server_port","value":10000},{"name":"is_llap","value":false},{"name":"use_sasl","value":"true"}],"id":"41","category":"editor","description":"Recommended","dialect_properties":{"is_sql":true,"sql_identifier_quote":"`","sql_identifier_comment_single":"--","has_catalog":false,"has_database":true,"has_table":true,"has_live_queries":false,"has_optimizer_risks":true,"has_optimizer_values":true,"has_auto_limit":false,"has_reference_language":true,"has_reference_functions":true,"has_use_statement":true}}'
 
 ### Delete
 
-    curl -X POST 'https://demo.gethue.com/api/connector/instance/delete' -d '{"connector": {"id": "1", "name": "hive"}}'
+    curl -X POST 'https://demo.gethue.com/api/connector/instance/delete' -d '{"connector": {"id": "1"}}'
 
 ### Test
 
-    curl -X POST 'https://demo.gethue.com/api/connector/instance/test/' -d '
-    {
-        "connector": {
-        "id": "1",
-        "dialect": "hive",
-        "nice_name": "Hive",
-        "description": "Via SqlAlchemy interface",
-        "category": "editor",
-        "interface": "sqlalchemy",
-        "settings": [
-          {
-            "name": "url",
-            "value": "hive://localhost:10000"
-          },
-          {
-            "name": "has_ssh",
-            "value": false
-          },
-          {
-            "name": "ssh_server_host",
-            "value": "127.0.0.1"
-          }
-        ],
-        "properties": {
-          "is_sql": true,
-          "sql_identifier_quote": "`",
-          "sql_identifier_comment_single": "--",
-          "has_catalog": false,
-          "has_database": true,
-          "has_table": true,
-          "has_live_queries": false,
-          "has_optimizer_risks": true,
-          "has_optimizer_values": true,
-          "has_auto_limit": false,
-          "has_reference_language": true,
-          "has_reference_functions": true,
-          "has_use_statement": true
-        }
-      }
-    }'
+Check if the connectivity is healthy:
 
+    curl -X POST 'https://demo.gethue.com/api/connector/instance/test/' -d 'connector={"nice_name":"Hive Docker Local","name":"41","dialect":"hive","interface":"hiveserver2","settings":[{"name":"server_host","value":"localhost"},{"name":"server_port","value":10000},{"name":"is_llap","value":false},{"name":"use_sasl","value":"true"}],"id":"41","category":"editor","description":"Recommended","dialect_properties":{"is_sql":true,"sql_identifier_quote":"`","sql_identifier_comment_single":"--","has_catalog":false,"has_database":true,"has_table":true,"has_live_queries":false,"has_optimizer_risks":true,"has_optimizer_values":true,"has_auto_limit":false,"has_reference_language":true,"has_reference_functions":true,"has_use_statement":true}}'
 
 ### Examples
+
+Install or update the connector examples:
 
     curl -X POST https://demo.gethue.com/api/connector/examples/install/
 

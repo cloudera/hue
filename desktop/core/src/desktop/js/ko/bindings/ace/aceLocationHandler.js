@@ -27,7 +27,7 @@ import {
   POST_FROM_SYNTAX_WORKER_EVENT,
   POST_TO_LOCATION_WORKER_EVENT,
   POST_TO_SYNTAX_WORKER_EVENT
-} from 'sql/sqlWorkerHandler';
+} from 'sql/workers/events';
 import stringDistance from 'sql/stringDistance';
 import hueDebug from 'utils/hueDebug';
 import huePubSub from 'utils/huePubSub';

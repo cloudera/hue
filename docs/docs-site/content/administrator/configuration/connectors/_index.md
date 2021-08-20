@@ -9,7 +9,7 @@ weight: 2
 
 ### Config file
 
-Hue connects to any database or warehouse via native or SqlAlchemy connectors that need to be added to the [Hue ini file](/administrator/configuration/). Except [impala] and [beeswax] which have a dedicated section, all the other ones should be appended below the [[interpreters]] of [notebook] e.g.:
+Hue connects to any database or warehouse via native Thrift or SqlAlchemy connectors that need to be added to the [Hue ini file](/administrator/configuration/). Except [impala] and [beeswax] which have a dedicated section, all the other ones should be appended below the [[interpreters]] of [notebook] e.g.:
 
     [notebook]
     [[interpreters]]
@@ -30,9 +30,9 @@ Most of the interpreters require to install their SqlAlchemy dialect (e.g. `./bu
 
 Read about [how to build your own parser](/developer/development/#sql-parsers) if you are looking at better autocompletes for your the SQL dialects you use.
 
-### Connectors UI
+### Connectors
 
-Admins can configure the connectors via the UI. This feature requires Editor v2 and is functional despite requiring a bit more polishing.
+Admins can configure the connectors via the UI or [API](/developer/api/rest/#connectors). This feature requires Editor v2 and is quite functional despite not being offically released and on by default.
 
     [desktop]
     enable_connectors=true
@@ -40,13 +40,13 @@ Admins can configure the connectors via the UI. This feature requires Editor v2 
     [notebook]
     enable_notebook_2=true
 
-**NOTE:** After enabling the above flags, if `django.db.utils.OperationalError: (1054, "Unknown column 'useradmin_huepermission.connector_id' in 'field list'")` error comes, then try **changing the DB name** in the hue.ini under `[[database]]` because there is no upgrade path and run the migrate command `./build/env/bin/hue migrate`.
+**NOTE:** After enabling the above flags, if a `django.db.utils.OperationalError: (1054, "Unknown column 'useradmin_huepermission.connector_id' in 'field list'")` error comes, then try **changing the DB name** in the hue.ini under `[[database]]` because there is no upgrade path and run the migrate command `./build/env/bin/hue migrate`.
 
-Go to `Administer Server` > `Connectors` > `+ Connector` or can directly navigate to `http://127.0.0.1:8000/hue/desktop/connectors`.
+Go to `Administer Server` > `Connectors` > `+ Connector` or directly navigate to the page `http://127.0.0.1:8000/hue/desktop/connectors`.
 
 !["Connectors"](https://cdn.gethue.com/uploads/2020/12/hue-connectors-create.png)
 
-Connectors are also configurable via the public [REST APIs](/developer/api/rest/#connectors).
+Connectors are also configurable via the public [REST API](/developer/api/rest/#connectors).
 
 ## Databases
 
@@ -163,72 +163,54 @@ Alternative:
 
 Presto has been forked into [Trino](#trino) and both share the same configuration.
 
+Currently just substitute 'presto' with 'trino' or vice versa.
+
 ### Trino
 
-Formerly known as PrestoSQL (hence still having 'presto' name in several parameters).
+Fork of PrestoSQL (hence still having 'presto' name in several parameters).
 
-The dialect should be added to the Python system or Hue Python virtual environment:
+Install at least the 0.6.2 version of pyhive from https://github.com/gethue/PyHive or https://github.com/dropbox/PyHive
 
     ./build/env/bin/pip install pyhive
 
-Then give Hue the information about the database source following the `presto://{trino-coordinator}:{port}/{catalog}/{schema}` format:
+Then give Hue the information about the database source following the `trino://{trino-coordinator}:{port}/{catalog}/{schema}` format:
 
     [[[presto]]]
     name = Trino
     interface=sqlalchemy
-    options='{"url": "presto://localhost:8080/tpch/default"}'
+    options='{"url": "trino://localhost:8080/tpch/default"}'
+
+**Note**: keep `[[[presto]]]` if not using the [connectors](/administrator/configuration/connectors/#connectors).
 
 With impersonation:
 
-    options='{"url": "presto://localhost:8080/tpch/default", "has_impersonation": true}'
+    options='{"url": "trino://localhost:8080/tpch/default", "has_impersonation": true}'
 
 With Kerberos:
 
-    options='{"url": "presto://localhost:8080/tpch/default?KerberosKeytabPath=/path/to/keytab&KerberosPrincipal=principal&KerberosRemoteServiceName=service&protocol=https"'
+    options='{"url": "trino://localhost:8080/tpch/default?KerberosKeytabPath=/path/to/keytab&KerberosPrincipal=principal&KerberosRemoteServiceName=service&protocol=https"'
 
 With credentials:
 
-    options='{"url": "presto://username:password@localhost:8080/tpch/default"}'
+    options='{"url": "trino://username:password@localhost:8080/tpch/default"}'
 
 With LDAPS enabled over HTTPS:
 
-    options='{"url": "presto://username:password@localhost:8443/tpch/default","connect_args":"{\"protocol\": \"https\"}"}'
+    options='{"url": "trino://username:password@localhost:8443/tpch/default","connect_args":"{\"protocol\": \"https\"}"}'
 
-Pass Presto Session properties along with HTTPS:
+Pass Trino Session properties along with HTTPS:
 
-    options='{"url": "presto://username:password@localhost:8443/tpch/default","connect_args":"{\"protocol\": \"https\", \"session_props\": {\"query_max_run_time\": \"1m\"}}"}'
+    options='{"url": "trino://username:password@localhost:8443/tpch/default","connect_args":"{\"protocol\": \"https\", \"session_props\": {\"query_max_run_time\": \"1m\"}}"}'
 
-Pass Presto Session Properties without HTTPS enabled:
+Pass Trino Session Properties without HTTPS enabled:
 
-    options='{"url": "presto://username:password@localhost:8080/tpch/default","connect_args":"{\"session_props\": {\"query_max_run_time\": \"1m\"}}"}'
+    options='{"url": "trino://username:password@localhost:8080/tpch/default","connect_args":"{\"session_props\": {\"query_max_run_time\": \"1m\"}}"}'
 
 **Note**
-Hue does not use trino specific dialect of SQLAlchemy which may lead to a *catalog must be specified* error. This can be solved by setting `protocol.v1.alternate-header-name=Presto` in the Trino's configuration. More details about his can be found at [Migrating from PrestoSQL to Trino](https://trino.io/blog/2021/01/04/migrating-from-prestosql-to-trino.html)
+In the past Hue did not use trino specific dialect of SQLAlchemy which may lead to a *catalog must be specified* error. This can be solved by setting `protocol.v1.alternate-header-name=Presto` in the Trino's configuration. More details about his can be found at [Migrating from PrestoSQL to Trino](https://trino.io/blog/2021/01/04/migrating-from-prestosql-to-trino.html)
 
 Also give a try to  https://github.com/dungdm93/sqlalchemy-trino for the 'trino://' and avoiding the [old protocol issue](https://github.com/dropbox/PyHive/issues/378).
 
-Alternative interfaces.
-
-Direct:
-
-    [[[presto]]]
-    name=Trino
-    interface=presto
-    ## Specific options for connecting to the Presto server.
-    ## To connect to Presto over HTTPS/SSL you will need to construct connection string like below:
-    ## "url": "jdbc:presto://localhost:8080/catalog/schema?SSL=true&SSLTrustStorePath=/path/to/key_file&SSLTrustStorePassword=${password}"
-    ## The JDBC driver presto-jdbc.jar need to be in the CLASSPATH environment variable.
-    ## If 'user' and 'password' are omitted, they will be prompted in the UI.
-    options='{"url": "jdbc:presto://localhost:8080/catalog/schema", "driver": "io.prestosql.jdbc.PrestoDriver", "user": "root", "password": "root"}'
-
-JDBC:
-
-The client driver is maintained by the Presto Team and can be downloaded here: https://trino.io/docs/current/installation/jdbc.html
-
-    [[[presto]]]
-    name=Trino JDBC
-    interface=jdbc
-    options='{"url": "jdbc:presto://localhost:8080/", "driver": "io.prestosql.jdbc.PrestoDriver"}'
 
 ### Oracle
 
@@ -1010,8 +992,6 @@ New end points have been added in [HUE-5420](https://issues.cloudera.org/browse/
 ### Azure File Systems
 
 Hue's file browser can now allow users to explore, manage, and upload data in an ADLS v1 or ADLS v2 (ABFS), in addition to HDFS and S3.
-
-Read more about it in the [ADLS User Documentation](/user/browsing#adls-abfs).
 
 In order to add an Azure account to Hue, you'll need to configure Hue with valid Azure credentials, including the client ID, client secret and tenant ID.
 These keys can securely stored in a script that outputs the actual access key and secret key to stdout to be read by Hue (this is similar to how Hue reads password scripts). In order to use script files, add the following section to your hue.ini configuration file:
