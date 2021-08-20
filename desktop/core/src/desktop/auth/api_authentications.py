@@ -54,7 +54,7 @@ class JwtAuthentication(authentication.BaseAuthentication):
         access_token,
         'secret',
         algorithms=["RS256"],
-        verify=AUTH.VERIFY_CUSTOM_JWT.get()
+        verify=AUTH.JWT.VERIFY.get()
       )
     except jwt.DecodeError:
       raise exceptions.AuthenticationFailed('JwtAuthentication: Invalid token')
@@ -79,5 +79,18 @@ class JwtAuthentication(authentication.BaseAuthentication):
     else:
       user.profile.update_data({'jwt_access_token': access_token})
       user.profile.save()
+
+    return (user, None)
+
+
+# for local dev env doesn't have authentication service
+class DummyCustomAuthentication(authentication.BaseAuthentication):
+
+  def authenticate(self, request):
+    LOG.debug('DummyCustomAuthentication: %s' % request.path)
+    user = find_or_create_user(username='hue', password='hue')
+    ensure_has_a_group(user)
+    user = rewrite_user(user)
+    user.is_active = True
 
     return (user, None)

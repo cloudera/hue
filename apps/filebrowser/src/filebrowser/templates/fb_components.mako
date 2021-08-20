@@ -57,14 +57,17 @@ else:
           </li>
         %endif
         <li>
-          <ul id="editBreadcrumb" class="hue-breadcrumbs editable-breadcrumbs" data-bind="foreach: breadcrumbs" style="padding-right:40px; padding-top: 12px" title="${_('Edit path')}">
-            <li data-bind="visible: label.slice(-1) == '/'">
+          <ul id="editBreadcrumb" class="hue-breadcrumbs editable-breadcrumbs" data-bind="foreach: breadcrumbs" style="padding-right:40px; padding-top: 12px" title="${_('Edit path')}"
+            ><li data-bind="visible: label.slice(-1) == '/' && window.RAZ_IS_ENABLED">
+              <span class="divider" data-bind="text: label"></span>
+            </li
+            ><li data-bind="visible: label.slice(-1) == '/' && !window.RAZ_IS_ENABLED">
               <a data-bind="click: show, attr: {'href': '${url('filebrowser:filebrowser.views.view', path=urlencode(''))}' + url}"><span class="divider" data-bind="text: label"></span></a>
-            </li>
-            <li data-bind="visible: label.slice(-1) != '/'">
+            </li
+            ><li data-bind="visible: label.slice(-1) != '/'">
               <a data-bind="text: label, click: show, attr: {'href': '${url('filebrowser:filebrowser.views.view', path=urlencode(''))}' + url}"></a><span class="divider">/</span>
-            </li>
-          </ul>
+            </li
+          ></ul>
           <input id="hueBreadcrumbText" type="text" style="display:none" data-bind="value: currentPath" autocomplete="off" class="input-xxlarge" />
         </li>
         % if is_trash_enabled:

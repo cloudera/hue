@@ -781,7 +781,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
           <div class="card-body">
             % if ENABLE_SCALABLE_INDEXER.get():
             <div class="control-group">
-              <label class="checkbox inline-block" title="${ _('Execute a cluster job to index a large dataset.') }" data-bind="visible: $root.createWizard.source.inputFormat() == 'file'">
+              <label class="checkbox inline-block" title="${ _('Execute a cluster job to index a large dataset.') }" data-bind="visible: (['file', 'localfile'].indexOf($root.createWizard.source.inputFormat()) != -1)">
                 <input type="checkbox" data-bind="checked: indexerRunJob">
                   <!-- ko if: outputFormat() == 'index' -->
                     ${_('Index with a job')}
@@ -1794,7 +1794,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
       });
 
       self.interpreters = ko.pureComputed(function() {
-        return window.getLastKnownConfig().app_config.editor.interpreters.filter(function (interpreter) { return interpreter.is_sql });
+        return window.getLastKnownConfig().app_config.editor.interpreters.filter(function (interpreter) { return interpreter.is_sql && interpreter.dialect != 'phoenix' });
       });
       self.interpreter = ko.observable(vm.sourceType);
       self.interpreter.subscribe(function(val) {
@@ -2346,7 +2346,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
           if (format.value === 'stream-table' && ['stream'].indexOf(wizard.source.inputFormat()) === -1) {
             return false;
           }
-          if (format.value === 'big-table' && ['file'].indexOf(wizard.source.inputFormat()) === -1) {
+          if (format.value === 'big-table' && ['file', 'localfile'].indexOf(wizard.source.inputFormat()) === -1) {
             return false;
           }
           if (format.value === 'hbase' && (wizard.source.inputFormat() !== 'rdbms' || wizard.source.rdbmsAllTablesSelected())) {
@@ -2374,8 +2374,8 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
       self.defaultName = ko.pureComputed(function() {
         var name = '';
 
-        if (wizard.source.inputFormat() === 'file' || wizard.source.inputFormat() === 'stream') {
-          if (self.outputFormat() === 'table') {
+        if (['file', 'stream', 'localfile'].indexOf(wizard.source.inputFormat()) != -1) {
+          if (['table', 'big-table'].indexOf(self.outputFormat()) != -1) {
             name = wizard.prefill.target_path().length > 0 ? wizard.prefill.target_path() : 'default';
 
             if (wizard.source.inputFormat() === 'stream') {
@@ -2385,7 +2385,16 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
                 name += '.' + wizard.source.streamObject();
               }
             } else if (wizard.source.path()) {
-              name += '.' + wizard.source.path().split('/').pop().split('.')[0];
+              const source_path = wizard.source.path();
+              var database_name = name += '.';
+              if (self.outputFormat() === 'big-table' && wizard.prefill.target_path().length === 0) {
+                database_name = '';
+              }
+              if (wizard.source.inputFormat() === 'localfile') {
+                name = database_name + source_path.substring(source_path.lastIndexOf(':') + 1, source_path.lastIndexOf(';')).split('.')[0];
+              } else {
+                name = database_name + source_path.split('/').pop().split('.')[0];
+              }
             }
           } else { // Index
             name = wizard.prefill.target_path().length > 0 ? wizard.prefill.target_path() : wizard.source.path().split('/').pop().split('.')[0];
@@ -2840,7 +2849,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
       };
       self.loadSampleData = function(resp) {
         resp.columns.forEach(function (entry, i, arr) {
-          if (self.destination.outputFormat() === 'table' && self.source.inputFormat() != 'rdbms') {
+          if (['table', 'big-table'].indexOf(self.destination.outputFormat()) != -1 && self.source.inputFormat() != 'rdbms') {
             entry.type = MAPPINGS.get(MAPPINGS.SOLR_TO_HIVE, entry.type, 'string');
           } else if (self.destination.outputFormat() === 'index') {
             entry.type = MAPPINGS.get(MAPPINGS.HIVE_TO_SOLR, entry.type, entry.type);

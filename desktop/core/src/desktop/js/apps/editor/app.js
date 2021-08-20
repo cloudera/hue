@@ -22,7 +22,7 @@ import 'ext/bootstrap-datepicker.min';
 import 'ext/jquery.hotkeys';
 import 'jquery/plugins/jquery.hdfstree';
 
-import sqlWorkerHandler from 'sql/sqlWorkerHandler';
+import { registerHueWorkers } from 'sql/workers/hueWorkerHandler';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import scrollbarWidth from 'utils/screen/scrollbarWidth';
@@ -319,7 +319,7 @@ huePubSub.subscribe('app.dom.loaded', app => {
     ko.applyBindings(viewModel, $(window.EDITOR_BINDABLE_ELEMENT)[0]);
     viewModel.init();
 
-    sqlWorkerHandler.registerWorkers();
+    registerHueWorkers();
 
     viewModel.selectedNotebook.subscribe(newVal => {
       huePubSub.publish('selected.notebook.changed', newVal);
