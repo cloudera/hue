@@ -1,0 +1,21 @@
+Metadata-Version: 2.1
+Name: xlsxreader
+Version: 0.2.0
+Summary: reads .xlsx files
+Home-page: https://github.infra.cloudera.com/michaelbrine/xlsx_to_delim
+Author: Michael Brine
+Author-email: mbrine0@gmail.com
+License: UNKNOWN
+Project-URL: Bug Tracker, https://github.infra.cloudera.com/michaelbrine/xlsx_to_delim
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=2.7
+Description-Content-Type: text/markdown
+License-File: LICENSE
+
+PyPi module that reads .xlsx files
+returns a delimted python tempfile of worksheet in positon 1 in a given .xlsx workbook 
+
+
