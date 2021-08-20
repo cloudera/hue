@@ -21,10 +21,9 @@ The default content type is form data, e.g.:
 
     -H "Content-Type: application/x-www-form-urlencoded" -d 'username=demo&password=demo'
 
-It is possible to submit data in JSON format:
+It is possible to submit data in JSON format for the calls also reading the data via `request.body`:
 
     -H "Content-Type: application/json" -d '{"username": "demo", "password": "demo"}'
-
 
 ### Curl
 
