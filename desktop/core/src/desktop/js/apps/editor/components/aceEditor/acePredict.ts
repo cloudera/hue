@@ -64,7 +64,9 @@ export const attachPredictTypeahead = (
 
   const updatePredictTypeahead = () => {
     if (activePredictPromise) {
-      activePredictPromise.cancel();
+      try {
+        activePredictPromise.cancel();
+      } catch {}
     }
     defer(() => {
       const editorText = editor.getValue();
@@ -76,26 +78,30 @@ export const attachPredictTypeahead = (
       ) {
         removeActivePredict();
       }
-      if (editorText.length && !activePredict) {
-        sqlAnalyzer
-          .predict({
-            beforeCursor: editor.getTextBeforeCursor(),
-            afterCursor: editor.getTextAfterCursor()
-          })
-          .then(({ prediction }) => {
-            if (prediction !== lastPrediction) {
-              const beforeCursor = editor.getTextBeforeCursor();
-              if (prediction && prediction.toLowerCase().startsWith(beforeCursor.toLowerCase())) {
-                setActivePredict(beforeCursor + prediction.slice(beforeCursor.length));
-              } else {
-                removeActivePredict();
+      try {
+        if (editorText.length && !activePredict) {
+          sqlAnalyzer
+            .predict({
+              beforeCursor: editor.getTextBeforeCursor(),
+              afterCursor: editor.getTextAfterCursor()
+            })
+            .then(({ prediction }) => {
+              if (prediction !== lastPrediction) {
+                const beforeCursor = editor.getTextBeforeCursor();
+                if (prediction && prediction.toLowerCase().startsWith(beforeCursor.toLowerCase())) {
+                  setActivePredict(beforeCursor + prediction.slice(beforeCursor.length));
+                } else {
+                  removeActivePredict();
+                }
               }
-            }
-            lastPrediction = prediction;
-          })
-          .catch(() => {
-            removeActivePredict();
-          });
+              lastPrediction = prediction;
+            })
+            .catch(() => {
+              removeActivePredict();
+            });
+        }
+      } catch {
+        removeActivePredict();
       }
     });
   };

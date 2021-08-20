@@ -26,6 +26,7 @@
           :id="id"
           :ace-options="aceOptions"
           :executor="executor"
+          :sql-analyzer-provider="sqlAnalyzerRepository"
           :sql-parser-provider="sqlParserProvider"
           :sql-reference-provider="sqlReferenceProvider"
           @active-statement-changed="onActiveStatementChanged"
@@ -91,6 +92,7 @@
   import { login } from 'api/auth';
   import { setBaseUrl } from 'api/utils';
   import contextCatalog from 'catalog/contextCatalog';
+  import sqlAnalyzerRepository from 'catalog/analyzer/sqlAnalyzerRepository';
   import HueIcons from 'components/icons/HueIcons.vue';
   import HueButton from 'components/HueButton.vue';
   import Spinner from 'components/Spinner.vue';
@@ -264,6 +266,7 @@
         logs,
         logsVisible,
         onActiveStatementChanged,
+        sqlAnalyzerRepository,
         sqlParserProvider,
         sqlReferenceProvider
       };

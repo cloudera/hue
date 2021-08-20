@@ -54,7 +54,7 @@
     ParsedLocation,
     SqlParserProvider
   } from 'parse/types';
-  import { EditorInterpreter } from 'config/types';
+  import { Connector, EditorInterpreter } from 'config/types';
   import { SqlReferenceProvider } from 'sql/reference/types';
   import { hueWindow } from 'types/types';
   import huePubSub from 'utils/huePubSub';
@@ -518,9 +518,10 @@
           e.text = removeUnicodes(e.text);
         };
 
-        if ((<hueWindow>window).ENABLE_PREDICT) {
+        const connector: Connector = executor.value.connector();
+        if (sqlAnalyzerProvider.value && connector.optimizer === 'api') {
           try {
-            attachPredictTypeahead(editor, executor.value.connector(), sqlAnalyzerProvider.value);
+            attachPredictTypeahead(editor, connector, sqlAnalyzerProvider.value);
           } catch (e) {
             console.warn('Failed attaching predict typeahead...');
             console.error(e);
