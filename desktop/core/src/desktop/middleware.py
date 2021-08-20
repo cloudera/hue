@@ -150,7 +150,7 @@ class ClusterMiddleware(MiddlewareMixin):
       else:
         LOG.warning("request.fs user was not set")
     else:
-      LOG.warning("request.fs was not set")
+      LOG.warning("request.fs was not set for anonymous user")
 
     # Deprecated
     request.jt = None
