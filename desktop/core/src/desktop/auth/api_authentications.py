@@ -81,16 +81,3 @@ class JwtAuthentication(authentication.BaseAuthentication):
       user.profile.save()
 
     return (user, None)
-
-
-# for local dev env doesn't have authentication service
-class DummyCustomAuthentication(authentication.BaseAuthentication):
-
-  def authenticate(self, request):
-    LOG.debug('DummyCustomAuthentication: %s' % request.path)
-    user = find_or_create_user(username='hue', password='hue')
-    ensure_has_a_group(user)
-    user = rewrite_user(user)
-    user.is_active = True
-
-    return (user, None)
