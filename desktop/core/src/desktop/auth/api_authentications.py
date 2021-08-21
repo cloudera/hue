@@ -83,8 +83,10 @@ class JwtAuthentication(authentication.BaseAuthentication):
     return (user, None)
 
 
-# for local dev env doesn't have authentication service
 class DummyCustomAuthentication(authentication.BaseAuthentication):
+  """
+  Only for local development environment does not have an external authentication service
+  """
 
   def authenticate(self, request):
     LOG.debug('DummyCustomAuthentication: %s' % request.path)
