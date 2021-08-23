@@ -828,7 +828,7 @@ class AssistDbPanel {
     }
 
     if (this.isStreams) {
-      const connector = findEditorConnector(connector => connector.dialect === 'kafka sql');
+      const connector = findEditorConnector(connector => connector.dialect === 'ksql');
       this.setSingleSource(connector, navigationSettings, true);
       return;
     }
