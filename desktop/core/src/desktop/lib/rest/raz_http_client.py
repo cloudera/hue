@@ -45,12 +45,11 @@ class RazHttpClient(HttpClient):
 
     response = raz_client.get_url(action=http_method, path=url, headers=headers)
 
-    signed_path = path + ('?' if '?' not in url else '&') + response['token']
+    signed_path = url + ('?' if '?' not in url else '&') + response['token']
 
     return super(RazHttpClient, self).execute(
         http_method=http_method,
         path=signed_path,
-        params=params,
         data=data,
         headers=headers,
         allow_redirects=allow_redirects,
