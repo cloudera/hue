@@ -34,20 +34,20 @@ class JwtAuthentication(authentication.BaseAuthentication):
     authorization_header = request.META.get('HTTP_AUTHORIZATION')
 
     if not authorization_header:
-      LOG.debug('JwtAuthentication: no authorization header')
+      LOG.debug('JwtAuthentication: no authorization header from %s' % request.path)
       return None
 
     header, access_token = authorization_header.split(' ')
 
     if header != 'Bearer':
-      LOG.debug('JwtAuthentication: no Bearer header')
+      LOG.debug('JwtAuthentication: no Bearer header from %s' % request.path)
       return None
 
     if not access_token:
-      LOG.debug('JwtAuthentication: no Bearer value')
+      LOG.debug('JwtAuthentication: no Bearer value from %s' % request.path)
       return None
 
-    LOG.debug('JwtAuthentication: got access token %s' % access_token)
+    LOG.debug('JwtAuthentication: got access token from %s: %s' % (request.path, access_token))
 
     try:
       payload = jwt.decode(
