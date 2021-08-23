@@ -150,7 +150,7 @@ class ClusterMiddleware(MiddlewareMixin):
       else:
         LOG.warning("request.fs user was not set")
     else:
-      LOG.warning("request.fs was not set")
+      LOG.warning("request.fs was not set for anonymous user")
 
     # Deprecated
     request.jt = None
@@ -308,7 +308,9 @@ class LoginAndPermissionMiddleware(MiddlewareMixin):
     if request.path in ['/oidc/authenticate/', '/oidc/callback/', '/oidc/logout/', '/hue/oidc_failed/']:
       return None
 
-    if request.path.startswith('/api/'):
+    if AUTH.AUTO_LOGIN_ENABLED.get() and request.path.startswith('/api/token/auth'):
+      pass # allow /api/token/auth can create user or make it active
+    elif request.path.startswith('/api/'):
       return None
 
     # Skip views not requiring login

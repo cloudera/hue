@@ -315,7 +315,7 @@ class SqlAlchemyApi(Api):
 
     if connection:
       cursor = connection['result'].cursor
-      if self.options['url'].startswith('presto://') and cursor and cursor.poll():
+      if (self.options['url'].startswith('presto://') | self.options['url'].startswith('trino://')) and cursor and cursor.poll():
         response['status'] = 'running'
       elif snippet['result']['handle']['has_result_set']:
         response['status'] = 'available'
@@ -330,7 +330,7 @@ class SqlAlchemyApi(Api):
   @query_error_handler
   def progress(self, notebook, snippet, logs=''):
     progress = 50
-    if self.options['url'].startswith('presto://'):
+    if self.options['url'].startswith('presto://') | self.options['url'].startswith('trino://') :
       guid = snippet['result']['handle']['guid']
       handle = CONNECTIONS.get(guid)
       stats = None
