@@ -166,8 +166,7 @@ class RazClient(object):
             return dict([(i.key, i.value) for i in signed_response.signer_generated_headers])
 
   def _make_adls_request(self, request_data, path, resource_path):
-    storage_account = path.netloc.split('.')[0]
-    container, relative_path = resource_path.split('/', 1)
+    container, storage_account = path.netloc.split('.', 1)[0].split('@')
 
     request_data.update({
       "clientType": "adls",
@@ -175,7 +174,7 @@ class RazClient(object):
         "resource": {
           "storageaccount": storage_account,
           "container": container,
-          "relativepath": relative_path,
+          "relativepath": resource_path,
         },
         "resourceOwner": "",
         "action": "read",

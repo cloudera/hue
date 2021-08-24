@@ -102,7 +102,7 @@ class RazClientTest(unittest.TestCase):
     self.raz_token = "mock_RAZ_token"
 
     self.s3_path = 'https://gethue-test.s3.amazonaws.com/gethue/data/customer.csv'
-    self.adls_path = 'https://gethuestorageaccount.blob.core.windows.net/demo-gethue-container/demo-dir1/customer.csv'
+    self.adls_path = 'https://data@gethuedevstorage.dfs.core.windows.net/data/user/sso_hueuser?action=getStatus'
 
   def test_get_raz_client_adls(self):
     with patch('desktop.lib.raz.raz_client.RazToken') as RazToken:
@@ -163,9 +163,9 @@ class RazClientTest(unittest.TestCase):
             'context': {}, 
             'operation': {
               'resource': {
-                'storageaccount': 'gethuestorageaccount', 
-                'container': 'demo-gethue-container', 
-                'relativepath': 'demo-dir1/customer.csv'
+                'storageaccount': 'gethuedevstorage', 
+                'container': 'data', 
+                'relativepath': 'data/user/sso_hueuser'
               }, 
               'resourceOwner': '', 
               'action': 'read', 
