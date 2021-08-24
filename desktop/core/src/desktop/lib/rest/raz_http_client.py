@@ -45,7 +45,9 @@ class RazHttpClient(HttpClient):
 
     response = raz_client.get_url(action=http_method, path=url, headers=headers)
 
-    signed_url = url + ('?' if '?' not in url else '&') + response['token']
+    signed_url = url
+    if response.get('token') is not None:
+      signed_url += ('?' if '?' not in url else '&') + response.get('token')
 
     # Required because `self._make_url` is called in base class execute method also
     signed_path = path + signed_url.partition(path)[2]
