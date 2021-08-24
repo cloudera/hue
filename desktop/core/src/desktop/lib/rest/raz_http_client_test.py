@@ -55,3 +55,21 @@ class TestRazHttpClient():
             clear_cookies=False,
             timeout=120
         )
+
+        # When there is no SAS token in response
+        raz_get_url.return_value = {}
+        client = RazHttpClient(username='test', base_url='https://gethue.blob.core.windows.net')
+        f = client.execute(http_method='GET', path='/gethue/data/customer.csv', params={'action': 'getStatus'})
+
+        raz_http_execute.assert_called_with(
+            http_method='GET',
+            path='/gethue/data/customer.csv?action=getStatus',
+            data=None,
+            headers=None,
+            allow_redirects=False,
+            urlencode=False,
+            files=None,
+            stream=False,
+            clear_cookies=False,
+            timeout=120
+        )
