@@ -18,7 +18,9 @@
 import logging
 import requests
 import jwt
+import json
 
+from cryptography.hazmat.primitives import serialization
 from rest_framework import authentication, exceptions
 
 from desktop.auth.backend import find_or_create_user, ensure_has_a_group, rewrite_user
@@ -50,15 +52,17 @@ class JwtAuthentication(authentication.BaseAuthentication):
 
     LOG.debug('JwtAuthentication: got access token from %s: %s' % (request.path, access_token))
 
-    # Fetch public key
-    token_metadata = jwt.get_unverified_header(access_token)
-    headers = {'kid': token_metadata.get('kid')} if token_metadata.get('kid') is not None else {}
-    public_key = requests.get(AUTH.JWT.KEY_SERVER_URL.get(), headers=headers) if AUTH.JWT.VERIFY.get() else ''
+    # Handle public key
+    public_key_pem = ''
+    if AUTH.JWT.VERIFY.get():
+      jwk = requests.get(AUTH.JWT.KEY_SERVER_URL.get())
+      public_key = jwt.algorithms.RSAAlgorithm.from_jwk(json.dumps(jwk["keys"][0])).public_key()
+      public_key_pem = public_key.public_bytes(encoding=serialization.Encoding.PEM,format=serialization.PublicFormat.SubjectPublicKeyInfo)
 
     try:
       payload = jwt.decode(
         access_token,
-        public_key,
+        public_key_pem,
         algorithms=["RS256"],
         verify=AUTH.JWT.VERIFY.get()
       )

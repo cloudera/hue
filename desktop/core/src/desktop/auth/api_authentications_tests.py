@@ -109,19 +109,52 @@ class TestJwtAuthentication():
 
   def test_check_token_verification_flag(self):
     with patch('desktop.auth.api_authentications.requests.get'):
+      with patch('desktop.auth.api_authentications.jwt.algorithms.RSAAlgorithm.from_jwk'):
 
-      # When verification flag is True for old sample token
-      reset = AUTH.JWT.VERIFY.set_for_testing(True)
-      try:
-        assert_raises(exceptions.AuthenticationFailed, JwtAuthentication().authenticate, self.request)
-      finally:
-        reset()
+        # When verification flag is False
+        reset = AUTH.JWT.VERIFY.set_for_testing(False)
+        try:
+          user, token = JwtAuthentication().authenticate(request=self.request)
 
-      # When verification flag is False
-      reset = AUTH.JWT.VERIFY.set_for_testing(False)
-      try:
-        user, token = JwtAuthentication().authenticate(request=self.request)
+          assert_equal(user, self.user)
+        finally:
+          reset()
 
-        assert_equal(user, self.user)
-      finally:
-        reset()
+  def test_handle_public_key(self):
+    with patch('desktop.auth.api_authentications.requests.get') as key_server_request:
+      with patch('desktop.auth.api_authentications.jwt.decode') as jwt_decode:
+
+        jwt_decode.return_value = {
+          "user": "test_user"
+        }
+        key_server_request.return_value = {
+          "keys": [
+            {
+              "kty": "RSA",
+              "kid": "1",
+              "alg": "RSA256",
+              "n": "rtT3gR0NDIx6gv8xYLiPue_ItaIbognCGGgQbipp3IOuobu2RnJjedsIRBTEOdkVx-xjV6m92VYtrpW6gM9vldwTfI0UmoSLGKT5uYd0JGHvYWoN9inCZYZcnala58T8HDgLiXa9KlEuQxGGQDemB3yf5rgS1OhLBKVsI8bMVgah7xNIiBOWsVeWIEr13Nem8HUuDqgIpL_8TgjxFOqFcdqPCfoIZ89JKEiKbsGbU-lqs1xYChFscI_w7Jc7l6rvf2nsLGMFs3U4ZJvS4AUpVno2e527clXzQisfJKwb4hjfKRMhHfnYfyJxaoHqWfx8DjXmH3CMqlWr_-hL3y1-4Q",
+              "e": "AQAB",
+              "d": "XVj4jcelH_4hq6_1_V6N3wlYcSKM_oeXStDFdQzQWR02MMS5HgQVeQqp7y_nVbvDFWvx3uySoWiSG5V2bzBStAE9plLtnVMHsbDkZVsdeA-ScMDfk3_Ye7yx1ryF_RoAQlDqWAs-FUojGUxSEhekXnr8JYRDCcq9w01P4ApVL9iX9Togk8MFO68vKRykeFC21TGE87-2_ieIMksDf25r-uhYzdN1FCJuzHRaYBUBgBRq82rgno1f1Y9_j8TN30NQtOLr5UtYkH-iKb_wqgocFG9GamEbBzzZW2_BwRhywHm1ciJyiQ_Woikx798HoXlHOEHi8q4G-ay2JUFcbTyAAQ",
+              "p": "5umhRLdRjv30UO53l9gmVs2nUJPD-Uv_vDzx27aemTqaBxjTj_rVo3_KUwunQ4Y9aaaQo9BvlxG-tlmtYuDHYKavxqFQ6Q6jci3OWv2my9515akl5nUWj4SQD9xvve3b7x-nVGRefYmGvscXZU_Ryg1CZ_4FPsfljWwBTo7ggaE",
+              "q": "wdOQhh0NOxj1oI3cod_IQxl-5UjBzRvkm6Yx9r2QyOn2wk60b_ExWA8CrEr-eOSSSc0TMf2Y8vbCjzXSkd2-Gbsz4OOC-AkxY5W4FonLxF8AQabAXeIIfH7qF7Q0ByaZBFFaNQ3ejBunBa5ph0KUrxDrzVf1tcX3b8y8fHIudUE",
+              "dp": "ctEaojtw72PxNsjMaJFOxvytRFClMnGKsMOxEynkBJbx_bNnhwEXd5vUM6Tov5ehM8Zhx0KeKgTlynAe2bqhCLr5Tg_qVmgz91M1d2MGq_pqrw6DTOtNk4E7zNc0LMF4CZe4sSrTHSLkADqotHSTAR_EtEbHvubQiph4seIzWeE",
+              "dq": "q_htG0D9czjC_i-_2PO3OCmP2BkEsloULDF51ST-J_TF1kKEf2mtUScIRRvIyjRqwwYsCMerg66CkxO6_2aRez0IW3kgw7dMVcIJ8h1SaKmtjZJIzUN2Khdk1aEyJEIPs7AGbFog4YjLWRQVV0gwqV9HCAsJ27yIvG4XsgaQx8E",
+              "qi": "lNOWMacUcZtytxeTfeR6OWbqufAp56cICNTZX82JDnoi2KCmyeUERl1tLdYC1giK2lNw5j57ojTigPpyhBdeZ-3NqlJEH8pq6gJXNSpBOWTGzOT_EcW2jaCP4cT8q1Js3pFUynYPdXRU9FG0kdQgNIrDztNZJlPtdFxAVgCM4PY",
+            }
+          ]
+        }
+
+        reset = AUTH.JWT.VERIFY.set_for_testing(True)
+        try:
+          user, token = JwtAuthentication().authenticate(request=self.request)
+
+          jwt_decode.assert_called_with(
+            self.sample_token,
+            b'-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArtT3gR0NDIx6gv8xYLiP\nue/ItaIbognCGGgQbipp3IOuobu2RnJjedsIRBTEOdkVx+xjV6m92VYtrpW6gM9v\nldwTfI0UmoSLGKT5uYd0JGHvYWoN9inCZYZcnala58T8HDgLiXa9KlEuQxGGQDem\nB3yf5rgS1OhLBKVsI8bMVgah7xNIiBOWsVeWIEr13Nem8HUuDqgIpL/8TgjxFOqF\ncdqPCfoIZ89JKEiKbsGbU+lqs1xYChFscI/w7Jc7l6rvf2nsLGMFs3U4ZJvS4AUp\nVno2e527clXzQisfJKwb4hjfKRMhHfnYfyJxaoHqWfx8DjXmH3CMqlWr/+hL3y1+\n4QIDAQAB\n-----END PUBLIC KEY-----\n',
+            algorithms=['RS256'],
+            verify=True
+          )
+          assert_equal(user, self.user)
+        finally:
+          reset()
