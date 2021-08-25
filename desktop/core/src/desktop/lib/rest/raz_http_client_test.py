@@ -16,9 +16,10 @@
 
 import sys
 
-from nose.tools import assert_equal, assert_false, assert_true
+from nose.tools import assert_equal, assert_false, assert_true, assert_raises
 
 from desktop.lib.rest.raz_http_client import RazHttpClient
+from desktop.lib.exceptions_renderable import PopupException
 
 
 if sys.version_info[0] > 2:
@@ -56,20 +57,10 @@ class TestRazHttpClient():
             timeout=120
         )
 
-        # When there is no SAS token in response
-        raz_get_url.return_value = {}
-        client = RazHttpClient(username='test', base_url='https://gethue.blob.core.windows.net')
-        f = client.execute(http_method='GET', path='/gethue/data/customer.csv', params={'action': 'getStatus'})
 
-        raz_http_execute.assert_called_with(
-            http_method='GET',
-            path='/gethue/data/customer.csv?action=getStatus',
-            data=None,
-            headers=None,
-            allow_redirects=False,
-            urlencode=False,
-            files=None,
-            stream=False,
-            clear_cookies=False,
-            timeout=120
-        )
+  def test_no_sas_token_in_response(self):
+    with patch('desktop.lib.rest.raz_http_client.AdlsRazClient.get_url') as raz_get_url:
+      raz_get_url.return_value = {}
+      client = RazHttpClient(username='test', base_url='https://gethue.blob.core.windows.net')
+
+      assert_raises(PopupException, client.execute, http_method='GET', path='/gethue/data/customer.csv', params={'action': 'getStatus'})
