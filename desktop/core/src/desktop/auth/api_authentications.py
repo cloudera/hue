@@ -52,12 +52,9 @@ class JwtAuthentication(authentication.BaseAuthentication):
 
     LOG.debug('JwtAuthentication: got access token from %s: %s' % (request.path, access_token))
 
-    # Handle public key
     public_key_pem = ''
     if AUTH.JWT.VERIFY.get():
-      jwk = requests.get(AUTH.JWT.KEY_SERVER_URL.get())
-      public_key = jwt.algorithms.RSAAlgorithm.from_jwk(json.dumps(jwk["keys"][0])).public_key()
-      public_key_pem = public_key.public_bytes(encoding=serialization.Encoding.PEM,format=serialization.PublicFormat.SubjectPublicKeyInfo)
+      public_key_pem = self._handle_public_key(access_token)
 
     try:
       payload = jwt.decode(
@@ -91,6 +88,19 @@ class JwtAuthentication(authentication.BaseAuthentication):
       user.profile.save()
 
     return (user, None)
+
+  def _handle_public_key(self, access_token):
+    token_metadata = jwt.get_unverified_header(access_token)
+    headers = {'kid': token_metadata.get('kid', {})} 
+
+    if AUTH.JWT.KEY_SERVER_URL.get():
+      jwk = requests.get(AUTH.JWT.KEY_SERVER_URL.get(), headers=headers)
+
+      if jwk.get('keys'):
+        public_key = jwt.algorithms.RSAAlgorithm.from_jwk(json.dumps(jwk["keys"][0])).public_key()
+        public_key_pem = public_key.public_bytes(encoding=serialization.Encoding.PEM, format=serialization.PublicFormat.SubjectPublicKeyInfo)
+
+        return public_key_pem
 
 
 class DummyCustomAuthentication(authentication.BaseAuthentication):
