@@ -102,7 +102,7 @@ class RazClientTest(unittest.TestCase):
     self.raz_token = "mock_RAZ_token"
 
     self.s3_path = 'https://gethue-test.s3.amazonaws.com/gethue/data/customer.csv'
-    self.adls_path = 'https://gethuestorageaccount.blob.core.windows.net/demo-gethue-container/demo-dir1/customer.csv'
+    self.adls_path = 'https://gethuestorageaccount.dfs.core.windows.net/demo-gethue-container/demo-dir1/customer.csv'
 
   def test_get_raz_client_adls(self):
     with patch('desktop.lib.raz.raz_client.RazToken') as RazToken:
@@ -141,7 +141,7 @@ class RazClientTest(unittest.TestCase):
         )
         uuid.return_value = 'mock_request_id'
 
-        client = RazClient(self.raz_url, self.raz_token, username=self.username, service="adls", service_name="adls", cluster_name="cl1")
+        client = RazClient(self.raz_url, self.raz_token, username=self.username, service="adls", service_name="cm_adls", cluster_name="cl1")
 
         resp = client.check_access(method='GET', url=self.adls_path)
 
@@ -151,7 +151,7 @@ class RazClientTest(unittest.TestCase):
           json={
             'requestId': 'mock_request_id', 
             'serviceType': 'adls', 
-            'serviceName': 'adls', 
+            'serviceName': 'cm_adls', 
             'user': 'gethue', 
             'userGroups': [], 
             'clientIpAddress': '', 
@@ -167,7 +167,7 @@ class RazClientTest(unittest.TestCase):
                 'container': 'demo-gethue-container', 
                 'relativepath': 'demo-dir1/customer.csv'
               }, 
-              'resourceOwner': '', 
+              'resourceOwner': 'gethuestorageaccount', 
               'action': 'read', 
               'accessTypes': ['read']
             }
