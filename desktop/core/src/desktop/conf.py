@@ -151,6 +151,9 @@ def is_python2():
   """Hue is running on Python 2."""
   return sys.version_info[0] == 2
 
+def is_jwt_authentication_enabled():
+  """JWT backend flag enabled or backend set in api auth explicitly"""
+  return AUTH.JWT.IS_ENABLED.get() or 'desktop.auth.api_authentications.JwtAuthentication' in AUTH.API_AUTH.get()
 
 USE_CHERRYPY_SERVER = Config(
   key="use_cherrypy_server",
@@ -2058,6 +2061,14 @@ ENABLE_LINK_SHARING = Config(
   type=coerce_bool,
   help=_('Turn on the direct link sharing of saved document.')
 )
+
+USE_THRIFT_HTTP_JWT = Config(
+  key="use_thrift_http_jwt",
+  help=_("Use JWT as Bearer header for authentication when using Thrift over HTTP transport."),
+  type=coerce_bool,
+  dynamic_default=is_jwt_authentication_enabled
+)
+
 DISABLE_LOCAL_STORAGE = Config(
   key='disable_local_storage',
   default="false",

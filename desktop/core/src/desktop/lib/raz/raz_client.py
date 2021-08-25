@@ -177,7 +177,7 @@ class RazClient(object):
           "container": container,
           "relativepath": relative_path,
         },
-        "resourceOwner": "",
+        "resourceOwner": storage_account,
         "action": "read",
         "accessTypes":["read"]
       }
