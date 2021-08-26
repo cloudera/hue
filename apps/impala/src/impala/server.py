@@ -30,7 +30,7 @@ from beeswax.server.hive_server2_lib import HiveServerClient
 
 from ImpalaService import ImpalaHiveServer2Service
 from impala.impala_flags import get_webserver_certificate_file, is_webserver_spnego_enabled, is_kerberos_enabled
-from impala.conf import DAEMON_API_USERNAME, DAEMON_API_PASSWORD, DAEMON_API_AUTH_SCHEME, COORDINATOR_URL
+from impala.conf import DAEMON_API_USERNAME, DAEMON_API_PASSWORD, DAEMON_API_PASSWORD_SCRIPT, DAEMON_API_AUTH_SCHEME, COORDINATOR_URL
 
 if sys.version_info[0] > 2:
   from django.utils.translation import gettext as _
@@ -151,12 +151,16 @@ class ImpalaDaemonApi(object):
     self._thread_local = threading.local()
 
     # You can set username/password for Impala Web UI which overrides kerberos
-    if DAEMON_API_USERNAME.get() is not None and DAEMON_API_PASSWORD.get() is not None:
+    daemon_api_pwd = \
+        (DAEMON_API_PASSWORD.get() if DAEMON_API_PASSWORD.get()
+         is not None else (DAEMON_API_PASSWORD_SCRIPT.get() if DAEMON_API_PASSWORD_SCRIPT.get()
+         is not None else None))
+    if DAEMON_API_USERNAME.get() is not None and daemon_api_pwd is not None:
       if DAEMON_API_AUTH_SCHEME.get().lower() == 'basic':
-        self._client.set_basic_auth(DAEMON_API_USERNAME.get(), DAEMON_API_PASSWORD.get())
+        self._client.set_basic_auth(DAEMON_API_USERNAME.get(), daemon_api_pwd)
         LOG.info("Using username and password for basic authentication")
       else:
-        self._client.set_digest_auth(DAEMON_API_USERNAME.get(), DAEMON_API_PASSWORD.get())
+        self._client.set_digest_auth(DAEMON_API_USERNAME.get(), daemon_api_pwd)
         LOG.info('Using username and password for digest authentication')
     elif self._webserver_spnego_enabled or self._security_enabled:
       self._client.set_kerberos_auth()
