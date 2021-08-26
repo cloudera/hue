@@ -241,7 +241,7 @@ def guess_field_types(request):
         column_row = csv_data[0]
       else:
         sample = csv_data[:4]
-        column_row = ['field_' + str(count+1) for count, col in enumerate(sample[0])] 
+        column_row = ['field_' + str(count+1) for count, col in enumerate(sample[0])]
 
       field_type_guesses = []
       for count, col in enumerate(column_row):
@@ -351,35 +351,6 @@ def guess_field_types(request):
               for col in kafkaFieldNames
           ]
       }
-
-#       data = """%(kafkaFieldNames)s
-# %(data)s""" % {
-#         'kafkaFieldNames': ','.join(kafkaFieldNames),
-#         'data': '\n'.join([','.join(cols) for cols in topics_data])
-#       }
-#       stream = string_io()
-#       stream.write(data)
-
-#       _convert_format(file_format["format"], inverse=True)
-
-#       indexer = MorphlineIndexer(request.user, request.fs)
-
-#       format_ = indexer.guess_field_types({
-#         "file": {
-#             "stream": stream,
-#             "name": file_format['path']
-#         },
-#         "format": file_format['format']
-#       })
-#       type_mapping = dict(
-#         list(
-#           zip(kafkaFieldNames, kafkaFieldTypes)
-#         )
-#       )
-
-#       for col in format_['columns']:
-#         col['keyType'] = type_mapping[col['name']]
-#         col['type'] = type_mapping[col['name']]
     elif file_format['streamSelection'] == 'flume':
       if 'hue-httpd/access_log' in file_format['channelSourcePath']:
         columns = [
@@ -483,7 +454,7 @@ def importer_submit(request):
           source,
           destination, index_name
       )
-  elif source['inputFormat'] in ('stream', 'connector') or destination['ouputFormat'] == 'stream':
+  elif destination['ouputFormat'] == 'stream-table':
     args = {
       'source': source,
       'destination': destination,
@@ -553,6 +524,7 @@ def importer_submit(request):
         start_time
       )
     else:
+      # TODO: if inputFormat is 'stream' and tableFormat is 'kudu' --> create Table only
       job_handle = _create_table(
         request,
         source,
@@ -741,9 +713,9 @@ def save_pipeline(request):
 
 
 def upload_local_file_drag_and_drop(request):
-
   response = {'status': -1, 'data': ''}
   form = UploadLocalFileForm(request.POST, request.FILES)
+
   if form.is_valid():
     resp = upload_local_file(request)
     json_data = json.loads(resp.content)
@@ -756,10 +728,10 @@ def upload_local_file_drag_and_drop(request):
 
 
 def upload_local_file(request):
-
   upload_file = request.FILES['file']
   username = request.user.username
   filename = "%s_%s:%s;" % (username, uuid.uuid4(), upload_file.name)
+
   temp_file = tempfile.NamedTemporaryFile(prefix=filename, suffix='.csv', delete=False)
   temp_file.write(upload_file.read())
   local_file_url = temp_file.name

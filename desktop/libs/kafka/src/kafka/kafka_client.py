@@ -85,3 +85,31 @@ class KafkaApi(object):
       })
     except RestException as e:
       raise KafkaApiException(e)
+
+
+class SchemaRegistryApi(object):
+  """
+  https://github.com/confluentinc/schema-registry
+  """
+
+  def __init__(self, user=None, security_enabled=False, ssl_cert_ca_verify=False):
+    self._api_url = KAFKA.SCHEMA_REGISTRY_API_URL.get().strip('/') if KAFKA.SCHEMA_REGISTRY_API_URL.get() else ''
+
+    self.user = user
+    self._client = HttpClient(self._api_url, logger=LOG)
+    self._root = Resource(self._client)
+
+
+  def subjects(self):
+    try:
+      response = self._root.get('subjects')
+      return json.loads(response)
+    except RestException as e:
+      raise KafkaApiException(e)
+
+  def subject(self, name):
+    try:
+      response = self._root.get('subjects/%s/versions/latest' % name)
+      return json.loads(response)
+    except RestException as e:
+      raise KafkaApiException(e)
