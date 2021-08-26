@@ -40,15 +40,15 @@ class TestRazHttpClient():
         raz_http_execute.return_value = 'my_file_content'
 
         client = RazHttpClient(username='test', base_url='https://gethue.blob.core.windows.net')
-        f = client.execute(http_method='GET', path='/gethue/data/customer.csv', params={'action': 'getStatus'})
+        f = client.execute(http_method='GET', path='/gethue/data/customer.csv', params={'action': 'getStatus'}, headers={"x-ms-version" : "2019-12-12"})
 
         assert_equal('my_file_content', f)
-        raz_get_url.assert_called_with(action='GET', path='https://gethue.blob.core.windows.net/gethue/data/customer.csv?action=getStatus', headers=None)
+        raz_get_url.assert_called_with(action='GET', path='https://gethue.blob.core.windows.net/gethue/data/customer.csv?action=getStatus', headers={"x-ms-version" : "2019-12-12"})
         raz_http_execute.assert_called_with(
             http_method='GET',
             path='/gethue/data/customer.csv?action=getStatus&sv=2014-02-14&sr=b&sig=pJL%2FWyed41tptiwBM5ymYre4qF8wzrO05tS5MCjkutc%3D&st=2015-01-02T01%3A40%3A51Z&se=2015-01-02T02%3A00%3A51Z&sp=r',
             data=None,
-            headers=None,
+            headers={"x-ms-version" : "2019-12-12"},
             allow_redirects=False,
             urlencode=False,
             files=None,
