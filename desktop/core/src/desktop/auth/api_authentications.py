@@ -94,11 +94,13 @@ class JwtAuthentication(authentication.BaseAuthentication):
     headers = {'kid': token_metadata.get('kid', {})} 
 
     if AUTH.JWT.KEY_SERVER_URL.get():
-      jwk = requests.get(AUTH.JWT.KEY_SERVER_URL.get(), headers=headers)
+      response = requests.get(AUTH.JWT.KEY_SERVER_URL.get(), headers=headers)
+      jwk = json.loads(response.content)
 
       if jwk.get('keys'):
         public_key = jwt.algorithms.RSAAlgorithm.from_jwk(json.dumps(jwk["keys"][0])).public_key()
-        public_key_pem = public_key.public_bytes(encoding=serialization.Encoding.PEM, format=serialization.PublicFormat.SubjectPublicKeyInfo)
+        public_key_pem = public_key.public_bytes(encoding=serialization.Encoding.PEM,
+                                                 format=serialization.PublicFormat.SubjectPublicKeyInfo)
 
         return public_key_pem
 
