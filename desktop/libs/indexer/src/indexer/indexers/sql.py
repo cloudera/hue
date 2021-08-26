@@ -87,7 +87,7 @@ class SQLIndexer(object):
     is_transactional = destination['isTransactional']
     default_transactional_type = 'insert_only' if destination['isInsertOnly'] else 'default'
 
-    skip_header = destination['hasHeader']
+    skip_header = destination.get('hasHeader')
 
     primary_keys = destination['primaryKeys']
 
