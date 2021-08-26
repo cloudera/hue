@@ -553,7 +553,10 @@ def load_table(request, database, table):
         }
         query_history = db.load_data(database, table.name, form_data, design, generate_ddl_only=generate_ddl_only)
         if generate_ddl_only:
-          last_executed = json.loads(request.POST.get('start_time'), '-1')
+          if sys.version_info[0] > 2:
+            last_executed = json.loads(request.POST.get('start_time'))
+          else:
+            last_executed = json.loads(request.POST.get('start_time'), '-1')
           job = make_notebook(
             name=_('Load data in %s.%s') % (database, table.name),
             editor_type=source_type,
@@ -590,7 +593,10 @@ def load_table(request, database, table):
            'database': database,
            'app_name': 'beeswax'
        }, force_template=True).content
-    response['data'] = popup
+    if sys.version_info[0] > 2:
+      response['data'] = popup.decode()
+    else:
+      response['data'] = popup
 
   return JsonResponse(response)
 
