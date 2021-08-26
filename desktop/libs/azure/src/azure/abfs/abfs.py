@@ -134,7 +134,7 @@ class ABFS(object):
 
   def _getheaders(self):
     headers = {
-      "x-ms-version" : "2019-02-02" # Note: this is required for setaccesscontrols
+      "x-ms-version": "2019-12-12" # For latest SAS support
     }
 
     if self._token_type and self._access_token:
