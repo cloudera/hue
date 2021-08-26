@@ -522,11 +522,7 @@ unittest frameworks, or you can just name your method with the word "test" at a 
 
 To run the unit tests (should take 5-10 minutes):
 
-    build/env/bin/hue test fast
-
-To run all the tests (unit and integration), use:
-
-    build/env/bin/hue test all
+    build/env/bin/hue test unit --with-xunit --with-cover
 
 To run only tests of a particular app, use:
 
@@ -549,6 +545,10 @@ e.g.
 To run a specific test in a class, use:
 
     build/env/bin/hue test specific <app><module>:<class><test_func>
+
+To run all the tests (unit and integration, will require some live clusters or services), use:
+
+    build/env/bin/hue test all
 
 Note:
 
