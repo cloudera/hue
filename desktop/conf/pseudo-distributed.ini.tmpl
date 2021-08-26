@@ -2120,12 +2120,18 @@
 
 [kafka]
 
-  [[kafka]]
-    # Enable the Kafka integration.
-    ## is_enabled=false
+[[kafka]]
+# Enable the Kafka integration.
+## is_enabled=false
 
-    # Base URL of Kafka Ksql API.
-    ## ksql_api_url=http://127.0.0.1:8088
+# URL of Kafka REST API.
+## api_url=http://localhost:8082
+
+# URL of Kafka Ksql API.
+## ksql_api_url=http://localhost:8088
+
+# URL of Schema Registry API.
+## schema_registry_api_url=http://localhost:8081
 
 
 ###########################################################################
