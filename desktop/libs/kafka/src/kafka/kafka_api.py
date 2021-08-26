@@ -26,7 +26,7 @@ from metadata.manager_client import ManagerApi
 from notebook.models import _get_notebook_api
 
 from kafka.conf import has_kafka_api
-from kafka.kafka_client import KafkaApi, KafkaApiException
+from kafka.kafka_client import KafkaApi, KafkaApiException, SchemaRegistryApi
 
 if sys.version_info[0] > 2:
   from django.utils.translation import gettext as _
@@ -111,7 +111,7 @@ def get_topics(user):
       'database': 'topics'
     }
 
-    from desktop.api_public import _get_interpreter_from_dialect   # due to a circular import
+    from desktop.api_public import _get_interpreter_from_dialect  # Avoid circular import
     interpreter = _get_interpreter_from_dialect('ksql', user)
     api = _get_notebook_api(user, connector_id=interpreter['type'])
 
@@ -123,12 +123,30 @@ def get_topics(user):
 
 
 def get_topic_data(user, name):
-  from desktop.api_public import _get_interpreter_from_dialect   # due to a circular import
-  interpreter = _get_interpreter_from_dialect('ksql', user)
-  api = _get_notebook_api(user, connector_id=interpreter['type'])
+  if has_kafka_api():
+    print(
+      SchemaRegistryApi().subjects()
+    )
+    print(
+      SchemaRegistryApi().subject(name='Kafka-value')
+    )
+    data = {
+      'full_headers': [{'name': 'message', 'type': 'string'}],
+      'rows': [
+        ['This is rider 894 and I am at 38.1952, -123.1723'],
+        ['This is rider 98 and I am at 39.2531, -121.9547'],
+        ['This is rider 564 and I am at 22.3431, -111.7670']
+      ]
+    }
+  else:
+    from desktop.api_public import _get_interpreter_from_dialect  # Avoid circular import
+    interpreter = _get_interpreter_from_dialect('ksql', user)
+    api = _get_notebook_api(user, connector_id=interpreter['type'])
 
-  data = api.get_sample_data(snippet={})
+    data = api.get_sample_data(snippet={})
+
   print(data)
+
   return data
 
 
