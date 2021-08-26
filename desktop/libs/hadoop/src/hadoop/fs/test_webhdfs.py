@@ -583,33 +583,35 @@ class WebhdfsTests(unittest.TestCase):
   def test_check_access(self):
     # Set user to owner
     self.cluster.fs.setuser('test')
-    assert_equals(b'' if sys.version_info[0] > 2 else '', self.cluster.fs.check_access(path='/user/test', aclspec='rw-'))  # returns zero-length content
+    assert_equals(b'' if sys.version_info[0] > 2 else '',
+                  self.cluster.fs.check_access(path='/user/test', aclspec='rw-'))  # returns zero-length content
 
     # Set user to superuser
     self.cluster.fs.setuser(self.cluster.superuser)
-    assert_equals(b'' if sys.version_info[0] > 2 else '', self.cluster.fs.check_access(path='/user/test', aclspec='rw-'))  # returns zero-length content
+    assert_equals(b'' if sys.version_info[0] > 2 else '',
+                  self.cluster.fs.check_access(path='/user/test', aclspec='rw-'))  # returns zero-length content
 
     # Set user to non-authorized, non-superuser user
     self.cluster.fs.setuser('nonadmin')
     assert_raises(WebHdfsException, self.cluster.fs.check_access, path='/user/test', aclspec='rw-')
-    
+
   def test_list(self):
     test_file = self.prefix + "/fortest.txt"
     test_dir = self.prefix + "/temp2"
     f = self.cluster.fs.open(test_file, "w")
     f.write("ok")
     f.close()
-    
+
     resp = self.cluster.fs.listdir(self.prefix)
     LOG.debug("%s" % resp)
-    
+
     test_dir = self.prefix + "/temp2"
     self.cluster.fs.mkdir(test_dir, 0o333)
     test_file2 = test_dir + "/fortest.txt"
     f = self.cluster.fs.open(test_file2, "w")
     f.write("ok")
     f.close()
-    
+
     resp = self.cluster.fs.listdir(self.prefix)
     LOG.debug("%s" % resp)
     resp = self.cluster.fs.listdir_stats(self.prefix)
