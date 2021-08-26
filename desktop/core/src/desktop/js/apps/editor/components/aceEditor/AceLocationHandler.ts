@@ -66,7 +66,7 @@ const VERIFY_LIMIT = 50;
 const VERIFY_DELAY = 50;
 
 const EXPAND_STAR_LABEL = I18n('Right-click to expand with columns');
-const CONTEXT_TOOLTIP_LABEL = I18n('Right-click to expand with columns');
+const CONTEXT_TOOLTIP_LABEL = I18n('Right-click for details');
 
 const isPointInside = (parseLocation: ParsedLocation, editorPosition: Ace.Position) => {
   const row = editorPosition.row + 1; // ace positioning has 0 based rows while the parser has 1
