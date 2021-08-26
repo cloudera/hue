@@ -308,7 +308,11 @@ class SQLIndexer(object):
     source_type = source['sourceType']
     editor_type = destination['sourceType']
 
-    columns = destination['columns']
+    cols_to_remove = sorted(
+      [col_index for col_index, col in enumerate(destination['columns']) if not col['keep']],
+      reverse=True
+    )
+    columns = [col for col_index, col in enumerate(destination['columns']) if col_index not in cols_to_remove]
 
     dialect = get_interpreter(source_type, self.user)['dialect']
 
@@ -344,6 +348,8 @@ class SQLIndexer(object):
         for count, row in enumerate(reader):
           if (source['format']['hasHeader'] and count == 0) or not row:
             continue
+          for col_index in cols_to_remove:
+            del row[col_index]
           if dialect == 'impala':                         # for the boolean col updating csv_val to (1,0)
             row = self.nomalize_booleans(row, columns)
           _csv_rows.append(tuple(row))
@@ -364,7 +370,8 @@ class SQLIndexer(object):
               else '  CAST ( CAST ( `%(name)s` AS TINYINT ) AS boolean ) `%(name)s`' % col for col in columns
             ])
 
-            sql += '''\nINSERT INTO %(database)s.%(table_name)s_tmp VALUES %(csv_rows)s;\n\nCREATE TABLE IF NOT EXISTS %(database)s.%(table_name)s
+            sql += '''\nINSERT INTO %(database)s.%(table_name)s_tmp VALUES %(csv_rows)s;\n
+CREATE TABLE IF NOT EXISTS %(database)s.%(table_name)s
 AS SELECT\n%(sql_)s\nFROM  %(database)s.%(table_name)s_tmp;\n\nDROP TABLE IF EXISTS %(database)s.%(table_name)s_tmp;'''% {
               'database': database,
               'table_name': table_name,
