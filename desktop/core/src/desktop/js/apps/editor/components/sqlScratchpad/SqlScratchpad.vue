@@ -19,7 +19,7 @@
 <template>
   <div class="sql-scratchpad">
     <HueIcons />
-    <Spinner v-if="loading" spin="true" />
+    <Spinner v-if="loading" :spin="true" />
     <div v-if="!loading && executor" class="sql-scratchpad-container">
       <div class="sql-scratchpad-editor">
         <AceEditor

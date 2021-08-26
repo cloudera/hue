@@ -797,20 +797,20 @@ def test_create_table_from_local():
     destination = {
       'name': 'default.test1',
       'columns': [
-        {'name': 'date', 'type': 'timestamp'},
-        {'name': 'hour', 'type': 'bigint'},
-        {'name': 'minute', 'type': 'bigint'},
-        {'name': 'dep', 'type': 'bigint'},
-        {'name': 'arr', 'type': 'bigint'},
-        {'name': 'dep_delay', 'type': 'bigint'},
-        {'name': 'arr_delay', 'type': 'bigint'},
-        {'name': 'carrier', 'type': 'string'},
-        {'name': 'flight', 'type': 'bigint'},
-        {'name': 'dest', 'type': 'string'},
-        {'name': 'plane', 'type': 'string'},
-        {'name': 'cancelled', 'type': 'boolean'},
-        {'name': 'time', 'type': 'bigint'},
-        {'name': 'dist', 'type': 'bigint'},
+        {'name': 'date', 'type': 'timestamp', 'keep': True},
+        {'name': 'hour', 'type': 'bigint', 'keep': True},
+        {'name': 'minute', 'type': 'bigint', 'keep': True},
+        {'name': 'dep', 'type': 'bigint', 'keep': True},
+        {'name': 'arr', 'type': 'bigint', 'keep': True},
+        {'name': 'dep_delay', 'type': 'bigint', 'keep': True},
+        {'name': 'arr_delay', 'type': 'bigint', 'keep': True},
+        {'name': 'carrier', 'type': 'string', 'keep': True},
+        {'name': 'flight', 'type': 'bigint', 'keep': True},
+        {'name': 'dest', 'type': 'string', 'keep': True},
+        {'name': 'plane', 'type': 'string', 'keep': True},
+        {'name': 'cancelled', 'type': 'boolean', 'keep': True},
+        {'name': 'time', 'type': 'bigint', 'keep': True},
+        {'name': 'dist', 'type': 'bigint', 'keep': True},
       ],
       'indexerPrimaryKey': [],
       'sourceType': 'hive'
@@ -849,9 +849,9 @@ def test_create_table_from_local_mysql():
     destination = {
       'name': 'default.test1',
       'columns': [
-        {'name': 'field_1', 'type': 'string'},
-        {'name': 'field_2', 'type': 'string'},
-        {'name': 'field_3', 'type': 'bigint'},
+        {'name': 'field_1', 'type': 'string', 'keep': True},
+        {'name': 'field_2', 'type': 'string', 'keep': True},
+        {'name': 'field_3', 'type': 'bigint', 'keep': True},
       ],
       'sourceType': 'mysql'
     }
@@ -883,20 +883,20 @@ def test_create_table_from_local_impala():
     destination = {
       'name': 'default.test1',
       'columns': [
-        {'name': 'date', 'type': 'timestamp'},
-        {'name': 'hour', 'type': 'bigint'},
-        {'name': 'minute', 'type': 'bigint'},
-        {'name': 'dep', 'type': 'bigint'},
-        {'name': 'arr', 'type': 'bigint'},
-        {'name': 'dep_delay', 'type': 'bigint'},
-        {'name': 'arr_delay', 'type': 'bigint'},
-        {'name': 'carrier', 'type': 'string'},
-        {'name': 'flight', 'type': 'bigint'},
-        {'name': 'dest', 'type': 'string'},
-        {'name': 'plane', 'type': 'string'},
-        {'name': 'cancelled', 'type': 'boolean'},
-        {'name': 'time', 'type': 'bigint'},
-        {'name': 'dist', 'type': 'bigint'},
+        {'name': 'date', 'type': 'timestamp', 'keep': True},
+        {'name': 'hour', 'type': 'bigint', 'keep': True},
+        {'name': 'minute', 'type': 'bigint', 'keep': True},
+        {'name': 'dep', 'type': 'bigint', 'keep': True},
+        {'name': 'arr', 'type': 'bigint', 'keep': True},
+        {'name': 'dep_delay', 'type': 'bigint', 'keep': True},
+        {'name': 'arr_delay', 'type': 'bigint', 'keep': True},
+        {'name': 'carrier', 'type': 'string', 'keep': True},
+        {'name': 'flight', 'type': 'bigint', 'keep': True},
+        {'name': 'dest', 'type': 'string', 'keep': True},
+        {'name': 'plane', 'type': 'string', 'keep': True},
+        {'name': 'cancelled', 'type': 'boolean', 'keep': True},
+        {'name': 'time', 'type': 'bigint', 'keep': True},
+        {'name': 'dist', 'type': 'bigint', 'keep': True},
       ],
       'sourceType': 'impala'
     }
@@ -950,5 +950,35 @@ AS SELECT
 FROM  default.test1_tmp;
 
 DROP TABLE IF EXISTS default.test1_tmp;'''
+
+    assert_equal(statement, sql)
+
+
+def test_create_table_with_drop_column_from_local():
+  with patch('indexer.indexers.sql.get_interpreter') as get_interpreter:
+    get_interpreter.return_value = {'Name': 'Hive', 'dialect': 'hive'}
+    source = {
+      'path': '',
+      'sourceType': 'hive'
+    }
+    destination = {
+      'name': 'default.test1',
+      'columns': [
+        {'name': 'date', 'type': 'timestamp', 'keep': False},
+        {'name': 'hour', 'type': 'bigint', 'keep': True},
+        {'name': 'minute', 'type': 'bigint', 'keep': False},
+        {'name': 'dep', 'type': 'bigint', 'keep': True},
+        {'name': 'arr', 'type': 'bigint', 'keep': False},
+      ],
+      'indexerPrimaryKey': [],
+      'sourceType': 'hive'
+    }
+    sql = SQLIndexer(user=Mock(), fs=Mock()).create_table_from_local_file(source, destination).get_str()
+
+    statement = '''USE default;
+
+CREATE TABLE IF NOT EXISTS default.test1 (
+  `hour` bigint,
+  `dep` bigint);'''
 
     assert_equal(statement, sql)

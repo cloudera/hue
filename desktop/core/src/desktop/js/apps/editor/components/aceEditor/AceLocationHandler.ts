@@ -66,7 +66,7 @@ const VERIFY_LIMIT = 50;
 const VERIFY_DELAY = 50;
 
 const EXPAND_STAR_LABEL = I18n('Right-click to expand with columns');
-const CONTEXT_TOOLTIP_LABEL = I18n('Right-click to expand with columns');
+const CONTEXT_TOOLTIP_LABEL = I18n('Right-click for details');
 
 const isPointInside = (parseLocation: ParsedLocation, editorPosition: Ace.Position) => {
   const row = editorPosition.row + 1; // ace positioning has 0 based rows while the parser has 1
@@ -102,10 +102,13 @@ const equalPositions = (editorPositionOne: Ace.Position, editorPositionTwo: Ace.
   editorPositionOne.row === editorPositionTwo.row &&
   editorPositionOne.column === editorPositionTwo.column;
 
+export type ActiveLocationHighlighting = 'error' | 'all';
+
 export default class AceLocationHandler implements Disposable {
   editor: Ace.Editor;
   editorId: string;
   executor: Executor;
+  activeLocationHighlighting: ActiveLocationHighlighting;
   temporaryOnly: boolean;
 
   subTracker: SubscriptionTracker = new SubscriptionTracker();
@@ -127,12 +130,14 @@ export default class AceLocationHandler implements Disposable {
     editor: Ace.Editor;
     editorId: string;
     executor: Executor;
+    activeLocationHighlighting?: ActiveLocationHighlighting;
     temporaryOnly?: boolean;
     sqlReferenceProvider?: SqlReferenceProvider;
   }) {
     this.editor = options.editor;
     this.editorId = options.editorId;
     this.executor = options.executor;
+    this.activeLocationHighlighting = options.activeLocationHighlighting || 'all';
     this.temporaryOnly = !!options.temporaryOnly;
     this.sqlReferenceProvider = options.sqlReferenceProvider;
 
@@ -251,6 +256,7 @@ export default class AceLocationHandler implements Disposable {
         if (endTestPosition.column !== pointerPosition.column) {
           const token = this.editor.session.getTokenAt(pointerPosition.row, pointerPosition.column);
           if (
+            this.activeLocationHighlighting === 'all' &&
             token !== null &&
             !token.notFound &&
             token.parseLocation &&
@@ -375,6 +381,7 @@ export default class AceLocationHandler implements Disposable {
           if (lastHoveredToken !== token) {
             clearActiveMarkers();
             if (
+              this.activeLocationHighlighting === 'all' &&
               token !== null &&
               !token.notFound &&
               token.parseLocation &&
@@ -439,7 +446,10 @@ export default class AceLocationHandler implements Disposable {
         ) {
           let range: Ace.Range | undefined = undefined;
 
-          if (token.parseLocation) {
+          if (
+            token.parseLocation &&
+            (this.activeLocationHighlighting === 'all' || token.notFound)
+          ) {
             range = markLocation(token.parseLocation);
           } else if (token.syntaxError) {
             range = new AceRange(

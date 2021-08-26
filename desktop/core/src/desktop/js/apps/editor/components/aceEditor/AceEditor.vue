@@ -42,7 +42,10 @@
   import AceSyntaxDropdown from './AceSyntaxDropdown.vue';
   import AceAutocomplete from './autocomplete/AceAutocomplete.vue';
   import AceGutterHandler from './AceGutterHandler';
-  import AceLocationHandler, { ACTIVE_STATEMENT_CHANGED_EVENT } from './AceLocationHandler';
+  import AceLocationHandler, {
+    ACTIVE_STATEMENT_CHANGED_EVENT,
+    ActiveLocationHighlighting
+  } from './AceLocationHandler';
   import { EXECUTE_ACTIVE_EXECUTABLE_TOPIC } from '../events';
   import { formatSql } from 'apps/editor/api';
   import Executor from 'apps/editor/execution/executor';
@@ -95,6 +98,11 @@
         type: Object as PropType<Executor>,
         required: true
       },
+      activeLocationHighlighting: {
+        type: String as () => ActiveLocationHighlighting,
+        required: false,
+        default: () => 'all'
+      },
       aceOptions: {
         type: Object as PropType<Ace.Options>,
         required: false,
@@ -129,6 +137,7 @@
         sqlReferenceProvider,
         executor,
         initialCursorPosition,
+        activeLocationHighlighting,
         sqlParserProvider,
         initialValue,
         aceOptions
@@ -426,6 +435,7 @@
           editor,
           editorId: id.value,
           executor: executor.value as Executor,
+          activeLocationHighlighting: activeLocationHighlighting.value,
           sqlReferenceProvider: sqlReferenceProvider.value
         });
         subTracker.addDisposable(aceLocationHandler);
