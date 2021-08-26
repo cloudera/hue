@@ -23,11 +23,7 @@ import { SqlAnalyzer, SqlAnalyzerProvider, SqlAnalyzerMode } from './types';
 const sqlAnalyzerInstances: { [connectorId: string]: SqlAnalyzer | undefined } = {};
 
 const createSqlAnalyzer = (connector: Connector): SqlAnalyzer => {
-  // TODO: Remove window.SQL_ANALYZER_MODE and hardcoded { optimizer: 'api' } when 'connector.optimizer_mode' works.
-  if (
-    (<hueWindow>window).SQL_ANALYZER_MODE === SqlAnalyzerMode.local ||
-    (<hueWindow>window).SQL_ANALYZER_MODE === SqlAnalyzerMode.api
-  ) {
+  if (connector.optimizer === 'api') {
     return new CombinedSqlAnalyser(connector);
   }
   return new NoopSqlAnalyzer();
