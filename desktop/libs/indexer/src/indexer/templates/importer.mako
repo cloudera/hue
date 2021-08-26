@@ -1167,7 +1167,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
 
       <span data-bind="visible: showProperties">
         <input type="text" class="input-medium margin-left-5" placeholder="${ _('Field comment') }" data-bind="value: comment">
-        <label class="checkbox" data-bind="visible: $root.createWizard.destination.tableFormat() == 'kudu'">
+        <label class="checkbox" data-bind="visible: $root.createWizard.destination.tableFormat() == 'kudu' || $root.createWizard.source.inputFormat() == 'localfile'">
           <input type="checkbox" data-bind="checked: keep"> ${_('Keep')}
         </label>
       </span>
