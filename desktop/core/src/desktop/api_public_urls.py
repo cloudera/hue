@@ -129,15 +129,15 @@ urlpatterns += [
 ]
 
 urlpatterns += [
-  re_path(r'^api/optimizer/top_databases/?$', api_public.top_databases, name='top_databases'),
-  re_path(r'^api/optimizer/top_tables/?$', api_public.top_tables, name='top_tables'),
-  re_path(r'^api/optimizer/top_columns/?$', api_public.top_columns, name='top_columns'),
-  re_path(r'^api/optimizer/top_joins/?$', api_public.top_joins, name='top_joins'),
-  re_path(r'^api/optimizer/top_filters/?$', api_public.top_filters, name='top_filters'),
-  re_path(r'^api/optimizer/top_aggs/?$', api_public.top_aggs, name='top_aggs'),
+  re_path(r'^optimizer/top_databases/?$', api_public.top_databases, name='optimizer_top_databases'),
+  re_path(r'^optimizer/top_tables/?$', api_public.top_tables, name='optimizer_top_tables'),
+  re_path(r'^optimizer/top_columns/?$', api_public.top_columns, name='optimizer_top_columns'),
+  re_path(r'^optimizer/top_joins/?$', api_public.top_joins, name='optimizer_top_joins'),
+  re_path(r'^optimizer/top_filters/?$', api_public.top_filters, name='optimizer_top_filters'),
+  re_path(r'^optimizer/top_aggs/?$', api_public.top_aggs, name='optimizer_top_aggs'),
 
-  re_path(r'^api/optimizer/query_risk/?$', api_public.query_risk, name='query_risk'),
-  re_path(r'^api/optimizer/predict/?$', api_public.predict, name='predict'),
-  re_path(r'^api/optimizer/query_compatibility/?$', api_public.query_compatibility, name='query_compatibility'),
-  re_path(r'^api/optimizer/similar_queries/?$', api_public.similar_queries, name='similar_queries'),
+  re_path(r'^optimizer/query_risk/?$', api_public.query_risk, name='optimizer_query_risk'),
+  re_path(r'^optimizer/predict/?$', api_public.predict, name='optimizer_predict'),
+  re_path(r'^optimizer/query_compatibility/?$', api_public.query_compatibility, name='optimizer_query_compatibility'),
+  re_path(r'^optimizer/similar_queries/?$', api_public.similar_queries, name='optimizer_similar_queries'),
 ]
