@@ -140,11 +140,9 @@ def get_raz_cluster_name():
   """
   return get_conf().get(_CNF_S3A_RAZ_CLUSTER_NAME, '') or get_conf().get(_CNF_ADLS_RAZ_CLUSTER_NAME, '')
 
-def get_raz_default_endpoint():
+def get_raz_s3_default_bucket():
   """
   Get the name of the default S3 bucket of Raz
-
-  S3 only. Add check for Azure when supported.
   """
 
   for key, val in get_conf().items():
