@@ -926,7 +926,8 @@ class FilesystemException(Exception):
 
 class Document2QueryMixin(object):
 
-  def documents(self, user, perms='both', include_history=False, include_trashed=False, include_managed=False, include_shared_links=False, allow_distinct=True):
+  def documents(self, user, perms='both', include_history=False, include_trashed=False, include_managed=False,
+                include_shared_links=False, allow_distinct=True):
     """
     Returns all documents that are owned or shared with the user.
     :param perms: both, shared, owned. Defaults to both.
@@ -1849,7 +1850,7 @@ class ClusterConfig(object):
           'name': interpreter['name'],
           'type': interpreter['type'],  # Connector v1
           'id': interpreter['type'],
-          'displayName': 'Unified Analytics' if ENABLE_UNIFIED_ANALYTICS.get() and interpreter['dialect'] == 'hive' else  interpreter['name'],
+          'displayName': 'Unified Analytics' if ENABLE_UNIFIED_ANALYTICS.get() and interpreter['dialect'] == 'hive' else interpreter['name'],
           'buttonName': _('Query'),
           'tooltip': _('%s Query') % interpreter['type'].title(),
           'optimizer': get_optimizer_mode(),
@@ -1905,7 +1906,7 @@ class ClusterConfig(object):
           'name': interpreter['name'],
           'type': interpreter['type'],
           'id': interpreter['type'],
-          'displayName': 'Unified Analytics' if ENABLE_UNIFIED_ANALYTICS.get() and interpreter['dialect'] == 'hive' else  interpreter['name'],
+          'displayName': 'Unified Analytics' if ENABLE_UNIFIED_ANALYTICS.get() and interpreter['dialect'] == 'hive' else interpreter['name'],
           'buttonName': _('Query'),
           'tooltip': _('%s Query') % interpreter['type'].title(),
           'page': '/editor/?type=%(type)s' % interpreter,
