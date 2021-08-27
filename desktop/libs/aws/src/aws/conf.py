@@ -287,7 +287,7 @@ def is_enabled():
   return ('default' in list(AWS_ACCOUNTS.keys()) and AWS_ACCOUNTS['default'].get_raw() and AWS_ACCOUNTS['default'].ACCESS_KEY_ID.get()) or \
       has_iam_metadata() or \
       conf_idbroker.is_idbroker_enabled('s3a') or \
-      (RAZ.IS_ENABLED.get() and bool(get_raz_default_endpoint) and 'default' in list(AWS_ACCOUNTS.keys()) and AWS_ACCOUNTS['default'].get_raw()) or \
+      (RAZ.IS_ENABLED.get() and bool(get_raz_default_endpoint()) and 'default' in list(AWS_ACCOUNTS.keys()) and AWS_ACCOUNTS['default'].get_raw()) or \
       IS_SELF_SIGNING_ENABLED.get()
 
 
@@ -349,7 +349,7 @@ def has_s3_access(user):
   from desktop.conf import RAZ  # Must be imported dynamically in order to have proper value
 
   return user.is_authenticated and user.is_active and (
-    is_admin(user) or user.has_hue_permission(action="s3_access", app="filebrowser") or (RAZ.IS_ENABLED.get() and bool(get_raz_default_endpoint))
+    is_admin(user) or user.has_hue_permission(action="s3_access", app="filebrowser") or (RAZ.IS_ENABLED.get() and bool(get_raz_default_endpoint()))
   )
 
 
