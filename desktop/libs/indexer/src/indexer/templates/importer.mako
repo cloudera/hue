@@ -2812,7 +2812,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
               self.source.streamObjects(resp['objects']);
             }
 
-            if (self.source.inputFormat() !== 'stream' && self.source.inputFormat() !== 'connector') {
+            if (self.source.inputFormat() !== 'localfile' && self.source.inputFormat() !== 'stream' && self.source.inputFormat() !== 'connector') {
               self.guessFieldTypes();
             }
           }
