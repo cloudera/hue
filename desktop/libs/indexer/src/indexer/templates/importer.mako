@@ -511,7 +511,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
               </thead>
               <tbody data-bind="foreach: createWizard.source.sample">
               <tr data-bind="foreach: $data">
-                <td data-bind="truncatedText: $data"></td>
+                <td data-bind="text: $data"></td>
               </tr>
               </tbody>
             </table>
