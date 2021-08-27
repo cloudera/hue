@@ -40,7 +40,7 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from django.urls import reverse, NoReverseMatch
 
 from dashboard.conf import get_engines, HAS_REPORT_ENABLED, IS_ENABLED as DASHBOARD_ENABLED
-from hadoop.core_site import get_raz_api_url, get_raz_default_endpoint
+from hadoop.core_site import get_raz_api_url, get_raz_s3_default_bucket
 from kafka.conf import has_kafka
 from indexer.conf import ENABLE_DIRECT_UPLOAD
 from metadata.conf import get_optimizer_mode
@@ -1729,8 +1729,8 @@ def get_remote_home_storage():
   remote_home_storage = REMOTE_STORAGE_HOME.get() if hasattr(REMOTE_STORAGE_HOME, 'get') and REMOTE_STORAGE_HOME.get() else None
 
   if not remote_home_storage:
-    if get_raz_api_url() and get_raz_default_endpoint():
-      remote_home_storage = 's3a://%(bucket)s' % get_raz_default_endpoint()
+    if get_raz_api_url() and get_raz_s3_default_bucket():
+      remote_home_storage = 's3a://%(bucket)s' % get_raz_s3_default_bucket()
 
   return remote_home_storage
 
