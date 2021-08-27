@@ -92,7 +92,7 @@ def test_core_site():
 
     assert_equal(core_site.get_raz_api_url(), 'https://gehue-adls-master:6082/')
     assert_equal(core_site.get_raz_cluster_name(), 'gehue-adls')
-    assert_equal(core_site.get_raz_default_endpoint(), {'host': 's3.us-west-2.amazonaws.com', 'bucket': 'gethue-dev'})
+    assert_equal(core_site.get_raz_s3_default_bucket(), {'host': 's3.us-west-2.amazonaws.com', 'bucket': 'gethue-dev'})
 
     assert_equal(core_site.get_default_fs(), 'abfs://data@gethuedevstorage.dfs.core.windows.net/hue-adls')
 
