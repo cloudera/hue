@@ -174,6 +174,10 @@ class Cursor(object):
             return self._process_result(results[0])
 
     def _transform_parameters(self, parameters):
+        if len(parameters) != len(self._parameter_data_types):
+            raise ProgrammingError('Number of placeholders (?) must match number of parameters.'
+                                   ' Number of placeholders: {0}. Number of parameters: {1}'
+                                   .format(len(self._parameter_data_types), len(parameters)))
         typed_parameters = []
         for value, data_type in zip(parameters, self._parameter_data_types):
             field_name, rep, mutate_to, cast_from, is_array = data_type
