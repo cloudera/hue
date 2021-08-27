@@ -54,7 +54,11 @@ urlpatterns += [
 
   re_path(r'^editor/describe/(?P<database>[^/]*)/?$', api_public.describe, name='editor_describe_database'),
   re_path(r'^editor/describe/(?P<database>[^/]*)/(?P<table>[\w_\-]+)/?$', api_public.describe, name='editor_describe_table'),
-  re_path(r'^editor/describe/(?P<database>[^/]*)/(?P<table>\w+)/stats(?:/(?P<column>\w+))?/?$', api_public.describe, name='editor_describe_column'),
+  re_path(
+    r'^editor/describe/(?P<database>[^/]*)/(?P<table>\w+)/stats(?:/(?P<column>\w+))?/?$',
+    api_public.describe,
+    name='editor_describe_column'
+  ),
 
   re_path(r'^editor/autocomplete/?$', api_public.autocomplete, name='editor_autocomplete_databases'),
   re_path(
@@ -93,7 +97,11 @@ urlpatterns += [
 ]
 
 urlpatterns += [
-  re_path(r'^(?P<dialect>.+)/analyze/(?P<database>\w+)/(?P<table>\w+)(?:/(?P<columns>\w+))?/?$', api_public.analyze_table, name='dialect_analyze_table'),
+  re_path(
+    r'^(?P<dialect>.+)/analyze/(?P<database>\w+)/(?P<table>\w+)(?:/(?P<columns>\w+))?/?$',
+    api_public.analyze_table,
+    name='dialect_analyze_table'
+  ),
 ]
 
 # Slack install API for using CORS by default
@@ -118,4 +126,18 @@ urlpatterns += [
   re_path(r'^connector/instance/test/?$', api_public.test_connector, name='connector_test'),
 
   re_path(r'^connector/examples/install/?$', api_public.install_connector_examples, name='connector_install_examples'),
+]
+
+urlpatterns += [
+  re_path(r'^optimizer/top_databases/?$', api_public.top_databases, name='optimizer_top_databases'),
+  re_path(r'^optimizer/top_tables/?$', api_public.top_tables, name='optimizer_top_tables'),
+  re_path(r'^optimizer/top_columns/?$', api_public.top_columns, name='optimizer_top_columns'),
+  re_path(r'^optimizer/top_joins/?$', api_public.top_joins, name='optimizer_top_joins'),
+  re_path(r'^optimizer/top_filters/?$', api_public.top_filters, name='optimizer_top_filters'),
+  re_path(r'^optimizer/top_aggs/?$', api_public.top_aggs, name='optimizer_top_aggs'),
+
+  re_path(r'^optimizer/query_risk/?$', api_public.query_risk, name='optimizer_query_risk'),
+  re_path(r'^optimizer/predict/?$', api_public.predict, name='optimizer_predict'),
+  re_path(r'^optimizer/query_compatibility/?$', api_public.query_compatibility, name='optimizer_query_compatibility'),
+  re_path(r'^optimizer/similar_queries/?$', api_public.similar_queries, name='optimizer_similar_queries'),
 ]

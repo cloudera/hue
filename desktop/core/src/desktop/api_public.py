@@ -22,6 +22,7 @@ from rest_framework.decorators import api_view
 
 from filebrowser import views as filebrowser_views
 from indexer import api3 as indexer_api3
+from metadata import optimizer_api
 from notebook import api as notebook_api
 from notebook.conf import get_ordered_interpreters
 
@@ -36,6 +37,8 @@ from beeswax import api as beeswax_api
 LOG = logging.getLogger(__name__)
 
 
+# Core
+
 @api_view(["POST"])
 def get_config(request):
   django_request = get_django_request(request)
@@ -46,6 +49,8 @@ def get_context_namespaces(request, interface):
   django_request = get_django_request(request)
   return desktop_api.get_context_namespaces(django_request, interface)
 
+
+# Editor
 
 @api_view(["POST"])
 def create_notebook(request):
@@ -73,7 +78,8 @@ def execute(request, dialect=None):
     params = {
       'statement': django_request.POST.get('statement'),
       'interpreter': '%(type)s' % interpreter,
-      'interpreter_id': ('%(type)s' if interpreter['type'].isdigit() else '"%(type)s"') % interpreter,  # If connectors off, we expect a string
+      # If connectors off, we expect a string
+      'interpreter_id': ('%(type)s' if interpreter['type'].isdigit() else '"%(type)s"') % interpreter,
       'dialect': '%(dialect)s' % interpreter
     }
 
@@ -133,7 +139,6 @@ def get_logs(request):
 
   return notebook_api.get_logs(django_request)
 
-
 @api_view(["POST"])
 def get_sample_data(request, server=None, database=None, table=None, column=None):
   django_request = get_django_request(request)
@@ -142,7 +147,6 @@ def get_sample_data(request, server=None, database=None, table=None, column=None
 
   return notebook_api.get_sample_data(django_request, server, database, table, column)
 
-
 @api_view(["POST"])
 def autocomplete(request, server=None, database=None, table=None, column=None, nested=None):
   django_request = get_django_request(request)
@@ -150,7 +154,6 @@ def autocomplete(request, server=None, database=None, table=None, column=None, n
   _patch_operation_id_request(django_request)
 
   return notebook_api.autocomplete(django_request, server, database, table, column, nested)
-
 
 @api_view(["POST"])
 def describe(request, database, table=None, column=None):
@@ -172,7 +175,7 @@ def analyze_table(request, dialect, database, table, columns=None):
     return HttpResponse(status=204)
 
 
-# Storage API
+# Storage
 
 @api_view(["GET"])
 def storage_view(request, path):
@@ -189,7 +192,7 @@ def storage_upload_file(request):
   django_request = get_django_request(request)
   return filebrowser_views.upload_file(django_request)
 
-# Importer API
+# Importer
 
 @api_view(["POST"])
 def guess_format(request):
@@ -206,7 +209,7 @@ def importer_submit(request):
   django_request = get_django_request(request)
   return indexer_api3.importer_submit(django_request)
 
-# Connector API
+# Connector
 
 @api_view(["GET"])
 def get_connector_types(request):
@@ -247,6 +250,60 @@ def test_connector(request):
 def install_connector_examples(request):
   django_request = get_django_request(request)
   return connector_api.install_connector_examples(django_request)
+
+
+# Metadata
+
+@api_view(["POST"])
+def predict(request):
+  django_request = get_django_request(request)
+  return optimizer_api.predict(django_request)
+
+@api_view(["POST"])
+def query_risk(request):
+  django_request = get_django_request(request)
+  return optimizer_api.query_risk(django_request)
+
+@api_view(["POST"])
+def query_compatibility(request):
+  django_request = get_django_request(request)
+  return optimizer_api.query_compatibility(django_request)
+
+@api_view(["POST"])
+def similar_queries(request):
+  django_request = get_django_request(request)
+  return optimizer_api.similar_queries(django_request)
+
+
+@api_view(["POST"])
+def top_databases(request):
+  django_request = get_django_request(request)
+  return optimizer_api.top_databases(django_request)
+
+@api_view(["POST"])
+def top_tables(request):
+  django_request = get_django_request(request)
+  return optimizer_api.top_tables(django_request)
+
+@api_view(["POST"])
+def top_columns(request):
+  django_request = get_django_request(request)
+  return optimizer_api.top_columns(django_request)
+
+@api_view(["POST"])
+def top_joins(request):
+  django_request = get_django_request(request)
+  return optimizer_api.top_joins(django_request)
+
+@api_view(["POST"])
+def top_filters(request):
+  django_request = get_django_request(request)
+  return optimizer_api.top_filters(django_request)
+
+@api_view(["POST"])
+def top_aggs(request):
+  django_request = get_django_request(request)
+  return optimizer_api.top_aggs(django_request)
 
 
 # Utils
