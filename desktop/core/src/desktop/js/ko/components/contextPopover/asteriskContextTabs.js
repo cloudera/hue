@@ -29,11 +29,9 @@ class AsteriskData {
     self.hasErrors = ko.observable(false);
     self.columns = [];
 
-    self.selectedColumns = ko.pureComputed(() => {
-      return self.columns.filter(column => {
-        return column.selected();
-      });
-    });
+    self.selectedColumns = ko.pureComputed(
+      () => (!self.loading() && self.columns.filter(column => column.selected())) || []
+    );
 
     self.expand = function () {
       const colsToExpand =

@@ -28,6 +28,7 @@
       :editor-id="id"
       :executor="executor"
     />
+    <ace-syntax-dropdown v-if="editor" :editor="editor" :editor-id="id" />
   </div>
 </template>
 
@@ -38,9 +39,13 @@
   import { Ace } from 'ext/ace';
 
   import { attachPredictTypeahead } from './acePredict';
+  import AceSyntaxDropdown from './AceSyntaxDropdown.vue';
   import AceAutocomplete from './autocomplete/AceAutocomplete.vue';
   import AceGutterHandler from './AceGutterHandler';
-  import AceLocationHandler, { ACTIVE_STATEMENT_CHANGED_EVENT } from './AceLocationHandler';
+  import AceLocationHandler, {
+    ACTIVE_STATEMENT_CHANGED_EVENT,
+    ActiveLocationHighlighting
+  } from './AceLocationHandler';
   import { EXECUTE_ACTIVE_EXECUTABLE_TOPIC } from '../events';
   import { formatSql } from 'apps/editor/api';
   import Executor from 'apps/editor/execution/executor';
@@ -52,7 +57,7 @@
     ParsedLocation,
     SqlParserProvider
   } from 'parse/types';
-  import { EditorInterpreter } from 'config/types';
+  import { Connector, EditorInterpreter } from 'config/types';
   import { SqlReferenceProvider } from 'sql/reference/types';
   import { hueWindow } from 'types/types';
   import huePubSub from 'utils/huePubSub';
@@ -72,6 +77,7 @@
   export default defineComponent({
     name: 'AceEditor',
     components: {
+      AceSyntaxDropdown,
       AceAutocomplete
     },
     props: {
@@ -91,6 +97,11 @@
       executor: {
         type: Object as PropType<Executor>,
         required: true
+      },
+      activeLocationHighlighting: {
+        type: String as () => ActiveLocationHighlighting,
+        required: false,
+        default: () => 'all'
       },
       aceOptions: {
         type: Object as PropType<Ace.Options>,
@@ -126,6 +137,7 @@
         sqlReferenceProvider,
         executor,
         initialCursorPosition,
+        activeLocationHighlighting,
         sqlParserProvider,
         initialValue,
         aceOptions
@@ -423,6 +435,7 @@
           editor,
           editorId: id.value,
           executor: executor.value as Executor,
+          activeLocationHighlighting: activeLocationHighlighting.value,
           sqlReferenceProvider: sqlReferenceProvider.value
         });
         subTracker.addDisposable(aceLocationHandler);
@@ -515,9 +528,10 @@
           e.text = removeUnicodes(e.text);
         };
 
-        if ((<hueWindow>window).ENABLE_PREDICT) {
+        const connector: Connector = executor.value.connector();
+        if (sqlAnalyzerProvider.value && connector.optimizer === 'api') {
           try {
-            attachPredictTypeahead(editor, executor.value.connector(), sqlAnalyzerProvider.value);
+            attachPredictTypeahead(editor, connector, sqlAnalyzerProvider.value);
           } catch (e) {
             console.warn('Failed attaching predict typeahead...');
             console.error(e);

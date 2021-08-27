@@ -637,7 +637,7 @@ else:
   <div id="submit-wf-modal" class="modal hide"></div>
 
   <script id="fileTemplate" type="text/html">
-    <tr class="row-animated" style="cursor: pointer" data-bind="drop: { enabled: name !== '.' && type !== 'file' && (!$root.isS3() || ($root.isS3() && !$root.isS3Root())), value: $data }, event: { mouseover: toggleHover, mouseout: toggleHover, contextmenu: showContextMenu }, click: $root.viewFile, css: { 'row-selected': selected(), 'row-highlighted': highlighted(), 'row-deleted': deleted() }">
+    <tr class="row-animated" style="cursor: pointer" data-bind="visible: !(name == '..' && window.RAZ_IS_ENABLED), drop: { enabled: name !== '.' && type !== 'file' && (!$root.isS3() || ($root.isS3() && !$root.isS3Root())), value: $data }, event: { mouseover: toggleHover, mouseout: toggleHover, contextmenu: showContextMenu }, click: $root.viewFile, css: { 'row-selected': selected(), 'row-highlighted': highlighted(), 'row-deleted': deleted() }">
       <td class="center" data-bind="click: name !== '..' ? handleSelect : void(0)" style="cursor: default">
         <div data-bind="multiCheck: '#fileBrowserTable', visible: name != '..', css: { 'hue-checkbox': name != '..', 'fa': name != '..', 'fa-check': selected }"></div>
       </td>
@@ -2501,7 +2501,12 @@ else:
         root: fileBrowserViewModel.rootTarget(),
         skipKeydownEvents: true,
         onEnter: function (el) {
-          fileBrowserViewModel.targetPath("${url('filebrowser:filebrowser.views.view', path='')}" + stripHashes(el.val()));
+          var target_path = stripHashes(el.val());
+          if (window.USER_HOME_DIR.split('/')[2] !== el.val().split('/')[2] && window.RAZ_IS_ENABLED){
+            $.jHueNotify.warn("${ _('You are not allowed to go outside ') }" + window.USER_HOME_DIR + "${ _(' bucket.') }");
+            target_path = window.USER_HOME_DIR;
+          } 
+          fileBrowserViewModel.targetPath("${url('filebrowser:filebrowser.views.view', path='')}" + target_path); 
           fileBrowserViewModel.getStats(function (data) {
             if (data.type != null && data.type == "file") {
               %if is_embeddable:
@@ -2511,7 +2516,7 @@ else:
               %endif
               return false;
             } else {
-              updateHash(stripHashes(el.val()));
+              updateHash(target_path);
             }
             $("#jHueHdfsAutocomplete").hide();
           });

@@ -89,7 +89,6 @@ else:
 ENGINES = {}
 CONNECTIONS = {}
 ENGINE_KEY = '%(username)s-%(connector_name)s'
-URL_PATTERN = '(?P<driver_name>.+?://)(?P<host>[^:/ ]+):(?P<port>[0-9]*).*'
 
 LOG = logging.getLogger(__name__)
 
@@ -172,18 +171,6 @@ class SqlAlchemyApi(Api):
       s3_staging_dir = url.rsplit('s3_staging_dir=', 1)[1]
       url = url.replace(s3_staging_dir, urllib_quote_plus(s3_staging_dir))
 
-    if self.options.get('has_impersonation'):
-      m = re.search(URL_PATTERN, url)
-      driver_name = m.group('driver_name')
-
-      if not driver_name:
-        raise QueryError('Driver name of %(url)s could not be found and impersonation is turned on' % {'url': url})
-
-      url = url.replace(driver_name, '%(driver_name)s%(username)s@' % {
-        'driver_name': driver_name,
-        'username': self.user.username
-      })
-
     if self.options.get('credentials_json'):
       self.options['credentials_info'] = json.loads(
           self.options.pop('credentials_json')
@@ -195,6 +182,9 @@ class SqlAlchemyApi(Api):
       self.options['connect_args'] = json.loads(
           self.options.pop('connect_args')
       )
+
+    if self.options.get('has_impersonation'):
+      self.options.setdefault('connect_args', {}).setdefault('principal_username', self.user.username)
 
     options = self.options.copy()
     options.pop('session', None)
@@ -325,7 +315,7 @@ class SqlAlchemyApi(Api):
 
     if connection:
       cursor = connection['result'].cursor
-      if self.options['url'].startswith('presto://') and cursor and cursor.poll():
+      if (self.options['url'].startswith('presto://') | self.options['url'].startswith('trino://')) and cursor and cursor.poll():
         response['status'] = 'running'
       elif snippet['result']['handle']['has_result_set']:
         response['status'] = 'available'
@@ -340,7 +330,7 @@ class SqlAlchemyApi(Api):
   @query_error_handler
   def progress(self, notebook, snippet, logs=''):
     progress = 50
-    if self.options['url'].startswith('presto://'):
+    if self.options['url'].startswith('presto://') | self.options['url'].startswith('trino://') :
       guid = snippet['result']['handle']['guid']
       handle = CONNECTIONS.get(guid)
       stats = None

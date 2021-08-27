@@ -49,7 +49,12 @@ We simplify object storage and DW integration. Now you can create a table from f
 
 ![Filebrowser Copy Path and Open In Importer Options](https://cdn.gethue.com/uploads/2021/08/Filebrowser_copypath_openinimporter.png)
 
+If you want to create a table then you can use either "Open in Importer" option or [Importer](https://demo.gethue.com/hue/indexer/importer) directly but if you want a table from your SQL then just copy the path of a file as described above and use it in the [editor](https://demo.gethue.com/hue/editor/?type=1).
 
+    create EXTERNAL TABLE book ( id BIGINT, isbn STRING, category STRING, publish_date TIMESTAMP, publisher STRING, price FLOAT ) 
+    ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+    stored as textfile
+    LOCATION  's3a://cldr-demo/books/books.csv';
 
 You can try this feature in the latest Hue version or at [demo.gethue.com](https://demo.gethue.com/hue/filebrowser/).  
 </br>

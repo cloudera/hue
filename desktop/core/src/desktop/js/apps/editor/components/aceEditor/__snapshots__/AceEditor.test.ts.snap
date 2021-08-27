@@ -99,5 +99,9 @@ exports[`AceEditor.vue should render 1`] = `
     sqlreferenceprovider="[object Object]"
     temporaryonly="false"
   />
+  <ace-syntax-dropdown-stub
+    editor="[object Object]"
+    editorid="some-id"
+  />
 </div>
 `;

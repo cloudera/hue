@@ -15,10 +15,17 @@
 # limitations under the License.
 
 import logging
+import sys
 
 from desktop import conf
 from desktop.lib.raz.clients import AdlsRazClient
 from desktop.lib.rest.http_client import HttpClient
+from desktop.lib.exceptions_renderable import PopupException
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+else:
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)
@@ -45,12 +52,18 @@ class RazHttpClient(HttpClient):
 
     response = raz_client.get_url(action=http_method, path=url, headers=headers)
 
-    signed_path = path + ('?' if '?' not in url else '&') + response['token']
+    signed_url = url
+    if response.get('token'):
+      signed_url += ('?' if '?' not in url else '&') + response.get('token')
+    else:
+      raise PopupException(_('No SAS token in response'), error_code=503)
+
+    # Required because `self._make_url` is called in base class execute method also
+    signed_path = path + signed_url.partition(path)[2]
 
     return super(RazHttpClient, self).execute(
         http_method=http_method,
         path=signed_path,
-        params=params,
         data=data,
         headers=headers,
         allow_redirects=allow_redirects,

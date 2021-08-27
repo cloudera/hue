@@ -96,10 +96,16 @@
     if attributes is None:
       attributes = {}
     ret_str = ""
-    for key, value in attributes.iteritems():
-      if key == "klass":
-        key = "class"
-      ret_str += "%s='%s' " % (key.replace("_", "-"), unicode(value))
+    if sys.version_info[0] > 2:
+      for key, value in attributes.items():
+        if key == "klass":
+          key = "class"
+        ret_str += "%s='%s' " % (key.replace("_", "-"), str(value))
+    else:
+      for key, value in attributes.iteritems():
+        if key == "klass":
+          key = "class"
+        ret_str += "%s='%s' " % (key.replace("_", "-"), unicode(value))
     return ret_str
 
   if not attrs:

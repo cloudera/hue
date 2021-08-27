@@ -106,7 +106,7 @@ def get_default_region():
 
 
 def get_default_host():
-  '''Returns the S3 host when Raz is configued'''
+  '''Returns the S3 host when Raz is configured'''
 
   if get_raz_api_url():
     endpoint = get_raz_default_endpoint()

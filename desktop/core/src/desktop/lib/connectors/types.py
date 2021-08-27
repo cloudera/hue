@@ -389,7 +389,35 @@ CONNECTOR_TYPES = [
     }
   },
   {
-    'nice_name': 'Trino (Presto SQL)',
+    'nice_name': 'Trino',
+    'dialect': 'trino',
+    'interface': 'sqlalchemy',
+    'settings': [
+      {'name': 'url', 'value': 'trino://localhost:8080/tpch'},
+      {'name': 'has_ssh', 'value': False},
+      {'name': 'ssh_server_host', 'value': '127.0.0.1'},
+      {'name': 'has_impersonation', 'value': False},
+    ],
+    'category': 'editor',
+    'description': '',
+    'properties': {
+      'is_sql': True,
+      'sql_identifier_quote': '"',
+      'sql_identifier_comment_single': '--',
+      'has_catalog': True,
+      'has_database': True,
+      'has_table': True,
+      'has_live_queries': False,
+      'has_optimizer_risks': True,
+      'has_optimizer_values': True,
+      'has_auto_limit': False,
+      'has_reference_language': False,
+      'has_reference_functions': False,
+      'has_use_statement': False,
+    }
+  },
+  {
+    'nice_name': 'Presto',
     'dialect': 'presto',
     'interface': 'sqlalchemy',
     'settings': [
@@ -417,7 +445,7 @@ CONNECTOR_TYPES = [
     }
   },
   {
-    'nice_name': 'Dasksql',
+    'nice_name': 'DaskSql',
     'dialect': 'dasksql',
     'interface': 'sqlalchemy',
     'settings': [

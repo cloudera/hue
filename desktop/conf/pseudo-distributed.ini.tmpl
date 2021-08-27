@@ -311,6 +311,9 @@
   # Turn on the direct link sharing of saved document.
   ## enable_link_sharing=true
 
+  # Use JWT as Bearer header for authentication when using Thrift over HTTP transport.
+  ## use_thrift_http_jwt=false
+
   # Hue uses Localstorage to keep the users settings and database preferences.
   # Please make this value true in case local storage should not be used
   # default value is false
@@ -362,12 +365,8 @@
     # Multiple Authentication backend combinations are supported by specifying a comma-separated list in order of priority.
     ## backend=desktop.auth.backend.AllowFirstUserDjangoBackend
 
-    # Custom Authentication backends for the REST API.
-    # Multiple Authentication backends are supported by specifying a comma-separated list in order of priority.
+    # Multiple Authentication backends for REST APIs are supported by specifying a comma-separated list in order of priority.
     ## api_auth=rest_framework_simplejwt.authentication.JWTAuthentication,rest_framework.authentication.SessionAuthentication
-
-    # Verify custom JWT.
-    ## verify_custom_jwt=true
 
     # Class which defines extra accessor methods for User objects.
     ## user_aug=desktop.auth.backend.DefaultUserAugmentor
@@ -436,6 +435,16 @@
 
     # If behind_reverse_proxy is True, it will look for the IP address from this header. Default: HTTP_X_FORWARDED_FOR
     ## reverse_proxy_header=HTTP_X_FORWARDED_FOR
+
+    [[[jwt]]]
+      # Adds custom JWT Authentication backend for REST APIs in top priority.
+      ## is_enabled=false
+
+      # Endpoint to fetch the public key from verification server.
+      ## key_server_url=https://ext_authz:8000
+
+      # Verify custom JWT signature.
+      ## verify=true
 
   # Configuration options for connecting to LDAP and Active Directory
   # -------------------------------------------------------------------
@@ -1873,8 +1882,8 @@
   [[abfs_clusters]]
     # Default ABFS cluster
     [[[default]]]
-      ## fs_defaultfs=abfss://<container_name>@<account_name>.dfs.core.windows.net
-      ## webhdfs_url=https://<container_name>@<account_name>.dfs.core.windows.net
+      ## fs_defaultfs=abfs://<container_name>@<account_name>.dfs.core.windows.net
+      ## webhdfs_url=https://<account_name>.dfs.core.windows.net
 
 ###########################################################################
 # Settings for the Sentry lib

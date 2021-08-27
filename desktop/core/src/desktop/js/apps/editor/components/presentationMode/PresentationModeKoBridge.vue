@@ -34,7 +34,7 @@
 
   import { Variable } from 'apps/editor/components/variableSubstitution/types';
   import { IdentifierLocation } from 'parse/types';
-  import { POST_FROM_LOCATION_WORKER_EVENT } from 'sql/sqlWorkerHandler';
+  import { POST_FROM_LOCATION_WORKER_EVENT } from 'sql/workers/events';
   import { wrap } from 'vue/webComponentWrap';
 
   import PresentationMode from './PresentationMode.vue';

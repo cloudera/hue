@@ -308,7 +308,11 @@ class SQLIndexer(object):
     source_type = source['sourceType']
     editor_type = destination['sourceType']
 
-    columns = destination['columns']
+    cols_to_remove = sorted(
+      [col_index for col_index, col in enumerate(destination['columns']) if not col['keep']],
+      reverse=True
+    )
+    columns = [col for col_index, col in enumerate(destination['columns']) if col_index not in cols_to_remove]
 
     dialect = get_interpreter(source_type, self.user)['dialect']
 
@@ -324,21 +328,6 @@ class SQLIndexer(object):
         'database': database,
         'table_name': table_name,
         'columns': ',\n'.join(['  `%(name)s` %(type)s' % col for col in columns]),
-      }
-
-    elif dialect == 'phoenix':
-
-      for col in columns:
-        if col['type'] == 'string':
-          col['type'] = 'CHAR(255)'
-
-      sql = '''CREATE TABLE IF NOT EXISTS %(database)s.%(table_name)s (
-%(columns)s
-CONSTRAINT my_pk PRIMARY KEY (%(primary_keys)s));\n''' % {
-          'database': database,
-          'table_name': table_name,
-          'columns': ',\n'.join(['  %(name)s %(type)s' % col for col in columns]),
-          'primary_keys': ', '.join(destination.get('primaryKeys'))
       }
 
     elif dialect == 'impala':
@@ -359,6 +348,8 @@ CONSTRAINT my_pk PRIMARY KEY (%(primary_keys)s));\n''' % {
         for count, row in enumerate(reader):
           if (source['format']['hasHeader'] and count == 0) or not row:
             continue
+          for col_index in cols_to_remove:
+            del row[col_index]
           if dialect == 'impala':                         # for the boolean col updating csv_val to (1,0)
             row = self.nomalize_booleans(row, columns)
           _csv_rows.append(tuple(row))
@@ -372,16 +363,6 @@ CONSTRAINT my_pk PRIMARY KEY (%(primary_keys)s));\n''' % {
               'table_name': table_name,
               'csv_rows': csv_rows
             }
-          elif dialect == 'phoenix':
-            for csv_row in _csv_rows:
-              _sql = ', '.join([ "'{0}'".format(col_val) if columns[count]['type'] in ('CHAR(255)', 'timestamp') \
-                else '{0}'.format(col_val) for count, col_val in enumerate(csv_row)])
-
-              sql += '''\nUPSERT INTO %(database)s.%(table_name)s VALUES (%(csv_row)s);\n''' % {
-                'database': database,
-                'table_name': table_name,
-                'csv_row': _sql
-              }
           elif dialect == 'impala':
              # casting from string to boolean is not allowed in impala so string -> int -> bool
             sql_ = ',\n'.join([
@@ -389,7 +370,8 @@ CONSTRAINT my_pk PRIMARY KEY (%(primary_keys)s));\n''' % {
               else '  CAST ( CAST ( `%(name)s` AS TINYINT ) AS boolean ) `%(name)s`' % col for col in columns
             ])
 
-            sql += '''\nINSERT INTO %(database)s.%(table_name)s_tmp VALUES %(csv_rows)s;\n\nCREATE TABLE IF NOT EXISTS %(database)s.%(table_name)s
+            sql += '''\nINSERT INTO %(database)s.%(table_name)s_tmp VALUES %(csv_rows)s;\n
+CREATE TABLE IF NOT EXISTS %(database)s.%(table_name)s
 AS SELECT\n%(sql_)s\nFROM  %(database)s.%(table_name)s_tmp;\n\nDROP TABLE IF EXISTS %(database)s.%(table_name)s_tmp;'''% {
               'database': database,
               'table_name': table_name,
