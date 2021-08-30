@@ -178,7 +178,7 @@ class RazClient(object):
     if len(resource_path) == 2:
       relative_path += resource_path[1]
 
-    access_type, relative_path = self.handle_adls_req_mapping(method, url_params, relative_path)
+    req_params = self.handle_adls_req_mapping(method, url_params, relative_path)
 
     request_data.update({
       "clientType": "adls",
@@ -186,10 +186,10 @@ class RazClient(object):
         "resource": {
           "storageaccount": storage_account,
           "container": container,
-          "relativepath": relative_path,
+          "relativepath": req_params.get('relative_path'),
         },
-        "action": access_type,
-        "accessTypes": [access_type]
+        "action": req_params.get('access_type'),
+        "accessTypes": [req_params.get('access_type')]
       }
     })
 
@@ -203,13 +203,16 @@ class RazClient(object):
         access_type = 'get-status'
     
     if method == 'GET':
+      # Read
+      access_type = 'read'
+
       # List
       if params.get('resource') == 'filesystem':
         if params.get('directory'):
           relative_path += lib_urlunquote(params['directory'])
           access_type = 'list'
 
-    return access_type, relative_path
+    return {'access_type': access_type, 'relative_path': relative_path}
 
 
   def _make_s3_request(self, request_data, request_headers, method, params, headers, url_params, endpoint, resource_path):
