@@ -102,7 +102,8 @@ class RazClientTest(unittest.TestCase):
     self.raz_token = "mock_RAZ_token"
 
     self.s3_path = 'https://gethue-test.s3.amazonaws.com/gethue/data/customer.csv'
-    self.adls_path = 'https://gethuestorageaccount.dfs.core.windows.net/demo-gethue-container/demo-dir1/customer.csv'
+    self.adls_path = 'https://gethuestorage.dfs.core.windows.net/data/user/csso_hueuser?action=getStatus'
+
 
   def test_get_raz_client_adls(self):
     with patch('desktop.lib.raz.raz_client.RazToken') as RazToken:
@@ -122,6 +123,7 @@ class RazClientTest(unittest.TestCase):
         assert_equal(client.raz_url, self.raz_url)
         assert_equal(client.service_name, 'gethue_adls')
         assert_equal(client.cluster_name, 'gethueCluster')
+
 
   def test_check_access_adls(self):
     with patch('desktop.lib.raz.raz_client.requests.post') as requests_post:
@@ -143,7 +145,8 @@ class RazClientTest(unittest.TestCase):
 
         client = RazClient(self.raz_url, self.raz_token, username=self.username, service="adls", service_name="cm_adls", cluster_name="cl1")
 
-        resp = client.check_access(method='GET', url=self.adls_path)
+        # Stats
+        resp = client.check_access(method='HEAD', url=self.adls_path)
 
         requests_post.assert_called_with(
           "https://raz.gethue.com:8080/api/authz/adls/access?delegation=mock_RAZ_token",
@@ -163,18 +166,70 @@ class RazClientTest(unittest.TestCase):
             'context': {}, 
             'operation': {
               'resource': {
-                'storageaccount': 'gethuestorageaccount', 
-                'container': 'demo-gethue-container', 
-                'relativepath': 'demo-dir1/customer.csv'
-              }, 
-              'resourceOwner': 'gethuestorageaccount', 
-              'action': 'read', 
-              'accessTypes': ['read']
+                'storageaccount': 'gethuestorage', 
+                'container': 'data', 
+                'relativepath': '/user/csso_hueuser'
+              },
+              'action': 'get-status', 
+              'accessTypes': ['get-status']
             }
           },
           verify=False
         )
         assert_equal(resp['token'], "nulltenantIdnullnullbnullALLOWEDnullnull1.05nSlN7t/QiPJ1OFlCruTEPLibFbAhEYYj5wbJuaeQqs=")
+
+  def test_handle_adls_req_mapping(self):
+    with patch('desktop.lib.raz.raz_client.requests.post') as requests_post:
+      with patch('desktop.lib.raz.raz_client.uuid.uuid4') as uuid:
+        uuid.return_value = 'mock_request_id'
+        requests_post.return_value = Mock(
+          json=Mock(return_value=
+          {
+            'operResult': {
+              'result': 'ALLOWED',
+              'additionalInfo': {
+                "ADLS_DSAS": "nulltenantIdnullnullbnullALLOWEDnullnull1.05nSlN7t/QiPJ1OFlCruTEPLibFbAhEYYj5wbJuaeQqs="
+                }
+              }
+            }
+          )
+        )
+
+        client = RazClient(self.raz_url, self.raz_token, username=self.username, service="adls", service_name="cm_adls", cluster_name="cl1")
+
+        # List directory
+        adls_url = 'https://gethuestorage.dfs.core.windows.net/data?directory=user%2Fcsso_hueuser&resource=filesystem&recursive=false'
+        resp = client.check_access(method='GET', url=adls_url)
+
+        requests_post.assert_called_with(
+          "https://raz.gethue.com:8080/api/authz/adls/access?delegation=mock_RAZ_token",
+          headers={"Content-Type": "application/json"},
+          json={
+            'requestId': 'mock_request_id', 
+            'serviceType': 'adls', 
+            'serviceName': 'cm_adls', 
+            'user': 'gethue', 
+            'userGroups': [], 
+            'clientIpAddress': '', 
+            'clientType': 'adls', 
+            'clusterName': 'cl1', 
+            'clusterType': '', 
+            'sessionId': '', 
+            'accessTime': '', 
+            'context': {}, 
+            'operation': {
+              'resource': {
+                'storageaccount': 'gethuestorage', 
+                'container': 'data', 
+                'relativepath': '/user/csso_hueuser'
+              },
+              'action': 'list', 
+              'accessTypes': ['list']
+            }
+          },
+          verify=False
+        )
+
 
   def test_get_raz_client_s3(self):
     with patch('desktop.lib.raz.raz_client.RazToken') as RazToken:
@@ -194,6 +249,7 @@ class RazClientTest(unittest.TestCase):
         assert_equal(client.raz_url, self.raz_url)
         assert_equal(client.service_name, 'gethue_s3')
         assert_equal(client.cluster_name, 'gethueCluster')
+
 
   def test_check_access_s3(self):
     with patch('desktop.lib.raz.raz_client.requests.post') as requests_post:
