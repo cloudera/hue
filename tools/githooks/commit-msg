@@ -2,17 +2,19 @@
 
 INPUT_FILE=$1
 START_LINE=${2:-`head -n1 $INPUT_FILE`}
-PATTERN="^.+{0,71}[^.]$"
+MAX=71
+PATTERN="^.{0,$MAX}$"
 
 if ! [[ "$START_LINE" =~ $PATTERN ]]; then
   echo "'$START_LINE' is not a valid commit message, please see for examples:"
   echo ""
-  echo "  50 characters max recommended, 72 is the hard limit"
+  echo "  50 characters lenght recommended, $MAX max"
   echo ""
   echo "  [hive] Add numExecutors options"
   echo "  [hive] Add numExecutors options (#1000)"
-  echo "  HUE-9999 [hive] Use 26000 as default for thrift-over-http"
+  echo "  GH-1000 [hive] Add numExecutors options"
   echo ""
-  echo "  Examples of labels: [hive], [impala], [phoenix], [ui], [k8s], [docs], [api]..."
+  echo "  Examples of labels: [hive], [impala], [ui], [docs], [api]..."
+  echo ""
   exit 1
 fi
