@@ -203,6 +203,46 @@ class RazClientTest(unittest.TestCase):
     assert_equal(response['access_type'], 'get-status')
     assert_equal(response['relative_path'], '/user/csso_hueuser')
 
+    # Create file
+    method = 'PUT'
+    relative_path = '/user/csso_hueuser/customers.csv'
+    url_params = {'resource': 'file'}
+
+    response = client.handle_adls_req_mapping(method, url_params, relative_path)
+
+    assert_equal(response['access_type'], 'create-file')
+    assert_equal(response['relative_path'], '/user/csso_hueuser/customers.csv')
+
+    # Create directory
+    method = 'PUT'
+    relative_path = '/user/csso_hueuser/test_dir'
+    url_params = {'resource': 'directory'}
+
+    response = client.handle_adls_req_mapping(method, url_params, relative_path)
+
+    assert_equal(response['access_type'], 'create-directory')
+    assert_equal(response['relative_path'], '/user/csso_hueuser/test_dir')
+
+    # Delete path
+    method = 'DELETE'
+    relative_path = '/user/csso_hueuser/test_dir/customer.csv'
+    url_params = {}
+
+    response = client.handle_adls_req_mapping(method, url_params, relative_path)
+
+    assert_equal(response['access_type'], 'delete')
+    assert_equal(response['relative_path'], '/user/csso_hueuser/test_dir/customer.csv')
+
+    # Delete with recursive as true
+    method = 'DELETE'
+    relative_path = '/user/csso_hueuser/test_dir'
+    url_params = {'recursive': 'true'}
+
+    response = client.handle_adls_req_mapping(method, url_params, relative_path)
+
+    assert_equal(response['access_type'], 'delete-recursive')
+    assert_equal(response['relative_path'], '/user/csso_hueuser/test_dir')
+
 
   def test_get_raz_client_s3(self):
     with patch('desktop.lib.raz.raz_client.RazToken') as RazToken:

@@ -200,21 +200,22 @@ class RazClient(object):
 
 
   def handle_adls_req_mapping(self, method, params, relative_path):
-    access_type = ''
-
     if method == 'HEAD':
-      # Stats
-      if params.get('action') == 'getStatus':
-        access_type = 'get-status'
+      access_type = 'get-status' if params.get('action') == 'getStatus' else ''
+
+    if method == 'DELETE':
+      access_type = 'delete-recursive' if params.get('recursive') == 'true' else 'delete'
     
     if method == 'GET':
-      access_type = 'read'
-
-      # List
-      if params.get('resource') == 'filesystem':
-        if params.get('directory'):
-          relative_path += lib_urlunquote(params['directory'])
-          access_type = 'list'
+      access_type = 'list' if params.get('resource') == 'filesystem' else 'read'
+      if params.get('directory'):
+        relative_path += lib_urlunquote(params['directory'])
+    
+    if method == 'PUT':
+      if params.get('resource') == 'file':
+        access_type = 'create-file'
+      elif params.get('resource') == 'directory':
+        access_type = 'create-directory'
 
     return {'access_type': access_type, 'relative_path': relative_path}
 
