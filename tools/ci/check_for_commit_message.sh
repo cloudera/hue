@@ -18,11 +18,13 @@
 FOUND_ISSUE=0
 IFS=$'\n'
 
-for commit in `git log origin/master..master --format="%s"`
+for commit in `git log origin..HEAD --format="%s"`
 do
- ./tools/githooks/commit-msg "" "$commit"
+  ./tools/githooks/commit-msg "" "$commit"
 
- if [ "$?" -ne "0" ]
+  echo "Checking $commit"
+
+  if [ "$?" -ne "0" ]
   then
     FOUND_ISSUE=-1
   fi

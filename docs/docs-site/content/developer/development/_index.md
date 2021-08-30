@@ -173,25 +173,24 @@ Then make your changes in code:
 
 ### Post a review
 
-Either post via the GitHub CLI:
+Either post via the [GitHub CLI](https://github.com/cli/cli):
 
     gh pr create --fill --assignee=romainr --web
 
-Or push to your branch in your repository forks by doing one time:
+Or push to your branch in your repository fork, e.g. if you are 'bob':
 
-    git remote add bob https://github.com/cloudera/hue
+    git remote add bob https://github.com/bob/hue
     git fetch bob
-
-Then just:
 
     git push bob HEAD:GH-1000-fix
 
-And create the pull request via the button on the https://github.com/cloudera/hue/tree/GH-1000-fix page.
+And create the pull request to cloudera/hue via the button on the https://github.com/bob/hue/tree/GH-1000-fix page.
 
 **Note**:
-If you have more than one diff, update `HEAD~1..HEAD` accordingly (e.g. `HEAD~2..HEAD`)
+GitHub CLI is recommended for automating even more the process. e.g. for asking reviewers and auto merging when all the checks are green:
 
-In the PR, reference the [GitHub issues](https://github.com/cloudera/hue/issues) if it has one.
+    gh pr create --fill --assignee=romainr --reviewer=agl29,Harshg999
+    gh pr merge --auto -r 2494
 
 ### Update a review
 
