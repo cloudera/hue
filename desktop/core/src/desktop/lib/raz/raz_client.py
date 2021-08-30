@@ -33,9 +33,10 @@ from desktop.lib.exceptions_renderable import PopupException
 import desktop.lib.raz.signer_protos_pb2 as raz_signer
 
 if sys.version_info[0] > 2:
-  from urllib.parse import urlparse as lib_urlparse
+  from urllib.parse import urlparse as lib_urlparse, unquote as lib_urlunquote
 else:
   from urlparse import urlparse as lib_urlparse
+  from urllib import unquote as lib_urlunquote
 
 
 LOG = logging.getLogger(__name__)
@@ -56,16 +57,21 @@ class RazToken:
 
   def get_delegation_token(self, user):
     ip_address = socket.gethostbyname(self.raz_hostname)
-    GET_PARAMS = {"op": "GETDELEGATIONTOKEN", "service": "%s:%s" % (ip_address, self.raz_port), "renewer": AUTH_USERNAME.get(), "doAs": user}
+    GET_PARAMS = {
+      "op": "GETDELEGATIONTOKEN",
+      "service": "%s:%s" % (ip_address, self.raz_port),
+      "renewer": AUTH_USERNAME.get(),
+      "doAs": user
+    }
     r = requests.get(self.raz_url, GET_PARAMS, auth=self.auth_handler, verify=False)
     self.raz_token = json.loads(r.text)['Token']['urlString']
     return self.raz_token
 
   def renew_delegation_token(self, user):
     if self.raz_token is None:
-        self.raz_token = self.get_delegation_token(user=user)
+      self.raz_token = self.get_delegation_token(user=user)
     if (self.init_time - timedelta(hours=8)) > datetime.now():
-        r = requests.put("%s?op=RENEWDELEGATIONTOKEN&token=%s"%(self.raz_url, self.raz_token), auth=self.auth_handler, verify=False)
+      r = requests.put("%s?op=RENEWDELEGATIONTOKEN&token=%s"%(self.raz_url, self.raz_token), auth=self.auth_handler, verify=False)
     return self.raz_token
 
 
@@ -93,6 +99,7 @@ class RazClient(object):
     self.service_name = service_name
     self.cluster_name = cluster_name
     self.requestid = str(uuid.uuid4())
+
 
   def check_access(self, method, url, params=None, headers=None):
     LOG.debug("Check access: method {%s}, url {%s}, params {%s}, headers {%s}" % (method, url, params, headers))
@@ -123,7 +130,7 @@ class RazClient(object):
     raz_url = "%s/api/authz/%s/access?delegation=%s" % (self.raz_url, self.service, self.raz_token)
 
     if self.service == 'adls':
-      self._make_adls_request(request_data, path, resource_path)
+      self._make_adls_request(request_data, method, path, url_params, resource_path)
     elif self.service == 's3':
       self._make_s3_request(request_data, request_headers, method, params, headers, url_params, endpoint, resource_path)
 
@@ -165,9 +172,18 @@ class RazClient(object):
           if signed_response is not None:
             return dict([(i.key, i.value) for i in signed_response.signer_generated_headers])
 
-  def _make_adls_request(self, request_data, path, resource_path):
+
+  def _make_adls_request(self, request_data, method, path, url_params, resource_path):
     storage_account = path.netloc.split('.')[0]
-    container, relative_path = resource_path.split('/', 1)
+    resource_path = resource_path.split('/', 1)
+
+    container = resource_path[0]
+    relative_path = "/"
+
+    if len(resource_path) == 2:
+      relative_path += resource_path[1]
+
+    req_params = self.handle_adls_req_mapping(method, url_params, relative_path)
 
     request_data.update({
       "clientType": "adls",
@@ -175,13 +191,33 @@ class RazClient(object):
         "resource": {
           "storageaccount": storage_account,
           "container": container,
-          "relativepath": relative_path,
+          "relativepath": req_params.get('relative_path'),
         },
-        "resourceOwner": storage_account,
-        "action": "read",
-        "accessTypes":["read"]
+        "action": req_params.get('access_type'),
+        "accessTypes": [req_params.get('access_type')]
       }
     })
+
+
+  def handle_adls_req_mapping(self, method, params, relative_path):
+    access_type = ''
+
+    if method == 'HEAD':
+      # Stats
+      if params.get('action') == 'getStatus':
+        access_type = 'get-status'
+    
+    if method == 'GET':
+      access_type = 'read'
+
+      # List
+      if params.get('resource') == 'filesystem':
+        if params.get('directory'):
+          relative_path += lib_urlunquote(params['directory'])
+          access_type = 'list'
+
+    return {'access_type': access_type, 'relative_path': relative_path}
+
 
   def _make_s3_request(self, request_data, request_headers, method, params, headers, url_params, endpoint, resource_path):
 
@@ -210,6 +246,7 @@ class RazClient(object):
     request_data["context"] = {
       "S3_SIGN_REQUEST": signed_request
     }
+
 
 def get_raz_client(raz_url, username, auth='kerberos', service='s3', service_name='cm_s3', cluster_name='myCluster'):
   if not username:
