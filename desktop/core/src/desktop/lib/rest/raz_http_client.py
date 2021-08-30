@@ -53,7 +53,7 @@ class RazHttpClient(HttpClient):
     response = raz_client.get_url(action=http_method, path=url, headers=headers)
 
     signed_url = url
-    if response.get('token'):
+    if response and response.get('token'):
       signed_url += ('?' if '?' not in url else '&') + response.get('token')
     else:
       raise PopupException(_('No SAS token in response'), error_code=503)
