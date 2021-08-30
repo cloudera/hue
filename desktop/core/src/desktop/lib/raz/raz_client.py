@@ -195,7 +195,6 @@ class RazClient(object):
   def handle_adls_req_mapping(self, method, params, relative_path):
     access_type = ''
 
-    print(params)
     if method == 'HEAD':
       # Stats
       if 'action' in params and params['action'] == 'getStatus':
