@@ -125,7 +125,7 @@ class RazClient(object):
     raz_url = "%s/api/authz/%s/access?delegation=%s" % (self.raz_url, self.service, self.raz_token)
 
     if self.service == 'adls':
-      self._make_adls_request(request_data, method, path, url_params, resource_path.split('/', 1))
+      self._make_adls_request(request_data, method, path, url_params, resource_path)
     elif self.service == 's3':
       self._make_s3_request(request_data, request_headers, method, params, headers, url_params, endpoint, resource_path)
 
@@ -170,6 +170,8 @@ class RazClient(object):
 
   def _make_adls_request(self, request_data, method, path, url_params, resource_path):
     storage_account = path.netloc.split('.')[0]
+    resource_path = resource_path.split('/', 1)
+
     container = resource_path[0]
     relative_path = "/"
 
@@ -197,16 +199,15 @@ class RazClient(object):
 
     if method == 'HEAD':
       # Stats
-      if 'action' in params and params['action'] == 'getStatus':
+      if params.get('action') == 'getStatus':
         access_type = 'get-status'
     
     if method == 'GET':
       # List
-      if 'resource' in params and params['resource'] == 'filesystem':
-        if 'directory' in params:
+      if params.get('resource') == 'filesystem':
+        if params.get('directory'):
           relative_path += lib_urlunquote(params['directory'])
           access_type = 'list'
-    
 
     return access_type, relative_path
 
