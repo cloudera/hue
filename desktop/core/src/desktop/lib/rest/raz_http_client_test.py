@@ -58,8 +58,16 @@ class TestRazHttpClient():
         )
 
 
-  def test_no_sas_token_in_response(self):
+  def test_handle_raz_adls_response(self):
     with patch('desktop.lib.rest.raz_http_client.AdlsRazClient.get_url') as raz_get_url:
+
+      # When RAZ denies request and sends no response
+      raz_get_url.return_value = None
+      client = RazHttpClient(username='test', base_url='https://gethue.blob.core.windows.net')
+
+      assert_raises(PopupException, client.execute, http_method='GET', path='/gethue/data/customer.csv', params={'action': 'getStatus'})
+
+      # When no SAS token in response
       raz_get_url.return_value = {}
       client = RazHttpClient(username='test', base_url='https://gethue.blob.core.windows.net')
 
