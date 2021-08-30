@@ -71,27 +71,27 @@ class RazTokenTest(unittest.TestCase):
 
     with patch('desktop.lib.raz.raz_client.requests.get') as requests_get:
       with patch('desktop.lib.raz.raz_client.socket.gethostbyname') as gethostbyname:
-          requests_get.return_value = Mock(
-            text='{"Token":{"urlString":"https://gethue-test.s3.amazonaws.com/gethue/data/customer.csv?' + \
-                  'AWSAccessKeyId=AKIA23E77ZX2HVY76YGL' + \
-                  '&Signature=3lhK%2BwtQ9Q2u5VDIqb4MEpoY3X4%3D&Expires=1617207304"}}'
-          )
-          gethostbyname.return_value = '128.0.0.1'
-          token = RazToken(raz_url='https://raz.gethue.com:8080', auth_handler=kerb_auth)
+        requests_get.return_value = Mock(
+          text='{"Token":{"urlString":"https://gethue-test.s3.amazonaws.com/gethue/data/customer.csv?' + \
+                'AWSAccessKeyId=AKIA23E77ZX2HVY76YGL' + \
+                '&Signature=3lhK%2BwtQ9Q2u5VDIqb4MEpoY3X4%3D&Expires=1617207304"}}'
+        )
+        gethostbyname.return_value = '128.0.0.1'
+        token = RazToken(raz_url='https://raz.gethue.com:8080', auth_handler=kerb_auth)
+
+        t = token.renew_delegation_token(user=self.username)
+
+        assert_equal(t,
+          'https://gethue-test.s3.amazonaws.com/gethue/data/customer.csv?AWSAccessKeyId=AKIA23E77ZX2HVY76YGL&'
+          'Signature=3lhK%2BwtQ9Q2u5VDIqb4MEpoY3X4%3D&Expires=1617207304'
+        )
+
+        with patch('desktop.lib.raz.raz_client.requests.put') as requests_put:
+          token.init_time += timedelta(hours=9)
 
           t = token.renew_delegation_token(user=self.username)
 
-          assert_equal(t,
-            'https://gethue-test.s3.amazonaws.com/gethue/data/customer.csv?AWSAccessKeyId=AKIA23E77ZX2HVY76YGL&'
-            'Signature=3lhK%2BwtQ9Q2u5VDIqb4MEpoY3X4%3D&Expires=1617207304'
-          )
-
-          with patch('desktop.lib.raz.raz_client.requests.put') as requests_put:
-            token.init_time += timedelta(hours=9)
-
-            t = token.renew_delegation_token(user=self.username)
-
-            requests_put.assert_called()
+          requests_put.assert_called()
 
 
 class RazClientTest(unittest.TestCase):
@@ -102,7 +102,8 @@ class RazClientTest(unittest.TestCase):
     self.raz_token = "mock_RAZ_token"
 
     self.s3_path = 'https://gethue-test.s3.amazonaws.com/gethue/data/customer.csv'
-    self.adls_path = 'https://gethuestorageaccount.dfs.core.windows.net/demo-gethue-container/demo-dir1/customer.csv'
+    self.adls_path = 'https://gethuestorage.dfs.core.windows.net/gethue-container/user/csso_hueuser/customer.csv'
+
 
   def test_get_raz_client_adls(self):
     with patch('desktop.lib.raz.raz_client.RazToken') as RazToken:
@@ -122,6 +123,7 @@ class RazClientTest(unittest.TestCase):
         assert_equal(client.raz_url, self.raz_url)
         assert_equal(client.service_name, 'gethue_adls')
         assert_equal(client.cluster_name, 'gethueCluster')
+
 
   def test_check_access_adls(self):
     with patch('desktop.lib.raz.raz_client.requests.post') as requests_post:
@@ -143,6 +145,7 @@ class RazClientTest(unittest.TestCase):
 
         client = RazClient(self.raz_url, self.raz_token, username=self.username, service="adls", service_name="cm_adls", cluster_name="cl1")
 
+        # Read file operation
         resp = client.check_access(method='GET', url=self.adls_path)
 
         requests_post.assert_called_with(
@@ -163,11 +166,10 @@ class RazClientTest(unittest.TestCase):
             'context': {}, 
             'operation': {
               'resource': {
-                'storageaccount': 'gethuestorageaccount', 
-                'container': 'demo-gethue-container', 
-                'relativepath': 'demo-dir1/customer.csv'
-              }, 
-              'resourceOwner': 'gethuestorageaccount', 
+                'storageaccount': 'gethuestorage', 
+                'container': 'gethue-container', 
+                'relativepath': '/user/csso_hueuser/customer.csv'
+              },
               'action': 'read', 
               'accessTypes': ['read']
             }
@@ -175,6 +177,32 @@ class RazClientTest(unittest.TestCase):
           verify=False
         )
         assert_equal(resp['token'], "nulltenantIdnullnullbnullALLOWEDnullnull1.05nSlN7t/QiPJ1OFlCruTEPLibFbAhEYYj5wbJuaeQqs=")
+
+
+  def test_handle_adls_action_types_mapping(self):
+
+    client = RazClient(self.raz_url, self.raz_token, username=self.username, service="adls", service_name="cm_adls", cluster_name="cl1")
+
+    # List directory
+    method = 'GET'
+    relative_path = '/'
+    url_params = {'directory': 'user%2Fcsso_hueuser', 'resource': 'filesystem', 'recursive': 'false'}
+
+    response = client.handle_adls_req_mapping(method, url_params, relative_path)
+
+    assert_equal(response['access_type'], 'list')
+    assert_equal(response['relative_path'], '/user/csso_hueuser')
+
+    # Stats
+    method = 'HEAD'
+    relative_path = '/user/csso_hueuser'
+    url_params = {'action': 'getStatus'}
+
+    response = client.handle_adls_req_mapping(method, url_params, relative_path)
+
+    assert_equal(response['access_type'], 'get-status')
+    assert_equal(response['relative_path'], '/user/csso_hueuser')
+
 
   def test_get_raz_client_s3(self):
     with patch('desktop.lib.raz.raz_client.RazToken') as RazToken:
@@ -194,6 +222,7 @@ class RazClientTest(unittest.TestCase):
         assert_equal(client.raz_url, self.raz_url)
         assert_equal(client.service_name, 'gethue_s3')
         assert_equal(client.cluster_name, 'gethueCluster')
+
 
   def test_check_access_s3(self):
     with patch('desktop.lib.raz.raz_client.requests.post') as requests_post:
@@ -242,17 +271,16 @@ class RazClientTest(unittest.TestCase):
                 'userGroups': [],
                 'clientIpAddress': '',
                 'clientType': '',
-                'clusterName':
-                'myCluster',
+                'clusterName': 'myCluster',
                 'clusterType': '',
                 'sessionId': '',
                 'accessTime': '',
                 'context': {
-                  'S3_SIGN_REQUEST': b'CiRodHRwczovL2dldGh1ZS10ZXN0LnMzLmFtYXpvbmF3cy5jb20QATIYZ2V0aHVlL2RhdGEvY3VzdG9tZXIuY3N2OABCAnMzSgJzMw=='
+                  'S3_SIGN_REQUEST': b'CiRodHRwczovL2dldGh1ZS10ZXN0LnMzLmFtYXpvbmF3cy5jb20Q' \
+                    b'ATIYZ2V0aHVlL2RhdGEvY3VzdG9tZXIuY3N2OABCAnMzSgJzMw=='
                 }
               },
               verify=False
             )
-
             assert_true(resp)
             assert_equal(resp['AWSAccessKeyId'], 'AKIA23E77ZX2HVY76YGL')

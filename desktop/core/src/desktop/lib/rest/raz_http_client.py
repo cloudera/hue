@@ -56,7 +56,7 @@ class RazHttpClient(HttpClient):
     if response and response.get('token'):
       signed_url += ('?' if '?' not in url else '&') + response.get('token')
     else:
-      raise PopupException(_('No SAS token in response'), error_code=503)
+      raise PopupException(_('No SAS token in RAZ response'), error_code=503)
 
     # Required because `self._make_url` is called in base class execute method also
     signed_path = path + signed_url.partition(path)[2]
