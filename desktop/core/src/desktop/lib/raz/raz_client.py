@@ -57,16 +57,21 @@ class RazToken:
 
   def get_delegation_token(self, user):
     ip_address = socket.gethostbyname(self.raz_hostname)
-    GET_PARAMS = {"op": "GETDELEGATIONTOKEN", "service": "%s:%s" % (ip_address, self.raz_port), "renewer": AUTH_USERNAME.get(), "doAs": user}
+    GET_PARAMS = {
+      "op": "GETDELEGATIONTOKEN",
+      "service": "%s:%s" % (ip_address, self.raz_port),
+      "renewer": AUTH_USERNAME.get(),
+      "doAs": user
+    }
     r = requests.get(self.raz_url, GET_PARAMS, auth=self.auth_handler, verify=False)
     self.raz_token = json.loads(r.text)['Token']['urlString']
     return self.raz_token
 
   def renew_delegation_token(self, user):
     if self.raz_token is None:
-        self.raz_token = self.get_delegation_token(user=user)
+      self.raz_token = self.get_delegation_token(user=user)
     if (self.init_time - timedelta(hours=8)) > datetime.now():
-        r = requests.put("%s?op=RENEWDELEGATIONTOKEN&token=%s"%(self.raz_url, self.raz_token), auth=self.auth_handler, verify=False)
+      r = requests.put("%s?op=RENEWDELEGATIONTOKEN&token=%s"%(self.raz_url, self.raz_token), auth=self.auth_handler, verify=False)
     return self.raz_token
 
 
@@ -203,7 +208,6 @@ class RazClient(object):
         access_type = 'get-status'
     
     if method == 'GET':
-      # Read
       access_type = 'read'
 
       # List
