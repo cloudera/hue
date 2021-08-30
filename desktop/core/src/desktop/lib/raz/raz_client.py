@@ -187,7 +187,7 @@ class RazClient(object):
           "relativepath": relative_path,
         },
         "action": access_type,
-        "accessTypes":[access_type]
+        "accessTypes": [access_type]
       }
     })
 

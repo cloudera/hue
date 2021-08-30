@@ -71,27 +71,27 @@ class RazTokenTest(unittest.TestCase):
 
     with patch('desktop.lib.raz.raz_client.requests.get') as requests_get:
       with patch('desktop.lib.raz.raz_client.socket.gethostbyname') as gethostbyname:
-          requests_get.return_value = Mock(
-            text='{"Token":{"urlString":"https://gethue-test.s3.amazonaws.com/gethue/data/customer.csv?' + \
-                  'AWSAccessKeyId=AKIA23E77ZX2HVY76YGL' + \
-                  '&Signature=3lhK%2BwtQ9Q2u5VDIqb4MEpoY3X4%3D&Expires=1617207304"}}'
-          )
-          gethostbyname.return_value = '128.0.0.1'
-          token = RazToken(raz_url='https://raz.gethue.com:8080', auth_handler=kerb_auth)
+        requests_get.return_value = Mock(
+          text='{"Token":{"urlString":"https://gethue-test.s3.amazonaws.com/gethue/data/customer.csv?' + \
+                'AWSAccessKeyId=AKIA23E77ZX2HVY76YGL' + \
+                '&Signature=3lhK%2BwtQ9Q2u5VDIqb4MEpoY3X4%3D&Expires=1617207304"}}'
+        )
+        gethostbyname.return_value = '128.0.0.1'
+        token = RazToken(raz_url='https://raz.gethue.com:8080', auth_handler=kerb_auth)
+
+        t = token.renew_delegation_token(user=self.username)
+
+        assert_equal(t,
+          'https://gethue-test.s3.amazonaws.com/gethue/data/customer.csv?AWSAccessKeyId=AKIA23E77ZX2HVY76YGL&'
+          'Signature=3lhK%2BwtQ9Q2u5VDIqb4MEpoY3X4%3D&Expires=1617207304'
+        )
+
+        with patch('desktop.lib.raz.raz_client.requests.put') as requests_put:
+          token.init_time += timedelta(hours=9)
 
           t = token.renew_delegation_token(user=self.username)
 
-          assert_equal(t,
-            'https://gethue-test.s3.amazonaws.com/gethue/data/customer.csv?AWSAccessKeyId=AKIA23E77ZX2HVY76YGL&'
-            'Signature=3lhK%2BwtQ9Q2u5VDIqb4MEpoY3X4%3D&Expires=1617207304'
-          )
-
-          with patch('desktop.lib.raz.raz_client.requests.put') as requests_put:
-            token.init_time += timedelta(hours=9)
-
-            t = token.renew_delegation_token(user=self.username)
-
-            requests_put.assert_called()
+          requests_put.assert_called()
 
 
 class RazClientTest(unittest.TestCase):
@@ -177,6 +177,7 @@ class RazClientTest(unittest.TestCase):
           verify=False
         )
         assert_equal(resp['token'], "nulltenantIdnullnullbnullALLOWEDnullnull1.05nSlN7t/QiPJ1OFlCruTEPLibFbAhEYYj5wbJuaeQqs=")
+
 
   def test_handle_adls_req_mapping(self):
     with patch('desktop.lib.raz.raz_client.requests.post') as requests_post:
@@ -298,17 +299,16 @@ class RazClientTest(unittest.TestCase):
                 'userGroups': [],
                 'clientIpAddress': '',
                 'clientType': '',
-                'clusterName':
-                'myCluster',
+                'clusterName': 'myCluster',
                 'clusterType': '',
                 'sessionId': '',
                 'accessTime': '',
                 'context': {
-                  'S3_SIGN_REQUEST': b'CiRodHRwczovL2dldGh1ZS10ZXN0LnMzLmFtYXpvbmF3cy5jb20QATIYZ2V0aHVlL2RhdGEvY3VzdG9tZXIuY3N2OABCAnMzSgJzMw=='
+                  'S3_SIGN_REQUEST': b'CiRodHRwczovL2dldGh1ZS10ZXN0LnMzLmFtYXpvbmF3cy5jb20Q' \
+                    b'ATIYZ2V0aHVlL2RhdGEvY3VzdG9tZXIuY3N2OABCAnMzSgJzMw=='
                 }
               },
               verify=False
             )
-
             assert_true(resp)
             assert_equal(resp['AWSAccessKeyId'], 'AKIA23E77ZX2HVY76YGL')
