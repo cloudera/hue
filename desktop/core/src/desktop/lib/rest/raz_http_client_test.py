@@ -35,18 +35,21 @@ class TestRazHttpClient():
       with patch('desktop.lib.rest.raz_http_client.HttpClient.execute') as raz_http_execute:
 
         raz_get_url.return_value = {
-          'token': 'sv=2014-02-14&sr=b&sig=pJL%2FWyed41tptiwBM5ymYre4qF8wzrO05tS5MCjkutc%3D&st=2015-01-02T01%3A40%3A51Z&se=2015-01-02T02%3A00%3A51Z&sp=r'
+          'token': 'sv=2014-02-14&sr=b&sig=pJL%2FWyed41tptiwBM5ymYre4qF8wzrO05tS5MCjkutc%3D' \
+            '&st=2015-01-02T01%3A40%3A51Z&se=2015-01-02T02%3A00%3A51Z&sp=r'
         }
         raz_http_execute.return_value = 'my_file_content'
 
-        client = RazHttpClient(username='test', base_url='https://gethue.blob.core.windows.net')
+        client = RazHttpClient(username='test', base_url='https://gethue.dfs.core.windows.net')
         f = client.execute(http_method='GET', path='/gethue/data/customer.csv', params={'action': 'getStatus'})
 
+        url = 'https://gethue.dfs.core.windows.net/gethue/data/customer.csv?action=getStatus'
         assert_equal('my_file_content', f)
-        raz_get_url.assert_called_with(action='GET', path='https://gethue.blob.core.windows.net/gethue/data/customer.csv?action=getStatus', headers=None)
+        raz_get_url.assert_called_with(action='GET', path=url, headers=None)
         raz_http_execute.assert_called_with(
             http_method='GET',
-            path='/gethue/data/customer.csv?action=getStatus&sv=2014-02-14&sr=b&sig=pJL%2FWyed41tptiwBM5ymYre4qF8wzrO05tS5MCjkutc%3D&st=2015-01-02T01%3A40%3A51Z&se=2015-01-02T02%3A00%3A51Z&sp=r',
+            path='/gethue/data/customer.csv?action=getStatus&sv=2014-02-14&sr=b&sig=pJL%2FWyed41tptiwBM5ymYre4qF8wzrO05tS5MCjkutc%3D' \
+              '&st=2015-01-02T01%3A40%3A51Z&se=2015-01-02T02%3A00%3A51Z&sp=r',
             data=None,
             headers=None,
             allow_redirects=False,
