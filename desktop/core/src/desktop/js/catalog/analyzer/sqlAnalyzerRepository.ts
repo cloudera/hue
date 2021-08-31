@@ -14,11 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import NoopSqlAnalyzer from './NoopSqlAnalyzer';
 import CombinedSqlAnalyser from './CombinedSqlAnalyser';
+import NoopSqlAnalyzer from './NoopSqlAnalyzer';
+import { SqlAnalyzer, SqlAnalyzerProvider } from './types';
 import { Connector } from 'config/types';
-import { hueWindow } from 'types/types';
-import { SqlAnalyzer, SqlAnalyzerProvider, SqlAnalyzerMode } from './types';
 
 const sqlAnalyzerInstances: { [connectorId: string]: SqlAnalyzer | undefined } = {};
 
