@@ -1,7 +1,9 @@
 # Welcome to Hue (http://gethue.com) Dockerfile
 
-FROM ubuntu:18.04
+FROM ubuntu:20.04
 LABEL description="Hue SQL Assistant - gethue.com"
+
+ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update -y && apt-get install -y \
   python3-pip \
@@ -14,7 +16,9 @@ RUN apt-get update -y && apt-get install -y \
   libmysqlclient-dev \
   libldap2-dev \
   libsnappy-dev \
-  python3.6-venv \
+  python3.8-venv \
+  python3.8-dev \
+  python3.8-distutils \
   rsync \
   curl \
   sudo \
@@ -36,10 +40,10 @@ RUN pip3 install --upgrade --no-cache-dir setuptools virtualenv pip && \
   rm -r /hue/desktop/conf/* && \
   cp -r /hue/desktop/conf.dist/* /hue/desktop/conf/ && \
   cd /hue && \
-  PREFIX=/usr/share PYTHON_VER=python3.6 make install && \
+  PREFIX=/usr/share PYTHON_VER=python3.8 make install && \
   chown -R hue /usr/share/hue && \
   npm cache clean --force && \
-  pip3 cache purge && \
+  pip cache purge && \
   rm -rf /var/lib/apt/lists/* && \
   cp -r /hue/tools/docker/hue/conf3/* /usr/share/hue/desktop/conf/ && \
   cp /hue/tools/docker/hue/startup.sh /usr/share/hue/startup.sh && \
