@@ -37,13 +37,13 @@ And finally launch the shell by:
 
 ### S3
 
-Interact directly with S3 by first getting a client:
+Interact directly with S3 by first getting the client:
 
     from desktop.lib.fsmanager import get_client
 
-    s3fs = get_client('default', 's3a', 'romain')
+    s3fs = get_client('default', 's3a', 'csso_hueuser')
 
-Then grab a key:
+Then grab the key:
 
     k = s3fs._get_key('s3a://gethue/')
     k.exists()
@@ -67,11 +67,38 @@ Or perform various FS operations:
 
 ### ADLS
 
+
+Interact directly with ADLS by first getting the client:
+
     from desktop.lib.fsmanager import get_client
 
-    fs = get_client('default', 'abfs', 'romain')
+    fs = get_client('default', 'abfs', 'csso_hueuser')
 
-    fs.stats('https://gethue.blob.core.windows.net/data')
+Perform various FS operations:
+
+    # Stats
+    fs.stats('abfs://data/user/csso_hueuser/demo_dir')
+    
+    # List
+    fs.listdir('abfs://data/user/csso_hueuser/demo_dir')
+    
+    # Create directory
+    fs.mkdir('abfs://data/user/csso_hueuser/new_dir')
+    
+    # Create file
+    fs.create('abfs://data/user/csso_hueuser/demo_dir/newfile.txt')
+
+    # Create file with write data
+    fs.create('abfs://data/user/csso_hueuser/demo_dir/demo_file.txt', data='Hello world!')
+    
+    # Read
+    fs.read('abfs://data/user/csso_hueuser/demo_dir/demo_file.txt')
+    
+    # Delete path (can be file or empty directory)
+    fs.remove('abfs://data/user/csso_hueuser/demo_dir/demo_file.txt')
+    
+    # Delete directory with recursive as true
+    fs.rmtree('abfs://data/user/csso_hueuser/demo_dir')
 
 ## Users
 
