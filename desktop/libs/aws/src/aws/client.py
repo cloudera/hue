@@ -28,6 +28,8 @@ from desktop.conf import RAZ
 from desktop.lib.idbroker import conf as conf_idbroker
 from desktop.lib.idbroker.client import IDBroker
 
+from hadoop.core_site import get_raz_s3_default_bucket
+
 LOG = logging.getLogger(__name__)
 
 
@@ -43,7 +45,7 @@ def get_credential_provider(identifier, user):
 def _make_client(identifier, user):
   client_conf = aws_conf.AWS_ACCOUNTS[identifier] if identifier in aws_conf.AWS_ACCOUNTS else None
 
-  if RAZ.IS_ENABLED.get() and not aws_conf.IS_SELF_SIGNING_ENABLED.get():
+  if RAZ.IS_ENABLED.get() and bool(get_raz_s3_default_bucket()) and not aws_conf.IS_SELF_SIGNING_ENABLED.get():
     host = aws_conf.get_default_host() or client_conf.HOST.get()
     s3_client = RazS3Connection(username=user, host=host)  # Note: Remaining AWS configuration is fully skipped
     s3_client_expiration = None
@@ -77,7 +79,7 @@ class CredentialProviderConf(object):
     else:
       return {
         'AccessKeyId': self._conf.ACCESS_KEY_ID.get(),
-        'SecretAccessKey':self._conf.get_default_secret_key(),
+        'SecretAccessKey': self._conf.get_default_secret_key(),
         'SessionToken': self._conf.get_default_session_token(),
         'AllowEnvironmentCredentials': True
       }
