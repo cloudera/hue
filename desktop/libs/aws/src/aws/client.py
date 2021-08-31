@@ -79,7 +79,7 @@ class CredentialProviderConf(object):
     else:
       return {
         'AccessKeyId': self._conf.ACCESS_KEY_ID.get(),
-        'SecretAccessKey':self._conf.get_default_secret_key(),
+        'SecretAccessKey': self._conf.get_default_secret_key(),
         'SessionToken': self._conf.get_default_session_token(),
         'AllowEnvironmentCredentials': True
       }
