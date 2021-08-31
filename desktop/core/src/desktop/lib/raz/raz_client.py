@@ -203,6 +203,9 @@ class RazClient(object):
     if method == 'HEAD':
       access_type = 'get-status' if params.get('action') == 'getStatus' else ''
 
+    if method == 'PATCH':
+      access_type = 'write' if params.get('action') == 'append' or params.get('action') == 'flush' else ''
+
     if method == 'DELETE':
       access_type = 'delete-recursive' if params.get('recursive') == 'true' else 'delete'
     
