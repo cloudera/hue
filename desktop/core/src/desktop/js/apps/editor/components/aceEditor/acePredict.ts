@@ -63,47 +63,31 @@ export const attachPredictTypeahead = (
   let lastPrediction: string | undefined;
 
   const updatePredictTypeahead = () => {
-    if (activePredictPromise) {
-      try {
-        activePredictPromise.cancel();
-      } catch {}
-    }
-    defer(() => {
-      const editorText = editor.getValue();
-      if (
-        activePredict &&
-        (!editorText.length ||
-          activePredict.text === editorText ||
-          activePredict.text.indexOf(editorText) !== 0)
-      ) {
-        removeActivePredict();
-      }
-      try {
-        if (editorText.length && !activePredict) {
-          sqlAnalyzer
-            .predict({
-              beforeCursor: editor.getTextBeforeCursor(),
-              afterCursor: editor.getTextAfterCursor()
-            })
-            .then(({ prediction }) => {
-              if (prediction !== lastPrediction) {
-                const beforeCursor = editor.getTextBeforeCursor();
-                if (prediction && prediction.toLowerCase().startsWith(beforeCursor.toLowerCase())) {
-                  setActivePredict(beforeCursor + prediction.slice(beforeCursor.length));
-                } else {
-                  removeActivePredict();
-                }
+    const editorText = editor.getValue();
+
+    try {
+      if (editorText.length && !activePredict) {
+        activePredictPromise = sqlAnalyzer.predict({
+          beforeCursor: editor.getTextBeforeCursor(),
+          afterCursor: editor.getTextAfterCursor()
+        });
+        activePredictPromise
+          .then(({ prediction }) => {
+            if (prediction !== lastPrediction) {
+              const beforeCursor = editor.getTextBeforeCursor();
+              if (prediction && prediction.toLowerCase().startsWith(beforeCursor.toLowerCase())) {
+                setActivePredict(beforeCursor + prediction.slice(beforeCursor.length));
+              } else {
+                removeActivePredict();
               }
-              lastPrediction = prediction;
-            })
-            .catch(() => {
-              removeActivePredict();
-            });
-        }
-      } catch {
-        removeActivePredict();
+            }
+            lastPrediction = prediction;
+          })
+          .catch(removeActivePredict);
       }
-    });
+    } catch {
+      removeActivePredict();
+    }
   };
 
   editor.commands.addCommand({
@@ -140,8 +124,30 @@ export const attachPredictTypeahead = (
     }
   });
 
+  let predictThrottle = -1;
+
   const predictOnInput = () => {
-    updatePredictTypeahead();
+    if (activePredictPromise) {
+      try {
+        activePredictPromise.cancel();
+        activePredictPromise = undefined;
+      } catch {}
+    }
+    defer(() => {
+      window.clearTimeout(predictThrottle);
+
+      const editorText = editor.getValue();
+      if (
+        activePredict &&
+        (!editorText.length ||
+          activePredict.text === editorText ||
+          activePredict.text.indexOf(editorText) !== 0)
+      ) {
+        removeActivePredict();
+      }
+
+      predictThrottle = window.setTimeout(updatePredictTypeahead, 300);
+    });
   };
 
   editor.on('input', predictOnInput);
