@@ -204,7 +204,12 @@ class RazClient(object):
       access_type = 'get-status' if params.get('action') == 'getStatus' else ''
 
     if method == 'PATCH':
-      access_type = 'write' if params.get('action') == 'append' or params.get('action') == 'flush' else ''
+      if params.get('action') == 'append' or params.get('action') == 'flush':
+        access_type = 'write'
+
+      if params.get('action') == 'setAccessControl':
+        access_type = 'set-permission'
+
 
     if method == 'DELETE':
       access_type = 'delete-recursive' if params.get('recursive') == 'true' else 'delete'
@@ -219,6 +224,8 @@ class RazClient(object):
         access_type = 'create-file'
       elif params.get('resource') == 'directory':
         access_type = 'create-directory'
+      else:
+        access_type = 'rename-source'
 
     return {'access_type': access_type, 'relative_path': relative_path}
 

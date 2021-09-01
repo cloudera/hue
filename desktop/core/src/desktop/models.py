@@ -77,7 +77,7 @@ SAMPLE_USER_ID = 1100713
 SAMPLE_USER_INSTALL = 'hue'
 SAMPLE_USER_OWNERS = ['hue', 'sample']
 
-UTC_TIME_FORMAT = "%Y-%m-%dT%H:%MZ"
+UTC_TIME_FORMAT = "%Y-%m-%dT%H:%M"
 HUE_VERSION = None
 
 
