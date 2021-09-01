@@ -60,14 +60,25 @@ class JwtAuthentication(authentication.BaseAuthentication):
       payload = jwt.decode(
         access_token,
         public_key_pem,
+        issuer=AUTH.JWT.ISSUER.get(),
+        audience=AUTH.JWT.AUDIENCE.get(),
         algorithms=["RS256"],
         verify=AUTH.JWT.VERIFY.get()
       )
     except jwt.DecodeError:
+      LOG.error('JwtAuthentication: Invalid token')
       raise exceptions.AuthenticationFailed('JwtAuthentication: Invalid token')
     except jwt.ExpiredSignatureError:
+      LOG.error('JwtAuthentication: Token expired')
       raise exceptions.AuthenticationFailed('JwtAuthentication: Token expired')
+    except jwt.InvalidIssuerError:
+      LOG.error('JwtAuthentication: issuer not match')
+      raise exceptions.AuthenticationFailed('JwtAuthentication: issuer not matching')
+    except jwt.InvalidAudienceError:
+      LOG.error('JwtAuthentication: audience not match or no audience')
+      raise exceptions.AuthenticationFailed('JwtAuthentication: audience not matching or no audience')
     except Exception as e:
+      LOG.error('JwtAuthentication: %s' % str(e))
       raise exceptions.AuthenticationFailed(e)
     
     if payload.get('user') is None:

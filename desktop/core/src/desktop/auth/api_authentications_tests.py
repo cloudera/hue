@@ -177,7 +177,9 @@ class TestJwtAuthentication():
 
         resets = [
           AUTH.JWT.VERIFY.set_for_testing(True),
-          AUTH.JWT.KEY_SERVER_URL.set_for_testing('https://ext-authz:8000')
+          AUTH.JWT.KEY_SERVER_URL.set_for_testing('https://ext-authz:8000'),
+          AUTH.JWT.ISSUER.set_for_testing('issuer'),
+          AUTH.JWT.AUDIENCE.set_for_testing('audience')
         ]
 
         try:
@@ -194,6 +196,8 @@ class TestJwtAuthentication():
             b'Vno2e527clXzQisfJKwb4hjfKRMhHfnYfyJxaoHqWfx8DjXmH3CMqlWr/+hL3y1+\n'
             b'4QIDAQAB\n'
             b'-----END PUBLIC KEY-----\n',
+            issuer=AUTH.JWT.ISSUER.get(),
+            audience=AUTH.JWT.AUDIENCE.get(),
             algorithms=['RS256'],
             verify=True
           )
