@@ -28,7 +28,7 @@ import threading
 import re
 
 from math import ceil
-from posixpath import join
+from posixpath import join, normpath
 
 from hadoop.hdfs_site import get_umask_mode
 from hadoop.fs.exceptions import WebHdfsException
@@ -36,6 +36,7 @@ from hadoop.fs.exceptions import WebHdfsException
 from desktop.conf import RAZ
 from desktop.lib.rest import http_client, resource
 from desktop.lib.rest.raz_http_client import RazHttpClient
+from desktop.lib.raz.clients import AdlsRazClient
 
 import azure.abfs.__init__ as Init_ABFS
 from azure.abfs.abfsfile import ABFSFile
@@ -572,6 +573,16 @@ class ABFS(object):
     Renames a file
     """
     headers = {'x-ms-rename-source': '/' + urllib_quote(Init_ABFS.strip_scheme(old))}
+
+    # Required to sign the header with SAS token for RAZ
+    if RAZ.IS_ENABLED.get():
+      raz_client = AdlsRazClient(username=self._user)
+      source_url = self._url + normpath('/' + headers['x-ms-rename-source'].lstrip('/'))
+
+      response = raz_client.get_url(action='PUT', path=source_url)
+      if response and response.get('token'):
+        headers['x-ms-rename-source'] += '?' + response['token']
+
     try:
       self._create_path(new, headers=headers, overwrite=True)
     except WebHdfsException as e:
