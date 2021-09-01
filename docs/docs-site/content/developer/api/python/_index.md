@@ -33,6 +33,25 @@ And finally launch the shell by:
     > ALERT: HUE_CONF_DIR must be set when running hue commands in CM Managed environment
     > ALERT: Please run 'hue <command> --cm-managed'
 
+
+## Query
+
+Requires a user object:
+
+    from notebook.models import make_notebook, MockRequest
+
+    job = make_notebook(
+        name='List tables in Salesforce database',
+        editor_type='hive',
+        statement='SHOW TABLES',
+        status='ready',
+        database='sfdc',
+        on_success_url='assist.db.refresh'
+    )
+
+    request = MockRequest(user=user)
+    job.execute_and_wait(request)
+
 ## Storage
 
 ### S3
@@ -78,25 +97,25 @@ Perform various FS operations:
 
     # Stats
     fs.stats('abfs://data/user/csso_hueuser/demo_dir')
-    
+
     # List
     fs.listdir('abfs://data/user/csso_hueuser/demo_dir')
-    
+
     # Create directory
     fs.mkdir('abfs://data/user/csso_hueuser/new_dir')
-    
+
     # Create file
     fs.create('abfs://data/user/csso_hueuser/demo_dir/newfile.txt')
 
     # Create file with write data
     fs.create('abfs://data/user/csso_hueuser/demo_dir/demo_file.txt', data='Hello world!')
-    
+
     # Read
     fs.read('abfs://data/user/csso_hueuser/demo_dir/demo_file.txt')
-    
+
     # Delete path (can be file or empty directory)
     fs.remove('abfs://data/user/csso_hueuser/demo_dir/demo_file.txt')
-    
+
     # Delete directory with recursive as true
     fs.rmtree('abfs://data/user/csso_hueuser/demo_dir')
 
