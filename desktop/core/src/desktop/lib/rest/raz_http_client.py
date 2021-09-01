@@ -41,22 +41,16 @@ class RazHttpClient(HttpClient):
               files=None, stream=False, clear_cookies=False, timeout=conf.REST_CONN_TIMEOUT.get()):
     """
     From an object URL we get back the SAS token as a GET param string, e.g.:
-    https://[storageaccountname].blob.core.windows.net/[containername]/[blobname]
+    https://{storageaccountname}.dfs.core.windows.net/{container}/{path}
     -->
-    https://[storageaccountname].blob.core.windows.net/[containername]/[blobname]?sv=2014-02-14&sr=b&
+    https://{storageaccountname}.dfs.core.windows.net/{container}/{path}?sv=2014-02-14&sr=b&
     sig=pJL%2FWyed41tptiwBM5ymYre4qF8wzrO05tS5MCjkutc%3D&st=2015-01-02T01%3A40%3A51Z&se=2015-01-02T02%3A00%3A51Z&sp=r
     """
-    raz_client = AdlsRazClient(username=self.username)
 
     url = self._make_url(path, params)
+    sas_token = self.get_sas_token(http_method, self.username, url, params, headers)
 
-    response = raz_client.get_url(action=http_method, path=url, headers=headers)
-
-    signed_url = url
-    if response and response.get('token'):
-      signed_url += ('?' if '?' not in url else '&') + response.get('token')
-    else:
-      raise PopupException(_('No SAS token in RAZ response'), error_code=403)
+    signed_url = url + ('?' if '?' not in url else '&') + sas_token
 
     # Required because `self._make_url` is called in base class execute method also
     signed_path = path + signed_url.partition(path)[2]
@@ -73,3 +67,12 @@ class RazHttpClient(HttpClient):
         clear_cookies=clear_cookies,
         timeout=timeout
     )
+
+  def get_sas_token(self, http_method, username, url, params=None, headers=None):
+    raz_client = AdlsRazClient(username=username)
+    response = raz_client.get_url(action=http_method, path=url, headers=headers)
+
+    if response and response.get('token'):
+      return response.get('token')
+    else:
+      raise PopupException(_('No SAS token in RAZ response'), error_code=403)

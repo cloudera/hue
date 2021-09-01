@@ -220,11 +220,12 @@ class RazClient(object):
         relative_path += lib_urlunquote(params['directory'])
     
     if method == 'PUT':
-      access_type = 'rename-source'
       if params.get('resource') == 'file':
         access_type = 'create-file'
       elif params.get('resource') == 'directory':
         access_type = 'create-directory'
+      else:
+        access_type = 'rename-source'
 
     return {'access_type': access_type, 'relative_path': relative_path}
 

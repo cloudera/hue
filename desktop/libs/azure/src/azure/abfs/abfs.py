@@ -28,7 +28,7 @@ import threading
 import re
 
 from math import ceil
-from posixpath import join, normpath
+from posixpath import join
 
 from hadoop.hdfs_site import get_umask_mode
 from hadoop.fs.exceptions import WebHdfsException
@@ -36,7 +36,6 @@ from hadoop.fs.exceptions import WebHdfsException
 from desktop.conf import RAZ
 from desktop.lib.rest import http_client, resource
 from desktop.lib.rest.raz_http_client import RazHttpClient
-from desktop.lib.raz.clients import AdlsRazClient
 
 import azure.abfs.__init__ as Init_ABFS
 from azure.abfs.abfsfile import ABFSFile
@@ -576,12 +575,11 @@ class ABFS(object):
 
     # Required to sign the header with SAS token for RAZ
     if RAZ.IS_ENABLED.get():
-      raz_client = AdlsRazClient(username=self._user)
-      source_url = self._url + normpath('/' + headers['x-ms-rename-source'].lstrip('/'))
+      raz_http_client = RazHttpClient(self._user, self._url, exc_class=WebHdfsException, logger=LOG)
+      url = raz_http_client._make_url(headers['x-ms-rename-source'], params=None)
 
-      response = raz_client.get_url(action='PUT', path=source_url)
-      if response and response.get('token'):
-        headers['x-ms-rename-source'] += '?' + response['token']
+      sas_token = raz_http_client.get_sas_token('PUT', self._user, url)
+      headers['x-ms-rename-source'] += '?' + sas_token
 
     try:
       self._create_path(new, headers=headers, overwrite=True)
