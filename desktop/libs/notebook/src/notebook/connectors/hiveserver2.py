@@ -29,6 +29,7 @@ import sys
 
 from django.urls import reverse
 
+from beeswax.conf import HPLSQL
 from desktop.auth.backend import is_admin
 from desktop.conf import USE_DEFAULT_CONFIGURATION, has_connectors
 from desktop.lib.conf import BoundConfig
@@ -189,7 +190,7 @@ class HS2Api(Api):
       session = None
 
     reuse_session = session is not None
-    if not reuse_session:
+    if not reuse_session or HPLSQL.get():
       db = dbms.get(self.user, query_server=get_query_server_config(name=lang, connector=self.interpreter))
       session = db.open_session(self.user)
 

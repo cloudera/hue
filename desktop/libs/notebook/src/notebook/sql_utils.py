@@ -22,6 +22,7 @@ import os
 import re
 import sys
 
+from beeswax.conf import HPLSQL
 from desktop.lib.i18n import smart_str
 
 if sys.version_info[0] > 2:
@@ -36,18 +37,31 @@ def get_statements(hql_query):
   hql_query_sio = string_io(hql_query)
 
   statements = []
-  for (start_row, start_col), (end_row, end_col), statement in split_statements(hql_query_sio.read()):
+  if HPLSQL.get():
     statements.append({
-      'start': {
-        'row': start_row,
-        'column': start_col
-      },
-      'end': {
-        'row': end_row,
-        'column': end_col
-      },
-      'statement': strip_trailing_semicolon(statement.rstrip())
+        'start': {
+          'row': 0,
+          'column': 0
+        },
+        'end': {
+          'row': 0,
+          'column': len(hql_query) - 1
+        },
+        'statement': hql_query
     })
+  else:
+    for (start_row, start_col), (end_row, end_col), statement in split_statements(hql_query_sio.read()):
+      statements.append({
+        'start': {
+          'row': start_row,
+          'column': start_col
+        },
+        'end': {
+          'row': end_row,
+          'column': end_col
+        },
+        'statement': strip_trailing_semicolon(statement.rstrip())
+      })
   return statements
 
 def get_current_statement(snippet):
