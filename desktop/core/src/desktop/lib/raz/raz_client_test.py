@@ -263,6 +263,16 @@ class RazClientTest(unittest.TestCase):
     assert_equal(response['access_type'], 'write')
     assert_equal(response['relative_path'], '/user/csso_hueuser/customers.csv')
 
+    # Chmod
+    method = 'PATCH'
+    relative_path = '/user/csso_hueuser/customers.csv'
+    url_params = {'action': 'setAccessControl'}
+
+    response = client.handle_adls_req_mapping(method, url_params, relative_path)
+
+    assert_equal(response['access_type'], 'set-permission')
+    assert_equal(response['relative_path'], '/user/csso_hueuser/customers.csv')
+
 
   def test_get_raz_client_s3(self):
     with patch('desktop.lib.raz.raz_client.RazToken') as RazToken:
