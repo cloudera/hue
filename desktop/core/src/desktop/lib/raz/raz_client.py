@@ -213,12 +213,12 @@ class RazClient(object):
 
     if method == 'DELETE':
       access_type = 'delete-recursive' if params.get('recursive') == 'true' else 'delete'
-    
+
     if method == 'GET':
       access_type = 'list' if params.get('resource') == 'filesystem' else 'read'
       if params.get('directory'):
         relative_path += lib_urlunquote(params['directory'])
-    
+
     if method == 'PUT':
       if params.get('resource') == 'file':
         access_type = 'create-file'
@@ -231,7 +231,6 @@ class RazClient(object):
 
 
   def _make_s3_request(self, request_data, request_headers, method, params, headers, url_params, endpoint, resource_path):
-
     allparams = [raz_signer.StringListStringMapProto(key=key, value=[val]) for key, val in url_params.items()]
     allparams.extend([raz_signer.StringListStringMapProto(key=key, value=[val]) for key, val in params.items()])
     headers = [raz_signer.StringStringMapProto(key=key, value=val) for key, val in headers.items()]
