@@ -98,7 +98,7 @@ Perform various FS operations:
     # Stats
     fs.stats('abfs://data/user/csso_hueuser/demo_dir')
 
-    # List
+    # List directory
     fs.listdir('abfs://data/user/csso_hueuser/demo_dir')
 
     # Create directory
@@ -118,6 +118,12 @@ Perform various FS operations:
 
     # Delete directory with recursive as true
     fs.rmtree('abfs://data/user/csso_hueuser/demo_dir')
+
+    # Chmod (accepts both octal number and string)
+    fs.chmod('abfs://data/user/csso_hueuser/demo_dir/demo_file.txt', permissionNumber='777')
+
+    # Rename path
+    fs.rename('abfs://data/user/csso_hueuser/old_name_dir/', 'abfs://data/user/csso_hueuser/new_name_dir/')
 
 ## Users
 
