@@ -22,6 +22,7 @@ import math
 import re
 import sys
 
+from retry_decorator import *
 from django.forms import ValidationError
 from django.http import Http404
 from django.utils.functional import wraps
@@ -110,6 +111,7 @@ def check_document_modify_permission():
   return inner
 
 
+@retry(QueryExpired, tries=3, timeout_secs=2.0)
 def api_error_handler(f):
   @wraps(f)
   def wrapper(*args, **kwargs):
