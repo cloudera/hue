@@ -16,9 +16,11 @@
 # limitations under the License.
 
 from builtins import zip
-from builtins import object
+import json
 import logging
+import sys
 
+from django.urls import reverse
 from nose.tools import assert_equal, assert_true, assert_false
 
 from desktop.auth.backend import rewrite_user
@@ -28,8 +30,47 @@ from useradmin.models import User
 
 from metadata.optimizer_api import _convert_queries
 
+if sys.version_info[0] > 2:
+  from unittest.mock import patch, Mock, MagicMock
+else:
+  from mock import patch, Mock, MagicMock
+
 
 LOG = logging.getLogger(__name__)
+
+
+
+class TestApi():
+
+  def setUp(self):
+    self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
+    self.client_not_me = make_logged_in_client(username="not_perm_user", groupname="default", recreate=True, is_superuser=False)
+
+    self.user = User.objects.get(username="test")
+    self.user_not_me = User.objects.get(username="not_perm_user")
+
+  def test_risk(self):
+    snippet = {"id":"2b7d1f46-17a0-30af-efeb-33d4c29b1055","type":"hive","status":"running","statement":
+        "select * from web_logs","properties":{"settings":[],"variables":[],"files":[],"functions":[]},
+        "result":{"id":"b424befa-f4f5-8799-a0b4-79753f2552b1","type":"table","handle":
+        {"log_context":None,"statements_count":1,"end":{"column":21,"row":0},"statement_id":0,
+        "has_more_statements":False,"start":{"column":0,"row":0},"secret":"rVRWw7YPRGqPT7LZ/TeFaA==an",
+        "has_result_set":True,"statement":"select * from web_logs","operation_type":0,"modified_row_count":
+        None,"guid":"7xm6+epkRx6dyvYvGNYePA==an"}},"lastExecuted": 1462554843817,"database":"default"}
+
+    with patch('metadata.optimizer_api.get_api') as get_api:
+      get_api.return_value = Mock(query_risk=Mock(return_value={'hint': 'hello'}))
+
+      response = self.client.post(reverse('metadata:query_risk'), {
+          'snippet': json.dumps(snippet),
+          'dbName': 'gethue',
+          'sourcePlatform': 'hive',
+          'interface': 'dummy',
+          'connector': json.dumps('{}')
+      })
+
+    data = json.loads(response.content)
+    assert_equal(0, data['status'], data)
 
 
 class TestOptimizerApi(object):

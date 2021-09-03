@@ -202,7 +202,8 @@ def query_risk(request):
     query = json.loads(request.POST.get('query'))
   else:
     snippet = json.loads(request.POST.get('snippet'))
-    query = get_current_statement(snippet)
+    should_close, resp = get_current_statement(snippet)
+    query = resp['statement']
   source_platform = request.POST.get('sourcePlatform')
   db_name = request.POST.get('dbName')
 
