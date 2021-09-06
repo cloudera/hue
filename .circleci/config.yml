@@ -2,21 +2,17 @@
 #
 # Check https://circleci.com/docs/2.0/language-python/ for more details
 #
-version: 2
-jobs:
-  build:
-    docker:
-      # specify the version you desire here
-      # - image: circleci/python:3.8.0
-      - image: gethue/hue:latest-py2
-
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/postgres:9.4
-
-    working_directory: ~/repo
-
+version: 2.1
+  
+commands:
+  build-common:
+    parameters:
+      go_arch:
+        # amd64 or arm64
+        type: string
+      hugo_arch:
+        # 64bit (AMD64) or ARM64
+        type: string
     steps:
       - checkout
 
@@ -43,29 +39,55 @@ jobs:
       - run:
           name: refresh sources
           command: |
-            rm -r /usr/share/hue/desktop/core/src/desktop
+            if [ ! -d /usr/share/hue ]; then
+              # Ubuntu 20.04 ARM64
+              sudo mkdir -p /usr/share/hue
+              sudo chown -R $USER:$USER /usr/share/hue
+            fi
+
+            rm -rf /usr/share/hue/desktop/core/src/desktop
+            mkdir -p /usr/share/hue/desktop/core/src/
             cp -r desktop/core/src/desktop /usr/share/hue/desktop/core/src/desktop
 
             for lib in `ls desktop/libs`
             do
-              rm -r /usr/share/hue/desktop/libs/$lib/src/$lib
+              rm -rf /usr/share/hue/desktop/libs/$lib/src/$lib
+              mkdir -p /usr/share/hue/desktop/libs/$lib/src/
               cp -r desktop/libs/$lib/src/$lib /usr/share/hue/desktop/libs/$lib/src/$lib
             done
-            for lib in `ls apps | grep -v Makefile`
+            for lib in `ls apps | grep -v Makefile | grep -v logs`
             do
-              rm -r /usr/share/hue/apps/$lib/src/$lib
+              rm -rf /usr/share/hue/apps/$lib/src/$lib
+              mkdir -p /usr/share/hue/apps/$lib/src/
               cp -r apps/$lib/src/$lib /usr/share/hue/apps/$lib/src/$lib
             done
 
-            rm -r /usr/share/hue/tools
+            rm -rf /usr/share/hue/tools
             cp -r tools /usr/share/hue
 
-            rm /usr/share/hue/desktop/conf/*.ini
+            rm -f /usr/share/hue/desktop/conf/*.ini
+            mkdir -p /usr/share/hue/desktop/conf/
             cp desktop/conf/pseudo-distributed.ini.tmpl /usr/share/hue/desktop/conf/pseudo-distributed.ini
 
             # ini configuration tweaks
             ## Very slow if on, cuts time in two and does not skip tests
             sed -i 's/## has_iam_detection=true/  has_iam_detection=false/g' /usr/share/hue/desktop/conf/pseudo-distributed.ini
+
+            # build Hue when using plain Ubuntu image
+            if [ ! -f /usr/share/hue/build/env/bin/hue ]; then
+              sudo add-apt-repository --yes ppa:deadsnakes/ppa
+              sudo apt-get update
+              DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true TZ=UTC sudo apt-get install -y --no-install-recommends python2.7-dev libsnappy-dev asciidoc git ant gcc g++ libffi-dev libkrb5-dev libmysqlclient-dev libsasl2-dev libsasl2-modules-gssapi-mit libsqlite3-dev libssl-dev libxml2-dev libxslt-dev make maven libldap2-dev python-setuptools libgmp3-dev
+              # see https://docs.gethue.com/administrator/installation/dependencies/#mysql--mariadb
+              git config user.email "hue+circleci@example.com"
+              git config user.name "Hue CircleCI"
+              git cherry-pick 7a9100d4a7f38eaef7bd4bd7c715ac1f24a969a8
+              git cherry-pick e67c1105b85b815346758ef1b9cd714dd91d7ea3
+              git clean -fdx
+              make apps
+              cp -r build /usr/share/hue/
+            fi
+            
 
             cd /usr/share/hue
             # make npm-install # Not available
@@ -76,9 +98,9 @@ jobs:
             cp ~/repo/.stylelintrc .
 
             cp ~/repo/webpack.config*.js .
-            rm package.json
+            rm -f package.json
             cp ~/repo/package.json .
-            rm package-lock.json
+            rm -f package-lock.json
             cp ~/repo/package-lock.json .
             npm install
             npm i eslint-plugin-jest@latest --save-dev # Seems to not be found otherwise
@@ -96,13 +118,13 @@ jobs:
             cd ~/repo
 
             # Installs to move to image building
-            curl -O https://dl.google.com/go/go1.15.linux-amd64.tar.gz
-            tar -xvf go1.15.linux-amd64.tar.gz
+            curl -O https://dl.google.com/go/go1.15.linux-<< parameters.go_arch >>.tar.gz
+            tar -xvf go1.15.linux-<< parameters.go_arch >>.tar.gz
             export GO111MODULE=on
             go/bin/go get -u github.com/raviqqe/muffet@v1.5.7
 
-            curl --output hugo_0.69.0_Linux-64bit.tar.gz -L https://github.com/gohugoio/hugo/releases/download/v0.69.0/hugo_0.69.0_Linux-64bit.tar.gz
-            tar -xvf hugo_0.69.0_Linux-64bit.tar.gz
+            curl --output hugo_0.69.0_Linux.tar.gz -L https://github.com/gohugoio/hugo/releases/download/v0.69.0/hugo_0.69.0_Linux-<< parameters.hugo_arch >>.tar.gz
+            tar -xvf hugo_0.69.0_Linux.tar.gz
 
             export PATH=$PWD:$HOME/go/bin:$PATH
 
@@ -179,32 +201,7 @@ jobs:
           path: test-reports
           destination: test-reports
 
-
-  commit:
-    docker:
-      - image: circleci/python:3.8.0
-
-    working_directory: ~/repo
-
-    steps:
-      - checkout
-
-      - add_ssh_keys:
-          fingerprints:
-            - "8c:68:29:28:04:80:38:31:c0:59:d9:3d:65:3e:b7:8c"
-
-      - run:
-          name: push to master
-          command: |
-            git push origin HEAD:master
-
-
-  build-py3.6:
-    docker:
-      - image: gethue/hue:latest-py2 # Should be circleci/python:3.6 at some point
-
-    working_directory: ~/repo
-
+  build-py-three-six-common:
     steps:
       - checkout
 
@@ -218,9 +215,17 @@ jobs:
       - run:
           name: compile
           command: |
-            apt-get update && apt-get install -y python3.6-dev libsnappy-dev asciidoc # This should not be needed as some point
+            if [ ! -d /usr/share/hue ]; then
+              # Install prerequisites on the Ubuntu 20.04 ARM64 image
+              sudo add-apt-repository --yes ppa:deadsnakes/ppa
+              sudo apt-get update
+              DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true TZ=UTC sudo apt-get install -y --no-install-recommends python3.6-dev libsnappy-dev asciidoc git ant gcc g++ libffi-dev libkrb5-dev libmysqlclient-dev libsasl2-dev libsasl2-modules-gssapi-mit libsqlite3-dev libssl-dev libxml2-dev libxslt-dev make maven libldap2-dev python3-setuptools libgmp3-dev docbook-xml docbook-xsl xsltproc
+            else
+              apt-get update && apt-get install -y python3.6-dev libsnappy-dev asciidoc # This should not be needed as some point
+            fi
 
             export PYTHON_VER=python3.6
+
             make apps
 
             make prod
@@ -241,20 +246,22 @@ jobs:
       #       - ./build/venv
       #     key: v1-dependencies-{{ checksum "esktop/core/requirements.txt" }}
 
-
-  build-py3.8:
-    docker:
-      - image: gethue/hue:latest-py2 # Should be circleci/python:3.x at some point
-
-    working_directory: ~/repo
-
+  build-py-three-eight-common:
     steps:
       - checkout
 
       - run:
           name: compile
           command: |
-            apt-get install -y python3.8-dev python3.8-venv python3.8-distutils libsnappy-dev # This should not be needed as some point
+            if [ ! -d /usr/share/hue ]; then
+              # Install prerequisites on the Ubuntu 20.04 ARM64 image
+              sudo add-apt-repository --yes ppa:deadsnakes/ppa
+              sudo apt-get update
+              DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true TZ=UTC sudo apt-get install -y --no-install-recommends python3.6-dev libsnappy-dev asciidoc git ant gcc g++ libffi-dev libkrb5-dev libmysqlclient-dev libsasl2-dev libsasl2-modules-gssapi-mit libsqlite3-dev libssl-dev libxml2-dev libxslt-dev make maven libldap2-dev python3-setuptools libgmp3-dev docbook-xml
+            else
+              sudo apt-get update
+              apt-get install -y --no-install-recommends python3.8-dev python3.8-venv python3.8-distutils libsnappy-dev # This should not be needed as some point
+            fi
 
             export PYTHON_VER=python3.8
             make apps
@@ -264,6 +271,95 @@ jobs:
           command: |
             PYTHONWARNINGS=always ./build/env/bin/hue test unit --with-xunit --with-cover
 
+
+jobs:
+  build:
+    docker:
+      # specify the version you desire here
+      # - image: circleci/python:3.8.0
+      - image: gethue/hue:latest-py2
+
+      # Specify service dependencies here if necessary
+      # CircleCI maintains a library of pre-built images
+      # documented at https://circleci.com/docs/2.0/circleci-images/
+      # - image: circleci/postgres:9.4
+
+    working_directory: ~/repo
+
+    steps:
+      - build-common:
+          go_arch: "amd64"
+          hugo_arch: "64bit"
+    
+  build-arm64:
+    machine:
+      image: ubuntu-2004:202101-01
+    resource_class: arm.medium
+
+    working_directory: ~/repo
+
+    steps:
+      - build-common:
+          go_arch: "arm64"
+          hugo_arch: "ARM64"
+
+  commit:
+    docker:
+      - image: circleci/python:3.8.0
+
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+
+      - add_ssh_keys:
+          fingerprints:
+            - "8c:68:29:28:04:80:38:31:c0:59:d9:3d:65:3e:b7:8c"
+
+      - run:
+          name: push to master
+          command: |
+            git push origin HEAD:master
+
+
+  build-py-three-six:
+    docker:
+      - image: gethue/hue:latest-py2 # Should be circleci/python:3.6 at some point
+        
+    working_directory: ~/repo
+
+    steps:
+      - build-py-three-six-common
+      
+  build-py-three-six-arm64:
+    machine:
+      image: ubuntu-2004:202101-01
+    resource_class: arm.medium
+        
+    working_directory: ~/repo
+
+    steps:
+      - build-py-three-six-common
+
+  build-py-three-eight:
+    machine:
+      image: ubuntu-2004:202101-01
+    resource_class: arm.medium
+
+    working_directory: ~/repo
+
+    steps:
+      - build-py-three-eight-common
+
+  build-py-three-eight-arm64:
+    machine:
+      image: ubuntu-2004:202101-01
+    resource_class: arm.medium
+
+    working_directory: ~/repo
+
+    steps:
+      - build-py-three-eight-common
 
 workflows:
   version: 2
@@ -275,7 +371,7 @@ workflows:
               ignore:
                 - master
                 - py3-ci
-      - build-py3.6:
+      - build-py-three-six:
           filters:
             branches:
               ignore:
@@ -284,20 +380,32 @@ workflows:
       - commit:
           requires:
             - build
-            - build-py3.6
+            - build-py-three-six
           filters:
             branches:
               only:
                 - /.*ci-commit-master.*/
   build-python3:
     jobs:
-      - build-py3.8:
+      - build-py-three-eight:
           filters:
             branches:
               only:
                 - py3-ci
-      - build-py3.6:
+      - build-py-three-six:
           filters:
             branches:
               only:
                 - py3-ci
+  arm64:
+    triggers:
+      - schedule:
+          cron: "0 1 * * 0" # every Sunday at 1AM
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - build-arm64
+      - build-py-three-six-arm64
+      - build-py-three-eight-arm64
