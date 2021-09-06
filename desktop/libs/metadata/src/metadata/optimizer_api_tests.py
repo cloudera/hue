@@ -24,6 +24,7 @@ from django.urls import reverse
 from nose.tools import assert_equal, assert_true, assert_false
 
 from desktop.auth.backend import rewrite_user
+from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_to_group, grant_access
 from useradmin.models import User
@@ -31,9 +32,9 @@ from useradmin.models import User
 from metadata.optimizer_api import _convert_queries
 
 if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock, MagicMock
+  from unittest.mock import patch, Mock
 else:
-  from mock import patch, Mock, MagicMock
+  from mock import patch, Mock
 
 
 LOG = logging.getLogger(__name__)
@@ -47,13 +48,16 @@ class TestApi():
     self.user = User.objects.get(username="test")
 
     self.user = rewrite_user(self.user)
-    add_to_group('test')
-    grant_access("test", "test", "metadata")
+    if not ENABLE_ORGANIZATIONS.get():
+      add_to_group('test')
+      grant_access("test", "test", "metadata")
 
 
-  def test_risk(self):
+  def test_risk_ui_api(self):
     snippet = {
-      "id": "2b7d1f46-17a0-30af-efeb-33d4c29b1055", "type": "hive", "status": "running",
+      "id": "2b7d1f46-17a0-30af-efeb-33d4c29b1055",
+      "type": "hive",
+      "status": "running",
       "statement": "select * from web_logs", "properties": {
         "settings": [], "variables": [], "files": [], "functions": []
       },
@@ -70,7 +74,16 @@ class TestApi():
           "guid": "7xm6+epkRx6dyvYvGNYePA==an"
         }
       },
-      "lastExecuted": 1462554843817, "database": "default"
+      "lastExecuted": 1462554843817,
+      "database": "default",
+      "connector": {
+        "name": "Hive",
+        "type": "6", "id": "6", "displayName": "Hive",
+        "optimizer": "api",
+        "is_sql": True,
+        "is_batchable": True,
+        "dialect": "hive"
+      }
     }
 
     with patch('metadata.optimizer_api.get_api') as get_api:
@@ -78,10 +91,7 @@ class TestApi():
 
       response = self.client.post(reverse('metadata:query_risk'), {
           'snippet': json.dumps(snippet),
-          'dbName': 'gethue',
-          'sourcePlatform': 'hive',
           'interface': 'dummy',
-          'connector': json.dumps('{}')
       })
 
       data = json.loads(response.content)
