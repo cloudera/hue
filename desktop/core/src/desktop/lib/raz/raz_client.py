@@ -174,16 +174,15 @@ class RazClient(object):
 
 
   def _make_adls_request(self, request_data, method, path, url_params, resource_path):
-    storage_account = path.netloc.split('.')[0]
     resource_path = resource_path.split('/', 1)
 
+    storage_account = path.netloc.split('.')[0]
     container = resource_path[0]
+
     relative_path = "/"
+    relative_path = self._handle_relative_path(method, url_params, resource_path, relative_path)
 
-    if len(resource_path) == 2:
-      relative_path += resource_path[1]
-
-    req_params = self.handle_adls_req_mapping(method, url_params, relative_path)
+    access_type = self.handle_adls_req_mapping(method, url_params)
 
     request_data.update({
       "clientType": "adls",
@@ -191,33 +190,39 @@ class RazClient(object):
         "resource": {
           "storageaccount": storage_account,
           "container": container,
-          "relativepath": req_params.get('relative_path'),
+          "relativepath": relative_path,
         },
-        "action": req_params.get('access_type'),
-        "accessTypes": [req_params.get('access_type')]
+        "action": access_type,
+        "accessTypes": [access_type]
       }
     })
 
 
-  def handle_adls_req_mapping(self, method, params, relative_path):
+  def _handle_relative_path(self, method, params, resource_path, relative_path,):
+    if len(resource_path) == 2:
+      relative_path += resource_path[1]
+
+    if relative_path == "/" and method == 'GET' and params.get('resource') == 'filesystem' and params.get('directory'):
+      relative_path += lib_urlunquote(params['directory'])
+
+    return relative_path
+
+
+  def handle_adls_req_mapping(self, method, params):
     if method == 'HEAD':
       access_type = 'get-status' if params.get('action') == 'getStatus' else ''
-
-    if method == 'PATCH':
-      if params.get('action') == 'append' or params.get('action') == 'flush':
-        access_type = 'write'
-
-      if params.get('action') == 'setAccessControl':
-        access_type = 'set-permission'
-
 
     if method == 'DELETE':
       access_type = 'delete-recursive' if params.get('recursive') == 'true' else 'delete'
 
     if method == 'GET':
       access_type = 'list' if params.get('resource') == 'filesystem' else 'read'
-      if params.get('directory'):
-        relative_path += lib_urlunquote(params['directory'])
+
+    if method == 'PATCH':
+      if params.get('action') in ('append', 'flush'):
+        access_type = 'write'
+      elif params.get('action') == 'setAccessControl':
+        access_type = 'set-permission'
 
     if method == 'PUT':
       if params.get('resource') == 'file':
@@ -227,7 +232,7 @@ class RazClient(object):
       else:
         access_type = 'rename-source'
 
-    return {'access_type': access_type, 'relative_path': relative_path}
+    return access_type
 
 
   def _make_s3_request(self, request_data, request_headers, method, params, headers, url_params, endpoint, resource_path):
