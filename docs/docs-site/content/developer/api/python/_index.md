@@ -123,7 +123,10 @@ Perform various FS operations:
     fs.chmod('abfs://data/user/csso_hueuser/demo_dir/demo_file.txt', permissionNumber='777')
 
     # Rename path
-    fs.rename('abfs://data/user/csso_hueuser/old_name_dir/', 'abfs://data/user/csso_hueuser/new_name_dir/')
+    fs.rename('abfs://data/user/csso_hueuser/old_name_dir', 'abfs://data/user/csso_hueuser/new_name_dir')
+
+    # Copy (for both file and directory)
+    fs.copy('abfs://data/user/csso_hueuser/source_path', 'abfs://data/user/csso_hueuser/destination_path')
 
 ## Users
 
