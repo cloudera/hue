@@ -42,8 +42,6 @@ from thrift.protocol.TMultiplexedProtocol import TMultiplexedProtocol
 from django.conf import settings
 from desktop.conf import SASL_MAX_BUFFER, CHERRYPY_SERVER_THREADS, ENABLE_SMART_THRIFT_POOL, USE_THRIFT_HTTP_JWT, ENABLE_ORGANIZATIONS
 
-from useradmin.models import User
-
 from desktop.lib.apputil import WARN_LEVEL_CALL_DURATION_MS, INFO_LEVEL_CALL_DURATION_MS
 from desktop.lib.python_util import create_synchronous_io_multiplexer
 from desktop.lib.thrift_.http_client import THttpClient
@@ -341,7 +339,9 @@ def connect_to_thrift(conf):
     if conf.use_sasl and conf.mechanism != 'PLAIN':
       mode.set_kerberos_auth(service=conf.kerberos_principal)
     elif USE_THRIFT_HTTP_JWT.get():
-      user = User.objects.get(username=conf.username)
+      from desktop.auth.backend import find_user # Cyclic dependency
+      user = find_user(conf.username)
+
       token = user.token if ENABLE_ORGANIZATIONS.get() else user.profile.data.get('jwt_access_token')
       mode.set_bearer_auth(token)
     else:
