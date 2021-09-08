@@ -2,7 +2,7 @@
 title: "Python"
 date: 2019-03-13T18:28:09-07:00
 draft: false
-weight: 2
+weight: 3
 ---
 
 Leverage the built-in Python shell to interact with the server and the API.
