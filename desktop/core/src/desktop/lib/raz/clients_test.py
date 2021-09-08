@@ -45,7 +45,8 @@ class S3RazClientLiveTest(unittest.TestCase):
 
 
   def test_check_acccess_s3_list_file(self):
-    # e.g. 'https://gethue-test.s3.amazonaws.com/data/query-hive-weblogs.csv?AWSAccessKeyId=AKIA23E77ZX2HVY76YGL&Signature=3lhK%2BwtQ9Q2u5VDIqb4MEpoY3X4%3D&Expires=1617207304'
+    # e.g. 'https://gethue-test.s3.amazonaws.com/data/query-hive-weblogs.csv?AWSAccessKeyId=AKIA23E77ZX2HVY76YGL&'
+    # 'Signature=3lhK%2BwtQ9Q2u5VDIqb4MEpoY3X4%3D&Expires=1617207304'
 
     url = S3RazClient().get_url(bucket='gethue-test', path='/data/query-hive-weblogs.csv')
 
@@ -87,7 +88,10 @@ class AdlsRazClientTest(unittest.TestCase):
                 headers={'x-ms-version': '2019-12-12', 'x-ms-rename-source': '/data/user/csso_hueuser/rename_source_dir'})
 
               check_access.assert_called_with(
-                headers={'x-ms-version': '2019-12-12', 'x-ms-rename-source': '/data/user/csso_hueuser/rename_source_dir?some_random_sas_token'},
+                headers={
+                  'x-ms-version': '2019-12-12', 
+                  'x-ms-rename-source': '/data/user/csso_hueuser/rename_source_dir?some_random_sas_token'
+                },
                 method='PUT',
                 url='https://gethuestorage.dfs.core.windows.net/data/user/csso_hueuser/rename_destination_dir'
               )
