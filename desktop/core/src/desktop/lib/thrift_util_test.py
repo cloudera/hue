@@ -432,7 +432,7 @@ class TestThriftJWT(unittest.TestCase):
               self.user.profile.save()
 
               conf = Mock(
-                klass = Mock(),
+                klass=Mock(),
                 username="test_not_user",
                 transport_mode='http',
                 timeout_seconds=None,
