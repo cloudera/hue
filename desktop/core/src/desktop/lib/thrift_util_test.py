@@ -44,7 +44,11 @@ from thrift.transport.TTransport import TBufferedTransportFactory, TTransportExc
 
 from desktop.lib import python_util, thrift_util
 from desktop.lib.thrift_util import jsonable2thrift, thrift2json, _unpack_guid_secret_in_handle
+from desktop.conf import USE_THRIFT_HTTP_JWT
+from desktop.lib.django_test_util import make_logged_in_client
+from desktop.auth.backend import rewrite_user, find_or_create_user, ensure_has_a_group, create_user
 
+from useradmin.models import User
 
 LOG = logging.getLogger(__name__)
 
@@ -341,6 +345,42 @@ class TestSuperClient(unittest.TestCase):
     with self.assertRaises(TTransportException):
       client.my_call()
       # Could check output for several "Thrift exception; retrying: some error"
+
+
+class TestThriftJWT(unittest.TestCase):
+  def setUp(self):
+    self.sample_token = "some_jwt_token"
+
+    self.client = make_logged_in_client(username="test_user", groupname="default", recreate=True, is_superuser=False)
+    self.user = rewrite_user(User.objects.get(username="test_user"))
+
+    self.user.profile.update_data({'jwt_access_token': self.sample_token})
+    self.user.profile.save()
+
+  def test_jwt_injection_thrift(self):
+    with patch('desktop.lib.thrift_util.TBinaryProtocol'):
+      with patch('desktop.lib.thrift_util.TBufferedTransport'):
+        with patch('desktop.lib.thrift_util.TBufferedTransport'):
+          with patch('desktop.lib.thrift_util.THttpClient') as THttpClient:
+
+            reset = USE_THRIFT_HTTP_JWT.set_for_testing(True)
+
+            conf = Mock(
+              klass = Mock(),
+              username = "test_user",
+              transport_mode = 'http',
+              timeout_seconds = None,
+              use_sasl = None,
+            )
+
+            THttpClient.set_verify = Mock()
+            THttpClient.set_bearer_auth = Mock()
+
+            try:
+              service, protocol, transport = thrift_util.connect_to_thrift(conf)
+              THttpClient.set_bearer_auth.assert_called_with('some_jwt_token')
+            finally:
+              reset()
 
 
 if __name__ == '__main__':
