@@ -14,14 +14,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import sys
 import unittest
 
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_equal, assert_false, assert_true, assert_raises
 
 from desktop.conf import RAZ
-from desktop.lib.raz.clients import S3RazClient
+from desktop.lib.raz.clients import S3RazClient, AdlsRazClient
 
+if sys.version_info[0] > 2:
+  from unittest.mock import patch, Mock
+else:
+  from mock import patch, Mock
 
 class S3RazClientLiveTest(unittest.TestCase):
 
@@ -40,7 +45,8 @@ class S3RazClientLiveTest(unittest.TestCase):
 
 
   def test_check_acccess_s3_list_file(self):
-    # e.g. 'https://gethue-test.s3.amazonaws.com/data/query-hive-weblogs.csv?AWSAccessKeyId=AKIA23E77ZX2HVY76YGL&Signature=3lhK%2BwtQ9Q2u5VDIqb4MEpoY3X4%3D&Expires=1617207304'
+    # e.g. 'https://gethue-test.s3.amazonaws.com/data/query-hive-weblogs.csv?AWSAccessKeyId=AKIA23E77ZX2HVY76YGL&'
+    # 'Signature=3lhK%2BwtQ9Q2u5VDIqb4MEpoY3X4%3D&Expires=1617207304'
 
     url = S3RazClient().get_url(bucket='gethue-test', path='/data/query-hive-weblogs.csv')
 
@@ -58,3 +64,36 @@ class S3RazClientLiveTest(unittest.TestCase):
 
 
   def test_check_acccess_s3_list_file_no_access(self): pass
+
+class AdlsRazClientTest(unittest.TestCase):
+
+  def setUp(self):
+    self.username = 'csso_hueuser'
+  
+  def test_check_rename_operation(self):
+    with patch('desktop.lib.raz.raz_client.RazToken.get_delegation_token') as raz_token:
+      with patch('desktop.lib.raz.raz_client.requests.post') as requests_post:
+        with patch('desktop.lib.raz.raz_client.uuid.uuid4') as uuid:
+          with patch('desktop.lib.raz.raz_client.RazClient.check_access') as check_access:
+
+            reset = RAZ.API_URL.set_for_testing('https://raz_url:8000')
+            check_access.return_value = {'token': 'some_random_sas_token'}
+
+            try:
+              sas_token = AdlsRazClient(
+                username=self.username
+              ).get_url(
+                action='PUT',
+                path='https://gethuestorage.dfs.core.windows.net/data/user/csso_hueuser/rename_destination_dir',
+                headers={'x-ms-version': '2019-12-12', 'x-ms-rename-source': '/data/user/csso_hueuser/rename_source_dir'})
+
+              check_access.assert_called_with(
+                headers={
+                  'x-ms-version': '2019-12-12', 
+                  'x-ms-rename-source': '/data/user/csso_hueuser/rename_source_dir?some_random_sas_token'
+                },
+                method='PUT',
+                url='https://gethuestorage.dfs.core.windows.net/data/user/csso_hueuser/rename_destination_dir'
+              )
+            finally:
+              reset()
