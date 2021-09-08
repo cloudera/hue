@@ -354,16 +354,18 @@ class TestThriftJWT(unittest.TestCase):
     self.client = make_logged_in_client(username="test_user", groupname="default", recreate=True, is_superuser=False)
     self.user = rewrite_user(User.objects.get(username="test_user"))
 
-    self.user.profile.update_data({'jwt_access_token': self.sample_token})
-    self.user.profile.save()
-
 
   def test_jwt_thrift(self):
     with patch('desktop.lib.thrift_util.TBinaryProtocol'):
       with patch('desktop.lib.thrift_util.TBufferedTransport'):
         with patch('desktop.lib.thrift_util.TBufferedTransport'):
           with patch('desktop.lib.thrift_util.THttpClient.set_bearer_auth') as set_bearer_auth:
+
+            self.user.profile.update_data({'jwt_access_token': self.sample_token})
+            self.user.profile.save()
+
             reset = USE_THRIFT_HTTP_JWT.set_for_testing(True)
+
             conf = Mock(
               klass = Mock(),
               username = "test_user",
@@ -388,17 +390,6 @@ class TestThriftJWT(unittest.TestCase):
             reset = USE_THRIFT_HTTP_JWT.set_for_testing(True)
 
             try:
-              # When user not found
-              conf = Mock(
-                klass = Mock(),
-                username = "test_not_user",
-                transport_mode = 'http',
-                timeout_seconds = None,
-                use_sasl = None,
-                http_url='some_http_url'
-              )
-              assert_raises(Exception, thrift_util.connect_to_thrift, conf)
-
               # When token not stored in user profile
               conf = Mock(
                 klass = Mock(),
@@ -408,8 +399,21 @@ class TestThriftJWT(unittest.TestCase):
                 use_sasl = None,
                 http_url='some_http_url'
               )
-              self.user.profile.update_data({})
+
+              assert_raises(Exception, thrift_util.connect_to_thrift, conf)
+
+              # When user not found
+              self.user.profile.update_data({'jwt_access_token': self.sample_token})
               self.user.profile.save()
+
+              conf = Mock(
+                klass = Mock(),
+                username = "test_not_user",
+                transport_mode = 'http',
+                timeout_seconds = None,
+                use_sasl = None,
+                http_url='some_http_url'
+              )
               assert_raises(Exception, thrift_util.connect_to_thrift, conf)
             finally:
               reset()
