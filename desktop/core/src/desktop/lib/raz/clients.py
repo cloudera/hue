@@ -52,8 +52,9 @@ class S3RazClient():
 
 class AdlsRazClient():
 
-  def __init__(self, username):
+  def __init__(self, username, base_url=None):
     self.username = username
+    self.base_url = base_url
 
   def get_url(self, action='GET', path=None, headers=None):
     c = get_raz_client(
@@ -62,5 +63,11 @@ class AdlsRazClient():
       auth=RAZ.API_AUTHENTICATION.get(),
       service='adls',
     )
+
+    # We need to sign the header source path separately for rename operation
+    if headers.get('x-ms-rename-source'):
+      source_path = self.base_url + headers.get('x-ms-rename-source')
+      sas_token = c.check_access(method=action, url=source_path, headers=None)
+      headers['x-ms-rename-source'] += '?' + sas_token.get('token')
 
     return c.check_access(method=action, url=path, headers=headers)
