@@ -36,7 +36,7 @@ if not gen_py_path in sys.path:
 
 from djangothrift_test_gen import TestService
 from djangothrift_test_gen.ttypes import TestStruct, TestNesting, TestEnum, TestManyTypes
-from nose.tools import assert_equal, assert_true
+from nose.tools import assert_equal, assert_true, assert_raises
 from thrift.protocol.TBinaryProtocol import TBinaryProtocolFactory
 from thrift.server import TServer
 from thrift.transport import TSocket
@@ -357,28 +357,60 @@ class TestThriftJWT(unittest.TestCase):
     self.user.profile.update_data({'jwt_access_token': self.sample_token})
     self.user.profile.save()
 
-  def test_jwt_injection_thrift(self):
+
+  def test_jwt_thrift(self):
     with patch('desktop.lib.thrift_util.TBinaryProtocol'):
       with patch('desktop.lib.thrift_util.TBufferedTransport'):
         with patch('desktop.lib.thrift_util.TBufferedTransport'):
-          with patch('desktop.lib.thrift_util.THttpClient') as THttpClient:
-
+          with patch('desktop.lib.thrift_util.THttpClient.set_bearer_auth') as set_bearer_auth:
             reset = USE_THRIFT_HTTP_JWT.set_for_testing(True)
-
             conf = Mock(
               klass = Mock(),
               username = "test_user",
               transport_mode = 'http',
               timeout_seconds = None,
               use_sasl = None,
+              http_url='some_http_url'
             )
-
-            THttpClient.set_verify = Mock()
-            THttpClient.set_bearer_auth = Mock()
 
             try:
               service, protocol, transport = thrift_util.connect_to_thrift(conf)
-              THttpClient.set_bearer_auth.assert_called_with('some_jwt_token')
+              set_bearer_auth.assert_called_with('some_jwt_token')
+            finally:
+              reset()
+
+
+  def test_jwt_thrift_exceptions(self):
+    with patch('desktop.lib.thrift_util.TBinaryProtocol'):
+      with patch('desktop.lib.thrift_util.TBufferedTransport'):
+        with patch('desktop.lib.thrift_util.TBufferedTransport'):
+          with patch('desktop.lib.thrift_util.THttpClient.set_bearer_auth') as set_bearer_auth:
+            reset = USE_THRIFT_HTTP_JWT.set_for_testing(True)
+
+            try:
+              # When user not found
+              conf = Mock(
+                klass = Mock(),
+                username = "test_not_user",
+                transport_mode = 'http',
+                timeout_seconds = None,
+                use_sasl = None,
+                http_url='some_http_url'
+              )
+              assert_raises(Exception, thrift_util.connect_to_thrift, conf)
+
+              # When token not stored in user profile
+              conf = Mock(
+                klass = Mock(),
+                username = "test_user",
+                transport_mode = 'http',
+                timeout_seconds = None,
+                use_sasl = None,
+                http_url='some_http_url'
+              )
+              self.user.profile.update_data({})
+              self.user.profile.save()
+              assert_raises(Exception, thrift_util.connect_to_thrift, conf)
             finally:
               reset()
 

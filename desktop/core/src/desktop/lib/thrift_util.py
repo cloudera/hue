@@ -340,8 +340,8 @@ def connect_to_thrift(conf):
       mode.set_kerberos_auth(service=conf.kerberos_principal)
 
     elif USE_THRIFT_HTTP_JWT.get():
-      from desktop.auth.backend import find_user # Cyclic dependency
-      user = find_user(conf.username)
+      from desktop.auth.backend import find_user, rewrite_user # Cyclic dependency
+      user = rewrite_user(find_user(conf.username))
 
       if user is None:
         raise Exception("JWT: User not found.")
@@ -352,7 +352,7 @@ def connect_to_thrift(conf):
         token = user.profile.data['jwt_access_token']
       else:
         raise Exception("JWT: Could not retrive saved token from user.")
-      
+
       mode.set_bearer_auth(token)
     else:
       mode.set_basic_auth(conf.username, conf.password)
