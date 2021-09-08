@@ -48,7 +48,7 @@ class RazHttpClient(HttpClient):
     """
 
     url = self._make_url(path, params)
-    sas_token = self.get_sas_token(http_method, self.username, url, params, headers, base_url=self._base_url)
+    sas_token = self.get_sas_token(http_method, self.username, url, params, headers)
 
     signed_url = url + ('?' if '?' not in url else '&') + sas_token
 
@@ -68,7 +68,7 @@ class RazHttpClient(HttpClient):
         timeout=timeout
     )
 
-  def get_sas_token(self, http_method, username, url, params=None, headers=None, base_url=None):
+  def get_sas_token(self, http_method, username, url, params=None, headers=None):
     raz_client = AdlsRazClient(username=username)
     response = raz_client.get_url(action=http_method, path=url, headers=headers)
 

@@ -52,9 +52,8 @@ class S3RazClient():
 
 class AdlsRazClient():
 
-  def __init__(self, username, base_url=None):
+  def __init__(self, username):
     self.username = username
-    self.base_url = base_url
 
   def get_url(self, action='GET', path=None, headers=None):
     c = get_raz_client(
@@ -66,7 +65,9 @@ class AdlsRazClient():
 
     # We need to sign the header source path separately for rename operation
     if headers.get('x-ms-rename-source'):
-      source_path = self.base_url + headers.get('x-ms-rename-source')
+      partition_path = path.partition('.dfs.core.windows.net')
+      source_path = partition_path[0] + partition_path[1] + headers.get('x-ms-rename-source')
+
       sas_token = c.check_access(method=action, url=source_path, headers=None)
       headers['x-ms-rename-source'] += '?' + sas_token.get('token')
 

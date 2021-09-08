@@ -66,11 +66,6 @@ class S3RazClientLiveTest(unittest.TestCase):
 
 class AdlsRazClientTest(unittest.TestCase):
 
-  @classmethod
-  def setUpClass(cls):
-    if not RAZ.IS_ENABLED.get():
-      raise SkipTest
-  
   def setUp(self):
     self.username = 'csso_hueuser'
   
@@ -85,17 +80,16 @@ class AdlsRazClientTest(unittest.TestCase):
 
             try:
               sas_token = AdlsRazClient(
-                username=self.username,
-                base_url='https://gethuestorage.dfs.core.windows.net'
+                username=self.username
               ).get_url(
                 action='PUT',
-                path='https://gethuestorage.dfs.core.windows.net/data/user/csso_harsh.gupta/renamed_dir',
-                headers={'x-ms-version': '2019-12-12', 'x-ms-rename-source': '/data/user/csso_harsh.gupta/test_dir'})
+                path='https://gethuestorage.dfs.core.windows.net/data/user/csso_hueuser/rename_destination_dir',
+                headers={'x-ms-version': '2019-12-12', 'x-ms-rename-source': '/data/user/csso_hueuser/rename_source_dir'})
 
               check_access.assert_called_with(
-                headers={'x-ms-version': '2019-12-12', 'x-ms-rename-source': '/data/user/csso_harsh.gupta/test_dir?some_random_sas_token'},
+                headers={'x-ms-version': '2019-12-12', 'x-ms-rename-source': '/data/user/csso_hueuser/rename_source_dir?some_random_sas_token'},
                 method='PUT',
-                url='https://gethuestorage.dfs.core.windows.net/data/user/csso_harsh.gupta/renamed_dir'
+                url='https://gethuestorage.dfs.core.windows.net/data/user/csso_hueuser/rename_destination_dir'
               )
             finally:
               reset()
