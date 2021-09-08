@@ -254,22 +254,6 @@ class RazClientTest(unittest.TestCase):
     access_type = client.handle_adls_req_mapping(method, url_params)
     assert_equal(access_type, 'set-permission')
 
-    # Rename
-    method = 'PUT'
-    relative_path = '/user/csso_hueuser/old_dir' # First call to fetch SAS to sign header path
-    url_params = {}
-
-    access_type = client.handle_adls_req_mapping(method, url_params)
-    assert_equal(access_type, 'rename-source')
-
-    method = 'PUT'
-    relative_path = '/user/csso_hueuser/new_dir' 
-    headers = {'x-ms-rename-source': '/user/csso_hueuser/old_dir?some_sas_token'} # Second call having signed header path
-    url_params = {}
-
-    access_type = client.handle_adls_req_mapping(method, url_params)
-    assert_equal(access_type, 'rename-source')
-
 
   def test_handle_relative_path(self):
     client = RazClient(self.raz_url, self.raz_token, username=self.username, service="adls", service_name="cm_adls", cluster_name="cl1")
