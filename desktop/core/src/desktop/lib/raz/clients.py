@@ -36,7 +36,9 @@ class S3RazClient():
       u'Host': u'prakashmowdev1.s3-us-west-2.amazonaws.com',
       u'X-Amz-Security-Token': u'IQoJb3JpZ2luX2Vj...C',
       u'X-Amz-Date': u'20210604T102022Z',
-      u'Authorization': u'AWS4-HMAC-SHA256 Credential=ASIAYO3P24NAOAYMMDNN/20210604/us-west-2/s3/aws4_request, SignedHeaders=host;user-agent;x-amz-content-sha256;x-amz-date;x-amz-security-token, Signature=d341a194c2998c64b6fc726b69d0c3c2b97d520265f80df7e1bc1ac59a21ef94',
+      u'Authorization': u'AWS4-HMAC-SHA256 Credential=ASIAYO3P24NAOAYMMDNN/20210604/us-west-2/s3/aws4_request, 
+                          SignedHeaders=host;user-agent;x-amz-content-sha256;x-amz-date;x-amz-security-token, 
+                          Signature=d341a194c2998c64b6fc726b69d0c3c2b97d520265f80df7e1bc1ac59a21ef94',
       u'User-Agent': u'user:csso_romain'
     }
     '''
