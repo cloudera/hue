@@ -740,7 +740,7 @@ Draft a new release on https://github.com/cloudera/hue/releases.
 
 Publish Github NPM package and Docker images at https://github.com/orgs/cloudera/packages?repo_name=hue.
 
-### Gethue
+### Tarball
 
 Building the tarball release:
 
@@ -793,6 +793,10 @@ Then connect to the server and index the package:
     ssh root@101.200.100.200
     cd /var/www/helm.gethue.com
     helm repo index .
+
+### Pypi
+
+TBD
 
 ### Documentation
 
