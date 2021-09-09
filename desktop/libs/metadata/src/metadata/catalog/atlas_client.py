@@ -91,10 +91,10 @@ class AtlasApi(Api):
       default_entity_types = ('TABLE', 'VIEW')
     elif 'hdfs' in sources:
       entity_types = ('FILE', 'DIRECTORY')
-      default_entity_types  = ('FILE', 'DIRECTORY')
+      default_entity_types = ('FILE', 'DIRECTORY')
     elif 's3' in sources:
       entity_types = ('FILE', 'DIRECTORY', 'S3BUCKET')
-      default_entity_types  = ('DIRECTORY', 'S3BUCKET')
+      default_entity_types = ('DIRECTORY', 'S3BUCKET')
 
     return default_entity_types, entity_types
 
@@ -124,7 +124,7 @@ class AtlasApi(Api):
     if atlas_entity['typeName'].lower().startswith('hive_'):
       nav_entity['sourceType'] = 'HIVE'
       qualified_name = atlas_entity['attributes'].get('qualifiedName')
-      qualified_path_parts=''
+      qualified_path_parts = ''
       if qualified_name is not None:
         qualified_path_parts = re.sub(r'@.*$', '', qualified_name).split('.')
         qualified_path_parts.pop()  # it's just the parent path we want so remove the entity name
@@ -171,7 +171,7 @@ class AtlasApi(Api):
       "entity": []
     }
 
-    try :
+    try:
       atlas_response = self._root.get('/v2/search/dsl?query=%s' % dsl_query, headers=self.__headers,
                                       params=self.__params)
       if not 'entities' in atlas_response or len(atlas_response['entities']) < 1:
