@@ -123,8 +123,11 @@ class AtlasApi(Api):
     # Convert Atlas qualified name of form db.tbl.col@cluster to parentPath of form /db/tbl
     if atlas_entity['typeName'].lower().startswith('hive_'):
       nav_entity['sourceType'] = 'HIVE'
-      qualified_path_parts = re.sub(r'@.*$', '', atlas_entity['attributes'].get('qualifiedName')).split('.')
-      qualified_path_parts.pop()  # it's just the parent path we want so remove the entity name
+      qualified_name = atlas_entity['attributes'].get('qualifiedName')
+      qualified_path_parts=''
+      if qualified_name is not None:
+        qualified_path_parts = re.sub(r'@.*$', '', qualified_name).split('.')
+        qualified_path_parts.pop()  # it's just the parent path we want so remove the entity name
       nav_entity['parentPath'] = '/' + '/'.join(qualified_path_parts)
 
     if 'classifications' in atlas_entity:
