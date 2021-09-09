@@ -5,8 +5,7 @@
 ![Hue Logo](https://raw.githubusercontent.com/cloudera/hue/master/docs/images/hue_logo.png)
 
 
-Query. Explore. Share.
-----------------------
+# Query. Explore. Share.
 
 Hue is a mature SQL Assistant for querying Databases & Data Warehouses.
 
@@ -22,8 +21,7 @@ Read more on [gethue.com](http://gethue.com) and
 
 ![Hue Editor](https://cdn.gethue.com/uploads/2021/02/hue-4.9.png)
 
-Getting Started
----------------
+# Getting Started
 
 Quick Demos:
 
@@ -32,8 +30,7 @@ Quick Demos:
 
 Three ways to start the server then configure the [databases](https://docs.gethue.com/administrator/configuration/connectors/) you want to query:
 
-Docker
-------
+## Docker
 Start Hue in a single click with the [Docker Guide](https://github.com/cloudera/hue/tree/master/tools/docker/hue) or the
 [video blog post](http://gethue.com/getting-started-with-hue-in-2-minutes-with-docker/).
 
@@ -41,8 +38,7 @@ Start Hue in a single click with the [Docker Guide](https://github.com/cloudera/
 
 Now Hue should be up and running on your default Docker IP on [http://localhost:8888](http://localhost:8888)!
 
-Kubernetes
-----------
+## Kubernetes
 
     helm repo add gethue https://helm.gethue.com
     helm repo update
@@ -50,8 +46,7 @@ Kubernetes
 
 Read more about configurations at [tools/kubernetes](tools/kubernetes/).
 
-Development
------------
+## Development
 
 For a very Quick Start go with the [Dev Environment Docker](https://docs.gethue.com/developer/development/#dev-docker).
 
@@ -65,13 +60,11 @@ Or install the [dependencies](https://docs.gethue.com/administrator/installation
 
 Now Hue should be running on [http://localhost:8000](http://localhost:8000)!
 
-Read more in the [development documentation](https://docs.gethue.com/developer/development/).
+Read more in the [documentation](https://docs.gethue.com/developer/development/).
 
-Components
-----------
+# Components
 
 SQL Editor, Parsers [components](https://docs.gethue.com/developer/components/) and REST/Python/CLI [APIs](https://docs.gethue.com/developer/api/).
 
-License
------------
+# License
 [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0)
