@@ -18,19 +18,19 @@ use Hue to quickly answer questions via self-service querying and are executing 
 Read more on [gethue.com](http://gethue.com) and
 - Connect to a [database](https://docs.gethue.com/administrator/configuration/connectors/)
 - Build your own Editor with the [SQL Scratchpad](https://docs.gethue.com/developer/components/scratchpad/)
-- or Query Service by leveraging the [REST API](https://docs.gethue.com/developer/api/rest/) and [Kubernetes](https://docs.gethue.com/administrator/installation/cloud/#kubernetes)
+- Boot the [Query Service](https://docs.gethue.com/administrator/installation/cloud/#kubernetes) and query the [API](https://docs.gethue.com/developer/api/rest/)
 
 ![Hue Editor](https://cdn.gethue.com/uploads/2021/02/hue-4.9.png)
 
 Getting Started
 ---------------
 
-You can start the server via three ways described below. Once setup, you would then need to configure the [desired databases](https://docs.gethue.com/administrator/configuration/connectors/) you want to query.
-
 Quick Demos:
 
 * Docker Compose: [Impala](https://gethue.com/blog/quickstart-sql-editor-for-apache-impala/), [Flink SQL](https://gethue.com/blog/sql-querying-live-kafka-logs-and-sending-live-updates-with-flink-sql/), [ksqlDB](https://gethue.com/blog/tutorial-query-live-data-stream-with-kafka-sql/), [Phoenix SQL / HBase](https://gethue.com/blog/querying-live-kafka-data-in-apache-hbase-with-phoenix/), [Spark SQL](https://gethue.com/blog/querying-spark-sql-with-spark-thrift-server-and-hue-editor/)
 * Live instance: [demo.gethue.com](https://demo.gethue.com/)
+
+Three ways to start the server and configure the [databases](https://docs.gethue.com/administrator/configuration/connectors/) you want to query:
 
 Docker
 ------
@@ -70,7 +70,7 @@ Read more in the [development documentation](https://docs.gethue.com/developer/d
 Components
 ----------
 
-Sql Editor and Sql Parsers [components](https://docs.gethue.com/developer/components/) and REST/Python [APIs](https://docs.gethue.com/developer/api/).
+SQL Editor, Parsers [components](https://docs.gethue.com/developer/components/) and REST/Python/CLI [APIs](https://docs.gethue.com/developer/api/).
 
 
 License
