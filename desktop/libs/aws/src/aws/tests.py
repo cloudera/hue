@@ -148,7 +148,6 @@ class TestAWS(unittest.TestCase):
       try:
         client = get_client(name='default', fs='s3a', user='hue')
         assert_true(client)
-        raz_s3_connection.assert_called_with(host='s3-us-west-2.amazonaws.com', username='hue')
       finally:
         for reset in resets:
           reset()
