@@ -116,7 +116,8 @@ class MySQLClient(BaseRDMSClient):
       'user': self.query_server['username'],
       'passwd': self.query_server['password'] or '',  # MySQL can accept an empty password
       'host': self.query_server['server_host'],
-      'port': self.query_server['server_port']
+      'port': self.query_server['server_port'],
+      'local_infile': False
     }
 
     if self.query_server['options']:
