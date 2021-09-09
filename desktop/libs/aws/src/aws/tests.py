@@ -39,7 +39,7 @@ LOG = logging.getLogger(__name__)
 class TestAWS(unittest.TestCase):
   def test_with_credentials(self):
     try:
-      finish = conf.AWS_ACCOUNTS.set_for_testing({'default': {'access_key_id':'access_key_id', 'secret_access_key': 'secret_access_key'}})
+      finish = conf.AWS_ACCOUNTS.set_for_testing({'default': {'access_key_id': 'access_key_id', 'secret_access_key': 'secret_access_key'}})
       with patch('aws.client.conf_idbroker.get_conf') as get_conf:
         with patch('aws.client.Client.get_s3_connection'):
           get_conf.return_value = {}
