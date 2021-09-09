@@ -5,9 +5,13 @@ draft: false
 weight: 2
 ---
 
-A wrapper around the REST API.
+Easily leverage the Query Service via the CLI.
 
-Install:
+- Execute an SQL statement or saved query
+- List, download, upload files
+
+
+Install from https://pypi.org/project/gethue/:
 
     pip install gethue
 
@@ -23,10 +27,6 @@ And use:
     Auth: success 200
     Token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjMxMjE5MDkxLCJqdGkiOiJkNGJkY2Q5M2NjMjg0MDlkYWJlYWZhNGRlNjlkOTMzMyIsInVzZXJfaWQiOjJ9.Gr8bW_JaZ8yzQ3eEZYp3jKbdsSgLAXxqvSRbeU6jhLg
 
-    > compose query
-
-  > compose query autocomplete
-
-List, view, download, upload files:
+List remote storage files:
 
     compose storage list s3a://demo-gethue
