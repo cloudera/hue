@@ -12,7 +12,7 @@ jobs:
           stale-issue-message: 'This issue is stale because it has been open 30 days with no activity and is not "roadmap" labeled or part of any milestone. Remove stale label or comment or this will be closed in 5 days.'
           days-before-stale: 30
           days-before-close: 5
-          exempt-issue-labels: 'roadmap'
+          exempt-issue-labels: 'roadmap, good first issue'
 
           stale-pr-message: 'This PR is stale because it has been open 45 days with no activity and is not "roadmap" labeled or part of any milestone. Remove stale label or comment or this will be closed in 10 days.'
           exempt-pr-labels: 'roadmap'
