@@ -25,7 +25,7 @@ And use:
 
     > compose query
 
-    > compose query autocomplete
+  > compose query autocomplete
 
 List, view, download, upload files:
 
