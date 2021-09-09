@@ -215,7 +215,8 @@ class AtlasApi(Api):
 
     return self.fetch_single_entity('hive_column where %s' % qualifiedNameCriteria)
 
-  def search_entities_interactive(self, query_s=None, limit=100, offset=0, facetFields=None, facetPrefix=None, facetRanges=None, filterQueries=None, firstClassEntitiesOnly=None, sources=None):
+  def search_entities_interactive(self, query_s=None, limit=100, offset=0, facetFields=None, facetPrefix=None, facetRanges=None,
+                                  filterQueries=None, firstClassEntitiesOnly=None, sources=None):
     response = {
       "status": 0,
       "results": [],
@@ -402,7 +403,8 @@ class AtlasApi(Api):
       properties.update(metadata)
       data = json.dumps(properties)
 
-      return self._root.put('entities/%(identity)s' % entity, params=self.__params, data=data, contenttype=_JSON_CONTENT_TYPE, allow_redirects=True, clear_cookies=True)
+      return self._root.put('entities/%(identity)s' % entity, params=self.__params, data=data, contenttype=_JSON_CONTENT_TYPE,
+                            allow_redirects=True, clear_cookies=True)
     except RestException as e:
       if e.code == 401:
         raise raise_popup_exception('Hue could not authenticate to Atlas', detail=e)
@@ -504,7 +506,8 @@ class AtlasApi(Api):
   def create_namespace_property(self, namespace, properties):
     try:
       data = json.dumps(properties)
-      return self._root.post('models/namespaces/%(namespace)s/properties' % {'namespace': namespace}, data=data, contenttype=_JSON_CONTENT_TYPE, clear_cookies=True)
+      return self._root.post('models/namespaces/%(namespace)s/properties' % {'namespace': namespace}, data=data,
+                             contenttype=_JSON_CONTENT_TYPE, clear_cookies=True)
     except RestException as e:
       if e.code == 401:
         raise raise_popup_exception('Hue could not authenticate to Atlas', detail=e)
@@ -525,7 +528,8 @@ class AtlasApi(Api):
   def map_namespace_property(self, clazz, properties):
     try:
       data = json.dumps(properties)
-      return self._root.post('models/packages/nav/classes/%(class)s/properties' % {'class': clazz}, data=data, contenttype=_JSON_CONTENT_TYPE, clear_cookies=True)
+      return self._root.post('models/packages/nav/classes/%(class)s/properties' % {'class': clazz}, data=data,
+                             contenttype=_JSON_CONTENT_TYPE, clear_cookies=True)
     except RestException as e:
       if e.code == 401:
         raise raise_popup_exception('Hue could not authenticate to Atlas', detail=e)
@@ -577,9 +581,12 @@ class AtlasApi(Api):
 
   def _get_boosted_term(self, term):
     return 'AND'.join([
-      '(%s)' % 'OR'.join(['(%s:%s*^%s)' % (field, term, weight) for (field, weight) in AtlasApi.DEFAULT_SEARCH_FIELDS]),  # Matching fields
-      '(%s)' % 'OR'.join(['(%s:[* TO *])' % field for (field, weight) in AtlasApi.DEFAULT_SEARCH_FIELDS]) # Boost entities with enriched fields
-      # Could add certain customProperties and properties
+        '(%s)' % 'OR'.join(['(%s:%s*^%s)' % (field, term, weight)
+                            for (field, weight) in AtlasApi.DEFAULT_SEARCH_FIELDS]),  # Matching fields
+        # Boost entities with enriched fields
+        '(%s)' % 'OR'.join(
+            ['(%s:[* TO *])' % field for (field, weight) in AtlasApi.DEFAULT_SEARCH_FIELDS])
+        # Could add certain customProperties and properties
     ])
 
   def _clean_path(self, path):
