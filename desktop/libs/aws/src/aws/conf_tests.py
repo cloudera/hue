@@ -22,7 +22,6 @@ import unittest
 from nose.tools import assert_equal, assert_true, assert_not_equal, assert_false
 
 from aws import conf
-from aws.client import Client, get_credential_provider
 
 from desktop.conf import RAZ
 from desktop.lib.django_test_util import make_logged_in_client
@@ -42,6 +41,10 @@ class TestAWSConf(unittest.TestCase):
     self.user = User.objects.get(username="test_user")
 
   def test_is_enabled_when_raz_enabled(self):
+
+    # When RAZ is not enabled
+    assert_false(conf.is_enabled())
+
     resets = [
       RAZ.IS_ENABLED.set_for_testing(True),
       conf.AWS_ACCOUNTS.set_for_testing({'default': {
@@ -59,8 +62,11 @@ class TestAWSConf(unittest.TestCase):
       conf.clear_cache()
   
   def test_has_s3_access_when_raz_enabled(self):
-    reset = RAZ.IS_ENABLED.set_for_testing(True)
 
+    # When RAZ is not enabled
+    assert_false(conf.has_s3_access(self.user))
+
+    reset = RAZ.IS_ENABLED.set_for_testing(True)
     try:
       assert_true(conf.has_s3_access(self.user))
     finally:
