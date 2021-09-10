@@ -1048,7 +1048,7 @@ Enable doAs support by adding the following properties to hbase-site.xml on each
     </property>
     <property>
       <name>hbase.thrift.support.proxyuser</name>
-      <value>true/value>
+      <value>true</value>
     </property>
 
 And the Hue hosts, or * to authorize from any host:
