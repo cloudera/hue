@@ -1059,7 +1059,7 @@ And the Hue hosts, or * to authorize from any host:
     </property>
     <property>
       <name>hadoop.proxyuser.hbase.groups</name>
-      <value>*/value>
+      <value>*</value>
     </property>
 
 Note: If you use framed transport, you cannot use doAs impersonation, because SASL does not work with Thrift framed transport.
