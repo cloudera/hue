@@ -30,7 +30,7 @@ from TCLIService.ttypes import TOpenSessionReq, TGetTablesReq, TFetchResultsReq,
   TGetCrossReferenceReq, TGetPrimaryKeysReq
 
 from desktop.lib import python_util, thrift_util
-from desktop.conf import DEFAULT_USER
+from desktop.conf import DEFAULT_USER, USE_THRIFT_HTTP_JWT
 
 from beeswax import conf as beeswax_conf, hive_site
 from beeswax.hive_site import hiveserver2_use_ssl
@@ -592,7 +592,7 @@ class HiveServerClient(object):
       validate = beeswax_conf.SSL.VALIDATE.get()
       timeout = beeswax_conf.SERVER_CONN_TIMEOUT.get()
 
-    if auth_username:
+    if auth_username and not USE_THRIFT_HTTP_JWT.get():
       username = auth_username
       password = auth_password
     else:

@@ -26,6 +26,7 @@ from aws.client import Client, get_credential_provider
 
 from desktop.lib.fsmanager import get_client, clear_cache
 from desktop.lib.python_util import current_ms_from_utc
+from desktop.conf import RAZ
 
 if sys.version_info[0] > 2:
   from unittest.mock import patch
@@ -38,7 +39,7 @@ LOG = logging.getLogger(__name__)
 class TestAWS(unittest.TestCase):
   def test_with_credentials(self):
     try:
-      finish = conf.AWS_ACCOUNTS.set_for_testing({'default': {'access_key_id':'access_key_id', 'secret_access_key': 'secret_access_key'}})
+      finish = conf.AWS_ACCOUNTS.set_for_testing({'default': {'access_key_id': 'access_key_id', 'secret_access_key': 'secret_access_key'}})
       with patch('aws.client.conf_idbroker.get_conf') as get_conf:
         with patch('aws.client.Client.get_s3_connection'):
           get_conf.return_value = {}
@@ -132,3 +133,23 @@ class TestAWS(unittest.TestCase):
       finish()
       clear_cache()
       conf.clear_cache()
+
+  def test_with_raz_enabled(self):
+    with patch('aws.client.RazS3Connection') as raz_s3_connection:
+      resets = [
+        RAZ.IS_ENABLED.set_for_testing(True),
+        conf.AWS_ACCOUNTS.set_for_testing({'default': {
+          'region': 'us-west-2',
+          'host': 's3-us-west-2.amazonaws.com',
+          'allow_environment_credentials': 'false'
+        }})
+      ]
+
+      try:
+        client = get_client(name='default', fs='s3a', user='hue')
+        assert_true(client)
+      finally:
+        for reset in resets:
+          reset()
+        clear_cache()
+        conf.clear_cache()

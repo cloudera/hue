@@ -740,7 +740,7 @@ Draft a new release on https://github.com/cloudera/hue/releases.
 
 Publish Github NPM package and Docker images at https://github.com/orgs/cloudera/packages?repo_name=hue.
 
-### Gethue
+### Tarball
 
 Building the tarball release:
 
@@ -793,6 +793,27 @@ Then connect to the server and index the package:
     ssh root@101.200.100.200
     cd /var/www/helm.gethue.com
     helm repo index .
+
+### Pypi
+
+The Python API and CLI (and soon API) are being transitioned to https://github.com/gethue/compose which host the `compose` and `compose-admin` commands.
+
+How to update the repo https://pypi.org/project/gethue/:
+
+    rm -rf dist && python3 -m build && python3 -m twine upload dist/*
+
+    python3 -m pip install gethue --upgrade
+
+Note:
+
+A Pypi token will be needed. For doing a test release https://test.pypi.org/project/gethue/ is handy:
+
+    python3 -m pip install --upgrade build
+
+    rm -rf dist && python3 -m build && python3 -m twine upload --repository testpypi dist/*
+    python3 -m pip install --index-url https://test.pypi.org/simple/ gethue --upgrade
+
+Read more on [Python packaging](https://packaging.python.org/tutorials/packaging-projects/#generating-distribution-archives).
 
 ### Documentation
 
