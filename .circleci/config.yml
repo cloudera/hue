@@ -2,7 +2,7 @@
 #
 # Check https://circleci.com/docs/2.0/language-python/ for more details
 #
-version: 2
+version: 2.1
 jobs:
   build:
     docker:
@@ -199,7 +199,7 @@ jobs:
             git push origin HEAD:master
 
 
-  build-py3.6:
+  build-py-36:
     docker:
       - image: gethue/hue:latest-py2 # Should be circleci/python:3.6 at some point
 
@@ -242,7 +242,7 @@ jobs:
       #     key: v1-dependencies-{{ checksum "esktop/core/requirements.txt" }}
 
 
-  build-py3.8:
+  build-py-38:
     docker:
       - image: gethue/hue:latest-py2 # Should be circleci/python:3.x at some point
 
@@ -275,7 +275,7 @@ workflows:
               ignore:
                 - master
                 - py3-ci
-      - build-py3.6:
+      - build-py-36:
           filters:
             branches:
               ignore:
@@ -284,19 +284,19 @@ workflows:
       - commit:
           requires:
             - build
-            - build-py3.6
+            - build-py-36
           filters:
             branches:
               only:
                 - /.*ci-commit-master.*/
   build-python3:
     jobs:
-      - build-py3.8:
+      - build-py-38:
           filters:
             branches:
               only:
                 - py3-ci
-      - build-py3.6:
+      - build-py-36:
           filters:
             branches:
               only:
