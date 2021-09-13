@@ -82,3 +82,24 @@ class TestAWSConf(unittest.TestCase):
       for reset in resets:
         reset()
       conf.clear_cache()
+
+  def test_is_raz_s3(self):
+
+    # When RAZ is not enabled
+    assert_false(conf.is_raz_s3())
+
+    # When RAZ is enabled for S3
+    resets = [
+      RAZ.IS_ENABLED.set_for_testing(True),
+      conf.AWS_ACCOUNTS.set_for_testing({'default': {
+        'region': 'us-west-2',
+        'host': 's3-us-west-2.amazonaws.com',
+        'allow_environment_credentials': 'false'
+      }})
+    ]
+    try:
+      assert_true(conf.is_raz_s3())
+    finally:
+      for reset in resets:
+        reset()
+      conf.clear_cache()
