@@ -288,7 +288,7 @@ def is_enabled():
       has_iam_metadata() or \
       conf_idbroker.is_idbroker_enabled('s3a') or \
       IS_SELF_SIGNING_ENABLED.get() or \
-      (RAZ.IS_ENABLED.get() and 'default' in list(AWS_ACCOUNTS.keys()) and AWS_ACCOUNTS['default'].get_raw())
+      (is_raz_s3() and 'default' in list(AWS_ACCOUNTS.keys()) and AWS_ACCOUNTS['default'].get_raw())
 
 
 def is_ec2_instance():
@@ -349,13 +349,13 @@ def has_s3_access(user):
   from desktop.conf import RAZ  # Must be imported dynamically in order to have proper value
 
   return user.is_authenticated and user.is_active and (
-    is_admin(user) or user.has_hue_permission(action="s3_access", app="filebrowser") or RAZ.IS_ENABLED.get())
+    is_admin(user) or user.has_hue_permission(action="s3_access", app="filebrowser") or is_raz_s3())
 
 
-def has_raz_s3():
+def is_raz_s3():
   from desktop.conf import RAZ  # Must be imported dynamically in order to have proper value
 
-  return (RAZ.IS_ENABLED.get() and bool(get_raz_s3_default_bucket()))
+  return (RAZ.IS_ENABLED.get() and AWS_ACCOUNTS['default'].HOST.get())
 
 
 def config_validator(user):
