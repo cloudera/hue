@@ -24,7 +24,6 @@ from aws import conf as aws_conf
 from aws.s3.s3connection import url_client_connect_to_region, RazS3Connection
 from aws.s3.s3fs import S3FileSystem, S3FileSystemException
 
-from desktop.conf import RAZ
 from desktop.lib.idbroker import conf as conf_idbroker
 from desktop.lib.idbroker.client import IDBroker
 
