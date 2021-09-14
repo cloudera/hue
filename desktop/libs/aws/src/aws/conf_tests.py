@@ -40,12 +40,20 @@ class TestAWSConf(unittest.TestCase):
     self.client = make_logged_in_client(username="test_user", groupname="default", recreate=True, is_superuser=False)
     self.user = User.objects.get(username="test_user")
 
-  def test_is_enabled_when_raz_enabled(self):
 
+  def test_is_enabled(self):
     # When RAZ is not enabled
     assert_false(conf.is_enabled())
 
-    # When RAZ is enabled for S3
+    # When only RAZ is enabled (S3 in Azure cluster)
+    reset = RAZ.IS_ENABLED.set_for_testing(True)
+    try:
+      assert_false(conf.is_enabled())
+    finally:
+      reset()
+      conf.clear_cache()
+
+    # When RAZ is enabled along with S3 config
     resets = [
       RAZ.IS_ENABLED.set_for_testing(True),
       conf.AWS_ACCOUNTS.set_for_testing({'default': {
@@ -61,13 +69,21 @@ class TestAWSConf(unittest.TestCase):
       for reset in resets:
         reset()
       conf.clear_cache()
-  
-  def test_has_s3_access_when_raz_enabled(self):
 
+
+  def test_has_s3_access(self):
     # When RAZ is not enabled
     assert_false(conf.has_s3_access(self.user))
 
-    # When RAZ is enabled for S3
+    # When only RAZ is enabled (S3 in Azure cluster)
+    reset = RAZ.IS_ENABLED.set_for_testing(True)
+    try:
+      assert_false(conf.has_s3_access(self.user))
+    finally:
+      reset()
+      conf.clear_cache()
+
+    # When RAZ is enabled along with S3 config
     resets = [
       RAZ.IS_ENABLED.set_for_testing(True),
       conf.AWS_ACCOUNTS.set_for_testing({'default': {
@@ -83,12 +99,20 @@ class TestAWSConf(unittest.TestCase):
         reset()
       conf.clear_cache()
 
-  def test_is_raz_s3(self):
 
+  def test_is_raz_s3(self):
     # When RAZ is not enabled
     assert_false(conf.is_raz_s3())
 
-    # When RAZ is enabled for S3
+    # When only RAZ is enabled (S3 in Azure cluster)
+    reset = RAZ.IS_ENABLED.set_for_testing(True)
+    try:
+      assert_false(conf.is_raz_s3())
+    finally:
+      reset()
+      conf.clear_cache()
+
+    # When RAZ is enabled along with S3 config
     resets = [
       RAZ.IS_ENABLED.set_for_testing(True),
       conf.AWS_ACCOUNTS.set_for_testing({'default': {
