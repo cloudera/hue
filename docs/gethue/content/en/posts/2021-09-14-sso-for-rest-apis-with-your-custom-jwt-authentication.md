@@ -71,6 +71,7 @@ Basically if it's enabled, then Hue will accept your JWT in the request headers 
 
 To enable the auth backend, make the following changes in the `hue.ini`:
 
+    [desktop]
     [[auth]]
     [[[jwt]]]
     is_enabled=true
