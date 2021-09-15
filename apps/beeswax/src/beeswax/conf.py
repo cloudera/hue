@@ -123,6 +123,12 @@ HIVE_HTTP_THRIFT_PORT = Config(
   dynamic_default=get_hive_thrift_http_port,
   type=int)
 
+HPLSQL = Config(
+  key="hplsql",
+  default=False,
+  type=coerce_bool,
+  help=_t('Enable the HPLSQL mode.'))
+
 HIVE_METASTORE_HOST = Config(
   key="hive_metastore_host",
   help=_t("Host where Hive Metastore Server (HMS) is running. If Kerberos security is enabled, "
