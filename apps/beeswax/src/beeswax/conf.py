@@ -43,14 +43,16 @@ HIVE_DISCOVERY_LLAP = Config(
 
 HIVE_DISCOVERY_HS2 = Config(
   key="hive_discovery_hs2",
-  help=_t("Determines whether we pull a random HiveServer2 from the list in zookeeper.  This HS2 instance is cached until hue is restarted."),
+  help=_t("Determines whether we pull a random HiveServer2 from the list in zookeeper. "
+    "This HS2 instance is cached until hue is restarted."),
   default="false",
   type=coerce_bool
 )
 
 HIVE_DISCOVERY_LLAP_HA = Config(
   key="hive_discovery_llap_ha",
-  help=_t("If you have more than one HSI server, it has a different znode setup.  This will trigger the code to check for the Active HSI Server"),
+  help=_t("If you have more than one HSI server, it has a different znode setup. "
+    "This will trigger the code to check for the Active HSI Server"),
   default="false",
   type=coerce_bool
 )
@@ -123,6 +125,12 @@ HIVE_HTTP_THRIFT_PORT = Config(
   dynamic_default=get_hive_thrift_http_port,
   type=int)
 
+HPLSQL = Config(
+  key="hplsql",
+  default=False,
+  type=coerce_bool,
+  help=_t('Enable the HPLSQL mode.'))
+
 HIVE_METASTORE_HOST = Config(
   key="hive_metastore_host",
   help=_t("Host where Hive Metastore Server (HMS) is running. If Kerberos security is enabled, "
@@ -169,7 +177,9 @@ BROWSE_PARTITIONED_TABLE_LIMIT = Config( # Deprecated, to remove in Hue 4
   key='browse_partitioned_table_limit',
   default=1000,
   type=int,
-  help=_t('Limit the number of partitions to list on the partitions page. A positive value will be set as the LIMIT. If 0 or negative, do not set any limit.'))
+  help=_t('Limit the number of partitions to list on the partitions page. A positive value will be set as the LIMIT. '
+    'If 0 or negative, do not set any limit.')
+  )
 
 QUERY_PARTITIONS_LIMIT = Config(
   key='query_partitions_limit',
@@ -232,7 +242,8 @@ CLOSE_QUERIES = Config(
 MAX_NUMBER_OF_SESSIONS = Config(
   key="max_number_of_sessions",
   help=_t("Hue will use at most this many HiveServer2 sessions per user at a time"
-          # The motivation for -1 is that Hue does currently keep track of session state perfectly and the user does not have ability to manage them effectively. The cost of a session is low
+          # The motivation for -1 is that Hue does currently keep track of session state perfectly and the user
+          # does not have ability to manage them effectively. The cost of a session is low
           "-1 is unlimited number of sessions."),
   type=int,
   default=1
@@ -256,28 +267,28 @@ SSL = ConfigSection(
   key='ssl',
   help=_t('SSL configuration for the server.'),
   members=dict(
-    CACERTS = Config(
+    CACERTS=Config(
       key="cacerts",
       help=_t("Path to Certificate Authority certificates."),
       type=str,
       dynamic_default=default_ssl_cacerts,
     ),
 
-    KEY = Config(
+    KEY=Config(
       key="key",
       help=_t("Path to the private key file, e.g. /etc/hue/key.pem"),
       type=str,
       default=None
     ),
 
-    CERT = Config(
+    CERT=Config(
       key="cert",
       help=_t("Path to the public certificate file, e.g. /etc/hue/cert.pem"),
       type=str,
       default=None
     ),
 
-    VALIDATE = Config(
+    VALIDATE=Config(
       key="validate",
       help=_t("Choose whether Hue should validate certificates received from the server."),
       type=coerce_bool,
