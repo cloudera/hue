@@ -2850,7 +2850,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
             }
 
             if (self.source.inputFormat() !== 'stream' && self.source.inputFormat() !== 'connector' &&
-                (self.source.inputFormat() == 'localfile' && self.source.path() != '') ) {
+                (['localfile', 'file'].indexOf(self.source.inputFormat()) != -1 && self.source.path() != '') ) {
               self.guessFieldTypes();
             }
           }
