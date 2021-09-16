@@ -103,6 +103,22 @@ const parserDefinitions = {
             'export default sqlStatementsParser;\n'
         );
       })
+  },
+  hplsqlStatementsParser: {
+    sources: ['hplsqlStatementsParser.jison'],
+    target: 'hplsqlStatementsParser.jison',
+    outputFolder: OUTPUT_FOLDER,
+    afterParse: contents =>
+      new Promise(resolve => {
+        resolve(
+          LICENSE +
+            contents.replace(
+              'parse: function parse',
+              SQL_STATEMENTS_PARSER_JSDOC + 'parse: function parse'
+            ) +
+            'export default hplsqlStatementsParser;\n'
+        );
+      })
   }
 };
 
