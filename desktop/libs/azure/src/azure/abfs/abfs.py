@@ -573,14 +573,6 @@ class ABFS(object):
     """
     headers = {'x-ms-rename-source': '/' + urllib_quote(Init_ABFS.strip_scheme(old))}
 
-    # Required to sign the header with SAS token for RAZ
-    if RAZ.IS_ENABLED.get():
-      raz_http_client = RazHttpClient(self._user, self._url, exc_class=WebHdfsException, logger=LOG)
-      url = raz_http_client._make_url(headers['x-ms-rename-source'], params=None)
-
-      sas_token = raz_http_client.get_sas_token('PUT', self._user, url)
-      headers['x-ms-rename-source'] += '?' + sas_token
-
     try:
       self._create_path(new, headers=headers, overwrite=True)
     except WebHdfsException as e:

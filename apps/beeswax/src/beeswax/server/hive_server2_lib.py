@@ -30,11 +30,11 @@ from TCLIService.ttypes import TOpenSessionReq, TGetTablesReq, TFetchResultsReq,
   TGetCrossReferenceReq, TGetPrimaryKeysReq
 
 from desktop.lib import python_util, thrift_util
-from desktop.conf import DEFAULT_USER
+from desktop.conf import DEFAULT_USER, USE_THRIFT_HTTP_JWT
 
 from beeswax import conf as beeswax_conf, hive_site
 from beeswax.hive_site import hiveserver2_use_ssl
-from beeswax.conf import CONFIG_WHITELIST, LIST_PARTITIONS_LIMIT
+from beeswax.conf import CONFIG_WHITELIST, LIST_PARTITIONS_LIMIT, HPLSQL
 from beeswax.models import Session, HiveServerQueryHandle, HiveServerQueryHistory
 from beeswax.server.dbms import Table, DataTable, QueryServerException, InvalidSessionQueryServerException
 
@@ -592,7 +592,7 @@ class HiveServerClient(object):
       validate = beeswax_conf.SSL.VALIDATE.get()
       timeout = beeswax_conf.SERVER_CONN_TIMEOUT.get()
 
-    if auth_username:
+    if auth_username and not USE_THRIFT_HTTP_JWT.get():
       username = auth_username
       password = auth_password
     else:
@@ -674,6 +674,8 @@ class HiveServerClient(object):
 
     if self.query_server['server_name'] == 'beeswax': # All the time
       kwargs['configuration'].update({'hive.server2.proxy.user': user.username})
+      if HPLSQL.get():
+        kwargs['configuration'].update({'set:hivevar:mode': 'HPLSQL'})
 
     if self.query_server['server_name'] == 'llap': # All the time
       kwargs['configuration'].update({'hive.server2.proxy.user': user.username})

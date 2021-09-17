@@ -180,7 +180,6 @@ class RazClientTest(unittest.TestCase):
 
 
   def test_handle_adls_action_types_mapping(self):
-
     client = RazClient(self.raz_url, self.raz_token, username=self.username, service="adls", service_name="cm_adls", cluster_name="cl1")
 
     # List directory
@@ -188,110 +187,100 @@ class RazClientTest(unittest.TestCase):
     relative_path = '/'
     url_params = {'directory': 'user%2Fcsso_hueuser', 'resource': 'filesystem', 'recursive': 'false'}
 
-    response = client.handle_adls_req_mapping(method, url_params, relative_path)
-
-    assert_equal(response['access_type'], 'list')
-    assert_equal(response['relative_path'], '/user/csso_hueuser')
+    access_type = client.handle_adls_req_mapping(method, url_params)
+    assert_equal(access_type, 'list')
 
     # Stats
     method = 'HEAD'
     relative_path = '/user/csso_hueuser'
     url_params = {'action': 'getStatus'}
 
-    response = client.handle_adls_req_mapping(method, url_params, relative_path)
-
-    assert_equal(response['access_type'], 'get-status')
-    assert_equal(response['relative_path'], '/user/csso_hueuser')
+    access_type = client.handle_adls_req_mapping(method, url_params)
+    assert_equal(access_type, 'get-status')
 
     # Delete path
     method = 'DELETE'
     relative_path = '/user/csso_hueuser/test_dir/customer.csv'
     url_params = {}
 
-    response = client.handle_adls_req_mapping(method, url_params, relative_path)
-
-    assert_equal(response['access_type'], 'delete')
-    assert_equal(response['relative_path'], '/user/csso_hueuser/test_dir/customer.csv')
+    access_type = client.handle_adls_req_mapping(method, url_params)
+    assert_equal(access_type, 'delete')
 
     # Delete with recursive as true
     method = 'DELETE'
     relative_path = '/user/csso_hueuser/test_dir'
     url_params = {'recursive': 'true'}
 
-    response = client.handle_adls_req_mapping(method, url_params, relative_path)
-
-    assert_equal(response['access_type'], 'delete-recursive')
-    assert_equal(response['relative_path'], '/user/csso_hueuser/test_dir')
+    access_type = client.handle_adls_req_mapping(method, url_params)
+    assert_equal(access_type, 'delete-recursive')
 
     # Create directory
     method = 'PUT'
     relative_path = '/user/csso_hueuser/test_dir'
     url_params = {'resource': 'directory'}
 
-    response = client.handle_adls_req_mapping(method, url_params, relative_path)
-
-    assert_equal(response['access_type'], 'create-directory')
-    assert_equal(response['relative_path'], '/user/csso_hueuser/test_dir')
+    access_type = client.handle_adls_req_mapping(method, url_params)
+    assert_equal(access_type, 'create-directory')
 
     # Create file
     method = 'PUT'
     relative_path = '/user/csso_hueuser/customers.csv'
     url_params = {'resource': 'file'}
 
-    response = client.handle_adls_req_mapping(method, url_params, relative_path)
-
-    assert_equal(response['access_type'], 'create-file')
-    assert_equal(response['relative_path'], '/user/csso_hueuser/customers.csv')
+    access_type = client.handle_adls_req_mapping(method, url_params)
+    assert_equal(access_type, 'create-file')
 
     # Append
     method = 'PATCH'
     relative_path = '/user/csso_hueuser/customers.csv'
     url_params = {'action': 'append'}
 
-    response = client.handle_adls_req_mapping(method, url_params, relative_path)
-
-    assert_equal(response['access_type'], 'write')
-    assert_equal(response['relative_path'], '/user/csso_hueuser/customers.csv')
+    access_type = client.handle_adls_req_mapping(method, url_params)
+    assert_equal(access_type, 'write')
 
     # Flush
     method = 'PATCH'
     relative_path = '/user/csso_hueuser/customers.csv'
     url_params = {'action': 'flush'}
 
-    response = client.handle_adls_req_mapping(method, url_params, relative_path)
-
-    assert_equal(response['access_type'], 'write')
-    assert_equal(response['relative_path'], '/user/csso_hueuser/customers.csv')
+    access_type = client.handle_adls_req_mapping(method, url_params)
+    assert_equal(access_type, 'write')
 
     # Chmod
     method = 'PATCH'
     relative_path = '/user/csso_hueuser/customers.csv'
     url_params = {'action': 'setAccessControl'}
 
-    response = client.handle_adls_req_mapping(method, url_params, relative_path)
+    access_type = client.handle_adls_req_mapping(method, url_params)
+    assert_equal(access_type, 'set-permission')
 
-    assert_equal(response['access_type'], 'set-permission')
-    assert_equal(response['relative_path'], '/user/csso_hueuser/customers.csv')
 
-    # Rename
-    method = 'PUT'
-    relative_path = '/user/csso_hueuser/old_dir' # First call to fetch SAS to sign header path
+  def test_handle_relative_path(self):
+    client = RazClient(self.raz_url, self.raz_token, username=self.username, service="adls", service_name="cm_adls", cluster_name="cl1")
+
+    # No relative path condition
+    method = 'GET'
+    resource_path = ['gethue-container']
     url_params = {}
 
-    response = client.handle_adls_req_mapping(method, url_params, relative_path)
+    relative_path = client._handle_relative_path(method, url_params, resource_path, "/")
+    assert_equal(relative_path, "/")
 
-    assert_equal(response['access_type'], 'rename-source')
-    assert_equal(response['relative_path'], '/user/csso_hueuser/old_dir')
-
-    method = 'PUT'
-    relative_path = '/user/csso_hueuser/new_dir' 
-    headers = {'x-ms-rename-source': '/user/csso_hueuser/old_dir?some_sas_token'} # Second call having signed header path
+    # When relative path present in URL
+    method = 'GET'
+    resource_path = ['gethue-container', 'user/csso_hueuser/customer.csv']
     url_params = {}
 
-    response = client.handle_adls_req_mapping(method, url_params, relative_path)
+    relative_path = client._handle_relative_path(method, url_params, resource_path, "/")
+    assert_equal(relative_path, "/user/csso_hueuser/customer.csv")
 
-    assert_equal(response['access_type'], 'rename-source')
-    assert_equal(response['relative_path'], '/user/csso_hueuser/new_dir')
+    # When list operation
+    method = 'GET'
+    resource_path = ['gethue-container']
+    url_params = {'directory': 'user%2Fcsso_hueuser', 'resource': 'filesystem', 'recursive': 'false'}
+
+    relative_path = client._handle_relative_path(method, url_params, resource_path, "/")
+    assert_equal(relative_path, "/user/csso_hueuser")
 
 
   def test_get_raz_client_s3(self):

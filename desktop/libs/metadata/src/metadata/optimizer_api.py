@@ -199,12 +199,17 @@ def query_risk(request):
   interface = request.POST.get('interface', OPTIMIZER.INTERFACE.get())
   connector = json.loads(request.POST.get('connector', '{}'))
   if request.POST.get('query'):
+    # Via API
     query = json.loads(request.POST.get('query'))
+    source_platform = request.POST.get('sourcePlatform')
+    db_name = request.POST.get('dbName')
   else:
+    # Via Editor
     snippet = json.loads(request.POST.get('snippet'))
-    query = get_current_statement(snippet)
-  source_platform = request.POST.get('sourcePlatform')
-  db_name = request.POST.get('dbName')
+    should_close, resp = get_current_statement(snippet)
+    query = resp['statement']
+    source_platform = snippet['connector']['dialect']
+    db_name = snippet['database']
 
   api = get_api(request.user, interface)
 

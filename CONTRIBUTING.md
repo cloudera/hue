@@ -11,7 +11,7 @@ Here is some inspiration:
 
 1. Updating a small piece of [documentation](https://docs.gethue.com). Pick a page and click on "Edit The Page".
 2. High level [Roadmap](/docs/ROADMAP.md)
-3. Check [Github issues](https://github.com/cloudera/hue/issues), especially [Good First Issues](https://github.com/cloudera/hue/pulls?q=is%3Apr+is%3Aopen+label%3A%22good+first+issue%22).
+3. Check [Github issues](https://github.com/cloudera/hue/issues), especially [Good First Issues](https://github.com/cloudera/hue/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22).
 4. Core areas: improving [SQL Components](https://docs.gethue.com/developer/components/) like Scratchpad and Parsers, [APIs](https://docs.gethue.com/developer/api/), Kubernetes service or [SQL connectors](https://docs.gethue.com/administrator/configuration/connectors/)
 
 # Submitting an improvement
