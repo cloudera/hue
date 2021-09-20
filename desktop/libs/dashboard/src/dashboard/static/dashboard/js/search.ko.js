@@ -2012,7 +2012,7 @@ var TempDocument = function () {
         if (data && data.data && data.data.snippets.length > 0) {
           self.name(data.document.name);
           var snippet = data.data.snippets[0];
-          self.parsedStatements(sqlStatementsParser.parse(snippet.statement));
+          self.parsedStatements(getStatementsParser(snippet.connector).parse(snippet.statement));
           self.selectedStatement(self.parsedStatements()[0].statement);
           self.selectedStatementId(0);
         }
