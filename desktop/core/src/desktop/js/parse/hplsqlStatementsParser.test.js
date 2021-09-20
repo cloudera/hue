@@ -82,11 +82,13 @@ describe('hplsqlStatementsParser.js', () => {
       "CREATE PROCEDURE greet(name STRING)\nBEGIN\n  PRINT 'Hello ' || name;\nEND;/\nprint 'world';",
       [
         {
+          type: 'statement',
           statement: "CREATE PROCEDURE greet(name STRING)\nBEGIN\n  PRINT 'Hello ' || name;\nEND;;",
           location: { first_line: 1, first_column: 0, last_line: 4, last_column: 5 },
           firstToken: 'CREATE'
         },
         {
+          type: 'statement',
           statement: "\nprint 'world';",
           location: { first_line: 4, first_column: 5, last_line: 5, last_column: 14 },
           firstToken: 'print'
