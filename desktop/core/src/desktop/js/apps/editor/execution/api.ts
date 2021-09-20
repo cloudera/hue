@@ -32,7 +32,8 @@ import { ResultRow, ResultType } from 'apps/editor/execution/executionResult';
 import { CancellablePromise } from 'api/cancellablePromise';
 import SubscriptionTracker from 'components/utils/SubscriptionTracker';
 import { Compute, Connector, Namespace } from 'config/types';
-import sqlStatementsParser, { ParsedSqlStatement } from 'parse/sqlStatementsParser';
+import { ParsedSqlStatement } from 'parse/sqlStatementsParser';
+import { getStatementsParser } from 'parse/utils';
 
 type SessionPropertyValue = string | number | boolean | null | undefined;
 
@@ -307,7 +308,7 @@ export const executeSingleStatement = ({
     let parsedStatement: ParsedSqlStatement | undefined = undefined;
 
     try {
-      const parsedStatements = sqlStatementsParser.parse(statement);
+      const parsedStatements = getStatementsParser(connector).parse(statement);
       parsedStatement = parsedStatements[0];
     } catch {}
 
