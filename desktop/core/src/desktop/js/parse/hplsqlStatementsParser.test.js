@@ -15,70 +15,29 @@
 // limitations under the License.
 
 import hplsqlStatementsParser from './hplsqlStatementsParser';
+import { testParser, runSharedStatementsParserTests } from './sharedStatementsParserTests.ts';
 
 describe('hplsqlStatementsParser.js', () => {
-  const stringifySplitResult = function (result) {
-    let s = '[';
-    let first = true;
-    result.forEach(entry => {
-      s += first ? '{\n' : ', {\n';
-      s += "  statement: '" + entry.statement.replace(/\n/g, '\\n') + "',\n";
-      s +=
-        '  location: { first_line: ' +
-        entry.location.first_line +
-        ', first_column: ' +
-        entry.location.first_column +
-        ', last_line: ' +
-        entry.location.last_line +
-        ', last_column: ' +
-        entry.location.last_column +
-        ' }';
-      if (entry.firstToken) {
-        s += ",\n  firstToken: '" + entry.firstToken + "'";
-      }
-      if (entry.database) {
-        s += ",\n  database: '" + entry.database + "'";
-      }
-      s += '\n}';
-      first = false;
-    });
-    s += ']';
-    return s;
-  };
-
-  const testParser = function (input, expectedOutput) {
-    try {
-      expectedOutput.forEach(entry => {
-        entry.type = 'statement';
-      });
-      const result = hplsqlStatementsParser.parse(input);
-      const because =
-        '\n\nParser output: ' +
-        stringifySplitResult(result) +
-        '\nExpected output: ' +
-        stringifySplitResult(expectedOutput);
-
-      expect(result).toEqual(expectedOutput, because);
-    } catch (error) {
-      console.error(error);
-      console.warn(error.message);
-
-      fail('Got error');
-    }
-  };
+  runSharedStatementsParserTests(hplsqlStatementsParser);
 
   it('should split "CREATE PROCEDURE greet(name STRING)\\nBEGIN\\n  PRINT \'Hello \' || name;END;" correctly', () => {
-    testParser("CREATE PROCEDURE greet(name STRING)\nBEGIN\n  PRINT 'Hello ' || name;END;", [
-      {
-        statement: "CREATE PROCEDURE greet(name STRING)\nBEGIN\n  PRINT 'Hello ' || name;END;",
-        location: { first_line: 1, first_column: 0, last_line: 3, last_column: 29 },
-        firstToken: 'CREATE'
-      }
-    ]);
+    testParser(
+      hplsqlStatementsParser,
+      "CREATE PROCEDURE greet(name STRING)\nBEGIN\n  PRINT 'Hello ' || name;END;",
+      [
+        {
+          type: 'statement',
+          statement: "CREATE PROCEDURE greet(name STRING)\nBEGIN\n  PRINT 'Hello ' || name;END;",
+          location: { first_line: 1, first_column: 0, last_line: 3, last_column: 29 },
+          firstToken: 'CREATE'
+        }
+      ]
+    );
   });
 
   it('should split "CREATE PROCEDURE greet(name STRING)\\nBEGIN\\n  PRINT \'Hello \' || name;\\nEND;/\\nprint "world";" correctly', () => {
     testParser(
+      hplsqlStatementsParser,
       "CREATE PROCEDURE greet(name STRING)\nBEGIN\n  PRINT 'Hello ' || name;\nEND;/\nprint 'world';",
       [
         {
