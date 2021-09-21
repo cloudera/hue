@@ -47,7 +47,7 @@ categories:
 
 <p align="center"> Using Shared Access Signatures (SAS) to manage files and its operations </p>
 
-Previously, we talked about [providing S3 data access without giving out actual credentials](https://gethue.com/blog/2021-04-23-s3-file-access-without-any-credentials-and-signed-urls/) via S3 signed URLs. This time, this feature is coming for another major cloud provider in the market, **Microsoft Azure!**
+Previously, we talked about [providing S3 data access without giving out actual credentials](/blog/2021-04-23-s3-file-access-without-any-credentials-and-signed-urls/) via S3 signed URLs. This time, this feature is coming for another major cloud provider in the market, **Microsoft Azure!**
 
 This main use case remains the same which is to keep things simple for the end users and walk one more step on the path towards unlocking true self-service querying.
 
@@ -59,13 +59,12 @@ A [SAS](https://docs.microsoft.com/en-us/azure/storage/common/storage-sas-overvi
 
 Hue does not require any ADLS credentials now and neither does it generate the SAS token. Hue just asks in this example to a [RAZ Server](https://blog.cloudera.com/access-control-for-azure-adls-cloud-object-storage/) to provide the equivalent SAS token for the ADLS call (REST APIs) a user wants to make via the File Browser.
 
-![Before: Users interacting with ADLS via Hue and a shared credential key (not very safe and not the best)](https://cdn.gethue.com/uploads/2021/09/before_raz_adls.png)
-*Before: Users interacting with ADLS via Hue and a shared credential key (not very safe and not the best)*
+![Before: Users interacting with ADLS via Hue and a shared credential key (not very safe and not the best)](https://cdn.gethue.com/uploads/2021/09/before_raz_adls.png)<br>*Before: Users interacting with ADLS via Hue and a shared credential key (not very safe and not the best)*
 
 <br>
 
 ![After: Users getting individual temporary SAS tokens letting them access any ADLS resource (safe and fine grain access possible)](https://cdn.gethue.com/uploads/2021/09/after_raz_adls.png)
-*After: Users getting individual temporary SAS tokens letting them access any ADLS resource (safe and fine grain access possible)*
+<br>*After: Users getting individual temporary SAS tokens letting them access any ADLS resource (safe and fine grain access possible)*
 
 <br>
 
