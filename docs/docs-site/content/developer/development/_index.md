@@ -777,7 +777,7 @@ Docker images are at https://hub.docker.com/u/gethue/:
     docker push gethue/nginx:4.10.0
 
 
-### Kubernetes / Helm package
+### Kubernetes / Helm
 
 To build the chart, use the package command from the Helm root directory:
 
@@ -819,7 +819,11 @@ Read more on [Python packaging](https://packaging.python.org/tutorials/packaging
 
 Documentation is currently being auto refreshed every morning of the week and run as a container.
 
-The manual process otherwise would be to [build it](#Documentation) and push it to the docs host.
+The manual process otherwise would be to [build it](#documentation-1) and push it to the docs host.
+
+The resources like images go to the CDN:
+
+    scp before_raz_adls.png after_raz_adls.png root@104.248.178.223:/var/www/cdn.gethue.com/uploads/2021/09/
 
 ### NPM registry
 
