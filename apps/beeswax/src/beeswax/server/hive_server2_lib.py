@@ -990,7 +990,10 @@ class HiveServerClient(object):
 
     # The query can override the default configuration
     configuration.update(self._get_query_configuration(query))
-    query_statement = query.get_query_statement(statement)
+    if HPLSQL.get() and self.query_server['server_name'] == 'beeswax':
+      query_statement = query.hql_query
+    else:
+      query_statement = query.get_query_statement(statement)
 
     return self.execute_async_statement(statement=query_statement, conf_overlay=configuration, session=session)
 
