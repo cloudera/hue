@@ -31,6 +31,7 @@ from django.urls import reverse
 from enum import Enum
 from TCLIService.ttypes import TSessionHandle, THandleIdentifier, TOperationState, TOperationHandle, TOperationType
 
+from beeswax.conf import HPLSQL
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.models import Document, Document2
 from desktop.redaction import global_redaction_engine
@@ -399,6 +400,8 @@ class SavedQuery(models.Model):
 class SessionManager(models.Manager):
 
   def get_session(self, user, application='beeswax', filter_open=True):
+    if HPLSQL.get() and application == 'beeswax':
+      application = 'hplsql'
     try:
       q = self.filter(owner=user, application=application).exclude(guid='').exclude(secret='')
       if filter_open:
