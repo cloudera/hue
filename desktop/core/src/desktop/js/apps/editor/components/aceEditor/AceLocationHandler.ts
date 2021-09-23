@@ -40,7 +40,8 @@ import { EditorInterpreter } from 'config/types';
 import { hueWindow } from 'types/types';
 import huePubSub, { HueSubscription } from 'utils/huePubSub';
 import I18n from 'utils/i18n';
-import sqlStatementsParser, { ParsedSqlStatement } from 'parse/sqlStatementsParser';
+import { ParsedSqlStatement } from 'parse/sqlStatementsParser';
+import { getStatementsParser } from 'parse/utils';
 import sqlUtils from 'sql/sqlUtils';
 import stringDistance from 'sql/stringDistance';
 import {
@@ -738,7 +739,9 @@ export default class AceLocationHandler implements Disposable {
     if (this.isSqlDialect()) {
       try {
         const lastChangeTime = this.editor.lastChangeTime;
-        this.lastKnownStatements.statements = sqlStatementsParser.parse(this.editor.getValue());
+        this.lastKnownStatements.statements = getStatementsParser(this.executor.connector()).parse(
+          this.editor.getValue()
+        );
         this.lastKnownStatements.editorChangeTime = lastChangeTime;
 
         const hueDebug = (<hueWindow>window).hueDebug;
