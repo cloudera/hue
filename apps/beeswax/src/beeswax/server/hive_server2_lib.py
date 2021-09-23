@@ -707,10 +707,11 @@ class HiveServerClient(object):
 
     encoded_status, encoded_guid = HiveServerQueryHandle(secret=sessionId.secret, guid=sessionId.guid).get()
     properties = json.dumps(res.configuration)
+    application = 'hplsql' if HPLSQL.get() and self.query_server['server_name'] == 'beeswax' else self.query_server['server_name']
 
     session = Session.objects.create(
         owner=user,
-        application=self.query_server['server_name'],
+        application=application,
         status_code=res.status.statusCode,
         secret=encoded_status,
         guid=encoded_guid,
