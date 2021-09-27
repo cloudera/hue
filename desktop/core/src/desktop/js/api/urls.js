@@ -40,7 +40,7 @@ export const SEND_SLACK_MESSAGE = '/desktop/slack/api/message/send';
 export const TOPO_URL = '/desktop/topo/';
 
 export const SEARCH_API = '/desktop/api/search/entities';
-export const INTERACTIVE_SEARCH_API = '/desktop/api/search/entities_interactive';
+export const INTERACTIVE_SEARCH_API = '/api/metadata/search/entities_interactive';
 
 export const CREATE_SESSION_API = '/api/editor/create_session'; // Note: dup by api.ts
 export const CLOSE_SESSION_API = '/api/editor/close_session'; // Note: dup by api.ts
