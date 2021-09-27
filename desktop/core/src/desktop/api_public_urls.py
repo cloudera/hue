@@ -141,3 +141,7 @@ urlpatterns += [
   re_path(r'^optimizer/query_compatibility/?$', api_public.query_compatibility, name='optimizer_query_compatibility'),
   re_path(r'^optimizer/similar_queries/?$', api_public.similar_queries, name='optimizer_similar_queries'),
 ]
+
+urlpatterns += [
+  re_path(r'^metadata/search/entities_interactive/?$', api_public.search_entities_interactive, name='metadata_entities_interactive'),
+]
