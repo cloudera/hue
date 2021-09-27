@@ -167,7 +167,7 @@ And then, add it in `hue.ini` (comma separated and in order of priority if multi
 
     [desktop]
     [[auth]]
-    api_auth=<you_own_custom_auth_backend>
+    api_auth=<your_own_custom_auth_backend>
 
 ## SQL Querying
 
