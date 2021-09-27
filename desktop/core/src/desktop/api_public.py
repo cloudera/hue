@@ -192,6 +192,7 @@ def storage_upload_file(request):
   django_request = get_django_request(request)
   return filebrowser_views.upload_file(django_request)
 
+
 # Importer
 
 @api_view(["POST"])
@@ -208,6 +209,7 @@ def guess_field_types(request):
 def importer_submit(request):
   django_request = get_django_request(request)
   return indexer_api3.importer_submit(django_request)
+
 
 # Connector
 
@@ -304,6 +306,11 @@ def top_filters(request):
 def top_aggs(request):
   django_request = get_django_request(request)
   return optimizer_api.top_aggs(django_request)
+
+@api_view(["POST"])
+def search_entities_interactive(request):
+  django_request = get_django_request(request)
+  return desktop_api.search_entities_interactive(django_request)
 
 
 # Utils
