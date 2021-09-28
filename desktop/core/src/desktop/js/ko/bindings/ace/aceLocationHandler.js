@@ -20,7 +20,7 @@ import ace from 'ext/aceHelper';
 import { DIALECT } from 'apps/editor/snippet';
 import dataCatalog from 'catalog/dataCatalog';
 import AssistStorageEntry from 'ko/components/assist/assistStorageEntry';
-import sqlStatementsParser from 'parse/sqlStatementsParser';
+import { getStatementsParser } from 'parse/utils';
 import sqlUtils from 'sql/sqlUtils';
 import {
   POST_FROM_LOCATION_WORKER_EVENT,
@@ -610,7 +610,9 @@ class AceLocationHandler {
       if (self.snippet.isSqlDialect()) {
         try {
           const lastChangeTime = self.editor.lastChangeTime;
-          lastKnownStatements = sqlStatementsParser.parse(self.editor.getValue());
+          lastKnownStatements = getStatementsParser(self.snippet.connector()).parse(
+            self.editor.getValue()
+          );
           lastKnownStatements.editorChangeTime = lastChangeTime;
 
           if (typeof hueDebug !== 'undefined' && hueDebug.logStatementLocations) {

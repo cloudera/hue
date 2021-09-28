@@ -130,7 +130,7 @@ Provide login credentials and get a [JWT token](https://jwt.io/):
 
     {"refresh":"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTYyMTcyNDYzMSwianRpIjoiOGM0NDRjYzRhN2VhNGMxZDliMGZhNmU1YzUyMjM1MjkiLCJ1c2VyX2lkIjoxfQ.t6t7_eYrNhpGN3-Jz5MDLXM8JtGP7V9Y9lacOTInqqQ","access":"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjIxNjM4NTMxLCJqdGkiOiJhZjgwN2E0ZjBmZDI0ZWMxYWQ2NTUzZjEyMjIyYzU4YyIsInVzZXJfaWQiOjF9.dQ1P3hbzSytp9-o8bWlcOcwrdwRVy95M2Eolph92QMA"}
 
-And keep the `access` token as the value of the bearer.
+And keep the `access` token as the value of the bearer header in the API calls.
 
 ### Validate token
 
@@ -144,6 +144,30 @@ Similarly, an `access` token validity can be extended via a refresh sending the 
 
     curl -X POST https://demo.gethue.com/api/token/refresh/ -d 'refresh=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTYyMTcyNDYzMSwianRpIjoiOGM0NDRjYzRhN2VhNGMxZDliMGZhNmU1YzUyMjM1MjkiLCJ1c2VyX2lkIjoxfQ.t6t7_eYrNhpGN3-Jz5MDLXM8JtGP7V9Y9lacOTInqqQ'
 
+### Custom JWT Authentication
+
+Users can authenticate with their own JWT with the help of custom backend **(supporting RSA256)**. To enable it, add the following in the `hue.ini`:
+
+    [desktop]
+    [[auth]]
+    [[[jwt]]]
+    is_enabled=true
+    key_server_url=https://ext_authz:8000
+    issuer=<your_external_app>
+    audience=hue
+
+Also, to allow Hue to send this JWT to external services like Impala, enable the following flag in `hue.ini`:
+
+    [desktop]
+    use_thrift_http_jwt=true
+
+If you wish to implement your own custom auth (having customized connection with external auth server or using different signing algorithm etc.), then you can follow the [Django REST Framework custom pluggability](https://www.django-rest-framework.org/api-guide/authentication/#custom-authentication) and add like this [dummy auth](https://github.com/cloudera/hue/blob/d75c8fc7b307fc67ef9a2a58e36cfb4ace6cd461/desktop/core/src/desktop/auth/api_authentications.py#L119).
+
+And then, add it in `hue.ini` (comma separated and in order of priority if multiple auth backends present):
+
+    [desktop]
+    [[auth]]
+    api_auth=<your_own_custom_auth_backend>
 
 ## SQL Querying
 
