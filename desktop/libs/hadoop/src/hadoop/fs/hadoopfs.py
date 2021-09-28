@@ -182,12 +182,14 @@ class Hdfs(object):
 
     from hadoop.hdfs_site import get_umask_mode
     from useradmin.conf import HOME_DIR_PERMISSIONS, USE_HOME_DIR_PERMISSIONS
+    from desktop.conf import DEFAULT_HDFS_SUPERUSER
     mode = int(HOME_DIR_PERMISSIONS.get(), 8) if USE_HOME_DIR_PERMISSIONS.get() else (0o777 & (0o1777 ^ get_umask_mode()))
     if not self.exists(home_path):
       user = self.user
+      LOG.debug('superuser used for home directory creation: %s' % self.superuser)
       try:
         try:
-          self.setuser(self.superuser)
+          self.setuser(DEFAULT_HDFS_SUPERUSER.get())
           self.mkdir(home_path)
           self.chmod(home_path, mode)
           self.chown(home_path, user)
