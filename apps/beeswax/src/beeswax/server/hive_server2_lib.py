@@ -1518,6 +1518,7 @@ class HiveServerClientCompatible(object):
           'type': table['TABLE_TYPE'].capitalize()
         }
       )
+    massaged_tables = sorted(massaged_tables, key=lambda table_: table_['name'])
     return massaged_tables
 
 
