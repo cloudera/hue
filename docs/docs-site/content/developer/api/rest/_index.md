@@ -580,24 +580,18 @@ Install or update the connector examples:
 The [metadata API](https://github.com/cloudera/hue/tree/master/desktop/libs/metadata) is powering the external [Catalog integrations](/user/browsing/#data-catalogs).
 
 ### Searching for entities
+    
+    curl -X POST http://demo.gethue.com/api/metadata/search/entities_interactive/' -d 'query_s="*sample"&sources=["documents", "sql", "hdfs", "s3"]'
 
-    $.post("/metadata/api/catalog/search_entities_interactive/", {
-        query_s: ko.mapping.toJSON("*sample"),
-        sources: ko.mapping.toJSON(["sql", "hdfs", "s3"]),
-        field_facets: ko.mapping.toJSON([]),
-        limit: 10
-    }, function(data) {
-        console.log(ko.mapping.toJSON(data));
-    });
+Some of the parameters:
+- **query_s:** search term
+- **sources:** sources to search from `["documents", "sql", "hdfs", "s3"]`
+- **field_facets:** `['type', 'owner', 'tags', 'lastModified']`
+- **limit:** 10
 
-Searching for entities with the dummy backend:
+Searching for entities with the `dummy` catalog:
 
-    $.post("/metadata/api/catalog/search_entities_interactive/", {
-        query_s: ko.mapping.toJSON("*sample"),
-        interface: "dummy"
-    }, function(data) {
-        console.log(ko.mapping.toJSON(data));
-    });
+    curl -X POST http://demo.gethue.com/api/metadata/search/entities_interactive/ -d 'query_s="*sample"&interface="dummy"'
 
 ### Finding an entity
 
