@@ -29,7 +29,7 @@ from useradmin.models import User
 from beeswax.conf import MAX_NUMBER_OF_SESSIONS, CLOSE_SESSIONS
 from beeswax.models import HiveServerQueryHandle, Session
 from beeswax.server.dbms import get_query_server_config, QueryServerException
-from beeswax.server.hive_server2_lib import HiveServerTable, HiveServerClient
+from beeswax.server.hive_server2_lib import HiveServerTable, HiveServerClient, HiveServerClientCompatible
 
 if sys.version_info[0] > 2:
   from unittest.mock import patch, Mock, MagicMock
@@ -1041,3 +1041,31 @@ class TestSessionManagement():
     finally:
       for f in finish:
         f()
+
+class TestHiveServerClientCompatible():
+
+
+  def test_get_tables_meta(self):
+    client = Mock(
+      get_tables_meta=Mock(return_value=[
+        {'TABLE_NAME': 'sample_07', 'TABLE_TYPE': 'TABLE', 'REMARKS': None},
+        {'TABLE_NAME': 'sample_08', 'TABLE_TYPE': 'TABLE', 'REMARKS': None},
+        {'TABLE_NAME': 'web_logs', 'TABLE_TYPE': 'TABLE', 'REMARKS': None},
+        {'TABLE_NAME': 'flights_13', 'TABLE_TYPE': 'TABLE', 'REMARKS': None},
+        {'TABLE_NAME': 'flights', 'TABLE_TYPE': 'TABLE', 'REMARKS': None},
+        {'TABLE_NAME': 'lights', 'TABLE_TYPE': 'TABLE', 'REMARKS': None}
+      ])
+    )
+    database = Mock()
+    table_names = Mock()
+    massaged_tables = HiveServerClientCompatible(client).get_tables_meta(database, table_names)
+    sorted_table = [
+      {'name': 'flights', 'comment': None, 'type': 'Table'},
+      {'name': 'flights_13', 'comment': None, 'type': 'Table'},
+      {'name': 'lights', 'comment': None, 'type': 'Table'},
+      {'name': 'sample_07', 'comment': None, 'type': 'Table'},
+      {'name': 'sample_08', 'comment': None, 'type': 'Table'},
+      {'name': 'web_logs', 'comment': None, 'type': 'Table'}
+    ]
+
+    assert_equal(sorted_table, massaged_tables)
