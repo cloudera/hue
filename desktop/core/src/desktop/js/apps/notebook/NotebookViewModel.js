@@ -168,7 +168,10 @@ export default class NotebookViewModel {
       const foundInterpreter = options.languages.find(
         interpreter => interpreter.type === self.editorType()
       );
-      return foundInterpreter?.displayName || foundInterpreter?.name || self.editorType();
+      return window.HPLSQL &&
+        (foundInterpreter?.displayName || foundInterpreter?.name || self.editorType()) === 'Hive'
+        ? 'Hive HPL/SQL'
+        : foundInterpreter?.displayName || foundInterpreter?.name || self.editorType();
     });
     self.autocompleteTimeout = options.autocompleteTimeout;
     self.selectedNotebook = ko.observable();
