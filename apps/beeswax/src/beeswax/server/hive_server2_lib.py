@@ -34,7 +34,7 @@ from desktop.conf import DEFAULT_USER, USE_THRIFT_HTTP_JWT
 
 from beeswax import conf as beeswax_conf, hive_site
 from beeswax.hive_site import hiveserver2_use_ssl
-from beeswax.conf import CONFIG_WHITELIST, LIST_PARTITIONS_LIMIT, HPLSQL
+from beeswax.conf import CONFIG_WHITELIST, LIST_PARTITIONS_LIMIT, HPLSQL, MAX_CATALOG_SQL_ENTRIES
 from beeswax.models import Session, HiveServerQueryHandle, HiveServerQueryHistory
 from beeswax.server.dbms import Table, DataTable, QueryServerException, InvalidSessionQueryServerException
 
@@ -179,7 +179,7 @@ class HiveServerTable(Table):
     try:
       end_cols_index = list(map(itemgetter('col_name'), rows[col_row_index:])).index('')
     except ValueError as e:
-      end_cols_index = 5000
+      end_cols_index = MAX_CATALOG_SQL_ENTRIES.get()
       LOG.warning('Could not guess end column index, so defaulting to %s: %s' % (end_cols_index, e))
     return [{
           'col_name': prop['col_name'].strip() if prop['col_name'] else prop['col_name'],
@@ -822,7 +822,9 @@ class HiveServerClient(object):
 
     (res, session) = self.call(self._client.GetSchemas, req)
 
-    results, schema = self.fetch_result(res.operationHandle, orientation=TFetchOrientation.FETCH_NEXT, max_rows=5000)
+    results, schema = self.fetch_result(
+      res.operationHandle, orientation=TFetchOrientation.FETCH_NEXT, max_rows=MAX_CATALOG_SQL_ENTRIES.get()
+    )
     self._close(res.operationHandle, session)
 
     col = 'TABLE_SCHEM'
@@ -832,8 +834,9 @@ class HiveServerClient(object):
   def get_database(self, database):
     query = 'DESCRIBE DATABASE EXTENDED `%s`' % (database)
 
-    desc_results, desc_schema, operation_handle, session = self.execute_statement(query, max_rows=5000,
-                                                                                  orientation=TFetchOrientation.FETCH_NEXT)
+    desc_results, desc_schema, operation_handle, session = self.execute_statement(
+      query, max_rows=MAX_CATALOG_SQL_ENTRIES.get(), orientation=TFetchOrientation.FETCH_NEXT
+    )
     self._close(operation_handle, session)
 
     if self.query_server.get('dialect') == 'impala':
@@ -856,7 +859,9 @@ class HiveServerClient(object):
     req = TGetTablesReq(schemaName=database, tableName=table_names, tableTypes=table_types)
     (res, session) = self.call(self._client.GetTables, req)
 
-    results, schema = self.fetch_result(res.operationHandle, orientation=TFetchOrientation.FETCH_NEXT, max_rows=5000)
+    results, schema = self.fetch_result(
+      res.operationHandle, orientation=TFetchOrientation.FETCH_NEXT, max_rows=MAX_CATALOG_SQL_ENTRIES.get()
+    )
     self._close(res.operationHandle, session)
 
     cols = ('TABLE_NAME', 'TABLE_TYPE', 'REMARKS')
@@ -869,7 +874,9 @@ class HiveServerClient(object):
     req = TGetTablesReq(schemaName=database, tableName=table_names, tableTypes=table_types)
     (res, session) = self.call(self._client.GetTables, req)
 
-    results, schema = self.fetch_result(res.operationHandle, orientation=TFetchOrientation.FETCH_NEXT, max_rows=5000)
+    results, schema = self.fetch_result(
+      res.operationHandle, orientation=TFetchOrientation.FETCH_NEXT, max_rows=MAX_CATALOG_SQL_ENTRIES.get()
+    )
     self._close(res.operationHandle, session)
 
     return HiveServerTRowSet(results.results, schema.schema).cols(('TABLE_NAME',))

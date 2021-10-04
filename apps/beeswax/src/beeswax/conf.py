@@ -358,3 +358,12 @@ CLOSE_SESSIONS = Config(
 
 def has_session_pool():
   return has_multiple_sessions() and not CLOSE_SESSIONS.get()
+
+MAX_CATALOG_SQL_ENTRIES = Config(
+  key="max_catalog_sql_entries",
+  help=_t(
+    "Max number of objects (columns, tables, databases) available to list in the left assist, autocomplete, table browser etc."
+    "Setting this higher than the default can degrade performance."),
+  default=5000,
+  type=int
+)
