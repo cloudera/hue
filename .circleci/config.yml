@@ -218,7 +218,7 @@ jobs:
       - run:
           name: compile
           command: |
-            apt-get update && apt-get install -y python3.6-dev libsnappy-dev asciidoc # This should not be needed as some point
+            apt-get update && apt-get install ca-certificates && apt-get install -y python3.6-dev libsnappy-dev asciidoc # This should not be needed as some point
 
             export PYTHON_VER=python3.6
             make apps
@@ -284,8 +284,7 @@ workflows:
       - commit:
           requires:
             - build
-            # Remove build-py-36 till https://github.com/nodesource/distributions/issues/1266 is fixed
-            # - build-py-36
+            - build-py-36
           filters:
             branches:
               only:
