@@ -284,7 +284,8 @@ workflows:
       - commit:
           requires:
             - build
-            - build-py-36
+            # Remove build-py-36 till https://github.com/nodesource/distributions/issues/1266 is fixed
+            # - build-py-36
           filters:
             branches:
               only:
