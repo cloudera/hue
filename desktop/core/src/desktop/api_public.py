@@ -32,6 +32,7 @@ from desktop.lib import fsmanager
 from desktop.lib.connectors import api as connector_api
 
 from useradmin import views as useradmin_views
+from useradmin import api as useradmin_api
 
 from beeswax import api as beeswax_api
 
@@ -325,6 +326,11 @@ def list_for_autocomplete(request):
 def get_users_by_id(request):
   django_request = get_django_request(request)
   return useradmin_views.get_users_by_id(django_request)
+
+@api_view(["GET"])
+def get_users(request):
+  django_request = get_django_request(request)
+  return useradmin_api.get_users(django_request)
 
 
 # Utils
