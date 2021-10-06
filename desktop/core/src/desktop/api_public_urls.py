@@ -145,3 +145,8 @@ urlpatterns += [
 urlpatterns += [
   re_path(r'^metadata/search/entities_interactive/?$', api_public.search_entities_interactive, name='metadata_entities_interactive'),
 ]
+
+urlpatterns += [
+  re_path(r'^iam/users/autocomplete', api_public.list_for_autocomplete, name='iam_users_list_for_autocomplete'),
+  re_path(r'^iam/users/?$', api_public.get_users_by_id, name='iam_get_users_by_id')
+]
