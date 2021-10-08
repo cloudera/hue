@@ -107,7 +107,7 @@ ${ fb_components.menubar() }
               </li>
               % if not is_trash_enabled:
               <li>
-                <a href="javascript: void(0)" class="delete-link" title="${_('Delete')}" data-bind="visible: !inTrash() && selectedFiles().length > 0 && isCurrentDirSelected().length == 0, click: deleteSelected">
+                <a href="javascript: void(0)" title="${_('Delete')}" data-bind="visible: !inTrash() && selectedFiles().length > 0 && isCurrentDirSelected().length == 0, click: deleteSelected">
                   <i class="fa fa-fw fa-bolt"></i> ${_('Delete')}
                 </a>
               </li>
