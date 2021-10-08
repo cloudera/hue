@@ -414,7 +414,7 @@ Some of the parameters:
  - sortby=name
  - descending=false
 
-e.g. pagesize=45&pagenum=1&filter=&sortby=name&descending=false
+E.g. `?pagesize=45&pagenum=1&filter=&sortby=name&descending=false`
 
 ### Preview
 
@@ -449,7 +449,7 @@ Some of the parameters:
 - compression=none
 - mode=text
 
-e.g. ?offset=0&length=204800&compression=none&mode=text
+E.g. `?offset=0&length=204800&compression=none&mode=text`
 
 ### Download
 
@@ -574,6 +574,36 @@ Check if the connectivity is healthy:
 Install or update the connector examples:
 
     curl -X POST https://demo.gethue.com/api/connector/examples/install/
+
+## IAM
+
+### Get users
+
+Get user records in Hue. Requires **admin privileges**.
+
+    curl -X GET http://demo.gethue.com/api/iam/get_users
+
+Optional GET params:
+- **username:** filter by username
+- **groups:** filter by specific group
+- **is_active:** filter by active status
+
+E.g. `?username=demo&groups=default&is_active=true`
+
+Search user records by list of user IDs. Requires **admin privileges**.
+
+    curl -X GET http://demo.gethue.com/api/iam/users?userids=[1100714,1100715]
+    
+    {"users": [{"id": 1100714,"username": "demo","first_name": "","last_name": "","email": "","last_login": "2021-10-06T01:36:49.663","editURL": "/useradmin/users/edit/demo"},{"id": 1100715,"username": "hue","first_name": "","last_name": "","email": "","last_login": "2021-08-11T07:15:48.793","editURL": "/useradmin/users/edit/hue"}]}
+
+User list_for_autocomplete API:
+
+    curl -X GET http://demo.gethue.com/api/iam/users/autocomplete
+ 
+Optional GET params:
+- **extend_user:** true or false (info about each user's groups)
+- **filter:** search term
+- **count:** Number of records (default is 100)
 
 ## Data Catalog
 
