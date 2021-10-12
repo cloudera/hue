@@ -49,7 +49,7 @@ ${ fb_components.menubar() }
   %endif
 </style>
 
-<div id="${ path.startswith('s3a://') and 'filebrowser_s3Components' or path.startswith('abfs://') and 'filebrowser_abfsComponents' or 'filebrowserComponents' }" class="container-fluid filebrowser" style="min-height: 100vh;">
+<div id="${ path.startswith('s3a://') and 'filebrowser_s3Components' or path.startswith('abfs://') and 'filebrowser_abfsComponents' or 'filebrowserComponents' }" class="container-fluid filebrowser" style="min-height: calc(100vh - 130px);">
   <div class="card card-small">
     <div class="actionbar">
     <%actionbar:render>
@@ -107,7 +107,7 @@ ${ fb_components.menubar() }
               </li>
               % if not is_trash_enabled:
               <li>
-                <a href="javascript: void(0)" class="delete-link" title="${_('Delete')}" data-bind="visible: !inTrash() && selectedFiles().length > 0 && isCurrentDirSelected().length == 0, click: deleteSelected">
+                <a href="javascript: void(0)" title="${_('Delete')}" data-bind="visible: !inTrash() && selectedFiles().length > 0 && isCurrentDirSelected().length == 0, click: deleteSelected">
                   <i class="fa fa-fw fa-bolt"></i> ${_('Delete')}
                 </a>
               </li>

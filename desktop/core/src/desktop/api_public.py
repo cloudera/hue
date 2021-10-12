@@ -31,6 +31,9 @@ from desktop.auth.backend import rewrite_user
 from desktop.lib import fsmanager
 from desktop.lib.connectors import api as connector_api
 
+from useradmin import views as useradmin_views
+from useradmin import api as useradmin_api
+
 from beeswax import api as beeswax_api
 
 
@@ -192,6 +195,7 @@ def storage_upload_file(request):
   django_request = get_django_request(request)
   return filebrowser_views.upload_file(django_request)
 
+
 # Importer
 
 @api_view(["POST"])
@@ -208,6 +212,7 @@ def guess_field_types(request):
 def importer_submit(request):
   django_request = get_django_request(request)
   return indexer_api3.importer_submit(django_request)
+
 
 # Connector
 
@@ -274,7 +279,6 @@ def similar_queries(request):
   django_request = get_django_request(request)
   return optimizer_api.similar_queries(django_request)
 
-
 @api_view(["POST"])
 def top_databases(request):
   django_request = get_django_request(request)
@@ -304,6 +308,29 @@ def top_filters(request):
 def top_aggs(request):
   django_request = get_django_request(request)
   return optimizer_api.top_aggs(django_request)
+
+@api_view(["POST"])
+def search_entities_interactive(request):
+  django_request = get_django_request(request)
+  return desktop_api.search_entities_interactive(django_request)
+
+
+# IAM
+
+@api_view(["GET"])
+def list_for_autocomplete(request):
+  django_request = get_django_request(request)
+  return useradmin_views.list_for_autocomplete(django_request)
+
+@api_view(["GET"])
+def get_users_by_id(request):
+  django_request = get_django_request(request)
+  return useradmin_views.get_users_by_id(django_request)
+
+@api_view(["GET"])
+def get_users(request):
+  django_request = get_django_request(request)
+  return useradmin_api.get_users(django_request)
 
 
 # Utils
