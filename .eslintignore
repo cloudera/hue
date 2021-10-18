@@ -5,6 +5,7 @@
 /desktop/core/src/desktop/js/parse/solrQueryParser.js
 /desktop/core/src/desktop/js/parse/sqlAutocompleteParser.js
 /desktop/core/src/desktop/js/parse/sqlStatementsParser.js
+/desktop/core/src/desktop/js/parse/hplsqlStatementsParser.js
 /desktop/core/src/desktop/js/parse/sqlSyntaxParser.js
 /desktop/core/src/desktop/js/utils/json.bigDataParse.js
 /desktop/core/src/desktop/js/parse/sql/generic/genericAutocompleteParser.js
