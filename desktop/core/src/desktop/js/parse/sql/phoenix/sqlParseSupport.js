@@ -1008,13 +1008,13 @@ const initSqlParser = function (parser) {
       'DESCRIBE',
       'DROP',
       'GRANT',
-      'INSERT',
       'REVOKE',
       'SELECT',
       'SET',
       'SHOW',
       'TRUNCATE',
       'UPDATE',
+      'UPSERT',
       'USE',
       'WITH'
     ];

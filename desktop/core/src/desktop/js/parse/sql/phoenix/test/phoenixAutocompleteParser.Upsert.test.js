@@ -16,7 +16,7 @@
 
 import phoenixAutocompleteParser from '../phoenixAutocompleteParser';
 
-describe('phoenixAutocompleteParser.js INSERT statements', () => {
+describe('phoenixAutocompleteParser.js UPSERT statements', () => {
   beforeAll(() => {
     phoenixAutocompleteParser.yy.parseError = function (msg) {
       throw Error(msg);
@@ -35,10 +35,10 @@ describe('phoenixAutocompleteParser.js INSERT statements', () => {
     ).toEqualDefinition(testDefinition);
   };
 
-  describe('INSERT', () => {
-    it('should handle "INSERT INTO bla.boo VALUES (1, 2, \'a\', 3); |"', () => {
+  describe('UPSERT', () => {
+    it('should handle "UPSERT INTO bla.boo VALUES(1, 2, 3); |"', () => {
       assertAutoComplete({
-        beforeCursor: "INSERT INTO bla.boo VALUES (1, 2, 'a', 3); ",
+        beforeCursor: 'UPSERT INTO bla.boo VALUES(1, 2, 3); ',
         afterCursor: '',
         noErrors: true,
         containsKeywords: ['SELECT'],
@@ -52,7 +52,7 @@ describe('phoenixAutocompleteParser.js INSERT statements', () => {
       assertAutoComplete({
         beforeCursor: '',
         afterCursor: '',
-        containsKeywords: ['INSERT'],
+        containsKeywords: ['UPSERT'],
         noErrors: true,
         expectedResult: {
           lowerCase: false
@@ -60,9 +60,9 @@ describe('phoenixAutocompleteParser.js INSERT statements', () => {
       });
     });
 
-    it('should suggest keywords for "INSERT |"', () => {
+    it('should suggest keywords for "UPSERT |"', () => {
       assertAutoComplete({
-        beforeCursor: 'INSERT ',
+        beforeCursor: 'UPSERT ',
         afterCursor: '',
         containsKeywords: ['INTO'],
         noErrors: true,
@@ -72,23 +72,22 @@ describe('phoenixAutocompleteParser.js INSERT statements', () => {
       });
     });
 
-    it('should suggest tables for "INSERT INTO |"', () => {
+    it('should suggest tables for "UPSERT INTO |"', () => {
       assertAutoComplete({
-        beforeCursor: 'INSERT INTO ',
+        beforeCursor: 'UPSERT INTO ',
         afterCursor: '',
         noErrors: true,
         expectedResult: {
           lowerCase: false,
           suggestTables: {},
-          suggestDatabases: { appendDot: true },
-          suggestKeywords: ['TABLE']
+          suggestDatabases: { appendDot: true }
         }
       });
     });
 
-    it('should suggest tables for "INSERT INTO baa.|"', () => {
+    it('should suggest tables for "UPSERT INTO baa.|"', () => {
       assertAutoComplete({
-        beforeCursor: 'INSERT INTO baa.',
+        beforeCursor: 'UPSERT INTO baa.',
         afterCursor: '',
         noErrors: true,
         expectedResult: {
@@ -98,23 +97,11 @@ describe('phoenixAutocompleteParser.js INSERT statements', () => {
       });
     });
 
-    it('should suggest tables for "INSERT INTO TABLE baa.|"', () => {
+    it('should suggest keywords for "UPSERT INTO baa |"', () => {
       assertAutoComplete({
-        beforeCursor: 'INSERT INTO TABLE baa.',
+        beforeCursor: 'UPSERT INTO baa ',
         afterCursor: '',
-        noErrors: true,
-        expectedResult: {
-          lowerCase: false,
-          suggestTables: { identifierChain: [{ name: 'baa' }] }
-        }
-      });
-    });
-
-    it('should suggest keywords for "INSERT INTO baa |"', () => {
-      assertAutoComplete({
-        beforeCursor: 'INSERT INTO baa ',
-        afterCursor: '',
-        containsKeywords: ['VALUES'],
+        containsKeywords: ['VALUES', 'SELECT'],
         noErrors: true,
         expectedResult: {
           lowerCase: false
@@ -122,12 +109,34 @@ describe('phoenixAutocompleteParser.js INSERT statements', () => {
       });
     });
 
-    it('should suggest keywords for "INSERT INTO TABLE baa |"', () => {
+    it('should suggest tables for "UPSERT INTO baa SELECT * FROM |"', () => {
       assertAutoComplete({
-        beforeCursor: 'INSERT INTO TABLE baa ',
+        beforeCursor: 'UPSERT INTO baa SELECT * FROM ',
         afterCursor: '',
-        containsKeywords: ['VALUES'],
         noErrors: true,
+        expectedResult: {
+          lowerCase: false,
+          suggestTables: {},
+          suggestDatabases: { appendDot: true }
+        }
+      });
+    });
+
+    it('should suggest columns for "UPSERT INTO boo.baa (|"', () => {
+      assertAutoComplete({
+        beforeCursor: 'UPSERT INTO boo.baa (',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestColumns: { tables: [{ identifierChain: [{ name: 'boo' }, { name: 'baa' }] }] }
+        }
+      });
+    });
+
+    it('should not suggest keywords for "UPSERT INTO boo.baa (a, b) VALUES (1, 2) |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'UPSERT INTO boo.baa (a, b) VALUES (1, 2) ',
+        afterCursor: '',
         expectedResult: {
           lowerCase: false
         }
