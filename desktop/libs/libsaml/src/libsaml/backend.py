@@ -128,7 +128,10 @@ class SAML2Backend(_Saml2Backend):
       redirect_url = "https://sso.cloudera.com/bin/services/support/api/public/logout"
       if prod_url not in conf.LOGOUT_URL.get():
         redirect_url = "https://sso.staging-upgrade.aem.cloudera.com/bin/services/support/api/public/logout"
-      html='<html><body onload="document.forms[0].submit()"><form action="%s" method="POST"><input name="logoutRedirect" type="hidden" value="%s"/></form></body></html>' % (conf.LOGOUT_URL.get(), redirect_url)
+      html =  '<html><body onload="document.forms[0].submit()">'
+      html += '<form action="%s" method="POST">' % (conf.LOGOUT_URL.get())
+      html += '<input name="logoutRedirect" type="hidden" value="%s"/>' % (redirect_url)
+      html += '</form></body></html>'
       return HttpResponse(html)
     else:
       return None
