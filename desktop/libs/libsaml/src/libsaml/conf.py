@@ -206,6 +206,11 @@ REQUIRED_GROUPS_ATTRIBUTE = Config(
   type=str,
   help=_t("Name of the SAML attribute containing the list of groups the user belongs to."))
 
+LOGOUT_URL = Config(
+  key="logout_url",
+  type=str,
+  default="",
+  help=_t("To log users out of magic-sso, CDP control panel use Logout URL"))
 
 def get_key_file_password():
   password = os.environ.get('HUE_SAML_KEY_FILE_PASSWORD')
