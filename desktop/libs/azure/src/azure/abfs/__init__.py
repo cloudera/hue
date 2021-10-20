@@ -27,6 +27,9 @@ from nose.tools import assert_not_equal
 from hadoop.fs import normpath as fs_normpath
 from azure.conf import get_default_abfs_fs
 
+from desktop.conf import RAZ
+from filebrowser.conf import REMOTE_STORAGE_HOME
+
 LOG = logging.getLogger(__name__)
 
 ABFS_PATH_RE = re.compile('^/*[aA][bB][fF][sS]{1,2}://([$a-z0-9](?!.*--)[-a-z0-9]{1,61}[a-z0-9])(@[^.]*?\.dfs\.core\.windows\.net)?(/(.*?)/?)?$') #check this first for problems
@@ -164,15 +167,26 @@ def abfspath(path, fs_defaultfs = None):
   LOG.debug("%s" % path)
   return path
 
-def get_home_dir_for_abfs():
+
+def get_home_dir_for_abfs(user=None):
   """
-  Attempts to go to the directory set by the user in the configuration file. If not defaults to abfs://
+  Attempts to go to the directory set in the config file or core-site.xml else defaults to abfs://
   """
+  from desktop.models import _handle_user_dir_raz
+
   try:
     filesystem = parse_uri(get_default_abfs_fs())[0]
-    return "abfs://" + filesystem
+    remote_home_abfs = "abfs://" + filesystem
   except:
-    return 'abfs://'
+    remote_home_abfs = 'abfs://'
+
+  # Check from remote_storage_home config only for RAZ env
+  if RAZ.IS_ENABLED.get() and hasattr(REMOTE_STORAGE_HOME, 'get') and REMOTE_STORAGE_HOME.get():
+    remote_home_abfs = REMOTE_STORAGE_HOME.get()
+    remote_home_abfs = _handle_user_dir_raz(user, remote_home_abfs)
+
+  return remote_home_abfs
+
 
 def abfsdatetime_to_timestamp(datetime):
   """
