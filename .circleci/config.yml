@@ -218,7 +218,7 @@ jobs:
       - run:
           name: compile
           command: |
-            apt-get upgrade -y ca-certificates && apt-get update && apt-get install -y python3.6-dev libsnappy-dev asciidoc # This should not be needed as some point
+            apt-get update && apt-get install -y python3.6-dev libsnappy-dev asciidoc # This should not be needed as some point
 
             export PYTHON_VER=python3.6
             make apps
