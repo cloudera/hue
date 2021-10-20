@@ -302,14 +302,15 @@ def kill_job(request, job):
   if not can_kill_job(job, request.user):
     raise PopupException(_("Kill operation is forbidden."))
 
+  api = get_api(request.user, request.jt)
+
   try:
-    job.kill()
+    api.kill_job(job.jobId)
   except Exception as e:
     LOG.exception('Killing job')
     raise PopupException(e)
 
   cur_time = time.time()
-  api = get_api(request.user, request.jt)
 
   while time.time() - cur_time < 15:
     try:
