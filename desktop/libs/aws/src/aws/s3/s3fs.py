@@ -35,6 +35,7 @@ from aws import s3
 from aws.conf import get_default_region, get_locations, PERMISSION_ACTION_S3
 from aws.s3 import normpath, s3file, translate_s3_error, S3A_ROOT
 from aws.s3.s3stat import S3Stat
+
 from filebrowser.conf import REMOTE_STORAGE_HOME
 
 if sys.version_info[0] > 2:
@@ -83,10 +84,13 @@ def auth_error_handler(view_fn):
   return decorator
 
 
-def get_s3_home_directory():
-  return REMOTE_STORAGE_HOME.get() \
-         if hasattr(REMOTE_STORAGE_HOME, 'get') and REMOTE_STORAGE_HOME.get() \
-         else 's3a://'
+def get_s3_home_directory(user=None):
+  from desktop.models import _handle_user_dir_raz
+
+  remote_home_s3 = REMOTE_STORAGE_HOME.get() if hasattr(REMOTE_STORAGE_HOME, 'get') and REMOTE_STORAGE_HOME.get() else 's3a://'
+  remote_home_s3 = _handle_user_dir_raz(user, remote_home_s3)
+
+  return remote_home_s3
 
 
 class S3FileSystem(object):
