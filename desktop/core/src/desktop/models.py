@@ -1733,6 +1733,12 @@ def get_remote_home_storage(user=None):
     if get_raz_api_url() and get_raz_s3_default_bucket():
       remote_home_storage = 's3a://%(bucket)s' % get_raz_s3_default_bucket()
 
+  remote_home_storage = _handle_user_dir_raz(user, remote_home_storage)
+
+  return remote_home_storage
+
+
+def _handle_user_dir_raz(user, remote_home_storage):
   # In RAZ env, apppend username so that it defaults to user's dir and doesn't give 403 error
   if user and remote_home_storage and RAZ.IS_ENABLED.get() and remote_home_storage.endswith('/user'):
     remote_home_storage += '/' + user.username
@@ -2008,7 +2014,7 @@ class ClusterConfig(object):
 
     if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('abfs', self.user):
       from azure.abfs.__init__ import get_home_dir_for_abfs
-      home_path = remote_home_storage if remote_home_storage else get_home_dir_for_abfs().encode('utf-8')
+      home_path = remote_home_storage if remote_home_storage else get_home_dir_for_abfs(self.user).encode('utf-8')
       interpreters.append({
         'type': 'abfs',
         'displayName': _('ABFS'),
