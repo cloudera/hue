@@ -50,7 +50,7 @@ from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access, add_to_group, add_permission, remove_from_group
 from desktop.lib.view_util import location_to_url
-from desktop.conf import is_oozie_enabled
+from desktop.conf import is_oozie_enabled, RAZ
 from hadoop import pseudo_hdfs4
 from hadoop.conf import UPLOAD_CHUNK_SIZE
 from hadoop.fs.webhdfs import WebHdfs
@@ -1469,6 +1469,7 @@ class TestADLSAccessPermissions(object):
     finally:
       remove_from_group(self.user.username, 'has_adls')
 
+
 class TestFileChooserRedirect(object):
 
   def setUp(self):
@@ -1484,38 +1485,88 @@ class TestFileChooserRedirect(object):
 
       # HDFS - default_to_home
       response = self.client.get('/filebrowser/view=%2F?default_to_home')
-      LOG.info("Response: %s" % response.status_code)
+
       assert_equal(302, response.status_code)
       assert_equal('/filebrowser/view=%2Fuser%2Ftest', response.url)
 
       # ABFS - default_abfs_home
       response = self.client.get('/filebrowser/view=%2F?default_abfs_home')
-      LOG.info("Response: %s" % response.status_code)
+
       assert_equal(302, response.status_code)
       assert_equal('/filebrowser/view=abfs%3A%2F%2F', response.url)
 
-      reset = ABFS_CLUSTERS['default'].FS_DEFAULTFS.set_for_testing(
-                  'abfs://data-container@mystorage.dfs.core.windows.net'
-              )
+      reset = ABFS_CLUSTERS['default'].FS_DEFAULTFS.set_for_testing('abfs://data-container@mystorage.dfs.core.windows.net')
       try:
         response = self.client.get('/filebrowser/view=%2F?default_abfs_home')
-        LOG.info("Response: %s" % response.status_code)
+
         assert_equal(302, response.status_code)
         assert_equal('/filebrowser/view=abfs%3A%2F%2Fdata-container', response.url)
       finally:
         reset()
 
+      resets = [
+        RAZ.IS_ENABLED.set_for_testing(True),
+        REMOTE_STORAGE_HOME.set_for_testing('abfs://data-container')
+      ]
+      try:
+        response = self.client.get('/filebrowser/view=%2F?default_abfs_home')
+
+        assert_equal(302, response.status_code)
+        assert_equal('/filebrowser/view=abfs%3A%2F%2Fdata-container', response.url)
+      finally:
+        for reset in resets:
+          reset()
+
+      resets = [
+        RAZ.IS_ENABLED.set_for_testing(True),
+        REMOTE_STORAGE_HOME.set_for_testing('abfs://data-container/user')
+      ]
+      try:
+        response = self.client.get('/filebrowser/view=%2F?default_abfs_home')
+
+        assert_equal(302, response.status_code)
+        assert_equal('/filebrowser/view=abfs%3A%2F%2Fdata-container%2Fuser%2Ftest', response.url)
+      finally:
+        for reset in resets:
+          reset()
+
       # S3A - default_s3_home
       response = self.client.get('/filebrowser/view=%2F?default_s3_home')
-      LOG.info("Response: %s" % response.status_code)
+
       assert_equal(302, response.status_code)
       assert_equal('/filebrowser/view=s3a%3A%2F%2F', response.url)
 
       reset = REMOTE_STORAGE_HOME.set_for_testing('s3a://my_bucket')
       try:
         response = self.client.get('/filebrowser/view=%2F?default_s3_home')
-        LOG.info("Response: %s" % response.status_code)
+
         assert_equal(302, response.status_code)
         assert_equal('/filebrowser/view=s3a%3A%2F%2Fmy_bucket', response.url)
       finally:
         reset()
+
+      resets = [
+        RAZ.IS_ENABLED.set_for_testing(True),
+        REMOTE_STORAGE_HOME.set_for_testing('s3a://my_bucket')
+      ]
+      try:
+        response = self.client.get('/filebrowser/view=%2F?default_s3_home')
+
+        assert_equal(302, response.status_code)
+        assert_equal('/filebrowser/view=s3a%3A%2F%2Fmy_bucket', response.url)
+      finally:
+        for reset in resets:
+          reset()
+
+      resets = [
+        RAZ.IS_ENABLED.set_for_testing(True),
+        REMOTE_STORAGE_HOME.set_for_testing('s3a://my_bucket/user')
+      ]
+      try:
+        response = self.client.get('/filebrowser/view=%2F?default_s3_home')
+
+        assert_equal(302, response.status_code)
+        assert_equal('/filebrowser/view=s3a%3A%2F%2Fmy_bucket%2Fuser%2Ftest', response.url)
+      finally:
+        for reset in resets:
+          reset()
