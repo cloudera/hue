@@ -89,7 +89,6 @@ class TestClusterConfig(object):
 
 
   def test_get_remote_storage_home(self):
-
     # When default home ends with /user in RAZ ADLS env.
     resets = [
       RAZ.IS_ENABLED.set_for_testing(True),
