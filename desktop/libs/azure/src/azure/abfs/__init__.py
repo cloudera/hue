@@ -32,7 +32,9 @@ from filebrowser.conf import REMOTE_STORAGE_HOME
 
 LOG = logging.getLogger(__name__)
 
-ABFS_PATH_RE = re.compile('^/*[aA][bB][fF][sS]{1,2}://([$a-z0-9](?!.*--)[-a-z0-9]{1,61}[a-z0-9])(@[^.]*?\.dfs\.core\.windows\.net)?(/(.*?)/?)?$') #check this first for problems
+#check this first for problems
+ABFS_PATH_RE = re.compile(
+  '^/*[aA][bB][fF][sS]{1,2}://([$a-z0-9](?!.*--)[-a-z0-9]{1,61}[a-z0-9])(@[^.]*?\.dfs\.core\.windows\.net)?(/(.*?)/?)?$')
 ABFS_ROOT_S = 'abfss://'
 ABFS_ROOT = 'abfs://'
 ABFSACCOUNT_NAME = re.compile('^/*[aA][bB][fF][sS]{1,2}://[$a-z0-9](?!.*--)[-a-z0-9]{1,61}[a-z0-9](@.*?)$')
@@ -115,14 +117,14 @@ def parent_path(path):
     return ABFS_ROOT
   else:
     x = only_filesystem_and_account_name(path)
-    if x !=path:
+    if x != path:
       filesystem = x
     parent = '/'.join(directory_name.split('/')[:-1])
   if path.lower().startswith(ABFS_ROOT):
     return normpath(ABFS_ROOT + filesystem + '/' + parent)
   return normpath(ABFS_ROOT_S + filesystem + '/' + parent)
 
-def join(first,*complist):
+def join(first, *complist):
   """
   Join a path on to another path
   """
@@ -142,7 +144,7 @@ def join(first,*complist):
   return joined
 
 
-def abfspath(path, fs_defaultfs = None):
+def abfspath(path, fs_defaultfs=None):
   """
   Converts a path to a path that the ABFS driver can use
   """
@@ -152,7 +154,7 @@ def abfspath(path, fs_defaultfs = None):
     except:
       LOG.warning("Configuration for ABFS is not set, may run into errors")
       return path
-  filesystem, dir_name = ("","")
+  filesystem, dir_name = ("", "")
   try:
     filesystem, dir_name = parse_uri(path)[:2]
   except:
