@@ -48,7 +48,8 @@ else:
   from django.utils.translation import ugettext as _
 
 DEFAULT_READ_SIZE = 1024 * 1024  # 1MB
-BUCKET_NAME_PATTERN = re.compile("^((?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9_\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9_\-]*[A-Za-z0-9]))$")
+BUCKET_NAME_PATTERN = re.compile(
+  "^((?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9_\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9_\-]*[A-Za-z0-9]))$")
 
 LOG = logging.getLogger(__name__)
 
@@ -110,7 +111,9 @@ class S3FileSystem(object):
       return self._s3_connection.get_bucket(name, headers=self.header_values)
     except S3ResponseError as e:
       if e.status == 301 or e.status == 400:
-        raise S3FileSystemException(_('Failed to retrieve bucket "%s" in region "%s" with "%s". Your bucket is in region "%s"') % (name, self._get_location(), e.message or e.reason, self.get_bucket_location(name)))
+        raise S3FileSystemException(
+          _('Failed to retrieve bucket "%s" in region "%s" with "%s". Your bucket is in region "%s"') % 
+          (name, self._get_location(), e.message or e.reason, self.get_bucket_location(name)))
       else:
         raise e
 
@@ -308,12 +311,14 @@ class S3FileSystem(object):
 
     if S3FileSystem.isroot(path):
       try:
-        return sorted([S3Stat.from_bucket(b, self.fs) for b in self._s3_connection.get_all_buckets(headers=self.header_values)], key=lambda x: x.name)
+        return sorted(
+          [S3Stat.from_bucket(b, self.fs) for b in self._s3_connection.get_all_buckets(headers=self.header_values)], key=lambda x: x.name)
       except S3FileSystemException as e:
         raise e
       except S3ResponseError as e:
         if 'Forbidden' in str(e) or (hasattr(e, 'status') and e.status == 403):
-          raise S3ListAllBucketsException(_('You do not have permissions to list all buckets. Please specify a bucket name you have access to.'))
+          raise S3ListAllBucketsException(
+            _('You do not have permissions to list all buckets. Please specify a bucket name you have access to.'))
         else:
           raise S3FileSystemException(_('Failed to retrieve buckets: %s') % e.reason)
       except Exception as e:
