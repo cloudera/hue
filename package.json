@@ -33,7 +33,7 @@
     "@gethue/sql-formatter": "4.0.3",
     "axios": "0.21.1",
     "clipboard": "1.7.1",
-    "core-js": "^3.4.2",
+    "core-js": "^3.4.8",
     "d3": "5.7.0",
     "d3v3": "1.0.3",
     "dropzone": "5.5.1",
