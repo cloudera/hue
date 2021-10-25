@@ -396,14 +396,14 @@ amount of standard database operations. To explore a row, simple scroll
 to the right. By scrolling, the row should continue to lazily-load cells
 until the end.
 
-![HBase](https://lh4.googleusercontent.com/rSmhp0hTq4xtod8SsoIn1A8tp7omHB46j0xtpnmtOQAHzn1PHw1C0rN7Yq8CBq0WOeSh_GVfFWB1P0mKsGGWIpAnGr-mxxJRIR3uW4exevkS5_mKBG0xIbJW)
+![HBase](https://cdn.gethue.com/uploads/2021/10/hbase_7.png)
 
 #### Adding Data
 
 To initially populate the table, you can insert a new row or bulk upload
 CSV/TSV/etc. type data into your table.
 
-![HBase](https://lh4.googleusercontent.com/3aMhyC8qDYdNf98Ge8qbD2EPXzCiL62lCWxHpzhfiYfZPj1F-nAgu3IhbuDYQpTVz1OCqaMDC1WDZ617YfiTsZDafbhHjXufv_f9yyXJbk95fMLNlywLZkHS)
+![HBase](https://cdn.gethue.com/uploads/2021/10/hbase_2.png)
 
 On the right hand side of a row is a '+' sign that lets you insert columns into your row.
 
@@ -412,25 +412,25 @@ On the right hand side of a row is a '+' sign that lets you insert columns into 
 
 To edit a cell, simply click to edit inline.
 
-![HBase](https://lh4.googleusercontent.com/ADTmywVLvEGPordZoEdsOIFkzCWlgc6lG6hrQdtAzT74nHgXqmyto4tPEqqrNmwk0pu709EnP_VIPAgvFPhlPT7NYSDj4LCbApRmw1z-mPyad2jMehWXiZAb)
+![HBase](https://cdn.gethue.com/uploads/2021/10/hbase_3.png)
 
 If you need more control or data about your cell, click “Full Editor” to
 edit.
 
-![HBase](https://lh4.googleusercontent.com/irYJEB6muPCT5Oj3x-LJvMZIhSskXJhIJUsnYL00VpaoYKNTI8NnL09WsmzkxuryFWQpETnUb6EfRkT3ZrrTu7-yAXRDmDCG940Ssh-wbJhaGYt3Sj4txn4T)
+![HBase](https://cdn.gethue.com/uploads/2021/10/hbase_5.png)
 
 In the full editor, you can view cell history or upload binary data to
 the cell. Binary data of certain MIME Types are detected, meaning you
 can view and edit images, PDFs, JSON, XML, and other types directly in
 your browser!
 
-![HBase](https://lh5.googleusercontent.com/N5MqnAhIPQ5D7KSU-ulHTLS0mGFZqC22ciwKGeWhntzpYx4bvqCSvcTc3xCYfCCP6HuxNTr7FlEVMowbSIJ_1nOt36wOXzNpvC-Bhy3gRXve4rIS-Ei6t_By)
+![HBase](https://cdn.gethue.com/uploads/2021/10/hbase_6.png)
 
 Hovering over a cell also reveals some more controls (such as the delete
 button or the timestamp). Click the title to select a few and do batch
 operations:
 
-![HBase](https://lh3.googleusercontent.com/ECcsG6M0zGESG4vuHO8KvgsxrGPbZ5cEhbFxjq2uPhgKzUS-8eTaPq3W2P-rSm13fLxEnEMJY1yFJ8pb2IBmy2KwhGgdFjqQUOTQhQV0sWsxnPFPxpjvoe3T)
+![HBase](https://cdn.gethue.com/uploads/2021/10/hbase_4.png)
 
 
 #### Smart Searchbar
@@ -444,7 +444,7 @@ two row keys with:
     domain.100, domain.200
 
 
-![HBase](https://lh4.googleusercontent.com/2swltMjM0iwMfsN5oL4CAGJvg_2ZEow_swIfUbUqfugC6WfwY7zSlCBeejTTH9u7ixy5w01KKJv4YEoh3ipGTQQrm0PZGgRxXyuqlD4XKS39w3NMVxSHGrx5)
+![HBase](https://cdn.gethue.com/uploads/2021/10/hbase_1.png)
 
 Submitting this query gives me the two rows I was looking for. If I want
 to fetch rows after one of these, I have to do a scan. This is as easy
