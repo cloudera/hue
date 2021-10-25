@@ -31,7 +31,7 @@
   },
   "dependencies": {
     "@gethue/sql-formatter": "4.0.3",
-    "axios": "0.21.1",
+    "axios": "0.21.4",
     "clipboard": "1.7.1",
     "core-js": "^3.4.2",
     "d3": "5.7.0",
