@@ -35,6 +35,7 @@ from aws import s3
 from aws.conf import get_default_region, get_locations, PERMISSION_ACTION_S3
 from aws.s3 import normpath, s3file, translate_s3_error, S3A_ROOT
 from aws.s3.s3stat import S3Stat
+
 from filebrowser.conf import REMOTE_STORAGE_HOME
 
 if sys.version_info[0] > 2:
@@ -47,7 +48,8 @@ else:
   from django.utils.translation import ugettext as _
 
 DEFAULT_READ_SIZE = 1024 * 1024  # 1MB
-BUCKET_NAME_PATTERN = re.compile("^((?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9_\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9_\-]*[A-Za-z0-9]))$")
+BUCKET_NAME_PATTERN = re.compile(
+  "^((?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9_\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9_\-]*[A-Za-z0-9]))$")
 
 LOG = logging.getLogger(__name__)
 
@@ -83,10 +85,13 @@ def auth_error_handler(view_fn):
   return decorator
 
 
-def get_s3_home_directory():
-  return REMOTE_STORAGE_HOME.get() \
-         if hasattr(REMOTE_STORAGE_HOME, 'get') and REMOTE_STORAGE_HOME.get() \
-         else 's3a://'
+def get_s3_home_directory(user=None):
+  from desktop.models import _handle_user_dir_raz
+
+  remote_home_s3 = REMOTE_STORAGE_HOME.get() if hasattr(REMOTE_STORAGE_HOME, 'get') and REMOTE_STORAGE_HOME.get() else 's3a://'
+  remote_home_s3 = _handle_user_dir_raz(user, remote_home_s3)
+
+  return remote_home_s3
 
 
 class S3FileSystem(object):
@@ -106,7 +111,9 @@ class S3FileSystem(object):
       return self._s3_connection.get_bucket(name, headers=self.header_values)
     except S3ResponseError as e:
       if e.status == 301 or e.status == 400:
-        raise S3FileSystemException(_('Failed to retrieve bucket "%s" in region "%s" with "%s". Your bucket is in region "%s"') % (name, self._get_location(), e.message or e.reason, self.get_bucket_location(name)))
+        raise S3FileSystemException(
+          _('Failed to retrieve bucket "%s" in region "%s" with "%s". Your bucket is in region "%s"') % 
+          (name, self._get_location(), e.message or e.reason, self.get_bucket_location(name)))
       else:
         raise e
 
@@ -304,12 +311,14 @@ class S3FileSystem(object):
 
     if S3FileSystem.isroot(path):
       try:
-        return sorted([S3Stat.from_bucket(b, self.fs) for b in self._s3_connection.get_all_buckets(headers=self.header_values)], key=lambda x: x.name)
+        return sorted(
+          [S3Stat.from_bucket(b, self.fs) for b in self._s3_connection.get_all_buckets(headers=self.header_values)], key=lambda x: x.name)
       except S3FileSystemException as e:
         raise e
       except S3ResponseError as e:
         if 'Forbidden' in str(e) or (hasattr(e, 'status') and e.status == 403):
-          raise S3ListAllBucketsException(_('You do not have permissions to list all buckets. Please specify a bucket name you have access to.'))
+          raise S3ListAllBucketsException(
+            _('You do not have permissions to list all buckets. Please specify a bucket name you have access to.'))
         else:
           raise S3FileSystemException(_('Failed to retrieve buckets: %s') % e.reason)
       except Exception as e:
