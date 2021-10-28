@@ -288,7 +288,7 @@ class LdapConnection(object):
             LOG.warning('Could not find %s in ldap attributes' % group_name_attr)
             continue
 
-          group_name = data[group_name_attr][0]
+          group_name = smart_str(data[group_name_attr][0])
           if desktop.conf.LDAP.FORCE_USERNAME_LOWERCASE.get():
             group_name = group_name.lower()
           elif desktop.conf.LDAP.FORCE_USERNAME_UPPERCASE.get():
