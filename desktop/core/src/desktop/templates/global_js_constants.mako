@@ -22,7 +22,7 @@
   from desktop.conf import APP_SWITCHER_ALTUS_BASE_URL, APP_SWITCHER_MOW_BASE_URL, CUSTOM_DASHBOARD_URL, \
       DISPLAY_APP_SWITCHER, IS_K8S_ONLY, IS_MULTICLUSTER_ONLY, USE_DEFAULT_CONFIGURATION, USE_NEW_ASSIST_PANEL, \
       VCS, ENABLE_GIST, ENABLE_LINK_SHARING, has_channels, has_connectors, ENABLE_UNIFIED_ANALYTICS, RAZ
-  from desktop.models import hue_version, _get_apps, get_cluster_config
+  from desktop.models import hue_version, _get_apps, get_cluster_config, _handle_user_dir_raz
 
   from beeswax.conf import DOWNLOAD_BYTES_LIMIT, DOWNLOAD_ROW_LIMIT, LIST_PARTITIONS_LIMIT, CLOSE_SESSIONS, HPLSQL
   from dashboard.conf import HAS_SQL_ENABLED
@@ -671,6 +671,8 @@
     # Code moved from assist.mako
     try:
       home_dir = REMOTE_STORAGE_HOME.get() if hasattr(REMOTE_STORAGE_HOME, 'get') and REMOTE_STORAGE_HOME.get() else user.get_home_directory()
+      home_dir = _handle_user_dir_raz(user, home_dir)
+
       if not request.fs.isdir(home_dir):
         home_dir = '/'
     except:
