@@ -270,6 +270,20 @@ class SQLIndexer(object):
             'final_table_name': final_table_name,
             'file_encoding': file_encoding
         }
+    if source['inputFormat'] == 'stream' and destination['tableFormat'] == 'kudu':
+       sql = '''CREATE TABLE IF NOT EXISTS %(database)s.%(table_name)s (
+%(columns)s,
+PRIMARY KEY (%(primary_keys)s)
+)
+PARTITION BY HASH PARTITIONS 16
+STORED AS KUDU
+TBLPROPERTIES('kudu.num_tablet_replicas'='1');
+''' % {
+          'database': database,
+          'table_name': final_table_name,
+          'columns': ',\n'.join(['  %(name)s %(type)s' % col for col in columns]),
+          'primary_keys': ', '.join(primary_keys)
+      }
 
     on_success_url = reverse(
         'metastore:describe_table', kwargs={'database': database, 'table': final_table_name}
