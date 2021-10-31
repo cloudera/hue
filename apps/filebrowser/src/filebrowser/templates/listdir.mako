@@ -49,7 +49,7 @@ ${ fb_components.menubar() }
   %endif
 </style>
 
-<div id="${ path.startswith('S3A://') and 'filebrowser_s3Components' or path.startswith('abfs://') and 'filebrowser_abfsComponents' or 'filebrowserComponents' }" class="container-fluid filebrowser">
+<div id="${ path.startswith('s3a://') and 'filebrowser_s3Components' or path.startswith('abfs://') and 'filebrowser_abfsComponents' or 'filebrowserComponents' }" class="container-fluid filebrowser" style="min-height: calc(100vh - 130px);">
   <div class="card card-small">
     <div class="actionbar">
     <%actionbar:render>
@@ -105,6 +105,13 @@ ${ fb_components.menubar() }
                   <i class="fa fa-fw fa-hdd-o"></i> ${_('Set replication')}
                 </a>
               </li>
+              % if not is_trash_enabled:
+              <li>
+                <a href="javascript: void(0)" title="${_('Delete')}" data-bind="visible: !inTrash() && selectedFiles().length > 0 && isCurrentDirSelected().length == 0, click: deleteSelected">
+                  <i class="fa fa-fw fa-bolt"></i> ${_('Delete')}
+                </a>
+              </li>
+              % endif
               % if ENABLE_EXTRACT_UPLOADED_ARCHIVE.get():
                 <li><a href="javascript: void(0)" title="${_('Compress selection into a single archive')}" data-bind="click: function() { setCompressArchiveDefault(); confirmCompressFiles();}, visible: showCompressButton">
                   <i class="fa fa-fw fa-file-archive-o"></i> ${_('Compress')}</a>
@@ -115,12 +122,11 @@ ${ fb_components.menubar() }
               % endif
             </ul>
           </div>
-
+          <button class="btn fileToolbarBtn" title="${_('Copy Path')}" data-bind="enable: selectedFiles().length == 1 && isCurrentDirSelected().length == 0, click: copyPath"><i class="fa fa-fw fa-files-o"></i> ${_('Copy Path')}</button>
+          <button class="btn fileToolbarBtn" title="${_('Open in Importer')}" data-bind="enable: selectedFiles().length == 1 && isCurrentDirSelected().length == 0 && selectedFile().type == 'file', click: openInImporter"><i class="fa fa-fw fa-database"></i> ${_('Open in Importer')}</button>
           <button class="btn fileToolbarBtn" title="${_('Restore from trash')}" data-bind="visible: inRestorableTrash(), click: restoreTrashSelected, enable: selectedFiles().length > 0 && isCurrentDirSelected().length == 0"><i class="fa fa-cloud-upload"></i> ${_('Restore')}</button>
           <!-- ko ifnot: inTrash -->
-          % if not is_trash_enabled:
-          <button class="btn fileToolbarBtn delete-link" title="${_('Delete forever')}" data-bind="enable: selectedFiles().length > 0 && isCurrentDirSelected().length == 0, click: deleteSelected"><i class="fa fa-bolt"></i> ${_('Delete forever')}</button>
-          % else:
+          % if is_trash_enabled:
           <div id="delete-dropdown" class="btn-group" style="vertical-align: middle">
             <button id="trash-btn" class="btn toolbarBtn" data-bind="enable: selectedFiles().length > 0 && isCurrentDirSelected().length == 0, click: trashSelected"><i class="fa fa-times"></i> ${_('Move to trash')}</button>
             <button id="trash-btn-caret" class="btn toolbarBtn dropdown-toggle" data-toggle="dropdown" data-bind="enable: selectedFiles().length > 0 && isCurrentDirSelected().length == 0">
@@ -179,7 +185,7 @@ ${ fb_components.menubar() }
             <ul class="dropdown-menu pull-right" style="top: auto">
               <li data-bind="visible: !isS3() && !isABFS() || isS3() && !isS3Root() || isABFS() && !isABFSRoot()"><a href="javascript: void(0)" class="create-file-link" title="${_('File')}"><i class="fa fa-file-o"></i> ${_('File')}</a></li>
               <li><a href="javascript: void(0)" class="create-directory-link" title="${_('Directory')}">
-                <i class="fa fa-folder"></i> 
+                <i class="fa fa-folder"></i>
                 <span data-bind="visible: !isS3() && !isABFS() || isS3() && !isS3Root() || isABFS() && !isABFSRoot()">${_('Directory')}</span>
                 <span data-bind="visible: isS3() && isS3Root()">${_('Bucket')}</span>
                 <span data-bind="visible: isABFS() && isABFSRoot()">${_('File System')}</span>

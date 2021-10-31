@@ -238,8 +238,8 @@ class AutocompleteResults {
     const foundArgumentDetails = (await getArgumentDetailsForUdf(
       this.sqlReferenceProvider,
       this.executor.connector(),
-      this.parseResult.udfArgument.name,
-      this.parseResult.udfArgument.position
+      this.parseResult.udfArgument!.name,
+      this.parseResult.udfArgument!.position
     )) || [{ type: 'T' }];
 
     if (foundArgumentDetails.length === 0 && this.parseResult.suggestColumns) {
@@ -701,7 +701,7 @@ class AutocompleteResults {
       try {
         const databases = await databasesPromise;
         const foundDb = databases.find(dbEntry =>
-          equalIgnoreCase(dbEntry.name, suggestTables.identifierChain[0].name)
+          equalIgnoreCase(dbEntry.name, suggestTables.identifierChain![0].name)
         );
         if (foundDb) {
           tableSuggestions = await getTableSuggestions();
@@ -1196,7 +1196,7 @@ class AutocompleteResults {
     // Last one is either partial name or empty
     parts.pop();
 
-    await new Promise(resolve => {
+    await new Promise<void>(resolve => {
       const apiHelperFn = (<{ [fn: string]: (arg: unknown) => JQueryXHR }>(<unknown>apiHelper))[
         fetchFunction
       ];

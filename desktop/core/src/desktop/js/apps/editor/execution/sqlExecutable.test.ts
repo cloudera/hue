@@ -18,7 +18,7 @@ import { CancellablePromise } from 'api/cancellablePromise';
 
 import Executor from 'apps/editor/execution/executor';
 import SqlExecutable from './sqlExecutable';
-import { ExecutionStatus } from './executable';
+import { ExecutionStatus } from './sqlExecutable';
 import sessionManager from './sessionManager';
 import * as ApiUtils from 'api/utils';
 import { ParsedSqlStatement } from 'parse/sqlStatementsParser';

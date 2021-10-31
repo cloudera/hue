@@ -19,6 +19,7 @@ import json
 import os
 import tempfile
 import string
+import sys
 
 from nose.tools import assert_equal, assert_false, assert_true, assert_raises, eq_
 
@@ -30,6 +31,111 @@ from aws.s3 import join, parse_uri
 from aws.s3.s3fs import S3FileSystem, S3FileSystemException
 from aws.s3.s3test_utils import S3TestBase, generate_id
 from aws.s3.upload import DEFAULT_WRITE_SIZE
+
+
+if sys.version_info[0] > 2:
+  from unittest.mock import patch, Mock
+else:
+  from mock import patch, Mock
+
+
+class TestS3FileSystem():
+
+  def test_rmtree_bucket(self):
+    with patch('aws.s3.s3fs.S3FileSystem._delete_bucket') as _delete_bucket:
+
+      fs = S3FileSystem(s3_connection=Mock())
+
+      fs.rmtree(path='s3a://gethue')
+
+      _delete_bucket.assert_called()
+
+  def test_rmtree_key(self):
+    with patch('aws.s3.s3fs.S3FileSystem._get_key') as _get_key:
+      with patch('aws.s3.s3fs.S3FileSystem.isdir') as isdir:
+
+        key = Mock(
+          name='data',
+          exists=Mock(return_value=True),
+          bucket=Mock(
+            list=Mock(return_value=[]),
+            delete_key=Mock()
+          ),
+          delete=Mock(
+            return_value=Mock(
+              exists=Mock(return_value=False)
+            )
+          )
+        )
+        _get_key.return_value = key
+        isdir.return_value = False
+
+        fs = S3FileSystem(s3_connection=Mock())
+
+        fs.rmtree(path='s3a://gethue/data')
+
+        key.delete.assert_called()
+        key.bucket.delete_keys.assert_not_called()
+
+  def test_rmtree_empty_dir(self):
+    with patch('aws.s3.s3fs.S3FileSystem._get_key') as _get_key:
+      with patch('aws.s3.s3fs.S3FileSystem.isdir') as isdir:
+
+        key = Mock(
+          name='data',
+          exists=Mock(return_value=True),
+          bucket=Mock(
+            list=Mock(return_value=[]),
+            delete_key=Mock()
+          ),
+          delete=Mock(
+            return_value=Mock(
+              exists=Mock(return_value=False)
+            )
+          )
+        )
+        _get_key.return_value = key
+        isdir.return_value = True
+
+        fs = S3FileSystem(s3_connection=Mock())
+
+        fs.rmtree(path='s3a://gethue/data')
+
+        key.delete.assert_called()
+        key.bucket.list.assert_called_with(prefix='s3a://gethue/data/')
+        key.bucket.delete_keys.assert_not_called()
+
+  def test_rmtree_non_empty_dir(self):
+    with patch('aws.s3.s3fs.S3FileSystem._get_key') as _get_key:
+      with patch('aws.s3.s3fs.S3FileSystem.isdir') as isdir:
+
+        key = Mock(
+          name='data',
+          exists=Mock(return_value=True),
+          bucket=Mock(
+            list=Mock(return_value=['s3a://gethue/data/1', 's3a://gethue/data/2']),
+            delete_keys=Mock(
+              return_value=Mock(
+                errors=[]
+              )
+            )
+          ),
+          delete=Mock(
+            return_value=Mock(
+              exists=Mock(return_value=False)
+            )
+          )
+        )
+        _get_key.return_value = key
+        isdir.return_value = True
+
+        fs = S3FileSystem(s3_connection=Mock())
+
+        fs.rmtree(path='s3a://gethue/data')
+
+        key.delete.assert_not_called()
+        key.bucket.list.assert_called_with(prefix='s3a://gethue/data/')
+        key.bucket.delete_keys.assert_called()
 
 
 class S3FSTest(S3TestBase):

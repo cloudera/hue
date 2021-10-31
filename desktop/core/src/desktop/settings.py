@@ -282,26 +282,6 @@ PYLINTRC = get_run_root('.pylintrc')
 # Custom CSRF Failure View
 CSRF_FAILURE_VIEW = 'desktop.views.csrf_failure'
 
-REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': [
-      'rest_framework.permissions.IsAuthenticated',
-    ],
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-      'rest_framework_simplejwt.authentication.JWTAuthentication',
-      'rest_framework.authentication.SessionAuthentication',
-    ),
-}
-
-SIMPLE_JWT = {
-  'ACCESS_TOKEN_LIFETIME': datetime.timedelta(days=1),
-  'REFRESH_TOKEN_LIFETIME': datetime.timedelta(days=7),
-  'ROTATE_REFRESH_TOKENS': False,
-  'BLACKLIST_AFTER_ROTATION': True,
-  'UPDATE_LAST_LOGIN': False,
-  'AUTH_HEADER_TYPES': ('Bearer',),
-}
-
-
 ############################################################
 # Part 4: Installation of apps
 ############################################################
@@ -349,6 +329,24 @@ if DEBUG: # For simplification, force all DEBUG when django_debug_mode is True a
 # Part 4a: Django configuration that requires bound Desktop
 # configs.
 ############################################################
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+      'rest_framework.permissions.IsAuthenticated',
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': desktop.conf.AUTH.API_AUTH.get()
+}
+if desktop.conf.AUTH.JWT.IS_ENABLED.get() and 'desktop.auth.api_authentications.JwtAuthentication' not in REST_FRAMEWORK['DEFAULT_AUTHENTICATION_CLASSES']:
+  REST_FRAMEWORK['DEFAULT_AUTHENTICATION_CLASSES'].insert(0, 'desktop.auth.api_authentications.JwtAuthentication')
+
+SIMPLE_JWT = {
+  'ACCESS_TOKEN_LIFETIME': datetime.timedelta(days=1),
+  'REFRESH_TOKEN_LIFETIME': datetime.timedelta(days=7),
+  'ROTATE_REFRESH_TOKENS': False,
+  'BLACKLIST_AFTER_ROTATION': True,
+  'UPDATE_LAST_LOGIN': False,
+  'AUTH_HEADER_TYPES': ('Bearer',),
+}
 
 if desktop.conf.ENABLE_ORGANIZATIONS.get():
   AUTH_USER_MODEL = 'useradmin.OrganizationUser'
@@ -424,6 +422,7 @@ else:
 DATABASES = {
   'default': default_db
 }
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 if desktop.conf.QUERY_DATABASE.HOST.get():
   DATABASES['query'] = {
@@ -525,6 +524,10 @@ if desktop.conf.DEMO_ENABLED.get():
   AUTHENTICATION_BACKENDS = ('desktop.auth.backend.DemoBackend',)
 else:
   AUTHENTICATION_BACKENDS = tuple(desktop.conf.AUTH.BACKEND.get())
+
+# AxesBackend should be the first backend in the AUTHENTICATION_BACKENDS list.
+if sys.version_info[0] > 2:
+  AUTHENTICATION_BACKENDS = ('axes.backends.AxesBackend',) + AUTHENTICATION_BACKENDS
 
 EMAIL_HOST = desktop.conf.SMTP.HOST.get()
 EMAIL_PORT = desktop.conf.SMTP.PORT.get()
@@ -838,6 +841,9 @@ MODULES_TO_PATCH = (
     'django.db.backends.utils',
     'django.utils.cache',
 )
+
+if sys.version_info[0] > 2:
+  MIDDLEWARE.append('axes.middleware.AxesMiddleware')  # AxesMiddleware should be the last middleware in the MIDDLEWARE list.
 
 try:
   import hashlib

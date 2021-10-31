@@ -58,8 +58,13 @@ def get_request_session(url, logger):
     with CACHE_SESSION_LOCK:
       CACHE_SESSION[url] = requests.Session()
       logger.debug("Setting request Session")
-      CACHE_SESSION[url].mount(url, requests.adapters.HTTPAdapter(pool_connections=conf.CHERRYPY_SERVER_THREADS.get(),
-                                                                  pool_maxsize=conf.CHERRYPY_SERVER_THREADS.get()))
+      CACHE_SESSION[url].mount(
+        url,
+        requests.adapters.HTTPAdapter(
+          pool_connections=conf.CHERRYPY_SERVER_THREADS.get(),
+          pool_maxsize=conf.CHERRYPY_SERVER_THREADS.get()
+        )
+      )
       logger.debug("Setting session adapter for %s" % url)
 
   return CACHE_SESSION
@@ -195,7 +200,7 @@ class HttpClient(object):
     if urlencode:
       path = urllib_quote(smart_str(path))
 
-    url = self._make_url(path, params)
+    url = self._make_url(path, params, do_urlencode=urlencode)
 
     if http_method in ("GET", "DELETE"):
       if data is not None:
@@ -238,12 +243,12 @@ class HttpClient(object):
             exceptions.TooManyRedirects) as ex:
       raise self._exc_class(ex)
 
-  def _make_url(self, path, params):
+  def _make_url(self, path, params, do_urlencode=True):
     res = self._base_url
     if path:
       res += posixpath.normpath('/' + path.lstrip('/'))
     if params:
-      param_str = urlencode(params)
+      param_str = urlencode(params) if do_urlencode else '&'.join(['%s=%s' % (k, v) for k, v in params.items()])
       res += '?' + param_str
     return iri_to_uri(res)
 

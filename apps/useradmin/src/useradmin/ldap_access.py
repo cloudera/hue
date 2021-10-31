@@ -191,7 +191,7 @@ class LdapConnection(object):
       msg = "Can\'t contact LDAP server"
     else:
       if bind_user:
-        msg = "Failed to bind to LDAP server as user %s" % bind_user
+        msg = "Failed to bind to LDAP server"
       else:
         msg = "Failed to bind to LDAP server anonymously"
 

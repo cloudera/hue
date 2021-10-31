@@ -66,7 +66,7 @@ class WebhdfsTests(unittest.TestCase):
     try:
       f.write("hello")
       f.close()
-      assert_equals("hello", fs.open(test_file).read())
+      assert_equals(b"hello" if sys.version_info[0] > 2 else "hello", fs.open(test_file).read())
       assert_equals(5, fs.stats(test_file)["size"])
       assert_true(fs.isfile(test_file))
       assert_false(fs.isfile("/"))
@@ -97,14 +97,14 @@ class WebhdfsTests(unittest.TestCase):
 
       f = fs.open(test_file, "r")
       f.seek(0, os.SEEK_SET)
-      assert_equals("he", f.read(2))
+      assert_equals(b"he" if sys.version_info[0] > 2 else "he", f.read(2))
       f.seek(1, os.SEEK_SET)
-      assert_equals("el", f.read(2))
+      assert_equals(b"el" if sys.version_info[0] > 2 else "el", f.read(2))
       f.seek(-1, os.SEEK_END)
-      assert_equals("o", f.read())
+      assert_equals(b"o" if sys.version_info[0] > 2 else "o", f.read())
       f.seek(0, os.SEEK_SET)
       f.seek(2, os.SEEK_CUR)
-      assert_equals("ll", f.read(2))
+      assert_equals(b"ll" if sys.version_info[0] > 2 else "ll", f.read(2))
     finally:
       fs.remove(test_file)
 
@@ -123,12 +123,15 @@ class WebhdfsTests(unittest.TestCase):
       f.close()
 
       for i in range(1, 10):
-        f = fs.open(test_file, "r")
+        f = fs.open(test_file, "rt" if sys.version_info[0] > 2 else "r")
 
         for j in range(1, 100):
           offset = random.randint(0, len(data) - 1)
           f.seek(offset, os.SEEK_SET)
-          assert_equals(data[offset:offset+50], f.read(50))
+          t = data[offset:offset+50]
+          if sys.version_info[0] > 2:
+            t = t.encode('utf-8')
+          assert_equals(t, f.read(50))
         f.close()
 
     finally:
@@ -295,9 +298,12 @@ class WebhdfsTests(unittest.TestCase):
     assert_equals(('hdfs', '', 'foo/bar', '', ''), Hdfs.urlsplit(url))
 
   def test_i18n_namespace(self):
-    # Use utf-8 encoding
-    reload(sys)
-    sys.setdefaultencoding('utf-8')
+    if sys.version_info[0] > 2:
+      pass
+    else:
+      # Use utf-8 encoding
+      reload(sys)
+      sys.setdefaultencoding('utf-8')
 
     def check_existence(name, parent, present=True):
       assertion = present and assert_true or assert_false
@@ -345,9 +351,12 @@ class WebhdfsTests(unittest.TestCase):
       except Exception as ex:
         LOG.error('Failed to cleanup %s: %s' % (prefix, ex))
 
-      # Reset encoding
-      reload(sys)
-      sys.setdefaultencoding('ascii')
+      if sys.version_info[0] > 2:
+        pass
+      else:
+        # Reset encoding
+        reload(sys)
+        sys.setdefaultencoding('ascii')
 
   def test_chmod(self):
     # Create a test directory with
@@ -560,7 +569,10 @@ class WebhdfsTests(unittest.TestCase):
         assert_false(self.cluster.fs.exists(PATH))
         assert_true(self.cluster.fs.exists(self.cluster.fs.trash_path(PATH)))
     finally:
-      reload(threading)
+      if sys.version_info[0] > 2:
+        pass
+      else:
+        reload(threading)
       self.cluster.fs.setuser(self.cluster.superuser)
       for directory in CLEANUP:
         try:
@@ -571,33 +583,35 @@ class WebhdfsTests(unittest.TestCase):
   def test_check_access(self):
     # Set user to owner
     self.cluster.fs.setuser('test')
-    assert_equals('', self.cluster.fs.check_access(path='/user/test', aclspec='rw-'))  # returns zero-length content
+    assert_equals(b'' if sys.version_info[0] > 2 else '',
+                  self.cluster.fs.check_access(path='/user/test', aclspec='rw-'))  # returns zero-length content
 
     # Set user to superuser
     self.cluster.fs.setuser(self.cluster.superuser)
-    assert_equals('', self.cluster.fs.check_access(path='/user/test', aclspec='rw-'))  # returns zero-length content
+    assert_equals(b'' if sys.version_info[0] > 2 else '',
+                  self.cluster.fs.check_access(path='/user/test', aclspec='rw-'))  # returns zero-length content
 
     # Set user to non-authorized, non-superuser user
     self.cluster.fs.setuser('nonadmin')
     assert_raises(WebHdfsException, self.cluster.fs.check_access, path='/user/test', aclspec='rw-')
-    
+
   def test_list(self):
     test_file = self.prefix + "/fortest.txt"
     test_dir = self.prefix + "/temp2"
     f = self.cluster.fs.open(test_file, "w")
     f.write("ok")
     f.close()
-    
+
     resp = self.cluster.fs.listdir(self.prefix)
     LOG.debug("%s" % resp)
-    
+
     test_dir = self.prefix + "/temp2"
     self.cluster.fs.mkdir(test_dir, 0o333)
     test_file2 = test_dir + "/fortest.txt"
     f = self.cluster.fs.open(test_file2, "w")
     f.write("ok")
     f.close()
-    
+
     resp = self.cluster.fs.listdir(self.prefix)
     LOG.debug("%s" % resp)
     resp = self.cluster.fs.listdir_stats(self.prefix)

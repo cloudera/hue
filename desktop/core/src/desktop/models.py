@@ -40,6 +40,7 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from django.urls import reverse, NoReverseMatch
 
 from dashboard.conf import get_engines, HAS_REPORT_ENABLED, IS_ENABLED as DASHBOARD_ENABLED
+from hadoop.core_site import get_raz_api_url, get_raz_s3_default_bucket
 from kafka.conf import has_kafka
 from indexer.conf import ENABLE_DIRECT_UPLOAD
 from metadata.conf import get_optimizer_mode
@@ -50,7 +51,7 @@ from useradmin.organization import _fitered_queryset
 from desktop import appmanager
 from desktop.auth.backend import is_admin
 from desktop.conf import get_clusters, IS_MULTICLUSTER_ONLY, ENABLE_ORGANIZATIONS, ENABLE_PROMETHEUS, \
-    has_connectors, TASK_SERVER, APP_BLACKLIST, ENABLE_SHARING, ENABLE_CONNECTORS, ENABLE_UNIFIED_ANALYTICS
+    has_connectors, TASK_SERVER, APP_BLACKLIST, ENABLE_SHARING, ENABLE_CONNECTORS, ENABLE_UNIFIED_ANALYTICS, RAZ
 from desktop.lib import fsmanager
 from desktop.lib.connectors.api import _get_installed_connectors
 from desktop.lib.connectors.models import Connector
@@ -76,7 +77,7 @@ SAMPLE_USER_ID = 1100713
 SAMPLE_USER_INSTALL = 'hue'
 SAMPLE_USER_OWNERS = ['hue', 'sample']
 
-UTC_TIME_FORMAT = "%Y-%m-%dT%H:%MZ"
+UTC_TIME_FORMAT = "%Y-%m-%dT%H:%M"
 HUE_VERSION = None
 
 
@@ -925,7 +926,8 @@ class FilesystemException(Exception):
 
 class Document2QueryMixin(object):
 
-  def documents(self, user, perms='both', include_history=False, include_trashed=False, include_managed=False, include_shared_links=False, allow_distinct=True):
+  def documents(self, user, perms='both', include_history=False, include_trashed=False, include_managed=False,
+                include_shared_links=False, allow_distinct=True):
     """
     Returns all documents that are owned or shared with the user.
     :param perms: both, shared, owned. Defaults to both.
@@ -1193,7 +1195,7 @@ class Document2(models.Model):
       db_index=True,
       verbose_name=_t('If managed under the cover by Hue and never by the user')
   )
-  is_trashed = models.NullBooleanField(default=False, db_index=True, verbose_name=_t('True if trashed'))
+  is_trashed = models.BooleanField(default=False, db_index=True, verbose_name=_t('True if trashed'))
 
   dependencies = models.ManyToManyField('self', symmetrical=False, related_name='dependents', db_index=True)
 
@@ -1724,6 +1726,25 @@ class Document2Permission(models.Model):
 def get_cluster_config(user):
   return Cluster(user).get_app_config().get_config()
 
+def get_remote_home_storage(user=None):
+  remote_home_storage = REMOTE_STORAGE_HOME.get() if hasattr(REMOTE_STORAGE_HOME, 'get') and REMOTE_STORAGE_HOME.get() else None
+
+  if not remote_home_storage:
+    if get_raz_api_url() and get_raz_s3_default_bucket():
+      remote_home_storage = 's3a://%(bucket)s' % get_raz_s3_default_bucket()
+
+  remote_home_storage = _handle_user_dir_raz(user, remote_home_storage)
+
+  return remote_home_storage
+
+
+def _handle_user_dir_raz(user, remote_home_storage):
+  # In RAZ env, apppend username so that it defaults to user's dir and doesn't give 403 error
+  if user and remote_home_storage and RAZ.IS_ENABLED.get() and remote_home_storage.endswith('/user'):
+    remote_home_storage += '/' + user.username
+
+  return remote_home_storage
+
 
 class ClusterConfig(object):
   """
@@ -1839,7 +1860,7 @@ class ClusterConfig(object):
           'name': interpreter['name'],
           'type': interpreter['type'],  # Connector v1
           'id': interpreter['type'],
-          'displayName': 'Unified Analytics' if ENABLE_UNIFIED_ANALYTICS.get() and interpreter['dialect'] == 'hive' else  interpreter['name'],
+        'displayName': 'Unified Analytics' if ENABLE_UNIFIED_ANALYTICS.get() and interpreter['dialect'] == 'hive' else interpreter['name'],
           'buttonName': _('Query'),
           'tooltip': _('%s Query') % interpreter['type'].title(),
           'optimizer': get_optimizer_mode(),
@@ -1895,7 +1916,7 @@ class ClusterConfig(object):
           'name': interpreter['name'],
           'type': interpreter['type'],
           'id': interpreter['type'],
-          'displayName': 'Unified Analytics' if ENABLE_UNIFIED_ANALYTICS.get() and interpreter['dialect'] == 'hive' else  interpreter['name'],
+        'displayName': 'Unified Analytics' if ENABLE_UNIFIED_ANALYTICS.get() and interpreter['dialect'] == 'hive' else interpreter['name'],
           'buttonName': _('Query'),
           'tooltip': _('%s Query') % interpreter['type'].title(),
           'page': '/editor/?type=%(type)s' % interpreter,
@@ -1954,7 +1975,8 @@ class ClusterConfig(object):
     elif 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('hdfs', self.user):
       hdfs_connectors.append(_('Files'))
 
-    remote_home_storage = REMOTE_STORAGE_HOME.get() if hasattr(REMOTE_STORAGE_HOME, 'get') and REMOTE_STORAGE_HOME.get() else None
+
+    remote_home_storage = get_remote_home_storage(self.user)
 
     for hdfs_connector in hdfs_connectors:
       force_home = remote_home_storage and not remote_home_storage.startswith('/')
@@ -1971,7 +1993,7 @@ class ClusterConfig(object):
       })
 
     if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('s3a', self.user):
-      home_path = remote_home_storage if remote_home_storage else 'S3A://'.encode('utf-8')
+      home_path = remote_home_storage if remote_home_storage else 's3a://'.encode('utf-8')
       interpreters.append({
         'type': 's3',
         'displayName': _('S3'),
@@ -1991,8 +2013,8 @@ class ClusterConfig(object):
       })
 
     if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('abfs', self.user):
-      from azure.abfs.__init__ import get_home_dir_for_ABFS
-      home_path = remote_home_storage if remote_home_storage else get_home_dir_for_ABFS().encode('utf-8')
+      from azure.abfs.__init__ import get_home_dir_for_abfs
+      home_path = remote_home_storage if remote_home_storage else get_home_dir_for_abfs(self.user).encode('utf-8')
       interpreters.append({
         'type': 'abfs',
         'displayName': _('ABFS'),

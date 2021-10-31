@@ -49,7 +49,7 @@ def get_navigator_server_url():
 
 def get_navigator_audit_log_dir():
   """Returns audit_event_log_dir"""
-  return get_conf().get(_CONF_NAVIGATOR_AUDIT_LOG_DIR, '')
+  return get_conf().get(_CONF_NAVIGATOR_AUDIT_LOG_DIR, '/var/log/hue/audit.log')
 
 
 def get_navigator_audit_max_file_size():

@@ -16,23 +16,15 @@
 
 import logging
 import sys
-import uuid
 
 from django.urls import reverse
 
 from notebook.models import make_notebook
-from useradmin.models import User
-
-from desktop.lib import django_mako
-from desktop.lib.exceptions_renderable import PopupException
 
 if sys.version_info[0] > 2:
-  from urllib.parse import urlparse, unquote as urllib_unquote
   from django.utils.translation import gettext as _
 else:
   from django.utils.translation import ugettext as _
-  from urllib import unquote as urllib_unquote
-  from urlparse import urlparse
 
 
 LOG = logging.getLogger(__name__)
@@ -53,7 +45,10 @@ class FlinkIndexer():
     final_table_name = table_name
 
     source_type = source['sourceType']
-    editor_type = '55'  # destination['sourceType']
+
+    from desktop.api_public import _get_interpreter_from_dialect   # due to a circular import
+    interpreter = _get_interpreter_from_dialect('flink', self.user)
+    editor_type = interpreter['type']  # destination['sourceType']
 
     columns = destination['columns']
 

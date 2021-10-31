@@ -21,17 +21,30 @@ export interface HueComponentOptions<T extends Component> extends ComponentOptio
   hueBaseUrl?: string;
 }
 
-const isRegistered = function (tag: string): boolean {
-  return window.customElements.get(tag) !== undefined;
-};
+const isRegistered = (tag: string): boolean => !!window.customElements?.get(tag);
 
 export const wrap = <T extends Component>(
   tag: string,
   component: { new (): T },
   options?: WebComponentOptions
 ): void => {
-  if (!isRegistered(tag)) {
+  if (!isRegistered(tag) && window.customElements) {
     const customElement: CustomElementConstructor = wrapper(component, createApp, h, options);
     window.customElements.define(tag, customElement);
   }
+};
+
+export const isDefined = async (tag: string): Promise<void> => {
+  new Promise(async (resolve, reject) => {
+    if (!window.customElements) {
+      reject('Web components are not supported!');
+    }
+    try {
+      await window.customElements.whenDefined(tag);
+    } catch (e) {
+      reject(e);
+      return;
+    }
+    resolve();
+  });
 };

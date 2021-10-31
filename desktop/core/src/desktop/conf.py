@@ -151,6 +151,9 @@ def is_python2():
   """Hue is running on Python 2."""
   return sys.version_info[0] == 2
 
+def is_jwt_authentication_enabled():
+  """JWT backend flag enabled or backend set in api auth explicitly"""
+  return AUTH.JWT.IS_ENABLED.get() or 'desktop.auth.api_authentications.JwtAuthentication' in AUTH.API_AUTH.get()
 
 USE_CHERRYPY_SERVER = Config(
   key="use_cherrypy_server",
@@ -1085,6 +1088,12 @@ AUTH = ConfigSection(
                   default="login",
                   help=_("The service to use when querying PAM. "
                          "The service usually corresponds to a single filename in /etc/pam.d")),
+    PAM_USE_PWD_MODULE=Config("pam_use_pwd_module",
+                       help=_("To use Python unix pwd module to get the username from the entered credentials in hue"
+                              " if Centrify like PAM service is in use. "
+                              "This will set the username to what is being returned by the pwd module."),
+                       type=coerce_bool,
+                       default=False),
     REMOTE_USER_HEADER=Config("remote_user_header",
                         default="HTTP_REMOTE_USER",
                         help=_("When using the desktop.auth.backend.RemoteUserDjangoBackend, this sets "
@@ -1183,6 +1192,50 @@ AUTH = ConfigSection(
       help=_("If True, will auto log any request as a `hue` user that needs to exist."),
       type=coerce_bool,
       default=False,
+    ),
+    API_AUTH=Config(
+        "api_auth",
+        default=[
+          'rest_framework_simplejwt.authentication.JWTAuthentication',
+          'rest_framework.authentication.SessionAuthentication'],
+        type=coerce_csv,
+        help=_("Multiple Authentication backends are supported by specifying a comma-separated list in order of priority.")
+    ),
+    JWT=ConfigSection(
+      key="jwt",
+      help=_("Configuration for Custom JWT Authentication."),
+      members=dict(
+        IS_ENABLED=Config(
+            key='is_enabled',
+            help=_('Adds custom JWT Authentication backend for REST APIs in top priority.'),
+            type=coerce_bool,
+            default=False,
+        ),
+        KEY_SERVER_URL=Config(
+            key="key_server_url",
+            default=None,
+            type=str,
+            help=_("Endpoint to fetch the public key from verification server.")
+        ),
+        ISSUER=Config(
+          key="issuer",
+          default=None,
+          type=str,
+          help=_("The identifier of the service issued the JWT")
+        ),
+        AUDIENCE=Config(
+          key="audience",
+          default=None,
+          type=str,
+          help=_("The identifier of the resource intend to access")
+        ),
+        VERIFY=Config(
+            key="verify",
+            default=True,
+            type=coerce_bool,
+            help=_("Verify custom JWT signature.")
+        ),
+      )
     ),
 ))
 
@@ -2021,6 +2074,14 @@ ENABLE_LINK_SHARING = Config(
   type=coerce_bool,
   help=_('Turn on the direct link sharing of saved document.')
 )
+
+USE_THRIFT_HTTP_JWT = Config(
+  key="use_thrift_http_jwt",
+  help=_("Use JWT as Bearer header for authentication when using Thrift over HTTP transport."),
+  type=coerce_bool,
+  dynamic_default=is_jwt_authentication_enabled
+)
+
 DISABLE_LOCAL_STORAGE = Config(
   key='disable_local_storage',
   default="false",
@@ -2092,6 +2153,14 @@ CONNECTORS = UnspecifiedConfigSection(
   )
 )
 
+def _get_raz_url():
+  """Check if we can guess if Raz is configured"""
+  from hadoop.core_site import get_raz_api_url  # Avoid circular import
+  return get_raz_api_url()
+
+def has_raz_url():
+  """Check if we can guess if Raz is configured"""
+  return bool(_get_raz_url())
 
 
 RAZ = ConfigSection(
@@ -2102,13 +2171,13 @@ RAZ = ConfigSection(
       key='is_enabled',
       help=_('Turns on the integration as ready to use'),
       type=coerce_bool,
-      default=False,
+      dynamic_default=has_raz_url,
     ),
     API_URL=Config(
         key='api_url',
         help=_('Endpoint to contact'),
         type=str,
-        default='https://localhost:8080',
+        dynamic_default=_get_raz_url,
     ),
     API_AUTHENTICATION=Config(
         key='api_authentication',

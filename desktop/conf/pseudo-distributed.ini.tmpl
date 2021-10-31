@@ -311,6 +311,9 @@
   # Turn on the direct link sharing of saved document.
   ## enable_link_sharing=true
 
+  # Use JWT as Bearer header for authentication when using Thrift over HTTP transport.
+  ## use_thrift_http_jwt=false
+
   # Hue uses Localstorage to keep the users settings and database preferences.
   # Please make this value true in case local storage should not be used
   # default value is false
@@ -362,11 +365,18 @@
     # Multiple Authentication backend combinations are supported by specifying a comma-separated list in order of priority.
     ## backend=desktop.auth.backend.AllowFirstUserDjangoBackend
 
+    # Multiple Authentication backends for REST APIs are supported by specifying a comma-separated list in order of priority.
+    ## api_auth=rest_framework_simplejwt.authentication.JWTAuthentication,rest_framework.authentication.SessionAuthentication
+
     # Class which defines extra accessor methods for User objects.
     ## user_aug=desktop.auth.backend.DefaultUserAugmentor
 
     # The service to use when querying PAM.
     ## pam_service=login
+
+    # To use Python unix pwd module to get the username from the entered credentials in Hue if Centrify like PAM service is in use.
+    # This will set the username to what is being returned by the pwd module.
+    ## pam_use_pwd_module=false
 
     # When using the desktop.auth.backend.RemoteUserDjangoBackend, this sets
     # the normalized name of the header that contains the remote user.
@@ -425,6 +435,22 @@
 
     # If behind_reverse_proxy is True, it will look for the IP address from this header. Default: HTTP_X_FORWARDED_FOR
     ## reverse_proxy_header=HTTP_X_FORWARDED_FOR
+
+    [[[jwt]]]
+      # Adds custom JWT Authentication backend for REST APIs in top priority.
+      ## is_enabled=false
+
+      # Endpoint to fetch the public key from verification server.
+      ## key_server_url=https://ext_authz:8000
+
+      # The identifier of the service issued the JWT
+      ## issuer=None
+
+      # The identifier of the resource intend to access
+      ## audience=None
+
+      # Verify custom JWT signature.
+      ## verify=true
 
   # Configuration options for connecting to LDAP and Active Directory
   # -------------------------------------------------------------------
@@ -1123,6 +1149,9 @@
   # Activate the tree widget (to drill down fields as dimensions, alpha).
   ## has_tree_widget=false
 
+  # Setting this value to true opens up for possible xss attacks.
+  ## allow_unsecure_html=false
+
   [[engines]]
 
     #  [[[solr]]]
@@ -1340,6 +1369,13 @@
   # Use SASL framework to establish connection to host.
   ## use_sasl=false
 
+  # Enable the HPLSQL mode.
+  ## hplsql=false
+
+  # Max number of objects (columns, tables, databases) available to list in the left assist, autocomplete, table browser etc.
+  # Setting this higher than the default can degrade performance.
+  ## max_catalog_sql_entries=5000
+
   [[ssl]]
     # Path to Certificate Authority certificates.
     ## cacerts=/etc/hue/cacerts.pem
@@ -1431,6 +1467,10 @@
 
   # Use Thrift over HTTP for the transport mode.
   ## use_thrift_http=false
+
+  # Due to IMPALA-10272, the importer fails with READ permissions.
+  # Setting this to True, means setting the scratch directory and its file to 777 so the importer does not fail with permission issue
+  ## user_scratch_dir_permission=false
 
   [[ssl]]
     # SSL communication enabled for this server.
@@ -1858,8 +1898,8 @@
   [[abfs_clusters]]
     # Default ABFS cluster
     [[[default]]]
-      ## fs_defaultfs=abfss://<container_name>@<account_name>.dfs.core.windows.net
-      ## webhdfs_url=https://<container_name>@<account_name>.dfs.core.windows.net
+      ## fs_defaultfs=abfs://<container_name>@<account_name>.dfs.core.windows.net
+      ## webhdfs_url=https://<account_name>.dfs.core.windows.net
 
 ###########################################################################
 # Settings for the Sentry lib
@@ -2093,12 +2133,18 @@
 
 [kafka]
 
-  [[kafka]]
-    # Enable the Kafka integration.
-    ## is_enabled=false
+[[kafka]]
+# Enable the Kafka integration.
+## is_enabled=false
 
-    # Base URL of Kafka Ksql API.
-    ## ksql_api_url=http://127.0.0.1:8088
+# URL of Kafka REST API.
+## api_url=http://localhost:8082
+
+# URL of Kafka Ksql API.
+## ksql_api_url=http://localhost:8088
+
+# URL of Schema Registry API.
+## schema_registry_api_url=http://localhost:8081
 
 
 ###########################################################################

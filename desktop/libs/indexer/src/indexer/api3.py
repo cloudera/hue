@@ -44,6 +44,7 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_unicode
 from desktop.lib.python_util import check_encoding
 from desktop.models import Document2
+from filebrowser.forms import UploadLocalFileForm
 from kafka.kafka_api import get_topics, get_topic_data
 from notebook.connectors.base import get_api, Notebook
 from notebook.decorators import api_error_handler
@@ -240,7 +241,7 @@ def guess_field_types(request):
         column_row = csv_data[0]
       else:
         sample = csv_data[:4]
-        column_row = ['field_' + str(count+1) for count, col in enumerate(sample[0])] 
+        column_row = ['field_' + str(count+1) for count, col in enumerate(sample[0])]
 
       field_type_guesses = []
       for count, col in enumerate(column_row):
@@ -350,35 +351,6 @@ def guess_field_types(request):
               for col in kafkaFieldNames
           ]
       }
-
-#       data = """%(kafkaFieldNames)s
-# %(data)s""" % {
-#         'kafkaFieldNames': ','.join(kafkaFieldNames),
-#         'data': '\n'.join([','.join(cols) for cols in topics_data])
-#       }
-#       stream = string_io()
-#       stream.write(data)
-
-#       _convert_format(file_format["format"], inverse=True)
-
-#       indexer = MorphlineIndexer(request.user, request.fs)
-
-#       format_ = indexer.guess_field_types({
-#         "file": {
-#             "stream": stream,
-#             "name": file_format['path']
-#         },
-#         "format": file_format['format']
-#       })
-#       type_mapping = dict(
-#         list(
-#           zip(kafkaFieldNames, kafkaFieldTypes)
-#         )
-#       )
-
-#       for col in format_['columns']:
-#         col['keyType'] = type_mapping[col['name']]
-#         col['type'] = type_mapping[col['name']]
     elif file_format['streamSelection'] == 'flume':
       if 'hue-httpd/access_log' in file_format['channelSourcePath']:
         columns = [
@@ -455,7 +427,7 @@ def importer_submit(request):
       stream = request.fs.open(path)
       file_encoding = check_encoding(stream.read(10000))
 
-  if destination['ouputFormat'] in ('database', 'table'):
+  if destination['ouputFormat'] in ('database', 'table') and request.fs is not None:
     destination['nonDefaultLocation'] = request.fs.netnormpath(destination['nonDefaultLocation']) \
         if destination['nonDefaultLocation'] else destination['nonDefaultLocation']
 
@@ -482,7 +454,7 @@ def importer_submit(request):
           source,
           destination, index_name
       )
-  elif source['inputFormat'] in ('stream', 'connector') or destination['ouputFormat'] == 'stream':
+  elif destination['ouputFormat'] == 'stream-table':
     args = {
       'source': source,
       'destination': destination,
@@ -523,6 +495,7 @@ def importer_submit(request):
     )
   elif destination['ouputFormat'] == 'big-table':
     args = {
+      'request': request,
       'source': source,
       'destination': destination,
       'start_time': start_time,
@@ -551,6 +524,7 @@ def importer_submit(request):
         start_time
       )
     else:
+      # TODO: if inputFormat is 'stream' and tableFormat is 'kudu' --> create Table only
       job_handle = _create_table(
         request,
         source,
@@ -738,11 +712,26 @@ def save_pipeline(request):
   return JsonResponse(response)
 
 
-def upload_local_file(request):
+def upload_local_file_drag_and_drop(request):
+  response = {'status': -1, 'data': ''}
+  form = UploadLocalFileForm(request.POST, request.FILES)
 
-  upload_file = request.FILES['inputfile']
+  if form.is_valid():
+    resp = upload_local_file(request)
+    json_data = json.loads(resp.content)
+    response['status'] = 0
+    response.update({
+      'path': json_data['local_file_url'],
+    })
+
+  return JsonResponse(response)
+
+
+def upload_local_file(request):
+  upload_file = request.FILES['file']
   username = request.user.username
-  filename = "%s_%s" % (username, uuid.uuid4())
+  filename = "%s_%s:%s;" % (username, uuid.uuid4(), upload_file.name)
+
   temp_file = tempfile.NamedTemporaryFile(prefix=filename, suffix='.csv', delete=False)
   temp_file.write(upload_file.read())
   local_file_url = temp_file.name

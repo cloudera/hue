@@ -973,8 +973,14 @@ def _get_find_groups_filter(ldap_info, server=None):
   sanitized_dn = ldap.filter.escape_filter_chars(ldap_info['dn']).replace(r'\2a', r'*')
   sanitized_dn = sanitized_dn.replace(r'\5c,', r'\5c\2c')
 
-  find_groups_filter = "(&" + group_filter + "(|(" + group_member_attr + "=" + ldap_info['username'] + ")(" + \
-                       group_member_attr + "=" + sanitized_dn + ")))"
+
+  if (group_member_attr.lower() == 'memberuid'):
+    find_groups_filter = "(&" + group_filter + "(" + group_member_attr + "=" + ldap_info['username'] + "))"
+  elif (group_member_attr.lower() == 'member' or group_member_attr.lower() == 'uniquemember'):
+    find_groups_filter = "(&" + group_filter + "(" + group_member_attr + "=" + sanitized_dn + "))"
+  else:
+    find_groups_filter = "(&" + group_filter + "(|(" + group_member_attr + "=" + ldap_info['username'] + ")(" + \
+                         group_member_attr + "=" + sanitized_dn + ")))"
 
   return find_groups_filter
 

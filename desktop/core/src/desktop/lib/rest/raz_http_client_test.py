@@ -16,10 +16,10 @@
 
 import sys
 
-
-from nose.tools import assert_equal, assert_false, assert_true
+from nose.tools import assert_equal, assert_false, assert_true, assert_raises
 
 from desktop.lib.rest.raz_http_client import RazHttpClient
+from desktop.lib.exceptions_renderable import PopupException
 
 
 if sys.version_info[0] > 2:
@@ -31,19 +31,47 @@ else:
 class TestRazHttpClient():
 
   def test_get_file(self):
-    with patch('desktop.lib.rest.raz_http_client.AdlsRazClient.get_url') as get_url:
-      with patch('desktop.lib.rest.raz_http_client.HttpClient.execute') as execute:
+    with patch('desktop.lib.rest.raz_http_client.AdlsRazClient.get_url') as raz_get_url:
+      with patch('desktop.lib.rest.raz_http_client.HttpClient.execute') as raz_http_execute:
 
-        get_url.return_value = 'https://gethue.blob.core.windows.net/hue/data/customer.csv?sv=2014-02-14&sr=b&' + \
-          'sig=pJL%2FWyed41tptiwBM5ymYre4qF8wzrO05tS5MCjkutc%3D&st=2015-01-02T01%3A40%3A51Z&se=2015-01-02T02%3A00%3A51Z&sp=r'
-        execute.return_value = 'my file'
+        raz_get_url.return_value = {
+          'token': 'sv=2014-02-14&sr=b&sig=pJL%2FWyed41tptiwBM5ymYre4qF8wzrO05tS5MCjkutc%3D' \
+            '&st=2015-01-02T01%3A40%3A51Z&se=2015-01-02T02%3A00%3A51Z&sp=r'
+        }
+        raz_http_execute.return_value = 'my_file_content'
 
-        client = RazHttpClient()
-        f = client.execute(http_method='GET', path='/gethue/data/customer.csv')
+        client = RazHttpClient(username='test', base_url='https://gethue.dfs.core.windows.net')
+        f = client.execute(http_method='GET', path='/gethue/data/customer.csv', params={'action': 'getStatus'})
 
-        assert_equal('my file', f)
-        get_url.assert_called_with('gethue.dfs.core.windows.net', 'hue', relative_path='/gethue/data/customer.csv', perm='read')
-        execute.assert_called_with(http_method='GET', path='https://gethue.blob.core.windows.net/hue/data/customer.csv?' + \
-          'sv=2014-02-14&sr=b&sig=pJL%2FWyed41tptiwBM5ymYre4qF8wzrO05tS5MCjkutc%3D&' + \
-          'st=2015-01-02T01%3A40%3A51Z&se=2015-01-02T02%3A00%3A51Z&sp=r'
+        url = 'https://gethue.dfs.core.windows.net/gethue/data/customer.csv?action=getStatus'
+        assert_equal('my_file_content', f)
+        raz_get_url.assert_called_with(action='GET', path=url, headers=None)
+        raz_http_execute.assert_called_with(
+            http_method='GET',
+            path='/gethue/data/customer.csv?action=getStatus&sv=2014-02-14&sr=b&sig=pJL%2FWyed41tptiwBM5ymYre4qF8wzrO05tS5MCjkutc%3D' \
+              '&st=2015-01-02T01%3A40%3A51Z&se=2015-01-02T02%3A00%3A51Z&sp=r',
+            data=None,
+            headers=None,
+            allow_redirects=False,
+            urlencode=False,
+            files=None,
+            stream=False,
+            clear_cookies=False,
+            timeout=120
         )
+
+
+  def test_handle_raz_adls_response(self):
+    with patch('desktop.lib.rest.raz_http_client.AdlsRazClient.get_url') as raz_get_url:
+
+      # When RAZ denies request and sends no response
+      raz_get_url.return_value = None
+      client = RazHttpClient(username='test', base_url='https://gethue.blob.core.windows.net')
+
+      assert_raises(PopupException, client.execute, http_method='GET', path='/gethue/data/customer.csv', params={'action': 'getStatus'})
+
+      # When no SAS token in response
+      raz_get_url.return_value = {}
+      client = RazHttpClient(username='test', base_url='https://gethue.blob.core.windows.net')
+
+      assert_raises(PopupException, client.execute, http_method='GET', path='/gethue/data/customer.csv', params={'action': 'getStatus'})

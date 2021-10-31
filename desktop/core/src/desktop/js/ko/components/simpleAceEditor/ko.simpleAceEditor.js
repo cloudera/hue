@@ -18,16 +18,16 @@ import $ from 'jquery';
 import * as ko from 'knockout';
 import ace from 'ext/aceHelper';
 
-import AceLocationHandler from 'ko/bindings/ace/aceLocationHandler';
-import componentUtils from 'ko/components/componentUtils';
-import UUID from 'utils/string/UUID';
-import { hueLocalStorage } from 'utils/storageUtils';
 import SolrFormulaAutocompleter from './solrFormulaAutocompleter';
 import SolrQueryAutocompleter from './solrQueryAutocompleter';
-import SqlAutocompleter from 'sql/sqlAutocompleter';
-import sqlWorkerHandler from 'sql/sqlWorkerHandler';
-import AceGutterHandler from 'ko/bindings/ace/aceGutterHandler';
 import { findEditorConnector } from 'config/hueConfig';
+import AceLocationHandler from 'ko/bindings/ace/aceLocationHandler';
+import componentUtils from 'ko/components/componentUtils';
+import { registerHueWorkers } from 'sql/workers/hueWorkerHandler';
+import SqlAutocompleter from 'sql/sqlAutocompleter';
+import AceGutterHandler from 'ko/bindings/ace/aceGutterHandler';
+import UUID from 'utils/string/UUID';
+import { hueLocalStorage } from 'utils/storageUtils';
 
 export const NAME = 'hue-simple-ace-editor';
 export const MULTI_NAME = 'hue-simple-ace-editor-multi';
@@ -154,7 +154,7 @@ class SimpleAceEditor {
       };
 
       if (connector.is_sql && !params.disableWorkers) {
-        sqlWorkerHandler.registerWorkers();
+        registerHueWorkers();
         const aceLocationHandler = new AceLocationHandler({
           editor: editor,
           editorId: $element.attr('id'),

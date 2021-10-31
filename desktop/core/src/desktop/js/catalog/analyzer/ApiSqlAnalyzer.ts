@@ -61,16 +61,16 @@ const genericSqlAnalyzerMultiTableFetch = <T extends TimestampedData>(
   });
 };
 
-const COMPATIBILITY_URL = '/notebook/api/optimizer/statement/compatibility';
-const PREDICT_URL = '/metadata/api/optimizer/predict';
-const RISK_URL = '/notebook/api/optimizer/statement/risk';
-const SIMILARITY_URL = '/notebook/api/optimizer/statement/similarity';
-const TOP_AGGS_URL = '/metadata/api/optimizer/top_aggs';
-const TOP_COLUMNS_URL = '/metadata/api/optimizer/top_columns';
-const TOP_FILTERS_URL = '/metadata/api/optimizer/top_filters';
-const TOP_JOINS_URL = '/metadata/api/optimizer/top_joins';
-const TOP_TABLES_URL = '/metadata/api/optimizer/top_tables';
-const TABLE_DETAILS_URL = '/metadata/api/optimizer/table_details';
+const COMPATIBILITY_URL = '/api/optimizer/query_compatibility';
+const PREDICT_URL = '/api/optimizer/predict';
+const RISK_URL = '/api/optimizer/query_risk/';
+const SIMILARITY_URL = '/api/optimizer/similar_queries';
+const TOP_AGGS_URL = '/api/optimizer/top_aggs';
+const TOP_COLUMNS_URL = '/api/optimizer/top_columns';
+const TOP_FILTERS_URL = '/api/optimizer/top_filters';
+const TOP_JOINS_URL = '/api/optimizer/top_joins';
+const TOP_TABLES_URL = '/api/optimizer/top_tables';
+const TABLE_DETAILS_URL = '/api/optimizer/table_details';
 
 export default class ApiSqlAnalyzer implements SqlAnalyzer {
   connector: Connector;

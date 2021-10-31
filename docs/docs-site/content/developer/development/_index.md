@@ -173,25 +173,24 @@ Then make your changes in code:
 
 ### Post a review
 
-Either post via the GitHub CLI:
+Either post via the [GitHub CLI](https://github.com/cli/cli):
 
     gh pr create --fill --assignee=romainr --web
 
-Or push to your branch in your repository forks by doing one time:
+Or push to your branch in your repository fork, e.g. if you are 'bob':
 
-    git remote add bob https://github.com/cloudera/hue
+    git remote add bob https://github.com/bob/hue
     git fetch bob
-
-Then just:
 
     git push bob HEAD:GH-1000-fix
 
-And create the pull request via the button on the https://github.com/cloudera/hue/tree/GH-1000-fix page.
+And create the pull request to cloudera/hue via the button on the https://github.com/bob/hue/tree/GH-1000-fix page.
 
 **Note**:
-If you have more than one diff, update `HEAD~1..HEAD` accordingly (e.g. `HEAD~2..HEAD`)
+GitHub CLI is recommended for automating even more the process. e.g. for asking reviewers and auto merging when all the checks are green:
 
-In the PR, reference the [GitHub issues](https://github.com/cloudera/hue/issues) if it has one.
+    gh pr create --fill --assignee=romainr --reviewer=agl29,Harshg999
+    gh pr merge --auto -r 2494
 
 ### Update a review
 
@@ -522,11 +521,7 @@ unittest frameworks, or you can just name your method with the word "test" at a 
 
 To run the unit tests (should take 5-10 minutes):
 
-    build/env/bin/hue test fast
-
-To run all the tests (unit and integration), use:
-
-    build/env/bin/hue test all
+    build/env/bin/hue test unit --with-xunit --with-cover
 
 To run only tests of a particular app, use:
 
@@ -549,6 +544,10 @@ e.g.
 To run a specific test in a class, use:
 
     build/env/bin/hue test specific <app><module>:<class><test_func>
+
+To run all the tests (unit and integration, will require some live clusters or services), use:
+
+    build/env/bin/hue test all
 
 Note:
 
@@ -741,7 +740,7 @@ Draft a new release on https://github.com/cloudera/hue/releases.
 
 Publish Github NPM package and Docker images at https://github.com/orgs/cloudera/packages?repo_name=hue.
 
-### Gethue
+### Tarball
 
 Building the tarball release:
 
@@ -778,7 +777,7 @@ Docker images are at https://hub.docker.com/u/gethue/:
     docker push gethue/nginx:4.10.0
 
 
-### Kubernetes / Helm package
+### Kubernetes / Helm
 
 To build the chart, use the package command from the Helm root directory:
 
@@ -795,11 +794,36 @@ Then connect to the server and index the package:
     cd /var/www/helm.gethue.com
     helm repo index .
 
+### Pypi
+
+The Python API and CLI (and soon API) are being transitioned to https://github.com/gethue/compose which host the `compose` and `compose-admin` commands.
+
+How to update the repo https://pypi.org/project/gethue/:
+
+    rm -rf dist && python3 -m build && python3 -m twine upload dist/*
+
+    python3 -m pip install gethue --upgrade
+
+Note:
+
+A Pypi token will be needed. For doing a test release https://test.pypi.org/project/gethue/ is handy:
+
+    python3 -m pip install --upgrade build
+
+    rm -rf dist && python3 -m build && python3 -m twine upload --repository testpypi dist/*
+    python3 -m pip install --index-url https://test.pypi.org/simple/ gethue --upgrade
+
+Read more on [Python packaging](https://packaging.python.org/tutorials/packaging-projects/#generating-distribution-archives).
+
 ### Documentation
 
 Documentation is currently being auto refreshed every morning of the week and run as a container.
 
-The manual process otherwise would be to [build it](#Documentation) and push it to the docs host.
+The manual process otherwise would be to [build it](#documentation-1) and push it to the docs host.
+
+The resources like images go to the CDN:
+
+    scp before_raz_adls.png after_raz_adls.png root@104.248.178.223:/var/www/cdn.gethue.com/uploads/2021/09/
 
 ### NPM registry
 

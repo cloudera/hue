@@ -15,11 +15,11 @@
 // limitations under the License.
 
 import { format } from '@gethue/sql-formatter';
-import { ExecutionStatus } from './execution/executable';
+import { ExecutionStatus } from './execution/sqlExecutable';
 import { CancellablePromise } from 'api/cancellablePromise';
 import { get } from 'api/utils';
 
-const HISTORY_API_URL = '/notebook/api/get_history';
+const HISTORY_API_URL = '/api/editor/get_history';
 
 export const formatSql = async (options: {
   statements: string;

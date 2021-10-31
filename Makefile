@@ -151,7 +151,7 @@ desktop: virtual-env
 	@if [ "$(PYTHON_VER)" = "python2.7" ] && [ "$(findstring apps,$(MAKECMDGOALS))" = "apps" ]; then \
 	  echo "--- start installing PIP_MODULES"; \
 	  $(ENV_PIP) install --upgrade pip; \
-	  $(ENV_PIP) install $(PIP_MODULES); \
+	  $(ENV_PIP) install --upgrade --force-reinstall $(PIP_MODULES); \
 	  echo "--- done installing PIP_MODULES"; \
 	else echo "--- skip installing PIP_MODULES"; \
 	fi

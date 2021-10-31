@@ -22,6 +22,7 @@ import os
 import re
 import sys
 
+from beeswax.conf import HPLSQL
 from desktop.lib.i18n import smart_str
 
 if sys.version_info[0] > 2:
@@ -50,6 +51,22 @@ def get_statements(hql_query):
     })
   return statements
 
+def get_hplsql_statements(hplsql_query):
+  statements = []
+  statements.append(
+    {
+      'start': {
+        'row': 0,
+        'column': 0
+      },
+      'end': {
+        'row': 0,
+        'column': len(hplsql_query) - 1
+      },
+      'statement': strip_trailing_semicolon(hplsql_query.rstrip())
+    })
+  return statements
+
 def get_current_statement(snippet):
   # Multiquery, if not first statement or arrived to the last query
   should_close = False
@@ -57,7 +74,10 @@ def get_current_statement(snippet):
   statement_id = handle.get('statement_id', 0)
   statements_count = handle.get('statements_count', 1)
 
-  statements = get_statements(snippet['statement'])
+  if HPLSQL.get() and snippet['dialect'] == 'hive':
+    statements = get_hplsql_statements(snippet['statement'])
+  else:
+    statements = get_statements(snippet['statement'])
 
   statement_id = min(statement_id, len(statements) - 1) # In case of removal of statements
   previous_statement_hash = compute_statement_hash(statements[statement_id]['statement'])

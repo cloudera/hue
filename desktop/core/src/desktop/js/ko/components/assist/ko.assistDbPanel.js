@@ -34,6 +34,7 @@ import dataCatalog from 'catalog/dataCatalog';
 import { CONFIG_REFRESHED_TOPIC } from 'config/events';
 import {
   filterEditorConnectors,
+  findBrowserConnector,
   findDashboardConnector,
   findEditorConnector
 } from 'config/hueConfig';
@@ -362,9 +363,9 @@ const TEMPLATE =
     <div class="assist-db-header-actions">
       <!-- ko ifnot: loading -->
       <span class="assist-tables-counter">(<span data-bind="text: filteredEntries().length"></span>)</span>
-      <!-- ko if: window.ENABLE_NEW_CREATE_TABLE && (sourceType === 'hive' || sourceType === 'impala') -->
+      <!-- ko if: sourceType !== 'solr' && $component.showImporter() -->
       <!-- ko if: typeof databaseName !== 'undefined' -->
-        <a class="inactive-action" data-bind="hueLink: window.HUE_URLS.IMPORTER_CREATE_TABLE + databaseName + '/?sourceType=' + sourceType + '&namespace=' + assistDbNamespace.namespace.id" title="${I18n(
+        <a class="inactive-action" data-bind="hueLink: importer_url + databaseName + '/?sourceType=' + sourceType + '&namespace=' + assistDbNamespace.namespace.id" title="${I18n(
           'Create table'
         )}" href="javascript:void(0)">
           <i class="pointer fa fa-plus" title="${I18n('Create table')}"></i>
@@ -577,6 +578,7 @@ class AssistDbPanel {
     this.isStreams = options.isStreams;
     this.isSolr = options.isSolr;
     this.nonSqlType = this.isSolr || this.isStreams;
+    this.showImporter = ko.observable(false);
 
     this.sources = ko.observableArray();
     this.sourceIndex = {};
@@ -826,13 +828,14 @@ class AssistDbPanel {
     }
 
     if (this.isStreams) {
-      const connector = findEditorConnector(connector => connector.dialect === 'kafka sql');
+      const connector = findEditorConnector(connector => connector.dialect === 'ksql');
       this.setSingleSource(connector, navigationSettings, true);
       return;
     }
 
     const updateFromConfig = () => {
       const sources = [];
+      this.showImporter(!!findBrowserConnector(connector => connector.type === 'importer'));
       const connectors = filterEditorConnectors(connector => connector.is_sql);
       connectors.forEach(connector => {
         const source =

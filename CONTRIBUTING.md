@@ -1,24 +1,22 @@
 ![alt text](https://raw.githubusercontent.com/cloudera/hue/master/docs/images/hue_logo.png "Hue Logo")
 
 
-The Hue project gladly welcomes [pull requests](https://github.com/cloudera/hue/pulls)!
+The Hue project gladly welcomes [improvements](https://github.com/cloudera/hue/pulls)!
 
-This document contains instructions on how to get involved in Hue improvement.
-
-In any case, feel free to ask here in a [discussion](https://github.com/cloudera/hue/discussions).
+This document contains instructions on how to get involved. In any case, feel free to ask [questions](https://github.com/cloudera/hue/discussions).
 
 # What to improve
 
-Here is some inspiration on which areas we would love to have some contributions:
+Here is some inspiration:
 
-1. Updating a small piece of [documentation](https://docs.gethue.com)
+1. Updating a small piece of [documentation](https://docs.gethue.com). Pick a page and click on "Edit The Page".
 2. High level [Roadmap](/docs/ROADMAP.md)
-3. Check [Github issues](https://github.com/cloudera/hue/issues).
-4. Improving [SQL Components](https://docs.gethue.com/developer/components/), [SQL autocompletes](https://docs.gethue.com/developer/development/#sql-parsers) or [SQL connectors](https://docs.gethue.com/developer/sdk/) are great projects
+3. Check [Github issues](https://github.com/cloudera/hue/issues), especially [Good First Issues](https://github.com/cloudera/hue/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22).
+4. Core areas: improving [SQL Components](https://docs.gethue.com/developer/components/) like Scratchpad and Parsers, [APIs](https://docs.gethue.com/developer/api/), Kubernetes service or [SQL connectors](https://docs.gethue.com/administrator/configuration/connectors/)
 
 # Submitting an improvement
 
-Here is an example of change: [Pull request 842](https://github.com/cloudera/hue/pull/842)
+Here is a good example of [Pull request](https://github.com/cloudera/hue/pull/2470) with code and unit test with mocks.
 
 ## Building
 

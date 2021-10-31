@@ -30,7 +30,7 @@ import * as ko from 'knockout';
 
 import huePubSub from 'utils/huePubSub';
 import sleep from 'utils/timing/sleep';
-import Executable, { ExecutionStatus } from './executable';
+import SqlExecutable, { ExecutionStatus } from './sqlExecutable';
 
 export const RESULT_TYPE = {
   TABLE: 'table'
@@ -96,7 +96,7 @@ export enum ResultType {
 }
 
 export default class ExecutionResult {
-  executable: Executable;
+  executable: SqlExecutable;
   streaming: boolean;
 
   type?: ResultType;
@@ -115,7 +115,7 @@ export default class ExecutionResult {
   isEscaped = false;
   fetchedOnce = false;
 
-  constructor(executable: Executable, streaming?: boolean) {
+  constructor(executable: SqlExecutable, streaming?: boolean) {
     this.executable = executable;
     this.streaming = !!streaming;
   }

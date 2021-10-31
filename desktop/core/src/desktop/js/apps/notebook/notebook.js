@@ -632,7 +632,7 @@ class Notebook {
       self.loadingHistory(true);
 
       $.get(
-        '/notebook/api/get_history',
+        '/api/editor/get_history',
         {
           doc_type: self.selectedSnippet(),
           limit: QUERIES_PER_PAGE,

@@ -27,7 +27,7 @@ import huePubSub from 'utils/huePubSub';
 import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
 import Result from 'apps/notebook/result';
 import Session from 'apps/notebook/session';
-import sqlStatementsParser from 'parse/sqlStatementsParser';
+import { getStatementsParser } from 'parse/utils';
 import { SHOW_EVENT as SHOW_GIST_MODAL_EVENT } from 'ko/components/ko.shareGistModal';
 import { cancelActiveRequest } from 'api/apiUtils';
 import { ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT } from 'apps/editor/events';
@@ -37,7 +37,7 @@ import {
   ASSIST_GET_SOURCE_EVENT,
   ASSIST_SET_SOURCE_EVENT
 } from 'ko/components/assist/events';
-import { POST_FROM_LOCATION_WORKER_EVENT } from 'sql/sqlWorkerHandler';
+import { POST_FROM_LOCATION_WORKER_EVENT } from 'sql/workers/events';
 import {
   ACTIVE_STATEMENT_CHANGED_EVENT,
   CURSOR_POSITION_CHANGED_EVENT,
@@ -1823,7 +1823,9 @@ class Snippet {
         data => {
           try {
             if (self.isSqlDialect() && data && data.handle) {
-              self.lastExecutedStatement(sqlStatementsParser.parse(data.handle.statement)[0]);
+              self.lastExecutedStatement(
+                getStatementsParser(self.connector()).parse(data.handle.statement)[0]
+              );
             } else {
               self.lastExecutedStatement(null);
             }
