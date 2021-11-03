@@ -1,5 +1,5 @@
 {
-  "lexer": "../generic/sql.jisonlex",
+  "lexer": "sql.jisonlex",
   "autocomplete": [
     "../generic/autocomplete_header.jison",
     "../generic/alter/alter_common.jison",
@@ -15,7 +15,6 @@
     "../generic/drop/drop_role.jison",
     "../generic/drop/drop_table.jison",
     "../generic/drop/drop_view.jison",
-    "../generic/insert/insert.jison",
     "../generic/select/cte_select_statement.jison",
     "../generic/select/from_clause.jison",
     "../generic/select/group_by_clause.jison",
@@ -53,6 +52,7 @@
     "../generic/use/use.jison",
     "../generic/sql_error.jison",
     "../generic/sql_main.jison",
+    "upsert/upsert.jison",
     "../calcite/quoted_table_identifier.jison",
     "../generic/sql_valueExpression.jison",
     "../generic/autocomplete_footer.jison"
@@ -72,7 +72,6 @@
     "../generic/drop/drop_role.jison",
     "../generic/drop/drop_table.jison",
     "../generic/drop/drop_view.jison",
-    "../generic/insert/insert.jison",
     "../generic/select/cte_select_statement.jison",
     "../generic/select/from_clause.jison",
     "../generic/select/group_by_clause.jison",
@@ -109,6 +108,7 @@
     "../generic/update/update_table.jison",
     "../generic/use/use.jison",
     "../generic/sql_main.jison",
+    "upsert/upsert.jison",
     "../calcite/quoted_table_identifier.jison",
     "../generic/sql_valueExpression.jison",
     "../generic/syntax_footer.jison"

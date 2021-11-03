@@ -341,13 +341,17 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
           <!-- /ko -->
 
           <!-- ko if: createWizard.source.inputFormat() == 'stream' -->
-            <div class="control-group">
-              <label class="control-label"><div>${ _('List') }</div>
-                <select data-bind="selectize: createWizard.source.publicStreams, value: createWizard.source.streamSelection, optionsText: 'name', optionsValue: 'value'" placeholder="${ _('The list of streams to consume, e.g. SFDC, Jiras...') }"></select>
-              </label>
-            </div>
+            ## <div class="control-group">
+            ##  <label class="control-label"><div>${ _('List') }</div>
+            ##    <select data-bind="selectize: createWizard.source.publicStreams, value: createWizard.source.streamSelection, optionsText: 'name', optionsValue: 'value'" placeholder="${ _('The list of streams to consume, e.g. SFDC, Jiras...') }"></select>
+            ##  </label>
+            ## s</div>
 
             <!-- ko if: createWizard.source.streamSelection() == 'kafka' -->
+              <div data-bind="template: { name: 'kafka-cluster-template', data: $data }" class="margin-top-10 field inline-block"></div>
+
+              <br>
+
               <div data-bind="template: { name: 'kafka-topic-template', data: $data }" class="margin-top-10 field inline-block"></div>
             <!-- /ko -->
 
@@ -781,7 +785,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
           <div class="card-body">
             % if ENABLE_SCALABLE_INDEXER.get():
             <div class="control-group">
-              <label class="checkbox inline-block" title="${ _('Execute a cluster job to index a large dataset.') }" data-bind="visible: $root.createWizard.source.inputFormat() == 'file'">
+              <label class="checkbox inline-block" title="${ _('Execute a cluster job to index a large dataset.') }" data-bind="visible: (['file', 'localfile'].indexOf($root.createWizard.source.inputFormat()) != -1)">
                 <input type="checkbox" data-bind="checked: indexerRunJob">
                   <!-- ko if: outputFormat() == 'index' -->
                     ${_('Index with a job')}
@@ -1137,7 +1141,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
 <script type="text/html" id="table-field-template">
   <div>
     <label data-bind="visible: level() == 0 || ($parent.type() != 'array' && $parent.type() != 'map')">${ _('Name') }&nbsp;
-      <input type="text" class="input-large" placeholder="${ _('Field name') }" required data-bind="textInput: name">
+      <input type="text" class="input-large" placeholder="${ _('Field name') }" required data-bind="textInput: name" pattern="[a-zA-Z0-9_]+$" title="${ _('Only alphanumeric and underscore characters') }">
     </label>
 
     <label class="margin-left-5">${ _('Type') }&nbsp;
@@ -1167,7 +1171,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
 
       <span data-bind="visible: showProperties">
         <input type="text" class="input-medium margin-left-5" placeholder="${ _('Field comment') }" data-bind="value: comment">
-        <label class="checkbox" data-bind="visible: $root.createWizard.destination.tableFormat() == 'kudu'">
+        <label class="checkbox" data-bind="visible: $root.createWizard.destination.tableFormat() == 'kudu' || $root.createWizard.source.inputFormat() == 'localfile'">
           <input type="checkbox" data-bind="checked: keep"> ${_('Keep')}
         </label>
       </span>
@@ -1340,6 +1344,29 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
     </div>
     <!-- /ko -->
   <!-- /ko -->
+</script>
+
+<script type="text/html" id="kafka-cluster-template">
+  <div class="control-group">
+    <label class="control-label"><div>${ _('Clusters') }</div>
+      <select class="input-xxlarge" data-bind="options: createWizard.source.kafkaClusters,
+            value: createWizard.source.kafkaSelectedCluster,
+            optionsCaption: '${ _("Choose...") }'"
+            placeholder="${ _('The list of Kafka cluster to consume topics from') }">
+      </select>
+
+    </label>
+
+    <br/>
+
+    ## <label class="control-group" data-bind="visible: createWizard.source.kafkaSelectedCluster">
+    ##  <label class="control-label"><div>${ _('Username') }</div>
+    ##    <input type="text" class="input-small" data-bind="value: createWizard.source.kafkaSelectedClusterUsername">
+    ##  </label>
+    ##  <label class="control-label"><div>${ _('Password') }</div>
+    ##    <input type="text" class="input-small" data-bind="value: createWizard.source.kafkaSelectedClusterPassword">
+    ##  </label>
+  </div>
 </script>
 
 <script type="text/html" id="kafka-topic-template">
@@ -1747,6 +1774,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
         if (val === 'stream') {
           if (self.streamSelection() === 'kafka') {
             wizard.guessFormat();
+            wizard.destination.outputFormat('table');
             wizard.destination.tableFormat('kudu');
           } else {
             wizard.destination.tableFormat('text');
@@ -1794,7 +1822,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
       });
 
       self.interpreters = ko.pureComputed(function() {
-        return window.getLastKnownConfig().app_config.editor.interpreters;
+        return window.getLastKnownConfig().app_config.editor.interpreters.filter(function (interpreter) { return interpreter.is_sql && interpreter.dialect != 'phoenix' });
       });
       self.interpreter = ko.observable(vm.sourceType);
       self.interpreter.subscribe(function(val) {
@@ -1805,7 +1833,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
         });
         wizard.destination.dialect(dialect[0]['dialect']);
       });
-  
+
       // File
       self.path = ko.observable('');
       self.path.subscribe(function(val) {
@@ -2064,13 +2092,23 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
         }
       });
 
+      self.kafkaClusters = ko.observableArray(['localhost', 'demo.gethue.com']);
+      self.kafkaSelectedCluster = ko.observable();
+      self.kafkaSelectedCluster.subscribe(function(val) {
+        if (val) {
+          wizard.guessFormat();
+        }
+      });
+      self.kafkaSelectedCluster('localhost');
+      self.kafkaSelectedClusterUsername = ko.observable('gethue');
+      self.kafkaSelectedClusterPassword = ko.observable('pwd');
       self.kafkaTopics = ko.observableArray();
       self.kafkaSelectedTopics = ko.observable(''); // Currently designed just for one
       self.kafkaSelectedTopics.subscribe(function(newValue) {
         if (newValue) {
           viewModel.createWizard.guessFieldTypes();
-          self.kafkaFieldNames(hueUtils.hueLocalStorage('pai' + '_kafka_topics_' + newValue + '_kafkaFieldNames'));
-          self.kafkaFieldTypes(hueUtils.hueLocalStorage('pai' + '_kafka_topics_' + newValue + '_kafkaFieldTypes'));
+          //self.kafkaFieldNames(hueUtils.hueLocalStorage('pai' + '_kafka_topics_' + newValue + '_kafkaFieldNames'));
+          //self.kafkaFieldTypes(hueUtils.hueLocalStorage('pai' + '_kafka_topics_' + newValue + '_kafkaFieldTypes'));
         }
       });
       self.kafkaSchemaManual = ko.observable('detect');
@@ -2327,11 +2365,10 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
           }
           if (format.value === 'index' && (
               wizard.source.inputFormat() === 'stream' ||
-              ['file', 'query', 'stream', 'manual'].indexOf(wizard.source.inputFormat()) === -1)) {
+              ['file', 'query', 'stream'].indexOf(wizard.source.inputFormat()) === -1)) {
             return false;
           }
           if (format.value === 'table' &&
-              wizard.source.inputFormat() === 'stream' ||
               (wizard.source.inputFormat() === 'table' || (
                 wizard.source.inputFormat() === 'rdbms' && wizard.source.rdbmsAllTablesSelected()))) {
             return false;
@@ -2346,7 +2383,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
           if (format.value === 'stream-table' && ['stream'].indexOf(wizard.source.inputFormat()) === -1) {
             return false;
           }
-          if (format.value === 'big-table' && ['file'].indexOf(wizard.source.inputFormat()) === -1) {
+          if (format.value === 'big-table' && ['file', 'localfile'].indexOf(wizard.source.inputFormat()) === -1) {
             return false;
           }
           if (format.value === 'hbase' && (wizard.source.inputFormat() !== 'rdbms' || wizard.source.rdbmsAllTablesSelected())) {
@@ -2374,8 +2411,8 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
       self.defaultName = ko.pureComputed(function() {
         var name = '';
 
-        if (wizard.source.inputFormat() === 'file' || wizard.source.inputFormat() === 'stream') {
-          if (self.outputFormat() === 'table') {
+        if (['file', 'stream', 'localfile'].indexOf(wizard.source.inputFormat()) != -1) {
+          if (['table', 'big-table'].indexOf(self.outputFormat()) != -1) {
             name = wizard.prefill.target_path().length > 0 ? wizard.prefill.target_path() : 'default';
 
             if (wizard.source.inputFormat() === 'stream') {
@@ -2385,7 +2422,16 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
                 name += '.' + wizard.source.streamObject();
               }
             } else if (wizard.source.path()) {
-              name += '.' + wizard.source.path().split('/').pop().split('.')[0];
+              const source_path = wizard.source.path();
+              var database_name = name += '.';
+              if (self.outputFormat() === 'big-table' && wizard.prefill.target_path().length === 0) {
+                database_name = '';
+              }
+              if (wizard.source.inputFormat() === 'localfile') {
+                name = database_name + source_path.substring(source_path.lastIndexOf(':') + 1, source_path.lastIndexOf(';')).split('.')[0];
+              } else {
+                name = database_name + source_path.split('/').pop().split('.')[0];
+              }
             }
           } else { // Index
             name = wizard.prefill.target_path().length > 0 ? wizard.prefill.target_path() : wizard.source.path().split('/').pop().split('.')[0];
@@ -2498,7 +2544,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
       self.KUDU_DEFAULT_PARTITION_COLUMN = {columns: [], range_partitions: [self.KUDU_DEFAULT_RANGE_PARTITION_COLUMN], name: 'HASH', int_val: 16};
 
       self.tableFormats = ko.pureComputed(function() {
-        if (wizard.source.inputFormat() === 'kafka') {
+        if (wizard.source.inputFormat() === 'stream') {
           return [{'value': 'kudu', 'name': 'Kudu'}];
         } else if (vm.sourceType == 'impala') { // Impala supports Kudu
           return [
@@ -2803,7 +2849,8 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
               self.source.streamObjects(resp['objects']);
             }
 
-            if (self.source.inputFormat() !== 'stream' && self.source.inputFormat() !== 'connector') {
+            if (self.source.inputFormat() !== 'stream' && self.source.inputFormat() !== 'connector' &&
+                (['localfile', 'file'].indexOf(self.source.inputFormat()) != -1 && self.source.path() != '') ) {
               self.guessFieldTypes();
             }
           }
@@ -2840,7 +2887,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
       };
       self.loadSampleData = function(resp) {
         resp.columns.forEach(function (entry, i, arr) {
-          if (self.destination.outputFormat() === 'table' && self.source.inputFormat() != 'rdbms') {
+          if (['table', 'big-table'].indexOf(self.destination.outputFormat()) != -1 && self.source.inputFormat() != 'rdbms') {
             entry.type = MAPPINGS.get(MAPPINGS.SOLR_TO_HIVE, entry.type, 'string');
           } else if (self.destination.outputFormat() === 'index') {
             entry.type = MAPPINGS.get(MAPPINGS.HIVE_TO_SOLR, entry.type, entry.type);
@@ -3179,29 +3226,29 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
 
       document.getElementById('inputfile').onchange = function () {
         upload();
-        };
-        function upload() {
-          var fd = new FormData();
-          var files = $('#inputfile')[0].files[0];
-          fd.append('inputfile', files);
-          var file_size = files.size;
-          if (file_size > 200000) {
-                $.jHueNotify.warn("${ _('File size exceeds the supported size (200 KB).') }");
-              }
-          else {
-            $.ajax({
-              url:"/indexer/api/indexer/upload_local_file",
-              type: 'post',
-              data: fd,
-              contentType:false,
-              cache: false,
-              processData:false,
-              success:function (response) {
-                viewModel.createWizard.source.path(response['local_file_url']);
-              }
-            });
-          }
-        };
+      };
+
+      function upload() {
+        var fd = new FormData();
+        var files = $('#inputfile')[0].files[0];
+        fd.append('file', files);
+        var file_size = files.size;
+        if (file_size > 200000) {
+          $.jHueNotify.warn("${ _('File size exceeds the supported size (200 KB).') }");
+        } else {
+          $.ajax({
+            url:"/indexer/api/indexer/upload_local_file",
+            type: 'post',
+            data: fd,
+            contentType:false,
+            cache: false,
+            processData:false,
+            success:function (response) {
+              viewModel.createWizard.source.path(response['local_file_url']);
+            }
+          });
+        }
+      };
 
       $('.importer-droppable').droppable({
         accept: ".draggableText",

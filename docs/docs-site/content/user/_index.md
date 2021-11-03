@@ -6,11 +6,11 @@ chapter = false
 pre = "<b>2. </b>"
 +++
 
-This section describes the main functionalities from a end user point of view.
+This section describes the main functionalities from an end user point of view.
 
 Hue consists in a single page interface that allow the users to perform data
-analyses without losing any context. The goal is to promote self service and stay simple like Excel
-so that 80% of the user can find, explore and query data and become more data driven.
+analysis without losing any context. The goal is to promote self service and stay simple like Excel
+so that 80% of the users can find, explore and query data and become more data driven.
 
 Please refer to [connector section](/administrator/configuration/connectors/#databases) for the list of the most popular Database/Data Warehouse supported.
 

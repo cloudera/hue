@@ -33,13 +33,13 @@
   import { defineComponent, PropType, ref, toRefs, watch } from 'vue';
 
   import SubscriptionTracker from 'components/utils/SubscriptionTracker';
-  import Executable, { ExecutionStatus } from '../execution/executable';
+  import SqlExecutable, { ExecutionStatus } from '../execution/sqlExecutable';
 
   export default defineComponent({
     name: 'ExecutableProgressBar',
     props: {
       executable: {
-        type: Object as PropType<Executable>,
+        type: Object as PropType<SqlExecutable>,
         default: undefined
       }
     },
@@ -53,7 +53,7 @@
 
       let hideTimeout = -1;
 
-      const updateFromExecutable = (updated?: Executable) => {
+      const updateFromExecutable = (updated?: SqlExecutable) => {
         window.clearTimeout(hideTimeout);
         progress.value = (updated && updated.progress) || 0;
         status.value = (updated && updated.status) || ExecutionStatus.ready;
@@ -69,7 +69,7 @@
       watch(
         executable,
         newVal => {
-          updateFromExecutable(newVal as Executable);
+          updateFromExecutable(newVal as SqlExecutable);
         },
         { immediate: true }
       );

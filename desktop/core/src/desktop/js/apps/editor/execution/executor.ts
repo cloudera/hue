@@ -17,7 +17,7 @@
 import KnockoutObservable from '@types/knockout';
 
 import Snippet from 'apps/editor/snippet';
-import Executable, { ExecutableRaw } from 'apps/editor/execution/executable';
+import SqlExecutable, { ExecutableRaw } from 'apps/editor/execution/sqlExecutable';
 import { syncSqlExecutables } from 'apps/editor/execution/utils';
 import { StatementDetails } from 'parse/types';
 import { Compute, Connector, Namespace } from 'config/types';
@@ -46,9 +46,9 @@ export default class Executor {
   defaultLimit?: KnockoutObservable<number>;
   isSqlEngine?: boolean;
   isSqlAnalyzerEnabled?: boolean;
-  executables: Executable[] = [];
+  executables: SqlExecutable[] = [];
   snippet?: Snippet;
-  activeExecutable?: Executable;
+  activeExecutable?: SqlExecutable;
   variables: VariableIndex = {};
 
   constructor(options: ExecutorOptions) {
@@ -73,13 +73,13 @@ export default class Executor {
     this.executables.forEach(existingExecutable => existingExecutable.cancelBatchChain());
   }
 
-  setExecutables(executables: Executable[]): void {
+  setExecutables(executables: SqlExecutable[]): void {
     this.cancelAll();
     this.executables = executables;
     this.executables.forEach(executable => executable.notify());
   }
 
-  update(statementDetails: StatementDetails, beforeExecute: boolean): Executable {
+  update(statementDetails: StatementDetails, beforeExecute: boolean): SqlExecutable {
     const executables = syncSqlExecutables(this, statementDetails);
 
     // Cancel any "lost" executables and any batch chain it's part of
@@ -92,7 +92,7 @@ export default class Executor {
     if (beforeExecute) {
       executables.selected.forEach(executable => executable.cancelBatchChain());
 
-      let previous: Executable | undefined;
+      let previous: SqlExecutable | undefined;
       executables.selected.forEach(executable => {
         if (previous) {
           executable.previousExecutable = previous;

@@ -19,13 +19,14 @@
 <template>
   <div class="sql-scratchpad">
     <HueIcons />
-    <Spinner v-if="loading" spin="true" />
+    <Spinner v-if="loading" :spin="true" />
     <div v-if="!loading && executor" class="sql-scratchpad-container">
       <div class="sql-scratchpad-editor">
         <AceEditor
           :id="id"
           :ace-options="aceOptions"
           :executor="executor"
+          :sql-analyzer-provider="sqlAnalyzerRepository"
           :sql-parser-provider="sqlParserProvider"
           :sql-reference-provider="sqlReferenceProvider"
           @active-statement-changed="onActiveStatementChanged"
@@ -37,9 +38,23 @@
       <div class="sql-scratchpad-actions">
         <ExecuteButton :executable="activeExecutable" />
         <ExecuteLimitInput :executable="activeExecutable" />
+        <HueButton
+          :style="{ float: 'right' }"
+          :small="true"
+          @click="
+            () => {
+              logsVisible = !logsVisible;
+            }
+          "
+        >
+          {{ logsVisible ? 'Result' : 'Logs' }}
+        </HueButton>
       </div>
-      <div class="sql-scratchpad-result">
+      <div v-show="!logsVisible" class="sql-scratchpad-result">
         <ResultTable :executable="activeExecutable" />
+      </div>
+      <div v-show="logsVisible" class="sql-scratchpad-logs">
+        <ExecutionAnalysisPanel :executable="activeExecutable" />
       </div>
     </div>
     <div v-else-if="!loading && !executor && errorMessage">
@@ -54,24 +69,34 @@
   import KnockoutObservable from '@types/knockout';
 
   import genericAutocompleteParser from 'parse/sql/generic/genericAutocompleteParser';
-  import genericSyntaxParser from 'parse/sql/generic/genericSyntaxParser';
   import { SqlParserProvider } from 'parse/types';
   import { SqlReferenceProvider } from 'sql/reference/types';
 
   import './SqlScratchpad.scss';
+  import {
+    EXECUTABLE_LOGS_UPDATED_TOPIC,
+    EXECUTABLE_TRANSITIONED_TOPIC,
+    ExecutableLogsUpdatedEvent,
+    ExecutableTransitionedEvent
+  } from '../../execution/events';
+  import ExecutionLogs from '../../execution/executionLogs';
   import AceEditor from '../aceEditor/AceEditor.vue';
   import { ActiveStatementChangedEventDetails } from '../aceEditor/types';
   import ExecutableProgressBar from '../ExecutableProgressBar.vue';
   import ExecuteButton from '../ExecuteButton.vue';
   import ExecuteLimitInput from '../ExecuteLimitInput.vue';
+  import ExecutionAnalysisPanel from '../executionAnalysis/ExecutionAnalysisPanel.vue';
   import ResultTable from '../result/ResultTable.vue';
   import Executor from '../../execution/executor';
-  import SqlExecutable from '../../execution/sqlExecutable';
+  import SqlExecutable, { ExecutionStatus } from '../../execution/sqlExecutable';
   import { login } from 'api/auth';
   import { setBaseUrl } from 'api/utils';
   import contextCatalog from 'catalog/contextCatalog';
+  import sqlAnalyzerRepository from 'catalog/analyzer/sqlAnalyzerRepository';
   import HueIcons from 'components/icons/HueIcons.vue';
+  import HueButton from 'components/HueButton.vue';
   import Spinner from 'components/Spinner.vue';
+  import SubscriptionTracker from 'components/utils/SubscriptionTracker';
   import { findEditorConnector, getConfig } from 'config/hueConfig';
   import { Compute, Connector, Namespace } from 'config/types';
   import UUID from 'utils/string/UUID';
@@ -79,6 +104,8 @@
   export default defineComponent({
     name: 'SqlScratchpad',
     components: {
+      ExecutionAnalysisPanel,
+      HueButton,
       Spinner,
       HueIcons,
       ResultTable,
@@ -111,15 +138,18 @@
     },
     setup(props) {
       const { apiUrl, dialect, username, email, password } = toRefs(props);
+      const subTracker = new SubscriptionTracker();
       const activeExecutable = ref<SqlExecutable>(null);
       const executor = ref<Executor>(null);
       const loading = ref<boolean>(true);
+      const logs = ref<ExecutionLogs>(undefined);
+      const logsVisible = ref<boolean>(false);
       const errorMessage = ref<string>(null);
       const id = UUID();
 
       const sqlParserProvider: SqlParserProvider = {
         getAutocompleteParser: () => Promise.resolve(genericAutocompleteParser),
-        getSyntaxParser: () => Promise.resolve(genericSyntaxParser)
+        getSyntaxParser: () => Promise.reject()
       };
 
       const sqlReferenceProvider: SqlReferenceProvider = {
@@ -149,7 +179,7 @@
               password.value
             );
           } catch (err) {
-            errorMessage.value = 'Login failed!';
+            errorMessage.value = 'Login failed: ' + err;
             console.error(err);
             return;
           }
@@ -191,10 +221,29 @@
         } catch {}
       };
 
+      subTracker.subscribe<ExecutableLogsUpdatedEvent>(
+        EXECUTABLE_LOGS_UPDATED_TOPIC,
+        executionLogs => {
+          if (activeExecutable.value?.id === executionLogs.executable.id) {
+            logs.value = executionLogs;
+          }
+        }
+      );
+
+      subTracker.subscribe<ExecutableTransitionedEvent>(EXECUTABLE_TRANSITIONED_TOPIC, event => {
+        if (
+          event.executable.id === activeExecutable.value?.id &&
+          event.newStatus === ExecutionStatus.failed
+        ) {
+          logsVisible.value = true;
+        }
+      });
+
       const onActiveStatementChanged = (event: ActiveStatementChangedEventDetails) => {
         if (executor.value) {
           executor.value.update(event, false);
           activeExecutable.value = executor.value.activeExecutable as SqlExecutable;
+          logs.value = activeExecutable.value.logs;
         }
       };
 
@@ -214,7 +263,10 @@
         errorMessage,
         executor,
         id,
+        logs,
+        logsVisible,
         onActiveStatementChanged,
+        sqlAnalyzerRepository,
         sqlParserProvider,
         sqlReferenceProvider
       };

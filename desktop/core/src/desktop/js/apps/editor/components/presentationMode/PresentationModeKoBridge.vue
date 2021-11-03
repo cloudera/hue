@@ -34,11 +34,11 @@
 
   import { Variable } from 'apps/editor/components/variableSubstitution/types';
   import { IdentifierLocation } from 'parse/types';
-  import { POST_FROM_LOCATION_WORKER_EVENT } from 'sql/sqlWorkerHandler';
+  import { POST_FROM_LOCATION_WORKER_EVENT } from 'sql/workers/events';
   import { wrap } from 'vue/webComponentWrap';
 
   import PresentationMode from './PresentationMode.vue';
-  import Executable from 'apps/editor/execution/executable';
+  import SqlExecutable from 'apps/editor/execution/sqlExecutable';
   import Executor from 'apps/editor/execution/executor';
   import SubscriptionTracker from 'components/utils/SubscriptionTracker';
 
@@ -92,9 +92,9 @@
       };
     },
     methods: {
-      onBeforeExecute(executable: Executable): void {
+      onBeforeExecute(executable: SqlExecutable): void {
         this.$el.dispatchEvent(
-          new CustomEvent<Executable>('before-execute', { bubbles: true, detail: executable })
+          new CustomEvent<SqlExecutable>('before-execute', { bubbles: true, detail: executable })
         );
       },
       onClose(): void {

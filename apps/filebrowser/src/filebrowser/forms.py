@@ -74,7 +74,9 @@ class PathField(CharField):
 
   def clean(self, value):
     cleaned_path = CharField.clean(self, value)
-    if value.lower().startswith(S3A_ROOT):
+    if not value:
+      value = ''
+    elif value.lower().startswith(S3A_ROOT):
       cleaned_path = s3_normpath(cleaned_path)
     elif value.lower().startswith(ABFS_ROOT):
       cleaned_path = abfs_normpath(cleaned_path)
@@ -129,8 +131,12 @@ class UploadFileForm(forms.Form):
   op = "upload"
   # The "hdfs" prefix in "hdfs_file" triggers the HDFSfileUploadHandler
   hdfs_file = FileField(label=_("File to Upload"))
-  dest = PathField(label=_("Destination Path"), help_text=_("Filename or directory to upload to."))
+  dest = PathField(label=_("Destination Path"), help_text=_("Filename or directory to upload to."), required=False)  # Used actually?
   extract_archive = BooleanField(required=False)
+
+class UploadLocalFileForm(forms.Form):
+  op = "upload"
+  file = FileField(label=_("File to Upload"))
 
 class UploadArchiveForm(forms.Form):
   op = "upload"

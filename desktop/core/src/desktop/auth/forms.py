@@ -207,6 +207,8 @@ class LdapAuthenticationForm(AuthenticationForm):
 
   def authenticate(self):
     request = None
+    if sys.version_info[0] > 2:
+      request = self.request
     username = self.cleaned_data.get('username') or ''
     password = self.cleaned_data.get('password')
     server = self.cleaned_data.get('server')

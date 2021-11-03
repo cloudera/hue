@@ -71,28 +71,27 @@ class RazTokenTest(unittest.TestCase):
 
     with patch('desktop.lib.raz.raz_client.requests.get') as requests_get:
       with patch('desktop.lib.raz.raz_client.socket.gethostbyname') as gethostbyname:
-          requests_get.return_value = Mock(
-            text='{"Token":{"urlString":"https://gethue-test.s3.amazonaws.com/gethue/data/customer.csv?' + \
-                  'AWSAccessKeyId=AKIA23E77ZX2HVY76YGL' + \
-                  '&Signature=3lhK%2BwtQ9Q2u5VDIqb4MEpoY3X4%3D&Expires=1617207304"}}'
-          )
-          gethostbyname.return_value = '128.0.0.1'
-          token = RazToken(raz_url='https://raz.gethue.com:8080', auth_handler=kerb_auth)
+        requests_get.return_value = Mock(
+          text='{"Token":{"urlString":"https://gethue-test.s3.amazonaws.com/gethue/data/customer.csv?' + \
+                'AWSAccessKeyId=AKIA23E77ZX2HVY76YGL' + \
+                '&Signature=3lhK%2BwtQ9Q2u5VDIqb4MEpoY3X4%3D&Expires=1617207304"}}'
+        )
+        gethostbyname.return_value = '128.0.0.1'
+        token = RazToken(raz_url='https://raz.gethue.com:8080', auth_handler=kerb_auth)
+
+        t = token.renew_delegation_token(user=self.username)
+
+        assert_equal(t,
+          'https://gethue-test.s3.amazonaws.com/gethue/data/customer.csv?AWSAccessKeyId=AKIA23E77ZX2HVY76YGL&'
+          'Signature=3lhK%2BwtQ9Q2u5VDIqb4MEpoY3X4%3D&Expires=1617207304'
+        )
+
+        with patch('desktop.lib.raz.raz_client.requests.put') as requests_put:
+          token.init_time += timedelta(hours=9)
 
           t = token.renew_delegation_token(user=self.username)
 
-          assert_equal(
-            'https://gethue-test.s3.amazonaws.com/gethue/data/customer.csv?AWSAccessKeyId=AKIA23E77ZX2HVY76YGL&'
-            'Signature=3lhK%2BwtQ9Q2u5VDIqb4MEpoY3X4%3D&Expires=1617207304',
-            t
-          )
-
-          with patch('desktop.lib.raz.raz_client.requests.put') as requests_put:
-            token.init_time += timedelta(hours=9)
-
-            t = token.renew_delegation_token(user=self.username)
-
-            requests_put.assert_called()
+          requests_put.assert_called()
 
 
 class RazClientTest(unittest.TestCase):
@@ -100,10 +99,191 @@ class RazClientTest(unittest.TestCase):
   def setUp(self):
     self.username = 'gethue'
     self.raz_url = 'https://raz.gethue.com:8080'
-    self.resource_url = 'https://gethue-test.s3.amazonaws.com/gethue/data/customer.csv'
+    self.raz_token = "mock_RAZ_token"
 
-  def test_get_raz_client(self):
+    self.s3_path = 'https://gethue-test.s3.amazonaws.com/gethue/data/customer.csv'
+    self.adls_path = 'https://gethuestorage.dfs.core.windows.net/gethue-container/user/csso_hueuser/customer.csv'
 
+
+  def test_get_raz_client_adls(self):
+    with patch('desktop.lib.raz.raz_client.RazToken') as RazToken:
+      with patch('desktop.lib.raz.raz_client.requests_kerberos.HTTPKerberosAuth') as HTTPKerberosAuth:
+        client = get_raz_client(
+          raz_url=self.raz_url,
+          username=self.username,
+          auth='kerberos',
+          service='adls',
+          service_name='gethue_adls',
+          cluster_name='gethueCluster'
+        )
+
+        assert_true(isinstance(client, RazClient))
+
+        HTTPKerberosAuth.assert_called()
+        assert_equal(client.raz_url, self.raz_url)
+        assert_equal(client.service_name, 'gethue_adls')
+        assert_equal(client.cluster_name, 'gethueCluster')
+
+
+  def test_check_access_adls(self):
+    with patch('desktop.lib.raz.raz_client.requests.post') as requests_post:
+      with patch('desktop.lib.raz.raz_client.uuid.uuid4') as uuid:
+
+        requests_post.return_value = Mock(
+          json=Mock(return_value=
+          {
+            'operResult': {
+              'result': 'ALLOWED',
+              'additionalInfo': {
+                "ADLS_DSAS": "nulltenantIdnullnullbnullALLOWEDnullnull1.05nSlN7t/QiPJ1OFlCruTEPLibFbAhEYYj5wbJuaeQqs="
+                }
+              }
+            }
+          )
+        )
+        uuid.return_value = 'mock_request_id'
+
+        client = RazClient(self.raz_url, self.raz_token, username=self.username, service="adls", service_name="cm_adls", cluster_name="cl1")
+
+        # Read file operation
+        resp = client.check_access(method='GET', url=self.adls_path)
+
+        requests_post.assert_called_with(
+          "https://raz.gethue.com:8080/api/authz/adls/access?delegation=mock_RAZ_token",
+          headers={"Content-Type": "application/json"},
+          json={
+            'requestId': 'mock_request_id', 
+            'serviceType': 'adls', 
+            'serviceName': 'cm_adls', 
+            'user': 'gethue', 
+            'userGroups': [], 
+            'clientIpAddress': '', 
+            'clientType': 'adls', 
+            'clusterName': 'cl1', 
+            'clusterType': '', 
+            'sessionId': '', 
+            'accessTime': '', 
+            'context': {}, 
+            'operation': {
+              'resource': {
+                'storageaccount': 'gethuestorage', 
+                'container': 'gethue-container', 
+                'relativepath': '/user/csso_hueuser/customer.csv'
+              },
+              'action': 'read', 
+              'accessTypes': ['read']
+            }
+          },
+          verify=False
+        )
+        assert_equal(resp['token'], "nulltenantIdnullnullbnullALLOWEDnullnull1.05nSlN7t/QiPJ1OFlCruTEPLibFbAhEYYj5wbJuaeQqs=")
+
+
+  def test_handle_adls_action_types_mapping(self):
+    client = RazClient(self.raz_url, self.raz_token, username=self.username, service="adls", service_name="cm_adls", cluster_name="cl1")
+
+    # List directory
+    method = 'GET'
+    relative_path = '/'
+    url_params = {'directory': 'user%2Fcsso_hueuser', 'resource': 'filesystem', 'recursive': 'false'}
+
+    access_type = client.handle_adls_req_mapping(method, url_params)
+    assert_equal(access_type, 'list')
+
+    # Stats
+    method = 'HEAD'
+    relative_path = '/user/csso_hueuser'
+    url_params = {'action': 'getStatus'}
+
+    access_type = client.handle_adls_req_mapping(method, url_params)
+    assert_equal(access_type, 'get-status')
+
+    # Delete path
+    method = 'DELETE'
+    relative_path = '/user/csso_hueuser/test_dir/customer.csv'
+    url_params = {}
+
+    access_type = client.handle_adls_req_mapping(method, url_params)
+    assert_equal(access_type, 'delete')
+
+    # Delete with recursive as true
+    method = 'DELETE'
+    relative_path = '/user/csso_hueuser/test_dir'
+    url_params = {'recursive': 'true'}
+
+    access_type = client.handle_adls_req_mapping(method, url_params)
+    assert_equal(access_type, 'delete-recursive')
+
+    # Create directory
+    method = 'PUT'
+    relative_path = '/user/csso_hueuser/test_dir'
+    url_params = {'resource': 'directory'}
+
+    access_type = client.handle_adls_req_mapping(method, url_params)
+    assert_equal(access_type, 'create-directory')
+
+    # Create file
+    method = 'PUT'
+    relative_path = '/user/csso_hueuser/customers.csv'
+    url_params = {'resource': 'file'}
+
+    access_type = client.handle_adls_req_mapping(method, url_params)
+    assert_equal(access_type, 'create-file')
+
+    # Append
+    method = 'PATCH'
+    relative_path = '/user/csso_hueuser/customers.csv'
+    url_params = {'action': 'append'}
+
+    access_type = client.handle_adls_req_mapping(method, url_params)
+    assert_equal(access_type, 'write')
+
+    # Flush
+    method = 'PATCH'
+    relative_path = '/user/csso_hueuser/customers.csv'
+    url_params = {'action': 'flush'}
+
+    access_type = client.handle_adls_req_mapping(method, url_params)
+    assert_equal(access_type, 'write')
+
+    # Chmod
+    method = 'PATCH'
+    relative_path = '/user/csso_hueuser/customers.csv'
+    url_params = {'action': 'setAccessControl'}
+
+    access_type = client.handle_adls_req_mapping(method, url_params)
+    assert_equal(access_type, 'set-permission')
+
+
+  def test_handle_relative_path(self):
+    client = RazClient(self.raz_url, self.raz_token, username=self.username, service="adls", service_name="cm_adls", cluster_name="cl1")
+
+    # No relative path condition
+    method = 'GET'
+    resource_path = ['gethue-container']
+    url_params = {}
+
+    relative_path = client._handle_relative_path(method, url_params, resource_path, "/")
+    assert_equal(relative_path, "/")
+
+    # When relative path present in URL
+    method = 'GET'
+    resource_path = ['gethue-container', 'user/csso_hueuser/customer.csv']
+    url_params = {}
+
+    relative_path = client._handle_relative_path(method, url_params, resource_path, "/")
+    assert_equal(relative_path, "/user/csso_hueuser/customer.csv")
+
+    # When list operation
+    method = 'GET'
+    resource_path = ['gethue-container']
+    url_params = {'directory': 'user%2Fcsso_hueuser', 'resource': 'filesystem', 'recursive': 'false'}
+
+    relative_path = client._handle_relative_path(method, url_params, resource_path, "/")
+    assert_equal(relative_path, "/user/csso_hueuser")
+
+
+  def test_get_raz_client_s3(self):
     with patch('desktop.lib.raz.raz_client.RazToken') as RazToken:
       with patch('desktop.lib.raz.raz_client.requests_kerberos.HTTPKerberosAuth') as HTTPKerberosAuth:
         client = get_raz_client(
@@ -118,55 +298,68 @@ class RazClientTest(unittest.TestCase):
         assert_true(isinstance(client, RazClient))
 
         HTTPKerberosAuth.assert_called()
-        assert_equal(
-          client.raz_url, self.raz_url
-        )
-        assert_equal(
-          client.service_name, 'gethue_s3'
-        )
-        assert_equal(
-          client.cluster_name, 'gethueCluster'
-        )
+        assert_equal(client.raz_url, self.raz_url)
+        assert_equal(client.service_name, 'gethue_s3')
+        assert_equal(client.cluster_name, 'gethueCluster')
 
 
-  def test_check_access(self):
-    raz_token = Mock()
-
-    client = RazClient(self.raz_url, raz_token, username=self.username)
-
+  def test_check_access_s3(self):
     with patch('desktop.lib.raz.raz_client.requests.post') as requests_post:
       with patch('desktop.lib.raz.raz_client.raz_signer.SignResponseProto') as SignResponseProto:
         with patch('desktop.lib.raz.raz_client.base64.b64decode') as b64decode:
-          requests_post.return_value = Mock(
-            json=Mock(return_value=
-              {
-                'operResult': {
-                  'result': 'ALLOWED',
-                  'additionalInfo': {
-                      'S3_SIGN_RESPONSE': 'My signed URL'
+          with patch('desktop.lib.raz.raz_client.uuid.uuid4') as uuid:
+
+            requests_post.return_value = Mock(
+              json=Mock(return_value=
+                {
+                  'operResult': {
+                    'result': 'ALLOWED',
+                    'additionalInfo': {
+                        'S3_SIGN_RESPONSE': 'My signed URL'
+                    }
                   }
                 }
-              }
-            )
-          )
-          b64decode.return_value = 'https://gethue-test.s3.amazonaws.com/gethue/data/customer.csv?AWSAccessKeyId=AKIA23E77ZX2HVY76YGL&' \
-              'Signature=3lhK%2BwtQ9Q2u5VDIqb4MEpoY3X4%3D&Expires=1617207304'
-
-          SignResponseProto.return_value = Mock(
-            FromString=Mock(
-              return_value=Mock(
-                signer_generated_headers=[
-                  Mock(key='AWSAccessKeyId', value='AKIA23E77ZX2HVY76YGL')
-                ]
               )
             )
-          )
+            b64decode.return_value = 'https://gethue-test.s3.amazonaws.com/gethue/data/customer.csv?AWSAccessKeyId=AKIA23E77ZX2HVY76YGL&' \
+                'Signature=3lhK%2BwtQ9Q2u5VDIqb4MEpoY3X4%3D&Expires=1617207304'
 
-          resp = client.check_access(method='GET', url=self.resource_url)
+            SignResponseProto.return_value = Mock(
+              FromString=Mock(
+                return_value=Mock(
+                  signer_generated_headers=[
+                    Mock(key='AWSAccessKeyId', value='AKIA23E77ZX2HVY76YGL')
+                  ]
+                )
+              )
+            )
+            uuid.return_value = 'mock_request_id'
 
-          assert_true(
-            resp
-          )
-          assert_equal(
-            resp['AWSAccessKeyId'], 'AKIA23E77ZX2HVY76YGL'
-          )
+            client = RazClient(self.raz_url, self.raz_token, username=self.username)
+
+            resp = client.check_access(method='GET', url=self.s3_path)
+
+            requests_post.assert_called_with(
+              'https://raz.gethue.com:8080/api/authz/s3/access?delegation=mock_RAZ_token', 
+              headers={'Content-Type': 'application/json', 'Accept-Encoding': 'gzip,deflate'}, 
+              json={
+                'requestId': 'mock_request_id',
+                'serviceType': 's3',
+                'serviceName': 'cm_s3',
+                'user': 'gethue',
+                'userGroups': [],
+                'clientIpAddress': '',
+                'clientType': '',
+                'clusterName': 'myCluster',
+                'clusterType': '',
+                'sessionId': '',
+                'accessTime': '',
+                'context': {
+                  'S3_SIGN_REQUEST': b'CiRodHRwczovL2dldGh1ZS10ZXN0LnMzLmFtYXpvbmF3cy5jb20Q' \
+                    b'ATIYZ2V0aHVlL2RhdGEvY3VzdG9tZXIuY3N2OABCAnMzSgJzMw=='
+                }
+              },
+              verify=False
+            )
+            assert_true(resp)
+            assert_equal(resp['AWSAccessKeyId'], 'AKIA23E77ZX2HVY76YGL')

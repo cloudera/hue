@@ -18,6 +18,11 @@ import { Ace } from 'ext/ace';
 import ace from 'ext/aceHelper';
 import KnockoutObservable from '@types/knockout';
 
+import {
+  SQL_SYNTAX_DROPDOWN_HIDE_TOPIC,
+  SQL_SYNTAX_DROPDOWN_SHOW_TOPIC,
+  SqlSyntaxDropdownShowEvent
+} from './events';
 import { ActiveStatementChangedEventDetails } from './types';
 import Executor from 'apps/editor/execution/executor';
 import DataCatalogEntry, { TableSourceMeta } from 'catalog/DataCatalogEntry';
@@ -35,7 +40,8 @@ import { EditorInterpreter } from 'config/types';
 import { hueWindow } from 'types/types';
 import huePubSub, { HueSubscription } from 'utils/huePubSub';
 import I18n from 'utils/i18n';
-import sqlStatementsParser, { ParsedSqlStatement } from 'parse/sqlStatementsParser';
+import { ParsedSqlStatement } from 'parse/sqlStatementsParser';
+import { getStatementsParser } from 'parse/utils';
 import sqlUtils from 'sql/sqlUtils';
 import stringDistance from 'sql/stringDistance';
 import {
@@ -43,7 +49,7 @@ import {
   POST_FROM_SYNTAX_WORKER_EVENT,
   POST_TO_LOCATION_WORKER_EVENT,
   POST_TO_SYNTAX_WORKER_EVENT
-} from 'sql/sqlWorkerHandler';
+} from 'sql/workers/events';
 import { getFromLocalStorage } from 'utils/storageUtils';
 import { SqlReferenceProvider } from 'sql/reference/types';
 
@@ -61,7 +67,7 @@ const VERIFY_LIMIT = 50;
 const VERIFY_DELAY = 50;
 
 const EXPAND_STAR_LABEL = I18n('Right-click to expand with columns');
-const CONTEXT_TOOLTIP_LABEL = I18n('Right-click to expand with columns');
+const CONTEXT_TOOLTIP_LABEL = I18n('Right-click for details');
 
 const isPointInside = (parseLocation: ParsedLocation, editorPosition: Ace.Position) => {
   const row = editorPosition.row + 1; // ace positioning has 0 based rows while the parser has 1
@@ -97,10 +103,13 @@ const equalPositions = (editorPositionOne: Ace.Position, editorPositionTwo: Ace.
   editorPositionOne.row === editorPositionTwo.row &&
   editorPositionOne.column === editorPositionTwo.column;
 
+export type ActiveLocationHighlighting = 'error' | 'all';
+
 export default class AceLocationHandler implements Disposable {
   editor: Ace.Editor;
   editorId: string;
   executor: Executor;
+  activeLocationHighlighting: ActiveLocationHighlighting;
   temporaryOnly: boolean;
 
   subTracker: SubscriptionTracker = new SubscriptionTracker();
@@ -122,12 +131,14 @@ export default class AceLocationHandler implements Disposable {
     editor: Ace.Editor;
     editorId: string;
     executor: Executor;
+    activeLocationHighlighting?: ActiveLocationHighlighting;
     temporaryOnly?: boolean;
     sqlReferenceProvider?: SqlReferenceProvider;
   }) {
     this.editor = options.editor;
     this.editorId = options.editorId;
     this.executor = options.executor;
+    this.activeLocationHighlighting = options.activeLocationHighlighting || 'all';
     this.temporaryOnly = !!options.temporaryOnly;
     this.sqlReferenceProvider = options.sqlReferenceProvider;
 
@@ -246,6 +257,7 @@ export default class AceLocationHandler implements Disposable {
         if (endTestPosition.column !== pointerPosition.column) {
           const token = this.editor.session.getTokenAt(pointerPosition.row, pointerPosition.column);
           if (
+            this.activeLocationHighlighting === 'all' &&
             token !== null &&
             !token.notFound &&
             token.parseLocation &&
@@ -370,6 +382,7 @@ export default class AceLocationHandler implements Disposable {
           if (lastHoveredToken !== token) {
             clearActiveMarkers();
             if (
+              this.activeLocationHighlighting === 'all' &&
               token !== null &&
               !token.notFound &&
               token.parseLocation &&
@@ -417,7 +430,7 @@ export default class AceLocationHandler implements Disposable {
     const onContextMenu = (e: { clientX: number; clientY: number; preventDefault: () => void }) => {
       const selectionRange = this.editor.selection.getRange();
       huePubSub.publish('context.popover.hide');
-      huePubSub.publish('sql.syntax.dropdown.hide');
+      huePubSub.publish(SQL_SYNTAX_DROPDOWN_HIDE_TOPIC);
       if (selectionRange.isEmpty()) {
         const pointerPosition = this.editor.renderer.screenToTextCoordinates(
           e.clientX + 5,
@@ -434,7 +447,10 @@ export default class AceLocationHandler implements Disposable {
         ) {
           let range: Ace.Range | undefined = undefined;
 
-          if (token.parseLocation) {
+          if (
+            token.parseLocation &&
+            (this.activeLocationHighlighting === 'all' || token.notFound)
+          ) {
             range = markLocation(token.parseLocation);
           } else if (token.syntaxError) {
             range = new AceRange(
@@ -514,7 +530,7 @@ export default class AceLocationHandler implements Disposable {
               });
             }
           } else if (token.syntaxError) {
-            huePubSub.publish('sql.syntax.dropdown.show', {
+            huePubSub.publish<SqlSyntaxDropdownShowEvent>(SQL_SYNTAX_DROPDOWN_SHOW_TOPIC, {
               editorId: this.editorId,
               data: token.syntaxError,
               editor: this.editor,
@@ -723,7 +739,9 @@ export default class AceLocationHandler implements Disposable {
     if (this.isSqlDialect()) {
       try {
         const lastChangeTime = this.editor.lastChangeTime;
-        this.lastKnownStatements.statements = sqlStatementsParser.parse(this.editor.getValue());
+        this.lastKnownStatements.statements = getStatementsParser(this.executor.connector()).parse(
+          this.editor.getValue()
+        );
         this.lastKnownStatements.editorChangeTime = lastChangeTime;
 
         const hueDebug = (<hueWindow>window).hueDebug;

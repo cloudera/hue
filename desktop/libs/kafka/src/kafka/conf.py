@@ -46,15 +46,20 @@ KAFKA = ConfigSection(
       type=coerce_bool,
       default=False
     ),
-    # Deprecated
     API_URL=Config(
       key='api_url',
-      help=_t('Base URL of Kafka REST API.'),
+      help=_t('URL of Kafka REST API.'),
       default=None
     ),
     KSQL_API_URL=Config(
       key='ksql_api_url',
-      help=_t('Base URL of ksqlDB API.'),
-      default='http://127.0.0.1:8088'),
+      help=_t('URL of ksqlDB API.'),
+      default='http://localhost:8088'
+    ),
+    SCHEMA_REGISTRY_API_URL=Config(
+      key='schema_registry_api_url',
+      help=_t('URL of Schema Registry API.'),
+      default='http://localhost:8081'
+    ),
   )
 )

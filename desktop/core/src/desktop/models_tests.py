@@ -31,13 +31,15 @@ from beeswax.design import hql_query
 from notebook.models import import_saved_beeswax_query
 from useradmin.models import get_default_user_group, User
 
-from desktop.conf import has_connectors
+from filebrowser.conf import REMOTE_STORAGE_HOME
+
+from desktop.conf import has_connectors, RAZ
 from desktop.converters import DocumentConverter
 from desktop.lib.connectors.models import Connector
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.fs import ProxyFS
 from desktop.lib.test_utils import grant_access
-from desktop.models import Directory, Document2, Document, Document2Permission, ClusterConfig
+from desktop.models import Directory, Document2, Document, Document2Permission, ClusterConfig, get_remote_home_storage
 
 try:
   from oozie.models2 import Workflow
@@ -62,6 +64,9 @@ class TestClusterConfig(object):
     self.client = make_logged_in_client(username="test", groupname="test", recreate=True, is_superuser=False)
     self.user = User.objects.get(username="test")
 
+    self.client_not_me = make_logged_in_client(username="test_not_me", groupname="test_not_me", recreate=True, is_superuser=False)
+    self.user_not_me = User.objects.get(username="test_not_me")
+
   def test_get_fs(self):
     if not has_connectors():
       raise SkipTest
@@ -81,6 +86,56 @@ class TestClusterConfig(object):
       main_app = ClusterConfig(user=self.user, apps=apps).get_main_quick_action(apps=apps)
 
       assert_true({'type': 1, 'name': 'SQL'}, main_app)
+
+
+  def test_get_remote_storage_home(self):
+    # When default home ends with /user in RAZ ADLS env.
+    resets = [
+      RAZ.IS_ENABLED.set_for_testing(True),
+      REMOTE_STORAGE_HOME.set_for_testing('abfs://gethue-container/user')
+    ]
+
+    try:
+      remote_home_storage = get_remote_home_storage(self.user)
+      assert_equal(remote_home_storage, 'abfs://gethue-container/user/test')
+
+      remote_home_storage = get_remote_home_storage(self.user_not_me)
+      assert_equal(remote_home_storage, 'abfs://gethue-container/user/test_not_me')
+    finally:
+      for reset in resets:
+        reset()
+
+    # When default home ends with /user in RAZ S3 env.
+    resets = [
+      RAZ.IS_ENABLED.set_for_testing(True),
+      REMOTE_STORAGE_HOME.set_for_testing('s3a://gethue-bucket/user')
+    ]
+
+    try:
+      remote_home_storage = get_remote_home_storage(self.user)
+      assert_equal(remote_home_storage, 's3a://gethue-bucket/user/test')
+
+      remote_home_storage = get_remote_home_storage(self.user_not_me)
+      assert_equal(remote_home_storage, 's3a://gethue-bucket/user/test_not_me')
+    finally:
+      for reset in resets:
+        reset()
+
+    # When default home does not ends with /user in RAZ env
+    resets = [
+      RAZ.IS_ENABLED.set_for_testing(True),
+      REMOTE_STORAGE_HOME.set_for_testing('abfs://gethue-container')
+    ]
+
+    try:
+      remote_home_storage = get_remote_home_storage(self.user)
+      assert_equal(remote_home_storage, 'abfs://gethue-container')
+
+      remote_home_storage = get_remote_home_storage(self.user_not_me)
+      assert_equal(remote_home_storage, 'abfs://gethue-container')
+    finally:
+      for reset in resets:
+        reset()
 
 
 class TestDocument2(object):

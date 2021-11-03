@@ -66,8 +66,6 @@ def jobs(request, interface=None):
   filters = dict([(key, value) for _filter in json.loads(
       request.POST.get('filters', '[]')) for key, value in list(_filter.items()) if value
   ])
-  if interface == 'queries-hive':
-    filters = json.loads(request.body)
 
   jobs = get_api(request.user, interface, cluster=cluster).apps(filters)
 
@@ -75,10 +73,7 @@ def jobs(request, interface=None):
   response['total'] = jobs.get('total')
   response['status'] = 0
 
-  if interface == 'queries-hive':
-    return JsonResponse(response['apps'])
-  else:
-    return JsonResponse(response)
+  return JsonResponse(response)
 
 
 @api_error_handler
@@ -87,10 +82,7 @@ def job(request, interface=None):
 
   cluster = json.loads(request.POST.get('cluster', '{}'))
   interface = interface or json.loads(request.POST.get('interface'))
-  if interface == 'queries-hive':
-    app_id = json.loads(request.body)['queryId']
-  else:
-    app_id = json.loads(request.POST.get('app_id'))
+  app_id = json.loads(request.POST.get('app_id'))
 
   if interface == 'schedules':
     offset = json.loads(request.POST.get('pagination', '{"offset": 1}')).get('offset')
@@ -104,10 +96,7 @@ def job(request, interface=None):
     response['app'] = response_app
     response['status'] = 0
 
-  if interface == 'queries-hive':
-    return JsonResponse(response['app'])
-  else:
-    return JsonResponse(response)
+  return JsonResponse(response)
 
 
 @api_error_handler

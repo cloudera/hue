@@ -6,7 +6,12 @@ exports[`DateRangePicker.vue should render 1`] = `
   inline="false"
 >
   <hue-button-stub
+    alert="false"
+    borderless="false"
     disabled="false"
+    large="false"
+    primary="false"
+    small="false"
   />
   <div
     class="hue-dropdown-drawer"

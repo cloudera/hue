@@ -17,7 +17,7 @@
 import { EXECUTABLE_UPDATED_TOPIC, ExecutableUpdatedEvent } from 'apps/editor/execution/events';
 import { nextTick } from 'vue';
 import { shallowMount, mount } from '@vue/test-utils';
-import Executable, { ExecutionStatus } from 'apps/editor/execution/executable';
+import SqlExecutable, { ExecutionStatus } from 'apps/editor/execution/sqlExecutable';
 import ExecutableProgressBar from './ExecutableProgressBar.vue';
 import huePubSub from 'utils/huePubSub';
 
@@ -36,7 +36,7 @@ describe('ExecutableProgressBar.vue', () => {
 
     const { element } = mount(ExecutableProgressBar, {
       propsData: {
-        executable: <Executable>mockExecutable
+        executable: <SqlExecutable>mockExecutable
       }
     });
 
@@ -49,7 +49,7 @@ describe('ExecutableProgressBar.vue', () => {
     mockExecutable.progress = 10;
     huePubSub.publish<ExecutableUpdatedEvent>(
       EXECUTABLE_UPDATED_TOPIC,
-      mockExecutable as Executable
+      mockExecutable as SqlExecutable
     );
     await nextTick();
 
@@ -65,7 +65,7 @@ describe('ExecutableProgressBar.vue', () => {
 
     const { element } = mount(ExecutableProgressBar, {
       propsData: {
-        executable: <Executable>mockExecutable
+        executable: <SqlExecutable>mockExecutable
       }
     });
 
@@ -78,7 +78,7 @@ describe('ExecutableProgressBar.vue', () => {
     mockExecutable.progress = 10;
     huePubSub.publish<ExecutableUpdatedEvent>(
       EXECUTABLE_UPDATED_TOPIC,
-      mockExecutable as Executable
+      mockExecutable as SqlExecutable
     );
     await nextTick();
 

@@ -32,6 +32,7 @@ from desktop.models import Document2
 from libsentry.privilege_checker import MissingSentryPrivilegeException
 from notebook.api import _get_statement
 from notebook.models import Notebook
+from notebook.sql_utils import get_current_statement
 
 from metadata.optimizer.base import get_api
 from metadata.optimizer.optimizer_client import NavOptException, _get_table_name, _clean_query
@@ -197,9 +198,18 @@ def query_risk(request):
 
   interface = request.POST.get('interface', OPTIMIZER.INTERFACE.get())
   connector = json.loads(request.POST.get('connector', '{}'))
-  query = json.loads(request.POST.get('query'))
-  source_platform = request.POST.get('sourcePlatform')
-  db_name = request.POST.get('dbName')
+  if request.POST.get('query'):
+    # Via API
+    query = json.loads(request.POST.get('query'))
+    source_platform = request.POST.get('sourcePlatform')
+    db_name = request.POST.get('dbName')
+  else:
+    # Via Editor
+    snippet = json.loads(request.POST.get('snippet'))
+    should_close, resp = get_current_statement(snippet)
+    query = resp['statement']
+    source_platform = snippet['connector']['dialect']
+    db_name = snippet['database']
 
   api = get_api(request.user, interface)
 

@@ -18,7 +18,7 @@
 
 <template>
   <li>
-    <button @click="$emit('click')"><slot /></button>
+    <button @click.stop="$emit('click')"><slot /></button>
   </li>
 </template>
 

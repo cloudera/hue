@@ -1,6 +1,6 @@
 {
   "name": "gethue",
-  "version": "4.10.0",
+  "version": "4.10.11",
   "description": "Hue is an Open source SQL Query Editor for Databases/Warehouses",
   "keywords": [
     "Query Editor",
@@ -65,7 +65,7 @@
     "selectize": "0.12.6",
     "selectize-plugin-clear": "0.0.3",
     "sprintf-js": "1.1.2",
-    "vue": "3.0.11",
+    "vue": "3.2.0",
     "vue-custom-element": "3.2.14",
     "vue3-datepicker": "^0.2.4"
   },
@@ -89,7 +89,7 @@
     "@types/webpack": "5.28.0",
     "@typescript-eslint/eslint-plugin": "4.25.0",
     "@typescript-eslint/parser": "4.25.0",
-    "@vue/compiler-sfc": "3.0.11",
+    "@vue/compiler-sfc": "3.2.0",
     "@vue/test-utils": "^2.0.0-rc.1",
     "babel-eslint": "10.1.0",
     "babel-jest": "26.6.3",
@@ -132,7 +132,7 @@
     "util": "0.12.4",
     "vti": "0.0.24",
     "vue-jest": "5.0.0-alpha.10",
-    "vue-loader": "16.2.0",
+    "vue-loader": "16.5.0",
     "webpack": "5.38.1",
     "webpack-bundle-analyzer": "4.4.2",
     "webpack-bundle-tracker": "1.0.0",

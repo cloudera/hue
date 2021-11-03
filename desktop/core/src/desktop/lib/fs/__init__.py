@@ -21,14 +21,14 @@ standard_library.install_aliases()
 from builtins import filter
 import posixpath
 import sys
-import urllib.parse
 
-from desktop.lib.fs.proxyfs import ProxyFS
+from desktop.lib.fs.proxyfs import ProxyFS  # Imported later from this module
 
 if sys.version_info[0] > 2:
   from urllib.parse import urlparse as lib_urlparse
 else:
   from urlparse import urlparse as lib_urlparse
+
 
 def splitpath(path):
   split = lib_urlparse(path)
@@ -42,7 +42,3 @@ def splitpath(path):
     parts = ['/'] + posixpath.normpath(path).split('/')
   # Filter empty parts out
   return list(filter(len, parts))
-
-
-
-

@@ -55,9 +55,8 @@ import I18n from 'utils/i18n';
 import MultiLineEllipsisHandler from 'utils/multiLineEllipsisHandler';
 
 import sqlUtils from 'sql/sqlUtils';
-import sqlWorkerHandler from 'sql/sqlWorkerHandler';
 
-import 'components/icons/HueIconsWebComponent';
+import 'webComponents/HueIcons';
 import 'components/sidebar/HueSidebarWebComponent';
 import 'components/assist/AssistPanelWebComponent';
 
@@ -71,6 +70,7 @@ import NotebookViewModel from 'apps/notebook/NotebookViewModel'; // In history, 
 import HdfsAutocompleter from 'utils/hdfsAutocompleter';
 import SqlAutocompleter from 'sql/sqlAutocompleter';
 import sqlStatementsParser from 'parse/sqlStatementsParser'; // In search.ko and notebook.ko
+import hplsqlStatementsParser from 'parse/hplsqlStatementsParser';
 import HueFileEntry from 'doc/hueFileEntry';
 import HueDocument from 'doc/hueDocument';
 import { getLastKnownConfig, refreshConfig } from 'config/hueConfig';
@@ -112,8 +112,8 @@ window.qq = qq;
 window.sprintf = sprintf;
 window.SqlAutocompleter = SqlAutocompleter;
 window.sqlStatementsParser = sqlStatementsParser;
+window.hplsqlStatementsParser = hplsqlStatementsParser;
 window.sqlUtils = sqlUtils;
-window.sqlWorkerHandler = sqlWorkerHandler;
 
 $(document).ready(async () => {
   await refreshConfig(); // Make sure we have config up front

@@ -2,48 +2,12 @@
 title: "Python"
 date: 2019-03-13T18:28:09-07:00
 draft: false
-weight: 2
+weight: 3
 ---
 
-Here is some overview about using the Python commands an shell and some examples below:
-
-* [Hue API: Execute some builtin or shell commands](http://gethue.com/hue-api-execute-some-builtin-commands/).
-* [How to manage the Hue database with the shell](http://gethue.com/how-to-manage-the-hue-database-with-the-shell/).
-
-## Users
-
-### Making a user admin
-
-Via the Hue shell:
+Leverage the built-in Python shell to interact with the server and the API.
 
     build/env/bin/hue shell
-
-Then type something similar to:
-
-    from django.contrib.auth.models import User
-
-    a = User.objects.get(username='hdfs')
-    a.is_staff = True
-    a.is_superuser = True
-    a.set_password('my_secret')
-    a.save()
-
-### Changing user password
-
-In the Hue shell:
-
-    from django.contrib.auth.models import User
-
-    user = User.objects.get(username='example')
-    user.set_password('some password')
-    user.save()
-
-
-### Counting user documents
-
-On the command line:
-
-    ./build/env/bin/hue shell
 
 If using Cloudera Manager, as a *root* user launch the shell.
 
@@ -69,16 +33,138 @@ And finally launch the shell by:
     > ALERT: HUE_CONF_DIR must be set when running hue commands in CM Managed environment
     > ALERT: Please run 'hue <command> --cm-managed'
 
-Then use the Python code to access a certain user information:
 
-    Python 2.7.6 (default, Oct 26 2016, 20:30:19)
-    Type "copyright", "credits" or "license" for more information.
+## Query
 
-    IPython 5.2.0 -- An enhanced Interactive Python.
-    ?         -> Introduction and overview of IPython's features.
-    %quickref -> Quick reference.
-    help      -> Python's own help system.
-    object?   -> Details about 'object', use 'object??' for extra details.
+Requires a user object:
+
+    from notebook.models import make_notebook, MockRequest
+
+    job = make_notebook(
+        name='List tables in Salesforce database',
+        editor_type='hive',
+        statement='SHOW TABLES',
+        status='ready',
+        database='sfdc',
+        on_success_url='assist.db.refresh'
+    )
+
+    request = MockRequest(user=user)
+    job.execute_and_wait(request)
+
+## Storage
+
+### S3
+
+Interact directly with S3 by first getting the client:
+
+    from desktop.lib.fsmanager import get_client
+
+    s3fs = get_client('default', 's3a', 'csso_hueuser')
+
+Then grab the key:
+
+    k = s3fs._get_key('s3a://gethue/')
+    k.exists()
+    s3fs.stats('s3a://gethue/user/gethue/footravel.csv').to_json_dict()
+
+Or perform various FS operations:
+
+    b = s3fs._get_bucket('gethue')
+    list(b.list(prefix='user/gethue/'))
+
+    new_k = b.new_key('user/gethue/data/3')
+    new_k.set_contents_from_string('123')
+
+    # new_k.delete()
+    result = new_k.bucket.delete_keys(new_k)
+
+    k = s3fs._get_key('s3a://gethue/user/gethue')
+
+    s3fs.listdir_stats('s3a://gethue/user/gethue')
+    s3fs.mkdir('s3a://gethue/user/gethue/demo')
+
+### ADLS
+
+
+Interact directly with ADLS by first getting the client:
+
+    from desktop.lib.fsmanager import get_client
+
+    fs = get_client('default', 'abfs', 'csso_hueuser')
+
+Perform various FS operations:
+
+    # Stats
+    fs.stats('abfs://data/user/csso_hueuser/demo_dir')
+
+    # List directory
+    fs.listdir('abfs://data/user/csso_hueuser/demo_dir')
+
+    # Create directory
+    fs.mkdir('abfs://data/user/csso_hueuser/new_dir')
+
+    # Create file
+    fs.create('abfs://data/user/csso_hueuser/demo_dir/newfile.txt')
+
+    # Create file with write data
+    fs.create('abfs://data/user/csso_hueuser/demo_dir/demo_file.txt', data='Hello world!')
+
+    # Read
+    fs.read('abfs://data/user/csso_hueuser/demo_dir/demo_file.txt')
+
+    # Delete path (can be file or empty directory)
+    fs.remove('abfs://data/user/csso_hueuser/demo_dir/demo_file.txt')
+
+    # Delete directory with recursive as true
+    fs.rmtree('abfs://data/user/csso_hueuser/demo_dir')
+
+    # Chmod (accepts both octal number and string)
+    fs.chmod('abfs://data/user/csso_hueuser/demo_dir/demo_file.txt', permissionNumber='777')
+
+    # Rename path
+    fs.rename('abfs://data/user/csso_hueuser/old_name_dir', 'abfs://data/user/csso_hueuser/new_name_dir')
+
+    # Copy (for both file and directory)
+    fs.copy('abfs://data/user/csso_hueuser/source_path', 'abfs://data/user/csso_hueuser/destination_path')
+
+## Users
+
+### Create
+
+    from desktop.auth.backend import create_user
+
+    bob = create_user(username='bob', password='secret1', is_superuser=True)
+    alice = create_user(username='alice', password='secret2', is_superuser=False)
+
+### Find or Create
+
+    from desktop.auth.backend import find_or_create_user
+
+    bob = find_or_create_user(username='bob', password='secret1', is_superuser=True)
+    alice = find_or_create_user(username='alice', password='secret2', is_superuser=False)
+
+### Convert to admin
+
+Then type something similar to:
+
+    from django.contrib.auth.models import User
+
+    a = User.objects.get(username='hdfs')
+    a.is_staff = True
+    a.is_superuser = True
+    a.set_password('my_secret')
+    a.save()
+
+### Changing password
+
+    from django.contrib.auth.models import User
+
+    user = User.objects.get(username='example')
+    user.set_password('some password')
+    user.save()
+
+### Counting documents
 
     from django.contrib.auth.models import User
     from desktop.models import Document2

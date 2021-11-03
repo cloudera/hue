@@ -25,7 +25,7 @@ export const HDFS_API_PREFIX = '/filebrowser/view=' + encodeURIComponent('/');
 export const ADLS_API_PREFIX = '/filebrowser/view=' + encodeURIComponent('adl:/');
 export const ABFS_API_PREFIX = '/filebrowser/view=' + encodeURIComponent('ABFS://');
 export const GIT_API_PREFIX = '/desktop/api/vcs/contents/';
-export const S3_API_PREFIX = '/filebrowser/view=' + encodeURIComponent('S3A://');
+export const S3_API_PREFIX = '/filebrowser/view=' + encodeURIComponent('s3a://');
 export const IMPALA_INVALIDATE_API = '/impala/api/invalidate';
 export const CONFIG_SAVE_API = '/desktop/api/configurations/save/';
 export const CONFIG_APPS_API = '/desktop/api/configurations';
@@ -40,7 +40,7 @@ export const SEND_SLACK_MESSAGE = '/desktop/slack/api/message/send';
 export const TOPO_URL = '/desktop/topo/';
 
 export const SEARCH_API = '/desktop/api/search/entities';
-export const INTERACTIVE_SEARCH_API = '/desktop/api/search/entities_interactive';
+export const INTERACTIVE_SEARCH_API = '/api/metadata/search/entities_interactive';
 
 export const CREATE_SESSION_API = '/api/editor/create_session'; // Note: dup by api.ts
 export const CLOSE_SESSION_API = '/api/editor/close_session'; // Note: dup by api.ts

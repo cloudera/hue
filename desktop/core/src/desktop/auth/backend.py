@@ -30,6 +30,7 @@ User to remain a django.contrib.auth.models.User object.
 
 from builtins import object
 from importlib import import_module
+from pwd import getpwnam
 
 import logging
 import sys
@@ -420,6 +421,10 @@ class PamBackend(DesktopBackendBase):
   def authenticate(self, request=None, username=None, password=None):
     username = force_username_case(username)
 
+    if AUTH.PAM_USE_PWD_MODULE.get():
+      LOG.debug('Setting username to %s using PAM pwd module for user %s' % (getpwnam(username).pw_name, username))
+      username = getpwnam(username).pw_name
+
     if pam.authenticate(username, password, AUTH.PAM_SERVICE.get()):
       is_super = False
       if User.objects.exclude(id=install_sample_user().id).count() == 0:
@@ -588,6 +593,14 @@ class LdapBackend(object):
     except ImproperlyConfigured as detail:
       LOG.warning("LDAP was not properly configured: %s", detail)
       return None
+
+    if AUTH.PAM_USE_PWD_MODULE.get():
+      LOG.debug('Setting LDAP username to %s using PAM pwd module for user %s' % (getpwnam(username).pw_name, username))
+      pam_user = getpwnam(username).pw_name
+      try:
+        user = User.objects.get(username__iexact=pam_user)
+      except User.DoesNotExist:
+        user = find_or_create_user(pam_user, None)
 
     if user is not None and user.is_active:
       profile = get_profile(user)
@@ -784,8 +797,12 @@ class RemoteUserDjangoBackend(django.contrib.auth.backends.RemoteUserBackend):
 
 
 class OIDCBackend(OIDCAuthenticationBackend):
-  def authenticate(self, **kwargs):
-    self.request = kwargs.pop('request', None)
+  def authenticate(self, *args, **kwargs):
+    if sys.version_info[0] > 2:
+      self.request = args[0]
+    else:
+      self.request = None
+
     if not self.request:
       return None
 
@@ -822,6 +839,9 @@ class OIDCBackend(OIDCAuthenticationBackend):
       self.save_refresh_tokens(refresh_token)
       user = self.get_or_create_user(access_token, id_token, verified_id)
       user = rewrite_user(user)
+
+      ensure_has_a_group(user)
+      
       return user
 
     return None

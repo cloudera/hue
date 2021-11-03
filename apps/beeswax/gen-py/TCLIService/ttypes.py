@@ -477,7 +477,7 @@ class TTypeQualifierValue(object):
       oprot.writeFieldEnd()
     if self.stringValue is not None:
       oprot.writeFieldBegin('stringValue', TType.STRING, 2)
-      oprot.writeString(self.stringValue)
+      oprot.writeString(self.stringValue.encode('utf-8') if (sys.version_info[0] == 2 and isinstance(self.stringValue, unicode)) else self.stringValue)
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
@@ -542,7 +542,7 @@ class TTypeQualifiers(object):
       oprot.writeFieldBegin('qualifiers', TType.MAP, 1)
       oprot.writeMapBegin(TType.STRING, TType.STRUCT, len(self.qualifiers))
       for kiter7, viter8 in self.qualifiers.items():
-        oprot.writeString(kiter7)
+        oprot.writeString(kiter7.encode('utf-8') if (sys.version_info[0] == 2 and isinstance(kiter7, unicode)) else kiter7)
         viter8.write(oprot)
       oprot.writeMapEnd()
       oprot.writeFieldEnd()
@@ -809,7 +809,7 @@ class TStructTypeEntry(object):
       oprot.writeFieldBegin('nameToTypePtr', TType.MAP, 1)
       oprot.writeMapBegin(TType.STRING, TType.I32, len(self.nameToTypePtr))
       for kiter16, viter17 in self.nameToTypePtr.items():
-        oprot.writeString(kiter16)
+        oprot.writeString(kiter16.encode('utf-8') if (sys.version_info[0] == 2 and isinstance(kiter16, unicode)) else kiter16)
         oprot.writeI32(viter17)
       oprot.writeMapEnd()
       oprot.writeFieldEnd()
@@ -877,7 +877,7 @@ class TUnionTypeEntry(object):
       oprot.writeFieldBegin('nameToTypePtr', TType.MAP, 1)
       oprot.writeMapBegin(TType.STRING, TType.I32, len(self.nameToTypePtr))
       for kiter25, viter26 in self.nameToTypePtr.items():
-        oprot.writeString(kiter25)
+        oprot.writeString(kiter25.encode('utf-8') if (sys.version_info[0] == 2 and isinstance(kiter25, unicode)) else kiter25)
         oprot.writeI32(viter26)
       oprot.writeMapEnd()
       oprot.writeFieldEnd()
@@ -937,7 +937,7 @@ class TUserDefinedTypeEntry(object):
     oprot.writeStructBegin('TUserDefinedTypeEntry')
     if self.typeClassName is not None:
       oprot.writeFieldBegin('typeClassName', TType.STRING, 1)
-      oprot.writeString(self.typeClassName)
+      oprot.writeString(self.typeClassName.encode('utf-8') if (sys.version_info[0] == 2 and isinstance(self.typeClassName, unicode)) else self.typeClassName)
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
@@ -1201,7 +1201,7 @@ class TColumnDesc(object):
     oprot.writeStructBegin('TColumnDesc')
     if self.columnName is not None:
       oprot.writeFieldBegin('columnName', TType.STRING, 1)
-      oprot.writeString(self.columnName)
+      oprot.writeString(self.columnName.encode('utf-8') if (sys.version_info[0] == 2 and isinstance(self.columnName, unicode)) else self.columnName)
       oprot.writeFieldEnd()
     if self.typeDesc is not None:
       oprot.writeFieldBegin('typeDesc', TType.STRUCT, 2)
@@ -1213,7 +1213,7 @@ class TColumnDesc(object):
       oprot.writeFieldEnd()
     if self.comment is not None:
       oprot.writeFieldBegin('comment', TType.STRING, 4)
-      oprot.writeString(self.comment)
+      oprot.writeString(self.comment.encode('utf-8') if (sys.version_info[0] == 2 and isinstance(self.comment, unicode)) else self.comment)
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
@@ -1678,7 +1678,7 @@ class TStringValue(object):
     oprot.writeStructBegin('TStringValue')
     if self.value is not None:
       oprot.writeFieldBegin('value', TType.STRING, 1)
-      oprot.writeString(self.value)
+      oprot.writeString(self.value.encode('utf-8') if (sys.version_info[0] == 2 and isinstance(self.value, unicode)) else self.value)
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
@@ -2418,7 +2418,7 @@ class TStringColumn(object):
       oprot.writeFieldBegin('values', TType.LIST, 1)
       oprot.writeListBegin(TType.STRING, len(self.values))
       for iter96 in self.values:
-        oprot.writeString(iter96)
+        oprot.writeString(iter96.encode('utf-8') if (sys.version_info[0] == 2 and isinstance(iter96, unicode)) else iter96)
       oprot.writeListEnd()
       oprot.writeFieldEnd()
     if self.nulls is not None:
@@ -2864,12 +2864,12 @@ class TStatus(object):
       oprot.writeFieldBegin('infoMessages', TType.LIST, 2)
       oprot.writeListBegin(TType.STRING, len(self.infoMessages))
       for iter124 in self.infoMessages:
-        oprot.writeString(iter124)
+        oprot.writeString(iter124.encode('utf-8') if (sys.version_info[0] == 2 and isinstance(iter124, unicode)) else iter124)
       oprot.writeListEnd()
       oprot.writeFieldEnd()
     if self.sqlState is not None:
       oprot.writeFieldBegin('sqlState', TType.STRING, 3)
-      oprot.writeString(self.sqlState)
+      oprot.writeString(self.sqlState.encode('utf-8') if (sys.version_info[0] == 2 and isinstance(self.sqlState, unicode)) else self.sqlState)
       oprot.writeFieldEnd()
     if self.errorCode is not None:
       oprot.writeFieldBegin('errorCode', TType.I32, 4)
@@ -2877,7 +2877,7 @@ class TStatus(object):
       oprot.writeFieldEnd()
     if self.errorMessage is not None:
       oprot.writeFieldBegin('errorMessage', TType.STRING, 5)
-      oprot.writeString(self.errorMessage)
+      oprot.writeString(self.errorMessage.encode('utf-8') if (sys.version_info[0] == 2 and isinstance(self.errorMessage, unicode)) else self.errorMessage)
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
@@ -3192,18 +3192,18 @@ class TOpenSessionReq(object):
       oprot.writeFieldEnd()
     if self.username is not None:
       oprot.writeFieldBegin('username', TType.STRING, 2)
-      oprot.writeString(self.username)
+      oprot.writeString(self.username.encode('utf-8') if (sys.version_info[0] == 2 and isinstance(self.username, unicode)) else self.username)
       oprot.writeFieldEnd()
     if self.password is not None:
       oprot.writeFieldBegin('password', TType.STRING, 3)
-      oprot.writeString(self.password)
+      oprot.writeString(self.password.encode('utf-8') if (sys.version_info[0] == 2 and isinstance(self.password, unicode)) else self.password)
       oprot.writeFieldEnd()
     if self.configuration is not None:
       oprot.writeFieldBegin('configuration', TType.MAP, 4)
       oprot.writeMapBegin(TType.STRING, TType.STRING, len(self.configuration))
       for kiter132, viter133 in self.configuration.items():
-        oprot.writeString(kiter132)
-        oprot.writeString(viter133)
+        oprot.writeString(kiter132.encode('utf-8') if (sys.version_info[0] == 2 and isinstance(kiter132, unicode)) else kiter132)
+        oprot.writeString(viter133.encode('utf-8') if (sys.version_info[0] == 2 and isinstance(viter133, unicode)) else viter133)
       oprot.writeMapEnd()
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
@@ -3305,8 +3305,8 @@ class TOpenSessionResp(object):
       oprot.writeFieldBegin('configuration', TType.MAP, 4)
       oprot.writeMapBegin(TType.STRING, TType.STRING, len(self.configuration))
       for kiter141, viter142 in self.configuration.items():
-        oprot.writeString(kiter141)
-        oprot.writeString(viter142)
+        oprot.writeString(kiter141.encode('utf-8') if (sys.version_info[0] == 2 and isinstance(kiter141, unicode)) else kiter141)
+        oprot.writeString(viter142.encode('utf-8') if (sys.version_info[0] == 2 and isinstance(viter142, unicode)) else viter142)
       oprot.writeMapEnd()
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
@@ -3387,8 +3387,8 @@ class TSetClientInfoReq(object):
       oprot.writeFieldBegin('configuration', TType.MAP, 2)
       oprot.writeMapBegin(TType.STRING, TType.STRING, len(self.configuration))
       for kiter150, viter151 in self.configuration.items():
-        oprot.writeString(kiter150)
-        oprot.writeString(viter151)
+        oprot.writeString(kiter150.encode('utf-8') if (sys.version_info[0] == 2 and isinstance(kiter150, unicode)) else kiter150)
+        oprot.writeString(viter151.encode('utf-8') if (sys.version_info[0] == 2 and isinstance(viter151, unicode)) else viter151)
       oprot.writeMapEnd()
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
@@ -3659,7 +3659,7 @@ class TGetInfoValue(object):
     oprot.writeStructBegin('TGetInfoValue')
     if self.stringValue is not None:
       oprot.writeFieldBegin('stringValue', TType.STRING, 1)
-      oprot.writeString(self.stringValue)
+      oprot.writeString(self.stringValue.encode('utf-8') if (sys.version_info[0] == 2 and isinstance(self.stringValue, unicode)) else self.stringValue)
       oprot.writeFieldEnd()
     if self.smallIntValue is not None:
       oprot.writeFieldBegin('smallIntValue', TType.I16, 2)
@@ -3919,14 +3919,14 @@ class TExecuteStatementReq(object):
       oprot.writeFieldEnd()
     if self.statement is not None:
       oprot.writeFieldBegin('statement', TType.STRING, 2)
-      oprot.writeString(self.statement)
+      oprot.writeString(self.statement.encode('utf-8') if (sys.version_info[0] == 2 and isinstance(self.statement, unicode)) else self.statement)
       oprot.writeFieldEnd()
     if self.confOverlay is not None:
       oprot.writeFieldBegin('confOverlay', TType.MAP, 3)
       oprot.writeMapBegin(TType.STRING, TType.STRING, len(self.confOverlay))
       for kiter159, viter160 in self.confOverlay.items():
-        oprot.writeString(kiter159)
-        oprot.writeString(viter160)
+        oprot.writeString(kiter159.encode('utf-8') if (sys.version_info[0] == 2 and isinstance(kiter159, unicode)) else kiter159)
+        oprot.writeString(viter160.encode('utf-8') if (sys.version_info[0] == 2 and isinstance(viter160, unicode)) else viter160)
       oprot.writeMapEnd()
       oprot.writeFieldEnd()
     if self.runAsync is not None:
@@ -4345,11 +4345,11 @@ class TGetSchemasReq(object):
       oprot.writeFieldEnd()
     if self.catalogName is not None:
       oprot.writeFieldBegin('catalogName', TType.STRING, 2)
-      oprot.writeString(self.catalogName)
+      oprot.writeString(self.catalogName.encode('utf-8') if (sys.version_info[0] == 2 and isinstance(self.catalogName, unicode)) else self.catalogName)
       oprot.writeFieldEnd()
     if self.schemaName is not None:
       oprot.writeFieldBegin('schemaName', TType.STRING, 3)
-      oprot.writeString(self.schemaName)
+      oprot.writeString(self.schemaName.encode('utf-8') if (sys.version_info[0] == 2 and isinstance(self.schemaName, unicode)) else self.schemaName)
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
@@ -4516,21 +4516,21 @@ class TGetTablesReq(object):
       oprot.writeFieldEnd()
     if self.catalogName is not None:
       oprot.writeFieldBegin('catalogName', TType.STRING, 2)
-      oprot.writeString(self.catalogName)
+      oprot.writeString(self.catalogName.encode('utf-8') if (sys.version_info[0] == 2 and isinstance(self.catalogName, unicode)) else self.catalogName)
       oprot.writeFieldEnd()
     if self.schemaName is not None:
       oprot.writeFieldBegin('schemaName', TType.STRING, 3)
-      oprot.writeString(self.schemaName)
+      oprot.writeString(self.schemaName.encode('utf-8') if (sys.version_info[0] == 2 and isinstance(self.schemaName, unicode)) else self.schemaName)
       oprot.writeFieldEnd()
     if self.tableName is not None:
       oprot.writeFieldBegin('tableName', TType.STRING, 4)
-      oprot.writeString(self.tableName)
+      oprot.writeString(self.tableName.encode('utf-8') if (sys.version_info[0] == 2 and isinstance(self.tableName, unicode)) else self.tableName)
       oprot.writeFieldEnd()
     if self.tableTypes is not None:
       oprot.writeFieldBegin('tableTypes', TType.LIST, 5)
       oprot.writeListBegin(TType.STRING, len(self.tableTypes))
       for iter167 in self.tableTypes:
-        oprot.writeString(iter167)
+        oprot.writeString(iter167.encode('utf-8') if (sys.version_info[0] == 2 and isinstance(iter167, unicode)) else iter167)
       oprot.writeListEnd()
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
@@ -4823,19 +4823,19 @@ class TGetColumnsReq(object):
       oprot.writeFieldEnd()
     if self.catalogName is not None:
       oprot.writeFieldBegin('catalogName', TType.STRING, 2)
-      oprot.writeString(self.catalogName)
+      oprot.writeString(self.catalogName.encode('utf-8') if (sys.version_info[0] == 2 and isinstance(self.catalogName, unicode)) else self.catalogName)
       oprot.writeFieldEnd()
     if self.schemaName is not None:
       oprot.writeFieldBegin('schemaName', TType.STRING, 3)
-      oprot.writeString(self.schemaName)
+      oprot.writeString(self.schemaName.encode('utf-8') if (sys.version_info[0] == 2 and isinstance(self.schemaName, unicode)) else self.schemaName)
       oprot.writeFieldEnd()
     if self.tableName is not None:
       oprot.writeFieldBegin('tableName', TType.STRING, 4)
-      oprot.writeString(self.tableName)
+      oprot.writeString(self.tableName.encode('utf-8') if (sys.version_info[0] == 2 and isinstance(self.tableName, unicode)) else self.tableName)
       oprot.writeFieldEnd()
     if self.columnName is not None:
       oprot.writeFieldBegin('columnName', TType.STRING, 5)
-      oprot.writeString(self.columnName)
+      oprot.writeString(self.columnName.encode('utf-8') if (sys.version_info[0] == 2 and isinstance(self.columnName, unicode)) else self.columnName)
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
@@ -4990,15 +4990,15 @@ class TGetFunctionsReq(object):
       oprot.writeFieldEnd()
     if self.catalogName is not None:
       oprot.writeFieldBegin('catalogName', TType.STRING, 2)
-      oprot.writeString(self.catalogName)
+      oprot.writeString(self.catalogName.encode('utf-8') if (sys.version_info[0] == 2 and isinstance(self.catalogName, unicode)) else self.catalogName)
       oprot.writeFieldEnd()
     if self.schemaName is not None:
       oprot.writeFieldBegin('schemaName', TType.STRING, 3)
-      oprot.writeString(self.schemaName)
+      oprot.writeString(self.schemaName.encode('utf-8') if (sys.version_info[0] == 2 and isinstance(self.schemaName, unicode)) else self.schemaName)
       oprot.writeFieldEnd()
     if self.functionName is not None:
       oprot.writeFieldBegin('functionName', TType.STRING, 4)
-      oprot.writeString(self.functionName)
+      oprot.writeString(self.functionName.encode('utf-8') if (sys.version_info[0] == 2 and isinstance(self.functionName, unicode)) else self.functionName)
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
@@ -5155,15 +5155,15 @@ class TGetPrimaryKeysReq(object):
       oprot.writeFieldEnd()
     if self.catalogName is not None:
       oprot.writeFieldBegin('catalogName', TType.STRING, 2)
-      oprot.writeString(self.catalogName)
+      oprot.writeString(self.catalogName.encode('utf-8') if (sys.version_info[0] == 2 and isinstance(self.catalogName, unicode)) else self.catalogName)
       oprot.writeFieldEnd()
     if self.schemaName is not None:
       oprot.writeFieldBegin('schemaName', TType.STRING, 3)
-      oprot.writeString(self.schemaName)
+      oprot.writeString(self.schemaName.encode('utf-8') if (sys.version_info[0] == 2 and isinstance(self.schemaName, unicode)) else self.schemaName)
       oprot.writeFieldEnd()
     if self.tableName is not None:
       oprot.writeFieldBegin('tableName', TType.STRING, 4)
-      oprot.writeString(self.tableName)
+      oprot.writeString(self.tableName.encode('utf-8') if (sys.version_info[0] == 2 and isinstance(self.tableName, unicode)) else self.tableName)
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
@@ -5340,27 +5340,27 @@ class TGetCrossReferenceReq(object):
       oprot.writeFieldEnd()
     if self.parentCatalogName is not None:
       oprot.writeFieldBegin('parentCatalogName', TType.STRING, 2)
-      oprot.writeString(self.parentCatalogName)
+      oprot.writeString(self.parentCatalogName.encode('utf-8') if (sys.version_info[0] == 2 and isinstance(self.parentCatalogName, unicode)) else self.parentCatalogName)
       oprot.writeFieldEnd()
     if self.parentSchemaName is not None:
       oprot.writeFieldBegin('parentSchemaName', TType.STRING, 3)
-      oprot.writeString(self.parentSchemaName)
+      oprot.writeString(self.parentSchemaName.encode('utf-8') if (sys.version_info[0] == 2 and isinstance(self.parentSchemaName, unicode)) else self.parentSchemaName)
       oprot.writeFieldEnd()
     if self.parentTableName is not None:
       oprot.writeFieldBegin('parentTableName', TType.STRING, 4)
-      oprot.writeString(self.parentTableName)
+      oprot.writeString(self.parentTableName.encode('utf-8') if (sys.version_info[0] == 2 and isinstance(self.parentTableName, unicode)) else self.parentTableName)
       oprot.writeFieldEnd()
     if self.foreignCatalogName is not None:
       oprot.writeFieldBegin('foreignCatalogName', TType.STRING, 5)
-      oprot.writeString(self.foreignCatalogName)
+      oprot.writeString(self.foreignCatalogName.encode('utf-8') if (sys.version_info[0] == 2 and isinstance(self.foreignCatalogName, unicode)) else self.foreignCatalogName)
       oprot.writeFieldEnd()
     if self.foreignSchemaName is not None:
       oprot.writeFieldBegin('foreignSchemaName', TType.STRING, 6)
-      oprot.writeString(self.foreignSchemaName)
+      oprot.writeString(self.foreignSchemaName.encode('utf-8') if (sys.version_info[0] == 2 and isinstance(self.foreignSchemaName, unicode)) else self.foreignSchemaName)
       oprot.writeFieldEnd()
     if self.foreignTableName is not None:
       oprot.writeFieldBegin('foreignTableName', TType.STRING, 7)
-      oprot.writeString(self.foreignTableName)
+      oprot.writeString(self.foreignTableName.encode('utf-8') if (sys.version_info[0] == 2 and isinstance(self.foreignTableName, unicode)) else self.foreignTableName)
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
@@ -5611,7 +5611,7 @@ class TProgressUpdateResp(object):
       oprot.writeFieldBegin('headerNames', TType.LIST, 1)
       oprot.writeListBegin(TType.STRING, len(self.headerNames))
       for iter186 in self.headerNames:
-        oprot.writeString(iter186)
+        oprot.writeString(iter186.encode('utf-8') if (sys.version_info[0] == 2 and isinstance(iter186, unicode)) else iter186)
       oprot.writeListEnd()
       oprot.writeFieldEnd()
     if self.rows is not None:
@@ -5620,7 +5620,7 @@ class TProgressUpdateResp(object):
       for iter187 in self.rows:
         oprot.writeListBegin(TType.STRING, len(iter187))
         for iter188 in iter187:
-          oprot.writeString(iter188)
+          oprot.writeString(iter188.encode('utf-8') if (sys.version_info[0] == 2 and isinstance(iter188, unicode)) else iter188)
         oprot.writeListEnd()
       oprot.writeListEnd()
       oprot.writeFieldEnd()
@@ -5634,7 +5634,7 @@ class TProgressUpdateResp(object):
       oprot.writeFieldEnd()
     if self.footerSummary is not None:
       oprot.writeFieldBegin('footerSummary', TType.STRING, 5)
-      oprot.writeString(self.footerSummary)
+      oprot.writeString(self.footerSummary.encode('utf-8') if (sys.version_info[0] == 2 and isinstance(self.footerSummary, unicode)) else self.footerSummary)
       oprot.writeFieldEnd()
     if self.startTime is not None:
       oprot.writeFieldBegin('startTime', TType.I64, 6)
@@ -5787,7 +5787,7 @@ class TGetOperationStatusResp(object):
       oprot.writeFieldEnd()
     if self.sqlState is not None:
       oprot.writeFieldBegin('sqlState', TType.STRING, 3)
-      oprot.writeString(self.sqlState)
+      oprot.writeString(self.sqlState.encode('utf-8') if (sys.version_info[0] == 2 and isinstance(self.sqlState, unicode)) else self.sqlState)
       oprot.writeFieldEnd()
     if self.errorCode is not None:
       oprot.writeFieldBegin('errorCode', TType.I32, 4)
@@ -5795,11 +5795,11 @@ class TGetOperationStatusResp(object):
       oprot.writeFieldEnd()
     if self.errorMessage is not None:
       oprot.writeFieldBegin('errorMessage', TType.STRING, 5)
-      oprot.writeString(self.errorMessage)
+      oprot.writeString(self.errorMessage.encode('utf-8') if (sys.version_info[0] == 2 and isinstance(self.errorMessage, unicode)) else self.errorMessage)
       oprot.writeFieldEnd()
     if self.taskStatus is not None:
       oprot.writeFieldBegin('taskStatus', TType.STRING, 6)
-      oprot.writeString(self.taskStatus)
+      oprot.writeString(self.taskStatus.encode('utf-8') if (sys.version_info[0] == 2 and isinstance(self.taskStatus, unicode)) else self.taskStatus)
       oprot.writeFieldEnd()
     if self.operationStarted is not None:
       oprot.writeFieldBegin('operationStarted', TType.I64, 7)
@@ -6440,11 +6440,11 @@ class TGetDelegationTokenReq(object):
       oprot.writeFieldEnd()
     if self.owner is not None:
       oprot.writeFieldBegin('owner', TType.STRING, 2)
-      oprot.writeString(self.owner)
+      oprot.writeString(self.owner.encode('utf-8') if (sys.version_info[0] == 2 and isinstance(self.owner, unicode)) else self.owner)
       oprot.writeFieldEnd()
     if self.renewer is not None:
       oprot.writeFieldBegin('renewer', TType.STRING, 3)
-      oprot.writeString(self.renewer)
+      oprot.writeString(self.renewer.encode('utf-8') if (sys.version_info[0] == 2 and isinstance(self.renewer, unicode)) else self.renewer)
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
@@ -6518,7 +6518,7 @@ class TGetDelegationTokenResp(object):
       oprot.writeFieldEnd()
     if self.delegationToken is not None:
       oprot.writeFieldBegin('delegationToken', TType.STRING, 2)
-      oprot.writeString(self.delegationToken)
+      oprot.writeString(self.delegationToken.encode('utf-8') if (sys.version_info[0] == 2 and isinstance(self.delegationToken, unicode)) else self.delegationToken)
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
@@ -6588,7 +6588,7 @@ class TCancelDelegationTokenReq(object):
       oprot.writeFieldEnd()
     if self.delegationToken is not None:
       oprot.writeFieldBegin('delegationToken', TType.STRING, 2)
-      oprot.writeString(self.delegationToken)
+      oprot.writeString(self.delegationToken.encode('utf-8') if (sys.version_info[0] == 2 and isinstance(self.delegationToken, unicode)) else self.delegationToken)
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
@@ -6719,7 +6719,7 @@ class TRenewDelegationTokenReq(object):
       oprot.writeFieldEnd()
     if self.delegationToken is not None:
       oprot.writeFieldBegin('delegationToken', TType.STRING, 2)
-      oprot.writeString(self.delegationToken)
+      oprot.writeString(self.delegationToken.encode('utf-8') if (sys.version_info[0] == 2 and isinstance(self.delegationToken, unicode)) else self.delegationToken)
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
@@ -6897,7 +6897,7 @@ class TGetQueryIdResp(object):
     oprot.writeStructBegin('TGetQueryIdResp')
     if self.queryId is not None:
       oprot.writeFieldBegin('queryId', TType.STRING, 1)
-      oprot.writeString(self.queryId)
+      oprot.writeString(self.queryId.encode('utf-8') if (sys.version_info[0] == 2 and isinstance(self.queryId, unicode)) else self.queryId)
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
@@ -7026,7 +7026,7 @@ class TGetLogResp(object):
       oprot.writeFieldEnd()
     if self.log is not None:
       oprot.writeFieldBegin('log', TType.STRING, 2)
-      oprot.writeString(self.log)
+      oprot.writeString(self.log.encode('utf-8') if (sys.version_info[0] == 2 and isinstance(self.log, unicode)) else self.log)
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()

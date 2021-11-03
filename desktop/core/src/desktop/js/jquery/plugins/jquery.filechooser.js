@@ -836,6 +836,8 @@ Plugin.prototype.init = function () {
     }
     if (initialPath != '') {
       self.navigateTo(self.options.initialPath);
+    } else if (window.USER_HOME_DIR != '/') {
+      self.navigateTo(window.USER_HOME_DIR);
     } else if (
       hueLocalStorage(STORAGE_PREFIX + self.options.user + self.options.fsSelected) != null
     ) {

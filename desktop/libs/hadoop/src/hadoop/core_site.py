@@ -18,6 +18,7 @@
 from __future__ import absolute_import
 import errno
 import logging
+import re
 import sys
 
 from hadoop import conf
@@ -41,6 +42,15 @@ _CNF_TRASH_INTERVAL = 'fs.trash.interval'
 _CNF_S3A_ACCESS_KEY = 'fs.s3a.access.key'
 _CNF_S3A_SECRET_KEY = 'fs.s3a.secret.key'
 _CNF_S3A_SESSION_TOKEN = 'fs.s3a.session.token'
+
+_CNF_S3A_RAZ_API_URL = 'fs.s3a.ext.raz.rest.host.url'
+_CNF_S3A_RAZ_CLUSTER_NAME = 'fs.s3a.ext.raz.s3.access.cluster.name'
+_CNF_S3A_RAZ_BUCKET_ENDPOINT = 'fs.s3a.bucket.(?P<bucket>[^.]+).endpoint'
+
+_CNF_ADLS_RAZ_API_URL = 'fs.azure.ext.raz.rest.host.url'
+_CNF_ADLS_RAZ_CLUSTER_NAME = 'fs.azure.ext.raz.adls.access.cluster.name'
+
+_CNF_DEFAULT_FS = 'fs.defaultFS'
 
 _CNF_ADLS_CLIENT_ID = 'dfs.adls.oauth2.client.id'
 _CNF_ADLS_AUTHENTICATION_CODE = 'dfs.adls.oauth2.credential'
@@ -110,6 +120,41 @@ def get_s3a_secret_key():
 
 def get_s3a_session_token():
   return get_conf().get(_CNF_S3A_SESSION_TOKEN)
+
+
+def get_raz_api_url():
+  """
+  Get Raz API.
+  """
+  s3a_raz_url = get_conf().get(_CNF_S3A_RAZ_API_URL)
+  adls_raz_url = get_conf().get(_CNF_ADLS_RAZ_API_URL)
+
+  if s3a_raz_url != adls_raz_url:
+    LOG.warning('Raz API: S3A and ADLS URLs are different')
+
+  return s3a_raz_url or adls_raz_url
+
+def get_raz_cluster_name():
+  """
+  Get the name of the Cluster where Raz is running.
+  """
+  return get_conf().get(_CNF_S3A_RAZ_CLUSTER_NAME, '') or get_conf().get(_CNF_ADLS_RAZ_CLUSTER_NAME, '')
+
+def get_raz_s3_default_bucket():
+  """
+  Get the name of the default S3 bucket of Raz
+  """
+
+  for key, val in get_conf().items():
+    match = re.search(_CNF_S3A_RAZ_BUCKET_ENDPOINT, key)
+    if match:
+      return {
+        'host': val,
+        'bucket': match.group('bucket')
+      }
+
+def get_default_fs():
+  return get_conf().get(_CNF_DEFAULT_FS)
 
 def get_adls_client_id():
   """

@@ -50,7 +50,7 @@ from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access, add_to_group, add_permission, remove_from_group
 from desktop.lib.view_util import location_to_url
-from desktop.conf import is_oozie_enabled
+from desktop.conf import is_oozie_enabled, RAZ
 from hadoop import pseudo_hdfs4
 from hadoop.conf import UPLOAD_CHUNK_SIZE
 from hadoop.fs.webhdfs import WebHdfs
@@ -225,16 +225,26 @@ class TestFileBrowser():
           supergroup='hdfs'
         )
 
-        response = self.client.get('/filebrowser/view=%2Fuser%2Fsystest%2Ftest5%2FT%D0%B6%D0%B5%D0%B9%D0%BA%D0%BE%D0%B1?pagesize=45&pagenum=1&filter=&sortby=name&descending=false&format=json&_=1581670214204')
+        response = self.client.get(
+          '/filebrowser/view=%2Fuser%2Fsystest%2Ftest5%2FT%D0%B6%D0%B5%D0%B9%D0%BA%D0%BE%D0%B1'
+          '?pagesize=45&pagenum=1&filter=&sortby=name&descending=false&format=json&_=1581670214204')
 
         assert_equal(200, response.status_code)
         dir_listing = json.loads(response.content)['files']
         assert_equal(5, len(dir_listing))
         assert_true(b'"url": "/filebrowser/view=%2Fuser%2Fsystest%2Ftest5",' in response.content, response.content)
-        assert_true(b'"url": "/filebrowser/view=%2Fuser%2Fsystest%2Ftest5%2FT%D0%B6%D0%B5%D0%B9%D0%BA%D0%BE%D0%B1",' in response.content, response.content)
-        assert_true(b'"url": "/filebrowser/view=%2Fuser%2Fsystest%2Ftest5%2FT%D0%B6%D0%B5%D0%B9%D0%BA%D0%BE%D0%B1%2Ffile_1.txt",' in response.content, response.content)
-        assert_true(b'"url": "/filebrowser/view=%2Fuser%2Fsystest%2Ftest5%2FT%D0%B6%D0%B5%D0%B9%D0%BA%D0%BE%D0%B1%2F%E6%96%87%E4%BB%B6_2.txt",' in response.content, response.content)
-        assert_true(b'"url": "/filebrowser/view=%2Fuser%2Fsystest%2Ftest5%2FT%D0%B6%D0%B5%D0%B9%D0%BA%D0%BE%D0%B1%2Femploy%C3%A9s_file.txt",' in response.content, response.content)
+        assert_true(
+          b'"url": "/filebrowser/view=%2Fuser%2Fsystest%2Ft'
+          b'est5%2FT%D0%B6%D0%B5%D0%B9%D0%BA%D0%BE%D0%B1",' in response.content, response.content)
+        assert_true(
+          b'"url": "/filebrowser/view=%2Fuser%2Fsystest%2Ftest5%2FT%D'
+          b'0%B6%D0%B5%D0%B9%D0%BA%D0%BE%D0%B1%2Ffile_1.txt",' in response.content, response.content)
+        assert_true(
+          b'"url": "/filebrowser/view=%2Fuser%2Fsystest%2Ftest5%2FT%D0%B6%D'
+          b'0%B5%D0%B9%D0%BA%D0%BE%D0%B1%2F%E6%96%87%E4%BB%B6_2.txt",' in response.content, response.content)
+        assert_true(
+          b'"url": "/filebrowser/view=%2Fuser%2Fsystest%2Ftest5%2FT%D0%B6%D0%B5%'
+          b'D0%B9%D0%BA%D0%BE%D0%B1%2Femploy%C3%A9s_file.txt",' in response.content, response.content)
 
 class TestFileBrowserWithHadoop(object):
   requires_hadoop = True
@@ -432,7 +442,7 @@ class TestFileBrowserWithHadoop(object):
     assert_not_equal(0o41777, int(self.cluster.fs.stats(PATH)["mode"]))
 
     # Setup post data
-    permissions_dict = dict( list(zip(permissions, [True]*len(permissions))) )
+    permissions_dict = dict(list(zip(permissions, [True]*len(permissions))))
     kwargs = {'path': [PATH]}
     kwargs.update(permissions_dict)
 
@@ -466,7 +476,7 @@ class TestFileBrowserWithHadoop(object):
     self.cluster.fs.mkdir(PATH)
 
     # Get current mode and make sure sticky bit is off
-    mode = expand_mode( int(self.cluster.fs.stats(PATH)["mode"]) )
+    mode = expand_mode(int(self.cluster.fs.stats(PATH)["mode"]))
     assert_equal(False, mode[-1])
 
     # Setup post data
@@ -481,13 +491,13 @@ class TestFileBrowserWithHadoop(object):
 
     # Set sticky bit, then check sticky bit is on in hdfs
     response = self.c.post("/filebrowser/chmod", kwargs)
-    mode = expand_mode( int(self.cluster.fs.stats(PATH)["mode"]) )
+    mode = expand_mode(int(self.cluster.fs.stats(PATH)["mode"]))
     assert_equal(True, mode[-1])
 
     # Unset sticky bit, then check sticky bit is off in hdfs
     del kwargs['sticky']
     response = self.c.post("/filebrowser/chmod", kwargs)
-    mode = expand_mode( int(self.cluster.fs.stats(PATH)["mode"]) )
+    mode = expand_mode(int(self.cluster.fs.stats(PATH)["mode"]))
     assert_equal(False, mode[-1])
 
 
@@ -633,7 +643,7 @@ class TestFileBrowserWithHadoop(object):
     self.cluster.fs.mkdir(self.cluster.fs.join(BASE, FUNNY_NAME))
 
     # All 12 of the entries
-    expect = [ '..', '.', FUNNY_NAME] + [ str(i) for i in range(1, 11) ]
+    expect = ['..', '.', FUNNY_NAME] + [str(i) for i in range(1, 11)]
 
     # Check pagination
     listing = self.c.get('/filebrowser/view=' + BASE + '?pagesize=20').context[0]['files']
@@ -650,10 +660,10 @@ class TestFileBrowserWithHadoop(object):
 
     # Check sorting (name)
     listing = self.c.get('/filebrowser/view=' + BASE + '?sortby=name').context[0]['files']
-    assert_equal(sorted(expect[2:]), [ f['name'] for f in listing ][2:])
+    assert_equal(sorted(expect[2:]), [f['name'] for f in listing][2:])
 
     listing = self.c.get('/filebrowser/view=' + BASE + '?sortby=name&descending=false').context[0]['files']
-    assert_equal(sorted(expect[2:]), [ f['name'] for f in listing ][2:])
+    assert_equal(sorted(expect[2:]), [f['name'] for f in listing][2:])
 
     listing = self.c.get('/filebrowser/view=' + BASE + '?sortby=name&descending=true').context[0]['files']
     assert_equal(".", listing[1]['name'])
@@ -662,7 +672,7 @@ class TestFileBrowserWithHadoop(object):
 
     # Check sorting (size)
     listing = self.c.get('/filebrowser/view=' + BASE + '?sortby=size').context[0]['files']
-    assert_equal(expect, [ f['name'] for f in listing ])
+    assert_equal(expect, [f['name'] for f in listing])
 
     # Check sorting (mtime)
     listing = self.c.get('/filebrowser/view=' + BASE + '?sortby=mtime').context[0]['files']
@@ -672,18 +682,18 @@ class TestFileBrowserWithHadoop(object):
 
     # Check filter
     listing = self.c.get('/filebrowser/view=' + BASE + '?filter=1').context[0]['files']
-    assert_equal(['..', '.', '1', '10'], [ f['name'] for f in listing ])
+    assert_equal(['..', '.', '1', '10'], [f['name'] for f in listing])
 
     listing = self.c.get('/filebrowser/view=' + BASE + '?filter=' + FUNNY_NAME).context[0]['files']
-    assert_equal(['..', '.', FUNNY_NAME], [ f['name'] for f in listing ])
+    assert_equal(['..', '.', FUNNY_NAME], [f['name'] for f in listing])
 
     # Check filter + sorting
     listing = self.c.get('/filebrowser/view=' + BASE + '?filter=1&sortby=name&descending=true').context[0]['files']
-    assert_equal(['..', '.', '10', '1'], [ f['name'] for f in listing ])
+    assert_equal(['..', '.', '10', '1'], [f['name'] for f in listing])
 
     # Check filter + sorting + pagination
     listing = self.c.get('/filebrowser/view=' + BASE + '?filter=1&sortby=name&descending=true&pagesize=1&pagenum=2').context[0]['files']
-    assert_equal(['..', '.', '1'], [ f['name'] for f in listing ])
+    assert_equal(['..', '.', '1'], [f['name'] for f in listing])
 
     # Check filter with empty results
     resp = self.c.get('/filebrowser/view=' + BASE + '?filter=empty&sortby=name&descending=true&pagesize=1&pagenum=2')
@@ -728,10 +738,12 @@ class TestFileBrowserWithHadoop(object):
       # Snappy compressed succeed
       response = self.c.get('/filebrowser/view=%s/test-view.stillsnappy' % prefix)
       assert_equal('snappy', response.context[0]['view']['compression'])
-      assert_equal(response.context[0]['view']['contents'], 'The broadcasters of your area in voluntary cooperation with the FCC and other authorities.', response)
+      assert_equal(
+        response.context[0]['view']['contents'],
+        'The broadcasters of your area in voluntary cooperation with the FCC and other authorities.', response)
 
       # Largest snappy compressed file
-      finish.append( MAX_SNAPPY_DECOMPRESSION_SIZE.set_for_testing(1) )
+      finish.append(MAX_SNAPPY_DECOMPRESSION_SIZE.set_for_testing(1))
       response = self.c.get('/filebrowser/view=%s/test-view.stillsnappy?compression=snappy' % prefix)
       assert_true('File size is greater than allowed max snappy decompression size of 1' in response.context[0]['message'], response)
 
@@ -841,7 +853,48 @@ class TestFileBrowserWithHadoop(object):
     self.cluster.fs.mkdir(prefix)
 
     # Parquet file encoded as hex.
-    test_data = "50415231150015d40115d4012c15321500150615080000020000003201000000000100000002000000030000000400000005000000060000000700000008000000090000000a0000000b0000000c0000000d0000000e0000000f000000100000001100000012000000130000001400000015000000160000001700000018000000150015b60415b6042c1532150015061508000002000000320107000000414c474552494109000000415247454e54494e41060000004252415a494c0600000043414e41444105000000454759505408000000455448494f504941060000004652414e4345070000004745524d414e5905000000494e44494109000000494e444f4e45534941040000004952414e0400000049524151050000004a4150414e060000004a4f5244414e050000004b454e5941070000004d4f524f43434f0a0000004d4f5a414d42495155450400000050455255050000004348494e4107000000524f4d414e49410c00000053415544492041524142494107000000564945544e414d060000005255535349410e000000554e49544544204b494e47444f4d0d000000554e4954454420535441544553150015d40115d4012c1532150015061508000002000000320100000000010000000100000001000000040000000000000003000000030000000200000002000000040000000400000002000000040000000000000000000000000000000100000002000000030000000400000002000000030000000300000001000000150015d61e15d61e2c153215001506150800000200000032013300000020686167676c652e206361726566756c6c792066696e616c206465706f736974732064657465637420736c796c7920616761694c000000616c20666f7865732070726f6d69736520736c796c79206163636f7264696e6720746f2074686520726567756c6172206163636f756e74732e20626f6c6420726571756573747320616c6f6e6b0000007920616c6f6e6773696465206f66207468652070656e64696e67206465706f736974732e206361726566756c6c79207370656369616c207061636b61676573206172652061626f7574207468652069726f6e696320666f726765732e20736c796c79207370656369616c20650000006561732068616e672069726f6e69632c2073696c656e74207061636b616765732e20736c796c7920726567756c6172207061636b616765732061726520667572696f75736c79206f76657220746865207469746865732e20666c756666696c7920626f6c6463000000792061626f766520746865206361726566756c6c7920756e757375616c207468656f646f6c697465732e2066696e616c206475676f7574732061726520717569636b6c79206163726f73732074686520667572696f75736c7920726567756c617220641f00000076656e207061636b616765732077616b6520717569636b6c792e207265677526000000726566756c6c792066696e616c2072657175657374732e20726567756c61722c2069726f6e693a0000006c20706c6174656c6574732e20726567756c6172206163636f756e747320782d7261793a20756e757375616c2c20726567756c6172206163636f41000000737320657863757365732063616a6f6c6520736c796c79206163726f737320746865207061636b616765732e206465706f73697473207072696e742061726f756e7200000020736c796c792065787072657373206173796d70746f7465732e20726567756c6172206465706f7369747320686167676c6520736c796c792e206361726566756c6c792069726f6e696320686f636b657920706c617965727320736c65657020626c697468656c792e206361726566756c6c320000006566756c6c7920616c6f6e6773696465206f662074686520736c796c792066696e616c20646570656e64656e636965732e20420000006e6963206465706f7369747320626f6f73742061746f702074686520717569636b6c792066696e616c2072657175657374733f20717569636b6c7920726567756c61240000006f75736c792e2066696e616c2c20657870726573732067696674732063616a6f6c652061370000006963206465706f736974732061726520626c697468656c792061626f757420746865206361726566756c6c7920726567756c61722070615d0000002070656e64696e67206578637573657320686167676c6520667572696f75736c79206465706f736974732e2070656e64696e672c20657870726573732070696e746f206265616e732077616b6520666c756666696c79207061737420745a000000726e732e20626c697468656c7920626f6c6420636f7572747320616d6f6e672074686520636c6f73656c7920726567756c6172207061636b616765732075736520667572696f75736c7920626f6c6420706c6174656c6574733f2d000000732e2069726f6e69632c20756e757375616c206173796d70746f7465732077616b6520626c697468656c7920726a000000706c6174656c6574732e20626c697468656c792070656e64696e6720646570656e64656e636965732075736520666c756666696c79206163726f737320746865206576656e2070696e746f206265616e732e206361726566756c6c792073696c656e74206163636f756e5b0000006320646570656e64656e636965732e20667572696f75736c792065787072657373206e6f746f726e697320736c65657020736c796c7920726567756c6172206163636f756e74732e20696465617320736c6565702e206465706f736f000000756c6172206173796d70746f746573206172652061626f75742074686520667572696f7573206d756c7469706c696572732e206578707265737320646570656e64656e63696573206e61672061626f7665207468652069726f6e6963616c6c792069726f6e6963206163636f756e744e00000074732e2073696c656e7420726571756573747320686167676c652e20636c6f73656c792065787072657373207061636b6167657320736c656570206163726f73732074686520626c697468656c792e00000068656c7920656e746963696e676c792065787072657373206163636f756e74732e206576656e2c2066696e616c204f00000020726571756573747320616761696e73742074686520706c6174656c65747320757365206e65766572206163636f7264696e6720746f2074686520717569636b6c7920726567756c61722070696e743d00000065616e7320626f6f7374206361726566756c6c79207370656369616c2072657175657374732e206163636f756e7473206172652e206361726566756c6c6e000000792066696e616c207061636b616765732e20736c6f7720666f7865732063616a6f6c6520717569636b6c792e20717569636b6c792073696c656e7420706c6174656c657473206272656163682069726f6e6963206163636f756e74732e20756e757375616c2070696e746f2062651502195c48016d15080015022502180a6e6174696f6e5f6b657900150c250218046e616d650015022502180a726567696f6e5f6b657900150c2502180b636f6d6d656e745f636f6c001632191c194c26081c1502190519180a6e6174696f6e5f6b65791500163216fa0116fa01260800002682021c150c19051918046e616d651500163216dc0416dc04268202000026de061c1502190519180a726567696f6e5f6b65791500163216fa0116fa0126de06000026d8081c150c190519180b636f6d6d656e745f636f6c1500163216fc1e16fc1e26d80800001600163200280a706172717565742d6d7200ea00000050415231"
+    test_data = "50415231150015d40115d4012c15321500150615080000020000003201000000000100000002000000030000000400000005000000060000000700000"
+    "008000000090000000a0000000b0000000c0000000d0000000e0000000f00000010000000110000001200000013000000140000001500000016000000170000001800"
+    "0000150015b60415b6042c1532150015061508000002000000320107000000414c474552494109000000415247454e54494e41060000004252415a494c06000000434"
+    "14e41444105000000454759505408000000455448494f504941060000004652414e4345070000004745524d414e5905000000494e44494109000000494e444f4e4553"
+    "4941040000004952414e0400000049524151050000004a4150414e060000004a4f5244414e050000004b454e5941070000004d4f524f43434f0a0000004d4f5a414d4"
+    "2495155450400000050455255050000004348494e4107000000524f4d414e49410c00000053415544492041524142494107000000564945544e414d06000000525553"
+    "5349410e000000554e49544544204b494e47444f4d0d000000554e4954454420535441544553150015d40115d4012c153215001506150800000200000032010000000"
+    "0010000000100000001000000040000000000000003000000030000000200000002000000040000000400000002000000040000000000000000000000000000000100"
+    "000002000000030000000400000002000000030000000300000001000000150015d61e15d61e2c153215001506150800000200000032013300000020686167676c652"
+    "e206361726566756c6c792066696e616c206465706f736974732064657465637420736c796c7920616761694c000000616c20666f7865732070726f6d69736520736c"
+    "796c79206163636f7264696e6720746f2074686520726567756c6172206163636f756e74732e20626f6c6420726571756573747320616c6f6e6b0000007920616c6f6"
+    "e6773696465206f66207468652070656e64696e67206465706f736974732e206361726566756c6c79207370656369616c207061636b61676573206172652061626f75"
+    "74207468652069726f6e696320666f726765732e20736c796c79207370656369616c20650000006561732068616e672069726f6e69632c2073696c656e74207061636"
+    "b616765732e20736c796c7920726567756c6172207061636b616765732061726520667572696f75736c79206f76657220746865207469746865732e20666c75666669"
+    "6c7920626f6c6463000000792061626f766520746865206361726566756c6c7920756e757375616c207468656f646f6c697465732e2066696e616c206475676f75747"
+    "32061726520717569636b6c79206163726f73732074686520667572696f75736c7920726567756c617220641f00000076656e207061636b616765732077616b652071"
+    "7569636b6c792e207265677526000000726566756c6c792066696e616c2072657175657374732e20726567756c61722c2069726f6e693a0000006c20706c6174656c6"
+    "574732e20726567756c6172206163636f756e747320782d7261793a20756e757375616c2c20726567756c6172206163636f4100000073732065786375736573206361"
+    "6a6f6c6520736c796c79206163726f737320746865207061636b616765732e206465706f73697473207072696e742061726f756e7200000020736c796c79206578707"
+    "2657373206173796d70746f7465732e20726567756c6172206465706f7369747320686167676c6520736c796c792e206361726566756c6c792069726f6e696320686f"
+    "636b657920706c617965727320736c65657020626c697468656c792e206361726566756c6c320000006566756c6c7920616c6f6e6773696465206f662074686520736"
+    "c796c792066696e616c20646570656e64656e636965732e20420000006e6963206465706f7369747320626f6f73742061746f702074686520717569636b6c79206669"
+    "6e616c2072657175657374733f20717569636b6c7920726567756c61240000006f75736c792e2066696e616c2c20657870726573732067696674732063616a6f6c652"
+    "061370000006963206465706f736974732061726520626c697468656c792061626f757420746865206361726566756c6c7920726567756c61722070615d0000002070"
+    "656e64696e67206578637573657320686167676c6520667572696f75736c79206465706f736974732e2070656e64696e672c20657870726573732070696e746f20626"
+    "5616e732077616b6520666c756666696c79207061737420745a000000726e732e20626c697468656c7920626f6c6420636f7572747320616d6f6e672074686520636c"
+    "6f73656c7920726567756c6172207061636b616765732075736520667572696f75736c7920626f6c6420706c6174656c6574733f2d000000732e2069726f6e69632c2"
+    "0756e757375616c206173796d70746f7465732077616b6520626c697468656c7920726a000000706c6174656c6574732e20626c697468656c792070656e64696e6720"
+    "646570656e64656e636965732075736520666c756666696c79206163726f737320746865206576656e2070696e746f206265616e732e206361726566756c6c7920736"
+    "96c656e74206163636f756e5b0000006320646570656e64656e636965732e20667572696f75736c792065787072657373206e6f746f726e697320736c65657020736c"
+    "796c7920726567756c6172206163636f756e74732e20696465617320736c6565702e206465706f736f000000756c6172206173796d70746f746573206172652061626"
+    "f75742074686520667572696f7573206d756c7469706c696572732e206578707265737320646570656e64656e63696573206e61672061626f7665207468652069726f"
+    "6e6963616c6c792069726f6e6963206163636f756e744e00000074732e2073696c656e7420726571756573747320686167676c652e20636c6f73656c7920657870726"
+    "57373207061636b6167657320736c656570206163726f73732074686520626c697468656c792e00000068656c7920656e746963696e676c7920657870726573732061"
+    "63636f756e74732e206576656e2c2066696e616c204f00000020726571756573747320616761696e73742074686520706c6174656c65747320757365206e657665722"
+    "06163636f7264696e6720746f2074686520717569636b6c7920726567756c61722070696e743d00000065616e7320626f6f7374206361726566756c6c792073706563"
+    "69616c2072657175657374732e206163636f756e7473206172652e206361726566756c6c6e000000792066696e616c207061636b616765732e20736c6f7720666f786"
+    "5732063616a6f6c6520717569636b6c792e20717569636b6c792073696c656e7420706c6174656c657473206272656163682069726f6e6963206163636f756e74732e"
+    "20756e757375616c2070696e746f2062651502195c48016d15080015022502180a6e6174696f6e5f6b657900150c250218046e616d650015022502180a726567696f6"
+    "e5f6b657900150c2502180b636f6d6d656e745f636f6c001632191c194c26081c1502190519180a6e6174696f6e5f6b65791500163216fa0116fa0126080000268202"
+    "1c150c19051918046e616d651500163216dc0416dc04268202000026de061c1502190519180a726567696f6e5f6b65791500163216fa0116fa0126de06000026d8081"
+    "c150c190519180b636f6d6d656e745f636f6c1500163216fc1e16fc1e26d80800001600163200280a706172717565742d6d7200ea00000050415231"
 
     f = self.cluster.fs.open(prefix + '/test-parquet.parquet', "w")
     f.write(test_data.decode('hex'))
@@ -998,7 +1051,8 @@ alert("XSS")
     f.write(sdf_string)
     f.close()
 
-    response = self.c.get('/filebrowser/download=%s/xss?disposition=inline' % prefix, follow=False) # The client does not support redirecting to another host. follow=False
+    # The client does not support redirecting to another host. follow=False
+    response = self.c.get('/filebrowser/download=%s/xss?disposition=inline' % prefix, follow=False)
     if response.status_code == 302: # Redirects to webhdfs
       assert_true(response.url.find('webhdfs') >= 0)
     else:
@@ -1154,7 +1208,7 @@ alert("XSS")
         resp2 = self.c.post('/jobbrowser/api/job/workflows', {'interface': '"workflows"', 'app_id': responseid})
         response2 = json.loads(resp2.content)
         if response2['app']['status'] != 'RUNNING':
-          assert_equal(response2['app']['status'] , 'SUCCEEDED', response2)
+          assert_equal(response2['app']['status'], 'SUCCEEDED', response2)
           break
         sleep(3)
         end_time = time()
@@ -1292,9 +1346,9 @@ def edit_i18n_helper(c, cluster, encoding, contents_pass_1, contents_pass_2):
   """
   Put the content into the file with a specific encoding.
   """
-  prefix = cluster.fs_prefix + '/test_edit_i18n'
+  p = cluster.fs_prefix + '/test_edit_i18n'
   # This path is non-normalized to test normalization too
-  filename = prefix + u'//test-filebrowser//./test-edit-carácter-internacional with space and () en-hello pt-Olá ch-你好 ko-안녕 ru-Здравствуйте'
+  filename = p + u'//test-filebrowser//./test-edit-carácter-internacional with space and () en-hello pt-Olá ch-你好 ko-안녕 ru-Здравствуйте'
 
   # File doesn't exist - should be empty
   edit_url = '/filebrowser/edit=' + filename
@@ -1380,7 +1434,8 @@ class TestS3AccessPermissions(object):
 #     with tempfile.NamedTemporaryFile() as local_file: # Flaky
 #       DEST_DIR = 'S3A://bucket/hue'
 #       LOCAL_FILE = local_file.name
-#       assert_raises(S3FileSystemException, self.client.post, '/filebrowser/upload/file?dest=%s' % DEST_DIR, dict(dest=DEST_DIR, hdfs_file=file(LOCAL_FILE)))
+#       assert_raises(
+#  S3FileSystemException, self.client.post, '/filebrowser/upload/file?dest=%s' % DEST_DIR, dict(dest=DEST_DIR, hdfs_file=file(LOCAL_FILE)))
 
   def test_has_default_permissions(self):
     if not get_test_bucket():
@@ -1413,7 +1468,8 @@ class TestABFSAccessPermissions(object):
 #     with tempfile.NamedTemporaryFile() as local_file: # Flaky
 #       DEST_DIR = 'S3A://bucket/hue'
 #       LOCAL_FILE = local_file.name
-#       assert_raises(S3FileSystemException, self.client.post, '/filebrowser/upload/file?dest=%s' % DEST_DIR, dict(dest=DEST_DIR, hdfs_file=file(LOCAL_FILE)))
+#       assert_raises(
+#  S3FileSystemException, self.client.post, '/filebrowser/upload/file?dest=%s' % DEST_DIR, dict(dest=DEST_DIR, hdfs_file=file(LOCAL_FILE)))
 
   def test_has_default_permissions(self):
     add_permission(self.user.username, 'has_abfs', permname='abfs_access', appname='filebrowser')
@@ -1458,7 +1514,8 @@ class TestADLSAccessPermissions(object):
 #     with tempfile.NamedTemporaryFile() as local_file: # Flaky
 #       DEST_DIR = 'S3A://bucket/hue'
 #       LOCAL_FILE = local_file.name
-#       assert_raises(S3FileSystemException, self.client.post, '/filebrowser/upload/file?dest=%s' % DEST_DIR, dict(dest=DEST_DIR, hdfs_file=file(LOCAL_FILE)))
+#       assert_raises(
+#  S3FileSystemException, self.client.post, '/filebrowser/upload/file?dest=%s' % DEST_DIR, dict(dest=DEST_DIR, hdfs_file=file(LOCAL_FILE)))
 
   def test_has_default_permissions(self):
     add_permission(self.user.username, 'has_adls', permname='adls_access', appname='filebrowser')
@@ -1468,6 +1525,7 @@ class TestADLSAccessPermissions(object):
       assert_equal(200, response.status_code)
     finally:
       remove_from_group(self.user.username, 'has_adls')
+
 
 class TestFileChooserRedirect(object):
 
@@ -1484,38 +1542,88 @@ class TestFileChooserRedirect(object):
 
       # HDFS - default_to_home
       response = self.client.get('/filebrowser/view=%2F?default_to_home')
-      LOG.info("Response: %s" % response.status_code)
+
       assert_equal(302, response.status_code)
       assert_equal('/filebrowser/view=%2Fuser%2Ftest', response.url)
 
       # ABFS - default_abfs_home
       response = self.client.get('/filebrowser/view=%2F?default_abfs_home')
-      LOG.info("Response: %s" % response.status_code)
+
       assert_equal(302, response.status_code)
       assert_equal('/filebrowser/view=abfs%3A%2F%2F', response.url)
 
-      reset = ABFS_CLUSTERS['default'].FS_DEFAULTFS.set_for_testing(
-                  'abfs://data-container@mystorage.dfs.core.windows.net'
-              )
+      reset = ABFS_CLUSTERS['default'].FS_DEFAULTFS.set_for_testing('abfs://data-container@mystorage.dfs.core.windows.net')
       try:
         response = self.client.get('/filebrowser/view=%2F?default_abfs_home')
-        LOG.info("Response: %s" % response.status_code)
+
         assert_equal(302, response.status_code)
         assert_equal('/filebrowser/view=abfs%3A%2F%2Fdata-container', response.url)
       finally:
         reset()
 
+      resets = [
+        RAZ.IS_ENABLED.set_for_testing(True),
+        REMOTE_STORAGE_HOME.set_for_testing('abfs://data-container')
+      ]
+      try:
+        response = self.client.get('/filebrowser/view=%2F?default_abfs_home')
+
+        assert_equal(302, response.status_code)
+        assert_equal('/filebrowser/view=abfs%3A%2F%2Fdata-container', response.url)
+      finally:
+        for reset in resets:
+          reset()
+
+      resets = [
+        RAZ.IS_ENABLED.set_for_testing(True),
+        REMOTE_STORAGE_HOME.set_for_testing('abfs://data-container/user')
+      ]
+      try:
+        response = self.client.get('/filebrowser/view=%2F?default_abfs_home')
+
+        assert_equal(302, response.status_code)
+        assert_equal('/filebrowser/view=abfs%3A%2F%2Fdata-container%2Fuser%2Ftest', response.url)
+      finally:
+        for reset in resets:
+          reset()
+
       # S3A - default_s3_home
       response = self.client.get('/filebrowser/view=%2F?default_s3_home')
-      LOG.info("Response: %s" % response.status_code)
+
       assert_equal(302, response.status_code)
       assert_equal('/filebrowser/view=s3a%3A%2F%2F', response.url)
 
       reset = REMOTE_STORAGE_HOME.set_for_testing('s3a://my_bucket')
       try:
         response = self.client.get('/filebrowser/view=%2F?default_s3_home')
-        LOG.info("Response: %s" % response.status_code)
+
         assert_equal(302, response.status_code)
         assert_equal('/filebrowser/view=s3a%3A%2F%2Fmy_bucket', response.url)
       finally:
         reset()
+
+      resets = [
+        RAZ.IS_ENABLED.set_for_testing(True),
+        REMOTE_STORAGE_HOME.set_for_testing('s3a://my_bucket')
+      ]
+      try:
+        response = self.client.get('/filebrowser/view=%2F?default_s3_home')
+
+        assert_equal(302, response.status_code)
+        assert_equal('/filebrowser/view=s3a%3A%2F%2Fmy_bucket', response.url)
+      finally:
+        for reset in resets:
+          reset()
+
+      resets = [
+        RAZ.IS_ENABLED.set_for_testing(True),
+        REMOTE_STORAGE_HOME.set_for_testing('s3a://my_bucket/user')
+      ]
+      try:
+        response = self.client.get('/filebrowser/view=%2F?default_s3_home')
+
+        assert_equal(302, response.status_code)
+        assert_equal('/filebrowser/view=s3a%3A%2F%2Fmy_bucket%2Fuser%2Ftest', response.url)
+      finally:
+        for reset in resets:
+          reset()

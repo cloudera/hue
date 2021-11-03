@@ -21,10 +21,10 @@
   from desktop.auth.backend import is_admin, is_hue_admin
   from desktop.conf import APP_SWITCHER_ALTUS_BASE_URL, APP_SWITCHER_MOW_BASE_URL, CUSTOM_DASHBOARD_URL, \
       DISPLAY_APP_SWITCHER, IS_K8S_ONLY, IS_MULTICLUSTER_ONLY, USE_DEFAULT_CONFIGURATION, USE_NEW_ASSIST_PANEL, \
-      VCS, ENABLE_GIST, ENABLE_LINK_SHARING, has_channels, has_connectors, ENABLE_UNIFIED_ANALYTICS
-  from desktop.models import hue_version, _get_apps, get_cluster_config
+      VCS, ENABLE_GIST, ENABLE_LINK_SHARING, has_channels, has_connectors, ENABLE_UNIFIED_ANALYTICS, RAZ
+  from desktop.models import hue_version, _get_apps, get_cluster_config, _handle_user_dir_raz
 
-  from beeswax.conf import DOWNLOAD_BYTES_LIMIT, DOWNLOAD_ROW_LIMIT, LIST_PARTITIONS_LIMIT, CLOSE_SESSIONS
+  from beeswax.conf import DOWNLOAD_BYTES_LIMIT, DOWNLOAD_ROW_LIMIT, LIST_PARTITIONS_LIMIT, CLOSE_SESSIONS, HPLSQL
   from dashboard.conf import HAS_SQL_ENABLED
   from jobbrowser.conf import ENABLE_HISTORY_V2
   from filebrowser.conf import SHOW_UPLOAD_BUTTON, REMOTE_STORAGE_HOME
@@ -106,6 +106,7 @@
   window.ENABLE_QUERY_BUILDER = '${ ENABLE_QUERY_BUILDER.get() }' === 'True';
   window.ENABLE_QUERY_SCHEDULING = '${ ENABLE_QUERY_SCHEDULING.get() }' === 'True';
   window.ENABLE_UNIFIED_ANALYTICS = '${ ENABLE_UNIFIED_ANALYTICS.get() }' === 'True';
+  window.RAZ_IS_ENABLED = '${ RAZ.IS_ENABLED.get() }' === 'True';
 
   window.ENABLE_HISTORY_V2 = '${ hasattr(ENABLE_HISTORY_V2, 'get') and ENABLE_HISTORY_V2.get() }' === 'True';
 
@@ -136,9 +137,11 @@
   window.JB_SINGLE_CHECK_INTERVAL_IN_MILLIS = 5000;
   window.JB_MULTI_CHECK_INTERVAL_IN_MILLIS = 20000;
   window.CLOSE_SESSIONS = {'hive': '${ CLOSE_SESSIONS.get() }' === 'True'};
+  window.HPLSQL = '${ HPLSQL.get() }' === 'True';
 
   window.HUE_URLS = {
     IMPORTER_CREATE_TABLE: '${ 'indexer' in apps and url('indexer:importer_prefill', source_type = 'all', target_type = 'table')}',
+    IMPORTER_CREATE_PHOENIX_TABLE: '${ 'indexer' in apps and url('indexer:importer_prefill', source_type = 'all', target_type = 'big-table')}',
     IMPORTER_CREATE_DATABASE: '${ 'indexer' in apps and url('indexer:importer_prefill', source_type = 'manual', target_type = 'database')}',
     NOTEBOOK_INDEX: '${url('notebook:index')}',
     % if 'pig' in apps:
@@ -668,6 +671,8 @@
     # Code moved from assist.mako
     try:
       home_dir = REMOTE_STORAGE_HOME.get() if hasattr(REMOTE_STORAGE_HOME, 'get') and REMOTE_STORAGE_HOME.get() else user.get_home_directory()
+      home_dir = _handle_user_dir_raz(user, home_dir)
+
       if not request.fs.isdir(home_dir):
         home_dir = '/'
     except:

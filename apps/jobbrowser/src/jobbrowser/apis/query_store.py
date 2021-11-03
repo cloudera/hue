@@ -67,11 +67,13 @@ def _create_query_store_client(request, content_type='application/json; charset=
   headers = {
     'x-do-as': request.user.username,
     'X-Requested-By': 'das',
-    'Content-Type': content_type
+    'Content-Type': content_type,
+    'Cookie': request.environ.get('HTTP_COOKIE')
   }
 
   client = HttpClient(QUERY_STORE.SERVER_URL.get())
   client.set_headers(headers)
+  client.set_verify(False)
 
   if USE_SASL.get():
     client.set_kerberos_auth()
