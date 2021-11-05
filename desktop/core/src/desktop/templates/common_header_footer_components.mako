@@ -407,8 +407,22 @@ else:
 
     // global catch for ajax calls after the user has logged out
     var isLoginRequired = false;
+
+    // The SAML backend does not return the /* login required */ for some reason. Instead it returns a 302 redirect
+    // to the login page. We use the intercepted XHR to detect a redirect by checking if the url contains /login/?next
+    // TODO: Remove this "hack" and have the saml backend behave as the other ones.
+    var interceptedXHR;
+    var originalXhr = $.ajaxSettings.xhr;
+    $.ajaxSettings.xhr = function () {
+      interceptedXHR = originalXhr();
+      return interceptedXHR;
+    };
+
     $(document).ajaxComplete(function (event, xhr, settings) {
-      if (xhr.responseText === '/* login required */') {
+        if (xhr.responseText === '/* login required */' ||
+                (window.SAML_LOGOUT_URL &&
+                        interceptedXHR.responseURL &&
+                        interceptedXHR.responseURL.indexOf('/login/?next=') !== -1)) {
         if (window.SAML_LOGOUT_URL) {
           var logoutForm = $('<form action="' + window.SAML_LOGOUT_URL + '"></form>');
 
