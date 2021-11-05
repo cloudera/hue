@@ -63,6 +63,8 @@ from desktop.lib.view_util import is_ajax
 from desktop.log import get_audit_logger
 from desktop.log.access import access_log, log_page_hit, access_warn
 
+from libsaml.conf import CDP_LOGOUT_URL
+
 if sys.version_info[0] > 2:
   from django.utils.translation import gettext as _
   from django.utils.http import url_has_allowed_host_and_scheme
@@ -384,11 +386,12 @@ class LoginAndPermissionMiddleware(MiddlewareMixin):
 
     logging.info("Redirecting to login page: %s", request.get_full_path())
     access_log(request, 'login redirection', level=access_log_level)
-    no_idle_backends = (
-        "libsaml.backend.SAML2Backend",
+    no_idle_backends = [
         "desktop.auth.backend.SpnegoDjangoBackend",
         "desktop.auth.backend.KnoxSpnegoDjangoBackend"
-    )
+    ]
+    if CDP_LOGOUT_URL.get()=="":
+      no_idle_backends.append("libsaml.backend.SAML2Backend")
     if request.ajax and all(no_idle_backend not in AUTH.BACKEND.get() for no_idle_backend in no_idle_backends):
       # Send back a magic header which causes Hue.Request to interpose itself
       # in the ajax request and make the user login before resubmitting the
