@@ -36,8 +36,8 @@ import sprintf from 'sprintf-js';
 import ko from 'ko/ko.all';
 
 import 'parse/parserTypeDefs';
-
 import 'utils/customIntervals';
+import { attachSamlIdleTimer } from './utils/samlIdleTimer';
 import 'utils/json.bigDataParse';
 import apiHelper from 'api/apiHelper';
 import CancellableJqPromise from 'api/cancellableJqPromise';
@@ -117,6 +117,7 @@ window.sqlUtils = sqlUtils;
 
 $(document).ready(async () => {
   await refreshConfig(); // Make sure we have config up front
+  attachSamlIdleTimer();
 
   const onePageViewModel = new OnePageViewModel();
   ko.applyBindings(onePageViewModel, $('.page-content')[0]);

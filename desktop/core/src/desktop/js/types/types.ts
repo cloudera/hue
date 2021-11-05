@@ -56,7 +56,10 @@ export interface hueWindow {
   HAS_SQL_ANALYZER?: boolean;
   HUE_BASE_URL?: string;
   HUE_VERSION?: string;
+  IDLE_SESSION_TIMEOUT?: number;
   LOGGED_USERNAME?: string;
+  SAML_LOGOUT_URL?: string;
+  SAML_REDIRECT_URL?: string;
   SHOW_ADD_MORE_EDITORS?: boolean;
   SQL_ANALYZER_MODE?: string;
   USER_IS_ADMIN?: boolean;

@@ -229,3 +229,11 @@ def config_validator(user):
   if USERNAME_SOURCE.get() not in USERNAME_SOURCES:
     res.append(("libsaml.username_source", _("username_source not configured properly. SAML integration may not work.")))
   return res
+
+def get_logout_redirect_url():
+  # This logic was derived from KNOX.
+  prod_url = "console.altus.cloudera.com"
+  redirect_url = "https://sso.cloudera.com/bin/services/support/api/public/logout"
+  if prod_url not in LOGOUT_URL.get():
+    redirect_url = "https://sso.staging-upgrade.aem.cloudera.com/bin/services/support/api/public/logout"
+  return redirect_url
