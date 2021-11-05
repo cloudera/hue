@@ -124,11 +124,10 @@ class SAML2Backend(_Saml2Backend):
     elif conf.LOGOUT_URL.get():
       auth_logout(request)
       # This logic was derived from KNOX.
-      prod_url = "console.altus.cloudera.com"
-      redirect_url = "https://sso.cloudera.com/bin/services/support/api/public/logout"
-      if prod_url not in conf.LOGOUT_URL.get():
-        redirect_url = "https://sso.staging-upgrade.aem.cloudera.com/bin/services/support/api/public/logout"
-      html='<html><body onload="document.forms[0].submit()"><form action="%s" method="POST"><input name="logoutRedirect" type="hidden" value="%s"/></form></body></html>' % (conf.LOGOUT_URL.get(), redirect_url)
+      redirect_url = conf.get_logout_redirect_url()
+      html = '<html><body onload="document.forms[0].submit()">' \
+             '<form action="%s" method="POST"><input name="logoutRedirect" type="hidden" value="%s"/></form>' \
+             '</body></html>' % (conf.LOGOUT_URL.get(), redirect_url)
       return HttpResponse(html)
     else:
       return None

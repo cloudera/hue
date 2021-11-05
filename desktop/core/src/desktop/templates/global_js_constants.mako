@@ -29,6 +29,7 @@
   from jobbrowser.conf import ENABLE_HISTORY_V2
   from filebrowser.conf import SHOW_UPLOAD_BUTTON, REMOTE_STORAGE_HOME
   from indexer.conf import ENABLE_NEW_INDEXER
+  from libsaml.conf import get_logout_redirect_url, LOGOUT_URL
   from metadata.conf import has_catalog, has_readonly_catalog, has_optimizer, has_workload_analytics, OPTIMIZER, get_optimizer_url, \
       get_catalog_url, get_optimizer_mode
   from metastore.conf import ENABLE_NEW_CREATE_TABLE
@@ -81,6 +82,9 @@
   window.HUE_BASE_URL = window.KNOX_BASE_PATH_HUE.indexOf('KNOX_BASE_PATH_HUE') < 0 ? window.KNOX_BASE_PATH_HUE : '';
   window.KNOX_BASE_PATH = window._KNOX_BASE_PATH.indexOf('KNOX_BASE_PATH_KNOX') < 0 ? window._KNOX_BASE_PATH_KNOX : '';
   window.KNOX_BASE_URL = window._KNOX_BASE_URL.indexOf('KNOX_BASE_URL') < 0 ? window._KNOX_BASE_URL : '';
+
+  window.SAML_LOGOUT_URL = '${ LOGOUT_URL.get() }';
+  window.SAML_REDIRECT_URL = '${ get_logout_redirect_url() }';
 
   window.HAS_GIT = ${ len(VCS.keys()) } > 0;
   window.HAS_MULTI_CLUSTER = '${ get_cluster_config(user)['has_computes'] }' === 'True';
