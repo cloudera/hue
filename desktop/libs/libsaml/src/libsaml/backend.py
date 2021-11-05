@@ -120,6 +120,13 @@ class SAML2Backend(_Saml2Backend):
       response = saml_logout(request)
       auth_logout(request)
       return response
+    elif conf.CDP_LOGOUT_URL.get():
+      auth_logout(request)
+      redirect_url = conf.get_logout_redirect_url()
+      html = '<html><body onload="document.forms[0].submit()">' \
+             '<form action="%s" method="POST"><input name="logoutRedirect" type="hidden" value="%s"/></form>' \
+             '</body></html>' % (conf.CDP_LOGOUT_URL.get(), redirect_url)
+      return HttpResponse(html)
     else:
       return None
 
