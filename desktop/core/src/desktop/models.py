@@ -2043,9 +2043,9 @@ class ClusterConfig(object):
 
     if 'jobbrowser' in self.apps:
       from hadoop.cluster import get_default_yarncluster  # Circular loop
-      from jobbrowser.conf import ENABLE_HIVE_QUERY_BROWSER, QUERY_STORE
+      from jobbrowser.conf import ENABLE_HIVE_QUERY_BROWSER, ENABLE_QUERIES_LIST
 
-      if get_default_yarncluster() or ENABLE_HIVE_QUERY_BROWSER.get() or QUERY_STORE.IS_ENABLED.get():
+      if get_default_yarncluster() or ENABLE_HIVE_QUERY_BROWSER.get() or ENABLE_QUERIES_LIST.get():
         interpreters.append({
           'type': 'yarn',
           'displayName': _('Jobs'),

@@ -95,12 +95,6 @@ QUERY_STORE = ConfigSection(
   key="query_store",
   help=_("""Credentials for query store API."""),
   members=dict(
-    IS_ENABLED = Config(
-      key="is_enabled",
-      help=_("Enable Query Store backend for showing Hive queries information."),
-      type=coerce_bool,
-      default=False
-    ),
     SERVER_URL=Config(
       key="server_url",
       default='http://localhost:8080/',
