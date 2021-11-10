@@ -24,6 +24,7 @@ import csv
 import json
 import logging
 import urllib.error
+import openpyxl
 import sys
 import tempfile
 import uuid
@@ -731,9 +732,20 @@ def upload_local_file(request):
   upload_file = request.FILES['file']
   username = request.user.username
   filename = "%s_%s:%s;" % (username, uuid.uuid4(), upload_file.name)
+  file_format = upload_file.name.split(".")[-1]
 
-  temp_file = tempfile.NamedTemporaryFile(prefix=filename, suffix='.csv', delete=False)
-  temp_file.write(upload_file.read())
+  if file_format == "xlsx":
+    workbook = openpyxl.load_workbook(upload_file)
+    sheet = workbook.active
+    temp_file = tempfile.NamedTemporaryFile(mode='w', prefix=filename, suffix='.csv', delete=False)
+    csv_file = csv.writer(temp_file)
+    for row in sheet.rows:
+      csv_file.writerow([cell.value for cell in row])
+
+  else: 
+    temp_file = tempfile.NamedTemporaryFile(prefix=filename, suffix='.csv', delete=False)
+    temp_file.write(upload_file.read())
+
   local_file_url = temp_file.name
   temp_file.close()
 
