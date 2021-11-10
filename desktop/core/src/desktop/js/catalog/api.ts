@@ -338,52 +338,54 @@ const whenAvailable = (options: {
   snippetJson: string;
   silenceErrors?: boolean;
 }) =>
-  new CancellablePromise<{ status?: string }>(async (resolve, reject, onCancel) => {
-    let promiseToCancel: Cancellable | undefined;
-    let cancelled = false;
-    onCancel(() => {
-      cancelled = true;
-      if (promiseToCancel) {
-        promiseToCancel.cancel();
-      }
-    });
-
-    const checkStatusPromise = post<{ query_status?: { status?: string } }>(
-      CHECK_STATUS_URL,
-      {
-        notebook: options.notebookJson,
-        snippet: options.snippetJson,
-        cluster: (options.entry.compute && JSON.stringify(options.entry.compute)) || '""'
-      },
-      { silenceErrors: options.silenceErrors }
-    );
-    try {
-      promiseToCancel = checkStatusPromise;
-      const response = await checkStatusPromise;
-
-      if (response && response.query_status && response.query_status.status) {
-        const status = response.query_status.status;
-        if (status === 'available') {
-          resolve(response.query_status);
-        } else if (status === 'running' || status === 'starting' || status === 'waiting') {
-          await sleep(500);
-          try {
-            if (!cancelled) {
-              const whenPromise = whenAvailable(options);
-              promiseToCancel = whenPromise;
-              resolve(await whenPromise);
-              return;
-            }
-          } catch (err) {}
+  new CancellablePromise<{ status?: string; has_result_set?: boolean }>(
+    async (resolve, reject, onCancel) => {
+      let promiseToCancel: Cancellable | undefined;
+      let cancelled = false;
+      onCancel(() => {
+        cancelled = true;
+        if (promiseToCancel) {
+          promiseToCancel.cancel();
         }
-        reject(response.query_status);
-      } else {
-        reject('Cancelled');
+      });
+
+      const checkStatusPromise = post<{ query_status?: { status?: string } }>(
+        CHECK_STATUS_URL,
+        {
+          notebook: options.notebookJson,
+          snippet: options.snippetJson,
+          cluster: (options.entry.compute && JSON.stringify(options.entry.compute)) || '""'
+        },
+        { silenceErrors: options.silenceErrors }
+      );
+      try {
+        promiseToCancel = checkStatusPromise;
+        const response = await checkStatusPromise;
+
+        if (response && response.query_status && response.query_status.status) {
+          const status = response.query_status.status;
+          if (status === 'available') {
+            resolve(response.query_status);
+          } else if (status === 'running' || status === 'starting' || status === 'waiting') {
+            await sleep(500);
+            try {
+              if (!cancelled) {
+                const whenPromise = whenAvailable(options);
+                promiseToCancel = whenPromise;
+                resolve(await whenPromise);
+                return;
+              }
+            } catch (err) {}
+          }
+          reject(response.query_status);
+        } else {
+          reject('Cancelled');
+        }
+      } catch (err) {
+        reject(err);
       }
-    } catch (err) {
-      reject(err);
     }
-  });
+  );
 
 export const fetchSample = ({
   entry,
@@ -481,7 +483,9 @@ export const fetchSample = ({
           reject();
           return;
         }
-
+        if (queryResult.result?.handle && typeof resultStatus.has_result_set !== 'undefined') {
+          queryResult.result.handle.has_result_set = resultStatus.has_result_set;
+        }
         snippetJson = JSON.stringify(queryResult);
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
