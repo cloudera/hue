@@ -79,7 +79,7 @@ describe('hdfsAutocompleter.js', () => {
         expect(value).toEqualAutocompleteValues(values);
       }
     };
-    return spyOn(spy, 'cb').and.callThrough();
+    return jest.spyOn(spy, 'cb');
   };
 
   const assertAutoComplete = function (testDefinition) {
