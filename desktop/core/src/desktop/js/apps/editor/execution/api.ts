@@ -143,6 +143,7 @@ export interface ExecuteStatusApiResponse {
   result?: ResultApiResponse; // For streaming
   status: string;
   message?: string;
+  has_result_set?: boolean;
 }
 
 export interface ExecuteApiOptions {
