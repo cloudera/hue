@@ -62,7 +62,7 @@ describe('dataCatalogEntry.ts', () => {
 
   describe('getSample', () => {
     const emptySampleApiSpy = () => {
-      spyOn(CatalogApi, 'fetchSample').and.returnValue(
+      jest.spyOn(CatalogApi, 'fetchSample').mockReturnValue(
         CancellablePromise.resolve<Sample>({
           data: [],
           meta: [],
@@ -110,7 +110,7 @@ describe('dataCatalogEntry.ts', () => {
     });
 
     it('should bubble up exceptions', async () => {
-      spyOn(CatalogApi, 'fetchSample').and.returnValue(CancellablePromise.reject('failed!'));
+      jest.spyOn(CatalogApi, 'fetchSample').mockReturnValue(CancellablePromise.reject('failed!'));
       const entryA = await getEntry('someDb.someTable');
       let caught = false;
       try {
