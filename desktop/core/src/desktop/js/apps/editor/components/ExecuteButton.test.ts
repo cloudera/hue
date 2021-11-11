@@ -14,10 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { EXECUTABLE_UPDATED_TOPIC, ExecutableUpdatedEvent } from 'apps/editor/execution/events';
-import huePubSub from 'utils/huePubSub';
 import { nextTick } from 'vue';
 import { mount, shallowMount } from '@vue/test-utils';
+
+import { Session } from '../execution/api';
+import { EXECUTABLE_UPDATED_TOPIC, ExecutableUpdatedEvent } from 'apps/editor/execution/events';
+import huePubSub from 'utils/huePubSub';
 import SqlExecutable, { ExecutionStatus } from 'apps/editor/execution/sqlExecutable';
 import sessionManager from 'apps/editor/execution/sessionManager';
 import ExecuteButton from './ExecuteButton.vue';
@@ -30,9 +32,9 @@ describe('ExecuteButton.vue', () => {
   });
 
   it('should show execute once the session is loaded', async () => {
-    const spy = spyOn(sessionManager, 'getSession').and.returnValue(
-      Promise.resolve({ type: 'foo' })
-    );
+    const spy = jest
+      .spyOn(sessionManager, 'getSession')
+      .mockReturnValue(Promise.resolve({ type: 'foo' } as Session));
 
     const mockExecutable = {
       cancel: noop,
@@ -64,9 +66,9 @@ describe('ExecuteButton.vue', () => {
   });
 
   it('should handle execute and stop clicks', async () => {
-    const spy = spyOn(sessionManager, 'getSession').and.returnValue(
-      Promise.resolve({ type: 'foo' })
-    );
+    const spy = jest
+      .spyOn(sessionManager, 'getSession')
+      .mockReturnValue(Promise.resolve({ type: 'foo' } as Session));
     let executeCalled = false;
     let cancelCalled = false;
     const mockExecutable = {
