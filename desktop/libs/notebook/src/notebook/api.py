@@ -300,6 +300,7 @@ def _check_status(request, notebook=None, snippet=None, operation_id=None):
           nb['snippets'][0]['status'] = status
           if has_result_set is not None:
             nb['snippets'][0]['has_result_set'] = has_result_set
+            nb['snippets'][0]['result']['handle']['has_result_set'] = has_result_set
           nb_doc.update_data(nb)
           nb_doc.save()
 
