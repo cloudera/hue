@@ -17,12 +17,12 @@
 
 import json
 import sys
-from nose.tools import assert_equal
+from nose.tools import assert_equal, assert_true
 from django.utils.datastructures import MultiValueDict
 from django.core.files.uploadhandler import InMemoryUploadedFile
 
 from desktop.settings import BASE_DIR
-from indexer.api3 import upload_local_file
+from indexer.api3 import upload_local_file, guess_field_types
 
 if sys.version_info[0] > 2:
   from urllib.parse import unquote as urllib_unquote
@@ -69,7 +69,7 @@ scattered,,,scattered
 ,scattered,,
 '''
   with open(BASE_DIR + '/apps/beeswax/data/tables/book.xlsx', 'rb') as file:
-    uploaded_file = InMemoryUploadedFile(file=file, field_name='test', name='book.xlsx', content_type='xlsx', size=100, charset='utf-8')
+    uploaded_file = InMemoryUploadedFile(file=file, field_name='test', name='book(1).xlsx', content_type='xlsx', size=100, charset='utf-8')
     request = Mock()
     request.user = Mock()
     request.FILES = MultiValueDict({'file': [uploaded_file]})
@@ -81,3 +81,26 @@ scattered,,,scattered
     test_file = _test_file.read().replace('\r\n', '\n')
 
     assert_equal(csv_file, test_file)
+    assert_true("book_1_xlsx" in path)
+
+
+def test_col_names():
+  file_format = {
+    'inputFormat': 'localfile',
+    'path': BASE_DIR + '/apps/beeswax/data/tables/flights.csv',
+    'format': {
+      'hasHeader': True
+    }
+  }
+  file_format = json.dumps(file_format)
+  request = Mock()
+  request.POST = {'fileFormat': file_format}
+
+  response = guess_field_types(request)
+  response = json.loads(response.content)
+
+  columns_name = [col['name'] for col in response['columns']]
+
+  assert_true('date_1_' in columns_name)
+  assert_true('hour_1' in columns_name)
+  assert_true('minute' in columns_name)
