@@ -25,6 +25,7 @@ import json
 import logging
 import urllib.error
 import openpyxl
+import re
 import sys
 import tempfile
 import uuid
@@ -239,7 +240,7 @@ def guess_field_types(request):
 
       if file_format['format']['hasHeader']:
         sample = csv_data[1:5]
-        column_row = csv_data[0]
+        column_row = [re.sub('[^0-9a-zA-Z]+', '_', col) for col in csv_data[0]]
       else:
         sample = csv_data[:4]
         column_row = ['field_' + str(count+1) for count, col in enumerate(sample[0])]
@@ -731,7 +732,7 @@ def upload_local_file_drag_and_drop(request):
 def upload_local_file(request):
   upload_file = request.FILES['file']
   username = request.user.username
-  filename = "%s_%s:%s;" % (username, uuid.uuid4(), upload_file.name)
+  filename = "%s_%s:%s;" % (username, uuid.uuid4(), re.sub('[^0-9a-zA-Z]+', '_', upload_file.name))
   file_format = upload_file.name.split(".")[-1]
 
   if file_format == "xlsx":
