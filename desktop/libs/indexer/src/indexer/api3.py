@@ -124,13 +124,20 @@ def guess_format(request):
   file_format = json.loads(request.POST.get('fileFormat', '{}'))
 
   if file_format['inputFormat'] == 'localfile':
-    format_ = {
-      "quoteChar": "\"",
-      "recordSeparator": '\\n',
-      "type": "csv",
-      "hasHeader": True,
-      "fieldSeparator": ","
-    }
+    path = urllib_unquote(file_format["path"])
+    if 'xlsx' in path:
+      format_ = {
+        "type": "xlsx",
+        "hasHeader": True
+      }
+    else:
+      format_ = {
+        "quoteChar": "\"",
+        "recordSeparator": '\\n',
+        "type": "csv",
+        "hasHeader": True,
+        "fieldSeparator": ","
+      }
 
   elif file_format['inputFormat'] == 'file':
     path = urllib_unquote(file_format["path"])
