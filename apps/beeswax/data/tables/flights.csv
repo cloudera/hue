@@ -1,4 +1,4 @@
-"date","hour","minute","dep","arr","dep_delay","arr_delay","carrier","flight","dest","plane","cancelled","time","dist"
+"date(1)","hour.1","minute","dep","arr","dep_delay","arr_delay","carrier","flight","dest","plane","cancelled","time","dist"
 2011-12-14 12:00:00,13,4,1304,1704,24,14,"WN",3085,"PHL","N524SW",true,159,1336
 2011-12-14 12:00:00,17,52,1752,1943,12,8,"WN",39,"PHX","N503SW",true,155,1020
 2011-12-14 12:00:00,7,9,709,853,-1,-12,"WN",424,"PHX","N761RR",true,152,1020
