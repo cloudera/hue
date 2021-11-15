@@ -24,6 +24,7 @@ import json
 import logging
 
 from django.contrib.auth import logout as auth_logout
+from django.http import HttpResponse
 from djangosaml2.backends import Saml2Backend as _Saml2Backend
 from djangosaml2.views import logout as saml_logout
 from libsaml import conf
