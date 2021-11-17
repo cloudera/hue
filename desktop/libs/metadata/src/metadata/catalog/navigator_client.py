@@ -102,7 +102,7 @@ class NavigatorApi(Api):
     self._root = resource.Resource(self._client, urlencode=False) # For search_entities_interactive
 
     self.__headers = {}
-    self.__params = ()
+    self.__params = {}
 
     #self._fillup_properties() # Disabled currently
 
@@ -348,11 +348,11 @@ class NavigatorApi(Api):
       else:
         filter_query = query_s
 
-      params += (
-        ('query', filter_query),
-        ('offset', offset),
-        ('limit', NAVIGATOR.FETCH_SIZE_SEARCH.get()),
-      )
+      params.update({
+        'query': filter_query,
+        'offset': offset,
+        'limit': NAVIGATOR.FETCH_SIZE_SEARCH.get()
+      })
 
       LOG.info(params)
       response = self._root.get('entities', headers=self.__headers, params=params)
@@ -431,11 +431,11 @@ class NavigatorApi(Api):
       if source_ids:
         filter_query = source_ids + '(' + filter_query + ')'
 
-      params += (
-        ('query', filter_query),
-        ('offset', 0),
-        ('limit', 2),  # We are looking for single entity, so limit to 2 to check for multiple results
-      )
+      params.update({
+        'query': filter_query,
+        'offset': 0,
+        'limit': 2  # We are looking for single entity, so limit to 2 to check for multiple results
+      })
 
       response = self._root.get('entities', headers=self.__headers, params=params)
 
@@ -544,9 +544,9 @@ class NavigatorApi(Api):
     try:
       params = self.__params
 
-      params += (
-        ('entityIds', entity_id),
-      )
+      params.update({
+        'entityIds': entity_id
+      })
 
       return self._root.get('lineage', headers=self.__headers, params=params)
     except RestException as e:
