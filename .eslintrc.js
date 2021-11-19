@@ -123,9 +123,9 @@ module.exports = {
   ],
   extends: ['plugin:prettier/recommended'],
   globals: globals,
-  parser: 'babel-eslint',
+  parser: '@babel/eslint-parser',
   parserOptions: {
-    parser: 'babel-eslint',
+    parser: '@babel/eslint-parser',
     ecmaVersion: 2017,
     sourceType: 'module',
     ecmaFeatures: {
