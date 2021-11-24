@@ -115,15 +115,16 @@ class NavigatorApi(Api):
       default_entity_types = ('TABLE', 'VIEW')
     elif 'hdfs' in sources:
       entity_types = ('FILE', 'DIRECTORY')
-      default_entity_types  = ('FILE', 'DIRECTORY')
+      default_entity_types = ('FILE', 'DIRECTORY')
     elif 's3' in sources:
       entity_types = ('FILE', 'DIRECTORY', 'S3BUCKET')
-      default_entity_types  = ('DIRECTORY', 'S3BUCKET')
+      default_entity_types = ('DIRECTORY', 'S3BUCKET')
 
     return default_entity_types, entity_types
 
 
-  def search_entities_interactive(self, query_s=None, limit=100, offset=0, facetFields=None, facetPrefix=None, facetRanges=None, filterQueries=None, firstClassEntitiesOnly=None, sources=None):
+  def search_entities_interactive(self, query_s=None, limit=100, offset=0, facetFields=None, facetPrefix=None, 
+                                  facetRanges=None, filterQueries=None, firstClassEntitiesOnly=None, sources=None):
     try:
       pagination = {
         'offset': offset,
@@ -131,74 +132,74 @@ class NavigatorApi(Api):
       }
 
       f = {
-          "outputFormat" : {
-            "type" : "dynamic"
+          "outputFormat": {
+            "type": "dynamic"
           },
-          "name" : {
-            "type" : "dynamic"
+          "name": {
+            "type": "dynamic"
           },
-          "lastModified" : {
-            "type" : "date"
+          "lastModified": {
+            "type": "date"
           },
-          "sourceType" : {
-            "type" : "dynamic"
+          "sourceType": {
+            "type": "dynamic"
           },
-          "parentPath" : {
-            "type" : "dynamic"
+          "parentPath": {
+            "type": "dynamic"
           },
-          "lastAccessed" : {
-            "type" : "date"
+          "lastAccessed": {
+            "type": "date"
           },
-          "type" : {
-            "type" : "dynamic"
+          "type": {
+            "type": "dynamic"
           },
-          "sourceId" : {
-            "type" : "dynamic"
+          "sourceId": {
+            "type": "dynamic"
           },
-          "partitionColNames" : {
-            "type" : "dynamic"
+          "partitionColNames": {
+            "type": "dynamic"
           },
-          "serDeName" : {
-            "type" : "dynamic"
+          "serDeName": {
+            "type": "dynamic"
           },
-          "created" : {
-            "type" : "date"
+          "created": {
+            "type": "date"
           },
-          "fileSystemPath" : {
-            "type" : "dynamic"
+          "fileSystemPath": {
+            "type": "dynamic"
           },
-          "compressed" : {
-            "type" : "bool"
+          "compressed": {
+            "type": "bool"
           },
-          "clusteredByColNames" : {
-            "type" : "dynamic"
+          "clusteredByColNames": {
+            "type": "dynamic"
           },
-          "originalName" : {
-            "type" : "dynamic"
+          "originalName": {
+            "type": "dynamic"
           },
-          "owner" : {
-            "type" : "dynamic"
+          "owner": {
+            "type": "dynamic"
           },
-          "extractorRunId" : {
-            "type" : "dynamic"
+          "extractorRunId": {
+            "type": "dynamic"
           },
-          "userEntity" : {
-            "type" : "bool"
+          "userEntity": {
+            "type": "bool"
           },
-          "sortByColNames" : {
-            "type" : "dynamic"
+          "sortByColNames": {
+            "type": "dynamic"
           },
-          "inputFormat" : {
-            "type" : "dynamic"
+          "inputFormat": {
+            "type": "dynamic"
           },
-          "serDeLibName" : {
-            "type" : "dynamic"
+          "serDeLibName": {
+            "type": "dynamic"
           },
-          "originalDescription" : {
-            "type" : "dynamic"
+          "originalDescription": {
+            "type": "dynamic"
           },
-          "lastModifiedBy" : {
-            "type" : "dynamic"
+          "lastModifiedBy": {
+            "type": "dynamic"
           }
         }
 
@@ -275,7 +276,12 @@ class NavigatorApi(Api):
 
       data = json.dumps(body)
       LOG.info(data)
-      response = self._root.post('interactive/entities?limit=%(limit)s&offset=%(offset)s' % pagination, data=data, contenttype=_JSON_CONTENT_TYPE, clear_cookies=True)
+      response = self._root.post(
+        'interactive/entities?limit=%(limit)s&offset=%(offset)s' % pagination,
+        data=data,
+        contenttype=_JSON_CONTENT_TYPE,
+        clear_cookies=True
+      )
 
       response['results'] = list(islice(self._secure_results(response['results']), limit)) # Apply Sentry perms
 
@@ -302,7 +308,9 @@ class NavigatorApi(Api):
     try:
       params = self.__params
       if not raw_query:
-        query_s = query_s.replace('{', '\\{').replace('}', '\\}').replace('(', '\\(').replace(')', '\\)').replace('[', '\\[').replace(']', '\\]')
+        query_s = query_s.replace('{', '\\{').replace('}', '\\}').replace(
+          '(', '\\('
+        ).replace(')', '\\)').replace('[', '\\[').replace(']', '\\]')
 
         search_terms = [term for term in query_s.strip().split()]
 
@@ -423,7 +431,7 @@ class NavigatorApi(Api):
 
       filter_query = 'AND'.join('(%s:%s)' % (key, value) for key, value in list(query_filters.items()))
       filter_query = '%(type)s AND %(filter_query)s' % {
-        'type': '(type:%s)' % 'TABLE OR type:VIEW' if type == 'TABLE' else type, # Impala does not always say that a table is actually a view
+        'type': '(type:%s)' % 'TABLE OR type:VIEW' if type == 'TABLE' else type, # Impala don't always say that a table is actually a view
         'filter_query': filter_query
       }
 
@@ -480,7 +488,15 @@ class NavigatorApi(Api):
       properties.update(metadata)
       data = json.dumps(properties)
 
-      return self._root.put('entities/%(identity)s' % entity, params=self.__params, data=data, contenttype=_JSON_CONTENT_TYPE, allow_redirects=True, clear_cookies=True)
+      return self._root.put(
+        'entities/%(identity)s' % entity,
+        params=self.__params,
+        data=data,
+        contenttype=_JSON_CONTENT_TYPE,
+        allow_redirects=True,
+        clear_cookies=True
+      )
+
     except RestException as e:
       msg = 'Failed to update entity %s: %s' % (entity['identity'], e)
       LOG.error(msg)
@@ -577,7 +593,13 @@ class NavigatorApi(Api):
   def create_namespace_property(self, namespace, properties):
     try:
       data = json.dumps(properties)
-      return self._root.post('models/namespaces/%(namespace)s/properties' % {'namespace': namespace}, data=data, contenttype=_JSON_CONTENT_TYPE, clear_cookies=True)
+      return self._root.post(
+        'models/namespaces/%(namespace)s/properties' % {'namespace': namespace},
+        data=data,
+        contenttype=_JSON_CONTENT_TYPE,
+        clear_cookies=True
+      )
+
     except RestException as e:
       msg = 'Failed to create namespace %s property' % namespace
       LOG.error(msg)
@@ -596,7 +618,13 @@ class NavigatorApi(Api):
   def map_namespace_property(self, clazz, properties):
     try:
       data = json.dumps(properties)
-      return self._root.post('models/packages/nav/classes/%(class)s/properties' % {'class': clazz}, data=data, contenttype=_JSON_CONTENT_TYPE, clear_cookies=True)
+      return self._root.post(
+        'models/packages/nav/classes/%(class)s/properties' % {'class': clazz},
+        data=data, 
+        contenttype=_JSON_CONTENT_TYPE, 
+        clear_cookies=True
+      )
+
     except RestException as e:
       msg = 'Failed to map class %s property' % clazz
       LOG.error(msg)
@@ -646,8 +674,12 @@ class NavigatorApi(Api):
 
   def _get_boosted_term(self, term):
     return 'AND'.join([
-      '(%s)' % 'OR'.join(['(%s:%s*^%s)' % (field, term, weight) for (field, weight) in NavigatorApi.DEFAULT_SEARCH_FIELDS]),  # Matching fields
-      '(%s)' % 'OR'.join(['(%s:[* TO *])' % field for (field, weight) in NavigatorApi.DEFAULT_SEARCH_FIELDS]) # Boost entities with enriched fields
+       # Matching fields
+      '(%s)' % 'OR'.join(['(%s:%s*^%s)' % (field, term, weight) for (field, weight) in NavigatorApi.DEFAULT_SEARCH_FIELDS]),
+
+      # Boost entities with enriched fields
+      '(%s)' % 'OR'.join(['(%s:[* TO *])' % field for (field, weight) in NavigatorApi.DEFAULT_SEARCH_FIELDS])
+
       # Could add certain customProperties and properties
     ])
 
