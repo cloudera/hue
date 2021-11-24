@@ -1436,7 +1436,7 @@ class SecurityContext(object):
         :param enctext: The encrypted text as a string
         :return: The decrypted text
         """
-        if key_file is None or len(key_file.strip()) == 0:
+        if key_file is None or len(key_file) == 0:
             key_file = self.key_file
         if passphrase is None:
             passphrase = self.key_file_passphrase
