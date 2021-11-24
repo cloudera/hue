@@ -488,10 +488,10 @@ class NavigatorApi(Api):
 
 
   def get_cluster_source_ids(self):
-    params = (
-      ('query', 'clusterName:"%s"' % get_navigator_hue_server_name()),
-      ('limit', 200),
-    )
+    params = {
+      'query': 'clusterName:"%s"' % get_navigator_hue_server_name(),
+      'limit': 200
+    }
 
     LOG.info(params)
     return self._root.get('entities', headers=self.__headers, params=params)
@@ -650,6 +650,7 @@ class NavigatorApi(Api):
       '(%s)' % 'OR'.join(['(%s:[* TO *])' % field for (field, weight) in NavigatorApi.DEFAULT_SEARCH_FIELDS]) # Boost entities with enriched fields
       # Could add certain customProperties and properties
     ])
+
 
   def _clean_path(self, path):
     return path.rstrip('/').split('/')[-1], self._escape_slashes(path.rstrip('/'))
