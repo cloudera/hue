@@ -15,7 +15,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-    <hadoop.version>3.1.1.7.2.11.0-233</hadoop.version>
+    <hadoop.version>3.1.1.7.2.12.1-1</hadoop.version>
     <hive.version>3.1.3000.2021.0.5-SNAPSHOT</hive.version>
     <tez.version>0.9.1.2021.0.5-SNAPSHOT</tez.version>
 
