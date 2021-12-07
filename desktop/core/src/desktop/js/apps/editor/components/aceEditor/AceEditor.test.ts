@@ -74,7 +74,7 @@ describe('AceEditor.vue', () => {
     initialValue?: string
   ): Promise<{ element: Element; editor: Ace.Editor }> =>
     new Promise(resolve => {
-      spyOn(dataCatalog, 'getChildren').and.returnValue(CancellablePromise.resolve([]));
+      jest.spyOn(dataCatalog, 'getChildren').mockReturnValue(CancellablePromise.resolve([]));
       const props = {
         initialValue,
         id: 'some-id',

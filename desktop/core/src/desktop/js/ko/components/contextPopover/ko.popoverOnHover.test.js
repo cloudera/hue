@@ -25,8 +25,6 @@ import { HIDE_CONTEXT_POPOVER_EVENT } from './ko.contextPopover';
 describe('ko.popoverOnHover.js', () => {
   const setup = koSetup();
 
-  jest.useFakeTimers();
-
   it('should render binding', async () => {
     const wrapper = await setup.renderKo(`<div id="foo" data-bind="${NAME}: () => {}"></div>`, {});
 
@@ -34,6 +32,7 @@ describe('ko.popoverOnHover.js', () => {
   });
 
   it('should call callback on hover and publish on leave', async () => {
+    jest.useFakeTimers('legacy');
     let callbackCalled = false;
     const viewModel = {
       callback: () => {

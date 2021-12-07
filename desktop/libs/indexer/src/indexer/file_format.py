@@ -50,7 +50,8 @@ IMPORT_PEEK_NLINES = 20
 def get_format_types():
   formats = [
     CSVFormat,
-    JsonFormat
+    JsonFormat,
+    XLSXFormat
   ]
 
   if ENABLE_SCALABLE_INDEXER.get():
@@ -301,6 +302,15 @@ class SyslogFormat(GrokLineFormat):
 class ParquetFormat(FileFormat):
   _name = "parquet"
   _description = _("Parquet Table")
+
+
+class XLSXFormat(GrokkedFormat):
+  _name = "xlsx"
+  _description = _("XLSX File")
+  _args = [
+    CheckboxArgument("hasHeader", "Has Header")
+  ]
+  _extensions = ["xlsx"]
 
 
 class CSVFormat(FileFormat):
