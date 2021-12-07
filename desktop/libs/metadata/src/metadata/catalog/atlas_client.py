@@ -20,6 +20,7 @@ import json
 import logging
 import re
 import sys
+import requests
 
 from desktop.lib.exceptions_renderable import raise_popup_exception
 from desktop.lib.rest import resource
@@ -65,7 +66,25 @@ class AtlasApi(Api):
   def __init__(self, user=None):
     super(AtlasApi, self).__init__(user)
 
-    self._api_url = CATALOG.API_URL.get().strip('/') + "/api/atlas"
+    self._api_url = None
+
+    # Checking which server is active server if there are multiple else use the one thats listed
+    atlas_servers = CATALOG.API_URL.get().replace("%20", "").replace("['", "").replace("']", "").replace("'", "").split(',')
+
+    for atlas_server in atlas_servers:
+      atlas_url = atlas_server + 'api/atlas/admin/status'
+      response = requests.get(atlas_url)
+      atlas_is_active = response.json()
+
+      if "ACTIVE" in atlas_is_active["Status"]:
+        LOG.debug('Setting Atlas API endpoint to: %s' % atlas_server)
+        self._api_url = atlas_server.strip().strip('/') + "/api/atlas"
+        break
+
+    if self._api_url is None:
+      self._api_url = CATALOG.API_URL.get()
+      LOG.warning('No Atlas server available for use, defaulting to %s' % self._api_url)
+
     self._username = CATALOG.SERVER_USER.get()
     self._password = CATALOG.SERVER_PASSWORD.get()
 
