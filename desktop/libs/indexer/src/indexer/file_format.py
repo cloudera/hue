@@ -304,15 +304,6 @@ class ParquetFormat(FileFormat):
   _description = _("Parquet Table")
 
 
-class XLSXFormat(GrokkedFormat):
-  _name = "xlsx"
-  _description = _("XLSX File")
-  _args = [
-    CheckboxArgument("hasHeader", "Has Header")
-  ]
-  _extensions = ["xlsx"]
-
-
 class CSVFormat(FileFormat):
   _name = "csv"
   _description = _("CSV File")
@@ -610,6 +601,15 @@ class CSVFormat(FileFormat):
       fields = []
 
     return fields
+
+
+class XLSXFormat(CSVFormat):
+  _name = "excel"
+  _description = _("Excel File")
+  _args = [
+    CheckboxArgument("hasHeader", "Has Header")
+  ]
+  _extensions = ["xlsx", "xls"]
 
 
 class JsonFormat(CSVFormat):
