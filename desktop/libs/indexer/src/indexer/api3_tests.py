@@ -17,12 +17,13 @@
 
 import json
 import sys
+from nose.plugins.skip import SkipTest
 from nose.tools import assert_equal, assert_true
 from django.utils.datastructures import MultiValueDict
 from django.core.files.uploadhandler import InMemoryUploadedFile
 
 from desktop.settings import BASE_DIR
-from indexer.api3 import upload_local_file, guess_field_types
+from indexer.api3 import upload_local_file, guess_field_types, guess_format
 
 if sys.version_info[0] > 2:
   from urllib.parse import unquote as urllib_unquote
@@ -104,3 +105,24 @@ def test_col_names():
   assert_true('date_1_' in columns_name)
   assert_true('hour_1' in columns_name)
   assert_true('minute' in columns_name)
+
+
+def test_guess_format_excel_remote_file():
+  if sys.version_info[0] > 2:
+    with patch('indexer.api3.pd') as pd:
+      with patch('indexer.api3.MorphlineIndexer') as MorphlineIndexer:
+        file_format = {
+          'inputFormat': 'file',
+          'path': 's3a://gethue/example1.xlsx'
+        }
+        file_format = json.dumps(file_format)
+        request = Mock(
+          POST={'fileFormat': file_format}
+        )
+
+        response = guess_format(request)
+        response = json.loads(response.content)
+
+        assert_equal(response['type'], "excel")
+  else:
+    raise SkipTest
