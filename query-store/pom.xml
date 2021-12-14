@@ -31,7 +31,7 @@
     <lombok.version>1.18.10</lombok.version>
     <protobuf.version>2.5.0</protobuf.version>
     <jdbi.version>3.14.1</jdbi.version>
-    <log4j2.version>2.15.0</log4j2.version>
+    <log4j2.version>2.16.0</log4j2.version>
     <postgres.version>42.2.14</postgres.version>
     <pg-embedded.version>0.7.1</pg-embedded.version>
     <jetty.version>9.4.43.v20210629</jetty.version>
