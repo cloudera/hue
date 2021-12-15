@@ -14,7 +14,7 @@
 
   <artifactId>hue-query-processor</artifactId>
   <name>Query Processor for Hive and Tez events</name>
-  <description>Process hive and tez events into DAS.</description>
+  <description>Process hive and tez events into Query Processor.</description>
 
   <properties>
     <mainClass>com.cloudera.hue.querystore.eventProcessor.EventProcessorApplication</mainClass>
