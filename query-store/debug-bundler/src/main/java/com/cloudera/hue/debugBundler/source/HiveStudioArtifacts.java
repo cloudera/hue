@@ -111,7 +111,7 @@ public class HiveStudioArtifacts implements ArtifactSource {
       artifacts.add(new Artifact() {
         @Override
         public String getName() {
-          return tezInfo.getDir("DAS/DAG." + FILE_EXT);
+          return tezInfo.getDir("QP/DAG." + FILE_EXT);
         }
 
         @Override
@@ -134,7 +134,7 @@ public class HiveStudioArtifacts implements ArtifactSource {
       artifacts.add(new Artifact() {
         @Override
         public String getName() {
-          return tezInfo.getDir("DAS/VERTEX." + FILE_EXT);
+          return tezInfo.getDir("QP/VERTEX." + FILE_EXT);
         }
 
         @Override
