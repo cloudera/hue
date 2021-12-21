@@ -40,8 +40,11 @@ from aws.s3.s3fs import S3FileSystemException
 from aws.s3.s3test_utils import get_test_bucket
 
 from azure.conf import is_abfs_enabled, is_adls_enabled, ABFS_CLUSTERS
+
 from django.urls import reverse
 from django.utils.encoding import smart_str
+from django.http import HttpResponse
+
 from nose.plugins.attrib import attr
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal, assert_raises,\
@@ -51,6 +54,7 @@ from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access, add_to_group, add_permission, remove_from_group
 from desktop.lib.view_util import location_to_url
 from desktop.conf import is_oozie_enabled, RAZ
+
 from hadoop import pseudo_hdfs4
 from hadoop.conf import UPLOAD_CHUNK_SIZE
 from hadoop.fs.webhdfs import WebHdfs
@@ -1627,3 +1631,14 @@ class TestFileChooserRedirect(object):
       finally:
         for reset in resets:
           reset()
+
+  def test_empty_path_to_default_index_dir(self):
+    with patch('filebrowser.views._normalize_path') as _normalize_path:
+      with patch('desktop.lib.fs.proxyfs.ProxyFS.stats') as stats:
+        with patch('filebrowser.views.listdir_paged') as listdir_paged:
+          stats.isDir.return_value = True
+          listdir_paged.return_value = HttpResponse()
+        
+          response = self.client.get('/filebrowser/view=')
+
+          _normalize_path.assert_called_with('/')
