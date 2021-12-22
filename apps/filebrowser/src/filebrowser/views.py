@@ -213,6 +213,7 @@ def download(request, path):
 
 def view(request, path):
   """Dispatches viewing of a path to either index() or fileview(), depending on type."""
+
   # index directory have to be default.
   if not path:
     path = '/'
