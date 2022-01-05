@@ -45,11 +45,21 @@ categories:
 
 ---
 
-If you are a Hue user then you might be familiar with the Hue [Direct Importer](/blog/2021-05-26-improved-hue-importer-select-a-file-choose-a-dialect-create-a-table/). It lets you create tables from a local CSV file. Now you can also create SQL tables by importing Excel (.xlsx) files into Hue.
+If you are a Hue user then you might be familiar with the Hue [Importer](https://docs.gethue.com/developer/api/rest/#file-import). It lets you create tables from a CSV file. Now you can also create SQL tables by importing Excel files into Hue.
 
+We have 2 options for file import
+
+1. [Direct Importer](/blog/2021-05-26-improved-hue-importer-select-a-file-choose-a-dialect-create-a-table/)
 
 ![Importer direct upload steps gif](https://cdn.gethue.com/uploads/2021/11/direct_importer_xlsx.gif)
 
+**Note:** Supports (.xlsx) excel file type only.
+
+2. [Remote Importer](https://gethue.com/hadoop-tutorial-create-hive-tables-with-headers-and)
+
+![Importer remote upload steps gif](https://cdn.gethue.com/uploads/2021/11/remote_importer_xlsx1.gif)
+
+**Note:** Python2 based Hue does not support remote excel file importer.
 
 You can try this feature in the latest Hue version or at [demo.gethue.com](https://demo.gethue.com/hue/indexer/importer).  
 </br>
