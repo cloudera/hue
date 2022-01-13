@@ -216,7 +216,7 @@ def get_query_server_config(name='beeswax', connector=None):
     else:
       kerberos_principal = get_hiveserver2_kerberos_principal(HIVE_SERVER_HOST.get())
       query_server = {
-          'server_name': 'beeswax',
+          'server_name': 'beeswax' if name != 'hplsql' else 'hplsql',
           'server_host': activeEndpoint["host"],
           'server_port': LLAP_SERVER_PORT.get() if name == 'llap' else HIVE_SERVER_PORT.get(),
           'principal': kerberos_principal,
