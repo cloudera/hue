@@ -57,7 +57,7 @@ try:
   from beeswax import conf as beeswax_conf, data_export
   from beeswax.api import _autocomplete, _get_sample_data
   from beeswax.conf import CONFIG_WHITELIST as hive_settings, DOWNLOAD_ROW_LIMIT, DOWNLOAD_BYTES_LIMIT, MAX_NUMBER_OF_SESSIONS, \
-      has_session_pool, has_multiple_sessions, CLOSE_SESSIONS, HPLSQL
+      has_session_pool, has_multiple_sessions, CLOSE_SESSIONS
   from beeswax.data_export import upload
   from beeswax.design import hql_query
   from beeswax.models import QUERY_TYPES, HiveServerQueryHandle, HiveServerQueryHistory, QueryHistory, Session
@@ -180,8 +180,6 @@ class HS2Api(Api):
   @query_error_handler
   def create_session(self, lang='hive', properties=None):
     application = 'beeswax' if lang == 'hive' or lang == 'llap' else lang
-    if application == 'beeswax' and HPLSQL.get():
-      application = 'hplsql'
 
     if has_session_pool():
       session = Session.objects.get_tez_session(self.user, application, MAX_NUMBER_OF_SESSIONS.get())
@@ -694,8 +692,6 @@ DROP TABLE IF EXISTS `%(table)s`;
       session_id = session.get('id')
       if session_id:
         filters = {'id': session_id, 'application': 'beeswax' if type == 'hive' or type == 'llap' else type}
-        if HPLSQL.get() and filters['application'] == 'beeswax':
-          filters['application'] = 'hplsql'
         if not is_admin(self.user):
           filters['owner'] = self.user
         return Session.objects.get(**filters)
@@ -744,7 +740,7 @@ DROP TABLE IF EXISTS `%(table)s`;
 
     return hql_query(
       statement,
-      query_type=QUERY_TYPES[0],
+      query_type=QUERY_TYPES[4] if hasattr(snippet, 'dialect') and snippet['dialect'] == 'hplsql' else QUERY_TYPES[0],
       settings=settings,
       file_resources=file_resources,
       functions=functions,
