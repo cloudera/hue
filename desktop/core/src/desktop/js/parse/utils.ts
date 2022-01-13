@@ -19,7 +19,7 @@ import hplsqlStatementsParser from 'parse/hplsqlStatementsParser';
 import sqlStatementsParser from 'parse/sqlStatementsParser';
 
 export const getStatementsParser = (connector: Connector): any => {
-  if (connector.dialect === 'hive' && window.HPLSQL) {
+  if (connector.dialect === 'hplsql') {
     return hplsqlStatementsParser;
   } else {
     return sqlStatementsParser;
