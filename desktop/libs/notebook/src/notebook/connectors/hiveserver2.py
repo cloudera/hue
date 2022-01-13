@@ -796,6 +796,8 @@ DROP TABLE IF EXISTS `%(table)s`;
       name = 'llap'
     elif dialect == 'impala':
       name = 'impala'
+    elif dialect == 'hplsql':
+      name = 'hplsql'
     else:
       name = 'sparksql'
 
