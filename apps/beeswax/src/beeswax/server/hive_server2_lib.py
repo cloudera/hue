@@ -677,6 +677,9 @@ class HiveServerClient(object):
       if HPLSQL.get():
         kwargs['configuration'].update({'set:hivevar:mode': 'HPLSQL'})
 
+    if self.query_server['server_name'] == 'hplsql': # All the time
+      kwargs['configuration'].update({'hive.server2.proxy.user': user.username, 'set:hivevar:mode': 'HPLSQL'})
+
     if self.query_server['server_name'] == 'llap': # All the time
       kwargs['configuration'].update({'hive.server2.proxy.user': user.username})
 
@@ -997,7 +1000,7 @@ class HiveServerClient(object):
 
     # The query can override the default configuration
     configuration.update(self._get_query_configuration(query))
-    if HPLSQL.get() and self.query_server['server_name'] == 'beeswax':
+    if self.query_server['server_name'] == 'hplsql':
       query_statement = query.hql_query
     else:
       query_statement = query.get_query_statement(statement)
