@@ -561,7 +561,7 @@ This is the same as creating a new connector instance, but as we provide the `id
 
 ### Delete
 
-    curl -X POST 'https://demo.gethue.com/api/connector/instance/delete' -d '{"connector": {"id": "1"}}'
+    curl -X POST 'https://demo.gethue.com/api/connector/instance/delete' -d 'connector={"id": "1"}}'
 
 ### Test
 
