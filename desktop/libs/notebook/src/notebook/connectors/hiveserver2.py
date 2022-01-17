@@ -737,10 +737,11 @@ DROP TABLE IF EXISTS `%(table)s`;
       functions = next((prop['value'] for prop in properties if prop['key'] == 'functions'), None)
 
     database = snippet.get('database') or 'default'
+    query_type = QUERY_TYPES[4] if hasattr(snippet, 'dialect') and snippet['dialect'] == 'hplsql' else QUERY_TYPES[0]
 
     return hql_query(
       statement,
-      query_type=QUERY_TYPES[4] if hasattr(snippet, 'dialect') and snippet['dialect'] == 'hplsql' else QUERY_TYPES[0],
+      query_type=query_type,
       settings=settings,
       file_resources=file_resources,
       functions=functions,
