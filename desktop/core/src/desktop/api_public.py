@@ -16,6 +16,7 @@
 # limitations under the License.
 
 import logging
+import json
 
 from django.http import QueryDict, HttpResponse
 from rest_framework.decorators import api_view
@@ -92,6 +93,15 @@ def execute(request, dialect=None):
         '"name":"","isSaved":false,"sessions":[]}' % params,
       'snippet': '{"id":%(interpreter_id)s,"type":"%(interpreter)s","result":{},"statement":"%(statement)s","properties":{}}' % params
     }
+
+    # Optional database param for specific query statements like "show tables;"
+    if django_request.POST.get('database'):
+      database = django_request.POST.get('database')
+      snippet = json.loads(data['snippet'])
+      snippet['database'] = database
+
+      data['snippet'] = json.dumps(snippet)
+
 
     django_request.POST = QueryDict(mutable=True)
     django_request.POST.update(data)
