@@ -34,7 +34,7 @@ from desktop.conf import DEFAULT_USER, USE_THRIFT_HTTP_JWT
 
 from beeswax import conf as beeswax_conf, hive_site
 from beeswax.hive_site import hiveserver2_use_ssl
-from beeswax.conf import CONFIG_WHITELIST, LIST_PARTITIONS_LIMIT, HPLSQL, MAX_CATALOG_SQL_ENTRIES
+from beeswax.conf import CONFIG_WHITELIST, LIST_PARTITIONS_LIMIT, MAX_CATALOG_SQL_ENTRIES
 from beeswax.models import Session, HiveServerQueryHandle, HiveServerQueryHistory
 from beeswax.server.dbms import Table, DataTable, QueryServerException, InvalidSessionQueryServerException
 
@@ -674,8 +674,6 @@ class HiveServerClient(object):
 
     if self.query_server['server_name'] == 'beeswax': # All the time
       kwargs['configuration'].update({'hive.server2.proxy.user': user.username})
-      if HPLSQL.get():
-        kwargs['configuration'].update({'set:hivevar:mode': 'HPLSQL'})
 
     if self.query_server['server_name'] == 'hplsql': # All the time
       kwargs['configuration'].update({'hive.server2.proxy.user': user.username, 'set:hivevar:mode': 'HPLSQL'})
@@ -710,11 +708,10 @@ class HiveServerClient(object):
 
     encoded_status, encoded_guid = HiveServerQueryHandle(secret=sessionId.secret, guid=sessionId.guid).get()
     properties = json.dumps(res.configuration)
-    application = 'hplsql' if HPLSQL.get() and self.query_server['server_name'] == 'beeswax' else self.query_server['server_name']
 
     session = Session.objects.create(
         owner=user,
-        application=application,
+        application=self.query_server['server_name'],
         status_code=res.status.statusCode,
         secret=encoded_status,
         guid=encoded_guid,
@@ -1000,10 +997,7 @@ class HiveServerClient(object):
 
     # The query can override the default configuration
     configuration.update(self._get_query_configuration(query))
-    if self.query_server['server_name'] == 'hplsql':
-      query_statement = query.hql_query
-    else:
-      query_statement = query.get_query_statement(statement)
+    query_statement = query.get_query_statement(statement)
 
     return self.execute_async_statement(statement=query_statement, conf_overlay=configuration, session=session)
 
