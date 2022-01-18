@@ -57,7 +57,7 @@ def get_current_statement(snippet):
   statement_id = handle.get('statement_id', 0)
   statements_count = handle.get('statements_count', 1)
 
-  statements = get_statements(snippet['statement'], snippet['dialect'] if hasattr(snippet, 'dialect') else None)
+  statements = get_statements(snippet['statement'], snippet['dialect'] if 'dialect' in snippet else None)
 
   statement_id = min(statement_id, len(statements) - 1) # In case of removal of statements
   previous_statement_hash = compute_statement_hash(statements[statement_id]['statement'])
