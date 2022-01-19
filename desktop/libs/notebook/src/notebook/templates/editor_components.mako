@@ -2088,6 +2088,12 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         snippetImage: '${ static("beeswax/art/icon_beeswax_48.png") }',
         sqlDialect: true
       },
+      hplsql: {
+        placeHolder: '${ _("Example: CREATE PROCEDURE name AS SELECT * FROM tablename limit 10 GO") }',
+        aceMode: 'ace/mode/hplsql',
+        snippetImage: '${ static("beeswax/art/icon_beeswax_48.png") }',
+        sqlDialect: true
+      },
       impala: {
         placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
         aceMode: 'ace/mode/impala',

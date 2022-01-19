@@ -23,6 +23,7 @@ import 'ext/ace/mode-druid';
 import 'ext/ace/mode-elasticsearch';
 import 'ext/ace/mode-flink';
 import 'ext/ace/mode-hive';
+import 'ext/ace/mode-hplsql';
 import 'ext/ace/mode-impala';
 import 'ext/ace/mode-ksql';
 import 'ext/ace/mode-mysql';
@@ -38,6 +39,7 @@ import 'ext/ace/snippets/druid';
 import 'ext/ace/snippets/elasticsearch';
 import 'ext/ace/snippets/flink';
 import 'ext/ace/snippets/hive';
+import 'ext/ace/snippets/hplsql';
 import 'ext/ace/snippets/impala';
 import 'ext/ace/snippets/ksql';
 import 'ext/ace/snippets/mysql';
@@ -61,6 +63,7 @@ const DIALECT_ACE_MODE_MAPPING: { [dialect: string]: string } = {
   'flink': 'ace/mode/flink',
   'dasksql': 'ace/mode/dasksql',
   'hive': 'ace/mode/hive',
+  'hplsql': 'ace/mode/hplsql',
   'impala': 'ace/mode/impala',
   'ksql': 'ace/mode/ksql',
   'mysql': 'ace/mode/mysql',
