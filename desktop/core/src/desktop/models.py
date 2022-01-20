@@ -1849,6 +1849,15 @@ class ClusterConfig(object):
     }
 
 
+  def displayName(self, dialect, name):
+    if ENABLE_UNIFIED_ANALYTICS.get() and dialect == 'hive':
+      return 'Unified Analytics'
+    elif name.lower() == 'hplsql':
+      return 'HPL/SQL'
+    else:
+      return name
+
+
   def _get_editor(self):
     interpreters = []
 
@@ -1860,7 +1869,7 @@ class ClusterConfig(object):
           'name': interpreter['name'],
           'type': interpreter['type'],  # Connector v1
           'id': interpreter['type'],
-        'displayName': 'Unified Analytics' if ENABLE_UNIFIED_ANALYTICS.get() and interpreter['dialect'] == 'hive' else interpreter['name'],
+          'displayName': self.displayName(interpreter['dialect'], interpreter['name']),
           'buttonName': _('Query'),
           'tooltip': _('%s Query') % interpreter['type'].title(),
           'optimizer': get_optimizer_mode(),
