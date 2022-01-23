@@ -24,12 +24,20 @@ public class AuthConfig {
     KERBEROS;
   }
 
+  // authorization modes
+  public enum AuthorizationMode{
+    NONE,
+    RANGER
+  }
+
   private UserAuth userAuth;
   private ServiceAuth serviceAuth;
 
   private String appUserName;
   private String adminUsers;
   private String adminGroups;
+
+  private AuthorizationMode authorizationMode;// it can be "NONE" or "RANGER"
 
   private String dasJWTCookieName;
   private String publicKey;
