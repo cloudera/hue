@@ -32,7 +32,7 @@ eventlet==0.30.2
 future==0.18.2
 greenlet==0.4.15
 gunicorn==19.9.0
-ipython==7.16.1  # Last Python 3.6
+ipython==7.16.3  # Last Python 3.6
 jaeger-client==4.3.0
 jdcal==1.0.1
 kazoo==2.8.0
