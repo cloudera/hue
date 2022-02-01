@@ -30,6 +30,7 @@ NEED_KRB181_WORKAROUND = None
 def renew_from_kt():
   cmdv = [CONF.KINIT_PATH.get(),
           "-k", # host ticket
+          "-r", "7d", # renewable for seven days
           "-t", CONF.HUE_KEYTAB.get(), # specify keytab
           "-c", CONF.CCACHE_PATH.get(), # specify credentials cache
           CONF.HUE_PRINCIPAL.get()]
