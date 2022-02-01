@@ -212,6 +212,12 @@ CDP_LOGOUT_URL = Config(
   default="",
   help=_t("To log users out of magic-sso, CDP control panel use Logout URL"))
 
+CDP_REDIRECT_URL = Config(
+  key="redirect_url",
+  type=str,
+  default="",
+  help=_t("After calling logout URL, user browser will redirect to redirect URL"))
+
 def get_key_file_password():
   password = os.environ.get('HUE_SAML_KEY_FILE_PASSWORD')
   if password is not None:
@@ -232,6 +238,8 @@ def config_validator(user):
 
 def get_logout_redirect_url():
   # This logic was derived from KNOX.
+  if CDP_REDIRECT_URL.get():
+    return CDP_REDIRECT_URL.get()
   prod_url = "consoleauth.altus.cloudera.com"
   redirect_url = "https://sso.cloudera.com/bin/services/support/api/public/logout"
   if prod_url not in CDP_LOGOUT_URL.get():
