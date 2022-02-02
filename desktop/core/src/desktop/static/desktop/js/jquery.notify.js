@@ -48,7 +48,11 @@
     var _this = this;
     var MARGIN = 4;
 
-    if (/^(504|upstream connect error|Gateway Time-out)/.test(_this.options.message.trim())) {
+    if (
+      /^(504|upstream connect error|Gateway Time-out|Service connectivity error)/.test(
+        _this.options.message.trim()
+      )
+    ) {
       console.warn(_this.options.message);
       return;
     }
