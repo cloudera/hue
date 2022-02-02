@@ -97,6 +97,8 @@ The following example prints the sum of numbers between 1 and 10:
     select sum;
 ![Example2](https://cdn.gethue.com/uploads/2022/02/Hplsql_example2.png)
 
+**Attention:** In hplsql mode, you must terminate the commands using the forward slash character (/). The semicolon (;) is used throughout procedure declarations and can no longer be relied upon to terminate a query in the editor.
+
 
 You can try this feature in the latest Hue version.  
 </br>
