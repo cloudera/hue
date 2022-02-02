@@ -138,15 +138,15 @@ Tip: if you run into building kerberos extension issue and see message `krb5-con
 * Xcode command line tools
 * [Homebrew](https://brew.sh)
 
-#### Big Sur on M1 or Intel with Python 3
+#### M1 or Intel based Macs with Python 3
 
-This is a verified step-by-step guide on how to get up and running on a fresh installation of macOS Big Sur, tested on both M1 and Intel based MacBook Pro.
+This is a verified step-by-step guide on how to get Hue up and running on a fresh installation of macOS (Big Sur, Monterey 12.0.1), tested on both M1 and Intel based MacBook Pro.
 
 1. Clone the Hue repo
 
     `git clone https://github.com/cloudera/hue.git`
 
-2. Install Brew if not already installed
+2. Install Brew (if not already installed)
 
    `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"`
 
@@ -172,12 +172,12 @@ This is a verified step-by-step guide on how to get up and running on a fresh in
 
    `brew install gmp openssl libffi`
 
-7. Install python, tested with the "macOS 64-bit installer" 3.7.9 direct download from python.org.
+7. Install python, tested with the **macOS 64-bit installer 3.7.9** direct download from python.org
 `https://www.python.org/ftp/python/3.7.9/python-3.7.9-macosx10.9.pkg`
 
-   - For M1 Macs, 3.7.9 from python.org is the only one that works and none of the homebrew version work at the time of writing.
+   - For **M1 Macs, 3.7.9 from python.org is the only Python version that works** and none of the homebrew versions work at the time of writing. Hue M1 support for Python >= 3.8 will be improved soon.
 
-   - For Intel Macs, other 3.x Python versions as well as Homebrew might work. However, direct download from python.org is preferred and tested.
+   - For Intel Macs, other 3.x Python versions as well as Homebrew ones might work. However, direct download from python.org is preferred and tested.
 
 8. Install mysql client
 
@@ -214,12 +214,21 @@ This is a verified step-by-step guide on how to get up and running on a fresh in
       password=huepassword
       name=hue_d
     ```
+12. For **M1 Macs**, if `make apps` fails with `virtualenv is not compatible with this system or executable` error
 
-12. If you use postgres as configured in the previous step you'll need to add the psycopg2 lib manually
+    ```
+    pip3.7 install virtualenv
+    virtualenv ./build/env
+    rm ./build/env/bin/python3.7
+    
+    make apps
+    ```
+
+14. If you use postgres as configured in the previous step you'll need to add the psycopg2 lib manually
 
     `./build/env/bin/pip install psycopg2-binary`
 
-12. Start Hue (note that export from step 10 above needs to be active)
+14. Start Hue (note that export from step 10 above needs to be active)
 
     `./build/env/bin/hue runserver 0.0.0.0:8888`
 
