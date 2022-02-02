@@ -116,6 +116,16 @@ In order to prevent spamming zookeeper, HiveServer2 is cached for the life of th
     [beeswax]
     cache_timeout = 60
 
+### HPL/SQL
+It is an Apache open source procedural extension for SQL for Hive users. This [HPL/SQL Editor](https://gethue.com/blog/2022-02-01-hplsql-support/) post demoes the integration.
+
+    [[[hplsql]]]
+    name=Hplsql
+    interface=hiveserver2
+**Note:** 
+- HPL/SQL uses the `[beeswax]` config like Hive uses.
+- In hplsql mode, you must terminate the commands using the forward slash character (/). The semicolon (;) is used throughout procedure declarations and can no longer be relied upon to terminate a query in the editor.
+
 ### Apache Impala
 
 This [Impala SQL Editor](https://gethue.com/blog/quickstart-sql-editor-for-apache-impala/) post demoes the integration.
