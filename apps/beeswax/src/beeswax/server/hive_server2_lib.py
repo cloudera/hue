@@ -37,6 +37,7 @@ from beeswax.hive_site import hiveserver2_use_ssl
 from beeswax.conf import CONFIG_WHITELIST, LIST_PARTITIONS_LIMIT, MAX_CATALOG_SQL_ENTRIES
 from beeswax.models import Session, HiveServerQueryHandle, HiveServerQueryHistory
 from beeswax.server.dbms import Table, DataTable, QueryServerException, InvalidSessionQueryServerException
+from notebook.connectors.base import get_interpreter
 
 if sys.version_info[0] > 2:
   from django.utils.translation import gettext as _
@@ -665,6 +666,7 @@ class HiveServerClient(object):
         'username': user.username,  # If SASL or LDAP, it gets the username from the authentication mechanism since it dependents on it.
         'configuration': {},
     }
+    interpreter = get_interpreter(connector_type=self.query_server['server_name'], user=self.user)
 
     if self.impersonation_enabled:
       kwargs.update({'username': DEFAULT_USER})
@@ -675,7 +677,7 @@ class HiveServerClient(object):
     if self.query_server['server_name'] == 'beeswax': # All the time
       kwargs['configuration'].update({'hive.server2.proxy.user': user.username})
 
-    if self.query_server['server_name'] == 'hplsql': # All the time
+    if self.query_server['server_name'] == 'hplsql' or interpreter['dialect'] == 'hplsql': # All the time
       kwargs['configuration'].update({'hive.server2.proxy.user': user.username, 'set:hivevar:mode': 'HPLSQL'})
 
     if self.query_server['server_name'] == 'llap': # All the time
