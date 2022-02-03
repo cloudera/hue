@@ -23,6 +23,7 @@ from nose.tools import assert_equal, assert_true, assert_raises, assert_not_equa
 from nose.plugins.skip import SkipTest
 from TCLIService.ttypes import TStatusCode
 
+from desktop.auth.backend import rewrite_user
 from desktop.lib.django_test_util import make_logged_in_client
 from useradmin.models import User
 
@@ -44,7 +45,7 @@ class TestHiveServerClient():
 
   def setUp(self):
     self.client = make_logged_in_client(username="test_hive_server2_lib", groupname="default", recreate=True, is_superuser=False)
-    self.user = User.objects.get(username="test_hive_server2_lib")
+    self.user = rewrite_user(User.objects.get(username="test_hive_server2_lib"))
 
     self.query_server = {
         'principal': 'hue',
