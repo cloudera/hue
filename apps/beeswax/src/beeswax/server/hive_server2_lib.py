@@ -666,7 +666,8 @@ class HiveServerClient(object):
         'username': user.username,  # If SASL or LDAP, it gets the username from the authentication mechanism since it dependents on it.
         'configuration': {},
     }
-    interpreter = get_interpreter(connector_type=self.query_server['server_name'], user=self.user)
+    connector_type = 'hive' if self.query_server['server_name'] == 'beeswax' else self.query_server['server_name']
+    interpreter = get_interpreter(connector_type=connector_type, user=self.user)
 
     if self.impersonation_enabled:
       kwargs.update({'username': DEFAULT_USER})
