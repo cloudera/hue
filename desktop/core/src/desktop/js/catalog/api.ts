@@ -34,6 +34,7 @@ import DataCatalogEntry, {
   SourceMeta
 } from 'catalog/DataCatalogEntry';
 import { Cluster, Compute, Connector, Namespace } from 'config/types';
+import { findEditorConnector } from 'config/hueConfig';
 import { hueWindow } from 'types/types';
 import '../utils/json.bigDataParse';
 import sleep from 'utils/timing/sleep';
@@ -158,7 +159,7 @@ export const fetchDescribe = ({
       {
         format: 'json',
         cluster: JSON.stringify(entry.compute),
-        source_type: entry.getConnector().id,
+        source_type: getAssistConnectorId(entry),
         connector: JSON.stringify(entry.getConnector())
       },
       {
@@ -432,7 +433,7 @@ export const fetchSample = ({
       {
         notebook: {},
         snippet: JSON.stringify({
-          type: entry.getConnector().id,
+          type: getAssistConnectorId(entry),
           compute: entry.compute
         }),
         async: true,
@@ -551,7 +552,7 @@ export const fetchSourceMetadata = ({
     {
       notebook: {},
       snippet: JSON.stringify({
-        type: entry.getConnector().id,
+        type: getAssistConnectorId(entry),
         source: 'data'
       }),
       operation: entry.isModel() ? 'model' : 'default',
@@ -588,6 +589,18 @@ interface SearchOptions {
 }
 
 type SearchResponse = { entities?: NavigatorMeta[] } | undefined;
+
+// this is a workaround for hplsql describe not working
+const getAssistConnectorId = (entry: DataCatalogEntry): string | number => {
+  const connector = entry.getConnector();
+  if (connector.dialect === 'hplsql') {
+    const hiveConnector = findEditorConnector(connector => connector.dialect === 'hive');
+    if (hiveConnector) {
+      return hiveConnector.id;
+    }
+  }
+  return connector.id;
+};
 
 export const searchEntities = ({
   limit,
