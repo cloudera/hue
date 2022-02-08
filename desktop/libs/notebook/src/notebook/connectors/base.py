@@ -399,7 +399,8 @@ def patch_snippet_for_connector(snippet):
   # TODO Connector unification
   """
   if snippet.get('connector') and snippet['connector'].get('type'):
-    snippet['type'] = snippet['connector']['type']  # To rename to 'id'
+    if snippet['connector']['dialect'] != 'hplsql':   # this is a workaround for hplsql describe not working
+      snippet['type'] = snippet['connector']['type']  # To rename to 'id'
     snippet['dialect'] = snippet['connector']['dialect']
   else:
     snippet['dialect'] = snippet['type']
