@@ -35,28 +35,28 @@ _MAKO_LOCK = threading.RLock()
 
 
 def _instrumented_test_render(self, *args, **data):
-    """
-    An instrumented Template render method, providing a signal
-    that can be intercepted by the test system Client
-    """
+  """
+  An instrumented Template render method, providing a signal
+  that can be intercepted by the test system Client
+  """
 
-    with _MAKO_LOCK:
-      def mako_callable_(context, *args, **kwargs):
-        template_rendered.send(sender=self, template=self, context=context)
-        return self.original_callable_[-1](context, *args, **kwargs)
+  with _MAKO_LOCK:
+    def mako_callable_(context, *args, **kwargs):
+      template_rendered.send(sender=self, template=self, context=context)
+      return self.original_callable_[-1](context, *args, **kwargs)
 
-      if hasattr(self, 'original_callable_'):
-        self.original_callable_.append(self.callable_)
-      else:
-        self.original_callable_ = [self.callable_]
+    if hasattr(self, 'original_callable_'):
+      self.original_callable_.append(self.callable_)
+    else:
+      self.original_callable_ = [self.callable_]
 
-      self.callable_ = mako_callable_
-      try:
-        response = runtime._render(self, self.original_callable_[-1], args, data)
-      finally:
-        self.callable_ = self.original_callable_.pop()
+    self.callable_ = mako_callable_
+    try:
+      response = runtime._render(self, self.original_callable_[-1], args, data)
+    finally:
+      self.callable_ = self.original_callable_.pop()
 
-      return response
+    return response
 
 
 class HueTestRunner(NoseTestSuiteRunner):
