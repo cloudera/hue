@@ -82,7 +82,19 @@ class HueTestRunner(NoseTestSuiteRunner):
       nose_argv.extend(args)
 
     if hasattr(settings, 'NOSE_ARGS'):
-      nose_argv.extend(settings.NOSE_ARGS)
+      extended_nose_args = settings.NOSE_ARGS
+
+      # Remove coverage packages option from settings.NOSE_ARGS if explicitly mentioned as test command-line argument.
+      # This will help as an option to report coverage for specific packages only if required.
+      for nose_arg in nose_argv:
+        if nose_arg.startswith('--cover-package'):
+          extended_nose_args = []
+
+          for arg in settings.NOSE_ARGS:
+            if not arg.startswith('--cover-package'):
+              extended_nose_args.append(arg)
+
+      nose_argv.extend(extended_nose_args)
 
     # Skip over 'manage.py test' and any arguments handled by django.
     django_opts = ['--noinput', '--liveserver', '-p', '--pattern']
