@@ -11,7 +11,7 @@ channels-redis==3.2.0
 configobj==5.0.6
 cryptography==3.3.2
 django-auth-ldap==2.3.0
-Django==3.2.5
+Django==3.2.11
 daphne==3.0.2
 django-axes==5.13.0
 django-celery-beat==2.2.1
