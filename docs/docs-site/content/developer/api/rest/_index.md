@@ -175,11 +175,14 @@ And then, add it in `hue.ini` (comma separated and in order of priority if multi
 
 Now that we are authenticated, here is how to execute a `SHOW TABLES` SQL query via the `hive` connector. You could repeat the steps with any query you want, e.g. `SELECT * FROM web_logs LIMIT 100`.
 
-Selecting the Database to query via the **dialect** argument in `/api/editor/execute/<dialect>`:
-- **hive**: select the first configured Hive databases.
+Selecting the **dialect** argument in `/api/editor/execute/<dialect>`:
+- **hive**: select the configured Hive dialect
 - **1**: select the connector id 1
 - **hive-1**: select the interpreter id 1 and hints that it is a Hive dialect
 - If blank will pick the first interpreter
+
+Optional parameter:
+- **database**: select a specific database
 
 For a `SHOW TABLES`, first we send the query statement:
 
@@ -561,7 +564,7 @@ This is the same as creating a new connector instance, but as we provide the `id
 
 ### Delete
 
-    curl -X POST 'https://demo.gethue.com/api/connector/instance/delete' -d '{"connector": {"id": "1"}}'
+    curl -X POST 'https://demo.gethue.com/api/connector/instance/delete' -d 'connector={"id": "1"}'
 
 ### Test
 

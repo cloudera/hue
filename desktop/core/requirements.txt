@@ -32,18 +32,19 @@ eventlet==0.30.2
 future==0.18.2
 greenlet==0.4.15
 gunicorn==19.9.0
-ipython==7.16.1  # Last Python 3.6
+ipython==7.16.3  # Last Python 3.6
 jaeger-client==4.3.0
 jdcal==1.0.1
 kazoo==2.8.0
 kerberos==1.3.0
 lockfile==0.12.2
-lxml==4.6.3
+lxml==4.6.5
 Mako==1.1.4
 Markdown==3.1
 mysqlclient==1.4.6
 nose==1.3.7
 openpyxl==2.6.2
+pandas==1.1.5
 phoenixdb==1.1.0
 prompt-toolkit==2.0.10
 protobuf==3.17.0

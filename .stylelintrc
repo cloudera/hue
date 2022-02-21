@@ -1,20 +1,64 @@
 {
-  "extends": "stylelint-config-standard",
-  "plugins": [
-    "stylelint-scss"
+  "overrides": [
+    {
+      "files": ["**/*.scss"],
+      "extends": "stylelint-config-standard-scss",
+      "customSyntax": "postcss-scss",
+      "plugins": [
+        "stylelint-scss"
+      ],
+      "rules": {
+        "scss/at-else-empty-line-before": null,
+        "scss/at-extend-no-missing-placeholder": null,
+        "scss/at-if-closing-brace-newline-after": null,
+        "scss/at-if-closing-brace-space-after": null,
+        "scss/at-import-partial-extension": null,
+        "scss/at-mixin-argumentless-call-parentheses": null,
+        "scss/at-mixin-pattern": null,
+        "scss/comment-no-empty": null,
+        "scss/dollar-variable-colon-space-after": null,
+        "scss/dollar-variable-empty-line-before": null,
+        "scss/double-slash-comment-empty-line-before": null,
+        "scss/double-slash-comment-whitespace-inside": null,
+        "selector-pseudo-element-no-unknown": [
+          true,
+          {
+            "ignorePseudoElements": ["v-deep"]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["**/*.less"],
+      "extends": "stylelint-config-standard",
+      "customSyntax": "postcss-less",
+      "rules": {
+        "at-rule-no-unknown": null,
+        "declaration-block-no-redundant-longhand-properties": null,
+        "function-url-quotes": null,
+        "media-feature-name-no-vendor-prefix": null,
+        "number-leading-zero": null,
+        "selector-attribute-quotes": null,
+        "selector-id-pattern": null
+      }
+    }
   ],
   "rules": {
-    "at-rule-no-unknown": null,
-    "max-empty-lines": 4,
+    "alpha-value-notation": null,
+    "at-rule-empty-line-before": null,
+    "at-rule-no-vendor-prefix": null,
+    "color-function-notation": null,
+    "font-family-name-quotes": null,
+    "keyframes-name-pattern": null,
+    "max-empty-lines": null,
+    "max-line-length": null,
     "no-descending-specificity": null,
-    "no-invalid-position-at-import-rule": null,
-    "number-leading-zero": null,
-    "scss/at-rule-no-unknown": true,
-    "selector-pseudo-element-no-unknown": [
-      true,
-      {
-        "ignorePseudoElements": ["v-deep"]
-      }
-    ]
+    "number-max-precision": null,
+    "property-no-vendor-prefix": null,
+    "selector-class-pattern": null,
+    "shorthand-property-no-redundant-values": null,
+    "string-quotes": null,
+    "value-keyword-case": null,
+    "value-no-vendor-prefix": null
   }
 }
