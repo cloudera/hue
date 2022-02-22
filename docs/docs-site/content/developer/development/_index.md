@@ -473,7 +473,7 @@ variable. The `create_desktop_app` command creates a default icon for you.
 
 **NOTE:** If you do not define an application icon, your application will not show up in the navigation bar.
 
-Hue ships with Twitter Bootstrap and Font Awesome 3 so you have plenty of scalable icons to choose from. You can style your elements to use them like this (in your mako template):
+Hue ships with Twitter Bootstrap and Font Awesome 3 (https://fontawesome.com/v3/) so you have plenty of scalable icons to choose from. You can style your elements to use them like this (in your mako template):
 
     <!-- show a trash icon in a link -->
     <a href="#something"><i class="icon-trash"></i> Trash</a>
