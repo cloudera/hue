@@ -64,6 +64,7 @@ const ADD_TAGS_URL = '/metadata/api/catalog/add_tags';
 const AUTOCOMPLETE_URL_PREFIX = '/api/editor/autocomplete/';
 const CANCEL_STATEMENT_URL = '/api/editor/cancel_statement';
 const CHECK_STATUS_URL = '/api/editor/check_status';
+const CLOSE_STATEMENT_URL = '/api/editor/close_statement';
 const DELETE_TAGS_URL = '/metadata/api/catalog/delete_tags';
 const DESCRIBE_URL = '/api/editor/describe/';
 const FETCH_RESULT_DATA_URL = '/api/editor/fetch_result_data';
@@ -400,6 +401,21 @@ export const fetchSample = ({
     let notebookJson: string | undefined = undefined;
     let snippetJson: string | undefined = undefined;
 
+    const closeQuery = async () => {
+      if (notebookJson) {
+        try {
+          await post(
+            CLOSE_STATEMENT_URL,
+            {
+              notebook: notebookJson,
+              snippet: snippetJson
+            },
+            { silenceErrors: true }
+          );
+        } catch (err) {}
+      }
+    };
+
     const cancelQuery = async () => {
       if (notebookJson) {
         try {
@@ -468,6 +484,7 @@ export const fetchSample = ({
           data: sampleResponse.rows,
           meta: sampleResponse.full_headers || []
         });
+        closeQuery();
       } else {
         const statusPromise = whenAvailable({
           notebookJson: notebookJson,
@@ -482,6 +499,7 @@ export const fetchSample = ({
 
         if (resultStatus.status !== 'available') {
           reject();
+          closeQuery();
           return;
         }
         if (queryResult.result?.handle && typeof resultStatus.has_result_set !== 'undefined') {
@@ -516,6 +534,7 @@ export const fetchSample = ({
         };
 
         resolve(sample);
+        closeQuery();
         cancellablePromises.pop();
 
         const closeSessions = (<hueWindow>window).CLOSE_SESSIONS;
@@ -540,6 +559,7 @@ export const fetchSample = ({
       }
     } catch (err) {
       reject();
+      closeQuery();
     }
   });
 
