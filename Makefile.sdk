@@ -120,6 +120,10 @@ ext-env-pip-install:
 	@echo '--- Finished $(REQUIREMENT_FILE) into virtual-env'
 	@$(ENV_PIP) install $(NAVOPTAPI_WHL)
 	@echo '--- Finished $(NAVOPTAPI_WHL) into virtual-env'
+	@echo '--- Installing ext-py3 into virtual-env via $(ENV_PIP)'
+	@$(ENV_PIP) install -e $(BOTO_PKG)
+	@echo '--- Finished installing ext-py3 into virtual-env via $(ENV_PIP)'
+	@touch $@
 
 #
 # ext-eggs
@@ -129,10 +133,12 @@ ext-env-pip-install:
 .PHONY: ext-eggs
 ext-eggs: $(EXT_PY_EGG_TARGETS)
 $(EXT_PY_EGG_TARGETS):
+ifeq ($(PYTHON_VER),python2.7)
 	@echo '--- Building egg for $(CUR_EXT_PY)'
 	@cd ext-py/$(CUR_EXT_PY) && $(ENV_PYTHON) \
 	  -c '__import__("setuptools.sandbox").sandbox.run_setup("setup.py", __import__("sys").argv[1:])' \
 	  bdist_egg
+endif
 	@mkdir -p $(@D) && touch $@
 
 #

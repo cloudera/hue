@@ -130,11 +130,20 @@ endif
 ###################################
 virtual-env: $(BLD_DIR_ENV)/stamp
 $(BLD_DIR_ENV)/stamp:
-	@echo "--- Creating virtual environment at $(BLD_DIR_ENV)"
-	$(SYS_PYTHON) $(VIRTUAL_BOOTSTRAP) \
-		$(VIRTUALENV_OPTS) --system-site-packages $(BLD_DIR_ENV)
-	@touch $@
-	@echo "--- $(BLD_DIR_ENV) ready"
+	@if [ "$(PYTHON_VER)" = "python2.7" ]; then \
+	  echo "--- Creating virtual environment at $(BLD_DIR_ENV)"; \
+	  $(SYS_PYTHON) $(VIRTUAL_BOOTSTRAP) \
+	    $(VIRTUALENV_OPTS) --system-site-packages $(BLD_DIR_ENV); \
+	  touch $@; \
+	  echo "--- $(BLD_DIR_ENV) ready"; \
+	else \
+	  echo "--- Creating virtual environment at $(BLD_DIR_ENV)"; \
+	  $(SYS_PYTHON) -m pip install --upgrade pip; \
+	  $(SYS_PIP) install virtualenv; \
+	  virtualenv $(BLD_DIR_ENV); \
+	  touch $@; \
+	  echo "--- $(BLD_DIR_ENV) ready"; \
+	fi
 
 .PHONY: virtual-env
 
@@ -177,7 +186,7 @@ INSTALL_CORE_FILES = \
 	tools/virtual-bootstrap \
 	tools/enable-python27.sh \
 	tools/relocatable.sh \
-	VERS* LICENSE* README* webpack-stats*.json
+	VERS* LICENSE* README*
 
 .PHONY: install
 install: virtual-env install-check install-core-structure install-desktop install-apps install-env
@@ -191,7 +200,7 @@ install-check:
 
 .PHONY: install-core-structure
 install-core-structure:
-	@echo --- Installing core source structure...
+	@echo --- Installing core source structure in $(INSTALL_DIR)...
 	@mkdir -p $(INSTALL_DIR)
 	@tar cf - $(INSTALL_CORE_FILES) | tar -C $(INSTALL_DIR) -xf -
 	@# Add some variables to Makefile to make sure that our virtualenv
