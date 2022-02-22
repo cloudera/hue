@@ -21,7 +21,7 @@ import json
 from django.http import QueryDict, HttpResponse
 from rest_framework.decorators import api_view
 
-from filebrowser import views as filebrowser_views
+from filebrowser import views as filebrowser_views, api as filebrowser_api
 from indexer import api3 as indexer_api3
 from metadata import optimizer_api
 from notebook import api as notebook_api
@@ -32,8 +32,7 @@ from desktop.auth.backend import rewrite_user
 from desktop.lib import fsmanager
 from desktop.lib.connectors import api as connector_api
 
-from useradmin import views as useradmin_views
-from useradmin import api as useradmin_api
+from useradmin import views as useradmin_views, api as useradmin_api
 
 from beeswax import api as beeswax_api
 
@@ -189,6 +188,11 @@ def analyze_table(request, dialect, database, table, columns=None):
 
 
 # Storage
+
+@api_view(["POST"])
+def storage_get_filesystems(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.get_filesystems(django_request)
 
 @api_view(["GET"])
 def storage_view(request, path):
