@@ -147,6 +147,22 @@ class Location(object):
     APSoutheast = 'ap-southeast-1'
     APSoutheast2 = 'ap-southeast-2'
     CNNorth1 = 'cn-north-1'
+    USEast1 = "us-east-1"
+    USEast2 = "us-east-2"
+    AfricaSouth = "af-south-1"
+    AsiaPacificEast = "ap-east-1"
+    AsiaPacificSouthEast3 = "ap-southeast-3"
+    AsiaPacificSouth1 = "ap-south-1"
+    AsiaPacificNorthEast3 = "ap-northeast-3"
+    AsiaPacificNorthEast2 = "ap-northeast-2"
+    CanadaCentral = "ca-central-1"
+    ChinaNorthWest1 = "cn-northwest-1"
+    EuropeWest1 = "eu-west-1"
+    EuropeWest2 = "eu-west-2"
+    EuropeSouth1 = "eu-south-1"
+    EuropeWest3 = "eu-west-3"
+    EuropeNorth1 = "eu-north-1"
+    MiddleEastSouth1 = "me-south-1"
 
 
 class NoHostProvided(object):
