@@ -89,7 +89,7 @@ class KeyFile():
     return self.key.read(size)
 
   def close(self):
-    self.key.close()
+    self.key.close(fast=True)
     self.location = None
     self.closed = True
 
