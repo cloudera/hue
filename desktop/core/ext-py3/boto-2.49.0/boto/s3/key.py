@@ -993,7 +993,12 @@ class Key(object):
                 'x-goog-encryption-kms-key-name', None)
             if (amz_server_side_encryption_customer_algorithm is None and
                     goog_customer_managed_encryption is None):
-                if self.etag != '"%s"' % md5:
+                server_side_encryption = response.getheader('x-amz-server-side-encryption', None)
+                # When server side encryption is AES256 (SSE-S3) or no SSE, etag equals to md5.
+                # But when it is aws:kms (SSE-KMS) and HTTP Method is PUT, the md5 is not match.
+                #
+                # http://docs.aws.amazon.com/AmazonS3/latest/API/RESTObjectPUT.html
+                if self.etag != '"%s"' % md5 and server_side_encryption != 'aws:kms' and response._method != 'PUT':
                     raise provider.storage_data_error(
                         'ETag from S3 did not match computed MD5. '
                         '%s vs. %s' % (self.etag, self.md5))
