@@ -2502,8 +2502,8 @@ else:
         skipKeydownEvents: true,
         onEnter: function (el) {
           var target_path = stripHashes(el.val());
-          if (window.USER_HOME_DIR.split('/')[2] !== el.val().split('/')[2] && window.RAZ_IS_ENABLED){
-            $.jHueNotify.warn("${ _('You are not allowed to go outside ') }" + window.USER_HOME_DIR + "${ _(' bucket.') }");
+          if (el.val().split('/')[2] === '' && window.RAZ_IS_ENABLED){
+            $.jHueNotify.warn("${ _('Listing of buckets is not allowed. Redirecting to the home directory.') }");
             target_path = window.USER_HOME_DIR;
           } 
           fileBrowserViewModel.targetPath("${url('filebrowser:filebrowser.views.view', path='')}" + target_path); 
