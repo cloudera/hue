@@ -28,14 +28,12 @@ RUN groupadd -g 1000 ${HUEUSER} && useradd -g 1000 -d ${HUE_HOME} -s /bin/bash -
 RUN mkdir -p ${HUE_LOG_DIR} && chown -R ${HUEUSER}:${HUEUSER} ${HUE_LOG_DIR}
 RUN echo "Include /etc/httpd/conf.d/hue_httpd.conf" >> /etc/httpd/conf/httpd.conf
 
-COPY static ${HUE_HOME}/build/static
-COPY hue_httpd.conf /etc/httpd/conf.d/hue_httpd.conf
-COPY hue.conf /etc/httpd/conf.d/hue.conf
-COPY run_httpd.sh ${HUE_HOME}
+COPY --chown=${HUEUSER}:${HUEUSER} static ${HUE_HOME}/build/static
+COPY --chown=${HUEUSER}:${HUEUSER} hue_httpd.conf /etc/httpd/conf.d/hue_httpd.conf
+COPY --chown=${HUEUSER}:${HUEUSER} hue.conf /etc/httpd/conf.d/hue.conf
+COPY --chown=${HUEUSER}:${HUEUSER} run_httpd.sh ${HUE_HOME}
 RUN sed -i "s|Listen 80|Listen 8080|g" /etc/httpd/conf/httpd.conf && sed -i "s|User apache|User hive|g" /etc/httpd/conf/httpd.conf && sed -i "s|Group apache|Group hive|g" /etc/httpd/conf/httpd.conf
-RUN chown -R ${HUEUSER}:${HUEUSER} ${HUE_HOME}/build/static \
-      /etc/httpd/conf.d/hue* \
-      ${HUE_HOME}/run_httpd.sh && chmod -v +x ${HUE_HOME}/run_httpd.sh
+RUN chmod -v +x ${HUE_HOME}/run_httpd.sh
 RUN mkdir -p /run && chown -R ${HUEUSER}:${HUEUSER} /run && mkdir -p /tmp/httpd && chown -R ${HUEUSER}:${HUEUSER} /tmp/httpd && chown -R ${HUEUSER}:${HUEUSER} /etc/httpd && chown -R ${HUEUSER}:${HUEUSER} /var/log && chown -R ${HUEUSER}:${HUEUSER} /etc/httpd/logs
 
 EXPOSE 8080
