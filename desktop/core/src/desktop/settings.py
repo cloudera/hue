@@ -148,6 +148,7 @@ MIDDLEWARE = [
     'desktop.middleware.MetricsMiddleware',
     'desktop.middleware.EnsureSafeMethodMiddleware',
     'desktop.middleware.AuditLoggingMiddleware',
+    'desktop.middleware.MultipleProxyMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
