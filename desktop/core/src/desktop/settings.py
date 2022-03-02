@@ -336,7 +336,8 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': desktop.conf.AUTH.API_AUTH.get()
 }
-if desktop.conf.AUTH.JWT.IS_ENABLED.get() and 'desktop.auth.api_authentications.JwtAuthentication' not in REST_FRAMEWORK['DEFAULT_AUTHENTICATION_CLASSES']:
+if desktop.conf.AUTH.JWT.IS_ENABLED.get() and \
+  'desktop.auth.api_authentications.JwtAuthentication' not in REST_FRAMEWORK['DEFAULT_AUTHENTICATION_CLASSES']:
   REST_FRAMEWORK['DEFAULT_AUTHENTICATION_CLASSES'].insert(0, 'desktop.auth.api_authentications.JwtAuthentication')
 
 SIMPLE_JWT = {
