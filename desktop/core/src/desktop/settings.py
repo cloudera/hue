@@ -380,7 +380,7 @@ EMAIL_SUBJECT_PREFIX = 'Hue %s - ' % desktop.conf.CLUSTER_ID.get()
 # Permissive CORS for public /api
 INSTALLED_APPS.append('corsheaders')
 MIDDLEWARE.insert(0, 'corsheaders.middleware.CorsMiddleware')
-CORS_URLS_REGEX = r'^/api/.*$'
+CORS_URLS_REGEX = r'^/api/.*$|/saml2/login/'
 CORS_ALLOW_CREDENTIALS = True
 if sys.version_info[0] > 2:
   CORS_ALLOW_ALL_ORIGINS = True
@@ -465,6 +465,7 @@ if desktop.conf.TASK_SERVER.ENABLED.get():
 SESSION_COOKIE_NAME = desktop.conf.SESSION.COOKIE_NAME.get()
 SESSION_COOKIE_AGE = desktop.conf.SESSION.TTL.get()
 SESSION_COOKIE_SECURE = desktop.conf.SESSION.SECURE.get()
+SECURE_REFERRER_POLICY = None
 SESSION_EXPIRE_AT_BROWSER_CLOSE = desktop.conf.SESSION.EXPIRE_AT_BROWSER_CLOSE.get()
 
 # HTTP only
