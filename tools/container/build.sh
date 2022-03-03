@@ -21,23 +21,22 @@ COMPILEHUE_VERSION=huecompile_ubi:$DOCKERHUEBASE_VERSION
 HUEBASE_VERSION=huebase_ubi:$DOCKERHUEBASE_VERSION
 HUELBBASE_VERSION=huelb_httpd_ubi:$DOCKERHUELB_VERSION
 
-CONTAINER_HUE_SRC=/root/hue
+CONTAINER_HUE_SRC=/root/${HUEUSER}
 CONTAINER_HUE_OPT=/opt
 
 # This step is performed inside the docker(compile step)
-compile_hue() {
+compile_py3hue() {
+  export HUE_HOME="/opt/${HUEUSER}"
   mkdir -p $CONTAINER_HUE_OPT
   cd $CONTAINER_HUE_SRC
-  PREFIX=$CONTAINER_HUE_OPT make install
-  cd $CONTAINER_HUE_OPT/hue
+  INSTALL_DIR=${HUE_HOME} make install
+  cd $CONTAINER_HUE_OPT/${HUEUSER}
   APPS=$(find apps -maxdepth 2 -name "src" -type d|cut -d"/" -f2|sort| sed 's/[^ ]* */apps\/&/g')
   ./build/env/bin/python tools/app_reg/app_reg.py --install $APPS --relative-paths
-  bash tools/relocatable.sh
 }
 
 # Compile the bits in the docker and copy it out
 docker_hue_compile() {
-  export HUE_USER="hive"
   export HUE_CONF="/etc/hue"
   export HUE_HOME="/opt/${HUEUSER}"
   export HUE_CONF_DIR="${HUE_CONF}/conf"
@@ -47,13 +46,12 @@ docker_hue_compile() {
   mkdir -p $BUILD_DIR
   docker run -dt --name $CONTAINER $COMPILEHUE_VERSION /bin/bash
   docker container cp $HUE_SRC $CONTAINER:$CONTAINER_HUE_SRC
-  docker container exec $CONTAINER $CONTAINER_HUE_SRC/tools/container/build.sh compile_hue
-  docker container cp $CONTAINER:$CONTAINER_HUE_OPT/hue $BUILD_DIR
+  docker container exec $CONTAINER $CONTAINER_HUE_SRC/tools/py3container/buildpy3.sh compile_py3hue
+  docker container cp $CONTAINER:$CONTAINER_HUE_OPT/${HUEUSER} $BUILD_DIR
   docker container stop $CONTAINER
 }
 
 docker_hue_build() {
-  export HUE_USER="hive"
   export HUE_CONF="/etc/hue"
   export HUE_HOME="/opt/${HUEUSER}"
   export HUE_CONF_DIR="${HUE_CONF}/conf"
@@ -61,12 +59,12 @@ docker_hue_build() {
   export UUID_GEN=$(uuidgen | cut -d"-" -f5)
 
   cd $HUE_DIR
-  cp -a $BUILD_DIR/hue $HUE_DIR
-  rm -f $HUE_DIR/hue/desktop/conf/*
+  cp -a $BUILD_DIR/${HUEUSER} $HUE_DIR
+  rm -f $HUE_DIR/${HUEUSER}/desktop/conf/*
 
   # Reduce Hue container size
-  rm -rf $HUE_DIR/hue/node_modules
-  rm -rf $HUE_DIR/hue/desktop/core/ext-eggs
+  rm -rf $HUE_DIR/${HUEUSER}/node_modules
+  rm -rf $HUE_DIR/${HUEUSER}/desktop/core/ext-eggs
 
   for f in $(find $HUE_DIR/supervisor-files -name "*_template"); do
     subst_var $f
@@ -84,14 +82,13 @@ docker_hue_build() {
 }
 
 docker_huelb_build() {
-  export HUE_USER="hive"
   export HUE_CONF="/etc/hue"
   export HUE_HOME="/opt/${HUEUSER}"
   export HUE_CONF_DIR="${HUE_CONF}/conf"
   export HUE_LOG_DIR="/var/log/${HUEUSER}"
 
   cd $APACHE_DIR
-  cp -a $BUILD_DIR/hue/build/static $APACHE_DIR
+  cp -a $BUILD_DIR/${HUEUSER}/build/static $APACHE_DIR
 
   for f in $(find $APACHE_DIR -name "*_template"); do
     subst_var $f
@@ -153,7 +150,7 @@ pull_base_images() {
 }
 
 rebuild_base_images() {
-  docker pull registry.access.redhat.com/ubi7/ubi:latest
+  docker pull registry.access.redhat.com/ubi8/ubi:latest
   build_huebase
   build_huelbbase
   build_huecompilebase
@@ -189,17 +186,17 @@ wait_for_parallel_jobs() {
   fi
 }
 
-if [[ $1 == "compile_hue" ]]; then
-  compile_hue
+if [[ $1 == "compile_py3hue" ]]; then
+  compile_py3hue
 else
   # Perform Hue Code Compilation and Docker packaging
   hue_containers_build
 
   # Perform any other container build process
-  extra_container_build=$(find_extra_container_to_build)
-  if test -n "$extra_container_build"; then
-    $extra_container_build
-  fi
+  #extra_container_build=$(find_extra_container_to_build)
+  #if test -n "$extra_container_build"; then
+  #  $extra_container_build
+  #fi
 
   # Wait for the parallel jobs to finish
   wait_for_parallel_jobs
