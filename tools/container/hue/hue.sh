@@ -50,17 +50,29 @@ function set_samlcert() {
   mkdir -pm 755 $HUE_CONF_DIR/samlcert
   cd $HUE_CONF_DIR/samlcert
   export RANDFILE=$HUE_CONF_DIR/samlcert/.rnd
+  CNAME=""
+  if [[ "$EXTERNAL_HOST" =~ .*"localhost".* ]]; then
+    CNAME=$EXTERNAL_HOST
+  else
+    LASTWORD=$(echo $EXTERNAL_HOST | awk -F'[.=]' '{print $NF}')
+    SECONDWORD=$(echo $EXTERNAL_HOST | awk -F'[.=]' '{print $(NF-1)}')
+    if [ ! -z ${LASTWORD} ]; then
+      CNAME="$SECONDWORD.$LASTWORD"
+    else
+      CNAME=$EXTERNAL_HOST
+    fi
+  fi
   if [ -z ${PASSPHRASE+x} ]; then
     openssl genrsa -des3 -passout pass:cloudera -out server.pass.key 2048
     openssl rsa -inform PEM -outform PEM -passin pass:cloudera -in server.pass.key -out server.key
-    openssl req -new -key server.key -out server.csr -subj "/C=US/ST=California/L=Palo Alto/O=Cloudera/OU=Hue/CN=$EXTERNAL_HOST"
+    openssl req -new -key server.key -out server.csr -subj "/C=US/ST=California/L=Palo Alto/O=Cloudera/OU=Hue/CN=$CNAME"
     openssl x509 -req -days 365 -in server.csr -signkey server.key -out server.crt
   else
     echo "#!/bin/bash" > $HUE_CONF_DIR/samlcert/pass.key
     echo "echo \$PASSPHRASE" >> $HUE_CONF_DIR/samlcert/pass.key
     chmod a+x $HUE_CONF_DIR/samlcert/pass.key
     openssl genrsa -des3 -passout pass:$PASSPHRASE -out server.key 2048
-    openssl req -new -key server.key -out server.csr -passin pass:$PASSPHRASE -subj "/C=US/ST=California/L=Palo Alto/O=Cloudera/OU=Hue/CN=$EXTERNAL_HOST"
+    openssl req -new -key server.key -out server.csr -passin pass:$PASSPHRASE -subj "/C=US/ST=California/L=Palo Alto/O=Cloudera/OU=Hue/CN=$CNAME"
     openssl x509 -req -days 365 -in server.csr -passin pass:$PASSPHRASE -signkey server.key -out server.crt
   fi
   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib64
@@ -86,7 +98,7 @@ elif [[ $1 == runcpserver ]]; then
   if [ -e "/etc/hue/conf/saml.ini" ]; then
     set_samlcert
   fi
-  $HUE_BIN/hue runcherrypyserver
+  $HUE_BIN/hue rungunicornserver
 fi
 
 exit 0
