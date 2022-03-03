@@ -339,6 +339,13 @@ class RazClientTest(unittest.TestCase):
 
             resp = client.check_access(method='GET', url=self.s3_path)
 
+            if sys.version_info[0] > 2:
+              signed_request = 'CiRodHRwczovL2dldGh1ZS10ZXN0LnMzLmFtYXpvbmF3cy5jb20Q' \
+                'ATIYZ2V0aHVlL2RhdGEvY3VzdG9tZXIuY3N2OABCAnMzSgJzMw=='
+            else:
+              signed_request = b'CiRodHRwczovL2dldGh1ZS10ZXN0LnMzLmFtYXpvbmF3cy5jb20Q' \
+                b'ATIYZ2V0aHVlL2RhdGEvY3VzdG9tZXIuY3N2OABCAnMzSgJzMw=='
+
             requests_post.assert_called_with(
               'https://raz.gethue.com:8080/api/authz/s3/access?delegation=mock_RAZ_token', 
               headers={'Content-Type': 'application/json', 'Accept-Encoding': 'gzip,deflate'}, 
@@ -355,8 +362,7 @@ class RazClientTest(unittest.TestCase):
                 'sessionId': '',
                 'accessTime': '',
                 'context': {
-                  'S3_SIGN_REQUEST': b'CiRodHRwczovL2dldGh1ZS10ZXN0LnMzLmFtYXpvbmF3cy5jb20Q' \
-                    b'ATIYZ2V0aHVlL2RhdGEvY3VzdG9tZXIuY3N2OABCAnMzSgJzMw=='
+                  'S3_SIGN_REQUEST': signed_request
                 }
               },
               verify=False
