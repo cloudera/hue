@@ -72,7 +72,7 @@ class AtlasApi(Api):
     atlas_servers = CATALOG.API_URL.get().replace("%20", "").replace("['", "").replace("']", "").replace("'", "").split(',')
 
     for atlas_server in atlas_servers:
-      atlas_url = atlas_server + 'api/atlas/admin/status'
+      atlas_url = atlas_server.strip().strip('/') + '/api/atlas/admin/status'
       response = requests.get(atlas_url)
       atlas_is_active = response.json()
 
