@@ -30,8 +30,8 @@ from desktop.conf import QUERY_DATABASE
 from desktop.lib.django_test_util import make_logged_in_client
 from useradmin.models import User
 
-from jobbrowser.apis.hive_query_api import HiveQueryApi, HiveQueryClient
-from jobbrowser.models import HiveQuery
+from jobbrowser.apis.hive_query_api import HiveQueryApi
+# from jobbrowser.models import HiveQuery
 
 
 if sys.version_info[0] > 2:

@@ -32,7 +32,7 @@ from notebook.models import _get_notebook_api, make_notebook, MockRequest
 
 from jobbrowser.apis.base_api import Api
 from jobbrowser.conf import QUERY_STORE
-from jobbrowser.models import HiveQuery
+# from jobbrowser.models import HiveQuery
 
 if sys.version_info[0] > 2:
   from django.utils.translation import gettext as _
@@ -172,37 +172,37 @@ class HiveQueryApi(Api):
       return 'PAUSED'
 
 
-class HiveQueryClient():
+# class HiveQueryClient():
 
-  def _get_all_queries(self):
-    return HiveQuery.objects.using('query').order_by('-start_time')
+#   def _get_all_queries(self):
+#     return HiveQuery.objects.using('query').order_by('-start_time')
 
-  def _get_queries(self, filters):
-    queries = self._get_all_queries()
-    queries = queries.filter(start_time__gte=filters['startTime'], end_time__lte=filters['endTime'])
-    if filters['text']:
-      queries = queries.filter(query__icontains=filters['text'])
+#   def _get_queries(self, filters):
+#     queries = self._get_all_queries()
+#     queries = queries.filter(start_time__gte=filters['startTime'], end_time__lte=filters['endTime'])
+#     if filters['text']:
+#       queries = queries.filter(query__icontains=filters['text'])
 
-    for facet in filters['facets']:
-      queries = queries.filter(**{facet['field']+'__in': facet['values']})
+#     for facet in filters['facets']:
+#       queries = queries.filter(**{facet['field']+'__in': facet['values']})
 
-    return queries
+#     return queries
 
-  def get_query_count(self, filters):
-    filtered_query_list = self._get_queries(filters)
+#   def get_query_count(self, filters):
+#     filtered_query_list = self._get_queries(filters)
 
-    return len(filtered_query_list)
+#     return len(filtered_query_list)
 
-  def get_queries(self, filters):
-    filtered_query_list = self._get_queries(filters)
-    paginated_query_list = filtered_query_list[filters['offset']:filters['offset'] + filters['limit']]
+#   def get_queries(self, filters):
+#     filtered_query_list = self._get_queries(filters)
+#     paginated_query_list = filtered_query_list[filters['offset']:filters['offset'] + filters['limit']]
 
-    return paginated_query_list
+#     return paginated_query_list
 
-  def get_query(self, query_id):
-    return HiveQuery.objects.using('query').get(query_id=query_id)
+#   def get_query(self, query_id):
+#     return HiveQuery.objects.using('query').get(query_id=query_id)
 
-  def get_query_analysis(self, query_id): pass
+#   def get_query_analysis(self, query_id): pass
 
   # EXPLAIN with row count
   # CBO COST
