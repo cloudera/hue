@@ -16,10 +16,7 @@ try:
 except ImportError:
     charset_normalizer = None
 
-try:
-    import chardet
-except ImportError:
-    chardet = None
+chardet = None
 
 try:
     from urllib3.contrib import pyopenssl
