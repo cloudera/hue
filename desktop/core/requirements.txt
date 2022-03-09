@@ -60,7 +60,6 @@ pytidylib==0.3.2
 pytz==2021.3
 PyJWT==1.7.1
 PyYAML==5.4.1
-requests==2.27.1
 requests-kerberos==0.12.0
 rsa==4.7
 sasl==0.2.1  # Move to https://pypi.org/project/sasl3/ ?
