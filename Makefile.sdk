@@ -122,6 +122,7 @@ ext-env-pip-install:
 	@echo '--- Finished $(NAVOPTAPI_WHL) into virtual-env'
 	@echo '--- Installing ext-py3 into virtual-env via $(ENV_PIP)'
 	@$(ENV_PIP) install -e $(BOTO_PKG)
+	@$(ENV_PIP) install -e $(REQUEST_PKG)
 	@echo '--- Finished installing ext-py3 into virtual-env via $(ENV_PIP)'
 	@touch $@
 
