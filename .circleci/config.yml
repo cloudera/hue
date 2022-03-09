@@ -281,8 +281,6 @@ jobs:
     docker:
       - image: gethue/hue:latest-py2 # Should be circleci/python:3.6 at some point
 
-    working_directory: ~/repo
-
     steps:
       - build-py-38-common
 
