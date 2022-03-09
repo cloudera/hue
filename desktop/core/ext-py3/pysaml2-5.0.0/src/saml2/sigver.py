@@ -457,9 +457,10 @@ def pem_format(key):
     ]).encode('ascii')
 
 
-def import_rsa_key_from_file(filename):
+def import_rsa_key_from_file(filename, passphrase=None):
     data = read_file(filename, 'rb')
-    key = saml2.cryptography.asymmetric.load_pem_private_key(data, None)
+    passphrase = bytes(passphrase) if passphrase else None
+    key = saml2.cryptography.asymmetric.load_pem_private_key(data, passphrase)
     return key
 
 
@@ -771,7 +772,7 @@ class CryptoBackendXmlSec1(CryptoBackend):
 
         return output.decode('utf-8')
 
-    def decrypt(self, enctext, key_file, id_attr):
+    def decrypt(self, enctext, key_file, id_attr, passphrase=None):
         """
 
         :param enctext: XML document containing an encrypted part
@@ -785,19 +786,20 @@ class CryptoBackendXmlSec1(CryptoBackend):
         com_list = [
             self.xmlsec,
             '--decrypt',
-            '--privkey-pem', key_file,
             '--id-attr:{id_attr}'.format(id_attr=id_attr),
             ENC_KEY_CLASS,
         ]
 
         try:
-            (_stdout, _stderr, output) = self._run_xmlsec(com_list, [tmp.name])
+            (_stdout, _stderr, output) = self._run_xmlsec(com_list, [tmp.name],
+                                                         key_file=key_file,
+                                                         passphrase=passphrase)
         except XmlsecError as e:
             six.raise_from(DecryptError(com_list), e)
 
         return output.decode('utf-8')
 
-    def sign_statement(self, statement, node_name, key_file, node_id, id_attr):
+    def sign_statement(self, statement, node_name, key_file, node_id, id_attr, passphrase=None):
         """
         Sign an XML statement.
 
@@ -820,7 +822,6 @@ class CryptoBackendXmlSec1(CryptoBackend):
         com_list = [
             self.xmlsec,
             '--sign',
-            '--privkey-pem', key_file,
             '--id-attr:{id_attr_name}'.format(id_attr_name=id_attr),
             node_name,
         ]
@@ -829,7 +830,9 @@ class CryptoBackendXmlSec1(CryptoBackend):
             com_list.extend(['--node-id', node_id])
 
         try:
-            (stdout, stderr, output) = self._run_xmlsec(com_list, [tmp.name])
+            (stdout, stderr, output) = self._run_xmlsec(com_list, [tmp.name],
+                                                       key_file=key_file,
+                                                       passphrase=passphrase)
         except XmlsecError as e:
             raise SignatureError(com_list)
 
@@ -880,7 +883,7 @@ class CryptoBackendXmlSec1(CryptoBackend):
 
         return parse_xmlsec_output(stderr)
 
-    def _run_xmlsec(self, com_list, extra_args):
+    def _run_xmlsec(self, com_list, extra_args, key_file=None, passphrase=None):
         """
         Common code to invoke xmlsec and parse the output.
         :param com_list: Key-value parameter list for xmlsec
@@ -890,6 +893,25 @@ class CryptoBackendXmlSec1(CryptoBackend):
         """
         with NamedTemporaryFile(suffix='.xml') as ntf:
             com_list.extend(['--output', ntf.name])
+
+            # Unfortunately there's no safe way to pass a password to xmlsec1.
+            # Instead, we'll decrypt the certificate and write it into a named pipe,
+            # which we'll pass to xmlsec1.
+            named_pipe = None
+            if key_file is not None:
+                if passphrase is not None:
+                    named_pipe = NamedPipe()
+
+                    # Decrypt the certificate, but don't write it into the FIFO
+                    # until after we've started xmlsec1.
+                    key_content = ''
+                    with open(key_file, 'r') as f:
+                        key_content = f.read()
+                    key = crypto.load_privatekey(crypto.FILETYPE_PEM, key_content, passphrase=str(passphrase))
+                    key_file = named_pipe.name
+
+                com_list.extend(["--privkey-pem", key_file])
+
             com_list += extra_args
 
             logger.debug('xmlsec command: %s', ' '.join(com_list))
@@ -1023,7 +1045,7 @@ def security_context(conf):
         _file_name = conf.getattr('key_file', '')
         if _file_name:
             try:
-                rsa_key = import_rsa_key_from_file(_file_name)
+                rsa_key = import_rsa_key_from_file(_file_name, passphrase=conf.key_file_passphrase)
             except Exception as err:
                 logger.error('Cannot import key from {file}: {err_msg}'.format(
                     file=_file_name, err_msg=err))
@@ -1371,12 +1393,17 @@ class SecurityContext(object):
         else:
             return dectext
 
-    def decrypt(self, enctext, key_file=None, id_attr=''):
+    def decrypt(self, enctext, key_file=None, id_attr='', passphrase=None):
         """ Decrypting an encrypted text by the use of a private key.
 
         :param enctext: The encrypted text as a string
         :return: The decrypted text
         """
+        if key_file is None or len(key_file) == 0:
+            key_file = self.key_file
+        if passphrase is None:
+            passphrase = self.key_file_passphrase
+
         if not id_attr:
             id_attr = self.id_attr
 
