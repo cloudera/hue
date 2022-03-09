@@ -11,7 +11,7 @@ from django.shortcuts import render
 
 def template_failure(request, status=403, **kwargs):
     """ Renders a SAML-specific template with general authentication error description. """
-    return render(request, 'djangosaml2/login_error.html', status=status)
+    return render(request, 'djangosaml2/login_error.html', status=status, using='django')
 
 
 def exception_failure(request, exc_class=PermissionDenied, **kwargs):
