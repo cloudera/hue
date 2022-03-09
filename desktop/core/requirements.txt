@@ -73,7 +73,6 @@ thrift-sasl==0.4.2
 git+https://github.com/gethue/django-babel.git
 git+https://github.com/gethue/django-mako.git
 werkzeug==2.0.1  # Should remove it here and from devtools.mk
-pysaml2==5.0.0
 djangosaml2==0.18.0
 django-utils-six==2.0
 six==1.16.0
