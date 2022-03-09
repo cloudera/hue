@@ -275,7 +275,7 @@ workflows:
               ignore:
                 - master
                 - py3-ci
-      - build-py-36:
+      - build-py-38:
           filters:
             branches:
               ignore:
@@ -284,7 +284,7 @@ workflows:
       - commit:
           requires:
             - build
-            - build-py-36
+            - build-py-38
           filters:
             branches:
               only:
@@ -292,11 +292,6 @@ workflows:
   build-python3:
     jobs:
       - build-py-38:
-          filters:
-            branches:
-              only:
-                - py3-ci
-      - build-py-36:
           filters:
             branches:
               only:
