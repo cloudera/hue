@@ -6,7 +6,7 @@ set -x
 # Time marker for both stderr and stdout
 date; date 1>&2
 
-export DESKTOP_LOG_DIR="/var/log/hive"
+export DESKTOP_LOG_DIR="/opt/hive/logs"
 export PYTHON_EGG_CACHE=$HUE_CONF_DIR/.python-eggs
 export SERVER_SOFTWARE="apache"
 
@@ -94,7 +94,7 @@ if [[ $1 == kt_renewer ]]; then
     KINIT_PATH=${KINIT_PATH-/usr/bin/kinit}
     $HUE_BIN/hue kt_renewer
   fi
-elif [[ $1 == runcpserver ]]; then
+elif [[ $1 == rungunicornserver ]]; then
   if [ -e "/etc/hue/conf/saml.ini" ]; then
     set_samlcert
   fi
