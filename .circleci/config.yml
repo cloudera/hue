@@ -302,6 +302,12 @@ workflows:
               ignore:
                 - master
                 - py3-ci
+      - build-py-38:
+          filters:
+            branches:
+              ignore:
+                - master
+                - py3-ci
       - commit:
           requires:
             - build
