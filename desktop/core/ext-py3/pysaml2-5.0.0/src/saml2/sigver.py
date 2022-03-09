@@ -650,10 +650,10 @@ class CryptoBackend(object):
     def encrypt_assertion(self, statement, enc_key, template, key_type, node_xpath):
         raise NotImplementedError()
 
-    def decrypt(self, enctext, key_file, id_attr):
+    def decrypt(self, enctext, key_file, id_attr, passphrase=None):
         raise NotImplementedError()
 
-    def sign_statement(self, statement, node_name, key_file, node_id, id_attr):
+    def sign_statement(self, statement, node_name, key_file, node_id, id_attr, passphrase=None):
         raise NotImplementedError()
 
     def validate_signature(self, enctext, cert_file, cert_type, node_name, node_id, id_attr):
@@ -953,7 +953,7 @@ class CryptoBackendXMLSecurity(CryptoBackend):
         # better than static 0.0 here.
         return 'XMLSecurity 0.0'
 
-    def sign_statement(self, statement, node_name, key_file, node_id, id_attr):
+    def sign_statement(self, statement, node_name, key_file, node_id, id_attr, passphrase=None):
         """
         Sign an XML statement.
 
@@ -968,6 +968,8 @@ class CryptoBackendXMLSecurity(CryptoBackend):
         """
         import xmlsec
         import lxml.etree
+
+        assert passphrase is None, "Encrypted key files is not supported"
 
         xml = xmlsec.parse_xml(statement)
         signed = xmlsec.sign(xml, key_file)
@@ -1077,6 +1079,7 @@ def security_context(conf):
             tmp_cert_file=conf.tmp_cert_file,
             tmp_key_file=conf.tmp_key_file,
             validate_certificate=conf.validate_certificate,
+            key_file_passphrase=conf.key_file_passphrase,
             enc_key_files=enc_key_files,
             encryption_keypairs=conf.encryption_keypairs,
             sec_backend=sec_backend,
@@ -1267,6 +1270,7 @@ class SecurityContext(object):
             generate_cert_info=None,
             tmp_cert_file=None, tmp_key_file=None,
             validate_certificate=None,
+            key_file_passphrase=None,
             enc_key_files=None, enc_key_type='pem',
             encryption_keypairs=None,
             enc_cert_type='pem',
@@ -1285,6 +1289,7 @@ class SecurityContext(object):
 
         # Your private key for signing
         self.key_file = key_file
+        self.key_file_passphrase = key_file_passphrase
         self.key_type = key_type
 
         # Your public key for signing
@@ -1371,6 +1376,7 @@ class SecurityContext(object):
         :return: The decrypted text
         """
         key_files = []
+        passphrase = self.key_file_passphrase
 
         if not isinstance(keys, list):
             keys = [keys]
@@ -1387,7 +1393,7 @@ class SecurityContext(object):
         key_file_names = list(tmp.name for tmp in key_files)
 
         try:
-            dectext = self.decrypt(enctext, key_file=key_file_names, id_attr=id_attr)
+            dectext = self.decrypt(enctext, key_file=key_file_names, id_attr=id_attr, passphrase=passphrase)
         except DecryptError as e:
             raise
         else:
@@ -1415,7 +1421,7 @@ class SecurityContext(object):
         ]
         for key_file in key_files:
             try:
-                dectext = self.crypto.decrypt(enctext, key_file, id_attr)
+                dectext = self.crypto.decrypt(enctext, key_file, id_attr, passphrase=passphrase)
             except XmlsecError as e:
                 continue
             else:
@@ -1714,7 +1720,7 @@ class SecurityContext(object):
         """ Deprecated function. See sign_statement(). """
         return self.sign_statement(statement, **kwargs)
 
-    def sign_statement(self, statement, node_name, key=None, key_file=None, node_id=None, id_attr=''):
+    def sign_statement(self, statement, node_name, key=None, key_file=None, node_id=None, id_attr='', passphrase=None):
         """Sign a SAML statement.
 
         :param statement: The statement to be signed
@@ -1737,12 +1743,17 @@ class SecurityContext(object):
         if not key and not key_file:
             key_file = self.key_file
 
+        if not passphrase:
+            passphrase = self.key_file_passphrase
+
+
         return self.crypto.sign_statement(
                 statement,
                 node_name,
                 key_file,
                 node_id,
-                id_attr)
+                id_attr,
+                passphrase=passphrase)
 
     def sign_assertion_using_xmlsec(self, statement, **kwargs):
         """ Deprecated function. See sign_assertion(). """
@@ -1775,7 +1786,7 @@ class SecurityContext(object):
         return self.sign_statement(
                 statement, class_name(samlp.AttributeQuery()), **kwargs)
 
-    def multiple_signatures(self, statement, to_sign, key=None, key_file=None, sign_alg=None, digest_alg=None):
+    def multiple_signatures(self, statement, to_sign, key=None, key_file=None, sign_alg=None, digest_alg=None, passphrase=None):
         """
         Sign multiple parts of a statement
 
@@ -1806,7 +1817,8 @@ class SecurityContext(object):
                     key=key,
                     key_file=key_file,
                     node_id=sid,
-                    id_attr=id_attr)
+                    id_attr=id_attr,
+                    passphrase=passphrase)
 
         return statement
 
