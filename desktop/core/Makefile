@@ -35,8 +35,7 @@ default::
 # 	Install app into the virtual environment.
 #
 .PHONY: env-install
-env-install: compile $(EXT_ENV_INSTALL)
+env-install: $(EXT_ENV_INSTALL) compile
 	@echo '--- Installing $(APP_NAME) into virtual-env'
 	@echo '--- env-install: EXT_ENV_INSTALL: $(EXT_ENV_INSTALL)'
 	@$(ENV_PYTHON) setup.py develop -N -q
-
