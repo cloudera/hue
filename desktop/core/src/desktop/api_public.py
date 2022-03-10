@@ -88,7 +88,7 @@ def execute(request, dialect=None):
 
     data = {
       'notebook': '{"type":"query-%(interpreter)s","snippets":[{"id":%(interpreter_id)s,"statement_raw":"",'
-        '"type":"%(interpreter)s","status":"","variables":[]}],'
+        '"type":"%(interpreter)s","status":"","variables":[],"properties":{}}],'
         '"name":"","isSaved":false,"sessions":[]}' % params,
       'snippet': '{"id":%(interpreter_id)s,"type":"%(interpreter)s","result":{},"statement":"%(statement)s","properties":{}}' % params
     }
@@ -367,7 +367,7 @@ def _patch_operation_id_request(django_request):
   data = {}
 
   if not django_request.POST.get('snippet'):
-    data['snippet'] = '{"type":"1","result":{}}'
+    data['snippet'] = '{"type":"1","result":{},"properties":{}}'
 
   django_request.POST = django_request.POST.copy() # Makes it mutable along with copying the object
   django_request.POST.update(data)

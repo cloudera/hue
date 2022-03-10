@@ -382,6 +382,7 @@ def fetch_result_size(request):
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
+  notebook = _get_notebook(request.user, notebook, operation_id)
   snippet = _get_snippet(request.user, notebook, snippet, operation_id)
 
   with opentracing.tracer.start_span('notebook-fetch_result_size') as span:
@@ -434,7 +435,9 @@ def get_logs(request):
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
-  if operation_id:
+  notebook = _get_notebook(request.user, notebook, operation_id)
+
+  if operation_id and not notebook.get('uuid'):
     notebook['uuid'] = operation_id
 
   startFrom = request.POST.get('from')
@@ -1046,4 +1049,13 @@ def _get_snippet(user, notebook, snippet, operation_id):
     nb_doc = Document2.objects.get_by_uuid(user=user, uuid=operation_id or notebook.get('uuid'))
     notebook = Notebook(document=nb_doc).get_data()
     snippet = notebook['snippets'][0]
+
   return snippet
+
+
+def _get_notebook(user, notebook, operation_id):
+  if operation_id and not notebook:
+    nb_doc = Document2.objects.get_by_uuid(user=user, uuid=operation_id)
+    notebook = Notebook(document=nb_doc).get_data()
+
+  return notebook
