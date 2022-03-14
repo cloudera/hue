@@ -76,7 +76,7 @@ navigator.audit_log_max_file_size=100
     try:
       metadata_sites.reset()
 
-      assert_equal(get_navigator_server_url(), 'http://localhost:7187')
+      assert_equal(get_navigator_server_url(), None)
     finally:
       metadata_sites.reset()
       for reset in resets:

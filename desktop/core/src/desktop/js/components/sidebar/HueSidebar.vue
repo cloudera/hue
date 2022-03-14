@@ -358,9 +358,9 @@
             if ((<SidebarAccordionItem>item).children) {
               found = findInside((<SidebarAccordionItem>item).children);
             }
-            const navigationItem = <SidebarNavigationItem>item;
-            if (!found && navigationItem.name === possibleItemName) {
-              found = navigationItem.name;
+            const { name } = <SidebarNavigationItem>item;
+            if (!found && (name === possibleItemName || name === `sdkapps-${possibleItemName}`)) {
+              found = name;
             }
             return found;
           });
@@ -398,7 +398,7 @@
                 return;
               }
               if (config && config.interpreters.length) {
-                if (config.interpreters.length === 1) {
+                if (config.interpreters.length === 1 && config.name !== 'other') {
                   appsItems.push({
                     type: 'navigation',
                     name: `${appName}-${config.name}`,

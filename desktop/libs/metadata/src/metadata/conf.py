@@ -54,7 +54,13 @@ def default_catalog_config_dir():
 
 def default_catalog_interface():
   """Detect if the configured catalog is Navigator or default to Atlas"""
-  return 'atlas' if atlas_flags.get_api_url() else 'navigator'
+  from metadata.metadata_sites import get_navigator_server_url
+  catalog_interface = ''
+  if atlas_flags.get_api_url():
+    catalog_interface = 'atlas'
+  elif get_navigator_server_url():
+    catalog_interface = 'navigator'
+  return catalog_interface
 
 def default_navigator_config_dir():
   """Get from usual main Hue config directory"""
@@ -63,7 +69,7 @@ def default_navigator_config_dir():
 def default_navigator_url():
   """Get from usual main Hue config directory"""
   from metadata.metadata_sites import get_navigator_server_url
-  return get_navigator_server_url() + '/api'
+  return get_navigator_server_url() + '/api' if get_navigator_server_url() else None
 
 
 def get_optimizer_url():
