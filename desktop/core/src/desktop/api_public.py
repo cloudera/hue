@@ -88,7 +88,7 @@ def execute(request, dialect=None):
 
     data = {
       'notebook': '{"type":"query-%(interpreter)s","snippets":[{"id":%(interpreter_id)s,"statement_raw":"",'
-        '"type":"%(interpreter)s","status":"","variables":[]}],'
+        '"type":"%(interpreter)s","status":"","variables":[],"properties":{}}],'
         '"name":"","isSaved":false,"sessions":[]}' % params,
       'snippet': '{"id":%(interpreter_id)s,"type":"%(interpreter)s","result":{},"statement":"%(statement)s","properties":{}}' % params
     }
