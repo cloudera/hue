@@ -7,6 +7,11 @@ REBUILD_BASE=1
 HUEUSER="hive"
 CONTAINER=$(uuidgen | cut -d"-" -f5)
 
+reset_git_state() {
+  cd $HUE_SRC
+  git clean -fdx
+}
+
 find_git_state() {
   cd $HUE_SRC
   export GBRANCH=$(git ls-remote  --get-url)"/commits/"$(git rev-parse --abbrev-ref HEAD)
