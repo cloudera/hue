@@ -194,10 +194,10 @@ else
   hue_containers_build
 
   # Perform any other container build process
-  #extra_container_build=$(find_extra_container_to_build)
-  #if test -n "$extra_container_build"; then
-  #  $extra_container_build
-  #fi
+  extra_container_build=$(find_extra_container_to_build)
+  if test -n "$extra_container_build"; then
+    $extra_container_build
+  fi
 
   # Wait for the parallel jobs to finish
   wait_for_parallel_jobs
