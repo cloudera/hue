@@ -160,7 +160,6 @@ rebuild_base_images() {
 }
 
 hue_containers_build() {
-  reset_git_state
   if [ $REBUILD_BASE -gt 0 ]; then
     rebuild_base_images
   fi
