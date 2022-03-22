@@ -1,4 +1,4 @@
-FROM registry.access.redhat.com/ubi7/ubi as base-ubi-7
+FROM registry.access.redhat.com/ubi8/ubi as base-ubi-8
 
 LABEL description="Hue Project https://github.com/cloudera/hue"
 
