@@ -13,7 +13,6 @@ cryptography==36.0.1
 django-auth-ldap==2.3.0
 Django==3.2.12
 daphne==3.0.2
-django-axes==5.13.0
 django-celery-beat==2.2.1
 django-celery-results==2.2.0
 django-cors-headers==3.7.0
