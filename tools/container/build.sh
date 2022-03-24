@@ -62,6 +62,9 @@ docker_hue_build() {
   cp -a $BUILD_DIR/${HUEUSER} $HUE_DIR
   rm -f $HUE_DIR/${HUEUSER}/desktop/conf/*
 
+  # Remove chardet package
+  rm -rf $HUE_DIR/${HUEUSER}/tools/virtual-bootstrap/virtualenv_support
+
   # Reduce Hue container size
   rm -rf $HUE_DIR/${HUEUSER}/node_modules
   rm -rf $HUE_DIR/${HUEUSER}/desktop/core/ext-eggs
