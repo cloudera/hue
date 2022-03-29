@@ -40,6 +40,7 @@ AlterTable
      parser.addColumnLocation($5.location, [ $5.identifier ]);
    }
  | AlterTableLeftSide 'SET' 'OWNER' RoleOrUser RegularOrBacktickedIdentifier
+ | AlterTableLeftSide 'SET' PartitionSpec
  | AlterTableLeftSide DropOperations
  | AlterTableLeftSide OptionalPartitionOperations
  | AlterTableLeftSide PartitionSpec OptionalPartitionOperations
@@ -69,7 +70,7 @@ AlterTable_EDIT
  | AlterTableLeftSide 'ADD' OptionalIfNotExists 'CURSOR'
    {
      if (!$3) {
-       parser.suggestKeywords([{ value: 'IF NOT EXISTS', weight: 4 }, { value: 'COLUMNS', weight: 3 }, { value: 'PARTITION', weight: 2 }, { value: 'RANGE PARTITION', weight: 1 }]);
+       parser.suggestKeywords([{ value: 'IF NOT EXISTS', weight: 4 }, { value: 'COLUMN', weight: 3 }, { value: 'COLUMNS', weight: 3 }, { value: 'PARTITION', weight: 2 }, { value: 'RANGE PARTITION', weight: 1 }]);
      } else {
        parser.suggestKeywords([{ value: 'PARTITION', weight: 2 }, { value: 'RANGE PARTITION', weight: 1 }]);
      }
@@ -154,14 +155,21 @@ AlterTable_EDIT
      parser.suggestKeywords(['ROLE', 'USER']);
    }
  | AlterTableLeftSide 'SET' 'OWNER' RoleOrUser 'CURSOR'
+ | AlterTableLeftSide 'SET' 'PARTITION' 'CURSOR'
+   {
+     parser.suggestKeywords(['SPEC']);
+   }
+ | AlterTableLeftSide 'SET' 'PARTITION' SpecClause_EDIT
+ | AlterTableLeftSide 'SET' 'PARTITION' SpecClause 'CURSOR'
  | AlterTableLeftSide OptionalPartitionOperations_EDIT
  | AlterTableLeftSide DropOperations_EDIT
  | AlterTableLeftSide 'CURSOR'
    {
-     parser.suggestKeywords(['ADD COLUMNS', 'ADD PARTITION', 'ADD RANGE PARTITION', 'ALTER', 'ALTER COLUMN', 'CHANGE',
-       'DROP COLUMN', 'DROP PARTITION', 'DROP RANGE PARTITION', 'PARTITION', 'RECOVER PARTITIONS', 'RENAME TO',
-       'REPLACE COLUMNS', 'SET CACHED IN', 'SET COLUMN STATS', 'SET FILEFORMAT', 'SET LOCATION', 'SET OWNER',
-       'SET ROW FORMAT', 'SET SERDEPROPERTIES', 'SET TBLPROPERTIES', 'SET UNCACHED']);
+     parser.suggestKeywords(['ADD COLUMN', 'ADD COLUMNS', 'ADD PARTITION', 'ADD RANGE PARTITION', 'ALTER',
+       'ALTER COLUMN', 'CHANGE', 'CHANGE COLUMN', 'DROP COLUMN', 'DROP PARTITION', 'DROP RANGE PARTITION', 'PARTITION',
+       'RECOVER PARTITIONS', 'RENAME TO', 'REPLACE COLUMNS', 'SET CACHED IN', 'SET COLUMN STATS', 'SET FILEFORMAT',
+       'SET LOCATION', 'SET OWNER', 'SET PARTITION SPEC', 'SET ROW FORMAT', 'SET SERDEPROPERTIES', 'SET TBLPROPERTIES',
+       'SET UNCACHED', 'UNSET SERDEPROPERTIES', 'UNSET TBLPROPERTIES']);
    }
  | AlterTableLeftSide PartitionSpec 'CURSOR'
    {
@@ -170,7 +178,11 @@ AlterTable_EDIT
    }
  | AlterTableLeftSide PartitionSpec AddOrReplace 'CURSOR'
    {
-     parser.suggestKeywords(['COLUMNS']);
+     if ($3.toLowerCase() === 'add') {
+       parser.suggestKeywords(['COLUMN', 'COLUMNS']);
+     } else {
+       parser.suggestKeywords(['COLUMNS']);
+     }
    }
  | AlterTableLeftSide PartitionSpec 'SET' 'CURSOR'
    {
@@ -178,7 +190,13 @@ AlterTable_EDIT
    }
  | AlterTableLeftSide 'SET' 'CURSOR'
    {
-     parser.suggestKeywords(['CACHED IN', 'COLUMN STATS', 'FILEFORMAT', 'LOCATION', 'OWNER ROLE', 'OWNER USER', 'ROW FORMAT', 'SERDEPROPERTIES', 'TBLPROPERTIES', 'UNCACHED']);
+     parser.suggestKeywords([
+       'CACHED IN', 'COLUMN STATS', 'FILEFORMAT', 'LOCATION', 'OWNER ROLE', 'OWNER USER', 'PARTITION SPEC',
+       'ROW FORMAT', 'SERDEPROPERTIES', 'TBLPROPERTIES', 'UNCACHED']);
+   }
+ | AlterTableLeftSide 'UNSET' 'CURSOR'
+   {
+     parser.suggestKeywords(['SERDEPROPERTIES', 'TBLPROPERTIES']);
    }
  | AlterTableLeftSide PartitionSpec OptionalPartitionOperations_EDIT
  | AlterTableLeftSide 'RENAME' 'CURSOR'
@@ -247,26 +265,31 @@ OptionalPartitionOperations
  | 'SET' CachedIn OptionalWithReplication
  | 'SET' 'ROW' 'FORMAT' DelimitedRowFormat
  | 'SET' 'UNCACHED'
+ | 'UNSET' 'TBLPROPERTIES' ParenthesizedPropertyAssignmentList
+ | 'UNSET' 'SERDEPROPERTIES' ParenthesizedPropertyAssignmentList
  | AddReplaceColumns
- | 'CHANGE' ColumnIdentifier ColumnSpecification
+ | 'CHANGE' OptionalColumn ColumnIdentifier ColumnSpecification
    {
-     parser.addColumnLocation($2.location, [ $2.identifier ]);
+     parser.addColumnLocation($3.location, [ $3.identifier ]);
    }
  ;
 
 OptionalPartitionOperations_EDIT
  : AddReplaceColumns_EDIT
- | 'CHANGE' 'CURSOR'
+ | 'CHANGE' OptionalColumn 'CURSOR'
    {
+     if (!$2) {
+       parser.suggestKeywords(['COLUMN']);
+     }
      parser.suggestColumns();
    }
- | 'CHANGE' ColumnIdentifier ColumnSpecification_EDIT
+ | 'CHANGE' OptionalColumn ColumnIdentifier ColumnSpecification_EDIT
    {
-     parser.addColumnLocation($2.location, [ $2.identifier ]);
+     parser.addColumnLocation($3.location, [ $3.identifier ]);
    }
- | 'CHANGE' ColumnIdentifier ColumnSpecification 'CURSOR'
+ | 'CHANGE' OptionalColumn ColumnIdentifier ColumnSpecification 'CURSOR'
    {
-     parser.addColumnLocation($2.location, [ $2.identifier ]);
+     parser.addColumnLocation($3.location, [ $3.identifier ]);
    }
  | 'SET' 'FILEFORMAT' 'CURSOR'
    {
@@ -300,11 +323,13 @@ OptionalPartitionOperations_EDIT
 
 AddReplaceColumns
  : AddOrReplace 'COLUMNS' ParenthesizedColumnSpecificationList
+ | AddOrReplace 'COLUMN' ColumnSpecification
  ;
 
 AddReplaceColumns_EDIT
  : AddOrReplace 'COLUMNS' ParenthesizedColumnSpecificationList_EDIT
  | AddOrReplace 'COLUMNS' ParenthesizedColumnSpecificationList 'CURSOR'
+ | AddOrReplace 'COLUMN' ColumnSpecification_EDIT
  ;
 
 ExchangePartitionSpec
