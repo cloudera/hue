@@ -23,35 +23,69 @@ DataDefinition_EDIT
  ;
 
 RevokeOnStatement
- : 'REVOKE' PrivilegeType 'ON' ObjectSpecification 'FROM' RegularOrBacktickedIdentifier
- | 'REVOKE' PrivilegeType 'ON' ObjectSpecification 'FROM' GroupRoleOrUser RegularOrBacktickedIdentifier
+ : 'REVOKE' OptionalGrantOptionFor PrivilegeType 'ON' ObjectSpecification 'FROM' RegularOrBacktickedIdentifier
+ | 'REVOKE' OptionalGrantOptionFor PrivilegeType 'ON' ObjectSpecification 'FROM' GroupRoleOrUser RegularOrBacktickedIdentifier
  ;
 
 RevokeOnStatement_EDIT
- : 'REVOKE' PrivilegeType_EDIT
- | 'REVOKE' PrivilegeType 'CURSOR'
+ : 'REVOKE' OptionalGrantOptionFor PrivilegeType_EDIT
+ | 'REVOKE' GrantOptionFor 'CURSOR'
    {
-     if ($2.isCreate) {
+     var keywords = parser.REVOKE_KEYWORDS.concat();
+     var idx = keywords.indexOf('GRANT OPTION FOR');
+     if (idx !== -1) {
+       keywords.splice(idx, 1);
+     }
+     parser.suggestKeywords(keywords);
+   }
+ | 'REVOKE' GrantOptionFor_EDIT
+ | 'REVOKE' OptionalGrantOptionFor PrivilegeType 'CURSOR'
+   {
+     if ($3.isCreate) {
        parser.suggestKeywords(['ON DATABASE', 'ON SERVER']);
      } else {
        parser.suggestKeywords(['ON DATABASE', 'ON SERVER', 'ON TABLE', 'ON URI']);
      }
    }
- | 'REVOKE' PrivilegeType 'ON' 'CURSOR'
+ | 'REVOKE' OptionalGrantOptionFor PrivilegeType 'ON' 'CURSOR'
    {
-     if ($2.isCreate) {
+     if ($3.isCreate) {
        parser.suggestKeywords(['DATABASE', 'SERVER']);
      } else {
        parser.suggestKeywords(['DATABASE', 'SERVER', 'TABLE', 'URI']);
      }
    }
- | 'REVOKE' PrivilegeType 'ON' ObjectSpecification_EDIT
- | 'REVOKE' PrivilegeType 'ON' ObjectSpecification 'CURSOR'
+ | 'REVOKE' OptionalGrantOptionFor PrivilegeType 'ON' ObjectSpecification_EDIT
+ | 'REVOKE' OptionalGrantOptionFor PrivilegeType 'ON' ObjectSpecification 'CURSOR'
    {
      parser.suggestKeywords(['FROM']);
    }
- | 'REVOKE' PrivilegeType 'ON' ObjectSpecification 'FROM' 'CURSOR'
+ | 'REVOKE' OptionalGrantOptionFor PrivilegeType 'ON' ObjectSpecification 'FROM' 'CURSOR'
    {
-     parser.suggestKeywords(['GROUP', 'ROLE', 'USER']);
+     if ($2) {
+       parser.suggestKeywords(['ROLE']);
+     } else {
+       parser.suggestKeywords(['GROUP', 'ROLE', 'USER']);
+     }
+   }
+ ;
+
+OptionalGrantOptionFor
+ :
+ | GrantOptionFor
+ ;
+
+GrantOptionFor
+ : 'GRANT' 'OPTION' 'FOR'
+ ;
+
+GrantOptionFor_EDIT
+ : 'GRANT' 'CURSOR'
+   {
+     parser.suggestKeywords(['OPTION FOR']);
+   }
+ | 'GRANT' 'OPTION' 'CURSOR'
+   {
+     parser.suggestKeywords(['FOR']);
    }
  ;
