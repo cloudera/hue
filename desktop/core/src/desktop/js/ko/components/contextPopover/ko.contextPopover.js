@@ -261,7 +261,7 @@ const SUPPORT_TEMPLATES = `
 
   <script type="text/html" id="context-lang-ref-contents">
     <div class="context-popover-content">
-      <div class="context-popover-flex-fill context-popover-docs-details" data-bind="html: body"></div>
+      <div class="context-popover-flex-fill context-popover-docs-details" data-bind="htmlUnsecure: body"></div>
       <div class="context-popover-flex-bottom-links">
         <div class="context-popover-link-row">
           <a class="inactive-action pointer" data-bind="click: openInRightAssist">
