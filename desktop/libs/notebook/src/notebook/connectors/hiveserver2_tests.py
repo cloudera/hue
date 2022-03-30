@@ -317,6 +317,65 @@ class TestApi():
         assert_equal(jobs[0]['url'], '')  # Is empty
 
 
+  def test_close_statement(self):
+    with patch('notebook.connectors.hiveserver2.HS2Api._get_db') as _get_db:
+      _get_db.return_value = Mock(
+        use=Mock(
+        ),
+        client=Mock(
+          query=Mock(
+            side_effect=QueryServerException(
+              Exception('Execution error!'),
+              message='Error while compiling statement: FAILED: HiveAccessControlException Permission denied'
+            )
+          ),
+        ),
+      )
+      notebook = {}
+      snippet = {
+        'id': '7ccdd296-20a3-da33-16ec-db58149aba0b', 'type': 'impala', 'status': 'running', 'statementType': 'text',
+        'statement': 'SELECT *\nFROM `default`.sample_07\nLIMIT 100\n;', 'aceCursorPosition': None, 'statementPath': '',
+        'associatedDocumentUuid': None,
+        'properties': {'settings': []},
+        'result': {
+          'id': 'd9a8dc1b-7f6d-169f-7dd7-660723cba3f4', 'type': 'table',
+          'handle': {
+            'secret': 'obUXjEDWTh+ke73YLlOlMw==', 'guid': '2iv5rEXrRE4AAAAABtXdxA==', 'operation_type': 0, 'has_result_set': True,
+            'modified_row_count': None, 'log_context': None, 'session_guid': '2440c57bc3806c6e:598514f42764cc91', 'session_id': 2094,
+            'session_type': 'impala', 'statement_id': 0, 'has_more_statements': False, 'statements_count': 1,
+            'previous_statement_hash': '39b8e5b3c37fda5ebd438da23f3e198c914750a64aa147f819a6a1e0', 'start': {'row': 0, 'column': 0},
+            'end': {'row': 0, 'column': 43}, 'statement': 'SELECT *\nFROM `default`.sample_07\nLIMIT 100'
+          }
+        }, 'database': 'default',
+        'compute': {
+          'id': 'default', 'name': 'default', 'namespace': 'default', 'interface': 'impala', 'type': 'direct', 'options': {}
+        }, 'wasBatchExecuted': False, 'dialect': 'impala'
+      }
+      api = HS2Api(self.user)
+
+      response = api.close_statement(notebook, snippet)
+      assert_equal(response['status'], 0)
+
+      snippet = {
+        'id': '7ccdd296-20a3-da33-16ec-db58149aba0b', 'type': 'impala', 'status': 'running',
+        'statementType': 'text', 'statement': 'SELECT *\nFROM `default`.sample_07\nLIMIT 100\n;',
+        'aceCursorPosition': None, 'statementPath': '', 'associatedDocumentUuid': None,
+        'properties': {'settings': []},
+        'result': {
+          'id': 'd9a8dc1b-7f6d-169f-7dd7-660723cba3f4', 'type': 'table',
+          'handle': {
+            'has_more_statements': False, 'statement_id': 0, 'statements_count': 1,
+            'previous_statement_hash': '39b8e5b3c37fda5ebd438da23f3e198c914750a64aa147f819a6a1e0'
+          }
+        }, 'database': 'default', 'compute': {'id': 'default', 'name': 'default', 'namespace': 'default',
+        'interface': 'impala', 'type': 'direct', 'options': {}}, 'wasBatchExecuted': False, 'dialect': 'impala'
+      }
+      api = HS2Api(self.user)
+      
+      response = api.close_statement(notebook, snippet)
+      assert_equal(response['status'], -1)  # snippet['result']['handel'] ['guid'] and ['secret'] are missing
+
+
   def test_get_error_message_from_query(self):
     with patch('notebook.connectors.hiveserver2.HS2Api._get_db') as _get_db:
       with patch('notebook.connectors.hiveserver2.HS2Api._get_current_statement') as _get_current_statement:
