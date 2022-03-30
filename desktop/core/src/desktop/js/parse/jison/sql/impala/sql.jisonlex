@@ -166,6 +166,7 @@
 'GROUPS'                                   { return 'GROUPS'; }
 'HASH'                                     { return 'HASH'; }
 'HAVING'                                   { return 'HAVING'; }
+'HISTORY'                                  { return 'HISTORY'; }
 'HOLD'                                     { return 'HOLD'; }
 'IF'                                       { return 'IF'; }
 'IGNORE'                                   { return 'IGNORE'; }
@@ -408,9 +409,14 @@ PARTITION\s+VALUE\s                        { return 'PARTITION_VALUE'; }
 'ROLE'                                     { return 'ROLE'; }
 'ARRAY'                                    { return 'ARRAY'; }
 'DEFAULT'                                  { return 'DEFAULT'; }
+'ICEBERG'                                  { return 'ICEBERG'; } // reserved?
 'MAP'                                      { return 'MAP'; }
 'OWNER'                                    { return 'OWNER'; }
+'SPEC'                                     { return 'SPEC'; }
 'STRUCT'                                   { return 'STRUCT'; }
+'SYSTEM_TIME'                              { return 'SYSTEM_TIME'; }
+'SYSTEM_VERSION'                           { return 'SYSTEM_VERSION'; }
+'UNSET'                                    { return 'UNSET'; }
 \[BROADCAST\]                              { return 'BROADCAST'; }
 \[NOSHUFFLE\]                              { return 'NOSHUFFLE'; }
 \[SHUFFLE\]                                { return 'SHUFFLE'; }

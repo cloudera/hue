@@ -28,6 +28,12 @@ ShowGrantStatement
    {
      parser.addDatabaseLocation(@7, [ { name: $7 } ]);
    }
+ | 'SHOW' 'GRANT' GroupRoleOrUser RegularOrBacktickedIdentifier 'ON' 'COLUMN' RegularOrBacktickedIdentifier '.' RegularOrBacktickedIdentifier '.' RegularOrBacktickedIdentifier
+   {
+     parser.addDatabaseLocation(@7, [ { name: $7 } ]);
+     parser.addTableLocation(@9, [ { name: $7 }, { name: $9 } ]);
+     parser.addColumnLocation(@11, [ { name: $7 }, { name: $9 }, { name: $11 } ]);
+   }
  | 'SHOW' 'GRANT' GroupRoleOrUser RegularOrBacktickedIdentifier 'ON' 'SERVER'
  | 'SHOW' 'GRANT' GroupRoleOrUser RegularOrBacktickedIdentifier 'ON' 'TABLE' SchemaQualifiedTableIdentifier
  | 'SHOW' 'GRANT' GroupRoleOrUser RegularOrBacktickedIdentifier 'ON' 'URI' RegularOrBacktickedIdentifier
@@ -45,8 +51,28 @@ ShowGrantStatement_EDIT
    }
  | 'SHOW' 'GRANT' GroupRoleOrUser RegularOrBacktickedIdentifier 'ON' 'CURSOR'
    {
-     parser.suggestKeywords(['DATABASE', 'SERVER', 'TABLE', 'URI']);
+     parser.suggestKeywords(['COLUMN', 'DATABASE', 'SERVER', 'TABLE', 'URI']);
    }
+ | 'SHOW' 'GRANT' GroupRoleOrUser RegularOrBacktickedIdentifier 'ON' 'COLUMN' 'CURSOR'
+    {
+      parser.suggestDatabases({
+        appendDot: true
+      });
+      parser.suggestTables();
+    }
+ | 'SHOW' 'GRANT' GroupRoleOrUser RegularOrBacktickedIdentifier 'ON' 'COLUMN' RegularOrBacktickedIdentifier '.' PartialBacktickedOrPartialCursor
+    {
+      parser.addDatabaseLocation(@7, [ { name: $7 } ]);
+      parser.suggestTablesOrColumns($7);
+    }
+ | 'SHOW' 'GRANT' GroupRoleOrUser RegularOrBacktickedIdentifier 'ON' 'COLUMN' RegularOrBacktickedIdentifier '.' RegularOrBacktickedIdentifier '.' PartialBacktickedOrPartialCursor
+    {
+      parser.addDatabaseLocation(@7, [ { name: $7 } ]);
+      parser.addTableLocation(@9, [ { name: $7 }, { name: $9 } ]);
+      parser.suggestColumns({
+        identifierChain: [ { name: $7 }, { name: $9 } ]
+      });
+    }
  | 'SHOW' 'GRANT' GroupRoleOrUser RegularOrBacktickedIdentifier 'ON' 'DATABASE' 'CURSOR'
    {
      parser.suggestDatabases();

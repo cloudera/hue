@@ -243,12 +243,14 @@ describe('impalaAutocompleteParser.js ALTER statements', () => {
         expectedResult: {
           lowerCase: false,
           suggestKeywords: [
+            'ADD COLUMN',
             'ADD COLUMNS',
             'ADD PARTITION',
             'ADD RANGE PARTITION',
             'ALTER',
             'ALTER COLUMN',
             'CHANGE',
+            'CHANGE COLUMN',
             'DROP COLUMN',
             'DROP PARTITION',
             'DROP RANGE PARTITION',
@@ -261,10 +263,13 @@ describe('impalaAutocompleteParser.js ALTER statements', () => {
             'SET FILEFORMAT',
             'SET LOCATION',
             'SET OWNER',
+            'SET PARTITION SPEC',
             'SET ROW FORMAT',
             'SET SERDEPROPERTIES',
             'SET TBLPROPERTIES',
-            'SET UNCACHED'
+            'SET UNCACHED',
+            'UNSET SERDEPROPERTIES',
+            'UNSET TBLPROPERTIES'
           ]
         }
       });
@@ -283,6 +288,7 @@ describe('impalaAutocompleteParser.js ALTER statements', () => {
             'LOCATION',
             'OWNER ROLE',
             'OWNER USER',
+            'PARTITION SPEC',
             'ROW FORMAT',
             'SERDEPROPERTIES',
             'TBLPROPERTIES',
@@ -321,6 +327,17 @@ describe('impalaAutocompleteParser.js ALTER statements', () => {
         expectedResult: {
           lowerCase: false,
           suggestIdentifiers: ["'avgSize'", "'maxSize'", "'numDVs'", "'numNulls'"]
+        }
+      });
+    });
+
+    it('should suggest keywords for "ALTER TABLE bar UNSET |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'ALTER TABLE bar UNSET ',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: ['SERDEPROPERTIES', 'TBLPROPERTIES']
         }
       });
     });
@@ -383,7 +400,7 @@ describe('impalaAutocompleteParser.js ALTER statements', () => {
         afterCursor: '',
         expectedResult: {
           lowerCase: false,
-          suggestKeywords: ['IF NOT EXISTS', 'COLUMNS', 'PARTITION', 'RANGE PARTITION']
+          suggestKeywords: ['IF NOT EXISTS', 'COLUMN', 'COLUMNS', 'PARTITION', 'RANGE PARTITION']
         }
       });
     });
@@ -477,6 +494,17 @@ describe('impalaAutocompleteParser.js ALTER statements', () => {
       });
     });
 
+    it('should suggest keywords for "ALTER TABLE bar ADD COLUMN a |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'ALTER TABLE bar ADD COLUMN a ',
+        afterCursor: '',
+        containsKeywords: ['INT'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
     it('should suggest keywords for "ALTER TABLE bar ADD COLUMNS (a INT, b |"', () => {
       assertAutoComplete({
         beforeCursor: 'ALTER TABLE bar ADD COLUMNS (a INT, b ',
@@ -563,7 +591,8 @@ describe('impalaAutocompleteParser.js ALTER statements', () => {
         afterCursor: '',
         expectedResult: {
           lowerCase: false,
-          suggestColumns: { tables: [{ identifierChain: [{ name: 'bar' }] }] }
+          suggestColumns: { tables: [{ identifierChain: [{ name: 'bar' }] }] },
+          suggestKeywords: ['COLUMN']
         }
       });
     });
@@ -573,6 +602,39 @@ describe('impalaAutocompleteParser.js ALTER statements', () => {
         beforeCursor: 'ALTER TABLE bar CHANGE foo bar ',
         afterCursor: '',
         containsKeywords: ['INT'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
+    it('should suggest keywords for "ALTER TABLE bar CHANGE COLUMN foo bar |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'ALTER TABLE bar CHANGE COLUMN foo bar ',
+        afterCursor: '',
+        containsKeywords: ['INT'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
+    it('should suggest keywords for "ALTER TABLE bar SET PARTITION |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'ALTER TABLE bar SET PARTITION ',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: ['SPEC']
+        }
+      });
+    });
+
+    it('should suggest keywords for "ALTER TABLE bar SET PARTITION SPEC (|"', () => {
+      assertAutoComplete({
+        beforeCursor: 'ALTER TABLE bar SET PARTITION SPEC(',
+        afterCursor: '',
+        containsKeywords: ['YEAR', 'VOID'],
         expectedResult: {
           lowerCase: false
         }
