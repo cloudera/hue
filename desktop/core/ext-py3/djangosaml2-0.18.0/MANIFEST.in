@@ -1,0 +1,6 @@
+include README
+include CHANGES
+include COPYING
+global-include *.html *.csr *.key *.pem *.xml
+include djangosaml2/tests/attribute-maps/*.py
+global-exclude *.pyc

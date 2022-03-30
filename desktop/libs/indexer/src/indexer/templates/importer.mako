@@ -237,7 +237,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
           <div data-bind="visible: createWizard.source.inputFormat() == 'localfile'">
               <form method="post" action="" enctype="multipart/form-data" id="uploadform">
                 <div >
-                    <input type="file" id="inputfile" name="inputfile" style="margin-left: 130px" accept=".csv">
+                    <input type="file" id="inputfile" name="inputfile" style="margin-left: 130px" accept=".csv, .xlsx">
                 </div>
             </form>
           </div>
@@ -460,8 +460,8 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
       <!-- ko ifnot: createWizard.isGuessingFormat -->
       <h4>${_('Format')}</h4>
       <div class="card-body">
-        <label data-bind="visible: (createWizard.prefill.source_type().length == 0 || createWizard.prefill.target_type() == 'index') &&
-            (createWizard.source.inputFormat() == 'file' || createWizard.source.inputFormat() == 'localfile' || createWizard.source.inputFormat() == 'stream')">
+        <label data-bind="visible: (createWizard.prefill.source_type().length > 0 && createWizard.prefill.target_type().length > 0) || ((createWizard.prefill.source_type().length == 0 || createWizard.prefill.target_type() == 'index') &&
+            (createWizard.source.inputFormat() == 'file' || createWizard.source.inputFormat() == 'localfile' || createWizard.source.inputFormat() == 'stream'))">
           <div>${_('File Type')}</div>
           <select data-bind="selectize: $root.createWizard.fileTypes, value: $root.createWizard.fileTypeName,
               optionsText: 'description', optionsValue: 'name'"></select>

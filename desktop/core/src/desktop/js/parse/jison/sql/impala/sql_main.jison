@@ -97,11 +97,16 @@ SqlStatement_EDIT
 
 NonReservedKeyword
  : 'DEFAULT'
+ | 'ICEBERG'
  | 'KEY'
  | 'OPTION'
  | 'OWNER'
  | 'SERVER'
+ | 'SPEC'
  | 'STRUCT'
+ | 'SYSTEM_TIME'
+ | 'SYSTEM_VERSION'
+ | 'UNSET'
  | 'URI'
  ;
 
@@ -1477,7 +1482,7 @@ JoinedTable_EDIT
  ;
 
 TablePrimary
- : TableOrQueryName OptionalCorrelationName OptionalTableSample
+ : TableOrQueryName OptionalCorrelationName OptionalAsOf OptionalTableSample
    {
      $$ = {
        primary: $1
@@ -1490,12 +1495,19 @@ TablePrimary
        parser.addTablePrimary($1);
      }
      var keywords = [];
-     if ($3 && $3.suggestKeywords) {
-       keywords = $3.suggestKeywords;
-     } else if (!$2 && !$3) {
-       keywords = [{ value: 'AS', weight: 2 }, { value: 'TABLESAMPLE', weight: 3 }];
-     } else if (!$3) {
-       keywords = [{ value: 'TABLESAMPLE', weight: 3 }];
+     if ($4 && $4.suggestKeywords) {
+       keywords = $4.suggestKeywords;
+     } else {
+       if (!$4) {
+         keywords.push({ value: 'TABLESAMPLE', weight: 3 });
+       }
+       if (!$4 && !$3) {
+         keywords.push({ value: 'FOR SYSTEM_TIME AS OF', weight: 4 });
+         keywords.push({ value: 'FOR SYSTEM_VERSION AS OF', weight: 4 });
+       }
+       if (!$4 && !$3 && !$2) {
+         keywords.push({ value: 'AS', weight: 5 });
+       }
      }
      if (keywords.length > 0) {
        $$.suggestKeywords = keywords;
@@ -1517,7 +1529,7 @@ TablePrimary
      if ($3 && $3.suggestKeywords) {
        keywords = $3.suggestKeywords;
      } else {
-       keywords = parser.getKeywordsForOptionalsLR([$3, $2], [{ value: 'TABLESAMPLE', weight: 1 }, { value: 'AS', weight: 2 }], [true, true]);
+       keywords = parser.getKeywordsForOptionalsLR([$3, $2], [{ value: 'TABLESAMPLE', weight: 3 }, { value: 'AS', weight: 4 }], [true, true]);
      }
      if (keywords.length > 0) {
        $$.suggestKeywords = keywords;
@@ -1526,13 +1538,13 @@ TablePrimary
  ;
 
 TablePrimary_EDIT
- : TableOrQueryName_EDIT OptionalCorrelationName OptionalTableSample
+ : TableOrQueryName_EDIT OptionalCorrelationName OptionalAsOf OptionalTableSample
    {
      if ($2) {
        parser.addTableAliasLocation($2.location, $2.alias, $1.identifierChain);
      }
    }
- | TableOrQueryName OptionalCorrelationName TableSample_EDIT
+ | TableOrQueryName OptionalCorrelationName OptionalAsOf TableSample_EDIT
    {
      if ($2) {
        $1.alias = $2.alias;
@@ -1540,6 +1552,7 @@ TablePrimary_EDIT
      }
      parser.addTablePrimary($1);
    }
+ | TableOrQueryName OptionalCorrelationName AsOf_EDIT OptionalTableSample
  | DerivedTable_EDIT OptionalCorrelationName OptionalTableSample
    {
      if ($2) {
@@ -1548,6 +1561,40 @@ TablePrimary_EDIT
      }
    }
  | DerivedTable OptionalCorrelationName_EDIT OptionalTableSample
+ ;
+
+OptionalAsOf
+ :
+ | AsOf
+ ;
+
+AsOf
+ : 'FOR' SystemTimeOrSystemVersion 'AS' 'OF' ValueExpression
+ ;
+
+
+AsOf_EDIT
+ : 'FOR' 'CURSOR'
+   {
+     parser.suggestKeywords(['SYSTEM_TIME AS OF', 'SYSTEM_VERSION AS OF']);
+   }
+ | 'FOR' SystemTimeOrSystemVersion 'CURSOR'
+   {
+     parser.suggestKeywords(['AS OF']);
+   }
+ | 'FOR' SystemTimeOrSystemVersion 'AS' 'CURSOR'
+   {
+     parser.suggestKeywords(['OF']);
+   }
+ | 'FOR' SystemTimeOrSystemVersion 'AS' 'OF' 'CURSOR'
+   {
+     parser.valueExpressionSuggest();
+   }
+ ;
+
+SystemTimeOrSystemVersion
+ : 'SYSTEM_TIME'
+ | 'SYSTEM_VERSION'
  ;
 
 TableOrQueryName

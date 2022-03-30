@@ -594,7 +594,7 @@ class LdapBackend(object):
       LOG.warning("LDAP was not properly configured: %s", detail)
       return None
 
-    if AUTH.PAM_USE_PWD_MODULE.get():
+    if AUTH.PAM_USE_PWD_MODULE.get() and user is not None:
       LOG.debug('Setting LDAP username to %s using PAM pwd module for user %s' % (getpwnam(username).pw_name, username))
       pam_user = getpwnam(username).pw_name
       try:

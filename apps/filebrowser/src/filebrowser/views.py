@@ -214,6 +214,9 @@ def download(request, path):
 def view(request, path):
   """Dispatches viewing of a path to either index() or fileview(), depending on type."""
 
+  # index directory have to be default.
+  if not path:
+    path = '/'
   path = _normalize_path(path)
 
   # default_abfs_home is set in jquery.filechooser.js

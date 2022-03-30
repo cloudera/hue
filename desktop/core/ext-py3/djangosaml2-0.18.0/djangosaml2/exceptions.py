@@ -1,0 +1,2 @@
+class IdPConfigurationMissing(Exception):
+    pass

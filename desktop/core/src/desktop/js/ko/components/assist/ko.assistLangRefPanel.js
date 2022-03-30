@@ -83,7 +83,7 @@ const TEMPLATE = `
       <!-- ko if: selectedTopic -->
       <div class="assist-flex-60 assist-docs-details" data-bind="with: selectedTopic">
         <div class="assist-panel-close"><button class="close" data-bind="click: function() { $component.selectedTopic(undefined); }">&times;</button></div>
-        <div data-bind="html: bodyMatch() || body()"></div>
+        <div data-bind="htmlUnsecure: bodyMatch() || body()"></div>
       </div>
       <!-- /ko -->
     </div>

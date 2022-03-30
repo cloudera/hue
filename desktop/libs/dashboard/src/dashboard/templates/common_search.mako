@@ -20,7 +20,7 @@ import sys
 from desktop import conf
 from desktop.views import commonheader, commonfooter, _ko, commonshare
 
-from dashboard.conf import USE_GRIDSTER, USE_NEW_ADD_METHOD, HAS_REPORT_ENABLED, HAS_WIDGET_FILTER, HAS_TREE_WIDGET
+from dashboard.conf import USE_GRIDSTER, USE_NEW_ADD_METHOD, HAS_REPORT_ENABLED, HAS_WIDGET_FILTER, HAS_TREE_WIDGET, ALLOW_UNSECURE_HTML
 
 if sys.version_info[0] > 2:
   from django.utils.translation import gettext as _
@@ -1057,7 +1057,11 @@ ${ dashboard.layout_skeleton(suffix='search') }
         </thead>
         <tbody data-bind="foreach: {data: $root.results, as: 'doc'}" class="result-tbody">
           <tr data-bind="style: {'backgroundColor': $index() % 2 == 0 ? '#FFF': '#F6F6F6'}">
+          % if ALLOW_UNSECURE_HTML.get():
+            <td><div data-bind="htmlUnsecure: content" style="margin-bottom: -20px"></div></td>
+          % else:
             <td><div data-bind="html: content" style="margin-bottom: -20px"></div></td>
+          % endif
           </tr>
           <tr>
             <td class="show-details-icon pointer" data-bind="click: toggleDocDetails">

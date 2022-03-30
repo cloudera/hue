@@ -29,6 +29,7 @@ const initSqlParser = function (parser) {
 
   parser.DESCRIBE_KEYWORDS = [
     { value: 'DATABASE', weight: 2 },
+    { value: 'HISTORY', weight: 2 },
     { value: 'EXTENDED', weight: 1 },
     { value: 'FORMATTED', weight: 1 }
   ];
@@ -38,6 +39,7 @@ const initSqlParser = function (parser) {
     'ALTER',
     'CREATE',
     'DROP',
+    'GRANT OPTION FOR',
     'INSERT',
     'REFRESH',
     'ROLE',
@@ -1266,6 +1268,7 @@ const initSqlParser = function (parser) {
   parser.suggestFileFormats = function () {
     parser.suggestKeywords([
       'AVRO',
+      'ICEBERG',
       'KUDU',
       'ORC',
       'PARQUET',

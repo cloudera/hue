@@ -77,6 +77,15 @@ def _connector_to_interpreter(connector):
   }
 
 
+def displayName(dialect, name):
+  if ENABLE_UNIFIED_ANALYTICS.get() and dialect == 'hive':
+    return 'Unified Analytics'
+  elif name.lower() == 'hplsql':
+    return 'HPL/SQL'
+  else:
+    return name
+
+
 def get_ordered_interpreters(user=None):
   global INTERPRETERS_CACHE
 
@@ -128,7 +137,7 @@ def get_ordered_interpreters(user=None):
 
   return [{
       "name": i.get('nice_name', i['name']),
-      'displayName': 'Unified Analytics' if ENABLE_UNIFIED_ANALYTICS.get() and i.get('dialect', i['name']).lower() == 'hive' else i.get('nice_name', i['name']),
+      'displayName': displayName(i.get('dialect', i['name']).lower(), i.get('nice_name', i['name'])),
       "type": i['type'],
       "interface": i['interface'],
       "options": i['options'],

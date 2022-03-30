@@ -974,6 +974,10 @@
     #   name=Hive
     #   interface=hiveserver2
 
+    # [[[hplsql]]]
+    #   name=Hplsql
+    #   interface=hiveserver2
+
     # [[[llap]]]
     #   name=LLAP
     #   interface=hiveserver2
@@ -1148,6 +1152,9 @@
 
   # Activate the tree widget (to drill down fields as dimensions, alpha).
   ## has_tree_widget=false
+
+  # Setting this value to true opens up for possible xss attacks.
+  ## allow_unsecure_html=false
 
   [[engines]]
 
@@ -1365,9 +1372,6 @@
 
   # Use SASL framework to establish connection to host.
   ## use_sasl=false
-
-  # Enable the HPLSQL mode.
-  ## hplsql=false
 
   # Max number of objects (columns, tables, databases) available to list in the left assist, autocomplete, table browser etc.
   # Setting this higher than the default can degrade performance.
