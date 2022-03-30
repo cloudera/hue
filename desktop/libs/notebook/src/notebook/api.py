@@ -407,7 +407,7 @@ def cancel_statement(request):
   response = {'status': -1}
 
   notebook = json.loads(request.POST.get('notebook', '{}'))
-  snippet = json.loads(request.POST.get('snippet', '{}'))
+  snippet = {}
   operation_id = request.POST.get('operationId') or notebook['uuid']
 
   snippet = _get_snippet(request.user, notebook, snippet, operation_id)
@@ -714,7 +714,7 @@ def close_statement(request):
   response = {'status': -1}
 
   notebook = json.loads(request.POST.get('notebook', '{}'))
-  snippet = json.loads(request.POST.get('snippet', '{}'))
+  snippet = {}
   operation_id = request.POST.get('operationId')
 
   if operation_id and not notebook.get('uuid'):
