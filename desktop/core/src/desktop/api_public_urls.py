@@ -91,6 +91,7 @@ urlpatterns += [
 ]
 
 urlpatterns += [
+  re_path(r'^storage/get_filesystems/?$', api_public.storage_get_filesystems, name='storage_get_filesystems'),
   re_path(r'^storage/view=(?P<path>.*)$', api_public.storage_view, name='storage_view'),
   re_path(r'^storage/download=(?P<path>.*)$', api_public.storage_download, name='storage_download'),
   re_path(r'^storage/upload/file/?$', api_public.storage_upload_file, name='storage_upload_file'),
@@ -140,4 +141,15 @@ urlpatterns += [
   re_path(r'^optimizer/predict/?$', api_public.predict, name='optimizer_predict'),
   re_path(r'^optimizer/query_compatibility/?$', api_public.query_compatibility, name='optimizer_query_compatibility'),
   re_path(r'^optimizer/similar_queries/?$', api_public.similar_queries, name='optimizer_similar_queries'),
+]
+
+urlpatterns += [
+  re_path(r'^metadata/search/entities_interactive/?$', api_public.search_entities_interactive, name='metadata_entities_interactive'),
+]
+
+urlpatterns += [
+  re_path(r'^iam/users/autocomplete', api_public.list_for_autocomplete, name='iam_users_list_for_autocomplete'),
+  re_path(r'^iam/users/?$', api_public.get_users_by_id, name='iam_get_users_by_id'),
+
+  re_path(r'^iam/get_users/?', api_public.get_users, name='iam_get_users'),
 ]

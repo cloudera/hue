@@ -19,7 +19,7 @@
 from beeswax.design import hql_query
 from notebook.sql_utils import strip_trailing_semicolon, split_statements
 
-from nose.tools import assert_equal
+from nose.tools import assert_equal, assert_not_equal
 
 
 def test_split_statements():
@@ -27,8 +27,14 @@ def test_split_statements():
   assert_equal(["select * where id == '10'"], hql_query("select * where id == '10'").statements)
   assert_equal(["select * where id == '10'"], hql_query("select * where id == '10';").statements)
   assert_equal(['select', "select * where id == '10;' limit 100"], hql_query("select; select * where id == '10;' limit 100;").statements)
-  assert_equal(['select', "select * where id == \"10;\" limit 100"], hql_query("select; select * where id == \"10;\" limit 100;").statements)
-  assert_equal(['select', "select * where id == '\"10;\"\"\"' limit 100"], hql_query("select; select * where id == '\"10;\"\"\"' limit 100;").statements)
+  assert_equal(
+    ['select', "select * where id == \"10;\" limit 100"],
+    hql_query("select; select * where id == \"10;\" limit 100;").statements
+  )
+  assert_equal(
+    ['select', "select * where id == '\"10;\"\"\"' limit 100"],
+    hql_query("select; select * where id == '\"10;\"\"\"' limit 100;").statements
+  )
 
 
 def teststrip_trailing_semicolon():
@@ -42,3 +48,15 @@ def teststrip_trailing_semicolon():
   assert_equal("fo;o;", strip_trailing_semicolon("fo;o;;     "))
   # No semicolons
   assert_equal("foo", strip_trailing_semicolon("foo"))
+
+def test_get_hplsql_statements():
+  # Not spliting statements at semicolon
+  assert_equal(
+    "CREATE FUNCTION hello()\n RETURNS STRING\nBEGIN\n RETURN 'Hello, world';\nEND",
+    split_statements("CREATE FUNCTION hello()\n RETURNS STRING\nBEGIN\n RETURN 'Hello, world';\nEND", 'hplsql')[0][2]
+  )
+
+  assert_not_equal(
+    "CREATE FUNCTION hello()\n RETURNS STRING\nBEGIN\n RETURN 'Hello, world';\nEND",
+    split_statements("CREATE FUNCTION hello()\n RETURNS STRING\nBEGIN\n RETURN 'Hello, world';\nEND")[0][2]
+  )

@@ -214,12 +214,15 @@ def download(request, path):
 def view(request, path):
   """Dispatches viewing of a path to either index() or fileview(), depending on type."""
 
+  # index directory have to be default.
+  if not path:
+    path = '/'
   path = _normalize_path(path)
 
   # default_abfs_home is set in jquery.filechooser.js
   if 'default_abfs_home' in request.GET:
     from azure.abfs.__init__ import get_home_dir_for_abfs
-    home_dir_path = get_home_dir_for_abfs()
+    home_dir_path = get_home_dir_for_abfs(request.user)
     if request.fs.isdir(home_dir_path):
       return format_preserving_redirect(
           request,
@@ -227,7 +230,7 @@ def view(request, path):
       )
 
   if 'default_s3_home' in request.GET:
-    home_dir_path = get_s3_home_directory()
+    home_dir_path = get_s3_home_directory(request.user)
     if request.fs.isdir(home_dir_path):
       return format_preserving_redirect(
           request,

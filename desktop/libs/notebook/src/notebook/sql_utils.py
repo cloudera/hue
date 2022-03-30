@@ -31,12 +31,12 @@ else:
 
 
 # Note: Might be replaceable by sqlparse.split
-def get_statements(hql_query):
+def get_statements(hql_query, dialect=None):
   hql_query = strip_trailing_semicolon(hql_query)
   hql_query_sio = string_io(hql_query)
 
   statements = []
-  for (start_row, start_col), (end_row, end_col), statement in split_statements(hql_query_sio.read()):
+  for (start_row, start_col), (end_row, end_col), statement in split_statements(hql_query_sio.read(), dialect):
     statements.append({
       'start': {
         'row': start_row,
@@ -57,7 +57,7 @@ def get_current_statement(snippet):
   statement_id = handle.get('statement_id', 0)
   statements_count = handle.get('statements_count', 1)
 
-  statements = get_statements(snippet['statement'])
+  statements = get_statements(snippet['statement'], snippet['dialect'] if 'dialect' in snippet else None)
 
   statement_id = min(statement_id, len(statements) - 1) # In case of removal of statements
   previous_statement_hash = compute_statement_hash(statements[statement_id]['statement'])
@@ -91,7 +91,7 @@ def compute_statement_hash(statement):
   else:
     return hashlib.sha224(smart_str(statement)).hexdigest()
 
-def split_statements(hql):
+def split_statements(hql, dialect=None):
   """
   Split statements at semicolons ignoring the ones inside quotes and comments.
   The comment symbols that come inside quotes should be ignored.
@@ -106,7 +106,7 @@ def split_statements(hql):
   end_row = 0
   end_col = len(hql) - 1
 
-  if hql.find(';') in (-1, len(hql) - 1):
+  if hql.find(';') in (-1, len(hql) - 1) or dialect == 'hplsql':
     return [((start_row, start_col), (end_row, end_col), hql)]
 
   lines = hql.splitlines()

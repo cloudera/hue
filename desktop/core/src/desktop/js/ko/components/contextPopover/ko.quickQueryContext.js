@@ -29,7 +29,7 @@ import { CONFIG_REFRESHED_TOPIC } from 'config/events';
 import { filterEditorConnectors } from 'config/hueConfig';
 import componentUtils from 'ko/components/componentUtils';
 import DisposableComponent from 'ko/components/DisposableComponent';
-import sqlStatementsParser from 'parse/sqlStatementsParser';
+import { getStatementsParser } from 'parse/utils';
 
 export const NAME = 'quick-query-context';
 
@@ -143,7 +143,9 @@ class QuickQueryContext extends DisposableComponent {
     const refreshExecutable = () => {
       window.clearTimeout(refreshExecutableThrottle);
       refreshExecutableThrottle = window.setTimeout(() => {
-        const parsedStatement = sqlStatementsParser.parse(this.statement() || '')[0];
+        const parsedStatement = getStatementsParser(this.connector()).parse(
+          this.statement() || ''
+        )[0];
 
         const executable = new SqlExecutable({
           executor: this.executor,

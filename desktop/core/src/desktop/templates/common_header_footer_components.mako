@@ -409,6 +409,10 @@ else:
     var isLoginRequired = false;
     $(document).ajaxComplete(function (event, xhr, settings) {
       if (xhr.responseText === '/* login required */') {
+        if (window.SAML_LOGOUT_URL && window.SAML_REDIRECT_URL) {
+          setTimeout(function () { window.location.href = "/accounts/logout" }, 2000);
+        }
+
         var isAutoLogout = settings.url == '/desktop/debug/is_idle';
         $('.blurred').removeClass('blurred');
 

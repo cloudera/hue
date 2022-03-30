@@ -50,7 +50,8 @@ IMPORT_PEEK_NLINES = 20
 def get_format_types():
   formats = [
     CSVFormat,
-    JsonFormat
+    JsonFormat,
+    XLSXFormat
   ]
 
   if ENABLE_SCALABLE_INDEXER.get():
@@ -600,6 +601,15 @@ class CSVFormat(FileFormat):
       fields = []
 
     return fields
+
+
+class XLSXFormat(CSVFormat):
+  _name = "excel"
+  _description = _("Excel File")
+  _args = [
+    CheckboxArgument("hasHeader", "Has Header")
+  ]
+  _extensions = ["xlsx", "xls"]
 
 
 class JsonFormat(CSVFormat):

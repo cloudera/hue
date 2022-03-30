@@ -52,7 +52,7 @@ QUERY_SUBMISSION_TIMEOUT = datetime.timedelta(0, 60 * 60)               # 1 hour
 # Constants for DB fields, hue ini
 BEESWAX = 'beeswax'
 HIVE_SERVER2 = 'hiveserver2'
-QUERY_TYPES = (HQL, IMPALA, RDBMS, SPARK) = list(range(4))
+QUERY_TYPES = (HQL, IMPALA, RDBMS, SPARK, HPLSQL) = list(range(5))
 
 class QueryHistory(models.Model):
   """
@@ -270,7 +270,7 @@ class SavedQuery(models.Model):
   DEFAULT_NEW_DESIGN_NAME = _('My saved query')
   AUTO_DESIGN_SUFFIX = _(' (new)')
   TYPES = QUERY_TYPES
-  TYPES_MAPPING = {'beeswax': HQL, 'hql': HQL, 'impala': IMPALA, 'rdbms': RDBMS, 'spark': SPARK}
+  TYPES_MAPPING = {'beeswax': HQL, 'hql': HQL, 'impala': IMPALA, 'rdbms': RDBMS, 'spark': SPARK, 'hplsql': HPLSQL}
 
   type = models.IntegerField(null=False)
   owner = models.ForeignKey(User, on_delete=models.CASCADE, db_index=True)

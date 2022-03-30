@@ -130,7 +130,7 @@ Provide login credentials and get a [JWT token](https://jwt.io/):
 
     {"refresh":"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTYyMTcyNDYzMSwianRpIjoiOGM0NDRjYzRhN2VhNGMxZDliMGZhNmU1YzUyMjM1MjkiLCJ1c2VyX2lkIjoxfQ.t6t7_eYrNhpGN3-Jz5MDLXM8JtGP7V9Y9lacOTInqqQ","access":"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjIxNjM4NTMxLCJqdGkiOiJhZjgwN2E0ZjBmZDI0ZWMxYWQ2NTUzZjEyMjIyYzU4YyIsInVzZXJfaWQiOjF9.dQ1P3hbzSytp9-o8bWlcOcwrdwRVy95M2Eolph92QMA"}
 
-And keep the `access` token as the value of the bearer.
+And keep the `access` token as the value of the bearer header in the API calls.
 
 ### Validate token
 
@@ -144,6 +144,30 @@ Similarly, an `access` token validity can be extended via a refresh sending the 
 
     curl -X POST https://demo.gethue.com/api/token/refresh/ -d 'refresh=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTYyMTcyNDYzMSwianRpIjoiOGM0NDRjYzRhN2VhNGMxZDliMGZhNmU1YzUyMjM1MjkiLCJ1c2VyX2lkIjoxfQ.t6t7_eYrNhpGN3-Jz5MDLXM8JtGP7V9Y9lacOTInqqQ'
 
+### Custom JWT Authentication
+
+Users can authenticate with their own JWT with the help of custom backend **(supporting RSA256)**. To enable it, add the following in the `hue.ini`:
+
+    [desktop]
+    [[auth]]
+    [[[jwt]]]
+    is_enabled=true
+    key_server_url=https://ext_authz:8000
+    issuer=<your_external_app>
+    audience=hue
+
+Also, to allow Hue to send this JWT to external services like Impala, enable the following flag in `hue.ini`:
+
+    [desktop]
+    use_thrift_http_jwt=true
+
+If you wish to implement your own custom auth (having customized connection with external auth server or using different signing algorithm etc.), then you can follow the [Django REST Framework custom pluggability](https://www.django-rest-framework.org/api-guide/authentication/#custom-authentication) and add like this [dummy auth](https://github.com/cloudera/hue/blob/d75c8fc7b307fc67ef9a2a58e36cfb4ace6cd461/desktop/core/src/desktop/auth/api_authentications.py#L119).
+
+And then, add it in `hue.ini` (comma separated and in order of priority if multiple auth backends present):
+
+    [desktop]
+    [[auth]]
+    api_auth=<your_own_custom_auth_backend>
 
 ## SQL Querying
 
@@ -151,11 +175,14 @@ Similarly, an `access` token validity can be extended via a refresh sending the 
 
 Now that we are authenticated, here is how to execute a `SHOW TABLES` SQL query via the `hive` connector. You could repeat the steps with any query you want, e.g. `SELECT * FROM web_logs LIMIT 100`.
 
-Selecting the Database to query via the **dialect** argument in `/api/editor/execute/<dialect>`:
-- **hive**: select the first configured Hive databases.
+Selecting the **dialect** argument in `/api/editor/execute/<dialect>`:
+- **hive**: select the configured Hive dialect
 - **1**: select the connector id 1
 - **hive-1**: select the interpreter id 1 and hints that it is a Hive dialect
 - If blank will pick the first interpreter
+
+Optional parameter:
+- **database**: select a specific database
 
 For a `SHOW TABLES`, first we send the query statement:
 
@@ -326,9 +353,17 @@ We can choose a dialect for `doc_type` e.g. impala, mysql, hive, phoenix, etc.
 
 ## File Browsing
 
-### List
-
 Hue's [File Browser](https://docs.gethue.com/user/browsing/#data) offer uploads, downloads, operations (create, delete, chmod...) and listing of data in HDFS (hdfs:// or no prefix), S3 (s3a:// prefix), ADLS (adls:// or abfs:// prefixes) storages.
+
+### Get Filesystems
+
+Get the filesystems configured with Hue:
+
+    curl -X POST https://demo.gethue.com/api/storage/get_filesystems
+    
+    {"status": 0, "filesystems": {"s3a": true}}
+
+### List
 
 Here is how to list the content of a path, here a S3 bucket `s3a://demo-gethue`:
 
@@ -390,7 +425,7 @@ Some of the parameters:
  - sortby=name
  - descending=false
 
-e.g. pagesize=45&pagenum=1&filter=&sortby=name&descending=false
+E.g. `?pagesize=45&pagenum=1&filter=&sortby=name&descending=false`
 
 ### Preview
 
@@ -425,7 +460,7 @@ Some of the parameters:
 - compression=none
 - mode=text
 
-e.g. ?offset=0&length=204800&compression=none&mode=text
+E.g. `?offset=0&length=204800&compression=none&mode=text`
 
 ### Download
 
@@ -537,13 +572,13 @@ This is the same as creating a new connector instance, but as we provide the `id
 
 ### Delete
 
-    curl -X POST 'https://demo.gethue.com/api/connector/instance/delete' -d '{"connector": {"id": "1"}}'
+    curl -X POST https://demo.gethue.com/api/connector/instance/delete -d 'connector={"id": "1"}'
 
 ### Test
 
 Check if the connectivity is healthy:
 
-    curl -X POST 'https://demo.gethue.com/api/connector/instance/test/' -d 'connector={"nice_name":"Hive Docker Local","name":"41","dialect":"hive","interface":"hiveserver2","settings":[{"name":"server_host","value":"localhost"},{"name":"server_port","value":10000},{"name":"is_llap","value":false},{"name":"use_sasl","value":"true"}],"id":"41","category":"editor","description":"Recommended","dialect_properties":{"is_sql":true,"sql_identifier_quote":"`","sql_identifier_comment_single":"--","has_catalog":false,"has_database":true,"has_table":true,"has_live_queries":false,"has_optimizer_risks":true,"has_optimizer_values":true,"has_auto_limit":false,"has_reference_language":true,"has_reference_functions":true,"has_use_statement":true}}'
+    curl -X POST https://demo.gethue.com/api/connector/instance/test/ -d 'connector={"nice_name":"Hive Docker Local","name":"41","dialect":"hive","interface":"hiveserver2","settings":[{"name":"server_host","value":"localhost"},{"name":"server_port","value":10000},{"name":"is_llap","value":false},{"name":"use_sasl","value":"true"}],"id":"41","category":"editor","description":"Recommended","dialect_properties":{"is_sql":true,"sql_identifier_quote":"`","sql_identifier_comment_single":"--","has_catalog":false,"has_database":true,"has_table":true,"has_live_queries":false,"has_optimizer_risks":true,"has_optimizer_values":true,"has_auto_limit":false,"has_reference_language":true,"has_reference_functions":true,"has_use_statement":true}}'
 
 ### Examples
 
@@ -551,29 +586,53 @@ Install or update the connector examples:
 
     curl -X POST https://demo.gethue.com/api/connector/examples/install/
 
+## IAM
+
+### Get users
+
+Get user records in Hue. Requires **admin privileges**.
+
+    curl -X GET https://demo.gethue.com/api/iam/get_users
+
+Optional GET params:
+- **username:** filter by username
+- **groups:** filter by specific group
+- **is_active:** filter by active status
+
+E.g. `?username=demo&groups=default&is_active=true`
+
+Search user records by list of user IDs. Requires **admin privileges**.
+
+    curl -X GET https://demo.gethue.com/api/iam/users?userids=[1100714,1100715]
+    
+    {"users": [{"id": 1100714,"username": "demo","first_name": "","last_name": "","email": "","last_login": "2021-10-06T01:36:49.663","editURL": "/useradmin/users/edit/demo"},{"id": 1100715,"username": "hue","first_name": "","last_name": "","email": "","last_login": "2021-08-11T07:15:48.793","editURL": "/useradmin/users/edit/hue"}]}
+
+User list_for_autocomplete API:
+
+    curl -X GET https://demo.gethue.com/api/iam/users/autocomplete
+ 
+Optional GET params:
+- **extend_user:** true or false (info about each user's groups)
+- **filter:** search term
+- **count:** Number of records (default is 100)
+
 ## Data Catalog
 
 The [metadata API](https://github.com/cloudera/hue/tree/master/desktop/libs/metadata) is powering the external [Catalog integrations](/user/browsing/#data-catalogs).
 
 ### Searching for entities
+    
+    curl -X POST https://demo.gethue.com/api/metadata/search/entities_interactive/ -d 'query_s="*sample"&sources=["documents", "sql", "hdfs", "s3"]'
 
-    $.post("/metadata/api/catalog/search_entities_interactive/", {
-        query_s: ko.mapping.toJSON("*sample"),
-        sources: ko.mapping.toJSON(["sql", "hdfs", "s3"]),
-        field_facets: ko.mapping.toJSON([]),
-        limit: 10
-    }, function(data) {
-        console.log(ko.mapping.toJSON(data));
-    });
+Some of the parameters:
+- **query_s:** search term
+- **sources:** sources to search from `["documents", "sql", "hdfs", "s3"]`
+- **field_facets:** `['type', 'owner', 'tags', 'lastModified']`
+- **limit:** 10
 
-Searching for entities with the dummy backend:
+Searching for entities with the `dummy` catalog:
 
-    $.post("/metadata/api/catalog/search_entities_interactive/", {
-        query_s: ko.mapping.toJSON("*sample"),
-        interface: "dummy"
-    }, function(data) {
-        console.log(ko.mapping.toJSON(data));
-    });
+    curl -X POST https://demo.gethue.com/api/metadata/search/entities_interactive/ -d 'query_s="*sample"&interface="dummy"'
 
 ### Finding an entity
 

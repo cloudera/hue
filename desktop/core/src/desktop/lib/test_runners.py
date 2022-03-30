@@ -35,28 +35,28 @@ _MAKO_LOCK = threading.RLock()
 
 
 def _instrumented_test_render(self, *args, **data):
-    """
-    An instrumented Template render method, providing a signal
-    that can be intercepted by the test system Client
-    """
+  """
+  An instrumented Template render method, providing a signal
+  that can be intercepted by the test system Client
+  """
 
-    with _MAKO_LOCK:
-      def mako_callable_(context, *args, **kwargs):
-        template_rendered.send(sender=self, template=self, context=context)
-        return self.original_callable_[-1](context, *args, **kwargs)
+  with _MAKO_LOCK:
+    def mako_callable_(context, *args, **kwargs):
+      template_rendered.send(sender=self, template=self, context=context)
+      return self.original_callable_[-1](context, *args, **kwargs)
 
-      if hasattr(self, 'original_callable_'):
-        self.original_callable_.append(self.callable_)
-      else:
-        self.original_callable_ = [self.callable_]
+    if hasattr(self, 'original_callable_'):
+      self.original_callable_.append(self.callable_)
+    else:
+      self.original_callable_ = [self.callable_]
 
-      self.callable_ = mako_callable_
-      try:
-        response = runtime._render(self, self.original_callable_[-1], args, data)
-      finally:
-        self.callable_ = self.original_callable_.pop()
+    self.callable_ = mako_callable_
+    try:
+      response = runtime._render(self, self.original_callable_[-1], args, data)
+    finally:
+      self.callable_ = self.original_callable_.pop()
 
-      return response
+    return response
 
 
 class HueTestRunner(NoseTestSuiteRunner):
@@ -82,7 +82,19 @@ class HueTestRunner(NoseTestSuiteRunner):
       nose_argv.extend(args)
 
     if hasattr(settings, 'NOSE_ARGS'):
-      nose_argv.extend(settings.NOSE_ARGS)
+      extended_nose_args = settings.NOSE_ARGS
+
+      # Remove coverage packages option from settings.NOSE_ARGS if explicitly mentioned as test command-line argument.
+      # This will help as an option to report coverage for specific packages only if required.
+      for nose_arg in nose_argv:
+        if nose_arg.startswith('--cover-package'):
+          extended_nose_args = []
+
+          for arg in settings.NOSE_ARGS:
+            if not arg.startswith('--cover-package'):
+              extended_nose_args.append(arg)
+
+      nose_argv.extend(extended_nose_args)
 
     # Skip over 'manage.py test' and any arguments handled by django.
     django_opts = ['--noinput', '--liveserver', '-p', '--pattern']

@@ -471,14 +471,9 @@ You should create an icon for your application that is a transparent png sized
 24px by 24px. Your `settings.py` file should point to your icon via the `ICON`
 variable. The `create_desktop_app` command creates a default icon for you.
 
-<div class="note">
-  If you do not define an application icon, your application will not show up
-  in the navigation bar.
-</div>
+**NOTE:** If you do not define an application icon, your application will not show up in the navigation bar.
 
-Hue ships with Twitter Bootstrap and Font Awesome 3 (http://fortawesome.github.io/Font-Awesome/)
-so you have plenty of scalable icons to choose from. You can style your elements to use them
-like this (in your mako template):
+Hue ships with Twitter Bootstrap and Font Awesome 3 (https://fontawesome.com/v3/) so you have plenty of scalable icons to choose from. You can style your elements to use them like this (in your mako template):
 
     <!-- show a trash icon in a link -->
     <a href="#something"><i class="icon-trash"></i> Trash</a>
@@ -777,7 +772,7 @@ Docker images are at https://hub.docker.com/u/gethue/:
     docker push gethue/nginx:4.10.0
 
 
-### Kubernetes / Helm package
+### Kubernetes / Helm
 
 To build the chart, use the package command from the Helm root directory:
 
@@ -819,7 +814,11 @@ Read more on [Python packaging](https://packaging.python.org/tutorials/packaging
 
 Documentation is currently being auto refreshed every morning of the week and run as a container.
 
-The manual process otherwise would be to [build it](#Documentation) and push it to the docs host.
+The manual process otherwise would be to [build it](#documentation-1) and push it to the docs host.
+
+The resources like images go to the CDN:
+
+    scp before_raz_adls.png after_raz_adls.png root@104.248.178.223:/var/www/cdn.gethue.com/uploads/2021/09/
 
 ### NPM registry
 

@@ -84,6 +84,12 @@ HAS_TREE_WIDGET = Config(
   type=coerce_bool
 )
 
+ALLOW_UNSECURE_HTML = Config(
+  key="allow_unsecure_html",
+  help=_t("Setting this value to true opens up for possible xss attacks."),
+  type=coerce_bool,
+  default=False
+)
 
 def get_properties():
   if ENGINES.get():

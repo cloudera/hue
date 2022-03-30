@@ -1,0 +1,34 @@
+# for container-y goodness:
+sudo: false
+
+language: python
+
+python:
+  - "3.6"
+  - "3.5"
+  - "3.4"
+  - "3.3"
+  - "2.7"
+
+# command to install dependencies
+install: 
+- "pip install -U pip setuptools"
+- "pip install -Ur requirements.txt"
+
+# command to run tests, e.g. python setup.py test
+script: nosetests --with-cov --cov=xlwt
+
+after_success:
+  - coveralls
+
+deploy:
+  provider: pypi
+  user: chrisw
+  password:
+    secure: HZ9DRsLpeNMBZc3Sjj2X/KF/fJxaDjINqbeUzJ7FnqcJ5A5ECDHZ/2Bxx/crdpfXwqHDPEcZvatu+LhtpBFu+HCUFAc00V0qvmq34RZDes9WNmnh5Kx97kXxdN0scoM1V7JXeDffhEUZJkL6EQJfJqUWvl9nq4SnC5wOlJBR3QE=
+  on:
+    tags: true
+    repo: python-excel/xlwt
+    python: "3.5"
+  skip_cleanup: true
+  distributions: "sdist bdist_wheel"

@@ -51,7 +51,7 @@ from useradmin.organization import _fitered_queryset
 from desktop import appmanager
 from desktop.auth.backend import is_admin
 from desktop.conf import get_clusters, IS_MULTICLUSTER_ONLY, ENABLE_ORGANIZATIONS, ENABLE_PROMETHEUS, \
-    has_connectors, TASK_SERVER, APP_BLACKLIST, ENABLE_SHARING, ENABLE_CONNECTORS, ENABLE_UNIFIED_ANALYTICS
+    has_connectors, TASK_SERVER, APP_BLACKLIST, ENABLE_SHARING, ENABLE_CONNECTORS, ENABLE_UNIFIED_ANALYTICS, RAZ
 from desktop.lib import fsmanager
 from desktop.lib.connectors.api import _get_installed_connectors
 from desktop.lib.connectors.models import Connector
@@ -1726,12 +1726,22 @@ class Document2Permission(models.Model):
 def get_cluster_config(user):
   return Cluster(user).get_app_config().get_config()
 
-def get_remote_home_storage():
+def get_remote_home_storage(user=None):
   remote_home_storage = REMOTE_STORAGE_HOME.get() if hasattr(REMOTE_STORAGE_HOME, 'get') and REMOTE_STORAGE_HOME.get() else None
 
   if not remote_home_storage:
     if get_raz_api_url() and get_raz_s3_default_bucket():
       remote_home_storage = 's3a://%(bucket)s' % get_raz_s3_default_bucket()
+
+  remote_home_storage = _handle_user_dir_raz(user, remote_home_storage)
+
+  return remote_home_storage
+
+
+def _handle_user_dir_raz(user, remote_home_storage):
+  # In RAZ env, apppend username so that it defaults to user's dir and doesn't give 403 error
+  if user and remote_home_storage and RAZ.IS_ENABLED.get() and remote_home_storage.endswith('/user'):
+    remote_home_storage += '/' + user.username
 
   return remote_home_storage
 
@@ -1839,6 +1849,15 @@ class ClusterConfig(object):
     }
 
 
+  def displayName(self, dialect, name):
+    if ENABLE_UNIFIED_ANALYTICS.get() and dialect == 'hive':
+      return 'Unified Analytics'
+    elif name.lower() == 'hplsql':
+      return 'HPL/SQL'
+    else:
+      return name
+
+
   def _get_editor(self):
     interpreters = []
 
@@ -1850,7 +1869,7 @@ class ClusterConfig(object):
           'name': interpreter['name'],
           'type': interpreter['type'],  # Connector v1
           'id': interpreter['type'],
-        'displayName': 'Unified Analytics' if ENABLE_UNIFIED_ANALYTICS.get() and interpreter['dialect'] == 'hive' else interpreter['name'],
+          'displayName': self.displayName(interpreter['dialect'], interpreter['name']),
           'buttonName': _('Query'),
           'tooltip': _('%s Query') % interpreter['type'].title(),
           'optimizer': get_optimizer_mode(),
@@ -1966,7 +1985,7 @@ class ClusterConfig(object):
       hdfs_connectors.append(_('Files'))
 
 
-    remote_home_storage = get_remote_home_storage()
+    remote_home_storage = get_remote_home_storage(self.user)
 
     for hdfs_connector in hdfs_connectors:
       force_home = remote_home_storage and not remote_home_storage.startswith('/')
@@ -2004,7 +2023,7 @@ class ClusterConfig(object):
 
     if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('abfs', self.user):
       from azure.abfs.__init__ import get_home_dir_for_abfs
-      home_path = remote_home_storage if remote_home_storage else get_home_dir_for_abfs().encode('utf-8')
+      home_path = remote_home_storage if remote_home_storage else get_home_dir_for_abfs(self.user).encode('utf-8')
       interpreters.append({
         'type': 'abfs',
         'displayName': _('ABFS'),
@@ -2033,9 +2052,9 @@ class ClusterConfig(object):
 
     if 'jobbrowser' in self.apps:
       from hadoop.cluster import get_default_yarncluster  # Circular loop
-      from jobbrowser.conf import ENABLE_HIVE_QUERY_BROWSER
+      from jobbrowser.conf import ENABLE_HIVE_QUERY_BROWSER, ENABLE_QUERIES_LIST
 
-      if get_default_yarncluster() or ENABLE_HIVE_QUERY_BROWSER.get():
+      if get_default_yarncluster() or ENABLE_HIVE_QUERY_BROWSER.get() or ENABLE_QUERIES_LIST.get():
         interpreters.append({
           'type': 'yarn',
           'displayName': _('Jobs'),

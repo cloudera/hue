@@ -203,7 +203,7 @@ ${ hueIcons.symbols() }
 
 % if hasattr(request, 'environ') and request.environ.get("PATH_INFO").find("/hue/") < 0:
   <script>
-    window.location.replace("/");
+    window.location.replace(window.HUE_BASE_URL || "/");
   </script>
 % endif
 

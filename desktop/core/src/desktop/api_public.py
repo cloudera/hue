@@ -16,11 +16,12 @@
 # limitations under the License.
 
 import logging
+import json
 
 from django.http import QueryDict, HttpResponse
 from rest_framework.decorators import api_view
 
-from filebrowser import views as filebrowser_views
+from filebrowser import views as filebrowser_views, api as filebrowser_api
 from indexer import api3 as indexer_api3
 from metadata import optimizer_api
 from notebook import api as notebook_api
@@ -30,6 +31,8 @@ from desktop import api2 as desktop_api
 from desktop.auth.backend import rewrite_user
 from desktop.lib import fsmanager
 from desktop.lib.connectors import api as connector_api
+
+from useradmin import views as useradmin_views, api as useradmin_api
 
 from beeswax import api as beeswax_api
 
@@ -85,10 +88,19 @@ def execute(request, dialect=None):
 
     data = {
       'notebook': '{"type":"query-%(interpreter)s","snippets":[{"id":%(interpreter_id)s,"statement_raw":"",'
-        '"type":"%(interpreter)s","status":"","variables":[]}],'
+        '"type":"%(interpreter)s","status":"","variables":[],"properties":{}}],'
         '"name":"","isSaved":false,"sessions":[]}' % params,
       'snippet': '{"id":%(interpreter_id)s,"type":"%(interpreter)s","result":{},"statement":"%(statement)s","properties":{}}' % params
     }
+
+    # Optional database param for specific query statements like "show tables;"
+    if django_request.POST.get('database'):
+      database = django_request.POST.get('database')
+      snippet = json.loads(data['snippet'])
+      snippet['database'] = database
+
+      data['snippet'] = json.dumps(snippet)
+
 
     django_request.POST = QueryDict(mutable=True)
     django_request.POST.update(data)
@@ -177,6 +189,11 @@ def analyze_table(request, dialect, database, table, columns=None):
 
 # Storage
 
+@api_view(["POST"])
+def storage_get_filesystems(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.get_filesystems(django_request)
+
 @api_view(["GET"])
 def storage_view(request, path):
   django_request = get_django_request(request)
@@ -191,6 +208,7 @@ def storage_download(request, path):
 def storage_upload_file(request):
   django_request = get_django_request(request)
   return filebrowser_views.upload_file(django_request)
+
 
 # Importer
 
@@ -208,6 +226,7 @@ def guess_field_types(request):
 def importer_submit(request):
   django_request = get_django_request(request)
   return indexer_api3.importer_submit(django_request)
+
 
 # Connector
 
@@ -274,7 +293,6 @@ def similar_queries(request):
   django_request = get_django_request(request)
   return optimizer_api.similar_queries(django_request)
 
-
 @api_view(["POST"])
 def top_databases(request):
   django_request = get_django_request(request)
@@ -304,6 +322,29 @@ def top_filters(request):
 def top_aggs(request):
   django_request = get_django_request(request)
   return optimizer_api.top_aggs(django_request)
+
+@api_view(["POST"])
+def search_entities_interactive(request):
+  django_request = get_django_request(request)
+  return desktop_api.search_entities_interactive(django_request)
+
+
+# IAM
+
+@api_view(["GET"])
+def list_for_autocomplete(request):
+  django_request = get_django_request(request)
+  return useradmin_views.list_for_autocomplete(django_request)
+
+@api_view(["GET"])
+def get_users_by_id(request):
+  django_request = get_django_request(request)
+  return useradmin_views.get_users_by_id(django_request)
+
+@api_view(["GET"])
+def get_users(request):
+  django_request = get_django_request(request)
+  return useradmin_api.get_users(django_request)
 
 
 # Utils
