@@ -46,6 +46,39 @@ function db_connectivity_check() {
   echo "$ret"
 }
 
+# In DWX, there are possibilities where
+# VW A/Hue Server A may run older version of django-axes-4.5.4 module
+# VW B/Hue Server B may run higher version of django-axes-5.13.0 module
+# Below function fix axes version issue with column issues
+function fix_column_issue() {
+  i=1
+  tablename=$1
+  columnname=$2
+  while [[ $i -lt 6 ]]; do
+    echo "Peforming check table \"${tablename}\", column \"${columnname}\""
+    cexist=$(echo "select column_name from INFORMATION_SCHEMA.COLUMNS \
+           where table_name='${tablename}';"|$HUE_BIN/hue dbshell 2>&1| \
+           grep "${columnname}")
+    if [[ "$cexist" =~ "$columnname" ]]; then
+      echo "Checked column \"${columnname}\" exist in table \"${tablename}\" seen as \"${cexist}\""
+      break
+    else
+      echo "Altering table \"${tablename}\", adding column \"${columnname}\""
+      column_add=$(echo "ALTER TABLE ${tablename} ADD COLUMN ${columnname} bool \
+                 NOT NULL DEFAULT false;"|$HUE_BIN/hue dbshell 2>&1)
+      if [[ "$column_add" == "ALTER TABLE"* ]]; then
+        echo "Fixed table \"${tablename}\", added column \"${columnname}\""
+        break
+      fi
+    fi
+
+    i=$((i+1))
+    sleep 1
+
+    echo "Failing db connectivity error: " $i " " $cexist
+  done
+}
+
 function set_samlcert() {
   mkdir -pm 755 $HUE_CONF_DIR/samlcert
   cd $HUE_CONF_DIR/samlcert
@@ -98,6 +131,8 @@ elif [[ $1 == rungunicornserver ]]; then
   if [ -e "/etc/hue/conf/saml.ini" ]; then
     set_samlcert
   fi
+  fix_column_issue "axes_accesslog" "trusted"
+  fix_column_issue "axes_accessattempt" "trusted"
   $HUE_BIN/hue rungunicornserver
 fi
 
