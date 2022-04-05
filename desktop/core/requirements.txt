@@ -4,7 +4,7 @@ avro-python3==1.8.2
 Babel==2.9.1
 boto==2.46.1
 # boto3==1.17.41  # Last Py2 is 1.17
-celery[redis]==5.1.2
+celery[redis]==5.2.2
 cffi==1.15.0
 channels==3.0.3
 channels-redis==3.2.0
