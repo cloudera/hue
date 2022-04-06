@@ -27,7 +27,7 @@ django_prometheus==1.0.15
 django-webpack-loader==1.0.0
 djangorestframework-simplejwt==4.4.0  # For Python 3.6
 djangorestframework==3.12.2
-eventlet==0.31.0
+eventlet==0.30.2
 future==0.18.2
 greenlet==0.4.15
 gunicorn==19.9.0
