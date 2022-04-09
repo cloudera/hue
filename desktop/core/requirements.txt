@@ -4,7 +4,7 @@ avro-python3==1.8.2
 Babel==2.9.1
 boto==2.46.1
 # boto3==1.17.41  # Last Py2 is 1.17
-celery[redis]==5.1.2
+celery[redis]==5.2.2
 cffi==1.15.0
 channels==3.0.3
 channels-redis==3.2.0
@@ -27,11 +27,11 @@ django_prometheus==1.0.15
 django-webpack-loader==1.0.0
 djangorestframework-simplejwt==4.4.0  # For Python 3.6
 djangorestframework==3.12.2
-eventlet==0.31.0
+eventlet==0.30.2
 future==0.18.2
 greenlet==0.4.15
 gunicorn==19.9.0
-ipython==7.16.3  # Last Python 3.6
+ipython==8.1.1  # Python >= 3.8
 jaeger-client==4.3.0
 jdcal==1.0.1
 kazoo==2.8.0
