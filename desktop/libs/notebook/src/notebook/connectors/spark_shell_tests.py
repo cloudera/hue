@@ -20,7 +20,7 @@ import sys
 from builtins import object
 from nose.tools import assert_equal, assert_true, assert_false
 
-from notebook.connectors.spark_shell import SparkApi
+from notebook.connectors.spark_shell import SparkApi, SESSIONS
 
 if sys.version_info[0] > 2:
   from unittest.mock import patch, Mock
@@ -49,6 +49,7 @@ class TestSparkApi(object):
     spark_api = self.api.get_api()
     assert_equal(spark_api.__class__.__name__, 'LivyClient')
 
+
   def test_get_livy_props_method(self):
     test_properties = [{
         "name": "files",
@@ -57,9 +58,11 @@ class TestSparkApi(object):
     props = self.api.get_livy_props('scala', test_properties)
     assert_equal(props['files'], ['file_a', 'file_b', 'file_c'])
 
+
   def test_create_session_with_config(self):
     lang = 'pyspark'
     properties = None
+    session_key = self.api._get_session_key()
 
     with patch('notebook.connectors.spark_shell.get_spark_api') as get_spark_api:
       with patch('notebook.connectors.spark_shell.DefaultConfiguration') as DefaultConfiguration:
@@ -82,37 +85,54 @@ class TestSparkApi(object):
           # Case with user configuration. Expected 2 driverCores
           USE_DEFAULT_CONFIGURATION.get.return_value = True
           session = self.api.create_session(lang=lang, properties=properties)
+
           assert_equal(session['type'], 'pyspark')
           assert_equal(session['id'], '1')
+
           for p in session['properties']:
             if p['name'] == 'driverCores':
               cores = p['value']
           assert_equal(cores, 2)
 
+          if SESSIONS.get(session_key):
+            del SESSIONS[session_key]
+
           # Case without user configuration. Expected 1 driverCores
           USE_DEFAULT_CONFIGURATION.get.return_value = True
           DefaultConfiguration.objects.get_configuration_for_user.return_value = None
           session2 = self.api.create_session(lang=lang, properties=properties)
+
           assert_equal(session2['type'], 'pyspark')
           assert_equal(session2['id'], '1')
+
           for p in session2['properties']:
             if p['name'] == 'driverCores':
               cores = p['value']
           assert_equal(cores, 1)
 
+          if SESSIONS.get(session_key):
+            del SESSIONS[session_key]
+
           # Case with no user configuration. Expected 1 driverCores
           USE_DEFAULT_CONFIGURATION.get.return_value = False
           session3 = self.api.create_session(lang=lang, properties=properties)
+
           assert_equal(session3['type'], 'pyspark')
           assert_equal(session3['id'], '1')
+
           for p in session3['properties']:
             if p['name'] == 'driverCores':
               cores = p['value']
           assert_equal(cores, 1)
 
+          if SESSIONS.get(session_key):
+            del SESSIONS[session_key]
+
+
   def test_create_session_plain(self):
     lang = 'pyspark'
     properties = None
+    session_key = self.api._get_session_key()
 
     with patch('notebook.connectors.spark_shell.get_spark_api') as get_spark_api:
       get_spark_api.return_value = Mock(
@@ -132,6 +152,10 @@ class TestSparkApi(object):
       files_properties = [prop for prop in session['properties'] if prop['name'] == 'files']
       assert_true(files_properties, session['properties'])
       assert_equal(files_properties[0]['value'], [], session['properties'])
+
+      if SESSIONS.get(session_key):
+        del SESSIONS[session_key]
+
 
   def test_get_jobs(self):
     local_jobs = [

@@ -113,7 +113,7 @@ class SparkApi(Api):
 
   def _get_session_key(self):
     return SESSION_KEY % {
-      'username': self.user.username,
+      'username': self.user.username if hasattr(self.user, 'username') else self.user,
       'interpreter_name': self.interpreter['name']
     }
 
