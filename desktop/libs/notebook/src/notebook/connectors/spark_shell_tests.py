@@ -18,7 +18,7 @@
 import sys
 
 from builtins import object
-from nose.tools import assert_equal, assert_true, assert_false
+from nose.tools import assert_equal, assert_true, assert_false, assert_raises
 
 from notebook.connectors.spark_shell import SparkApi, SESSIONS
 
@@ -155,6 +155,84 @@ class TestSparkApi(object):
 
       if SESSIONS.get(session_key):
         del SESSIONS[session_key]
+
+
+  def test_execute(self):
+    with patch('notebook.connectors.spark_shell._get_snippet_session') as _get_snippet_session:
+      with patch('notebook.connectors.spark_shell.get_spark_api') as get_spark_api:
+        notebook = Mock()
+        snippet = {'statement': 'select * from some_table'}
+        _get_snippet_session.return_value = {'id': '1'}
+
+        get_spark_api.return_value = Mock(
+          submit_statement=Mock(
+            return_value={'id': 'some_id'}
+          )
+        )
+
+        response = self.api.execute(notebook, snippet)
+        assert_equal(response['id'], 'some_id')
+
+        get_spark_api.return_value = Mock(
+          submit_statement=Mock()
+        )
+        assert_raises(Exception, self.api.execute, notebook, snippet)
+
+
+  def test_check_status(self):
+    with patch('notebook.connectors.spark_shell._get_snippet_session') as _get_snippet_session:
+      with patch('notebook.connectors.spark_shell.get_spark_api') as get_spark_api:
+        notebook = Mock()
+        snippet = {
+          'result': {
+            'handle': {
+              'id': {'some_id'}
+            }
+          }
+        }
+        _get_snippet_session.return_value = {'id': '1'}
+
+        get_spark_api.return_value = Mock(
+          fetch_data=Mock(
+            return_value={'state': 'some_state'}
+          )
+        )
+
+        response = self.api.check_status(notebook, snippet)
+        assert_equal(response['status'], 'some_state')
+
+        get_spark_api.return_value = Mock(
+          submit_statement=Mock()
+        )
+        assert_raises(Exception, self.api.check_status, notebook, snippet)
+  
+
+  def test_get_sample_data(self):
+    snippet = Mock()
+    self.api._execute = Mock(
+      return_value='some_value'
+    )
+    self.api._check_status_and_fetch_result = Mock(
+      return_value={
+        'data': 'some_data',
+        'meta': 'some_meta'
+      }
+    )
+
+    response = self.api.get_sample_data(snippet, 'some_db', 'some_table', 'some_column')
+
+    assert_equal(response['rows'], 'some_data')
+    assert_equal(response['full_headers'], 'some_meta')
+  
+
+  def test_get_select_query(self):
+    # Without column name
+    response = self.api._get_select_query('some_db', 'some_table')
+    assert_equal(response, 'SELECT *\nFROM some_db.some_table\nLIMIT 100\n')
+
+    # With some column name
+    response = self.api._get_select_query('some_db', 'some_table', 'some_column')
+    assert_equal(response, 'SELECT some_column\nFROM some_db.some_table\nLIMIT 100\n')
 
 
   def test_get_jobs(self):
