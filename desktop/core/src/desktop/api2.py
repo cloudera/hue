@@ -56,6 +56,8 @@ from desktop.models import Document2, Document, Directory, FilesystemException, 
   UserPreferences, get_user_preferences, set_user_preferences, get_cluster_config, __paginate, _get_gist_document
 from desktop.views import serve_403_error
 
+from hadoop.cluster import is_yarn
+
 if sys.version_info[0] > 2:
   from io import StringIO as string_io
   from django.utils.translation import gettext as _
@@ -87,6 +89,7 @@ def api_error_handler(func):
 def get_config(request):
   config = get_cluster_config(request.user)
   config['hue_config']['is_admin'] = is_admin(request.user)
+  config['hue_config']['is_yarn_enabled'] = is_yarn()
   config['clusters'] = list(get_clusters(request.user).values())
   config['documents'] = {
     'types': list(Document2.objects.documents(user=request.user).order_by().values_list('type', flat=True).distinct())
