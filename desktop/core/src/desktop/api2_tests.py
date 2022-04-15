@@ -122,6 +122,8 @@ class TestApi2(object):
     config = json.loads(response.content)
 
     assert_true('types' in config['documents'])
+    assert_true('is_admin' in config['hue_config'])
+    assert_true('is_yarn_enabled' in config['hue_config'])
     assert_false('query-TestApi2.test_get_config' in config['documents']['types'], config)
 
     doc = Document2.objects.create(
