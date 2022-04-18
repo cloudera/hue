@@ -161,17 +161,17 @@ class TestSparkApi(object):
     with patch('notebook.connectors.spark_shell._get_snippet_session') as _get_snippet_session:
       with patch('notebook.connectors.spark_shell.get_spark_api') as get_spark_api:
         notebook = Mock()
-        snippet = {'statement': 'select * from some_table'}
+        snippet = {'statement': 'select * from test_table'}
         _get_snippet_session.return_value = {'id': '1'}
 
         get_spark_api.return_value = Mock(
           submit_statement=Mock(
-            return_value={'id': 'some_id'}
+            return_value={'id': 'test_id'}
           )
         )
 
         response = self.api.execute(notebook, snippet)
-        assert_equal(response['id'], 'some_id')
+        assert_equal(response['id'], 'test_id')
 
         get_spark_api.return_value = Mock(
           submit_statement=Mock()
@@ -186,7 +186,7 @@ class TestSparkApi(object):
         snippet = {
           'result': {
             'handle': {
-              'id': {'some_id'}
+              'id': {'test_id'}
             }
           }
         }
@@ -194,12 +194,12 @@ class TestSparkApi(object):
 
         get_spark_api.return_value = Mock(
           fetch_data=Mock(
-            return_value={'state': 'some_state'}
+            return_value={'state': 'test_state'}
           )
         )
 
         response = self.api.check_status(notebook, snippet)
-        assert_equal(response['status'], 'some_state')
+        assert_equal(response['status'], 'test_state')
 
         get_spark_api.return_value = Mock(
           submit_statement=Mock()
@@ -210,29 +210,33 @@ class TestSparkApi(object):
   def test_get_sample_data(self):
     snippet = Mock()
     self.api._execute = Mock(
-      return_value='some_value'
+      return_value='test_value'
     )
     self.api._check_status_and_fetch_result = Mock(
       return_value={
-        'data': 'some_data',
-        'meta': 'some_meta'
+        'data': 'test_data',
+        'meta': 'test_meta'
       }
     )
 
-    response = self.api.get_sample_data(snippet, 'some_db', 'some_table', 'some_column')
+    response = self.api.get_sample_data(snippet, 'test_db', 'test_table', 'test_column')
 
-    assert_equal(response['rows'], 'some_data')
-    assert_equal(response['full_headers'], 'some_meta')
+    assert_equal(response['rows'], 'test_data')
+    assert_equal(response['full_headers'], 'test_meta')
   
 
   def test_get_select_query(self):
+    # With operation as 'hello'
+    response = self.api._get_select_query('test_db', 'test_table', 'test_column', 'hello')
+    assert_equal(response, "SELECT 'Hello World!'")
+
     # Without column name
-    response = self.api._get_select_query('some_db', 'some_table')
-    assert_equal(response, 'SELECT *\nFROM some_db.some_table\nLIMIT 100\n')
+    response = self.api._get_select_query('test_db', 'test_table')
+    assert_equal(response, 'SELECT *\nFROM test_db.test_table\nLIMIT 100\n')
 
     # With some column name
-    response = self.api._get_select_query('some_db', 'some_table', 'some_column')
-    assert_equal(response, 'SELECT some_column\nFROM some_db.some_table\nLIMIT 100\n')
+    response = self.api._get_select_query('test_db', 'test_table', 'test_column')
+    assert_equal(response, 'SELECT test_column\nFROM test_db.test_table\nLIMIT 100\n')
 
 
   def test_get_jobs(self):

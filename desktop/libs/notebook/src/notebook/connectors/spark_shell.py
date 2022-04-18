@@ -400,10 +400,7 @@ class SparkApi(Api):
     session_key = self._get_session_key()
     session = SESSIONS.get(session_key)
 
-    if operation == 'hello':
-      statement = "SELECT 'Hello World!'"
-    else:
-      statement = self._get_select_query(database, table, column)
+    statement = self._get_select_query(database, table, column, operation)
 
     sample_execute = self._execute(api, session, statement)
     sample_result = self._check_status_and_fetch_result(api, session, sample_execute)
@@ -422,18 +419,23 @@ class SparkApi(Api):
     return self._get_select_query(database, table)
 
   
-  def _get_select_query(self, database, table, column=None, limit=100):
-    column = '%(column)s' % {'column': column} if column else '*'
-    return textwrap.dedent('''\
-        SELECT %(column)s
-        FROM %(database)s.%(table)s
-        LIMIT %(limit)s
-        ''' % {
-          'database': database,
-          'table': table,
-          'column': column,
-          'limit': limit,
-      })
+  def _get_select_query(self, database, table, column=None, operation=None, limit=100):
+    if operation == 'hello':
+      statement = "SELECT 'Hello World!'"
+    else:
+      column = '%(column)s' % {'column': column} if column else '*'
+      statement = textwrap.dedent('''\
+          SELECT %(column)s
+          FROM %(database)s.%(table)s
+          LIMIT %(limit)s
+          ''' % {
+            'database': database,
+            'table': table,
+            'column': column,
+            'limit': limit,
+        })
+
+    return statement
 
 
   def _get_standalone_jobs(self, logs):
