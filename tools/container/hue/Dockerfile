@@ -23,8 +23,11 @@ ENV NAME="hue" \
     PATH=$PATH:${HUE_BIN} \
     SUPERVISOR_VERSION=4.0.2
 
-# create hue user
-RUN groupadd -g 1000 ${HUEUSER} && useradd -g 1000 -d ${HUE_HOME} -s /bin/bash -u 1000 ${HUEUSER}
+# Switch to non-root default user
+RUN yum install -y microdnf && \
+    microdnf install -y shadow-utils findutils && \
+    groupadd -g 1000 ${HUEUSER} && \
+    useradd -g 1000 -d ${HUE_HOME} -s /bin/bash -u 1000 ${HUEUSER}
 
 COPY --chown=${HUEUSER}:${HUEUSER} ${HUEUSER} ${HUE_HOME}
 COPY --chown=${HUEUSER}:${HUEUSER} hue.sh ${HUE_HOME}/hue.sh
@@ -57,5 +60,8 @@ RUN rm -rf ${HUE_HOME}/build/env/lib/python3.8/site-packages/pip/_vendor/chardet
 
 EXPOSE 8888 9111
 
+# Switch to non-root default user
+USER hive
+ENV USER hive
 WORKDIR ${HUE_HOME}
 CMD ["/usr/local/bin/supervisord","-c","/etc/supervisord.conf"]
