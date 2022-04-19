@@ -22,8 +22,11 @@ ENV NAME="hue" \
     PATH=$PATH:${HUE_BIN} \
     SUPERVISOR_VERSION=4.0.2
 
-# create hue user
-RUN groupadd -g 1000 ${HUEUSER} && useradd -g 1000 -d ${HUE_HOME} -s /bin/bash -u 1000 ${HUEUSER}
+# Switch to non-root default user
+RUN yum install -y microdnf && \
+    microdnf install -y shadow-utils findutils && \
+    groupadd -g 1000 ${HUEUSER} && \
+    useradd -g 1000 -d ${HUE_HOME} -s /bin/bash -u 1000 ${HUEUSER}
 
 RUN mkdir -p ${HUE_LOG_DIR} && chown -R ${HUEUSER}:${HUEUSER} ${HUE_LOG_DIR}
 RUN echo "Include /etc/httpd/conf.d/hue_httpd.conf" >> /etc/httpd/conf/httpd.conf
@@ -40,5 +43,8 @@ EXPOSE 8080
 # https://httpd.apache.org/docs/2.4/stopping.html#gracefulstop
 STOPSIGNAL SIGINT
 
+# Switch to non-root default user
+USER hive
+ENV USER hive
 WORKDIR ${HUE_HOME}
 CMD ["run_httpd.sh"]
