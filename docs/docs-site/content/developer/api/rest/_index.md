@@ -487,7 +487,6 @@ Create a directory at a specific path:
 
     curl -X POST https://demo.gethue.com/api/storage/mkdir
     
-Parameters:
 - **name:** name of the directory
 - **path:** specific path where user wants to create the directory
 
