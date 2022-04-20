@@ -44,15 +44,15 @@ def query_error_handler(func):
       raise e
     except Exception as e:
       message = force_unicode(smart_str(e))
+      LOG.error(message)
       if 'error occurred while trying to connect to the Java server' in message:
-        raise QueryError, _('%s: is the DB Proxy server running?') % message, sys.exc_info()[2]
+        raise QueryError('%s: is the DB Proxy server running?' % sys.exc_info()[2])
       elif 'Access denied' in message:
-        raise AuthenticationRequired, '', sys.exc_info()[2]
+        raise AuthenticationRequired(sys.exc_info()[2])
       else:
-        raise QueryError, message, sys.exc_info()[2]
+        raise QueryError(sys.exc_info()[2])
 
   return decorator
-
 
 class JdbcApi(Api):
 
@@ -191,43 +191,54 @@ class Assist(object):
   def __init__(self, db):
     self.db = db
 
+  def get_schemas_qry(self):
+    qry = 'SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA'
+    if "exasol" in self.db.jdbc_driver:
+      qry = 'SELECT SCHEMA_NAME FROM EXA_ALL_SCHEMAS'
+    return qry
+
   def get_databases(self):
-    dbs, description = query_and_fetch(self.db, 'SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA')
+    dbs, description = query_and_fetch(self.db, self.get_schemas_qry())
     return [db[0] and db[0].strip() for db in dbs]
 
   def get_tables(self, database, table_names=[]):
     tables = self.get_tables_full(database, table_names)
     return [table['name'] for table in tables]
 
+  def get_tables_qry(self, database):
+    qry = "SELECT TABLE_NAME, TABLE_COMMENT FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='%s'" % database
+    if "exasol" in self.db.jdbc_driver:
+      qry = "SELECT TABLE_NAME, TABLE_COMMENT FROM EXA_ALL_TABLES WHERE TABLE_SCHEMA='%s'" % database
+    return qry
+
   def get_tables_full(self, database, table_names=[]):
     try:
-      tables, description = query_and_fetch(self.db,
-        "SELECT TABLE_NAME, TABLE_COMMENT FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='%s'" % database)
+      tables, description = query_and_fetch(self.db, self.get_tables_qry(database))
       return [{"comment": table[1] and table[1].strip(), "type": "Table", "name": table[0] and table[0].strip()} for table in tables]
     except Exception as e:
       if 'SQLServerException' in str(e) and 'TABLE_COMMENT' in str(e):
         LOG.warn('Seems like SQLServer is use, TABLE_COMMENT field does not exist in INFORMATION_SCHEMA.TABLES')
-        tables, description = query_and_fetch(self.db,
-          "SELECT TABLE_NAME, NULL as TABLE_COMMENT FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='%s'" % database)
+        tables, description = query_and_fetch(self.db, self.get_tables_qry(database))
         return [{"comment": table[1] and table[1].strip(), "type": "Table", "name": table[0] and table[0].strip()} for table in tables]
 
   def get_columns(self, database, table):
     columns = self.get_columns_full(database, table)
     return [col['name'] for col in columns]
 
+  def get_columns_qry(self, database, table):
+    qry = "SELECT COLUMN_NAME, DATA_TYPE, COLUMN_COMMENT FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='%s' AND TABLE_NAME='%s'" % (database, table)
+    if "exasol" in self.db.jdbc_driver:
+      qry = "SELECT COLUMN_NAME, COLUMN_TYPE, COLUMN_COMMENT FROM EXA_ALL_COLUMNS WHERE COLUMN_SCHEMA='%s' AND COLUMN_TABLE='%s'" % (database, table)
+    return qry
+
   def get_columns_full(self, database, table):
     try:
-      columns, description = query_and_fetch(self.db,
-        "SELECT COLUMN_NAME, DATA_TYPE, COLUMN_COMMENT FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='%s' AND TABLE_NAME='%s'" % (
-          database, table))
+      columns, description = query_and_fetch(self.db, self.get_columns_qry(database, table))
       return [{"comment": col[2] and col[2].strip(), "type": col[1], "name": col[0] and col[0].strip()} for col in columns]
     except Exception as e:
       if 'SQLServerException' in str(e) and 'COLUMN_COMMENT' in str(e):
         LOG.warn('Seems like SQLServer is use, COLUMN_COMMENT field does not exist in INFORMATION_SCHEMA.COLUMNS')
-        columns, description = query_and_fetch(self.db,
-          "SELECT COLUMN_NAME, DATA_TYPE, NULL as COLUMN_COMMENT FROM INFORMATION_SCHEMA.COLUMNS "
-          "WHERE TABLE_SCHEMA='%s' AND TABLE_NAME='%s'" % (
-            database, table))
+        columns, description = query_and_fetch(self.db, self.get_columns_qry(database, table))
         return [{"comment": col[2] and col[2].strip(), "type": col[1], "name": col[0] and col[0].strip()} for col in columns]
 
   def get_sample_data(self, database, table, column=None):
