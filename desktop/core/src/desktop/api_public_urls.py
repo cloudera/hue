@@ -95,6 +95,7 @@ urlpatterns += [
   re_path(r'^storage/view=(?P<path>.*)$', api_public.storage_view, name='storage_view'),
   re_path(r'^storage/download=(?P<path>.*)$', api_public.storage_download, name='storage_download'),
   re_path(r'^storage/upload/file/?$', api_public.storage_upload_file, name='storage_upload_file'),
+  re_path(r'^storage/mkdir$', api_public.storage_mkdir, name='storage_mkdir'),
 ]
 
 urlpatterns += [
