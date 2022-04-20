@@ -209,6 +209,11 @@ def storage_upload_file(request):
   django_request = get_django_request(request)
   return filebrowser_views.upload_file(django_request)
 
+@api_view(["POST"])
+def storage_mkdir(request):
+  django_request = get_django_request(request)
+  return filebrowser_views.mkdir(django_request)
+
 
 # Importer
 
