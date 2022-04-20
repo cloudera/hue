@@ -46,11 +46,152 @@ describe('hiveAutocompleteParser.js CREATE statements', () => {
     });
   });
 
+  it('should handle "CREATE EXTERNAL TABLE ice_t_identity_part (a int) PARTITIONED BY (b string) STORED BY ICEBERG; |"', () => {
+    assertAutoComplete({
+      beforeCursor:
+        'CREATE EXTERNAL TABLE ice_t_identity_part (a int) PARTITIONED BY (b string) STORED BY ICEBERG; ',
+      afterCursor: '',
+      noErrors: true,
+      containsKeywords: ['SELECT'],
+      expectedResult: {
+        lowerCase: false
+      }
+    });
+  });
+
+  it('should handle "create external table tbl_ice ... stored by iceberg ...; |"', () => {
+    assertAutoComplete({
+      beforeCursor:
+        "create external table tbl_ice(a int, b string, c int) partitioned by spec (bucket(16, a), truncate(3, b)) stored by iceberg stored as avro tblproperties ('format-version'='2'); ",
+      afterCursor: '',
+      noErrors: true,
+      containsKeywords: ['SELECT'],
+      expectedResult: {
+        lowerCase: true
+      }
+    });
+  });
+
+  it('should handle "create external table tbl_ice_other(a int, b string) stored by iceberg; |"', () => {
+    assertAutoComplete({
+      beforeCursor: 'create external table tbl_ice_other(a int, b string) stored by iceberg; ',
+      afterCursor: '',
+      noErrors: true,
+      containsKeywords: ['SELECT'],
+      expectedResult: {
+        lowerCase: true
+      }
+    });
+  });
+
+  it('should handle "CREATE EXTERNAL TABLE ice_orc (i int, s string, ts timestamp, d date) STORED BY ICEBERG STORED AS ORC; |"', () => {
+    assertAutoComplete({
+      beforeCursor:
+        'CREATE EXTERNAL TABLE ice_orc (i int, s string, ts timestamp, d date) STORED BY ICEBERG STORED AS ORC; ',
+      afterCursor: '',
+      noErrors: true,
+      containsKeywords: ['SELECT'],
+      expectedResult: {
+        lowerCase: false
+      }
+    });
+  });
+
+  it('should handle "CREATE EXTERNAL TABLE ice_t (i int, s string, ts timestamp, d date) STORED BY \'org.apache.iceberg.mr.hive.HiveIcebergStorageHandler\' STORED AS AVRO; |"', () => {
+    assertAutoComplete({
+      beforeCursor:
+        "CREATE EXTERNAL TABLE ice_t (i int, s string, ts timestamp, d date) STORED BY 'org.apache.iceberg.mr.hive.HiveIcebergStorageHandler' STORED AS AVRO; ",
+      afterCursor: '',
+      noErrors: true,
+      containsKeywords: ['SELECT'],
+      expectedResult: {
+        lowerCase: false
+      }
+    });
+  });
+
+  it("should handle \"CREATE EXTERNAL TABLE ice_t (i int, s string, ts timestamp, d date) STORED BY ICEBERG WITH SERDEPROPERTIES('dummy'='dummy_value') STORED AS ORC; |\"", () => {
+    assertAutoComplete({
+      beforeCursor:
+        "CREATE EXTERNAL TABLE ice_t (i int, s string, ts timestamp, d date) STORED BY ICEBERG WITH SERDEPROPERTIES('dummy'='dummy_value') STORED AS ORC; ",
+      afterCursor: '',
+      noErrors: true,
+      containsKeywords: ['SELECT'],
+      expectedResult: {
+        lowerCase: false
+      }
+    });
+  });
+
+  it("should handle \"create external table tbl_ice(a int, b string, c int) partitioned by spec (bucket(16, a), truncate(3, b)) stored by iceberg tblproperties ('format-version'='2'); |\"", () => {
+    assertAutoComplete({
+      beforeCursor:
+        "create external table tbl_ice(a int, b string, c int) partitioned by spec (bucket(16, a), truncate(3, b)) stored by iceberg tblproperties ('format-version'='2'); ",
+      afterCursor: '',
+      noErrors: true,
+      containsKeywords: ['SELECT'],
+      expectedResult: {
+        lowerCase: true
+      }
+    });
+  });
+
+  it('should handle "CREATE EXTERNAL TABLE ice_t_transform (year_field date, month_field date, day_field date, hour_field timestamp, truncate_field string, bucket_field int, identity_field int) PARTITIONED BY SPEC (year(year_field), month(month_field), day(day_field), hour(hour_field), truncate(2, truncate_field), bucket(2, bucket_field), identity_field) STORED BY ICEBERG; |"', () => {
+    assertAutoComplete({
+      beforeCursor:
+        'CREATE EXTERNAL TABLE ice_t_transform (year_field date, month_field date, day_field date, hour_field timestamp, truncate_field string, bucket_field int, identity_field int) PARTITIONED BY SPEC (year(year_field), month(month_field), day(day_field), hour(hour_field), truncate(2, truncate_field), bucket(2, bucket_field), identity_field) STORED BY ICEBERG; ',
+      afterCursor: '',
+      noErrors: true,
+      containsKeywords: ['SELECT'],
+      expectedResult: {
+        lowerCase: false
+      }
+    });
+  });
+
+  it('should handle "CREATE EXTERNAL TABLE ice_t_transform_prop (id int, year_field date, month_field date, day_field date, hour_field timestamp, truncate_field string, bucket_field int, identity_field int) STORED BY ICEBERG TBLPROPERTIES (\'iceberg.mr.table.partition.spec\'=\'{"spec-id":0,"fields":[{"name":"year_field_year","transform":"year","source-id":1,"field-id":1000},{"name":"month_field_month","transform":"month","source-id":2,"field-id":1001},{"name":"day_field_day","transform":"day","source-id":3,"field-id":1002},{"name":"hour_field_hour","transform":"hour","source-id":4,"field-id":1003},{"name":"truncate_field_trunc","transform":"truncate[2]","source-id":5,"field-id":1004},{"name":"bucket_field_bucket","transform":"bucket[2]","source-id":6,"field-id":1005},{"name":"identity_field","transform":"identity","source-id":7,"field-id":1006}]}\'); |"', () => {
+    assertAutoComplete({
+      beforeCursor:
+        'CREATE EXTERNAL TABLE ice_t_transform_prop (id int, year_field date, month_field date, day_field date, hour_field timestamp, truncate_field string, bucket_field int, identity_field int) STORED BY ICEBERG TBLPROPERTIES (\'iceberg.mr.table.partition.spec\'=\'{"spec-id":0,"fields":[{"name":"year_field_year","transform":"year","source-id":1,"field-id":1000},{"name":"month_field_month","transform":"month","source-id":2,"field-id":1001},{"name":"day_field_day","transform":"day","source-id":3,"field-id":1002},{"name":"hour_field_hour","transform":"hour","source-id":4,"field-id":1003},{"name":"truncate_field_trunc","transform":"truncate[2]","source-id":5,"field-id":1004},{"name":"bucket_field_bucket","transform":"bucket[2]","source-id":6,"field-id":1005},{"name":"identity_field","transform":"identity","source-id":7,"field-id":1006}]}\'); ',
+      afterCursor: '',
+      noErrors: true,
+      containsKeywords: ['SELECT'],
+      expectedResult: {
+        lowerCase: false
+      }
+    });
+  });
+
+  it('should handle "CREATE TABLE target STORED BY ICEBERG AS SELECT * FROM source; |"', () => {
+    assertAutoComplete({
+      beforeCursor: 'CREATE TABLE target STORED BY ICEBERG AS SELECT * FROM source; ',
+      afterCursor: '',
+      noErrors: true,
+      containsKeywords: ['SELECT'],
+      expectedResult: {
+        lowerCase: false
+      }
+    });
+  });
+
+  it('should handle "CREATE EXTERNAL TABLE foo PARTITIONED BY SPEC (year(year_field), month(month_field), day(day_field), hour(hour_field), truncate(2, truncate_field), bucket(2, bucket_field), identity_field) STORED BY ICEBERG; |"', () => {
+    assertAutoComplete({
+      beforeCursor:
+        'CREATE EXTERNAL TABLE foo PARTITIONED BY SPEC (year(year_field), month(month_field), day(day_field), hour(hour_field), truncate(2, truncate_field), bucket(2, bucket_field), identity_field) STORED BY ICEBERG; ',
+      afterCursor: '',
+      noErrors: true,
+      containsKeywords: ['SELECT'],
+      expectedResult: {
+        lowerCase: false
+      }
+    });
+  });
+
   it('should handle "CREATE ROLE baaa;|', () => {
     assertAutoComplete({
       beforeCursor: 'CREATE ROLE baaa;',
       afterCursor: '',
-      noError: true,
+      noErrors: true,
       containsKeywords: ['SELECT'],
       expectedResult: {
         lowerCase: false
@@ -65,11 +206,13 @@ describe('hiveAutocompleteParser.js CREATE statements', () => {
       expectedResult: {
         lowerCase: false,
         suggestKeywords: [
+          'CONNECTOR',
           'DATABASE',
           'EXTERNAL TABLE',
           'FUNCTION',
           'INDEX',
           'MATERIALIZED VIEW',
+          'REMOTE DATABASE',
           'ROLE',
           'SCHEDULED QUERY',
           'SCHEMA',
@@ -85,7 +228,125 @@ describe('hiveAutocompleteParser.js CREATE statements', () => {
     });
   });
 
+  describe('CREATE CONNECTOR', () => {
+    it("should handle \"CREATE CONNECTOR IF NOT EXISTS foo TYPE 'mysql' URL 'http://someURl' COMMENT 'Connector comment ' WITH DCPROPERTIES ('foo'='bar'); |\"", () => {
+      assertAutoComplete({
+        beforeCursor:
+          "CREATE CONNECTOR IF NOT EXISTS foo TYPE 'mysql' URL 'http://someURl' COMMENT 'Connector comment ' WITH DCPROPERTIES ('foo'='bar'); ",
+        afterCursor: '',
+        noErrors: true,
+        containsKeywords: ['SELECT'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
+    it('should suggest keywords for "CREATE CONNECTOR |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'CREATE CONNECTOR ',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: ['IF NOT EXISTS']
+        }
+      });
+    });
+
+    it('should suggest keywords for "CREATE CONNECTOR IF |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'CREATE CONNECTOR IF ',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: ['NOT EXISTS']
+        }
+      });
+    });
+
+    it('should suggest keywords for "CREATE CONNECTOR foo |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'CREATE CONNECTOR foo ',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: ['TYPE', 'URL', 'COMMENT', 'WITH DCPROPERTIES']
+        }
+      });
+    });
+
+    it('should suggest keywords for "CREATE CONNECTOR foo TYPE \'bar\' |"', () => {
+      assertAutoComplete({
+        beforeCursor: "CREATE CONNECTOR foo TYPE 'bar' ",
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: ['URL', 'COMMENT', 'WITH DCPROPERTIES']
+        }
+      });
+    });
+
+    it("should suggest keywords for \"CREATE CONNECTOR foo TYPE 'bar' URL 'http://someurl' |\"", () => {
+      assertAutoComplete({
+        beforeCursor: "CREATE CONNECTOR foo TYPE 'bar' URL 'http://someurl' ",
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: ['COMMENT', 'WITH DCPROPERTIES']
+        }
+      });
+    });
+
+    it("should suggest keywords for \"CREATE CONNECTOR foo TYPE 'bar' URL 'http://someurl' COMMENT 'some comment' |\"", () => {
+      assertAutoComplete({
+        beforeCursor:
+          "CREATE CONNECTOR foo TYPE 'bar' URL 'http://someurl' COMMENT 'some comment' ",
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: ['WITH DCPROPERTIES']
+        }
+      });
+    });
+
+    it("should suggest keywords for \"CREATE CONNECTOR foo TYPE 'bar' URL 'http://someurl' COMMENT 'some comment' WITH |\"", () => {
+      assertAutoComplete({
+        beforeCursor:
+          "CREATE CONNECTOR foo TYPE 'bar' URL 'http://someurl' COMMENT 'some comment' WITH ",
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: ['DCPROPERTIES']
+        }
+      });
+    });
+
+    it("should suggest keywords for \"CREATE CONNECTOR foo TYPE 'bar' URL 'http://someurl' WITH |\"", () => {
+      assertAutoComplete({
+        beforeCursor: "CREATE CONNECTOR foo TYPE 'bar' URL 'http://someurl' WITH ",
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: ['DCPROPERTIES']
+        }
+      });
+    });
+  });
+
   describe('CREATE DATABASE', () => {
+    it("should handle \"CREATE REMOTE DATABASE postgres_db1 USING foo WITH DBPROPERTIES ('connector.remoteDbName'='db1'); |\"", () => {
+      assertAutoComplete({
+        beforeCursor:
+          "CREATE REMOTE DATABASE postgres_db1 USING foo WITH DBPROPERTIES ('connector.remoteDbName'='db1'); ",
+        afterCursor: '',
+        noErrors: true,
+        containsKeywords: ['SELECT'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
     it('should suggest keywords for "CREATE DATABASE |"', () => {
       assertAutoComplete({
         beforeCursor: 'CREATE DATABASE ',
@@ -180,6 +441,7 @@ describe('hiveAutocompleteParser.js CREATE statements', () => {
       assertAutoComplete({
         beforeCursor: "CREATE TEMPORARY FUNCTION baaa AS 'boo.baa'; ",
         afterCursor: '',
+        noErrors: true,
         containsKeywords: ['SELECT'],
         expectedResult: {
           lowerCase: false
@@ -192,6 +454,7 @@ describe('hiveAutocompleteParser.js CREATE statements', () => {
         beforeCursor:
           "CREATE FUNCTION boo.baaa AS 'boo.baa' USING JAR 'boo.jar', FILE 'booo', ARCHIVE 'baa'; ",
         afterCursor: '',
+        noErrors: true,
         containsKeywords: ['SELECT'],
         expectedResult: {
           lowerCase: false
@@ -284,6 +547,7 @@ describe('hiveAutocompleteParser.js CREATE statements', () => {
           '("boo.baa"="ble", "blaa"=1) IN TABLE dbTwo.tblTwo ROW FORMAT DELIMITED STORED AS PARQUET LOCATION \'/baa/boo\' ' +
           'TBLPROPERTIES ("bla"=1) COMMENT "booo"; ',
         afterCursor: '',
+        noErrors: true,
         containsKeywords: ['SELECT'],
         expectedResult: {
           lowerCase: false
@@ -295,6 +559,7 @@ describe('hiveAutocompleteParser.js CREATE statements', () => {
       assertAutoComplete({
         beforeCursor: "CREATE INDEX bla ON TABLE db.tbl (a, b, c) AS 'boo.baa.bitmap'; ",
         afterCursor: '',
+        noErrors: true,
         containsKeywords: ['SELECT'],
         expectedResult: {
           lowerCase: false
@@ -642,6 +907,7 @@ describe('hiveAutocompleteParser.js CREATE statements', () => {
       assertAutoComplete({
         beforeCursor: 'CREATE ROLE boo; ',
         afterCursor: '',
+        noErrors: true,
         containsKeywords: ['SELECT'],
         expectedResult: {
           lowerCase: false
@@ -1259,6 +1525,37 @@ describe('hiveAutocompleteParser.js CREATE statements', () => {
     it('should suggest keywords for "CREATE TABLE foo (id int) STORED AS |"', () => {
       assertAutoComplete({
         beforeCursor: 'CREATE TABLE foo (id int) STORED AS ',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: [
+            'AVRO',
+            'INPUTFORMAT',
+            'JSONFILE',
+            'ORC',
+            'PARQUET',
+            'RCFILE',
+            'SEQUENCEFILE',
+            'TEXTFILE'
+          ]
+        }
+      });
+    });
+
+    it('should suggest keywords for "CREATE TABLE foo (id int) STORED BY |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'CREATE TABLE foo (id int) STORED BY ',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: ['ICEBERG']
+        }
+      });
+    });
+
+    it('should suggest keywords for "CREATE TABLE foo (id int) STORED BY ICEBERG STORED AS |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'CREATE TABLE foo (id int) STORED BY ICEBERG STORED AS ',
         afterCursor: '',
         expectedResult: {
           lowerCase: false,

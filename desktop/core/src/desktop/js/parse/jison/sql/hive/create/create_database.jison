@@ -27,6 +27,10 @@ CreateDatabase
    {
      parser.addNewDatabaseLocation(@4, [{ name: $4 }]);
    }
+ | 'CREATE_REMOTE' DatabaseOrSchema RegularIdentifier 'USING' RegularIdentifier OptionalDbProperties
+   {
+     parser.addNewDatabaseLocation(@3, [{ name: $3 }]);
+   }
  ;
 
 CreateDatabase_EDIT
@@ -48,9 +52,28 @@ CreateDatabase_EDIT
    {
      parser.addNewDatabaseLocation(@4, [{ name: $4 }]);
    }
+ | 'CREATE' DatabaseOrSchema OptionalIfNotExists RegularIdentifier DatabaseDefinitionOptionals_EDIT
  | 'CREATE' DatabaseOrSchema OptionalIfNotExists RegularIdentifier DatabaseDefinitionOptionals 'CURSOR'
    {
      parser.addNewDatabaseLocation(@4, [{ name: $4 }]);
+   }
+ | 'CREATE_REMOTE' 'CURSOR'
+   {
+     parser.suggestKeywords(['DATABASE']);
+   }
+ | 'CREATE_REMOTE' DatabaseOrSchema RegularIdentifier 'CURSOR'
+   {
+     parser.addNewDatabaseLocation(@3, [{ name: $3 }]);
+     parser.suggestKeywords(['USING']);
+   }
+ | 'CREATE_REMOTE' DatabaseOrSchema RegularIdentifier 'USING' RegularIdentifier OptionalDbProperties 'CURSOR'
+   {
+     parser.addNewDatabaseLocation(@3, [{ name: $3 }]);
+     parser.suggestKeywords(['WITH DBPROPERTIES']);
+   }
+ | 'CREATE_REMOTE' DatabaseOrSchema RegularIdentifier 'USING' RegularIdentifier DbProperties_EDIT
+   {
+     parser.addNewDatabaseLocation(@3, [{ name: $3 }]);
    }
  ;
 

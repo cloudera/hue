@@ -135,6 +135,15 @@ const HIVE_DIALECT = 'hive';
 const IMPALA_DIALECT = 'impala';
 const PHOENIX_DIALECT = 'phoenix';
 
+const HIVE_VIRTUAL_COLUMNS = [
+  'BLOCK__OFFSET__INSIDE__FILE',
+  'GROUPING__ID',
+  'RAW__DATA__SIZE',
+  'ROW__ID',
+  'ROW__IS__DELETED',
+  'ROW__OFFSET__INSIDE__BLOCK'
+];
+
 const locateSubQuery = (subQueries: SubQuery[], subQueryName: string): SubQuery | undefined => {
   if (subQueries) {
     return subQueries.find(knownSubQuery => equalIgnoreCase(knownSubQuery.alias, subQueryName));
@@ -772,19 +781,14 @@ class AutocompleteResults {
     AutocompleteResults.mergeColumns(columnSuggestions);
 
     if (this.dialect() === HIVE_DIALECT && /[^.]$/.test(this.editor.getTextBeforeCursor())) {
-      columnSuggestions.push({
-        value: 'BLOCK__OFFSET__INSIDE__FILE',
-        meta: MetaLabels.Virtual,
-        category: Category.VirtualColumn,
-        popular: false,
-        details: { name: 'BLOCK__OFFSET__INSIDE__FILE' }
-      });
-      columnSuggestions.push({
-        value: 'INPUT__FILE__NAME',
-        meta: MetaLabels.Virtual,
-        category: Category.VirtualColumn,
-        popular: false,
-        details: { name: 'INPUT__FILE__NAME' }
+      HIVE_VIRTUAL_COLUMNS.forEach(virtualColumn => {
+        columnSuggestions.push({
+          value: virtualColumn,
+          meta: MetaLabels.Virtual,
+          category: Category.VirtualColumn,
+          popular: false,
+          details: { name: virtualColumn }
+        });
       });
     }
 
