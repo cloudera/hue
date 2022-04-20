@@ -43,7 +43,7 @@ jobs:
         sudo apt-get install -y python3-setuptools
         sudo apt-get install -y libncursesw5-dev libgdbm-dev libc6-dev libssl-dev openssl libffi-dev
 
-        export PYTHON_VER=python3.8
+        export PYTHON_VER=python3.9
         make apps
 
     - name: run tests
