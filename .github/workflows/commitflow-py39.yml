@@ -1,0 +1,51 @@
+name: Python 3.9 CI
+
+on:
+  push:
+    branches:
+    - master
+  pull_request:
+    branches:
+    - master
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: [3.9]
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Cache pip
+      uses: actions/cache@v2
+      with:
+        # This path is specific to Ubuntu
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('desktop/core/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+          ${{ runner.os }}-
+
+    - name: compile
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gcc g++ build-essential python3.9-dev python3.9-venv python3.9-distutils asciidoc rsync curl sudo libkrb5-dev libldap2-dev libsasl2-dev libxml2-dev libxslt-dev libldap2-dev libsnappy-dev libsasl2-modules-gssapi-mit libsnappy-dev libffi-dev # This should not be needed as some point
+        sudo curl -sL https://deb.nodesource.com/setup_14.x | sudo bash - && sudo apt-get install -y nodejs
+        sudo curl -sL https://bootstrap.pypa.io/get-pip.py | sudo python3.9
+        sudo apt-get install -y python3-setuptools
+        sudo apt-get install -y libncursesw5-dev libgdbm-dev libc6-dev libssl-dev openssl libffi-dev
+
+        export PYTHON_VER=python3.9
+        make apps
+
+    - name: run tests
+      run: |
+        PYTHONWARNINGS=always ./build/env/bin/hue test unit --with-xunit --with-cover
