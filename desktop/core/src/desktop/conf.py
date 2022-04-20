@@ -642,6 +642,7 @@ def default_from_email():
     _default_from_email = "hue@" + fqdn
   return _default_from_email
 
+from indexer.conf import ENABLE_DIRECT_UPLOAD  # Circular dependency 
 
 def default_database_options():
   """Database type dependent options"""
@@ -649,6 +650,8 @@ def default_database_options():
     return {'threaded': True}
   elif DATABASE.ENGINE.get().endswith('sqlite3'):
     return {'timeout': 30}
+  elif DATABASE.ENGINE.get().endswith('mysql') and ENABLE_DIRECT_UPLOAD:     # Setting this variable to 64MB because mysql5.7
+    return {'init_command': 'SET GLOBAL max_allowed_packet=67108864'}        # has default value of this variable 4MB
   else:
     return {}
 
