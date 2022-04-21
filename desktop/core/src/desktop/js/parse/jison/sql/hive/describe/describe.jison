@@ -72,7 +72,7 @@ DescribeStatement_EDIT
  | 'DESCRIBE' OptionalExtendedOrFormatted 'CURSOR'
    {
      if (!$2) {
-       parser.suggestKeywords(['DATABASE', 'EXTENDED', 'FORMATTED', 'FUNCTION', 'SCHEMA']);
+       parser.suggestKeywords(['CONNECTOR', 'DATABASE', 'EXTENDED', 'FORMATTED', 'FUNCTION', 'SCHEMA']);
      }
      parser.suggestTables();
      parser.suggestDatabases({ appendDot: true });

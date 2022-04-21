@@ -109,6 +109,7 @@ NonReservedKeyword
  | 'COMPACTIONS'
  | 'COMPUTE'
  | 'CONCATENATE'
+ | 'CONNECTORS'
  | 'COST'
  | 'CRON'
  | 'CURRENT_DATE'
@@ -118,6 +119,7 @@ NonReservedKeyword
  | 'DATABASES'
  | 'DAY'
  | 'DAYOFWEEK'
+ | 'DCPROPERTIES'
  | 'DBPROPERTIES'
  | 'DEFAULT'
  | 'DEFERRED'
@@ -147,6 +149,7 @@ NonReservedKeyword
  | 'FORMAT'
  | 'FUNCTIONS'
  | 'HOUR'
+ | 'ICEBERG'
  | 'IDXPROPERTIES'
  | 'INPATH'
  | 'INPUTFORMAT'
@@ -197,6 +200,7 @@ NonReservedKeyword
  | 'RECOVER'
  | 'RELOAD'
  | 'RELY'
+ | 'REMOTE'
  | 'RENAME'
  | 'REPAIR'
  | 'REPLACE'
@@ -216,6 +220,7 @@ NonReservedKeyword
  | 'SKEWED_LOCATION'
  | 'SKEWED'
  | 'SORTED'
+ | 'SPEC'
  | 'STATISTICS'
  | 'STORED'
  | 'STORED_AS_DIRECTORIES'
@@ -231,9 +236,11 @@ NonReservedKeyword
  | 'TOUCH'
  | 'TRANSACTIONAL'
  | 'TRANSACTIONS'
+ | 'TYPE'
  | 'UNARCHIVE'
  | 'UNIONTYPE'
  | 'UNIQUE'
+ | 'URL'
  | 'USE'
  | 'VECTORIZATION'
  | 'VIEW'
@@ -1359,6 +1366,11 @@ WithQuery
      parser.addCteAliasLocation(@1, $1);
      $4.alias = $1;
      $$ = $4;
+   }
+ | RegularOrBacktickedIdentifier 'AS' '(' ValuesClause ')'
+   {
+     parser.addCteAliasLocation(@1, $1);
+     $$ = { alias: $1 };
    }
  ;
 
@@ -2660,6 +2672,7 @@ TableOrQueryName_EDIT
 
 DerivedTable
  : TableSubQuery
+ | '(' ValuesClause ')' -> {}
  ;
 
 DerivedTable_EDIT
@@ -3154,4 +3167,21 @@ LateralViewColumnAliases
 LateralViewColumnAliases_EDIT
  : 'AS' PartialBacktickedOrCursor
  | 'AS' RegularOrBacktickedIdentifier ',' PartialBacktickedOrAnyCursor
+ ;
+
+ValueExpression
+ : '(' ValuesClause ')'
+ ;
+
+ValuesClause
+ : 'VALUES' ValuesList
+ ;
+
+ValuesList
+ : ParenthesizedRowValuesList
+ | ValuesList ',' ParenthesizedRowValuesList
+ ;
+
+ParenthesizedRowValuesList
+ : '(' InValueList ')'
  ;
