@@ -757,6 +757,7 @@ export const initSyntaxParser = parser => {
   const IGNORED_EXPECTED = {
     ';': true,
     '.': true,
+    CREATE_REMOTE: true,
     EOF: true,
     UNSIGNED_INTEGER: true,
     UNSIGNED_INTEGER_E: true,
