@@ -227,7 +227,7 @@ MatchCondition_EDIT
 UpdateDeleteOrInsert
  : 'UPDATE' 'SET' SetClauseList        -> { isUpdate: true }
  | 'DELETE'                            -> { isDelete: true }
- | 'INSERT' 'VALUES' InsertValuesList  -> { isInsert: true }
+ | 'INSERT' ValuesClause  -> { isInsert: true }
  ;
 
 UpdateDeleteOrInsert_EDIT

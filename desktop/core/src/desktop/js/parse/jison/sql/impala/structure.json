@@ -122,6 +122,7 @@
     "delete/delete.jison",
     "describe/describe.jison",
     "describe/describe_database.jison",
+    "describe/describe_history.jison",
     "drop/drop_aggregate_function.jison",
     "drop/drop_common.jison",
     "drop/drop_database.jison",
