@@ -175,11 +175,14 @@ And then, add it in `hue.ini` (comma separated and in order of priority if multi
 
 Now that we are authenticated, here is how to execute a `SHOW TABLES` SQL query via the `hive` connector. You could repeat the steps with any query you want, e.g. `SELECT * FROM web_logs LIMIT 100`.
 
-Selecting the Database to query via the **dialect** argument in `/api/editor/execute/<dialect>`:
-- **hive**: select the first configured Hive databases.
+Selecting the **dialect** argument in `/api/editor/execute/<dialect>`:
+- **hive**: select the configured Hive dialect
 - **1**: select the connector id 1
 - **hive-1**: select the interpreter id 1 and hints that it is a Hive dialect
 - If blank will pick the first interpreter
+
+Optional parameter:
+- **database**: select a specific database
 
 For a `SHOW TABLES`, first we send the query statement:
 
@@ -350,9 +353,17 @@ We can choose a dialect for `doc_type` e.g. impala, mysql, hive, phoenix, etc.
 
 ## File Browsing
 
-### List
+Hue's [File Browser](https://docs.gethue.com/user/browsing/#data) offer uploads, downloads, operations (create, delete, chmod...) and listing of data in HDFS (`hdfs://` or no prefix), S3 (`s3a://` prefix), ADLS (`adls://` or `abfs://` prefixes) storages.
 
-Hue's [File Browser](https://docs.gethue.com/user/browsing/#data) offer uploads, downloads, operations (create, delete, chmod...) and listing of data in HDFS (hdfs:// or no prefix), S3 (s3a:// prefix), ADLS (adls:// or abfs:// prefixes) storages.
+### Get Filesystems
+
+Get the filesystems configured with Hue:
+
+    curl -X POST https://demo.gethue.com/api/storage/get_filesystems
+    
+    {"status": 0, "filesystems": {"s3a": true}}
+
+### List
 
 Here is how to list the content of a path, here a S3 bucket `s3a://demo-gethue`:
 
@@ -467,8 +478,17 @@ Upload a local file to a remote destination folder:
 
     curl -X POST https://demo.gethue.com/api/storage/upload/file?dest=s3a://demo-gethue/web_log_data/ --form hdfs_file=@README.md
 
-- dest: folder path will be created if it does not exist yet
-- hdfs_file: relative or absolute path to a file. It should be read more like `local_file`, it is not related to HDFS
+- **dest:** folder path will be created if it does not exist yet
+- **hdfs_file:** relative or absolute path to a file. It should be read more like `local_file`, it is not related to HDFS
+
+### Create Directory
+
+Create a directory at a specific path:
+
+    curl -X POST https://demo.gethue.com/api/storage/mkdir
+    
+- **name:** name of the directory
+- **path:** specific path where user wants to create the directory
 
 ## Data Importer
 
@@ -561,13 +581,13 @@ This is the same as creating a new connector instance, but as we provide the `id
 
 ### Delete
 
-    curl -X POST 'https://demo.gethue.com/api/connector/instance/delete' -d '{"connector": {"id": "1"}}'
+    curl -X POST https://demo.gethue.com/api/connector/instance/delete -d 'connector={"id": "1"}'
 
 ### Test
 
 Check if the connectivity is healthy:
 
-    curl -X POST 'https://demo.gethue.com/api/connector/instance/test/' -d 'connector={"nice_name":"Hive Docker Local","name":"41","dialect":"hive","interface":"hiveserver2","settings":[{"name":"server_host","value":"localhost"},{"name":"server_port","value":10000},{"name":"is_llap","value":false},{"name":"use_sasl","value":"true"}],"id":"41","category":"editor","description":"Recommended","dialect_properties":{"is_sql":true,"sql_identifier_quote":"`","sql_identifier_comment_single":"--","has_catalog":false,"has_database":true,"has_table":true,"has_live_queries":false,"has_optimizer_risks":true,"has_optimizer_values":true,"has_auto_limit":false,"has_reference_language":true,"has_reference_functions":true,"has_use_statement":true}}'
+    curl -X POST https://demo.gethue.com/api/connector/instance/test/ -d 'connector={"nice_name":"Hive Docker Local","name":"41","dialect":"hive","interface":"hiveserver2","settings":[{"name":"server_host","value":"localhost"},{"name":"server_port","value":10000},{"name":"is_llap","value":false},{"name":"use_sasl","value":"true"}],"id":"41","category":"editor","description":"Recommended","dialect_properties":{"is_sql":true,"sql_identifier_quote":"`","sql_identifier_comment_single":"--","has_catalog":false,"has_database":true,"has_table":true,"has_live_queries":false,"has_optimizer_risks":true,"has_optimizer_values":true,"has_auto_limit":false,"has_reference_language":true,"has_reference_functions":true,"has_use_statement":true}}'
 
 ### Examples
 
@@ -581,7 +601,7 @@ Install or update the connector examples:
 
 Get user records in Hue. Requires **admin privileges**.
 
-    curl -X GET http://demo.gethue.com/api/iam/get_users
+    curl -X GET https://demo.gethue.com/api/iam/get_users
 
 Optional GET params:
 - **username:** filter by username
@@ -592,13 +612,13 @@ E.g. `?username=demo&groups=default&is_active=true`
 
 Search user records by list of user IDs. Requires **admin privileges**.
 
-    curl -X GET http://demo.gethue.com/api/iam/users?userids=[1100714,1100715]
+    curl -X GET https://demo.gethue.com/api/iam/users?userids=[1100714,1100715]
     
     {"users": [{"id": 1100714,"username": "demo","first_name": "","last_name": "","email": "","last_login": "2021-10-06T01:36:49.663","editURL": "/useradmin/users/edit/demo"},{"id": 1100715,"username": "hue","first_name": "","last_name": "","email": "","last_login": "2021-08-11T07:15:48.793","editURL": "/useradmin/users/edit/hue"}]}
 
 User list_for_autocomplete API:
 
-    curl -X GET http://demo.gethue.com/api/iam/users/autocomplete
+    curl -X GET https://demo.gethue.com/api/iam/users/autocomplete
  
 Optional GET params:
 - **extend_user:** true or false (info about each user's groups)
@@ -611,7 +631,7 @@ The [metadata API](https://github.com/cloudera/hue/tree/master/desktop/libs/meta
 
 ### Searching for entities
     
-    curl -X POST http://demo.gethue.com/api/metadata/search/entities_interactive/' -d 'query_s="*sample"&sources=["documents", "sql", "hdfs", "s3"]'
+    curl -X POST https://demo.gethue.com/api/metadata/search/entities_interactive/ -d 'query_s="*sample"&sources=["documents", "sql", "hdfs", "s3"]'
 
 Some of the parameters:
 - **query_s:** search term
@@ -621,7 +641,7 @@ Some of the parameters:
 
 Searching for entities with the `dummy` catalog:
 
-    curl -X POST http://demo.gethue.com/api/metadata/search/entities_interactive/ -d 'query_s="*sample"&interface="dummy"'
+    curl -X POST https://demo.gethue.com/api/metadata/search/entities_interactive/ -d 'query_s="*sample"&interface="dummy"'
 
 ### Finding an entity
 

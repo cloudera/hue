@@ -670,7 +670,7 @@ All the spark-submit, spark-shell, pyspark, sparkR properties of jobs & shells c
 
 ### Spark
 
-Hue relies on [Livy](http://livy.io/) for the interactive Scala, Python, SparkSQL and R snippets.
+Hue relies on [Livy](https://livy.incubator.apache.org/) for the interactive Scala, Python, SparkSQL and R snippets.
 
 Livy is an open source REST interface for interacting with Apache Spark from anywhere. It got initially developed in the Hue project but got a lot of traction and was moved to its own project on livy.io.
 
@@ -678,7 +678,7 @@ Make sure that the Notebook and interpreters [configured](/administrator/configu
 
 #### Livy
 
-Starting the Livy REST server is detailed on livy.io the [get started](http://livy.incubator.apache.org/get-started/).
+Starting the Livy REST server is detailed on the [get started](http://livy.incubator.apache.org/get-started/) page.
 
 **Executing some Spark**
 

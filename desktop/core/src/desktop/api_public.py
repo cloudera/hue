@@ -16,11 +16,12 @@
 # limitations under the License.
 
 import logging
+import json
 
 from django.http import QueryDict, HttpResponse
 from rest_framework.decorators import api_view
 
-from filebrowser import views as filebrowser_views
+from filebrowser import views as filebrowser_views, api as filebrowser_api
 from indexer import api3 as indexer_api3
 from metadata import optimizer_api
 from notebook import api as notebook_api
@@ -31,8 +32,7 @@ from desktop.auth.backend import rewrite_user
 from desktop.lib import fsmanager
 from desktop.lib.connectors import api as connector_api
 
-from useradmin import views as useradmin_views
-from useradmin import api as useradmin_api
+from useradmin import views as useradmin_views, api as useradmin_api
 
 from beeswax import api as beeswax_api
 
@@ -88,10 +88,19 @@ def execute(request, dialect=None):
 
     data = {
       'notebook': '{"type":"query-%(interpreter)s","snippets":[{"id":%(interpreter_id)s,"statement_raw":"",'
-        '"type":"%(interpreter)s","status":"","variables":[]}],'
+        '"type":"%(interpreter)s","status":"","variables":[],"properties":{}}],'
         '"name":"","isSaved":false,"sessions":[]}' % params,
       'snippet': '{"id":%(interpreter_id)s,"type":"%(interpreter)s","result":{},"statement":"%(statement)s","properties":{}}' % params
     }
+
+    # Optional database param for specific query statements like "show tables;"
+    if django_request.POST.get('database'):
+      database = django_request.POST.get('database')
+      snippet = json.loads(data['snippet'])
+      snippet['database'] = database
+
+      data['snippet'] = json.dumps(snippet)
+
 
     django_request.POST = QueryDict(mutable=True)
     django_request.POST.update(data)
@@ -180,6 +189,11 @@ def analyze_table(request, dialect, database, table, columns=None):
 
 # Storage
 
+@api_view(["POST"])
+def storage_get_filesystems(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.get_filesystems(django_request)
+
 @api_view(["GET"])
 def storage_view(request, path):
   django_request = get_django_request(request)
@@ -194,6 +208,11 @@ def storage_download(request, path):
 def storage_upload_file(request):
   django_request = get_django_request(request)
   return filebrowser_views.upload_file(django_request)
+
+@api_view(["POST"])
+def storage_mkdir(request):
+  django_request = get_django_request(request)
+  return filebrowser_views.mkdir(django_request)
 
 
 # Importer

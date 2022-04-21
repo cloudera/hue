@@ -18,9 +18,9 @@
 import sys
 
 from builtins import object
-from nose.tools import assert_equal, assert_true, assert_false
+from nose.tools import assert_equal, assert_true, assert_false, assert_raises
 
-from notebook.connectors.spark_shell import SparkApi
+from notebook.connectors.spark_shell import SparkApi, SESSIONS
 
 if sys.version_info[0] > 2:
   from unittest.mock import patch, Mock
@@ -49,6 +49,7 @@ class TestSparkApi(object):
     spark_api = self.api.get_api()
     assert_equal(spark_api.__class__.__name__, 'LivyClient')
 
+
   def test_get_livy_props_method(self):
     test_properties = [{
         "name": "files",
@@ -57,9 +58,11 @@ class TestSparkApi(object):
     props = self.api.get_livy_props('scala', test_properties)
     assert_equal(props['files'], ['file_a', 'file_b', 'file_c'])
 
+
   def test_create_session_with_config(self):
     lang = 'pyspark'
     properties = None
+    session_key = self.api._get_session_key()
 
     with patch('notebook.connectors.spark_shell.get_spark_api') as get_spark_api:
       with patch('notebook.connectors.spark_shell.DefaultConfiguration') as DefaultConfiguration:
@@ -82,37 +85,54 @@ class TestSparkApi(object):
           # Case with user configuration. Expected 2 driverCores
           USE_DEFAULT_CONFIGURATION.get.return_value = True
           session = self.api.create_session(lang=lang, properties=properties)
+
           assert_equal(session['type'], 'pyspark')
           assert_equal(session['id'], '1')
+
           for p in session['properties']:
             if p['name'] == 'driverCores':
               cores = p['value']
           assert_equal(cores, 2)
 
+          if SESSIONS.get(session_key):
+            del SESSIONS[session_key]
+
           # Case without user configuration. Expected 1 driverCores
           USE_DEFAULT_CONFIGURATION.get.return_value = True
           DefaultConfiguration.objects.get_configuration_for_user.return_value = None
           session2 = self.api.create_session(lang=lang, properties=properties)
+
           assert_equal(session2['type'], 'pyspark')
           assert_equal(session2['id'], '1')
+
           for p in session2['properties']:
             if p['name'] == 'driverCores':
               cores = p['value']
           assert_equal(cores, 1)
 
+          if SESSIONS.get(session_key):
+            del SESSIONS[session_key]
+
           # Case with no user configuration. Expected 1 driverCores
           USE_DEFAULT_CONFIGURATION.get.return_value = False
           session3 = self.api.create_session(lang=lang, properties=properties)
+
           assert_equal(session3['type'], 'pyspark')
           assert_equal(session3['id'], '1')
+
           for p in session3['properties']:
             if p['name'] == 'driverCores':
               cores = p['value']
           assert_equal(cores, 1)
 
+          if SESSIONS.get(session_key):
+            del SESSIONS[session_key]
+
+
   def test_create_session_plain(self):
     lang = 'pyspark'
     properties = None
+    session_key = self.api._get_session_key()
 
     with patch('notebook.connectors.spark_shell.get_spark_api') as get_spark_api:
       get_spark_api.return_value = Mock(
@@ -132,6 +152,92 @@ class TestSparkApi(object):
       files_properties = [prop for prop in session['properties'] if prop['name'] == 'files']
       assert_true(files_properties, session['properties'])
       assert_equal(files_properties[0]['value'], [], session['properties'])
+
+      if SESSIONS.get(session_key):
+        del SESSIONS[session_key]
+
+
+  def test_execute(self):
+    with patch('notebook.connectors.spark_shell._get_snippet_session') as _get_snippet_session:
+      with patch('notebook.connectors.spark_shell.get_spark_api') as get_spark_api:
+        notebook = Mock()
+        snippet = {'statement': 'select * from test_table'}
+        _get_snippet_session.return_value = {'id': '1'}
+
+        get_spark_api.return_value = Mock(
+          submit_statement=Mock(
+            return_value={'id': 'test_id'}
+          )
+        )
+
+        response = self.api.execute(notebook, snippet)
+        assert_equal(response['id'], 'test_id')
+
+        get_spark_api.return_value = Mock(
+          submit_statement=Mock()
+        )
+        assert_raises(Exception, self.api.execute, notebook, snippet)
+
+
+  def test_check_status(self):
+    with patch('notebook.connectors.spark_shell._get_snippet_session') as _get_snippet_session:
+      with patch('notebook.connectors.spark_shell.get_spark_api') as get_spark_api:
+        notebook = Mock()
+        snippet = {
+          'result': {
+            'handle': {
+              'id': {'test_id'}
+            }
+          }
+        }
+        _get_snippet_session.return_value = {'id': '1'}
+
+        get_spark_api.return_value = Mock(
+          fetch_data=Mock(
+            return_value={'state': 'test_state'}
+          )
+        )
+
+        response = self.api.check_status(notebook, snippet)
+        assert_equal(response['status'], 'test_state')
+
+        get_spark_api.return_value = Mock(
+          submit_statement=Mock()
+        )
+        assert_raises(Exception, self.api.check_status, notebook, snippet)
+  
+
+  def test_get_sample_data(self):
+    snippet = Mock()
+    self.api._execute = Mock(
+      return_value='test_value'
+    )
+    self.api._check_status_and_fetch_result = Mock(
+      return_value={
+        'data': 'test_data',
+        'meta': 'test_meta'
+      }
+    )
+
+    response = self.api.get_sample_data(snippet, 'test_db', 'test_table', 'test_column')
+
+    assert_equal(response['rows'], 'test_data')
+    assert_equal(response['full_headers'], 'test_meta')
+  
+
+  def test_get_select_query(self):
+    # With operation as 'hello'
+    response = self.api._get_select_query('test_db', 'test_table', 'test_column', 'hello')
+    assert_equal(response, "SELECT 'Hello World!'")
+
+    # Without column name
+    response = self.api._get_select_query('test_db', 'test_table')
+    assert_equal(response, 'SELECT *\nFROM test_db.test_table\nLIMIT 100\n')
+
+    # With some column name
+    response = self.api._get_select_query('test_db', 'test_table', 'test_column')
+    assert_equal(response, 'SELECT test_column\nFROM test_db.test_table\nLIMIT 100\n')
+
 
   def test_get_jobs(self):
     local_jobs = [

@@ -1035,7 +1035,10 @@ class Snippet {
         const previousHash = self.result.handle().previous_statement_hash;
         self.executeNextTimeout = setTimeout(() => {
           // Don't execute if the handle has changed during the timeout
-          if (previousHash === self.result.handle().previous_statement_hash) {
+          if (
+            self.status() !== 'running' &&
+            previousHash === self.result.handle().previous_statement_hash
+          ) {
             self.execute(true); // Execute next, need to wait as we disabled fast click
           }
         }, 1000);

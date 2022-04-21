@@ -237,7 +237,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
           <div data-bind="visible: createWizard.source.inputFormat() == 'localfile'">
               <form method="post" action="" enctype="multipart/form-data" id="uploadform">
                 <div >
-                    <input type="file" id="inputfile" name="inputfile" style="margin-left: 130px" accept=".csv">
+                    <input type="file" id="inputfile" name="inputfile" style="margin-left: 130px" accept=".csv, .xlsx">
                 </div>
             </form>
           </div>
@@ -460,8 +460,8 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
       <!-- ko ifnot: createWizard.isGuessingFormat -->
       <h4>${_('Format')}</h4>
       <div class="card-body">
-        <label data-bind="visible: (createWizard.prefill.source_type().length == 0 || createWizard.prefill.target_type() == 'index') &&
-            (createWizard.source.inputFormat() == 'file' || createWizard.source.inputFormat() == 'localfile' || createWizard.source.inputFormat() == 'stream')">
+        <label data-bind="visible: (createWizard.prefill.source_type().length > 0 && createWizard.prefill.target_type().length > 0) || ((createWizard.prefill.source_type().length == 0 || createWizard.prefill.target_type() == 'index') &&
+            (createWizard.source.inputFormat() == 'file' || createWizard.source.inputFormat() == 'localfile' || createWizard.source.inputFormat() == 'stream'))">
           <div>${_('File Type')}</div>
           <select data-bind="selectize: $root.createWizard.fileTypes, value: $root.createWizard.fileTypeName,
               optionsText: 'description', optionsValue: 'name'"></select>
@@ -3233,8 +3233,8 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
         var files = $('#inputfile')[0].files[0];
         fd.append('file', files);
         var file_size = files.size;
-        if (file_size > 200000) {
-          $.jHueNotify.warn("${ _('File size exceeds the supported size (200 KB).') }");
+        if (file_size > 10485760) {
+          $.jHueNotify.warn("${ _('File size exceeds the supported size (10 MB). Please use the S3, ABFS or HDFS browser to upload files.') }");
         } else {
           $.ajax({
             url:"/indexer/api/indexer/upload_local_file",

@@ -63,6 +63,8 @@ from desktop.lib.view_util import is_ajax
 from desktop.log import get_audit_logger
 from desktop.log.access import access_log, log_page_hit, access_warn
 
+from libsaml.conf import CDP_LOGOUT_URL
+
 if sys.version_info[0] > 2:
   from django.utils.translation import gettext as _
   from django.utils.http import url_has_allowed_host_and_scheme
@@ -384,11 +386,12 @@ class LoginAndPermissionMiddleware(MiddlewareMixin):
 
     logging.info("Redirecting to login page: %s", request.get_full_path())
     access_log(request, 'login redirection', level=access_log_level)
-    no_idle_backends = (
-        "libsaml.backend.SAML2Backend",
+    no_idle_backends = [
         "desktop.auth.backend.SpnegoDjangoBackend",
         "desktop.auth.backend.KnoxSpnegoDjangoBackend"
-    )
+    ]
+    if CDP_LOGOUT_URL.get() == "":
+      no_idle_backends.append("libsaml.backend.SAML2Backend")
     if request.ajax and all(no_idle_backend not in AUTH.BACKEND.get() for no_idle_backend in no_idle_backends):
       # Send back a magic header which causes Hue.Request to interpose itself
       # in the ajax request and make the user login before resubmitting the
@@ -920,3 +923,25 @@ class MimeTypeJSFileFixStreamingMiddleware(MiddlewareMixin):
       response['Content-Type'] = "application/javascript"
 
     return response
+
+class MultipleProxyMiddleware:
+  FORWARDED_FOR_FIELDS = [
+    'HTTP_X_FORWARDED_FOR',
+    'HTTP_X_FORWARDED_HOST',
+    'HTTP_X_FORWARDED_SERVER',
+  ]
+
+  def __init__(self, get_response):
+    self.get_response = get_response
+
+  def __call__(self, request):
+    """
+    Rewrites the proxy headers so that only the most
+    recent proxy is used.
+    """
+    for field in self.FORWARDED_FOR_FIELDS:
+      if field in request.META:
+        if ',' in request.META[field]:
+          parts = request.META[field].split(',')
+          request.META[field] = parts[-1].strip()
+    return self.get_response(request)

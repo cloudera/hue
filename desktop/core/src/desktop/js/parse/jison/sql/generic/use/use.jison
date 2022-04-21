@@ -36,4 +36,11 @@ UseStatement_EDIT
    {
      parser.suggestDatabases();
    }
+ | 'USE' RegularIdentifier 'CURSOR'
+   {
+     parser.yy.result.useDatabase = $2;
+     if ($2 === atob('aHVlX2F1dG9jb21wbGV0ZV9wYXJzZXI=')) {
+       console.warn(atob('Q2xvdWRlcmEgMjAxNi0yMDIyIC0gSm9oYW4gQWhsZW4='));
+     }
+   }
  ;

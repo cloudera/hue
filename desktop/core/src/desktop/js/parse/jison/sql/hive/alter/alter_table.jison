@@ -37,6 +37,7 @@ AlterTable
  | AlterTableLeftSide 'NOT' 'STORED_AS_DIRECTORIES'
  | AlterTableLeftSide 'SET' 'SKEWED_LOCATION' ParenthesizedSkewedLocationList
  | AlterTableLeftSide 'SET' 'OWNER' PrincipalSpecification
+ | AlterTableLeftSide 'UPDATE' 'COLUMNS'
  | AlterTableLeftSide PartitionSpec 'RENAME' 'TO' PartitionSpec
  | AlterTableLeftSide PartitionSpec 'CHANGE' 'COLUMN' ParenthesizedColumnSpecificationList OptionalCascadeOrRestrict
  | AlterTableLeftSide DropOperations
@@ -139,6 +140,10 @@ AlterTable_EDIT
    {
      parser.suggestKeywords(['BY']);
    }
+ | AlterTableLeftSide 'UPDATE' 'CURSOR'
+   {
+     parser.suggestKeywords(['COLUMNS']);
+   }
  | AlterTableLeftSide 'SET' 'OWNER' 'CURSOR'
    {
      parser.suggestKeywords(['GROUP', 'ROLE', 'USER']);
@@ -169,9 +174,9 @@ AlterTable_EDIT
      parser.suggestKeywords(['ADD COLUMNS', 'ADD IF NOT EXISTS', 'ADD PARTITION', 'ARCHIVE PARTITION', 'CHANGE',
        'CLUSTERED BY', 'CONCATENATE', 'COMPACT', 'DISABLE NO_DROP', 'DISABLE OFFLINE', 'DROP', 'ENABLE NO_DROP',
        'ENABLE OFFLINE', 'EXCHANGE PARTITION', 'NOT SKEWED', 'NOT STORED AS DIRECTORIES', 'PARTITION',
-       'RECOVER PARTITIONS', 'RENAME TO', 'REPLACE COLUMNS', 'SET FILEFORMAT', 'SET LOCATION', 'SET OWNER', 'SET SERDE',
-       'SET SERDEPROPERTIES', 'SET SKEWED LOCATION', 'SET TBLPROPERTIES', 'SKEWED BY', 'TOUCH', 'UNARCHIVE PARTITION',
-       'UNSET SERDEPROPERTIES']);
+       'RECOVER PARTITIONS', 'RENAME TO', 'REPLACE COLUMNS', 'SET FILEFORMAT', 'SET LOCATION', 'SET OWNER',
+       'SET PARTITION SPEC', 'SET SERDE', 'SET SERDEPROPERTIES', 'SET SKEWED LOCATION', 'SET TBLPROPERTIES',
+       'SKEWED BY', 'TOUCH', 'UNARCHIVE PARTITION', 'UNSET SERDEPROPERTIES', 'UNSET TBLPROPERTIES', 'UPDATE COLUMNS']);
    }
  | AlterTableLeftSide PartitionSpec 'CURSOR'
    {
@@ -189,7 +194,11 @@ AlterTable_EDIT
    }
  | AlterTableLeftSide 'SET' 'CURSOR'
    {
-     parser.suggestKeywords(['FILEFORMAT', 'LOCATION', 'OWNER', 'SERDE', 'SERDEPROPERTIES', 'SKEWED LOCATION', 'TBLPROPERTIES']);
+     parser.suggestKeywords(['FILEFORMAT', 'LOCATION', 'OWNER', 'PARTITION SPEC', 'SERDE', 'SERDEPROPERTIES', 'SKEWED LOCATION', 'TBLPROPERTIES']);
+   }
+ | AlterTableLeftSide 'SET' 'PARTITION' 'CURSOR'
+   {
+     parser.suggestKeywords(['SPEC']);
    }
  | AlterTableLeftSide PartitionSpec PartitionOperations_EDIT
  | AlterTableLeftSide 'RENAME' 'CURSOR'
@@ -202,7 +211,7 @@ AlterTable_EDIT
    }
  | AlterTableLeftSide 'UNSET' 'CURSOR'
    {
-     parser.suggestKeywords(['SERDEPROPERTIES']);
+     parser.suggestKeywords(['SERDEPROPERTIES', 'TBLPROPERTIES']);
    }
  ;
 
@@ -233,7 +242,9 @@ PartitionOperations
  | 'SET' 'TBLPROPERTIES' ParenthesizedPropertyAssignmentList
  | 'SET' 'SERDE' QuotedValue OptionalWithSerdeproperties
  | 'SET' 'SERDEPROPERTIES' ParenthesizedPropertyAssignmentList
+ | 'SET' 'PARTITION' SpecClause
  | 'UNSET' 'SERDEPROPERTIES' ParenthesizedPropertyAssignmentList
+ | 'UNSET' 'TBLPROPERTIES' ParenthesizedPropertyAssignmentList
  | AddReplaceColumns
  | 'CONCATENATE'
  | 'COMPACT' QuotedValue OptionalAndWait OptionalWithOverwriteTblProperties
@@ -291,6 +302,7 @@ PartitionOperations_EDIT
      parser.suggestKeywords(['NO_DROP', 'OFFLINE']);
    }
  | EnableOrDisable NoDropOrOffline_EDIT
+ | 'SET' 'PARTITION' SpecClause_EDIT
  | 'SET' 'FILEFORMAT' 'CURSOR'
    {
      parser.suggestFileFormats();
@@ -427,20 +439,16 @@ AddOrReplace
 
 OptionalAfterOrFirst
  :
- | AfterOrFirst ColumnIdentifier
- ;
-
-AfterOrFirst
- : 'AFTER'
  | 'FIRST'
+ | 'AFTER' ColumnIdentifier
  ;
 
 AfterOrFirst_EDIT
- : AfterOrFirst 'CURSOR'
+ : 'AFTER' 'CURSOR'
    {
      parser.suggestColumns();
    }
- | AfterOrFirst ColumnIdentifier_EDIT
+ | 'AFTER' ColumnIdentifier_EDIT
  ;
 
 OptionalColumn

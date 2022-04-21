@@ -381,18 +381,20 @@ describe('AutocompleteResults.js', () => {
   it('should handle parse results with functions', async () => {
     subject.entries([]);
 
-    const spy = spyOn(sqlUdfRepository, 'getUdfsWithReturnTypes').and.callFake(async () =>
-      Promise.resolve([
-        {
-          name: 'count',
-          returnTypes: ['BIGINT'],
-          arguments: [[{ type: 'T' }]],
-          signature: 'count(col)',
-          draggable: 'count()',
-          description: 'some desc'
-        }
-      ])
-    );
+    const spy = jest
+      .spyOn(sqlUdfRepository, 'getUdfsWithReturnTypes')
+      .mockImplementation(async () =>
+        Promise.resolve([
+          {
+            name: 'count',
+            returnTypes: ['BIGINT'],
+            arguments: [[{ type: 'T' }]],
+            signature: 'count(col)',
+            draggable: 'count()',
+            description: 'some desc'
+          }
+        ])
+      );
 
     expect(subject.filtered().length).toBe(0);
 
@@ -414,9 +416,9 @@ describe('AutocompleteResults.js', () => {
   it('should handle parse results with udf argument keywords', async () => {
     subject.entries([]);
 
-    const spy = spyOn(sqlUdfRepository, 'getArgumentDetailsForUdf').and.callFake(async () =>
-      Promise.resolve([{ type: 'T', keywords: ['a', 'b'] }])
-    );
+    const spy = jest
+      .spyOn(sqlUdfRepository, 'getArgumentDetailsForUdf')
+      .mockImplementation(async () => Promise.resolve([{ type: 'T', keywords: ['a', 'b'] }]));
 
     expect(subject.filtered().length).toBe(0);
 
@@ -440,7 +442,7 @@ describe('AutocompleteResults.js', () => {
   it('should handle parse results set options', async () => {
     subject.entries([]);
 
-    const spy = spyOn(sqlReferenceRepository, 'getSetOptions').and.callFake(
+    const spy = jest.spyOn(sqlReferenceRepository, 'getSetOptions').mockImplementation(
       async dialect =>
         new Promise(resolve => {
           expect(dialect).toEqual(subject.snippet.connector().dialect);

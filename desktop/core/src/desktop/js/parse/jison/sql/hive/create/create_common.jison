@@ -15,17 +15,19 @@
 // limitations under the License.
 
 DataDefinition_EDIT
- : 'CREATE' OptionalTemporary OptionalTransactional OptionalExternal 'CURSOR'
+ : 'CREATE' OptionalTemporary OptionalTransactional OptionalExternal OptionalRemote 'CURSOR'
    {
-     if ($4) {
+     if ($5) {
+       parser.suggestKeywords(['DATABASE']);
+     } else if ($4) {
        parser.suggestKeywords(['TABLE']);
      } else {
        if ($2 && !$3) {
          parser.suggestKeywords(['EXTERNAL TABLE', 'FUNCTION', 'MACRO', 'TABLE']);
        } else if (!$2 && !$3) {
-         parser.suggestKeywords(['DATABASE', 'EXTERNAL TABLE', 'FUNCTION', 'INDEX', 'MATERIALIZED VIEW', 'ROLE',
-           'SCHEDULED QUERY', 'SCHEMA', 'TABLE', 'TEMPORARY EXTERNAL TABLE', 'TEMPORARY FUNCTION', 'TEMPORARY MACRO',
-           'TEMPORARY TABLE', 'TRANSACTIONAL TABLE', 'VIEW']);
+         parser.suggestKeywords(['CONNECTOR', 'DATABASE', 'EXTERNAL TABLE', 'FUNCTION', 'INDEX', 'MATERIALIZED VIEW',
+           'REMOTE DATABASE', 'ROLE', 'SCHEDULED QUERY', 'SCHEMA', 'TABLE', 'TEMPORARY EXTERNAL TABLE',
+           'TEMPORARY FUNCTION', 'TEMPORARY MACRO', 'TEMPORARY TABLE', 'TRANSACTIONAL TABLE', 'VIEW']);
        } else if ($3) {
          parser.suggestKeywords(['TABLE']);
        }
@@ -36,6 +38,11 @@ DataDefinition_EDIT
 OptionalComment
  :
  | Comment
+ ;
+
+OptionalRemote
+ :
+ | 'REMOTE'
  ;
 
 Comment
@@ -537,10 +544,10 @@ OptionalStoredAsOrBy
 
 StoredAsOrBy
  : StoredAs
- | 'STORED' 'BY' QuotedValue
-  {
-    $$ = { storedBy: true }
-  }
+ | StoredBy           -> { storedBy: true, suggestKeywords: ['STORED AS', 'WITH SERDEPROPERTIES'] }
+ | StoredBy WithSerdeproperties
+ | StoredBy WithSerdeproperties StoredAs
+ | StoredBy StoredAs
  ;
 
 StoredAsOrBy_EDIT
@@ -548,6 +555,15 @@ StoredAsOrBy_EDIT
    {
      parser.suggestKeywords(['AS', 'BY']);
    }
+ | StoredBy_EDIT
+ | StoredBy 'STORED' 'CURSOR'
+   {
+     parser.suggestKeywords(['AS']);
+   }
+ | StoredBy StoredAs_EDIT
+ | StoredBy WithSerdeproperties_EDIT
+ | StoredBy_EDIT StoredAs
+ | StoredBy WithSerdeproperties_EDIT StoredAs
  | StoredAs_EDIT
  ;
 
@@ -564,6 +580,24 @@ StoredAs_EDIT
  : 'STORED' 'AS' 'CURSOR'
    {
      parser.suggestFileFormats();
+   }
+ ;
+
+StoredBy
+ : 'STORED' 'BY' QuotedValue
+   {
+     $$ = { storedBy: true }
+   }
+ | 'STORED' 'BY' 'ICEBERG'
+   {
+     $$ = { storedBy: true }
+   }
+ ;
+
+StoredBy_EDIT
+ : 'STORED' 'BY' 'CURSOR'
+   {
+     parser.suggestKeywords(['ICEBERG']);
    }
  ;
 

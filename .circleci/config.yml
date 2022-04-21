@@ -3,20 +3,16 @@
 # Check https://circleci.com/docs/2.0/language-python/ for more details
 #
 version: 2.1
-jobs:
-  build:
-    docker:
-      # specify the version you desire here
-      # - image: circleci/python:3.8.0
-      - image: gethue/hue:latest-py2
 
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/postgres:9.4
-
-    working_directory: ~/repo
-
+commands:
+  build-common:
+    parameters:
+      go_arch:
+        # amd64 or arm64
+        type: string
+      hugo_arch:
+        # 64bit (AMD64) or ARM64
+        type: string
     steps:
       - checkout
 
@@ -96,13 +92,13 @@ jobs:
             cd ~/repo
 
             # Installs to move to image building
-            curl -O https://dl.google.com/go/go1.15.linux-amd64.tar.gz
-            tar -xvf go1.15.linux-amd64.tar.gz
+            curl -O https://dl.google.com/go/go1.15.linux-<< parameters.go_arch >>.tar.gz
+            tar -xvf go1.15.linux-<< parameters.go_arch >>.tar.gz
             export GO111MODULE=on
             go/bin/go get -u github.com/raviqqe/muffet@v1.5.7
 
-            curl --output hugo_0.69.0_Linux-64bit.tar.gz -L https://github.com/gohugoio/hugo/releases/download/v0.69.0/hugo_0.69.0_Linux-64bit.tar.gz
-            tar -xvf hugo_0.69.0_Linux-64bit.tar.gz
+            curl --output hugo_0.69.0_Linux.tar.gz -L https://github.com/gohugoio/hugo/releases/download/v0.69.0/hugo_0.69.0_Linux-<< parameters.hugo_arch >>.tar.gz
+            tar -xvf hugo_0.69.0_Linux.tar.gz
 
             export PATH=$PWD:$HOME/go/bin:$PATH
 
@@ -179,32 +175,7 @@ jobs:
           path: test-reports
           destination: test-reports
 
-
-  commit:
-    docker:
-      - image: circleci/python:3.8.0
-
-    working_directory: ~/repo
-
-    steps:
-      - checkout
-
-      - add_ssh_keys:
-          fingerprints:
-            - "8c:68:29:28:04:80:38:31:c0:59:d9:3d:65:3e:b7:8c"
-
-      - run:
-          name: push to master
-          command: |
-            git push origin HEAD:master
-
-
-  build-py-36:
-    docker:
-      - image: gethue/hue:latest-py2 # Should be circleci/python:3.6 at some point
-
-    working_directory: ~/repo
-
+  build-py-36-common:
     steps:
       - checkout
 
@@ -241,13 +212,7 @@ jobs:
       #       - ./build/venv
       #     key: v1-dependencies-{{ checksum "esktop/core/requirements.txt" }}
 
-
-  build-py-38:
-    docker:
-      - image: gethue/hue:latest-py2 # Should be circleci/python:3.x at some point
-
-    working_directory: ~/repo
-
+  build-py-38-common:
     steps:
       - checkout
 
@@ -265,6 +230,62 @@ jobs:
             PYTHONWARNINGS=always ./build/env/bin/hue test unit --with-xunit --with-cover
 
 
+jobs:
+  build:
+    docker:
+      # specify the version you desire here
+      # - image: circleci/python:3.8.0
+      - image: gethue/hue:latest-py2
+
+      # Specify service dependencies here if necessary
+      # CircleCI maintains a library of pre-built images
+      # documented at https://circleci.com/docs/2.0/circleci-images/
+      # - image: circleci/postgres:9.4
+
+    working_directory: ~/repo
+
+    steps:
+      - build-common:
+          go_arch: "amd64"
+          hugo_arch: "64bit"
+
+  commit:
+    docker:
+      - image: circleci/python:3.8.0
+
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+
+      - add_ssh_keys:
+          fingerprints:
+            - "8c:68:29:28:04:80:38:31:c0:59:d9:3d:65:3e:b7:8c"
+
+      - run:
+          name: push to master
+          command: |
+            git push origin HEAD:master
+
+
+  build-py-36:
+    docker:
+      - image: gethue/hue:latest-py2 # Should be circleci/python:3.6 at some point
+
+    working_directory: ~/repo
+
+    steps:
+      - build-py-36-common
+
+  build-py-38:
+    docker:
+      - image: gethue/hue:latest-py2 # Should be circleci/python:3.6 at some point
+
+    working_directory: ~/repo
+
+    steps:
+      - build-py-38-common
+
 workflows:
   version: 2
   run-tests-and-rebase-master:
@@ -275,29 +296,10 @@ workflows:
               ignore:
                 - master
                 - py3-ci
-      - build-py-36:
-          filters:
-            branches:
-              ignore:
-                - master
-                - py3-ci
       - commit:
           requires:
             - build
-            - build-py-36
           filters:
             branches:
               only:
                 - /.*ci-commit-master.*/
-  build-python3:
-    jobs:
-      - build-py-38:
-          filters:
-            branches:
-              only:
-                - py3-ci
-      - build-py-36:
-          filters:
-            branches:
-              only:
-                - py3-ci

@@ -82,41 +82,40 @@ TableDefinitionRightPart_EDIT
      if (!$1 && !$2 && !$3 && !$4 && !$5 && !$6 && !$7 && !$8 && !$9 && !$10) {
        keywords.push({ value: 'LIKE', weight: 1 });
        keywords.push({ value: 'LIKE PARQUET', weight: 1 });
-     } else {
-       if (!$2 && !$3 && !$4 && !$5 && !$6 && !$7 && !$8 && !$9 && !$10) {
-         keywords.push({ value: 'PARTITIONED BY', weight: 12 });
-         keywords.push({ value: 'PARTITION BY', weight: 12 });
-       }
-       if (!$3 && !$4 && !$5 && !$6 && !$7 && !$8 && !$9 && !$10) {
-         keywords.push({ value: 'SORT BY', weight: 11 });
-       }
-       if (!$4 && !$5 && !$6 && !$7 && !$8 && !$9 && !$10) {
-         keywords.push({ value: 'COMMENT', weight: 10 });
-       }
-       if (!$5 && !$6 && !$7 && !$8 && !$9 && !$10) {
-         keywords.push({ value: 'ROW FORMAT', weight: 7 });
-       } else if ($5 && $5.suggestKeywords && !$6 && !$7 && !$8 && !$9 && !$10) {
-         keywords = keywords.concat(parser.createWeightedKeywords($5.suggestKeywords, 7));
-       }
-       if (!$6 && !$7 && !$8 && !$9 && !$10) {
-         keywords.push({ value: 'WITH SERDEPROPERTIES', weight: 6 });
-       }
-       if (!$7 && !$8 && !$9 && !$10) {
-         keywords.push({ value: 'STORED AS', weight: 5 });
-       }
-       if (!$8 && !$9 && !$10) {
-         keywords.push({ value: 'LOCATION', weight: 4 });
-       }
-       if (!$9 && !$10) {
-         keywords.push({ value: 'CACHED IN', weight: 3 }, { value: 'UNCACHED', weight: 3 });
-       } else if ($9 && $9.suggestKeywords && !$10) {
-         keywords = keywords.concat(parser.createWeightedKeywords($9.suggestKeywords, 3));
-       }
-       if (!$10) {
-         keywords.push({ value: 'TBLPROPERTIES', weight: 2 });
-       }
-       keywords.push({ value: 'AS', weight: 1 });
      }
+     if (!$2 && !$3 && !$4 && !$5 && !$6 && !$7 && !$8 && !$9 && !$10) {
+       keywords.push({ value: 'PARTITIONED BY', weight: 12 });
+       keywords.push({ value: 'PARTITION BY', weight: 12 });
+     }
+     if (!$3 && !$4 && !$5 && !$6 && !$7 && !$8 && !$9 && !$10) {
+       keywords.push({ value: 'SORT BY', weight: 11 });
+     }
+     if (!$4 && !$5 && !$6 && !$7 && !$8 && !$9 && !$10) {
+       keywords.push({ value: 'COMMENT', weight: 10 });
+     }
+     if (!$5 && !$6 && !$7 && !$8 && !$9 && !$10) {
+       keywords.push({ value: 'ROW FORMAT', weight: 7 });
+     } else if ($5 && $5.suggestKeywords && !$6 && !$7 && !$8 && !$9 && !$10) {
+       keywords = keywords.concat(parser.createWeightedKeywords($5.suggestKeywords, 7));
+     }
+     if (!$6 && !$7 && !$8 && !$9 && !$10) {
+       keywords.push({ value: 'WITH SERDEPROPERTIES', weight: 6 });
+     }
+     if (!$7 && !$8 && !$9 && !$10) {
+       keywords.push({ value: 'STORED AS', weight: 5 });
+     }
+     if (!$8 && !$9 && !$10) {
+       keywords.push({ value: 'LOCATION', weight: 4 });
+     }
+     if (!$9 && !$10) {
+       keywords.push({ value: 'CACHED IN', weight: 3 }, { value: 'UNCACHED', weight: 3 });
+     } else if ($9 && $9.suggestKeywords && !$10) {
+       keywords = keywords.concat(parser.createWeightedKeywords($9.suggestKeywords, 3));
+     }
+     if (!$10) {
+       keywords.push({ value: 'TBLPROPERTIES', weight: 2 });
+     }
+     keywords.push({ value: 'AS', weight: 1 });
 
      parser.suggestKeywords(keywords);
    }
@@ -161,6 +160,7 @@ OptionalPartitionedBy
 
 PartitionedBy
  : 'PARTITIONED' 'BY' ParenthesizedColumnSpecificationList
+ | 'PARTITIONED' 'BY' SpecClause
  | 'PARTITION' 'BY' HashClauses
  | 'PARTITION' 'BY' HashClauses ',' RangeClause
  | 'PARTITION' 'BY' RangeClause
@@ -183,6 +183,11 @@ PartitionedBy_EDIT
    }
  | 'PARTITIONED' 'BY' ParenthesizedColumnSpecificationList_EDIT
  | 'PARTITIONED' ParenthesizedColumnSpecificationList_EDIT
+ | 'PARTITIONED' 'BY' SpecClause_EDIT
+ | 'PARTITIONED' 'BY' 'CURSOR'
+   {
+     parser.suggestKeywords(['SPEC']);
+   }
  | 'PARTITION' 'CURSOR'
    {
      parser.suggestKeywords(['BY']);
@@ -236,6 +241,43 @@ RangeClause_EDIT
  | 'RANGE' ParenthesizedColumnList 'CURSOR'
  | 'RANGE' ParenthesizedColumnList ParenthesizedPartitionValuesList_EDIT
  | 'RANGE' ParenthesizedColumnList_EDIT ParenthesizedPartitionValuesList
+ ;
+
+SpecClause
+ : 'SPEC' ParenthesizedSpecList
+ ;
+
+SpecClause_EDIT
+ : 'SPEC' 'CURSOR'
+ | 'SPEC' ParenthesizedSpecList_EDIT
+ ;
+
+ParenthesizedSpecList
+ : '(' SpecList ')'
+ ;
+
+ParenthesizedSpecList_EDIT
+ : '(' 'CURSOR' RightParenthesisOrError
+   {
+     parser.suggestKeywords(['BUCKET', 'DAY', 'HOUR', 'IDENTITY', 'MONTH', 'TRUNCATE', 'YEAR', 'VOID' ]);
+   }
+ | '(' SpecList_EDIT RightParenthesisOrError
+ ;
+
+SpecList
+ : ArbitraryFunction
+ | SpecList ',' ArbitraryFunction
+ ;
+
+SpecList_EDIT
+ : SpecList ',' 'CURSOR'
+   {
+     parser.suggestKeywords(['BUCKET', 'DAY', 'HOUR', 'IDENTITY', 'MONTH', 'TRUNCATE', 'YEAR', 'VOID' ]);
+   }
+ | SpecList ',' 'CURSOR' ',' SpecList
+   {
+     parser.suggestKeywords(['BUCKET', 'DAY', 'HOUR', 'IDENTITY', 'MONTH', 'TRUNCATE', 'YEAR', 'VOID' ]);
+   }
  ;
 
 OptionalSortBy
@@ -389,6 +431,7 @@ StoredAs_EDIT
 
 FileFormat
  : 'AVRO'
+ | 'ICEBERG'
  | 'KUDU'
  | 'ORC'
  | 'PARQUET'

@@ -45,7 +45,7 @@ CreateMaterializedView_EDIT
    OptionalPartitionedOn OptionalClusteredOrDistributedOn OptionalRowFormat OptionalStoredAsOrBy OptionalHdfsLocation
    OptionalTblproperties 'CURSOR'
    {
-     parser.suggestKeywordsForOptionalsLR([undefined, $12, $11, $10, $9, $8, $7, $6, $5], [
+     var keywords = parser.getKeywordsForOptionalsLR([undefined, $12, $11, $10, $9, $8, $7, $6, $5], [
        { value: 'AS SELECT', weight: 1 },
        { value: 'TBLPROPERTIES', weight: 2 },
        { value: 'LOCATION', weight: 3 },
@@ -55,6 +55,13 @@ CreateMaterializedView_EDIT
        { value: 'COMMENT', weight: 7 },
        { value: 'DISABLE REWRITE', weight: 8 }
      ]);
+
+     if (!$13 && !$12 && $11 && $11.suggestKeywords) {
+       keywords = keywords.concat(parser.createWeightedKeywords($11.suggestKeywords, 4));
+     }
+     if (keywords.length) {
+       parser.suggestKeywords(keywords);
+     }
    }
  | 'CREATE' 'MATERIALIZED' 'VIEW' OptionalIfNotExists SchemaQualifiedIdentifier DisableRewrite_EDIT OptionalComment
    OptionalPartitionedOn OptionalClusteredOrDistributedOn OptionalRowFormat OptionalStoredAsOrBy OptionalHdfsLocation
