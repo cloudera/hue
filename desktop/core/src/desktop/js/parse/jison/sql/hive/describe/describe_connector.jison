@@ -14,11 +14,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-InsertValuesList
- : ParenthesizedRowValuesList
- | InsertValuesList ',' ParenthesizedRowValuesList
+DataDefinition
+ : DescribeConnectorStatement
  ;
 
-ParenthesizedRowValuesList
- : '(' InValueList ')'
+DataDefinition_EDIT
+ : DescribeConnectorStatement_EDIT
+ ;
+
+DescribeConnectorStatement
+ : 'DESCRIBE' 'CONNECTOR' OptionalExtended RegularOrBacktickedIdentifier
+ ;
+
+DescribeConnectorStatement_EDIT
+ : 'DESCRIBE' 'CONNECTOR' OptionalExtended 'CURSOR'
+   {
+     if (!$3) {
+       parser.suggestKeywords(['EXTENDED']);
+     }
+   }
+ | 'DESCRIBE' 'CONNECTOR' OptionalExtended 'CURSOR' RegularOrBacktickedIdentifier
+   {
+     if (!$3) {
+       parser.suggestKeywords(['EXTENDED']);
+     }
+   }
  ;

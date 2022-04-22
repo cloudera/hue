@@ -47,6 +47,18 @@ describe('hiveAutocompleteParser.js INSERT statements', () => {
       });
     });
 
+    it('should handle "INSERT OVERWRITE TABLE target SELECT * FROM source; |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'INSERT OVERWRITE TABLE target SELECT * FROM source; ',
+        afterCursor: '',
+        noErrors: true,
+        containsKeywords: ['SELECT'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
     it('should suggest keywords for "|"', () => {
       assertAutoComplete({
         beforeCursor: '',

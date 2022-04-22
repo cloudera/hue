@@ -160,11 +160,14 @@
 'COLLECTION'                         { return 'COLLECTION'; }
 'COLUMNS'                            { return 'COLUMNS'; }
 'COMMENT'                            { return 'COMMENT'; }
+'CONNECTOR'                          { return 'CONNECTOR'; }
+'CONNECTORS'                         { return 'CONNECTORS'; }
 'COMPACT'                            { return 'COMPACT'; }
 'COMPACTIONS'                        { return 'COMPACTIONS'; }
 'COMPUTE'                            { return 'COMPUTE'; }
 'CONCATENATE'                        { return 'CONCATENATE'; }
 'COST'                               { return 'COST'; }
+CREATE\s+REMOTE                      { parser.determineCase(yytext); return 'CREATE_REMOTE'; }
 'CRON'                               { return 'CRON'; }
 'CURRENT_DATE'                       { return 'CURRENT_DATE'; }
 'CURRENT_TIMESTAMP'                  { return 'CURRENT_TIMESTAMP'; }
@@ -173,6 +176,7 @@
 'DATABASES'                          { return 'DATABASES'; }
 'DAY'                                { return 'DAY'; }
 'DAYOFWEEK'                          { return 'DAYOFWEEK'; }
+'DCPROPERTIES'                       { return 'DCPROPERTIES'; }
 'DBPROPERTIES'                       { return 'DBPROPERTIES'; }
 'DEFAULT'                            { return 'DEFAULT'; }
 'DEFERRED'                           { return 'DEFERRED'; }
@@ -205,6 +209,7 @@ DOUBLE\s+PRECISION                   { return 'DOUBLE_PRECISION'; }
 'FORMATTED'                          { return 'FORMATTED'; }
 'FUNCTIONS'                          { return 'FUNCTIONS'; }
 'HOUR'                               { return 'HOUR'; }
+'ICEBERG'                            { return 'ICEBERG'; }
 'IDXPROPERTIES'                      { return 'IDXPROPERTIES'; }
 'INDEX'                              { return 'INDEX'; }
 'INDEXES'                            { return 'INDEXES'; }
@@ -259,6 +264,7 @@ OVERWRITE\s+DIRECTORY                { this.begin('hdfs'); return 'OVERWRITE_DIR
 'RECOVER'                            { return 'RECOVER'; }
 'RELOAD'                             { parser.determineCase(yytext); return 'RELOAD'; }
 'RELY'                               { return 'RELY'; }
+'REMOTE'                             { return 'REMOTE'; }
 'RENAME'                             { return 'RENAME'; }
 'REPAIR'                             { return 'REPAIR'; }
 'REPLACE'                            { return 'REPLACE'; }
@@ -281,6 +287,7 @@ OVERWRITE\s+DIRECTORY                { this.begin('hdfs'); return 'OVERWRITE_DIR
 'SKEWED'                             { return 'SKEWED'; }
 'SORT'                               { return 'SORT'; }
 'SORTED'                             { return 'SORTED'; }
+'SPEC'                               { return 'SPEC'; }
 'STATISTICS'                         { return 'STATISTICS'; }
 'STORED'                             { return 'STORED'; }
 STORED\s+AS\s+DIRECTORIES            { return 'STORED_AS_DIRECTORIES'; }
@@ -297,10 +304,12 @@ STORED\s+AS\s+DIRECTORIES            { return 'STORED_AS_DIRECTORIES'; }
 'TOUCH'                              { return 'TOUCH'; }
 'TRANSACTIONAL'                      { return 'TRANSACTIONAL'; }
 'TRANSACTIONS'                       { return 'TRANSACTIONS'; }
+'TYPE'                               { return 'TYPE'; }
 'UNARCHIVE'                          { return 'UNARCHIVE'; }
 'UNIONTYPE'                          { return 'UNIONTYPE'; }
 'UNIQUE'                             { return 'UNIQUE'; }
 'UNSET'                              { return 'UNSET'; }
+'URL'                                { return 'URL'; }
 'USE'                                { parser.determineCase(yytext); parser.addStatementTypeLocation('USE', yylloc); return 'USE'; }
 'VECTORIZATION'                      { return 'VECTORIZATION'; }
 'VIEW'                               { return 'VIEW'; }

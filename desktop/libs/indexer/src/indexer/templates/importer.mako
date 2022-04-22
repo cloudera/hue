@@ -237,7 +237,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
           <div data-bind="visible: createWizard.source.inputFormat() == 'localfile'">
               <form method="post" action="" enctype="multipart/form-data" id="uploadform">
                 <div >
-                    <input type="file" id="inputfile" name="inputfile" style="margin-left: 130px" accept=".csv, .xlsx">
+                    <input type="file" id="inputfile" name="inputfile" style="margin-left: 130px" accept=".csv, .xlsx, .xls">
                 </div>
             </form>
           </div>
@@ -1836,6 +1836,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
 
       // File
       self.path = ko.observable('');
+      self.file_type = ko.observable('');
       self.path.subscribe(function(val) {
         if (val) {
           wizard.guessFormat();
@@ -3245,6 +3246,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
             processData:false,
             success:function (response) {
               viewModel.createWizard.source.path(response['local_file_url']);
+              viewModel.createWizard.source.file_type(response['file_type']);
             }
           });
         }
