@@ -288,7 +288,7 @@ class LdapConnection(object):
             LOG.warning('Could not find %s in ldap attributes' % group_name_attr)
             continue
 
-          group_name = data[group_name_attr][0]
+          group_name = smart_str(data[group_name_attr][0])
           if desktop.conf.LDAP.FORCE_USERNAME_LOWERCASE.get():
             group_name = group_name.lower()
           elif desktop.conf.LDAP.FORCE_USERNAME_UPPERCASE.get():
@@ -351,7 +351,7 @@ class LdapConnection(object):
       user_filter = '(' + user_filter + ')'
 
     # Allow wild cards on non distinguished names
-    sanitized_name = ldap.filter.escape_filter_chars(username_pattern).replace(r'\2a', r'*')
+    sanitized_name = ldap.filter.escape_filter_chars(smart_str(username_pattern)).replace(r'\2a', r'*')
     # Fix issue where \, is converted to \5c,
     sanitized_name = sanitized_name.replace(r'\5c,', r'\2c')
 
