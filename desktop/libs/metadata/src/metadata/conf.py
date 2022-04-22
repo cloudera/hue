@@ -331,7 +331,7 @@ CATALOG = ConfigSection(
     ENABLE_BASIC_SEARCH=Config(
       key="enable_basic_search",
       help=_t("Limits found entities to a specific cluster."),
-      default=False,
+      default=True,
       type=coerce_bool
     ),
     FETCH_SIZE_SEARCH_INTERACTIVE=Config(
