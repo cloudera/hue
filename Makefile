@@ -140,7 +140,7 @@ else ifeq ($(PYTHON_VER),python3.8)
 	@$(SYS_PIP) install virtualenv
 	@virtualenv $(BLD_DIR_ENV)
 endif
-	@echo "--- Virtual environment $(SYS_PYTHON) $(BLD_DIR_ENV) ready"
+	@echo "--- Virtual environment $(BLD_DIR_ENV) ready"
 	@touch $@
 
 ###################################
