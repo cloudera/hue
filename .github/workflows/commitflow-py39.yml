@@ -44,6 +44,11 @@ jobs:
         sudo apt-get install -y libncursesw5-dev libgdbm-dev libc6-dev libssl-dev openssl libffi-dev
 
         export PYTHON_VER=python3.9
+
+        python3.9 -m pip install --upgrade pip
+        pip3.9 install virtualenv
+        virtualenv ./build/env
+        
         make apps
 
     - name: run tests
