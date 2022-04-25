@@ -50,6 +50,7 @@ jobs:
         virtualenv ./build/env
         
         make apps
+        ./build/env/bin/hue migrate
 
     - name: run tests
       run: |
