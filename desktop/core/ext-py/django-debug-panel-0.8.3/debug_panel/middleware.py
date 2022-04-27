@@ -41,11 +41,10 @@ class DebugPanelMiddleware(debug_toolbar.middleware.DebugToolbarMiddleware):
         Otherwise we fallback to the default debug_toolbar middleware.
         """
 
-        res = super(DebugPanelMiddleware, self).process_request(request)
         try:
             res = resolve(request.path, urlconf=debug_panel.urls)
         except Resolver404:
-            return res
+            return super(DebugPanelMiddleware, self).process_request(request)
 
         return res.func(request, *res.args, **res.kwargs)
 

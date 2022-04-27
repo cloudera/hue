@@ -735,8 +735,9 @@ def show_toolbar(request):
   return DEBUG and desktop.conf.ENABLE_DJANGO_DEBUG_TOOL.get() and is_user_allowed
 
 if DEBUG and desktop.conf.ENABLE_DJANGO_DEBUG_TOOL.get():
-  idx = MIDDLEWARE.index('desktop.middleware.ClusterMiddleware')
-  MIDDLEWARE.insert(idx + 1, 'debug_panel.middleware.DebugPanelMiddleware')
+  idx = MIDDLEWARE_CLASSES.index('desktop.middleware.ClusterMiddleware')
+  MIDDLEWARE_CLASSES.insert(idx + 1, 'debug_toolbar.middleware.DebugToolbarMiddleware')
+  MIDDLEWARE_CLASSES.insert(idx + 2, 'debug_panel.middleware.DebugPanelMiddleware')
 
   INSTALLED_APPS += (
       'debug_toolbar',
@@ -759,7 +760,6 @@ if DEBUG and desktop.conf.ENABLE_DJANGO_DEBUG_TOOL.get():
   ]
 
   DEBUG_TOOLBAR_CONFIG = {
-      'JQUERY_URL': os.path.join(STATIC_ROOT, 'desktop/ext/js/jquery/jquery-2.2.4.min.js'),
       'RESULTS_CACHE_SIZE': 200,
       'SHOW_TOOLBAR_CALLBACK': show_toolbar
   }
