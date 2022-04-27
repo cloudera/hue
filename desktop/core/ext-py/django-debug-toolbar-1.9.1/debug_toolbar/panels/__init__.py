@@ -93,7 +93,7 @@ class Panel(object):
         template's context.
         """
         if self.has_content:
-            return render_to_string(self.template, self.get_stats(), using='django')
+            return render_to_string(self.template, self.get_stats())
 
     # URLs for panel-specific views
 

@@ -30,7 +30,7 @@ def sql_select(request):
             'alias': form.cleaned_data['alias'],
         }
         # Using SimpleTemplateResponse avoids running global context processors.
-        return SimpleTemplateResponse('debug_toolbar/panels/sql_select.html', context, using='django')
+        return SimpleTemplateResponse('debug_toolbar/panels/sql_select.html', context)
     return HttpResponseBadRequest('Form errors')
 
 
@@ -67,7 +67,7 @@ def sql_explain(request):
             'alias': form.cleaned_data['alias'],
         }
         # Using SimpleTemplateResponse avoids running global context processors.
-        return SimpleTemplateResponse('debug_toolbar/panels/sql_explain.html', context, using='django')
+        return SimpleTemplateResponse('debug_toolbar/panels/sql_explain.html', context)
     return HttpResponseBadRequest('Form errors')
 
 
@@ -114,5 +114,5 @@ def sql_profile(request):
             'alias': form.cleaned_data['alias'],
         }
         # Using SimpleTemplateResponse avoids running global context processors.
-        return SimpleTemplateResponse('debug_toolbar/panels/sql_profile.html', context, using='django')
+        return SimpleTemplateResponse('debug_toolbar/panels/sql_profile.html', context)
     return HttpResponseBadRequest('Form errors')

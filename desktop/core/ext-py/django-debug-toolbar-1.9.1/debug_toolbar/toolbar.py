@@ -61,7 +61,7 @@ class DebugToolbar(object):
             self.store()
         try:
             context = {'toolbar': self}
-            return render_to_string('debug_toolbar/base.html', context, using='django')
+            return render_to_string('debug_toolbar/base.html', context)
         except TemplateSyntaxError:
             if not apps.is_installed('django.contrib.staticfiles'):
                 raise ImproperlyConfigured(

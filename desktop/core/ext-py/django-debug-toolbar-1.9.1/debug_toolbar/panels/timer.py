@@ -48,7 +48,7 @@ class TimerPanel(Panel):
             (_("Elapsed time"), _("%(total_time)0.3f msec") % stats),
             (_("Context switches"), _("%(vcsw)d voluntary, %(ivcsw)d involuntary") % stats),
         )
-        return render_to_string(self.template, {'rows': rows}, using='django')
+        return render_to_string(self.template, {'rows': rows})
 
     def process_request(self, request):
         self._start_time = time.time()

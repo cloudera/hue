@@ -19,15 +19,16 @@
                 } else {
                     $('.djdt-panelContent').hide(); // Hide any that are already open
                     var inner = current.find('.djDebugPanelContent .djdt-scroll'),
-                        store_id = $('#djDebug').data('store-id');
-                    if (store_id && inner.children().length === 0) {
+                        store_id = $('#djDebug').data('store-id'),
+                        render_panel_url = $('#djDebug').data('render-panel-url');
+                    if (store_id !== '' && inner.children().length === 0) {
                         var ajax_data = {
                             data: {
                                 store_id: store_id,
                                 panel_id: this.className
                             },
                             type: 'GET',
-                            url: $('#djDebug').data('render-panel-url')
+                            url: render_panel_url
                         };
                         $.ajax(ajax_data).done(function(data){
                             inner.prev().remove();  // Remove AJAX loader
@@ -63,16 +64,16 @@
 
                 if (name == 'button') {
                     var form = self.parents('form:eq(0)');
-                    ajax_data.url = self.attr('formaction');
+                    ajax_data['url'] = self.attr('formaction');
 
                     if (form.length) {
-                        ajax_data.data = form.serialize();
-                        ajax_data.type = form.attr('method') || 'POST';
+                        ajax_data['data'] = form.serialize();
+                        ajax_data['type'] = form.attr('method') || 'POST';
                     }
                 }
 
                 if (name == 'a') {
-                    ajax_data.url = self.attr('href');
+                    ajax_data['url'] = self.attr('href');
                 }
 
                 $.ajax(ajax_data).done(function(data){
@@ -140,13 +141,13 @@
                     // due to djdt.handleDragged being set to true.
                     if (djdt.handleDragged || event.pageY != startPageY) {
                         var top = baseY + event.clientY;
-
+                        
                         if (top < 0) {
                             top = 0;
                         } else if (top + handle.height() > windowHeight) {
                             top = windowHeight - handle.height();
                         }
-
+                        
                         handle.css({top: top});
                         djdt.handleDragged = true;
                     }
@@ -212,13 +213,11 @@
             $('#djDebugToolbar li').removeClass('djdt-active');
             // finally close toolbar
             $('#djDebugToolbar').hide('fast');
-            handle = $('#djDebugToolbarHandle');
-            handle.show();
+            $('#djDebugToolbarHandle').show();
             // set handle position
             var handleTop = djdt.cookie.get('djdttop');
             if (handleTop) {
-                handleTop = Math.min(handleTop, window.innerHeight - handle.outerHeight() - 10);
-                handle.css({top: handleTop + 'px'});
+                $('#djDebugToolbarHandle').css({top: handleTop + 'px'});
             }
             // Unbind keydown
             $(document).unbind('keydown.djDebug');
