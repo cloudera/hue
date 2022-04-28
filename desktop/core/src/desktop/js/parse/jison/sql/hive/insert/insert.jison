@@ -86,7 +86,7 @@ InsertStatement_EDIT
  ;
 
 InsertWithoutQuery
- : 'INSERT' 'INTO' OptionalTable SchemaQualifiedTableIdentifier OptionalPartitionSpec 'VALUES' InsertValuesList
+ : 'INSERT' 'INTO' OptionalTable SchemaQualifiedTableIdentifier OptionalPartitionSpec ValuesClause
    {
      $4.owner = 'insert';
      parser.addTablePrimary($4);

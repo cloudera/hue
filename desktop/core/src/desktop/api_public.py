@@ -88,7 +88,7 @@ def execute(request, dialect=None):
 
     data = {
       'notebook': '{"type":"query-%(interpreter)s","snippets":[{"id":%(interpreter_id)s,"statement_raw":"",'
-        '"type":"%(interpreter)s","status":"","variables":[]}],'
+        '"type":"%(interpreter)s","status":"","variables":[],"properties":{}}],'
         '"name":"","isSaved":false,"sessions":[]}' % params,
       'snippet': '{"id":%(interpreter_id)s,"type":"%(interpreter)s","result":{},"statement":"%(statement)s","properties":{}}' % params
     }
@@ -208,6 +208,11 @@ def storage_download(request, path):
 def storage_upload_file(request):
   django_request = get_django_request(request)
   return filebrowser_views.upload_file(django_request)
+
+@api_view(["POST"])
+def storage_mkdir(request):
+  django_request = get_django_request(request)
+  return filebrowser_views.mkdir(django_request)
 
 
 # Importer

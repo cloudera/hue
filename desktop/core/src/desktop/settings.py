@@ -37,6 +37,7 @@ from desktop.lib.python_util import force_dict_to_strings
 
 from aws.conf import is_enabled as is_s3_enabled
 from azure.conf import is_abfs_enabled
+from indexer.conf import ENABLE_DIRECT_UPLOAD
 
 if sys.version_info[0] > 2:
   from django.utils.translation import gettext_lazy as _
@@ -117,6 +118,8 @@ USE_TZ = False
 # Examples: "http://media.lawrence.com/media/", "http://example.com/media/"
 MEDIA_URL = ''
 
+if ENABLE_DIRECT_UPLOAD:
+  DATA_UPLOAD_MAX_MEMORY_SIZE = 67108864  # Setting this variable to 64MB as we are sending long POST requests
 
 ############################################################
 # Part 3: Django configuration
@@ -148,6 +151,7 @@ MIDDLEWARE = [
     'desktop.middleware.MetricsMiddleware',
     'desktop.middleware.EnsureSafeMethodMiddleware',
     'desktop.middleware.AuditLoggingMiddleware',
+    'desktop.middleware.MultipleProxyMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -336,7 +340,8 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': desktop.conf.AUTH.API_AUTH.get()
 }
-if desktop.conf.AUTH.JWT.IS_ENABLED.get() and 'desktop.auth.api_authentications.JwtAuthentication' not in REST_FRAMEWORK['DEFAULT_AUTHENTICATION_CLASSES']:
+if desktop.conf.AUTH.JWT.IS_ENABLED.get() and \
+  'desktop.auth.api_authentications.JwtAuthentication' not in REST_FRAMEWORK['DEFAULT_AUTHENTICATION_CLASSES']:
   REST_FRAMEWORK['DEFAULT_AUTHENTICATION_CLASSES'].insert(0, 'desktop.auth.api_authentications.JwtAuthentication')
 
 SIMPLE_JWT = {
@@ -378,7 +383,7 @@ EMAIL_SUBJECT_PREFIX = 'Hue %s - ' % desktop.conf.CLUSTER_ID.get()
 # Permissive CORS for public /api
 INSTALLED_APPS.append('corsheaders')
 MIDDLEWARE.insert(0, 'corsheaders.middleware.CorsMiddleware')
-CORS_URLS_REGEX = r'^/api/.*$'
+CORS_URLS_REGEX = r'^/api/.*$|/saml2/login/'
 CORS_ALLOW_CREDENTIALS = True
 if sys.version_info[0] > 2:
   CORS_ALLOW_ALL_ORIGINS = True
@@ -463,6 +468,7 @@ if desktop.conf.TASK_SERVER.ENABLED.get():
 SESSION_COOKIE_NAME = desktop.conf.SESSION.COOKIE_NAME.get()
 SESSION_COOKIE_AGE = desktop.conf.SESSION.TTL.get()
 SESSION_COOKIE_SECURE = desktop.conf.SESSION.SECURE.get()
+SECURE_REFERRER_POLICY = None
 SESSION_EXPIRE_AT_BROWSER_CLOSE = desktop.conf.SESSION.EXPIRE_AT_BROWSER_CLOSE.get()
 
 # HTTP only

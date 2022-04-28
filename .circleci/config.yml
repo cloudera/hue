@@ -352,16 +352,9 @@ workflows:
               ignore:
                 - master
                 - py3-ci
-      - build-py-36:
-          filters:
-            branches:
-              ignore:
-                - master
-                - py3-ci
       - commit:
           requires:
             - build
-            - build-py-36
           filters:
             branches:
               only:
@@ -390,3 +383,4 @@ workflows:
       - build-arm64
       - build-py-36-arm64
       - build-py-38-arm64
+

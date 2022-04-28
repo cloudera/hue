@@ -34,6 +34,8 @@ else:
 
 
 def test_xlsx_local_file_upload():
+  if sys.version_info[0] < 3:
+    raise SkipTest
 
   csv_file = '''test 1,test.2,test_3,test_4
 2010-10-10 00:00:00,2012-10-11 01:00:00,30,
@@ -113,7 +115,8 @@ def test_guess_format_excel_remote_file():
       with patch('indexer.api3.MorphlineIndexer') as MorphlineIndexer:
         file_format = {
           'inputFormat': 'file',
-          'path': 's3a://gethue/example1.xlsx'
+          'path': 's3a://gethue/example1.xlsx',
+          'file_type': ''
         }
         file_format = json.dumps(file_format)
         request = Mock(

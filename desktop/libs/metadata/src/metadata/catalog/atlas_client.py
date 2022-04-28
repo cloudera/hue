@@ -72,7 +72,7 @@ class AtlasApi(Api):
     atlas_servers = CATALOG.API_URL.get().replace("%20", "").replace("['", "").replace("']", "").replace("'", "").split(',')
 
     for atlas_server in atlas_servers:
-      atlas_url = atlas_server + 'api/atlas/admin/status'
+      atlas_url = atlas_server.strip().strip('/') + '/api/atlas/admin/status'
       response = requests.get(atlas_url)
       atlas_is_active = response.json()
 
@@ -191,8 +191,13 @@ class AtlasApi(Api):
     }
 
     try:
-      atlas_response = self._root.get('/v2/search/dsl?query=%s' % dsl_query, headers=self.__headers,
-                                      params=self.__params)
+      if CATALOG.ENABLE_BASIC_SEARCH.get():
+        atlas_response = self._root.get('/v2/search/basic?query=%s' % dsl_query, headers=self.__headers,
+                                       params=self.__params)
+      else:
+        atlas_response = self._root.get('/v2/search/dsl?query=%s' % dsl_query, headers=self.__headers,
+                                       params=self.__params)
+
       if not 'entities' in atlas_response or len(atlas_response['entities']) < 1:
         raise CatalogEntityDoesNotExistException('Could not find entity with query: %s' % dsl_query)
 
@@ -370,7 +375,10 @@ class AtlasApi(Api):
         else:
           atlas_dsl_query = 'from %s where qualifiedName like \'%s*\' limit %s' % (atlas_type, parentPath, limit)
 
-      atlas_response = self._root.get('/v2/search/dsl?query=%s' % atlas_dsl_query)
+      if CATALOG.ENABLE_BASIC_SEARCH.get():
+        atlas_response = self._root.get('/v2/search/basic?query=%s' % atlas_dsl_query)
+      else:
+        atlas_response = self._root.get('/v2/search/dsl?query=%s' % atlas_dsl_query)
 
       # Adapt Atlas entities to Navigator structure in the results
       if 'entities' in atlas_response:

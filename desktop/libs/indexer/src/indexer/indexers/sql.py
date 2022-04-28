@@ -315,6 +315,7 @@ class SQLIndexer(object):
     columns = [col for col_index, col in enumerate(destination['columns']) if col_index not in cols_to_remove]
 
     dialect = get_interpreter(source_type, self.user)['dialect']
+    tmp_table_name = table_name
 
     if dialect in ('hive', 'mysql'):
 
@@ -331,10 +332,11 @@ class SQLIndexer(object):
       }
 
     elif dialect == 'impala':
-      sql = '''CREATE TABLE IF NOT EXISTS %(database)s.%(table_name)s_tmp (
+      tmp_table_name = tmp_table_name + '_tmp'
+      sql = '''CREATE TABLE IF NOT EXISTS %(database)s.%(table_name)s (
 %(columns)s);\n''' % {
           'database': database,
-          'table_name': table_name,
+          'table_name': tmp_table_name,
           'columns': ',\n'.join(['  `%(name)s` string' % col for col in columns]),
       }                                                 # Impala does not implicitly cast between string and numeric or Boolean types.
 
@@ -355,23 +357,30 @@ class SQLIndexer(object):
           _csv_rows.append(tuple(row))
 
         if _csv_rows:
-          csv_rows = str(_csv_rows)[1:-1]
 
-          if dialect in ('hive', 'mysql'):
-            sql += '''\nINSERT INTO %(database)s.%(table_name)s VALUES %(csv_rows)s;\n'''% {
+          insert_sql = ""
+          for count in range(1 + len(_csv_rows)//5000):      # Inserting 5000 (decided through testing on some files) rows through one sql
+            temp_list = _csv_rows[count*5000:(count+1)*5000] # statement as we can get memory issue if we insert all rows in one statement.
+            if len(temp_list) == 0:
+              break
+            csv_rows = str(temp_list)[1:-1]
+            insert_sql += '''\nINSERT INTO %(database)s.%(table_name)s VALUES %(csv_rows)s;\n'''% {
               'database': database,
-              'table_name': table_name,
+              'table_name': tmp_table_name,
               'csv_rows': csv_rows
             }
+
+          if dialect in ('hive', 'mysql'):
+            sql += insert_sql
+
           elif dialect == 'impala':
              # casting from string to boolean is not allowed in impala so string -> int -> bool
             sql_ = ',\n'.join([
               '  CAST ( `%(name)s` AS %(type)s ) `%(name)s`' % col if col['type'] != 'boolean' \
               else '  CAST ( CAST ( `%(name)s` AS TINYINT ) AS boolean ) `%(name)s`' % col for col in columns
             ])
-
-            sql += '''\nINSERT INTO %(database)s.%(table_name)s_tmp VALUES %(csv_rows)s;\n
-CREATE TABLE IF NOT EXISTS %(database)s.%(table_name)s
+            sql += insert_sql
+            sql += '''\nCREATE TABLE IF NOT EXISTS %(database)s.%(table_name)s
 AS SELECT\n%(sql_)s\nFROM  %(database)s.%(table_name)s_tmp;\n\nDROP TABLE IF EXISTS %(database)s.%(table_name)s_tmp;'''% {
               'database': database,
               'table_name': table_name,

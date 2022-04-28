@@ -353,7 +353,7 @@ We can choose a dialect for `doc_type` e.g. impala, mysql, hive, phoenix, etc.
 
 ## File Browsing
 
-Hue's [File Browser](https://docs.gethue.com/user/browsing/#data) offer uploads, downloads, operations (create, delete, chmod...) and listing of data in HDFS (hdfs:// or no prefix), S3 (s3a:// prefix), ADLS (adls:// or abfs:// prefixes) storages.
+Hue's [File Browser](https://docs.gethue.com/user/browsing/#data) offer uploads, downloads, operations (create, delete, chmod...) and listing of data in HDFS (`hdfs://` or no prefix), S3 (`s3a://` prefix), ADLS (`adls://` or `abfs://` prefixes) storages.
 
 ### Get Filesystems
 
@@ -478,8 +478,17 @@ Upload a local file to a remote destination folder:
 
     curl -X POST https://demo.gethue.com/api/storage/upload/file?dest=s3a://demo-gethue/web_log_data/ --form hdfs_file=@README.md
 
-- dest: folder path will be created if it does not exist yet
-- hdfs_file: relative or absolute path to a file. It should be read more like `local_file`, it is not related to HDFS
+- **dest:** folder path will be created if it does not exist yet
+- **hdfs_file:** relative or absolute path to a file. It should be read more like `local_file`, it is not related to HDFS
+
+### Create Directory
+
+Create a directory at a specific path:
+
+    curl -X POST https://demo.gethue.com/api/storage/mkdir
+    
+- **name:** name of the directory
+- **path:** specific path where user wants to create the directory
 
 ## Data Importer
 

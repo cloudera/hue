@@ -11,6 +11,8 @@ RUN apt-get update -y && apt-get install -y \
   libsasl2-modules-gssapi-mit \
   libsasl2-dev \
   libkrb5-dev \
+  krb5-config \
+  krb5-user \
   libxml2-dev \
   libxslt-dev \
   libmysqlclient-dev \

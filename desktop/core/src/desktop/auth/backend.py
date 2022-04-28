@@ -873,13 +873,16 @@ class OIDCBackend(OIDCAuthenticationBackend):
         return None
       username = default_username_algo(email)
 
-    return self.UserModel.objects.create_user(
-        username=username,
-        email=email,
-        first_name=first_name,
-        last_name=last_name,
-        is_superuser=self.is_hue_superuser(claims)
+    user = self.UserModel.objects.create_user(
+      username=username,
+      email=email,
+      first_name=first_name,
+      last_name=last_name,
+      is_superuser=self.is_hue_superuser(claims)
     )
+
+    ensure_has_a_group(user)
+    return user
 
   def get_or_create_user(self, access_token, id_token, verified_id):
     user = super(OIDCBackend, self).get_or_create_user(access_token, id_token, verified_id)

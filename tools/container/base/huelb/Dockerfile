@@ -1,4 +1,4 @@
-FROM registry.access.redhat.com/ubi7/ubi as base-ubi-7
+FROM registry.access.redhat.com/ubi8/ubi as base-ubi-8
 
 LABEL description="Hue Project https://github.com/cloudera/hue"
 
@@ -11,7 +11,9 @@ RUN set -eux; \
         httpd \
         httpd-tools \
         gettext \
-        nmap-ncat
+        nmap-ncat && \
+      yum clean all -y && \
+      rm -rf /var/cache/yum
 
 # kubernetes pod health check
 COPY healthz.sh /

@@ -237,7 +237,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
           <div data-bind="visible: createWizard.source.inputFormat() == 'localfile'">
               <form method="post" action="" enctype="multipart/form-data" id="uploadform">
                 <div >
-                    <input type="file" id="inputfile" name="inputfile" style="margin-left: 130px" accept=".csv, .xlsx">
+                    <input type="file" id="inputfile" name="inputfile" style="margin-left: 130px" accept=".csv, .xlsx, .xls">
                 </div>
             </form>
           </div>
@@ -1836,6 +1836,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
 
       // File
       self.path = ko.observable('');
+      self.file_type = ko.observable('');
       self.path.subscribe(function(val) {
         if (val) {
           wizard.guessFormat();
@@ -3233,8 +3234,8 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
         var files = $('#inputfile')[0].files[0];
         fd.append('file', files);
         var file_size = files.size;
-        if (file_size > 200000) {
-          $.jHueNotify.warn("${ _('File size exceeds the supported size (200 KB).') }");
+        if (file_size > 10485760) {
+          $.jHueNotify.warn("${ _('File size exceeds the supported size (10 MB). Please use the S3, ABFS or HDFS browser to upload files.') }");
         } else {
           $.ajax({
             url:"/indexer/api/indexer/upload_local_file",
@@ -3245,6 +3246,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
             processData:false,
             success:function (response) {
               viewModel.createWizard.source.path(response['local_file_url']);
+              viewModel.createWizard.source.file_type(response['file_type']);
             }
           });
         }
