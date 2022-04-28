@@ -218,6 +218,11 @@ class TestSparkApi(object):
         'meta': 'test_meta'
       }
     )
+    self.api.create_session = Mock(
+      return_value={
+        'id': 'test_id'
+      }
+    )
 
     response = self.api.get_sample_data(snippet, 'test_db', 'test_table', 'test_column')
 
