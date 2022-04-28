@@ -204,7 +204,8 @@ def get_query_server_config(name='beeswax', connector=None):
           hiveservers = get_zk_hs2()
           LOG.debug("Available Hive Servers: {0}".format(hiveservers))
           if not hiveservers:
-            raise PopupException(_('There is no running Hive server available'))
+            LOG.error('There are no running Hive server available')
+            raise PopupException(_('There are no running Hive server available'))
           server_to_use = 0
           LOG.debug("Selected Hive server {0}: {1}".format(server_to_use, hiveservers[server_to_use]))
           cache.set(
@@ -222,7 +223,7 @@ def get_query_server_config(name='beeswax', connector=None):
         if HIVE_DISCOVERY_HS2.get():
           # Replace ActiveEndpoint if the current HS2 is down
           hiveservers = get_zk_hs2()
-          if hiveservers is not None:
+          if hiveservers:
             server_to_use = 0
             hs2_host_name = hiveservers[server_to_use].split(";")[0].split("=")[1].split(":")[0]
             hs2_in_active_endpoint = hs2_host_name in activeEndpoint
@@ -240,6 +241,9 @@ def get_query_server_config(name='beeswax', connector=None):
                   "port": hiveservers[server_to_use].split(";")[0].split("=")[1].split(":")[1]
                 })
               )
+          else:
+            LOG.error('Currently there are no HiveServer2 running')
+            raise PopupException(_('Currently there are no HiveServer2 running'))
 
       activeEndpoint = json.loads(cache.get("hiveserver2"))
 
