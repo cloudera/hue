@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import SidePanelViewModel from './SidePanelViewModel';
+import SidePanelViewModel from './sidePanelViewModel';
 import huePubSub from 'utils/huePubSub';
 import { BOTH_ASSIST_TOGGLE_EVENT } from 'ko/components/assist/events';
 import hueAnalytics from 'utils/hueAnalytics';
