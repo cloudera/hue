@@ -370,20 +370,10 @@ workflows:
       - build-py-38:
           filters:
             branches:
-              only:
-                - py3-ci
+              ignore:
+                - master
       - build-py-38-arm64:
           filters:
             branches:
-              only:
-                - py3-ci
-      - build-py-36:
-          filters:
-            branches:
-              only:
-                - py3-ci      
-      - build-py-36-arm64:
-          filters:
-            branches:
-              only:
-                - py3-ci
+              ignore:
+                - master  
