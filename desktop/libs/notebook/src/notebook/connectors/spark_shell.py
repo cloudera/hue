@@ -123,7 +123,10 @@ class SparkApi(Api):
     session_key = self._get_session_key()
 
     if SESSIONS.get(session_key):
-      return SESSIONS[session_key]
+      # Checking if the session is actually present to avoid stale value
+      session_present = api.get_session(SESSIONS[session_key]['id'])
+      if session_present:
+        return SESSIONS[session_key]
 
     if not properties and USE_DEFAULT_CONFIGURATION.get():
       user_config = DefaultConfiguration.objects.get_configuration_for_user(app='spark', user=self.user)
@@ -307,7 +310,7 @@ class SparkApi(Api):
         if e.code == 404 or e.code == 500: # TODO remove the 500
           raise SessionExpired(e)
       finally:
-        if SESSIONS.get(session_key):
+        if SESSIONS.get(session_key) and session['id'] == SESSIONS[session_key]['id']:
           del SESSIONS[session_key]
     else:
       return {'status': -1}
@@ -329,6 +332,11 @@ class SparkApi(Api):
     # we could implement this by introducing an API cache per user similarly to SqlAlchemy.
     api = self.get_api()
     session_key = self._get_session_key()
+
+    # Trying to close unused sessions if there are any.
+    # Calling the method here since this /autocomplete call can be frequent enough and we dont need dedicated one.
+    if SESSIONS.get(session_key):
+      self._close_unused_sessions()
     
     session = SESSIONS[session_key] if SESSIONS.get(session_key) else self.create_session(snippet.get('type'))
 
@@ -348,6 +356,19 @@ class SparkApi(Api):
       ]
 
     return response
+
+
+  def _close_unused_sessions(self):
+    '''
+    Closes all unsused Livy sessions for a particular user to free up session resources.
+    '''
+    api = self.get_api()
+    session_key = self._get_session_key()
+
+    all_sessions = api.get_sessions()
+    for session in all_sessions['sessions']:
+      if session['owner'] == self.user.username and session['id'] != SESSIONS[session_key]['id']:
+        self.close_session(session)
 
 
   def _check_status_and_fetch_result(self, api, session, execute_resp):
@@ -398,7 +419,13 @@ class SparkApi(Api):
   def get_sample_data(self, snippet, database=None, table=None, column=None, is_async=False, operation=None):
     api = self.get_api()
     session_key = self._get_session_key()
-    session = SESSIONS.get(session_key)
+
+    # Trying to close unused sessions if there are any.
+    # Calling the method here since this /sample_data call can be frequent enough and we dont need dedicated one.
+    if SESSIONS.get(session_key):
+      self._close_unused_sessions()
+
+    session = SESSIONS[session_key] if SESSIONS.get(session_key) else self.create_session(snippet.get('type'))
 
     statement = self._get_select_query(database, table, column, operation)
 
