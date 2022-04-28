@@ -352,6 +352,12 @@ workflows:
               ignore:
                 - master
                 - py3-ci
+      - build-arm64:
+          filters:
+            branches:
+              ignore:
+                - master
+                - py3-ci
       - commit:
           requires:
             - build
@@ -366,21 +372,18 @@ workflows:
             branches:
               only:
                 - py3-ci
-      - build-py-36:
+      - build-py-38-arm64:
           filters:
             branches:
               only:
                 - py3-ci
-  arm64:
-    triggers:
-      - schedule:
-          cron: "0 1 * * 0" # every Sunday at 1AM
+      - build-py-36:
           filters:
             branches:
               only:
-                - master
-    jobs:
-      - build-arm64
-      - build-py-36-arm64
-      - build-py-38-arm64
-
+                - py3-ci      
+      - build-py-36-arm64:
+          filters:
+            branches:
+              only:
+                - py3-ci
