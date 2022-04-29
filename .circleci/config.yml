@@ -245,7 +245,7 @@ commands:
           name: compile
           command: |
             
-            if [ -d /usr/share/hue ];; then 
+            if [ -d /usr/share/hue ]; then 
               # Running in gethue/hue Docker container
               apt-get install -y python3.8-dev python3.8-venv python3.8-distutils libsnappy-dev # This should not be needed as some point
             else
