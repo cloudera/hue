@@ -253,6 +253,15 @@ commands:
             sudo curl -sL https://bootstrap.pypa.io/get-pip.py | sudo python3.8
             sudo apt-get install -y libncursesw5-dev libgdbm-dev libc6-dev libssl-dev openssl libffi-dev
             
+            if test $(id --user) = 0; then 
+              # Running in gethue/hue Docker container
+              # Switch to user 'hue'
+              chown -R hue:hue .
+              CURR_FOLDER=$PWD
+              su - hue
+              cd $CURR_FOLDER
+            fi
+
             export PYTHON_VER=python3.8
             make apps
 
@@ -333,7 +342,6 @@ jobs:
   build-py-38:
     docker:
       - image: gethue/hue:latest-py2 # Should be circleci/python:3.6 at some point
-        user: hue
 
     working_directory: ~/repo
 
