@@ -244,10 +244,11 @@ commands:
       - run:
           name: compile
           command: |
+            export PATH=$HOME/.local/bin:$PATH
             sudo ln -fs /usr/share/zoneinfo/UTC /etc/localtime
             export DEBIAN_FRONTEND=noninteractive
             sudo apt-get update
-            sudo apt-get install -y gcc g++ build-essential python3.8-dev python3.8-venv python3.8-distutils asciidoc rsync curl sudo libkrb5-dev libldap2-dev libsasl2-dev libxml2-dev libxslt-dev sudo libldap2-dev libsnappy-dev libsasl2-modules-gssapi-mit libsnappy-dev libffi-dev # This should not be needed as some point
+            sudo apt-get install -y gcc g++ build-essential python3.8-dev python3.8-venv python3.8-distutils asciidoc rsync curl libkrb5-dev libldap2-dev libsasl2-dev libxml2-dev libxslt-dev libldap2-dev libsnappy-dev libsasl2-modules-gssapi-mit libsnappy-dev libffi-dev # This should not be needed as some point
             sudo curl -sL https://deb.nodesource.com/setup_14.x | sudo bash - && sudo apt-get install -y nodejs
             sudo curl -sL https://bootstrap.pypa.io/get-pip.py | sudo python3.8
             sudo apt-get install -y python3-setuptools
