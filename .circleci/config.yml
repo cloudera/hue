@@ -259,7 +259,7 @@ commands:
               # Running in gethue/hue Docker container
               # Switch to user 'hue'
               chown -R hue:hue .
-              su - hue -c "make apps"
+              su - hue -c "cd $PWD; make apps"
             else 
               make apps
             fi
