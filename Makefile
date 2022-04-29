@@ -141,7 +141,7 @@ else ifeq ($(PYTHON_VER),python3.8)
 #   @virtualenv $(BLD_DIR_ENV)
 	@$(SYS_PYTHON) -m venv $(BLD_DIR_ENV)
 	@source $(BLD_DIR_ENV)/bin/activate
-	@pip install -U setuptools setuptools-rust
+	@pip install -U setuptools
 endif
 	@echo "--- Virtual environment $(BLD_DIR_ENV) ready"
 	@touch $@
