@@ -18,7 +18,7 @@ import SidePanelViewModel from './sidePanelViewModel';
 import huePubSub from 'utils/huePubSub';
 import { BOTH_ASSIST_TOGGLE_EVENT } from 'ko/components/assist/events';
 import hueAnalytics from 'utils/hueAnalytics';
-import * as all from 'utils/storageUtils';
+import * as storageUtils from 'utils/storageUtils';
 
 describe('SidePanelViewModel', () => {
   beforeAll(() => {
@@ -30,16 +30,16 @@ describe('SidePanelViewModel', () => {
   });
 
   it('Should hide the assistspanels on BOTH_ASSIST_TOGGLE_EVENT when visible', () => {
-    jest.spyOn(all, 'getFromLocalStorage').mockImplementation(() => true);
-    jest.spyOn(all, 'setInLocalStorage').mockImplementation(() => {});
+    jest.spyOn(storageUtils, 'getFromLocalStorage').mockImplementation(() => true);
+    jest.spyOn(storageUtils, 'setInLocalStorage').mockImplementation(() => {});
     const sidePanelViewModel = new SidePanelViewModel();
     expect(sidePanelViewModel.rightAssistVisible()).toBeTruthy();
     expect(sidePanelViewModel.leftAssistVisible()).toBeTruthy();
-    expect(all.setInLocalStorage).not.toHaveBeenCalledWith(
+    expect(storageUtils.setInLocalStorage).not.toHaveBeenCalledWith(
       'assist.left_assist_panel_visible',
       false
     );
-    expect(all.setInLocalStorage).not.toHaveBeenCalledWith(
+    expect(storageUtils.setInLocalStorage).not.toHaveBeenCalledWith(
       'assist.right_assist_panel_visible',
       false
     );
@@ -47,22 +47,28 @@ describe('SidePanelViewModel', () => {
     huePubSub.publish(BOTH_ASSIST_TOGGLE_EVENT);
     expect(sidePanelViewModel.rightAssistVisible()).toBeFalsy();
     expect(sidePanelViewModel.leftAssistVisible()).toBeFalsy();
-    expect(all.setInLocalStorage).toHaveBeenCalledWith('assist.left_assist_panel_visible', false);
-    expect(all.setInLocalStorage).toHaveBeenCalledWith('assist.right_assist_panel_visible', false);
+    expect(storageUtils.setInLocalStorage).toHaveBeenCalledWith(
+      'assist.left_assist_panel_visible',
+      false
+    );
+    expect(storageUtils.setInLocalStorage).toHaveBeenCalledWith(
+      'assist.right_assist_panel_visible',
+      false
+    );
   });
 
   it('Should show the assistspanels on BOTH_ASSIST_TOGGLE_EVENT when hidden', () => {
-    jest.spyOn(all, 'getFromLocalStorage').mockImplementation(() => false);
-    jest.spyOn(all, 'setInLocalStorage').mockImplementation(() => {});
+    jest.spyOn(storageUtils, 'getFromLocalStorage').mockImplementation(() => false);
+    jest.spyOn(storageUtils, 'setInLocalStorage').mockImplementation(() => {});
     const sidePanelViewModel = new SidePanelViewModel();
 
     expect(sidePanelViewModel.rightAssistVisible()).toBeFalsy();
     expect(sidePanelViewModel.leftAssistVisible()).toBeFalsy();
-    expect(all.setInLocalStorage).not.toHaveBeenCalledWith(
+    expect(storageUtils.setInLocalStorage).not.toHaveBeenCalledWith(
       'assist.left_assist_panel_visible',
       true
     );
-    expect(all.setInLocalStorage).not.toHaveBeenCalledWith(
+    expect(storageUtils.setInLocalStorage).not.toHaveBeenCalledWith(
       'assist.right_assist_panel_visible',
       true
     );
@@ -70,7 +76,13 @@ describe('SidePanelViewModel', () => {
     huePubSub.publish(BOTH_ASSIST_TOGGLE_EVENT);
     expect(sidePanelViewModel.rightAssistVisible()).toBeTruthy();
     expect(sidePanelViewModel.leftAssistVisible()).toBeTruthy();
-    expect(all.setInLocalStorage).toHaveBeenCalledWith('assist.left_assist_panel_visible', true);
-    expect(all.setInLocalStorage).toHaveBeenCalledWith('assist.right_assist_panel_visible', true);
+    expect(storageUtils.setInLocalStorage).toHaveBeenCalledWith(
+      'assist.left_assist_panel_visible',
+      true
+    );
+    expect(storageUtils.setInLocalStorage).toHaveBeenCalledWith(
+      'assist.right_assist_panel_visible',
+      true
+    );
   });
 });
