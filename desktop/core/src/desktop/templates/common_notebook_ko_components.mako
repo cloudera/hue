@@ -882,7 +882,10 @@ else:
         },{
           id: 'settings',
           label: '${ _('Settings')}',
-          shortcuts: [{ shortcut: 'Ctrl - ,', macShortcut: 'Command - ,', description: '${ _('Show the settings menu where you can control autocomplete behaviour, syntax checker, dark theme and various editor settings.')}' }]
+          shortcuts: [
+            { shortcut: 'Ctrl-,', macShortcut: 'Command-,', description: '${ _('Show the settings menu where you can control autocomplete behaviour, syntax checker, dark theme and various editor settings.')}'},
+            { shortcut: 'Ctrl-.', macShortcut: 'Command-.', description: '${ _('Show or hide the assist panels.')}' }
+            ]
         }];
 
         self.query = ko.observable('');
