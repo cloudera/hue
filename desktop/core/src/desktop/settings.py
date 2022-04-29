@@ -724,54 +724,6 @@ DOCUMENT2_SEARCH_MAX_LENGTH = 2000
 # To avoid performace issue, config check will display warning when Document2 over this size
 DOCUMENT2_MAX_ENTRIES = 100000
 
-DEBUG_TOOLBAR_PATCH_SETTINGS = False
-
-def show_toolbar(request):
-  # Here can be used to decide if showing toolbar bases on request object:
-  #   For example, limit IP address by checking request.META['REMOTE_ADDR'], which can avoid setting INTERNAL_IPS.
-  list_allowed_users = desktop.conf.DJANGO_DEBUG_TOOL_USERS.get()
-  is_user_allowed = list_allowed_users[0] == '' or request.user.username in list_allowed_users
-  return DEBUG and desktop.conf.ENABLE_DJANGO_DEBUG_TOOL.get() and is_user_allowed
-
-if DEBUG and desktop.conf.ENABLE_DJANGO_DEBUG_TOOL.get():
-  idx = MIDDLEWARE_CLASSES.index('desktop.middleware.ClusterMiddleware')
-  MIDDLEWARE_CLASSES.insert(idx + 1, 'debug_panel.middleware.DebugPanelMiddleware')
-
-  INSTALLED_APPS += (
-      'debug_toolbar',
-      'debug_panel',
-  )
-
-  DEBUG_TOOLBAR_PANELS = [
-      'debug_toolbar.panels.versions.VersionsPanel',
-      'debug_toolbar.panels.timer.TimerPanel',
-      'debug_toolbar.panels.settings.SettingsPanel',
-      'debug_toolbar.panels.headers.HeadersPanel',
-      'debug_toolbar.panels.request.RequestPanel',
-      'debug_toolbar.panels.sql.SQLPanel',
-      'debug_toolbar.panels.staticfiles.StaticFilesPanel',
-      'debug_toolbar.panels.templates.TemplatesPanel',
-      'debug_toolbar.panels.cache.CachePanel',
-      'debug_toolbar.panels.signals.SignalsPanel',
-      'debug_toolbar.panels.logging.LoggingPanel',
-      'debug_toolbar.panels.redirects.RedirectsPanel',
-  ]
-
-  DEBUG_TOOLBAR_CONFIG = {
-      'RESULTS_CACHE_SIZE': 200,
-      'SHOW_TOOLBAR_CALLBACK': show_toolbar
-  }
-
-  CACHES.update({
-      'debug-panel': {
-          'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-          'LOCATION': '/var/tmp/debug-panel-cache',
-          'OPTIONS': {
-              'MAX_ENTRIES': 10000
-          }
-      }
-  })
-
 
 ################################################################
 # Celery settings

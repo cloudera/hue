@@ -1790,19 +1790,6 @@ ENABLE_SHARING = Config(
   type=coerce_bool,
   default=True)
 
-ENABLE_DJANGO_DEBUG_TOOL = Config(
-  key="enable_django_debug_tool",
-  help=_('Allow use django debug tool with Chrome browser for debugging issue, django_debug_mode must be true also'),
-  type=coerce_bool,
-  default=False)
-
-DJANGO_DEBUG_TOOL_USERS = Config(
-  key='django_debug_tool_users',
-  default='',
-  type=coerce_csv,
-  help=_('Comma separated list of users that allow to use django debug tool. If it is empty, all users are allowed.')
-)
-
 USE_NEW_ASSIST_PANEL = Config(
   key='use_new_assist_panel',
   default=False,
