@@ -333,6 +333,7 @@ jobs:
   build-py-38:
     docker:
       - image: gethue/hue:latest-py2 # Should be circleci/python:3.6 at some point
+        user: hue
 
     working_directory: ~/repo
 
