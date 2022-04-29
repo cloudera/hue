@@ -257,9 +257,9 @@ commands:
               # Running in gethue/hue Docker container
               # Switch to user 'hue'
               chown -R hue:hue .
-              CURR_FOLDER=$PWD
+              chmod +x /root
               su - hue
-              cd $CURR_FOLDER
+              cd /root/repo
             fi
 
             export PYTHON_VER=python3.8
