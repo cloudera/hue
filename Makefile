@@ -140,6 +140,8 @@ else ifeq ($(PYTHON_VER),python3.8)
 #	@$(SYS_PIP) install virtualenv
 #   @virtualenv $(BLD_DIR_ENV)
 	@$(SYS_PYTHON) -m venv $(BLD_DIR_ENV)
+	@source $(BLD_DIR_ENV)/bin/activate
+	@pip install -U pip setuptools 
 endif
 	@echo "--- Virtual environment $(BLD_DIR_ENV) ready"
 	@touch $@
