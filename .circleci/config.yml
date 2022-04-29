@@ -253,15 +253,14 @@ commands:
             sudo curl -sL https://bootstrap.pypa.io/get-pip.py | sudo python3.8
             sudo apt-get install -y libncursesw5-dev libgdbm-dev libc6-dev libssl-dev openssl libffi-dev
             
-            export PYTHON_VER=python3.8
-
             if test $(id --user) = 0; then 
               # Running in gethue/hue Docker container
               # Switch to user 'hue'
               chown -R hue:hue .
               chmod +x /root
-              su - hue -c "cd $PWD; make apps"
+              su - hue -c "cd $PWD && export PYTHON_VER=python3.8 && make apps"
             else 
+              export PYTHON_VER=python3.8
               make apps
             fi
 
