@@ -61,6 +61,7 @@ import 'components/sidebar/HueSidebarWebComponent';
 import 'components/assist/AssistPanelWebComponent';
 
 import 'ko/components/assist/assistViewModel';
+import { BOTH_ASSIST_TOGGLE_EVENT } from 'ko/components/assist/events';
 import OnePageViewModel from 'onePageViewModel';
 import SidePanelViewModel from 'sidePanelViewModel';
 import TopNavViewModel from 'topNavViewModel';
@@ -174,4 +175,11 @@ $(document).ready(async () => {
   });
 
   $('.page-content').jHueScrollUp();
+});
+
+// Framework independent global keyboard shortcuts
+document.addEventListener('keydown', e => {
+  if (e.key === '.' && (e.metaKey || e.ctrlKey)) {
+    huePubSub.publish(BOTH_ASSIST_TOGGLE_EVENT);
+  }
 });
