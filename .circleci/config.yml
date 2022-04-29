@@ -252,7 +252,8 @@ commands:
             sudo curl -sL https://deb.nodesource.com/setup_14.x | sudo bash - && sudo apt-get install -y nodejs
             sudo curl -sL https://bootstrap.pypa.io/get-pip.py | sudo python3.8
             sudo apt-get install -y libncursesw5-dev libgdbm-dev libc6-dev libssl-dev openssl
-            
+            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sudo sh
+
             if test $(id --user) = 0; then 
               # Running in gethue/hue Docker container
               # Switch to user 'hue'
