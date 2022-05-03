@@ -16,7 +16,7 @@
 
 import { CancellablePromise } from 'api/cancellablePromise';
 import dataCatalog from 'catalog/dataCatalog';
-import DataCatalogEntry, { Sample } from 'catalog/DataCatalogEntry';
+import DataCatalogEntry, { Sample, TableAnalysis } from 'catalog/DataCatalogEntry';
 import { Compute, Connector, Namespace } from 'config/types';
 import * as CatalogApi from './api';
 
@@ -59,6 +59,95 @@ describe('dataCatalogEntry.ts', () => {
   beforeEach(clearStorage);
 
   afterAll(clearStorage);
+
+  describe('getAnalysis', () => {
+    const emptyAnalysisApiSpy = () => {
+      jest.spyOn(CatalogApi, 'fetchDescribe').mockReturnValue(
+        CancellablePromise.resolve<TableAnalysis>({
+          message: '',
+          name: 'iceberg-table-test',
+          partition_keys: [],
+          cols: [{ name: 'i', type: 'int', comment: '' }],
+          path_location: 'test',
+          hdfs_link: '/test',
+          is_view: false,
+          properties: [],
+          details: {
+            stats: {
+              table_type: 'ICEBERG'
+            },
+            properties: {}
+          },
+          stats: [],
+          primary_keys: []
+        })
+      );
+    };
+
+    it('should return true for isIcebergTable after the analysis has has been loaded', async () => {
+      emptyAnalysisApiSpy();
+      const entry = await getEntry('someDb.someIcebergTable');
+
+      expect(entry.isIcebergTable()).toBeFalsy();
+
+      await entry.getAnalysis();
+      expect(entry.isIcebergTable()).toBeTruthy();
+    });
+
+    it('rejects a cachedOnly request if there is no previous promise', async () => {
+      emptyAnalysisApiSpy();
+      const entryA = await getEntry('someDb.someTable');
+      let rejected = false;
+      await entryA.getAnalysis({ cachedOnly: true }).catch(() => {
+        rejected = true;
+      });
+
+      expect(rejected).toBeTruthy();
+    });
+
+    it('should return the same analysis promise for the same entry', async () => {
+      emptyAnalysisApiSpy();
+      const entryA = await getEntry('someDb.someTable');
+      const entryB = await getEntry('someDb.someTable');
+      expect(entryA.getAnalysis()).toEqual(entryB.getAnalysis());
+    });
+
+    it('should not return the same analysis promise for different entries', async () => {
+      emptyAnalysisApiSpy();
+      const entryA = await getEntry('someDb.someTableOne');
+      const entryB = await getEntry('someDb.someTableTwo');
+      expect(entryA.getAnalysis()).not.toEqual(entryB.getAnalysis());
+    });
+
+    it('should keep the analysis promise for future session use', async () => {
+      emptyAnalysisApiSpy();
+      const entryA = await getEntry('someDb.someTable');
+      await entryA.clearCache();
+      const analysisPromise = entryA.getAnalysis();
+      expect(entryA.analysisPromise).toEqual(analysisPromise);
+      const entryB = await getEntry('someDb.someTable');
+      expect(entryB.analysisPromise).toEqual(analysisPromise);
+    });
+
+    it('should not cancel when cancellable option is not set to true', async () => {
+      emptyAnalysisApiSpy();
+      const entryA = await getEntry('someDb.someTable');
+      const analysisPromise = entryA.getAnalysis({ cancellable: false });
+      await analysisPromise.cancel();
+      expect(analysisPromise.cancelled).toBeFalsy();
+      expect(entryA.analysisPromise).toEqual(analysisPromise);
+    });
+
+    it('should not return a cancelled analysis promise', async () => {
+      emptyAnalysisApiSpy();
+      const entryA = await getEntry('someDb.someTable');
+      const cancelledPromise = entryA.getAnalysis({ cancellable: true });
+      await cancelledPromise.cancel();
+      const newPromise = entryA.getAnalysis();
+      expect(cancelledPromise.cancelled).toBeTruthy();
+      expect(newPromise).not.toEqual(cancelledPromise);
+    });
+  });
 
   describe('getSample', () => {
     const emptySampleApiSpy = () => {
