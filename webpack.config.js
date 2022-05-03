@@ -36,7 +36,7 @@ const config = {
   },
   mode: 'development',
   module: {
-    rules: [
+    rules: [    
       {
         test: /\.vue$/,
         exclude: /node_modules/,
@@ -45,8 +45,18 @@ const config = {
       {
         test: /\.(jsx?|tsx?)$/,
         exclude: /node_modules/,
-        use: ['source-map-loader', 'babel-loader']
+        use: [{
+          loader: 'babel-loader',
+          options: {
+            presets: ['@babel/preset-env', '@babel/preset-react']
+          }
+        }] 
       },
+      {
+        test: /\.(jsx?|tsx?)$/,
+        enforce: "pre",
+        use: ["source-map-loader"],
+      },      
       {
         test: /\.scss$/,
         exclude: /node_modules/,

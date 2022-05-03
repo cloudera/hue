@@ -43,6 +43,25 @@
   ${ render_bundle(bundle) | n,unicode }
 % endfor
 
+
+<!-- REACT INTEGRATION EXAMPLE WITHOUT KO-BINDING 
+This script is used to generate react root components when the page is loaded. The component element
+tag must be present in the part of the DOM specified by the selector when this script runs.
+There is no bridge to KO for components using this integration. Example using inside main HTML code:
+
+  <MyComponent data-reactcomponent='MyComponent' data-props='{"aProp" : "aValue"}'></MyComponent>
+
+!-->
+<script type="text/javascript">
+  (function () {    
+    window.createReactComponents('#embeddable_editor');
+  })();
+</script>
+<p style="position: absolute; z-index: 99999; top: 50px">           
+  <ReactExampleGlobal data-reactcomponent='ReactExampleGlobal' data-props='{"children": "mako template only", "version" : "${sys.version_info[0]}"}'></ReactExampleGlobal>
+</p>
+
+
 <script type="text/html" id="editor-snippet-icon">
   <!-- ko if: viewSettings().snippetImage -->
   <img class="snippet-icon-image" data-bind="attr: { 'src': viewSettings().snippetImage }" alt="${ _('Snippet icon') }">
@@ -985,7 +1004,20 @@
           </div>
 
           <div class="tab-pane" id="queryResults" data-bind="css: {'active': currentQueryTab() == 'queryResults'}">
-            <div class="execution-results-tab-panel">
+            <div class="execution-results-tab-panel">              
+
+              <!-- REACT EXAMPLES WITH KO-BINDING 
+              These components below show how to integrate react with Knockout.js using the KO reactWrapper binding
+              New components, regardless if they are global or app specific must be added to 
+              desktop/core/src/desktop/js/reactComponents/imports.js              
+              !-->
+              
+              <!-- Example component defined and used globally within Hue -->
+              <ReactExampleGlobal data-bind="reactWrapper: 'ReactExampleGlobal', props: { children: 'KO binding used', myObj: activeExecutable }"></ReactExampleGlobal>
+              
+              <!-- Example component defined and used only within the "Editor app" -->
+              <ReactExample data-bind="reactWrapper: 'ReactExample', props: { title: 'Result title', activeExecutable: activeExecutable }"></ReactExample>
+
               <result-table-ko-bridge class="table-results-bridge" data-bind="vueKoProps: {
                   'executable-observable': activeExecutable
                 }"></result-table-ko-bridge>
