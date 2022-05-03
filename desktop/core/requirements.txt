@@ -9,7 +9,7 @@ cffi==1.15.0
 channels==3.0.3
 channels-redis==3.2.0
 configobj==5.0.6
-cryptography==37.0.1
+cryptography==36.0.1
 django-auth-ldap==2.3.0
 Django==3.2.13
 daphne==3.0.2
