@@ -101,7 +101,7 @@ def query_error_handler(func):
       message = force_unicode(str(e))
       if 'timed out' in message:
         raise OperationTimeout(e)
-      elif 'Could not connect to any' in message:
+      elif 'Connection refused' in message or 'Name or service not known' in message or 'Could not connect to any' in message:
         reset_ha()
       else:
         raise QueryError(message)
