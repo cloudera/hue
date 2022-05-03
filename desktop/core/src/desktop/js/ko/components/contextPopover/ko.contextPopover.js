@@ -276,7 +276,31 @@ const SUPPORT_TEMPLATES = `
 
   <script type="text/html" id="context-catalog-entry-title">
     <div class="hue-popover-title">
-      <i class="hue-popover-title-icon fa muted" data-bind="css: catalogEntry() && (catalogEntry().isView() || parentIsView()) ? 'fa-eye' : (catalogEntry().isDatabase() ? 'fa-database' : (catalogEntry().isModel() ? 'fa-puzzle-piece' : 'fa-table'))"></i>
+      <!-- ko if: catalogEntry().isTable() -->
+        <span class="hue-popover-title-secondary-icon-container">
+          <!-- ko hueSpinner: { spin: loading, inline: true } --><!-- /ko -->
+          <!-- ko ifnot: loading -->  
+            <!-- ko if:catalogEntry().isIcebergTable() -->  
+              <i class="hue-popover-title-icon fa muted fa-snowflake-o"  title="${I18n(
+                'Iceberg table'
+              )}"></i>
+            <!-- /ko -->
+            <!-- ko ifnot:catalogEntry().isIcebergTable() -->  
+              <i class="hue-popover-title-icon fa muted fa-table"></i>
+            <!-- /ko -->            
+          <!-- /ko -->
+        </span>
+      <!-- /ko -->
+      <!-- ko ifnot: catalogEntry().isTable() -->
+        <i class="hue-popover-title-icon fa muted" data-bind="css: 
+        catalogEntry() && (catalogEntry().isView() || parentIsView()) 
+        ? 'fa-eye' 
+        : (catalogEntry().isDatabase() 
+        ? 'fa-database' 
+        : (catalogEntry().isModel() 
+        ? 'fa-puzzle-piece' 
+        : 'fa-table'))"></i>      
+      <!-- /ko -->
       <span class="hue-popover-title-text" data-bind="foreach: breadCrumbs">
         <!-- ko ifnot: isActive --><div><a href="javascript: void(0);" data-bind="click: makeActive, text: name"></a>.</div><!-- /ko -->
         <!-- ko if: isActive -->
