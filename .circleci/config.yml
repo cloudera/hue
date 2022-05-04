@@ -213,8 +213,8 @@ commands:
               apt-get install -y python3.8-dev python3.8-venv python3.8-distutils libsnappy-dev # This should not be needed as some point
               curl -sL https://bootstrap.pypa.io/get-pip.py | python3.8
             else
-              export PATH=$HOME/.local/bin:$PATH
-              sudo ln -fs /usr/share/zoneinfo/UTC /etc/localtime
+              # export PATH=$HOME/.local/bin:$PATH
+              # sudo ln -fs /usr/share/zoneinfo/UTC /etc/localtime
               export DEBIAN_FRONTEND=noninteractive
               sudo apt-get update
               sudo apt-get install -y gcc g++ build-essential python3.8-dev python3.8-venv python3.8-distutils asciidoc rsync curl libkrb5-dev libldap2-dev libsasl2-dev libxml2-dev libxslt-dev  libsasl2-modules-gssapi-mit libsnappy-dev libffi-dev
