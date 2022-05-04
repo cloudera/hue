@@ -200,43 +200,6 @@ commands:
           path: test-reports
           destination: test-reports
 
-  build-py-36-common:
-    steps:
-      - checkout
-
-      # Download and cache dependencies
-      # - restore_cache:
-      #     keys:
-      #       - v1-dependencies-{{ checksum "desktop/core/requirements.txt" }}
-      #       # fallback to using the latest cache if no exact match is found
-      #       - v1-dependencies-
-
-      - run:
-          name: compile
-          command: |
-            apt-get update && apt-get install -y python3.6-dev libsnappy-dev asciidoc # This should not be needed as some point
-
-            export PYTHON_VER=python3.6
-            make apps
-
-            make prod
-
-      - run:
-          name: run tests
-          command: |
-            PYTHONWARNINGS=always ./build/env/bin/hue test unit --with-xunit --with-cover
-
-      # - run:
-      #     name: install dependencies
-      #     command: |
-      #       python -m venv venv
-      #       make apps
-
-      # - save_cache:
-      #     paths:
-      #       - ./build/venv
-      #     key: v1-dependencies-{{ checksum "esktop/core/requirements.txt" }}
-
   build-py-38-common:
     steps:
       - checkout
@@ -244,8 +207,8 @@ commands:
       - run:
           name: compile
           command: |
-            
-            if [ -d /usr/share/hue ]; then 
+
+            if [ -d /usr/share/hue ]; then
               # Running in gethue/hue Docker container
               apt-get install -y python3.8-dev python3.8-venv python3.8-distutils libsnappy-dev # This should not be needed as some point
               curl -sL https://bootstrap.pypa.io/get-pip.py | python3.8
@@ -254,7 +217,7 @@ commands:
               sudo ln -fs /usr/share/zoneinfo/UTC /etc/localtime
               export DEBIAN_FRONTEND=noninteractive
               sudo apt-get update
-              sudo apt-get install -y gcc g++ build-essential python3.8-dev python3.8-venv python3.8-distutils asciidoc rsync curl libkrb5-dev libldap2-dev libsasl2-dev libxml2-dev libxslt-dev libldap2-dev libsnappy-dev libsasl2-modules-gssapi-mit libsnappy-dev libffi-dev
+              sudo apt-get install -y gcc g++ build-essential python3.8-dev python3.8-venv python3.8-distutils asciidoc rsync curl libkrb5-dev libldap2-dev libsasl2-dev libxml2-dev libxslt-dev  libsasl2-modules-gssapi-mit libsnappy-dev libffi-dev
               curl -sL https://deb.nodesource.com/setup_14.x | sudo bash - && sudo apt-get install -y nodejs
               curl -sL https://bootstrap.pypa.io/get-pip.py | sudo python3.8
               sudo apt-get install -y libncursesw5-dev libgdbm-dev libc6-dev libssl-dev openssl
@@ -318,25 +281,6 @@ jobs:
           command: |
             git push origin HEAD:master
 
-  build-py-36:
-    docker:
-      - image: gethue/hue:latest-py2 # Should be circleci/python:3.6 at some point
-
-    working_directory: ~/repo
-
-    steps:
-      - build-py-36-common
-
-  build-py-36-arm64:
-    machine:
-      image: ubuntu-2004:202101-01
-    resource_class: arm.medium
-
-    working_directory: ~/repo
-
-    steps:
-      - build-py-36-common
-
   build-py-38:
     docker:
       - image: gethue/hue:latest-py2 # Should be circleci/python:3.6 at some point
@@ -390,4 +334,4 @@ workflows:
           filters:
             branches:
               ignore:
-                - master  
+                - master
