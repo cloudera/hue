@@ -217,7 +217,7 @@ commands:
               sudo ln -fs /usr/share/zoneinfo/UTC /etc/localtime
               export DEBIAN_FRONTEND=noninteractive
               sudo apt-get update
-              sudo apt-get install -y gcc g++ build-essential python3.8-dev python3.8-venv python3.8-distutils asciidoc rsync curl libkrb5-dev libldap2-dev libsasl2-dev libxml2-dev libxslt-dev libldap2-dev libsnappy-dev libsasl2-modules-gssapi-mit libsnappy-dev libffi-dev
+              sudo apt-get install -y gcc g++ build-essential python3.8-dev python3.8-venv python3.8-distutils asciidoc rsync curl libkrb5-dev libldap2-dev libsasl2-dev libxml2-dev libxslt-dev  libsasl2-modules-gssapi-mit libsnappy-dev libffi-dev
               curl -sL https://deb.nodesource.com/setup_14.x | sudo bash - && sudo apt-get install -y nodejs
               curl -sL https://bootstrap.pypa.io/get-pip.py | sudo python3.8
               sudo apt-get install -y libncursesw5-dev libgdbm-dev libc6-dev libssl-dev openssl
