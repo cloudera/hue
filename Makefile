@@ -137,7 +137,8 @@ ifeq ($(PYTHON_VER),python2.7)
 	@$(SYS_PYTHON) $(VIRTUAL_BOOTSTRAP) $(VIRTUALENV_OPTS) --system-site-packages $(BLD_DIR_ENV)
 else ifeq ($(PYTHON_VER),python3.8)
 	@$(SYS_PYTHON) -m pip install --upgrade pip
-	@$(SYS_PYTHON) -m venv $(BLD_DIR_ENV)
+	@$(SYS_PIP) install virtualenv
+	@virtualenv -p python3.8 $(BLD_DIR_ENV)
 	@$(ENV_PIP) install -U pip setuptools
 endif
 	@echo "--- Virtual environment $(BLD_DIR_ENV) ready"
