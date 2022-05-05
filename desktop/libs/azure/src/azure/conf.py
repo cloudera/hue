@@ -77,7 +77,7 @@ def get_default_abfs_url():
 def get_default_abfs_fs():
   default_fs = core_site.get_default_fs()
 
-  return default_fs if default_fs and default_fs.startwith('abfs://') and \
+  return default_fs if default_fs and default_fs.startswith('abfs://') and \
                        ABFS_CLUSTERS['default'].ENABLE_DEFAULTFS_FROM_CORESITE.get() else ABFS_CLUSTERS['default'].FS_DEFAULTFS.get()
 
 ADLS_CLUSTERS = UnspecifiedConfigSection(
