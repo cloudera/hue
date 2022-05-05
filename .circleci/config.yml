@@ -213,7 +213,6 @@ commands:
               apt-get install -y python3.8-dev python3.8-venv python3.8-distutils libsnappy-dev # This should not be needed as some point
               curl -sL https://bootstrap.pypa.io/get-pip.py | python3.8
             else
-              export PATH=$HOME/.local/bin:$PATH
               sudo ln -fs /usr/share/zoneinfo/UTC /etc/localtime
               export DEBIAN_FRONTEND=noninteractive
               sudo apt-get update
