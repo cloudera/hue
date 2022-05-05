@@ -37,11 +37,11 @@ jobs:
     - name: compile
       run: |
         sudo apt-get update
-        sudo apt-get install -y gcc g++ build-essential python3.8-dev python3.8-venv python3.8-distutils asciidoc rsync curl sudo libkrb5-dev libldap2-dev libsasl2-dev libxml2-dev libxslt-dev libldap2-dev libsnappy-dev libsasl2-modules-gssapi-mit libsnappy-dev libffi-dev # This should not be needed as some point
+        sudo apt-get install -y gcc g++ build-essential python3.8-dev python3.8-venv python3.8-distutils asciidoc rsync curl sudo libkrb5-dev libldap2-dev libsasl2-dev libxml2-dev libxslt-dev  libsasl2-modules-gssapi-mit libsnappy-dev libffi-dev # This should not be needed as some point
         sudo curl -sL https://deb.nodesource.com/setup_14.x | sudo bash - && sudo apt-get install -y nodejs
         sudo curl -sL https://bootstrap.pypa.io/get-pip.py | sudo python3.8
         sudo apt-get install -y python3-setuptools
-        sudo apt-get install -y libncursesw5-dev libgdbm-dev libc6-dev libssl-dev openssl libffi-dev
+        sudo apt-get install -y libncursesw5-dev libgdbm-dev libc6-dev libssl-dev openssl
 
         export PYTHON_VER=python3.8
         make apps
