@@ -138,7 +138,7 @@ ifeq ($(PYTHON_VER),python2.7)
 else ifeq ($(PYTHON_VER),python3.8)
 	@$(SYS_PYTHON) -m pip install --upgrade pip
 	@$(SYS_PIP) install virtualenv
-	@virtualenv $(BLD_DIR_ENV)
+	@virtualenv -p $(PYTHON_VER) $(BLD_DIR_ENV)
 endif
 	@echo "--- Virtual environment $(BLD_DIR_ENV) ready"
 	@touch $@
