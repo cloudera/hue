@@ -18,7 +18,7 @@ from __future__ import absolute_import
 import logging
 import sys
 
-from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_password_from_script
+from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_password_from_script, coerce_bool
 from desktop.lib.idbroker import conf as conf_idbroker
 
 from hadoop import core_site
@@ -146,7 +146,7 @@ ABFS_CLUSTERS = UnspecifiedConfigSection(
     members=dict(
       ENABLE_DEFAULTFS_FROM_CORESITE=Config(
         key="enable_defaultfs_from_coresite",
-        type=bool,
+        type=coerce_bool,
         default=True,
         help="Enable this param to use the defaultFS from core-site.xml"),
       FS_DEFAULTFS=Config("fs_defaultfs", help="abfs://<container_name>@<account_name>.dfs.core.windows.net", type=str, default=None),
