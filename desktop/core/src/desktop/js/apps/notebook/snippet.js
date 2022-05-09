@@ -31,7 +31,7 @@ import { getStatementsParser } from 'parse/utils';
 import { SHOW_EVENT as SHOW_GIST_MODAL_EVENT } from 'ko/components/ko.shareGistModal';
 import { cancelActiveRequest } from 'api/apiUtils';
 import { ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT } from 'apps/editor/events';
-import { findEditorConnector, getConfig } from 'config/hueConfig';
+import { findEditorConnector, getLastKnownConfig } from 'config/hueConfig';
 import {
   ASSIST_GET_DATABASE_EVENT,
   ASSIST_GET_SOURCE_EVENT,
@@ -2575,12 +2575,10 @@ class Snippet {
                   } else {
                     job.percentJob = ko.observable(job.percentJob);
                   }
-
-                  getConfig().then(config => {
-                    if (config['hue_config']['is_yarn_enabled']) {
-                      self.jobs.push(job);
-                    }
-                  });
+                  const config = getLastKnownConfig();
+                  if (config && config['hue_config'] && config['hue_config']['is_yarn_enabled']) {
+                    self.jobs.push(job);
+                  }
                 } else if (typeof job.percentJob !== 'undefined') {
                   for (let i = 0; i < _found.length; i++) {
                     _found[i].percentJob(job.percentJob);
