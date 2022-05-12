@@ -1414,6 +1414,11 @@ export default class DataCatalogEntry {
     return false;
   }
 
+  getHdfsFilePath(): string {
+    const hdfs_link = this.analysis?.hdfs_link || '';
+    return hdfs_link.replace('/filebrowser/view=', '');
+  }
+
   /**
    * Returns true if the entry is an Iceberg table
    */
