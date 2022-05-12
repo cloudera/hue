@@ -69,7 +69,7 @@ describe('dataCatalogEntry.ts', () => {
           partition_keys: [],
           cols: [{ name: 'i', type: 'int', comment: '' }],
           path_location: 'test',
-          hdfs_link: '/test',
+          hdfs_link: '/filebrowser/view=/warehouse/tablespace/managed/hive/sample_07',
           is_view: false,
           properties: [],
           details: {
@@ -92,6 +92,13 @@ describe('dataCatalogEntry.ts', () => {
 
       await entry.getAnalysis();
       expect(entry.isIcebergTable()).toBeTruthy();
+    });
+
+    it('should return the hdfs path based on the hdfs_link', async () => {
+      emptyAnalysisApiSpy();
+      const entry = await getEntry('someDb.someTable');
+      await entry.getAnalysis();
+      expect(entry.getHdfsFilePath()).toEqual('/warehouse/tablespace/managed/hive/sample_07');
     });
 
     it('rejects a cachedOnly request if there is no previous promise', async () => {
