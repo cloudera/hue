@@ -1,2 +1,0 @@
-<% _.forEach(licenses, function(license) { %><%- license.name %> | <%- license.version %> | <%- license.licenses %>
-<% }); %>
