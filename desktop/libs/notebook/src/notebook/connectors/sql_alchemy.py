@@ -443,11 +443,14 @@ class SqlAlchemyApi(Api):
     elif table is None:
       tables_meta = []
       for t in assist.get_table_names(database):
+        print("sakfakj", t)
         t = self._fix_bigquery_db_prefixes(t)
         tables_meta.append({'name': t, 'type': 'Table', 'comment': ''})
       for t in assist.get_view_names(database):
+        print("rywiutwriutyrwuityiw", t)
         t = self._fix_bigquery_db_prefixes(t)
         tables_meta.append({'name': t, 'type': 'View', 'comment': ''})
+      print("808080808080808080", tables_meta)
       response['tables_meta'] = tables_meta
     elif column is None:
       columns = assist.get_columns(database, table)
@@ -548,9 +551,12 @@ class Assist(object):
     return self.db.get_table_names(database)
 
   def get_view_names(self, database, view_names=[]):
+    # print("1212121212121212121221", database, self.db, self, self.db.get_view_definition("mobile_product_metrics", schema="AYUSH"))
     try:
+      print("dsfdsfsfs")
       return self.db.get_view_names(database)
     except NotImplementedError:
+      print("vnsjonskjf")
       return []
 
   def get_tables(self, database, table_names=[]):
