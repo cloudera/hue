@@ -357,9 +357,7 @@ class LoginAndPermissionMiddleware(MiddlewareMixin):
           not (
               is_admin(request.user) or
               request.user.has_hue_permission(action="access", app=app_accessed) or
-              request.user.has_hue_permission(action=access_view, app=app_accessed)
-          ) and \
-          not (app_accessed == '__debug__' and DJANGO_DEBUG_MODE.get()):
+              request.user.has_hue_permission(action=access_view, app=app_accessed)):
         access_log(request, 'permission denied', level=access_log_level)
         return PopupException(
             _("You do not have permission to access the %(app_name)s application.") % {'app_name': app_accessed.capitalize()},
