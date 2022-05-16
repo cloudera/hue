@@ -131,8 +131,6 @@ Frontend third party dependencies (some checked in and some via npm)
 |ESLint config prettier|4.0.0|MIT|https://www.npmjs.com/package/eslint-config-prettier|
 |ESLint plugin prettier|3.0.1|MIT|https://www.npmjs.com/package/eslint-plugin-prettier|
 |Expose Loader|0.7.5|MIT|https://www.npmjs.com/package/expose-loader|
-|django-debug-panel|0.8.3|BSD|https://pypi.org/project/django-debug-panel/0.8.3/|
-|django-debug-toolbar|1.3.2|BSD|https://pypi.python.org/pypi/django-debug-toolbar/1.3.2|
 |filesize.js|4.0.0|BSD|https://github.com/avoidwork/filesize.js|
 |FileUploader|?|MIT|https://github.com/FineUploader/fine-uploader|
 |Freshereditor|?|None|https://github.com/mquan/freshereditor|
