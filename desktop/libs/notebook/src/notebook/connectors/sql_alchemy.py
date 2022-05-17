@@ -271,7 +271,7 @@ class SqlAlchemyApi(Api):
     }
     CONNECTIONS[guid] = cache
 
-    response =  {
+    response = {
       'sync': False,
       'has_result_set': result.cursor != None,
       'modified_row_count': 0,
@@ -343,7 +343,7 @@ class SqlAlchemyApi(Api):
   @query_error_handler
   def progress(self, notebook, snippet, logs=''):
     progress = 50
-    if self.options['url'].startswith('presto://') | self.options['url'].startswith('trino://') :
+    if self.options['url'].startswith('presto://') | self.options['url'].startswith('trino://'):
       guid = snippet['result']['handle']['guid']
       handle = CONNECTIONS.get(guid)
       stats = None
