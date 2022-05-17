@@ -126,7 +126,7 @@ class SqlAlchemyApi(Api):
     if interpreter.get('dialect_properties'):
       self.backticks = interpreter['dialect_properties']['sql_identifier_quote']
     else:
-      self.backticks = '"' if re.match('^(postgresql://|awsathena|elasticsearch|phoenix)', self.options.get('url', '')) else '`'
+      self.backticks = '"' if re.match('^(postgresql://|awsathena|elasticsearch|phoenix|trino)', self.options.get('url', '')) else '`'
 
   def _get_engine_key(self):
     return ENGINE_KEY % {
