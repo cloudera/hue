@@ -244,6 +244,29 @@ class TestApi(object):
                                        connect_args={'principal_username': 'test'},
                                        pool_pre_ping=True)
 
+  def test_create_engine_with_impersonation_phoenix(self):
+    interpreter = {
+      'name': 'hive',
+      'options': {
+        'url': 'phoenix://hue:8080/hue',
+        'session': {},
+        'has_impersonation': False  # Off
+      }
+    }
+
+    with patch('notebook.connectors.sql_alchemy.create_engine') as create_engine:
+      engine = SqlAlchemyApi(self.user, interpreter)._create_engine()
+
+      create_engine.assert_called_with('phoenix://hue:8080/hue', pool_pre_ping=False)
+
+
+    interpreter['options']['has_impersonation'] = True  # On
+
+    with patch('notebook.connectors.sql_alchemy.create_engine') as create_engine:
+      engine = SqlAlchemyApi(self.user, interpreter)._create_engine()
+
+      create_engine.assert_called_with('phoenix://test@hue:8080/hue', pool_pre_ping=False)
+
 
   def test_explain(self):
 
