@@ -196,6 +196,7 @@ class SqlAlchemyApi(Api):
           self.options.pop('connect_args')
       )
 
+    # phoenixdb does not support impersonation using principal_username parameter
     if self.options.get('has_impersonation') and not driver_name.startswith("phoenix"):
       self.options.setdefault('connect_args', {}).setdefault('principal_username', self.user.username)
 

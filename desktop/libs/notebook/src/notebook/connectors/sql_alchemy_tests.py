@@ -246,7 +246,7 @@ class TestApi(object):
 
   def test_create_engine_with_impersonation_phoenix(self):
     interpreter = {
-      'name': 'hive',
+      'name': 'phoenix',
       'options': {
         'url': 'phoenix://hue:8080/hue',
         'session': {},
