@@ -387,7 +387,7 @@ class OAuthBackend(DesktopBackendBase):
     return True
 
 
-class AllowAllBackend(DesktopBackendBase):
+class AllowAllBackend(django.contrib.auth.backends.ModelBackend):
   """
   Authentication backend that allows any user to login as long
   as they have a username. The users will be added to the 'default_user_group'.
@@ -395,20 +395,31 @@ class AllowAllBackend(DesktopBackendBase):
   We want to ensure that already created users (e.g., from other backends)
   retain their superuser status, and any new users are not super users by default.
   """
-  def check_auth(self, username, password):
-    user = find_user(username)
-    if user is None:
-      user = create_user(username, password)
-      user.is_superuser = False
-      user.save()
+  def authenticate(self, *args, **kwargs):
+    if sys.version_info[0] > 2:
+      request = args[0]
+    else:
+      request = None
+
+    username = kwargs.get("username", "user")
+    user = super(AllowAllBackend, self).authenticate(request, username=username, password=username)
+    if user is not None:
+      user = rewrite_user(user)
+      return user
+
+    user = find_or_create_user(username, username)
+    user = rewrite_user(user)
+    user.is_superuser = False
+    user.save()
 
     ensure_has_a_group(user)
 
     return user
 
-  @classmethod
-  def manages_passwords_externally(cls):
-    return True
+  def get_user(self, user_id):
+    user = super(AllowAllBackend, self).get_user(user_id)
+    user = rewrite_user(user)
+    return user
 
 
 class PamBackend(DesktopBackendBase):
@@ -841,7 +852,7 @@ class OIDCBackend(OIDCAuthenticationBackend):
       user = rewrite_user(user)
 
       ensure_has_a_group(user)
-      
+
       return user
 
     return None
