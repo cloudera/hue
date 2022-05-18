@@ -250,6 +250,9 @@ ${ components.menubar(is_embeddable) }
           </a>
         </span>
         ${ _('Table') }
+        <!-- ko if: $parent.catalogEntry.isIcebergTable() -->
+          <i class="fa muted fa-snowflake-o" title="${ _('Iceberg table') }"></i>
+        <!-- /ko -->
       <!-- /ko -->
     </div>
     <!-- ko ifnot: $parent.catalogEntry.isView() -->
