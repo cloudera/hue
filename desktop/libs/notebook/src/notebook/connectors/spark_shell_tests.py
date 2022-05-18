@@ -169,6 +169,7 @@ class TestSparkApi(object):
             return_value={'id': 'test_id'}
           )
         )
+        self.api._check_session = Mock(return_value={'id': '1'})
 
         response = self.api.execute(notebook, snippet)
         assert_equal(response['id'], 'test_id')
@@ -197,6 +198,7 @@ class TestSparkApi(object):
             return_value={'state': 'test_state'}
           )
         )
+        self.api._handle_session_health_check = Mock(return_value={'id': '1'})
 
         response = self.api.check_status(notebook, snippet)
         assert_equal(response['status'], 'test_state')
