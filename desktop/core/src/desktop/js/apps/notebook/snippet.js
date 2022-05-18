@@ -2576,9 +2576,14 @@ class Snippet {
                     job.percentJob = ko.observable(job.percentJob);
                   }
                   const config = getLastKnownConfig();
-                  if (config && config['hue_config'] && config['hue_config']['is_yarn_enabled']) {
-                    self.jobs.push(job);
+                  // Yarn job names start with 'application' and we skip them if yarn config is not present.
+                  if (
+                    job.name.startsWith('application') &&
+                    !(config && config['hue_config'] && config['hue_config']['is_yarn_enabled'])
+                  ) {
+                    return;
                   }
+                  self.jobs.push(job);
                 } else if (typeof job.percentJob !== 'undefined') {
                   for (let i = 0; i < _found.length; i++) {
                     _found[i].percentJob(job.percentJob);
