@@ -3027,7 +3027,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       };
 
       self._rewriteKnoxUrls = function (data) {
-        if (data.app.type === 'SPARK') {
+        if (data && data.app && data.app.type === 'SPARK' && data.app.properties && data.app.properties.metadata) {
           data.app.properties.metadata.forEach(function (item) {
             if (item.name === 'trackingUrl') {
               /*
@@ -3035,9 +3035,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                 Sample trackingUrl: http://<yarn>:8088/proxy/application_1652826179847_0003/
                 Knox URL: https://<knox-base>/yarn/cluster/app/application_1652826179847_0003
               */
-              const matches = item.value.match('(application_[0-9_]+)');
+              var matches = item.value.match('(application_[0-9_]+)');
               if (matches && matches.length > 1) {
-                const applicationId = matches[1];
+                var applicationId = matches[1];
                 item.value = window.KNOX_BASE_URL + '/yarn/cluster/app/' + applicationId;
               }
             }
@@ -3098,7 +3098,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
         lastFetchJobRequest = self._fetchJob(function (data) {
           if (data.status == 0) {
-            if (window.KNOX_BASE_URL.length && window.KNOX_BASE_URL.length) {
+            if (window.KNOX_BASE_URL && window.KNOX_BASE_URL.length) {
               self._rewriteKnoxUrls(data);
             }
 
