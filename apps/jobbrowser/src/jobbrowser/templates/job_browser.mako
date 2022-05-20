@@ -3033,12 +3033,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               /*
                 Rewrite tracking url
                 Sample trackingUrl: http://<yarn>:8088/proxy/application_1652826179847_0003/
-                Knox URL: https://<knox-base>/yarn/cluster/app/application_1652826179847_0003
+                Knox URL: https://<knox-base>/yarnuiv2/redirect#/yarn-app/application_1652826179847_0003/attempts
               */
               var matches = item.value.match('(application_[0-9_]+)');
               if (matches && matches.length > 1) {
                 var applicationId = matches[1];
-                item.value = window.KNOX_BASE_URL + '/yarn/cluster/app/' + applicationId;
+                item.value = window.KNOX_BASE_URL + '/yarnuiv2/redirect#/yarn-app/' + applicationId + '/attempts';
               }
             }
             return;
