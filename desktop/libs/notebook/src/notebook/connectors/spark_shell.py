@@ -362,7 +362,7 @@ class SparkApi(Api):
       finally:
         stored_session_info = self._get_session_info_from_user()
         if stored_session_info and session['id'] == stored_session_info['id']:
-          self._remove_info_session_from_user()
+          self._remove_session_info_from_user()
     else:
       return {'status': -1}
 
@@ -592,7 +592,7 @@ class SparkApi(Api):
     self.user.profile.save()
 
 
-  def _remove_info_session_from_user(self):
+  def _remove_session_info_from_user(self):
     self.user = rewrite_user(self.user)
     session_key = self._get_session_key()
 

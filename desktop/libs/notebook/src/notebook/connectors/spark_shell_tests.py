@@ -100,7 +100,7 @@ class TestSparkApi(object):
           assert_equal(cores, 2)
 
           if self.api._get_session_info_from_user():
-            self.api._remove_info_session_from_user()
+            self.api._remove_session_info_from_user()
 
           # Case without user configuration. Expected 1 driverCores
           USE_DEFAULT_CONFIGURATION.get.return_value = True
