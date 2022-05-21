@@ -20,7 +20,10 @@ import sys
 from builtins import object
 from nose.tools import assert_equal, assert_true, assert_false, assert_raises
 
-from notebook.connectors.spark_shell import SparkApi, SESSIONS
+from desktop.lib.django_test_util import make_logged_in_client
+from useradmin.models import User
+
+from notebook.connectors.spark_shell import SparkApi
 
 if sys.version_info[0] > 2:
   from unittest.mock import patch, Mock
@@ -31,7 +34,9 @@ else:
 class TestSparkApi(object):
 
   def setUp(self):
-    self.user = 'hue_test'
+    self.client = make_logged_in_client(username="hue_test", groupname="default", recreate=True, is_superuser=False)
+    self.user = User.objects.get(username="hue_test")
+
     self.interpreter = {
         'name': 'livy',
         'options': {
@@ -94,8 +99,8 @@ class TestSparkApi(object):
               cores = p['value']
           assert_equal(cores, 2)
 
-          if SESSIONS.get(session_key):
-            del SESSIONS[session_key]
+          if self.api._get_session_info_from_user():
+            self.api._remove_info_session_from_user()
 
           # Case without user configuration. Expected 1 driverCores
           USE_DEFAULT_CONFIGURATION.get.return_value = True
@@ -110,9 +115,6 @@ class TestSparkApi(object):
               cores = p['value']
           assert_equal(cores, 1)
 
-          if SESSIONS.get(session_key):
-            del SESSIONS[session_key]
-
           # Case with no user configuration. Expected 1 driverCores
           USE_DEFAULT_CONFIGURATION.get.return_value = False
           session3 = self.api.create_session(lang=lang, properties=properties)
@@ -124,9 +126,6 @@ class TestSparkApi(object):
             if p['name'] == 'driverCores':
               cores = p['value']
           assert_equal(cores, 1)
-
-          if SESSIONS.get(session_key):
-            del SESSIONS[session_key]
 
 
   def test_create_session_plain(self):
@@ -152,9 +151,6 @@ class TestSparkApi(object):
       files_properties = [prop for prop in session['properties'] if prop['name'] == 'files']
       assert_true(files_properties, session['properties'])
       assert_equal(files_properties[0]['value'], [], session['properties'])
-
-      if SESSIONS.get(session_key):
-        del SESSIONS[session_key]
 
 
   def test_execute(self):
