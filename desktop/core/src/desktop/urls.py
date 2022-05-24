@@ -28,8 +28,6 @@ import sys
 # https://docs.djangoproject.com/en/1.7/ref/applications/#django.apps.AppConfig.ready
 #
 
-import debug_toolbar
-
 import desktop.lib.metrics.file_reporter
 desktop.lib.metrics.file_reporter.start_file_reporter()
 
@@ -51,7 +49,7 @@ from desktop import api as desktop_api
 from desktop import api2 as desktop_api2
 from desktop import api_public_urls
 from desktop.auth import views as desktop_auth_views
-from desktop.conf import METRICS, USE_NEW_EDITOR, ENABLE_DJANGO_DEBUG_TOOL, ANALYTICS, has_connectors, ENABLE_PROMETHEUS, SLACK
+from desktop.conf import METRICS, USE_NEW_EDITOR, ANALYTICS, has_connectors, ENABLE_PROMETHEUS, SLACK
 from desktop.configuration import api as desktop_configuration_api
 from desktop.lib.vcs import api as desktop_lib_vcs_api
 from desktop.settings import is_oidc_configured
@@ -276,12 +274,6 @@ urlpatterns = []
 urlpatterns.extend(dynamic_patterns)
 urlpatterns.extend(app_urls_patterns)
 urlpatterns.extend(static_patterns)
-
-
-if settings.DEBUG and ENABLE_DJANGO_DEBUG_TOOL.get():
-  urlpatterns += [
-    re_path(r'^__debug__/', include(debug_toolbar.urls)),
-  ]
 
 if is_oidc_configured():
   urlpatterns += [

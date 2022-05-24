@@ -124,9 +124,6 @@ class DataCatalogContext {
         .catch(() => {
           self.hasErrors(true);
         })
-        .finally(() => {
-          self.loading(false);
-        })
     );
 
     // TODO: Use connector attributes in dataCatalogContext
@@ -177,6 +174,7 @@ class DataCatalogContext {
     );
 
     $.when.apply($, self.activePromises).always(() => {
+      self.loading(false);
       self.activePromises.length = 0;
     });
   }
