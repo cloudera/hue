@@ -642,7 +642,6 @@ def default_from_email():
     _default_from_email = "hue@" + fqdn
   return _default_from_email
 
-from indexer.conf import ENABLE_DIRECT_UPLOAD  # Circular dependency 
 
 def default_database_options():
   """Database type dependent options"""
@@ -650,8 +649,6 @@ def default_database_options():
     return {'threaded': True}
   elif DATABASE.ENGINE.get().endswith('sqlite3'):
     return {'timeout': 30}
-  elif DATABASE.ENGINE.get().endswith('mysql') and ENABLE_DIRECT_UPLOAD:     # Setting this variable to 64MB because mysql5.7
-    return {'init_command': 'SET GLOBAL max_allowed_packet=67108864'}        # has default value of this variable 4MB
   else:
     return {}
 
@@ -1792,19 +1789,6 @@ ENABLE_SHARING = Config(
     'Global setting to enable or disable document sharing. Note that this does not affect currently shared documents.'),
   type=coerce_bool,
   default=True)
-
-ENABLE_DJANGO_DEBUG_TOOL = Config(
-  key="enable_django_debug_tool",
-  help=_('Allow use django debug tool with Chrome browser for debugging issue, django_debug_mode must be true also'),
-  type=coerce_bool,
-  default=False)
-
-DJANGO_DEBUG_TOOL_USERS = Config(
-  key='django_debug_tool_users',
-  default='',
-  type=coerce_csv,
-  help=_('Comma separated list of users that allow to use django debug tool. If it is empty, all users are allowed.')
-)
 
 USE_NEW_ASSIST_PANEL = Config(
   key='use_new_assist_panel',
