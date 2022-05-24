@@ -16,8 +16,9 @@
 
 /* eslint-disable no-restricted-syntax */
 
-const fs = require('fs');
 const cli = require('jison/lib/cli');
+const fs = require('fs');
+const fsExtra = require('fs-extra');
 
 const LICENSE =
   '// Licensed to Cloudera, Inc. under one\n' +
@@ -43,15 +44,9 @@ const SQL_STATEMENTS_PARSER_JSDOC =
   ' * @return {SqlStatementsParserResult}\n' +
   ' */\n';
 
-const PARSER_FOLDER = '../../desktop/core/src/desktop/js/parse/sql/';
 const OUTPUT_FOLDER = '../../desktop/core/src/desktop/js/parse/';
-const JISON_FOLDER = '../../desktop/core/src/desktop/js/parse/jison/';
-const SQL_PARSER_REPOSITORY_PATH =
-  '../../desktop/core/src/desktop/js/parse/sql/sqlParserRepository.ts';
-const SYNTAX_PARSER_IMPORT_TEMPLATE =
-  '  KEY: () => import(/* webpackChunkName: "KEY-parser" */ \'./KEY/KEYSyntaxParser\')';
-const AUTOCOMPLETE_PARSER_IMPORT_TEMPLATE =
-  '  KEY: () => import(/* webpackChunkName: "KEY-parser" */ \'./KEY/KEYAutocompleteParser\')';
+const PARSER_FOLDER = `${OUTPUT_FOLDER}sql/`;
+const JISON_FOLDER = `${OUTPUT_FOLDER}jison/`;
 
 const parserDefinitions = {
   globalSearchParser: {
@@ -148,11 +143,14 @@ const readFile = path =>
 
 const writeFile = (path, contents) =>
   new Promise((resolve, reject) => {
-    fs.writeFile(path, contents, err => {
-      if (err) {
-        reject();
-      }
-      resolve();
+    fsExtra.ensureFile(path).then(() => {
+      fs.writeFile(path, contents, err => {
+        if (err) {
+          console.log(err);
+          reject();
+        }
+        resolve();
+      });
     });
   });
 
@@ -229,7 +227,10 @@ const generateParser = parserName =>
                     deleteFile(generatedJsFileName);
                     resolve();
                   })
-                  .catch(reject);
+                  .catch(error => {
+                    console.info(error);
+                    reject();
+                  });
               })
               .catch(reject);
           })
@@ -301,11 +302,13 @@ const addParsersFromStructure = (structure, dialect) => {
   );
 };
 
+const fileIsVisible = fileName => !fileName.startsWith('.');
+
 const identifySqlParsers = () =>
   new Promise(resolve => {
     listDir(JISON_FOLDER + 'sql').then(files => {
       const promises = [];
-      files.forEach(folder => {
+      files.filter(fileIsVisible).forEach(folder => {
         promises.push(
           listDir(JISON_FOLDER + 'sql/' + folder).then(async jisonFiles => {
             if (jisonFiles.find(fileName => fileName === 'structure.json')) {
@@ -376,12 +379,10 @@ const prepareForNewParser = () =>
                     listDir(JISON_FOLDER + 'sql/' + source).then(files => {
                       const copyPromises = [];
                       files.forEach(file => {
-                        copyPromises.push(
-                          copyFile(
-                            JISON_FOLDER + 'sql/' + source + '/' + file,
-                            JISON_FOLDER + 'sql/' + target + '/' + file
-                          )
-                        );
+                        // "file" can also be a subfolder with files in it
+                        const fromPath = JISON_FOLDER + 'sql/' + source + '/' + file;
+                        const toPath = JISON_FOLDER + 'sql/' + target + '/' + file;
+                        copyPromises.push(fsExtra.copy(fromPath, toPath));
                       });
                       Promise.all(copyPromises).then(() => {
                         const autocompleteSources = [
@@ -484,37 +485,6 @@ identifySqlParsers().then(() => {
             console.log(error);
             console.log('FAIL!');
           });
-      } else {
-        const autocompParsers = [];
-        const syntaxParsers = [];
-        console.log('Updating sqlParserRepository.ts...');
-        Object.keys(parserDefinitions).forEach(key => {
-          if (parserDefinitions[key].sqlParser === 'AUTOCOMPLETE') {
-            autocompParsers.push(
-              AUTOCOMPLETE_PARSER_IMPORT_TEMPLATE.replace(
-                /KEY/g,
-                key.replace('AutocompleteParser', '')
-              )
-            );
-          } else if (parserDefinitions[key].sqlParser === 'SYNTAX') {
-            syntaxParsers.push(
-              SYNTAX_PARSER_IMPORT_TEMPLATE.replace(/KEY/g, key.replace('SyntaxParser', ''))
-            );
-          }
-        });
-        readFile(SQL_PARSER_REPOSITORY_PATH).then(contents => {
-          contents = contents.replace(
-            /const SYNTAX_MODULES = [^}]+}/,
-            'const SYNTAX_MODULES = {\n' + syntaxParsers.sort().join(',\n') + '\n}'
-          );
-          contents = contents.replace(
-            /const AUTOCOMPLETE_MODULES = [^}]+}/,
-            'const AUTOCOMPLETE_MODULES = {\n' + autocompParsers.sort().join(',\n') + '\n}'
-          );
-          writeFile(SQL_PARSER_REPOSITORY_PATH, contents).then(() => {
-            console.log('Done!\n');
-          });
-        });
       }
     };
     generateRecursive();
@@ -522,3 +492,5 @@ identifySqlParsers().then(() => {
 });
 
 /* eslint-enable no-restricted-syntax */
+
+module.exports = { LICENSE, PARSER_FOLDER };
