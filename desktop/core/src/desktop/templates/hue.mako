@@ -326,7 +326,6 @@ ${ commonHeaderFooterComponents.header_pollers(user, is_s3_enabled, apps) }
 ${ smart_unicode(login_modal(request).content) | n,unicode }
 % endif
 
-<div class="shepherd-backdrop"></div>
 
 <iframe id="zoomDetectFrame" style="width: 250px; display: none" ></iframe>
 
