@@ -69,6 +69,8 @@ jobs:
 
         cp -r docs /usr/share/hue
 
+        cd /usr/share/hue/tools/jison && npm install && node generateParserModuleImports.js
+
         cd /usr/share/hue
 
         npm install
