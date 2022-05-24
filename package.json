@@ -107,7 +107,7 @@
     "eslint-plugin-prettier": "3.4.0",
     "eslint-plugin-vue": "7.10.0",
     "expose-loader": "3.0.0",
-    "grunt": "1.4.1",
+    "grunt": "1.5.2",
     "grunt-contrib-less": "3.0.0",
     "grunt-contrib-watch": "1.1.0",
     "identity-obj-proxy": "3.0.0",
