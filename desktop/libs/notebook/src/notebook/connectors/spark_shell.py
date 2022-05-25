@@ -234,6 +234,12 @@ class SparkApi(Api):
     session = self._handle_session_health_check(session)
 
     response = self._fetch_result(api, session, cell, start_over)
+
+    # Close unused sessions if there are any.
+    # Clean here since /fetch_result_data is called only once after the /execute call
+    if self._get_session_info_from_user():
+      self._close_unused_sessions()
+
     return response
 
 
