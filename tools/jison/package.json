@@ -9,7 +9,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "fs-extra": "^10.1.0",
     "jison": "https://github.com/JohanAhlen/jison/tarball/ad8e41475e"
   }
 }
