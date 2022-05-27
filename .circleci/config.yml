@@ -101,10 +101,6 @@ commands:
             cp ~/repo/package.json .
             rm -f package-lock.json
             cp ~/repo/package-lock.json .
-
-            cd /usr/share/hue/tools/jison && npm install && node generateParserModuleImports.js
-            cd /usr/share/hue
-            
             npm install
             npm i eslint-plugin-jest@latest --save-dev # Seems to not be found otherwise
             npm run webpack
