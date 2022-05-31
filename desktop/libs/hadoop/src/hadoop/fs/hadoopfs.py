@@ -235,7 +235,7 @@ class Hdfs(object):
       else:
         LOG.info(_('%(remote_dst)s does not exist. Trying to copy.') % {'remote_dst': remote_dst})
 
-      src = file(local_src)
+      src = open(local_src)
       try:
         try:
           self.create(remote_dst, permission=0o755)
