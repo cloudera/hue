@@ -423,6 +423,11 @@ else:
     "CONN_MAX_AGE": desktop.conf.DATABASE.CONN_MAX_AGE.get(),
   }
 
+  if desktop.conf.DATABASE.ENGINE.get() == 'django.db.backends.oracle' and \
+     'PORT=' in desktop.conf.DATABASE.NAME.get():
+    # remove port number for Oracle RAC, and the port number is in description string
+    del default_db["PORT"]
+
 DATABASES = {
   'default': default_db
 }
