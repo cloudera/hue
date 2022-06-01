@@ -38,6 +38,13 @@ else:
 
 
 class TestJwtAuthentication():
+
+  @classmethod
+  def setUpClass(cls):
+    if sys.version_info[0] < 3:
+      raise SkipTest
+
+
   def setUp(self):
     self.client = make_logged_in_client(username="test_user", groupname="default", recreate=True, is_superuser=False)
     self.user = rewrite_user(User.objects.get(username="test_user"))
