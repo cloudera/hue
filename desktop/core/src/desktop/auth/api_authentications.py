@@ -52,6 +52,9 @@ class JwtAuthentication(authentication.BaseAuthentication):
 
     LOG.debug('JwtAuthentication: got access token from %s: %s' % (request.path, access_token))
 
+    decode_options = {
+      'verify_signature': AUTH.JWT.VERIFY.get(),
+    }
     public_key_pem = ''
     if AUTH.JWT.VERIFY.get():
       public_key_pem = self._handle_public_key(access_token)
@@ -63,7 +66,7 @@ class JwtAuthentication(authentication.BaseAuthentication):
         issuer=AUTH.JWT.ISSUER.get(),
         audience=AUTH.JWT.AUDIENCE.get(),
         algorithms=["RS256"],
-        verify=AUTH.JWT.VERIFY.get()
+        options=decode_options
       )
     except jwt.DecodeError:
       LOG.error('JwtAuthentication: Invalid token')
