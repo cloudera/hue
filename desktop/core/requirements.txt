@@ -25,7 +25,7 @@ django-nose==1.4.7
 django_opentracing==1.1.0
 django_prometheus==1.0.15
 django-webpack-loader==1.0.0
-djangorestframework-simplejwt==4.4.0  # For Python 3.6
+djangorestframework-simplejwt==5.2.0
 djangorestframework==3.12.2
 eventlet==0.30.2
 future==0.18.2
@@ -57,7 +57,7 @@ python-ldap==3.1.0
 python-oauth2==1.1.0
 pytidylib==0.3.2
 pytz==2021.3
-PyJWT==1.7.1
+PyJWT==2.4.0
 PyYAML==5.4.1
 requests-kerberos==0.12.0
 rsa==4.7
