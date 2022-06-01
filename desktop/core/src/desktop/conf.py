@@ -227,40 +227,20 @@ SSL_CIPHER_LIST = Config(
   key="ssl_cipher_list",
   help=_("List of allowed and disallowed ciphers"),
 
-  # From https://wiki.mozilla.org/Security/Server_Side_TLS v3.7 default
-  # recommendation, which should be compatible with Firefox 1, Chrome 1, IE 7,
-  # Opera 5 and Safari 1.
+  # Based on "Intermediate compatibility" recommendations from
+  # https://wiki.mozilla.org/Security/Server_Side_TLS#Intermediate_compatibility_.28recommended.29
+  # which should be compatible with Firefox 27, Chrome 31, IE 11,
+  # Opera 20 and Safari 9.
   default=':'.join([
     'ECDHE-RSA-AES128-GCM-SHA256',
     'ECDHE-ECDSA-AES128-GCM-SHA256',
     'ECDHE-RSA-AES256-GCM-SHA384',
     'ECDHE-ECDSA-AES256-GCM-SHA384',
     'DHE-RSA-AES128-GCM-SHA256',
-    'DHE-DSS-AES128-GCM-SHA256',
-    'kEDH+AESGCM',
-    'ECDHE-RSA-AES128-SHA256',
-    'ECDHE-ECDSA-AES128-SHA256',
-    'ECDHE-RSA-AES128-SHA',
-    'ECDHE-ECDSA-AES128-SHA',
-    'ECDHE-RSA-AES256-SHA384',
-    'ECDHE-ECDSA-AES256-SHA384',
-    'ECDHE-RSA-AES256-SHA',
-    'ECDHE-ECDSA-AES256-SHA',
-    'DHE-RSA-AES128-SHA256',
-    'DHE-RSA-AES128-SHA',
-    'DHE-DSS-AES128-SHA256',
-    'DHE-RSA-AES256-SHA256',
-    'DHE-DSS-AES256-SHA',
-    'DHE-RSA-AES256-SHA',
-    'AES128-GCM-SHA256',
-    'AES256-GCM-SHA384',
-    'AES128-SHA256',
-    'AES256-SHA256',
-    'AES128-SHA',
-    'AES256-SHA',
-    'AES',
-    'CAMELLIA',
-    'DES-CBC3-SHA',
+    'ECDHE-ECDSA-CHACHA20-POLY1305',
+    'ECDHE-RSA-CHACHA20-POLY1305',
+    'DHE-RSA-AES256-GCM-SHA384',
+
     '!aNULL',
     '!eNULL',
     '!EXPORT',
