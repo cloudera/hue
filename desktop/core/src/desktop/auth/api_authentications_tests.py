@@ -199,7 +199,7 @@ class TestJwtAuthentication():
             issuer=AUTH.JWT.ISSUER.get(),
             audience=AUTH.JWT.AUDIENCE.get(),
             algorithms=['RS256'],
-            verify=True
+            options={'verify_signature': True}
           )
           assert_equal(user, self.user)
         finally:
