@@ -831,13 +831,30 @@ class OnePageViewModel {
       });
     });
 
+    // The page library encodes the plus character (+) as a space in the returning
+    // params object. That causes the path used by the file viewer to break and this
+    // is a defensive fix to handle that while still having access to the other ctx params
+    // needed to "revert" the incorrect encoding.
+    const fixPlusCharTurnedIntoSpace = (ctx, mapping) => {
+      let correctCtxParams = ctx.params;
+      if (mapping.app === 'filebrowser' && ctx.path.indexOf('+') >= 0) {
+        if (ctx.params[0] && ctx.params[0].indexOf(' ') >= 0) {
+          const pathWithoutParams = mapping.url.slice(0, -1);
+          const modifiedParam = decodeURIComponent(ctx.path.replace(pathWithoutParams, ''));
+          correctCtxParams = { 0: modifiedParam };
+        }
+      }
+      return correctCtxParams;
+    };
+
     pageMapping.forEach(mapping => {
       page(
         mapping.url,
         _.isFunction(mapping.app)
           ? mapping.app
           : ctx => {
-              self.currentContextParams(ctx.params);
+              const ctxParams = fixPlusCharTurnedIntoSpace(ctx, mapping);
+              self.currentContextParams(ctxParams);
               self.currentQueryString(ctx.querystring);
               self.loadApp(mapping.app);
             }
