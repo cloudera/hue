@@ -443,7 +443,7 @@ else:
   <div id="uploadFileModal" class="modal hide fade">
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
-      <h2 class="modal-title">${_('Upload to')} <span data-bind="text: currentPath"></span></h2>
+      <h2 class="modal-title">${_('Upload to')} <span data-bind="text: currentDecodedPath"></span></h2>
     </div>
     <div class="modal-body form-inline">
       <div id="fileUploader" class="uploader">
@@ -1055,7 +1055,16 @@ else:
       };
 
       self.currentPath = ko.observable(currentDirPath);
+      self.currentDecodedPath = ko.observable(decodeURI(currentDirPath));      
+
       self.currentPath.subscribe(function (path) {
+        // currentEditablePath can be edited by the user in #hueBreadcrumbText.
+        // It is using a decoded currentPath in order to correctly display non ASCII characters        
+        const decodedPath = decodeURI(path);
+        if (decodedPath !== self.currentDecodedPath()) {          
+          self.currentDecodedPath(decodedPath);
+        } 
+        
         $(document).trigger('currPathLoaded', { path: path });
       });
 
@@ -1367,10 +1376,15 @@ else:
           self.targetPath(file.url);
           updateHash(stripHashes(file.path));
         } else {
+          
+          // Fix to encode potential hash characters in a file name when viewing a file
+          const url = file.name.indexOf('#') >= 0 && file.url.indexOf('#') >= 0 
+            ? file.url.replaceAll('#', encodeURIComponent('#')) : file.url;
+
           %if is_embeddable:
-          huePubSub.publish('open.link', file.url);
+          huePubSub.publish('open.link', url);
           %else:
-          window.location.href = file.url;
+          window.location.href = url;
           %endif
         }
       };
