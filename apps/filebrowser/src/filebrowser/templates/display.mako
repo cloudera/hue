@@ -242,7 +242,14 @@ ${ fb_components.menubar() }
       mode: viewModel.mode()
     };
 
-    $.getJSON(_baseUrl, params, function (data) {
+    // Singel quotes (') encoded as Unicode Hex Character
+    // will cause the $.getJSON call to produce an incorrect url, 
+    // so we remove the encoding and use plain single quotes.
+    let contentUrl = _baseUrl.replaceAll('&#x27;', "'");
+    // Entity encoded ampersand doesn't work in file or folder names and
+    // needs to be replaced with '&'
+    contentUrl = contentUrl.replaceAll('&amp;', "&");
+    $.getJSON(contentUrl, params, function (data) {
       var _html = "";
 
       viewModel.file(ko.mapping.fromJS(data, { 'ignore': ['view.contents', 'view.xxd'] }));
