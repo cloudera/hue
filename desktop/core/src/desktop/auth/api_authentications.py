@@ -19,6 +19,7 @@ import logging
 import requests
 import jwt
 import json
+import sys
 
 from cryptography.hazmat.primitives import serialization
 from rest_framework import authentication, exceptions
@@ -52,22 +53,28 @@ class JwtAuthentication(authentication.BaseAuthentication):
 
     LOG.debug('JwtAuthentication: got access token from %s: %s' % (request.path, access_token))
 
-    decode_options = {
-      'verify_signature': AUTH.JWT.VERIFY.get(),
-    }
     public_key_pem = ''
     if AUTH.JWT.VERIFY.get():
       public_key_pem = self._handle_public_key(access_token)
 
+    params = {
+      'jwt': access_token,
+      'key': public_key_pem,
+      'issuer': AUTH.JWT.ISSUER.get(),
+      'audience': AUTH.JWT.AUDIENCE.get(),
+      'algorithms': ["RS256"]
+    }
+
+    if sys.version_info[0] > 2:
+      params['options'] = {
+        'verify_signature': AUTH.JWT.VERIFY.get()
+      }
+    else:
+      params['verify'] = AUTH.JWT.VERIFY.get()
+
     try:
-      payload = jwt.decode(
-        access_token,
-        public_key_pem,
-        issuer=AUTH.JWT.ISSUER.get(),
-        audience=AUTH.JWT.AUDIENCE.get(),
-        algorithms=["RS256"],
-        options=decode_options
-      )
+      payload = jwt.decode(**params)
+
     except jwt.DecodeError:
       LOG.error('JwtAuthentication: Invalid token')
       raise exceptions.AuthenticationFailed('JwtAuthentication: Invalid token')
