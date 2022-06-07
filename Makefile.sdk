@@ -194,7 +194,7 @@ distclean:: clean
 .PHONY: compile-locale
 compile-locale:
 	$(PYBABEL) extract . -F babel.cfg -k _ -k _t -o $(LOCALE_ROOT)/en_US.pot --copyright-holder="Cloudera, Inc" --project="Hue" --version=""
-	$(PYBABEL) update -D django -i $(LOCALE_ROOT)/en_US.pot -d $(LOCALE_ROOT)
+	$(PYBABEL) update -D django -i $(LOCALE_ROOT)/en_US.pot -d $(LOCALE_ROOT) -N  # skipping the fuzzy translation
 	$(PYBABEL) compile -D django -d $(LOCALE_ROOT)
 
 
