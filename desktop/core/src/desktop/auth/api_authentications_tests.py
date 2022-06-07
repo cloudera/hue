@@ -193,8 +193,11 @@ class TestJwtAuthentication():
           user, token = JwtAuthentication().authenticate(request=self.request)
 
           jwt_decode.assert_called_with(
-            self.sample_token,
-            b'-----BEGIN PUBLIC KEY-----\n'
+            algorithms=['RS256'],
+            audience=AUTH.JWT.AUDIENCE.get(),
+            issuer=AUTH.JWT.ISSUER.get(),
+            jwt=self.sample_token,
+            key=b'-----BEGIN PUBLIC KEY-----\n'
             b'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArtT3gR0NDIx6gv8xYLiP\n'
             b'ue/ItaIbognCGGgQbipp3IOuobu2RnJjedsIRBTEOdkVx+xjV6m92VYtrpW6gM9v\n'
             b'ldwTfI0UmoSLGKT5uYd0JGHvYWoN9inCZYZcnala58T8HDgLiXa9KlEuQxGGQDem\n'
@@ -203,9 +206,6 @@ class TestJwtAuthentication():
             b'Vno2e527clXzQisfJKwb4hjfKRMhHfnYfyJxaoHqWfx8DjXmH3CMqlWr/+hL3y1+\n'
             b'4QIDAQAB\n'
             b'-----END PUBLIC KEY-----\n',
-            issuer=AUTH.JWT.ISSUER.get(),
-            audience=AUTH.JWT.AUDIENCE.get(),
-            algorithms=['RS256'],
             options={'verify_signature': True}
           )
           assert_equal(user, self.user)
