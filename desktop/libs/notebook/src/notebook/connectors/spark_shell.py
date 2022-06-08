@@ -238,7 +238,7 @@ class SparkApi(Api):
     # Close unused sessions if there are any.
     # Clean here since /fetch_result_data is called only once after the /execute call
     if self._get_session_info_from_user():
-      self._close_unused_sessions()
+      self._close_unused_sessions(snippet.get('type'))
 
     return response
 
@@ -343,7 +343,7 @@ class SparkApi(Api):
       if stored_session_info and self._check_session(stored_session_info):
         session = stored_session_info
       else:
-        raise PopupException(_("Session expired. Please create new session and try again."))
+        raise Exception(_("Session error. Please create new session and try again."))
     
     return session
 
@@ -391,7 +391,7 @@ class SparkApi(Api):
     # Trying to close unused sessions if there are any.
     # Calling the method here since this /autocomplete call can be frequent enough and we dont need dedicated one.
     if self._get_session_info_from_user():
-      self._close_unused_sessions()
+      self._close_unused_sessions(snippet.get('type'))
     
     stored_session_info = self._get_session_info_from_user()
     if stored_session_info and self._check_session(stored_session_info):
@@ -417,7 +417,7 @@ class SparkApi(Api):
     return response
 
 
-  def _close_unused_sessions(self):
+  def _close_unused_sessions(self, session_type):
     '''
     Closes all unused Livy sessions for a particular user to free up session resources.
     '''
@@ -434,7 +434,7 @@ class SparkApi(Api):
       stored_session_info = self._get_session_info_from_user()
       for session in all_sessions['sessions']:
         if session['owner'] == self.user.username and session['id'] != stored_session_info['id'] and \
-          session['state'] in ('idle', 'shutting_down', 'error', 'dead', 'killed'):
+          session['kind'] == session_type and session['state'] in ('idle', 'shutting_down', 'error', 'dead', 'killed'):
           self.close_session(session)
 
 
@@ -491,7 +491,7 @@ class SparkApi(Api):
     # Trying to close unused sessions if there are any.
     # Calling the method here since this /sample_data call can be frequent enough and we dont need dedicated one.
     if self._get_session_info_from_user():
-      self._close_unused_sessions()
+      self._close_unused_sessions(snippet.get('type'))
 
     stored_session_info = self._get_session_info_from_user()
     if stored_session_info and self._check_session(stored_session_info):
