@@ -343,7 +343,7 @@ class SparkApi(Api):
       if stored_session_info and self._check_session(stored_session_info):
         session = stored_session_info
       else:
-        raise Exception(_("Session error. Please create new session and try again."))
+        raise PopupException(_("Session error. Please create new session and try again."))
     
     return session
 
