@@ -90,7 +90,7 @@
   import Executor from '../../execution/executor';
   import SqlExecutable, { ExecutionStatus } from '../../execution/sqlExecutable';
   import { login } from 'api/auth';
-  import { setBaseUrl } from 'api/utils';
+  import { setBaseUrl, setBearerToken } from 'api/utils';
   import contextCatalog from 'catalog/contextCatalog';
   import sqlAnalyzerRepository from 'catalog/analyzer/sqlAnalyzerRepository';
   import HueIcons from 'components/icons/HueIcons.vue';
@@ -134,10 +134,14 @@
       password: {
         type: String as PropType<string | null>,
         default: null
+      },
+      jwt: {
+        type: String as PropType<string | null>,
+        default: null
       }
     },
     setup(props) {
-      const { apiUrl, dialect, username, email, password } = toRefs(props);
+      const { apiUrl, dialect, username, email, password, jwt } = toRefs(props);
       const subTracker = new SubscriptionTracker();
       const activeExecutable = ref<SqlExecutable>(null);
       const executor = ref<Executor>(null);
@@ -183,6 +187,10 @@
             console.error(err);
             return;
           }
+        }
+
+        if (jwt.value !== null) {
+          setBearerToken(jwt.value);
         }
 
         try {
