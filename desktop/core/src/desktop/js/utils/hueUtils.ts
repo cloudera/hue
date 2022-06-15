@@ -38,6 +38,7 @@ import stripHtmlFromFunctions from './html/stripHtmlForFunctions';
 import deleteAllEmptyStringKeys from './string/deleteAllEmptyStringKeys';
 import equalIgnoreCase from './string/equalIgnoreCase';
 import parseHivePseudoJson from './string/parseHivePseudoJson';
+import isComplexDBTypeDefinition from './string/isComplexDBTypeDefinition';
 import UUID from './string/UUID';
 
 import waitForObservable from './timing/waitForObservable';
@@ -77,6 +78,7 @@ export default {
   isOverflowing,
   logError,
   parseHivePseudoJson,
+  isComplexDBTypeDefinition,
   removeURLParameter,
   replaceURL,
   scrollbarWidth,
