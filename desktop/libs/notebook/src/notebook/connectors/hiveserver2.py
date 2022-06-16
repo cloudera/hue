@@ -650,15 +650,13 @@ class HS2Api(Api):
     hql = '''
 DROP TABLE IF EXISTS `%(table)s`;
 
-CREATE TABLE `%(table)s` ROW FORMAT DELIMITED
+CREATE EXTERNAL TABLE `%(table)s` ROW FORMAT DELIMITED
      FIELDS TERMINATED BY '\\t'
      ESCAPED BY '\\\\'
      LINES TERMINATED BY '\\n'
      STORED AS TEXTFILE LOCATION '%(location)s'
      AS
 %(hql)s;
-
-ALTER TABLE `%(table)s` SET TBLPROPERTIES('EXTERNAL'='TRUE');
 
 DROP TABLE IF EXISTS `%(table)s`;
     ''' % {
