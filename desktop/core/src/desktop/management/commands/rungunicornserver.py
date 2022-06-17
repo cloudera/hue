@@ -108,18 +108,18 @@ def rungunicornserver():
       'enable_stdio_inheritance': None,
       'errorlog': "-",
       'forwarded_allow_ips': None,
-      'graceful_timeout': None,
+      'graceful_timeout': 900,                # Timeout for graceful workers restart.
       'group': None,
       'initgroups': None,
-      'keepalive': None,
+      'keepalive': 120,                       # Set this to a higher value because this Gunicorn is behind a load balancer
       'keyfile': conf.SSL_PRIVATE_KEY.get(),  # SSL key file
       'limit_request_field_size': None,
       'limit_request_fields': None,
       'limit_request_line': None,
       'logconfig': None,
       'loglevel': 'info',
-      'max_requests': None,
-      'max_requests_jitter': None,
+      'max_requests': 0,                      # 0 means disable worker restart.
+      'max_requests_jitter': 0,
       'paste': None,
       'pidfile': None,
       'preload_app': None,
@@ -142,7 +142,7 @@ def rungunicornserver():
       'syslog_facility': None,
       'syslog_prefix': None,
       'threads': conf.CHERRYPY_SERVER_THREADS.get(),
-      'timeout': None,
+      'timeout': 900,                         # Workers silent for more than this many seconds are killed and restarted.
       'umask': None,
       'user': None,
       'worker_class': conf.GUNICORN_WORKER_CLASS.get(),
