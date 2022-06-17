@@ -148,7 +148,7 @@ ENABLE_DIRECT_UPLOAD = Config(
   key="enable_direct_upload",
   help=_t("Flag to turn on the direct upload of a small file."),
   type=coerce_bool,
-  default=True
+  default=False
 )
 
 # Unused
