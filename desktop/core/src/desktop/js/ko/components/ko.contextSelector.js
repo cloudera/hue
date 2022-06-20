@@ -241,7 +241,7 @@ const HueContextSelector = function (params) {
     huePubSub.subscribe('data.catalog.entry.refreshed', details => {
       if (details.entry.isSource()) {
         if (ko.unwrap(self.connector).id === details.entry.getConnector().id) {
-          self.reloadDatabases(true);
+          self.reloadDatabases();
         }
       }
     });
@@ -387,7 +387,7 @@ HueContextSelector.prototype.reload = function (type) {
   }
 };
 
-HueContextSelector.prototype.reloadDatabases = function (force_refresh) {
+HueContextSelector.prototype.reloadDatabases = function () {
   const self = this;
   if (self.database && !self.hideDatabases) {
     self.loadingDatabases(true);
@@ -456,8 +456,7 @@ HueContextSelector.prototype.reloadDatabases = function (force_refresh) {
                     huePubSub.publish(ASSIST_SET_DATABASE_EVENT, {
                       connector: connector,
                       namespace: self[TYPES_INDEX.namespace.name](),
-                      name: self.database(),
-                      force_refresh: force_refresh
+                      name: self.database()
                     });
                   }
                 });
