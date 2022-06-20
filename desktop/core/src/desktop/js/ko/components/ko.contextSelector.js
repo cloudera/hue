@@ -423,42 +423,7 @@ HueContextSelector.prototype.reloadDatabases = function () {
                   self.availableDatabases([]);
                 })
                 .finally(() => {
-                  let lastSelectedDb = getFromLocalStorage(
-                    'assist_' +
-                      ko.unwrap(self.connector).id +
-                      '_' +
-                      self[TYPES_INDEX.namespace.name]().id +
-                      '.lastSelectedDb'
-                  );
-
-                  const updateAssist = lastSelectedDb !== '';
-
-                  if (
-                    !self.database() ||
-                    self.availableDatabases().indexOf(self.database()) === -1
-                  ) {
-                    if (!lastSelectedDb) {
-                      lastSelectedDb = 'default';
-                    }
-
-                    if (
-                      self.availableDatabases().length === 0 ||
-                      self.availableDatabases().indexOf(lastSelectedDb) !== -1
-                    ) {
-                      self.database(lastSelectedDb);
-                    } else {
-                      self.database(self.availableDatabases()[0]);
-                    }
-                  }
                   self.loadingDatabases(false);
-
-                  if (updateAssist) {
-                    huePubSub.publish(ASSIST_SET_DATABASE_EVENT, {
-                      connector: connector,
-                      namespace: self[TYPES_INDEX.namespace.name](),
-                      name: self.database()
-                    });
-                  }
                 });
             });
         }, 10);
