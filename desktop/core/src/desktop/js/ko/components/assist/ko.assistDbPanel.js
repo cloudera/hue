@@ -656,12 +656,14 @@ class AssistDbPanel {
         }
       });
     } else if (!this.isSolr && !this.isStreams) {
-      huePubSub.subscribe(ASSIST_SET_DATABASE_EVENT, databaseDef => {
+      huePubSub.subscribe(ASSIST_SET_DATABASE_EVENT, (databaseDef, force_refresh) => {
         if (!databaseDef.connector || !this.sourceIndex[databaseDef.connector.id]) {
           return;
         }
         this.selectedSource(this.sourceIndex[databaseDef.connector.id]);
-        this.setDatabaseWhenLoaded(databaseDef.namespace, databaseDef.name);
+        if (!databaseDef.force_refresh) {
+          this.setDatabaseWhenLoaded(databaseDef.namespace, databaseDef.name);
+        }
       });
 
       const getSelectedDatabase = connector => {
