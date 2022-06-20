@@ -326,7 +326,6 @@ ${ commonHeaderFooterComponents.header_pollers(user, is_s3_enabled, apps) }
 ${ smart_unicode(login_modal(request).content) | n,unicode }
 % endif
 
-<div class="shepherd-backdrop"></div>
 
 <iframe id="zoomDetectFrame" style="width: 250px; display: none" ></iframe>
 
@@ -441,7 +440,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
     %if is_admin(user):
       tour.addStep('admin', {
         text: '${ _ko('As a superuser, you can check system configuration from the user menu and install sample data and jobs for your users.') }',
-        attachTo: '.hue-sidebar .shepherd-user-menu right'
+        attachTo: '.server-position-pointer-welcome-tour left'
       });
     %endif
 

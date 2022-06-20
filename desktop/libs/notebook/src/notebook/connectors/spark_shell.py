@@ -21,12 +21,14 @@ import re
 import sys
 import time
 import textwrap
+import json
 
 from desktop.conf import USE_DEFAULT_CONFIGURATION
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode
 from desktop.lib.rest.http_client import RestException
 from desktop.models import DefaultConfiguration
+from desktop.auth.backend import rewrite_user
 
 from notebook.data_export import download as spark_download
 from notebook.connectors.base import Api, QueryError, SessionExpired, _get_snippet_session
@@ -46,8 +48,8 @@ try:
 except ImportError as e:
   LOG.exception('Spark is not enabled')
 
-SESSIONS = {}
 SESSION_KEY = '%(username)s-%(interpreter_name)s'
+
 class SparkApi(Api):
 
   SPARK_UI_RE = re.compile("Started SparkUI at (http[s]?://([0-9a-zA-Z-_\.]+):(\d+))")
@@ -118,15 +120,28 @@ class SparkApi(Api):
     }
 
 
+  def _check_session(self, session):
+    '''
+    Check if the session is actually present and its state is healthy.
+    '''
+    api = self.get_api()
+    try:
+      session_present = api.get_session(session['id'])
+    except Exception as e:
+      session_present = None
+
+    if session_present and session_present['state'] not in ('dead', 'shutting_down', 'error', 'killed'):
+      return session_present
+
+
   def create_session(self, lang='scala', properties=None):
     api = self.get_api()
-    session_key = self._get_session_key()
+    stored_session_info = self._get_session_info_from_user()
 
-    if SESSIONS.get(session_key):
-      # Checking if the session is actually present to avoid stale value
-      session_present = api.get_session(SESSIONS[session_key]['id'])
+    if stored_session_info:
+      session_present = self._check_session(stored_session_info)
       if session_present:
-        return SESSIONS[session_key]
+        return stored_session_info
 
     if not properties and USE_DEFAULT_CONFIGURATION.get():
       user_config = DefaultConfiguration.objects.get_configuration_for_user(app='spark', user=self.user)
@@ -149,27 +164,32 @@ class SparkApi(Api):
       info = '\n'.join(status['log']) if status['log'] else 'timeout'
       raise QueryError(_('The Spark session is %s and could not be created in the cluster: %s') % (status['state'], info))
 
-    SESSIONS[session_key] = {
+    new_session_info = {
         'type': lang,
         'id': response['id'],
         'properties': self.to_properties(props)
     }
-    return SESSIONS[session_key]
+    self._set_session_info_to_user(new_session_info)
+
+    return new_session_info
     
 
   def execute(self, notebook, snippet):
     api = self.get_api()
     session = _get_snippet_session(notebook, snippet)
 
-    response = self._execute(api, session, snippet['statement'])
+    response = self._execute(api, session, snippet.get('type'), snippet['statement'])
     return response
 
 
-  def _execute(self, api, session, statement):
-    session_key = self._get_session_key()
+  def _execute(self, api, session, snippet_type, statement):
 
-    if session['id'] is None and SESSIONS.get(session_key) is not None:
-      session = SESSIONS[session_key]
+    if not session or not self._check_session(session):
+      stored_session_info = self._get_session_info_from_user()
+      if stored_session_info and self._check_session(stored_session_info):
+        session = stored_session_info
+      else:
+        session = self.create_session(snippet_type)
 
     try:
       response = api.submit_statement(session['id'], statement)
@@ -191,6 +211,8 @@ class SparkApi(Api):
     session = _get_snippet_session(notebook, snippet)
     cell = snippet['result']['handle']['id']
 
+    session = self._handle_session_health_check(session)
+
     try:
       response = api.fetch_data(session['id'], cell)
       return {
@@ -209,7 +231,15 @@ class SparkApi(Api):
     session = _get_snippet_session(notebook, snippet)
     cell = snippet['result']['handle']['id']
 
+    session = self._handle_session_health_check(session)
+
     response = self._fetch_result(api, session, cell, start_over)
+
+    # Close unused sessions if there are any.
+    # Clean here since /fetch_result_data is called only once after the /execute call
+    if self._get_session_info_from_user():
+      self._close_unused_sessions(snippet.get('type'))
+
     return response
 
 
@@ -279,16 +309,43 @@ class SparkApi(Api):
   def cancel(self, notebook, snippet):
     api = self.get_api()
     session = _get_snippet_session(notebook, snippet)
-    response = api.cancel(session['id'])
+
+    session = self._handle_session_health_check(session)
+
+    try:
+      response = api.cancel(session['id'])
+    except Exception as e:
+      message = force_unicode(str(e)).lower()
+      LOG.debug(message)
 
     return {'status': 0}
 
 
   def get_log(self, notebook, snippet, startFrom=0, size=None):
+    response = {'status': 0}
     api = self.get_api()
     session = _get_snippet_session(notebook, snippet)
 
-    return api.get_log(session['id'], startFrom=startFrom, size=size)
+    session = self._handle_session_health_check(session)
+    try:
+      response = api.get_log(session['id'], startFrom=startFrom, size=size)
+    except RestException as e:
+      message = force_unicode(str(e)).lower()
+      LOG.debug(message)
+
+    return response
+  
+
+  def _handle_session_health_check(self, session):
+
+    if not session or not self._check_session(session):
+      stored_session_info = self._get_session_info_from_user()
+      if stored_session_info and self._check_session(stored_session_info):
+        session = stored_session_info
+      else:
+        raise PopupException(_("Session error. Please create new session and try again."))
+    
+    return session
 
 
   def close_statement(self, notebook, snippet): # Individual statements cannot be closed
@@ -297,7 +354,6 @@ class SparkApi(Api):
 
   def close_session(self, session):
     api = self.get_api()
-    session_key = self._get_session_key()
 
     if session['id'] is not None:
       try:
@@ -310,8 +366,9 @@ class SparkApi(Api):
         if e.code == 404 or e.code == 500: # TODO remove the 500
           raise SessionExpired(e)
       finally:
-        if SESSIONS.get(session_key) and session['id'] == SESSIONS[session_key]['id']:
-          del SESSIONS[session_key]
+        stored_session_info = self._get_session_info_from_user()
+        if stored_session_info and session['id'] == stored_session_info['id']:
+          self._remove_session_info_from_user()
     else:
       return {'status': -1}
 
@@ -327,25 +384,27 @@ class SparkApi(Api):
 
   def autocomplete(self, snippet, database=None, table=None, column=None, nested=None, operation=None):
     response = {}
-
     # As booting a new SQL session is slow and we don't send the id of the current one in /autocomplete
     # we could implement this by introducing an API cache per user similarly to SqlAlchemy.
     api = self.get_api()
-    session_key = self._get_session_key()
 
     # Trying to close unused sessions if there are any.
     # Calling the method here since this /autocomplete call can be frequent enough and we dont need dedicated one.
-    if SESSIONS.get(session_key):
-      self._close_unused_sessions()
+    if self._get_session_info_from_user():
+      self._close_unused_sessions(snippet.get('type'))
     
-    session = SESSIONS[session_key] if SESSIONS.get(session_key) else self.create_session(snippet.get('type'))
+    stored_session_info = self._get_session_info_from_user()
+    if stored_session_info and self._check_session(stored_session_info):
+      session = stored_session_info
+    else:
+      session = self.create_session(snippet.get('type'))
 
     if database is None:
-      response['databases'] = self._show_databases(api, session)
+      response['databases'] = self._show_databases(api, session, snippet.get('type'))
     elif table is None:
-      response['tables_meta'] = self._show_tables(api, session, database)
+      response['tables_meta'] = self._show_tables(api, session, snippet.get('type'), database)
     elif column is None:
-      columns = self._get_columns(api, session, database, table)
+      columns = self._get_columns(api, session, snippet.get('type'), database, table)
       response['columns'] = [col['name'] for col in columns]
       response['extended_columns'] = [{
           'comment': col.get('comment'),
@@ -358,54 +417,64 @@ class SparkApi(Api):
     return response
 
 
-  def _close_unused_sessions(self):
+  def _close_unused_sessions(self, session_type):
     '''
-    Closes all unsused Livy sessions for a particular user to free up session resources.
+    Closes all unused Livy sessions for a particular user to free up session resources.
     '''
     api = self.get_api()
-    session_key = self._get_session_key()
+    all_sessions = {}
 
-    all_sessions = api.get_sessions()
-    for session in all_sessions['sessions']:
-      if session['owner'] == self.user.username and session['id'] != SESSIONS[session_key]['id']:
-        self.close_session(session)
+    try:
+      all_sessions = api.get_sessions()
+    except Exception as e:
+      message = force_unicode(str(e)).lower()
+      LOG.debug(message)
+
+    if all_sessions:
+      stored_session_info = self._get_session_info_from_user()
+      for session in all_sessions['sessions']:
+        if session['owner'] == self.user.username and session['id'] != stored_session_info['id'] and \
+          session['kind'] == session_type and session['state'] in ('idle', 'shutting_down', 'error', 'dead', 'killed'):
+          self.close_session(session)
 
 
   def _check_status_and_fetch_result(self, api, session, execute_resp):
     check_status = api.fetch_data(session['id'], execute_resp['id'])
 
-    while check_status['state'] in ['running', 'waiting']:
+    count = 0
+    while check_status['state'] in ['running', 'waiting'] and count < 120:
       check_status = api.fetch_data(session['id'], execute_resp['id'])
+      count += 1
       time.sleep(1)
 
     if check_status['state'] == 'available':
       return self._fetch_result(api, session, execute_resp['id'], start_over=True)
 
 
-  def _show_databases(self, api, session):
-    show_db_execute = self._execute(api, session, 'SHOW DATABASES')
+  def _show_databases(self, api, session, snippet_type):
+    show_db_execute = self._execute(api, session, snippet_type, 'SHOW DATABASES')
     db_list = self._check_status_and_fetch_result(api, session, show_db_execute)
 
     if db_list:
       return [db[0] for db in db_list['data']]
 
 
-  def _show_tables(self, api, session, database):
-    use_db_execute = self._execute(api, session, 'USE %(database)s' % {'database': database})
+  def _show_tables(self, api, session, snippet_type, database):
+    use_db_execute = self._execute(api, session, snippet_type, 'USE %(database)s' % {'database': database})
     use_db_resp = self._check_status_and_fetch_result(api, session, use_db_execute)
 
-    show_tables_execute = self._execute(api, session, 'SHOW TABLES')
+    show_tables_execute = self._execute(api, session, snippet_type, 'SHOW TABLES')
     tables_list = self._check_status_and_fetch_result(api, session, show_tables_execute)
 
     if tables_list:
       return [table[1] for table in tables_list['data']]
 
 
-  def _get_columns(self, api, session, database, table):
-    use_db_execute = self._execute(api, session, 'USE %(database)s' % {'database': database})
+  def _get_columns(self, api, session, snippet_type, database, table):
+    use_db_execute = self._execute(api, session, snippet_type, 'USE %(database)s' % {'database': database})
     use_db_resp = self._check_status_and_fetch_result(api, session, use_db_execute)
 
-    describe_tables_execute = self._execute(api, session, 'DESCRIBE %(table)s' % {'table': table})
+    describe_tables_execute = self._execute(api, session, snippet_type, 'DESCRIBE %(table)s' % {'table': table})
     columns_list = self._check_status_and_fetch_result(api, session, describe_tables_execute)
 
     if columns_list:
@@ -418,18 +487,21 @@ class SparkApi(Api):
 
   def get_sample_data(self, snippet, database=None, table=None, column=None, is_async=False, operation=None):
     api = self.get_api()
-    session_key = self._get_session_key()
 
     # Trying to close unused sessions if there are any.
     # Calling the method here since this /sample_data call can be frequent enough and we dont need dedicated one.
-    if SESSIONS.get(session_key):
-      self._close_unused_sessions()
+    if self._get_session_info_from_user():
+      self._close_unused_sessions(snippet.get('type'))
 
-    session = SESSIONS[session_key] if SESSIONS.get(session_key) else self.create_session(snippet.get('type'))
+    stored_session_info = self._get_session_info_from_user()
+    if stored_session_info and self._check_session(stored_session_info):
+      session = stored_session_info
+    else:
+      session = self.create_session(snippet.get('type'))
 
     statement = self._get_select_query(database, table, column, operation)
 
-    sample_execute = self._execute(api, session, statement)
+    sample_execute = self._execute(api, session, snippet.get('type'), statement)
     sample_result = self._check_status_and_fetch_result(api, session, sample_execute)
 
     response = {
@@ -508,6 +580,34 @@ class SparkApi(Api):
 
   def _is_yarn_mode(self):
     return LIVY_SERVER_SESSION_KIND.get() == "yarn"
+
+
+  def _get_session_info_from_user(self):
+    self.user = rewrite_user(self.user)
+    session_key = self._get_session_key()
+
+    if self.user.profile.data.get(session_key):
+      return self.user.profile.data[session_key]
+
+
+  def _set_session_info_to_user(self, session_info):
+    self.user = rewrite_user(self.user)
+    session_key = self._get_session_key()
+
+    self.user.profile.update_data({session_key: session_info})
+    self.user.profile.save()
+
+
+  def _remove_session_info_from_user(self):
+    self.user = rewrite_user(self.user)
+    session_key = self._get_session_key()
+
+    if self.user.profile.data.get(session_key):
+      json_data = self.user.profile.data
+      json_data.pop(session_key)
+      self.user.profile.json_data = json.dumps(json_data)
+    
+    self.user.profile.save()
 
 
 class SparkConfiguration(object):

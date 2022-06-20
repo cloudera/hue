@@ -227,40 +227,19 @@ SSL_CIPHER_LIST = Config(
   key="ssl_cipher_list",
   help=_("List of allowed and disallowed ciphers"),
 
-  # From https://wiki.mozilla.org/Security/Server_Side_TLS v3.7 default
-  # recommendation, which should be compatible with Firefox 1, Chrome 1, IE 7,
-  # Opera 5 and Safari 1.
+  # Based on "Intermediate compatibility" recommendations from
+  # https://wiki.mozilla.org/Security/Server_Side_TLS#Intermediate_compatibility_.28recommended.29
+  # which should be compatible with Firefox 27, Chrome 31, IE 11,
+  # Opera 20 and Safari 9.
   default=':'.join([
     'ECDHE-RSA-AES128-GCM-SHA256',
     'ECDHE-ECDSA-AES128-GCM-SHA256',
     'ECDHE-RSA-AES256-GCM-SHA384',
     'ECDHE-ECDSA-AES256-GCM-SHA384',
     'DHE-RSA-AES128-GCM-SHA256',
-    'DHE-DSS-AES128-GCM-SHA256',
-    'kEDH+AESGCM',
-    'ECDHE-RSA-AES128-SHA256',
-    'ECDHE-ECDSA-AES128-SHA256',
-    'ECDHE-RSA-AES128-SHA',
-    'ECDHE-ECDSA-AES128-SHA',
-    'ECDHE-RSA-AES256-SHA384',
-    'ECDHE-ECDSA-AES256-SHA384',
-    'ECDHE-RSA-AES256-SHA',
-    'ECDHE-ECDSA-AES256-SHA',
-    'DHE-RSA-AES128-SHA256',
-    'DHE-RSA-AES128-SHA',
-    'DHE-DSS-AES128-SHA256',
-    'DHE-RSA-AES256-SHA256',
-    'DHE-DSS-AES256-SHA',
-    'DHE-RSA-AES256-SHA',
-    'AES128-GCM-SHA256',
-    'AES256-GCM-SHA384',
-    'AES128-SHA256',
-    'AES256-SHA256',
-    'AES128-SHA',
-    'AES256-SHA',
-    'AES',
-    'CAMELLIA',
-    'DES-CBC3-SHA',
+    'ECDHE-ECDSA-CHACHA20-POLY1305',
+    'ECDHE-RSA-CHACHA20-POLY1305',
+    'DHE-RSA-AES256-GCM-SHA384',
     '!aNULL',
     '!eNULL',
     '!EXPORT',
@@ -1309,7 +1288,7 @@ LDAP = ConfigSection(
                            default=None,
                            help=_("The LDAP URL to connect to.")),
           USE_START_TLS=Config("use_start_tls",
-                               default=True,
+                               default=False,
                                type=coerce_bool,
                                help=_("Use StartTLS when communicating with LDAP server.")),
           LDAP_CERT=Config("ldap_cert",
@@ -1406,7 +1385,7 @@ LDAP = ConfigSection(
                      default=None,
                      help=_("The LDAP URL to connect to.")),
     USE_START_TLS=Config("use_start_tls",
-                         default=True,
+                         default=False,
                          type=coerce_bool,
                          help=_("Use StartTLS when communicating with LDAP server.")),
     LDAP_CERT=Config("ldap_cert",
@@ -1789,19 +1768,6 @@ ENABLE_SHARING = Config(
     'Global setting to enable or disable document sharing. Note that this does not affect currently shared documents.'),
   type=coerce_bool,
   default=True)
-
-ENABLE_DJANGO_DEBUG_TOOL = Config(
-  key="enable_django_debug_tool",
-  help=_('Allow use django debug tool with Chrome browser for debugging issue, django_debug_mode must be true also'),
-  type=coerce_bool,
-  default=False)
-
-DJANGO_DEBUG_TOOL_USERS = Config(
-  key='django_debug_tool_users',
-  default='',
-  type=coerce_csv,
-  help=_('Comma separated list of users that allow to use django debug tool. If it is empty, all users are allowed.')
-)
 
 USE_NEW_ASSIST_PANEL = Config(
   key='use_new_assist_panel',

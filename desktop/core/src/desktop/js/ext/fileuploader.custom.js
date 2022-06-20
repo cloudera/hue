@@ -1256,11 +1256,14 @@ qq.extend(qq.UploadHandlerXhr.prototype, {
             }
         };
 
-        var formData = new FormData();
-        formData.append(params.fileFieldLabel, file);
+        var formData = new FormData();        
+        formData.append(params.fileFieldLabel, file, file.name.normalize('NFC'));
         formData.append('dest', params.dest);
 
-        var action = this._options.action + "?dest=" + params.dest;
+        // Encoding is needed to support folder names with some special 
+        // non alfanumeric characters like plus (+) and ampersand (&)
+        var destination = encodeURIComponent(params.dest);
+        var action = this._options.action + "?dest=" + destination;
         xhr.open("POST", action, true);
         xhr.send(formData);
     },
