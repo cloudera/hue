@@ -202,7 +202,7 @@ This is a verified step-by-step guide on how to get Hue up and running on a fres
 
     `desktop/conf/pseudo-distributed.ini`
 
-    For postgres according to step 5 above set:
+    According to step 5 above for postgres, set under `[desktop]`:
 
     ```
     [[database]]
