@@ -1256,8 +1256,8 @@ qq.extend(qq.UploadHandlerXhr.prototype, {
             }
         };
 
-        var formData = new FormData();
-        formData.append(params.fileFieldLabel, file);
+        var formData = new FormData();        
+        formData.append(params.fileFieldLabel, file, file.name.normalize('NFC'));
         formData.append('dest', params.dest);
 
         // Encoding is needed to support folder names with some special 
