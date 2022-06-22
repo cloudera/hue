@@ -97,15 +97,9 @@ def get_ordered_interpreters(user=None):
     ]
   else:
     if INTERPRETERS_CACHE is None:
-      none_user = None # for getting full list of interpreters
-      if is_cm_managed():
-        extra_interpreters = INTERPRETERS.get()  # Combine the other apps interpreters
-        _default_interpreters(none_user)
-      else:
-        extra_interpreters = {}
-
-      if not INTERPRETERS.get():
-        _default_interpreters(none_user)
+      none_user = None # For getting full list of interpreters
+      extra_interpreters = INTERPRETERS.get()  # Combine the other apps interpreters
+      _default_interpreters(none_user)
 
       INTERPRETERS_CACHE = INTERPRETERS.get()
       INTERPRETERS_CACHE.update(extra_interpreters)
@@ -189,6 +183,13 @@ INTERPRETERS_SHOWN_ON_WHEEL = Config(
           "Only the first 5 interpreters will appear on the wheel."),
   type=coerce_csv,
   default=[]
+)
+
+ENABLE_ALL_INTERPRETERS = Config(
+  key="enable_all_interpreters",
+  help=_t("Flag to enable all interpreters (Hive and Impala are added by default) related to every whitelisted app."),
+  type=coerce_bool,
+  default=False
 )
 
 DEFAULT_LIMIT = Config(
@@ -311,78 +312,79 @@ def _default_interpreters(user):
 
     interpreters.append(('hive', {
       'name': interpreter_name, 'interface': 'hiveserver2', 'options': {}
-    }),)
+    }))
 
   if 'impala' in apps:
     interpreters.append(('impala', {
       'name': 'Impala', 'interface': 'hiveserver2', 'options': {}
-    }),)
-
-  if 'pig' in apps:
-    interpreters.append(('pig', {
-      'name': 'Pig', 'interface': 'oozie', 'options': {}
     }))
 
-  if 'oozie' in apps and 'jobsub' in apps:
-    interpreters.extend((
-      ('java', {
-          'name': 'Java', 'interface': 'oozie', 'options': {}
-      }),
-      ('spark2', {
-          'name': 'Spark', 'interface': 'oozie', 'options': {}
-      }),
-      ('mapreduce', {
-          'name': 'MapReduce', 'interface': 'oozie', 'options': {}
-      }),
-      ('shell', {
-          'name': 'Shell', 'interface': 'oozie', 'options': {}
-      }),
-      ('sqoop1', {
-          'name': 'Sqoop 1', 'interface': 'oozie', 'options': {}
-      }),
-      ('distcp', {
-          'name': 'Distcp', 'interface': 'oozie', 'options': {}
-      }),
-    ))
+  if ENABLE_ALL_INTERPRETERS.get():
+    if 'pig' in apps:
+      interpreters.append(('pig', {
+        'name': 'Pig', 'interface': 'oozie', 'options': {}
+      }))
 
-  from dashboard.conf import get_properties  # Cyclic dependency
-  dashboards = get_properties()
-  if dashboards.get('solr') and dashboards['solr']['analytics']:
-    interpreters.append(('solr', {
-        'name': 'Solr SQL', 'interface': 'solr', 'options': {}
-    }),)
+    if 'oozie' in apps and 'jobsub' in apps:
+      interpreters.extend((
+        ('java', {
+            'name': 'Java', 'interface': 'oozie', 'options': {}
+        }),
+        ('spark2', {
+            'name': 'Spark', 'interface': 'oozie', 'options': {}
+        }),
+        ('mapreduce', {
+            'name': 'MapReduce', 'interface': 'oozie', 'options': {}
+        }),
+        ('shell', {
+            'name': 'Shell', 'interface': 'oozie', 'options': {}
+        }),
+        ('sqoop1', {
+            'name': 'Sqoop 1', 'interface': 'oozie', 'options': {}
+        }),
+        ('distcp', {
+            'name': 'Distcp', 'interface': 'oozie', 'options': {}
+        }),
+      ))
 
-  from desktop.models import Cluster  # Cyclic dependency
-  cluster = Cluster(user)
-  if cluster and cluster.get_type() == 'dataeng':
-    interpreters.append(('dataeng', {
-        'name': 'DataEng', 'interface': 'dataeng', 'options': {}
-    }))
+    from dashboard.conf import get_properties  # Cyclic dependency
+    dashboards = get_properties()
+    if dashboards.get('solr') and dashboards['solr']['analytics']:
+      interpreters.append(('solr', {
+          'name': 'Solr SQL', 'interface': 'solr', 'options': {}
+      }),)
 
-  if 'spark' in apps:
-    interpreters.extend((
-      ('spark', {
-          'name': 'Scala', 'interface': 'livy', 'options': {}
-      }),
-      ('pyspark', {
-          'name': 'PySpark', 'interface': 'livy', 'options': {}
-      }),
-      ('r', {
-          'name': 'R', 'interface': 'livy', 'options': {}
-      }),
-      ('jar', {
-          'name': 'Spark Submit Jar', 'interface': 'livy-batch', 'options': {}
-      }),
-      ('py', {
-          'name': 'Spark Submit Python', 'interface': 'livy-batch', 'options': {}
-      }),
-      ('text', {
-          'name': 'Text', 'interface': 'text', 'options': {}
-      }),
-      ('markdown', {
-          'name': 'Markdown', 'interface': 'text', 'options': {}
-      })
-    ))
+    from desktop.models import Cluster  # Cyclic dependency
+    cluster = Cluster(user)
+    if cluster and cluster.get_type() == 'dataeng':
+      interpreters.append(('dataeng', {
+          'name': 'DataEng', 'interface': 'dataeng', 'options': {}
+      }))
+
+    if 'spark' in apps:
+      interpreters.extend((
+        ('spark', {
+            'name': 'Scala', 'interface': 'livy', 'options': {}
+        }),
+        ('pyspark', {
+            'name': 'PySpark', 'interface': 'livy', 'options': {}
+        }),
+        ('r', {
+            'name': 'R', 'interface': 'livy', 'options': {}
+        }),
+        ('jar', {
+            'name': 'Spark Submit Jar', 'interface': 'livy-batch', 'options': {}
+        }),
+        ('py', {
+            'name': 'Spark Submit Python', 'interface': 'livy-batch', 'options': {}
+        }),
+        ('text', {
+            'name': 'Text', 'interface': 'text', 'options': {}
+        }),
+        ('markdown', {
+            'name': 'Markdown', 'interface': 'text', 'options': {}
+        })
+      ))
 
   INTERPRETERS.set_for_testing(OrderedDict(interpreters))
 
