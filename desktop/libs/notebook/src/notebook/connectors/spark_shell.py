@@ -424,6 +424,8 @@ class SparkApi(Api):
     api = self.get_api()
     all_sessions = {}
 
+    session_type = 'sql' if session_type == 'sparksql' else session_type
+
     try:
       all_sessions = api.get_sessions()
     except Exception as e:
