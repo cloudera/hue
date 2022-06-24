@@ -643,6 +643,10 @@ def test_get_interpreters_to_show():
           'name': 'Hive', 'displayName': 'Hive', 'interface': 'hiveserver2', 'type': 'hive', 'is_sql': True,
           'options': {}, 'dialect_properties': {}, 'is_catalog': False, 'category': 'editor', 'dialect': 'hive'
       }),
+      ('impala', {
+          'name': 'Impala', 'displayName': 'Impala', 'interface': 'hiveserver2', 'type': 'impala', 'is_sql': True,
+          'options': {}, 'dialect_properties': {}, 'is_catalog': False, 'category': 'editor', 'dialect': 'impala'
+      }),
       ('spark', {
           'name': 'Scala', 'displayName': 'Scala', 'interface': 'livy', 'type': 'spark', 'is_sql': False, 'options': {},
           'dialect_properties': {}, 'is_catalog': False, 'category': 'editor', 'dialect': 'scala'
@@ -669,6 +673,10 @@ def test_get_interpreters_to_show():
       ('hive', {
           'name': 'Hive', 'displayName': 'Hive', 'interface': 'hiveserver2', 'is_sql': True, 'type': 'hive',
           'options': {}, 'dialect_properties': {}, 'is_catalog': False, 'category': 'editor', 'dialect': 'hive'
+      }),
+      ('impala', {
+          'name': 'Impala', 'displayName': 'Impala', 'interface': 'hiveserver2', 'type': 'impala', 'is_sql': True,
+          'options': {}, 'dialect_properties': {}, 'is_catalog': False, 'category': 'editor', 'dialect': 'impala'
       }),
       ('spark', {
           'name': 'Scala', 'displayName': 'Scala', 'interface': 'livy', 'type': 'spark', 'is_sql': False, 'options': {},
