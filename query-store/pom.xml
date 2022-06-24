@@ -22,7 +22,7 @@
     <javac.version>1.8</javac.version>
     <guice.version>4.2.3</guice.version>
     <slf4j.version>1.7.30</slf4j.version>
-    <dropwizard.version>2.0.25</dropwizard.version>
+    <dropwizard.version>2.0.31</dropwizard.version>
     <guava.version>28.1-jre</guava.version>
     <junit.version>4.13</junit.version>
     <jackson.version>2.11.4</jackson.version>
