@@ -70,6 +70,8 @@ from desktop.redaction import logfilter
 from desktop.redaction.engine import RedactionPolicy, RedactionRule
 from desktop.views import check_config, home, generate_configspec, load_confs, collect_validation_messages, _get_config_errors
 
+from notebook.conf import ENABLE_ALL_INTERPRETERS
+
 if sys.version_info[0] > 2:
   from io import StringIO as string_io
   from unittest.mock import patch, Mock
@@ -619,6 +621,17 @@ def test_app_permissions():
     apps = ClusterConfig(user=user).get_apps()
     assert_false('hive' in apps.get('editor', {}).get('interpreter_names', []), apps)
     assert_true('impala' in apps.get('editor', {}).get('interpreter_names', []), apps)
+    # Because ENABLE_ALL_INTERPRETERS flag is False
+    assert_false('pig' in apps.get('editor', {}).get('interpreter_names', []), apps)
+    assert_false('solr' in apps.get('editor', {}).get('interpreter_names', []), apps)
+    assert_false('spark' in apps.get('editor', {}).get('interpreter_names', []), apps)
+
+    # Check for other default editors below when ENABLE_ALL_INTERPRETERS flag is True
+    flag_reset = ENABLE_ALL_INTERPRETERS.set_for_testing(True)
+
+    apps = ClusterConfig(user=user).get_apps()
+    assert_false('hive' in apps.get('editor', {}).get('interpreter_names', []), apps)
+    assert_true('impala' in apps.get('editor', {}).get('interpreter_names', []), apps)
     assert_true('pig' in apps.get('editor', {}).get('interpreter_names', []), apps)
     assert_false('solr' in apps.get('editor', {}).get('interpreter_names', []), apps)
     assert_false('spark' in apps.get('editor', {}).get('interpreter_names', []), apps)
@@ -662,6 +675,7 @@ def test_app_permissions():
       assert_true('py' in apps.get('editor', {}).get('interpreter_names', []), apps)
 
   finally:
+    flag_reset()
     for f in resets:
       f()
 
