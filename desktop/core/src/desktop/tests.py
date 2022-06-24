@@ -70,6 +70,7 @@ from desktop.redaction import logfilter
 from desktop.redaction.engine import RedactionPolicy, RedactionRule
 from desktop.views import check_config, home, generate_configspec, load_confs, collect_validation_messages, _get_config_errors
 
+import notebook.conf
 from notebook.conf import ENABLE_ALL_INTERPRETERS
 
 if sys.version_info[0] > 2:
@@ -628,6 +629,7 @@ def test_app_permissions():
 
     # Check for other default editors below when ENABLE_ALL_INTERPRETERS flag is True
     flag_reset = ENABLE_ALL_INTERPRETERS.set_for_testing(True)
+    notebook.conf.INTERPRETERS_CACHE = None
 
     apps = ClusterConfig(user=user).get_apps()
     assert_false('hive' in apps.get('editor', {}).get('interpreter_names', []), apps)
