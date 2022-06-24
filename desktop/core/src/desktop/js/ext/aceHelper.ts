@@ -71,7 +71,7 @@ const DIALECT_ACE_MODE_MAPPING: { [dialect: string]: string } = {
   'phoenix': 'ace/mode/phoenix',
   'presto': 'ace/mode/presto',
   'solr': 'ace/mode/solr',
-  'sql': 'ace/mode/sql'
+  'sparksql': 'ace/mode/sql'
 };
 
 export const getAceMode = (dialect?: string): string =>
