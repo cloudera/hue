@@ -19,7 +19,7 @@ stacks:
   - centos7
   components:
   - comp_name: hue
-    branch: ${CDH_branch}
+    branch: ${CDH_BRANCH}
     git_url: git@github.infra.cloudera.com:cdh/hue.git
     enable_review: false
   - comp_name: CDPD
@@ -38,7 +38,7 @@ stacks:
           name: L0
           overrides: {}
           parameters:
-            release: ${CDH_VERSION}
+            release: ${CDH_RELEASE_VERSION}
           payload: []
           projects: []
           requirements:
@@ -48,7 +48,8 @@ stacks:
           username: ''
         comp_name: hue
       release_branch: ${CDH_RELEASE_BRANCH}
+  name: CDH
   stack_name: CDH
-  version: ${CDH_VERSION}
+  version: ${CDH_RELEASE_VERSION}
   base_build_number: ${CDH_BUILDNUMBER}
 
