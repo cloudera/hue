@@ -45,6 +45,16 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
 <head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-s"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-25K7599S1Q');
+    
+  </script>
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta charset="utf-8">
   <title>Hue</title>
@@ -85,9 +95,21 @@
   % if not conf.DEV.get():
   <script src="${ static('desktop/js/hue.errorcatcher.js') }"></script>
   % endif
+
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-WMP8NH3');</script>
+  <!-- End Google Tag Manager -->
 </head>
 
 <body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WMP8NH3"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
 
 <hue-icons-web-component></hue-icons-web-component>
 
@@ -503,6 +525,17 @@ ${ commonHeaderFooterComponents.footer(messages) }
   ${ _('Hue and the Hue logo are trademarks of Cloudera, Inc.') }
   <b>Query. Explore. Repeat.</b>
 </div>
+<script>
+  document.addEventListener("click", function(event){
+  gtag ('event', event.target.innerText + ' ' +'clicked', {
+    'link_text': event.target.innerText,
+    'link_url': event.target.baseURI,
+    'link_id': event.target.id,
+    'link_classes': event.target.className
+  })
+  })
+  
+</script>
 
 </body>
 </html>
