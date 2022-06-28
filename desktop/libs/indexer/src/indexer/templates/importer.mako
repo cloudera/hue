@@ -3234,8 +3234,8 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
         var files = $('#inputfile')[0].files[0];
         fd.append('file', files);
         var file_size = files.size;
-        if (file_size > 10485760) {
-          $.jHueNotify.warn("${ _('File size exceeds the supported size (10 MB). Please use the S3, ABFS or HDFS browser to upload files.') }");
+        if (file_size > 1 * 1024 * 1024) {          
+          $.jHueNotify.warn("${ _('File size exceeds the supported size (1 MB). Please use the S3, ABFS or HDFS browser to upload files.') }");
         } else {
           $.ajax({
             url:"/indexer/api/indexer/upload_local_file",
