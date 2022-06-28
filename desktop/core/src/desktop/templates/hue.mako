@@ -527,12 +527,12 @@ ${ commonHeaderFooterComponents.footer(messages) }
 </div>
 <script>
   document.addEventListener("click", function(event){
-  gtag ('event', event.target.innerText + ' ' +'clicked', {
-    'link_text': event.target.innerText,
-    'link_url': event.target.baseURI,
-    'link_id': event.target.id,
-    'link_classes': event.target.className
-  })
+    gtag ('event', event.target.innerText + ' ' +'clicked', {
+      'link_text': event.target.innerText,
+      'link_url': event.target.baseURI,
+      'link_id': event.target.id,
+      'link_classes': event.target.className
+    })
   })
   
 </script>
