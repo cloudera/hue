@@ -44,7 +44,7 @@ import notebook.connectors.hiveserver2
 from notebook.api import _historify
 from notebook.connectors.base import Notebook, QueryError, Api, QueryExpired
 from notebook.decorators import api_error_handler
-from notebook.conf import get_ordered_interpreters, INTERPRETERS_SHOWN_ON_WHEEL, INTERPRETERS
+from notebook.conf import get_ordered_interpreters, INTERPRETERS_SHOWN_ON_WHEEL, INTERPRETERS, ENABLE_ALL_INTERPRETERS
 
 
 if sys.version_info[0] > 2:
@@ -643,6 +643,10 @@ def test_get_interpreters_to_show():
           'name': 'Hive', 'displayName': 'Hive', 'interface': 'hiveserver2', 'type': 'hive', 'is_sql': True,
           'options': {}, 'dialect_properties': {}, 'is_catalog': False, 'category': 'editor', 'dialect': 'hive'
       }),
+      ('impala', {
+          'name': 'Impala', 'displayName': 'Impala', 'interface': 'hiveserver2', 'type': 'impala', 'is_sql': True,
+          'options': {}, 'dialect_properties': {}, 'is_catalog': False, 'category': 'editor', 'dialect': 'impala'
+      }),
       ('spark', {
           'name': 'Scala', 'displayName': 'Scala', 'interface': 'livy', 'type': 'spark', 'is_sql': False, 'options': {},
           'dialect_properties': {}, 'is_catalog': False, 'category': 'editor', 'dialect': 'scala'
@@ -670,6 +674,10 @@ def test_get_interpreters_to_show():
           'name': 'Hive', 'displayName': 'Hive', 'interface': 'hiveserver2', 'is_sql': True, 'type': 'hive',
           'options': {}, 'dialect_properties': {}, 'is_catalog': False, 'category': 'editor', 'dialect': 'hive'
       }),
+      ('impala', {
+          'name': 'Impala', 'displayName': 'Impala', 'interface': 'hiveserver2', 'type': 'impala', 'is_sql': True,
+          'options': {}, 'dialect_properties': {}, 'is_catalog': False, 'category': 'editor', 'dialect': 'impala'
+      }),
       ('spark', {
           'name': 'Scala', 'displayName': 'Scala', 'interface': 'livy', 'type': 'spark', 'is_sql': False, 'options': {},
           'dialect_properties': {}, 'is_catalog': False, 'category': 'editor', 'dialect': 'scala'
@@ -680,7 +688,8 @@ def test_get_interpreters_to_show():
     resets = [
       INTERPRETERS.set_for_testing(default_interpreters),
       APP_BLACKLIST.set_for_testing(''),
-      ENABLE_CONNECTORS.set_for_testing(False)
+      ENABLE_CONNECTORS.set_for_testing(False),
+      ENABLE_ALL_INTERPRETERS.set_for_testing(False)
     ]
     appmanager.DESKTOP_MODULES = []
     appmanager.DESKTOP_APPS = None
@@ -733,73 +742,139 @@ def test_get_ordered_interpreters():
 
   try:
     resets = [APP_BLACKLIST.set_for_testing('')]
+    flag_reset = ENABLE_ALL_INTERPRETERS.set_for_testing(False)
     appmanager.DESKTOP_MODULES = []
     appmanager.DESKTOP_APPS = None
     appmanager.load_apps(APP_BLACKLIST.get())
 
-    with patch('notebook.conf.is_cm_managed') as is_cm_managed:
-      with patch('notebook.conf.appmanager.get_apps_dict') as get_apps_dict:
-        with patch('notebook.conf.has_connectors') as has_connectors:
-          get_apps_dict.return_value = {'hive': {}}
-          has_connectors.return_value = False
-          notebook.conf.INTERPRETERS_CACHE = None
+    with patch('notebook.conf.appmanager.get_apps_dict') as get_apps_dict:
+      with patch('notebook.conf.has_connectors') as has_connectors:
+        get_apps_dict.return_value = {'hive': {}} # Impala blacklisted indirectly
+        has_connectors.return_value = False
+        notebook.conf.INTERPRETERS_CACHE = None
 
-          is_cm_managed.return_value = False
+        # No interpreters explicitly added
+        INTERPRETERS.set_for_testing(
+          OrderedDict((
+        )))
 
-          # No CM --> Verbatim
-          INTERPRETERS.set_for_testing(
-            OrderedDict((
-              ('phoenix', {
-                  'name': 'Phoenix', 'interface': 'sqlalchemy', 'dialect': 'phoenix'
-              }),)
-            )
-          )
-          assert_equal(
-            [interpreter['dialect'] for interpreter in get_ordered_interpreters()],
-            ['phoenix']
-          )
-          assert_equal(  # Check twice because of cache
-            [interpreter['dialect'] for interpreter in get_ordered_interpreters()],
-            ['phoenix']
-          )
+        assert_equal(
+          [interpreter['dialect'] for interpreter in get_ordered_interpreters()],
+          ['hive']
+        )
+        assert_equal(  # Check twice because of cache
+          [interpreter['dialect'] for interpreter in get_ordered_interpreters()],
+          ['hive']
+        )
+        notebook.conf.INTERPRETERS_CACHE = None
 
-          is_cm_managed.return_value = True
-          notebook.conf.INTERPRETERS_CACHE = None
+        # Interpreter added explicitly
+        INTERPRETERS.set_for_testing(
+          OrderedDict((
+            ('phoenix', {
+                'name': 'Phoenix', 'interface': 'sqlalchemy', 'dialect': 'phoenix'
+            }),)
+          )
+        )
+        assert_equal(
+          [interpreter['dialect'] for interpreter in get_ordered_interpreters()],
+          ['hive', 'phoenix']
+        )
+        assert_equal(  # Check twice
+          [interpreter['dialect'] for interpreter in get_ordered_interpreters()],
+          ['hive', 'phoenix']
+        )
+        notebook.conf.INTERPRETERS_CACHE = None
 
-          # CM --> Append []
-          INTERPRETERS.set_for_testing(
-            OrderedDict(()
-            )
+        # Add one of the spark editor explicitly when spark is blacklisted
+        INTERPRETERS.set_for_testing(
+          OrderedDict((
+            ('pyspark', {
+                'name': 'PySpark', 'interface': 'livy', 'dialect': 'pyspark'
+            }),)
           )
+        )
+        # Explicitly added spark editor not seen when flag is False
+        assert_equal(
+          [interpreter['dialect'] for interpreter in get_ordered_interpreters()],
+          ['hive']
+        )
+        assert_equal(  # Check twice because of cache
+          [interpreter['dialect'] for interpreter in get_ordered_interpreters()],
+          ['hive']
+        )
+        notebook.conf.INTERPRETERS_CACHE = None
 
-          assert_equal(
-            [interpreter['dialect'] for interpreter in get_ordered_interpreters()],
-            ['hive']
-          )
-          assert_equal(  # Check twice
-            [interpreter['dialect'] for interpreter in get_ordered_interpreters()],
-            ['hive']
-          )
+        # Whitelist spark app and no explicit interpreter added
+        get_apps_dict.return_value = {'hive': {}, 'spark': {}}
 
-          notebook.conf.INTERPRETERS_CACHE = None
+        INTERPRETERS.set_for_testing(
+          OrderedDict((
+        )))
+        # No spark interpreter because ENABLE_ALL_INTERPRETERS is currently False
+        assert_equal(
+          [interpreter['dialect'] for interpreter in get_ordered_interpreters()],
+          ['hive']
+        )
+        assert_equal(  # Check twice because of cache
+          [interpreter['dialect'] for interpreter in get_ordered_interpreters()],
+          ['hive']
+        )
+        notebook.conf.INTERPRETERS_CACHE = None
 
-          # CM --> Append [Phoenix]
-          INTERPRETERS.set_for_testing(
-            OrderedDict((
-              ('phoenix', {
-                  'name': 'Phoenix', 'interface': 'sqlalchemy', 'dialect': 'phoenix'
-              }),)
-            )
+        # Add one of the spark editor explicitly
+        INTERPRETERS.set_for_testing(
+          OrderedDict((
+            ('pyspark', {
+                'name': 'PySpark', 'interface': 'livy', 'dialect': 'pyspark'
+            }),)
           )
-          assert_equal(
-            [interpreter['dialect'] for interpreter in get_ordered_interpreters()],
-            ['hive', 'phoenix']
+        )
+        # Explicitly added spark editor seen even when flag is False
+        assert_equal(
+          [interpreter['dialect'] for interpreter in get_ordered_interpreters()],
+          ['hive', 'pyspark']
+        )
+        assert_equal(  # Check twice because of cache
+          [interpreter['dialect'] for interpreter in get_ordered_interpreters()],
+          ['hive', 'pyspark']
+        )
+        notebook.conf.INTERPRETERS_CACHE = None
+
+        flag_reset = ENABLE_ALL_INTERPRETERS.set_for_testing(True) # Check interpreters when flag is True
+
+        INTERPRETERS.set_for_testing(
+          OrderedDict((
+        )))
+        assert_equal(
+          [interpreter['dialect'] for interpreter in get_ordered_interpreters()],
+          ['hive', 'scala', 'pyspark', 'r', 'spark submit jar', 'spark submit python', 'text', 'markdown']
+        )
+        assert_equal(  # Check twice because of cache
+          [interpreter['dialect'] for interpreter in get_ordered_interpreters()],
+          ['hive', 'scala', 'pyspark', 'r', 'spark submit jar', 'spark submit python', 'text', 'markdown']
+        )
+        notebook.conf.INTERPRETERS_CACHE = None
+
+        # Interpreter added explicitly when flag is True
+        INTERPRETERS.set_for_testing(
+          OrderedDict((
+            ('phoenix', {
+              'name': 'Phoenix', 'interface': 'sqlalchemy', 'dialect': 'phoenix'
+            }),)
           )
-          assert_equal(  # Check twice
-            [interpreter['dialect'] for interpreter in get_ordered_interpreters()],
-            ['hive', 'phoenix']
-          )
+        )
+        assert_equal(
+          [interpreter['dialect'] for interpreter in get_ordered_interpreters()],
+          ['hive', 'scala', 'pyspark', 'r', 'spark submit jar', 'spark submit python', 'text', 'markdown', 'phoenix']
+        )
+        assert_equal(  # Check twice
+          [interpreter['dialect'] for interpreter in get_ordered_interpreters()],
+          ['hive', 'scala', 'pyspark', 'r', 'spark submit jar', 'spark submit python', 'text', 'markdown', 'phoenix']
+        )
+
   finally:
+    flag_reset()
     for reset in resets:
       reset()
     appmanager.DESKTOP_MODULES = []
