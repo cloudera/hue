@@ -2096,7 +2096,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
       self.kafkaClusters = ko.observableArray(['localhost', 'demo.gethue.com']);
       self.kafkaSelectedCluster = ko.observable();
       self.kafkaSelectedCluster.subscribe(function(val) {
-        if (val) {
+        if (val && self.inputFormat() == 'stream') {
           wizard.guessFormat();
         }
       });
