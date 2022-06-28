@@ -189,7 +189,7 @@ ENABLE_ALL_INTERPRETERS = Config(
   key="enable_all_interpreters",
   help=_t("Flag to enable all interpreters (Hive and Impala are added by default) related to every whitelisted app."),
   type=coerce_bool,
-  default=False
+  default=True
 )
 
 DEFAULT_LIMIT = Config(
@@ -312,12 +312,12 @@ def _default_interpreters(user):
 
     interpreters.append(('hive', {
       'name': interpreter_name, 'interface': 'hiveserver2', 'options': {}
-    }))
+    }),)
 
   if 'impala' in apps:
     interpreters.append(('impala', {
       'name': 'Impala', 'interface': 'hiveserver2', 'options': {}
-    }))
+    }),)
 
   if ENABLE_ALL_INTERPRETERS.get():
     if 'pig' in apps:
