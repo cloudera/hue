@@ -126,6 +126,7 @@ ext-env-pip-install:
 	@$(ENV_PIP) install -e $(PYSAML2_PKG)
 	@$(ENV_PIP) install -e $(DJANGOSAML2_PKG)
 	@$(ENV_PIP) install -e $(DJANGO_AXES_PKG)
+	@$(ENV_PIP) install -e $(PHOENIXDB_PKG)
 	@echo '--- Finished installing ext-py3 into virtual-env via $(ENV_PIP)'
 	@touch $@
 
