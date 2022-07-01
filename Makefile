@@ -232,9 +232,6 @@ install-env:
 	cp $(ROOT)/babel.config.js $(INSTALL_DIR)
 	cp $(ROOT)/tsconfig.json $(INSTALL_DIR)
 	$(MAKE) -C $(INSTALL_DIR) npm-install
-	@if [ "$(MAKECMDGOALS)" = "install" ]; then \
-	  $(MAKE) -C $(INSTALL_DIR) create-static; \
-	fi
 
 
 ###################################
