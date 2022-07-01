@@ -16,11 +16,7 @@
 
 import { merge } from 'lodash';
 
-import {
-  default as MetastoreTable,
-  TABLE_SOURCE_TYPE_HIVE,
-  TABLE_SOURCE_TYPE_SPARK
-} from './metastoreTable';
+import { default as MetastoreTable, DIALECT_HIVE, DIALECT_SPARK } from './metastoreTable';
 
 describe('metastoreTable.js', () => {
   const generateOptions = customOptions => {
@@ -30,6 +26,7 @@ describe('metastoreTable.js', () => {
         isModel: () => false,
         isTransactionalTable: () => false,
         isView: () => false,
+        getDialect: () => DIALECT_HIVE,
         getAnalysis: () =>
           Promise.resolve({
             details: {
@@ -67,9 +64,8 @@ describe('metastoreTable.js', () => {
 
   it('should enable import when analysis is loaded', async () => {
     const metastoreTable = new MetastoreTable(generateOptions({}));
-    const sourceType = 'sql';
     await metastoreTable.fetchDetails();
-    expect(metastoreTable.enableImport(sourceType)).toEqual(true);
+    expect(metastoreTable.enableImport()).toEqual(true);
   });
 
   it('should not enable import before there is an analysis loaded', async () => {
@@ -83,42 +79,44 @@ describe('metastoreTable.js', () => {
     const metastoreTable = new MetastoreTable(
       generateOptions({ catalogEntry: { getAnalysis: () => unresolvedPromise } })
     );
-    const sourceType = 'sql';
 
     await metastoreTable.fetchDetails();
-    expect(metastoreTable.enableImport(sourceType)).toEqual(false);
+    expect(metastoreTable.enableImport()).toEqual(false);
   });
 
   it('should not enable import when the table is a view', async () => {
     const metastoreTable = new MetastoreTable(
       generateOptions({ catalogEntry: { isView: () => true } })
     );
-    const sourceType = 'sql';
     await metastoreTable.fetchDetails();
-    expect(metastoreTable.enableImport(sourceType)).toEqual(false);
+    expect(metastoreTable.enableImport()).toEqual(false);
   });
 
-  it('should not enable import when the table is transactional and source type Hive', async () => {
+  it('should not enable import when the table is transactional and dialect is Hive', async () => {
     const metastoreTransactionalHiveTable = new MetastoreTable(
       generateOptions({ catalogEntry: { isTransactionalTable: () => true } })
     );
     await metastoreTransactionalHiveTable.fetchDetails();
-    expect(metastoreTransactionalHiveTable.enableImport(TABLE_SOURCE_TYPE_HIVE)).toEqual(false);
+    expect(metastoreTransactionalHiveTable.enableImport()).toEqual(false);
 
     const metastoreTransactionalTable = new MetastoreTable(
-      generateOptions({ catalogEntry: { isTransactionalTable: () => true } })
+      generateOptions({
+        catalogEntry: { isTransactionalTable: () => true, getDialect: () => 'sql' }
+      })
     );
     await metastoreTransactionalTable.fetchDetails();
-    expect(metastoreTransactionalTable.enableImport('sql')).toEqual(true);
+    expect(metastoreTransactionalTable.enableImport()).toEqual(true);
 
     const metastoreHiveTable = new MetastoreTable(generateOptions());
     await metastoreHiveTable.fetchDetails();
-    expect(metastoreHiveTable.enableImport(TABLE_SOURCE_TYPE_HIVE)).toEqual(true);
+    expect(metastoreHiveTable.enableImport()).toEqual(true);
   });
 
-  it('should not enable import when the source type is sparksql', async () => {
-    const metastoreTable = new MetastoreTable(generateOptions());
+  it('should not enable import when the dialect is spark sql', async () => {
+    const metastoreTable = new MetastoreTable(
+      generateOptions({ catalogEntry: { getDialect: () => DIALECT_SPARK } })
+    );
     await metastoreTable.fetchDetails();
-    expect(metastoreTable.enableImport(TABLE_SOURCE_TYPE_SPARK)).toEqual(false);
+    expect(metastoreTable.enableImport()).toEqual(false);
   });
 });

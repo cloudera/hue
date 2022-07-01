@@ -28,8 +28,8 @@ import I18n from 'utils/i18n';
 
 let contextPopoverTimeout = -1;
 
-export const TABLE_SOURCE_TYPE_HIVE = 'hive';
-export const TABLE_SOURCE_TYPE_SPARK = 'sparksql';
+export const DIALECT_HIVE = 'hive';
+export const DIALECT_SPARK = 'spark sql';
 
 class MetastoreTable {
   /**
@@ -394,12 +394,13 @@ class MetastoreTable {
     this.catalogEntry.clearCache();
   }
 
-  enableImport(sourceType) {
+  enableImport() {
     const detailsLoaded = !!this.tableDetails();
+    const dialect = this.catalogEntry.getDialect();
     const isView = this.catalogEntry.isView();
     const isTransactionalHive =
-      sourceType === TABLE_SOURCE_TYPE_HIVE && this.catalogEntry.isTransactionalTable();
-    const isSpark = sourceType === TABLE_SOURCE_TYPE_SPARK;
+      dialect === DIALECT_HIVE && this.catalogEntry.isTransactionalTable();
+    const isSpark = dialect === DIALECT_SPARK;
 
     return detailsLoaded && !(isSpark || isView || isTransactionalHive);
   }
