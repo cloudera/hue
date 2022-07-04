@@ -23,6 +23,8 @@ import time
 import textwrap
 import json
 
+from beeswax.server.dbms import Table
+
 from desktop.conf import USE_DEFAULT_CONFIGURATION
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode
@@ -183,7 +185,6 @@ class SparkApi(Api):
 
 
   def _execute(self, api, session, snippet_type, statement):
-
     if not session or not self._check_session(session):
       stored_session_info = self._get_session_info_from_user()
       if stored_session_info and self._check_session(stored_session_info):
@@ -247,11 +248,11 @@ class SparkApi(Api):
     try:
       response = api.fetch_data(session['id'], cell)
     except Exception as e:
-      message = force_unicode(str(e)).lower()
+      message = force_unicode(str(e))
       if re.search("session ('\d+' )?not found", message):
         raise SessionExpired(e)
       else:
-        raise e
+        raise PopupException(_(message))
 
     content = response['output']
 
@@ -337,7 +338,6 @@ class SparkApi(Api):
   
 
   def _handle_session_health_check(self, session):
-
     if not session or not self._check_session(session):
       stored_session_info = self._get_session_info_from_user()
       if stored_session_info and self._check_session(stored_session_info):
@@ -480,11 +480,21 @@ class SparkApi(Api):
     columns_list = self._check_status_and_fetch_result(api, session, describe_tables_execute)
 
     if columns_list:
-      return [{
-        'name': col[0],
-        'type': col[1],
-        'comment': '',
-      } for col in columns_list['data']]
+      cols = []
+      cols_flag = True
+      for col in columns_list['data']:
+        # Columns are at the start of the result data and then comes all other info like partitions, we want to skip other info.
+        if col[0] == '' or col[0].startswith('#'):
+          cols_flag = False
+
+        if cols_flag:
+          cols.append({
+            'name': col[0],
+            'type': col[1],
+            'comment': col[2],
+          })
+
+      return cols
 
 
   def get_sample_data(self, snippet, database=None, table=None, column=None, is_async=False, operation=None):
@@ -537,6 +547,69 @@ class SparkApi(Api):
         })
 
     return statement
+
+
+  def describe_table(self, notebook, snippet, database=None, table=None):
+    api = self.get_api()
+
+    stored_session_info = self._get_session_info_from_user()
+    if stored_session_info and self._check_session(stored_session_info):
+      session = stored_session_info
+    else:
+      session = self.create_session(snippet.get('type'))
+
+    describe_query = 'DESCRIBE FORMATTED %(db)s.%(tb)s' % {'db': database, 'tb': table}
+    table_execute = self._execute(api, session, snippet.get('type'), describe_query)
+    table_result = self._check_status_and_fetch_result(api, session, table_execute)
+
+    tb = SparkDescribeTable(table_result)
+    tb.handle_describe_format()
+
+    return {
+      'status': 0,
+      'name': tb.name,
+      'partition_keys': tb.partition_keys,
+      'primary_keys': tb.primary_keys,
+      'cols': tb.cols,
+      'path_location': tb.path_location,
+      'hdfs_link': tb.hdfs_link,
+      'comment': tb.comment,
+      'is_view': tb.is_view,
+      'properties': tb.properties,
+      'details': tb.details,
+      'stats': tb.stats
+    }
+
+
+  def describe_database(self, notebook, snippet, database=None):
+    response = {'status': 0}
+    api = self.get_api()
+
+    stored_session_info = self._get_session_info_from_user()
+    if stored_session_info and self._check_session(stored_session_info):
+      session = stored_session_info
+    else:
+      session = self.create_session(snippet.get('type'))
+
+    describe_query = 'DESCRIBE DATABASE EXTENDED %(db)s' % {'db': database}
+    db_execute = self._execute(api, session, snippet.get('type'), describe_query)
+    db_result = self._check_status_and_fetch_result(api, session, db_execute)
+
+    for d in db_result.get('data', []):
+      if d[0] in ('Database Name', 'Namespace Name'):
+        response['db_name'] = d[1]
+      elif d[0] == 'Comment':
+        response['comment'] = d[1]
+      elif d[0] == 'Location':
+        response['location'] = d[1]
+      elif d[0] == 'Owner':
+        response['owner_name'] = d[1]
+      elif d[0] == 'Properties':
+        properties = _handle_properties_format(d[1])
+        if properties is not None:
+          response['parameters'] = properties
+
+    return response
 
 
   def _get_standalone_jobs(self, logs):
@@ -610,6 +683,132 @@ class SparkApi(Api):
       self.user.profile.json_data = json.dumps(json_data)
     
     self.user.profile.save()
+
+
+class SparkDescribeTable(Table):
+  def __init__(self, desc_results):
+    self.data = desc_results.get('data', [])
+    self.meta = desc_results.get('meta', [])
+    self.images = desc_results.get('images', [])
+    self.type = desc_results.get('type')
+
+    self.name = ''
+    self.path_location = ''
+    self.comment = ''
+    self.owner = ''
+    self.table_type = ''
+    self.created_time = ''
+    self.serde = ''
+    self.properties = []
+    self.stats = []
+    self.cols = []
+    self.partition_keys = []
+    self.primary_keys = [] # Not implemented
+    self.is_view = False
+    self._details = None
+
+  def handle_describe_format(self):
+    cols_flag = True
+    partition_flag = True
+
+    for d in self.data:
+      if cols_flag:
+        if (d[0] == d[1] == d[2] == '') or d[0].startswith('#'):
+          cols_flag = False
+        else:
+          self.cols.append({
+            'name': d[0],
+            'type': d[1],
+            'comment': d[2]
+          })
+
+      if not cols_flag:
+        if d[0] == '# Partition Information' or partition_flag:
+          if d[0] == d[1] == d[2] == '':
+            partition_flag = False
+
+          if not d[0].startswith('#') and partition_flag:
+            self.partition_keys.append({
+              'name': d[0],
+              'type': d[1]
+            })
+
+        self.properties.append({
+          'col_name': d[0],
+          'data_type': d[1],
+          'comment': d[2]
+        })
+
+      if d[0] == 'Table':
+        self.name = d[1] 
+      elif d[0] == 'Type':
+        if 'view' in d[1].lower():
+          self.is_view = True
+        else:
+          self.table_type = d[1]
+      elif d[0] == 'Location':
+        self.path_location = d[1]
+      elif d[0] == 'Comment':
+        self.comment = d[1]
+      elif d[0] == 'Owner':
+        self.owner = d[1]
+      elif d[0] == 'Created Time':
+        self.created_time = d[1]
+      elif d[0] == 'Serde Library':
+        self.serde = d[1]
+      elif d[0] == 'Table Properties':
+        stat_list = list(map(str.strip, d[1].strip('][').replace('"', '').split(',')))
+        self.stats = [{
+          'data_type': stat.split('=')[0],
+          'col_name': stat.split('=')[1],
+          'comment': ''
+        } for stat in stat_list]
+
+  @property
+  def details(self):
+    if self._details is None:
+      if 'ParquetHiveSerDe' in self.serde:
+        details_format = 'parquet'
+      elif 'LazySimpleSerDe' in self.serde:
+        details_format = 'text'
+      else:
+        details_format = serde.rsplit('.', 1)[-1]
+
+      self._details = {
+        'stats': self.stats,
+        'properties': {
+          'owner': self.owner,
+          'create_time': self.created_time,
+          'table_type': self.table_type,
+          'format': details_format
+        }
+      }
+    return self._details
+
+
+def _handle_properties_format(str_tuple):
+  """
+  Converts tuple string to following format:
+  '((Create-by,hueuser), (Create-date,09/01/2019))' --> "{Create-by=hueuser, Create-date=09/01/2019}"
+  """
+  comma_split = '),('
+  if '), (' in str_tuple:
+    comma_split = '), ('
+
+  try:
+    # Temp conversion to dict
+    prop_dict = dict([x.split(',') for x in str_tuple[2:-2].split(comma_split)])
+
+    prop_str = "{"
+    for k, v in prop_dict.items():
+      prop_str += str(k) + '=' + str(v) + ', '
+    prop_str = prop_str[:-2] + "}"
+
+    return prop_str
+
+  except Exception as e:
+    message = force_unicode(str(e))
+    LOG.error(message)
 
 
 class SparkConfiguration(object):
