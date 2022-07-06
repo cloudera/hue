@@ -81,7 +81,8 @@ class ProxyFS(object):
         return True
       user = rewrite_user(User.objects.get(username=self.getuser()))
       return user.is_authenticated and user.is_active and \
-        (is_admin(user) or not filebrowser_action or user.has_hue_permission(action=filebrowser_action, app="filebrowser") or RAZ.IS_ENABLED.get())
+        (is_admin(user) or not filebrowser_action or
+         user.has_hue_permission(action=filebrowser_action, app="filebrowser") or RAZ.IS_ENABLED.get())
 
     except User.DoesNotExist:
       LOG.exception('proxyfs.has_access()')
@@ -217,7 +218,7 @@ class ProxyFS(object):
     return fs.mktemp(subdir=subdir, prefix=prefix, basedir=basedir)
 
   def purge_trash(self):
-    fs = self._get_fs()  # Only webhdfs supports trash.
+    fs = self._get_fs(None)  # Only webhdfs supports trash.
     if fs and hasattr(fs, 'purge_trash'):
       fs.purge_trash()
 
