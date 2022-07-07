@@ -263,6 +263,167 @@ class TestSparkApi(object):
     assert_equal(response, 'SELECT test_column\nFROM test_db.test_table\nLIMIT 100\n')
 
 
+  def test_describe_table(self):
+    notebook = Mock()
+    snippet = Mock()
+    self.api.create_session = Mock(
+      return_value={
+        'id': 'test_id'
+      }
+    )
+    self.api._execute = Mock(
+      return_value='test_value'
+    )
+    self.api._check_status_and_fetch_result = Mock(
+      return_value={
+        'data': [
+          ['nname', 'string', None],
+          ['# Partition Information', '', ''],
+          ['# col_name', 'data_type', 'comment'],
+          ['state', 'string', 'null'],
+          ['', '', ''],
+          ['# Detailed Table Information', '', ''],
+          ['Database', 'default', ''],
+          ['Table', 'test_nonacid', ''],
+          ['Owner', 'demo', ''],
+          ['Created Time', 'Tue Jun 28 11:35:33 UTC 2022', ''],
+          ['Last Access', 'UNKNOWN', ''],
+          ['Created By', 'Spark 3.3.0.7.2.16.0-94', ''],
+          ['Type', 'EXTERNAL', ''],
+          ['Provider', 'hive', ''],
+          ['Table Properties',
+            '[TRANSLATED_TO_EXTERNAL=TRUE, bucketing_version=2, '
+            'external.table.purge=TRUE, numFilesErasureCoded=0, '
+            'transient_lastDdlTime=1656416152]',
+            ''],
+          ['Statistics', '6 bytes', ''],
+          ['Location',
+            'hdfs://test_url:8020/warehouse/tablespace/external/hive/test_nonacid',
+            ''],
+          ['Serde Library',
+            'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe',
+            ''],
+          ['InputFormat', 'org.apache.hadoop.mapred.TextInputFormat', ''],
+          ['OutputFormat',
+            'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat',
+            ''],
+          ['Storage Properties', '[serialization.format=1]', ''],
+          ['Partition Provider', 'Catalog', '']],
+        'images': [],
+        'meta': [
+          {'comment': '', 'name': 'col_name', 'type': 'string'},
+          {'comment': '', 'name': 'data_type', 'type': 'string'},
+          {'comment': '', 'name': 'comment', 'type': 'string'}],
+        'type': 'table'
+      }
+    )
+    response = self.api.describe_table(notebook, snippet, 'default', 'test_nonacid')
+
+    assert_equal(response, {
+      'cols': [{'comment': None, 'name': 'nname', 'type': 'string'}],
+      'comment': '',
+      'details': {'properties': {
+        'create_time': 'Tue Jun 28 11:35:33 UTC 2022',
+        'format': 'text',
+        'owner': 'demo',
+        'table_type': 'EXTERNAL'},
+      'stats': [
+        {
+          'col_name': 'TRUE',
+          'comment': '',
+          'data_type': 'TRANSLATED_TO_EXTERNAL'},
+        {
+          'col_name': '2',
+          'comment': '',
+          'data_type': 'bucketing_version'},
+        {
+          'col_name': 'TRUE',
+          'comment': '',
+          'data_type': 'external.table.purge'},
+        {
+          'col_name': '0',
+          'comment': '',
+          'data_type': 'numFilesErasureCoded'},
+        {
+          'col_name': '1656416152',
+          'comment': '',
+          'data_type': 'transient_lastDdlTime'}]},
+      'hdfs_link': '/filebrowser/view=/warehouse/tablespace/external/hive/test_nonacid',
+      'is_view': False,
+      'name': 'test_nonacid',
+      'partition_keys': [{'name': 'state', 'type': 'string'}],
+      'path_location': 'hdfs://test_url:8020/warehouse/tablespace/external/hive/test_nonacid',
+      'primary_keys': [],
+      'properties': [{'col_name': '# Partition Information',
+                      'comment': '',
+                      'data_type': ''},
+                      {'col_name': '# col_name',
+                      'comment': 'comment',
+                      'data_type': 'data_type'},
+                      {'col_name': 'state', 'comment': 'null', 'data_type': 'string'},
+                      {'col_name': '', 'comment': '', 'data_type': ''},
+                      {'col_name': '# Detailed Table Information',
+                      'comment': '',
+                      'data_type': ''},
+                      {'col_name': 'Database', 'comment': '', 'data_type': 'default'},
+                      {'col_name': 'Table',
+                      'comment': '',
+                      'data_type': 'test_nonacid'},
+                      {'col_name': 'Owner', 'comment': '', 'data_type': 'demo'},
+                      {'col_name': 'Created Time',
+                      'comment': '',
+                      'data_type': 'Tue Jun 28 11:35:33 UTC 2022'},
+                      {'col_name': 'Last Access',
+                      'comment': '',
+                      'data_type': 'UNKNOWN'},
+                      {'col_name': 'Created By',
+                      'comment': '',
+                      'data_type': 'Spark 3.3.0.7.2.16.0-94'},
+                      {'col_name': 'Type', 'comment': '', 'data_type': 'EXTERNAL'},
+                      {'col_name': 'Provider', 'comment': '', 'data_type': 'hive'},
+                      {'col_name': 'Table Properties',
+                      'comment': '',
+                      'data_type': '[TRANSLATED_TO_EXTERNAL=TRUE, '
+                                    'bucketing_version=2, external.table.purge=TRUE, '
+                                    'numFilesErasureCoded=0, '
+                                    'transient_lastDdlTime=1656416152]'},
+                      {'col_name': 'Statistics',
+                      'comment': '',
+                      'data_type': '6 bytes'},
+                      {'col_name': 'Location',
+                      'comment': '',
+                      'data_type': 'hdfs://test_url:8020/warehouse/tablespace/external/hive/test_nonacid'},
+                      {'col_name': 'Serde Library',
+                      'comment': '',
+                      'data_type': 'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe'},
+                      {'col_name': 'InputFormat',
+                      'comment': '',
+                      'data_type': 'org.apache.hadoop.mapred.TextInputFormat'},
+                      {'col_name': 'OutputFormat',
+                      'comment': '',
+                      'data_type': 'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'},
+                      {'col_name': 'Storage Properties',
+                      'comment': '',
+                      'data_type': '[serialization.format=1]'},
+                      {'col_name': 'Partition Provider',
+                      'comment': '',
+                      'data_type': 'Catalog'}],
+      'stats': [{'col_name': 'TRUE',
+                  'comment': '',
+                  'data_type': 'TRANSLATED_TO_EXTERNAL'},
+                {'col_name': '2', 'comment': '', 'data_type': 'bucketing_version'},
+                {'col_name': 'TRUE',
+                  'comment': '',
+                  'data_type': 'external.table.purge'},
+                {'col_name': '0',
+                  'comment': '',
+                  'data_type': 'numFilesErasureCoded'},
+                {'col_name': '1656416152',
+                  'comment': '',
+                  'data_type': 'transient_lastDdlTime'}],
+      'status': 0})
+
+
   def test_get_jobs(self):
     local_jobs = [
       {'url': u'http://172.21.1.246:4040/jobs/job/?id=0', 'name': u'0'}
