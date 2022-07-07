@@ -502,7 +502,7 @@ class SparkApi(Api):
     response = {
       'status': 0,
       'rows': [],
-      'full_header': []
+      'full_headers': []
     }
 
     # Trying to close unused sessions if there are any.

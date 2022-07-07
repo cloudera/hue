@@ -210,18 +210,39 @@ class TestSparkApi(object):
     self.api._execute = Mock(
       return_value='test_value'
     )
+    self.api.create_session = Mock(
+      return_value={
+        'id': 'test_id'
+      }
+    )
     self.api._check_status_and_fetch_result = Mock(
       return_value={
         'data': 'test_data',
         'meta': 'test_meta'
       }
     )
-    self.api.create_session = Mock(
+
+    # When table is transactional
+    self.api.describe_table = Mock(
       return_value={
-        'id': 'test_id'
+        'stats': [{
+          'data_type': 'transactional',
+          'col_name': 'true',
+          'comment': ''
+        }]
       }
     )
+    response = self.api.get_sample_data(snippet, 'test_db', 'test_table', 'test_column')
 
+    assert_equal(response['rows'], [])
+    assert_equal(response['full_headers'], [])
+
+    # When table is not transactional
+    self.api.describe_table = Mock(
+      return_value={
+        'stats': [] # No details regarding transactionality is present in describe response
+      }
+    )
     response = self.api.get_sample_data(snippet, 'test_db', 'test_table', 'test_column')
 
     assert_equal(response['rows'], 'test_data')
