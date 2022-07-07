@@ -499,6 +499,11 @@ class SparkApi(Api):
 
   def get_sample_data(self, snippet, database=None, table=None, column=None, is_async=False, operation=None):
     api = self.get_api()
+    response = {
+      'status': 0,
+      'rows': [],
+      'full_header': []
+    }
 
     # Trying to close unused sessions if there are any.
     # Calling the method here since this /sample_data call can be frequent enough and we dont need dedicated one.
@@ -511,15 +516,20 @@ class SparkApi(Api):
     else:
       session = self.create_session(snippet.get('type'))
 
+    # Skip sample data for transactional tables
+    notebook = {}
+    tb_describe = self.describe_table(notebook, snippet, database, table)
+
+    for stat in tb_describe['stats']:
+      if stat.get('data_type') and stat['data_type'] == 'transactional' and stat.get('col_name'):
+        return response
+
+
     statement = self._get_select_query(database, table, column, operation)
 
     sample_execute = self._execute(api, session, snippet.get('type'), statement)
     sample_result = self._check_status_and_fetch_result(api, session, sample_execute)
 
-    response = {
-      'status': 0,
-      'result': {}
-    }
     response['rows'] = sample_result['data']
     response['full_headers'] = sample_result['meta']
 
