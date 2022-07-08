@@ -263,6 +263,42 @@ class TestSparkApi(object):
     assert_equal(response, 'SELECT test_column\nFROM test_db.test_table\nLIMIT 100\n')
 
 
+  def test_describe_database(self):
+    notebook = Mock()
+    snippet = Mock()
+    self.api.create_session = Mock(
+      return_value={
+        'id': 'test_id'
+      }
+    )
+    self.api._execute = Mock(
+      return_value='test_value'
+    )
+    self.api._check_status_and_fetch_result = Mock(
+      return_value={
+        'data': [
+          ['Namespace Name', 'employees'],
+          ['Comment', 'For software companies'],
+          ['Location', 'hdfs://test_url:8020/warehouse/tablespace/external/hive/employees.db'],
+          ['Owner', 'demo'],
+          ['Properties', '((Create-by,Kevin), (Create-date,09/01/2019))']],
+        'images': [],
+        'meta': [
+          {'comment': '', 'name': 'info_name', 'type': 'string'},
+          {'comment': '', 'name': 'info_value', 'type': 'string'}],
+        'type': 'table'}
+    )
+    response = self.api.describe_database(notebook, snippet, 'employees')
+
+    assert_equal(response, {
+      'comment': 'For software companies',
+      'db_name': 'employees',
+      'location': 'hdfs://test_url:8020/warehouse/tablespace/external/hive/employees.db',
+      'owner_name': 'demo',
+      'parameters': '{Create-by=Kevin, Create-date=09/01/2019}',
+      'status': 0})
+
+
   def test_describe_table(self):
     notebook = Mock()
     snippet = Mock()
