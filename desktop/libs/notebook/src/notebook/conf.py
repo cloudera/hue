@@ -141,7 +141,7 @@ def get_ordered_interpreters(user=None):
       "type": i['type'],
       "interface": i['interface'],
       "options": i['options'],
-      'dialect': i.get('dialect', i['name']).lower(),
+      'dialect': i.get('dialect', i['type']).lower(),
       'dialect_properties': i.get('dialect_properties') or {},  # Empty when connectors off
       'category': i.get('category', 'editor'),
       "is_sql": i.get('is_sql') or \
