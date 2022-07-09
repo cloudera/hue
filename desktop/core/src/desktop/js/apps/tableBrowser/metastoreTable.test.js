@@ -112,7 +112,7 @@ describe('metastoreTable.js', () => {
     expect(metastoreHiveTable.enableImport()).toEqual(true);
   });
 
-  it('should not enable import when the dialect is spark sql', async () => {
+  it('should not enable import when the dialect is sparksql', async () => {
     const metastoreTable = new MetastoreTable(
       generateOptions({ catalogEntry: { getDialect: () => DIALECT_SPARK } })
     );
