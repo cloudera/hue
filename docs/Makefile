@@ -33,33 +33,44 @@ NO_TOC := --xsltproc-opts='--stringparam generate.toc ""'
 #
 DOC_FILES := $(shell find . -prune -o -name release-notes -o -path '*/gethue/*' -prune -o -print)
 $(BLD_DIR_DOC): release-notes $(DOC_FILES)
+# skip a2x generation if not found
+ifeq (0, $(shell which a2x 1>/dev/null 2>/dev/null; echo $$?))
 	@echo '--- Generating doc at $@'
 	@mkdir -p $@
 
-	@a2x $(NO_TOC) --icons --icons-dir=images --format=xhtml --stylesheet=css/docbook.css -D $@ index.txt
-	@rm -f index.xml
+	-@a2x $(NO_TOC) --icons --icons-dir=images --format=xhtml --stylesheet=css/docbook.css -D $@ index.txt
+	-@rm -f index.xml
 
-	@cp images/favicon.ico $@
-	@# Remove intermediate file
-	@rsync -a images $@/
-	@rsync -a js $@/
-	@rsync -a css $@/
-	@rsync -a fonts $@/
+	-@cp images/favicon.ico $@
+	-@# Remove intermediate file
+	-@rsync -a images $@/
+	-@rsync -a js $@/
+	-@rsync -a css $@/
+	-@rsync -a fonts $@/
+else
+	@echo "a2x is not found"
+endif
 
 
 .PHONY: release-notes
 release-notes: $(BLD_DIR_DOC)/release-notes
 $(BLD_DIR_DOC)/release-notes: $(wildcard release-notes/*.txt)
+# skip a2x generation if not found
+ifeq (0, $(shell which a2x 1>/dev/null 2>/dev/null; echo $$?))
 	@echo '--- Generating release notes at $@'
 	@mkdir -p $@
-	@cp css/docbook.css release-notes/
-	@for i in $? ; do \
+	-@cp css/docbook.css release-notes/
+	-@for i in $? ; do \
 	  a2x $(NO_TOC) --format=xhtml --stylesheet=docbook.css $$i ; \
 	  rm -f $$i.xml ; \
 	done;
-	@mv release-notes/docbook.css $@/
-	@mv release-notes/*.html $@/
+
+	-@mv release-notes/docbook.css $@/
+	-@mv release-notes/*.html $@/
 	@echo "--- Generated $@"
+else
+	@echo "a2x is not found"
+endif
 
 
 .PHONY: admin-manual
