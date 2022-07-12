@@ -17,7 +17,7 @@
   <properties>
     <mainClass>com.cloudera.hue.querystore.eventProcessor.EventProcessorApplication</mainClass>
     <creation.time>${maven.build.timestamp}</creation.time>
-    <ranger.version>2.1.0.7.2.16.0-SNAPSHOT</ranger.version>
+    <ranger.version>2.3.0.7.2.16.0-SNAPSHOT</ranger.version>
   </properties>
 
   <dependencies>
