@@ -1,9 +1,9 @@
 apache-ranger==0.0.3
+requests-gssapi==1.2.3
 asn1crypto==0.24.0
 avro-python3==1.8.2
-Babel==2.9.1
-boto==2.46.1
-# boto3==1.17.41  # Last Py2 is 1.17
+#@TODO@ We need to upgrade to Babel==2.9.1
+Babel==2.5.3
 celery[redis]==5.2.2
 cffi==1.15.0
 channels==3.0.3
@@ -73,3 +73,9 @@ git+https://github.com/gethue/django-mako.git
 werkzeug==2.0.1  # Should remove it here and from devtools.mk
 django-utils-six==2.0
 six==1.16.0
+-e file:///${ROOT}/desktop/core/ext-py3/requests-2.27.1
+-e file:///${ROOT}/desktop/core/ext-py3/boto-2.49.0
+-e file:///${ROOT}/desktop/core/ext-py3/django-axes-5.13.0
+-e file:///${ROOT}/desktop/core/ext-py3/djangosaml2-0.18.0
+-e file:///${ROOT}/desktop/core/ext-py3/pysaml2-5.0.0
+-e file:///${ROOT}/desktop/core/ext-py3/phoenixdb-1.1.0
