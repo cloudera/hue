@@ -23,7 +23,7 @@
     <!-- <queries-search :searches="searches" :table-definition="tableDefinition" /> -->
     <div class="query-table-actions">
       <search-input
-        :value="searchText"
+        v-model="searchText"
         :placeholder="I18n('Query text or Query/DAG/App ID')"
         :show-magnify="false"
         @search="searchQueries"
