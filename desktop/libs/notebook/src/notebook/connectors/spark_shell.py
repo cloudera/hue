@@ -721,6 +721,10 @@ class SparkDescribeTable(Table):
     partition_flag = True
 
     for d in self.data:
+      d[0] = str(d[0])
+      d[1] = str(d[1])
+      d[2] = str(d[2])
+
       if cols_flag:
         if (d[0] == d[1] == d[2] == '') or d[0].startswith('#'):
           cols_flag = False
