@@ -356,7 +356,7 @@ class TestSparkApi(object):
     response = self.api.describe_table(notebook, snippet, 'default', 'test_nonacid')
 
     assert_equal(response, {
-      'cols': [{'comment': None, 'name': 'nname', 'type': 'string'}],
+      'cols': [{'comment': 'None', 'name': 'nname', 'type': 'string'}],
       'comment': '',
       'details': {'properties': {
         'create_time': 'Tue Jun 28 11:35:33 UTC 2022',
