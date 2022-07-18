@@ -29,7 +29,7 @@ import I18n from 'utils/i18n';
 let contextPopoverTimeout = -1;
 
 export const DIALECT_HIVE = 'hive';
-export const DIALECT_SPARK = 'spark sql';
+export const DIALECT_SPARK = 'sparksql';
 
 class MetastoreTable {
   /**

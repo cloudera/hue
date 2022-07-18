@@ -170,7 +170,7 @@ class SQLIndexer(object):
         user_scratch_dir = self.fs.get_home_dir() + '/.scratchdir/%s' % str(uuid.uuid4()) # Make sure it's unique.
         self.fs.do_as_user(self.user, self.fs.mkdir, user_scratch_dir, 0o0777)
         self.fs.do_as_user(self.user, self.fs.rename, source['path'], user_scratch_dir)
-        if USER_SCRATCH_DIR_PERMISSION.get():
+        if editor_type == 'impala' and USER_SCRATCH_DIR_PERMISSION.get():
           self.fs.do_as_user(self.user, self.fs.chmod, user_scratch_dir, 0o0777, True)
         source_path = user_scratch_dir + '/' + source['path'].split('/')[-1]
 
@@ -315,7 +315,6 @@ class SQLIndexer(object):
     columns = [col for col_index, col in enumerate(destination['columns']) if col_index not in cols_to_remove]
 
     dialect = get_interpreter(source_type, self.user)['dialect']
-    tmp_table_name = table_name
 
     if dialect in ('hive', 'mysql'):
 
@@ -332,11 +331,10 @@ class SQLIndexer(object):
       }
 
     elif dialect == 'impala':
-      tmp_table_name = tmp_table_name + '_tmp'
-      sql = '''CREATE TABLE IF NOT EXISTS %(database)s.%(table_name)s (
+      sql = '''CREATE TABLE IF NOT EXISTS %(database)s.%(table_name)s_tmp (
 %(columns)s);\n''' % {
           'database': database,
-          'table_name': tmp_table_name,
+          'table_name': table_name,
           'columns': ',\n'.join(['  `%(name)s` string' % col for col in columns]),
       }                                                 # Impala does not implicitly cast between string and numeric or Boolean types.
 
@@ -357,30 +355,23 @@ class SQLIndexer(object):
           _csv_rows.append(tuple(row))
 
         if _csv_rows:
-
-          insert_sql = ""
-          for count in range(1 + len(_csv_rows)//5000):      # Inserting 5000 (decided through testing on some files) rows through one sql
-            temp_list = _csv_rows[count*5000:(count+1)*5000] # statement as we can get memory issue if we insert all rows in one statement.
-            if len(temp_list) == 0:
-              break
-            csv_rows = str(temp_list)[1:-1]
-            insert_sql += '''\nINSERT INTO %(database)s.%(table_name)s VALUES %(csv_rows)s;\n'''% {
-              'database': database,
-              'table_name': tmp_table_name,
-              'csv_rows': csv_rows
-            }
+          csv_rows = str(_csv_rows)[1:-1]
 
           if dialect in ('hive', 'mysql'):
-            sql += insert_sql
-
+            sql += '''\nINSERT INTO %(database)s.%(table_name)s VALUES %(csv_rows)s;\n'''% {
+              'database': database,
+              'table_name': table_name,
+              'csv_rows': csv_rows
+            }
           elif dialect == 'impala':
              # casting from string to boolean is not allowed in impala so string -> int -> bool
             sql_ = ',\n'.join([
               '  CAST ( `%(name)s` AS %(type)s ) `%(name)s`' % col if col['type'] != 'boolean' \
               else '  CAST ( CAST ( `%(name)s` AS TINYINT ) AS boolean ) `%(name)s`' % col for col in columns
             ])
-            sql += insert_sql
-            sql += '''\nCREATE TABLE IF NOT EXISTS %(database)s.%(table_name)s
+
+            sql += '''\nINSERT INTO %(database)s.%(table_name)s_tmp VALUES %(csv_rows)s;\n
+CREATE TABLE IF NOT EXISTS %(database)s.%(table_name)s
 AS SELECT\n%(sql_)s\nFROM  %(database)s.%(table_name)s_tmp;\n\nDROP TABLE IF EXISTS %(database)s.%(table_name)s_tmp;'''% {
               'database': database,
               'table_name': table_name,
