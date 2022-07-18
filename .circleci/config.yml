@@ -223,6 +223,7 @@ commands:
             fi
 
             export PYTHON_VER=python3.8
+            export ROOT=$PWD
             make apps
 
       - run:
