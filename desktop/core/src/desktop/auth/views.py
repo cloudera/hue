@@ -33,7 +33,7 @@ import django.contrib.auth.views
 from django.core.exceptions import SuspiciousOperation
 from django.contrib.auth import login, get_backends, authenticate
 from django.contrib.sessions.models import Session
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponseServerError
 from django.urls import reverse
 
 from hadoop.fs.exceptions import WebHdfsException
@@ -262,10 +262,31 @@ def dt_logout(request, next_page=None):
   if len([backend for backend in backends if hasattr(backend, 'logout')]) == len(backends):
     LOG.warning("Failed to log out from all backends for user: %s" % (username))
 
+  backend_names = [backend.__class__.__name__ for backend in backends]
+  if 'KnoxSpnegoDjangoBackend' in backend_names:
+    next_page = '/knox/logout?originalUrl=%s' % _get_knox_hue_home(request)
+    LOG.debug("----> next_page: %s" % next_page)
+  else:
+    LOG.debug("Knox backend: %s" % ', '.join(backend_names))
+
   response = django.contrib.auth.views.LogoutView.as_view(next_page=next_page)(request)
   response.delete_cookie(LOAD_BALANCER_COOKIE)
   return response
 
+@login_notrequired
+def idle_redirect(request):
+  LOG.debug("Knox idle_redirect auth: %s" % str(request.user.is_authenticated))
+  return HttpResponseRedirect('/knox/logout?originalUrl=%s' % _get_knox_hue_home(request))
+
+def _get_knox_hue_home(request):
+  referer_url = request.META.get('HTTP_REFERER')
+  LOG.debug("Knox REFERER: %s" % referer_url)
+  home_url = referer_url.split('cdp-proxy/hue/', 1)[0] + 'cdp-proxy/hue/'
+  return home_url
+
+@login_notrequired
+def knox_logout(request):
+  return HttpResponseServerError('Failed to log out from Knox!')
 
 def profile(request):
   """

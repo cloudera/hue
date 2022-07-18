@@ -73,6 +73,8 @@ dynamic_patterns = [
   re_path(r'^hue/accounts/logout/?$', desktop_auth_views.dt_logout, {'next_page': '/'}),
   re_path(r'^accounts/login/?$', desktop_auth_views.dt_login), # Deprecated
   re_path(r'^accounts/logout/?$', desktop_auth_views.dt_logout, {'next_page': '/'}),
+  re_path(r'^knox/idle_redirect/?$', desktop_auth_views.idle_redirect),
+  re_path(r'^knox/logout/?$', desktop_auth_views.knox_logout),
   re_path(r'^profile$', desktop_auth_views.profile),
   re_path(r'^login/oauth/?$', desktop_auth_views.oauth_login),
   re_path(r'^login/oauth_authenticated/?$', desktop_auth_views.oauth_authenticated),

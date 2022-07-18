@@ -385,8 +385,7 @@ class LoginAndPermissionMiddleware(MiddlewareMixin):
     logging.info("Redirecting to login page: %s", request.get_full_path())
     access_log(request, 'login redirection', level=access_log_level)
     no_idle_backends = [
-        "desktop.auth.backend.SpnegoDjangoBackend",
-        "desktop.auth.backend.KnoxSpnegoDjangoBackend"
+        "desktop.auth.backend.SpnegoDjangoBackend"
     ]
     if CDP_LOGOUT_URL.get() == "":
       no_idle_backends.append("libsaml.backend.SAML2Backend")
