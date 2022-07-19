@@ -194,7 +194,15 @@ This is a verified step-by-step guide on how to get Hue up and running on a fres
     export CFLAGS="-I$(xcrun --show-sdk-path)/usr/include/sasl"
     export LDFLAGS="-L/usr/local/opt/libffi/lib -L/usr/local/opt/openssl@1.1/lib"
     export CPPFLAGS="-L/usr/local/opt/libffi/lib/include -L/usr/local/opt/openssl@1.1/lib/include"
+    ```
 
+    Also export `ROOT` which should point to your cloned Hue repository:
+    ```
+    export ROOT=<path_to_cloned_hue_repository>
+    ```
+    
+    Then run:
+    ```
     make apps
     ```
 
