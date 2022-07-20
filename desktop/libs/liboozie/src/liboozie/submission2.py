@@ -408,10 +408,12 @@ STORED AS TEXTFILE %s""" % (self.properties.get('send_result_path'),
     """From XML and job.properties HDFS files"""
     deployment_dir = os.path.dirname(application_path)
     xml = self.fs.do_as_user(self.user, self.fs.read, application_path, 0, 1 * 1024 ** 2)
+    xml = xml.decode('utf-8') if hasattr(xml, 'decode') else xml
 
     properties_file = deployment_dir + '/job.properties'
     if self.fs.do_as_user(self.user, self.fs.exists, properties_file):
       properties = self.fs.do_as_user(self.user, self.fs.read, properties_file, 0, 1 * 1024 ** 2)
+      properties = properties.decode('utf-8') if hasattr(properties, 'decode') else properties
     else:
       properties = None
 
