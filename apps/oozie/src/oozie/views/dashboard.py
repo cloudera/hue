@@ -975,7 +975,7 @@ def submit_external_job(request, application_path):
     application_path = application_path.replace("abfs:/", "abfs://")
   elif application_path.startswith('s3a:/') and not application_path.startswith('s3a://'):
     application_path = application_path.replace('s3a:/', 's3a://')
-  else:
+  elif not application_path.startswith('/'):
     application_path = "/" + application_path
 
   if application_path.startswith("abfs://"):
@@ -1022,6 +1022,8 @@ def submit_external_job(request, application_path):
                    'show_dryrun': os.path.basename(application_path) != 'bundle.xml',
                    'return_json': request.GET.get('format') == 'json'
                  }, force_template=True).content
+
+  popup = popup.decode('utf-8') if hasattr(popup, 'decode') else popup
   return JsonResponse(popup, safe=False)
 
 
