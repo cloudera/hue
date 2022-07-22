@@ -3237,7 +3237,10 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
         var files = $('#inputfile')[0].files[0];
         fd.append('file', files);
         var file_size = files.size;
-        if (file_size > 200 * 1024) {          
+        if (file_size === 0) {
+          $.jHueNotify.warn("${ _('This file is empty, please select another file.') }");
+        }
+        else if (file_size > 200 * 1024) {          
           $.jHueNotify.warn("${ _('File size exceeds the supported size (200 KB). Please use the S3, ABFS or HDFS browser to upload files.') }");
         } else {
           $.ajax({
