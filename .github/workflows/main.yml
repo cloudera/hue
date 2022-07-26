@@ -1,36 +1,19 @@
-name: Code quality
-# Run this workflow when a pull request is created.
-on: [pull_request]
+name: Pronto
+on: [pull_request_target]
 
 jobs:
   pronto:
+
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      # Pronto docs suggest limiting the depth of the clone
-      # to speed things up.
       - run: |
           git fetch --no-tags --prune --depth=10 origin +refs/heads/*:refs/remotes/origin/*
-
-      # If your project only specifies its Ruby version in its
-      # Gemfile, you'll need to specify a version for the
-      # action to use. See documentation for the
-      # ruby/setup-ruby action for details.
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
-
-      # Install the runners you'd like Pronto to use on each
-      # scan. This setup includes the Standard Ruby style
-      # guide, and Brakeman security analyzer
-      - name: Set up Pronto
-        run: gem install pronto pronto-standardrb pronto-brakeman
-
-      # Perform a scan on the diff between your branch and
-      # your PR's target branch (e.g, staging, main ...)
+      - name: Setup pronto
+        run: gem install pronto pronto-rubocop
       - name: Run Pronto
-        run: pronto run -f github_status github_pr -c origin/$
-        env:
-          PRONTO_PULL_REQUEST_ID: $
-          PRONTO_GITHUB_ACCESS_TOKEN: "$"
+        run: PRONTO_PULL_REQUEST_ID="${{ github.event.pull_request.number }}" PRONTO_GITHUB_ACCESS_TOKEN="${{ github.token }}" pronto run -f github_status github_pr -c origin/${{ github.base_ref }}
