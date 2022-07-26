@@ -16,4 +16,4 @@ jobs:
       - name: Setup pronto
         run: gem install pronto pronto-rubocop pronto-goodcheck
       - name: Run Pronto
-        run: PRONTO_PULL_REQUEST_ID="${{ github.event.pull_request.number }}" PRONTO_GITHUB_ACCESS_TOKEN="${{ github.token }}" pronto run -f github_status github_pr -c origin/${{ github.base_ref }}
+        run: PRONTO_PULL_REQUEST_ID="${{ github.event.pull_request.number }}" PRONTO_GITHUB_ACCESS_TOKEN="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" pronto run -f github_status github_pr -c origin/${{ github.base_ref }}
