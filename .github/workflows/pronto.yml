@@ -13,6 +13,9 @@ jobs:
           git fetch --no-tags --prune --depth=10 origin +refs/heads/*:refs/remotes/origin/*
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.0' # Not needed with a .ruby-version file
+          bundler-cache: true # runs 'bundle install' and caches installed gems automatically
       - name: Setup pronto
         run: gem install pronto pronto-rubocop pronto-goodcheck
       - name: Run Pronto
