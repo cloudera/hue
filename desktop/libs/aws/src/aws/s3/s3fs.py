@@ -67,6 +67,7 @@ def auth_error_handler(view_fn):
     try:
       return view_fn(*args, **kwargs)
     except (S3ResponseError, IOError) as e:
+      LOG.exception('S3 error: ' + str(e))
       if 'Forbidden' in str(e) or (hasattr(e, 'status') and e.status == 403):
         path = kwargs.get('path')
         if not path and len(args) > 1:
