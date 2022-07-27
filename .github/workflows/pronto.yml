@@ -17,6 +17,6 @@ jobs:
           ruby-version: '3.0' # Not needed with a .ruby-version file
           bundler-cache: true # runs 'bundle install' and caches installed gems automatically
       - name: Setup pronto
-        run: gem install pronto pronto-rubocop pronto-goodcheck
+        run: gem install faraday-retry pronto pronto-rubocop pronto-goodcheck
       - name: Run Pronto
         run: PRONTO_PULL_REQUEST_ID="${{ github.event.pull_request.number }}" PRONTO_GITHUB_ACCESS_TOKEN="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" pronto run -f github_status github_pr -c origin/${{ github.base_ref }}
