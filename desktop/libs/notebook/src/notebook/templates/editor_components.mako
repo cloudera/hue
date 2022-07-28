@@ -1948,12 +1948,22 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     <h2 class="modal-title">${_('Smart Query')}</h2>
   </div>
 
- 
+  <div class="modal-body">
+    <form>
+      <div class="control-group">
+        <label class="control-label">${_('Enter text to generate query for: ')}</label>
+        <div class="controls">
+          <textarea id="inputQuery" name="inputQuery" style="width:545px;height:80px" ></textarea>
+        </div>
+      </div>
+    </form>
+  </div>
 
   <div class="modal-footer">
     <a class="btn" data-dismiss="modal">${_('Cancel')}</a>
-    
+    <input type="button" class="btn btn-primary" value="${_('Generate Query')}" data-dismiss="modal" data-bind="click: function() {var text = $('textarea#inputQuery').val(); console.log(text);}" />
   </div>
+
 </div>
 
 <div id="saveAsModal${ suffix }" class="modal hide fade">
