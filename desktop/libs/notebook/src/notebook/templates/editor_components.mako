@@ -224,6 +224,12 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
   % endif
 
     <div class="btn-group">
+      <a class="btn" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Smart query...") }" data-bind="click: function() { $('#smartQueryModal${ suffix }').modal('show');} ">
+        <i>Smart query</i>
+      </a>
+    </div>
+
+    <div class="btn-group">
       <a class="btn" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: function() { if ($root.canSave() ) { saveNotebook() } else { $('#saveAsModal${ suffix }').modal('show');} }, attr: { title: $root.canSave() ? '${ _ko('Save') }' : '${ _ko('Save As') }' }">
         <i class="fa fa-save"></i>
       </a>
@@ -1935,6 +1941,20 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
   <!-- /ko -->
 </div>
 
+<div id="smartQueryModal${ suffix }" class="modal hide fade">
+
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+    <h2 class="modal-title">${_('Smart Query')}</h2>
+  </div>
+
+ 
+
+  <div class="modal-footer">
+    <a class="btn" data-dismiss="modal">${_('Cancel')}</a>
+    
+  </div>
+</div>
 
 <div id="saveAsModal${ suffix }" class="modal hide fade">
   <div class="modal-header">
