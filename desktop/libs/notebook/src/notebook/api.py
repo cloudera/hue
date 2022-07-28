@@ -767,6 +767,28 @@ def autocomplete(request, server=None, database=None, table=None, column=None, n
 @require_POST
 @check_document_access_permission
 @api_error_handler
+def autocomplete1(request, server=None, database=None, table=None, column=None, nested=None):
+  response = {'status': -1}
+
+  # Passed by check_document_access_permission but unused by APIs
+  notebook = json.loads(request.POST.get('notebook', '{}'))
+  snippet = json.loads(request.POST.get('snippet', '{}'))
+  action = request.POST.get('operation', 'schema')
+
+  try:
+    autocomplete_data = get_api(request, snippet).autocomplete(snippet, database, table, column, nested, action)
+    response.update(autocomplete_data)
+  except QueryExpired as e:
+    LOG.warning('Expired query seen: %s' % e)
+
+  response['status'] = 0
+
+  return response
+
+
+@require_POST
+@check_document_access_permission
+@api_error_handler
 def get_sample_data(request, server=None, database=None, table=None, column=None):
   response = {'status': -1}
 

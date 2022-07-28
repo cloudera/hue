@@ -17,6 +17,8 @@
 
 import logging
 import json
+import openai
+from desktop.lib.django_util import JsonResponse
 
 from django.http import QueryDict, HttpResponse
 from rest_framework.decorators import api_view
@@ -166,6 +168,56 @@ def autocomplete(request, server=None, database=None, table=None, column=None, n
   _patch_operation_id_request(django_request)
 
   return notebook_api.autocomplete(django_request, server, database, table, column, nested)
+
+
+@api_view(["POST"])
+def smart_query(request, query=None):
+  parsed_data = parse_database(request, "default")
+  parsed_data += "\n"
+  parsed_data += "A query to list salary more than 20000\n"
+
+  OPENAI_API_KEY = "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"
+  
+  openai.api_key = OPENAI_API_KEY
+
+  response = openai.Completion.create(
+    model="text-davinci-002",
+    prompt=parsed_data,
+    temperature=0.7,
+    max_tokens=150,
+    top_p=1,
+    frequency_penalty=0,
+    presence_penalty=0,
+    stop=["#", ";"]
+  )
+  return JsonResponse(response)
+
+
+def parse_database(request, database=None):
+  django_request = get_django_request(request)
+
+  _patch_operation_id_request(django_request)
+
+  database = "default"
+  table = None
+  resp1 = notebook_api.autocomplete1(django_request, None, database, table, None, None)
+  l = len(resp1["tables_meta"])
+  tables_list = []
+  for i in resp1["tables_meta"]:
+    tables_list.append(i["name"])
+  st = ""
+  for i in tables_list:
+    database = "default"
+    resp2 = notebook_api.autocomplete1(django_request, None, database, i, None, None)
+    st += i
+    st += "("
+    temp_col = str(resp2["columns"])
+    final_col = temp_col[1:-1]
+    st += final_col
+    st += ")\n"
+
+  return st
+
 
 @api_view(["POST"])
 def describe(request, database, table=None, column=None):
