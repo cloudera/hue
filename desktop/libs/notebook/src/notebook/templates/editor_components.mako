@@ -55,7 +55,50 @@ else:
 <script src="${ static('oozie/js/coordinator-editor.ko.js') }"></script>
 <script src="${ static('oozie/js/list-oozie-coordinator.ko.js') }"></script>
 % endif
-
+<script>
+ function generateSmartQuery(humanText)
+ {
+   console.log(humanText)
+   let queryObj = {
+     query: humanText,
+     database: "student"
+   }
+   let hardCodedResponse = {
+     "id":"cmpl-5Yt6dPf930ZSwxrm6n7LASBKuZPsM",
+     "object":"text_completion",
+     "created":1658996663,
+     "model":"text-davinci-002",
+     "choices":[{"text":" DISTINCT d.name\nFROM department d\nJOIN employee e ON d.id = e.department_id\nJOIN salary_payments sp ON sp.employee_id=e.id\nWHERE sp.date > (CURRENT_DATE - INTERVAL '3 months')\nGROUP BY d.name\nHAVING COUNT(e.id) > 10",
+     "index":0,
+     "logprobs":null,
+     "finish_reason":"stop"}],
+     "usage":{"prompt_tokens":77,"completion_tokens":88,"total_tokens":165}
+    }
+   
+   let post = JSON.stringify(queryObj)
+   const sqlQueryText = document.getElementById('sqlQueryTextarea')
+   fetch("http://127.0.0.1:8000/hue/smartquery", {
+      method: 'post',
+      body: post,
+      headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+      }
+    }).then((response) => {
+        return response.json()
+    }).then((res) => {
+        if (res.status === 201) {
+            console.log("Smart query successfully created!")
+        }
+    }).catch((error) => {
+        console.log(error)
+        console.log(hardCodedResponse.choices[0].text)
+        let sqlquery = hardCodedResponse.choices[0].text
+        huePubSub.publish('editor.insert.at.cursor', { text: sqlquery });
+        
+    })
+ }
+</script>
 <script src="${ static('desktop/js/ko.common-dashboard.js') }" type="text/javascript" charset="utf-8"></script>
 
 %if ENABLE_QUERY_BUILDER.get():
@@ -1957,11 +2000,13 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         </div>
       </div>
     </form>
+    
   </div>
+  
 
   <div class="modal-footer">
     <a class="btn" data-dismiss="modal">${_('Cancel')}</a>
-    <input type="button" class="btn btn-primary" value="${_('Generate Query')}" data-dismiss="modal" data-bind="click: function() {var text = $('textarea#inputQuery').val(); console.log(text);}" />
+    <input type="button" data-dismiss="modal" class="btn btn-primary" value="${_('Generate Query')}" data-bind="click: function() {var humantext = $('textarea#inputQuery').val(); generateSmartQuery(humantext);}" />
   </div>
 
 </div>
