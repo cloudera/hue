@@ -43,4 +43,7 @@ public interface TezAppInfoDao extends JdbiDao<TezAppInfo> {
   @SqlUpdate("UPDATE tez_app_info SET app_id = :appId, submit_time = :submitTime, " +
       "config_compressed = :configCompressed WHERE id = :id")
   int update(@BindBean TezAppInfo appInfo);
+
+  @SqlUpdate("delete from tez_app_info where submit_time < :submitTime")
+  int deleteOlder(@Bind("submitTime") long submitTime);
 }

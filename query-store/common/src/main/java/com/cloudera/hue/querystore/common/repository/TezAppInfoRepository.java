@@ -44,4 +44,8 @@ public class TezAppInfoRepository extends JdbiRepository<TezAppInfo, TezAppInfoD
   public boolean delete(long id) {
     return !(0 == dao.delete(id));
   }
+
+  public int deleteOlder(long submitTime) {
+    return dao.deleteOlder(submitTime * 1000);
+  }
 }

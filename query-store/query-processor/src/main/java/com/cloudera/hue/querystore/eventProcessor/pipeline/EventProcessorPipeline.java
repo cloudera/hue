@@ -32,6 +32,7 @@ import com.cloudera.hue.querystore.common.entities.FileStatusEntity;
 import com.cloudera.hue.querystore.common.entities.FileStatusEntity.FileStatusType;
 import com.cloudera.hue.querystore.common.repository.FileStatusPersistenceManager;
 import com.cloudera.hue.querystore.common.repository.transaction.TransactionManager;
+import com.cloudera.hue.querystore.eventProcessor.lifecycle.CleanupManager;
 import com.cloudera.hue.querystore.eventProcessor.processors.EventProcessor;
 import com.cloudera.hue.querystore.eventProcessor.processors.ProcessingStatus;
 import com.codahale.metrics.Gauge;
@@ -52,8 +53,6 @@ public class EventProcessorPipeline<T extends MessageLite> {
       new ConfVar<>("hue.query-processor.event-pipeline.hdfs-sync-wait-time-millis", 2 * 60 * 1000l); // 2 minutes
   public static final ConfVar<Integer> MAX_PARALLELISM =
       new ConfVar<>("hue.query-processor.event-pipeline.max-parallelism", 50);
-  public static final ConfVar<Long> CLEANUP_INTERVAL_SECS =
-      new ConfVar<>("hue.query-processor.event-pipeline.cleanup-interval-secs", 30 * 24 * 3600L); // 30 days
 
   private final Clock clock;
   private final DatePartitionedLogger<T> partitionedLogger;
@@ -77,7 +76,7 @@ public class EventProcessorPipeline<T extends MessageLite> {
   private final Meter eventsProcessedMeter;
   private final Meter eventsProcessingFailureMeter;
   private final Meter eventsIOFailureMeter;
-  
+
   // The current directory we are scanning for new or changed files.
   private String scanDir;
   private final ConcurrentHashMap<String, FileProcessingStatus> scanDirEntities =
@@ -176,7 +175,7 @@ public class EventProcessorPipeline<T extends MessageLite> {
     log.info("Loading offsets for: " + type);
     Collection<FileStatusEntity> savedOffsets = txnManager.withTransaction(
           () -> fsPersistenceManager.getFileOfType(type));
-    LocalDate maxDate = getMinDateForProcessing(clock, config);
+    LocalDate maxDate = CleanupManager.getMinDateForProcessing(clock, config);
     for (FileStatusEntity fsEntity : savedOffsets) {
       if (fsEntity.getDate().compareTo(maxDate) > 0) {
         maxDate = fsEntity.getDate();
@@ -429,11 +428,5 @@ public class EventProcessorPipeline<T extends MessageLite> {
       }
       return isFinished;
     }
-  }
-
-  // Used in event processor pipeline to ignore all files before this time.
-  public static LocalDate getMinDateForProcessing(Clock clock, DasConfiguration config) {
-    long time = clock.getTime() / 1000 - config.getConf(CLEANUP_INTERVAL_SECS);
-    return LocalDateTime.ofEpochSecond(time, 0, ZoneOffset.UTC).toLocalDate();
   }
 }
