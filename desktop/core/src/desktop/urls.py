@@ -155,6 +155,8 @@ dynamic_patterns += [
 
   # Permissions
   re_path(r'^desktop/api/doc/update_permissions', desktop_api.update_permissions),
+
+  re_path(r'^desktop/api/smart_query', desktop_api.smart_query),
 ]
 
 dynamic_patterns += [

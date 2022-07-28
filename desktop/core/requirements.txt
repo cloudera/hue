@@ -3,4 +3,3 @@ numpy==1.23.1
 pandas==1.4.2
 lxml==4.9.1
 -r ${ROOT}/desktop/core/base_requirements.txt
-

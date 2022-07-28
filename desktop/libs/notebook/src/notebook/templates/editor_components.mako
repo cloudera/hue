@@ -55,7 +55,22 @@ else:
 <script src="${ static('oozie/js/coordinator-editor.ko.js') }"></script>
 <script src="${ static('oozie/js/list-oozie-coordinator.ko.js') }"></script>
 % endif
-
+<script>
+ function generateSmartQuery(humanText, db)
+ {
+   console.log(db);
+    huePubSub.publish('editor.create.new');
+   $.post("/api/editor/smart_query/", { "database": db, "query": humanText}, 
+   function(data) { 
+     let response = data;
+     let sqlQuery = response["choices"][0]["text"];
+     huePubSub.publish('editor.insert.at.cursor', { text: sqlQuery });
+     console.log(sqlQuery);
+     console.log(response);
+    });
+   
+ }
+</script>
 <script src="${ static('desktop/js/ko.common-dashboard.js') }" type="text/javascript" charset="utf-8"></script>
 
 %if ENABLE_QUERY_BUILDER.get():
@@ -222,6 +237,12 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       </div>
     <!-- /ko -->
   % endif
+
+    <div class="btn-group">
+      <a class="btn" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Smart query...") }" data-bind="click: function() {$('#smartQueryModal${ suffix }').modal('show');} ">
+        <i>Smart query</i>
+      </a>
+    </div>
 
     <div class="btn-group">
       <a class="btn" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: function() { if ($root.canSave() ) { saveNotebook() } else { $('#saveAsModal${ suffix }').modal('show');} }, attr: { title: $root.canSave() ? '${ _ko('Save') }' : '${ _ko('Save As') }' }">
@@ -1935,6 +1956,38 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
   <!-- /ko -->
 </div>
 
+<div id="smartQueryModal${ suffix }" class="modal hide fade">
+
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+    <h2 class="modal-title">${_('Smart Query')}</h2>
+  </div>
+
+  <div class="modal-body">
+    <form>
+      <div class="control-group">
+        <label class="control-label">${_('Enter text to generate query for: ')}</label>
+        <div class="controls">
+          <textarea id="inputQuery" name="inputQuery" style="width:545px;height:80px" ></textarea>
+        </div>
+      </div>
+      <div class="control-group">
+        <label class="control-label">${_('Enter database name: ')}</label>
+        <div class="controls">
+          <input type="text" id="inputDatabase" name="inputDatabase" style="width:545px;" ></input>
+        </div>
+      </div>
+    </form>
+    
+  </div>
+  
+
+  <div class="modal-footer">
+    <a class="btn" data-dismiss="modal">${_('Cancel')}</a>
+    <input type="button" data-dismiss="modal" class="btn btn-primary" value="${_('Generate Query')}" data-bind="click: function() {var humantext = $('textarea#inputQuery').val(); var db = document.getElementById('inputDatabase').value; generateSmartQuery(humantext, db); document.getElementById('inputQuery').value = ''; document.getElementById('inputDatabase').value=''}" />
+  </div>
+
+</div>
 
 <div id="saveAsModal${ suffix }" class="modal hide fade">
   <div class="modal-header">

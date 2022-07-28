@@ -17,6 +17,9 @@
 
 import logging
 import json
+import openai
+import os
+from desktop.lib.django_util import JsonResponse
 
 from django.http import QueryDict, HttpResponse
 from rest_framework.permissions import AllowAny
@@ -171,6 +174,56 @@ def autocomplete(request, server=None, database=None, table=None, column=None, n
   _patch_operation_id_request(django_request)
 
   return notebook_api.autocomplete(django_request, server, database, table, column, nested)
+
+
+@api_view(["POST"])
+def smart_query(request, query=None):
+  database = request.POST.get("database")
+  query = request.POST.get("query")
+  parsed_data = parse_database(request, database)
+  parsed_data += "\n"
+  parsed_data += query
+  parsed_data += "\n"
+  
+  openai.api_key = os.getenv("api_key")
+  LOG.debug(openai.api_key)
+  response = openai.Completion.create(
+    model="text-davinci-002",
+    prompt=parsed_data,
+    temperature=0.7,
+    max_tokens=150,
+    top_p=1,
+    frequency_penalty=0,
+    presence_penalty=0,
+    stop=["#", ";"]
+  )
+  return JsonResponse(response)
+
+
+def parse_database(request, database=None):
+  django_request = get_django_request(request)
+
+  _patch_operation_id_request(django_request)
+
+  table = None
+  resp1 = notebook_api.autocomplete1(django_request, None, database, table, None, None)
+  
+  tables_list = []
+  for table in resp1["tables_meta"]:
+    tables_list.append(table["name"])
+  
+  parsed_data = ""
+  for table in tables_list:
+    resp2 = notebook_api.autocomplete1(django_request, None, database, table, None, None)
+    parsed_data += table
+    parsed_data += "("
+    temp_col = str(resp2["columns"])
+    final_col = temp_col[1:-1]
+    parsed_data += final_col
+    parsed_data += ")\n"
+
+  return parsed_data
+
 
 @api_view(["POST"])
 def describe(request, database, table=None, column=None):
