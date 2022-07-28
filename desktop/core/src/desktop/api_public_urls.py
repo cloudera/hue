@@ -154,3 +154,7 @@ urlpatterns += [
 
   re_path(r'^iam/get_users/?', api_public.get_users, name='iam_get_users'),
 ]
+
+urlpatterns += [
+  re_path(r'^editor/smart_query', api_public.smart_query, name='smart_query'),
+]
