@@ -54,14 +54,9 @@ public enum ArtifactSourceType implements ArtifactSourceCreator {
   public static List<ArtifactSourceCreator> getValues(String logSource) {
     switch (logSource.toLowerCase()) {
       case "k8s":
-        return Arrays.asList(HIVE_STUDIO,
-          SYS_LOG,
-          TEZ_HDFS);
+        return Arrays.asList(HIVE_STUDIO, TEZ_HDFS);
       default:
-        return Arrays.asList(HIVE_STUDIO,
-          TEZ_HDFS, TEZ_AM_INFO, TEZ_AM_LOG_INFO, TEZ_AM_LOGS,
-          TEZ_TASK_LOGS_INFO, TEZ_TASK_LOGS,
-          LLAP_DEAMON_LOGS_INFO, LLAP_DEAMON_LOGS);
+        return Arrays.asList(HIVE_STUDIO, TEZ_HDFS, TEZ_AM_INFO);
     }
   }
 }
