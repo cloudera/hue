@@ -22,6 +22,7 @@ import com.cloudera.hue.querystore.common.module.CommonModule;
 import com.cloudera.hue.querystore.common.resource.HealthCheckResource;
 import com.cloudera.hue.querystore.common.util.PasswordSubstitutor;
 import com.cloudera.hue.querystore.eventProcessor.bundle.DefaultFlywayBundle;
+import com.cloudera.hue.querystore.eventProcessor.lifecycle.CleanupManager;
 import com.cloudera.hue.querystore.eventProcessor.lifecycle.EventProcessorManager;
 import com.cloudera.hue.querystore.eventProcessor.module.EventProcessorModule;
 import com.cloudera.hue.querystore.eventProcessor.resources.AboutResource;
@@ -99,6 +100,7 @@ public class EventProcessorApplication extends Application<EventProcessorConfigu
     if (configuration.getDasConf().getConf(ENABLE_EVENT_PROCESSOR)) {
       EventProcessorManager eventProcessorManager = injector.getInstance(EventProcessorManager.class);
       environment.lifecycle().manage(eventProcessorManager);
+      environment.lifecycle().manage(injector.getInstance(CleanupManager.class));
     }
   }
 
