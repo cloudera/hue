@@ -79,3 +79,4 @@ six==1.16.0
 -e file:///${ROOT}/desktop/core/ext-py3/djangosaml2-0.18.0
 -e file:///${ROOT}/desktop/core/ext-py3/pysaml2-5.0.0
 -e file:///${ROOT}/desktop/core/ext-py3/phoenixdb-1.1.0
+openai==0.19.0

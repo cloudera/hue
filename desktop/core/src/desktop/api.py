@@ -19,6 +19,7 @@ import logging
 import json
 import sys
 import time
+import openai
 
 from collections import defaultdict
 
@@ -314,6 +315,27 @@ def remove_tag(request):
     response['message'] = force_unicode(e)
 
   return JsonResponse(response)
+
+
+def parse_database(database):
+  return "### Postgres SQL tables, with their properties:\n#\n# Employee(id, name, department_id)\n# Department(id, name, address)\n# Salary_Payments(id, employee_id, amount, date)\n#\n### A query to list the names of the departments which employed more than 10 employees in the last 3 months\nSELECT"
+
+@require_POST
+def smart_query(request):
+    query = parse_database(request.database)
+    openai.api_key = os.getenv("OPENAI_API_KEY")
+
+    response = openai.Completion.create(
+      model="text-davinci-002",
+      prompt=query,
+      temperature=0.7,
+      max_tokens=150,
+      top_p=1,
+      frequency_penalty=0,
+      presence_penalty=0,
+      stop=["#", ";"]
+    )
+    return JsonResponse(response)
 
 
 @require_POST
