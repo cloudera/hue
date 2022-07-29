@@ -41,9 +41,12 @@ urlpatterns = [
   re_path(r'^editor_m/?$', notebook_views.editor_m, name='editor_m'),
   re_path(r'^browse/(?P<database>[^/?]+)/(?P<table>\w+)(?:/(?P<partition_spec>.+?))?/?$', notebook_views.browse, name='browse'),
   re_path(r'^execute_and_watch/?$', notebook_views.execute_and_watch, name='execute_and_watch'),
+  re_path(r'^execute_and_watch/?$', notebook_views.execute_and_watch, name='execute_and_watch'),
+  re_path(r'^execute_and_watch/?$', notebook_views.execute_and_watch, name='execute_and_watch'),
+
 ]
 
-# APIs
+  # APIs
 urlpatterns += [
   re_path(r'^api/create_notebook/?$', notebook_api.create_notebook, name='create_notebook'),
   re_path(r'^api/create_session/?$', notebook_api.create_session, name='create_session'),
@@ -92,6 +95,8 @@ urlpatterns += [
     name='api_autocomplete_nested'
   ),
   re_path(r'^api/sample/(?P<database>[^/?]*)/(?P<table>[\w_\-]+)/?$', notebook_api.get_sample_data, name='api_sample_data'),
+  re_path(r'^api/sample/(?P<database>[^/?]*)/(?P<table>[\w_\-]+)/?$', notebook_api.get_sample_data, name='api_sample_data'),
+
   re_path(
     r'^api/sample/(?P<database>[^/?]*)/(?P<table>[\w_\-]+)/(?P<column>\w+)/?$',
     notebook_api.get_sample_data,
@@ -100,6 +105,8 @@ urlpatterns += [
 
   # SQLite
   re_path(r'^api/autocomplete//?(?P<server>[\w_\-/]+)/(?P<database>[^/?]*)/?$', notebook_api.autocomplete, name='api_autocomplete_tables'),
+  re_path(r'^api/autocomplete//?(?P<server>[\w_\-/]+)/(?P<database>[^/?]*)/?$', notebook_api.autocomplete, name='api_autocomplete_tables'),
+
   re_path(
     r'^api/autocomplete//?(?P<server>[\w_\-/]+)/(?P<database>[^/?]*)/(?P<table>\w+)/?$',
     notebook_api.autocomplete,
