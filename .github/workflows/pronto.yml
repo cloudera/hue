@@ -19,5 +19,5 @@ jobs:
       - name: Setup pronto
         run: gem install faraday-retry pronto pronto-rubocop pronto-goodcheck
       - name: Run Pronto
-        working-directory: ../hue
+        working-directory: "~/hue"
         run: PRONTO_PULL_REQUEST_ID="${{ github.event.pull_request.number }}" PRONTO_GITHUB_ACCESS_TOKEN="${{ github.token }}" pronto run -f github_status github_pr -c origin/${{ github.base_ref }}
