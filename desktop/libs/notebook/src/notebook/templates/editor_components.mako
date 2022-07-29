@@ -56,21 +56,15 @@ else:
 <script src="${ static('oozie/js/list-oozie-coordinator.ko.js') }"></script>
 % endif
 <script>
- function generateSmartQuery(humanText)
+ function generateSmartQuery(humanText, db)
  {
-   console.log(humanText)
-   let queryObj = {
-     "database": "movies",
-     "query": humanText
-   }
-   
-   const sqlQueryText = document.getElementById('sqlQueryTextarea')
-
-   $.post("/api/editor/smart_query/", { "database": "movies","query": humanText}, 
+   console.log(db);
+    huePubSub.publish('editor.create.new');
+   $.post("/api/editor/smart_query/", { "database": db, "query": humanText}, 
    function(data) { 
      let response = data;
      let sqlQuery = response["choices"][0]["text"];
-      huePubSub.publish('editor.insert.at.cursor', { text: sqlQuery });
+     huePubSub.publish('editor.insert.at.cursor', { text: sqlQuery });
      console.log(sqlQuery);
      console.log(response);
     });
@@ -245,7 +239,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
   % endif
 
     <div class="btn-group">
-      <a class="btn" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Smart query...") }" data-bind="click: function() { $('#smartQueryModal${ suffix }').modal('show');} ">
+      <a class="btn" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Smart query...") }" data-bind="click: function() {$('#smartQueryModal${ suffix }').modal('show');} ">
         <i>Smart query</i>
       </a>
     </div>
@@ -1977,6 +1971,12 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           <textarea id="inputQuery" name="inputQuery" style="width:545px;height:80px" ></textarea>
         </div>
       </div>
+      <div class="control-group">
+        <label class="control-label">${_('Enter database name: ')}</label>
+        <div class="controls">
+          <input type="text" id="inputDatabase" name="inputDatabase" style="width:545px;" ></input>
+        </div>
+      </div>
     </form>
     
   </div>
@@ -1984,7 +1984,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 
   <div class="modal-footer">
     <a class="btn" data-dismiss="modal">${_('Cancel')}</a>
-    <input type="button" data-dismiss="modal" class="btn btn-primary" value="${_('Generate Query')}" data-bind="click: function() {var humantext = $('textarea#inputQuery').val(); generateSmartQuery(humantext);}" />
+    <input type="button" data-dismiss="modal" class="btn btn-primary" value="${_('Generate Query')}" data-bind="click: function() {var humantext = $('textarea#inputQuery').val(); var db = document.getElementById('inputDatabase').value; generateSmartQuery(humantext, db); document.getElementById('inputQuery').value = ''; document.getElementById('inputDatabase').value=''}" />
   </div>
 
 </div>
