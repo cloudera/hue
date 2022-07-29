@@ -1,0 +1,13 @@
+rules:
+  # id, pattern, message are required attributes.
+  - id: example.github
+    pattern: Github
+    message: Do you want to write GitHub?
+    glob:
+      - "desktop/libs/notebook/src/notebook/urls.py"
+      - "**/*.{yaml,yml}"
+      - "public/**/*.html"
+    fail:
+      - Signup via Github
+    pass:
+      - Signup via GitHub
