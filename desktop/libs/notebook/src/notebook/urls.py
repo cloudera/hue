@@ -105,6 +105,8 @@ urlpatterns += [
 
   # SQLite
   re_path(r'^api/autocomplete//?(?P<server>[\w_\-/]+)/(?P<database>[^/?]*)/?$', notebook_api.autocomplete, name='api_autocomplete_tables'),
+  re_path(r'^api/autocomplete//?(?P<server>[\w_\-/]+)/(?P<database>[^/?]*)/?$', notebook_api.autocomplete, name='api_autocomplete_tables'),
+
   re_path(
     r'^api/autocomplete//?(?P<server>[\w_\-/]+)/(?P<database>[^/?]*)/(?P<table>\w+)/?$',
     notebook_api.autocomplete,
