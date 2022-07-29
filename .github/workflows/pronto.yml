@@ -18,9 +18,6 @@ jobs:
           bundler-cache: true # runs 'bundle install' and caches installed gems automatically
       - name: Setup pronto
         run: gem install faraday-retry pronto pronto-rubocop pronto-goodcheck
-      - name: echo
-        run: |
-          echo "pwd: $pwd"
       - name: Run Pronto
-        working-directory: ./
+        working-directory: ./hue
         run: PRONTO_PULL_REQUEST_ID="${{ github.event.pull_request.number }}" PRONTO_GITHUB_ACCESS_TOKEN="${{ github.token }}" pronto run -f github_status github_pr -c origin/${{ github.base_ref }}
