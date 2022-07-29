@@ -41,9 +41,11 @@ urlpatterns = [
   re_path(r'^editor_m/?$', notebook_views.editor_m, name='editor_m'),
   re_path(r'^browse/(?P<database>[^/?]+)/(?P<table>\w+)(?:/(?P<partition_spec>.+?))?/?$', notebook_views.browse, name='browse'),
   re_path(r'^execute_and_watch/?$', notebook_views.execute_and_watch, name='execute_and_watch'),
+  re_path(r'^execute_and_watch/?$', notebook_views.execute_and_watch, name='execute_and_watch'),
+
 ]
 
-# APIs
+  # APIs
 urlpatterns += [
   re_path(r'^api/create_notebook/?$', notebook_api.create_notebook, name='create_notebook'),
   re_path(r'^api/create_session/?$', notebook_api.create_session, name='create_session'),
