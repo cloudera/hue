@@ -60,43 +60,21 @@ else:
  {
    console.log(humanText)
    let queryObj = {
-     query: humanText,
-     database: "student"
+     "database": "movies",
+     "query": humanText
    }
-   let hardCodedResponse = {
-     "id":"cmpl-5Yt6dPf930ZSwxrm6n7LASBKuZPsM",
-     "object":"text_completion",
-     "created":1658996663,
-     "model":"text-davinci-002",
-     "choices":[{"text":" DISTINCT d.name\nFROM department d\nJOIN employee e ON d.id = e.department_id\nJOIN salary_payments sp ON sp.employee_id=e.id\nWHERE sp.date > (CURRENT_DATE - INTERVAL '3 months')\nGROUP BY d.name\nHAVING COUNT(e.id) > 10",
-     "index":0,
-     "logprobs":null,
-     "finish_reason":"stop"}],
-     "usage":{"prompt_tokens":77,"completion_tokens":88,"total_tokens":165}
-    }
    
-   let post = JSON.stringify(queryObj)
    const sqlQueryText = document.getElementById('sqlQueryTextarea')
-   fetch("http://127.0.0.1:8000/hue/smartquery", {
-      method: 'post',
-      body: post,
-      headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-      }
-    }).then((response) => {
-        return response.json()
-    }).then((res) => {
-        if (res.status === 201) {
-            console.log("Smart query successfully created!")
-        }
-    }).catch((error) => {
-        console.log(error)
-        console.log(hardCodedResponse.choices[0].text)
-        let sqlquery = hardCodedResponse.choices[0].text
-        huePubSub.publish('editor.insert.at.cursor', { text: sqlquery });
-        
-    })
+
+   $.post("/api/editor/smart_query/", { "database": "movies","query": humanText}, 
+   function(data) { 
+     let response = data;
+     let sqlQuery = response["choices"][0]["text"];
+      huePubSub.publish('editor.insert.at.cursor', { text: sqlQuery });
+     console.log(sqlQuery);
+     console.log(response);
+    });
+   
  }
 </script>
 <script src="${ static('desktop/js/ko.common-dashboard.js') }" type="text/javascript" charset="utf-8"></script>
