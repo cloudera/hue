@@ -23,3 +23,24 @@ class Migration(migrations.Migration):
             field=models.TextField(max_length='100'),
         ),
     ]
+
+
+
+class Migration(migrations.Migration):
+
+    dependencies = [
+        ('beeswax', '0001_initial'),
+    ]
+
+    operations = [
+        migrations.AlterField(
+            model_name='session',
+            name='guid',
+            field=models.TextField(max_length='100'),
+        ),
+        migrations.AlterField(
+            model_name='session',
+            name='secret',
+            field=models.TextField(max_length='100'),
+        ),
+    ]
