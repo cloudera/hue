@@ -42,6 +42,7 @@ urlpatterns = [
   re_path(r'^browse/(?P<database>[^/?]+)/(?P<table>\w+)(?:/(?P<partition_spec>.+?))?/?$', notebook_views.browse, name='browse'),
   re_path(r'^execute_and_watch/?$', notebook_views.execute_and_watch, name='execute_and_watch'),
   re_path(r'^execute_and_watch/?$', notebook_views.execute_and_watch, name='execute_and_watch'),
+  re_path(r'^execute_and_watch/?$', notebook_views.execute_and_watch, name='execute_and_watch'),
 
 ]
 
@@ -94,6 +95,8 @@ urlpatterns += [
     name='api_autocomplete_nested'
   ),
   re_path(r'^api/sample/(?P<database>[^/?]*)/(?P<table>[\w_\-]+)/?$', notebook_api.get_sample_data, name='api_sample_data'),
+  re_path(r'^api/sample/(?P<database>[^/?]*)/(?P<table>[\w_\-]+)/?$', notebook_api.get_sample_data, name='api_sample_data'),
+
   re_path(
     r'^api/sample/(?P<database>[^/?]*)/(?P<table>[\w_\-]+)/(?P<column>\w+)/?$',
     notebook_api.get_sample_data,
