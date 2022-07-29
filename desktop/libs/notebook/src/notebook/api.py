@@ -772,7 +772,7 @@ def autocomplete1(request, server=None, database=None, table=None, column=None, 
 
   # Passed by check_document_access_permission but unused by APIs
   notebook = json.loads(request.POST.get('notebook', '{}'))
-  snippet = json.loads(request.POST.get('snippet', '{}'))
+  snippet = {'type': 'hive', 'dialect': 'hive'}
   action = request.POST.get('operation', 'schema')
 
   try:
