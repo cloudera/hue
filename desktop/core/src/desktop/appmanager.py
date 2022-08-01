@@ -67,8 +67,8 @@ def _import_module_or_none(module):
     # an import error itself.
     tb = sys.exc_info()[2]
     top_frame = traceback.extract_tb(tb)[-1]
-    err_file = re.sub(r'\.pyc','.py', top_frame[0])
-    my_file = re.sub(r'\.pyc','.py', __file__)
+    err_file = re.sub(r'\.pyc', '.py', top_frame[0])
+    my_file = re.sub(r'\.pyc', '.py', __file__)
     if err_file == my_file:
       return None
     else:
@@ -125,14 +125,14 @@ class DesktopModuleInfo(object):
       self.nice_name = self.name
 
     if hasattr(self.settings, "ICON"):
-        self.icon_path = self.settings.ICON
+      self.icon_path = self.settings.ICON
     else:
-        self.icon_path = ""
+      self.icon_path = ""
 
     if hasattr(self.settings, "MENU_INDEX"):
-        self.menu_index = self.settings.MENU_INDEX
+      self.menu_index = self.settings.MENU_INDEX
     else:
-        self.menu_index = 999
+      self.menu_index = 999
 
     self.is_url_namespaced = hasattr(self.settings, 'IS_URL_NAMESPACED')
 
@@ -279,7 +279,9 @@ def get_desktop_module(name):
   Harmless linear search.
   """
   global DESKTOP_MODULES
+  # LOG.info("----> get_desktop_module DESKTOP_MODULES: %s" % ','.join([app.name for app in DESKTOP_MODULES]))
   for app in DESKTOP_MODULES:
     if app.name == name:
       return app
+  raise Exception("----> get_desktop_module DESKTOP_MODULES: %s" % ','.join([app.name for app in DESKTOP_MODULES]))
   return None

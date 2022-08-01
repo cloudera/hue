@@ -26,9 +26,6 @@ from desktop.lib.django_test_util import make_logged_in_client
 LOG = logging.getLogger(__name__)
 
 def test_about():
-  #@TODO@ Fix this test
-  if sys.version_info[0] > 2:
-    raise SkipTest
   c = make_logged_in_client(username="test", is_superuser=True)
 
   # Test default output
