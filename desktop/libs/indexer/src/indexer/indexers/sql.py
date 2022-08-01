@@ -55,6 +55,11 @@ try:
 except ImportError as e:
   LOG.warning('Hive and HiveServer2 interfaces are not enabled')
 
+try:
+  from impala import conf as impala_conf
+except ImportError as e:
+  LOG.warning("Impala app is not enabled")
+  impala_conf = None
 
 class SQLIndexer(object):
 
@@ -170,7 +175,7 @@ class SQLIndexer(object):
         user_scratch_dir = self.fs.get_home_dir() + '/.scratchdir/%s' % str(uuid.uuid4()) # Make sure it's unique.
         self.fs.do_as_user(self.user, self.fs.mkdir, user_scratch_dir, 0o0777)
         self.fs.do_as_user(self.user, self.fs.rename, source['path'], user_scratch_dir)
-        if editor_type == 'impala' and USER_SCRATCH_DIR_PERMISSION.get():
+        if editor_type == 'impala' and impala_conf and impala_conf.USER_SCRATCH_DIR_PERMISSION.get():
           self.fs.do_as_user(self.user, self.fs.chmod, user_scratch_dir, 0o0777, True)
         source_path = user_scratch_dir + '/' + source['path'].split('/')[-1]
 
