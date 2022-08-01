@@ -32,7 +32,6 @@ from hadoop.fs.hadoopfs import Hdfs
 from notebook.connectors.base import get_interpreter
 from notebook.models import make_notebook
 from useradmin.models import User
-from impala.conf import USER_SCRATCH_DIR_PERMISSION
 
 from desktop.lib import django_mako
 from desktop.lib.exceptions_renderable import PopupException
