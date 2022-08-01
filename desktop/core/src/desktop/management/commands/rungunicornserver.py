@@ -99,7 +99,7 @@ def rungunicornserver():
   # https://github.com/benoitc/gunicorn/issues/2410
   ssl_keyfile = None
   if conf.SSL_CERTIFICATE.get() and conf.SSL_PRIVATE_KEY.get():
-    ssl_password = str.encode(conf.get_ssl_password())
+    ssl_password = str.encode(conf.get_ssl_password()) if conf.get_ssl_password() is not None else None
     if ssl_password:
       with open(conf.SSL_PRIVATE_KEY.get(), 'r') as f:
         with tempfile.NamedTemporaryFile(dir=os.path.dirname(
