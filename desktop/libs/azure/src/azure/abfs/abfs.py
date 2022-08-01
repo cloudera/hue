@@ -362,6 +362,10 @@ class ABFS(object):
   def create_home_dir(self, home_path=None):
     LOG.info('Create home directory is not available for Azure filesystem')
 
+    # Implement user home dir creation when Raz is enabled
+    
+
+
   def _create_path(self, path, params=None, headers=None, overwrite=False):
     """
     Container method for Create
