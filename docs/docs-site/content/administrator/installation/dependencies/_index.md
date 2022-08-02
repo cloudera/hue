@@ -186,7 +186,7 @@ This is a verified step-by-step guide on how to get Hue up and running on a fres
 
    `brew install node`
 
-9. In the cloned hue folder run:
+9. In the hue directory run:
 
     ```
     export PYTHON_VER=python3.8
@@ -196,9 +196,9 @@ This is a verified step-by-step guide on how to get Hue up and running on a fres
     export CPPFLAGS="-L/usr/local/opt/libffi/lib/include -L/usr/local/opt/openssl@1.1/lib/include"
     ```
 
-    Also export `ROOT` which should point to your cloned Hue repository:
+    Also export `ROOT` which should point to your Hue directory:
     ```
-    export ROOT=<path_to_cloned_hue_repository>
+    export ROOT=<path_to_hue_directory>
     ```
     
     Then run:
