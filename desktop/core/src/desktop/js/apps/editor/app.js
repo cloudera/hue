@@ -65,6 +65,13 @@ huePubSub.subscribe('app.dom.loaded', app => {
       HUE_PUB_SUB_EDITOR_ID
     );
 
+    huePubSub.subscribe(
+    'split.panel.resized',
+    () => {huePubSub.publish('recalculate.name.description.width'
+    },
+    HUE_PUB_SUB_EDITOR_ID
+  );
+
     const showHoverMsg = e => {
       let dt = null;
       if (e) {
