@@ -161,11 +161,16 @@ This is a verified step-by-step guide on how to get Hue up and running on a fres
 5. Create the hue database and set permissions
 
    ```
+   # Create the DB
    createdb hue_d --lc-collate='en_US.UTF-8' -T "template0"
+   
+   # Connect to the dbms shell
    psql -s hue_d
-   hue_d=# create user hue_u with password 'huepassword';
-   hue_d=# grant all privileges on database hue_d to hue_u;
-   hue_d=# \q
+   
+   # Run the following lines one by one
+   create user hue_u with password 'huepassword';
+   grant all privileges on database hue_d to hue_u;
+   \q
    ```
 
 6. Install gmp, openssl and libffi (Note some might be installed from postgres)
@@ -177,15 +182,11 @@ This is a verified step-by-step guide on how to get Hue up and running on a fres
 
    - For Intel Macs, only Python 3.8 works as April 2022. Python 3.8 via Homebrew might work. However, direct download from python.org is preferred and tested.
 
-8. Install mysql client
-
-   `brew install mysql`
-
-9. Install node and npm (unless already present)
+8. Install node and npm (unless already present) using nvm or brew
 
    `brew install node`
 
-10. In the cloned hue folder run:
+9. In the hue directory run:
 
     ```
     export PYTHON_VER=python3.8
@@ -193,15 +194,23 @@ This is a verified step-by-step guide on how to get Hue up and running on a fres
     export CFLAGS="-I$(xcrun --show-sdk-path)/usr/include/sasl"
     export LDFLAGS="-L/usr/local/opt/libffi/lib -L/usr/local/opt/openssl@1.1/lib"
     export CPPFLAGS="-L/usr/local/opt/libffi/lib/include -L/usr/local/opt/openssl@1.1/lib/include"
+    ```
 
+    Also export `ROOT` which should point to your Hue directory:
+    ```
+    export ROOT=<path_to_hue_directory>
+    ```
+    
+    Then run:
+    ```
     make apps
     ```
 
-11. Configure Hue to your liking, edit
+10. Configure Hue to your liking, edit
 
     `desktop/conf/pseudo-distributed.ini`
 
-    For postgres according to step 5 above set:
+    According to step 5 above for postgres, set under `[desktop]`:
 
     ```
     [[database]]
@@ -213,13 +222,20 @@ This is a verified step-by-step guide on how to get Hue up and running on a fres
       name=hue_d
     ```
 
-12. If you use postgres as configured in the previous step you'll need to add the psycopg2 lib manually
+11. If you use postgres as configured in the previous step you'll need to add the psycopg2 lib manually
 
     `./build/env/bin/pip install psycopg2-binary`
 
-13. Start Hue (note that export from step 10 above needs to be active)
+12. Apply migrations (if any)
 
-    `./build/env/bin/hue runserver 0.0.0.0:8888`
+    ```
+    ./build/env/bin/hue makemigrations
+    ./build/env/bin/hue migrate
+    ```
+
+13. Start Hue
+
+    `./build/env/bin/hue runserver`
 
 #### 10.14, 10.15
 

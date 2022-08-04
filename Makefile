@@ -148,8 +148,13 @@ ifeq ($(PYTHON_VER),python2.7)
 	@$(ENV_PIP) install --upgrade pip
 	@$(ENV_PIP) install --upgrade --force-reinstall $(PIP_MODULES)
 	@echo "--- done installing PIP_MODULES in virtual-env"
-else
-	@echo "--- skip installing PIP_MODULES in virtual-env"
+else ifeq ($(PYTHON_VER),python3.8)
+	@echo '--- Installing $(REQUIREMENT_FILE) into virtual-env via $(ENV_PIP)'
+	@$(ENV_PIP) install -r $(REQUIREMENT_FILE)
+	@echo '--- Finished $(REQUIREMENT_FILE) into virtual-env'
+	@$(ENV_PIP) install $(NAVOPTAPI_WHL)
+	@echo '--- Finished $(NAVOPTAPI_WHL) into virtual-env'
+	@touch $(REQUIREMENT_DOT_FILE)
 endif
 
 ###################################
@@ -232,9 +237,7 @@ install-env:
 	cp $(ROOT)/babel.config.js $(INSTALL_DIR)
 	cp $(ROOT)/tsconfig.json $(INSTALL_DIR)
 	$(MAKE) -C $(INSTALL_DIR) npm-install
-	@if [ "$(MAKECMDGOALS)" = "install" ]; then \
-	  $(MAKE) -C $(INSTALL_DIR) create-static; \
-	fi
+	$(MAKE) -C $(INSTALL_DIR) create-static
 
 
 ###################################
@@ -245,15 +248,12 @@ install-env:
 npm-install:
 	npm --version
 	node --version
-	pushd tools/jison && npm install && node generateParserModuleImports.js && popd	
 	npm install
 	npm run webpack
 	npm run webpack-login
 	npm run webpack-workers
 	node_modules/.bin/removeNPMAbsolutePaths .
-	@if [ "$(MAKECMDGOALS)" = "install" ]; then \
-	  rm -rf node_modules; \
-	fi
+	rm -rf node_modules
 
 .PHONY: create-static
 create-static:

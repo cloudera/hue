@@ -29,6 +29,35 @@ import $ from 'jquery';
 // Helper functions
 //
 
+const splitProtocolAndPathName = (fullUrl) => {
+    // The path name can contain one or more questionmarks (?) that are NOT specifying 
+    // the search/query start for these urls so we use a custom regex instead of URL() to parse.
+    const splitRegex = /^(\w*:)?(.*)$/i;
+    const [match, protocol, pathName] = splitRegex.exec(fullUrl);
+    return [protocol ?? '', pathName ]
+}
+
+const isUnicodeAlphaNumeric = /^[\p{L}\p{N}]*$/u;
+const encodeUploadPath = (char) => {            
+    const needsEncoding = !isUnicodeAlphaNumeric.test(char) && char !== '/' && char !== '?';
+    return needsEncoding ? encodeURIComponent(char) : char;
+}
+
+/**
+ * Fixes encoding issues with the destination folder url.
+ * Some special non-alphanumeric characters like plus (+) and ampersand (&) needs encoding
+ * while the slash (/) which represents a directory and question mark (?) should not be encoded. 
+ * Alphanumeric characters that are non ASCII (e.g. åäö) should not be encoded since that
+ * will fail if the target is s3 or abfs.     
+ * @param {string} destination The "destination url" used for the filesystem. Might not be a valid url.
+ */
+const fixUploadDestination = (destination) => {
+    const decodedDestination = decodeURIComponent(destination);
+    const [protocol, path] = splitProtocolAndPathName(decodedDestination);
+    const updatedPath = [...path].map(encodeUploadPath).join('');
+    return `${protocol}${updatedPath}`;        
+}
+
 
 let qq = {};
 
@@ -1256,11 +1285,12 @@ qq.extend(qq.UploadHandlerXhr.prototype, {
             }
         };
 
-        var formData = new FormData();
-        formData.append(params.fileFieldLabel, file);
+        var formData = new FormData();        
+        formData.append(params.fileFieldLabel, file, file.name.normalize('NFC'));
         formData.append('dest', params.dest);
 
-        var action = this._options.action + "?dest=" + params.dest;
+        const destination = fixUploadDestination(params.dest);
+        var action = this._options.action + "?dest=" + destination;
         xhr.open("POST", action, true);
         xhr.send(formData);
     },

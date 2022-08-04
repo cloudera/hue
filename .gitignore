@@ -115,9 +115,6 @@ junitresults*
 # Generated js bundles
 desktop/core/src/desktop/static/desktop/js/bundles/
 
-# Generated ts files
-desktop/core/src/desktop/js/parse/sql/parserModules.ts
-
 # Hugo generated files
 docs/docs-site/public/
 

@@ -68,7 +68,7 @@ else:
               <a data-bind="text: label, click: show, attr: {'href': '${url('filebrowser:filebrowser.views.view', path=urlencode(''))}' + url}"></a><span class="divider">/</span>
             </li
           ></ul>
-          <input id="hueBreadcrumbText" type="text" style="display:none" data-bind="value: currentPath" autocomplete="off" class="input-xxlarge" />
+          <input id="hueBreadcrumbText" type="text" style="display:none" data-bind="value: currentDecodedPath" autocomplete="off" class="input-xxlarge" />          
         </li>
         % if is_trash_enabled:
         <li class="pull-right">
@@ -86,9 +86,10 @@ else:
           % for breadcrumb_item in breadcrumbs:
             <% label, f_url = breadcrumb_item['label'], breadcrumb_item['url'] %>
             %if label[-1] == '/':
-            <li><a data-bind="hueLink: '${'/filebrowser/view=' + f_url}'"><span class="divider">${label}</span></a></li>
+            ## Backticks are used as quotes to handle single quote in f_url
+            <li><a data-bind="hueLink: `${'/filebrowser/view=' + f_url}`"><span class="divider">${label}</span></a></li>
             %else:
-            <li><a data-bind="hueLink: '${'/filebrowser/view=' + f_url}'">${label}</a><span class="divider">/</span></li>
+            <li><a data-bind="hueLink: `${'/filebrowser/view=' + f_url}`">${label}</a><span class="divider">/</span></li>
             %endif
           % endfor
           </ul>
