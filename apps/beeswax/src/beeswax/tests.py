@@ -2804,6 +2804,9 @@ class MockDbms(object):
   def get_state(self, handle):
     return 0
 
+  def get_query_server_config(self):
+    return {}
+
 class TestWithMockedServer(object):
 
   def setUp(self):

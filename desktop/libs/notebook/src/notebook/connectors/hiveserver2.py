@@ -190,28 +190,17 @@ class HS2Api(Api):
       uses_session_pool = False
       uses_multiple_sessions = False
 
-    try:
-      if uses_session_pool:
-        session = Session.objects.get_tez_session(self.user, application, MAX_NUMBER_OF_SESSIONS.get())
-      elif not uses_multiple_sessions:
-        session = Session.objects.get_session(self.user, application=application)
-      else:
-        session = None
-    except Exception as e:
-      if 'Connection refused' in str(e) or 'Name or service not known' in str(e):
-        LOG.exception('Connection being refused or service is not available in either session or in multiple sessions'
-                      '- HA failover')
-        reset_ha()
+    if uses_session_pool:
+      session = Session.objects.get_tez_session(self.user, application, MAX_NUMBER_OF_SESSIONS.get())
+    elif not uses_multiple_sessions:
+      session = Session.objects.get_session(self.user, application=application)
+    else:
+      session = None
 
     reuse_session = session is not None
     if not reuse_session:
       db = dbms.get(self.user, query_server=get_query_server_config(name=lang, connector=self.interpreter))
-      try:
-        session = db.open_session(self.user)
-      except Exception as e:
-        if 'Connection refused' in str(e) or 'Name or service not known' in str(e):
-          LOG.exception('Connection being refused or service is not available in reuse session - HA failover')
-          reset_ha()
+      session = db.open_session(self.user)
 
     response = {
       'type': lang,

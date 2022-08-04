@@ -17,6 +17,7 @@
 
 from builtins import object
 import logging
+import platform
 import re
 import sys
 import threading
@@ -130,15 +131,31 @@ def get(user, query_server=None, cluster=None):
     elif RESET_HS2_QUERY_SERVER:
       from beeswax.server.hive_server2_lib import HiveServerClient, HiveServerClientCompatible
       RESET_HS2_QUERY_SERVER = False
-      LOG.debug('Setting DBMS cache for the new hs2')
-      DBMS_CACHE[user.id].clear()
-      DBMS_CACHE[user.id][query_server['server_name']] = HiveServer2Dbms(
-        HiveServerClientCompatible(HiveServerClient(query_server, user)),
-        QueryHistory.SERVER_TYPE[1][0]
-      )
+
+      cached_query_server = DBMS_CACHE[user.id][query_server['server_name']].get_query_server_config()
+      if query_server != cached_query_server:
+        # clear all user caches in advance
+        for user_cache in DBMS_CACHE.values():
+          if query_server['server_name'] in user_cache:
+            user_cache[query_server['server_name']] = {}
+
+        LOG.debug('Setting DBMS cache for the new hs2 : %s', query_server)
+        DBMS_CACHE[user.id][query_server['server_name']] = HiveServer2Dbms(
+          HiveServerClientCompatible(HiveServerClient(query_server, user)),
+          QueryHistory.SERVER_TYPE[1][0]
+        )
+
     return DBMS_CACHE[user.id][query_server['server_name']]
   finally:
     DBMS_CACHE_LOCK.release()
+
+
+def select_hive_server(hiveservers, activeEndpoint=None):
+  servers = map(lambda server: {'host': server[0], 'port': server[1]},
+                     [server.split(';')[0].split('=')[1].split(":") for server in hiveservers])
+  return ((next(iter(filter(lambda server: server == activeEndpoint, servers)), None) if activeEndpoint else None)
+          or next(iter(filter(lambda server: platform.node() in server['host'], servers)), None)
+          or servers[abs(hash(platform.node())) % len(servers)])
 
 
 def get_query_server_config(name='beeswax', connector=None):
@@ -206,46 +223,38 @@ def get_query_server_config(name='beeswax', connector=None):
           if not hiveservers:
             LOG.error('There are no running Hive server available')
             raise PopupException(_('There are no running Hive server available'))
-          server_to_use = 0
-          LOG.debug("Selected Hive server {0}: {1}".format(server_to_use, hiveservers[server_to_use]))
+          hive_server = select_hive_server(hiveservers)
+          reset_ha()
           cache.set(
             "hiveserver2",
-            json.dumps({
-              "host": hiveservers[server_to_use].split(";")[0].split("=")[1].split(":")[0],
-              "port": hiveservers[server_to_use].split(";")[0].split("=")[1].split(":")[1]
-            })
+            json.dumps(hive_server)
           )
+          activeEndpoint = hive_server
         else:
-          cache.set("hiveserver2", json.dumps({"host": HIVE_SERVER_HOST.get(), "port": HIVE_HTTP_THRIFT_PORT.get()}))
+          activeEndpoint = {"host": HIVE_SERVER_HOST.get(), "port": HIVE_HTTP_THRIFT_PORT.get()}
+          cache.set("hiveserver2", json.dumps(activeEndpoint))
       else:
-        # Setting hs2 cache in-case there is no HS2 discovery
-        cache.set("hiveserver2", json.dumps({"host": HIVE_SERVER_HOST.get(), "port": HIVE_HTTP_THRIFT_PORT.get()}))
+        activeEndpoint = json.loads(activeEndpoint)
         if HIVE_DISCOVERY_HS2.get():
           # Replace ActiveEndpoint if the current HS2 is down
           hiveservers = get_zk_hs2()
           if hiveservers:
-            server_to_use = 0
-            hs2_host_name = hiveservers[server_to_use].split(";")[0].split("=")[1].split(":")[0]
-            hs2_in_active_endpoint = hs2_host_name in activeEndpoint
+            hive_server = select_hive_server(hiveservers, activeEndpoint)
+            hs2_in_active_endpoint = hive_server == activeEndpoint
             LOG.debug("Is the current HS2 active {0}".format(hs2_in_active_endpoint))
             if not hs2_in_active_endpoint:
               LOG.error(
                 'Current HiveServer is down, working to connect with the next available HiveServer from Zookeeper')
               reset_ha()
-              server_to_use = 0
-              LOG.debug("Selected HiveServer {0}: {1}".format(server_to_use, hiveservers[server_to_use]))
+              LOG.debug("Selected HiveServer {0}".format(hive_server))
               cache.set(
                 "hiveserver2",
-                json.dumps({
-                  "host": hiveservers[server_to_use].split(";")[0].split("=")[1].split(":")[0],
-                  "port": hiveservers[server_to_use].split(";")[0].split("=")[1].split(":")[1]
-                })
+                json.dumps(hive_server)
               )
+              activeEndpoint = hive_server
           else:
             LOG.error('Currently there are no HiveServer2 running')
             raise PopupException(_('Currently there are no HiveServer2 running'))
-
-      activeEndpoint = json.loads(cache.get("hiveserver2"))
 
     if name == 'impala':
       from impala.dbms import get_query_server_config as impala_query_server_config
@@ -1289,6 +1298,10 @@ class HiveServer2Dbms(object):
 
   def get_default_configuration(self, include_hadoop):
     return self.client.get_default_configuration(include_hadoop)
+
+
+  def get_query_server_config(self):
+    return self.client.get_query_server_config()
 
 
 class Table(object):

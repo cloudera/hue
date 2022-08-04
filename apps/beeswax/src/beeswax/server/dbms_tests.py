@@ -18,11 +18,12 @@
 
 import logging
 import sys
-from beeswax.server.dbms import get_query_server_config
+import time
+from beeswax.server.dbms import get_query_server_config, get
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.settings import CACHES_HIVE_DISCOVERY_KEY
 from django.core.cache import caches
-from nose.tools import assert_equal, assert_raises
+from nose.tools import assert_equal, assert_not_equal, assert_raises
 
 if sys.version_info[0] > 2:
   from unittest.mock import patch, Mock
@@ -143,29 +144,72 @@ class TestGetQueryServerConfig():
               except PopupException as e:
                 assert_equal(e.message, 'There are no running Hive server available')
 
-  def test_get_hs2_discovery(self):
-
+  def test_get_hs2_discovery_locality(self):
+    hosts = ['hive-llap-1.gethue.com', 'hive-llap-2.gethue.com']
     with patch('beeswax.conf.HIVE_DISCOVERY_HS2.get') as HIVE_DISCOVERY_HS2:
       with patch('beeswax.conf.HIVE_DISCOVERY_HIVESERVER2_ZNODE.get') as HIVE_DISCOVERY_HIVESERVER2_ZNODE:
         with patch('beeswax.server.dbms.KazooClient') as KazooClient:
-          HIVE_DISCOVERY_HS2.return_value = True
-          HIVE_DISCOVERY_HIVESERVER2_ZNODE.return_value = True
-          KazooClient.return_value = Mock(
-            exists=Mock(return_value=True),
-            # Bug "TypeError: expected string or buffer" if False, to add a new test case and fix
-            get_children=Mock(return_value=[
-              'serverUri=hive-llap-1.gethue.com:10000;serverUri=hive-llap-2.gethue.com:10000'])
-          )
+          with patch('platform.node') as node:
+            HIVE_DISCOVERY_HS2.return_value = True
+            HIVE_DISCOVERY_HIVESERVER2_ZNODE.return_value = True
+            KazooClient.return_value = Mock(
+              exists=Mock(return_value=True),
+              # Bug "TypeError: expected string or buffer" if False, to add a new test case and fix
+              get_children=Mock(
+                return_value=map(lambda h: "serverUri={0}:{1};version=xxx;sequence=xxx".format(h, '10000'), hosts)
+              )
+            )
 
-          try:
-            query_server = get_query_server_config(name='hive')
-          except PopupException as e:
-            assert_equal(e.message, 'There are no running Hive server available')
+            for host in hosts:
+              node.return_value = host
 
-          assert_equal(query_server['server_name'], 'beeswax')
-          assert_equal(query_server['server_host'], 'hive-llap-1.gethue.com')
-          assert_equal(query_server['server_port'], 10000)
+              try:
+                query_server = get_query_server_config(name='hive')
+                cache.clear()
+              except PopupException as e:
+                assert_equal(e.message, 'There are no running Hive server available')
 
+              assert_equal(query_server['server_name'], 'beeswax')
+              assert_equal(query_server['server_host'], host)
+              assert_equal(query_server['server_port'], 10000)
+
+  def test_get_dbms_after_cache_expiration(self):
+    hosts = ['hive-llap-1.gethue.com', 'hive-llap-2.gethue.com', 'hive-llap-3.gethue.com', 'hive-llap-4.gethue.com']
+    znodes = lambda hh: map(lambda h: "serverUri={0}:{1};version=xxx;sequence=xxx".format(h, '10000'), hh)
+    with patch('beeswax.conf.HIVE_DISCOVERY_HS2.get') as HIVE_DISCOVERY_HS2:
+      with patch('beeswax.conf.HIVE_DISCOVERY_HIVESERVER2_ZNODE.get') as HIVE_DISCOVERY_HIVESERVER2_ZNODE:
+        with patch('beeswax.server.dbms.KazooClient') as KazooClient:
+          with patch('platform.node') as node:
+            HIVE_DISCOVERY_HS2.return_value = True
+            HIVE_DISCOVERY_HIVESERVER2_ZNODE.return_value = True
+            KazooClient.return_value = Mock(
+              exists=Mock(return_value=True),
+              # Bug "TypeError: expected string or buffer" if False, to add a new test case and fix
+              get_children=Mock(return_value=znodes(hosts))
+            )
+
+            cache.default_timeout = 2
+
+            mock_user = Mock(id='test_user')
+            expected_host = hosts[0]
+            node.return_value = expected_host
+
+            available_hosts = hosts
+            for _ in range(len(hosts) - 1):
+              db = get(mock_user, get_query_server_config('hive'))
+
+              assert_equal(expected_host, db.get_query_server_config()['server_host'])
+
+              # expire cache
+              time.sleep(2)
+
+              # deregister the host cached previously
+              available_hosts = [host for host in available_hosts if host != expected_host]
+              KazooClient.return_value.get_children.return_value = znodes(available_hosts)
+
+              db_after_cache_expiration = get(mock_user, get_query_server_config('hive'))
+              assert_not_equal(expected_host, db_after_cache_expiration.get_query_server_config()['server_host'])
+              expected_host = db_after_cache_expiration.get_query_server_config()['server_host']
 
 # TODO: all the combinations in new test methods, e.g.:
 # HIVE_DISCOVERY_LLAP_HA.get() --> True

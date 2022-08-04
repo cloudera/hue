@@ -692,12 +692,13 @@ class HiveServerClient(object):
 
     LOG.info('Opening %s thrift session for user %s' % (self.query_server['server_name'], user.username))
 
+    req = TOpenSessionReq(**kwargs)
     try:
-      req = TOpenSessionReq(**kwargs)
+      res = self._client.OpenSession(req)
     except Exception as e:
-      if 'Connection refused' in str(e):
-        reset_ha()
-    res = self._client.OpenSession(req)
+      reset_ha()
+      raise e
+
     self.coordinator_host = self._client.get_coordinator_host()
     if self.coordinator_host:
       res.configuration['coordinator_host'] = self.coordinator_host
@@ -708,6 +709,7 @@ class HiveServerClient(object):
       else:
         message = ''
 
+      reset_ha()
       raise QueryServerException(Exception('Bad status for request %s:\n%s' % (req, res)), message=message)
 
     sessionId = res.sessionHandle.sessionId
@@ -1322,6 +1324,9 @@ class HiveServerClient(object):
 
     return results
 
+  def get_query_server_config(self):
+    return self.query_server
+
 
 class HiveServerTableCompatible(HiveServerTable):
   """Same API as Beeswax"""
@@ -1556,6 +1561,9 @@ class HiveServerClientCompatible(object):
 
   def get_default_configuration(self, *args, **kwargs):
     return []
+
+  def get_query_server_config(self):
+    return self._client.get_query_server_config()
 
 
   def get_results_metadata(self, handle):
