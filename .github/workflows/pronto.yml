@@ -35,7 +35,7 @@ jobs:
           bundler-cache: true
 
       - name: Setup pronto
-        run: gem install pronto pronto-rubocop
+        run: gem install faraday-retry pronto pronto-rubocop pronto-goodcheck
       - name: Run Pronto
         run: bundle exec pronto run -f github_status github_pr -c origin/${{ github.base_ref }}
         env:
