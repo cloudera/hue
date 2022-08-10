@@ -621,7 +621,8 @@ class OnePageViewModel {
       {
         url: '/filebrowser/download=*',
         app: function (ctx) {
-          location.href = window.HUE_BASE_URL + '/filebrowser/download=' + ctx.params[0];
+          const ctxParams = getCorrectedCtxParams(ctx, '/filebrowser/download=*');
+          location.href = window.HUE_BASE_URL + '/filebrowser/download=' + ctxParams[0];
         }
       },
       {
@@ -832,19 +833,24 @@ class OnePageViewModel {
     });
 
     // The page library encodes the plus character (+) as a space in the returning
-    // params object. That causes the path used by the file viewer to break and this
+    // params object. That causes the path used by the file viewer and downloader to break and this
     // is a defensive fix to handle that while still having access to the other ctx params
     // needed to "revert" the incorrect encoding.
-    const fixPlusCharTurnedIntoSpace = (ctx, mapping) => {
-      let correctCtxParams = ctx.params;
-      if (mapping.app === 'filebrowser' && ctx.path.indexOf('+') >= 0) {
-        if (ctx.params[0] && ctx.params[0].indexOf(' ') >= 0) {
-          const pathWithoutParams = mapping.url.slice(0, -1);
-          const modifiedParam = decodeURIComponent(ctx.path.replace(pathWithoutParams, ''));
-          correctCtxParams = { 0: modifiedParam };
-        }
-      }
-      return correctCtxParams;
+    const fixPlusCharTurnedIntoSpace = (ctx, mappingUrl) => {
+      const pathWithoutParams = mappingUrl.slice(0, -1);
+      // The original params with the plus character (+) can still be found in ctx.path
+      // and we use those to create our own encoded version that handles the plus character correctly.
+      const paramsOnly = ctx.path.replace(pathWithoutParams, '');
+      return decodeURIComponent(paramsOnly);
+    };
+
+    const getCorrectedCtxParams = (ctx, mappingUrl) => {
+      const pathHasPlus = ctx.path.indexOf('+') >= 0;
+      const paramsHaveSpaces = ctx.params[0] && ctx.params[0].indexOf(' ') >= 0;
+
+      return pathHasPlus && paramsHaveSpaces
+        ? { 0: fixPlusCharTurnedIntoSpace(ctx, mappingUrl) }
+        : ctx.params;
     };
 
     pageMapping.forEach(mapping => {
@@ -853,7 +859,10 @@ class OnePageViewModel {
         _.isFunction(mapping.app)
           ? mapping.app
           : ctx => {
-              const ctxParams = fixPlusCharTurnedIntoSpace(ctx, mapping);
+              const ctxParams =
+                mapping.app === 'filebrowser'
+                  ? getCorrectedCtxParams(ctx, mapping.url)
+                  : ctx.params;
               self.currentContextParams(ctxParams);
               self.currentQueryString(ctx.querystring);
               self.loadApp(mapping.app);
