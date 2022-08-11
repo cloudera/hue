@@ -1394,7 +1394,16 @@ else:
       };
 
       self.downloadFile = function () {
-        huePubSub.publish('open.link', self.selectedFile().url.replace("${url('filebrowser:filebrowser.views.view', path='')}", "${url('filebrowser:filebrowser_views_download', path='')}"));
+        const baseUrl = "${url('filebrowser:filebrowser_views_download', path='')}";
+      // If the hash characters aren't encoded the page library will
+      // split the path on the first occurence and the remaining string will not
+      // be part of the path. Question marks must also be encoded or the string after the first
+      // question mark will be interpreted as the url querystring.      
+        const partiallyEncodedFilePath = self.selectedFile().path.replaceAll('#', encodeURIComponent('#'))
+          .replaceAll('?', encodeURIComponent('?'));;
+        const fullUrl = baseUrl+partiallyEncodedFilePath;
+        
+        huePubSub.publish('open.link', fullUrl);
       };
 
       self.renameFile = function () {
