@@ -621,8 +621,8 @@ class OnePageViewModel {
       {
         url: '/filebrowser/download=*',
         app: function (ctx) {
-          const ctxParams = getCorrectedCtxParams(ctx, '/filebrowser/download=*');
-          location.href = window.HUE_BASE_URL + '/filebrowser/download=' + ctxParams[0];
+          const filePathParam = getModifiedCtxParamForFilePath(ctx, '/filebrowser/download=*');
+          location.href = window.HUE_BASE_URL + '/filebrowser/download=' + filePathParam;
         }
       },
       {
@@ -836,21 +836,38 @@ class OnePageViewModel {
     // params object. That causes the path used by the file viewer and downloader to break and this
     // is a defensive fix to handle that while still having access to the other ctx params
     // needed to "revert" the incorrect encoding.
-    const fixPlusCharTurnedIntoSpace = (ctx, mappingUrl) => {
-      const pathWithoutParams = mappingUrl.slice(0, -1);
-      // The original params with the plus character (+) can still be found in ctx.path
-      // and we use those to create our own encoded version that handles the plus character correctly.
-      const paramsOnly = ctx.path.replace(pathWithoutParams, '');
-      return decodeURIComponent(paramsOnly);
-    };
-
-    const getCorrectedCtxParams = (ctx, mappingUrl) => {
+    const fixPlusCharTurnedIntoSpace = (ctx, pathWithoutParams) => {
       const pathHasPlus = ctx.path.indexOf('+') >= 0;
       const paramsHaveSpaces = ctx.params[0] && ctx.params[0].indexOf(' ') >= 0;
 
-      return pathHasPlus && paramsHaveSpaces
-        ? { 0: fixPlusCharTurnedIntoSpace(ctx, mappingUrl) }
-        : ctx.params;
+      if (pathHasPlus && paramsHaveSpaces) {
+        // The original params with the plus character (+) can still be found in ctx.path
+        // and we use those to create our own encoded version that handles the plus character correctly.
+        const paramsOnly = ctx.path.replace(pathWithoutParams, '');
+        return decodeURIComponent(paramsOnly);
+      }
+
+      return ctx?.params[0];
+    };
+
+    // The page library decodes any hash characters (#) in the params object, so unless it is explicitly
+    // encoded again the file download links will break.
+    const fixHashCharInParam = (ctx, filePathParam) => {
+      const pathHasUTF8EncodedHash = ctx.path.indexOf('%23') >= 0;
+      const paramHasHash = ctx.params[0] && ctx.params[0].indexOf('#') >= 0;
+      const encodeHashChar = pathHasUTF8EncodedHash && paramHasHash;
+
+      return encodeHashChar
+        ? filePathParam.replaceAll('#', encodeURIComponent('#'))
+        : filePathParam;
+    };
+
+    const getModifiedCtxParamForFilePath = (ctx, mappingUrl) => {
+      const pathWithoutParams = mappingUrl.slice(0, -1);
+      let filePathParam = fixPlusCharTurnedIntoSpace(ctx, pathWithoutParams);
+      filePathParam = fixHashCharInParam(ctx, filePathParam);
+
+      return filePathParam.replaceAll('?', encodeURIComponent('?'));
     };
 
     pageMapping.forEach(mapping => {
@@ -861,7 +878,7 @@ class OnePageViewModel {
           : ctx => {
               const ctxParams =
                 mapping.app === 'filebrowser'
-                  ? getCorrectedCtxParams(ctx, mapping.url)
+                  ? { 0: getModifiedCtxParamForFilePath(ctx, mapping.url) }
                   : ctx.params;
               self.currentContextParams(ctxParams);
               self.currentQueryString(ctx.querystring);

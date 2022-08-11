@@ -227,6 +227,8 @@ ${ fb_components.menubar() }
     return view.contents.match(new RegExp('[\\s\\S]{1,' + chunkSize + '}', 'g'));
   }
 
+  // The python backend incorrectly encodes a couple of characters that we fix
+  // in the frontend here 
   function fixSpecialCharacterEncoding (url) {
     // Singel quotes (') encoded as Unicode Hex Character
     // will cause the $.getJSON call and file downloads to produce an incorrect url, 
@@ -391,12 +393,19 @@ ${ fb_components.menubar() }
       self.changePage();
     }
 
-    self.downloadFile = function () {        
-      const doubleEncodedPath = "${url('filebrowser:filebrowser_views_download', path=path_enc)}";
-      const normalEncodedPath = decodeURIComponent(doubleEncodedPath);
-      const fixedPath = fixSpecialCharacterEncoding(normalEncodedPath);
+    self.downloadFile = function () {
+      const filePath = "${path}";
+      const correctedFilePath = fixSpecialCharacterEncoding(filePath);
+      // If the hash characters aren't encoded the page library will
+      // split the path on the first occurence and the remaining string will not
+      // be part of the path. Question marks must also be encoded or the string after the first
+      // question mark will be interpreted as the url querystring.
+      const partiallyEncodedFilePath = correctedFilePath.replaceAll('#', encodeURIComponent('#'))
+        .replaceAll('?', encodeURIComponent('?'));
+      const baseUrl = "${url('filebrowser:filebrowser_views_download', path='')}";
+      const fullUrl = baseUrl+partiallyEncodedFilePath;
 
-      huePubSub.publish('open.link', fixedPath);
+      huePubSub.publish('open.link', fullUrl);
     };
 
     self.pageChanged = function () {
