@@ -53,12 +53,13 @@ import desktop.views
 from desktop import appmanager, metrics
 from desktop.auth.backend import is_admin, find_or_create_user, ensure_has_a_group, rewrite_user
 from desktop.conf import AUTH, HTTP_ALLOWED_METHODS, ENABLE_PROMETHEUS, KNOX, DJANGO_DEBUG_MODE, AUDIT_EVENT_LOG_DIR, \
-    SERVER_USER, REDIRECT_WHITELIST, SECURE_CONTENT_SECURITY_POLICY, has_connectors
+    METRICS, SERVER_USER, REDIRECT_WHITELIST, SECURE_CONTENT_SECURITY_POLICY, has_connectors, is_gunicorn_report_enabled
 from desktop.context_processors import get_app_name
 from desktop.lib import apputil, i18n, fsmanager
 from desktop.lib.django_util import JsonResponse, render, render_json
 from desktop.lib.exceptions import StructuredException
 from desktop.lib.exceptions_renderable import PopupException
+from desktop.lib.metrics import global_registry
 from desktop.lib.view_util import is_ajax
 from desktop.log import get_audit_logger
 from desktop.log.access import access_log, log_page_hit, access_warn
@@ -868,15 +869,18 @@ class EnsureSafeRedirectURLMiddleware(MiddlewareMixin):
     else:
       return response
 
-
 class MetricsMiddleware(MiddlewareMixin):
   """
   Middleware to track the number of active requests.
   """
 
   def process_request(self, request):
+    # import threading
+    # LOG.debug("===> MetricsMiddleware pid: %d thread: %d" % (os.getpid(), threading.get_ident()))
     self._response_timer = metrics.response_time.time()
     metrics.active_requests.inc()
+    if is_gunicorn_report_enabled():
+      global_registry().update_metrics_shared_data()
 
   def process_exception(self, request, exception):
     self._response_timer.stop()
@@ -885,6 +889,8 @@ class MetricsMiddleware(MiddlewareMixin):
   def process_response(self, request, response):
     self._response_timer.stop()
     metrics.active_requests.dec()
+    if is_gunicorn_report_enabled():
+      global_registry().update_metrics_shared_data()
     return response
 
 
