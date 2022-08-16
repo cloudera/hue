@@ -708,6 +708,11 @@ METRICS = ConfigSection(
   )
 )
 
+def is_gunicorn_report_enabled():
+  return 'rungunicornserver' in sys.argv \
+    and METRICS.LOCATION.get() is not None \
+    and METRICS.COLLECTION_INTERVAL.get() is not None
+
 SLACK = ConfigSection(
   key='slack',
   help=_("""Configuration options for slack """),
