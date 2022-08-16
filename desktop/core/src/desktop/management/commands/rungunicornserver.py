@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 
 from OpenSSL import crypto
 
+import atexit
 import os
 import sys
 import ssl
@@ -28,10 +29,11 @@ import tempfile
 import gunicorn.app.base
 
 from desktop import conf
-from desktop import supervisor
+from desktop import supervisor, metrics
 from django.core.management.base import BaseCommand
 from django.core.wsgi import get_wsgi_application
 from gunicorn import util
+from multiprocessing.util import _exit_function
 from six import iteritems
 
 if sys.version_info[0] > 2:
@@ -60,6 +62,9 @@ def number_of_workers():
 def handler_app(environ, start_response):
   os.environ.setdefault("DJANGO_SETTINGS_MODULE", "desktop.settings")
   return get_wsgi_application()
+
+def post_worker_init(worker):
+  atexit.unregister(_exit_function)
 
 
 class StandaloneApplication(gunicorn.app.base.BaseApplication):
@@ -168,7 +173,8 @@ def rungunicornserver():
       'worker_class': conf.GUNICORN_WORKER_CLASS.get(),
       'worker_connections': 1000,
       'worker_tmp_dir': None,
-      'workers': conf.GUNICORN_NUMBER_OF_WORKERS.get() if conf.GUNICORN_NUMBER_OF_WORKERS.get() is not None else number_of_workers()
+      'workers': conf.GUNICORN_NUMBER_OF_WORKERS.get() if conf.GUNICORN_NUMBER_OF_WORKERS.get() is not None else number_of_workers(),
+      'post_worker_init': post_worker_init
   }
   StandaloneApplication(handler_app, options).run()
 
