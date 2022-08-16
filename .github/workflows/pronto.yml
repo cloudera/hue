@@ -21,7 +21,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
       - run: |
-          git fetch --no-tags --prune --depth=10 origin +refs/heads/*:refs/remotes/origin/*
+          git fetch --no-tags --prune origin +refs/heads/*:refs/remotes/origin/*
       - name: checkout 1
         run: git checkout ${{ GITHUB_HEAD_REF }}
 
