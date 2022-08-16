@@ -156,7 +156,7 @@ class TestGetQueryServerConfig():
               exists=Mock(return_value=True),
               # Bug "TypeError: expected string or buffer" if False, to add a new test case and fix
               get_children=Mock(
-                return_value=map(lambda h: "serverUri={0}:{1};version=xxx;sequence=xxx".format(h, '10000'), hosts)
+                return_value=list(map(lambda h: "serverUri={0}:{1};version=xxx;sequence=xxx".format(h, '10000'), hosts))
               )
             )
 
@@ -175,7 +175,7 @@ class TestGetQueryServerConfig():
 
   def test_get_dbms_after_cache_expiration(self):
     hosts = ['hive-llap-1.gethue.com', 'hive-llap-2.gethue.com', 'hive-llap-3.gethue.com', 'hive-llap-4.gethue.com']
-    znodes = lambda hh: map(lambda h: "serverUri={0}:{1};version=xxx;sequence=xxx".format(h, '10000'), hh)
+    znodes = lambda hh: list(map(lambda h: "serverUri={0}:{1};version=xxx;sequence=xxx".format(h, '10000'), hh))
     with patch('beeswax.conf.HIVE_DISCOVERY_HS2.get') as HIVE_DISCOVERY_HS2:
       with patch('beeswax.conf.HIVE_DISCOVERY_HIVESERVER2_ZNODE.get') as HIVE_DISCOVERY_HIVESERVER2_ZNODE:
         with patch('beeswax.server.dbms.KazooClient') as KazooClient:

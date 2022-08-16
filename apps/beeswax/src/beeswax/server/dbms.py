@@ -151,8 +151,8 @@ def get(user, query_server=None, cluster=None):
 
 
 def select_hive_server(hiveservers, activeEndpoint=None):
-  servers = map(lambda server: {'host': server[0], 'port': server[1]},
-                     [server.split(';')[0].split('=')[1].split(":") for server in hiveservers])
+  servers = list(map(lambda server: {'host': server[0], 'port': server[1]},
+                     [server.split(';')[0].split('=')[1].split(":") for server in hiveservers]))
   return ((next(iter(filter(lambda server: server == activeEndpoint, servers)), None) if activeEndpoint else None)
           or next(iter(filter(lambda server: platform.node() in server['host'], servers)), None)
           or servers[abs(hash(platform.node())) % len(servers)])
