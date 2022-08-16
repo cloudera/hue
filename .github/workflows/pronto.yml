@@ -22,6 +22,7 @@ jobs:
         uses: actions/checkout@v2
       - run: |
           git fetch --no-tags --prune --depth=10 origin +refs/heads/*:refs/remotes/origin/*
+          git checkout test-14
 
       # If your project only specifies its Ruby version in its
       # Gemfile, you'll need to specify a version for the
