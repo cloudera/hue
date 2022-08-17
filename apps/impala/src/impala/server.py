@@ -69,6 +69,11 @@ class ImpalaDaemonApiException(Exception):
 
 
 class ImpalaServerClient(HiveServerClient):
+  def __init__(self, query_server, user):
+    super(ImpalaServerClient, self).__init__(query_server, user)
+    self.max_number_of_sessions = 1
+    self.has_close_sessions = False
+    self.has_session_pool = False
 
   def get_exec_summary(self, operation_handle, session_handle):
     """

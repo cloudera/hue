@@ -17,7 +17,9 @@ from __future__ import absolute_import
 
 import logging
 import sys
+import requests
 
+from requests_kerberos import HTTPKerberosAuth
 from hadoop.core_site import get_conf
 
 if sys.version_info[0] > 2:
@@ -41,9 +43,32 @@ def validate_fs(fs=None):
     LOG.warning('Selected FS %s is not supported by Hue IDBroker client' % fs)
     return None
 
-def get_cab_address(fs=None):
+def _handle_idbroker_ha(fs=None):
   fs = validate_fs(fs)
-  return get_conf().get(_CNF_CAB_ADDRESS % fs) if fs else None
+  idbrokeraddr = get_conf().get(_CNF_CAB_ADDRESS % fs) if fs else None
+  response = None
+  if fs:
+    id_broker_addr = get_conf().get(_CNF_CAB_ADDRESS % fs)
+    if id_broker_addr:
+      id_broker_addr_list = id_broker_addr.split(',')
+      for id_broker_addr in id_broker_addr_list:
+        try:
+          response = requests.get(id_broker_addr + 'dt/knoxtoken/api/v1/token', auth=HTTPKerberosAuth(), verify=False)
+        except Exception as e:
+          if 'Name or service not known' in str(e):
+            LOG.warn('IDBroker %s is not available for use' % id_broker_addr)
+        # Check response for None and if response code is successful (200) or authentication needed (401)
+        if (response is not None) and (response.status_code in (200, 401)):
+          idbrokeraddr = id_broker_addr
+          break
+      return idbrokeraddr
+    else:
+      return idbrokeraddr
+  else:
+    return idbrokeraddr
+
+def get_cab_address(fs=None):
+  return _handle_idbroker_ha(fs)
 
 def get_cab_dt_path(fs=None):
   fs = validate_fs(fs)
