@@ -26,9 +26,11 @@ import sys
 
 import common
 
+py2or3 = "2"
 if sys.version_info[0] > 2:
   from builtins import object
   open_file = open
+  py2or3 = "3"
 else:
   open_file = file
 
@@ -53,7 +55,7 @@ class PthFile(object):
   def __init__(self):
     """May raise SystemError if the virtual env is absent"""
     self._path = _get_pth_filename()
-    self._entries = [ ]
+    self._entries = []
     self._read()
 
   def _relpath(self, path):
@@ -137,9 +139,11 @@ class PthFile(object):
     with open(self._path, 'w') as _file:
       # We want the Hue libraries to come before system libraries in
       # case there is a name collision.
-      _file.write("import sys; sys.__plen = len(sys.path)\n")
+      if py2or3 == "2":
+        _file.write("import sys; sys.__plen = len(sys.path)\n")
       _file.write('\n'.join(sorted(self._entries)))
-      _file.write("\nimport sys; new=sys.path[sys.__plen:]; del sys.path[sys.__plen:]; sys.path[0:0]=new\n")
+      if py2or3 == "2":
+        _file.write("\nimport sys; new=sys.path[sys.__plen:]; del sys.path[sys.__plen:]; sys.path[0:0]=new\n")
     LOG.info('=== Saved %s' % self._path)
 
   def sync(self, apps):

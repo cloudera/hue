@@ -902,7 +902,7 @@ ${ components.menubar(is_embeddable) }
                         <a class="btn btn-default" data-bind="attr: { 'href': '/metastore/table/'+ catalogEntry.path.join('/') + '/read' }" title="${_('Browse Data')}"><i class="fa fa-play fa-fw"></i> ${_('Browse Data')}</a>
                       % endif
                       % if has_write_access:
-                        <a href="javascript: void(0);" class="btn btn-default" data-bind="click: showImportData, visible: tableDetails() && !catalogEntry.isView()" title="${_('Import Data')}"><i class="fa fa-upload fa-fw"></i> ${_('Import')}</a>
+                        <a href="javascript: void(0);" class="btn btn-default" data-bind="click: showImportData, visible: enableImport($root.source().type)" title="${_('Import Data')}"><i class="fa fa-upload fa-fw"></i> ${_('Import')}</a>
                       % endif
                       % if has_write_access:
                         <a href="#dropSingleTable" data-toggle="modal" class="btn btn-default" data-bind="attr: { 'title' : tableDetails() && catalogEntry.isView() ? '${_('Drop View')}' : '${_('Drop Table')}' }"><i class="fa fa-times fa-fw"></i> ${_('Drop')}</a>

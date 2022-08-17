@@ -17,17 +17,23 @@
 
 from __future__ import unicode_literals
 
+from OpenSSL import crypto
+
+import atexit
 import os
 import sys
 import ssl
 import multiprocessing
+import tempfile
 
 import gunicorn.app.base
 
 from desktop import conf
+from desktop import supervisor, metrics
 from django.core.management.base import BaseCommand
 from django.core.wsgi import get_wsgi_application
 from gunicorn import util
+from multiprocessing.util import _exit_function
 from six import iteritems
 
 if sys.version_info[0] > 2:
@@ -56,6 +62,9 @@ def number_of_workers():
 def handler_app(environ, start_response):
   os.environ.setdefault("DJANGO_SETTINGS_MODULE", "desktop.settings")
   return get_wsgi_application()
+
+def post_worker_init(worker):
+  atexit.unregister(_exit_function)
 
 
 class StandaloneApplication(gunicorn.app.base.BaseApplication):
@@ -91,9 +100,25 @@ class StandaloneApplication(gunicorn.app.base.BaseApplication):
 def rungunicornserver():
   bind_addr = conf.HTTP_HOST.get() + ":" + str(conf.HTTP_PORT.get())
 
+  # Currently gunicorn does not support passphrase suppored SSL Keyfile
+  # https://github.com/benoitc/gunicorn/issues/2410
+  ssl_keyfile = None
+  if conf.SSL_CERTIFICATE.get() and conf.SSL_PRIVATE_KEY.get():
+    ssl_password = str.encode(conf.get_ssl_password()) if conf.get_ssl_password() is not None else None
+    if ssl_password:
+      with open(conf.SSL_PRIVATE_KEY.get(), 'r') as f:
+        with tempfile.NamedTemporaryFile(dir=os.path.dirname(
+                                          conf.SSL_CERTIFICATE.get()), delete=False) as tf:
+          tf.write(crypto.dump_privatekey(crypto.FILETYPE_PEM,
+                                          crypto.load_privatekey(crypto.FILETYPE_PEM,
+                                                                 f.read(), ssl_password)))
+          ssl_keyfile = tf.name
+    else:
+      ssl_keyfile = conf.SSL_PRIVATE_KEY.get()
+
   options = {
       'accesslog': "-",
-      'backlog': None,
+      'backlog': 2048,
       'bind': [bind_addr],
       'ca_certs': conf.SSL_CACERTS.get(),     # CA certificates file
       'capture_output': True,
@@ -104,25 +129,25 @@ def rungunicornserver():
       'ciphers': conf.SSL_CIPHER_LIST.get(),  # Ciphers to use (see stdlib ssl module)
       'config': None,
       'daemon': None,
-      'do_handshake_on_connect': None,        # Whether to perform SSL handshake on socket connect (see stdlib ssl module)
+      'do_handshake_on_connect': False,       # Whether to perform SSL handshake on socket connect.
       'enable_stdio_inheritance': None,
       'errorlog': "-",
       'forwarded_allow_ips': None,
       'graceful_timeout': 900,                # Timeout for graceful workers restart.
-      'group': None,
+      'group': conf.SERVER_GROUP.get(),
       'initgroups': None,
-      'keepalive': 120,                       # Set this to a higher value because this Gunicorn is behind a load balancer
-      'keyfile': conf.SSL_PRIVATE_KEY.get(),  # SSL key file
+      'keepalive': 120,                       # seconds to wait for requests on a keep-alive connection.
+      'keyfile': ssl_keyfile,                 # SSL key file
       'limit_request_field_size': None,
       'limit_request_fields': None,
       'limit_request_line': None,
       'logconfig': None,
       'loglevel': 'info',
-      'max_requests': 0,                      # 0 means disable worker restart.
+      'max_requests': 1200,                   # The maximum number of requests a worker will process before restarting.
       'max_requests_jitter': 0,
       'paste': None,
       'pidfile': None,
-      'preload_app': None,
+      'preload_app': False,
       'proc_name': "hue",
       'proxy_allow_ips': None,
       'proxy_protocol': None,
@@ -133,7 +158,7 @@ def rungunicornserver():
       'reload_engine': None,
       'sendfile': None,
       'spew': None,
-      'ssl_version': ssl.PROTOCOL_TLSv1_2,    # SSL version to use (see stdlib ssl module) [ssl.PROTOCOL_SSLv23, ssl.PROTOCOL_TLSv1]
+      'ssl_version': ssl.PROTOCOL_TLSv1_2,    # SSL version to use
       'statsd_host': None,
       'statsd_prefix': None,
       'suppress_ragged_eofs': None,           # Suppress ragged EOFs (see stdlib ssl module)
@@ -144,11 +169,12 @@ def rungunicornserver():
       'threads': conf.CHERRYPY_SERVER_THREADS.get(),
       'timeout': 900,                         # Workers silent for more than this many seconds are killed and restarted.
       'umask': None,
-      'user': None,
+      'user': conf.SERVER_USER.get(),
       'worker_class': conf.GUNICORN_WORKER_CLASS.get(),
-      'worker_connections': None,
+      'worker_connections': 1000,
       'worker_tmp_dir': None,
-      'workers': conf.GUNICORN_NUMBER_OF_WORKERS.get() if conf.GUNICORN_NUMBER_OF_WORKERS.get() is not None else number_of_workers()
+      'workers': conf.GUNICORN_NUMBER_OF_WORKERS.get() if conf.GUNICORN_NUMBER_OF_WORKERS.get() is not None else number_of_workers(),
+      'post_worker_init': post_worker_init
   }
   StandaloneApplication(handler_app, options).run()
 

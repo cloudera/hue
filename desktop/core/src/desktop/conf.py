@@ -708,6 +708,11 @@ METRICS = ConfigSection(
   )
 )
 
+def is_gunicorn_report_enabled():
+  return 'rungunicornserver' in sys.argv \
+    and METRICS.LOCATION.get() is not None \
+    and METRICS.COLLECTION_INTERVAL.get() is not None
+
 SLACK = ConfigSection(
   key='slack',
   help=_("""Configuration options for slack """),
@@ -1288,7 +1293,7 @@ LDAP = ConfigSection(
                            default=None,
                            help=_("The LDAP URL to connect to.")),
           USE_START_TLS=Config("use_start_tls",
-                               default=False,
+                               default=True,
                                type=coerce_bool,
                                help=_("Use StartTLS when communicating with LDAP server.")),
           LDAP_CERT=Config("ldap_cert",
@@ -1385,7 +1390,7 @@ LDAP = ConfigSection(
                      default=None,
                      help=_("The LDAP URL to connect to.")),
     USE_START_TLS=Config("use_start_tls",
-                         default=False,
+                         default=True,
                          type=coerce_bool,
                          help=_("Use StartTLS when communicating with LDAP server.")),
     LDAP_CERT=Config("ldap_cert",

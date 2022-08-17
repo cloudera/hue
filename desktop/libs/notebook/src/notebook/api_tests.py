@@ -645,7 +645,7 @@ def test_get_interpreters_to_show():
       }),
       ('spark', {
           'name': 'Scala', 'displayName': 'Scala', 'interface': 'livy', 'type': 'spark', 'is_sql': False, 'options': {},
-          'dialect_properties': {}, 'is_catalog': False, 'category': 'editor', 'dialect': 'scala'
+          'dialect_properties': {}, 'is_catalog': False, 'category': 'editor', 'dialect': 'spark'
       }),
       ('pig', {
           'name': 'Pig', 'displayName': 'Pig', 'interface': 'pig', 'type': 'pig', 'is_sql': False, 'options': {},
@@ -672,7 +672,7 @@ def test_get_interpreters_to_show():
       }),
       ('spark', {
           'name': 'Scala', 'displayName': 'Scala', 'interface': 'livy', 'type': 'spark', 'is_sql': False, 'options': {},
-          'dialect_properties': {}, 'is_catalog': False, 'category': 'editor', 'dialect': 'scala'
+          'dialect_properties': {}, 'is_catalog': False, 'category': 'editor', 'dialect': 'spark'
       })
     ))
 

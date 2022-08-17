@@ -141,12 +141,12 @@ def get_ordered_interpreters(user=None):
       "type": i['type'],
       "interface": i['interface'],
       "options": i['options'],
-      'dialect': i.get('dialect', i['name']).lower(),
+      'dialect': i.get('dialect', i['type']).lower(),
       'dialect_properties': i.get('dialect_properties') or {},  # Empty when connectors off
       'category': i.get('category', 'editor'),
       "is_sql": i.get('is_sql') or \
           i['interface'] in ["hiveserver2", "rdbms", "jdbc", "solr", "sqlalchemy", "ksql", "flink"] or \
-          i['type'] == 'sql',
+          i['type'] in ["sql", "sparksql"],
       "is_catalog": i['interface'] in ["hms",],
     }
     for i in interpreters
