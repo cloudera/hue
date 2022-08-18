@@ -21,6 +21,7 @@ stacks:
   - comp_name: hue
     branch: ${CDH_BRANCH}
     git_url: git@github.infra.cloudera.com:cdh/hue.git
+    git_sha: HEAD
     enable_review: false
     trigger_if_changed: true
   - comp_name: CDPD
