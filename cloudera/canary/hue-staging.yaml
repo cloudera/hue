@@ -27,6 +27,7 @@ stacks:
   - comp_name: CDPD
     branch: ${CDH_RELEASE_BRANCH}
     git_url: git@github.infra.cloudera.com:CDH/CDPD.git
+    git_sha: HEAD
     enable_review: false
     is_base_repo: true
   tests:
