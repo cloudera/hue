@@ -210,7 +210,9 @@ class RazClient(object):
 
   def handle_adls_req_mapping(self, method, params):
     if method == 'HEAD':
-      access_type = 'get-status' if params.get('action') == 'getStatus' else ''
+      access_type = ''
+      if params.get('action') == 'getStatus' or params.get('resource') == 'filesystem':
+        access_type = 'get-status'
 
     if method == 'DELETE':
       access_type = 'delete-recursive' if params.get('recursive') == 'true' else 'delete'
