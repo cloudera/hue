@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import huePubSub from '../utils/huePubSub';
 
 // Basic helper hook to let a component subscribe to a huePubSub topic and rerender for each message
@@ -6,19 +6,21 @@ import huePubSub from '../utils/huePubSub';
 // Use with caution and preferrably only at the top level component in your component tree since
 // we don't want to have states stored all over the app.
 export function useHuePubSub({ topic }) {
-  const subcriptionCreated = useRef(false);
-  const [huePubSubState, setHuePubSubState] = useState({info: undefined});
+  const [huePubSubState, setHuePubSubState] = useState({ info: undefined });
 
-  if (!subcriptionCreated.current) {
-    huePubSub.subscribe(topic, info => {
+  useEffect(() => {
+    const pubSub = huePubSub.subscribe(topic, info => {
       // Always create a new state so that the react component is rerendered even
       // if the info is the same as previous info. This is to stay aligned with the idea
       // of having a component being notified for EVERY message for the topics it subscribes to.
       setHuePubSubState(() => ({ info }));
     });
 
-    subcriptionCreated.current = true;
-  }
+    return () => {
+      // Remove huePubSub subscription
+      pubSub.remove();
+    };
+  });
 
   return huePubSubState.info;
 }
