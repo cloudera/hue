@@ -27,6 +27,8 @@ from useradmin.models import User
 from desktop.auth.backend import is_admin
 from desktop.conf import DEFAULT_USER, ENABLE_ORGANIZATIONS
 
+from aws.conf import is_raz_s3
+from aws.s3.s3fs import get_s3_home_directory
 
 if sys.version_info[0] > 2:
   from urllib.parse import urlparse as lib_urlparse
@@ -69,6 +71,9 @@ class ProxyFS(object):
     ret_scheme = scheme or self._default_scheme
     if not ret_scheme:
       raise IOError('Can not figure out scheme for path "%s"' % path)
+    LOG.info('in _get_scheme and scheme is: ' + str(ret_scheme))
+    LOG.info('default scheme is: ' + str(self._default_scheme))
+    LOG.info('in _get_scheme and path is: ' + str(path))
     return ret_scheme
 
   def _has_access(self, fs):
@@ -90,10 +95,12 @@ class ProxyFS(object):
 
   def _get_fs(self, path):
     scheme = self._get_scheme(path)
+    LOG.info('in get_fs: ' + str(scheme))
     if self.getuser() is None:
       raise IOError('User not set')
     try:
       fs = self._fs_dict[scheme](self._name, self.getuser())
+      LOG.info('fs: ' + str(fs))
       if self._has_access(fs):
         fs.setuser(self.getuser())
         return fs
@@ -107,6 +114,7 @@ class ProxyFS(object):
     Returns two FS for source and destination paths respectively.
     If `dst` is not self-contained path assumes it's relative path to `src`.
     """
+    LOG.info('--------------- in 1')
 
     src_fs = self._get_fs(src)
     dst_scheme = lib_urlparse(dst).scheme
@@ -143,18 +151,23 @@ class ProxyFS(object):
   # Proxy methods to suitable filesystem
   # ------------------------------------
   def isdir(self, path):
+    LOG.info('--------------- in 2')
     return self._get_fs(path).isdir(path)
 
   def isfile(self, path):
+    LOG.info('--------------- in 3')
     return self._get_fs(path).isfile(path)
 
   def stats(self, path):
+    LOG.info('--------------- in 4')
     return self._get_fs(path).stats(path)
 
   def listdir_stats(self, path, **kwargs):
+    LOG.info('--------------- in 5')
     return self._get_fs(path).listdir_stats(path, **kwargs)
 
   def listdir(self, path, glob=None):
+    LOG.info('--------------- in 6')
     return self._get_fs(path).listdir(path, glob)
 
   def normpath(self, path):
@@ -167,18 +180,22 @@ class ProxyFS(object):
     return self._get_fs(path).open(path, *args, **kwargs)
 
   def exists(self, path):
+    LOG.info('--------------- in 10')
     return self._get_fs(path).exists(path)
 
   def isroot(self, path):
+    LOG.info('--------------- in 11')
     return self._get_fs(path).isroot(path)
 
   def parent_path(self, path):
+    LOG.info('--------------- in 12')
     return self._get_fs(path).parent_path(path)
 
   def join(self, first, *comp_list):
     return self._get_fs(first).join(first, *comp_list)
 
   def mkdir(self, path, *args, **kwargs):
+    LOG.info('--------------- in 14')
     return self._get_fs(path).mkdir(path, *args, **kwargs)
 
   def read(self, path, *args, **kwargs):
@@ -200,8 +217,16 @@ class ProxyFS(object):
     self._get_fs(path).create(path, *args, **kwargs)
 
   def create_home_dir(self, home_path=None):
+    LOG.info('--------------- in 21')
+    LOG.info('in proxy fs create_home_dir')
+    LOG.info('home_path: ' + str(home_path))
     if home_path is None:
       home_path = self.get_home_dir()
+
+    if is_raz_s3():
+      home_path = get_s3_home_directory(User.objects.get(username=self.getuser()))
+
+    LOG.info('get_home_dir: ' + str(home_path))
     self._get_fs(home_path).create_home_dir(home_path)
 
   def chown(self, path, *args, **kwargs):

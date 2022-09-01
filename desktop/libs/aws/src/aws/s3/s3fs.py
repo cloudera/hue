@@ -32,7 +32,7 @@ from boto.s3.key import Key
 from boto.s3.prefix import Prefix
 
 from aws import s3
-from aws.conf import get_default_region, get_locations, PERMISSION_ACTION_S3
+from aws.conf import get_default_region, get_locations, PERMISSION_ACTION_S3, is_raz_s3
 from aws.s3 import normpath, s3file, translate_s3_error, S3A_ROOT
 from aws.s3.s3stat import S3Stat
 
@@ -392,7 +392,20 @@ class S3FileSystem(object):
     return self._filebrowser_action
 
   def create_home_dir(self, home_path):
-    LOG.info('Create home directory is not available for S3 filesystem')
+    LOG.info('----------------------------------------')
+    LOG.info(str(home_path))
+    LOG.info(str(self.user))
+    LOG.info(str(self.superuser))
+
+    # When S3 raz is enabled, try to create user home dir for REMOTE_STORAGE_HOME path
+    if is_raz_s3():
+      LOG.info('Attempting to create directory for path: %s' % home_path)
+      try:
+        self.mkdir(home_path)
+      except Exception as e:
+        LOG.exception(str(e))
+    else:
+      LOG.info('Create home directory is not available for S3 filesystem')
 
   @translate_s3_error
   @auth_error_handler
