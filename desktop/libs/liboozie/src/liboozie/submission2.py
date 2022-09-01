@@ -557,7 +557,10 @@ STORED AS TEXTFILE %s""" % (self.properties.get('send_result_path'),
         jar_path = node.data['properties'].get('jar_path')
         if jar_path:
           if not jar_path.startswith('/'):  # If workspace relative path
-            jar_path = self.fs.join(self.job.deployment_dir, jar_path)
+            if jar_path.startswith('s3a://') or jar_path.startswith('abfs://'):
+              jar_path = jar_path
+            else:
+              jar_path = self.fs.join(self.job.deployment_dir, jar_path)
           if not jar_path.startswith(lib_path):  # If not already in lib
             files.append(jar_path)
 
@@ -574,12 +577,15 @@ STORED AS TEXTFILE %s""" % (self.properties.get('send_result_path'),
       if files:
         for jar_file in files:
           LOG.debug("Updating %s" % jar_file)
-          jar_lib_path = self.fs.join(lib_path, self.fs.basename(jar_file))
+          if jar_file.startswith('s3a://') or jar_file.startswith('abfs://'):
+            jar_lib_path = jar_file
+          else:
+            jar_lib_path = self.fs.join(lib_path, self.fs.basename(jar_file))
           # Refresh if needed
           if self.fs.exists(jar_lib_path) and self.fs.exists(jar_file):
             stat_src = self.fs.stats(jar_file)
             stat_dest = self.fs.stats(jar_lib_path)
-            if stat_src.fileId != stat_dest.fileId:
+            if hasattr(stat_src, 'fileId') and hasattr(stat_dest, 'fileId') and stat_src.fileId != stat_dest.fileId:
               self.fs.remove(jar_lib_path, skip_trash=True)
           self.fs.copyfile(jar_file, jar_lib_path)
 
