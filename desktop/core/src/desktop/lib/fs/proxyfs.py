@@ -30,6 +30,9 @@ from desktop.conf import DEFAULT_USER, ENABLE_ORGANIZATIONS
 from aws.conf import is_raz_s3
 from aws.s3.s3fs import get_s3_home_directory
 
+from azure.conf import is_raz_abfs
+from azure.abfs.__init__ import get_home_dir_for_abfs
+
 if sys.version_info[0] > 2:
   from urllib.parse import urlparse as lib_urlparse
 else:
@@ -212,16 +215,24 @@ class ProxyFS(object):
     try:
       self._get_fs(home_path).create_home_dir(home_path)
     except Exception as e:
-      LOG.debug('Could not create HDFS home directory for path %s : %s' % (home_path, str(e)))
+      LOG.debug('Error creating HDFS home directory for path %s : %s' % (home_path, str(e)))
 
     # Get the new home_path for S3/ABFS when RAZ is enabled.
     if is_raz_s3():
       home_path = get_s3_home_directory(User.objects.get(username=self.getuser()))
+    elif is_raz_abfs():
+      home_path = get_home_dir_for_abfs(User.objects.get(username=self.getuser()))
 
-    try:
-      self._get_fs(home_path).create_home_dir(home_path)
-    except Exception as e:
-      LOG.debug('Could not create user directory for path %s : %s' % (home_path, str(e)))
+    # Try getting user from the request and create home dirs. This helps when Hue admin is trying to create the dir for other users.
+    # That way only Hue admin needs authorization to create for all Hue users and not each individual user.
+    # If normal users also have authorization, then they can also create the dir for themselves if they want.
+    from crequest.middleware import CrequestMiddleware
+    request = CrequestMiddleware.get_request()
+    username = request.user.username if request and hasattr(request, 'user') and request.user.is_authenticated else self.getuser()
+
+    if is_raz_s3() or is_raz_abfs():
+      fs = self.do_as_user(username, self._get_fs, home_path)
+      fs.create_home_dir(home_path)
 
   def chown(self, path, *args, **kwargs):
     self._get_fs(path).chown(path, *args, **kwargs)
