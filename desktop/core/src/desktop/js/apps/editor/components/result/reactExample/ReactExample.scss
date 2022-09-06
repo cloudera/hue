@@ -1,11 +1,12 @@
 // Component styling using BEM notation
 
-$my-color:   #F8F8F8;
+$my-color:   #f8f8f8;
 
 .react-example {
   background-color: $my-color;
 }
 
-.react-example__title, .react-example__description {
+.react-example__title,
+.react-example__description {
   color: black;
 }
