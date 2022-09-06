@@ -202,10 +202,10 @@ class ProxyFS(object):
     self._get_fs(path).create(path, *args, **kwargs)
 
   def create_home_dir(self, home_path=None):
-    '''
+    """
     Initially home_path will have path value for HDFS and if it is configured in Hue, try creating the user home dir for it first.
     Then we check if S3/ABFS is configured in Hue via RAZ. If yes, try creating user home dir for them next.
-    '''
+    """
     if home_path is None:
       home_path = self.get_home_dir()
 
