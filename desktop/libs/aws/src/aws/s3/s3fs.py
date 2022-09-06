@@ -392,18 +392,13 @@ class S3FileSystem(object):
     return self._filebrowser_action
 
   def create_home_dir(self, home_path):
-    LOG.info('----------------------------------------')
-    LOG.info(str(home_path))
-    LOG.info(str(self.user))
-    LOG.info(str(self.superuser))
-
     # When S3 raz is enabled, try to create user home dir for REMOTE_STORAGE_HOME path
     if is_raz_s3():
-      LOG.info('Attempting to create directory for path: %s' % home_path)
+      LOG.debug('Attempting to create user directory for path: %s' % home_path)
       try:
         self.mkdir(home_path)
       except Exception as e:
-        LOG.exception(str(e))
+        LOG.exception('Failed to create user home directory for path %s with error: %s' % (home_path, str(e)))
     else:
       LOG.info('Create home directory is not available for S3 filesystem')
 
