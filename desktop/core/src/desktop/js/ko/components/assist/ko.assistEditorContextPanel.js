@@ -291,7 +291,10 @@ class AssistEditorContextPanel {
       }
       window.clearTimeout(loadEntriesTimeout);
       if (this.activeTables().length === 1) {
-        this.activeTables()[0].open(true);
+        const singleTable = this.activeTables()[0];
+        if (!singleTable.hasErrors()) {
+          singleTable.open(true);
+        }
       } else {
         loadEntriesTimeout = window.setTimeout(() => {
           this.activeTables().every(table => {
