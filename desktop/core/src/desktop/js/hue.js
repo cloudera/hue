@@ -21,10 +21,6 @@ import _ from 'lodash';
 import $ from 'jquery/jquery.common';
 import 'ext/bootstrap.2.3.2.min';
 import 'ext/bootstrap-editable.1.5.1.min';
-
-// import 'react';
-// import 'react-dom';
-
 import 'utils/d3Extensions';
 import * as d3 from 'd3';
 import d3v3 from 'd3v3';
