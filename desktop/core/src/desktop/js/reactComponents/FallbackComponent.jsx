@@ -1,6 +1,7 @@
+'use strict';
+
 import * as React from 'react';
 
-('use strict');
 
 // This component is rendered if the react loadComponent can't find
 // which react component to use 

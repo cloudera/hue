@@ -1,29 +1,28 @@
+'use strict';
+
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 
 import './ReactExampleGlobal.scss';
 
-('use strict');
-
-const propTypes = {
-  onClick: PropTypes.func,
-  version: PropTypes.string,
-  myObj: PropTypes.any,
-  children: PropTypes.any,
-};
-
+export interface ReactExampleGlobalProps {
+  onClick(e: React.MouseEvent): any;
+  version: string;
+  myObj?: any;
+  className?: string;
+  children?: React.ReactNode | React.ReactNode[];
+}
 
 const defaultProps = {
-  onClick: ()=>{},
-  version: 'xxx',
+  onClick: () => {},
+  version: 'xxx'
 };
 
-const ReactExampleGlobal = ({ children, onClick, version, myObj }) => {
+const ReactExampleGlobal = ({ onClick, children, version, myObj }: ReactExampleGlobalProps) => {
   const [isClicked, setIsClicked] = useState(false);
 
   return (
     <button
-      className='react-example-global'
+      className="react-example-global"
       disabled={isClicked}
       onClick={e => {
         onClick(e);
@@ -36,7 +35,6 @@ const ReactExampleGlobal = ({ children, onClick, version, myObj }) => {
   );
 };
 
-ReactExampleGlobal.propTypes = propTypes;
 ReactExampleGlobal.defaultProps = defaultProps;
 
 export default ReactExampleGlobal;

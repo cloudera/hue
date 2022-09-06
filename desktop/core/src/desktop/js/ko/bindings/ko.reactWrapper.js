@@ -7,18 +7,18 @@ import { loadComponent } from '../../reactComponents/imports';
 /**
  * REACT KNOCKOUT INTEGRATION
  * This is a oneway binding from knockout to react.js. Use the data-binding called reactWrapper
- * followed by the component name. Props are passed in as js object literal coded as a string using 
+ * followed by the component name. Props are passed in as js object literal coded as a string using
  * the props param. Any new components used must also be added to the import file
- * desktop/core/src/desktop/js/reactComponents/imports.js. 
- * 
+ * desktop/core/src/desktop/js/reactComponents/imports.js.
+ *
  * Example usage:
  *
- * <MyComponent data-bind="reactWrapper: 'MyComponent', 
+ * <MyComponent data-bind="reactWrapper: 'MyComponent',
  *    props: { title: 'Result title', activeExecutable: activeExecutable }">
  * </MyComponent>
- * 
- * 
- * The name of the component element tag (eg <MyComponent>) can be anything, but for consistency 
+ *
+ *
+ * The name of the component element tag (eg <MyComponent>) can be anything, but for consistency
  * and to stay close to how normal react components look we use the actual component name.
  */
 

@@ -80,7 +80,7 @@ import HueDocument from 'doc/hueDocument';
 import { getLastKnownConfig, refreshConfig } from 'config/hueConfig';
 import { simpleGet } from 'api/apiUtils'; // In analytics.mako, metrics.mako, threads.mako
 import Mustache from 'mustache'; // In hbase/templates/app.mako, jobsub.templates.js, search.ko.js, search.util.js
-import {createReactComponents} from 'reactComponents/createRootElements.js';
+import { createReactComponents } from 'reactComponents/createRootElements.js';
 
 // TODO: Migrate away
 window._ = _;

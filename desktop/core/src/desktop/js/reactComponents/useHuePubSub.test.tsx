@@ -5,9 +5,11 @@ import huePubSub from '../utils/huePubSub';
 describe('useHuePubSub', () => {
   const originalSubscribe = huePubSub.subscribe;
   let publishCallback;
+  let remove = jest.fn();
 
   const subscribeMock = jest.fn().mockImplementation((topic, callback) => {
     publishCallback = callback;
+    return { remove }
   });
 
   beforeAll(() => {
@@ -22,15 +24,17 @@ describe('useHuePubSub', () => {
     huePubSub.subscribe = originalSubscribe;
   });
 
-  test('only subscribes once', () => {
+  test('only subscribes once per hook lifecycle', () => {
     expect(huePubSub.subscribe).toBeCalledTimes(0);
 
-    const { result, rerender } = renderHook(() => useHuePubSub({ topic: 'my.test.topic' }));
-    expect(huePubSub.subscribe).toHaveBeenCalledWith('my.test.topic', expect.anything());
+    const { rerender } = renderHook(() => useHuePubSub({ topic: 'my.test.topic' }));
+    expect(huePubSub.subscribe).toHaveBeenCalledWith('my.test.topic', expect.anything(), undefined);
     expect(huePubSub.subscribe).toHaveBeenCalledTimes(1);
-
+    expect(remove).not.toHaveBeenCalled();
+    
     rerender();
-    expect(huePubSub.subscribe).toHaveBeenCalledTimes(1);
+    expect(remove).toHaveBeenCalled();
+    expect(huePubSub.subscribe).toHaveBeenCalledTimes(2);
   });
 
   test('initial state is undefined', () => {

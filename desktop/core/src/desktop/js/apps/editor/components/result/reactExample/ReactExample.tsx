@@ -1,27 +1,42 @@
-import PropTypes from 'prop-types';
-import * as React from 'react';
+'use strict';
 
+import React, { FunctionComponent } from 'react';
+
+// If importing using "import { Ace } from 'ext/ace'" VSCode typescript will complain
+import { Ace } from '../../../../../ext/ace';
+
+import {CURSOR_POSITION_CHANGED_EVENT} from '../../../components/aceEditor/AceLocationHandler';
 import ReactExampleGlobal from '../../../../../reactComponents/ReactExampleGlobal/ReactExampleGlobal';
 import { useHuePubSub } from '../../../../../reactComponents/useHuePubSub';
+import SqlExecutable from '../../../execution/sqlExecutable';
 
 import './ReactExample.scss';
 
-('use strict');
-
-const propTypes = {
+export interface ReactExampleProps {
+  title: string;
   // This example component recieves the "activeExecutable" used in the result page but
   // the props in general can of course be of any type
-  activeExecutable: PropTypes.oneOfType([PropTypes.func, PropTypes.shape({ id: PropTypes.string })])
-};
+  activeExecutable?: SqlExecutable;
+}
+
+// When we have type definitions and Ace imported using webackpack we should
+// use those types instead of creating our own, e.g. Ace.Position
+interface EditorCursor {
+  position: Ace.Position
+}
+
 const defaultProps = { title: 'Default result title' };
 
-const ReactExample = ({ title, activeExecutable }) => {
+// Using the FunctionComponent generic is optional. Alternatively you can explicitly
+// define the children prop like in the ReactExampleGlobal component.
+const ReactExample: FunctionComponent<ReactExampleProps> = ({ title, activeExecutable }) => {
   // Example of having the react component rerender based on changes from useHuePubSub.
   // Use with caution and preferrably only at the top level component in your component tree.
-  const editorCursor = useHuePubSub({ topic: 'editor.cursor.position.changed' });
+  const editorCursor = useHuePubSub<EditorCursor>({ topic: CURSOR_POSITION_CHANGED_EVENT });
 
   const id = activeExecutable?.id;
-  const position = editorCursor?.position !== undefined ? JSON.stringify(editorCursor.position) : 'not available';
+  const position =
+    editorCursor?.position !== undefined ? JSON.stringify(editorCursor.position) : 'not available';
 
   return (
     <div className="react-example">
@@ -42,7 +57,6 @@ const ReactExample = ({ title, activeExecutable }) => {
   );
 };
 
-ReactExample.propTypes = propTypes;
 ReactExample.defaultProps = defaultProps;
 
 export default ReactExample;

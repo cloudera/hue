@@ -3,7 +3,6 @@
 // so we handle the imports dynamically for that reason.
 export async function loadComponent(name) {
   switch (name) {
-
     // Page specific components here
     case 'ReactExample':
       return (await import('../apps/editor/components/result/reactExample/ReactExample')).default;
