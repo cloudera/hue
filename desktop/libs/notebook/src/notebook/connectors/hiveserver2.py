@@ -183,10 +183,17 @@ class HS2Api(Api):
   def create_session(self, lang='hive', properties=None):
     application = 'beeswax' if lang == 'hive' or lang == 'llap' else lang
 
+    uses_session_pool = has_session_pool()
+    uses_multiple_sessions = has_multiple_sessions()
+
+    if lang == 'impala':
+      uses_session_pool = False
+      uses_multiple_sessions = False
+
     try:
-      if has_session_pool():
+      if uses_session_pool:
         session = Session.objects.get_tez_session(self.user, application, MAX_NUMBER_OF_SESSIONS.get())
-      elif not has_multiple_sessions():
+      elif not uses_multiple_sessions:
         session = Session.objects.get_session(self.user, application=application)
       else:
         session = None
@@ -195,7 +202,7 @@ class HS2Api(Api):
         LOG.exception('Connection being refused or service is not available in either session or in multiple sessions'
                       '- HA failover')
         reset_ha()
-        
+
     reuse_session = session is not None
     if not reuse_session:
       db = dbms.get(self.user, query_server=get_query_server_config(name=lang, connector=self.interpreter))
@@ -289,8 +296,13 @@ class HS2Api(Api):
       except Exception as e:
         LOG.exception('Error closing statement %s' % str(e))
 
+    close_sessions = CLOSE_SESSIONS.get()
+
+    if session['type'] == 'impala':
+      close_sessions = False
+
     try:
-      if idle and CLOSE_SESSIONS.get():
+      if idle and close_sessions:
         response['result'].append(self.close_session(session))
     except QueryExpired:
       pass
