@@ -157,16 +157,18 @@ ABFS_CLUSTERS = UnspecifiedConfigSection(
   )
 )
 
+def is_raz_abfs():
+  from desktop.conf import RAZ  # Must be imported dynamically in order to have proper value
+  return (RAZ.IS_ENABLED.get() and 'default' in list(ABFS_CLUSTERS.keys()))
+
 def is_adls_enabled():
   return ('default' in list(AZURE_ACCOUNTS.keys()) and AZURE_ACCOUNTS['default'].get_raw() and AZURE_ACCOUNTS['default'].CLIENT_ID.get() \
     or (conf_idbroker.is_idbroker_enabled('azure') and has_azure_metadata())) and 'default' in list(ADLS_CLUSTERS.keys())
 
 def is_abfs_enabled():
-  from desktop.conf import RAZ  # Must be imported dynamically in order to have proper value
-
   return ('default' in list(AZURE_ACCOUNTS.keys()) and AZURE_ACCOUNTS['default'].get_raw() and AZURE_ACCOUNTS['default'].CLIENT_ID.get() \
     or (conf_idbroker.is_idbroker_enabled('azure') and has_azure_metadata())) and 'default' in list(ABFS_CLUSTERS.keys()) \
-    or (RAZ.IS_ENABLED.get() and 'default' in list(ABFS_CLUSTERS.keys()))
+    or is_raz_abfs()
 
 def has_adls_access(user):
   from desktop.conf import RAZ  # Must be imported dynamically in order to have proper value
