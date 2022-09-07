@@ -22,6 +22,7 @@ from builtins import object
 import logging
 import sys
 
+from crequest.middleware import CrequestMiddleware
 from useradmin.models import User
 
 from desktop.auth.backend import is_admin
@@ -226,7 +227,6 @@ class ProxyFS(object):
     # Try getting user from the request and create home dirs. This helps when Hue admin is trying to create the dir for other users.
     # That way only Hue admin needs authorization to create for all Hue users and not each individual user.
     # If normal users also have authorization, then they can also create the dir for themselves if they want.
-    from crequest.middleware import CrequestMiddleware
     request = CrequestMiddleware.get_request()
     username = request.user.username if request and hasattr(request, 'user') and request.user.is_authenticated else self.getuser()
 
