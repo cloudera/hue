@@ -1367,6 +1367,8 @@ else:
       }
 
       self.viewFile = function (file, e) {
+        const urlEncodedPercentage = '%25';
+        
         e.stopImmediatePropagation();
         if (file.type == "dir") {
           // Reset page number so that we don't hit a page that doesn't exist
@@ -1374,14 +1376,27 @@ else:
           self.enableFilterAfterSearch = false;
           self.searchQuery("");
           self.targetPath(file.url);
-          updateHash(stripHashes(file.path));
+
+          const path = file.path;
+          const percentageEncodedPath = path.includes('%') && !path.includes(urlEncodedPercentage) ? 
+            path.replaceAll('%', urlEncodedPercentage) : path;
+        
+          updateHash(stripHashes(percentageEncodedPath));
         } else {
           
           // Fix to encode potential hash characters in a file name when viewing a file
-          const url = file.name.indexOf('#') >= 0 && file.url.indexOf('#') >= 0 
+          let url = file.name.indexOf('#') >= 0 && file.url.indexOf('#') >= 0 
             ? file.url.replaceAll('#', encodeURIComponent('#')) : file.url;
 
           %if is_embeddable:
+
+          // Fix. The '%' character needs to be encoded twice due to a bug in the page library
+          // that decodes the url twice
+          
+          if(file.path.includes('%') && !file.path.includes(urlEncodedPercentage)) {            
+            url = url.replaceAll(urlEncodedPercentage, encodeURIComponent(urlEncodedPercentage));
+          }
+
           huePubSub.publish('open.link', url);
           %else:
           window.location.href = url;
@@ -1398,8 +1413,10 @@ else:
       // If the hash characters aren't encoded the page library will
       // split the path on the first occurence and the remaining string will not
       // be part of the path. Question marks must also be encoded or the string after the first
-      // question mark will be interpreted as the url querystring.      
-        const partiallyEncodedFilePath = self.selectedFile().path.replaceAll('#', encodeURIComponent('#'))
+      // question mark will be interpreted as the url querystring.
+      // Percentage character must be double encoded due to the page library that decodes the url twice
+        const doubleUrlEncodedPercentage = '%2525';
+        const partiallyEncodedFilePath = self.selectedFile().path.replaceAll('%', doubleUrlEncodedPercentage).replaceAll('#', encodeURIComponent('#'))
           .replaceAll('?', encodeURIComponent('?'));;
         const fullUrl = baseUrl+partiallyEncodedFilePath;
         
