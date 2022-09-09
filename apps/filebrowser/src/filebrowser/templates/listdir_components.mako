@@ -1393,7 +1393,7 @@ else:
           // Fix. The '%' character needs to be encoded twice due to a bug in the page library
           // that decodes the url twice
           
-          if(file.path.includes('%') && !file.path.includes(urlEncodedPercentage)) {            
+          if (file.path.includes('%') && !file.path.includes(urlEncodedPercentage)) {            
             url = url.replaceAll(urlEncodedPercentage, encodeURIComponent(urlEncodedPercentage));
           }
 
