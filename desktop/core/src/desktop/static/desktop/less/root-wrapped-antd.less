@@ -1,9 +1,12 @@
+// Needed to wrap antd and prevent it from affecting global styles
+
 // The Ant Design library modifies the global styles which will affect the UI in Hue
 // in multiple places where not intended. So in order to utilize the components locally
-// without leaking styles we wrap it all in an antd class. Since ant-modal-root likely
-// is placed outside the .antd wrapper we need to add the styles there as well.
+// without leaking styles we wrap it all in an antd class. Since the ant-modal-root  
+// is placed outside the .antd wrapper we need to add the base styles there as well.
 .antd,
-.ant-modal-root {
+.ant-modal-root
+ {
   /* stylelint-disable no-invalid-position-at-import-rule */
 
   // We need to reset some global styles from Bootstrap to prevent them from
@@ -21,7 +24,8 @@
   @import 'node_modules/antd/es/skeleton/style/index.less';
   @import 'node_modules/antd/es/menu/style/index.less';
   @import 'node_modules/antd/es/spin/style/index.less';
-
+  @import 'node_modules/antd/es/segmented/style/index.less';
+  @import 'node_modules/antd/es/select/style/index.less'; 
   /* stylelint-enable no-invalid-position-at-import-rule */
 
   // Required global overrides:
@@ -31,6 +35,24 @@
     // Further increase the z-index here if needed.
     z-index: 1010;
   }
+}
+
+// SPECICAL CASE COMPONENTS
+
+
+// The Antd select styles contain rule constructs that are not all properly translated when 
+// wrapped in class like the .antd wrapper above. In order to fix the failing rules we 
+// import the less styles again into the root. Another problem that prevents a wrapper is 
+// that the .ant-select-dropdown element is placed in the root of the DOM and not inside 
+// the parent wrapper.
+@import 'antd/es/select/style/index.less';
+@import 'antd/es/menu/style/index.less';
+// Select requires motion.less to function properly
+@import 'antd/es/style/core/motion.less';
+// The box-sizing is an original global antd declaration that we need to add explicitly 
+// since the ant-select-dropdown it outside the .antd wrapper 
+.ant-select-dropdown .ant-select-item {
+  box-sizing: border-box;  
 }
 
 // Ant Design's Modal adds a new body width to compensate for vertical scrollbar

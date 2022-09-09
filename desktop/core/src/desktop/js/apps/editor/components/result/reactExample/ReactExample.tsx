@@ -1,7 +1,7 @@
 'use strict';
 
 import React, { FunctionComponent, useState } from 'react';
-import { Button, Modal, Skeleton } from 'antd';
+import { Button, Modal, Skeleton, Menu } from 'antd';
 
 // Provides a i18n translation hook
 import { i18nReact } from '../../../../../utils/i18nReact';

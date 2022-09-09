@@ -628,7 +628,11 @@ There is no bridge to KO for components using this integration. Example using in
     <div class="pull-left">
       <executable-actions-ko-bridge data-bind="
         vueEvents: {
-          'execute-successful': function () { currentQueryTab('queryResults') },
+          'execute-successful': function () { 
+            ## console.info('setting queryResults tab')
+            ## currentQueryTab('queryResults')
+            ## currentQueryTab('queryResults') 
+            },
           'execute-failed': function () { currentQueryTab('executionAnalysis') }
         },
         vueKoProps: {
@@ -1023,13 +1027,16 @@ There is no bridge to KO for components using this integration. Example using in
 
           <div class="tab-pane" id="queryChart" data-bind="css: {'active': currentQueryTab() == 'queryChart'}">
             <div class="editor-bottom-tab-panel editor-chart-panel">
-              <!-- ko component: { name: 'snippet-result-chart', params: {
-                activeExecutable: activeExecutable,
-                editorMode: parentVm.editorMode,
-                id: id,
-                isPresentationMode: parentNotebook.isPresentationMode,
-                resultsKlass: resultsKlass
-              }} --><!-- /ko -->
+              <!-- ko if: currentQueryTab() == 'queryChart' -->
+                <ChartPanel data-bind="reactWrapper: 'ChartPanel', props: { activeExecutable: activeExecutable }"></ChartPanel>
+              <!-- /ko -->
+              ## <!-- ko component: { name: 'snippet-result-chart', params: {
+              ##   activeExecutable: activeExecutable,
+              ##   editorMode: parentVm.editorMode,
+              ##   id: id,
+              ##   isPresentationMode: parentNotebook.isPresentationMode,
+              ##   resultsKlass: resultsKlass
+              ## }} --><!-- /ko -->
             </div>
           </div>
 

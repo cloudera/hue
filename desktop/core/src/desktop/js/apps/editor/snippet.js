@@ -58,7 +58,7 @@ import {
   ASSIST_GET_SOURCE_EVENT,
   ASSIST_SET_SOURCE_EVENT
 } from 'ko/components/assist/events';
-import { EXECUTABLE_UPDATED_TOPIC } from './execution/events';
+import { EXECUTABLE_UPDATED_TOPIC, EXECUTABLE_CHART_UPDATED_TOPIC } from './execution/events';
 
 // TODO: Remove for ENABLE_NOTEBOOK_2. Temporary here for debug
 window.SqlExecutable = SqlExecutable;
@@ -629,6 +629,12 @@ export default class Snippet {
         this.updateFromExecutable(executable);
       }
     });
+
+    huePubSub.subscribe(EXECUTABLE_CHART_UPDATED_TOPIC, chartSettings => {
+      const executable = this.activeExecutable();
+      executable.chartSettings = chartSettings;
+      this.activeExecutable(executable);
+    });    
 
     this.activeExecutable.subscribe(this.updateFromExecutable.bind(this));
 

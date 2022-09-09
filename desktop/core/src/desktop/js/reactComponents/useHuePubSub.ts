@@ -22,6 +22,7 @@ export function useHuePubSub<Type>({
         // Always create a new state so that the react component is rerendered even
         // if the info is the same as previous info. This is to stay aligned with the idea
         // of having a component being notified for EVERY message for the topics it subscribes to.
+        // console.info(topic, info);
         setHuePubSubState(() => ({ info }));
       },
       app

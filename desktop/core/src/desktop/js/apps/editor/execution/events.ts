@@ -35,6 +35,9 @@ export type ExecutableLogsUpdatedEvent = ExecutionLogs;
 export const EXECUTABLE_RESULT_UPDATED_TOPIC = 'hue.executable.result.updated';
 export type ExecutableResultUpdatedEvent = ExecutionResult;
 
+export const EXECUTABLE_CHART_UPDATED_TOPIC = 'hue.executable.charts.updated';
+export type ExecutableChartUpdatedEvent = {chartType: string};
+
 export const SHOW_SESSION_AUTH_MODAL_TOPIC = 'show.session.auth.modal';
 export interface ShowSessionAuthModalEvent {
   message?: string;

@@ -126,6 +126,7 @@ export default class SqlExecutable {
   previousExecutable?: SqlExecutable;
   nextExecutable?: SqlExecutable;
   observerState: { [key: string]: unknown } = {};
+  chartSettings: { [key: string]: unknown } = {};
   lost = false;
   edited = false;
   parsedStatement: ParsedSqlStatement;

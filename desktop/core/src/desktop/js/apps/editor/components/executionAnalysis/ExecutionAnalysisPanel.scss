@@ -5,6 +5,8 @@
   @include fillAbsolute;
   @include flexRowLayout;
 
+  margin: 0 8px;
+
   .execution-analysis-errors,
   .execution-analysis-jobs,
   .execution-analysis-logs {

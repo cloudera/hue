@@ -1,0 +1,38 @@
+@import '../../../../components/styles/variables.scss';
+
+$config-drawer-width: 300px;
+$config-drawer-transition: 0.3s;
+$top-menu-height: $fluid-spacing-xl;
+
+$border-color: $fluid-gray-300;
+$menu-background-color: $fluid-gray-050;
+
+// The ko-react-binding creates an additional wrapper element
+// which also needs a height for the components full height to work.
+chartpanel {
+  height: 100%;
+
+  .hue-chart-panel {
+    position: relative;
+    overflow: hidden;
+    height: inherit;
+    // border: 1px solid red; // DEBUG TEMP
+  }
+
+  .hue-chart-panel-top-menu {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background-color: $menu-background-color;
+    height: $top-menu-height;
+    padding: 0 8px;
+
+    li {
+      list-style-type: none;
+    }
+
+    .spacer {
+      flex-grow: 2;
+    }
+  }
+}

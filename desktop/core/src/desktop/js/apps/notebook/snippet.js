@@ -2207,6 +2207,7 @@ class Snippet {
       rows -= result.data.length;
 
       if (result.data.length > 0) {
+        console.info('setting queryResults tab');
         self.currentQueryTab('queryResults');
       }
 
