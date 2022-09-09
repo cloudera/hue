@@ -101,6 +101,7 @@ import 'ko/bindings/ko.onClickOutside';
 import 'ko/bindings/ko.oneClickSelect';
 import 'ko/bindings/ko.parseArguments';
 import 'ko/bindings/ko.publish';
+import 'ko/bindings/ko.reactWrapper';
 import 'ko/bindings/ko.readOnlyAce';
 import 'ko/bindings/ko.resizable';
 import 'ko/bindings/ko.select2';
