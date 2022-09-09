@@ -400,7 +400,9 @@ ${ fb_components.menubar() }
       // split the path on the first occurence and the remaining string will not
       // be part of the path. Question marks must also be encoded or the string after the first
       // question mark will be interpreted as the url querystring.
-      const partiallyEncodedFilePath = correctedFilePath.replaceAll('#', encodeURIComponent('#'))
+      // Percentage character must be double encoded due to the page library that decodes the url twice
+      const doubleUrlEncodedPercentage = '%2525';
+      const partiallyEncodedFilePath = correctedFilePath.replaceAll('%', doubleUrlEncodedPercentage).replaceAll('#', encodeURIComponent('#'))
         .replaceAll('?', encodeURIComponent('?'));
       const baseUrl = "${url('filebrowser:filebrowser_views_download', path='')}";
       const fullUrl = baseUrl+partiallyEncodedFilePath;
