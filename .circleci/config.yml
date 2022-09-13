@@ -117,8 +117,8 @@ commands:
             cd ~/repo
 
             # Installs to move to image building
-            curl -O https://dl.google.com/go/go1.15.linux-<< parameters.go_arch >>.tar.gz
-            tar -xvf go1.15.linux-<< parameters.go_arch >>.tar.gz
+            curl -O https://dl.google.com/go/go1.17.linux-<< parameters.go_arch >>.tar.gz
+            tar -xvf go1.17.linux-<< parameters.go_arch >>.tar.gz
             export GO111MODULE=on
             go/bin/go get -u github.com/raviqqe/muffet@v1.5.7
 
