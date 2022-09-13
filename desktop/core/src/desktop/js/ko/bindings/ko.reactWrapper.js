@@ -36,7 +36,7 @@ ko.bindingHandlers.reactWrapper = (() => {
       const props = getProps(allBindings);
 
       // The component's react root should only be created once per DOM
-      // load so we pass it along via the bindingContext to be reused in the KO update call
+      // load so we pass it along via the bindingContext to be reused in the KO update call.
       const reactRoot = createRoot(el);
       el.__KO_React_root = reactRoot;
       loadComponent(componentName).then(Component => {
