@@ -1,0 +1,44 @@
+rules:
+  - id: hue.api_reviews
+    pattern: re_path
+    message: API Reviewers Assemble - Review Needed for the Hue API cc @tabraiz12
+    glob:
+      - "**/urls.py"
+
+  - id: hue.db_reviewers
+    pattern: class Migration(migrations.Migration)
+    message: DB Reviewers Assemble - Review Needed for the Hue DB Schema cc @tabraiz12
+    glob:
+      - "**/*.py"
+
+  - id: exclusionary_terminology
+    pattern:
+      - /(?:blacklist|whitelist)/i
+      - /(?:master|slave)/i
+      - /(?:grandfather)/i
+      - /(?:Man hours)/i
+      - /(?:Sanity check)/i
+      - /(?:Dummy value)/i
+
+    message: |
+      These words are exclusionary,
+
+      Whitelist => Allowlist
+      Blacklist => Denylist
+      Master/Slave => Leader/Follower or Primary/Secondary or Active/Standby
+      Grandfathered => Legacy status
+      Man hours => Person hours or Engineer hours
+      Sanity check => Quick check or Confidence check
+      Dummy value => Sample value
+
+      Refer https://cloudera.atlassian.net/wiki/spaces/ENG/overview?homepageId=101482622
+    glob:
+      - "**/*"
+
+exclude:
+  - node_modules
+  - vendor
+  - assets/**/*.png
+  - goodcheck.yml
+
+exclude_binary: true
