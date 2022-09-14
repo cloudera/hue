@@ -1,13 +1,18 @@
 rules:
   - id: hue.api_reviews
     pattern: re_path
-    message: API Reviewers Assemble - Review Needed for the Hue API cc @tabraiz12
+    message: | 
+      API Reviewers Assemble - Review Needed for the Hue API 
+      cc @tabraiz12
+      Refer API GuideLines -  https://cloudera.atlassian.net/wiki/spaces/ENG/overview?homepageId=101482622
     glob:
       - "**/urls.py"
 
   - id: hue.db_reviewers
     pattern: class Migration(migrations.Migration)
-    message: DB Reviewers Assemble - Review Needed for the Hue DB Schema cc @tabraiz12
+    message: | 
+      DB Reviewers Assemble - Review Needed for the Hue DB Schema cc @tabraiz12
+      Refer DB GuideLines -  https://cloudera.atlassian.net/wiki/spaces/ENG/overview?homepageId=101482622
     glob:
       - "**/*.py"
 
@@ -21,7 +26,7 @@ rules:
       - /(?:Dummy value)/i
 
     message: |
-      These words are exclusionary,
+      These words are exclusionary terminology,
 
       Whitelist => Allowlist
       Blacklist => Denylist
@@ -31,9 +36,15 @@ rules:
       Sanity check => Quick check or Confidence check
       Dummy value => Sample value
 
-      Refer https://cloudera.atlassian.net/wiki/spaces/ENG/overview?homepageId=101482622
+      Create A guideline Doc
     glob:
       - "**/*"
+
+  - id: editor_feature
+    message: |
+      Adding Features Owners for Editor V2 are Johan and Bjorn
+    glob:
+      - desktop/libs/notebook/src/notebook/templates/editor2.mako
 
 exclude:
   - node_modules

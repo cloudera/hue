@@ -40,8 +40,11 @@ jobs:
           # Run `bundle install` with cache when `true`
           bundler-cache: true
 
-      - name: Setup Avenger Bot
-        run: gem install faraday-retry pronto pronto-goodcheck
+      - name: Setup goodcheck
+        run: |
+          gem install specific_install
+          gem specific_install -l https://github.com/tabraiz12/pronto -b pronto-filecomment
+          gem specific_install -l https://github.com/tabraiz12/pronto-goodcheck.git -b pronto-check-filecomment
       - name: Run Avenger Bot
         run: pronto run -f github_status github_pr -c origin/${{ github.base_ref }}
         env:
