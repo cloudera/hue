@@ -358,7 +358,7 @@ class SQLIndexer(object):
             row = self.nomalize_booleans(row, columns)
           _csv_rows.append(tuple(row))
 
-        if _csv_rows:
+        if _csv_rows:  #sql for data insertion
           csv_rows = str(_csv_rows)[1:-1]
 
           if dialect in ('hive', 'mysql'):
@@ -368,18 +368,23 @@ class SQLIndexer(object):
               'csv_rows': csv_rows
             }
           elif dialect == 'impala':
-             # casting from string to boolean is not allowed in impala so string -> int -> bool
-            sql_ = ',\n'.join([
-              '  CAST ( `%(name)s` AS %(type)s ) `%(name)s`' % col if col['type'] != 'boolean' \
-              else '  CAST ( CAST ( `%(name)s` AS TINYINT ) AS boolean ) `%(name)s`' % col for col in columns
-            ])
-
-            sql += '''\nINSERT INTO %(database)s.%(table_name)s_tmp VALUES %(csv_rows)s;\n
-CREATE TABLE IF NOT EXISTS %(database)s.%(table_name)s
-AS SELECT\n%(sql_)s\nFROM  %(database)s.%(table_name)s_tmp;\n\nDROP TABLE IF EXISTS %(database)s.%(table_name)s_tmp;'''% {
+            sql += '''\nINSERT INTO %(database)s.%(table_name)s_tmp VALUES %(csv_rows)s;\n'''% {
               'database': database,
               'table_name': table_name,
               'csv_rows': csv_rows,
+            }
+
+        if dialect == 'impala':
+          # casting from string to boolean is not allowed in impala so string -> int -> bool
+          sql_ = ',\n'.join([
+            '  CAST ( `%(name)s` AS %(type)s ) `%(name)s`' % col if col['type'] != 'boolean' \
+            else '  CAST ( CAST ( `%(name)s` AS TINYINT ) AS boolean ) `%(name)s`' % col for col in columns
+          ])
+
+          sql += '''\nCREATE TABLE IF NOT EXISTS %(database)s.%(table_name)s
+AS SELECT\n%(sql_)s\nFROM  %(database)s.%(table_name)s_tmp;\n\nDROP TABLE IF EXISTS %(database)s.%(table_name)s_tmp;'''% {
+              'database': database,
+              'table_name': table_name,
               'sql_': sql_
             }
 
