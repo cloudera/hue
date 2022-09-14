@@ -3225,6 +3225,10 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
 
       $(window).on('resize', resizeElements);
 
+      document.getElementById('inputfile').onclick = function () {
+        this.value = null;
+      };
+
       document.getElementById('inputfile').onchange = function () {
         upload();
       };
