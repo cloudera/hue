@@ -71,7 +71,7 @@ RUN ./build/env/bin/pip install --no-cache-dir \
   #ksql \
   git+https://github.com/bryanyang0528/ksql-python \
   pydruid \
-  pybigquery \
+  # pybigquery \
   elasticsearch-dbapi \
   pyasn1==0.4.1 \
   # View some parquet files
