@@ -1,0 +1,43 @@
+name: Pronto
+on: [pull_request_target]
+
+jobs:
+  pronto:
+
+    runs-on: ubuntu-latest
+
+    env:
+      # Requires the relevant gems to have a separate group in `Gemfile`
+      # At the time of writing there is no way to only install gems in specific group(s) by specifying the group name(s)
+      BUNDLE_WITHOUT: "default development test"
+      # `MAKE="make --jobs $(nproc)"` is from
+      # https://build.betterup.com/one-weird-trick-that-will-speed-up-your-bundle-install/
+      # Only works for MRI
+      #
+      # Using 4 since https://github.com/ruby/setup-ruby use 4
+      MAKE: "make --jobs 4"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - run: |
+          git fetch --no-tags --prune origin +refs/heads/*:refs/remotes/origin/*
+
+      # If your project only specifies its Ruby version in its
+      # Gemfile, you'll need to specify a version for the
+      # action to use. See documentation for the
+      # ruby/setup-ruby action for details.
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version:  "2.7"
+          # Run `bundle install` with cache when `true`
+          bundler-cache: true
+
+      - name: Setup Avenger Bot
+        run: gem install faraday-retry pronto pronto-goodcheck
+      - name: Run Avenger Bot
+        run: pronto run -f github_status github_pr -c origin/${{ github.base_ref }}
+        env:
+          PRONTO_PULL_REQUEST_ID: ${{ github.event.pull_request.number }}
+          PRONTO_GITHUB_ACCESS_TOKEN: "${{ github.token }}"
