@@ -1,0 +1,2 @@
+eslint_executable: /usr/local/bin/eslint
+cmd_line_opts: '--ext .html,.js,.es6'
