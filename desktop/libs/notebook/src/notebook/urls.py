@@ -27,7 +27,7 @@ else:
 
 # Views
 urlpatterns = [
-  re_path(r'^$', notebook_views.notebook, name='index'),
+  re_path(r'^$', notebook_views.notebook, name='index',
   re_path(r'^notebook/?$', notebook_views.notebook, name='notebook'),
   re_path(r'^notebook_embeddable/?$', notebook_views.notebook_embeddable, name='notebook_embeddable'),
   re_path(r'^notebooks/?$', notebook_views.notebooks, name='notebooks'),
@@ -73,6 +73,8 @@ urlpatterns += [
   re_path(r'^api/optimizer/statement/risk/?$', notebook_api.statement_risk, name='statement_risk'),
   re_path(r'^api/optimizer/statement/compatibility/?$', notebook_api.statement_compatibility, name='statement_compatibility'),
   re_path(r'^api/optimizer/statement/similarity/?$', notebook_api.statement_similarity, name='statement_similarity'),
+  re_path(r'^api/optimizer/statement/similarity_test/?$', notebook_api.statement_similarity, name='similarity_test'),
+  
 ]
 
 # Assist API

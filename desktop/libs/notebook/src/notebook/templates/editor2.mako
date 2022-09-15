@@ -165,6 +165,7 @@ There is no bridge to KO for components using this integration. Example using in
 <script type="text/html" id="doc-search-autocomp-item">
   <a>
     <div>
+      <div> Random Changes </div>
       <strong style="font-size: 14px;" data-bind="html: name"></strong>
       <div style="width: 190px; overflow: hidden; white-space: nowrap; text-overflow:ellipsis; font-size: 12px;" class="muted" data-bind="text: description"></div>
     </div>

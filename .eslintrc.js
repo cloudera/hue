@@ -50,7 +50,9 @@ const hueGlobals = [
   'jest',
   'spyOn',
   'xdescribe',
-  'xit'
+  'xit',
+  'ko',
+  '$'
 ];
 
 const globals = normalGlobals.concat(hueGlobals).reduce((acc, key) => {
