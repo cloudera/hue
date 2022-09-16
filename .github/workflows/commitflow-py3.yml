@@ -1,4 +1,4 @@
-name: Python 3 CI
+name: Python 3.8 CI
 
 on:
   push:
@@ -24,15 +24,6 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Cache pip
-      uses: actions/cache@v2
-      with:
-        # This path is specific to Ubuntu
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('desktop/core/requirements.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-pip-
-          ${{ runner.os }}-
 
     - name: compile
       run: |
@@ -42,6 +33,7 @@ jobs:
         sudo curl -sL https://bootstrap.pypa.io/get-pip.py | sudo python3.8
         sudo apt-get install -y python3-setuptools
         sudo apt-get install -y libncursesw5-dev libgdbm-dev libc6-dev libssl-dev openssl
+        sudo apt-get install -y git
 
         export PYTHON_VER=python3.8
         export ROOT=$PWD
