@@ -77,6 +77,7 @@
 # Global variables
 ###################################
 ROOT := $(realpath .)
+PPC64LE := $(shell uname -m)
 
 include $(ROOT)/Makefile.vars.priv
 
@@ -149,8 +150,13 @@ ifeq ($(PYTHON_VER),python2.7)
 	@$(ENV_PIP) install --upgrade --force-reinstall $(PIP_MODULES)
 	@echo "--- done installing PIP_MODULES in virtual-env"
 else ifeq ($(PYTHON_VER),python3.8)
-	@echo '--- Installing $(REQUIREMENT_FILE) into virtual-env via $(ENV_PIP)'
-	@$(ENV_PIP) install -r $(REQUIREMENT_FILE)
+ifeq ($(PPC64LE),ppc64le)
+	@echo '--- Installing $(REQUIREMENT_PPC64LE_FILE) into virtual-env via $(ENV_PIP)'
+	@ROOT=$(ROOT) $(ENV_PIP) install -r $(REQUIREMENT_PPC64LE_FILE)
+else
+	@echo '--- Installing $(REQUIREMENT_FILE) into virtual-env via $(ENV_PIP) where ROOT is $(ROOT)'
+	@ROOT=$(ROOT) $(ENV_PIP) install -r $(REQUIREMENT_FILE)
+endif
 	@echo '--- Finished $(REQUIREMENT_FILE) into virtual-env'
 	@$(ENV_PIP) install $(NAVOPTAPI_WHL)
 	@echo '--- Finished $(NAVOPTAPI_WHL) into virtual-env'
