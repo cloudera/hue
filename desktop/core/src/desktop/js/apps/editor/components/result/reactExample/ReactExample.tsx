@@ -1,11 +1,16 @@
 'use strict';
 
 import React, { FunctionComponent } from 'react';
+import { Button } from 'antd';
 
-// If importing using "import { Ace } from 'ext/ace'" VSCode typescript will complain
+// This must be .less and not .css
+import 'antd/es/button/style/index.less';
+
+// tsx-files don't have the same baseUrl as other js files so
+// we are using a relative path when importing
 import { Ace } from '../../../../../ext/ace';
 
-import {CURSOR_POSITION_CHANGED_EVENT} from '../../../components/aceEditor/AceLocationHandler';
+import { CURSOR_POSITION_CHANGED_EVENT } from '../../aceEditor/AceLocationHandler';
 import ReactExampleGlobal from '../../../../../reactComponents/ReactExampleGlobal/ReactExampleGlobal';
 import { useHuePubSub } from '../../../../../reactComponents/useHuePubSub';
 import SqlExecutable from '../../../execution/sqlExecutable';
@@ -22,7 +27,7 @@ export interface ReactExampleProps {
 // When we have type definitions and Ace imported using webackpack we should
 // use those types instead of creating our own, e.g. Ace.Position
 interface EditorCursor {
-  position: Ace.Position
+  position: Ace.Position;
 }
 
 const defaultProps = { title: 'Default result title' };
@@ -53,6 +58,9 @@ const ReactExample: FunctionComponent<ReactExampleProps> = ({ title, activeExecu
       <ReactExampleGlobal className="react-example__react-example-global-component">
         I'm a button from the application global component set
       </ReactExampleGlobal>
+      <Button type="primary" onClick={() => console.info('clicked')}>
+        I'm an Antd button
+      </Button>
     </div>
   );
 };
