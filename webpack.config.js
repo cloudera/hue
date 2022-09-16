@@ -15,6 +15,7 @@
 // limitations under the License.
 
 const fs = require('fs');
+const webpack = require('webpack');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const {
   BUNDLES,
@@ -63,6 +64,22 @@ const config = {
         use: ['style-loader', 'css-loader', 'sass-loader']
       },
       {
+        test: /\.less$/i,
+        use: [
+          { loader: "style-loader" },
+          { loader: "css-loader" },
+          {
+              loader: "less-loader",
+              options: {
+                  lessOptions: {
+                      // This is not ideal but required by antd library
+                      javascriptEnabled: true,
+                  }
+              }
+          }          
+        ],
+      },      
+      {
         test: /\.html$/,
         exclude: /node_modules/,
         use: { loader: 'html', options: { interpolater: true, removeComments: false } }
@@ -93,7 +110,9 @@ const config = {
     maxAssetSize: 400 * 1024 // 400kb
   },
   plugins: getPluginConfig(BUNDLES.HUE).concat([
-    new CleanWebpackPlugin([`${__dirname}/desktop/core/src/desktop/static/desktop/js/bundles/hue`])
+    // Needed to wrap antd and prevent it from affecting global styles
+    new webpack.NormalModuleReplacementPlugin( /node_modules\/antd\/lib\/style\/index\.less/, `${__dirname}/desktop/core/static/desktop/less/root-wrapped-antd.less`),
+    new CleanWebpackPlugin([`${__dirname}/desktop/core/src/desktop/static/desktop/js/bundles/hue`]),    
   ]),
   resolve: {
     extensions: ['.json', '.jsx', '.js', '.tsx', '.ts', '.vue'],
