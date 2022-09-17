@@ -77,6 +77,7 @@
 # Global variables
 ###################################
 ROOT := $(realpath .)
+PPC64LE := $(shell uname -m)
 
 include $(ROOT)/Makefile.vars.priv
 
@@ -138,7 +139,11 @@ ifeq ($(PYTHON_VER),python2.7)
 else ifeq ($(PYTHON_VER),python3.8)
 	@$(SYS_PYTHON) -m pip install --upgrade pip
 	@$(SYS_PIP) install virtualenv
-	@virtualenv $(BLD_DIR_ENV)
+	@if [[ "ppc64le" == $(PPC64LE) ]]; then \
+	  $(SYS_PYTHON) -m venv $(BLD_DIR_ENV); \
+	 else \
+	  virtualenv -p $(PYTHON_VER) $(BLD_DIR_ENV); \
+	 fi
 endif
 	@echo "--- Virtual environment $(BLD_DIR_ENV) ready"
 	@touch $@
@@ -149,9 +154,15 @@ ifeq ($(PYTHON_VER),python2.7)
 	@$(ENV_PIP) install --upgrade --force-reinstall $(PIP_MODULES)
 	@echo "--- done installing PIP_MODULES in virtual-env"
 else ifeq ($(PYTHON_VER),python3.8)
-	@echo '--- Installing $(REQUIREMENT_FILE) into virtual-env via $(ENV_PIP)'
-	@$(ENV_PIP) install -r $(REQUIREMENT_FILE)
-	@echo '--- Finished $(REQUIREMENT_FILE) into virtual-env'
+	@if [[ "ppc64le" == $(PPC64LE) ]]; then \
+	  echo '--- Installing $(REQUIREMENT_PPC64LE_FILE) into virtual-env via $(ENV_PIP)'; \
+	  $(ENV_PIP) install -r $(REQUIREMENT_PPC64LE_FILE); \
+	  echo '--- Finished $(REQUIREMENT_PPC64LE_FILE) into virtual-env'; \
+	 else \
+	  echo '--- Installing $(REQUIREMENT_FILE) into virtual-env via $(ENV_PIP)'; \
+	  $(ENV_PIP) install -r $(REQUIREMENT_FILE); \
+	  echo '--- Finished $(REQUIREMENT_FILE) into virtual-env'; \
+         fi
 	@$(ENV_PIP) install $(NAVOPTAPI_WHL)
 	@echo '--- Finished $(NAVOPTAPI_WHL) into virtual-env'
 	@touch $(REQUIREMENT_DOT_FILE)
