@@ -117,6 +117,7 @@ USE_TZ = False
 # Examples: "http://media.lawrence.com/media/", "http://example.com/media/"
 MEDIA_URL = ''
 
+DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880  # Setting this variable to 5MB as sometime request size > 2.5MB (default value)
 
 ############################################################
 # Part 3: Django configuration
