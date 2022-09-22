@@ -32,7 +32,7 @@ describe('deXSS.ts', () => {
   it('should return null when the value is null', () => {
     expect(deXSS(null)).toEqual('null');
   });
-
+  
   it('should remove JS code from a string', () => {
     expect(deXSS('hello <script>alert(123)</script>world')).toEqual('hello world');
   });

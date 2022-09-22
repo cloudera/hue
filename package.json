@@ -64,7 +64,7 @@
     "react-dom": "^18.1.0",
     "regenerator-runtime": "^0.13.3",
     "removeNPMAbsolutePaths": "^1.0.4",
-    "sanitize-html": "^2.1.2",
+    "sanitize-html": "^2.7.2",
     "select2": "3.5.1",
     "selectize": "0.12.6",
     "selectize-plugin-clear": "0.0.3",
