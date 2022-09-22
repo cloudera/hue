@@ -34,7 +34,18 @@ function find_home() {
 }
 
 function install_prerequisite() {
-  export SQLITE3_PATH="$TOOLS_HOME/sqlite/sqlite3"
+  if [[ $1 == "redhat8_ppc" ]]; then
+    export FORCEINSTALL=0
+    export SQLITE3_PATH="$TOOLS_HOME/sqlite/bin/sqlite3"
+    redhat8_ppc_install
+  elif [[ $1 == "redhat7_ppc" ]]; then
+    export FORCEINSTALL=0
+    export SQLITE3_PATH="$TOOLS_HOME/sqlite/bin/sqlite3"
+    redhat7_ppc_install
+    source /opt/rh/rh-nodejs14/enable
+  fi
+
+  export SQLITE3_PATH=${SQLITE3_PATH:-"$TOOLS_HOME/sqlite/sqlite3"}
   check_python_path
   check_sqlite3
   if [[ $1 == "centos7" ]]; then
@@ -52,7 +63,6 @@ function install_prerequisite() {
   elif [[ $1 == "ubuntu20" ]]; then
     ubuntu20_install
   fi
-  ls -lR /usr/local/lib
 
 }
 

@@ -31,6 +31,85 @@ function check_sqlite3() {
   fi
 }
 
+function redhat7_ppc_install() {
+  if [[ $FORCEINSTALL -eq 1 ]]; then
+    # pre-req install
+    sudo -- sh -c 'yum install -y cyrus-sasl-gssapi \
+      cyrus-sasl-plain \
+      java-11-openjdk \
+      java-11-openjdk-devel \
+      java-11-openjdk-headless \
+      krb5-workstation \
+      libpcap \
+      ncurses-devel \
+      nmap-ncat \
+      xmlsec1 \
+      xmlsec1-openssl \
+      unzip'
+    # NODEJS 14 install
+    sudo -- sh -c 'yum install -y rh-nodejs14-runtime-3.6-1.el7.ppc64le.rpm \
+      rh-nodejs14-npm-6.14.15-14.18.2.1.el7.ppc64le.rpm \
+      rh-nodejs14-nodejs-14.18.2-1.el7.ppc64le.rpm'
+    # sqlite3 install
+    sudo TOOLS_HOME=${TOOLS_HOME} -- sh -c 'mkdir -p ${TOOLS_HOME} && \
+      cd ${TOOLS_HOME} && \
+      curl -o sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
+      tar zxvf sqlite-autoconf-3350500.tar.gz && \
+      cd sqlite-autoconf-3350500 && \
+      ./configure --prefix=${TOOLS_HOME}/sqlite && make && make install'
+    export LD_LIBRARY_PATH=${TOOLS_HOME}/sqlite/lib:/usr/local/lib:$LD_LIBRARY_PATH
+    # python3.8 re install for sqlite3 3.35.5 or higher version
+    sudo LD_LIBRARY_PATH=/usr/local/lib:$ORACLE_INSTANTCLIENT19_PATH:$LD_LIBRARY_PATH \
+         LD_RUN_PATH=/usr/local/lib:$ORACLE_INSTANTCLIENT19_PATH:$LD_RUN_PATH \
+         -- sh -c 'curl -o Python-3.8.13.tgz https://www.python.org/ftp/python/3.8.13/Python-3.8.13.tgz && \
+      tar zxvf Python-3.8.13.tgz && \
+      cd Python-3.8.13 && \
+      ./configure --enable-shared --prefix=/opt/cloudera/cm-agent && \
+      make install'
+    # Pip modules install
+    sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install virtualenv virtualenv-make-relocatable'
+  fi
+}
+
+function redhat8_ppc_install() {
+  if [[ $FORCEINSTALL -eq 1 ]]; then
+    # pre-req install
+    sudo -- sh -c 'yum install -y \
+      python38 \
+      python38-libs \
+      python38-devel \
+      python38-numpy \
+      python38-PyMySQL \
+      python38-cryptography \
+      python38-cffi \
+      python38-psycopg2 \
+      python38-Cython \
+      python38-lxml \
+      java-11-openjdk-devel \
+      java-11-openjdk-headless \
+      krb5-workstation \
+      nmap-ncat \
+      xmlsec1 \
+      xmlsec1-openssl \
+      libss \
+      ncurses-devel'
+    # MySQLdb install
+    sudo -- sh -c 'yum install -y python3-mysqlclient'
+    # NODEJS 14 install
+    sudo -- sh -c 'yum install -y nodejs npm'
+    # Pip modules install
+    sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install virtualenv virtualenv-make-relocatable mysqlclient'
+    # sqlite3 install
+    sudo TOOLS_HOME=${TOOLS_HOME} -- sh -c 'mkdir -p ${TOOLS_HOME} && \
+      cd ${TOOLS_HOME} && \
+      curl -o sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
+      tar zxvf sqlite-autoconf-3350500.tar.gz && \
+      cd sqlite-autoconf-3350500 && \
+      ./configure --prefix=${TOOLS_HOME}/sqlite && make && make install'
+    export LD_LIBRARY_PATH=${TOOLS_HOME}/sqlite/lib:/usr/local/lib:$LD_LIBRARY_PATH
+  fi
+}
+
 function sles12_install() {
   if [[ $FORCEINSTALL -eq 1 ]]; then
     # pre-req install
