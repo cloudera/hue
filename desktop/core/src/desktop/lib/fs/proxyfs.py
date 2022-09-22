@@ -194,6 +194,7 @@ class ProxyFS(object):
     return self._get_fs(path).append(path, *args, **kwargs)
 
   def rmtree(self, path, *args, **kwargs):
+
     self._get_fs(path).rmtree(path, *args, **kwargs)
 
   def remove(self, path, skip_trash=False):
