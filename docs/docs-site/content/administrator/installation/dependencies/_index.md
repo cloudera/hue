@@ -152,11 +152,11 @@ This is a verified step-by-step guide on how to get Hue up and running on a fres
 
 3. Install postgres (unless you prefer something else)
 
-   `brew install postgres`
+   `brew install postgresql@14`
 
 4. Start Postgres
 
-   `brew services start postgresql`
+   `brew services start postgresql@14`
 
 5. Create the hue database and set permissions
 
