@@ -1,0 +1,19 @@
+// The Ant Design library modifies the global styles which will affect the UI in Hue
+// in multiple places where not intended. So in order to utilize the components locally
+// without leaking styles we wrap it all in an antd class.
+.antd {
+  /* stylelint-disable no-invalid-position-at-import-rule */
+
+  // We need to reset some global styles from Bootstrap to prevent them from
+  // interfering with the Antd styles
+  @import './reset-globals.less';
+
+  // Import global antd styles
+  @root-entry-name: variable;
+  @import 'node_modules/antd/es/style/core/index.less';
+  @import 'node_modules/antd/es/style/themes/default.less';
+
+  // Import the styles for the actual components used
+  @import 'node_modules/antd/es/button/style/index.less';
+  /* stylelint-enable no-invalid-position-at-import-rule */
+}
