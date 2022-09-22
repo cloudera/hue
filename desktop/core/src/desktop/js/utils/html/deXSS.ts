@@ -16,15 +16,14 @@
 
 import sanitizeHtml from 'sanitize-html';
 
-  const deXSS = (str?: boolean | string | number | null): string => {
-    if (str === null) {
-      return 'null';
-    }
-    if (typeof str !== 'undefined') {
-      return sanitizeHtml(str as string) || '';
-    }
-    return '';
+const deXSS = (str?: boolean | string | number | null): string => {
+  if (str === null) {
+    return 'null';
   }
-
+  if (typeof str !== 'undefined') {
+    return sanitizeHtml(str as string) || '';
+  }
+  return '';
+};
 
 export default deXSS;
