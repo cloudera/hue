@@ -191,7 +191,7 @@ export interface AutocompleteParseResult {
 }
 
 export interface SqlStatementsParser {
-  parse(text: string): ParsedSqlStatement;
+  parse(text: string): ParsedSqlStatement[];
 }
 
 export interface AutocompleteParser {
