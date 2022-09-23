@@ -2,6 +2,8 @@
 
 import React, { useState } from 'react';
 
+import { i18nReact } from '../../utils/i18nReact';
+
 import './ReactExampleGlobal.scss';
 
 export interface ReactExampleGlobalProps {
@@ -12,19 +14,18 @@ export interface ReactExampleGlobalProps {
   children?: React.ReactNode | React.ReactNode[];
 }
 
-const defaultProps = {
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  onClick: () => {},
-  version: 'xxx'
-};
-
 const ReactExampleGlobal = ({
   onClick,
   children,
-  version,
+  version = '1',
   myObj
 }: ReactExampleGlobalProps): JSX.Element => {
   const [isClicked, setIsClicked] = useState(false);
+
+  // We use the translation hook with the built in suspence,
+  // meaning that this component won't render until the language file
+  // have been loaded.
+  const { t } = i18nReact.useTranslation();
 
   return (
     <button
@@ -36,11 +37,9 @@ const ReactExampleGlobal = ({
         console.info(`ReactExampleGlobal clicked  ${version} ${myObj?.id}`);
       }}
     >
-      ReactExampleGlobal - {children ?? 'Like me'}
+      ReactExampleGlobal - {children ?? t('Yes')}
     </button>
   );
 };
-
-ReactExampleGlobal.defaultProps = defaultProps;
 
 export default ReactExampleGlobal;
