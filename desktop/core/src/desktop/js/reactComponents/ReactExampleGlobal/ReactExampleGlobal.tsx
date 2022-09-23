@@ -5,19 +5,25 @@ import React, { useState } from 'react';
 import './ReactExampleGlobal.scss';
 
 export interface ReactExampleGlobalProps {
-  onClick(e: React.MouseEvent): any;
-  version: string;
-  myObj?: any;
+  onClick?(e: React.MouseEvent): void;
+  version?: string;
+  myObj?: { id: string };
   className?: string;
   children?: React.ReactNode | React.ReactNode[];
 }
 
 const defaultProps = {
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   onClick: () => {},
   version: 'xxx'
 };
 
-const ReactExampleGlobal = ({ onClick, children, version, myObj }: ReactExampleGlobalProps) => {
+const ReactExampleGlobal = ({
+  onClick,
+  children,
+  version,
+  myObj
+}: ReactExampleGlobalProps): JSX.Element => {
   const [isClicked, setIsClicked] = useState(false);
 
   return (
@@ -25,7 +31,7 @@ const ReactExampleGlobal = ({ onClick, children, version, myObj }: ReactExampleG
       className="react-example-global"
       disabled={isClicked}
       onClick={e => {
-        onClick(e);
+        onClick && onClick(e);
         setIsClicked(true);
         console.info(`ReactExampleGlobal clicked  ${version} ${myObj?.id}`);
       }}

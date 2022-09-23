@@ -5,11 +5,11 @@ import huePubSub from '../utils/huePubSub';
 describe('useHuePubSub', () => {
   const originalSubscribe = huePubSub.subscribe;
   let publishCallback;
-  let remove = jest.fn();
+  const remove = jest.fn();
 
   const subscribeMock = jest.fn().mockImplementation((topic, callback) => {
     publishCallback = callback;
-    return { remove }
+    return { remove };
   });
 
   beforeAll(() => {
@@ -31,7 +31,7 @@ describe('useHuePubSub', () => {
     expect(huePubSub.subscribe).toHaveBeenCalledWith('my.test.topic', expect.anything(), undefined);
     expect(huePubSub.subscribe).toHaveBeenCalledTimes(1);
     expect(remove).not.toHaveBeenCalled();
-    
+
     rerender();
     expect(remove).toHaveBeenCalled();
     expect(huePubSub.subscribe).toHaveBeenCalledTimes(2);
