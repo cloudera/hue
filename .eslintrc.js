@@ -112,7 +112,7 @@ module.exports = {
       }
     },
     {
-      files: ['*.ts'],
+      files: ['*.ts', '*.tsx'],
       extends: ['plugin:@typescript-eslint/recommended'],
       parser: '@typescript-eslint/parser',
       plugins: ['jest', '@typescript-eslint'],
