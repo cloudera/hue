@@ -36,6 +36,7 @@
   from metastore.views import has_write_access
   from notebook.conf import ENABLE_NOTEBOOK_2, ENABLE_QUERY_ANALYSIS, ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_SQL_INDEXER, \
       get_ordered_interpreters, SHOW_NOTEBOOKS
+  from django.utils.translation import get_language
 
   if sys.version_info[0] > 2:
     from django.utils.translation import gettext as _
@@ -632,6 +633,7 @@
     'Yes': '${ _('Yes') }',
     'Yes, delete': '${ _('Yes, delete') }',
   };
+  window.HUE_LANG = '${get_language()}';
 
   window.STATIC_URLS = {
     'desktop/art/cloudera-data-warehouse-3.svg': '${ static('desktop/art/cloudera-data-warehouse-3.svg') }',
