@@ -282,6 +282,7 @@ function redhat8_install() {
 function ubuntu18_install() {
     if [[ $FORCEINSTALL -eq 1 ]]; then
     # pre-req install
+    sudo -- sh -c 'apt-get update'
     sudo -- sh -c 'DEBIAN_FRONTEND=noninteractive apt -qq -y install  \
         krb5-user \
         krb5-kdc \
