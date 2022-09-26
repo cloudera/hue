@@ -14,15 +14,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import 'regenerator-runtime/runtime';
+import React, { SVGProps } from 'react';
 
-import HueIcons from 'components/icons/vue/HueIcons.vue';
-import { isDefined, wrap } from 'vue/webComponentWrap';
+const PageNextIcon = (props: SVGProps<SVGSVGElement>): JSX.Element => (
+  <svg viewBox="0 0 24 24" fill="none" width="1em" height="1em" {...props}>
+    <path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M17 12l-8.678 8L7 18.515 14.069 12 7 5.484 8.322 4 17 12z"
+      fill="currentColor"
+    />
+  </svg>
+);
 
-const NAME = 'hue-icons';
-
-wrap(NAME, HueIcons);
-
-const hueIconsDefined = async (): Promise<void> => await isDefined(NAME);
-
-export default hueIconsDefined;
+export default PageNextIcon;

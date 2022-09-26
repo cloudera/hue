@@ -14,15 +14,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import 'regenerator-runtime/runtime';
+import React, { SVGProps } from 'react';
 
-import HueIcons from 'components/icons/vue/HueIcons.vue';
-import { isDefined, wrap } from 'vue/webComponentWrap';
+const CheckmarkIcon = (props: SVGProps<SVGSVGElement>): JSX.Element => (
+  <svg viewBox="0 0 24 24" fill="none" width="1em" height="1em" {...props}>
+    <path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M9.675 15.899l-4.262-4.262L4 13.052l5.656 5.657 11.318-11.31L19.574 6l-9.899 9.899z"
+      fill="currentColor"
+    />
+  </svg>
+);
 
-const NAME = 'hue-icons';
-
-wrap(NAME, HueIcons);
-
-const hueIconsDefined = async (): Promise<void> => await isDefined(NAME);
-
-export default hueIconsDefined;
+export default CheckmarkIcon;
