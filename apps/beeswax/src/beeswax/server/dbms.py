@@ -462,13 +462,24 @@ class HiveServer2Dbms(object):
       self.close(handle)
 
       # We get back: database | tableName | isTemporary
-      return [{
-          'name': row[1],
-          'type': 'VIEW' if row[2] else 'TABLE',
-          'comment': ''
-        }
-        for row in result.rows()
-      ]
+      try:
+        return [{
+            'name': row[1],
+            'type': 'VIEW' if row[2] else 'TABLE',
+            'comment': ''
+          }
+          for row in result.rows()
+        ]
+      except:
+        tables = result.data_table.results.results.columns[0].stringVal.values
+        # We get back: database | tableName | isTemporary
+        return [{
+            'name': table,
+            'type': 'TABLE',
+            'comment': ''
+          }
+          for table in tables
+        ]   
     else:
       return []
 

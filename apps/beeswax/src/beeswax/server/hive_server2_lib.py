@@ -379,6 +379,7 @@ class HiveServerTColumnValue2(object):
 
 class HiveServerDataTable(DataTable):
   def __init__(self, results, schema, operation_handle, query_server, session=None):
+    self.results = results
     self.schema = schema and schema.schema
     self.row_set = HiveServerTRowSet(results.results, schema)
     self.operation_handle = operation_handle
