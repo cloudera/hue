@@ -49,8 +49,8 @@
   import { defineComponent } from 'vue';
 
   import './Spinner.scss';
-  import SpinnerLargeIcon from './icons/SpinnerLargeIcon';
-  import SpinnerSmallIcon from './icons/SpinnerSmallIcon';
+  import SpinnerLargeIcon from './icons/vue/SpinnerLargeIcon';
+  import SpinnerSmallIcon from './icons/vue/SpinnerSmallIcon';
 
   export default defineComponent({
     name: 'Spinner',
