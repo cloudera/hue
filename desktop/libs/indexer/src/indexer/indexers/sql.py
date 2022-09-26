@@ -84,6 +84,8 @@ class SQLIndexer(object):
 
     source_path = urllib_unquote(source['path'])
     load_data = destination['importData']
+    isIceberg = destination['isIceberg']
+
     external = not destination['useDefaultLocation']
     external_path = urllib_unquote(destination['nonDefaultLocation'])
 
@@ -136,7 +138,7 @@ class SQLIndexer(object):
     "escapeChar"    = "\\\\"
     ''' % source['format']
 
-    use_temp_table = table_format in ('parquet', 'orc', 'kudu') or is_transactional
+    use_temp_table = table_format in ('parquet', 'orc', 'kudu') or is_transactional or isIceberg
     if use_temp_table: # We'll be using a temp table to load data
       if load_data:
         table_name, final_table_name = 'hue__tmp_%s' % table_name, table_name
@@ -247,7 +249,13 @@ class SQLIndexer(object):
         }
       else:
         columns_list = ['*']
-        extra_create_properties = 'STORED AS %(file_format)s' % {'file_format': file_format}
+        extra_create_properties = ''
+        if isIceberg:
+          if source_type == 'hive':
+            extra_create_properties = "STORED BY ICEBERG\n"
+          elif source_type == 'impala':
+            file_format = 'ICEBERG'
+        extra_create_properties += 'STORED AS %(file_format)s' % {'file_format': file_format}
         if is_transactional:
           extra_create_properties += "\nTBLPROPERTIES('transactional'='true', 'transactional_properties'='%s')" % \
               default_transactional_type
