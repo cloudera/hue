@@ -24,7 +24,7 @@
 
   import DropdownMenuButton from './dropdown/DropdownMenuButton.vue';
   import DropdownMenu from './dropdown/DropdownMenu.vue';
-  import ConnectorIcon from './icons/ConnectorIcon';
+  import ConnectorIcon from './icons/vue/ConnectorIcon';
   import { SqlContext } from './SqlContextSelector';
   import SubscriptionTracker from './utils/SubscriptionTracker';
   import { EditorInterpreter } from 'config/types';

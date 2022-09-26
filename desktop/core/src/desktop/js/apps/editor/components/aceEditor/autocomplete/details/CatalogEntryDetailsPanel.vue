@@ -66,10 +66,10 @@
   import { CancellablePromise } from 'api/cancellablePromise';
   import DataCatalogEntry from 'catalog/DataCatalogEntry';
   import Spinner from 'components/Spinner.vue';
-  import ColumnIcon from 'components/icons/ColumnIcon';
-  import DatabaseIcon from 'components/icons/DatabaseIcon';
-  import TableIcon from 'components/icons/TableIcon';
-  import ViewIcon from 'components/icons/ViewIcon';
+  import ColumnIcon from 'components/icons/vue/ColumnIcon';
+  import DatabaseIcon from 'components/icons/vue/DatabaseIcon';
+  import TableIcon from 'components/icons/vue/TableIcon';
+  import ViewIcon from 'components/icons/vue/ViewIcon';
   import I18n from 'utils/i18n';
 
   const COMMENT_LOAD_DELAY = 1500;
