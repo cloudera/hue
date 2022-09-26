@@ -28,7 +28,7 @@
 
   import './AssistPanel.scss';
   import SqlAssistPanel from './SqlAssistPanel.vue';
-  import HueIcons from 'components/icons/HueIcons.vue';
+  import HueIcons from 'components/icons/vue/HueIcons.vue';
 
   export default defineComponent({
     name: 'AssistPanel',
