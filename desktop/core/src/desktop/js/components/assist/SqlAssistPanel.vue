@@ -70,10 +70,10 @@
   import './SqlAssistPanel.scss';
   import SubscriptionTracker from '../utils/SubscriptionTracker';
   import SqlAssistEntry from './SqlAssistEntry.vue';
-  import ChevronLeftIcon from '../icons/ChevronLeftIcon';
-  import ConnectorIcon from '../icons/ConnectorIcon';
+  import ChevronLeftIcon from '../icons/vue/ChevronLeftIcon';
+  import ConnectorIcon from '../icons/vue/ConnectorIcon';
   import Spinner from '../Spinner.vue';
-  import DatabaseIcon from '../icons/DatabaseIcon';
+  import DatabaseIcon from '../icons/vue/DatabaseIcon';
   import dataCatalog from 'catalog/dataCatalog';
   import DataCatalogEntry from 'catalog/DataCatalogEntry';
   import { SqlContext } from 'components/SqlContextSelector';
