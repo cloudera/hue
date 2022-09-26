@@ -18,7 +18,7 @@ import { EXECUTE_ACTIVE_EXECUTABLE_TOPIC } from 'apps/editor/components/events';
 import $ from 'jquery';
 import * as ko from 'knockout';
 import komapping from 'knockout.mapping';
-import { markdown } from 'markdown';
+import snarkdown from 'snarkdown';
 
 import 'apps/editor/components/ko.executableLogs';
 import 'apps/editor/components/ko.snippetEditorActions';
@@ -36,6 +36,7 @@ import './components/variableSubstitution/VariableSubstitutionKoBridge.vue';
 
 import AceAutocompleteWrapper from 'apps/notebook/aceAutocompleteWrapper';
 import apiHelper from 'api/apiHelper';
+import deXSS from 'utils/html/deXSS';
 import Executor from 'apps/editor/execution/executor';
 import hueAnalytics from 'utils/hueAnalytics';
 import huePubSub from 'utils/huePubSub';
@@ -1050,9 +1051,11 @@ export default class Snippet {
   }
 
   renderMarkdown() {
-    return this.statement_raw().replace(/([^$]*)([$]+[^$]*[$]+)?/g, (a, textRepl, code) => {
-      return markdown.toHTML(textRepl).replace(/^<p>|<\/p>$/g, '') + (code ? code : '');
-    });
+    return this.statement_raw().replace(
+      /([^$]*)([$]+[^$]*[$]+)?/g,
+      (a, textRepl, code) =>
+        deXSS(snarkdown(textRepl)).replace(/^<p>|<\/p>$/g, '') + (code ? code : '')
+    );
   }
 
   startLongOperationTimeout() {
