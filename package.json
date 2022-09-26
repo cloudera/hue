@@ -33,7 +33,6 @@
     "@gethue/sql-formatter": "4.0.3",
     "antd": "^4.23.1",
     "axios": "0.24.0",
-    "babel-cli": "^6.26.0",
     "babel-preset-react-app": "^3.1.2",
     "clipboard": "1.7.1",
     "core-js": "3.19.1",
@@ -75,6 +74,7 @@
     "vue3-datepicker": "^0.2.4"
   },
   "devDependencies": {
+    "@babel/cli": "7.18.10",
     "@babel/core": "7.14.3",
     "@babel/eslint-parser": "7.16.3",
     "@babel/node": "7.14.2",
