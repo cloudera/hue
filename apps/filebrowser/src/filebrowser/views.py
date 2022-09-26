@@ -47,6 +47,7 @@ from django.utils.html import escape
 from aws.s3.s3fs import S3FileSystemException, S3ListAllBucketsException, get_s3_home_directory
 from desktop import appmanager
 from desktop.auth.backend import is_admin
+from desktop.conf import RAZ
 from desktop.lib import fsmanager
 from desktop.lib import i18n
 from desktop.lib.conf import coerce_bool
@@ -549,8 +550,19 @@ def listdir_paged(request, path):
     page = None
     shown_stats = []
 
-  # Include parent dir always as second option, unless at filesystem root.
-  if not request.fs.isroot(path):
+  logger.info('in listdir_paged ----->')
+
+  # Include same dir always as first option to see stats of the current folder.
+  current_stat = request.fs.stats(path)
+  # The 'path' field would be absolute, but we want its basename to be
+  # actually '.' for display purposes. Encode it since _massage_stats expects byte strings.
+  current_stat.path = path
+  current_stat.name = "."
+  shown_stats.insert(0, current_stat)
+
+  # Include parent dir always as second option, unless at filesystem root or when RAZ is enabled.
+  if not (request.fs.isroot(path) or RAZ.IS_ENABLED.get()):
+    logger.info('inside if condition')
     parent_path = request.fs.parent_path(path)
     parent_stat = request.fs.stats(parent_path)
     # The 'path' field would be absolute, but we want its basename to be
@@ -559,13 +571,8 @@ def listdir_paged(request, path):
     parent_stat['name'] = ".."
     shown_stats.insert(0, parent_stat)
 
-  # Include same dir always as first option to see stats of the current folder
-  current_stat = request.fs.stats(path)
-  # The 'path' field would be absolute, but we want its basename to be
-  # actually '.' for display purposes. Encode it since _massage_stats expects byte strings.
-  current_stat.path = path
-  current_stat.name = "."
-  shown_stats.insert(1, current_stat)
+  logger.info("printing shown stats --------------------------------")
+  logger.info(str(shown_stats))
 
   if page:
     page.object_list = [_massage_stats(request, stat_absolute_path(path, s)) for s in shown_stats]
