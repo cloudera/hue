@@ -40,7 +40,7 @@ from desktop.lib.rest.raz_http_client import RazHttpClient
 import azure.abfs.__init__ as Init_ABFS
 from azure.abfs.abfsfile import ABFSFile
 from azure.abfs.abfsstats import ABFSStat
-from azure.conf import PERMISSION_ACTION_ABFS
+from azure.conf import PERMISSION_ACTION_ABFS, is_raz_abfs
 
 if sys.version_info[0] > 2:
   import urllib.request, urllib.error
@@ -359,8 +359,17 @@ class ABFS(object):
     if data:
       self._writedata(path, data, len(data))
 
-  def create_home_dir(self, home_path=None):
-    LOG.info('Create home directory is not available for Azure filesystem')
+  def create_home_dir(self, home_path):
+    # When ABFS raz is enabled, try to create user home dir for REMOTE_STORAGE_HOME path
+    if is_raz_abfs():
+      LOG.debug('Attempting to create user directory for path: %s' % home_path)
+      try:
+        if not self.exists(home_path):
+          self.mkdir(home_path)
+      except Exception as e:
+        LOG.exception('Failed to create user home directory for path %s with error: %s' % (home_path, str(e)))
+    else:
+      LOG.info('Create home directory is not available for Azure filesystem')
 
   def _create_path(self, path, params=None, headers=None, overwrite=False):
     """
