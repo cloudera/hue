@@ -198,7 +198,7 @@ class RazClient(object):
     })
 
 
-  def _handle_relative_path(self, method, params, resource_path, relative_path,):
+  def _handle_relative_path(self, method, params, resource_path, relative_path):
     if len(resource_path) == 2:
       relative_path += resource_path[1]
 
