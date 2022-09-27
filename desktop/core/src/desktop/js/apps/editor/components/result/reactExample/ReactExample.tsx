@@ -1,7 +1,7 @@
 'use strict';
 
-import React, { FunctionComponent } from 'react';
-import { Button } from 'antd';
+import React, { FunctionComponent, useState } from 'react';
+import { Button, Modal } from 'antd';
 
 // tsx-files don't have the same baseUrl as other js files so
 // we are using a relative path when importing
@@ -40,6 +40,20 @@ const ReactExample: FunctionComponent<ReactExampleProps> = ({ title, activeExecu
   const position =
     editorCursor?.position !== undefined ? JSON.stringify(editorCursor.position) : 'not available';
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const showModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleOk = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
+
   return (
     // The 'antd' class is added to the root element since we want it to apply the correct
     // "global" styling to its antd sub components, e.g. the antd Button.
@@ -47,6 +61,10 @@ const ReactExample: FunctionComponent<ReactExampleProps> = ({ title, activeExecu
     // 'root-wrapped-antd.less'.
     <div className="react-example antd">
       <h1 className="react-example__title">{title}</h1>
+      <Button type="primary" onClick={showModal}>
+        Open Modal
+      </Button>
+
       <p className="react-example__description">
         I'm an Editor specific react component containing subcomponents. The dynamic id that I'm
         getting from a Knockout observable is {id}.
@@ -62,6 +80,11 @@ const ReactExample: FunctionComponent<ReactExampleProps> = ({ title, activeExecu
       <Button type="primary" onClick={() => console.info('clicked')}>
         I'm an Antd button
       </Button>
+      <Modal title="Basic Modal" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
+        <p>Some contents...</p>
+        <p>Some contents...</p>
+        <p>Some contents...</p>
+      </Modal>
     </div>
   );
 };
