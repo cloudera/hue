@@ -8,7 +8,6 @@ import java.util.List;
 import com.cloudera.hue.debugBundler.source.HiveStudioArtifacts;
 import com.cloudera.hue.debugBundler.source.LlapDeamonLogsArtifacts;
 import com.cloudera.hue.debugBundler.source.LlapDeamonLogsListArtifacts;
-import com.cloudera.hue.debugBundler.source.SysLogsArtifacts;
 import com.cloudera.hue.debugBundler.source.TezAMInfoArtifacts;
 import com.cloudera.hue.debugBundler.source.TezAMLogsArtifacts;
 import com.cloudera.hue.debugBundler.source.TezAMLogsListArtifacts;
@@ -21,8 +20,6 @@ public enum ArtifactSourceType implements ArtifactSourceCreator {
 
   // From Hive Studio - Needs Query ID
   HIVE_STUDIO(HiveStudioArtifacts.class),
-
-  SYS_LOG(SysLogsArtifacts.class),
 
   TEZ_HDFS(TezHDFSArtifacts.class),
 

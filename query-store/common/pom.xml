@@ -94,10 +94,6 @@
       <artifactId>hadoop-cloud-storage</artifactId>
       <scope>runtime</scope>
     </dependency>
-    <dependency>
-      <groupId>org.apache.hive</groupId>
-      <artifactId>hive-jdbc</artifactId>
-    </dependency>
   </dependencies>
 
 </project>

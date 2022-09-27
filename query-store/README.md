@@ -29,7 +29,6 @@ There are other commands like jvstop and jvstart to only start and stop the quer
 
 * Change fs.defaultFS in conf/core-site.xml to point to the correct hdfs server. Affects eventprocessor source and download logs.
 * Change yarn.resourcemanager.webapp.address and yarn.timeline-service.webapp.address in conf/yarn-site.xml to point to correct RM and timeline address. Affects download logs.
-* If we have to test download logs via hive set hue.query-processor.debug-bundler.logs-source to "k8s" and set hue.query-processor.hive-jdbc-url to correct jdbc url in conf/hue-query-processor.json.
 
 This will work only with non secure cluster. For secure cluster, you have to get the core-site.xml from the cluster and setup kerberos and configure das with correct keytabs.
 
