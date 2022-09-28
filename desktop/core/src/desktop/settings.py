@@ -803,6 +803,8 @@ MODULES_TO_PATCH = (
 
 if sys.version_info[0] > 2:
   MIDDLEWARE.append('axes.middleware.AxesMiddleware')  # AxesMiddleware should be the last middleware in the MIDDLEWARE list.
+else:
+  MIDDLEWARE.remove('desktop.middleware.MultipleProxyMiddleware')
 
 try:
   import hashlib
