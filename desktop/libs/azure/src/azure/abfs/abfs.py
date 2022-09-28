@@ -366,6 +366,8 @@ class ABFS(object):
       try:
         if not self.exists(home_path):
           self.mkdir(home_path)
+        else:
+          LOG.debug('Skipping user directory creation, the path already exists: %s' % home_path)
       except Exception as e:
         LOG.exception('Failed to create user home directory for path %s with error: %s' % (home_path, str(e)))
     else:
