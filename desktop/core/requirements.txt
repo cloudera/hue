@@ -2,7 +2,6 @@ apache-ranger==0.0.3
 requests-gssapi==1.2.3
 asn1crypto==0.24.0
 avro-python3==1.8.2
-#@TODO@ We need to upgrade to Babel==2.9.1
 Babel==2.9.1
 celery[redis]==5.2.2
 cffi==1.15.0
