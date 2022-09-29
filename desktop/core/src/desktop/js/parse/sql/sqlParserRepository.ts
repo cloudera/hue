@@ -14,21 +14,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/* eslint-disable */
 import { AutocompleteParser, SqlParserProvider, SyntaxParser } from 'parse/types';
 
-/**
- * AUTOCOMPLETE_MODULES and SYNTAX_MODULES are generated, do not edit manually, see tools/jison/generateParsers.js
- */
 const AUTOCOMPLETE_MODULES = {
-  calcite: () => import(/* webpackChunkName: "calcite-parser" */ './calcite/calciteAutocompleteParser'),
-  dasksql: () => import(/* webpackChunkName: "dasksql-parser" */ './dasksql/dasksqlAutocompleteParser'),
+  calcite: () =>
+    import(/* webpackChunkName: "calcite-parser" */ './calcite/calciteAutocompleteParser'),
+  dasksql: () =>
+    import(/* webpackChunkName: "dasksql-parser" */ './dasksql/dasksqlAutocompleteParser'),
   flink: () => import(/* webpackChunkName: "flink-parser" */ './flink/flinkAutocompleteParser'),
-  generic: () => import(/* webpackChunkName: "generic-parser" */ './generic/genericAutocompleteParser'),
+  generic: () =>
+    import(/* webpackChunkName: "generic-parser" */ './generic/genericAutocompleteParser'),
   hive: () => import(/* webpackChunkName: "hive-parser" */ './hive/hiveAutocompleteParser'),
   impala: () => import(/* webpackChunkName: "impala-parser" */ './impala/impalaAutocompleteParser'),
   ksql: () => import(/* webpackChunkName: "ksql-parser" */ './ksql/ksqlAutocompleteParser'),
-  phoenix: () => import(/* webpackChunkName: "phoenix-parser" */ './phoenix/phoenixAutocompleteParser'),
+  phoenix: () =>
+    import(/* webpackChunkName: "phoenix-parser" */ './phoenix/phoenixAutocompleteParser'),
   presto: () => import(/* webpackChunkName: "presto-parser" */ './presto/prestoAutocompleteParser')
 };
 const SYNTAX_MODULES = {
@@ -42,7 +42,6 @@ const SYNTAX_MODULES = {
   phoenix: () => import(/* webpackChunkName: "phoenix-parser" */ './phoenix/phoenixSyntaxParser'),
   presto: () => import(/* webpackChunkName: "presto-parser" */ './presto/prestoSyntaxParser')
 };
-/* eslint-enable */
 
 export class SqlParserRepository implements SqlParserProvider {
   modulePromises: { [dialect: string]: Promise<AutocompleteParser | SyntaxParser> } = {};
