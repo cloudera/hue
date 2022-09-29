@@ -1,5 +1,4 @@
 import React from 'react';
-import './FileChooserModal.scss';
 import Modal from 'antd/lib/modal/Modal';
 
 interface FileProps {
