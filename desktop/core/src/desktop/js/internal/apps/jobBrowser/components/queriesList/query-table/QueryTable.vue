@@ -55,6 +55,7 @@
         </hue-button>
         <QueryKillButton :queries="selectedQueries" @killed="reload()" />
         <hue-button @click="searchQueries">
+          <em class="fa fa-refresh" />
           {{ I18n('Refresh') }}
         </hue-button>
       </div>
@@ -408,7 +409,7 @@
       .query-table-actions-right {
         display: inline-block;
         position: absolute;
-        right: 40px;
+        right: 44px;
       }
     }
 

@@ -20,16 +20,25 @@
   <div>
     <div>
       <div class="buttons-container">
-        <hue-button @click="showQueries">Queries</hue-button>
-        <QueryKillButton :queries="[query]" @killed="$emit('reload')" />
-        <a
-          :href="`${HUE_BASE_URL}/jobbrowser/query-store/data-bundle/${query.queryId}`"
-          target="_blank"
-          download
-          class="btn btn-outline-primary download-link"
-        >
-          Download
-        </a>
+        <hue-button @click="showQueries" borderless>
+          <em class="fa fa-chevron-left" />
+          Queries
+        </hue-button>
+        <div class="buttons-right">
+          <a
+            :href="`${HUE_BASE_URL}/jobbrowser/query-store/data-bundle/${query.queryId}`"
+            target="_blank"
+            download
+            class="btn btn-outline-primary download-link"
+          >
+            Download
+          </a>
+          <QueryKillButton :queries="[query]" @killed="$emit('reload')" />
+          <hue-button @click="$emit('reload')">
+            <em class="fa fa-refresh" />
+            {{ I18n('Refresh') }}
+          </hue-button>
+        </div>
       </div>
 
       <QueryInfoTop :query="query" />
@@ -117,6 +126,8 @@
   import { Query, Dag } from '../index';
   import { hueWindow } from 'types/types';
 
+  import I18n from 'utils/i18n';
+
   export default defineComponent({
     components: {
       Tab,
@@ -160,6 +171,10 @@
       hasDiagnostics(): boolean {
         return this.query.dags.some((dag: Dag) => dag.dagDetails.diagnostics);
       }
+    },
+
+    methods: {
+      I18n
     }
   });
 </script>
@@ -170,8 +185,16 @@
 
   .buttons-container {
     margin-bottom: 20px;
-    .hue-btn {
-      margin-right: 5px;
+    position: relative;
+
+    .buttons-right {
+      position: absolute;
+      right: 0px;
+      top: 0px;
+
+      & > * {
+        margin-left: 5px;
+      }
     }
   }
 
