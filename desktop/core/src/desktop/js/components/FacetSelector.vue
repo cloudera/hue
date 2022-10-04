@@ -147,28 +147,25 @@
     },
 
     created() {
-      this.$watch(
-        () => this.facet.values,
-        (): void => {
-          const newValues = this.facet.values.map(val => val.key);
-          if (!this.lastKnownValues) {
-            // Select all initially
-            this.selectedValues = newValues;
-            this.previousSelection = newValues;
-          } else {
-            // Keep previous selection on change
-            const selected = new Set(this.selectedValues);
+      this.$watch('facet.values.length', (): void => {
+        const newValues = this.facet.values.map(val => val.key);
+        if (!this.lastKnownValues) {
+          // Select all initially
+          this.selectedValues = newValues;
+          this.previousSelection = newValues;
+        } else {
+          // Keep previous selection on change
+          const selected = new Set(this.selectedValues);
 
-            // Select any new values that might have appeared
-            const oldValues = new Set(this.lastKnownValues);
+          // Select any new values that might have appeared
+          const oldValues = new Set(this.lastKnownValues);
 
-            this.selectedValues = newValues.filter(
-              newValue => selected.has(newValue) || !oldValues.has(newValue)
-            );
-          }
-          this.lastKnownValues = newValues;
+          this.selectedValues = newValues.filter(
+            newValue => selected.has(newValue) || !oldValues.has(newValue)
+          );
         }
-      );
+        this.lastKnownValues = newValues;
+      });
     },
 
     methods: {
