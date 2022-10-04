@@ -44,9 +44,9 @@
         />
         <date-range-picker ref="rangePicker" @date-range-changed="timeRangeChanged" />
         <hue-link class="clear-link" @click="clearSearch">{{ I18n('Clear All') }}</hue-link>
-        <hue-link class="columns-link" @click="toggleColumnSelector">
+        <!-- <hue-link class="columns-link" @click="toggleColumnSelector">
           {{ I18n('Columns') }}
-        </hue-link>
+        </hue-link> -->
       </div>
 
       <div class="query-table-actions-right">
@@ -406,8 +406,9 @@
       }
 
       .query-table-actions-right {
-        float: right;
         display: inline-block;
+        position: absolute;
+        right: 40px;
       }
     }
 
