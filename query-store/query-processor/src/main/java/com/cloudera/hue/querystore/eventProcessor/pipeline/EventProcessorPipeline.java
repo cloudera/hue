@@ -46,7 +46,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class EventProcessorPipeline<T extends MessageLite> {
   public static final ConfVar<Long> FOLDER_SCAN_DELAY_MILLIS =
-      new ConfVar<>("hue.query-processor.event-pipeline.folder-scan-delay-millis", 2000L); // 2 seconds
+      new ConfVar<>("hue.query-processor.event-pipeline.folder-scan-delay-millis", 5 * 60 * 1000l); // 5 minutes
   public static final ConfVar<Long> AUTO_CLOSE_DELAY_MILLIS =
       new ConfVar<>("hue.query-processor.event-pipeline.autoclose-delay-millis", 4 * 24 * 3600 * 1000l); // 4 days
   public static final ConfVar<Long> HDFS_SYNC_WAIT_TIME_MILLIS =
