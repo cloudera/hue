@@ -82,11 +82,11 @@ export HUE_WEBPACK_CONFIG='webpack.config.internal.js'
 export PYTHON_H=$PYTHON38_PATH/include/python3.8/Python.h
 export PYTHON_VER=python3.8
 export SYS_PYTHON=$PYTHON38_PATH/bin/python3.8
-export SQLITE3_PATH="${TOOLS_HOME}/sqlite/sqlite3"
+export SQLITE3_PATH=${SQLITE3_PATH:="${TOOLS_HOME}/sqlite/sqlite3"}
 export ORACLE_INSTANTCLIENT19_PATH="/opt/toolchain/instantclient_19_15"
 export LD_LIBRARY_PATH=/usr/local/lib:$ORACLE_INSTANTCLIENT19_PATH:$LD_LIBRARY_PATH
 export LD_RUN_PATH=/usr/local/lib:$ORACLE_INSTANTCLIENT19_PATH:$LD_RUN_PATH
-export PATH=$PYTHON38_PATH/bin:${TOOLS_HOME}/sqlite:/usr/bin:$PATH
+export PATH=$HOME/.local/bin:$PYTHON38_PATH/bin:${TOOLS_HOME}/sqlite:/usr/bin:$PATH
 
 HUE_SRC=$(realpath $WORK_DIR/../..)
 export ROOT=$HUE_SRC
