@@ -141,9 +141,8 @@ else ifeq ($(PYTHON_VER),python3.8)
 	@$(SYS_PIP) install virtualenv
 	@if [[ "ppc64le" == $(PPC64LE) ]]; then \
 	  $(SYS_PYTHON) -m venv $(BLD_DIR_ENV); \
-	 else \
-	  virtualenv -p $(PYTHON_VER) $(BLD_DIR_ENV); \
 	 fi
+	@virtualenv -p $(PYTHON_VER) $(BLD_DIR_ENV)
 endif
 	@echo "--- Virtual environment $(BLD_DIR_ENV) ready"
 	@touch $@
