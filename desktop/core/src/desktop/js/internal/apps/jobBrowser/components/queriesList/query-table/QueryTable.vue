@@ -43,10 +43,17 @@
           @facet-changed="facetChanged"
         />
         <date-range-picker ref="rangePicker" @date-range-changed="timeRangeChanged" />
-        <hue-link class="clear-link" @click="clearSearch">{{ I18n('Clear All') }}</hue-link>
         <!-- <hue-link class="columns-link" @click="toggleColumnSelector">
           {{ I18n('Columns') }}
         </hue-link> -->
+      </div>
+
+      <div class="query-table-sort">
+        <hue-icon type="hi-sort" /> Sort by:
+        <sort-selector :sort="sort" :columns="columns" @sort-changed="sortChanged" />
+        <hue-button class="clear-link" borderless @click="clearSearch">
+          {{ I18n('Clear All') }}
+        </hue-button>
       </div>
 
       <div class="query-table-actions-right">
@@ -118,6 +125,7 @@
   import { duration } from 'components/Duration.vue';
   import { Facet, FacetValue, FacetValueLabels, SearchFacet } from 'components/FacetSelector';
   import FacetSelector from 'components/FacetSelector.vue';
+  import SortSelector from '../components/SortSelector.vue';
   import HueButton from 'components/HueButton.vue';
   import HueIcon from 'components/HueIcon.vue';
   import HueLink from 'components/HueLink.vue';
@@ -129,6 +137,7 @@
   import StatusIndicator from 'components/StatusIndicator.vue';
   import { timeAgo } from 'components/TimeAgo.vue';
   import I18n from 'utils/i18n';
+  import { SortInfo } from '../QueriesList.vue';
 
   const DEFAULT_STATUS_FACET_VALUES: Map<string, FacetValue> = new Map<string, FacetValue>([
     ['STARTED', { key: 'STARTED', value: 0 }],
@@ -137,10 +146,16 @@
     ['ERROR', { key: 'ERROR', value: 0 }]
   ]);
 
+  const DEFAULT_SORT: SortInfo = {
+    column: 'startTime',
+    order: 'DESC'
+  };
+
   export default defineComponent({
     name: 'QueryTable',
     components: {
       FacetSelector,
+      SortSelector,
       HueIcon,
       DateRangePicker,
       StatusIndicator,
@@ -243,6 +258,7 @@
         selectedQueries: [] as Query[],
         currentPage: null as Page | null,
         searchText: '',
+        sort: DEFAULT_SORT,
         timeRange: null as Range | null,
         facets: {} as { [field: string]: SearchFacet },
         statusFacet: {
@@ -276,11 +292,17 @@
     methods: {
       clearSearch(): void {
         this.searchText = '';
+        this.sort = DEFAULT_SORT;
+
         (this.$refs.rangePicker as typeof DateRangePicker).clear();
         (this.$refs.statusFacetSelector as typeof FacetSelector).clear();
       },
       diffQueries(queries: Query[]): void {
         this.$emit('diff-queries', queries);
+      },
+      sortChanged(sort: SortInfo): void {
+        this.sort = sort;
+        this.notifySearch();
       },
       facetChanged(searchFacet: SearchFacet): void {
         this.facets[searchFacet.field] = searchFacet;
@@ -302,7 +324,8 @@
             page: this.currentPage,
             text: this.searchText,
             timeRange: this.timeRange,
-            facets: Object.values(this.facets)
+            facets: Object.values(this.facets),
+            sort: this.sort
           });
 
           const now = Date.now();
@@ -396,13 +419,14 @@
         margin-left: 5px;
       }
 
+      .query-table-sort,
       .query-table-filters {
         display: inline-block;
         margin-left: 30px;
 
         .columns-link,
         .clear-link {
-          margin-left: 30px;
+          margin-left: 10px;
         }
       }
 

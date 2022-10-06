@@ -63,11 +63,14 @@
 
   const QUERY_ID_PARAM = 'queryId';
 
+  export type SortInfo = { column: string; order: 'ASC' | 'DESC' };
+
   interface FetchOptions {
     page: Page;
     text?: string;
     timeRange?: { from: number; to: number };
     facets: SearchFacet[];
+    sort: SortInfo;
   }
 
   export default defineComponent({
@@ -139,7 +142,7 @@
             offset: options.page.offset,
             facets: options.facets,
             text: options.text,
-            sortText: 'startTime:DESC',
+            sortText: `${options.sort.column}:${options.sort.order}`,
             startTime:
               (options.timeRange && options.timeRange.from) || now - 1000 * 60 * 60 * 24 * 7
           });
