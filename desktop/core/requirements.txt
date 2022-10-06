@@ -24,6 +24,7 @@ django-nose==1.4.7
 django_opentracing==1.1.0
 django_prometheus==1.0.15
 django-webpack-loader==1.0.0
+djangomako==1.3.2
 djangorestframework-simplejwt==5.2.0
 djangorestframework==3.12.2
 eventlet==0.30.2
@@ -37,7 +38,7 @@ kazoo==2.8.0
 kerberos==1.3.0
 lockfile==0.12.2
 lxml==4.6.5
-Mako==1.1.4
+Mako==1.2.3
 Markdown==3.1
 nose==1.3.7
 openpyxl==3.0.9
@@ -70,7 +71,6 @@ tabulate==0.8.9
 thrift==0.13.0
 thrift-sasl==0.4.2
 git+https://github.com/gethue/django-babel.git
-git+https://github.com/gethue/django-mako.git
 werkzeug==2.0.1  # Should remove it here and from devtools.mk
 django-utils-six==2.0
 six==1.16.0
