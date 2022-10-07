@@ -23,3 +23,8 @@ export default interface CounterSet {
   counters: CounterGroup[];
   cssClass: string;
 }
+
+//TODO: Must be imported from components/HueTable.d
+export type Row = { [key: string]: unknown };
+
+export const generateValueColumnKey = (index: number): string => `counterSet_${index}`;

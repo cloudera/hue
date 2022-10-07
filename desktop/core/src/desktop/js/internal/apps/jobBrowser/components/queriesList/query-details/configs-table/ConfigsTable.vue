@@ -18,7 +18,11 @@
 
 <template>
   <div>
-    <HueTable v-if="rows.length" :columns="columns" :rows="rows" />
+    <HueTable v-if="rows.length" :columns="columns" :rows="rows" >
+      <template #cell-variance="row">
+        <VarianceCell :data="row" />
+      </template>
+    </HueTable>
     <h2 v-else>No configurations available!</h2>
   </div>
 </template>
@@ -29,10 +33,8 @@
   import { Column } from '../../../../../../../components/HueTable';
   import HueTable from '../../../../../../../components/HueTable.vue';
 
-  import ConfigSet from './ConfigSet';
-
-  //TODO: Must be imported from components/HueTable.d
-  type Row = { [key: string]: unknown };
+  import ConfigSet, { Row, generateValueColumnKey } from './ConfigSet';
+  import VarianceCell from './VarianceCell.vue';
 
   const DEFAULT_VALUE_COLUMN_TITLE = 'Config Value';
   const NAME_COLUMNS: Column<Row>[] = [
@@ -44,7 +46,8 @@
 
   export default defineComponent({
     components: {
-      HueTable
+      HueTable,
+      VarianceCell
     },
 
     props: {
@@ -65,7 +68,7 @@
 
         const configs = this.configs.filter((configSet: ConfigSet) => configSet.configs);
         configs.forEach((configSet: ConfigSet, index: number) => {
-          const configKey: string = this.generateValueColumnkey(index);
+          const configKey: string = generateValueColumnKey(index);
 
           for (const configName in configSet.configs) {
             let row: Row | undefined = rowHash.get(configName);
@@ -92,26 +95,29 @@
         this.configs.forEach((configSet: ConfigSet, index: number) => {
           valueColumns.push({
             label: configSet.title || DEFAULT_VALUE_COLUMN_TITLE,
-            key: this.generateValueColumnkey(index),
+            key: generateValueColumnKey(index),
             headerCssClass: configSet.cssClass,
             cssClass: configSet.cssClass
           });
         });
+
+        if (this.configs.length > 1) {
+          valueColumns.push({
+            label: 'Variance',
+            key: 'variance'
+          });
+        }
 
         return NAME_COLUMNS.concat(valueColumns);
       }
     },
 
     methods: {
-      generateValueColumnkey(index: number): string {
-        return `configSet_${index}`;
-      },
-
       areDifferent(row: Row, valueCount: number): boolean {
         if (valueCount > 1) {
-          const firstVal = row[this.generateValueColumnkey(0)];
+          const firstVal = row[generateValueColumnKey(0)];
           for (let i = 1; i < valueCount; i++) {
-            if (row[this.generateValueColumnkey(i)] !== firstVal) {
+            if (row[generateValueColumnKey(i)] !== firstVal) {
               return true;
             }
           }
