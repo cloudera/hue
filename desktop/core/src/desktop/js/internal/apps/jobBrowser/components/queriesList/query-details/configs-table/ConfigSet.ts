@@ -21,3 +21,8 @@ export default interface ConfigSet {
   configs: { [key: string]: unknown };
   cssClass: string;
 }
+
+//TODO: Must be imported from components/HueTable.d
+export type Row = { [key: string]: unknown };
+
+export const generateValueColumnKey = (index: number): string => `configSet_${index}`;
