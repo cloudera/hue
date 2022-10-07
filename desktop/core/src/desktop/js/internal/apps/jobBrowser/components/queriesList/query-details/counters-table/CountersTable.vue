@@ -18,7 +18,11 @@
 
 <template>
   <div>
-    <HueTable v-if="rows.length" :columns="columns" :rows="rows" />
+    <HueTable v-if="rows.length" :columns="columns" :rows="rows">
+      <template #cell-variance="row">
+        <VarianceCell :data="row" />
+      </template>
+    </HueTable>
     <h2 v-else>No counters available!</h2>
   </div>
 </template>
@@ -31,10 +35,8 @@
 
   import { CounterGroup, CounterDetails } from '../../index';
 
-  import CounterSet from './CounterSet';
-
-  //TODO: Must be imported from components/HueTable.d
-  type Row = { [key: string]: unknown };
+  import CounterSet, { Row, generateValueColumnKey } from './CounterSet';
+  import VarianceCell from './VarianceCell.vue';
 
   const DEFAULT_VALUE_COLUMN_TITLE = 'Counter Value';
   const NAME_COLUMNS: Column<Row>[] = [
@@ -50,7 +52,8 @@
 
   export default defineComponent({
     components: {
-      HueTable
+      HueTable,
+      VarianceCell
     },
 
     props: {
@@ -71,11 +74,18 @@
         this.counters.forEach((counterSet: CounterSet, index: number) => {
           valueColumns.push({
             label: counterSet.title || DEFAULT_VALUE_COLUMN_TITLE,
-            key: this.generateValueColumnkey(index),
+            key: generateValueColumnKey(index),
             headerCssClass: counterSet.cssClass,
             cssClass: counterSet.cssClass
           });
         });
+
+        if (this.counters.length > 1) {
+          valueColumns.push({
+            label: 'Variance',
+            key: 'variance'
+          });
+        }
 
         return NAME_COLUMNS.concat(valueColumns);
       },
@@ -85,7 +95,7 @@
 
         const counters = this.counters.filter((counterSet: CounterSet) => counterSet.counters);
         counters.forEach((counterSet: CounterSet, index: number) => {
-          const counterKey: string = this.generateValueColumnkey(index);
+          const counterKey: string = generateValueColumnKey(index);
           counterSet.counters.forEach((counterGroup: CounterGroup) => {
             counterGroup.counters.forEach((counter: CounterDetails) => {
               const counterId: string = counterGroup.counterGroupName + counter.counterName;
@@ -113,15 +123,11 @@
     },
 
     methods: {
-      generateValueColumnkey(index: number): string {
-        return `counterSet_${index}`;
-      },
-
       areDifferent(row: Row, valueCount: number): boolean {
         if (valueCount > 1) {
-          const firstVal = row[this.generateValueColumnkey(0)];
+          const firstVal = row[generateValueColumnKey(0)];
           for (let i = 1; i < valueCount; i++) {
-            if (row[this.generateValueColumnkey(i)] !== firstVal) {
+            if (row[generateValueColumnKey(i)] !== firstVal) {
               return true;
             }
           }
