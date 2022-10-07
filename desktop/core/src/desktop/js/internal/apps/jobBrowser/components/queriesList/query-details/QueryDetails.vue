@@ -25,6 +25,10 @@
           Queries
         </hue-button>
         <div class="buttons-right">
+          <hue-button @click="reExecute">
+            <em class="fa fa-play" />
+            {{ I18n('Re Execute') }}
+          </hue-button>
           <a
             :href="`${HUE_BASE_URL}/jobbrowser/query-store/data-bundle/${query.queryId}`"
             target="_blank"
@@ -125,6 +129,7 @@
 
   import { Query, Dag } from '../index';
   import { hueWindow } from 'types/types';
+  import huePubSub from 'utils/huePubSub';
 
   import I18n from 'utils/i18n';
 
@@ -174,7 +179,24 @@
     },
 
     methods: {
-      I18n
+      I18n,
+      async reExecute() {
+        huePubSub.publish('open.editor.new.query', {
+          sourceType: 'hive'
+        });
+
+        huePubSub.subscribeOnce(
+          'ace.editor.focused',
+          () =>
+            setTimeout(() => {
+              huePubSub.publish('editor.insert.at.cursor', {
+                text: this.query.query,
+                cursorEndAdjust: 0
+              });
+            }, 100),
+          ''
+        );
+      }
     }
   });
 </script>
