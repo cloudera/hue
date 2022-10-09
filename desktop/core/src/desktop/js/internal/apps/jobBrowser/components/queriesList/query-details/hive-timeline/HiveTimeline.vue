@@ -189,14 +189,20 @@
   export default defineComponent({
     props: {
       perf: {
-        type: Object as PropType<Perf>,
-        default: undefined
+        type: Object as PropType<Perf | NormalizedHivePerf>,
+        required: true
+      },
+      scale: {
+        type: Object as PropType<number>,
+        default: 1
       }
     },
 
     computed: {
       normalizedPerf(): NormalizedHivePerf {
-        return new NormalizedHivePerf(this.perf);
+        return this.perf instanceof NormalizedHivePerf
+          ? this.perf
+          : new NormalizedHivePerf(this.perf);
       }
     },
 
@@ -216,11 +222,13 @@
           const perfValue = parseInt(bar.dataset.value || '0');
           const widthPercent = (perfValue / perf.total) * 100;
           bar.style.width = `${widthPercent}%`;
+          bar.style.display = widthPercent ? 'inline-block' : 'none';
         });
       },
       alignTimeline(): void {
         this.alignBars(this.$el.querySelectorAll('.sub-groups .bar'), this.normalizedPerf);
         this.alignBars(this.$el.querySelectorAll('.groups .bar'), this.normalizedPerf);
+        this.$el.querySelector('.timeline-bars').style.width = `${this.scale * 100}%`;
       }
     }
   });
