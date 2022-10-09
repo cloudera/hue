@@ -25,7 +25,7 @@
       <div class="process-names">
         <ProcessName
           v-for="process in normalizedProcesses"
-          :key="process._id"
+          :key="process._id + index"
           :process="process"
           @showTooltip="showTooltip"
           @hideTooltip="hideTooltip"
@@ -39,7 +39,7 @@
         <div class="zoom-panel">
           <ProcessVisual
             v-for="process in normalizedProcesses"
-            :key="process._id"
+            :key="process._id + index"
             :process="process"
             :processor="processor"
             @showTooltip="showTooltip"
@@ -49,7 +49,7 @@
           <div v-if="consolidate" class="consolidated-view">
             <ConsolidatedProcess
               v-for="process in normalizedProcesses"
-              :key="process._id"
+              :key="process._id + index"
               :focused-process="focusedProcess"
               :process="process"
               :processor="processor"
@@ -101,6 +101,10 @@
       consolidate: {
         type: Boolean,
         default: true
+      },
+      timeWindow: {
+        type: Number,
+        default: 0
       }
     },
 
@@ -108,6 +112,7 @@
       processes: VertexProcess[];
       processor?: Processor;
       focusedProcess: VertexProcess | undefined;
+      index: number;
 
       tooltipContents: TooltipContent[] | null;
 
@@ -132,6 +137,7 @@
         processes,
         processor,
         focusedProcess: undefined,
+        index: Math.random(),
 
         tooltipContents: null,
 
@@ -231,6 +237,19 @@
     //   };
     // }
 
+    watch: {
+      timeWindow: function () {
+        // TODO: Dedupe
+        try {
+          this.processor = this.createProcessor(this.processes);
+          this.index = Math.random();
+        } catch (e) {
+          console.error(e);
+          this.errMessage = 'Invalid data!';
+        }
+      }
+    },
+
     unmounted() {
       // Release listeners
     },
@@ -238,15 +257,17 @@
     methods: {
       createProcessor(processes: VertexProcess[]): Processor {
         const processor = new Processor();
-        processor.startTime = this.startTime(processes);
-        processor.endTime = this.endTime(processes);
+        processor.startTime = this.calculateStartTime(processes);
+        processor.endTime = this.timeWindow
+          ? processor.startTime + this.timeWindow
+          : this.calculateEndTime(processes);
         processor.processCount = processes.length;
 
         return processor;
       },
 
       // Watch : "processes.@each.startEvent"
-      startTime(processes: VertexProcess[]): number {
+      calculateStartTime(processes: VertexProcess[]): number {
         if (processes.length) {
           let startTime = processes[0].startTime;
           processes.forEach(process => {
@@ -261,7 +282,7 @@
       },
 
       // Watch - "processes.@each.endEvent"
-      endTime(processes: VertexProcess[]): number {
+      calculateEndTime(processes: VertexProcess[]): number {
         if (processes.length) {
           let endTime = processes[0].endTime;
           processes.forEach(process => {
