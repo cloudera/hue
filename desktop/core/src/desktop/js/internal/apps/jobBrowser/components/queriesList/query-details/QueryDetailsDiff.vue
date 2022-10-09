@@ -38,13 +38,19 @@
         <VisualExplain :query="queries[1]" class="query-b" />
       </tab>
       <tab title="Timeline" class="hue-layout-column">
+        <div class="scale-controls">
+          <label>
+            <input v-model="useSameTimeScale" type="checkbox" />
+            Use Same Time Scale
+          </label>
+        </div>
         <div class="hue-info-box">
           <LabeledInfo label="Query">{{ queries[0].queryId }}</LabeledInfo>
-          <HiveTimeline :perf="queries[0].details.perf" />
+          <HiveTimeline :perf="normalizedPerfs[0]" :scale="calculateScaleOf(0)" />
         </div>
         <div class="hue-info-box query-b">
           <LabeledInfo label="Query">{{ queries[1].queryId }}</LabeledInfo>
-          <HiveTimeline :perf="queries[1].details.perf" />
+          <HiveTimeline :perf="normalizedPerfs[1]" :scale="calculateScaleOf(1)" />
         </div>
       </tab>
       <tab title="Query Config">
@@ -99,17 +105,23 @@
           </div>
         </tab>
         <tab title="DAG Swimlane" class="hue-layout-column">
+          <div class="scale-controls">
+            <label>
+              <input v-model="useSameTimeScale" type="checkbox" />
+              Use Same Time Scale
+            </label>
+          </div>
           <div class="hue-layout-column hue-info-box">
             <div v-for="dag in queries[0].dags" :key="dag.dagInfo.dagId">
               <LabeledInfo label="DAG">{{ dag.dagInfo.dagId }}</LabeledInfo>
-              <DagSwimlane :dag="dag" />
+              <DagSwimlane :dag="dag" :time-window="timeWindow" />
             </div>
             <div v-if="!get(queries, '[0].dags.length')">No DAGs!</div>
           </div>
           <div class="hue-layout-column hue-info-box query-b">
             <div v-for="dag in queries[1].dags" :key="dag.dagInfo.dagId">
               <LabeledInfo label="DAG">{{ dag.dagInfo.dagId }}</LabeledInfo>
-              <DagSwimlane :dag="dag" />
+              <DagSwimlane :dag="dag" :time-window="timeWindow" />
             </div>
             <div v-if="!get(queries, '[1].dags.length')">No DAGs!</div>
           </div>
@@ -179,6 +191,7 @@
   import DagSwimlane from './dag-swimlane/DagSwimlane.vue';
 
   import LabeledInfo from '../components/LabeledInfo.vue';
+  import NormalizedHivePerf from './hive-timeline/NormalizedHivePerf';
 
   import { Query, Dag } from '../index';
 
@@ -219,7 +232,8 @@
 
     data() {
       return {
-        hideSimilarValues: false
+        hideSimilarValues: false,
+        useSameTimeScale: true
       };
     },
 
@@ -228,11 +242,38 @@
         return this.queries.some((query: Query) =>
           query.dags.some((dag: Dag) => dag.dagDetails.diagnostics)
         );
+      },
+      normalizedPerfs(): NormalizedHivePerf[] {
+        return this.queries.map(query => new NormalizedHivePerf(query.details.perf));
+      },
+      timeWindow(): number {
+        let timeWindow = 0;
+
+        if (this.useSameTimeScale) {
+          this.queries.forEach(query => {
+            query.dags.forEach(dag => {
+              timeWindow = Math.max(timeWindow, dag.dagInfo.endTime - dag.dagInfo.startTime);
+            });
+          });
+
+          return timeWindow;
+        }
+
+        return timeWindow;
       }
     },
 
     methods: {
-      get
+      get,
+      calculateScaleOf(index: number): number {
+        if (this.useSameTimeScale) {
+          return (
+            this.normalizedPerfs[index].total /
+            Math.max(this.normalizedPerfs[0].total, this.normalizedPerfs[1].total)
+          );
+        }
+        return 1;
+      }
     }
   });
 </script>
@@ -277,6 +318,15 @@
     text-align: right;
     input {
       vertical-align: top;
+    }
+  }
+
+  .scale-controls {
+    label {
+      display: inline-block;
+      input {
+        vertical-align: top;
+      }
     }
   }
 </style>

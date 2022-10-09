@@ -39,7 +39,7 @@
     const luxonDuration = LuxonDuration.fromMillis(value);
     if (short) {
       for (const limit of SHORT_LIMITS) {
-        const val = Math.floor(luxonDuration.as(limit.unit));
+        const val = Number(luxonDuration.as(limit.unit).toFixed(1));
         if (val >= 1) {
           return val + I18n(limit.postfix + (limit.appendS && val > 1 ? 's' : ''));
         }

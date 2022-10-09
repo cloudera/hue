@@ -36,6 +36,8 @@ $border-color: #d6d8db;
   .timeline-bars {
     margin-bottom: 10px;
 
+    transition: width 0.5s ease-out;
+
     font-size: 0;
     overflow: hidden;
 

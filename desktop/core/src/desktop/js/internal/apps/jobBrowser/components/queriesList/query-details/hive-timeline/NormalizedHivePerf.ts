@@ -40,7 +40,7 @@ export default class NormalizedHivePerf {
   };
   total: number;
 
-  constructor(perf: Perf) {
+  constructor(perf: Perf | undefined) {
     perf = perf || {};
     Object.assign(this, perf);
 
