@@ -55,4 +55,9 @@ public class TezDagBasicInfoRepository extends JdbiRepository<TezDagBasicInfo, T
   public int deleteOlder(long startTime) {
     return dao.deleteOlder(startTime * 1000);
   }
+
+  public int purge() {
+    return dao.purge();
+  }
+
 }

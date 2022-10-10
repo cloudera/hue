@@ -102,4 +102,9 @@ public class HiveQueryBasicInfoRepository extends JdbiRepository<HiveQueryBasicI
   public int deleteOlder(long startTime) {
     return dao.deleteOlder(startTime * 1000);
   }
+
+  public int purge() {
+    return dao.purge();
+  }
+
 }
