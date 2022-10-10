@@ -46,4 +46,7 @@ public interface TezAppInfoDao extends JdbiDao<TezAppInfo> {
 
   @SqlUpdate("delete from tez_app_info where submit_time < :submitTime")
   int deleteOlder(@Bind("submitTime") long submitTime);
+
+  @SqlUpdate("vacuum full tez_app_info")
+  int purge();
 }

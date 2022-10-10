@@ -68,4 +68,8 @@ public interface HiveQueryExtendedInfoDao extends JdbiDao<HiveQueryExtendedInfo>
   @SqlUpdate("delete from query_details qd using hive_query hq " +
       "where hq.id = qd.hive_query_id and hq.start_time < :startTime")
   int deleteOlder(@Bind("startTime") long startTime);
+
+  @SqlUpdate("vacuum full query_details")
+  int purge();
+
 }
