@@ -1,0 +1,35 @@
+lxml package
+============
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   lxml.html
+   lxml.isoschematron
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   lxml.ElementInclude
+   lxml._elementpath
+   lxml.builder
+   lxml.cssselect
+   lxml.doctestcompare
+   lxml.etree
+   lxml.objectify
+   lxml.sax
+
+Module contents
+---------------
+
+.. automodule:: lxml
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:

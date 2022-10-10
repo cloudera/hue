@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>lxml.html.clean module &mdash; lxml  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="lxml.html.defs module" href="lxml.html.defs.html" />
+    <link rel="prev" title="lxml.html.builder module" href="lxml.html.builder.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> lxml
+            <img src="_static/python-xml.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                4.9.1
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="lxml.html">lxml package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="lxml.html.html">lxml.html package</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="lxml.html.ElementSoup.html">lxml.html.ElementSoup module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lxml.html._diffcommand.html">lxml.html._diffcommand module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lxml.html._setmixin.html">lxml.html._setmixin module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lxml.html.builder.html">lxml.html.builder module</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">lxml.html.clean module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lxml.html.defs.html">lxml.html.defs module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lxml.html.diff.html">lxml.html.diff module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lxml.html.formfill.html">lxml.html.formfill module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lxml.html.html5parser.html">lxml.html.html5parser module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lxml.html.soupparser.html">lxml.html.soupparser module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lxml.isoschematron.html">lxml.isoschematron package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lxml.ElementInclude.html">lxml.ElementInclude module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lxml._elementpath.html">lxml._elementpath module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lxml.builder.html">lxml.builder module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lxml.cssselect.html">lxml.cssselect module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lxml.doctestcompare.html">lxml.doctestcompare module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lxml.etree.html">lxml.etree module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lxml.objectify.html">lxml.objectify module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lxml.sax.html">lxml.sax module</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">lxml</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="lxml.html">lxml package</a> &raquo;</li>
+          <li><a href="lxml.html.html">lxml.html package</a> &raquo;</li>
+      <li>lxml.html.clean module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/lxml.html.clean.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-lxml.html.clean">
+<span id="lxml-html-clean-module"></span><h1>lxml.html.clean module<a class="headerlink" href="#module-lxml.html.clean" title="Permalink to this heading"></a></h1>
+<p>A cleanup tool for HTML.</p>
+<p>Removes unwanted tags and content.  See the <cite>Cleaner</cite> class for
+details.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="lxml.html.clean.Cleaner">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lxml.html.clean.</span></span><span class="sig-name descname"><span class="pre">Cleaner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kw</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lxml.html.clean.Cleaner" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Instances cleans the document of each of the possible offending
+elements.  The cleaning is controlled by attributes; you can
+override attributes in a subclass, or set them in the constructor.</p>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">scripts</span></code>:</dt><dd><p>Removes any <code class="docutils literal notranslate"><span class="pre">&lt;script&gt;</span></code> tags.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">javascript</span></code>:</dt><dd><p>Removes any Javascript, like an <code class="docutils literal notranslate"><span class="pre">onclick</span></code> attribute. Also removes stylesheets
+as they could contain Javascript.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">comments</span></code>:</dt><dd><p>Removes any comments.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">style</span></code>:</dt><dd><p>Removes any style tags.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">inline_style</span></code></dt><dd><p>Removes any style attributes.  Defaults to the value of the <code class="docutils literal notranslate"><span class="pre">style</span></code> option.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">links</span></code>:</dt><dd><p>Removes any <code class="docutils literal notranslate"><span class="pre">&lt;link&gt;</span></code> tags</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">meta</span></code>:</dt><dd><p>Removes any <code class="docutils literal notranslate"><span class="pre">&lt;meta&gt;</span></code> tags</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">page_structure</span></code>:</dt><dd><p>Structural parts of a page: <code class="docutils literal notranslate"><span class="pre">&lt;head&gt;</span></code>, <code class="docutils literal notranslate"><span class="pre">&lt;html&gt;</span></code>, <code class="docutils literal notranslate"><span class="pre">&lt;title&gt;</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">processing_instructions</span></code>:</dt><dd><p>Removes any processing instructions.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">embedded</span></code>:</dt><dd><p>Removes any embedded objects (flash, iframes)</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">frames</span></code>:</dt><dd><p>Removes any frame-related tags</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">forms</span></code>:</dt><dd><p>Removes any form tags</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">annoying_tags</span></code>:</dt><dd><p>Tags that aren’t <em>wrong</em>, but are annoying.  <code class="docutils literal notranslate"><span class="pre">&lt;blink&gt;</span></code> and <code class="docutils literal notranslate"><span class="pre">&lt;marquee&gt;</span></code></p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">remove_tags</span></code>:</dt><dd><p>A list of tags to remove.  Only the tags will be removed,
+their content will get pulled up into the parent tag.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">kill_tags</span></code>:</dt><dd><p>A list of tags to kill.  Killing also removes the tag’s content,
+i.e. the whole subtree, not just the tag itself.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">allow_tags</span></code>:</dt><dd><p>A list of tags to include (default include all).</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">remove_unknown_tags</span></code>:</dt><dd><p>Remove any tags that aren’t standard parts of HTML.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">safe_attrs_only</span></code>:</dt><dd><p>If true, only include ‘safe’ attributes (specifically the list
+from the feedparser HTML sanitisation web site).</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">safe_attrs</span></code>:</dt><dd><p>A set of attribute names to override the default list of attributes
+considered ‘safe’ (when safe_attrs_only=True).</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">add_nofollow</span></code>:</dt><dd><p>If true, then any &lt;a&gt; tags will have <code class="docutils literal notranslate"><span class="pre">rel=&quot;nofollow&quot;</span></code> added to them.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">host_whitelist</span></code>:</dt><dd><p>A list or set of hosts that you can use for embedded content
+(for content like <code class="docutils literal notranslate"><span class="pre">&lt;object&gt;</span></code>, <code class="docutils literal notranslate"><span class="pre">&lt;link</span> <span class="pre">rel=&quot;stylesheet&quot;&gt;</span></code>, etc).
+You can also implement/override the method
+<code class="docutils literal notranslate"><span class="pre">allow_embedded_url(el,</span> <span class="pre">url)</span></code> or <code class="docutils literal notranslate"><span class="pre">allow_element(el)</span></code> to
+implement more complex rules for what can be embedded.
+Anything that passes this test will be shown, regardless of
+the value of (for instance) <code class="docutils literal notranslate"><span class="pre">embedded</span></code>.</p>
+<p>Note that this parameter might not work as intended if you do not
+make the links absolute before doing the cleaning.</p>
+<p>Note that you may also need to set <code class="docutils literal notranslate"><span class="pre">whitelist_tags</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">whitelist_tags</span></code>:</dt><dd><p>A set of tags that can be included with <code class="docutils literal notranslate"><span class="pre">host_whitelist</span></code>.
+The default is <code class="docutils literal notranslate"><span class="pre">iframe</span></code> and <code class="docutils literal notranslate"><span class="pre">embed</span></code>; you may wish to
+include other tags like <code class="docutils literal notranslate"><span class="pre">script</span></code>, or you may want to
+implement <code class="docutils literal notranslate"><span class="pre">allow_embedded_url</span></code> for more control.  Set to None to
+include all tags.</p>
+</dd>
+</dl>
+<p>This modifies the document <em>in place</em>.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="lxml.html.clean.Cleaner._has_sneaky_javascript">
+<span class="sig-name descname"><span class="pre">_has_sneaky_javascript</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">style</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lxml.html.clean.Cleaner._has_sneaky_javascript" title="Permalink to this definition"></a></dt>
+<dd><p>Depending on the browser, stuff like <code class="docutils literal notranslate"><span class="pre">e</span> <span class="pre">x</span> <span class="pre">p</span> <span class="pre">r</span> <span class="pre">e</span> <span class="pre">s</span> <span class="pre">s</span> <span class="pre">i</span> <span class="pre">o</span> <span class="pre">n(...)</span></code>
+can get interpreted, or <code class="docutils literal notranslate"><span class="pre">expre/*</span> <span class="pre">stuff</span> <span class="pre">*/ssion(...)</span></code>.  This
+checks for attempt to do stuff like this.</p>
+<p>Typically the response will be to kill the entire style; if you
+have just a bit of Javascript in the style another rule will catch
+that and remove only the Javascript from the style; this catches
+more sneaky attempts.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lxml.html.clean.Cleaner._kill_elements">
+<span class="sig-name descname"><span class="pre">_kill_elements</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">doc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">condition</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iterate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lxml.html.clean.Cleaner._kill_elements" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lxml.html.clean.Cleaner._remove_javascript_link">
+<span class="sig-name descname"><span class="pre">_remove_javascript_link</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">link</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lxml.html.clean.Cleaner._remove_javascript_link" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lxml.html.clean.Cleaner._substitute_comments">
+<span class="sig-name descname"><span class="pre">_substitute_comments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lxml.html.clean.Cleaner._substitute_comments" title="Permalink to this definition"></a></dt>
+<dd><p>Return the string obtained by replacing the leftmost non-overlapping occurrences of pattern in string by the replacement repl.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lxml.html.clean.Cleaner.allow_element">
+<span class="sig-name descname"><span class="pre">allow_element</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">el</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lxml.html.clean.Cleaner.allow_element" title="Permalink to this definition"></a></dt>
+<dd><p>Decide whether an element is configured to be accepted or rejected.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>el</strong> – an element.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>true to accept the element or false to reject/discard it.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lxml.html.clean.Cleaner.allow_embedded_url">
+<span class="sig-name descname"><span class="pre">allow_embedded_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">el</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lxml.html.clean.Cleaner.allow_embedded_url" title="Permalink to this definition"></a></dt>
+<dd><p>Decide whether a URL that was found in an element’s attributes or text
+if configured to be accepted or rejected.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>el</strong> – an element.</p></li>
+<li><p><strong>url</strong> – a URL found on the element.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>true to accept the URL and false to reject it.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lxml.html.clean.Cleaner.allow_follow">
+<span class="sig-name descname"><span class="pre">allow_follow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">anchor</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lxml.html.clean.Cleaner.allow_follow" title="Permalink to this definition"></a></dt>
+<dd><p>Override to suppress rel=”nofollow” on some anchors.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lxml.html.clean.Cleaner.clean_html">
+<span class="sig-name descname"><span class="pre">clean_html</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">html</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lxml.html.clean.Cleaner.clean_html" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lxml.html.clean.Cleaner.kill_conditional_comments">
+<span class="sig-name descname"><span class="pre">kill_conditional_comments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">doc</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lxml.html.clean.Cleaner.kill_conditional_comments" title="Permalink to this definition"></a></dt>
+<dd><p>IE conditional comments basically embed HTML that the parser
+doesn’t normally see.  We can’t allow anything like that, so
+we’ll kill any comments that could be conditional.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lxml.html.clean.Cleaner._tag_link_attrs">
+<span class="sig-name descname"><span class="pre">_tag_link_attrs</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'a':</span> <span class="pre">'href',</span> <span class="pre">'applet':</span> <span class="pre">['code',</span> <span class="pre">'object'],</span> <span class="pre">'embed':</span> <span class="pre">'src',</span> <span class="pre">'iframe':</span> <span class="pre">'src',</span> <span class="pre">'layer':</span> <span class="pre">'src',</span> <span class="pre">'link':</span> <span class="pre">'href',</span> <span class="pre">'script':</span> <span class="pre">'src'}</span></em><a class="headerlink" href="#lxml.html.clean.Cleaner._tag_link_attrs" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lxml.html.clean.Cleaner.add_nofollow">
+<span class="sig-name descname"><span class="pre">add_nofollow</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#lxml.html.clean.Cleaner.add_nofollow" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lxml.html.clean.Cleaner.allow_tags">
+<span class="sig-name descname"><span class="pre">allow_tags</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#lxml.html.clean.Cleaner.allow_tags" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lxml.html.clean.Cleaner.annoying_tags">
+<span class="sig-name descname"><span class="pre">annoying_tags</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#lxml.html.clean.Cleaner.annoying_tags" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lxml.html.clean.Cleaner.comments">
+<span class="sig-name descname"><span class="pre">comments</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#lxml.html.clean.Cleaner.comments" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lxml.html.clean.Cleaner.embedded">
+<span class="sig-name descname"><span class="pre">embedded</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#lxml.html.clean.Cleaner.embedded" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lxml.html.clean.Cleaner.forms">
+<span class="sig-name descname"><span class="pre">forms</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#lxml.html.clean.Cleaner.forms" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lxml.html.clean.Cleaner.frames">
+<span class="sig-name descname"><span class="pre">frames</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#lxml.html.clean.Cleaner.frames" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lxml.html.clean.Cleaner.host_whitelist">
+<span class="sig-name descname"><span class="pre">host_whitelist</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">()</span></em><a class="headerlink" href="#lxml.html.clean.Cleaner.host_whitelist" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lxml.html.clean.Cleaner.inline_style">
+<span class="sig-name descname"><span class="pre">inline_style</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#lxml.html.clean.Cleaner.inline_style" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lxml.html.clean.Cleaner.javascript">
+<span class="sig-name descname"><span class="pre">javascript</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#lxml.html.clean.Cleaner.javascript" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lxml.html.clean.Cleaner.kill_tags">
+<span class="sig-name descname"><span class="pre">kill_tags</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#lxml.html.clean.Cleaner.kill_tags" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lxml.html.clean.Cleaner.links">
+<span class="sig-name descname"><span class="pre">links</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#lxml.html.clean.Cleaner.links" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lxml.html.clean.Cleaner.meta">
+<span class="sig-name descname"><span class="pre">meta</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#lxml.html.clean.Cleaner.meta" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lxml.html.clean.Cleaner.page_structure">
+<span class="sig-name descname"><span class="pre">page_structure</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#lxml.html.clean.Cleaner.page_structure" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lxml.html.clean.Cleaner.processing_instructions">
+<span class="sig-name descname"><span class="pre">processing_instructions</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#lxml.html.clean.Cleaner.processing_instructions" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lxml.html.clean.Cleaner.remove_tags">
+<span class="sig-name descname"><span class="pre">remove_tags</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#lxml.html.clean.Cleaner.remove_tags" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lxml.html.clean.Cleaner.remove_unknown_tags">
+<span class="sig-name descname"><span class="pre">remove_unknown_tags</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#lxml.html.clean.Cleaner.remove_unknown_tags" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lxml.html.clean.Cleaner.safe_attrs">
+<span class="sig-name descname"><span class="pre">safe_attrs</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">frozenset({'abbr',</span> <span class="pre">'accept',</span> <span class="pre">'accept-charset',</span> <span class="pre">'accesskey',</span> <span class="pre">'action',</span> <span class="pre">'align',</span> <span class="pre">'alt',</span> <span class="pre">'axis',</span> <span class="pre">'border',</span> <span class="pre">'cellpadding',</span> <span class="pre">'cellspacing',</span> <span class="pre">'char',</span> <span class="pre">'charoff',</span> <span class="pre">'charset',</span> <span class="pre">'checked',</span> <span class="pre">'cite',</span> <span class="pre">'class',</span> <span class="pre">'clear',</span> <span class="pre">'color',</span> <span class="pre">'cols',</span> <span class="pre">'colspan',</span> <span class="pre">'compact',</span> <span class="pre">'coords',</span> <span class="pre">'datetime',</span> <span class="pre">'dir',</span> <span class="pre">'disabled',</span> <span class="pre">'enctype',</span> <span class="pre">'for',</span> <span class="pre">'frame',</span> <span class="pre">'headers',</span> <span class="pre">'height',</span> <span class="pre">'href',</span> <span class="pre">'hreflang',</span> <span class="pre">'hspace',</span> <span class="pre">'id',</span> <span class="pre">'ismap',</span> <span class="pre">'label',</span> <span class="pre">'lang',</span> <span class="pre">'longdesc',</span> <span class="pre">'maxlength',</span> <span class="pre">'media',</span> <span class="pre">'method',</span> <span class="pre">'multiple',</span> <span class="pre">'name',</span> <span class="pre">'nohref',</span> <span class="pre">'noshade',</span> <span class="pre">'nowrap',</span> <span class="pre">'prompt',</span> <span class="pre">'readonly',</span> <span class="pre">'rel',</span> <span class="pre">'rev',</span> <span class="pre">'rows',</span> <span class="pre">'rowspan',</span> <span class="pre">'rules',</span> <span class="pre">'scope',</span> <span class="pre">'selected',</span> <span class="pre">'shape',</span> <span class="pre">'size',</span> <span class="pre">'span',</span> <span class="pre">'src',</span> <span class="pre">'start',</span> <span class="pre">'summary',</span> <span class="pre">'tabindex',</span> <span class="pre">'target',</span> <span class="pre">'title',</span> <span class="pre">'type',</span> <span class="pre">'usemap',</span> <span class="pre">'valign',</span> <span class="pre">'value',</span> <span class="pre">'vspace',</span> <span class="pre">'width'})</span></em><a class="headerlink" href="#lxml.html.clean.Cleaner.safe_attrs" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lxml.html.clean.Cleaner.safe_attrs_only">
+<span class="sig-name descname"><span class="pre">safe_attrs_only</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#lxml.html.clean.Cleaner.safe_attrs_only" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lxml.html.clean.Cleaner.scripts">
+<span class="sig-name descname"><span class="pre">scripts</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#lxml.html.clean.Cleaner.scripts" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lxml.html.clean.Cleaner.style">
+<span class="sig-name descname"><span class="pre">style</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#lxml.html.clean.Cleaner.style" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lxml.html.clean.Cleaner.whitelist_tags">
+<span class="sig-name descname"><span class="pre">whitelist_tags</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'embed',</span> <span class="pre">'iframe'}</span></em><a class="headerlink" href="#lxml.html.clean.Cleaner.whitelist_tags" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lxml.html.clean._break_text">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.clean.</span></span><span class="sig-name descname"><span class="pre">_break_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">break_character</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lxml.html.clean._break_text" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lxml.html.clean._find_image_dataurls">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.clean.</span></span><span class="sig-name descname"><span class="pre">_find_image_dataurls</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">endpos</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">9223372036854775807</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lxml.html.clean._find_image_dataurls" title="Permalink to this definition"></a></dt>
+<dd><p>Return a list of all non-overlapping matches of pattern in string.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lxml.html.clean._has_javascript_scheme">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.clean.</span></span><span class="sig-name descname"><span class="pre">_has_javascript_scheme</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lxml.html.clean._has_javascript_scheme" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lxml.html.clean._insert_break">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.clean.</span></span><span class="sig-name descname"><span class="pre">_insert_break</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">word</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">break_character</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lxml.html.clean._insert_break" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lxml.html.clean._is_unsafe_image_type">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.clean.</span></span><span class="sig-name descname"><span class="pre">_is_unsafe_image_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">endpos</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">9223372036854775807</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lxml.html.clean._is_unsafe_image_type" title="Permalink to this definition"></a></dt>
+<dd><p>Scan through string looking for a match, and return a corresponding match object instance.</p>
+<p>Return None if no position in the string matches.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lxml.html.clean._link_text">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.clean.</span></span><span class="sig-name descname"><span class="pre">_link_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">link_regexes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">avoid_hosts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factory</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lxml.html.clean._link_text" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lxml.html.clean._looks_like_tag_content">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.clean.</span></span><span class="sig-name descname"><span class="pre">_looks_like_tag_content</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">endpos</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">9223372036854775807</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lxml.html.clean._looks_like_tag_content" title="Permalink to this definition"></a></dt>
+<dd><p>Scan through string looking for a match, and return a corresponding match object instance.</p>
+<p>Return None if no position in the string matches.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lxml.html.clean._possibly_malicious_schemes">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.clean.</span></span><span class="sig-name descname"><span class="pre">_possibly_malicious_schemes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">endpos</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">9223372036854775807</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lxml.html.clean._possibly_malicious_schemes" title="Permalink to this definition"></a></dt>
+<dd><p>Return a list of all non-overlapping matches of pattern in string.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lxml.html.clean._replace_css_import">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.clean.</span></span><span class="sig-name descname"><span class="pre">_replace_css_import</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">repl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">string</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lxml.html.clean._replace_css_import" title="Permalink to this definition"></a></dt>
+<dd><p>Return the string obtained by replacing the leftmost non-overlapping occurrences of pattern in string by the replacement repl.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lxml.html.clean._replace_css_javascript">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.clean.</span></span><span class="sig-name descname"><span class="pre">_replace_css_javascript</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">repl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">string</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lxml.html.clean._replace_css_javascript" title="Permalink to this definition"></a></dt>
+<dd><p>Return the string obtained by replacing the leftmost non-overlapping occurrences of pattern in string by the replacement repl.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lxml.html.clean._substitute_whitespace">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.clean.</span></span><span class="sig-name descname"><span class="pre">_substitute_whitespace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">repl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">string</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lxml.html.clean._substitute_whitespace" title="Permalink to this definition"></a></dt>
+<dd><p>Return the string obtained by replacing the leftmost non-overlapping occurrences of pattern in string by the replacement repl.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lxml.html.clean.autolink">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.clean.</span></span><span class="sig-name descname"><span class="pre">autolink</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">el</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">link_regexes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[re.compile('(?P&lt;body&gt;https?://(?P&lt;host&gt;[a-z0-9._-]+)(?:/[/\\-_.,a-z0-9%&amp;?;=~]*)?(?:\\([/\\-_.,a-z0-9%&amp;?;=~]*\\))?)',</span> <span class="pre">re.IGNORECASE),</span> <span class="pre">re.compile('mailto:(?P&lt;body&gt;[a-z0-9._-]+&#64;(?P&lt;host&gt;[a-z0-9_.-]+[a-z]))',</span> <span class="pre">re.IGNORECASE)]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">avoid_elements</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['textarea',</span> <span class="pre">'pre',</span> <span class="pre">'code',</span> <span class="pre">'head',</span> <span class="pre">'select',</span> <span class="pre">'a']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">avoid_hosts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[re.compile('^localhost',</span> <span class="pre">re.IGNORECASE),</span> <span class="pre">re.compile('\\bexample\\.(?:com|org|net)$',</span> <span class="pre">re.IGNORECASE),</span> <span class="pre">re.compile('^127\\.0\\.0\\.1$')]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">avoid_classes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['nolink']</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lxml.html.clean.autolink" title="Permalink to this definition"></a></dt>
+<dd><p>Turn any URLs into links.</p>
+<p>It will search for links identified by the given regular
+expressions (by default mailto and http(s) links).</p>
+<p>It won’t link text in an element in avoid_elements, or an element
+with a class in avoid_classes.  It won’t link to anything with a
+host that matches one of the regular expressions in avoid_hosts
+(default localhost and 127.0.0.1).</p>
+<p>If you pass in an element, the element’s tail will not be
+substituted, only the contents of the element.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lxml.html.clean.autolink_html">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.clean.</span></span><span class="sig-name descname"><span class="pre">autolink_html</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">html</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kw</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lxml.html.clean.autolink_html" title="Permalink to this definition"></a></dt>
+<dd><p>Turn any URLs into links.</p>
+<p>It will search for links identified by the given regular
+expressions (by default mailto and http(s) links).</p>
+<p>It won’t link text in an element in avoid_elements, or an element
+with a class in avoid_classes.  It won’t link to anything with a
+host that matches one of the regular expressions in avoid_hosts
+(default localhost and 127.0.0.1).</p>
+<p>If you pass in an element, the element’s tail will not be
+substituted, only the contents of the element.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lxml.html.clean.clean_html">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.clean.</span></span><span class="sig-name descname"><span class="pre">clean_html</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">html</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lxml.html.clean.clean_html" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lxml.html.clean.word_break">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.clean.</span></span><span class="sig-name descname"><span class="pre">word_break</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">el</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">40</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">avoid_elements</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['pre',</span> <span class="pre">'textarea',</span> <span class="pre">'code']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">avoid_classes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['nobreak']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">break_character</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'\u200b'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lxml.html.clean.word_break" title="Permalink to this definition"></a></dt>
+<dd><p>Breaks any long words found in the body of the text (not attributes).</p>
+<p>Doesn’t effect any of the tags in avoid_elements, by default
+<code class="docutils literal notranslate"><span class="pre">&lt;textarea&gt;</span></code> and <code class="docutils literal notranslate"><span class="pre">&lt;pre&gt;</span></code></p>
+<p>Breaks words by inserting &amp;#8203;, which is a unicode character
+for Zero Width Space character.  This generally takes up no space
+in rendering, but does copy as a space, and in monospace contexts
+usually takes up space.</p>
+<p>See <a class="reference external" href="http://www.cs.tut.fi/~jkorpela/html/nobr.html">http://www.cs.tut.fi/~jkorpela/html/nobr.html</a> for a discussion</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lxml.html.clean.word_break_html">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.clean.</span></span><span class="sig-name descname"><span class="pre">word_break_html</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">html</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kw</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lxml.html.clean.word_break_html" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="lxml.html.builder.html" class="btn btn-neutral float-left" title="lxml.html.builder module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="lxml.html.defs.html" class="btn btn-neutral float-right" title="lxml.html.defs module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020, lxml dev team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
