@@ -1,8 +1,0 @@
-lxml.html.\_setmixin module
-===========================
-
-.. automodule:: lxml.html._setmixin
-   :members:
-   :undoc-members:
-   :show-inheritance:
-   :private-members:
