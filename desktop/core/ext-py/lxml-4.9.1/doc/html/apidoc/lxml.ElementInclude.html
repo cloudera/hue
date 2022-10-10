@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>lxml.ElementInclude module &mdash; lxml  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="lxml._elementpath module" href="lxml._elementpath.html" />
+    <link rel="prev" title="lxml.isoschematron package" href="lxml.isoschematron.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> lxml
+            <img src="_static/python-xml.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                4.9.1
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="lxml.html">lxml package</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="lxml.html.html">lxml.html package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lxml.html.ElementSoup.html">lxml.html.ElementSoup module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lxml.html._diffcommand.html">lxml.html._diffcommand module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lxml.html._setmixin.html">lxml.html._setmixin module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lxml.html.builder.html">lxml.html.builder module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lxml.html.clean.html">lxml.html.clean module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lxml.html.defs.html">lxml.html.defs module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lxml.html.diff.html">lxml.html.diff module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lxml.html.formfill.html">lxml.html.formfill module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lxml.html.html5parser.html">lxml.html.html5parser module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lxml.html.soupparser.html">lxml.html.soupparser module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lxml.isoschematron.html">lxml.isoschematron package</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">lxml.ElementInclude module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lxml._elementpath.html">lxml._elementpath module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lxml.builder.html">lxml.builder module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lxml.cssselect.html">lxml.cssselect module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lxml.doctestcompare.html">lxml.doctestcompare module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lxml.etree.html">lxml.etree module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lxml.objectify.html">lxml.objectify module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lxml.sax.html">lxml.sax module</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">lxml</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="lxml.html">lxml package</a> &raquo;</li>
+      <li>lxml.ElementInclude module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/lxml.ElementInclude.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-lxml.ElementInclude">
+<span id="lxml-elementinclude-module"></span><h1>lxml.ElementInclude module<a class="headerlink" href="#module-lxml.ElementInclude" title="Permalink to this heading"></a></h1>
+<p>Limited XInclude support for the ElementTree package.</p>
+<p>While lxml.etree has full support for XInclude (see
+<cite>etree.ElementTree.xinclude()</cite>), this module provides a simpler, pure
+Python, ElementTree compatible implementation that supports a simple
+form of custom URL resolvers.</p>
+<dl class="py exception">
+<dt class="sig sig-object py" id="lxml.ElementInclude.FatalIncludeError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lxml.ElementInclude.</span></span><span class="sig-name descname"><span class="pre">FatalIncludeError</span></span><a class="reference internal" href="_modules/lxml/ElementInclude.html#FatalIncludeError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lxml.ElementInclude.FatalIncludeError" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="lxml.etree.html#lxml.etree.LxmlSyntaxError" title="lxml.etree.LxmlSyntaxError"><code class="xref py py-class docutils literal notranslate"><span class="pre">LxmlSyntaxError</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="lxml.ElementInclude.FatalIncludeError.with_traceback">
+<span class="sig-name descname"><span class="pre">with_traceback</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lxml.ElementInclude.FatalIncludeError.with_traceback" title="Permalink to this definition"></a></dt>
+<dd><p>Exception.with_traceback(tb) –
+set self.__traceback__ to tb and return self.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lxml.ElementInclude.FatalIncludeError.args">
+<span class="sig-name descname"><span class="pre">args</span></span><a class="headerlink" href="#lxml.ElementInclude.FatalIncludeError.args" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lxml.ElementInclude.FatalIncludeError.filename">
+<span class="sig-name descname"><span class="pre">filename</span></span><a class="headerlink" href="#lxml.ElementInclude.FatalIncludeError.filename" title="Permalink to this definition"></a></dt>
+<dd><p>exception filename</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lxml.ElementInclude.FatalIncludeError.lineno">
+<span class="sig-name descname"><span class="pre">lineno</span></span><a class="headerlink" href="#lxml.ElementInclude.FatalIncludeError.lineno" title="Permalink to this definition"></a></dt>
+<dd><p>exception lineno</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lxml.ElementInclude.FatalIncludeError.msg">
+<span class="sig-name descname"><span class="pre">msg</span></span><a class="headerlink" href="#lxml.ElementInclude.FatalIncludeError.msg" title="Permalink to this definition"></a></dt>
+<dd><p>exception msg</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lxml.ElementInclude.FatalIncludeError.offset">
+<span class="sig-name descname"><span class="pre">offset</span></span><a class="headerlink" href="#lxml.ElementInclude.FatalIncludeError.offset" title="Permalink to this definition"></a></dt>
+<dd><p>exception offset</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lxml.ElementInclude.FatalIncludeError.print_file_and_line">
+<span class="sig-name descname"><span class="pre">print_file_and_line</span></span><a class="headerlink" href="#lxml.ElementInclude.FatalIncludeError.print_file_and_line" title="Permalink to this definition"></a></dt>
+<dd><p>exception print_file_and_line</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lxml.ElementInclude.FatalIncludeError.text">
+<span class="sig-name descname"><span class="pre">text</span></span><a class="headerlink" href="#lxml.ElementInclude.FatalIncludeError.text" title="Permalink to this definition"></a></dt>
+<dd><p>exception text</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="lxml.ElementInclude.LimitedRecursiveIncludeError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lxml.ElementInclude.</span></span><span class="sig-name descname"><span class="pre">LimitedRecursiveIncludeError</span></span><a class="reference internal" href="_modules/lxml/ElementInclude.html#LimitedRecursiveIncludeError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lxml.ElementInclude.LimitedRecursiveIncludeError" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#lxml.ElementInclude.FatalIncludeError" title="lxml.ElementInclude.FatalIncludeError"><code class="xref py py-class docutils literal notranslate"><span class="pre">FatalIncludeError</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="lxml.ElementInclude.LimitedRecursiveIncludeError.with_traceback">
+<span class="sig-name descname"><span class="pre">with_traceback</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lxml.ElementInclude.LimitedRecursiveIncludeError.with_traceback" title="Permalink to this definition"></a></dt>
+<dd><p>Exception.with_traceback(tb) –
+set self.__traceback__ to tb and return self.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lxml.ElementInclude.LimitedRecursiveIncludeError.args">
+<span class="sig-name descname"><span class="pre">args</span></span><a class="headerlink" href="#lxml.ElementInclude.LimitedRecursiveIncludeError.args" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lxml.ElementInclude.LimitedRecursiveIncludeError.filename">
+<span class="sig-name descname"><span class="pre">filename</span></span><a class="headerlink" href="#lxml.ElementInclude.LimitedRecursiveIncludeError.filename" title="Permalink to this definition"></a></dt>
+<dd><p>exception filename</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lxml.ElementInclude.LimitedRecursiveIncludeError.lineno">
+<span class="sig-name descname"><span class="pre">lineno</span></span><a class="headerlink" href="#lxml.ElementInclude.LimitedRecursiveIncludeError.lineno" title="Permalink to this definition"></a></dt>
+<dd><p>exception lineno</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lxml.ElementInclude.LimitedRecursiveIncludeError.msg">
+<span class="sig-name descname"><span class="pre">msg</span></span><a class="headerlink" href="#lxml.ElementInclude.LimitedRecursiveIncludeError.msg" title="Permalink to this definition"></a></dt>
+<dd><p>exception msg</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lxml.ElementInclude.LimitedRecursiveIncludeError.offset">
+<span class="sig-name descname"><span class="pre">offset</span></span><a class="headerlink" href="#lxml.ElementInclude.LimitedRecursiveIncludeError.offset" title="Permalink to this definition"></a></dt>
+<dd><p>exception offset</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lxml.ElementInclude.LimitedRecursiveIncludeError.print_file_and_line">
+<span class="sig-name descname"><span class="pre">print_file_and_line</span></span><a class="headerlink" href="#lxml.ElementInclude.LimitedRecursiveIncludeError.print_file_and_line" title="Permalink to this definition"></a></dt>
+<dd><p>exception print_file_and_line</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lxml.ElementInclude.LimitedRecursiveIncludeError.text">
+<span class="sig-name descname"><span class="pre">text</span></span><a class="headerlink" href="#lxml.ElementInclude.LimitedRecursiveIncludeError.text" title="Permalink to this definition"></a></dt>
+<dd><p>exception text</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lxml.ElementInclude._include">
+<span class="sig-prename descclassname"><span class="pre">lxml.ElementInclude.</span></span><span class="sig-name descname"><span class="pre">_include</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">elem</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loader</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_url</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_parent_hrefs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lxml/ElementInclude.html#_include"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lxml.ElementInclude._include" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lxml.ElementInclude._lxml_default_loader">
+<span class="sig-prename descclassname"><span class="pre">lxml.ElementInclude.</span></span><span class="sig-name descname"><span class="pre">_lxml_default_loader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">href</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parse</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parser</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lxml/ElementInclude.html#_lxml_default_loader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lxml.ElementInclude._lxml_default_loader" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lxml.ElementInclude._wrap_et_loader">
+<span class="sig-prename descclassname"><span class="pre">lxml.ElementInclude.</span></span><span class="sig-name descname"><span class="pre">_wrap_et_loader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">loader</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lxml/ElementInclude.html#_wrap_et_loader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lxml.ElementInclude._wrap_et_loader" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lxml.ElementInclude.default_loader">
+<span class="sig-prename descclassname"><span class="pre">lxml.ElementInclude.</span></span><span class="sig-name descname"><span class="pre">default_loader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">href</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parse</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lxml/ElementInclude.html#default_loader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lxml.ElementInclude.default_loader" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lxml.ElementInclude.include">
+<span class="sig-prename descclassname"><span class="pre">lxml.ElementInclude.</span></span><span class="sig-name descname"><span class="pre">include</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">elem</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loader</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_url</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lxml/ElementInclude.html#include"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lxml.ElementInclude.include" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="lxml.isoschematron.html" class="btn btn-neutral float-left" title="lxml.isoschematron package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="lxml._elementpath.html" class="btn btn-neutral float-right" title="lxml._elementpath module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020, lxml dev team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

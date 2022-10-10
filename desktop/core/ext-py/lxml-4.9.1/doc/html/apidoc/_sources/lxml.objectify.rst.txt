@@ -1,0 +1,8 @@
+lxml.objectify module
+=====================
+
+.. automodule:: lxml.objectify
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
