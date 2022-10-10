@@ -77,18 +77,33 @@ public class CleanupManager implements Managed {
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
       long queryInfoDelTime = System.currentTimeMillis() / 1000 - config.getConf(CLEANUP_INTERVAL_SECS);
-      txnManager.withTransaction(() -> {
-        log.info("Query info clean for records older than: {}", queryInfoDelTime);
-        vertexInfoRepoProvider.get().deleteOlder(queryInfoDelTime);
-        tezDagExtendedInfoRepository.get().deleteOlder(queryInfoDelTime);
-        tezDagBasicInfoRepository.get().deleteOlder(queryInfoDelTime);
-        hiveQueryExtendedInfoRepository.get().deleteOlder(queryInfoDelTime);
-        hiveQueryBasicInfoRepository.get().deleteOlder(queryInfoDelTime);
-        tezAppInfoRepository.get().deleteOlder(queryInfoDelTime);
-
-        return true;
-      });
+      deleteOlder(queryInfoDelTime);
     }
+  }
+
+  public void deleteOlder(long startTime) {
+    txnManager.withTransaction(() -> {
+      log.info("Query info clean for records older than: {}", startTime);
+      vertexInfoRepoProvider.get().deleteOlder(startTime);
+      tezDagExtendedInfoRepository.get().deleteOlder(startTime);
+      tezDagBasicInfoRepository.get().deleteOlder(startTime);
+      hiveQueryExtendedInfoRepository.get().deleteOlder(startTime);
+      hiveQueryBasicInfoRepository.get().deleteOlder(startTime);
+      tezAppInfoRepository.get().deleteOlder(startTime);
+
+      return true;
+    });
+  }
+
+  public void purge() {
+      log.info("vacuum all the tables: (vertex_info, dag_details, dag_info, query_details, hive_query, tez_app_info");
+
+      vertexInfoRepoProvider.get().purge();
+      tezDagExtendedInfoRepository.get().purge();
+      tezDagBasicInfoRepository.get().purge();
+      hiveQueryExtendedInfoRepository.get().purge();
+      hiveQueryBasicInfoRepository.get().purge();
+      tezAppInfoRepository.get().purge();
   }
 
   @Override

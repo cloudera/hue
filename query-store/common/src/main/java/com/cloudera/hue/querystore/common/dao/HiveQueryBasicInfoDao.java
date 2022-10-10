@@ -71,4 +71,8 @@ public interface HiveQueryBasicInfoDao extends JdbiDao<HiveQueryBasicInfo> {
 
   @SqlUpdate("delete from hive_query where start_time < :startTime")
   int deleteOlder(@Bind("startTime") long startTime);
+
+  @SqlUpdate("vacuum full hive_query")
+  int purge();
+
 }

@@ -48,4 +48,8 @@ public class TezAppInfoRepository extends JdbiRepository<TezAppInfo, TezAppInfoD
   public int deleteOlder(long submitTime) {
     return dao.deleteOlder(submitTime * 1000);
   }
+
+  public int purge() {
+    return dao.purge();
+  }
 }

@@ -65,4 +65,8 @@ public interface VertexInfoDao extends JdbiDao<VertexInfo> {
   @SqlUpdate("delete from vertex_info vi using dag_info di " +
       "where di.id = vi.dag_id and di.start_time < :startTime")
   int deleteOlder(@Bind("startTime") long startTime);
+
+  @SqlUpdate("vacuum full vertex_info")
+  int purge();
+
 }

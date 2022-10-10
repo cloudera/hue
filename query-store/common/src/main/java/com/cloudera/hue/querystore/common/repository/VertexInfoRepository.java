@@ -53,4 +53,9 @@ public class VertexInfoRepository extends JdbiRepository<VertexInfo, VertexInfoD
   public int deleteOlder(long startTime) {
     return dao.deleteOlder(startTime * 1000);
   }
+
+  public int purge() {
+    return dao.purge();
+  }
+
 }

@@ -53,4 +53,8 @@ public interface TezDagBasicInfoDao extends JdbiDao<TezDagBasicInfo> {
 
   @SqlUpdate("delete from dag_info where start_time < :startTime")
   int deleteOlder(@Bind("startTime") long startTime);
+
+  @SqlUpdate("vacuum full dag_info")
+  int purge();
+
 }
