@@ -1,4 +1,5 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 
 import React from 'react';
@@ -10,26 +11,31 @@ describe('ReactExampleGlobal', () => {
 
   afterEach(() => consoleSpy.mockClear());
 
-  test('disables after click', () => {
+  test('disables after click', async () => {
+    // It is recommended to call userEvent.setup per test
+    const user = userEvent.setup();
     render(<ReactExampleGlobal />);
     const btn = screen.getByRole('button', { name: 'ReactExampleGlobal - Like me' });
     expect(btn).not.toBeDisabled();
-    fireEvent.click(btn);
+
+    await user.click(btn);
     expect(btn).toBeDisabled();
   });
 
-  test('provides click callback', () => {
+  test('provides click callback', async () => {
+    const user = userEvent.setup();
     const clickCallback = jest.fn();
     render(<ReactExampleGlobal onClick={clickCallback} />);
     const btn = screen.getByRole('button', { name: 'ReactExampleGlobal - Like me' });
-    fireEvent.click(btn);
+    await user.click(btn);
     expect(clickCallback).toHaveBeenCalled();
   });
 
-  test('prints to console.info on click', () => {
+  test('prints to console.info on click', async () => {
+    const user = userEvent.setup();
     render(<ReactExampleGlobal version="1" myObj={{ id: 'a' }} />);
     const btn = screen.getByRole('button', { name: 'ReactExampleGlobal - Like me' });
-    fireEvent.click(btn);
+    await user.click(btn);
     expect(consoleSpy).toHaveBeenCalledWith('ReactExampleGlobal clicked  1 a');
   });
 });

@@ -1,0 +1,8 @@
+lxml.etree module
+=================
+
+.. automodule:: lxml.etree
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:

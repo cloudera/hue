@@ -1,0 +1,8 @@
+lxml.sax module
+===============
+
+.. automodule:: lxml.sax
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
