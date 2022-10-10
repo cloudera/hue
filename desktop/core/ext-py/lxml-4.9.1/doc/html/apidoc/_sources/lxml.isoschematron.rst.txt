@@ -1,0 +1,11 @@
+lxml.isoschematron package
+==========================
+
+Module contents
+---------------
+
+.. automodule:: lxml.isoschematron
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
