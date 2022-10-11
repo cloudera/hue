@@ -1,11 +1,10 @@
 [
   {
     "namePrefix": "should suggest keywords",
-    "beforeCursor": ";;",
+    "beforeCursor": "[;;",
     "afterCursor": "",
     "containsKeywords": [
-      "SELECT",
-      "WITH"
+      "SELECT"
     ],
     "expectedResult": {
       "lowerCase": false
