@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import genericSyntaxParser from '../genericSyntaxParser';
+import genericSyntaxParser from './genericSyntaxParser';
 
 describe('genericSyntaxParser.js', () => {
   const expectedToStrings = function (expected) {

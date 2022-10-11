@@ -1,0 +1,14 @@
+[
+  {
+    "namePrefix": "should suggest columns",
+    "beforeCursor": "SELECT * FROM testTable WHERE baa baaa boo",
+    "afterCursor": "",
+    "containsKeywords": [
+      "GROUP BY",
+      "ORDER BY"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  }
+]

@@ -1,0 +1,110 @@
+[
+  {
+    "namePrefix": "should not report errors",
+    "beforeCursor": "INSERT INTO bla.boo VALUES (1, 2, 'a', 3); ",
+    "afterCursor": "",
+    "noErrors": true,
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "",
+    "afterCursor": "",
+    "containsKeywords": [
+      "INSERT"
+    ],
+    "noErrors": true,
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "INSERT ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "INTO"
+    ],
+    "noErrors": true,
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest tables",
+    "beforeCursor": "INSERT INTO ",
+    "afterCursor": "",
+    "noErrors": true,
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestTables": {},
+      "suggestDatabases": {
+        "appendDot": true
+      },
+      "suggestKeywords": [
+        "TABLE"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest tables",
+    "beforeCursor": "INSERT INTO baa.",
+    "afterCursor": "",
+    "noErrors": true,
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestTables": {
+        "identifierChain": [
+          {
+            "name": "baa"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest tables",
+    "beforeCursor": "INSERT INTO TABLE baa.",
+    "afterCursor": "",
+    "noErrors": true,
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestTables": {
+        "identifierChain": [
+          {
+            "name": "baa"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "INSERT INTO baa ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "VALUES"
+    ],
+    "noErrors": true,
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "INSERT INTO TABLE baa ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "VALUES"
+    ],
+    "noErrors": true,
+    "expectedResult": {
+      "lowerCase": false
+    }
+  }
+]
