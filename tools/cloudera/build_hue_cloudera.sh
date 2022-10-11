@@ -48,7 +48,7 @@ function install_prerequisite() {
   export SQLITE3_PATH=${SQLITE3_PATH:-"$TOOLS_HOME/sqlite/sqlite3"}
   check_python_path
   check_sqlite3
-  if [[ $1 == "centos7" ]]; then
+  if [[ $1 == "centos7" || $1 == "snapshot" ]]; then
     export PYTHON38_PATH=/opt/cloudera/cm-agent
     export pip38_bin="$PYTHON38_PATH/bin/pip3.8"
     centos7_install
