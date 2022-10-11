@@ -138,12 +138,6 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'build', 'static')
 
 
-# List of callables that know how to import templates from various sources.
-GTEMPLATE_LOADERS = (
-  'django.template.loaders.filesystem.Loader',
-  'django.template.loaders.app_directories.Loader'
-)
-
 MIDDLEWARE = [
     # The order matters
     'desktop.middleware.MetricsMiddleware',
@@ -255,7 +249,6 @@ TEMPLATES = [
     'NAME': 'mako',
     'OPTIONS': {
       'context_processors': GTEMPLATE_CONTEXT_PROCESSORS,
-      'loaders': GTEMPLATE_LOADERS,
     },
   },
   {
