@@ -29,7 +29,9 @@ const AUTOCOMPLETE_MODULES = {
   ksql: () => import(/* webpackChunkName: "ksql-parser" */ './ksql/ksqlAutocompleteParser'),
   phoenix: () =>
     import(/* webpackChunkName: "phoenix-parser" */ './phoenix/phoenixAutocompleteParser'),
-  presto: () => import(/* webpackChunkName: "presto-parser" */ './presto/prestoAutocompleteParser')
+  presto: () => import(/* webpackChunkName: "presto-parser" */ './presto/prestoAutocompleteParser'),
+  sparksql: () =>
+    import(/* webpackChunkName: "sparksql-parser" */ './sparksql/sparksqlAutocompleteParser')
 };
 const SYNTAX_MODULES = {
   calcite: () => import(/* webpackChunkName: "calcite-parser" */ './calcite/calciteSyntaxParser'),
@@ -40,7 +42,9 @@ const SYNTAX_MODULES = {
   impala: () => import(/* webpackChunkName: "impala-parser" */ './impala/impalaSyntaxParser'),
   ksql: () => import(/* webpackChunkName: "ksql-parser" */ './ksql/ksqlSyntaxParser'),
   phoenix: () => import(/* webpackChunkName: "phoenix-parser" */ './phoenix/phoenixSyntaxParser'),
-  presto: () => import(/* webpackChunkName: "presto-parser" */ './presto/prestoSyntaxParser')
+  presto: () => import(/* webpackChunkName: "presto-parser" */ './presto/prestoSyntaxParser'),
+  sparksql: () =>
+    import(/* webpackChunkName: "sparksql-parser" */ './sparksql/sparksqlSyntaxParser')
 };
 
 export class SqlParserRepository implements SqlParserProvider {
