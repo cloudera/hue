@@ -35,42 +35,6 @@ describe('genericAutocompleteParser.js ALTER statements', () => {
     ).toEqualDefinition(testDefinition);
   };
 
-  describe('ALTER TABLE', () => {
-    it('should suggest keywords for "ALTER |"', () => {
-      assertAutoComplete({
-        beforeCursor: 'ALTER ',
-        afterCursor: '',
-        containsKeywords: ['TABLE'],
-        expectedResult: {
-          lowerCase: false
-        }
-      });
-    });
-
-    it('should suggest tables for "ALTER TABLE |"', () => {
-      assertAutoComplete({
-        beforeCursor: 'ALTER TABLE ',
-        afterCursor: '',
-        expectedResult: {
-          lowerCase: false,
-          suggestTables: { onlyTables: true },
-          suggestDatabases: { appendDot: true }
-        }
-      });
-    });
-
-    it('should suggest tables for "ALTER TABLE foo.|"', () => {
-      assertAutoComplete({
-        beforeCursor: 'ALTER TABLE foo.',
-        afterCursor: '',
-        expectedResult: {
-          lowerCase: false,
-          suggestTables: { identifierChain: [{ name: 'foo' }], onlyTables: true }
-        }
-      });
-    });
-  });
-
   describe('ALTER VIEW', () => {
     it('should handle "ALTER VIEW baa.boo AS SELECT * FROM bla;|"', () => {
       assertAutoComplete({
