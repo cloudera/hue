@@ -193,20 +193,48 @@ const initSqlParser = function (parser) {
     return { suggestKeywords: keywords };
   };
 
+  parser.getDataSourceKeywords = function () {
+    return ['AVRO', 'CSV', 'HIVE', 'JDBC', 'ORC', 'PARQUET', 'TEXTFILE', 'TXT'];
+  };
+
   parser.getTypeKeywords = function () {
     return [
+      'ARRAY',
       'BIGINT',
+      'BINARY',
       'BOOLEAN',
-      'CHAR',
+      'BYTE',
+      'DATE',
+      'DEC',
       'DECIMAL',
       'DOUBLE',
       'FLOAT',
       'INT',
+      'INTEGER',
+      'INTERVAL YEAR',
+      'INTERVAL YEAR TO MONTH',
+      'INTERVAL MONTH',
+      'INTERVAL DAY',
+      'INTERVAL DAY TO HOUR',
+      'INTERVAL DAY TO MINUTE',
+      'INTERVAL DAY TO SECOND',
+      'INTERVAL HOUR',
+      'INTERVAL HOUR TO MINUTE',
+      'INTERVAL HOUR TO SECOND',
+      'INTERVAL MINUTE',
+      'INTERVAL MINUTE TO SECOND',
+      'INTERVAL SECOND',
+      'LONG',
+      'MAP',
+      'NUMERIC',
+      'REAL',
       'SMALLINT',
+      'STRUCT',
       'TIMESTAMP',
-      'STRING',
       'TINYINT',
-      'VARCHAR'
+      'STRING',
+      'SHORT',
+      'TINYINT'
     ];
   };
 
@@ -1002,7 +1030,7 @@ const initSqlParser = function (parser) {
   };
 
   parser.suggestDdlAndDmlKeywords = function (extraKeywords) {
-    let keywords = ['CREATE', 'DESCRIBE', 'SELECT', 'SHOW'];
+    let keywords = ['ALTER', 'CREATE', 'DESCRIBE', 'SELECT', 'SHOW'];
 
     if (extraKeywords) {
       keywords = keywords.concat(extraKeywords);
