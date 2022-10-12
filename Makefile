@@ -267,7 +267,7 @@ npm-install:
 
 .PHONY: create-static
 create-static:
-	./build/env/bin/hue collectstatic --noinput
+	./build/env/bin/python ./build/env/bin/hue collectstatic --noinput
 
 # <<<< DEV ONLY
 .PHONY: doc
