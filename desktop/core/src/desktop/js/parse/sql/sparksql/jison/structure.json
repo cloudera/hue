@@ -2,6 +2,11 @@
   "lexer": "sql.jisonlex",
   "autocomplete": [
     "../../generic/jison/autocomplete_header.jison",
+    "alter/alter_common.jison",
+    "alter/alter_database.jison",
+    "alter/alter_table.jison",
+    "alter/alter_view.jison",
+    "create/create_common.jison",
     "../../generic/jison/select/cte_select_statement.jison",
     "../../generic/jison/select/from_clause.jison",
     "../../generic/jison/select/group_by_clause.jison",
@@ -38,6 +43,11 @@
   ],
   "syntax": [
     "../../generic/jison/syntax_header.jison",
+    "alter/alter_common.jison",
+    "alter/alter_database.jison",
+    "alter/alter_table.jison",
+    "alter/alter_view.jison",
+    "create/create_common.jison",
     "../../generic/jison/select/cte_select_statement.jison",
     "../../generic/jison/select/from_clause.jison",
     "../../generic/jison/select/group_by_clause.jison",
