@@ -151,7 +151,7 @@ MIDDLEWARE = [
     'desktop.middleware.SpnegoMiddleware',
     'desktop.middleware.HueRemoteUserMiddleware',
     'django.middleware.locale.LocaleMiddleware',
-    'django_babel.middleware.LocaleMiddleware',
+    'enmerkar.middleware.LocaleMiddleware',
     'desktop.middleware.AjaxMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -196,7 +196,7 @@ INSTALLED_APPS = [
     #'south', # database migration tool
 
     # i18n support
-    'django_babel',
+    'enmerkar',
 
     # Desktop injects all the other installed apps into here magically.
     'desktop',
