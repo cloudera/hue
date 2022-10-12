@@ -282,6 +282,10 @@ OptionalIfExists
    }
  ;
 
+IfExists_EDIT
+ : OptionalIfExists_EDIT
+ ;
+
 OptionalIfExists_EDIT
  : 'IF' 'CURSOR'
    {
@@ -295,6 +299,10 @@ OptionalIfNotExists
    {
      parser.yy.correlatedSubQuery = false;
    }
+ ;
+
+IfNotExists_EDIT
+ : OptionalIfNotExists_EDIT
  ;
 
 OptionalIfNotExists_EDIT
