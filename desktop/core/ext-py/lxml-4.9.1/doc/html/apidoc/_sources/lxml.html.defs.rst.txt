@@ -1,0 +1,8 @@
+lxml.html.defs module
+=====================
+
+.. automodule:: lxml.html.defs
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:

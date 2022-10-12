@@ -1013,9 +1013,8 @@ There is no bridge to KO for components using this integration. Example using in
               <ReactExampleGlobal data-bind="reactWrapper: 'ReactExampleGlobal', props: { children: 'KO binding used', myObj: activeExecutable }"></ReactExampleGlobal>
               
               Example component defined and used only within the "Editor app"
-              <ReactExample data-bind="reactWrapper: 'ReactExample', props: { title: 'Result title', activeExecutable: activeExecutable }"></ReactExample>
+              <ReactExample data-bind="reactWrapper: 'ReactExample', props: { activeExecutable: activeExecutable }"></ReactExample>
               !-->
-
               <result-table-ko-bridge class="table-results-bridge" data-bind="vueKoProps: {
                   'executable-observable': activeExecutable
                 }"></result-table-ko-bridge>

@@ -55,6 +55,7 @@ export interface hueWindow {
   HAS_CONNECTORS?: boolean;
   HAS_SQL_ANALYZER?: boolean;
   HUE_BASE_URL?: string;
+  HUE_LANG?: string;
   HUE_VERSION?: string;
   LOGGED_USERNAME?: string;
   SHOW_ADD_MORE_EDITORS?: boolean;
