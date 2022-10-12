@@ -1,0 +1,77 @@
+[
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "DATABASE",
+      "NAMESPACE",
+      "SCHEMA"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest databases",
+    "beforeCursor": "ALTER DATABASE ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestDatabases": {}
+    }
+  },
+  {
+    "namePrefix": "should suggest databases",
+    "beforeCursor": "ALTER NAMESPACE ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestDatabases": {}
+    }
+  },
+  {
+    "namePrefix": "should suggest databases",
+    "beforeCursor": "ALTER SCHEMA ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestDatabases": {}
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER DATABASE foo ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "SET DBPROPERTIES",
+        "SET LOCATION",
+        "SET PROPERTIES"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER SCHEMA foo SET ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "DBPROPERTIES",
+        "LOCATION",
+        "PROPERTIES"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest databases",
+    "beforeCursor": "ALTER NAMESPACE ",
+    "afterCursor": " SET LOCATION 'some location';",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestDatabases": {}
+    }
+  }
+]

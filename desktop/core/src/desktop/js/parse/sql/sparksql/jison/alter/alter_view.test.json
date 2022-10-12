@@ -1,0 +1,223 @@
+[
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "VIEW"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest views and databases",
+    "beforeCursor": "ALTER VIEW ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestTables": {
+        "onlyViews": true
+      },
+      "suggestDatabases": {
+        "appendDot": true
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest views",
+    "beforeCursor": "ALTER VIEW foo.",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestTables": {
+        "onlyViews": true,
+        "identifierChain": [
+          {
+            "name": "foo"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER VIEW foo ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "SET TBLPROPERTIES"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER VIEW foo.bar ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "SET TBLPROPERTIES"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER VIEW foo ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "RENAME TO"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER VIEW foo RENAME ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "TO"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest views and databases",
+    "beforeCursor": "ALTER VIEW ",
+    "afterCursor": " RENAME TO bar",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestTables": {
+        "onlyViews": true
+      },
+      "suggestDatabases": {
+        "appendDot": true
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest tables",
+    "beforeCursor": "ALTER VIEW foo.",
+    "afterCursor": " RENAME TO bar",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestTables": {
+        "onlyViews": true,
+        "identifierChain": [
+          {
+            "name": "foo"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER VIEW bar ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "SET TBLPROPERTIES",
+      "UNSET TBLPROPERTIES"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER VIEW bar SET ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "TBLPROPERTIES"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER VIEW bar UNSET ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "TBLPROPERTIES"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER VIEW bar UNSET TBLPROPERTIES ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "IF EXISTS"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER VIEW bar UNSET TBLPROPERTIES IF ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "EXISTS"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER VIEW bar ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "AS SELECT"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER VIEW bar AS ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "SELECT"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER VIEW bar AS SELECT ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "*"
+    ],
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestAggregateFunctions": {
+        "tables": []
+      },
+      "suggestAnalyticFunctions": true,
+      "suggestFunctions": {},
+      "suggestColumns": {
+        "source": "select",
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "bar"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+]
