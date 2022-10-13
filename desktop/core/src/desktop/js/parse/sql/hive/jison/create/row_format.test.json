@@ -1,0 +1,52 @@
+[
+  {
+    "namePrefix": "should not report errors",
+    "beforeCursor": "CREATE TABLE foo (id int) ROW FORMAT DELIMITED FIELDS TERMINATED BY ',' ESCAPED BY 'q'; ",
+    "afterCursor": "",
+    "noErrors": true,
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE TABLE foo (id int) ROW FORMAT ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "DELIMITED",
+      "SERDE"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE TABLE foo (id int) ROW FORMAT DELIMITED ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "FIELDS TERMINATED BY",
+      "COLLECTION ITEMS TERMINATED BY",
+      "MAP KEYS TERMINATED BY",
+      "LINES TERMINATED BY",
+      "NULL DEFINED AS"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE TABLE foo (id int) ROW FORMAT DELIMITED MAP ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "KEYS TERMINATED BY"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  }
+]

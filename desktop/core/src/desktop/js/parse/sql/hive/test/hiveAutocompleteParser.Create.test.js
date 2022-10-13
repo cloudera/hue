@@ -1584,58 +1584,13 @@ describe('hiveAutocompleteParser.js CREATE statements', () => {
       });
     });
 
-    it('should suggest keywords for "CREATE TABLE foo (id int) ROW FORMAT |"', () => {
-      assertAutoComplete({
-        beforeCursor: 'CREATE TABLE foo (id int) ROW FORMAT ',
-        afterCursor: '',
-        expectedResult: {
-          lowerCase: false,
-          suggestKeywords: ['DELIMITED', 'SERDE']
-        }
-      });
-    });
-
     it('should suggest keywords for "CREATE TABLE foo (id int) ROW FORMAT DELIMITED |"', () => {
       assertAutoComplete({
         beforeCursor: 'CREATE TABLE foo (id int) ROW FORMAT DELIMITED ',
         afterCursor: '',
+        containsKeywords: ['STORED AS', 'STORED BY', 'LOCATION', 'TBLPROPERTIES', 'AS'],
         expectedResult: {
-          lowerCase: false,
-          suggestKeywords: [
-            'FIELDS TERMINATED BY',
-            'COLLECTION ITEMS TERMINATED BY',
-            'MAP KEYS TERMINATED BY',
-            'LINES TERMINATED BY',
-            'NULL DEFINED AS',
-            'STORED AS',
-            'STORED BY',
-            'LOCATION',
-            'TBLPROPERTIES',
-            'AS'
-          ]
-        }
-      });
-    });
-
-    it('should suggest keywords for "CREATE TABLE foo (id int) ROW FORMAT DELIMITED MAP |"', () => {
-      assertAutoComplete({
-        beforeCursor: 'CREATE TABLE foo (id int) ROW FORMAT DELIMITED MAP ',
-        afterCursor: '',
-        expectedResult: {
-          lowerCase: false,
-          suggestKeywords: ['KEYS TERMINATED BY']
-        }
-      });
-    });
-
-    it('should suggest keywords for "CREATE TABLE foo (id int) ROW FORMAT DELIMITED MAP KEYS TERMINATED BY \'a\' NULL DEFINED |"', () => {
-      assertAutoComplete({
-        beforeCursor:
-          "CREATE TABLE foo (id int) ROW FORMAT DELIMITED MAP KEYS TERMINATED BY 'a' NULL DEFINED ",
-        afterCursor: '',
-        expectedResult: {
-          lowerCase: false,
-          suggestKeywords: ['AS']
+          lowerCase: false
         }
       });
     });
