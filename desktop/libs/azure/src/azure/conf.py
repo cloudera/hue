@@ -167,7 +167,7 @@ def is_adls_enabled():
 
 def is_abfs_enabled():
   return ('default' in list(AZURE_ACCOUNTS.keys()) and AZURE_ACCOUNTS['default'].get_raw() and AZURE_ACCOUNTS['default'].CLIENT_ID.get() \
-    or (conf_idbroker.is_idbroker_enabled('azure') and has_azure_metadata() and not is_raz_abfs())) and 'default' in list(ABFS_CLUSTERS.keys()) \
+    or (conf_idbroker.is_idbroker_enabled('azure') and has_azure_metadata())) and 'default' in list(ABFS_CLUSTERS.keys()) \
     or is_raz_abfs()
 
 def has_adls_access(user):
