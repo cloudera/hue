@@ -22,8 +22,6 @@ import requests
 from requests_kerberos import HTTPKerberosAuth
 from hadoop.core_site import get_conf
 
-from desktop.conf import RAZ
-
 if sys.version_info[0] > 2:
   from django.utils.translation import gettext_lazy as _t
 else:
@@ -89,6 +87,8 @@ def get_cab_password(fs=None):
   return get_conf().get(_CNF_CAB_PASSWORD % fs) if fs else None
 
 def is_idbroker_enabled(fs=None):
+  from desktop.conf import RAZ  # Must be imported dynamically in order to have proper value
+
   return get_cab_address(fs) is not None and not RAZ.IS_ENABLED.get() # Skipping IDBroker for FS when RAZ is present
 
 def config_validator():
