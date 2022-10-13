@@ -87,7 +87,9 @@ def get_cab_password(fs=None):
   return get_conf().get(_CNF_CAB_PASSWORD % fs) if fs else None
 
 def is_idbroker_enabled(fs=None):
-  return get_cab_address(fs) is not None
+  from desktop.conf import RAZ  # Must be imported dynamically in order to have proper value
+
+  return get_cab_address(fs) is not None and not RAZ.IS_ENABLED.get() # Skipping IDBroker for FS when RAZ is present
 
 def config_validator():
   res = []
