@@ -1,0 +1,122 @@
+[
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "DATABASE",
+      "SCHEMA"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE DATABASE ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": ["IF NOT EXISTS"]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE DATABASE IF ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": ["NOT EXISTS"]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE DATABASE IF NOT ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": ["EXISTS"]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE DATABASE foo ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": ["COMMENT", "LOCATION", "WITH DBPROPERTIES"]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE DATABASE foo COMMENT 'some comment' ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": ["LOCATION", "WITH DBPROPERTIES"]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE SCHEMA foo COMMENT 'some comment' ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": ["LOCATION", "WITH DBPROPERTIES"]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE DATABASE foo COMMENT 'some comment' LOCATION 'bar' ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": ["WITH DBPROPERTIES"]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE DATABASE foo COMMENT 'some comment' LOCATION 'bar' WITH ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": ["DBPROPERTIES"]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE DATABASE foo COMMENT 'some comment' ",
+    "afterCursor": " WITH DBPROPERTIES ('a'='b')",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": ["LOCATION"]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE SCHEMA foo ",
+    "afterCursor": " LOCATION 'some location' WITH DBPROPERTIES ('a'='b')",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": ["COMMENT"]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE DATABASE ",
+    "afterCursor": " foo WITH DBPROPERTIES ('a'='b')",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": ["IF NOT EXISTS"]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE SCHEMA IF NOT ",
+    "afterCursor": " foo WITH DBPROPERTIES ('a'='b')",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": ["EXISTS"]
+    }
+  }
+]
