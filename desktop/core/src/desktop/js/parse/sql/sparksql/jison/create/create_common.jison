@@ -14,6 +14,57 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+DataDefinition_EDIT
+ : 'CREATE' OptionalOrReplace OptionalTemporary 'CURSOR'
+   {
+     if (!$2 && !$3) {
+       parser.suggestKeywords([
+         'DATABASE', 'EXTERNAL TABLE', 'FUNCTION', 'GLOBAL TEMPORARY VIEW', 'OR REPLACE', 'SCHEMA', 'TABLE', 'TEMPORARY FUNCTION', 'TEMPORARY VIEW', 'VIEW']);
+     } else if ($2 && !$3) {
+       parser.suggestKeywords(['FUNCTION', 'GLOBAL TEMPORARY VIEW', 'TEMPORARY FUNCTION', 'TEMPORARY VIEW', 'VIEW']);
+     } else if ($3) {
+       parser.suggestKeywords(['FUNCTION', 'VIEW']);
+     }
+   }
+ | 'CREATE' OrReplace_EDIT
+ | 'CREATE' OptionalOrReplace Temporary_EDIT
+ ;
+
+
+OptionalTemporary
+ :
+ | 'TEMPORARY'
+ | 'GLOBAL' 'TEMPORARY'
+ ;
+
+Temporary_EDIT
+ : 'GLOBAL' 'CURSOR'
+   {
+     parser.suggestKeywords(['TEMPORARY']);
+   }
+ ;
+
+OptionalOrReplace
+ :
+ | OrReplace
+ ;
+
+OrReplace
+ : 'OR' 'REPLACE'
+ ;
+
+OrReplace_EDIT
+ : 'OR' 'CURSOR'
+   {
+     parser.suggestKeywords(['REPLACE']);
+   }
+ ;
+
+OptionalParenthesizedColumnSpecificationList
+ :
+ | ParenthesizedColumnSpecificationList
+ ;
+
 ParenthesizedColumnSpecificationList
  : '(' ColumnSpecificationList ')'                              -> $2
  ;
@@ -51,64 +102,29 @@ ColumnSpecificationList_EDIT
  ;
 
 ColumnSpecification
- : ColumnIdentifier ColumnDataType OptionalColumnOptions
+ : ColumnIdentifier ColumnDataType OptionalComment
    {
      $$ = $1;
      $$.type = $2;
      var keywords = [];
-     if (!$3['comment']) {
+     if (!$3) {
        keywords.push('COMMENT');
      }
-     if (keywords.length > 0) {
+     if (!$3 && $2 && $2.suggestKeywords) {
+       keywords = keywords.concat($2.suggestKeywords);
+     }
+     if (keywords.length) {
        $$.suggestKeywords = keywords;
      }
    }
  ;
 
 ColumnSpecification_EDIT
- : ColumnIdentifier 'CURSOR' OptionalColumnOptions
+ : ColumnIdentifier 'CURSOR' OptionalComment
    {
      parser.suggestKeywords(parser.getColumnDataTypeKeywords());
    }
- | ColumnIdentifier ColumnDataType_EDIT OptionalColumnOptions
- | ColumnIdentifier ColumnDataType ColumnOptions_EDIT
- ;
-
-OptionalColumnOptions
- :                      -> {}
- | ColumnOptions
- ;
-
-ColumnOptions
- : ColumnOption
-   {
-     $$ = {};
-     $$[$1] = true;
-   }
- | ColumnOptions ColumnOption
-   {
-     $1[$2] = true;
-   }
- ;
-
-ColumnOptions_EDIT
- : ColumnOption_EDIT
- | ColumnOption_EDIT ColumnOptions
- | ColumnOptions ColumnOption_EDIT
- | ColumnOptions ColumnOption_EDIT ColumnOptions
- ;
-
-ColumnOption
- : 'NOT' 'NULL'                                              -> 'null'
- | 'NULL'                                                    -> 'null'
- | Comment                                                   -> 'comment'
- ;
-
-ColumnOption_EDIT
- : 'NOT' 'CURSOR'
-   {
-     parser.suggestKeywords(['NULL']);
-   }
+ | ColumnIdentifier ColumnDataType_EDIT OptionalComment
  ;
 
 ColumnDataType
@@ -119,12 +135,14 @@ ColumnDataType
  | ArrayType_INVALID
  | MapType_INVALID
  | StructType_INVALID
+ | IntervalType
  ;
 
 ColumnDataType_EDIT
  : ArrayType_EDIT
  | MapType_EDIT
  | StructType_EDIT
+ | IntervalType_EDIT
  ;
 
 ArrayType
@@ -256,4 +274,71 @@ ParenthesizedPartitionList
 PartitionList
  : PartitionSpec
  | PartitionList, PartitionSpec
+ ;
+
+
+OptionalComment
+ :
+ | Comment
+ ;
+
+Comment
+ : 'COMMENT' QuotedValue
+ ;
+
+// Extension of PrimitiveType in sql_main.jison
+PrimitiveType
+ : 'BYTE'
+ | 'SHORT'
+ | 'INTEGER'
+ | 'LONG'
+ | 'REAL'
+ | 'DATE'
+ | 'BINARY'
+ | 'NUMERIC'
+ | 'DEC'
+ ;
+
+IntervalType
+ : 'INTERVAL' IntervalUnit
+   {
+     if ($2.toUpperCase() == 'MINUTE') {
+       $$ = { suggestKeywords: ['TO SECOND'] };
+     } else if ($2.toUpperCase() == 'HOUR') {
+       $$ = { suggestKeywords: ['TO SECOND', 'TO MINUTE'] };
+     } else if ($2.toUpperCase() == 'DAY') {
+       $$ = { suggestKeywords: ['TO HOUR', 'TO SECOND', 'TO MINUTE'] };
+     } else if ($2.toUpperCase() == 'YEAR') {
+       $$ = { suggestKeywords: ['TO MONTH'] };
+     }
+   }
+ | 'INTERVAL' IntervalUnit 'TO' IntervalUnit
+ ;
+
+IntervalType_EDIT
+ : 'INTERVAL' 'CURSOR'
+   {
+     parser.suggestKeywords(['SECOND', 'MINUTE', 'HOUR', 'DAY', 'MONTH', 'YEAR']);
+   }
+ | 'INTERVAL' IntervalUnit 'TO' 'CURSOR'
+   {
+     if ($2.toUpperCase() == 'MINUTE') {
+       $$ = { suggestKeywords: ['SECOND'] };
+     } else if ($2.toUpperCase() == 'HOUR') {
+       $$ = { suggestKeywords: ['SECOND', 'MINUTE'] };
+     } else if ($2.toUpperCase() == 'DAY') {
+       $$ = { suggestKeywords: ['HOUR', 'SECOND', 'MINUTE'] };
+     } else if ($2.toUpperCase() == 'YEAR') {
+       $$ = { suggestKeywords: ['MONTH'] };
+     }
+   }
+ ;
+
+IntervalUnit
+ : 'DAY'
+ | 'YEAR'
+ | 'HOUR'
+ | 'MINUTE'
+ | 'MONTH'
+ | 'SECOND'
  ;

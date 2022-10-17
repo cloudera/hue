@@ -1,0 +1,714 @@
+[
+  {
+    "namePrefix": "should not report errors",
+    "beforeCursor": "CREATE TABLE IF NOT EXISTS foo LIKE db.tbl USING CSV ROW FORMAT DELIMITED STORED AS PARQUET TBLPROPERTIES ('a'='b') LOCATION 'boo'; ",
+    "afterCursor": "",
+    "noErrors": true,
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "TABLE",
+      "EXTERNAL TABLE"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE EXTERNAL ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "TABLE"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE TABLE ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "IF NOT EXISTS"
+      ],
+      "suggestDatabases": {
+        "appendDot": true
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE TABLE IF ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "NOT EXISTS"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE EXTERNAL TABLE IF NOT ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "EXISTS"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE TABLE foo ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "LIKE",
+        "USING",
+        "COMMENT",
+        "PARTITIONED BY",
+        "CLUSTERED BY",
+        "ROW FORMAT",
+        "STORED AS",
+        "LOCATION",
+        "TBLPROPERTIES",
+        "AS"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest tables",
+    "beforeCursor": "CREATE TABLE foo LIKE ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestDatabases": {
+        "appendDot": true
+      },
+      "suggestTables": {}
+    }
+  },
+  {
+    "namePrefix": "should suggest tables",
+    "beforeCursor": "CREATE TABLE foo LIKE foo.",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestTables": {
+        "identifierChain": [
+          {
+            "name": "foo"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE TABLE IF NOT EXISTS foo LIKE bar ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "USING"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE TABLE IF NOT EXISTS foo LIKE bar USING ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "PARQUET"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE TABLE IF NOT EXISTS foo LIKE bar USING CSV ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "ROW FORMAT",
+        "STORED AS",
+        "TBLPROPERTIES",
+        "LOCATION"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE TABLE IF NOT EXISTS foo LIKE bar USING CSV ROW ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "FORMAT"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE TABLE IF NOT EXISTS foo LIKE bar USING CSV ROW FORMAT ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "DELIMITED",
+      "SERDE"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE TABLE IF NOT EXISTS foo LIKE bar USING CSV ROW FORMAT DELIMITED ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "STORED AS",
+      "LOCATION"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE TABLE foo LIKE bar USING CSV STORED ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "AS"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE TABLE foo LIKE bar USING CSV STORED AS ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "ORC"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE TABLE foo LIKE bar USING CSV STORED AS ORC ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "TBLPROPERTIES",
+        "LOCATION"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE TABLE foo LIKE bar USING CSV STORED AS ORC TBLPROPERTIES ('a' = 'b') ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "LOCATION"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE TABLE ",
+    "afterCursor": " foo LIKE bar USING CSV STORED AS ORC TBLPROPERTIES ('a' = 'b')",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "IF NOT EXISTS"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE TABLE IF ",
+    "afterCursor": " foo LIKE bar USING CSV STORED AS ORC TBLPROPERTIES ('a' = 'b')",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "NOT EXISTS"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE TABLE boo (id ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "INT",
+      "INTERVAL MINUTE"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE TABLE boo (id INTERVAL MINUTE ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "COMMENT",
+      "TO SECOND"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE TABLE boo (id INTERVAL MINUTE, foo ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "STRING"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE TABLE boo (id INTERVAL MINUTE, foo STRING) ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "COMMENT",
+      "USING",
+      "ROW FORMAT",
+      "AS"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE TABLE boo (id INTERVAL MINUTE, foo STRING) USING ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "CSV"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE TABLE boo (id INTERVAL MINUTE, foo STRING) USING CSV ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "OPTIONS",
+        "PARTITIONED BY",
+        "CLUSTERED BY",
+        "LOCATION",
+        "COMMENT",
+        "TBLPROPERTIES",
+        "AS"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE TABLE IF NOT EXISTS boo (id INTERVAL MINUTE, foo STRING) USING CSV OPTIONS ('a'='b') ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "PARTITIONED BY",
+        "CLUSTERED BY",
+        "LOCATION",
+        "COMMENT",
+        "TBLPROPERTIES",
+        "AS"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE TABLE IF NOT EXISTS boo (id INTERVAL MINUTE, foo STRING) USING CSV OPTIONS ('a'='b') PARTITIONED ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "BY"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE TABLE IF NOT EXISTS boo (id INTERVAL MINUTE, foo STRING) USING CSV OPTIONS ('a'='b') PARTITIONED BY (a, b, c) ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "CLUSTERED BY",
+        "LOCATION",
+        "COMMENT",
+        "TBLPROPERTIES",
+        "AS"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE TABLE IF NOT EXISTS boo (id INTERVAL MINUTE, foo STRING) USING CSV OPTIONS ('a'='b') PARTITIONED BY (a, b, c) CLUSTERED ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "BY"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE TABLE IF NOT EXISTS boo (id INTERVAL MINUTE, foo STRING) USING CSV OPTIONS ('a'='b') PARTITIONED BY (a, b, c) CLUSTERED BY (e, f) ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "SORTED BY",
+        "INTO"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE TABLE IF NOT EXISTS boo (id INTERVAL MINUTE, foo STRING) USING CSV OPTIONS ('a'='b') PARTITIONED BY (a, b, c) CLUSTERED BY (e, f) SORTED ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "BY"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE TABLE IF NOT EXISTS boo (id INTERVAL MINUTE, foo STRING) USING CSV OPTIONS ('a'='b') PARTITIONED BY (a, b, c) CLUSTERED BY (e, f) SORTED BY (d) ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "INTO"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE TABLE boo (id int) USING CSV CLUSTERED BY (e, f) INTO 1 ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "BUCKETS"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE TABLE boo (id int) USING CSV CLUSTERED BY (e, f) SORTED BY (d) INTO 1 ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "BUCKETS"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE TABLE boo (id int) USING CSV CLUSTERED BY (e, f) INTO 1 BUCKETS ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "LOCATION",
+        "COMMENT",
+        "TBLPROPERTIES",
+        "AS"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE TABLE boo (id int) USING CSV CLUSTERED BY (e, f) INTO 1 BUCKETS LOCATION 'foo' ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "COMMENT",
+        "TBLPROPERTIES",
+        "AS"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE TABLE boo (id int) USING CSV CLUSTERED BY (e, f) INTO 1 BUCKETS LOCATION 'foo' COMMENT 'boo' ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "TBLPROPERTIES",
+        "AS"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE TABLE boo (id int) USING CSV LOCATION 'foo' COMMENT 'boo' TBLPROPERTIES ('a'='b') ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "AS"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE TABLE boo (id int) USING CSV LOCATION 'foo' COMMENT 'boo' TBLPROPERTIES ('a'='b') AS ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "SELECT"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE TABLE boo (id int) USING CSV AS SELECT ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "*"
+    ],
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestAggregateFunctions": {
+        "tables": []
+      },
+      "suggestAnalyticFunctions": true,
+      "suggestFunctions": {},
+      "suggestTables": {
+        "prependQuestionMark": true,
+        "prependFrom": true
+      },
+      "suggestDatabases": {
+        "prependQuestionMark": true,
+        "prependFrom": true,
+        "appendDot": true
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE TABLE ",
+    "afterCursor": " boo (id int) USING CSV AS SELECT * FROM foo;",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "IF NOT EXISTS"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE TABLE IF NOT ",
+    "afterCursor": " boo (id int) USING CSV AS SELECT * FROM foo;",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "EXISTS"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE EXTERNAL TABLE foo (id ",
+    "afterCursor": "",
+    "containsKeywords": ["NUMERIC"],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE EXTERNAL TABLE foo (id int) ",
+    "afterCursor": "",
+    "containsKeywords": ["COMMENT","PARTITIONED BY","CLUSTERED BY","ROW FORMAT","STORED AS","LOCATION","TBLPROPERTIES","AS"],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE EXTERNAL TABLE foo (id int) COMMENT 'bla' ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": ["PARTITIONED BY","CLUSTERED BY","ROW FORMAT","STORED AS","LOCATION","TBLPROPERTIES","AS"]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE EXTERNAL TABLE foo (id int) COMMENT 'bla' PARTITIONED ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": ["BY"]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE EXTERNAL TABLE foo (id int) COMMENT 'bla' PARTITIONED BY (a) ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": ["CLUSTERED BY","ROW FORMAT","STORED AS","LOCATION","TBLPROPERTIES","AS"]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE EXTERNAL TABLE foo (id int) COMMENT 'bla' PARTITIONED BY (a) CLUSTERED ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": ["BY"]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE EXTERNAL TABLE foo (id int) COMMENT 'bla' PARTITIONED BY (a) CLUSTERED BY (a) ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": ["SORTED BY", "INTO"]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE EXTERNAL TABLE foo (id int) COMMENT 'bla' PARTITIONED BY (a) CLUSTERED BY (a) INTO 10 BUCKETS ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": ["ROW FORMAT","STORED AS","LOCATION","TBLPROPERTIES","AS"]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE TABLE foo (id int) COMMENT 'bla' PARTITIONED BY (a) CLUSTERED BY (a) INTO 10 BUCKETS ROW ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": ["FORMAT"]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE EXTERNAL TABLE foo (id int) ROW FORMAT DELIMITED ",
+    "afterCursor": "",
+    "containsKeywords": ["STORED AS","LOCATION","TBLPROPERTIES","AS"],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE EXTERNAL TABLE foo (id int) ROW FORMAT DELIMITED STORED ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": ["AS"]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE TABLE IF NOT EXISTS foo (id int) ROW FORMAT DELIMITED STORED AS PARQUET ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": ["LOCATION","TBLPROPERTIES","AS"]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE EXTERNAL TABLE foo (id int) LOCATION 'foo' ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": ["TBLPROPERTIES","AS"]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE EXTERNAL TABLE foo (id int) TBLPROPERTIES ('foo'='1') ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": ["AS"]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE TABLE boo (id int) AS ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "SELECT"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE TABLE boo (id int) AS SELECT ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "*"
+    ],
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestAggregateFunctions": {
+        "tables": []
+      },
+      "suggestAnalyticFunctions": true,
+      "suggestFunctions": {},
+      "suggestTables": {
+        "prependQuestionMark": true,
+        "prependFrom": true
+      },
+      "suggestDatabases": {
+        "prependQuestionMark": true,
+        "prependFrom": true,
+        "appendDot": true
+      }
+    }
+  }
+]
