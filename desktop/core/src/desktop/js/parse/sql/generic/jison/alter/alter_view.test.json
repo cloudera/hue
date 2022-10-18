@@ -1,0 +1,89 @@
+[
+  {
+    "namePrefix": "should not report errors",
+    "beforeCursor": "ALTER VIEW baa.boo AS SELECT * FROM bla;",
+    "afterCursor": "",
+    "noErrors": true,
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "VIEW"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest views",
+    "beforeCursor": "ALTER VIEW ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestTables": {
+        "onlyViews": true
+      },
+      "suggestDatabases": {
+        "appendDot": true
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest views",
+    "beforeCursor": "ALTER VIEW boo.",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestTables": {
+        "identifierChain": [
+          {
+            "name": "boo"
+          }
+        ],
+        "onlyViews": true
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER VIEW boo ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "AS"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER VIEW baa.boo AS ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "SELECT"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest databases",
+    "beforeCursor": "ALTER VIEW baa.boo AS SELECT * FROM ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestTables": {},
+      "suggestDatabases": {
+        "appendDot": true
+      }
+    }
+  }
+]

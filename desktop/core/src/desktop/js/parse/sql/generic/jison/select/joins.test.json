@@ -1,0 +1,1009 @@
+[
+  {
+    "namePrefix": "should suggest columns",
+    "beforeCursor": "SELECT t1.testTableColumn1, t2.testTableColumn3 FROM testTable1 t1 JOIN testTable2 t2 ON t1.",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestColumns": {
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "testTable1"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest columns",
+    "beforeCursor": "SELECT t1.testTableColumn1, t2.testTableColumn3 FROM database_two.testTable1 t1 JOIN testTable2 t2 ON t1.",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestColumns": {
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "database_two"
+              },
+              {
+                "name": "testTable1"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest tables",
+    "beforeCursor": "SELECT * FROM testTable1 JOIN ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestJoins": {
+        "prependJoin": false,
+        "joinType": "JOIN",
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "testTable1"
+              }
+            ]
+          }
+        ]
+      },
+      "suggestTables": {},
+      "suggestDatabases": {
+        "appendDot": true
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest joins",
+    "beforeCursor": "SELECT * FROM testTable1 JOIN testTable2 JOIN ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestJoins": {
+        "prependJoin": false,
+        "joinType": "JOIN",
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "testTable1"
+              }
+            ]
+          },
+          {
+            "identifierChain": [
+              {
+                "name": "testTable2"
+              }
+            ]
+          }
+        ]
+      },
+      "suggestTables": {},
+      "suggestDatabases": {
+        "appendDot": true
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "SELECT * FROM testTable1 INNER ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "JOIN"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "SELECT * FROM testTable1 FULL ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "JOIN",
+        "OUTER JOIN"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "SELECT * FROM testTable1 FULL OUTER ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "JOIN"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "SELECT * FROM testTable1 LEFT ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "JOIN",
+        "OUTER JOIN"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "SELECT * FROM testTable1 LEFT OUTER ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "JOIN"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "SELECT * FROM testTable1 RIGHT ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "JOIN",
+        "OUTER JOIN"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "SELECT * FROM testTable1 RIGHT OUTER ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "JOIN"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest tables",
+    "beforeCursor": "SELECT * FROM testTable1 JOIN db1.",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestTables": {
+        "identifierChain": [
+          {
+            "name": "db1"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest tables",
+    "beforeCursor": "SELECT * FROM testTable1 JOIN db1.",
+    "afterCursor": " JOIN foo",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestTables": {
+        "identifierChain": [
+          {
+            "name": "db1"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest join conditions",
+    "beforeCursor": "SELECT testTable1.* FROM testTable1 JOIN testTable2 ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "ON"
+    ],
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestJoinConditions": {
+        "prependOn": true,
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "testTable1"
+              }
+            ]
+          },
+          {
+            "identifierChain": [
+              {
+                "name": "testTable2"
+              }
+            ]
+          }
+        ]
+      },
+      "suggestFilters": {
+        "prefix": "WHERE",
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "testTable1"
+              }
+            ]
+          },
+          {
+            "identifierChain": [
+              {
+                "name": "testTable2"
+              }
+            ]
+          }
+        ]
+      },
+      "suggestGroupBys": {
+        "prefix": "GROUP BY",
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "testTable1"
+              }
+            ]
+          },
+          {
+            "identifierChain": [
+              {
+                "name": "testTable2"
+              }
+            ]
+          }
+        ]
+      },
+      "suggestOrderBys": {
+        "prefix": "ORDER BY",
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "testTable1"
+              }
+            ]
+          },
+          {
+            "identifierChain": [
+              {
+                "name": "testTable2"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest tables",
+    "beforeCursor": "SELECT testTable1.* FROM testTable1 JOIN testTable2 ON ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "CASE"
+    ],
+    "expectedResult": {
+      "suggestColumns": {
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "testTable1"
+              }
+            ]
+          },
+          {
+            "identifierChain": [
+              {
+                "name": "testTable2"
+              }
+            ]
+          }
+        ]
+      },
+      "suggestFunctions": {},
+      "suggestJoinConditions": {
+        "prependOn": false,
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "testTable1"
+              }
+            ]
+          },
+          {
+            "identifierChain": [
+              {
+                "name": "testTable2"
+              }
+            ]
+          }
+        ]
+      },
+      "suggestIdentifiers": [
+        {
+          "name": "testTable1.",
+          "type": "table"
+        },
+        {
+          "name": "testTable2.",
+          "type": "table"
+        }
+      ],
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest tables",
+    "beforeCursor": "SELECT testTable1.* FROM testTable1 JOIN testTable2 ON (",
+    "afterCursor": "",
+    "containsKeywords": [
+      "CASE"
+    ],
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestFunctions": {},
+      "suggestColumns": {
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "testTable1"
+              }
+            ]
+          },
+          {
+            "identifierChain": [
+              {
+                "name": "testTable2"
+              }
+            ]
+          }
+        ]
+      },
+      "suggestIdentifiers": [
+        {
+          "name": "testTable1.",
+          "type": "table"
+        },
+        {
+          "name": "testTable2.",
+          "type": "table"
+        }
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest tables",
+    "beforeCursor": "SELECT testTable1.* FROM testTable1 JOIN testTable2 ON (testTable1.testColumn1 = testTable2.testColumn3 AND ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "CASE"
+    ],
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestFunctions": {},
+      "suggestColumns": {
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "testTable1"
+              }
+            ]
+          },
+          {
+            "identifierChain": [
+              {
+                "name": "testTable2"
+              }
+            ]
+          }
+        ]
+      },
+      "suggestIdentifiers": [
+        {
+          "name": "testTable1.",
+          "type": "table"
+        },
+        {
+          "name": "testTable2.",
+          "type": "table"
+        }
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest tables",
+    "beforeCursor": "SELECT testTable1.* FROM testTable1 JOIN testTable2 ON (",
+    "afterCursor": " AND testTable1.testColumn1 = testTable2.testColumn3",
+    "containsKeywords": [
+      "CASE"
+    ],
+    "expectedResult": {
+      "locations": [
+        {
+          "type": "statement",
+          "location": {
+            "first_line": 1,
+            "last_line": 1,
+            "first_column": 1,
+            "last_column": 109
+          }
+        },
+        {
+          "type": "selectList",
+          "missing": false,
+          "location": {
+            "first_line": 1,
+            "last_line": 1,
+            "first_column": 8,
+            "last_column": 20
+          }
+        },
+        {
+          "type": "table",
+          "location": {
+            "first_line": 1,
+            "last_line": 1,
+            "first_column": 8,
+            "last_column": 18
+          },
+          "identifierChain": [
+            {
+              "name": "testTable1"
+            }
+          ]
+        },
+        {
+          "type": "asterisk",
+          "location": {
+            "first_line": 1,
+            "last_line": 1,
+            "first_column": 19,
+            "last_column": 20
+          },
+          "tables": [
+            {
+              "identifierChain": [
+                {
+                  "name": "testTable1"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "table",
+          "location": {
+            "first_line": 1,
+            "last_line": 1,
+            "first_column": 26,
+            "last_column": 36
+          },
+          "identifierChain": [
+            {
+              "name": "testTable1"
+            }
+          ]
+        },
+        {
+          "type": "table",
+          "location": {
+            "first_line": 1,
+            "last_line": 1,
+            "first_column": 42,
+            "last_column": 52
+          },
+          "identifierChain": [
+            {
+              "name": "testTable2"
+            }
+          ]
+        },
+        {
+          "type": "table",
+          "location": {
+            "first_line": 1,
+            "last_line": 1,
+            "first_column": 62,
+            "last_column": 72
+          },
+          "identifierChain": [
+            {
+              "name": "testTable1"
+            }
+          ]
+        },
+        {
+          "type": "column",
+          "location": {
+            "first_line": 1,
+            "last_line": 1,
+            "first_column": 73,
+            "last_column": 84
+          },
+          "identifierChain": [
+            {
+              "name": "testColumn1"
+            }
+          ],
+          "tables": [
+            {
+              "identifierChain": [
+                {
+                  "name": "testTable1"
+                }
+              ]
+            }
+          ],
+          "qualified": true
+        },
+        {
+          "type": "table",
+          "location": {
+            "first_line": 1,
+            "last_line": 1,
+            "first_column": 87,
+            "last_column": 97
+          },
+          "identifierChain": [
+            {
+              "name": "testTable2"
+            }
+          ]
+        },
+        {
+          "type": "column",
+          "location": {
+            "first_line": 1,
+            "last_line": 1,
+            "first_column": 98,
+            "last_column": 109
+          },
+          "identifierChain": [
+            {
+              "name": "testColumn3"
+            }
+          ],
+          "tables": [
+            {
+              "identifierChain": [
+                {
+                  "name": "testTable2"
+                }
+              ]
+            }
+          ],
+          "qualified": true
+        },
+        {
+          "type": "whereClause",
+          "missing": true,
+          "location": {
+            "first_line": 1,
+            "last_line": 1,
+            "first_column": 109,
+            "last_column": 109
+          }
+        },
+        {
+          "type": "limitClause",
+          "missing": true,
+          "location": {
+            "first_line": 1,
+            "last_line": 1,
+            "first_column": 109,
+            "last_column": 109
+          }
+        }
+      ],
+      "suggestColumns": {
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "testTable1"
+              }
+            ]
+          },
+          {
+            "identifierChain": [
+              {
+                "name": "testTable2"
+              }
+            ]
+          }
+        ]
+      },
+      "suggestIdentifiers": [
+        {
+          "name": "testTable1.",
+          "type": "table"
+        },
+        {
+          "name": "testTable2.",
+          "type": "table"
+        }
+      ],
+      "suggestFunctions": {},
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest identifiers",
+    "beforeCursor": "select * from testTable1 join db.testTable2 on ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "CASE"
+    ],
+    "expectedResult": {
+      "lowerCase": true,
+      "suggestFunctions": {},
+      "suggestJoinConditions": {
+        "prependOn": false,
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "testTable1"
+              }
+            ]
+          },
+          {
+            "identifierChain": [
+              {
+                "name": "db"
+              },
+              {
+                "name": "testTable2"
+              }
+            ]
+          }
+        ]
+      },
+      "suggestColumns": {
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "testTable1"
+              }
+            ]
+          },
+          {
+            "identifierChain": [
+              {
+                "name": "db"
+              },
+              {
+                "name": "testTable2"
+              }
+            ]
+          }
+        ]
+      },
+      "suggestIdentifiers": [
+        {
+          "name": "testTable1.",
+          "type": "table"
+        },
+        {
+          "name": "testTable2.",
+          "type": "table"
+        }
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest identifiers",
+    "beforeCursor": "select * from testTable1 JOIN testTable2 on (testTable1.testColumn1 = ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "CASE"
+    ],
+    "expectedResult": {
+      "suggestValues": {},
+      "colRef": {
+        "identifierChain": [
+          {
+            "name": "testTable1"
+          },
+          {
+            "name": "testColumn1"
+          }
+        ]
+      },
+      "suggestFunctions": {
+        "types": [
+          "COLREF"
+        ]
+      },
+      "suggestColumns": {
+        "types": [
+          "COLREF"
+        ],
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "testTable1"
+              }
+            ]
+          },
+          {
+            "identifierChain": [
+              {
+                "name": "testTable2"
+              }
+            ]
+          }
+        ]
+      },
+      "suggestIdentifiers": [
+        {
+          "name": "testTable1.",
+          "type": "table"
+        },
+        {
+          "name": "testTable2.",
+          "type": "table"
+        }
+      ],
+      "lowerCase": true
+    }
+  },
+  {
+    "namePrefix": "should suggest columns",
+    "beforeCursor": "select * from testTable1 JOIN testTable2 on (testTable1.testColumn1 = testTable2.",
+    "afterCursor": "",
+    "ignoreErrors": true,
+    "expectedResult": {
+      "lowerCase": true,
+      "colRef": {
+        "identifierChain": [
+          {
+            "name": "testTable1"
+          },
+          {
+            "name": "testColumn1"
+          }
+        ]
+      },
+      "suggestColumns": {
+        "types": [
+          "COLREF"
+        ],
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "testTable2"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest columns",
+    "beforeCursor": "SELECT testTable1.* FROM testTable1 JOIN testTable2 ON (testTable1.testColumn1 = testTable2.testColumn3 AND testTable1.",
+    "afterCursor": "",
+    "ignoreErrors": true,
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestColumns": {
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "testTable1"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "SELECT t1.* FROM table1 t1 ",
+    "afterCursor": " JOIN",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestJoins": {
+        "prependJoin": true,
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "table1"
+              }
+            ],
+            "alias": "t1"
+          }
+        ]
+      },
+      "suggestKeywords": [
+        "FULL",
+        "FULL OUTER",
+        "INNER",
+        "LEFT",
+        "LEFT OUTER",
+        "RIGHT",
+        "RIGHT OUTER"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "SELECT t1.* FROM table1 t1 ",
+    "afterCursor": " JOIN table2 t2 ON t1.bla = t2.bla",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestJoins": {
+        "prependJoin": true,
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "table1"
+              }
+            ],
+            "alias": "t1"
+          }
+        ]
+      },
+      "suggestKeywords": [
+        "FULL",
+        "FULL OUTER",
+        "INNER",
+        "LEFT",
+        "LEFT OUTER",
+        "RIGHT",
+        "RIGHT OUTER"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "SELECT t1.* FROM table1 t1 JOIN table2 t2 ",
+    "afterCursor": " JOIN table3",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "ON",
+        "FULL",
+        "FULL OUTER",
+        "INNER",
+        "LEFT",
+        "LEFT OUTER",
+        "RIGHT",
+        "RIGHT OUTER"
+      ],
+      "suggestJoinConditions": {
+        "prependOn": true,
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "table1"
+              }
+            ],
+            "alias": "t1"
+          },
+          {
+            "identifierChain": [
+              {
+                "name": "table2"
+              }
+            ],
+            "alias": "t2"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "SELECT t1.* FROM table1 t1 FULL ",
+    "afterCursor": " JOIN",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "OUTER"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "SELECT t1.* FROM table1 t1 RIGHT ",
+    "afterCursor": " JOIN",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "OUTER"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest joins",
+    "beforeCursor": "SELECT * FROM testTable1 ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "JOIN"
+    ],
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestJoins": {
+        "prependJoin": true,
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "testTable1"
+              }
+            ]
+          }
+        ]
+      },
+      "suggestFilters": {
+        "prefix": "WHERE",
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "testTable1"
+              }
+            ]
+          }
+        ]
+      },
+      "suggestGroupBys": {
+        "prefix": "GROUP BY",
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "testTable1"
+              }
+            ]
+          }
+        ]
+      },
+      "suggestOrderBys": {
+        "prefix": "ORDER BY",
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "testTable1"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+]
