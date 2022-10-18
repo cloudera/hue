@@ -1,0 +1,117 @@
+[
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "",
+    "afterCursor": "",
+    "containsKeywords": [
+      "USE"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest databases",
+    "serverResponses": {},
+    "beforeCursor": "USE ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestDatabases": {}
+    }
+  },
+  {
+    "namePrefix": "should suggest databases",
+    "serverResponses": {},
+    "beforeCursor": "USE bla",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestDatabases": {}
+    }
+  },
+  {
+    "namePrefix": "should use a use statement",
+    "beforeCursor": "use database_two; \nSELECT ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "*",
+      "ALL",
+      "DISTINCT"
+    ],
+    "expectedResult": {
+      "useDatabase": "database_two",
+      "lowerCase": true,
+      "suggestAggregateFunctions": {
+        "tables": []
+      },
+      "suggestAnalyticFunctions": true,
+      "suggestFunctions": {},
+      "suggestTables": {
+        "prependQuestionMark": true,
+        "prependFrom": true
+      },
+      "suggestDatabases": {
+        "prependQuestionMark": true,
+        "prependFrom": true,
+        "appendDot": true
+      }
+    }
+  },
+  {
+    "namePrefix": "should use the last use statement",
+    "beforeCursor": "USE other_db; USE closest_db; \n\tSELECT ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "*",
+      "ALL",
+      "DISTINCT"
+    ],
+    "expectedResult": {
+      "useDatabase": "closest_db",
+      "lowerCase": false,
+      "suggestAggregateFunctions": {
+        "tables": []
+      },
+      "suggestAnalyticFunctions": true,
+      "suggestFunctions": {},
+      "suggestTables": {
+        "prependQuestionMark": true,
+        "prependFrom": true
+      },
+      "suggestDatabases": {
+        "prependQuestionMark": true,
+        "prependFrom": true,
+        "appendDot": true
+      }
+    }
+  },
+  {
+    "namePrefix": "should use the use statement",
+    "beforeCursor": "USE other_db; USE closest_db; \n\tSELECT ",
+    "afterCursor": "; USE some_other_db;",
+    "containsKeywords": [
+      "*",
+      "ALL",
+      "DISTINCT"
+    ],
+    "expectedResult": {
+      "useDatabase": "closest_db",
+      "lowerCase": false,
+      "suggestAggregateFunctions": {
+        "tables": []
+      },
+      "suggestAnalyticFunctions": true,
+      "suggestFunctions": {},
+      "suggestTables": {
+        "prependQuestionMark": true,
+        "prependFrom": true
+      },
+      "suggestDatabases": {
+        "prependQuestionMark": true,
+        "prependFrom": true,
+        "appendDot": true
+      }
+    }
+  }
+]

@@ -1,0 +1,58 @@
+[
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "DATABASE",
+      "SCHEMA"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE DATABASE ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "IF NOT EXISTS"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE DATABASE IF ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "NOT EXISTS"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE SCHEMA ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "IF NOT EXISTS"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE DATABASE ",
+    "afterCursor": " bla;",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "IF NOT EXISTS"
+      ]
+    }
+  }
+]

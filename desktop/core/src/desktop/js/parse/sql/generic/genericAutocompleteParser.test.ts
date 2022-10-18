@@ -18,6 +18,7 @@ import genericAutocompleteParser from './genericAutocompleteParser';
 import structure from './jison/structure.json';
 import { AutocompleteParser } from '../../types';
 import { extractTestCases, runTestCases } from '../testUtils';
+import { assertPartials, CommonParser } from '../sharedParserTests';
 
 const jisonFolder = 'desktop/core/src/desktop/js/parse/sql/generic/jison';
 const groupedTestCases = extractTestCases(jisonFolder, structure.autocomplete);
@@ -25,4 +26,10 @@ const groupedTestCases = extractTestCases(jisonFolder, structure.autocomplete);
 describe('genericAutocompleteParser', () => {
   // TODO: Fix the types
   runTestCases(genericAutocompleteParser as unknown as AutocompleteParser, groupedTestCases);
+
+  describe('partial removal', () => {
+    it('should identify part lengths', () => {
+      assertPartials(genericAutocompleteParser as unknown as CommonParser);
+    });
+  });
 });

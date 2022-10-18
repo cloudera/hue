@@ -43,8 +43,8 @@ interface GroupedTestCases {
 
 /**
  * Finds and parses x.test.json files given a list of jison files.
- * For example, if alter_table.jison is part of the structure it will look for alter_table.test.json and if it does
- * it'll parser it (TestCase[]). Test cases are grouped per found .jison file.
+ * For example, if alter_table.jison is part of the structure it will look for alter_table.test.json, and if it
+ * exists it'll parse it (TestCase[]). Test cases are grouped per found .jison file.
  */
 export const extractTestCases = (
   jisonFolder: string,
@@ -77,9 +77,12 @@ const createAssertForAutocomplete = (
   return assertAutocomplete;
 };
 
+const prettyLineBreaks = (text: string): string => text.replace(/\n/g, '\\n').replace(/\r/g, '\\r');
+
 export const runTestCases = (
   autocompleteParser: AutocompleteParser,
-  groupedTestCases: GroupedTestCases[]
+  groupedTestCases: GroupedTestCases[],
+  debug = false
 ): void => {
   beforeAll(() => {
     // This guarantees that any parse errors are actually thrown
@@ -90,13 +93,15 @@ export const runTestCases = (
     };
   });
 
-  const assertTestCase = createAssertForAutocomplete(autocompleteParser);
+  const assertTestCase = createAssertForAutocomplete(autocompleteParser, debug);
 
   groupedTestCases.forEach(({ jisonFile, testCases }) => {
     // Each group (jison file) gets its own describe
     describe(jisonFile, () => {
       testCases.forEach(testCase => {
-        it(`${testCase.namePrefix} given "${testCase.beforeCursor}|${testCase.afterCursor}"`, () => {
+        it(`${testCase.namePrefix} given "${prettyLineBreaks(
+          testCase.beforeCursor
+        )}|${prettyLineBreaks(testCase.afterCursor)}"`, () => {
           assertTestCase(testCase);
         });
       });
