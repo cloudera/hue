@@ -35,7 +35,7 @@ const TEMPLATE = `
       <button type="button" class="close" data-dismiss="modal" aria-label="${ I18n('Close') }"><span aria-hidden="true">&times;</span></button>
       <h2 class="modal-title">${ I18n('Sharing') } - <span data-bind="text: documentName"></span></h2>
     </div>
-    <div class="modal-body" style="overflow: visible; height: 240px">
+    <div class="modal-body" style="overflow: visible;">
       <!-- ko with: document -->
         <!-- ko with: definition -->
           <!-- ko component: {
@@ -45,16 +45,16 @@ const TEMPLATE = `
               docDefinition: $data
             }
           } --><!-- /ko -->
-          <div class="row-fluid" data-bind="visible: !$parent.hasErrors()" style="max-height: 114px;" id="scrolldiv">
+          <div class="row-fluid" data-bind="visible: !$parent.hasErrors()"  id="scrolldiv">
             <div class="span6">
               <h4 class="muted" style="margin-top: 0">${ I18n('Read') }</h4>
               <div data-bind="visible: (perms.read.users.length == 0 && perms.read.groups.length == 0)">${ I18n('The document is not shared for read.') }</div>
-              <ul class="unstyled airy" data-bind="foreach: perms.read.users">
+              <ul class="unstyled airy" style="max-height: 20vh; overflow-x:auto;" data-bind="foreach: perms.read.users">
                 <li>
                   <span class="badge badge-info" data-bind="css: { 'badge-left' : $parents[1].fileEntry.canModify() }"><i class="fa fa-user"></i> <span data-bind="text: $parents[1].prettifyUsernameById(id), attr:{'data-id': id}"></span></span><span class="badge badge-right trash-share" data-bind="visible: $parents[1].fileEntry.canModify(), click: function() { $parents[1].removeUserReadShare($data) }"> <i class="fa fa-times"></i></span>
                 </li>
               </ul>
-              <ul class="unstyled airy" data-bind="foreach: perms.read.groups">
+              <ul class="unstyled airy" style="max-height: 20vh; overflow-x:auto;" data-bind="foreach: perms.read.groups">
                 <li>
                   <span class="badge badge-info" data-bind="css: { 'badge-left' : $parents[1].fileEntry.canModify() }"><i class="fa fa-users"></i> ${ I18n('Group') } &quot;<span data-bind="text: name"></span>&quot;</span><span class="badge badge-right trash-share" data-bind="visible: $parents[1].fileEntry.canModify(), click: function() { $parents[1].removeGroupReadShare($data) }"> <i class="fa fa-times"></i></span>
                 </li>
@@ -64,7 +64,7 @@ const TEMPLATE = `
             <div class="span6">
               <h4 class="muted" style="margin-top: 0">${ I18n('Modify') }</h4>
               <div data-bind="visible: (perms.write.users.length == 0 && perms.write.groups.length == 0)">${ I18n('The document is not shared for modify.') }</div>
-              <ul class="unstyled airy" data-bind="foreach: perms.write.users">
+              <ul class="unstyled airy" style="max-height: 20vh; overflow-x:auto;" data-bind="foreach: perms.write.users">
                 <li>
                   <span class="badge badge-info badge-left" data-bind="css: { 'badge-left' : $parents[1].fileEntry.canModify() }">
                     <i class="fa fa-user">
@@ -77,7 +77,7 @@ const TEMPLATE = `
                   </span>
                 </li>
               </ul>
-              <ul class="unstyled airy" data-bind="foreach: perms.write.groups">
+              <ul class="unstyled airy" style="max-height: 20vh; overflow-x:auto;" data-bind="foreach: perms.write.groups">
                 <li>
                   <span class="badge badge-info badge-left" data-bind="css: { 'badge-left' : $parents[1].fileEntry.canModify() }">
                     <i class="fa fa-users"></i> ${ I18n('Group') } &quot;
