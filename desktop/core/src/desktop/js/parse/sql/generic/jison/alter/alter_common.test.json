@@ -1,0 +1,25 @@
+[
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "",
+    "afterCursor": "",
+    "containsKeywords": [
+      "ALTER"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "TABLE",
+      "VIEW"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  }
+]
