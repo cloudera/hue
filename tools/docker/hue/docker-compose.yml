@@ -2,14 +2,14 @@ version: '3'
 
 services:
   cloudera:
-      image: gethue/hue:latest
+      image: hue:latest
       hostname: hue
       container_name: hue
       dns: 8.8.8.8
       ports:
       - "8888:8888"
       volumes:
-        - ./hue.ini:/usr/share/hue/desktop/conf/z-hue.ini
+        - ./conf:/usr/share/hue/desktop/conf
       depends_on:
       - "database"
   database:
@@ -24,7 +24,7 @@ services:
           MYSQL_ROOT_USER: root
           MYSQL_ROOT_PASSWORD: secret
           MYSQL_DATABASE: hue
-          MYSQL_USER: root
+          MYSQL_USER: hue
           MYSQL_PASSWORD: secret
 volumes:
   data:

@@ -156,7 +156,7 @@ def rungunicornserver():
       'raw_paste_global_conf': None,
       'reload': None,
       'reload_engine': None,
-      'sendfile': None,
+      'sendfile': False,
       'spew': None,
       'ssl_version': ssl.PROTOCOL_TLSv1_2,    # SSL version to use
       'statsd_host': None,

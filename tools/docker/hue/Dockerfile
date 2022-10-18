@@ -83,7 +83,9 @@ RUN ./build/env/bin/pip install --no-cache-dir \
   # sqlalchemy-clickhouse depend on infi.clickhouse_orm
   # install after sqlalchemy-clickhouse and version == 1.0.4
   # otherwise Code: 516, Authentication failed will display
-  infi.clickhouse_orm==1.0.4
+  infi.clickhouse_orm==1.0.4 \
+  pyAthena \
+  mysqlclient
 
 USER hue
 
