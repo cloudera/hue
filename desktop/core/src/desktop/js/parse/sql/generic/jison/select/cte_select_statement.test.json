@@ -1,0 +1,272 @@
+[
+  {
+    "namePrefix": "should not report errors",
+    "beforeCursor": "WITH q1 AS ( SELECT key FROM src WHERE something) SELECT * FROM q1;",
+    "afterCursor": "",
+    "noErrors": true,
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "WITH t1 ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "AS"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "WITH t1 AS (",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "SELECT"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "WITH t1 AS (SELECT * FROM boo) ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest identifiers",
+    "beforeCursor": "WITH t1 AS (SELECT * FROM FOO) SELECT ",
+    "afterCursor": "",
+    "noErrors": true,
+    "containsKeywords": [
+      "*",
+      "ALL",
+      "DISTINCT"
+    ],
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestAggregateFunctions": {
+        "tables": []
+      },
+      "suggestAnalyticFunctions": true,
+      "suggestFunctions": {},
+      "suggestTables": {
+        "prependQuestionMark": true,
+        "prependFrom": true
+      },
+      "suggestDatabases": {
+        "prependQuestionMark": true,
+        "prependFrom": true,
+        "appendDot": true
+      },
+      "suggestCommonTableExpressions": [
+        {
+          "name": "t1",
+          "prependFrom": true,
+          "prependQuestionMark": true
+        }
+      ],
+      "commonTableExpressions": [
+        {
+          "alias": "t1",
+          "columns": [
+            {
+              "tables": [
+                {
+                  "identifierChain": [
+                    {
+                      "name": "FOO"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest identifiers",
+    "beforeCursor": "WITH t1 AS (SELECT * FROM FOO), t2 AS (SELECT ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "*",
+      "ALL",
+      "DISTINCT"
+    ],
+    "expectedResult": {
+      "suggestAggregateFunctions": {
+        "tables": []
+      },
+      "suggestAnalyticFunctions": true,
+      "suggestFunctions": {},
+      "suggestTables": {
+        "prependQuestionMark": true,
+        "prependFrom": true
+      },
+      "suggestDatabases": {
+        "prependQuestionMark": true,
+        "prependFrom": true,
+        "appendDot": true
+      },
+      "lowerCase": false,
+      "suggestCommonTableExpressions": [
+        {
+          "name": "t1",
+          "prependFrom": true,
+          "prependQuestionMark": true
+        }
+      ],
+      "commonTableExpressions": [
+        {
+          "alias": "t1",
+          "columns": [
+            {
+              "tables": [
+                {
+                  "identifierChain": [
+                    {
+                      "name": "FOO"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest identifiers",
+    "beforeCursor": "WITH t1 AS (SELECT * FROM FOO) SELECT * FROM ",
+    "afterCursor": "",
+    "noErrors": true,
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestTables": {},
+      "suggestDatabases": {
+        "appendDot": true
+      },
+      "suggestCommonTableExpressions": [
+        {
+          "name": "t1"
+        }
+      ],
+      "commonTableExpressions": [
+        {
+          "alias": "t1",
+          "columns": [
+            {
+              "tables": [
+                {
+                  "identifierChain": [
+                    {
+                      "name": "FOO"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "with s as (select * from foo join bar) select * from ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": true,
+      "suggestTables": {},
+      "suggestDatabases": {
+        "appendDot": true
+      },
+      "commonTableExpressions": [
+        {
+          "columns": [
+            {
+              "tables": [
+                {
+                  "identifierChain": [
+                    {
+                      "name": "foo"
+                    }
+                  ]
+                },
+                {
+                  "identifierChain": [
+                    {
+                      "name": "bar"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "alias": "s"
+        }
+      ],
+      "suggestCommonTableExpressions": [
+        {
+          "name": "s"
+        }
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "with s as (select * from foo join bar) select * from ",
+    "afterCursor": ";",
+    "expectedResult": {
+      "lowerCase": true,
+      "suggestTables": {},
+      "suggestDatabases": {
+        "appendDot": true
+      },
+      "commonTableExpressions": [
+        {
+          "columns": [
+            {
+              "tables": [
+                {
+                  "identifierChain": [
+                    {
+                      "name": "foo"
+                    }
+                  ]
+                },
+                {
+                  "identifierChain": [
+                    {
+                      "name": "bar"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "alias": "s"
+        }
+      ],
+      "suggestCommonTableExpressions": [
+        {
+          "name": "s"
+        }
+      ]
+    }
+  }
+]
