@@ -2,14 +2,15 @@
 package com.cloudera.hue.querystore.common.filters;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 
 import com.cloudera.hue.querystore.common.AppAuthentication;
 import com.cloudera.hue.querystore.common.resource.RequestContext;
+import com.google.gson.JsonObject;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -19,7 +20,6 @@ import lombok.extern.slf4j.Slf4j;
 @Provider
 @Slf4j
 public class RequestContextFilter implements ContainerRequestFilter {
-  public static final String REQUEST_CONTEXT_PROPERTY_NAME = "REQUEST-CONTEXT";
   public static final String SESSION_USER_KEY = "user";
   public static final String DO_AS_HEADER = "x-do-as";
 
@@ -30,27 +30,21 @@ public class RequestContextFilter implements ContainerRequestFilter {
   private AppAuthentication appAuth;
 
   @Override
-  public void filter(ContainerRequestContext containerRequestContext) {
+  public void filter(ContainerRequestContext containerRequestContext){
     String username = null;
     boolean secure = true;
 
     username = servletRequest.getHeader(DO_AS_HEADER);
 
     if (username == null) {
-      HttpSession session = servletRequest.getSession(false);
-      if (session != null) {
-        username = (String)session.getAttribute(SESSION_USER_KEY);
-      }
-    }
+      String errorMsg = "Invalid request: x-do-as header is missing";
+      log.error(errorMsg);
 
-    if (username == null) {
-      username = appAuth.getAppUser();
-    }
-
-    if (username == null) {
-      log.error("Username not configured, assuming hive user, things might break badly");
-      username = "hive";
-      secure = false;
+      JsonObject jsonResponse = new JsonObject();
+      jsonResponse.addProperty("message", errorMsg);
+      containerRequestContext.abortWith(Response.status(Response.Status.BAD_REQUEST)
+          .entity(jsonResponse.toString()).build());
+      return;
     }
 
     log.debug("Final username: {}", username);
