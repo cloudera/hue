@@ -133,6 +133,8 @@
 
   import I18n from 'utils/i18n';
 
+  declare const ENABLE_NOTEBOOK_2: boolean;
+
   export default defineComponent({
     components: {
       Tab,
@@ -186,7 +188,7 @@
         });
 
         huePubSub.subscribeOnce(
-          'ace.editor.focused',
+          ENABLE_NOTEBOOK_2 ? 'ace.editor.focused' : 'set.current.app.view.model',
           () =>
             setTimeout(() => {
               huePubSub.publish('editor.insert.at.cursor', {
