@@ -210,6 +210,8 @@ class ProxyFS(object):
     Initially home_path will have path value for HDFS and if it is configured in Hue, try creating the user home dir for it first.
     Then we check if S3/ABFS is configured in Hue via RAZ. If yes, try creating user home dir for them next.
     """
+    from desktop.conf import RAZ # Imported dynamically in order to have proper value.
+
     if home_path is None:
       home_path = self.get_home_dir()
 
@@ -230,7 +232,7 @@ class ProxyFS(object):
     request = CrequestMiddleware.get_request()
     username = request.user.username if request and hasattr(request, 'user') and request.user.is_authenticated else self.getuser()
 
-    if is_raz_s3() or is_raz_abfs():
+    if RAZ.AUTOCREATE_USER_DIR.get() and (is_raz_s3() or is_raz_abfs()):
       fs = self.do_as_user(username, self._get_fs, home_path)
       fs.create_home_dir(home_path)
 

@@ -2156,6 +2156,12 @@ RAZ = ConfigSection(
         type=coerce_str_lowercase,
         default='kerberos',
     ),
+    AUTOCREATE_USER_DIR=Config(
+      key='autocreate_user_dir',
+      help=_('Autocreate the user home directory in the remote storage home path.'),
+      type=coerce_bool,
+      default=True,
+    ),
   )
 )
 
