@@ -16,7 +16,15 @@
 
 import { assertPartials } from 'parse/sql/sharedParserTests';
 import impalaAutocompleteParser from '../impalaAutocompleteParser';
+import { extractTestCases, runTestCases } from '../../testUtils';
+
+import structure from '../jison/structure.json';
+const jisonFolder = 'desktop/core/src/desktop/js/parse/sql/impala/jison';
+const groupedTestCases = extractTestCases(jisonFolder, structure.autocomplete);
+
 describe('impalaAutocompleteParser.js', () => {
+  runTestCases(impalaAutocompleteParser, groupedTestCases);
+
   beforeAll(() => {
     impalaAutocompleteParser.yy.parseError = function (msg) {
       throw Error(msg);
