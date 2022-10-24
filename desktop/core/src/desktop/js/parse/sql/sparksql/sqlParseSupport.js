@@ -1030,7 +1030,19 @@ const initSqlParser = function (parser) {
   };
 
   parser.suggestDdlAndDmlKeywords = function (extraKeywords) {
-    let keywords = ['ALTER', 'CREATE', 'DESCRIBE', 'SELECT', 'SHOW'];
+    let keywords = [
+      'ALTER',
+      'CREATE',
+      'DESCRIBE',
+      'DROP',
+      'INSERT',
+      'LOAD',
+      'MSCK',
+      'SELECT',
+      'SHOW',
+      'TRUNCATE',
+      'USE'
+    ];
 
     if (extraKeywords) {
       keywords = keywords.concat(extraKeywords);

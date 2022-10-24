@@ -16,7 +16,7 @@
 
 %options case-insensitive flex
 %s between
-%x hdfs doubleQuotedValue singleQuotedValue backtickedValue
+%x hdfs hdfsv2 doubleQuotedValue singleQuotedValue backtickedValue
 %%
 
 \s                                         { /* skip whitespace */ }
@@ -66,7 +66,7 @@
 'IF'                                       { return 'IF'; }
 'IN'                                       { return 'IN'; }
 'INNER'                                    { return 'INNER'; }
-'INSERT'                                   { return 'INSERT'; }
+'INSERT'                                   { parser.determineCase(yytext); return 'INSERT'; }
 'INT'                                      { return 'INT'; }
 'INTO'                                     { return 'INTO'; }
 'IS'                                       { return 'IS'; }
@@ -128,12 +128,14 @@
 'CLUSTERED'                                { return 'CLUSTERED'; }
 'COLLECTION'                               { return 'COLLECTION'; }
 'COLUMN'                                   { return 'COLUMN'; }
+'DATA'                                     { return 'DATA'; }
 'DATE'                                     { return 'DATE'; }
 'DAY'                                      { return 'DAY'; }
 'DBPROPERTIES'                             { return 'DBPROPERTIES'; }
 'DEC'                                      { return 'DEC'; }
 'DEFINED'                                  { return 'DEFINED'; }
 'DELIMITED'                                { return 'DELIMITED'; }
+'DIRECTORY'                                { return 'DIRECTORY'; }
 'ESCAPED'                                  { return 'ESCAPED'; }
 'EXTERNAL'                                 { return 'EXTERNAL'; }
 'FIELDS'                                   { return 'FIELDS'; }
@@ -143,20 +145,25 @@
 'FUNCTION'                                 { return 'FUNCTION'; }
 'GLOBAL'                                   { return 'GLOBAL'; }
 'HOUR'                                     { return 'HOUR'; }
+'INPATH'                                   { this.begin('hdfs'); return 'INPATH'; }
 'INTEGER'                                  { return 'INTEGER'; }
 'INTERVAL'                                 { return 'INTERVAL'; }
 'ITEMS'                                    { return 'ITEMS'; }
 'JAR'                                      { return 'JAR'; }
 'KEYS'                                     { return 'KEYS'; }
 'LINES'                                    { return 'LINES'; }
+'LOAD'                                     { parser.determineCase(yytext); return 'LOAD'; }
+'LOCAL'                                    { return 'LOCAL'; }
 'LOCATION'                                 { return 'LOCATION'; }
 'LONG'                                     { return 'LONG'; }
 'MAP'                                      { return 'MAP'; }
 'MINUTE'                                   { return 'MINUTE'; }
 'MONTH'                                    { return 'MONTH'; }
+'MSCK'                                     { return 'MSCK'; }
 'NAMESPACE'                                { return 'NAMESPACE'; }
 'NUMERIC'                                  { return 'NUMERIC'; }
 'OPTIONS'                                  { return 'OPTIONS'; }
+'OVERWRITE'                                { return 'OVERWRITE'; }
 'PARTITIONED'                              { return 'PARTITIONED'; }
 'PARTITIONS'                               { return 'PARTITIONS'; }
 'PROPERTIES'                               { return 'PROPERTIES'; }
@@ -164,12 +171,15 @@
 'RECOVER'                                  { return 'RECOVER'; }
 'RENAME'                                   { return 'RENAME'; }
 'REPLACE'                                  { return 'REPLACE'; }
+'REPAIR'                                   { return 'REPAIR'; }
+'RESTRICT'                                 { return 'RESTRICT'; }
 'SECOND'                                   { return 'SECOND'; }
 'SERDE'                                    { return 'SERDE'; }
 'SERDEPROPERTIES'                          { return 'SERDEPROPERTIES'; }
 'SHORT'                                    { return 'SHORT'; }
 'SORTED'                                   { return 'SORTED'; }
 'STORED'                                   { return 'STORED'; }
+'SYNC'                                     { return 'SYNC'; }
 'TBLPROPERTIES'                            { return 'TBLPROPERTIES'; }
 'TEMPORARY'                                { return 'TEMPORARY'; }
 'TERMINATED'                               { return 'TERMINATED'; }
@@ -216,6 +226,7 @@ ROW_NUMBER\s*\(                            { yy.lexer.unput('('); yytext = 'row_
 [0-9]+E                                    { return 'UNSIGNED_INTEGER_E'; }
 [A-Za-z0-9_]+                              { return 'REGULAR_IDENTIFIER'; }
 
+DIRECTORY\s+['"]                           { this.begin('hdfs'); return 'DIRECTORY_PATH'; }
 <hdfs>'\u2020'                             { parser.yy.cursorFound = true; return 'CURSOR'; }
 <hdfs>'\u2021'                             { parser.yy.cursorFound = true; return 'PARTIAL_CURSOR'; }
 <hdfs>\s+['"]                              { return 'HDFS_START_QUOTE'; }
@@ -268,7 +279,7 @@ ROW_NUMBER\s*\(                            { yy.lexer.unput('('); yytext = 'row_
 <backtickedValue>\`                        { this.popState(); return 'BACKTICK'; }
 
 \'                                         { this.begin('singleQuotedValue'); return 'SINGLE_QUOTE'; }
-<singleQuotedValue>(?:\\\\|\\[']|[^'])+         {
+<singleQuotedValue>(?:\\\\|\\[']|[^'])+    {
                                              if (parser.handleQuotedValueWithCursor(this, yytext, yylloc, '\'')) {
                                                return 'PARTIAL_VALUE';
                                              }

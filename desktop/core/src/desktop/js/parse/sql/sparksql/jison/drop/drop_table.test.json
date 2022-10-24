@@ -1,48 +1,35 @@
 [
   {
+    "namePrefix": "should handle",
+    "beforeCursor": "DROP TABLE  IF EXISTS db.tbl;",
+    "afterCursor": "",
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "noErrors": true,
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
     "namePrefix": "should suggest keywords",
     "beforeCursor": "DROP ",
     "afterCursor": "",
     "containsKeywords": [
-      "VIEW"
+      "TABLE"
     ],
     "expectedResult": {
       "lowerCase": false
     }
   },
   {
-    "namePrefix": "should not report errors",
-    "beforeCursor": "DROP VIEW boo;",
+    "namePrefix": "should suggest tables",
+    "beforeCursor": "DROP TABLE ",
     "afterCursor": "",
-    "containsKeywords": [
-      "SELECT"
-    ],
-    "noErrors": true,
-    "expectedResult": {
-      "lowerCase": false
-    }
-  },
-  {
-    "namePrefix": "should not report errors",
-    "beforeCursor": "DROP VIEW IF EXISTS baa.boo;",
-    "afterCursor": "",
-    "containsKeywords": [
-      "SELECT"
-    ],
-    "noErrors": true,
-    "expectedResult": {
-      "lowerCase": false
-    }
-  },
-  {
-    "namePrefix": "should suggest views",
-    "beforeCursor": "DROP VIEW ",
-    "afterCursor": "",
-    "noErrors": true,
     "expectedResult": {
       "lowerCase": false,
       "suggestTables": {
-        "onlyViews": true
+        "onlyTables": true
       },
       "suggestDatabases": {
         "appendDot": true
@@ -54,9 +41,8 @@
   },
   {
     "namePrefix": "should suggest keywords",
-    "beforeCursor": "DROP VIEW IF ",
+    "beforeCursor": "DROP TABLE IF ",
     "afterCursor": "",
-    "noErrors": true,
     "expectedResult": {
       "lowerCase": false,
       "suggestKeywords": [
@@ -65,25 +51,22 @@
     }
   },
   {
-    "namePrefix": "should suggest views",
-    "beforeCursor": "DROP VIEW boo.",
+    "namePrefix": "should suggest tables",
+    "beforeCursor": "DROP TABLE IF EXISTS ",
     "afterCursor": "",
-    "noErrors": true,
     "expectedResult": {
       "lowerCase": false,
       "suggestTables": {
-        "identifierChain": [
-          {
-            "name": "boo"
-          }
-        ],
-        "onlyViews": true
+        "onlyTables": true
+      },
+      "suggestDatabases": {
+        "appendDot": true
       }
     }
   },
   {
-    "namePrefix": "should suggest views",
-    "beforeCursor": "DROP VIEW IF EXISTS foo.",
+    "namePrefix": "should suggest tables",
+    "beforeCursor": "DROP TABLE IF EXISTS foo.",
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
@@ -93,13 +76,13 @@
             "name": "foo"
           }
         ],
-        "onlyViews": true
+        "onlyTables": true
       }
     }
   },
   {
     "namePrefix": "should suggest keywords",
-    "beforeCursor": "DROP VIEW ",
+    "beforeCursor": "DROP TABLE ",
     "afterCursor": " foo.bar",
     "expectedResult": {
       "lowerCase": false,
