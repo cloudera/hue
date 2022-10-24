@@ -15,45 +15,8 @@
 // limitations under the License.
 
 DataDefinition_EDIT
- : 'ALTER' 'CURSOR'
+ : 'MSCK' 'CURSOR'
    {
-     parser.suggestKeywords(['DATABASE', 'NAMESPACE', 'SCHEMA', 'TABLE', 'VIEW']);
+     parser.suggestKeywords(['REPAIR TABLE']);
    }
- ;
-
-ParenthesizedPropertyAssignmentList
- : '(' PropertyAssignmentList ')'
- ;
-
-PropertyAssignmentList
- : PropertyAssignment
- | PropertyAssignmentList ',' PropertyAssignment
- ;
-
-PropertyAssignment
- : QuotedValue '=' UnsignedValueSpecification
- | QuotedValue '=' RegularIdentifier
- | QuotedValue RegularIdentifier
- | QuotedValue QuotedValue
- | RegularIdentifier '=' UnsignedValueSpecification
- | RegularIdentifier UnsignedValueSpecification
- | RegularIdentifier '=' RegularIdentifier
- | RegularIdentifier RegularIdentifier
- ;
-
-ParenthesizedPropertyList
- : '(' PropertyList ')'
- ;
-
-PropertyList
- : QuotedValue
- | PropertyList ',' QuotedValue
- ;
-
-FileFormat
- : 'CSV'
- | 'JSON'
- | 'ORC'
- | 'PARQUET'
- | 'TEXTFILE'
  ;

@@ -3,11 +3,11 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "SELECT * FROM database_two.testTable ORDER BY foo LIMIT 10 ",
     "afterCursor": "",
+    "containsKeywords": [
+      "UNION"
+    ],
     "expectedResult": {
-      "lowerCase": false,
-      "suggestKeywords": [
-        "UNION"
-      ]
+      "lowerCase": false
     }
   },
   {
