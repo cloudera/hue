@@ -409,7 +409,7 @@ else:
                 result += '<tr>';
                 for (var i = 1; i < row.length; i++) { // Skip the row number column              
                   var htmlDecodedValue = hueUtils.html2text(row[i]);
-                  var needsToStayEncoded = hueUtils.isComplexDBTypeDefinition(htmlDecodedValue)
+                  var needsToStayEncoded = hueUtils.includesComplexDBTypeDefinition(htmlDecodedValue);
                   result += '<td>' + ( needsToStayEncoded ? row[i] : htmlDecodedValue) + '</td>';
                 }
                 result += '</tr>';
