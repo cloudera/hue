@@ -1,0 +1,284 @@
+[
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "SELECT * FROM testTable ORDER ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "BY"
+      ],
+      "suggestOrderBys": {
+        "prefix": "BY",
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "testTable"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest columns",
+    "beforeCursor": "SELECT * FROM testTable WHERE baa baaa boo ORDER ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "BY"
+      ],
+      "suggestOrderBys": {
+        "prefix": "BY",
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "testTable"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest columns",
+    "beforeCursor": "SELECT * FROM testTable ORDER BY ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "CASE"
+    ],
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestFunctions": {},
+      "suggestAnalyticFunctions": true,
+      "suggestColumns": {
+        "source": "order by",
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "testTable"
+              }
+            ]
+          }
+        ]
+      },
+      "suggestOrderBys": {
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "testTable"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest columns",
+    "beforeCursor": "SELECT * FROM database_two.testTable ORDER BY ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "CASE"
+    ],
+    "expectedResult": {
+      "suggestColumns": {
+        "source": "order by",
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "database_two"
+              },
+              {
+                "name": "testTable"
+              }
+            ]
+          }
+        ]
+      },
+      "suggestFunctions": {},
+      "suggestAnalyticFunctions": true,
+      "suggestOrderBys": {
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "database_two"
+              },
+              {
+                "name": "testTable"
+              }
+            ]
+          }
+        ]
+      },
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "SELECT * FROM database_two.testTable ORDER BY foo ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "ASC",
+        "DESC",
+        "LIMIT",
+        "UNION"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "SELECT * FROM database_two.testTable ORDER BY foo + ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "CASE"
+    ],
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestFunctions": {
+        "types": [
+          "NUMBER"
+        ]
+      },
+      "suggestColumns": {
+        "source": "order by",
+        "types": [
+          "NUMBER"
+        ],
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "database_two"
+              },
+              {
+                "name": "testTable"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest columns",
+    "beforeCursor": "SELECT * FROM database_two.testTable ORDER BY foo, ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "CASE"
+    ],
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestFunctions": {},
+      "suggestAnalyticFunctions": true,
+      "suggestColumns": {
+        "source": "order by",
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "database_two"
+              },
+              {
+                "name": "testTable"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest columns",
+    "beforeCursor": "SELECT * FROM database_two.testTable ORDER BY foo + baa ASC, ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "CASE"
+    ],
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestFunctions": {},
+      "suggestAnalyticFunctions": true,
+      "suggestColumns": {
+        "source": "order by",
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "database_two"
+              },
+              {
+                "name": "testTable"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest columns",
+    "beforeCursor": "SELECT * FROM database_two.testTable ORDER BY foo ASC, ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "CASE"
+    ],
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestFunctions": {},
+      "suggestAnalyticFunctions": true,
+      "suggestColumns": {
+        "source": "order by",
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "database_two"
+              },
+              {
+                "name": "testTable"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "SELECT * FROM database_two.testTable ORDER BY foo DESC, bar ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "ASC",
+        "DESC",
+        "LIMIT",
+        "UNION"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "SELECT * FROM database_two.testTable ORDER BY foo DESC, bar ",
+    "afterCursor": ", bla",
+    "containsKeywords": [
+      "ASC",
+      "DESC"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  }
+]

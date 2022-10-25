@@ -1,0 +1,134 @@
+[
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "bla; ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "bla bla bla;bla; ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "Åäö; ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "bla bla bla;bla;\n",
+    "afterCursor": ";bladiblaa blaa",
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "FROM; ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "INTO USE; ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "INTO SELECT; OR FROM FROM;",
+    "afterCursor": "",
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "INTO SELECT; OR FROM FROM;",
+    "afterCursor": ";BLAAA; AND;",
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "INTO bla bla;AND booo;",
+    "afterCursor": "",
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "",
+    "afterCursor": "; SELECT LIMIT 10",
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "",
+    "afterCursor": " * FROM boo; SELECT LIMIT 10",
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "bla",
+    "afterCursor": " * FROM boo; SELECT LIMIT 10",
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  }
+]

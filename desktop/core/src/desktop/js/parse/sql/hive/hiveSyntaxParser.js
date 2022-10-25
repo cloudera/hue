@@ -4919,6 +4919,11 @@ parseError: function parseError (str, hash) {
         throw error;
     }
 },
+/**
+ * @param {string} input
+ *
+ * @return {AutocompleteParseResult}
+ */
 parse: function parse (input) {
     var self = this,
         stack = [0],

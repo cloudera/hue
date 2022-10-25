@@ -786,4 +786,5 @@ function Parser () {
 }
 Parser.prototype = parser;parser.Parser = Parser;
 return new Parser;
-})();export default hplsqlStatementsParser;
+})();
+export default hplsqlStatementsParser;

@@ -1,0 +1,8 @@
+lxml.html.ElementSoup module
+============================
+
+.. automodule:: lxml.html.ElementSoup
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:

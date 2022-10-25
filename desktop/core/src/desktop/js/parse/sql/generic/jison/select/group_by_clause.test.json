@@ -1,0 +1,341 @@
+[
+  {
+    "namePrefix": "should suggest columns",
+    "beforeCursor": "SELECT * FROM testTable WHERE baa baaa boo GROUP ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "BY"
+      ],
+      "suggestGroupBys": {
+        "prefix": "BY",
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "testTable"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "SELECT * FROM testTable GROUP ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "BY"
+      ],
+      "suggestGroupBys": {
+        "prefix": "BY",
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "testTable"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "SELECT * FROM foo WHERE id LIKE '' GROUP ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestGroupBys": {
+        "prefix": "BY",
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "foo"
+              }
+            ]
+          }
+        ]
+      },
+      "suggestKeywords": [
+        "BY"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest columns",
+    "beforeCursor": "SELECT * FROM testTable GROUP BY ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "CASE"
+    ],
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestFunctions": {},
+      "suggestColumns": {
+        "source": "group by",
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "testTable"
+              }
+            ]
+          }
+        ]
+      },
+      "suggestGroupBys": {
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "testTable"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest columns",
+    "beforeCursor": "SELECT * FROM database_two.testTable GROUP BY ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "CASE"
+    ],
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestFunctions": {},
+      "suggestColumns": {
+        "source": "group by",
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "database_two"
+              },
+              {
+                "name": "testTable"
+              }
+            ]
+          }
+        ]
+      },
+      "suggestGroupBys": {
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "database_two"
+              },
+              {
+                "name": "testTable"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest identifiers",
+    "beforeCursor": "SELECT * FROM testTableA tta, testTableB GROUP BY ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "CASE"
+    ],
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestFunctions": {},
+      "suggestColumns": {
+        "source": "group by",
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "testTableA"
+              }
+            ],
+            "alias": "tta"
+          },
+          {
+            "identifierChain": [
+              {
+                "name": "testTableB"
+              }
+            ]
+          }
+        ]
+      },
+      "suggestIdentifiers": [
+        {
+          "name": "tta.",
+          "type": "alias"
+        },
+        {
+          "name": "testTableB.",
+          "type": "table"
+        }
+      ],
+      "suggestGroupBys": {
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "testTableA"
+              }
+            ],
+            "alias": "tta"
+          },
+          {
+            "identifierChain": [
+              {
+                "name": "testTableB"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest identifier",
+    "beforeCursor": "SELECT * FROM testTableA tta, testTableB GROUP BY bla, ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "CASE"
+    ],
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestFunctions": {},
+      "suggestColumns": {
+        "source": "group by",
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "testTableA"
+              }
+            ],
+            "alias": "tta"
+          },
+          {
+            "identifierChain": [
+              {
+                "name": "testTableB"
+              }
+            ]
+          }
+        ]
+      },
+      "suggestIdentifiers": [
+        {
+          "name": "tta.",
+          "type": "alias"
+        },
+        {
+          "name": "testTableB.",
+          "type": "table"
+        }
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest identifier",
+    "beforeCursor": "SELECT * FROM testTableA tta, testTableB GROUP BY bla+",
+    "afterCursor": "",
+    "containsKeywords": [
+      "CASE"
+    ],
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestFunctions": {
+        "types": [
+          "NUMBER"
+        ]
+      },
+      "suggestColumns": {
+        "source": "group by",
+        "types": [
+          "NUMBER"
+        ],
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "testTableA"
+              }
+            ],
+            "alias": "tta"
+          },
+          {
+            "identifierChain": [
+              {
+                "name": "testTableB"
+              }
+            ]
+          }
+        ]
+      },
+      "suggestIdentifiers": [
+        {
+          "name": "tta.",
+          "type": "alias"
+        },
+        {
+          "name": "testTableB.",
+          "type": "table"
+        }
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest identifier",
+    "beforeCursor": "SELECT * FROM testTableA tta, testTableB GROUP BY bla, ",
+    "afterCursor": ", foo",
+    "containsKeywords": [
+      "CASE"
+    ],
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestFunctions": {},
+      "suggestColumns": {
+        "source": "group by",
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "testTableA"
+              }
+            ],
+            "alias": "tta"
+          },
+          {
+            "identifierChain": [
+              {
+                "name": "testTableB"
+              }
+            ]
+          }
+        ]
+      },
+      "suggestIdentifiers": [
+        {
+          "name": "tta.",
+          "type": "alias"
+        },
+        {
+          "name": "testTableB.",
+          "type": "table"
+        }
+      ]
+    }
+  }
+]
