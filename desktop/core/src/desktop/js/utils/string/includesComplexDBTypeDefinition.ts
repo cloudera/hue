@@ -15,9 +15,9 @@
 // limitations under the License.
 
 // Complex data type definitions used by Hive
-const complexTypes = /^(map|struct|array|uniontype)<.*>$/i;
+const complexTypes = /(map|struct|array|uniontype)<.*>/i;
 
-const isComplexDBTypeDefinition = (dataType: string | number): boolean =>
+const includesComplexDBTypeDefinition = (dataType: string | number): boolean =>
   typeof dataType === 'string' ? complexTypes.test(dataType) : false;
 
-export default isComplexDBTypeDefinition;
+export default includesComplexDBTypeDefinition;
