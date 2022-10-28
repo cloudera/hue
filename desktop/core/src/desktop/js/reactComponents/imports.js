@@ -11,10 +11,8 @@ export async function loadComponent(name) {
     case 'ReactExampleGlobal':
       return (await import('./ReactExampleGlobal/ReactExampleGlobal')).default;
 
-    case 'FileChooserComponentButton':
-      return (
-        await import('./FileChooserComponent/FileChooserComponentButton/FileChooserComponentButton')
-      ).default;
+    case 'FileChooserWithButton':
+      return (await import('./FileChooser/FileChooserWithButton/FileChooserWithButton')).default;
 
     default:
       console.error(`A placeholder component is rendered because you probably forgot to include your new component in the 
