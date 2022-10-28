@@ -1,0 +1,8 @@
+@use '../../../components/styles/colors' as colors;
+
+.file-chooser__button {
+  background-color: colors.$hue-primary-color-dark;
+  color: white;
+  margin-left: 40px;
+  margin-top: 12px;
+}
