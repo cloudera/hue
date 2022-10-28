@@ -56,7 +56,7 @@ public class SearchService {
   private static final String FACET_IDENTIFIER_TEXT = "facet";
 
   private static volatile List<FieldInformation> fieldsInformation = null;
-  private static final String SORT_FRAGMENT = "ORDER BY %s";
+  private static final String SORT_FRAGMENT = "ORDER BY %s NULLS LAST";
 
   private final SearchQueryParser basicParser;
   private final SortInputParser sortInputParser;
