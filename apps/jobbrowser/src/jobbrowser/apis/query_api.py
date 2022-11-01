@@ -43,7 +43,7 @@ LOG = logging.getLogger(__name__)
 try:
   from beeswax.models import Session
   from impala.server import get_api as get_impalad_api, _get_impala_server_url
-except Exception as e:
+except ImportError as e:
   LOG.exception('Some application are not enabled: %s' % e)
 
 
