@@ -76,9 +76,25 @@ expect.extend({
       }
     }
 
+    if (testDefinition.noErrors && actualResponse.errors) {
+      return {
+        pass: false,
+        message: () =>
+          '\n        Statement: ' +
+          testDefinition.beforeCursor +
+          '|' +
+          testDefinition.afterCursor +
+          '\n' +
+          '  noErrors set to: ' +
+          testDefinition.noErrors +
+          '\n' +
+          '     Found errors: ' +
+          JSON.stringify(actualResponse.errors)
+      };
+    }
+
     if (
-      ((testDefinition.expectedResult && testDefinition.expectedResult.locations) ||
-        testDefinition.expectedLocations) &&
+      (testDefinition.expectedResult?.locations || testDefinition.expectedLocations) &&
       actualResponse.locations
     ) {
       const expectedLoc =
@@ -154,7 +170,7 @@ expect.extend({
         };
       }
     }
-    if (typeof testDefinition.expectedResult.locations === 'undefined') {
+    if (!testDefinition.expectedResult?.locations) {
       delete actualResponse.locations;
     }
     let deleteKeywords = false;
@@ -261,8 +277,17 @@ expect.extend({
     if (deleteKeywords) {
       delete actualResponse.suggestKeywords;
     }
+
+    if (
+      testDefinition.expectedResult &&
+      typeof testDefinition.expectedResult.lowerCase === 'undefined'
+    ) {
+      testDefinition.expectedResult.lowerCase = false;
+    }
     return {
-      pass: resultEquals(actualResponse, testDefinition.expectedResult),
+      pass:
+        !testDefinition.expectedResult ||
+        resultEquals(actualResponse, testDefinition.expectedResult),
       message: () =>
         '\n        Statement: ' +
         testDefinition.beforeCursor +
