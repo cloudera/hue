@@ -35,7 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 public class CleanupManager implements Managed {
   // Needs a quartz scheduler cron expression
   public static final ConfVar<String> CRON_CONFIG =
-      new ConfVar<>("hue.query-processor.event-pipeline.cleanup.cron.expression", "0 0 2 * * ?"); // 30 days
+      new ConfVar<>("hue.query-processor.event-pipeline.cleanup.cron.expression", "0 0 2 * * ?"); // At 02:00:00am every day
 
   public static final ConfVar<Long> CLEANUP_INTERVAL_SECS =
       new ConfVar<>("hue.query-processor.event-pipeline.cleanup-interval-secs", 30 * 24 * 3600L); // 30 days
