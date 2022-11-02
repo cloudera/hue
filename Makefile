@@ -138,7 +138,7 @@ ifeq ($(PYTHON_VER),python2.7)
 	@$(SYS_PYTHON) $(VIRTUAL_BOOTSTRAP) $(VIRTUALENV_OPTS) --system-site-packages $(BLD_DIR_ENV)
 else ifeq ($(PYTHON_VER),python3.8)
 	@$(SYS_PYTHON) -m pip install --upgrade pip
-	@$(SYS_PIP) install virtualenv
+	@$(SYS_PIP) install virtualenv virtualenv-make-relocatable
 	@if [[ "ppc64le" == $(PPC64LE) ]]; then \
 	  $(SYS_PYTHON) -m venv $(BLD_DIR_ENV); \
 	 fi
