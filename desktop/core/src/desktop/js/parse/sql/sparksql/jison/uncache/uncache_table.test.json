@@ -1,0 +1,53 @@
+[
+  {
+    "namePrefix": "should not find errors",
+    "beforeCursor": "UNCACHE TABLE IF EXISTS foo.t1;",
+    "afterCursor": "",
+    "noErrors": true,
+    "containsKeywords": [
+      "SELECT"
+    ]
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "UNCACHE ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "TABLE"
+    ]
+  },
+  {
+    "namePrefix": "should suggest tables",
+    "beforeCursor": "UNCACHE TABLE ",
+    "afterCursor": "",
+    "expectedResult": {
+      "suggestKeywords": ["IF EXISTS"],
+      "suggestTables": {},
+      "suggestDatabases": {
+        "appendDot": true
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "UNCACHE TABLE IF ",
+    "afterCursor": "",
+    "expectedResult": {
+      "suggestKeywords": ["EXISTS"]
+    }
+  },
+  {
+    "namePrefix": "should suggest tables",
+    "beforeCursor": "UNCACHE TABLE foo.",
+    "afterCursor": "",
+    "expectedResult": {
+      "suggestTables": {
+        "identifierChain": [
+          {
+            "name": "foo"
+          }
+        ]
+      }
+    }
+  }
+]

@@ -16,7 +16,7 @@
 
 %options case-insensitive flex
 %s between
-%x hdfs hdfsv2 doubleQuotedValue singleQuotedValue backtickedValue
+%x hdfs sparkfile doubleQuotedValue singleQuotedValue backtickedValue
 %%
 
 \s                                         { /* skip whitespace */ }
@@ -30,50 +30,37 @@
 
 // Reserved Keywords
 'ALL'                                      { return 'ALL'; }
-'ALTER'                                    { parser.determineCase(yytext); parser.addStatementTypeLocation('ALTER', yylloc, yy.lexer.upcomingInput()); return 'ALTER'; }
 'AND'                                      { return 'AND'; }
 'AS'                                       { return 'AS'; }
 'ASC'                                      { return 'ASC'; }
-'BETWEEN'                                  { this.begin('between'); return 'BETWEEN'; }
 'BIGINT'                                   { return 'BIGINT'; }
-'BOOLEAN'                                  { return 'BOOLEAN'; }
 'BY'                                       { return 'BY'; }
-'CASCADE'                                  { return 'CASCADE'; }
 'CASE'                                     { return 'CASE'; }
-'CHAR'                                     { return 'CHAR'; }
+'COLUMN'                                   { return 'COLUMN'; }
 'COLUMNS'                                  { return 'COLUMNS'; }
-'COMMENT'                                  { return 'COMMENT'; }
-'CREATE'                                   { parser.determineCase(yytext); return 'CREATE'; }
 'CROSS'                                    { return 'CROSS'; }
-'CURRENT'                                  { return 'CURRENT'; }
 'DATABASE'                                 { return 'DATABASE'; }
-'DECIMAL'                                  { return 'DECIMAL'; }
-'DESC'                                     { return 'DESC'; }
+'DESC'                                     { parser.determineCase(yytext); return 'DESC'; }
+'DIRECTORY'                                { return 'DIRECTORY'; }
 'DISTINCT'                                 { return 'DISTINCT'; }
-'DIV'                                      { return 'ARITHMETIC_OPERATOR'; }
-'DOUBLE'                                   { return 'DOUBLE'; }
-'DROP'                                     { parser.determineCase(yytext); parser.addStatementTypeLocation('DROP', yylloc, yy.lexer.upcomingInput()); return 'DROP'; }
+'EXTENDED'                                 { return 'EXTENDED'; }
+'FUNCTION'                                 { return 'FUNCTION'; }
 'ELSE'                                     { return 'ELSE'; }
 'END'                                      { return 'END'; }
 'EXISTS'                                   { parser.yy.correlatedSubQuery = true; return 'EXISTS'; }
 'FALSE'                                    { return 'FALSE'; }
-'FLOAT'                                    { return 'FLOAT'; }
-'FOLLOWING'                                { return 'FOLLOWING'; }
 'FROM'                                     { parser.determineCase(yytext); return 'FROM'; }
 'FULL'                                     { return 'FULL'; }
 'GROUP'                                    { return 'GROUP'; }
 'HAVING'                                   { return 'HAVING'; }
 'IF'                                       { return 'IF'; }
 'IN'                                       { return 'IN'; }
-'INNER'                                    { return 'INNER'; }
-'INSERT'                                   { parser.determineCase(yytext); return 'INSERT'; }
-'INT'                                      { return 'INT'; }
 'INTO'                                     { return 'INTO'; }
-'IS'                                       { return 'IS'; }
 'JOIN'                                     { return 'JOIN'; }
 'LEFT'                                     { return 'LEFT'; }
 'LIKE'                                     { return 'LIKE'; }
 'LIMIT'                                    { return 'LIMIT'; }
+'LOCAL'                                    { return 'LOCAL'; }
 'NOT'                                      { return 'NOT'; }
 'NULL'                                     { return 'NULL'; }
 'ON'                                       { return 'ON'; }
@@ -82,121 +69,152 @@
 'ORDER'                                    { return 'ORDER'; }
 'OUTER'                                    { return 'OUTER'; }
 'PARTITION'                                { return 'PARTITION'; }
-'PRECEDING'                                { return 'PRECEDING'; }
-'PURGE'                                    { return 'PURGE'; }
-'RANGE'                                    { return 'RANGE'; }
 'REGEXP'                                   { return 'REGEXP'; }
 'RIGHT'                                    { return 'RIGHT'; }
 'RLIKE'                                    { return 'RLIKE'; }
-'ROW'                                      { return 'ROW'; }
 'ROLE'                                     { return 'ROLE'; }
-'ROWS'                                     { return 'ROWS'; }
-'SCHEMA'                                   { return 'SCHEMA'; }
-'SCHEMAS'                                  { return 'SCHEMAS'; }
 'SELECT'                                   { parser.determineCase(yytext); parser.addStatementTypeLocation('SELECT', yylloc); return 'SELECT'; }
 'SEMI'                                     { return 'SEMI'; }
-'SET'                                      { parser.determineCase(yytext); parser.addStatementTypeLocation('SET', yylloc); return 'SET'; }
-'SHOW'                                     { parser.determineCase(yytext); parser.addStatementTypeLocation('SHOW', yylloc); return 'SHOW'; }
-'SMALLINT'                                 { return 'SMALLINT'; }
-'STRING'                                   { return 'STRING'; }
 'TABLE'                                    { return 'TABLE'; }
-'TABLES'                                   { return 'TABLES'; }
 'THEN'                                     { return 'THEN'; }
-'TIMESTAMP'                                { return 'TIMESTAMP'; }
-'TINYINT'                                  { return 'TINYINT'; }
-'TO'                                       { return 'TO'; }
 'TRUE'                                     { return 'TRUE'; }
 'TRUNCATE'                                 { parser.determineCase(yytext); parser.addStatementTypeLocation('TRUNCATE', yylloc, yy.lexer.upcomingInput()); return 'TRUNCATE'; }
-'UNBOUNDED'                                { return 'UNBOUNDED'; }
 'UNION'                                    { return 'UNION'; }
-'UPDATE'                                   { parser.determineCase(yytext); return 'UPDATE'; }
-'USE'                                      { parser.determineCase(yytext); parser.addStatementTypeLocation('USE', yylloc); return 'USE'; }
-'VALUES'                                   { return 'VALUES'; }
-'VARCHAR'                                  { return 'VARCHAR'; }
-'VIEW'                                     { return 'VIEW'; }
 'WHEN'                                     { return 'WHEN'; }
 'WHERE'                                    { return 'WHERE'; }
 'WITH'                                     { parser.determineCase(yytext); parser.addStatementTypeLocation('WITH', yylloc); return 'WITH'; }
+'MAP'                                      { return 'MAP'; }
+'OVERWRITE'                                { return 'OVERWRITE'; }
+'QUERY'                                    { return 'QUERY'; }
+'USER'                                     { return 'USER'; }
 
-// Unknown if reserved or not
-'ADD'                                      { return 'ADD'; }
+// Non-reserved Keywords
+'ADD'                                      { parser.determineCase(yytext); return 'ADD'; }
+'ALTER'                                    { parser.determineCase(yytext); parser.addStatementTypeLocation('ALTER', yylloc, yy.lexer.upcomingInput()); return 'ALTER'; }
+'ANALYZE'                                  { parser.determineCase(yytext); return 'ANALYZE'; }
 'ARCHIVE'                                  { return 'ARCHIVE'; }
+'BETWEEN'                                  { this.begin('between'); return 'BETWEEN'; }
 'BINARY'                                   { return 'BINARY'; }
+'BOOLEAN'                                  { return 'BOOLEAN'; }
 'BUCKETS'                                  { return 'BUCKETS'; }
 'BYTE'                                     { return 'BYTE'; }
+'CACHE'                                    { parser.determineCase(yytext); return 'CACHE'; }
+'CASCADE'                                  { return 'CASCADE'; }
 'CHANGE'                                   { return 'CHANGE'; }
+'CHAR'                                     { return 'CHAR'; }
+'CLEAR'                                    { parser.determineCase(yytext); return 'CLEAR'; }
 'CLUSTERED'                                { return 'CLUSTERED'; }
 'COLLECTION'                               { return 'COLLECTION'; }
-'COLUMN'                                   { return 'COLUMN'; }
+'COMMENT'                                  { return 'COMMENT'; }
+'COMPUTE'                                  { return 'COMPUTE'; }
+'CREATE'                                   { parser.determineCase(yytext); return 'CREATE'; }
+'CSV'                                      { return 'CSV'; }
+'CURRENT'                                  { return 'CURRENT'; }
 'DATA'                                     { return 'DATA'; }
+'DATABASES'                                { return 'DATABASES'; }
 'DATE'                                     { return 'DATE'; }
 'DAY'                                      { return 'DAY'; }
 'DBPROPERTIES'                             { return 'DBPROPERTIES'; }
 'DEC'                                      { return 'DEC'; }
+'DECIMAL'                                  { return 'DECIMAL'; }
 'DEFINED'                                  { return 'DEFINED'; }
 'DELIMITED'                                { return 'DELIMITED'; }
-'DIRECTORY'                                { return 'DIRECTORY'; }
+'DESCRIBE'                                 { parser.determineCase(yytext); return 'DESCRIBE'; }
+'DIV'                                      { return 'ARITHMETIC_OPERATOR'; }
+'DOUBLE'                                   { return 'DOUBLE'; }
+'DROP'                                     { parser.determineCase(yytext); parser.addStatementTypeLocation('DROP', yylloc, yy.lexer.upcomingInput()); return 'DROP'; }
 'ESCAPED'                                  { return 'ESCAPED'; }
 'EXTERNAL'                                 { return 'EXTERNAL'; }
 'FIELDS'                                   { return 'FIELDS'; }
 'FILE'                                     { return 'FILE'; }
 'FILEFORMAT'                               { return 'FILEFORMAT'; }
+'FLOAT'                                    { return 'FLOAT'; }
+'FOLLOWING'                                { return 'FOLLOWING'; }
+'FOR'                                      { return 'FOR'; }
 'FORMAT'                                   { return 'FORMAT'; }
-'FUNCTION'                                 { return 'FUNCTION'; }
+'FUNCTIONS'                                { return 'FUNCTIONS'; }
 'GLOBAL'                                   { return 'GLOBAL'; }
 'HOUR'                                     { return 'HOUR'; }
+'INNER'                                    { return 'INNER'; }
 'INPATH'                                   { this.begin('hdfs'); return 'INPATH'; }
+'INSERT'                                   { parser.determineCase(yytext); return 'INSERT'; }
+'INT'                                      { return 'INT'; }
 'INTEGER'                                  { return 'INTEGER'; }
 'INTERVAL'                                 { return 'INTERVAL'; }
+'IS'                                       { return 'IS'; }
 'ITEMS'                                    { return 'ITEMS'; }
 'JAR'                                      { return 'JAR'; }
+'JDBC'                                     { return 'JDBC'; }
+'JSON'                                     { return 'JSON'; }
 'KEYS'                                     { return 'KEYS'; }
+'LAZY'                                     { return 'LAZY'; }
 'LINES'                                    { return 'LINES'; }
+'LIST'                                     { return 'LIST'; }
 'LOAD'                                     { parser.determineCase(yytext); return 'LOAD'; }
-'LOCAL'                                    { return 'LOCAL'; }
 'LOCATION'                                 { return 'LOCATION'; }
 'LONG'                                     { return 'LONG'; }
-'MAP'                                      { return 'MAP'; }
 'MINUTE'                                   { return 'MINUTE'; }
 'MONTH'                                    { return 'MONTH'; }
 'MSCK'                                     { return 'MSCK'; }
 'NAMESPACE'                                { return 'NAMESPACE'; }
+'NOSCAN'                                   { return 'NOSCAN'; }
 'NUMERIC'                                  { return 'NUMERIC'; }
 'OPTIONS'                                  { return 'OPTIONS'; }
-'OVERWRITE'                                { return 'OVERWRITE'; }
-'PARTITIONED'                              { return 'PARTITIONED'; }
-'PARTITIONS'                               { return 'PARTITIONS'; }
-'PROPERTIES'                               { return 'PROPERTIES'; }
-'REAL'                                     { return 'REAL'; }
-'RECOVER'                                  { return 'RECOVER'; }
-'RENAME'                                   { return 'RENAME'; }
-'REPLACE'                                  { return 'REPLACE'; }
-'REPAIR'                                   { return 'REPAIR'; }
-'RESTRICT'                                 { return 'RESTRICT'; }
-'SECOND'                                   { return 'SECOND'; }
-'SERDE'                                    { return 'SERDE'; }
-'SERDEPROPERTIES'                          { return 'SERDEPROPERTIES'; }
-'SHORT'                                    { return 'SHORT'; }
-'SORTED'                                   { return 'SORTED'; }
-'STORED'                                   { return 'STORED'; }
-'SYNC'                                     { return 'SYNC'; }
-'TBLPROPERTIES'                            { return 'TBLPROPERTIES'; }
-'TEMPORARY'                                { return 'TEMPORARY'; }
-'TERMINATED'                               { return 'TERMINATED'; }
-'UNSET'                                    { return 'UNSET'; }
-'USING'                                    { return 'USING'; }
-'YEAR'                                     { return 'YEAR'; }
-
-// Non-reserved Keywords
-'CSV'                                      { return 'CSV'; }
-'JDBC'                                     { return 'JDBC'; }
-'JSON'                                     { return 'JSON'; }
 'ORC'                                      { return 'ORC'; }
 'OVER'                                     { return 'OVER'; }
 'PARQUET'                                  { return 'PARQUET'; }
+'PARTITIONED'                              { return 'PARTITIONED'; }
+'PARTITIONS'                               { return 'PARTITIONS'; }
+'PRECEDING'                                { return 'PRECEDING'; }
+'PROPERTIES'                               { return 'PROPERTIES'; }
+'PURGE'                                    { return 'PURGE'; }
+'RANGE'                                    { return 'RANGE'; }
+'REAL'                                     { return 'REAL'; }
+'RECOVER'                                  { return 'RECOVER'; }
+'REFRESH'                                  { parser.determineCase(yytext); return 'REFRESH'; }
+'RENAME'                                   { return 'RENAME'; }
+'REPAIR'                                   { return 'REPAIR'; }
+'REPLACE'                                  { return 'REPLACE'; }
+'RESET'                                    { parser.determineCase(yytext); return 'RESET'; }
+'RESTRICT'                                 { return 'RESTRICT'; }
 'ROLE'                                     { return 'ROLE'; }
+'ROW'                                      { return 'ROW'; }
+'ROWS'                                     { return 'ROWS'; }
+'SCHEMA'                                   { return 'SCHEMA'; }
+'SCHEMAS'                                  { return 'SCHEMAS'; }
+'SECOND'                                   { return 'SECOND'; }
+'SERDE'                                    { return 'SERDE'; }
+'SERDEPROPERTIES'                          { return 'SERDEPROPERTIES'; }
+'SET'                                      { parser.determineCase(yytext); parser.addStatementTypeLocation('SET', yylloc); return 'SET'; }
+'SHORT'                                    { return 'SHORT'; }
+'SHOW'                                     { parser.determineCase(yytext); parser.addStatementTypeLocation('SHOW', yylloc); return 'SHOW'; }
+'SMALLINT'                                 { return 'SMALLINT'; }
+'SORTED'                                   { return 'SORTED'; }
+'STATISTICS'                               { return 'STATISTICS'; }
+'STORED'                                   { return 'STORED'; }
+'STRING'                                   { return 'STRING'; }
+'SYNC'                                     { return 'SYNC'; }
+'SYSTEM'                                   { return 'SYSTEM'; }
+'TABLES'                                   { return 'TABLES'; }
+'TBLPROPERTIES'                            { return 'TBLPROPERTIES'; }
+'TEMPORARY'                                { return 'TEMPORARY'; }
+'TERMINATED'                               { return 'TERMINATED'; }
 'TEXTFILE'                                 { return 'TEXTFILE'; }
+'TIMESTAMP'                                { return 'TIMESTAMP'; }
+'TINYINT'                                  { return 'TINYINT'; }
+'TO'                                       { return 'TO'; }
 'TXT'                                      { return 'TXT'; }
+'UNBOUNDED'                                { return 'UNBOUNDED'; }
+'UNCACHE'                                  { return 'UNCACHE'; }
+'UNSET'                                    { return 'UNSET'; }
+'UPDATE'                                   { parser.determineCase(yytext); return 'UPDATE'; }
+'USE'                                      { parser.determineCase(yytext); parser.addStatementTypeLocation('USE', yylloc); return 'USE'; }
+'USING'                                    { return 'USING'; }
+'VALUES'                                   { return 'VALUES'; }
+'VARCHAR'                                  { return 'VARCHAR'; }
+'VIEW'                                     { return 'VIEW'; }
+'VIEWS'                                    { return 'VIEWS'; }
+'YEAR'                                     { return 'YEAR'; }
 
 // --- UDFs ---
 AVG\s*\(                                   { yy.lexer.unput('('); yytext = 'avg'; parser.addFunctionLocation(yylloc, yytext); return 'AVG'; }
@@ -233,6 +251,26 @@ DIRECTORY\s+['"]                           { this.begin('hdfs'); return 'DIRECTO
 <hdfs>[^'"\u2020\u2021]+                   { parser.addFileLocation(yylloc, yytext); return 'HDFS_PATH'; }
 <hdfs>['"]                                 { this.popState(); return 'HDFS_END_QUOTE'; }
 <hdfs><<EOF>>                              { return 'EOF'; }
+
+ADD\s+ARCHIVE\s+                           { this.begin('sparkfile'); return 'ADD_ARCHIVE'; }
+ADD\s+ARCHIVES\s+                          { this.begin('sparkfile'); return 'ADD_ARCHIVES'; }
+ADD\s+FILE\s+                              { this.begin('sparkfile'); return 'ADD_FILE'; }
+ADD\s+FILES\s+                             { this.begin('sparkfile'); return 'ADD_FILES'; }
+ADD\s+JAR\s+                               { this.begin('sparkfile'); return 'ADD_JAR'; }
+ADD\s+JARS\s+                              { this.begin('sparkfile'); return 'ADD_JARS'; }
+LIST\s+ARCHIVE\s+                          { this.begin('sparkfile'); return 'LIST_ARCHIVE'; }
+LIST\s+ARCHIVES\s+                         { this.begin('sparkfile'); return 'LIST_ARCHIVES'; }
+LIST\s+FILE\s+                             { this.begin('sparkfile'); return 'LIST_FILE'; }
+LIST\s+FILES\s+                            { this.begin('sparkfile'); return 'LIST_FILES'; }
+LIST\s+JAR\s+                              { this.begin('sparkfile'); return 'LIST_JAR'; }
+LIST\s+JARS\s+                             { this.begin('sparkfile'); return 'LIST_JARS'; }
+<sparkfile>'\u2020'                        { parser.yy.cursorFound = true; return 'CURSOR'; }
+<sparkfile>'\u2021'                        { parser.yy.cursorFound = true; return 'PARTIAL_CURSOR'; }
+<sparkfile>[^;\s'"\u2020\u2021]+           { parser.addFileLocation(yylloc, yytext); return 'FILE_PATH'; }
+<sparkfile>[\s]+                           { return 'WHITESPACE'; }
+<sparkfile>['"]                            { return 'FILE_QUOTE'; }
+<sparkfile>';'                             { this.popState(); return ';'; }
+<sparkfile><<EOF>>                         { this.popState(); return 'EOF'; }
 
 '&&'                                       { return 'AND'; }
 '||'                                       { return 'OR'; }
@@ -288,7 +326,7 @@ DIRECTORY\s+['"]                           { this.begin('hdfs'); return 'DIRECTO
 <singleQuotedValue>\'                      { this.popState(); return 'SINGLE_QUOTE'; }
 
 \"                                         { this.begin('doubleQuotedValue'); return 'DOUBLE_QUOTE'; }
-<doubleQuotedValue>(?:\\\\|\\["]|[^"])+         {
+<doubleQuotedValue>(?:\\\\|\\["]|[^"])+    {
                                              if (parser.handleQuotedValueWithCursor(this, yytext, yylloc, '"')) {
                                                return 'PARTIAL_VALUE';
                                              }

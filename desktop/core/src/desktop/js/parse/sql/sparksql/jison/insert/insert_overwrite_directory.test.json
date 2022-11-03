@@ -1,6 +1,6 @@
 [
   {
-    "namePrefix": "should handle ",
+    "namePrefix": "should not find errors",
     "beforeCursor": "INSERT OVERWRITE DIRECTORY '/blabla/bla' USING parquet OPTIONS (col1 = 1, col2 = 2, col3 = test) SELECT * FROM boo;",
     "afterCursor": "",
     "noErrors": true,
@@ -12,7 +12,7 @@
     }
   },
   {
-    "namePrefix": "should handle ",
+    "namePrefix": "should not find errors",
     "beforeCursor": "INSERT OVERWRITE DIRECTORY\nUSING parquet\nOPTIONS ('path' '/tmp/destination', col1 1, col2 2, col3 'test')\n    SELECT * FROM test_table;",
     "afterCursor": "",
     "noErrors": true,
@@ -24,7 +24,7 @@
     }
   },
   {
-    "namePrefix": "should handle ",
+    "namePrefix": "should not find errors",
     "beforeCursor": "INSERT OVERWRITE LOCAL DIRECTORY '/tmp/destination'\n    ROW FORMAT DELIMITED FIELDS TERMINATED BY ','\n    SELECT * FROM test_table;",
     "afterCursor": "",
     "noErrors": true,
@@ -279,7 +279,9 @@
     "afterCursor": " VALUES (1,2,3);",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": ["DELIMITED", "SERDE"]
+      "suggestKeywords": [
+        "DELIMITED", "SERDE"
+      ]
     }
   }
 ]

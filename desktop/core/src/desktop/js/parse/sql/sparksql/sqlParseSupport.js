@@ -1031,16 +1031,25 @@ const initSqlParser = function (parser) {
 
   parser.suggestDdlAndDmlKeywords = function (extraKeywords) {
     let keywords = [
+      'ADD',
       'ALTER',
+      'ANALYZE',
+      'CACHE',
+      'CLEAR',
       'CREATE',
+      'DESC',
       'DESCRIBE',
       'DROP',
       'INSERT',
+      'LIST',
       'LOAD',
       'MSCK',
+      'REFRESH',
+      'RESET',
       'SELECT',
       'SHOW',
       'TRUNCATE',
+      'UNCACHE',
       'USE'
     ];
 

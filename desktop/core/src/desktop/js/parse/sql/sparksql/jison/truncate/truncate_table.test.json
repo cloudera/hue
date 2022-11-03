@@ -1,6 +1,6 @@
 [
   {
-    "namePrefix": "should handle",
+    "namePrefix": "should not find errors",
     "beforeCursor": "TRUNCATE TABLE table_identifier PARTITION (a = 1, b = 2);",
     "afterCursor": "",
     "containsKeywords": [
