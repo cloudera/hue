@@ -1,6 +1,6 @@
 [
   {
-    "namePrefix": "should handle ",
+    "namePrefix": "should not find errors",
     "beforeCursor": "LOAD DATA LOCAL INPATH '/warehouse/test_partition/c2=2/c3=3'\n    OVERWRITE INTO TABLE test_load_partition PARTITION (c2=2, c3=3);",
     "afterCursor": "",
     "noErrors": true,

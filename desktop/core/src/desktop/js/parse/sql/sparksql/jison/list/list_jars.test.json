@@ -1,0 +1,61 @@
+[
+  {
+    "namePrefix": "should not find errors",
+    "beforeCursor": "LIST JARS /tmp/test.txt \"/path with space/cde.txt\" '/path with space/fgh.txt';",
+    "afterCursor": "",
+    "noErrors": true,
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "LIST ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "JARS"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest files",
+    "beforeCursor": "LIST JARS /boo/file.txt /",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestHdfs": { "path": "/" }
+    }
+  },
+  {
+    "namePrefix": "should suggest files",
+    "beforeCursor": "LIST JARS /boo/file1.txt \"/",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestHdfs": { "path": "/" }
+    }
+  },
+  {
+    "namePrefix": "should suggest files",
+    "beforeCursor": "LIST JARS '/boo/file2.txt' \"/foo/",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestHdfs": { "path": "/foo/" }
+    }
+  },
+  {
+    "namePrefix": "should suggest files",
+    "beforeCursor": "LIST JARS '/boo/file2.txt' /foo.txt '/foo /bar/bla",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestHdfs": { "path": "/foo /bar/" }
+    }
+  }
+]

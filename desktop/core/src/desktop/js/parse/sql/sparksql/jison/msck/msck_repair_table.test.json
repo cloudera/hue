@@ -1,6 +1,6 @@
 [
   {
-    "namePrefix": "should handle",
+    "namePrefix": "should not find errors",
     "beforeCursor": "MSCK REPAIR TABLE db.tbl ADD PARTITIONS;",
     "afterCursor": "",
     "containsKeywords": [

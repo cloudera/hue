@@ -1,0 +1,104 @@
+[
+  {
+    "namePrefix": "should not find errors",
+    "beforeCursor": "SHOW SYSTEM FUNCTIONS concat;",
+    "afterCursor": "",
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "noErrors": true
+  },
+  {
+    "namePrefix": "should not find errors",
+    "beforeCursor": "SHOW SYSTEM FUNCTIONS FROM salesdb LIKE 'max';",
+    "afterCursor": "",
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "noErrors": true
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "SHOW ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "ALL FUNCTIONS",
+      "FUNCTIONS",
+      "SYSTEM FUNCTIONS",
+      "USER FUNCTIONS"
+    ]
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "SHOW ALL ",
+    "afterCursor": "",
+    "expectedResult": {
+      "suggestKeywords": [
+        "FUNCTIONS"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "SHOW SYSTEM ",
+    "afterCursor": "",
+    "expectedResult": {
+      "suggestKeywords": [
+        "FUNCTIONS"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "SHOW USER ",
+    "afterCursor": "",
+    "expectedResult": {
+      "suggestKeywords": [
+        "FUNCTIONS"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "SHOW USER FUNCTIONS ",
+    "afterCursor": "",
+    "expectedResult": {
+      "suggestKeywords": [
+        "FROM",
+        "IN",
+        "LIKE"
+      ],
+      "suggestAggregateFunctions": {
+        "tables": []
+      },
+      "suggestAnalyticFunctions": true,
+      "suggestFunctions": {}
+    }
+  },
+  {
+    "namePrefix": "should suggest databases",
+    "beforeCursor": "SHOW FUNCTIONS FROM ",
+    "afterCursor": "",
+    "expectedResult": {
+      "suggestDatabases": {}
+    }
+  },
+  {
+    "namePrefix": "should suggest databases",
+    "beforeCursor": "SHOW SYSTEM FUNCTIONS IN ",
+    "afterCursor": "",
+    "expectedResult": {
+      "suggestDatabases": {}
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "SHOW ALL FUNCTIONS IN foo ",
+    "afterCursor": "",
+    "expectedResult": {
+      "suggestKeywords": [
+        "LIKE"
+      ]
+    }
+  }
+]
