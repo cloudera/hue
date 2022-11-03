@@ -1,0 +1,70 @@
+[
+  {
+    "namePrefix": "should not find errors",
+    "beforeCursor": "DESC FUNCTION EXTENDED abs;",
+    "afterCursor": "",
+    "noErrors": true,
+    "containsKeywords": [
+      "SELECT"
+    ]
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "DESCRIBE ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "FUNCTION"
+    ]
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "DESC ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "FUNCTION"
+    ]
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "DESCRIBE FUNCTION ",
+    "afterCursor": "",
+    "expectedResult": {
+      "suggestKeywords": [
+        "EXTENDED"
+      ],
+      "suggestAggregateFunctions": {
+        "tables": []
+      },
+      "suggestAnalyticFunctions": true,
+      "suggestFunctions": {},
+      "suggestDatabases": {
+        "appendDot": true
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest functions",
+    "beforeCursor": "DESCRIBE FUNCTION EXTENDED ",
+    "afterCursor": "",
+    "expectedResult": {
+      "suggestAggregateFunctions": {
+        "tables": []
+      },
+      "suggestAnalyticFunctions": true,
+      "suggestFunctions": {},
+      "suggestDatabases": {
+        "appendDot": true
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "DESCRIBE DATABASE EXTENDED `",
+    "afterCursor": "",
+    "expectedResult": {
+      "suggestDatabases": {
+        "appendBacktick": true
+      }
+    }
+  }
+]

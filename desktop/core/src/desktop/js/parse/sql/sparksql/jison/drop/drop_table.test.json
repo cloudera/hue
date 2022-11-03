@@ -1,6 +1,6 @@
 [
   {
-    "namePrefix": "should handle",
+    "namePrefix": "should not find errors",
     "beforeCursor": "DROP TABLE  IF EXISTS db.tbl;",
     "afterCursor": "",
     "containsKeywords": [

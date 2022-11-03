@@ -1,0 +1,130 @@
+[
+  {
+    "namePrefix": "should not find errors",
+    "beforeCursor": "ADD ARCHIVE /tmp/test;",
+    "afterCursor": "",
+    "noErrors": true,
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should not find errors",
+    "beforeCursor": "ADD ARCHIVE \"/path/to/file/abc.txt\";",
+    "afterCursor": "",
+    "noErrors": true,
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should not find errors",
+    "beforeCursor": "ADD ARCHIVE '/path/to/file with space/abc.txt';",
+    "afterCursor": "",
+    "noErrors": true,
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ADD ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "ARCHIVE"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest files",
+    "beforeCursor": "ADD ARCHIVE /",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestHdfs": { "path": "/" }
+    }
+  },
+  {
+    "namePrefix": "should suggest files",
+    "beforeCursor": "ADD ARCHIVE /boo/",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestHdfs": { "path": "/boo/" }
+    }
+  },
+  {
+    "namePrefix": "should suggest files",
+    "beforeCursor": "ADD ARCHIVE '",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestHdfs": { "path": "" }
+    }
+  },
+  {
+    "namePrefix": "should suggest files",
+    "beforeCursor": "ADD ARCHIVE '/foo/",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestHdfs": { "path": "/foo/" }
+    }
+  },
+  {
+    "namePrefix": "should suggest files",
+    "beforeCursor": "ADD ARCHIVE '/foo bar/",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestHdfs": { "path": "/foo bar/" }
+    }
+  },
+  {
+    "namePrefix": "should suggest files",
+    "beforeCursor": "ADD ARCHIVE \"",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestHdfs": { "path": "" }
+    }
+  },
+  {
+    "namePrefix": "should suggest files",
+    "beforeCursor": "ADD ARCHIVE \"/foo/",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestHdfs": { "path": "/foo/" }
+    }
+  },
+  {
+    "namePrefix": "should suggest files",
+    "beforeCursor": "ADD ARCHIVE \"/foo bar/",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestHdfs": { "path": "/foo bar/" }
+    }
+  },
+  {
+    "namePrefix": "should suggest files",
+    "beforeCursor": "ADD ARCHIVE \"/foo bar/partial",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestHdfs": { "path": "/foo bar/" }
+    }
+  }
+]

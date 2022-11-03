@@ -1,0 +1,77 @@
+[
+  {
+    "namePrefix": "should not find errors",
+    "beforeCursor": "SHOW CREATE TABLE test;",
+    "afterCursor": "",
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "noErrors": true
+  },
+  {
+    "namePrefix": "should not find errors",
+    "beforeCursor": "SHOW CREATE TABLE foo.test AS SERDE;",
+    "afterCursor": "",
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "noErrors": true
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "SHOW ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "CREATE TABLE"
+    ]
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "SHOW CREATE ",
+    "afterCursor": "",
+    "expectedResult": {
+      "suggestKeywords": ["TABLE"]
+    }
+  },
+  {
+    "namePrefix": "should suggest tables",
+    "beforeCursor": "SHOW CREATE TABLE ",
+    "afterCursor": "",
+    "expectedResult": {
+      "suggestDatabases": {
+        "appendDot": true
+      },
+      "suggestTables": {}
+    }
+  },
+  {
+    "namePrefix": "should suggest tables",
+    "beforeCursor": "SHOW CREATE TABLE foo.",
+    "afterCursor": "",
+    "expectedResult": {
+      "suggestTables": {
+        "identifierChain": [
+          {
+            "name": "foo"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "SHOW CREATE TABLE foo ",
+    "afterCursor": "",
+    "expectedResult": {
+      "suggestKeywords": ["AS SERDE"]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "SHOW CREATE TABLE foo AS ",
+    "afterCursor": "",
+    "expectedResult": {
+      "suggestKeywords": ["SERDE"]
+    }
+  }
+]
