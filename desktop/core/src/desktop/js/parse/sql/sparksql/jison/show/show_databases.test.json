@@ -1,0 +1,45 @@
+[
+  {
+    "namePrefix": "should not find errors",
+    "beforeCursor": "SHOW SCHEMAS;",
+    "afterCursor": "",
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "noErrors": true
+  },
+  {
+    "namePrefix": "should not find errors",
+    "beforeCursor": "SHOW DATABASES LIKE 'pay*';",
+    "afterCursor": "",
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "noErrors": true
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "SHOW ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "DATABASES",
+      "SCHEMAS"
+    ]
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "SHOW DATABASES ",
+    "afterCursor": "",
+    "expectedResult": {
+      "suggestKeywords": ["LIKE"]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "SHOW SCHEMAS ",
+    "afterCursor": "",
+    "expectedResult": {
+      "suggestKeywords": ["LIKE"]
+    }
+  }
+]

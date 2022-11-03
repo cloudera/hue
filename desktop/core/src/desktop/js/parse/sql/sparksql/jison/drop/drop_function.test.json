@@ -1,6 +1,6 @@
 [
   {
-    "namePrefix": "should handle",
+    "namePrefix": "should not find errors",
     "beforeCursor": "DROP TEMPORARY FUNCTION IF EXISTS baa;",
     "afterCursor": "",
     "containsKeywords": [

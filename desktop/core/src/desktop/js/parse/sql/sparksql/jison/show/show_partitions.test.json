@@ -1,0 +1,93 @@
+[
+  {
+    "namePrefix": "should not find errors",
+    "beforeCursor": "SHOW PARTITIONS customer;",
+    "afterCursor": "",
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "noErrors": true
+  },
+  {
+    "namePrefix": "should not find errors",
+    "beforeCursor": "SHOW PARTITIONS salesdb.customer;",
+    "afterCursor": "",
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "noErrors": true
+  },
+  {
+    "namePrefix": "should not find errors",
+    "beforeCursor": "SHOW PARTITIONS customer PARTITION (state = 'CA', city = 'Fremont');",
+    "afterCursor": "",
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "noErrors": true
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "SHOW ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "PARTITIONS"
+    ]
+  },
+  {
+    "namePrefix": "should suggest tables",
+    "beforeCursor": "SHOW PARTITIONS ",
+    "afterCursor": "",
+    "expectedResult": {
+      "suggestDatabases": {
+        "appendDot": true
+      },
+      "suggestTables": {}
+    }
+  },
+  {
+    "namePrefix": "should suggest tables",
+    "beforeCursor": "SHOW PARTITIONS foo.",
+    "afterCursor": "",
+    "expectedResult": {
+      "suggestTables": {
+        "identifierChain": [
+          {
+            "name": "foo"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "SHOW PARTITIONS foo ",
+    "afterCursor": "",
+    "expectedResult": {
+      "suggestKeywords": [
+        "PARTITION"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest columns",
+    "beforeCursor": "SHOW PARTITIONS foo.bar PARTITION (",
+    "afterCursor": "",
+    "expectedResult": {
+      "suggestColumns": {
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "foo"
+              },
+              {
+                "name": "bar"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+]
