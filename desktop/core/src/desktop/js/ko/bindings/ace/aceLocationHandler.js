@@ -712,7 +712,9 @@ class AceLocationHandler {
     const self = this;
     if (
       self.sqlSyntaxWorkerSub !== null &&
-      (self.dialect() === DIALECT.impala || self.dialect() === DIALECT.hive)
+      (self.dialect() === DIALECT.impala ||
+        self.dialect() === DIALECT.hive ||
+        self.dialect() === DIALECT.sparksql)
     ) {
       const AceRange = ace.require('ace/range').Range;
       const editorChangeTime = self.editor.lastChangeTime;
