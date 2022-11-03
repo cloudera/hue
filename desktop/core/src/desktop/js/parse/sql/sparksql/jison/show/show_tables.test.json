@@ -1,0 +1,77 @@
+[
+  {
+    "namePrefix": "should not find errors",
+    "beforeCursor": "SHOW TABLES;",
+    "afterCursor": "",
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "noErrors": true
+  },
+  {
+    "namePrefix": "should not find errors",
+    "beforeCursor": "SHOW TABLES IN userdb;",
+    "afterCursor": "",
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "noErrors": true
+  },
+  {
+    "namePrefix": "should not find errors",
+    "beforeCursor": "SHOW TABLES FROM default LIKE 'sam*';",
+    "afterCursor": "",
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "noErrors": true
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "SHOW ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "TABLES"
+    ]
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "SHOW TABLES ",
+    "afterCursor": "",
+    "expectedResult": {
+      "suggestKeywords": ["FROM", "IN", "LIKE"]
+    }
+  },
+  {
+    "namePrefix": "should suggest databases",
+    "beforeCursor": "SHOW TABLES FROM ",
+    "afterCursor": "",
+    "expectedResult": {
+      "suggestDatabases": {}
+    }
+  },
+  {
+    "namePrefix": "should suggest databases",
+    "beforeCursor": "SHOW TABLES IN ",
+    "afterCursor": "",
+    "expectedResult": {
+      "suggestDatabases": {}
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "SHOW TABLES IN foo ",
+    "afterCursor": "",
+    "expectedResult": {
+      "suggestKeywords": ["LIKE"]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "SHOW TABLES FROM `bar foo` ",
+    "afterCursor": "",
+    "expectedResult": {
+      "suggestKeywords": ["LIKE"]
+    }
+  }
+]

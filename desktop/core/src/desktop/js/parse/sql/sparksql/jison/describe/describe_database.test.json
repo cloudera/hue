@@ -1,0 +1,46 @@
+[
+  {
+    "namePrefix": "should not find errors",
+    "beforeCursor": "DESCRIBE DATABASE EXTENDED employees;",
+    "afterCursor": "",
+    "noErrors": true,
+    "containsKeywords": [
+      "SELECT"
+    ]
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "DESCRIBE ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "DATABASE"
+    ]
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "DESCRIBE DATABASE ",
+    "afterCursor": "",
+    "expectedResult": {
+      "suggestKeywords": [
+        "EXTENDED"
+      ],
+      "suggestDatabases": {}
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "DESCRIBE DATABASE EXTENDED ",
+    "afterCursor": "",
+    "expectedResult": {
+      "suggestDatabases": {}
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "DESC DATABASE EXTENDED `",
+    "afterCursor": "",
+    "expectedResult": {
+      "suggestDatabases": { "appendBacktick": true }
+    }
+  }
+]

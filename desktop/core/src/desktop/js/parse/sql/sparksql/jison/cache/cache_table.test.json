@@ -1,0 +1,181 @@
+[
+  {
+    "namePrefix": "should not find errors",
+    "beforeCursor": "CACHE TABLE testCache OPTIONS ('storageLevel' 'DISK_ONLY') SELECT * FROM testData;",
+    "afterCursor": "",
+    "noErrors": true,
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CACHE ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "LAZY TABLE",
+      "TABLE"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CACHE LAZY ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "TABLE"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest tables",
+    "beforeCursor": "CACHE TABLE ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestTables": {},
+      "suggestDatabases": {
+        "appendDot": true
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest tables",
+    "beforeCursor": "CACHE LAZY TABLE foo.",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestTables": {
+        "identifierChain": [
+          {
+            "name": "foo"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CACHE TABLE foo.bar ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "OPTIONS",
+        "AS SELECT",
+        "SELECT"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CACHE TABLE foo.bar OPTIONS (",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "'storageLevel'"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CACHE TABLE foo.bar OPTIONS ('storageLevel' ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "'MEMORY_AND_DISK_2'"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CACHE TABLE foo.bar OPTIONS ('storageLevel' = ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "'MEMORY_AND_DISK_2'"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CACHE TABLE foo.bar OPTIONS ('storageLevel' = 'MEMORY_AND_DISK_2') ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "AS SELECT",
+        "SELECT"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CACHE TABLE foo.bar OPTIONS ('storageLevel' = 'MEMORY_AND_DISK_2') AS ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "SELECT"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CACHE TABLE foo.bar OPTIONS ('storageLevel' = 'MEMORY_AND_DISK_2') AS SELECT ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "*"
+    ],
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestAggregateFunctions": {
+        "tables": []
+      },
+      "suggestAnalyticFunctions": true,
+      "suggestFunctions": {},
+      "suggestTables": {
+        "prependQuestionMark": true,
+        "prependFrom": true
+      },
+      "suggestDatabases": {
+        "prependQuestionMark": true,
+        "prependFrom": true,
+        "appendDot": true }
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CACHE TABLE foo SELECT ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "*"
+    ],
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestAggregateFunctions": {
+        "tables": []
+      },
+      "suggestAnalyticFunctions": true,
+      "suggestFunctions": {},
+      "suggestTables": {
+        "prependQuestionMark": true,
+        "prependFrom": true
+      },
+      "suggestDatabases": {
+        "prependQuestionMark": true,
+        "prependFrom": true,
+        "appendDot": true }
+    }
+  }
+]
