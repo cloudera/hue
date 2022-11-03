@@ -1005,6 +1005,7 @@ const initSqlParser = function (parser) {
     let keywords = [
       'ALTER',
       'CREATE',
+      'DELETE',
       'DESCRIBE',
       'DROP',
       'GRANT',
