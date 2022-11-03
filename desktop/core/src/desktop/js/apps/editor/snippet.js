@@ -77,6 +77,7 @@ export const DIALECT = {
   mapreduce: 'mapreduce',
   pig: 'pig',
   distcp: 'distcp',
+  sparksql: 'sparksql',
   sqoop1: 'sqoop1'
 };
 
