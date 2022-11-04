@@ -61,14 +61,14 @@ You can start a Phoenix QueryServer instance on http://localhost:8765 for testin
 the following command in the pohoenix-queryserver-parent directory::
 
     mvn clean verify -am -pl phoenix-queryserver-it -Dtest=foo \
-    -Dit.test=QueryServerBasicsIT\#startLocalPQS \
+    -Dit.test=QueryServerBasicsIT#startLocalPQS \
     -Ddo.not.randomize.pqs.port=true -Dstart.unsecure.pqs=true
 
 You can start a secure (https+kerberos) Phoenix QueryServer instance on https://localhost:8765
 for testing by running the following command in the phoenix-queryserver-parent directory::
 
     mvn clean verify -am -pl phoenix-queryserver-it -Dtest=foo \
-    -Dit.test=SecureQueryServerPhoenixDBIT\#startLocalPQS \
+    -Dit.test=SecureQueryServerPhoenixDBIT#startLocalPQS \
     -Ddo.not.randomize.pqs.port=true -Dstart.secure.pqs=true
 
 this will also create a shell script in phoenix-queryserver-it/target/krb_setup.sh, that you can use to set
@@ -92,7 +92,7 @@ various Phoenix-specific features. In order to run the test suite, you need a
 working Phoenix database and set the ``PHOENIXDB_TEST_DB_URL`` environment variable::
 
     export PHOENIXDB_TEST_DB_URL='http://localhost:8765/'
-    nosetests
+    tox
 
 If you use a secure PQS server, you can set the connection parameters via the following environment
 variables:
@@ -110,11 +110,11 @@ Similarly, tox can be used to run the test suite against multiple Python version
     pyenv global 2.7.14 3.5.5 3.6.4
     PHOENIXDB_TEST_DB_URL='http://localhost:8765' tox
 
-You can use tox and docker to run the tests on supported python versions up to 3.8 without
+You can use tox and docker to run the tests on supported python versions without
 installing the environments locally::
 
     docker build -t toxtest .
-    docker run --rm  -v `pwd`:/src toxtest
+    docker run --rm --add-host=host.docker.internal:host-gateway -v `pwd`:/src toxtest
 
 You can also run the test suite from maven as part of the Java build by setting the 
 run.full.python.testsuite property. You DO NOT need to set the PHOENIXDB_* enviroment variables,
