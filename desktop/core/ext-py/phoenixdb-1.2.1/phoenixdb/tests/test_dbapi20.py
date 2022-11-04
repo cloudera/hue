@@ -105,7 +105,7 @@ class PhoenixDatabaseAPI20Test(dbapi20.DatabaseAPI20Test):
             # no rows
             cur.execute('select name from %sbooze' % self.table_prefix)
             self.assertRaises(StopIteration, cur.next)
-            self.failUnless(cur.rowcount in (-1, 0))
+            self.assertTrue(cur.rowcount in (-1, 0))
 
             # cursor.next should raise an Error if called after
             # executing a query that cannnot return rows
@@ -120,6 +120,6 @@ class PhoenixDatabaseAPI20Test(dbapi20.DatabaseAPI20Test):
             self.assertEqual(r[0], 'Victoria Bitter', 'cursor.next retrieved incorrect data')
             # cursor.next should raise StopIteration if no more rows available
             self.assertRaises(StopIteration, cur.next)
-            self.failUnless(cur.rowcount in (-1, 1))
+            self.assertTrue(cur.rowcount in (-1, 1))
         finally:
             con.close()

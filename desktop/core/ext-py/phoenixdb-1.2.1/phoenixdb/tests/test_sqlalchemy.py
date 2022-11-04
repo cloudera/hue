@@ -59,11 +59,13 @@ class SQLAlchemyTest(unittest.TestCase):
             try:
                 inspector = db.inspect(engine)
 
+                connection.execute('drop table if exists USERS')
                 connection.execute('drop table if exists ALCHEMY_TEST')
                 connection.execute('drop table if exists A.ALCHEMY_TEST_A')
                 connection.execute('drop table if exists B.ALCHEMY_TEST_B')
 
                 self.assertEqual(inspector.get_schema_names(), ['', 'SYSTEM'])
+                self.assertEqual(inspector.get_table_names(), [])
 
                 connection.execute(text('create table ALCHEMY_TEST (ID integer primary key)'))
                 connection.execute(text('create table A.ALCHEMY_TEST_A (ID_A integer primary key)'))
@@ -78,7 +80,7 @@ class SQLAlchemyTest(unittest.TestCase):
                 self.assertEqual(inspector.get_table_names('B'), ['ALCHEMY_TEST_B'])
 
                 self.assertEqual(inspector.get_view_names(), ['ALCHEMY_TEST_VIEW'])
-                
+
                 self.assertEqual(inspector.get_columns('ALCHEMY_TEST').pop()['name'], 'ID')
                 self.assertEqual(
                     inspector.get_columns('ALCHEMY_TEST', '').pop()['name'], 'ID')
