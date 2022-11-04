@@ -90,6 +90,8 @@ class PhoenixDialect(DefaultDialect):
 
     driver = "phoenixdb"
 
+    supports_statement_cache = False  # We only implement textual SQL anyway
+
     ddl_compiler = PhoenixDDLCompiler
 
     execution_ctx_cls = PhoenixExecutionContext
