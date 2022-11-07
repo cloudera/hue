@@ -785,6 +785,8 @@ export const initSyntaxParser = parser => {
     PARTITION_VALUE: 'PARTITION'
   };
 
+  const VALID_KEYWORD_REGEX = /^[a-z]+$/i;
+
   parser.parseSyntax = (beforeCursor, afterCursor, debug) => {
     parser.yy.caseDetermined = false;
     parser.yy.error = undefined;
@@ -844,7 +846,7 @@ export const initSyntaxParser = parser => {
             });
             parser.yy.error.possibleReserved = true;
           }
-        } else if (!IGNORED_EXPECTED[expected] && /[a-z_]+/i.test(expected)) {
+        } else if (!IGNORED_EXPECTED[expected] && VALID_KEYWORD_REGEX.test(expected)) {
           // Skip mixed-case expected
           if (expected.toUpperCase() !== expected) {
             continue;
