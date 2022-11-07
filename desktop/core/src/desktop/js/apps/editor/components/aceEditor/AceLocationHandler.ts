@@ -1412,7 +1412,11 @@ export default class AceLocationHandler implements Disposable {
           }
         });
 
-        if (this.getDialect() === IMPALA_DIALECT || this.getDialect() === HIVE_DIALECT) {
+        if (
+          this.getDialect() === IMPALA_DIALECT ||
+          this.getDialect() === HIVE_DIALECT ||
+          this.getDialect() === SPARKSQL_DIALECT
+        ) {
           this.verifyExists(tokensToVerify, e.data.activeStatementLocations);
         }
         huePubSub.publish('editor.active.locations', lastKnownLocations);
