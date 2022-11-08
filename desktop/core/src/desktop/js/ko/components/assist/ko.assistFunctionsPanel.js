@@ -106,7 +106,7 @@ const TEMPLATE = `
               <div class="assist-panel-close"><button class="close" data-bind="click: function() { $parent.selectedFunction(null); }">&times;</button></div>
               <div class="assist-function-signature blue" data-bind="draggableText: { text: draggable, meta: { type: 'function' } }, text: signature, event: { 'dblclick': function () { huePubSub.publish('editor.insert.at.cursor', { text: draggable }); } }"></div>
               <!-- ko if: description -->
-              <div data-bind="html: descriptionMatch"></div>
+              <div class="preformatted" data-bind="html: descriptionMatch"></div>
               <!-- /ko -->
               <!-- /ko -->
             </div>

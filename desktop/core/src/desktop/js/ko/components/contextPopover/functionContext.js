@@ -33,7 +33,7 @@ export const FUNCTION_CONTEXT_TEMPLATE = `
   <div class="context-popover-flex-fill" data-bind="with: details">
     <div style="padding: 8px">
       <p style="margin: 10px 10px 18px 10px;"><span style="white-space: pre;" class="monospace" data-bind="text: signature"></span></p>
-      <p><span data-bind="text: description"></span></p>
+      <p><span class="preformatted" data-bind="text: description"></span></p>
     </div>
   </div>
 </script>
