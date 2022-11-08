@@ -1330,7 +1330,11 @@ class AceLocationHandler {
         }
       });
 
-      if (self.dialect() === DIALECT.impala || self.dialect() === DIALECT.hive) {
+      if (
+        self.dialect() === DIALECT.impala ||
+        self.dialect() === DIALECT.hive ||
+        self.dialect() === DIALECT.sparksql
+      ) {
         self.verifyExists(tokensToVerify, e.data.activeStatementLocations);
       }
       huePubSub.publish('editor.active.locations', lastKnownLocations);
