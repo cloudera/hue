@@ -1227,6 +1227,12 @@ There is no bridge to KO for components using this integration. Example using in
       spark2: {
         snippetImage: '${ static("spark/art/icon_spark_48.png") }'
       },
+      sparksql: {
+        placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
+        aceMode: 'ace/mode/sparksql',
+        snippetImage: '${ static("beeswax/art/icon_spark_48.png") }',
+        sqlDialect: true
+      },
       mapreduce: {
         snippetIcon: 'fa-file-archive-o'
       },
