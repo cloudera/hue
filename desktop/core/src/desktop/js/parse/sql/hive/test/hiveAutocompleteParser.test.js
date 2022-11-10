@@ -16,7 +16,15 @@
 
 import { assertPartials } from 'parse/sql/sharedParserTests';
 import hiveAutocompleteParser from '../hiveAutocompleteParser';
+import { extractTestCases, runTestCases } from '../../testUtils';
+import structure from '../../hive/jison/structure.json';
+
+const jisonFolder = 'desktop/core/src/desktop/js/parse/sql/hive/jison';
+const groupedTestCases = extractTestCases(jisonFolder, structure.autocomplete);
+
 describe('hiveAutocompleteParser.js', () => {
+  runTestCases(hiveAutocompleteParser, groupedTestCases);
+
   beforeAll(() => {
     hiveAutocompleteParser.yy.parseError = function (msg) {
       throw Error(msg);

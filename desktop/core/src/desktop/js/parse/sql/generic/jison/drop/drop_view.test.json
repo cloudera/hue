@@ -80,5 +80,32 @@
         "onlyViews": true
       }
     }
+  },
+  {
+    "namePrefix": "should suggest views",
+    "beforeCursor": "DROP VIEW IF EXISTS foo.",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestTables": {
+        "identifierChain": [
+          {
+            "name": "foo"
+          }
+        ],
+        "onlyViews": true
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "DROP VIEW ",
+    "afterCursor": " foo.bar",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "IF EXISTS"
+      ]
+    }
   }
 ]

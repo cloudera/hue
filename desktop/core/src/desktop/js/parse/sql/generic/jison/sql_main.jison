@@ -135,7 +135,6 @@ NonStartingToken
  | 'CURRENT'
  | 'DATABASE'
  | 'DECIMAL'
- | 'DESC'
  | 'DISTINCT'
  | 'DOUBLE'
  | 'DOUBLE_QUOTE'
@@ -260,12 +259,16 @@ QuotedValue_EDIT
  | DoubleQuotedValue_EDIT
  ;
 
-OptionalFromDatabase
+OptionalFromOrInDatabase
  :
- | FromOrIn DatabaseIdentifier
+ | FromOrInDatabases
  ;
 
-OptionalFromDatabase_EDIT
+FromOrInDatabases
+ : FromOrIn DatabaseIdentifier
+ ;
+
+FromOrInDatabase_EDIT
  : FromOrIn DatabaseIdentifier_EDIT
  ;
 
@@ -282,6 +285,10 @@ OptionalIfExists
    }
  ;
 
+IfExists_EDIT
+ : OptionalIfExists_EDIT
+ ;
+
 OptionalIfExists_EDIT
  : 'IF' 'CURSOR'
    {
@@ -295,6 +302,10 @@ OptionalIfNotExists
    {
      parser.yy.correlatedSubQuery = false;
    }
+ ;
+
+IfNotExists_EDIT
+ : OptionalIfNotExists_EDIT
  ;
 
 OptionalIfNotExists_EDIT

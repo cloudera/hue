@@ -1,0 +1,13 @@
+[
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CLEAR ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "CACHE"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  }
+]

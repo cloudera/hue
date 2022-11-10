@@ -1,0 +1,94 @@
+[
+  {
+    "namePrefix": "should not find errors",
+    "beforeCursor": "DROP TABLE  IF EXISTS db.tbl;",
+    "afterCursor": "",
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "noErrors": true,
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "DROP ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "TABLE"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest tables",
+    "beforeCursor": "DROP TABLE ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestTables": {
+        "onlyTables": true
+      },
+      "suggestDatabases": {
+        "appendDot": true
+      },
+      "suggestKeywords": [
+        "IF EXISTS"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "DROP TABLE IF ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "EXISTS"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest tables",
+    "beforeCursor": "DROP TABLE IF EXISTS ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestTables": {
+        "onlyTables": true
+      },
+      "suggestDatabases": {
+        "appendDot": true
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest tables",
+    "beforeCursor": "DROP TABLE IF EXISTS foo.",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestTables": {
+        "identifierChain": [
+          {
+            "name": "foo"
+          }
+        ],
+        "onlyTables": true
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "DROP TABLE ",
+    "afterCursor": " foo.bar",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "IF EXISTS"
+      ]
+    }
+  }
+]

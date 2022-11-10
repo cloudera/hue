@@ -216,11 +216,6 @@ SpecList_EDIT
    }
  ;
 
-OptionalClusteredBy
- :
- | ClusteredBy
- ;
-
 OptionalSkewedBy
  :
  | SkewedBy
