@@ -1,5 +1,0 @@
-include LICENSE
-include src/ext/*
-global-exclude __pycache__
-global-exclude *.py[co]
-
