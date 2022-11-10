@@ -37,7 +37,7 @@
     "babel-preset-react-app": "^3.1.2",
     "clipboard": "1.7.1",
     "core-js": "3.19.1",
-    "d3": "5.7.0",
+    "d3": "7.6.1",
     "d3v3": "1.0.3",
     "dropzone": "5.5.1",
     "file-saver": "^2.0.2",
