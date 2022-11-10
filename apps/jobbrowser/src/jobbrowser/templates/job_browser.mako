@@ -1517,12 +1517,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         <div class="tab-content">
           <div class="tab-pane active" id="servicesLoad">
             <div class="wxm-poc" style="clear: both;">
-              <div style="float:left; margin-right: 10px; margin-bottom: 10px;">
-                % if PROMETHEUS.API_URL.get():
-                <!-- ko component: { name: 'performance-graph', params: { clusterName: name(), type: 'cpu' } } --><!-- /ko -->
-                % else:
-                  ${ _("Metrics are not setup") }
-                % endif
+              <div style="float:left; margin-right: 10px; margin-bottom: 10px;">                
+                ${ _("Metrics are not setup") }
               </div>
             </div>
           </div>
