@@ -58,9 +58,7 @@ const TEMPLATE = `
 
 class DownloadResultModal {
   constructor(params, $downloadProgressModal) {
-    if (typeof trackOnGA == 'function') {
-      trackOnGA('notebook/download/' + params.format);
-    }
+    window.hueAnalytics.log('notebook', 'download' + params.format);
 
     const executable = params.executable;
     this.$downloadProgressModal = $downloadProgressModal;
