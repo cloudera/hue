@@ -14,17 +14,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import '@testing-library/jest-dom';
+import { post } from '../../api/utils';
+import { CancellablePromise } from '../../api/cancellablePromise';
 
-import React from 'react';
+const FILESYSTEMS_API_URL = '/api/storage/get_filesystems';
 
-import FileChooserWithButton from './FileChooserWithButton';
+export interface FetchFileSystemsResponse {
+  filesystems: Array<string>;
+  status: number;
+}
 
-test('Filechooser modal opens on button click', async () => {
-  const user = userEvent.setup();
-  const { queryByText } = render(<FileChooserWithButton title={'File chooser component'} />);
-  await user.click(screen.getByRole('button', { name: 'File chooser component' }));
-  expect(queryByText('Choose a file')).toBeInTheDocument();
-});
+export const fetchFileSystems = (): CancellablePromise<FetchFileSystemsResponse> => {
+  return post(FILESYSTEMS_API_URL);
+};
