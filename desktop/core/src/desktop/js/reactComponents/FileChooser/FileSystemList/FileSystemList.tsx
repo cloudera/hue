@@ -14,37 +14,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useState } from 'react';
-import { Button } from 'antd';
+import React from 'react';
+import { Menu } from 'antd';
 
-import './FileChooserWithButton.scss';
-import FileChooserModal from '../FileChooserModal/FileChooserModal';
+import './FileSystemList.scss';
+import { FileSystem } from '../types';
 
-interface FileChooserWithButtonProps {
-  title: string;
+interface FileSystemProps {
+  fileSystems: Array<FileSystem>;
 }
 
-const defaultProps = { title: 'File chooser component' };
-
-const FileChooserWithButton: React.FC<FileChooserWithButtonProps> = ({ title }): JSX.Element => {
-  const [show, setShow] = useState(false);
-
+const FileSystemList: React.FC<FileSystemProps> = ({ fileSystems }) => {
   return (
     <>
-      <Button className="file-chooser__button" type="primary" onClick={() => setShow(true)}>
-        {title}
-      </Button>
-
-      <FileChooserModal
-        onCancel={() => setShow(false)}
-        show={show}
-        title="Choose a file"
-        okText="Select"
-      />
+      <Menu items={fileSystems} className="file-system__panel"></Menu>
     </>
   );
 };
 
-FileChooserWithButton.defaultProps = defaultProps;
-
-export default FileChooserWithButton;
+export default FileSystemList;

@@ -14,17 +14,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import '@testing-library/jest-dom';
-
-import React from 'react';
-
-import FileChooserWithButton from './FileChooserWithButton';
-
-test('Filechooser modal opens on button click', async () => {
-  const user = userEvent.setup();
-  const { queryByText } = render(<FileChooserWithButton title={'File chooser component'} />);
-  await user.click(screen.getByRole('button', { name: 'File chooser component' }));
-  expect(queryByText('Choose a file')).toBeInTheDocument();
-});
+//TODO: the interface will change based on the new api to accomodate errors
+export interface FileSystem {
+  label: string;
+  key: string;
+  icon: JSX.Element;
+}
