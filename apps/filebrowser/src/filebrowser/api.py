@@ -21,7 +21,8 @@ from desktop.lib.django_util import JsonResponse
 from desktop.lib import fsmanager
 from desktop.lib.i18n import smart_unicode
 
-from aws.conf import has_s3_access
+from azure.abfs.__init__ import get_home_dir_for_abfs
+from aws.s3.s3fs import get_s3_home_directory
 
 
 LOG = logging.getLogger(__name__)
@@ -52,3 +53,24 @@ def get_filesystems(request):
   response['filesystems'] = filesystems
 
   return JsonResponse(response)
+
+
+@error_handler
+def get_filesystems_with_home_dirs(request): # Using as a public API only for now
+  filesystems = []
+  user_home_dir = ''
+
+  for fs in fsmanager.get_filesystems(request.user):
+    if fs == 'hdfs':
+      user_home_dir = request.user.get_home_directory()
+    elif fs == 's3a':
+      user_home_dir = get_s3_home_directory(request.user)
+    elif fs == 'abfs':
+      user_home_dir = get_home_dir_for_abfs(request.user)
+
+    filesystems.append({
+      'file_system': fs,
+      'user_home_directory': user_home_dir,
+    })
+
+  return JsonResponse(filesystems, safe=False)
