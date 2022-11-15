@@ -43,7 +43,6 @@ def error_handler(view_fn):
 
 @error_handler
 def get_filesystems(request):
-  response = {}
   filesystems = []
   user_home_dir = ''
 
@@ -61,5 +60,4 @@ def get_filesystems(request):
       }
     })
 
-  response['filesystems'] = filesystems
-  return JsonResponse(response)
+  return JsonResponse(filesystems, safe=False)
