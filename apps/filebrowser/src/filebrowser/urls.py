@@ -61,5 +61,5 @@ urlpatterns = [
 
 # API
 urlpatterns += [
-  re_path(r'^api/get_filesystems/?', filebrowser_api.get_filesystems, name='get_filesystems'),
+  re_path(r'^api/get_filesystems/?', filebrowser_api.get_filesystems_with_home_dirs, name='get_filesystems'),
 ]

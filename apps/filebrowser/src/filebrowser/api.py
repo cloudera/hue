@@ -43,6 +43,20 @@ def error_handler(view_fn):
 
 @error_handler
 def get_filesystems(request):
+  response = {}
+
+  filesystems = {}
+  for k in fsmanager.get_filesystems(request.user):
+    filesystems[k] = True
+
+  response['status'] = 0
+  response['filesystems'] = filesystems
+
+  return JsonResponse(response)
+
+
+@error_handler
+def get_filesystems_with_home_dirs(request): # Using as a public API only for now
   filesystems = []
   user_home_dir = ''
 
@@ -55,9 +69,8 @@ def get_filesystems(request):
       user_home_dir = get_home_dir_for_abfs(request.user)
 
     filesystems.append({
-      fs: {
-        'user_home_directory': user_home_dir,
-      }
+      'file_system': fs,
+      'user_home_directory': user_home_dir,
     })
 
   return JsonResponse(filesystems, safe=False)
