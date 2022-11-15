@@ -32,27 +32,16 @@ stacks:
     is_base_repo: true
   tests:
     ART:
-      test_suites:
-      - selected_tests:
-        - branches: []
-          dependencies: []
-          keyvalue: {}
-          marker_list: []
-          name: L0
-          overrides: {}
-          parameters:
-            release: ${CDH_RELEASE_VERSION}
-          payload: []
-          projects: []
-          requirements:
-          - cdh
-          source: quasar
-          type: automatic
-          username: ''
-        comp_name: hue
+      cloud_type: mot.kv.cloud.ycloud
+      quasar_branch: cdh6.x
       release_branch: ${CDH_RELEASE_BRANCH}
+      test_suites:
+      - comp_name: hue
+        marker_list: []
+        tier_tests:
+        - tier_name: functional-test
+          payload_name: pcqe_ycloud
   name: CDH
   stack_name: CDH
   version: ${CDH_RELEASE_VERSION}
   base_build_number: ${CDH_BUILDNUMBER}
-
