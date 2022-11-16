@@ -203,9 +203,10 @@ class RazClient(object):
       relative_path += resource_path[1]
 
     if relative_path == "/" and method == 'GET' and params.get('resource') == 'filesystem' and params.get('directory'):
-      relative_path += lib_urlunquote(params['directory'])
+      relative_path += params['directory']
 
-    return relative_path
+    # Unquoting the full relative_path to catch edge cases like path having whitespaces or non-ascii chars.
+    return lib_urlunquote(relative_path)
 
 
   def handle_adls_req_mapping(self, method, params):
