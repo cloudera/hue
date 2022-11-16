@@ -198,6 +198,13 @@ class RazClientTest(unittest.TestCase):
     access_type = client.handle_adls_req_mapping(method, url_params)
     assert_equal(access_type, 'get-status')
 
+    method = 'HEAD'
+    relative_path = '/user'
+    url_params = {'resource': 'filesystem'} # Stats call for first-level directories like /user
+
+    access_type = client.handle_adls_req_mapping(method, url_params)
+    assert_equal(access_type, 'get-status')
+
     # Delete path
     method = 'DELETE'
     relative_path = '/user/csso_hueuser/test_dir/customer.csv'
@@ -266,13 +273,21 @@ class RazClientTest(unittest.TestCase):
     relative_path = client._handle_relative_path(method, url_params, resource_path, "/")
     assert_equal(relative_path, "/")
 
-    # When relative path present in URL
+    # When relative path is present in URL
     method = 'GET'
     resource_path = ['gethue-container', 'user/csso_hueuser/customer.csv']
     url_params = {}
 
     relative_path = client._handle_relative_path(method, url_params, resource_path, "/")
     assert_equal(relative_path, "/user/csso_hueuser/customer.csv")
+
+    # When relative path present in URL is having quoted whitespaces (%20)
+    method = 'GET'
+    resource_path = ['gethue-container', 'user/csso_hueuser/customer%20(1).csv']
+    url_params = {}
+
+    relative_path = client._handle_relative_path(method, url_params, resource_path, "/")
+    assert_equal(relative_path, "/user/csso_hueuser/customer (1).csv")
 
     # When list operation
     method = 'GET'
