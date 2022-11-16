@@ -52,8 +52,9 @@ class RazHttpClient(HttpClient):
 
     signed_url = url + ('?' if '?' not in url else '&') + sas_token
 
-    # Required because `self._make_url` is called in base class execute method also
-    signed_path = path + signed_url.partition(path)[2]
+    # self._make_url is called in base class execute method as well,
+    # so we remove https://{storageaccountname}.dfs.core.windows.net from the signed url here.
+    signed_path = signed_url.partition('.dfs.core.windows.net')[2]
 
     return super(RazHttpClient, self).execute(
         http_method=http_method,
