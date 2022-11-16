@@ -21,6 +21,7 @@ import componentUtils from 'ko/components/componentUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import UUID from 'utils/string/UUID';
+import hueAnalytics from 'utils/hueAnalytics';
 
 export const NAME = 'download-result-modal';
 
@@ -58,7 +59,7 @@ const TEMPLATE = `
 
 class DownloadResultModal {
   constructor(params, $downloadProgressModal) {
-    window.hueAnalytics.log('notebook', 'download' + params.format);
+    hueAnalytics.log('notebook', 'download' + params.format);
 
     const executable = params.executable;
     this.$downloadProgressModal = $downloadProgressModal;
