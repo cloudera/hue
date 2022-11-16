@@ -72,7 +72,7 @@ export const hueAnalytics = {
 };
 
 export const setupGlobalListenersForAnalytics = (): void => {
-  document.addEventListener('click', (event: Event) => {
+  document.addEventListener('click', event => {
     const eventTarget = event?.target as HTMLElement;
     const analyticsDataAttribute = eventTarget.dataset?.hueAnalytics;
     if (analyticsDataAttribute) {
