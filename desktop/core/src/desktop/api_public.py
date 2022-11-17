@@ -189,7 +189,7 @@ def analyze_table(request, dialect, database, table, columns=None):
 
 # Storage
 
-@api_view(["POST"])
+@api_view(["GET"])
 def storage_get_filesystems(request):
   django_request = get_django_request(request)
   return filebrowser_api.get_filesystems_with_home_dirs(django_request)

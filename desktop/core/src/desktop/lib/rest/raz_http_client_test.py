@@ -60,6 +60,26 @@ class TestRazHttpClient():
             timeout=120
         )
 
+        # Check for path having whitespaces (#20)
+        f = client.execute(http_method='GET', path='/gethue/data/banks (1).csv', params={'action': 'getStatus'})
+
+        url = 'https://gethue.dfs.core.windows.net/gethue/data/banks%20(1).csv?action=getStatus'
+        assert_equal('my_file_content', f)
+        raz_get_url.assert_called_with(action='GET', path=url, headers=None)
+        raz_http_execute.assert_called_with(
+            http_method='GET',
+            path='/gethue/data/banks%20(1).csv?action=getStatus&sv=2014-02-14&sr=b&sig=pJL%2FWyed41tptiwBM5ymYre4qF8wzrO05tS5MCjkutc%3D' \
+              '&st=2015-01-02T01%3A40%3A51Z&se=2015-01-02T02%3A00%3A51Z&sp=r',
+            data=None,
+            headers=None,
+            allow_redirects=False,
+            urlencode=False,
+            files=None,
+            stream=False,
+            clear_cookies=False,
+            timeout=120
+        )
+
 
   def test_handle_raz_adls_response(self):
     with patch('desktop.lib.rest.raz_http_client.AdlsRazClient.get_url') as raz_get_url:
