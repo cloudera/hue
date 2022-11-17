@@ -486,9 +486,7 @@ else:
       }
 
       DownloadResultsViewModel.prototype.download = function (format) {
-        if (typeof trackOnGA == 'function') {
-          trackOnGA('notebook/download/' + format);
-        }
+        window.hueAnalytics.log('notebook', 'download' + format);
 
         var self = this;
         $.cookie('download-' + self.snippet.id(), null, { expires: -1, path: '/' })
