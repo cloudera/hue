@@ -43,7 +43,7 @@ import CancellableJqPromise from 'api/cancellableJqPromise';
 import { DOCUMENT_TYPE_I18n, DOCUMENT_TYPES } from 'doc/docSupport';
 import contextCatalog from 'catalog/contextCatalog';
 import dataCatalog from 'catalog/dataCatalog';
-import hueAnalytics from 'utils/hueAnalytics';
+import hueAnalytics, { setupGlobalListenersForAnalytics } from 'utils/hueAnalytics';
 import HueColors from 'utils/hueColors';
 import hueDebug from 'utils/hueDebug';
 import hueDrop from 'utils/hueDrop';
@@ -97,6 +97,7 @@ window.HdfsAutocompleter = HdfsAutocompleter;
 window.hueAnalytics = hueAnalytics;
 window.HueColors = HueColors;
 window.hueDebug = hueDebug;
+window.hueDebugAnalytics = false;
 window.HueDocument = HueDocument;
 window.hueDrop = hueDrop;
 window.HueFileEntry = HueFileEntry;
@@ -174,6 +175,8 @@ $(document).ready(async () => {
       }
     }, 10);
   });
+
+  setupGlobalListenersForAnalytics();
 
   $('.page-content').jHueScrollUp();
 });

@@ -48,6 +48,7 @@ export interface hueWindow {
   CACHEABLE_TTL?: { default?: number; sqlAnalyzer?: number };
   CLOSE_SESSIONS?: { [dialect: string]: boolean };
   CUSTOM_DASHBOARD_URL?: string;
+  DEV?: boolean;
   DISABLE_LOCAL_STORAGE?: boolean;
   ENABLE_PREDICT?: boolean;
   ENABLE_SQL_SYNTAX_CHECK?: boolean;
@@ -66,5 +67,6 @@ export interface hueWindow {
   WEB_SOCKETS_ENABLED?: boolean;
   WS_CHANNEL?: string;
   hueDebug?: HueDebug;
-  trackOnGA?(track: string): void;
+  hueDebugAnalytics?: boolean;
+  gtag?: (type: string, name: string, parameters: { action: string; version: string }) => void;
 }
