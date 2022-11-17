@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 
 import { i18nReact } from '../../utils/i18nReact';
+import hueAnalytics from '../../utils/hueAnalytics';
 
 import './ReactExampleGlobal.scss';
 
@@ -35,6 +36,7 @@ const ReactExampleGlobal = ({
         onClick && onClick(e);
         setIsClicked(true);
         console.info(`ReactExampleGlobal clicked  ${version} ${myObj?.id}`);
+        hueAnalytics.log('test-area', 'button click', true);
       }}
     >
       ReactExampleGlobal - {children ?? t('Yes')}

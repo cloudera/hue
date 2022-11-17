@@ -45,6 +45,25 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
 <head>
+
+  % if conf.COLLECT_USAGE.get():
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=${conf.GTAG_ID.get()}"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', '${ conf.GTAG_ID.get()}', { 
+        // Prevent GA from accidentally passing client meta data present in urls
+        send_page_view: false, 
+        page_location: 'redacted',
+        page_referrer: 'redacted',
+        allow_google_signals: false
+        });
+    </script>
+  % endif
+
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta charset="utf-8">
   <title>Hue</title>
