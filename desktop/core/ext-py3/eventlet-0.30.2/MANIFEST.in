@@ -1,0 +1,4 @@
+recursive-include tests *.py *.crt *.key
+recursive-include doc *.rst *.txt *.py Makefile *.png
+recursive-include examples *.py *.html
+include MANIFEST.in NEWS AUTHORS LICENSE README.rst
