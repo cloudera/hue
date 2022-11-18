@@ -227,14 +227,14 @@ class SparkApi(Api):
         raise e
 
 
-  def fetch_result(self, notebook, snippet, rows, start_over):
+  def fetch_result(self, notebook, snippet, rows, start_over=False):
     api = self.get_api()
     session = _get_snippet_session(notebook, snippet)
     cell = snippet['result']['handle']['id']
 
     session = self._handle_session_health_check(session)
 
-    response = self._fetch_result(api, session, cell, start_over)
+    response = self._fetch_result(api, session, cell)
 
     # Close unused sessions if there are any.
     # Clean here since /fetch_result_data is called only once after the /execute call
@@ -244,7 +244,7 @@ class SparkApi(Api):
     return response
 
 
-  def _fetch_result(self, api, session, cell, start_over):
+  def _fetch_result(self, api, session, cell):
     try:
       response = api.fetch_data(session['id'], cell)
     except Exception as e:
@@ -281,10 +281,6 @@ class SparkApi(Api):
         headers = table['headers']
         meta = [{'name': h['name'], 'type': h['type'], 'comment': ''} for h in headers]
         type = 'table'
-
-      # Non start_over not supported
-      if not start_over:
-        data = []
 
       return {
           'data': data,
@@ -449,7 +445,7 @@ class SparkApi(Api):
       time.sleep(1)
 
     if check_status['state'] == 'available':
-      return self._fetch_result(api, session, execute_resp['id'], start_over=True)
+      return self._fetch_result(api, session, execute_resp['id'])
 
 
   def _show_databases(self, api, session, snippet_type):
