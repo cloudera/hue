@@ -33,7 +33,6 @@ const hueGlobals = [
   'MediumEditor',
   'moment',
   'Role',
-  'trackOnGA',
   '__webpack_public_path__',
 
   // jest

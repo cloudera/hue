@@ -122,3 +122,4 @@ process.on('unhandledRejection', err => {
 });
 
 jest.mock('../utils/i18nReact');
+jest.mock('../utils/hueAnalytics');

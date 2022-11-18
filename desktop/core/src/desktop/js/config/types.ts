@@ -81,6 +81,7 @@ export interface HueConfig extends GenericApiResponse {
   status: number;
   hue_config: {
     enable_sharing: boolean;
+    collect_usage: boolean;
   };
 }
 
