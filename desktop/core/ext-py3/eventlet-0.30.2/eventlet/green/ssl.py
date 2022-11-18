@@ -85,6 +85,7 @@ class GreenSSLSocket(_original_sslsocket):
                         ssl_version=ssl_version,
                         ca_certs=ca_certs,
                         do_handshake_on_connect=False,
+                        ciphers=kw.get('ciphers'),
                     )
             ret.keyfile = keyfile
             ret.certfile = certfile
