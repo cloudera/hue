@@ -144,9 +144,10 @@ def index(request):
 
 
 def _normalize_path(path):
-  decoded_path = unquote_url(path)
-  if path != decoded_path:
-    path = decoded_path
+  # Prevent decoding of already decoded path, every path contains a '/' which would be encoded to %2F, hence
+  # if / is present it means that it's already been decoded.
+  if '/' not in path:
+    path = unquote_url(path)
 
   # Check if protocol missing / and add it back (e.g. Kubernetes ingress can strip double slash)
   if path.startswith('abfs:/') and not path.startswith('abfs://'):

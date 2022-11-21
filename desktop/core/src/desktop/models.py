@@ -51,7 +51,7 @@ from useradmin.organization import _fitered_queryset
 from desktop import appmanager
 from desktop.auth.backend import is_admin
 from desktop.conf import get_clusters, IS_MULTICLUSTER_ONLY, ENABLE_ORGANIZATIONS, ENABLE_PROMETHEUS, \
-    has_connectors, TASK_SERVER, APP_BLACKLIST, ENABLE_SHARING, ENABLE_CONNECTORS, ENABLE_UNIFIED_ANALYTICS, RAZ
+    has_connectors, TASK_SERVER, APP_BLACKLIST, COLLECT_USAGE, ENABLE_SHARING, ENABLE_CONNECTORS, ENABLE_UNIFIED_ANALYTICS, RAZ
 from desktop.lib import fsmanager
 from desktop.lib.connectors.api import _get_installed_connectors
 from desktop.lib.connectors.models import Connector
@@ -1785,7 +1785,8 @@ class ClusterConfig(object):
       'cluster_type': self.cluster_type,
       'has_computes': self.cluster_type in ('altus', 'snowball'), # or any grouped engine connectors
       'hue_config': {
-        'enable_sharing': ENABLE_SHARING.get()
+        'enable_sharing': ENABLE_SHARING.get(),
+        'collect_usage': COLLECT_USAGE.get()
       }
     }
 
