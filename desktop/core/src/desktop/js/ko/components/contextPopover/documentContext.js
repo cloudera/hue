@@ -90,6 +90,7 @@ class DocumentContext {
     self.errorText = ko.observable();
     self.template = TEMPLATE_NAME;
 
+    self.documentId = ko.observable();
     self.documentContents = ko.observable();
     self.loadDocument();
 
@@ -103,6 +104,14 @@ class DocumentContext {
     self.disposals.push(() => {
       showInAssistPubSub.remove();
     });
+  }
+
+  download() {
+    if (this.documentId()) {
+      window.location.href = `${
+        window.HUE_BASE_URL
+      }/desktop/api2/doc/export?documents=[${this.documentId()}]`;
+    }
   }
 
   open(entry) {
@@ -129,6 +138,7 @@ class DocumentContext {
         silenceErrors: true
       })
       .done(response => {
+        this.documentId(response.document?.id);
         self.documentContents(response.data);
         self.loading(false);
       })

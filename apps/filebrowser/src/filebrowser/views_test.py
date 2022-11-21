@@ -63,7 +63,7 @@ from useradmin.models import User, Group
 from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE, MAX_SNAPPY_DECOMPRESSION_SIZE,\
   REMOTE_STORAGE_HOME
 from filebrowser.lib.rwx import expand_mode
-from filebrowser.views import snappy_installed
+from filebrowser.views import snappy_installed, _normalize_path
 
 if sys.version_info[0] > 2:
   from urllib.parse import unquote as urllib_unquote, urlparse
@@ -1642,3 +1642,54 @@ class TestFileChooserRedirect(object):
           response = self.client.get('/filebrowser/view=')
 
           _normalize_path.assert_called_with('/')
+
+class TestNormalizePath(object):
+
+  def test_should_decode_encoded_path(self):
+    encoded_path = '%2Fsome%2Fpath%20with%20space%20in%20name'
+    expected_path = '/some/path with space in name'
+
+    normalized = _normalize_path(encoded_path)
+    assert_equal(expected_path, normalized)
+
+  def test_decoding_should_only_happen_once(self):
+    encoded_path = '%2Fsome%2Ffolder%2Fwith%2520percent%20twenty%20in%20the%20name'
+    expected_decoded_path = '/some/folder/with%20percent twenty in the name'
+
+    normalized_once = _normalize_path(encoded_path)
+    assert_equal(expected_decoded_path, normalized_once)
+
+    normalized_twice = _normalize_path(normalized_once)
+    assert_equal(expected_decoded_path, normalized_twice)
+
+  def test_abfs_correction(self):
+    path = 'abfs:/some/path'
+    expected_corrected_path = 'abfs://some/path'
+
+    normalized_once = _normalize_path(path)
+    assert_equal(expected_corrected_path, normalized_once)
+
+    normalized_twice = _normalize_path(normalized_once)
+    assert_equal(expected_corrected_path, normalized_twice)
+
+  def test_abfs_correction_already_correct(self):
+    path = 'abfs://some/path'
+
+    normalized = _normalize_path(path)
+    assert_equal(path, normalized)
+
+  def test_s3a_correction(self):
+    path = 's3a:%2Fsome%2Fpath'
+    expected_corrected_path = 's3a://some/path'
+
+    normalized_once = _normalize_path(path)
+    assert_equal(expected_corrected_path, normalized_once)
+
+    normalized_twice = _normalize_path(normalized_once)
+    assert_equal(expected_corrected_path, normalized_twice)
+
+  def test_s3a_correction_already_correct(self):
+    path = 's3a://some/path'
+
+    normalized = _normalize_path(path)
+    assert_equal(path, normalized)
