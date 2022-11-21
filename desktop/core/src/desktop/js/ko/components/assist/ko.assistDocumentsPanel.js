@@ -53,6 +53,9 @@ const TEMPLATE = `
       'Share'
     )}</a></li>
     <!-- /ko -->
+    <li><a href="javascript: void(0);" data-bind="click: contextMenuDownload"><i class="fa fa-fw fa-download"></i> ${I18n(
+      'Download'
+    )}</a></li>
   </script>
 
   <script type="text/html" id="assist-document-header-actions">
