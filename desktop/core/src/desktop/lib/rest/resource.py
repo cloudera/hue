@@ -134,6 +134,9 @@ class Resource(object):
           resp_content[:log_length] if resp else '',
           log_length and len(resp_content) > log_length and '...' or '' if resp else ''
         )
+        LOG.debug(' in resource invoke ----->>>>')
+        LOG.debug(str(resp_content))
+        LOG.debug(str(message))
       except:
         short_call_name = '%s %s' % (method, self._client._base_url)
         LOG.exception('Error logging return call %s' % short_call_name)
