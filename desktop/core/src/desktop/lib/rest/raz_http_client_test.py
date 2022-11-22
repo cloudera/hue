@@ -80,6 +80,25 @@ class TestRazHttpClient():
             timeout=120
         )
 
+        # Check for root path stats
+        f = client.execute(http_method='HEAD', path='/gethue', params={'action': 'getAccessControl'})
+        url = 'https://gethue.dfs.core.windows.net/gethue/?action=getAccessControl'
+
+        raz_get_url.assert_called_with(action='HEAD', path=url, headers=None)
+        raz_http_execute.assert_called_with(
+            http_method='HEAD',
+            path='/gethue/?action=getAccessControl&sv=2014-02-14&sr=b&sig=pJL%2FWyed41tptiwBM5ymYre4qF8wzrO05tS5MCjkutc%3D' \
+              '&st=2015-01-02T01%3A40%3A51Z&se=2015-01-02T02%3A00%3A51Z&sp=r',
+            data=None,
+            headers=None,
+            allow_redirects=False,
+            urlencode=False,
+            files=None,
+            stream=False,
+            clear_cookies=False,
+            timeout=120
+        )
+
 
   def test_handle_raz_adls_response(self):
     with patch('desktop.lib.rest.raz_http_client.AdlsRazClient.get_url') as raz_get_url:

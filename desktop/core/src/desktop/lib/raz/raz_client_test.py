@@ -205,6 +205,13 @@ class RazClientTest(unittest.TestCase):
     access_type = client.handle_adls_req_mapping(method, url_params)
     assert_equal(access_type, 'get-status')
 
+    method = 'HEAD'
+    relative_path = '/'
+    url_params = {'action': 'getAccessControl'} # Stats call for root directory path
+
+    access_type = client.handle_adls_req_mapping(method, url_params)
+    assert_equal(access_type, 'get-acl')
+
     # Delete path
     method = 'DELETE'
     relative_path = '/user/csso_hueuser/test_dir/customer.csv'
