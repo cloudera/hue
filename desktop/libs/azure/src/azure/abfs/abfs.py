@@ -266,7 +266,12 @@ class ABFS(object):
     """
     if params is None:
       params = {}
-    params['resource'] = 'filesystem'
+
+    # For RAZ ABFS, the root path stats should have 'getAccessControl' param.
+    if is_raz_abfs():
+      params['action'] = 'getAccessControl'
+    else:
+      params['resource'] = 'filesystem'
 
     res = self._root._invoke('HEAD', schemeless_path, params, headers=self._getheaders(), **kwargs)
 
