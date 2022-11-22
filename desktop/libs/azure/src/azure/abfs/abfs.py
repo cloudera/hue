@@ -267,7 +267,7 @@ class ABFS(object):
     if params is None:
       params = {}
 
-    # For RAZ ABFS, the "/" path stats should have 'getAccessControl' param.
+    # For RAZ ABFS, the root path stats should have 'getAccessControl' param.
     if is_raz_abfs():
       params['action'] = 'getAccessControl'
     else:
