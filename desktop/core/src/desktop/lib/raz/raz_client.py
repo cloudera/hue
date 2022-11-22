@@ -214,6 +214,8 @@ class RazClient(object):
       access_type = ''
       if params.get('action') == 'getStatus' or params.get('resource') == 'filesystem':
         access_type = 'get-status'
+      if params.get('action') == 'getAccessControl':
+        access_type = 'get-acl'
 
     if method == 'DELETE':
       access_type = 'delete-recursive' if params.get('recursive') == 'true' else 'delete'
