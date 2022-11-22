@@ -48,6 +48,13 @@ class RazHttpClient(HttpClient):
     """
 
     url = self._make_url(path, params)
+
+    # For root stats, the root path needs to end with '/' before adding the query params.
+    if params and 'action' in params and params['action'] == 'getAccessControl':
+      partition_url = list(url.partition('?'))
+      partition_url[0] += '/'
+      url = ''.join(partition_url)
+
     sas_token = self.get_sas_token(http_method, self.username, url, params, headers)
 
     signed_url = url + ('?' if '?' not in url else '&') + sas_token
