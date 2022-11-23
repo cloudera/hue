@@ -134,6 +134,10 @@ def index(request):
   # Redirect to home directory by default
   path = request.user.get_home_directory()
 
+  logger.info('index --------------------------------------------------------------------------------------------')
+  logger.info(path)
+  logger.info('index --------------------------------------------------------------------------------------------')
+
   try:
     if not request.fs.isdir(path):
       path = '/'
@@ -142,12 +146,17 @@ def index(request):
 
   return view(request, path)
 
+def _decodeSlashes(path):
+  # This is a fix for some installations where the path is still having the slash (/) encoded
+  # as %2F while the rest of the path is actually decoded. 
+  encodedSlash = '%2F'
+  if path.startswith(encodedSlash) or path.startswith('abfs:' + encodedSlash) or path.startswith('s3a:' + encodedSlash) :
+    path = path.replace(encodedSlash, '/')
+
+  return path
 
 def _normalize_path(path):
-  # Prevent decoding of already decoded path, every path contains a '/' which would be encoded to %2F, hence
-  # if / is present it means that it's already been decoded.
-  if '/' not in path:
-    path = unquote_url(path)
+  path = _decodeSlashes(path)
 
   # Check if protocol missing / and add it back (e.g. Kubernetes ingress can strip double slash)
   if path.startswith('abfs:/') and not path.startswith('abfs://'):
@@ -157,7 +166,6 @@ def _normalize_path(path):
 
   return path
 
-
 def download(request, path):
   """
   Downloads a file.
@@ -165,6 +173,11 @@ def download(request, path):
   This is inspired by django.views.static.serve.
   ?disposition={attachment, inline}
   """
+
+  logger.info('download --------------------------------------------------------------------------------------------')
+  logger.info(path)
+  logger.info('download --------------------------------------------------------------------------------------------')
+
   path = _normalize_path(path)
 
   if not SHOW_DOWNLOAD_BUTTON.get():
@@ -213,13 +226,21 @@ def download(request, path):
   return response
 
 
-def view(request, path):
+def view(request, path):  
   """Dispatches viewing of a path to either index() or fileview(), depending on type."""
+  
+  logger.info('VIEW x------------------------------------------------------------------------------------------------------------')
+  logger.info('path: ' + path)
+  logger.info('VIEW ------------------------------------------------------------------------------------------------------------')
+
 
   # index directory have to be default.
   if not path:
     path = '/'
   path = _normalize_path(path)
+
+  logger.info('normalized path: ' + path)
+
 
   # default_abfs_home is set in jquery.filechooser.js
   if 'default_abfs_home' in request.GET:
@@ -300,6 +321,7 @@ def _home_trash_path(fs, user, path):
 
 
 def home_relative_view(request, path):
+  # logger.info('home_relative_view oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo')
   path = _normalize_path(path)
 
   home_dir_path = request.user.get_home_directory()
@@ -367,7 +389,7 @@ def save_file(request):
   """
   form = EditorForm(request.POST)
   is_valid = form.is_valid()
-  path = form.cleaned_data.get('path')
+  path = form['path'].value()
 
   path = _normalize_path(path)
 
@@ -500,6 +522,15 @@ def listdir_paged(request, path):
   """
   path = _normalize_path(path)
 
+  
+
+  # logger.info("listdir_paged **************************************************************************")
+  # logger.info(request)
+  # logger.info(path)
+  # logger.info("listdir_paged **************************************************************************")
+
+
+
   if not request.fs.isdir(path):
     raise PopupException("Not a directory: %s" % (path,))
 
@@ -591,7 +622,7 @@ def listdir_paged(request, path):
       # The following should probably be deprecated
       'cwd_set': True,
       'file_filter': 'any',
-      'current_dir_path': urllib_quote(path.encode('utf-8'), safe=SAFE_CHARACTERS_URI),
+      'current_dir_path': path,
       'is_fs_superuser': is_fs_superuser,
       'groups': is_fs_superuser and [str(x) for x in Group.objects.values_list('name', flat=True)] or [],
       'users': is_fs_superuser and [str(x) for x in User.objects.values_list('username', flat=True)] or [],
@@ -682,6 +713,12 @@ def display(request, path):
 
   Note that display by length and offset are on bytes, not on characters.
   """
+
+  logger.info('display ------------------------------------------------------------------------------------------------------------------------------')
+  logger.info('path: ' + path)
+  logger.info('_normalize_path(path): ' + _normalize_path(path))
+  logger.info('display ------------------------------------------------------------------------------------------------------------------------------')
+
   path = _normalize_path(path)
 
   if not request.fs.isfile(path):
@@ -690,6 +727,7 @@ def display(request, path):
   # display inline files just if it's not an ajax request
   if not is_ajax(request):
     if _can_inline_display(path):
+      logger.info('display ----------------------------------------------------------------------------------------------------------------------------- redirect reverse')
       return redirect(reverse('filebrowser:filebrowser_views_download', args=[path]) + '?disposition=inline')
 
   stats = request.fs.stats(path)
@@ -1218,7 +1256,7 @@ def rename(request):
       raise PopupException(_("Could not rename folder \"%s\" to \"%s\": Hashes are not allowed in filenames." % (src_path, dest_path)))
     if "/" not in dest_path:
       src_dir = os.path.dirname(src_path)
-      dest_path = request.fs.join(urllib_unquote(src_dir), urllib_unquote(dest_path))
+      dest_path = request.fs.join(src_dir, dest_path)
     if request.fs.exists(dest_path):
       raise PopupException(_('The destination path "%s" already exists.') % dest_path)
     request.fs.rename(src_path, dest_path)
@@ -1233,27 +1271,35 @@ def set_replication(request):
 
   return generic_op(SetReplicationFactorForm, request, smart_set_replication, ["src_path", "replication_factor"], None)
 
-
+# BJORN HERE?
 def mkdir(request):
+  # logger.info("('*********************************** request" % request)
+  # logger.info('*********************************** request', request)
   def smart_mkdir(path, name):
     # Make sure only one directory is specified at a time.
     # No absolute directory specification allowed.
+
+    # logger.info("*********************************** name" + str(name))
     if posixpath.sep in name or "#" in name:
       raise PopupException(_("Could not name folder \"%s\": Slashes or hashes are not allowed in filenames." % name))
-    request.fs.mkdir(request.fs.join(urllib_unquote(path), urllib_unquote(name)))
+    request.fs.mkdir(request.fs.join(path, name))
 
   return generic_op(MkDirForm, request, smart_mkdir, ["path", "name"], "path")
 
 def touch(request):
   def smart_touch(path, name):
+    logger.info('TOUCH ---------------------------------------------------x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x--x')
+    logger.info('path' + path)
+    logger.info('name' + name)
+    logger.info('TOUCH ---------------------------------------------------x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x--x')
     # Make sure only the filename is specified.
     # No absolute path specification allowed.
     if posixpath.sep in name:
       raise PopupException(_("Could not name file \"%s\": Slashes are not allowed in filenames." % name))
     request.fs.create(
         request.fs.join(
-            urllib_unquote(path.encode('utf-8') if not isinstance(path, str) else path),
-            urllib_unquote(name.encode('utf-8') if not isinstance(name, str) else name)
+            (path.encode('utf-8') if not isinstance(path, str) else path),
+            (name.encode('utf-8') if not isinstance(name, str) else name)
         )
     )
 
@@ -1265,7 +1311,10 @@ def rmtree(request):
   params = ["path"]
   def bulk_rmtree(*args, **kwargs):
     for arg in args:
-      request.fs.do_as_user(request.user, request.fs.rmtree, urllib_unquote(arg['path']), 'skip_trash' in request.GET)
+      logger.info('rmtree ---------------------------------------------------x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x--x')
+      logger.info("arg['path']" + arg['path'])
+      logger.info('rmtree ---------------------------------------------------x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x--x')      
+      request.fs.do_as_user(request.user, request.fs.rmtree, arg['path'], 'skip_trash' in request.GET)
   return generic_op(RmTreeFormSet, request, bulk_rmtree, ["path"], None,
                     data_extractor=formset_data_extractor(recurring, params),
                     arg_extractor=formset_arg_extractor,
@@ -1314,7 +1363,7 @@ def chmod(request):
   def bulk_chmod(*args, **kwargs):
     op = partial(request.fs.chmod, recursive=request.POST.get('recursive', False))
     for arg in args:
-      op(urllib_unquote(arg['path']), arg['mode'])
+      op(arg['path'], arg['mode'])
   # mode here is abused: on input, it's a string, but when retrieved,
   # it's an int.
   return generic_op(ChmodFormSet, request, bulk_chmod, ['path', 'mode'], "path",

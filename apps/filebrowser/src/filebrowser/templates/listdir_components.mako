@@ -443,7 +443,7 @@ else:
   <div id="uploadFileModal" class="modal hide fade">
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
-      <h2 class="modal-title">${_('Upload to')} <span data-bind="text: currentDecodedPath"></span></h2>
+      <h2 class="modal-title">${_('Upload to')} <span data-bind="text: currentPath"></span></h2>
     </div>
     <div class="modal-body form-inline">
       <div id="fileUploader" class="uploader">
@@ -907,7 +907,7 @@ else:
       return {
         url: breadcrumb.url,
         label: breadcrumb.label,
-        show: function (breadcrumb, e) {
+        show: function (breadcrumb, e) {          
           var isLeftButton = (e.which || e.button) === 1;
           if (isLeftButton) {
             if (! (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey)) {
@@ -916,11 +916,15 @@ else:
               if (this.url == null || this.url == "") {
                 // forcing root on empty breadcrumb url
                 this.url = "/";
-              }
-
+              }              
               fileBrowserViewModel.targetPageNum(1);
               fileBrowserViewModel.targetPath("${url('filebrowser:filebrowser.views.view', path='')}" + stripHashes(this.url));
-              updateHash(this.url);
+
+              // The breadcrumbs url comes encoded from the backend              
+              const decodedPath = decodeURIComponent(this.url);
+              const pathPrefix = "${url('filebrowser:filebrowser.views.view', path='')}";
+              console.info('breadcrumb.url decodedPath', decodedPath);
+              huePubSub.publish('open.filebrowserlink', { pathPrefix, decodedPath });              
             }
             else {
               window.open($(e.target).attr('href'));
@@ -1055,16 +1059,8 @@ else:
       };
 
       self.currentPath = ko.observable(currentDirPath);
-      self.currentDecodedPath = ko.observable(decodeURI(currentDirPath));      
 
-      self.currentPath.subscribe(function (path) {
-        // currentEditablePath can be edited by the user in #hueBreadcrumbText.
-        // It is using a decoded currentPath in order to correctly display non ASCII characters        
-        const decodedPath = decodeURI(path);
-        if (decodedPath !== self.currentDecodedPath()) {          
-          self.currentDecodedPath(decodedPath);
-        } 
-        
+      self.currentPath.subscribe(function (path) {        
         $(document).trigger('currPathLoaded', { path: path });
       });
 
@@ -1367,60 +1363,22 @@ else:
       }
 
       self.viewFile = function (file, e) {
-        const urlEncodedPercentage = '%25';
-        
         e.stopImmediatePropagation();
         if (file.type == "dir") {
           // Reset page number so that we don't hit a page that doesn't exist
-          self.targetPageNum(1);
-          self.enableFilterAfterSearch = false;
-          self.searchQuery("");
-          self.targetPath(file.url);
-
-          const path = file.path;
-          const percentageEncodedPath = path.includes('%') && !path.includes(urlEncodedPercentage) ? 
-            path.replaceAll('%', urlEncodedPercentage) : path;
-        
-          updateHash(stripHashes(percentageEncodedPath));
-        } else {
-          
-          // Fix to encode potential hash characters in a file name when viewing a file
-          let url = file.name.indexOf('#') >= 0 && file.url.indexOf('#') >= 0 
-            ? file.url.replaceAll('#', encodeURIComponent('#')) : file.url;
-
-          %if is_embeddable:
-
-          // Fix. The '%' character needs to be encoded twice due to a bug in the page library
-          // that decodes the url twice
-          
-          if (file.path.includes('%') && !file.path.includes(urlEncodedPercentage)) {            
-            url = url.replaceAll(urlEncodedPercentage, encodeURIComponent(urlEncodedPercentage));
-          }
-
-          huePubSub.publish('open.link', url);
-          %else:
-          window.location.href = url;
-          %endif
+          ## self.targetPageNum(1);
+          // TODO: check if we can remoce the 3 lines below
+          ## self.enableFilterAfterSearch = false;
+          ## self.searchQuery("");
+          ## self.targetPath(file.url);
         }
-      };
-
-      self.editFile = function () {
-        huePubSub.publish('open.link', self.selectedFile().url.replace("${url('filebrowser:filebrowser.views.view', path='')}", "${url('filebrowser:filebrowser_views_edit', path='')}"));
+        const decodedPath = file.path;
+        const pathPrefix = "${url('filebrowser:filebrowser.views.view', path='')}";
+        huePubSub.publish('open.filebrowserlink', { pathPrefix, decodedPath });                  
       };
 
       self.downloadFile = function () {
-        const baseUrl = "${url('filebrowser:filebrowser_views_download', path='')}";
-      // If the hash characters aren't encoded the page library will
-      // split the path on the first occurence and the remaining string will not
-      // be part of the path. Question marks must also be encoded or the string after the first
-      // question mark will be interpreted as the url querystring.
-      // Percentage character must be double encoded due to the page library that decodes the url twice
-        const doubleUrlEncodedPercentage = '%2525';
-        const partiallyEncodedFilePath = self.selectedFile().path.replaceAll('%', doubleUrlEncodedPercentage).replaceAll('#', encodeURIComponent('#'))
-          .replaceAll('?', encodeURIComponent('?'));;
-        const fullUrl = baseUrl+partiallyEncodedFilePath;
-        
-        huePubSub.publish('open.link', fullUrl);
+        huePubSub.publish('open.filebrowserlink', { pathPrefix: '/filebrowser/download=', decodedPath: self.selectedFile().path });  
       };
 
       self.renameFile = function () {
@@ -2541,6 +2499,7 @@ else:
         root: fileBrowserViewModel.rootTarget(),
         skipKeydownEvents: true,
         onEnter: function (el) {
+          console.info('hueBreadcrumbText - onEnter');
           var target_path = stripHashes(el.val());
           if (el.val().split('/')[2] === '' && window.RAZ_IS_ENABLED){
             $.jHueNotify.warn("${ _('Listing of buckets is not allowed. Redirecting to the home directory.') }");

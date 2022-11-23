@@ -618,13 +618,13 @@ class OnePageViewModel {
         }
       },
       { url: '/filebrowser/view=*', app: 'filebrowser' },
-      {
-        url: '/filebrowser/download=*',
-        app: function (ctx) {
-          const filePathParam = getModifiedCtxParamForFilePath(ctx, '/filebrowser/download=*');
-          location.href = window.HUE_BASE_URL + '/filebrowser/download=' + filePathParam;
-        }
-      },
+      // {
+      //   url: '/filebrowser/download=*',
+      //   app: function (ctx) {
+      //     const filePathParam = getModifiedCtxParamForFilePath(ctx, '/filebrowser/download=*');
+      //     location.href = window.HUE_BASE_URL + '/filebrowser/download=' + filePathParam;
+      //   }
+      // },
       {
         url: '/filebrowser/*',
         app: function () {
@@ -832,43 +832,19 @@ class OnePageViewModel {
       });
     });
 
-    // The page library encodes the plus character (+) as a space in the returning
-    // params object. That causes the path used by the file viewer and downloader to break and this
-    // is a defensive fix to handle that while still having access to the other ctx params
-    // needed to "revert" the incorrect encoding.
-    const fixPlusCharTurnedIntoSpace = (ctx, pathWithoutParams) => {
-      const pathHasPlus = ctx.path.indexOf('+') >= 0;
-      const paramsHaveSpaces = ctx.params[0] && ctx.params[0].indexOf(' ') >= 0;
-
-      if (pathHasPlus && paramsHaveSpaces) {
-        // The original params with the plus character (+) can still be found in ctx.path
-        // and we use those to create our own encoded version that handles the plus character correctly.
-        const paramsOnly = ctx.path.replace(pathWithoutParams, '');
-        return decodeURIComponent(paramsOnly);
-      }
-
-      return ctx?.params[0];
-    };
-
-    // The page library decodes any hash characters (#) in the params object, so unless it is explicitly
-    // encoded again the file download links will break.
-    const fixHashCharInParam = (ctx, filePathParam) => {
-      const pathHasUTF8EncodedHash = ctx.path.indexOf('%23') >= 0;
-      const paramHasHash = ctx.params[0] && ctx.params[0].indexOf('#') >= 0;
-      const encodeHashChar = pathHasUTF8EncodedHash && paramHasHash;
-
-      return encodeHashChar
-        ? filePathParam.replaceAll('#', encodeURIComponent('#'))
-        : filePathParam;
-    };
-
-    const getModifiedCtxParamForFilePath = (ctx, mappingUrl) => {
+    const getModifiedCtxParamForFilePath = (ctx, mappingUrl) => {   
+      // FIX. The page library decodes the ctx.params differently than it decodes
+      // the ctx.path, e.g. '+' is turned into ' ' which we don't want. Therefore we use
+      // the path to extract the params manually and get the correct characters.
       const pathWithoutParams = mappingUrl.slice(0, -1);
-      let filePathParam = fixPlusCharTurnedIntoSpace(ctx, pathWithoutParams);
-      filePathParam = fixHashCharInParam(ctx, filePathParam);
-
-      return filePathParam.replaceAll('?', encodeURIComponent('?'));
-    };
+      const paramsOnly = ctx.path.replace(pathWithoutParams, '');
+      const filePathParam = decodeURIComponent(paramsOnly);
+      
+      // Unfortunate hack needed since % has to be double encoded since the page library
+      // decodes it twice. This is temporarily double encoding only between the
+      // huePubSub.publish('open.link', fullUrl); and the onePgeViewModel.js.
+      return filePathParam.replaceAll('%25', '%');
+    };    
 
     pageMapping.forEach(mapping => {
       page(
@@ -922,6 +898,24 @@ class OnePageViewModel {
         console.warn('Received an open.link without href.');
       }
     });
+
+    huePubSub.subscribe('open.filebrowserlink', ({pathPrefix, decodedPath}) => { 
+      if (pathPrefix.includes('download=')) {
+        const encodedPath = encodeURIComponent(decodedPath);
+        window.location = pathPrefix+encodedPath;
+        return;
+      }
+      
+      const appPrefix = '/hue';
+      const urlEncodedPercentage = '%25';
+      // Fix. The '%' character needs to be encoded twice due to a bug in the page library
+      // that decodes the url twice.      
+      const pageFixedPath = decodedPath.replaceAll('%', urlEncodedPercentage);
+      const encodedPath = encodeURIComponent(pageFixedPath);
+      const href = window.HUE_BASE_URL + appPrefix + pathPrefix + encodedPath;
+      
+      page(href);
+    });    
   }
 }
 
