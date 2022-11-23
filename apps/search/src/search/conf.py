@@ -41,6 +41,12 @@ SECURITY_ENABLED = Config(
   default=False,
   type=coerce_bool)
 
+DOWNLOAD_LIMIT = Config(
+  key="download_limit",
+  help=_("Default 1000 rows, max is 15K rows."),
+  default=1000,
+  type=int)
+
 # Unused: deprecated by dashboard
 LATEST = Config(
   key="latest",
