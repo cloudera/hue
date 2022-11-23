@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -29,8 +30,17 @@ def test_splitpath():
   eq_(s('s3a://bucket/key'), ['s3a://', 'bucket', 'key'])
   eq_(s('s3a://bucket/key/'), ['s3a://', 'bucket', 'key'])
   eq_(s('s3a://bucket/bar/foo'), ['s3a://', 'bucket', 'bar', 'foo'])
+  eq_(s('s3a://bucket/bar/foo?I-have-a-questionmark-in-the-folder-name/me?to'), \
+    ['s3a://', 'bucket', 'bar', 'foo?I-have-a-questionmark-in-the-folder-name', 'me?to'])
+  eq_(s(u"s3a://bucket/all%20% ~@$&()*!+=;.?'Tжейкоб-åäö-你好"), \
+    ['s3a://', 'bucket', u"all%20% ~@$&()*!+=;.?'Tжейкоб-åäö-你好"])
+  
 
   eq_(s('/'), ['/'])
   eq_(s('/dir'), ['/', 'dir'])
   eq_(s('/dir/file'), ['/', 'dir', 'file'])
   eq_(s('/dir/file/'), ['/', 'dir', 'file'])
+  eq_(s('/dir/file/foo?I-have-a-questionmark-in-the-folder-name/me?to'), \
+    ['/', 'dir', 'file', 'foo?I-have-a-questionmark-in-the-folder-name', 'me?to'])
+  eq_(s(u"/dir/all%20% ~@$&()*!+=;.?'Tжейкоб-åäö-你好"), \
+    ['/', 'dir', u"all%20% ~@$&()*!+=;.?'Tжейкоб-åäö-你好"])
