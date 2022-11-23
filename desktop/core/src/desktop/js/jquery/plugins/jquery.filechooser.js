@@ -288,13 +288,17 @@ Plugin.prototype.navigateTo = function (path) {
   $(_parent.element)
     .find('.filechooser-tree')
     .html('<i style="font-size: 24px; color: #DDD" class="fa fa-spinner fa-spin"></i>');
-  let pageSize = '?pagesize=1000';
-  const index = path.indexOf('?');
-  if (index > -1) {
-    pageSize = path.substring(index) + pageSize.replace(/\?/, '&');
-    path = path.substring(0, index);
-  }
-  $.getJSON('/filebrowser/view=' + encodeURIComponent(path) + pageSize, data => {
+
+  // The default paths '/?default_to_home', '/?default_s3_home' etc already contains a query string
+  // so we append pageSizeParam as an additional param, not a new query string.
+  const isDefaultRedirectFlag = /^\/\?default_.*_(home|trash)$/.test(path);
+  const pageSizeParam = 'pagesize=1000';
+  const encodedPath = encodeURIComponent(path);
+  const pathAndQuery = isDefaultRedirectFlag
+    ? path + '&' + pageSizeParam
+    : encodedPath + '?' + pageSizeParam;
+
+  $.getJSON('/filebrowser/view=' + pathAndQuery, data => {
     $(_parent.element).find('.filechooser-tree').empty();
 
     path = data.current_dir_path || path; // use real path.

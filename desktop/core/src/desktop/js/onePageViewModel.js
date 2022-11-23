@@ -317,9 +317,6 @@ class OnePageViewModel {
       huePubSub.publish('hue.datatable.search.hide');
       huePubSub.publish('hue.scrollleft.hide');
       huePubSub.publish('context.panel.visible', false);
-      if (app === 'filebrowser') {
-        $(window).unbind('hashchange.fblist');
-      }
       if (app.startsWith('oozie')) {
         huePubSub.clearAppSubscribers('oozie');
       }
@@ -619,13 +616,6 @@ class OnePageViewModel {
       },
       { url: '/filebrowser/view=*', app: 'filebrowser' },
       {
-        url: '/filebrowser/download=*',
-        app: function (ctx) {
-          const filePathParam = getModifiedCtxParamForFilePath(ctx, '/filebrowser/download=*');
-          location.href = window.HUE_BASE_URL + '/filebrowser/download=' + filePathParam;
-        }
-      },
-      {
         url: '/filebrowser/*',
         app: function () {
           page('/filebrowser/view=' + DROPZONE_HOME_DIR);
@@ -832,42 +822,18 @@ class OnePageViewModel {
       });
     });
 
-    // The page library encodes the plus character (+) as a space in the returning
-    // params object. That causes the path used by the file viewer and downloader to break and this
-    // is a defensive fix to handle that while still having access to the other ctx params
-    // needed to "revert" the incorrect encoding.
-    const fixPlusCharTurnedIntoSpace = (ctx, pathWithoutParams) => {
-      const pathHasPlus = ctx.path.indexOf('+') >= 0;
-      const paramsHaveSpaces = ctx.params[0] && ctx.params[0].indexOf(' ') >= 0;
-
-      if (pathHasPlus && paramsHaveSpaces) {
-        // The original params with the plus character (+) can still be found in ctx.path
-        // and we use those to create our own encoded version that handles the plus character correctly.
-        const paramsOnly = ctx.path.replace(pathWithoutParams, '');
-        return decodeURIComponent(paramsOnly);
-      }
-
-      return ctx?.params[0];
-    };
-
-    // The page library decodes any hash characters (#) in the params object, so unless it is explicitly
-    // encoded again the file download links will break.
-    const fixHashCharInParam = (ctx, filePathParam) => {
-      const pathHasUTF8EncodedHash = ctx.path.indexOf('%23') >= 0;
-      const paramHasHash = ctx.params[0] && ctx.params[0].indexOf('#') >= 0;
-      const encodeHashChar = pathHasUTF8EncodedHash && paramHasHash;
-
-      return encodeHashChar
-        ? filePathParam.replaceAll('#', encodeURIComponent('#'))
-        : filePathParam;
-    };
-
     const getModifiedCtxParamForFilePath = (ctx, mappingUrl) => {
+      // FIX. The page library decodes the ctx.params differently than it decodes
+      // the ctx.path, e.g. '+' is turned into ' ' which we don't want. Therefore we use
+      // the path to extract the params manually and get the correct characters.
       const pathWithoutParams = mappingUrl.slice(0, -1);
-      let filePathParam = fixPlusCharTurnedIntoSpace(ctx, pathWithoutParams);
-      filePathParam = fixHashCharInParam(ctx, filePathParam);
+      const paramsOnly = ctx.path.replace(pathWithoutParams, '');
+      const filePathParam = decodeURIComponent(paramsOnly);
 
-      return filePathParam.replaceAll('?', encodeURIComponent('?'));
+      // Unfortunate hack needed since % has to be double encoded since the page library
+      // decodes it twice. This is temporarily double encoding only between the
+      // huePubSub.publish('open.link', fullUrl); and the onePgeViewModel.js.
+      return filePathParam.replaceAll('%25', '%');
     };
 
     pageMapping.forEach(mapping => {
@@ -920,6 +886,36 @@ class OnePageViewModel {
         }
       } else {
         console.warn('Received an open.link without href.');
+      }
+    });
+
+    huePubSub.subscribe('open.filebrowserlink', ({ pathPrefix, decodedPath, fileBrowserModel }) => {
+      if (pathPrefix.includes('download=')) {
+        // The download view on the backend requires the slashes not to
+        // be encoded in order for the file to be correctly named.
+        const encodedPath = encodeURIComponent(decodedPath).replaceAll('%2F', '/');
+        window.location = pathPrefix + encodedPath;
+        return;
+      }
+
+      const appPrefix = '/hue';
+      const urlEncodedPercentage = '%25';
+      // Fix. The '%' character needs to be encoded twice due to a bug in the page library
+      // that decodes the url twice. Even when we don't directly call pag() we still need this
+      // fix since the user can reload the page which will trigger a call to page().
+      const pageFixedEncodedPath = encodeURIComponent(
+        decodedPath.replaceAll('%', urlEncodedPercentage)
+      );
+      const href = window.HUE_BASE_URL + appPrefix + pathPrefix + pageFixedEncodedPath;
+
+      // We don't want reload the entire filebrowser when navigating between folders
+      // and already on the listdir_components page.
+      if (fileBrowserModel) {
+        fileBrowserModel.targetPath(pathPrefix + encodeURIComponent(decodedPath));
+        window.history.pushState(null, '', href);
+        fileBrowserModel.retrieveData();
+      } else {
+        page(href);
       }
     });
   }
