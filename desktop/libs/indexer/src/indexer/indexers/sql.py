@@ -82,7 +82,7 @@ class SQLIndexer(object):
     kudu_partition_columns = destination['kuduPartitionColumns']
     comment = destination['description']
 
-    source_path = urllib_unquote(source['path'])
+    source_path = source['path']
     load_data = destination['importData']
     isIceberg = destination['isIceberg']
 

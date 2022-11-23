@@ -1645,22 +1645,12 @@ class TestFileChooserRedirect(object):
 
 class TestNormalizePath(object):
 
-  def test_should_decode_encoded_path(self):
-    encoded_path = '%2Fsome%2Fpath%20with%20space%20in%20name'
-    expected_path = '/some/path with space in name'
+  def test_should_decode_encoded_slash_only(self):
+    encoded_path = '%2Fsome%2Fpath%20with%20space%20in name'
+    expected_path = '/some/path%20with%20space%20in name'
 
     normalized = _normalize_path(encoded_path)
     assert_equal(expected_path, normalized)
-
-  def test_decoding_should_only_happen_once(self):
-    encoded_path = '%2Fsome%2Ffolder%2Fwith%2520percent%20twenty%20in%20the%20name'
-    expected_decoded_path = '/some/folder/with%20percent twenty in the name'
-
-    normalized_once = _normalize_path(encoded_path)
-    assert_equal(expected_decoded_path, normalized_once)
-
-    normalized_twice = _normalize_path(normalized_once)
-    assert_equal(expected_decoded_path, normalized_twice)
 
   def test_abfs_correction(self):
     path = 'abfs:/some/path'
