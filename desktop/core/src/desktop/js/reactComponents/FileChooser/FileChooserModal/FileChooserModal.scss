@@ -1,0 +1,30 @@
+@import '../../../components/styles/colors';
+
+//Without using .ant-modal-body the width, height and padding are not applied
+.file-chooser__modal  {
+    height: 554px;
+    width: 930px;
+    padding: 0px;
+} 
+
+// without .ant-menu the styles are not applied
+.file-system__panel {
+  height: 554px;
+  width: 187px;
+  background-color: $fluid-gray-100;
+  padding-top: 20px;
+}
+// .ant-menu .ant-modal-body
+// .ant-menu-item {
+//   display: flex !important;
+//   align-items: center;
+// }
+
+// .ant-menu-item-icon {
+//   height: 20px !important;
+//   width: 20px !important;
+// }
+
+// .ant-menu-item-selected {
+//   background-color: $fluid-gray-300 !important;
+// }
