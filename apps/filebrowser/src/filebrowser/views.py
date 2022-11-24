@@ -132,16 +132,15 @@ class ParquetOptions(object):
 
 def index(request):
   # Redirect to home directory by default
-  logger.debug('--------- in index')
-  # path = request.user.get_home_directory()
+  path = request.user.get_home_directory()
 
-  # try:
-  #   if not request.fs.isdir(path):
-  #     path = '/'
-  # except Exception:
-  #   pass
+  try:
+    if not request.fs.isdir(path):
+      path = '/'
+  except Exception:
+    pass
 
-  # return view(request, path)
+  return view(request, path)
 
 
 def _normalize_path(path):
