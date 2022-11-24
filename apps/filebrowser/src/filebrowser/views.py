@@ -284,6 +284,8 @@ def view(request, path):
     if "Connection refused" in str(e):
       msg += _(" The HDFS REST service is not available. ")
 
+    logger.error(msg + str(e))
+
     if is_ajax(request):
       exception = {
         'error': msg
