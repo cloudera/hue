@@ -325,7 +325,7 @@ class SparkApi(Api):
 
 
   def _handle_result_meta(self, result):
-    meta=[]
+    meta = []
     is_complex_type = False
 
     for f in result['schema']['fields']:
@@ -337,9 +337,9 @@ class SparkApi(Api):
         elif f['type']['type'] in ('array', 'map'):
           complex_type = 'string'
 
-        meta.append({'name': f['name'], 'type': complex_type , 'comment': ''})
+        meta.append({'name': f['name'], 'type': complex_type, 'comment': ''})
       else:
-        meta.append({'name': f['name'], 'type': f['type'] , 'comment': ''})
+        meta.append({'name': f['name'], 'type': f['type'], 'comment': ''})
     
     return meta, is_complex_type
 
