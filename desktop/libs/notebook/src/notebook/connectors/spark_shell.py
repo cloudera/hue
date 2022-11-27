@@ -269,9 +269,9 @@ class SparkApi(Api):
           images = []
         if 'application/json' in data:
           result = data['application/json']
-          data = result['data']
-          meta = [{'name': field['name'], 'type': field['type'], 'comment': ''} for field in result['schema']['fields']]
           type = 'table'
+          meta, is_complex_type = self._handle_result_meta(result)
+          data = self._handle_result_data(result, is_complex_type)
         else:
           data = [[data['text/plain']]]
           meta = [{'name': 'Header', 'type': 'STRING_TYPE', 'comment': ''}]
@@ -300,6 +300,48 @@ class SparkApi(Api):
         msg += ' ' + ''.join(tb)
 
       raise QueryError(msg)
+
+
+  def _handle_result_data(self, result, is_complex_type=False):
+    data = []
+
+    if is_complex_type:
+      for row in result['data']:
+        row_data = []
+        for ele in row:
+          if isinstance(ele, dict):
+            row_schema = []
+            for val in ele['schema']:
+              row_schema.append(val['name'])
+            row_data.append(dict(zip(row_schema, ele['values'])))
+          else:
+            row_data.append(ele)
+
+        data.append(row_data)
+    else:
+      data = result['data']
+    
+    return data
+
+
+  def _handle_result_meta(self, result):
+    meta=[]
+    is_complex_type = False
+
+    for f in result['schema']['fields']:
+      if isinstance(f.get('type'), dict):
+        is_complex_type = True
+
+        if f['type']['type'] == 'struct':
+          complex_type = 'struct'
+        elif f['type']['type'] in ('array', 'map'):
+          complex_type = 'string'
+
+        meta.append({'name': f['name'], 'type': complex_type , 'comment': ''})
+      else:
+        meta.append({'name': f['name'], 'type': f['type'] , 'comment': ''})
+    
+    return meta, is_complex_type
 
 
   def cancel(self, notebook, snippet):
