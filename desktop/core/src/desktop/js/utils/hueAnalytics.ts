@@ -40,6 +40,22 @@ const formatGaData = (
   }
 });
 
+// Check and warning for when the analytics log/convert are called incorrectly
+// by legacy non typescript code. We want this to fail silenctly in hueDebugAnalytics mode.
+const validateParameterTypes = (area: string, action: string): boolean => {
+  const typedWindow = <hueWindow>window;
+  if (typedWindow.DEV && typedWindow.hueDebugAnalytics) {
+    if (typeof area !== 'string') {
+      console.error(`hueAnalytics parameter "area" must be a string`);
+    }
+    if (typeof action !== 'string') {
+      console.error(`hueAnalytics parameter "action" must be a string`);
+    }
+  }
+
+  return typeof area === 'string' && typeof action === 'string';
+};
+
 export const hueAnalytics = {
   log(area: string, action: string, isPrioritised?: boolean): void {
     const config = getLastKnownConfig();
@@ -49,6 +65,10 @@ export const hueAnalytics = {
     }
 
     if (config?.hue_config?.collect_usage) {
+      if (!validateParameterTypes(area, action)) {
+        return;
+      }
+
       const { type, name, params } = formatGaData(area, action);
 
       // Quick debug mode to check that the analytics logging is working when developing new features
@@ -64,6 +84,10 @@ export const hueAnalytics = {
     }
   },
   convert(area: string, action: string): void {
+    if (!validateParameterTypes(area, action)) {
+      return;
+    }
+
     post('/desktop/log_analytics', {
       area,
       action

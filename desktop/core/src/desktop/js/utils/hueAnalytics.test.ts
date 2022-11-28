@@ -91,6 +91,65 @@ describe('hueAnalytics', () => {
     });
   });
 
+  it('should not log to backend or GA with incorrect parameters', () => {
+    const gtagSpy = jest.fn();
+    getLastKnownConfigMock.mockImplementation(() => {
+      return { hue_config: { collect_usage: true } };
+    });
+
+    windowSpy.mockImplementation(() => ({
+      DEV: false,
+      gtag: gtagSpy
+    }));
+
+    windowSpy.mockImplementation(() => ({}));
+
+    hueAnalytics.convert(null, 'action1');
+    hueAnalytics.convert(undefined, 'action1');
+    hueAnalytics.convert([], 'action1');
+    hueAnalytics.convert({}, 'action1');
+    hueAnalytics.convert(NaN, 'action1');
+    hueAnalytics.convert(1, 'action1');
+    hueAnalytics.convert(true, 'action1');
+    hueAnalytics.convert(new Date(), 'action1');
+    hueAnalytics.convert(BigInt(1), 'action1');
+    hueAnalytics.convert(Symbol(), 'action1');
+    hueAnalytics.convert('area1', null);
+    hueAnalytics.convert('area1', undefined);
+    hueAnalytics.convert('area1', []);
+    hueAnalytics.convert('area1', {});
+    hueAnalytics.convert('area1', NaN);
+    hueAnalytics.convert('area1', 1);
+    hueAnalytics.convert('area1', true);
+    hueAnalytics.convert('area1', new Date());
+    hueAnalytics.convert('area1', BigInt(1));
+    hueAnalytics.convert('area1', Symbol());
+
+    hueAnalytics.log(null, 'action1');
+    hueAnalytics.log(undefined, 'action1');
+    hueAnalytics.log([], 'action1');
+    hueAnalytics.log({}, 'action1');
+    hueAnalytics.log(NaN, 'action1');
+    hueAnalytics.log(1, 'action1');
+    hueAnalytics.log(true, 'action1');
+    hueAnalytics.log(new Date(), 'action1');
+    hueAnalytics.log(BigInt(1), 'action1');
+    hueAnalytics.log(Symbol(), 'action1');
+    hueAnalytics.log('area1', null);
+    hueAnalytics.log('area1', undefined);
+    hueAnalytics.log('area1', []);
+    hueAnalytics.log('area1', {});
+    hueAnalytics.log('area1', NaN);
+    hueAnalytics.log('area1', 1);
+    hueAnalytics.log('area1', true);
+    hueAnalytics.log('area1', new Date());
+    hueAnalytics.log('area1', BigInt(1));
+    hueAnalytics.log('area1', Symbol());
+
+    expect(gtagSpy).not.toHaveBeenCalled();
+    expect(postSpy).not.toHaveBeenCalled();
+  });
+
   it('should use global listener to log clicks on element with attribute "data-hue-analytics"', () => {
     const gtagSpy = jest.fn();
     getLastKnownConfigMock.mockImplementation(() => {
