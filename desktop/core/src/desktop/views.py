@@ -220,7 +220,8 @@ def log_js_error(request):
 
 def log_analytics(request):
   ai = AccessInfo(request)
-  ai.log(level=logging.INFO, msg='UI INTERACTION: ' + request.POST.get('area') + ' > ' + request.POST.get('action'))
+  if request.POST.get('area') and request.POST.get('action'):
+    ai.log(level=logging.INFO, msg='UI INTERACTION: ' + request.POST.get('area') + ' > ' + request.POST.get('action'))
 
   return JsonResponse({'status': 0})
 
