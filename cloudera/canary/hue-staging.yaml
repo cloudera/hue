@@ -4,7 +4,7 @@ canary:
   template_id: ''
   template_name: ''
   email: rel-eng@cloudera.com
-  username: rel-eng
+  username: relengcanaryuser
 metadata:
   tags:
   - hue-team
