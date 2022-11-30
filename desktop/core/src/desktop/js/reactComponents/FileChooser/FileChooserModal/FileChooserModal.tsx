@@ -16,6 +16,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Modal from 'antd/lib/modal/Modal';
+import { Menu, Spin } from 'antd';
 
 import HdfsIcon from '../../../components/icons/HdfsIcon';
 import S3Icon from '../../../components/icons/S3Icon';
@@ -23,18 +24,19 @@ import AdlsIcon from '../../../components/icons/AdlsIcon';
 
 import { fetchFileSystems } from '../api';
 import { FileSystem } from '../types';
-import FileSystemList from '../FileSystemList/FileSystemList';
+import './FileChooserModal.scss';
 interface FileProps {
   show: boolean;
   onCancel: () => void;
-  title: string;
-  okText: string;
+  title?: string;
+  okText?: string;
 }
 
 const defaultProps = { title: 'Choose a file', okText: 'Select' };
 
 const FileChooserModal: React.FC<FileProps> = ({ show, onCancel, title, okText }) => {
-  const [fileSystemList, setFileSystemList] = useState<Array<FileSystem>>([]);
+  const [fileSystemList, setFileSystemList] = useState<FileSystem[] | undefined>();
+  const [loading, setLoading] = useState(true);
 
   const icons = {
     hdfs: <HdfsIcon />,
@@ -51,21 +53,31 @@ const FileChooserModal: React.FC<FileProps> = ({ show, onCancel, title, okText }
     onCancel();
   };
 
+  const onPathChange = e => {
+    //TODO: Use fileSystemList[e.key].user_home_dir to retrieve files
+  };
+
   useEffect(() => {
-    if (show) {
-      fetchFileSystems().then(fileSystemResponse => {
-        const fileSystems = Object.keys(fileSystemResponse.filesystems);
-        if (fileSystems !== undefined || fileSystems.length !== 0) {
-          const fileSystemsObj = fileSystems.map(system => {
+    if (show && !fileSystemList) {
+      setLoading(true);
+      fetchFileSystems()
+        .then(fileSystems => {
+          const fileSystemsObj = fileSystems.map((system, index) => {
             return {
-              label: system,
-              key: system,
-              icon: icons[system]
+              label: system.file_system,
+              key: index,
+              icon: icons[system.file_system],
+              user_home_dir: system.user_home_directory
             };
           });
           setFileSystemList(fileSystemsObj);
-        }
-      });
+        })
+        .catch(error => {
+          //TODO: Properly handle errors.
+        })
+        .finally(() => {
+          setLoading(false);
+        });
     }
   }, [show]);
 
@@ -77,9 +89,11 @@ const FileChooserModal: React.FC<FileProps> = ({ show, onCancel, title, okText }
       onCancel={handleCancel}
       okText={okText}
       width={930}
-      bodyStyle={{ height: '554px', padding: '0px' }}
+      className="file-chooser__modal"
     >
-      <FileSystemList fileSystems={fileSystemList}></FileSystemList>
+      <Spin spinning={loading}>
+        <Menu items={fileSystemList} onSelect={onPathChange} className="file-system__panel"></Menu>
+      </Spin>
     </Modal>
   );
 };

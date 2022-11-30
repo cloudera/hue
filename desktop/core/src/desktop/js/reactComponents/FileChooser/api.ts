@@ -14,16 +14,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { post } from '../../api/utils';
+import { get } from '../../api/utils';
 import { CancellablePromise } from '../../api/cancellablePromise';
 
-const FILESYSTEMS_API_URL = '/api/storage/get_filesystems';
+const FILESYSTEMS_API_URL = '/api/storage/filesystems';
 
-export interface FetchFileSystemsResponse {
-  filesystems: Array<string>;
-  status: number;
+export interface ApiFileSystem {
+  file_system: string;
+  user_home_directory: string;
 }
 
-export const fetchFileSystems = (): CancellablePromise<FetchFileSystemsResponse> => {
-  return post(FILESYSTEMS_API_URL);
-};
+export const fetchFileSystems = (): CancellablePromise<ApiFileSystem[]> => get(FILESYSTEMS_API_URL);
