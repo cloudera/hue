@@ -14,25 +14,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-@import '../../../components/styles/colors';
+import { CancellablePromise } from '../../api/cancellablePromise';
+import * as ApiUtils from '../../api/utils';
+import { fetchFileSystems } from './api';
 
-.file-system__panel.ant-menu {
-  height: 554px;
-  width: 187px;
-  background-color: $fluid-gray-100;
-  padding-top: 20px;
-}
+describe('tests the filesystems api', () => {
+  it('test for valid filesystem api response', async () => {
+    const mockData = [
+      { file_system: 'hdfs', user_home_directory: '/user/demo' },
+      { file_system: 'abfs', user_home_directory: 'abfs://jahlenc' }
+    ];
 
-.ant-menu-item {
-  display: flex !important;
-  align-items: center;
-}
+    const getSpy = jest
+      .spyOn(ApiUtils, 'get')
+      .mockImplementation(() => CancellablePromise.resolve(mockData));
 
-.ant-menu-item-icon {
-  height: 20px !important;
-  width: 20px !important;
-}
+    const filesystems = await fetchFileSystems();
 
-.ant-menu-item-selected {
-  background-color: $fluid-gray-300 !important;
-}
+    expect(getSpy).toHaveBeenCalledWith('/api/storage/filesystems');
+    expect(filesystems).toEqual(mockData);
+  });
+
+  //TODO: tests for errors
+});
