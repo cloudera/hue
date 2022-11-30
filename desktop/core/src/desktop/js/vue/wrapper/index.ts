@@ -212,7 +212,7 @@ export default function wrap(
     }
 
     disconnectedCallback() {
-      callHooks(this._component, 'unmounted');
+      this._wrapper.unmount();
     }
   }
 
