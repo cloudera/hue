@@ -14,22 +14,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react';
-import { Menu } from 'antd';
+@import '../../../components/styles/colors';
 
-import './FileSystemList.scss';
-import { FileSystem } from '../types';
-
-interface FileSystemProps {
-  fileSystems: Array<FileSystem>;
+.file-chooser__modal .ant-modal-body {
+  height: 554px;
+  padding: 0;
 }
 
-const FileSystemList: React.FC<FileSystemProps> = ({ fileSystems }) => {
-  return (
-    <>
-      <Menu items={fileSystems} className="file-system__panel"></Menu>
-    </>
-  );
-};
+.file-system__panel.ant-menu {
+  height: 554px;
+  width: 187px;
+  background-color: $fluid-gray-100;
+  padding-top: 20px;
+}
 
-export default FileSystemList;
+.file-system__panel .ant-menu-item {
+  display: flex !important;
+  align-items: center;
+}
+
+.file-system__panel .ant-menu-item-icon {
+  height: 20px !important;
+  width: 20px !important;
+}
+
+.file-system__panel .ant-menu-item-selected {
+  background-color: $fluid-gray-300 !important;
+}

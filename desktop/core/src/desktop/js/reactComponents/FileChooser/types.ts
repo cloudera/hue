@@ -17,6 +17,7 @@
 //TODO: the interface will change based on the new api to accomodate errors
 export interface FileSystem {
   label: string;
-  key: string;
+  key: number;
   icon: JSX.Element;
+  user_home_dir: string;
 }
