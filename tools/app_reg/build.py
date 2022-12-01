@@ -47,7 +47,7 @@ def make_app(app):
 
   Call `make egg-info ext-eggs' on the app.
   """
-  cmdv = [ 'make', '-C', app.abs_path, 'egg-info', 'ext-eggs' ]
+  cmdv = ['make', '-C', app.abs_path, 'egg-info', 'ext-eggs']
   return runcmd(cmdv, dict(ROOT=common.INSTALL_ROOT)) == 0
 
 
@@ -60,8 +60,8 @@ def make_syncdb():
   hue_file = os.path.join(common.INSTALL_ROOT, 'build', 'env', 'bin', 'hue')
   hue_exec = "%s %s" % (python_exec, hue_file)
   if os.path.exists(hue_file):
-    statuses.append( runcmd([ hue_exec, 'makemigrations', '--noinput' ]) )
-    statuses.append( runcmd([ hue_exec, 'migrate', '--fake-initial' ]) )
+    statuses.append(runcmd([hue_exec, 'makemigrations', '--noinput']))
+    statuses.append(runcmd([hue_exec, 'migrate', '--fake-initial']))
   return not any(statuses)
 
 def make_collectstatic():
@@ -73,5 +73,5 @@ def make_collectstatic():
   hue_file = os.path.join(common.INSTALL_ROOT, 'build', 'env', 'bin', 'hue')
   hue_exec = "%s %s" % (python_exec, hue_file)
   if os.path.exists(hue_file):
-    statuses.append( runcmd([ hue_exec, 'collectstatic', '--noinput' ]) )
+    statuses.append(runcmd([hue_exec, 'collectstatic', '--noinput']))
   return not any(statuses)
