@@ -246,7 +246,8 @@ class RazClient(object):
     headers = [raz_signer.StringStringMapProto(key=key, value=val) for key, val in headers.items()]
 
     LOG.debug(
-      "Preparing sign request with http_method: {%s}, headers: {%s}, parameters: {%s}, endpoint: {%s}, resource_path: {%s}, content_to_sign: {%s}" %
+      "Preparing sign request with "
+      "http_method: {%s}, headers: {%s}, parameters: {%s}, endpoint: {%s}, resource_path: {%s}, content_to_sign: {%s}" %
       (method, headers, allparams, endpoint, resource_path, data)
     )
     raz_req = raz_signer.SignRequestProto(
