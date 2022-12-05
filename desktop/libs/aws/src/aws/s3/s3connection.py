@@ -170,19 +170,19 @@ class SelfSignedUrlS3Connection(SignedUrlS3Connection):
                     query_args=None, sender=None, override_num_retries=None,
                     retry_handler=None):
     if isinstance(bucket, self.bucket_class):
-        bucket = bucket.name
+      bucket = bucket.name
     if isinstance(key, Key):
-        key = key.name
+      key = key.name
     path = self.calling_format.build_path_base(bucket, key)
     boto.log.debug('path=%s' % path)
     auth_path = self.calling_format.build_auth_path(bucket, key)
     boto.log.debug('auth_path=%s' % auth_path)
     host = self.calling_format.build_host(self.server_name(), bucket)
     if query_args:
-        path += '?' + query_args
-        boto.log.debug('path=%s' % path)
-        auth_path += '?' + query_args
-        boto.log.debug('auth_path=%s' % auth_path)
+      path += '?' + query_args
+      boto.log.debug('path=%s' % path)
+      auth_path += '?' + query_args
+      boto.log.debug('auth_path=%s' % auth_path)
 
     params = {}
     http_request = self.build_base_http_request(method, path, auth_path,
@@ -217,17 +217,17 @@ class SelfSignedUrlS3Connection(SignedUrlS3Connection):
 
 
 def url_client_connect_to_region(region_name, **kw_params):
-    if 'host' in kw_params:
-        host = kw_params.pop('host')
-        if host not in ['', None]:
-            region = S3RegionInfo(
-                name='custom',
-                endpoint=host,
-                connection_cls=SelfSignedUrlS3Connection  # Override S3Connection class in connect_to_region of boto/s3/__init__.py
-            )
-            return region.connect(**kw_params)
+  if 'host' in kw_params:
+    host = kw_params.pop('host')
+    if host not in ['', None]:
+      region = S3RegionInfo(
+          name='custom',
+          endpoint=host,
+          connection_cls=SelfSignedUrlS3Connection  # Override S3Connection class in connect_to_region of boto/s3/__init__.py
+      )
+      return region.connect(**kw_params)
 
-    return connect('s3', region_name, region_cls=S3RegionInfo,
+  return connect('s3', region_name, region_cls=S3RegionInfo,
                    connection_cls=SelfSignedUrlS3Connection, **kw_params)
 
 
@@ -351,17 +351,17 @@ class UrlBucket(Bucket):
       provider = self.connection.provider
       # k.metadata = boto.utils.get_aws_metadata(response.msg, provider)
       for field in Key.base_fields:
-          k.__dict__[field.lower().replace('-', '_')] = \
-              response.getheader(field)
+        k.__dict__[field.lower().replace('-', '_')] = \
+          response.getheader(field)
       # the following machinations are a workaround to the fact that
       # apache/fastcgi omits the content-length header on HEAD
       # requests when the content-length is zero.
       # See http://goo.gl/0Tdax for more details.
       clen = response.getheader('content-length')
       if clen:
-          k.size = int(response.getheader('content-length'))
+        k.size = int(response.getheader('content-length'))
       else:
-          k.size = 0
+        k.size = 0
       k.name = key_name
       k.handle_version_headers(response)
       k.handle_encryption_headers(response)
