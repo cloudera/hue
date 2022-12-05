@@ -101,7 +101,7 @@ class RazClient(object):
     self.requestid = str(uuid.uuid4())
 
 
-  def check_access(self, method, url, params=None, headers=None):
+  def check_access(self, method, url, params=None, headers=None, data=None):
     LOG.debug("Check access: method {%s}, url {%s}, params {%s}, headers {%s}" % (method, url, params, headers))
 
     path = lib_urlparse(url)
@@ -132,7 +132,7 @@ class RazClient(object):
     if self.service == 'adls':
       self._make_adls_request(request_data, method, path, url_params, resource_path)
     elif self.service == 's3':
-      self._make_s3_request(request_data, request_headers, method, params, headers, url_params, endpoint, resource_path)
+      self._make_s3_request(request_data, request_headers, method, params, headers, url_params, endpoint, resource_path, data=data)
 
     LOG.debug('Raz url: %s' % raz_url)
     LOG.debug("Sending access check headers: {%s} request_data: {%s}" % (request_headers, request_data))
@@ -240,14 +240,14 @@ class RazClient(object):
     return access_type
 
 
-  def _make_s3_request(self, request_data, request_headers, method, params, headers, url_params, endpoint, resource_path):
+  def _make_s3_request(self, request_data, request_headers, method, params, headers, url_params, endpoint, resource_path, data=None):
     allparams = [raz_signer.StringListStringMapProto(key=key, value=[val]) for key, val in url_params.items()]
     allparams.extend([raz_signer.StringListStringMapProto(key=key, value=[val]) for key, val in params.items()])
     headers = [raz_signer.StringStringMapProto(key=key, value=val) for key, val in headers.items()]
 
     LOG.debug(
-      "Preparing sign request with http_method: {%s}, headers: {%s}, parameters: {%s}, endpoint: {%s}, resource_path: {%s}" %
-      (method, headers, allparams, endpoint, resource_path)
+      "Preparing sign request with http_method: {%s}, headers: {%s}, parameters: {%s}, endpoint: {%s}, resource_path: {%s}, content_to_sign: {%s}" %
+      (method, headers, allparams, endpoint, resource_path, data)
     )
     raz_req = raz_signer.SignRequestProto(
         endpoint_prefix=self.service_params['endpoint_prefix'],
@@ -257,6 +257,7 @@ class RazClient(object):
         headers=headers,
         parameters=allparams,
         resource_path=resource_path,
+        content_to_sign=data,
         time_offset=0
     )
     raz_req_serialized = raz_req.SerializeToString()
