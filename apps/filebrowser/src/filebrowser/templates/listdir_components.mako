@@ -1187,8 +1187,8 @@ else:
 
       self.retrieveData = function (clearAssistCache) {
         self.isLoading(true);
-
-        $.getJSON(self.targetPath() + (self.targetPath().indexOf('?') > 0 ? '&' : '?') + "pagesize=" + self.recordsPerPage() + "&pagenum=" + self.targetPageNum() + "&filter=" + self.searchQuery() + "&sortby=" + self.sortBy() + "&descending=" + self.sortDescending() + "&format=json", function (data) {
+        const encodedSearchFilter = encodeURIComponent(self.searchQuery());
+        $.getJSON(self.targetPath() + (self.targetPath().indexOf('?') > 0 ? '&' : '?') + "pagesize=" + self.recordsPerPage() + "&pagenum=" + self.targetPageNum() + "&filter=" + encodedSearchFilter + "&sortby=" + self.sortBy() + "&descending=" + self.sortDescending() + "&format=json", function (data) {
           if (data.error){
             $(document).trigger("error", data.error);
             self.isLoading(false);
@@ -1656,7 +1656,7 @@ else:
 
         $("#deleteForm").attr("action", "/filebrowser/rmtree" + "?" +
           (self.skipTrash() ? "skip_trash=true&" : "") +
-          "next=${url('filebrowser:filebrowser.views.view', path='')}" + self.currentPath());
+          "next=${url('filebrowser:filebrowser.views.view', path='')}" + encodeURIComponent(self.currentPath()));
 
         $("#deleteModal").modal({
           keyboard:true,

@@ -1453,8 +1453,8 @@ def _upload_file(request):
 
   if form.is_valid():
     uploaded_file = request.FILES['hdfs_file']
-    dest = scheme_absolute_path(unquote_url(request.GET['dest']), unquote_url(request.GET['dest']))
-    filepath = request.fs.join(dest, unquote_url(uploaded_file.name))
+    dest = request.GET['dest']
+    filepath = request.fs.join(dest, uploaded_file.name)
 
     if request.fs.isdir(dest) and posixpath.sep in uploaded_file.name:
       raise PopupException(_('Sorry, no "%(sep)s" in the filename %(name)s.' % {'sep': posixpath.sep, 'name': uploaded_file.name}))
