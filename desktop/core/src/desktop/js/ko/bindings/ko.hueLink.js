@@ -48,7 +48,10 @@ ko.bindingHandlers.hueLink = {
   update: function (element, valueAccessor) {
     const url = ko.unwrap(valueAccessor());
     if (url) {
-      $(element).attr('href', '/hue' + (url.indexOf('/') === 0 ? url : '/' + url));
+      $(element).attr(
+        'href',
+        window.HUE_BASE_URL + '/hue' + (url.indexOf('/') === 0 ? url : '/' + url)
+      );
     } else {
       $(element).attr('href', 'javascript: void(0);');
     }
