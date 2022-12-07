@@ -1,0 +1,42 @@
+---
+canary:
+  id: ''
+  template_id: ''
+  template_name: ''
+  email: rel-eng@cloudera.com
+  username: relengcanaryuser
+metadata:
+  tags:
+  - hue-team
+  - upstream-to-cdpd-master
+  jira: []
+  slack_room: []
+  email:
+  - eng-hue@cloudera.com
+stacks:
+- downstream_stacks: []
+  os:
+  - centos7
+  components:
+  - comp_name: hue
+    branch: ${CDH_BRANCH}
+    git_url: git@github.infra.cloudera.com:cdh/hue.git
+    git_sha: HEAD
+    enable_review: false
+    automerge: true
+    trigger_if_changed: true
+  - comp_name: CDPD
+    branch: ${CDH_RELEASE_BRANCH}
+    git_url: git@github.infra.cloudera.com:CDH/CDPD.git
+    git_sha: HEAD
+    enable_review: false
+    is_base_repo: true
+  gates:
+  - depends-on: []
+    name: build
+    vote: true
+  tests: {}
+  name: CDH
+  stack_name: CDH
+  version: ${CDH_RELEASE_VERSION}
+  base_build_number: ${CDH_BUILDNUMBER}
