@@ -1,0 +1,71 @@
+[build-system]
+requires = [
+    'setuptools>=44',
+    'wheel>=0.30.0',
+    'six',
+]
+build-backend = 'setuptools.build_meta'
+
+# ignore the tox documentation, it IS NOT supported yet
+# https://github.com/tox-dev/tox/issues/2148
+#[tox]
+#isolated_build = true
+
+[tool.tox]
+legacy_tox_ini = """
+[tox]
+envlist = py310
+isolated_build = true
+#skipsdist = true
+
+[gh-actions]
+python =
+    3.7: py37
+    3.8: py38
+    3.9: py39
+    3.10: py310
+
+[testenv]
+basepython = python3.10
+passenv = *
+deps =
+    bandit
+    flake8
+    mypy
+    types-six
+    coverage
+    pytest-cov
+    pytest
+    -rrequirements.txt
+
+commands =
+    flake8 src/pam/
+    mypy
+    bandit -r src -c "pyproject.toml"
+    pytest --cov -r w --capture=sys -vvv --cov-report=html
+"""
+
+[tool.bandit]
+exclude_dirs = ["./venv", "./test", ]
+recursive = true
+
+[tool.mypy]
+files = ["src/pam/__init__.py", "src/pam/__internals.py"]
+ignore_missing_imports = true
+
+[tool.pytest]
+python_files = "test_*.py"
+norecursedirs = ".tox"
+
+[tool.coverage.run]
+branch = true
+# awkward how I can include "pam" but I have to be incredibly specific when omitting
+source = ["pam"]
+omit = ["*/pam/pam.py", "*/pam/version.py",]
+
+[tool.coverage.html]
+directory = "htmlcov"
+
+[tool.coverage.report]
+skip_empty = true
+fail_under = 100
