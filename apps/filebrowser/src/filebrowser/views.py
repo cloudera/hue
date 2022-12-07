@@ -1330,8 +1330,8 @@ def move(request):
       if arg['src_path'] == arg['dest_path']:
         raise PopupException(_('Source path and destination path cannot be same'))
       request.fs.rename(
-          urllib_unquote(arg['src_path'].encode('utf-8') if not isinstance(arg['src_path'], str) else arg['src_path']),
-          urllib_unquote(arg['dest_path'].encode('utf-8') if not isinstance(arg['dest_path'], str) else arg['dest_path'])
+          arg['src_path'].encode('utf-8') if not isinstance(arg['src_path'], str) else arg['src_path'],
+          arg['dest_path'].encode('utf-8') if not isinstance(arg['dest_path'], str) else arg['dest_path']
       )
   return generic_op(RenameFormSet, request, bulk_move, ["src_path", "dest_path"], None,
                     data_extractor=formset_data_extractor(recurring, params),
@@ -1347,7 +1347,9 @@ def copy(request):
     for arg in args:
       if arg['src_path'] == arg['dest_path']:
         raise PopupException(_('Source path and destination path cannot be same'))
-      request.fs.copy(unquote_url(arg['src_path']), unquote_url(arg['dest_path']), recursive=True, owner=request.user)
+      logger.info('COPY ****************************************************************************************************************')
+      logger.info(arg['src_path'] + " -> " + arg['dest_path'])
+      request.fs.copy(arg['src_path'], arg['dest_path'], recursive=True, owner=request.user)
   return generic_op(CopyFormSet, request, bulk_copy, ["src_path", "dest_path"], None,
                     data_extractor=formset_data_extractor(recurring, params),
                     arg_extractor=formset_arg_extractor,
@@ -1518,9 +1520,9 @@ def compress_files_using_batch_job(request):
 
     if upload_path and file_names and archive_name:
       try:
-        upload_path = urllib_unquote(upload_path)
-        archive_name = urllib_unquote(archive_name)
-        file_names = [urllib_unquote(name) for name in file_names]
+        #upload_path = urllib_unquote(upload_path)
+        #archive_name = urllib_unquote(archive_name)
+        #file_names = [urllib_unquote(name) for name in file_names]
         response = compress_files_in_hdfs(request, file_names, upload_path, archive_name)
       except Exception as e:
         response['message'] = _('Exception occurred while compressing files: %s' % e)
