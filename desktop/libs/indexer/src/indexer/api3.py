@@ -124,7 +124,10 @@ def _convert_format(format_dict, inverse=False):
 def guess_format(request):
   file_format = json.loads(request.POST.get('fileFormat', '{}'))
   file_type = file_format['file_type']
-  path = urllib_unquote(file_format["path"])
+  path = file_format["path"]
+  LOG.info('guess_format ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^')
+  LOG.info('path :' + path)
+
   
   if sys.version_info[0] < 3 and (file_type == 'excel' or path[-3:] == 'xls' or path[-4:] == 'xlsx'):
     return JsonResponse({'status': -1, 'message': 'Python2 based Hue does not support Excel file importer'})
@@ -263,7 +266,9 @@ def guess_field_types(request):
   file_format = json.loads(request.POST.get('fileFormat', '{}'))
 
   if file_format['inputFormat'] == 'localfile':
+    LOG.info('guess_field_types - local ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^')    
     path = urllib_unquote(file_format['path'])
+    LOG.info('path: ' + path)
 
     with open(path, 'r') as local_file:
 
@@ -295,7 +300,11 @@ def guess_field_types(request):
 
   elif file_format['inputFormat'] == 'file':
     indexer = MorphlineIndexer(request.user, request.fs)
-    path = urllib_unquote(file_format["path"])
+    path = file_format["path"]
+
+    LOG.info('guess_field_types - local ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^')
+    LOG.info('path: ' + path)
+
     if path[-3:] == 'xls' or path[-4:] == 'xlsx':
       path = excel_to_csv_file_name_change(path)
     stream = request.fs.open(path)
@@ -458,10 +467,14 @@ def importer_submit(request):
   file_encoding = None
   if source['inputFormat'] == 'file':
     if source['path']:
-      path = urllib_unquote(source['path'])
+      LOG.info('importer_submit --------------------------------------------------------------------------------------------------------')
+      path = source['path']
+      LOG.info("path: " + path)
+      LOG.info('importer_submit --------------------------------------------------------------------------------------------------------')
       if path[-3:] == 'xls' or path[-4:] == 'xlsx':
         path = excel_to_csv_file_name_change(path)
       source['path'] = request.fs.netnormpath(path)
+      LOG.info("source['path']: " + source['path'])
       stream = request.fs.open(path)
       file_encoding = check_encoding(stream.read(10000))
 
@@ -470,10 +483,12 @@ def importer_submit(request):
         if destination['nonDefaultLocation'] else destination['nonDefaultLocation']
 
   if destination['ouputFormat'] == 'index':
+    LOG.info('1 --------------------------------------------------------------------------------------------------------')
     source['columns'] = destination['columns']
     index_name = destination["name"]
 
     if destination['indexerRunJob'] or source['inputFormat'] == 'stream':
+      LOG.info('2 --------------------------------------------------------------------------------------------------------')
       _convert_format(source["format"], inverse=True)
       job_handle = _large_indexing(
           request,
@@ -484,6 +499,7 @@ def importer_submit(request):
           destination=destination
       )
     else:
+      LOG.info('3 --------------------------------------------------------------------------------------------------------')
       client = SolrClient(request.user)
       job_handle = _small_indexing(
           request.user,

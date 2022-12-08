@@ -1271,13 +1271,18 @@ def set_replication(request):
 
   return generic_op(SetReplicationFactorForm, request, smart_set_replication, ["src_path", "replication_factor"], None)
 
-# BJORN HERE?
 def mkdir(request):
   # logger.info("('*********************************** request" % request)
   # logger.info('*********************************** request', request)
   def smart_mkdir(path, name):
     # Make sure only one directory is specified at a time.
     # No absolute directory specification allowed.
+
+    logger.info("mkdir ********************************************************************************************************************************************")
+    logger.info("path " + path)
+    logger.info("name " + name)
+    logger.info("joined " + request.fs.join(path, name))
+    logger.info("mkdir ********************************************************************************************************************************************")
 
     # logger.info("*********************************** name" + str(name))
     if posixpath.sep in name or "#" in name:

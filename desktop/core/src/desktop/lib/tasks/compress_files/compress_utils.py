@@ -39,7 +39,7 @@ def compress_files_in_hdfs(request, file_names, upload_path, archive_name):
 
   _upload_compress_files_script_to_hdfs(request.fs)
 
-  files = [{"value": upload_path + '/' + urllib_quote(file_name.encode('utf-8'), SAFE_CHARACTERS_URI)} for file_name in file_names]
+  files = [{"value": urllib_quote(upload_path.encode('utf-8'), SAFE_CHARACTERS_URI) + '/' + urllib_quote(file_name.encode('utf-8'), SAFE_CHARACTERS_URI)} for file_name in file_names]
   files.append({'value': '/user/' + DEFAULT_USER.get() + '/common/compress_files_in_hdfs.sh'})
   start_time = json.loads(request.POST.get('start_time', '-1'))
 
