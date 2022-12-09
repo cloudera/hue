@@ -63,14 +63,10 @@ class RazHttpClient(HttpClient):
     # so we remove https://{storageaccountname}.dfs.core.windows.net from the signed url here.
     signed_path = signed_url.partition('.dfs.core.windows.net')[2]
 
-    LOG.debug('after signed path ----->')
-    LOG.debug('http_method ----->' + str(http_method))
-    LOG.debug('params ----->' + str(params))
-
-    response = {}
     try:
+      # Sometimes correct call with SAS token fails, so we retry some operations once again.
       if retry >= 0:
-        response = super(RazHttpClient, self).execute(
+        return super(RazHttpClient, self).execute(
             http_method=http_method,
             path=signed_path,
             data=data,
@@ -85,10 +81,11 @@ class RazHttpClient(HttpClient):
     except Exception as e:
       LOG.debug('ABFS Exception: ' + str(e))
 
-      if http_method == 'HEAD':
-        LOG.debug('Retrying the stats call again for path %s' % path)
+      # Only retrying idempotent operations once.
+      if http_method in ('HEAD', 'GET'): 
+        LOG.debug('Retrying same operation again for path %s' % path)
         retry -= 1
-        self.execute(
+        return self.execute(
             http_method=http_method, 
             path=path, 
             params=params, 
@@ -102,24 +99,6 @@ class RazHttpClient(HttpClient):
             timeout=timeout, 
             retry=retry
         )
-
-    LOG.debug('response from ABFS ------>')
-    LOG.debug(str(response))
-
-    return response
-
-    # return super(RazHttpClient, self).execute(
-    #     http_method=http_method,
-    #     path=signed_path,
-    #     data=data,
-    #     headers=headers,
-    #     allow_redirects=allow_redirects,
-    #     urlencode=False,
-    #     files=files,
-    #     stream=stream,
-    #     clear_cookies=clear_cookies,
-    #     timeout=timeout
-    # )
 
   def get_sas_token(self, http_method, username, url, params=None, headers=None):
     raz_client = AdlsRazClient(username=username)
