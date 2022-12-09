@@ -481,6 +481,8 @@ def importer_submit(request):
   if destination['ouputFormat'] in ('database', 'table') and request.fs is not None:
     destination['nonDefaultLocation'] = request.fs.netnormpath(destination['nonDefaultLocation']) \
         if destination['nonDefaultLocation'] else destination['nonDefaultLocation']
+  
+
 
   if destination['ouputFormat'] == 'index':
     LOG.info('1 --------------------------------------------------------------------------------------------------------')
@@ -579,6 +581,7 @@ def importer_submit(request):
       )
     else:
       # TODO: if inputFormat is 'stream' and tableFormat is 'kudu' --> create Table only
+      LOG.info("HERE _create_table")
       job_handle = _create_table(
         request,
         source,
@@ -628,7 +631,7 @@ def _small_indexing(user, fs, client, source, destination, index_name):
   errors = []
 
   if source['inputFormat'] not in ('manual', 'table', 'query_handle'):
-    path = urllib_unquote(source["path"])
+    path = source["path"]
     stats = fs.stats(path)
     if stats.size > MAX_UPLOAD_SIZE:
       raise PopupException(_('File size is too large to handle!'))
@@ -640,7 +643,7 @@ def _small_indexing(user, fs, client, source, destination, index_name):
 
   if source['inputFormat'] == 'file':
     kwargs['separator'] = source['format']['fieldSeparator']
-    path = urllib_unquote(source["path"])
+    path = source["path"]
     data = fs.read(path, 0, MAX_UPLOAD_SIZE)
 
   if client.is_solr_six_or_more():
