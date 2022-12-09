@@ -5,7 +5,6 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -54,6 +53,8 @@ public class EventProcessorPipeline<T extends MessageLite> {
   public static final ConfVar<Integer> MAX_PARALLELISM =
       new ConfVar<>("hue.query-processor.event-pipeline.max-parallelism", 50);
 
+  protected static final long UPDATE_THROTTLE_MILLIS = 2000;
+
   private final Clock clock;
   private final DatePartitionedLogger<T> partitionedLogger;
   private final EventProcessor<T> processor;
@@ -72,10 +73,16 @@ public class EventProcessorPipeline<T extends MessageLite> {
   private final ExecutorService eventProcessorExecutor;
   private static final int INIT = 0, START = 1, STOPPED = 2;
   private final AtomicInteger state = new AtomicInteger(INIT);
+  private final AtomicInteger refresherState = new AtomicInteger(INIT);
 
   private final Meter eventsProcessedMeter;
   private final Meter eventsProcessingFailureMeter;
   private final Meter eventsIOFailureMeter;
+
+  private long updateTime;
+  public long getUpdateTime() {
+    return updateTime;
+  }
 
   // The current directory we are scanning for new or changed files.
   private String scanDir;
@@ -129,18 +136,7 @@ public class EventProcessorPipeline<T extends MessageLite> {
       metricRegistry.register(type.name() + ".currentQueueSize", (Gauge<Integer>)() -> filesQueue.size());
 
       this.loadOffsets();
-      filesRefresherExecutor.scheduleWithFixedDelay(() -> {
-        log.debug("Refreshing for type " + type);
-        try {
-          this.refreshCurrent();
-          this.processQueue();
-          this.refreshOld();
-          this.processQueue();
-        } catch (Throwable t) {
-          log.error("Caught throwable while refereshing type: " + type, t);
-        }
-        log.debug("Refreshing finished " + type);
-      }, 0, refreshDelay, TimeUnit.MILLISECONDS);
+      filesRefresherExecutor.scheduleWithFixedDelay(this::refresh, 0, refreshDelay, TimeUnit.MILLISECONDS);
       log.info("Started pipeline for: " + type);
     } else {
       log.error("Trying to start in invalid state: " + state.get());
@@ -236,6 +232,30 @@ public class EventProcessorPipeline<T extends MessageLite> {
           entity.getFileName(), entity.getDate(), type);
       eventProcessorExecutor.execute(new FileEventsProcessor(fps));
       fps = filesQueue.poll();
+    }
+  }
+
+  private void refresh() {
+    if (refresherState.compareAndSet(INIT, START)) {
+      log.debug("Refreshing for type " + type);
+      try {
+        this.refreshCurrent();
+        this.processQueue();
+        this.refreshOld();
+        this.processQueue();
+
+        updateTime = clock.getTime();
+      } catch (Throwable t) {
+        log.error("Caught throwable while refereshing type: " + type, t);
+      }
+      log.debug("Refreshing finished " + type);
+      refresherState.set(INIT);
+    }
+  }
+
+  public void forceRefresh() {
+    if (refresherState.get() == INIT && (clock.getTime() - updateTime) > UPDATE_THROTTLE_MILLIS) {
+      filesRefresherExecutor.execute(this::refresh);
     }
   }
 
