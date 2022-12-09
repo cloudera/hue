@@ -81,7 +81,7 @@ class RazHttpClient(HttpClient):
     except Exception as e:
       LOG.debug('ABFS Exception: ' + str(e))
 
-      # Only retrying idempotent operations once.
+      # Only retrying safe operations once.
       if http_method in ('HEAD', 'GET') and e.code == 403: 
         LOG.debug('Retrying same operation again for path: %s' % path)
         retry -= 1
