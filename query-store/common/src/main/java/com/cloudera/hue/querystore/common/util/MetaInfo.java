@@ -18,6 +18,7 @@ public class MetaInfo {
   private int limit;
   private int offset;
   private long size;
+  private long updateTime;
 
   private MetaInfo() {
   }
@@ -33,10 +34,12 @@ public class MetaInfo {
       this.metaInfo = new MetaInfo();
     }
 
-    public <T> Builder fromPageData(PageData<T> pageData) {
+    public <T> Builder fromPageData(PageData<T> pageData, long updateTime) {
       metaInfo.limit = pageData.getLimit();
       metaInfo.offset = pageData.getOffset();
       metaInfo.size = pageData.getCount();
+      metaInfo.updateTime = updateTime;
+
       return this;
     }
 

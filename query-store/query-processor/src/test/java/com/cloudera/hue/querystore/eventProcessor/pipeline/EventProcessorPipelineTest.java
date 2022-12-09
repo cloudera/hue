@@ -27,6 +27,7 @@ import org.apache.hadoop.yarn.util.Clock;
 import org.apache.tez.dag.history.logging.proto.DatePartitionedLogger;
 import org.apache.tez.dag.history.logging.proto.HistoryLoggerProtos.HistoryEventProto;
 import org.apache.tez.dag.history.logging.proto.ProtoMessageReader;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -52,6 +53,7 @@ public class EventProcessorPipelineTest {
   private TestLogger logger;
   private EventProcessorPipeline<HistoryEventProto> pipeline;
   private MetricRegistry metricRegistry;
+  private TransactionManager txnManager;
 
   @Mock EventProcessor<HistoryEventProto> processor;
   @Mock FileStatusPersistenceManager fsPersistenceManager;
@@ -76,7 +78,7 @@ public class EventProcessorPipelineTest {
 
     clock = new TestClock();
     logger = spy(new TestLogger(clock));
-    TransactionManager txnManager = new TransactionManager(null) {
+    txnManager = new TransactionManager(null) {
       @Override
       public <T, X extends Exception> T withTransaction(Callable<T, X> callable) throws X {
         return callable.call();
@@ -128,7 +130,12 @@ public class EventProcessorPipelineTest {
         ));
 
     pipeline.start();
+    long updateTime = pipeline.getUpdateTime();
+
     Thread.sleep(1000);
+
+    Assert.assertTrue("Time not updated", updateTime < pipeline.getUpdateTime());
+    updateTime = pipeline.getUpdateTime();
 
     // First directory will be 30 days minus current date.
     verify(logger, times(1)).scanForChangedFiles(eq("date=1969-12-05"), any());
@@ -179,9 +186,42 @@ public class EventProcessorPipelineTest {
     clock.setTime(7 * 24 * 60 * 60 * 1000L + 1);
     Thread.sleep(1000);
 
+    Assert.assertTrue("Time not updated", updateTime < pipeline.getUpdateTime());
+
     // Now date has changed it should advance and also delete the old files.
     verify(logger, VerificationModeFactory.atLeastOnce()).getNextDirectory(eq("date=1970-01-03"));
     verify(fsPersistenceManager, times(5)).delete(any());
+
+    pipeline.shutdown();
+  }
+
+  @Test
+  public void testForceRefresh() throws Exception {
+    DasConfiguration config = new DasConfiguration();
+    config.setConf(EventProcessorPipeline.FOLDER_SCAN_DELAY_MILLIS, 5 * 60 * 1000l);
+
+    EventProcessorPipeline<HistoryEventProto> pipeline = new EventProcessorPipeline<>(clock, logger, processor, txnManager,
+        fsPersistenceManager, FileStatusType.TEZ, config, metricRegistry);
+
+    clock.setTime(3 * 24 * 60 * 60 * 1000L);
+
+    pipeline.start();
+    Thread.sleep(1000);
+    long updateTime = pipeline.getUpdateTime();
+    Assert.assertTrue("updateTime wasn't set", updateTime == clock.getTime());
+
+    clock.setTime(3 * 24 * 60 * 70 * 1000L);
+
+    pipeline.forceRefresh();
+    Thread.sleep(1000);
+    Assert.assertTrue("Time not updated", updateTime < pipeline.getUpdateTime());
+    updateTime = pipeline.getUpdateTime();
+
+    pipeline.forceRefresh();
+    Thread.sleep(EventProcessorPipeline.UPDATE_THROTTLE_MILLIS / 2);
+    pipeline.forceRefresh();
+    Thread.sleep(1000);
+    Assert.assertTrue("forceRefresh was not throttled", updateTime == pipeline.getUpdateTime());
 
     pipeline.shutdown();
   }

@@ -30,6 +30,7 @@ import com.cloudera.hue.querystore.common.repository.PageData;
 import com.cloudera.hue.querystore.common.services.SearchService;
 import com.cloudera.hue.querystore.common.util.MetaInfo;
 import com.cloudera.hue.querystore.common.util.Pair;
+import com.cloudera.hue.querystore.eventProcessor.lifecycle.EventProcessorManager;
 import com.google.common.collect.ImmutableMap;
 
 import lombok.extern.slf4j.Slf4j;
@@ -43,10 +44,12 @@ public class QuerySearchResource {
   private static final int MAX_FACET_FIELDS_SEARCH_ALLOWED = 3;
 
   private final SearchService searchService;
+  private final EventProcessorManager eventProcessorManager;
 
   @Inject
-  public QuerySearchResource(SearchService searchService) {
+  public QuerySearchResource(SearchService searchService, EventProcessorManager eventProcessorManager) {
     this.searchService = searchService;
+    this.eventProcessorManager = eventProcessorManager;
   }
 
   /**
@@ -75,6 +78,9 @@ public class QuerySearchResource {
   @Path("/search")
   public Response getBasicSearchedQueriesWithFacets(SearchRequest.SearchRequestWrapper request,
                                           @Context SecurityContext securityContext) {
+
+    eventProcessorManager.forceRefresh();
+
     SearchRequest search = request.getSearch();
     return getSearchResponse(search.getText(), search.getSortText(),
         search.getOffset(), search.getLimit(), search.getStartTime(), search.getEndTime(),
@@ -85,10 +91,11 @@ public class QuerySearchResource {
       Integer limit, Long startTime, Long endTime, List<SearchRequest.Facet> facets,
       List<SearchRequest.RangeFacet> rangeFacets, String effectiveUser, String searchType) {
 
+    long queryUpdateTime = eventProcessorManager.getQueryUpdateTime();
     PageData<HiveQueryDto> pageData = searchService.doBasicSearch(queryText, sortText, offset, limit,
       startTime, endTime, facets, rangeFacets, effectiveUser);
 
-    MetaInfo metaInfo = MetaInfo.builder().fromPageData(pageData).build();
+    MetaInfo metaInfo = MetaInfo.builder().fromPageData(pageData, queryUpdateTime).build();
     Map<String, Object> response = ImmutableMap.of("queries", pageData.getEntities(), "meta", metaInfo);
 
     return Response.ok(response).build();
