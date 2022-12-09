@@ -38,7 +38,7 @@ class RazHttpClient(HttpClient):
     self.username = username
 
   def execute(self, http_method, path, params=None, data=None, headers=None, allow_redirects=False, urlencode=True,
-              files=None, stream=False, clear_cookies=False, timeout=conf.REST_CONN_TIMEOUT.get()):
+              files=None, stream=False, clear_cookies=False, timeout=conf.REST_CONN_TIMEOUT.get(), retry=1):
     """
     From an object URL we get back the SAS token as a GET param string, e.g.:
     https://{storageaccountname}.dfs.core.windows.net/{container}/{path}
@@ -63,18 +63,63 @@ class RazHttpClient(HttpClient):
     # so we remove https://{storageaccountname}.dfs.core.windows.net from the signed url here.
     signed_path = signed_url.partition('.dfs.core.windows.net')[2]
 
-    return super(RazHttpClient, self).execute(
-        http_method=http_method,
-        path=signed_path,
-        data=data,
-        headers=headers,
-        allow_redirects=allow_redirects,
-        urlencode=False,
-        files=files,
-        stream=stream,
-        clear_cookies=clear_cookies,
-        timeout=timeout
-    )
+    LOG.debug('after signed path ----->')
+    LOG.debug('http_method ----->' + str(http_method))
+    LOG.debug('params ----->' + str(params))
+
+    response = {}
+    try:
+      if retry >= 0:
+        response = super(RazHttpClient, self).execute(
+            http_method=http_method,
+            path=signed_path,
+            data=data,
+            headers=headers,
+            allow_redirects=allow_redirects,
+            urlencode=False,
+            files=files,
+            stream=stream,
+            clear_cookies=clear_cookies,
+            timeout=timeout
+        )
+    except Exception as e:
+      LOG.debug('ABFS Exception: ' + str(e))
+
+      if http_method == 'HEAD':
+        LOG.debug('Retrying the stats call again for path %s' % path)
+        retry -= 1
+        self.execute(
+            http_method=http_method, 
+            path=path, 
+            params=params, 
+            data=data, 
+            headers=headers, 
+            allow_redirects=allow_redirects, 
+            urlencode=urlencode, 
+            files=files, 
+            stream=stream, 
+            clear_cookies=clear_cookies, 
+            timeout=timeout, 
+            retry=retry
+        )
+
+    LOG.debug('response from ABFS ------>')
+    LOG.debug(str(response))
+
+    return response
+
+    # return super(RazHttpClient, self).execute(
+    #     http_method=http_method,
+    #     path=signed_path,
+    #     data=data,
+    #     headers=headers,
+    #     allow_redirects=allow_redirects,
+    #     urlencode=False,
+    #     files=files,
+    #     stream=stream,
+    #     clear_cookies=clear_cookies,
+    #     timeout=timeout
+    # )
 
   def get_sas_token(self, http_method, username, url, params=None, headers=None):
     raz_client = AdlsRazClient(username=username)
