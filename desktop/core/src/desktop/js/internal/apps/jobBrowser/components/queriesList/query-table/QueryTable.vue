@@ -64,6 +64,9 @@
         <hue-button @click="searchQueries">
           <em class="fa fa-refresh" />
           {{ I18n('Refresh') }}
+          <span class="update-time">
+            {{ getUpdateTimeText(updateTime) }}
+          </span>
         </hue-button>
       </div>
     </div>
@@ -174,6 +177,10 @@
         required: true
       },
       totalQueries: {
+        type: Number,
+        required: true
+      },
+      updateTime: {
         type: Number,
         required: true
       }
@@ -290,6 +297,9 @@
       this.setStatusFacetValues([]);
     },
     methods: {
+      getUpdateTimeText(time: number): string {
+        return time ? `Data updated  ${timeAgo(time)}` : '';
+      },
       clearSearch(): void {
         this.searchText = '';
         this.sort = DEFAULT_SORT;
@@ -434,6 +444,20 @@
         display: inline-block;
         position: absolute;
         right: 44px;
+
+        .update-time {
+          display: inline-block;
+          position: absolute;
+          white-space: nowrap;
+
+          pointer-events: none;
+
+          font-size: 0.7em;
+          color: #5a656d;
+
+          top: 30px;
+          right: 0px;
+        }
       }
     }
 

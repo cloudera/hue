@@ -204,6 +204,7 @@ export interface SearchMeta {
   limit: number;
   offset: number;
   size: number;
+  updateTime: number;
 }
 
 interface TableDefinition {

@@ -80,6 +80,17 @@ public class EventProcessorManager implements Managed {
     log.info("EventProcessorManager: stopped");
   }
 
+  public void forceRefresh() {
+    log.info("EventProcessorManager: forceRefresh");
+    tezEventsPipeline.forceRefresh();
+    tezAppEventsPipeline.forceRefresh();
+    hiveEventsPipeline.forceRefresh();
+  }
+
+  public long getQueryUpdateTime() {
+    return hiveEventsPipeline.getUpdateTime();
+  }
+
   private void startTezPipeline() {
     log.info("Starting tez events pipeline");
     try {

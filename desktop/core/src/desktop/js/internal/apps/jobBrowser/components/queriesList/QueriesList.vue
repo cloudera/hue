@@ -38,6 +38,7 @@
       v-else
       :queries="queries"
       :total-queries="(searchMeta && searchMeta.size) || 0"
+      :update-time="(searchMeta && searchMeta.updateTime) || 0"
       @diff-queries="diffQueries"
       @query-selected="querySelected"
       @reload="lastFetchOptions && fetch(lastFetchOptions)"
