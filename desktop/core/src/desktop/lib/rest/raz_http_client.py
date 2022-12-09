@@ -82,8 +82,8 @@ class RazHttpClient(HttpClient):
       LOG.debug('ABFS Exception: ' + str(e))
 
       # Only retrying idempotent operations once.
-      if http_method in ('HEAD', 'GET'): 
-        LOG.debug('Retrying same operation again for path %s' % path)
+      if http_method in ('HEAD', 'GET') and e.code == 403: 
+        LOG.debug('Retrying same operation again for path: %s' % path)
         retry -= 1
         return self.execute(
             http_method=http_method, 
@@ -99,6 +99,9 @@ class RazHttpClient(HttpClient):
             timeout=timeout, 
             retry=retry
         )
+      else:
+        # Re-raise all other exceptions to be handled later for other operations such as rename.
+        raise e
 
   def get_sas_token(self, http_method, username, url, params=None, headers=None):
     raz_client = AdlsRazClient(username=username)
