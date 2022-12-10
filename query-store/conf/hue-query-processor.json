@@ -7,17 +7,15 @@
     "connectionTimeout": "2s"
   },
   "dasConf": {
-    "hue.query-processor.event-pipeline.folder-scan-delay-millis" : 2000,
-    "hive.hook.proto.base-directory": "/warehouse/tablespace/external/hive/sys.db/query_data/",
-    "tez.history.logging.proto-base-dir": "/warehouse/tablespace/external/hive/sys.db/"
+    "hive.hook.proto.base-directory": "/warehouse/tablespace/managed/hive/sys.db/query_data/",
+    "tez.history.logging.proto-base-dir": "/warehouse/tablespace/managed/hive/sys.db/"
   },
   "database": {
     "driverClass": "org.postgresql.Driver",
-    "url": "jdbc:postgresql://localhost:5432/hue_db?currentSchema=hue_schema",
-    "user": "hue_user",
-    "password": "hue_pass",
-    "properties": {
-    }
+    "url": "jdbc:postgresql://localhost:5432/qp_db?currentSchema=qp_schema",
+    "user": "qp_user",
+    "password": "qp_pass",
+    "properties": {}
   },
   "server": {
     "applicationConnectors": [
@@ -32,7 +30,7 @@
     }
   },
   "flyway": {
-    "schemas": ["hue_schema"],
+    "schemas": ["qp_schema"],
     "locations": [
       "db/migrate/common", "db/migrate/dev"
     ]

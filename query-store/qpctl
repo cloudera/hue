@@ -13,17 +13,17 @@ DEBUG_ARGS="-agentlib:jdwp=transport=dt_socket,server=y,address=8000,suspend=y"
 YJP_ARGS="-agentpath:/Applications/YourKit-Java-Profiler-2019.1.app/Contents/Resources/bin/mac/libyjpagent.jnilib=disablestacktelemetry,exceptions=disable,listen=all"
 JAVA_ARGS="-Dlog4j.configurationFile=$CONF_DIR/hue-query-processor-log4j2.yml -DHADOOP_USER_NAME=hive"
 
-DB=hue_db
-DBUSER=hue_user
-DBPASS=hue_pass
-DBSCHEMA=hue_schema
+DB=qp_db
+DBUSER=qp_user
+DBPASS=qp_pass
+DBSCHEMA=qp_schema
 
 export HADOOP_CONF=$CONF_DIR
-PG_PATH=$(echo /usr/local/Cellar/postgresql@9.6/*/bin)
+PG_PATH=$(echo /usr/local/Cellar/postgresql@11/*/bin)
 
 start_postgres() {
   echo "starting postgres"
-  brew services start postgresql@9.6
+  brew services start postgresql@11
   PATH="$PATH:$PG_PATH"
   while ! pg_isready -d template1; do
     echo "waiting for postgres"
@@ -33,7 +33,7 @@ start_postgres() {
 
 stop_postgres() {
   echo "stopping postgres"
-  brew services stop postgresql@9.6
+  brew services stop postgresql@11
 }
 
 connect_postgres() {
