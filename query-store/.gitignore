@@ -2,3 +2,7 @@
 .classpath
 .project
 .settings
+
+# QP
+qp.log
+qp.pid
