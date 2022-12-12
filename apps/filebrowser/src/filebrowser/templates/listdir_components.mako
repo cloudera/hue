@@ -1378,6 +1378,7 @@ else:
       };
 
       self.downloadFile = function () {
+        huePubSub.publish('ignore.next.unload');
         huePubSub.publish('open.filebrowserlink', { pathPrefix: '/filebrowser/download=', decodedPath: self.selectedFile().path });  
       };
 

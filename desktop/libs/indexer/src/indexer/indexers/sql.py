@@ -82,9 +82,6 @@ class SQLIndexer(object):
     kudu_partition_columns = destination['kuduPartitionColumns']
     comment = destination['description']
 
-    LOG.info('HERE IN SQL.PY path: ' + source['path'])
-    # This source path probably doesn't need to be decoded but just to be safe and
-    # not introduce any regressions we conditionally remove it
     source_path = source['path']
 
     LOG.info('decoded source_path: ' + source_path)
