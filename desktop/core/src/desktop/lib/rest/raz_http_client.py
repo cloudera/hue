@@ -38,7 +38,7 @@ class RazHttpClient(HttpClient):
     self.username = username
 
   def execute(self, http_method, path, params=None, data=None, headers=None, allow_redirects=False, urlencode=True,
-              files=None, stream=False, clear_cookies=False, timeout=conf.REST_CONN_TIMEOUT.get()):
+              files=None, stream=False, clear_cookies=False, timeout=conf.REST_CONN_TIMEOUT.get(), retry=1):
     """
     From an object URL we get back the SAS token as a GET param string, e.g.:
     https://{storageaccountname}.dfs.core.windows.net/{container}/{path}
@@ -63,18 +63,45 @@ class RazHttpClient(HttpClient):
     # so we remove https://{storageaccountname}.dfs.core.windows.net from the signed url here.
     signed_path = signed_url.partition('.dfs.core.windows.net')[2]
 
-    return super(RazHttpClient, self).execute(
-        http_method=http_method,
-        path=signed_path,
-        data=data,
-        headers=headers,
-        allow_redirects=allow_redirects,
-        urlencode=False,
-        files=files,
-        stream=stream,
-        clear_cookies=clear_cookies,
-        timeout=timeout
-    )
+    try:
+      # Sometimes correct call with SAS token fails, so we retry some operations once again.
+      if retry >= 0:
+        return super(RazHttpClient, self).execute(
+            http_method=http_method,
+            path=signed_path,
+            data=data,
+            headers=headers,
+            allow_redirects=allow_redirects,
+            urlencode=False,
+            files=files,
+            stream=stream,
+            clear_cookies=clear_cookies,
+            timeout=timeout
+        )
+    except Exception as e:
+      LOG.debug('ABFS Exception: ' + str(e))
+
+      # Only retrying safe operations once.
+      if http_method in ('HEAD', 'GET') and e.code == 403: 
+        LOG.debug('Retrying same operation again for path: %s' % path)
+        retry -= 1
+        return self.execute(
+            http_method=http_method, 
+            path=path, 
+            params=params, 
+            data=data, 
+            headers=headers, 
+            allow_redirects=allow_redirects, 
+            urlencode=urlencode, 
+            files=files, 
+            stream=stream, 
+            clear_cookies=clear_cookies, 
+            timeout=timeout, 
+            retry=retry
+        )
+      else:
+        # Re-raise all other exceptions to be handled later for other operations such as rename.
+        raise e
 
   def get_sas_token(self, http_method, username, url, params=None, headers=None):
     raz_client = AdlsRazClient(username=username)
