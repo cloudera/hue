@@ -49,7 +49,7 @@ import com.google.common.collect.Lists;
 import lombok.Data;
 
 public class EventProcessorPipelineTest {
-  private TestClock clock;
+  private RunningTestClock clock;
   private TestLogger logger;
   private EventProcessorPipeline<HistoryEventProto> pipeline;
   private MetricRegistry metricRegistry;
@@ -76,7 +76,7 @@ public class EventProcessorPipelineTest {
     when(processor.process(eq(HistoryEventProto.getDefaultInstance()), any()))
         .thenReturn(ProcessingStatus.SUCCESS);
 
-    clock = new TestClock();
+    clock = new RunningTestClock();
     logger = spy(new TestLogger(clock));
     txnManager = new TransactionManager(null) {
       @Override
@@ -130,12 +130,12 @@ public class EventProcessorPipelineTest {
         ));
 
     pipeline.start();
-    long updateTime = pipeline.getUpdateTime();
+    long refreshTime = pipeline.getRefreshTime();
 
     Thread.sleep(1000);
 
-    Assert.assertTrue("Time not updated", updateTime < pipeline.getUpdateTime());
-    updateTime = pipeline.getUpdateTime();
+    Assert.assertTrue("Time not updated", refreshTime < pipeline.getRefreshTime());
+    refreshTime = pipeline.getRefreshTime();
 
     // First directory will be 30 days minus current date.
     verify(logger, times(1)).scanForChangedFiles(eq("date=1969-12-05"), any());
@@ -176,7 +176,9 @@ public class EventProcessorPipelineTest {
     // Keep invoke because current day is same.
     verify(logger, VerificationModeFactory.atLeastOnce())
       .scanForChangedFiles(eq("date=1970-01-03"), any());
-    verify(logger, times(0)).getNextDirectory(eq("date=1970-01-03"));
+    verify(logger, times(3)).getNextDirectory(eq("date=1970-01-03"));
+
+    verify(logger, times(0)).scanForChangedFiles(eq("date=1970-01-05"), any());
 
     // No file should be deleted until now.
     verify(fsPersistenceManager, times(0)).delete(any());
@@ -186,7 +188,7 @@ public class EventProcessorPipelineTest {
     clock.setTime(7 * 24 * 60 * 60 * 1000L + 1);
     Thread.sleep(1000);
 
-    Assert.assertTrue("Time not updated", updateTime < pipeline.getUpdateTime());
+    Assert.assertTrue("Time not updated", refreshTime < pipeline.getRefreshTime());
 
     // Now date has changed it should advance and also delete the old files.
     verify(logger, VerificationModeFactory.atLeastOnce()).getNextDirectory(eq("date=1970-01-03"));
@@ -200,6 +202,7 @@ public class EventProcessorPipelineTest {
     DasConfiguration config = new DasConfiguration();
     config.setConf(EventProcessorPipeline.FOLDER_SCAN_DELAY_MILLIS, 5 * 60 * 1000l);
 
+    TestClock clock = new TestClock();
     EventProcessorPipeline<HistoryEventProto> pipeline = new EventProcessorPipeline<>(clock, logger, processor, txnManager,
         fsPersistenceManager, FileStatusType.TEZ, config, metricRegistry);
 
@@ -207,21 +210,21 @@ public class EventProcessorPipelineTest {
 
     pipeline.start();
     Thread.sleep(1000);
-    long updateTime = pipeline.getUpdateTime();
-    Assert.assertTrue("updateTime wasn't set", updateTime == clock.getTime());
+    long refreshTime = pipeline.getRefreshTime();
+    Assert.assertTrue("refreshTime wasn't set", refreshTime == clock.getTime());
 
     clock.setTime(3 * 24 * 60 * 70 * 1000L);
 
     pipeline.forceRefresh();
     Thread.sleep(1000);
-    Assert.assertTrue("Time not updated", updateTime < pipeline.getUpdateTime());
-    updateTime = pipeline.getUpdateTime();
+    Assert.assertTrue("Time not updated", refreshTime < pipeline.getRefreshTime());
+    refreshTime = pipeline.getRefreshTime();
 
     pipeline.forceRefresh();
-    Thread.sleep(EventProcessorPipeline.UPDATE_THROTTLE_MILLIS / 2);
+    Thread.sleep(EventProcessorPipeline.REFRESH_THROTTLE_MILLIS / 2);
     pipeline.forceRefresh();
     Thread.sleep(1000);
-    Assert.assertTrue("forceRefresh was not throttled", updateTime == pipeline.getUpdateTime());
+    Assert.assertTrue("forceRefresh was not throttled", refreshTime == pipeline.getRefreshTime());
 
     pipeline.shutdown();
   }
@@ -263,7 +266,7 @@ public class EventProcessorPipelineTest {
 
   class TestLogger extends DatePartitionedLogger<HistoryEventProto> {
 
-    public TestLogger(TestClock clock) throws IOException {
+    public TestLogger(RunningTestClock clock) throws IOException {
       // This is never invoked, just for compiler to be happy.
       super(HistoryEventProto.PARSER, new Path("/tmp/"), new Configuration(), clock);
     }
@@ -319,5 +322,15 @@ public class EventProcessorPipelineTest {
   @Data
   static class TestClock implements Clock {
     volatile long time = 0;
+  }
+
+  @Data
+  static class RunningTestClock implements Clock {
+    volatile long time = 0;
+
+    public long getTime() {
+      time += EventProcessorPipeline.REFRESH_THROTTLE_MILLIS + 1000;
+      return time;
+    }
   }
 }
