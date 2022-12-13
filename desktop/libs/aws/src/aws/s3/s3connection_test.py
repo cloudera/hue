@@ -85,7 +85,7 @@ class TestRazS3Connection():
           http_request.headers
         )
         assert_equal({}, http_request.params)
-        assert_equal('', http_request.body)
+        assert_equal(b'', http_request.body)
 
 
 class TestSelfSignedUrlS3Connection():
