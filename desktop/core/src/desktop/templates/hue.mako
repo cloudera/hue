@@ -146,11 +146,7 @@ ${ hueIcons.symbols() }
   <hue-sidebar-web-component style="flex: 1 1 auto"></hue-sidebar-web-component>
 
   <div class="main-page">
-    % if banner_message or conf.CUSTOM.BANNER_TOP_HTML.get():
-      <div class="banner">
-        ${ banner_message or conf.CUSTOM.BANNER_TOP_HTML.get() | n,unicode }
-      </div>
-    % endif
+    <AppBanner data-reactcomponent='AppBanner'></AppBanner>
 
     <nav class="navbar navbar-default">
       <div class="navbar-inner top-nav">
