@@ -119,6 +119,8 @@ window.createReactComponents = createReactComponents;
 $(document).ready(async () => {
   await refreshConfig(); // Make sure we have config up front
 
+  createReactComponents('.main-page');
+
   const onePageViewModel = new OnePageViewModel();
   ko.applyBindings(onePageViewModel, $('.page-content')[0]);
 

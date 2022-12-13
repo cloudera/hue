@@ -8,6 +8,9 @@ export async function loadComponent(name) {
       return (await import('../apps/editor/components/result/reactExample/ReactExample')).default;
 
     // Application global components here
+    case 'AppBanner':
+      return (await import('./AppBanner/AppBanner')).default;
+
     case 'ReactExampleGlobal':
       return (await import('./ReactExampleGlobal/ReactExampleGlobal')).default;
 
