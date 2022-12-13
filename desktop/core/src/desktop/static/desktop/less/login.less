@@ -20,22 +20,32 @@
 
 @sidebar-bg-color: #132329;
 
-@-webkit-keyframes spinner {
-  from {
-    -webkit-transform: rotateY(0deg);
-  }
+.login-page {
+  .fillAbsolute();
+  .display-flex();
+  .flex-direction(column);
 
-  to {
-    -webkit-transform: rotateY(-360deg);
+  background-color: #f8f8f8;
+}
+
+#login-modal {
+  padding: 0 !important;
+  box-shadow: none;
+  background: transparent;
+  border: none;
+
+  > .login-container {
+    border: 1px solid transparent !important;
   }
 }
 
 .login-container {
+  .flex(0 1 auto);
+  .hue-box-shadow-bottom;
+
   width: 500px;
   display: block;
   margin: auto;
-  margin-bottom: 50px;
-  background: @cui-white;
   border: 1px solid @cui-default-border-color;
   border-radius: 4px;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='248' height='196' viewBox='0 0 248 196'%3E%3Cdefs%3E%3Cpath id='6zd0wr4qxa' d='M0 0H248V196H0z'/%3E%3C/defs%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg%3E%3Cg%3E%3Cg transform='translate(-125 -842) translate(125 270) translate(0 572)'%3E%3Cmask id='4w2gcddqub' fill='%23fff'%3E%3Cuse xlink:href='%236zd0wr4qxa'/%3E%3C/mask%3E%3Cuse fill='%23132329' xlink:href='%236zd0wr4qxa'/%3E%3Cg mask='url(%234w2gcddqub)' opacity='.503'%3E%3Cg%3E%3Cpath fill='%2319323C' d='M117.744 164.685L0 282.43 42.867 282.43 160.612 164.685z' transform='translate(53 -87)'/%3E%3Cpath fill='%23224452' d='M282.73 0L117.913 164.685 160.612 164.685 42.868 282.429 349.591 282.459 349.591 0.002z' transform='translate(53 -87)'/%3E%3Cg%3E%3Cpath fill='%23224452' d='M148.278 0L146.067 0 28.322 117.745 30.533 117.745zM141.346 0L23.602 117.745 25.813 117.745 143.558 0zM35.253 117.745L152.998 0 150.786 0 33.041 117.745zM39.973 117.745L157.718 0 155.507 0 37.762 117.745zM136.626 0L18.881 117.745 21.092 117.745 138.838 0zM122.466 0L4.721 117.745 6.933 117.745 124.677 0zM117.746 0L0 117.745 2.212 117.745 119.956 0zM127.187 0L9.441 117.745 11.653 117.745 129.398 0zM131.907 0L14.161 117.745 16.372 117.745 134.118 0z' transform='translate(53 -87) translate(13.957 108.673)'/%3E%3C/g%3E%3C/g%3E%3C/g%3E%3C/g%3E%3C/g%3E%3C/g%3E%3C/g%3E%3C/svg%3E%0A");
@@ -47,14 +57,18 @@
     white-space: normal;
   }
 
+  select {
+    width: 100%;
+  }
+
   .logo {
-    width: 70px;
     height: 70px;
     text-align: center;
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 35px;
-    margin-bottom: 35px;
+    margin: 35px auto;
+
+    img {
+      margin-top: 2px;
+    }
   }
 
   h3 {
@@ -67,10 +81,6 @@
     background-color: @cui-white;
     width: 70px;
     height: 70px;
-  }
-
-  .logo img {
-    margin-top: 2px;
   }
 
   form {
@@ -99,10 +109,10 @@
         -moz-box-shadow: none !important;
         box-shadow: none !important;
       }
-    }
 
-    .text-input.error {
-      border-color: @cui-red-500;
+      &.error {
+        border-color: @cui-red-500;
+      }
     }
 
     ul.errorlist li {
@@ -151,11 +161,6 @@
   }
 }
 
-:-webkit-autofill,
-:-webkit-autofill:focus {
-  -webkit-box-shadow: 0 0 0 1000px white inset !important;
-}
-
 input[type='password']::-ms-reveal {
   display: none;
 }
@@ -165,42 +170,33 @@ input[type='password']::-ms-reveal {
 }
 
 .trademark {
-  position: fixed;
-  bottom: 10px;
+  .flex(0 1 auto);
+
   margin-left: auto;
   margin-right: auto;
-  width: 100%;
-  background-color: @cui-gray-050;
+  padding-bottom: 10px;
 }
 
-@media screen and (max-width: 800px) {
-  body {
-    padding-top: 40px !important;
-  }
+.svg-hue-logo-main {
+  fill: @hue-primary-color-dark;
+}
 
-  .login-box {
-    width: 300px;
-  }
+.svg-hue-logo-trunk {
+  fill: @hue-trunk;
+}
 
-  .login-container form {
-    margin-left: 10px;
-    margin-right: 10px;
-  }
-
-  .login-container form input[type='submit'] {
-    margin-bottom: 20px;
+@-webkit-keyframes autofill {
+  to {
+    background: transparent;
   }
 }
 
-@media screen and (max-width: 540px) {
-  .login-container {
-    width: 90%;
-  }
+:-webkit-autofill {
+  -webkit-animation-name: autofill;
+  -webkit-animation-fill-mode: both;
 }
 
-#login-modal {
-  padding: 0 !important;
-  box-shadow: none;
-  background: transparent;
-  border: none;
+:-webkit-autofill,
+:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px white inset !important;
 }
