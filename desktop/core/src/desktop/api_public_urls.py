@@ -36,6 +36,7 @@ urlpatterns = [
 # Compatibility with "old" private API.
 # e.g. https://demo.gethue.com/notebook/api/execute/hive
 urlpatterns += [
+  re_path(r'^banners/?$', api_public.get_banners, name='core_banners'),
   re_path(r'^get_config/?$', api_public.get_config),
   re_path(r'^get_namespaces/(?P<interface>[\w\-]+)/?$', api_public.get_context_namespaces),  # To remove
 
