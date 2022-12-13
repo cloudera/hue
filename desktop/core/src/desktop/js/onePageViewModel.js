@@ -317,9 +317,6 @@ class OnePageViewModel {
       huePubSub.publish('hue.datatable.search.hide');
       huePubSub.publish('hue.scrollleft.hide');
       huePubSub.publish('context.panel.visible', false);
-      if (app === 'filebrowser') {
-        $(window).unbind('hashchange.fblist');
-      }
       if (app.startsWith('oozie')) {
         huePubSub.clearAppSubscribers('oozie');
       }
@@ -899,7 +896,7 @@ class OnePageViewModel {
       }
     });
 
-    huePubSub.subscribe('open.filebrowserlink', ({pathPrefix, decodedPath}) => { 
+    huePubSub.subscribe('open.filebrowserlink', ({pathPrefix, decodedPath, fileBrowserModel}) => {
       if (pathPrefix.includes('download=')) {
         // The download view on the backend requires the slashes not to 
         // be encoded in order for the file to be correctly named. 
@@ -911,12 +908,21 @@ class OnePageViewModel {
       const appPrefix = '/hue';
       const urlEncodedPercentage = '%25';
       // Fix. The '%' character needs to be encoded twice due to a bug in the page library
-      // that decodes the url twice.      
+      // that decodes the url twice. Even when we don't directly call pag() we still need this
+      // fix since the user can reload the page which will trigger a call to page().
       const pageFixedPath = decodedPath.replaceAll('%', urlEncodedPercentage);
       const encodedPath = encodeURIComponent(pageFixedPath);
       const href = window.HUE_BASE_URL + appPrefix + pathPrefix + encodedPath;
-      
-      page(href);
+
+      // We don't want reload the entire filebrowser when navigating between folders
+      // and already on the listdir_components page.
+      if (fileBrowserModel) {
+        fileBrowserModel.targetPath(pathPrefix + encodedPath);
+        window.history.pushState(null, '', href);      
+        fileBrowserModel.retrieveData();
+      } else {
+        page(href);
+      }
     });    
   }
 }

@@ -299,10 +299,6 @@ Plugin.prototype.navigateTo = function (path) {
     path + '&' + pageSizeParam :
     encodedPath + '?' + pageSizeParam;
 
-  console.info('-------------------------------------');   
-  console.info('path: ', '/filebrowser/view=' + path);  
-  console.info('encoded path: ', '/filebrowser/view=' + pathAndQuery);
-
   $.getJSON('/filebrowser/view=' + pathAndQuery, data => {
     $(_parent.element).find('.filechooser-tree').empty();
 

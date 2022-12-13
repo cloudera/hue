@@ -428,7 +428,7 @@ def parse_breadcrumbs(path):
     if url and not url.endswith('/'):
       url += '/'
     url += part
-    breadcrumbs.append({'url': urllib_quote(url.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS), 'label': part})
+    breadcrumbs.append({'url': url, 'label': part})
   return breadcrumbs
 
 

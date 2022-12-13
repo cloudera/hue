@@ -801,16 +801,6 @@ else:
       return (bytes / Math.pow(k, i)).toPrecision(dm) + ' ' + sizes[i];
     }
 
-    var updateHash = function (hash) {
-      hash = encodeURI(decodeURIComponent(hash));
-      %if not is_embeddable:
-      window.location.hash = hash;
-      %else:
-      hueUtils.changeURL('#' + hash);
-      huePubSub.publish('fb.update.hash');
-      %endif
-    }
-
     var Page = function (page) {
       if (page != null) {
         return {
@@ -917,14 +907,9 @@ else:
                 // forcing root on empty breadcrumb url
                 this.url = "/";
               }              
-              fileBrowserViewModel.targetPageNum(1);
-              fileBrowserViewModel.targetPath("${url('filebrowser:filebrowser.views.view', path='')}" + stripHashes(this.url));
-
-              // The breadcrumbs url comes encoded from the backend              
-              const decodedPath = decodeURIComponent(this.url);
+              fileBrowserViewModel.targetPageNum(1);              
               const pathPrefix = "${url('filebrowser:filebrowser.views.view', path='')}";
-              console.info('breadcrumb.url decodedPath', decodedPath);
-              huePubSub.publish('open.filebrowserlink', { pathPrefix, decodedPath });              
+              huePubSub.publish('open.filebrowserlink', { pathPrefix, decodedPath: this.url, fileBrowserModel: fileBrowserViewModel});              
             }
             else {
               window.open($(e.target).attr('href'));
@@ -1345,7 +1330,6 @@ else:
             e.preventDefault();
             fileBrowserViewModel.targetPageNum(1);
             fileBrowserViewModel.targetPath("${url('filebrowser:filebrowser.views.view', path='')}?" + folderPath);
-            updateHash('');
             fileBrowserViewModel.retrieveData();
           }
           else {
@@ -1364,17 +1348,18 @@ else:
 
       self.viewFile = function (file, e) {
         e.stopImmediatePropagation();
-        if (file.type == "dir") {
-          // Reset page number so that we don't hit a page that doesn't exist
-          ## self.targetPageNum(1);
-          // TODO: check if we can remoce the 3 lines below
-          ## self.enableFilterAfterSearch = false;
-          ## self.searchQuery("");
-          ## self.targetPath(file.url);
-        }
         const decodedPath = file.path;
         const pathPrefix = "${url('filebrowser:filebrowser.views.view', path='')}";
-        huePubSub.publish('open.filebrowserlink', { pathPrefix, decodedPath });                  
+
+        if (file.type == "dir") {
+          // Reset page number so that we don't hit a page that doesn't exist
+          self.targetPageNum(1);        
+          self.enableFilterAfterSearch = false;
+          self.searchQuery("");
+          huePubSub.publish('open.filebrowserlink', { pathPrefix, decodedPath, fileBrowserModel: self });
+        } else {
+          huePubSub.publish('open.filebrowserlink', { pathPrefix, decodedPath });
+        }        
       };
 
       self.downloadFile = function () {
@@ -2452,39 +2437,7 @@ else:
 
       $("*[rel='tooltip']").tooltip({ placement:"bottom" });
 
-      var hashchange = function () {
-        if (window.location.pathname.indexOf('/filebrowser') > -1) {
-          var targetPath = "";
-          var hash = decodeURI(window.location.hash.substring(1));
-          if (hash != null && hash != "" && hash.indexOf('/') > -1) {
-            targetPath = "${url('filebrowser:filebrowser.views.view', path='')}";
-            if (hash.indexOf("!!") != 0) {
-              targetPath += stripHashes(encodeURIComponent(hash));
-            }
-            else {
-              targetPath = fileBrowserViewModel.targetPath() + encodeURI(hash);
-            }
-            fileBrowserViewModel.targetPageNum(1)
-          }
-          if (window.location.href.indexOf("#") == -1) {
-            fileBrowserViewModel.targetPageNum(1);
-            targetPath = "${current_request_path | n,unicode }";
-          }
-          if (targetPath != "") {
-            fileBrowserViewModel.targetPath(targetPath);
-            fileBrowserViewModel.retrieveData();
-          }
-        }
-      }
-
-      huePubSub.subscribe('fb.update.hash', hashchange, 'filebrowser');
-
-      if (window.location.hash != null && window.location.hash.length > 1) {
-        hashchange();
-      }
-      else {
-        fileBrowserViewModel.retrieveData();
-      }
+      fileBrowserViewModel.retrieveData();
 
 
       $("#editBreadcrumb").click(function (e) {
@@ -2506,7 +2459,7 @@ else:
             $.jHueNotify.warn("${ _('Listing of buckets is not allowed. Redirecting to the home directory.') }");
             target_path = window.USER_HOME_DIR;
           } 
-          fileBrowserViewModel.targetPath("${url('filebrowser:filebrowser.views.view', path='')}" + target_path); 
+          fileBrowserViewModel.targetPath("${url('filebrowser:filebrowser.views.view', path='')}" + encodeURIComponent(target_path)); 
           fileBrowserViewModel.getStats(function (data) {
             if (data.type != null && data.type == "file") {
               %if is_embeddable:
@@ -2516,7 +2469,8 @@ else:
               %endif
               return false;
             } else {
-              updateHash(target_path);
+              const pathPrefix = "${url('filebrowser:filebrowser.views.view', path='')}";
+              huePubSub.publish('open.filebrowserlink', { pathPrefix, decodedPath: target_path, fileBrowserModel: fileBrowserViewModel});
             }
             $("#jHueHdfsAutocomplete").hide();
           });
@@ -2543,7 +2497,6 @@ else:
         }
       });
 
-      $(window).bind("hashchange.fblist", hashchange);
 
       $(".actionbar").data("originalWidth", $(".actionbar").width());
 
