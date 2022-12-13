@@ -87,8 +87,8 @@ public class EventProcessorManager implements Managed {
     hiveEventsPipeline.forceRefresh();
   }
 
-  public long getQueryUpdateTime() {
-    return hiveEventsPipeline.getUpdateTime();
+  public long getQueryRefreshTime() {
+    return hiveEventsPipeline.getRefreshTime();
   }
 
   private void startTezPipeline() {

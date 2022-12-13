@@ -91,11 +91,11 @@ public class QuerySearchResource {
       Integer limit, Long startTime, Long endTime, List<SearchRequest.Facet> facets,
       List<SearchRequest.RangeFacet> rangeFacets, String effectiveUser, String searchType) {
 
-    long queryUpdateTime = eventProcessorManager.getQueryUpdateTime();
+    long updateTime = eventProcessorManager.getQueryRefreshTime();
     PageData<HiveQueryDto> pageData = searchService.doBasicSearch(queryText, sortText, offset, limit,
       startTime, endTime, facets, rangeFacets, effectiveUser);
 
-    MetaInfo metaInfo = MetaInfo.builder().fromPageData(pageData, queryUpdateTime).build();
+    MetaInfo metaInfo = MetaInfo.builder().fromPageData(pageData, updateTime).build();
     Map<String, Object> response = ImmutableMap.of("queries", pageData.getEntities(), "meta", metaInfo);
 
     return Response.ok(response).build();

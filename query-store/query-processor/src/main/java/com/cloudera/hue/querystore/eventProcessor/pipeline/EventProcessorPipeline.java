@@ -17,6 +17,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.Path;
@@ -53,7 +54,7 @@ public class EventProcessorPipeline<T extends MessageLite> {
   public static final ConfVar<Integer> MAX_PARALLELISM =
       new ConfVar<>("hue.query-processor.event-pipeline.max-parallelism", 50);
 
-  protected static final long UPDATE_THROTTLE_MILLIS = 2000;
+  protected static final long REFRESH_THROTTLE_MILLIS = 2000;
 
   private final Clock clock;
   private final DatePartitionedLogger<T> partitionedLogger;
@@ -73,15 +74,14 @@ public class EventProcessorPipeline<T extends MessageLite> {
   private final ExecutorService eventProcessorExecutor;
   private static final int INIT = 0, START = 1, STOPPED = 2;
   private final AtomicInteger state = new AtomicInteger(INIT);
-  private final AtomicInteger refresherState = new AtomicInteger(INIT);
 
   private final Meter eventsProcessedMeter;
   private final Meter eventsProcessingFailureMeter;
   private final Meter eventsIOFailureMeter;
 
-  private long updateTime;
-  public long getUpdateTime() {
-    return updateTime;
+  private final AtomicLong refreshTime = new AtomicLong(0l);
+  public long getRefreshTime() {
+    return refreshTime.get();
   }
 
   // The current directory we are scanning for new or changed files.
@@ -236,7 +236,7 @@ public class EventProcessorPipeline<T extends MessageLite> {
   }
 
   private void refresh() {
-    if (refresherState.compareAndSet(INIT, START)) {
+    if ((clock.getTime() - refreshTime.get()) > REFRESH_THROTTLE_MILLIS) {
       log.debug("Refreshing for type " + type);
       try {
         this.refreshCurrent();
@@ -244,19 +244,16 @@ public class EventProcessorPipeline<T extends MessageLite> {
         this.refreshOld();
         this.processQueue();
 
-        updateTime = clock.getTime();
+        refreshTime.set(clock.getTime());
       } catch (Throwable t) {
         log.error("Caught throwable while refereshing type: " + type, t);
       }
       log.debug("Refreshing finished " + type);
-      refresherState.set(INIT);
     }
   }
 
   public void forceRefresh() {
-    if (refresherState.get() == INIT && (clock.getTime() - updateTime) > UPDATE_THROTTLE_MILLIS) {
-      filesRefresherExecutor.execute(this::refresh);
-    }
+    filesRefresherExecutor.execute(this::refresh);
   }
 
   private void updateScanDir(String newDir) {
