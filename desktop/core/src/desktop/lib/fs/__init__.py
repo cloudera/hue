@@ -32,10 +32,19 @@ else:
 
 def splitpath(path):
   split = lib_urlparse(path)
+  path_parsed_as_query = ''
+  
+  # Make sure the splitpath can handle a path that contains "?" since
+  # that is the case for the file browser paths.
+  if '?' in path:
+    path_parsed_as_query = '?'
+    if split.query:
+      path_parsed_as_query = '?' + split.query
+
   if split.scheme and split.netloc:
-    parts = [split.scheme + '://', split.netloc] + split.path.split('/')
+    parts = [split.scheme + '://', split.netloc] + (split.path + path_parsed_as_query).split('/')
   elif split.scheme and split.path:
-    parts = [split.scheme + ':/'] + split.path.split('/')
+    parts = [split.scheme + ':/'] + (split.path + path_parsed_as_query).split('/')
   elif split.scheme:
     parts = [split.scheme + ("://" if path.find("://") >= 0 else ":/")]
   else:
