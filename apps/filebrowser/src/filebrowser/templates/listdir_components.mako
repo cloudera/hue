@@ -2461,15 +2461,11 @@ else:
           } 
           fileBrowserViewModel.targetPath("${url('filebrowser:filebrowser.views.view', path='')}" + encodeURIComponent(target_path)); 
           fileBrowserViewModel.getStats(function (data) {
-            if (data.type != null && data.type == "file") {
-              %if is_embeddable:
-              huePubSub.publish('open.link', data.url);
-              %else:
-              huePubSub.publish('open.link', data.url);
-              %endif
+            const pathPrefix = "${url('filebrowser:filebrowser.views.view', path='')}";
+            if (data.type != null && data.type == "file") {              
+              huePubSub.publish('open.filebrowserlink', { pathPrefix, decodedPath: target_path});              
               return false;
             } else {
-              const pathPrefix = "${url('filebrowser:filebrowser.views.view', path='')}";
               huePubSub.publish('open.filebrowserlink', { pathPrefix, decodedPath: target_path, fileBrowserModel: fileBrowserViewModel});
             }
             $("#jHueHdfsAutocomplete").hide();

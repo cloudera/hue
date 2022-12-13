@@ -910,14 +910,13 @@ class OnePageViewModel {
       // Fix. The '%' character needs to be encoded twice due to a bug in the page library
       // that decodes the url twice. Even when we don't directly call pag() we still need this
       // fix since the user can reload the page which will trigger a call to page().
-      const pageFixedPath = decodedPath.replaceAll('%', urlEncodedPercentage);
-      const encodedPath = encodeURIComponent(pageFixedPath);
-      const href = window.HUE_BASE_URL + appPrefix + pathPrefix + encodedPath;
+      const pageFixedEncodedPath = encodeURIComponent(decodedPath.replaceAll('%', urlEncodedPercentage));
+      const href = window.HUE_BASE_URL + appPrefix + pathPrefix + pageFixedEncodedPath;
 
       // We don't want reload the entire filebrowser when navigating between folders
       // and already on the listdir_components page.
       if (fileBrowserModel) {
-        fileBrowserModel.targetPath(pathPrefix + encodedPath);
+        fileBrowserModel.targetPath(pathPrefix + encodeURIComponent(decodedPath));
         window.history.pushState(null, '', href);      
         fileBrowserModel.retrieveData();
       } else {

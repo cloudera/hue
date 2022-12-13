@@ -91,10 +91,10 @@ else:
             <% label, f_url = breadcrumb_item['label'], breadcrumb_item['url'] %>
             %if label[-1] == '/':
             <li><a href="javascript: void(0)" data-bind="click: ()=> {
-              huePubSub.publish('open.filebrowserlink', { pathPrefix: '/filebrowser/view=', decodedPath: decodeURIComponent(`${f_url | n}`) });}"><span class="divider">${label}</span></a></li>
+              huePubSub.publish('open.filebrowserlink', { pathPrefix: '/filebrowser/view=', decodedPath: `${f_url | n}` });}"><span class="divider">${label}</span></a></li>
             %else:
             <li><a href="javascript: void(0)" data-bind="click: ()=> {
-              huePubSub.publish('open.filebrowserlink', { pathPrefix: '/filebrowser/view=', decodedPath: decodeURIComponent(`${f_url | n}`) });}">${label}</a><span class="divider">/</span></li>
+              huePubSub.publish('open.filebrowserlink', { pathPrefix: '/filebrowser/view=', decodedPath: `${f_url | n}` });}">${label}</a><span class="divider">/</span></li>
             %endif
           % endfor
           </ul>
