@@ -42,8 +42,11 @@ RUN pip3 install --upgrade --no-cache-dir setuptools virtualenv pip && \
   rm -rf /hue/desktop/conf && \
   cp -r /hue/desktop/conf.dist /hue/desktop/conf && \
   cd /hue && \
+  ln -fs /usr/local/bin/pip3.8 /usr/bin/pip3.8 && \
+  ln -fs /usr/local/bin/pip3.8 /usr/bin/pip3 && \
   PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python \
-  PREFIX=/usr/share ROOT=/usr/share/hue PYTHON_VER=python3.8 make apps install && \
+  PREFIX=/usr/share ROOT=/usr/share/hue PYTHON_VER=python3.8 ROOT=/hue \
+  SYS_PYTHON=/usr/bin/python3.8 SYS_PIP=/usr/local/bin/pip3.8 make apps install && \
   chown -R hue /usr/share/hue && \
   npm cache clean --force && \
   pip cache purge && \

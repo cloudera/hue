@@ -250,6 +250,11 @@ class RazClient(object):
       "http_method: {%s}, headers: {%s}, parameters: {%s}, endpoint: {%s}, resource_path: {%s}, content_to_sign: {%s}" %
       (method, headers, allparams, endpoint, resource_path, data)
     )
+
+    # Raz signed request proto call expects data as bytes instead of str for Py3.
+    if sys.version_info[0] > 2 and data is not None and not isinstance(data, bytes):
+      data = data.encode()
+
     raz_req = raz_signer.SignRequestProto(
         endpoint_prefix=self.service_params['endpoint_prefix'],
         service_name=self.service_params['service_name'],
