@@ -86,7 +86,7 @@ class ABFSStat(object):
       permissions = ABFSStat.char_permissions_to_oct_permissions(resp['permissions'])
     except:
       permissions = None
-    return cls(isDir, headers['date'], resp['lastModified'], size, path, resp.get('owner'), resp.get('group'), mode = permissions)
+    return cls(isDir, headers['date'], resp.get('lastModified'), size, path, resp.get('owner'), resp.get('group'), mode = permissions)
 
   @classmethod
   def for_single(cls,resp, path):
