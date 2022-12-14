@@ -98,7 +98,7 @@ class RazS3Connection(SignedUrlS3Connection):
     3. return self._mexe(requests)
   """
 
-  def make_request(self, method, bucket='', key='', headers=None, data=b'',
+  def make_request(self, method, bucket='', key='', headers=None, data='',
                     query_args=None, sender=None, override_num_retries=None,
                     retry_handler=None):
 
@@ -139,7 +139,7 @@ class RazS3Connection(SignedUrlS3Connection):
     url = 'https://%(host)s%(path)s' % {'host': host, 'path': path}
 
     # Do not send the xml data for signing for upload operation
-    xml_data = b'' if query_args and 'uploadId=' in query_args else data
+    xml_data = '' if query_args and 'uploadId=' in query_args else data
 
     raz_headers = self.get_signed_url(action=method, url=url, headers=headers, data=xml_data)
     LOG.debug('Raz returned those headers: %s' % raz_headers)
