@@ -245,6 +245,10 @@ class RazClient(object):
     allparams.extend([raz_signer.StringListStringMapProto(key=key, value=[val]) for key, val in params.items()])
     headers = [raz_signer.StringStringMapProto(key=key, value=val) for key, val in headers.items()]
 
+    # Raz signed request proto call expects data as bytes instead of str for Py3.
+    if sys.version_info[0] > 2 and not isinstance(data, bytes):
+      data = data.encode()
+
     LOG.debug(
       "Preparing sign request with "
       "http_method: {%s}, headers: {%s}, parameters: {%s}, endpoint: {%s}, resource_path: {%s}, content_to_sign: {%s}" %
