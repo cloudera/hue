@@ -252,7 +252,7 @@ class RazClient(object):
     )
 
     # Raz signed request proto call expects data as bytes instead of str for Py3.
-    if sys.version_info[0] > 2 and not isinstance(data, bytes):
+    if sys.version_info[0] > 2 and data is not None and not isinstance(data, bytes):
       data = data.encode()
 
     raz_req = raz_signer.SignRequestProto(
