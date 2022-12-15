@@ -21,6 +21,18 @@
   height: 554px;
 }
 
+.modal__spinner.ant-spin-nested-loading {
+  width: 100%;
+}
+
+.modal__spinner .ant-spin-container {
+  display: flex;
+}
+
+.files-table__spinner.ant-spin-nested-loading {
+  width: 100%;
+}
+
 .file-system__panel.ant-menu {
   height: 554px;
   width: 187px;
