@@ -32,10 +32,6 @@ else:
 <%namespace name="workflow" file="common_workflow.mako" />
 <%namespace name="layout" file="../navigation-bar.mako" />
 
-%if not is_embeddable:
-${ commonheader(_("Workflow Editor"), "Oozie", user, request, "40px") | n,unicode }
-%endif
-
 <div id="oozie_workflowComponents" class="dashboard-container oozie_workflowComponents">
 
 <%def name="buttons()">
@@ -67,13 +63,11 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, request, "40px") | n,unicod
             <i class="fa fa-fw fa-file-o"></i> ${ _('New') }
           </a>
         </li>
-        %if is_embeddable:
-          <li>
-            <a href="javascript: void(0)" data-bind="publish: { 'assist.show.documents': 'oozie-workflow2' }">
-              <svg class="hi hi-fw hi-bigger"><use xlink:href="#hi-documents"></use></svg> ${ _('Workflows') }
-            </a>
-          </li>
-        %endif
+        <li>
+          <a href="javascript: void(0)" data-bind="publish: { 'assist.show.documents': 'oozie-workflow2' }">
+            <svg class="hi hi-fw hi-bigger"><use xlink:href="#hi-documents"></use></svg> ${ _('Workflows') }
+          </a>
+        </li>
         <li class="divider"></li>
         <li data-bind="visible: workflow.id() != null, css: {'disabled': workflow.isDirty()}">
           <a class="pointer" data-bind="click: schedule">
@@ -86,10 +80,8 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, request, "40px") | n,unicod
           </a>
         </li>
         <li>
-          <a ${ not is_embeddable and 'target="_blank"' or ''}
-              title="${ _('Go upload additional files and libraries to the deployment directory') }"
-              data-bind="hueLink: '/filebrowser/view=' + $root.workflow.properties.deployment_dir()"
-            >
+          <a title="${ _('Go upload additional files and libraries to the deployment directory') }"
+             data-bind="hueLink: '/filebrowser/view=' + $root.workflow.properties.deployment_dir()">
             <i class="fa fa-fw fa-folder-open"></i> ${ _('Workspace') }
           </a>
         </li>
@@ -107,7 +99,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, request, "40px") | n,unicod
 </%def>
 <div class="workflow-editor-container">
   <div class="workflow-actions">
-    ${ layout.menubar(section='workflows', is_editor=True, pullright=buttons, is_embeddable=is_embeddable) }
+    ${ layout.menubar(section='workflows', is_editor=True, pullright=buttons) }
 
     <style type="text/css">
       body {
@@ -435,11 +427,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, request, "40px") | n,unicod
       </span>
 
       <div class="row-fluid">
-        %if is_embeddable:
         <div class="span12 margin-top-20">
-        %else:
-        <div class="span12" data-bind="style:{'marginTop' : $root.isEditing() ? '120px': '50px'}">
-        %endif
           <div class="object-name" style="text-align: center">
             <span data-bind="editable: $root.workflow.name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}"></span>
           </div>
@@ -595,14 +583,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, request, "40px") | n,unicod
 
 ${ dashboard.import_layout() }
 
-%if not is_embeddable:
-${ commonshare() | n,unicode }
-%endif
-
 <script src="${ static('desktop/js/select2.full.patched.js') }" type="text/javascript" charset="utf-8"></script>
-% if not is_embeddable:
-<script src="${ static('desktop/js/share2.vm.js') }"></script>
-%endif
 
 ${ dashboard.import_bindings() }
 
@@ -613,7 +594,7 @@ ${ dashboard.import_bindings() }
 ${ utils.submit_popup_event() }
 
 <style type="text/css">
-% if conf.CUSTOM.BANNER_TOP_HTML.get() or not is_embeddable:
+% if conf.CUSTOM.BANNER_TOP_HTML.get():
   .card-toolbar {
     top: 100px!important;
   }
@@ -630,11 +611,7 @@ ${ utils.submit_popup_event() }
   window.workflowEditorViewModel = new WorkflowEditorViewModel(${ layout_json | n,unicode }, ${ workflow_json | n,unicode }, ${ credentials_json | n,unicode }, ${ workflow_properties_json | n,unicode }, ${ subworkflows_json | n,unicode }, ${ can_edit_json | n,unicode });
   ko.applyBindings(window.workflowEditorViewModel, $("#oozie_workflowComponents")[0]);
 
-  % if not is_embeddable:
-  var shareViewModel = initSharing("#documentShareModal");
-  % endif
   shareViewModel.setDocUuid('${ doc_uuid }');
-
 
   % if ENABLE_DOCUMENT_ACTION.get():
   var defaultSection = hueUtils.hueLocalStorage('oozie.draggable_section') || 'documents';
@@ -922,7 +899,3 @@ ${ utils.submit_popup_event() }
   });
 
 </script>
-
-%if not is_embeddable:
-${ commonfooter(request, messages) | n,unicode }
-%endif

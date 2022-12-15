@@ -32,10 +32,6 @@ else:
 <%namespace name="configKoComponents" file="/config_ko_components.mako" />
 <%namespace name="layout" file="layout.mako" />
 
-% if not is_embeddable:
-  ${ commonheader(_('Configurations'), "useradmin", user, request) | n,unicode }
-% endif
-
 ${layout.menubar(section='configurations')}
 
 <script id="app-list" type="text/html">
@@ -126,10 +122,6 @@ ${layout.menubar(section='configurations')}
   <!-- ko template: { if: !loading() && !hasErrors() && !selectedApp(), name: 'app-list' } --><!-- /ko -->
   <!-- ko template: { if: !loading() && !hasErrors() && selectedApp(), name: 'edit-app' } --><!-- /ko -->
 </div>
-
-%if not is_embeddable:
-${ configKoComponents.config() }
-%endif
 
 <script type="text/javascript">
   (function () {
@@ -303,7 +295,3 @@ ${ configKoComponents.config() }
 </script>
 
 ${ layout.commons() }
-
-% if not is_embeddable:
-  ${ commonfooter(request, messages) | n,unicode }
-% endif

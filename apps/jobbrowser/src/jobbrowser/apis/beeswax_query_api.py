@@ -49,7 +49,10 @@ class BeeswaxQueryApi(Api):
   def apps(self, filters):
     filter_map = self._get_filter_map(filters)
     limit = filters.get('pagination', {'limit': 25}).get('limit')
-    jobs = query_history.get_query_history(request_user=filter_map.get('effective_user'), start_date=filter_map.get('date'), start_time=filter_map.get('time'), query_id=filter_map.get('query_id'), status=filter_map.get('status'), limit=limit)
+    jobs = query_history.get_query_history(request_user=filter_map.get('effective_user'),
+                                           start_date=filter_map.get('date'), start_time=filter_map.get('time'),
+                                           query_id=filter_map.get('query_id'), status=filter_map.get('status'),
+                                           limit=limit)
 
     current_time = current_ms_from_utc()
     apps = {
@@ -125,7 +128,7 @@ class BeeswaxQueryApi(Api):
 
     return message;
 
-  def logs(self, appid, app_type, log_name=None, is_embeddable=False):
+  def logs(self, appid, app_type, log_name=None):
     return {'logs': ''}
 
   def profile(self, appid, app_type, app_property, app_filters):
@@ -166,9 +169,9 @@ class BeeswaxQueryApi(Api):
         return lambda app: app[name] == value
 
       for key, name in list(filter_names.items()):
-          text_filter = re.search(r"\s*("+key+")\s*:([^ ]+)", filters.get("text"))
-          if text_filter and text_filter.group(1) == key:
-            filter_map[name] = text_filter.group(2).strip()
+        text_filter = re.search(r"\s*("+key+")\s*:([^ ]+)", filters.get("text"))
+        if text_filter and text_filter.group(1) == key:
+          filter_map[name] = text_filter.group(2).strip()
 
     if filters.get("time"):
       time_filter = filters.get("time")

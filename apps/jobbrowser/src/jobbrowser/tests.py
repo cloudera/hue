@@ -1753,36 +1753,37 @@ def test_make_log_links():
 
   # FileBrowser
   assert_equal(
-      """<a href="/filebrowser/view=/user/romain/tmp">hdfs://localhost:8020/user/romain/tmp</a>  &lt;dir&gt;""",
+      """<a href="/hue/filebrowser/view=/user/romain/tmp">hdfs://localhost:8020/user/romain/tmp</a>  &lt;dir&gt;""",
       LinkJobLogs._make_links('hdfs://localhost:8020/user/romain/tmp  <dir>')
   )
   assert_equal(
-      """<a href="/filebrowser/view=/user/romain/tmp">hdfs://localhost:8020/user/romain/tmp</a>&lt;dir&gt;""",
+      """<a href="/hue/filebrowser/view=/user/romain/tmp">hdfs://localhost:8020/user/romain/tmp</a>&lt;dir&gt;""",
       LinkJobLogs._make_links('hdfs://localhost:8020/user/romain/tmp<dir>')
   )
   assert_equal(
-      """output: <a href="/filebrowser/view=/user/romain/tmp">/user/romain/tmp</a>  &lt;dir&gt;""",
+      """output: <a href="/hue/filebrowser/view=/user/romain/tmp">/user/romain/tmp</a>  &lt;dir&gt;""",
       LinkJobLogs._make_links('output: /user/romain/tmp  <dir>')
   )
   assert_equal(
-      ('Successfully read 3760 records (112648 bytes) from: &quot;<a href="/filebrowser/view=/user/hue/pig/examples/data/midsummer.txt">'
+      ('Successfully read 3760 records (112648 bytes) from: &quot;'
+        '<a href="/hue/filebrowser/view=/user/hue/pig/examples/data/midsummer.txt">'
         '/user/hue/pig/examples/data/midsummer.txt</a>&quot;'),
       LinkJobLogs._make_links('Successfully read 3760 records (112648 bytes) from: "/user/hue/pig/examples/data/midsummer.txt"')
   )
   assert_equal(
-      'data,upper_case  MAP_ONLY  <a href="/filebrowser/view=/user/romain/out/fffff">hdfs://localhost:8020/user/romain/out/fffff</a>,',
+      'data,upper_case  MAP_ONLY  <a href="/hue/filebrowser/view=/user/romain/out/fffff">hdfs://localhost:8020/user/romain/out/fffff</a>,',
       LinkJobLogs._make_links('data,upper_case  MAP_ONLY  hdfs://localhost:8020/user/romain/out/fffff,')
   )
   assert_equal(
-      'MAP_ONLY  <a href="/filebrowser/view=/user/romain/out/fffff">hdfs://localhost:8020/user/romain/out/fffff</a>\n2013',
+      'MAP_ONLY  <a href="/hue/filebrowser/view=/user/romain/out/fffff">hdfs://localhost:8020/user/romain/out/fffff</a>\n2013',
       LinkJobLogs._make_links('MAP_ONLY  hdfs://localhost:8020/user/romain/out/fffff\n2013')
   )
   assert_equal(
-      ' <a href="/filebrowser/view=/jobs.tsv">/jobs.tsv</a> ',
+      ' <a href="/hue/filebrowser/view=/jobs.tsv">/jobs.tsv</a> ',
       LinkJobLogs._make_links(' /jobs.tsv ')
   )
   assert_equal(
-      '<a href="/filebrowser/view=/user/romain/job_pos_2012.tsv">hdfs://localhost:8020/user/romain/job_pos_2012.tsv</a>',
+      '<a href="/hue/filebrowser/view=/user/romain/job_pos_2012.tsv">hdfs://localhost:8020/user/romain/job_pos_2012.tsv</a>',
       LinkJobLogs._make_links('hdfs://localhost:8020/user/romain/job_pos_2012.tsv')
   )
 

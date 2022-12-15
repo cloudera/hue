@@ -27,10 +27,6 @@ else:
   from django.utils.translation import ugettext as _
 %>
 
-%if not is_embeddable:
-${ commonheader(title, "", user, request, "40px") | n,unicode }
-%endif
-
 <div class="container-fluid">
   <div class="row-fluid">
     <div class="span12">
@@ -96,7 +92,3 @@ ${ commonheader(title, "", user, request, "40px") | n,unicode }
     $(selector).slideToggle(500);
   }
 </script>
-
-%if not is_embeddable:
-${ commonfooter(None, messages) | n,unicode }
-%endif

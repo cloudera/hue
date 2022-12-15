@@ -30,7 +30,7 @@ else:
 
 <%namespace name="dashboard" file="common_dashboard.mako" />
 
-<%def name="page_structure(is_mobile=False, is_embeddable=False, is_report=False)">
+<%def name="page_structure(is_mobile=False, is_report=False)">
 
 <script type="text/javascript">
   SLIDER_LABELS = {
@@ -214,13 +214,6 @@ else:
             </a>
           </li>
           <!-- /ko -->
-          %if not is_embeddable:
-            <li>
-              <a class="pointer" data-bind="click: function(){ hueUtils.goFullScreen(); $root.isEditing(false); $root.isPlayerMode(true); }">
-                <i class="fa fa-fw fa-expand"></i> ${ _('Player mode') }
-              </a>
-            </li>
-          %endif
 
           <li data-bind="visible: columns().length != 0">
             <a class="pointer" data-toggle="modal" data-target="#settingsDemiModal">
@@ -3073,9 +3066,6 @@ ${ dashboard.layout_skeleton(suffix='search') }
 
 ${ dashboard.import_layout(True) }
 
-% if not is_embeddable:
-<script src="${ static('desktop/js/share2.vm.js') }"></script>
-% endif
 <script src="${ static('dashboard/js/search.utils.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/jquery.textsqueezer.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/shortcut.js') }" type="text/javascript" charset="utf-8"></script>
@@ -3088,7 +3078,7 @@ ${ dashboard.import_layout(True) }
 ${ dashboard.import_bindings() }
 
 <style type="text/css">
-% if conf.CUSTOM.BANNER_TOP_HTML.get() or not is_embeddable:
+% if conf.CUSTOM.BANNER_TOP_HTML.get():
   .search-bar {
     top: 58px!important;
   }

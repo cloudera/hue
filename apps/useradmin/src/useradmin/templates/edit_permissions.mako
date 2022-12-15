@@ -30,10 +30,6 @@ else:
 
 <%namespace name="layout" file="layout.mako" />
 
-% if not is_embeddable:
-  ${ commonheader(_('Permissions'), "useradmin", user, request) | n,unicode }
-% endif
-
 ${ layout.menubar(section='permissions') }
 
 <%def name="render_field(field)">
@@ -72,9 +68,6 @@ ${ layout.menubar(section='permissions') }
 
       <div class="form-actions">
         <input type="submit" class="btn btn-primary disable-feedback" value="${_('Update permission')}"/>
-        % if is_embeddable:
-          <input type="hidden" value="true" name="is_embeddable" />
-        % endif
         <a href="/useradmin/permissions" class="btn">${_('Cancel')}</a>
       </div>
     </form>
@@ -91,7 +84,6 @@ ${ layout.menubar(section='permissions') }
       width: 600,
       height: 500
     });
-    % if is_embeddable:
     $editPermissionsComponents.find('#editForm').ajaxForm({
       dataType:  'json',
       success: function(data) {
@@ -104,12 +96,7 @@ ${ layout.menubar(section='permissions') }
         }
       }
     });
-    % endif
   });
 </script>
 
 ${layout.commons()}
-
-%if not is_embeddable:
-${ commonfooter(request, messages) | n,unicode }
-%endif

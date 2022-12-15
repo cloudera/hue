@@ -388,25 +388,20 @@ else:
 
 
 <%def name="import_modals()">
-<div id="chooseWorkflowDemiModal" class="${ is_embeddable and 'modal' or 'demi-modal' } fade" data-backdrop="${ is_embeddable and 'true' or 'false' }">
-  %if is_embeddable:
+<div id="chooseWorkflowDemiModal" class="modal fade" data-backdrop="true">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
     <h2 id="myModalLabel" class="modal-title">${_('Choose a workflow')}</h2>
   </div>
-  %endif
 
   <div class="modal-body">
-    %if not is_embeddable:
-    <a href="javascript: void(0)" data-dismiss="modal" class="pull-right"><i class="fa fa-times"></i></a>
-    %endif
     <div style="float: left; margin-right: 10px;text-align: center">
       <input type="text" data-bind="clearable: $root.workflowModalFilter, valueUpdate:'afterkeydown'" placeholder="${_('Filter workflows')}" class="input" style="float: left" /><br/>
     </div>
     <div>
       <ul data-bind="foreach: $root.filteredModalWorkflows().sort(function (l, r) { return l.name() > r.name() ? 1 : -1 }), visible: $root.filteredModalWorkflows().length > 0"
           class="unstyled inline fields-chooser" style="height: 100px; overflow-y: auto">
-        <li style="${ not is_embeddable and 'line-height: 30px' or ''}">
+        <li>
           <span class="badge badge-info" data-bind="click: selectWorkflow">
             <span data-bind="text: name(), attr: {'title': uuid()}"></span>
           </span>
@@ -420,9 +415,6 @@ else:
       </div>
     </div>
   </div>
-  %if not is_embeddable:
-  <div><a class="pointer demi-modal-chevron" data-dismiss="modal"><i class="fa fa-chevron-up"></i></a></div>
-  %endif
 </div>
 
 

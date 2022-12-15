@@ -28,7 +28,7 @@
 <%namespace name="utils" file="utils.inc.mako" />
 
 
-<%def name="menubar(section='', dashboard=False, is_editor=False, pullright=None, is_embeddable=False)">
+<%def name="menubar(section='', dashboard=False, is_editor=False, pullright=None)">
     <div class="navbar hue-title-bar">
       <div class="navbar-inner">
         <div class="container-fluid">
@@ -78,7 +78,7 @@
                   <img src="${ static('oozie/art/icon_oozie_dashboard_48.png') }" class="app-icon" alt="${ _('Oozie dashboard icon') }" /> ${ _('Oozie Dashboard') }
                 </a>
                 % else:
-                <a title="${ _('Switch to the dashboard') }" href="${ is_embeddable and '/hue/jobbrowser/#!workflows' or getURL(section, dashboard, ENABLE_V2.get())}">
+                <a title="${ _('Switch to the dashboard') }" href="/hue/jobbrowser/#!workflows">
                   <svg class="svg-app-icon"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#hi-oozie"></use></svg> ${ _('Oozie Editor') }
                   <!-- ko component: { name: 'hue-favorite-app', params: { app: 'scheduler', interpreter: '${ getInterpreter(section) }' }} --><!-- /ko -->
                 </a>
@@ -90,18 +90,6 @@
                 <li class="${utils.is_selected(section, 'bundles')}"><a href="${url('oozie:list_oozie_bundles')}">${ _('Bundles') }</a></li>
                 <li class="${utils.is_selected(section, 'sla')}"><a href="${url('oozie:list_oozie_sla')}">${ _('SLA') }</a></li>
                 <li class="${utils.is_selected(section, 'oozie')}"><a href="${url('oozie:list_oozie_info')}">${ _('Oozie') }</a></li>
-              % else:
-                % if not is_embeddable:
-                  % if is_editor:
-                    <li class="${utils.is_selected(section, 'workflows')}"><a href="${url('oozie:list_editor_workflows')}">${ _('Workflows') }</a></li>
-                    <li class="${utils.is_selected(section, 'coordinators')}"><a href="${url('oozie:list_editor_coordinators')}">${ _('Coordinators') }</a></li>
-                    <li class="${utils.is_selected(section, 'bundles')}"><a href="${url('oozie:list_editor_bundles')}">${ _('Bundles') }</a></li>
-                  % else:
-                    <li class="${utils.is_selected(section, 'workflows')}"><a href="${url('oozie:list_workflows')}">${ _('Workflows') }</a></li>
-                    <li class="${utils.is_selected(section, 'coordinators')}"><a href="${url('oozie:list_coordinators')}">${ _('Coordinators') }</a></li>
-                    <li class="${utils.is_selected(section, 'bundles')}"><a href="${url('oozie:list_bundles')}">${ _('Bundles') }</a></li>
-                  % endif
-                % endif
               % endif
             </ul>
           </div>

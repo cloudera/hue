@@ -37,11 +37,6 @@
 %>
 <%namespace name="fb_components" file="fb_components.mako" />
 
-%if not is_embeddable:
-${ commonheader(_('%(filename)s - File Viewer') % dict(filename=truncate(filename)), 'filebrowser', user, request) | n,unicode }
-%endif
-
-
 ${ fb_components.menubar() }
 
 <div id="fileviewerComponents" class="container-fluid">
@@ -373,7 +368,7 @@ ${ fb_components.menubar() }
       self.isViewing(false);
       self.isLoading(true);
       $.ajax({
-        url: '${ edit_url }' + '?is_embeddable=true',
+        url: '${ edit_url }',
         beforeSend:function (xhr) {
           xhr.setRequestHeader('X-Requested-With', 'Hue');
         },
@@ -502,12 +497,6 @@ ${ fb_components.menubar() }
   $(document).ready(function () {
     ko.applyBindings(viewModel, $('#fileviewerComponents')[0]);
 
-    % if not is_embeddable:
-    $(document).ajaxError(function () {
-      $.jHueNotify.error("${_('There was an unexpected server error.')}");
-    });
-    % endif
-
     setTimeout(function () {
       resizeText();
       getContent();
@@ -527,7 +516,3 @@ ${ fb_components.menubar() }
   });
 }());
 </script>
-
-%if not is_embeddable:
-${ commonfooter(request, messages) | n,unicode }
-%endif

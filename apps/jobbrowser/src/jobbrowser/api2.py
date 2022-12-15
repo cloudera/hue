@@ -141,9 +141,7 @@ def logs(request):
   app_type = json.loads(request.POST.get('type'))
   log_name = json.loads(request.POST.get('name'))
 
-  response['logs'] = get_api(request.user, interface, cluster=cluster).logs(
-      app_id, app_type, log_name, json.loads(request.GET.get('is_embeddable', 'false').lower())
-  )
+  response['logs'] = get_api(request.user, interface, cluster=cluster).logs(app_id, app_type, log_name)
   response['status'] = 0
 
   return JsonResponse(response)

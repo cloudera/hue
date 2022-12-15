@@ -61,7 +61,8 @@ class DataWarehouseClusterApi(Api):
         'user': app['clusterName'].split('-', 1)[0],
         'progress': app.get('progress', 100),
         'queue': 'group',
-        'duration': ((datetime.now() - parser.parse(app['creationDate']).replace(tzinfo=None)).seconds * 1000) if app['creationDate'] else 0,
+        'duration': ((datetime.now() - parser.parse(app['creationDate']).replace(tzinfo=None)).seconds * 1000) if app[
+          'creationDate'] else 0,
         'submitted': app['creationDate'],
         'canWrite': True
       } for app in sorted(jobs['clusters'], key=lambda a: a['creationDate'], reverse=True)],
@@ -107,7 +108,7 @@ class DataWarehouseClusterApi(Api):
     return message;
 
 
-  def logs(self, appid, app_type, log_name=None, is_embeddable=False):
+  def logs(self, appid, app_type, log_name=None):
     return {'logs': ''}
 
 

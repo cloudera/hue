@@ -88,7 +88,7 @@ class HiveQueryApi(Api):
 
     job.execute_and_wait(MockRequest(user=self.user))
 
-  def logs(self, appid, app_type, log_name=None, is_embeddable=False):
+  def logs(self, appid, app_type, log_name=None):
     return {'logs': ''}
 
   def profile(self, appid, app_type, app_property, app_filters):

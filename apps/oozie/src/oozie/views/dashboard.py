@@ -652,7 +652,6 @@ def list_oozie_info(request):
     'metrics': metrics,
     'configuration': configuration,
     'oozie_status': oozie_status,
-    'is_embeddable': request.GET.get('is_embeddable', False),
   })
 
 
@@ -695,7 +694,6 @@ def list_oozie_sla(request):
   return render('dashboard/list_oozie_sla.mako', request, {
     'oozie_slas': oozie_slas,
     'show_slas_hint': show_slas_hint,
-    'is_embeddable': request.GET.get('is_embeddable', False),
   })
 
 

@@ -359,7 +359,6 @@ class MetastoreTable {
       $.post('/tables/drop/' + this.database.catalogEntry.name, {
         table_selection: ko.mapping.toJSON([this.database.catalogEntry.name]),
         skip_trash: 'off',
-        is_embeddable: true,
         cluster: JSON.stringify(this.database.catalogEntry.compute)
       }).done(resp => {
         if (resp.history_uuid) {

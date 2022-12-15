@@ -115,7 +115,6 @@ def get_job(request, job_id):
 
 def apps(request):
   return render('job_browser.mako', request, {
-    'is_embeddable': request.GET.get('is_embeddable', False),
     'is_mini': request.GET.get('is_mini', False),
     'hiveserver2_impersonation_enabled': hiveserver2_impersonation_enabled()
   })
@@ -353,7 +352,7 @@ def job_attempt_logs(request, job, attempt_index=0):
 
 
 @check_job_permission
-def job_attempt_logs_json(request, job, attempt_index=0, name='syslog', offset=LOG_OFFSET_BYTES, is_embeddable=False):
+def job_attempt_logs_json(request, job, attempt_index=0, name='syslog', offset=LOG_OFFSET_BYTES):
   """For async log retrieval as Yarn servers are very slow"""
   log_link = None
   response = {'status': -1}
@@ -399,7 +398,7 @@ def job_attempt_logs_json(request, job, attempt_index=0, name='syslog', offset=L
       log = html.fromstring(api_resp, parser=html.HTMLParser()).xpath('/html/body/table/tbody/tr/td[2]')[0].text_content()
 
       response['status'] = 0
-      response['log'] = LinkJobLogs._make_hdfs_links(log, is_embeddable)
+      response['log'] = LinkJobLogs._make_hdfs_links(log)
     except Exception as e:
       response['log'] = _('Failed to retrieve log: %s' % e)
       try:

@@ -31,10 +31,6 @@ else:
 
 <%namespace name="layout" file="layout.mako" />
 
-% if not is_embeddable:
-  ${ commonheader(_('Groups'), "useradmin", user, request) | n,unicode }
-% endif
-
 ${ layout.menubar(section='groups') }
 
 <%def name="render_field(field)">
@@ -90,9 +86,6 @@ ${ layout.menubar(section='groups') }
               <input type="submit" class="btn btn-primary disable-feedback" value="${_('Add group')}"/>
           % endif
         % endif
-        % if is_embeddable:
-          <input type="hidden" value="true" name="is_embeddable" />
-        % endif
         <a href="/useradmin/groups" class="btn">${_('Cancel')}</a>
       </div>
     </form>
@@ -117,7 +110,6 @@ ${ layout.menubar(section='groups') }
       width: 600,
       height: 240
     });
-    % if is_embeddable:
     $editGroupComponents.find('#editForm').ajaxForm({
       dataType:  'json',
       success: function(data) {
@@ -133,12 +125,7 @@ ${ layout.menubar(section='groups') }
         $.jHueNotify.error(data.responseJSON['message']);
       }
     });
-    % endif
   });
 </script>
 
 ${ layout.commons() }
-
-% if not is_embeddable:
-  ${ commonfooter(request, messages) | n,unicode }
-% endif

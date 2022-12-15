@@ -23,14 +23,7 @@
     from django.utils.translation import ugettext as _
 %>
 
-<%namespace name="layout" file="../navigation-bar.mako" />
 <%namespace name="utils" file="../utils.inc.mako" />
-
-%if not is_embeddable:
-${ commonheader(_("SLA"), "sla", user, request) | n,unicode }
-${ layout.menubar(section='sla', dashboard=True) }
-%endif
-
 
 <style type="text/css">
   .label-with-margin {
@@ -326,7 +319,3 @@ ${ utils.decorate_datetime_fields() }
     });
   });
 </script>
-
-%if not is_embeddable:
-${ commonfooter(request, messages) | n,unicode }
-%endif

@@ -26,10 +26,6 @@
 
 <%namespace name="actionbar" file="actionbar.mako" />
 
-%if not is_embeddable:
-${ commonheader(None, "sqoop", user, request) | n,unicode }
-%endif
-
 <div id="sqoopComponents">
   <div data-bind="if: !isLoading(), css: {'hide': isLoading}" id="top-bar-container" class="hide">
     <div class="top-bar" data-bind="visible:shownSection() == 'jobs-list'">
@@ -695,7 +691,7 @@ ${ commonheader(None, "sqoop", user, request) | n,unicode }
 <link href="${ static('sqoop/css/sqoop.css') }" rel="stylesheet">
 
 <style type="text/css">
-% if conf.CUSTOM.BANNER_TOP_HTML.get() or not is_embeddable:
+% if conf.CUSTOM.BANNER_TOP_HTML.get():
   #sqoopComponents .top-bar {
     top: 58px!important;
   }
@@ -1306,7 +1302,3 @@ $(document).ready(function () {
 });
 
 </script>
-
-%if not is_embeddable:
-${ commonfooter(request, messages) | n,unicode }
-%endif

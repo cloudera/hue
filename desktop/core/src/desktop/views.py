@@ -171,7 +171,7 @@ def home(request):
   })
 
 
-def home2(request, is_embeddable=False):
+def home2(request):
   apps = appmanager.get_apps_dict(request.user)
 
   return render('home2.mako', request, {
@@ -180,7 +180,7 @@ def home2(request, is_embeddable=False):
   })
 
 
-def catalog(request, is_embeddable=False):
+def catalog(request):
   apps = appmanager.get_apps_dict(request.user)
 
   return render('catalog.mako', request, {
@@ -246,12 +246,14 @@ def log_view(request):
         dict(
           log=[l for l in h.buf],
           query=request.GET.get("q", ""),
-          hostname=hostname, is_embeddable=request.GET.get('is_embeddable', False)
+          hostname=hostname
         )
       )
 
   return render('logs.mako', request, dict(
-      log=[_("No logs found!")], query='', hostname=hostname, is_embeddable=request.GET.get('is_embeddable', False)
+      log=[_("No logs found!")],
+      query='',
+      hostname=hostname
     )
   )
 
@@ -293,7 +295,7 @@ def download_log_view(request):
         LOG.exception("Couldn't construct zip file to write logs")
         return log_view(request)
 
-  return django_render(request, "logs.mako", dict(log=[_("No logs found.")], is_embeddable=request.GET.get('is_embeddable', False)))
+  return django_render(request, "logs.mako", dict(log=[_("No logs found.")]))
 
 
 def bootstrap(request):

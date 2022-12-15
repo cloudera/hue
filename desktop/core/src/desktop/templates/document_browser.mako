@@ -27,7 +27,7 @@ else:
   from django.utils.translation import ugettext as _
 %>
 
-<%def name="docBrowser(is_embeddable=False)">
+<%def name="docBrowser()">
 
   <script src="${ static('desktop/ext/js/jquery/plugins/jquery.hotkeys.js') }"></script>
   <link href="${ static('desktop/css/home.css') }" rel="stylesheet">
@@ -90,11 +90,7 @@ else:
                       % if 'beeswax' in apps:
                         <li>
                           <a title="${_('Hive Query')}"
-                          % if is_embeddable:
                             data-bind="click: function() { huePubSub.publish('open.editor.new.query', {type: 'hive', 'directoryUuid': getDirectory()}); }" href="javascript:void(0);"
-                          % else:
-                            data-bind="hueLink: addDirectoryParamToUrl('${ url('notebook:editor') }?type=hive')"
-                          % endif
                           >
                             <!-- ko template: { name: 'app-icon-template', data: { icon: 'hive' } } --><!-- /ko --> ${_('Hive Query')}
                           </a>
@@ -103,11 +99,7 @@ else:
                       % if 'impala' in apps:
                         <li>
                           <a title="${_('Impala Query')}"
-                          % if is_embeddable:
                             data-bind="click: function() { huePubSub.publish('open.editor.new.query', {type: 'impala', 'directoryUuid': getDirectory()}); }" href="javascript:void(0);"
-                          % else:
-                            data-bind="hueLink: addDirectoryParamToUrl('${ url('notebook:editor') }?type=impala')"
-                          % endif
                           >
                             <!-- ko template: { name: 'app-icon-template', data: { icon: 'impala' } } --><!-- /ko --> ${_('Impala Query')}
                           </a>
@@ -133,17 +125,17 @@ else:
                       % if 'oozie' in apps:
                         <li>
                           <a title="${_('Oozie Workflow')}" data-bind="hueLink: addDirectoryParamToUrl('${ url('oozie:new_workflow') }')">
-                            <!-- ko template: { name: 'app-icon-template', data: { icon: 'oozie-workflow' } } --><!-- /ko --> ${_('Workflow') if is_embeddable else _('Oozie Workflow')}
+                            <!-- ko template: { name: 'app-icon-template', data: { icon: 'oozie-workflow' } } --><!-- /ko --> ${_('Workflow')}
                           </a>
                         </li>
                         <li>
                           <a title="${_('Oozie Schedule')}" data-bind="hueLink: addDirectoryParamToUrl('${ url('oozie:new_coordinator') }')">
-                            <!-- ko template: { name: 'app-icon-template', data: { icon: 'oozie-coordinator' } } --><!-- /ko --> ${_('Schedule') if is_embeddable else _('Oozie Coordinator')}
+                            <!-- ko template: { name: 'app-icon-template', data: { icon: 'oozie-coordinator' } } --><!-- /ko --> ${_('Schedule')}
                           </a>
                         </li>
                         <li>
                           <a title="${_('Oozie Bundle')}" data-bind="hueLink: addDirectoryParamToUrl('${ url('oozie:new_bundle') }')">
-                            <!-- ko template: { name: 'app-icon-template', data: { icon: 'oozie-bundle' } } --><!-- /ko --> ${_('Bundle') if is_embeddable else _('Oozie Bundle')}
+                            <!-- ko template: { name: 'app-icon-template', data: { icon: 'oozie-bundle' } } --><!-- /ko --> ${_('Bundle')}
                           </a>
                         </li>
                       % endif

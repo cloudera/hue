@@ -16,10 +16,6 @@
 ${'<'}%!from desktop.views import commonheader, commonfooter %>
 ${'<'}%namespace name="shared" file="shared_components.mako" />
 
-${'%'}if not is_embeddable:
-${'$'}{commonheader("${" ".join(word.capitalize() for word in app_name.split("_"))}", "${app_name}", user, request) | n,unicode}
-${'%'}endif
-
 ${'$'}{shared.menubar(section='mytab')}
 
 ${'#'}# Use double hashes for a mako template comment
@@ -34,6 +30,3 @@ ${'#'}# Main body
     </div>
   </div>
 </div>
-${'%'}if not is_embeddable:
-${'$'}{commonfooter(request, messages) | n,unicode}
-${'%'}endif

@@ -43,7 +43,6 @@ def admin_wizard(request):
       'version': hue_version(),
       'apps': dict([(app.name, app) for app in apps]),
       'app_names': app_names,
-      'is_embeddable': request.GET.get('is_embeddable', False),
       'collect_usage': collect_usage(),
   })
 

@@ -31,10 +31,6 @@ else:
 <%namespace name="actionbar" file="actionbar.mako" />
 <%namespace name="layout" file="layout.mako" />
 
-%if not is_embeddable:
-${ commonheader(_('Users'), "useradmin", user, request) | n,unicode }
-%endif
-
 ${layout.menubar(section='users')}
 
 <div id="usersComponents" class="useradmin container-fluid">
@@ -64,7 +60,7 @@ ${layout.menubar(section='users')}
               <i class="fa fa-plus-circle"></i> ${_('Add/Sync LDAP user')}
             </a>
             <a href="javascript:void(0)" class="btn confirmationModal"
-                data-confirmation-url="${ url('useradmin:useradmin_views_sync_ldap_users_groups') }${ is_embeddable and '?is_embeddable=true' or ''}">
+                data-confirmation-url="${ url('useradmin:useradmin_views_sync_ldap_users_groups') }">
                 <i class="fa fa-refresh"></i> ${_('Sync LDAP users/groups')}
             </a>
           % else:
@@ -156,9 +152,6 @@ ${layout.menubar(section='users')}
   <div class="modal hide fade delete-user">
     <form action="${ url('useradmin:useradmin.views.delete_user') }" method="POST">
       ${ csrf_token(request) | n,unicode }
-      % if is_embeddable:
-        <input type="hidden" value="true" name="is_embeddable" />
-      % endif
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
         <h2 class="modal-title">${ _("Are you sure you want to deactivate the user selection?") }</h2>
@@ -235,7 +228,6 @@ ${layout.menubar(section='users')}
       placement: 'right'
     });
 
-    % if is_embeddable:
     $usersComponents.find('.delete-user form').ajaxForm({
       dataType: 'json',
       success: function(data) {
@@ -255,7 +247,6 @@ ${layout.menubar(section='users')}
         }
       }
     });
-    % endif
 
     $usersComponents.find(".dataTables_wrapper").css("min-height", "0");
     $usersComponents.find(".dataTables_filter").hide();
@@ -270,7 +261,6 @@ ${layout.menubar(section='users')}
         dataType: "html",
         success: function (data) {
           $usersComponents.find(".sync-ldap").html(data);
-          % if is_embeddable:
           $usersComponents.find('.sync-ldap form').ajaxForm({
             dataType:  'json',
             beforeSend: function (xhr) {
@@ -294,7 +284,6 @@ ${layout.menubar(section='users')}
               huePubSub.publish('open.link', data.url);
             }
           });
-          % endif
           $usersComponents.find(".sync-ldap").modal("show");
         }
       });
@@ -346,7 +335,3 @@ ${layout.menubar(section='users')}
 </script>
 
 ${ layout.commons() }
-
-% if not is_embeddable:
-  ${ commonfooter(request, messages) | n,unicode }
-% endif

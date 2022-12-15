@@ -100,7 +100,7 @@ class BundleApi(Api):
     return _manage_oozie_job(self.user, action, app_ids)
 
 
-  def logs(self, appid, app_type, log_name=None, is_embeddable=False):
+  def logs(self, appid, app_type, log_name=None):
     request = MockDjangoRequest(self.user)
     data = get_oozie_job_log(request, job_id=appid)
 

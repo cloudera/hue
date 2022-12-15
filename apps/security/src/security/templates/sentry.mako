@@ -27,11 +27,7 @@ else:
 <%namespace name="layout" file="layout.mako" />
 <%namespace name="tree" file="common_tree.mako" />
 
-%if not is_embeddable:
-${ commonheader(_('Hadoop Security'), "security", user, request) | n,unicode }
-%endif
-
-${ layout.menubar(section=component, is_embeddable=is_embeddable) }
+${ layout.menubar(section=component) }
 
 <span id="securityComponents" class="security-components">
 
@@ -849,7 +845,3 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
   })();
 </script>
 </span>
-
-%if not is_embeddable:
-${ commonfooter(request, messages) | n,unicode }
-%endif

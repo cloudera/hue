@@ -24,9 +24,6 @@ else:
 %>
 
 <%namespace name="layout" file="layout.mako" />
-%if not is_embeddable:
-${ commonheader(_('Hue Users'), "useradmin", user, request) | n,unicode }
-%endif
 
 ${ layout.menubar(section='users') }
 
@@ -37,9 +34,6 @@ ${ layout.menubar(section='users') }
 
     <form id="syncForm" action="${ url('useradmin:useradmin.views.add_ldap_users') }" method="POST" class="form form-horizontal" autocomplete="off">
       ${ csrf_token(request) | n,unicode }
-      % if is_embeddable:
-        <input type="hidden" value="true" name="is_embeddable" />
-      % endif
       <fieldset>
         % for field in form.fields:
           % if form[field].is_hidden:
@@ -72,7 +66,6 @@ ${ layout.menubar(section='users') }
       width: 618,
       height: 240
     });
-    %if is_embeddable:
     $addLdapUsersComponents.find('#syncForm').ajaxForm({
       dataType:  'json',
       success: function(data) {
@@ -88,12 +81,7 @@ ${ layout.menubar(section='users') }
         $.jHueNotify.error(data.responseJSON['message']);
       }
     });
-    %endif
   });
 </script>
 
 ${layout.commons()}
-
-%if not is_embeddable:
-${ commonfooter(request, messages) | n,unicode }
-%endif

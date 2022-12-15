@@ -34,13 +34,6 @@
 
 <%namespace name="actionbar" file="actionbar.mako" />
 
-% if not is_embeddable:
-${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
-
-<link rel="stylesheet" href="${ static('notebook/css/notebook.css') }">
-<link rel="stylesheet" href="${ static('notebook/css/notebook-layout.css') }">
-% endif
-
 <link rel="stylesheet" href="${ static('indexer/css/importer.css') }" type="text/css">
 
 <style type="text/css">
@@ -85,38 +78,10 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
   </div>
 </div>
 
-% if not is_embeddable:
-<a title="${_('Toggle Assist')}" class="pointer show-assist" data-bind="visible: !$root.isLeftPanelVisible() && $root.assistAvailable(), click: function() { $root.isLeftPanelVisible(true); }">
-  <i class="fa fa-chevron-right"></i>
-</a>
-% endif
-
 <div class="main-content">
   <div class="vertical-full container-fluid" data-bind="style: { 'padding-left' : $root.isLeftPanelVisible() ? '0' : '20px' }">
     <div class="vertical-full">
       <div class="vertical-full row-fluid panel-container">
-        %if not is_embeddable:
-        <div class="assist-container left-panel" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable()">
-          <a title="${_('Toggle Assist')}" class="pointer hide-assist" data-bind="click: function() { $root.isLeftPanelVisible(false) }">
-            <i class="fa fa-chevron-left"></i>
-          </a>
-          <div class="assist" data-bind="component: {
-              name: 'assist-panel',
-              params: {
-                user: '${user.username}',
-                onlySql: false,
-                sql: {
-                  navigationSettings: {
-                    openItem: false,
-                    showStats: true
-                  }
-                },
-                visibleAssistPanels: ['sql', 'hdfs', 'documents']
-              }
-            }"></div>
-        </div>
-        <div class="resizer" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable(), splitDraggable : { appName: 'notebook', leftPanelVisible: $root.isLeftPanelVisible }"><div class="resize-bar">&nbsp;</div></div>
-        %endif
         <div class="content-panel importer-droppable">
           <div class="content-panel-inner">
           <!-- ko template: 'create-index-wizard' --><!-- /ko -->
@@ -1489,11 +1454,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
 
 
 <script type="text/javascript">
-  % if is_embeddable:
   var MAIN_SCROLLABLE = '.page-content';
-  % else:
-  var MAIN_SCROLLABLE = '.content-panel';
-  % endif
 
   (function () {
     if (ko.options) {
@@ -2964,110 +2925,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
         $(".jHueNotify").remove();
 
         self.indexingStarted(true);
-% if not is_embeddable:
-        viewModel.isLoading(true);
-        self.isIndexing(true);
 
-        $.post("${ url('indexer:importer_submit') }", {
-          "source": ko.mapping.toJSON(self.source),
-          "destination": ko.mapping.toJSON(self.destination)
-        }, function (resp) {
-          if (resp.status !== 0) {
-            $(document).trigger("error", resp.message);
-            self.indexingStarted(false);
-            self.isIndexing(false);
-          } else if (resp.on_success_url) {
-            $.jHueNotify.info("${ _('Creation success.') }");
-            if (resp.pubSubUrl) {
-              huePubSub.publish(notebook.pubSubUrl);
-            }
-            huePubSub.publish('open.link', resp.on_success_url);
-          } else {
-            self.showCreate(true);
-            self.editorId(resp.history_id);
-            self.jobId(resp.handle.id);
-            $('#importerNotebook').html($('#importerNotebook-progress').html());
-
-            self.editorVM = new window.NotebookViewModel(resp.history_uuid, '', {
-              user: '${ user.username }',
-              userId: ${ user.id },
-              languages: [{name: "Java", type: "java"}, {name: "Hive SQL", type: "hive"}], // TODO reuse
-              snippetViewSettings: {
-                java : {
-                  snippetIcon: 'fa-file-archive-o '
-                },
-                hive: {
-                  placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
-                  aceMode: 'ace/mode/hive',
-                  snippetImage: '${ static("beeswax/art/icon_beeswax_48.png") }',
-                  sqlDialect: true
-                },
-                impala: {
-                  placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
-                  aceMode: 'ace/mode/impala',
-                  snippetImage: '${ static("impala/art/icon_impala_48.png") }',
-                  sqlDialect: true
-                },
-                sqoop1: {
-                  placeHolder: '${ _("Example: import  --connect jdbc:hsqldb:file:db.hsqldb --table TT --target-dir hdfs://localhost:8020/user/foo -m 1") }',
-                  snippetImage: '${ static("sqoop/art/icon_sqoop_48.png") }'
-                }
-              }
-            });
-            self.editorVM.editorMode(true);
-            self.editorVM.isNotificationManager(true);
-            ko.cleanNode($("#importerNotebook")[0]);
-            ko.applyBindings(self.editorVM, $("#importerNotebook")[0]);
-
-            self.editorVM.openNotebook(resp.history_uuid, null, true, function(){
-              self.editorVM.selectedNotebook().snippets()[0].progress.subscribe(function(val){
-                if (val === 100) {
-                  self.indexingStarted(false);
-                  self.isIndexing(false);
-                  self.indexingSuccess(true);
-                }
-              });
-              self.editorVM.selectedNotebook().snippets()[0].status.subscribe(function(val){
-                if (val === 'failed') {
-                  self.isIndexing(false);
-                  self.indexingStarted(false);
-                  self.indexingError(true);
-                } else if (val === 'available') {
-                  var snippet = self.editorVM.selectedNotebook().snippets()[0]; // Could be native to editor at some point
-                  if (!snippet.result.handle().has_more_statements) {
-                    if (self.editorVM.selectedNotebook().onSuccessUrl()) {
-                      var match = snippet.statement_raw().match(/CREATE TABLE `([^`]+)`/i);
-                      if (match) {
-                        var db = match[1];
-                        dataCatalog.getEntry({ connector: snippet.connector(), namespace: self.namespace(), compute: self.compute(), path: [ db ]}).then(function (dbEntry) {
-                          dbEntry.clearCache({ silenceErrors: true }).then(function () {
-                            huePubSub.publish('open.link', self.editorVM.selectedNotebook().onSuccessUrl());
-                          })
-                        });
-                      } else {
-                        dataCatalog.getEntry({ connector: snippet.connector(), namespace: self.namespace(), compute: self.compute(), path: []}).then(function (sourceEntry) {
-                          sourceEntry.clearCache({ silenceErrors: true }).then(function () {
-                            huePubSub.publish('open.link', self.editorVM.selectedNotebook().onSuccessUrl());
-                          })
-                        });
-                      }
-                    }
-                  } else { // Perform last DROP statement execute
-                    snippet.execute();
-                  }
-                }
-              });
-              self.editorVM.selectedNotebook().snippets()[0].checkStatus();
-            });
-          }
-          viewModel.isLoading(false);
-        }).fail(function (xhr, textStatus, errorThrown) {
-          $(document).trigger("error", xhr.responseText);
-          viewModel.isLoading(false);
-          self.indexingStarted(false);
-          self.isIndexing(false);
-        });
-% else:
         $.post("${ url('indexer:importer_submit') }", {
           "source": ko.mapping.toJSON(self.source),
           "destination": ko.mapping.toJSON(self.destination),
@@ -3099,7 +2957,6 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
           self.indexingStarted(false);
           $(document).trigger("error", xhr.responseText);
         });
-% endif
 
         hueAnalytics.log('importer', 'submit/' + self.source.inputFormat() + '/' + self.destination.outputFormat());
       };
@@ -3198,11 +3055,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
       self.wizardEnabled = ko.observable(false);
       self.currentStep = ko.observable(self.createWizard.prefill.target_type() === 'database' ? 2 : 1);
       self.currentStep.subscribe(function () {
-        %if is_embeddable:
         $('.page-content').scrollTop(0);
-        %else:
-        $('.content-panel').scrollTop(0);
-        %endif
       });
       self.previousStepVisible = ko.pureComputed(function(){
         return self.currentStep() > 1 && (self.createWizard.destination.outputFormat() !== 'database' || self.createWizard.source.inputFormat() === 'rdbms');
@@ -3328,7 +3181,3 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
   })();
 </script>
 </span>
-
-%if not is_embeddable:
-${ commonfooter(request, messages) | n,unicode }
-%endif

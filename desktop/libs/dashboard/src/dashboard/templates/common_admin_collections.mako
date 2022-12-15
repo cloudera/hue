@@ -39,7 +39,7 @@
 <div class="search-bar" style="height: 30px">
   <div class="pull-right">
     % if user.has_hue_permission(action="access", app='indexer'):
-    <a class="btn importBtn" href="${ is_embeddable and "javascript: huePubSub.publish('open.link', '" + url('indexer:collections') + "')" or url('indexer:collections') }" title="${ _('Indexes') }">
+    <a class="btn importBtn" href="javascript: huePubSub.publish('open.link', '${url('indexer:collections')}')" title="${ _('Indexes') }">
       <i class="fa fa-database"></i> ${ _('Indexes') }
     </a>
     % endif
@@ -79,7 +79,7 @@
 
       <%def name="creation()">
         %if not is_mobile:
-        <a data-bind="visible: collections().length > 0 && !isLoading()" class="btn" href="${ is_embeddable and "javascript: huePubSub.publish('open.link', '" + url('dashboard:new_search') + "')" or url('dashboard:new_search') }" title="${ _('Create a new dashboard') }">
+        <a data-bind="visible: collections().length > 0 && !isLoading()" class="btn" href="javascript: huePubSub.publish('open.link', '${url('dashboard:new_search')}')" title="${ _('Create a new dashboard') }">
           <i class="fa fa-plus-circle"></i> ${ _('Create') }
         </a>
         <a data-bind="visible: !isLoading(), click: function() { $('#import-documents').modal('show'); }" class="btn">

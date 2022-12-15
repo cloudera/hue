@@ -102,7 +102,6 @@ def databases(request):
     'is_navigator_enabled': has_catalog(request.user),
     'optimizer_url': get_optimizer_url(),
     'navigator_url': get_catalog_url(),
-    'is_embeddable': request.GET.get('is_embeddable', False),
     'source_type': _get_servername(db),
   })
 
@@ -118,37 +117,28 @@ def drop_database(request):
     databases = request.POST.getlist('database_selection')
 
     try:
-      if request.POST.get('is_embeddable'):
-        design = SavedQuery.create_empty(
-            app_name=source_type if source_type != 'hive' else 'beeswax',
-            owner=request.user,
-            data=hql_query('').dumps()
-        )
-        last_executed = json.loads(request.POST.get('start_time', '-1'))
-        cluster = json.loads(request.POST.get('cluster', '{}'))
-        namespace = json.loads(request.POST.get('namespace', '{}'))
-        sql = db.drop_databases(databases, design, generate_ddl_only=True)
-        job = make_notebook(
-            name=_('Drop database %s') % ', '.join(databases)[:100],
-            editor_type=source_type,
-            statement=sql.strip(),
-            status='ready',
-            database=None,
-            namespace=namespace,
-            compute=cluster,
-            on_success_url='assist.db.refresh',
-            is_task=True,
-            last_executed=last_executed
-        )
-        return JsonResponse(job.execute(request))
-      else:
-        design = SavedQuery.create_empty(app_name='beeswax', owner=request.user, data=hql_query('').dumps())
-        query_history = db.drop_databases(databases, design)
-        url = reverse(
-            'beeswax:watch_query_history',
-            kwargs={'query_history_id': query_history.id}
-        ) + '?on_success_url=' + reverse('metastore:databases')
-        return redirect(url)
+      design = SavedQuery.create_empty(
+          app_name=source_type if source_type != 'hive' else 'beeswax',
+          owner=request.user,
+          data=hql_query('').dumps()
+      )
+      last_executed = json.loads(request.POST.get('start_time', '-1'))
+      cluster = json.loads(request.POST.get('cluster', '{}'))
+      namespace = json.loads(request.POST.get('namespace', '{}'))
+      sql = db.drop_databases(databases, design, generate_ddl_only=True)
+      job = make_notebook(
+          name=_('Drop database %s') % ', '.join(databases)[:100],
+          editor_type=source_type,
+          statement=sql.strip(),
+          status='ready',
+          database=None,
+          namespace=namespace,
+          compute=cluster,
+          on_success_url='assist.db.refresh',
+          is_task=True,
+          last_executed=last_executed
+      )
+      return JsonResponse(job.execute(request))
     except Exception as ex:
       error_message, log = dbms.expand_exception(ex, db)
       error = _("Failed to remove %(databases)s.  Error: %(error)s") % {'databases': ','.join(databases), 'error': error_message}
@@ -283,7 +273,6 @@ def show_tables(request, database=None):
     'is_navigator_enabled': has_catalog(request.user),
     'optimizer_url': get_optimizer_url(),
     'navigator_url': get_catalog_url(),
-    'is_embeddable': request.GET.get('is_embeddable', False),
     'source_type': _get_servername(db),
     })
 
@@ -369,7 +358,6 @@ def describe_table(request, database, table):
       'is_navigator_enabled': has_catalog(request.user),
       'optimizer_url': get_optimizer_url(),
       'navigator_url': get_catalog_url(),
-      'is_embeddable': request.GET.get('is_embeddable', False),
       'source_type': _get_servername(db),
     })
 
@@ -472,31 +460,21 @@ def drop_table(request, database):
       cluster = json.loads(request.POST.get('cluster', '{}'))
       namespace = json.loads(request.POST.get('namespace', '{}'))
 
-      if request.POST.get('is_embeddable'):
-        last_executed = json.loads(request.POST.get('start_time', '-1'))
-        sql = db.drop_tables(database, tables_objects, design=None, skip_trash=skip_trash, generate_ddl_only=True)
-        job = make_notebook(
-            name=_('Drop table %s') % ', '.join([table.name for table in tables_objects])[:100],
-            editor_type=source_type,
-            statement=sql.strip(),
-            status='ready',
-            database=database,
-            namespace=namespace,
-            compute=cluster,
-            on_success_url='assist.db.refresh',
-            is_task=True,
-            last_executed=last_executed
-        )
-        return JsonResponse(job.execute(request))
-      else:
-        # Can't be simpler without an important refactoring
-        design = SavedQuery.create_empty(app_name='beeswax', owner=request.user, data=hql_query('').dumps())
-        query_history = db.drop_tables(database, tables_objects, design, skip_trash=skip_trash)
-        url = reverse(
-            'beeswax:watch_query_history',
-            kwargs={'query_history_id': query_history.id}
-        ) + '?on_success_url=' + reverse('metastore:show_tables', kwargs={'database': database})
-        return redirect(url)
+      last_executed = json.loads(request.POST.get('start_time', '-1'))
+      sql = db.drop_tables(database, tables_objects, design=None, skip_trash=skip_trash, generate_ddl_only=True)
+      job = make_notebook(
+          name=_('Drop table %s') % ', '.join([table.name for table in tables_objects])[:100],
+          editor_type=source_type,
+          statement=sql.strip(),
+          status='ready',
+          database=database,
+          namespace=namespace,
+          compute=cluster,
+          on_success_url='assist.db.refresh',
+          is_task=True,
+          last_executed=last_executed
+      )
+      return JsonResponse(job.execute(request))
     except Exception as ex:
       error_message, log = dbms.expand_exception(ex, db)
       error = _("Failed to remove %(tables)s.  Error: %(error)s") % {'tables': ','.join(tables), 'error': error_message}
@@ -539,7 +517,6 @@ def load_table(request, database, table):
 
     if load_form.is_valid():
       on_success_url = reverse('metastore:describe_table', kwargs={'database': database, 'table': table.name})
-      generate_ddl_only = request.POST.get('is_embeddable', 'false') == 'true'
       try:
         design = SavedQuery.create_empty(
             app_name=source_type if source_type != 'hive' else 'beeswax',
@@ -551,31 +528,22 @@ def load_table(request, database, table):
           'overwrite': load_form.cleaned_data['overwrite'],
           'partition_columns': [(column_name, load_form.cleaned_data[key]) for key, column_name in load_form.partition_columns.items()],
         }
-        query_history = db.load_data(database, table.name, form_data, design, generate_ddl_only=generate_ddl_only)
-        if generate_ddl_only:
-          if sys.version_info[0] > 2:
-            last_executed = json.loads(request.POST.get('start_time'))
-          else:
-            last_executed = json.loads(request.POST.get('start_time'), '-1')
-          job = make_notebook(
-            name=_('Load data in %s.%s') % (database, table.name),
-            editor_type=source_type,
-            statement=query_history.strip(),
-            status='ready',
-            database=database,
-            on_success_url='assist.db.refresh',
-            is_task=True,
-            last_executed=last_executed
-          )
-          response = job.execute(request)
+        query_history = db.load_data(database, table.name, form_data, design, generate_ddl_only=True)
+        if sys.version_info[0] > 2:
+          last_executed = json.loads(request.POST.get('start_time'))
         else:
-          url = reverse(
-              'beeswax:watch_query_history',
-              kwargs={'query_history_id': query_history.id}
-          ) + '?on_success_url=' + on_success_url
-          response['status'] = 0
-          response['data'] = url
-          response['query_history_id'] = query_history.id
+          last_executed = json.loads(request.POST.get('start_time'), '-1')
+        job = make_notebook(
+          name=_('Load data in %s.%s') % (database, table.name),
+          editor_type=source_type,
+          statement=query_history.strip(),
+          status='ready',
+          database=database,
+          on_success_url='assist.db.refresh',
+          is_task=True,
+          last_executed=last_executed
+        )
+        response = job.execute(request)
       except QueryError as ex:
         response['status'] = 1
         response['data'] = _("Can't load the data: ") + ex.message
@@ -659,7 +627,6 @@ def describe_partitions(request, database, table):
         'is_navigator_enabled': has_catalog(request.user),
         'optimizer_url': get_optimizer_url(),
         'navigator_url': get_catalog_url(),
-        'is_embeddable': request.GET.get('is_embeddable', False),
         'source_type': _get_servername(db),
     })
 

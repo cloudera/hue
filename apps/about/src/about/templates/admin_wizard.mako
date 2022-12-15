@@ -34,10 +34,6 @@ else:
 
 <%namespace name="layout" file="/about_layout.mako" />
 
-% if not is_embeddable:
-  ${ commonheader(_('Quick Start'), "quickstart", user, request, "70px") | n,unicode }
-% endif
-
 ${ layout.menubar(section='quick_start') }
 
 <div class="container-fluid" id="adminWizardComponents">
@@ -219,11 +215,7 @@ ${ layout.menubar(section='quick_start') }
           <div id="step4" class="stepDetails hide">
             <div>
               <h3>${ _('Create or import users') }</h3>
-              <a href="${ url('useradmin:useradmin.views.list_users') }"
-                 % if not is_embeddable:
-                 target="_blank"
-                 % endif
-              ><i class="fa fa-user"></i> ${ _('User Admin') }</a>
+              <a href="${ url('useradmin:useradmin.views.list_users') }"><i class="fa fa-user"></i> ${ _('User Admin') }</a>
             </div>
 
             <div class="margin-top-30">
@@ -240,17 +232,6 @@ ${ layout.menubar(section='quick_start') }
                 </a>
               </label>
             </div>
-
-            % if not is_embeddable:
-            <div class="margin-top-30">
-              <h3>${ _('Skip wizard next time') }</h3>
-              <label class="checkbox">
-                <input id="updateSkipWizard" type="checkbox" style="margin-right: 10px" title="${ _('Check to skip this wizard next time.') }"/>
-                ${ _('Skip the Quick Start Wizard at next login and land directly on your starred application.') }
-              </label>
-            </div>
-            % endif
-
           </div>
           </div>
 
@@ -485,7 +466,7 @@ ${ layout.menubar(section='quick_start') }
     });
 
     $("#doneBtn").click(function () {
-      huePubSub.publish('open.link', "${ is_embeddable and '/' or url('desktop_views_home2') }");
+      huePubSub.publish('open.link', '/');
     });
 
     $(".updatePreferences").click(function () {
@@ -508,8 +489,4 @@ ${ layout.menubar(section='quick_start') }
     });
   });
 </script>
-% endif
-
-% if not is_embeddable:
-  ${ commonfooter(request, messages) | n,unicode }
 % endif

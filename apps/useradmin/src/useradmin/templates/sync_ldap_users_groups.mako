@@ -41,9 +41,6 @@ else:
 
 <form action="${path}" method="POST" class="form form-horizontal">
   ${ csrf_token(request) | n,unicode }
-  % if is_embeddable:
-    <input type="hidden" value="true" name="is_embeddable" />
-  % endif
   <div class="modal-header left">
     <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
     <h2 class="modal-title">${_('Sync LDAP users and groups')}</h2>

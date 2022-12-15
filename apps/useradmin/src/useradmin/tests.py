@@ -1246,8 +1246,7 @@ class TestUserAdmin(BaseUserAdminTests):
     response = edit_user.post('/useradmin/users/edit/admin', dict(
         username="admin",
         is_superuser=True,
-        language="en-us><script>alert('Hacked')</script>",
-        is_embeddable=True)
+        language="en-us><script>alert('Hacked')</script>")
     )
     content = json.loads(response.content)
     assert_true('Select a valid choice. en-us>alert(\'Hacked\') is not one of the available choices.', content['errors'][0]['message'][0])
@@ -1277,8 +1276,7 @@ class TestUserAdmin(BaseUserAdminTests):
     response = edit_user.post('/useradmin/users/edit/edit_user', dict(
         username="edit_user",
         is_superuser=False,
-        language="en-us><script>alert('Hacked')</script>",
-        is_embeddable=True)
+        language="en-us><script>alert('Hacked')</script>")
     )
     content = json.loads(response.content)
     assert_true(

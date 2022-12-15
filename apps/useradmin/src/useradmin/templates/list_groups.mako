@@ -32,10 +32,6 @@ else:
 <%namespace name="actionbar" file="actionbar.mako" />
 <%namespace name="layout" file="layout.mako" />
 
-%if not is_embeddable:
-${ commonheader(_('Groups'), "useradmin", user, request) | n,unicode }
-%endif
-
 ${layout.menubar(section='groups')}
 
 <div id="groupsComponents" class="useradmin container-fluid">
@@ -122,9 +118,6 @@ ${layout.menubar(section='groups')}
   <div class="modal hide fade delete-group">
     <form action="${ url('useradmin:useradmin.views.delete_group') }" method="POST">
       ${ csrf_token(request) | n,unicode }
-      % if is_embeddable:
-        <input type="hidden" value="true" name="is_embeddable" />
-      % endif
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
         <h2 class="modal-title">${_("Are you sure you want to delete the selected group(s)?")}</h2>
@@ -178,7 +171,6 @@ ${layout.menubar(section='groups')}
       }
     });
 
-    % if is_embeddable:
     $groupsComponents.find('.delete-group form').ajaxForm({
       dataType:  'json',
       success: function(data) {
@@ -189,7 +181,6 @@ ${layout.menubar(section='groups')}
         }
       }
     });
-    % endif
 
     $groupsComponents.find(".filter-input").jHueDelayedInput(function () {
       if (dt) {
@@ -250,7 +241,3 @@ ${layout.menubar(section='groups')}
 </script>
 
 ${layout.commons()}
-
-%if not is_embeddable:
-${ commonfooter(request, messages) | n,unicode }
-%endif

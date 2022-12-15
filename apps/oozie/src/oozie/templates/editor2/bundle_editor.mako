@@ -26,10 +26,6 @@ else:
 <%namespace name="layout" file="../navigation-bar.mako" />
 <%namespace name="utils" file="../utils.inc.mako" />
 
-% if not is_embeddable:
-${ commonheader(_("Bundle Editor"), "Oozie", user, request) | n,unicode }
-% endif
-
 <div id="oozie_bundleComponents">
 
 <%def name="buttons()">
@@ -62,13 +58,11 @@ ${ commonheader(_("Bundle Editor"), "Oozie", user, request) | n,unicode }
             <i class="fa fa-fw fa-file-o"></i> ${ _('New') }
           </a>
         </li>
-        %if is_embeddable:
-          <li>
-            <a href="javascript: void(0)" data-bind="publish: { 'assist.show.documents': 'oozie-bundle2' }">
-              <svg class="hi hi-fw hi-bigger"><use xlink:href="#hi-documents"></use></svg> ${ _('Bundles') }
-            </a>
-          </li>
-        %endif
+        <li>
+          <a href="javascript: void(0)" data-bind="publish: { 'assist.show.documents': 'oozie-bundle2' }">
+            <svg class="hi hi-fw hi-bigger"><use xlink:href="#hi-documents"></use></svg> ${ _('Bundles') }
+          </a>
+        </li>
         <li class="divider"></li>
         <li data-bind="visible: canEdit">
           <a class="pointer" data-toggle="modal" data-target="#settingsModal">
@@ -87,17 +81,13 @@ ${ commonheader(_("Bundle Editor"), "Oozie", user, request) | n,unicode }
   </div>
 </%def>
 
-${ layout.menubar(section='bundles', is_editor=True, pullright=buttons, is_embeddable=is_embeddable) }
+${ layout.menubar(section='bundles', is_editor=True, pullright=buttons) }
 
 <script type="text/javascript">
   if (window.location.hash != "") {
     if (window.location.hash.indexOf("bundle") > -1) {
       var url = "/oozie/editor/bundle/edit/?" + window.location.hash.substr(1).replace(/(<([^>]+)>)/ig, "");
-      % if is_embeddable:
-        huePubSub.publish('open.link', url);
-      % else:
-        location.href = url;
-      % endif
+      huePubSub.publish('open.link', url);
     }
   }
 </script>
@@ -167,24 +157,19 @@ ${ layout.menubar(section='bundles', is_editor=True, pullright=buttons, is_embed
 </div>
 
 
-<div id="chooseCoordinatorDemiModal" class="${ is_embeddable and 'modal' or 'demi-modal' } fade" data-backdrop="${ is_embeddable and 'true' or 'false' }">
-  %if is_embeddable:
-    <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
-      <h2 class="modal-title">${ _('Choose a coordinator') }</h2>
-    </div>
-  %endif
+<div id="chooseCoordinatorDemiModal" class="modal fade" data-backdrop="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+    <h2 class="modal-title">${ _('Choose a coordinator') }</h2>
+  </div>
   <div class="modal-body">
-    %if not is_embeddable:
-    <a href="javascript: void(0)" data-dismiss="modal" class="pull-right"><i class="fa fa-times"></i></a>
-    %endif
     <div style="float: left; margin-right: 10px;text-align: center">
       <input type="text" data-bind="clearable: $root.coordinatorModalFilter, valueUpdate:'afterkeydown'" placeholder="${_('Filter coordinators')}" class="input" style="float: left" /><br/>
     </div>
     <div>
       <ul data-bind="foreach: $root.filteredModalCoordinators().sort(function (l, r) { return l.name() > r.name() ? 1 : -1 }), visible: $root.filteredModalCoordinators().length > 0"
           class="unstyled inline fields-chooser" style="height: 100px; overflow-y: auto">
-        <li style="${ not is_embeddable and 'line-height: 30px' or ''}">
+        <li>
           <span data-bind="click: selectCoordinator" class="badge badge-info"><span data-bind="text: name(), attr: {'title': uuid()}"></span>
           </span>
           <a data-bind="hueLink: '${ url('oozie:edit_coordinator') }?uuid=' + uuid()" title="${ _('Open') }">
@@ -197,9 +182,6 @@ ${ layout.menubar(section='bundles', is_editor=True, pullright=buttons, is_embed
       </div>
     </div>
   </div>
-  %if not is_embeddable:
-  <div><a class="pointer demi-modal-chevron" data-dismiss="modal"><i class="fa fa-chevron-up"></i></a></div>
-  %endif
 </div>
 
 
@@ -268,15 +250,6 @@ ${ layout.menubar(section='bundles', is_editor=True, pullright=buttons, is_embed
 <link rel="stylesheet" href="${ static('oozie/css/coordinator-editor.css') }">
 
 ${ dashboard.import_layout() }
-
-%if not is_embeddable:
-${ commonshare() | n,unicode }
-%endif
-
-% if not is_embeddable:
-<script src="${ static('desktop/js/share2.vm.js') }"></script>
-%endif
-
 ${ dashboard.import_bindings() }
 
 <script src="${ static('oozie/js/bundle-editor.ko.js') }" type="text/javascript" charset="utf-8"></script>
@@ -292,9 +265,6 @@ ${ utils.submit_popup_event() }
 
   viewModel.bundle.tracker().markCurrentStateAsClean();
 
-  % if not is_embeddable:
-  var shareViewModel = initSharing("#documentShareModal");
-  % endif
   shareViewModel.setDocUuid('${ doc_uuid }');
 
   var tempCoordinator = null;
@@ -374,7 +344,3 @@ ${ utils.submit_popup_event() }
     }, 'oozie');
   });
 </script>
-
-% if not is_embeddable:
-${ commonfooter(request, messages) | n,unicode }
-% endif

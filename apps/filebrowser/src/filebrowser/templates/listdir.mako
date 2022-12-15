@@ -32,9 +32,6 @@ else:
 <%namespace name="dir" file="listdir_components.mako" />
 <%namespace name="fb_components" file="fb_components.mako" />
 
-%if not is_embeddable:
-${ commonheader(None, 'filebrowser', user, request) | n,unicode }
-%endif
 ${ fb_components.menubar() }
 
 <style type="text/css">
@@ -42,11 +39,9 @@ ${ fb_components.menubar() }
     margin-left: -10px;
   }
 
-  %if is_embeddable:
-    .filebrowser .pagination {
-      position: inherit;
-    }
-  %endif
+  .filebrowser .pagination {
+    position: inherit;
+  }
 </style>
 
 <div id="${ path.startswith('s3a://') and 'filebrowser_s3Components' or path.startswith('abfs://') and 'filebrowser_abfsComponents' or 'filebrowserComponents' }" class="container-fluid filebrowser" style="min-height: calc(100vh - 130px);">
@@ -224,8 +219,3 @@ ${ fb_components.menubar() }
     <p class="hoverText"></p>
   </div>
 </div>
-
-
-%if not is_embeddable:
-${ commonfooter(request, messages) | n,unicode }
-%endif

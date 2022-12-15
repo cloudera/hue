@@ -28,10 +28,6 @@ from desktop.views import commonheader, commonfooter, commonshare, _ko
 <%namespace name="layout" file="../navigation-bar.mako" />
 <%namespace name="scheduler" file="common_scheduler.inc.mako" />
 
-%if not is_embeddable:
-${ commonheader(_("Coordinator Editor"), "Oozie", user, request) | n,unicode }
-%endif
-
 <div id="oozie_coordinatorComponents">
 
 <%def name="buttons()">
@@ -64,13 +60,11 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user, request) | n,unicode }
             <i class="fa fa-fw fa-file-o"></i> ${ _('New') }
           </a>
         </li>
-        %if is_embeddable:
-          <li>
-            <a href="javascript: void(0)" data-bind="publish: { 'assist.show.documents': 'oozie-coordinator2' }">
-              <svg class="hi hi-fw hi-bigger"><use xlink:href="#hi-documents"></use></svg> ${ _('Schedules') }
-            </a>
-          </li>
-        %endif
+        <li>
+          <a href="javascript: void(0)" data-bind="publish: { 'assist.show.documents': 'oozie-coordinator2' }">
+            <svg class="hi hi-fw hi-bigger"><use xlink:href="#hi-documents"></use></svg> ${ _('Schedules') }
+          </a>
+        </li>
         <li class="divider"></li>
         <li data-bind="visible: canEdit">
           <a class="pointer" data-toggle="modal" data-target="#settingsModal">
@@ -91,25 +85,20 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user, request) | n,unicode }
   </div>
 </%def>
 
-${ layout.menubar(section='coordinators', is_editor=True, pullright=buttons, is_embeddable=is_embeddable) }
+${ layout.menubar(section='coordinators', is_editor=True, pullright=buttons) }
 
 
 <script type="text/javascript">
   if (window.location.hash != "") {
     if (window.location.hash.indexOf("coordinator") > -1) {
       var url = "/oozie/editor/coordinator/edit/?" + window.location.hash.substr(1).replace(/(<([^>]+)>)/ig, "");
-      % if is_embeddable:
-        huePubSub.publish('open.link', url);
-      % else:
-        location.href = url;
-      % endif
+      huePubSub.publish('open.link', url);
     }
   }
 </script>
 
 ${ scheduler.import_layout() }
 ${ scheduler.import_modals() }
-
 
 <div class="submit-modal modal hide"></div>
 
@@ -123,16 +112,6 @@ ${ scheduler.import_modals() }
 <script src="${ static('desktop/js/jqCron.js') }" type="text/javascript"></script>
 
 ${ dashboard.import_layout() }
-
-%if not is_embeddable:
-${ commonshare() | n,unicode }
-%endif
-
-% if not is_embeddable:
-<script src="${ static('desktop/js/share2.vm.js') }"></script>
-%endif
-
-
 ${ dashboard.import_bindings() }
 
 <script src="${ static('oozie/js/coordinator-editor.ko.js') }" type="text/javascript" charset="utf-8"></script>
@@ -153,9 +132,6 @@ ${ scheduler.import_sla_cron(coordinator_json) }
   viewModel.coordinator.tracker().markCurrentStateAsClean();
   viewModel.coordinator.refreshParameters();
 
-  % if not is_embeddable:
-  var shareViewModel = initSharing("#documentShareModal");
-  % endif
   shareViewModel.setDocUuid('${ doc_uuid }');
 
   function showChooseWorkflow() {
@@ -204,7 +180,3 @@ ${ scheduler.import_sla_cron(coordinator_json) }
     }, 'oozie');
   });
 </script>
-
-%if not is_embeddable:
-${ commonfooter(request, messages) | n,unicode }
-%endif

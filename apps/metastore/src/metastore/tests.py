@@ -338,7 +338,7 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
     assert_true('want to delete' in resp.content, resp.content)
     resp = self.client.post(
       '/metastore/tables/drop/%s' % self.db_name,
-      {u'table_selection': [u'test_drop_1', u'test_drop_2', u'test_drop_3'], 'is_embeddable': True}
+      {u'table_selection': [u'test_drop_1', u'test_drop_2', u'test_drop_3']}
     )
     assert_equal(resp.status_code, 302)
   
@@ -359,8 +359,7 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
       {
         u'table_selection': [u'test_drop_multi_tables_with_skip_trash_1',
                              u'test_drop_multi_tables_with_skip_trash_2', u'test_drop_multi_tables_with_skip_trash_3'],
-        u'skip_trash': u'on',
-        'is_embeddable': True
+        u'skip_trash': u'on'
       }
     )
     assert_equal(resp.status_code, 302)
@@ -395,8 +394,7 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
       # Drop them
       resp = self.client.get('/metastore/databases/drop', follow=True)
       assert_true('want to delete' in resp.content, resp.content)
-      resp = self.client.post('/metastore/databases/drop',
-                              {u'database_selection': [db1, db2, db3], 'is_embeddable': True})
+      resp = self.client.post('/metastore/databases/drop', {u'database_selection': [db1, db2, db3]})
       assert_equal(resp.status_code, 302)
     finally:
       make_query(self.client, 'DROP DATABASE IF EXISTS %(db)s' % {'db': db1}, wait=True)

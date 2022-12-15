@@ -384,7 +384,7 @@ class TestSparkApi(object):
           'col_name': '1656416152',
           'comment': '',
           'data_type': 'transient_lastDdlTime'}]},
-      'hdfs_link': '/filebrowser/view=/warehouse/tablespace/external/hive/test_nonacid',
+      'hdfs_link': '/hue/filebrowser/view=/warehouse/tablespace/external/hive/test_nonacid',
       'is_view': False,
       'name': 'test_nonacid',
       'partition_keys': [{'name': 'state', 'type': 'string'}],

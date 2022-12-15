@@ -52,7 +52,6 @@ def has_write_access(user):
 def app(request):
   return render('app.mako', request, {
     'can_write': has_write_access(request.user),
-    'is_embeddable': request.GET.get('is_embeddable', False),
   })
 
 # action/cluster/arg1/arg2/arg3...

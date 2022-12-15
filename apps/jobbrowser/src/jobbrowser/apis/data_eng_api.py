@@ -81,7 +81,7 @@ class DataEngClusterApi(Api):
     return message;
 
 
-  def logs(self, appid, app_type, log_name=None, is_embeddable=False):
+  def logs(self, appid, app_type, log_name=None):
     return {'logs': ''}
 
 
@@ -160,7 +160,7 @@ class DataEngJobApi(Api):
     return {}
 
 
-  def logs(self, appid, app_type, log_name=None, is_embeddable=False):
+  def logs(self, appid, app_type, log_name=None):
     return {'logs': ''}
 
 

@@ -35,21 +35,14 @@ else:
   from django.utils.translation import ugettext as _
 %>
 
-<%def name="includes(is_embeddable=False, suffix='')">
+<%def name="includes(suffix='')">
 <link rel="stylesheet" href="${ static('dashboard/css/common_dashboard.css') }">
-% if not is_embeddable:
-<link rel="stylesheet" href="${ static('notebook/css/notebook-layout.css') }">
-% endif
 <link rel="stylesheet" href="${ static('notebook/css/notebook.css') }">
 <link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-editable.css') }">
 
 <link rel="stylesheet" href="${ static('desktop/ext/css/medium-editor.min.css') }">
 <link rel="stylesheet" href="${ static('desktop/css/bootstrap-medium-editor.css') }">
 <link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-datepicker.min.css') }">
-
-% if not is_embeddable:
-<script src="${ static('desktop/js/share2.vm.js') }"></script>
-% endif
 
 % if ENABLE_QUERY_SCHEDULING.get():
 <script src="${ static('oozie/js/coordinator-editor.ko.js') }"></script>
@@ -324,7 +317,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 </%def>
 
 
-<%def name="commonHTML(is_embeddable=False, suffix='')">
+<%def name="commonHTML(suffix='')">
 
 <div id="helpModal${ suffix }" class="modal transparent-modal hide" data-backdrop="true" style="width:980px;margin-left:-510px!important">
   <div class="modal-header">
@@ -367,16 +360,6 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 </div>
 % endif
 
-% if not is_embeddable:
-<a title="${_('Toggle Assist')}" class="pointer show-assist" data-bind="visible: !$root.isLeftPanelVisible() && $root.assistAvailable(), click: function() { $root.isLeftPanelVisible(true); huePubSub.publish('assist.set.manual.visibility'); }">
-  <i class="fa fa-chevron-right"></i>
-</a>
-<a title="${_('Toggle Assist')}" class="pointer show-assist-right" data-bind="visible: !$root.isRightPanelVisible() && $root.isRightPanelAvailable(), click: function() { $root.isRightPanelVisible(true); huePubSub.publish('assist.set.manual.visibility'); }">
-  <i class="fa fa-chevron-left"></i>
-</a>
-% endif
-
-
 <div data-bind="css: {'main-content': true, 'editor-mode': $root.editorMode()}">
   <div class="vertical-full container-fluid" data-bind="style: { 'padding-left' : $root.isLeftPanelVisible() || $root.isPresentationMode() || $root.isResultFullScreenMode() ? '0' : '20px' }" >
     <div class="vertical-full">
@@ -387,30 +370,6 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 </div>
 
 <script type="text/html" id="notebook${ suffix }">
-  % if not is_embeddable:
-  <div class="assist-container left-panel" data-bind="visible: isLeftPanelVisible() && assistAvailable()">
-    <a title="${_('Toggle Assist')}" class="pointer hide-assist" data-bind="click: function() { isLeftPanelVisible(false); huePubSub.publish('assist.set.manual.visibility'); }">
-      <i class="fa fa-chevron-left"></i>
-    </a>
-    <div class="assist" data-bind="component: {
-        name: 'assist-panel',
-        params: {
-          user: user,
-          sql: {
-            navigationSettings: {
-              openDatabase: false,
-              openItem: false,
-              showStats: true,
-              pinEnabled: true
-            },
-          },
-          visibleAssistPanels: editorMode() ? ['sql'] : []
-        }
-      }"></div>
-  </div>
-  <div class="resizer" data-bind="visible: isLeftPanelVisible() && assistAvailable(), splitDraggable : { appName: 'notebook', leftPanelVisible: isLeftPanelVisible, rightPanelVisible: isRightPanelVisible, rightPanelAvailable: isRightPanelAvailable, onPosition: function(){ huePubSub.publish('split.draggable.position') } }"><div class="resize-bar">&nbsp;</div></div>
-  % endif
-
   <div class="content-panel" data-bind="event: { scroll: function(){ var ls = $(MAIN_SCROLLABLE).data('lastScroll'); if (ls && ls != $(MAIN_SCROLLABLE).scrollTop()){ $(document).trigger('hideAutocomplete'); }; $(MAIN_SCROLLABLE).data('lastScroll', $(MAIN_SCROLLABLE).scrollTop()) } }, with: selectedNotebook">
     <div>
       <div class="row-fluid row-container sortable-snippets" data-bind="css: {'is-editing': $root.isEditing, 'margin-left-10': $root.isPresentationMode},
@@ -463,24 +422,6 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       % endif
     </div>
   </div>
-
-  % if not is_embeddable:
-    <!-- ko if: isRightPanelAvailable -->
-    <div class="resizer" data-bind="visible: isRightPanelVisible, splitDraggable : { isRightPanel: true, appName: 'notebook', leftPanelVisible: isLeftPanelVisible, rightPanelVisible: isRightPanelVisible, rightPanelAvailable: isRightPanelAvailable, onPosition: function(){ huePubSub.publish('split.draggable.position') } }" style="display: none;"><div class="resize-bar">&nbsp;</div></div>
-    <!-- /ko -->
-    <div class="assist-container right-panel" data-bind="visible: isRightPanelVisible() && isRightPanelAvailable()" style="display:none;">
-      <a title="${_('Toggle Assist')}" class="pointer hide-assist-right" data-bind="click: function() { isRightPanelVisible(false); huePubSub.publish('assist.set.manual.visibility'); }">
-        <i class="fa fa-chevron-right"></i>
-      </a>
-      <div class="assist" data-bind="component: {
-          name: 'right-assist-panel',
-          params: {
-            rightAssistAvailable: isRightPanelAvailable
-          }
-        }" >
-      </div>
-    </div>
-  % endif
 </script>
 
 <script type="text/html" id="notebook-session-config-template${ suffix }">
@@ -550,11 +491,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       <a href="javascript: void(0)" class="inactive-action close-logs-overlay" data-bind="click: function(){ showLogs(false) }">&times;</a>
       <ul data-bind="visible: jobs().length > 0, foreach: jobs" class="unstyled jobs-overlay">
         <li data-bind="attr: {'id': $data.name.substr(4)}">
-          % if is_embeddable:
-            <a class="pointer" data-bind="text: $.trim($data.name), click: function() { huePubSub.publish('show.jobs.panel', {id: $data.name, interface: $parent.type() == 'impala' ? 'queries' : 'jobs', compute: $parent.compute}); }, clickBubble: false"></a>
-          % else:
-            <a data-bind="text: $.trim($data.name), hueLink: $data.url"></a>
-          % endif
+          <a class="pointer" data-bind="text: $.trim($data.name), click: function() { huePubSub.publish('show.jobs.panel', {id: $data.name, interface: $parent.type() == 'impala' ? 'queries' : 'jobs', compute: $parent.compute}); }, clickBubble: false"></a>
           <!-- ko if: typeof percentJob === 'function' && percentJob() > -1 -->
           <div class="progress-job progress pull-left" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': percentJob() < 100, 'progress-success': percentJob() === 100}">
             <div class="bar" data-bind="style: {'width': percentJob() + '%'}"></div>
@@ -2055,7 +1992,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 </%def>
 
 
-<%def name="commonJS(is_embeddable=False, bindableElement='editorComponents', suffix='')">
+<%def name="commonJS(bindableElement='editorComponents', suffix='')">
 
 <script type="text/javascript">
   window.EDITOR_BINDABLE_ELEMENT = '#${ bindableElement }';

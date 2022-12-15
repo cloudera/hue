@@ -28,11 +28,11 @@
 
 <%namespace name="docBrowser" file="/document_browser.mako" />
 
-<%def name="homeJSModels(is_embeddable=False)">
+<%def name="homeJSModels()">
   <script src="${ static('desktop/ext/js/jquery/plugins/jquery.mousewheel.min.js') }"></script>
   <script src="${ static('desktop/js/home2.vm.js') }"></script>
 
-  ${ docBrowser.docBrowser(is_embeddable) }
+  ${ docBrowser.docBrowser() }
 </%def>
 
 
@@ -55,7 +55,7 @@
 </div>
 </%def>
 
-<%def name="vm(is_embeddable=False)">
+<%def name="vm()">
 <script type="text/html" id="document-template">
   <tr>
     <td style="width: 26px"></td>
@@ -115,10 +115,10 @@
         var filterType = window.location.pathname.indexOf('/home') > -1 && hueUtils.getParameter('type') != '' ? 'type=' + hueUtils.getParameter('type') : '';
         if (typeof newEntry !== 'undefined' && newEntry.definition().uuid && !newEntry.isRoot()) {
           if (hueUtils.getParameter('uuid') === '' || hueUtils.getParameter('uuid') !== newEntry.definition().uuid){
-            hueUtils.changeURL('${ is_embeddable and '/hue' or ''}/home/?uuid=' + newEntry.definition().uuid + '&' + filterType);
+            hueUtils.changeURL('/hue/home/?uuid=' + newEntry.definition().uuid + '&' + filterType);
           }
         } else if (typeof newEntry === 'undefined' || newEntry.isRoot()) {
-          var url = '${ is_embeddable and '/hue' or ''}/home/' + (filterType ? '?' + filterType : '');
+          var url = '/hue/home/' + (filterType ? '?' + filterType : '');
           if (window.location.pathname + window.location.search !== url) {
             hueUtils.changeURL(url);
           }

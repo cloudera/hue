@@ -30,30 +30,12 @@
 <%namespace name="actionbar" file="actionbar.mako" />
 
 <%
-MAIN_SCROLLABLE = is_embeddable and ".page-content" or ".content-panel"
+MAIN_SCROLLABLE = ".page-content"
 %>
-
-%if not is_embeddable:
-${ commonheader(_("Streams Browser"), "search", user, request, "60px") | n,unicode }
-<script src="${ static('desktop/ext/js/jquery/plugins/jquery.mousewheel.min.js') }"></script>
-
-<link rel="stylesheet" href="${ static('notebook/css/notebook-layout.css') }">
-<style type="text/css">
-% if conf.CUSTOM.BANNER_TOP_HTML.get():
-  .show-assist {
-    top: 110px!important;
-  }
-  .main-content {
-    top: 112px!important;
-  }
-% endif
-</style>
-%endif
 
 <link rel="stylesheet" href="${ static('notebook/css/notebook.css') }" type="text/css">
 <link rel="stylesheet" href="${ static('indexer/css/indexes.css') }" type="text/css">
 <script src="${ static('dashboard/js/search.ko.js') }" type="text/javascript" charset="utf-8"></script>
-
 
 <script type="text/html" id="indexes-breadcrumbs">
   <h1>
@@ -102,40 +84,10 @@ ${ commonheader(_("Streams Browser"), "search", user, request, "60px") | n,unico
 </div>
 
 <div id="indexesComponents" class="notebook">
-
-  % if not is_embeddable:
-  <a title="${_('Toggle Assist')}" class="pointer show-assist" data-bind="visible: !$root.isLeftPanelVisible() && $root.assistAvailable(), click: function () { $root.isLeftPanelVisible(true); }">
-    <i class="fa fa-chevron-right"></i>
-  </a>
-  % endif
-
   <div class="main-content">
     <div class="vertical-full container-fluid" data-bind="style: { 'padding-left' : $root.isLeftPanelVisible() ? '0' : '20px' }">
       <div class="vertical-full row-fluid panel-container">
-        % if not is_embeddable:
-        <div class="assist-container left-panel" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable()">
-          <a title="${_('Toggle Assist')}" class="pointer hide-assist" data-bind="click: function() { $root.isLeftPanelVisible(false) }">
-            <i class="fa fa-chevron-left"></i>
-          </a>
-          <div class="assist" data-bind="component: {
-              name: 'assist-panel',
-              params: {
-                user: '${user.username}',
-                sql: {
-                  navigationSettings: {
-                    openItem: true,
-                    showStats: true
-                  }
-                },
-                visibleAssistPanels: ['sql']
-              }
-            }"></div>
-        </div>
-        <div class="resizer" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable(), splitDraggable : { appName: 'notebook', leftPanelVisible: $root.isLeftPanelVisible }"><div class="resize-bar">&nbsp;</div></div>
-        % endif
         <div class="content-panel">
-
-
           <div class="indexer-main">
             <!-- ko template: { name: 'indexes-breadcrumbs' }--><!-- /ko -->
 
@@ -629,11 +581,7 @@ ${ commonheader(_("Streams Browser"), "search", user, request, "60px") | n,unico
                     parentId: 'index-sample',
                     classToRemove: 'sample-table',
                     mainScrollable: '${ MAIN_SCROLLABLE }',
-                    % if is_embeddable:
-                      stickToTopPosition: 51 + bannerTopHeight,
-                    % else:
-                      stickToTopPosition: 76 + bannerTopHeight,
-                    % endif
+                    stickToTopPosition: 51 + bannerTopHeight,
                     clonedContainerPosition: 'fixed',
                     app: 'indexes'
                   });
@@ -847,7 +795,3 @@ ${ commonheader(_("Streams Browser"), "search", user, request, "60px") | n,unico
     });
   })();
 </script>
-
-%if not is_embeddable:
-${ commonfooter(request, messages) | n,unicode }
-%endif

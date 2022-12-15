@@ -25,13 +25,11 @@
 %>
 
 <%namespace name="actionbar" file="actionbar.mako" />
-%if not is_embeddable:
-${ commonheader(None, "hbase", user, request) | n,unicode }
-%endif
-<div id="hbaseComponents">
-<link href="${ static('hbase/css/hbase.css') }" rel="stylesheet" type="text/css" />
 
-<div class="navbar hue-title-bar nokids">
+<div id="hbaseComponents">
+  <link href="${ static('hbase/css/hbase.css') }" rel="stylesheet" type="text/css" />
+
+  <div class="navbar hue-title-bar nokids">
     <div class="navbar-inner">
     <div class="container-fluid">
       <div class="nav-collapse">
@@ -290,11 +288,7 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
     ${smartview('views.tabledata')}
 
     <br/><br/><br/><br/>
-    <div class="subnav
-    %if not is_embeddable:
-    navbar-fixed-bottom
-    %endif
-    well-small">
+    <div class="subnav well-small">
         <div class="hbase-subnav">
           <div class="footer-slider">
             <span data-bind="visible: !hbaseApp.views.tabledata.isLoading()">
@@ -2570,7 +2564,3 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
 <script>
   routie.setPathname('/hbase');
 </script>
-
-%if not is_embeddable:
-${ commonfooter(request, messages) | n,unicode }
-%endif

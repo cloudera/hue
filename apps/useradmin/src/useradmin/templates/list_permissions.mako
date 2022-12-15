@@ -31,10 +31,7 @@ else:
 <%namespace name="actionbar" file="actionbar.mako" />
 <%namespace name="layout" file="layout.mako" />
 
-% if not is_embeddable:
-  ${ commonheader(_('Permissions'), "useradmin", user, request) | n,unicode }
-% endif
-  ${ layout.menubar(section='permissions') }
+${ layout.menubar(section='permissions') }
 
 <div id="permissionsComponents" class="useradmin container-fluid">
   <div class="card card-small">
@@ -130,7 +127,3 @@ else:
 </script>
 
 ${layout.commons()}
-
-%if not is_embeddable:
-${ commonfooter(request, messages) | n,unicode }
-%endif

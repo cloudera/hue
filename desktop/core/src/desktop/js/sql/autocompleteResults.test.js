@@ -210,7 +210,6 @@ describe('AutocompleteResults.js', () => {
         }
       ],
       users: [],
-      is_embeddable: false,
       supergroup: 'supergroup',
       descending: 'false',
       groups: [],

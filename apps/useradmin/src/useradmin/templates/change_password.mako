@@ -25,10 +25,6 @@ from useradmin.hue_password_policy import is_password_policy_enabled, get_passwo
 
 <%namespace name="layout" file="layout.mako" />
 
-% if not is_embeddable:
-  ${ commonheader(_('Hue Users'), "useradmin", user, request) | n,unicode }
-% endif
-
 ${ layout.menubar(section='users') }
 
 <div id="editUserComponents"  class="useradmin container-fluid">
@@ -73,9 +69,8 @@ ${ layout.menubar(section='users') }
 </div>
 <script type="text/javascript">
 $(document).ready(function(){
- var currentStep = "step1";
+  var currentStep = "step1";
   var $editUserComponents = $('#editUserComponents');
-  % if is_embeddable:
   $editUserComponents.find('#editForm').attr('action', window.location.pathname.substr((window.HUE_BASE_URL + '/hue').length).replace(/\/$/, ''));
   $editUserComponents.find('#editForm').ajaxForm({
     dataType:  'json',
@@ -89,12 +84,7 @@ $(document).ready(function(){
       }
     }
   });
-  % endif
 });
 </script>
 
 ${layout.commons()}
-
-%if not is_embeddable:
-${ commonfooter(request, messages) | n,unicode }
-%endif

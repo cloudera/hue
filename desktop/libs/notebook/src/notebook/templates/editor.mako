@@ -30,12 +30,8 @@
 <%namespace name="hueAceAutocompleter" file="/hue_ace_autocompleter.mako" />
 
 <div id="editorComponents" class="editorComponents notebook">
-  ${ editorComponents.includes(is_embeddable=is_embeddable, suffix='editor') }
+  ${ editorComponents.includes(suffix='editor') }
   ${ editorComponents.topBar(suffix='editor') }
-  ${ editorComponents.commonHTML(is_embeddable=is_embeddable, suffix='editor') }
-  ${ editorComponents.commonJS(is_embeddable=is_embeddable, suffix='editor') }
+  ${ editorComponents.commonHTML(suffix='editor') }
+  ${ editorComponents.commonJS(suffix='editor') }
 </div>
-
-% if not is_embeddable:
-  ${ commonfooter(request, messages) | n,unicode }
-% endif

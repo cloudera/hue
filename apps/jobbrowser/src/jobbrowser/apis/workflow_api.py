@@ -108,7 +108,7 @@ class WorkflowApi(Api):
     return _manage_oozie_job(self.user, action, app_ids)
 
 
-  def logs(self, appid, app_type, log_name=None, is_embeddable=False):
+  def logs(self, appid, app_type, log_name=None):
     if '@' in appid:
       return WorkflowActionApi(self.user).logs(appid, app_type)
 
@@ -133,7 +133,8 @@ class WorkflowApi(Api):
       workflow = oozie_api.get_job(jobid=appid)
       return {
         'properties': workflow.conf_dict,
-        'properties_display': [{'name': key, 'value': val, 'link': is_linkable(key, val) and hdfs_link_js(val)} for key, val in workflow.conf_dict.items()],
+        'properties_display': [{'name': key, 'value': val, 'link': is_linkable(key, val) and hdfs_link_js(val)} for
+                               key, val in workflow.conf_dict.items()],
       }
 
     return {}
@@ -205,31 +206,33 @@ def _manage_oozie_job(user, action, app_ids):
 
 
 def _filter_oozie_jobs(user, filters, kwargs):
-    text_filters = _extract_query_params(filters)
+  text_filters = _extract_query_params(filters)
 
-    if has_oozie_installed and not has_dashboard_jobs_access(user):
-      kwargs['filters'].append(('user', user.username))
-    elif 'username' in text_filters:
-      kwargs['filters'].append(('user', text_filters['username']))
+  if has_oozie_installed and not has_dashboard_jobs_access(user):
+    kwargs['filters'].append(('user', user.username))
+  elif 'username' in text_filters:
+    kwargs['filters'].append(('user', text_filters['username']))
 
-    if 'id' in text_filters:
-      kwargs['filters'].append(('id', text_filters['id']))
+  if 'id' in text_filters:
+    kwargs['filters'].append(('id', text_filters['id']))
 
-    if 'name' in text_filters:
-      kwargs['filters'].append(('name', text_filters['name']))
+  if 'name' in text_filters:
+    kwargs['filters'].append(('name', text_filters['name']))
 
-    if 'time' in filters:
-      kwargs['filters'].extend([('startcreatedtime', '-%s%s' % (filters['time']['time_value'], filters['time']['time_unit'][:1]))])
+  if 'time' in filters:
+    kwargs['filters'].extend(
+      [('startcreatedtime', '-%s%s' % (filters['time']['time_value'], filters['time']['time_unit'][:1]))])
 
-    if has_oozie_installed and ENABLE_OOZIE_BACKEND_FILTERING.get() and text_filters.get('text'):
-      kwargs['filters'].extend([('text', text_filters.get('text'))])
+  if has_oozie_installed and ENABLE_OOZIE_BACKEND_FILTERING.get() and text_filters.get('text'):
+    kwargs['filters'].extend([('text', text_filters.get('text'))])
 
-    if filters['pagination']:
-      kwargs['offset'] = filters['pagination']['offset']
-      kwargs['cnt'] = min(filters['pagination']['limit'], OOZIE_JOBS_COUNT_LIMIT)
+  if filters['pagination']:
+    kwargs['offset'] = filters['pagination']['offset']
+    kwargs['cnt'] = min(filters['pagination']['limit'], OOZIE_JOBS_COUNT_LIMIT)
 
-    if filters.get('states'):
-      states_filters = {'running': ['RUNNING', 'PREP', 'SUSPENDED'], 'completed': ['SUCCEEDED'], 'failed': ['FAILED', 'KILLED'],}
-      for _state in filters.get('states'):
-        for _status in states_filters[_state]:
-          kwargs['filters'].extend([('status', _status)])
+  if filters.get('states'):
+    states_filters = {'running': ['RUNNING', 'PREP', 'SUSPENDED'], 'completed': ['SUCCEEDED'],
+                      'failed': ['FAILED', 'KILLED'], }
+    for _state in filters.get('states'):
+      for _status in states_filters[_state]:
+        kwargs['filters'].extend([('status', _status)])

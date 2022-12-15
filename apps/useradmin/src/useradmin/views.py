@@ -78,7 +78,6 @@ def list_users(request):
       'users': User.objects.all(),
       'users_json': json.dumps(list(User.objects.values_list('id', flat=True))),
       'request': request,
-      'is_embeddable': request.GET.get('is_embeddable', False),
       'is_ldap_setup': is_ldap_setup()
   })
 
@@ -87,7 +86,6 @@ def list_groups(request):
   return render("list_groups.mako", request, {
       'groups': Group.objects.all(),
       'groups_json': json.dumps(list(Group.objects.values_list('name', flat=True))),
-      'is_embeddable': request.GET.get('is_embeddable', False),
       'is_ldap_setup': is_ldap_setup()
   })
 
@@ -101,21 +99,17 @@ def list_permissions(request):
 
   return render("list_permissions.mako", request, {
     'permissions': permissions,
-    'is_embeddable': request.GET.get('is_embeddable', False)
   })
 
 
 def list_configurations(request):
-  return render("list_configurations.mako", request, {
-    'is_embeddable': request.GET.get('is_embeddable', False)
-  })
+  return render("list_configurations.mako", request, {})
 
 
 def list_organizations(request):
   return render("list_organizations.mako", request, {
       'groups': Organization.objects.all(),
       'groups_json': json.dumps(list(Organization.objects.values_list('name', flat=True))),
-      'is_embeddable': request.GET.get('is_embeddable', False),
   })
 
 
@@ -236,13 +230,7 @@ def delete_user(request):
     'operationText': '%s User(s): %s' % (action_text.title(), ', '.join(usernames))
   }
 
-  is_embeddable = request.GET.get('is_embeddable', request.POST.get('is_embeddable', False))
-
-  if is_embeddable:
-    return JsonResponse({'url': '/hue' + reverse('useradmin:useradmin.views.list_users')})
-  else:
-    request.info(_('The users were %s.') % action_text)
-    return redirect(reverse('useradmin:useradmin.views.list_users'))
+  return JsonResponse({'url': '/hue' + reverse('useradmin:useradmin.views.list_users')})
 
 
 def delete_group(request):
@@ -268,13 +256,8 @@ def delete_group(request):
         'operation': 'DELETE_GROUP',
         'operationText': 'Deleted Group(s): %s' % ', '.join(group_names)
       }
-      is_embeddable = request.GET.get('is_embeddable', request.POST.get('is_embeddable', False))
 
-      if is_embeddable:
-        return JsonResponse({'url': '/hue' + reverse('useradmin:useradmin.views.list_groups')})
-      else:
-        request.info(_('The groups were deleted.'))
-        return redirect(reverse('useradmin:useradmin.views.list_groups'))
+      return JsonResponse({'url': '/hue' + reverse('useradmin:useradmin.views.list_groups')})
     except Group.DoesNotExist:
       raise PopupException(_("Group not found."), error_code=404)
   else:
@@ -309,7 +292,6 @@ def edit_user(request, username=None):
 
   userprofile = get_profile(request.user)
   updated = False
-  is_embeddable = request.GET.get('is_embeddable', request.POST.get('is_embeddable', False))
 
   if username is not None:
     instance = User.objects.get(username=username)
@@ -380,9 +362,6 @@ def edit_user(request, username=None):
         request.session['django_language'] = form.cleaned_data.get('language')
         updated = True
 
-      if updated and not is_embeddable:
-        request.info(_('User information updated'))
-
       # Audit log
       if username is not None:
         request.audit = {
@@ -404,15 +383,9 @@ def edit_user(request, username=None):
         else:
           return JsonResponse({'url': '/hue'})
       elif is_admin(request.user):
-        if is_embeddable:
-          return JsonResponse({'url': '/hue' + reverse('useradmin:useradmin.views.list_users')})
-        else:
-          return redirect(reverse('useradmin:useradmin.views.list_users'))
+        return JsonResponse({'url': '/hue' + reverse('useradmin:useradmin.views.list_users')})
       else:
-        if is_embeddable:
-          return JsonResponse({'url': '/hue' + reverse('useradmin:useradmin.views.edit_user', kwargs={'username': username})})
-        else:
-          return redirect(reverse('useradmin:useradmin.views.edit_user', kwargs={'username': username}))
+        return JsonResponse({'url': '/hue' + reverse('useradmin:useradmin.views.edit_user', kwargs={'username': username})})
   else:
     # Initialize form values
     default_user_group = get_default_user_group()
@@ -429,19 +402,17 @@ def edit_user(request, username=None):
   if require_change_password(userprofile):
     return render('change_password.mako', request, {
       'form': form,
-      'username': username,
-      'is_embeddable': is_embeddable
+      'username': username
     })
   else:
-    if request.method == 'POST' and is_embeddable:
+    if request.method == 'POST':
       return JsonResponse({'status': -1,
                            'errors': [{'id': f.id_for_label, 'message': list(map(antixss, f.errors))} for f in form if
                                       f.errors]})
     else:
       return render('edit_user.mako', request, {
         'form': form,
-        'username': username,
-        'is_embeddable': is_embeddable
+        'username': username
       })
 
 
@@ -472,8 +443,6 @@ def edit_group(request, name=None):
   else:
     instance = None
 
-  is_embeddable = request.GET.get('is_embeddable', request.POST.get('is_embeddable', False))
-
   if request.method == 'POST':
     form = GroupEditForm(request.POST, instance=instance)
 
@@ -496,15 +465,11 @@ def edit_group(request, name=None):
           'operationText': 'Created Group: %s, with member(s): %s' % (request.POST.get('name', ''), ', '.join(usernames))
         }
 
-      if is_embeddable:
-        return JsonResponse({'url': '/hue' + reverse('useradmin:useradmin.views.list_groups')})
-      else:
-        request.info(_('Group information updated'))
-        return redirect('/useradmin/groups')
+      return JsonResponse({'url': '/hue' + reverse('useradmin:useradmin.views.list_groups')})
   else:
     form = GroupEditForm(instance=instance)
 
-  if request.method == 'POST' and is_embeddable:
+  if request.method == 'POST':
     return JsonResponse({
       'status': -1,
       'errors': [{'id': f.id_for_label, 'message': f.errors} for f in form if f.errors]
@@ -514,7 +479,6 @@ def edit_group(request, name=None):
       'form': form,
       'action': request.path,
       'name': name,
-      'is_embeddable': is_embeddable,
     })
 
 
@@ -540,7 +504,6 @@ def edit_permission(request, app=None, priv=None):
     raise PopupException(_("You must be a superuser to change permissions."), error_code=401)
 
   instance = HuePermission.objects.get(app=app, action=priv)
-  is_embeddable = request.GET.get('is_embeddable', request.POST.get('is_embeddable', False))
 
   if request.method == 'POST':
     form = PermissionsEditForm(request.POST, instance=instance)
@@ -551,14 +514,10 @@ def edit_permission(request, app=None, priv=None):
         'operationText': 'Successfully edited permissions: %(app)s/%(priv)s' % {'app': app, 'priv': priv}
       }
 
-      if is_embeddable:
-        return JsonResponse({'url': '/hue' + reverse('useradmin:useradmin.views.list_permissions')})
-      else:
-        request.info(_('Permission information updated'))
-        return redirect(reverse('useradmin:useradmin.views.list_permissions'))
+      return JsonResponse({'url': '/hue' + reverse('useradmin:useradmin.views.list_permissions')})
   else:
     form = PermissionsEditForm(instance=instance)
-  if request.method == 'POST' and is_embeddable:
+  if request.method == 'POST':
     return JsonResponse(
         {'status': -1, 'errors': [{'id': f.id_for_label, 'message': f.errors} for f in form if f.errors]}
     )
@@ -568,7 +527,6 @@ def edit_permission(request, app=None, priv=None):
       'action': request.path,
       'app': app,
       'priv': priv,
-      'is_embeddable': is_embeddable,
     })
 
 
@@ -588,8 +546,6 @@ def add_ldap_users(request):
       'allowed': False,
     }
     raise PopupException(_("You must be a superuser to add another user."), error_code=401)
-
-  is_embeddable = request.GET.get('is_embeddable', request.POST.get('is_embeddable', False))
 
   if request.method == 'POST':
     form = AddLdapUsersForm(request.POST)
@@ -628,18 +584,15 @@ def add_ldap_users(request):
           unique_users = set(failed_ldap_users)
           request.warn(_('Failed to import following users: %s') % ', '.join(unique_users))
 
-        if is_embeddable:
-          return JsonResponse({'status': 0})
-        else:
-          return redirect(reverse('useradmin:useradmin.views.list_users'))
+        return JsonResponse({'status': 0})
   else:
     form = AddLdapUsersForm()
 
-  if request.method == 'POST' and is_embeddable:
+  if request.method == 'POST':
     return JsonResponse(
       {'status': -1, 'errors': [{'id': f.id_for_label, 'message': f.errors} for f in form if f.errors]})
   else:
-    return render('add_ldap_users.mako', request, dict(form=form, is_embeddable=is_embeddable))
+    return render('add_ldap_users.mako', request, dict(form=form))
 
 
 def add_ldap_groups(request):
@@ -659,8 +612,6 @@ def add_ldap_groups(request):
       'allowed': False,
     }
     raise PopupException(_("You must be a superuser to add another group."), error_code=401)
-
-  is_embeddable = request.GET.get('is_embeddable', request.POST.get('is_embeddable', False))
 
   if request.method == 'POST':
     form = AddLdapGroupsForm(request.POST)
@@ -706,10 +657,7 @@ def add_ldap_groups(request):
           unique_users = set(failed_ldap_users)
           request.warn(_('Failed to import following users: %s') % ', '.join(unique_users))
 
-        if is_embeddable:
-          return JsonResponse({'url': '/hue' + reverse('useradmin:useradmin.views.list_groups')})
-        else:
-          return redirect(reverse('useradmin:useradmin.views.list_groups'))
+        return JsonResponse({'url': '/hue' + reverse('useradmin:useradmin.views.list_groups')})
 
       else:
         errors = form._errors.setdefault('groupname_pattern', ErrorList())
@@ -718,12 +666,12 @@ def add_ldap_groups(request):
   else:
     form = AddLdapGroupsForm()
 
-  if request.method == 'POST' and is_embeddable:
+  if request.method == 'POST':
     return JsonResponse(
         {'status': -1, 'errors': [{'id': f.id_for_label, 'message': f.errors} for f in form if f.errors]}
     )
   else:
-    return render('edit_group.mako', request, dict(form=form, action=request.path, ldap=True, is_embeddable=is_embeddable))
+    return render('edit_group.mako', request, dict(form=form, action=request.path, ldap=True))
 
 
 def sync_ldap_users_groups(request):
@@ -741,8 +689,6 @@ def sync_ldap_users_groups(request):
       'allowed': False
     }
     raise PopupException(_("You must be a superuser to sync the LDAP users/groups."), error_code=401)
-
-  is_embeddable = request.GET.get('is_embeddable', request.POST.get('is_embeddable', False))
 
   if request.method == 'POST':
     form = SyncLdapUsersGroupsForm(request.POST)
@@ -768,19 +714,16 @@ def sync_ldap_users_groups(request):
         unique_users = set(failed_ldap_users)
         request.warn(_('Failed to import following users: %s') % ', '.join(unique_users))
 
-      if is_embeddable:
-        return JsonResponse({'url': '/hue' + reverse('useradmin:useradmin.views.list_users')})
-      else:
-        return redirect(reverse('useradmin:useradmin.views.list_users'))
+      return JsonResponse({'url': '/hue' + reverse('useradmin:useradmin.views.list_users')})
   else:
     form = SyncLdapUsersGroupsForm()
 
-  if request.method == 'POST' and is_embeddable:
+  if request.method == 'POST':
     return JsonResponse(
         {'status': -1, 'errors': [{'id': f.id_for_label, 'message': f.errors} for f in form if f.errors]}
     )
   else:
-    return render("sync_ldap_users_groups.mako", request, dict(path=request.path, form=form, is_embeddable=is_embeddable))
+    return render("sync_ldap_users_groups.mako", request, dict(path=request.path, form=form))
 
 
 def sync_ldap_users_and_groups(connection, is_ensuring_home_directory=False, fs=None, failed_users=None):

@@ -352,7 +352,6 @@ def edit(request, path, form=None):
       filename=os.path.basename(path),
       dirname=os.path.dirname(path),
       breadcrumbs=parse_breadcrumbs(path),
-      is_embeddable=request.GET.get('is_embeddable', False),
       show_download_button=SHOW_DOWNLOAD_BUTTON.get())
   if not is_ajax(request):
     data['stats'] = stats
@@ -444,7 +443,6 @@ def listdir(request, path):
       'show_upload': (request.GET.get('show_upload') == 'false' and (False,) or (True,))[0],
       'show_download_button': SHOW_DOWNLOAD_BUTTON.get(),
       'show_upload_button': SHOW_UPLOAD_BUTTON.get(),
-      'is_embeddable': request.GET.get('is_embeddable', False),
   }
 
   stats = request.fs.listdir_stats(path)
@@ -601,7 +599,6 @@ def listdir_paged(request, path):
       'apps': list(appmanager.get_apps_dict(request.user).keys()),
       'show_download_button': SHOW_DOWNLOAD_BUTTON.get(),
       'show_upload_button': SHOW_UPLOAD_BUTTON.get(),
-      'is_embeddable': request.GET.get('is_embeddable', False),
       's3_listing_not_allowed': s3_listing_not_allowed
   }
   return render('listdir.mako', request, data)
@@ -766,7 +763,6 @@ def display(request, path):
   # Start with index-like data:
   stats = request.fs.stats(path)
   data = _massage_stats(request, stat_absolute_path(path, stats))
-  data["is_embeddable"] = request.GET.get('is_embeddable', False)
   # And add a view structure:
   data["success"] = True
   data["view"] = {

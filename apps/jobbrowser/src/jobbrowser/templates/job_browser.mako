@@ -37,26 +37,7 @@ else:
 SUFFIX = is_mini and "-mini" or ""
 %>
 
-% if not is_embeddable:
-${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
-% endif
-
 <span class="notebook">
-
-% if not is_embeddable:
-<link rel="stylesheet" href="${ static('notebook/css/notebook.css') }">
-<link rel="stylesheet" href="${ static('notebook/css/notebook-layout.css') }">
-<style type="text/css">
-% if CUSTOM.BANNER_TOP_HTML.get():
-  .show-assist {
-    top: 110px!important;
-  }
-  .main-content {
-    top: 112px!important;
-  }
-% endif
-</style>
-% endif
 
 <link rel="stylesheet" href="${ static('jobbrowser/css/jobbrowser-embeddable.css') }">
 
@@ -87,13 +68,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 % else:
 <div id="jobbrowserMiniComponents" class="jobbrowser-components jobbrowser-mini jb-panel">
 % endif
-
-% if not is_embeddable:
-  <a title="${_('Toggle Assist')}" class="pointer show-assist" data-bind="visible: !$root.isLeftPanelVisible() && $root.assistAvailable(), click: function() { $root.isLeftPanelVisible(true); }">
-    <i class="fa fa-chevron-right"></i>
-  </a>
-% endif
-
 
 % if is_mini:
   <div class="mini-jb-context-selector">
@@ -306,28 +280,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     <div class="vertical-full container-fluid" data-bind="style: { 'padding-left' : $root.isLeftPanelVisible() ? '0' : '20px' }">
       <div class="vertical-full">
         <div class="vertical-full row-fluid panel-container">
-          % if not is_embeddable:
-          <div class="assist-container left-panel" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable()">
-            <a title="${_('Toggle Assist')}" class="pointer hide-assist" data-bind="click: function() { $root.isLeftPanelVisible(false) }">
-              <i class="fa fa-chevron-left"></i>
-            </a>
-            <div class="assist" data-bind="component: {
-                name: 'assist-panel',
-                params: {
-                  user: '${user.username}',
-                  sql: {
-                    navigationSettings: {
-                      openItem: false,
-                      showStats: true
-                    }
-                  },
-                  visibleAssistPanels: ['sql']
-                }
-              }"></div>
-          </div>
-          <div class="resizer" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable(), splitDraggable : { appName: 'notebook', leftPanelVisible: $root.isLeftPanelVisible }"><div class="resize-bar">&nbsp;</div></div>
-          % endif
-
           <div class="content-panel">
             <div class="content-panel-inner">
               <!-- ko if: $root.job() -->
@@ -3231,7 +3183,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.fetchLogs = function (name) {
         name = name || 'default';
         vm.apiHelper.cancelActiveRequest(lastFetchLogsRequest);
-        lastFetchLogsRequest = $.post("/jobbrowser/api/job/logs?is_embeddable=${ str(is_embeddable).lower() }", {
+        lastFetchLogsRequest = $.post("/jobbrowser/api/job/logs", {
           cluster: ko.mapping.toJSON(vm.compute),
           app_id: ko.mapping.toJSON(self.id),
           interface: ko.mapping.toJSON(vm.interface),
@@ -3993,7 +3945,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.loadSlaPage = function(){
         if (!self.slasLoadedOnce) {
           $.ajax({
-            url: '/oozie/list_oozie_sla/?is_embeddable=true',
+            url: '/oozie/list_oozie_sla/',
             beforeSend: function (xhr) {
               xhr.setRequestHeader('X-Requested-With', 'Hue');
             },
@@ -4012,7 +3964,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         if (!self.oozieInfoLoadedOnce) {
           self.oozieInfoLoadedOnce = true;
           $.ajax({
-            url: '/oozie/list_oozie_info/?is_embeddable=true',
+            url: '/oozie/list_oozie_info/',
             beforeSend: function (xhr) {
               xhr.setRequestHeader('X-Requested-With', 'Hue');
             },
@@ -4320,7 +4272,3 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   })();
 </script>
 </span>
-
-% if not is_embeddable:
-${ commonfooter(request, messages) | n,unicode }
-% endif

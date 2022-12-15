@@ -803,12 +803,8 @@ else:
 
     var updateHash = function (hash) {
       hash = encodeURI(decodeURIComponent(hash));
-      %if not is_embeddable:
-      window.location.hash = hash;
-      %else:
       hueUtils.changeURL('#' + hash);
       huePubSub.publish('fb.update.hash');
-      %endif
     }
 
     var Page = function (page) {
@@ -886,10 +882,7 @@ else:
           // display context menu and ensure it is on-screen
           if ($.inArray(row.name, ['..', '.Trash']) === -1) {
             this.selected(true);
-            var verticalCorrection = 0;
-            %if is_embeddable:
-              verticalCorrection = $('.page-content').scrollTop() - $('.navbar-default').height() - $('.banner').height();
-            %endif
+            var verticalCorrection = $('.page-content').scrollTop() - $('.navbar-default').height() - $('.banner').height();
             cm.css({ display: 'block', top: e.pageY - 15 + verticalCorrection, left: (e.offsetX < rect.right - 300 ) ? e.offsetX + 100 : e.offsetX - 250 });
           } else {
             cm.css({ display: 'none' });
@@ -1259,10 +1252,7 @@ else:
 
         $("*[rel='tooltip']").tooltip({ placement:"left" });
 
-        var $scrollable = $(window);
-        %if is_embeddable:
-          $scrollable = $('.page-content');
-        %endif
+        var $scrollable = $('.page-content');
 
         if ($('.row-highlighted').length > 0) {
           $scrollable.scrollTop($('.row-highlighted:eq(0)').offset().top - 150);
@@ -1388,8 +1378,6 @@ else:
           let url = file.name.indexOf('#') >= 0 && file.url.indexOf('#') >= 0 
             ? file.url.replaceAll('#', encodeURIComponent('#')) : file.url;
 
-          %if is_embeddable:
-
           // Fix. The '%' character needs to be encoded twice due to a bug in the page library
           // that decodes the url twice
           
@@ -1398,9 +1386,6 @@ else:
           }
 
           huePubSub.publish('open.link', url);
-          %else:
-          window.location.href = url;
-          %endif
         }
       };
 
@@ -1713,10 +1698,7 @@ else:
               $(self.selectedFiles()).each(function (index, file) {
                 file.deleted(true);
               });
-              var $scrollable = $(window);
-              %if is_embeddable:
-                $scrollable = $('.page-content');
-              %endif
+              var $scrollable = $('.page-content');
               if ($('.row-deleted').length > 0 && $('.row-deleted:eq(0)').offset()) {
                 $scrollable.scrollTop($('.row-deleted:eq(0)').offset().top - 150);
               }
@@ -2549,11 +2531,7 @@ else:
           fileBrowserViewModel.targetPath("${url('filebrowser:filebrowser.views.view', path='')}" + target_path); 
           fileBrowserViewModel.getStats(function (data) {
             if (data.type != null && data.type == "file") {
-              %if is_embeddable:
               huePubSub.publish('open.link', data.url);
-              %else:
-              huePubSub.publish('open.link', data.url);
-              %endif
               return false;
             } else {
               updateHash(target_path);
@@ -2591,7 +2569,6 @@ else:
 
       resetActionbar();
 
-      %if is_embeddable:
       $('.page-content').scroll(function () {
         if ($('.page-content').scrollTop() > 50) {
           $(".actionbar").width($(".actionbar").data("originalWidth"));
@@ -2601,17 +2578,6 @@ else:
           resetActionbar();
         }
       });
-      %else:
-      $(window).scroll(function () {
-        if ($(window).scrollTop() > 20) {
-          $(".actionbar").width($(".actionbar").data("originalWidth"));
-          $(".actionbar").css("position", "fixed").css("top", "73px").css("zIndex", "1001");
-          $(".actionbarGhost").removeClass("hide");
-        } else {
-          resetActionbar();
-        }
-      });
-      %endif
 
       $("#uploadFileModal").on("shown", function () {
         if (typeof _dropzone != "undefined") {

@@ -32,9 +32,9 @@
 
 
 <div id="notebookComponents" class="notebook">
-  ${ editorComponents.includes(is_embeddable=is_embeddable, suffix='notebook') }
+  ${ editorComponents.includes(suffix='notebook') }
   ${ editorComponents.topBar(suffix='notebook') }
-  <%editorComponents:commonHTML is_embeddable="${is_embeddable}" suffix="notebook">
+  <%editorComponents:commonHTML suffix="notebook">
     <%def name="addSnippetHTML()">
       <h1 class="empty" data-bind="visible: $root.availableSnippets().length == 0">${ _('There are no snippets configured.') }</h1>
 
@@ -55,5 +55,5 @@
 
   ${ notebookKoComponents.addSnippetMenu() }
 
-  ${ editorComponents.commonJS(is_embeddable=is_embeddable, bindableElement='notebookComponents', suffix='notebook') }
+  ${ editorComponents.commonJS(bindableElement='notebookComponents', suffix='notebook') }
 </div>

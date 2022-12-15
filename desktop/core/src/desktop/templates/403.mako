@@ -23,10 +23,6 @@ else:
 from desktop.views import commonheader, commonfooter
 %>
 
-%if not is_embeddable:
-${ commonheader(_('403 - Access forbidden'), "", user, request) | n,unicode }
-%endif
-
 <link rel="stylesheet" href="${ static('desktop/css/httperrors.css') }">
 
 <div id="httperror" class="container-fluid">
@@ -45,7 +41,3 @@ ${ commonheader(_('403 - Access forbidden'), "", user, request) | n,unicode }
     </div>
   </div>
 </div>
-
-%if not is_embeddable:
-${ commonfooter(request, messages) | n,unicode }
-%endif

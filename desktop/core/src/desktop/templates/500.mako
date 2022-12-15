@@ -25,10 +25,6 @@ else:
 from desktop.auth.backend import is_admin
 %>
 
-%if not is_embeddable:
-${ commonheader(_('500 - Server error'), "", user, request) | n,unicode }
-%endif
-
 <link rel="stylesheet" href="${ static('desktop/css/httperrors.css') }">
 
 <div id="httperror" class="container-fluid">
@@ -76,7 +72,7 @@ ${ commonheader(_('500 - Server error'), "", user, request) | n,unicode }
         </div>
       % else:
         % if is_admin(user):
-          <a href="/logs" ${ not is_embeddable and 'target="_blank"'  or '' } title="${ _('View server logs') }">${_('View logs')}</a>
+          <a href="/logs" title="${ _('View server logs') }">${_('View logs')}</a>
         % endif
       % endif
 
@@ -89,7 +85,3 @@ ${ commonheader(_('500 - Server error'), "", user, request) | n,unicode }
     $(selector).slideToggle(500);
   }
 </script>
-
-%if not is_embeddable:
-${ commonfooter(request, messages) | n,unicode }
-%endif

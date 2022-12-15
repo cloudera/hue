@@ -26,10 +26,6 @@ else:
   from django.utils.translation import ugettext as _
 %>
 
-%if not is_embeddable:
-${ commonheader(_('Error'), app_name, user, request, "40px") | n,unicode }
-%endif
-
   <div class="container-fluid">
     <div class="row-fluid">
       <div class="span12">
@@ -56,7 +52,3 @@ ${ commonheader(_('Error'), app_name, user, request, "40px") | n,unicode }
       </div>
     </div>
   </div>
-
-%if not is_embeddable:
-${ commonfooter(request, messages) | n,unicode }
-%endif

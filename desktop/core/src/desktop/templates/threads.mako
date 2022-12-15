@@ -25,11 +25,6 @@ else:
 <%namespace name="actionbar" file="actionbar.mako" />
 <%namespace name="layout" file="about_layout.mako" />
 
-%if not is_embeddable:
-${ commonheader(_('Threads'), "about", user, request) | n,unicode }
-%endif
-
-
 <script type="text/javascript">
   (function () {
     var ThreadsViewModel = function () {
@@ -55,7 +50,3 @@ ${layout.menubar(section='threads')}
     <pre data-bind="text: $root.threads"></pre>
   </div>
 </div>
-
-%if not is_embeddable:
-${ commonfooter(request, messages) | n,unicode }
-%endif

@@ -1399,10 +1399,9 @@ def edit_i18n_helper(c, cluster, encoding, contents_pass_1, contents_pass_2):
 
 
 def test_location_to_url():
-  prefix = '/filebrowser/view='
+  prefix = '/hue/filebrowser/view='
   assert_equal(prefix + '/var/lib/hadoop-hdfs', location_to_url('/var/lib/hadoop-hdfs', False))
   assert_equal(prefix + '/var/lib/hadoop-hdfs', location_to_url('hdfs://localhost:8020/var/lib/hadoop-hdfs'))
-  assert_equal('/hue' + prefix + '/var/lib/hadoop-hdfs', location_to_url('hdfs://localhost:8020/var/lib/hadoop-hdfs', False, True))
   assert_equal(prefix + '/', location_to_url('hdfs://localhost:8020'))
   assert_equal(prefix + 's3a://bucket/key', location_to_url('s3a://bucket/key'))
 

@@ -31,12 +31,7 @@ else:
 
 <%namespace name="layout" file="layout.mako" />
 
-% if not is_embeddable:
-  ${ commonheader(_('Users'), "useradmin", user, request) | n,unicode }
-% endif
-
 ${ layout.menubar(section='users') }
-
 
 <div id="editUserComponents" class="useradmin container-fluid">
   <div class="card card-small title">
@@ -131,9 +126,6 @@ ${ layout.menubar(section='users') }
       <div class="form-actions">
         <a class="backBtn btn disabled">${ _('Back') }</a>
         <a class="nextBtn btn btn-primary disable-feedback">${ _('Next') }</a>
-        % if is_embeddable:
-          <input type="hidden" value="true" name="is_embeddable" />
-        % endif
         % if username:
         <input type="submit" class="btn btn-primary disable-feedback" value="${_('Update user')}"/>
         % else:
@@ -157,8 +149,6 @@ $(document).ready(function(){
     height:240
   });
 
-
-  % if is_embeddable:
   $editUserComponents.find('#editForm').attr('action', window.location.pathname.substr((window.HUE_BASE_URL + '/hue').length).replace(/\/$/, ''));
   $editUserComponents.find('#editForm').ajaxForm({
     dataType:  'json',
@@ -172,9 +162,8 @@ $(document).ready(function(){
       }
     }
   });
-  % endif
 
- var currentStep = "step1";
+  var currentStep = "step1";
 
   function showStep(step) {
     currentStep = step;
@@ -250,20 +239,7 @@ $(document).ready(function(){
     $(this).parents(".control-group").removeClass("error");
     $(this).parent().find(".help-inline").remove();
   });
-
-  % if not is_embeddable:
-  $editUserComponents.find("#editForm").on("submit", function(){
-    if (validateStep("step1") && validateStep("step2")) {
-      return true;
-    }
-    return false;
-  })
-  % endif
 });
 </script>
 
 ${layout.commons()}
-
-%if not is_embeddable:
-${ commonfooter(None, messages) | n,unicode }
-%endif

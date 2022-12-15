@@ -28,10 +28,6 @@ else:
 
 <%namespace name="macros" file="macros.mako" />
 
-% if not is_embeddable:
-${ commonheader(_('Dashboard'), "dashboard", user, request, "120px") | n,unicode }
-% endif
-
 <style type="text/css">
   .waiting {
     font-size: 196px;
@@ -64,7 +60,3 @@ ${ commonheader(_('Dashboard'), "dashboard", user, request, "120px") | n,unicode
     </div>
   </div>
 </div>
-
-% if not is_embeddable:
-${ commonfooter(request, messages) | n,unicode }
-% endif

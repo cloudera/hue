@@ -30,7 +30,6 @@ else:
       <h2 class="modal-title">${_('Import Data')}</h2>
     </div>
     <div class="modal-body">
-        <input id="load_data_is_embeddable" type="hidden" name="is_embeddable" value="false">
         <input id="load_data_source_type" type="hidden" name="source_type" value="${ source_type }">
         <input type="hidden" name="start_time" value=""/>
 
@@ -137,7 +136,6 @@ else:
     }
 
     $("#load-data-submit-btn").click(function (e) {
-      $("#load_data_is_embeddable").val("true");
       $("#load-data-form").find('input[name=start_time]').val(ko.mapping.toJSON(new Date().getTime()));
       $.post("${ url('metastore:load_table', database=database, table=table.name) }",
         $("#load-data-form").serialize(),

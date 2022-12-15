@@ -293,7 +293,3 @@ ${ utils.submit_popup_event() }
     $("a[data-row-selector='true']").jHueRowSelector();
   });
 </script>
-
-%if not is_embeddable:
-${commonfooter(request, messages) | n,unicode}
-%endif

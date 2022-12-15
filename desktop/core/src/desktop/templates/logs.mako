@@ -30,10 +30,6 @@ else:
 <%namespace name="actionbar" file="actionbar.mako" />
 <%namespace name="layout" file="about_layout.mako" />
 
-% if not is_embeddable:
-${ commonheader(_('Server Logs'), "about", user, request) | n,unicode }
-% endif
-
 ${ layout.menubar(section='log_view') }
 
 <style type="text/css">
@@ -215,7 +211,3 @@ ${ layout.menubar(section='log_view') }
     });
   });
 </script>
-
-% if not is_embeddable:
-${ commonfooter(request, messages) | n,unicode }
-% endif

@@ -23,10 +23,6 @@ def is_selected(section, matcher):
     return ""
 %>
 
-%if not is_embeddable:
-${ commonheader("Hue Help", "help", user, request, "40px") | n,unicode }
-%endif
-
 <style type="text/css">
   .card h1, .card h2, .card h3, .card h4 {
     color: #777777;
@@ -78,7 +74,3 @@ ${ commonheader("Hue Help", "help", user, request, "40px") | n,unicode }
     $.jHueScrollUp();
   });
 </script>
-
-%if not is_embeddable:
-${ commonfooter(request, messages) | n,unicode }
-%endif

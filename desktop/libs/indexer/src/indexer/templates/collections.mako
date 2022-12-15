@@ -25,10 +25,6 @@
 
 <%namespace name="actionbar" file="actionbar.mako" />
 
-%if not is_embeddable:
-${ commonheader(_('Search Indexes'), "indexer", user, request, "90px") | n,unicode }
-%endif
-
 <div id="indexesComponents">
 <link rel="stylesheet" href="${ static('indexer/css/admin.css') }">
 
@@ -70,7 +66,7 @@ ${ commonheader(_('Search Indexes'), "indexer", user, request, "90px") | n,unico
           <li class="app-header">
             <a href="#manage">
               <i class="fa fa-database app-icon"></i>
-              ${ _('Index Browser') if is_embeddable else _('Indexes') }
+              ${ _('Index Browser')
             </a>
           </li>
         </ul>
@@ -639,7 +635,3 @@ vm.manage.fetchCollections();
 ko.applyBindings(vm, $('#indexesComponents')[0]);
 
 </script>
-
-%if not is_embeddable:
-${ commonfooter(request, messages) | n,unicode }
-%endif

@@ -113,7 +113,7 @@ class HistoryApi(Api):
     # Notebook API
     pass
 
-  def logs(self, appid, app_type, log_name=None, is_embeddable=False):
+  def logs(self, appid, app_type, log_name=None):
     return {'logs': ''}
 
 

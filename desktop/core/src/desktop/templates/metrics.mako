@@ -26,20 +26,15 @@ else:
 %>
 
 <%
-MAIN_SCROLLABLE = is_embeddable and "'.page-content'" or "window"
+MAIN_SCROLLABLE = "'.page-content'"
 if conf.CUSTOM.BANNER_TOP_HTML.get():
-  TOP_SNAP = is_embeddable and "78px" or "106px"
+  TOP_SNAP = "78px"
 else:
-  TOP_SNAP = is_embeddable and "50px" or "106px"
+  TOP_SNAP = "50px"
 %>
 
 <%namespace name="actionbar" file="actionbar.mako" />
 <%namespace name="layout" file="about_layout.mako" />
-
-%if not is_embeddable:
-${ commonheader(_('Metrics'), "about", user, request) | n,unicode }
-%endif
-
 
 <script type="text/javascript">
   (function () {
@@ -104,7 +99,7 @@ ${layout.menubar(section='metrics')}
 <div id="metricsComponents" class="container-fluid">
   <div class="card card-small margin-top-10">
     <!-- ko if: metrics() -->
-    <div data-bind="dockable: { scrollable: ${ MAIN_SCROLLABLE }, jumpCorrection: 0,topSnap: '${ TOP_SNAP }', triggerAdjust: ${ is_embeddable and "0" or "106" }}">
+    <div data-bind="dockable: { scrollable: ${ MAIN_SCROLLABLE }, jumpCorrection: 0,topSnap: '${ TOP_SNAP }', triggerAdjust: 0 }">
       <ul class="nav nav-pills">
         <li data-bind="css: { 'active': $root.selectedMetric() === 'All' }">
           <a href="javascript:void(0)" data-bind="text: 'All', click: function(){ $root.selectedMetric('All') }"></a>
@@ -171,8 +166,3 @@ ${layout.menubar(section='metrics')}
   <!-- /ko -->
   </div>
 </div>
-
-
-%if not is_embeddable:
-${ commonfooter(request, messages) | n,unicode }
-%endif

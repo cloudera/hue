@@ -63,8 +63,8 @@ class JobApi(Api):
   def action(self, app_ids, operation):
     return self._get_api(app_ids).action(operation, app_ids)
 
-  def logs(self, appid, app_type, log_name, is_embeddable=False):
-    return self._get_api(appid).logs(appid, app_type, log_name, is_embeddable)
+  def logs(self, appid, app_type, log_name):
+    return self._get_api(appid).logs(appid, app_type, log_name)
 
   def profile(self, appid, app_type, app_property, app_filters):
     return self._get_api(appid).profile(appid, app_type, app_property, app_filters)
@@ -227,7 +227,7 @@ class YarnApi(Api):
       return {}
 
 
-  def logs(self, appid, app_type, log_name, is_embeddable=False):
+  def logs(self, appid, app_type, log_name):
     logs = ''
     logs_list = []
     try:
@@ -243,7 +243,7 @@ class YarnApi(Api):
             else:
               logs = logs[1]
         else:
-          response = job_attempt_logs_json(MockDjangoRequest(self.user), job=appid, name=log_name, is_embeddable=is_embeddable)
+          response = job_attempt_logs_json(MockDjangoRequest(self.user), job=appid, name=log_name)
           logs = json.loads(response.content).get('log')
       elif app_type == 'SPARK':
         response = job_executor_logs(MockDjangoRequest(self.user), job=appid, name=log_name)
@@ -320,7 +320,7 @@ class YarnAttemptApi(Api):
     return common
 
 
-  def logs(self, appid, app_type, log_name, is_embeddable=False):
+  def logs(self, appid, app_type, log_name):
     if log_name == 'default':
       log_name = 'stdout'
 
@@ -418,12 +418,12 @@ class YarnMapReduceTaskApi(Api):
     return common
 
 
-  def logs(self, appid, app_type, log_name, is_embeddable=False):
+  def logs(self, appid, app_type, log_name):
     if log_name == 'default':
       log_name = 'stdout'
 
     try:
-      response = job_attempt_logs_json(MockDjangoRequest(self.user), job=self.app_id, name=log_name, is_embeddable=is_embeddable)
+      response = job_attempt_logs_json(MockDjangoRequest(self.user), job=self.app_id, name=log_name)
       logs = json.loads(response.content)['log']
     except PopupException as e:
       LOG.warning('No task attempt found for default logs: %s' % e)
@@ -496,7 +496,7 @@ class YarnMapReduceTaskAttemptApi(Api):
     return common
 
 
-  def logs(self, appid, app_type, log_name, is_embeddable=False):
+  def logs(self, appid, app_type, log_name):
     if log_name == 'default':
       log_name = 'stdout'
 
@@ -526,7 +526,9 @@ class YarnMapReduceTaskAttemptApi(Api):
     return {
         #"elapsedMergeTime" : task.elapsedMergeTime,
         #"shuffleFinishTime" : task.shuffleFinishTime,
-        "assignedContainerId" : task.assignedContainerId if hasattr(task, 'assignedContainerId') else task.amContainerId if hasattr(task, 'amContainerId') else '',
+        "assignedContainerId": task.assignedContainerId if hasattr(task,
+                                                                 'assignedContainerId') else task.amContainerId if hasattr(
+        task, 'amContainerId') else '',
         "progress" : task.progress if hasattr(task, 'progress') else '',
         "elapsedTime" : task.elapsedTime if hasattr(task, 'elapsedTime') else '',
         "state" : task.state if hasattr(task, 'state') else task.appAttemptState if hasattr(task, 'appAttemptState') else '',
@@ -541,7 +543,8 @@ class YarnMapReduceTaskAttemptApi(Api):
         "finishTime" : task.finishTime if hasattr(task, 'finishTime') else int(task.finishedTime) if hasattr(task, 'finishedTime') else '',
         "app_id": self.app_id,
         "task_id": self.task_id,
-        'apiStatus': self._api_status(task.state) if hasattr(task, 'state') else self._api_status(task.appAttemptState) if hasattr(task, 'appAttemptState') else '',
+        'apiStatus': self._api_status(task.state) if hasattr(task, 'state') else self._api_status(
+          task.appAttemptState) if hasattr(task, 'appAttemptState') else '',
         'host': task.host if hasattr(task, 'host') else '',
         'rpcPort': task.rpcPort if hasattr(task, 'rpcPort') else '',
         'diagnosticsInfo': task.diagnosticsInfo if hasattr(task, 'diagnosticsInfo') else ''
@@ -600,7 +603,7 @@ class SparkExecutorApi(Api):
        "logs": executor['logs']
     }
 
-  def logs(self, appid, app_type, log_name, is_embeddable=False):
+  def logs(self, appid, app_type, log_name):
     log = ""
 
     if self._executors and self._executors[0]:

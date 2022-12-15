@@ -126,7 +126,6 @@ def _edit_workflow(request, doc, workflow):
       'doc_uuid': doc.uuid if doc else '',
       'subworkflows_json': json.dumps(_get_workflows(request.user), cls=JSONEncoderForHTML),
       'can_edit_json': json.dumps(can_edit_json),
-      'is_embeddable': request.GET.get('is_embeddable', False),
   })
 
 
@@ -399,7 +398,9 @@ def submit_single_action(request, doc_id, node_id):
   workflow.import_workspace(request.fs, parent_wf.deployment_dir, request.user)
   workflow.document = parent_doc
 
-  return _submit_workflow_helper(request, workflow, submit_action=reverse('oozie:submit_single_action', kwargs={'doc_id': doc_id, 'node_id': node_id}))
+  return _submit_workflow_helper(request, workflow, submit_action=reverse('oozie:submit_single_action',
+                                                                          kwargs={'doc_id': doc_id,
+                                                                                  'node_id': node_id}))
 
 
 def _submit_workflow_helper(request, workflow, submit_action):
@@ -555,7 +556,6 @@ def edit_coordinator(request):
       'credentials': list(credentials.credentials.keys()),
       'workflows': workflows,
       'doc_uuid': doc.uuid if doc else '',
-      'is_embeddable': request.GET.get('is_embeddable', False),
       'can_edit': can_edit,
       'layout': django_mako.render_to_string('editor2/common_scheduler.mako', {'coordinator_json': coordinator.to_json_for_html()})
     })
@@ -565,7 +565,6 @@ def edit_coordinator(request):
       'credentials_json': json.dumps(list(credentials.credentials.keys()), cls=JSONEncoderForHTML),
       'workflows_json': json.dumps(workflows, cls=JSONEncoderForHTML),
       'doc_uuid': doc.uuid if doc else '',
-      'is_embeddable': request.GET.get('is_embeddable', False),
       'can_edit_json': json.dumps(can_edit)
   })
 
@@ -631,7 +630,8 @@ def save_coordinator(request):
         owner=request.user,
         is_managed=coordinator_data.get('isManaged')
     )
-    Document.objects.link(coordinator_doc, owner=coordinator_doc.owner, name=coordinator_doc.name, description=coordinator_doc.description, extra='coordinator2')
+    Document.objects.link(coordinator_doc, owner=coordinator_doc.owner, name=coordinator_doc.name,
+                          description=coordinator_doc.description, extra='coordinator2')
 
   scheduled_id = coordinator_data['properties']['workflow'] or coordinator_data['properties']['document']
   if scheduled_id:
@@ -744,7 +744,9 @@ def _submit_coordinator(request, coordinator, mapping):
           u'groupSize': 0,
           u'useSpot': False
         },
-        u'environmentName': u'crn:altus:environments:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:environment:analytics/236ebdda-18bd-428a-9d2b-cd6973d42946',
+        u'environmentName':
+          u'crn:altus:environments:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:environment:' +
+          u'analytics/236ebdda-18bd-428a-9d2b-cd6973d42946',
         u'instanceBootstrapScript': u'',
         u'instanceType': u'm4.xlarge',
         u'jobSubmissionGroupName': u'',
@@ -777,7 +779,8 @@ def _submit_coordinator(request, coordinator, mapping):
   #           }
   #         }
         ],
-        u'namespaceName': u'crn:altus:sdx:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:namespace:analytics/7ea35fe5-dbc9-4b17-92b1-97a1ab32e410',
+        u'namespaceName':
+          u'crn:altus:sdx:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:namespace:analytics/7ea35fe5-dbc9-4b17-92b1-97a1ab32e410',
         u'publicKey': DEFAULT_PUBLIC_KEY.get(),
         u'serviceType': u'SPARK',
         u'workersConfiguration': {},
@@ -794,7 +797,8 @@ def _submit_coordinator(request, coordinator, mapping):
     return job_id
   except RestException as ex:
     LOG.exception('Error submitting coordinator')
-    raise PopupException(_("Error submitting coordinator %s") % (coordinator,), detail=ex._headers.get('oozie-error-message', ex), error_code=200)
+    raise PopupException(_("Error submitting coordinator %s") % (coordinator,),
+                         detail=ex._headers.get('oozie-error-message', ex), error_code=200)
 
 
 @check_editor_access_permission
@@ -839,7 +843,6 @@ def edit_bundle(request):
       'bundle_json': bundle.to_json_for_html(),
       'coordinators_json': json.dumps(coordinators, cls=JSONEncoderForHTML),
       'doc_uuid': doc.uuid if doc else '',
-      'is_embeddable': request.GET.get('is_embeddable', False),
       'can_edit_json': json.dumps(can_edit_json)
   })
 
@@ -961,7 +964,9 @@ def submit_bundle(request, doc_id):
 def _submit_bundle(request, bundle, properties):
   try:
     deployment_mapping = {}
-    coords = dict([(c.uuid, c) for c in Document2.objects.filter(type='oozie-coordinator2', uuid__in=[b['coordinator'] for b in bundle.data['coordinators']])])
+    coords = dict([(c.uuid, c) for c in Document2.objects.filter(type='oozie-coordinator2',
+                                                                 uuid__in=[b['coordinator'] for b in
+                                                                           bundle.data['coordinators']])])
 
     for i, bundled in enumerate(bundle.data['coordinators']):
       coord = coords[bundled['coordinator']]

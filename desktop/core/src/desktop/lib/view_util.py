@@ -98,7 +98,7 @@ def is_ajax(request):
 
   return _is_ajax
 
-def location_to_url(location, strict=True, is_embeddable=False):
+def location_to_url(location, strict=True):
   """
   If possible, returns a file browser URL to the location.
   Prunes HDFS URI to path.
@@ -123,7 +123,7 @@ def location_to_url(location, strict=True, is_embeddable=False):
     LOG.warning('No table filesystem link: %s' % e)
     return None
 
-  if is_embeddable and not filebrowser_path.startswith('/hue'):
+  if not filebrowser_path.startswith('/hue'):
     filebrowser_path = '/hue' + filebrowser_path
 
   return filebrowser_path

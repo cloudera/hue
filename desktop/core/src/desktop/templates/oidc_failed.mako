@@ -25,10 +25,6 @@ else:
   from django.utils.translation import ugettext as _
 %>
 
-%if not is_embeddable:
-${ commonheader(_('OpenID Connect Login Failed:'), "", user, request) | n,unicode }
-%endif
-
 <link rel="stylesheet" href="${ static('desktop/css/httperrors.css') }">
 
 <div id="httperror" class="container-fluid">
@@ -47,7 +43,3 @@ ${ commonheader(_('OpenID Connect Login Failed:'), "", user, request) | n,unicod
     </div>
   </div>
 </div>
-
-%if not is_embeddable:
-${ commonfooter(request, messages) | n,unicode }
-%endif

@@ -81,7 +81,7 @@ class LivySessionsApi(Api):
     return {}
 
 
-  def logs(self, appid, app_type, log_name=None, is_embeddable=False):
+  def logs(self, appid, app_type, log_name=None):
     return {'logs': ''}
 
 
@@ -156,7 +156,7 @@ class LivyJobApi(Api):
     return {}
 
 
-  def logs(self, appid, app_type, log_name=None, is_embeddable=False):
+  def logs(self, appid, app_type, log_name=None):
     return {'logs': ''}
 
 

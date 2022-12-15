@@ -23,13 +23,7 @@
     from django.utils.translation import ugettext as _
 %>
 
-<%namespace name="layout" file="../navigation-bar.mako" />
 <%namespace name="utils" file="../utils.inc.mako" />
-
-%if not is_embeddable:
-${ commonheader(_("Oozie Information"), "oozie", user, request) | n,unicode }
-${ layout.menubar(section='oozie', dashboard=True) }
-%endif
 
 <style type="text/css">
   .oozie-info .form-search {
@@ -221,13 +215,6 @@ ${ layout.menubar(section='oozie', dashboard=True) }
       </form>
       ${ utils.display_conf(configuration, "configurationTable") }
     </div>
-
-    %if not is_embeddable:
-    <div style="margin-bottom: 16px; margin-top: 10px">
-      <a href="${ url('oozie:list_oozie_bundles') }" class="btn">${ _('Back') }</a>
-    </div>
-    %endif
-
     </div>
     </div>
   </div>
@@ -323,7 +310,3 @@ ${ layout.menubar(section='oozie', dashboard=True) }
     });
   });
 </script>
-
-%if not is_embeddable:
-${ commonfooter(request, messages) | n,unicode }
-%endif
