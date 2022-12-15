@@ -14,18 +14,38 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { get } from '../../api/utils';
-import { CancellablePromise } from '../../api/cancellablePromise';
-import { PathAndFileData } from './types';
+.path-browser {
+  height: 20px;
+  margin: 1.5px 0 0 18px !important;
+  display: flex;
 
-const FILESYSTEMS_API_URL = '/api/storage/filesystems';
-const VIEWFILES_API_URl = '/api/storage/view=';
-export interface ApiFileSystem {
-  file_system: string;
-  user_home_directory: string;
+  &:hover {
+    background-color: #f1f2f3;
+  }
 }
 
-export const fetchFileSystems = (): CancellablePromise<ApiFileSystem[]> => get(FILESYSTEMS_API_URL);
+.path-browser__breadcrumb.ant-breadcrumb {
+  margin-left: 10px;
 
-export const fetchFiles = (filePath: string): CancellablePromise<PathAndFileData> =>
-  get(VIEWFILES_API_URl + filePath);
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.path-browser__breadcrumb li:last-child .ant-breadcrumb-separator:last-child {
+  display: none;
+}
+
+.toggle-breadcrumb-input {
+  pointer-events: auto;
+  width: 60px;
+
+  &:hover {
+    cursor: text;
+  }
+}
+
+.path-browser__input.ant-input {
+  width: 300px;
+  padding: 0;
+}

@@ -21,3 +21,36 @@ export interface FileSystem {
   icon: JSX.Element;
   user_home_dir: string;
 }
+
+interface Stats {
+  aclBit: boolean;
+  atime: string;
+  group: string;
+  mode: number;
+  mtime: string;
+  path: string;
+  size: number;
+  user: string;
+}
+
+interface File {
+  humansize: string;
+  is_sentry_managed: boolean;
+  mode: string;
+  mtime: string;
+  name: string;
+  path: string;
+  rwx: string;
+  stats: Stats;
+  type: string;
+  url: string;
+}
+export interface BreadcrumbData {
+  label: string;
+  url: string;
+}
+export interface PathAndFileData {
+  path: string;
+  breadcrumbs: Array<BreadcrumbData>;
+  files: Array<File>;
+}
