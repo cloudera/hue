@@ -30,10 +30,6 @@ stacks:
     git_sha: HEAD
     enable_review: false
     is_base_repo: true
-  gates:
-  - depends-on: []
-    name: build
-    vote: true
   tests: {}
   name: CDWH
   stack_name: CDWH
