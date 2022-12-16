@@ -133,14 +133,19 @@ class HttpClient(object):
   def set_kerberos_auth(self, service="HTTP"):
     """Set up kerberos auth for the client, based on the current ticket."""
     mutual_auth = conf.KERBEROS.MUTUAL_AUTHENTICATION.get().upper()
+    hostname_override = conf.KERBEROS.HOSTNAME_OVERRIDE.get()
     if mutual_auth == 'OPTIONAL':
-      self._session.auth = HTTPKerberosAuth(mutual_authentication=OPTIONAL, service=service)
+      self._session.auth = HTTPKerberosAuth(mutual_authentication=OPTIONAL, service=service,
+                                            hostname_override=hostname_override)
     elif mutual_auth == 'REQUIRED':
-      self._session.auth = HTTPKerberosAuth(mutual_authentication=REQUIRED, service=service)
+      self._session.auth = HTTPKerberosAuth(mutual_authentication=REQUIRED, service=service,
+                                            hostname_override=hostname_override)
     elif mutual_auth == 'DISABLED':
-      self._session.auth = HTTPKerberosAuth(mutual_authentication=DISABLED, service=service)
+      self._session.auth = HTTPKerberosAuth(mutual_authentication=DISABLED, service=service,
+                                            hostname_override=hostname_override)
     else:
-      self._session.auth = HTTPKerberosAuth(mutual_authentication=OPTIONAL, service=service)
+      self._session.auth = HTTPKerberosAuth(mutual_authentication=OPTIONAL, service=service,
+                                            hostname_override=hostname_override)
     return self
 
   def set_basic_auth(self, username, password):

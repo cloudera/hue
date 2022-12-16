@@ -977,6 +977,13 @@ KERBEROS = ConfigSection(
       type=str,
       default="OPTIONAL",
     ),
+    HOSTNAME_OVERRIDE=Config(
+      key='hostname_override',
+      help=_("Optional hostname override that allows use of an arbitrary hostname for the Kerberos exchange "
+             "(e.g. in cases of aliased hosts, CNAMEs)"),
+      type=str,
+      default=None,
+    ),
   )
 )
 
