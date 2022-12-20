@@ -176,7 +176,7 @@ public class EventProcessorPipelineTest {
     // Keep invoke because current day is same.
     verify(logger, VerificationModeFactory.atLeastOnce())
       .scanForChangedFiles(eq("date=1970-01-03"), any());
-    verify(logger, times(3)).getNextDirectory(eq("date=1970-01-03"));
+    verify(logger, atLeast(3)).getNextDirectory(eq("date=1970-01-03"));
 
     verify(logger, times(0)).scanForChangedFiles(eq("date=1970-01-05"), any());
 
