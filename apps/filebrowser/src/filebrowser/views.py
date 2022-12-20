@@ -203,6 +203,7 @@ def download(request, path):
     setattr(response, 'redirect_override', True)
   else:
     response = StreamingHttpResponse(file_reader(fh), content_type=content_type)
+    response["Cache-Control"] = 'no-cache' # Browsers must not cache files but always download
     response["Last-Modified"] = http_date(stats['mtime'])
     response["Content-Length"] = stats['size']
     response['Content-Disposition'] = request.GET.get('disposition', 'attachment; filename="' + stats['name'] + '"') \
