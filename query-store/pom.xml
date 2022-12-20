@@ -27,7 +27,7 @@
     <junit.version>4.13</junit.version>
     <jackson.version>2.11.4</jackson.version>
     <jackson.modules.version>2.11.4</jackson.modules.version>
-    <jersey.version>2.31</jersey.version>
+    <jersey.version>2.35</jersey.version>
     <lombok.version>1.18.10</lombok.version>
     <protobuf.version>3.21.7</protobuf.version>
     <jdbi.version>3.14.1</jdbi.version>
@@ -381,6 +381,52 @@
         <artifactId>jersey-server</artifactId>
         <version>${jersey.version}</version>
       </dependency>
+
+    <dependency>
+        <groupId>org.glassfish.jersey.core</groupId>
+        <artifactId>jersey-common</artifactId>
+        <version>${jersey.version}</version>
+        <exclusions>
+            <exclusion>
+                <groupId>*</groupId>
+                <artifactId>*</artifactId>
+            </exclusion>
+        </exclusions>
+    </dependency>
+    <dependency>
+        <groupId>org.glassfish.jersey.containers</groupId>
+        <artifactId>jersey-container-servlet</artifactId>
+        <version>${jersey.version}</version>
+        <exclusions>
+            <exclusion>
+                <groupId>*</groupId>
+                <artifactId>*</artifactId>
+            </exclusion>
+        </exclusions>
+    </dependency>
+    <dependency>
+        <groupId>org.glassfish.jersey.containers</groupId>
+        <artifactId>jersey-container-servlet-core</artifactId>
+        <version>${jersey.version}</version>
+        <exclusions>
+            <exclusion>
+                <groupId>*</groupId>
+                <artifactId>*</artifactId>
+            </exclusion>
+        </exclusions>
+    </dependency>
+    <dependency>
+        <groupId>org.glassfish.jersey.ext</groupId>
+        <artifactId>jersey-bean-validation</artifactId>
+        <version>${jersey.version}</version>
+        <exclusions>
+            <exclusion>
+                <groupId>*</groupId>
+                <artifactId>*</artifactId>
+            </exclusion>
+        </exclusions>
+    </dependency>
+
 
       <!-- Test dependencies -->
       <dependency>
