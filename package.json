@@ -61,7 +61,7 @@
     "mustache": "4.1.0",
     "page": "1.8.6",
     "plotly.js-dist": "1.45.3",
-    "qs": "6.9.4",
+    "qs": "6.9.7",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-i18next": "11.18.6",
