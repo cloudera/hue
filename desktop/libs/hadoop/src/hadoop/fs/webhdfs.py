@@ -997,6 +997,9 @@ class File(object):
     self._pos += len(data)
     return data
 
+  def create(self, data):
+    self._fs.create(self._path, data=data)
+
   def write(self, data):
     """Append the data to the end of the file"""
     self.append(data)

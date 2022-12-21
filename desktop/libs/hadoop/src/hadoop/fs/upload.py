@@ -116,7 +116,18 @@ class HDFStemporaryUploadedFile(object):
         LOG.exception('Failed to remove temporary upload file "%s". Please cleanup manually: %s' % (self._path, ex))
 
   def write(self, data):
-    self._file.write(data)
+    try:
+      self._file.write(data)
+    except WebHdfsException as e:
+      LOG.exception("WebHdfsException: " + str(e))
+      if "append() Not implemented by the OzoneFileSystem FileSystem implementation" in e.message:
+        self.create(data)
+  
+  def create(self, data):
+    # If temp file exist, we are deleting it
+    if self._fs.exists(self._path):
+      self._fs._delete(self._path)
+    self._file.create(data)
 
   def flush(self):
     self._file.flush()
@@ -176,7 +187,8 @@ class HDFSfileUploadHandler(FileUploadHandler):
     LOG.debug("HDFSfileUploadHandler receive_data_chunk")
 
     if not self._activated:
-      if self.request.META.get('PATH_INFO').startswith('/filebrowser') and self.request.META.get('PATH_INFO') != '/filebrowser/upload/archive':
+      if self.request.META.get('PATH_INFO').startswith('/filebrowser') and \
+          self.request.META.get('PATH_INFO') != '/filebrowser/upload/archive':
         raise SkipFile()
       return raw_data
 

@@ -132,6 +132,8 @@ def s3datetime_to_timestamp(datetime):
   # There is chance (depends on platform) to get
   # `'z' is a bad directive in format ...` error (see https://bugs.python.org/issue6641),
   # but S3 always returns time in GMT, so `GMT` and `.000Z` can be pruned.
+  if datetime.count('GMT') == 2:                 # workaround for ozone s3 connector
+    datetime = datetime[0:len(datetime)//2-1]
   try:
     stripped = time.strptime(datetime[:-4], '%a, %d %b %Y %H:%M:%S')
     assert datetime[-4:] == ' GMT', 'Time [%s] is not in GMT.' % datetime

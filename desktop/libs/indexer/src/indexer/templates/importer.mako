@@ -691,6 +691,18 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
               </div>
 
               <div class="control-group">
+                <label class="checkbox inline-block">
+                  <input type="checkbox" data-bind="checked: isOzone"> ${_('IsOzone')}
+                </label>
+              </div>
+
+              <div class="control-group" data-bind="visible: isOzone">
+                <label class="control-label"><div>${ _('Ozone Bucket Path') }</div>
+                  <input type="text" class="form-control input-xxlarge" data-bind="value: ozonefsPath,  enable: isOzone, valueUpdate: 'afterkeydown'" placeholder="${ _('ofs://ozone1/vol/bucket') }" required>
+                </label>
+              </div>
+
+              <div class="control-group">
                 <label><div>${ _('Description') }</div>
                     <input type="text" class="form-control input-xxlarge" data-bind="value: description, valueUpdate: 'afterkeydown'" placeholder="${ _('Description') }">
                 </label>
@@ -2563,6 +2575,8 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
 
       self.icebergEnabled = ko.observable(vm.sourceType == 'impala' || vm.sourceType == 'hive');
       self.isIceberg = ko.observable(false);
+      self.isOzone = ko.observable(false);
+      self.ozonefsPath = ko.observable('');
 
       self.tableFormats = ko.pureComputed(function() {
         if (wizard.source.inputFormat() === 'stream') {
@@ -2835,7 +2849,9 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
           }).length === 0
         ) || self.destination.indexerConfigSet();
 
-        return self.isValidDestination() && validFields && validTableColumns && validIndexFields && isTargetAlreadyExisting && isValidTable;
+        var validOzonePath = !self.destination.isOzone() || (self.destination.isOzone() && self.destination.ozonefsPath() !== '');
+
+        return self.isValidDestination() && validFields && validTableColumns && validIndexFields && isTargetAlreadyExisting && isValidTable && validOzonePath;
       });
 
       self.formatTypeSubscribed = false;

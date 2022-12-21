@@ -220,6 +220,11 @@ class S3FileSystem(object):
 
   @staticmethod
   def _stats_key(key, fs='s3a'):
+    if key.size == 0:                                  # workaround for ozone s3 connector
+      key_name = S3FileSystem._append_separator(key.name)
+      ls = key.bucket.get_all_keys(prefix=key_name, max_keys=1)  
+      if len(ls) > 0:
+        return S3Stat.from_key(key, is_dir=True, fs=fs)
     if key.size is not None:
       is_directory_name = not key.name or key.name[-1] == '/'
       return S3Stat.from_key(key, is_dir=is_directory_name, fs=fs)

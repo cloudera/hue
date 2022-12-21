@@ -76,6 +76,8 @@ class SQLIndexer(object):
 
     table_format = destination['tableFormat']
     source_type = source['sourceType']
+    ozonefs_path = destination['ozonefsPath']
+    isOzone = destination['isOzone']
 
     columns = destination['columns']
     partition_columns = destination['partitionColumns']
@@ -165,8 +167,11 @@ class SQLIndexer(object):
         if len(self.fs.listdir(external_path)) > 1:
           # If dir not just the file, create data dir and move file there. Make sure it's unique.
           external_path = external_path + '/%s%s_table' % (external_file_name, str(uuid.uuid4()))
-          self.fs.mkdir(external_path)
-          self.fs.rename(source_path, external_path)
+          if isOzone and ("s3a://" in external_path or "s3a://" in source_path):
+            self.fs.rename(source_path, external_path + '/' + external_file_name)
+          else:
+            self.fs.mkdir(external_path)
+            self.fs.rename(source_path, external_path)
     elif load_data: # We'll use load data command
       parent_path = self.fs.parent_path(source_path)
       stats = self.fs.stats(parent_path)
@@ -189,6 +194,20 @@ class SQLIndexer(object):
     # The temp table is not transactional, but final table can be if is_transactional.
     # tbl_properties that don't exist in previous versions can safely be added without error.
     tbl_properties['transactional'] = 'false'
+
+    if isOzone:
+      abs_path = 2
+      if "s3a://" in external_path or "s3a://" in source_path:
+        abs_path = 3
+      if len(external_path.split('/', abs_path)) > abs_path:
+        external_path = ozonefs_path + '/' + external_path.split('/', abs_path)[abs_path]
+      else:
+        external_path = ozonefs_path
+      
+      if len(source_path.split('/', abs_path)) > abs_path:
+        source_path = ozonefs_path + '/' + source_path.split('/', abs_path)[abs_path]
+      else:
+        source_path = ozonefs_path
 
     sql += django_mako.render_to_string("gen/create_table_statement.mako", {
         'table': {
