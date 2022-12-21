@@ -1,6 +1,6 @@
 {
   "name": "vue3-webcomponent-wrapper",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "description": "Wrap and register a Vue 3 component as a custom element.",
   "main": "dist/index.js",
   "scripts": {
