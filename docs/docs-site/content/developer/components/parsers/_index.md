@@ -24,14 +24,8 @@ Refer the [SQL Parser Documentation](/developer/development/#sql-parsers) for ho
       <option value="calciteAutocompleteParser">Calcite Autocomplete Parser</option>
       <option value="calciteSyntaxParser">Calcite Syntax Error Parser</option>
       <option disabled> </option>
-      <option value="elasticsearchAutocompleteParser">Elasticsearch Autocomplete Parser</option>
-      <option value="elasticsearchSyntaxParser">Elasticsearch Syntax Error Parser</option>
-      <option disabled> </option>
       <option value="phoenixAutocompleteParser">Phoenix Autocomplete Parser</option>
       <option value="phoenixSyntaxParser">Phoenix Syntax Error Parser</option>
-      <option disabled> </option>
-      <option value="druidAutocompleteParser">Druid Autocomplete Parser</option>
-      <option value="druidSyntaxParser">Druid Syntax Error Parser</option>
       <option disabled> </option>
       <option value="flinkAutocompleteParser">Flink Autocomplete Parser</option>
       <option value="flinkSyntaxParser">Flink Syntax Error Parser</option>
