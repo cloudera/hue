@@ -36,6 +36,9 @@ Refer the [SQL Parser Documentation](/developer/development/#sql-parsers) for ho
       <option value="prestoAutocompleteParser">Presto Autocomplete Parser</option>
       <option value="prestoSyntaxParser">Presto Syntax Error Parser</option>
       <option disabled> </option>
+      <option value="dasksqlAutocompleteParser">Dask Autocomplete Parser</option>
+      <option value="dasksqlSyntaxParser">Dask Syntax Error Parser</option>
+      <option disabled> </option>
       <option value="genericAutocompleteParser">Generic Autocomplete Parser</option>
       <option value="genericSyntaxParser">Generic Syntax Error Parser</option>
     </select>
