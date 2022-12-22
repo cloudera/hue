@@ -2,7 +2,7 @@
 
 ## Update GetHue version
 
-Docs uses GetHue for live demos. Kindly follow these steps to update GetHue to the version of your choice.
+Docs depends on gethue NPM package for live demos. Kindly follow these steps to update gethue to the version of your choice.
 
 ### 1. Install GetHue
 
@@ -13,7 +13,9 @@ Docs uses GetHue for live demos. Kindly follow these steps to update GetHue to t
 
     npm run update-static
 
-This must update the resources used in the docs. On `git status` you must see modifications on `./package.json`, `./package-lock.json` & `static/js/gethue/`. And on `hugo serve` you must see the updated resources in the docs UI.
+This must update the resources used in the docs. On `git status` you must see modifications on `./package.json`, `./package-lock.json` & `static/js/gethue/`.
+
+On `hugo serve` you must see the updated resources in the docs UI.
 
 ### 3. Commit changes
 
