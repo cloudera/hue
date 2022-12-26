@@ -12,7 +12,7 @@ Django>=1.11,<2.0
 dj-database-url==0.4.2
 
 # Packaging
-wheel==0.29.0
+wheel==0.38.1
 twine==1.9.1
 
 # PEP8, PEP257, and static analysis
