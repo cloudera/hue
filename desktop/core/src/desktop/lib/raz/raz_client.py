@@ -241,6 +241,14 @@ class RazClient(object):
 
 
   def _make_s3_request(self, request_data, request_headers, method, params, headers, url_params, endpoint, resource_path, data=None):
+
+    # Unquote path fully for GET operations with non-ascii characters.
+    if method == 'GET' and 'prefix' in url_params and '%' in url_params['prefix']:
+      if isinstance(url_params['prefix'], unicode) and sys.version_info[0] < 3:
+        url_params['prefix'] = url_params['prefix'].encode()
+
+      url_params['prefix'] = lib_urlunquote(url_params['prefix'])
+
     allparams = [raz_signer.StringListStringMapProto(key=key, value=[val]) for key, val in url_params.items()]
     allparams.extend([raz_signer.StringListStringMapProto(key=key, value=[val]) for key, val in params.items()])
     headers = [raz_signer.StringStringMapProto(key=key, value=val) for key, val in headers.items()]
