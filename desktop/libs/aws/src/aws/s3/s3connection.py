@@ -114,15 +114,39 @@ class RazS3Connection(SignedUrlS3Connection):
     LOG.debug('auth_path=%s' % auth_path)
 
     host = self.calling_format.build_host(self.server_name(), bucket)
+    LOG.debug(' after host ---------->>>')
 
     if query_args:
+
+      if isinstance(query_args, unicode) and sys.version_info[0] < 3:
+        query_args = query_args.encode()
+      LOG.debug('in query_args if --------->>>')
+      LOG.debug(query_args)
+      LOG.debug(type(query_args))
+
       # Clean prefix to remove s3a%3A//[S3_BUCKET]/ for sending correct relative path to RAZ
       if 'prefix=s3a%3A//' in query_args:
-        qs_parsed = parse_qs(query_args) # all strings will be unquoted
+        LOG.debug('in query_args if again if --------->>>')
+        LOG.debug(query_args)
+        LOG.debug(type(query_args))
+        qs_parsed = dict(item.split('=') for item in query_args.split('&') if item)
+        for k,v in qs_parsed.items():
+          qs_parsed[k] = [v]
+        #qs_parsed = parse_qs(query_args) # all strings will be unquoted
+        LOG.debug('after qs_parsed --------->>>')
+        LOG.debug(qs_parsed)
         prefix_relative_path = qs_parsed['prefix'][0].partition(bucket + '/')[2]
+        LOG.debug('after prefix_relative_path --------->>>')
+
         qs_parsed['prefix'][0] = prefix_relative_path
+        LOG.debug(' after assigning new value --------->>>')
+        LOG.debug(qs_parsed)
 
         query_args = unquote(urlencode(qs_parsed, doseq=True))
+        LOG.debug('after query_args changed --------->>>')
+        
+      LOG.debug(query_args)
+      LOG.debug(type(query_args))
 
       path += '?' + query_args
       LOG.debug('path=%s' % path)
@@ -130,7 +154,32 @@ class RazS3Connection(SignedUrlS3Connection):
       LOG.debug('auth_path=%s' % auth_path)
 
     params = {}
+
+    if isinstance(auth_path, unicode) and sys.version_info[0] < 3:
+      auth_path = auth_path.encode()
+    
+    if isinstance(host, unicode) and sys.version_info[0] < 3:
+      host = host.encode()
+
+    LOG.debug(method)
+    LOG.debug('type of method' + str(type(method)))
+    LOG.debug(path)
+    LOG.debug('type of path' + str(type(path)))
+    LOG.debug(auth_path)
+    LOG.debug('type of auth_path' + str(type(auth_path)))
+    LOG.debug(params)
+    LOG.debug('type of params' + str(type(params)))
+    LOG.debug(headers)
+    LOG.debug('type of headers' + str(type(headers)))
+    
+    LOG.debug(data)
+    LOG.debug('type of data' + str(type(data)))
+    LOG.debug(host)
+    LOG.debug('type of host' + str(type(host)))
+
     http_request = self.build_base_http_request(method, path, auth_path, params, headers, data, host)
+
+    LOG.debug('after request')
 
     # Actual override starts here
     LOG.debug('http_request: %s, %s, %s, %s, %s, %s, %s' % (method, path, auth_path, params, headers, data, host))
@@ -143,6 +192,7 @@ class RazS3Connection(SignedUrlS3Connection):
 
     raz_headers = self.get_signed_url(action=method, url=url, headers=headers, data=xml_data)
     LOG.debug('Raz returned those headers: %s' % raz_headers)
+    LOG.debug('type of raz_headers' + str(type(raz_headers)))
 
     if raz_headers is not None:
       http_request.headers.update(raz_headers)
@@ -150,6 +200,12 @@ class RazS3Connection(SignedUrlS3Connection):
       LOG.error('We got back empty header from Raz for the request %s' % http_request)
 
     LOG.debug('Overriden: %s' % http_request)
+    LOG.debug('type of http_request' + str(type(http_request)))
+
+    LOG.debug(sender)
+    LOG.debug('type of sender' + str(type(sender)))
+    LOG.debug(retry_handler)
+    LOG.debug('type of retry_handler' + str(type(retry_handler)))
 
     return self._mexe(http_request, sender, override_num_retries,
                       retry_handler=retry_handler)
