@@ -19,11 +19,12 @@ import logging
 import requests
 import sys
 import xml.sax
+import xml.etree.ElementTree as ET
 
 if sys.version_info[0] > 2:
-  from urllib.parse import unquote, urlparse as lib_urlparse, parse_qs, urlencode
+  from urllib.parse import unquote, urlparse as lib_urlparse, parse_qs, urlencode, quote
 else:
-  from urllib import unquote, urlencode
+  from urllib import unquote, urlencode, quote
   from urlparse import urlparse as lib_urlparse, parse_qs
 
 from boto.connection import HTTPRequest
@@ -114,15 +115,11 @@ class RazS3Connection(SignedUrlS3Connection):
     LOG.debug('auth_path=%s' % auth_path)
 
     host = self.calling_format.build_host(self.server_name(), bucket)
-    LOG.debug(' after host ---------->>>')
 
     if query_args:
 
       if isinstance(query_args, unicode) and sys.version_info[0] < 3:
-        query_args = query_args.encode()
-      LOG.debug('in query_args if --------->>>')
-      LOG.debug(query_args)
-      LOG.debug(type(query_args))
+        query_args = query_args.encode('utf-8')
 
       # Clean prefix to remove s3a%3A//[S3_BUCKET]/ for sending correct relative path to RAZ
       if 'prefix=s3a%3A//' in query_args:
@@ -156,10 +153,10 @@ class RazS3Connection(SignedUrlS3Connection):
     params = {}
 
     if isinstance(auth_path, unicode) and sys.version_info[0] < 3:
-      auth_path = auth_path.encode()
+      auth_path = auth_path.encode('utf-8')
     
     if isinstance(host, unicode) and sys.version_info[0] < 3:
-      host = host.encode()
+      host = host.encode('utf-8')
 
     LOG.debug(method)
     LOG.debug('type of method' + str(type(method)))
@@ -171,7 +168,37 @@ class RazS3Connection(SignedUrlS3Connection):
     LOG.debug('type of params' + str(type(params)))
     LOG.debug(headers)
     LOG.debug('type of headers' + str(type(headers)))
-    
+    LOG.debug(data)
+    LOG.debug('type of data' + str(type(data)))
+
+    if data:
+      import xml.etree.ElementTree as ET
+      data_xml_root = ET.fromstring(data)
+      for object in data_xml_root:
+        for key in object:
+          # LOG.debug(key.text)
+          # for c in key.text:
+          #   if not (0 <= ord(c) <= 127):
+          #     key.text = key.text.replace(c, quote(c))
+          # LOG.debug(key.text)
+          l = list(key.text)
+          l = [x.encode('utf-8') for x in l if isinstance(x, unicode) and sys.version_info[0] < 3]
+          for i,c in enumerate(l):
+            if len(c)>1:
+              l[i] = quote(c)
+
+          key.text = ''.join(l)
+      
+      new_data_xml_str = ET.tostring(data_xml_root).decode() if sys.version_info[0] > 2 else ET.tostring(data_xml_root)
+      data = '<?xml version="1.0" encoding="UTF-8"?>' + new_data_xml_str
+
+      import hashlib
+      if sys.version_info[0] > 2:
+        import base64
+        headers['Content-MD5'] = base64.b64encode(hashlib.md5(data.encode('utf-8')).digest()).decode()
+      else:
+        headers['Content-MD5'] = hashlib.md5(data.encode('utf-8')).digest().encode('base64').strip()
+
     LOG.debug(data)
     LOG.debug('type of data' + str(type(data)))
     LOG.debug(host)
