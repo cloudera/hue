@@ -584,7 +584,7 @@ class ResultChart extends DisposableComponent {
     };
 
     this.subscribe(EXECUTABLE_RESULT_UPDATED_TOPIC, executionResult => {
-      if (this.activeExecutable() === executionResult.executable) {
+      if (this.activeExecutable()?.id === executionResult?.executable?.id) {
         handleResultChange();
       }
     });
