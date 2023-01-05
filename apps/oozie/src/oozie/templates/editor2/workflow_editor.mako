@@ -671,11 +671,13 @@ ${ utils.submit_popup_event() }
         showAddActionDemiModal(widget);
       });
     } else {
-      if (window.workflowEditorViewModel.currentlyDraggedOp() == "move"){
-        window.workflowEditorViewModel.workflow.moveNode(widget);
-      } else { // Copy
-        var _sourceNode = window.workflowEditorViewModel.workflow.getNodeById(window.workflowEditorViewModel.currentlyDraggedWidget().id());
-        window.workflowEditorViewModel.workflow.newNode(widget, window.workflowEditorViewModel.workflow.addNode, _sourceNode);
+      if (widget) {
+        if (window.workflowEditorViewModel.currentlyDraggedOp() == "move"){
+          window.workflowEditorViewModel.workflow.moveNode(widget);
+        } else { // Copy
+          var _sourceNode = window.workflowEditorViewModel.workflow.getNodeById(window.workflowEditorViewModel.currentlyDraggedWidget().id());
+          window.workflowEditorViewModel.workflow.newNode(widget, window.workflowEditorViewModel.workflow.addNode, _sourceNode);
+        }
       }
       window.setTimeout(renderChangeables, 0);
     }
