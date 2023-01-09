@@ -87,7 +87,7 @@ class SQLIndexer(object):
     isIceberg = destination['isIceberg']
 
     external = not destination['useDefaultLocation']
-    external_path = urllib_unquote(destination['nonDefaultLocation'])
+    external_path = destination['nonDefaultLocation']
 
     editor_type = destination['sourceType']
     is_transactional = destination['isTransactional']
