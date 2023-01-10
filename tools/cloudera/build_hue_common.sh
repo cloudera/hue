@@ -68,6 +68,7 @@ function redhat7_ppc_install() {
       make install'
     # Pip modules install
     sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install virtualenv virtualenv-make-relocatable'
+    sudo pip38_bin=${pip38_bin} -- sh -c 'ln -fs ${pip38_bin} $(dirname ${pip38_bin})/pip'
   fi
 }
 
@@ -99,6 +100,7 @@ function redhat8_ppc_install() {
     sudo -- sh -c 'yum install -y nodejs npm'
     # Pip modules install
     sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install virtualenv virtualenv-make-relocatable mysqlclient'
+    sudo pip38_bin=${pip38_bin} -- sh -c 'ln -fs ${pip38_bin} $(dirname ${pip38_bin})/pip'
     # sqlite3 install
     sudo TOOLS_HOME=${TOOLS_HOME} -- sh -c 'mkdir -p ${TOOLS_HOME} && \
       cd ${TOOLS_HOME} && \
@@ -129,6 +131,7 @@ function sles12_install() {
     sudo -- sh -c 'zypper install -y npm14 nodejs14'
     # Pip modules install
     sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install virtualenv virtualenv-make-relocatable mysqlclient'
+    sudo pip38_bin=${pip38_bin} -- sh -c 'ln -fs ${pip38_bin} $(dirname ${pip38_bin})/pip'
     # sqlite3 install
     sudo -- sh -c 'curl --insecure -o sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
         tar zxvf sqlite-autoconf-3350500.tar.gz && \
@@ -174,6 +177,7 @@ function centos7_install() {
       make install'
     # Pip modules install
     sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install virtualenv virtualenv-make-relocatable mysqlclient'
+    sudo pip38_bin=${pip38_bin} -- sh -c 'ln -fs ${pip38_bin} $(dirname ${pip38_bin})/pip'
   fi
 }
 
@@ -197,6 +201,7 @@ function redhat8_install() {
     sudo -- sh -c 'curl -sL https://rpm.nodesource.com/setup_14.x | bash - && yum install -y nodejs'
     # Pip modules install
     sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install virtualenv virtualenv-make-relocatable mysqlclient'
+    sudo pip38_bin=${pip38_bin} -- sh -c 'ln -fs ${pip38_bin} $(dirname ${pip38_bin})/pip'
     # sqlite3 install
     sudo -- sh -c 'curl -o sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
       tar zxvf sqlite-autoconf-3350500.tar.gz && \
@@ -240,6 +245,7 @@ function ubuntu18_install() {
       apt -y install nodejs'
     # Pip modules install
     sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install virtualenv virtualenv-make-relocatable mysqlclient'
+    sudo pip38_bin=${pip38_bin} -- sh -c 'ln -fs ${pip38_bin} $(dirname ${pip38_bin})/pip'
     # sqlite3 install
     sudo -- sh -c 'curl -o sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
         tar zxvf sqlite-autoconf-3350500.tar.gz && \
@@ -286,6 +292,7 @@ function ubuntu20_install() {
       apt -y install nodejs'
     # Pip modules install
     sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install virtualenv virtualenv-make-relocatable mysqlclient'
+    sudo pip38_bin=${pip38_bin} -- sh -c 'ln -fs ${pip38_bin} $(dirname ${pip38_bin})/pip'
     # sqlite3 install
     sudo -- sh -c 'curl -o sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
         tar zxvf sqlite-autoconf-3350500.tar.gz && \
