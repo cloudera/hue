@@ -37,6 +37,29 @@ class TestApi2(object):
     self.user = User.objects.get(username="api2_user")
 
 
+  def test_import_document_with_forward_ref(self, client=None):
+    if client is None:
+      client = self.client
+    
+    doc = '''[\n{\n  "model": "desktop.document2",\n  "pk": 20,\n  "fields": {\n    "owner": [\n      "admin"\n    ],\n'''\
+    '''"name": "schd1",\n    "description": "",\n    "uuid": "fa08942c-edf7-f712-921f-c0fb891d1fc4",\n    "type": '''\
+    '''"oozie-coordinator2",\n    "connector": null,\n    "data": "{\\"layout\\": [{\\"oozieRows\\": []}]}",\n    "extra": "",\n    '''\
+    '''"search": null,\n    "last_modified": "2023-01-05T23:08:44.548",\n'''\
+    '''    "version": 1,\n    "is_history": false,\n    "is_managed": false,\n    "is_trashed": false,\n    "parent_directory":'''\
+    ''' [\n      "117db535-78b6-42e5-92bf-dbafcae015a7",\n      1,\n      false\n    ],\n    "dependencies": [\n      [\n      '''\
+    '''  "92a7dd47-d8c8-b2d8-2895-440ccbc94198",\n        1,\n        false\n      ]\n    ]\n  }\n},\n{\n  "model": '''\
+    '''"desktop.document2",\n  "pk": 21,\n  "fields": {\n    "owner": [\n      "admin"\n    ],\n    "name": "wf2",\n   '''\
+    ''' "description": "",\n    "uuid": "92a7dd47-d8c8-b2d8-2895-440ccbc94198",\n    "type": "oozie-workflow2",\n    '''\
+    '''"connector": null,\n    "data": "{\\"layout\\": [{\\"oozieRows\\": []}]}",\n    "extra": "",\n    "search": null,\n   '''\
+    ''' "last_modified": "2023-01-05T23:08:27.853",\n    "version": 1,\n    "is_history": false,\n    "is_managed": false,\n '''\
+    '''   "is_trashed": false,\n    "parent_directory": [\n      "117db535-78b6-42e5-92bf-dbafcae015a7",\n      1,\n      '''\
+    '''false\n    ],\n    "dependencies": []\n  }\n}\n]\n'''
+    
+    response = client.post("/desktop/api2/doc/import", {'documents': json.dumps(doc)})
+    status = json.loads(response.content)['status']
+    assert_equal(status, 0)
+  
+  
   def test_search_entities_interactive_xss(self):
     query = Document2.objects.create(
         name='<script>alert(5)</script>',
