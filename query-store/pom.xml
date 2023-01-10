@@ -25,8 +25,8 @@
     <dropwizard.version>2.0.31</dropwizard.version>
     <guava.version>28.1-jre</guava.version>
     <junit.version>4.13</junit.version>
-    <jackson.version>2.11.4</jackson.version>
-    <jackson.modules.version>2.11.4</jackson.modules.version>
+    <jackson.version>2.13.4.2</jackson.version>
+    <jackson.modules.version>2.13.4</jackson.modules.version>
     <jersey.version>2.35</jersey.version>
     <lombok.version>1.18.10</lombok.version>
     <protobuf.version>3.21.7</protobuf.version>
@@ -719,6 +719,27 @@
         <artifactId>jackson-jaxrs-json-provider</artifactId>
         <version>${jackson.modules.version}</version>
       </dependency>
+            <dependency>
+        <groupId>com.fasterxml.jackson.dataformat</groupId>
+        <artifactId>jackson-dataformat-yaml</artifactId>
+        <version>${jackson.modules.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-annotations</artifactId>
+        <version>${jackson.modules.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-core</artifactId>
+        <version>${jackson.modules.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson.datatype</groupId>
+        <artifactId>jackson-datatype-guava</artifactId>
+        <version>${jackson.modules.version}</version>
+      </dependency>
+
       <dependency>
         <groupId>org.lz4</groupId>
         <artifactId>lz4-java</artifactId>
