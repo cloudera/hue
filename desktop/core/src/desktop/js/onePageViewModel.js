@@ -894,7 +894,8 @@ class OnePageViewModel {
         // The download view on the backend requires the slashes not to
         // be encoded in order for the file to be correctly named.
         const encodedPath = encodeURIComponent(decodedPath).replaceAll('%2F', '/');
-        window.location = pathPrefix + encodedPath;
+        const possibleKnoxUrlPathPrefix = window.HUE_BASE_URL;
+        window.location = possibleKnoxUrlPathPrefix + pathPrefix + encodedPath;
         return;
       }
 
