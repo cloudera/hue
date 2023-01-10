@@ -37,6 +37,80 @@ class TestApi2(object):
     self.user = User.objects.get(username="api2_user")
 
 
+  def test_import_document_with_forward_ref(self, client=None):
+    if client is None:
+      client = self.client
+    
+    doc = '''[
+{
+  "model": "desktop.document2",
+  "pk": 20,
+  "fields": {
+    "owner": [
+      "admin"
+    ],
+    "name": "schd1",
+    "description": "",
+    "uuid": "fa08942c-edf7-f712-921f-c0fb891d1fc4",
+    "type": "oozie-coordinator2",
+    "connector": null,
+    "data": "{}",
+    "extra": "",
+    "search": null,
+    "last_modified": "2023-01-05T23:08:44.548",
+    "version": 1,
+    "is_history": false,
+    "is_managed": false,
+    "is_trashed": false,
+    "parent_directory": [
+      "117db535-78b6-42e5-92bf-dbafcae015a7",
+      1,
+      false
+    ],
+    "dependencies": [
+      [
+        "92a7dd47-d8c8-b2d8-2895-440ccbc94198",
+        1,
+        false
+      ]
+    ]
+  }
+},
+{
+  "model": "desktop.document2",
+  "pk": 21,
+  "fields": {
+    "owner": [
+      "admin"
+    ],
+    "name": "wf2",
+    "description": "",
+    "uuid": "92a7dd47-d8c8-b2d8-2895-440ccbc94198",
+    "type": "oozie-workflow2",
+    "connector": null,
+    "data": "{}",
+    "extra": "",
+    "search": null,
+    "last_modified": "2023-01-05T23:08:27.853",
+    "version": 1,
+    "is_history": false,
+    "is_managed": false,
+    "is_trashed": false,
+    "parent_directory": [
+      "117db535-78b6-42e5-92bf-dbafcae015a7",
+      1,
+      false
+    ],
+    "dependencies": []
+  }
+}
+]'''
+
+    response = client.post("/desktop/api2/doc/import", {'documents': json.dumps(doc)})
+    status = json.loads(response.content)['status']
+    assert_equal(status, 0)
+  
+  
   def test_search_entities_interactive_xss(self):
     query = Document2.objects.create(
         name='<script>alert(5)</script>',
