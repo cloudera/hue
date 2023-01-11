@@ -1517,7 +1517,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         <div class="tab-content">
           <div class="tab-pane active" id="servicesLoad">
             <div class="wxm-poc" style="clear: both;">
-              <div style="float:left; margin-right: 10px; margin-bottom: 10px;">                
+              <div style="float:left; margin-right: 10px; margin-bottom: 10px;">
                 ${ _("Metrics are not setup") }
               </div>
             </div>
@@ -3184,7 +3184,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         });
       };
 
-      self.updateJob = function () {
+      self.updateJob = function (updateLogs) {
         huePubSub.publish('graph.refresh.view');
         var deferred = $.Deferred();
         if (vm.job() == self && self.apiStatus() == 'RUNNING') {
@@ -3215,7 +3215,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             } else {
               requests.push(vm.job().fetchStatus());
             }
-            requests.push(vm.job().fetchLogs(vm.job().logActive()));
+            if(updateLogs !== false) {
+              requests.push(vm.job().fetchLogs(vm.job().logActive()));
+            }
             var profile = $("div[data-jobType] .tab-content .active").data("profile");
             if (profile) {
               requests.push(vm.job().fetchProfile(profile));
@@ -4080,6 +4082,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       var updateJobTimeout = -1;
       var updateJobsTimeout = -1;
+      var jobUpdateCounter = 0;
+      var exponentialFactor = 1;
       self.job.subscribe(function(val) {
         self.monitorJob(val);
       });
@@ -4087,11 +4091,18 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.monitorJob = function(job) {
         window.clearTimeout(updateJobTimeout);
         window.clearTimeout(updateJobsTimeout);
+        jobUpdateCounter = 0;
+        exponentialFactor = 1;
         if (self.interface() && self.interface() !== 'slas' && self.interface() !== 'oozie-info' && self.interface !== 'queries'){
           if (job) {
             if (job.apiStatus() === 'RUNNING') {
               var _updateJob = function () {
-                var def = job.updateJob();
+                jobUpdateCounter++;
+                var updateLogs = (jobUpdateCounter % exponentialFactor) === 0;
+                if(updateLogs && exponentialFactor < 50) {
+                  exponentialFactor *= 2;
+                }
+                var def = job.updateJob(updateLogs);
                 if (def) {
                   def.done(function () {
                     updateJobTimeout = setTimeout(_updateJob, window.JB_SINGLE_CHECK_INTERVAL_IN_MILLIS);
