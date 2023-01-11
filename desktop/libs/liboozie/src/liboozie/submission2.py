@@ -616,10 +616,16 @@ STORED AS TEXTFILE %s""" % (self.properties.get('send_result_path'),
 
   def _create_file(self, deployment_dir, file_name, data, do_as=False):
     file_path = self.fs.join(deployment_dir, file_name)
+
+    # In Py3 because of i18n, the xml data is not properly utf-8 encoded for some languages.
+    # This can later throw UnicodeEncodeError exception for request body in HDFS or other FS API calls. To tackle this,
+    # We are converting the data into bytes by utf-8 encoding instead of str type.
+    data = smart_str(data).encode('utf-8') if sys.version_info[0] > 2 else smart_str(data)
+
     if do_as:
-      self.fs.do_as_user(self.user, self.fs.create, file_path, overwrite=True, permission=0o644, data=smart_str(data))
+      self.fs.do_as_user(self.user, self.fs.create, file_path, overwrite=True, permission=0o644, data=data)
     else:
-      self.fs.create(file_path, overwrite=True, permission=0o644, data=smart_str(data))
+      self.fs.create(file_path, overwrite=True, permission=0o644, data=data)
     LOG.debug("Created/Updated %s" % (file_path,))
 
   def _generate_altus_action_script(self, service, command, arguments, auth_key_id, auth_key_secret):
