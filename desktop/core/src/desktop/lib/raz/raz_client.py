@@ -245,7 +245,7 @@ class RazClient(object):
     # In GET operations with non-ascii chars, only the non-ascii part is URL encoded.
     # We need to unquote the path fully before making a signed request for RAZ.
     if method == 'GET' and 'prefix' in url_params and '%' in url_params['prefix']:
-      if isinstance(url_params['prefix'], unicode) and sys.version_info[0] < 3:
+      if sys.version_info[0] < 3 and isinstance(url_params['prefix'], unicode):
         url_params['prefix'] = url_params['prefix'].encode()
 
       url_params['prefix'] = lib_urlunquote(url_params['prefix'])
