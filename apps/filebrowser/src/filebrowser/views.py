@@ -1190,6 +1190,11 @@ def generic_op(form_class, request, op, parameter_names, piggyback=None, templat
 
       if next:
         logging.debug("Next: %s" % next)
+        file_path_prefix = '/filebrowser/view='
+        if next.startswith(file_path_prefix):          
+          decoded_file_path = next[len(file_path_prefix):]
+          filepath_encoded_next = file_path_prefix + urllib_quote(decoded_file_path.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS)
+          return format_preserving_redirect(request, filepath_encoded_next)
         # Doesn't need to be quoted: quoting is done by HttpResponseRedirect.
         return format_preserving_redirect(request, next)
       ret["success"] = True

@@ -1374,7 +1374,7 @@ else:
 
         $("#newNameInput").val(self.selectedFile().name);
 
-        $("#renameForm").attr("action", "/filebrowser/rename?next=${url('filebrowser:filebrowser.views.view', path='')}" + self.currentPath());
+        $("#renameForm").attr("action", "/filebrowser/rename?next=${url('filebrowser:filebrowser.views.view', path='')}" + encodeURIComponent(self.currentPath()));
 
         $('#renameForm').ajaxForm({
           dataType:  'json',
@@ -1396,7 +1396,7 @@ else:
 
         $("#setReplFileName").text(self.selectedFile().path);
 
-        $("#setReplicationFactorForm").attr("action", "/filebrowser/set_replication?next=${url('filebrowser:filebrowser.views.view', path='')}" + self.currentPath());
+        $("#setReplicationFactorForm").attr("action", "/filebrowser/set_replication?next=${url('filebrowser:filebrowser.views.view', path='')}" + encodeURIComponent(self.currentPath()));
 
         $('#setReplicationFactorForm').ajaxForm({
           dataType: 'json',
@@ -1490,7 +1490,7 @@ else:
 
         hiddenFields($("#copyForm"), "src_path", paths);
 
-        $("#copyForm").attr("action", "/filebrowser/copy?next=${url('filebrowser:filebrowser.views.view', path='')}" + self.currentPath());
+        $("#copyForm").attr("action", "/filebrowser/copy?next=${url('filebrowser:filebrowser.views.view', path='')}" + encodeURIComponent(self.currentPath()));
 
         $("#copyModal").modal({
           keyboard:true,
@@ -1542,7 +1542,7 @@ else:
 
           hiddenFields($("#chownForm"), 'path', paths);
 
-          $("#chownForm").attr("action", "/filebrowser/chown?next=${url('filebrowser:filebrowser.views.view', path='')}" + self.currentPath());
+          $("#chownForm").attr("action", "/filebrowser/chown?next=${url('filebrowser:filebrowser.views.view', path='')}" + encodeURIComponent(self.currentPath()));
 
           $("select[name='user']").val(self.selectedFile().stats.user);
 
@@ -1594,7 +1594,7 @@ else:
 
           hiddenFields($("#chmodForm"), 'path', paths);
 
-          $("#chmodForm").attr("action", "/filebrowser/chmod?next=${url('filebrowser:filebrowser.views.view', path='')}" + self.currentPath());
+          $("#chmodForm").attr("action", "/filebrowser/chmod?next=${url('filebrowser:filebrowser.views.view', path='')}" + encodeURIComponent(self.currentPath()));
 
           $("#changePermissionModal").modal({
             keyboard: true,
@@ -1807,7 +1807,7 @@ else:
       };
 
       self.createDirectory = function (formElement) {
-        $(formElement).attr("action", "/filebrowser/mkdir?next=${url('filebrowser:filebrowser.views.view', path='')}" + self.currentPath());
+        $(formElement).attr("action", "/filebrowser/mkdir?next=${url('filebrowser:filebrowser.views.view', path='')}" + encodeURIComponent(self.currentPath()));
         if ($.trim($("#newDirectoryNameInput").val()) == "") {
           $("#directoryNameRequiredAlert").show();
           $("#newDirectoryNameInput").addClass("fieldError");
@@ -1844,7 +1844,7 @@ else:
       };
 
       self.createFile = function (formElement) {
-        $(formElement).attr("action", "/filebrowser/touch?next=${url('filebrowser:filebrowser.views.view', path='')}" + self.currentPath());
+        $(formElement).attr("action", "/filebrowser/touch?next=${url('filebrowser:filebrowser.views.view', path='')}" + encodeURIComponent(self.currentPath()));
         if ($.trim($("#newFileNameInput").val()) == "") {
           $("#fileNameRequiredAlert").show();
           $("#newFileNameInput").addClass("fieldError");
@@ -1883,7 +1883,7 @@ else:
 
         hiddenFields($("#restoreTrashForm"), 'path', paths);
 
-        $("#restoreTrashForm").attr("action", "/filebrowser/trash/restore?next=${url('filebrowser:filebrowser.views.view', path='')}" + self.currentPath());
+        $("#restoreTrashForm").attr("action", "/filebrowser/trash/restore?next=${url('filebrowser:filebrowser.views.view', path='')}" + encodeURIComponent(self.currentPath()));
 
         $("#restoreTrashModal").modal({
           keyboard:true,
