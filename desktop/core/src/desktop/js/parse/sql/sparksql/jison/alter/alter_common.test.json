@@ -1,0 +1,13 @@
+[
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "",
+    "afterCursor": "",
+    "containsKeywords": [
+      "ALTER"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  }
+]

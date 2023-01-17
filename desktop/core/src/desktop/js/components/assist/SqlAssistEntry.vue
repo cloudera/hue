@@ -54,12 +54,12 @@
 <script lang="ts">
   import { defineComponent, PropType, ref, toRefs, watch } from 'vue';
 
-  import ColumnIcon from '../icons/ColumnIcon';
-  import DatabaseIcon from '../icons/DatabaseIcon';
-  import DropDownIcon from '../icons/DropDownIcon';
-  import DropRightIcon from '../icons/DropRightIcon';
-  import TableIcon from '../icons/TableIcon';
-  import ViewIcon from '../icons/ViewIcon';
+  import ColumnIcon from '../icons/vue/ColumnIcon';
+  import DatabaseIcon from '../icons/vue/DatabaseIcon';
+  import DropDownIcon from '../icons/vue/DropDownIcon';
+  import DropRightIcon from '../icons/vue/DropRightIcon';
+  import TableIcon from '../icons/vue/TableIcon';
+  import ViewIcon from '../icons/vue/ViewIcon';
   import Spinner from '../Spinner.vue';
   import DataCatalogEntry from 'catalog/DataCatalogEntry';
 

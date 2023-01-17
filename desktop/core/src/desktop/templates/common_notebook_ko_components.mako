@@ -407,8 +407,10 @@ else:
               result += '</tr>';
               data.forEach(function (row) {
                 result += '<tr>';
-                for (var i = 1; i < row.length; i++) { // Skip the row number column
-                  result += '<td>' + hueUtils.html2text(row[i]) + '</td>';
+                for (var i = 1; i < row.length; i++) { // Skip the row number column              
+                  var htmlDecodedValue = hueUtils.html2text(row[i]);
+                  var needsToStayEncoded = hueUtils.includesComplexDBTypeDefinition(htmlDecodedValue);
+                  result += '<td>' + ( needsToStayEncoded ? row[i] : htmlDecodedValue) + '</td>';
                 }
                 result += '</tr>';
               });
@@ -484,9 +486,7 @@ else:
       }
 
       DownloadResultsViewModel.prototype.download = function (format) {
-        if (typeof trackOnGA == 'function') {
-          trackOnGA('notebook/download/' + format);
-        }
+        window.hueAnalytics.log('notebook', 'download' + format);
 
         var self = this;
         $.cookie('download-' + self.snippet.id(), null, { expires: -1, path: '/' })
@@ -882,7 +882,10 @@ else:
         },{
           id: 'settings',
           label: '${ _('Settings')}',
-          shortcuts: [{ shortcut: 'Ctrl - ,', macShortcut: 'Command - ,', description: '${ _('Show the settings menu where you can control autocomplete behaviour, syntax checker, dark theme and various editor settings.')}' }]
+          shortcuts: [
+            { shortcut: 'Ctrl-,', macShortcut: 'Command-,', description: '${ _('Show the settings menu where you can control autocomplete behaviour, syntax checker, dark theme and various editor settings.')}'},
+            { shortcut: 'Ctrl-.', macShortcut: 'Command-.', description: '${ _('Show or hide the assist panels.')}' }
+            ]
         }];
 
         self.query = ko.observable('');

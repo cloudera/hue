@@ -1,4 +1,4 @@
-import { ComponentPublicInstance, VNode } from 'vue';
+import { VNode } from 'vue';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type KeyHash = { [key: string]: any };
@@ -19,18 +19,6 @@ export function setInitialProps(propsList: string[]): KeyHash {
     res[key] = undefined;
   });
   return res;
-}
-
-export function callHooks(vm: ComponentPublicInstance | undefined, hook: string): void {
-  if (vm) {
-    let hooks = vm.$options[hook] || [];
-    if (!Array.isArray(hooks)) {
-      hooks = [hooks];
-    }
-    hooks.forEach((hook: () => void): void => {
-      hook.call(vm);
-    });
-  }
 }
 
 export function createCustomEvent(name: string, args: unknown[]): CustomEvent {

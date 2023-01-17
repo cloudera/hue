@@ -1,0 +1,45 @@
+// The Ant Design library modifies the global styles which will affect the UI in Hue
+// in multiple places where not intended. So in order to utilize the components locally
+// without leaking styles we wrap it all in an antd class. Since ant-modal-root likely
+// is placed outside the .antd wrapper we need to add the styles there as well.
+.antd,
+.ant-modal-root {
+  /* stylelint-disable no-invalid-position-at-import-rule */
+
+  // We need to reset some global styles from Bootstrap to prevent them from
+  // interfering with the Antd styles
+  @import './reset-globals.less';
+
+  // Import global antd styles
+  @root-entry-name: variable;
+  @import 'node_modules/antd/es/style/core/index.less';
+  @import 'node_modules/antd/es/style/themes/default.less';
+
+  // Import the styles for the actual components used
+  @import 'node_modules/antd/es/button/style/index.less';
+  @import 'node_modules/antd/es/modal/style/index.less';
+  @import 'node_modules/antd/es/skeleton/style/index.less';
+  @import 'node_modules/antd/es/menu/style/index.less';
+  @import 'node_modules/antd/es/spin/style/index.less';
+
+  /* stylelint-enable no-invalid-position-at-import-rule */
+
+  // Required global overrides:
+  .ant-modal-mask,
+  .ant-modal-wrap {
+    // There are Hue components using z-indexes higher than the ant modal.
+    // Further increase the z-index here if needed.
+    z-index: 1010;
+  }
+}
+
+// Ant Design's Modal adds a new body width to compensate for vertical scrollbar
+// which has to be reverted since Hue (at the time of writing) uses overflow:hidden
+// on the body tag.
+body.ant-scrolling-effect {
+  width: 100% !important;
+}
+
+/* stylelint-disable no-invalid-position-at-import-rule */
+@import 'antd/es/menu/style/index.less';
+@import 'antd/es/style/core/motion.less';

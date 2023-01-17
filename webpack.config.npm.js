@@ -124,14 +124,6 @@ const parserConfig = Object.assign({}, defaultConfig, {
     calciteAutocompleteParser: [`${JS_ROOT}/parse/sql/calcite/calciteAutocompleteParser.js`],
     calciteSyntaxParser: [`${JS_ROOT}/parse/sql/calcite/calciteSyntaxParser.js`],
 
-    druidAutocompleteParser: [`${JS_ROOT}/parse/sql/druid/druidAutocompleteParser.js`],
-    druidSyntaxParser: [`${JS_ROOT}/parse/sql/druid/druidSyntaxParser.js`],
-
-    elasticsearchAutocompleteParser: [
-      `${JS_ROOT}/parse/sql/elasticsearch/elasticsearchAutocompleteParser.js`
-    ],
-    elasticsearchSyntaxParser: [`${JS_ROOT}/parse/sql/elasticsearch/elasticsearchSyntaxParser.js`],
-
     flinkAutocompleteParser: [`${JS_ROOT}/parse/sql/flink/flinkAutocompleteParser.js`],
     flinkSyntaxParser: [`${JS_ROOT}/parse/sql/flink/flinkSyntaxParser.js`],
 

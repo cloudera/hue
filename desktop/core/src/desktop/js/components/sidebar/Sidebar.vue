@@ -214,7 +214,7 @@
         const sharedProps = {
           name: 'user',
           displayName: this.userDrawerItem.displayName,
-          iconHtml: `<div class="sidebar-user-icon" role="img">${this.userDrawerItem.displayName[0].toUpperCase()}</div>`
+          iconHtml: `<div class="sidebar-user-icon server-position-pointer-welcome-tour" role="img">${this.userDrawerItem.displayName[0].toUpperCase()}</div>`
         };
         if (this.useDrawerForUser) {
           return {

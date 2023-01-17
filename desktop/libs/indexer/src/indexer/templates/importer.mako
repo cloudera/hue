@@ -237,7 +237,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
           <div data-bind="visible: createWizard.source.inputFormat() == 'localfile'">
               <form method="post" action="" enctype="multipart/form-data" id="uploadform">
                 <div >
-                    <input type="file" id="inputfile" name="inputfile" style="margin-left: 130px" accept=".csv, .xlsx">
+                    <input type="file" id="inputfile" name="inputfile" style="margin-left: 130px" accept=".csv, .xlsx, .xls">
                 </div>
             </form>
           </div>
@@ -636,7 +636,16 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
           <div class="card-body">
             <div class="control-group">
               <label for="destinationFormat" class="control-label"><div>${ _('Format') }</div>
+                ## we need only few options when isIceberg is selected and looks like ko.selectize.custom.js has some issue so adding this workaround
+                <!-- ko if: !isIceberg() -->
                 <select id="destinationFormat" data-bind="selectize: tableFormats, value: tableFormat, optionsValue: 'value', optionsText: 'name'"></select>
+                <!-- /ko -->
+                <!-- ko if: isIceberg() && $root.createWizard.source.sourceType() === 'hive' -->
+                <select id="destinationFormat" data-bind="selectize: [{value: 'parquet', name: 'Parquet'}, {'value': 'avro', 'name': 'Avro'}, {'value': 'orc', 'name': 'ORC'}], value: tableFormat, optionsValue: 'value', optionsText: 'name'"></select>
+                <!-- /ko -->
+                <!-- ko if: isIceberg() && $root.createWizard.source.sourceType() === 'impala' -->
+                <select id="destinationFormat" data-bind="selectize: [{value: 'parquet', name: 'Parquet'}], value: tableFormat, optionsValue: 'value', optionsText: 'name'"></select>
+                <!-- /ko -->
               </label>
             </div>
 
@@ -651,12 +660,12 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
             <span data-bind="visible: showProperties">
               <div class="control-group">
                 <label class="checkbox inline-block" data-bind="visible: tableFormat() != 'kudu'">
-                  <input type="checkbox" data-bind="checked: useDefaultLocation"> ${_('Store in Default location')}
+                  <input type="checkbox" data-bind="checked: useDefaultLocation, disable: isIceberg"> ${_('Store in Default location')}
                 </label>
               </div>
               <div class="control-group" data-bind="visible: isTransactionalVisible">
                 <label class="checkbox inline-block">
-                  <input type="checkbox" data-bind="checked: isTransactional"> ${_('Transactional table')}
+                  <input type="checkbox" data-bind="checked: isTransactional, disable: isIceberg"> ${_('Transactional table')}
                 </label>
                 <label class="checkbox inline-block" title="${_('Full transactional support available in Hive with ORC')}">
                   <input type="checkbox" data-bind="checked: isInsertOnly, enable: isTransactionalUpdateEnabled"> ${_('Insert only')}
@@ -674,6 +683,13 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
                   <input type="checkbox" data-bind="checked: importData, disable: !useDefaultLocation() && $parent.createWizard.source.path() == nonDefaultLocation();"> ${_('Import data')}
                 </label>
               </div>
+
+              <div class="control-group" data-bind="visible: icebergEnabled">
+                <label class="checkbox inline-block">
+                  <input type="checkbox" data-bind="checked: isIceberg"> ${_('Iceberg table')}
+                </label>
+              </div>
+
               <div class="control-group">
                 <label><div>${ _('Description') }</div>
                     <input type="text" class="form-control input-xxlarge" data-bind="value: description, valueUpdate: 'afterkeydown'" placeholder="${ _('Description') }">
@@ -1836,6 +1852,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
 
       // File
       self.path = ko.observable('');
+      self.file_type = ko.observable('');
       self.path.subscribe(function(val) {
         if (val) {
           wizard.guessFormat();
@@ -2095,7 +2112,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
       self.kafkaClusters = ko.observableArray(['localhost', 'demo.gethue.com']);
       self.kafkaSelectedCluster = ko.observable();
       self.kafkaSelectedCluster.subscribe(function(val) {
-        if (val) {
+        if (val && self.inputFormat() == 'stream') {
           wizard.guessFormat();
         }
       });
@@ -2543,6 +2560,10 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
       self.KUDU_DEFAULT_RANGE_PARTITION_COLUMN = {values: [{value: ''}], name: 'VALUES', lower_val: 0, include_lower_val: '<=', upper_val: 1, include_upper_val: '<='};
       self.KUDU_DEFAULT_PARTITION_COLUMN = {columns: [], range_partitions: [self.KUDU_DEFAULT_RANGE_PARTITION_COLUMN], name: 'HASH', int_val: 16};
 
+
+      self.icebergEnabled = ko.observable(vm.sourceType == 'impala' || vm.sourceType == 'hive');
+      self.isIceberg = ko.observable(false);
+
       self.tableFormats = ko.pureComputed(function() {
         if (wizard.source.inputFormat() === 'stream') {
           return [{'value': 'kudu', 'name': 'Kudu'}];
@@ -2601,6 +2622,20 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
           self.isInsertOnly(true);
         }
         return enabled;
+      });
+      self.isIceberg.subscribe(function(val) {
+        if (val) {
+          self.useDefaultLocation(false);
+          self.isTransactional(false);
+          if ( ['avro', 'orc'].indexOf(self.tableFormat()) === -1  || vm.sourceType === 'impala') {
+            self.tableFormat('parquet');
+          }
+        }
+        else {
+          self.useDefaultLocation(true);
+          self.isTransactional(self.isTransactionalVisible());
+          self.tableFormat('text');
+        }
       });
 
       self.hasHeader = ko.observable(false);
@@ -3224,6 +3259,10 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
 
       $(window).on('resize', resizeElements);
 
+      document.getElementById('inputfile').onclick = function () {
+        this.value = null;
+      };
+
       document.getElementById('inputfile').onchange = function () {
         upload();
       };
@@ -3233,8 +3272,11 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
         var files = $('#inputfile')[0].files[0];
         fd.append('file', files);
         var file_size = files.size;
-        if (file_size > 10485760) {
-          $.jHueNotify.warn("${ _('File size exceeds the supported size (10 MB). Please use the S3, ABFS or HDFS browser to upload files.') }");
+        if (file_size === 0) {
+          $.jHueNotify.warn("${ _('This file is empty, please select another file.') }");
+        }
+        else if (file_size > 200 * 1024) {          
+          $.jHueNotify.warn("${ _('File size exceeds the supported size (200 KB). Please use the S3, ABFS or HDFS browser to upload files.') }");
         } else {
           $.ajax({
             url:"/indexer/api/indexer/upload_local_file",
@@ -3245,6 +3287,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
             processData:false,
             success:function (response) {
               viewModel.createWizard.source.path(response['local_file_url']);
+              viewModel.createWizard.source.file_type(response['file_type']);
             }
           });
         }

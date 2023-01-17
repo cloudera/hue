@@ -227,40 +227,19 @@ SSL_CIPHER_LIST = Config(
   key="ssl_cipher_list",
   help=_("List of allowed and disallowed ciphers"),
 
-  # From https://wiki.mozilla.org/Security/Server_Side_TLS v3.7 default
-  # recommendation, which should be compatible with Firefox 1, Chrome 1, IE 7,
-  # Opera 5 and Safari 1.
+  # Based on "Intermediate compatibility" recommendations from
+  # https://wiki.mozilla.org/Security/Server_Side_TLS#Intermediate_compatibility_.28recommended.29
+  # which should be compatible with Firefox 27, Chrome 31, IE 11,
+  # Opera 20 and Safari 9.
   default=':'.join([
     'ECDHE-RSA-AES128-GCM-SHA256',
     'ECDHE-ECDSA-AES128-GCM-SHA256',
     'ECDHE-RSA-AES256-GCM-SHA384',
     'ECDHE-ECDSA-AES256-GCM-SHA384',
     'DHE-RSA-AES128-GCM-SHA256',
-    'DHE-DSS-AES128-GCM-SHA256',
-    'kEDH+AESGCM',
-    'ECDHE-RSA-AES128-SHA256',
-    'ECDHE-ECDSA-AES128-SHA256',
-    'ECDHE-RSA-AES128-SHA',
-    'ECDHE-ECDSA-AES128-SHA',
-    'ECDHE-RSA-AES256-SHA384',
-    'ECDHE-ECDSA-AES256-SHA384',
-    'ECDHE-RSA-AES256-SHA',
-    'ECDHE-ECDSA-AES256-SHA',
-    'DHE-RSA-AES128-SHA256',
-    'DHE-RSA-AES128-SHA',
-    'DHE-DSS-AES128-SHA256',
-    'DHE-RSA-AES256-SHA256',
-    'DHE-DSS-AES256-SHA',
-    'DHE-RSA-AES256-SHA',
-    'AES128-GCM-SHA256',
-    'AES256-GCM-SHA384',
-    'AES128-SHA256',
-    'AES256-SHA256',
-    'AES128-SHA',
-    'AES256-SHA',
-    'AES',
-    'CAMELLIA',
-    'DES-CBC3-SHA',
+    'ECDHE-ECDSA-CHACHA20-POLY1305',
+    'ECDHE-RSA-CHACHA20-POLY1305',
+    'DHE-RSA-AES256-GCM-SHA384',
     '!aNULL',
     '!eNULL',
     '!EXPORT',
@@ -343,10 +322,10 @@ SECURE_CONTENT_SECURITY_POLICY = Config(
   help=_('X-Content-Type-Options: nosniff. This is a HTTP response header feature that helps prevent attacks '
     'based on MIME-type confusion.'),
   type=str,
-  default="script-src 'self' 'unsafe-inline' 'unsafe-eval' *.google-analytics.com *.doubleclick.net data:;"+
-          "img-src 'self' *.google-analytics.com *.doubleclick.net http://*.tile.osm.org *.tile.osm.org *.gstatic.com data:;"+
+  default="script-src 'self' 'unsafe-inline' 'unsafe-eval' *.googletagmanager.com *.doubleclick.net data:;"+
+          "img-src 'self' *.doubleclick.net http://*.tile.osm.org *.tile.osm.org *.gstatic.com data:;"+
           "style-src 'self' 'unsafe-inline' fonts.googleapis.com;"+
-          "connect-src 'self';"+
+          "connect-src 'self' *.google-analytics.com;"+
           "frame-src *;"+
           "child-src 'self' data: *.vimeo.com;"+
           "object-src 'none'")
@@ -468,9 +447,15 @@ USER_ACCESS_HISTORY_SIZE = Config(
 COLLECT_USAGE = Config(
   key="collect_usage",
   help=_("Help improve Hue with anonymous usage analytics."
-         "Use Google Analytics to see how many times an application or specific section of an application is used, nothing more."),
+         "Use Google Analytics 4 to see how many times an application or specific section of an application is used, nothing more."),
   type=coerce_bool,
   default=True)
+
+GTAG_ID = Config(
+  key="gtag_id",
+  help=_("The gTag id used for anonymous analytics with Google Analytics 4."),
+  type=str,
+  default="G-25K7599S1Q")
 
 REST_RESPONSE_SIZE = Config(
   key="rest_response_size",
@@ -642,7 +627,6 @@ def default_from_email():
     _default_from_email = "hue@" + fqdn
   return _default_from_email
 
-from indexer.conf import ENABLE_DIRECT_UPLOAD  # Circular dependency 
 
 def default_database_options():
   """Database type dependent options"""
@@ -650,8 +634,6 @@ def default_database_options():
     return {'threaded': True}
   elif DATABASE.ENGINE.get().endswith('sqlite3'):
     return {'timeout': 30}
-  elif DATABASE.ENGINE.get().endswith('mysql') and ENABLE_DIRECT_UPLOAD:     # Setting this variable to 64MB because mysql5.7
-    return {'init_command': 'SET GLOBAL max_allowed_packet=67108864'}        # has default value of this variable 4MB
   else:
     return {}
 
@@ -731,6 +713,11 @@ METRICS = ConfigSection(
       default=30000),
   )
 )
+
+def is_gunicorn_report_enabled():
+  return 'rungunicornserver' in sys.argv \
+    and METRICS.LOCATION.get() is not None \
+    and METRICS.COLLECTION_INTERVAL.get() is not None
 
 SLACK = ConfigSection(
   key='slack',
@@ -1793,19 +1780,6 @@ ENABLE_SHARING = Config(
   type=coerce_bool,
   default=True)
 
-ENABLE_DJANGO_DEBUG_TOOL = Config(
-  key="enable_django_debug_tool",
-  help=_('Allow use django debug tool with Chrome browser for debugging issue, django_debug_mode must be true also'),
-  type=coerce_bool,
-  default=False)
-
-DJANGO_DEBUG_TOOL_USERS = Config(
-  key='django_debug_tool_users',
-  default='',
-  type=coerce_csv,
-  help=_('Comma separated list of users that allow to use django debug tool. If it is empty, all users are allowed.')
-)
-
 USE_NEW_ASSIST_PANEL = Config(
   key='use_new_assist_panel',
   default=False,
@@ -2187,6 +2161,12 @@ RAZ = ConfigSection(
         help=_('How to authenticate against: KERBEROS or JWT (not supported yet)'),
         type=coerce_str_lowercase,
         default='kerberos',
+    ),
+    AUTOCREATE_USER_DIR=Config(
+      key='autocreate_user_dir',
+      help=_('Autocreate the user home directory in the remote storage home path.'),
+      type=coerce_bool,
+      default=True,
     ),
   )
 )

@@ -728,7 +728,7 @@ class HiveServerClient(object):
 
     # HS2 does not return properties in TOpenSessionResp
     # TEZ returns properties, but we need the configuration to detect engine
-    properties = session.get_properties()
+    properties = session.get_properties() or {}
     if not properties or self.query_server['server_name'] == 'beeswax':
       configuration = self.get_configuration(session=session)
       properties.update(configuration)

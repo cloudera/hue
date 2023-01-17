@@ -152,58 +152,65 @@ This is a verified step-by-step guide on how to get Hue up and running on a fres
 
 3. Install postgres (unless you prefer something else)
 
-   `brew install postgres`
+   `brew install postgresql@14`
 
 4. Start Postgres
 
-   `brew services start postgresql`
+   `brew services start postgresql@14`
 
 5. Create the hue database and set permissions
 
    ```
+   # Create the DB
    createdb hue_d --lc-collate='en_US.UTF-8' -T "template0"
+   
+   # Connect to the dbms shell
    psql -s hue_d
-   hue_d=# create user hue_u with password 'huepassword';
-   hue_d=# grant all privileges on database hue_d to hue_u;
-   hue_d=# \q
+   
+   # Run the following lines one by one
+   create user hue_u with password 'huepassword';
+   grant all privileges on database hue_d to hue_u;
+   \q
    ```
 
 6. Install gmp, openssl and libffi (Note some might be installed from postgres)
 
    `brew install gmp openssl libffi`
 
-7. Install python, tested with the **macOS 64-bit installer 3.7.9** direct download from python.org
-`https://www.python.org/ftp/python/3.7.9/python-3.7.9-macosx10.9.pkg`
+7. Install python, tested with the **macOS 64-bit installer 3.8.10** direct download from python.org
+`https://www.python.org/ftp/python/3.8.10/python-3.8.10-macos11.pkg`
 
-   - For **M1 Macs, 3.7.9 from python.org is the only Python version that works** and none of the homebrew versions work at the time of writing. Hue M1 support for Python >= 3.8 will be improved soon.
+   - For Intel Macs, only Python 3.8 works as April 2022. Python 3.8 via Homebrew might work. However, direct download from python.org is preferred and tested.
 
-   - For Intel Macs, other 3.x Python versions as well as Homebrew ones might work. However, direct download from python.org is preferred and tested.
-
-8. Install mysql client
-
-   `brew install mysql`
-
-9. Install node and npm (unless already present)
+8. Install node and npm (unless already present) using nvm or brew
 
    `brew install node`
 
-10. In the cloned hue folder run:
+9. In the hue directory run:
 
     ```
-    export PYTHON_VER=python3.7
+    export PYTHON_VER=python3.8
     export SKIP_PYTHONDEV_CHECK=true
     export CFLAGS="-I$(xcrun --show-sdk-path)/usr/include/sasl"
     export LDFLAGS="-L/usr/local/opt/libffi/lib -L/usr/local/opt/openssl@1.1/lib"
     export CPPFLAGS="-L/usr/local/opt/libffi/lib/include -L/usr/local/opt/openssl@1.1/lib/include"
+    ```
 
+    Also export `ROOT` which should point to your Hue directory:
+    ```
+    export ROOT=<path_to_hue_directory>
+    ```
+    
+    Then run:
+    ```
     make apps
     ```
 
-11. Configure Hue to your liking, edit
+10. Configure Hue to your liking, edit
 
     `desktop/conf/pseudo-distributed.ini`
 
-    For postgres according to step 5 above set:
+    According to step 5 above for postgres, set under `[desktop]`:
 
     ```
     [[database]]
@@ -214,23 +221,21 @@ This is a verified step-by-step guide on how to get Hue up and running on a fres
       password=huepassword
       name=hue_d
     ```
-12. For **M1 Macs**, if `make apps` fails with `virtualenv is not compatible with this system or executable` error
 
-    ```
-    pip3.7 install virtualenv
-    virtualenv ./build/env
-    rm ./build/env/bin/python3.7
-    
-    make apps
-    ```
-
-13. If you use postgres as configured in the previous step you'll need to add the psycopg2 lib manually
+11. If you use postgres as configured in the previous step you'll need to add the psycopg2 lib manually
 
     `./build/env/bin/pip install psycopg2-binary`
 
-14. Start Hue (note that export from step 10 above needs to be active)
+12. Apply migrations (if any)
 
-    `./build/env/bin/hue runserver 0.0.0.0:8888`
+    ```
+    ./build/env/bin/hue makemigrations
+    ./build/env/bin/hue migrate
+    ```
+
+13. Start Hue
+
+    `./build/env/bin/hue runserver`
 
 #### 10.14, 10.15
 
@@ -246,9 +251,16 @@ Fix openssl errors (required for MacOS 10.11+)
 
     export LDFLAGS=-L/usr/local/opt/openssl/lib && export CPPFLAGS=-I/usr/local/opt/openssl/include
 
-If `runserver` stops abruptly with a  `"zsh: abort"` message
+If `runserver` stops abruptly with a `"zsh: abort"` message
 
     export DYLD_FALLBACK_LIBRARY_PATH=/usr/local/opt/openssl/lib
+
+If `runserver` stops abruptly with a `loading libcrypto in an unsafe way` message
+
+    sudo mkdir /usr/local/lib
+    # depends on your openssl version, link the following files to /usr/local/lib
+    sudo ln -s /opt/homebrew/Cellar/openssl@3/3.0.2/lib/libcrypto.3.dylib /usr/local/lib/libcrypto.dylib
+    sudo ln -s /opt/homebrew/Cellar/openssl@3/3.0.2/lib/libssl.3.dylib /usr/local/lib/libssl.dylib
 
 If you are getting `Could not find Python.h` message
 

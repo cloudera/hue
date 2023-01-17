@@ -201,6 +201,17 @@ describe('hiveAutocompleteParser.js DESCRIBE statements', () => {
     });
   });
 
+  it('should handle "DESCRIBE CONNECTOR EXTENDED foo; |"', () => {
+    assertAutoComplete({
+      beforeCursor: 'DESCRIBE CONNECTOR EXTENDED foo;',
+      afterCursor: '',
+      containsKeywords: ['SELECT'],
+      expectedResult: {
+        lowerCase: false
+      }
+    });
+  });
+
   it('should handle "DESCRIBE DATABASE db;|"', () => {
     assertAutoComplete({
       beforeCursor: 'DESCRIBE DATABASE db;',
@@ -251,9 +262,20 @@ describe('hiveAutocompleteParser.js DESCRIBE statements', () => {
       afterCursor: '',
       expectedResult: {
         lowerCase: false,
-        suggestKeywords: ['DATABASE', 'EXTENDED', 'FORMATTED', 'FUNCTION', 'SCHEMA'],
+        suggestKeywords: ['CONNECTOR', 'DATABASE', 'EXTENDED', 'FORMATTED', 'FUNCTION', 'SCHEMA'],
         suggestTables: {},
         suggestDatabases: { appendDot: true }
+      }
+    });
+  });
+
+  it('should suggest keywords for "DESCRIBE CONNECTOR |"', () => {
+    assertAutoComplete({
+      beforeCursor: 'DESCRIBE CONNECTOR ',
+      afterCursor: '',
+      expectedResult: {
+        lowerCase: false,
+        suggestKeywords: ['EXTENDED']
       }
     });
   });
@@ -264,7 +286,7 @@ describe('hiveAutocompleteParser.js DESCRIBE statements', () => {
       afterCursor: '',
       expectedResult: {
         lowerCase: false,
-        suggestKeywords: ['DATABASE', 'EXTENDED', 'FORMATTED', 'FUNCTION', 'SCHEMA'],
+        suggestKeywords: ['CONNECTOR', 'DATABASE', 'EXTENDED', 'FORMATTED', 'FUNCTION', 'SCHEMA'],
         suggestTables: {},
         suggestDatabases: { appendDot: true }
       }

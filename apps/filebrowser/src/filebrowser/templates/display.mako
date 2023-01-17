@@ -29,7 +29,7 @@
     from urllib import quote as urllib_quote
     from django.utils.translation import ugettext as _
 %>
-<%
+<%  
   path_enc = urllib_quote(path.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS)
   dirname_enc = urlencode(view['dirname'])
   base_url = url('filebrowser:filebrowser.views.view', path=path_enc)
@@ -52,7 +52,7 @@ ${ fb_components.menubar() }
         <!-- ko if: $root.file -->
         <ul class="nav nav-list">
           <!-- ko if: $root.isViewing -->
-            <li><a href="${url('filebrowser:filebrowser.views.view', path=dirname_enc)}"><i class="fa fa-reply"></i> ${_('Back')}</a></li>
+            <li><a  data-bind="click: goToParentDirectory" href=""><i class="fa fa-reply"></i> ${_('Back')}</a></li>
 
             <!-- ko if: $root.file().view.compression() && $root.file().view.compression() === "none" && $root.file().editable -->
               <li><a class="pointer" data-bind="click: $root.editFile"><i class="fa fa-pencil"></i> ${_('Edit file')}</a></li>
@@ -227,9 +227,26 @@ ${ fb_components.menubar() }
     return view.contents.match(new RegExp('[\\s\\S]{1,' + chunkSize + '}', 'g'));
   }
 
-  function getContent (callback) {
-    var _baseUrl = "${url('filebrowser:filebrowser.views.view', path=path_enc)}";
+  // The python backend incorrectly encodes a couple of characters that we fix
+  // in the frontend here 
+  function fixSpecialCharacterEncoding (url) {
+    // Singel quotes (') encoded as Unicode Hex Character
+    // will cause the $.getJSON call and file downloads to produce an incorrect url, 
+    // so we remove the encoding and use plain single quotes.
+    const modifiedUrl = url.replaceAll('&#x27;', "'");
+    // Entity encoded ampersand doesn't work in file or folder names and
+    // needs to be replaced with '&'
+    return modifiedUrl.replaceAll('&amp;', "&");    
+  }
 
+  function getContent (callback) {
+    // We don't use the python variable path_enc here since that will 
+    // produce a double encoded path after calling the python url function
+    const decodedPath = "${path | n}";
+    const encodedPath = encodeURIComponent(decodedPath);
+    const pathPrefix = "/filebrowser/view=";
+    const contentPath = pathPrefix+encodedPath;
+    
     viewModel.isLoading(true);
 
     var startPage = viewModel.page();
@@ -242,7 +259,7 @@ ${ fb_components.menubar() }
       mode: viewModel.mode()
     };
 
-    $.getJSON(_baseUrl, params, function (data) {
+    $.getJSON(contentPath, params, function (data) {
       var _html = "";
 
       viewModel.file(ko.mapping.fromJS(data, { 'ignore': ['view.contents', 'view.xxd'] }));
@@ -292,6 +309,10 @@ ${ fb_components.menubar() }
 
   function DisplayViewModel (params) {
     var self = this;
+
+    self.goToParentDirectory = function () {
+      huePubSub.publish('open.filebrowserlink', { pathPrefix: "/filebrowser/view=", decodedPath: "${view['dirname'] | n}" });
+    }
 
     self.changePage = function () {
       renderPages();
@@ -358,8 +379,10 @@ ${ fb_components.menubar() }
     self.editFile = function() {
       self.isViewing(false);
       self.isLoading(true);
+      
+      const encodedPath = encodeURIComponent("${path | n}");      
       $.ajax({
-        url: '${ edit_url }' + '?is_embeddable=true',
+        url: '/filebrowser/edit=' + encodedPath + '?is_embeddable=true',
         beforeSend:function (xhr) {
           xhr.setRequestHeader('X-Requested-With', 'Hue');
         },
@@ -380,7 +403,7 @@ ${ fb_components.menubar() }
     }
 
     self.downloadFile = function () {
-      huePubSub.publish('open.link', "${url('filebrowser:filebrowser_views_download', path=path_enc)}");
+      huePubSub.publish('open.filebrowserlink', { pathPrefix: "/filebrowser/download=", decodedPath:  "${path | n}" });      
     };
 
     self.pageChanged = function () {

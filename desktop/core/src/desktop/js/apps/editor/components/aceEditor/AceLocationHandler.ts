@@ -60,6 +60,7 @@ export const GET_ACTIVE_LOCATIONS_EVENT = 'get.active.editor.locations';
 
 const HIVE_DIALECT = 'hive';
 const IMPALA_DIALECT = 'impala';
+const SPARKSQL_DIALECT = 'sparksql';
 
 const STATEMENT_COUNT_AROUND_ACTIVE = 10;
 
@@ -776,7 +777,9 @@ export default class AceLocationHandler implements Disposable {
   checkForSyntaxErrors(statementLocation: ParsedLocation, cursorPosition: Ace.Position): void {
     if (
       this.sqlSyntaxWorkerSub &&
-      (this.getDialect() === IMPALA_DIALECT || this.getDialect() === HIVE_DIALECT)
+      (this.getDialect() === IMPALA_DIALECT ||
+        this.getDialect() === HIVE_DIALECT ||
+        this.getDialect() === SPARKSQL_DIALECT)
     ) {
       const AceRange = ace.require('ace/range').Range;
       const editorChangeTime = this.editor.lastChangeTime;
@@ -1409,7 +1412,11 @@ export default class AceLocationHandler implements Disposable {
           }
         });
 
-        if (this.getDialect() === IMPALA_DIALECT || this.getDialect() === HIVE_DIALECT) {
+        if (
+          this.getDialect() === IMPALA_DIALECT ||
+          this.getDialect() === HIVE_DIALECT ||
+          this.getDialect() === SPARKSQL_DIALECT
+        ) {
           this.verifyExists(tokensToVerify, e.data.activeStatementLocations);
         }
         huePubSub.publish('editor.active.locations', lastKnownLocations);

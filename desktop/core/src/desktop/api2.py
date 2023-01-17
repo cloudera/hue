@@ -45,7 +45,7 @@ from useradmin.models import User, Group
 
 from desktop import appmanager
 from desktop.auth.backend import is_admin
-from desktop.conf import ENABLE_CONNECTORS, ENABLE_GIST_PREVIEW, get_clusters, IS_K8S_ONLY, ENABLE_SHARING
+from desktop.conf import ENABLE_CONNECTORS, ENABLE_GIST_PREVIEW, CUSTOM, get_clusters, IS_K8S_ONLY, ENABLE_SHARING
 from desktop.lib.conf import BoundContainer, GLOBAL_CONFIG, is_anonymous
 from desktop.lib.django_util import JsonResponse, login_notrequired, render
 from desktop.lib.exceptions_renderable import PopupException
@@ -54,7 +54,7 @@ from desktop.lib.i18n import smart_str, force_unicode
 from desktop.lib.paths import get_desktop_root
 from desktop.models import Document2, Document, Directory, FilesystemException, uuid_default, \
   UserPreferences, get_user_preferences, set_user_preferences, get_cluster_config, __paginate, _get_gist_document
-from desktop.views import serve_403_error
+from desktop.views import get_banner_message, serve_403_error
 
 from hadoop.cluster import is_yarn
 
@@ -84,6 +84,13 @@ def api_error_handler(func):
 
   return decorator
 
+@api_error_handler
+def get_banners(request):
+  banners = {
+    'system': get_banner_message(request),
+    'configured': CUSTOM.BANNER_TOP_HTML.get()
+  }
+  return JsonResponse(banners)
 
 @api_error_handler
 def get_config(request):

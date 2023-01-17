@@ -120,3 +120,6 @@ axios.interceptors.request.use(config => {
 process.on('unhandledRejection', err => {
   fail(err);
 });
+
+jest.mock('../utils/i18nReact');
+jest.mock('../utils/hueAnalytics');

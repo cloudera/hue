@@ -1,0 +1,62 @@
+[
+  {
+    "namePrefix": "should not find errors",
+    "beforeCursor": "SHOW TBLPROPERTIES bar;",
+    "afterCursor": "",
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "noErrors": true
+  },
+  {
+    "namePrefix": "should not find errors",
+    "beforeCursor": "SHOW TBLPROPERTIES bar (created.by.user);",
+    "afterCursor": "",
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "noErrors": true
+  },
+  {
+    "namePrefix": "should not find errors",
+    "beforeCursor": "SHOW TBLPROPERTIES foo.bar ('created.date');",
+    "afterCursor": "",
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "noErrors": true
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "SHOW ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "TBLPROPERTIES"
+    ]
+  },
+  {
+    "namePrefix": "should suggest tables",
+    "beforeCursor": "SHOW TBLPROPERTIES ",
+    "afterCursor": "",
+    "expectedResult": {
+      "suggestDatabases": {
+        "appendDot": true
+      },
+      "suggestTables": {}
+    }
+  },
+  {
+    "namePrefix": "should suggest tables",
+    "beforeCursor": "SHOW TBLPROPERTIES `foo`.",
+    "afterCursor": "",
+    "expectedResult": {
+      "suggestTables": {
+        "identifierChain": [
+          {
+            "name": "foo"
+          }
+        ]
+      }
+    }
+  }
+]

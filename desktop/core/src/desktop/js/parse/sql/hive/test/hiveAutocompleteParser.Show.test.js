@@ -44,6 +44,7 @@ describe('hiveAutocompleteParser.js SHOW statements', () => {
           'COLUMNS',
           'COMPACTIONS',
           'CONF',
+          'CONNECTORS',
           'CREATE TABLE',
           'CURRENT ROLES',
           'DATABASES',
@@ -87,6 +88,20 @@ describe('hiveAutocompleteParser.js SHOW statements', () => {
     it('should handle "SHOW CONF a.b.c;|"', () => {
       assertAutoComplete({
         beforeCursor: 'SHOW CONF a.b.c;',
+        afterCursor: '',
+        noErrors: true,
+        containsKeywords: ['SELECT'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+  });
+
+  describe('SHOW CONNECTORS', () => {
+    it('should handle "SHOW CONNECTORS; |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SHOW CONNECTORS; ',
         afterCursor: '',
         noErrors: true,
         containsKeywords: ['SELECT'],

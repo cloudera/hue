@@ -801,16 +801,6 @@ else:
       return (bytes / Math.pow(k, i)).toPrecision(dm) + ' ' + sizes[i];
     }
 
-    var updateHash = function (hash) {
-      hash = encodeURI(decodeURIComponent(hash));
-      %if not is_embeddable:
-      window.location.hash = hash;
-      %else:
-      hueUtils.changeURL('#' + hash);
-      huePubSub.publish('fb.update.hash');
-      %endif
-    }
-
     var Page = function (page) {
       if (page != null) {
         return {
@@ -916,11 +906,10 @@ else:
               if (this.url == null || this.url == "") {
                 // forcing root on empty breadcrumb url
                 this.url = "/";
-              }
-
-              fileBrowserViewModel.targetPageNum(1);
-              fileBrowserViewModel.targetPath("${url('filebrowser:filebrowser.views.view', path='')}" + stripHashes(this.url));
-              updateHash(this.url);
+              }              
+              fileBrowserViewModel.targetPageNum(1);              
+              const pathPrefix = "${url('filebrowser:filebrowser.views.view', path='')}";
+              huePubSub.publish('open.filebrowserlink', { pathPrefix, decodedPath: this.url, fileBrowserModel: fileBrowserViewModel});              
             }
             else {
               window.open($(e.target).attr('href'));
@@ -1055,7 +1044,8 @@ else:
       };
 
       self.currentPath = ko.observable(currentDirPath);
-      self.currentPath.subscribe(function (path) {
+
+      self.currentPath.subscribe(function (path) {        
         $(document).trigger('currPathLoaded', { path: path });
       });
 
@@ -1162,7 +1152,7 @@ else:
       self.showSummary = function () {
         self.isLoadingSummary(true);
         $("#contentSummaryModal").modal("show");
-        $.getJSON("${url('filebrowser:content_summary', path='')}" + self.selectedFile().path, function (data) {
+        $.getJSON("${url('filebrowser:content_summary', path='')}" + encodeURIComponent(self.selectedFile().path), function (data) {
           if (data.status == 0) {
             self.contentSummary(ko.mapping.fromJS(data.summary));
             self.isLoadingSummary(false);
@@ -1182,8 +1172,8 @@ else:
 
       self.retrieveData = function (clearAssistCache) {
         self.isLoading(true);
-
-        $.getJSON(self.targetPath() + (self.targetPath().indexOf('?') > 0 ? '&' : '?') + "pagesize=" + self.recordsPerPage() + "&pagenum=" + self.targetPageNum() + "&filter=" + self.searchQuery() + "&sortby=" + self.sortBy() + "&descending=" + self.sortDescending() + "&format=json", function (data) {
+        const encodedSearchFilter = encodeURIComponent(self.searchQuery());
+        $.getJSON(self.targetPath() + (self.targetPath().indexOf('?') > 0 ? '&' : '?') + "pagesize=" + self.recordsPerPage() + "&pagenum=" + self.targetPageNum() + "&filter=" + encodedSearchFilter + "&sortby=" + self.sortBy() + "&descending=" + self.sortDescending() + "&format=json", function (data) {
           if (data.error){
             $(document).trigger("error", data.error);
             self.isLoading(false);
@@ -1340,7 +1330,6 @@ else:
             e.preventDefault();
             fileBrowserViewModel.targetPageNum(1);
             fileBrowserViewModel.targetPath("${url('filebrowser:filebrowser.views.view', path='')}?" + folderPath);
-            updateHash('');
             fileBrowserViewModel.retrieveData();
           }
           else {
@@ -1359,28 +1348,23 @@ else:
 
       self.viewFile = function (file, e) {
         e.stopImmediatePropagation();
+        const decodedPath = file.path;
+        const pathPrefix = "${url('filebrowser:filebrowser.views.view', path='')}";
+
         if (file.type == "dir") {
           // Reset page number so that we don't hit a page that doesn't exist
-          self.targetPageNum(1);
+          self.targetPageNum(1);        
           self.enableFilterAfterSearch = false;
           self.searchQuery("");
-          self.targetPath(file.url);
-          updateHash(stripHashes(file.path));
+          huePubSub.publish('open.filebrowserlink', { pathPrefix, decodedPath, fileBrowserModel: self });
         } else {
-          %if is_embeddable:
-          huePubSub.publish('open.link', file.url);
-          %else:
-          window.location.href = file.url;
-          %endif
-        }
-      };
-
-      self.editFile = function () {
-        huePubSub.publish('open.link', self.selectedFile().url.replace("${url('filebrowser:filebrowser.views.view', path='')}", "${url('filebrowser:filebrowser_views_edit', path='')}"));
+          huePubSub.publish('open.filebrowserlink', { pathPrefix, decodedPath });
+        }        
       };
 
       self.downloadFile = function () {
-        huePubSub.publish('open.link', self.selectedFile().url.replace("${url('filebrowser:filebrowser.views.view', path='')}", "${url('filebrowser:filebrowser_views_download', path='')}"));
+        huePubSub.publish('ignore.next.unload');
+        huePubSub.publish('open.filebrowserlink', { pathPrefix: '/filebrowser/download=', decodedPath: self.selectedFile().path });  
       };
 
       self.renameFile = function () {
@@ -1390,7 +1374,7 @@ else:
 
         $("#newNameInput").val(self.selectedFile().name);
 
-        $("#renameForm").attr("action", "/filebrowser/rename?next=${url('filebrowser:filebrowser.views.view', path='')}" + self.currentPath());
+        $("#renameForm").attr("action", "/filebrowser/rename?next=${url('filebrowser:filebrowser.views.view', path='')}" + encodeURIComponent(self.currentPath()));
 
         $('#renameForm').ajaxForm({
           dataType:  'json',
@@ -1412,7 +1396,7 @@ else:
 
         $("#setReplFileName").text(self.selectedFile().path);
 
-        $("#setReplicationFactorForm").attr("action", "/filebrowser/set_replication?next=${url('filebrowser:filebrowser.views.view', path='')}" + self.currentPath());
+        $("#setReplicationFactorForm").attr("action", "/filebrowser/set_replication?next=${url('filebrowser:filebrowser.views.view', path='')}" + encodeURIComponent(self.currentPath()));
 
         $('#setReplicationFactorForm').ajaxForm({
           dataType: 'json',
@@ -1448,7 +1432,7 @@ else:
 
         if (!isMoveOnSelf){
           hiddenFields($("#moveForm"), "src_path", paths);
-          $("#moveForm").attr("action", "/filebrowser/move?next=${url('filebrowser:filebrowser.views.view', path='')}" + self.currentPath());
+          $("#moveForm").attr("action", "/filebrowser/move?next=${url('filebrowser:filebrowser.views.view', path='')}" + encodeURIComponent(self.currentPath()));
           $('#moveForm').ajaxForm({
             dataType:  'json',
             success: function() {
@@ -1506,7 +1490,7 @@ else:
 
         hiddenFields($("#copyForm"), "src_path", paths);
 
-        $("#copyForm").attr("action", "/filebrowser/copy?next=${url('filebrowser:filebrowser.views.view', path='')}" + self.currentPath());
+        $("#copyForm").attr("action", "/filebrowser/copy?next=${url('filebrowser:filebrowser.views.view', path='')}" + encodeURIComponent(self.currentPath()));
 
         $("#copyModal").modal({
           keyboard:true,
@@ -1558,7 +1542,7 @@ else:
 
           hiddenFields($("#chownForm"), 'path', paths);
 
-          $("#chownForm").attr("action", "/filebrowser/chown?next=${url('filebrowser:filebrowser.views.view', path='')}" + self.currentPath());
+          $("#chownForm").attr("action", "/filebrowser/chown?next=${url('filebrowser:filebrowser.views.view', path='')}" + encodeURIComponent(self.currentPath()));
 
           $("select[name='user']").val(self.selectedFile().stats.user);
 
@@ -1610,7 +1594,7 @@ else:
 
           hiddenFields($("#chmodForm"), 'path', paths);
 
-          $("#chmodForm").attr("action", "/filebrowser/chmod?next=${url('filebrowser:filebrowser.views.view', path='')}" + self.currentPath());
+          $("#chmodForm").attr("action", "/filebrowser/chmod?next=${url('filebrowser:filebrowser.views.view', path='')}" + encodeURIComponent(self.currentPath()));
 
           $("#changePermissionModal").modal({
             keyboard: true,
@@ -1658,7 +1642,7 @@ else:
 
         $("#deleteForm").attr("action", "/filebrowser/rmtree" + "?" +
           (self.skipTrash() ? "skip_trash=true&" : "") +
-          "next=${url('filebrowser:filebrowser.views.view', path='')}" + self.currentPath());
+          "next=${url('filebrowser:filebrowser.views.view', path='')}" + encodeURIComponent(self.currentPath()));
 
         $("#deleteModal").modal({
           keyboard:true,
@@ -1823,7 +1807,7 @@ else:
       };
 
       self.createDirectory = function (formElement) {
-        $(formElement).attr("action", "/filebrowser/mkdir?next=${url('filebrowser:filebrowser.views.view', path='')}" + self.currentPath());
+        $(formElement).attr("action", "/filebrowser/mkdir?next=${url('filebrowser:filebrowser.views.view', path='')}" + encodeURIComponent(self.currentPath()));
         if ($.trim($("#newDirectoryNameInput").val()) == "") {
           $("#directoryNameRequiredAlert").show();
           $("#newDirectoryNameInput").addClass("fieldError");
@@ -1860,7 +1844,7 @@ else:
       };
 
       self.createFile = function (formElement) {
-        $(formElement).attr("action", "/filebrowser/touch?next=${url('filebrowser:filebrowser.views.view', path='')}" + self.currentPath());
+        $(formElement).attr("action", "/filebrowser/touch?next=${url('filebrowser:filebrowser.views.view', path='')}" + encodeURIComponent(self.currentPath()));
         if ($.trim($("#newFileNameInput").val()) == "") {
           $("#fileNameRequiredAlert").show();
           $("#newFileNameInput").addClass("fieldError");
@@ -1899,7 +1883,7 @@ else:
 
         hiddenFields($("#restoreTrashForm"), 'path', paths);
 
-        $("#restoreTrashForm").attr("action", "/filebrowser/trash/restore?next=${url('filebrowser:filebrowser.views.view', path='')}" + self.currentPath());
+        $("#restoreTrashForm").attr("action", "/filebrowser/trash/restore?next=${url('filebrowser:filebrowser.views.view', path='')}" + encodeURIComponent(self.currentPath()));
 
         $("#restoreTrashModal").modal({
           keyboard:true,
@@ -2453,39 +2437,7 @@ else:
 
       $("*[rel='tooltip']").tooltip({ placement:"bottom" });
 
-      var hashchange = function () {
-        if (window.location.pathname.indexOf('/filebrowser') > -1) {
-          var targetPath = "";
-          var hash = decodeURI(window.location.hash.substring(1));
-          if (hash != null && hash != "" && hash.indexOf('/') > -1) {
-            targetPath = "${url('filebrowser:filebrowser.views.view', path='')}";
-            if (hash.indexOf("!!") != 0) {
-              targetPath += stripHashes(encodeURIComponent(hash));
-            }
-            else {
-              targetPath = fileBrowserViewModel.targetPath() + encodeURI(hash);
-            }
-            fileBrowserViewModel.targetPageNum(1)
-          }
-          if (window.location.href.indexOf("#") == -1) {
-            fileBrowserViewModel.targetPageNum(1);
-            targetPath = "${current_request_path | n,unicode }";
-          }
-          if (targetPath != "") {
-            fileBrowserViewModel.targetPath(targetPath);
-            fileBrowserViewModel.retrieveData();
-          }
-        }
-      }
-
-      huePubSub.subscribe('fb.update.hash', hashchange, 'filebrowser');
-
-      if (window.location.hash != null && window.location.hash.length > 1) {
-        hashchange();
-      }
-      else {
-        fileBrowserViewModel.retrieveData();
-      }
+      fileBrowserViewModel.retrieveData();
 
 
       $("#editBreadcrumb").click(function (e) {
@@ -2506,17 +2458,14 @@ else:
             $.jHueNotify.warn("${ _('Listing of buckets is not allowed. Redirecting to the home directory.') }");
             target_path = window.USER_HOME_DIR;
           } 
-          fileBrowserViewModel.targetPath("${url('filebrowser:filebrowser.views.view', path='')}" + target_path); 
+          fileBrowserViewModel.targetPath("${url('filebrowser:filebrowser.views.view', path='')}" + encodeURIComponent(target_path)); 
           fileBrowserViewModel.getStats(function (data) {
-            if (data.type != null && data.type == "file") {
-              %if is_embeddable:
-              huePubSub.publish('open.link', data.url);
-              %else:
-              huePubSub.publish('open.link', data.url);
-              %endif
+            const pathPrefix = "${url('filebrowser:filebrowser.views.view', path='')}";
+            if (data.type != null && data.type == "file") {              
+              huePubSub.publish('open.filebrowserlink', { pathPrefix, decodedPath: target_path});              
               return false;
             } else {
-              updateHash(target_path);
+              huePubSub.publish('open.filebrowserlink', { pathPrefix, decodedPath: target_path, fileBrowserModel: fileBrowserViewModel});
             }
             $("#jHueHdfsAutocomplete").hide();
           });
@@ -2543,7 +2492,6 @@ else:
         }
       });
 
-      $(window).bind("hashchange.fblist", hashchange);
 
       $(".actionbar").data("originalWidth", $(".actionbar").width());
 

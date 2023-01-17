@@ -123,10 +123,14 @@ def _convert_format(format_dict, inverse=False):
 @api_error_handler
 def guess_format(request):
   file_format = json.loads(request.POST.get('fileFormat', '{}'))
+  file_type = file_format['file_type']
+  path = file_format["path"]
+  
+  if sys.version_info[0] < 3 and (file_type == 'excel' or path[-3:] == 'xls' or path[-4:] == 'xlsx'):
+    return JsonResponse({'status': -1, 'message': 'Python2 based Hue does not support Excel file importer'})
 
   if file_format['inputFormat'] == 'localfile':
-    path = urllib_unquote(file_format["path"])
-    if 'xlsx' in path:
+    if file_type == 'excel':
       format_ = {
         "type": "excel",
         "hasHeader": True
@@ -141,20 +145,16 @@ def guess_format(request):
       }
 
   elif file_format['inputFormat'] == 'file':
-    path = urllib_unquote(file_format["path"])
     if path[-3:] == 'xls' or path[-4:] == 'xlsx':
-      if sys.version_info[0] > 2:
-        file_obj = request.fs.open(path)
-        if path[-3:] == 'xls':
-          df = pd.read_excel(file_obj.read(1024 * 1024 * 1024), engine='xlrd')
-        else:
-          df = pd.read_excel(file_obj.read(1024 * 1024 * 1024), engine='openpyxl')
-        _csv_data = df.to_csv(index=False)
-
-        path = excel_to_csv_file_name_change(path)
-        request.fs.create(path, overwrite=True, data=_csv_data)
+      file_obj = request.fs.open(path)
+      if path[-3:] == 'xls':
+        df = pd.read_excel(file_obj.read(1024 * 1024 * 1024), engine='xlrd')
       else:
-        return JsonResponse({'status': -1, 'message': 'Python2 based Hue does not support Excel file importer'})
+        df = pd.read_excel(file_obj.read(1024 * 1024 * 1024), engine='openpyxl')
+      _csv_data = df.to_csv(index=False)
+
+      path = excel_to_csv_file_name_change(path)
+      request.fs.create(path, overwrite=True, data=_csv_data)
 
     indexer = MorphlineIndexer(request.user, request.fs)
     if not request.fs.isfile(path):
@@ -295,7 +295,8 @@ def guess_field_types(request):
 
   elif file_format['inputFormat'] == 'file':
     indexer = MorphlineIndexer(request.user, request.fs)
-    path = urllib_unquote(file_format["path"])
+    path = file_format["path"]
+
     if path[-3:] == 'xls' or path[-4:] == 'xlsx':
       path = excel_to_csv_file_name_change(path)
     stream = request.fs.open(path)
@@ -458,7 +459,7 @@ def importer_submit(request):
   file_encoding = None
   if source['inputFormat'] == 'file':
     if source['path']:
-      path = urllib_unquote(source['path'])
+      path = source['path']
       if path[-3:] == 'xls' or path[-4:] == 'xlsx':
         path = excel_to_csv_file_name_change(path)
       source['path'] = request.fs.netnormpath(path)
@@ -612,7 +613,7 @@ def _small_indexing(user, fs, client, source, destination, index_name):
   errors = []
 
   if source['inputFormat'] not in ('manual', 'table', 'query_handle'):
-    path = urllib_unquote(source["path"])
+    path = source["path"]
     stats = fs.stats(path)
     if stats.size > MAX_UPLOAD_SIZE:
       raise PopupException(_('File size is too large to handle!'))
@@ -624,7 +625,7 @@ def _small_indexing(user, fs, client, source, destination, index_name):
 
   if source['inputFormat'] == 'file':
     kwargs['separator'] = source['format']['fieldSeparator']
-    path = urllib_unquote(source["path"])
+    path = source["path"]
     data = fs.read(path, 0, MAX_UPLOAD_SIZE)
 
   if client.is_solr_six_or_more():
@@ -778,14 +779,17 @@ def upload_local_file(request):
   username = request.user.username
   filename = "%s_%s:%s;" % (username, uuid.uuid4(), re.sub('[^0-9a-zA-Z]+', '_', upload_file.name))
   file_format = upload_file.name.split(".")[-1]
+  file_type = 'csv'
 
-  if file_format == "xlsx":
-    workbook = openpyxl.load_workbook(upload_file)
-    sheet = workbook.active
+  if file_format in ("xlsx", "xls"):
+    if file_format == "xlsx":
+      read_file = pd.read_excel(upload_file)
+    else:
+      read_file = pd.read_excel(upload_file, engine='xlrd')
+  
     temp_file = tempfile.NamedTemporaryFile(mode='w', prefix=filename, suffix='.csv', delete=False)
-    csv_file = csv.writer(temp_file)
-    for row in sheet.rows:
-      csv_file.writerow([cell.value for cell in row])
+    read_file.to_csv(temp_file, index=False)
+    file_type = 'excel'
 
   else: 
     temp_file = tempfile.NamedTemporaryFile(prefix=filename, suffix='.csv', delete=False)
@@ -794,4 +798,4 @@ def upload_local_file(request):
   local_file_url = temp_file.name
   temp_file.close()
 
-  return JsonResponse({'local_file_url': local_file_url})
+  return JsonResponse({'local_file_url': local_file_url, 'file_type': file_type})

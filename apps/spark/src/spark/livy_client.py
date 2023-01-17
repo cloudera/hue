@@ -153,6 +153,9 @@ class LivyClient(object):
   def get_batches(self):
     return self._root.get('batches')
 
+  def cancel_statement(self, session, statement_id):
+    return self._root.post('sessions/%s/statements/%s/cancel' % (session, statement_id))
+
   def submit_batch(self, properties):
     properties['proxyUser'] = self.user
     return self._root.post('batches', data=json.dumps(properties), contenttype=_JSON_CONTENT_TYPE)

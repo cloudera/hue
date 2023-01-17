@@ -357,11 +357,11 @@ Hue's [File Browser](https://docs.gethue.com/user/browsing/#data) offer uploads,
 
 ### Get Filesystems
 
-Get the filesystems configured with Hue:
+Get the filesystems details such as configured filesystems in Hue which user has access to and its home directories:
 
-    curl -X POST https://demo.gethue.com/api/storage/get_filesystems
+    curl -X GET https://demo.gethue.com/api/storage/filesystems
     
-    {"status": 0, "filesystems": {"s3a": true}}
+    [{"file_system": "hdfs", "user_home_directory": "/user/demo"}, {"file_system": "s3a", "user_home_directory": "s3a://<some_s3_path>"}, {"file_system": "abfs", "user_home_directory": "abfs://<some_abfs_path>"}]
 
 ### List
 

@@ -1,0 +1,783 @@
+[
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "TABLE"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest tables and databases",
+    "beforeCursor": "ALTER TABLE ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestTables": {},
+      "suggestDatabases": {
+        "appendDot": true
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest tables",
+    "beforeCursor": "ALTER TABLE foo.",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestTables": {
+        "identifierChain": [
+          {
+            "name": "foo"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER TABLE foo ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "PARTITION",
+      "ADD"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER TABLE foo.bar ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "PARTITION",
+      "ADD"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER TABLE foo ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "RENAME TO",
+      "PARTITION"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER TABLE foo RENAME ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "TO"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest tables and databases",
+    "beforeCursor": "ALTER TABLE ",
+    "afterCursor": " RENAME TO bar",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestTables": {},
+      "suggestDatabases": {
+        "appendDot": true
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest tables",
+    "beforeCursor": "ALTER TABLE foo.",
+    "afterCursor": " RENAME TO bar",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestTables": {
+        "identifierChain": [
+          {
+            "name": "foo"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER TABLE foo PARTITION (a=1) RENAME ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "TO"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER TABLE foo PARTITION (a=1) RENAME TO ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "PARTITION"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest tables and databases",
+    "beforeCursor": "ALTER TABLE ",
+    "afterCursor": " PARTITION (a=1) RENAME TO PARTITION (b=1)",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestTables": {},
+      "suggestDatabases": {
+        "appendDot": true
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest tables",
+    "beforeCursor": "ALTER TABLE foo.",
+    "afterCursor": " PARTITION (a=1) RENAME TO PARTITION (b=1)",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestTables": {
+        "identifierChain": [
+          {
+            "name": "foo"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER TABLE foo ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "ADD COLUMNS"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER TABLE foo ADD ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "COLUMNS"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest column types",
+    "beforeCursor": "ALTER TABLE foo ADD COLUMNS (a ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "DEC"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER TABLE foo ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "DROP COLUMN",
+      "DROP COLUMNS"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER TABLE foo DROP ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "COLUMN",
+      "COLUMNS"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest columns",
+    "beforeCursor": "ALTER TABLE foo DROP COLUMN ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestColumns": {
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "foo"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest columns",
+    "beforeCursor": "ALTER TABLE foo DROP COLUMNS (",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestColumns": {
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "foo"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest columns",
+    "beforeCursor": "ALTER TABLE foo DROP COLUMNS (bar, ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestColumns": {
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "foo"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER TABLE foo ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "RENAME COLUMN"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER TABLE foo RENAME ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "COLUMN"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest columns",
+    "beforeCursor": "ALTER TABLE foo RENAME COLUMN ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestColumns": {
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "foo"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER TABLE foo RENAME COLUMN bar ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "TO"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER TABLE foo ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "ALTER",
+      "CHANGE",
+      "ALTER COLUMN",
+      "CHANGE COLUMN"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest columns",
+    "beforeCursor": "ALTER TABLE bar ALTER ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestColumns": {
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "bar"
+              }
+            ]
+          }
+        ]
+      },
+      "suggestKeywords": [
+        "COLUMN"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest columns",
+    "beforeCursor": "ALTER TABLE bar CHANGE ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestColumns": {
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "bar"
+              }
+            ]
+          }
+        ]
+      },
+      "suggestKeywords": [
+        "COLUMN"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest columns",
+    "beforeCursor": "ALTER TABLE bar ALTER COLUMN ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestColumns": {
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "bar"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest columns",
+    "beforeCursor": "ALTER TABLE bar CHANGE COLUMN ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestColumns": {
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "bar"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest types",
+    "beforeCursor": "ALTER TABLE bar CHANGE foo ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "BIGINT"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER TABLE bar ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "REPLACE COLUMNS"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER TABLE bar REPLACE ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "COLUMNS"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER TABLE bar PARTITION (a=1) REPLACE ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "COLUMNS"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER TABLE bar ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "ADD",
+      "ADD IF NOT EXISTS"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER TABLE bar ADD IF ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "NOT EXISTS"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER TABLE bar ADD IF NOT ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "EXISTS"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER TABLE bar ADD ",
+    "afterCursor": " (PARTITION (a=1));",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "IF NOT EXISTS"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER TABLE bar ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "DROP",
+      "DROP IF EXISTS"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER TABLE bar DROP ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "IF EXISTS",
+      "PARTITION"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER TABLE bar DROP IF ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "EXISTS"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER TABLE bar DROP IF EXISTS ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "PARTITION"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER TABLE bar DROP PARTITION (a=1) ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "PURGE"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER TABLE bar ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "SET",
+      "SET TBLPROPERTIES",
+      "UNSET TBLPROPERTIES"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER TABLE bar SET ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "TBLPROPERTIES"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER TABLE bar UNSET ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "TBLPROPERTIES"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER TABLE bar UNSET TBLPROPERTIES ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "IF EXISTS"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER TABLE bar UNSET TBLPROPERTIES IF ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "EXISTS"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER TABLE bar ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "SET",
+      "SET SERDE",
+      "SET SERDEPROPERTIES"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER TABLE bar SET ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "SERDE",
+      "SERDEPROPERTIES"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER TABLE bar PARTITION (a=1) ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "SET",
+      "SET SERDE",
+      "SET SERDEPROPERTIES"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER TABLE bar PARTITION (a=1) SET ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "SERDE",
+      "SERDEPROPERTIES"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER TABLE bar SET SERDE \"asdf\" ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "WITH SERDEPROPERTIES"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER TABLE bar SET SERDE \"asdf\" WITH ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "SERDEPROPERTIES"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER TABLE bar ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "SET",
+      "SET FILEFORMAT",
+      "SET LOCATION"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER TABLE bar PARTITION (a=1) ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "SET",
+      "SET FILEFORMAT",
+      "SET LOCATION"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER TABLE bar SET ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "FILEFORMAT",
+      "LOCATION"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER TABLE bar PARTITION (a=1) SET ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "FILEFORMAT",
+      "LOCATION"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER TABLE bar SET FILEFORMAT ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "PARQUET"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER TABLE bar ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "RECOVER PARTITIONS"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER TABLE bar RECOVER ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "PARTITIONS"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  }
+]

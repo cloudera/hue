@@ -36,6 +36,7 @@ urlpatterns = [
 # Compatibility with "old" private API.
 # e.g. https://demo.gethue.com/notebook/api/execute/hive
 urlpatterns += [
+  re_path(r'^banners/?$', api_public.get_banners, name='core_banners'),
   re_path(r'^get_config/?$', api_public.get_config),
   re_path(r'^get_namespaces/(?P<interface>[\w\-]+)/?$', api_public.get_context_namespaces),  # To remove
 
@@ -91,7 +92,7 @@ urlpatterns += [
 ]
 
 urlpatterns += [
-  re_path(r'^storage/get_filesystems/?$', api_public.storage_get_filesystems, name='storage_get_filesystems'),
+  re_path(r'^storage/filesystems/?$', api_public.storage_get_filesystems, name='storage_get_filesystems'),
   re_path(r'^storage/view=(?P<path>.*)$', api_public.storage_view, name='storage_view'),
   re_path(r'^storage/download=(?P<path>.*)$', api_public.storage_download, name='storage_download'),
   re_path(r'^storage/upload/file/?$', api_public.storage_upload_file, name='storage_upload_file'),

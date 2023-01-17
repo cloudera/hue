@@ -207,12 +207,6 @@ ${ hueIcons.symbols() }
   </script>
 % endif
 
-% if banner_message or conf.CUSTOM.BANNER_TOP_HTML.get():
-  <div class="banner">
-    ${ banner_message or conf.CUSTOM.BANNER_TOP_HTML.get() | n,unicode }
-  </div>
-% endif
-
 <%
   def count_apps(apps, app_list):
     count = 0

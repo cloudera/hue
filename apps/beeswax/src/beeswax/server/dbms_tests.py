@@ -141,7 +141,7 @@ class TestGetQueryServerConfig():
               try:
                 query_server = get_query_server_config(name='hive')
               except PopupException as e:
-                assert_equal(e.message, 'There is no running Hive server available')
+                assert_equal(e.message, 'There are no running Hive server available')
 
   def test_get_hs2_discovery(self):
 
@@ -160,7 +160,7 @@ class TestGetQueryServerConfig():
           try:
             query_server = get_query_server_config(name='hive')
           except PopupException as e:
-            assert_equal(e.message, 'There is no running Hive server available')
+            assert_equal(e.message, 'There are no running Hive server available')
 
           assert_equal(query_server['server_name'], 'beeswax')
           assert_equal(query_server['server_host'], 'hive-llap-1.gethue.com')

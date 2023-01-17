@@ -45,6 +45,25 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
 <head>
+
+  % if conf.COLLECT_USAGE.get():
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=${conf.GTAG_ID.get()}"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', '${ conf.GTAG_ID.get()}', { 
+        // Prevent GA from accidentally passing client meta data present in urls
+        send_page_view: false, 
+        page_location: 'redacted',
+        page_referrer: 'redacted',
+        allow_google_signals: false
+        });
+    </script>
+  % endif
+
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta charset="utf-8">
   <title>Hue</title>
@@ -127,11 +146,7 @@ ${ hueIcons.symbols() }
   <hue-sidebar-web-component style="flex: 1 1 auto"></hue-sidebar-web-component>
 
   <div class="main-page">
-    % if banner_message or conf.CUSTOM.BANNER_TOP_HTML.get():
-      <div class="banner">
-        ${ banner_message or conf.CUSTOM.BANNER_TOP_HTML.get() | n,unicode }
-      </div>
-    % endif
+    <AppBanner data-reactcomponent='AppBanner'></AppBanner>
 
     <nav class="navbar navbar-default">
       <div class="navbar-inner top-nav">
@@ -326,7 +341,6 @@ ${ commonHeaderFooterComponents.header_pollers(user, is_s3_enabled, apps) }
 ${ smart_unicode(login_modal(request).content) | n,unicode }
 % endif
 
-<div class="shepherd-backdrop"></div>
 
 <iframe id="zoomDetectFrame" style="width: 250px; display: none" ></iframe>
 
@@ -441,7 +455,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
     %if is_admin(user):
       tour.addStep('admin', {
         text: '${ _ko('As a superuser, you can check system configuration from the user menu and install sample data and jobs for your users.') }',
-        attachTo: '.hue-sidebar .shepherd-user-menu right'
+        attachTo: '.server-position-pointer-welcome-tour left'
       });
     %endif
 

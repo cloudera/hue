@@ -1,0 +1,43 @@
+[
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ALTER ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "TABLE"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest tables",
+    "beforeCursor": "ALTER TABLE ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestTables": {
+        "onlyTables": true
+      },
+      "suggestDatabases": {
+        "appendDot": true
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest tables",
+    "beforeCursor": "ALTER TABLE foo.",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestTables": {
+        "identifierChain": [
+          {
+            "name": "foo"
+          }
+        ],
+        "onlyTables": true
+      }
+    }
+  }
+]

@@ -41,6 +41,7 @@ describe('hiveAutocompleteParser.js DROP statements', () => {
       expectedResult: {
         lowerCase: false,
         suggestKeywords: [
+          'CONNECTOR',
           'DATABASE',
           'FUNCTION',
           'INDEX',
@@ -183,6 +184,41 @@ describe('hiveAutocompleteParser.js DROP statements', () => {
             types: ['COLREF'],
             tables: [{ identifierChain: [{ name: 'boo' }, { name: 'baa' }] }]
           }
+        }
+      });
+    });
+  });
+
+  describe('DROP CONNECTOR', () => {
+    it('should handle "DROP CONNECTOR IF EXISTS foo; |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'DROP CONNECTOR IF EXISTS foo;',
+        afterCursor: '',
+        containsKeywords: ['SELECT'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
+    it('should suggest databases for "DROP CONNECTOR |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'DROP CONNECTOR ',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: ['IF EXISTS']
+        }
+      });
+    });
+
+    it('should suggest databases for "DROP CONNECTOR IF |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'DROP CONNECTOR IF ',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: ['EXISTS']
         }
       });
     });

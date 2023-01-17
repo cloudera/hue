@@ -93,7 +93,7 @@
   import { setBaseUrl } from 'api/utils';
   import contextCatalog from 'catalog/contextCatalog';
   import sqlAnalyzerRepository from 'catalog/analyzer/sqlAnalyzerRepository';
-  import HueIcons from 'components/icons/HueIcons.vue';
+  import HueIcons from 'components/icons/vue/HueIcons.vue';
   import HueButton from 'components/HueButton.vue';
   import Spinner from 'components/Spinner.vue';
   import SubscriptionTracker from 'components/utils/SubscriptionTracker';

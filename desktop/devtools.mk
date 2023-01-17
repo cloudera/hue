@@ -31,9 +31,13 @@ PYPI_MIRROR ?= https://pypi.python.org/simple/
 # Install/download dev tools for SDK into the virtual environment
 .PHONY: $(DEVTOOLS)
 $(DEVTOOLS):
+ifeq ($(PYTHON_VER),python2.7)
 	@echo "--- Installing development tool: $@"
 	$(ENV_PIP)  \
 	   install $(subst ],,$(subst [,==,$@))
+endif
+	@echo
+
 
 $(BLD_DIR):
 	@mkdir -p $@

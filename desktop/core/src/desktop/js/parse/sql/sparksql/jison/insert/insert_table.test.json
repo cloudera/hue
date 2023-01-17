@@ -1,0 +1,252 @@
+[
+  {
+    "namePrefix": "should not find errors",
+    "beforeCursor": "INSERT INTO TABLE db.tbl PARTITION (a=1,b=2) (c,d) VALUES (NULL , 1), ( 2, 3 ); ",
+    "afterCursor": "",
+    "noErrors": true,
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should not find errors",
+    "beforeCursor": "INSERT INTO TABLE db.tbl PARTITION (a=1,b=2) (c,d) SELECT 1; ",
+    "afterCursor": "",
+    "noErrors": true,
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest tables",
+    "beforeCursor": "INSERT db.",
+    "afterCursor": "",
+    "noErrors": true,
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestTables": {
+        "identifierChain": [
+          {
+            "name": "db"
+          }
+        ],
+        "tablesOnly": true
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest tables",
+    "beforeCursor": "INSERT INTO db.",
+    "afterCursor": "",
+    "noErrors": true,
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestTables": {
+        "identifierChain": [
+          {
+            "name": "db"
+          }
+        ],
+        "tablesOnly": true
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest tables",
+    "beforeCursor": "INSERT OVERWRITE TABLE db.",
+    "afterCursor": "",
+    "noErrors": true,
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestTables": {
+        "identifierChain": [
+          {
+            "name": "db"
+          }
+        ],
+        "tablesOnly": true
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "INSERT db ",
+    "afterCursor": "",
+    "noErrors": true,
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "PARTITION",
+        "SELECT",
+        "VALUES"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest columns",
+    "beforeCursor": "INSERT OVERWRITE TABLE foo.tbl ( ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestColumns": {
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "foo"
+              },
+              {
+                "name": "tbl"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest columns",
+    "beforeCursor": "INSERT OVERWRITE TABLE foo.tbl PARTITION ( ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestColumns": {
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "foo"
+              },
+              {
+                "name": "tbl"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest columns",
+    "beforeCursor": "INSERT OVERWRITE TABLE foo.tbl PARTITION (a = 1) (b, c, ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestColumns": {
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "foo"
+              },
+              {
+                "name": "tbl"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "INSERT INTO TABLE db.tbl PARTITION (a = 1) (b) ",
+    "afterCursor": "",
+    "noErrors": true,
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "SELECT",
+        "VALUES"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "INSERT OVERWRITE tbl (b) ",
+    "afterCursor": "",
+    "noErrors": true,
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "SELECT",
+        "VALUES"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "INSERT OVERWRITE tbl PARTITION (b = '123') SELECT ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "*",
+      "CASE",
+      "ALL",
+      "DISTINCT",
+      "FALSE",
+      "NULL",
+      "TRUE"
+    ],
+    "noErrors": true,
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestAggregateFunctions": {
+        "tables": []
+      },
+      "suggestAnalyticFunctions": true,
+      "suggestFunctions": {},
+      "suggestTables": {
+        "prependQuestionMark": true,
+        "prependFrom": true
+      },
+      "suggestDatabases": {
+        "prependQuestionMark": true,
+        "prependFrom": true,
+        "appendDot": true
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "INSERT ",
+    "afterCursor": " db.tbl VALUES (1);",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "INTO",
+        "INTO TABLE",
+        "OVERWRITE",
+        "OVERWRITE TABLE",
+        "TABLE"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "INSERT OVERWRITE ",
+    "afterCursor": " db.tbl VALUES (1);",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "TABLE"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "INSERT OVERWRITE db.tbl ",
+    "afterCursor": " SELECT * FROM foo;",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "PARTITION"
+      ]
+    }
+  }
+]

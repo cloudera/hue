@@ -1,0 +1,112 @@
+[
+  {
+    "namePrefix": "should not find errors",
+    "beforeCursor": "MSCK REPAIR TABLE db.tbl ADD PARTITIONS;",
+    "afterCursor": "",
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "noErrors": true,
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "MSCK ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "REPAIR TABLE"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "MSCK REPAIR ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "TABLE"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest tables",
+    "beforeCursor": "MSCK REPAIR TABLE ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestTables": {
+        "onlyTables": true
+      },
+      "suggestDatabases": {
+        "appendDot": true
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest tables",
+    "beforeCursor": "MSCK REPAIR TABLE foo.",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestTables": {
+        "identifierChain": [
+          {
+            "name": "foo"
+          }
+        ],
+        "onlyTables": true
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "MSCK REPAIR TABLE foo.bar ",
+    "afterCursor": " ",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "ADD PARTITIONS",
+        "DROP PARTITIONS",
+        "SYNC PARTITIONS"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "MSCK REPAIR TABLE foo.bar ADD ",
+    "afterCursor": " ",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "PARTITIONS"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "MSCK REPAIR TABLE foo.bar DROP ",
+    "afterCursor": " ",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "PARTITIONS"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "MSCK REPAIR TABLE foo.bar SYNC ",
+    "afterCursor": " ",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "PARTITIONS"
+      ]
+    }
+  }
+]
