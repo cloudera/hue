@@ -34,17 +34,31 @@
         <SearchInput v-model="searchFilter" :show-magnify="false" :small="true" />
       </div>
       <div class="query-history-actions">
-        <HueButton :small="true" :disabled="!history.length" @click="onClearClick">
+        <HueButton
+          data-hue-analytics="editor:clear-query-history-btn-click"
+          :small="true"
+          :disabled="!history.length"
+          @click="onClearClick"
+        >
           <i class="fa fa-fw fa-calendar-times-o" /> {{ I18n('Clear') }}
         </HueButton>
-        <HueButton :small="true" :disabled="!history.length" @click="onExportClick">
+        <HueButton
+          data-hue-analytics="editor:export-query-history-btn-click"
+          :small="true"
+          :disabled="!history.length"
+          @click="onExportClick"
+        >
           <i
             class="fa fa-fw"
             :class="{ 'fa-download': !exportingHistory, 'fa-spinner fa-spin': exportingHistory }"
           />
           {{ I18n('Export') }}
         </HueButton>
-        <HueButton :small="true" @click="onImportClick">
+        <HueButton
+          data-hue-analytics="editor:import-query-history-btn-click"
+          :small="true"
+          @click="onImportClick"
+        >
           <i class="fa fa-fw fa-upload" /> {{ I18n('import') }}
         </HueButton>
       </div>

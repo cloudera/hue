@@ -863,8 +863,10 @@ class ResultChart extends DisposableComponent {
   }
 
   prepopulateChart() {
-    const type = this.chartType();
-    hueAnalytics.log('notebook', 'chart/' + type);
+    if (!window.ENABLE_NOTEBOOK_2) {
+      const type = this.chartType();
+      hueAnalytics.log('notebook', 'chart/' + type);
+    }
 
     if (this.isMapChart() && this.cleanedNumericMeta().length >= 2) {
       if (this.chartX() === null || typeof this.chartX() === 'undefined') {
