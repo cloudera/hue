@@ -480,6 +480,7 @@ else:
       }
 
       KeyValueListInputViewModel.prototype.addValue = function () {
+        window.hueAnalytics.log('editor', 'settings/add-settings-value');
         var self = this;
         var newValue = {
           key: ko.observable(''),
@@ -610,6 +611,7 @@ else:
       }
 
       FunctionListInputViewModel.prototype.addValue = function () {
+        window.hueAnalytics.log('editor', 'settings/add-function');
         var self = this;
         var newValue = {
           name: ko.observable(''),
@@ -683,6 +685,7 @@ else:
       }
 
       HdfsFileListInputViewModel.prototype.addValue = function () {
+        window.hueAnalytics.log('editor', 'settings/add-file-path');
         var self = this;
         var newValue = {
           path: ko.observable(''),
