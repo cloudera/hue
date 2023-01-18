@@ -36,7 +36,7 @@ const TEMPLATE = `
     </button>
     <ul class="dropdown-menu pull-right" style="position: fixed !important; transform: translateX(-143px); left: initial; right: initial; top: initial; bottom: initial;">
       <li>
-        <a href="javascript:void(0)" data-bind="click: explain, css: {'disabled': !explainEnabled() }" title="${I18n(
+        <a data-hue-analytics="editor:more-menu-selection/explain-btn-click" href="javascript:void(0)" data-bind="click: explain, css: {'disabled': !explainEnabled() }" title="${I18n(
           'Explain the current SQL query'
         )}">
           <i class="fa fa-fw fa-map-o"></i> ${I18n('Explain')}
@@ -44,7 +44,7 @@ const TEMPLATE = `
       </li>
       <!-- ko if: window.HAS_GIST -->
       <li>
-        <a href="javascript:void(0)" data-bind="click: createGist, css: { 'disabled': !createGistEnabled() }" title="${I18n(
+        <a data-hue-analytics="editor:more-menu-selection/sharable-link" href="javascript:void(0)" data-bind="click: createGist, css: { 'disabled': !createGistEnabled() }" title="${I18n(
           'Share the query selection via a link'
         )}">
           <i class="fa fa-fw fa-link"></i> ${I18n('Shareable link')}
@@ -52,21 +52,21 @@ const TEMPLATE = `
       </li>
       <!-- /ko -->
       <li>
-        <a href="javascript:void(0)" data-bind="click: format, css: { 'disabled': !formatEnabled() }" title="${I18n(
+        <a data-hue-analytics="editor:more-menu-selection/format" href="javascript:void(0)" data-bind="click: format, css: { 'disabled': !formatEnabled() }" title="${I18n(
           'Format the current SQL query'
         )}">
           <i class="fa fa-fw fa-indent"></i> ${I18n('Format')}
         </a>
       </li>
       <li>
-        <a href="javascript:void(0)" data-bind="click: clear, css: {'disabled': !clearEnabled() }" title="${I18n(
+        <a data-hue-analytics="editor:more-menu-selection/clear" href="javascript:void(0)" data-bind="click: clear, css: {'disabled': !clearEnabled() }" title="${I18n(
           'Clear the current editor'
         )}">
           <i class="fa fa-fw fa-eraser"></i> ${I18n('Clear')}
         </a>
       </li>
       <li>
-        <a href="javascript:void(0)" data-bind="toggle: snippet.settingsVisible, visible: snippet.hasProperties" title="${I18n(
+        <a data-hue-analytics="editor:more-menu-selection/settings" href="javascript:void(0)" data-bind="toggle: snippet.settingsVisible, visible: snippet.hasProperties" title="${I18n(
           'Query settings'
         )}">
           <i class="fa fa-fw fa-cog"></i> ${I18n('Settings')}
