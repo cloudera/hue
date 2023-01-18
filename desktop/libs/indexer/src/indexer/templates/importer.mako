@@ -229,7 +229,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
             </label>
             <!-- ko if: createWizard.source.path().length > 0 -->
               <a data-bind="storageContextPopover: { path: createWizard.source.path(), offset: { right: 5 } }" title="${ _('Preview') }" style="font-size: 14px" class="margin-left-10">
-                <i class="fa fa-fw fa-info"></i>
+                <i data-hue-analytics="importer:preview-path-btn-click" class="fa fa-fw fa-info"></i>
               </a>
             <!-- /ko -->
           </div>
@@ -652,7 +652,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
             <div class="control-group">
               <label class="control-label"><div>${ _('Extras') }</div>
                 <a href="javascript:void(0)" data-bind="css: { 'inactive-action': !showProperties() }, toggle: showProperties" title="${ _('Show extra properties') }">
-                  <i class="fa fa-sliders fa-padding-top"></i>
+                  <i data-hue-analytics="importer:show-extras-btn-click" class="fa fa-sliders fa-padding-top"></i>
                 </a>
               </label>
             </div>
@@ -660,12 +660,12 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
             <span data-bind="visible: showProperties">
               <div class="control-group">
                 <label class="checkbox inline-block" data-bind="visible: tableFormat() != 'kudu'">
-                  <input type="checkbox" data-bind="checked: useDefaultLocation, disable: isIceberg"> ${_('Store in Default location')}
+                  <input data-hue-analytics="importer:store-in-default-localtion-checkbox-interaction" type="checkbox" data-bind="checked: useDefaultLocation, disable: isIceberg"> ${_('Store in Default location')}
                 </label>
               </div>
               <div class="control-group" data-bind="visible: isTransactionalVisible">
                 <label class="checkbox inline-block">
-                  <input type="checkbox" data-bind="checked: isTransactional, disable: isIceberg"> ${_('Transactional table')}
+                  <input type="checkbox" data-hue-analytics="importer:is-transactional-checkbox-interaction" data-bind="checked: isTransactional, disable: isIceberg"> ${_('Transactional table')}
                 </label>
                 <label class="checkbox inline-block" title="${_('Full transactional support available in Hive with ORC')}">
                   <input type="checkbox" data-bind="checked: isInsertOnly, enable: isTransactionalUpdateEnabled"> ${_('Insert only')}
@@ -680,13 +680,13 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
 
               <div class="control-group">
                 <label class="checkbox inline-block" data-bind="visible: $root.createWizard.source.inputFormat() != 'manual'">
-                  <input type="checkbox" data-bind="checked: importData, disable: !useDefaultLocation() && $parent.createWizard.source.path() == nonDefaultLocation();"> ${_('Import data')}
+                  <input data-hue-analytics="importer:import-data-checkbox-interaction" type="checkbox" data-bind="checked: importData, disable: !useDefaultLocation() && $parent.createWizard.source.path() == nonDefaultLocation();"> ${_('Import data')}
                 </label>
               </div>
 
               <div class="control-group" data-bind="visible: icebergEnabled">
                 <label class="checkbox inline-block">
-                  <input type="checkbox" data-bind="checked: isIceberg"> ${_('Iceberg table')}
+                  <input data-hue-analytics="importer:is-iceberg-checkbox-interaction" type="checkbox" data-bind="checked: isIceberg"> ${_('Iceberg table')}
                 </label>
               </div>
 
@@ -697,7 +697,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
               </div>
               <div class="control-group" data-bind="visible: $root.createWizard.source.inputFormat() == 'file'">
                 <label class="checkbox inline-block">
-                  <input type="checkbox" data-bind="checked: hasHeader"> ${_('Use first row as header')}
+                  <input data-hue-analytics="importer:use-first-row-as-header-interaction" type="checkbox" data-bind="checked: hasHeader"> ${_('Use first row as header')}
                 </label>
               </div>
               <div class="control-group" data-bind="visible: tableFormat() == 'text'">
@@ -735,11 +735,14 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
               <!-- ko if: tableFormat() != 'kudu' && $root.createWizard.source.inputFormat() != 'rdbms' -->
               <div class="inline-table">
                 <div class="form-inline" data-bind="foreach: partitionColumns">
-                  <a class="pointer pull-right margin-top-20" data-bind="click: function() { $parent.partitionColumns.remove($data); }"><i class="fa fa-minus"></i></a>
+                  <a class="pointer pull-right margin-top-20" data-bind="click: function() { 
+                    $parent.partitionColumns.remove($data);
+                    window.hueAnalytics.log('importer', 'remove-partiction-btn-click');
+                  }"><i class="fa fa-minus"></i></a>
                   <div data-bind="template: { name: 'table-field-template', data: $data }" class="margin-top-10 field inline-block"></div>
                   <div class="clearfix"></div>
                 </div>
-                <a data-bind="click: function() { partitionColumns.push($root.loadDefaultField({isPartition: true})); }" class="pointer" title="${_('Add Partition')}"><i class="fa fa-plus fa-padding-top"></i> ${_('Add partition')}</a>
+                <a data-hue-analytics="importer:add-partiction-btn-click" data-bind="click: function() { partitionColumns.push($root.loadDefaultField({isPartition: true})); }" class="pointer" title="${_('Add Partition')}"><i class="fa fa-plus fa-padding-top"></i> ${_('Add partition')}</a>
               </div>
               <!-- /ko -->
 
@@ -997,7 +1000,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
               <!-- ko ifnot: fieldEditorEnabled -->
                 ${_('Fields')} <!-- ko if: $root.createWizard.isGuessingFieldTypes --><i class="fa fa-spinner fa-spin"></i><!-- /ko -->
                 <a class="inactive-action pointer" data-bind="visible: columns().length > 0, publish: 'importer.show.bulkeditor'" href="javascript:void(0)">
-                  <i class="fa fa-edit"></i>
+                  <i data-hue-analytics="importer:bulk-field-editor-show" class="fa fa-edit"></i>
                 </a>
               <!-- /ko -->
             </h4>
@@ -1107,13 +1110,16 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
       <!-- /ko -->
 
       <!-- ko if: currentStep() == 1 -->
-      <button class="btn" data-bind="enable: !createWizard.isGuessingFormat() && createWizard.source.show(), click: function() { currentStep(2); }">
+      <button class="btn" data-bind="enable: !createWizard.isGuessingFormat() && createWizard.source.show(), click: function() { 
+        currentStep(2);
+        window.hueAnalytics.log('importer', 'next-btn-click/' +  createWizard?.source?.inputFormat());
+        }">
         ${_('Next')}
       </button>
       <!-- /ko -->
 
       <!-- ko if: currentStep() == 2 -->
-        <button class="btn btn-primary disable-feedback" data-bind="click: function() { createWizard.indexFile(); }, enable: createWizard.readyToIndex() && !createWizard.indexingStarted()">
+        <button data-hue-analytics="importer:submit-btn-click" class="btn btn-primary disable-feedback" data-bind="click: function() { createWizard.indexFile(); }, enable: createWizard.readyToIndex() && !createWizard.indexingStarted()">
           ${ _('Submit') } <i class="fa fa-spinner fa-spin" data-bind="visible: createWizard.indexingStarted"></i>
         </button>
 
@@ -1146,8 +1152,8 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
       <input type="text" class="input-xxlarge" placeholder="${ _('e.g. id, name, salary') }" data-bind="textInput: createWizard.destination.bulkColumnNames">
     </div>
     <div class="modal-footer">
-      <button class="btn" data-dismiss="modal" aria-hidden="true">${ _('Cancel') }</button>
-      <button class="btn btn-primary" data-bind="click: createWizard.destination.processBulkColumnNames">${ _('Change field names') }</button>
+      <button data-hue-analytics="importer:bulk-field-editor-cancel" class="btn" data-dismiss="modal" aria-hidden="true">${ _('Cancel') }</button>
+      <button data-hue-analytics="importer:bulk-field-editor-change" class="btn btn-primary" data-bind="click: createWizard.destination.processBulkColumnNames">${ _('Change field names') }</button>
     </div>
   </div>
 
@@ -1157,7 +1163,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
 <script type="text/html" id="table-field-template">
   <div>
     <label data-bind="visible: level() == 0 || ($parent.type() != 'array' && $parent.type() != 'map')">${ _('Name') }&nbsp;
-      <input type="text" class="input-large" placeholder="${ _('Field name') }" required data-bind="textInput: name" pattern="[a-zA-Z0-9_]+$" title="${ _('Only alphanumeric and underscore characters') }">
+      <input data-hue-analytics="importer:field-name-click" type="text" class="input-large" placeholder="${ _('Field name') }" required data-bind="textInput: name" pattern="[a-zA-Z0-9_]+$" title="${ _('Only alphanumeric and underscore characters') }">
     </label>
 
     <label class="margin-left-5">${ _('Type') }&nbsp;
@@ -1183,7 +1189,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
     <!-- /ko -->
 
     <span data-bind="visible: level() == 0 || ($parent.type() != 'array' && $parent.type() != 'map')">
-      <a href="javascript:void(0)" title="${ _('Show field properties') }" data-bind="css: {'inactive-action': !showProperties()}, click: function() {showProperties(!showProperties()) }"><i class="fa fa-sliders"></i></a>
+      <a href="javascript:void(0)" title="${ _('Show field properties') }" data-bind="css: {'inactive-action': !showProperties()}, click: function() {showProperties(!showProperties()) }"><i data-hue-analytics="importer:toggle-field-properties" class="fa fa-sliders"></i></a>
 
       <span data-bind="visible: showProperties">
         <input type="text" class="input-medium margin-left-5" placeholder="${ _('Field comment') }" data-bind="value: comment">
@@ -1781,6 +1787,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
       % endif
 
       self.inputFormat.subscribe(function(val) {
+        window.hueAnalytics.log('importer', 'source-type-selection/' + val);
         wizard.destination.columns.removeAll();
         if (self.sample()) {
           self.sample.removeAll();
@@ -2345,6 +2352,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
           wizard.guessFieldTypes();
           resizeElements();
         }
+        window.hueAnalytics.log('importer', 'destination-type-selection/' + newValue);
       });
       self.outputFormatsList = ko.observableArray([
           {'name': '${ _("Table") }', 'value': 'table'},
@@ -2560,6 +2568,9 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
         return self.outputFormat() === 'database' ? self.name() : (self.outputFormat() === 'table' && self.name().indexOf('.') > 0 ? self.name().split('.', 2)[0] : 'default');
       });
       self.tableFormat = ko.observable('text');
+      self.tableFormat.subscribe(function(value) {
+        window.hueAnalytics.log('importer', 'table-format-selection/' + value);
+      })
       self.KUDU_DEFAULT_RANGE_PARTITION_COLUMN = {values: [{value: ''}], name: 'VALUES', lower_val: 0, include_lower_val: '<=', upper_val: 1, include_upper_val: '<='};
       self.KUDU_DEFAULT_PARTITION_COLUMN = {columns: [], range_partitions: [self.KUDU_DEFAULT_RANGE_PARTITION_COLUMN], name: 'HASH', int_val: 16};
 
@@ -2609,7 +2620,13 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
       });
 
       self.importData = ko.observable(true);
+      self.importData.subscribe(function(val) {
+        window.hueAnalytics.log('importer', 'import-data/' + val);
+      })      
       self.useDefaultLocation = ko.observable(true);
+      self.useDefaultLocation.subscribe(function(val) {
+        window.hueAnalytics.log('importer', 'default-location/' + val);
+      })
       self.nonDefaultLocation = ko.observable('');
 
       var isTransactionalVisibleImpala = '${ impala_flags.is_transactional() }'.toLowerCase() == 'true';
@@ -2618,6 +2635,9 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
 
       self.isTransactionalVisible = ko.observable((vm.sourceType == 'impala' && isTransactionalVisibleImpala) || (vm.sourceType == 'hive' && isTransactionalVisibleHive));
       self.isTransactional = ko.observable(self.isTransactionalVisible());
+      self.isTransactional.subscribe(function(val) {
+        window.hueAnalytics.log('importer', 'is-transactional/' + val);
+      })   
       self.isInsertOnly = ko.observable(true); // Impala doesn't have yet full support.
       self.isTransactionalUpdateEnabled = ko.pureComputed(function() {
         var enabled = self.tableFormat() == 'orc' && (vm.sourceType == 'hive' || (vm.sourceType == 'impala' && transactionalDefaultType.length && transactionalDefaultType != 'insert_only'));
@@ -2639,6 +2659,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
           self.isTransactional(self.isTransactionalVisible());
           self.tableFormat('text');
         }
+        window.hueAnalytics.log('importer', 'is-iceberg/' + val);
       });
 
       self.hasHeader = ko.observable(false);
@@ -2746,6 +2767,9 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
       self.fileType = ko.observable();
       self.fileType.subscribe(function (newType) {
         if (self.source.format()) {
+          if(self.source.format()?.type() !== newType?.name) {
+            window.hueAnalytics.log('importer', 'file-type-selected/' + newType?.name);
+          }
           self.source.format().type(newType.name);
         }
       });
@@ -3222,7 +3246,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
       self.previousStep = function () {
         if (self.previousStepVisible()) {
           self.currentStep(self.currentStep() - 1);
-          hueAnalytics.log('importer', 'step/' + self.currentStep());
+          window.hueAnalytics.log('importer', 'back-btn-click/' +  self.createWizard?.source?.inputFormat() );
         }
       };
 
