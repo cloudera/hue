@@ -245,7 +245,7 @@ The “rdbms” interface works great for MySQL, PostgreSQL, SQLite, and Oracle,
 
 Integrating an external JDBC database involves a 3-step process:
 
-Download the compatible client driver JAR file for your specific OS and database. Usually you can find the driver files from the official database vendor site; for example, the MySQL JDBC connector for Mac OSX can be found here: https://dev.mysql.com/downloads/connector/j/.
+Download the compatible client driver JAR file for your specific OS and database. Usually you can find the driver files from the official database vendor site.
 
 **Note**: In the case of MySQL, the JDBC driver is platform independent, but some drivers are specific to certain OSes and versions so be sure to verify compatibility.)
 Add the path to the driver JAR file to your Java CLASSPATH. Here, we set the CLASSPATH environment variable in our `.bash_profile` script.
