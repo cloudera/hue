@@ -909,7 +909,8 @@ else:
               }              
               fileBrowserViewModel.targetPageNum(1);              
               const pathPrefix = "${url('filebrowser:filebrowser.views.view', path='')}";
-              huePubSub.publish('open.filebrowserlink', { pathPrefix, decodedPath: this.url, fileBrowserModel: fileBrowserViewModel});              
+              huePubSub.publish('open.filebrowserlink', { pathPrefix, decodedPath: this.url, fileBrowserModel: fileBrowserViewModel});
+              window.hueAnalytics.log('filebrowser', 'directory-breadcrumb-navigation');             
             }
             else {
               window.open($(e.target).attr('href'));
@@ -1312,6 +1313,7 @@ else:
 
       self.searchQuery.subscribe(function (newValue) {
         if (newValue !== '' || self.enableFilterAfterSearch) {
+          window.hueAnalytics.log('filebrowser', newValue === '' ? 'search-file-name-clear' : 'search-file-name');
           self.filter();
         }
         self.enableFilterAfterSearch = true;
@@ -1340,6 +1342,7 @@ else:
 
       self.openHome = function (vm, e) {
         self.openDefaultFolder(vm, e, 'default_to_home');
+        window.hueAnalytics.log('filebrowser', 'home-btn-click');
       }
 
       self.openTrash = function (vm, e) {
@@ -1374,7 +1377,7 @@ else:
 
         $("#newNameInput").val(self.selectedFile().name);
 
-        $("#renameForm").attr("action", "/filebrowser/rename?next=${url('filebrowser:filebrowser.views.view', path='')}" + self.currentPath());
+        $("#renameForm").attr("action", "/filebrowser/rename?next=${url('filebrowser:filebrowser.views.view', path='')}" + encodeURIComponent(self.currentPath()));
 
         $('#renameForm').ajaxForm({
           dataType:  'json',
@@ -1396,7 +1399,7 @@ else:
 
         $("#setReplFileName").text(self.selectedFile().path);
 
-        $("#setReplicationFactorForm").attr("action", "/filebrowser/set_replication?next=${url('filebrowser:filebrowser.views.view', path='')}" + self.currentPath());
+        $("#setReplicationFactorForm").attr("action", "/filebrowser/set_replication?next=${url('filebrowser:filebrowser.views.view', path='')}" + encodeURIComponent(self.currentPath()));
 
         $('#setReplicationFactorForm').ajaxForm({
           dataType: 'json',
@@ -1490,7 +1493,7 @@ else:
 
         hiddenFields($("#copyForm"), "src_path", paths);
 
-        $("#copyForm").attr("action", "/filebrowser/copy?next=${url('filebrowser:filebrowser.views.view', path='')}" + self.currentPath());
+        $("#copyForm").attr("action", "/filebrowser/copy?next=${url('filebrowser:filebrowser.views.view', path='')}" + encodeURIComponent(self.currentPath()));
 
         $("#copyModal").modal({
           keyboard:true,
@@ -1542,7 +1545,7 @@ else:
 
           hiddenFields($("#chownForm"), 'path', paths);
 
-          $("#chownForm").attr("action", "/filebrowser/chown?next=${url('filebrowser:filebrowser.views.view', path='')}" + self.currentPath());
+          $("#chownForm").attr("action", "/filebrowser/chown?next=${url('filebrowser:filebrowser.views.view', path='')}" + encodeURIComponent(self.currentPath()));
 
           $("select[name='user']").val(self.selectedFile().stats.user);
 
@@ -1582,6 +1585,7 @@ else:
       };
 
       self.changePermissions = function (data, event) {
+        window.hueAnalytics.log('filebrowser', 'actions-menu/change-permissions-click');
         if (!self.isCurrentDirSentryManaged()) {
           var paths = [];
 
@@ -1594,7 +1598,7 @@ else:
 
           hiddenFields($("#chmodForm"), 'path', paths);
 
-          $("#chmodForm").attr("action", "/filebrowser/chmod?next=${url('filebrowser:filebrowser.views.view', path='')}" + self.currentPath());
+          $("#chmodForm").attr("action", "/filebrowser/chmod?next=${url('filebrowser:filebrowser.views.view', path='')}" + encodeURIComponent(self.currentPath()));
 
           $("#changePermissionModal").modal({
             keyboard: true,
@@ -1807,7 +1811,7 @@ else:
       };
 
       self.createDirectory = function (formElement) {
-        $(formElement).attr("action", "/filebrowser/mkdir?next=${url('filebrowser:filebrowser.views.view', path='')}" + self.currentPath());
+        $(formElement).attr("action", "/filebrowser/mkdir?next=${url('filebrowser:filebrowser.views.view', path='')}" + encodeURIComponent(self.currentPath()));
         if ($.trim($("#newDirectoryNameInput").val()) == "") {
           $("#directoryNameRequiredAlert").show();
           $("#newDirectoryNameInput").addClass("fieldError");
@@ -1844,7 +1848,7 @@ else:
       };
 
       self.createFile = function (formElement) {
-        $(formElement).attr("action", "/filebrowser/touch?next=${url('filebrowser:filebrowser.views.view', path='')}" + self.currentPath());
+        $(formElement).attr("action", "/filebrowser/touch?next=${url('filebrowser:filebrowser.views.view', path='')}" + encodeURIComponent(self.currentPath()));
         if ($.trim($("#newFileNameInput").val()) == "") {
           $("#fileNameRequiredAlert").show();
           $("#newFileNameInput").addClass("fieldError");
@@ -1883,7 +1887,7 @@ else:
 
         hiddenFields($("#restoreTrashForm"), 'path', paths);
 
-        $("#restoreTrashForm").attr("action", "/filebrowser/trash/restore?next=${url('filebrowser:filebrowser.views.view', path='')}" + self.currentPath());
+        $("#restoreTrashForm").attr("action", "/filebrowser/trash/restore?next=${url('filebrowser:filebrowser.views.view', path='')}" + encodeURIComponent(self.currentPath()));
 
         $("#restoreTrashModal").modal({
           keyboard:true,
@@ -2391,6 +2395,7 @@ else:
       huePubSub.publish('update.autocompleters');
 
       $(".create-directory-link").click(function () {
+        window.hueAnalytics.log('filebrowser', 'new-directory-btn-click');
         $("#newDirectoryNameInput").val('');
         $("#createDirectoryModal").modal({
           keyboard:true,
@@ -2445,6 +2450,7 @@ else:
           $(this).hide();
           $(".hue-breadcrumbs").hide();
           $("#hueBreadcrumbText").show().focus();
+          window.hueAnalytics.log('filebrowser', 'edit-breadcrumb-click');
         }
       });
 

@@ -20,6 +20,7 @@
   <form autocomplete="off" class="inline-block margin-left-10">
     <input
       v-model="limit"
+      data-hue-analytics="editor:limit-input-click"
       class="input-small limit-input"
       type="number"
       autocorrect="off"
