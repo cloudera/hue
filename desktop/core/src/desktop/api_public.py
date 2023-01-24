@@ -56,7 +56,8 @@ def get_context_namespaces(request, interface):
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def get_banners(request):
-  return desktop_api.get_banners(request)
+  django_request = get_django_request(request)
+  return desktop_api.get_banners(django_request)
 
 # Editor
 
@@ -386,7 +387,8 @@ def _patch_operation_id_request(django_request):
 def get_django_request(request):
   django_request = request._request
 
-  django_request.user = rewrite_user(django_request.user)
+  if hasattr(django_request, 'user') and not django_request.user.is_anonymous:
+    django_request.user = rewrite_user(django_request.user)
 
   # Workaround ClusterMiddleware not being applied
   if django_request.path.startswith('/api/') and django_request.fs is None:
