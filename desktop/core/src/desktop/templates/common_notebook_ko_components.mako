@@ -181,9 +181,9 @@ else:
         <li>
           <a class="download" href="javascript:void(0)" data-bind="click: downloadCsv, event: { mouseover: function(){ window.onbeforeunload = null; }, mouseout: function() { window.onbeforeunload = $(window).data('beforeunload'); } }"
           % if hasattr(DOWNLOAD_ROW_LIMIT, 'get') and DOWNLOAD_ROW_LIMIT.get() >= 0 and hasattr(DOWNLOAD_BYTES_LIMIT, 'get') and DOWNLOAD_BYTES_LIMIT.get() >= 0:
-          title="${ _('Download first %s rows or %s MB as CSV') % ( DOWNLOAD_ROW_LIMIT.get(), DOWNLOAD_BYTES_LIMIT.get() / 1024 / 1024 ) }"
+          title="${ _('Download first %s rows or %s MB as CSV') % ( DOWNLOAD_ROW_LIMIT.get(), (DOWNLOAD_BYTES_LIMIT.get() / 1024 / 1024)) }"
           % elif hasattr(DOWNLOAD_BYTES_LIMIT, 'get') and DOWNLOAD_BYTES_LIMIT.get() >= 0:
-          title="${ _('Download first %s MB as CSV') % DOWNLOAD_BYTES_LIMIT.get() / 1024 / 1024 }"
+          title="${ _('Download first %s MB as CSV') % (DOWNLOAD_BYTES_LIMIT.get() / 1024 / 1024) }"
           % else:
           title="${ _('Download first %s rows as CSV') % (hasattr(DOWNLOAD_ROW_LIMIT, 'get') and DOWNLOAD_ROW_LIMIT.get()) }"
           % endif
@@ -194,9 +194,9 @@ else:
         <li>
           <a class="download" href="javascript:void(0)" data-bind="click: downloadXls, event: { mouseover: function(){ window.onbeforeunload = null; }, mouseout: function() { window.onbeforeunload = $(window).data('beforeunload'); } }"
           % if hasattr(DOWNLOAD_ROW_LIMIT, 'get') and DOWNLOAD_ROW_LIMIT.get() >= 0 and hasattr(DOWNLOAD_BYTES_LIMIT, 'get') and DOWNLOAD_BYTES_LIMIT.get() >= 0:
-          title="${ _('Download first %s rows or %s MB as XLS') % ( DOWNLOAD_ROW_LIMIT.get(), DOWNLOAD_BYTES_LIMIT.get() / 1024 / 1024 ) }"
+          title="${ _('Download first %s rows or %s MB as XLS') % ( DOWNLOAD_ROW_LIMIT.get(), (DOWNLOAD_BYTES_LIMIT.get() / 1024 / 1024) ) }"
           % elif hasattr(DOWNLOAD_BYTES_LIMIT, 'get') and DOWNLOAD_BYTES_LIMIT.get() >= 0:
-          title="${ _('Download first %s MB as XLS') % DOWNLOAD_BYTES_LIMIT.get() / 1024 / 1024 }"
+          title="${ _('Download first %s MB as XLS') % (DOWNLOAD_BYTES_LIMIT.get() / 1024 / 1024) }"
           % else:
           title="${ _('Download first %s rows as XLS') % (hasattr(DOWNLOAD_ROW_LIMIT, 'get') and DOWNLOAD_ROW_LIMIT.get()) }"
           % endif
@@ -254,9 +254,9 @@ else:
                   <span style="width: 190px; overflow: hidden; text-overflow: ellipsis; display: inline-block; white-space: nowrap;">
                   &nbsp;
                   % if hasattr(DOWNLOAD_ROW_LIMIT, 'get') and DOWNLOAD_ROW_LIMIT.get() >= 0 and hasattr(DOWNLOAD_BYTES_LIMIT, 'get') and DOWNLOAD_BYTES_LIMIT.get() >= 0:
-                    ${ _('First %s rows or %s MB') % ( DOWNLOAD_ROW_LIMIT.get(), DOWNLOAD_BYTES_LIMIT.get() / 1024 / 1024 ) }
+                    ${ _('First %s rows or %s MB') % ( DOWNLOAD_ROW_LIMIT.get(), (DOWNLOAD_BYTES_LIMIT.get() / 1024 / 1024) ) }
                   % elif hasattr(DOWNLOAD_BYTES_LIMIT, 'get') and DOWNLOAD_BYTES_LIMIT.get() >= 0:
-                    ${ _('First %s MB') % DOWNLOAD_BYTES_LIMIT.get() / 1024 / 1024 }
+                    ${ _('First %s MB') % (DOWNLOAD_BYTES_LIMIT.get() / 1024 / 1024) }
                   % else:
                     ${ _('First %s rows') % (hasattr(DOWNLOAD_ROW_LIMIT, 'get') and DOWNLOAD_ROW_LIMIT.get()) }
                   % endif
