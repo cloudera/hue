@@ -138,9 +138,9 @@ def rungunicornserver():
       'initgroups': None,
       'keepalive': 120,                       # seconds to wait for requests on a keep-alive connection.
       'keyfile': ssl_keyfile,                 # SSL key file
-      'limit_request_field_size': None,
-      'limit_request_fields': None,
-      'limit_request_line': None,
+      'limit_request_field_size': conf.LIMIT_REQUEST_FIELD_SIZE.get(),
+      'limit_request_fields': conf.LIMIT_REQUEST_FIELDS.get(),
+      'limit_request_line': conf.LIMIT_REQUEST_LINE.get(),
       'logconfig': None,
       'loglevel': 'info',
       'max_requests': 1200,                   # The maximum number of requests a worker will process before restarting.
