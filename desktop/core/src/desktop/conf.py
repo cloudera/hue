@@ -205,6 +205,27 @@ X_FRAME_OPTIONS = Config(
   type=str,
   default="SAMEORIGIN")
 
+LIMIT_REQUEST_FIELD_SIZE = Config(
+  key="limit_request_field_size",
+  help=_("This property specifies the maximum allowed size of an HTTP request header field."),
+  default=8190,
+  type=int
+)
+
+LIMIT_REQUEST_FIELDS = Config(
+  key="limit_request_fields",
+  help=_("This property specifies the maximum number of HTTP headers fields in a request."),
+  default=100,
+  type=int
+)
+
+LIMIT_REQUEST_LINE = Config(
+  key="limit_request_line",
+  help=_("This property specifies the maximum size of HTTP request line in bytes."),
+  default=4094,
+  type=int
+)
+
 SSL_CERTIFICATE = Config(
   key="ssl_certificate",
   help=_("Filename of SSL Certificate"),
