@@ -3,7 +3,7 @@ title:  Hue 4.11 and its new dialects and features are out!
 author: Hue Team
 type: post
 date: 2023-01-23T00:00:00+00:00
-url: /blog/2023-01-23-hue-4.11-hplsql-sparksql-iceberg/
+url: /blog/hue-4-11-hplsql-sparksql-iceberg/
 sf_thumbnail_type:
   - none
 sf_thumbnail_link_type:
