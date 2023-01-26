@@ -33,6 +33,7 @@
   import ExecutableActions from './ExecutableActions.vue';
   import SqlExecutable from 'apps/editor/execution/sqlExecutable';
   import SubscriptionTracker from 'components/utils/SubscriptionTracker';
+  import hueAnalytics from '../../../../js/utils/hueAnalytics';
 
   import { wrap } from 'vue/webComponentWrap';
 
@@ -66,6 +67,7 @@
     },
     methods: {
       limitChanged(limit: number): void {
+        hueAnalytics.log('editor', 'limit-changed/' + limit);
         if (this.executable && this.executable.executor.defaultLimit) {
           this.executable.executor.defaultLimit(limit);
         }

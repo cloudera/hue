@@ -29,7 +29,7 @@
     from urllib import quote as urllib_quote
     from django.utils.translation import ugettext as _
 %>
-<%
+<%  
   path_enc = urllib_quote(path.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS)
   dirname_enc = urlencode(view['dirname'])
   base_url = url('filebrowser:filebrowser.views.view', path=path_enc)
@@ -52,46 +52,46 @@ ${ fb_components.menubar() }
         <!-- ko if: $root.file -->
         <ul class="nav nav-list">
           <!-- ko if: $root.isViewing -->
-            <li><a href="${url('filebrowser:filebrowser.views.view', path=dirname_enc)}"><i class="fa fa-reply"></i> ${_('Back')}</a></li>
+            <li><a data-hue-analytics="filebrowser:back-btn-click" data-bind="click: goToParentDirectory" href=""><i class="fa fa-reply"></i> ${_('Back')}</a></li>
 
             <!-- ko if: $root.file().view.compression() && $root.file().view.compression() === "none" && $root.file().editable -->
-              <li><a class="pointer" data-bind="click: $root.editFile"><i class="fa fa-pencil"></i> ${_('Edit file')}</a></li>
+              <li><a data-hue-analytics="filebrowser:edit-file-btn-click"class="pointer" data-bind="click: $root.editFile"><i class="fa fa-pencil"></i> ${_('Edit file')}</a></li>
             <!-- /ko -->
 
-            <li><a class="pointer" data-bind="click: changePage"><i class="fa fa-refresh"></i> ${_('Refresh')}</a></li>
+            <li><a data-hue-analytics="filebrowser:refresh-btn-click" class="pointer" data-bind="click: changePage"><i class="fa fa-refresh"></i> ${_('Refresh')}</a></li>
 
             <!-- ko if: $root.file().view.mode() === 'binary' -->
-            <li><a class="pointer" data-bind="click: function(){ switchMode('text'); }"><i class="fa fa-font"></i> ${_('View as text')}</a></li>
+            <li><a data-hue-analytics="filebrowser:view-text-btn-click" class="pointer" data-bind="click: function(){ switchMode('text'); }"><i class="fa fa-font"></i> ${_('View as text')}</a></li>
             <!-- /ko -->
 
             <!-- ko if: $root.file().view.mode() === 'text' -->
-              <li><a class="pointer" data-bind="click: function(){ switchMode('binary'); }"><i class="fa fa-barcode"></i> ${_('View as binary')}</a></li>
+              <li><a data-hue-analytics="filebrowser:view-binary-btn-click" class="pointer" data-bind="click: function(){ switchMode('binary'); }"><i class="fa fa-barcode"></i> ${_('View as binary')}</a></li>
             <!-- /ko -->
 
             <!-- ko if: $root.file().view.compression() !== "gzip" && $root.file().path().toLowerCase().endsWith('.gz') -->
-              <li><a class="pointer" data-bind="click: function(){ switchCompression('gzip'); }"><i class="fa fa-youtube-play"></i> ${_('Preview as Gzip')}</a></li>
+              <li><a data-hue-analytics="filebrowser:preview-gzip--btn-click" class="pointer" data-bind="click: function(){ switchCompression('gzip'); }"><i class="fa fa-youtube-play"></i> ${_('Preview as Gzip')}</a></li>
             <!-- /ko -->
 
             <!-- ko if: $root.file().view.compression() !== "bz2" && ($root.file().path().toLowerCase().endsWith('.bz2') || $root.file().path().toLowerCase().endsWith('.bzip2'))-->
-              <li><a class="pointer" data-bind="click: function(){ switchCompression('bz2'); }"><i class="fa fa-youtube-play"></i> ${_('Preview as Bzip2')}</a></li>
+              <li><a data-hue-analytics="filebrowser:preview-bz2--btn-click" class="pointer" data-bind="click: function(){ switchCompression('bz2'); }"><i class="fa fa-youtube-play"></i> ${_('Preview as Bzip2')}</a></li>
             <!-- /ko -->
 
             <!-- ko if: $root.file().view.compression() !== "avro" && $root.file().view.compression() !== "snappy_avro" && $root.file().path().toLowerCase().endsWith('.avro') -->
-              <li><a class="pointer" data-bind="click: function(){ switchCompression('avro'); }"><i class="fa fa-youtube-play"></i> ${_('Preview as Avro')}</a></li>
+              <li><a data-hue-analytics="filebrowser:preview-avro--btn-click" class="pointer" data-bind="click: function(){ switchCompression('avro'); }"><i class="fa fa-youtube-play"></i> ${_('Preview as Avro')}</a></li>
             <!-- /ko -->
 
             <!-- ko if: $root.file().view.compression() && $root.file().view.compression() !== "none" -->
-              <li><a class="pointer" data-bind="click: function(){ switchCompression('none'); }"><i class="fa fa-times-circle"></i> ${_('Stop preview')}</a></li>
+              <li><a data-hue-analytics="filebrowser:stop-preview--btn-click" class="pointer" data-bind="click: function(){ switchCompression('none'); }"><i class="fa fa-times-circle"></i> ${_('Stop preview')}</a></li>
             <!-- /ko -->
           <!-- /ko -->
 
           <!-- ko ifnot: $root.isViewing -->
-            <li><a class="pointer" data-bind="click: $root.viewFile"><i class="fa fa-reply"></i> ${_('View file')}</a></li>
+            <li><a data-hue-analytics="filebrowser:view-file-btn-click" class="pointer" data-bind="click: $root.viewFile"><i class="fa fa-reply"></i> ${_('View file')}</a></li>
           <!-- /ko -->
 
           <!-- ko if: $root.isViewing -->
             <!-- ko if: $root.file().show_download_button -->
-              <li><a class="pointer" data-bind="click: $root.downloadFile"><i class="fa fa-download"></i> ${_('Download')}</a></li>
+              <li><a data-hue-analytics="filebrowser:download-btn-click" class="pointer" data-bind="click: $root.downloadFile"><i class="fa fa-download"></i> ${_('Download')}</a></li>
             <!-- /ko -->
           <!-- /ko -->
 
@@ -240,8 +240,13 @@ ${ fb_components.menubar() }
   }
 
   function getContent (callback) {
-    var _baseUrl = "${url('filebrowser:filebrowser.views.view', path=path_enc)}";
-
+    // We don't use the python variable path_enc here since that will 
+    // produce a double encoded path after calling the python url function
+    const decodedPath = "${path | n}";
+    const encodedPath = encodeURIComponent(decodedPath);
+    const pathPrefix = "/filebrowser/view=";
+    const contentPath = pathPrefix+encodedPath;
+    
     viewModel.isLoading(true);
 
     var startPage = viewModel.page();
@@ -254,9 +259,7 @@ ${ fb_components.menubar() }
       mode: viewModel.mode()
     };
 
-    contentUrl = fixSpecialCharacterEncoding(_baseUrl);
-
-    $.getJSON(contentUrl, params, function (data) {
+    $.getJSON(contentPath, params, function (data) {
       var _html = "";
 
       viewModel.file(ko.mapping.fromJS(data, { 'ignore': ['view.contents', 'view.xxd'] }));
@@ -306,6 +309,10 @@ ${ fb_components.menubar() }
 
   function DisplayViewModel (params) {
     var self = this;
+
+    self.goToParentDirectory = function () {
+      huePubSub.publish('open.filebrowserlink', { pathPrefix: "/filebrowser/view=", decodedPath: "${view['dirname'] | n}" });
+    }
 
     self.changePage = function () {
       renderPages();
@@ -372,8 +379,10 @@ ${ fb_components.menubar() }
     self.editFile = function() {
       self.isViewing(false);
       self.isLoading(true);
+      
+      const encodedPath = encodeURIComponent("${path | n}");      
       $.ajax({
-        url: '${ edit_url }' + '?is_embeddable=true',
+        url: '/filebrowser/edit=' + encodedPath + '?is_embeddable=true',
         beforeSend:function (xhr) {
           xhr.setRequestHeader('X-Requested-With', 'Hue');
         },
@@ -394,20 +403,7 @@ ${ fb_components.menubar() }
     }
 
     self.downloadFile = function () {
-      const filePath = "${path}";
-      const correctedFilePath = fixSpecialCharacterEncoding(filePath);
-      // If the hash characters aren't encoded the page library will
-      // split the path on the first occurence and the remaining string will not
-      // be part of the path. Question marks must also be encoded or the string after the first
-      // question mark will be interpreted as the url querystring.
-      // Percentage character must be double encoded due to the page library that decodes the url twice
-      const doubleUrlEncodedPercentage = '%2525';
-      const partiallyEncodedFilePath = correctedFilePath.replaceAll('%', doubleUrlEncodedPercentage).replaceAll('#', encodeURIComponent('#'))
-        .replaceAll('?', encodeURIComponent('?'));
-      const baseUrl = "${url('filebrowser:filebrowser_views_download', path='')}";
-      const fullUrl = baseUrl+partiallyEncodedFilePath;
-
-      huePubSub.publish('open.link', fullUrl);
+      huePubSub.publish('open.filebrowserlink', { pathPrefix: "/filebrowser/download=", decodedPath:  "${path | n}" });      
     };
 
     self.pageChanged = function () {

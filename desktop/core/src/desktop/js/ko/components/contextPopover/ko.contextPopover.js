@@ -56,10 +56,13 @@ const SUPPORT_TEMPLATES = `
         </a>
         <!-- ko if: isDocument -->
         <!-- ko with: contents -->
+        <!-- ko if: documentId -->
+        <a href="javascript: void(0);" class="inactive-action" data-bind="click: download">
+          <i style="font-size: 11px;" title="${I18n('Download')}" class="fa fa-download"></i> ${I18n('Download')}
+        </a>
+        <!-- /ko -->
         <a href="javascript: void(0);" class="inactive-action" data-bind="click: open">
-          <i style="font-size: 11px;" title="${I18n('Open')}" class="fa fa-file-o"></i> ${I18n(
-  'Open'
-)}
+          <i style="font-size: 11px;" title="${I18n('Open')}" class="fa fa-file-o"></i> ${I18n('Open')}
         </a>
         <!-- /ko -->
         <!-- /ko -->

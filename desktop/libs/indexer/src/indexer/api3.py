@@ -124,7 +124,7 @@ def _convert_format(format_dict, inverse=False):
 def guess_format(request):
   file_format = json.loads(request.POST.get('fileFormat', '{}'))
   file_type = file_format['file_type']
-  path = urllib_unquote(file_format["path"])
+  path = file_format["path"]
   
   if sys.version_info[0] < 3 and (file_type == 'excel' or path[-3:] == 'xls' or path[-4:] == 'xlsx'):
     return JsonResponse({'status': -1, 'message': 'Python2 based Hue does not support Excel file importer'})
@@ -295,7 +295,8 @@ def guess_field_types(request):
 
   elif file_format['inputFormat'] == 'file':
     indexer = MorphlineIndexer(request.user, request.fs)
-    path = urllib_unquote(file_format["path"])
+    path = file_format["path"]
+
     if path[-3:] == 'xls' or path[-4:] == 'xlsx':
       path = excel_to_csv_file_name_change(path)
     stream = request.fs.open(path)
@@ -458,7 +459,7 @@ def importer_submit(request):
   file_encoding = None
   if source['inputFormat'] == 'file':
     if source['path']:
-      path = urllib_unquote(source['path'])
+      path = source['path']
       if path[-3:] == 'xls' or path[-4:] == 'xlsx':
         path = excel_to_csv_file_name_change(path)
       source['path'] = request.fs.netnormpath(path)
@@ -612,7 +613,7 @@ def _small_indexing(user, fs, client, source, destination, index_name):
   errors = []
 
   if source['inputFormat'] not in ('manual', 'table', 'query_handle'):
-    path = urllib_unquote(source["path"])
+    path = source["path"]
     stats = fs.stats(path)
     if stats.size > MAX_UPLOAD_SIZE:
       raise PopupException(_('File size is too large to handle!'))
@@ -624,7 +625,7 @@ def _small_indexing(user, fs, client, source, destination, index_name):
 
   if source['inputFormat'] == 'file':
     kwargs['separator'] = source['format']['fieldSeparator']
-    path = urllib_unquote(source["path"])
+    path = source["path"]
     data = fs.read(path, 0, MAX_UPLOAD_SIZE)
 
   if client.is_solr_six_or_more():

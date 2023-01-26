@@ -40,6 +40,7 @@ class SidePanelViewModel {
         setInLocalStorage('assist.left_assist_panel_visible', val);
       }
       hueAnalytics.convert('hue', 'leftAssistVisible/' + val);
+      hueAnalytics.log('left-assist-panel', 'show-assist-toggle/' + val);
       window.setTimeout(() => {
         huePubSub.publish('split.panel.resized');
         $(window).trigger('resize');

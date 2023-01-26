@@ -164,7 +164,6 @@ import 'ko/components/ko.inlineAutocomplete';
 import 'ko/components/ko.jobBrowserLinks';
 import 'ko/components/ko.navProperties';
 import 'ko/components/ko.navTags';
-import 'ko/components/ko.performanceGraph';
 import 'ko/components/ko.pollingCatalogEntriesList';
 import 'ko/components/ko.quickQueryAction';
 import 'ko/components/ko.sentryPrivileges';

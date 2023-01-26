@@ -137,13 +137,12 @@ $(BLD_DIR_ENV)/stamp:
 ifeq ($(PYTHON_VER),python2.7)
 	@$(SYS_PYTHON) $(VIRTUAL_BOOTSTRAP) $(VIRTUALENV_OPTS) --system-site-packages $(BLD_DIR_ENV)
 else ifeq ($(PYTHON_VER),python3.8)
-	@$(SYS_PYTHON) -m pip install --upgrade pip
-	@$(SYS_PIP) install virtualenv
+	@$(SYS_PYTHON) -m pip install --upgrade pip==22.2.2
+	@$(SYS_PIP) install virtualenv==20.16.5 virtualenv-make-relocatable==0.0.1
 	@if [[ "ppc64le" == $(PPC64LE) ]]; then \
 	  $(SYS_PYTHON) -m venv $(BLD_DIR_ENV); \
-	 else \
-	  virtualenv -p $(PYTHON_VER) $(BLD_DIR_ENV); \
 	 fi
+	@virtualenv -p $(PYTHON_VER) $(BLD_DIR_ENV)
 endif
 	@echo "--- Virtual environment $(BLD_DIR_ENV) ready"
 	@touch $@
@@ -268,7 +267,7 @@ npm-install:
 
 .PHONY: create-static
 create-static:
-	./build/env/bin/hue collectstatic --noinput
+	./build/env/bin/python ./build/env/bin/hue collectstatic --noinput
 
 # <<<< DEV ONLY
 .PHONY: doc

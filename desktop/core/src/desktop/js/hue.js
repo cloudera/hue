@@ -22,7 +22,6 @@ import $ from 'jquery/jquery.common';
 import 'ext/bootstrap.2.3.2.min';
 import 'ext/bootstrap-editable.1.5.1.min';
 import 'utils/d3Extensions';
-import * as d3 from 'd3';
 import d3v3 from 'd3v3';
 import Dropzone from 'dropzone';
 import filesize from 'filesize';
@@ -43,7 +42,7 @@ import CancellableJqPromise from 'api/cancellableJqPromise';
 import { DOCUMENT_TYPE_I18n, DOCUMENT_TYPES } from 'doc/docSupport';
 import contextCatalog from 'catalog/contextCatalog';
 import dataCatalog from 'catalog/dataCatalog';
-import hueAnalytics from 'utils/hueAnalytics';
+import hueAnalytics, { setupGlobalListenersForAnalytics } from 'utils/hueAnalytics';
 import HueColors from 'utils/hueColors';
 import hueDebug from 'utils/hueDebug';
 import hueDrop from 'utils/hueDrop';
@@ -84,7 +83,6 @@ window.apiHelper = apiHelper;
 window.simpleGet = simpleGet;
 window.CancellableJqPromise = CancellableJqPromise;
 window.contextCatalog = contextCatalog;
-window.d3 = d3;
 window.d3v3 = d3v3;
 window.dataCatalog = dataCatalog;
 window.DOCUMENT_TYPE_I18n = DOCUMENT_TYPE_I18n;
@@ -97,6 +95,7 @@ window.HdfsAutocompleter = HdfsAutocompleter;
 window.hueAnalytics = hueAnalytics;
 window.HueColors = HueColors;
 window.hueDebug = hueDebug;
+window.hueDebugAnalytics = false;
 window.HueDocument = HueDocument;
 window.hueDrop = hueDrop;
 window.HueFileEntry = HueFileEntry;
@@ -119,6 +118,8 @@ window.createReactComponents = createReactComponents;
 
 $(document).ready(async () => {
   await refreshConfig(); // Make sure we have config up front
+
+  createReactComponents('.main-page');
 
   const onePageViewModel = new OnePageViewModel();
   ko.applyBindings(onePageViewModel, $('.page-content')[0]);
@@ -174,6 +175,8 @@ $(document).ready(async () => {
       }
     }, 10);
   });
+
+  setupGlobalListenersForAnalytics();
 
   $('.page-content').jHueScrollUp();
 });

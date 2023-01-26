@@ -473,7 +473,7 @@ variable. The `create_desktop_app` command creates a default icon for you.
 
 **NOTE:** If you do not define an application icon, your application will not show up in the navigation bar.
 
-Hue ships with Twitter Bootstrap and Font Awesome 3 (https://fontawesome.com/v3/) so you have plenty of scalable icons to choose from. You can style your elements to use them like this (in your mako template):
+Hue ships with Twitter Bootstrap and Font Awesome 4 so you have plenty of scalable icons to choose from. You can style your elements to use them like this (in your mako template):
 
     <!-- show a trash icon in a link -->
     <a href="#something"><i class="icon-trash"></i> Trash</a>
@@ -724,12 +724,12 @@ And add them and the authors to the release notes:
 
 Pushing the release branch:
 
-    git push origin HEAD:branch-4.10.0
+    git push origin HEAD:branch-4.11.0
 
 Tagging the release:
 
-    git tag -a release-4.10.0 -m "release-4.10.0"
-    git push origin release-4.10.0
+    git tag -a release-4.11.0 -m "release-4.11.0"
+    git push origin release-4.11.0
 
 Draft a new release on https://github.com/cloudera/hue/releases.
 
@@ -739,7 +739,7 @@ Publish Github NPM package and Docker images at https://github.com/orgs/cloudera
 
 Building the tarball release:
 
-    git checkout -b release-4.10.0 release-4.10.0
+    git checkout -b release-4.11.0 release-4.11.0
     export PYTHON_VER=python3.8
     make prod
 
@@ -749,27 +749,27 @@ You might need to upgrade the [Mysqlclient](https://docs.gethue.com/administrato
       44 | #include "my_config.h"
           |          ^~~~~~~~~~~~~
 
-Source of the release: https://github.com/cloudera/hue/archive/release-4.10.0.zip
+Source of the release: https://github.com/cloudera/hue/archive/release-4.11.0.zip
 
 Push to the CDN:
 
-    scp hue-4.10.0.tgz root@cdn.gethue.com:/var/www/cdn.gethue.com/downloads
+    scp hue-4.11.0.tgz root@cdn.gethue.com:/var/www/cdn.gethue.com/downloads
 
 ### Docker
 
 Docker images are at https://hub.docker.com/u/gethue/:
 
-    docker build https://github.com/cloudera/hue.git#release-4.10.0 -t gethue/hue:4.10.0 -f tools/docker/hue/Dockerfile
-    docker tag gethue/hue:4.10.0 gethue/hue:latest
+    docker build https://github.com/cloudera/hue.git#release-4.11.0 -t gethue/hue:4.11.0 -f tools/docker/hue/Dockerfile
+    docker tag gethue/hue:4.11.0 gethue/hue:latest
     docker images
     docker login -u gethue
     docker push gethue/hue
-    docker push gethue/hue:4.10.0
+    docker push gethue/hue:4.11.0
 
-    docker build https://github.com/cloudera/hue.git#release-4.10.0 -t gethue/nginx:4.10.0 -f tools/docker/nginx/Dockerfile;
-    docker tag gethue/nginx:4.10.0 gethue/nginx:latest
+    docker build https://github.com/cloudera/hue.git#release-4.11.0 -t gethue/nginx:4.11.0 -f tools/docker/nginx/Dockerfile;
+    docker tag gethue/nginx:4.11.0 gethue/nginx:latest
     docker push gethue/nginx
-    docker push gethue/nginx:4.10.0
+    docker push gethue/nginx:4.11.0
 
 
 ### Kubernetes / Helm

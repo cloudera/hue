@@ -6,9 +6,10 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
 
-    "clean-static": "rm -rf static/js/gethue/*",
-    "copy-static": "cp -r node_modules/gethue/components static/js/gethue/ && cp -r node_modules/gethue/parsers static/js/gethue/",
-    "update-static": "npm run clean-static && npm run copy-static"
+    "clean-static": "rm -rf static/js/gethue",
+    "copy-components": "mkdir -p static/js/gethue/components && cp -r node_modules/gethue/lib/components/*.js static/js/gethue/components/",
+    "copy-parsers": "mkdir -p static/js/gethue/parsers && cp -r node_modules/gethue/lib/parsers/*.js static/js/gethue/parsers/",
+    "update-static": "npm run clean-static && npm run copy-components && npm run copy-parsers"
   },
   "author": "",
   "license": "Apache-2.0",

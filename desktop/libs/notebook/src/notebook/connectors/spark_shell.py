@@ -227,14 +227,14 @@ class SparkApi(Api):
         raise e
 
 
-  def fetch_result(self, notebook, snippet, rows, start_over):
+  def fetch_result(self, notebook, snippet, rows, start_over=False):
     api = self.get_api()
     session = _get_snippet_session(notebook, snippet)
     cell = snippet['result']['handle']['id']
 
     session = self._handle_session_health_check(session)
 
-    response = self._fetch_result(api, session, cell, start_over)
+    response = self._fetch_result(api, session, cell)
 
     # Close unused sessions if there are any.
     # Clean here since /fetch_result_data is called only once after the /execute call
@@ -244,7 +244,7 @@ class SparkApi(Api):
     return response
 
 
-  def _fetch_result(self, api, session, cell, start_over):
+  def _fetch_result(self, api, session, cell):
     try:
       response = api.fetch_data(session['id'], cell)
     except Exception as e:
@@ -269,9 +269,9 @@ class SparkApi(Api):
           images = []
         if 'application/json' in data:
           result = data['application/json']
-          data = result['data']
-          meta = [{'name': field['name'], 'type': field['type'], 'comment': ''} for field in result['schema']['fields']]
           type = 'table'
+          meta, is_complex_type = self._handle_result_meta(result)
+          data = self._handle_result_data(result, is_complex_type)
         else:
           data = [[data['text/plain']]]
           meta = [{'name': 'Header', 'type': 'STRING_TYPE', 'comment': ''}]
@@ -281,10 +281,6 @@ class SparkApi(Api):
         headers = table['headers']
         meta = [{'name': h['name'], 'type': h['type'], 'comment': ''} for h in headers]
         type = 'table'
-
-      # Non start_over not supported
-      if not start_over:
-        data = []
 
       return {
           'data': data,
@@ -304,6 +300,48 @@ class SparkApi(Api):
         msg += ' ' + ''.join(tb)
 
       raise QueryError(msg)
+
+
+  def _handle_result_data(self, result, is_complex_type=False):
+    data = []
+
+    if is_complex_type:
+      for row in result['data']:
+        row_data = []
+        for ele in row:
+          if isinstance(ele, dict):
+            row_schema = []
+            for val in ele['schema']:
+              row_schema.append(val['name'])
+            row_data.append(dict(zip(row_schema, ele['values'])))
+          else:
+            row_data.append(ele)
+
+        data.append(row_data)
+    else:
+      data = result['data']
+    
+    return data
+
+
+  def _handle_result_meta(self, result):
+    meta = []
+    is_complex_type = False
+
+    for f in result['schema']['fields']:
+      if isinstance(f.get('type'), dict):
+        is_complex_type = True
+
+        if f['type']['type'] == 'struct':
+          complex_type = 'struct'
+        elif f['type']['type'] in ('array', 'map'):
+          complex_type = 'string'
+
+        meta.append({'name': f['name'], 'type': complex_type, 'comment': ''})
+      else:
+        meta.append({'name': f['name'], 'type': f['type'], 'comment': ''})
+    
+    return meta, is_complex_type
 
 
   def cancel(self, notebook, snippet):
@@ -449,7 +487,7 @@ class SparkApi(Api):
       time.sleep(1)
 
     if check_status['state'] == 'available':
-      return self._fetch_result(api, session, execute_resp['id'], start_over=True)
+      return self._fetch_result(api, session, execute_resp['id'])
 
 
   def _show_databases(self, api, session, snippet_type):

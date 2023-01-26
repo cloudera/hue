@@ -45,6 +45,25 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
 <head>
+
+  % if conf.COLLECT_USAGE.get():
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=${conf.GTAG_ID.get()}"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', '${ conf.GTAG_ID.get()}', { 
+        // Prevent GA from accidentally passing client meta data present in urls
+        send_page_view: false, 
+        page_location: 'redacted',
+        page_referrer: 'redacted',
+        allow_google_signals: false
+        });
+    </script>
+  % endif
+
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta charset="utf-8">
   <title>Hue</title>
@@ -127,11 +146,7 @@ ${ hueIcons.symbols() }
   <hue-sidebar-web-component style="flex: 1 1 auto"></hue-sidebar-web-component>
 
   <div class="main-page">
-    % if banner_message or conf.CUSTOM.BANNER_TOP_HTML.get():
-      <div class="banner">
-        ${ banner_message or conf.CUSTOM.BANNER_TOP_HTML.get() | n,unicode }
-      </div>
-    % endif
+    <AppBanner data-reactcomponent='AppBanner'></AppBanner>
 
     <nav class="navbar navbar-default">
       <div class="navbar-inner top-nav">

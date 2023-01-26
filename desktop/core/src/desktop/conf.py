@@ -322,10 +322,10 @@ SECURE_CONTENT_SECURITY_POLICY = Config(
   help=_('X-Content-Type-Options: nosniff. This is a HTTP response header feature that helps prevent attacks '
     'based on MIME-type confusion.'),
   type=str,
-  default="script-src 'self' 'unsafe-inline' 'unsafe-eval' *.google-analytics.com *.doubleclick.net data:;"+
-          "img-src 'self' *.google-analytics.com *.doubleclick.net http://*.tile.osm.org *.tile.osm.org *.gstatic.com data:;"+
+  default="script-src 'self' 'unsafe-inline' 'unsafe-eval' *.googletagmanager.com *.doubleclick.net data:;"+
+          "img-src 'self' *.doubleclick.net http://*.tile.osm.org *.tile.osm.org *.gstatic.com data:;"+
           "style-src 'self' 'unsafe-inline' fonts.googleapis.com;"+
-          "connect-src 'self';"+
+          "connect-src 'self' *.google-analytics.com;"+
           "frame-src *;"+
           "child-src 'self' data: *.vimeo.com;"+
           "object-src 'none'")
@@ -447,9 +447,15 @@ USER_ACCESS_HISTORY_SIZE = Config(
 COLLECT_USAGE = Config(
   key="collect_usage",
   help=_("Help improve Hue with anonymous usage analytics."
-         "Use Google Analytics to see how many times an application or specific section of an application is used, nothing more."),
+         "Use Google Analytics 4 to see how many times an application or specific section of an application is used, nothing more."),
   type=coerce_bool,
   default=True)
+
+GTAG_ID = Config(
+  key="gtag_id",
+  help=_("The gTag id used for anonymous analytics with Google Analytics 4."),
+  type=str,
+  default="G-25K7599S1Q")
 
 REST_RESPONSE_SIZE = Config(
   key="rest_response_size",

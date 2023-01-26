@@ -94,6 +94,10 @@ class TSocket(TSocketBase):
                 if exc.errno in (errno.EWOULDBLOCK, errno.EAGAIN):
                     return True
                 return False
+            except ValueError as e:
+                logger.debug(e)
+                # SSLSocket fails on recv with non-zero flags; fallback to the old behavior
+                return True
         finally:
             self.handle.settimeout(original_timeout)
 

@@ -220,7 +220,11 @@ def log_js_error(request):
 
 def log_analytics(request):
   ai = AccessInfo(request)
-  ai.log(level=logging.INFO, msg='PAGE: ' + request.POST.get('page'))
+  area = request.POST.get('area')
+  action = request.POST.get('action')
+
+  if area is not None and action is not None:
+    ai.log(level=logging.INFO, msg='UI INTERACTION: ' + area + ' > ' + action)
 
   return JsonResponse({'status': 0})
 
@@ -550,23 +554,18 @@ def get_banner_message(request):
   forwarded_host = request.get_host()
 
   if hasattr(request, 'environ'):
-    message = None
     path_info = request.environ.get("PATH_INFO")
     if path_info.find("/hue") < 0 and path_info.find("accounts/login") < 0 and not request.path.startswith('/api/'):
       url = request.build_absolute_uri("/hue")
-      link = '<a href="%s" style="color: #FFF; font-weight: bold">%s</a>' % (url, url)
-      message = _('You are accessing an older version of Hue, please switch to the latest version: %s.') % link
+      link = '<a href="%s">%s</a>' % (url, url)
+      banner_message = _('You are accessing an older version of Hue, please switch to the latest version: %s.') % link
       LOG.warning('User %s is using Hue 3 UI' % request.user.username)
 
     if HUE_LOAD_BALANCER.get() and HUE_LOAD_BALANCER.get() != [''] and \
       (not forwarded_host or not any(forwarded_host in lb for lb in HUE_LOAD_BALANCER.get())):
-      message = _('You are accessing a non-optimized Hue, please switch to one of the available addresses: %s') % \
-        (", ".join(['<a href="%s" style="color: #FFF; font-weight: bold">%s</a>' % (host, host) for host in HUE_LOAD_BALANCER.get()]))
+      banner_message = _('You are accessing a non-optimized Hue, please switch to one of the available addresses: %s') % \
+        (", ".join(['<a href="%s">%s</a>' % (host, host) for host in HUE_LOAD_BALANCER.get()]))
       LOG.warning('User %s is bypassing the load balancer' % request.user.username)
-
-    if message:
-      banner_message = '<div style="padding: 4px; text-align: center; background-color: #003F6C; height: 24px; color: #DBE8F1">%s</div>' \
-          % message
 
   return banner_message
 

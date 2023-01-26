@@ -101,7 +101,7 @@ class RazClient(object):
     self.requestid = str(uuid.uuid4())
 
 
-  def check_access(self, method, url, params=None, headers=None):
+  def check_access(self, method, url, params=None, headers=None, data=None):
     LOG.debug("Check access: method {%s}, url {%s}, params {%s}, headers {%s}" % (method, url, params, headers))
 
     path = lib_urlparse(url)
@@ -132,7 +132,7 @@ class RazClient(object):
     if self.service == 'adls':
       self._make_adls_request(request_data, method, path, url_params, resource_path)
     elif self.service == 's3':
-      self._make_s3_request(request_data, request_headers, method, params, headers, url_params, endpoint, resource_path)
+      self._make_s3_request(request_data, request_headers, method, params, headers, url_params, endpoint, resource_path, data=data)
 
     LOG.debug('Raz url: %s' % raz_url)
     LOG.debug("Sending access check headers: {%s} request_data: {%s}" % (request_headers, request_data))
@@ -203,9 +203,10 @@ class RazClient(object):
       relative_path += resource_path[1]
 
     if relative_path == "/" and method == 'GET' and params.get('resource') == 'filesystem' and params.get('directory'):
-      relative_path += lib_urlunquote(params['directory'])
+      relative_path += params['directory']
 
-    return relative_path
+    # Unquoting the full relative_path to catch edge cases like path having whitespaces or non-ascii chars.
+    return lib_urlunquote(relative_path)
 
 
   def handle_adls_req_mapping(self, method, params):
@@ -213,6 +214,8 @@ class RazClient(object):
       access_type = ''
       if params.get('action') == 'getStatus' or params.get('resource') == 'filesystem':
         access_type = 'get-status'
+      if params.get('action') == 'getAccessControl':
+        access_type = 'get-acl'
 
     if method == 'DELETE':
       access_type = 'delete-recursive' if params.get('recursive') == 'true' else 'delete'
@@ -237,15 +240,30 @@ class RazClient(object):
     return access_type
 
 
-  def _make_s3_request(self, request_data, request_headers, method, params, headers, url_params, endpoint, resource_path):
+  def _make_s3_request(self, request_data, request_headers, method, params, headers, url_params, endpoint, resource_path, data=None):
+
+    # In GET operations with non-ascii chars, only the non-ascii part is URL encoded.
+    # We need to unquote the path fully before making a signed request for RAZ.
+    if method == 'GET' and 'prefix' in url_params and '%' in url_params['prefix']:
+      if sys.version_info[0] < 3 and isinstance(url_params['prefix'], unicode):
+        url_params['prefix'] = url_params['prefix'].encode()
+
+      url_params['prefix'] = lib_urlunquote(url_params['prefix'])
+
     allparams = [raz_signer.StringListStringMapProto(key=key, value=[val]) for key, val in url_params.items()]
     allparams.extend([raz_signer.StringListStringMapProto(key=key, value=[val]) for key, val in params.items()])
     headers = [raz_signer.StringStringMapProto(key=key, value=val) for key, val in headers.items()]
 
     LOG.debug(
-      "Preparing sign request with http_method: {%s}, headers: {%s}, parameters: {%s}, endpoint: {%s}, resource_path: {%s}" %
-      (method, headers, allparams, endpoint, resource_path)
+      "Preparing sign request with "
+      "http_method: {%s}, headers: {%s}, parameters: {%s}, endpoint: {%s}, resource_path: {%s}, content_to_sign: {%s}" %
+      (method, headers, allparams, endpoint, resource_path, data)
     )
+
+    # Raz signed request proto call expects data as bytes instead of str for Py3.
+    if sys.version_info[0] > 2 and data is not None and not isinstance(data, bytes):
+      data = data.encode()
+
     raz_req = raz_signer.SignRequestProto(
         endpoint_prefix=self.service_params['endpoint_prefix'],
         service_name=self.service_params['service_name'],
@@ -254,6 +272,7 @@ class RazClient(object):
         headers=headers,
         parameters=allparams,
         resource_path=resource_path,
+        content_to_sign=data,
         time_offset=0
     )
     raz_req_serialized = raz_req.SerializeToString()
