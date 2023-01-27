@@ -49,13 +49,11 @@ class RazHttpClient(HttpClient):
     sig=pJL%2FWyed41tptiwBM5ymYre4qF8wzrO05tS5MCjkutc%3D&st=2015-01-02T01%3A40%3A51Z&se=2015-01-02T02%3A00%3A51Z&sp=r
     """
 
-    if '%' in path:
-      if sys.version_info[0] < 3 and isinstance(path, unicode):
-        path = path.encode('utf-8')
+    if sys.version_info[0] < 3 and isinstance(path, unicode):
+      path = path.encode('utf-8')
 
-      path = lib_urlquote(path)
+    url = self._make_url(lib_urlquote(path), params, do_urlencode=False)
 
-    url = self._make_url(path, params)
 
     # For root stats, the root path needs to end with '/' before adding the query params.
     if params and 'action' in params and params['action'] == 'getAccessControl':
@@ -100,7 +98,7 @@ class RazHttpClient(HttpClient):
             data=data, 
             headers=headers, 
             allow_redirects=allow_redirects, 
-            urlencode=urlencode, 
+            urlencode=False, 
             files=files, 
             stream=stream, 
             clear_cookies=clear_cookies, 
