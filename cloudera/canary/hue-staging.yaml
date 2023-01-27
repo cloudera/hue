@@ -23,6 +23,7 @@ stacks:
     git_url: git@github.infra.cloudera.com:cdh/hue.git
     git_sha: HEAD
     enable_review: false
+    automerge: true
     trigger_if_changed: true
   - comp_name: CDWH
     branch: ${CDWH_RELEASE_BRANCH}
