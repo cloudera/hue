@@ -69,7 +69,7 @@ from hadoop.fs.fsutils import do_overwrite_save
 from useradmin.models import User, Group
 
 from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE, MAX_SNAPPY_DECOMPRESSION_SIZE,\
-    SHOW_DOWNLOAD_BUTTON, SHOW_UPLOAD_BUTTON, REDIRECT_DOWNLOAD
+    SHOW_DOWNLOAD_BUTTON, SHOW_UPLOAD_BUTTON, REDIRECT_DOWNLOAD, FILE_DOWNLOAD_CACHE_CONTROL
 from filebrowser.lib.archives import archive_factory
 from filebrowser.lib.rwx import filetype, rwx
 from filebrowser.lib import xxd
@@ -203,7 +203,8 @@ def download(request, path):
     setattr(response, 'redirect_override', True)
   else:
     response = StreamingHttpResponse(file_reader(fh), content_type=content_type)
-    response["Cache-Control"] = 'no-cache' # Browsers must not cache files but always download
+    if FILE_DOWNLOAD_CACHE_CONTROL.get():
+      response["Cache-Control"] = FILE_DOWNLOAD_CACHE_CONTROL.get()
     response["Last-Modified"] = http_date(stats['mtime'])
     response["Content-Length"] = stats['size']
     response['Content-Disposition'] = request.GET.get('disposition', 'attachment; filename="' + stats['name'] + '"') \
