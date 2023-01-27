@@ -76,3 +76,9 @@ REMOTE_STORAGE_HOME = Config(
   type=str,
   default=None,
   help="Optionally set this if you want a different home directory path. e.g. s3a://gethue.")
+
+FILE_DOWNLOAD_CACHE_CONTROL = Config(
+  key="file_download_cache_control",
+  type=str,
+  default=None,
+  help="Optionally set this to control the caching strategy for files download")
