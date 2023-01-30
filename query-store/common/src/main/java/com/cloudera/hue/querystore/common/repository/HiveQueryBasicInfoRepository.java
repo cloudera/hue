@@ -1,10 +1,12 @@
 // (c) Copyright 2020-2021 Cloudera, Inc. All rights reserved.
 package com.cloudera.hue.querystore.common.repository;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -14,6 +16,7 @@ import org.jdbi.v3.core.mapper.reflect.BeanMapper;
 
 import com.cloudera.hue.querystore.common.dao.HiveQueryBasicInfoDao;
 import com.cloudera.hue.querystore.common.dto.FacetEntry;
+import com.cloudera.hue.querystore.common.dto.FacetValue;
 import com.cloudera.hue.querystore.common.entities.HiveQueryBasicInfo;
 import com.cloudera.hue.querystore.common.entities.TezDagBasicInfo;
 import com.cloudera.hue.querystore.common.exception.DBUpdateFailedException;
@@ -107,4 +110,14 @@ public class HiveQueryBasicInfoRepository extends JdbiRepository<HiveQueryBasicI
     return dao.purge();
   }
 
+  public Optional<List<FacetValue>> getFacetValues(Set<String> facetFieldSets, String queryText, long startTime,
+        long endTime, String userName, int facetsResultLimit) {
+
+    List<FacetValue> facetValueList = new ArrayList<FacetValue>();
+    for (String facetField: facetFieldSets) {
+      List<FacetEntry> facetEntry = dao.getFacetValues(facetField, queryText, startTime, endTime, userName, facetsResultLimit);
+      facetValueList.add(new FacetValue(facetField, facetEntry));
+    }
+    return Optional.of(facetValueList);
+  }
 }
