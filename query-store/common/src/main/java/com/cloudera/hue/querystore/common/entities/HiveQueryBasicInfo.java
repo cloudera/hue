@@ -160,10 +160,10 @@ public class HiveQueryBasicInfo implements JdbiEntity {
   @ColumnInfo(columnName="execution_mode", searchable = true, facetable = true)
   private String executionMode;
 
-  @ColumnInfo(columnName="tables_read", searchable = true, facetable = true)
+  @ColumnInfo(columnName="tables_read", searchable = true, facetable = false)
   private ArrayNode tablesRead;
 
-  @ColumnInfo(columnName="tables_written", searchable = true, facetable = true)
+  @ColumnInfo(columnName="tables_written", searchable = true, facetable = false)
   private ArrayNode tablesWritten;
 
   @ColumnInfo(columnName="databases_used", searchable = false, facetable = false)

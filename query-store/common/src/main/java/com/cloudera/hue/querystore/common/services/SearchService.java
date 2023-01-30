@@ -3,14 +3,10 @@ package com.cloudera.hue.querystore.common.services;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -18,8 +14,6 @@ import javax.inject.Named;
 import org.jdbi.v3.core.mapper.JoinRow;
 
 import com.cloudera.hue.querystore.common.dto.DagDto;
-import com.cloudera.hue.querystore.common.dto.FacetEntry;
-import com.cloudera.hue.querystore.common.dto.FacetValue;
 import com.cloudera.hue.querystore.common.dto.FieldInformation;
 import com.cloudera.hue.querystore.common.dto.HiveQueryDto;
 import com.cloudera.hue.querystore.common.dto.SearchRequest;
@@ -27,10 +21,8 @@ import com.cloudera.hue.querystore.common.entities.HiveQueryBasicInfo;
 import com.cloudera.hue.querystore.common.entities.TezDagBasicInfo;
 import com.cloudera.hue.querystore.common.repository.HiveQueryBasicInfoRepository;
 import com.cloudera.hue.querystore.common.repository.PageData;
-import com.cloudera.hue.querystore.common.repository.transaction.DASTransaction;
 import com.cloudera.hue.querystore.common.util.Pair;
 import com.cloudera.hue.querystore.generator.CountQueryGenerator;
-import com.cloudera.hue.querystore.generator.FacetQueryGenerator;
 import com.cloudera.hue.querystore.generator.NullHighlightQueryFunctionGenerator;
 import com.cloudera.hue.querystore.generator.SearchQueryGenerator;
 import com.cloudera.hue.querystore.orm.EntityField;
@@ -52,9 +44,6 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class SearchService {
-  private static final String RANGE_FACET_IDENTIFIER_TEXT = "range-facet";
-  private static final String FACET_IDENTIFIER_TEXT = "facet";
-
   private static volatile List<FieldInformation> fieldsInformation = null;
   private static final String SORT_FRAGMENT = "ORDER BY %s NULLS LAST";
 
@@ -156,76 +145,6 @@ public class SearchService {
     Long queryCount = repository.executeSearchCountQuery(finalCountSql, countParameterBindings);
 
     return new PageData<>(queries, iOffset, iLimit, queryCount);
-  }
-
-  @DASTransaction
-  public Pair<List<FacetValue>, List<FacetValue>> getFacetValues(String queryText,
-      Set<String> facetFields, Long startTime, Long endTime, String username) {
-    String iQueryText = SanitizeUtility.sanitizeQuery(queryText);
-    Long iEndTime = SanitizeUtility.sanitizeEndTime(startTime, endTime);
-    Long iStartTime = SanitizeUtility.sanitizeStartTime(startTime, endTime);
-
-    QueryParseResult parseResult = basicParser.parse(iQueryText);
-    TimeRangeParseResult timeRangeParseResult = timeRangeInputParser.parse(new Pair<>(iStartTime, iEndTime));
-
-    List<String> predicates = Lists.newArrayList(parseResult.getPredicate(),
-        timeRangeParseResult.getTimeRangeExpression());
-    if (username != null) {
-      predicates.add(HiveQueryBasicInfo.TABLE_INFORMATION.getTablePrefix() + ".request_user = :username");
-    }
-
-    FacetQueryGenerator facetCountQuery = new FacetQueryGenerator(HiveQueryBasicInfo.TABLE_INFORMATION,
-        TezDagBasicInfo.TABLE_INFORMATION, new HashSet<>(facetFields), predicates);
-    String finalSql = facetCountQuery.generate();
-    log.debug("Final facet query: {}", finalSql);
-
-    Map<String, Object> parameterBindings = new HashMap<>();
-    parameterBindings.putAll(parseResult.getParameterBindings());
-    parameterBindings.putAll(timeRangeParseResult.getParameterBindings());
-    parameterBindings.put("username", username);
-
-    List<FacetEntry> entries = repository.executeFacetQuery(finalSql, parameterBindings);
-    return extractFacetsFromEntries(entries);
-  }
-
-  private Pair<List<FacetValue>, List<FacetValue>> extractFacetsFromEntries(List<FacetEntry> entries) {
-    ArrayList<FacetEntry> entriesArrayList = new ArrayList<>(entries);
-    Stream<Integer> indexStream = IntStream.range(0, entries.size()).boxed().filter(i -> {
-      FacetEntry facetEntry = entriesArrayList.get(i);
-      return facetEntry.isFirst();
-    });
-
-    List<Integer> partitionIndexes = indexStream.collect(Collectors.toList());
-    partitionIndexes.add(entries.size());
-
-    List<List<FacetEntry>> subSets = IntStream.range(0, partitionIndexes.size() - 1)
-        .mapToObj(i -> entriesArrayList.subList(partitionIndexes.get(i), partitionIndexes.get(i + 1)))
-        .collect(Collectors.toList());
-
-    List<FacetValue> facets = new ArrayList<>();
-    List<FacetValue> rangeFacets = new ArrayList<>();
-
-    for(List<FacetEntry> subSet : subSets) {
-      FacetEntry topEntry = subSet.get(0);
-      String facetKey = topEntry.getType().toLowerCase();
-      List<FacetEntry> facetEntries = subSet.subList(1, subSet.size());
-      if(facetKey.startsWith(RANGE_FACET_IDENTIFIER_TEXT)) {
-        if (rangeFacetShouldBeAdded(facetEntries)) {
-          rangeFacets.add(new FacetValue(topEntry.getKey(), facetEntries));
-        }
-      }
-
-      if(facetKey.startsWith(FACET_IDENTIFIER_TEXT)) {
-        facets.add(new FacetValue(topEntry.getKey(), facetEntries));
-      }
-    }
-    return new Pair<>(facets, rangeFacets);
-  }
-
-  private boolean rangeFacetShouldBeAdded(List<FacetEntry> facetEntries) {
-    if(facetEntries.size() != 2) return false;
-    long nullValueEntryCount = facetEntries.stream().filter(x -> x.getValue() == null).count();
-    return nullValueEntryCount == 0;
   }
 
   public static List<FieldInformation> getFieldsInformation() {

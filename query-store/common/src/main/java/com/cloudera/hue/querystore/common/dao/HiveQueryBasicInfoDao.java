@@ -5,10 +5,12 @@ import org.jdbi.v3.sqlobject.config.RegisterBeanMapper;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.customizer.BindList;
+import org.jdbi.v3.sqlobject.customizer.Define;
 import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
+import com.cloudera.hue.querystore.common.dto.FacetEntry;
 import com.cloudera.hue.querystore.common.entities.HiveQueryBasicInfo;
 import com.cloudera.hue.querystore.common.repository.JdbiDao;
 
@@ -75,4 +77,7 @@ public interface HiveQueryBasicInfoDao extends JdbiDao<HiveQueryBasicInfo> {
   @SqlUpdate("vacuum full hive_query")
   int purge();
 
+  @RegisterBeanMapper(FacetEntry.class)
+  @SqlQuery("select <facetField> as key, count(<facetField>) as value from hive_query where start_time >= :startTime AND start_time <= :endTime AND request_user = :userName GROUP BY <facetField> ORDER BY count(<facetField>) DESC LIMIT :facetsResultLimit")
+  List<FacetEntry> getFacetValues(@Define("facetField") String facetField, @Bind("queryText") String queryText, @Bind("startTime") long startTime, @Bind("endTime") long endTime, @Bind("userName") String userName, @Bind("facetsResultLimit")  int facetsResultLimit);
 }
