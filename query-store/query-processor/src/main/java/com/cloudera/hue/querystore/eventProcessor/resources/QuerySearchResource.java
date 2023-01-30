@@ -5,8 +5,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -22,16 +24,23 @@ import javax.ws.rs.core.SecurityContext;
 import org.apache.commons.lang.StringUtils;
 
 import com.cloudera.hue.querystore.common.AppAuthentication;
+import com.cloudera.hue.querystore.common.config.DasConfiguration;
+import com.cloudera.hue.querystore.common.config.DasConfiguration.ConfVar;
 import com.cloudera.hue.querystore.common.dto.FacetValue;
 import com.cloudera.hue.querystore.common.dto.FieldInformation;
 import com.cloudera.hue.querystore.common.dto.HiveQueryDto;
 import com.cloudera.hue.querystore.common.dto.SearchRequest;
+import com.cloudera.hue.querystore.common.entities.HiveQueryBasicInfo;
+import com.cloudera.hue.querystore.common.repository.HiveQueryBasicInfoRepository;
 import com.cloudera.hue.querystore.common.repository.PageData;
+import com.cloudera.hue.querystore.common.services.SanitizeUtility;
 import com.cloudera.hue.querystore.common.services.SearchService;
 import com.cloudera.hue.querystore.common.util.MetaInfo;
-import com.cloudera.hue.querystore.common.util.Pair;
 import com.cloudera.hue.querystore.eventProcessor.lifecycle.EventProcessorManager;
+import com.cloudera.hue.querystore.orm.EntityField;
+import com.cloudera.hue.querystore.orm.EntityTable;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Sets;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -41,15 +50,21 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Path("/query")
 public class QuerySearchResource {
-  private static final int MAX_FACET_FIELDS_SEARCH_ALLOWED = 3;
+  private static final ConfVar<Integer> QP_FACETS_RESULT_LIMIT =
+	      new ConfVar<>("hue.query-processor.search.facet.result.limit", 10);
 
   private final SearchService searchService;
   private final EventProcessorManager eventProcessorManager;
+  private final HiveQueryBasicInfoRepository repository;
+  private final DasConfiguration dasConfig;
 
   @Inject
-  public QuerySearchResource(SearchService searchService, EventProcessorManager eventProcessorManager) {
+  public QuerySearchResource(SearchService searchService, EventProcessorManager eventProcessorManager, HiveQueryBasicInfoRepository repository,
+        DasConfiguration dasConfig) {
     this.searchService = searchService;
     this.eventProcessorManager = eventProcessorManager;
+    this.repository = repository;
+    this.dasConfig = dasConfig;
   }
 
   /**
@@ -119,7 +134,7 @@ public class QuerySearchResource {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("/facets")
-  public Response getFacetValues(@QueryParam("text") String queryText,
+  public Response getFacetValuesNew(@QueryParam("text") String queryText,
                                  @QueryParam("facetFields") String facetFields,
                                  @QueryParam("startTime") Long startTime,
                                  @QueryParam("endTime") Long endTime,
@@ -127,22 +142,31 @@ public class QuerySearchResource {
     if (StringUtils.isEmpty(facetFields)) {
       return Response.status(Response.Status.BAD_REQUEST).entity("'facetField' query parameter is required.").build();
     }
-    Set<String> facetFieldSets = extractFacetFields(facetFields);
-    if (facetFieldSets.size() > MAX_FACET_FIELDS_SEARCH_ALLOWED) {
-      log.error("Max allowed facets to be queries is {}. Current queried fields is {}",
-          MAX_FACET_FIELDS_SEARCH_ALLOWED, facetFieldSets.size());
-      return Response.status(Response.Status.BAD_REQUEST).entity("Max allowed facets to be queries is " +
-          MAX_FACET_FIELDS_SEARCH_ALLOWED + ". Current queried fields is " + facetFieldSets.size()).build();
-    }
-    Pair<List<FacetValue>, List<FacetValue>> facetsPair = searchService.getFacetValues(
-        queryText, facetFieldSets, startTime, endTime, getEffectiveUser(securityContext));
-    List<FacetValue> facets = facetsPair.getFirst();
-    List<FacetValue> rangeFacets = facetsPair.getSecond();
-    Map<String, Object> response = ImmutableMap.of("facets", facets, "rangeFacets", rangeFacets);
-    return Response.ok(response).build();
+
+    String ifacetFields = SanitizeUtility.sanitizeQuery(facetFields);
+    Set<String> facetFieldSets = extractFacetFields(ifacetFields);
+
+    String iQueryText = SanitizeUtility.sanitizeQuery(queryText);
+    Long iStartTime = SanitizeUtility.sanitizeStartTime(startTime, endTime);
+    Long iEndTime = SanitizeUtility.sanitizeEndTime(startTime, endTime);
+
+    facetFieldSets = filterFacetable(HiveQueryBasicInfo.TABLE_INFORMATION, facetFieldSets);
+
+    Optional<List<FacetValue>> facetValueList = repository.getFacetValues(facetFieldSets, iQueryText, iStartTime, iEndTime,
+        getEffectiveUser(securityContext), dasConfig.getConf(QP_FACETS_RESULT_LIMIT));
+
+    Map<String, Object> response = ImmutableMap.of("facets", facetValueList.get());
+	return Response.ok(response).build();
   }
 
   private Set<String> extractFacetFields(String facetFieldsText) {
     return Arrays.stream(facetFieldsText.split(",")).map(String::trim).collect(Collectors.toSet());
+  }
+
+  private Set<String> filterFacetable(EntityTable table, Set<String> facetFields) {
+    Stream<EntityField> firstFacetableFields = table.getFields().stream().filter(x -> x.isFacetable());
+    Set<String> facetableFields = firstFacetableFields.map(EntityField::getDbFieldName).collect(Collectors.toSet());
+
+    return Sets.intersection(facetFields, facetableFields);
   }
 }
