@@ -72,7 +72,10 @@ public class AppAuthentication {
   public Role getRole(String user) {
     if (overrideRoleToAdmin || adminUsers.contains(user.toLowerCase())) {
       return Role.ADMIN;
+    } else if (adminGroups.isEmpty()) {
+      return Role.USER;
     }
+
     try {
       Set<String> groups = Groups.getUserToGroupsMappingService().getGroupsSet(user);
       for (String group : groups) {
