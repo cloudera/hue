@@ -133,7 +133,6 @@ const ChartPanel = ({ activeExecutable }) => {
         </li>
         <li className="spacer"></li>
         <li><Divider type="vertical" /></li>
-        <li><div role="separator" type="vertical" /></div>
         <li>
           <Button onClick={toggleConfigDrawer}>Configure</Button>
         </li>
