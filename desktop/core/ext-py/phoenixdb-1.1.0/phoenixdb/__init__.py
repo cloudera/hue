@@ -123,14 +123,6 @@ def connect(url, max_retries=None, auth=None, authentication=None, avatica_user=
     return Connection(client, **kwargs)
 
 
-def _get_SPNEGOAuth():
-    try:
-        spnego = gssapi.mechs.Mechanism.from_sasl_name("SPNEGO")
-    except AttributeError:
-        spnego = gssapi.OID.from_int_seq("1.3.6.1.5.5.2")
-    return HTTPSPNEGOAuth(opportunistic_auth=True, mech=spnego)
-
-
 def _process_args(
         url, auth=None, authentication=None, avatica_user=None, avatica_password=None,
         truststore=None, verify=None, do_as=None, user=None, password=None):
@@ -184,10 +176,14 @@ def _process_args(
 
     if auth == "SPNEGO":
         # Special case for backwards compatibility
-        auth = _get_SPNEGOAuth()
+        auth = HTTPSPNEGOAuth(opportunistic_auth=True)
     elif auth is None and authentication is not None:
         if authentication == "SPNEGO":
-            auth = _get_SPNEGOAuth()
+            try:
+                spnego = gssapi.mechs.Mechanism.from_sasl_name("SPNEGO")
+            except AttributeError:
+                spnego = gssapi.OID.from_int_seq("1.3.6.1.5.5.2")
+            auth = HTTPSPNEGOAuth(opportunistic_auth=True, mech=spnego)
         elif authentication == "BASIC" and avatica_user is not None and avatica_password is not None:
             auth = HTTPBasicAuth(avatica_user, avatica_password)
         elif authentication == "DIGEST" and avatica_user is not None and avatica_password is not None:
