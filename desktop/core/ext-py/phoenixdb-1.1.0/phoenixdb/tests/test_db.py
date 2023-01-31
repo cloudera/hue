@@ -125,7 +125,6 @@ class PhoenixDatabaseTest(DatabaseTestCase):
     def test_meta(self):
         with self.conn.cursor() as cursor:
             try:
-                cursor.execute('drop table if exists USERS')
                 cursor.execute('drop table if exists DEFAULT_TABLE')
                 cursor.execute('drop table if exists A_SCHEMA.A_TABLE')
                 cursor.execute('drop table if exists B_SCHMEA.B_TABLE')
