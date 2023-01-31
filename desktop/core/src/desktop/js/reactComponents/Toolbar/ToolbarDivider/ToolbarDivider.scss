@@ -1,0 +1,38 @@
+@import '../ToolbarShared.scss';
+
+$vertical-margin: 3px;
+
+@mixin set-sizes($toolbar-height) {
+  .hue-toolbar-divider {
+    height: $toolbar-height;
+
+    .ant-divider-vertical {
+      height: calc(#{$toolbar-height} - calc(#{$vertical-margin} * 2));
+    }
+  }
+}
+
+.antd {
+  .hue-toolbar {
+    .hue-toolbar-divider {
+      list-style-type: none;
+
+      .ant-divider-vertical {
+        border-left-color: $toolbar-border-color;
+        top: $vertical-margin;
+      }
+    }
+
+    &--small {
+      @include set-sizes($toolbar-height-small);
+    }
+
+    &--medium {
+      @include set-sizes($toolbar-height-medium);
+    }
+
+    &--large {
+      @include set-sizes($toolbar-height-large);
+    }
+  }
+}
