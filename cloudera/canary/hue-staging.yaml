@@ -31,16 +31,16 @@ stacks:
     enable_review: false
     is_base_repo: true
   tests:
-      ART:
-        cloud_type: mot.kv.cloud.ycloud
-   	quasar_branch: cdh6.x
-   	release_branch: ${CDH_RELEASE_BRANCH}
-   	test_suites:
-   	- comp_name: hue
-    	  marker_list: []
-    	  tier_tests:
-    	  - tier_name: functional-test
-     	    payload_name: pcqe_ycloud
+    ART:
+      cloud_type: mot.kv.cloud.ycloud
+      quasar_branch: cdh6.x
+      release_branch: ${CDH_RELEASE_BRANCH}
+      test_suites:
+      - comp_name: hue
+        marker_list: []
+        tier_tests:
+        - tier_name: functional-test
+          payload_name: pcqe_ycloud
   name: CDH
   stack_name: CDH
   version: ${CDH_RELEASE_VERSION}
