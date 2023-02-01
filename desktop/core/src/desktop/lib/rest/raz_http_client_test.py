@@ -61,7 +61,7 @@ class TestRazHttpClient():
             timeout=120
         )
 
-        # Check for path having whitespaces (#20)
+        # Check for file path having whitespaces
         f = client.execute(http_method='GET', path='/gethue/data/banks (1).csv', params={'action': 'getStatus'})
 
         url = 'https://gethue.dfs.core.windows.net/gethue/data/banks%20%281%29.csv?action=getStatus'
@@ -69,8 +69,8 @@ class TestRazHttpClient():
         raz_get_url.assert_called_with(action='GET', path=url, headers=None)
         raz_http_execute.assert_called_with(
             http_method='GET',
-            path='/gethue/data/banks%20%281%29.csv?action=getStatus&sv=2014-02-14&sr=b&sig=pJL%2FWyed41tptiwBM5ymYre4qF8wzrO05tS5MCjkutc%3D' \
-              '&st=2015-01-02T01%3A40%3A51Z&se=2015-01-02T02%3A00%3A51Z&sp=r',
+            path='/gethue/data/banks%20%281%29.csv?action=getStatus&sv=2014-02-14&sr=b&' \
+              'sig=pJL%2FWyed41tptiwBM5ymYre4qF8wzrO05tS5MCjkutc%3D&st=2015-01-02T01%3A40%3A51Z&se=2015-01-02T02%3A00%3A51Z&sp=r',
             data=None,
             headers=None,
             allow_redirects=False,
@@ -81,7 +81,88 @@ class TestRazHttpClient():
             timeout=120
         )
 
-        # Check for root path stats
+
+  def test_directory_paths(self):
+    with patch('desktop.lib.rest.raz_http_client.AdlsRazClient.get_url') as raz_get_url:
+      with patch('desktop.lib.rest.raz_http_client.HttpClient.execute') as raz_http_execute:
+        raz_get_url.return_value = {
+          'token': 'sv=2014-02-14&sr=b&sig=pJL%2FWyed41tptiwBM5ymYre4qF8wzrO05tS5MCjkutc%3D' \
+            '&st=2015-01-02T01%3A40%3A51Z&se=2015-01-02T02%3A00%3A51Z&sp=r'
+        }
+        client = RazHttpClient(username='test', base_url='https://gethue.dfs.core.windows.net')
+
+        # List call for non-ascii directory name (/user/Tжейкоб)
+        f = client.execute(
+          http_method='GET',
+          path='/test',
+          params={'directory': 'user/T\u0436\u0435\u0438\u0306\u043a\u043e\u0431', 'resource': 'filesystem'}
+        )
+        url = 'https://gethue.dfs.core.windows.net/test?directory=user/T%D0%B6%D0%B5%D0%B8%CC%86%D0%BA%D0%BE%D0%B1&resource=filesystem'
+
+        raz_get_url.assert_called_with(action='GET', path=url, headers=None)
+        raz_http_execute.assert_called_with(
+            http_method='GET',
+            path='/test?directory=user/T%D0%B6%D0%B5%D0%B8%CC%86%D0%BA%D0%BE%D0%B1&resource=filesystem&sv=2014-02-14&' \
+              'sr=b&sig=pJL%2FWyed41tptiwBM5ymYre4qF8wzrO05tS5MCjkutc%3D&st=2015-01-02T01%3A40%3A51Z&se=2015-01-02T02%3A00%3A51Z&sp=r',
+            data=None,
+            headers=None,
+            allow_redirects=False,
+            urlencode=False,
+            files=None,
+            stream=False,
+            clear_cookies=False,
+            timeout=120
+        )
+
+        # List call for directory name having whitespaces (/user/test dir)
+        f = client.execute(http_method='GET', path='/test', params={'directory': 'user/test user', 'resource': 'filesystem'})
+        url = 'https://gethue.dfs.core.windows.net/test?directory=user/test%20user&resource=filesystem'
+
+        raz_get_url.assert_called_with(action='GET', path=url, headers=None)
+        raz_http_execute.assert_called_with(
+            http_method='GET',
+            path='/test?directory=user/test%20user&resource=filesystem&sv=2014-02-14&' \
+              'sr=b&sig=pJL%2FWyed41tptiwBM5ymYre4qF8wzrO05tS5MCjkutc%3D&st=2015-01-02T01%3A40%3A51Z&se=2015-01-02T02%3A00%3A51Z&sp=r',
+            data=None,
+            headers=None,
+            allow_redirects=False,
+            urlencode=False,
+            files=None,
+            stream=False,
+            clear_cookies=False,
+            timeout=120
+        )
+
+        # List call for directory name having %20 like characters (/user/ab%20cd)
+        f = client.execute(http_method='GET', path='/test', params={'directory': 'user/ab%20cd', 'resource': 'filesystem'})
+        url = 'https://gethue.dfs.core.windows.net/test?directory=user%2Fab%2520cd&resource=filesystem'
+
+        raz_get_url.assert_called_with(action='GET', path=url, headers=None)
+        raz_http_execute.assert_called_with(
+            http_method='GET',
+            path='/test?directory=user%2Fab%2520cd&resource=filesystem&sv=2014-02-14&' \
+              'sr=b&sig=pJL%2FWyed41tptiwBM5ymYre4qF8wzrO05tS5MCjkutc%3D&st=2015-01-02T01%3A40%3A51Z&se=2015-01-02T02%3A00%3A51Z&sp=r',
+            data=None,
+            headers=None,
+            allow_redirects=False,
+            urlencode=False,
+            files=None,
+            stream=False,
+            clear_cookies=False,
+            timeout=120
+        )
+
+
+  def test_root_path_stats(self):
+    with patch('desktop.lib.rest.raz_http_client.AdlsRazClient.get_url') as raz_get_url:
+      with patch('desktop.lib.rest.raz_http_client.HttpClient.execute') as raz_http_execute:
+
+        raz_get_url.return_value = {
+          'token': 'sv=2014-02-14&sr=b&sig=pJL%2FWyed41tptiwBM5ymYre4qF8wzrO05tS5MCjkutc%3D' \
+            '&st=2015-01-02T01%3A40%3A51Z&se=2015-01-02T02%3A00%3A51Z&sp=r'
+        }
+
+        client = RazHttpClient(username='test', base_url='https://gethue.dfs.core.windows.net')
         f = client.execute(http_method='HEAD', path='/gethue', params={'action': 'getAccessControl'})
         url = 'https://gethue.dfs.core.windows.net/gethue/?action=getAccessControl'
 
