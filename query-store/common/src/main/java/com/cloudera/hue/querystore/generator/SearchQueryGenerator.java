@@ -1,6 +1,7 @@
 // (c) Copyright 2020-2021 Cloudera, Inc. All rights reserved.
 package com.cloudera.hue.querystore.generator;
 
+import java.util.Iterator;
 import java.util.List;
 
 import com.cloudera.hue.querystore.orm.EntityField;
@@ -12,7 +13,6 @@ import com.cloudera.hue.querystore.orm.EntityTable;
 public class SearchQueryGenerator {
   private final String offsetParameterBinding;
   private final String limitParameterBinding;
-  private final String highlightQueryFunction;
   private final List<String> predicates;
   private final String sortFragment;
   private final EntityTable hiveQuery;
@@ -20,25 +20,28 @@ public class SearchQueryGenerator {
 
   public SearchQueryGenerator(EntityTable hiveQuery, EntityTable dagInfo,
 	      String offsetParameterBinding, String limitParameterBinding,
-	      String highlightQueryFunction, String sortFragment, List<String> predicates) {
+	      String sortFragment, List<String> predicates) {
     this.hiveQuery = hiveQuery;
     this.dagInfo = dagInfo;
     this.offsetParameterBinding = offsetParameterBinding;
     this.limitParameterBinding = limitParameterBinding;
-    this.highlightQueryFunction = highlightQueryFunction;
     this.predicates = predicates;
     this.sortFragment = sortFragment;
   }
 
-  private static void addFields(StringBuilder builder, EntityTable table) {
-    for (EntityField field : table.getFields()) {
+  private static void addFields(StringBuilder builder, EntityTable table, boolean isLastField) {
+    Iterator<EntityField> iterator = table.getFields().iterator();
+    while (iterator.hasNext()) {
+      EntityField field = iterator.next();
       builder.append(field.getEntityPrefix());
       builder.append(".");
       builder.append(field.getDbFieldName());
       builder.append(" AS ");
       builder.append(field.getEntityPrefix());
       builder.append(field.getDbFieldName());
-      builder.append(", ");
+      if (!isLastField || iterator.hasNext()) {
+        builder.append(", ");
+      }
     }
   }
 
@@ -51,9 +54,8 @@ public class SearchQueryGenerator {
   public String generate() {
     StringBuilder builder = new StringBuilder(2048);
     builder.append("SELECT ");
-    addFields(builder, hiveQuery);
-    addFields(builder, dagInfo);
-    builder.append(highlightQueryFunction);
+    addFields(builder, hiveQuery, false);
+    addFields(builder, dagInfo, true);
     builder.append(" FROM ");
     addTable(builder, hiveQuery);
     builder.append(" LEFT OUTER JOIN ");

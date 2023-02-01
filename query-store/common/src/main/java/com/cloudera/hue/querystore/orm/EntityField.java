@@ -20,10 +20,6 @@ public class EntityField {
   private final String displayName;
   private final boolean exclude;
 
-  public static EntityField dummyWithProjection(String highLightProjectionColumnName) {
-    return new EntityField(false,false, false, "", "", "", "", true, highLightProjectionColumnName, "", false, false, "", true);
-  }
-
   public boolean isJsonArrayField() {
     return "tablesRead".equalsIgnoreCase(entityFieldName) || "tablesWritten".equalsIgnoreCase(entityFieldName);
   }
