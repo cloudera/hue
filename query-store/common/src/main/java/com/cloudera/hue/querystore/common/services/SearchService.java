@@ -23,7 +23,6 @@ import com.cloudera.hue.querystore.common.repository.HiveQueryBasicInfoRepositor
 import com.cloudera.hue.querystore.common.repository.PageData;
 import com.cloudera.hue.querystore.common.util.Pair;
 import com.cloudera.hue.querystore.generator.CountQueryGenerator;
-import com.cloudera.hue.querystore.generator.NullHighlightQueryFunctionGenerator;
 import com.cloudera.hue.querystore.generator.SearchQueryGenerator;
 import com.cloudera.hue.querystore.orm.EntityField;
 import com.cloudera.hue.querystore.parsers.FacetInputParser;
@@ -89,10 +88,6 @@ public class SearchService {
     String sortFragment = sortParseResult.isSortingRequired()
         ? String.format(SORT_FRAGMENT, sortParseResult.getSortExpression()) : "";
 
-  //TODO - highlightQueryFunction must be fully removed 
-    final String highlightQueryFunction = new NullHighlightQueryFunctionGenerator()
-        .generate(EntityField.dummyWithProjection("highlighted_query"));
-
     List<String> predicates = Lists.newArrayList(parseResult.getPredicate(), facetParseResult.getFacetExpression(),
         rangeFacetParseResult.getFacetExpression(), timeRangeParseResult.getTimeRangeExpression());
 
@@ -102,7 +97,7 @@ public class SearchService {
 
     SearchQueryGenerator searchQueryGenerator = new SearchQueryGenerator(
         HiveQueryBasicInfo.TABLE_INFORMATION, TezDagBasicInfo.TABLE_INFORMATION, "offset", "limit",
-        highlightQueryFunction, sortFragment, predicates);
+        sortFragment, predicates);
     String finalSql = searchQueryGenerator.generate();
 
     CountQueryGenerator countQueryGenerator = new CountQueryGenerator(
