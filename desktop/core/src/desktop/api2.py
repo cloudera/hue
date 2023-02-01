@@ -25,6 +25,7 @@ import sys
 import tempfile
 import zipfile
 
+from collections import defaultdict
 from datetime import datetime
 
 from django.core import management
@@ -813,6 +814,54 @@ def export_documents(request):
     return make_response(f.getvalue(), 'json', filename)
 
 
+def topological_sort(docs):
+
+  '''There is a bug in django 1.11 (https://code.djangoproject.com/ticket/26291)
+     and we are handling it via sorting the given documents in topological format.
+     
+     Hence this function is needed only if we are using Python2 based Hue as it uses django 1.11
+     and python3 based Hue don't require this method as it uses django 3.2.
+
+     input => docs: -> list of documents which needs to import in Hue
+     output => serialized_doc: -> list of sorted documents 
+     (if document1 is dependent on document2 then document1 is listed after document2)'''
+
+  size = len(docs)
+  graph = defaultdict(list)
+  for doc in docs:     ## creating a graph, assuming a document is a node of graph
+    dep_size = len(doc['fields']['dependencies'])
+    for i in range(dep_size):
+      graph[(doc['fields']['dependencies'])[i][0]].append(doc['fields']['uuid'])
+
+  visited = {}
+  _doc = {}
+  for doc in docs:     ## making all the nodes of graph unvisited and capturing the doc in the dict with uuid as key
+    _doc[doc['fields']['uuid']] = doc
+    visited[doc['fields']['uuid']] = False
+  
+  stack = []
+  for doc in docs:     ## calling _topological_sort function to sort the doc if node is not visited
+    if visited[doc['fields']['uuid']] == False:
+      _topological_sort(doc['fields']['uuid'], visited, stack, graph)
+  
+  stack = stack[::-1]  ## list is in revered order so we are just reversing it
+
+  serialized_doc = []
+  for i in range(size):
+    serialized_doc.append(_doc[stack[i]])
+    
+  return serialized_doc
+
+
+def _topological_sort(vertex, visited, stack, graph):
+  visited[vertex] = True
+  for i in graph[vertex]:
+    if visited[i] == False:
+      _topological_sort(i, visited, stack, graph)
+
+  stack.append(vertex)
+
+
 @ensure_csrf_cookie
 def import_documents(request):
   def is_reserved_directory(doc):
@@ -867,6 +916,11 @@ def import_documents(request):
       # Set last modified date to now
       doc['fields']['last_modified'] = datetime.now().replace(microsecond=0).isoformat()
       docs.append(doc)
+  
+  if sys.version_info[0] < 3:
+    ## In Django 1.11 loaddata cannot deserialize fixtures with forward references hence 
+    ## calling the topological_sort function to sort the document
+    docs = topological_sort(docs)
 
   f = tempfile.NamedTemporaryFile(mode='w+', suffix='.json')
   f.write(json.dumps(docs))
