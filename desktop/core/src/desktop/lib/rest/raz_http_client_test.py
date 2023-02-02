@@ -93,10 +93,15 @@ class TestRazHttpClient():
         client = RazHttpClient(username='test', base_url='https://gethue.dfs.core.windows.net')
 
         # List call for non-ascii directory name (/user/Tжейкоб)
+        if sys.version_info[0] > 2:
+          params = {'directory': 'user/T\u0436\u0435\u0438\u0306\u043a\u043e\u0431', 'resource': 'filesystem'}
+        else:
+          params = {u'directory': u'user/T\u0436\u0435\u0438\u0306\u043a\u043e\u0431', u'resource': u'filesystem'}
+
         f = client.execute(
           http_method='GET',
           path='/test',
-          params={'directory': 'user/T\u0436\u0435\u0438\u0306\u043a\u043e\u0431', 'resource': 'filesystem'}
+          params=params
         )
         url = 'https://gethue.dfs.core.windows.net/test?directory=user/T%D0%B6%D0%B5%D0%B8%CC%86%D0%BA%D0%BE%D0%B1&resource=filesystem'
 
