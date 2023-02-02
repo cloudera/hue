@@ -51,6 +51,6 @@ export interface BreadcrumbData {
 }
 export interface PathAndFileData {
   path: string;
-  breadcrumbs: Array<BreadcrumbData>;
-  files: Array<File>;
+  breadcrumbs: BreadcrumbData[];
+  files: File[];
 }

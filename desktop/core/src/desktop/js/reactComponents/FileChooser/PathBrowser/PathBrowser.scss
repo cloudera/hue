@@ -14,38 +14,106 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.path-browser {
-  height: 20px;
-  margin: 1.5px 0 0 18px !important;
-  display: flex;
+@import '../../../components/styles/colors';
 
-  &:hover {
-    background-color: #f1f2f3;
-  }
+.hue-filesystem__icon {
+  object-fit: cover;
+  margin-left: 10px !important;
+  margin-right: 10px !important;
 }
 
-.path-browser__breadcrumb.ant-breadcrumb {
-  margin-left: 10px;
+.hue-path-browser {
+  height: 28px;
+  display: inline-flex;
+  position: absolute;
+  width: 100%;
+}
+
+.hue-path-browser__breadcrumb {
+  display: flex;
+  gap: 10px;
+  max-width: 45%;
 
   &:hover {
     cursor: pointer;
   }
 }
 
-.path-browser__breadcrumb li:last-child .ant-breadcrumb-separator:last-child {
-  display: none;
+.hue-path-browser__breadcrumb-seperator.anticon {
+  width: 15px;
+  flex: 0 0 auto;
 }
 
-.toggle-breadcrumb-input {
-  pointer-events: auto;
-  width: 60px;
+.hue-path-browser__dropdown.ant-dropdown-menu {
+  background-color: $fluid-gray-200;
+  max-height: 200px;
+  width: 200px;
+  overflow-y: scroll;
+}
+
+.hue-path-browser__dropdown .ant-dropdown-menu-title-content {
+  display: inline-block;
+  overflow-x: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.hue-path-browser__dropdown-button.ant-btn {
+  border: none;
+  box-shadow: none;
 
   &:hover {
-    cursor: text;
+    background-color: $fluid-gray-100;
+  }
+
+  &:focus {
+    background-color: $fluid-gray-100;
   }
 }
 
-.path-browser__input.ant-input {
-  width: 300px;
+.hue-toggle-breadcrumb-input.ant-btn:empty {
+  pointer-events: auto;
+  width: 60px;
+  visibility: visible;
+  border: none;
+  box-shadow: none;
   padding: 0;
+
+  &:hover {
+    cursor: text;
+    background-color: $fluid-gray-100;
+  }
+
+  &:focus {
+    background-color: $fluid-gray-100;
+  }
+}
+
+.hue-path-browser__input.ant-input-affix-wrapper {
+  width: 300px;
+}
+
+.hue-path-browser-panel__button.ant-btn {
+  position: absolute;
+  border: none;
+  box-shadow: none;
+  color: $fluid-blue-400;
+  flex: 0 0 auto;
+  padding: 0;
+
+  &:hover {
+    border: $fluid-gray-300 solid 1px;
+  }
+
+  &:focus {
+    border: $fluid-gray-300 solid 1px;
+  }
+}
+
+.hue-new-folder__button.ant-btn {
+  right: 70px;
+}
+
+.hue-upload__button.ant-btn {
+  right: 10px;
 }
