@@ -14,11 +14,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-@import '../../../components/styles/colors';
+import React, { ReactElement, ReactNode } from 'react';
+import { Tooltip } from 'antd';
 
-.hue-file-chooser__button {
-  background-color: $hue-primary-color-dark;
-  color: white;
-  margin-left: 40px;
-  margin-top: 12px;
+interface OverflowTooltipProps {
+  title: string;
+  isOverflowing: boolean;
+  toolTipTriggers: string | string[];
+  children: ReactNode | ReactElement;
 }
+
+const OverflowTooltip: React.FC<OverflowTooltipProps> = ({
+  title,
+  isOverflowing,
+  toolTipTriggers,
+  children
+}) => {
+  return isOverflowing ? (
+    <Tooltip title={title} trigger={toolTipTriggers}>
+      {children}
+    </Tooltip>
+  ) : (
+    <>{children}</>
+  );
+};
+
+export default OverflowTooltip;

@@ -26,6 +26,7 @@ import { fetchFileSystems, fetchFiles } from '../api';
 import { FileSystem, PathAndFileData } from '../types';
 import './FileChooserModal.scss';
 import PathBrowser from '../PathBrowser/PathBrowser';
+
 interface FileProps {
   show: boolean;
   onCancel: () => void;
@@ -38,7 +39,7 @@ const defaultProps = { title: 'Choose a file', okText: 'Select' };
 const FileChooserModal: React.FC<FileProps> = ({ show, onCancel, title, okText }) => {
   const [fileSystemList, setFileSystemList] = useState<FileSystem[] | undefined>();
   const [filePath, setFilePath] = useState<string | undefined>();
-  const [fetchedFilesData, setFetchedFilesData] = useState<PathAndFileData | undefined>();
+  const [filesData, setFilesData] = useState<PathAndFileData | undefined>();
   const [loading, setLoading] = useState(true);
   const [loadingFiles, setloadingFiles] = useState(true);
 
@@ -55,10 +56,6 @@ const FileChooserModal: React.FC<FileProps> = ({ show, onCancel, title, okText }
 
   const handleCancel = () => {
     onCancel();
-  };
-
-  const onFilePathChange = (path: string) => {
-    setFilePath(path);
   };
 
   useEffect(() => {
@@ -92,8 +89,8 @@ const FileChooserModal: React.FC<FileProps> = ({ show, onCancel, title, okText }
     if (filePath) {
       setloadingFiles(true);
       fetchFiles(filePath)
-        .then(filesData => {
-          setFetchedFilesData(filesData);
+        .then(responseFilesData => {
+          setFilesData(responseFilesData);
         })
         .catch(error => {
           //TODO: handle errors
@@ -112,21 +109,21 @@ const FileChooserModal: React.FC<FileProps> = ({ show, onCancel, title, okText }
       onCancel={handleCancel}
       okText={okText}
       width={930}
-      className="file-chooser__modal"
+      className="hue-file-chooser__modal"
     >
-      <Spin spinning={loading} wrapperClassName="modal__spinner">
+      <Spin spinning={loading} wrapperClassName="hue-file-chooser-modal__spinner">
         <Menu
           items={fileSystemList}
-          onSelect={e => {
-            onFilePathChange(fileSystemList[e.key].user_home_dir);
+          onSelect={selectedMenuItem => {
+            setFilePath(fileSystemList[selectedMenuItem.key].user_home_dir);
           }}
-          className="file-system__panel"
+          className="hue-file-system__panel"
         ></Menu>
 
-        <Spin wrapperClassName="files-table__spinner" spinning={loadingFiles}>
+        <Spin wrapperClassName="hue-files-table__spinner" spinning={loadingFiles}>
           <PathBrowser
-            onFilePathChange={onFilePathChange}
-            breadcrumbs={fetchedFilesData?.breadcrumbs}
+            handleFilePathChange={setFilePath}
+            breadcrumbs={filesData?.breadcrumbs}
           ></PathBrowser>
         </Spin>
       </Spin>

@@ -16,40 +16,40 @@
 
 @import '../../../components/styles/colors';
 
-.file-chooser__modal .ant-modal-body {
+.hue-file-chooser__modal .ant-modal-body {
   padding: 0;
   height: 554px;
 }
 
-.modal__spinner.ant-spin-nested-loading {
+.hue-file-chooser-modal__spinner.ant-spin-nested-loading {
   width: 100%;
 }
 
-.modal__spinner .ant-spin-container {
+.hue-file-chooser-modal__spinner .ant-spin-container {
   display: flex;
 }
 
-.files-table__spinner.ant-spin-nested-loading {
+.hue-files-table__spinner.ant-spin-nested-loading {
   width: 100%;
 }
 
-.file-system__panel.ant-menu {
+.hue-file-system__panel.ant-menu {
   height: 554px;
   width: 187px;
   background-color: $fluid-gray-100;
   padding-top: 20px;
 }
 
-.file-system__panel .ant-menu-item {
+.hue-file-system__panel .ant-menu-item {
   display: flex !important;
   align-items: center;
 }
 
-.file-system__panel .ant-menu-item-icon {
+.hue-file-system__panel .ant-menu-item-icon {
   height: 20px !important;
   width: 20px !important;
 }
 
-.file-system__panel .ant-menu-item-selected {
+.hue-file-system__panel .ant-menu-item-selected {
   background-color: $fluid-gray-300 !important;
 }

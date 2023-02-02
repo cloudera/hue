@@ -14,11 +14,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-@import '../../../components/styles/colors';
+.hue-path-browser__overflowing-label.ant-btn {
+  background-color: transparent;
+  white-space: nowrap;
+  padding: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border: none;
+  flex: 0 1 auto;
+}
 
-.hue-file-chooser__button {
-  background-color: $hue-primary-color-dark;
-  color: white;
-  margin-left: 40px;
-  margin-top: 12px;
+.hue-path-browser__overflowing-label.ant-btn > span {
+  display: contents;
 }
