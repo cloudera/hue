@@ -24,8 +24,10 @@ from desktop.lib.exceptions_renderable import PopupException
 
 if sys.version_info[0] > 2:
   from django.utils.translation import gettext as _
+  from urllib.parse import quote as lib_urlquote
 else:
   from django.utils.translation import ugettext as _
+  from urllib import quote as lib_urlquote
 
 
 LOG = logging.getLogger(__name__)
@@ -46,8 +48,12 @@ class RazHttpClient(HttpClient):
     https://{storageaccountname}.dfs.core.windows.net/{container}/{path}?sv=2014-02-14&sr=b&
     sig=pJL%2FWyed41tptiwBM5ymYre4qF8wzrO05tS5MCjkutc%3D&st=2015-01-02T01%3A40%3A51Z&se=2015-01-02T02%3A00%3A51Z&sp=r
     """
+    if sys.version_info[0] < 3 and isinstance(path, unicode):
+      path = path.encode('utf-8')
 
-    url = self._make_url(path, params)
+    do_urlencode = True if params and 'directory' in params and '%' in params['directory'] else False
+
+    url = self._make_url(lib_urlquote(path), params, do_urlencode=do_urlencode)
 
     # For root stats, the root path needs to end with '/' before adding the query params.
     if params and 'action' in params and params['action'] == 'getAccessControl':
@@ -56,7 +62,6 @@ class RazHttpClient(HttpClient):
       url = ''.join(partition_url)
 
     sas_token = self.get_sas_token(http_method, self.username, url, params, headers)
-
     signed_url = url + ('?' if '?' not in url else '&') + sas_token
 
     # self._make_url is called in base class execute method as well,
