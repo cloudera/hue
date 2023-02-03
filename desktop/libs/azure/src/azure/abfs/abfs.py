@@ -587,7 +587,11 @@ class ABFS(object):
     """
     Renames a file
     """
-    headers = {'x-ms-rename-source': '/' + urllib_quote(Init_ABFS.strip_scheme(old))}
+    rename_source = Init_ABFS.strip_scheme(old)
+    if sys.version_info[0] < 3 and isinstance(rename_source, unicode):
+      rename_source = rename_source.encode('utf-8')
+
+    headers = {'x-ms-rename-source': '/' + urllib_quote(rename_source)}
 
     try:
       self._create_path(new, headers=headers, overwrite=True)
