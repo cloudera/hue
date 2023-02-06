@@ -33,7 +33,7 @@ import com.cloudera.hue.querystore.common.dto.SearchRequest;
 import com.cloudera.hue.querystore.common.entities.HiveQueryBasicInfo;
 import com.cloudera.hue.querystore.common.repository.HiveQueryBasicInfoRepository;
 import com.cloudera.hue.querystore.common.repository.PageData;
-import com.cloudera.hue.querystore.common.services.SanitizeUtility;
+import com.cloudera.hue.querystore.common.services.StandardizeParamsUtility;
 import com.cloudera.hue.querystore.common.services.SearchService;
 import com.cloudera.hue.querystore.common.util.MetaInfo;
 import com.cloudera.hue.querystore.eventProcessor.lifecycle.EventProcessorManager;
@@ -143,12 +143,12 @@ public class QuerySearchResource {
       return Response.status(Response.Status.BAD_REQUEST).entity("'facetField' query parameter is required.").build();
     }
 
-    String ifacetFields = SanitizeUtility.sanitizeQuery(facetFields);
+    String ifacetFields = StandardizeParamsUtility.sanitizeQuery(facetFields);
     Set<String> facetFieldSets = extractFacetFields(ifacetFields);
 
-    String iQueryText = SanitizeUtility.sanitizeQuery(queryText);
-    Long iStartTime = SanitizeUtility.sanitizeStartTime(startTime, endTime);
-    Long iEndTime = SanitizeUtility.sanitizeEndTime(startTime, endTime);
+    String iQueryText = StandardizeParamsUtility.sanitizeQuery(queryText);
+    Long iStartTime = StandardizeParamsUtility.sanitizeStartTime(startTime, endTime);
+    Long iEndTime = StandardizeParamsUtility.sanitizeEndTime(startTime, endTime);
 
     facetFieldSets = filterFacetable(HiveQueryBasicInfo.TABLE_INFORMATION, facetFieldSets);
 

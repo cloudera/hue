@@ -4,7 +4,7 @@ package com.cloudera.hue.querystore.common.services;
 /**
  * Utility to perform search-query sanitization
  */
-public class SanitizeUtility {
+public class StandardizeParamsUtility {
   private static final int DEFAULT_SEARCH_DURATION = 7 * 24 * 60 * 60 * 1000;
   private static final int MAX_LIMIT = 100;
 
