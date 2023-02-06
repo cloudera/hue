@@ -57,14 +57,16 @@ public class QuerySearchResource {
   private final EventProcessorManager eventProcessorManager;
   private final HiveQueryBasicInfoRepository repository;
   private final DasConfiguration dasConfig;
+  private AppAuthentication appAuth;
 
   @Inject
   public QuerySearchResource(SearchService searchService, EventProcessorManager eventProcessorManager, HiveQueryBasicInfoRepository repository,
-        DasConfiguration dasConfig) {
+        DasConfiguration dasConfig, AppAuthentication appAuth) {
     this.searchService = searchService;
     this.eventProcessorManager = eventProcessorManager;
     this.repository = repository;
     this.dasConfig = dasConfig;
+    this.appAuth = appAuth;
   }
 
   /**
@@ -134,8 +136,7 @@ public class QuerySearchResource {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("/facets")
-  public Response getFacetValuesNew(@QueryParam("text") String queryText,
-                                 @QueryParam("facetFields") String facetFields,
+  public Response getFacetValuesNew(@QueryParam("facetFields") String facetFields,
                                  @QueryParam("startTime") Long startTime,
                                  @QueryParam("endTime") Long endTime,
                                  @Context SecurityContext securityContext) {
@@ -146,14 +147,15 @@ public class QuerySearchResource {
     String ifacetFields = StandardizeParamsUtility.sanitizeQuery(facetFields);
     Set<String> facetFieldSets = extractFacetFields(ifacetFields);
 
-    String iQueryText = StandardizeParamsUtility.sanitizeQuery(queryText);
     Long iStartTime = StandardizeParamsUtility.sanitizeStartTime(startTime, endTime);
     Long iEndTime = StandardizeParamsUtility.sanitizeEndTime(startTime, endTime);
 
     facetFieldSets = filterFacetable(HiveQueryBasicInfo.TABLE_INFORMATION, facetFieldSets);
 
-    Optional<List<FacetValue>> facetValueList = repository.getFacetValues(facetFieldSets, iQueryText, iStartTime, iEndTime,
-        getEffectiveUser(securityContext), dasConfig.getConf(QP_FACETS_RESULT_LIMIT));
+    String userName = getEffectiveUser(securityContext);
+
+    Optional<List<FacetValue>> facetValueList = repository.getFacetValues(facetFieldSets, iStartTime, iEndTime,
+        userName, appAuth.getRole(userName), dasConfig.getConf(QP_FACETS_RESULT_LIMIT));
 
     Map<String, Object> response = ImmutableMap.of("facets", facetValueList.get());
 	return Response.ok(response).build();

@@ -382,6 +382,11 @@
         <artifactId>jdbi3-postgres</artifactId>
         <version>${jdbi.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.jdbi</groupId>
+        <artifactId>jdbi3-stringtemplate4</artifactId>
+        <version>${jdbi.version}</version>
+      </dependency>
 
       <dependency>
         <groupId>org.glassfish.jersey.core</groupId>

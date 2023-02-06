@@ -17,6 +17,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.MockitoAnnotations;
 
+import com.cloudera.hue.querystore.common.AppAuthentication;
 import com.cloudera.hue.querystore.common.dao.HiveQueryBasicInfoDao;
 import com.cloudera.hue.querystore.common.dto.FacetEntry;
 import com.cloudera.hue.querystore.common.dto.FacetValue;
@@ -29,7 +30,6 @@ public class HiveQueryBasicInfoRepositoryTest {
   private final String UNKNOWN_FACET_FIELD = "unknown_facet_field";
 
   private Set<String> facetFieldSets;
-  private String queryText;
   private Long startTime;
   private Long endTime;
   private String requestUser;
@@ -42,28 +42,27 @@ public class HiveQueryBasicInfoRepositoryTest {
     hiveQueryService = new HiveQueryBasicInfoRepository(hiveQueryBasicInfoDao);
 
     facetFieldSets = new HashSet<>(facetFields);
-    queryText = "";
     startTime = 1672311006606L;
     endTime = 1672915806606L;
     requestUser = "admin";
+    boolean userCheck = false;
     facetsResultLimit = 2;
 
-    when(hiveQueryBasicInfoDao.getFacetValues(UNKNOWN_FACET_FIELD, queryText, startTime, endTime, requestUser, facetsResultLimit)).thenReturn(Collections.emptyList());
-    when(hiveQueryBasicInfoDao.getFacetValues("tables_read", queryText, startTime, endTime, requestUser, facetsResultLimit)).thenReturn(getFacetValuesForTablesRead());
-    when(hiveQueryBasicInfoDao.getFacetValues("tables_written", queryText, startTime, endTime, requestUser, facetsResultLimit)).thenReturn(getFacetValuesForTablesWritten());
-    when(hiveQueryBasicInfoDao.getFacetValues("used_cbo", queryText, startTime, endTime, requestUser, facetsResultLimit)).thenReturn(getFacetValuesForUsedCBO());
+    when(hiveQueryBasicInfoDao.getFacetValues(UNKNOWN_FACET_FIELD, startTime, endTime, requestUser, userCheck, facetsResultLimit)).thenReturn(Collections.emptyList());
+    when(hiveQueryBasicInfoDao.getFacetValues("tables_read", startTime, endTime, requestUser, userCheck, facetsResultLimit)).thenReturn(getFacetValuesForTablesRead());
+    when(hiveQueryBasicInfoDao.getFacetValues("tables_written", startTime, endTime, requestUser, userCheck, facetsResultLimit)).thenReturn(getFacetValuesForTablesWritten());
+    when(hiveQueryBasicInfoDao.getFacetValues("used_cbo", startTime, endTime, requestUser, userCheck, facetsResultLimit)).thenReturn(getFacetValuesForUsedCBO());
+
+    // checking for the user-role USER, passing the userCheck as "true"
+    when(hiveQueryBasicInfoDao.getFacetValues("user_id", startTime, endTime, requestUser, !userCheck, facetsResultLimit)).thenReturn(getFacetValuesForUserId());
   }
 
   @Test
   public void testMultipleFacetResults() {
-    System.out.println("\n In testMultipleFacetResults\n=================================================");
-
     List<String> facetList = Arrays.asList("tables_read", "tables_written", "used_cbo");
     facetFieldSets = new HashSet<>(facetList);
-    Optional<List<FacetValue>> facetValueList = hiveQueryService.getFacetValues(facetFieldSets, queryText, startTime, endTime, requestUser, facetsResultLimit);
+    Optional<List<FacetValue>> facetValueList = hiveQueryService.getFacetValues(facetFieldSets, startTime, endTime, requestUser, AppAuthentication.Role.ADMIN, facetsResultLimit);
     List<FacetValue> facetValues = facetValueList.get();
-
-    print(facetValueList.get());
 
     Assert.assertTrue(facetValueList.isPresent());
     Assert.assertEquals(facetValues.size(), 3);
@@ -73,18 +72,10 @@ public class HiveQueryBasicInfoRepositoryTest {
     Assert.assertTrue(facetList.contains(facetValues.get(2).getFacetField()));
   }
 
-  private void print(List<FacetValue> facetValueList) {
-    for(FacetValue fv: facetValueList) {
-       System.out.println("fv.getFacetField() => " + fv.getFacetField() + ", fv.getValues()=" + fv.getValues());
-    }
-  }
-
   @Test
   public void testInvalidFacetName() {
-    System.out.println("\n In testInvalidFacetName\n=================================================");
-
     facetFieldSets = new HashSet<>(Arrays.asList(UNKNOWN_FACET_FIELD));
-    Optional<List<FacetValue>> facetValueList = hiveQueryService.getFacetValues(facetFieldSets, queryText, startTime, endTime, requestUser, facetsResultLimit);
+    Optional<List<FacetValue>> facetValueList = hiveQueryService.getFacetValues(facetFieldSets, startTime, endTime, requestUser, AppAuthentication.Role.ADMIN, facetsResultLimit);
 
     Assert.assertTrue(facetValueList.isPresent());
     Assert.assertEquals(facetValueList.get().size(), 1);
@@ -92,21 +83,26 @@ public class HiveQueryBasicInfoRepositoryTest {
 
   @Test
   public void testFewInvalidAndFewValidFacetNames() {
-    System.out.println("\n In testFewInvalidAndFewValidFacetNames\n=================================================");
-
     List<String> facetList = Arrays.asList("tables_read", "tables_written", UNKNOWN_FACET_FIELD);
 
     facetFieldSets = new HashSet<>(facetList);
-    Optional<List<FacetValue>> facetValueList = hiveQueryService.getFacetValues(facetFieldSets, queryText, startTime, endTime, requestUser, facetsResultLimit);
+    Optional<List<FacetValue>> facetValueList = hiveQueryService.getFacetValues(facetFieldSets, startTime, endTime, requestUser, AppAuthentication.Role.ADMIN, facetsResultLimit);
     List<FacetValue> facetValues = facetValueList.get();
-
-    print(facetValueList.get());
 
     Assert.assertTrue(facetValueList.isPresent());
     Assert.assertEquals(facetValues.size(), 3);
 
     Assert.assertTrue(facetList.contains(facetValues.get(0).getFacetField()));
     Assert.assertTrue(facetList.contains(facetValues.get(1).getFacetField()));
+  }
+
+  @Test
+  public void testUserRoleAsUser() {
+    facetFieldSets = new HashSet<>(Arrays.asList(UNKNOWN_FACET_FIELD));
+    Optional<List<FacetValue>> facetValueList = hiveQueryService.getFacetValues(facetFieldSets, startTime, endTime, requestUser, AppAuthentication.Role.USER, facetsResultLimit);
+
+    Assert.assertTrue(facetValueList.isPresent());
+    Assert.assertEquals(facetValueList.get().size(), 1);
   }
 
   private List<FacetEntry> getFacetValuesForTablesRead(){
@@ -161,6 +157,16 @@ public class HiveQueryBasicInfoRepositoryTest {
 
     facetEntries.add(facetEntry1);
     facetEntries.add(facetEntry2);
+    return facetEntries;
+  }
+
+  private List<FacetEntry> getFacetValuesForUserId(){
+    List<FacetEntry> facetEntries = new ArrayList<FacetEntry>();
+    FacetEntry facetEntry1 = new FacetEntry();
+    facetEntry1.setKey("hive");
+    facetEntry1.setValue(9L);
+
+    facetEntries.add(facetEntry1);
     return facetEntries;
   }
 }
