@@ -73,12 +73,12 @@ public class SearchService {
       Integer limit, Long startTime, Long endTime, List<SearchRequest.Facet> facets,
       List<SearchRequest.RangeFacet> rangeFacets, String username) {
 
-    int iOffset = SanitizeUtility.sanitizeOffset(offset);
-    int iLimit = SanitizeUtility.sanitizeLimit(limit);
-    String iQueryText = SanitizeUtility.sanitizeQuery(queryText);
-    String iSortText = SanitizeUtility.sanitizeQuery(sortText);
-    Long iEndTime = SanitizeUtility.sanitizeEndTime(startTime, endTime);
-    Long iStartTime = SanitizeUtility.sanitizeStartTime(startTime, endTime);
+    int iOffset = StandardizeParamsUtility.sanitizeOffset(offset);
+    int iLimit = StandardizeParamsUtility.sanitizeLimit(limit);
+    String iQueryText = StandardizeParamsUtility.sanitizeQuery(queryText);
+    String iSortText = StandardizeParamsUtility.sanitizeQuery(sortText);
+    Long iEndTime = StandardizeParamsUtility.sanitizeEndTime(startTime, endTime);
+    Long iStartTime = StandardizeParamsUtility.sanitizeStartTime(startTime, endTime);
 
     QueryParseResult parseResult = basicParser.parse(iQueryText);
     SortParseResult sortParseResult = sortInputParser.parse(iSortText);
