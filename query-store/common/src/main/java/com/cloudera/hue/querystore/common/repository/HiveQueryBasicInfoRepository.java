@@ -14,6 +14,8 @@ import org.jdbi.v3.core.mapper.JoinRow;
 import org.jdbi.v3.core.mapper.JoinRowMapper;
 import org.jdbi.v3.core.mapper.reflect.BeanMapper;
 
+import com.cloudera.hue.querystore.common.AppAuthentication;
+import com.cloudera.hue.querystore.common.AppAuthentication.Role;
 import com.cloudera.hue.querystore.common.dao.HiveQueryBasicInfoDao;
 import com.cloudera.hue.querystore.common.dto.FacetEntry;
 import com.cloudera.hue.querystore.common.dto.FacetValue;
@@ -46,13 +48,6 @@ public class HiveQueryBasicInfoRepository extends JdbiRepository<HiveQueryBasicI
   public Long executeSearchCountQuery(String countQuery, Map<String, Object> parameters) {
     return getDao().withHandle(handle -> handle.createQuery(countQuery).bindMap(parameters)
         .mapTo(Long.class).findFirst().orElse(0l));
-  }
-
-  public List<FacetEntry> executeFacetQuery(String query, Map<String, Object> parameters) {
-    return getDao().withHandle(handle -> {
-      handle.registerRowMapper(BeanMapper.factory(FacetEntry.class));
-        return handle.createQuery(query).bindMap(parameters).mapTo(FacetEntry.class).list();
-    });
   }
 
   public Optional<HiveQueryBasicInfo> findByHiveQueryId(String queryId) {
@@ -110,12 +105,14 @@ public class HiveQueryBasicInfoRepository extends JdbiRepository<HiveQueryBasicI
     return dao.purge();
   }
 
-  public Optional<List<FacetValue>> getFacetValues(Set<String> facetFieldSets, String queryText, long startTime,
-        long endTime, String userName, int facetsResultLimit) {
+  public Optional<List<FacetValue>> getFacetValues(Set<String> facetFieldSets, long startTime,
+        long endTime, String userName, Role userRole, int facetsResultLimit) {
 
     List<FacetValue> facetValueList = new ArrayList<FacetValue>();
+    boolean userCheck = !AppAuthentication.Role.ADMIN.equals(userRole);
+
     for (String facetField: facetFieldSets) {
-      List<FacetEntry> facetEntry = dao.getFacetValues(facetField, queryText, startTime, endTime, userName, facetsResultLimit);
+      List<FacetEntry> facetEntry = dao.getFacetValues(facetField, startTime, endTime, userName, userCheck, facetsResultLimit);
       facetValueList.add(new FacetValue(facetField, facetEntry));
     }
     return Optional.of(facetValueList);

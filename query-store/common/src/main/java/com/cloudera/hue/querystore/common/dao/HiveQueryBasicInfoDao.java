@@ -9,6 +9,7 @@ import org.jdbi.v3.sqlobject.customizer.Define;
 import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
+import org.jdbi.v3.stringtemplate4.UseStringTemplateEngine;
 
 import com.cloudera.hue.querystore.common.dto.FacetEntry;
 import com.cloudera.hue.querystore.common.entities.HiveQueryBasicInfo;
@@ -78,6 +79,14 @@ public interface HiveQueryBasicInfoDao extends JdbiDao<HiveQueryBasicInfo> {
   int purge();
 
   @RegisterBeanMapper(FacetEntry.class)
-  @SqlQuery("select <facetField> as key, count(<facetField>) as value from hive_query where start_time >= :startTime AND start_time <= :endTime AND request_user = :userName GROUP BY <facetField> ORDER BY count(<facetField>) DESC LIMIT :facetsResultLimit")
-  List<FacetEntry> getFacetValues(@Define("facetField") String facetField, @Bind("queryText") String queryText, @Bind("startTime") long startTime, @Bind("endTime") long endTime, @Bind("userName") String userName, @Bind("facetsResultLimit")  int facetsResultLimit);
+  @SqlQuery("select <facetField> as key, count(<facetField>) as value from hive_query " +
+      "where start_time >= :startTime AND start_time \\<= :endTime " +
+      "<if(userCheck)> AND request_user = :userName <endif> " +
+      "GROUP BY <facetField> " +
+      "ORDER BY count(<facetField>) DESC LIMIT :facetsResultLimit")
+  @UseStringTemplateEngine
+  List<FacetEntry> getFacetValues(@Define("facetField") String facetField,
+      @Bind("startTime") long startTime, @Bind("endTime") long endTime,
+      @Bind("userName") String userName, @Define("userCheck") boolean userCheck,
+      @Bind("facetsResultLimit")  int facetsResultLimit);
 }
