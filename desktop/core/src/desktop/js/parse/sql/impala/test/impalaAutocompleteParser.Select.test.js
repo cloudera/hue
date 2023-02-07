@@ -359,6 +359,30 @@ describe('impalaAutocompleteParser.js SELECT statements', () => {
       });
     });
 
+    it('should handle "SELECT * FROM ice_t FOR SYSTEM_TIME AS OF now() - interval 5 days;"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT * FROM ice_t FOR SYSTEM_TIME AS OF now() - interval 5 days; ',
+        afterCursor: '',
+        noErrors: true,
+        containsKeywords: ['SELECT'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
+    it('should handle "SELECT * FROM ice_t FOR SYSTEM_VERSION AS OF 123456;"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT * FROM ice_t FOR SYSTEM_VERSION AS OF 123456; ',
+        afterCursor: '',
+        noErrors: true,
+        containsKeywords: ['SELECT'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
     it('should suggest columns "SELECT IF(baa, boo, bee) AS b, | FROM testTable;"', () => {
       assertAutoComplete({
         beforeCursor: 'SELECT IF(baa, boo, bee) AS b, ',
@@ -3152,6 +3176,8 @@ describe('impalaAutocompleteParser.js SELECT statements', () => {
         },
         suggestKeywords: [
           'AS',
+          'FOR SYSTEM_TIME AS OF',
+          'FOR SYSTEM_VERSION AS OF',
           'WHERE',
           'GROUP BY',
           'HAVING',
@@ -3178,6 +3204,62 @@ describe('impalaAutocompleteParser.js SELECT statements', () => {
           'RIGHT SEMI JOIN',
           'SEMI JOIN'
         ]
+      }
+    });
+  });
+
+  it('should suggest keywords for "SELECT * FROM testTableA FOR |"', () => {
+    assertAutoComplete({
+      beforeCursor: 'SELECT * FROM testTableA FOR ',
+      afterCursor: '',
+      expectedResult: {
+        lowerCase: false,
+        suggestKeywords: ['SYSTEM_TIME AS OF', 'SYSTEM_VERSION AS OF']
+      }
+    });
+  });
+
+  it('should suggest keywords for "SELECT * FROM SYSTEM_TIME FOR |"', () => {
+    assertAutoComplete({
+      beforeCursor: 'SELECT * FROM testTableA FOR SYSTEM_TIME ',
+      afterCursor: '',
+      expectedResult: {
+        lowerCase: false,
+        suggestKeywords: ['AS OF']
+      }
+    });
+  });
+
+  it('should suggest keywords for "SELECT * FROM SYSTEM_VERSION FOR |"', () => {
+    assertAutoComplete({
+      beforeCursor: 'SELECT * FROM testTableA FOR SYSTEM_VERSION ',
+      afterCursor: '',
+      expectedResult: {
+        lowerCase: false,
+        suggestKeywords: ['AS OF']
+      }
+    });
+  });
+
+  it('should suggest keywords for "SELECT * FROM SYSTEM_TIME FOR AS |"', () => {
+    assertAutoComplete({
+      beforeCursor: 'SELECT * FROM testTableA FOR SYSTEM_TIME AS ',
+      afterCursor: '',
+      expectedResult: {
+        lowerCase: false,
+        suggestKeywords: ['OF']
+      }
+    });
+  });
+
+  it('should suggest keywords for "SELECT * FROM SYSTEM_TIME FOR AS OF |"', () => {
+    assertAutoComplete({
+      beforeCursor: 'SELECT * FROM testTableA FOR SYSTEM_VERSION AS OF ',
+      afterCursor: '',
+      containsKeywords: ['INTERVAL'],
+      expectedResult: {
+        lowerCase: false,
+        suggestFunctions: {}
       }
     });
   });
@@ -6537,6 +6619,8 @@ describe('impalaAutocompleteParser.js SELECT statements', () => {
             tables: [{ identifierChain: [{ name: 'table1' }], alias: 't1' }]
           },
           suggestKeywords: [
+            'FOR SYSTEM_TIME AS OF',
+            'FOR SYSTEM_VERSION AS OF',
             'TABLESAMPLE',
             'ANTI',
             'CROSS',

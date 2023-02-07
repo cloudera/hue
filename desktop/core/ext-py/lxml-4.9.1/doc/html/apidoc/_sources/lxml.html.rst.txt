@@ -1,0 +1,28 @@
+lxml.html package
+=================
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   lxml.html.ElementSoup
+   lxml.html._diffcommand
+   lxml.html._setmixin
+   lxml.html.builder
+   lxml.html.clean
+   lxml.html.defs
+   lxml.html.diff
+   lxml.html.formfill
+   lxml.html.html5parser
+   lxml.html.soupparser
+
+Module contents
+---------------
+
+.. automodule:: lxml.html
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:

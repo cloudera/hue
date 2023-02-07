@@ -18,7 +18,10 @@
 import sys
 
 from builtins import object
-from nose.tools import assert_equal, assert_true, assert_false
+from nose.tools import assert_equal, assert_true, assert_false, assert_raises
+
+from desktop.lib.django_test_util import make_logged_in_client
+from useradmin.models import User
 
 from notebook.connectors.spark_shell import SparkApi
 
@@ -31,7 +34,9 @@ else:
 class TestSparkApi(object):
 
   def setUp(self):
-    self.user = 'hue_test'
+    self.client = make_logged_in_client(username="hue_test", groupname="default", recreate=True, is_superuser=False)
+    self.user = User.objects.get(username="hue_test")
+
     self.interpreter = {
         'name': 'livy',
         'options': {
@@ -49,6 +54,7 @@ class TestSparkApi(object):
     spark_api = self.api.get_api()
     assert_equal(spark_api.__class__.__name__, 'LivyClient')
 
+
   def test_get_livy_props_method(self):
     test_properties = [{
         "name": "files",
@@ -57,9 +63,11 @@ class TestSparkApi(object):
     props = self.api.get_livy_props('scala', test_properties)
     assert_equal(props['files'], ['file_a', 'file_b', 'file_c'])
 
+
   def test_create_session_with_config(self):
     lang = 'pyspark'
     properties = None
+    session_key = self.api._get_session_key()
 
     with patch('notebook.connectors.spark_shell.get_spark_api') as get_spark_api:
       with patch('notebook.connectors.spark_shell.DefaultConfiguration') as DefaultConfiguration:
@@ -82,19 +90,26 @@ class TestSparkApi(object):
           # Case with user configuration. Expected 2 driverCores
           USE_DEFAULT_CONFIGURATION.get.return_value = True
           session = self.api.create_session(lang=lang, properties=properties)
+
           assert_equal(session['type'], 'pyspark')
           assert_equal(session['id'], '1')
+
           for p in session['properties']:
             if p['name'] == 'driverCores':
               cores = p['value']
           assert_equal(cores, 2)
 
+          if self.api._get_session_info_from_user():
+            self.api._remove_session_info_from_user()
+
           # Case without user configuration. Expected 1 driverCores
           USE_DEFAULT_CONFIGURATION.get.return_value = True
           DefaultConfiguration.objects.get_configuration_for_user.return_value = None
           session2 = self.api.create_session(lang=lang, properties=properties)
+
           assert_equal(session2['type'], 'pyspark')
           assert_equal(session2['id'], '1')
+
           for p in session2['properties']:
             if p['name'] == 'driverCores':
               cores = p['value']
@@ -103,16 +118,20 @@ class TestSparkApi(object):
           # Case with no user configuration. Expected 1 driverCores
           USE_DEFAULT_CONFIGURATION.get.return_value = False
           session3 = self.api.create_session(lang=lang, properties=properties)
+
           assert_equal(session3['type'], 'pyspark')
           assert_equal(session3['id'], '1')
+
           for p in session3['properties']:
             if p['name'] == 'driverCores':
               cores = p['value']
           assert_equal(cores, 1)
 
+
   def test_create_session_plain(self):
     lang = 'pyspark'
     properties = None
+    session_key = self.api._get_session_key()
 
     with patch('notebook.connectors.spark_shell.get_spark_api') as get_spark_api:
       get_spark_api.return_value = Mock(
@@ -132,6 +151,314 @@ class TestSparkApi(object):
       files_properties = [prop for prop in session['properties'] if prop['name'] == 'files']
       assert_true(files_properties, session['properties'])
       assert_equal(files_properties[0]['value'], [], session['properties'])
+
+
+  def test_execute(self):
+    with patch('notebook.connectors.spark_shell._get_snippet_session') as _get_snippet_session:
+      with patch('notebook.connectors.spark_shell.get_spark_api') as get_spark_api:
+        notebook = Mock()
+        snippet = {'statement': 'select * from test_table'}
+        _get_snippet_session.return_value = {'id': '1'}
+
+        get_spark_api.return_value = Mock(
+          submit_statement=Mock(
+            return_value={'id': 'test_id'}
+          )
+        )
+        self.api._check_session = Mock(return_value={'id': '1'})
+
+        response = self.api.execute(notebook, snippet)
+        assert_equal(response['id'], 'test_id')
+
+        get_spark_api.return_value = Mock(
+          submit_statement=Mock()
+        )
+        assert_raises(Exception, self.api.execute, notebook, snippet)
+
+
+  def test_check_status(self):
+    with patch('notebook.connectors.spark_shell._get_snippet_session') as _get_snippet_session:
+      with patch('notebook.connectors.spark_shell.get_spark_api') as get_spark_api:
+        notebook = Mock()
+        snippet = {
+          'result': {
+            'handle': {
+              'id': {'test_id'}
+            }
+          }
+        }
+        _get_snippet_session.return_value = {'id': '1'}
+
+        get_spark_api.return_value = Mock(
+          fetch_data=Mock(
+            return_value={'state': 'test_state'}
+          )
+        )
+        self.api._handle_session_health_check = Mock(return_value={'id': '1'})
+
+        response = self.api.check_status(notebook, snippet)
+        assert_equal(response['status'], 'test_state')
+
+        get_spark_api.return_value = Mock(
+          submit_statement=Mock()
+        )
+        assert_raises(Exception, self.api.check_status, notebook, snippet)
+  
+
+  def test_get_sample_data(self):
+    snippet = Mock()
+    self.api._execute = Mock(
+      return_value='test_value'
+    )
+    self.api.create_session = Mock(
+      return_value={
+        'id': 'test_id'
+      }
+    )
+    self.api._check_status_and_fetch_result = Mock(
+      return_value={
+        'data': 'test_data',
+        'meta': 'test_meta'
+      }
+    )
+
+    # When table is transactional
+    self.api.describe_table = Mock(
+      return_value={
+        'stats': [{
+          'data_type': 'transactional',
+          'col_name': 'true',
+          'comment': ''
+        }]
+      }
+    )
+    response = self.api.get_sample_data(snippet, 'test_db', 'test_table', 'test_column')
+
+    assert_equal(response['rows'], [])
+    assert_equal(response['full_headers'], [])
+
+    # When table is not transactional
+    self.api.describe_table = Mock(
+      return_value={
+        'stats': [] # No details regarding transactionality is present in describe response
+      }
+    )
+    response = self.api.get_sample_data(snippet, 'test_db', 'test_table', 'test_column')
+
+    assert_equal(response['rows'], 'test_data')
+    assert_equal(response['full_headers'], 'test_meta')
+  
+
+  def test_get_select_query(self):
+    # With operation as 'hello'
+    response = self.api._get_select_query('test_db', 'test_table', 'test_column', 'hello')
+    assert_equal(response, "SELECT 'Hello World!'")
+
+    # Without column name
+    response = self.api._get_select_query('test_db', 'test_table')
+    assert_equal(response, 'SELECT *\nFROM test_db.test_table\nLIMIT 100\n')
+
+    # With some column name
+    response = self.api._get_select_query('test_db', 'test_table', 'test_column')
+    assert_equal(response, 'SELECT test_column\nFROM test_db.test_table\nLIMIT 100\n')
+
+
+  def test_describe_database(self):
+    notebook = Mock()
+    snippet = Mock()
+    self.api.create_session = Mock(
+      return_value={
+        'id': 'test_id'
+      }
+    )
+    self.api._execute = Mock(
+      return_value='test_value'
+    )
+    self.api._check_status_and_fetch_result = Mock(
+      return_value={
+        'data': [
+          ['Namespace Name', 'employees'],
+          ['Comment', 'For software companies'],
+          ['Location', 'hdfs://test_url:8020/warehouse/tablespace/external/hive/employees.db'],
+          ['Owner', 'demo'],
+          ['Properties', '((Create-by,Kevin), (Create-date,09/01/2019))']],
+        'images': [],
+        'meta': [
+          {'comment': '', 'name': 'info_name', 'type': 'string'},
+          {'comment': '', 'name': 'info_value', 'type': 'string'}],
+        'type': 'table'}
+    )
+    response = self.api.describe_database(notebook, snippet, 'employees')
+
+    assert_equal(response, {
+      'comment': 'For software companies',
+      'db_name': 'employees',
+      'location': 'hdfs://test_url:8020/warehouse/tablespace/external/hive/employees.db',
+      'owner_name': 'demo',
+      'parameters': '{Create-by=Kevin, Create-date=09/01/2019}',
+      'status': 0})
+
+
+  def test_describe_table(self):
+    notebook = Mock()
+    snippet = Mock()
+    self.api.create_session = Mock(
+      return_value={
+        'id': 'test_id'
+      }
+    )
+    self.api._execute = Mock(
+      return_value='test_value'
+    )
+    self.api._check_status_and_fetch_result = Mock(
+      return_value={
+        'data': [
+          ['nname', 'string', None],
+          ['# Partition Information', '', ''],
+          ['# col_name', 'data_type', 'comment'],
+          ['state', 'string', 'null'],
+          ['', '', ''],
+          ['# Detailed Table Information', '', ''],
+          ['Database', 'default', ''],
+          ['Table', 'test_nonacid', ''],
+          ['Owner', 'demo', ''],
+          ['Created Time', 'Tue Jun 28 11:35:33 UTC 2022', ''],
+          ['Last Access', 'UNKNOWN', ''],
+          ['Created By', 'Spark 3.3.0.7.2.16.0-94', ''],
+          ['Type', 'EXTERNAL', ''],
+          ['Provider', 'hive', ''],
+          ['Table Properties',
+            '[TRANSLATED_TO_EXTERNAL=TRUE, bucketing_version=2, '
+            'external.table.purge=TRUE, numFilesErasureCoded=0, '
+            'transient_lastDdlTime=1656416152]',
+            ''],
+          ['Statistics', '6 bytes', ''],
+          ['Location',
+            'hdfs://test_url:8020/warehouse/tablespace/external/hive/test_nonacid',
+            ''],
+          ['Serde Library',
+            'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe',
+            ''],
+          ['InputFormat', 'org.apache.hadoop.mapred.TextInputFormat', ''],
+          ['OutputFormat',
+            'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat',
+            ''],
+          ['Storage Properties', '[serialization.format=1]', ''],
+          ['Partition Provider', 'Catalog', '']],
+        'images': [],
+        'meta': [
+          {'comment': '', 'name': 'col_name', 'type': 'string'},
+          {'comment': '', 'name': 'data_type', 'type': 'string'},
+          {'comment': '', 'name': 'comment', 'type': 'string'}],
+        'type': 'table'
+      }
+    )
+    response = self.api.describe_table(notebook, snippet, 'default', 'test_nonacid')
+
+    assert_equal(response, {
+      'cols': [{'comment': 'None', 'name': 'nname', 'type': 'string'}],
+      'comment': '',
+      'details': {'properties': {
+        'create_time': 'Tue Jun 28 11:35:33 UTC 2022',
+        'format': 'text',
+        'owner': 'demo',
+        'table_type': 'EXTERNAL'},
+      'stats': [
+        {
+          'col_name': 'TRUE',
+          'comment': '',
+          'data_type': 'TRANSLATED_TO_EXTERNAL'},
+        {
+          'col_name': '2',
+          'comment': '',
+          'data_type': 'bucketing_version'},
+        {
+          'col_name': 'TRUE',
+          'comment': '',
+          'data_type': 'external.table.purge'},
+        {
+          'col_name': '0',
+          'comment': '',
+          'data_type': 'numFilesErasureCoded'},
+        {
+          'col_name': '1656416152',
+          'comment': '',
+          'data_type': 'transient_lastDdlTime'}]},
+      'hdfs_link': '/filebrowser/view=/warehouse/tablespace/external/hive/test_nonacid',
+      'is_view': False,
+      'name': 'test_nonacid',
+      'partition_keys': [{'name': 'state', 'type': 'string'}],
+      'path_location': 'hdfs://test_url:8020/warehouse/tablespace/external/hive/test_nonacid',
+      'primary_keys': [],
+      'properties': [{'col_name': '# Partition Information',
+                      'comment': '',
+                      'data_type': ''},
+                      {'col_name': '# col_name',
+                      'comment': 'comment',
+                      'data_type': 'data_type'},
+                      {'col_name': 'state', 'comment': 'null', 'data_type': 'string'},
+                      {'col_name': '', 'comment': '', 'data_type': ''},
+                      {'col_name': '# Detailed Table Information',
+                      'comment': '',
+                      'data_type': ''},
+                      {'col_name': 'Database', 'comment': '', 'data_type': 'default'},
+                      {'col_name': 'Table',
+                      'comment': '',
+                      'data_type': 'test_nonacid'},
+                      {'col_name': 'Owner', 'comment': '', 'data_type': 'demo'},
+                      {'col_name': 'Created Time',
+                      'comment': '',
+                      'data_type': 'Tue Jun 28 11:35:33 UTC 2022'},
+                      {'col_name': 'Last Access',
+                      'comment': '',
+                      'data_type': 'UNKNOWN'},
+                      {'col_name': 'Created By',
+                      'comment': '',
+                      'data_type': 'Spark 3.3.0.7.2.16.0-94'},
+                      {'col_name': 'Type', 'comment': '', 'data_type': 'EXTERNAL'},
+                      {'col_name': 'Provider', 'comment': '', 'data_type': 'hive'},
+                      {'col_name': 'Table Properties',
+                      'comment': '',
+                      'data_type': '[TRANSLATED_TO_EXTERNAL=TRUE, '
+                                    'bucketing_version=2, external.table.purge=TRUE, '
+                                    'numFilesErasureCoded=0, '
+                                    'transient_lastDdlTime=1656416152]'},
+                      {'col_name': 'Statistics',
+                      'comment': '',
+                      'data_type': '6 bytes'},
+                      {'col_name': 'Location',
+                      'comment': '',
+                      'data_type': 'hdfs://test_url:8020/warehouse/tablespace/external/hive/test_nonacid'},
+                      {'col_name': 'Serde Library',
+                      'comment': '',
+                      'data_type': 'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe'},
+                      {'col_name': 'InputFormat',
+                      'comment': '',
+                      'data_type': 'org.apache.hadoop.mapred.TextInputFormat'},
+                      {'col_name': 'OutputFormat',
+                      'comment': '',
+                      'data_type': 'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'},
+                      {'col_name': 'Storage Properties',
+                      'comment': '',
+                      'data_type': '[serialization.format=1]'},
+                      {'col_name': 'Partition Provider',
+                      'comment': '',
+                      'data_type': 'Catalog'}],
+      'stats': [{'col_name': 'TRUE',
+                  'comment': '',
+                  'data_type': 'TRANSLATED_TO_EXTERNAL'},
+                {'col_name': '2', 'comment': '', 'data_type': 'bucketing_version'},
+                {'col_name': 'TRUE',
+                  'comment': '',
+                  'data_type': 'external.table.purge'},
+                {'col_name': '0',
+                  'comment': '',
+                  'data_type': 'numFilesErasureCoded'},
+                {'col_name': '1656416152',
+                  'comment': '',
+                  'data_type': 'transient_lastDdlTime'}],
+      'status': 0})
+
 
   def test_get_jobs(self):
     local_jobs = [

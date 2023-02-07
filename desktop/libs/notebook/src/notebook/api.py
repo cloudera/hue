@@ -1045,7 +1045,9 @@ def describe(request, database, table=None, column=None):
 
 
 def _get_snippet(user, notebook, snippet, operation_id):
-  if operation_id or not snippet:
+  # snippet is not complete so we are extracting it again for the editor call
+  snippet_has_guid = snippet.get('result') and snippet['result'].get('handle') and snippet['result']['handle'].get('guid')
+  if operation_id or not snippet or not snippet_has_guid:
     nb_doc = Document2.objects.get_by_uuid(user=user, uuid=operation_id or notebook.get('uuid'))
     notebook = Notebook(document=nb_doc).get_data()
     snippet = notebook['snippets'][0]

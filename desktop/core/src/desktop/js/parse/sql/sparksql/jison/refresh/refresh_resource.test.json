@@ -1,0 +1,11 @@
+[
+  {
+    "namePrefix": "should not find errors",
+    "beforeCursor": "REFRESH \"hdfs://path/to/table\";",
+    "afterCursor": "",
+    "noErrors": true,
+    "containsKeywords": [
+      "SELECT"
+    ]
+  }
+]

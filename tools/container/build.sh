@@ -27,6 +27,7 @@ CONTAINER_HUE_OPT=/opt
 # This step is performed inside the docker(compile step)
 compile_py3hue() {
   export HUE_HOME="/opt/${HUEUSER}"
+  export ROOT="/opt/${HUEUSER}"
   mkdir -p $CONTAINER_HUE_OPT
   cd $CONTAINER_HUE_SRC
   INSTALL_DIR=${HUE_HOME} make install
@@ -61,6 +62,9 @@ docker_hue_build() {
   cd $HUE_DIR
   cp -a $BUILD_DIR/${HUEUSER} $HUE_DIR
   rm -f $HUE_DIR/${HUEUSER}/desktop/conf/*
+
+  # Remove chardet package
+  rm -rf $HUE_DIR/${HUEUSER}/tools/virtual-bootstrap/virtualenv_support
 
   # Reduce Hue container size
   rm -rf $HUE_DIR/${HUEUSER}/node_modules
@@ -193,10 +197,10 @@ else
   hue_containers_build
 
   # Perform any other container build process
-  #extra_container_build=$(find_extra_container_to_build)
-  #if test -n "$extra_container_build"; then
-  #  $extra_container_build
-  #fi
+  extra_container_build=$(find_extra_container_to_build)
+  if test -n "$extra_container_build"; then
+    $extra_container_build
+  fi
 
   # Wait for the parallel jobs to finish
   wait_for_parallel_jobs

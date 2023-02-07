@@ -15,9 +15,10 @@
 // limitations under the License.
 
 import { TypeConversion } from 'sql/reference/types';
+import { TYPE_CONVERSION as GENERIC_TYPE_CONVERSION } from './generic/typeConversion';
 import { TYPE_CONVERSION as HIVE_TYPE_CONVERSION } from './hive/typeConversion';
 import { TYPE_CONVERSION as IMPALA_TYPE_CONVERSION } from './impala/typeConversion';
-import { TYPE_CONVERSION as GENERIC_TYPE_CONVERSION } from './generic/typeConversion';
+import { TYPE_CONVERSION as SPARKSQL_TYPE_CONVERSION } from './sparksql/typeConversion';
 
 const stripPrecision = (types: string[]): string[] => {
   const result: string[] = [];
@@ -32,13 +33,16 @@ const stripPrecision = (types: string[]): string[] => {
 };
 
 const getTypeConversion = (dialect: string): TypeConversion => {
-  if (dialect === 'impala') {
-    return IMPALA_TYPE_CONVERSION;
+  switch (dialect) {
+    case 'hive':
+      return HIVE_TYPE_CONVERSION;
+    case 'impala':
+      return IMPALA_TYPE_CONVERSION;
+    case 'sparksql':
+      return SPARKSQL_TYPE_CONVERSION;
+    default:
+      return GENERIC_TYPE_CONVERSION;
   }
-  if (dialect === 'hive') {
-    return HIVE_TYPE_CONVERSION;
-  }
-  return GENERIC_TYPE_CONVERSION;
 };
 
 /**

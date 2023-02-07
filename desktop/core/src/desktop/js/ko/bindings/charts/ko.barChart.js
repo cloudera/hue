@@ -29,10 +29,19 @@ import {
 } from 'ko/bindings/charts/chartUtils';
 import huePubSub from 'utils/huePubSub';
 
+const getChartType = options => {
+  if (typeof options?.type === 'function') {
+    const typeResult = options.type();
+    return Array.isArray(typeResult) ? typeResult[0] : typeResult;
+  } else if (typeof console.warn !== 'undefined') {
+    console.warn('Expected chart options type to be a function');
+  }
+};
+
 ko.bindingHandlers.barChart = {
   init: function (element, valueAccessor) {
     const _options = ko.unwrap(valueAccessor());
-    if (_options.type && _options.type() === 'line') {
+    if (getChartType(_options) === 'line') {
       window.setTimeout(() => {
         lineChartBuilder(element, valueAccessor(), false);
       }, 0);
@@ -46,11 +55,16 @@ ko.bindingHandlers.barChart = {
   },
   update: function (element, valueAccessor) {
     const _options = ko.unwrap(valueAccessor());
-    if (_options.type && _options.type() !== $(element).data('type')) {
+    const chosenChartType = getChartType(_options);
+    const renderedChartType = $(element).data('type');
+    const chartTypeHasChanged = chosenChartType !== renderedChartType;
+    const chartNotBuilt = !$(element).data('chart');
+
+    if (chartTypeHasChanged || chartNotBuilt) {
       if ($(element).find('svg').length > 0) {
         $(element).find('svg').remove();
       }
-      if (_options.type() === 'line') {
+      if (chosenChartType === 'line') {
         window.setTimeout(() => {
           lineChartBuilder(element, valueAccessor(), false);
         }, 0);
@@ -59,7 +73,7 @@ ko.bindingHandlers.barChart = {
           barChartBuilder(element, valueAccessor(), false);
         }, 0);
       }
-      $(element).data('type', _options.type());
+      $(element).data('type', chosenChartType);
     }
     const _datum = _options.transformer(_options.datum);
     const _chart = $(element).data('chart');

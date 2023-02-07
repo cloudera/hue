@@ -1,0 +1,197 @@
+[
+  {
+    "namePrefix": "should not find errors",
+    "beforeCursor": "LOAD DATA LOCAL INPATH '/warehouse/test_partition/c2=2/c3=3'\n    OVERWRITE INTO TABLE test_load_partition PARTITION (c2=2, c3=3);",
+    "afterCursor": "",
+    "noErrors": true,
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "",
+    "afterCursor": "",
+    "containsKeywords": [
+      "LOAD"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "LOAD ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "DATA INPATH",
+        "DATA LOCAL INPATH"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "LOAD DATA ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "INPATH",
+        "LOCAL INPATH"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "LOAD DATA LOCAL ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "INPATH"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest files",
+    "beforeCursor": "LOAD DATA INPATH '",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestHdfs": {
+        "path": ""
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest files",
+    "beforeCursor": "LOAD DATA INPATH '/foo",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestHdfs": {
+        "path": "/"
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest files",
+    "beforeCursor": "LOAD DATA INPATH '/foo/",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestHdfs": {
+        "path": "/foo/"
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "LOAD DATA LOCAL INPATH '/boo' ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "INTO TABLE",
+        "OVERWRITE INTO TABLE"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "LOAD DATA LOCAL INPATH '/boo' ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "INTO TABLE",
+        "OVERWRITE INTO TABLE"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "LOAD DATA LOCAL INPATH '/boo' OVERWRITE ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "INTO TABLE"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "LOAD DATA LOCAL INPATH '/boo' OVERWRITE INTO ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "TABLE"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "LOAD DATA LOCAL INPATH '/boo' INTO ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "TABLE"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest tables",
+    "beforeCursor": "LOAD DATA LOCAL INPATH '/boo' INTO TABLE ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestTables": {},
+      "suggestDatabases": {
+        "appendDot": true
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest tables",
+    "beforeCursor": "LOAD DATA LOCAL INPATH '/boo' OVERWRITE INTO TABLE foo.",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestTables": {
+        "identifierChain": [
+          {
+            "name": "foo"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "LOAD DATA LOCAL INPATH '/boo' INTO TABLE foo ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "PARTITION"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest columns",
+    "beforeCursor": "LOAD DATA LOCAL INPATH '/boo' INTO TABLE foo PARTITION (",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestColumns": { "tables": [{ "identifierChain": [{ "name": "foo" }] }] }
+    }
+  }
+]

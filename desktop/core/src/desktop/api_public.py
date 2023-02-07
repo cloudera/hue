@@ -19,7 +19,8 @@ import logging
 import json
 
 from django.http import QueryDict, HttpResponse
-from rest_framework.decorators import api_view
+from rest_framework.permissions import AllowAny
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
 
 from filebrowser import views as filebrowser_views, api as filebrowser_api
 from indexer import api3 as indexer_api3
@@ -52,6 +53,10 @@ def get_context_namespaces(request, interface):
   django_request = get_django_request(request)
   return desktop_api.get_context_namespaces(django_request, interface)
 
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def get_banners(request):
+  return desktop_api.get_banners(request)
 
 # Editor
 
@@ -189,10 +194,10 @@ def analyze_table(request, dialect, database, table, columns=None):
 
 # Storage
 
-@api_view(["POST"])
+@api_view(["GET"])
 def storage_get_filesystems(request):
   django_request = get_django_request(request)
-  return filebrowser_api.get_filesystems(django_request)
+  return filebrowser_api.get_filesystems_with_home_dirs(django_request)
 
 @api_view(["GET"])
 def storage_view(request, path):
@@ -208,6 +213,11 @@ def storage_download(request, path):
 def storage_upload_file(request):
   django_request = get_django_request(request)
   return filebrowser_views.upload_file(django_request)
+
+@api_view(["POST"])
+def storage_mkdir(request):
+  django_request = get_django_request(request)
+  return filebrowser_views.mkdir(django_request)
 
 
 # Importer

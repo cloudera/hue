@@ -1,0 +1,8 @@
+lxml.html.builder module
+========================
+
+.. automodule:: lxml.html.builder
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:

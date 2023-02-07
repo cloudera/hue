@@ -46,10 +46,10 @@ from hadoop.fs.webhdfs_types import WebHdfsStat, WebHdfsContentSummary
 from hadoop.hdfs_site import get_nn_sentry_prefixes, get_umask_mode, get_supergroup, get_webhdfs_ssl
 
 if sys.version_info[0] > 2:
-  from urllib.parse import unquote as urllib_quote, urlparse
+  from urllib.parse import unquote as urllib_unquote, urlparse
   from django.utils.translation import gettext as _
 else:
-  from urllib import unquote as urllib_quote
+  from urllib import unquote as urllib_unquote
   from urlparse import urlparse
   from django.utils.translation import ugettext as _
 
@@ -90,7 +90,7 @@ class WebHdfs(Hdfs):
     self._logical_name = logical_name
     self._supergroup = hdfs_supergroup
     self._scheme = ""
-    self._netloc = "";
+    self._netloc = ""
     self._is_remote = False
     self._has_trash_support = True
     self.expiration = None
@@ -571,8 +571,8 @@ class WebHdfs(Hdfs):
           del params['doas']
         if 'user.name' in params:
           del params['user.name']
-    quoted_path = urllib_quote(smart_str(path))
-    return self._client._make_url(quoted_path, params)
+    unquoted_path = urllib_unquote(smart_str(path))
+    return self._client._make_url(unquoted_path, params)
 
   def read(self, path, offset, length, bufsize=None):
     """

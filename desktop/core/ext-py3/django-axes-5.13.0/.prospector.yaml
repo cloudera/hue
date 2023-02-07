@@ -1,0 +1,7 @@
+ignore-paths:
+  - docs
+  - axes/migrations
+
+pep8:
+  options:
+    max-line-length: 142

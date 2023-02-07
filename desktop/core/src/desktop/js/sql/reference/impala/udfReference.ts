@@ -1592,6 +1592,15 @@ const STRING_FUNCTIONS: UdfCategoryFunctions = {
     description:
       'Removes all instances of one or more characters from the start and end of a STRING value. By default, removes only spaces. If a non-NULL optional second argument is specified, the function removes all occurrences of characters in that second argument from the beginning and end of the string.'
   },
+  bytes: {
+    name: 'bytes',
+    returnTypes: ['INT'],
+    arguments: [[{ type: 'STRING' }]],
+    signature: 'bytes(STRING byte_expression)',
+    draggable: 'bytes()',
+    description:
+      'Returns the number of bytes contained in the specified byte string. Syntax: BYTES(byte_expression) Where: byte_expression is the byte string for which the number of bytes is to be returned. The BYTES function is  similar to the LENGTH() function except that it always returns the number of bytes regardless of the status of UTF-8 mode whether it is turned ON or OFF.'
+  },
   char_length: {
     name: 'char_length',
     returnTypes: ['INT'],

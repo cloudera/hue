@@ -27,8 +27,11 @@ window.huePubSub = huePubSub;
 
 import { createApp } from 'vue';
 import TrademarkBanner from 'vue/components/login/TrademarkBanner.vue';
+import { createReactComponents } from './reactComponents/createRootElements';
 
 window.addEventListener('DOMContentLoaded', () => {
+  createReactComponents('.login-page');
+
   createApp({
     components: {
       'trademark-banner': TrademarkBanner

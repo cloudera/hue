@@ -36,7 +36,7 @@ from beeswax import conf as beeswax_conf, hive_site
 from beeswax.hive_site import hiveserver2_use_ssl
 from beeswax.conf import CONFIG_WHITELIST, LIST_PARTITIONS_LIMIT, MAX_CATALOG_SQL_ENTRIES
 from beeswax.models import Session, HiveServerQueryHandle, HiveServerQueryHistory
-from beeswax.server.dbms import Table, DataTable, QueryServerException, InvalidSessionQueryServerException
+from beeswax.server.dbms import Table, DataTable, QueryServerException, InvalidSessionQueryServerException, reset_ha
 from notebook.connectors.base import get_interpreter
 
 if sys.version_info[0] > 2:
@@ -692,7 +692,11 @@ class HiveServerClient(object):
 
     LOG.info('Opening %s thrift session for user %s' % (self.query_server['server_name'], user.username))
 
-    req = TOpenSessionReq(**kwargs)
+    try:
+      req = TOpenSessionReq(**kwargs)
+    except Exception as e:
+      if 'Connection refused' in str(e):
+        reset_ha()
     res = self._client.OpenSession(req)
     self.coordinator_host = self._client.get_coordinator_host()
     if self.coordinator_host:
@@ -724,7 +728,7 @@ class HiveServerClient(object):
 
     # HS2 does not return properties in TOpenSessionResp
     # TEZ returns properties, but we need the configuration to detect engine
-    properties = session.get_properties()
+    properties = session.get_properties() or {}
     if not properties or self.query_server['server_name'] == 'beeswax':
       configuration = self.get_configuration(session=session)
       properties.update(configuration)

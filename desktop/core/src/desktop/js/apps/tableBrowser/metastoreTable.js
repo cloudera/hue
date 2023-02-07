@@ -28,6 +28,9 @@ import I18n from 'utils/i18n';
 
 let contextPopoverTimeout = -1;
 
+export const DIALECT_HIVE = 'hive';
+export const DIALECT_SPARK = 'sparksql';
+
 class MetastoreTable {
   /**
    * @param {Object} options
@@ -389,6 +392,17 @@ class MetastoreTable {
     this.partitions.loaded(false);
     // Clear will publish when done
     this.catalogEntry.clearCache();
+  }
+
+  enableImport() {
+    const detailsLoaded = !!this.tableDetails();
+    const dialect = this.catalogEntry.getDialect();
+    const isView = this.catalogEntry.isView();
+    const isTransactionalHive =
+      dialect === DIALECT_HIVE && this.catalogEntry.isTransactionalTable();
+    const isSpark = dialect === DIALECT_SPARK;
+
+    return detailsLoaded && !(isSpark || isView || isTransactionalHive);
   }
 
   showImportData() {

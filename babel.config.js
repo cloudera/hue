@@ -21,7 +21,7 @@ module.exports = function (api) {
   api.cache(true);
   api.assertVersion('^7.4.5');
 
-  const presets = ['babel-preset-typescript-vue3', '@babel/typescript', '@babel/preset-env'];
+  const presets = ['babel-preset-typescript-vue3', '@babel/typescript', '@babel/preset-env', '@babel/preset-react'];
   const plugins = [
     [
       'module-resolver',

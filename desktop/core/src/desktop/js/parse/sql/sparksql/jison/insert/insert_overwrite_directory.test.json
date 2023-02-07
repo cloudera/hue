@@ -1,0 +1,287 @@
+[
+  {
+    "namePrefix": "should not find errors",
+    "beforeCursor": "INSERT OVERWRITE DIRECTORY '/blabla/bla' USING parquet OPTIONS (col1 = 1, col2 = 2, col3 = test) SELECT * FROM boo;",
+    "afterCursor": "",
+    "noErrors": true,
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should not find errors",
+    "beforeCursor": "INSERT OVERWRITE DIRECTORY\nUSING parquet\nOPTIONS ('path' '/tmp/destination', col1 1, col2 2, col3 'test')\n    SELECT * FROM test_table;",
+    "afterCursor": "",
+    "noErrors": true,
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should not find errors",
+    "beforeCursor": "INSERT OVERWRITE LOCAL DIRECTORY '/tmp/destination'\n    ROW FORMAT DELIMITED FIELDS TERMINATED BY ','\n    SELECT * FROM test_table;",
+    "afterCursor": "",
+    "noErrors": true,
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "INSERT OVERWRITE LOCAL ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "DIRECTORY"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest paths",
+    "beforeCursor": "INSERT OVERWRITE LOCAL DIRECTORY '",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestHdfs": {
+        "path": ""
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest paths",
+    "beforeCursor": "INSERT OVERWRITE LOCAL DIRECTORY '/bla/bla/",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestHdfs": {
+        "path": "/bla/bla/"
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "INSERT OVERWRITE DIRECTORY ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "ROW FORMAT",
+        "SELECT",
+        "STORED AS",
+        "USING",
+        "VALUES"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "INSERT OVERWRITE DIRECTORY '/foo' ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "ROW FORMAT",
+        "SELECT",
+        "STORED AS",
+        "USING",
+        "VALUES"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "INSERT OVERWRITE DIRECTORY '/foo' ROW ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "FORMAT"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "INSERT OVERWRITE DIRECTORY '/foo' ROW FORMAT ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "DELIMITED",
+        "SERDE"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "INSERT OVERWRITE DIRECTORY '/foo' ROW FORMAT DELIMITED ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "FIELDS TERMINATED BY",
+        "COLLECTION ITEMS TERMINATED BY",
+        "MAP KEYS TERMINATED BY",
+        "LINES TERMINATED BY",
+        "NULL DEFINED AS",
+        "SELECT",
+        "STORED AS",
+        "VALUES"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "INSERT OVERWRITE DIRECTORY '/foo' ROW FORMAT DELIMITED NULL ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "DEFINED AS"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "INSERT OVERWRITE DIRECTORY '/foo' ROW FORMAT DELIMITED FIELDS TERMINATED BY 'a' ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "STORED AS",
+      "SELECT",
+      "VALUES"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "INSERT OVERWRITE DIRECTORY '/foo' USING ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "PARQUET"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "INSERT OVERWRITE DIRECTORY '/foo' USING PARQUET ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "OPTIONS",
+        "SELECT",
+        "VALUES"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "INSERT OVERWRITE DIRECTORY '/foo' USING PARQUET OPTIONS (a b) ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "SELECT",
+        "VALUES"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "INSERT OVERWRITE DIRECTORY USING PARQUET OPTIONS (a b) ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "SELECT",
+        "VALUES"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "INSERT OVERWRITE DIRECTORY '/foo' USING PARQUET OPTIONS (a b) SELECT ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "*",
+      "CASE",
+      "ALL",
+      "DISTINCT",
+      "FALSE",
+      "NULL",
+      "TRUE"
+    ],
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestAggregateFunctions": {
+        "tables": []
+      },
+      "suggestAnalyticFunctions": true,
+      "suggestFunctions": {},
+      "suggestTables": {
+        "prependQuestionMark": true,
+        "prependFrom": true
+      },
+      "suggestDatabases": {
+        "prependQuestionMark": true,
+        "prependFrom": true,
+        "appendDot": true
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "INSERT OVERWRITE DIRECTORY '/foo' ROW FORMAT DELIMITED FIELDS TERMINATED BY 'a' SELECT ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "*",
+      "CASE",
+      "ALL",
+      "DISTINCT",
+      "FALSE",
+      "NULL",
+      "TRUE"
+    ],
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestAggregateFunctions": {
+        "tables": []
+      },
+      "suggestAnalyticFunctions": true,
+      "suggestFunctions": {},
+      "suggestTables": {
+        "prependQuestionMark": true,
+        "prependFrom": true
+      },
+      "suggestDatabases": {
+        "prependQuestionMark": true,
+        "prependFrom": true,
+        "appendDot": true
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest paths",
+    "beforeCursor": "INSERT OVERWRITE LOCAL DIRECTORY '/bla/bla/' ROW FORMAT ",
+    "afterCursor": " VALUES (1,2,3);",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "DELIMITED", "SERDE"
+      ]
+    }
+  }
+]

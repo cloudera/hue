@@ -24,7 +24,7 @@
 
   top: 0;
   left: 0;
-  z-index: 1039;
+  z-index: 1050;
   padding: 1px;
   background-color: @cui-white;
   -webkit-background-clip: padding-box;
@@ -52,7 +52,7 @@
 .hue-popover.hue-popover-top .hue-popover-arrow::after {
   bottom: 1px;
   margin-left: -3px;
-  content: "";
+  content: '';
   border-top-color: @hue-primary-color-dark;
   border-bottom-width: 0;
 }
@@ -72,7 +72,7 @@
 .hue-popover.hue-popover-right .hue-popover-arrow::after {
   bottom: -3px;
   left: 1px;
-  content: "";
+  content: '';
   border-right-color: @hue-primary-color-dark;
   border-left-width: 0;
 }
@@ -92,7 +92,7 @@
 .hue-popover.hue-popover-bottom .hue-popover-arrow::after {
   top: 3px;
   margin-left: -3px;
-  content: "";
+  content: '';
   border-top-width: 0;
   border-bottom-color: @hue-primary-color-dark;
 }
@@ -112,7 +112,7 @@
 .hue-popover.hue-popover-left .hue-popover-arrow::after {
   right: 2px;
   bottom: -3px;
-  content: "";
+  content: '';
   border-right-width: 0;
   border-left-color: @hue-primary-color-dark;
 }
@@ -129,6 +129,16 @@
 
   .hue-popover-title-icon {
     margin-top: 3px;
+  }
+
+  .hue-popover-title-secondary-icon-container {
+    width: 20px;
+    display: inline-block;
+    margin-top: 3px;
+
+    .hue-popover-title-icon {
+      margin-top: 0;
+    }
   }
 
   .hue-popover-title-text {

@@ -37,6 +37,7 @@ export const RESERVED_WORDS: Set<string> = new Set([
   'COMMIT',
   'CONF',
   'CONSTRAINT',
+  'CONNECTOR',
   'CREATE',
   'CROSS',
   'CUBE',

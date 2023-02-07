@@ -257,6 +257,57 @@ describe('hiveAutocompleteParser.js SELECT statements', () => {
       });
     });
 
+    it('should handle "SELECT * FROM (VALUES(1,2,3),(4,5,6)) as foo; |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT * FROM (VALUES(1,2,3),(4,5,6)) as foo; ',
+        afterCursor: '',
+        noErrors: true,
+        containsKeywords: ['SELECT'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
+    it("should handle \"SELECT * FROM (VALUES(1,2,3),(4,5,6)) as foo JOIN (VALUES(1,'a'),(4,'b')) as bar ON foo.col1 = bar.col1; |\"", () => {
+      assertAutoComplete({
+        beforeCursor:
+          "SELECT * FROM (VALUES(1,2,3),(4,5,6)) as foo JOIN (VALUES(1,'a'),(4,'b')) as bar ON foo.col1 = bar.col1; ",
+        afterCursor: '',
+        noErrors: true,
+        containsKeywords: ['SELECT'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
+    it("should handle \"WITH t1 AS (VALUES('a', 'b'), ('b', 'c')) SELECT * FROM t1 WHERE col1 = 'a' UNION ALL SELECT * from t1 WHERE col1 = 'b'; |\"", () => {
+      assertAutoComplete({
+        beforeCursor:
+          "WITH t1 AS (VALUES('a', 'b'), ('b', 'c')) SELECT * FROM t1 WHERE col1 = 'a' UNION ALL SELECT * from t1 WHERE col1 = 'b'; ",
+        afterCursor: '',
+        noErrors: true,
+        containsKeywords: ['SELECT'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
+    it('should handle "SELECT t1.bigint_col FROM alltypestiny t1 WHERE t1.bigint_col > 1 AND NOT EXISTS (SELECT SUM(smallint_col) AS int_col FROM alltypestiny WHERE t1.date_string_col = string_col AND t1.timestamp_col = timestamp_col) GROUP BY t1.bigint_col; |"', () => {
+      assertAutoComplete({
+        beforeCursor:
+          'SELECT t1.bigint_col FROM alltypestiny t1 WHERE t1.bigint_col > 1 AND NOT EXISTS (SELECT SUM(smallint_col) AS int_col FROM alltypestiny WHERE t1.date_string_col = string_col AND t1.timestamp_col = timestamp_col) GROUP BY t1.bigint_col; ',
+        afterCursor: '',
+        noErrors: true,
+        containsKeywords: ['SELECT'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
     it("should handle \"SELECT bla NOT RLIKE 'ble', ble NOT REGEXP 'b' FROM tbl; |\"", () => {
       assertAutoComplete({
         beforeCursor: "SELECT bla NOT RLIKE 'ble', ble NOT REGEXP 'b' FROM tbl; ",

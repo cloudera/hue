@@ -593,7 +593,7 @@ class Coordinator(Job):
     end = mktime(self.endTime)
 
     if end != start:
-      progress = min(int((1 - math.floor((end - next) / (end - start))) * 100), 100)
+      progress = min(int((1 - (end - next) / (end - start)) * 100), 100)
     else:
       progress = 100
 

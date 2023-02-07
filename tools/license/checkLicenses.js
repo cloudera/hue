@@ -42,7 +42,10 @@ checker.init(
           lowerLicenses.indexOf('isc') === -1 &&
           lowerLicenses.indexOf('unlicense') === -1 &&
           lowerLicenses.indexOf('cc') === -1 &&
-          lowerLicenses.indexOf('python-2.0') === -1
+          lowerLicenses.indexOf('python-2.0') === -1 &&
+          // lz-string is marked as WTFPL license on NPM but the valid license is MIT from the github repo
+          // https://github.com/pieroxy/lz-string/issues/147
+          !packageName.startsWith('lz-string@')
         ) {
           console.warn(`Found invalid license in "${packageName}", license: "${licenses}".`);
           process.exitCode = 1;

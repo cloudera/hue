@@ -1,0 +1,111 @@
+[
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "DROP ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "VIEW"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should not report errors",
+    "beforeCursor": "DROP VIEW boo;",
+    "afterCursor": "",
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "noErrors": true,
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should not report errors",
+    "beforeCursor": "DROP VIEW IF EXISTS baa.boo;",
+    "afterCursor": "",
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "noErrors": true,
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest views",
+    "beforeCursor": "DROP VIEW ",
+    "afterCursor": "",
+    "noErrors": true,
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestTables": {
+        "onlyViews": true
+      },
+      "suggestDatabases": {
+        "appendDot": true
+      },
+      "suggestKeywords": [
+        "IF EXISTS"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "DROP VIEW IF ",
+    "afterCursor": "",
+    "noErrors": true,
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "EXISTS"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest views",
+    "beforeCursor": "DROP VIEW boo.",
+    "afterCursor": "",
+    "noErrors": true,
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestTables": {
+        "identifierChain": [
+          {
+            "name": "boo"
+          }
+        ],
+        "onlyViews": true
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest views",
+    "beforeCursor": "DROP VIEW IF EXISTS foo.",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestTables": {
+        "identifierChain": [
+          {
+            "name": "foo"
+          }
+        ],
+        "onlyViews": true
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "DROP VIEW ",
+    "afterCursor": " foo.bar",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "IF EXISTS"
+      ]
+    }
+  }
+]

@@ -50,7 +50,7 @@ describe('impalaAutocompleteParser.js CREATE statements', () => {
     assertAutoComplete({
       beforeCursor: 'CREATE ROLE baaa;',
       afterCursor: '',
-      noError: true,
+      noErrors: true,
       containsKeywords: ['SELECT'],
       expectedResult: {
         lowerCase: false
@@ -732,9 +732,9 @@ describe('impalaAutocompleteParser.js CREATE statements', () => {
       assertAutoComplete({
         beforeCursor: 'CREATE TABLE boo ',
         afterCursor: '',
+        containsKeywords: ['LIKE', 'LIKE PARQUET', 'STORED AS'],
         expectedResult: {
-          lowerCase: false,
-          suggestKeywords: ['LIKE', 'LIKE PARQUET']
+          lowerCase: false
         }
       });
     });
@@ -885,6 +885,51 @@ describe('impalaAutocompleteParser.js CREATE statements', () => {
       });
     });
 
+    it('should suggest keywords for "CREATE TABLE foo (id int) PARTITIONED BY |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'CREATE TABLE foo (id int) PARTITIONED BY ',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: ['SPEC']
+        }
+      });
+    });
+
+    it('should suggest keywords for "CREATE TABLE foo (id int) PARTITIONED BY SPEC (|"', () => {
+      assertAutoComplete({
+        beforeCursor: 'CREATE TABLE foo (id int) PARTITIONED BY SPEC (',
+        afterCursor: '',
+        containsKeywords: ['BUCKET', 'VOID'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
+    it('should suggest keywords for "CREATE TABLE foo (id int) PARTITIONED BY SPEC (BUCKET(5, i), |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'CREATE TABLE foo (id int) PARTITIONED BY SPEC (BUCKET(5, i), ',
+        afterCursor: '',
+        containsKeywords: ['IDENTITY', 'YEAR'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
+    it('should suggest keywords for "CREATE TABLE foo (id int) PARTITIONED BY SPEC (BUCKET(5, i), MONTH(d), TRUNCATE(3, s), HOUR(t)) |"', () => {
+      assertAutoComplete({
+        beforeCursor:
+          'CREATE TABLE foo (id int) PARTITIONED BY SPEC (BUCKET(5, i), MONTH(d), TRUNCATE(3, s), HOUR(t)) ',
+        afterCursor: '',
+        containsKeywords: ['STORED AS'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
     it('should suggest keywords for "CREATE TABLE foo (id int) WITH |"', () => {
       assertAutoComplete({
         beforeCursor: 'CREATE TABLE foo (id int) WITH ',
@@ -936,7 +981,16 @@ describe('impalaAutocompleteParser.js CREATE statements', () => {
         afterCursor: '',
         expectedResult: {
           lowerCase: false,
-          suggestKeywords: ['AVRO', 'KUDU', 'ORC', 'PARQUET', 'RCFILE', 'SEQUENCEFILE', 'TEXTFILE']
+          suggestKeywords: [
+            'AVRO',
+            'ICEBERG',
+            'KUDU',
+            'ORC',
+            'PARQUET',
+            'RCFILE',
+            'SEQUENCEFILE',
+            'TEXTFILE'
+          ]
         }
       });
     });

@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>lxml.doctestcompare &mdash; lxml  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> lxml
+            <img src="../../_static/python-xml.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                4.9.1
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../lxml.html">lxml package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../lxml.html.html">lxml.html package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../lxml.html.ElementSoup.html">lxml.html.ElementSoup module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../lxml.html._diffcommand.html">lxml.html._diffcommand module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../lxml.html._setmixin.html">lxml.html._setmixin module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../lxml.html.builder.html">lxml.html.builder module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../lxml.html.clean.html">lxml.html.clean module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../lxml.html.defs.html">lxml.html.defs module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../lxml.html.diff.html">lxml.html.diff module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../lxml.html.formfill.html">lxml.html.formfill module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../lxml.html.html5parser.html">lxml.html.html5parser module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../lxml.html.soupparser.html">lxml.html.soupparser module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../lxml.isoschematron.html">lxml.isoschematron package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../lxml.ElementInclude.html">lxml.ElementInclude module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../lxml._elementpath.html">lxml._elementpath module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../lxml.builder.html">lxml.builder module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../lxml.cssselect.html">lxml.cssselect module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../lxml.doctestcompare.html">lxml.doctestcompare module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../lxml.etree.html">lxml.etree module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../lxml.objectify.html">lxml.objectify module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../lxml.sax.html">lxml.sax module</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">lxml</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+          <li><a href="../lxml.html">lxml</a> &raquo;</li>
+      <li>lxml.doctestcompare</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for lxml.doctestcompare</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">lxml-based doctest output comparison.</span>
+
+<span class="sd">Note: normally, you should just import the `lxml.usedoctest` and</span>
+<span class="sd">`lxml.html.usedoctest` modules from within a doctest, instead of this</span>
+<span class="sd">one::</span>
+
+<span class="sd">    &gt;&gt;&gt; import lxml.usedoctest # for XML output</span>
+
+<span class="sd">    &gt;&gt;&gt; import lxml.html.usedoctest # for HTML output</span>
+
+<span class="sd">To use this module directly, you must call ``lxmldoctest.install()``,</span>
+<span class="sd">which will cause doctest to use this in all subsequent calls.</span>
+
+<span class="sd">This changes the way output is checked and comparisons are made for</span>
+<span class="sd">XML or HTML-like content.</span>
+
+<span class="sd">XML or HTML content is noticed because the example starts with ``&lt;``</span>
+<span class="sd">(it&#39;s HTML if it starts with ``&lt;html``).  You can also use the</span>
+<span class="sd">``PARSE_HTML`` and ``PARSE_XML`` flags to force parsing.</span>
+
+<span class="sd">Some rough wildcard-like things are allowed.  Whitespace is generally</span>
+<span class="sd">ignored (except in attributes).  In text (attributes and text in the</span>
+<span class="sd">body) you can use ``...`` as a wildcard.  In an example it also</span>
+<span class="sd">matches any trailing tags in the element, though it does not match</span>
+<span class="sd">leading tags.  You may create a tag ``&lt;any&gt;`` or include an ``any``</span>
+<span class="sd">attribute in the tag.  An ``any`` tag matches any tag, while the</span>
+<span class="sd">attribute matches any and all attributes.</span>
+
+<span class="sd">When a match fails, the reformatted example and gotten text is</span>
+<span class="sd">displayed (indented), and a rough diff-like output is given.  Anything</span>
+<span class="sd">marked with ``+`` is in the output but wasn&#39;t supposed to be, and</span>
+<span class="sd">similarly ``-`` means its in the example but wasn&#39;t in the output.</span>
+
+<span class="sd">You can disable parsing on one line with ``# doctest:+NOPARSE_MARKUP``</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">lxml</span> <span class="kn">import</span> <span class="n">etree</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">doctest</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">html</span> <span class="kn">import</span> <span class="n">escape</span> <span class="k">as</span> <span class="n">html_escape</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">cgi</span> <span class="kn">import</span> <span class="n">escape</span> <span class="k">as</span> <span class="n">html_escape</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;PARSE_HTML&#39;</span><span class="p">,</span> <span class="s1">&#39;PARSE_XML&#39;</span><span class="p">,</span> <span class="s1">&#39;NOPARSE_MARKUP&#39;</span><span class="p">,</span> <span class="s1">&#39;LXMLOutputChecker&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;LHTMLOutputChecker&#39;</span><span class="p">,</span> <span class="s1">&#39;install&#39;</span><span class="p">,</span> <span class="s1">&#39;temp_install&#39;</span><span class="p">]</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">_basestring</span> <span class="o">=</span> <span class="n">basestring</span>
+<span class="k">except</span> <span class="ne">NameError</span><span class="p">:</span>
+    <span class="n">_basestring</span> <span class="o">=</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)</span>
+
+<span class="n">_IS_PYTHON_3</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">3</span>
+
+<span class="n">PARSE_HTML</span> <span class="o">=</span> <span class="n">doctest</span><span class="o">.</span><span class="n">register_optionflag</span><span class="p">(</span><span class="s1">&#39;PARSE_HTML&#39;</span><span class="p">)</span>
+<span class="n">PARSE_XML</span> <span class="o">=</span> <span class="n">doctest</span><span class="o">.</span><span class="n">register_optionflag</span><span class="p">(</span><span class="s1">&#39;PARSE_XML&#39;</span><span class="p">)</span>
+<span class="n">NOPARSE_MARKUP</span> <span class="o">=</span> <span class="n">doctest</span><span class="o">.</span><span class="n">register_optionflag</span><span class="p">(</span><span class="s1">&#39;NOPARSE_MARKUP&#39;</span><span class="p">)</span>
+
+<span class="n">OutputChecker</span> <span class="o">=</span> <span class="n">doctest</span><span class="o">.</span><span class="n">OutputChecker</span>
+
+<div class="viewcode-block" id="strip"><a class="viewcode-back" href="../../lxml.doctestcompare.html#lxml.doctestcompare.strip">[docs]</a><span class="k">def</span> <span class="nf">strip</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">v</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="norm_whitespace"><a class="viewcode-back" href="../../lxml.doctestcompare.html#lxml.doctestcompare.norm_whitespace">[docs]</a><span class="k">def</span> <span class="nf">norm_whitespace</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">_norm_whitespace_re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span></div>
+
+<span class="n">_html_parser</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">HTMLParser</span><span class="p">(</span><span class="n">recover</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">remove_blank_text</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<div class="viewcode-block" id="html_fromstring"><a class="viewcode-back" href="../../lxml.doctestcompare.html#lxml.doctestcompare.html_fromstring">[docs]</a><span class="k">def</span> <span class="nf">html_fromstring</span><span class="p">(</span><span class="n">html</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">etree</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">html</span><span class="p">,</span> <span class="n">_html_parser</span><span class="p">)</span></div>
+
+<span class="c1"># We use this to distinguish repr()s from elements:</span>
+<span class="n">_repr_re</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^&lt;[^&gt;]+ (at|object) &#39;</span><span class="p">)</span>
+<span class="n">_norm_whitespace_re</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;[ \t\n][ \t\n]+&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="LXMLOutputChecker"><a class="viewcode-back" href="../../lxml.doctestcompare.html#lxml.doctestcompare.LXMLOutputChecker">[docs]</a><span class="k">class</span> <span class="nc">LXMLOutputChecker</span><span class="p">(</span><span class="n">OutputChecker</span><span class="p">):</span>
+
+    <span class="n">empty_tags</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;param&#39;</span><span class="p">,</span> <span class="s1">&#39;img&#39;</span><span class="p">,</span> <span class="s1">&#39;area&#39;</span><span class="p">,</span> <span class="s1">&#39;br&#39;</span><span class="p">,</span> <span class="s1">&#39;basefont&#39;</span><span class="p">,</span> <span class="s1">&#39;input&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;base&#39;</span><span class="p">,</span> <span class="s1">&#39;meta&#39;</span><span class="p">,</span> <span class="s1">&#39;link&#39;</span><span class="p">,</span> <span class="s1">&#39;col&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="LXMLOutputChecker.get_default_parser"><a class="viewcode-back" href="../../lxml.doctestcompare.html#lxml.doctestcompare.LXMLOutputChecker.get_default_parser">[docs]</a>    <span class="k">def</span> <span class="nf">get_default_parser</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">etree</span><span class="o">.</span><span class="n">XML</span></div>
+
+<div class="viewcode-block" id="LXMLOutputChecker.check_output"><a class="viewcode-back" href="../../lxml.doctestcompare.html#lxml.doctestcompare.LXMLOutputChecker.check_output">[docs]</a>    <span class="k">def</span> <span class="nf">check_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">want</span><span class="p">,</span> <span class="n">got</span><span class="p">,</span> <span class="n">optionflags</span><span class="p">):</span>
+        <span class="n">alt_self</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_temp_override_self&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">alt_self</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">super_method</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_temp_call_super_check_output</span>
+            <span class="bp">self</span> <span class="o">=</span> <span class="n">alt_self</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">super_method</span> <span class="o">=</span> <span class="n">OutputChecker</span><span class="o">.</span><span class="n">check_output</span>
+        <span class="n">parser</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_parser</span><span class="p">(</span><span class="n">want</span><span class="p">,</span> <span class="n">got</span><span class="p">,</span> <span class="n">optionflags</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">parser</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">super_method</span><span class="p">(</span>
+                <span class="bp">self</span><span class="p">,</span> <span class="n">want</span><span class="p">,</span> <span class="n">got</span><span class="p">,</span> <span class="n">optionflags</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">want_doc</span> <span class="o">=</span> <span class="n">parser</span><span class="p">(</span><span class="n">want</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">etree</span><span class="o">.</span><span class="n">XMLSyntaxError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">got_doc</span> <span class="o">=</span> <span class="n">parser</span><span class="p">(</span><span class="n">got</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">etree</span><span class="o">.</span><span class="n">XMLSyntaxError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">compare_docs</span><span class="p">(</span><span class="n">want_doc</span><span class="p">,</span> <span class="n">got_doc</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LXMLOutputChecker.get_parser"><a class="viewcode-back" href="../../lxml.doctestcompare.html#lxml.doctestcompare.LXMLOutputChecker.get_parser">[docs]</a>    <span class="k">def</span> <span class="nf">get_parser</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">want</span><span class="p">,</span> <span class="n">got</span><span class="p">,</span> <span class="n">optionflags</span><span class="p">):</span>
+        <span class="n">parser</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">NOPARSE_MARKUP</span> <span class="o">&amp;</span> <span class="n">optionflags</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">PARSE_HTML</span> <span class="o">&amp;</span> <span class="n">optionflags</span><span class="p">:</span>
+            <span class="n">parser</span> <span class="o">=</span> <span class="n">html_fromstring</span>
+        <span class="k">elif</span> <span class="n">PARSE_XML</span> <span class="o">&amp;</span> <span class="n">optionflags</span><span class="p">:</span>
+            <span class="n">parser</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">XML</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="n">want</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;&lt;html&#39;</span><span class="p">)</span>
+              <span class="ow">and</span> <span class="n">got</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;&lt;html&#39;</span><span class="p">)):</span>
+            <span class="n">parser</span> <span class="o">=</span> <span class="n">html_fromstring</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_looks_like_markup</span><span class="p">(</span><span class="n">want</span><span class="p">)</span>
+              <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_looks_like_markup</span><span class="p">(</span><span class="n">got</span><span class="p">)):</span>
+            <span class="n">parser</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_default_parser</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">parser</span></div>
+
+<div class="viewcode-block" id="LXMLOutputChecker._looks_like_markup"><a class="viewcode-back" href="../../lxml.doctestcompare.html#lxml.doctestcompare.LXMLOutputChecker._looks_like_markup">[docs]</a>    <span class="k">def</span> <span class="nf">_looks_like_markup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;&lt;&#39;</span><span class="p">)</span>
+                <span class="ow">and</span> <span class="ow">not</span> <span class="n">_repr_re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">s</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="LXMLOutputChecker.compare_docs"><a class="viewcode-back" href="../../lxml.doctestcompare.html#lxml.doctestcompare.LXMLOutputChecker.compare_docs">[docs]</a>    <span class="k">def</span> <span class="nf">compare_docs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">want</span><span class="p">,</span> <span class="n">got</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag_compare</span><span class="p">(</span><span class="n">want</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="n">got</span><span class="o">.</span><span class="n">tag</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">text_compare</span><span class="p">(</span><span class="n">want</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="n">got</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="kc">True</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">text_compare</span><span class="p">(</span><span class="n">want</span><span class="o">.</span><span class="n">tail</span><span class="p">,</span> <span class="n">got</span><span class="o">.</span><span class="n">tail</span><span class="p">,</span> <span class="kc">True</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="s1">&#39;any&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">want</span><span class="o">.</span><span class="n">attrib</span><span class="p">:</span>
+            <span class="n">want_keys</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">want</span><span class="o">.</span><span class="n">attrib</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+            <span class="n">got_keys</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">got</span><span class="o">.</span><span class="n">attrib</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+            <span class="k">if</span> <span class="n">want_keys</span> <span class="o">!=</span> <span class="n">got_keys</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">want_keys</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">text_compare</span><span class="p">(</span><span class="n">want</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">got</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="kc">False</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">want</span><span class="o">.</span><span class="n">text</span> <span class="o">!=</span> <span class="s1">&#39;...&#39;</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">want</span><span class="p">):</span>
+            <span class="n">want_children</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">want</span><span class="p">)</span>
+            <span class="n">got_children</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">got</span><span class="p">)</span>
+            <span class="k">while</span> <span class="n">want_children</span> <span class="ow">or</span> <span class="n">got_children</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">want_children</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">got_children</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="kc">False</span>
+                <span class="n">want_first</span> <span class="o">=</span> <span class="n">want_children</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">got_first</span> <span class="o">=</span> <span class="n">got_children</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">compare_docs</span><span class="p">(</span><span class="n">want_first</span><span class="p">,</span> <span class="n">got_first</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="kc">False</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">got_children</span> <span class="ow">and</span> <span class="n">want_first</span><span class="o">.</span><span class="n">tail</span> <span class="o">==</span> <span class="s1">&#39;...&#39;</span><span class="p">:</span>
+                    <span class="k">break</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="LXMLOutputChecker.text_compare"><a class="viewcode-back" href="../../lxml.doctestcompare.html#lxml.doctestcompare.LXMLOutputChecker.text_compare">[docs]</a>    <span class="k">def</span> <span class="nf">text_compare</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">want</span><span class="p">,</span> <span class="n">got</span><span class="p">,</span> <span class="n">strip</span><span class="p">):</span>
+        <span class="n">want</span> <span class="o">=</span> <span class="n">want</span> <span class="ow">or</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">got</span> <span class="o">=</span> <span class="n">got</span> <span class="ow">or</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">strip</span><span class="p">:</span>
+            <span class="n">want</span> <span class="o">=</span> <span class="n">norm_whitespace</span><span class="p">(</span><span class="n">want</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="n">got</span> <span class="o">=</span> <span class="n">norm_whitespace</span><span class="p">(</span><span class="n">got</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">want</span> <span class="o">=</span> <span class="s1">&#39;^</span><span class="si">%s</span><span class="s1">$&#39;</span> <span class="o">%</span> <span class="n">re</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">want</span><span class="p">)</span>
+        <span class="n">want</span> <span class="o">=</span> <span class="n">want</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\.\.\.&#39;</span><span class="p">,</span> <span class="s1">&#39;.*&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">want</span><span class="p">,</span> <span class="n">got</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="LXMLOutputChecker.tag_compare"><a class="viewcode-back" href="../../lxml.doctestcompare.html#lxml.doctestcompare.LXMLOutputChecker.tag_compare">[docs]</a>    <span class="k">def</span> <span class="nf">tag_compare</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">want</span><span class="p">,</span> <span class="n">got</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">want</span> <span class="o">==</span> <span class="s1">&#39;any&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">want</span><span class="p">,</span> <span class="n">_basestring</span><span class="p">)</span>
+            <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">got</span><span class="p">,</span> <span class="n">_basestring</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="n">want</span> <span class="o">==</span> <span class="n">got</span>
+        <span class="n">want</span> <span class="o">=</span> <span class="n">want</span> <span class="ow">or</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">got</span> <span class="o">=</span> <span class="n">got</span> <span class="ow">or</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">want</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;{...}&#39;</span><span class="p">):</span>
+            <span class="c1"># Ellipsis on the namespace</span>
+            <span class="k">return</span> <span class="n">want</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;}&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">got</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;}&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">want</span> <span class="o">==</span> <span class="n">got</span></div>
+
+<div class="viewcode-block" id="LXMLOutputChecker.output_difference"><a class="viewcode-back" href="../../lxml.doctestcompare.html#lxml.doctestcompare.LXMLOutputChecker.output_difference">[docs]</a>    <span class="k">def</span> <span class="nf">output_difference</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">example</span><span class="p">,</span> <span class="n">got</span><span class="p">,</span> <span class="n">optionflags</span><span class="p">):</span>
+        <span class="n">want</span> <span class="o">=</span> <span class="n">example</span><span class="o">.</span><span class="n">want</span>
+        <span class="n">parser</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_parser</span><span class="p">(</span><span class="n">want</span><span class="p">,</span> <span class="n">got</span><span class="p">,</span> <span class="n">optionflags</span><span class="p">)</span>
+        <span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">parser</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">want_doc</span> <span class="o">=</span> <span class="n">parser</span><span class="p">(</span><span class="n">want</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">etree</span><span class="o">.</span><span class="n">XMLSyntaxError</span><span class="p">:</span>
+                <span class="n">e</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;In example: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">e</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">got_doc</span> <span class="o">=</span> <span class="n">parser</span><span class="p">(</span><span class="n">got</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">etree</span><span class="o">.</span><span class="n">XMLSyntaxError</span><span class="p">:</span>
+                <span class="n">e</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;In actual output: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">e</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">parser</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">errors</span><span class="p">:</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">OutputChecker</span><span class="o">.</span><span class="n">output_difference</span><span class="p">(</span>
+                <span class="bp">self</span><span class="p">,</span> <span class="n">example</span><span class="p">,</span> <span class="n">got</span><span class="p">,</span> <span class="n">optionflags</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">errors</span><span class="p">:</span>
+                <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">value</span>
+        <span class="n">html</span> <span class="o">=</span> <span class="n">parser</span> <span class="ow">is</span> <span class="n">html_fromstring</span>
+        <span class="n">diff_parts</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Expected:&#39;</span><span class="p">,</span>
+                      <span class="bp">self</span><span class="o">.</span><span class="n">format_doc</span><span class="p">(</span><span class="n">want_doc</span><span class="p">,</span> <span class="n">html</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                      <span class="s1">&#39;Got:&#39;</span><span class="p">,</span>
+                      <span class="bp">self</span><span class="o">.</span><span class="n">format_doc</span><span class="p">(</span><span class="n">got_doc</span><span class="p">,</span> <span class="n">html</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                      <span class="s1">&#39;Diff:&#39;</span><span class="p">,</span>
+                      <span class="bp">self</span><span class="o">.</span><span class="n">collect_diff</span><span class="p">(</span><span class="n">want_doc</span><span class="p">,</span> <span class="n">got_doc</span><span class="p">,</span> <span class="n">html</span><span class="p">,</span> <span class="mi">2</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">diff_parts</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LXMLOutputChecker.html_empty_tag"><a class="viewcode-back" href="../../lxml.doctestcompare.html#lxml.doctestcompare.LXMLOutputChecker.html_empty_tag">[docs]</a>    <span class="k">def</span> <span class="nf">html_empty_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">el</span><span class="p">,</span> <span class="n">html</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">html</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">el</span><span class="o">.</span><span class="n">tag</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">empty_tags</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">el</span><span class="o">.</span><span class="n">text</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">el</span><span class="p">):</span>
+            <span class="c1"># This shouldn&#39;t happen (contents in an empty tag)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="LXMLOutputChecker.format_doc"><a class="viewcode-back" href="../../lxml.doctestcompare.html#lxml.doctestcompare.LXMLOutputChecker.format_doc">[docs]</a>    <span class="k">def</span> <span class="nf">format_doc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">doc</span><span class="p">,</span> <span class="n">html</span><span class="p">,</span> <span class="n">indent</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="n">parts</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">doc</span><span class="p">):</span>
+            <span class="c1"># No children...</span>
+            <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">*</span><span class="n">indent</span><span class="p">)</span>
+            <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span>
+            <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">format_tag</span><span class="p">(</span><span class="n">doc</span><span class="p">))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">html_empty_tag</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span> <span class="n">html</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">strip</span><span class="p">(</span><span class="n">doc</span><span class="o">.</span><span class="n">text</span><span class="p">):</span>
+                    <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">format_text</span><span class="p">(</span><span class="n">doc</span><span class="o">.</span><span class="n">text</span><span class="p">))</span>
+                <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">format_end_tag</span><span class="p">(</span><span class="n">doc</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">strip</span><span class="p">(</span><span class="n">doc</span><span class="o">.</span><span class="n">tail</span><span class="p">):</span>
+                <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">format_text</span><span class="p">(</span><span class="n">doc</span><span class="o">.</span><span class="n">tail</span><span class="p">))</span>
+            <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span>
+        <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">*</span><span class="n">indent</span><span class="p">)</span>
+        <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span>
+        <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">format_tag</span><span class="p">(</span><span class="n">doc</span><span class="p">))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">html_empty_tag</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span> <span class="n">html</span><span class="p">):</span>
+            <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">strip</span><span class="p">(</span><span class="n">doc</span><span class="o">.</span><span class="n">text</span><span class="p">):</span>
+                <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">*</span><span class="n">indent</span><span class="p">)</span>
+                <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">format_text</span><span class="p">(</span><span class="n">doc</span><span class="o">.</span><span class="n">text</span><span class="p">))</span>
+                <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="n">doc</span><span class="p">:</span>
+                <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">format_doc</span><span class="p">(</span><span class="n">el</span><span class="p">,</span> <span class="n">html</span><span class="p">,</span> <span class="n">indent</span><span class="o">+</span><span class="mi">2</span><span class="p">))</span>
+            <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">*</span><span class="n">indent</span><span class="p">)</span>
+            <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">format_end_tag</span><span class="p">(</span><span class="n">doc</span><span class="p">))</span>
+            <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">strip</span><span class="p">(</span><span class="n">doc</span><span class="o">.</span><span class="n">tail</span><span class="p">):</span>
+            <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">*</span><span class="n">indent</span><span class="p">)</span>
+            <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">format_text</span><span class="p">(</span><span class="n">doc</span><span class="o">.</span><span class="n">tail</span><span class="p">))</span>
+            <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LXMLOutputChecker.format_text"><a class="viewcode-back" href="../../lxml.doctestcompare.html#lxml.doctestcompare.LXMLOutputChecker.format_text">[docs]</a>    <span class="k">def</span> <span class="nf">format_text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">strip</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">text</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">strip</span><span class="p">:</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">html_escape</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LXMLOutputChecker.format_tag"><a class="viewcode-back" href="../../lxml.doctestcompare.html#lxml.doctestcompare.LXMLOutputChecker.format_tag">[docs]</a>    <span class="k">def</span> <span class="nf">format_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">el</span><span class="p">):</span>
+        <span class="n">attrs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">el</span><span class="p">,</span> <span class="n">etree</span><span class="o">.</span><span class="n">CommentBase</span><span class="p">):</span>
+            <span class="c1"># FIXME: probably PIs should be handled specially too?</span>
+            <span class="k">return</span> <span class="s1">&#39;&lt;!--&#39;</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">el</span><span class="o">.</span><span class="n">attrib</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+            <span class="n">attrs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_text</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="kc">False</span><span class="p">)))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">attrs</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;&lt;</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="n">el</span><span class="o">.</span><span class="n">tag</span>
+        <span class="k">return</span> <span class="s1">&#39;&lt;</span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">el</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">attrs</span><span class="p">))</span></div>
+    
+<div class="viewcode-block" id="LXMLOutputChecker.format_end_tag"><a class="viewcode-back" href="../../lxml.doctestcompare.html#lxml.doctestcompare.LXMLOutputChecker.format_end_tag">[docs]</a>    <span class="k">def</span> <span class="nf">format_end_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">el</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">el</span><span class="p">,</span> <span class="n">etree</span><span class="o">.</span><span class="n">CommentBase</span><span class="p">):</span>
+            <span class="c1"># FIXME: probably PIs should be handled specially too?</span>
+            <span class="k">return</span> <span class="s1">&#39;--&gt;&#39;</span>
+        <span class="k">return</span> <span class="s1">&#39;&lt;/</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="n">el</span><span class="o">.</span><span class="n">tag</span></div>
+
+<div class="viewcode-block" id="LXMLOutputChecker.collect_diff"><a class="viewcode-back" href="../../lxml.doctestcompare.html#lxml.doctestcompare.LXMLOutputChecker.collect_diff">[docs]</a>    <span class="k">def</span> <span class="nf">collect_diff</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">want</span><span class="p">,</span> <span class="n">got</span><span class="p">,</span> <span class="n">html</span><span class="p">,</span> <span class="n">indent</span><span class="p">):</span>
+        <span class="n">parts</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">want</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">got</span><span class="p">):</span>
+            <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">*</span><span class="n">indent</span><span class="p">)</span>
+            <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collect_diff_tag</span><span class="p">(</span><span class="n">want</span><span class="p">,</span> <span class="n">got</span><span class="p">))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">html_empty_tag</span><span class="p">(</span><span class="n">got</span><span class="p">,</span> <span class="n">html</span><span class="p">):</span>
+                <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collect_diff_text</span><span class="p">(</span><span class="n">want</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="n">got</span><span class="o">.</span><span class="n">text</span><span class="p">))</span>
+                <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collect_diff_end_tag</span><span class="p">(</span><span class="n">want</span><span class="p">,</span> <span class="n">got</span><span class="p">))</span>
+            <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collect_diff_text</span><span class="p">(</span><span class="n">want</span><span class="o">.</span><span class="n">tail</span><span class="p">,</span> <span class="n">got</span><span class="o">.</span><span class="n">tail</span><span class="p">))</span>
+            <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span>
+        <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">*</span><span class="n">indent</span><span class="p">)</span>
+        <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collect_diff_tag</span><span class="p">(</span><span class="n">want</span><span class="p">,</span> <span class="n">got</span><span class="p">))</span>
+        <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">strip</span><span class="p">(</span><span class="n">want</span><span class="o">.</span><span class="n">text</span><span class="p">)</span> <span class="ow">or</span> <span class="n">strip</span><span class="p">(</span><span class="n">got</span><span class="o">.</span><span class="n">text</span><span class="p">):</span>
+            <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">*</span><span class="n">indent</span><span class="p">)</span>
+            <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collect_diff_text</span><span class="p">(</span><span class="n">want</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="n">got</span><span class="o">.</span><span class="n">text</span><span class="p">))</span>
+            <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">want_children</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">want</span><span class="p">)</span>
+        <span class="n">got_children</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">got</span><span class="p">)</span>
+        <span class="k">while</span> <span class="n">want_children</span> <span class="ow">or</span> <span class="n">got_children</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">want_children</span><span class="p">:</span>
+                <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">format_doc</span><span class="p">(</span><span class="n">got_children</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">html</span><span class="p">,</span> <span class="n">indent</span><span class="o">+</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;+&#39;</span><span class="p">))</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">got_children</span><span class="p">:</span>
+                <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">format_doc</span><span class="p">(</span><span class="n">want_children</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">html</span><span class="p">,</span> <span class="n">indent</span><span class="o">+</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">))</span>
+                <span class="k">continue</span>
+            <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collect_diff</span><span class="p">(</span>
+                <span class="n">want_children</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">got_children</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">html</span><span class="p">,</span> <span class="n">indent</span><span class="o">+</span><span class="mi">2</span><span class="p">))</span>
+        <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">*</span><span class="n">indent</span><span class="p">)</span>
+        <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collect_diff_end_tag</span><span class="p">(</span><span class="n">want</span><span class="p">,</span> <span class="n">got</span><span class="p">))</span>
+        <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">strip</span><span class="p">(</span><span class="n">want</span><span class="o">.</span><span class="n">tail</span><span class="p">)</span> <span class="ow">or</span> <span class="n">strip</span><span class="p">(</span><span class="n">got</span><span class="o">.</span><span class="n">tail</span><span class="p">):</span>
+            <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">*</span><span class="n">indent</span><span class="p">)</span>
+            <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collect_diff_text</span><span class="p">(</span><span class="n">want</span><span class="o">.</span><span class="n">tail</span><span class="p">,</span> <span class="n">got</span><span class="o">.</span><span class="n">tail</span><span class="p">))</span>
+            <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LXMLOutputChecker.collect_diff_tag"><a class="viewcode-back" href="../../lxml.doctestcompare.html#lxml.doctestcompare.LXMLOutputChecker.collect_diff_tag">[docs]</a>    <span class="k">def</span> <span class="nf">collect_diff_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">want</span><span class="p">,</span> <span class="n">got</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag_compare</span><span class="p">(</span><span class="n">want</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="n">got</span><span class="o">.</span><span class="n">tag</span><span class="p">):</span>
+            <span class="n">tag</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> (got: </span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">want</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="n">got</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">tag</span> <span class="o">=</span> <span class="n">got</span><span class="o">.</span><span class="n">tag</span>
+        <span class="n">attrs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="nb">any</span> <span class="o">=</span> <span class="n">want</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="s1">&#39;any&#39;</span> <span class="ow">or</span> <span class="s1">&#39;any&#39;</span> <span class="ow">in</span> <span class="n">want</span><span class="o">.</span><span class="n">attrib</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">got</span><span class="o">.</span><span class="n">attrib</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">want</span><span class="o">.</span><span class="n">attrib</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">:</span>
+                <span class="n">attrs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;+</span><span class="si">%s</span><span class="s1">=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_text</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="kc">False</span><span class="p">)))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">want</span><span class="o">.</span><span class="n">attrib</span><span class="p">:</span>
+                    <span class="n">text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">collect_diff_text</span><span class="p">(</span><span class="n">want</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="n">name</span><span class="p">],</span> <span class="n">value</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_text</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+                <span class="n">attrs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">text</span><span class="p">))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">want</span><span class="o">.</span><span class="n">attrib</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+                <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">got</span><span class="o">.</span><span class="n">attrib</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">attrs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;-</span><span class="si">%s</span><span class="s1">=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_text</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="kc">False</span><span class="p">)))</span>
+        <span class="k">if</span> <span class="n">attrs</span><span class="p">:</span>
+            <span class="n">tag</span> <span class="o">=</span> <span class="s1">&#39;&lt;</span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">attrs</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">tag</span> <span class="o">=</span> <span class="s1">&#39;&lt;</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="n">tag</span>
+        <span class="k">return</span> <span class="n">tag</span></div>
+
+<div class="viewcode-block" id="LXMLOutputChecker.collect_diff_end_tag"><a class="viewcode-back" href="../../lxml.doctestcompare.html#lxml.doctestcompare.LXMLOutputChecker.collect_diff_end_tag">[docs]</a>    <span class="k">def</span> <span class="nf">collect_diff_end_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">want</span><span class="p">,</span> <span class="n">got</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">want</span><span class="o">.</span><span class="n">tag</span> <span class="o">!=</span> <span class="n">got</span><span class="o">.</span><span class="n">tag</span><span class="p">:</span>
+            <span class="n">tag</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> (got: </span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">want</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="n">got</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">tag</span> <span class="o">=</span> <span class="n">got</span><span class="o">.</span><span class="n">tag</span>
+        <span class="k">return</span> <span class="s1">&#39;&lt;/</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="n">tag</span></div>
+
+<div class="viewcode-block" id="LXMLOutputChecker.collect_diff_text"><a class="viewcode-back" href="../../lxml.doctestcompare.html#lxml.doctestcompare.LXMLOutputChecker.collect_diff_text">[docs]</a>    <span class="k">def</span> <span class="nf">collect_diff_text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">want</span><span class="p">,</span> <span class="n">got</span><span class="p">,</span> <span class="n">strip</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">text_compare</span><span class="p">(</span><span class="n">want</span><span class="p">,</span> <span class="n">got</span><span class="p">,</span> <span class="n">strip</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">got</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s1">&#39;&#39;</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_text</span><span class="p">(</span><span class="n">got</span><span class="p">,</span> <span class="n">strip</span><span class="p">)</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> (got: </span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">want</span><span class="p">,</span> <span class="n">got</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_text</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">strip</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="LHTMLOutputChecker"><a class="viewcode-back" href="../../lxml.doctestcompare.html#lxml.doctestcompare.LHTMLOutputChecker">[docs]</a><span class="k">class</span> <span class="nc">LHTMLOutputChecker</span><span class="p">(</span><span class="n">LXMLOutputChecker</span><span class="p">):</span>
+<div class="viewcode-block" id="LHTMLOutputChecker.get_default_parser"><a class="viewcode-back" href="../../lxml.doctestcompare.html#lxml.doctestcompare.LHTMLOutputChecker.get_default_parser">[docs]</a>    <span class="k">def</span> <span class="nf">get_default_parser</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">html_fromstring</span></div></div>
+    
+<div class="viewcode-block" id="install"><a class="viewcode-back" href="../../lxml.doctestcompare.html#lxml.doctestcompare.install">[docs]</a><span class="k">def</span> <span class="nf">install</span><span class="p">(</span><span class="n">html</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Install doctestcompare for all future doctests.</span>
+
+<span class="sd">    If html is true, then by default the HTML parser will be used;</span>
+<span class="sd">    otherwise the XML parser is used.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">html</span><span class="p">:</span>
+        <span class="n">doctest</span><span class="o">.</span><span class="n">OutputChecker</span> <span class="o">=</span> <span class="n">LHTMLOutputChecker</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">doctest</span><span class="o">.</span><span class="n">OutputChecker</span> <span class="o">=</span> <span class="n">LXMLOutputChecker</span></div>
+
+<div class="viewcode-block" id="temp_install"><a class="viewcode-back" href="../../lxml.doctestcompare.html#lxml.doctestcompare.temp_install">[docs]</a><span class="k">def</span> <span class="nf">temp_install</span><span class="p">(</span><span class="n">html</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">del_module</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Use this *inside* a doctest to enable this checker for this</span>
+<span class="sd">    doctest only.</span>
+
+<span class="sd">    If html is true, then by default the HTML parser will be used;</span>
+<span class="sd">    otherwise the XML parser is used.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">html</span><span class="p">:</span>
+        <span class="n">Checker</span> <span class="o">=</span> <span class="n">LHTMLOutputChecker</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">Checker</span> <span class="o">=</span> <span class="n">LXMLOutputChecker</span>
+    <span class="n">frame</span> <span class="o">=</span> <span class="n">_find_doctest_frame</span><span class="p">()</span>
+    <span class="n">dt_self</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">f_locals</span><span class="p">[</span><span class="s1">&#39;self&#39;</span><span class="p">]</span>
+    <span class="n">checker</span> <span class="o">=</span> <span class="n">Checker</span><span class="p">()</span>
+    <span class="n">old_checker</span> <span class="o">=</span> <span class="n">dt_self</span><span class="o">.</span><span class="n">_checker</span>
+    <span class="n">dt_self</span><span class="o">.</span><span class="n">_checker</span> <span class="o">=</span> <span class="n">checker</span>
+    <span class="c1"># The unfortunate thing is that there is a local variable &#39;check&#39;</span>
+    <span class="c1"># in the function that runs the doctests, that is a bound method</span>
+    <span class="c1"># into the output checker.  We have to update that.  We can&#39;t</span>
+    <span class="c1"># modify the frame, so we have to modify the object in place.  The</span>
+    <span class="c1"># only way to do this is to actually change the func_code</span>
+    <span class="c1"># attribute of the method.  We change it, and then wait for</span>
+    <span class="c1"># __record_outcome to be run, which signals the end of the __run</span>
+    <span class="c1"># method, at which point we restore the previous check_output</span>
+    <span class="c1"># implementation.</span>
+    <span class="k">if</span> <span class="n">_IS_PYTHON_3</span><span class="p">:</span>
+        <span class="n">check_func</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">f_locals</span><span class="p">[</span><span class="s1">&#39;check&#39;</span><span class="p">]</span><span class="o">.</span><span class="vm">__func__</span>
+        <span class="n">checker_check_func</span> <span class="o">=</span> <span class="n">checker</span><span class="o">.</span><span class="n">check_output</span><span class="o">.</span><span class="vm">__func__</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">check_func</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">f_locals</span><span class="p">[</span><span class="s1">&#39;check&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">im_func</span>
+        <span class="n">checker_check_func</span> <span class="o">=</span> <span class="n">checker</span><span class="o">.</span><span class="n">check_output</span><span class="o">.</span><span class="n">im_func</span>
+    <span class="c1"># Because we can&#39;t patch up func_globals, this is the only global</span>
+    <span class="c1"># in check_output that we care about:</span>
+    <span class="n">doctest</span><span class="o">.</span><span class="n">etree</span> <span class="o">=</span> <span class="n">etree</span>
+    <span class="n">_RestoreChecker</span><span class="p">(</span><span class="n">dt_self</span><span class="p">,</span> <span class="n">old_checker</span><span class="p">,</span> <span class="n">checker</span><span class="p">,</span>
+                    <span class="n">check_func</span><span class="p">,</span> <span class="n">checker_check_func</span><span class="p">,</span>
+                    <span class="n">del_module</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="_RestoreChecker"><a class="viewcode-back" href="../../lxml.doctestcompare.html#lxml.doctestcompare._RestoreChecker">[docs]</a><span class="k">class</span> <span class="nc">_RestoreChecker</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dt_self</span><span class="p">,</span> <span class="n">old_checker</span><span class="p">,</span> <span class="n">new_checker</span><span class="p">,</span> <span class="n">check_func</span><span class="p">,</span> <span class="n">clone_func</span><span class="p">,</span>
+                 <span class="n">del_module</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dt_self</span> <span class="o">=</span> <span class="n">dt_self</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">checker</span> <span class="o">=</span> <span class="n">old_checker</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">checker</span><span class="o">.</span><span class="n">_temp_call_super_check_output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">call_super</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">checker</span><span class="o">.</span><span class="n">_temp_override_self</span> <span class="o">=</span> <span class="n">new_checker</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_func</span> <span class="o">=</span> <span class="n">check_func</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clone_func</span> <span class="o">=</span> <span class="n">clone_func</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">del_module</span> <span class="o">=</span> <span class="n">del_module</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">install_clone</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">install_dt_self</span><span class="p">()</span>
+<div class="viewcode-block" id="_RestoreChecker.install_clone"><a class="viewcode-back" href="../../lxml.doctestcompare.html#lxml.doctestcompare._RestoreChecker.install_clone">[docs]</a>    <span class="k">def</span> <span class="nf">install_clone</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">_IS_PYTHON_3</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">func_code</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_func</span><span class="o">.</span><span class="vm">__code__</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">func_globals</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_func</span><span class="o">.</span><span class="vm">__globals__</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check_func</span><span class="o">.</span><span class="vm">__code__</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">clone_func</span><span class="o">.</span><span class="vm">__code__</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">func_code</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_func</span><span class="o">.</span><span class="n">func_code</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">func_globals</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_func</span><span class="o">.</span><span class="n">func_globals</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check_func</span><span class="o">.</span><span class="n">func_code</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">clone_func</span><span class="o">.</span><span class="n">func_code</span></div>
+<div class="viewcode-block" id="_RestoreChecker.uninstall_clone"><a class="viewcode-back" href="../../lxml.doctestcompare.html#lxml.doctestcompare._RestoreChecker.uninstall_clone">[docs]</a>    <span class="k">def</span> <span class="nf">uninstall_clone</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">_IS_PYTHON_3</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check_func</span><span class="o">.</span><span class="vm">__code__</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">func_code</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check_func</span><span class="o">.</span><span class="n">func_code</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">func_code</span></div>
+<div class="viewcode-block" id="_RestoreChecker.install_dt_self"><a class="viewcode-back" href="../../lxml.doctestcompare.html#lxml.doctestcompare._RestoreChecker.install_dt_self">[docs]</a>    <span class="k">def</span> <span class="nf">install_dt_self</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prev_func</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt_self</span><span class="o">.</span><span class="n">_DocTestRunner__record_outcome</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dt_self</span><span class="o">.</span><span class="n">_DocTestRunner__record_outcome</span> <span class="o">=</span> <span class="bp">self</span></div>
+<div class="viewcode-block" id="_RestoreChecker.uninstall_dt_self"><a class="viewcode-back" href="../../lxml.doctestcompare.html#lxml.doctestcompare._RestoreChecker.uninstall_dt_self">[docs]</a>    <span class="k">def</span> <span class="nf">uninstall_dt_self</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dt_self</span><span class="o">.</span><span class="n">_DocTestRunner__record_outcome</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prev_func</span></div>
+<div class="viewcode-block" id="_RestoreChecker.uninstall_module"><a class="viewcode-back" href="../../lxml.doctestcompare.html#lxml.doctestcompare._RestoreChecker.uninstall_module">[docs]</a>    <span class="k">def</span> <span class="nf">uninstall_module</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">del_module</span><span class="p">:</span>
+            <span class="kn">import</span> <span class="nn">sys</span>
+            <span class="k">del</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">del_module</span><span class="p">]</span>
+            <span class="k">if</span> <span class="s1">&#39;.&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">del_module</span><span class="p">:</span>
+                <span class="n">package</span><span class="p">,</span> <span class="n">module</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">del_module</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">package_mod</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="n">package</span><span class="p">]</span>
+                <span class="nb">delattr</span><span class="p">(</span><span class="n">package_mod</span><span class="p">,</span> <span class="n">module</span><span class="p">)</span></div>
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uninstall_clone</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uninstall_dt_self</span><span class="p">()</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">checker</span><span class="o">.</span><span class="n">_temp_override_self</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">checker</span><span class="o">.</span><span class="n">_temp_call_super_check_output</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prev_func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uninstall_module</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">result</span>
+<div class="viewcode-block" id="_RestoreChecker.call_super"><a class="viewcode-back" href="../../lxml.doctestcompare.html#lxml.doctestcompare._RestoreChecker.call_super">[docs]</a>    <span class="k">def</span> <span class="nf">call_super</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uninstall_clone</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">install_clone</span><span class="p">()</span></div></div>
+            
+<div class="viewcode-block" id="_find_doctest_frame"><a class="viewcode-back" href="../../lxml.doctestcompare.html#lxml.doctestcompare._find_doctest_frame">[docs]</a><span class="k">def</span> <span class="nf">_find_doctest_frame</span><span class="p">():</span>
+    <span class="kn">import</span> <span class="nn">sys</span>
+    <span class="n">frame</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">while</span> <span class="n">frame</span><span class="p">:</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">f_locals</span>
+        <span class="k">if</span> <span class="s1">&#39;BOOM&#39;</span> <span class="ow">in</span> <span class="n">l</span><span class="p">:</span>
+            <span class="c1"># Sign of doctest</span>
+            <span class="k">return</span> <span class="n">frame</span>
+        <span class="n">frame</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">f_back</span>
+    <span class="k">raise</span> <span class="ne">LookupError</span><span class="p">(</span>
+        <span class="s2">&quot;Could not find doctest (only use this function *inside* a doctest)&quot;</span><span class="p">)</span></div>
+    
+<span class="n">__test__</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;basic&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;&#39;</span>
+<span class="s1">    &gt;&gt;&gt; temp_install()</span>
+<span class="s1">    &gt;&gt;&gt; print &quot;&quot;&quot;&lt;xml a=&quot;1&quot; b=&quot;2&quot;&gt;stuff&lt;/xml&gt;&quot;&quot;&quot;</span>
+<span class="s1">    &lt;xml b=&quot;2&quot; a=&quot;1&quot;&gt;...&lt;/xml&gt;</span>
+<span class="s1">    &gt;&gt;&gt; print &quot;&quot;&quot;&lt;xml xmlns=&quot;http://example.com&quot;&gt;&lt;tag   attr=&quot;bar&quot;   /&gt;&lt;/xml&gt;&quot;&quot;&quot;</span>
+<span class="s1">    &lt;xml xmlns=&quot;...&quot;&gt;</span>
+<span class="s1">      &lt;tag attr=&quot;...&quot; /&gt;</span>
+<span class="s1">    &lt;/xml&gt;</span>
+<span class="s1">    &gt;&gt;&gt; print &quot;&quot;&quot;&lt;xml&gt;blahblahblah&lt;foo /&gt;&lt;/xml&gt;&quot;&quot;&quot; # doctest: +NOPARSE_MARKUP, +ELLIPSIS</span>
+<span class="s1">    &lt;xml&gt;...foo /&gt;&lt;/xml&gt;</span>
+<span class="s1">    &#39;&#39;&#39;</span><span class="p">}</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">doctest</span>
+    <span class="n">doctest</span><span class="o">.</span><span class="n">testmod</span><span class="p">()</span>
+    
+    
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020, lxml dev team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

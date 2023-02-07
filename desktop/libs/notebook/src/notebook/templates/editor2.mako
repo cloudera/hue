@@ -43,6 +43,23 @@
   ${ render_bundle(bundle) | n,unicode }
 % endfor
 
+
+<!-- REACT INTEGRATION EXAMPLE WITHOUT KO-BINDING 
+This script is used to generate react root components when the page is loaded. The component element
+tag must be present in the part of the DOM specified by the selector when this script runs.
+There is no bridge to KO for components using this integration. Example using inside main HTML code:
+
+<script type="text/javascript">
+  (function () {    
+    window.createReactComponents('#embeddable_editor');
+  })();
+</script>
+<p style="position: absolute; z-index: 99999; top: 50px">           
+  <ReactExampleGlobal data-reactcomponent='ReactExampleGlobal' data-props='{"myObj": {"id": 1}, "children": "mako template only", "version" : "${sys.version_info[0]}"}'></ReactExampleGlobal>
+</p>  
+
+!-->
+
 <script type="text/html" id="editor-snippet-icon">
   <!-- ko if: viewSettings().snippetImage -->
   <img class="snippet-icon-image" data-bind="attr: { 'src': viewSettings().snippetImage }" alt="${ _('Snippet icon') }">
@@ -57,7 +74,7 @@
 % if ENABLE_PRESENTATION.get():
     <!-- ko with: selectedNotebook() -->
     <div class="btn-group">
-      <a class="btn" data-bind="click: function() { isPresentationMode(!isPresentationMode()); },
+      <a class="btn" data-bind="click: function() { isPresentationMode(!isPresentationMode()); hueAnalytics.log('editor', 'view-as-presentation');},
       css: {'btn-inverse': $root.isPresentationMode()}, attr: {title: isPresentationMode() ? '${ _ko('Exit presentation') }' : '${ _ko('View as a presentation') }'}">
         <i class="fa fa-line-chart"></i>
       </a>
@@ -77,7 +94,7 @@
 % endif
 
     <div class="btn-group">
-      <a class="btn" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: function() { if ($root.canSave() ) { saveNotebook() } else { $('#editorSaveAsModal').modal('show');} }, attr: { title: $root.canSave() ? '${ _ko('Save') }' : '${ _ko('Save As') }' }">
+      <a data-hue-analytics="editor:save-query-as-click" class="btn" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: function() { if ($root.canSave() ) { saveNotebook() } else { $('#editorSaveAsModal').modal('show');} }, attr: { title: $root.canSave() ? '${ _ko('Save') }' : '${ _ko('Save As') }' }">
         <i class="fa fa-save"></i>
       </a>
 
@@ -103,7 +120,7 @@
       <ul class="dropdown-menu pull-right">
         <li>
           <!-- ko if: editorMode -->
-          <a href="javascript:void(0)" data-bind="click: function() { hueUtils.removeURLParameter('editor'); newNotebook($root.editorType(), null, selectedNotebook() ? $root.selectedNotebook().snippets()[0].currentQueryTab() : null, 'blank'); }, attr: { 'title': '${ _('New ') }' +  editorTitle() + '${ _(' Query') }' }">
+          <a data-hue-analytics="editor:new-query-button-click" href="javascript:void(0)" data-bind="click: function() { hueUtils.removeURLParameter('editor'); newNotebook($root.editorType(), null, selectedNotebook() ? $root.selectedNotebook().snippets()[0].currentQueryTab() : null, 'blank'); }, attr: { 'title': '${ _('New ') }' +  editorTitle() + '${ _(' Query') }' }">
             <i class="fa fa-fw fa-file-o"></i> ${ _('New') }
           </a>
           <!-- /ko -->
@@ -114,12 +131,12 @@
           <!-- /ko -->
         </li>
         <li>
-          <a href="javascript:void(0)" data-bind="publish: { 'assist.show.documents': editorMode() ? 'query-' + editorType() : editorType() }">
+          <a data-hue-analytics="editor:queries-button-click" href="javascript:void(0)" data-bind="publish: { 'assist.show.documents': editorMode() ? 'query-' + editorType() : editorType() }">
             <svg class="hi hi-fw hi-bigger"><use xlink:href="#hi-documents"></use></svg> <span data-bind="text: editorMode() ? '${ _ko('Queries') }' : '${ _ko('Notebooks') }'"></span>
           </a>
         </li>
         <li>
-          <a href="javascript:void(0)" title="${ _('Show Editor Help') }" data-toggle="modal" data-target="#editorHelpModal">
+          <a data-hue-analytics="editor:show-help-button-click" href="javascript:void(0)" title="${ _('Show Editor Help') }" data-toggle="modal" data-target="#editorHelpModal">
             <i class="fa fa-fw fa-question"></i>  ${ _('Help') }
           </a>
         </li>
@@ -135,7 +152,7 @@
         <!-- /ko -->
         <!-- /ko -->
         <li>
-          <a href="javascript:void(0)" data-bind="click: showSessionPanel">
+          <a data-hue-analytics="editor:show-sessions-button-click" href="javascript:void(0)" data-bind="click: showSessionPanel">
             <i class="fa fa-fw fa-cogs"></i> ${ _('Sessions') }
           </a>
         </li>
@@ -822,12 +839,12 @@
             </li>
             <li class="query-name no-horiz-padding skip-width-calculation">
               <a href="javascript:void(0)">
-                <div class="notebook-name-desc" data-bind="editable: name, editableOptions: { inputclass: 'notebook-name-input', enabled: true, placement: 'bottom', emptytext: '${_ko('Add a name...')}', tpl: '<input type=\'text\' maxlength=\'255\'>' }"></div>
+                <div data-hue-analytics="editor:add-name-click" class="notebook-name-desc" data-bind="editable: name, editableOptions: { inputclass: 'notebook-name-input', enabled: true, placement: 'bottom', emptytext: '${_ko('Add a name...')}', tpl: '<input type=\'text\' maxlength=\'255\'>' }"></div>
               </a>
             </li>
             <li class="skip-width-calculation" data-bind="tooltip: { placement: 'bottom', title: description }">
               <a href="javascript:void(0)">
-                <div class="notebook-name-desc" data-bind="editable: description, editableOptions: { type: 'textarea', enabled: true, placement: 'bottom', emptytext: '${_ko('Add a description...')}' }"></div>
+                <div data-hue-analytics="editor:add-description-click" class="notebook-name-desc" data-bind="editable: description, editableOptions: { type: 'textarea', enabled: true, placement: 'bottom', emptytext: '${_ko('Add a description...')}' }"></div>
               </a>
             </li>
             <!-- /ko -->
@@ -874,7 +891,7 @@
           <div class="editor-top-right-actions">
             <!-- ko template: { name: 'snippet-header-database-selection' } --><!-- /ko -->
             <button title="${ _('Expand editor') }" data-bind="toggle: $root.topExpanded">
-              <i class="fa" data-bind="css: { 'fa-expand': !$root.topExpanded(), 'fa-compress': $root.topExpanded() }"></i>
+              <i data-hue-analytics="editor:expand-editor-click" class="fa" data-bind="css: { 'fa-expand': !$root.topExpanded(), 'fa-compress': $root.topExpanded() }"></i>
             </button>
           </div>
         </div>
@@ -913,23 +930,23 @@
       <div class="editor-bottom">
         <ul class="editor-bottom-tabs nav nav-tabs">
           <li data-bind="click: function() { currentQueryTab('queryHistory'); }, css: { 'active': currentQueryTab() == 'queryHistory' }">
-            <a class="inactive-action" style="display:inline-block" href="#queryHistory" data-toggle="tab">${_('Query History')}</a>
+            <a data-hue-analytics="editor:bottom-tab-click/query-history" class="inactive-action" style="display:inline-block" href="#queryHistory" data-toggle="tab">${_('Query History')}</a>
           </li>
           <li data-bind="click: function(){ currentQueryTab('savedQueries'); }, css: { 'active': currentQueryTab() == 'savedQueries' }">
-            <a class="inactive-action" style="display:inline-block" href="#savedQueries" data-toggle="tab">${_('Saved Queries')}</a>
+            <a data-hue-analytics="editor:bottom-tab-click/saved-queries" class="inactive-action" style="display:inline-block" href="#savedQueries" data-toggle="tab">${_('Saved Queries')}</a>
           </li>
           <li data-bind="click: function() { currentQueryTab('queryResults'); }, css: {'active': currentQueryTab() == 'queryResults'}">
-            <a class="inactive-action" style="display:inline-block" href="#queryResults" data-toggle="tab">${_('Results')}
+            <a data-hue-analytics="editor:bottom-tab-click/query-result" class="inactive-action" style="display:inline-block" href="#queryResults" data-toggle="tab">${_('Results')}
   ##          <!-- ko if: result.rows() != null  -->
   ##          (<span data-bind="text: result.rows().toLocaleString() + (dialect() == 'impala' && result.rows() == 1024 ? '+' : '')" title="${ _('Number of rows') }"></span>)
   ##          <!-- /ko -->
             </a>
           </li>
           <li data-bind="click: function() { currentQueryTab('queryChart'); }, css: {'active': currentQueryTab() == 'queryChart'}">
-            <a class="inactive-action" style="display:inline-block" href="#queryChart" data-toggle="tab">${_('Chart')}</a>
+            <a data-hue-analytics="editor:bottom-tab-click/query-chart" class="inactive-action" style="display:inline-block" href="#queryChart" data-toggle="tab">${_('Chart')}</a>
           </li>
           <!-- ko if: explanation -->
-          <li data-bind="click: function() { currentQueryTab('queryExplain'); }, css: {'active': currentQueryTab() == 'queryExplain'}"><a class="inactive-action" href="#queryExplain" data-toggle="tab">${_('Explain')}</a></li>
+          <li data-hue-analytics="editor:bottom-tab-click/query-explain" data-bind="click: function() { currentQueryTab('queryExplain'); }, css: {'active': currentQueryTab() == 'queryExplain'}"><a class="inactive-action" href="#queryExplain" data-toggle="tab">${_('Explain')}</a></li>
           <!-- /ko -->
           <!-- ko foreach: pinnedContextTabs -->
           <li data-bind="click: function() { $parent.currentQueryTab(tabId) }, css: { 'active': $parent.currentQueryTab() === tabId }">
@@ -943,12 +960,12 @@
           <!-- /ko -->
 
           <li data-bind="click: function(){ currentQueryTab('executionAnalysis'); }, css: {'active': currentQueryTab() == 'executionAnalysis'}">
-            <a class="inactive-action" href="#executionAnalysis" data-toggle="tab">${_('Execution Analysis')}</a>
+            <a data-hue-analytics="editor:bottom-tab-click/execution-analysis" class="inactive-action" href="#executionAnalysis" data-toggle="tab">${_('Execution Analysis')}</a>
           </li>
 
           <li class="editor-bottom-tab-actions">
             <button data-bind="toggle: $root.bottomExpanded">
-              <i class="fa" data-bind="css: { 'fa-expand': !$root.bottomExpanded(), 'fa-compress': $root.bottomExpanded() }"></i>
+              <i data-hue-analytics="editor:expand-result-click" class="fa" data-bind="css: { 'fa-expand': !$root.bottomExpanded(), 'fa-compress': $root.bottomExpanded() }"></i>
             </button>
           </li>
         </ul>
@@ -985,7 +1002,19 @@
           </div>
 
           <div class="tab-pane" id="queryResults" data-bind="css: {'active': currentQueryTab() == 'queryResults'}">
-            <div class="execution-results-tab-panel">
+            <div class="execution-results-tab-panel">              
+
+              <!-- REACT EXAMPLES WITH KO-BINDING 
+              These components below show how to integrate react with Knockout.js using the KO reactWrapper binding
+              New components, regardless if they are global or app specific must be added to 
+              desktop/core/src/desktop/js/reactComponents/imports.js              
+              
+              Example component defined and used globally within Hue
+              <ReactExampleGlobal data-bind="reactWrapper: 'ReactExampleGlobal', props: { children: 'KO binding used', myObj: activeExecutable }"></ReactExampleGlobal>
+              
+              Example component defined and used only within the "Editor app"
+              <ReactExample data-bind="reactWrapper: 'ReactExample', props: { activeExecutable: activeExecutable }"></ReactExample>
+              !-->
               <result-table-ko-bridge class="table-results-bridge" data-bind="vueKoProps: {
                   'executable-observable': activeExecutable
                 }"></result-table-ko-bridge>
@@ -1197,6 +1226,12 @@
       },
       spark2: {
         snippetImage: '${ static("spark/art/icon_spark_48.png") }'
+      },
+      sparksql: {
+        placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
+        aceMode: 'ace/mode/sparksql',
+        snippetImage: '${ static("beeswax/art/icon_spark_48.png") }',
+        sqlDialect: true
       },
       mapreduce: {
         snippetIcon: 'fa-file-archive-o'

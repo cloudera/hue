@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
+    "jsx": "react",
     "declaration": true,
-    "emitDeclarationOnly": true,
     "target": "esnext",
     "module": "esnext",
     "moduleResolution": "node",
@@ -37,6 +37,9 @@
     "node_modules",
     ".github",
     ".git",
-    ".circleci"
+    ".circleci",
+    // Temporary fix to prevent typescript generated JSX errors in the IDE 
+    // triggered by using baseUrl": "desktop/core/src/desktop/js".
+    "**/*.tsx"
   ]
 }

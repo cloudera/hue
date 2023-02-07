@@ -47,6 +47,7 @@ from django.utils.html import escape
 from aws.s3.s3fs import S3FileSystemException, S3ListAllBucketsException, get_s3_home_directory
 from desktop import appmanager
 from desktop.auth.backend import is_admin
+from desktop.conf import RAZ
 from desktop.lib import fsmanager
 from desktop.lib import i18n
 from desktop.lib.conf import coerce_bool
@@ -141,11 +142,17 @@ def index(request):
 
   return view(request, path)
 
+def _decode_slashes(path):
+  # This is a fix for some installations where the path is still having the slash (/) encoded
+  # as %2F while the rest of the path is actually decoded. 
+  encoded_slash = '%2F'
+  if path.startswith(encoded_slash) or path.startswith('abfs:' + encoded_slash) or path.startswith('s3a:' + encoded_slash):
+    path = path.replace(encoded_slash, '/')
+
+  return path
 
 def _normalize_path(path):
-  decoded_path = unquote_url(path)
-  if path != decoded_path:
-    path = decoded_path
+  path = _decode_slashes(path)
 
   # Check if protocol missing / and add it back (e.g. Kubernetes ingress can strip double slash)
   if path.startswith('abfs:/') and not path.startswith('abfs://'):
@@ -196,6 +203,7 @@ def download(request, path):
     setattr(response, 'redirect_override', True)
   else:
     response = StreamingHttpResponse(file_reader(fh), content_type=content_type)
+    response["Cache-Control"] = 'no-cache' # Browsers must not cache files but always download
     response["Last-Modified"] = http_date(stats['mtime'])
     response["Content-Length"] = stats['size']
     response['Content-Disposition'] = request.GET.get('disposition', 'attachment; filename="' + stats['name'] + '"') \
@@ -282,6 +290,8 @@ def view(request, path):
     if "Connection refused" in str(e):
       msg += _(" The HDFS REST service is not available. ")
 
+    logger.error(msg + str(e))
+
     if is_ajax(request):
       exception = {
         'error': msg
@@ -363,7 +373,7 @@ def save_file(request):
   """
   form = EditorForm(request.POST)
   is_valid = form.is_valid()
-  path = form.cleaned_data.get('path')
+  path = form['path'].value()
 
   path = _normalize_path(path)
 
@@ -402,7 +412,7 @@ def parse_breadcrumbs(path):
     if url and not url.endswith('/'):
       url += '/'
     url += part
-    breadcrumbs.append({'url': urllib_quote(url.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS), 'label': part})
+    breadcrumbs.append({'url': url, 'label': part})
   return breadcrumbs
 
 
@@ -549,8 +559,16 @@ def listdir_paged(request, path):
     page = None
     shown_stats = []
 
-  # Include parent dir always as second option, unless at filesystem root.
-  if not request.fs.isroot(path):
+  # Include same dir always as first option to see stats of the current folder.
+  current_stat = request.fs.stats(path)
+  # The 'path' field would be absolute, but we want its basename to be
+  # actually '.' for display purposes. Encode it since _massage_stats expects byte strings.
+  current_stat.path = path
+  current_stat.name = "."
+  shown_stats.insert(0, current_stat)
+
+  # Include parent dir always as second option, unless at filesystem root or when RAZ is enabled.
+  if not (request.fs.isroot(path) or RAZ.IS_ENABLED.get()):
     parent_path = request.fs.parent_path(path)
     parent_stat = request.fs.stats(parent_path)
     # The 'path' field would be absolute, but we want its basename to be
@@ -558,14 +576,6 @@ def listdir_paged(request, path):
     parent_stat['path'] = parent_path
     parent_stat['name'] = ".."
     shown_stats.insert(0, parent_stat)
-
-  # Include same dir always as first option to see stats of the current folder
-  current_stat = request.fs.stats(path)
-  # The 'path' field would be absolute, but we want its basename to be
-  # actually '.' for display purposes. Encode it since _massage_stats expects byte strings.
-  current_stat.path = path
-  current_stat.name = "."
-  shown_stats.insert(1, current_stat)
 
   if page:
     page.object_list = [_massage_stats(request, stat_absolute_path(path, s)) for s in shown_stats]
@@ -587,7 +597,7 @@ def listdir_paged(request, path):
       # The following should probably be deprecated
       'cwd_set': True,
       'file_filter': 'any',
-      'current_dir_path': urllib_quote(path.encode('utf-8'), safe=SAFE_CHARACTERS_URI),
+      'current_dir_path': path,
       'is_fs_superuser': is_fs_superuser,
       'groups': is_fs_superuser and [str(x) for x in Group.objects.values_list('name', flat=True)] or [],
       'users': is_fs_superuser and [str(x) for x in User.objects.values_list('username', flat=True)] or [],
@@ -1180,6 +1190,11 @@ def generic_op(form_class, request, op, parameter_names, piggyback=None, templat
 
       if next:
         logging.debug("Next: %s" % next)
+        file_path_prefix = '/filebrowser/view='
+        if next.startswith(file_path_prefix):          
+          decoded_file_path = next[len(file_path_prefix):]
+          filepath_encoded_next = file_path_prefix + urllib_quote(decoded_file_path.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS)
+          return format_preserving_redirect(request, filepath_encoded_next)
         # Doesn't need to be quoted: quoting is done by HttpResponseRedirect.
         return format_preserving_redirect(request, next)
       ret["success"] = True
@@ -1214,7 +1229,7 @@ def rename(request):
       raise PopupException(_("Could not rename folder \"%s\" to \"%s\": Hashes are not allowed in filenames." % (src_path, dest_path)))
     if "/" not in dest_path:
       src_dir = os.path.dirname(src_path)
-      dest_path = request.fs.join(urllib_unquote(src_dir), urllib_unquote(dest_path))
+      dest_path = request.fs.join(src_dir, dest_path)
     if request.fs.exists(dest_path):
       raise PopupException(_('The destination path "%s" already exists.') % dest_path)
     request.fs.rename(src_path, dest_path)
@@ -1229,14 +1244,13 @@ def set_replication(request):
 
   return generic_op(SetReplicationFactorForm, request, smart_set_replication, ["src_path", "replication_factor"], None)
 
-
 def mkdir(request):
   def smart_mkdir(path, name):
     # Make sure only one directory is specified at a time.
     # No absolute directory specification allowed.
     if posixpath.sep in name or "#" in name:
       raise PopupException(_("Could not name folder \"%s\": Slashes or hashes are not allowed in filenames." % name))
-    request.fs.mkdir(request.fs.join(urllib_unquote(path), urllib_unquote(name)))
+    request.fs.mkdir(request.fs.join(path, name))
 
   return generic_op(MkDirForm, request, smart_mkdir, ["path", "name"], "path")
 
@@ -1248,8 +1262,8 @@ def touch(request):
       raise PopupException(_("Could not name file \"%s\": Slashes are not allowed in filenames." % name))
     request.fs.create(
         request.fs.join(
-            urllib_unquote(path.encode('utf-8') if not isinstance(path, str) else path),
-            urllib_unquote(name.encode('utf-8') if not isinstance(name, str) else name)
+            (path.encode('utf-8') if not isinstance(path, str) else path),
+            (name.encode('utf-8') if not isinstance(name, str) else name)
         )
     )
 
@@ -1261,7 +1275,7 @@ def rmtree(request):
   params = ["path"]
   def bulk_rmtree(*args, **kwargs):
     for arg in args:
-      request.fs.do_as_user(request.user, request.fs.rmtree, urllib_unquote(arg['path']), 'skip_trash' in request.GET)
+      request.fs.do_as_user(request.user, request.fs.rmtree, arg['path'], 'skip_trash' in request.GET)
   return generic_op(RmTreeFormSet, request, bulk_rmtree, ["path"], None,
                     data_extractor=formset_data_extractor(recurring, params),
                     arg_extractor=formset_arg_extractor,
@@ -1277,8 +1291,8 @@ def move(request):
       if arg['src_path'] == arg['dest_path']:
         raise PopupException(_('Source path and destination path cannot be same'))
       request.fs.rename(
-          urllib_unquote(arg['src_path'].encode('utf-8') if not isinstance(arg['src_path'], str) else arg['src_path']),
-          urllib_unquote(arg['dest_path'].encode('utf-8') if not isinstance(arg['dest_path'], str) else arg['dest_path'])
+          arg['src_path'].encode('utf-8') if not isinstance(arg['src_path'], str) else arg['src_path'],
+          arg['dest_path'].encode('utf-8') if not isinstance(arg['dest_path'], str) else arg['dest_path']
       )
   return generic_op(RenameFormSet, request, bulk_move, ["src_path", "dest_path"], None,
                     data_extractor=formset_data_extractor(recurring, params),
@@ -1294,7 +1308,7 @@ def copy(request):
     for arg in args:
       if arg['src_path'] == arg['dest_path']:
         raise PopupException(_('Source path and destination path cannot be same'))
-      request.fs.copy(unquote_url(arg['src_path']), unquote_url(arg['dest_path']), recursive=True, owner=request.user)
+      request.fs.copy(arg['src_path'], arg['dest_path'], recursive=True, owner=request.user)
   return generic_op(CopyFormSet, request, bulk_copy, ["src_path", "dest_path"], None,
                     data_extractor=formset_data_extractor(recurring, params),
                     arg_extractor=formset_arg_extractor,
@@ -1310,7 +1324,7 @@ def chmod(request):
   def bulk_chmod(*args, **kwargs):
     op = partial(request.fs.chmod, recursive=request.POST.get('recursive', False))
     for arg in args:
-      op(urllib_unquote(arg['path']), arg['mode'])
+      op(arg['path'], arg['mode'])
   # mode here is abused: on input, it's a string, but when retrieved,
   # it's an int.
   return generic_op(ChmodFormSet, request, bulk_chmod, ['path', 'mode'], "path",
@@ -1400,8 +1414,8 @@ def _upload_file(request):
 
   if form.is_valid():
     uploaded_file = request.FILES['hdfs_file']
-    dest = scheme_absolute_path(unquote_url(request.GET['dest']), unquote_url(request.GET['dest']))
-    filepath = request.fs.join(dest, unquote_url(uploaded_file.name))
+    dest = request.GET['dest']
+    filepath = request.fs.join(dest, uploaded_file.name)
 
     if request.fs.isdir(dest) and posixpath.sep in uploaded_file.name:
       raise PopupException(_('Sorry, no "%(sep)s" in the filename %(name)s.' % {'sep': posixpath.sep, 'name': uploaded_file.name}))
@@ -1465,9 +1479,6 @@ def compress_files_using_batch_job(request):
 
     if upload_path and file_names and archive_name:
       try:
-        upload_path = urllib_unquote(upload_path)
-        archive_name = urllib_unquote(archive_name)
-        file_names = [urllib_unquote(name) for name in file_names]
         response = compress_files_in_hdfs(request, file_names, upload_path, archive_name)
       except Exception as e:
         response['message'] = _('Exception occurred while compressing files: %s' % e)
