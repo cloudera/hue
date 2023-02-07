@@ -153,7 +153,7 @@ def get_region(conf=None):
     LOG.warning("Region, %s, not found in the list of supported regions: %s" % (region, ', '.join(get_locations())))
     region = ''
 
-  REGION_CACHED = region
+  REGION_CACHED = region 
 
   return region
 
