@@ -40,7 +40,7 @@ stacks:
         marker_list: []
         tier_tests:
         - tier_name: functional-test
-          payload_name: pcqe_ycloud
+          payload_name: edw_org_ycloud
   name: CDH
   stack_name: CDH
   version: ${CDH_RELEASE_VERSION}
