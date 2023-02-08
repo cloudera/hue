@@ -27,7 +27,7 @@ CHAR_TO_OCT = {"---": 0, "--x": 1, "-w-": 2, "-wx": 3, "r--": 4, "r-x": 5, "rw-"
 
 class ABFSStat(object):
 
-  def __init__(self, isDir, atime, mtime, size, path, owner = '', group='', mode=None):
+  def __init__(self, isDir, atime, mtime, size, path, owner='', group='', mode=None):
     self.name = strip_path(path)
     self.path = path
     self.isDir = isDir
@@ -100,7 +100,7 @@ class ABFSStat(object):
 
   @classmethod
   def for_filesystem(cls, resp, path):
-      return cls(True, resp['date'], resp['Last-Modified'], 0, path)
+    return cls(True, resp['date'], resp['Last-Modified'], 0, path)
 
   @staticmethod
   def char_permissions_to_oct_permissions(permissions):
@@ -112,10 +112,10 @@ class ABFSStat(object):
 
   def to_json_dict(self):
     """
-    Returns a dictionary for easy serialization long lineslong lineslong lineslong lineslong lineslong lineslong lineslong lineslong lineslong lines
+    Returns a dictionary for easy serialization
     """
-    keys = ('path', 'size', 'atime', 'mtime', 'mode', 'user', 'group', 'aclBit' )
+    keys = ('path', 'size', 'atime', 'mtime', 'mode', 'user', 'group', 'aclBit')
     res = {}
     for k in keys:
-      res[k]=self[k]
+      res[k] = self[k]
     return res

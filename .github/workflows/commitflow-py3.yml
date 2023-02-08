@@ -26,6 +26,7 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
+
     - name: Cache pip
       uses: actions/cache@v2
       with:
@@ -49,7 +50,7 @@ jobs:
         export ROOT=$PWD
         make apps
 
-    - name: run python lint
+    - name: run python lints
       run: |
         ./build/env/bin/pip install pylint==2.5.3 pylint-django==2.3.0 configparser==5.3.0
         ./tools/ci/check_for_python_lint.sh
