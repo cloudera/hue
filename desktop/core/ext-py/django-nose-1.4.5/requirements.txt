@@ -34,6 +34,6 @@ tox==2.7.0
 
 # Better interactive debugging
 gnureadline==6.3.3
-ipython==5.4.1
+ipython==8.10.0
 ipdb==0.10.3
 ipdbplugin==1.4.5
