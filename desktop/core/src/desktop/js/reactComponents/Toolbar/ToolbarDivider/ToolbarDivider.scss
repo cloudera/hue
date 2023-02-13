@@ -1,0 +1,12 @@
+@import '../ToolbarShared.scss';
+
+.antd {
+  .hue-toolbar-divider {
+    height: $toolbar-height;
+    .ant-divider-vertical {
+      height: $toolbar-height;
+      border-left-color: $toolbar-border-color;
+    }
+    
+  }
+}

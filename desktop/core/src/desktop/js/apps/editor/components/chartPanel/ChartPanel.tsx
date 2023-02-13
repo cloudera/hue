@@ -17,9 +17,9 @@
 import { Button, Select, Divider } from 'antd';
 import React, { useState, useMemo } from 'react';
 
-import PushDrawer, {
-  DrawerHeader
-} from '../../../../reactComponents/PushDrawer/PushDrawer';
+import ImportIcon from '../../../../components/icons/ImportIcon';
+import Toolbar, { ToolbarButton, ToolbarDivider } from '../../../../reactComponents/Toolbar/Toolbar';
+import PushDrawer, { DrawerHeader } from '../../../../reactComponents/PushDrawer/PushDrawer';
 import { useHuePubSub } from '../../../../reactComponents/useHuePubSub';
 import huePubSub from '../../../../utils/huePubSub';
 import {
@@ -33,8 +33,6 @@ import ExecutionResult from '../../execution/ExecutionResult';
 import SqlExecutable, { ExecutionStatus } from '../../execution/sqlExecutable';
 
 import './ChartPanel.scss';
-
-('use strict');
 
 const MAX_NUMBER_OF_ROWS = 100;
 
@@ -56,11 +54,14 @@ const isLoading = (statusTransition: ExecutableTransitionedEvent | undefined) =>
 };
 
 export interface ChartPanelProps {
-  activeExecutable: SqlExecutable;
+  activeExecutable: SqlExecutable | (() => SqlExecutable);
+  testId?: string;
 }
-const defaultProps = {};
+const defaultProps = {
+  testId: 'chart-panel'
+};
 
-const ChartPanel = ({ activeExecutable }) => {
+const ChartPanel = ({ activeExecutable, testId }: ChartPanelProps) => {
   const executable = typeof activeExecutable === 'function' ? activeExecutable() : activeExecutable;
   const result: ExecutionResult = executable?.result;
 
@@ -90,7 +91,6 @@ const ChartPanel = ({ activeExecutable }) => {
 
   const [configIsOpen, setConfigIsOpen] = useState(false);
 
-
   const toggleConfigDrawer = () => {
     setConfigIsOpen(open => !open);
   };
@@ -119,7 +119,7 @@ const ChartPanel = ({ activeExecutable }) => {
     () => ({
       width: '277px',
       isOpen: configIsOpen,
-      header: () => <DrawerHeader onClose={close} title={'Chart settings'}/>,
+      header: () => <DrawerHeader onClose={close} title={'Chart settings'} />,
       content: () => <div>I'm the drawer</div>
     }),
     [configIsOpen]
@@ -127,29 +127,15 @@ const ChartPanel = ({ activeExecutable }) => {
 
   return (
     <div className="hue-chart-panel antd-reset antd">
-      <menu className="hue-chart-panel-top-menu">
-        <li>
-          <Button type="link">Add a chart name</Button>      
-        </li>
-        <li className="spacer"></li>
-        <li><Divider type="vertical" /></li>
-        <li>
-          <Button onClick={toggleConfigDrawer}>Configure</Button>
-        </li>
-        <li>
-          <Button>Expand</Button>
-        </li>
-        <li>
-          <Button>Share</Button>
-        </li>
-        <li>
-          <Button>Download</Button>
-        </li>
-      </menu>
-      <PushDrawer
-        leftDrawer={drawerConfig}
-        mainContent={() => <div>I'm the main content</div>}
-      />
+      <Toolbar testId={`${testId}-toolbar`} content={() => <>
+        <ToolbarButton type="link">Add a chart name</ToolbarButton>
+        <div className="hue-toolbar__spacer"></div>
+        <ToolbarDivider/>
+        <ToolbarButton icon={<ImportIcon/>} type="link">Configure</ToolbarButton>
+        <ToolbarButton icon={<ImportIcon/>} iconPosition="right" type="link">Share</ToolbarButton>
+        <ToolbarButton type="link">Download</ToolbarButton>
+      </>} />
+      <PushDrawer leftDrawer={drawerConfig} mainContent={() => <div>I'm the main content</div>} />
 
       {/* <div
         className={classNames('hue-chart-panel-settings', {

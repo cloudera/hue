@@ -1,0 +1,15 @@
+@import '../ToolbarShared.scss';
+
+.antd {
+  .hue-toolbar-button {
+    span {
+      display: flex;
+      align-items: center;
+      gap: 4px
+    }
+    svg {
+      height: 16px;
+      width: 16px;
+    }
+  }
+}
