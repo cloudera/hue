@@ -1,0 +1,51 @@
+name: File a Bug 🐞 
+description: Report a failure in functionality
+title: " <add title>"
+labels: [BUG]
+body:
+- type: markdown
+  attributes:
+    value: "## Thanks for engaging with the Hue community! &#10084;&#65039;"
+- type: markdown
+  attributes:
+    value: |       
+      If this is a question rather than a bug, e.g. if you are unsure how to configure something, please use the discussion forum at [hue/discussions](https://github.com/cloudera/hue/discussions) or [discourse.gethue.com](https://discourse.gethue.com/)
+      
+      Please remember that Hue is open source and our aim is to have the community contribute to the codebase. We do our best to respond in a timely fashion, but if you find a fix yourself we would love for you to become a contributor by creating a [pull request](https://github.com/cloudera/hue/blob/master/CONTRIBUTING.md) with your changes.
+- type: checkboxes
+  attributes:
+    label: Is there an existing issue for this?
+    description: Please search to see if an issue already exists for the bug you encountered.
+    options:
+    - label: I have searched the existing issues
+      required: true
+- type: textarea
+  attributes:
+    label: Description
+    description: A concise description of what you're experiencing and expecting.
+  validations:
+    required: true
+- type: textarea
+  attributes:
+    label: Steps To Reproduce
+    description: Steps to reproduce the behavior, including relevant config
+    placeholder: |
+      1. In this environment...
+      2. With this config...
+      3. Run '...'
+      4. See error...
+  validations:
+    required: true
+- type: textarea
+  attributes:
+    label: Logs
+    description: Please attach any relevant log files or error output 
+  validations:
+    required: false    
+- type: input
+  attributes:
+    label: Hue version
+    description: "E.g. 'Open source release 4.11' or 'Open source current master' or 'gethue/hue:latest' or CDH 5.16' or 'CDP 1.0'"
+    placeholder: "Open source release 4.11"
+  validations:
+    required: true
