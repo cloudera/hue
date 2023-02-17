@@ -41,6 +41,8 @@ import com.cloudera.hue.querystore.common.repository.transaction.Callable;
 import com.cloudera.hue.querystore.common.repository.transaction.TransactionManager;
 import com.cloudera.hue.querystore.eventProcessor.processors.EventProcessor;
 import com.cloudera.hue.querystore.eventProcessor.processors.ProcessingStatus;
+import com.cloudera.hue.querystore.eventProcessor.readers.FileReader;
+import com.cloudera.hue.querystore.eventProcessor.readers.ProtoFileReader;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
@@ -88,7 +90,8 @@ public class EventProcessorPipelineTest {
     DasConfiguration config = new DasConfiguration();
     config.setConf(EventProcessorPipeline.FOLDER_SCAN_DELAY_MILLIS, 100L);
     metricRegistry = new MetricRegistry();
-    pipeline = new EventProcessorPipeline<>(clock, logger, processor, txnManager,
+    FileReader<HistoryEventProto> testReader = new ProtoFileReader<HistoryEventProto>(logger);
+    pipeline = new EventProcessorPipeline<>(clock, testReader, processor, txnManager,
         fsPersistenceManager, FileStatusType.TEZ, config, metricRegistry);
   }
 
@@ -203,7 +206,8 @@ public class EventProcessorPipelineTest {
     config.setConf(EventProcessorPipeline.FOLDER_SCAN_DELAY_MILLIS, 5 * 60 * 1000l);
 
     TestClock clock = new TestClock();
-    EventProcessorPipeline<HistoryEventProto> pipeline = new EventProcessorPipeline<>(clock, logger, processor, txnManager,
+    FileReader<HistoryEventProto> testReader = new ProtoFileReader<HistoryEventProto>(logger);
+    EventProcessorPipeline<HistoryEventProto> pipeline = new EventProcessorPipeline<>(clock, testReader, processor, txnManager,
         fsPersistenceManager, FileStatusType.TEZ, config, metricRegistry);
 
     clock.setTime(3 * 24 * 60 * 60 * 1000L);
