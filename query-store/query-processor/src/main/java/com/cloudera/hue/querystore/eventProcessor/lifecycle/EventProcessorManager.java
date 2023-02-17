@@ -23,6 +23,8 @@ import com.cloudera.hue.querystore.common.repository.transaction.TransactionMana
 import com.cloudera.hue.querystore.eventProcessor.pipeline.EventProcessorPipeline;
 import com.cloudera.hue.querystore.eventProcessor.processors.HiveEventProcessorDispatcher;
 import com.cloudera.hue.querystore.eventProcessor.processors.TezEventProcessorDispatcher;
+import com.cloudera.hue.querystore.eventProcessor.readers.FileReader;
+import com.cloudera.hue.querystore.eventProcessor.readers.ProtoFileReader;
 import com.codahale.metrics.MetricRegistry;
 
 import io.dropwizard.lifecycle.Managed;
@@ -53,8 +55,10 @@ public class EventProcessorManager implements Managed {
                                MetricRegistry metricRegistry) {
     this.eventProcessingConfig = eventProcessingConfig;
     this.hadoopConfiguration = hadoopConfiguration;
+
     this.tezEventProcessor = tezEventProcessor;
     this.hiveEventProcessor = hiveEventProcessor;
+
     this.fsPersistenceManager = fsPersistenceManager;
     this.txnManager = txnManager;
     this.metricRegistry = metricRegistry;
@@ -74,6 +78,7 @@ public class EventProcessorManager implements Managed {
     tezEventsPipeline.shutdown();
     tezAppEventsPipeline.shutdown();
     hiveEventsPipeline.shutdown();
+
     tezEventsPipeline.awaitTermination();
     tezAppEventsPipeline.awaitTermination();
     hiveEventsPipeline.awaitTermination();
@@ -108,12 +113,15 @@ public class EventProcessorManager implements Managed {
       if (!loggers.setup(hadoopConfiguration, clock)) {
         throw new RuntimeException("Failed to create tez events pipeline, loggers setup failed");
       }
-      tezEventsPipeline = new EventProcessorPipeline<>(clock, loggers.getDagEventsLogger(),
+
+      FileReader<HistoryEventProto> dagFileReader = new ProtoFileReader<HistoryEventProto>(loggers.getDagEventsLogger());
+      tezEventsPipeline = new EventProcessorPipeline<>(clock, dagFileReader,
           tezEventProcessor, txnManager, fsPersistenceManager, FileStatusType.TEZ,
           eventProcessingConfig, metricRegistry);
       tezEventsPipeline.start();
 
-      tezAppEventsPipeline = new EventProcessorPipeline<>(clock, loggers.getAppEventsLogger(),
+      FileReader<HistoryEventProto> appFileReader = new ProtoFileReader<HistoryEventProto>(loggers.getAppEventsLogger());
+      tezAppEventsPipeline = new EventProcessorPipeline<>(clock, appFileReader,
           tezEventProcessor, txnManager, fsPersistenceManager, FileStatusType.TEZ_APP,
           eventProcessingConfig, metricRegistry);
       tezAppEventsPipeline.start();
@@ -141,7 +149,8 @@ public class EventProcessorManager implements Managed {
       SystemClock clock = SystemClock.getInstance();
       DatePartitionedLogger<HiveHookEventProto> logger = new DatePartitionedLogger<>(
           HiveHookEventProto.PARSER, new Path(hiveBaseDir), hadoopConfiguration, clock);
-      hiveEventsPipeline = new EventProcessorPipeline<>(clock, logger, hiveEventProcessor, txnManager,
+      FileReader<HiveHookEventProto> hiveFileReader = new ProtoFileReader<HiveHookEventProto>(logger);
+      hiveEventsPipeline = new EventProcessorPipeline<>(clock, hiveFileReader, hiveEventProcessor, txnManager,
           fsPersistenceManager, FileStatusType.HIVE, eventProcessingConfig, metricRegistry);
       hiveEventsPipeline.start();
 

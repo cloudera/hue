@@ -8,13 +8,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.Path;
-import org.apache.tez.dag.history.logging.proto.DatePartitionedLogger;
-import org.apache.tez.dag.history.logging.proto.ProtoMessageReader;
 
 import com.cloudera.hue.querystore.common.entities.FileStatusEntity;
 import com.cloudera.hue.querystore.common.repository.FileStatusPersistenceManager;
 import com.cloudera.hue.querystore.common.repository.transaction.TransactionManager;
-import com.google.protobuf.MessageLite;
+import com.cloudera.hue.querystore.eventProcessor.readers.EventReader;
+import com.cloudera.hue.querystore.eventProcessor.readers.FileReader;
 
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
@@ -118,13 +117,13 @@ public class FileProcessingStatus {
     return false;
   }
 
-  public synchronized boolean shouldRefreshOld(DatePartitionedLogger<?> partitionedLogger) {
+  public synchronized boolean shouldRefreshOld(FileReader<?> fileReader) {
     if (scheduled.get()) {
       return false;
     }
     try {
-      Path path = partitionedLogger.getPathForDate(entity.getDate(), entity.getFileName());
-      FileStatus status = path.getFileSystem(partitionedLogger.getConfig()).getFileStatus(path);
+      Path path = fileReader.getPathForDate(entity.getDate(), entity.getFileName());
+      FileStatus status = path.getFileSystem(fileReader.getConfig()).getFileStatus(path);
       return entity.getPosition() < status.getLen();
     } catch (IOException e) {
       log.warn("IOException while trying to refresh: " + entity.getFileName());
@@ -132,11 +131,10 @@ public class FileProcessingStatus {
     return false;
   }
 
-  public synchronized <T extends MessageLite> ProtoMessageReader<T> getReader(
-      DatePartitionedLogger<T> partitionedLogger) {
+  public synchronized <T> EventReader<T> getEventReader(FileReader<T> fileReader) {
     try {
-      Path filePath = partitionedLogger.getPathForDate(entity.getDate(), entity.getFileName());
-      ProtoMessageReader<T> reader = partitionedLogger.getReader(filePath);
+      Path filePath = fileReader.getPathForDate(entity.getDate(), entity.getFileName());
+      EventReader<T> reader = fileReader.getEventReader(filePath, this);
       Long offset = entity.getPosition();
       if (offset != null && offset > 0) {
         reader.setOffset(offset);

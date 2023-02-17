@@ -1,7 +1,6 @@
 // (c) Copyright 2020-2021 Cloudera, Inc. All rights reserved.
 package com.cloudera.hue.querystore.eventProcessor.pipeline;
 
-import java.io.EOFException;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -23,8 +22,6 @@ import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IOUtils;
 import org.apache.hadoop.yarn.util.Clock;
-import org.apache.tez.dag.history.logging.proto.DatePartitionedLogger;
-import org.apache.tez.dag.history.logging.proto.ProtoMessageReader;
 
 import com.cloudera.hue.querystore.common.config.DasConfiguration;
 import com.cloudera.hue.querystore.common.config.DasConfiguration.ConfVar;
@@ -35,6 +32,8 @@ import com.cloudera.hue.querystore.common.repository.transaction.TransactionMana
 import com.cloudera.hue.querystore.eventProcessor.lifecycle.CleanupManager;
 import com.cloudera.hue.querystore.eventProcessor.processors.EventProcessor;
 import com.cloudera.hue.querystore.eventProcessor.processors.ProcessingStatus;
+import com.cloudera.hue.querystore.eventProcessor.readers.EventReader;
+import com.cloudera.hue.querystore.eventProcessor.readers.FileReader;
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
@@ -57,7 +56,7 @@ public class EventProcessorPipeline<T extends MessageLite> {
   protected static final long REFRESH_THROTTLE_MILLIS = 2000;
 
   private final Clock clock;
-  private final DatePartitionedLogger<T> partitionedLogger;
+  private final FileReader<T> fileReader;
   private final EventProcessor<T> processor;
   private final TransactionManager txnManager;
   private final FileStatusPersistenceManager fsPersistenceManager;
@@ -77,7 +76,6 @@ public class EventProcessorPipeline<T extends MessageLite> {
 
   private final Meter eventsProcessedMeter;
   private final Meter eventsProcessingFailureMeter;
-  private final Meter eventsIOFailureMeter;
 
   private final AtomicLong refreshTime = new AtomicLong(0l);
   public long getRefreshTime() {
@@ -94,12 +92,12 @@ public class EventProcessorPipeline<T extends MessageLite> {
   // The new files which have to be scanned.
   private final LinkedBlockingQueue<FileProcessingStatus> filesQueue = new LinkedBlockingQueue<>();
 
-  public EventProcessorPipeline(Clock clock, DatePartitionedLogger<T> manifestLogger,
+  public EventProcessorPipeline(Clock clock, FileReader<T> fileReader,
       EventProcessor<T> processor, TransactionManager txnManager,
       FileStatusPersistenceManager fsPersistenceManager, FileStatusType type,
       DasConfiguration dasConfig, MetricRegistry metricRegistry) {
     this.clock = clock;
-    this.partitionedLogger = manifestLogger;
+    this.fileReader = fileReader;
     this.processor = processor;
     this.txnManager = txnManager;
     this.fsPersistenceManager = fsPersistenceManager;
@@ -109,7 +107,6 @@ public class EventProcessorPipeline<T extends MessageLite> {
 
     eventsProcessedMeter = metricRegistry.meter(type.name() + ".eventsProcessed");
     eventsProcessingFailureMeter = metricRegistry.meter(type.name() + ".eventsProcessingFailure");
-    eventsIOFailureMeter = metricRegistry.meter(type.name() + ".eventsIOFailure");
 
     this.syncTime = dasConfig.getConf(HDFS_SYNC_WAIT_TIME_MILLIS) / 1000;
     this.refreshDelay = dasConfig.getConf(FOLDER_SCAN_DELAY_MILLIS);
@@ -185,7 +182,7 @@ public class EventProcessorPipeline<T extends MessageLite> {
         this.previousEntities.add(fps);
       }
     }
-    this.scanDir = partitionedLogger.getDirForDate(maxDate);
+    this.scanDir = fileReader.getDirForDate(maxDate);
     log.info("Offsets loaded for {}, scanDir: {}", type, scanDir);
   }
 
@@ -217,7 +214,7 @@ public class EventProcessorPipeline<T extends MessageLite> {
         // for some reason it always fails.
         continue;
       }
-      if (fps.shouldRefreshOld(partitionedLogger)) {
+      if (fps.shouldRefreshOld(fileReader)) {
         filesQueue.add(fps);
       }
     }
@@ -264,7 +261,7 @@ public class EventProcessorPipeline<T extends MessageLite> {
   }
 
   private void addAll(List<FileStatus> changedFiles) {
-    LocalDate scanDate = partitionedLogger.getDateFromDir(scanDir);
+    LocalDate scanDate = fileReader.getDateFromDir(scanDir);
 
     for (FileStatus status : changedFiles) {
       String fileName = status.getPath().getName();
@@ -316,24 +313,24 @@ public class EventProcessorPipeline<T extends MessageLite> {
   private boolean loadMore() throws IOException {
     ImmutableMapView<String, FileProcessingStatus, Long> scanDirOffsets =
         new ImmutableMapView<>(scanDirEntities, a -> a.getPosition());
-    List<FileStatus> changedFiles = partitionedLogger.scanForChangedFiles(scanDir, scanDirOffsets);
+    List<FileStatus> changedFiles = fileReader.scanForChangedFiles(scanDir, scanDirOffsets);
     changedFiles = removeFinished(changedFiles);
     while (changedFiles.isEmpty()) {
-      LocalDateTime utcNow = partitionedLogger.getNow();
+      LocalDateTime utcNow = fileReader.getNow();
       if (utcNow.getHour() * 3600 + utcNow.getMinute() * 60 + utcNow.getSecond() < syncTime) {
         // We are in the delay window for today, do not advance date if we are moving from
         // yesterday.
-        String yesterDir = partitionedLogger.getDirForDate(utcNow.toLocalDate().minusDays(1));
+        String yesterDir = fileReader.getDirForDate(utcNow.toLocalDate().minusDays(1));
         if (yesterDir.equals(scanDir)) {
           return false;
         }
       }
-      String nextDir = partitionedLogger.getNextDirectory(scanDir);
-      if (nextDir == null || utcNow.toLocalDate().compareTo(partitionedLogger.getDateFromDir(nextDir)) < 0) {
+      String nextDir = fileReader.getNextDirectory(scanDir);
+      if (nextDir == null || utcNow.toLocalDate().compareTo(fileReader.getDateFromDir(nextDir)) < 0) {
         return false;
       }
       updateScanDir(nextDir);
-      changedFiles = partitionedLogger.scanForChangedFiles(scanDir, scanDirOffsets);
+      changedFiles = fileReader.scanForChangedFiles(scanDir, scanDirOffsets);
       changedFiles = removeFinished(changedFiles);
     }
     addAll(changedFiles);
@@ -357,15 +354,14 @@ public class EventProcessorPipeline<T extends MessageLite> {
     }
 
     private void runInternal() {
-      ProtoMessageReader<T> reader = fileStatus.getReader(partitionedLogger);
+      EventReader<T> reader = fileStatus.getEventReader(fileReader);
       if (reader == null) {
         return;
       }
       Path filePath = reader.getFilePath();
       log.trace("Started processing file: " + filePath);
       try {
-        for (T evt = readEvent(reader); evt != null && state.get() == START;
-            evt = readEvent(reader)) {
+        for (T evt = reader.read(); evt != null && state.get() == START; evt = reader.read()) {
           boolean isFinalEvent = processEvent(evt, filePath);
           fileStatus.updateEntity(isFinalEvent, reader.getOffset(), clock.getTime());
         }
@@ -377,42 +373,6 @@ public class EventProcessorPipeline<T extends MessageLite> {
         IOUtils.cleanupWithLogger(log, reader);
         log.trace("Finished processing file: " + filePath);
       }
-    }
-
-    private T readEvent(ProtoMessageReader<T> reader) {
-      T evt = null;
-      try {
-        evt  = reader.readEvent();
-        if (evt == null) {
-          long fsPos = fileStatus.getPosition();
-          long readerOffset = reader.getOffset();
-          if (readerOffset == fsPos + 20 + 4) {
-            // Handle multiple consecutive sync markers.
-            log.warn("Got multi sync marker for file: {}, at location: {}",
-                reader.getFilePath(), fsPos);
-            reader.setOffset(fsPos + 20);
-            return readEvent(reader);
-          } else if (fsPos < readerOffset) {
-            // Prevent getting stuck at this offset.
-            log.warn("Incrementing retry count for file: {}, at filePos: {}, offset: {}",
-                reader.getFilePath(), fsPos, readerOffset);
-            fileStatus.readFailed();
-          }
-        } else {
-          // successful read, reset read retry count.
-          fileStatus.readSuccess();
-        }
-      } catch (EOFException e) {
-        // We are getting EOF for an old file, prevent getting stuck here.
-        if (fileStatus.getEntity().getDate().isBefore(partitionedLogger.getNow().toLocalDate())) {
-          eventsIOFailureMeter.mark();
-          fileStatus.readFailed();
-        }
-      } catch (Exception e) {
-        eventsIOFailureMeter.mark();
-        fileStatus.readFailed();
-      }
-      return evt;
     }
 
     @SuppressWarnings("fallthrough")
