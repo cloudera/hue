@@ -169,6 +169,11 @@
       <groupId>com.cloudera.hue</groupId>
       <artifactId>hue-hive-debug-bundler</artifactId>
     </dependency>
+
+    <dependency>
+      <groupId>com.cloudera.cmf</groupId>
+      <artifactId>impala-profile-extractor</artifactId>
+    </dependency>
   </dependencies>
 
   <build>
