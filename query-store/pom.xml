@@ -35,6 +35,7 @@
     <postgres.version>42.5.1</postgres.version>
     <pg-embedded.version>0.7.1</pg-embedded.version>
     <jetty.version>9.4.43.v20210629</jetty.version>
+    <impala-profile-extractor.version>7.6.0</impala-profile-extractor.version>
   </properties>
 
   <modules>
@@ -777,6 +778,27 @@
         <groupId>com.cloudera.hue</groupId>
         <artifactId>hue-hive-debug-bundler</artifactId>
         <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.cloudera.cmf</groupId>
+        <artifactId>impala-profile-extractor</artifactId>
+        <version>${impala-profile-extractor.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+          </exclusion>
+
+        </exclusions>
       </dependency>
     </dependencies>
   </dependencyManagement>
