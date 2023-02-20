@@ -38,12 +38,11 @@ import com.codahale.metrics.Gauge;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import com.google.protobuf.MessageLite;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class EventProcessorPipeline<T extends MessageLite> {
+public class EventProcessorPipeline<T> {
   public static final ConfVar<Long> FOLDER_SCAN_DELAY_MILLIS =
       new ConfVar<>("hue.query-processor.event-pipeline.folder-scan-delay-millis", 5 * 60 * 1000l); // 5 minutes
   public static final ConfVar<Long> AUTO_CLOSE_DELAY_MILLIS =

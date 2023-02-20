@@ -36,7 +36,7 @@ import com.cloudera.hue.querystore.common.repository.PageData;
 import com.cloudera.hue.querystore.common.services.StandardizeParamsUtility;
 import com.cloudera.hue.querystore.common.services.SearchService;
 import com.cloudera.hue.querystore.common.util.MetaInfo;
-import com.cloudera.hue.querystore.eventProcessor.lifecycle.EventProcessorManager;
+import com.cloudera.hue.querystore.eventProcessor.lifecycle.HiveEventProcessorManager;
 import com.cloudera.hue.querystore.orm.EntityField;
 import com.cloudera.hue.querystore.orm.EntityTable;
 import com.google.common.collect.ImmutableMap;
@@ -54,16 +54,16 @@ public class QuerySearchResource {
 	      new ConfVar<>("hue.query-processor.search.facet.result.limit", 10);
 
   private final SearchService searchService;
-  private final EventProcessorManager eventProcessorManager;
+  private final HiveEventProcessorManager hievEventProcessorManager;
   private final HiveQueryBasicInfoRepository repository;
   private final DasConfiguration dasConfig;
   private AppAuthentication appAuth;
 
   @Inject
-  public QuerySearchResource(SearchService searchService, EventProcessorManager eventProcessorManager, HiveQueryBasicInfoRepository repository,
+  public QuerySearchResource(SearchService searchService, HiveEventProcessorManager hievEventProcessorManager, HiveQueryBasicInfoRepository repository,
         DasConfiguration dasConfig, AppAuthentication appAuth) {
     this.searchService = searchService;
-    this.eventProcessorManager = eventProcessorManager;
+    this.hievEventProcessorManager = hievEventProcessorManager;
     this.repository = repository;
     this.dasConfig = dasConfig;
     this.appAuth = appAuth;
@@ -96,7 +96,7 @@ public class QuerySearchResource {
   public Response getBasicSearchedQueriesWithFacets(SearchRequest.SearchRequestWrapper request,
                                           @Context SecurityContext securityContext) {
 
-    eventProcessorManager.forceRefresh();
+    hievEventProcessorManager.forceRefresh();
 
     SearchRequest search = request.getSearch();
     return getSearchResponse(search.getText(), search.getSortText(),
@@ -108,7 +108,7 @@ public class QuerySearchResource {
       Integer limit, Long startTime, Long endTime, List<SearchRequest.Facet> facets,
       List<SearchRequest.RangeFacet> rangeFacets, String effectiveUser, String searchType) {
 
-    long updateTime = eventProcessorManager.getQueryRefreshTime();
+    long updateTime = hievEventProcessorManager.getQueryRefreshTime();
     PageData<HiveQueryDto> pageData = searchService.doBasicSearch(queryText, sortText, offset, limit,
       startTime, endTime, facets, rangeFacets, effectiveUser);
 

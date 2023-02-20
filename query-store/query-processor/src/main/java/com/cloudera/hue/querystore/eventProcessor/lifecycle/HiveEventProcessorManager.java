@@ -32,11 +32,12 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Singleton
-public class EventProcessorManager implements Managed {
+public class HiveEventProcessorManager implements Managed {
   private final Configuration hadoopConfiguration;
   private final DasConfiguration eventProcessingConfig;
   private final TezEventProcessorDispatcher tezEventProcessor;
   private final HiveEventProcessorDispatcher hiveEventProcessor;
+
   private final FileStatusPersistenceManager fsPersistenceManager;
   private final TransactionManager txnManager;
   private final MetricRegistry metricRegistry;
@@ -46,7 +47,7 @@ public class EventProcessorManager implements Managed {
   private EventProcessorPipeline<HiveHookEventProto> hiveEventsPipeline;
 
   @Inject
-  public EventProcessorManager(DasConfiguration eventProcessingConfig,
+  public HiveEventProcessorManager(DasConfiguration eventProcessingConfig,
                                Configuration hadoopConfiguration,
                                TezEventProcessorDispatcher tezEventProcessor,
                                HiveEventProcessorDispatcher hiveEventProcessor,
@@ -74,7 +75,7 @@ public class EventProcessorManager implements Managed {
 
   @Override
   public void stop() {
-    log.info("EventProcessorManager: stopping");
+    log.info("HiveEventProcessorManager: stopping");
     tezEventsPipeline.shutdown();
     tezAppEventsPipeline.shutdown();
     hiveEventsPipeline.shutdown();
@@ -82,11 +83,11 @@ public class EventProcessorManager implements Managed {
     tezEventsPipeline.awaitTermination();
     tezAppEventsPipeline.awaitTermination();
     hiveEventsPipeline.awaitTermination();
-    log.info("EventProcessorManager: stopped");
+    log.info("HiveEventProcessorManager: stopped");
   }
 
   public void forceRefresh() {
-    log.info("EventProcessorManager: forceRefresh");
+    log.info("HiveEventProcessorManager: forceRefresh");
     tezEventsPipeline.forceRefresh();
     tezAppEventsPipeline.forceRefresh();
     hiveEventsPipeline.forceRefresh();
