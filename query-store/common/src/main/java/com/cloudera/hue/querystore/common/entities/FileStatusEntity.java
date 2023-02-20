@@ -10,7 +10,7 @@ import lombok.Data;
  */
 @Data
 public class FileStatusEntity implements JdbiEntity {
-  public enum FileStatusType { HIVE, TEZ, TEZ_APP };
+  public enum FileStatusType { HIVE, TEZ, TEZ_APP, IMPALA };
 
   private Long id;
   private FileStatusType fileType;

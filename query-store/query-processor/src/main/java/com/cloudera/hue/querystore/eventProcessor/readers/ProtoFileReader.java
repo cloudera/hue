@@ -33,7 +33,7 @@ public class ProtoFileReader<T extends MessageLite> implements FileReader<T> {
     return partitionedLogger.getDirForDate(date);
   }
 
-  public LocalDate getDateFromDir(String dirName) {
+  public LocalDate getDateFromDir(String dirName) throws IllegalArgumentException {
     return partitionedLogger.getDateFromDir(dirName);
   }
 
