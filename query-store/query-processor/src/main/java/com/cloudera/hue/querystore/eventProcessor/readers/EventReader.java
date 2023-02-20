@@ -12,6 +12,6 @@ public interface EventReader<T> extends Closeable {
 
   Path getFilePath();
 
-  T read();
+  T read() throws IOException;
 
 }

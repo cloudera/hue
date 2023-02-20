@@ -22,7 +22,7 @@ public interface FileReader<T> {
   LocalDateTime getNow();
 
   String getDirForDate(LocalDate date);
-  LocalDate getDateFromDir(String dirName);
+  LocalDate getDateFromDir(String dirName) throws IllegalArgumentException;
 
   Path getPathForDate(LocalDate date, String fileName) throws IOException;
 

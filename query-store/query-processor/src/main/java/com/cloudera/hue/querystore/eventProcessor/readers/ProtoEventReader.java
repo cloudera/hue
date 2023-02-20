@@ -37,7 +37,7 @@ public class ProtoEventReader<T extends MessageLite> implements EventReader<T> {
     return protoMessageReader.getFilePath();
   }
 
-  public T read() {
+  public T read() throws IOException {
     T evt = null;
     try {
       evt  = protoMessageReader.readEvent();
@@ -46,8 +46,7 @@ public class ProtoEventReader<T extends MessageLite> implements EventReader<T> {
         long readerOffset = protoMessageReader.getOffset();
         if (readerOffset == fsPos + 20 + 4) {
           // Handle multiple consecutive sync markers.
-          log.warn("Got multi sync marker for file: {}, at location: {}",
-          protoMessageReader.getFilePath(), fsPos);
+          log.warn("Got multi sync marker for file: {}, at location: {}", protoMessageReader.getFilePath(), fsPos);
           protoMessageReader.setOffset(fsPos + 20);
           return read();
         } else if (fsPos < readerOffset) {

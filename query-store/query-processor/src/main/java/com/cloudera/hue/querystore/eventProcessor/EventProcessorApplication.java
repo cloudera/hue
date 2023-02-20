@@ -23,7 +23,8 @@ import com.cloudera.hue.querystore.common.resource.HealthCheckResource;
 import com.cloudera.hue.querystore.common.util.PasswordSubstitutor;
 import com.cloudera.hue.querystore.eventProcessor.bundle.DefaultFlywayBundle;
 import com.cloudera.hue.querystore.eventProcessor.lifecycle.CleanupManager;
-import com.cloudera.hue.querystore.eventProcessor.lifecycle.EventProcessorManager;
+import com.cloudera.hue.querystore.eventProcessor.lifecycle.HiveEventProcessorManager;
+import com.cloudera.hue.querystore.eventProcessor.lifecycle.ImpalaEventProcessorManager;
 import com.cloudera.hue.querystore.eventProcessor.module.EventProcessorModule;
 import com.cloudera.hue.querystore.eventProcessor.resources.AboutResource;
 import com.cloudera.hue.querystore.eventProcessor.resources.BundleResource;
@@ -52,10 +53,15 @@ public class EventProcessorApplication extends Application<EventProcessorConfigu
       new ConfVar<>("hue.query-processor.session-timeout-secs", 24 * 60 * 60); // 1 day default.
   private static final ConfVar<String> COOKIE_NAME =
       new ConfVar<>("hue.query-processor.session-cookie-name", "HUE_QP_SESSIONID");
-  private static final ConfVar<Boolean> ENABLE_EVENT_PROCESSOR =
-      new ConfVar<>("hue.query-processor.event-pipeline.enabled", true);
   private static final ConfVar<Boolean> ENABLE_REST_APIS =
       new ConfVar<>("hue.query-processor.rest-apis.enabled", true);
+
+  private static final ConfVar<Boolean> ENABLE_EVENT_PROCESSOR =
+      new ConfVar<>("hue.query-processor.event-pipeline.enabled", true);
+  private static final ConfVar<Boolean> ENABLE_HIVE_EVENT_PROCESSOR =
+      new ConfVar<>("hue.query-processor.hive.event-pipeline.enabled", true);
+  private static final ConfVar<Boolean> ENABLE_IMPALA_EVENT_PROCESSOR =
+      new ConfVar<>("hue.query-processor.impala.event-pipeline.enabled", true);
 
   @Override
   protected void bootstrapLogging() {
@@ -99,8 +105,15 @@ public class EventProcessorApplication extends Application<EventProcessorConfigu
     environment.jersey().setUrlPattern("/api/*");
 
     if (configuration.getDasConf().getConf(ENABLE_EVENT_PROCESSOR)) {
-      EventProcessorManager eventProcessorManager = injector.getInstance(EventProcessorManager.class);
-      environment.lifecycle().manage(eventProcessorManager);
+      if (configuration.getDasConf().getConf(ENABLE_HIVE_EVENT_PROCESSOR)) {
+        HiveEventProcessorManager hiveEPManager = injector.getInstance(HiveEventProcessorManager.class);
+        environment.lifecycle().manage(hiveEPManager);
+      }
+      if (configuration.getDasConf().getConf(ENABLE_IMPALA_EVENT_PROCESSOR)) {
+        ImpalaEventProcessorManager impalaEPManager = injector.getInstance(ImpalaEventProcessorManager.class);
+        environment.lifecycle().manage(impalaEPManager);
+      }
+
       environment.lifecycle().manage(injector.getInstance(CleanupManager.class));
     }
   }
