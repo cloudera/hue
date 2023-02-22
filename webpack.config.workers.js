@@ -39,6 +39,7 @@ module.exports = {
     }
   },
   output: {
+    hashFunction: 'xxhash64',
     path: __dirname + '/desktop/core/src/desktop/static/desktop/js/bundles/workers',
     filename: shared.output.filename,
     chunkFilename: shared.output.chunkFilename,
