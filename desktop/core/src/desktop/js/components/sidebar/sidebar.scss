@@ -300,6 +300,8 @@
   position: absolute;
   top: 13px;
   left: 6px;
+  width: 1em;
+  height: 1em;
   transition: transform $sidebar-animation-duration-base;
 
   svg {
