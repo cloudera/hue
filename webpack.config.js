@@ -96,6 +96,8 @@ const config = {
     }
   },
   output: {
+    // Needed, at the time of writing with webpack 5.54.0, when using node 18.14.1 and later. 
+    hashFunction: 'xxhash64',
     path: __dirname + '/desktop/core/src/desktop/static/desktop/js/bundles/hue',
     filename: '[name]-bundle-[fullhash].js',
     chunkFilename: '[name]-chunk-[fullhash].js',
