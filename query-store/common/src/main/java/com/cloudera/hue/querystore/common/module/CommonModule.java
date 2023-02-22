@@ -14,6 +14,7 @@ import com.cloudera.hue.querystore.common.AppAuthentication;
 import com.cloudera.hue.querystore.common.dao.FileStatusDao;
 import com.cloudera.hue.querystore.common.dao.HiveQueryBasicInfoDao;
 import com.cloudera.hue.querystore.common.dao.HiveQueryExtendedInfoDao;
+import com.cloudera.hue.querystore.common.dao.ImpalaQueryDao;
 import com.cloudera.hue.querystore.common.dao.TezAppInfoDao;
 import com.cloudera.hue.querystore.common.dao.TezDagBasicInfoDao;
 import com.cloudera.hue.querystore.common.dao.TezDagExtendedInfoDao;
@@ -146,6 +147,11 @@ public class CommonModule extends AbstractModule {
   @Provides
   public HiveQueryExtendedInfoDao getQueryDetailsDao(TransactionManager txnManager) {
     return txnManager.createDao(HiveQueryExtendedInfoDao.class);
+  }
+
+  @Provides
+  public ImpalaQueryDao getImpalaQueryDao(TransactionManager txnManager) {
+    return txnManager.createDao(ImpalaQueryDao.class);
   }
 
   @Provides

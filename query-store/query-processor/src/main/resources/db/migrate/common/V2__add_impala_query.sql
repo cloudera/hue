@@ -5,7 +5,6 @@
  */
 CREATE TABLE impala_query (
   id                    SERIAL PRIMARY KEY,
-  version               SMALLINT,
 
   query_id              VARCHAR(512) UNIQUE,
   query_text            TEXT,
@@ -24,7 +23,8 @@ CREATE TABLE impala_query (
   peak_memory           BIGINT,
   hdfs_bytes_read       BIGINT,
 
-  source_files          TEXT
+  source_file          TEXT,
+  version               SMALLINT
 );
 
 CREATE INDEX idx_iq_query_id
