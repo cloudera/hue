@@ -22,17 +22,17 @@ public class ImpalaEventProcessorDispatcher implements EventProcessor<ImpalaRunt
   public ProcessingStatus process(ImpalaRuntimeProfileTree event, Path filePath) {
     log.info("Processing impala profile for query {}", event.getQueryId());
 
-    ProcessingStatus processingStatus = null;
+    ProcessingStatus processingStatus = queryProfileProcessor.process(event, filePath);
 
     // TODO: Better handling of each of the following states
     // Successful processing of event - SUCCESS
     // When process errored - ERROR
     // After processing last file event - FINISH
 
-    if(queryProfileProcessor.process(event)) {
-      processingStatus = ProcessingStatus.SUCCESS;
-    } else {
-      processingStatus = ProcessingStatus.FINISH;
+    if (processingStatus.getStatus() == ProcessingStatus.Status.SUCCESS) {
+      log.debug("Query {}, processed successfully", event.getQueryId());
+    } else if (processingStatus.getStatus() == ProcessingStatus.Status.ERROR) {
+      log.error("Failed to process query {}", event.getQueryId());
     }
 
     return processingStatus;

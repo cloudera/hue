@@ -37,7 +37,7 @@ public class ImpalaQueryEntity implements JdbiEntity {
       Long peakMemory,
       Long hdfsBytesRead,
 
-      String sourceFiles) {
+      String sourceFile) {
     this.id = id;
 
     this.queryId = queryId;
@@ -57,7 +57,7 @@ public class ImpalaQueryEntity implements JdbiEntity {
     this.peakMemory = peakMemory;
     this.hdfsBytesRead = hdfsBytesRead;
 
-    this.sourceFiles = sourceFiles;
+    this.sourceFile = sourceFile;
   }
 
   @ColumnInfo(columnName="id", exclude = true, id=true)
@@ -106,8 +106,8 @@ public class ImpalaQueryEntity implements JdbiEntity {
   @ColumnInfo(columnName="hdfs_bytes_read", searchable = true, sortable = true, rangeFacetable = true)
   private Long hdfsBytesRead;
 
-  @ColumnInfo(columnName="source_files")
-  private String sourceFiles;
+  @ColumnInfo(columnName="source_file")
+  private String sourceFile;
 
   public enum Status {
     STARTED, RUNNING, SUCCESS, ERROR
