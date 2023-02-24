@@ -25,6 +25,7 @@ public class ImpalaEventReader implements EventReader<ImpalaRuntimeProfileTree> 
   private final FileProcessingStatus fileStatus;
   private final FSDataInputStream stream;
   private final BufferedReader reader;
+  // private final LineNumberReader r;
 
   public ImpalaEventReader(ImpalaFileReader fileReader, Path filePath, FileProcessingStatus fileStatus) throws IOException {
     this.filePath = filePath;

@@ -11,6 +11,7 @@ import javax.ws.rs.Priorities;
 import org.eclipse.jetty.server.session.SessionHandler;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.jdbi.v3.core.Jdbi;
+import org.jdbi.v3.core.statement.Slf4JSqlLogger;
 
 import com.cloudera.hue.querystore.common.AppAuthentication;
 import com.cloudera.hue.querystore.common.config.AuthConfig;
@@ -29,6 +30,7 @@ import com.cloudera.hue.querystore.eventProcessor.module.EventProcessorModule;
 import com.cloudera.hue.querystore.eventProcessor.resources.AboutResource;
 import com.cloudera.hue.querystore.eventProcessor.resources.BundleResource;
 import com.cloudera.hue.querystore.eventProcessor.resources.HiveQueryResource;
+import com.cloudera.hue.querystore.eventProcessor.resources.ImpalaResource;
 import com.cloudera.hue.querystore.eventProcessor.resources.QuerySearchResource;
 import com.cloudera.hue.querystore.eventProcessor.resources.AdminResource;
 import com.codahale.metrics.jdbi3.InstrumentedSqlLogger;
@@ -167,6 +169,7 @@ public class EventProcessorApplication extends Application<EventProcessorConfigu
       jersey.register(injector.getInstance(BundleResource.class));
       jersey.register(injector.getInstance(HiveQueryResource.class));
       jersey.register(injector.getInstance(QuerySearchResource.class));
+      jersey.register(injector.getInstance(ImpalaResource.class));
       jersey.register(injector.getInstance(AdminResource.class));
     }
   }
