@@ -8,7 +8,9 @@ import java.util.Optional;
 
 import org.jdbi.v3.core.HandleCallback;
 
+import com.cloudera.hue.querystore.common.AppAuthentication;
 import com.cloudera.hue.querystore.common.entities.JdbiEntity;
+import com.cloudera.hue.querystore.common.exception.DBUpdateFailedException;
 import com.google.inject.TypeLiteral;
 
 public abstract class JdbiRepository<Entity extends JdbiEntity, Dao extends JdbiDao<Entity>> {
@@ -26,6 +28,14 @@ public abstract class JdbiRepository<Entity extends JdbiEntity, Dao extends Jdbi
     dao.withHandle(callback);
   }
 
+  protected boolean checkCurrentUser(AppAuthentication.Role role) {
+    return !AppAuthentication.Role.ADMIN.equals(role);
+  }
+
+  protected boolean isNotNull(Object obj) {
+    return obj != null;
+  }
+
 /*
 Trying to reuse the following code across repositories has a few issues.
 - java failed in runtime with save NoSuchMethodError in lambda, which went away with a full rebuild
@@ -41,13 +51,25 @@ Putting this away for another time and using working around found by Niti for no
     return dao.findAll();
   }
 
+  /**
+   * Insert or updates the entity. The returned entity does not contain the auto updated fields like version.
+   * Do not use this entity to update again. Get the entity again using findOne and use that object to do any
+   * further updates. The return type is carried over from legacy hibernate implementation
+   * TODO: make this method and super method return void for better clarity. Or may be we need not Override.
+   * @param entity Entity object to be saved or updated.
+   * @return
+   */
   public Entity save(Entity entity) {
     if (entity.getId() == null) {
-      long id = dao.insert(entity);
+      Long id = dao.insert(entity);
       entity.setId(id);
     } else {
-      dao.update(entity);
+      int update = dao.update(entity);
+      if (0 == update) {
+        throw new DBUpdateFailedException(entity);
+      }
     }
+
     return entity;
   }
 
