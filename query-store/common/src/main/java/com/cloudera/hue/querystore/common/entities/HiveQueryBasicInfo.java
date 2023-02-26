@@ -12,12 +12,14 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.FieldNameConstants;
 
 /**
  * Entity for Hive Query
  */
 @Data
 @NoArgsConstructor
+@FieldNameConstants
 @SearchQuery(prefix = "hq", table="hive_query")
 public class HiveQueryBasicInfo implements JdbiEntity {
   public static final EntityTable TABLE_INFORMATION = EntityFieldProcessor.process(HiveQueryBasicInfo.class);

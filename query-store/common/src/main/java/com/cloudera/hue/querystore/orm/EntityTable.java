@@ -16,8 +16,8 @@ public class EntityTable {
   private final Class<?> entityClass;
 
   public String getDbFieldName(String entityFieldName) {
-    for(EntityField field : fields) {
-      if(field.getEntityFieldName() == entityFieldName) {
+    for (EntityField field : fields) {
+      if (field.getEntityFieldName().equals(entityFieldName)) {
         return field.getDbFieldName();
       }
     }

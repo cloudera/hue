@@ -1,6 +1,5 @@
 package com.cloudera.hue.querystore.common.dto;
 
-import com.cloudera.hue.querystore.orm.EntityField;
 import com.cloudera.hue.querystore.orm.EntityTable;
 
 import lombok.Getter;
@@ -20,7 +19,7 @@ public class SortDetails {
     this.columnName = columnName == null ? DEFAULT_SORT_COLUMN : columnName;
 
     this.order = DEFAULT_SORT_ORDER;
-    if(parts.length == 2 && parts[1].toUpperCase() == "ASC") {
+    if (parts.length == 2 && parts[1].toUpperCase().equals("ASC")) {
       this.order = "ASC";
     }
   }

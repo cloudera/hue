@@ -3,15 +3,18 @@ package com.cloudera.hue.querystore.eventProcessor.resources;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -26,14 +29,24 @@ import org.apache.hadoop.http.HttpConfig.Policy;
 import org.apache.hadoop.yarn.conf.YarnConfiguration;
 
 import com.cloudera.hue.querystore.common.AppAuthentication;
+import com.cloudera.hue.querystore.common.dto.DagDto;
 import com.cloudera.hue.querystore.common.dto.HiveQueryDto;
+import com.cloudera.hue.querystore.common.dto.QuerySearchParams;
+import com.cloudera.hue.querystore.common.dto.QuerySearchResult;
 import com.cloudera.hue.querystore.common.entities.HiveQueryBasicInfo;
 import com.cloudera.hue.querystore.common.entities.HiveQueryExtendedInfo;
+import com.cloudera.hue.querystore.common.entities.ImpalaQueryEntity;
+import com.cloudera.hue.querystore.common.entities.TezDagBasicInfo;
 import com.cloudera.hue.querystore.common.entities.VertexInfo;
 import com.cloudera.hue.querystore.common.repository.HiveQueryBasicInfoRepository;
 import com.cloudera.hue.querystore.common.repository.HiveQueryExtendedInfoRepository;
+import com.cloudera.hue.querystore.common.repository.PageData;
+import com.cloudera.hue.querystore.common.repository.TezDagBasicInfoRepository;
 import com.cloudera.hue.querystore.common.repository.VertexInfoRepository;
 import com.cloudera.hue.querystore.common.services.DagInfoService;
+import com.cloudera.hue.querystore.common.util.MetaInfo;
+import com.cloudera.hue.querystore.eventProcessor.lifecycle.HiveEventProcessorManager;
+import com.google.common.collect.ImmutableMap;
 
 /**
  * Resource class for working with the hive ide Udfs
@@ -45,9 +58,12 @@ public class HiveQueryResource {
   private final HiveQueryExtendedInfoRepository queryDetailsService;
   private final VertexInfoRepository vertexInfoService;
   private final TaskAttemptInfoService taskAttemptInfoService;
-
-
   private final YarnConfiguration yarnConfiguration;
+
+  private final HiveEventProcessorManager hiveEventProcessorManager;
+  private final HiveQueryBasicInfoRepository repository;
+  private final TezDagBasicInfoRepository tezDagRepository;
+  private AppAuthentication appAuth;
 
   private static final String LOG_EXT = ".log";
 
@@ -55,7 +71,11 @@ public class HiveQueryResource {
   public HiveQueryResource(HiveQueryBasicInfoRepository hiveQueryRepo, DagInfoService dagInfoService,
                            HiveQueryExtendedInfoRepository queryDetailsService, VertexInfoRepository vertexInfoService,
                            TaskAttemptInfoService taskAttemptInfoService,
-                           YarnConfiguration yarnConfiguration) {
+                           YarnConfiguration yarnConfiguration,
+                           HiveEventProcessorManager hiveEventProcessorManager,
+                           HiveQueryBasicInfoRepository repository,
+                           TezDagBasicInfoRepository tezDagRepository,
+                           AppAuthentication appAuth) {
     this.hiveQueryRepo = hiveQueryRepo;
     this.dagInfoService = dagInfoService;
     this.queryDetailsService = queryDetailsService;
@@ -63,6 +83,11 @@ public class HiveQueryResource {
     this.taskAttemptInfoService = taskAttemptInfoService;
 
     this.yarnConfiguration = yarnConfiguration;
+
+    this.hiveEventProcessorManager = hiveEventProcessorManager;
+    this.repository = repository;
+    this.tezDagRepository = tezDagRepository;
+    this.appAuth = appAuth;
   }
 
   private boolean userCheck(HiveQueryBasicInfo hiveQuery, SecurityContext securityContext) {
@@ -210,5 +235,46 @@ public class HiveQueryResource {
     response.put("taskAttempts", taskAttempts);
     response.put("taskAttemptsCount", taskAttempts.size());
     return Response.ok(response).build();
+  }
+
+  /**
+   * Gets a list of hive queryies
+   */
+  @POST
+  @Produces(MediaType.APPLICATION_JSON)
+  @Path("/queries")
+  public Response getSearchedQueries(QuerySearchParams params, @Context SecurityContext securityContext) {
+
+    hiveEventProcessorManager.forceRefresh();
+
+    String userName = securityContext.getUserPrincipal().getName();
+    AppAuthentication.Role role = appAuth.getRole(userName);
+
+    List<HiveQueryBasicInfo> queries = repository.getSearchResults(params, userName, role);
+
+    QuerySearchResult<HiveQueryDto> result = new QuerySearchResult<HiveQueryDto>(
+      loadDagInfo(queries),
+      repository.getSearchResultsCount(params, userName, role),
+      params,
+      hiveEventProcessorManager.getQueryRefreshTime()
+    );
+    return Response.ok(result).build();
+
+  }
+
+  private List<HiveQueryDto> loadDagInfo(List<HiveQueryBasicInfo> queries){
+    List<HiveQueryDto> queriesDtoList = new ArrayList<HiveQueryDto>();
+
+    for (HiveQueryBasicInfo hiveQuery: queries) {
+      HiveQueryDto queryDto = new HiveQueryDto(hiveQuery, null, new ArrayList<>());
+      Collection<TezDagBasicInfo> dags = tezDagRepository.getByHiveQueryTableId(hiveQuery.getId());
+
+      for (TezDagBasicInfo dagInfo: dags) {
+        DagDto dagDto = new DagDto(dagInfo, null, null);
+        queryDto.getDags().add(dagDto);
+      }
+      queriesDtoList.add(queryDto);
+    }
+    return queriesDtoList;
   }
 }

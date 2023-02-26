@@ -1,6 +1,5 @@
 // (c) Copyright 2020-2021 Cloudera, Inc. All rights reserved.
 package com.cloudera.hue.querystore.eventProcessor.resources;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -28,15 +27,11 @@ import com.cloudera.hue.querystore.common.config.DasConfiguration;
 import com.cloudera.hue.querystore.common.config.DasConfiguration.ConfVar;
 import com.cloudera.hue.querystore.common.dto.FacetValue;
 import com.cloudera.hue.querystore.common.dto.FieldInformation;
-import com.cloudera.hue.querystore.common.dto.HiveQueryDto;
-import com.cloudera.hue.querystore.common.dto.SearchRequest;
+import com.cloudera.hue.querystore.common.dto.QuerySearchParams;
 import com.cloudera.hue.querystore.common.entities.HiveQueryBasicInfo;
 import com.cloudera.hue.querystore.common.repository.HiveQueryBasicInfoRepository;
-import com.cloudera.hue.querystore.common.repository.PageData;
 import com.cloudera.hue.querystore.common.services.StandardizeParamsUtility;
 import com.cloudera.hue.querystore.common.services.SearchService;
-import com.cloudera.hue.querystore.common.util.MetaInfo;
-import com.cloudera.hue.querystore.eventProcessor.lifecycle.HiveEventProcessorManager;
 import com.cloudera.hue.querystore.orm.EntityField;
 import com.cloudera.hue.querystore.orm.EntityTable;
 import com.google.common.collect.ImmutableMap;
@@ -53,38 +48,36 @@ public class QuerySearchResource {
   private static final ConfVar<Integer> QP_FACETS_RESULT_LIMIT =
 	      new ConfVar<>("hue.query-processor.search.facet.result.limit", 10);
 
-  private final SearchService searchService;
-  private final HiveEventProcessorManager hievEventProcessorManager;
   private final HiveQueryBasicInfoRepository repository;
   private final DasConfiguration dasConfig;
   private AppAuthentication appAuth;
+  private HiveQueryResource hiveQueryResource;
 
   @Inject
-  public QuerySearchResource(SearchService searchService, HiveEventProcessorManager hievEventProcessorManager, HiveQueryBasicInfoRepository repository,
-        DasConfiguration dasConfig, AppAuthentication appAuth) {
-    this.searchService = searchService;
-    this.hievEventProcessorManager = hievEventProcessorManager;
+  public QuerySearchResource(HiveQueryBasicInfoRepository repository,
+        DasConfiguration dasConfig, AppAuthentication appAuth,
+        HiveQueryResource hiveQueryResource) {
     this.repository = repository;
     this.dasConfig = dasConfig;
     this.appAuth = appAuth;
+    this.hiveQueryResource = hiveQueryResource;
   }
 
-  /**
-   * Gets a list of query matching the basic search
-   */
-  @GET
-  @Produces(MediaType.APPLICATION_JSON)
-  @Path("/search")
-  public Response getBasicSearchedQueries(@QueryParam("text") String queryText,
-                                          @QueryParam("sort") String sortText,
-                                          @QueryParam("type") String searchType,
-                                          @QueryParam("offset") Integer offset,
-                                          @QueryParam("limit") Integer limit,
-                                          @QueryParam("startTime") Long startTime,
-                                          @QueryParam("endTime") Long endTime,
-                                          @Context SecurityContext securityContext) {
-    return getSearchResponse(queryText, sortText, offset, limit, startTime, endTime,
-        new ArrayList<>(), new ArrayList<>(), getEffectiveUser(securityContext), searchType);
+  public static class QuerySearchParamsWrapper {
+    private QuerySearchParams params;
+    public QuerySearchParamsWrapper() { }
+
+    public QuerySearchParamsWrapper(QuerySearchParams params) {
+      this.params = params;
+    }
+
+    public QuerySearchParams getParams() {
+      return params;
+    }
+
+    public void setSearch(QuerySearchParams params) {
+      this.params = params;
+    }
   }
 
   /**
@@ -93,29 +86,8 @@ public class QuerySearchResource {
   @POST
   @Produces(MediaType.APPLICATION_JSON)
   @Path("/search")
-  public Response getBasicSearchedQueriesWithFacets(SearchRequest.SearchRequestWrapper request,
-                                          @Context SecurityContext securityContext) {
-
-    hievEventProcessorManager.forceRefresh();
-
-    SearchRequest search = request.getSearch();
-    return getSearchResponse(search.getText(), search.getSortText(),
-        search.getOffset(), search.getLimit(), search.getStartTime(), search.getEndTime(),
-        search.getFacets(), search.getRangeFacets(), getEffectiveUser(securityContext), search.getType());
-  }
-
-  private Response getSearchResponse(String queryText, String sortText, Integer offset,
-      Integer limit, Long startTime, Long endTime, List<SearchRequest.Facet> facets,
-      List<SearchRequest.RangeFacet> rangeFacets, String effectiveUser, String searchType) {
-
-    long updateTime = hievEventProcessorManager.getQueryRefreshTime();
-    PageData<HiveQueryDto> pageData = searchService.doBasicSearch(queryText, sortText, offset, limit,
-      startTime, endTime, facets, rangeFacets, effectiveUser);
-
-    MetaInfo metaInfo = MetaInfo.builder().fromPageData(pageData, updateTime).build();
-    Map<String, Object> response = ImmutableMap.of("queries", pageData.getEntities(), "meta", metaInfo);
-
-    return Response.ok(response).build();
+  public Response getBasicSearchedQueriesWithFacets(QuerySearchParamsWrapper request, @Context SecurityContext securityContext) {
+    return hiveQueryResource.getSearchedQueries(request.getParams(), securityContext);
   }
 
   @GET
@@ -145,12 +117,11 @@ public class QuerySearchResource {
     }
 
     String ifacetFields = StandardizeParamsUtility.sanitizeQuery(facetFields);
-    Set<String> facetFieldSets = extractFacetFields(ifacetFields);
 
     Long iStartTime = StandardizeParamsUtility.sanitizeStartTime(startTime, endTime);
     Long iEndTime = StandardizeParamsUtility.sanitizeEndTime(startTime, endTime);
 
-    facetFieldSets = filterFacetable(HiveQueryBasicInfo.TABLE_INFORMATION, facetFieldSets);
+    Set<String> facetFieldSets = filterFacetable(HiveQueryBasicInfo.TABLE_INFORMATION, ifacetFields);
 
     String userName = getEffectiveUser(securityContext);
 
@@ -161,14 +132,12 @@ public class QuerySearchResource {
 	return Response.ok(response).build();
   }
 
-  private Set<String> extractFacetFields(String facetFieldsText) {
-    return Arrays.stream(facetFieldsText.split(",")).map(String::trim).collect(Collectors.toSet());
-  }
+  private Set<String> filterFacetable(EntityTable table, String ifacetFields) {
+    Set<String> inputFacetFields = Arrays.stream(ifacetFields.split(",")).map(String::trim).collect(Collectors.toSet());
 
-  private Set<String> filterFacetable(EntityTable table, Set<String> facetFields) {
     Stream<EntityField> firstFacetableFields = table.getFields().stream().filter(x -> x.isFacetable());
     Set<String> facetableFields = firstFacetableFields.map(EntityField::getDbFieldName).collect(Collectors.toSet());
 
-    return Sets.intersection(facetFields, facetableFields);
+    return Sets.intersection(inputFacetFields, facetableFields);
   }
 }
