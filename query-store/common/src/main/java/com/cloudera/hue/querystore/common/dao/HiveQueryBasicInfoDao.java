@@ -5,6 +5,7 @@ import org.jdbi.v3.sqlobject.config.RegisterBeanMapper;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.customizer.BindList;
+import org.jdbi.v3.sqlobject.customizer.BindList.EmptyHandling;
 import org.jdbi.v3.sqlobject.customizer.Define;
 import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
@@ -89,4 +90,49 @@ public interface HiveQueryBasicInfoDao extends JdbiDao<HiveQueryBasicInfo> {
       @Bind("startTime") long startTime, @Bind("endTime") long endTime,
       @Bind("userName") String userName, @Define("userCheck") boolean userCheck,
       @Bind("facetsResultLimit")  int facetsResultLimit);
+
+  @SqlQuery(
+      "select count(*) from hive_query " +
+      "where start_time >= :startTime AND start_time \\<= :endTime " +
+      "<if(checkUser)> AND request_user = :userName <endif> "
+  )
+  @UseStringTemplateEngine
+  long getSearchResultsCount(
+      @Bind("startTime") Long startTime, @Bind("endTime") Long endTime,
+      @Define("checkUser") boolean checkUser, @Bind("userName") String userName
+  );
+
+  @RegisterBeanMapper(HiveQueryBasicInfo.class)
+  @SqlQuery(
+      "select * from hive_query " +
+      "where start_time >= :startTime AND start_time \\<= :endTime " +
+      "<if(checkUser)> AND request_user = :userName <endif> " +
+
+      "<if(checkText)>AND (query_id = :text OR query LIKE :queryText) <endif>" +
+
+      "<if(checkStatus)> AND status in (<status>) <endif> " +
+      "<if(checkQueueName)> AND queue_name in (<queueName>) <endif> " +
+      "<if(checkUserId)> AND user_id in (<userId>) <endif> " +
+      "<if(checkExecutionMode)> AND execution_mode in (<executionMode>) <endif> " +
+      "<if(checkUsedCbo)> AND used_cbo in (<usedCbo>) <endif> " +
+
+      "ORDER BY <sortColumn> IS NULL, <sortColumn> <sortOrder> " +
+      "limit :limit offset :offset"
+  )
+  @UseStringTemplateEngine
+  List<HiveQueryBasicInfo> getSearchResults(
+      @Bind("startTime") Long startTime, @Bind("endTime") Long endTime,
+      @Define("checkUser") boolean checkUser, @Bind("userName") String userName,
+
+      @Define("checkText") Boolean checkText, @Bind("text") String text, @Bind("queryText") String queryText,
+
+      @Define("checkStatus") boolean checkStatus, @BindList(value = "status", onEmpty = EmptyHandling.NULL_STRING) List<Object> status,
+      @Define("checkQueueName") boolean checkQueueName, @BindList(value = "queueName", onEmpty = EmptyHandling.NULL_STRING) List<Object> queueName,
+      @Define("checkUserId") boolean checkUserId, @BindList(value = "userId", onEmpty = EmptyHandling.NULL_STRING) List<Object> userId,
+      @Define("checkExecutionMode") boolean checkExecutionMode, @BindList(value = "executionMode", onEmpty = EmptyHandling.NULL_STRING) List<Object> executionMode,
+      @Define("checkUsedCbo") boolean checkUsedCbo, @BindList(value = "usedCbo", onEmpty = EmptyHandling.NULL_STRING) List<Object> usedCbo,
+
+      @Define("sortColumn") String sortColumn, @Define("sortOrder") String sortOrder,
+      @Bind("offset") Integer offset, @Bind("limit") Integer limit
+  );
 }

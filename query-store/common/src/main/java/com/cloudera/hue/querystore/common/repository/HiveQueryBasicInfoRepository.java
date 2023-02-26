@@ -10,6 +10,7 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jdbi.v3.core.mapper.JoinRow;
 import org.jdbi.v3.core.mapper.JoinRowMapper;
 import org.jdbi.v3.core.mapper.reflect.BeanMapper;
@@ -17,8 +18,11 @@ import org.jdbi.v3.core.mapper.reflect.BeanMapper;
 import com.cloudera.hue.querystore.common.AppAuthentication;
 import com.cloudera.hue.querystore.common.AppAuthentication.Role;
 import com.cloudera.hue.querystore.common.dao.HiveQueryBasicInfoDao;
+import com.cloudera.hue.querystore.common.dto.HiveSearchDetails;
 import com.cloudera.hue.querystore.common.dto.FacetEntry;
 import com.cloudera.hue.querystore.common.dto.FacetValue;
+import com.cloudera.hue.querystore.common.dto.QuerySearchParams;
+import com.cloudera.hue.querystore.common.dto.SortDetails;
 import com.cloudera.hue.querystore.common.entities.HiveQueryBasicInfo;
 import com.cloudera.hue.querystore.common.entities.TezDagBasicInfo;
 import com.cloudera.hue.querystore.common.exception.DBUpdateFailedException;
@@ -106,15 +110,41 @@ public class HiveQueryBasicInfoRepository extends JdbiRepository<HiveQueryBasicI
   }
 
   public Optional<List<FacetValue>> getFacetValues(Set<String> facetFieldSets, long startTime,
-        long endTime, String userName, Role userRole, int facetsResultLimit) {
+        long endTime, String userName, Role role, int facetsResultLimit) {
 
     List<FacetValue> facetValueList = new ArrayList<FacetValue>();
-    boolean userCheck = !AppAuthentication.Role.ADMIN.equals(userRole);
 
     for (String facetField: facetFieldSets) {
-      List<FacetEntry> facetEntry = dao.getFacetValues(facetField, startTime, endTime, userName, userCheck, facetsResultLimit);
+      List<FacetEntry> facetEntry = dao.getFacetValues(facetField, startTime, endTime, userName, checkCurrentUser(role), facetsResultLimit);
       facetValueList.add(new FacetValue(facetField, facetEntry));
     }
     return Optional.of(facetValueList);
+  }
+
+  public long getSearchResultsCount(QuerySearchParams params, String userName, AppAuthentication.Role role) {
+    return dao.getSearchResultsCount(params.getStartTime(), params.getEndTime(), checkCurrentUser(role), userName);
+  }
+
+  public List<HiveQueryBasicInfo> getSearchResults(QuerySearchParams params, String userName, Role role) {
+    HiveSearchDetails fields = new HiveSearchDetails(params);
+
+    SortDetails sort = new SortDetails(params, HiveQueryBasicInfo.TABLE_INFORMATION);
+
+    List<HiveQueryBasicInfo> searchResultList = dao.getSearchResults(
+        params.getStartTime(), params.getEndTime(),
+        checkCurrentUser(role), userName,
+
+        StringUtils.isNotEmpty(fields.getText()), fields.getText(), fields.getQueryText(),
+
+        isNotNull(fields.getStatuses()), fields.getStatuses(),
+        isNotNull(fields.getQueueNames()), fields.getQueueNames(),
+        isNotNull(fields.getUserIds()), fields.getUserIds(),
+        isNotNull(fields.getExecutionModes()), fields.getExecutionModes(),
+        isNotNull(fields.getUsedCbo()), fields.getUsedCbo(),
+
+        sort.getColumnName(), sort.getOrder(),
+        params.getOffset(), params.getLimit()
+    );
+    return searchResultList;
   }
 }
