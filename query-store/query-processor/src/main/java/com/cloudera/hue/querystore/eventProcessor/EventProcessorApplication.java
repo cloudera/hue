@@ -49,6 +49,9 @@ import io.dropwizard.jetty.setup.ServletEnvironment;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class EventProcessorApplication extends Application<EventProcessorConfiguration> {
 
   private static final ConfVar<Integer> SESSION_TIMEOUT =
@@ -63,7 +66,7 @@ public class EventProcessorApplication extends Application<EventProcessorConfigu
   private static final ConfVar<Boolean> ENABLE_HIVE_EVENT_PROCESSOR =
       new ConfVar<>("hue.query-processor.hive.event-pipeline.enabled", true);
   private static final ConfVar<Boolean> ENABLE_IMPALA_EVENT_PROCESSOR =
-      new ConfVar<>("hue.query-processor.impala.event-pipeline.enabled", true);
+      new ConfVar<>("hue.query-processor.impala.event-pipeline.enabled", false);
 
   @Override
   protected void bootstrapLogging() {
@@ -110,13 +113,20 @@ public class EventProcessorApplication extends Application<EventProcessorConfigu
       if (configuration.getDasConf().getConf(ENABLE_HIVE_EVENT_PROCESSOR)) {
         HiveEventProcessorManager hiveEPManager = injector.getInstance(HiveEventProcessorManager.class);
         environment.lifecycle().manage(hiveEPManager);
+      } else {
+        log.info("Hive event processing is disabled: Configuration {} is false", ENABLE_HIVE_EVENT_PROCESSOR.getName());
       }
+
       if (configuration.getDasConf().getConf(ENABLE_IMPALA_EVENT_PROCESSOR)) {
         ImpalaEventProcessorManager impalaEPManager = injector.getInstance(ImpalaEventProcessorManager.class);
         environment.lifecycle().manage(impalaEPManager);
+      } else {
+        log.info("Impala event processing is disabled: Configuration {} is false", ENABLE_IMPALA_EVENT_PROCESSOR.getName());
       }
 
       environment.lifecycle().manage(injector.getInstance(CleanupManager.class));
+    } else {
+      log.info("Event processing is disabled: Configuration {} is false", ENABLE_EVENT_PROCESSOR.getName());
     }
   }
 

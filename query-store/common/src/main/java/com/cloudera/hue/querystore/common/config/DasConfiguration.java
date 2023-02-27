@@ -12,11 +12,13 @@ import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class DasConfiguration {
   private final Map<String, Object> properties = new HashMap<>();
 
+  @Getter
   @AllArgsConstructor
   public static class ConfVar<T> {
     @NotNull
