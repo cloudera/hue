@@ -5,15 +5,18 @@ import com.cloudera.hue.querystore.orm.EntityTable;
 import com.cloudera.hue.querystore.orm.annotation.ColumnInfo;
 import com.cloudera.hue.querystore.orm.annotation.EntityFieldProcessor;
 import com.cloudera.hue.querystore.orm.annotation.SearchQuery;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.FieldNameConstants;
 
 /**
  * Entity for Impala Query
  */
 @Data
 @NoArgsConstructor
+@FieldNameConstants
 @SearchQuery(prefix = "iq", table="impala_query")
 public class ImpalaQueryEntity implements JdbiEntity {
   public static final EntityTable TABLE_INFORMATION = EntityFieldProcessor.process(ImpalaQueryEntity.class);
@@ -60,12 +63,13 @@ public class ImpalaQueryEntity implements JdbiEntity {
     this.sourceFile = sourceFile;
   }
 
-  @ColumnInfo(columnName="id", exclude = true, id=true)
+  @ColumnInfo(columnName="id", id=true)
+  @JsonIgnore
   private Long id;
 
-  // version field for tracking and failing on dirty writes
-  @ColumnInfo(columnName="version", exclude = true)
-  private Integer version;
+  @ColumnInfo(columnName="version")
+  @JsonIgnore
+  private Integer version; // version field for tracking and failing on dirty writes
 
   @ColumnInfo(columnName="query_id", searchable = true)
   private String queryId;
@@ -107,6 +111,7 @@ public class ImpalaQueryEntity implements JdbiEntity {
   private Long hdfsBytesRead;
 
   @ColumnInfo(columnName="source_file")
+  @JsonIgnore
   private String sourceFile;
 
   public enum Status {

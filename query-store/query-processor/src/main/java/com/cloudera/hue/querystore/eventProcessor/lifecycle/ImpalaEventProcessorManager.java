@@ -26,8 +26,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Singleton
 public class ImpalaEventProcessorManager implements Managed {
-  private final Configuration hadoopConfiguration;
   private final DasConfiguration eventProcessingConfig;
+  private final Configuration hadoopConfiguration;
   private final ImpalaEventProcessorDispatcher impalaEventProcessor;
 
   private final FileStatusPersistenceManager fsPersistenceManager;
@@ -57,50 +57,54 @@ public class ImpalaEventProcessorManager implements Managed {
 
   @Override
   public void start() {
-    log.info("Starting");
+    log.info("ImpalaEventProcessorManager: Starting");
     startImpalaPipeline();
-    log.info("Started");
+    log.info("ImpalaEventProcessorManager: Started");
   }
 
   @Override
   public void stop() {
-    log.info("ImpalaEventProcessorManager: stopping");
-    impalaEventsPipeline.shutdown();
-    impalaEventsPipeline.awaitTermination();
-    log.info("ImpalaEventProcessorManager: stopped");
+    if(impalaEventsPipeline != null) {
+      log.info("ImpalaEventProcessorManager: stopping");
+      impalaEventsPipeline.shutdown();
+      impalaEventsPipeline.awaitTermination();
+      log.info("ImpalaEventProcessorManager: stopped");
+    }
   }
 
   public void forceRefresh() {
-    log.info("ImpalaEventProcessorManager: forceRefresh");
-    impalaEventsPipeline.forceRefresh();
+    if(impalaEventsPipeline != null) {
+      log.info("ImpalaEventProcessorManager: forceRefresh");
+      impalaEventsPipeline.forceRefresh();
+    }
   }
 
   public long getQueryRefreshTime() {
-    return impalaEventsPipeline.getRefreshTime();
+    return impalaEventsPipeline != null ? impalaEventsPipeline.getRefreshTime() : 0;
+  }
+
+  private String getBaseDir() throws RuntimeException {
+    // TODO: This should read from impala configs.
+    String impalaBaseDir = eventProcessingConfig.getString(CONF_PROFILE_LOG_DIR, null);
+    if (impalaBaseDir == null) {
+      throw new RuntimeException("Impala profile log dir not configured. Please set: " + CONF_PROFILE_LOG_DIR);
+    }
+    log.info("Impala profile log dir: " + impalaBaseDir);
+    return impalaBaseDir;
   }
 
   private void startImpalaPipeline() {
-    log.info("Starting Impala events pipeline");
     try {
       log.info("Creating Impala events pipeline");
-      // TODO: This should read from impala configs.
-      String impalaBaseDir = eventProcessingConfig.getString(CONF_PROFILE_LOG_DIR, null);
-      if (impalaBaseDir == null) {
-        throw new RuntimeException("Failed to create Impala events pipeline, invalid Impala config. " +
-            "Please set: " + CONF_PROFILE_LOG_DIR);
-      }
-      log.info("Impala base dir: " + impalaBaseDir);
-
+      String impalaBaseDir = getBaseDir();
       SystemClock clock = SystemClock.getInstance();
       ImpalaFileReader impalaFileReader = new ImpalaFileReader(new Path(impalaBaseDir), hadoopConfiguration, clock);
       impalaEventsPipeline = new EventProcessorPipeline<ImpalaRuntimeProfileTree>(clock, impalaFileReader, impalaEventProcessor, txnManager,
           fsPersistenceManager, FileStatusType.IMPALA, eventProcessingConfig, metricRegistry);
       impalaEventsPipeline.start();
-
-      log.info("Started Impala events pipeline");
     } catch (IOException e) {
       log.error("Failed to start Impala events pipeline");
-      throw new RuntimeException("Failed to create Impala events pipeline, got exception: ", e);
+      throw new RuntimeException("Failed to create Impala events pipeline: ", e);
     }
   }
 }
