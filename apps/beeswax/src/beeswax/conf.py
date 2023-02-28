@@ -159,6 +159,12 @@ SERVER_CONN_TIMEOUT = Config(
   type=int,
   help=_t('Timeout in seconds for Thrift calls.'))
 
+ZOOKEEPER_CONN_TIMEOUT = Config(
+  key='zookeeper_conn_timeout',
+  default=30,
+  type=int,
+  help=_t('Timeout in seconds for zookeeper connection.'))
+
 USE_GET_LOG_API = Config( # To remove in Hue 4
   key='use_get_log_api',
   default=False,
