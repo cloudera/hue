@@ -9,7 +9,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
 import org.jdbi.v3.core.mapper.JoinRow;
 
@@ -21,19 +20,9 @@ import com.cloudera.hue.querystore.common.entities.HiveQueryBasicInfo;
 import com.cloudera.hue.querystore.common.entities.TezDagBasicInfo;
 import com.cloudera.hue.querystore.common.repository.HiveQueryBasicInfoRepository;
 import com.cloudera.hue.querystore.common.repository.PageData;
-import com.cloudera.hue.querystore.common.util.Pair;
 import com.cloudera.hue.querystore.generator.CountQueryGenerator;
 import com.cloudera.hue.querystore.generator.SearchQueryGenerator;
 import com.cloudera.hue.querystore.orm.EntityField;
-import com.cloudera.hue.querystore.parsers.FacetInputParser;
-import com.cloudera.hue.querystore.parsers.FacetParseResult;
-import com.cloudera.hue.querystore.parsers.QueryParseResult;
-import com.cloudera.hue.querystore.parsers.RangeFacetInputParser;
-import com.cloudera.hue.querystore.parsers.SearchQueryParser;
-import com.cloudera.hue.querystore.parsers.SortInputParser;
-import com.cloudera.hue.querystore.parsers.SortParseResult;
-import com.cloudera.hue.querystore.parsers.TimeRangeInputParser;
-import com.cloudera.hue.querystore.parsers.TimeRangeParseResult;
 import com.google.common.collect.Lists;
 
 import lombok.extern.slf4j.Slf4j;
@@ -44,27 +33,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class SearchService {
   private static volatile List<FieldInformation> fieldsInformation = null;
-  private static final String SORT_FRAGMENT = "ORDER BY %s NULLS LAST";
 
-  private final SearchQueryParser basicParser;
-  private final SortInputParser sortInputParser;
-  private final FacetInputParser facetParser;
-  private final RangeFacetInputParser rangeFacetParser;
-  private final TimeRangeInputParser timeRangeInputParser;
   private final HiveQueryBasicInfoRepository repository;
 
   @Inject
-  public SearchService(@Named("Basic") SearchQueryParser basicParser,
-                       SortInputParser sortInputParser,
-                       FacetInputParser facetParser,
-                       RangeFacetInputParser rangeFacetParser,
-                       TimeRangeInputParser timeRangeInputParser,
-                       HiveQueryBasicInfoRepository repository) {
-    this.basicParser = basicParser;
-    this.sortInputParser = sortInputParser;
-    this.facetParser = facetParser;
-    this.rangeFacetParser = rangeFacetParser;
-    this.timeRangeInputParser = timeRangeInputParser;
+  public SearchService(HiveQueryBasicInfoRepository repository) {
     this.repository = repository;
   }
 
@@ -74,22 +47,9 @@ public class SearchService {
 
     int iOffset = StandardizeParamsUtility.sanitizeOffset(offset);
     int iLimit = StandardizeParamsUtility.sanitizeLimit(limit);
-    String iQueryText = StandardizeParamsUtility.sanitizeQuery(queryText);
-    String iSortText = StandardizeParamsUtility.sanitizeQuery(sortText);
-    Long iEndTime = StandardizeParamsUtility.sanitizeEndTime(startTime, endTime);
-    Long iStartTime = StandardizeParamsUtility.sanitizeStartTime(startTime, endTime);
 
-    QueryParseResult parseResult = basicParser.parse(iQueryText);
-    SortParseResult sortParseResult = sortInputParser.parse(iSortText);
-    FacetParseResult facetParseResult = facetParser.parse(facets);
-    FacetParseResult rangeFacetParseResult = rangeFacetParser.parse(rangeFacets);
-    TimeRangeParseResult timeRangeParseResult = timeRangeInputParser.parse(new Pair<>(iStartTime, iEndTime));
-
-    String sortFragment = sortParseResult.isSortingRequired()
-        ? String.format(SORT_FRAGMENT, sortParseResult.getSortExpression()) : "";
-
-    List<String> predicates = Lists.newArrayList(parseResult.getPredicate(), facetParseResult.getFacetExpression(),
-        rangeFacetParseResult.getFacetExpression(), timeRangeParseResult.getTimeRangeExpression());
+    String sortFragment = null;
+    List<String> predicates = Lists.newArrayList(null, null, null, null);
 
     if (username != null) {
       predicates.add(HiveQueryBasicInfo.TABLE_INFORMATION.getTablePrefix() + ".request_user = :username");
@@ -105,10 +65,6 @@ public class SearchService {
     String finalCountSql = countQueryGenerator.generate();
 
     Map<String, Object> parameterBindings = new HashMap<>();
-    parameterBindings.putAll(parseResult.getParameterBindings());
-    parameterBindings.putAll(facetParseResult.getParameterBindings());
-    parameterBindings.putAll(rangeFacetParseResult.getParameterBindings());
-    parameterBindings.putAll(timeRangeParseResult.getParameterBindings());
     if (username != null) {
       parameterBindings.put("username", username);
     }
