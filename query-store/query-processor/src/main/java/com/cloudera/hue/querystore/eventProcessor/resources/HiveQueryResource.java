@@ -35,18 +35,14 @@ import com.cloudera.hue.querystore.common.dto.QuerySearchParams;
 import com.cloudera.hue.querystore.common.dto.QuerySearchResult;
 import com.cloudera.hue.querystore.common.entities.HiveQueryBasicInfo;
 import com.cloudera.hue.querystore.common.entities.HiveQueryExtendedInfo;
-import com.cloudera.hue.querystore.common.entities.ImpalaQueryEntity;
 import com.cloudera.hue.querystore.common.entities.TezDagBasicInfo;
 import com.cloudera.hue.querystore.common.entities.VertexInfo;
 import com.cloudera.hue.querystore.common.repository.HiveQueryBasicInfoRepository;
 import com.cloudera.hue.querystore.common.repository.HiveQueryExtendedInfoRepository;
-import com.cloudera.hue.querystore.common.repository.PageData;
 import com.cloudera.hue.querystore.common.repository.TezDagBasicInfoRepository;
 import com.cloudera.hue.querystore.common.repository.VertexInfoRepository;
 import com.cloudera.hue.querystore.common.services.DagInfoService;
-import com.cloudera.hue.querystore.common.util.MetaInfo;
 import com.cloudera.hue.querystore.eventProcessor.lifecycle.HiveEventProcessorManager;
-import com.google.common.collect.ImmutableMap;
 
 /**
  * Resource class for working with the hive ide Udfs

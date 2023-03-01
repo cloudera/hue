@@ -4,27 +4,22 @@ package com.cloudera.hue.querystore.common.repository;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
 import javax.inject.Inject;
 
 import org.apache.commons.lang3.StringUtils;
-import org.jdbi.v3.core.mapper.JoinRow;
-import org.jdbi.v3.core.mapper.JoinRowMapper;
-import org.jdbi.v3.core.mapper.reflect.BeanMapper;
 
 import com.cloudera.hue.querystore.common.AppAuthentication;
 import com.cloudera.hue.querystore.common.AppAuthentication.Role;
 import com.cloudera.hue.querystore.common.dao.HiveQueryBasicInfoDao;
-import com.cloudera.hue.querystore.common.dto.HiveSearchDetails;
 import com.cloudera.hue.querystore.common.dto.FacetEntry;
 import com.cloudera.hue.querystore.common.dto.FacetValue;
+import com.cloudera.hue.querystore.common.dto.HiveSearchDetails;
 import com.cloudera.hue.querystore.common.dto.QuerySearchParams;
 import com.cloudera.hue.querystore.common.dto.SortDetails;
 import com.cloudera.hue.querystore.common.entities.HiveQueryBasicInfo;
-import com.cloudera.hue.querystore.common.entities.TezDagBasicInfo;
 import com.cloudera.hue.querystore.common.exception.DBUpdateFailedException;
 
 import lombok.extern.slf4j.Slf4j;
@@ -38,20 +33,6 @@ public class HiveQueryBasicInfoRepository extends JdbiRepository<HiveQueryBasicI
   @Inject
   public HiveQueryBasicInfoRepository(HiveQueryBasicInfoDao dao){
     super(dao);
-  }
-
-  public List<JoinRow> executeSearchQuery(String query, Map<String, Object> parameters) {
-    return getDao().withHandle(handle -> {
-      handle.registerRowMapper(BeanMapper.factory(HiveQueryBasicInfo.class, "hq"));
-      handle.registerRowMapper(BeanMapper.factory(TezDagBasicInfo.class, "di"));
-      handle.registerRowMapper(JoinRowMapper.forTypes(HiveQueryBasicInfo.class, TezDagBasicInfo.class));
-      return handle.createQuery(query).bindMap(parameters).mapTo(JoinRow.class).list();
-    });
-  }
-
-  public Long executeSearchCountQuery(String countQuery, Map<String, Object> parameters) {
-    return getDao().withHandle(handle -> handle.createQuery(countQuery).bindMap(parameters)
-        .mapTo(Long.class).findFirst().orElse(0l));
   }
 
   public Optional<HiveQueryBasicInfo> findByHiveQueryId(String queryId) {
@@ -134,7 +115,7 @@ public class HiveQueryBasicInfoRepository extends JdbiRepository<HiveQueryBasicI
         params.getStartTime(), params.getEndTime(),
         checkCurrentUser(role), userName,
 
-        StringUtils.isNotEmpty(fields.getText()), fields.getText(), fields.getQueryText(),
+        isNotNull(fields.getText()), fields.getText(), fields.getQueryText(),
 
         isNotNull(fields.getStatuses()), fields.getStatuses(),
         isNotNull(fields.getQueueNames()), fields.getQueueNames(),
