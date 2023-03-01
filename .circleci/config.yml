@@ -77,7 +77,7 @@ commands:
             if [ ! -f /usr/share/hue/build/env/bin/hue ]; then
               sudo add-apt-repository --yes ppa:deadsnakes/ppa
               sudo apt-get update
-              DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true TZ=UTC sudo apt-get install -y --no-install-recommends python2.7-dev libsnappy-dev asciidoc git ant gcc g++ libffi-dev libkrb5-dev libmysqlclient-dev libsasl2-dev libsasl2-modules-gssapi-mit libsqlite3-dev libssl-dev libxml2-dev libxslt-dev make maven libldap2-dev python-setuptools libgmp3-dev
+              DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true TZ=UTC sudo apt-get update && apt-get install -y --no-install-recommends python2.7-dev libsnappy-dev asciidoc git ant gcc g++ libffi-dev libkrb5-dev libmysqlclient-dev libsasl2-dev libsasl2-modules-gssapi-mit libsqlite3-dev libssl-dev libxml2-dev libxslt-dev make maven libldap2-dev python-setuptools libgmp3-dev
               # see https://docs.gethue.com/administrator/installation/dependencies/#mysql--mariadb
               git config user.email "hue+circleci@example.com"
               git config user.name "Hue CircleCI"
@@ -215,11 +215,11 @@ commands:
             else
               sudo ln -fs /usr/share/zoneinfo/UTC /etc/localtime
               export DEBIAN_FRONTEND=noninteractive
-              sudo apt-get update
-              sudo apt-get install -y gcc g++ build-essential python3.8-dev python3.8-venv python3.8-distutils asciidoc rsync curl libkrb5-dev libldap2-dev libsasl2-dev libxml2-dev libxslt-dev  libsasl2-modules-gssapi-mit libsnappy-dev libffi-dev
+              sudo apt-get clean && apt-get update
+              sudo apt-get update && apt-get install -f -y gcc g++ build-essential python3.8-dev python3.8-venv python3.8-distutils asciidoc rsync curl libkrb5-dev libldap2-dev libsasl2-dev libxml2-dev libxslt-dev  libsasl2-modules-gssapi-mit libsnappy-dev libffi-dev
               curl -sL https://deb.nodesource.com/setup_14.x | sudo bash - && sudo apt-get install -y nodejs
               curl -sL https://bootstrap.pypa.io/get-pip.py | sudo python3.8
-              sudo apt-get install -y libncursesw5-dev libgdbm-dev libc6-dev libssl-dev openssl
+              sudo apt-get update && apt-get install -y libncursesw5-dev libgdbm-dev libc6-dev libssl-dev openssl
             fi
 
             export PYTHON_VER=python3.8
