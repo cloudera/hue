@@ -31,7 +31,6 @@ import com.cloudera.hue.querystore.common.dto.QuerySearchParams;
 import com.cloudera.hue.querystore.common.entities.HiveQueryBasicInfo;
 import com.cloudera.hue.querystore.common.repository.HiveQueryBasicInfoRepository;
 import com.cloudera.hue.querystore.common.services.StandardizeParamsUtility;
-import com.cloudera.hue.querystore.common.services.SearchService;
 import com.cloudera.hue.querystore.orm.EntityField;
 import com.cloudera.hue.querystore.orm.EntityTable;
 import com.google.common.collect.ImmutableMap;
@@ -63,13 +62,8 @@ public class QuerySearchResource {
     this.hiveQueryResource = hiveQueryResource;
   }
 
-  public static class QuerySearchParamsWrapper {
+  private static class QuerySearchParamsWrapper {
     private QuerySearchParams params;
-    public QuerySearchParamsWrapper() { }
-
-    public QuerySearchParamsWrapper(QuerySearchParams params) {
-      this.params = params;
-    }
 
     public QuerySearchParams getParams() {
       return params;
@@ -94,7 +88,7 @@ public class QuerySearchResource {
   @Produces(MediaType.APPLICATION_JSON)
   @Path("/fields-information")
   public Response getSearchableColumnInfo() {
-    List<FieldInformation> fieldsInformations = SearchService.getFieldsInformation();
+    List<FieldInformation> fieldsInformations = FieldInformation.getFieldsInformation();
     return Response.ok(Collections.singletonMap("fieldsInfo", fieldsInformations)).build();
   }
 
