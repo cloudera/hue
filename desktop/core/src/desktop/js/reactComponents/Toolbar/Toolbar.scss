@@ -1,0 +1,25 @@
+@import './ToolbarShared.scss';
+
+.antd {
+  .hue-toolbar {
+    display: flex;
+    align-items: center;
+    background-color: $toolbar-background-color;
+
+    &--small {
+      height: $toolbar-height-small;
+    }
+
+    &--medium {
+      height: $toolbar-height-medium;
+    }
+
+    &--large {
+      height: $toolbar-height-large;
+    }
+  }
+
+  .hue-toolbar__spacer {
+    flex-grow: 2;
+  }
+}
