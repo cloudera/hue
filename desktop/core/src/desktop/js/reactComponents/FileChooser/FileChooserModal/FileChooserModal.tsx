@@ -16,7 +16,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Modal from 'antd/lib/modal/Modal';
-import { Menu, Spin } from 'antd';
+import { Col, Menu, Row, Spin } from 'antd';
 
 import HdfsIcon from '../../../components/icons/HdfsIcon';
 import S3Icon from '../../../components/icons/S3Icon';
@@ -111,21 +111,24 @@ const FileChooserModal: React.FC<FileProps> = ({ show, onCancel, title, okText }
       width={930}
       className="hue-file-chooser__modal"
     >
-      <Spin spinning={loading} wrapperClassName="hue-file-chooser-modal__spinner">
-        <Menu
-          items={fileSystemList}
-          onSelect={selectedMenuItem => {
-            setFilePath(fileSystemList[selectedMenuItem.key].user_home_dir);
-          }}
-          className="hue-file-system__panel"
-        ></Menu>
-
-        <Spin wrapperClassName="hue-files-table__spinner" spinning={loadingFiles}>
-          <PathBrowser
-            handleFilePathChange={setFilePath}
-            breadcrumbs={filesData?.breadcrumbs}
-          ></PathBrowser>
-        </Spin>
+      <Spin spinning={true} wrapperClassName="hue-file-chooser-modal__spinner">
+        <Row>
+          <Col span={5}>
+            <Menu
+              items={fileSystemList}
+              onSelect={selectedMenuItem => {
+                setFilePath(fileSystemList[selectedMenuItem.key].user_home_dir);
+              }}
+              className="hue-file-system__panel"
+            ></Menu>
+          </Col>
+          <Col span={19}>
+            <PathBrowser
+              handleFilePathChange={setFilePath}
+              breadcrumbs={filesData?.breadcrumbs}
+            ></PathBrowser>
+          </Col>
+        </Row>
       </Spin>
     </Modal>
   );

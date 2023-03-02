@@ -79,6 +79,16 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
               <!-- /ko -->
             </a>
           </li>
+          <script type="text/javascript">
+            (function () {    
+              window.createReactComponents('#importerComponents');
+            })();
+          </script>
+          <li>
+            <div>
+              <FileChooserWithButton data-reactcomponent='FileChooserWithButton' ></FileChooserWithButton>
+            </div>
+          </li>
         </ul>
       </div>
     </div>

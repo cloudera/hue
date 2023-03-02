@@ -20,23 +20,19 @@ import { Button } from 'antd';
 import OverflowTooltip from './OverflowTooltip';
 import './OverflowingItem.scss';
 
-enum OverflowingComponentType {
-  breadcrumb,
-  menu
-}
-
-type OverflowingComponentTypeString = keyof typeof OverflowingComponentType;
-
+type OverflowingComponentType = 'breadcrumb' | 'menu';
 interface OverflowingItemProps {
   label: string;
   url: string;
   handleFilePathChange: (path: string) => void;
-  componentType: OverflowingComponentTypeString;
+  componentType: OverflowingComponentType;
 }
 
-const customStyles = {
+const customStyles: {
+  [key in OverflowingComponentType]: React.CSSProperties;
+} = {
   breadcrumb: {
-    minWidth: '4ch'
+    minWidth: '5ch'
   },
   menu: {
     width: '100%',
@@ -82,7 +78,7 @@ const OverflowingItem: React.FC<OverflowingItemProps> = ({
         onClick={() => {
           handleFilePathChange(url);
         }}
-        style={customStyles[componentType] as React.CSSProperties}
+        style={customStyles[componentType]}
       >
         {label}
       </Button>

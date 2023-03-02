@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.hue-path-browser__overflowing-label.ant-btn {
+.hue-path-browser__overflowing-label {
   background-color: transparent;
   white-space: nowrap;
   padding: 0;
@@ -22,8 +22,9 @@
   text-overflow: ellipsis;
   border: none;
   flex: 0 1 auto;
-}
+  box-shadow: none;
 
-.hue-path-browser__overflowing-label.ant-btn > span {
-  display: contents;
+  > span {
+    display: contents;
+  }
 }
