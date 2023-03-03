@@ -3,13 +3,9 @@ package com.cloudera.hue.querystore.eventProcessor.processors.impala;
 import com.cloudera.hue.querystore.common.entities.ImpalaQueryEntity;
 import com.cloudera.hue.querystore.common.repository.ImpalaQueryRepository;
 import com.cloudera.hue.querystore.common.repository.transaction.DASTransaction;
+import com.cloudera.hue.querystore.eventProcessor.eventdefs.ImpalaQueryProfile;
 import com.cloudera.hue.querystore.eventProcessor.processors.ProcessingStatus;
 import com.cloudera.ipe.IPEConstants;
-import com.cloudera.ipe.model.impala.ImpalaRuntimeProfileTree;
-import com.cloudera.ipe.rules.ImpalaHDFSIOAnalysisRule;
-import com.cloudera.ipe.rules.ImpalaMemoryUsageAnalysisRule;
-import com.cloudera.ipe.rules.ImpalaRuntimeProfile;
-import com.cloudera.ipe.rules.ImpalaThreadTimeAnalysisRule;
 
 import java.net.URI;
 import java.util.Map;
@@ -35,32 +31,16 @@ public class ImpalaQueryProfileProcessor {
   }
 
   @DASTransaction
-  public ProcessingStatus process(ImpalaRuntimeProfileTree tree, Path sourceFile) {
+  public ProcessingStatus process(ImpalaQueryProfile profile, Path sourceFile) {
 
-    Map<String, String> details = tree.getSummaryMap();
-
-    ImpalaHDFSIOAnalysisRule hdfsioAnalysisRule = new ImpalaHDFSIOAnalysisRule();
-    Map<String, String> hdfsMetrics = hdfsioAnalysisRule.process(tree);
-
-    ImpalaMemoryUsageAnalysisRule memoryUsageAnalysisRule = new ImpalaMemoryUsageAnalysisRule(
-        ImpalaRuntimeProfile.DEFAULT_TIME_FORMATS);
-    Map<String, String> memoryMetrics = memoryUsageAnalysisRule.process(tree);
-
-    // Uncomment if some value need to be taken from cpuMetrics
-    // ImpalaResourceMetricsConverterAnalysisRule resourceAnalysisRule = new ImpalaResourceMetricsConverterAnalysisRule();
-    // Map<String, String> cpuMetrics = resourceAnalysisRule.process(tree);
-
-    ImpalaThreadTimeAnalysisRule threadTimeAnalysisRule = new ImpalaThreadTimeAnalysisRule(
-        ImpalaRuntimeProfile.DEFAULT_TIME_FORMATS);
-    Map<String, String> threadTimeMetrics = threadTimeAnalysisRule.process(tree);
-
-    // Uncomment if some value need to be taken from insertMetrics
-    // ImpalaInsertAnalysisRule insertAnalysisRule = new ImpalaInsertAnalysisRule();
-    // Map<String, String> insertMetrics = insertAnalysisRule.process(tree);
+    Map<String, String> details = profile.getSummaryMap();
+    Map<String, String> hdfsMetrics = profile.getHdfsMetricsMap();
+    Map<String, String> memoryMetrics = profile.getMemoryMetrics();
+    Map<String, String> threadTimeMetrics = profile.getThreadTimeMetrics();
 
     ImpalaQueryEntity entity = new ImpalaQueryEntity();
 
-    entity.setQueryId(tree.getQueryId());
+    entity.setQueryId(profile.getQueryId());
     entity.setQueryText(details.get(PropKey.SQL_STATEMENT));
     entity.setStatus(details.get(PropKey.QUERY_STATE));
     entity.setQueryType(details.get(PropKey.QUERY_TYPE));
@@ -77,7 +57,7 @@ public class ImpalaQueryProfileProcessor {
     entity.setCoordinator(details.get(PropKey.COORDINATOR));
 
     entity.setCpuTime(parseLong(threadTimeMetrics.get(PropKey.THREAD_CPU_TIME)));
-    entity.setRowsProduced(tree.getRowsProduced());
+    entity.setRowsProduced(profile.getTree().getRowsProduced());
     entity.setPeakMemory(parseLong(memoryMetrics.get(PropKey.MEMORY_PER_NODE_PEAK)));
     entity.setHdfsBytesRead(parseLong(hdfsMetrics.get(PropKey.HDFS_BYTES_READ)));
 
