@@ -8,9 +8,8 @@ import com.cloudera.ipe.IPEConstants;
 import com.cloudera.ipe.model.impala.ImpalaRuntimeProfileTree;
 import com.cloudera.ipe.rules.ImpalaHDFSIOAnalysisRule;
 import com.cloudera.ipe.rules.ImpalaMemoryUsageAnalysisRule;
+import com.cloudera.ipe.rules.ImpalaRuntimeProfile;
 import com.cloudera.ipe.rules.ImpalaThreadTimeAnalysisRule;
-
-import com.google.common.collect.ImmutableList;
 
 import java.net.URI;
 import java.util.Map;
@@ -20,6 +19,7 @@ import javax.inject.Provider;
 
 import org.apache.hadoop.fs.Path;
 import org.joda.time.DateTimeZone;
+import org.joda.time.Instant;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
@@ -27,8 +27,6 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class ImpalaQueryProfileProcessor {
-  private static ImmutableList<DateTimeFormatter> TIME_FORMATS = getTimeFormats(DateTimeZone.UTC);
-
   private final Provider<ImpalaQueryRepository> impalaQueryRepositoryProvider;
 
   @Inject
@@ -44,14 +42,16 @@ public class ImpalaQueryProfileProcessor {
     ImpalaHDFSIOAnalysisRule hdfsioAnalysisRule = new ImpalaHDFSIOAnalysisRule();
     Map<String, String> hdfsMetrics = hdfsioAnalysisRule.process(tree);
 
-    ImpalaMemoryUsageAnalysisRule memoryUsageAnalysisRule = new ImpalaMemoryUsageAnalysisRule(TIME_FORMATS);
+    ImpalaMemoryUsageAnalysisRule memoryUsageAnalysisRule = new ImpalaMemoryUsageAnalysisRule(
+        ImpalaRuntimeProfile.DEFAULT_TIME_FORMATS);
     Map<String, String> memoryMetrics = memoryUsageAnalysisRule.process(tree);
 
     // Uncomment if some value need to be taken from cpuMetrics
     // ImpalaResourceMetricsConverterAnalysisRule resourceAnalysisRule = new ImpalaResourceMetricsConverterAnalysisRule();
     // Map<String, String> cpuMetrics = resourceAnalysisRule.process(tree);
 
-    ImpalaThreadTimeAnalysisRule threadTimeAnalysisRule = new ImpalaThreadTimeAnalysisRule(TIME_FORMATS);
+    ImpalaThreadTimeAnalysisRule threadTimeAnalysisRule = new ImpalaThreadTimeAnalysisRule(
+        ImpalaRuntimeProfile.DEFAULT_TIME_FORMATS);
     Map<String, String> threadTimeMetrics = threadTimeAnalysisRule.process(tree);
 
     // Uncomment if some value need to be taken from insertMetrics
@@ -65,9 +65,13 @@ public class ImpalaQueryProfileProcessor {
     entity.setStatus(details.get(PropKey.QUERY_STATE));
     entity.setQueryType(details.get(PropKey.QUERY_TYPE));
 
-    entity.setStartTime(tree.getStartTime(TIME_FORMATS).getMillis());
-    entity.setEndTime(tree.getEndTime(TIME_FORMATS).getMillis());
-    entity.setDuration(tree.getDuration(TIME_FORMATS).getMillis());
+    Long startTime = parseTime(details.get(IPEConstants.IMPALA_START_TIME_INFO_STRING));
+    Long endTime = parseTime(details.get(IPEConstants.IMPALA_END_TIME_INFO_STRING));
+    entity.setStartTime(startTime);
+    entity.setEndTime(endTime);
+    if(startTime != null && endTime != null) {
+      entity.setDuration(endTime - startTime);
+    }
 
     entity.setUserName(details.get(PropKey.USER));
     entity.setCoordinator(details.get(PropKey.COORDINATOR));
@@ -95,17 +99,18 @@ public class ImpalaQueryProfileProcessor {
     }
   }
 
-  private static ImmutableList<DateTimeFormatter> getTimeFormats(DateTimeZone timeZone) {
-    ImmutableList.Builder<DateTimeFormatter> timeFormatBuilder = ImmutableList.builder();
-    for (String format : IPEConstants.DEFAULT_IMPALA_RUNTIME_PROFILE_TIME_FORMATS) {
-      try {
-        timeFormatBuilder.add(DateTimeFormat.forPattern(format).withZone(timeZone));
-      } catch (IllegalArgumentException e) {
-        throw new UnsupportedOperationException("Invalid time format: " + format);
+  public static final DateTimeFormatter TIME_FORMATTER = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS")
+      .withZone(DateTimeZone.UTC);
+  private static Long parseTime(String timeString) {
+    try {
+      if(timeString.lastIndexOf(".") == timeString.length() - 10) {
+        // Remove nano seconds if present
+        timeString = timeString.substring(0, timeString.length() - 6);
       }
+      return Instant.parse(timeString, TIME_FORMATTER).getMillis();
+    } catch (IllegalArgumentException e) {
+      return null;
     }
-    ImmutableList<DateTimeFormatter> timeFormats = timeFormatBuilder.build();
-    return timeFormats;
   }
 
   interface PropKey {
