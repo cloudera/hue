@@ -1448,6 +1448,9 @@ class AutocompleteResults {
       }
     } else if (/^hdfs:\/\//i.test(path)) {
       path = path.substring(6);
+    } else if (/^ofs:\/\//i.test(path)) {
+      fetchFunction = 'fetchOfsPath';
+      path = path.substring(5);
     }
 
     const parts = path.split('/');
