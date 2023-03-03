@@ -4,6 +4,7 @@ import javax.inject.Inject;
 
 import org.apache.hadoop.fs.Path;
 
+import com.cloudera.hue.querystore.eventProcessor.eventdefs.ImpalaQueryProfile;
 import com.cloudera.hue.querystore.eventProcessor.processors.impala.ImpalaQueryProfileProcessor;
 import com.cloudera.ipe.model.impala.ImpalaRuntimeProfileTree;
 
@@ -22,7 +23,8 @@ public class ImpalaEventProcessorDispatcher implements EventProcessor<ImpalaRunt
   public ProcessingStatus process(ImpalaRuntimeProfileTree event, Path filePath) {
     log.info("Processing impala profile for query {}", event.getQueryId());
 
-    ProcessingStatus processingStatus = queryProfileProcessor.process(event, filePath);
+    ImpalaQueryProfile profile = new ImpalaQueryProfile(event);
+    ProcessingStatus processingStatus = queryProfileProcessor.process(profile, filePath);
 
     // TODO: Better handling of each of the following states
     // Successful processing of event - SUCCESS
