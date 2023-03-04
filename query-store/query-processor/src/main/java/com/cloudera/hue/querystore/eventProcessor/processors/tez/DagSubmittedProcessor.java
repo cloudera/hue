@@ -22,8 +22,8 @@ import com.cloudera.hue.querystore.common.repository.HiveQueryBasicInfoRepositor
 import com.cloudera.hue.querystore.common.repository.TezDagBasicInfoRepository;
 import com.cloudera.hue.querystore.common.repository.TezDagExtendedInfoRepository;
 import com.cloudera.hue.querystore.common.repository.transaction.DASTransaction;
+import com.cloudera.hue.querystore.eventProcessor.dispatchers.HiveEventDispatcher;
 import com.cloudera.hue.querystore.eventProcessor.eventdefs.TezHSEvent;
-import com.cloudera.hue.querystore.eventProcessor.processors.HiveEventProcessorDispatcher;
 import com.cloudera.hue.querystore.eventProcessor.processors.HiveEventType;
 import com.cloudera.hue.querystore.eventProcessor.processors.ProcessingStatus;
 import com.cloudera.hue.querystore.eventProcessor.processors.TezEventProcessor;
@@ -40,19 +40,19 @@ public class DagSubmittedProcessor implements TezEventProcessor {
   private final Provider<HiveQueryBasicInfoRepository> hiveQueryRepositoryProvider;
   private final Provider<TezDagBasicInfoRepository> dagInfoRepositoryProvider;
   private final Provider<TezDagExtendedInfoRepository> dagDetailsRepositoryProvider;
-  private final HiveEventProcessorDispatcher hiveEventProcessor;
+  private final HiveEventDispatcher hiveEventDispatcher;
 
   @Inject
   public DagSubmittedProcessor(ProcessorHelper helper,
                                Provider<HiveQueryBasicInfoRepository> hiveQueryRepositoryProvider,
                                Provider<TezDagBasicInfoRepository> dagInfoRepositoryProvider,
                                Provider<TezDagExtendedInfoRepository> dagDetailsRepositoryProvider,
-                               HiveEventProcessorDispatcher hiveEventProcessor) {
+                               HiveEventDispatcher hiveEventDispatcher) {
     this.helper = helper;
     this.hiveQueryRepositoryProvider = hiveQueryRepositoryProvider;
     this.dagInfoRepositoryProvider = dagInfoRepositoryProvider;
     this.dagDetailsRepositoryProvider = dagDetailsRepositoryProvider;
-    this.hiveEventProcessor = hiveEventProcessor;
+    this.hiveEventDispatcher = hiveEventDispatcher;
   }
 
   @Override
@@ -74,7 +74,7 @@ public class DagSubmittedProcessor implements TezEventProcessor {
             "Processing a dummy 'QUERY_SUBMITTED' event.", event.getEventType(), event.getDagId(),
             hiveQueryId);
         HiveHookEventProto eventProto = createDummyQuerySubmittedEvent(event);
-        hiveEventProcessor.process(eventProto, filePath);
+        hiveEventDispatcher.process(eventProto, filePath);
         firstHiveQuery = hiveQueryRepository.findByHiveQueryId(hiveQueryId);
       }
       hiveQuery = firstHiveQuery.get();

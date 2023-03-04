@@ -14,8 +14,8 @@ import com.cloudera.hue.querystore.common.config.DasConfiguration;
 import com.cloudera.hue.querystore.common.entities.FileStatusEntity.FileStatusType;
 import com.cloudera.hue.querystore.common.repository.FileStatusPersistenceManager;
 import com.cloudera.hue.querystore.common.repository.transaction.TransactionManager;
+import com.cloudera.hue.querystore.eventProcessor.dispatchers.ImpalaEventDispatcher;
 import com.cloudera.hue.querystore.eventProcessor.pipeline.EventProcessorPipeline;
-import com.cloudera.hue.querystore.eventProcessor.processors.ImpalaEventProcessorDispatcher;
 import com.cloudera.hue.querystore.eventProcessor.readers.ImpalaFileReader;
 import com.cloudera.ipe.model.impala.ImpalaRuntimeProfileTree;
 import com.codahale.metrics.MetricRegistry;
@@ -28,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 public class ImpalaEventProcessorManager implements Managed {
   private final DasConfiguration eventProcessingConfig;
   private final Configuration hadoopConfiguration;
-  private final ImpalaEventProcessorDispatcher impalaEventProcessor;
+  private final ImpalaEventDispatcher impalaEventDispatcher;
 
   private final FileStatusPersistenceManager fsPersistenceManager;
   private final TransactionManager txnManager;
@@ -41,14 +41,14 @@ public class ImpalaEventProcessorManager implements Managed {
   @Inject
   public ImpalaEventProcessorManager(DasConfiguration eventProcessingConfig,
                                Configuration hadoopConfiguration,
-                               ImpalaEventProcessorDispatcher impalaEventProcessor,
+                               ImpalaEventDispatcher impalaEventDispatcher,
                                FileStatusPersistenceManager fsPersistenceManager,
                                TransactionManager txnManager,
                                MetricRegistry metricRegistry) {
     this.eventProcessingConfig = eventProcessingConfig;
     this.hadoopConfiguration = hadoopConfiguration;
 
-    this.impalaEventProcessor = impalaEventProcessor;
+    this.impalaEventDispatcher = impalaEventDispatcher;
 
     this.fsPersistenceManager = fsPersistenceManager;
     this.txnManager = txnManager;
@@ -99,7 +99,7 @@ public class ImpalaEventProcessorManager implements Managed {
       String impalaBaseDir = getBaseDir();
       SystemClock clock = SystemClock.getInstance();
       ImpalaFileReader impalaFileReader = new ImpalaFileReader(new Path(impalaBaseDir), hadoopConfiguration, clock);
-      impalaEventsPipeline = new EventProcessorPipeline<ImpalaRuntimeProfileTree>(clock, impalaFileReader, impalaEventProcessor, txnManager,
+      impalaEventsPipeline = new EventProcessorPipeline<ImpalaRuntimeProfileTree>(clock, impalaFileReader, impalaEventDispatcher, txnManager,
           fsPersistenceManager, FileStatusType.IMPALA, eventProcessingConfig, metricRegistry);
       impalaEventsPipeline.start();
     } catch (IOException e) {

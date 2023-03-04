@@ -1,5 +1,5 @@
 // (c) Copyright 2020-2021 Cloudera, Inc. All rights reserved.
-package com.cloudera.hue.querystore.eventProcessor.processors;
+package com.cloudera.hue.querystore.eventProcessor.dispatchers;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,6 +13,9 @@ import org.apache.tez.dag.history.logging.proto.HistoryLoggerProtos.HistoryEvent
 import org.apache.tez.dag.history.logging.proto.HistoryLoggerProtos.KVPair;
 
 import com.cloudera.hue.querystore.eventProcessor.eventdefs.TezHSEvent;
+import com.cloudera.hue.querystore.eventProcessor.processors.ProcessingStatus;
+import com.cloudera.hue.querystore.eventProcessor.processors.TezEventProcessor;
+import com.cloudera.hue.querystore.eventProcessor.processors.TezEventType;
 import com.cloudera.hue.querystore.eventProcessor.processors.tez.DagFinishedProcessor;
 import com.cloudera.hue.querystore.eventProcessor.processors.tez.DagInitializedProcessor;
 import com.cloudera.hue.querystore.eventProcessor.processors.tez.DagStartedProcessor;
@@ -30,11 +33,11 @@ import com.cloudera.hue.querystore.eventProcessor.processors.tez.VertexStartedPr
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class TezEventProcessorDispatcher implements EventProcessor<HistoryEventProto> {
+public class TezEventDispatcher implements EventDispatcher<HistoryEventProto> {
   private final Map<String, List<TezEventProcessor>> processors = new HashMap<>();
 
   @Inject
-  public TezEventProcessorDispatcher(DagSubmittedProcessor dagSubmittedProcessor,
+  public TezEventDispatcher(DagSubmittedProcessor dagSubmittedProcessor,
                              DagInitializedProcessor dagInitializedProcessor,
                              DagStartedProcessor dagStartedProcessor,
                              DagFinishedProcessor dagFinishedProcessor,

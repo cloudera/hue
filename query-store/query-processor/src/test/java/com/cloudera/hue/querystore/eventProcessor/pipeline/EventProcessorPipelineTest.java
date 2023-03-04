@@ -39,7 +39,7 @@ import com.cloudera.hue.querystore.common.entities.FileStatusEntity.FileStatusTy
 import com.cloudera.hue.querystore.common.repository.FileStatusPersistenceManager;
 import com.cloudera.hue.querystore.common.repository.transaction.Callable;
 import com.cloudera.hue.querystore.common.repository.transaction.TransactionManager;
-import com.cloudera.hue.querystore.eventProcessor.processors.EventProcessor;
+import com.cloudera.hue.querystore.eventProcessor.dispatchers.EventDispatcher;
 import com.cloudera.hue.querystore.eventProcessor.processors.ProcessingStatus;
 import com.cloudera.hue.querystore.eventProcessor.readers.FileReader;
 import com.cloudera.hue.querystore.eventProcessor.readers.ProtoFileReader;
@@ -57,7 +57,7 @@ public class EventProcessorPipelineTest {
   private MetricRegistry metricRegistry;
   private TransactionManager txnManager;
 
-  @Mock EventProcessor<HistoryEventProto> processor;
+  @Mock EventDispatcher<HistoryEventProto> dispatcher;
   @Mock FileStatusPersistenceManager fsPersistenceManager;
   @Mock ProtoMessageReader<HistoryEventProto> goodReader;
   @Mock ProtoMessageReader<HistoryEventProto> eofReader;
@@ -75,7 +75,7 @@ public class EventProcessorPipelineTest {
     when(fsPersistenceManager.getFileOfType(FileStatusType.TEZ))
         .thenReturn(Collections.emptyList());
     when(fsPersistenceManager.create(any())).thenAnswer(m -> m.getArgument(0));
-    when(processor.process(eq(HistoryEventProto.getDefaultInstance()), any()))
+    when(dispatcher.process(eq(HistoryEventProto.getDefaultInstance()), any()))
         .thenReturn(ProcessingStatus.SUCCESS);
 
     clock = new RunningTestClock();
@@ -91,7 +91,7 @@ public class EventProcessorPipelineTest {
     config.setConf(EventProcessorPipeline.FOLDER_SCAN_DELAY_MILLIS, 100L);
     metricRegistry = new MetricRegistry();
     FileReader<HistoryEventProto> testReader = new ProtoFileReader<HistoryEventProto>(logger);
-    pipeline = new EventProcessorPipeline<>(clock, testReader, processor, txnManager,
+    pipeline = new EventProcessorPipeline<>(clock, testReader, dispatcher, txnManager,
         fsPersistenceManager, FileStatusType.TEZ, config, metricRegistry);
   }
 
@@ -152,7 +152,7 @@ public class EventProcessorPipelineTest {
     verify(logger, times(6)).getReader(eq(goodPath));
     verify(goodReader, times(7)).readEvent();
     verify(goodReader, times(7)).getOffset();
-    verify(processor).process(eq(HistoryEventProto.getDefaultInstance()), any());
+    verify(dispatcher).process(eq(HistoryEventProto.getDefaultInstance()), any());
 
     verify(logger, times(6)).getReader(eq(errorOpenEOFPath));
     verify(logger, times(6)).getReader(eq(errorOpenIOPath));
@@ -207,7 +207,7 @@ public class EventProcessorPipelineTest {
 
     TestClock clock = new TestClock();
     FileReader<HistoryEventProto> testReader = new ProtoFileReader<HistoryEventProto>(logger);
-    EventProcessorPipeline<HistoryEventProto> pipeline = new EventProcessorPipeline<>(clock, testReader, processor, txnManager,
+    EventProcessorPipeline<HistoryEventProto> pipeline = new EventProcessorPipeline<>(clock, testReader, dispatcher, txnManager,
         fsPersistenceManager, FileStatusType.TEZ, config, metricRegistry);
 
     clock.setTime(3 * 24 * 60 * 60 * 1000L);

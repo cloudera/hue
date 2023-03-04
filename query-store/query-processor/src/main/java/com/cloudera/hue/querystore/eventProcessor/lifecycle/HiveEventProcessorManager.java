@@ -20,9 +20,9 @@ import com.cloudera.hue.querystore.common.config.DasConfiguration;
 import com.cloudera.hue.querystore.common.entities.FileStatusEntity.FileStatusType;
 import com.cloudera.hue.querystore.common.repository.FileStatusPersistenceManager;
 import com.cloudera.hue.querystore.common.repository.transaction.TransactionManager;
+import com.cloudera.hue.querystore.eventProcessor.dispatchers.HiveEventDispatcher;
+import com.cloudera.hue.querystore.eventProcessor.dispatchers.TezEventDispatcher;
 import com.cloudera.hue.querystore.eventProcessor.pipeline.EventProcessorPipeline;
-import com.cloudera.hue.querystore.eventProcessor.processors.HiveEventProcessorDispatcher;
-import com.cloudera.hue.querystore.eventProcessor.processors.TezEventProcessorDispatcher;
 import com.cloudera.hue.querystore.eventProcessor.readers.FileReader;
 import com.cloudera.hue.querystore.eventProcessor.readers.ProtoFileReader;
 import com.codahale.metrics.MetricRegistry;
@@ -35,8 +35,8 @@ import lombok.extern.slf4j.Slf4j;
 public class HiveEventProcessorManager implements Managed {
   private final Configuration hadoopConfiguration;
   private final DasConfiguration eventProcessingConfig;
-  private final TezEventProcessorDispatcher tezEventProcessor;
-  private final HiveEventProcessorDispatcher hiveEventProcessor;
+  private final TezEventDispatcher tezEventDispatcher;
+  private final HiveEventDispatcher hiveEventDispatcher;
 
   private final FileStatusPersistenceManager fsPersistenceManager;
   private final TransactionManager txnManager;
@@ -49,16 +49,16 @@ public class HiveEventProcessorManager implements Managed {
   @Inject
   public HiveEventProcessorManager(DasConfiguration eventProcessingConfig,
                                Configuration hadoopConfiguration,
-                               TezEventProcessorDispatcher tezEventProcessor,
-                               HiveEventProcessorDispatcher hiveEventProcessor,
+                               TezEventDispatcher tezEventDispatcher,
+                               HiveEventDispatcher hiveEventDispatcher,
                                FileStatusPersistenceManager fsPersistenceManager,
                                TransactionManager txnManager,
                                MetricRegistry metricRegistry) {
     this.eventProcessingConfig = eventProcessingConfig;
     this.hadoopConfiguration = hadoopConfiguration;
 
-    this.tezEventProcessor = tezEventProcessor;
-    this.hiveEventProcessor = hiveEventProcessor;
+    this.tezEventDispatcher = tezEventDispatcher;
+    this.hiveEventDispatcher = hiveEventDispatcher;
 
     this.fsPersistenceManager = fsPersistenceManager;
     this.txnManager = txnManager;
@@ -117,13 +117,13 @@ public class HiveEventProcessorManager implements Managed {
 
       FileReader<HistoryEventProto> dagFileReader = new ProtoFileReader<HistoryEventProto>(loggers.getDagEventsLogger());
       tezEventsPipeline = new EventProcessorPipeline<>(clock, dagFileReader,
-          tezEventProcessor, txnManager, fsPersistenceManager, FileStatusType.TEZ,
+          tezEventDispatcher, txnManager, fsPersistenceManager, FileStatusType.TEZ,
           eventProcessingConfig, metricRegistry);
       tezEventsPipeline.start();
 
       FileReader<HistoryEventProto> appFileReader = new ProtoFileReader<HistoryEventProto>(loggers.getAppEventsLogger());
       tezAppEventsPipeline = new EventProcessorPipeline<>(clock, appFileReader,
-          tezEventProcessor, txnManager, fsPersistenceManager, FileStatusType.TEZ_APP,
+          tezEventDispatcher, txnManager, fsPersistenceManager, FileStatusType.TEZ_APP,
           eventProcessingConfig, metricRegistry);
       tezAppEventsPipeline.start();
 
@@ -151,7 +151,7 @@ public class HiveEventProcessorManager implements Managed {
       DatePartitionedLogger<HiveHookEventProto> logger = new DatePartitionedLogger<>(
           HiveHookEventProto.PARSER, new Path(hiveBaseDir), hadoopConfiguration, clock);
       FileReader<HiveHookEventProto> hiveFileReader = new ProtoFileReader<HiveHookEventProto>(logger);
-      hiveEventsPipeline = new EventProcessorPipeline<>(clock, hiveFileReader, hiveEventProcessor, txnManager,
+      hiveEventsPipeline = new EventProcessorPipeline<>(clock, hiveFileReader, hiveEventDispatcher, txnManager,
           fsPersistenceManager, FileStatusType.HIVE, eventProcessingConfig, metricRegistry);
       hiveEventsPipeline.start();
 

@@ -1,5 +1,5 @@
 // (c) Copyright 2020-2021 Cloudera, Inc. All rights reserved.
-package com.cloudera.hue.querystore.eventProcessor.processors;
+package com.cloudera.hue.querystore.eventProcessor.dispatchers;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -17,19 +17,22 @@ import org.apache.hadoop.hive.ql.hooks.proto.HiveHookEvents.MapFieldEntry;
 
 import com.cloudera.hue.querystore.common.config.DasConfiguration;
 import com.cloudera.hue.querystore.eventProcessor.eventdefs.HiveHSEvent;
+import com.cloudera.hue.querystore.eventProcessor.processors.HiveEventProcessor;
+import com.cloudera.hue.querystore.eventProcessor.processors.HiveEventType;
+import com.cloudera.hue.querystore.eventProcessor.processors.ProcessingStatus;
 import com.cloudera.hue.querystore.eventProcessor.processors.hive.QueryCompletedProcessor;
 import com.cloudera.hue.querystore.eventProcessor.processors.hive.QuerySubmittedProcessor;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class HiveEventProcessorDispatcher implements EventProcessor<HiveHookEventProto> {
+public class HiveEventDispatcher implements EventDispatcher<HiveHookEventProto> {
 
   private final Map<String, List<HiveEventProcessor>> processors = new HashMap<>();
   private final boolean splitEvents;
 
   @Inject
-  public HiveEventProcessorDispatcher(QuerySubmittedProcessor submittedProcessor,
+  public HiveEventDispatcher(QuerySubmittedProcessor submittedProcessor,
       QueryCompletedProcessor completedProcessor, DasConfiguration config, Configuration hadoopConfiguration) {
     HiveEventProcessor[] hiveProcs = {submittedProcessor, completedProcessor};
     for (HiveEventProcessor processor : hiveProcs) {

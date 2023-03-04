@@ -29,8 +29,8 @@ import com.cloudera.hue.querystore.common.entities.FileStatusEntity;
 import com.cloudera.hue.querystore.common.entities.FileStatusEntity.FileStatusType;
 import com.cloudera.hue.querystore.common.repository.FileStatusPersistenceManager;
 import com.cloudera.hue.querystore.common.repository.transaction.TransactionManager;
+import com.cloudera.hue.querystore.eventProcessor.dispatchers.EventDispatcher;
 import com.cloudera.hue.querystore.eventProcessor.lifecycle.CleanupManager;
-import com.cloudera.hue.querystore.eventProcessor.processors.EventProcessor;
 import com.cloudera.hue.querystore.eventProcessor.processors.ProcessingStatus;
 import com.cloudera.hue.querystore.eventProcessor.readers.EventReader;
 import com.cloudera.hue.querystore.eventProcessor.readers.FileReader;
@@ -56,7 +56,7 @@ public class EventProcessorPipeline<T> {
 
   private final Clock clock;
   private final FileReader<T> fileReader;
-  private final EventProcessor<T> processor;
+  private final EventDispatcher<T> eventDispatcher;
   private final TransactionManager txnManager;
   private final FileStatusPersistenceManager fsPersistenceManager;
   private final FileStatusType type;
@@ -92,12 +92,12 @@ public class EventProcessorPipeline<T> {
   private final LinkedBlockingQueue<FileProcessingStatus> filesQueue = new LinkedBlockingQueue<>();
 
   public EventProcessorPipeline(Clock clock, FileReader<T> fileReader,
-      EventProcessor<T> processor, TransactionManager txnManager,
+      EventDispatcher<T> eventDispatcher, TransactionManager txnManager,
       FileStatusPersistenceManager fsPersistenceManager, FileStatusType type,
       DasConfiguration dasConfig, MetricRegistry metricRegistry) {
     this.clock = clock;
     this.fileReader = fileReader;
-    this.processor = processor;
+    this.eventDispatcher = eventDispatcher;
     this.txnManager = txnManager;
     this.fsPersistenceManager = fsPersistenceManager;
     this.type = type;
@@ -385,7 +385,7 @@ public class EventProcessorPipeline<T> {
       String fileName = fileStatus.getEntity().getFileName();
       try {
         log.trace("Started processing event for file: {}, event: {}", fileName, evt);
-        ProcessingStatus status = txnManager.withTransaction(() -> processor.process(evt, filePath));
+        ProcessingStatus status = txnManager.withTransaction(() -> eventDispatcher.process(evt, filePath));
         switch (status.getStatus()) {
           case ERROR:
             throw new Exception("Error processing event", status.getError());
