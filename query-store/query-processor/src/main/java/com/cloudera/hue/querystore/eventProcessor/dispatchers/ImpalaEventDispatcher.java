@@ -1,21 +1,22 @@
-package com.cloudera.hue.querystore.eventProcessor.processors;
+package com.cloudera.hue.querystore.eventProcessor.dispatchers;
 
 import javax.inject.Inject;
 
 import org.apache.hadoop.fs.Path;
 
 import com.cloudera.hue.querystore.eventProcessor.eventdefs.ImpalaQueryProfile;
+import com.cloudera.hue.querystore.eventProcessor.processors.ProcessingStatus;
 import com.cloudera.hue.querystore.eventProcessor.processors.impala.ImpalaQueryProfileProcessor;
 import com.cloudera.ipe.model.impala.ImpalaRuntimeProfileTree;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class ImpalaEventProcessorDispatcher implements EventProcessor<ImpalaRuntimeProfileTree> {
+public class ImpalaEventDispatcher implements EventDispatcher<ImpalaRuntimeProfileTree> {
   private final ImpalaQueryProfileProcessor queryProfileProcessor;
 
   @Inject
-  public ImpalaEventProcessorDispatcher(ImpalaQueryProfileProcessor queryProfileProcessor) {
+  public ImpalaEventDispatcher(ImpalaQueryProfileProcessor queryProfileProcessor) {
     this.queryProfileProcessor = queryProfileProcessor;
   }
 
