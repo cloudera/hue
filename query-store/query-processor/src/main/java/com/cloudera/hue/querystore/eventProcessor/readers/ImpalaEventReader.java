@@ -20,48 +20,69 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class ImpalaEventReader implements EventReader<ImpalaRuntimeProfileTree> {
-  private final ImpalaFileReader fileReader;
   private final Path filePath;
+  private final FileSystem fs;
+  private final ImpalaFileReader fileReader;
   private final FileProcessingStatus fileStatus;
-  private final FSDataInputStream stream;
-  private final BufferedReader reader;
-  // private final LineNumberReader r;
+
+  private BufferedReader reader;
+  private long offset = 0;
 
   public ImpalaEventReader(ImpalaFileReader fileReader, Path filePath, FileProcessingStatus fileStatus) throws IOException {
     this.filePath = filePath;
     this.fileStatus = fileStatus;
     this.fileReader = fileReader;
 
-    FileSystem fs = FileSystem.get(fileReader.getConfig());
-    this.stream = fs.open(filePath);
+    this.fs = FileSystem.get(fileReader.getConfig());
+
+    FSDataInputStream stream = fs.open(filePath);
     this.reader = new BufferedReader(new InputStreamReader(stream));
   }
 
   public long getOffset() throws IOException {
-    return stream.getPos();
+    return offset;
   }
 
   public void setOffset(long offset) throws IOException {
+    this.offset = offset;
+
+    reader.close();
+    FSDataInputStream stream = fs.open(filePath);
     stream.seek(offset);
+    reader = new BufferedReader(new InputStreamReader(stream));
   }
 
   public Path getFilePath() {
     return filePath;
   }
 
+  private String readLine() throws IOException {
+    String line = reader.readLine();
+    if(line != null) {
+      // Advance offset. +1 for the new line character
+      offset += line.length() + 1;
+    }
+    return line;
+  }
+
   public ImpalaRuntimeProfileTree read() throws IOException {
     try {
-      String line =  reader.readLine();
+      String line = readLine();
+
+      while ("".equals(line)) {
+        // Skip empty lines if any
+        line =  readLine();
+      }
 
       if (line == null) {
-        fileStatus.readFailed(); // TODO: Validate this check
+        // End of file - Mark failed to revisit
+        fileStatus.readFailed();
         return null;
       }
 
       String[] parts = line.split(" ");
       if (parts.length != 3) {
-        log.error("Unexpected Impala profile format in file {}", filePath);
-        fileStatus.readFailed();
+        throw new Error("Unexpected Impala profile format in file " + filePath);
       }
 
       byte[] payload = Base64.decodeBase64(parts[2]);
@@ -88,7 +109,6 @@ public class ImpalaEventReader implements EventReader<ImpalaRuntimeProfileTree> 
   }
 
   public void close() throws IOException {
-    stream.close();
-    reader.close();
+    reader.close(); // Closes the stream too
   }
 }
