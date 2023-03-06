@@ -1,7 +1,6 @@
 // (c) Copyright 2020-2021 Cloudera, Inc. All rights reserved.
 package com.cloudera.hue.querystore.eventProcessor.resources;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -26,7 +25,6 @@ import com.cloudera.hue.querystore.common.AppAuthentication;
 import com.cloudera.hue.querystore.common.config.DasConfiguration;
 import com.cloudera.hue.querystore.common.config.DasConfiguration.ConfVar;
 import com.cloudera.hue.querystore.common.dto.FacetValue;
-import com.cloudera.hue.querystore.common.dto.FieldInformation;
 import com.cloudera.hue.querystore.common.dto.QuerySearchParams;
 import com.cloudera.hue.querystore.common.entities.HiveQueryBasicInfo;
 import com.cloudera.hue.querystore.common.repository.HiveQueryBasicInfoRepository;
@@ -82,14 +80,6 @@ public class QuerySearchResource {
   @Path("/search")
   public Response getBasicSearchedQueriesWithFacets(QuerySearchParamsWrapper request, @Context SecurityContext securityContext) {
     return hiveQueryResource.getSearchedQueries(request.getParams(), securityContext);
-  }
-
-  @GET
-  @Produces(MediaType.APPLICATION_JSON)
-  @Path("/fields-information")
-  public Response getSearchableColumnInfo() {
-    List<FieldInformation> fieldsInformations = FieldInformation.getFieldsInformation();
-    return Response.ok(Collections.singletonMap("fieldsInfo", fieldsInformations)).build();
   }
 
   private String getEffectiveUser(SecurityContext securityContext) {
