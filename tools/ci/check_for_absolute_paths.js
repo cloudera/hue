@@ -18,7 +18,7 @@ const fs = require('fs');
 
 const TARGET_EXTENSIONS = /\.(js|map|css)$/i;
 const FOLDERS_TO_CHECK = ['desktop/core/src/desktop/static'];
-const HUE_ABSOLUTE_PATH = __dirname.replace('/tools/detect-absolute-paths', '');
+const HUE_ABSOLUTE_PATH = __dirname.replace('/tools/ci', '');
 
 const scanFile = async path =>
   new Promise(resolve => {

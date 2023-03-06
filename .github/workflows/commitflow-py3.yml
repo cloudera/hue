@@ -22,6 +22,10 @@ jobs:
       with:
         fetch-depth: 0
 
+    - name: run commit title format check
+      run: |
+        ./tools/ci/check_for_commit_message.sh
+
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
