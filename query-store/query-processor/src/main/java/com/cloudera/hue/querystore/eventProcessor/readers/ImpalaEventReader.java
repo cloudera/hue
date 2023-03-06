@@ -21,21 +21,22 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ImpalaEventReader implements EventReader<ImpalaRuntimeProfileTree> {
   private final Path filePath;
-  private final FileSystem fs;
+  private final FSDataInputStream stream;
   private final ImpalaFileReader fileReader;
   private final FileProcessingStatus fileStatus;
 
   private BufferedReader reader;
   private long offset = 0;
 
-  public ImpalaEventReader(ImpalaFileReader fileReader, Path filePath, FileProcessingStatus fileStatus) throws IOException {
+  public ImpalaEventReader(ImpalaFileReader fileReader, Path filePath,
+      FileProcessingStatus fileStatus) throws IOException {
     this.filePath = filePath;
     this.fileStatus = fileStatus;
     this.fileReader = fileReader;
 
-    this.fs = FileSystem.get(fileReader.getConfig());
+    FileSystem fs = FileSystem.get(fileReader.getConfig());
+    this.stream = fs.open(filePath);
 
-    FSDataInputStream stream = fs.open(filePath);
     this.reader = new BufferedReader(new InputStreamReader(stream));
   }
 
@@ -46,9 +47,10 @@ public class ImpalaEventReader implements EventReader<ImpalaRuntimeProfileTree> 
   public void setOffset(long offset) throws IOException {
     this.offset = offset;
 
-    reader.close();
-    FSDataInputStream stream = fs.open(filePath);
     stream.seek(offset);
+
+    // reader.close() is costly.
+    // Just abandon the BufferedReader and create new, next GC will pick and clean it up.
     reader = new BufferedReader(new InputStreamReader(stream));
   }
 
