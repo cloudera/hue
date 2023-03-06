@@ -102,13 +102,19 @@ commands:
             rm -f package-lock.json
             cp ~/repo/package-lock.json .
             npm install
-            npm i eslint-plugin-jest@latest --save-dev # Seems to not be found otherwise
             npm run webpack
             npm run webpack-login
             npm run webpack-workers
             ./build/env/bin/hue collectstatic --noinput
 
             cp -r ~/repo/docs .
+
+      - run:
+          name: run commit title format check
+          command: |
+            cd ~/repo
+
+            ./tools/ci/check_for_commit_message.sh
 
       # Run documentation lint
       - run:
@@ -141,13 +147,6 @@ commands:
             ./tools/ci/check_for_python_lint.sh /usr/share/hue
 
       - run:
-          name: run commit title format check
-          command: |
-            cd ~/repo
-
-            ./tools/ci/check_for_commit_message.sh
-
-      - run:
           name: run js lint
           command: |
             cd /usr/share/hue
@@ -163,6 +162,13 @@ commands:
             cd /usr/share/hue
 
             npm run style-lint
+
+      - run:
+          name: run npm version checker
+          command: |
+            cd /usr/share/hue
+
+            npm run check-pinned-versions
 
       - run:
           name: run npm license checker

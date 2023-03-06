@@ -177,7 +177,8 @@
     "test-coverage": "jest --coverage",
     "test-dev": "jest --watch",
     "test-clearCache": "jest --clearCache",
-    "check-license": "node ./tools/license/checkLicenses.js",
-    "check-absolute-paths": "node ./tools/detect-absolute-paths/detectAbsolutePaths.js"
+    "check-license": "node ./tools/ci/check_for_js_licenses.js",
+    "check-absolute-paths": "node ./tools/ci/check_for_absolute_paths.js",
+    "check-pinned-versions": "node ./tools/ci/check_for_pinned_versions.js"
   }
 }
