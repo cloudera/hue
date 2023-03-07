@@ -3,10 +3,11 @@ package com.cloudera.hue.querystore.eventProcessor.readers;
 import java.io.BufferedReader;
 import java.io.EOFException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.joda.time.Instant;
@@ -21,7 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ImpalaEventReader implements EventReader<ImpalaRuntimeProfileTree> {
   private final Path filePath;
-  private final FSDataInputStream stream;
+  private final InputStream stream;
   private final ImpalaFileReader fileReader;
   private final FileProcessingStatus fileStatus;
 
@@ -35,8 +36,13 @@ public class ImpalaEventReader implements EventReader<ImpalaRuntimeProfileTree> 
     this.fileReader = fileReader;
 
     FileSystem fs = FileSystem.get(fileReader.getConfig());
-    this.stream = fs.open(filePath);
 
+    InputStream stream = fs.open(filePath);
+    if(filePath.toString().toLowerCase().endsWith(".gz")) {
+      stream = new GZIPInputStream(stream);
+    }
+
+    this.stream = stream;
     this.reader = new BufferedReader(new InputStreamReader(stream));
   }
 
@@ -47,7 +53,7 @@ public class ImpalaEventReader implements EventReader<ImpalaRuntimeProfileTree> 
   public void setOffset(long offset) throws IOException {
     this.offset = offset;
 
-    stream.seek(offset);
+    stream.skip(offset);
 
     // reader.close() is costly.
     // Just abandon the BufferedReader and create new, next GC will pick and clean it up.
