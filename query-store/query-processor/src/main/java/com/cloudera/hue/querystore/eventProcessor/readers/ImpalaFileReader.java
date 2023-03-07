@@ -12,7 +12,9 @@ import java.util.Map;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.LocatedFileStatus;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.RemoteIterator;
 import org.apache.hadoop.yarn.util.Clock;
 
 import com.cloudera.hue.querystore.eventProcessor.pipeline.FileProcessingStatus;
@@ -76,20 +78,27 @@ public class ImpalaFileReader implements FileReader<ImpalaRuntimeProfileTree> {
     if (!fileSystem.exists(dirPath)) {
       return newFiles;
     }
-    for (FileStatus status : fileSystem.listStatus(dirPath)) {
+
+    RemoteIterator<LocatedFileStatus> fileStatusListIterator = fileSystem.listFiles(dirPath, true);
+
+    while(fileStatusListIterator.hasNext()){
+      LocatedFileStatus status = fileStatusListIterator.next();
+
       String fileName = status.getPath().getName();
-      Long offset = currentOffsets.get(fileName);
 
       //TODO: Temporary, remove once cron job is removed for POC
       if(fileName.endsWith("_COPYING_")) {
         continue;
       }
 
+      Long offset = currentOffsets.get(fileName);
+
       // If the offset was never added or offset < fileSize.
       if (offset == null || offset < status.getLen()) {
         newFiles.add(status);
       }
     }
+
     return newFiles;
   }
 
