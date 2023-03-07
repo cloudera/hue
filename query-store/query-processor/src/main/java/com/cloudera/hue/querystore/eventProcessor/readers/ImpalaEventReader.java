@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.joda.time.Instant;
@@ -26,6 +27,9 @@ public class ImpalaEventReader implements EventReader<ImpalaRuntimeProfileTree> 
   private final ImpalaFileReader fileReader;
   private final FileProcessingStatus fileStatus;
 
+  // In CDW there is a cases where a line might be split into 16k chunks
+  private static final int MARK_LIMIT = 20 * 1024; // 20 Kb
+
   private BufferedReader reader;
   private long offset = 0;
 
@@ -37,6 +41,7 @@ public class ImpalaEventReader implements EventReader<ImpalaRuntimeProfileTree> 
 
     FileSystem fs = FileSystem.get(fileReader.getConfig());
 
+    // TODO: For non gz, we could improive performance using FSDataInputStream & stream.seek(offset)
     InputStream stream = fs.open(filePath);
     if(filePath.toString().toLowerCase().endsWith(".gz")) {
       stream = new GZIPInputStream(stream);
@@ -73,13 +78,22 @@ public class ImpalaEventReader implements EventReader<ImpalaRuntimeProfileTree> 
     return line;
   }
 
+  private String getNextLine() throws IOException {
+    reader.mark(MARK_LIMIT);
+    String line = reader.readLine();
+    reader.reset();
+    return line;
+  }
+
   public ImpalaRuntimeProfileTree read() throws IOException {
     try {
       String line = readLine();
 
-      while ("".equals(line)) {
-        // Skip empty lines if any
-        line =  readLine();
+      // TODO: Improve the following three blocks - while, if & if while
+
+      while (line != null && StringUtils.countMatches(line, " ") != 2) {
+        // Skip invalid lines if any. fluentd in CDW adds 3 lines at the begining.
+        line = readLine();
       }
 
       if (line == null) {
@@ -88,11 +102,16 @@ public class ImpalaEventReader implements EventReader<ImpalaRuntimeProfileTree> 
         return null;
       }
 
-      String[] parts = line.split(" ");
-      if (parts.length != 3) {
-        throw new Error("Unexpected Impala profile format in file " + filePath);
+      if (StringUtils.countMatches(line, " ") == 2) {
+        // In CDW there could be cases where a line might be split into 16k chunks
+        String nextLine = getNextLine();
+        while(nextLine != null && nextLine.length() > 0 && StringUtils.countMatches(nextLine, " ") == 0) {
+          line += readLine();
+          nextLine = getNextLine();
+        }
       }
 
+      String[] parts = line.split(" ");
       byte[] payload = Base64.decodeBase64(parts[2]);
       ImpalaRuntimeProfile p = new ImpalaRuntimeProfile(payload,
       "", "",
