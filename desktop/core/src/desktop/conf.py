@@ -2545,3 +2545,73 @@ def is_gs_enabled():
 def has_gs_access(user):
   from desktop.auth.backend import is_admin
   return user.is_authenticated and user.is_active and (is_admin(user) or user.has_hue_permission(action="gs_access", app="filebrowser"))
+
+
+def get_ozone_conf_dir_default():
+  """
+  Get from environment variable OZONE_CONF_DIR or '/etc/ozone/conf'
+  """
+  return os.environ.get("OZONE_CONF_DIR", "/etc/ozone/conf")
+
+
+PERMISSION_ACTION_OFS = "ofs_access"
+
+OZONE = UnspecifiedConfigSection(
+  "ozone",
+  help="One entry for each Ozone cluster",
+  each=ConfigSection(
+    help="Information about a single Ozone cluster",
+    members=dict(
+      FS_DEFAULTFS=Config(
+          "fs_defaultfs",
+          help="The equivalent of fs.defaultFS (aka fs.default.name)",
+          type=str,
+          default=None
+      ),
+      LOGICAL_NAME=Config(
+          "logical_name",
+          default="",
+          type=str,
+          help=_('NameNode logical name.')
+      ),
+      WEBHDFS_URL=Config(
+          "webhdfs_url",
+          help="The URL to WebHDFS/HttpFS service. Defaults to the WebHDFS URL on the NameNode.",
+          type=str,
+          default=None
+      ),
+      SECURITY_ENABLED=Config(
+          "security_enabled",
+          help="Whether Ozone requires client to perform Kerberos authentication",
+          type=coerce_bool,
+          default=False
+      ),
+      SSL_CERT_CA_VERIFY=Config(
+          "ssl_cert_ca_verify",
+          help="Choose whether Hue should validate certificates received from the server.",
+          dynamic_default=default_ssl_validate,
+          type=coerce_bool
+      ),
+      TEMP_DIR=Config(
+          "temp_dir",
+          help="Ozone directory for temporary files",
+          default='/tmp',
+          type=str
+      ),
+      OZONE_CONF_DIR=Config(
+          key="ozone_conf_dir",
+          dynamic_default=get_ozone_conf_dir_default,
+          help="Directory of the Ozone configuration. Defaults to the env variable OZONE_CONF_DIR when set, or '/etc/ozone/conf'",
+          type=str
+      ),
+    )
+  )
+)
+
+def is_ofs_enabled():
+  return ('default' in list(OZONE.keys()) and OZONE['default'].get_raw() and OZONE['default'].WEBHDFS_URL.get())
+
+
+def has_ofs_access(user):
+  from desktop.auth.backend import is_admin
+  return user.is_authenticated and user.is_active and (is_admin(user) or user.has_hue_permission(action="ofs_access", app="filebrowser"))
