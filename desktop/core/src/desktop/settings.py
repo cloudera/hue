@@ -37,6 +37,7 @@ from desktop.lib.python_util import force_dict_to_strings
 
 from aws.conf import is_enabled as is_s3_enabled
 from azure.conf import is_abfs_enabled
+from desktop.conf import is_ofs_enabled
 
 if sys.version_info[0] > 2:
   from django.utils.translation import gettext_lazy as _
@@ -664,6 +665,9 @@ if is_s3_enabled():
 
 if is_abfs_enabled():
   file_upload_handlers.insert(0, 'azure.abfs.upload.ABFSFileUploadHandler')
+
+if is_ofs_enabled():
+  file_upload_handlers.insert(0, 'desktop.lib.fs.ozone.upload.OFSFileUploadHandler')
 
 
 FILE_UPLOAD_HANDLERS = tuple(file_upload_handlers)
