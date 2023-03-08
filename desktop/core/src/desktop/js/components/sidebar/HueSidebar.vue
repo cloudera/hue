@@ -18,16 +18,19 @@
 
 <template>
   <Sidebar
-    :sidebar-items="sidebarItems"
-    :use-drawer-for-user="false"
-    :user-drawer-item="userDrawerItem"
-    :user-drawer-children="userDrawerChildren"
-    :use-drawer-for-help="false"
-    :help-drawer-item="helpDrawerItem"
-    :help-drawer-children="helpDrawerChildren"
     :active-item-name="activeItemName"
-    :is-collapsed="isCollapsed"
     :drawer-topic="drawerTopic"
+    :help-drawer-children="helpDrawerChildren"
+    :help-drawer-item="helpDrawerItem"
+    :hue-version="hueVersion"
+    :img-version="imgVersion"
+    :is-collapsed="isCollapsed"
+    :sidebar-items="sidebarItems"
+    :use-drawer-for-help="false"
+    :use-drawer-for-user="false"
+    :user-drawer-children="userDrawerChildren"
+    :user-drawer-item="userDrawerItem"
+    :warehouse-name="warehouseName"
     @toggle-collapsed="toggleCollapsed"
     @header-click="onHeaderClick"
   />
@@ -236,14 +239,20 @@
     data(): {
       sidebarItems: SidebarItem[];
       activeItemName: string;
-      isCollapsed: boolean;
       drawerTopic: string | null;
+      hueVersion: string | null;
+      imgVersion: string | null;
+      isCollapsed: boolean;
+      warehouseName: string | null;
     } {
       return {
-        sidebarItems: [],
         activeItemName: '',
+        drawerTopic: null,
+        hueVersion: null,
+        imgVersion: null,
         isCollapsed: getFromLocalStorage('hue.sidebar.collapse', true),
-        drawerTopic: null
+        sidebarItems: [],
+        warehouseName: null
       };
     },
 
@@ -375,6 +384,10 @@
 
       hueConfigUpdated(clusterConfig: HueConfig): void {
         const items: SidebarItem[] = [];
+
+        this.hueVersion = clusterConfig?.hue_version || null;
+        this.imgVersion = clusterConfig?.img_version || null;
+        this.warehouseName = clusterConfig?.vw_name || null;
 
         if (clusterConfig && clusterConfig.app_config) {
           const favourite = clusterConfig.main_button_action;

@@ -15,6 +15,7 @@
 // limitations under the License.
 
 @import '../styles/colors';
+@import '../styles/mixins';
 @import '../styles/variables';
 @import './variables';
 
@@ -376,8 +377,13 @@
   margin-left: $fluid-spacing-m;
   color: $sidebar-default-text-color;
   flex-grow: 1;
+  font-family: Roboto Mono, Menlo, Monaco, Consolas, "Courier New", monospace;
   font-size: $font-size-sm;
   overflow: hidden;
+
+  > div {
+    @include nowrap-ellipsis;
+  }
 }
 
 .sidebar-footer-collapse-btn {
