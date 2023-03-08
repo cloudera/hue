@@ -115,7 +115,8 @@ class EditorDroppableMenu extends DisposableComponent {
           meta.type === 's3' ||
           meta.type === 'hdfs' ||
           meta.type === 'adls' ||
-          meta.type === 'abfs'
+          meta.type === 'abfs' ||
+          meta.type === 'ofs'
         ) {
           text = "'" + meta.definition.path + "'";
         }
