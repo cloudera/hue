@@ -39,6 +39,10 @@ const TYPE_SPECIFICS = {
   s3: {
     apiHelperFetchFunction: 'fetchS3Path',
     dblClickPubSubId: 'assist.dblClickS3Item'
+  },
+  ofs: {
+    apiHelperFetchFunction: 'fetchOfsPath',
+    dblClickPubSubId: 'assist.dblClickOfsItem'
   }
 };
 
@@ -359,6 +363,7 @@ class AssistStorageEntry {
     type = type.replace(/s3.*/i, 's3');
     type = type.replace(/adl.*/i, 'adls');
     type = type.replace(/abfs.*/i, 'abfs');
+    type = type.replace(/ofs.*/i, 'ofs');
 
     // TODO: connector.id for browser connectors
     const connector = findBrowserConnector(connector => connector.type === type);
