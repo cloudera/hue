@@ -33,6 +33,7 @@ from notebook.connectors.base import get_interpreter
 from notebook.models import make_notebook
 from useradmin.models import User
 
+from desktop.conf import OZONE
 from desktop.lib import django_mako
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.settings import BASE_DIR
@@ -83,6 +84,7 @@ class SQLIndexer(object):
     comment = destination['description']
 
     source_path = source['path']
+    ozone_service_id = OZONE.get()['default'].FS_DEFAULTFS.get()[6:]
     load_data = destination['importData']
     isIceberg = destination['isIceberg']
 
@@ -182,6 +184,11 @@ class SQLIndexer(object):
 
     if external_path.lower().startswith("abfs"): #this is to check if its using an ABFS path
       external_path = abfspath(external_path)
+    elif external_path.lower().startswith("ofs") or source_path.lower().startswith("ofs"):  #this is to check if its using an OFS path
+      # as of now ozone has 3 managers and impala/hive don't know on which manager
+      # they need to ping hence we are sending the ozone_service_id with path
+      external_path = external_path[:6] + ozone_service_id + external_path[5:]
+      source_path = source_path[:6] + ozone_service_id + source_path[5:]
 
     tbl_properties = OrderedDict()
     if skip_header:
