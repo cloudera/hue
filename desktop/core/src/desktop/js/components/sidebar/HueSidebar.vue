@@ -299,6 +299,8 @@
               adaptedName = 'adls';
             } else if (location.href.indexOf('=abfs') !== -1) {
               adaptedName = 'abfs';
+            } else if (location.href.indexOf('=ofs') !== -1) {
+              adaptedName = 'ofs';
             } else {
               adaptedName = 'hdfs';
             }

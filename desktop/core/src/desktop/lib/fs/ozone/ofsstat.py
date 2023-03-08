@@ -15,22 +15,30 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-DJANGO_APPS = ['filebrowser']
-NICE_NAME = "File Browser"
-REQUIRES_HADOOP = False
-ICON = "filebrowser/art/icon_filebrowser_48.png"
-MENU_INDEX = 20
-IS_URL_NAMESPACED = True
+from builtins import oct
+import math
+import stat
 
-from aws.conf import PERMISSION_ACTION_S3
-from azure.conf import PERMISSION_ACTION_ADLS, PERMISSION_ACTION_ABFS
-from desktop.conf import PERMISSION_ACTION_GS, PERMISSION_ACTION_OFS
+from django.utils.encoding import smart_str
 
+from hadoop.fs.hadoopfs import decode_fs_path
+from hadoop.fs.webhdfs_types import WebHdfsStat
 
-PERMISSION_ACTIONS = (
-  (PERMISSION_ACTION_S3, "Access to S3 from filebrowser and filepicker."),
-  (PERMISSION_ACTION_ADLS, "Access to ADLS from filebrowser and filepicker."),
-  (PERMISSION_ACTION_ABFS, "Access to ABFS from filebrowser and filepicker."),
-  (PERMISSION_ACTION_GS, "Access to GS from filebrowser and filepicker."),
-  (PERMISSION_ACTION_OFS, "Access to OFS from filebrowser and filepicker.")
-)
+from desktop.lib.fs.ozone import join as ofs_join
+
+class OzoneFSStat(WebHdfsStat):
+  """
+  Information about a path in Ozone.
+
+  Modelled after org.apache.hadoop.fs.FileStatus
+  """
+
+  def __init__(self, file_status, parent_path):
+    super(OzoneFSStat, self).__init__(file_status, parent_path)
+    self.path = ofs_join(parent_path, self.name)
+
+  def __unicode__(self):
+    return "[OzoneFSStat] %7s %8s %8s %12s %s%s" % (oct(self.mode), self.user, self.group, self.size, self.path, self.isDir and '/' or "")
+
+  def __repr__(self):
+    return smart_str("<OzoneFSStat %s>" % (self.path))
