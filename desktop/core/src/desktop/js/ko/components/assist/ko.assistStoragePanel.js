@@ -221,7 +221,9 @@ class AssistStoragePanel {
 
     huePubSub.subscribe('assist.storage.go.home', () => {
       const path =
-        this.activeSource().type === 's3' || this.activeSource().type === 'abfs'
+        this.activeSource().type === 's3' ||
+        this.activeSource().type === 'abfs' ||
+        this.activeSource().type === 'ofs'
           ? '/'
           : window.USER_HOME_DIR;
       this.loadPath(path);
