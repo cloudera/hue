@@ -915,10 +915,10 @@
       # NameNode logical name.
       ## logical_name=
 
-      # Use WebHdfs/HttpFS as the communication mechanism.
-      # Domain should be the NameNode or HttpFS host.
-      # Default port is 14000 for HttpFS.
-      ## webhdfs_url=http://localhost:50070/webhdfs/v1
+      # Use HttpFS as the communication mechanism.
+      # Domain should be the HttpFS host and port.
+      # Default port is 9778 for HttpFS.
+      ## webhdfs_url=http://localhost:9778/webhdfs/v1
 
       # Whether Ozone requires client to perform Kerberos authentication.
       ## security_enabled=false
