@@ -42,6 +42,7 @@ public class ImpalaEventReader implements EventReader<ImpalaRuntimeProfileTree> 
     FileSystem fs = FileSystem.get(fileReader.getConfig());
 
     // TODO: For non gz, we could improive performance using FSDataInputStream & stream.seek(offset)
+    // TODO: Could move CDW specific items to ImpalaCDWEventReader
     InputStream stream = fs.open(filePath);
     if(filePath.toString().toLowerCase().endsWith(".gz")) {
       stream = new GZIPInputStream(stream);

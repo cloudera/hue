@@ -94,11 +94,11 @@ public class FileProcessingStatus {
   }
 
   public void processingFailed(Exception e) throws Exception {
-    log.error("Got error processing event for file: {}", entity.getFileName());
+    log.error("Got error processing event for file: {}", entity.getFilePath());
     if (processRetryCount.incrementAndGet() < MAX_RETRY_COUNT) {
       throw e;
     }
-    log.error("Ignoring event for fileName: {} at pos: {}", entity.getFileName(),
+    log.error("Ignoring event for fileName: {} at pos: {}", entity.getFilePath(),
         entity.getPosition());
   }
 
@@ -109,7 +109,7 @@ public class FileProcessingStatus {
   public synchronized boolean removeIfOlder(TransactionManager txnManager,
       FileStatusPersistenceManager fsPersistenceManager, long minTime) {
     if (!scheduled.get() && (entity.isFinished() || entity.getLastEventTime() < minTime)) {
-      log.info("Removing file {}, with date {}", entity.getFileName(), entity.getDate());
+      log.info("Removing file {}, with date {}", entity.getFilePath(), entity.getDate());
       // Remove finished or expired entities.
       txnManager.withTransaction(() -> fsPersistenceManager.delete(entity));
       return true;
@@ -122,18 +122,18 @@ public class FileProcessingStatus {
       return false;
     }
     try {
-      Path path = fileReader.getPathForDate(entity.getDate(), entity.getFileName());
+      Path path = fileReader.getPathForDate(entity.getDate(), entity.getFilePath());
       FileStatus status = path.getFileSystem(fileReader.getConfig()).getFileStatus(path);
       return entity.getPosition() < status.getLen();
     } catch (IOException e) {
-      log.warn("IOException while trying to refresh: " + entity.getFileName());
+      log.warn("IOException while trying to refresh: " + entity.getFilePath());
     }
     return false;
   }
 
   public synchronized <T> EventReader<T> getEventReader(FileReader<T> fileReader) {
     try {
-      Path filePath = fileReader.getPathForDate(entity.getDate(), entity.getFileName());
+      Path filePath = fileReader.getPathForDate(entity.getDate(), entity.getFilePath());
       EventReader<T> reader = fileReader.getEventReader(filePath, this);
       Long offset = entity.getPosition();
       if (offset != null && offset > 0) {
