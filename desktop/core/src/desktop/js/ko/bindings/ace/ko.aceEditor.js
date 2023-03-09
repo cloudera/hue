@@ -640,9 +640,9 @@ registerBinding(NAME, {
       dblClickAbfsItemSub.remove();
     });
 
-    const dblClickOfsItemSub = huePubSub.subscribe('assist.dblClickOfsItem', assistHdfsEntry => {
+    const dblClickOfsItemSub = huePubSub.subscribe('assist.dblClickOfsItem', assistOfsEntry => {
       if ($el.data('last-active-editor')) {
-        editor.session.insert(editor.getCursorPosition(), 'ofs://' + assistHdfsEntry.path + "'");
+        editor.session.insert(editor.getCursorPosition(), 'ofs://' + assistOfsEntry.path + "'");
       }
     });
 
