@@ -24,7 +24,8 @@ public interface FileReader<T> {
   String getDirForDate(LocalDate date);
   LocalDate getDateFromDir(String dirName) throws IllegalArgumentException;
 
-  Path getPathForDate(LocalDate date, String fileName) throws IOException;
+  Path getAbsoluteScanPath(String dateDir);
+  Path getPathForDate(LocalDate date, String filePath) throws IOException;
 
   EventReader<T> getEventReader(Path filePath, FileProcessingStatus fileStatus) throws IOException;
 

@@ -33,7 +33,7 @@ public interface FileStatusDao extends JdbiDao<FileStatusEntity> {
 
   @Override
   @SqlUpdate("insert into file_status (file_type, date, file_name, position, " +
-      "last_event_time, finished) values (:fileType, :date, :fileName, :position, " +
+      "last_event_time, finished) values (:fileType, :date, :filePath, :position, " +
       ":lastEventTime, :finished)")
   @GetGeneratedKeys
   long insert(@BindBean FileStatusEntity entity);
@@ -44,7 +44,7 @@ public interface FileStatusDao extends JdbiDao<FileStatusEntity> {
 
   @Override
   @SqlUpdate("update file_status set file_type = :fileType, date = :date, " +
-      "file_name = :fileName, position = :position, last_event_time = :lastEventTime, " +
+      "file_name = :filePath, position = :position, last_event_time = :lastEventTime, " +
       "finished = :finished where id = :id" )
   int update(@BindBean FileStatusEntity savedQuery);
 }

@@ -21,6 +21,9 @@ import com.cloudera.hue.querystore.eventProcessor.pipeline.FileProcessingStatus;
 
 import com.cloudera.ipe.model.impala.ImpalaRuntimeProfileTree;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class ImpalaFileReader implements FileReader<ImpalaRuntimeProfileTree> {
   private final Path basePath;
   private final Configuration conf;
@@ -60,6 +63,13 @@ public class ImpalaFileReader implements FileReader<ImpalaRuntimeProfileTree> {
   }
 
   /**
+   * Create absolute scan path for the given date
+   */
+  public Path getAbsoluteScanPath(String dateDir) {
+    return new Path(basePath, dateDir);
+  }
+
+  /**
    * Create a path for the given date and fileName. This can be used to create a reader.
    */
   public Path getPathForDate(LocalDate date, String fileName) throws IOException {
@@ -79,25 +89,35 @@ public class ImpalaFileReader implements FileReader<ImpalaRuntimeProfileTree> {
       return newFiles;
     }
 
-    RemoteIterator<LocatedFileStatus> fileStatusListIterator = fileSystem.listFiles(dirPath, true);
+    int filesScanned = 0;
 
+    RemoteIterator<LocatedFileStatus> fileStatusListIterator = fileSystem.listFiles(dirPath, true);
     while(fileStatusListIterator.hasNext()){
+      filesScanned++;
+
       LocatedFileStatus status = fileStatusListIterator.next();
 
-      String fileName = status.getPath().getName();
+      String filePath = status.getPath().toString();
 
       //TODO: Temporary, remove once cron job is removed for POC
-      if(fileName.endsWith("_COPYING_")) {
+      if(filePath.endsWith("_COPYING_")) {
         continue;
       }
 
-      Long offset = currentOffsets.get(fileName);
+      // TODO: Optimize this part. we shouldnt recursively scan the complete sub dirs.
+      // Can do that under dt=<date_stamp>/ns=<impala_ID>/app=impala-profiles, but not under /dt=<date_stamp>
+      // Get list of ns directories under, append app=impala-profiles. And if present then do a recursive scan
+      if(filePath.contains("app=impala-profiles")) { // Only for CDW
+        Long offset = currentOffsets.get(filePath);
 
-      // If the offset was never added or offset < fileSize.
-      if (offset == null || offset < status.getLen()) {
-        newFiles.add(status);
+        // If the offset was never added or offset < fileSize.
+        if (offset == null || offset < status.getLen()) {
+          newFiles.add(status);
+        }
       }
     }
+
+    log.info("Scanned {} files for Impala query profile", filesScanned);
 
     return newFiles;
   }

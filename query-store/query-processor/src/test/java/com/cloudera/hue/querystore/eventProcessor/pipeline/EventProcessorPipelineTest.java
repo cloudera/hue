@@ -118,11 +118,11 @@ public class EventProcessorPipelineTest {
   public void testPipeline() throws Exception {
     clock.setTime(3 * 24 * 60 * 60 * 1000L);
     logger.setupNextDirs("date=1969-12-05", "date=1970-01-01", "date=1970-01-02", "date=1970-01-03");
-    Path goodPath = new Path("/basedir/date=1970-01-01/good");
-    Path errorOpenEOFPath = new Path("/basedir/date=1970-01-01/error_open_eof");
-    Path errorOpenIOPath = new Path("/basedir/date=1970-01-01/error_open_io");
-    Path errorReadEOFPath = new Path("/basedir/date=1970-01-01/error_read_eof");
-    Path errorReadIOPath = new Path("/basedir/date=1970-01-01/error_read_io");
+    Path goodPath = new Path("/tmp/date=1970-01-01/good");
+    Path errorOpenEOFPath = new Path("/tmp/date=1970-01-01/error_open_eof");
+    Path errorOpenIOPath = new Path("/tmp/date=1970-01-01/error_open_io");
+    Path errorReadEOFPath = new Path("/tmp/date=1970-01-01/error_read_eof");
+    Path errorReadIOPath = new Path("/tmp/date=1970-01-01/error_read_io");
 
     List<Path> errorPaths = Lists.newArrayList(errorOpenEOFPath, errorOpenIOPath, errorReadIOPath,
         errorReadEOFPath);
@@ -237,7 +237,7 @@ public class EventProcessorPipelineTest {
   public void testRetryStartingErrorGrowingFile() throws Exception {
     clock.setTime(1800); // 1st day.
     logger.setupNextDirs("date=1969-12-02", "date=1970-01-01", "date=1970-01-04", "date=1970-01-05");
-    Path errorOpenEOFPath = new Path("/basedir/date=1970-01-01/error_open_eof");
+    Path errorOpenEOFPath = new Path("/tmp/date=1970-01-01/error_open_eof");
     List<Path> paths = Collections.singletonList(errorOpenEOFPath);
     logger.setupScanPaths(ImmutableMap.<String, Iterator<List<Path>>>of(
         "date=1970-01-01", Iterables.<List<Path>>cycle(Collections.singleton(paths)).iterator()));
@@ -271,13 +271,12 @@ public class EventProcessorPipelineTest {
   class TestLogger extends DatePartitionedLogger<HistoryEventProto> {
 
     public TestLogger(RunningTestClock clock) throws IOException {
-      // This is never invoked, just for compiler to be happy.
       super(HistoryEventProto.PARSER, new Path("/tmp/"), new Configuration(), clock);
     }
 
     @Override
     public Path getPathForDate(LocalDate date, String fileName) throws IOException {
-      return new Path("/basedir/" + getDirForDate(date) + "/" + fileName);
+      return new Path("/tmp/" + getDirForDate(date) + "/" + fileName);
     }
 
     @Override

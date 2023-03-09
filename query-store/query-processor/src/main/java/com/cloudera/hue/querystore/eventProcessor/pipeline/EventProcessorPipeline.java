@@ -2,6 +2,7 @@
 package com.cloudera.hue.querystore.eventProcessor.pipeline;
 
 import java.io.IOException;
+import java.net.URI;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -176,7 +177,7 @@ public class EventProcessorPipeline<T> {
     for (FileStatusEntity fsEntity : savedOffsets) {
       FileProcessingStatus fps = new FileProcessingStatus(fsEntity);
       if (fsEntity.getDate().equals(maxDate)) {
-        this.scanDirEntities.put(fsEntity.getFileName(), fps);
+        this.scanDirEntities.put(fsEntity.getFilePath(), fps);
       } else {
         this.previousEntities.add(fps);
       }
@@ -225,7 +226,7 @@ public class EventProcessorPipeline<T> {
     while (fps != null) {
       FileStatusEntity entity = fps.getEntity();
       log.trace("Submitting file: {}, date: {}, type: {}",
-          entity.getFileName(), entity.getDate(), type);
+          entity.getFilePath(), entity.getDate(), type);
       eventProcessorExecutor.execute(new FileEventsProcessor(fps));
       fps = filesQueue.poll();
     }
@@ -259,24 +260,29 @@ public class EventProcessorPipeline<T> {
     log.debug("Changed to new dir: {}, for type: {}", newDir, type);
   }
 
+  private URI getScanPathUri() {
+    return Path.getPathWithoutSchemeAndAuthority(fileReader.getAbsoluteScanPath(scanDir)).toUri();
+  }
+
   private void addAll(List<FileStatus> changedFiles) {
     LocalDate scanDate = fileReader.getDateFromDir(scanDir);
+    URI scanPath = getScanPathUri();
 
     for (FileStatus status : changedFiles) {
-      String fileName = status.getPath().getName();
-      FileProcessingStatus fps = scanDirEntities.get(fileName);
+      String relativeFilePath = scanPath.relativize(status.getPath().toUri()).toString();
+      FileProcessingStatus fps = scanDirEntities.get(relativeFilePath);
       if (fps == null) {
         // New file found add to database.
         FileStatusEntity entity = new FileStatusEntity();
         entity.setFileType(type);
         entity.setDate(scanDate);
-        entity.setFileName(fileName);
+        entity.setFilePath(relativeFilePath);
         entity.setFinished(false);
         entity.setLastEventTime(clock.getTime());
         entity.setPosition(0L);
-        log.debug("Adding file: {} to db of type {}", entity.getFileName(), type);
+        log.debug("Adding file: {} to db of type {}", entity.getFilePath(), type);
         fps = new FileProcessingStatus(fsPersistenceManager.create(entity));
-        scanDirEntities.put(fileName, fps);
+        scanDirEntities.put(relativeFilePath, fps);
       }
       if (fps.schedule()) {
         filesQueue.add(fps);
@@ -296,10 +302,11 @@ public class EventProcessorPipeline<T> {
 
   private List<FileStatus> removeFinished(List<FileStatus> changedFiles) {
     Iterator<FileStatus> iter = changedFiles.iterator();
+    URI scanPath = getScanPathUri();
     while (iter.hasNext()) {
       FileStatus status = iter.next();
-      String fileName = status.getPath().getName();
-      FileProcessingStatus fps = scanDirEntities.get(fileName);
+      String relativeFilePath = scanPath.relativize(status.getPath().toUri()).toString();
+      FileProcessingStatus fps = scanDirEntities.get(relativeFilePath);
       // TODO: Add recovery, there is data. We should use sequence file recovery to move ahead and
       // read more events.
       if (fps != null && fps.isFinished(status.getLen())) {
@@ -381,20 +388,20 @@ public class EventProcessorPipeline<T> {
       // processing rest of the events in the file. Currently its terminate processing
       // And in some cases instead of returning a status we just throw an Exception, clean
       // that up.
+      String filePathStr = fileStatus.getEntity().getFilePath();
       boolean isFinished = false;
-      String fileName = fileStatus.getEntity().getFileName();
       try {
-        log.trace("Started processing event for file: {}, event: {}", fileName, evt);
+        log.trace("Started processing event for file: {}, event: {}", filePathStr, evt);
         ProcessingStatus status = txnManager.withTransaction(() -> eventDispatcher.process(evt, filePath));
         switch (status.getStatus()) {
           case ERROR:
             throw new Exception("Error processing event", status.getError());
           case FINISH:
-            log.trace("Recieved finish event for file: {}", fileName);
+            log.trace("Recieved finish event for file: {}", filePathStr);
             isFinished = true;
           case SKIP:
           case SUCCESS:
-            log.trace("Finished processing event for file: {}", fileName);
+            log.trace("Finished processing event for file: {}", filePathStr);
         }
         eventsProcessedMeter.mark();
         fileStatus.processingSuccess();
