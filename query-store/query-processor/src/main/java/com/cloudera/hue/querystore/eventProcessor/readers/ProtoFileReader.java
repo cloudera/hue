@@ -41,8 +41,12 @@ public class ProtoFileReader<T extends MessageLite> implements FileReader<T> {
     return new ProtoEventReader<>(partitionedLogger.getReader(filePath), fileStatus, partitionedLogger);
   }
 
-  public Path getPathForDate(LocalDate date, String fileName) throws IOException {
-    return partitionedLogger.getPathForDate(date, fileName);
+  public Path getAbsoluteScanPath(String dateDir) {
+    return partitionedLogger.getPathForSubdir(dateDir, ".");
+  }
+
+  public Path getPathForDate(LocalDate date, String filePath) throws IOException {
+    return partitionedLogger.getPathForDate(date, filePath);
   }
 
   public List<FileStatus> scanForChangedFiles(String subDir, Map<String, Long> currentOffsets) throws IOException {

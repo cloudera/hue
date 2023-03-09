@@ -163,7 +163,7 @@ public class TestLocal {
     Class<FileStatusRepository> repoClass = FileStatusRepository.class;
     FileStatusEntity setting = new FileStatusEntity();
     setting.setDate(LocalDate.ofEpochDay(0));
-    setting.setFileName("file1");
+    setting.setFilePath("file1");
     setting.setFileType(FileStatusType.HIVE);
     setting.setLastEventTime(1232141241L);
     setting.setFinished(false);
