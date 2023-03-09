@@ -84,7 +84,6 @@ class SQLIndexer(object):
     comment = destination['description']
 
     source_path = source['path']
-    ozone_service_id = OZONE.get()['default'].FS_DEFAULTFS.get()[6:]
     load_data = destination['importData']
     isIceberg = destination['isIceberg']
 
@@ -184,11 +183,18 @@ class SQLIndexer(object):
 
     if external_path.lower().startswith("abfs"): #this is to check if its using an ABFS path
       external_path = abfspath(external_path)
-    elif external_path.lower().startswith("ofs") or source_path.lower().startswith("ofs"):  #this is to check if its using an OFS path
-      # as of now ozone has 3 managers and impala/hive don't know on which manager
-      # they need to ping hence we are sending the ozone_service_id with path
-      external_path = external_path[:6] + ozone_service_id + external_path[5:]
-      source_path = source_path[:6] + ozone_service_id + source_path[5:]
+    elif external_path.lower().startswith("ofs") or source_path.lower().startswith("ofs"):  # This is to check if its using an OFS path
+      if OZONE['default'].FS_DEFAULTFS.get():
+        fs_defaultfs_schemeless = OZONE['default'].FS_DEFAULTFS.get()[6:]
+
+        # Add fs_defaultfs netloc in the OFS path for Hive/Impala.
+        # fs_defaultfs can be Ozone service ID if Ozone is in HA or Ozone Manager URI in non-HA mode.
+        # E.g: ofs:// + fs_defaultfs_schemeless + /vol1/buk1/key
+
+        external_path = external_path[:6] + fs_defaultfs_schemeless + external_path[5:]
+        source_path = source_path[:6] + fs_defaultfs_schemeless + source_path[5:]
+      else:
+        raise PopupException('Ozone fs_defaultFS is not configured.')
 
     tbl_properties = OrderedDict()
     if skip_header:
