@@ -25,8 +25,10 @@ from hadoop.conf import UPLOAD_CHUNK_SIZE
 from hadoop.fs.exceptions import WebHdfsException
 
 if sys.version_info[0] > 2:
+  from urllib.parse import urlparse as lib_urlparse
   from django.utils.translation import gettext as _
 else:
+  from urlparse import urlparse as lib_urlparse
   from django.utils.translation import ugettext as _
 
 
@@ -54,8 +56,12 @@ class OFSFileUploadHandler(FileUploadHandler):
 
     if self._is_ofs_upload():
       self._fs = self._get_ofs(request)
-       # Verify that the path exists
-      self._fs.stats(self.destination)
+
+      # Verify that the path exists
+      try:
+        self._fs.stats(self.destination)
+      except Exception as e:
+        raise OFSFileUploadError(_('Destination path does not exist: %s' % self.destination))
 
     LOG.debug("Chunk size = %d" % UPLOAD_CHUNK_SIZE.get())
 
@@ -106,18 +112,18 @@ class OFSFileUploadHandler(FileUploadHandler):
   def _get_ofs(self, request):
     fs = get_client(fs='ofs', user=request.user.username)
     if not fs:
-      raise OFSFileUploadError(_("No OFS filesystem found"))
+      raise OFSFileUploadError(_("No OFS filesystem found."))
     return fs
 
   def _is_ofs_upload(self):
-    return self._get_scheme() and self._get_scheme().startswith('OFS')
+    return self._get_scheme() and self._get_scheme().startswith('ofs')
 
   def _get_scheme(self):
     if self.destination:
-      dst_parts = self.destination.split('://')
-      if dst_parts:
-        return dst_parts[0].upper()
+      dst_parse = lib_urlparse(self.destination)
+      if dst_parse.scheme:
+        return dst_parse.scheme.lower()
       else:
-        raise WebHdfsException('Destination does not start with a valid scheme.')
+        raise OFSFileUploadError('Destination does not start with a valid scheme.')
     else:
       return None
