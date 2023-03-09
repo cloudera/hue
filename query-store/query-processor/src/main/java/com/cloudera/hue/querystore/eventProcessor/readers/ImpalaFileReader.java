@@ -15,6 +15,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.LocatedFileStatus;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.RemoteIterator;
+import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.yarn.util.Clock;
 
 import com.cloudera.hue.querystore.eventProcessor.pipeline.FileProcessingStatus;
@@ -31,10 +32,28 @@ public class ImpalaFileReader implements FileReader<ImpalaRuntimeProfileTree> {
 
   private static String DATE_KEY = "dt=";
 
+  // Everyone has permission to write, but with sticky set so that delete is restricted.
+  private static final FsPermission DIR_PERMISSION = FsPermission.createImmutable((short)01777);
+
   public ImpalaFileReader(Path baseDir, Configuration conf, Clock clock) throws IOException {
     this.conf = new Configuration(conf);
     this.clock = clock;
+
     this.basePath = baseDir.getFileSystem(conf).resolvePath(baseDir);
+    createBaseDirIfNotExists();
+  }
+
+  private void createBaseDirIfNotExists() throws IOException {
+    FileSystem fileSystem = basePath.getFileSystem(conf);
+    try {
+      if (!fileSystem.exists(basePath)) {
+        fileSystem.mkdirs(basePath);
+        fileSystem.setPermission(basePath, DIR_PERMISSION);
+      }
+    } catch (IOException e) {
+      // Ignore this exception, if there is a problem it'll fail when trying to read or write.
+      log.warn("Error while trying to set permission: ", e);
+    }
   }
 
   public Configuration getConfig() {
