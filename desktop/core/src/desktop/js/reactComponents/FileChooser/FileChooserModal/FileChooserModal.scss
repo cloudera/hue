@@ -19,37 +19,24 @@
 .hue-file-chooser__modal .ant-modal-body {
   padding: 0;
   height: 554px;
-}
 
-.hue-file-chooser-modal__spinner.ant-spin-nested-loading {
-  width: 100%;
-}
+  .hue-file-system__panel {
+    height: 554px;
+    background-color: $fluid-gray-100;
+    padding-top: 20px;
 
-.hue-file-chooser-modal__spinner .ant-spin-container {
-  display: flex;
-}
+    .ant-menu-item {
+      display: flex;
+      align-items: center;
+    }
 
-.hue-files-table__spinner.ant-spin-nested-loading {
-  width: 100%;
-}
+    .ant-menu-item-icon {
+      height: 20px;
+      width: 20px;
+    }
 
-.hue-file-system__panel.ant-menu {
-  height: 554px;
-  width: 187px;
-  background-color: $fluid-gray-100;
-  padding-top: 20px;
-}
-
-.hue-file-system__panel .ant-menu-item {
-  display: flex !important;
-  align-items: center;
-}
-
-.hue-file-system__panel .ant-menu-item-icon {
-  height: 20px !important;
-  width: 20px !important;
-}
-
-.hue-file-system__panel .ant-menu-item-selected {
-  background-color: $fluid-gray-300 !important;
+    .ant-menu-item-selected {
+      background-color: $fluid-gray-300;
+    }
+  }
 }

@@ -16,104 +16,108 @@
 
 @import '../../../components/styles/colors';
 
-.hue-filesystem__icon {
-  object-fit: cover;
-  margin-left: 10px !important;
-  margin-right: 10px !important;
-}
-
 .hue-path-browser {
-  height: 28px;
-  display: inline-flex;
-  position: absolute;
-  width: 100%;
+  display: flex;
+
+  .hue-filesystem__icon {
+    object-fit: cover;
+    width: 24px;
+    height: 24px;
+    margin-left: 10px;
+    margin-right: 10px;
+  }
+
+  .hue-toggle-breadcrumb-input:empty {
+    pointer-events: auto;
+    width: 60px;
+    visibility: visible;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+
+    &:hover {
+      cursor: text;
+      background-color: $fluid-gray-100;
+    }
+
+    &:focus {
+      background-color: $fluid-gray-100;
+    }
+  }
 }
 
 .hue-path-browser__breadcrumb {
+  /* stylelint-disable no-invalid-position-at-import-rule */
+  @import './OverflowingItem.scss';
+
   display: flex;
   gap: 10px;
-  max-width: 45%;
+  max-width: 60%;
 
   &:hover {
     cursor: pointer;
   }
+
+  .hue-path-browser__dropdown-button {
+    border: none;
+    box-shadow: none;
+
+    &:hover {
+      background-color: $fluid-gray-100;
+    }
+
+    &:focus {
+      background-color: $fluid-gray-100;
+    }
+  }
 }
 
-.hue-path-browser__breadcrumb-seperator.anticon {
-  width: 15px;
+.hue-path-browser__breadcrumb-seperator {
+  width: 14px;
+  height: 28px;
   flex: 0 0 auto;
 }
 
-.hue-path-browser__dropdown.ant-dropdown-menu {
-  background-color: $fluid-gray-200;
-  max-height: 200px;
+.hue-path-browser__dropdown {
   width: 200px;
-  overflow-y: scroll;
-}
 
-.hue-path-browser__dropdown .ant-dropdown-menu-title-content {
-  display: inline-block;
-  overflow-x: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-.hue-path-browser__dropdown-button.ant-btn {
-  border: none;
-  box-shadow: none;
-
-  &:hover {
-    background-color: $fluid-gray-100;
+  .hue-path-browser__dropdown {
+    background-color: $fluid-gray-200;
+    overflow-y: scroll;
+    max-height: 200px;
   }
 
-  &:focus {
-    background-color: $fluid-gray-100;
+  .ant-dropdown-menu-title-content {
+    display: inline-block;
+    overflow-x: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
 }
 
-.hue-toggle-breadcrumb-input.ant-btn:empty {
-  pointer-events: auto;
-  width: 60px;
-  visibility: visible;
-  border: none;
-  box-shadow: none;
-  padding: 0;
+.hue-path-browser-panel {
+  .hue-path-browser__input {
+    width: 300px;
 
-  &:hover {
-    cursor: text;
-    background-color: $fluid-gray-100;
+    .ant-input-prefix {
+      width: 24px;
+      height: 24px;
+    }
   }
 
-  &:focus {
-    background-color: $fluid-gray-100;
+  .hue-path-browser-panel__button {
+    border: none;
+    box-shadow: none;
+    color: $fluid-blue-400;
+    padding: 0;
+    width: 100%;
+
+    &:hover {
+      border: $fluid-gray-300 solid 1px;
+    }
+
+    &:focus {
+      border: $fluid-gray-300 solid 1px;
+    }
   }
-}
-
-.hue-path-browser__input.ant-input-affix-wrapper {
-  width: 300px;
-}
-
-.hue-path-browser-panel__button.ant-btn {
-  position: absolute;
-  border: none;
-  box-shadow: none;
-  color: $fluid-blue-400;
-  flex: 0 0 auto;
-  padding: 0;
-
-  &:hover {
-    border: $fluid-gray-300 solid 1px;
-  }
-
-  &:focus {
-    border: $fluid-gray-300 solid 1px;
-  }
-}
-
-.hue-new-folder__button.ant-btn {
-  right: 70px;
-}
-
-.hue-upload__button.ant-btn {
-  right: 10px;
 }
