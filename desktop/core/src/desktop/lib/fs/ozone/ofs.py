@@ -147,10 +147,6 @@ class OzoneFS(WebHdfs):
   def filebrowser_action(self):
     return self._filebrowser_action
 
-  def rename(self, old, new):
-    self.copy(old, new, recursive=True)
-    self.rmtree(old, skip_trash=True)
-
   def upload(self, file, path, *args, **kwargs):
     """
     Upload is done by the OFSFileUploadHandler
