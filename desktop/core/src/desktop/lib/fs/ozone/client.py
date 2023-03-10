@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -13,3 +14,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+from desktop import conf
+from desktop.lib.fs.ozone.ofs import OzoneFS
+
+
+def _make_ofs_client(identifier, user=None):
+  config = conf.OZONE[identifier] if identifier in list(conf.OZONE.keys()) else None
+
+  return OzoneFS.from_config(config)

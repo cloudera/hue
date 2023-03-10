@@ -904,6 +904,30 @@
         # The JSON credentials to authenticate to Google Cloud e.g. '{ "type": "service_account", "project_id": .... }'
         # json_credentials=None
 
+  ## Configuration for Ozone File System
+  # ------------------------------------------------------------------------
+  [[ozone]]
+    # Default Ozone cluster
+    [[[default]]]
+      # Enter the filesystem URI
+      fs_defaultfs=ofs://localhost:8020
+
+      # NameNode logical name.
+      ## logical_name=
+
+      # Use HttpFS as the communication mechanism.
+      # Domain should be the HttpFS host and port.
+      # Default port is 9778 for HttpFS.
+      ## webhdfs_url=http://localhost:9778/webhdfs/v1
+
+      # Whether Ozone requires client to perform Kerberos authentication.
+      ## security_enabled=false
+
+      # Choose whether Hue should validate certificates received from the server.
+      ## ssl_cert_ca_verify=true
+
+      # Directory of the Ozone configuration
+      ## ozone_conf_dir=$OZONE_CONF_DIR when set or '/etc/ozone/conf'
 
   ## Configuration for RAZ service integration
   # ------------------------------------------------------------------------
@@ -1206,6 +1230,9 @@
       # Whether Hue should list this HDFS cluster. For historical reason there is no way to disable HDFS.
       ## is_enabled=true
 
+  # Size, in bytes, of the chunks Django should store into memory and feed into the handler. Default is 64MB.
+  ## upload_chunk_size=64*1024*1024
+  
   # Configuration for YARN (MR2)
   # ------------------------------------------------------------------------
   [[yarn_clusters]]
