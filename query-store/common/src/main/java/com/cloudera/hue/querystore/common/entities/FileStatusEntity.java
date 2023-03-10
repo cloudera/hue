@@ -3,8 +3,6 @@ package com.cloudera.hue.querystore.common.entities;
 
 import java.time.LocalDate;
 
-import org.jdbi.v3.core.mapper.reflect.ColumnName;
-
 import lombok.Data;
 
 /**
@@ -17,11 +15,16 @@ public class FileStatusEntity implements JdbiEntity {
   private Long id;
   private FileStatusType fileType;
   private LocalDate date;
-
-  // Keeping column as file_name to avoid migration changes. We have a UNIQUE CONSTRAINT that uses file_name.
-  @ColumnName("file_name")
-  private String filePath;
+  private String fileName;
   private volatile long position;
   private volatile long lastEventTime;
   private volatile boolean finished;
+
+  // Keeping column as file_name to avoid migration changes. We have a UNIQUE CONSTRAINT that uses file_name.
+  public String getFilePath() {
+    return fileName;
+  }
+  public void setFilePath(String path) {
+    fileName = path;
+  }
 }

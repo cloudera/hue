@@ -39,16 +39,16 @@ public class ImpalaFileReader implements FileReader<ImpalaRuntimeProfileTree> {
     this.conf = new Configuration(conf);
     this.clock = clock;
 
+    createDirIfNotExists(baseDir);
     this.basePath = baseDir.getFileSystem(conf).resolvePath(baseDir);
-    createBaseDirIfNotExists();
   }
 
-  private void createBaseDirIfNotExists() throws IOException {
-    FileSystem fileSystem = basePath.getFileSystem(conf);
+  private void createDirIfNotExists(Path path) throws IOException {
+    FileSystem fileSystem = path.getFileSystem(conf);
     try {
-      if (!fileSystem.exists(basePath)) {
-        fileSystem.mkdirs(basePath);
-        fileSystem.setPermission(basePath, DIR_PERMISSION);
+      if (!fileSystem.exists(path)) {
+        fileSystem.mkdirs(path);
+        fileSystem.setPermission(path, DIR_PERMISSION);
       }
     } catch (IOException e) {
       // Ignore this exception, if there is a problem it'll fail when trying to read or write.
@@ -79,13 +79,6 @@ public class ImpalaFileReader implements FileReader<ImpalaRuntimeProfileTree> {
       throw new IllegalArgumentException("Invalid directory: "+ dirName);
     }
     return LocalDate.parse(dirName.substring(DATE_KEY.length()), DateTimeFormatter.ISO_LOCAL_DATE);
-  }
-
-  /**
-   * Create absolute scan path for the given date
-   */
-  public Path getAbsoluteScanPath(String dateDir) {
-    return new Path(basePath, dateDir);
   }
 
   /**
