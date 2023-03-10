@@ -15,7 +15,7 @@ Running in dev mode:
 
 brew install 'postgresql@9.6'
 
-# Start & stop using qpctl
+# Start & stop using qpctli to connect with Postgres
 
 ```
 ./qpctl start # Start postgres, setup database schema and start query processor
@@ -24,6 +24,19 @@ brew install 'postgresql@9.6'
 ```
 
 There are other commands like jvstop and jvstart to only start and stop the query processor.
+
+
+# Install Mysql
+
+brew install mysql
+/
+# Start & stop using qpctl_mysql to connect with Mysql
+
+```
+./qpctl_mysql start  # Start postgres, setup database schema and start query processor
+
+./qpctl_mysql stop   # Stop query processor, delete schema and stop postgres.
+```
 
 # Dev configurations, to work remote hdfs:
 
@@ -35,4 +48,4 @@ This will work only with non secure cluster. For secure cluster, you have to get
 # Dev configuration, to work with localfile system:
 
 * Delete conf/core-site.xml or remove fs.defaultFS entry in conf/core-site.xml.
-* Change paths hive.hook.proto.base-directory and tez.history.logging.proto-base-dir in conf/hue-query-processor.json
+* Change paths hive.hook.proto.base-directory and tez.history.logging.proto-base-dir in conf/hue-query-processor.json / conf/hue-query-processor_mysql.json

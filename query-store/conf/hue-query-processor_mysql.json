@@ -1,0 +1,47 @@
+{
+  "logging": {
+    "type": "external"
+  },
+  "jerseyClient":{
+    "timeout": "240s",
+    "connectionTimeout": "2s"
+  },
+  "dasConf": {
+    "hive.hook.proto.base-directory": "/warehouse/tablespace/managed/hive/sys.db/query_data/",
+    "tez.history.logging.proto-base-dir": "/warehouse/tablespace/managed/hive/sys.db/",
+    "impala.history.profile_log_dir": "/warehouse/tablespace/external/hive/sys.db/impala_data/"
+  },
+  "database": {
+    "driverClass": "com.mysql.cj.jdbc.Driver",
+    "url": "jdbc:mysql://localhost:3306/qp_db",
+    "user": "qp_user",
+    "password": "qp_pass",
+    "properties": {}
+  },
+  "server": {
+    "applicationConnectors": [
+      {
+        "type": "http",
+        "port": 9091
+      }
+    ],
+    "adminConnectors": [],
+    "requestLog": {
+      "type": "external"
+    }
+  },
+  "flyway": {
+    "schemas": ["qp_db"],
+    "locations": [
+      "db/migrate/mysql/common", "db/migrate/dev"
+    ]
+  },
+  "authConfig": {
+    "appUserName": "hive",
+    "serviceAuth": "NONE",
+    "serviceKeytab": "",
+    "servicePrincipal": ""
+  },
+  "credentialProviderPath": "",
+  "passwordAliases": []
+}

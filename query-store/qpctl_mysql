@@ -1,0 +1,117 @@
+#!/bin/bash
+
+SRC_DIR=$(dirname $BASH_SOURCE)
+CONF_DIR=$SRC_DIR/conf
+LOG_DIR=$SRC_DIR/logs
+QP_DIR=$SRC_DIR/query-processor/
+CP_FILE=$QP_DIR/target/classpath
+
+source $QP_DIR/target/classes/env-version.sh
+
+MAIN_CLASS=com.cloudera.hue.querystore.eventProcessor.EventProcessorApplication
+DEBUG_ARGS="-agentlib:jdwp=transport=dt_socket,server=y,address=8000,suspend=y"
+YJP_ARGS="-agentpath:/Applications/YourKit-Java-Profiler-2019.1.app/Contents/Resources/bin/mac/libyjpagent.jnilib=disablestacktelemetry,exceptions=disable,listen=all"
+JAVA_ARGS="-Dlog4j.configurationFile=$CONF_DIR/hue-query-processor-log4j2.yml -DHADOOP_USER_NAME=hive"
+
+DB=qp_db
+DBUSER=qp_user
+DBPASS=qp_pass
+
+export HADOOP_CONF=$CONF_DIR
+MYSQL_PATH=$(echo /usr/local/Cellar/mysql/*/bin/)
+
+start() {
+  echo "starting mysql"
+  brew services start mysql
+  PATH="$PATH:$MYSQL_PATH"
+
+  echo "waiting for mysql ..."
+  sleep 3
+  echo "starting the main script now"
+}
+
+stop() {
+  echo "stopping mysql"
+  brew services stop mysql
+}
+
+gen_cp() {
+  if [ ! -f $CP_FILE ]; then
+    echo "Generating classpath"
+    mvn -q -nsu -pl query-processor dependency:build-classpath -Dmdep.outputFile=target/classpath -Dmdep.regenerateFile=true
+    echo -n ":$QP_DIR/target/hue-query-processor-${HUE_QP_VERSION}.jar" >> $CP_FILE
+  fi
+}
+
+setup_db() {
+  echo "Setting up mysql qp_db and users ..."
+  PATH="$PATH:$MYSQL_PATH"
+  mysql -u root -e "CREATE USER $DBUSER@'localhost' IDENTIFIED BY '$DBPASS';" &&
+  mysql -u root -e "CREATE DATABASE $DB;" &&
+  mysql -u root -e "USE $DB; GRANT ALL PRIVILEGES ON $DB.* TO $DBUSER@'localhost';"
+
+  gen_cp
+  echo migrate db ...
+  CLASSPATH=$(cat $CP_FILE) java $MAIN_CLASS db migrate $CONF_DIR/hue-query-processor_mysql.json > /dev/null
+}
+
+delete_db() {
+  echo "Dropping mysql qp_db and users..."
+  PATH="$PATH:$MYSQL_PATH"
+  mysql -u root -e "DROP database $DB;"
+  mysql -u root -e "DROP USER $DBUSER@'localhost';"
+}
+
+start_java() {
+  gen_cp
+  echo starting query processor ...
+  CLASSPATH=$SRC_DIR/conf/:$(cat $CP_FILE) java $JAVA_ARGS $MAIN_CLASS server $CONF_DIR/hue-query-processor_mysql.json > qp.log 2>&1 &
+  echo $! > qp.pid
+}
+
+stop_java() {
+  echo "Killing java procs ..."
+  kill $(cat qp.pid)
+}
+
+while (($#)); do
+  case $1 in
+  start)
+    set -e
+    start
+    setup_db
+    start_java
+    ;;
+  stop)
+    stop_java
+    echo "Waiting 5 sec before deleting db"
+    sleep 5
+    delete_db
+    stop
+    ;;
+
+  jvstart)
+    start_java
+    ;;
+  jvstop)
+    stop_java
+    ;;
+  msstart)
+    start
+    ;;
+  msstop)
+    stop
+    ;;
+  mssetup)
+    setup_db
+    ;;
+  msreset)
+    delete_db
+    ;;
+  *)
+    echo "Usage: $0 <start|stop|jvstart|jvstop|msstart|msstop|mssetup|msreset>"
+    exit 1
+    ;;
+  esac
+  shift
+done
