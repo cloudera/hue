@@ -46,18 +46,18 @@ def normpath(path):
   return normalized
 
 
-def abspath(cd, uri):
+def abspath(path, key):
   """
   Returns absolute URI, examples:
 
   abspath('ofs://volume/bucket/key', key2') == 'ofs://volume/bucket/key/key2'
   abspath('ofs://volume/bucket/key', 'ofs://volume/bucket2/key2') == 'ofs://volume/bucket2/key2'
   """
-  if cd.lower().startswith(OFS_ROOT):
-    uri = join(cd, uri)
+  if path.lower().startswith(OFS_ROOT):
+    key = join(path, key)
   else:
-    uri = normpath(join(cd, uri))
-  return uri
+    key = normpath(join(path, key))
+  return key
 
 
 def join(*comp_list):
