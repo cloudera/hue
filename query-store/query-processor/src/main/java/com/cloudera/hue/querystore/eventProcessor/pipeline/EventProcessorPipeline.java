@@ -2,7 +2,6 @@
 package com.cloudera.hue.querystore.eventProcessor.pipeline;
 
 import java.io.IOException;
-import java.net.URI;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -260,16 +259,24 @@ public class EventProcessorPipeline<T> {
     log.debug("Changed to new dir: {}, for type: {}", newDir, type);
   }
 
-  private URI getScanPathUri() {
-    return Path.getPathWithoutSchemeAndAuthority(fileReader.getAbsoluteScanPath(scanDir)).toUri();
+  private String getRelativePath(FileStatus status) {
+    String path = status.getPath().toString();
+    String[] parts = path.split(scanDir);
+    if(parts.length == 2) {
+      path = parts[1].substring(1); // Remove forward slash
+    } else {
+      // Gracefully handle
+      log.error("Invalid file path {}. Scan directory '{}' not found", path, scanDir);
+    }
+    return path;
   }
 
   private void addAll(List<FileStatus> changedFiles) {
     LocalDate scanDate = fileReader.getDateFromDir(scanDir);
-    URI scanPath = getScanPathUri();
 
     for (FileStatus status : changedFiles) {
-      String relativeFilePath = scanPath.relativize(status.getPath().toUri()).toString();
+      String relativeFilePath = getRelativePath(status);
+
       FileProcessingStatus fps = scanDirEntities.get(relativeFilePath);
       if (fps == null) {
         // New file found add to database.
@@ -302,10 +309,9 @@ public class EventProcessorPipeline<T> {
 
   private List<FileStatus> removeFinished(List<FileStatus> changedFiles) {
     Iterator<FileStatus> iter = changedFiles.iterator();
-    URI scanPath = getScanPathUri();
     while (iter.hasNext()) {
       FileStatus status = iter.next();
-      String relativeFilePath = scanPath.relativize(status.getPath().toUri()).toString();
+      String relativeFilePath = getRelativePath(status);
       FileProcessingStatus fps = scanDirEntities.get(relativeFilePath);
       // TODO: Add recovery, there is data. We should use sequence file recovery to move ahead and
       // read more events.

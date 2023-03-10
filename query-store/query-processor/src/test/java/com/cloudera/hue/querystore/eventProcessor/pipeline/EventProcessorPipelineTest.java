@@ -109,6 +109,7 @@ public class EventProcessorPipelineTest {
   private List<FileStatus> fromPaths(List<Path> paths) {
     List<FileStatus> status = new ArrayList<>();
     for (Path path : paths) {
+      path = new Path("file", "", path.toString());
       status.add(new FileStatus(fileLen.get(), false, 3, 1l, 0L, 0L, null, "user1", "group1", path));
     }
     return status;

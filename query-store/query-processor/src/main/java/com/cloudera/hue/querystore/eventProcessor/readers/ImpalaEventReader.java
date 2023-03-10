@@ -39,7 +39,7 @@ public class ImpalaEventReader implements EventReader<ImpalaRuntimeProfileTree> 
     this.fileStatus = fileStatus;
     this.fileReader = fileReader;
 
-    FileSystem fs = FileSystem.get(fileReader.getConfig());
+    FileSystem fs = filePath.getFileSystem(fileReader.getConfig());
 
     // TODO: For non gz, we could improive performance using FSDataInputStream & stream.seek(offset)
     // TODO: Could move CDW specific items to ImpalaCDWEventReader
