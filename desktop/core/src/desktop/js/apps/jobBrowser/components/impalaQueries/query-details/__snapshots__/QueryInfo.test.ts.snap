@@ -1,0 +1,53 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`QueryInfo.vue should render 1`] = `
+<div
+  class="query-info layout-row"
+>
+  <div>
+    <div
+      class="hue-info-box"
+    >
+      <labeled-info-stub
+        label="Query"
+      />
+    </div>
+  </div>
+  <div>
+    <div
+      class="hue-info-box"
+    >
+      <labeled-info-stub
+        label="Start Time"
+      />
+      <labeled-info-stub
+        label="End Time"
+      />
+      <labeled-info-stub
+        label="Duration"
+      />
+      <labeled-info-stub
+        label="Query Type"
+      />
+      <labeled-info-stub
+        label="User Name"
+      />
+      <labeled-info-stub
+        label="Coordinator"
+      />
+      <labeled-info-stub
+        label="CPU Time"
+      />
+      <labeled-info-stub
+        label="Rows Produced"
+      />
+      <labeled-info-stub
+        label="Peak Memory"
+      />
+      <labeled-info-stub
+        label="HDFS Bytes Read"
+      />
+    </div>
+  </div>
+</div>
+`;
