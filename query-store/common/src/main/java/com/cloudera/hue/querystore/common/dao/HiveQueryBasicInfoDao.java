@@ -43,7 +43,7 @@ public interface HiveQueryBasicInfoDao extends JdbiDao<HiveQueryBasicInfo> {
       " (:queryId,:query,:startTime,:endTime,:elapsedTime,:status," +
       ":queueName,:userId,:requestUser,:cpuTime,:physicalMemory,:virtualMemory,:dataRead,:dataWritten,:operationId," +
       ":clientIpAddress,:hiveInstanceAddress,:hiveInstanceType,:sessionId,:logId,:threadId,:executionMode," +
-      "cast(:tablesRead as jsonb),cast( :tablesWritten as jsonb),cast( :databasesUsed as jsonb),:domainId," +
+      "cast(:tablesRead as json),cast( :tablesWritten as json),cast( :databasesUsed as json),:domainId," +
       ":llapAppId,:usedCBO,:firstTaskStartedTime,:waitingTime,:resourceUtilization,0,:createdAt)")
   @GetGeneratedKeys
   long insert(@BindBean HiveQueryBasicInfo entity);
@@ -59,8 +59,8 @@ public interface HiveQueryBasicInfoDao extends JdbiDao<HiveQueryBasicInfo> {
       "virtual_memory = :virtualMemory, data_read = :dataRead, data_written = :dataWritten, " +
       "operation_id = :operationId, client_ip_address = :clientIpAddress, " +
       "hive_instance_address = :hiveInstanceAddress, hive_instance_type = :hiveInstanceType, session_id = :sessionId," +
-      "log_id = :logId, thread_id = :threadId, execution_mode = :executionMode, tables_read = cast(:tablesRead as jsonb), " +
-      "tables_written = cast( :tablesWritten as jsonb), databases_used = cast( :databasesUsed as jsonb), " +
+      "log_id = :logId, thread_id = :threadId, execution_mode = :executionMode, tables_read = cast(:tablesRead as json), " +
+      "tables_written = cast( :tablesWritten as json), databases_used = cast( :databasesUsed as json), " +
       "domain_id = :domainId, llap_app_id = :llapAppId, used_cbo = :usedCBO, " +
       "first_task_started_time = :firstTaskStartedTime, waiting_time = :waitingTime, " +
       "resource_utilization = :resourceUtilization, version = :version + 1 " +
