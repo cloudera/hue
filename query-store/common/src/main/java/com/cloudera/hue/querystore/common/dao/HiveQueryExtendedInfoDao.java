@@ -32,7 +32,7 @@ public interface HiveQueryExtendedInfoDao extends JdbiDao<HiveQueryExtendedInfo>
 
   @Override
   @SqlUpdate("insert into query_details (perf, hive_query_id, explain_plan_compressed, configuration_compressed, " +
-      "created_at) values (cast(:perf as jsonb), :hiveQueryId, :explainPlanCompressed, :configurationCompressed, " +
+      "created_at) values (cast(:perf as json), :hiveQueryId, :explainPlanCompressed, :configurationCompressed, " +
       ":createdAt)")
   @GetGeneratedKeys
   long insert(@BindBean HiveQueryExtendedInfo entity);
@@ -42,7 +42,7 @@ public interface HiveQueryExtendedInfoDao extends JdbiDao<HiveQueryExtendedInfo>
   int delete(@Bind("id") long id);
 
   @Override
-  @SqlUpdate("update query_details set perf = cast(:perf as jsonb), hive_query_id = :hiveQueryId, " +
+  @SqlUpdate("update query_details set perf = cast(:perf as json), hive_query_id = :hiveQueryId, " +
       "explain_plan_compressed = :explainPlanCompressed, configuration_compressed = :configurationCompressed " +
       "where id = :id" )
   int update(@BindBean HiveQueryExtendedInfo QueryDetails);
