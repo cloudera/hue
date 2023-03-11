@@ -1,0 +1,14 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ImpalaQueries.vue should render 1`] = `
+<div
+  class="impala-queries"
+>
+  <!--v-if-->
+  <query-table-stub
+    queries=""
+    totalqueries="0"
+    updatetime="0"
+  />
+</div>
+`;
