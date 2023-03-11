@@ -1773,15 +1773,14 @@
   # Show the Hive section for listing the query history and providing more troubleshooting information.
   ## enable_hive_query_browser=false
 
-  # Show the Queries section for listing Hive/Impala query history and providing more troubleshooting information.
-  ## enable_queries_list=false
-
   # Use the proxy API instead of the ORM to access the query_store.
   ## use_proxy=true
 
   [[query_store]]
     # URL of Query Store API server.
-    ##server_url=http://localhost:8080/
+    ##server_url=
+    # Show the Hive/Impala query history. The value is automatically set to false if server_url is empty, else true.
+    ##enable=false
 
 ###########################################################################
 # Settings to configure Sentry / Security App.

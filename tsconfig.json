@@ -9,6 +9,9 @@
     "allowJs": true,
     "noEmit": true,
     "strict": true,
+    "types": [
+      "vite/client"
+    ],
     "experimentalDecorators": true,
     "isolatedModules": true,
     "esModuleInterop": true,
@@ -38,7 +41,7 @@
     ".github",
     ".git",
     ".circleci",
-    // Temporary fix to prevent typescript generated JSX errors in the IDE 
+    // Temporary fix to prevent typescript generated JSX errors in the IDE
     // triggered by using baseUrl": "desktop/core/src/desktop/js".
     "**/*.tsx"
   ]

@@ -38,6 +38,16 @@ $hue-panel-border-radius: 3px;
   overflow: hidden;
 }
 
+.hue-box {
+  padding: 10px;
+
+  overflow: hidden;
+  text-indent: 0px;
+
+  border: 1px solid $fluid-gray-300;
+  border-radius: $hue-panel-border-radius;
+}
+
 .no-select {
   // Every browser except IE 9
   -webkit-touch-callout: none;
