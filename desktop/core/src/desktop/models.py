@@ -79,6 +79,8 @@ SAMPLE_USER_OWNERS = ['hue', 'sample']
 
 UTC_TIME_FORMAT = "%Y-%m-%dT%H:%M"
 HUE_VERSION = None
+SELECTED_HUE_VW = None
+HUE_IMAGE_VERSION = None
 
 
 def uuid_default():
@@ -90,16 +92,58 @@ def hue_version():
   if HUE_VERSION is None:
     HUE_VERSION = HUE_DESKTOP_VERSION
 
+  return HUE_VERSION
+
+def hue_image_version():
+  global HUE_IMAGE_VERSION
+
+  if HUE_IMAGE_VERSION is None:
     p = get_run_root('cloudera', 'cdh_version.properties')
     if os.path.exists(p):
       build_version = _version_from_properties(open(p))
       if build_version:
-        HUE_VERSION = '%s - %s' % (HUE_VERSION, build_version)
+        HUE_IMAGE_VERSION = '%s' % (build_version)
 
-  return HUE_VERSION
+    elif os.getenv('HUE_CONF_DIR') and os.path.exists(os.getenv('HUE_CONF_DIR')):
+      cdw_path = os.getenv('HUE_CONF_DIR') + '/zhue.ini'
+      if os.path.exists(cdw_path):
+        hue_img_version = _version_from_hue_conf(open(cdw_path))
+        if hue_img_version:
+          HUE_IMAGE_VERSION = '%s' % (hue_img_version)
+
+  return HUE_IMAGE_VERSION
+
+def selected_hue_vw():
+  global SELECTED_HUE_VW
+
+  if SELECTED_HUE_VW is None:
+    if os.getenv('HUE_CONF_DIR') and os.path.exists(os.getenv('HUE_CONF_DIR')):
+      cdw_path = os.getenv('HUE_CONF_DIR') + '/zhue.ini'
+      if os.path.exists(cdw_path):
+        selected_hue_vw_name = _vw_name_from_hue_conf(open(cdw_path))
+        if selected_hue_vw_name:
+          SELECTED_HUE_VW = '%s' % (selected_hue_vw_name)
+
+  return SELECTED_HUE_VW
 
 def _version_from_properties(f):
   return dict(line.strip().split('=') for line in f.readlines() if len(line.strip().split('=')) == 2).get('cloudera.cdh.release')
+
+def _version_from_hue_conf(f):
+  hue_img_version = ''
+  for line in f.readlines():
+    if 'hue_image_version' in line:
+      hue_img_version += line.split('=')[1].replace('"', '').strip()
+
+  return hue_img_version
+
+def _vw_name_from_hue_conf(f):
+  selected_hue_vw_name = ''
+  for line in f.readlines():
+    if 'selected_hue_vw' in line:
+      selected_hue_vw_name += line.split('=')[1].replace('"', '').strip()
+
+  return selected_hue_vw_name
 
 def get_sample_user_install(user):
   if ENABLE_ORGANIZATIONS.get():
@@ -1764,6 +1808,9 @@ class ClusterConfig(object):
     app_config = self.get_apps()
     editors = app_config.get('editor')
     main_button_action = self.get_main_quick_action(app_config)
+    img_version = hue_image_version()
+    hue_version1 = hue_version()
+    selected_hue_vw_name = selected_hue_vw()
 
     if main_button_action.get('is_sql'):
       default_sql_interpreter = main_button_action['type']
@@ -1787,7 +1834,10 @@ class ClusterConfig(object):
       'hue_config': {
         'enable_sharing': ENABLE_SHARING.get(),
         'collect_usage': COLLECT_USAGE.get()
-      }
+      },
+      'vw_name': selected_hue_vw_name,
+      'img_version': img_version,
+      'hue_version': hue_version1
     }
 
 
