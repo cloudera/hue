@@ -9,7 +9,8 @@
   "dasConf": {
     "hive.hook.proto.base-directory": "/warehouse/tablespace/managed/hive/sys.db/query_data/",
     "tez.history.logging.proto-base-dir": "/warehouse/tablespace/managed/hive/sys.db/",
-    "impala.history.profile_log_dir": "/warehouse/tablespace/external/hive/sys.db/impala_data/"
+    "impala.history.profile_log_dir": "/warehouse/tablespace/external/hive/sys.db/logs/",
+    "hue.query-processor.impala.event-pipeline.enabled": false
   },
   "database": {
     "driverClass": "org.postgresql.Driver",

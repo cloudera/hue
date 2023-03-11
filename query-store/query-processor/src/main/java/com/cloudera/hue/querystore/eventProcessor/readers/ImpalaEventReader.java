@@ -32,6 +32,7 @@ public class ImpalaEventReader implements EventReader<ImpalaRuntimeProfileTree> 
 
   private BufferedReader reader;
   private long offset = 0;
+  private long lastOffset = 0;
 
   public ImpalaEventReader(ImpalaFileReader fileReader, Path filePath,
       FileProcessingStatus fileStatus) throws IOException {
@@ -66,6 +67,10 @@ public class ImpalaEventReader implements EventReader<ImpalaRuntimeProfileTree> 
     reader = new BufferedReader(new InputStreamReader(stream));
   }
 
+  public Long getLastOffset() {
+    return lastOffset;
+  }
+
   public Path getFilePath() {
     return filePath;
   }
@@ -88,12 +93,14 @@ public class ImpalaEventReader implements EventReader<ImpalaRuntimeProfileTree> 
 
   public ImpalaRuntimeProfileTree read() throws IOException {
     try {
+      lastOffset = offset;
       String line = readLine();
 
       // TODO: Improve the following three blocks - while, if & if while
 
       while (line != null && StringUtils.countMatches(line, " ") != 2) {
         // Skip invalid lines if any. fluentd in CDW adds 3 lines at the begining.
+        lastOffset = offset;
         line = readLine();
       }
 

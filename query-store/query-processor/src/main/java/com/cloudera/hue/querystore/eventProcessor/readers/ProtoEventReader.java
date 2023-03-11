@@ -37,6 +37,11 @@ public class ProtoEventReader<T extends MessageLite> implements EventReader<T> {
     return protoMessageReader.getFilePath();
   }
 
+  public Long getLastOffset() {
+    //TODO: Implement
+    return 0l;
+  }
+
   public T read() throws IOException {
     T evt = null;
     try {

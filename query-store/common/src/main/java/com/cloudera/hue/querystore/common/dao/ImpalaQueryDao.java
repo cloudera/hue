@@ -83,10 +83,10 @@ public interface ImpalaQueryDao extends JdbiDao<ImpalaQueryEntity> {
   @Override
   @SqlUpdate("insert into impala_query (query_id,query_text,status,query_type," +
       "start_time,end_time,duration,user_name,coordinator," +
-      "cpu_time,rows_produced,peak_memory,hdfs_bytes_read,source_file,version) " +
+      "cpu_time,rows_produced,peak_memory,hdfs_bytes_read,source,version) " +
       "values " +
       "(:queryId,:queryText,:status,:queryType,:startTime,:endTime,:duration," +
-      ":userName,:coordinator,:cpuTime,:rowsProduced,:peakMemory,:hdfsBytesRead,:sourceFile,0)")
+      ":userName,:coordinator,:cpuTime,:rowsProduced,:peakMemory,:hdfsBytesRead,cast(:source as jsonb),0)")
   @GetGeneratedKeys
   long insert(@BindBean ImpalaQueryEntity entity);
 
@@ -95,7 +95,7 @@ public interface ImpalaQueryDao extends JdbiDao<ImpalaQueryEntity> {
       "status = :status, query_type = :queryType, start_time = :startTime, end_time = :endTime, " +
       "duration = :duration, user_name = :userName, coordinator = :coordinator, cpu_time = :cpuTime, " +
       "rows_produced = :rowsProduced, peak_memory = :peakMemory, hdfs_bytes_read = :hdfsBytesRead, " +
-      "source_file = :sourceFile, version = :version + 1 " +
+      "source = cast(:source as jsonb), version = :version + 1 " +
       "where id = :id and version = :version" )
   int update(@BindBean ImpalaQueryEntity query);
 

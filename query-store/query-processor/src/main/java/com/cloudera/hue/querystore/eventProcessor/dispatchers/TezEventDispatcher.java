@@ -79,7 +79,7 @@ public class TezEventDispatcher implements EventDispatcher<HistoryEventProto> {
   }
 
   @Override
-  public ProcessingStatus process(HistoryEventProto event, Path filePath) {
+  public ProcessingStatus process(HistoryEventProto event, Path filePath, Long eventOffset) {
     if (!processors.containsKey(event.getEventType().toUpperCase())) {
       return ProcessingStatus.SKIP;
     }

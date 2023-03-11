@@ -75,7 +75,7 @@ public class EventProcessorPipelineTest {
     when(fsPersistenceManager.getFileOfType(FileStatusType.TEZ))
         .thenReturn(Collections.emptyList());
     when(fsPersistenceManager.create(any())).thenAnswer(m -> m.getArgument(0));
-    when(dispatcher.process(eq(HistoryEventProto.getDefaultInstance()), any()))
+    when(dispatcher.process(eq(HistoryEventProto.getDefaultInstance()), any(), any()))
         .thenReturn(ProcessingStatus.SUCCESS);
 
     clock = new RunningTestClock();
@@ -153,7 +153,7 @@ public class EventProcessorPipelineTest {
     verify(logger, times(6)).getReader(eq(goodPath));
     verify(goodReader, times(7)).readEvent();
     verify(goodReader, times(7)).getOffset();
-    verify(dispatcher).process(eq(HistoryEventProto.getDefaultInstance()), any());
+    verify(dispatcher).process(eq(HistoryEventProto.getDefaultInstance()), any(), any());
 
     verify(logger, times(6)).getReader(eq(errorOpenEOFPath));
     verify(logger, times(6)).getReader(eq(errorOpenIOPath));

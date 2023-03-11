@@ -74,7 +74,7 @@ public class DagSubmittedProcessor implements TezEventProcessor {
             "Processing a dummy 'QUERY_SUBMITTED' event.", event.getEventType(), event.getDagId(),
             hiveQueryId);
         HiveHookEventProto eventProto = createDummyQuerySubmittedEvent(event);
-        hiveEventDispatcher.process(eventProto, filePath);
+        hiveEventDispatcher.process(eventProto, filePath, 0l);
         firstHiveQuery = hiveQueryRepository.findByHiveQueryId(hiveQueryId);
       }
       hiveQuery = firstHiveQuery.get();
