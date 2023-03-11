@@ -40,7 +40,7 @@ public class ImpalaQueryProfile {
     return summaryMap;
   }
 
-  public Map<String, String> getHdfsMetricsMap() {
+  public Map<String, String> getHdfsMetrics() {
     if(hdfsMetrics == null) {
       ImpalaHDFSIOAnalysisRule hdfsioAnalysisRule = new ImpalaHDFSIOAnalysisRule();
       hdfsMetrics = hdfsioAnalysisRule.process(tree);
