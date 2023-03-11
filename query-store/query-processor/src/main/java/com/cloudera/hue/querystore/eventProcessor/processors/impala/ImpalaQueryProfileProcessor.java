@@ -106,7 +106,7 @@ public class ImpalaQueryProfileProcessor {
 
   interface PropKey {
     String SQL_STATEMENT = "Sql Statement";
-    String QUERY_STATE = "Impala Query State";
+    String QUERY_STATE = "Query State";
     String QUERY_TYPE = "Query Type";
 
     String USER = "User";
