@@ -19,7 +19,7 @@
 import api from '../../../commons/api-utils/api';
 import { AxiosResponse } from 'axios';
 
-import { ImpalaQuery } from '../index.d';
+import { ImpalaQuery, ImpalaQueryProfile } from '../index.d';
 import { SearchRequest, SearchResponse } from '../../../commons/api-utils/search';
 
 const QUERIES_URL = '/jobbrowser/query-store/api/impala/queries';
@@ -32,7 +32,7 @@ export const searchQueries = async <Q>(options: SearchRequest): Promise<SearchRe
   return response.data;
 };
 
-type QueryData = { query: ImpalaQuery; profile: unknown };
+type QueryData = { query: ImpalaQuery; profile: ImpalaQueryProfile };
 export const loadQuery = async (queryId: string): Promise<ImpalaQuery> => {
   const url = `${QUERIES_URL}/${encodeURIComponent(queryId)}`;
   const response = await api.get<ImpalaQuery, AxiosResponse<QueryData>>(url);

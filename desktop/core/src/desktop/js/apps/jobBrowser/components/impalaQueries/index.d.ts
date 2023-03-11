@@ -26,6 +26,17 @@ export enum ImpalaQueryTypes {
   DDL = 'DDL'
 }
 
+type Map = { [key: string]: string };
+export interface ImpalaQueryProfile {
+  summaryMap: Map;
+
+  cpuMetrics: Map;
+  hdfsMetrics: Map;
+  insertMetrics: Map;
+  memoryMetrics: Map;
+  threadTimeMetrics: Map;
+}
+
 export interface ImpalaQuery {
   queryId: string;
   queryText: string;
@@ -44,7 +55,7 @@ export interface ImpalaQuery {
   peakMemory: number;
   hdfsBytesRead: number;
 
-  profile: any;
+  profile: ImpalaQueryProfile;
 }
 
 // TODO: Remove if not used

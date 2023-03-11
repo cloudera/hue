@@ -75,7 +75,7 @@
 
   import CountersTable from './counters-table/CountersTable.vue';
 
-  import { CounterDetails, CounterGroup, ImpalaQuery } from '../index';
+  import { CounterDetails, CounterGroup, ImpalaQuery, ImpalaQueryProfile } from '../index';
   import { hueWindow } from 'types/types';
   import huePubSub from 'utils/huePubSub';
 
@@ -131,8 +131,8 @@
           ''
         );
       },
-      getCounters: function (profile: any): CounterGroup[] {
-        const kvToCounters = (kv: any): CounterDetails[] => {
+      getCounters: function (profile: ImpalaQueryProfile): CounterGroup[] {
+        const kvToCounters = (kv: ImpalaQueryProfile['cpuMetrics']): CounterDetails[] => {
           return Object.keys(kv).map(key => ({
             counterName: key,
             counterValue: kv[key]
@@ -145,7 +145,7 @@
           },
           {
             counterGroupName: 'HDFS Metrics',
-            counters: kvToCounters(profile.hdfsMetricsMap)
+            counters: kvToCounters(profile.hdfsMetrics)
           },
           {
             counterGroupName: 'Memory Metrics',
