@@ -55,7 +55,7 @@ public class HiveEventDispatcher implements EventDispatcher<HiveHookEventProto> 
   }
 
   @Override
-  public ProcessingStatus process(HiveHookEventProto event, Path filePath) {
+  public ProcessingStatus process(HiveHookEventProto event, Path filePath, Long eventOffset) {
     if (!processors.containsKey(event.getEventType().toUpperCase())) {
       return ProcessingStatus.SKIP;
     }

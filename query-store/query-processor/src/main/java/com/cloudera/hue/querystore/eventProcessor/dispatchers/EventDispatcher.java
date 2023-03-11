@@ -12,5 +12,5 @@ import com.cloudera.hue.querystore.eventProcessor.processors.ProcessingStatus;
  * @param <T> The type of the event that the processor will process
  */
 public interface EventDispatcher<T> {
-  ProcessingStatus process(T event, Path filePath);
+  ProcessingStatus process(T event, Path filePath, Long eventOffset);
 }

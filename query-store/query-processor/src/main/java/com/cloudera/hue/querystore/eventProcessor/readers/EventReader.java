@@ -10,6 +10,8 @@ public interface EventReader<T> extends Closeable {
   long getOffset() throws IOException;
   void setOffset(long offset) throws IOException;
 
+  Long getLastOffset();
+
   Path getFilePath();
 
   T read() throws IOException;

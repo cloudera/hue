@@ -374,7 +374,7 @@ public class EventProcessorPipeline<T> {
       log.trace("Started processing file: " + filePath);
       try {
         for (T evt = reader.read(); evt != null && state.get() == START; evt = reader.read()) {
-          boolean isFinalEvent = processEvent(evt, filePath);
+          boolean isFinalEvent = processEvent(evt, filePath, reader.getLastOffset());
           fileStatus.updateEntity(isFinalEvent, reader.getOffset(), clock.getTime());
         }
         fileStatus.updatePosition(fsPersistenceManager);
@@ -388,7 +388,7 @@ public class EventProcessorPipeline<T> {
     }
 
     @SuppressWarnings("fallthrough")
-    private boolean processEvent(T evt, Path filePath) throws Exception {
+    private boolean processEvent(T evt, Path filePath, Long eventOffset) throws Exception {
       // We should get more information from processing status, it should be able to tell
       // us if an error is retriable and then should we ignore after retry or terminate
       // processing rest of the events in the file. Currently its terminate processing
@@ -398,7 +398,7 @@ public class EventProcessorPipeline<T> {
       boolean isFinished = false;
       try {
         log.trace("Started processing event for file: {}, event: {}", filePathStr, evt);
-        ProcessingStatus status = txnManager.withTransaction(() -> eventDispatcher.process(evt, filePath));
+        ProcessingStatus status = txnManager.withTransaction(() -> eventDispatcher.process(evt, filePath, eventOffset));
         switch (status.getStatus()) {
           case ERROR:
             throw new Exception("Error processing event", status.getError());

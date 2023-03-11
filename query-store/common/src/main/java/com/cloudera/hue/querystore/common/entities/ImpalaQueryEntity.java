@@ -6,6 +6,7 @@ import com.cloudera.hue.querystore.orm.annotation.ColumnInfo;
 import com.cloudera.hue.querystore.orm.annotation.EntityFieldProcessor;
 import com.cloudera.hue.querystore.orm.annotation.SearchQuery;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -40,7 +41,7 @@ public class ImpalaQueryEntity implements JdbiEntity {
       Long peakMemory,
       Long hdfsBytesRead,
 
-      String sourceFile) {
+      ObjectNode source) {
     this.id = id;
 
     this.queryId = queryId;
@@ -60,7 +61,7 @@ public class ImpalaQueryEntity implements JdbiEntity {
     this.peakMemory = peakMemory;
     this.hdfsBytesRead = hdfsBytesRead;
 
-    this.sourceFile = sourceFile;
+    this.source = source;
   }
 
   @ColumnInfo(columnName="id", id=true)
@@ -110,9 +111,9 @@ public class ImpalaQueryEntity implements JdbiEntity {
   @ColumnInfo(columnName="hdfs_bytes_read", searchable = true, sortable = true, rangeFacetable = true)
   private Long hdfsBytesRead;
 
-  @ColumnInfo(columnName="source_file")
   @JsonIgnore
-  private String sourceFile;
+  @ColumnInfo(columnName="source")
+  private ObjectNode source;
 
   public enum Status {
     STARTED, RUNNING, SUCCESS, ERROR
