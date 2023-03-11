@@ -105,7 +105,7 @@
   import { duration } from 'components/Duration.vue';
   import { Facet, FacetValue, FacetValueLabels, SearchFacet } from 'components/FacetSelector';
   import FacetSelector from 'components/FacetSelector.vue';
-  import SortSelector from '../components/SortSelector.vue';
+  import SortSelector from './SortSelector.vue';
   import HueButton from 'components/HueButton.vue';
   import HueIcon from 'components/HueIcon.vue';
   import HueLink from 'components/HueLink.vue';
