@@ -116,6 +116,10 @@ def rungunicornserver():
     else:
       ssl_keyfile = conf.SSL_PRIVATE_KEY.get()
 
+  # Hide server name = gunicorn and mask it to apache
+  gunicorn.SERVER_SOFTWARE = 'apache'
+  os.environ['SERVER_SOFTWARE'] = gunicorn.SERVER_SOFTWARE
+
   options = {
       'accesslog': "-",
       'backlog': 2048,
