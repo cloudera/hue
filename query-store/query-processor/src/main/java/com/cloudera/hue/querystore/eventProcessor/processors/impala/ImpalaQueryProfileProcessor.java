@@ -40,7 +40,7 @@ public class ImpalaQueryProfileProcessor {
   public ProcessingStatus process(ImpalaQueryProfile profile, Path sourceFile, Long eventOffset) {
 
     Map<String, String> details = profile.getSummaryMap();
-    Map<String, String> hdfsMetrics = profile.getHdfsMetricsMap();
+    Map<String, String> hdfsMetrics = profile.getHdfsMetrics();
     Map<String, String> memoryMetrics = profile.getMemoryMetrics();
     Map<String, String> threadTimeMetrics = profile.getThreadTimeMetrics();
 
