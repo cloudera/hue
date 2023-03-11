@@ -159,4 +159,8 @@ public class ImpalaFileReader implements FileReader<ImpalaRuntimeProfileTree> {
   public EventReader<ImpalaRuntimeProfileTree> getEventReader(Path filePath, FileProcessingStatus fileStatus) throws IOException {
     return new ImpalaEventReader(this, filePath, fileStatus);
   }
+
+  public EventReader<ImpalaRuntimeProfileTree> getEventReader(Path filePath) throws IOException {
+    return getEventReader(filePath, new FileProcessingStatus(null));
+  }
 }
