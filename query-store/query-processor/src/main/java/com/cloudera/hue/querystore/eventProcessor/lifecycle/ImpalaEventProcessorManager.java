@@ -11,14 +11,18 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.yarn.util.SystemClock;
 
 import com.cloudera.hue.querystore.common.config.DasConfiguration;
+import com.cloudera.hue.querystore.common.entities.ImpalaQueryEntity;
 import com.cloudera.hue.querystore.common.entities.FileStatusEntity.FileStatusType;
 import com.cloudera.hue.querystore.common.repository.FileStatusPersistenceManager;
 import com.cloudera.hue.querystore.common.repository.transaction.TransactionManager;
 import com.cloudera.hue.querystore.eventProcessor.dispatchers.ImpalaEventDispatcher;
+import com.cloudera.hue.querystore.eventProcessor.eventdefs.ImpalaQueryProfile;
 import com.cloudera.hue.querystore.eventProcessor.pipeline.EventProcessorPipeline;
+import com.cloudera.hue.querystore.eventProcessor.readers.EventReader;
 import com.cloudera.hue.querystore.eventProcessor.readers.ImpalaFileReader;
 import com.cloudera.ipe.model.impala.ImpalaRuntimeProfileTree;
 import com.codahale.metrics.MetricRegistry;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import io.dropwizard.lifecycle.Managed;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +41,7 @@ public class ImpalaEventProcessorManager implements Managed {
   private static final String CONF_PROFILE_LOG_DIR = "impala.history.profile_log_dir";
 
   private EventProcessorPipeline<ImpalaRuntimeProfileTree> impalaEventsPipeline;
+  private ImpalaFileReader impalaFileReader;
 
   @Inject
   public ImpalaEventProcessorManager(DasConfiguration eventProcessingConfig,
@@ -98,7 +103,7 @@ public class ImpalaEventProcessorManager implements Managed {
       log.info("Creating Impala events pipeline");
       String impalaBaseDir = getBaseDir();
       SystemClock clock = SystemClock.getInstance();
-      ImpalaFileReader impalaFileReader = new ImpalaFileReader(new Path(impalaBaseDir), hadoopConfiguration, clock);
+      impalaFileReader = new ImpalaFileReader(new Path(impalaBaseDir), hadoopConfiguration, clock);
       impalaEventsPipeline = new EventProcessorPipeline<ImpalaRuntimeProfileTree>(clock, impalaFileReader, impalaEventDispatcher, txnManager,
           fsPersistenceManager, FileStatusType.IMPALA, eventProcessingConfig, metricRegistry);
       impalaEventsPipeline.start();
@@ -106,5 +111,26 @@ public class ImpalaEventProcessorManager implements Managed {
       log.error("Failed to start Impala events pipeline");
       throw new RuntimeException("Failed to create Impala events pipeline: ", e);
     }
+  }
+
+  public ImpalaQueryProfile loadProfile(ImpalaQueryEntity entity) {
+    // TODO: Move to a generic place
+    ObjectNode source = entity.getSource();
+    String sourceFile = source.fieldNames().next();
+    Long eventOffset = source.get(sourceFile).get(0).asLong();
+
+    ImpalaQueryProfile profile = null;
+
+    if(impalaFileReader != null) {
+      try {
+        EventReader<ImpalaRuntimeProfileTree> eventReader = impalaFileReader.getEventReader(new Path(sourceFile));
+        eventReader.setOffset(eventOffset);
+        profile = new ImpalaQueryProfile(eventReader.read());
+      } catch(IOException e) {
+        log.error("Profile fetch failed for query {}", entity.getId(), e);
+      }
+    }
+
+    return profile;
   }
 }

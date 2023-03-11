@@ -9,11 +9,13 @@ import com.cloudera.ipe.rules.ImpalaMemoryUsageAnalysisRule;
 import com.cloudera.ipe.rules.ImpalaResourceMetricsConverterAnalysisRule;
 import com.cloudera.ipe.rules.ImpalaRuntimeProfile;
 import com.cloudera.ipe.rules.ImpalaThreadTimeAnalysisRule;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Getter;
 
 public class ImpalaQueryProfile {
   @Getter
+  @JsonIgnore
   private final ImpalaRuntimeProfileTree tree;
 
   private Map<String, String> summaryMap;
