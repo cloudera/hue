@@ -34,6 +34,7 @@
     <jdbi.version>3.30.0</jdbi.version>
     <log4j2.version>2.17.1</log4j2.version>
     <postgres.version>42.5.1</postgres.version>
+    <mysql.version>8.0.32</mysql.version>
     <pg-embedded.version>0.7.1</pg-embedded.version>
     <jetty.version>9.4.48.v20220622</jetty.version>
     <impala-profile-extractor.version>7.6.0</impala-profile-extractor.version>
@@ -159,6 +160,12 @@
         <groupId>org.postgresql</groupId>
         <artifactId>postgresql</artifactId>
         <version>${postgres.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.mysql</groupId>
+        <artifactId>mysql-connector-j</artifactId>
+        <version>${mysql.version}</version>
       </dependency>
 
       <dependency>
