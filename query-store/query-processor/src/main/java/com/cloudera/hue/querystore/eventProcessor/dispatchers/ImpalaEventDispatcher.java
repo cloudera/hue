@@ -21,11 +21,11 @@ public class ImpalaEventDispatcher implements EventDispatcher<ImpalaRuntimeProfi
   }
 
   @Override
-  public ProcessingStatus process(ImpalaRuntimeProfileTree event, Path filePath) {
+  public ProcessingStatus process(ImpalaRuntimeProfileTree event, Path filePath, Long eventOffset) {
     log.info("Processing impala profile for query {}", event.getQueryId());
 
     ImpalaQueryProfile profile = new ImpalaQueryProfile(event);
-    ProcessingStatus processingStatus = queryProfileProcessor.process(profile, filePath);
+    ProcessingStatus processingStatus = queryProfileProcessor.process(profile, filePath, eventOffset);
 
     // TODO: Better handling of each of the following states
     // Successful processing of event - SUCCESS

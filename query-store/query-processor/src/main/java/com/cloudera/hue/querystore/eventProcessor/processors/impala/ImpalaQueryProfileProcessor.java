@@ -6,8 +6,12 @@ import com.cloudera.hue.querystore.common.repository.transaction.DASTransaction;
 import com.cloudera.hue.querystore.eventProcessor.eventdefs.ImpalaQueryProfile;
 import com.cloudera.hue.querystore.eventProcessor.processors.ProcessingStatus;
 import com.cloudera.ipe.IPEConstants;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import java.net.URI;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -24,14 +28,16 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ImpalaQueryProfileProcessor {
   private final Provider<ImpalaQueryRepository> impalaQueryRepositoryProvider;
+  private final ObjectMapper objectMapper;
 
   @Inject
-  public ImpalaQueryProfileProcessor(Provider<ImpalaQueryRepository> impalaQueryRepositoryProvider) {
+  public ImpalaQueryProfileProcessor(Provider<ImpalaQueryRepository> impalaQueryRepositoryProvider, ObjectMapper objectMapper) {
     this.impalaQueryRepositoryProvider = impalaQueryRepositoryProvider;
+    this.objectMapper = objectMapper;
   }
 
   @DASTransaction
-  public ProcessingStatus process(ImpalaQueryProfile profile, Path sourceFile) {
+  public ProcessingStatus process(ImpalaQueryProfile profile, Path sourceFile, Long eventOffset) {
 
     Map<String, String> details = profile.getSummaryMap();
     Map<String, String> hdfsMetrics = profile.getHdfsMetricsMap();
@@ -61,13 +67,18 @@ public class ImpalaQueryProfileProcessor {
     entity.setPeakMemory(parseLong(memoryMetrics.get(PropKey.MEMORY_PER_NODE_PEAK)));
     entity.setHdfsBytesRead(parseLong(hdfsMetrics.get(PropKey.HDFS_BYTES_READ)));
 
-    URI sourceFileUri = URI.create(sourceFile.toString());
-    entity.setSourceFile(sourceFileUri.getPath());
+    entity.setSource(buildSource(sourceFile, eventOffset));
 
     ImpalaQueryRepository impalaQueryRepository = impalaQueryRepositoryProvider.get();
     impalaQueryRepository.save(entity);
 
     return ProcessingStatus.SUCCESS;
+  }
+
+  private ObjectNode buildSource(Path sourceFile, Long eventOffset) {
+    Map<String, List<Long>> source = new HashMap<>();
+    source.put(sourceFile.toString(), Arrays.asList(eventOffset));
+    return objectMapper.convertValue(source, ObjectNode.class);
   }
 
   private Long parseLong(String value) {

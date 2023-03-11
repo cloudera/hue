@@ -23,7 +23,7 @@ CREATE TABLE impala_query (
   peak_memory           BIGINT,
   hdfs_bytes_read       BIGINT,
 
-  source_file          TEXT,
+  source                JSONB,
   version               SMALLINT
 );
 
