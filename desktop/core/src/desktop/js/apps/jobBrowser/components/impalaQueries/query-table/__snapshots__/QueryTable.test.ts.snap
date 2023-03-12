@@ -47,7 +47,7 @@ exports[`QueryTable.vue should render 1`] = `
       />
        Sort by: 
       <sort-selector-stub
-        columns="[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object]"
+        columns="[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object]"
         sort="[object Object]"
       />
       <hue-button-stub
@@ -89,7 +89,7 @@ exports[`QueryTable.vue should render 1`] = `
     >
       <hue-table-stub
         clickablerows="false"
-        columns="[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object]"
+        columns="[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object]"
         rows=""
         showheader="true"
         stickyfirstcolumn="false"
