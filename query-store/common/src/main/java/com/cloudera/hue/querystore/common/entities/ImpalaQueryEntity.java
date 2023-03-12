@@ -99,6 +99,12 @@ public class ImpalaQueryEntity implements JdbiEntity {
   @ColumnInfo(columnName="coordinator", searchable = true, sortable = true, facetable = true)
   private String coordinator;
 
+  @ColumnInfo(columnName="default_db", searchable = true, sortable = true, facetable = true)
+  private String defaultDb;
+
+  @ColumnInfo(columnName="request_pool", searchable = true, sortable = true, facetable = true)
+  private String requestPool;
+
   @ColumnInfo(columnName="cpu_time", searchable = true, sortable = true, rangeFacetable = true)
   private Long cpuTime;
 
