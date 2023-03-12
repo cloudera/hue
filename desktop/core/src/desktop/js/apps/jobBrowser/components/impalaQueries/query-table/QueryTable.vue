@@ -121,8 +121,13 @@
 
   const STATUS_FACET_VALUES: FacetValue[] = [
     { key: 'FINISHED', value: 0 },
-    { key: 'ERROR', value: 0 }
+    { key: 'EXCEPTION', value: 0 }
   ];
+  const STATUS_LABELS: FacetValueLabels = {
+    FINISHED: I18n('Finished'),
+    EXCEPTION: I18n('Exception'),
+    COMPILED: I18n('Compiled')
+  };
 
   const DEFAULT_SORT: SortInfo = {
     column: 'startTime',
@@ -159,13 +164,6 @@
     },
     emits: ['diff-queries', 'kill-queries', 'query-selected', 'reload', 'search'],
     setup() {
-      const statusValueLabels: FacetValueLabels = {
-        STARTED: I18n('Started'),
-        RUNNING: I18n('Running'),
-        SUCCESS: I18n('Success'),
-        ERROR: I18n('Error')
-      };
-
       const columns: Column<ImpalaQuery>[] = [
         { key: 'select', label: '' },
         { key: 'status', label: 'Status' },
@@ -208,9 +206,7 @@
         }
       ];
 
-      const notifyThrottle = -1;
-
-      return { columns, statusValueLabels, notifyThrottle };
+      return { columns, statusValueLabels: STATUS_LABELS, notifyThrottle: -1 };
     },
     data() {
       return {
