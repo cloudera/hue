@@ -186,7 +186,8 @@
         },
 
         { key: 'userName', label: 'User' },
-        { key: 'coordinator', label: 'Coordinator' },
+        { key: 'defaultDb', label: 'Default DB' },
+        { key: 'requestPool', label: 'Request Pool' },
 
         {
           key: 'cpuTime',
@@ -203,7 +204,8 @@
           key: 'hdfsBytesRead',
           label: 'HDFS Bytes Read',
           adapter: (_, query) => humanSize(query.hdfsBytesRead)
-        }
+        },
+        { key: 'coordinator', label: 'Coordinator' }
       ];
 
       return { columns, statusValueLabels: STATUS_LABELS, notifyThrottle: -1 };
