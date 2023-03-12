@@ -18,6 +18,8 @@ public class ImpalaSearchDetails {
 
   private List<Object> userNames;
   private List<Object> coordinators;
+  private List<Object> defaultDbs;
+  private List<Object> requestPools;
 
   public ImpalaSearchDetails(QuerySearchParams params) {
 
@@ -33,5 +35,7 @@ public class ImpalaSearchDetails {
 
     this.userNames = facetMap.get(ImpalaQueryEntity.Fields.userName);
     this.coordinators = facetMap.get(ImpalaQueryEntity.Fields.coordinator);
+    this.defaultDbs = facetMap.get(ImpalaQueryEntity.Fields.defaultDb);
+    this.requestPools = facetMap.get(ImpalaQueryEntity.Fields.requestPool);
   }
 }

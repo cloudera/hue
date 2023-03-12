@@ -61,6 +61,8 @@ public class ImpalaQueryProfileProcessor {
 
     entity.setUserName(details.get(PropKey.USER));
     entity.setCoordinator(details.get(PropKey.COORDINATOR));
+    entity.setDefaultDb(details.get(PropKey.DEFAULT_DB));
+    entity.setRequestPool(details.get(PropKey.REQUEST_POOL));
 
     entity.setCpuTime(parseLong(threadTimeMetrics.get(PropKey.THREAD_CPU_TIME)));
     entity.setRowsProduced(profile.getTree().getRowsProduced());
@@ -111,6 +113,8 @@ public class ImpalaQueryProfileProcessor {
 
     String USER = "User";
     String COORDINATOR = "Coordinator";
+    String DEFAULT_DB = "Default Db";
+    String REQUEST_POOL = "Request Pool";
 
     String THREAD_CPU_TIME = "thread_cpu_time";
     String MEMORY_PER_NODE_PEAK = "memory_per_node_peak";

@@ -17,6 +17,8 @@ CREATE TABLE impala_query (
 
   user_name             VARCHAR(64),
   coordinator           VARCHAR(2048),
+  default_db            VARCHAR(512),
+  request_pool          VARCHAR(512),
 
   cpu_time              BIGINT,
   rows_produced         BIGINT,
@@ -47,6 +49,10 @@ CREATE INDEX idx_iq_user_name
   ON impala_query (user_name);
 CREATE INDEX idx_iq_coordinator
   ON impala_query (coordinator);
+CREATE INDEX idx_iq_default_db
+  ON impala_query (default_db);
+CREATE INDEX idx_iq_request_pool
+  ON impala_query (request_pool);
 
 CREATE INDEX idx_iq_cpu_time
   ON impala_query (cpu_time);
