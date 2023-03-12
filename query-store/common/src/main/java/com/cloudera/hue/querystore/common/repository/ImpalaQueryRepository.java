@@ -46,6 +46,8 @@ public class ImpalaQueryRepository extends JdbiRepository<ImpalaQueryEntity, Imp
       isNotNull(search.getQueryTypes()), search.getQueryTypes(),
       isNotNull(search.getUserNames()), search.getUserNames(),
       isNotNull(search.getCoordinators()), search.getCoordinators(),
+      isNotNull(search.getDefaultDbs()), search.getDefaultDbs(),
+      isNotNull(search.getRequestPools()), search.getRequestPools(),
 
       sort.getColumnName(), sort.getOrder(),
       params.getLimit(), params.getOffset()
