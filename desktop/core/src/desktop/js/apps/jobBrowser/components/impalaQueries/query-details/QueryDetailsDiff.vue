@@ -133,7 +133,7 @@
           },
           {
             counterGroupName: 'HDFS Metrics',
-            counters: kvToCounters(profile.hdfsMetricsMap)
+            counters: kvToCounters(profile.hdfsMetrics)
           },
           {
             counterGroupName: 'Memory Metrics',
