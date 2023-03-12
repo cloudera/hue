@@ -285,3 +285,7 @@ if SLACK.IS_ENABLED.get():
   urlpatterns += [
     re_path(r'^desktop/slack/', include('desktop.lib.botserver.urls')),
   ]
+
+urlpatterns += [
+ re_path(r'^desktop/insertsql/', desktop_views.insertsql, name='desktop_views_insertparser'),
+]

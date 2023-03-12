@@ -825,4 +825,10 @@ def topo(request, location='world'):
   #//return settings.STATIC_URL + path
   return response
 
-# hello
+def insertsql(request):
+ response = {'status': -1}
+ name = json.loads(request.POST.get('name', '{}'))
+ itstype = json.loads(request.POST.get('itstype', '{}'))
+
+
+ return JsonResponse(response)
