@@ -97,8 +97,8 @@ QUERY_STORE = ConfigSection(
       default='',
       help=_("URL of Query Store API server.")
     ),
-    ENABLE=Config(
-      key="enable",
+    IS_ENABLED=Config(
+      key="is_enabled",
       type=coerce_bool,
       dynamic_default=query_store_url_is_set,
       help=_("Visualize Hive/Impala query history data from Query Store.")

@@ -3962,10 +3962,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           return '${ ENABLE_QUERY_SCHEDULING.get() }' == 'True';
         };
         var hiveQueriesInterfaceCondition = function () {
-          return '${ QUERY_STORE.ENABLE.get() }' == 'True' && isDialectEnabled('hive');
+          return '${ QUERY_STORE.IS_ENABLED.get() }' == 'True' && isDialectEnabled('hive');
         };
         var impalaQueriesInterfaceCondition = function () {
-          return '${ QUERY_STORE.ENABLE.get() }' == 'True' && isDialectEnabled('impala');
+          return '${ QUERY_STORE.IS_ENABLED.get() }' == 'True' && isDialectEnabled('impala');
         };
 
         var interfaces = [
