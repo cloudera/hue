@@ -70,7 +70,7 @@
   import { Column } from 'components/HueTable';
   import { ImpalaQuery } from '../index';
 
-  const SORTABLE_COLUMNS = new Set([
+  const SORTABLE_COLUMNS = new Set<keyof ImpalaQuery>([
     'startTime',
     'endTime',
     'duration',
@@ -118,7 +118,7 @@
 
       label(): string {
         const column = this.columns.find(col => col.key === this.sort.column);
-        return column ? `${column.label}: ${this.sort.order === 'ASC' ? 'Asc' : 'Desc'}` : '';
+        return column ? `${column.label}: ${I18n(this.sort.order === 'ASC' ? 'Asc' : 'Desc')}` : '';
       }
     },
 

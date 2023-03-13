@@ -63,6 +63,7 @@
   import { loadQuery, searchQueries } from './api/query';
 
   const QUERY_ID_PARAM = 'queryId';
+  const DEFAULT_TIME_WINDOW = 1000 * 60 * 60 * 24 * 7; // 7 days
 
   export type SortInfo = { column: string; order: 'ASC' | 'DESC' };
 
@@ -145,8 +146,7 @@
             facets: options.facets,
             text: options.text,
             sortText: `${options.sort.column}:${options.sort.order}`,
-            startTime:
-              (options.timeRange && options.timeRange.from) || now - 1000 * 60 * 60 * 24 * 7
+            startTime: (options.timeRange && options.timeRange.from) || now - DEFAULT_TIME_WINDOW
           });
           this.searchMeta = searchResponse.meta;
           this.queries = searchResponse.queries;

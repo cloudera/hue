@@ -17,11 +17,11 @@
 -->
 
 <template>
-  <div v-if="variance">
+  <div v-if="varianceTxt">
     <div class="variance-bar">
-      <div class="value2-bar" :style="{ width: value2Width + '%' }" />
+      <div class="value2-bar" :style="{ width: variancePercent + '%' }" />
     </div>
-    {{ variance }}
+    {{ varianceTxt }}
   </div>
 </template>
 
@@ -33,15 +33,15 @@
   export default defineComponent({
     props: {
       data: {
-        type: Object as PropType<Row[]>,
+        type: Object as PropType<Row>,
         required: true
       }
     },
 
     data() {
       return {
-        variance: '',
-        value2Width: 0
+        varianceTxt: '',
+        variancePercent: 0
       };
     },
 
@@ -51,11 +51,11 @@
         const value2 = Number(this.data[generateValueColumnKey(1)]);
 
         if (isNaN(value1) || isNaN(value2) || value1 <= 0 || value2 <= 0) {
-          this.variance = '';
+          this.varianceTxt = '';
         } else {
-          this.value2Width = (value2 / (value1 + value2)) * 100;
+          this.variancePercent = (value2 / (value1 + value2)) * 100;
           const variance = value1 >= value2 ? value1 / value2 : value2 / value1;
-          this.variance = `${Number(variance.toFixed(2))}x`;
+          this.varianceTxt = `${Number(variance.toFixed(2))}x`;
         }
       }
     }

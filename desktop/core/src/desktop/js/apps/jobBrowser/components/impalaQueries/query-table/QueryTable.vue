@@ -241,7 +241,7 @@
     },
     methods: {
       getUpdateTimeText(time: number): string {
-        return time ? `Data updated  ${timeAgo(time)}` : '';
+        return time ? `${I18n('Data updated')} ${timeAgo(time)}` : '';
       },
       clearSearch(): void {
         this.searchText = '';

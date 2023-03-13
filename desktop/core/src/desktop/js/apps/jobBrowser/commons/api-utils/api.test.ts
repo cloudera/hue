@@ -26,7 +26,7 @@ const TEST_MSG = 'Test msg';
 const TEST_DETAILS = 'Test details';
 
 describe('api.ts', () => {
-  it('Interceptor must throw ApiError if response contain invalid status, even if HTTP status is 200', async () => {
+  it('Interceptor should throw ApiError if response contain invalid status, even if HTTP status is 200', async () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     api.defaults.adapter = <AxiosAdapter>((config: AxiosRequestConfig): AxiosPromise<any> => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -24,4 +24,6 @@ export default interface CounterSet {
   cssClass: string;
 }
 
+export type Row = { [key: string]: unknown };
+
 export const generateValueColumnKey = (index: number): string => `counterSet_${index}`;

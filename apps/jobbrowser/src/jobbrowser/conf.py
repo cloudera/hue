@@ -84,7 +84,7 @@ ENABLE_HISTORY_V2 = Config(
   default=False
 )
 
-def query_store_url_is_set():
+def is_query_store_url_set():
   """Check if query store url is configured"""
   return QUERY_STORE.SERVER_URL.get() != ''
 
@@ -100,7 +100,7 @@ QUERY_STORE = ConfigSection(
     IS_ENABLED=Config(
       key="is_enabled",
       type=coerce_bool,
-      dynamic_default=query_store_url_is_set,
+      dynamic_default=is_query_store_url_set,
       help=_("Visualize Hive/Impala query history data from Query Store.")
     ),
   )

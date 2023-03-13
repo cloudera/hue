@@ -16,14 +16,16 @@
  * limitations under the License.
  */
 
-import { shallowMount } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 import CountersTable from './CountersTable.vue';
+
+import counters from './__test_data__/counters.json';
 
 describe('CountersTable.vue', () => {
   it('should render', () => {
-    const wrapper = shallowMount(CountersTable, {
+    const wrapper = mount(CountersTable, {
       propsData: {
-        counters: []
+        counters
       }
     });
     expect(wrapper.element).toMatchSnapshot();

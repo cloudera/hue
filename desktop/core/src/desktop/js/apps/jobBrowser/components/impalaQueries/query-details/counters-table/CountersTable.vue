@@ -34,21 +34,20 @@
 
   import { Column } from '../../../../../../components/HueTable';
   import HueTable from '../../../../../../components/HueTable.vue';
-  import { Row } from '../../../../../../components/HueTable';
 
   import { CounterGroup, CounterDetails } from '../../index';
 
-  import CounterSet, { generateValueColumnKey } from './CounterSet';
+  import CounterSet, { Row, generateValueColumnKey } from './CounterSet';
   import VarianceCell from './VarianceCell.vue';
 
   const DEFAULT_VALUE_COLUMN_TITLE = 'Counter Value';
   const NAME_COLUMNS: Column<Row>[] = [
     {
-      label: 'Group Name',
+      label: I18n('Group Name'),
       key: 'groupName'
     },
     {
-      label: 'Counter Name',
+      label: I18n('Counter Name'),
       key: 'counterName'
     }
   ];
@@ -85,7 +84,7 @@
 
         if (this.counters.length > 1) {
           valueColumns.push({
-            label: 'Variance',
+            label: I18n('Variance'),
             key: 'variance'
           });
         }
@@ -118,7 +117,7 @@
         rows = Array.from(rowHash.values());
 
         if (this.hideSimilarValues) {
-          rows = rows.filter((row: Row) => this.areDifferent(row, this.counters.length));
+          rows = rows.filter((row: Row) => this.isValuesDifferent(row, this.counters.length));
         }
 
         return rows;
@@ -127,7 +126,7 @@
 
     methods: {
       I18n,
-      areDifferent(row: Row, valueCount: number): boolean {
+      isValuesDifferent(row: Row, valueCount: number): boolean {
         if (valueCount > 1) {
           const firstVal = row[generateValueColumnKey(0)];
           for (let i = 1; i < valueCount; i++) {

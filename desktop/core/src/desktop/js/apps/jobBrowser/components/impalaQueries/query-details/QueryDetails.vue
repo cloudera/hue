@@ -104,11 +104,9 @@
 
     setup(): {
       showQueries?: () => void;
-      HUE_BASE_URL?: string;
     } {
       return {
-        showQueries: inject('showQueries'),
-        HUE_BASE_URL: (<hueWindow>window).HUE_BASE_URL
+        showQueries: inject('showQueries')
       };
     },
 
@@ -132,12 +130,11 @@
         );
       },
       getCounters: function (profile: ImpalaQueryProfile): CounterGroup[] {
-        const kvToCounters = (kv: ImpalaQueryProfile['cpuMetrics']): CounterDetails[] => {
-          return Object.keys(kv).map(key => ({
+        const kvToCounters = (kv: ImpalaQueryProfile['cpuMetrics']): CounterDetails[] =>
+          Object.keys(kv).map(key => ({
             counterName: key,
             counterValue: kv[key]
           }));
-        };
         return [
           {
             counterGroupName: I18n('CPU Metrics'),
