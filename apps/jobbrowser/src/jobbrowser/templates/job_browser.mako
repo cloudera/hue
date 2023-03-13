@@ -3985,7 +3985,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           {'interface': 'bundles', 'label': '${ _ko('Bundles') }', 'condition': schedulerExtraInterfaceCondition},
           {'interface': 'slas', 'label': '${ _ko('SLAs') }', 'condition': schedulerExtraInterfaceCondition},
           {'interface': 'livy-sessions', 'label': '${ _ko('Livy') }', 'condition': livyInterfaceCondition},
-          {'interface': 'hive-queries', 'label': '${ _ko('Queries') }', 'condition': hiveQueriesInterfaceCondition},
+          {'interface': 'hive-queries', 'label': '${ _ko('Hive Queries') }', 'condition': hiveQueriesInterfaceCondition},
           {'interface': 'impala-queries', 'label': '${ _ko('Impala Queries') }', 'condition': impalaQueriesInterfaceCondition},
         ];
 
