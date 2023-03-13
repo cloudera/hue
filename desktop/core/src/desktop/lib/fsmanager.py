@@ -38,6 +38,8 @@ from desktop.lib.idbroker import conf as conf_idbroker
 from hadoop.cluster import get_hdfs, _make_filesystem
 from hadoop.conf import has_hdfs_enabled
 
+LOG = logging.getLogger(__name__)
+
 
 SUPPORTED_FS = ['hdfs', 's3a', 'adl', 'abfs', 'gs', 'ofs']
 CLIENT_CACHE = None
@@ -93,6 +95,7 @@ def _make_client(fs, name, user):
   if fs == 'hdfs':
     return _make_filesystem(name)
   elif fs == 's3a':
+    LOG.debug('in fsmanager _make_client ----->>> ' + str(user))
     return aws.client._make_client(name, user)
   elif fs == 'adl':
     return azure.client._make_adls_client(name, user)
@@ -118,13 +121,16 @@ def _get_client_cached(fs, name, user):
   if CLIENT_CACHE is None:
     CLIENT_CACHE = {}
   # We don't want to cache by username when IDBroker not enabled
+  LOG.debug('in _get_client_cached ---->>> ' + str(user))
   cache_key = _get_cache_key(fs, name, user) if conf_idbroker.is_idbroker_enabled(fs) else _get_cache_key(fs, name)
+  LOG.debug('in _get_client_cached cache_key---->>> ' + str(cache_key))
   client = CLIENT_CACHE.get(cache_key)
 
   # Expiration from IDBroker returns java timestamp in MS
   if client and (client.expiration is None or client.expiration > int(current_ms_from_utc())):
     return client
   else:
+    LOG.debug('in _get_client_cached below if ---->>> ' + str(user))
     client = _make_client(fs, name, user)
     CLIENT_CACHE[cache_key] = client
     return client

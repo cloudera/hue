@@ -156,6 +156,7 @@ class RazS3Connection(SignedUrlS3Connection):
 
 
   def get_signed_url(self, action='GET', url=None, headers=None, data=None):
+    LOG.debug('in RazS3Connection get_signed_url ---->>> ' + str(self.username))
     raz_client = S3RazClient(username=self.username)
 
     return raz_client.get_url(action, url, headers, data)

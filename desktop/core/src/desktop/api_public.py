@@ -393,6 +393,7 @@ def get_django_request(request):
     django_request.fs = fsmanager.get_filesystem(django_request.fs_ref)
 
     if django_request.user.is_authenticated and django_request.fs is not None:
+      LOG.debug('in api public ------>>>' + str(django_request.user.username))
       django_request.fs.setuser(django_request.user.username)
 
   return django_request

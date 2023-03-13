@@ -569,6 +569,7 @@ class S3FileSystem(object):
     return True
 
   def setuser(self, user):
+    LOG.debug('in S3 setuser ------>>> ' + str(user))
     self.user = user  # Only used in Cluster middleware request.fs
 
   def get_upload_chuck_size(self):
