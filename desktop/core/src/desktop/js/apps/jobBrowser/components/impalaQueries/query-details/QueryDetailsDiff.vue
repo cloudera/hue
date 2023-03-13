@@ -21,7 +21,7 @@
     <div class="buttons-container">
       <hue-button borderless @click="() => showQueries && showQueries()">
         <em class="fa fa-chevron-left" />
-        Queries
+        {{ I18n('Queries') }}
       </hue-button>
     </div>
 
@@ -32,11 +32,11 @@
 
     <tabs>
       <!-- Query Tabs -->
-      <tab title="Query Info" class="query-info">
+      <tab :title="I18n('Query Info')" class="query-info">
         <QueryInfo :query="queries[0]" layout="column" />
         <QueryInfo :query="queries[1]" layout="column" class="query-b" />
       </tab>
-      <tab title="Plan">
+      <tab :title="I18n('Plan')">
         <pre class="hue-box">
           {{ queries[0].profile.summaryMap['Plan'] }}
         </pre>
@@ -44,7 +44,7 @@
           {{ queries[1].profile.summaryMap['Plan'] }}
         </pre>
       </tab>
-      <tab title="Exec Summary">
+      <tab :title="I18n('Exec Summary')">
         <pre class="hue-box">
           {{ queries[0].profile.summaryMap['ExecSummary'] }}
         </pre>
@@ -52,16 +52,16 @@
           {{ queries[1].profile.summaryMap['ExecSummary'] }}
         </pre>
       </tab>
-      <tab title="Metrics">
+      <tab :title="I18n('Metrics')">
         <CountersTable
           :counters="[
             {
-              title: `Metrics : ${queries[0].queryId}`,
+              title: `${I18n('Metrics')} : ${queries[0].queryId}`,
               counters: getCounters(queries[0].profile),
               cssClass: ''
             },
             {
-              title: `Metrics : ${queries[1].queryId}`,
+              title: `${I18n('Metrics')} : ${queries[1].queryId}`,
               counters: getCounters(queries[1].profile),
               cssClass: ''
             }
@@ -81,6 +81,8 @@
   import QueryInfoTop from './QueryInfoTop.vue';
   import QueryInfo from './QueryInfo.vue';
   import CountersTable from './counters-table/CountersTable.vue';
+
+  import I18n from 'utils/i18n';
 
   import { CounterDetails, CounterGroup, ImpalaQuery } from '../index';
 
@@ -119,6 +121,7 @@
 
     methods: {
       get,
+      I18n,
       getCounters: function (profile: any): CounterGroup[] {
         const kvToCounters = (kv: any): CounterDetails[] => {
           return Object.keys(kv).map(key => ({
@@ -128,19 +131,19 @@
         };
         return [
           {
-            counterGroupName: 'CPU Metrics',
+            counterGroupName: I18n('CPU Metrics'),
             counters: kvToCounters(profile.cpuMetrics)
           },
           {
-            counterGroupName: 'HDFS Metrics',
+            counterGroupName: I18n('HDFS Metrics'),
             counters: kvToCounters(profile.hdfsMetrics)
           },
           {
-            counterGroupName: 'Memory Metrics',
+            counterGroupName: I18n('Memory Metrics'),
             counters: kvToCounters(profile.memoryMetrics)
           },
           {
-            counterGroupName: 'Thread Time Metrics',
+            counterGroupName: I18n('Thread Time Metrics'),
             counters: kvToCounters(profile.threadTimeMetrics)
           }
         ];

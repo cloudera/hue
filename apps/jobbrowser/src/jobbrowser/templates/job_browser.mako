@@ -3919,7 +3919,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       self.availableInterfaces = ko.pureComputed(function () {
         var isDialectEnabled = function (dialect) {
-          return self.appConfig() && self.appConfig()['editor'] && self.appConfig()['editor']['interpreter_names'].indexOf(dialect) != -1;
+          return self.appConfig()?.editor?.interpreter_names?.indexOf(dialect) >= 0;
         };
 
         var historyInterfaceCondition = function () {

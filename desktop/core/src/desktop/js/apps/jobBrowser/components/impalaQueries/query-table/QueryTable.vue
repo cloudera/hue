@@ -45,7 +45,7 @@
       </div>
 
       <div class="query-table-sort">
-        <hue-icon type="hi-sort" /> Sort by:
+        <hue-icon type="hi-sort" /> {{ I18n('Sort by') }}:
         <sort-selector :sort="sort" :columns="columns" @sort-changed="sortChanged" />
         <hue-button class="clear-link" borderless @click="clearSearch">
           {{ I18n('Clear All') }}

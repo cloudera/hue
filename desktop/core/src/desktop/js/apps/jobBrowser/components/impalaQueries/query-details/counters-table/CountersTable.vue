@@ -23,19 +23,22 @@
         <VarianceCell :data="row" />
       </template>
     </HueTable>
-    <h2 v-else>No counters available!</h2>
+    <h2 v-else>{{ I18n('No counters available!') }}</h2>
   </div>
 </template>
 
 <script lang="ts">
   import { defineComponent, PropType } from 'vue';
 
+  import I18n from 'utils/i18n';
+
   import { Column } from '../../../../../../components/HueTable';
   import HueTable from '../../../../../../components/HueTable.vue';
+  import { Row } from '../../../../../../components/HueTable';
 
   import { CounterGroup, CounterDetails } from '../../index';
 
-  import CounterSet, { Row, generateValueColumnKey } from './CounterSet';
+  import CounterSet, { generateValueColumnKey } from './CounterSet';
   import VarianceCell from './VarianceCell.vue';
 
   const DEFAULT_VALUE_COLUMN_TITLE = 'Counter Value';
@@ -123,6 +126,7 @@
     },
 
     methods: {
+      I18n,
       areDifferent(row: Row, valueCount: number): boolean {
         if (valueCount > 1) {
           const firstVal = row[generateValueColumnKey(0)];

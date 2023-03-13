@@ -24,7 +24,4 @@ export default interface CounterSet {
   cssClass: string;
 }
 
-//TODO: Must be imported from components/HueTable.d
-export type Row = { [key: string]: unknown };
-
 export const generateValueColumnKey = (index: number): string => `counterSet_${index}`;

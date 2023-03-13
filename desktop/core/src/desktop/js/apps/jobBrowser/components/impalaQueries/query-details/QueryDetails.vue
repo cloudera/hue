@@ -22,7 +22,7 @@
       <div class="buttons-container">
         <hue-button borderless @click="() => showQueries && showQueries()">
           <em class="fa fa-chevron-left" />
-          Queries
+          {{ I18n('Queries') }}
         </hue-button>
         <div class="buttons-right">
           <hue-button @click="$emit('reload')">
@@ -35,24 +35,24 @@
       <QueryInfoTop :query="query" />
 
       <tabs>
-        <tab title="Query Info">
+        <tab :title="I18n('Query Info')">
           <QueryInfo :query="query" />
         </tab>
-        <tab title="Plan">
+        <tab :title="I18n('Plan')">
           <pre class="hue-box">
             {{ query.profile.summaryMap['Plan'] }}
           </pre>
         </tab>
-        <tab title="Exec Summary">
+        <tab :title="I18n('Exec Summary')">
           <pre class="hue-box">
             {{ query.profile.summaryMap['ExecSummary'] }}
           </pre>
         </tab>
-        <tab title="Metrics">
+        <tab :title="I18n('Metrics')">
           <CountersTable
             :counters="[
               {
-                title: `Metrics : ${query.queryId}`,
+                title: `${I18n('Metrics')} : ${query.queryId}`,
                 counters: getCounters(query.profile),
                 cssClass: ''
               }
@@ -140,19 +140,19 @@
         };
         return [
           {
-            counterGroupName: 'CPU Metrics',
+            counterGroupName: I18n('CPU Metrics'),
             counters: kvToCounters(profile.cpuMetrics)
           },
           {
-            counterGroupName: 'HDFS Metrics',
+            counterGroupName: I18n('HDFS Metrics'),
             counters: kvToCounters(profile.hdfsMetrics)
           },
           {
-            counterGroupName: 'Memory Metrics',
+            counterGroupName: I18n('Memory Metrics'),
             counters: kvToCounters(profile.memoryMetrics)
           },
           {
-            counterGroupName: 'Thread Time Metrics',
+            counterGroupName: I18n('Thread Time Metrics'),
             counters: kvToCounters(profile.threadTimeMetrics)
           }
         ];
