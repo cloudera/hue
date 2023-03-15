@@ -100,6 +100,7 @@
     'oozie-bundle': `<svg class="hi hi-fw"><use xlink:href="#hi-oozie-bundle"></use></svg>`,
     'oozie-coordinator': `<svg class="hi hi-fw"><use xlink:href="#hi-oozie-coordinator"></use></svg>`,
     'oozie-workflow': `<svg class="hi hi-fw"><use xlink:href="#hi-oozie-workflow"></use></svg>`,
+    ofs: `<svg class="hi hi-fw"><use xlink:href="#hi-ofs"></use></svg>`,
     pig: `<svg class="hi hi-fw"><use xlink:href="#hi-pig"></use></svg>`,
     py: `<svg class="hi hi-fw"><use xlink:href="#hi-py"></use></svg>`,
     pyspark: `<svg class="hi hi-fw"><use xlink:href="#hi-spark"></use></svg>`,
