@@ -889,36 +889,44 @@ class OnePageViewModel {
       }
     });
 
-    huePubSub.subscribe('open.filebrowserlink', ({ pathPrefix, decodedPath, fileBrowserModel }) => {
-      if (pathPrefix.includes('download=')) {
-        // The download view on the backend requires the slashes not to
-        // be encoded in order for the file to be correctly named.
-        const encodedPath = encodeURIComponent(decodedPath).replaceAll('%2F', '/');
-        const possibleKnoxUrlPathPrefix = window.HUE_BASE_URL;
-        window.location = possibleKnoxUrlPathPrefix + pathPrefix + encodedPath;
-        return;
-      }
+    huePubSub.subscribe(
+      'open.filebrowserlink',
+      ({ pathPrefix, decodedPath, fileBrowserModel, browserTarget }) => {
+        if (pathPrefix.includes('download=')) {
+          // The download view on the backend requires the slashes not to
+          // be encoded in order for the file to be correctly named.
+          const encodedPath = encodeURIComponent(decodedPath).replaceAll('%2F', '/');
+          const possibleKnoxUrlPathPrefix = window.HUE_BASE_URL;
+          window.location = possibleKnoxUrlPathPrefix + pathPrefix + encodedPath;
+          return;
+        }
 
-      const appPrefix = '/hue';
-      const urlEncodedPercentage = '%25';
-      // Fix. The '%' character needs to be encoded twice due to a bug in the page library
-      // that decodes the url twice. Even when we don't directly call pag() we still need this
-      // fix since the user can reload the page which will trigger a call to page().
-      const pageFixedEncodedPath = encodeURIComponent(
-        decodedPath.replaceAll('%', urlEncodedPercentage)
-      );
-      const href = window.HUE_BASE_URL + appPrefix + pathPrefix + pageFixedEncodedPath;
+        const appPrefix = '/hue';
+        const urlEncodedPercentage = '%25';
+        // Fix. The '%' character needs to be encoded twice due to a bug in the page library
+        // that decodes the url twice. Even when we don't directly call page() we still need this
+        // fix since the user can reload the page which will trigger a call to page().
+        const pageFixedEncodedPath = encodeURIComponent(
+          decodedPath.replaceAll('%', urlEncodedPercentage)
+        );
+        const href = window.HUE_BASE_URL + appPrefix + pathPrefix + pageFixedEncodedPath;
 
-      // We don't want reload the entire filebrowser when navigating between folders
-      // and already on the listdir_components page.
-      if (fileBrowserModel) {
-        fileBrowserModel.targetPath(pathPrefix + encodeURIComponent(decodedPath));
-        window.history.pushState(null, '', href);
-        fileBrowserModel.retrieveData();
-      } else {
-        page(href);
+        if (browserTarget) {
+          window.open(href, browserTarget);
+          return;
+        }
+
+        // We don't want reload the entire filebrowser when navigating between folders
+        // and already on the listdir_components page.
+        if (fileBrowserModel) {
+          fileBrowserModel.targetPath(pathPrefix + encodeURIComponent(decodedPath));
+          window.history.pushState(null, '', href);
+          fileBrowserModel.retrieveData();
+        } else {
+          page(href);
+        }
       }
-    });
+    );
   }
 }
 
