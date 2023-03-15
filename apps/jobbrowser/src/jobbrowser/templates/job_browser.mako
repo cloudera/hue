@@ -193,7 +193,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
 
   <script type="text/html" id="apps-list${ SUFFIX }">
-    <table data-bind="attr: {id: tableId}" class="datatables table table-condensed status-border-container">
+    <table data-bind="attr: {id: tableId}" class="datatables table table-condensed status-border-container hue-jobs-table">
       <thead>
       <tr>
         <th width="1%" class="vertical-align-middle">
@@ -408,9 +408,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                   <!-- /ko -->
                   <!-- ko ifnot: $root.isMini -->
                   <h4>${ _('Running') }</h4>
-                  <div data-bind="template: { name: 'apps-list${ SUFFIX }', data: { apps: jobs.runningApps, tableId: 'runningJobsTable', selectedJobs: jobs.selectedJobs} }"></div>
+                  <div data-bind="template: { name: 'apps-list${ SUFFIX }', data: { apps: jobs.runningApps, tableId: 'runningJobsTable', selectedJobs: jobs.selectedJobs} }" class="hue-horizontally-scrollable"></div>
                   <h4>${ _('Completed') }</h4>
-                  <div data-bind="template: { name: 'apps-list${ SUFFIX }', data: { apps: jobs.finishedApps, tableId: 'completedJobsTable', selectedJobs: jobs.selectedJobs } }"></div>
+                  <div data-bind="template: { name: 'apps-list${ SUFFIX }', data: { apps: jobs.finishedApps, tableId: 'completedJobsTable', selectedJobs: jobs.selectedJobs } }" class="hue-horizontally-scrollable"></div>
                   <!-- /ko -->
                 <!-- /ko -->
               </div>
