@@ -75,7 +75,7 @@ def enable_logging(args, options):
     _proc = os.path.basename(len(sys.argv) > 1 and sys.argv[1] or sys.argv[0])
     os.environ["HUE_PROCESS_NAME"] = _proc
 
-  desktop.log.basic_logging(os.environ["HUE_PROCESS_NAME"], log_dir=None, conf_file='log.conf')
+  desktop.log.basic_logging(os.environ["HUE_PROCESS_NAME"])
   logging.info("Welcome to Hue from Gunicorn server " + HUE_DESKTOP_VERSION)
 
 def post_fork(server, worker):
