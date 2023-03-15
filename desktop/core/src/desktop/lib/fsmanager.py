@@ -29,7 +29,7 @@ from aws.conf import is_enabled as is_s3_enabled, has_s3_access
 from azure.conf import is_adls_enabled, is_abfs_enabled, has_adls_access, has_abfs_access
 
 
-from desktop.conf import is_gs_enabled, has_gs_access, DEFAULT_USER, is_ofs_enabled, has_ofs_access
+from desktop.conf import is_gs_enabled, has_gs_access, DEFAULT_USER, is_ofs_enabled, has_ofs_access, RAZ
 
 from desktop.lib.fs.proxyfs import ProxyFS
 from desktop.lib.python_util import current_ms_from_utc
@@ -117,8 +117,15 @@ def _get_client_cached(fs, name, user):
   global CLIENT_CACHE
   if CLIENT_CACHE is None:
     CLIENT_CACHE = {}
-  # We don't want to cache by username when IDBroker not enabled
-  cache_key = _get_cache_key(fs, name, user) if conf_idbroker.is_idbroker_enabled(fs) else _get_cache_key(fs, name)
+
+  if (conf_idbroker.is_idbroker_enabled(fs) or RAZ.IS_ENABLED.get()):
+    cache_key = _get_cache_key(fs, name, user)
+  else:
+    # By default, caching via default hue user key because there are no user-mapping like scenarios same as in IDBroker or RAZ.
+    # For FS like S3 and ABFS: Default case is via access key and secret which just allows everyone to access everything.
+    # For FS like HDFS and Ozone: This user mapping is handled behind the scenes and we are impersonating user for them.
+    cache_key = _get_cache_key(fs, name)
+
   client = CLIENT_CACHE.get(cache_key)
 
   # Expiration from IDBroker returns java timestamp in MS
