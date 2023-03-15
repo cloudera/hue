@@ -23,7 +23,7 @@ from impala.conf import COORDINATOR_URL as IMPALA_COORDINATOR_URL
 from metadata.conf import PROMETHEUS
 from notebook.conf import ENABLE_QUERY_SCHEDULING
 
-from jobbrowser.conf import DISABLE_KILLING_JOBS, MAX_JOB_FETCH, ENABLE_QUERY_BROWSER, ENABLE_HIVE_QUERY_BROWSER, ENABLE_QUERIES_LIST, ENABLE_HISTORY_V2
+from jobbrowser.conf import DISABLE_KILLING_JOBS, MAX_JOB_FETCH, ENABLE_QUERY_BROWSER, ENABLE_HIVE_QUERY_BROWSER, QUERY_STORE, ENABLE_HISTORY_V2
 
 from webpack_loader.templatetags.webpack_loader import render_bundle
 
@@ -334,7 +334,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               <div data-bind="template: { name: 'breadcrumbs${ SUFFIX }' }"></div>
               <!-- /ko -->
 
-              <!-- ko if: interface() !== 'slas' && interface() !== 'oozie-info' && interface() !== 'queries'-->
+              <!-- ko if: interface() !== 'slas' && interface() !== 'oozie-info' && interface() !== 'hive-queries' && interface() !== 'impala-queries'-->
               <!-- ko if: !$root.job() -->
               <form class="form-inline">
                 <!-- ko if: !$root.isMini() && interface() == 'queries-impala' -->
@@ -486,8 +486,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               <!-- /ko -->
               <div id="slas" data-bind="visible: interface() === 'slas'"></div>
 
-              <!-- ko if: interface() === 'queries' -->
+              <!-- ko if: interface() === 'hive-queries' -->
                 <queries-list></queries-list>
+              <!-- /ko -->
+
+              <!-- ko if: interface() === 'impala-queries' -->
+                <impala-queries></impala-queries>
               <!-- /ko -->
 
               <!-- ko if: interface() === 'oozie-info' -->
@@ -3707,7 +3711,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       });
 
       self.fetchJobs = function () {
-        if(vm.interface() === 'queries') {
+        if(vm.interface() === 'hive-queries' || vm.interface() === 'impala-queries') {
           return;
         }
 
@@ -3731,7 +3735,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       }
 
       self.updateJobs = function () {
-        if(vm.interface() === 'queries') {
+        if(vm.interface() === 'hive-queries' || vm.interface() === 'impala-queries') {
           return;
         }
 
@@ -3914,6 +3918,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       });
 
       self.availableInterfaces = ko.pureComputed(function () {
+        var isDialectEnabled = function (dialect) {
+          return self.appConfig()?.editor?.interpreter_names?.indexOf(dialect) >= 0;
+        };
+
         var historyInterfaceCondition = function () {
           return '${ ENABLE_HISTORY_V2.get() }' == 'True';
         };
@@ -3953,8 +3961,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         var scheduleHiveInterfaceCondition = function () {
           return '${ ENABLE_QUERY_SCHEDULING.get() }' == 'True';
         };
-        var queriesInterfaceCondition = function () {
-          return '${ ENABLE_QUERIES_LIST.get() }' == 'True';
+        var hiveQueriesInterfaceCondition = function () {
+          return '${ QUERY_STORE.IS_ENABLED.get() }' == 'True' && isDialectEnabled('hive');
+        };
+        var impalaQueriesInterfaceCondition = function () {
+          return '${ QUERY_STORE.IS_ENABLED.get() }' == 'True' && isDialectEnabled('impala');
         };
 
         var interfaces = [
@@ -3974,7 +3985,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           {'interface': 'bundles', 'label': '${ _ko('Bundles') }', 'condition': schedulerExtraInterfaceCondition},
           {'interface': 'slas', 'label': '${ _ko('SLAs') }', 'condition': schedulerExtraInterfaceCondition},
           {'interface': 'livy-sessions', 'label': '${ _ko('Livy') }', 'condition': livyInterfaceCondition},
-          {'interface': 'queries', 'label': '${ _ko('Queries') }', 'condition': queriesInterfaceCondition},
+          {'interface': 'hive-queries', 'label': '${ _ko('Hive Queries') }', 'condition': hiveQueriesInterfaceCondition},
+          {'interface': 'impala-queries', 'label': '${ _ko('Impala Queries') }', 'condition': impalaQueriesInterfaceCondition},
         ];
 
         return interfaces.filter(function (i) {
@@ -4062,7 +4074,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             self.loadOozieInfoPage();
           % endif
         }
-        else if(interface !== 'queries'){
+        else if(interface !== 'hive-queries' || interface !== 'impala-queries'){
           self.jobs.fetchJobs();
         }
       };
@@ -4093,7 +4105,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         window.clearTimeout(updateJobsTimeout);
         jobUpdateCounter = 0;
         exponentialFactor = 1;
-        if (self.interface() && self.interface() !== 'slas' && self.interface() !== 'oozie-info' && self.interface !== 'queries'){
+        if (self.interface() && self.interface() !== 'slas' && self.interface() !== 'oozie-info' && self.interface !== 'hive-queries' && self.interface !== 'impala-queries'){
           if (job) {
             if (job.apiStatus() === 'RUNNING') {
               var _updateJob = function () {
@@ -4180,7 +4192,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           case 'engines':
           case 'dataeng-jobs':
           case 'livy-sessions':
-          case 'queries':
+          case 'hive-queries':
+          case 'impala-queries':
             self.selectInterface(h);
             break;
           default:
