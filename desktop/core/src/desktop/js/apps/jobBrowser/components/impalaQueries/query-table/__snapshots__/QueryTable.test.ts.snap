@@ -1,0 +1,104 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`QueryTable.vue should render 1`] = `
+<div
+  class="impala-query-table"
+>
+  <div
+    class="query-table-actions"
+  >
+    <search-input-stub
+      modelvalue=""
+      placeholder="Query text or Query ID"
+      showmagnify="false"
+      small="false"
+    />
+    <hue-button-stub
+      alert="false"
+      borderless="false"
+      disabled="false"
+      large="false"
+      primary="false"
+      small="false"
+    />
+    <div
+      class="query-table-filters"
+    >
+      <hue-icon-stub
+        type="hi-filter"
+      />
+       Filter by: 
+      <facet-selector-stub
+        disabled="false"
+        facet="[object Object]"
+        fieldlabel="Status"
+        filterenabled="false"
+        valuelabels="[object Object]"
+      />
+      <date-range-picker-stub
+        inline="false"
+      />
+    </div>
+    <div
+      class="query-table-sort"
+    >
+      <hue-icon-stub
+        type="hi-sort"
+      />
+       Sort by: 
+      <sort-selector-stub
+        columns="[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object]"
+        sort="[object Object]"
+      />
+      <hue-button-stub
+        alert="false"
+        borderless="true"
+        class="clear-link"
+        disabled="false"
+        large="false"
+        primary="false"
+        small="false"
+      />
+    </div>
+    <div
+      class="query-table-actions-right"
+    >
+      <hue-button-stub
+        alert="false"
+        borderless="false"
+        disabled="true"
+        large="false"
+        primary="false"
+        small="false"
+      />
+      <hue-button-stub
+        alert="false"
+        borderless="false"
+        disabled="false"
+        large="false"
+        primary="false"
+        small="false"
+      />
+    </div>
+  </div>
+  <div
+    class="query-table-container"
+  >
+    <div
+      class="query-table-right-panel"
+    >
+      <hue-table-stub
+        clickablerows="false"
+        columns="[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object]"
+        rows=""
+        showheader="true"
+        stickyfirstcolumn="false"
+        stickyheader="false"
+      />
+    </div>
+  </div>
+  <paginator-stub
+    totalentries="0"
+  />
+</div>
+`;

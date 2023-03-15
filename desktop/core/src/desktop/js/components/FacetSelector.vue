@@ -106,8 +106,9 @@
 
       lastKnownValues?: string[];
     } {
+      const facetKeys = this.facet.values.map(val => val.key);
       return {
-        selectedValues: [],
+        selectedValues: facetKeys,
         previousSelection: []
       };
     },
