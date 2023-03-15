@@ -132,8 +132,8 @@ const defaults = {
       home: '/?default_ofs_home',
       icon: {
         svg: {
-          brand: '#hi-adls',
-          home: '#hi-adls'
+          brand: '#hi-ofs',
+          home: '#hi-ofs'
         },
         brand: 'fa-windows',
         home: 'fa-windows'
