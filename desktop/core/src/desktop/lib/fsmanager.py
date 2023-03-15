@@ -38,8 +38,6 @@ from desktop.lib.idbroker import conf as conf_idbroker
 from hadoop.cluster import get_hdfs, _make_filesystem
 from hadoop.conf import has_hdfs_enabled
 
-LOG = logging.getLogger(__name__)
-
 
 SUPPORTED_FS = ['hdfs', 's3a', 'adl', 'abfs', 'gs', 'ofs']
 CLIENT_CACHE = None

@@ -149,7 +149,6 @@ class ClusterMiddleware(MiddlewareMixin):
       request.fs = fsmanager.get_filesystem(request.fs_ref)
 
       if request.fs is not None:
-        LOG.debug('in cluster middleware ---> ' + str(request.user.username))
         request.fs.setuser(request.user.username)
       else:
         LOG.warning("request.fs user was not set")

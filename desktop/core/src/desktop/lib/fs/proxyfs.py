@@ -128,7 +128,6 @@ class ProxyFS(object):
       self._user['user'] = user.username
     else:
       self._user['user'] = user
-    
     return curr
 
   def getuser(self):
