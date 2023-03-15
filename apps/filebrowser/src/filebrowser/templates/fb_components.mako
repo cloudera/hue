@@ -54,7 +54,7 @@ else:
         %elif path.lower().find('ofs://') == 0:
           <li style="padding-top: 12px">
             <span class="breadcrumb-link homeLink">
-              <svg class="hi"><use xlink:href='#hi-adls'></use></svg>
+              <svg class="hi"><use xlink:href='#hi-ofs'></use></svg>
             </span>
           </li>
         %else:
