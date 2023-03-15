@@ -118,10 +118,12 @@ def _get_client_cached(fs, name, user):
   if CLIENT_CACHE is None:
     CLIENT_CACHE = {}
 
-  # We don't want to cache by username when IDBroker or RAZ is not enabled
   if (conf_idbroker.is_idbroker_enabled(fs) or RAZ.IS_ENABLED.get()):
     cache_key = _get_cache_key(fs, name, user)
   else:
+    # By default, caching via default hue user key because there are no user-mapping like scenarios same as in IDBroker or RAZ.
+    # For FS like S3 and ABFS: Default case is via access key and secret which just allows everyone to access everything.
+    # For FS like HDFS and Ozone: This user mapping is handled behind the scenes and we are impersonating user for them.
     cache_key = _get_cache_key(fs, name)
 
   client = CLIENT_CACHE.get(cache_key)
