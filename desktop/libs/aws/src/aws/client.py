@@ -46,7 +46,6 @@ def _make_client(identifier, user):
 
   if aws_conf.is_raz_s3():
     host = aws_conf.get_default_host() or client_conf.HOST.get()
-    LOG.debug('in _make_client ---->>> ' + str(user))
     s3_client = RazS3Connection(username=user, host=host)  # Note: Remaining AWS configuration is fully skipped
     s3_client_expiration = None
   else:

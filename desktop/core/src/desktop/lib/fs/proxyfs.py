@@ -102,7 +102,6 @@ class ProxyFS(object):
     try:
       fs = self._fs_dict[scheme](self._name, self.getuser())
       if self._has_access(fs):
-        LOG.debug('in _get_fs ---->>> ' + str(self.getuser()))
         fs.setuser(self.getuser())
         return fs
       else:
@@ -125,22 +124,18 @@ class ProxyFS(object):
   def setuser(self, user):
     """Set a new user. Return the past current user."""
     curr = self.getuser()
-    LOG.debug('in setuser and user is ----->>> ' + str(user))
     if hasattr(user, 'username'):
       self._user['user'] = user.username
     else:
       self._user['user'] = user
     
-    LOG.debug(' _user dict is ---->>> ' + str(self._user))
     return curr
 
   def getuser(self):
-    LOG.debug('in getuser and user is ----->>> ' + str(self._user['user']))
     return self._user['user']
 
   def do_as_user(self, username, fn, *args, **kwargs):
     prev = self.getuser()
-    LOG.debug('in do_as_user ------->>> ' + str(username))
     try:
       self.setuser(username)
       return fn(*args, **kwargs)
@@ -151,8 +146,6 @@ class ProxyFS(object):
     scheme = self._get_scheme(args[0])
     fs = self._fs_dict[scheme](self._name, user=DEFAULT_USER)
     user = fs.superuser if fs.superuser else DEFAULT_USER
-    LOG.debug('in do_as_superuser ------->>> fs.superuser ' + str(fs.superuser))
-    LOG.debug('in do_as_superuser ------->>> DEFAULT_USER ' + str(DEFAULT_USER))
     return self.do_as_user(user, fn, *args, **kwargs)
 
   # Proxy methods to suitable filesystem
@@ -244,8 +237,6 @@ class ProxyFS(object):
     # If normal users also have authorization, then they can also create the dir for themselves if they want.
     request = CrequestMiddleware.get_request()
     username = request.user.username if request and hasattr(request, 'user') and request.user.is_authenticated else self.getuser()
-
-    LOG.debug('in create_home_dir ------>>> ' + str(username))
 
     if RAZ.AUTOCREATE_USER_DIR.get() and (is_raz_s3() or is_raz_abfs()):
       fs = self.do_as_user(username, self._get_fs, home_path)
