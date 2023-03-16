@@ -46,7 +46,7 @@ RUN echo "${HUEUSER} ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/${HUEUSER} && \
 COPY --chown=${HUEUSER}:${HUEUSER} hueconf ${HUE_CONF}/conf
 
 RUN ln -s ${HUE_CONF}/conf/log.conf ${HUE_HOME}/desktop/conf/log.conf; \
-    ln -s ${HUE_CONF}/conf/gunicorn_log.conf ${HUE_HOME}/desktop/conf/gunicorn_log.conf \
+    ln -s ${HUE_CONF}/conf/gunicorn_log.conf ${HUE_HOME}/desktop/conf/gunicorn_log.conf; \
     ln -s ${HUE_CONF}/conf/log4j.properties ${HUE_HOME}/desktop/conf/log4j.properties
 
 # supervisor stuff
