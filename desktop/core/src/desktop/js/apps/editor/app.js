@@ -509,7 +509,7 @@ huePubSub.subscribe('app.dom.loaded', app => {
     );
 
     huePubSub.subscribe('editor.create.new', newKeyHandler, HUE_PUB_SUB_EDITOR_ID);
-
+    
     if (viewModel.isSqlAnalyzerEnabled()) {
       if (window.SQL_ANALYZER_AUTO_UPLOAD_QUERIES) {
         huePubSub.subscribe(
@@ -520,7 +520,7 @@ huePubSub.subscribe('app.dom.loaded', app => {
           HUE_PUB_SUB_EDITOR_ID
         );
       }
-
+      
       if (window.SQL_ANALYZER_AUTO_UPLOAD_DDL) {
         huePubSub.subscribe(
           'editor.upload.table.stats',

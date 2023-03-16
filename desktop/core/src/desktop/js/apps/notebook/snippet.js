@@ -1719,6 +1719,21 @@ class Snippet {
 
     self.execute = function (automaticallyTriggered) {
       self.clearActiveExecuteRequests();
+      self.insertsqlparser = $.post(
+        '/desktop/insertsql/',
+        {
+          name: 'Employeeid',
+          itsType: 'columnName'
+        },
+        data => {
+          try {
+            console.log("within post query catch");
+          } catch (e) {
+            console.log("error!!")
+          }
+        }
+      );
+      self.insertsqlparser;
 
       if (!automaticallyTriggered && self.ace()) {
         const selectionRange = self.ace().getSelectionRange();

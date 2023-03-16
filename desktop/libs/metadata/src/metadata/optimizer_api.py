@@ -468,6 +468,9 @@ def upload_query(request):
       response['query_upload'] = api.upload(data=queries, data_type='queries', source_platform=source_platform)
     except Document2.DoesNotExist:
       response['query_upload'] = _('Skipped as task query')
+
+  # elif OPTIMIZER.AUTO_UPLOAD_QUERIES.get() and locations:
+    # store the locations
   else:
     response['query_upload'] = _('Skipped')
   response['status'] = 0
