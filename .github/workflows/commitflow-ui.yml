@@ -7,8 +7,8 @@ on:
   pull_request:
     branches:
     - master
-    # paths:
-    #   - '**.js' // this workflow will run when a pull request includes a change to a JavaScript file (.js)
+    paths:
+      - '**.js'
 
 jobs:
   build:
