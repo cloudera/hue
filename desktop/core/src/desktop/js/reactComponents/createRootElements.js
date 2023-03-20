@@ -31,7 +31,7 @@ async function render(name, props, root) {
 }
 
 export async function createReactComponents(selector) {
-  // Find all DOM containers
+  // Find all DOM containers .
   document.querySelectorAll(`${selector} [data-reactcomponent]`).forEach(domContainer => {
     const componentName = domContainer.dataset['reactcomponent'];
     const rawPropDataset = domContainer.dataset.props ? JSON.parse(domContainer.dataset.props) : {};
