@@ -415,7 +415,7 @@ class ApiHelper {
   fetchAbfsPath(options) {
     let url =
       URLS.ABFS_API_PREFIX +
-      encodeURI(options.pathParts.join('/')) +
+      options.pathParts.join('/') +
       '?format=json&sortby=name&descending=false&pagesize=' +
       (options.pageSize || 500) +
       '&pagenum=' +
@@ -603,10 +603,9 @@ class ApiHelper {
    * @param {string} [options.filter]
    */
   fetchS3Path(options) {
-    options.pathParts.shift(); // remove the trailing /
     let url =
       URLS.S3_API_PREFIX +
-      encodeURI(options.pathParts.join('/')) +
+      options.pathParts.join('/') +
       '?format=json&sortby=name&descending=false&pagesize=' +
       (options.pageSize || 500) +
       '&pagenum=' +
