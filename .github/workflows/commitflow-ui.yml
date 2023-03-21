@@ -9,12 +9,13 @@ on:
     - master
     paths:
       - '**.js'
+      - '**.jsx'
+      - '**.ts'
+      - '**.tsx'
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - name: Checkout
       uses: actions/checkout@v3
