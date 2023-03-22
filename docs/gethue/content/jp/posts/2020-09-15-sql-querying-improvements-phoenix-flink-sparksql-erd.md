@@ -217,11 +217,9 @@ Hive 4 は SQL 構文による[スケジューリングクエリ](https://cwiki.
 
 `hue.ini` で有効にする方法は次のとおりです。
 
-    [notebook]
-    enable_notebook_2=true
-
     [desktop]
     enable_connectors=true
+    enable_hue_5=true
 
 **注** [https://demo.gethue.com/](https://demo.gethue.com/) では新しいエディタが有効になっています。
 
