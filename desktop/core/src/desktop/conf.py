@@ -1785,6 +1785,13 @@ EDITOR_AUTOCOMPLETE_TIMEOUT = Config(
   help=_('Timeout value in ms for autocomplete of columns, tables, values etc. 0 = disabled.')
 )
 
+ENABLE_HUE_5 = Config(
+  key="enable_hue_5",
+  help=_("Feature flag to enable Hue 5."),
+  type=coerce_bool,
+  default=False
+)
+
 USE_NEW_EDITOR = Config( # To remove in Hue 4
   key='',
   default=True,
