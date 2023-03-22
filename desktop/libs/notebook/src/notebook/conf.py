@@ -219,13 +219,6 @@ ENABLE_QUERY_BUILDER = Config(
   default=False
 )
 
-ENABLE_NOTEBOOK_2 = Config(
-  key="enable_notebook_2",
-  help=_t("Feature flag to enable Notebook 2."),
-  type=coerce_bool,
-  default=False
-)
-
 # Note: requires Oozie app
 ENABLE_QUERY_SCHEDULING = Config(
   key="enable_query_scheduling",

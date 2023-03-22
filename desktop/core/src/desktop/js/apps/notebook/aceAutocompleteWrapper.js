@@ -39,7 +39,7 @@ class AceAutocompleteWrapper {
         timeout: options.timeout
       });
     };
-    if (window.ENABLE_NOTEBOOK_2) {
+    if (window.ENABLE_HUE_5) {
       self.snippet.dialect.subscribe(() => {
         initializeAutocompleter();
       });
