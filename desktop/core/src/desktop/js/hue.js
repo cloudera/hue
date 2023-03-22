@@ -128,7 +128,7 @@ $(document).ready(async () => {
   ko.applyBindings(sidePanelViewModel, $('.left-panel')[0]);
   ko.applyBindings(sidePanelViewModel, $('#leftResizer')[0]);
   ko.applyBindings(sidePanelViewModel, $('.right-panel')[0]);
-  if (!window.ENABLE_NOTEBOOK_2) {
+  if (!window.ENABLE_HUE_5) {
     ko.applyBindings(sidePanelViewModel, $('.context-panel')[0]);
   }
 
