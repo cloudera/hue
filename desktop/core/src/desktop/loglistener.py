@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import argparse
+import json
 import logging
 import logging.config
 import os
@@ -35,8 +36,23 @@ from socketserver import ThreadingTCPServer, StreamRequestHandler
 #   reconfiguration of logging.
 #
 #   _listener holds the server object doing the listening
+rt = None
 _udslistener = None
-def udslisten(server_address='/tmp/hue.uds', verify=None):
+
+def udsstopListening():
+  """
+  Stop the listening server which was created with a call to listen().
+  """
+  global _udslistener
+  logging._acquireLock()
+  try:
+    if _udslistener:
+      _udslistener.abort = 1
+      _udslistener = None
+  finally:
+    logging._releaseLock()
+
+def udslisten(server_address='hue.uds', verify=None):
   """
   Start up a socket server on the specified unix domain socket, and listen for new
   configurations.
@@ -47,14 +63,13 @@ def udslisten(server_address='/tmp/hue.uds', verify=None):
     This basically logs the record using whatever logging policy is
     configured locally.
     """
-
     def handle(self):
       """
       Handle multiple requests - each expected to be a 4-byte length,
       followed by the LogRecord in pickle format. Logs the record
       according to whatever policy is configured locally.
       """
-      while True:
+      while self.server.ready:
         chunk = self.connection.recv(4)
         if len(chunk) < 4:
           break
@@ -62,13 +77,9 @@ def udslisten(server_address='/tmp/hue.uds', verify=None):
         chunk = self.connection.recv(slen)
         while len(chunk) < slen:
           chunk = chunk + self.connection.recv(slen - len(chunk))
-        obj = self.unPickle(chunk)
+        obj = pickle.loads(chunk)
         record = logging.makeLogRecord(obj)
         self.handleLogRecord(record)
-
-    def unPickle(self, data):
-      return pickle.loads(data)
-
     def handleLogRecord(self, record):
       # if a name is specified, we use the named logger rather than the one
       # implied by the record.
@@ -85,7 +96,7 @@ def udslisten(server_address='/tmp/hue.uds', verify=None):
     """
     request_queue_size = 1
 
-    def __init__(self, server_address='/tmp/hue.uds', handler=None,
+    def __init__(self, server_address='hue.uds', handler=None,
                  ready=None, verify=None):
       ThreadingTCPServer.__init__(self, server_address, handler)
       logging._acquireLock()
@@ -130,7 +141,7 @@ def udslisten(server_address='/tmp/hue.uds', verify=None):
       self.ready = threading.Event()
 
     def run(self):
-      server = self.rcvr(server_address='/tmp/hue.uds', handler=self.hdlr,
+      server = self.rcvr(server_address=self.server_address, handler=self.hdlr,
                          ready=self.ready, verify=self.verify)
       self.ready.set()
       global _udslistener
@@ -139,28 +150,24 @@ def udslisten(server_address='/tmp/hue.uds', verify=None):
       logging._releaseLock()
       server.serve_until_stopped()
 
+    def stop(self):
+      udsstopListening()
+      self.ready.clear()
+
+    def stopped(self):
+      return self.ready.is_set()
+
   return Server(ConfigSocketReceiver, ConfigStreamHandler, server_address, verify)
 
-def udsstopListening():
-  """
-  Stop the listening server which was created with a call to listen().
-  """
-  global _udslistener
-  logging._acquireLock()
-  try:
-    if _udslistener:
-      _udslistener.abort = 1
-      _udslistener = None
-  finally:
-    logging._releaseLock()
-
 def argprocessing(args=[], options={}):
-  parser = argparse.ArgumentParser(prog='runloglistener', description='What this program does', epilog='Text at the bottom of help')
-  parser.add_argument('-s', '--socket', dest='socket', action='store', default='/tmp/hue.uds')
+  parser = argparse.ArgumentParser(prog='loglistener', description='Run Log listener listening the unix domain socket.')
+  parser.add_argument('-s', '--socket', dest='socket', action='store', default='')
 
   opts = parser.parse_args()
   if opts.socket:
     options['socket'] = opts.socket
+  else:
+    options['socket'] = "%s/hue.uds" % (os.getenv("DESKTOP_LOG_DIR", "/var/log/hue"))
 
 def enable_logging(args, options):
   CONF_RE = re.compile('%LOG_DIR%')
@@ -175,7 +182,8 @@ def enable_logging(args, options):
     sio = string_io(CONF_RE.sub(_repl, raw))
     logging.config.fileConfig(sio)
   root_logger = logging.getLogger()
-  root_logger.info("Welcome to Hue from Listener server ")
+  root_logger.info("Starting Hue Log Listener server using socket file %s" % (options["socket"]))
+  root_logger.info("Using logging.conf file %s" % (CONF_FILE))
 
 class LogException(Exception):
   def __init__(self, e):
@@ -185,12 +193,11 @@ class LogException(Exception):
   def __str__(self):
     return self.message
 
-rt = None
 def signal_handler(sig, frame):
-  print("Received %s" % sig)
   global rt
-  udsstopListening()
-  rt.join()
+  print("Received signal to stop log listener %s" % sig)
+  rt.stop()
+  sys.exit(1)
 
 def start_listener(args, options):
   global rt
@@ -204,8 +211,11 @@ def start_listener(args, options):
   signal.signal(signal.SIGINT, signal_handler)
   signal.signal(signal.SIGQUIT, signal_handler)
   enable_logging(args, options)
-  rt = udslisten(options["socket"], verify=False)
-  rt.start()
+  rt = udslisten(server_address=options["socket"], verify=None)
+  try:
+    rt.start()
+  finally:
+    rt.stop()
 
 if __name__ == '__main__':
   args = sys.argv[1:]
