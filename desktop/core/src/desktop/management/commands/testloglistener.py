@@ -26,33 +26,35 @@ from django.core.management.base import BaseCommand
 from django.utils.translation import gettext as _
 
 SERVER_HELP = r"""
-  Run Python log tester
+  Generate Log lines to test new Log listener functionality
 """
 def argprocessing(args=[], options={}):
-  parser = argparse.ArgumentParser(prog='testloglistener', description='What this program does', epilog='Text at the bottom of help')
-  parser.add_argument('-s', '--socket', dest='socket', action='store', default='/tmp/hue.uds')
+  parser = argparse.ArgumentParser(prog='testloglistener', description='Generate log to test new logging functionality')
+  parser.add_argument('-s', '--socket', dest='socket', action='store', default='')
 
   opts = parser.parse_args()
-  if opts.socket:
+  if opts.socket != '':
     options['socket'] = opts.socket
+  else:
+    options['socket'] = "%s/hue.uds" % (os.getenv("DESKTOP_LOG_DIR", "/var/log/hue"))
 
 def enable_logging(args, options):
   HUE_DESKTOP_VERSION = pkg_resources.get_distribution("desktop").version or "Unknown"
   # Start basic logging as soon as possible.
-  if "HUE_PROCESS_NAME" not in os.environ:
-    _proc = os.path.basename(len(sys.argv) > 1 and sys.argv[1] or sys.argv[0])
-    os.environ["HUE_PROCESS_NAME"] = _proc
-
-  desktop.log.basic_logging(os.environ["HUE_PROCESS_NAME"])
+  desktop.log.basic_logging("rungunicornserver")
   logging.info("Welcome to Hue from Listener server " + HUE_DESKTOP_VERSION)
 
 class Command(BaseCommand):
-  help = _("Web server for Hue.")
+  help = _("Test script for logging.")
 
   def add_arguments(self, parser):
-    parser.add_argument('--socket', help=_("Unix Domain Socket file"), action='store', default=None)
+    parser.add_argument('-s', '--socket', help=_("Unix Domain Socket file"), dest='socket',
+                        action='store', default='')
 
   def handle(self, *args, **options):
+    if options["socket"] == '':
+      options['socket'] = "%s/hue.uds" % (os.getenv("DESKTOP_LOG_DIR", "/var/log/hue"))
+
     start_testing(args, options)
 
   def usage(self, subcommand):
