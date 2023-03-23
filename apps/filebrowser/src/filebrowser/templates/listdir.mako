@@ -61,12 +61,12 @@ ${ fb_components.menubar() }
         <div class="btn-toolbar" style="display: inline; vertical-align: middle">
           <div id="ch-dropdown" class="btn-group" style="vertical-align: middle">
             <button class="btn dropdown-toggle" title="${_('Actions')}" data-toggle="dropdown"
-            data-bind="visible: !inTrash(), enable: selectedFiles().length > 0 && ((!isS3() && !isABFS()) || (isS3() && !isS3Root()) || (isABFS() && !isABFSRoot()))">
+            data-bind="visible: !inTrash(), enable: selectedFiles().length > 0 && ((!isS3() && !isABFS() && !isOFS()) || (isS3() && !isS3Root()) || (isABFS() && !isABFSRoot()) || (isOFS() && !isOFSRoot()))">
               <i class="fa fa-cog"></i> ${_('Actions')}
               <span class="caret" style="line-height: 15px"></span>
             </button>
             <ul class="dropdown-menu" style="top: auto">
-              <li><a data-hue-analytics="filebrowser:actions-menu/rename-click" href="javascript: void(0)" title="${_('Rename')}" data-bind="visible: !inTrash() && selectedFiles().length == 1 && !isOFSRoot() && !isOFSVol(), click: renameFile,
+              <li><a data-hue-analytics="filebrowser:actions-menu/rename-click" href="javascript: void(0)" title="${_('Rename')}" data-bind="visible: !inTrash() && selectedFiles().length == 1 && !isOFSServiceID() && !isOFSVol(), click: renameFile,
               enable: selectedFiles().length == 1 && isCurrentDirSelected().length == 0"><i class="fa fa-fw fa-font"></i>
               ${_('Rename')}</a></li>
               <li><a data-hue-analytics="filebrowser:actions-menu/move-click" href="javascript: void(0)" title="${_('Move')}" data-bind="click: move, enable: selectedFiles().length > 0 &&
@@ -171,25 +171,25 @@ ${ fb_components.menubar() }
           <!-- /ko -->
           <!-- ko ifnot: isS3() || isABFS() -->
           <div id="upload-dropdown" class="btn-group" style="vertical-align: middle">
-            <a data-hue-analytics="filebrowser:upload-btn-click" href="javascript: void(0)" class="btn upload-link dropdown-toggle" title="${_('Upload')}" data-bind="click: uploadFile, visible: !inTrash(), css: {'disabled': isS3() && isS3Root() || isABFS() && isABFSRoot() || (isOFS() && (isOFSRoot() || isOFSVol()))}">
+            <a data-hue-analytics="filebrowser:upload-btn-click" href="javascript: void(0)" class="btn upload-link dropdown-toggle" title="${_('Upload')}" data-bind="click: uploadFile, visible: !inTrash(), css: {'disabled': isS3() && isS3Root() || isABFS() && isABFSRoot() || (isOFS() && (isOFSRoot() || isOFSServiceID() || isOFSVol()))}">
               <i class="fa fa-arrow-circle-o-up"></i> ${_('Upload')}
             </a>
           </div>
           <!-- /ko -->
           % endif
           <div class="btn-group" style="vertical-align: middle">
-            <a href="javascript: void(0)" data-toggle="dropdown" class="btn dropdown-toggle" data-bind="visible: !inTrash()">
+            <a href="javascript: void(0)" data-toggle="dropdown" class="btn dropdown-toggle" data-bind="visible: !inTrash(), css: {'disabled': isOFSRoot()}">
               <i class="fa fa-plus-circle"></i> ${_('New')}
               <span class="caret"></span>
             </a>
             <ul class="dropdown-menu pull-right" style="top: auto">
-              <li data-bind="visible: !isS3() && !isABFS() && !isOFS() || isS3() && !isS3Root() || isABFS() && !isABFSRoot() || isOFS() && !isOFSRoot() && !isOFSVol()"><a data-hue-analytics="filebrowser:new-file-btn-click" href="javascript: void(0)" class="create-file-link" title="${_('File')}"><i class="fa fa-file-o"></i> ${_('File')}</a></li>
+              <li data-bind="visible: !isS3() && !isABFS() && !isOFS() || isS3() && !isS3Root() || isABFS() && !isABFSRoot() || isOFS() && !isOFSServiceID() && !isOFSVol()"><a data-hue-analytics="filebrowser:new-file-btn-click" href="javascript: void(0)" class="create-file-link" title="${_('File')}"><i class="fa fa-file-o"></i> ${_('File')}</a></li>
               <li><a href="javascript: void(0)" class="create-directory-link" title="${_('Directory')}">
                 <i class="fa fa-folder"></i>
-                <span data-bind="visible: !isS3() && !isABFS() && !isOFS() || isS3() && !isS3Root() || isABFS() && !isABFSRoot() || isOFS() && !isOFSRoot() && !isOFSVol()">${_('Directory')}</span>
+                <span data-bind="visible: !isS3() && !isABFS() && !isOFS() || isS3() && !isS3Root() || isABFS() && !isABFSRoot() || isOFS() && !isOFSServiceID() && !isOFSVol()">${_('Directory')}</span>
                 <span data-bind="visible: (isS3() && isS3Root()) || (isOFS() && isOFSVol())">${_('Bucket')}</span>
                 <span data-bind="visible: isABFS() && isABFSRoot()">${_('File System')}</span>
-                <span data-bind="visible: isOFS() && isOFSRoot()">${_('Volume')}</span>
+                <span data-bind="visible: isOFS() && isOFSServiceID()">${_('Volume')}</span>
               </a></li>
             </ul>
           </div>
