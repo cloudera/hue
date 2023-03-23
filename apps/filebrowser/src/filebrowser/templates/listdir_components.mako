@@ -501,6 +501,12 @@ else:
         <div id="smallFileSystemNameAlert" class="hide" style="position: absolute; left: 10px;">
           <span class="label label-important"><span class="newName"></span> ${_('File system requires namesize to be 3 or more characters')}</span>
         </div>
+        <div id="volumeBucketNameAlert" class="hide" style="position: absolute; left: 10px;">
+          <span class="label label-important"><span class="newName"></span> ${_('Volume and Bucket name should be 3 to 63 characters.')}</span>
+        </div>
+        <div id="upperCaseVolumeBucketNameAlert" class="hide" style="position: absolute; left: 10px;">
+          <span class="label label-important"><span class="newName"></span> ${_('Upper case characters are not supported for Volume and Bucket names.')}</span>
+        </div>
         <a class="btn" href="#" data-dismiss="modal">${_('Cancel')}</a>
         <input class="btn btn-primary" type="submit" value="${_('Create')}" />
       </div>
@@ -1854,6 +1860,20 @@ else:
           resetPrimaryButtonsStatus(); //globally available
           return false;
         }
+        if (self.isOFSRoot() || self.isOFSVol()) {
+          if ($("#newDirectoryNameInput").val().length < 3 || $("#newDirectoryNameInput").val().length > 63) {
+            $("#volumeBucketNameAlert").show();
+            $("#newDirectoryNameInput").addClass("fieldError");
+            resetPrimaryButtonsStatus(); //globally available
+            return false;
+          }
+          if ($("#newDirectoryNameInput").val() !== $("#newDirectoryNameInput").val().toLowerCase()) {
+            $("#upperCaseVolumeBucketNameAlert").show();
+            $("#newDirectoryNameInput").addClass("fieldError");
+            resetPrimaryButtonsStatus(); //globally available
+            return false;
+          }
+        }
         $(formElement).ajaxSubmit({
           dataType:  'json',
           success: function() {
@@ -2442,6 +2462,8 @@ else:
         $("#directoryNameRequiredAlert").hide();
         $("#directoryNameExistsAlert").hide();
         $("#smallFileSystemNameAlert").hide();
+        $("#volumeBucketNameAlert").hide();
+        $("#upperCaseVolumeBucketNameAlert").hide();
       });
 
       $("#newFileNameInput").focus(function () {
