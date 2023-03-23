@@ -39,6 +39,8 @@ GUNICORN_SERVER_HELP = r"""
   Run Hue using the Gunicorn WSGI server in asynchronous mode.
 """
 
+PID_FILE = None
+
 class Command(BaseCommand):
   help = _("Gunicorn Web server for Hue.")
 
@@ -68,6 +70,11 @@ def handler_app(environ, start_response):
   os.environ.setdefault("DJANGO_SETTINGS_MODULE", "desktop.settings")
   return get_wsgi_application()
 
+def post_fork(server, worker):
+  global PID_FILE
+  with open(PID_FILE, "a") as f:
+    f.write("%s\n"%worker.pid)
+
 def enable_logging(args, options):
   HUE_DESKTOP_VERSION = pkg_resources.get_distribution("desktop").version or "Unknown"
   # Start basic logging as soon as possible.
@@ -77,10 +84,6 @@ def enable_logging(args, options):
 
   desktop.log.basic_logging(os.environ["HUE_PROCESS_NAME"])
   logging.info("Welcome to Hue from Gunicorn server " + HUE_DESKTOP_VERSION)
-
-def post_fork(server, worker):
-  with open("/tmp/gunicorn_workers.pid", "a") as f:
-    f.write("%s\n"%worker.pid)
 
 class StandaloneApplication(gunicorn.app.base.BaseApplication):
   def __init__(self, app, options=None):
@@ -112,10 +115,16 @@ class StandaloneApplication(gunicorn.app.base.BaseApplication):
     return self.load_wsgiapp()
 
 def argprocessing(args=[], options={}):
+  global PID_FILE
   if options['bind']:
+    http_port = "8888"
     bind_addr = options['bind']
+    if ":" in bind_addr:
+      http_port = bind_addr.split(":")[1]
+    PID_FILE = "/tmp/hue_%s.pid" % (http_port)
   else:
     bind_addr = conf.HTTP_HOST.get() + ":" + str(conf.HTTP_PORT.get())
+    PID_FILE = "/tmp/hue_%s.pid" % (conf.HTTP_PORT.get())
   options['bind_addr'] = bind_addr
 
   # Currently gunicorn does not support passphrase suppored SSL Keyfile
@@ -161,7 +170,6 @@ def rungunicornserver(args=[], options={}):
       'limit_request_field_size': conf.LIMIT_REQUEST_FIELD_SIZE.get(),
       'limit_request_fields': conf.LIMIT_REQUEST_FIELDS.get(),
       'limit_request_line': conf.LIMIT_REQUEST_LINE.get(),
-      'logconfig': '/etc/hue/conf/log.conf',
       'loglevel': 'info',
       'max_requests': 1200,                   # The maximum number of requests a worker will process before restarting.
       'max_requests_jitter': 0,
@@ -199,6 +207,7 @@ def rungunicornserver(args=[], options={}):
   StandaloneApplication(handler_app, gunicorn_options).run()
 
 def start_server(args, options):
+  global PID_FILE
   argprocessing(args, options)
 
   # Hide the Server software version in the response body
@@ -208,9 +217,9 @@ def start_server(args, options):
   # Activate django translation
   activate_translation()
   enable_logging(args, options)
-  with open("/tmp/gunicorn_workers.pid", "w") as f:
-    f.write("%s\n"%os.getpid())
   atexit.unregister(_exit_function)
+  with open(PID_FILE, "a") as f:
+    f.write("%s\n"%os.getpid())
   rungunicornserver(args, options)
 
 if __name__ == '__main__':
