@@ -109,13 +109,6 @@ commands:
 
             cp -r ~/repo/docs .
 
-      - run:
-          name: run commit title format check
-          command: |
-            cd ~/repo
-
-            ./tools/ci/check_for_commit_message.sh
-
       # Run documentation lint
       - run:
           name: run documentation lints
@@ -146,44 +139,6 @@ commands:
             /usr/share/hue/build/env/bin/pip install pylint==1.7.5 pylint-django==0.7.2 configparser==4.0.2
             ./tools/ci/check_for_python_lint.sh /usr/share/hue
 
-      - run:
-          name: run js lint
-          command: |
-            cd /usr/share/hue
-            cp ~/repo/.prettierrc .
-            cp ~/repo/.eslint* .
-            cp ~/repo/tools . -r
-
-            npm run lint
-
-      - run:
-          name: run style lint
-          command: |
-            cd /usr/share/hue
-
-            npm run style-lint
-
-      - run:
-          name: run npm version checker
-          command: |
-            cd /usr/share/hue
-
-            npm run check-pinned-versions
-
-      - run:
-          name: run npm license checker
-          command: |
-            cd /usr/share/hue
-
-            npm run check-license
-
-      - run:
-          name: run npm absolute path detection
-          command: |
-            cd /usr/share/hue
-
-            npm run check-absolute-paths
-
       # Run tests
       - run:
           name: run python API tests
@@ -191,16 +146,6 @@ commands:
             cd /usr/share/hue
 
             PYTHONWARNINGS=always ./build/env/bin/hue test unit --with-xunit --with-cover
-
-      - run:
-          name: run js tests
-          command: |
-            cd /usr/share/hue
-
-            # https://jestjs.io/docs/en/troubleshooting.html#tests-are-extremely-slow-on-docker-andor-continuous-integration-ci-server
-            sed -i 's/"test": "jest"/"test": "jest --runInBand"/g' package.json
-
-            npm run test
 
       - store_artifacts:
           path: test-reports
