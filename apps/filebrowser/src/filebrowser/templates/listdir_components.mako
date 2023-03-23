@@ -461,7 +461,7 @@ else:
     <div id="createDirectoryModal" class="modal hide fade">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
-        <!-- ko if: (!isS3() && !isABFS() && !isOFS()) || (isS3() && !isS3Root()) || (isABFS() && !isABFSRoot()) || (isOFS() && !isOFSRoot() && !isOFSVol())  -->
+        <!-- ko if: (!isS3() && !isABFS() && !isOFS()) || (isS3() && !isS3Root()) || (isABFS() && !isABFSRoot()) || (isOFS() && !isOFSServiceID() && !isOFSVol())  -->
         <h2 class="modal-title">${_('Create Directory')}</h2>
         <!-- /ko -->
         <!-- ko if: (isS3() && isS3Root()) || (isOFS() && isOFSVol()) -->
@@ -470,13 +470,13 @@ else:
         <!-- ko if: isABFS() && isABFSRoot() -->
         <h2 class="modal-title">${_('Create File System')}</h2>
         <!-- /ko -->
-        <!-- ko if: isOFS() && isOFSRoot() -->
+        <!-- ko if: isOFS() && isOFSServiceID() -->
         <h2 class="modal-title">${_('Create Volume')}</h2>
         <!-- /ko -->
       </div>
       <div class="modal-body">
         <label>
-          <!-- ko if: (!isS3() && !isABFS() && !isOFS()) || (isS3() && !isS3Root()) || (isABFS() && !isABFSRoot()) || (isOFS() && !isOFSRoot() && !isOFSVol()) -->
+          <!-- ko if: (!isS3() && !isABFS() && !isOFS()) || (isS3() && !isS3Root()) || (isABFS() && !isABFSRoot()) || (isOFS() && !isOFSServiceID() && !isOFSVol()) -->
           ${_('Directory Name')}
           <!-- /ko -->
           <!-- ko if: (isS3() && isS3Root()) || (isOFS() && isOFSVol()) -->
@@ -485,7 +485,7 @@ else:
           <!-- ko if: isABFS() && isABFSRoot() -->
           ${_('File System Name')}
           <!-- /ko -->
-          <!-- ko if: isOFS() && isOFSRoot() -->
+          <!-- ko if: isOFS() && isOFSServiceID() -->
           ${_('Volume Name')}
           <!-- /ko -->
           <input id="newDirectoryNameInput" name="name" value="" type="text" class="input-xlarge"/></label>
@@ -587,12 +587,12 @@ else:
   <!-- actions context menu -->
   <ul class="context-menu dropdown-menu">
   <!-- ko ifnot: $root.inTrash -->
-    <li data-bind="visible: (!isS3() && !isABFS() && !isOFS()) || (isS3() && !isS3Root()) || (isABFS() && !isABFSRoot()) || (isOFS() && !isOFSRoot() && !isOFSVol()), css: {'disabled': $root.selectedFiles().length != 1 || isCurrentDirSelected().length > 0}">
+    <li data-bind="visible: (!isS3() && !isABFS() && !isOFS()) || (isS3() && !isS3Root()) || (isABFS() && !isABFSRoot()) || (isOFS() && !isOFSServiceID() && !isOFSVol()), css: {'disabled': $root.selectedFiles().length != 1 || isCurrentDirSelected().length > 0}">
     <a href="javascript: void(0)" title="${_('Rename')}" data-bind="click: ($root.selectedFiles().length == 1 && isCurrentDirSelected().length == 0) ? $root.renameFile: void(0)"><i class="fa fa-fw fa-font"></i>
     ${_('Rename')}</a></li>
-    <li data-bind="visible: (!isS3() && !isABFS() && !isOFS()) || (isS3() && !isS3Root()) || (isABFS() && !isABFSRoot()) || (isOFS() && !isOFSRoot() && !isOFSVol()), css: {'disabled': $root.selectedFiles().length == 0 || isCurrentDirSelected().length > 0}">
+    <li data-bind="visible: (!isS3() && !isABFS() && !isOFS()) || (isS3() && !isS3Root()) || (isABFS() && !isABFSRoot()) || (isOFS() && !isOFSServiceID() && !isOFSVol()), css: {'disabled': $root.selectedFiles().length == 0 || isCurrentDirSelected().length > 0}">
     <a href="javascript: void(0)" title="${_('Move')}" data-bind="click: ( $root.selectedFiles().length > 0 && isCurrentDirSelected().length == 0) ? $root.move: void(0)"><i class="fa fa-fw fa-random"></i> ${_('Move')}</a></li>
-    <li data-bind="visible: (!isS3() && !isABFS() && !isOFS()) || (isS3() && !isS3Root()) || (isABFS() && !isABFSRoot()) || (isOFS() && !isOFSRoot() && !isOFSVol()), css: {'disabled': $root.selectedFiles().length == 0 || isCurrentDirSelected().length > 0}">
+    <li data-bind="visible: (!isS3() && !isABFS() && !isOFS()) || (isS3() && !isS3Root()) || (isABFS() && !isABFSRoot()) || (isOFS() && !isOFSServiceID() && !isOFSVol()), css: {'disabled': $root.selectedFiles().length == 0 || isCurrentDirSelected().length > 0}">
     <a href="javascript: void(0)" title="${_('Copy')}" data-bind="click: ($root.selectedFiles().length > 0 && isCurrentDirSelected().length == 0) ? $root.copy: void(0)"><i class="fa fa-fw fa-files-o"></i> ${_('Copy')}</a></li>
     % if show_download_button:
     <li data-bind="css: {'disabled': $root.inTrash() || $root.selectedFiles().length != 1 || selectedFile().type != 'file'}">
@@ -1156,8 +1156,12 @@ else:
         return self.isOFS() && self.currentPath().toLowerCase() === 'ofs://';
       });
 
-      self.isOFSVol = ko.pureComputed(function () {
+      self.isOFSServiceID = ko.pureComputed(function () {
         return self.isOFS() && self.currentPath().split("/").length === 3 && self.currentPath().split("/")[2] !== '';
+      });
+
+      self.isOFSVol = ko.pureComputed(function () {
+        return self.isOFS() && self.currentPath().split("/").length === 4 && self.currentPath().split("/")[3] !== '';
       });
 
       self.inTrash = ko.computed(function() {
@@ -1860,7 +1864,7 @@ else:
           resetPrimaryButtonsStatus(); //globally available
           return false;
         }
-        if (self.isOFSRoot() || self.isOFSVol()) {
+        if (self.isOFSServiceID() || self.isOFSVol()) {
           if ($("#newDirectoryNameInput").val().length < 3 || $("#newDirectoryNameInput").val().length > 63) {
             $("#volumeBucketNameAlert").show();
             $("#newDirectoryNameInput").addClass("fieldError");
