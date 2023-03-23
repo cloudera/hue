@@ -2050,7 +2050,8 @@ class ClusterConfig(object):
         'displayName': _('ABFS'),
         'buttonName': _('Browse'),
         'tooltip': _('ABFS'),
-        'page': '/filebrowser/view=' + urllib_quote(home_path, safe=SAFE_CHARACTERS_URI_COMPONENTS)
+        'page': '/filebrowser/view=' + urllib_quote(home_path, safe=SAFE_CHARACTERS_URI_COMPONENTS),
+        'homePath': home_path
       })
 
     if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('ofs', self.user):

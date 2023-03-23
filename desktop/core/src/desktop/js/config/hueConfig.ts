@@ -124,7 +124,8 @@ export const filterEditorConnectors = (
   connectorTest: ConnectorTest<AppType.editor>
 ): EditorInterpreter[] => filterConnector(AppType.editor, connectorTest);
 
-const rootPathRegex = /.*%3A%2F%2F(.+)$/;
+// const rootPathRegex = /.*%3A%2F%2F(.+)$/;
+const rootPathRegex = /.*:\/\/(.+)$/;
 
 /**
  * This takes the initial path from the "browser" config, used in cases where the users can't access '/'
@@ -134,7 +135,8 @@ export const getRootFilePath = (connector: BrowserInterpreter): string => {
   if (!connector || connector.type === 'hdfs') {
     return '';
   }
-  const match = connector.page.match(rootPathRegex);
+  // const match = connector.page.match(rootPathRegex);
+  const match = connector.homePath?.match(rootPathRegex);
   if (match) {
     return match[1] + '/';
   }

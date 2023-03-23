@@ -118,7 +118,9 @@ export interface EditorInterpreter extends IdentifiableInterpreter {
 }
 
 /* eslint-disable @typescript-eslint/no-empty-interface */
-export interface BrowserInterpreter extends Interpreter {}
+export interface BrowserInterpreter extends Interpreter {
+  homePath?: string
+}
 
 export interface CatalogInterpreter extends IdentifiableInterpreter {
   is_catalog: boolean;

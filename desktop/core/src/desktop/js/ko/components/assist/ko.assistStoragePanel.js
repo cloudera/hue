@@ -204,8 +204,10 @@ class AssistStoragePanel {
     this.selectedStorageEntry = ko.observable();
 
     this.activeSource.subscribe(newValue => {
+      console.info('activeSource', newValue);
       if (newValue) {
         this.rootPath = getRootFilePath(this.activeSource());
+        console.info('rootPath', this.rootPath);
         setInLocalStorage('assist.lastStorageSource', newValue.type);
         this.selectedStorageEntry(undefined);
         this.reload();
@@ -229,6 +231,7 @@ class AssistStoragePanel {
         this.activeSource().type === 'ofs'
           ? '/'
           : window.USER_HOME_DIR;
+      console.info('0. assist.storage.go.home', path);
       this.loadPath(path);
       setInLocalStorage('assist.currentStoragePath_' + this.activeSource().type, path);
     });
@@ -237,6 +240,7 @@ class AssistStoragePanel {
   }
 
   loadPath(path) {
+    console.info('1. load path', path);
     this.loading(true);
     let relativePath = path;
     if (this.rootPath) {

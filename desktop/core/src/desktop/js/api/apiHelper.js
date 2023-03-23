@@ -413,9 +413,14 @@ class ApiHelper {
    * @param {string} [options.filter]
    */
   fetchAbfsPath(options) {
+    // const [encodedRemoteStorageHome, ...filePath] = options.pathParts;
+    // const encodedFilePath = filePath ? encodeURIComponent('/' + filePath.join('/')) : '';
+
     let url =
       URLS.ABFS_API_PREFIX +
-      options.pathParts.join('/') +
+      // encodedRemoteStorageHome +
+      // encodedFilePath +
+      encodeURI(options.pathParts.join('/')) +
       '?format=json&sortby=name&descending=false&pagesize=' +
       (options.pageSize || 500) +
       '&pagenum=' +
