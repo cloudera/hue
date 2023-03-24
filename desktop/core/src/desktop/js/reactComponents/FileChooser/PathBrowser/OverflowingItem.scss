@@ -14,18 +14,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { get } from '../../api/utils';
-import { CancellablePromise } from '../../api/cancellablePromise';
-import { PathAndFileData } from './types';
+.hue-path-browser__overflowing-label {
+  background-color: transparent;
+  white-space: nowrap;
+  padding: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border: none;
+  flex: 0 1 auto;
+  box-shadow: none;
 
-const FILESYSTEMS_API_URL = '/api/storage/filesystems';
-const VIEWFILES_API_URl = '/api/storage/view=';
-export interface ApiFileSystem {
-  file_system: string;
-  user_home_directory: string;
+  > span {
+    display: contents;
+  }
 }
-
-export const fetchFileSystems = (): CancellablePromise<ApiFileSystem[]> => get(FILESYSTEMS_API_URL);
-
-export const fetchFiles = (filePath: string): CancellablePromise<PathAndFileData> =>
-  get(VIEWFILES_API_URl + filePath);

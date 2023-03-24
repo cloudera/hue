@@ -30,9 +30,10 @@
     "node": ">=0.10.0"
   },
   "dependencies": {
+    "@ant-design/icons": "5.0.1",
     "@gethue/sql-formatter": "4.0.3",
     "@selectize/selectize": "0.14.0",
-    "antd": "4.23.1",
+    "antd": "4.24.5",
     "axios": "0.24.0",
     "babel-preset-react-app": "3.1.2",
     "classnames": "2.3.2",
