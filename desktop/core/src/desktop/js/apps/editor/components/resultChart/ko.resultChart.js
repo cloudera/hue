@@ -863,7 +863,7 @@ class ResultChart extends DisposableComponent {
   }
 
   prepopulateChart() {
-    if (!window.ENABLE_NOTEBOOK_2) {
+    if (!window.ENABLE_HUE_5) {
       const type = this.chartType();
       hueAnalytics.log('notebook', 'chart/' + type);
     }

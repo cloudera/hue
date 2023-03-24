@@ -60,7 +60,7 @@ import {
 } from 'ko/components/assist/events';
 import { EXECUTABLE_UPDATED_TOPIC } from './execution/events';
 
-// TODO: Remove for ENABLE_NOTEBOOK_2. Temporary here for debug
+// TODO: Remove together with ENABLE_HUE_5. Temporary here for debug
 window.SqlExecutable = SqlExecutable;
 window.Executor = Executor;
 
@@ -879,7 +879,7 @@ export default class Snippet {
 
   handleAjaxError(data, callback) {
     if (data.status === -2) {
-      // TODO: Session expired, check if handleAjaxError is used for ENABLE_NOTEBOOK_2
+      // TODO: Session expired, check if handleAjaxError is used for ENABLE_HUE_5
     } else if (data.status === -3) {
       // Statement expired
       this.status(STATUS.expired);

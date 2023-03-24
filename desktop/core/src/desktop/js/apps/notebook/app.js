@@ -41,7 +41,7 @@ const HUE_PUB_SUB_EDITOR_ID =
   window.location.pathname.indexOf('notebook') > -1 ? 'notebook' : 'editor';
 
 huePubSub.subscribe('app.dom.loaded', app => {
-  if ((app === 'editor' && !window.ENABLE_NOTEBOOK_2) || app === 'notebook') {
+  if ((app === 'editor' && !window.ENABLE_HUE_5) || app === 'notebook') {
     window.MAIN_SCROLLABLE = '.page-content';
 
     let isLeftNavOpen = false;

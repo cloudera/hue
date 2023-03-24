@@ -221,11 +221,9 @@ The query execution has been rewritten for better stability and running more tha
 
 Here is how to enable it in the `hue.ini`.
 
-    [notebook]
-    enable_notebook_2=true
-
     [desktop]
     enable_connectors=true
+    enable_hue_5=true
 
 **Note** [https://demo.gethue.com/](https://demo.gethue.com/) has the new Editor enabled
 
