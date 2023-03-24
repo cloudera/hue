@@ -205,6 +205,18 @@ X_FRAME_OPTIONS = Config(
   type=str,
   default="SAMEORIGIN")
 
+HUE_IMAGE_VERSION = Config(
+  key="hue_image_version",
+  help=_("Image version of Hue"),
+  type=str,
+  default="")
+
+HUE_HOST_NAME = Config(
+  key="hue_host",
+  help=_("Name of Hue host selected"),
+  type=str,
+  default="")
+
 LIMIT_REQUEST_FIELD_SIZE = Config(
   key="limit_request_field_size",
   help=_("This property specifies the maximum allowed size of an HTTP request header field."),

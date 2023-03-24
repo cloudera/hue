@@ -51,7 +51,8 @@ from useradmin.organization import _fitered_queryset
 from desktop import appmanager
 from desktop.auth.backend import is_admin
 from desktop.conf import get_clusters, IS_MULTICLUSTER_ONLY, ENABLE_ORGANIZATIONS, ENABLE_PROMETHEUS, \
-    has_connectors, TASK_SERVER, APP_BLACKLIST, COLLECT_USAGE, ENABLE_SHARING, ENABLE_CONNECTORS, ENABLE_UNIFIED_ANALYTICS, RAZ
+    has_connectors, TASK_SERVER, APP_BLACKLIST, COLLECT_USAGE, ENABLE_SHARING, ENABLE_CONNECTORS, ENABLE_UNIFIED_ANALYTICS, RAZ, \
+    HUE_IMAGE_VERSION, HUE_HOST_NAME
 from desktop.lib import fsmanager
 from desktop.lib.connectors.api import _get_installed_connectors
 from desktop.lib.connectors.models import Connector
@@ -79,8 +80,7 @@ SAMPLE_USER_OWNERS = ['hue', 'sample']
 
 UTC_TIME_FORMAT = "%Y-%m-%dT%H:%M"
 HUE_VERSION = None
-SELECTED_HUE_VW = None
-HUE_IMAGE_VERSION = None
+IMAGE_VERSION = None
 
 
 def uuid_default():
@@ -95,55 +95,25 @@ def hue_version():
   return HUE_VERSION
 
 def hue_image_version():
-  global HUE_IMAGE_VERSION
+  global IMAGE_VERSION
 
-  if HUE_IMAGE_VERSION is None:
+  if IMAGE_VERSION is None:
     p = get_run_root('cloudera', 'cdh_version.properties')
     if os.path.exists(p):
       build_version = _version_from_properties(open(p))
       if build_version:
-        HUE_IMAGE_VERSION = '%s' % (build_version)
+        IMAGE_VERSION = '%s' % (build_version)
 
-    elif os.getenv('HUE_CONF_DIR') and os.path.exists(os.getenv('HUE_CONF_DIR')):
-      cdw_path = os.getenv('HUE_CONF_DIR') + '/zhue.ini'
-      if os.path.exists(cdw_path):
-        hue_img_version = _version_from_hue_conf(open(cdw_path))
-        if hue_img_version:
-          HUE_IMAGE_VERSION = '%s' % (hue_img_version)
+    else:
+      IMAGE_VERSION = HUE_IMAGE_VERSION.get()
 
-  return HUE_IMAGE_VERSION
+  return IMAGE_VERSION
 
-def selected_hue_vw():
-  global SELECTED_HUE_VW
-
-  if SELECTED_HUE_VW is None:
-    if os.getenv('HUE_CONF_DIR') and os.path.exists(os.getenv('HUE_CONF_DIR')):
-      cdw_path = os.getenv('HUE_CONF_DIR') + '/zhue.ini'
-      if os.path.exists(cdw_path):
-        selected_hue_vw_name = _vw_name_from_hue_conf(open(cdw_path))
-        if selected_hue_vw_name:
-          SELECTED_HUE_VW = '%s' % (selected_hue_vw_name)
-
-  return SELECTED_HUE_VW
+def name_of_hue_host():
+  return HUE_HOST_NAME.get()
 
 def _version_from_properties(f):
   return dict(line.strip().split('=') for line in f.readlines() if len(line.strip().split('=')) == 2).get('cloudera.cdh.release')
-
-def _version_from_hue_conf(f):
-  hue_img_version = ''
-  for line in f.readlines():
-    if 'hue_image_version' in line:
-      hue_img_version += line.split('=')[1].replace('"', '').strip()
-
-  return hue_img_version
-
-def _vw_name_from_hue_conf(f):
-  selected_hue_vw_name = ''
-  for line in f.readlines():
-    if 'selected_hue_vw' in line:
-      selected_hue_vw_name += line.split('=')[1].replace('"', '').strip()
-
-  return selected_hue_vw_name
 
 def get_sample_user_install(user):
   if ENABLE_ORGANIZATIONS.get():
@@ -1809,8 +1779,8 @@ class ClusterConfig(object):
     editors = app_config.get('editor')
     main_button_action = self.get_main_quick_action(app_config)
     img_version = hue_image_version()
-    hue_version1 = hue_version()
-    selected_hue_vw_name = selected_hue_vw()
+    version_of_hue = hue_version()
+    hue_host_name = name_of_hue_host()
 
     if main_button_action.get('is_sql'):
       default_sql_interpreter = main_button_action['type']
@@ -1835,9 +1805,9 @@ class ClusterConfig(object):
         'enable_sharing': ENABLE_SHARING.get(),
         'collect_usage': COLLECT_USAGE.get()
       },
-      'vw_name': selected_hue_vw_name,
+      'vw_name': hue_host_name,
       'img_version': img_version,
-      'hue_version': hue_version1
+      'hue_version': version_of_hue
     }
 
 
@@ -2114,9 +2084,9 @@ class ClusterConfig(object):
 
     if 'jobbrowser' in self.apps:
       from hadoop.cluster import get_default_yarncluster  # Circular loop
-      from jobbrowser.conf import ENABLE_HIVE_QUERY_BROWSER, ENABLE_QUERIES_LIST
+      from jobbrowser.conf import ENABLE_HIVE_QUERY_BROWSER, QUERY_STORE
 
-      if get_default_yarncluster() or ENABLE_HIVE_QUERY_BROWSER.get() or ENABLE_QUERIES_LIST.get():
+      if get_default_yarncluster() or ENABLE_HIVE_QUERY_BROWSER.get() or QUERY_STORE.IS_ENABLED.get():
         interpreters.append({
           'type': 'yarn',
           'displayName': _('Jobs'),

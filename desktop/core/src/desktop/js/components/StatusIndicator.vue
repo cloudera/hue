@@ -32,7 +32,9 @@
   // TODO: Support spinner
   const ICON_MAPPING: { [value: string]: string } = {
     success: 'hi-status-success',
+    finished: 'hi-status-success',
     error: 'hi-status-error',
+    exception: 'hi-status-error',
     warning: 'hi-status-warning',
     stopped: 'hi-status-stopped'
   };

@@ -77,13 +77,6 @@ ENABLE_HIVE_QUERY_BROWSER = Config(
   default=False
 )
 
-ENABLE_QUERIES_LIST = Config(
-  key="enable_queries_list",
-  help=_("Show the Queries section for listing Hive/Impala query history and providing more troubleshooting information."),
-  type=coerce_bool,
-  default=False
-)
-
 ENABLE_HISTORY_V2 = Config(
   key="enable_history_v2",
   help=_("Show the version 2 of job/query History which unifies the all into one."),
@@ -91,15 +84,25 @@ ENABLE_HISTORY_V2 = Config(
   default=False
 )
 
+def is_query_store_url_set():
+  """Check if query store url is configured"""
+  return QUERY_STORE.SERVER_URL.get() != ''
+
 QUERY_STORE = ConfigSection(
   key="query_store",
-  help=_("""Credentials for query store API."""),
+  help=_("Configs for managing query store interface."),
   members=dict(
     SERVER_URL=Config(
       key="server_url",
-      default='http://localhost:8080/',
+      default='',
       help=_("URL of Query Store API server.")
-    )
+    ),
+    IS_ENABLED=Config(
+      key="is_enabled",
+      type=coerce_bool,
+      dynamic_default=is_query_store_url_set,
+      help=_("Visualize Hive/Impala query history data from Query Store.")
+    ),
   )
 )
 
