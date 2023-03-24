@@ -34,14 +34,14 @@ describe('snippet.js', () => {
     }
   };
 
-  const previousEnableNotebook2 = window.ENABLE_NOTEBOOK_2;
+  const previousEnableHue5 = window.ENABLE_HUE_5;
 
   beforeAll(() => {
-    window.ENABLE_NOTEBOOK_2 = true;
+    window.ENABLE_HUE_5 = true;
   });
 
   afterAll(() => {
-    window.ENABLE_NOTEBOOK_2 = previousEnableNotebook2;
+    window.ENABLE_HUE_5 = previousEnableHue5;
   });
 
   beforeEach(() => {

@@ -32,13 +32,11 @@ Read about [how to build your own parser](/developer/development/#sql-parsers) i
 
 ### Connectors
 
-Admins can configure the connectors via the UI or [API](/developer/api/rest/#connectors). This feature requires Editor v2 and is quite functional despite not being offically released and on by default.
+Admins can configure the connectors via the UI or [API](/developer/api/rest/#connectors). This feature requires the Hue 5 feature flag set and is quite functional despite not being officially released and on by default.
 
     [desktop]
     enable_connectors=true
-
-    [notebook]
-    enable_notebook_2=true
+    enable_hue_5=true
 
 **NOTE:** After enabling the above flags, if a `django.db.utils.OperationalError: (1054, "Unknown column 'useradmin_huepermission.connector_id' in 'field list'")` error comes, then try **changing the DB name** in the hue.ini under `[[database]]` because there is no upgrade path and run the migrate command `./build/env/bin/hue migrate`.
 

@@ -59,7 +59,7 @@ class OnePageViewModel {
           waitForObservable(viewModel.selectedNotebook, () => {
             if (viewModel.editorType() !== type) {
               viewModel.selectedNotebook().selectedSnippet(type);
-              if (!window.ENABLE_NOTEBOOK_2) {
+              if (!window.ENABLE_HUE_5) {
                 viewModel.editorType(type);
               }
               viewModel.newNotebook(type);
@@ -597,7 +597,7 @@ class OnePageViewModel {
                   self.isLoadingEmbeddable(true);
                   viewModel
                     .openNotebook(getUrlParameter('editor'))
-                    [window.ENABLE_NOTEBOOK_2 ? 'finally' : 'always'](() => {
+                    [window.ENABLE_HUE_5 ? 'finally' : 'always'](() => {
                       self.isLoadingEmbeddable(false);
                     });
                 });
@@ -691,11 +691,9 @@ class OnePageViewModel {
           if (notebookId !== '') {
             self.getActiveAppViewModel(viewModel => {
               self.isLoadingEmbeddable(true);
-              viewModel
-                .openNotebook(notebookId)
-                [window.ENABLE_NOTEBOOK_2 ? 'finally' : 'always'](() => {
-                  self.isLoadingEmbeddable(false);
-                });
+              viewModel.openNotebook(notebookId)[window.ENABLE_HUE_5 ? 'finally' : 'always'](() => {
+                self.isLoadingEmbeddable(false);
+              });
             });
           } else {
             self.getActiveAppViewModel(viewModel => {
