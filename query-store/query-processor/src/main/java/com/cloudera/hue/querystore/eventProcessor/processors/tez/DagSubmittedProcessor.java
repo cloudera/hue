@@ -66,7 +66,7 @@ public class DagSubmittedProcessor implements TezEventProcessor {
 
     // TODO: We should refine this further by CALLER_CONTEXT_TYPE.
     HiveQueryBasicInfo hiveQuery = null;
-    String hiveQueryId = otherInfo.get(ATSConstants.CALLER_CONTEXT_ID);
+    String hiveQueryId = extractQueryId(otherInfo);
     if (hiveQueryId != null) {
       Optional<HiveQueryBasicInfo> firstHiveQuery = hiveQueryRepository.findByHiveQueryId(hiveQueryId);
       if (!firstHiveQuery.isPresent()) {
@@ -114,7 +114,7 @@ public class DagSubmittedProcessor implements TezEventProcessor {
       dagInfo.setCreatedAt(LocalDateTime.ofInstant(Instant.ofEpochMilli(event.getEventTime()), ZoneId.systemDefault()));
     }
     dagInfo.setQueueName(otherInfo.get(ATSConstants.DAG_QUEUE_NAME));
-    dagInfo.setCallerId(otherInfo.get(ATSConstants.CALLER_CONTEXT_ID));
+    dagInfo.setCallerId(extractQueryId(otherInfo));
     dagInfo.setCallerType(otherInfo.get(ATSConstants.CALLER_CONTEXT_TYPE));
     dagInfo.setAmWebserviceVer(otherInfo.get(ATSConstants.DAG_AM_WEB_SERVICE_VERSION));
     dagInfo.setSourceFile(filePath.toString());
@@ -148,7 +148,7 @@ public class DagSubmittedProcessor implements TezEventProcessor {
     HiveHookEventProto.Builder builder = HiveHookEventProto.newBuilder();
     builder.setEventType(HiveEventType.QUERY_SUBMITTED.toString());
     Map<String, String> otherInfo = event.getOtherInfo();
-    String hiveQueryId = otherInfo.get(ATSConstants.CALLER_CONTEXT_ID);
+    String hiveQueryId = extractQueryId(otherInfo);
     builder.setHiveQueryId(hiveQueryId);
     builder.setTimestamp(event.getEventTime());
     builder.setUser(event.getUser());
@@ -161,5 +161,14 @@ public class DagSubmittedProcessor implements TezEventProcessor {
   @Override
   public TezEventType[] validEvents() {
     return new TezEventType[]{TezEventType.DAG_SUBMITTED};
+  }
+
+  private String extractQueryId(Map<String, String> otherInfo) {
+    String hiveQueryId = otherInfo.get(ATSConstants.CALLER_CONTEXT_ID);
+    if(hiveQueryId != null) {
+      // Needed because of https://issues.apache.org/jira/browse/HIVE-26789
+      hiveQueryId = hiveQueryId.split("_User")[0];
+    }
+    return hiveQueryId;
   }
 }
