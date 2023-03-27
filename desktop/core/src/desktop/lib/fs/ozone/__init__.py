@@ -46,15 +46,15 @@ def normpath(path):
   return normalized
 
 
-def abspath(path, key):
+def abspath(path, key, ofs_serviceid):
   """
   Returns absolute URI, examples:
 
-  abspath('ofs://volume/bucket/key', key2') == 'ofs://volume/bucket/key/key2'
-  abspath('ofs://volume/bucket/key', 'ofs://volume/bucket2/key2') == 'ofs://volume/bucket2/key2'
+  abspath('ofs://ozone1/volume/bucket/key', key2') == 'ofs://ozone1/volume/bucket/key/key2'
+  abspath('ofs://ozone1/volume/bucket/key', 'ofs://ozone1/volume/bucket2/key2') == 'ofs://ozone1/volume/bucket2/key2'
   """
   if path.lower().startswith(OFS_ROOT):
-    key = join(path, key)
+    key = _serviceid_join(join(path, key), ofs_serviceid)
   else:
     key = normpath(join(path, key))
   return key
@@ -67,10 +67,15 @@ def join(*comp_list):
     except ValueError:
       return '/' if is_root(uri) else uri
   joined = posixpath.join(*list(map(_prep, comp_list)))
-  if joined and joined[0] == '/':
-    joined = 'ofs:/%s' % joined
   return joined
 
+def _serviceid_join(path, ofs_serviceid):
+  if path and (path == '/' or path.startswith('/' + ofs_serviceid)):
+    path = 'ofs:/' + path
+  elif path and not path.startswith(OFS_ROOT + ofs_serviceid + '/'):
+    path = OFS_ROOT + ofs_serviceid + '/' + path.lstrip('/')
+  
+  return path
 
 def _append_separator(path):
   if path and not path.endswith('/'):
@@ -80,13 +85,13 @@ def _append_separator(path):
 
 def parse_uri(uri):
   """
-  Returns tuple (volume_name, key_name, key_basename).
+  Returns tuple (service_id, key_name, key_basename).
   Raises ValueError if invalid OFS URI is passed.
   
-  ofs://volume1/bucket1/key1/key2 -> 
-  group1 -> volume1
-  group2 -> /bucket1/key1/key2
-  group3 -> bucket1/key1/key2
+  ofs://ozone1/volume1/bucket1/key1/key2 -> 
+  group1 -> ozone1
+  group2 -> /volume1/bucket1/key1/key2
+  group3 -> volume1/bucket1/key1/key2
   group4 -> key2
   """
   match = OFS_PATH_RE.match(uri)
@@ -97,14 +102,14 @@ def parse_uri(uri):
   return match.group(1), key_name, key_basename
 
 
-def parent_path(path):
+def parent_path(path, ofs_serviceid):
   parent_dir = _append_separator(path)
   if not is_root(parent_dir):
-    volume_name, key_name, key_basename = parse_uri(path)
-    if not key_basename:  # volume is top-level so return root
+    service_id, key_name, key_basename = parse_uri(path)
+    if not key_basename:  # service_id is top-level so return root
       parent_dir = OFS_ROOT
     else:
-      volume_path = '%s%s' % (OFS_ROOT, volume_name)
+      service_id_path = '%s%s' % (OFS_ROOT, service_id)
       key_path = '/'.join(key_name.split('/')[:-1])
-      parent_dir = abspath(volume_path, key_path)
+      parent_dir = abspath(service_id_path, key_path, ofs_serviceid)
   return parent_dir

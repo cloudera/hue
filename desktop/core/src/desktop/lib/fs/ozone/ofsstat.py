@@ -24,7 +24,7 @@ from django.utils.encoding import smart_str
 from hadoop.fs.hadoopfs import decode_fs_path
 from hadoop.fs.webhdfs_types import WebHdfsStat
 
-from desktop.lib.fs.ozone import join as ofs_join
+from desktop.lib.fs.ozone import _serviceid_join, join as ofs_join
 
 class OzoneFSStat(WebHdfsStat):
   """
@@ -33,9 +33,9 @@ class OzoneFSStat(WebHdfsStat):
   Modelled after org.apache.hadoop.fs.FileStatus
   """
 
-  def __init__(self, file_status, parent_path):
+  def __init__(self, file_status, parent_path, ofs_serviceid=''):
     super(OzoneFSStat, self).__init__(file_status, parent_path)
-    self.path = ofs_join(parent_path, self.name)
+    self.path = _serviceid_join(ofs_join(parent_path, self.name), ofs_serviceid)
 
   def __unicode__(self):
     return "[OzoneFSStat] %7s %8s %8s %12s %s%s" % (oct(self.mode), self.user, self.group, self.size, self.path, self.isDir and '/' or "")
