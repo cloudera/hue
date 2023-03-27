@@ -23,8 +23,10 @@ import logging
 import sys
 import threading
 
+from django.utils.encoding import smart_str
+
 from desktop.lib.rest import http_client, resource
-from desktop.lib.fs.ozone import OFS_ROOT, normpath, is_root, parent_path
+from desktop.lib.fs.ozone import OFS_ROOT, normpath, is_root, parent_path, _serviceid_join, join as ofs_join
 from desktop.lib.fs.ozone.ofsstat import OzoneFSStat
 from desktop.conf import PERMISSION_ACTION_OFS
 
@@ -85,10 +87,11 @@ class OzoneFS(WebHdfs):
     )
 
   def strip_normpath(self, path):
-    if path.startswith('ofs://'):
-      path = path[5:]
-    elif path.startswith('ofs:/'):
-      path = path[4:]
+    if path.startswith(OFS_ROOT + self._netloc):
+      path = path.split(OFS_ROOT + self._netloc)[1]
+    elif path.startswith('ofs:/' + self._netloc):
+      path = path.split('ofs:/' + self._netloc)[1]
+
     return path
 
   def normpath(self, path):
@@ -101,7 +104,7 @@ class OzoneFS(WebHdfs):
     return is_root(path)
 
   def parent_path(self, path):
-    return parent_path(path)
+    return parent_path(path, self._netloc)
 
   def listdir_stats(self, path, glob=None):
     """
@@ -109,31 +112,54 @@ class OzoneFS(WebHdfs):
 
     Get directory listing with stats.
     """
-    path = self.strip_normpath(path)
-    params = self._getparams()
-    if glob is not None:
-      params['filter'] = glob
-    params['op'] = 'LISTSTATUS'
-    headers = self._getheaders()
-    json = self._root.get(path, params, headers)
+    if path == OFS_ROOT:
+      json = self._handle_serviceid_path_status()
+    else:
+      path = self.strip_normpath(path)
+      params = self._getparams()
+
+      if glob is not None:
+        params['filter'] = glob
+      params['op'] = 'LISTSTATUS'
+      headers = self._getheaders()
+
+      json = self._root.get(path, params, headers)
+
     filestatus_list = json['FileStatuses']['FileStatus']
-    return [OzoneFSStat(st, path) for st in filestatus_list]
+    return [OzoneFSStat(st, path, self._netloc) for st in filestatus_list]
 
   def _stats(self, path):
     """
     This stats method returns None if the entry is not found.
     """
-    path = self.strip_normpath(path)
-    params = self._getparams()
-    params['op'] = 'GETFILESTATUS'
-    headers = self._getheaders()
-    try:
-      json = self._root.get(path, params, headers)
-      return OzoneFSStat(json['FileStatus'], path)
-    except WebHdfsException as ex:
-      if ex.server_exc == 'FileNotFoundException' or ex.code == 404:
-        return None
-      raise ex
+    if path == OFS_ROOT:
+      serviceid_path_status = self._handle_serviceid_path_status()['FileStatuses']['FileStatus'][0]
+      json = {'FileStatus': serviceid_path_status}
+    else:
+      path = self.strip_normpath(path)
+      params = self._getparams()
+      params['op'] = 'GETFILESTATUS'
+      headers = self._getheaders()
+
+      try:
+        json = self._root.get(path, params, headers)
+      except WebHdfsException as ex:
+        if ex.server_exc == 'FileNotFoundException' or ex.code == 404:
+          return None
+        raise ex
+    
+    return OzoneFSStat(json['FileStatus'], path, self._netloc)
+  
+  def _handle_serviceid_path_status(self):
+    json = {
+      'FileStatuses': {
+        'FileStatus': [{
+          'pathSuffix': self._netloc, 'type': 'DIRECTORY', 'length': 0, 'owner': '', 'group': '', 
+          'permission': '777', 'accessTime': 0, 'modificationTime': 0, 'blockSize': 0, 'replication': 0
+          }]
+        }
+      }
+    return json
   
   def stats(self, path):
     """
@@ -152,3 +178,35 @@ class OzoneFS(WebHdfs):
     Upload is done by the OFSFileUploadHandler
     """
     pass
+
+  def rename(self, old, new):
+    """rename(old, new)"""
+    old = self.strip_normpath(old)
+    if not self.is_absolute(new):
+      new = _serviceid_join(ofs_join(self.dirname(old), new), self._netloc)
+    new = self.strip_normpath(new)
+
+    params = self._getparams()
+    params['op'] = 'RENAME'
+    # Encode `new' because it's in the params
+    params['destination'] = smart_str(new)
+    headers = self._getheaders()
+
+    result = self._root.put(old, params, headers=headers)
+
+    if not result['boolean']:
+      raise IOError(_("Rename failed: %s -> %s") % (smart_str(old, errors='replace'), smart_str(new, errors='replace')))
+  
+  def rename_star(self, old_dir, new_dir):
+    """Equivalent to `mv old_dir/* new"""
+    if not self.isdir(old_dir):
+      raise IOError(errno.ENOTDIR, _("'%s' is not a directory") % old_dir)
+
+    if not self.exists(new_dir):
+      self.mkdir(new_dir)
+    elif not self.isdir(new_dir):
+      raise IOError(errno.ENOTDIR, _("'%s' is not a directory") % new_dir)
+  
+    ls = self.listdir(old_dir)
+    for dirent in ls:
+      self.rename(_serviceid_join(ofs_join(old_dir, dirent), self._netloc), _serviceid_join(ofs_join(new_dir, dirent), self._netloc))
