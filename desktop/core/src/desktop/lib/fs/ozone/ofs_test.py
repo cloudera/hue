@@ -56,35 +56,38 @@ class TestOFSClient(object):
 
 
   def test_strip_normpath(self):
-    test_path = self.ofs_client.strip_normpath('ofs://vol1/buk1/key')
+    test_path = self.ofs_client.strip_normpath('ofs://ozone1/vol1/buk1/key')
     assert_equal(test_path, '/vol1/buk1/key')
 
-    test_path = self.ofs_client.strip_normpath('ofs:/vol1/buk1/key')
+    test_path = self.ofs_client.strip_normpath('ofs:/ozone1/vol1/buk1/key')
     assert_equal(test_path, '/vol1/buk1/key')
 
-    test_path = self.ofs_client.strip_normpath('/vol1/buk1/key')
-    assert_equal(test_path, '/vol1/buk1/key')
+    test_path = self.ofs_client.strip_normpath('/ozone1/vol1/buk1/key')
+    assert_equal(test_path, '/ozone1/vol1/buk1/key')
 
 
   def test_normpath(self):
     test_path = self.ofs_client.normpath('ofs://')
     assert_equal(test_path, 'ofs://')
 
-    test_path = self.ofs_client.normpath('ofs://vol1/buk1/key')
-    assert_equal(test_path, 'ofs://vol1/buk1/key')
+    test_path = self.ofs_client.normpath('ofs://ozone1/vol1/buk1/key')
+    assert_equal(test_path, 'ofs://ozone1/vol1/buk1/key')
 
-    test_path = self.ofs_client.normpath('ofs://vol1/buk1/key/')
-    assert_equal(test_path, 'ofs://vol1/buk1/key')
+    test_path = self.ofs_client.normpath('ofs://ozone1/vol1/buk1/key/')
+    assert_equal(test_path, 'ofs://ozone1/vol1/buk1/key')
 
-    test_path = self.ofs_client.normpath('ofs://vol1/buk1/key//')
-    assert_equal(test_path, 'ofs://vol1/buk1/key')
+    test_path = self.ofs_client.normpath('ofs://ozone1/vol1/buk1/key//')
+    assert_equal(test_path, 'ofs://ozone1/vol1/buk1/key')
 
-    test_path = self.ofs_client.normpath('ofs://vol1/buk1//key//')
-    assert_equal(test_path, 'ofs://vol1/buk1/key')
+    test_path = self.ofs_client.normpath('ofs://ozone1/vol1/buk1//key//')
+    assert_equal(test_path, 'ofs://ozone1/vol1/buk1/key')
 
 
   def test_isroot(self):
-    is_root = self.ofs_client.isroot('ofs://vol1/buk1/key')
+    is_root = self.ofs_client.isroot('ofs://ozone1/vol1/buk1/key')
+    assert_equal(is_root, False)
+
+    is_root = self.ofs_client.isroot('ofs://ozone1')
     assert_equal(is_root, False)
 
     is_root = self.ofs_client.isroot('ofs://')
@@ -95,17 +98,36 @@ class TestOFSClient(object):
     parent_path = self.ofs_client.parent_path('ofs://')
     assert_equal(parent_path, 'ofs://')
 
-    parent_path = self.ofs_client.parent_path('ofs://vol1/buk1/dir1/file1.csv')
-    assert_equal(parent_path, 'ofs://vol1/buk1/dir1')
+    parent_path = self.ofs_client.parent_path('ofs://ozone1/vol1/buk1/dir1/file1.csv')
+    assert_equal(parent_path, 'ofs://ozone1/vol1/buk1/dir1')
 
-    parent_path = self.ofs_client.parent_path('ofs://vol1/buk1/key')
-    assert_equal(parent_path, 'ofs://vol1/buk1')
+    parent_path = self.ofs_client.parent_path('ofs://ozone1/vol1/buk1/key')
+    assert_equal(parent_path, 'ofs://ozone1/vol1/buk1')
 
-    parent_path = self.ofs_client.parent_path('ofs://vol1/buk1')
-    assert_equal(parent_path, 'ofs://vol1/')
+    parent_path = self.ofs_client.parent_path('ofs://ozone1/vol1/buk1')
+    assert_equal(parent_path, 'ofs://ozone1/vol1')
 
-    parent_path = self.ofs_client.parent_path('ofs://vol1')
+    parent_path = self.ofs_client.parent_path('ofs://ozone1/vol1')
+    assert_equal(parent_path, 'ofs://ozone1/')
+
+    parent_path = self.ofs_client.parent_path('ofs://ozone1')
     assert_equal(parent_path, 'ofs://')
+
+
+  def test_listdir_stats_for_serviceid_path(self):
+    serviceid_stat = self.ofs_client.listdir_stats('ofs://')
+    assert_equal(
+      serviceid_stat[0].to_json_dict(),
+      {'path': 'ofs://ozone1', 'size': 0, 'atime': 0, 'mtime': 0, 'mode': 16895, 'user': '', 'group': '', 'blockSize': 0, 'replication': 0}
+    )
+
+
+  def test_stats_for_serviceid_path(self):
+    serviceid_stat = self.ofs_client.stats('ofs://')
+    assert_equal(
+      serviceid_stat.to_json_dict(),
+      {'path': 'ofs://ozone1', 'size': 0, 'atime': 0, 'mtime': 0, 'mode': 16895, 'user': '', 'group': '', 'blockSize': 0, 'replication': 0}
+    )
 
 
   @classmethod

@@ -26,14 +26,14 @@ class TestOzoneFSStat(object):
       'pathSuffix': 'testfile.csv', 'type': 'FILE', 'length': 32, 'owner': 'hueadmin', 'group': 'huegroup',
       'permission': '666', 'accessTime': 1677914460588, 'modificationTime': 1677914460588, 'blockSize': 268435456, 'replication': 3}
 
-    test_parent_path = '/gethue/'
+    test_parent_path = '/ozone1/gethue/'
 
     self.stat = OzoneFSStat(test_file_status, test_parent_path)
 
 
   def test_stat_attributes(self):
     assert_equal(self.stat.name, 'testfile.csv')
-    assert_equal(self.stat.path, 'ofs://gethue/testfile.csv')
+    assert_equal(self.stat.path, 'ofs://ozone1/gethue/testfile.csv')
     assert_equal(self.stat.isDir, False)
     assert_equal(self.stat.type, 'FILE')
     assert_equal(self.stat.atime, 1677914460)
@@ -50,7 +50,7 @@ class TestOzoneFSStat(object):
 
   def test_to_json_dict(self):
     expected_json_dict = {
-      'path': 'ofs://gethue/testfile.csv', 'size': 32, 'atime': 1677914460, 'mtime': 1677914460, 'mode': 33206, 'user': 'hueadmin',
+      'path': 'ofs://ozone1/gethue/testfile.csv', 'size': 32, 'atime': 1677914460, 'mtime': 1677914460, 'mode': 33206, 'user': 'hueadmin',
       'group': 'huegroup', 'blockSize': 268435456, 'replication': 3}
 
     assert_equal(self.stat.to_json_dict(), expected_json_dict)
