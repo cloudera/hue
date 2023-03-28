@@ -20,8 +20,9 @@
   from desktop import conf
   from desktop.auth.backend import is_admin, is_hue_admin
   from desktop.conf import APP_SWITCHER_ALTUS_BASE_URL, APP_SWITCHER_MOW_BASE_URL, CUSTOM_DASHBOARD_URL, \
-      DISPLAY_APP_SWITCHER, IS_K8S_ONLY, IS_MULTICLUSTER_ONLY, USE_DEFAULT_CONFIGURATION, USE_NEW_ASSIST_PANEL, \
-      VCS, ENABLE_GIST, ENABLE_LINK_SHARING, has_channels, has_connectors, ENABLE_UNIFIED_ANALYTICS, RAZ
+      DISPLAY_APP_SWITCHER, ENABLE_HUE_5, IS_K8S_ONLY, IS_MULTICLUSTER_ONLY, USE_DEFAULT_CONFIGURATION,\
+      USE_NEW_ASSIST_PANEL, VCS, ENABLE_GIST, ENABLE_LINK_SHARING, has_channels, has_connectors,\
+      ENABLE_UNIFIED_ANALYTICS, RAZ
   from desktop.models import hue_version, _get_apps, get_cluster_config, _handle_user_dir_raz
 
   from beeswax.conf import DOWNLOAD_BYTES_LIMIT, DOWNLOAD_ROW_LIMIT, LIST_PARTITIONS_LIMIT, CLOSE_SESSIONS
@@ -35,7 +36,7 @@
       get_catalog_url, get_optimizer_mode
   from metastore.conf import ENABLE_NEW_CREATE_TABLE
   from metastore.views import has_write_access
-  from notebook.conf import ENABLE_NOTEBOOK_2, ENABLE_QUERY_ANALYSIS, ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_SQL_INDEXER, \
+  from notebook.conf import ENABLE_QUERY_ANALYSIS, ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_SQL_INDEXER, \
       get_ordered_interpreters, SHOW_NOTEBOOKS
   from django.utils.translation import get_language
 
@@ -105,7 +106,7 @@
 
   window.ENABLE_DOWNLOAD = '${ conf.ENABLE_DOWNLOAD.get() }' === 'True';
   window.ENABLE_NEW_CREATE_TABLE = '${ hasattr(ENABLE_NEW_CREATE_TABLE, 'get') and ENABLE_NEW_CREATE_TABLE.get()}' === 'True';
-  window.ENABLE_NOTEBOOK_2 = '${ ENABLE_NOTEBOOK_2.get() }' === 'True';
+  window.ENABLE_HUE_5 = '${ ENABLE_HUE_5.get() }' === 'True';
   window.ENABLE_PREDICT = '${ OPTIMIZER.ENABLE_PREDICT.get() }' === 'True';
   window.ENABLE_SQL_INDEXER = '${ ENABLE_SQL_INDEXER.get() }' === 'True';
 
