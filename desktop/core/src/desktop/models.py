@@ -1161,7 +1161,16 @@ class Document2Manager(models.Manager, Document2QueryMixin):
     LOG.info("Moved %d documents to home directory for user: %s" % (count, user.username))
     return home_dir
 
+class DocParser(models.Model):
+  firstToken = models.CharField(default='', max_length=255)
+  statement = models.CharField(default='', max_length=255)
+  Type = models.CharField(default='', max_length=255)
+  identifier = models.CharField(default='', max_length=255)
+  missing = models.BooleanField(default=True)
 
+  def __str__(self):
+    return self.name
+  
 class Document2(models.Model):
 
   HOME_DIR = ''

@@ -29,6 +29,7 @@ from desktop.auth.backend import is_admin
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.i18n import force_unicode
 from desktop.models import Document2
+from desktop.models import DocParser
 from libsentry.privilege_checker import MissingSentryPrivilegeException
 from notebook.api import _get_statement
 from notebook.models import Notebook
@@ -454,6 +455,9 @@ def upload_query(request):
   interface = request.POST.get('interface', OPTIMIZER.INTERFACE.get())
   source_platform = request.POST.get('sourcePlatform', 'default')
   query_id = request.POST.get('query_id')
+  locations = request.POST.get('locations')
+  print('Below is the SQL Parser in the backend: ')
+  print(locations)
 
   if OPTIMIZER.AUTO_UPLOAD_QUERIES.get() and source_platform in ('hive', 'impala') and query_id:
     try:
@@ -468,6 +472,7 @@ def upload_query(request):
       response['query_upload'] = api.upload(data=queries, data_type='queries', source_platform=source_platform)
     except Document2.DoesNotExist:
       response['query_upload'] = _('Skipped as task query')
+
   else:
     response['query_upload'] = _('Skipped')
   response['status'] = 0

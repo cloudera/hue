@@ -34,6 +34,7 @@ import bootstrapRatios from 'utils/html/bootstrapRatios';
 import scrollbarWidth from 'utils/screen/scrollbarWidth';
 import waitForRendered from 'utils/timing/waitForRendered';
 import { SHOW_LEFT_ASSIST_EVENT } from 'ko/components/assist/events';
+import sqlParserRepository from 'parse/sql/sqlParserRepository';
 
 window.Clipboard = Clipboard;
 
@@ -953,7 +954,21 @@ huePubSub.subscribe('app.dom.loaded', app => {
         huePubSub.subscribe(
           'editor.upload.query',
           query_id => {
-            viewModel.selectedNotebook().snippets()[0].uploadQuery(query_id);
+            const useInternalHueOptimizerStorage = true;
+            if (useInternalHueOptimizerStorage) {
+              const snippet = viewModel.selectedNotebook().snippets()[0];
+              const dialect = snippet.dialect();
+              const statement = snippet.statement_raw();
+              sqlParserRepository.getAutocompleteParser(dialect).then(parser => {
+                const parseResults = parser.parseSql(statement, '');
+                $.post('/metadata/api/optimizer/upload/query', {
+                  sourcePlatform: dialect,
+                  locations: JSON.stringify(parseResults.locations)
+                });
+              });
+            } else {
+              viewModel.selectedNotebook().snippets()[0].uploadQuery(query_id);
+            }
           },
           HUE_PUB_SUB_EDITOR_ID
         );
