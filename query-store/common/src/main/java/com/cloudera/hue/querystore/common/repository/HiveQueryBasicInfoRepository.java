@@ -21,6 +21,7 @@ import com.cloudera.hue.querystore.common.dto.QuerySearchParams;
 import com.cloudera.hue.querystore.common.dto.SortDetails;
 import com.cloudera.hue.querystore.common.entities.HiveQueryBasicInfo;
 import com.cloudera.hue.querystore.common.exception.DBUpdateFailedException;
+import com.cloudera.hue.querystore.common.services.QuerySearchParamsUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -106,7 +107,8 @@ public class HiveQueryBasicInfoRepository extends JdbiRepository<HiveQueryBasicI
     return dao.getSearchResultsCount(params.getStartTime(), params.getEndTime(), checkCurrentUser(role), userName);
   }
 
-  public List<HiveQueryBasicInfo> getSearchResults(QuerySearchParams params, String userName, Role role) {
+  public List<HiveQueryBasicInfo> getSearchResults(QuerySearchParams reqParams, String userName, Role role) {
+    QuerySearchParams params = QuerySearchParamsUtils.standardize(reqParams);
     HiveSearchDetails fields = new HiveSearchDetails(params);
 
     SortDetails sort = new SortDetails(params, HiveQueryBasicInfo.TABLE_INFORMATION);
