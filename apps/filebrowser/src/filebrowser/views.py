@@ -1318,11 +1318,17 @@ def move(request):
 def copy(request):
   recurring = ['dest_path']
   params = ['src_path']
+  ozone_skip_files = []
   def bulk_copy(*args, **kwargs):
     for arg in args:
       if arg['src_path'] == arg['dest_path']:
         raise PopupException(_('Source path and destination path cannot be same'))
-      request.fs.copy(arg['src_path'], arg['dest_path'], recursive=True, owner=request.user)
+      if arg['src_path'].startswith("ofs://"):
+        ozone_skip_files.append(request.fs.copy(arg['src_path'], arg['dest_path'], recursive=True, owner=request.user))
+      else:
+        request.fs.copy(arg['src_path'], arg['dest_path'], recursive=True, owner=request.user)
+    if ozone_skip_files:
+      raise PopupException(_(str(ozone_skip_files)), error_code=413)
   return generic_op(CopyFormSet, request, bulk_copy, ["src_path", "dest_path"], None,
                     data_extractor=formset_data_extractor(recurring, params),
                     arg_extractor=formset_arg_extractor,

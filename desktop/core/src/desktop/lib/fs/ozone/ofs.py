@@ -20,6 +20,8 @@ Interfaces for Hadoop filesystem access via HttpFs/WebHDFS
 """
 import errno
 import logging
+import posixpath
+import stat
 import sys
 import threading
 
@@ -210,3 +212,97 @@ class OzoneFS(WebHdfs):
     ls = self.listdir(old_dir)
     for dirent in ls:
       self.rename(_serviceid_join(ofs_join(old_dir, dirent), self._netloc), _serviceid_join(ofs_join(new_dir, dirent), self._netloc))
+
+  def copy_remote_dir(self, source, destination, dir_mode=None, owner=None, file_list=None):
+    if owner is None:
+      owner = self.DEFAULT_USER
+
+    if dir_mode is None:
+      dir_mode = self.getDefaultDirPerms()
+
+    if not self.exists(destination):
+      self.do_as_user(owner, self.mkdir, destination, mode=dir_mode)
+
+    for stat in self.listdir_stats(source):
+      source_file = stat.path
+      destination_file = posixpath.join(destination, stat.name)
+      if stat.isDir:
+        self.copy_remote_dir(source_file, destination_file, dir_mode, owner, file_list)
+      else:
+        if stat.size > self.get_upload_chuck_size():
+          if file_list is not None:
+            file_list.append(source_file)
+        else:
+          self.do_as_user(owner, self.copyfile, source_file, destination_file)
+    return file_list
+
+  def copy(self, src, dest, recursive=False, dir_mode=None, owner=None):
+    """
+    Copy file, or directory, in HDFS to another location in HDFS.
+
+    ``src`` -- The directory, or file, to copy from.
+    ``dest`` -- the directory, or file, to copy to.
+            If 'dest' is a directory that exists, copy 'src' into dest.
+            If 'dest' is a file that exists and 'src' is a file, overwrite dest.
+            If 'dest' does not exist, create 'src' as 'dest'.
+    ``recursive`` -- Recursively copy contents of 'src' to 'dest'.
+                This is required for directories.
+    ``dir_mode`` and ``owner`` are used to define permissions on the newly
+    copied files and directories.
+
+    This method will overwrite any pre-existing files that collide with what is being copied.
+    Copying a directory to a file is not allowed.
+    """
+    if owner is None:
+      owner = self.user
+
+    # Hue was defauling permissions on copying files to the permissions
+    # of the original file, but was not doing the same for directories
+    # changed below for directories to remain consistent
+    if dir_mode is None:
+      sb = self._stats(src)
+      dir_mode = oct(stat.S_IMODE(sb.mode))
+
+    src = self.strip_normpath(src)
+    dest = self.strip_normpath(dest)
+
+    if not self.exists(src):
+      raise IOError(errno.ENOENT, _("File not found: %s") % src)
+
+    file_list = [] # Store the files which are greater than the upload_chunck_size()
+
+    if self.isdir(src):
+      # 'src' is directory.
+      # Skip if not recursive copy and 'src' is directory.
+      if not recursive:
+        LOG.debug("Skipping contents of %s" % src)
+        return None
+
+      # If 'dest' is a directory change 'dest'
+      # to include 'src' basename.
+      # create 'dest' if it doesn't already exist.
+      if self.exists(dest):
+        if self.isdir(dest):
+          dest = self.join(dest, self.basename(src))
+        else:
+          raise IOError(errno.EEXIST, _("Destination file %s exists and is not a directory.") % dest)
+
+      self.do_as_user(owner, self.mkdir, dest, mode=dir_mode)
+
+      # Copy files in 'src' directory to 'dest'.
+      
+      file_list = self.copy_remote_dir(src, dest, dir_mode, owner, file_list)
+    else:
+      # 'src' is a file.
+      # If 'dest' is a directory, then copy 'src' into that directory.
+      # Other wise, copy to 'dest'.
+      stats = self.listdir_stats(src)[0]
+      if stats.size < self.get_upload_chuck_size():
+        if self.exists(dest) and self.isdir(dest):
+          self.copyfile(src, self.join(dest, self.basename(src)))
+        else:
+          self.copyfile(src, dest)
+      else:
+        file_list.append(src)
+
+    return file_list
