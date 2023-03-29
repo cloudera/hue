@@ -80,7 +80,7 @@ class TestSQLIndexer(object):
     assert_equal(
       [statement.strip() for statement in u'''DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;
 
-CREATE TABLE `default`.`hue__tmp_export_table`
+CREATE TABLE IF NOT EXISTS `default`.`hue__tmp_export_table`
 (
   `id` int ) COMMENT "No comment!"
 PARTITIONED BY (
@@ -312,7 +312,7 @@ def test_generate_create_kudu_table_with_data():
 
     assert_true('''DROP TABLE IF EXISTS `default`.`hue__tmp_index_data`;''' in sql, sql)
 
-    statement = '''CREATE EXTERNAL TABLE `default`.`hue__tmp_index_data`
+    statement = '''CREATE EXTERNAL TABLE IF NOT EXISTS `default`.`hue__tmp_index_data`
 (
   `business_id` string ,
   `cool` bigint ,
@@ -419,7 +419,7 @@ def test_generate_create_parquet_table():
 
   assert_true('''USE default;''' in sql, sql)
 
-  statement = '''CREATE EXTERNAL TABLE `default`.`hue__tmp_parquet_table`
+  statement = '''CREATE EXTERNAL TABLE IF NOT EXISTS `default`.`hue__tmp_parquet_table`
 (
   `acct_client` string ,
   `tran_amount` double ,
@@ -512,7 +512,7 @@ def test_generate_create_iceberg_table():
   print(sql)
   assert_true('''USE default;''' in sql, sql)
 
-  statement = '''CREATE EXTERNAL TABLE `default`.`hue__tmp_parquet_table`
+  statement = '''CREATE EXTERNAL TABLE IF NOT EXISTS `default`.`hue__tmp_parquet_table`
 (
   `acct_client` string ,
   `tran_amount` double ,
@@ -605,7 +605,7 @@ def test_generate_create_orc_table_transactional():
 
   assert_true('''USE default;''' in sql, sql)
 
-  statement = '''CREATE EXTERNAL TABLE `default`.`hue__tmp_parquet_table`
+  statement = '''CREATE EXTERNAL TABLE IF NOT EXISTS `default`.`hue__tmp_parquet_table`
 (
   `acct_client` string ,
   `tran_amount` double ,
@@ -829,7 +829,7 @@ def test_create_ddl_with_nonascii():
 
   assert_true('''USE default;''' in sql, sql)
 
-  statement = '''CREATE TABLE `default`.`hue__tmp_renamed_chinese_cities_gb2312`
+  statement = '''CREATE TABLE IF NOT EXISTS `default`.`hue__tmp_renamed_chinese_cities_gb2312`
 (
   `Before` string ,
   `old_Chinese_name` string ,
