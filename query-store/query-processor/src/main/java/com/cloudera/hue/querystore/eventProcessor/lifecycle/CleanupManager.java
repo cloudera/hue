@@ -22,6 +22,7 @@ import com.cloudera.hue.querystore.common.config.DasConfiguration;
 import com.cloudera.hue.querystore.common.config.DasConfiguration.ConfVar;
 import com.cloudera.hue.querystore.common.repository.HiveQueryBasicInfoRepository;
 import com.cloudera.hue.querystore.common.repository.HiveQueryExtendedInfoRepository;
+import com.cloudera.hue.querystore.common.repository.ImpalaQueryRepository;
 import com.cloudera.hue.querystore.common.repository.TezAppInfoRepository;
 import com.cloudera.hue.querystore.common.repository.TezDagBasicInfoRepository;
 import com.cloudera.hue.querystore.common.repository.TezDagExtendedInfoRepository;
@@ -48,7 +49,8 @@ public class CleanupManager implements Managed {
   private final Provider<TezDagBasicInfoRepository> tezDagBasicInfoRepository;
   private final Provider<TezDagExtendedInfoRepository> tezDagExtendedInfoRepository;
   private final Provider<VertexInfoRepository> vertexInfoRepoProvider;
-  private final Provider<TezAppInfoRepository> tezAppInfoRepository;
+  private final Provider<TezAppInfoRepository> tezAppInfoRepositoryProvider;
+  private final Provider<ImpalaQueryRepository> impalaQueryRepositoryProvider;
 
   private Scheduler scheduler;
 
@@ -60,7 +62,8 @@ public class CleanupManager implements Managed {
       Provider<TezDagBasicInfoRepository> tezDagBasicInfoRepository,
       Provider<TezDagExtendedInfoRepository> tezDagExtendedInfoRepository,
       Provider<VertexInfoRepository> vertexInfoRepoProvider,
-      Provider<TezAppInfoRepository> tezAppInfoRepository) {
+      Provider<TezAppInfoRepository> tezAppInfoRepositoryProvider,
+      Provider<ImpalaQueryRepository> impalaQueryRepositoryProvider) {
 
     this.config = config;
     this.txnManager = txnManager;
@@ -70,7 +73,8 @@ public class CleanupManager implements Managed {
     this.tezDagBasicInfoRepository = tezDagBasicInfoRepository;
     this.tezDagExtendedInfoRepository = tezDagExtendedInfoRepository;
     this.vertexInfoRepoProvider = vertexInfoRepoProvider;
-    this.tezAppInfoRepository = tezAppInfoRepository;
+    this.tezAppInfoRepositoryProvider = tezAppInfoRepositoryProvider;
+    this.impalaQueryRepositoryProvider = impalaQueryRepositoryProvider;
   }
 
   private class CleanupJob implements Job {
@@ -89,7 +93,8 @@ public class CleanupManager implements Managed {
       tezDagBasicInfoRepository.get().deleteOlder(startTime);
       hiveQueryExtendedInfoRepository.get().deleteOlder(startTime);
       hiveQueryBasicInfoRepository.get().deleteOlder(startTime);
-      tezAppInfoRepository.get().deleteOlder(startTime);
+      tezAppInfoRepositoryProvider.get().deleteOlder(startTime);
+      impalaQueryRepositoryProvider.get().deleteOlder(startTime);
 
       return true;
     });
@@ -103,7 +108,7 @@ public class CleanupManager implements Managed {
       tezDagBasicInfoRepository.get().purge();
       hiveQueryExtendedInfoRepository.get().purge();
       hiveQueryBasicInfoRepository.get().purge();
-      tezAppInfoRepository.get().purge();
+      tezAppInfoRepositoryProvider.get().purge();
   }
 
   @Override
