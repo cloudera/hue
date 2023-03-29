@@ -3965,7 +3965,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           return '${ QUERY_STORE.IS_ENABLED.get() }' == 'True' && isDialectEnabled('hive');
         };
         var impalaQueriesInterfaceCondition = function () {
-          return '${ QUERY_STORE.IS_ENABLED.get() }' == 'True' && isDialectEnabled('impala');
+          return '${ QUERY_STORE.IS_ENABLED.get() }' == 'True' && isDialectEnabled('impala') && '${ is_mini }' == 'False';
         };
 
         var interfaces = [
