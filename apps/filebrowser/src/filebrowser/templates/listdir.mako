@@ -61,7 +61,7 @@ ${ fb_components.menubar() }
         <div class="btn-toolbar" style="display: inline; vertical-align: middle">
           <div id="ch-dropdown" class="btn-group" style="vertical-align: middle">
             <button class="btn dropdown-toggle" title="${_('Actions')}" data-toggle="dropdown"
-            data-bind="visible: !inTrash(), enable: selectedFiles().length > 0 && ((!isS3() && !isABFS() && !isOFS()) || (isS3() && !isS3Root()) || (isABFS() && !isABFSRoot()) || (isOFS() && !isOFSRoot()))">
+            data-bind="visible: !inTrash(), enable: selectedFiles().length > 0 && ((!isS3() && !isABFS() && !isOFS()) || (isS3() && !isS3Root()) || (isABFS() && !isABFSRoot()) || (isOFS() && !(isOFSRoot() || isOFSServiceID() || isOFSVol())))">
               <i class="fa fa-cog"></i> ${_('Actions')}
               <span class="caret" style="line-height: 15px"></span>
             </button>
