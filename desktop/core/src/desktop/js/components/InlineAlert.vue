@@ -35,9 +35,7 @@
       <a v-if="details" class="more-less-button" @click="showDetails = false">
         {{ I18n('Less details') }}
       </a>
-      <pre class="inline-alert-details">
-        {{ details }}
-      </pre>
+      <pre class="inline-alert-details">{{ details }}</pre>
     </div>
     <a v-else-if="details" class="more-less-button" @click="showDetails = true">
       {{ I18n('More details') }}

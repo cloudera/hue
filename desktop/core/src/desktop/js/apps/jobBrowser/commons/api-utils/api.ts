@@ -16,26 +16,20 @@
  * limitations under the License.
  */
 
-import axios, { AxiosInstance, AxiosResponse } from 'axios';
-
-const api: AxiosInstance = axios.create();
-export default api;
-
-api.interceptors.response.use(
-  (response: AxiosResponse): AxiosResponse => {
-    if (response.data.status === -1) {
-      throw new ApiError(response);
-    }
-    return response;
-  },
-  error => Promise.reject(error)
-);
-
 export class ApiError extends Error {
-  details!: string;
+  details: string | undefined;
 
-  constructor(response: AxiosResponse) {
-    super(response.data.message);
-    this.details = response.data.content;
+  constructor(message: string) {
+    let firstLine = message;
+    let details: string | undefined = undefined;
+
+    const firstLineEnd = message.indexOf('\n');
+    if (firstLineEnd != -1) {
+      firstLine = message.substring(0, firstLineEnd);
+      details = message.substring(firstLineEnd + 1);
+    }
+
+    super(firstLine);
+    this.details = details;
   }
 }
