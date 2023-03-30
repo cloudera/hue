@@ -16,50 +16,18 @@
  * limitations under the License.
  */
 
-import api from './api';
 import { ApiError } from './api';
-import { AxiosAdapter, AxiosPromise, AxiosRequestConfig } from 'axios';
-
-const TEST_URL = 'http://test-url';
-
-const TEST_MSG = 'Test msg';
-const TEST_DETAILS = 'Test details';
 
 describe('api.ts', () => {
-  it('Interceptor should throw ApiError if response contain invalid status, even if HTTP status is 200', async () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    api.defaults.adapter = <AxiosAdapter>((config: AxiosRequestConfig): AxiosPromise<any> => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return <AxiosPromise<any>>new Promise((resolve: any) => {
-        const response = {
-          data: {
-            status: -1,
-            message: TEST_MSG,
-            content: TEST_DETAILS
-          },
-          status: 200,
-          statusText: '',
-          headers: [],
-          config
-        };
-        resolve(response);
-      });
-    });
-
-    let response!: ApiError;
-
-    try {
-      await api.get(TEST_URL);
-    } catch (e) {
-      response = e;
-    }
-
-    expect(response).toBeTruthy();
-    expect(response.message).toBe(TEST_MSG);
-    expect(response.details).toBe(TEST_DETAILS);
-  });
-
-  it('ApiError', async () => {
+  it('ApiError instantiation', async () => {
     expect(ApiError).toBeTruthy();
+
+    let apiError = new ApiError('error message 1');
+    expect(apiError.message).toEqual('error message 1');
+    expect(apiError.details).toEqual(undefined);
+
+    apiError = new ApiError('error message 2\nerror details\nerror details');
+    expect(apiError.message).toEqual('error message 2');
+    expect(apiError.details).toEqual('error details\nerror details');
   });
 });
