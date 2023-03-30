@@ -10,12 +10,18 @@ CREATE TABLE impala_query (
   query_text            TEXT,
   status                VARCHAR(16),
   query_type            VARCHAR(16),
+  ddl_type              VARCHAR(16),
 
   start_time            BIGINT,
   end_time              BIGINT,
   duration              BIGINT,
 
   user_name             VARCHAR(64),
+  connected_user        VARCHAR(64),
+  delegated_user        VARCHAR(64),
+
+  session_id            VARCHAR(256),
+  cluster_id            VARCHAR(256),
   coordinator           VARCHAR(2048),
   default_db            VARCHAR(512),
   request_pool          VARCHAR(512),
@@ -37,6 +43,8 @@ CREATE INDEX idx_iq_status
   ON impala_query (status);
 CREATE INDEX idx_iq_query_type
   ON impala_query (query_type);
+CREATE INDEX idx_iq_ddl_type
+  ON impala_query (ddl_type);
 
 CREATE INDEX idx_iq_start_time
   ON impala_query (start_time);
@@ -47,6 +55,15 @@ CREATE INDEX idx_iq_duration
 
 CREATE INDEX idx_iq_user_name
   ON impala_query (user_name);
+CREATE INDEX idx_iq_connected_user
+  ON impala_query (connected_user);
+CREATE INDEX idx_iq_delegated_user
+  ON impala_query (delegated_user);
+
+CREATE INDEX idx_iq_session_id
+  ON impala_query (session_id);
+CREATE INDEX idx_iq_cluster_id
+  ON impala_query (cluster_id);
 CREATE INDEX idx_iq_coordinator
   ON impala_query (coordinator);
 CREATE INDEX idx_iq_default_db
