@@ -151,7 +151,7 @@
           this.searchMeta = searchResponse.meta;
           this.queries = searchResponse.queries;
         } catch (error) {
-          this.error = error as ApiError;
+          this.error = new ApiError(String(error));
         }
         this.loading = false;
       },
@@ -164,7 +164,7 @@
           const fetchPromises = queriesToDiff.map(query => loadQuery(query.queryId));
           this.queriesToDiff = await Promise.all(fetchPromises);
         } catch (error) {
-          this.error = error as ApiError;
+          this.error = new ApiError(String(error));
         }
         this.loading = false;
       },
@@ -174,7 +174,7 @@
         try {
           this.selectedQuery = await loadQuery(query.queryId);
         } catch (error) {
-          this.error = error as ApiError;
+          this.error = new ApiError(String(error));
         }
         this.loading = false;
       }
