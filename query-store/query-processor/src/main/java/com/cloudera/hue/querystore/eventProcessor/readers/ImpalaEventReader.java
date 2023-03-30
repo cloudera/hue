@@ -23,7 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ImpalaEventReader implements EventReader<ImpalaRuntimeProfileTree> {
   private final Path filePath;
-  private final InputStream stream;
+  private final FileSystem fs;
   private final ImpalaFileReader fileReader;
   private final FileProcessingStatus fileStatus;
 
@@ -40,17 +40,9 @@ public class ImpalaEventReader implements EventReader<ImpalaRuntimeProfileTree> 
     this.fileStatus = fileStatus;
     this.fileReader = fileReader;
 
-    FileSystem fs = filePath.getFileSystem(fileReader.getConfig());
+    this.fs = filePath.getFileSystem(fileReader.getConfig());
 
-    // TODO: For non gz, we could improive performance using FSDataInputStream & stream.seek(offset)
-    // TODO: Could move CDW specific items to ImpalaCDWEventReader
-    InputStream stream = fs.open(filePath);
-    if(filePath.toString().toLowerCase().endsWith(".gz")) {
-      stream = new GZIPInputStream(stream);
-    }
-
-    this.stream = stream;
-    this.reader = new BufferedReader(new InputStreamReader(stream));
+    setOffset(0);
   }
 
   public long getOffset() throws IOException {
@@ -59,6 +51,13 @@ public class ImpalaEventReader implements EventReader<ImpalaRuntimeProfileTree> 
 
   public void setOffset(long offset) throws IOException {
     this.offset = offset;
+
+    // TODO: For non gz, we could improive performance using FSDataInputStream & stream.seek(offset)
+    // TODO: Could move CDW specific items to ImpalaCDWEventReader
+    InputStream stream = fs.open(filePath);
+    if(filePath.toString().toLowerCase().endsWith(".gz")) {
+      stream = new GZIPInputStream(stream);
+    }
 
     stream.skip(offset);
 
