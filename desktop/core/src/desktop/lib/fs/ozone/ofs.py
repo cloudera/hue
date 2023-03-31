@@ -213,7 +213,7 @@ class OzoneFS(WebHdfs):
     for dirent in ls:
       self.rename(_serviceid_join(ofs_join(old_dir, dirent), self._netloc), _serviceid_join(ofs_join(new_dir, dirent), self._netloc))
 
-  def copy_remote_dir(self, source, destination, dir_mode=None, owner=None, file_list=None):
+  def copy_remote_dir(self, source, destination, dir_mode=None, owner=None, skip_file_list=None):
     if owner is None:
       owner = self.DEFAULT_USER
 
@@ -227,14 +227,14 @@ class OzoneFS(WebHdfs):
       source_file = stat.path
       destination_file = posixpath.join(destination, stat.name)
       if stat.isDir:
-        self.copy_remote_dir(source_file, destination_file, dir_mode, owner, file_list)
+        self.copy_remote_dir(source_file, destination_file, dir_mode, owner, skip_file_list)
       else:
         if stat.size > self.get_upload_chuck_size():
-          if file_list is not None:
-            file_list.append(source_file)
+          if skip_file_list is not None:
+            skip_file_list += ' \n- ' + source_file
         else:
           self.do_as_user(owner, self.copyfile, source_file, destination_file)
-    return file_list
+    return skip_file_list
 
   def copy(self, src, dest, recursive=False, dir_mode=None, owner=None):
     """
@@ -256,7 +256,7 @@ class OzoneFS(WebHdfs):
     if owner is None:
       owner = self.user
 
-    # Hue was defauling permissions on copying files to the permissions
+    # Hue was defaulting permissions on copying files to the permissions
     # of the original file, but was not doing the same for directories
     # changed below for directories to remain consistent
     if dir_mode is None:
@@ -269,7 +269,7 @@ class OzoneFS(WebHdfs):
     if not self.exists(src):
       raise IOError(errno.ENOENT, _("File not found: %s") % src)
 
-    file_list = [] # Store the files which are greater than the upload_chunck_size()
+    skip_file_list = '' # Store the files to skip copying which are greater than the upload_chunck_size()
 
     if self.isdir(src):
       # 'src' is directory.
@@ -291,7 +291,7 @@ class OzoneFS(WebHdfs):
 
       # Copy files in 'src' directory to 'dest'.
       
-      file_list = self.copy_remote_dir(src, dest, dir_mode, owner, file_list)
+      skip_file_list = self.copy_remote_dir(src, dest, dir_mode, owner, skip_file_list)
     else:
       # 'src' is a file.
       # If 'dest' is a directory, then copy 'src' into that directory.
@@ -303,6 +303,6 @@ class OzoneFS(WebHdfs):
         else:
           self.copyfile(src, dest)
       else:
-        file_list.append(src)
+        skip_file_list += ' \n- ' + src
 
-    return file_list
+    return skip_file_list

@@ -1540,14 +1540,8 @@ else:
             self.retrieveData(true);
           },
           error: function(xhr){
-            if (xhr.status === 413) {
-              $.jHueNotify.error(JSON.parse(xhr.responseText).message);
-              resetPrimaryButtonsStatus();
-            }
-            else {
-              $.jHueNotify.error(xhr.responseText);
-              resetPrimaryButtonsStatus();
-            }
+            $.jHueNotify.error(xhr.responseText);
+            resetPrimaryButtonsStatus();
           }
         });
 

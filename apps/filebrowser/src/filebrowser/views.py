@@ -1318,17 +1318,22 @@ def move(request):
 def copy(request):
   recurring = ['dest_path']
   params = ['src_path']
-  ozone_skip_files = []
   def bulk_copy(*args, **kwargs):
+    ofs_skip_files = ''
     for arg in args:
       if arg['src_path'] == arg['dest_path']:
         raise PopupException(_('Source path and destination path cannot be same'))
-      if arg['src_path'].startswith("ofs://"):
-        ozone_skip_files.append(request.fs.copy(arg['src_path'], arg['dest_path'], recursive=True, owner=request.user))
+
+      # Copy method for OFS returns a string of skipped files if their size is greater than chunk size.
+      if arg['src_path'].startswith('ofs://'):
+        ofs_skip_files += request.fs.copy(arg['src_path'], arg['dest_path'], recursive=True, owner=request.user)
       else:
         request.fs.copy(arg['src_path'], arg['dest_path'], recursive=True, owner=request.user)
-    if ozone_skip_files:
-      raise PopupException(_(str(ozone_skip_files)), error_code=413)
+    
+    # Send skipped filenames via raising exception to let users know.
+    if ofs_skip_files:
+      raise PopupException("Following files were skipped due to file size limitations:" + ofs_skip_files)
+
   return generic_op(CopyFormSet, request, bulk_copy, ["src_path", "dest_path"], None,
                     data_extractor=formset_data_extractor(recurring, params),
                     arg_extractor=formset_arg_extractor,
