@@ -1,0 +1,50 @@
+{
+  "logging": {
+    "type": "external"
+  },
+  "jerseyClient":{
+    "timeout": "240s",
+    "connectionTimeout": "2s"
+  },
+  "dasConf": {
+    "hive.hook.proto.base-directory": "/warehouse/tablespace/managed/hive/sys.db/query_data/",
+    "tez.history.logging.proto-base-dir": "/warehouse/tablespace/managed/hive/sys.db/",
+    "impala.history.profile_log_dir": "/warehouse/tablespace/external/hive/sys.db/logs/",
+    "hue.query-processor.impala.event-pipeline.enabled": false
+  },
+  "database": {
+    "driverClass": "oracle.jdbc.OracleDriver",
+    "url": "jdbc:oracle:thin:@//demo-orac-amlesh-1-o12.demo-orac-amlesh-1-o12.root.hwx.site:1521/orcl12c",
+    "user": "qp_user",
+    "password": "qp_pass",
+    "properties": {},
+    "validationQuery": "SELECT 1 FROM DUAL"
+  },
+  "server": {
+    "applicationConnectors": [
+      {
+        "type": "http",
+        "port": 9092
+      }
+    ],
+    "adminConnectors": [],
+    "requestLog": {
+      "type": "external"
+    }
+  },
+  "flyway": {
+    "schemas": ["QP_USER"],
+    "locations": [
+      "db/migrate/oracle/common"
+    ],
+    "baselineOnMigrate":true
+  },
+  "authConfig": {
+    "appUserName": "hive",
+    "serviceAuth": "NONE",
+    "serviceKeytab": "",
+    "servicePrincipal": ""
+  },
+  "credentialProviderPath": "",
+  "passwordAliases": []
+}
