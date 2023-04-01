@@ -16,8 +16,9 @@
  * limitations under the License.
  */
 
-import api from './api';
-import { AxiosResponse } from 'axios';
+import { get, post } from 'api/utils';
+import { ApiError } from './api';
+
 import { Facet } from '../../../../../../components/FacetSelector';
 import { FieldInfo, Query, Search, SearchMeta } from '../index';
 // Uncomment to serve mock response instead of calling the API endpoints
@@ -47,10 +48,19 @@ export interface SearchResponse {
 }
 
 export const searchQueries = async (options: SearchRequest): Promise<SearchResponse> => {
-  const response = await api.post<SearchRequest, AxiosResponse<SearchResponse>>(SEARCH_URL, {
-    search: { ...options, type: 'BASIC' }
-  });
-  return response.data;
+  try {
+    return await post<SearchResponse>(
+      SEARCH_URL,
+      {
+        search: { ...options, type: 'BASIC' }
+      },
+      {
+        qsEncodeData: false
+      }
+    );
+  } catch (err) {
+    throw new ApiError(err);
+  }
 };
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -91,11 +101,15 @@ export interface FacetsResponse {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const fetchFacets = async (params: FacetsParams): Promise<FacetsResponse> => {
-  // TODO: Implement GET '/api/query/facets?startTime=x&endTime=y&facetFields=z'
-  const response = await api.get<FacetsParams, AxiosResponse<FacetsResponse>>(FACETS_URL, {
-    params
-  });
-  return response.data;
+  if (Array.isArray(params.facetFields)) {
+    params.facetFields = params.facetFields.join(',');
+  }
+  try {
+    // TODO: Implement GET '/api/query/facets?startTime=x&endTime=y&facetFields=z'
+    return await get<FacetsResponse>(FACETS_URL, params);
+  } catch (err) {
+    throw new ApiError(err);
+  }
 };
 
 export const fetchFieldsInfo = async (): Promise<FieldInfo[]> => {

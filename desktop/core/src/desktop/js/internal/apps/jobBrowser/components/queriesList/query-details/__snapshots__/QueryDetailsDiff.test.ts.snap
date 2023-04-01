@@ -5,7 +5,14 @@ exports[`QueryDetailsDiff.vue should render 1`] = `
   <div
     class="buttons-container"
   >
-    <hue-button-stub />
+    <hue-button-stub
+      alert="false"
+      borderless="true"
+      disabled="false"
+      large="false"
+      primary="false"
+      small="false"
+    />
   </div>
   <div
     class="hue-layout-row"

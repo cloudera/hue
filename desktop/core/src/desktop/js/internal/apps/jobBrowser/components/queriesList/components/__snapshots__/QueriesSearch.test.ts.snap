@@ -6,6 +6,8 @@ exports[`QueriesSearch.vue should render 1`] = `
     class="input-group"
   >
     <dropdown-panel-stub
+      closeonclick="true"
+      disabled="false"
       link="false"
       text="Searches"
     />
@@ -33,7 +35,7 @@ exports[`QueriesSearch.vue should render 1`] = `
         class="dropdown-menu range-panel pull-right"
       >
         <range-panel-stub
-          table-definition="[object Object]"
+          tabledefinition="[object Object]"
         />
       </div>
       <button

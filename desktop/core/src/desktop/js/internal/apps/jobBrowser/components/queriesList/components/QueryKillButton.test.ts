@@ -18,7 +18,8 @@ import { mount } from '@vue/test-utils';
 
 import QueryKillButton from './QueryKillButton.vue';
 import { QueryStatus } from '../index.d';
-import { sleep } from 'utils/hueUtils';
+
+const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 import * as queryApiUtils from '../api-utils/query';
 

@@ -6,6 +6,7 @@ exports[`HiveTimeline.vue should render 1`] = `
 >
   <div
     class="timeline-bars"
+    style="width: 100%;"
   >
     <div
       class="groups"
@@ -13,6 +14,7 @@ exports[`HiveTimeline.vue should render 1`] = `
       <div
         class="bar"
         data-value="0"
+        style="display: none;"
         title="Pre-Execution + DAG construction"
       >
          Pre-Execution + DAG construction 
@@ -20,6 +22,7 @@ exports[`HiveTimeline.vue should render 1`] = `
       <div
         class="bar"
         data-value="0"
+        style="display: none;"
         title="DAG Submission"
       >
          DAG Submission 
@@ -27,6 +30,7 @@ exports[`HiveTimeline.vue should render 1`] = `
       <div
         class="bar"
         data-value="0"
+        style="display: none;"
         title="DAG Runtime"
       >
          DAG Runtime 
@@ -34,6 +38,7 @@ exports[`HiveTimeline.vue should render 1`] = `
       <div
         class="bar"
         data-value="0"
+        style="display: none;"
         title="Post Execution"
       >
          Post Execution 
@@ -45,6 +50,7 @@ exports[`HiveTimeline.vue should render 1`] = `
       <div
         class="bar"
         data-value="0"
+        style="display: none;"
         title="Compile"
       >
          Compile 
@@ -52,6 +58,7 @@ exports[`HiveTimeline.vue should render 1`] = `
       <div
         class="bar"
         data-value="0"
+        style="display: none;"
         title="Parse"
       >
          Parse 
@@ -59,6 +66,7 @@ exports[`HiveTimeline.vue should render 1`] = `
       <div
         class="bar"
         data-value="0"
+        style="display: none;"
         title="Build Dag"
       >
          Build Dag 
@@ -66,6 +74,7 @@ exports[`HiveTimeline.vue should render 1`] = `
       <div
         class="bar"
         data-value="0"
+        style="display: none;"
         title="Submit Dag"
       >
          Submit Dag 
@@ -73,6 +82,7 @@ exports[`HiveTimeline.vue should render 1`] = `
       <div
         class="bar"
         data-value="0"
+        style="display: none;"
         title="Submit To Running"
       >
          Submit To Running 
@@ -80,6 +90,7 @@ exports[`HiveTimeline.vue should render 1`] = `
       <div
         class="bar"
         data-value="0"
+        style="display: none;"
         title="Run Dag"
       >
          Run Dag 
@@ -87,6 +98,7 @@ exports[`HiveTimeline.vue should render 1`] = `
       <div
         class="bar"
         data-value="0"
+        style="display: none;"
         title="Post Logging Hook"
       >
          Post ATS Hook 
@@ -94,6 +106,7 @@ exports[`HiveTimeline.vue should render 1`] = `
       <div
         class="bar"
         data-value="0"
+        style="display: none;"
         title="Remove Files"
       >
          Remove Files 
@@ -101,6 +114,7 @@ exports[`HiveTimeline.vue should render 1`] = `
       <div
         class="bar"
         data-value="0"
+        style="display: none;"
         title="Rename Or Move Files"
       >
          Rename Or Move Files 

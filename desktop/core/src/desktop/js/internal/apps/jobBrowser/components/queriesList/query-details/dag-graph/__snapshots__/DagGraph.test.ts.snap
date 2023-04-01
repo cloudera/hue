@@ -69,7 +69,7 @@ exports[`DagGraph.vue should render 1`] = `
         >
           <path
             d="M0,-5L10,0L0,5"
-            style="fill: #aaa;"
+            style="fill:#aaa;"
           />
         </marker>
         <radialgradient
@@ -82,11 +82,11 @@ exports[`DagGraph.vue should render 1`] = `
         >
           <stop
             offset="0%"
-            style="stop-color: rgb(176, 196, 222);"
+            style="stop-color:#b0c4de;"
           />
           <stop
             offset="100%"
-            style="stop-color: rgb(118, 156, 205);"
+            style="stop-color:#769ccd;"
           />
         </radialgradient>
         <radialgradient
@@ -99,11 +99,11 @@ exports[`DagGraph.vue should render 1`] = `
         >
           <stop
             offset="0%"
-            style="stop-color: rgb(173, 255, 46);"
+            style="stop-color:#adff2e;"
           />
           <stop
             offset="100%"
-            style="stop-color: rgb(145, 215, 35);"
+            style="stop-color:#91d723;"
           />
         </radialgradient>
         <radialgradient
@@ -116,11 +116,11 @@ exports[`DagGraph.vue should render 1`] = `
         >
           <stop
             offset="0%"
-            style="stop-color: rgb(250, 128, 114);"
+            style="stop-color:#fa8072;"
           />
           <stop
             offset="100%"
-            style="stop-color: rgb(210, 100, 87);"
+            style="stop-color:#d26457;"
           />
         </radialgradient>
         <radialgradient
@@ -133,11 +133,11 @@ exports[`DagGraph.vue should render 1`] = `
         >
           <stop
             offset="0%"
-            style="stop-color: rgb(208, 191, 209);"
+            style="stop-color:#d0bfd1;"
           />
           <stop
             offset="100%"
-            style="stop-color: rgb(175, 143, 177);"
+            style="stop-color:#af8fb1;"
           />
         </radialgradient>
         <radialgradient
@@ -150,11 +150,11 @@ exports[`DagGraph.vue should render 1`] = `
         >
           <stop
             offset="0%"
-            style="stop-color: rgb(187, 187, 187);"
+            style="stop-color:#bbbbbb;"
           />
           <stop
             offset="100%"
-            style="stop-color: rgb(153, 153, 153);"
+            style="stop-color:#999999;"
           />
         </radialgradient>
         <filter
@@ -417,7 +417,7 @@ exports[`DagGraph.vue should render 1`] = `
     class="button-panel"
   >
     <em
-      class="tgl-additionals fa fa-circle "
+      class="tgl-additionals fa fa-circle"
       title="Toggle source/sink visibility"
     />
     <em
