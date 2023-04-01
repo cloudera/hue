@@ -16,11 +16,12 @@
  * limitations under the License.
  */
 
-import api from './api';
-import { AxiosResponse } from 'axios';
 import { Query, QueryStatus, Vertex } from '../index.d';
+import { ApiError } from './api';
 
-import { sleep } from '../../../../../../utils/hueUtils';
+import { get, post } from 'api/utils';
+
+const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 const QUERY_URL = '/jobbrowser/query-store/api/hive/query';
 const QUERY_KILL_URL = '/jobbrowser/api/job/action/queries-hive/kill';
@@ -42,34 +43,39 @@ interface VerticesRequest {
 }
 
 const fetchDagVertices = async (dagId: string): Promise<Vertex[]> => {
-  const params = { dagId: dagId };
-  const response = await api.get<VerticesRequest, AxiosResponse<{ vertices: Vertex[] }>>(
-    VERTICES_URL,
-    { params }
-  );
-  return response.data.vertices;
+  const params: VerticesRequest = { dagId: dagId };
+  try {
+    const response = await get<{ vertices: Vertex[] }>(VERTICES_URL, params);
+    return response.vertices;
+  } catch (err) {
+    throw new ApiError(err);
+  }
 };
 
 export const fetchQuery = async (queryId: string): Promise<Query> => {
   const params = { queryId: queryId };
-  const response = await api.get<ExtendedQueryRequest, AxiosResponse<{ query: Query }>>(QUERY_URL, {
-    params
-  });
-  return response.data.query;
+  try {
+    const response = await get<{ query: Query }>(QUERY_URL, params);
+    return response.query;
+  } catch (err) {
+    throw new ApiError(err);
+  }
 };
 
 export const fetchExtendedQuery = async (queryId: string): Promise<Query> => {
   const params = { queryId: queryId, extended: true };
-  const response = await api.get<ExtendedQueryRequest, AxiosResponse<{ query: Query }>>(QUERY_URL, {
-    params
-  });
-  const query: Query = response.data.query;
+  try {
+    const response = await get<{ query: Query }>(QUERY_URL, params);
+    const query: Query = response.query;
 
-  for (const dag of query.dags) {
-    dag.vertices = await fetchDagVertices(dag.dagInfo.dagId);
+    for (const dag of query.dags) {
+      dag.vertices = await fetchDagVertices(dag.dagInfo.dagId);
+    }
+
+    return query;
+  } catch (err) {
+    throw new ApiError(err);
   }
-
-  return query;
 };
 
 export const kill = async (queries: Query[]): Promise<void> => {
@@ -80,7 +86,13 @@ export const kill = async (queries: Query[]): Promise<void> => {
   params.append('interface', JSON.stringify('queries-hive'));
   params.append('app_ids', JSON.stringify(queryIds));
 
-  await api.post(QUERY_KILL_URL, params);
+  try {
+    await post(QUERY_KILL_URL, params, {
+      qsEncodeData: false
+    });
+  } catch (err) {
+    throw new ApiError(err);
+  }
 };
 
 /**

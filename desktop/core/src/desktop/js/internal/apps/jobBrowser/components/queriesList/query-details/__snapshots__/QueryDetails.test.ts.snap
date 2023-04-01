@@ -6,18 +6,45 @@ exports[`QueryDetails.vue should render 1`] = `
     <div
       class="buttons-container"
     >
-      <hue-button-stub />
-      <query-kill-button-stub
-        queries="[object Object]"
+      <hue-button-stub
+        alert="false"
+        borderless="true"
+        disabled="false"
+        large="false"
+        primary="false"
+        small="false"
       />
-      <a
-        class="btn btn-outline-primary download-link"
-        download=""
-        href="/jobbrowser/query-store/data-bundle/hive_20200925121648_f613ce22-571c-4650-b594-8ee37f2adbe8"
-        target="_blank"
+      <div
+        class="buttons-right"
       >
-         Download 
-      </a>
+        <hue-button-stub
+          alert="false"
+          borderless="false"
+          disabled="false"
+          large="false"
+          primary="false"
+          small="false"
+        />
+        <a
+          class="btn btn-outline-primary download-link"
+          download=""
+          href="/jobbrowser/query-store/data-bundle/hive_20200925121648_f613ce22-571c-4650-b594-8ee37f2adbe8"
+          target="_blank"
+        >
+           Download 
+        </a>
+        <query-kill-button-stub
+          queries="[object Object]"
+        />
+        <hue-button-stub
+          alert="false"
+          borderless="false"
+          disabled="false"
+          large="false"
+          primary="false"
+          small="false"
+        />
+      </div>
     </div>
     <query-info-top-stub
       query="[object Object]"

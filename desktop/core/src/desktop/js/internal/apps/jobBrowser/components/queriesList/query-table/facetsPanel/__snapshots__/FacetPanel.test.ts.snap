@@ -11,15 +11,15 @@ exports[`FacetsPanel.vue should render 1`] = `
     
     <facet-value-list-stub
       facet="[object Object]"
-      selected-values="[object Object],[object Object]"
+      selectedvalues="[object Object],[object Object]"
     />
     <facet-value-list-stub
       facet="[object Object]"
-      selected-values="[object Object]"
+      selectedvalues="[object Object]"
     />
     <facet-value-list-stub
       facet="[object Object]"
-      selected-values="[object Object]"
+      selectedvalues="[object Object]"
     />
     
   </ul>
