@@ -62,7 +62,7 @@
   import Spinner from 'components/Spinner.vue';
   import { ApiError } from './api-utils/api';
 
-  const QUERY_ID_PARAM = 'queryId';
+  const QUERY_ID_PARAM = 'hiveQueryId';
 
   export type SortInfo = { column: string; order: 'ASC' | 'DESC' };
 

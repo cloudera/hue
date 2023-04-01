@@ -7,7 +7,8 @@ exports[`QueriesList.vue should render 1`] = `
   <!--v-if-->
   <query-table-stub
     queries=""
-    total-queries="0"
+    totalqueries="0"
+    updatetime="0"
   />
 </div>
 `;
