@@ -114,19 +114,13 @@ $(EXT_PY_ENV_INSTALL_TARGETS): CUR_EXT_PY=$(notdir $(@D))
 #   	Pip install any 3rd party package that are based on requirements.txt
 #
 .PHONY: ext-env-pip-install
-ext-env-pip-install:
+ext-env-pip-install: $(REQUIREMENT_DOT_FILE)
+$(REQUIREMENT_DOT_FILE):
 	@echo '--- Installing $(REQUIREMENT_FILE) into virtual-env via $(ENV_PIP)'
 	@$(ENV_PIP) install -r $(REQUIREMENT_FILE)
 	@echo '--- Finished $(REQUIREMENT_FILE) into virtual-env'
 	@$(ENV_PIP) install $(NAVOPTAPI_WHL)
 	@echo '--- Finished $(NAVOPTAPI_WHL) into virtual-env'
-	@echo '--- Installing ext-py3 into virtual-env via $(ENV_PIP)'
-	@$(ENV_PIP) install -e $(BOTO_PKG)
-	@$(ENV_PIP) install -e $(REQUEST_PKG)
-	@$(ENV_PIP) install -e $(PYSAML2_PKG)
-	@$(ENV_PIP) install -e $(DJANGOSAML2_PKG)
-	@$(ENV_PIP) install -e $(DJANGO_AXES_PKG)
-	@echo '--- Finished installing ext-py3 into virtual-env via $(ENV_PIP)'
 	@touch $@
 
 #

@@ -1,0 +1,22 @@
+Metadata-Version: 1.1
+Name: thrift_sasl
+Version: 0.4.3
+Summary: Thrift SASL Python module that implements SASL transports for Thrift (`TSaslClientTransport`).
+Home-page: https://github.com/cloudera/thrift_sasl
+Author: UNKNOWN
+Author-email: UNKNOWN
+License: Apache License, Version 2.0
+Description: Thrift SASL Python module that implements SASL transports for Thrift (`TSaslClientTransport`).
+Keywords: thrift sasl transport
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 2
+Classifier: Programming Language :: Python :: 2.6
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.3
+Classifier: Programming Language :: Python :: 3.4
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9

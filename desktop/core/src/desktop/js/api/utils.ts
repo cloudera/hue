@@ -36,12 +36,14 @@ export interface DefaultApiResponse {
   responseText?: string;
   statusText?: string;
   traceback?: string;
+  content?: string;
 }
 
 export interface ApiFetchOptions<T, E = string> extends AxiosRequestConfig {
   silenceErrors?: boolean;
   ignoreSuccessErrors?: boolean;
   transformResponse?: AxiosTransformer;
+  qsEncodeData?: boolean;
   handleSuccess?: (
     response: T & DefaultApiResponse,
     resolve: (val: T) => void,
@@ -118,6 +120,9 @@ export const extractErrorMessage = (
     } catch (err) {}
     return defaultResponse.responseText;
   }
+  if (defaultResponse.message && defaultResponse.content) {
+    return `${defaultResponse.message}\n${defaultResponse.content}`;
+  }
   if (errorResponse.message) {
     return errorResponse.message;
   }
@@ -187,8 +192,10 @@ export const post = <T, U = unknown>(
     const { cancelToken, cancel } = getCancelToken();
     let completed = false;
 
+    const encodeData = options?.qsEncodeData == undefined || options?.qsEncodeData;
+
     axiosInstance
-      .post<T & DefaultApiResponse>(url, qs.stringify(data), {
+      .post<T & DefaultApiResponse>(url, encodeData ? qs.stringify(data) : data, {
         cancelToken,
         ...options
       })

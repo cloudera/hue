@@ -141,12 +141,12 @@ def get_ordered_interpreters(user=None):
       "type": i['type'],
       "interface": i['interface'],
       "options": i['options'],
-      'dialect': i.get('dialect', i['name']).lower(),
+      'dialect': i.get('dialect', i['type']).lower(),
       'dialect_properties': i.get('dialect_properties') or {},  # Empty when connectors off
       'category': i.get('category', 'editor'),
       "is_sql": i.get('is_sql') or \
           i['interface'] in ["hiveserver2", "rdbms", "jdbc", "solr", "sqlalchemy", "ksql", "flink"] or \
-          i['type'] == 'sql',
+          i['type'] in ["sql", "sparksql"],
       "is_catalog": i['interface'] in ["hms",],
     }
     for i in interpreters
@@ -215,13 +215,6 @@ DBPROXY_EXTRA_CLASSPATH = Config(
 ENABLE_QUERY_BUILDER = Config(
   key="enable_query_builder",
   help=_t("Flag to enable the SQL query builder of the table assist."),
-  type=coerce_bool,
-  default=False
-)
-
-ENABLE_NOTEBOOK_2 = Config(
-  key="enable_notebook_2",
-  help=_t("Feature flag to enable Notebook 2."),
   type=coerce_bool,
   default=False
 )

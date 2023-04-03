@@ -1426,6 +1426,10 @@ export default class DataCatalogEntry {
     return this.analysis?.details?.stats?.table_type === 'ICEBERG';
   }
 
+  isTransactionalTable(): boolean {
+    return this.analysis?.details?.stats?.transactional === 'true';
+  }
+
   /**
    * Returns true if the entry is a view. It will be accurate once the source meta has been loaded.
    */

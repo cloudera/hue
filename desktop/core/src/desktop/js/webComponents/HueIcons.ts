@@ -16,7 +16,7 @@
 
 import 'regenerator-runtime/runtime';
 
-import HueIcons from 'components/icons/HueIcons.vue';
+import HueIcons from 'components/icons/vue/HueIcons.vue';
 import { isDefined, wrap } from 'vue/webComponentWrap';
 
 const NAME = 'hue-icons';

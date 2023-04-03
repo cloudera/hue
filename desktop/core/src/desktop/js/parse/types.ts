@@ -191,11 +191,11 @@ export interface AutocompleteParseResult {
 }
 
 export interface SqlStatementsParser {
-  parse(text: string): ParsedSqlStatement;
+  parse(text: string): ParsedSqlStatement[];
 }
 
 export interface AutocompleteParser {
-  parseSql(beforeCursor: string, afterCursor: string): AutocompleteParseResult;
+  parseSql(beforeCursor: string, afterCursor: string, debug?: boolean): AutocompleteParseResult;
 }
 
 export interface SyntaxParser {

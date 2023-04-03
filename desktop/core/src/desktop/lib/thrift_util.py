@@ -605,7 +605,8 @@ def unpack_guid(guid):
   return "%016x:%016x" % struct.unpack(b"QQ", guid)
 
 def unpack_guid_base64(guid):
-  return "%016x:%016x" % struct.unpack(b"QQ", base64.decodestring(guid))
+  decoded_guid = base64.b64decode(guid) if sys.version_info[0] > 2 else base64.decodestring(guid)
+  return "%016x:%016x" % struct.unpack(b"QQ", decoded_guid)
 
 def simpler_string(thrift_obj):
   """

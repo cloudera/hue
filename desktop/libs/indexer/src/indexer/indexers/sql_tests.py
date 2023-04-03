@@ -64,6 +64,7 @@ class TestSQLIndexer(object):
         'name': 'default.export_table',
         'tableFormat': 'csv',
         'importData': True,
+        'isIceberg': False,
         'nonDefaultLocation': '/user/hue/customer_stats.csv',
         'columns': [{'name': 'id', 'type': 'int'}],
         'partitionColumns': [{'name': 'day', 'type': 'date', 'partitionValue': '20200101'}],
@@ -79,7 +80,7 @@ class TestSQLIndexer(object):
     assert_equal(
       [statement.strip() for statement in u'''DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;
 
-CREATE TABLE `default`.`hue__tmp_export_table`
+CREATE TABLE IF NOT EXISTS `default`.`hue__tmp_export_table`
 (
   `id` int ) COMMENT "No comment!"
 PARTITIONED BY (
@@ -174,7 +175,7 @@ def test_generate_create_text_table_with_data_partition():
     u'useCustomDelimiters': False, u'apiHelperType': u'hive', u'kuduPartitionColumns': [],
     u'outputFormats': [{u'name': u'Table', u'value': u'table'}, {u'name': u'Solr index', u'value': u'index'}],
     u'customMapDelimiter': u'\\003', u'showProperties': False, u'useDefaultLocation': True, u'description': u'',
-    u'primaryKeyObjects': [], u'customFieldDelimiter': u',', u'existingTargetUrl': u'', u'importData': True,
+    u'primaryKeyObjects': [], u'customFieldDelimiter': u',', u'existingTargetUrl': u'', u'importData': True, u'isIceberg': False,
     u'databaseName': u'default', u'KUDU_DEFAULT_RANGE_PARTITION_COLUMN': {u'include_upper_val': u'<=', u'upper_val': 1,
     u'name': u'VALUES', u'include_lower_val': u'<=', u'lower_val': 0, u'values': [{u'value': u''}]}, u'primaryKeys': [],
     u'outputFormat': u'table', u'nonDefaultLocation': u'/user/romain/customer_stats.csv', u'name': u'default.customer_stats',
@@ -250,7 +251,7 @@ def test_generate_create_kudu_table_with_data():
     u'description': u'Big Data', u'primaryKeyObjects': [{u'operations': [], u'comment': u'', u'name': u'id', u'level': 0,
     u'keyType': u'string', u'required': False, u'nested': [], u'isPartition': False, u'length': 100, u'multiValued': False,
     u'unique': False, u'type': u'string', u'showProperties': False, u'keep': True}], u'customFieldDelimiter': u',',
-    u'existingTargetUrl': u'', u'importData': True, u'databaseName': u'default',
+    u'existingTargetUrl': u'', u'importData': True, u'isIceberg': False, u'databaseName': u'default',
     u'KUDU_DEFAULT_RANGE_PARTITION_COLUMN': {u'include_upper_val': u'<=', u'upper_val': 1, u'name': u'VALUES',
     u'include_lower_val': u'<=', u'lower_val': 0, u'values': [{u'value': u''}]}, u'primaryKeys': [u'id'],
     u'outputFormat': u'table', u'nonDefaultLocation': u'/user/admin/index_data.csv', u'name': u'index_data',
@@ -311,7 +312,7 @@ def test_generate_create_kudu_table_with_data():
 
     assert_true('''DROP TABLE IF EXISTS `default`.`hue__tmp_index_data`;''' in sql, sql)
 
-    statement = '''CREATE EXTERNAL TABLE `default`.`hue__tmp_index_data`
+    statement = '''CREATE EXTERNAL TABLE IF NOT EXISTS `default`.`hue__tmp_index_data`
 (
   `business_id` string ,
   `cool` bigint ,
@@ -406,8 +407,9 @@ def test_generate_create_parquet_table():
     '''"text","name":"Text"},{"value":"parquet","name":"Parquet"},{"value":"kudu","name":"Kudu"},{"value":"csv","name":"Csv"},'''
     '''{"value":"avro","name":"Avro"},{"value":"json","name":"Json"},{"value":"regexp","name":"Regexp"},{"value":"orc",'''
     '''"name":"ORC"}],"partitionColumns":[],"kuduPartitionColumns":[],"primaryKeys":[],"primaryKeyObjects":[],"importData":true,'''
-    '''"useDefaultLocation":true,"nonDefaultLocation":"/user/hue/data/query-hive-360.csv","hasHeader":true,"useCustomDelimiters":'''
-    '''false,"customFieldDelimiter":",","customCollectionDelimiter":"\\\\002","customMapDelimiter":"\\\\003","customRegexp":""}'''
+    '''"isIceberg":false,"useDefaultLocation":true,"nonDefaultLocation":"/user/hue/data/query-hive-360.csv","hasHeader":true,'''
+    '''"useCustomDelimiters":false,"customFieldDelimiter":",","customCollectionDelimiter":"\\\\002","customMapDelimiter":"\\\\003",'''
+    '''"customRegexp":""}'''
   )
 
   path = {'isDir': False, 'split': ('/user/hue/data', 'query-hive-360.csv'), 'listdir': ['/user/hue/data']}
@@ -417,7 +419,7 @@ def test_generate_create_parquet_table():
 
   assert_true('''USE default;''' in sql, sql)
 
-  statement = '''CREATE EXTERNAL TABLE `default`.`hue__tmp_parquet_table`
+  statement = '''CREATE EXTERNAL TABLE IF NOT EXISTS `default`.`hue__tmp_parquet_table`
 (
   `acct_client` string ,
   `tran_amount` double ,
@@ -435,6 +437,100 @@ TBLPROPERTIES('skip.header.line.count'='1', 'transactional'='false')
 
   assert_true('''CREATE TABLE `default`.`parquet_table`
         STORED AS parquet
+        AS SELECT *
+        FROM `default`.`hue__tmp_parquet_table`;
+''' in sql, sql)
+
+  assert_true('''DROP TABLE IF EXISTS `default`.`hue__tmp_parquet_table`;''' in sql, sql)
+
+
+def test_generate_create_iceberg_table():
+  source = json.loads('''{"sourceType": "hive", "name":"","sample":[["Bank Of America","3000000.0","US","Miami","37.6801986694",'''
+    '''"-121.92150116"],["Citi Bank","2800000.0","US","Richmond","37.5242004395","-77.4932022095"],["Deutsche Bank","2600000.0","US",'''
+    '''"Corpus Christi","40.7807998657","-73.9772033691"],["Thomson Reuters","2400000.0","US","Albany","35.7976989746",'''
+    '''"-78.6252975464"],'''
+    '''["OpenX","2200000.0","US","Des Moines","40.5411987305","-119.586898804"]],"sampleCols":[{"operations":[],"comment":"",'''
+    '''"nested":[],'''
+    '''"name":"acct_client","level":0,"keyType":"string","required":false,"precision":10,"keep":true,"isPartition":false,"length":100,'''
+    '''"partitionValue":"","multiValued":false,"unique":false,"type":"string","showProperties":false,"scale":0},{"operations":[],'''
+    '''"comment":"","nested":[],"name":"tran_amount","level":0,"keyType":"string","required":false,"precision":10,"keep":true,'''
+    '''"isPartition":false,"length":100,"partitionValue":"","multiValued":false,"unique":false,"type":"double",'''
+    '''"showProperties":false,"scale":0},{"operations":[],"comment":"","nested":[],"name":"tran_country_cd","level":0,"keyType":'''
+    '''"string","required":false,"precision":10,"keep":true,"isPartition":false,"length":100,"partitionValue":"","multiValued":false,'''
+    '''"unique":false,"type":"string","showProperties":false,"scale":0},{"operations":[],"comment":"","nested":[],"name":"vrfcn_city",'''
+    '''"level":0,"keyType":"string","required":false,"precision":10,"keep":true,"isPartition":false,"length":100,"partitionValue":"",'''
+    '''"multiValued":false,"unique":false,"type":"string","showProperties":false,"scale":0},{"operations":[],"comment":"","nested":[],'''
+    '''"name":"vrfcn_city_lat","level":0,"keyType":"string","required":false,"precision":10,"keep":true,"isPartition":false,'''
+    '''"length":100,'''
+    '''"partitionValue":"","multiValued":false,"unique":false,"type":"double","showProperties":false,"scale":0},{"operations":[],'''
+    '''"comment":"","nested":[],"name":"vrfcn_city_lon","level":0,"keyType":"string","required":false,"precision":10,"keep":true,'''
+    '''"isPartition":false,"length":100,"partitionValue":"","multiValued":false,"unique":false,"type":"double","showProperties":false,'''
+    '''"scale":0}],"inputFormat":"file","inputFormatsAll":[{"value":"file","name":"File"},{"value":"manual","name":"Manually"},'''
+    '''{"value":"query","name":"SQL Query"},{"value":"table","name":"Table"}],"inputFormatsManual":[{"value":"manual","name":'''
+    '''"Manually"}],"inputFormats":[{"value":"file","name":"File"},{"value":"manual","name":"Manually"},{"value":"query","name":'''
+    '''"SQL Query"},{"value":"table","name":"Table"}],"path":"/user/hue/data/query-hive-360.csv","isObjectStore":false,"table":"",'''
+    '''"tableName":"","databaseName":"default","apiHelperType":"hive","query":"","draggedQuery":"","format":{"type":"csv",'''
+    '''"fieldSeparator":",","recordSeparator":"\\n","quoteChar":"\\"","hasHeader":true,"status":0},"show":true,"defaultName":'''
+    '''"default.query-hive-360"}'''
+  )
+  destination = json.loads('''{"isTransactional": false, "isInsertOnly": false, "sourceType": "hive", "name":"default.parquet_table"'''
+    ''',"apiHelperType":"hive","description":"","outputFormat":"table","outputFormatsList":[{"name":"Table","value":"table"},'''
+    '''{"name":"Solr index","value":"index"},{"name":"File","value":"file"},{"name":"Database","value":"database"}],'''
+    '''"outputFormats":[{"name":"Table","value":"table"},{"name":"Solr index","value":"index"}],"columns":[{"operations":[],'''
+    '''"comment":"","nested":[],"name":"acct_client","level":0,"keyType":"string","required":false,"precision":10,"keep":true,'''
+    '''"isPartition":false,"length":100,"partitionValue":"","multiValued":false,"unique":false,"type":"string","showProperties":'''
+    '''false,"scale":0},{"operations":[],"comment":"","nested":[],"name":"tran_amount","level":0,"keyType":"string","required":false,'''
+    '''"precision":10,"keep":true,"isPartition":false,"length":100,"partitionValue":"","multiValued":false,"unique":false,"type":'''
+    '''"double","showProperties":false,"scale":0},{"operations":[],"comment":"","nested":[],"name":"tran_country_cd","level":0,'''
+    '''"keyType":"string","required":false,"precision":10,"keep":true,"isPartition":false,"length":100,"partitionValue":"",'''
+    '''"multiValued":false,"unique":false,"type":"string","showProperties":false,"scale":0},{"operations":[],"comment":"","nested":'''
+    '''[],"name":"vrfcn_city","level":0,"keyType":"string","required":false,"precision":10,"keep":true,"isPartition":false,"length":'''
+    '''100,"partitionValue":"","multiValued":false,"unique":false,"type":"string","showProperties":false,"scale":0},{"operations":[],'''
+    '''"comment":"","nested":[],"name":"vrfcn_city_lat","level":0,"keyType":"string","required":false,"precision":10,"keep":true,'''
+    '''"isPartition":false,"length":100,"partitionValue":"","multiValued":false,"unique":false,"type":"double","showProperties":'''
+    '''false,"scale":0},{"operations":[],"comment":"","nested":[],"name":"vrfcn_city_lon","level":0,"keyType":"string","required":'''
+    '''false,"precision":10,"keep":true,"isPartition":false,"length":100,"partitionValue":"","multiValued":false,"unique":false,'''
+    '''"type":"double","showProperties":false,"scale":0}],"bulkColumnNames":"acct_client,tran_amount,tran_country_cd,vrfcn_city,'''
+    '''vrfcn_city_lat,vrfcn_city_lon","showProperties":false,"isTargetExisting":false,"isTargetChecking":false,"existingTargetUrl":'''
+    '''"","tableName":"parquet_table","databaseName":"default","tableFormat":"parquet","KUDU_DEFAULT_RANGE_PARTITION_COLUMN":'''
+    '''{"values":[{"value":""}],"name":"VALUES","lower_val":0,"include_lower_val":"<=","upper_val":1,"include_upper_val":"<="},'''
+    '''"KUDU_DEFAULT_PARTITION_COLUMN":{"columns":[],"range_partitions":[{"values":[{"value":""}],"name":"VALUES","lower_val":0,'''
+    '''"include_lower_val":"<=","upper_val":1,"include_upper_val":"<="}],"name":"HASH","int_val":16},"tableFormats":[{"value":'''
+    '''"text","name":"Text"},{"value":"parquet","name":"Parquet"},{"value":"kudu","name":"Kudu"},{"value":"csv","name":"Csv"},'''
+    '''{"value":"avro","name":"Avro"},{"value":"json","name":"Json"},{"value":"regexp","name":"Regexp"},{"value":"orc",'''
+    '''"name":"ORC"}],"partitionColumns":[],"kuduPartitionColumns":[],"primaryKeys":[],"primaryKeyObjects":[],"importData":true,'''
+    '''"isIceberg":true,"useDefaultLocation":true,"nonDefaultLocation":"/user/hue/data/query-hive-360.csv","hasHeader":true,'''
+    '''"useCustomDelimiters":false,"customFieldDelimiter":",","customCollectionDelimiter":"\\\\002","customMapDelimiter":"\\\\003",'''
+    '''"customRegexp":""}'''
+  )
+
+  path = {'isDir': False, 'split': ('/user/hue/data', 'query-hive-360.csv'), 'listdir': ['/user/hue/data']}
+  request = MockRequest(fs=MockFs(path=path))
+
+  sql = SQLIndexer(user=request.user, fs=request.fs).create_table_from_a_file(source, destination).get_str()
+
+  print(sql)
+  assert_true('''USE default;''' in sql, sql)
+
+  statement = '''CREATE EXTERNAL TABLE IF NOT EXISTS `default`.`hue__tmp_parquet_table`
+(
+  `acct_client` string ,
+  `tran_amount` double ,
+  `tran_country_cd` string ,
+  `vrfcn_city` string ,
+  `vrfcn_city_lat` double ,
+  `vrfcn_city_lon` double ) ROW FORMAT   DELIMITED
+    FIELDS TERMINATED BY ','
+    COLLECTION ITEMS TERMINATED BY '\\002'
+    MAP KEYS TERMINATED BY '\\003'
+  STORED AS TextFile LOCATION '/user/hue/data'
+TBLPROPERTIES('skip.header.line.count'='1', 'transactional'='false')
+;'''
+  assert_true(statement in sql, sql)
+
+  assert_true('''CREATE TABLE `default`.`parquet_table`
+        STORED BY ICEBERG
+STORED AS parquet
         AS SELECT *
         FROM `default`.`hue__tmp_parquet_table`;
 ''' in sql, sql)
@@ -499,7 +595,7 @@ def test_generate_create_orc_table_transactional():
   '''{"value":"orc","name":"ORC"}],"partitionColumns":[],"kuduPartitionColumns":[],"primaryKeys":[],"primaryKeyObjects":[],'''
   '''"importData":true,"useDefaultLocation":true,"nonDefaultLocation":"/user/hue/data/query-hive-360.csv","hasHeader":true,'''
   '''"useCustomDelimiters":false,"customFieldDelimiter":",","customCollectionDelimiter":"\\\\002","customMapDelimiter":"\\\\003",'''
-  '''"customRegexp":""}'''
+  '''"customRegexp":"","isIceberg":false}'''
   )
 
   path = {'isDir': False, 'split': ('/user/hue/data', 'query-hive-360.csv'), 'listdir': ['/user/hue/data']}
@@ -509,7 +605,7 @@ def test_generate_create_orc_table_transactional():
 
   assert_true('''USE default;''' in sql, sql)
 
-  statement = '''CREATE EXTERNAL TABLE `default`.`hue__tmp_parquet_table`
+  statement = '''CREATE EXTERNAL TABLE IF NOT EXISTS `default`.`hue__tmp_parquet_table`
 (
   `acct_client` string ,
   `tran_amount` double ,
@@ -564,7 +660,8 @@ def test_generate_create_empty_kudu_table():
     '''{"value":"avro","name":"Avro"},{"value":"json","name":"Json"},{"value":"regexp","name":"Regexp"},{"value":"orc","name":"ORC"}],'''
     '''"partitionColumns":[],"kuduPartitionColumns":[],"primaryKeys": ["acct_client"],"primaryKeyObjects":[],"importData":false,'''
     '''"useDefaultLocation":true,"nonDefaultLocation":"/user/hue/data/query-hive-360.csv","hasHeader":false,"useCustomDelimiters":'''
-    '''false,"customFieldDelimiter":",","customCollectionDelimiter":"\\\\002","customMapDelimiter":"\\\\003","customRegexp":""}'''
+    '''false,"customFieldDelimiter":",","customCollectionDelimiter":"\\\\002","customMapDelimiter":"\\\\003","customRegexp":"",'''
+    '''"isIceberg":false}'''
   )
 
   path = {'isDir': False, 'split': ('/user/hue/data', 'query-hive-360.csv'), 'listdir': ['/user/hue/data']}
@@ -682,7 +779,7 @@ def test_create_ddl_with_nonascii():
                  u'rdbmsSplitByColumn': [], u'existingTargetUrl': u'', u'channelSinkTypes':
                    [{u'name': u'This topic', u'value': u'kafka'}, {u'name': u'Solr', u'value': u'solr'},
                     {u'name': u'HDFS', u'value': u'hdfs'}], u'defaultName': u'default.renamed_chinese_cities_gb2312',
-                 u'isTransactionalUpdateEnabled': False, u'importData': True, u'databaseName': u'default',
+                 u'isTransactionalUpdateEnabled': False, u'importData': True, u'isIceberg': False, u'databaseName': u'default',
                  u'indexerRunJob': False, u'indexerReplicationFactor': 1, u'KUDU_DEFAULT_RANGE_PARTITION_COLUMN':
                    {u'include_upper_val': u'<=', u'upper_val': 1, u'name': u'VALUES', u'include_lower_val': u'<=',
                     u'lower_val': 0, u'values': [{u'value': u''}]}, u'primaryKeys': [], u'indexerConfigSet': u'',
@@ -732,7 +829,7 @@ def test_create_ddl_with_nonascii():
 
   assert_true('''USE default;''' in sql, sql)
 
-  statement = '''CREATE TABLE `default`.`hue__tmp_renamed_chinese_cities_gb2312`
+  statement = '''CREATE TABLE IF NOT EXISTS `default`.`hue__tmp_renamed_chinese_cities_gb2312`
 (
   `Before` string ,
   `old_Chinese_name` string ,
@@ -900,8 +997,7 @@ def test_create_table_from_local_impala():
       ],
       'sourceType': 'impala'
     }
-    request = MockRequest(fs=MockFs())
-    sql = SQLIndexer(user=request.user, fs=request.fs).create_table_from_local_file(source, destination).get_str()
+    sql = SQLIndexer(user=Mock(), fs=Mock()).create_table_from_local_file(source, destination).get_str()
 
     statement = '''USE default;
 
@@ -930,6 +1026,77 @@ INSERT INTO default.test1_tmp VALUES \
 ('2011-12-14 12:00:00', '16', '13', '1613', '1731', '8', '-4', 'WN', '33', 'SAN', 'N707SA', '1', '185', '1313'), \
 ('2011-12-14 12:00:00', '11', '45', '1145', '1257', '5', '-13', 'WN', '1212', 'SAN', 'N279WN', '0', '183', '1313'), \
 ('2011-12-14 12:00:00', '20', '16', '2016', '2112', '36', '32', 'WN', '207', 'SAT', 'N929WN', '0', '44', '192');
+
+CREATE TABLE IF NOT EXISTS default.test1
+AS SELECT
+  CAST ( `date` AS timestamp ) `date`,
+  CAST ( `hour` AS bigint ) `hour`,
+  CAST ( `minute` AS bigint ) `minute`,
+  CAST ( `dep` AS bigint ) `dep`,
+  CAST ( `arr` AS bigint ) `arr`,
+  CAST ( `dep_delay` AS bigint ) `dep_delay`,
+  CAST ( `arr_delay` AS bigint ) `arr_delay`,
+  CAST ( `carrier` AS string ) `carrier`,
+  CAST ( `flight` AS bigint ) `flight`,
+  CAST ( `dest` AS string ) `dest`,
+  CAST ( `plane` AS string ) `plane`,
+  CAST ( CAST ( `cancelled` AS TINYINT ) AS boolean ) `cancelled`,
+  CAST ( `time` AS bigint ) `time`,
+  CAST ( `dist` AS bigint ) `dist`
+FROM  default.test1_tmp;
+
+DROP TABLE IF EXISTS default.test1_tmp;'''
+
+    assert_equal(statement, sql)
+
+
+def test_create_table_only_header_file_local_impala():
+  with patch('indexer.indexers.sql.get_interpreter') as get_interpreter:
+    get_interpreter.return_value = {'Name': 'Impala', 'dialect': 'impala'}
+    source = {
+      'path': BASE_DIR + '/apps/beeswax/data/tables/onlyheader.csv',
+      'sourceType': 'impala',
+      'format': {'hasHeader': True}
+    }
+    destination = {
+      'name': 'default.test1',
+      'columns': [
+        {'name': 'date', 'type': 'timestamp', 'keep': True},
+        {'name': 'hour', 'type': 'bigint', 'keep': True},
+        {'name': 'minute', 'type': 'bigint', 'keep': True},
+        {'name': 'dep', 'type': 'bigint', 'keep': True},
+        {'name': 'arr', 'type': 'bigint', 'keep': True},
+        {'name': 'dep_delay', 'type': 'bigint', 'keep': True},
+        {'name': 'arr_delay', 'type': 'bigint', 'keep': True},
+        {'name': 'carrier', 'type': 'string', 'keep': True},
+        {'name': 'flight', 'type': 'bigint', 'keep': True},
+        {'name': 'dest', 'type': 'string', 'keep': True},
+        {'name': 'plane', 'type': 'string', 'keep': True},
+        {'name': 'cancelled', 'type': 'boolean', 'keep': True},
+        {'name': 'time', 'type': 'bigint', 'keep': True},
+        {'name': 'dist', 'type': 'bigint', 'keep': True},
+      ],
+      'sourceType': 'impala'
+    }
+    sql = SQLIndexer(user=Mock(), fs=Mock()).create_table_from_local_file(source, destination).get_str()
+
+    statement = '''USE default;
+
+CREATE TABLE IF NOT EXISTS default.test1_tmp (
+  `date` string,
+  `hour` string,
+  `minute` string,
+  `dep` string,
+  `arr` string,
+  `dep_delay` string,
+  `arr_delay` string,
+  `carrier` string,
+  `flight` string,
+  `dest` string,
+  `plane` string,
+  `cancelled` string,
+  `time` string,
+  `dist` string);
 
 CREATE TABLE IF NOT EXISTS default.test1
 AS SELECT

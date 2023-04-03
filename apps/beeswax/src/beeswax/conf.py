@@ -159,6 +159,12 @@ SERVER_CONN_TIMEOUT = Config(
   type=int,
   help=_t('Timeout in seconds for Thrift calls.'))
 
+ZOOKEEPER_CONN_TIMEOUT = Config(
+  key='zookeeper_conn_timeout',
+  default=30,
+  type=int,
+  help=_t('Timeout in seconds for zookeeper connection.'))
+
 USE_GET_LOG_API = Config( # To remove in Hue 4
   key='use_get_log_api',
   default=False,
@@ -240,7 +246,7 @@ MAX_NUMBER_OF_SESSIONS = Config(
           # does not have ability to manage them effectively. The cost of a session is low
           "-1 is unlimited number of sessions."),
   type=int,
-  default=1
+  default=-1
 )
 
 THRIFT_VERSION = Config(

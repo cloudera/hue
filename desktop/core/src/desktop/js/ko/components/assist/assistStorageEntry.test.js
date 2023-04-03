@@ -16,6 +16,8 @@
 
 import $ from 'jquery';
 
+import huePubSub from 'utils/huePubSub';
+
 import AssistStorageEntry from './assistStorageEntry';
 import * as hueConfig from 'config/hueConfig';
 
@@ -79,5 +81,36 @@ describe('assistStorageEntry.js', () => {
 
     spy.mockRestore();
     spy.mockClear();
+  });
+
+  it('uses pubsub "open.filebrowserlink" with decoded path to open files in the filebrowser', async () => {
+    const publishSpy = jest.spyOn(huePubSub, 'publish');
+    const entry = new AssistStorageEntry({
+      parent: null,
+      definition: { type: 'file', path: '/%20 åäö' }
+    });
+    expect(entry.definition.type).toEqual('file');
+    const event = {};
+    entry.toggleOpen(undefined, event);
+    expect(publishSpy).toBeCalledWith('open.filebrowserlink', {
+      decodedPath: '/%20 åäö',
+      pathPrefix: '/filebrowser/view='
+    });
+  });
+
+  it('uses pubsub "open.filebrowserlink" with decoded path to open files in a new window', async () => {
+    const publishSpy = jest.spyOn(huePubSub, 'publish');
+    const entry = new AssistStorageEntry({
+      parent: null,
+      definition: { type: 'file', path: '/%20 åäö' }
+    });
+    expect(entry.definition.type).toEqual('file');
+    const event = { ctrlKey: true };
+    entry.toggleOpen(undefined, event);
+    expect(publishSpy).toBeCalledWith('open.filebrowserlink', {
+      decodedPath: '/%20 åäö',
+      pathPrefix: '/filebrowser/view=',
+      browserTarget: '_blank'
+    });
   });
 });

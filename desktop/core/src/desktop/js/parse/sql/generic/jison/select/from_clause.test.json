@@ -1,0 +1,101 @@
+[
+  {
+    "namePrefix": "should suggest databases or tables",
+    "beforeCursor": "SELECT * FROM ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestTables": {},
+      "suggestDatabases": {
+        "appendDot": true
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest databases or tables",
+    "beforeCursor": "SELECT * FROM tes",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestTables": {},
+      "suggestDatabases": {
+        "appendDot": true
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest databases or tables",
+    "beforeCursor": "SELECT * FROM `tes",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestTables": {
+        "appendBacktick": true
+      },
+      "suggestDatabases": {
+        "appendBacktick": true,
+        "appendDot": true
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest tables",
+    "beforeCursor": "SELECT * FROM database_two.",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestTables": {
+        "identifierChain": [
+          {
+            "name": "database_two"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest tables",
+    "beforeCursor": "SELECT * FROM `database_two`.",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestTables": {
+        "identifierChain": [
+          {
+            "name": "database_two"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest tables",
+    "beforeCursor": "SELECT * FROM 33abc.",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestTables": {
+        "identifierChain": [
+          {
+            "name": "33abc"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest tables",
+    "beforeCursor": "SELECT * FROM `database_two`.`bla ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestTables": {
+        "identifierChain": [
+          {
+            "name": "database_two"
+          }
+        ]
+      }
+    }
+  }
+]

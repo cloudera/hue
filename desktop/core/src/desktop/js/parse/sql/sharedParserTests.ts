@@ -1,4 +1,4 @@
-interface CommonParser {
+export interface CommonParser {
   identifyPartials(
     beforeCursor: string,
     afterCursor: string

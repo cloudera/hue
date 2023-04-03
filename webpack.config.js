@@ -15,6 +15,7 @@
 // limitations under the License.
 
 const fs = require('fs');
+const webpack = require('webpack');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const {
   BUNDLES,
@@ -36,7 +37,7 @@ const config = {
   },
   mode: 'development',
   module: {
-    rules: [
+    rules: [    
       {
         test: /\.vue$/,
         exclude: /node_modules/,
@@ -45,13 +46,39 @@ const config = {
       {
         test: /\.(jsx?|tsx?)$/,
         exclude: /node_modules/,
-        use: ['source-map-loader', 'babel-loader']
+        use: [{
+          loader: 'babel-loader',
+          options: {
+            presets: ['@babel/preset-env', '@babel/preset-react']
+          }
+        }] 
       },
+      {
+        test: /\.(jsx?|tsx?)$/,
+        enforce: "pre",
+        use: ["source-map-loader"],
+      },      
       {
         test: /\.scss$/,
         exclude: /node_modules/,
         use: ['style-loader', 'css-loader', 'sass-loader']
       },
+      {
+        test: /\.less$/i,
+        use: [
+          { loader: "style-loader" },
+          { loader: "css-loader" },
+          {
+              loader: "less-loader",
+              options: {
+                  lessOptions: {
+                      // This is not ideal but required by antd library
+                      javascriptEnabled: true,
+                  }
+              }
+          }          
+        ],
+      },      
       {
         test: /\.html$/,
         exclude: /node_modules/,
@@ -69,6 +96,8 @@ const config = {
     }
   },
   output: {
+    // Needed, at the time of writing with webpack 5.54.0, when using node 18.14.1 and later. 
+    hashFunction: 'xxhash64',
     path: __dirname + '/desktop/core/src/desktop/static/desktop/js/bundles/hue',
     filename: '[name]-bundle-[fullhash].js',
     chunkFilename: '[name]-chunk-[fullhash].js',
@@ -83,7 +112,9 @@ const config = {
     maxAssetSize: 400 * 1024 // 400kb
   },
   plugins: getPluginConfig(BUNDLES.HUE).concat([
-    new CleanWebpackPlugin([`${__dirname}/desktop/core/src/desktop/static/desktop/js/bundles/hue`])
+    // Needed to wrap antd and prevent it from affecting global styles
+    new webpack.NormalModuleReplacementPlugin( /node_modules\/antd\/lib\/style\/index\.less/, `${__dirname}/desktop/core/static/desktop/less/root-wrapped-antd.less`),
+    new CleanWebpackPlugin([`${__dirname}/desktop/core/src/desktop/static/desktop/js/bundles/hue`]),    
   ]),
   resolve: {
     extensions: ['.json', '.jsx', '.js', '.tsx', '.ts', '.vue'],

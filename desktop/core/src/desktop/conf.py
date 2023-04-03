@@ -205,6 +205,39 @@ X_FRAME_OPTIONS = Config(
   type=str,
   default="SAMEORIGIN")
 
+HUE_IMAGE_VERSION = Config(
+  key="hue_image_version",
+  help=_("Image version of Hue"),
+  type=str,
+  default="")
+
+HUE_HOST_NAME = Config(
+  key="hue_host",
+  help=_("Name of Hue host selected"),
+  type=str,
+  default="")
+
+LIMIT_REQUEST_FIELD_SIZE = Config(
+  key="limit_request_field_size",
+  help=_("This property specifies the maximum allowed size of an HTTP request header field."),
+  default=8190,
+  type=int
+)
+
+LIMIT_REQUEST_FIELDS = Config(
+  key="limit_request_fields",
+  help=_("This property specifies the maximum number of HTTP headers fields in a request."),
+  default=100,
+  type=int
+)
+
+LIMIT_REQUEST_LINE = Config(
+  key="limit_request_line",
+  help=_("This property specifies the maximum size of HTTP request line in bytes."),
+  default=4094,
+  type=int
+)
+
 SSL_CERTIFICATE = Config(
   key="ssl_certificate",
   help=_("Filename of SSL Certificate"),
@@ -233,13 +266,7 @@ SSL_CIPHER_LIST = Config(
   # Opera 20 and Safari 9.
   default=':'.join([
     'ECDHE-RSA-AES128-GCM-SHA256',
-    'ECDHE-ECDSA-AES128-GCM-SHA256',
     'ECDHE-RSA-AES256-GCM-SHA384',
-    'ECDHE-ECDSA-AES256-GCM-SHA384',
-    'DHE-RSA-AES128-GCM-SHA256',
-    'ECDHE-ECDSA-CHACHA20-POLY1305',
-    'ECDHE-RSA-CHACHA20-POLY1305',
-    'DHE-RSA-AES256-GCM-SHA384',
     '!aNULL',
     '!eNULL',
     '!EXPORT',
@@ -322,10 +349,10 @@ SECURE_CONTENT_SECURITY_POLICY = Config(
   help=_('X-Content-Type-Options: nosniff. This is a HTTP response header feature that helps prevent attacks '
     'based on MIME-type confusion.'),
   type=str,
-  default="script-src 'self' 'unsafe-inline' 'unsafe-eval' *.google-analytics.com *.doubleclick.net data:;"+
-          "img-src 'self' *.google-analytics.com *.doubleclick.net http://*.tile.osm.org *.tile.osm.org *.gstatic.com data:;"+
+  default="script-src 'self' 'unsafe-inline' 'unsafe-eval' *.googletagmanager.com *.doubleclick.net data:;"+
+          "img-src 'self' *.doubleclick.net http://*.tile.osm.org *.tile.osm.org *.gstatic.com data:;"+
           "style-src 'self' 'unsafe-inline' fonts.googleapis.com;"+
-          "connect-src 'self';"+
+          "connect-src 'self' *.google-analytics.com;"+
           "frame-src *;"+
           "child-src 'self' data: *.vimeo.com;"+
           "object-src 'none'")
@@ -447,9 +474,15 @@ USER_ACCESS_HISTORY_SIZE = Config(
 COLLECT_USAGE = Config(
   key="collect_usage",
   help=_("Help improve Hue with anonymous usage analytics."
-         "Use Google Analytics to see how many times an application or specific section of an application is used, nothing more."),
+         "Use Google Analytics 4 to see how many times an application or specific section of an application is used, nothing more."),
   type=coerce_bool,
   default=True)
+
+GTAG_ID = Config(
+  key="gtag_id",
+  help=_("The gTag id used for anonymous analytics with Google Analytics 4."),
+  type=str,
+  default="G-25K7599S1Q")
 
 REST_RESPONSE_SIZE = Config(
   key="rest_response_size",
@@ -707,6 +740,11 @@ METRICS = ConfigSection(
       default=30000),
   )
 )
+
+def is_gunicorn_report_enabled():
+  return 'rungunicornserver' in sys.argv \
+    and METRICS.LOCATION.get() is not None \
+    and METRICS.COLLECTION_INTERVAL.get() is not None
 
 SLACK = ConfigSection(
   key='slack',
@@ -1288,7 +1326,7 @@ LDAP = ConfigSection(
                            default=None,
                            help=_("The LDAP URL to connect to.")),
           USE_START_TLS=Config("use_start_tls",
-                               default=False,
+                               default=True,
                                type=coerce_bool,
                                help=_("Use StartTLS when communicating with LDAP server.")),
           LDAP_CERT=Config("ldap_cert",
@@ -1385,7 +1423,7 @@ LDAP = ConfigSection(
                      default=None,
                      help=_("The LDAP URL to connect to.")),
     USE_START_TLS=Config("use_start_tls",
-                         default=False,
+                         default=True,
                          type=coerce_bool,
                          help=_("Use StartTLS when communicating with LDAP server.")),
     LDAP_CERT=Config("ldap_cert",
@@ -1745,6 +1783,13 @@ EDITOR_AUTOCOMPLETE_TIMEOUT = Config(
   type=int,
   default=30000,
   help=_('Timeout value in ms for autocomplete of columns, tables, values etc. 0 = disabled.')
+)
+
+ENABLE_HUE_5 = Config(
+  key="enable_hue_5",
+  help=_("Feature flag to enable Hue 5."),
+  type=coerce_bool,
+  default=False
 )
 
 USE_NEW_EDITOR = Config( # To remove in Hue 4
@@ -2151,6 +2196,12 @@ RAZ = ConfigSection(
         type=coerce_str_lowercase,
         default='kerberos',
     ),
+    AUTOCREATE_USER_DIR=Config(
+      key='autocreate_user_dir',
+      help=_('Autocreate the user home directory in the remote storage home path.'),
+      type=coerce_bool,
+      default=True,
+    ),
   )
 )
 
@@ -2513,3 +2564,73 @@ def is_gs_enabled():
 def has_gs_access(user):
   from desktop.auth.backend import is_admin
   return user.is_authenticated and user.is_active and (is_admin(user) or user.has_hue_permission(action="gs_access", app="filebrowser"))
+
+
+def get_ozone_conf_dir_default():
+  """
+  Get from environment variable OZONE_CONF_DIR or '/etc/ozone/conf'
+  """
+  return os.environ.get("OZONE_CONF_DIR", "/etc/ozone/conf")
+
+
+PERMISSION_ACTION_OFS = "ofs_access"
+
+OZONE = UnspecifiedConfigSection(
+  "ozone",
+  help="One entry for each Ozone cluster",
+  each=ConfigSection(
+    help="Information about a single Ozone cluster",
+    members=dict(
+      FS_DEFAULTFS=Config(
+          "fs_defaultfs",
+          help="The equivalent of fs.defaultFS (aka fs.default.name)",
+          type=str,
+          default=None
+      ),
+      LOGICAL_NAME=Config(
+          "logical_name",
+          default="",
+          type=str,
+          help=_('NameNode logical name.')
+      ),
+      WEBHDFS_URL=Config(
+          "webhdfs_url",
+          help="The URL to WebHDFS/HttpFS service. Defaults to the WebHDFS URL on the NameNode.",
+          type=str,
+          default=None
+      ),
+      SECURITY_ENABLED=Config(
+          "security_enabled",
+          help="Whether Ozone requires client to perform Kerberos authentication",
+          type=coerce_bool,
+          default=False
+      ),
+      SSL_CERT_CA_VERIFY=Config(
+          "ssl_cert_ca_verify",
+          help="Choose whether Hue should validate certificates received from the server.",
+          dynamic_default=default_ssl_validate,
+          type=coerce_bool
+      ),
+      TEMP_DIR=Config(
+          "temp_dir",
+          help="Ozone directory for temporary files",
+          default='/tmp',
+          type=str
+      ),
+      OZONE_CONF_DIR=Config(
+          key="ozone_conf_dir",
+          dynamic_default=get_ozone_conf_dir_default,
+          help="Directory of the Ozone configuration. Defaults to the env variable OZONE_CONF_DIR when set, or '/etc/ozone/conf'",
+          type=str
+      ),
+    )
+  )
+)
+
+def is_ofs_enabled():
+  return ('default' in list(OZONE.keys()) and OZONE['default'].get_raw() and OZONE['default'].WEBHDFS_URL.get())
+
+
+def has_ofs_access(user):
+  from desktop.auth.backend import is_admin
+  return user.is_authenticated and user.is_active and (is_admin(user) or user.has_hue_permission(action="ofs_access", app="filebrowser"))

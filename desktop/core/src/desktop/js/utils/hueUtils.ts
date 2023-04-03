@@ -38,6 +38,7 @@ import stripHtmlFromFunctions from './html/stripHtmlForFunctions';
 import deleteAllEmptyStringKeys from './string/deleteAllEmptyStringKeys';
 import equalIgnoreCase from './string/equalIgnoreCase';
 import parseHivePseudoJson from './string/parseHivePseudoJson';
+import includesComplexDBTypeDefinition from './string/includesComplexDBTypeDefinition';
 import UUID from './string/UUID';
 
 import waitForObservable from './timing/waitForObservable';
@@ -73,6 +74,7 @@ export default {
   hueLocalStorage,
   html2text,
   htmlEncode,
+  includesComplexDBTypeDefinition,
   isFullScreen,
   isOverflowing,
   logError,

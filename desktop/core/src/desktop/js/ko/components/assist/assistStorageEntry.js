@@ -39,6 +39,10 @@ const TYPE_SPECIFICS = {
   s3: {
     apiHelperFetchFunction: 'fetchS3Path',
     dblClickPubSubId: 'assist.dblClickS3Item'
+  },
+  ofs: {
+    apiHelperFetchFunction: 'fetchOfsPath',
+    dblClickPubSubId: 'assist.dblClickOfsItem'
   }
 };
 
@@ -244,11 +248,14 @@ class AssistStorageEntry {
   toggleOpen(data, event) {
     const self = this;
     if (self.definition.type === 'file') {
-      if (event.ctrlKey || event.metaKey || event.which === 2) {
-        window.open('/hue' + self.definition.url, '_blank');
-      } else {
-        huePubSub.publish('open.link', self.definition.url);
-      }
+      const browserTarget =
+        event.ctrlKey || event.metaKey || event.which === 2 ? '_blank' : undefined;
+
+      huePubSub.publish('open.filebrowserlink', {
+        pathPrefix: '/filebrowser/view=',
+        decodedPath: self.definition.path,
+        browserTarget
+      });
       return;
     }
     self.open(!self.open());
@@ -356,6 +363,7 @@ class AssistStorageEntry {
     type = type.replace(/s3.*/i, 's3');
     type = type.replace(/adl.*/i, 'adls');
     type = type.replace(/abfs.*/i, 'abfs');
+    type = type.replace(/ofs.*/i, 'ofs');
 
     // TODO: connector.id for browser connectors
     const connector = findBrowserConnector(connector => connector.type === type);

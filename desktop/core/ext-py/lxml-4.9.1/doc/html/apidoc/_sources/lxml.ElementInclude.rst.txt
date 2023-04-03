@@ -1,0 +1,8 @@
+lxml.ElementInclude module
+==========================
+
+.. automodule:: lxml.ElementInclude
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:

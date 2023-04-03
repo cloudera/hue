@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>lxml.html.builder module &mdash; lxml  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="lxml.html.clean module" href="lxml.html.clean.html" />
+    <link rel="prev" title="lxml.html._setmixin module" href="lxml.html._setmixin.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> lxml
+            <img src="_static/python-xml.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                4.9.1
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="lxml.html">lxml package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="lxml.html.html">lxml.html package</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="lxml.html.ElementSoup.html">lxml.html.ElementSoup module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lxml.html._diffcommand.html">lxml.html._diffcommand module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lxml.html._setmixin.html">lxml.html._setmixin module</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">lxml.html.builder module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lxml.html.clean.html">lxml.html.clean module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lxml.html.defs.html">lxml.html.defs module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lxml.html.diff.html">lxml.html.diff module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lxml.html.formfill.html">lxml.html.formfill module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lxml.html.html5parser.html">lxml.html.html5parser module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lxml.html.soupparser.html">lxml.html.soupparser module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lxml.isoschematron.html">lxml.isoschematron package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lxml.ElementInclude.html">lxml.ElementInclude module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lxml._elementpath.html">lxml._elementpath module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lxml.builder.html">lxml.builder module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lxml.cssselect.html">lxml.cssselect module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lxml.doctestcompare.html">lxml.doctestcompare module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lxml.etree.html">lxml.etree module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lxml.objectify.html">lxml.objectify module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lxml.sax.html">lxml.sax module</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">lxml</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="lxml.html">lxml package</a> &raquo;</li>
+          <li><a href="lxml.html.html">lxml.html package</a> &raquo;</li>
+      <li>lxml.html.builder module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/lxml.html.builder.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-lxml.html.builder">
+<span id="lxml-html-builder-module"></span><h1>lxml.html.builder module<a class="headerlink" href="#module-lxml.html.builder" title="Permalink to this heading"></a></h1>
+<p>A set of HTML generator tags for building HTML documents.</p>
+<p>Usage:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">lxml.html.builder</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">html</span> <span class="o">=</span> <span class="n">HTML</span><span class="p">(</span>
+<span class="gp">... </span>           <span class="n">HEAD</span><span class="p">(</span> <span class="n">TITLE</span><span class="p">(</span><span class="s2">&quot;Hello World&quot;</span><span class="p">)</span> <span class="p">),</span>
+<span class="gp">... </span>           <span class="n">BODY</span><span class="p">(</span> <span class="n">CLASS</span><span class="p">(</span><span class="s2">&quot;main&quot;</span><span class="p">),</span>
+<span class="gp">... </span>                 <span class="n">H1</span><span class="p">(</span><span class="s2">&quot;Hello World !&quot;</span><span class="p">)</span>
+<span class="gp">... </span>           <span class="p">)</span>
+<span class="gp">... </span>       <span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">lxml.etree</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">lxml</span><span class="o">.</span><span class="n">etree</span><span class="o">.</span><span class="n">tostring</span><span class="p">(</span><span class="n">html</span><span class="p">,</span> <span class="n">pretty_print</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">&lt;html&gt;</span>
+<span class="go">  &lt;head&gt;</span>
+<span class="go">    &lt;title&gt;Hello World&lt;/title&gt;</span>
+<span class="go">  &lt;/head&gt;</span>
+<span class="go">  &lt;body class=&quot;main&quot;&gt;</span>
+<span class="go">    &lt;h1&gt;Hello World !&lt;/h1&gt;</span>
+<span class="go">  &lt;/body&gt;</span>
+<span class="go">&lt;/html&gt;</span>
+</pre></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="lxml.html.builder.CLASS">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">CLASS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lxml/html/builder.html#CLASS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lxml.html.builder.CLASS" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lxml.html.builder.FOR">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">FOR</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lxml/html/builder.html#FOR"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lxml.html.builder.FOR" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.A">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">A</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'a')</span></em><a class="headerlink" href="#lxml.html.builder.A" title="Permalink to this definition"></a></dt>
+<dd><p>anchor</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.ABBR">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">ABBR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'abbr')</span></em><a class="headerlink" href="#lxml.html.builder.ABBR" title="Permalink to this definition"></a></dt>
+<dd><p>abbreviated form (e.g., WWW, HTTP, etc.)</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.ACRONYM">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">ACRONYM</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'acronym')</span></em><a class="headerlink" href="#lxml.html.builder.ACRONYM" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.ADDRESS">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">ADDRESS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'address')</span></em><a class="headerlink" href="#lxml.html.builder.ADDRESS" title="Permalink to this definition"></a></dt>
+<dd><p>information on author</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.APPLET">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">APPLET</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'applet')</span></em><a class="headerlink" href="#lxml.html.builder.APPLET" title="Permalink to this definition"></a></dt>
+<dd><p>Java applet (DEPRECATED)</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.AREA">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">AREA</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'area')</span></em><a class="headerlink" href="#lxml.html.builder.AREA" title="Permalink to this definition"></a></dt>
+<dd><p>client-side image map area</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.B">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">B</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'b')</span></em><a class="headerlink" href="#lxml.html.builder.B" title="Permalink to this definition"></a></dt>
+<dd><p>bold text style</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.BASE">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">BASE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'base')</span></em><a class="headerlink" href="#lxml.html.builder.BASE" title="Permalink to this definition"></a></dt>
+<dd><p>document base URI</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.BASEFONT">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">BASEFONT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'basefont')</span></em><a class="headerlink" href="#lxml.html.builder.BASEFONT" title="Permalink to this definition"></a></dt>
+<dd><p>base font size (DEPRECATED)</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.BDO">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">BDO</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'bdo')</span></em><a class="headerlink" href="#lxml.html.builder.BDO" title="Permalink to this definition"></a></dt>
+<dd><p>I18N BiDi over-ride</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.BIG">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">BIG</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'big')</span></em><a class="headerlink" href="#lxml.html.builder.BIG" title="Permalink to this definition"></a></dt>
+<dd><p>large text style</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.BLOCKQUOTE">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">BLOCKQUOTE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'blockquote')</span></em><a class="headerlink" href="#lxml.html.builder.BLOCKQUOTE" title="Permalink to this definition"></a></dt>
+<dd><p>long quotation</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.BODY">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">BODY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'body')</span></em><a class="headerlink" href="#lxml.html.builder.BODY" title="Permalink to this definition"></a></dt>
+<dd><p>document body</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.BR">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">BR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'br')</span></em><a class="headerlink" href="#lxml.html.builder.BR" title="Permalink to this definition"></a></dt>
+<dd><p>forced line break</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.BUTTON">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">BUTTON</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'button')</span></em><a class="headerlink" href="#lxml.html.builder.BUTTON" title="Permalink to this definition"></a></dt>
+<dd><p>push button</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.CAPTION">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">CAPTION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'caption')</span></em><a class="headerlink" href="#lxml.html.builder.CAPTION" title="Permalink to this definition"></a></dt>
+<dd><p>table caption</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.CENTER">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">CENTER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'center')</span></em><a class="headerlink" href="#lxml.html.builder.CENTER" title="Permalink to this definition"></a></dt>
+<dd><p>shorthand for DIV align=center (DEPRECATED)</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.CITE">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">CITE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'cite')</span></em><a class="headerlink" href="#lxml.html.builder.CITE" title="Permalink to this definition"></a></dt>
+<dd><p>citation</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.CODE">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">CODE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'code')</span></em><a class="headerlink" href="#lxml.html.builder.CODE" title="Permalink to this definition"></a></dt>
+<dd><p>computer code fragment</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.COL">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">COL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'col')</span></em><a class="headerlink" href="#lxml.html.builder.COL" title="Permalink to this definition"></a></dt>
+<dd><p>table column</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.COLGROUP">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">COLGROUP</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'colgroup')</span></em><a class="headerlink" href="#lxml.html.builder.COLGROUP" title="Permalink to this definition"></a></dt>
+<dd><p>table column group</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.DD">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">DD</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'dd')</span></em><a class="headerlink" href="#lxml.html.builder.DD" title="Permalink to this definition"></a></dt>
+<dd><p>definition description</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.DEL">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">DEL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'del')</span></em><a class="headerlink" href="#lxml.html.builder.DEL" title="Permalink to this definition"></a></dt>
+<dd><p>deleted text</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.DFN">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">DFN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'dfn')</span></em><a class="headerlink" href="#lxml.html.builder.DFN" title="Permalink to this definition"></a></dt>
+<dd><p>instance definition</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.DIR">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">DIR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'dir')</span></em><a class="headerlink" href="#lxml.html.builder.DIR" title="Permalink to this definition"></a></dt>
+<dd><p>directory list (DEPRECATED)</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.DIV">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">DIV</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'div')</span></em><a class="headerlink" href="#lxml.html.builder.DIV" title="Permalink to this definition"></a></dt>
+<dd><p>generic language/style container</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.DL">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">DL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'dl')</span></em><a class="headerlink" href="#lxml.html.builder.DL" title="Permalink to this definition"></a></dt>
+<dd><p>definition list</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.DT">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">DT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'dt')</span></em><a class="headerlink" href="#lxml.html.builder.DT" title="Permalink to this definition"></a></dt>
+<dd><p>definition term</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.EM">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">EM</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'em')</span></em><a class="headerlink" href="#lxml.html.builder.EM" title="Permalink to this definition"></a></dt>
+<dd><p>emphasis</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.FIELDSET">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">FIELDSET</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'fieldset')</span></em><a class="headerlink" href="#lxml.html.builder.FIELDSET" title="Permalink to this definition"></a></dt>
+<dd><p>form control group</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.FONT">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">FONT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'font')</span></em><a class="headerlink" href="#lxml.html.builder.FONT" title="Permalink to this definition"></a></dt>
+<dd><p>local change to font (DEPRECATED)</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.FORM">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">FORM</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'form')</span></em><a class="headerlink" href="#lxml.html.builder.FORM" title="Permalink to this definition"></a></dt>
+<dd><p>interactive form</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.FRAME">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">FRAME</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'frame')</span></em><a class="headerlink" href="#lxml.html.builder.FRAME" title="Permalink to this definition"></a></dt>
+<dd><p>subwindow</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.FRAMESET">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">FRAMESET</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'frameset')</span></em><a class="headerlink" href="#lxml.html.builder.FRAMESET" title="Permalink to this definition"></a></dt>
+<dd><p>window subdivision</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.H1">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">H1</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'h1')</span></em><a class="headerlink" href="#lxml.html.builder.H1" title="Permalink to this definition"></a></dt>
+<dd><p>heading</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.H2">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">H2</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'h2')</span></em><a class="headerlink" href="#lxml.html.builder.H2" title="Permalink to this definition"></a></dt>
+<dd><p>heading</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.H3">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">H3</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'h3')</span></em><a class="headerlink" href="#lxml.html.builder.H3" title="Permalink to this definition"></a></dt>
+<dd><p>heading</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.H4">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">H4</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'h4')</span></em><a class="headerlink" href="#lxml.html.builder.H4" title="Permalink to this definition"></a></dt>
+<dd><p>heading</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.H5">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">H5</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'h5')</span></em><a class="headerlink" href="#lxml.html.builder.H5" title="Permalink to this definition"></a></dt>
+<dd><p>heading</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.H6">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">H6</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'h6')</span></em><a class="headerlink" href="#lxml.html.builder.H6" title="Permalink to this definition"></a></dt>
+<dd><p>heading</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.HEAD">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">HEAD</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'head')</span></em><a class="headerlink" href="#lxml.html.builder.HEAD" title="Permalink to this definition"></a></dt>
+<dd><p>document head</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.HR">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">HR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'hr')</span></em><a class="headerlink" href="#lxml.html.builder.HR" title="Permalink to this definition"></a></dt>
+<dd><p>horizontal rule</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.HTML">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">HTML</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'html')</span></em><a class="headerlink" href="#lxml.html.builder.HTML" title="Permalink to this definition"></a></dt>
+<dd><p>document root element</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.I">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">I</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'i')</span></em><a class="headerlink" href="#lxml.html.builder.I" title="Permalink to this definition"></a></dt>
+<dd><p>italic text style</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.IFRAME">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">IFRAME</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'iframe')</span></em><a class="headerlink" href="#lxml.html.builder.IFRAME" title="Permalink to this definition"></a></dt>
+<dd><p>inline subwindow</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.IMG">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">IMG</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'img')</span></em><a class="headerlink" href="#lxml.html.builder.IMG" title="Permalink to this definition"></a></dt>
+<dd><p>Embedded image</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.INPUT">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">INPUT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'input')</span></em><a class="headerlink" href="#lxml.html.builder.INPUT" title="Permalink to this definition"></a></dt>
+<dd><p>form control</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.INS">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">INS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'ins')</span></em><a class="headerlink" href="#lxml.html.builder.INS" title="Permalink to this definition"></a></dt>
+<dd><p>inserted text</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.ISINDEX">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">ISINDEX</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'isindex')</span></em><a class="headerlink" href="#lxml.html.builder.ISINDEX" title="Permalink to this definition"></a></dt>
+<dd><p>single line prompt (DEPRECATED)</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.KBD">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">KBD</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'kbd')</span></em><a class="headerlink" href="#lxml.html.builder.KBD" title="Permalink to this definition"></a></dt>
+<dd><p>text to be entered by the user</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.LABEL">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">LABEL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'label')</span></em><a class="headerlink" href="#lxml.html.builder.LABEL" title="Permalink to this definition"></a></dt>
+<dd><p>form field label text</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.LEGEND">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">LEGEND</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'legend')</span></em><a class="headerlink" href="#lxml.html.builder.LEGEND" title="Permalink to this definition"></a></dt>
+<dd><p>fieldset legend</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.LI">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">LI</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'li')</span></em><a class="headerlink" href="#lxml.html.builder.LI" title="Permalink to this definition"></a></dt>
+<dd><p>list item</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.LINK">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">LINK</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'link')</span></em><a class="headerlink" href="#lxml.html.builder.LINK" title="Permalink to this definition"></a></dt>
+<dd><p>a media-independent link</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.MAP">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">MAP</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'map')</span></em><a class="headerlink" href="#lxml.html.builder.MAP" title="Permalink to this definition"></a></dt>
+<dd><p>client-side image map</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.MENU">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">MENU</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'menu')</span></em><a class="headerlink" href="#lxml.html.builder.MENU" title="Permalink to this definition"></a></dt>
+<dd><p>menu list (DEPRECATED)</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.META">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">META</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'meta')</span></em><a class="headerlink" href="#lxml.html.builder.META" title="Permalink to this definition"></a></dt>
+<dd><p>generic metainformation</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.NOFRAMES">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">NOFRAMES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'noframes')</span></em><a class="headerlink" href="#lxml.html.builder.NOFRAMES" title="Permalink to this definition"></a></dt>
+<dd><p>alternate content container for non frame-based rendering</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.NOSCRIPT">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">NOSCRIPT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'noscript')</span></em><a class="headerlink" href="#lxml.html.builder.NOSCRIPT" title="Permalink to this definition"></a></dt>
+<dd><p>alternate content container for non script-based rendering</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.OBJECT">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">OBJECT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'object')</span></em><a class="headerlink" href="#lxml.html.builder.OBJECT" title="Permalink to this definition"></a></dt>
+<dd><p>generic embedded object</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.OL">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">OL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'ol')</span></em><a class="headerlink" href="#lxml.html.builder.OL" title="Permalink to this definition"></a></dt>
+<dd><p>ordered list</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.OPTGROUP">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">OPTGROUP</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'optgroup')</span></em><a class="headerlink" href="#lxml.html.builder.OPTGROUP" title="Permalink to this definition"></a></dt>
+<dd><p>option group</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.OPTION">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">OPTION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'option')</span></em><a class="headerlink" href="#lxml.html.builder.OPTION" title="Permalink to this definition"></a></dt>
+<dd><p>selectable choice</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.P">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">P</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'p')</span></em><a class="headerlink" href="#lxml.html.builder.P" title="Permalink to this definition"></a></dt>
+<dd><p>paragraph</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.PARAM">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">PARAM</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'param')</span></em><a class="headerlink" href="#lxml.html.builder.PARAM" title="Permalink to this definition"></a></dt>
+<dd><p>named property value</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.PRE">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">PRE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'pre')</span></em><a class="headerlink" href="#lxml.html.builder.PRE" title="Permalink to this definition"></a></dt>
+<dd><p>preformatted text</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.Q">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">Q</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'q')</span></em><a class="headerlink" href="#lxml.html.builder.Q" title="Permalink to this definition"></a></dt>
+<dd><p>short inline quotation</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.S">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">S</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'s')</span></em><a class="headerlink" href="#lxml.html.builder.S" title="Permalink to this definition"></a></dt>
+<dd><p>strike-through text style (DEPRECATED)</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.SAMP">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">SAMP</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'samp')</span></em><a class="headerlink" href="#lxml.html.builder.SAMP" title="Permalink to this definition"></a></dt>
+<dd><p>sample program output, scripts, etc.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.SCRIPT">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">SCRIPT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'script')</span></em><a class="headerlink" href="#lxml.html.builder.SCRIPT" title="Permalink to this definition"></a></dt>
+<dd><p>script statements</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.SELECT">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">SELECT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'select')</span></em><a class="headerlink" href="#lxml.html.builder.SELECT" title="Permalink to this definition"></a></dt>
+<dd><p>option selector</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.SMALL">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">SMALL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'small')</span></em><a class="headerlink" href="#lxml.html.builder.SMALL" title="Permalink to this definition"></a></dt>
+<dd><p>small text style</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.SPAN">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">SPAN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'span')</span></em><a class="headerlink" href="#lxml.html.builder.SPAN" title="Permalink to this definition"></a></dt>
+<dd><p>generic language/style container</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.STRIKE">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">STRIKE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'strike')</span></em><a class="headerlink" href="#lxml.html.builder.STRIKE" title="Permalink to this definition"></a></dt>
+<dd><p>strike-through text (DEPRECATED)</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.STRONG">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">STRONG</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'strong')</span></em><a class="headerlink" href="#lxml.html.builder.STRONG" title="Permalink to this definition"></a></dt>
+<dd><p>strong emphasis</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.STYLE">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">STYLE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'style')</span></em><a class="headerlink" href="#lxml.html.builder.STYLE" title="Permalink to this definition"></a></dt>
+<dd><p>style info</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.SUB">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">SUB</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'sub')</span></em><a class="headerlink" href="#lxml.html.builder.SUB" title="Permalink to this definition"></a></dt>
+<dd><p>subscript</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.SUP">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">SUP</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'sup')</span></em><a class="headerlink" href="#lxml.html.builder.SUP" title="Permalink to this definition"></a></dt>
+<dd><p>superscript</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.TABLE">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">TABLE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'table')</span></em><a class="headerlink" href="#lxml.html.builder.TABLE" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.TBODY">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">TBODY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'tbody')</span></em><a class="headerlink" href="#lxml.html.builder.TBODY" title="Permalink to this definition"></a></dt>
+<dd><p>table body</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.TD">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">TD</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'td')</span></em><a class="headerlink" href="#lxml.html.builder.TD" title="Permalink to this definition"></a></dt>
+<dd><p>table data cell</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.TEXTAREA">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">TEXTAREA</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'textarea')</span></em><a class="headerlink" href="#lxml.html.builder.TEXTAREA" title="Permalink to this definition"></a></dt>
+<dd><p>multi-line text field</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.TFOOT">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">TFOOT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'tfoot')</span></em><a class="headerlink" href="#lxml.html.builder.TFOOT" title="Permalink to this definition"></a></dt>
+<dd><p>table footer</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.TH">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">TH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'th')</span></em><a class="headerlink" href="#lxml.html.builder.TH" title="Permalink to this definition"></a></dt>
+<dd><p>table header cell</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.THEAD">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">THEAD</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'thead')</span></em><a class="headerlink" href="#lxml.html.builder.THEAD" title="Permalink to this definition"></a></dt>
+<dd><p>table header</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.TITLE">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">TITLE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'title')</span></em><a class="headerlink" href="#lxml.html.builder.TITLE" title="Permalink to this definition"></a></dt>
+<dd><p>document title</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.TR">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">TR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'tr')</span></em><a class="headerlink" href="#lxml.html.builder.TR" title="Permalink to this definition"></a></dt>
+<dd><p>table row</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.TT">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">TT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'tt')</span></em><a class="headerlink" href="#lxml.html.builder.TT" title="Permalink to this definition"></a></dt>
+<dd><p>teletype or monospaced text style</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.U">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">U</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'u')</span></em><a class="headerlink" href="#lxml.html.builder.U" title="Permalink to this definition"></a></dt>
+<dd><p>underlined text style (DEPRECATED)</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.UL">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">UL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'ul')</span></em><a class="headerlink" href="#lxml.html.builder.UL" title="Permalink to this definition"></a></dt>
+<dd><p>unordered list</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="lxml.html.builder.VAR">
+<span class="sig-prename descclassname"><span class="pre">lxml.html.builder.</span></span><span class="sig-name descname"><span class="pre">VAR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">functools.partial(&lt;lxml.builder.ElementMaker</span> <span class="pre">object&gt;,</span> <span class="pre">'var')</span></em><a class="headerlink" href="#lxml.html.builder.VAR" title="Permalink to this definition"></a></dt>
+<dd><p>instance of a variable or program argument</p>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="lxml.html._setmixin.html" class="btn btn-neutral float-left" title="lxml.html._setmixin module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="lxml.html.clean.html" class="btn btn-neutral float-right" title="lxml.html.clean module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020, lxml dev team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

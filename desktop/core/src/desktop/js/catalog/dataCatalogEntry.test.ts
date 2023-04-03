@@ -14,6 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { merge } from 'lodash';
+
 import { CancellablePromise } from 'api/cancellablePromise';
 import dataCatalog from 'catalog/dataCatalog';
 import DataCatalogEntry, { Sample, TableAnalysis } from 'catalog/DataCatalogEntry';
@@ -61,27 +63,30 @@ describe('dataCatalogEntry.ts', () => {
   afterAll(clearStorage);
 
   describe('getAnalysis', () => {
-    const emptyAnalysisApiSpy = () => {
-      jest.spyOn(CatalogApi, 'fetchDescribe').mockReturnValue(
-        CancellablePromise.resolve<TableAnalysis>({
-          message: '',
-          name: 'iceberg-table-test',
-          partition_keys: [],
-          cols: [{ name: 'i', type: 'int', comment: '' }],
-          path_location: 'test',
-          hdfs_link: '/filebrowser/view=/warehouse/tablespace/managed/hive/sample_07',
-          is_view: false,
-          properties: [],
-          details: {
-            stats: {
-              table_type: 'ICEBERG'
-            },
-            properties: {}
-          },
-          stats: [],
-          primary_keys: []
-        })
-      );
+    const getAnalysisObj = () => ({
+      message: '',
+      name: 'iceberg-table-test',
+      partition_keys: [],
+      cols: [{ name: 'i', type: 'int', comment: '' }],
+      path_location: 'test',
+      hdfs_link: '/filebrowser/view=/warehouse/tablespace/managed/hive/sample_07',
+      is_view: false,
+      properties: [],
+      details: {
+        stats: {
+          table_type: 'ICEBERG'
+        },
+        properties: {}
+      },
+      stats: [],
+      primary_keys: []
+    });
+
+    const emptyAnalysisApiSpy = (additionalAnalysis: Record<string, unknown> = {}) => {
+      const customAnalysis = merge({}, getAnalysisObj(), additionalAnalysis);
+      jest
+        .spyOn(CatalogApi, 'fetchDescribe')
+        .mockReturnValue(CancellablePromise.resolve<TableAnalysis>(customAnalysis));
     };
 
     it('should return true for isIcebergTable after the analysis has has been loaded', async () => {
@@ -92,6 +97,26 @@ describe('dataCatalogEntry.ts', () => {
 
       await entry.getAnalysis();
       expect(entry.isIcebergTable()).toBeTruthy();
+    });
+
+    it('returns true for isTransactionalTable when details.stats.transactional="true"', async () => {
+      emptyAnalysisApiSpy({ details: { stats: { transactional: 'true' } } });
+      const entry = await getEntry('someDb.someTransactionalTable');
+
+      expect(entry.isTransactionalTable()).toBeFalsy();
+
+      await entry.getAnalysis();
+      expect(entry.isTransactionalTable()).toBeTruthy();
+    });
+
+    it('returns false for isTransactionalTable when there is no details.stats.transactional defined', async () => {
+      emptyAnalysisApiSpy();
+      const entry = await getEntry('someDb.someTransactionalTable');
+
+      expect(entry.isTransactionalTable()).toBeFalsy();
+
+      await entry.getAnalysis();
+      expect(entry.isTransactionalTable()).toBeFalsy();
     });
 
     it('should return the hdfs path based on the hdfs_link', async () => {

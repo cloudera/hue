@@ -53,7 +53,7 @@ from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access, add_to_group, add_permission, remove_from_group
 from desktop.lib.view_util import location_to_url
-from desktop.conf import is_oozie_enabled, RAZ
+from desktop.conf import is_oozie_enabled, RAZ, is_ofs_enabled, OZONE
 
 from hadoop import pseudo_hdfs4
 from hadoop.conf import UPLOAD_CHUNK_SIZE
@@ -63,7 +63,7 @@ from useradmin.models import User, Group
 from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE, MAX_SNAPPY_DECOMPRESSION_SIZE,\
   REMOTE_STORAGE_HOME
 from filebrowser.lib.rwx import expand_mode
-from filebrowser.views import snappy_installed
+from filebrowser.views import snappy_installed, _normalize_path
 
 if sys.version_info[0] > 2:
   from urllib.parse import unquote as urllib_unquote, urlparse
@@ -1530,6 +1530,45 @@ class TestADLSAccessPermissions(object):
     finally:
       remove_from_group(self.user.username, 'has_adls')
 
+class TestOFSAccessPermissions(object):
+  def setUp(self):
+    self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
+    grant_access('test', 'test', 'filebrowser')
+    add_to_group('test')
+
+    self.user = User.objects.get(username="test")
+
+  def test_no_default_permissions(self):
+    response = self.client.get('/filebrowser/view=ofs://')
+    assert_equal(500, response.status_code)
+
+    response = self.client.get('/filebrowser/view=ofs://volume')
+    assert_equal(500, response.status_code)
+
+    response = self.client.get('/filebrowser/view=ofs://volume/bucket')
+    assert_equal(500, response.status_code)
+
+    response = self.client.get('/filebrowser/view=ofs://volume/bucket/hue')
+    assert_equal(500, response.status_code)
+
+    response = self.client.post('/filebrowser/rmtree', dict(path=['ofs://volume/bucket/hue']))
+    assert_equal(500, response.status_code)
+
+    # 500 for real currently
+    assert_raises(IOError, self.client.get, '/filebrowser/edit=ofs://volume/bucket/hue')
+
+  def test_has_default_permissions(self):
+    if not is_ofs_enabled():
+      raise SkipTest
+
+    add_permission(self.user.username, 'has_ofs', permname='ofs_access', appname='filebrowser')
+
+    try:
+      response = self.client.get('/filebrowser/view=ofs://')
+      assert_equal(200, response.status_code)
+    finally:
+      remove_from_group(self.user.username, 'has_ofs')
+
 
 class TestFileChooserRedirect(object):
 
@@ -1540,7 +1579,7 @@ class TestFileChooserRedirect(object):
 
     self.user = User.objects.get(username="test")
 
-  def test_hdfs_redirect(self):
+  def test_fs_redirect(self):
     with patch('desktop.lib.fs.proxyfs.ProxyFS.isdir') as is_dir:
       is_dir.return_value = True
 
@@ -1550,11 +1589,34 @@ class TestFileChooserRedirect(object):
       assert_equal(302, response.status_code)
       assert_equal('/filebrowser/view=%2Fuser%2Ftest', response.url)
 
-      # ABFS - default_abfs_home
-      response = self.client.get('/filebrowser/view=%2F?default_abfs_home')
+      # OFS - default_ofs_home
+      reset = OZONE['default'].WEBHDFS_URL.set_for_testing(None)
+      try:
+        response = self.client.get('/filebrowser/view=%2F?default_ofs_home')
 
-      assert_equal(302, response.status_code)
-      assert_equal('/filebrowser/view=abfs%3A%2F%2F', response.url)
+        assert_equal(302, response.status_code)
+        assert_equal('/filebrowser/view=ofs%3A%2F%2F', response.url)
+      finally:
+        reset()
+
+      reset = OZONE['default'].WEBHDFS_URL.set_for_testing('http://localhost:9778/webhdfs/v1')
+      try:
+        response = self.client.get('/filebrowser/view=%2F?default_ofs_home')
+
+        assert_equal(302, response.status_code)
+        assert_equal('/filebrowser/view=ofs%3A%2F%2F', response.url)
+      finally:
+        reset()
+
+      # ABFS - default_abfs_home
+      reset = ABFS_CLUSTERS['default'].FS_DEFAULTFS.set_for_testing(None)
+      try:
+        response = self.client.get('/filebrowser/view=%2F?default_abfs_home')
+
+        assert_equal(302, response.status_code)
+        assert_equal('/filebrowser/view=abfs%3A%2F%2F', response.url)
+      finally:
+        reset()
 
       reset = ABFS_CLUSTERS['default'].FS_DEFAULTFS.set_for_testing('abfs://data-container@mystorage.dfs.core.windows.net')
       try:
@@ -1592,10 +1654,14 @@ class TestFileChooserRedirect(object):
           reset()
 
       # S3A - default_s3_home
-      response = self.client.get('/filebrowser/view=%2F?default_s3_home')
+      reset = REMOTE_STORAGE_HOME.set_for_testing(None)
+      try:
+        response = self.client.get('/filebrowser/view=%2F?default_s3_home')
 
-      assert_equal(302, response.status_code)
-      assert_equal('/filebrowser/view=s3a%3A%2F%2F', response.url)
+        assert_equal(302, response.status_code)
+        assert_equal('/filebrowser/view=s3a%3A%2F%2F', response.url)
+      finally:
+        reset()
 
       reset = REMOTE_STORAGE_HOME.set_for_testing('s3a://my_bucket')
       try:
@@ -1642,3 +1708,60 @@ class TestFileChooserRedirect(object):
           response = self.client.get('/filebrowser/view=')
 
           _normalize_path.assert_called_with('/')
+
+class TestNormalizePath(object):
+
+  def test_should_decode_encoded_slash_only(self):
+    encoded_path = '%2Fsome%2Fpath%20with%20space%20in name'
+    expected_path = '/some/path%20with%20space%20in name'
+
+    normalized = _normalize_path(encoded_path)
+    assert_equal(expected_path, normalized)
+
+  def test_abfs_correction(self):
+    path = 'abfs:/some/path'
+    expected_corrected_path = 'abfs://some/path'
+
+    normalized_once = _normalize_path(path)
+    assert_equal(expected_corrected_path, normalized_once)
+
+    normalized_twice = _normalize_path(normalized_once)
+    assert_equal(expected_corrected_path, normalized_twice)
+
+  def test_abfs_correction_already_correct(self):
+    path = 'abfs://some/path'
+
+    normalized = _normalize_path(path)
+    assert_equal(path, normalized)
+
+  def test_s3a_correction(self):
+    path = 's3a:%2Fsome%2Fpath'
+    expected_corrected_path = 's3a://some/path'
+
+    normalized_once = _normalize_path(path)
+    assert_equal(expected_corrected_path, normalized_once)
+
+    normalized_twice = _normalize_path(normalized_once)
+    assert_equal(expected_corrected_path, normalized_twice)
+
+  def test_s3a_correction_already_correct(self):
+    path = 's3a://some/path'
+
+    normalized = _normalize_path(path)
+    assert_equal(path, normalized)
+
+  def test_ofs_correction(self):
+    path = 'ofs:%2Fsome%2Fpath'
+    expected_corrected_path = 'ofs://some/path'
+
+    normalized_once = _normalize_path(path)
+    assert_equal(expected_corrected_path, normalized_once)
+
+    normalized_twice = _normalize_path(normalized_once)
+    assert_equal(expected_corrected_path, normalized_twice)
+
+  def test_ofs_correction_already_correct(self):
+    path = 'ofs://some/path'
+
+    normalized = _normalize_path(path)
+    assert_equal(path, normalized)

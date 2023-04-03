@@ -51,6 +51,12 @@ else:
               <svg class="hi"><use xlink:href='#hi-adls'></use></svg>
             </span>
           </li>
+        %elif path.lower().find('ofs://') == 0:
+          <li style="padding-top: 12px">
+            <span class="breadcrumb-link homeLink">
+              <svg class="hi"><use xlink:href='#hi-ofs'></use></svg>
+            </span>
+          </li>
         %else:
           <li><a class="pointer breadcrumb-link homeLink" data-bind="click: $root.openHome, attr:{'href': window.HUE_BASE_URL + '/filebrowser/view=' + window.USER_HOME_DIR  + '?default_to_home'}">
             <i class="fa fa-home"></i> ${_('Home')}</a>
@@ -68,7 +74,7 @@ else:
               <a data-bind="text: label, click: show, attr: {'href': '${url('filebrowser:filebrowser.views.view', path=urlencode(''))}' + url}"></a><span class="divider">/</span>
             </li
           ></ul>
-          <input id="hueBreadcrumbText" type="text" style="display:none" data-bind="value: currentDecodedPath" autocomplete="off" class="input-xxlarge" />          
+          <input id="hueBreadcrumbText" type="text" style="display:none" data-bind="value: currentPath" autocomplete="off" class="input-xxlarge" />
         </li>
         % if is_trash_enabled:
         <li class="pull-right">
@@ -80,16 +86,25 @@ else:
       </ul>
     % else:
       <ul class="nav nav-pills hue-breadcrumbs-bar">
-        <li><a data-bind="hueLink: window.HUE_BASE_URL + '/filebrowser/view='+ window.USER_HOME_DIR +'?default_to_home'" class="breadcrumb-link homeLink"><i class="fa fa-home"></i> ${_('Home')}</a></li>
+        <li>
+          <a data-bind="hueLink: window.HUE_BASE_URL + '/filebrowser/view='+ window.USER_HOME_DIR +'?default_to_home'" class="breadcrumb-link homeLink">
+            <i class="fa fa-home"></i> ${_('Home')}
+          </a>
+        </li>
         <li>
           <ul class="hue-breadcrumbs" style="padding-right:40px; padding-top: 12px">
           % for breadcrumb_item in breadcrumbs:
             <% label, f_url = breadcrumb_item['label'], breadcrumb_item['url'] %>
             %if label[-1] == '/':
-            ## Backticks are used as quotes to handle single quote in f_url
-            <li><a data-bind="hueLink: `${'/filebrowser/view=' + f_url}`"><span class="divider">${label}</span></a></li>
+            <li><a href="javascript: void(0)" data-bind="click: ()=> {
+              huePubSub.publish('open.filebrowserlink', { pathPrefix: '/filebrowser/view=', decodedPath: `${f_url | n}` });
+              window.hueAnalytics.log('filebrowser', 'file-breadcrumb-navigation');
+              }"><span class="divider">${label}</span></a></li>              
             %else:
-            <li><a data-bind="hueLink: `${'/filebrowser/view=' + f_url}`">${label}</a><span class="divider">/</span></li>
+            <li><a href="javascript: void(0)" data-bind="click: ()=> {
+              huePubSub.publish('open.filebrowserlink', { pathPrefix: '/filebrowser/view=', decodedPath: `${f_url | n}` });
+              window.hueAnalytics.log('filebrowser', 'file-breadcrumb-navigation');
+              }">${label}</a><span class="divider">/</span></li>              
             %endif
           % endfor
           </ul>

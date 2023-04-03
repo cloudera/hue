@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>xml.sax.handler &mdash; lxml  documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> lxml
+            <img src="../../../_static/python-xml.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                4.9.1
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../lxml.html">lxml package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../lxml.html.html">lxml.html package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../lxml.html.ElementSoup.html">lxml.html.ElementSoup module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../lxml.html._diffcommand.html">lxml.html._diffcommand module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../lxml.html._setmixin.html">lxml.html._setmixin module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../lxml.html.builder.html">lxml.html.builder module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../lxml.html.clean.html">lxml.html.clean module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../lxml.html.defs.html">lxml.html.defs module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../lxml.html.diff.html">lxml.html.diff module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../lxml.html.formfill.html">lxml.html.formfill module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../lxml.html.html5parser.html">lxml.html.html5parser module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../lxml.html.soupparser.html">lxml.html.soupparser module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../lxml.isoschematron.html">lxml.isoschematron package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../lxml.ElementInclude.html">lxml.ElementInclude module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../lxml._elementpath.html">lxml._elementpath module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../lxml.builder.html">lxml.builder module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../lxml.cssselect.html">lxml.cssselect module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../lxml.doctestcompare.html">lxml.doctestcompare module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../lxml.etree.html">lxml.etree module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../lxml.objectify.html">lxml.objectify module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../lxml.sax.html">lxml.sax module</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">lxml</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>xml.sax.handler</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for xml.sax.handler</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains the core classes of version 2.0 of SAX for Python.</span>
+<span class="sd">This file provides only default classes with absolutely minimum</span>
+<span class="sd">functionality, from which drivers and applications can be subclassed.</span>
+
+<span class="sd">Many of these classes are empty and are included only as documentation</span>
+<span class="sd">of the interfaces.</span>
+
+<span class="sd">$Id$</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">version</span> <span class="o">=</span> <span class="s1">&#39;2.0beta&#39;</span>
+
+<span class="c1">#============================================================================</span>
+<span class="c1">#</span>
+<span class="c1"># HANDLER INTERFACES</span>
+<span class="c1">#</span>
+<span class="c1">#============================================================================</span>
+
+<span class="c1"># ===== ERRORHANDLER =====</span>
+
+<span class="k">class</span> <span class="nc">ErrorHandler</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Basic interface for SAX error handlers.</span>
+
+<span class="sd">    If you create an object that implements this interface, then</span>
+<span class="sd">    register the object with your XMLReader, the parser will call the</span>
+<span class="sd">    methods in your object to report all warnings and errors. There</span>
+<span class="sd">    are three levels of errors available: warnings, (possibly)</span>
+<span class="sd">    recoverable errors, and unrecoverable errors. All methods take a</span>
+<span class="sd">    SAXParseException as the only parameter.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exception</span><span class="p">):</span>
+        <span class="s2">&quot;Handle a recoverable error.&quot;</span>
+        <span class="k">raise</span> <span class="n">exception</span>
+
+    <span class="k">def</span> <span class="nf">fatalError</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exception</span><span class="p">):</span>
+        <span class="s2">&quot;Handle a non-recoverable error.&quot;</span>
+        <span class="k">raise</span> <span class="n">exception</span>
+
+    <span class="k">def</span> <span class="nf">warning</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exception</span><span class="p">):</span>
+        <span class="s2">&quot;Handle a warning.&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">exception</span><span class="p">)</span>
+
+
+<span class="c1"># ===== CONTENTHANDLER =====</span>
+
+<span class="k">class</span> <span class="nc">ContentHandler</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Interface for receiving logical document content events.</span>
+
+<span class="sd">    This is the main callback interface in SAX, and the one most</span>
+<span class="sd">    important to applications. The order of events in this interface</span>
+<span class="sd">    mirrors the order of the information in the document.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_locator</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">setDocumentLocator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">locator</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Called by the parser to give the application a locator for</span>
+<span class="sd">        locating the origin of document events.</span>
+
+<span class="sd">        SAX parsers are strongly encouraged (though not absolutely</span>
+<span class="sd">        required) to supply a locator: if it does so, it must supply</span>
+<span class="sd">        the locator to the application by invoking this method before</span>
+<span class="sd">        invoking any of the other methods in the DocumentHandler</span>
+<span class="sd">        interface.</span>
+
+<span class="sd">        The locator allows the application to determine the end</span>
+<span class="sd">        position of any document-related event, even if the parser is</span>
+<span class="sd">        not reporting an error. Typically, the application will use</span>
+<span class="sd">        this information for reporting its own errors (such as</span>
+<span class="sd">        character content that does not match an application&#39;s</span>
+<span class="sd">        business rules). The information returned by the locator is</span>
+<span class="sd">        probably not sufficient for use with a search engine.</span>
+
+<span class="sd">        Note that the locator will return correct information only</span>
+<span class="sd">        during the invocation of the events in this interface. The</span>
+<span class="sd">        application should not attempt to use it at any other time.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_locator</span> <span class="o">=</span> <span class="n">locator</span>
+
+    <span class="k">def</span> <span class="nf">startDocument</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Receive notification of the beginning of a document.</span>
+
+<span class="sd">        The SAX parser will invoke this method only once, before any</span>
+<span class="sd">        other methods in this interface or in DTDHandler (except for</span>
+<span class="sd">        setDocumentLocator).&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">endDocument</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Receive notification of the end of a document.</span>
+
+<span class="sd">        The SAX parser will invoke this method only once, and it will</span>
+<span class="sd">        be the last method invoked during the parse. The parser shall</span>
+<span class="sd">        not invoke this method until it has either abandoned parsing</span>
+<span class="sd">        (because of an unrecoverable error) or reached the end of</span>
+<span class="sd">        input.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">startPrefixMapping</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">uri</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Begin the scope of a prefix-URI Namespace mapping.</span>
+
+<span class="sd">        The information from this event is not necessary for normal</span>
+<span class="sd">        Namespace processing: the SAX XML reader will automatically</span>
+<span class="sd">        replace prefixes for element and attribute names when the</span>
+<span class="sd">        http://xml.org/sax/features/namespaces feature is true (the</span>
+<span class="sd">        default).</span>
+
+<span class="sd">        There are cases, however, when applications need to use</span>
+<span class="sd">        prefixes in character data or in attribute values, where they</span>
+<span class="sd">        cannot safely be expanded automatically; the</span>
+<span class="sd">        start/endPrefixMapping event supplies the information to the</span>
+<span class="sd">        application to expand prefixes in those contexts itself, if</span>
+<span class="sd">        necessary.</span>
+
+<span class="sd">        Note that start/endPrefixMapping events are not guaranteed to</span>
+<span class="sd">        be properly nested relative to each-other: all</span>
+<span class="sd">        startPrefixMapping events will occur before the corresponding</span>
+<span class="sd">        startElement event, and all endPrefixMapping events will occur</span>
+<span class="sd">        after the corresponding endElement event, but their order is</span>
+<span class="sd">        not guaranteed.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">endPrefixMapping</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;End the scope of a prefix-URI mapping.</span>
+
+<span class="sd">        See startPrefixMapping for details. This event will always</span>
+<span class="sd">        occur after the corresponding endElement event, but the order</span>
+<span class="sd">        of endPrefixMapping events is not otherwise guaranteed.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">startElement</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">attrs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Signals the start of an element in non-namespace mode.</span>
+
+<span class="sd">        The name parameter contains the raw XML 1.0 name of the</span>
+<span class="sd">        element type as a string and the attrs parameter holds an</span>
+<span class="sd">        instance of the Attributes class containing the attributes of</span>
+<span class="sd">        the element.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">endElement</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Signals the end of an element in non-namespace mode.</span>
+
+<span class="sd">        The name parameter contains the name of the element type, just</span>
+<span class="sd">        as with the startElement event.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">startElementNS</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">qname</span><span class="p">,</span> <span class="n">attrs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Signals the start of an element in namespace mode.</span>
+
+<span class="sd">        The name parameter contains the name of the element type as a</span>
+<span class="sd">        (uri, localname) tuple, the qname parameter the raw XML 1.0</span>
+<span class="sd">        name used in the source document, and the attrs parameter</span>
+<span class="sd">        holds an instance of the Attributes class containing the</span>
+<span class="sd">        attributes of the element.</span>
+
+<span class="sd">        The uri part of the name tuple is None for elements which have</span>
+<span class="sd">        no namespace.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">endElementNS</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">qname</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Signals the end of an element in namespace mode.</span>
+
+<span class="sd">        The name parameter contains the name of the element type, just</span>
+<span class="sd">        as with the startElementNS event.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">characters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">content</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Receive notification of character data.</span>
+
+<span class="sd">        The Parser will call this method to report each chunk of</span>
+<span class="sd">        character data. SAX parsers may return all contiguous</span>
+<span class="sd">        character data in a single chunk, or they may split it into</span>
+<span class="sd">        several chunks; however, all of the characters in any single</span>
+<span class="sd">        event must come from the same external entity so that the</span>
+<span class="sd">        Locator provides useful information.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">ignorableWhitespace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">whitespace</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Receive notification of ignorable whitespace in element content.</span>
+
+<span class="sd">        Validating Parsers must use this method to report each chunk</span>
+<span class="sd">        of ignorable whitespace (see the W3C XML 1.0 recommendation,</span>
+<span class="sd">        section 2.10): non-validating parsers may also use this method</span>
+<span class="sd">        if they are capable of parsing and using content models.</span>
+
+<span class="sd">        SAX parsers may return all contiguous whitespace in a single</span>
+<span class="sd">        chunk, or they may split it into several chunks; however, all</span>
+<span class="sd">        of the characters in any single event must come from the same</span>
+<span class="sd">        external entity, so that the Locator provides useful</span>
+<span class="sd">        information.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">processingInstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Receive notification of a processing instruction.</span>
+
+<span class="sd">        The Parser will invoke this method once for each processing</span>
+<span class="sd">        instruction found: note that processing instructions may occur</span>
+<span class="sd">        before or after the main document element.</span>
+
+<span class="sd">        A SAX parser should never report an XML declaration (XML 1.0,</span>
+<span class="sd">        section 2.8) or a text declaration (XML 1.0, section 4.3.1)</span>
+<span class="sd">        using this method.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">skippedEntity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Receive notification of a skipped entity.</span>
+
+<span class="sd">        The Parser will invoke this method once for each entity</span>
+<span class="sd">        skipped. Non-validating processors may skip entities if they</span>
+<span class="sd">        have not seen the declarations (because, for example, the</span>
+<span class="sd">        entity was declared in an external DTD subset). All processors</span>
+<span class="sd">        may skip external entities, depending on the values of the</span>
+<span class="sd">        http://xml.org/sax/features/external-general-entities and the</span>
+<span class="sd">        http://xml.org/sax/features/external-parameter-entities</span>
+<span class="sd">        properties.&quot;&quot;&quot;</span>
+
+
+<span class="c1"># ===== DTDHandler =====</span>
+
+<span class="k">class</span> <span class="nc">DTDHandler</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Handle DTD events.</span>
+
+<span class="sd">    This interface specifies only those DTD events required for basic</span>
+<span class="sd">    parsing (unparsed entities and attributes).&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">notationDecl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">publicId</span><span class="p">,</span> <span class="n">systemId</span><span class="p">):</span>
+        <span class="s2">&quot;Handle a notation declaration event.&quot;</span>
+
+    <span class="k">def</span> <span class="nf">unparsedEntityDecl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">publicId</span><span class="p">,</span> <span class="n">systemId</span><span class="p">,</span> <span class="n">ndata</span><span class="p">):</span>
+        <span class="s2">&quot;Handle an unparsed entity declaration event.&quot;</span>
+
+
+<span class="c1"># ===== ENTITYRESOLVER =====</span>
+
+<span class="k">class</span> <span class="nc">EntityResolver</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Basic interface for resolving entities. If you create an object</span>
+<span class="sd">    implementing this interface, then register the object with your</span>
+<span class="sd">    Parser, the parser will call the method in your object to</span>
+<span class="sd">    resolve all external entities. Note that DefaultHandler implements</span>
+<span class="sd">    this interface with the default behaviour.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">resolveEntity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">publicId</span><span class="p">,</span> <span class="n">systemId</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Resolve the system identifier of an entity and return either</span>
+<span class="sd">        the system identifier to read from as a string, or an InputSource</span>
+<span class="sd">        to read from.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">systemId</span>
+
+
+<span class="c1">#============================================================================</span>
+<span class="c1">#</span>
+<span class="c1"># CORE FEATURES</span>
+<span class="c1">#</span>
+<span class="c1">#============================================================================</span>
+
+<span class="n">feature_namespaces</span> <span class="o">=</span> <span class="s2">&quot;http://xml.org/sax/features/namespaces&quot;</span>
+<span class="c1"># true: Perform Namespace processing (default).</span>
+<span class="c1"># false: Optionally do not perform Namespace processing</span>
+<span class="c1">#        (implies namespace-prefixes).</span>
+<span class="c1"># access: (parsing) read-only; (not parsing) read/write</span>
+
+<span class="n">feature_namespace_prefixes</span> <span class="o">=</span> <span class="s2">&quot;http://xml.org/sax/features/namespace-prefixes&quot;</span>
+<span class="c1"># true: Report the original prefixed names and attributes used for Namespace</span>
+<span class="c1">#       declarations.</span>
+<span class="c1"># false: Do not report attributes used for Namespace declarations, and</span>
+<span class="c1">#        optionally do not report original prefixed names (default).</span>
+<span class="c1"># access: (parsing) read-only; (not parsing) read/write</span>
+
+<span class="n">feature_string_interning</span> <span class="o">=</span> <span class="s2">&quot;http://xml.org/sax/features/string-interning&quot;</span>
+<span class="c1"># true: All element names, prefixes, attribute names, Namespace URIs, and</span>
+<span class="c1">#       local names are interned using the built-in intern function.</span>
+<span class="c1"># false: Names are not necessarily interned, although they may be (default).</span>
+<span class="c1"># access: (parsing) read-only; (not parsing) read/write</span>
+
+<span class="n">feature_validation</span> <span class="o">=</span> <span class="s2">&quot;http://xml.org/sax/features/validation&quot;</span>
+<span class="c1"># true: Report all validation errors (implies external-general-entities and</span>
+<span class="c1">#       external-parameter-entities).</span>
+<span class="c1"># false: Do not report validation errors.</span>
+<span class="c1"># access: (parsing) read-only; (not parsing) read/write</span>
+
+<span class="n">feature_external_ges</span> <span class="o">=</span> <span class="s2">&quot;http://xml.org/sax/features/external-general-entities&quot;</span>
+<span class="c1"># true: Include all external general (text) entities.</span>
+<span class="c1"># false: Do not include external general entities.</span>
+<span class="c1"># access: (parsing) read-only; (not parsing) read/write</span>
+
+<span class="n">feature_external_pes</span> <span class="o">=</span> <span class="s2">&quot;http://xml.org/sax/features/external-parameter-entities&quot;</span>
+<span class="c1"># true: Include all external parameter entities, including the external</span>
+<span class="c1">#       DTD subset.</span>
+<span class="c1"># false: Do not include any external parameter entities, even the external</span>
+<span class="c1">#        DTD subset.</span>
+<span class="c1"># access: (parsing) read-only; (not parsing) read/write</span>
+
+<span class="n">all_features</span> <span class="o">=</span> <span class="p">[</span><span class="n">feature_namespaces</span><span class="p">,</span>
+                <span class="n">feature_namespace_prefixes</span><span class="p">,</span>
+                <span class="n">feature_string_interning</span><span class="p">,</span>
+                <span class="n">feature_validation</span><span class="p">,</span>
+                <span class="n">feature_external_ges</span><span class="p">,</span>
+                <span class="n">feature_external_pes</span><span class="p">]</span>
+
+
+<span class="c1">#============================================================================</span>
+<span class="c1">#</span>
+<span class="c1"># CORE PROPERTIES</span>
+<span class="c1">#</span>
+<span class="c1">#============================================================================</span>
+
+<span class="n">property_lexical_handler</span> <span class="o">=</span> <span class="s2">&quot;http://xml.org/sax/properties/lexical-handler&quot;</span>
+<span class="c1"># data type: xml.sax.sax2lib.LexicalHandler</span>
+<span class="c1"># description: An optional extension handler for lexical events like comments.</span>
+<span class="c1"># access: read/write</span>
+
+<span class="n">property_declaration_handler</span> <span class="o">=</span> <span class="s2">&quot;http://xml.org/sax/properties/declaration-handler&quot;</span>
+<span class="c1"># data type: xml.sax.sax2lib.DeclHandler</span>
+<span class="c1"># description: An optional extension handler for DTD-related events other</span>
+<span class="c1">#              than notations and unparsed entities.</span>
+<span class="c1"># access: read/write</span>
+
+<span class="n">property_dom_node</span> <span class="o">=</span> <span class="s2">&quot;http://xml.org/sax/properties/dom-node&quot;</span>
+<span class="c1"># data type: org.w3c.dom.Node</span>
+<span class="c1"># description: When parsing, the current DOM node being visited if this is</span>
+<span class="c1">#              a DOM iterator; when not parsing, the root DOM node for</span>
+<span class="c1">#              iteration.</span>
+<span class="c1"># access: (parsing) read-only; (not parsing) read/write</span>
+
+<span class="n">property_xml_string</span> <span class="o">=</span> <span class="s2">&quot;http://xml.org/sax/properties/xml-string&quot;</span>
+<span class="c1"># data type: String</span>
+<span class="c1"># description: The literal string of characters that was the source for</span>
+<span class="c1">#              the current event.</span>
+<span class="c1"># access: read-only</span>
+
+<span class="n">property_encoding</span> <span class="o">=</span> <span class="s2">&quot;http://www.python.org/sax/properties/encoding&quot;</span>
+<span class="c1"># data type: String</span>
+<span class="c1"># description: The name of the encoding to assume for input data.</span>
+<span class="c1"># access: write: set the encoding, e.g. established by a higher-level</span>
+<span class="c1">#                protocol. May change during parsing (e.g. after</span>
+<span class="c1">#                processing a META tag)</span>
+<span class="c1">#         read:  return the current encoding (possibly established through</span>
+<span class="c1">#                auto-detection.</span>
+<span class="c1"># initial value: UTF-8</span>
+<span class="c1">#</span>
+
+<span class="n">property_interning_dict</span> <span class="o">=</span> <span class="s2">&quot;http://www.python.org/sax/properties/interning-dict&quot;</span>
+<span class="c1"># data type: Dictionary</span>
+<span class="c1"># description: The dictionary used to intern common strings in the document</span>
+<span class="c1"># access: write: Request that the parser uses a specific dictionary, to</span>
+<span class="c1">#                allow interning across different documents</span>
+<span class="c1">#         read:  return the current interning dictionary, or None</span>
+<span class="c1">#</span>
+
+<span class="n">all_properties</span> <span class="o">=</span> <span class="p">[</span><span class="n">property_lexical_handler</span><span class="p">,</span>
+                  <span class="n">property_dom_node</span><span class="p">,</span>
+                  <span class="n">property_declaration_handler</span><span class="p">,</span>
+                  <span class="n">property_xml_string</span><span class="p">,</span>
+                  <span class="n">property_encoding</span><span class="p">,</span>
+                  <span class="n">property_interning_dict</span><span class="p">]</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020, lxml dev team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

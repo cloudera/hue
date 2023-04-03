@@ -77,6 +77,7 @@
 # Global variables
 ###################################
 ROOT := $(realpath .)
+PPC64LE := $(shell uname -m)
 
 include $(ROOT)/Makefile.vars.priv
 
@@ -136,8 +137,11 @@ $(BLD_DIR_ENV)/stamp:
 ifeq ($(PYTHON_VER),python2.7)
 	@$(SYS_PYTHON) $(VIRTUAL_BOOTSTRAP) $(VIRTUALENV_OPTS) --system-site-packages $(BLD_DIR_ENV)
 else ifeq ($(PYTHON_VER),python3.8)
-	@$(SYS_PYTHON) -m pip install --upgrade pip
-	@$(SYS_PIP) install virtualenv
+	@$(SYS_PYTHON) -m pip install --upgrade pip==22.2.2
+	@$(SYS_PIP) install virtualenv==20.16.5 virtualenv-make-relocatable==0.0.1
+	@if [[ "ppc64le" == $(PPC64LE) ]]; then \
+	  $(SYS_PYTHON) -m venv $(BLD_DIR_ENV); \
+	 fi
 	@virtualenv -p $(PYTHON_VER) $(BLD_DIR_ENV)
 endif
 	@echo "--- Virtual environment $(BLD_DIR_ENV) ready"
@@ -148,8 +152,19 @@ ifeq ($(PYTHON_VER),python2.7)
 	@$(ENV_PIP) install --upgrade pip
 	@$(ENV_PIP) install --upgrade --force-reinstall $(PIP_MODULES)
 	@echo "--- done installing PIP_MODULES in virtual-env"
-else
-	@echo "--- skip installing PIP_MODULES in virtual-env"
+else ifeq ($(PYTHON_VER),python3.8)
+	@if [[ "ppc64le" == $(PPC64LE) ]]; then \
+	  echo '--- Installing $(REQUIREMENT_PPC64LE_FILE) into virtual-env via $(ENV_PIP)'; \
+	  $(ENV_PIP) install -r $(REQUIREMENT_PPC64LE_FILE); \
+	  echo '--- Finished $(REQUIREMENT_PPC64LE_FILE) into virtual-env'; \
+	 else \
+	  echo '--- Installing $(REQUIREMENT_FILE) into virtual-env via $(ENV_PIP)'; \
+	  $(ENV_PIP) install -r $(REQUIREMENT_FILE); \
+	  echo '--- Finished $(REQUIREMENT_FILE) into virtual-env'; \
+         fi
+	@$(ENV_PIP) install $(NAVOPTAPI_WHL)
+	@echo '--- Finished $(NAVOPTAPI_WHL) into virtual-env'
+	@touch $(REQUIREMENT_DOT_FILE)
 endif
 
 ###################################
@@ -232,9 +247,7 @@ install-env:
 	cp $(ROOT)/babel.config.js $(INSTALL_DIR)
 	cp $(ROOT)/tsconfig.json $(INSTALL_DIR)
 	$(MAKE) -C $(INSTALL_DIR) npm-install
-	@if [ "$(MAKECMDGOALS)" = "install" ]; then \
-	  $(MAKE) -C $(INSTALL_DIR) create-static; \
-	fi
+	$(MAKE) -C $(INSTALL_DIR) create-static
 
 
 ###################################
@@ -250,13 +263,11 @@ npm-install:
 	npm run webpack-login
 	npm run webpack-workers
 	node_modules/.bin/removeNPMAbsolutePaths .
-	@if [ "$(MAKECMDGOALS)" = "install" ]; then \
-	  rm -rf node_modules; \
-	fi
+	rm -rf node_modules
 
 .PHONY: create-static
 create-static:
-	./build/env/bin/hue collectstatic --noinput
+	./build/env/bin/python ./build/env/bin/hue collectstatic --noinput
 
 # <<<< DEV ONLY
 .PHONY: doc

@@ -1,0 +1,45 @@
+[
+  {
+    "namePrefix": "should accept statement",
+    "beforeCursor": "REFRESH TABLE tempDB.view1; ",
+    "afterCursor": "",
+    "noErrors": true,
+    "containsKeywords": [
+      "SELECT"
+    ]
+  },
+  {
+    "namePrefix": "should not find errors",
+    "beforeCursor": "REFRESH `foo db1`.`bar fun1`;`",
+    "afterCursor": "",
+    "noErrors": true,
+    "containsKeywords": [
+      "SELECT"
+    ]
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "REFRESH ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "TABLE"
+    ],
+    "expectedResult": {
+      "suggestDatabases": {
+        "appendDot": true
+      },
+      "suggestTables": {}
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "REFRESH TABLE ",
+    "afterCursor": "",
+    "expectedResult": {
+      "suggestDatabases": {
+        "appendDot": true
+      },
+      "suggestTables": {}
+    }
+  }
+]

@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>lxml.html.formfill &mdash; lxml  documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> lxml
+            <img src="../../../_static/python-xml.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                4.9.1
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../lxml.html">lxml package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../lxml.html.html">lxml.html package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../lxml.html.ElementSoup.html">lxml.html.ElementSoup module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../lxml.html._diffcommand.html">lxml.html._diffcommand module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../lxml.html._setmixin.html">lxml.html._setmixin module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../lxml.html.builder.html">lxml.html.builder module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../lxml.html.clean.html">lxml.html.clean module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../lxml.html.defs.html">lxml.html.defs module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../lxml.html.diff.html">lxml.html.diff module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../lxml.html.formfill.html">lxml.html.formfill module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../lxml.html.html5parser.html">lxml.html.html5parser module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../lxml.html.soupparser.html">lxml.html.soupparser module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../lxml.isoschematron.html">lxml.isoschematron package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../lxml.ElementInclude.html">lxml.ElementInclude module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../lxml._elementpath.html">lxml._elementpath module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../lxml.builder.html">lxml.builder module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../lxml.cssselect.html">lxml.cssselect module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../lxml.doctestcompare.html">lxml.doctestcompare module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../lxml.etree.html">lxml.etree module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../lxml.objectify.html">lxml.objectify module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../lxml.sax.html">lxml.sax module</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">lxml</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+          <li><a href="../../lxml.html">lxml</a> &raquo;</li>
+          <li><a href="../html.html">lxml.html</a> &raquo;</li>
+      <li>lxml.html.formfill</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for lxml.html.formfill</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">lxml.etree</span> <span class="kn">import</span> <span class="n">XPath</span><span class="p">,</span> <span class="n">ElementBase</span>
+<span class="kn">from</span> <span class="nn">lxml.html</span> <span class="kn">import</span> <span class="n">fromstring</span><span class="p">,</span> <span class="n">XHTML_NAMESPACE</span>
+<span class="kn">from</span> <span class="nn">lxml.html</span> <span class="kn">import</span> <span class="n">_forms_xpath</span><span class="p">,</span> <span class="n">_options_xpath</span><span class="p">,</span> <span class="n">_nons</span><span class="p">,</span> <span class="n">_transform_result</span>
+<span class="kn">from</span> <span class="nn">lxml.html</span> <span class="kn">import</span> <span class="n">defs</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">basestring</span>
+<span class="k">except</span> <span class="ne">NameError</span><span class="p">:</span>
+    <span class="c1"># Python 3</span>
+    <span class="n">basestring</span> <span class="o">=</span> <span class="nb">str</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;FormNotFound&#39;</span><span class="p">,</span> <span class="s1">&#39;fill_form&#39;</span><span class="p">,</span> <span class="s1">&#39;fill_form_html&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;insert_errors&#39;</span><span class="p">,</span> <span class="s1">&#39;insert_errors_html&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;DefaultErrorCreator&#39;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="FormNotFound"><a class="viewcode-back" href="../../../lxml.html.formfill.html#lxml.html.formfill.FormNotFound">[docs]</a><span class="k">class</span> <span class="nc">FormNotFound</span><span class="p">(</span><span class="ne">LookupError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Raised when no form can be found</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+<span class="n">_form_name_xpath</span> <span class="o">=</span> <span class="n">XPath</span><span class="p">(</span><span class="s1">&#39;descendant-or-self::form[name=$name]|descendant-or-self::x:form[name=$name]&#39;</span><span class="p">,</span> <span class="n">namespaces</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span><span class="n">XHTML_NAMESPACE</span><span class="p">})</span>
+<span class="n">_input_xpath</span> <span class="o">=</span> <span class="n">XPath</span><span class="p">(</span><span class="s1">&#39;|&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;descendant-or-self::&#39;</span><span class="o">+</span><span class="n">_tag</span> <span class="k">for</span> <span class="n">_tag</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;input&#39;</span><span class="p">,</span><span class="s1">&#39;select&#39;</span><span class="p">,</span><span class="s1">&#39;textarea&#39;</span><span class="p">,</span><span class="s1">&#39;x:input&#39;</span><span class="p">,</span><span class="s1">&#39;x:select&#39;</span><span class="p">,</span><span class="s1">&#39;x:textarea&#39;</span><span class="p">)]),</span>
+                               <span class="n">namespaces</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span><span class="n">XHTML_NAMESPACE</span><span class="p">})</span>
+<span class="n">_label_for_xpath</span> <span class="o">=</span> <span class="n">XPath</span><span class="p">(</span><span class="s1">&#39;//label[@for=$for_id]|//x:label[@for=$for_id]&#39;</span><span class="p">,</span>
+                               <span class="n">namespaces</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span><span class="n">XHTML_NAMESPACE</span><span class="p">})</span>
+<span class="n">_name_xpath</span> <span class="o">=</span> <span class="n">XPath</span><span class="p">(</span><span class="s1">&#39;descendant-or-self::*[@name=$name]&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="fill_form"><a class="viewcode-back" href="../../../lxml.html.formfill.html#lxml.html.formfill.fill_form">[docs]</a><span class="k">def</span> <span class="nf">fill_form</span><span class="p">(</span>
+    <span class="n">el</span><span class="p">,</span>
+    <span class="n">values</span><span class="p">,</span>
+    <span class="n">form_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">form_index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+    <span class="n">el</span> <span class="o">=</span> <span class="n">_find_form</span><span class="p">(</span><span class="n">el</span><span class="p">,</span> <span class="n">form_id</span><span class="o">=</span><span class="n">form_id</span><span class="p">,</span> <span class="n">form_index</span><span class="o">=</span><span class="n">form_index</span><span class="p">)</span>
+    <span class="n">_fill_form</span><span class="p">(</span><span class="n">el</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="fill_form_html"><a class="viewcode-back" href="../../../lxml.html.formfill.html#lxml.html.formfill.fill_form_html">[docs]</a><span class="k">def</span> <span class="nf">fill_form_html</span><span class="p">(</span><span class="n">html</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">form_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">form_index</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">result_type</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">html</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">html</span><span class="p">,</span> <span class="n">basestring</span><span class="p">):</span>
+        <span class="n">doc</span> <span class="o">=</span> <span class="n">fromstring</span><span class="p">(</span><span class="n">html</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">doc</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">html</span><span class="p">)</span>
+    <span class="n">fill_form</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">form_id</span><span class="o">=</span><span class="n">form_id</span><span class="p">,</span> <span class="n">form_index</span><span class="o">=</span><span class="n">form_index</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_transform_result</span><span class="p">(</span><span class="n">result_type</span><span class="p">,</span> <span class="n">doc</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="_fill_form"><a class="viewcode-back" href="../../../lxml.html.formfill.html#lxml.html.formfill._fill_form">[docs]</a><span class="k">def</span> <span class="nf">_fill_form</span><span class="p">(</span><span class="n">el</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+    <span class="n">counts</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="s1">&#39;mixed&#39;</span><span class="p">):</span>
+        <span class="c1"># For Paste request parameters</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">mixed</span><span class="p">()</span>
+    <span class="n">inputs</span> <span class="o">=</span> <span class="n">_input_xpath</span><span class="p">(</span><span class="n">el</span><span class="p">)</span>
+    <span class="k">for</span> <span class="nb">input</span> <span class="ow">in</span> <span class="n">inputs</span><span class="p">:</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">name</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="n">_takes_multiple</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="p">[])</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="p">[</span><span class="n">value</span><span class="p">]</span>
+            <span class="n">_fill_multiple</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">values</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="n">counts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="n">counts</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">index</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">values</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+                <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+                    <span class="k">continue</span>
+            <span class="k">elif</span> <span class="n">index</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">_fill_single</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="_takes_multiple"><a class="viewcode-back" href="../../../lxml.html.formfill.html#lxml.html.formfill._takes_multiple">[docs]</a><span class="k">def</span> <span class="nf">_takes_multiple</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">_nons</span><span class="p">(</span><span class="nb">input</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;select&#39;</span> <span class="ow">and</span> <span class="nb">input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;multiple&#39;</span><span class="p">):</span>
+        <span class="c1"># FIXME: multiple=&quot;0&quot;?</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="nb">type</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">type</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;radio&#39;</span><span class="p">,</span> <span class="s1">&#39;checkbox&#39;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="_fill_multiple"><a class="viewcode-back" href="../../../lxml.html.formfill.html#lxml.html.formfill._fill_multiple">[docs]</a><span class="k">def</span> <span class="nf">_fill_multiple</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="nb">type</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">type</span> <span class="o">==</span> <span class="s1">&#39;checkbox&#39;</span><span class="p">:</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">value</span><span class="p">:</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">basestring</span><span class="p">):</span>
+                    <span class="c1"># The only valid &quot;on&quot; value for an unnamed checkbox is &#39;on&#39;</span>
+                    <span class="n">result</span> <span class="o">=</span> <span class="n">result</span> <span class="o">==</span> <span class="s1">&#39;on&#39;</span>
+            <span class="n">_check</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">_check</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">type</span> <span class="o">==</span> <span class="s1">&#39;radio&#39;</span><span class="p">:</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">)</span>
+        <span class="n">_check</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">_nons</span><span class="p">(</span><span class="nb">input</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;select&#39;</span>
+        <span class="k">for</span> <span class="n">option</span> <span class="ow">in</span> <span class="n">_options_xpath</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="n">option</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># This seems to be the default, at least on IE</span>
+                <span class="c1"># FIXME: but I&#39;m not sure</span>
+                <span class="n">v</span> <span class="o">=</span> <span class="n">option</span><span class="o">.</span><span class="n">text_content</span><span class="p">()</span>
+            <span class="n">_select</span><span class="p">(</span><span class="n">option</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="_check"><a class="viewcode-back" href="../../../lxml.html.formfill.html#lxml.html.formfill._check">[docs]</a><span class="k">def</span> <span class="nf">_check</span><span class="p">(</span><span class="n">el</span><span class="p">,</span> <span class="n">check</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">check</span><span class="p">:</span>
+        <span class="n">el</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;checked&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s1">&#39;checked&#39;</span> <span class="ow">in</span> <span class="n">el</span><span class="o">.</span><span class="n">attrib</span><span class="p">:</span>
+            <span class="k">del</span> <span class="n">el</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;checked&#39;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="_select"><a class="viewcode-back" href="../../../lxml.html.formfill.html#lxml.html.formfill._select">[docs]</a><span class="k">def</span> <span class="nf">_select</span><span class="p">(</span><span class="n">el</span><span class="p">,</span> <span class="n">select</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">select</span><span class="p">:</span>
+        <span class="n">el</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;selected&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s1">&#39;selected&#39;</span> <span class="ow">in</span> <span class="n">el</span><span class="o">.</span><span class="n">attrib</span><span class="p">:</span>
+            <span class="k">del</span> <span class="n">el</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;selected&#39;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="_fill_single"><a class="viewcode-back" href="../../../lxml.html.formfill.html#lxml.html.formfill._fill_single">[docs]</a><span class="k">def</span> <span class="nf">_fill_single</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">_nons</span><span class="p">(</span><span class="nb">input</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;textarea&#39;</span><span class="p">:</span>
+        <span class="nb">input</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">value</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">input</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="_find_form"><a class="viewcode-back" href="../../../lxml.html.formfill.html#lxml.html.formfill._find_form">[docs]</a><span class="k">def</span> <span class="nf">_find_form</span><span class="p">(</span><span class="n">el</span><span class="p">,</span> <span class="n">form_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">form_index</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">form_id</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">form_index</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">forms</span> <span class="o">=</span> <span class="n">_forms_xpath</span><span class="p">(</span><span class="n">el</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">form</span> <span class="ow">in</span> <span class="n">forms</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">form</span>
+        <span class="k">raise</span> <span class="n">FormNotFound</span><span class="p">(</span>
+            <span class="s2">&quot;No forms in page&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">form_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">get_element_by_id</span><span class="p">(</span><span class="n">form_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">form</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">form</span>
+        <span class="n">forms</span> <span class="o">=</span> <span class="n">_form_name_xpath</span><span class="p">(</span><span class="n">el</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">form_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">forms</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">forms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">FormNotFound</span><span class="p">(</span>
+                <span class="s2">&quot;No form with the name or id of </span><span class="si">%r</span><span class="s2"> (forms: </span><span class="si">%s</span><span class="s2">)&quot;</span>
+                <span class="o">%</span> <span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_find_form_ids</span><span class="p">(</span><span class="n">el</span><span class="p">))))</span>               
+    <span class="k">if</span> <span class="n">form_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">forms</span> <span class="o">=</span> <span class="n">_forms_xpath</span><span class="p">(</span><span class="n">el</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">forms</span><span class="p">[</span><span class="n">form_index</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">FormNotFound</span><span class="p">(</span>
+                <span class="s2">&quot;There is no form with the index </span><span class="si">%r</span><span class="s2"> (</span><span class="si">%i</span><span class="s2"> forms found)&quot;</span>
+                <span class="o">%</span> <span class="p">(</span><span class="n">form_index</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">forms</span><span class="p">)))</span></div>
+
+<div class="viewcode-block" id="_find_form_ids"><a class="viewcode-back" href="../../../lxml.html.formfill.html#lxml.html.formfill._find_form_ids">[docs]</a><span class="k">def</span> <span class="nf">_find_form_ids</span><span class="p">(</span><span class="n">el</span><span class="p">):</span>
+    <span class="n">forms</span> <span class="o">=</span> <span class="n">_forms_xpath</span><span class="p">(</span><span class="n">el</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">forms</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="s1">&#39;(no forms)&#39;</span>
+        <span class="k">return</span>
+    <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">form</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">forms</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">):</span>
+                <span class="k">yield</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> or </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">),</span>
+                                     <span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">):</span>
+            <span class="k">yield</span> <span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="s1">&#39;(unnamed form </span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">index</span></div>
+
+<span class="c1">############################################################</span>
+<span class="c1">## Error filling</span>
+<span class="c1">############################################################</span>
+
+<div class="viewcode-block" id="DefaultErrorCreator"><a class="viewcode-back" href="../../../lxml.html.formfill.html#lxml.html.formfill.DefaultErrorCreator">[docs]</a><span class="k">class</span> <span class="nc">DefaultErrorCreator</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="n">insert_before</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">block_inside</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">error_container_tag</span> <span class="o">=</span> <span class="s1">&#39;div&#39;</span>
+    <span class="n">error_message_class</span> <span class="o">=</span> <span class="s1">&#39;error-message&#39;</span>
+    <span class="n">error_block_class</span> <span class="o">=</span> <span class="s1">&#39;error-block&#39;</span>
+    <span class="n">default_message</span> <span class="o">=</span> <span class="s2">&quot;Invalid&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">kw</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                    <span class="s2">&quot;Unexpected keyword argument: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">el</span><span class="p">,</span> <span class="n">is_block</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="n">error_el</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">makeelement</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">error_container_tag</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">error_message_class</span><span class="p">:</span>
+            <span class="n">error_el</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;class&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">error_message_class</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">is_block</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">error_block_class</span><span class="p">:</span>
+            <span class="n">error_el</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;class&#39;</span><span class="p">,</span> <span class="n">error_el</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;class&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39; &#39;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">error_block_class</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">message</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">message</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">message</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_message</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">ElementBase</span><span class="p">):</span>
+            <span class="n">error_el</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">basestring</span><span class="p">),</span> <span class="p">(</span>
+                <span class="s2">&quot;Bad message; should be a string or element: </span><span class="si">%r</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">message</span><span class="p">)</span>
+            <span class="n">error_el</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">message</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_message</span>
+        <span class="k">if</span> <span class="n">is_block</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">block_inside</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">insert_before</span><span class="p">:</span>
+                <span class="n">error_el</span><span class="o">.</span><span class="n">tail</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">text</span>
+                <span class="n">el</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">el</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">error_el</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">el</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">error_el</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">parent</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">getparent</span><span class="p">()</span>
+            <span class="n">pos</span> <span class="o">=</span> <span class="n">parent</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">el</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">insert_before</span><span class="p">:</span>
+                <span class="n">parent</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">error_el</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">error_el</span><span class="o">.</span><span class="n">tail</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">tail</span>
+                <span class="n">el</span><span class="o">.</span><span class="n">tail</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">parent</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">pos</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">error_el</span><span class="p">)</span></div>
+
+<span class="n">default_error_creator</span> <span class="o">=</span> <span class="n">DefaultErrorCreator</span><span class="p">()</span>
+    
+
+<div class="viewcode-block" id="insert_errors"><a class="viewcode-back" href="../../../lxml.html.formfill.html#lxml.html.formfill.insert_errors">[docs]</a><span class="k">def</span> <span class="nf">insert_errors</span><span class="p">(</span>
+    <span class="n">el</span><span class="p">,</span>
+    <span class="n">errors</span><span class="p">,</span>
+    <span class="n">form_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">form_index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">error_class</span><span class="o">=</span><span class="s2">&quot;error&quot;</span><span class="p">,</span>
+    <span class="n">error_creator</span><span class="o">=</span><span class="n">default_error_creator</span><span class="p">,</span>
+    <span class="p">):</span>
+    <span class="n">el</span> <span class="o">=</span> <span class="n">_find_form</span><span class="p">(</span><span class="n">el</span><span class="p">,</span> <span class="n">form_id</span><span class="o">=</span><span class="n">form_id</span><span class="p">,</span> <span class="n">form_index</span><span class="o">=</span><span class="n">form_index</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">error</span> <span class="ow">in</span> <span class="n">errors</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">error</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">for</span> <span class="n">error_el</span><span class="p">,</span> <span class="n">message</span> <span class="ow">in</span> <span class="n">_find_elements_for_name</span><span class="p">(</span><span class="n">el</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">error</span><span class="p">):</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="p">(</span><span class="n">basestring</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span> <span class="n">ElementBase</span><span class="p">)),</span> <span class="p">(</span>
+                <span class="s2">&quot;Bad message: </span><span class="si">%r</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">message</span><span class="p">)</span>
+            <span class="n">_insert_error</span><span class="p">(</span><span class="n">error_el</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">error_class</span><span class="p">,</span> <span class="n">error_creator</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="insert_errors_html"><a class="viewcode-back" href="../../../lxml.html.formfill.html#lxml.html.formfill.insert_errors_html">[docs]</a><span class="k">def</span> <span class="nf">insert_errors_html</span><span class="p">(</span><span class="n">html</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+    <span class="n">result_type</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">html</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">html</span><span class="p">,</span> <span class="n">basestring</span><span class="p">):</span>
+        <span class="n">doc</span> <span class="o">=</span> <span class="n">fromstring</span><span class="p">(</span><span class="n">html</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">doc</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">html</span><span class="p">)</span>
+    <span class="n">insert_errors</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_transform_result</span><span class="p">(</span><span class="n">result_type</span><span class="p">,</span> <span class="n">doc</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="_insert_error"><a class="viewcode-back" href="../../../lxml.html.formfill.html#lxml.html.formfill._insert_error">[docs]</a><span class="k">def</span> <span class="nf">_insert_error</span><span class="p">(</span><span class="n">el</span><span class="p">,</span> <span class="n">error</span><span class="p">,</span> <span class="n">error_class</span><span class="p">,</span> <span class="n">error_creator</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">_nons</span><span class="p">(</span><span class="n">el</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span> <span class="ow">in</span> <span class="n">defs</span><span class="o">.</span><span class="n">empty_tags</span> <span class="ow">or</span> <span class="n">_nons</span><span class="p">(</span><span class="n">el</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;textarea&#39;</span><span class="p">:</span>
+        <span class="n">is_block</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">is_block</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">if</span> <span class="n">_nons</span><span class="p">(</span><span class="n">el</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span> <span class="o">!=</span> <span class="s1">&#39;form&#39;</span> <span class="ow">and</span> <span class="n">error_class</span><span class="p">:</span>
+        <span class="n">_add_class</span><span class="p">(</span><span class="n">el</span><span class="p">,</span> <span class="n">error_class</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">el</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">):</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="n">_label_for_xpath</span><span class="p">(</span><span class="n">el</span><span class="p">,</span> <span class="n">for_id</span><span class="o">=</span><span class="n">el</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">labels</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">:</span>
+                <span class="n">_add_class</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">error_class</span><span class="p">)</span>
+    <span class="n">error_creator</span><span class="p">(</span><span class="n">el</span><span class="p">,</span> <span class="n">is_block</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="_add_class"><a class="viewcode-back" href="../../../lxml.html.formfill.html#lxml.html.formfill._add_class">[docs]</a><span class="k">def</span> <span class="nf">_add_class</span><span class="p">(</span><span class="n">el</span><span class="p">,</span> <span class="n">class_name</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">el</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;class&#39;</span><span class="p">):</span>
+        <span class="n">el</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;class&#39;</span><span class="p">,</span> <span class="n">el</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;class&#39;</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39; &#39;</span><span class="o">+</span><span class="n">class_name</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">el</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;class&#39;</span><span class="p">,</span> <span class="n">class_name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="_find_elements_for_name"><a class="viewcode-back" href="../../../lxml.html.formfill.html#lxml.html.formfill._find_elements_for_name">[docs]</a><span class="k">def</span> <span class="nf">_find_elements_for_name</span><span class="p">(</span><span class="n">form</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">error</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># An error for the entire form</span>
+        <span class="k">yield</span> <span class="n">form</span><span class="p">,</span> <span class="n">error</span>
+        <span class="k">return</span>
+    <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;#&#39;</span><span class="p">):</span>
+        <span class="c1"># By id</span>
+        <span class="n">el</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">get_element_by_id</span><span class="p">(</span><span class="n">name</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+        <span class="k">if</span> <span class="n">el</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">el</span><span class="p">,</span> <span class="n">error</span>
+        <span class="k">return</span>
+    <span class="n">els</span> <span class="o">=</span> <span class="n">_name_xpath</span><span class="p">(</span><span class="n">form</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">els</span><span class="p">:</span>
+        <span class="c1"># FIXME: should this raise an exception?</span>
+        <span class="k">return</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+        <span class="k">yield</span> <span class="n">els</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">error</span>
+        <span class="k">return</span>
+    <span class="c1"># FIXME: if error is longer than els, should it raise an error?</span>
+    <span class="k">for</span> <span class="n">el</span><span class="p">,</span> <span class="n">err</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">els</span><span class="p">,</span> <span class="n">error</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">err</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">yield</span> <span class="n">el</span><span class="p">,</span> <span class="n">err</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020, lxml dev team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

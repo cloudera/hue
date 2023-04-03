@@ -17,11 +17,12 @@
 import $ from 'jquery';
 import * as ko from 'knockout';
 import komapping from 'knockout.mapping';
-import { markdown } from 'markdown';
+import snarkdown from 'snarkdown';
 
 import AceAutocompleteWrapper from 'apps/notebook/aceAutocompleteWrapper';
 import apiHelper from 'api/apiHelper';
 import dataCatalog from 'catalog/dataCatalog';
+import deXSS from 'utils/html/deXSS';
 import hueAnalytics from 'utils/hueAnalytics';
 import huePubSub from 'utils/huePubSub';
 import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
@@ -2799,9 +2800,11 @@ class Snippet {
   }
 
   renderMarkdown() {
-    return this.statement_raw().replace(/([^$]*)([$]+[^$]*[$]+)?/g, (a, textRepl, code) => {
-      return markdown.toHTML(textRepl).replace(/^<p>|<\/p>$/g, '') + (code ? code : '');
-    });
+    return this.statement_raw().replace(
+      /([^$]*)([$]+[^$]*[$]+)?/g,
+      (a, textRepl, code) =>
+        deXSS(snarkdown(textRepl)).replace(/^<p>|<\/p>$/g, '') + (code ? code : '')
+    );
   }
 
   async exportHistory() {

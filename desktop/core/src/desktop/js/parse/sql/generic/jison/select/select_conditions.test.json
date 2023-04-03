@@ -1,0 +1,26 @@
+[
+  {
+    "namePrefix": "should suggest columns",
+    "beforeCursor": "SELECT * FROM testTable ORDER BY bla bla bla boo ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "LIMIT",
+      "UNION"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest columns",
+    "beforeCursor": "SELECT * FROM testTable ORDER BY bla bla bla boo ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "LIMIT",
+      "UNION"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  }
+]

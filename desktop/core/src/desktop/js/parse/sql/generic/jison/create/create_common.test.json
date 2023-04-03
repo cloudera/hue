@@ -1,0 +1,28 @@
+[
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "",
+    "afterCursor": "",
+    "containsKeywords": [
+      "CREATE"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "DATABASE",
+      "ROLE",
+      "SCHEMA",
+      "TABLE",
+      "VIEW"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  }
+]

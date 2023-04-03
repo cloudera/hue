@@ -23,7 +23,7 @@ from impala.conf import COORDINATOR_URL as IMPALA_COORDINATOR_URL
 from metadata.conf import PROMETHEUS
 from notebook.conf import ENABLE_QUERY_SCHEDULING
 
-from jobbrowser.conf import DISABLE_KILLING_JOBS, MAX_JOB_FETCH, ENABLE_QUERY_BROWSER, ENABLE_HIVE_QUERY_BROWSER, ENABLE_QUERIES_LIST, ENABLE_HISTORY_V2
+from jobbrowser.conf import DISABLE_KILLING_JOBS, MAX_JOB_FETCH, ENABLE_QUERY_BROWSER, ENABLE_HIVE_QUERY_BROWSER, QUERY_STORE, ENABLE_HISTORY_V2
 
 from webpack_loader.templatetags.webpack_loader import render_bundle
 
@@ -193,7 +193,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
 
   <script type="text/html" id="apps-list${ SUFFIX }">
-    <table data-bind="attr: {id: tableId}" class="datatables table table-condensed status-border-container">
+    <table data-bind="attr: {id: tableId}" class="datatables table table-condensed status-border-container hue-jobs-table">
       <thead>
       <tr>
         <th width="1%" class="vertical-align-middle">
@@ -334,7 +334,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               <div data-bind="template: { name: 'breadcrumbs${ SUFFIX }' }"></div>
               <!-- /ko -->
 
-              <!-- ko if: interface() !== 'slas' && interface() !== 'oozie-info' && interface() !== 'queries'-->
+              <!-- ko if: interface() !== 'slas' && interface() !== 'oozie-info' && interface() !== 'hive-queries' && interface() !== 'impala-queries'-->
               <!-- ko if: !$root.job() -->
               <form class="form-inline">
                 <!-- ko if: !$root.isMini() && interface() == 'queries-impala' -->
@@ -408,9 +408,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                   <!-- /ko -->
                   <!-- ko ifnot: $root.isMini -->
                   <h4>${ _('Running') }</h4>
-                  <div data-bind="template: { name: 'apps-list${ SUFFIX }', data: { apps: jobs.runningApps, tableId: 'runningJobsTable', selectedJobs: jobs.selectedJobs} }"></div>
+                  <div data-bind="template: { name: 'apps-list${ SUFFIX }', data: { apps: jobs.runningApps, tableId: 'runningJobsTable', selectedJobs: jobs.selectedJobs} }" class="hue-horizontally-scrollable"></div>
                   <h4>${ _('Completed') }</h4>
-                  <div data-bind="template: { name: 'apps-list${ SUFFIX }', data: { apps: jobs.finishedApps, tableId: 'completedJobsTable', selectedJobs: jobs.selectedJobs } }"></div>
+                  <div data-bind="template: { name: 'apps-list${ SUFFIX }', data: { apps: jobs.finishedApps, tableId: 'completedJobsTable', selectedJobs: jobs.selectedJobs } }" class="hue-horizontally-scrollable"></div>
                   <!-- /ko -->
                 <!-- /ko -->
               </div>
@@ -486,8 +486,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               <!-- /ko -->
               <div id="slas" data-bind="visible: interface() === 'slas'"></div>
 
-              <!-- ko if: interface() === 'queries' -->
+              <!-- ko if: interface() === 'hive-queries' -->
                 <queries-list></queries-list>
+              <!-- /ko -->
+
+              <!-- ko if: interface() === 'impala-queries' -->
+                <impala-queries></impala-queries>
               <!-- /ko -->
 
               <!-- ko if: interface() === 'oozie-info' -->
@@ -1518,11 +1522,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <div class="tab-pane active" id="servicesLoad">
             <div class="wxm-poc" style="clear: both;">
               <div style="float:left; margin-right: 10px; margin-bottom: 10px;">
-                % if PROMETHEUS.API_URL.get():
-                <!-- ko component: { name: 'performance-graph', params: { clusterName: name(), type: 'cpu' } } --><!-- /ko -->
-                % else:
-                  ${ _("Metrics are not setup") }
-                % endif
+                ${ _("Metrics are not setup") }
               </div>
             </div>
           </div>
@@ -3188,7 +3188,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         });
       };
 
-      self.updateJob = function () {
+      self.updateJob = function (updateLogs) {
         huePubSub.publish('graph.refresh.view');
         var deferred = $.Deferred();
         if (vm.job() == self && self.apiStatus() == 'RUNNING') {
@@ -3219,7 +3219,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             } else {
               requests.push(vm.job().fetchStatus());
             }
-            requests.push(vm.job().fetchLogs(vm.job().logActive()));
+            if(updateLogs !== false) {
+              requests.push(vm.job().fetchLogs(vm.job().logActive()));
+            }
             var profile = $("div[data-jobType] .tab-content .active").data("profile");
             if (profile) {
               requests.push(vm.job().fetchProfile(profile));
@@ -3709,7 +3711,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       });
 
       self.fetchJobs = function () {
-        if(vm.interface() === 'queries') {
+        if(vm.interface() === 'hive-queries' || vm.interface() === 'impala-queries') {
           return;
         }
 
@@ -3733,7 +3735,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       }
 
       self.updateJobs = function () {
-        if(vm.interface() === 'queries') {
+        if(vm.interface() === 'hive-queries' || vm.interface() === 'impala-queries') {
           return;
         }
 
@@ -3916,6 +3918,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       });
 
       self.availableInterfaces = ko.pureComputed(function () {
+        var isDialectEnabled = function (dialect) {
+          return self.appConfig()?.editor?.interpreter_names?.indexOf(dialect) >= 0;
+        };
+
         var historyInterfaceCondition = function () {
           return '${ ENABLE_HISTORY_V2.get() }' == 'True';
         };
@@ -3955,8 +3961,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         var scheduleHiveInterfaceCondition = function () {
           return '${ ENABLE_QUERY_SCHEDULING.get() }' == 'True';
         };
-        var queriesInterfaceCondition = function () {
-          return '${ ENABLE_QUERIES_LIST.get() }' == 'True';
+        var hiveQueriesInterfaceCondition = function () {
+          return '${ QUERY_STORE.IS_ENABLED.get() }' == 'True' && isDialectEnabled('hive');
+        };
+        var impalaQueriesInterfaceCondition = function () {
+          return '${ QUERY_STORE.IS_ENABLED.get() }' == 'True' && isDialectEnabled('impala');
         };
 
         var interfaces = [
@@ -3976,7 +3985,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           {'interface': 'bundles', 'label': '${ _ko('Bundles') }', 'condition': schedulerExtraInterfaceCondition},
           {'interface': 'slas', 'label': '${ _ko('SLAs') }', 'condition': schedulerExtraInterfaceCondition},
           {'interface': 'livy-sessions', 'label': '${ _ko('Livy') }', 'condition': livyInterfaceCondition},
-          {'interface': 'queries', 'label': '${ _ko('Queries') }', 'condition': queriesInterfaceCondition},
+          {'interface': 'hive-queries', 'label': '${ _ko('Hive Queries') }', 'condition': hiveQueriesInterfaceCondition},
+          {'interface': 'impala-queries', 'label': '${ _ko('Impala Queries') }', 'condition': impalaQueriesInterfaceCondition},
         ];
 
         return interfaces.filter(function (i) {
@@ -4064,7 +4074,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             self.loadOozieInfoPage();
           % endif
         }
-        else if(interface !== 'queries'){
+        else if(interface !== 'hive-queries' || interface !== 'impala-queries'){
           self.jobs.fetchJobs();
         }
       };
@@ -4084,6 +4094,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       var updateJobTimeout = -1;
       var updateJobsTimeout = -1;
+      var jobUpdateCounter = 0;
+      var exponentialFactor = 1;
       self.job.subscribe(function(val) {
         self.monitorJob(val);
       });
@@ -4091,11 +4103,18 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.monitorJob = function(job) {
         window.clearTimeout(updateJobTimeout);
         window.clearTimeout(updateJobsTimeout);
-        if (self.interface() && self.interface() !== 'slas' && self.interface() !== 'oozie-info' && self.interface !== 'queries'){
+        jobUpdateCounter = 0;
+        exponentialFactor = 1;
+        if (self.interface() && self.interface() !== 'slas' && self.interface() !== 'oozie-info' && self.interface !== 'hive-queries' && self.interface !== 'impala-queries'){
           if (job) {
             if (job.apiStatus() === 'RUNNING') {
               var _updateJob = function () {
-                var def = job.updateJob();
+                jobUpdateCounter++;
+                var updateLogs = (jobUpdateCounter % exponentialFactor) === 0;
+                if(updateLogs && exponentialFactor < 50) {
+                  exponentialFactor *= 2;
+                }
+                var def = job.updateJob(updateLogs);
                 if (def) {
                   def.done(function () {
                     updateJobTimeout = setTimeout(_updateJob, window.JB_SINGLE_CHECK_INTERVAL_IN_MILLIS);
@@ -4173,7 +4192,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           case 'engines':
           case 'dataeng-jobs':
           case 'livy-sessions':
-          case 'queries':
+          case 'hive-queries':
+          case 'impala-queries':
             self.selectInterface(h);
             break;
           default:

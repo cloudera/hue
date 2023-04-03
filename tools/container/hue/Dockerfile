@@ -46,6 +46,7 @@ RUN echo "${HUEUSER} ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/${HUEUSER} && \
 COPY --chown=${HUEUSER}:${HUEUSER} hueconf ${HUE_CONF}/conf
 
 RUN ln -s ${HUE_CONF}/conf/log.conf ${HUE_HOME}/desktop/conf/log.conf; \
+    ln -s ${HUE_CONF}/conf/gunicorn_log.conf ${HUE_HOME}/desktop/conf/gunicorn_log.conf; \
     ln -s ${HUE_CONF}/conf/log4j.properties ${HUE_HOME}/desktop/conf/log4j.properties
 
 # supervisor stuff
@@ -53,6 +54,7 @@ RUN mkdir -p /etc/supervisor.d/ && chmod +w /etc/supervisor.d && mkdir -p /var/l
 ADD supervisor-files/etc/supervisord.conf /etc/supervisord.conf
 ADD supervisor-files/hue_server.conf /etc/supervisor.d/
 ADD supervisor-files/hue_ktrenewer.conf /etc/supervisor.d/
+ADD supervisor-files/hue_loglistener.conf /etc/supervisor.d/
 RUN chown -R ${HUEUSER}:${HUEUSER} /etc/supervisord.conf && chown -R ${HUEUSER}:${HUEUSER} /etc/supervisor.d
 
 # Remove chardet package

@@ -1,0 +1,40 @@
+[
+  {
+    "namePrefix": "should not report errors",
+    "beforeCursor": "TRUNCATE TABLE baa.boo;",
+    "afterCursor": "",
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "noErrors": true,
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "truncate ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": true,
+      "suggestKeywords": [
+        "TABLE"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest tables",
+    "beforeCursor": "TRUNCATE TABLE ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestTables": {},
+      "suggestDatabases": {
+        "appendDot": true
+      },
+      "suggestKeywords": [
+        "IF EXISTS"
+      ]
+    }
+  }
+]

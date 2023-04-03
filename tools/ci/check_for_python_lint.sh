@@ -22,6 +22,7 @@ FOUND_ISSUE=-1
 
 files=`git diff --name-only origin/master --diff-filter=b | egrep .py$ | \
   grep -v /ext-py/ | \
+  grep -v /ext-py3/ | \
   grep -v wsgiserver.py | \
   grep -v /migrations/ | \
   grep -v apps/oozie/src/oozie/tests.py | \

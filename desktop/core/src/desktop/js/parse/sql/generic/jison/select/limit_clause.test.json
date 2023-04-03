@@ -1,0 +1,18 @@
+[
+  {
+    "namePrefix": "should suggest values",
+    "beforeCursor": "SELECT COUNT(*) AS boo FROM testTable GROUP BY baa LIMIT ",
+    "afterCursor": "",
+    "noErrors": true,
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "10",
+        "100",
+        "1000",
+        "10000",
+        "5000"
+      ]
+    }
+  }
+]

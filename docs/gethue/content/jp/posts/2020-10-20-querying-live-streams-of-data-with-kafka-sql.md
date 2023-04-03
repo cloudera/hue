@@ -104,8 +104,8 @@ categories:
 
 既存の Hue Editor をお持ちで ksqlDB を指定したい場合は、この設定変更で有効にしてください:
 
-    [notebook]
-    enable_notebook_2=true
+    [desktop]
+    enable_hue_5=true
 
     [[interpreters]]
 

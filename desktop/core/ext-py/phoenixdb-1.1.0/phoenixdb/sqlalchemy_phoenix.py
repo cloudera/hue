@@ -153,8 +153,8 @@ class PhoenixDialect(DefaultDialect):
     def get_view_names(self, connection, schema=None, **kw):
         if schema is None:
             schema = ''
-        return connection.connect().connection.meta().get_tables(schemaPattern=schema,
-                                                                 typeList=('VIEW'))
+        views = connection.connect().connection.meta().get_tables(schemaPattern=schema, typeList=('VIEW',))
+        return [view['TABLE_NAME'] for view in views]
 
     def get_columns(self, connection, table_name, schema=None, **kw):
         if schema is None:

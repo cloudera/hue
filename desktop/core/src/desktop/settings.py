@@ -37,7 +37,7 @@ from desktop.lib.python_util import force_dict_to_strings
 
 from aws.conf import is_enabled as is_s3_enabled
 from azure.conf import is_abfs_enabled
-from indexer.conf import ENABLE_DIRECT_UPLOAD
+from desktop.conf import is_ofs_enabled
 
 if sys.version_info[0] > 2:
   from django.utils.translation import gettext_lazy as _
@@ -118,8 +118,7 @@ USE_TZ = False
 # Examples: "http://media.lawrence.com/media/", "http://example.com/media/"
 MEDIA_URL = ''
 
-if ENABLE_DIRECT_UPLOAD:
-  DATA_UPLOAD_MAX_MEMORY_SIZE = 67108864  # Setting this variable to 64MB as we are sending long POST requests
+DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880  # Setting this variable to 5MB as sometime request size > 2.5MB (default value)
 
 ############################################################
 # Part 3: Django configuration
@@ -139,12 +138,6 @@ STATIC_URL = '/static/'
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'build', 'static')
 
-
-# List of callables that know how to import templates from various sources.
-GTEMPLATE_LOADERS = (
-  'django.template.loaders.filesystem.Loader',
-  'django.template.loaders.app_directories.Loader'
-)
 
 MIDDLEWARE = [
     # The order matters
@@ -257,7 +250,6 @@ TEMPLATES = [
     'NAME': 'mako',
     'OPTIONS': {
       'context_processors': GTEMPLATE_CONTEXT_PROCESSORS,
-      'loaders': GTEMPLATE_LOADERS,
     },
   },
   {
@@ -674,6 +666,9 @@ if is_s3_enabled():
 if is_abfs_enabled():
   file_upload_handlers.insert(0, 'azure.abfs.upload.ABFSFileUploadHandler')
 
+if is_ofs_enabled():
+  file_upload_handlers.insert(0, 'desktop.lib.fs.ozone.upload.OFSFileUploadHandler')
+
 
 FILE_UPLOAD_HANDLERS = tuple(file_upload_handlers)
 
@@ -805,6 +800,8 @@ MODULES_TO_PATCH = (
 
 if sys.version_info[0] > 2:
   MIDDLEWARE.append('axes.middleware.AxesMiddleware')  # AxesMiddleware should be the last middleware in the MIDDLEWARE list.
+else:
+  MIDDLEWARE.remove('desktop.middleware.MultipleProxyMiddleware')
 
 try:
   import hashlib

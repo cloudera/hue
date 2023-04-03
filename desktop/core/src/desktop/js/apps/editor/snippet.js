@@ -18,7 +18,7 @@ import { EXECUTE_ACTIVE_EXECUTABLE_TOPIC } from 'apps/editor/components/events';
 import $ from 'jquery';
 import * as ko from 'knockout';
 import komapping from 'knockout.mapping';
-import { markdown } from 'markdown';
+import snarkdown from 'snarkdown';
 
 import 'apps/editor/components/ko.executableLogs';
 import 'apps/editor/components/ko.snippetEditorActions';
@@ -36,6 +36,7 @@ import './components/variableSubstitution/VariableSubstitutionKoBridge.vue';
 
 import AceAutocompleteWrapper from 'apps/notebook/aceAutocompleteWrapper';
 import apiHelper from 'api/apiHelper';
+import deXSS from 'utils/html/deXSS';
 import Executor from 'apps/editor/execution/executor';
 import hueAnalytics from 'utils/hueAnalytics';
 import huePubSub from 'utils/huePubSub';
@@ -59,7 +60,7 @@ import {
 } from 'ko/components/assist/events';
 import { EXECUTABLE_UPDATED_TOPIC } from './execution/events';
 
-// TODO: Remove for ENABLE_NOTEBOOK_2. Temporary here for debug
+// TODO: Remove together with ENABLE_HUE_5. Temporary here for debug
 window.SqlExecutable = SqlExecutable;
 window.Executor = Executor;
 
@@ -76,6 +77,7 @@ export const DIALECT = {
   mapreduce: 'mapreduce',
   pig: 'pig',
   distcp: 'distcp',
+  sparksql: 'sparksql',
   sqoop1: 'sqoop1'
 };
 
@@ -877,7 +879,7 @@ export default class Snippet {
 
   handleAjaxError(data, callback) {
     if (data.status === -2) {
-      // TODO: Session expired, check if handleAjaxError is used for ENABLE_NOTEBOOK_2
+      // TODO: Session expired, check if handleAjaxError is used for ENABLE_HUE_5
     } else if (data.status === -3) {
       // Statement expired
       this.status(STATUS.expired);
@@ -1050,9 +1052,11 @@ export default class Snippet {
   }
 
   renderMarkdown() {
-    return this.statement_raw().replace(/([^$]*)([$]+[^$]*[$]+)?/g, (a, textRepl, code) => {
-      return markdown.toHTML(textRepl).replace(/^<p>|<\/p>$/g, '') + (code ? code : '');
-    });
+    return this.statement_raw().replace(
+      /([^$]*)([$]+[^$]*[$]+)?/g,
+      (a, textRepl, code) =>
+        deXSS(snarkdown(textRepl)).replace(/^<p>|<\/p>$/g, '') + (code ? code : '')
+    );
   }
 
   startLongOperationTimeout() {
