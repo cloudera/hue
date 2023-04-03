@@ -44,8 +44,10 @@ from notebook.models import make_notebook
 
 if sys.version_info[0] > 2:
   from django.utils.translation import gettext as _
+  from base64 import decodebytes
 else:
   from django.utils.translation import ugettext as _
+  from base64 import decodestring as decodebytes
 
 
 LOG = logging.getLogger(__name__)
@@ -142,7 +144,7 @@ def alanize(request):
     doc = Document2.objects.get(id=query_id)
     snippets = doc.data_dict.get('snippets', [])
     secret = snippets[0]['result']['handle']['secret']
-    impala_query_id = unpack_guid(base64.decodestring(secret))
+    impala_query_id = unpack_guid(decodebytes(secret))
     query_profile = api.get_query_profile_encoded(impala_query_id)
     profile = analyzer.analyze(analyzer.parse_data(query_profile))
     ANALYZER.pre_process(profile)
