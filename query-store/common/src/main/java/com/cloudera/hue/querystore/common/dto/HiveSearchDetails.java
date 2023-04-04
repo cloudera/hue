@@ -37,6 +37,6 @@ public class HiveSearchDetails {
     this.userIds = facetMap.get(HiveQueryBasicInfo.Fields.userId);
     this.requestUsers = facetMap.get(HiveQueryBasicInfo.Fields.requestUser);
     this.executionModes = facetMap.get(HiveQueryBasicInfo.Fields.executionMode);
-    this.usedCbo = facetMap.get(HiveQueryBasicInfo.Fields.usedCBO);
+    this.usedCbo = facetMap.get(HiveQueryBasicInfo.Fields.usedCbo);
   }
 }

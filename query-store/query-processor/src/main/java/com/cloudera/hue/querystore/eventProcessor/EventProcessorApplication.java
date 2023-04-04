@@ -17,9 +17,11 @@ import com.cloudera.hue.querystore.common.AppAuthentication;
 import com.cloudera.hue.querystore.common.config.AuthConfig;
 import com.cloudera.hue.querystore.common.config.DasConfiguration;
 import com.cloudera.hue.querystore.common.config.DasConfiguration.ConfVar;
+import com.cloudera.hue.querystore.common.config.DatabaseType;
 import com.cloudera.hue.querystore.common.filters.RequestContextFilter;
 import com.cloudera.hue.querystore.common.filters.SPNEGOFilter;
 import com.cloudera.hue.querystore.common.module.CommonModule;
+import com.cloudera.hue.querystore.common.module.OracleCommonModule;
 import com.cloudera.hue.querystore.common.resource.HealthCheckResource;
 import com.cloudera.hue.querystore.common.util.PasswordSubstitutor;
 import com.cloudera.hue.querystore.eventProcessor.bundle.DefaultFlywayBundle;
@@ -37,6 +39,7 @@ import com.codahale.metrics.jdbi3.InstrumentedSqlLogger;
 import com.codahale.metrics.jdbi3.strategies.SmartNameStrategy;
 import com.codahale.metrics.jmx.JmxReporter;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 
@@ -132,8 +135,14 @@ public class EventProcessorApplication extends Application<EventProcessorConfigu
 
   private Injector initializeGuice(EventProcessorConfiguration configuration, Environment environment, Jdbi jdbi,
       AppAuthentication appAuth) {
+    AbstractModule module = new CommonModule(jdbi, appAuth);
+
+    if (DatabaseType.isOracle(configuration.getDatabase().getDriverClass())) {
+      module = new OracleCommonModule(jdbi, appAuth);
+    }
+
     return Guice.createInjector(
-        new CommonModule(jdbi, appAuth),
+        module,
         new EventProcessorModule(configuration, environment)
     );
   }

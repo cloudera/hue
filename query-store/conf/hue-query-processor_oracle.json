@@ -14,7 +14,7 @@
   },
   "database": {
     "driverClass": "oracle.jdbc.OracleDriver",
-    "url": "jdbc:oracle:thin:@//demo-orac-amlesh-1-o12.demo-orac-amlesh-1-o12.root.hwx.site:1521/orcl12c",
+    "url": "jdbc:oracle:thin:@//amleshkumar-1-o12.amleshkumar-1-o12.root.hwx.site:1521/orcl12c",
     "user": "qp_user",
     "password": "qp_pass",
     "properties": {},
