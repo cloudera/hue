@@ -34,11 +34,6 @@ from libanalyze import models
 from libanalyze import utils
 from libanalyze.rules import to_double
 
-if sys.version_info[0] > 2:
-  from base64 import decodebytes
-else:
-  from base64 import decodestring as decodebytes
-
 
 class Node(object):
   """Simple Node"""
@@ -442,7 +437,7 @@ def parse(file_name):
   into the TRuntimeProfileTree structure."""
   with open(file_name) as fid:
     for line in fid:
-      val = decodebytes(line.strip())
+      val = base64.decodestring(line.strip())
       try:
           val = decompress(val.strip())
       except:
@@ -450,7 +445,7 @@ def parse(file_name):
       return decode_thrift(val)
 
 def parse_data(data):
-  val = decodebytes(data)
+  val = base64.decodestring(data)
   try:
       val = decompress(val.strip())
   except:
