@@ -142,7 +142,7 @@ public class QuerySubmittedProcessor implements HiveEventProcessor {
     query.setThreadId(otherInfo.get(OtherInfoType.THREAD_NAME.name()));
     query.setSessionId(otherInfo.get(OtherInfoType.SESSION_ID.name()));
     query.setHiveInstanceAddress(otherInfo.get(OtherInfoType.HIVE_ADDRESS.name()));
-    query.setUsedCBO(false);
+    query.setUsedCbo(false);
 
     QueryData queryData = helper.parseData(
         otherInfo.get(OtherInfoType.QUERY.name()), QueryData.class);
@@ -153,7 +153,7 @@ public class QuerySubmittedProcessor implements HiveEventProcessor {
       details.setExplainPlan(explainPlan);
 
       if (explainPlan.has(CBO_INFO_KEY)) {
-        query.setUsedCBO(true);
+        query.setUsedCbo(true);
       }
       details.setExplainPlan(queryData.getExplainPlan());
     }

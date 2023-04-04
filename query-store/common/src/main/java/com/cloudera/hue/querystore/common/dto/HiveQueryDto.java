@@ -79,7 +79,7 @@ public class HiveQueryDto {
     this.databasesUsed = hiveQuery.getDatabasesUsed();
     this.domainId = hiveQuery.getDomainId();
     this.llapAppId = hiveQuery.getLlapAppId();
-    this.usedCBO = hiveQuery.isUsedCBO();
+    this.usedCBO = hiveQuery.isUsedCbo();
     // this.processed = hiveQuery.getProcessed();
     this.createdAt = hiveQuery.getCreatedAt();
   }

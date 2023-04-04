@@ -84,7 +84,7 @@ public class HiveQueryBasicInfo implements JdbiEntity {
     this.databasesUsed = databasesUsed;
     this.domainId = domainId;
     this.llapAppId = llapAppId;
-    this.usedCBO = usedCBO;
+    this.usedCbo = usedCBO;
     this.firstTaskStartedTime = firstTaskStartedTime;
     this.waitingTime = waitingTime;
   }
@@ -178,7 +178,7 @@ public class HiveQueryBasicInfo implements JdbiEntity {
   private String llapAppId;
 
   @ColumnInfo(columnName="used_cbo", searchable = true, facetable = true)
-  private boolean usedCBO = false;
+  private boolean usedCbo = false;
 
   @ColumnInfo(columnName="first_task_started_time", exclude = true)
   private Long firstTaskStartedTime;

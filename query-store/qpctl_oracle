@@ -16,6 +16,7 @@ JAVA_ARGS="-Dlog4j.configurationFile=$CONF_DIR/hue-query-processor-log4j2.yml -D
 DB=qp_db
 DBUSER=qp_user
 DBPASS=qp_pass
+QP_HOST=cm/cm@amleshkumar-1-o12.amleshkumar-1-o12.root.hwx.site:1521/orcl12c
 
 export HADOOP_CONF=$CONF_DIR
 ORACLE_PATH=$(echo /opt/oracle/product/12.2.0/bin/sqlplus)
@@ -47,18 +48,8 @@ setup_db() {
   echo "Setting up Oracle qp_db and users ..."
   PATH="$PATH:$ORACLE_PATH"
   
-  sqlplus -s cm/cm@demo-orac-amlesh-1-o12.demo-orac-amlesh-1-o12.root.hwx.site:1521/orcl12c <<< "CREATE USER $DBUSER IDENTIFIED BY $DBPASS;" &&
-  sqlplus -s cm/cm@demo-orac-amlesh-1-o12.demo-orac-amlesh-1-o12.root.hwx.site:1521/orcl12c <<< "GRANT CREATE TABLE TO $DBUSER;" &&
-  sqlplus -s cm/cm@demo-orac-amlesh-1-o12.demo-orac-amlesh-1-o12.root.hwx.site:1521/orcl12c <<< "GRANT CREATE USER TO $DBUSER;" &&
-  sqlplus -s cm/cm@demo-orac-amlesh-1-o12.demo-orac-amlesh-1-o12.root.hwx.site:1521/orcl12c <<< "GRANT CREATE SESSION TO $DBUSER;" &&
-  sqlplus -s cm/cm@demo-orac-amlesh-1-o12.demo-orac-amlesh-1-o12.root.hwx.site:1521/orcl12c <<< "GRANT CONNECT TO $DBUSER;"
-#  sqlplus -s cm/cm@demo-orac-amlesh-1-o12.demo-orac-amlesh-1-o12.root.hwx.site:1521/orcl12c <<< "ALTER USER $DBUSER QUOTA 100M ON USERS;" &&
-  sqlplus -s cm/cm@demo-orac-amlesh-1-o12.demo-orac-amlesh-1-o12.root.hwx.site:1521/orcl12c <<< "GRANT UNLIMITED TABLESPACE TO $DBUSER;" &&
-
-  sqlplus -s qp_user/qp_pass@demo-orac-amlesh-1-o12.demo-orac-amlesh-1-o12.root.hwx.site:1521/orcl12c <<< "SELECT 1 FROM DUAL;" &&
-
-#  sqlplus -s cm/cm@demo-orac-amlesh-1-o12.demo-orac-amlesh-1-o12.root.hwx.site:1521/orcl12c <<< "CREATE DATABASE $DB;" &&
-#  sqlplus -s cm/cm@demo-orac-amlesh-1-o12.demo-orac-amlesh-1-o12.root.hwx.site:1521/orcl12c <<< "USE $DB; GRANT ALL PRIVILEGES ON $DB.* TO $DBUSER@'localhost';"
+  sqlplus -s $QP_HOST <<< "CREATE USER $DBUSER IDENTIFIED BY $DBPASS;" &&
+  sqlplus -s $QP_HOST <<< "GRANT ALL PRIVILEGES TO $DBUSER;" &&
 
   gen_cp
   echo migrate db ...
@@ -69,8 +60,7 @@ delete_db() {
   echo "Dropping Oracle qp_db and users..."
   PATH="$PATH:$ORACLE_PATH"
 
-#  sqlplus -s cm/cm@demo-orac-amlesh-1-o12.demo-orac-amlesh-1-o12.root.hwx.site:1521/orcl12c <<< "DROP database $DB;"
-  sqlplus -s cm/cm@demo-orac-amlesh-1-o12.demo-orac-amlesh-1-o12.root.hwx.site:1521/orcl12c <<< "DROP USER $DBUSER CASCADE;"
+  sqlplus -s $QP_HOST <<< "DROP USER $DBUSER CASCADE;"
 }
 
 start_java() {
