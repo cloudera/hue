@@ -46,15 +46,15 @@ public class TestQuerySubmittedProcessor {
 
     event.setOtherInfo(new HashMap<>());
     querySubmittedProcessor.enrichFromEvent(event, hiveQuery, queryDetails);
-    Assert.assertEquals("Invalid CBO check, expects No", false, hiveQuery.isUsedCBO());
+    Assert.assertEquals("Invalid CBO check, expects No", false, hiveQuery.isUsedCbo());
 
     event.getOtherInfo().put("QUERY", "{\"queryText\":\"Text\", \"queryPlan\":{\"cboInfo\": \"Some text\"}}");
     querySubmittedProcessor.enrichFromEvent(event, hiveQuery, queryDetails);
-    Assert.assertEquals("Invalid CBO check, expects Yes", true, hiveQuery.isUsedCBO());
+    Assert.assertEquals("Invalid CBO check, expects Yes", true, hiveQuery.isUsedCbo());
 
     event.getOtherInfo().put("QUERY", "{\"queryText\":\"Text\", \"queryPlan\":{}}");
     querySubmittedProcessor.enrichFromEvent(event, hiveQuery, queryDetails);
-    Assert.assertEquals("Invalid CBO check, expects No", false, hiveQuery.isUsedCBO());
+    Assert.assertEquals("Invalid CBO check, expects No", false, hiveQuery.isUsedCbo());
   }
 
 }
