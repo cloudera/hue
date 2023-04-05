@@ -180,7 +180,8 @@ def run_sqoop(request, source, destination, start_time):
     password_file_path = request.fs.join(request.fs.get_home_dir() + '/sqoop/', uuid.uuid4().hex + '.password')
     request.fs.do_as_user(
       request.user,
-      request.fs.create, password_file_path,
+      request.fs.create,
+      password_file_path,
       overwrite=True,
       permission=0o700,
       data=smart_str(rdbms_password)
