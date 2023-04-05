@@ -433,12 +433,12 @@ def get_api(request, snippet):
     interpreter = get_interpreter(connector_type=connector_name, user=request.user)
 
   interface = snippet.get('interface')
-    if interface is None:
-      interface = interpreter['interface']
+  if interface is None:
+    interface = interpreter['interface']
 
   options = snippet.get('options')
-    if options is not None:
-      interpreter['options'] = options
+  if options is not None:
+    interpreter['options'] = options
 
   if get_cluster_config(request.user)['has_computes']:
     compute = json.loads(request.POST.get('cluster', '""'))  # Via Catalog autocomplete API or Notebook create sessions.
