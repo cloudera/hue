@@ -385,6 +385,14 @@ def get_interpreter(connector_type, user=None):
         'options': {},
         'is_sql': False
       }]
+    elif connector_type == 'importer':
+      interpreter = [{
+        'name': 'importer',
+        'type': '',
+        'interface': '',
+        'options': {},
+        'is_sql': False
+      }]
     else:
       raise PopupException(_('Snippet type %s is not configured.') % connector_type)
   elif len(interpreter) > 1:
@@ -424,7 +432,13 @@ def get_api(request, snippet):
   else:
     interpreter = get_interpreter(connector_type=connector_name, user=request.user)
 
-  interface = interpreter['interface']
+  interface = snippet.get('interface')
+    if interface is None:
+      interface = interpreter['interface']
+
+  options = snippet.get('options')
+    if options is not None:
+      interpreter['options'] = options
 
   if get_cluster_config(request.user)['has_computes']:
     compute = json.loads(request.POST.get('cluster', '""'))  # Via Catalog autocomplete API or Notebook create sessions.
