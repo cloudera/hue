@@ -464,7 +464,7 @@ def upload_query(request):
   print(conv_str)
   print('separated by commas is as follows: ')
   print(conv_str.split(','))
-  print(conv_str[2])
+  # print(conv_str[2])
 
   if OPTIMIZER.AUTO_UPLOAD_QUERIES.get() and source_platform in ('hive', 'impala') and query_id:
     try:
