@@ -29,7 +29,7 @@ from desktop.auth.backend import is_admin
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.i18n import force_unicode
 from desktop.models import Document2
-from desktop.models import DocParser
+from desktop.models import SqlLocation
 from libsentry.privilege_checker import MissingSentryPrivilegeException
 from notebook.api import _get_statement
 from notebook.models import Notebook
@@ -456,6 +456,15 @@ def upload_query(request):
   source_platform = request.POST.get('sourcePlatform', 'default')
   query_id = request.POST.get('query_id')
   locations = request.POST.get('locations')
+  print('Data in the backend is as below:')
+  print(locations)
+  conv_str = json.dumps(locations)
+  print(type(conv_str))
+  print('diff_format is as follows: ')
+  print(conv_str)
+  print('separated by commas is as follows: ')
+  print(conv_str.split(','))
+  print(conv_str[2])
 
   if OPTIMIZER.AUTO_UPLOAD_QUERIES.get() and source_platform in ('hive', 'impala') and query_id:
     try:
@@ -470,6 +479,16 @@ def upload_query(request):
       response['query_upload'] = api.upload(data=queries, data_type='queries', source_platform=source_platform)
     except Document2.DoesNotExist:
       response['query_upload'] = _('Skipped as task query')
+  
+  elif OPTIMIZER.AUTO_UPLOAD_QUERIES.get() and locations:
+    try:
+      Sql_obj = SqlLocation(first_token='abc' , statement='df' , its_type='table' , identifier='ldc')
+      Sql_obj.save()
+      SqlLocation.objects.all().values()
+      response['query_upload'] = _('SQL parser saved to DB')
+    except:
+      response['query_upload'] = _('failed to upload SQL query')
+
   else:
     response['query_upload'] = _('Skipped')
   response['status'] = 0
