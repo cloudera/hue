@@ -178,7 +178,13 @@ def run_sqoop(request, source, destination, start_time):
       url = rdbms_host
 
     password_file_path = request.fs.join(request.fs.get_home_dir() + '/sqoop/', uuid.uuid4().hex + '.password')
-    request.fs.do_as_user(request.user, request.fs.create, password_file_path, overwrite=True, permission=0o700, data=smart_str(rdbms_password))
+    request.fs.do_as_user(
+      request.user,
+      request.fs.create, password_file_path,
+      overwrite=True,
+      permission=0o700,
+      data=smart_str(rdbms_password)
+      )
 
     lib_files = []
     if destination['sqoopJobLibPaths']:
@@ -210,7 +216,11 @@ def run_sqoop(request, source, destination, start_time):
         'targetDir': targetDir
       }
       if destination_file_output_format == 'text':
-        statement = '%(statement)s --as-textfile --fields-terminated-by %(customFieldsDelimiter)s --lines-terminated-by %(customLineDelimiter)s --enclosed-by %(customEnclosedByDelimiter)s' % {
+        statement = '%(statement)s'\
+        ' --as-textfile'\
+        ' --fields-terminated-by %(customFieldsDelimiter)s'\
+        ' --lines-terminated-by %(customLineDelimiter)s'\
+        ' --enclosed-by %(customEnclosedByDelimiter)s' % {
           'statement': statement,
           'customFieldsDelimiter': destination_custom_fields_delimiter,
           'customLineDelimiter': destination_custom_line_delimiter,
@@ -234,7 +244,12 @@ def run_sqoop(request, source, destination, start_time):
         'exclude': exclude
       }
     else:
-      statement = 'import %(statement)s --table %(rdbmsTableName)s --hive-import --delete-target-dir --hive-database %(hive_database_name)s --hive-table %(hive_table_name)s' % {
+      statement = 'import %(statement)s'\
+      ' --table %(rdbmsTableName)s'\
+      ' --hive-import'\
+      ' --delete-target-dir'\
+      ' --hive-database %(hive_database_name)s'\
+      ' --hive-table %(hive_table_name)s' % {
         'statement': statement,
         'rdbmsTableName': rdbms_table_name,
         'hive_database_name': destination_database_name,
