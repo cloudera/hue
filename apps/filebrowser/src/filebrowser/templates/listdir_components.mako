@@ -2012,10 +2012,14 @@ else:
         });
 
         $("#fileUploader").on('fb:updatePath', function (e, options) {
-          const uploadingToOzone = self.currentPath().startsWith("ofs://");          
-          if (uploadingToOzone && UPLOAD_CHUNK_SIZE) {
-            uploader.setOption('sizeLimit', UPLOAD_CHUNK_SIZE);
-          }  
+          const uploadingToOzone = self.currentPath().startsWith("ofs://");
+          const ozoneSizeLimit = Math.min(
+            ...[UPLOAD_CHUNK_SIZE, MAX_FILE_SIZE_UPLOAD_LIMIT].filter(Number.isFinite)
+          );
+          const newSizeLimit = uploadingToOzone ? ozoneSizeLimit : MAX_FILE_SIZE_UPLOAD_LIMIT;
+          if (newSizeLimit) {
+            uploader.setOption('sizeLimit', newSizeLimit);
+          }
           uploader.setParams({
             dest: options.dest,
             fileFieldLabel: "hdfs_file"
