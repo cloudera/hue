@@ -100,7 +100,7 @@ def _get_api(request):
     name = type
     interface = file_format['inputFormat']
 
-  return get_api(request, { 'type': type, 'interface': interface, 'options': options, 'query_server': query_server, 'name': name})
+  return get_api(request, {'type': type, 'interface': interface, 'options': options, 'query_server': query_server, 'name': name})
 
 def jdbc_db_list(request):
   format_ = {'data': [], 'status': 1}
