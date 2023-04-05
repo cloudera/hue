@@ -29,7 +29,7 @@
   from dashboard.conf import HAS_SQL_ENABLED
   from hadoop.conf import UPLOAD_CHUNK_SIZE
   from jobbrowser.conf import ENABLE_HISTORY_V2
-  from filebrowser.conf import SHOW_UPLOAD_BUTTON, REMOTE_STORAGE_HOME
+  from filebrowser.conf import SHOW_UPLOAD_BUTTON, REMOTE_STORAGE_HOME, MAX_FILE_SIZE_UPLOAD_LIMIT
   from indexer.conf import ENABLE_NEW_INDEXER
   from libsaml.conf import get_logout_redirect_url, CDP_LOGOUT_URL
   from metadata.conf import has_catalog, has_readonly_catalog, has_optimizer, has_workload_analytics, OPTIMIZER, get_optimizer_url, \
@@ -137,7 +137,8 @@
 
   window.SHOW_NOTEBOOKS = '${ SHOW_NOTEBOOKS.get() }' === 'True'
   window.SHOW_UPLOAD_BUTTON = '${ hasattr(SHOW_UPLOAD_BUTTON, 'get') and SHOW_UPLOAD_BUTTON.get() }' === 'True'
-  window.UPLOAD_CHUNK_SIZE = '${ UPLOAD_CHUNK_SIZE.get() }';
+  window.UPLOAD_CHUNK_SIZE = ${ UPLOAD_CHUNK_SIZE.get() };
+  window.MAX_FILE_SIZE_UPLOAD_LIMIT = ${ MAX_FILE_SIZE_UPLOAD_LIMIT.get() if hasattr(MAX_FILE_SIZE_UPLOAD_LIMIT, 'get') and MAX_FILE_SIZE_UPLOAD_LIMIT.get() >= 0 else 'undefined' };
 
   window.IS_MULTICLUSTER_ONLY = '${ IS_MULTICLUSTER_ONLY.get() }' === 'True';
   window.IS_K8S_ONLY = '${ IS_K8S_ONLY.get() }' === 'True';
