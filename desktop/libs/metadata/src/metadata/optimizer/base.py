@@ -37,9 +37,6 @@ def get_api(user, interface):
   elif interface == 'dummy':
     from metadata.optimizer.dummy_client import DummyClient
     return DummyClient(user=user)
-  # elif interface == 'SQLParser':
-  #   from metadata.optimizer.OptimizerParser import OptimizerParser
-  #   return OptimizerParser(user)
   else:
     raise PopupException(_('Optimizer connector interface not recognized: %s') % interface)
 

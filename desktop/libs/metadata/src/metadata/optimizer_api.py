@@ -29,7 +29,7 @@ from desktop.auth.backend import is_admin
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.i18n import force_unicode
 from desktop.models import Document2
-from desktop.models import SqlLocation
+from desktop.models import SqlQuery
 from libsentry.privilege_checker import MissingSentryPrivilegeException
 from notebook.api import _get_statement
 from notebook.models import Notebook
@@ -143,6 +143,10 @@ def top_tables(request):
   response['status'] = 0
 
   return JsonResponse(response)
+# UI expects a response with {status: 0, top_tables: []}
+#top_tables me tables of line 132 having databse, name, etc. are going or might be empty
+#top_tables:[{database: 'default if not found ya fir u mention databse.tablename in select query, name: table name, popularity: number/percentage jahan pr
+# top query mili ha out of total queries say 150, column_count: 0 maybe, total: 500}]
 
 
 @require_POST
@@ -455,16 +459,8 @@ def upload_query(request):
   interface = request.POST.get('interface', OPTIMIZER.INTERFACE.get())
   source_platform = request.POST.get('sourcePlatform', 'default')
   query_id = request.POST.get('query_id')
-  locations = request.POST.get('locations')
-  print('Data in the backend is as below:')
-  print(locations)
-  conv_str = json.dumps(locations)
-  print(type(conv_str))
-  print('diff_format is as follows: ')
-  print(conv_str)
-  print('separated by commas is as follows: ')
-  print(conv_str.split(','))
-  # print(conv_str[2])
+  sql_query = request.POST.get('locations')
+  sql_query = json.loads(sql_query) # extracting the SQL query in the form of a list
 
   if OPTIMIZER.AUTO_UPLOAD_QUERIES.get() and source_platform in ('hive', 'impala') and query_id:
     try:
@@ -480,11 +476,22 @@ def upload_query(request):
     except Document2.DoesNotExist:
       response['query_upload'] = _('Skipped as task query')
   
-  elif OPTIMIZER.AUTO_UPLOAD_QUERIES.get() and locations:
+  elif OPTIMIZER.AUTO_UPLOAD_QUERIES.get() and sql_query:
     try:
-      Sql_obj = SqlLocation(first_token='abc' , statement='df' , its_type='table' , identifier='ldc')
+      #extracting values related to table(s)
+      for i in sql_query:
+        if i['type'] == 'table':
+          type_name = i['type']
+          if len(i['identifierChain']) > 1:
+            table_name = i['identifierChain'][len(i['identifierChain'])-1]['name']
+            database_name = i['identifierChain'][0]['name']
+          else:
+            table_name = i['identifierChain'][0]['name']
+            database_name = 'default'
+
+      # sending the fetched values from the SQL query to the database
+      Sql_obj = SqlQuery(name=table_name , its_type=type_name , database=database_name)
       Sql_obj.save()
-      SqlLocation.objects.all().values()
       response['query_upload'] = _('SQL parser saved to DB')
     except:
       response['query_upload'] = _('failed to upload SQL query')
