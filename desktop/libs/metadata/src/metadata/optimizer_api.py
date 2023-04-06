@@ -143,11 +143,6 @@ def top_tables(request):
   response['status'] = 0
 
   return JsonResponse(response)
-# UI expects a response with {status: 0, top_tables: []}
-#top_tables me tables of line 132 having databse, name, etc. are going or might be empty
-#top_tables:[{database: 'default if not found ya fir u mention databse.tablename in select query, name: table name, popularity: number/percentage jahan pr
-# top query mili ha out of total queries say 150, column_count: 0 maybe, total: 500}]
-
 
 @require_POST
 @error_handler
