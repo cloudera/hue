@@ -175,8 +175,15 @@ def run_sqoop(request, source, destination, start_time):
       rdbms_port = source['rdbmsPort']
       rdbms_user_name = source['rdbmsUsername']
       rdbms_password = source['rdbmsPassword']
+      rdbms_driver = source['rdbmsType']
       url = rdbms_host
-
+      if rdbms_driver != 'jdbc':
+        url = 'jdbc:%(rdbmsType)s://%(url)s:%(rdbmsPort)s' % {
+          'rdbmsType': rdbms_driver,
+          'url': url,
+          'rdbmsPort': rdbms_port
+        }
+      
     password_file_path = request.fs.join(request.fs.get_home_dir() + '/sqoop/', uuid.uuid4().hex + '.password')
     request.fs.do_as_user(
       request.user,
