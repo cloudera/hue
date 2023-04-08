@@ -28,6 +28,7 @@ RUN apt-get update -y && apt-get install -y \
   rm -rf /var/lib/apt/lists/*
 
 ADD . /hue
+COPY ./desktop/conf.dist/log.conf /etc/hue/conf/log.conf
 
 RUN pip3 install --upgrade --no-cache-dir setuptools virtualenv pip && \
   curl -sL https://deb.nodesource.com/setup_14.x | sudo bash - && \
