@@ -60,7 +60,7 @@ def file_reader(fh):
   """Generator that reads a file, chunk-by-chunk."""
   while True:
     chunk = fh.read(DOWNLOAD_CHUNK_SIZE)
-    if chunk == '':
+    if not chunk:
       fh.close()
       break
     yield chunk
