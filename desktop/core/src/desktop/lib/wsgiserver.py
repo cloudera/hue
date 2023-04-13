@@ -1389,7 +1389,7 @@ class ThreadPool(object):
         # Grow/shrink the pool if necessary.
         # Remove any dead threads from our list
         for t in self._threads:
-            if not t.isAlive():
+            if not t.is_alive():
                 self._threads.remove(t)
                 amount -= 1
 
@@ -1411,13 +1411,13 @@ class ThreadPool(object):
         current = threading.currentThread()
         while self._threads:
             worker = self._threads.pop()
-            if worker is not current and worker.isAlive():
+            if worker is not current and worker.is_alive():
                 try:
                     if timeout is None or timeout < 0:
                         worker.join()
                     else:
                         worker.join(timeout)
-                        if worker.isAlive():
+                        if worker.is_alive():
                             # We exhausted the timeout.
                             # Forcibly shut down the socket.
                             c = worker.conn
