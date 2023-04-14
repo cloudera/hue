@@ -91,7 +91,7 @@ def run_test_server():
     # Make sure the server thread is done.
     print("Closing thread " + str(thread))
     thread.join(10.0) # Wait at most 10 seconds
-    assert_false(thread.isAlive())
+    assert_false(thread.is_alive())
 
   return httpd, finish
 run_test_server.__test__ = False
