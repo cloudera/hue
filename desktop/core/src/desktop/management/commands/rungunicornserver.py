@@ -29,6 +29,7 @@ import tempfile
 from OpenSSL import crypto
 from multiprocessing.util import _exit_function
 from desktop import conf
+from desktop.lib.paths import get_desktop_root
 from django.core.management.base import BaseCommand
 from django.core.wsgi import get_wsgi_application
 from django.utils.translation import gettext as _
@@ -130,12 +131,15 @@ def argprocessing(args=[], options={}):
   # Currently gunicorn does not support passphrase suppored SSL Keyfile
   # https://github.com/benoitc/gunicorn/issues/2410
   ssl_keyfile = None
+  worker_tmp_dir = os.environ.get("HUE_CONF_DIR", get_desktop_root("conf"))
+  if not worker_tmp_dir:
+    worker_tmp_dir = "/tmp"
+  options['worker_tmp_dir'] = worker_tmp_dir
   if conf.SSL_CERTIFICATE.get() and conf.SSL_PRIVATE_KEY.get():
     ssl_password = str.encode(conf.get_ssl_password()) if conf.get_ssl_password() is not None else None
     if ssl_password:
       with open(conf.SSL_PRIVATE_KEY.get(), 'r') as f:
-        with tempfile.NamedTemporaryFile(dir=os.path.dirname(
-                                          conf.SSL_CERTIFICATE.get()), delete=False) as tf:
+        with tempfile.NamedTemporaryFile(dir=worker_tmp_dir, delete=False) as tf:
           tf.write(crypto.dump_privatekey(crypto.FILETYPE_PEM,
                                           crypto.load_privatekey(crypto.FILETYPE_PEM,
                                                                  f.read(), ssl_password)))
@@ -200,7 +204,7 @@ def rungunicornserver(args=[], options={}):
       'user': conf.SERVER_USER.get(),
       'worker_class': conf.GUNICORN_WORKER_CLASS.get(),
       'worker_connections': 1000,
-      'worker_tmp_dir': None,
+      'worker_tmp_dir': options['worker_tmp_dir'],
       'workers': conf.GUNICORN_NUMBER_OF_WORKERS.get() if conf.GUNICORN_NUMBER_OF_WORKERS.get() is not None else 5,
       'post_fork': post_fork
   }
