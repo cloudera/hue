@@ -197,8 +197,10 @@ def download(request, path):
     request.fs.read(path, offset=0, length=1)
   except WebHdfsException as e:
     if e.code == 403:
-      raise PopupException(_('User %s is not authorized to download file at path "%s"') %
-                           (request.user.username, path))
+      raise PopupException(_('User %s is not authorized to download file at path "%s"') % (request.user.username, path))
+    elif request.fs._get_scheme(path).lower() == 'abfs' and e.code == 416:
+      # Safe to skip ABFS exception of code 416 for zero length objects, file will get downloaded anyway.
+      logger.exception('Skipping exception from ABFS: ' + str(e))
     else:
       raise PopupException(_('Failed to download file at path "%s": %s') % (path, e))
 
