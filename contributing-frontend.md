@@ -12,6 +12,8 @@ If you want to add a new component as a descendant to an already existing react 
 
 If you want to add a react component where there currently is no react ancestor in the DOM you will have to integrate it as a react root node in the page itself, either directly in an HTML page or by using the Knockout-to-React bridge. There is currently no Vue-to-React bridge in Hue.
 
+A react root element (or the first container element within it) must include the HTML classes `cuix` and `antd` in order for the styling of the child components to work. 
+
 ### HTML/Mako page integration
 
 If your react component isn't dependent on any Knockout observables or Vue components you can integrate it by adding a small script and a component reference directly in the HTML code. The following example integrates MyComponent as a react root in an HTML/mako file.
@@ -65,14 +67,14 @@ Hue does not use the React PropTypes or defaulProps. Instead type checking for t
 
 All texts exposed to the end user (paragraphs, labels, alt texts, aria text etc) should be internationalized. To help with this Hue has a hook called `useTranslation` in module [i18nReact](https://github.com/cloudera/hue/blob/master/desktop/core/src/desktop/js/utils/i18nReact.ts). This is a wrapper around the hook provided by the external package `react-i18next`.
 
-```js
+```ts
 const { t } = i18nReact.useTranslation();
 const myGreeting = t('Hello');
 ```
 
 The useTranslation hook will automatically suspend your component from rendering until the language files have been loaded from the backend. If you want to provide your own loading indicator you can disable the suspense with the config object as shown below. The `ready` property will be false until the translate function is ready to use. Unless you are writing a React root component this is normally not something you have to think about.
 
-```js
+```ts
 const { t, ready } = i18nReact.useTranslation(undefined, { useSuspense: false });`
 ```
 
@@ -82,15 +84,15 @@ The useTranslation hook is automatically mocked in the unit tests. The json base
 
 For communication with non react based parts of Hue there is a publish–subscribe messaging system called [huePubsub](https://github.com/cloudera/hue/blob/master/desktop/core/src/desktop/js/utils/huePubSub.ts). To publish a message, call the `publish` function with a topic. You can subscribe to a topic using the hook [usePubSub](https://github.com/cloudera/hue/blob/master/desktop/core/src/desktop/js/reactComponents/useHuePubSub.ts) which will force your functional component to rerender once a message matching the topic is published. In the example below the editCursor state is updated by useHuePubSub each time a CURSOR_POSITION_CHANGED_EVENT is published.
 
-```js
-const editorCursor = useHuePubSub < EditorCursor > { topic: CURSOR_POSITION_CHANGED_EVENT };
+```ts
+const editorCursor = useHuePubSub<EditorCursor>({ topic: CURSOR_POSITION_CHANGED_EVENT });
 ```
 
 ## Unit testing
 
 Tests are written using [Jest](https://jestjs.io/) and [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/). New test files will be automatically picked up by the test runner which is started with the command `npm run test`. Try to use the `userEvent` instead of the low level `fireEvent` when simulating user events. Below is a simple test file example.
 
-```js
+```ts
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -119,7 +121,7 @@ Hue uses a component library from Cloudera called cuix and the open source libra
 
 Example of how to import and use cuix and antd components in Hue:
 
-```js
+```ts
 // The Pagination styles from antd are automatically overwritten by cuix to fit Hue
 import { Pagination } from 'antd';
 // Cuix exports its own primary button based on the antd button
@@ -157,7 +159,7 @@ Predefined variables are available in [components/styles/variables.scss](https:/
 
 The scss file must be imported in the source code of your component.
 
-```js
+```ts
 // In MyComponent.tsx
 import React from 'react';
 import classNames from 'classnames';
@@ -165,11 +167,12 @@ import './MyComponent.scss';
 
 const MyComponent = ({special}) => {
   return (
-    <div>
+    // In this example MyComponent is a react root so we also add the cuix antd classes 
+    <div class="cuix antd">
       <!-- The hue-1 class is defined in the shared styling file classes.scss -->
       <h1 class={classNames('hue-h1', {['hue-my-component__header--special-state']: special})}>
         Hello, this is MyComponent!
-      </h1>      
+      </h1>
     </div>
   );
 };
