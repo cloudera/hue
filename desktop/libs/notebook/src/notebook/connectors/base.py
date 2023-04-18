@@ -385,9 +385,9 @@ def get_interpreter(connector_type, user=None):
         'options': {},
         'is_sql': False
       }]
-    elif connector_type == 'importer':
+    elif connector_type == 'custom':
       interpreter = [{
-        'name': 'importer',
+        'name': 'custom',
         'type': '',
         'interface': '',
         'options': {},

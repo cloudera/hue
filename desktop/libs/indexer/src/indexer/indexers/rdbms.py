@@ -70,7 +70,7 @@ def _get_api(request):
   options = None
   query_server = None
   if file_format['rdbmsMode'] == 'customRdbms':
-    type = 'importer'
+    type = 'custom'
     if file_format['rdbmsType'] == 'jdbc':
       name = file_format['rdbmsHostname'] # We make sure it's unique as name is the cache key
       interface = file_format['rdbmsType']
