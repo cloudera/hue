@@ -15,6 +15,7 @@ ENV NAME="hue" \
     HUE_HOME="/opt/${HUEUSER}" \
     HUE_CONF_DIR="${HUE_CONF}/conf" \
     HUE_LOG_DIR="/var/log/${HUEUSER}" \
+    DESKTOP_LOG_DIR="/var/log/${HUEUSER}" \
     HUE_BUILDNO=${GBN} \
     HUE_SHAURL=${GSHA} \
     HUE_BRANCHURL=${GBRANCH} \

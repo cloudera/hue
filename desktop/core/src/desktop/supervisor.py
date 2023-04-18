@@ -203,7 +203,7 @@ def shutdown(sups):
     still_alive = False
     for sup in sups:
       sup.join(0.2)
-      still_alive = still_alive or sup.isAlive()
+      still_alive = still_alive or sup.is_alive()
     if not still_alive:
       break
   if still_alive:
@@ -395,7 +395,7 @@ def wait_loop(sups, options):
     time.sleep(1)
     for sup in sups:
       sup.join(0.1)
-      if not sup.isAlive():
+      if not sup.is_alive():
         if sup.state == Supervisor.FINISHED:
           sups.remove(sup)
         else:
