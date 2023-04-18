@@ -1,7 +1,10 @@
 'use strict';
 
 import React, { FunctionComponent, useState } from 'react';
-import { Button, Modal, Skeleton } from 'antd';
+import { Button, Modal, Skeleton, Pagination } from 'antd';
+import PrimaryButton from 'cuix/dist/components/Button/PrimaryButton';
+
+import PlusCircleIcon from '@cloudera/cuix-core/icons/react/PlusCircleIcon';
 
 // Provides a i18n translation hook
 import { i18nReact } from '../../../../../utils/i18nReact';
@@ -76,11 +79,17 @@ const ReactExample: FunctionComponent<ReactExampleProps> = ({ activeExecutable, 
     // Also make sure that the component specific Antd style is imported in the file
     // 'root-wrapped-antd.less'.
     <React.StrictMode>
-      <div className="react-example antd">
+      <div className="react-example cuix antd">
         <h1 className="react-example__title">{title}</h1>
-        <Button type="primary" onClick={showModal}>
-          {t('Open')}
-        </Button>
+        <Pagination
+          showTotal={total => `Total ${total} items`}
+          showSizeChanger
+          defaultCurrent={1}
+          total={500}
+        />
+        <PrimaryButton icon={<PlusCircleIcon />} onClick={showModal}>
+          {t('Open (cuix button)')}
+        </PrimaryButton>
 
         <p className="react-example__description">
           I'm an Editor specific react component containing subcomponents. The dynamic id that I'm

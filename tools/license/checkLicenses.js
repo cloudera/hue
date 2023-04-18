@@ -1,4 +1,4 @@
-// Licensed to Cloudera, Inc. under one
+ // Licensed to Cloudera, Inc. under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
 // regarding copyright ownership.  Cloudera, Inc. licenses this file
@@ -45,7 +45,10 @@ checker.init(
           lowerLicenses.indexOf('python-2.0') === -1 &&
           // lz-string is marked as WTFPL license on NPM but the valid license is MIT from the github repo
           // https://github.com/pieroxy/lz-string/issues/147
-          !packageName.startsWith('lz-string@')
+          !packageName.startsWith('lz-string@') &&
+          // cuix and cuix-core are from Cloudera, no need to check licence here.
+          !packageName.startsWith('@cloudera/cuix-core@') && 
+          !packageName.startsWith('cuix@')
         ) {
           console.warn(`Found invalid license in "${packageName}", license: "${licenses}".`);
           process.exitCode = 1;
