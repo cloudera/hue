@@ -84,7 +84,7 @@
 </script>
 
 <style lang="scss" scoped>
-  @import './styles/colors';
+  @import './styles/variables';
 
   .hue-tabs {
     ul {
@@ -99,22 +99,22 @@
         border-bottom: 3px solid transparent;
         cursor: pointer;
         margin-right: 10px;
-        color: $fluid-gray-700;
+        color: $fluidx-gray-700;
 
         &:hover {
-          color: $fluid-blue-500;
+          color: $fluidx-blue-500;
         }
 
         &.active {
-          color: $fluid-blue-500;
-          border-bottom: 3px solid $fluid-blue-400;
+          color: $fluidx-blue-500;
+          border-bottom: 3px solid $fluidx-blue-400;
         }
       }
     }
     .hue-tab-container {
       position: relative;
       margin: 12px 0;
-      background-color: $fluid-white;
+      background-color: $fluidx-white;
     }
   }
 </style>

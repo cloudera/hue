@@ -16,7 +16,7 @@
  limitations under the License.
 */
 
-@import './styles/colors';
+@import './styles/variables';
 @import './styles/mixins';
 
 .hue-table-container {
@@ -33,7 +33,7 @@
       border-collapse: collapse;
 
       tbody > tr:first-child {
-        border-top: 1px solid $fluid-gray-300;
+        border-top: 1px solid $fluidx-gray-300;
       }
     }
 
@@ -49,7 +49,7 @@
           height: 16px;
           max-width: 300px;
           padding: 12px;
-          border-bottom: 1px solid $fluid-gray-300;
+          border-bottom: 1px solid $fluidx-gray-300;
           text-align: left;
 
           &.column-flush {
@@ -62,14 +62,14 @@
     thead {
       tr {
         th {
-          background-color: $fluid-white;
-          color: $fluid-gray-700;
+          background-color: $fluidx-white;
+          color: $fluidx-gray-700;
           font-size: 13px;
           font-weight: 500;
           white-space: nowrap;
 
           &.sticky-first-col {
-            background-color: $fluid-white;
+            background-color: $fluidx-white;
             position: sticky;
             position: -webkit-sticky;
             left: 0;
@@ -90,13 +90,13 @@
     tbody {
       tr {
         td {
-          color: $fluid-gray-900;
+          color: $fluidx-gray-900;
           font-size: 14px;
 
           &.sticky-first-col {
             @include position-sticky;
 
-            background-color: $fluid-white;
+            background-color: $fluidx-white;
             left: 0;
             z-index: 100;
           }
@@ -111,7 +111,7 @@
         cursor: pointer;
 
         &:hover {
-          background-color: $fluid-blue-050;
+          background-color: $fluidx-blue-050;
         }
       }
     }

@@ -19,7 +19,7 @@
 @use 'sass:math';
 
 @import './styles/mixins';
-@import './styles/colors';
+@import './styles/variables';
 
 $spinner-label-ratio: math.div(2, 3);
 $spinner-large-size: 25px;
@@ -56,7 +56,7 @@ $spinner-xlarge-size: 50px;
 
   &.spinner-blackout {
     z-index: 999;
-    background-color: $fluid-white;
+    background-color: $fluidx-white;
   }
 
   .spinner-inner {
@@ -79,7 +79,7 @@ $spinner-xlarge-size: 50px;
 
     span {
       margin-left: 5px;
-      color: $fluid-gray-500;
+      color: $fluidx-gray-500;
     }
 
     &.spinner-center {

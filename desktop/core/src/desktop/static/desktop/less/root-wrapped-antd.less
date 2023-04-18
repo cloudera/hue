@@ -2,36 +2,18 @@
 // in multiple places where not intended. So in order to utilize the components locally
 // without leaking styles we wrap it all in an antd class. Since ant-modal-root likely
 // is placed outside the .antd wrapper we need to add the styles there as well.
+
+/* stylelint-disable no-invalid-position-at-import-rule */
+
 .antd,
 .ant-modal-root {
-  /* stylelint-disable no-invalid-position-at-import-rule */
-
   // We need to reset some global styles from Bootstrap to prevent them from
   // interfering with the Antd styles
   @import './reset-globals.less';
 
   // Import global antd styles
-  @root-entry-name: variable;
-  @import 'node_modules/antd/es/style/core/index.less';
-  @import (reference) 'node_modules/antd/es/style/themes/default.less';
-
-  // Import the styles for the actual components used
-  @import 'node_modules/antd/es/button/style/index.less';
-  @import 'node_modules/antd/es/modal/style/index.less';
-  @import 'node_modules/antd/es/skeleton/style/index.less';
-  @import 'node_modules/antd/es/menu/style/index.less';
-  @import 'node_modules/antd/es/spin/style/index.less';
-  @import 'node_modules/antd/es/segmented/style/index.less';
-  @import 'node_modules/antd/es/select/style/index.less';
-  @import 'node_modules/antd/es/divider/style/index.less';
-  @import 'node_modules/antd/es/breadcrumb/style/index.less';
-  @import 'node_modules/antd/es/input/style/index.less';
-  @import 'node_modules/antd/es/dropdown/style/index.less';
-  @import 'node_modules/antd/es/tooltip/style/index.less';
-  @import 'node_modules/antd/es/grid/style/index.less';
-  @import 'node_modules/antd/es/pagination/style/index.less';
-
-  /* stylelint-enable no-invalid-position-at-import-rule */
+  @import 'antd/dist/antd.less';
+  @import 'node_modules/cuix/dist/styles/variables.less';
 
   // Required global overrides:
   .ant-modal-mask,
@@ -49,7 +31,7 @@ body.ant-scrolling-effect {
   width: 100% !important;
 }
 
-/* stylelint-disable no-invalid-position-at-import-rule */
+// We need these styles available outside the .antd wrapper
 @import 'antd/es/menu/style/index.less';
 @import 'antd/es/style/core/motion.less';
 @import 'antd/es/dropdown/style/index.less';

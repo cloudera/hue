@@ -63,12 +63,12 @@
 </script>
 
 <style lang="scss" scoped>
-  @import '../../../../../../components/styles/colors.scss';
+  @import '../../../../../../components/styles/variables.scss';
   @import '../../../../../../components/styles/mixins';
   .variance-bar {
     display: inline-block;
 
-    border: 1px solid $fluid-gray-400;
+    border: 1px solid $fluidx-gray-400;
     border-radius: $hue-panel-border-radius;
 
     width: 150px;
@@ -77,11 +77,11 @@
     overflow: hidden;
 
     .value2-bar {
-      background-color: $fluid-blue-100;
+      background-color: $fluidx-blue-100;
       height: 10px;
       width: 50%;
 
-      border-left: 1px solid $fluid-gray-400;
+      border-left: 1px solid $fluidx-gray-400;
 
       margin-left: auto;
       margin-right: 0;

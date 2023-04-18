@@ -14,17 +14,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-@use '../../../components/styles/hue5-globals.scss';
-@import '../../../components/styles/variables';
+@use 'classes';
+@use 'variables' as vars;
 
-$border-color: $fluid-gray-300;
+$border-color: vars.$fluidx-gray-300;
 
 .antd {
   .hue-push-drawer__drawer {
     position: absolute;
     height: 100%;
-    transition: $animation-duration-base;
-    padding: $fluid-spacing-s;
+    transition: vars.$animation-duration-base;
+    padding: vars.$fluidx-spacing-s;
   }
 
   .hue-push-drawer__drawer--left {
