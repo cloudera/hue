@@ -16,8 +16,20 @@
  limitations under the License.
 */
 
+// THESE VARIABLES ARE FOR REACT.JS COMPONENTS
+// (and possibly some Vue components until they have been translated to react)
+
+// Many, but not all, cuix can be imported from the cuix-core library.
+// These variable are prefixed with fluidx which is the legacy name of cuix.
+// Includes both spacing and color variables.
+@import '@cloudera/cuix-core/variables.scss';
+
+// TODO: These variables are named diferently. We should remove the usage.
 @import './colors';
 
+// Some handy variables used by cuix are only available as less variables where the
+// origin of the value can be either cuix or antd. Here we manually recreate the once we
+// want in Hue as sass variables.
 $animation-duration-base: 0.2s;
 $animation-duration-slow: 0.3s;
 $text-color: $fluid-gray-900;
@@ -38,31 +50,3 @@ $fluid-spacing-xxl: 48px;
 $fluid-spacing-giant: 64px;
 
 $fluid-border-radius: 3px;
-
-$fluidx-heading-h1-size: 28px;
-$fluidx-heading-h1-line-height: 36px;
-$fluidx-heading-h1-weight: 300;
-$fluidx-heading-h2-size: 24px;
-$fluidx-heading-h2-line-height: 32px;
-$fluidx-heading-h2-weight: 300;
-$fluidx-heading-h3-size: 20px;
-$fluidx-heading-h3-line-height: 28px;
-$fluidx-heading-h3-weight: 300;
-$fluidx-heading-h4-size: 16px;
-$fluidx-heading-h4-line-height: 24px;
-$fluidx-heading-h4-weight: 500;
-$fluidx-heading-h5-size: 14px;
-$fluidx-heading-h5-line-height: 16px;
-$fluidx-heading-h5-weight: 500;
-$fluidx-heading-h6-size: 12px;
-$fluidx-heading-h6-line-height: 20px;
-$fluidx-heading-h6-weight: 500;
-
-/** For Modal Dialogs and Title Bars */
-$fluidx-title-h1-small-size: 20px;
-
-/** For Modal Dialogs and Title Bars */
-$fluidx-title-h1-small-line-height: 28px;
-
-/** For Modal Dialogs and Title Bars */
-$fluidx-title-h1-small-weight: 300;
