@@ -949,6 +949,10 @@ class MultipleProxyMiddleware:
         if ',' in request.META[field]:
           parts = request.META[field].split(',')
           request.META[field] = parts[-1].strip()
+
+    if 'HTTP_X_FORWARDED_FOR' not in request.META and 'REMOTE_ADDR' in request.META:
+      request.META['HTTP_X_FORWARDED_FOR'] = request.META['REMOTE_ADDR']
+
     return self.get_response(request)
 
 
