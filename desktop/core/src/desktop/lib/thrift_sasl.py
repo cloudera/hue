@@ -22,10 +22,17 @@ from __future__ import absolute_import
 from future import standard_library
 standard_library.install_aliases()
 from thrift.transport import TTransport
+from thrift.transport.TSocket import TSocket
 from thrift.transport.TTransport import *
 from thrift.protocol import TBinaryProtocol
 import struct
 import sys
+
+import pkg_resources
+from desktop.monkey_patches import isOpen as is_tsocket_open
+
+if pkg_resources.get_distribution('thrift').version == '0.16.0':
+  TSocket.isOpen = is_tsocket_open
 
 # TODO: Check whether the following distinction is necessary. Does not appear to
 # break anything when `io.BytesIO` is used everywhere, but there may be some edge
@@ -124,7 +131,7 @@ class TSaslClientTransport(TTransportBase, CReadableTransport):
       if not success:
         raise TTransportException(type=TTransportException.UNKNOWN,
                                   message=self.sasl.getError())
-      if (len(encoded)==len(buffer)):
+      if (len(encoded) == len(buffer)):
         self.encode = False
         self._flushPlain(buffer)
       else:

@@ -112,3 +112,35 @@ def monkey_patch_md5(modules_to_patch):
     module = importlib.import_module(module_name)
     module.hashlib = patched_hashlib
   LOG.debug("Finish monkey patch md5 ...")
+
+def isOpen(self):
+  print("monkey patching ... thrift.isOpen() ")
+  import socket, errno
+  if self.handle is None:
+    return False
+
+  # this lets us cheaply see if the other end of the socket is still
+  # connected. if disconnected, we'll get EOF back (expressed as zero
+  # bytes of data) otherwise we'll get one byte or an error indicating
+  # we'd have to block for data.
+  #
+  # note that we're not doing this with socket.MSG_DONTWAIT because 1)
+  # it's linux-specific and 2) gevent-patched sockets hide EAGAIN from us
+  # when timeout is non-zero.
+  original_timeout = self.handle.gettimeout()
+  try:
+    self.handle.settimeout(0)
+    try:
+      peeked_bytes = self.handle.recv(1, socket.MSG_PEEK)
+    except (socket.error, OSError) as exc:  # on modern python this is just BlockingIOError
+      if exc.errno in (errno.EWOULDBLOCK, errno.EAGAIN):
+        return True
+      return False
+    except ValueError:
+      # SSLSocket fails on recv with non-zero flags; fallback to the old behavior
+      return True
+  finally:
+    self.handle.settimeout(original_timeout)
+
+  # the length will be zero if we got EOF (indicating connection closed)
+  return len(peeked_bytes) == 1
