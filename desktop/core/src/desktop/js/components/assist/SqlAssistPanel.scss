@@ -16,7 +16,7 @@
  limitations under the License.
 */
 
-@import '../styles/colors';
+@import '../styles/variables';
 @import '../styles/mixins';
 
 .hue-sql-assist-panel {
@@ -68,7 +68,7 @@
         cursor: pointer;
 
         &:hover {
-          background-color: $fluid-gray-100;
+          background-color: $fluidx-gray-100;
         }
 
         &:focus {

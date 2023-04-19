@@ -15,7 +15,7 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 */
-@import './colors.scss';
+@import './variables.scss';
 
 /*
 
@@ -41,7 +41,7 @@ $hue-panel-border-radius: 3px;
 .hue-box {
   padding: 10px;
   overflow: hidden;
-  border: 1px solid $fluid-gray-300;
+  border: 1px solid $fluidx-gray-300;
   border-radius: $hue-panel-border-radius;
 }
 
