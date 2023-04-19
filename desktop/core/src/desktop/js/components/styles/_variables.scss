@@ -24,29 +24,33 @@
 // Includes both spacing and color variables.
 @import '@cloudera/cuix-core/variables.scss';
 
-// TODO: These variables are named diferently. We should remove the usage.
-@import './colors';
-
 // Some handy variables used by cuix are only available as less variables where the
 // origin of the value can be either cuix or antd. Here we manually recreate the once we
 // want in Hue as sass variables.
 $animation-duration-base: 0.2s;
 $animation-duration-slow: 0.3s;
-$text-color: $fluid-gray-900;
+$text-color: $fluidx-gray-900;
 $line-height-base: 1.4285;
+$border-radius-base: 3px;
 
 $font-size-sm: 12px;
 $font-size-base: 14px;
 $font-size-lg: 16px;
 $font-size-xl: 20px;
 
-$fluid-spacing-xxs: 4px;
-$fluid-spacing-xs: 8px;
-$fluid-spacing-s: 16px;
-$fluid-spacing-m: 24px;
-$fluid-spacing-l: 32px;
-$fluid-spacing-xl: 40px;
-$fluid-spacing-xxl: 48px;
-$fluid-spacing-giant: 64px;
+// Specific HUE variables
+$hue-primary-color-dark: #0b7fad;
+$hue-primary-color-light: #dbe8f1;
+$hue-trunk: #9678d3;
 
-$fluid-border-radius: 3px;
+$hue-action-primary: $fluidx-blue-500;
+$hue-action-primary-hover: $fluidx-blue-700;
+$hue-action-danger: $fluidx-red-500;
+$hue-action-danger-hover: $fluidx-red-700;
+$hue-action-disabled: $fluidx-gray-200;
+
+$hue-border-color: $fluidx-gray-300;
+$hue-disabled-color: $fluidx-gray-200;
+
+$hue-error-color: $fluidx-red-500;
+$hue-warning-color: $fluidx-orange-400;

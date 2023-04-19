@@ -1,4 +1,4 @@
-@import '../../../../components/styles/colors.scss';
+@import '../../../../components/styles/variables.scss';
 @import '../../../../components/styles/mixins.scss';
 
 .execution-analysis-panel {
@@ -36,8 +36,8 @@
 
   .execution-analysis-errors {
     ul {
-      background-color: $fluid-red-050;
-      color: $fluid-red-700;
+      background-color: $fluidx-red-050;
+      color: $fluidx-red-700;
       list-style: none;
       padding: 5px 10px;
       margin: 0;

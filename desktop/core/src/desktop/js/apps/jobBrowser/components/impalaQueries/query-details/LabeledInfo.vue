@@ -66,18 +66,18 @@
 </script>
 
 <style lang="scss" scoped>
-  @import '../../../../../components/styles/colors.scss';
+  @import '../../../../../components/styles/variables.scss';
 
   .labeled-info-title {
     text-transform: uppercase;
-    color: $fluid-gray-500;
+    color: $fluidx-gray-500;
     font-weight: normal;
     font-size: 12px;
     margin: 0;
   }
 
   .labled-info-value {
-    color: $fluid-gray-700;
+    color: $fluidx-gray-700;
     margin-bottom: 5px;
   }
 </style>

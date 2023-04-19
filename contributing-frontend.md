@@ -128,13 +128,6 @@ import { Pagination } from 'antd';
 import PrimaryButton from 'cuix/dist/components/Button/PrimaryButton';
 ```
 
-If you are importing a component from Ant Design that is new to Hue you also need to import its styles into the
-file `desktop/core/src/desktop/static/desktop/less/root-wrapped-antd.less`. If you would import the pagination component for the first time you would write
-
-```less
-import 'node_modules/antd/es/pagination/style/index.less';
-```
-
 ## Styling
 
 Hue uses `Sass` while both cuix and Ant Design use `Less` for writing CSS. The core cuix variables are however stil available in sass.

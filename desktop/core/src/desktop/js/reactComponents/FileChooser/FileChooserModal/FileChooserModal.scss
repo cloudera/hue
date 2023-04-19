@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-@import '../../../components/styles/colors';
+@use 'variables' as vars;
 
 .hue-file-chooser__modal .ant-modal-body {
   padding: 0;
@@ -22,7 +22,7 @@
 
   .hue-file-system__panel {
     height: 554px;
-    background-color: $fluid-gray-100;
+    background-color: vars.$fluidx-gray-100;
     padding-top: 20px;
 
     .ant-menu-item {
@@ -36,7 +36,7 @@
     }
 
     .ant-menu-item-selected {
-      background-color: $fluid-gray-300;
+      background-color: vars.$fluidx-gray-300;
     }
   }
 }
