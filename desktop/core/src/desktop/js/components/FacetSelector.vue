@@ -201,7 +201,7 @@
 </script>
 
 <style lang="scss" scoped>
-  @import './styles/colors';
+  @import './styles/variables';
   @import './styles/mixins';
 
   .facet-selector {

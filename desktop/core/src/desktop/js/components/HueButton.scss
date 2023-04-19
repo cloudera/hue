@@ -16,15 +16,14 @@
  limitations under the License.
 */
 
-@import './styles/colors';
 @import './styles/variables';
 
 .hue-btn {
   height: 32px;
-  border-radius: $fluid-border-radius;
-  border: solid 1px $fluid-gray-300;
-  background-color: $fluid-white;
-  color: $fluid-blue-500;
+  border-radius: $border-radius-base;
+  border: solid 1px $fluidx-gray-300;
+  background-color: $fluidx-white;
+  color: $fluidx-blue-500;
   padding: 0 12px;
 
   &.hue-btn-small {
@@ -40,17 +39,17 @@
   }
 
   &:hover {
-    border: solid 1px $fluid-blue-700;
+    border: solid 1px $fluidx-blue-700;
   }
 
   &:active {
-    border: solid 1px $fluid-blue-800;
+    border: solid 1px $fluidx-blue-800;
   }
 
   &[disabled] {
     cursor: default;
-    color: $fluid-gray-400;
-    border: solid 1px $fluid-gray-200;
+    color: $fluidx-gray-400;
+    border: solid 1px $fluidx-gray-200;
   }
 
   &:focus {
@@ -58,48 +57,48 @@
   }
 
   &:focus-visible {
-    border: solid 1px $fluid-blue-800;
-    outline: $fluid-blue-100 auto 4px;
+    border: solid 1px $fluidx-blue-800;
+    outline: $fluidx-blue-100 auto 4px;
   }
 
   &.hue-btn-primary:not([disabled]) {
-    color: $fluid-white;
-    background-color: $fluid-blue-500;
-    border: solid 1px $fluid-blue-500;
+    color: $fluidx-white;
+    background-color: $fluidx-blue-500;
+    border: solid 1px $fluidx-blue-500;
 
     &:hover {
-      background-color: $fluid-blue-700;
-      border: solid 1px $fluid-blue-700;
+      background-color: $fluidx-blue-700;
+      border: solid 1px $fluidx-blue-700;
     }
 
     &.active {
-      background-color: $fluid-blue-800;
-      border: solid 1px $fluid-blue-800;
+      background-color: $fluidx-blue-800;
+      border: solid 1px $fluidx-blue-800;
     }
 
     &:focus-visible {
-      border: solid 1px $fluid-gray-900;
+      border: solid 1px $fluidx-gray-900;
     }
   }
 
   &.hue-btn-alert:not([disabled]) {
-    color: $fluid-white;
-    background-color: $fluid-red-500;
-    border: solid 1px $fluid-red-500;
+    color: $fluidx-white;
+    background-color: $fluidx-red-500;
+    border: solid 1px $fluidx-red-500;
 
     &:hover {
-      background-color: $fluid-red-700;
-      border: solid 1px $fluid-red-700;
+      background-color: $fluidx-red-700;
+      border: solid 1px $fluidx-red-700;
     }
 
     &:active {
-      background-color: $fluid-red-800;
-      border: solid 1px $fluid-red-800;
+      background-color: $fluidx-red-800;
+      border: solid 1px $fluidx-red-800;
     }
 
     &:focus-visible {
-      border: solid 1px $fluid-red-800;
-      outline-color: $fluid-red-100;
+      border: solid 1px $fluidx-red-800;
+      outline-color: $fluidx-red-100;
       outline-width: 4px;
     }
   }
@@ -108,22 +107,22 @@
     border: solid 1px transparent;
 
     &:hover {
-      border: solid 1px $fluid-gray-300;
+      border: solid 1px $fluidx-gray-300;
     }
 
     &:active {
-      border: solid 1px $fluid-gray-400;
+      border: solid 1px $fluidx-gray-400;
     }
   }
 
   &.hue-btn-borderless[disabled] {
     border: solid 1px transparent;
-    color: $fluid-gray-400;
+    color: $fluidx-gray-400;
   }
 
   &.hue-btn-alert[disabled],
   &.hue-btn-primary[disabled] {
-    background-color: $fluid-gray-200;
-    border: solid 1px $fluid-gray-200;
+    background-color: $fluidx-gray-200;
+    border: solid 1px $fluidx-gray-200;
   }
 }

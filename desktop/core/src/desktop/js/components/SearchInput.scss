@@ -17,7 +17,7 @@
 */
 
 @import './styles/mixins';
-@import './styles/colors';
+@import './styles/variables';
 
 
 .hue-search-input {
@@ -26,7 +26,7 @@
   position: relative;
   border-radius: $hue-panel-border-radius;
   border: 1px solid $hue-border-color;
-  background-color: $fluid-white;
+  background-color: $fluidx-white;
   height: 30px;
   width: 250px;
 
@@ -68,7 +68,7 @@
       left: 10px;
       top: 6px;
       font-size: 16px;
-      color: $fluid-gray-700;
+      color: $fluidx-gray-700;
     }
 
     input {
@@ -92,7 +92,7 @@
       }
 
       &.hue-search-input-overlay {
-        color: $fluid-gray-500;
+        color: $fluidx-gray-500;
         outline: none;
         z-index: 1;
       }

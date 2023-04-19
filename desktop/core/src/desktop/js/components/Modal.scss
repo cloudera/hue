@@ -16,7 +16,7 @@
  limitations under the License.
 */
 
-@import './styles/colors';
+@import './styles/variables';
 @import './styles/mixins';
 
 .hue-modal-mask {
@@ -58,7 +58,7 @@
 
     width: 500px;
     margin: 0 auto;
-    background-color: $fluid-white;
+    background-color: $fluidx-white;
     border-radius: $hue-panel-border-radius;
 
     .hue-modal-header {

@@ -1,9 +1,8 @@
 'use strict';
 
 import React, { FunctionComponent, useState } from 'react';
-import { Button, Modal, Skeleton, Pagination } from 'antd';
+import { Button, Modal, Skeleton, Pagination, Dropdown } from 'antd';
 import PrimaryButton from 'cuix/dist/components/Button/PrimaryButton';
-
 import PlusCircleIcon from '@cloudera/cuix-core/icons/react/PlusCircleIcon';
 
 // Provides a i18n translation hook
@@ -69,6 +68,11 @@ const ReactExample: FunctionComponent<ReactExampleProps> = ({ activeExecutable, 
     setIsModalOpen(false);
   };
 
+  const items = [
+    { label: 'item 1', key: 'item-1' }, // remember to pass the key prop
+    { label: 'item 2', key: 'item-2' }
+  ];
+
   return !i18nReady ? (
     <div className="antd">
       <Skeleton />
@@ -76,11 +80,9 @@ const ReactExample: FunctionComponent<ReactExampleProps> = ({ activeExecutable, 
   ) : (
     // The 'antd' class is added to the root element since we want it to apply the correct
     // "global" styling to its antd sub components, e.g. the antd Button.
-    // Also make sure that the component specific Antd style is imported in the file
-    // 'root-wrapped-antd.less'.
     <React.StrictMode>
       <div className="react-example cuix antd">
-        <h1 className="react-example__title">{title}</h1>
+        <h1 className="react-example__title hue-h1 ">{title}</h1>
         <Pagination
           showTotal={total => `Total ${total} items`}
           showSizeChanger
@@ -90,6 +92,9 @@ const ReactExample: FunctionComponent<ReactExampleProps> = ({ activeExecutable, 
         <PrimaryButton icon={<PlusCircleIcon />} onClick={showModal}>
           {t('Open (cuix button)')}
         </PrimaryButton>
+        <Dropdown menu={{ items }}>
+          <a>Hover me</a>
+        </Dropdown>
 
         <p className="react-example__description">
           I'm an Editor specific react component containing subcomponents. The dynamic id that I'm
