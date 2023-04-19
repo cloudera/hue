@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-@use 'variables';
+@use 'variables' as vars;
 @use 'mixins';
 
 .app-banner {
@@ -24,6 +24,6 @@
 .app-banner--system {
   padding: 4px;
   text-align: center;
-  background-color: variables.$fluidx-blue-800;
-  color: variables.$fluidx-blue-050;
+  background-color: vars.$fluidx-blue-800;
+  color: vars.$fluidx-blue-050;
 }
