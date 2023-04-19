@@ -4,7 +4,7 @@
 
 $antd-btn-padding-horizontal: 12px;
 $focus-border-width: 3px;
-$focus-border-color: $fluid-blue-200;
+$focus-border-color: $fluidx-blue-200;
 
 @mixin tab-focus-apparence() {
   // Prevent antd transition when modifying padding to allow
@@ -13,7 +13,7 @@ $focus-border-color: $fluid-blue-200;
 
   &:focus-visible {
     border-color: $focus-border-color;
-    border-radius: $fluid-border-radius;
+    border-radius: $border-radius-base;
     transition: none;
   }
 }
@@ -52,7 +52,7 @@ $focus-border-color: $fluid-blue-200;
       span {
         display: flex;
         align-items: center;
-        gap: $fluid-spacing-xxs;
+        gap: $fluidx-spacing-xxs;
       }
     }
 

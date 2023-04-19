@@ -316,7 +316,7 @@
 </script>
 
 <style lang="scss" scoped>
-  @import '../../../../../components/styles/colors.scss';
+  @import '../../../../../components/styles/variables.scss';
   @import '../../../../../components/styles/mixins';
 
   .impala-query-table {
@@ -385,7 +385,7 @@
       ::v-deep(i) {
         font-size: 20px;
         padding: 2px;
-        color: $fluid-gray-500;
+        color: $fluidx-gray-500;
       }
     }
 

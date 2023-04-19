@@ -237,7 +237,7 @@
 </script>
 
 <style lang="scss" scoped>
-  @import 'styles/colors';
+  @import 'styles/variables';
   @import 'styles/mixins';
 
   .date-range-picker-panel {
@@ -274,7 +274,7 @@
               padding: 1px 2px;
 
               &.selected {
-                background-color: $fluid-gray-100;
+                background-color: $fluidx-gray-100;
               }
             }
           }
@@ -286,7 +286,7 @@
         padding: 15px 20px;
 
         .range-header {
-          color: $fluid-gray-500;
+          color: $fluidx-gray-500;
           margin-bottom: 5px;
           text-transform: uppercase;
         }
@@ -297,7 +297,7 @@
           line-height: 24px;
           width: 100%;
           font-size: 13px;
-          border: 1px solid $fluid-gray-800;
+          border: 1px solid $fluidx-gray-800;
           border-radius: 3px;
         }
 
