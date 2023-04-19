@@ -158,6 +158,7 @@ def argprocessing(args=[], options={}):
 def rungunicornserver(args=[], options={}):
   gunicorn_options = {
       'accesslog': "-",
+      'access_log_format': "%({x-forwarded-for}i)s %(h)s %(l)s %(u)s %(t)s '%(r)s' %(s)s %(b)s '%(f)s' '%(a)s'",
       'backlog': 2048,
       'bind': [options['bind_addr']],
       'ca_certs': conf.SSL_CACERTS.get(),     # CA certificates file
