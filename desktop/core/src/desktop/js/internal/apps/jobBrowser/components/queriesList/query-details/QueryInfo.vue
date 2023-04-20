@@ -110,7 +110,7 @@
 </script>
 
 <style lang="scss" scoped>
-  @import '../../../../../../components/styles/colors';
+  @import '../../../../../../components/styles/variables';
   @import '../../../../../../components/styles/mixins';
 
   .query-info {
@@ -151,7 +151,7 @@
       overflow: hidden;
       white-space: normal;
 
-      border: 1px solid $fluid-gray-300;
+      border: 1px solid $fluidx-gray-300;
       border-radius: $hue-panel-border-radius;
     }
   }

@@ -204,7 +204,7 @@
 </script>
 
 <style lang="scss" scoped>
-  @import '../../../../../../components/styles/colors';
+  @import '../../../../../../components/styles/variables';
   @import '../../../../../../components/styles/mixins';
 
   .buttons-container {
@@ -228,7 +228,7 @@
     border-radius: $hue-panel-border-radius;
 
     &:hover {
-      border-color: $fluid-blue-700;
+      border-color: $fluidx-blue-700;
     }
   }
 
