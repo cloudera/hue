@@ -186,7 +186,7 @@ class HbaseApi(object):
 
   def getRowPartial(self, cluster, tableName, rowKey, offset, number):
     client = self.connectCluster(cluster)
-    scan = get_thrift_type('TScan')(startRow=rowKey, stopRow=None, timestamp=None, columns=[], caching=None, filterString="ColumnPaginationFilter(%i, %i)" % (number, offset), batchSize=None)
+    scan = get_thrift_type('TScan')(startRow=rowKey, stopRow=None, timestamp=None, columns=[], caching=None, filterString="PrefixFilter('%s') AND ColumnPaginationFilter(%i, %i)" % (rowKey, number, offset), batchSize=None)
     scanner = client.scannerOpenWithScan(tableName, scan, None, doas=self.user.username)
     return client.scannerGetList(scanner, 1, doas=self.user.username)
 
