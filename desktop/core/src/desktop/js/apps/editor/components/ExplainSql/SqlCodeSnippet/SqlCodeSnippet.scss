@@ -1,0 +1,79 @@
+@use 'variables' as vars;
+@use 'mixins';
+@use 'classes';
+
+// TODO: base all alerts on this instead
+@mixin bottom-bar {
+  display: flex;
+  column-gap: 4px;
+  align-items: center;
+  justify-content: space-between;
+  padding-right: 4px;
+  padding-left: 12px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+
+  // &::before {
+  //   content: '';
+  //   flex-grow: 1;
+  // }
+}
+
+.cuix.antd {
+  .hue-explain-sql__code-wrapper {
+    // Overrides SyntaxHighlighter theme
+  }
+
+  .hue-explain-sql__top-info-bar {
+    font-size: 11px;
+    margin-bottom: 0;
+    border-top-left-radius: vars.$border-radius-base;
+    border-top-right-radius: vars.$border-radius-base;
+    padding: vars.$fluidx-spacing-xs vars.$fluidx-spacing-s;
+    display: block;
+    background-color: vars.$fluidx-gray-800;
+    color: vars.$fluidx-gray-500;
+    text-align: right;
+  }
+
+  .hue-explain-sql__highlighter {
+    // font-size: 12px;
+    // background-color: vars.$fluidx-slate-800;
+    padding: vars.$fluidx-spacing-s;
+    margin-bottom: 0;
+  }
+
+  .hue-explain-sql__code {
+    font-size: 12px;
+    background-color: vars.$fluidx-slate-800;
+    // padding: vars.$fluidx-spacing-xs;
+  }
+
+  .hue-explain-sql--parse-alert {
+    @include bottom-bar;
+    background-color: vars.$fluidx-orange-050;
+    color: vars.$fluidx-orange-900;
+  }
+
+  .hue-explain-sql--suggestion-alert {
+    @include bottom-bar;
+    background-color: vars.$fluidx-green-050;
+    color: vars.$fluidx-green-900;
+  }
+
+  .hue-explain-sql--alert-button {
+    flex-shrink: 0;
+  }
+
+  .hue-explain-sql--explanation {
+    padding: 8px;
+    font-size: 13px;
+    background-color: vars.$fluidx-gray-700;
+    color: vars.$fluidx-gray-050;
+  }
+
+  .hue-explain-sql--nql-actions-bar, .hue-explain-sql--sql-actions-bar {
+    @include bottom-bar;
+    background-color: vars.$fluidx-gray-050;
+  }
+}
