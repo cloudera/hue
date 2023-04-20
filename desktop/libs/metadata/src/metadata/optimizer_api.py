@@ -34,6 +34,7 @@ from libsentry.privilege_checker import MissingSentryPrivilegeException
 from notebook.api import _get_statement
 from notebook.models import Notebook
 from notebook.sql_utils import get_current_statement
+from django.db.models import Count
 
 from metadata.optimizer.base import get_api
 from metadata.optimizer.optimizer_client import NavOptException, _get_table_name, _clean_query
@@ -139,7 +140,7 @@ def top_tables(request):
     for table in data.get('results', [])
   ]
 
-  response['top_tables'] = tables
+  response['top_tables'] = data['results']
   response['status'] = 0
 
   return JsonResponse(response)
@@ -487,6 +488,7 @@ def upload_query(request):
       # sending the fetched values from the SQL query to the database
       Sql_obj = SqlQuery(name=table_name , its_type=type_name , database=database_name)
       Sql_obj.save()
+
       response['query_upload'] = _('SQL parser saved to DB')
     except:
       response['query_upload'] = _('failed to upload SQL query')
