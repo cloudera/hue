@@ -413,7 +413,7 @@
 </script>
 
 <style lang="scss" scoped>
-  @import '../../../../../../components/styles/colors';
+  @import '../../../../../../components/styles/variables';
   @import '../../../../../../components/styles/mixins';
 
   .query-table {
@@ -482,7 +482,7 @@
       ::v-deep(i) {
         font-size: 20px;
         padding: 2px;
-        color: $fluid-gray-500;
+        color: $fluidx-gray-500;
       }
     }
 
