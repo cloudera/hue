@@ -37,9 +37,7 @@ LOG = logging.getLogger(__name__)
 class OptimizerParserClient(Api):
     # retriving the data from the database 
     def top_tables(self, workfloadId=None, database_name='default', page_size=1000, startingToken=None, connector=None):
-            print('abcdef')
             result_query = SqlQuery.objects.filter(database=database_name).values('database' , 'name').annotate(usage_count=Count('*')).order_by('-usage_count').values('database' , 'name', 'usage_count')[:5]
-            print(result_query)
       
             data = {
                 'results': [{
