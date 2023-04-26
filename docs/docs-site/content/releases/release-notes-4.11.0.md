@@ -72,7 +72,7 @@ Go grab it and give it a spin!
 
 * Docker
     ```
-    docker run -it -p 8888:8888 gethue/4.11.0
+    docker run -it -p 8888:8888 gethue/hue:4.11.0
     ```
 * Kubernetes :
     ```

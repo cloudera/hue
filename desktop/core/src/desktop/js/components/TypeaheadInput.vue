@@ -44,7 +44,7 @@
 </script>
 
 <style scoped lang="scss">
-  @import './styles/colors';
+  @import './styles/variables';
 
   .typeahead-input {
     position: relative;
@@ -69,7 +69,7 @@
     .typeahead-placeholder {
       z-index: 1;
       color: #ccc;
-      background-color: $fluid-white;
+      background-color: $fluidx-white;
       box-shadow: none;
     }
   }

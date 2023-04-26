@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-@import '../../../components/styles/colors';
+@use 'variables' as vars;
 
 .hue-path-browser {
   display: flex;
@@ -37,11 +37,11 @@
 
     &:hover {
       cursor: text;
-      background-color: $fluid-gray-100;
+      background-color: vars.$fluidx-gray-100;
     }
 
     &:focus {
-      background-color: $fluid-gray-100;
+      background-color: vars.$fluidx-gray-100;
     }
   }
 }
@@ -63,11 +63,11 @@
     box-shadow: none;
 
     &:hover {
-      background-color: $fluid-gray-100;
+      background-color: vars.$fluidx-gray-100;
     }
 
     &:focus {
-      background-color: $fluid-gray-100;
+      background-color: vars.$fluidx-gray-100;
     }
   }
 }
@@ -82,7 +82,7 @@
   width: 200px;
 
   .hue-path-browser__dropdown {
-    background-color: $fluid-gray-200;
+    background-color: vars.$fluidx-gray-200;
     overflow-y: scroll;
     max-height: 200px;
   }
@@ -108,16 +108,16 @@
   .hue-path-browser-panel__button {
     border: none;
     box-shadow: none;
-    color: $fluid-blue-400;
+    color: vars.$fluidx-blue-400;
     padding: 0;
     width: 100%;
 
     &:hover {
-      border: $fluid-gray-300 solid 1px;
+      border: vars.$fluidx-gray-300 solid 1px;
     }
 
     &:focus {
-      border: $fluid-gray-300 solid 1px;
+      border: vars.$fluidx-gray-300 solid 1px;
     }
   }
 }

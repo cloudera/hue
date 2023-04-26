@@ -152,7 +152,7 @@
 </script>
 
 <style lang="scss" scoped>
-  @import 'components/styles/colors';
+  @import 'components/styles/variables';
   @import 'components/styles/mixins';
 
   .sort-selector {
