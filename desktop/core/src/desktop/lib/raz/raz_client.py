@@ -32,6 +32,7 @@ from desktop.conf import AUTH_USERNAME
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.sdxaas.knox_jwt import fetch_jwt
 
+
 import desktop.lib.raz.signer_protos_pb2 as raz_signer
 
 if sys.version_info[0] > 2:
