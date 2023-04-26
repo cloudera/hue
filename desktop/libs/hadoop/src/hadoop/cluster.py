@@ -82,6 +82,8 @@ def get_all_hdfs():
     return FS_CACHE
 
   FS_CACHE = {}
+  for identifier in list(conf.HDFS_CLUSTERS.keys()):
+    FS_CACHE[identifier] = _make_filesystem(identifier)
   if has_connectors():
     for connector in _get_installed_connectors(category='browsers', dialect='hdfs', interface='rest'):
       settings = {setting['name']: setting['value'] for setting in connector['settings']}
@@ -89,9 +91,7 @@ def get_all_hdfs():
         url=settings['server_url'],
         fs_defaultfs=settings['default_fs']
       )
-  else:
-    for identifier in list(conf.HDFS_CLUSTERS.keys()):
-      FS_CACHE[identifier] = _make_filesystem(identifier)
+
   return FS_CACHE
 
 

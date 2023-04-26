@@ -306,28 +306,25 @@ def get_query_server_config(name='beeswax', connector=None):
 
 def get_query_server_config_via_connector(connector):
   # TODO: connector is actually a notebook interpreter
-  connector_name = full_connector_name = connector['type']
-  compute_name = None
-  if connector.get('compute'):
-    compute_name = connector['compute']['name']
-    full_connector_name = '%s-%s' % (connector_name, compute_name)
+  compute = connector.get('compute', connector)
+  connector_name = connector['type']
+  compute_name = compute['type']
   LOG.debug("Query cluster connector %s compute %s" % (connector_name, compute_name))
 
-  if connector['options'].get('has_ssh') == 'true':
+  if compute['options'].get('has_ssh') == 'true':
     server_host = '127.0.0.1'
-    server_port = connector['options']['server_port']
   else:
-    server_host = (connector['compute']['options'] if 'compute' in connector else connector['options'])['server_host']
-    server_port = int((connector['compute']['options'] if 'compute' in connector else connector['options'])['server_port'])
+    server_host = compute['options']['server_host']
+  server_port = int(compute['options']['server_port'])
 
-  if 'impersonation_enabled' in connector['options']:
-    impersonation_enabled = connector['options']['impersonation_enabled'] == 'true'
+  if 'impersonation_enabled' in compute['options']:
+    impersonation_enabled = bool(compute['options']['impersonation_enabled'])
   else:
     impersonation_enabled = hiveserver2_impersonation_enabled()
 
   return {
-      'dialect': connector['dialect'],
-      'server_name': full_connector_name,
+      'dialect': compute['dialect'],
+      'server_name': compute_name,
       'server_host': server_host,
       'server_port': server_port,
       'principal': 'TODO',
@@ -335,10 +332,12 @@ def get_query_server_config_via_connector(connector):
       'auth_password': AUTH_PASSWORD.get(),
 
       'impersonation_enabled': impersonation_enabled,
-      'use_sasl': connector['options'].get('use_sasl', 'true') == 'true',
+      'use_sasl': str(compute['options'].get('use_sasl', True)).upper() == 'TRUE',
       'SESSION_TIMEOUT_S': 15 * 60,
       'querycache_rows': 1000,
       'QUERY_TIMEOUT_S': 15 * 60,
+      'transport_mode': compute['options'].get('transport_mode', 'http'),
+      'http_url': compute['options'].get('http_url', 'http://%s:%s/cliservice' % (server_host, server_port)),
   }
 
 

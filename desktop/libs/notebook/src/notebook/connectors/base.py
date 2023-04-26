@@ -28,6 +28,7 @@ from django.utils.encoding import smart_str
 from desktop.auth.backend import is_admin
 from desktop.conf import TASK_SERVER, has_connectors
 from desktop.lib import export_csvxls
+from desktop.lib.connectors.models import Connector
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_unicode
 from desktop.models import get_cluster_config
@@ -357,7 +358,7 @@ class Notebook(object):
 
 def get_interpreter(connector_type, user=None):
   interpreter = [
-    interpreter for interpreter in get_ordered_interpreters(user) if connector_type == interpreter['type']
+    interpreter for interpreter in get_ordered_interpreters(user=user, include_children=True) if connector_type == interpreter['type']
   ]
 
   if not interpreter:
@@ -439,7 +440,17 @@ def get_api(request, snippet):
     interface = snippet.get('interface') 
     interpreter['options'] = snippet.get('options')
 
-  if get_cluster_config(request.user)['has_computes']:
+  if snippet.get('compute'):
+    interpreter['compute'] = snippet['compute']
+    interface = snippet['compute']['interface']
+  elif interpreter['interface'] == 'multi-hs2-compute':
+    connector = Connector.objects.get(id=interpreter['type'])
+    computes = connector.get_computes(request.user)
+    if computes:
+      interpreter['compute'] = computes[0]
+      interface = computes[0]['interface']
+
+  if not interpreter.get('compute') and get_cluster_config(request.user)['has_computes']:
     compute = json.loads(request.POST.get('cluster', '""'))  # Via Catalog autocomplete API or Notebook create sessions.
     if compute == '""' or compute == 'undefined':
       compute = None

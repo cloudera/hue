@@ -59,9 +59,9 @@ UPLOAD_CHUNK_SIZE = Config(
 def has_hdfs_enabled():
   if has_connectors():
     from desktop.lib.connectors.api import _get_installed_connectors
-    return any([connector for connector in _get_installed_connectors() if connector['dialect'] == 'hdfs'])
-  else:
-    return list(HDFS_CLUSTERS.keys())
+    if any([connector for connector in _get_installed_connectors() if connector['dialect'] == 'hdfs']):
+      return True
+  return list(HDFS_CLUSTERS.keys())
 
 
 def get_hadoop_conf_dir_default():

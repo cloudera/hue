@@ -52,6 +52,10 @@ class BaseConnector(models.Model):
       help_text=_t('Type of interface, e.g. sqlalchemy, hiveserver2... '),
       default='sqlalchemy'
   )
+  parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True)
+  is_ready = models.BooleanField(default=True)
+  external_id = models.CharField(max_length=255, null=True, db_index=True)
+  ldap_groups_json = models.TextField(default='[]')
   settings = models.TextField(default='{}')
   last_modified = models.DateTimeField(auto_now=True, db_index=True, verbose_name=_t('Time last modified'))
 
@@ -76,6 +80,23 @@ class BaseConnector(models.Model):
       'last_modified': self.last_modified
     }
 
+  @property
+  def ldap_groups(self):
+    if not self.ldap_groups_json:
+      self.ldap_groups_json = json.dumps([])
+    return set(json.loads(self.ldap_groups_json))
+
+  @ldap_groups.setter
+  def ldap_groups(self, val):
+    self.ldap_groups_json = json.dumps(list(val or []))
+
+  def get_computes(self, user):
+    """Returns the computes belonging to the current top level connector."""
+    computes = [
+      _connector_to_interpreter(connector)
+      for connector in _get_installed_connectors(user=user, parent=self)
+    ]
+    return computes
 
 if ENABLE_ORGANIZATIONS.get():
   class ConnectorManager(models.Manager):
@@ -122,15 +143,29 @@ else:
       return (self.dialect, self.interface)
 
 
-def _get_installed_connectors(category=None, categories=None, dialect=None, interface=None, user=None, connector_id=None):
-  from desktop.auth.backend import is_admin
+def _get_installed_connectors(category=None, categories=None, dialect=None, interface=None,
+                              user=None, connector_id=None, parent=None, include_children=True):
+  if user is None:
+    return []
+
+  from useradmin.models import UserProfile
+  profile = UserProfile.objects.get(user=user)
 
   connectors_objects = Connector.objects.all()
-
-  if user is not None and not is_admin(user):  # Apply Permissions
-    connectors_objects = connectors_objects.filter(huepermission__in=user.get_permissions())
-
   connectors_objects = connectors_objects.order_by('id')
+
+  if parent is not None:
+    connectors_objects = [connector for connector in connectors_objects if connector.parent == parent]
+  elif not include_children:
+    connectors_objects = [connector for connector in connectors_objects if connector.parent is None]
+    # Filter out any connectors that do not have children
+    #connectors_objects = [co for co in connectors_objects
+    #                      if co.interface != 'multi-hs2-compute' or co.get_computes(user)]
+
+  # Select connectors if there is any overlap of the ldap groups of user and connector
+  # Or if the connector does not have any restriction of ldap groups
+  user_groups = set(profile.data.get("saml_attributes", {}).get("groups", []))
+  connectors_objects = [co for co in connectors_objects if not co.ldap_groups or co.ldap_groups.intersection(user_groups)]
 
   connector_instances = [
       {
@@ -168,8 +203,21 @@ def _get_installed_connectors(category=None, categories=None, dialect=None, inte
   if connector_id and user and not connectors:
     raise ConnectorNotFoundException(_('Connector %s not found for user %s') % (connector_id, user))
 
+  print('CONNECT: connectors/models.y: 212: connectors', connectors)
+
   return connectors
 
+def _connector_to_interpreter(connector):
+  return {
+      'name': connector['nice_name'],
+      'type': connector['name'],  # Aka id
+      'dialect': connector['dialect'],
+      'category': connector['category'],
+      'is_sql': connector['dialect_properties']['is_sql'],
+      'interface': connector['interface'],
+      'options': {setting['name']: setting['value'] for setting in connector['settings']},
+      'dialect_properties': connector['dialect_properties'],
+  }
 
 def _augment_connector_properties(connector):
   '''

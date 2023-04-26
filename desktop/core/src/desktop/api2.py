@@ -49,6 +49,7 @@ from desktop import appmanager
 from desktop.auth.backend import is_admin
 from desktop.conf import ENABLE_CONNECTORS, ENABLE_GIST_PREVIEW, CUSTOM, get_clusters, IS_K8S_ONLY, ENABLE_SHARING
 from desktop.lib.conf import BoundContainer, GLOBAL_CONFIG, is_anonymous
+from desktop.lib.connectors.models import Connector
 from desktop.lib.django_util import JsonResponse, login_notrequired, render
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.export_csvxls import make_response
@@ -213,6 +214,13 @@ def get_context_namespaces(request, interface):
           'computes': [_cluster for _cluster in adb_clusters if _cluster.get('namespaceCrn') == namespace.get('crn')]
         } for namespace in sdx_namespaces if namespace.get('status') == 'CREATED' or IS_K8S_ONLY.get()
       ])
+  elif interface == 'multi-hs2-compute':
+    connector = Connector.objects.get(id=interface)
+    computes = connector.get_computes(request.user)
+    namespaces = [{
+        'id': interface, 'name': 'default', 'status': 'CREATED',
+        'computes': computes
+    }]
 
   response[interface] = namespaces
   response['status'] = 0
@@ -228,36 +236,12 @@ def get_context_computes(request, interface):
   response = {}
   computes = []
 
-  clusters = list(get_clusters(request.user).values())
+  interpreter = get_interpreter(connector_type=interface, user=request.user)
 
-  if get_cluster_config(request.user)['has_computes']: # TODO: only based on interface selected?
-    interpreter = get_interpreter(connector_type=interface, user=request.user)
-    if interpreter['dialect'] == 'impala':
-      # dw_clusters = DataWarehouse2Api(request.user).list_clusters()['clusters']
-      dw_clusters = [
-        {'crn': 'c1', 'clusterName': 'c1', 'status': 'created', 'options': {'server_host': 'c1.gethue.com', 'server_port': 10000}},
-        {'crn': 'c2', 'clusterName': 'c2', 'status': 'created', 'options': {'server_host': 'c2.gethue.com', 'server_port': 10000}},
-      ]
-      computes.extend([{
-          'id': cluster.get('crn'),
-          'name': cluster.get('clusterName'),
-          'status': cluster.get('status'),
-          'namespace': cluster.get('namespaceCrn', cluster.get('crn')),
-          'type': interpreter['dialect'],
-          'options': cluster['options'],
-        } for cluster in dw_clusters]
-      )
-  else:
-    # Currently broken if not sent
-    computes.extend([{
-        'id': cluster['id'],
-        'name': cluster['name'],
-        'namespace': cluster['id'],
-        'interface': interface,
-        'type': cluster['type'],
-        'options': {}
-      } for cluster in clusters if cluster.get('type') == 'direct'
-    ])
+  if interpreter:
+    if interpreter['interface'] == 'multi-hs2-compute':
+      connector = Connector.objects.get(id=interface)
+      computes = connector.get_computes(request.user)
 
   response[interface] = computes
   response['status'] = 0

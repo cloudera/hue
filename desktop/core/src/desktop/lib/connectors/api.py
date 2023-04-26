@@ -20,13 +20,13 @@ import logging
 import sys
 
 from useradmin.models import update_app_permissions
-from notebook.conf import config_validator, _connector_to_interpreter
+from notebook.conf import config_validator
 
 from desktop.auth.decorators import admin_required
 from desktop.decorators import api_error_handler
 from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.lib.connectors.models import _get_installed_connectors, get_connectors_types, Connector, _create_connector_examples, \
+from desktop.lib.connectors.models import _get_installed_connectors, _connector_to_interpreter, Connector, _create_connector_examples, \
     _augment_connector_properties
 from desktop.lib.connectors.types import get_connectors_types, get_connector_categories, get_connector_by_type
 

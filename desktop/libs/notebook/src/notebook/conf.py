@@ -64,17 +64,7 @@ def check_has_missing_permission(user, interpreter, user_apps=None):
          (interpreter in ('java', 'spark2', 'mapreduce', 'shell', 'sqoop1', 'distcp') and 'oozie' not in user_apps)
 
 
-def _connector_to_interpreter(connector):
-  return {
-      'name': connector['nice_name'],
-      'type': connector['name'],  # Aka id
-      'dialect': connector['dialect'],
-      'category': connector['category'],
-      'is_sql': connector['dialect_properties']['is_sql'],
-      'interface': connector['interface'],
-      'options': {setting['name']: setting['value'] for setting in connector['settings']},
-      'dialect_properties': connector['dialect_properties'],
-  }
+
 
 
 def displayName(dialect, name):
@@ -86,14 +76,14 @@ def displayName(dialect, name):
     return name
 
 
-def get_ordered_interpreters(user=None):
+def get_ordered_interpreters(user=None, include_children=False):
   global INTERPRETERS_CACHE
 
   if has_connectors():
-    from desktop.lib.connectors.api import _get_installed_connectors
+    from desktop.lib.connectors.api import _get_installed_connectors, _connector_to_interpreter
     interpreters = [
       _connector_to_interpreter(connector)
-      for connector in _get_installed_connectors(categories=['editor', 'catalogs'], user=user)
+      for connector in _get_installed_connectors(categories=['editor', 'catalogs'], user=user, include_children=include_children)
     ]
   else:
     if INTERPRETERS_CACHE is None:

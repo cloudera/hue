@@ -315,11 +315,13 @@ class HS2Api(Api):
   def execute(self, notebook, snippet):
     db = self._get_db(snippet, interpreter=self.interpreter)
 
+    type = snippet['compute']['type'] if snippet.get('compute') else snippet['type']
+
     statement = self._get_current_statement(notebook, snippet)
-    session = self._get_session(notebook, snippet['type'])
+    session = self._get_session(notebook, type)
 
     query = self._prepare_hql_query(snippet, statement['statement'], session)
-    _session = self._get_session_by_id(notebook, snippet['type'])
+    _session = self._get_session_by_id(notebook, type)
 
     try:
       if statement.get('statement_id') == 0: # TODO: move this to client
