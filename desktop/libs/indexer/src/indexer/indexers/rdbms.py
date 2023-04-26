@@ -177,6 +177,7 @@ def run_sqoop(request, source, destination, start_time):
       rdbms_password = source['rdbmsPassword']
       rdbms_driver = source['rdbmsType']
       url = rdbms_host
+      # If Driver type is not jdbc, url variable should be regenerated with jdbc scheme to make sqoop command valid.
       if rdbms_driver != 'jdbc':
         url = 'jdbc:%(rdbmsType)s://%(url)s:%(rdbmsPort)s' % {
           'rdbmsType': rdbms_driver,
