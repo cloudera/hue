@@ -1161,10 +1161,10 @@ class Document2Manager(models.Manager, Document2QueryMixin):
     LOG.info("Moved %d documents to home directory for user: %s" % (count, user.username))
     return home_dir
 
-class SqlQuery(models.Model):
-  name = models.CharField(default=None, max_length=255)
-  its_type = models.CharField(default='', max_length=255)
-  database = models.CharField(default='', max_length=255)
+class SqlQueryParser(models.Model):
+  database = models.CharField(default=None, max_length=255)
+  table_name = models.CharField(default='', max_length=255)
+  column_name = models.CharField(default='', max_length=255)
 
   def __str__(self):
     return self.name

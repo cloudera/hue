@@ -21,7 +21,7 @@ import sys
 
 from desktop.lib.exceptions_renderable import PopupException
 from django.db.models import Count
-from desktop.models import SqlQuery
+from desktop.models import SqlQueryParser
 
 from metadata.optimizer.base import Api
 
@@ -37,37 +37,37 @@ LOG = logging.getLogger(__name__)
 class OptimizerParserClient(Api):
     # retriving the data from the database 
     def top_tables(self, workfloadId=None, database_name='default', page_size=1000, startingToken=None, connector=None):
-            result_query = SqlQuery.objects.filter(database=database_name).values('database' , 'name').annotate(usage_count=Count('*')).order_by('-usage_count').values('database' , 'name', 'usage_count')[:5]
+            result_query = SqlQueryParser.objects.filter(database=database_name).values('database' , 'table_name').annotate(usage_count=Count('*')).order_by('-usage_count').values('database' , 'table_name', 'usage_count')[:5]
       
             data = {
                 'results': [{
                     "database": "default",
                     "name": "sample_07",
-                    "workloadPercent": 42,
+                    "workloadPercent": 6,
                     "columnCount": 4,
                     "total": 6
                     }, {
                     "database": "default",
                     "name": "sample_08",
-                    "workloadPercent": 21,
+                    "workloadPercent": 5,
                     "columnCount": 4,
                     "total": 3
                     }, {
                     "database": "default",
                     "name": "web_logs",
-                    "workloadPercent": 21,
+                    "workloadPercent": 4,
                     "columnCount": 1,
                     "total": 3
                     }, {
                     "database": "default",
                     "name": "customers",
-                    "workloadPercent": 7,
+                    "workloadPercent": 3,
                     "columnCount": 44,
                     "total": 1
                     }, {
                     "database": "default",
                     "name": "customers",
-                    "workloadPercent": 7,
+                    "workloadPercent": 2,
                     "columnCount": 44,
                     "total": 1
                     }
@@ -77,7 +77,7 @@ class OptimizerParserClient(Api):
             i=0
             for d in data['results']:
                 d['database'] = result_query[i]['database']
-                d['name'] = result_query[i]['name']
+                d['name'] = result_query[i]['table_name']
                 i = i+1
 
             return data

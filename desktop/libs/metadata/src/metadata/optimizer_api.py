@@ -29,12 +29,11 @@ from desktop.auth.backend import is_admin
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.i18n import force_unicode
 from desktop.models import Document2
-from desktop.models import SqlQuery
+from desktop.models import SqlQueryParser
 from libsentry.privilege_checker import MissingSentryPrivilegeException
 from notebook.api import _get_statement
 from notebook.models import Notebook
 from notebook.sql_utils import get_current_statement
-from django.db.models import Count
 
 from metadata.optimizer.base import get_api
 from metadata.optimizer.optimizer_client import NavOptException, _get_table_name, _clean_query
@@ -140,7 +139,7 @@ def top_tables(request):
     for table in data.get('results', [])
   ]
 
-  response['top_tables'] = data['results']
+  response['top_tables'] = tables
   response['status'] = 0
 
   return JsonResponse(response)
@@ -457,6 +456,7 @@ def upload_query(request):
   query_id = request.POST.get('query_id')
   sql_query = request.POST.get('locations')
   sql_query = json.loads(sql_query) # extracting the SQL query in the form of a list
+  print('sql_query', sql_query)
 
   if OPTIMIZER.AUTO_UPLOAD_QUERIES.get() and source_platform in ('hive', 'impala') and query_id:
     try:
@@ -474,10 +474,9 @@ def upload_query(request):
   
   elif OPTIMIZER.AUTO_UPLOAD_QUERIES.get() and sql_query:
     try:
-      #extracting values related to table(s)
+      #extracting values related to table(s) and database
       for i in sql_query:
         if i['type'] == 'table':
-          type_name = i['type']
           if len(i['identifierChain']) > 1:
             table_name = i['identifierChain'][len(i['identifierChain'])-1]['name']
             database_name = i['identifierChain'][0]['name']
@@ -485,8 +484,15 @@ def upload_query(request):
             table_name = i['identifierChain'][0]['name']
             database_name = 'default'
 
+        #extracting values related to column(s)
+        if i['type'] == 'column':
+          if len(i['identifierChain']) > 1:
+            column_name = i['identifierChain'][len(i['identifierChain'])-1]['name']
+          else:
+            column_name = i['identifierChain'][0]['name']    
+
       # sending the fetched values from the SQL query to the database
-      Sql_obj = SqlQuery(name=table_name , its_type=type_name , database=database_name)
+      Sql_obj = SqlQueryParser(database=database_name , table_name = table_name , column_name = column_name)
       Sql_obj.save()
 
       response['query_upload'] = _('SQL parser saved to DB')

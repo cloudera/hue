@@ -112,7 +112,7 @@ def _get_table_name(path):
   elif path.count('.') == 2:
     database, table, column = path.split('.', 2)
   else:
-    database, table = 'default', path
+    database, table = path, path
 
   name = {'database': database, 'table': table}
   if column:
