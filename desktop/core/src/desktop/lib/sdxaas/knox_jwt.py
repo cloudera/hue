@@ -17,9 +17,10 @@
 import json
 import logging
 import requests
+import requests_kerberos
 
-from requests_kerberos import HTTPKerberosAuth
 from desktop.conf import SDXAAS
+from desktop.lib.exceptions_renderable import PopupException
 
 LOG = logging.getLogger(__name__)
 
@@ -28,7 +29,7 @@ _KNOX_TOKEN_API = '/knoxtoken/api/v1/token'
 
 def handle_knox_ha():
   knox_urls = SDXAAS.TOKEN_URL.get()
-  auth_handler = HTTPKerberosAuth(mutual_authentication=requests_kerberos.OPTIONAL)
+  auth_handler = requests_kerberos.HTTPKerberosAuth(mutual_authentication=requests_kerberos.OPTIONAL)
   res = None
 
   if knox_urls:
@@ -51,15 +52,20 @@ def fetch_jwt():
   Return JWT fetched from healthy Knox host for SDXaaS.
   '''
   knox_url = handle_knox_ha()
-  auth_handler = HTTPKerberosAuth(mutual_authentication=requests_kerberos.OPTIONAL)
+  if not knox_url:
+    raise PopupException('Knox URL not available to fetch JWT.')
+
+  auth_handler = requests_kerberos.HTTPKerberosAuth(mutual_authentication=requests_kerberos.OPTIONAL)
   knox_response = None
 
   try:
-    knox_response = requests.get(knox_url + _KNOX_TOKEN_API + '?knox.token.include.groups=true', auth=auth_handler, verify=False)
+    knox_response = requests.get(knox_url.rstrip('/') + _KNOX_TOKEN_API + '?knox.token.include.groups=true', auth=auth_handler, verify=False)
   except Exception as e:
     raise Exception('Error fetching JWT from Knox URL %s with exception: %s' % (knox_url, str(e)))
-  
+
+  jwt_token = None
   if knox_response:
     jwt_token = json.loads(knox_response.text)['access_token']
     LOG.debug('Retrieved Knox JWT: %s' % jwt_token)
-    return jwt_token
+
+  return jwt_token

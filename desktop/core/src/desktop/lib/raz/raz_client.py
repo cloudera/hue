@@ -74,11 +74,14 @@ class RazToken:
       r = requests.get(self.raz_url, GET_PARAMS, auth=self.auth_handler, verify=False)
     elif self.auth_type == 'jwt':
       jwt_token = fetch_jwt()
+      if jwt_token is None:
+        raise PopupException('Knox JWT is not available to send to RAZ.')
+
       _headers = {'Authorization': 'Bearer %s' % (jwt_token)}
       r = requests.get(self.raz_url, GET_PARAMS, headers=_headers, verify=False)
 
     self.raz_token = json.loads(r.text)['Token']['urlString']
-    LOG.debug('Raz Token: %s' % self.raz_token)
+    LOG.debug('Raz token: %s' % self.raz_token)
 
     return self.raz_token
     # try:
