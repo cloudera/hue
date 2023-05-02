@@ -390,14 +390,14 @@ def dump_config(request):
   return render("dump_config.mako", request, {})
 
 
-@hue_admin_required
+@login_notrequired
 @access_log_level(logging.WARN)
 def threads(request):
   """Dumps out server threads. Useful for debugging."""
   out = string_io()
   dump_traceback(file=out)
 
-  if is_ajax(request):
+  if is_ajax(request) or request.GET.get("format") == "json":
     return HttpResponse(out.getvalue(), content_type="text/plain")
   else:
     return render("threads.mako", request, {'text': out.getvalue(), 'is_embeddable': request.GET.get('is_embeddable', False)})
