@@ -24,6 +24,7 @@ from rest_framework.decorators import api_view, authentication_classes, permissi
 
 from filebrowser import views as filebrowser_views, api as filebrowser_api
 from indexer import api3 as indexer_api3
+from desktop.lib.django_util import JsonResponse
 from metadata import optimizer_api
 from notebook import api as notebook_api
 from notebook.conf import get_ordered_interpreters
@@ -36,7 +37,7 @@ from desktop.lib.connectors import api as connector_api
 from useradmin import views as useradmin_views, api as useradmin_api
 
 from beeswax import api as beeswax_api
-
+from desktop.lib.llm import llm
 
 LOG = logging.getLogger()
 
@@ -236,6 +237,73 @@ def guess_field_types(request):
 def importer_submit(request):
   django_request = get_django_request(request)
   return indexer_api3.importer_submit(django_request)
+
+
+@api_view(["POST"])
+def generate_sql(request, query=None):
+  database = request.POST.get("database")
+  query = request.POST.get("prompt")
+  
+  if llm.is_llm_sql_enabled():
+    parsed_data = parse_database(request, database)
+    generated_query = llm.generate_sql(query, parsed_data)
+    return JsonResponse(generated_query)
+  else:
+    return JsonResponse({
+      "message": "LLM SQL is not enabled on this server"
+    }, status=403)
+
+@api_view(["POST"])
+def chat(request, prompt=None, conversation_id=None):
+  # request_data = json.loads(request.body)
+  prompt = request.data.get("prompt")
+  type = request.data.get("type")
+  metadata = request.data.get("metadata")
+  if llm.is_llm_sql_enabled():
+    generated_response = llm.chat(prompt, metadata, type)
+    return JsonResponse(generated_response)
+  else:
+    return JsonResponse({
+      "message": "LLM SQL is not enabled on this server"
+    }, status=403)
+
+
+def parse_database(request, database=None):
+  django_request = get_django_request(request)
+
+  _patch_operation_id_request(django_request)
+
+  table = None
+  database_cache_key = f'parse_database:{database}'
+  cached_database = cache.get(database_cache_key)
+
+  if cached_database:
+      return cached_database
+  database_cache_key = f'parse_database:{database}'
+  cached_database = cache.get(database_cache_key)
+
+  if cached_database:
+      return cached_database
+  
+  databases = notebook_api.autocomplete1(django_request, None, database, None, None, None)
+
+  database_details = {}
+  for table in databases["tables_meta"]:
+    table_details = notebook_api.autocomplete1(django_request, None, database, table['name'], None, None)
+    database_details[table['name']] = table_details['columns']
+
+  cache.set(database_cache_key, database_details, 30*60)
+  return database_details
+  databases = notebook_api.autocomplete1(django_request, None, database, None, None, None)
+
+  database_details = {}
+  for table in databases["tables_meta"]:
+    table_details = notebook_api.autocomplete1(django_request, None, database, table['name'], None, None)
+    database_details[table['name']] = table_details['columns']
+
+  cache.set(database_cache_key, database_details, 30*60)
+  return database_details
+
 
 
 # Connector
