@@ -40,8 +40,10 @@ from metadata.conf import OPTIMIZER
 
 if sys.version_info[0] > 2:
   from django.utils.translation import gettext as _
+  from base64 import decodebytes
 else:
   from django.utils.translation import ugettext as _
+  from base64 import decodestring as decodebytes
 
 LOG = logging.getLogger(__name__)
 
@@ -397,7 +399,7 @@ def _convert_queries(queries_data):
         if isinstance(guid, str):
           guid = guid.encode('utf-8')
         # unpack_guid uses '%016x:%016x' while optmizer api uses '%s:%s'.
-        original_query_id = '%s:%s' % struct.unpack(b"QQ", base64.decodestring(guid))
+        original_query_id = '%s:%s' % struct.unpack(b"QQ", decodebytes(guid))
         execution_time = snippet['result']['executionTime'] * 100 if snippet['status'] in ('available', 'expired') else -1
         statement = _clean_query(_get_statement(query_data))
         queries.append((original_query_id, execution_time, statement, snippet.get('database', 'default').strip()))
