@@ -45,6 +45,7 @@ categories:
 ---
 
 Greetings, Ozone users!
+
 Hue has recently added official support for browsing Apache Ozone using its file browser! Hue can be set-up to seamlessly read and write to a configured Apache Ozone file system service, and users can directly query from and save data in it.
 
 ![Ozone Youtube Video]()
@@ -61,7 +62,8 @@ In addition to simplifying navigation, this approach allows for easier maintenan
 ### Getting Started
 
 To configure Hue for Ozone file browsing, make the necessary changes to the hue.ini configuration file.
-Add the following settings under the `[desktop]` section, within the [ozone] section:
+
+Add the following settings under the `[desktop]` section, within the `[[ozone]]` section:
 
 ```
 [[[default]]]
@@ -71,21 +73,18 @@ ssl_cert_ca_verify=true
 security_enabled=true
 ```
 
-**fs_defaultfs**: Ozone service ID (HA mode) or URL for Ozone manager (non-HA mode).
-**webhdfs_url**: URL of HttpFS endpoint for the running Ozone service.
+- **fs_defaultfs**: Ozone service ID (HA mode) or URL for Ozone Manager (non-HA mode).
+- **webhdfs_url**: URL of HttpFS endpoint for the running Ozone service.
 
 ![Ozone Hue integration]()
 
 
 </br>
 </br>
-For feedback, questions, or suggestions, feel free to comment on [GitHub Discussions](https://github.com/cloudera/hue/discussions) and [quick start](https://docs.gethue.com/quickstart/) SQL querying!
+For feedback, questions, or suggestions, feel free to comment on ![GitHub Discussions](https://github.com/cloudera/hue/discussions) and ![quick start](https://docs.gethue.com/quickstart/) SQL querying!
 
 
 Upwards and Onwards!
 
 
 [Harsh](https://github.com/Harshg999) and [Ayush](https://github.com/agl29) from the Hue Team
-
-
-
