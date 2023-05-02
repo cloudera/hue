@@ -50,7 +50,7 @@ Hue has recently added official support for browsing Apache Ozone using its file
 
 ![Ozone Youtube Video]()
 
-### Exploring Ozone in Hue
+## Exploring Ozone in Hue
 Apache Ozone is a highly scalable, distributed storage solution for analytics, big data, and cloud native applications. It is optimized for both efficient object store and file system operations. Ozone offers a multi-protocol file system that recently has started supporting HttpFS REST APIs. 
 
 Hue integrates with these HttpFS APIs to offer a convenient method for browsing and accessing the entirety of an Ozone file system, including all volumes, buckets, and directories.
@@ -59,7 +59,7 @@ Hue integrates with these HttpFS APIs to offer a convenient method for browsing 
 
 In addition to simplifying navigation, this approach allows for easier maintenance of its features. As Ozone continues to expand support for additional HttpFS APIs, future updates to Hue will provide even greater functionality, such as expanded file system capabilities!
 
-### Getting Started
+## Getting Started
 
 To configure Hue for Ozone file browsing, make the necessary changes to the hue.ini configuration file.
 
@@ -81,8 +81,8 @@ security_enabled=true
 
 </br>
 </br>
-For feedback, questions, or suggestions, feel free to comment on ![GitHub Discussions](https://github.com/cloudera/hue/discussions) and ![quick start](https://docs.gethue.com/quickstart/) SQL querying!
 
+For feedback, questions, or suggestions, feel free to comment on [GitHub Discussions](https://github.com/cloudera/hue/discussions) and [quick start](https://docs.gethue.com/quickstart/) SQL querying!
 
 Upwards and Onwards!
 
