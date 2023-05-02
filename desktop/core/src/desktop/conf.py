@@ -205,6 +205,40 @@ X_FRAME_OPTIONS = Config(
   type=str,
   default="SAMEORIGIN")
 
+LLM = ConfigSection(
+  key='llm',
+  help=_("""Configuration options for LLM"""),
+  members=dict(
+    ENABLE=Config(
+      key='enable_llm_sql',
+      help=_('Enable LLM'),
+      default=True,
+      type=coerce_bool),
+    OPENAI=ConfigSection(
+      key='openai',
+      help=_('Configuration options for the OpenAI API'),
+      members=dict(
+        ENABLE=Config(
+          key='enable_open_ai',
+          help=_('Open AI'),
+          default=True,
+          type=coerce_bool
+        ),
+        TOKEN=Config(
+          key='token',
+          help=_('API token for the OpenAI API'),
+          type=str),
+        MODEL=Config(
+          key='model',
+          help=_('OpenAI model for LLM'),
+          type=str,
+          default='davinci'),
+      )
+    )
+    
+  )
+)
+
 HUE_IMAGE_VERSION = Config(
   key="hue_image_version",
   help=_("Image version of Hue"),

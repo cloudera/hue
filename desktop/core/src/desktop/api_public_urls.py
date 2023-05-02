@@ -155,3 +155,8 @@ urlpatterns += [
 
   re_path(r'^iam/get_users/?', api_public.get_users, name='iam_get_users'),
 ]
+
+urlpatterns += [
+  re_path(r'^editor/generate_sql', api_public.generate_sql, name='generate_sql'),
+  re_path(r'^editor/chat', api_public.chat, name='chat'),
+]
