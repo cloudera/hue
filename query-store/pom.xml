@@ -27,7 +27,7 @@
     <guava.version>28.1-jre</guava.version>
     <junit.version>4.13</junit.version>
     <jackson.version>2.13.4.2</jackson.version>
-    <jackson.modules.version>2.14.2</jackson.modules.version>
+    <jackson.modules.version>2.15.0</jackson.modules.version>
     <jersey.version>2.35</jersey.version>
     <lombok.version>1.18.10</lombok.version>
     <protobuf.version>3.21.7</protobuf.version>
