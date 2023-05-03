@@ -32,7 +32,6 @@ from desktop.conf import AUTH_USERNAME
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.sdxaas.knox_jwt import fetch_jwt
 
-
 import desktop.lib.raz.signer_protos_pb2 as raz_signer
 
 if sys.version_info[0] > 2:
@@ -84,32 +83,6 @@ class RazToken:
     LOG.debug('Raz token: %s' % self.raz_token)
 
     return self.raz_token
-    # try:
-    #   response_from_knox = requests.get(knox_url, auth=self.auth_handler, verify=False)
-
-    #   LOG.debug('Response from Knox ---->>>>')
-    #   jwt_token = json.loads(response_from_knox.text)['access_token']
-    #   LOG.debug(jwt_token)
-
-    #   encoded_jwt_token = base64.b64encode(jwt_token.encode('utf-8')).decode('utf-8')
-    #   LOG.debug('encoded jwt token ----->>>')
-    #   LOG.debug(encoded_jwt_token)
-
-    #   headers = {
-    #     'Authorization': 'Bearer %s' % (jwt_token)
-    #   }
-    #   resp = requests.get(self.raz_url, GET_PARAMS, headers=headers, verify=False)
-    #   LOG.debug('new RAZ token --------->>>')
-    #   LOG.debug(str(resp))
-    #   LOG.debug(str(dict(resp)))
-    #   LOG.debug(resp.content)
-    #   LOG.debug(resp.body)
-    #   LOG.debug(str(json.loads(resp.text)))
-
-    #   # self.raz_token = json.loads(resp.text)['Token']['urlString']
-    # except Exception as e:
-    #   LOG.debug('Exception from Knox ---->>>>')
-    #   LOG.debug(str(e))
 
 
   def renew_delegation_token(self, user):

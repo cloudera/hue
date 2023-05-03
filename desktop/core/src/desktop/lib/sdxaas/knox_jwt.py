@@ -25,6 +25,7 @@ from desktop.lib.exceptions_renderable import PopupException
 LOG = logging.getLogger(__name__)
 
 _KNOX_TOKEN_API = '/knoxtoken/api/v1/token'
+_KNOX_TOKEN_GET_PARAM_STRING = '?knox.token.include.groups=true'
 
 
 def handle_knox_ha():
@@ -59,7 +60,7 @@ def fetch_jwt():
   knox_response = None
 
   try:
-    knox_response = requests.get(knox_url.rstrip('/') + _KNOX_TOKEN_API + '?knox.token.include.groups=true', auth=auth_handler, verify=False)
+    knox_response = requests.get(knox_url.rstrip('/') + _KNOX_TOKEN_API + _KNOX_TOKEN_GET_PARAM_STRING, auth=auth_handler, verify=False)
   except Exception as e:
     raise Exception('Error fetching JWT from Knox URL %s with exception: %s' % (knox_url, str(e)))
 
