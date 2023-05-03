@@ -34,7 +34,9 @@ def handle_knox_ha():
   res = None
 
   if knox_urls:
-    knox_urls_list = knox_urls.split(',')
+    # Config format is "['url1', 'url2']" for HA, so we need to clean up and split correctly in list.
+    # For non-HA, its normal url string.
+    knox_urls_list = knox_urls.replace("%20", "").replace("['", "").replace("']", "").replace("'", "").split(',')
 
     for k_url in knox_urls_list:
       try:
@@ -50,7 +52,7 @@ def handle_knox_ha():
 
 def fetch_jwt():
   '''
-  Return JWT fetched from healthy Knox host for SDXaaS.
+  Return JWT fetched from healthy Knox host.
   '''
   knox_url = handle_knox_ha()
   if not knox_url:
@@ -60,6 +62,7 @@ def fetch_jwt():
   knox_response = None
 
   try:
+    LOG.debug('Fetching Knox JWT from URL: %s' % knox_url)
     knox_response = requests.get(knox_url.rstrip('/') + _KNOX_TOKEN_API + _KNOX_TOKEN_GET_PARAM_STRING, auth=auth_handler, verify=False)
   except Exception as e:
     raise Exception('Error fetching JWT from Knox URL %s with exception: %s' % (knox_url, str(e)))
