@@ -374,10 +374,12 @@ def top_columns(request):
   interface = request.POST.get('interface', OPTIMIZER.INTERFACE.get())
   connector = json.loads(request.POST.get('connector', '{}'))
   db_tables = json.loads(request.POST.get('dbTables', '[]'))
+  database = request.POST.get('database', 'default')
 
   api = get_api(request.user, interface)
 
-  data = api.top_columns(db_tables=db_tables, connector=connector)
+  data = api.top_columns(db_tables=db_tables, connector=connector, database_name=database)
+  data = list(data)
 
   response['status'] = 0
   response['values'] = data or []
@@ -456,7 +458,6 @@ def upload_query(request):
   query_id = request.POST.get('query_id')
   sql_query = request.POST.get('locations')
   sql_query = json.loads(sql_query) # extracting the SQL query in the form of a list
-  print('sql_query', sql_query)
 
   if OPTIMIZER.AUTO_UPLOAD_QUERIES.get() and source_platform in ('hive', 'impala') and query_id:
     try:

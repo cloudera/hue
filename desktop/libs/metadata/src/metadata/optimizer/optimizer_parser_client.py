@@ -22,7 +22,6 @@ import sys
 from desktop.lib.exceptions_renderable import PopupException
 from django.db.models import Count
 from desktop.models import SqlQueryParser
-
 from metadata.optimizer.base import Api
 
 if sys.version_info[0] > 2:
@@ -81,3 +80,10 @@ class OptimizerParserClient(Api):
                 i = i+1
 
             return data
+    
+    def top_columns(self, db_tables=None, page_size=100, startingToken=None, connector=None, database_name='default'):
+      db_tables = ' '.join(map(str, db_tables))
+      db_table_only = db_tables.split(".")[1]
+      results = SqlQueryParser.objects.filter(database=database_name, table_name = db_table_only).values('database', 'table_name', 'column_name').annotate(usage_count=Count('*')).order_by('-usage_count')[:5]
+
+      return results
