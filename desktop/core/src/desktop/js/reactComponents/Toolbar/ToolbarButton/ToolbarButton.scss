@@ -1,0 +1,76 @@
+@use "sass:color";
+
+@import '../ToolbarShared.scss';
+
+$antd-btn-padding-horizontal: 12px;
+$focus-border-width: 3px;
+$focus-border-color: $fluidx-blue-200;
+
+@mixin tab-focus-apparence() {
+  // Prevent antd transition when modifying padding to allow
+  // for the focus-visible border.
+  transition: 0s padding ease-out;
+
+  &:focus-visible {
+    border-color: $focus-border-color;
+    border-radius: $border-radius-base;
+    transition: none;
+  }
+}
+
+@mixin set-sizes($font-size, $icon-size, $toolbar-height) {
+  height: $toolbar-height;
+  font-size: $font-size;
+
+  svg {
+    height: $icon-size;
+    width: $icon-size;
+  }
+}
+
+.antd {
+  .hue-toolbar {
+    .hue-toolbar-button__wrapper {
+      list-style-type: none;
+      height: 100%;
+      display: flex;
+      align-items: center;
+    }
+
+    .hue-toolbar-button {
+      @include tab-focus-apparence;
+
+      padding: 0 $antd-btn-padding-horizontal;
+      border-width: $focus-border-width;
+      border-color: transparent;
+      border-radius: 0;
+
+      &:hover {
+        background-color: color.adjust($toolbar-background-color, $lightness: -3%);
+      }
+
+      span {
+        display: flex;
+        align-items: center;
+        gap: $fluidx-spacing-xxs;
+      }
+    }
+
+    &--small .hue-toolbar-button {
+      @include set-sizes(12px, 14px, $toolbar-height-small);
+    }
+
+    &--medium .hue-toolbar-button {
+      @include set-sizes(14px, 16px, $toolbar-height-medium);
+    }
+
+    &--large .hue-toolbar-button {
+      @include set-sizes(16px, 20px, $toolbar-height-large);
+    }
+  }
+}
+
+// Fix to cancel out hardcoded padding by antd for anchor based buttons
+a.hue-toolbar-button.ant-btn {
+  display: flex;
+}

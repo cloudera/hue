@@ -53,7 +53,7 @@ def _handle_idbroker_ha(fs=None):
       id_broker_addr_list = id_broker_addr.split(',')
       for id_broker_addr in id_broker_addr_list:
         try:
-          response = requests.get(id_broker_addr + 'dt/knoxtoken/api/v1/token', auth=HTTPKerberosAuth(), verify=False)
+          response = requests.get(id_broker_addr.rstrip('/') + '/dt/knoxtoken/api/v1/token', auth=HTTPKerberosAuth(), verify=False)
         except Exception as e:
           if 'Name or service not known' in str(e):
             LOG.warn('IDBroker %s is not available for use' % id_broker_addr)

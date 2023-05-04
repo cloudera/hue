@@ -766,7 +766,8 @@ class WebHdfs(Hdfs):
     if dir_mode is None:
       dir_mode = self.getDefaultDirPerms()
 
-    self.do_as_user(owner, self.mkdir, destination, mode=dir_mode)
+    if not self.exists(destination):
+      self.do_as_user(owner, self.mkdir, destination, mode=dir_mode)
 
     for stat in self.listdir_stats(source):
       source_file = stat.path
@@ -797,7 +798,7 @@ class WebHdfs(Hdfs):
     if owner is None:
       owner = self.user
 
-    # Hue was defauling permissions on copying files to the permissions
+    # Hue was defaulting permissions on copying files to the permissions
     # of the original file, but was not doing the same for directories
     # changed below for directories to remain consistent
     if dir_mode is None:

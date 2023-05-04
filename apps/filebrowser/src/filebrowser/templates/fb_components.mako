@@ -51,6 +51,12 @@ else:
               <svg class="hi"><use xlink:href='#hi-adls'></use></svg>
             </span>
           </li>
+        %elif path.lower().find('ofs://') == 0:
+          <li style="padding-top: 12px">
+            <span class="breadcrumb-link homeLink">
+              <svg class="hi"><use xlink:href='#hi-ofs'></use></svg>
+            </span>
+          </li>
         %else:
           <li><a class="pointer breadcrumb-link homeLink" data-bind="click: $root.openHome, attr:{'href': window.HUE_BASE_URL + '/filebrowser/view=' + window.USER_HOME_DIR  + '?default_to_home'}">
             <i class="fa fa-home"></i> ${_('Home')}</a>

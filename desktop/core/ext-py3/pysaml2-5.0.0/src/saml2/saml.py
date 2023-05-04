@@ -87,8 +87,8 @@ XSD = "xs"
 NS_SOAP_ENC = "http://schemas.xmlsoap.org/soap/encoding/"
 
 
-_b64_decode_fn = getattr(base64, 'decodebytes', base64.decodestring)
-_b64_encode_fn = getattr(base64, 'encodebytes', base64.encodestring)
+_b64_decode_fn = getattr(base64, 'decodebytes', base64.decodebytes)
+_b64_encode_fn = getattr(base64, 'encodebytes', base64.encodebytes)
 
 
 class AttributeValueBase(SamlBase):

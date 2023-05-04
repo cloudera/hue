@@ -23,12 +23,13 @@ import logging
 import aws.client
 import azure.client
 import desktop.lib.fs.gc.client
+import desktop.lib.fs.ozone.client
 
 from aws.conf import is_enabled as is_s3_enabled, has_s3_access
 from azure.conf import is_adls_enabled, is_abfs_enabled, has_adls_access, has_abfs_access
 
 
-from desktop.conf import is_gs_enabled, has_gs_access, DEFAULT_USER
+from desktop.conf import is_gs_enabled, has_gs_access, DEFAULT_USER, is_ofs_enabled, has_ofs_access, RAZ
 
 from desktop.lib.fs.proxyfs import ProxyFS
 from desktop.lib.python_util import current_ms_from_utc
@@ -38,7 +39,7 @@ from hadoop.cluster import get_hdfs, _make_filesystem
 from hadoop.conf import has_hdfs_enabled
 
 
-SUPPORTED_FS = ['hdfs', 's3a', 'adl', 'abfs', 'gs']
+SUPPORTED_FS = ['hdfs', 's3a', 'adl', 'abfs', 'gs', 'ofs']
 CLIENT_CACHE = None
 _DEFAULT_USER = DEFAULT_USER.get()
 
@@ -65,6 +66,8 @@ def has_access(fs=None, user=None):
     return has_abfs_access(user)
   elif fs == 'gs':
     return has_gs_access(user)
+  elif fs == 'ofs':
+    return has_ofs_access(user)
 
 
 def is_enabled(fs):
@@ -78,6 +81,8 @@ def is_enabled(fs):
     return is_abfs_enabled()
   elif fs == 'gs':
     return is_gs_enabled()
+  elif fs == 'ofs':
+    return is_ofs_enabled()
 
 
 def is_enabled_and_has_access(fs=None, user=None):
@@ -95,13 +100,15 @@ def _make_client(fs, name, user):
     return azure.client._make_abfs_client(name, user)
   elif fs == 'gs':
     return desktop.lib.fs.gc.client._make_client(name, user)
+  elif fs == 'ofs':
+    return desktop.lib.fs.ozone.client._make_ofs_client(name, user)
   return None
 
 
 def _get_client(fs=None):
   if fs == 'hdfs':
     return get_hdfs
-  elif fs in ['s3a', 'adl', 'abfs', 'gs']:
+  elif fs in ['s3a', 'adl', 'abfs', 'gs', 'ofs']:
     return partial(_get_client_cached, fs)
   return None
 
@@ -110,8 +117,15 @@ def _get_client_cached(fs, name, user):
   global CLIENT_CACHE
   if CLIENT_CACHE is None:
     CLIENT_CACHE = {}
-  # We don't want to cache by username when IDBroker not enabled
-  cache_key = _get_cache_key(fs, name, user) if conf_idbroker.is_idbroker_enabled(fs) else _get_cache_key(fs, name)
+
+  if (conf_idbroker.is_idbroker_enabled(fs) or RAZ.IS_ENABLED.get()):
+    cache_key = _get_cache_key(fs, name, user)
+  else:
+    # By default, caching via default hue user key because there are no user-mapping like scenarios same as in IDBroker or RAZ.
+    # For FS like S3 and ABFS: Default case is via access key and secret which just allows everyone to access everything.
+    # For FS like HDFS and Ozone: This user mapping is handled behind the scenes and we are impersonating user for them.
+    cache_key = _get_cache_key(fs, name)
+
   client = CLIENT_CACHE.get(cache_key)
 
   # Expiration from IDBroker returns java timestamp in MS

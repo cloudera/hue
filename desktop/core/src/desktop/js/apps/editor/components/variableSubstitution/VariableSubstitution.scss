@@ -1,4 +1,4 @@
-@import '../../../../components/styles/colors.scss';
+@import '../../../../components/styles/variables.scss';
 @import '../../../../components/styles/mixins.scss';
 
 .variable-substitution {
@@ -32,7 +32,7 @@
 
       input {
         font-size: 14px;
-        border: 1px solid $fluid-gray-300;
+        border: 1px solid $fluidx-gray-300;
         margin: 0;
         padding: 3px 6px;
         border-radius: 0 2px 2px 0;
@@ -51,13 +51,13 @@
       padding: 3px 6px;
       font-size: 14px;
       vertical-align: top;
-      border: 1px solid $fluid-gray-300;
+      border: 1px solid $fluidx-gray-300;
     }
 
     .variable-label {
       min-width: 16px;
-      background-color: $fluid-gray-050;
-      color: $fluid-gray-800;
+      background-color: $fluidx-gray-050;
+      color: $fluidx-gray-800;
       border-radius: 2px 0 0 2px;
       border-right: none;
       text-align: center;

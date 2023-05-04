@@ -14,15 +14,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-@use '../../../components/styles/hue5-globals.scss';
-@import '../../../components/styles/variables';
+@use 'classes';
+@use 'variables' as vars;
 
 .antd {
   .hue-push-drawer-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: $fluid-spacing-s;
+    margin-bottom: vars.$fluidx-spacing-s;
   }
 
   .hue-push-drawer-header__title {

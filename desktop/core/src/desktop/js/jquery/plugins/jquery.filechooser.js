@@ -125,6 +125,23 @@ const defaults = {
         home: '',
         name: 'ABFS'
       }
+    },
+    ofs: {
+      scheme: 'ofs',
+      root: 'ofs://',
+      home: '/?default_ofs_home',
+      icon: {
+        svg: {
+          brand: '#hi-ofs',
+          home: '#hi-ofs'
+        },
+        brand: 'fa-windows',
+        home: 'fa-windows'
+      },
+      label: {
+        home: '',
+        name: 'OFS'
+      }
     }
   },
   fsSelected: 'hdfs',

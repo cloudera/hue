@@ -461,26 +461,32 @@ else:
     <div id="createDirectoryModal" class="modal hide fade">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
-        <!-- ko if: (!isS3() && !isABFS()) || (isS3() && !isS3Root()) || (isABFS() && !isABFSRoot()) -->
+        <!-- ko if: (!isS3() && !isABFS() && !isOFS()) || (isS3() && !isS3Root()) || (isABFS() && !isABFSRoot()) || (isOFS() && !isOFSServiceID() && !isOFSVol())  -->
         <h2 class="modal-title">${_('Create Directory')}</h2>
         <!-- /ko -->
-        <!-- ko if: isS3() && isS3Root() -->
+        <!-- ko if: (isS3() && isS3Root()) || (isOFS() && isOFSVol()) -->
         <h2 class="modal-title">${_('Create Bucket')}</h2>
         <!-- /ko -->
         <!-- ko if: isABFS() && isABFSRoot() -->
         <h2 class="modal-title">${_('Create File System')}</h2>
         <!-- /ko -->
+        <!-- ko if: isOFS() && isOFSServiceID() -->
+        <h2 class="modal-title">${_('Create Volume')}</h2>
+        <!-- /ko -->
       </div>
       <div class="modal-body">
         <label>
-          <!-- ko if: (!isS3() && !isABFS()) || (isS3() && !isS3Root()) || (isABFS() && !isABFSRoot()) -->
+          <!-- ko if: (!isS3() && !isABFS() && !isOFS()) || (isS3() && !isS3Root()) || (isABFS() && !isABFSRoot()) || (isOFS() && !isOFSServiceID() && !isOFSVol()) -->
           ${_('Directory Name')}
           <!-- /ko -->
-          <!-- ko if: isS3() && isS3Root() -->
+          <!-- ko if: (isS3() && isS3Root()) || (isOFS() && isOFSVol()) -->
           ${_('Bucket Name')}
           <!-- /ko -->
           <!-- ko if: isABFS() && isABFSRoot() -->
           ${_('File System Name')}
+          <!-- /ko -->
+          <!-- ko if: isOFS() && isOFSServiceID() -->
+          ${_('Volume Name')}
           <!-- /ko -->
           <input id="newDirectoryNameInput" name="name" value="" type="text" class="input-xlarge"/></label>
           <input type="hidden" name="path" data-bind="value: currentPath"/>
@@ -494,6 +500,12 @@ else:
         </div>
         <div id="smallFileSystemNameAlert" class="hide" style="position: absolute; left: 10px;">
           <span class="label label-important"><span class="newName"></span> ${_('File system requires namesize to be 3 or more characters')}</span>
+        </div>
+        <div id="volumeBucketNameAlert" class="hide" style="position: absolute; left: 10px;">
+          <span class="label label-important"><span class="newName"></span> ${_('Volume and Bucket name should be 3 to 63 characters.')}</span>
+        </div>
+        <div id="upperCaseVolumeBucketNameAlert" class="hide" style="position: absolute; left: 10px;">
+          <span class="label label-important"><span class="newName"></span> ${_('Upper case characters are not supported for Volume and Bucket names.')}</span>
         </div>
         <a class="btn" href="#" data-dismiss="modal">${_('Cancel')}</a>
         <input class="btn btn-primary" type="submit" value="${_('Create')}" />
@@ -575,12 +587,12 @@ else:
   <!-- actions context menu -->
   <ul class="context-menu dropdown-menu">
   <!-- ko ifnot: $root.inTrash -->
-    <li data-bind="visible: (!isS3() && !isABFS()) || (isS3() && !isS3Root()) || (isABFS() && !isABFSRoot()), css: {'disabled': $root.selectedFiles().length != 1 || isCurrentDirSelected().length > 0}">
+    <li data-bind="visible: (!isS3() && !isABFS() && !isOFS()) || (isS3() && !isS3Root()) || (isABFS() && !isABFSRoot()) || (isOFS() && !isOFSServiceID() && !isOFSVol()), css: {'disabled': $root.selectedFiles().length != 1 || isCurrentDirSelected().length > 0}">
     <a href="javascript: void(0)" title="${_('Rename')}" data-bind="click: ($root.selectedFiles().length == 1 && isCurrentDirSelected().length == 0) ? $root.renameFile: void(0)"><i class="fa fa-fw fa-font"></i>
     ${_('Rename')}</a></li>
-    <li data-bind="visible: (!isS3() && !isABFS()) || (isS3() && !isS3Root()) || (isABFS() && !isABFSRoot()), css: {'disabled': $root.selectedFiles().length == 0 || isCurrentDirSelected().length > 0}">
+    <li data-bind="visible: (!isS3() && !isABFS() && !isOFS()) || (isS3() && !isS3Root()) || (isABFS() && !isABFSRoot()) || (isOFS() && !isOFSServiceID() && !isOFSVol()), css: {'disabled': $root.selectedFiles().length == 0 || isCurrentDirSelected().length > 0}">
     <a href="javascript: void(0)" title="${_('Move')}" data-bind="click: ( $root.selectedFiles().length > 0 && isCurrentDirSelected().length == 0) ? $root.move: void(0)"><i class="fa fa-fw fa-random"></i> ${_('Move')}</a></li>
-    <li data-bind="visible: (!isS3() && !isABFS()) || (isS3() && !isS3Root()) || (isABFS() && !isABFSRoot()), css: {'disabled': $root.selectedFiles().length == 0 || isCurrentDirSelected().length > 0}">
+    <li data-bind="visible: (!isS3() && !isABFS() && !isOFS()) || (isS3() && !isS3Root()) || (isABFS() && !isABFSRoot()) || (isOFS() && !isOFSServiceID() && !isOFSVol()), css: {'disabled': $root.selectedFiles().length == 0 || isCurrentDirSelected().length > 0}">
     <a href="javascript: void(0)" title="${_('Copy')}" data-bind="click: ($root.selectedFiles().length > 0 && isCurrentDirSelected().length == 0) ? $root.copy: void(0)"><i class="fa fa-fw fa-files-o"></i> ${_('Copy')}</a></li>
     % if show_download_button:
     <li data-bind="css: {'disabled': $root.inTrash() || $root.selectedFiles().length != 1 || selectedFile().type != 'file'}">
@@ -1062,6 +1074,10 @@ else:
         return self.currentPath().toLowerCase().indexOf('abfs://') === 0;
       });
 
+      self.isOFS = ko.pureComputed(function () {
+        return self.currentPath().toLowerCase().indexOf('ofs://') === 0;
+      });
+
       self.scheme = ko.pureComputed(function () {
         var path = self.currentPath();
         return path.substring(0, path.indexOf(':/')) || "hdfs";
@@ -1073,6 +1089,8 @@ else:
           return 'adls';
         } else if (scheme === 's3a' ){
           return 's3';
+        } else if (scheme === 'ofs' ){
+          return 'ofs';
         } else if (!scheme || scheme == 'hdfs') {
           return 'hdfs';
         } else {
@@ -1088,6 +1106,8 @@ else:
           return 'adl:/';
         } else if (path.indexOf('abfs://') >= 0) {
           return 'abfs://';
+        } else if (path.indexOf('ofs://') >= 0) {
+          return 'ofs://';
         } else {
           return '/';
         }
@@ -1106,13 +1126,13 @@ else:
         return currentPath.indexOf('/') === 0 || currentPath.indexOf('hdfs') === 0
       });
       self.isCompressEnabled = ko.pureComputed(function () {
-        return !self.isS3() && !self.isAdls() && !self.isABFS();
+        return !self.isS3() && !self.isAdls() && !self.isABFS() && !self.isOFS();
       });
       self.isSummaryEnabled = ko.pureComputed(function () {
-        return self.isHdfs();
+        return self.isHdfs() || self.isOFS();
       });
       self.isPermissionEnabled = ko.pureComputed(function () {
-        return !self.isS3() && !self.isABFSRoot();
+        return !self.isS3() && !self.isABFSRoot() && !self.isOFS();
       });
       self.isReplicationEnabled = ko.pureComputed(function () {
         return self.isHdfs();
@@ -1130,6 +1150,18 @@ else:
 
       self.isABFSRoot = ko.pureComputed(function () {
         return self.isABFS() && self.currentPath().toLowerCase() === 'abfs://';
+      });
+
+      self.isOFSRoot = ko.pureComputed(function () {
+        return self.isOFS() && self.currentPath().toLowerCase() === 'ofs://';
+      });
+
+      self.isOFSServiceID = ko.pureComputed(function () {
+        return self.isOFS() && self.currentPath().split("/").length === 3 && self.currentPath().split("/")[2] !== '';
+      });
+
+      self.isOFSVol = ko.pureComputed(function () {
+        return self.isOFS() && self.currentPath().split("/").length === 4 && self.currentPath().split("/")[3] !== '';
       });
 
       self.inTrash = ko.computed(function() {
@@ -1832,6 +1864,20 @@ else:
           resetPrimaryButtonsStatus(); //globally available
           return false;
         }
+        if (self.isOFSServiceID() || self.isOFSVol()) {
+          if ($("#newDirectoryNameInput").val().length < 3 || $("#newDirectoryNameInput").val().length > 63) {
+            $("#volumeBucketNameAlert").show();
+            $("#newDirectoryNameInput").addClass("fieldError");
+            resetPrimaryButtonsStatus(); //globally available
+            return false;
+          }
+          if ($("#newDirectoryNameInput").val() !== $("#newDirectoryNameInput").val().toLowerCase()) {
+            $("#upperCaseVolumeBucketNameAlert").show();
+            $("#newDirectoryNameInput").addClass("fieldError");
+            resetPrimaryButtonsStatus(); //globally available
+            return false;
+          }
+        }
         $(formElement).ajaxSubmit({
           dataType:  'json',
           success: function() {
@@ -1990,6 +2036,14 @@ else:
         });
 
         $("#fileUploader").on('fb:updatePath', function (e, options) {
+          const uploadingToOzone = self.currentPath().startsWith("ofs://");
+          const ozoneSizeLimit = Math.min(
+            ...[UPLOAD_CHUNK_SIZE, MAX_FILE_SIZE_UPLOAD_LIMIT].filter(Number.isFinite)
+          );
+          const newSizeLimit = uploadingToOzone ? ozoneSizeLimit : MAX_FILE_SIZE_UPLOAD_LIMIT;
+          if (newSizeLimit) {
+            uploader.setOption('sizeLimit', newSizeLimit);
+          }
           uploader.setParams({
             dest: options.dest,
             fileFieldLabel: "hdfs_file"
@@ -2416,6 +2470,8 @@ else:
         $("#directoryNameRequiredAlert").hide();
         $("#directoryNameExistsAlert").hide();
         $("#smallFileSystemNameAlert").hide();
+        $("#volumeBucketNameAlert").hide();
+        $("#upperCaseVolumeBucketNameAlert").hide();
       });
 
       $("#newFileNameInput").focus(function () {

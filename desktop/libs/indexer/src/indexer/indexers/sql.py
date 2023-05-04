@@ -183,6 +183,7 @@ class SQLIndexer(object):
     if external_path.lower().startswith("abfs"): #this is to check if its using an ABFS path
       external_path = abfspath(external_path)
 
+
     tbl_properties = OrderedDict()
     if skip_header:
       tbl_properties['skip.header.line.count'] = '1'

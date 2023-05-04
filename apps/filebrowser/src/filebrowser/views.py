@@ -56,6 +56,7 @@ from desktop.lib.django_util import JsonResponse
 from desktop.lib.export_csvxls import file_reader
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.fs import splitpath
+from desktop.lib.fs.ozone.ofs import get_ofs_home_directory
 from desktop.lib.i18n import smart_str
 from desktop.lib.paths import SAFE_CHARACTERS_URI, SAFE_CHARACTERS_URI_COMPONENTS
 from desktop.lib.tasks.compress_files.compress_utils import compress_files_in_hdfs
@@ -69,7 +70,7 @@ from hadoop.fs.fsutils import do_overwrite_save
 from useradmin.models import User, Group
 
 from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE, MAX_SNAPPY_DECOMPRESSION_SIZE,\
-    SHOW_DOWNLOAD_BUTTON, SHOW_UPLOAD_BUTTON, REDIRECT_DOWNLOAD
+    SHOW_DOWNLOAD_BUTTON, SHOW_UPLOAD_BUTTON, REDIRECT_DOWNLOAD, FILE_DOWNLOAD_CACHE_CONTROL
 from filebrowser.lib.archives import archive_factory
 from filebrowser.lib.rwx import filetype, rwx
 from filebrowser.lib import xxd
@@ -146,7 +147,8 @@ def _decode_slashes(path):
   # This is a fix for some installations where the path is still having the slash (/) encoded
   # as %2F while the rest of the path is actually decoded. 
   encoded_slash = '%2F'
-  if path.startswith(encoded_slash) or path.startswith('abfs:' + encoded_slash) or path.startswith('s3a:' + encoded_slash):
+  if path.startswith(encoded_slash) or path.startswith('abfs:' + encoded_slash) or \
+    path.startswith('s3a:' + encoded_slash) or path.startswith('ofs:' + encoded_slash):
     path = path.replace(encoded_slash, '/')
 
   return path
@@ -159,6 +161,8 @@ def _normalize_path(path):
     path = path.replace('abfs:/', 'abfs://')
   if path.startswith('s3a:/') and not path.startswith('s3a://'):
     path = path.replace('s3a:/', 's3a://')
+  if path.startswith('ofs:/') and not path.startswith('ofs://'):
+    path = path.replace('ofs:/', 'ofs://')
 
   return path
 
@@ -193,8 +197,10 @@ def download(request, path):
     request.fs.read(path, offset=0, length=1)
   except WebHdfsException as e:
     if e.code == 403:
-      raise PopupException(_('User %s is not authorized to download file at path "%s"') %
-                           (request.user.username, path))
+      raise PopupException(_('User %s is not authorized to download file at path "%s"') % (request.user.username, path))
+    elif request.fs._get_scheme(path).lower() == 'abfs' and e.code == 416:
+      # Safe to skip ABFS exception of code 416 for zero length objects, file will get downloaded anyway.
+      logger.exception('Skipping exception from ABFS: ' + str(e))
     else:
       raise PopupException(_('Failed to download file at path "%s": %s') % (path, e))
 
@@ -203,7 +209,8 @@ def download(request, path):
     setattr(response, 'redirect_override', True)
   else:
     response = StreamingHttpResponse(file_reader(fh), content_type=content_type)
-    response["Cache-Control"] = 'no-cache' # Browsers must not cache files but always download
+    if FILE_DOWNLOAD_CACHE_CONTROL.get():
+      response["Cache-Control"] = FILE_DOWNLOAD_CACHE_CONTROL.get()
     response["Last-Modified"] = http_date(stats['mtime'])
     response["Content-Length"] = stats['size']
     response['Content-Disposition'] = request.GET.get('disposition', 'attachment; filename="' + stats['name'] + '"') \
@@ -239,6 +246,15 @@ def view(request, path):
 
   if 'default_s3_home' in request.GET:
     home_dir_path = get_s3_home_directory(request.user)
+    if request.fs.isdir(home_dir_path):
+      return format_preserving_redirect(
+          request,
+          '/filebrowser/view=' + urllib_quote(home_dir_path.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS)
+      )
+
+  # default_ofs_home is set in jquery.filechooser.js
+  if 'default_ofs_home' in request.GET:
+    home_dir_path = get_ofs_home_directory()
     if request.fs.isdir(home_dir_path):
       return format_preserving_redirect(
           request,
@@ -1305,10 +1321,21 @@ def copy(request):
   recurring = ['dest_path']
   params = ['src_path']
   def bulk_copy(*args, **kwargs):
+    ofs_skip_files = ''
     for arg in args:
       if arg['src_path'] == arg['dest_path']:
         raise PopupException(_('Source path and destination path cannot be same'))
-      request.fs.copy(arg['src_path'], arg['dest_path'], recursive=True, owner=request.user)
+
+      # Copy method for OFS returns a string of skipped files if their size is greater than chunk size.
+      if arg['src_path'].startswith('ofs://'):
+        ofs_skip_files += request.fs.copy(arg['src_path'], arg['dest_path'], recursive=True, owner=request.user)
+      else:
+        request.fs.copy(arg['src_path'], arg['dest_path'], recursive=True, owner=request.user)
+    
+    # Send skipped filenames via raising exception to let users know.
+    if ofs_skip_files:
+      raise PopupException("Following files were skipped due to file size limitations:" + ofs_skip_files)
+
   return generic_op(CopyFormSet, request, bulk_copy, ["src_path", "dest_path"], None,
                     data_extractor=formset_data_extractor(recurring, params),
                     arg_extractor=formset_arg_extractor,

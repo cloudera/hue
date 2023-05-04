@@ -14,10 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-@use '../../components/styles/hue5-globals.scss';
-@import '../../components/styles/variables';
+@use 'classes';
+@use 'variables' as vars;
 
-$spacing: $fluid-spacing-s;
+$spacing: vars.$fluidx-spacing-s;
 
 // The .antd wrapper is needed to bind closer than the reset-globals.less
 // which resets stuff like borders etc needed for antd components.
@@ -30,7 +30,7 @@ $spacing: $fluid-spacing-s;
 
   .hue-push-drawer__content {
     position: absolute;
-    transition: $animation-duration-base;
+    transition: vars.$animation-duration-base;
     height: 100%;
     width: 100%;
     padding: $spacing;

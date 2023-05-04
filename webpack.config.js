@@ -61,7 +61,17 @@ const config = {
       {
         test: /\.scss$/,
         exclude: /node_modules/,
-        use: ['style-loader', 'css-loader', 'sass-loader']
+        use: ['style-loader', 'css-loader', {
+          loader: 'sass-loader',
+          options: {
+            sassOptions: {
+              includePaths: [
+                'desktop/core/src/desktop/js/components/styles',
+                'node_modules',
+              ],
+            },
+          },
+        },]
       },
       {
         test: /\.less$/i,
@@ -96,6 +106,8 @@ const config = {
     }
   },
   output: {
+    // Needed, at the time of writing with webpack 5.54.0, when using node 18.14.1 and later. 
+    hashFunction: 'xxhash64',
     path: __dirname + '/desktop/core/src/desktop/static/desktop/js/bundles/hue',
     filename: '[name]-bundle-[fullhash].js',
     chunkFilename: '[name]-chunk-[fullhash].js',
@@ -110,8 +122,6 @@ const config = {
     maxAssetSize: 400 * 1024 // 400kb
   },
   plugins: getPluginConfig(BUNDLES.HUE).concat([
-    // Needed to wrap antd and prevent it from affecting global styles
-    new webpack.NormalModuleReplacementPlugin( /node_modules\/antd\/lib\/style\/index\.less/, `${__dirname}/desktop/core/static/desktop/less/root-wrapped-antd.less`),
     new CleanWebpackPlugin([`${__dirname}/desktop/core/src/desktop/static/desktop/js/bundles/hue`]),    
   ]),
   resolve: {

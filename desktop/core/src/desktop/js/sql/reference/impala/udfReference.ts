@@ -1540,10 +1540,10 @@ const CONDITIONAL_FUNCTIONS: UdfCategoryFunctions = {
     name: 'nvl2',
     returnTypes: ['T'],
     arguments: [[{ type: 'T' }], [{ type: 'T' }], [{ type: 'T' }]],
-    signature: 'nvl2(T a, T ifNull, T ifNotNull)',
+    signature: 'nvl2(T a, T ifNotNull, T ifNull)',
     draggable: 'nvl2()',
     description:
-      'Enhanced variant of the nvl() function. Tests an expression and returns different result values depending on whether it is NULL or not. If the first argument is NULL, returns the second argument. If the first argument is not NULL, returns the third argument. Equivalent to the nvl2() function from Oracle.'
+      'Returns the second argument, ifNotNull, if the first argument is not NULL. Returns the third argument, ifNull, if the first argument is NULL.'
   },
   zeroifnull: {
     name: 'zeroifnull',

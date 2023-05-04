@@ -1,11 +1,11 @@
-@import '../../../../components/styles/colors.scss';
+@import '../../../../components/styles/variables.scss';
 @import '../../../../components/styles/mixins.scss';
 
 .ace-editor-component {
   height: 100%;
   width: 100%;
   text-align: left;
-  color: $fluid-black;
+  color: $fluidx-black;
 
   .ace-editor {
     height: 100%;
@@ -45,7 +45,7 @@
 
           50% {
             background-color: rgba(0, 140, 255, 0.4);
-            color: $fluid-gray-700;
+            color: $fluidx-gray-700;
           }
 
           100% {
@@ -55,18 +55,18 @@
       }
 
       &.ace-failed-gutter-decoration {
-        background-color: $fluid-red-050;
-        border-right: 1px solid $fluid-red-700;
+        background-color: $fluidx-red-050;
+        border-right: 1px solid $fluidx-red-700;
       }
 
       &.ace-completed-gutter-decoration {
-        background-color: $fluid-green-050;
-        border-right: 1px solid $fluid-green-400;
+        background-color: $fluidx-green-050;
+        border-right: 1px solid $fluidx-green-400;
       }
 
       &.ace_error {
-        background-color: $fluid-red-050;
-        border-right: 1px solid $fluid-red-700;
+        background-color: $fluidx-red-050;
+        border-right: 1px solid $fluidx-red-700;
         border-left: none;
       }
     }
@@ -89,7 +89,7 @@
 
       .ace-failed-marker,
       .ace_error-line {
-        background-color: $fluid-red-050 !important;
+        background-color: $fluidx-red-050 !important;
         opacity: 0.5;
         z-index: 6;
       }
@@ -101,22 +101,22 @@
       border-right: 1px solid transparent;
 
       &.ace-active-gutter-decoration {
-        background-color: $fluid-slate-700;
-        color: $fluid-slate-100;
-        border-right: 1px solid $fluid-slate-600;
+        background-color: $fluidx-slate-700;
+        color: $fluidx-slate-100;
+        border-right: 1px solid $fluidx-slate-600;
       }
 
       &.ace_error {
-        background-color: $fluid-red-050;
-        border-right: 1px solid $fluid-red-700;
+        background-color: $fluidx-red-050;
+        border-right: 1px solid $fluidx-red-700;
         border-left: none;
       }
     }
 
     .hue-ace-location {
       position: absolute;
-      background-color: $fluid-slate-700;
-      border: 1px solid $fluid-slate-700;
+      background-color: $fluidx-slate-700;
+      border: 1px solid $fluidx-slate-700;
       border-radius: 1px;
       margin-left: -1px;
       margin-top: -1px;
@@ -131,7 +131,7 @@
 
       .ace-failed-marker,
       .ace_error-line {
-        background-color: $fluid-red-050 !important;
+        background-color: $fluidx-red-050 !important;
         opacity: 0.5;
         z-index: 6;
       }
@@ -157,9 +157,9 @@
     width: 300px;
     max-height: 250px;
     overflow: hidden;
-    border: 1px solid $fluid-gray-300;
+    border: 1px solid $fluidx-gray-300;
     border-radius: 2px;
-    background-color: $fluid-white;
+    background-color: $fluidx-white;
   }
 
   .autocompleter-suggestions {
@@ -176,7 +176,7 @@
 
     position: relative;
     padding: 5px;
-    background-color: $fluid-gray-040;
+    background-color: $fluidx-gray-040;
     line-height: 20px;
     font-size: 14px;
     overflow: hidden;
@@ -184,7 +184,7 @@
     text-overflow: ellipsis;
 
     .popular {
-      color: $fluid-orange-300;
+      color: $fluidx-orange-300;
       margin-top: 3px;
       float: right;
     }
@@ -219,7 +219,7 @@
 
   .autocompleter-categories > div.active {
     display: inline-block;
-    border-bottom: 2px solid $fluid-blue-400;
+    border-bottom: 2px solid $fluidx-blue-400;
     cursor: default;
   }
 
@@ -232,7 +232,7 @@
   .autocompleter-suggestion {
     height: 19px;
     clear: both;
-    background-color: $fluid-white;
+    background-color: $fluidx-white;
     padding: 3px;
     cursor: pointer;
     position: relative;
@@ -242,11 +242,11 @@
   }
 
   .autocompleter-suggestion:hover {
-    background-color: $fluid-gray-200;
+    background-color: $fluidx-gray-200;
   }
 
   .autocompleter-suggestion.selected {
-    background-color: $fluid-gray-300;
+    background-color: $fluidx-gray-300;
   }
 
   .autocompleter-suggestion-value {
@@ -269,7 +269,7 @@
     right: 0;
     top: 3px;
     padding-right: 3px;
-    color: $fluid-gray-700;
+    color: $fluidx-gray-700;
     max-width: 65px;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -297,7 +297,7 @@
 
   .autocompleter-details-contents .details-attribute,
   .autocompleter-details-contents .details-popularity {
-    color: $fluid-gray-700;
+    color: $fluidx-gray-700;
     display: inline-block;
   }
 
@@ -309,7 +309,7 @@
   }
 
   .autocompleter-details-contents .details-popularity .progress .bar {
-    background-color: $fluid-blue-400;
+    background-color: $fluidx-blue-400;
   }
 
   .autocompleter-details-contents .details-comment,
@@ -317,7 +317,7 @@
     font-size: 14px;
     margin-top: 5px;
     margin-bottom: 5px;
-    color: $fluid-gray-700;
+    color: $fluidx-gray-700;
   }
 
   .autocompleter-details-contents .details-header {
@@ -330,7 +330,7 @@
     margin-top: 5px;
     margin-bottom: 5px;
     font-size: 13px;
-    color: $fluid-gray-700;
+    color: $fluidx-gray-700;
     font-style: italic;
   }
 
@@ -341,9 +341,9 @@
   }
 
   .autocompleter-details-contents .details-code {
-    background-color: $fluid-gray-040;
+    background-color: $fluidx-gray-040;
     padding: 3px;
-    color: $fluid-gray-700;
+    color: $fluidx-gray-700;
     font: 12px normal Roboto Mono, Menlo, Monaco, Consolas, "Courier New", monospace;
     direction: ltr;
   }
