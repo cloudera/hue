@@ -189,6 +189,19 @@ class TestApi2(object):
     assert_true(len(response.content) < len(private_response.content))
 
 
+  def test_url_password_hiding(self):
+    client = make_logged_in_client(username="api2_superuser", groupname="default", recreate=True, is_superuser=True)
+    user = User.objects.get(username="api2_superuser")
+
+    data_to_escape = b"protocol://user:very_secret_password@host:1234/some/url"
+    clear = HIVE_SERVER_HOST.set_for_testing(data_to_escape)
+    try:
+      response = client.get('/desktop/api2/get_hue_config', data={})
+      assert_true(b"protocol://user:**********@host:1234/some/url" in response.content, response.content)
+    finally:
+      clear()
+
+
   def test_get_config(self):
     response = self.client.get('/desktop/api2/get_config')
 
