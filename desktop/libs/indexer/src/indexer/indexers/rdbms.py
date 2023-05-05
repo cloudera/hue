@@ -100,7 +100,7 @@ def _get_api(request):
     name = type
     interface = file_format['inputFormat']
 
-  return get_api(request, { 'type': type, 'interface': interface, 'options': options, 'query_server': query_server, 'name': name})
+  return get_api(request, {'type': type, 'interface': interface, 'options': options, 'query_server': query_server, 'name': name})
 
 def jdbc_db_list(request):
   format_ = {'data': [], 'status': 1}
@@ -175,10 +175,25 @@ def run_sqoop(request, source, destination, start_time):
       rdbms_port = source['rdbmsPort']
       rdbms_user_name = source['rdbmsUsername']
       rdbms_password = source['rdbmsPassword']
+      rdbms_driver = source['rdbmsType']
       url = rdbms_host
-
+      # If Driver type is not jdbc, url variable should be regenerated with jdbc scheme to make sqoop command valid.
+      if rdbms_driver != 'jdbc':
+        url = 'jdbc:%(rdbmsType)s://%(url)s:%(rdbmsPort)s' % {
+          'rdbmsType': rdbms_driver,
+          'url': url,
+          'rdbmsPort': rdbms_port
+        }
+      
     password_file_path = request.fs.join(request.fs.get_home_dir() + '/sqoop/', uuid.uuid4().hex + '.password')
-    request.fs.do_as_user(request.user, request.fs.create, password_file_path, overwrite=True, permission=0o700, data=smart_str(rdbms_password))
+    request.fs.do_as_user(
+      request.user,
+      request.fs.create,
+      password_file_path,
+      overwrite=True,
+      permission=0o700,
+      data=smart_str(rdbms_password)
+      )
 
     lib_files = []
     if destination['sqoopJobLibPaths']:
@@ -210,7 +225,11 @@ def run_sqoop(request, source, destination, start_time):
         'targetDir': targetDir
       }
       if destination_file_output_format == 'text':
-        statement = '%(statement)s --as-textfile --fields-terminated-by %(customFieldsDelimiter)s --lines-terminated-by %(customLineDelimiter)s --enclosed-by %(customEnclosedByDelimiter)s' % {
+        statement = '%(statement)s'\
+        ' --as-textfile'\
+        ' --fields-terminated-by %(customFieldsDelimiter)s'\
+        ' --lines-terminated-by %(customLineDelimiter)s'\
+        ' --enclosed-by %(customEnclosedByDelimiter)s' % {
           'statement': statement,
           'customFieldsDelimiter': destination_custom_fields_delimiter,
           'customLineDelimiter': destination_custom_line_delimiter,
@@ -234,7 +253,12 @@ def run_sqoop(request, source, destination, start_time):
         'exclude': exclude
       }
     else:
-      statement = 'import %(statement)s --table %(rdbmsTableName)s --hive-import --delete-target-dir --hive-database %(hive_database_name)s --hive-table %(hive_table_name)s' % {
+      statement = 'import %(statement)s'\
+      ' --table %(rdbmsTableName)s'\
+      ' --hive-import'\
+      ' --delete-target-dir'\
+      ' --hive-database %(hive_database_name)s'\
+      ' --hive-table %(hive_table_name)s' % {
         'statement': statement,
         'rdbmsTableName': rdbms_table_name,
         'hive_database_name': destination_database_name,
