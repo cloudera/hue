@@ -20,6 +20,7 @@ standard_library.install_aliases()
 from builtins import map
 import logging
 import os
+import re
 import json
 import sys
 import tempfile
@@ -148,6 +149,7 @@ def get_hue_config(request):
           conf['value'] = str(module.get_raw())
         else:
           conf['value'] = str(module.get_raw()).decode('utf-8', 'replace')
+        conf['value'] = re.sub('(.*)://(.*):(.*)@(.*)', r'\1://\2:**********@\4', conf['value'])
       attrs.append(conf)
 
     return attrs
