@@ -14,16 +14,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-@import '../../components/styles/colors.scss';
-@import '../../components/styles/mixins.scss';
+@use 'variables' as vars;
+@use 'mixins';
 
 .app-banner {
-  @include flex(0 0 auto);
+  @include mixins.flex(0 0 auto);
 }
 
 .app-banner--system {
   padding: 4px;
   text-align: center;
-  background-color: $fluid-blue-800;
-  color: $fluid-blue-050;
+  background-color: vars.$fluidx-blue-800;
+  color: vars.$fluidx-blue-050;
 }

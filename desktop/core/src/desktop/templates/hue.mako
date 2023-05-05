@@ -18,7 +18,7 @@
   import sys
 
   from desktop import conf
-  from desktop.conf import IS_MULTICLUSTER_ONLY, has_multi_clusters
+  from desktop.conf import ENABLE_HUE_5, IS_MULTICLUSTER_ONLY, has_multi_clusters
   from desktop.views import _ko, commonshare, login_modal
   from desktop.lib.i18n import smart_unicode
   from desktop.models import PREFERENCE_IS_WELCOME_TOUR_SEEN, hue_version, get_cluster_config
@@ -28,7 +28,6 @@
   from filebrowser.conf import SHOW_UPLOAD_BUTTON
   from indexer.conf import ENABLE_NEW_INDEXER
   from metadata.conf import has_optimizer, OPTIMIZER
-  from notebook.conf import ENABLE_NOTEBOOK_2
 
   from desktop.auth.backend import is_admin
   from webpack_loader.templatetags.webpack_loader import render_bundle
@@ -215,7 +214,7 @@ ${ hueIcons.symbols() }
       }"><div class="resize-bar"></div></div>
 
       <div class="page-content">
-        <!-- ko if: window.ENABLE_NOTEBOOK_2 -->
+        <!-- ko if: window.ENABLE_HUE_5 -->
         <!-- ko component: 'session-panel' --><!-- /ko -->
         <!-- /ko -->
         <!-- ko hueSpinner: { spin: isLoadingEmbeddable, center: true, size: 'xlarge', blackout: true } --><!-- /ko -->
@@ -280,7 +279,7 @@ ${ hueIcons.symbols() }
           }
         }" style="display: none;"></div>
 
-      %if not ENABLE_NOTEBOOK_2.get():
+      %if not ENABLE_HUE_5.get():
       <div class="context-panel" data-bind="slideVisible: contextPanelVisible">
         <div class="margin-top-10 padding-left-10 padding-right-10">
           <h4 class="margin-bottom-30"><i class="fa fa-cogs"></i> ${_('Session')}</h4>

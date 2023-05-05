@@ -2,6 +2,13 @@
 .DS_Store
 ._*
 
+# Idea files
+.idea
+.run
+
+# pip requirements file
+.requirements
+
 # Python compiled files
 *.pyc
 *.pyo

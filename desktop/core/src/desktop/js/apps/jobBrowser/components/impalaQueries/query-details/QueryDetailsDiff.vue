@@ -153,13 +153,13 @@
 </script>
 
 <style lang="scss" scoped>
-  @import '../../../../../components/styles/colors.scss';
+  @import '../../../../../components/styles/variables.scss';
   @import '../../../../../components/styles/mixins';
 
   .hue-info-box {
     padding: 10px;
 
-    border: 1px solid $fluid-gray-300;
+    border: 1px solid $fluidx-gray-300;
     border-radius: $hue-panel-border-radius;
   }
 
@@ -184,7 +184,7 @@
   ::v-deep(.query-b-deep .query-b),
   ::v-deep(.query-b-deep .hue-info-box),
   ::v-deep(.query-b-deep .dag-view-container) {
-    background-color: $fluid-blue-050;
+    background-color: $fluidx-blue-050;
     border-radius: $hue-panel-border-radius;
   }
 

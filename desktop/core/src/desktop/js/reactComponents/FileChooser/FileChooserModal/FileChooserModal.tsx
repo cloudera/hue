@@ -16,15 +16,17 @@
 
 import React, { useState, useEffect } from 'react';
 import Modal from 'antd/lib/modal/Modal';
-import { Menu, Spin } from 'antd';
+import { Col, Menu, Row, Spin } from 'antd';
 
 import HdfsIcon from '../../../components/icons/HdfsIcon';
 import S3Icon from '../../../components/icons/S3Icon';
 import AdlsIcon from '../../../components/icons/AdlsIcon';
 
-import { fetchFileSystems } from '../api';
-import { FileSystem } from '../types';
+import { fetchFileSystems, fetchFiles } from '../api';
+import { FileSystem, PathAndFileData } from '../types';
 import './FileChooserModal.scss';
+import PathBrowser from '../PathBrowser/PathBrowser';
+
 interface FileProps {
   show: boolean;
   onCancel: () => void;
@@ -36,7 +38,10 @@ const defaultProps = { title: 'Choose a file', okText: 'Select' };
 
 const FileChooserModal: React.FC<FileProps> = ({ show, onCancel, title, okText }) => {
   const [fileSystemList, setFileSystemList] = useState<FileSystem[] | undefined>();
+  const [filePath, setFilePath] = useState<string | undefined>();
+  const [filesData, setFilesData] = useState<PathAndFileData | undefined>();
   const [loading, setLoading] = useState(true);
+  const [loadingFiles, setloadingFiles] = useState(true);
 
   const icons = {
     hdfs: <HdfsIcon />,
@@ -53,10 +58,6 @@ const FileChooserModal: React.FC<FileProps> = ({ show, onCancel, title, okText }
     onCancel();
   };
 
-  const onPathChange = e => {
-    //TODO: Use fileSystemList[e.key].user_home_dir to retrieve files
-  };
-
   useEffect(() => {
     if (show && !fileSystemList) {
       setLoading(true);
@@ -71,6 +72,9 @@ const FileChooserModal: React.FC<FileProps> = ({ show, onCancel, title, okText }
             };
           });
           setFileSystemList(fileSystemsObj);
+          if (fileSystems.length !== 0) {
+            setFilePath(fileSystems[0].user_home_directory);
+          }
         })
         .catch(error => {
           //TODO: Properly handle errors.
@@ -81,6 +85,22 @@ const FileChooserModal: React.FC<FileProps> = ({ show, onCancel, title, okText }
     }
   }, [show]);
 
+  useEffect(() => {
+    if (filePath) {
+      setloadingFiles(true);
+      fetchFiles(filePath)
+        .then(responseFilesData => {
+          setFilesData(responseFilesData);
+        })
+        .catch(error => {
+          //TODO: handle errors
+        })
+        .finally(() => {
+          setloadingFiles(false);
+        });
+    }
+  }, [filePath]);
+
   return (
     <Modal
       title={title}
@@ -89,10 +109,28 @@ const FileChooserModal: React.FC<FileProps> = ({ show, onCancel, title, okText }
       onCancel={handleCancel}
       okText={okText}
       width={930}
-      className="file-chooser__modal"
+      className="hue-file-chooser__modal"
     >
       <Spin spinning={loading}>
-        <Menu items={fileSystemList} onSelect={onPathChange} className="file-system__panel"></Menu>
+        <Row>
+          <Col span={5}>
+            <Menu
+              items={fileSystemList}
+              onSelect={selectedMenuItem => {
+                setFilePath(fileSystemList[selectedMenuItem.key].user_home_dir);
+              }}
+              className="hue-file-system__panel"
+            ></Menu>
+          </Col>
+          <Col span={19}>
+            <Spin spinning={loadingFiles}>
+              <PathBrowser
+                handleFilePathChange={setFilePath}
+                breadcrumbs={filesData?.breadcrumbs}
+              ></PathBrowser>
+            </Spin>
+          </Col>
+        </Row>
       </Spin>
     </Modal>
   );

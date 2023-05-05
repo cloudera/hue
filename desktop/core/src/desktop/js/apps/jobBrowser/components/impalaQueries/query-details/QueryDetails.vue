@@ -81,7 +81,7 @@
 
   import I18n from 'utils/i18n';
 
-  declare const ENABLE_NOTEBOOK_2: boolean;
+  declare const ENABLE_HUE_5: boolean;
 
   export default defineComponent({
     components: {
@@ -118,7 +118,7 @@
         });
 
         huePubSub.subscribeOnce(
-          ENABLE_NOTEBOOK_2 ? 'ace.editor.focused' : 'set.current.app.view.model',
+          ENABLE_HUE_5 ? 'ace.editor.focused' : 'set.current.app.view.model',
           () =>
             setTimeout(() => {
               huePubSub.publish('editor.insert.at.cursor', {
@@ -159,7 +159,7 @@
 </script>
 
 <style lang="scss" scoped>
-  @import '../../../../../components/styles/colors.scss';
+  @import '../../../../../components/styles/variables.scss';
   @import '../../../../../components/styles/mixins';
 
   .buttons-container {
@@ -183,7 +183,7 @@
     border-radius: $hue-panel-border-radius;
 
     &:hover {
-      border-color: $fluid-blue-700;
+      border-color: $fluidx-blue-700;
     }
   }
 

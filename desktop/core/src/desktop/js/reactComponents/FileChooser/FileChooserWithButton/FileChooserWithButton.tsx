@@ -31,7 +31,7 @@ const FileChooserWithButton: React.FC<FileChooserWithButtonProps> = ({ title }):
 
   return (
     <>
-      <Button className="file-chooser__button" type="primary" onClick={() => setShow(true)}>
+      <Button className="hue-file-chooser__button" type="primary" onClick={() => setShow(true)}>
         {title}
       </Button>
 

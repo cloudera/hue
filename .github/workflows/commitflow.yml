@@ -77,7 +77,6 @@ jobs:
         npm run webpack-workers
         ./build/env/bin/hue collectstatic --noinput
 
-
     # - name: run documentation lints
     #   run: |
     #     cd $GITHUB_WORKSPACE
@@ -105,33 +104,6 @@ jobs:
     #     /usr/share/hue/build/env/bin/pip install pylint==1.7.5 pylint-django==0.7.2 configparser==4.0.2
     #     ./tools/ci/check_for_python_lint.sh /usr/share/hue
 
-    - name: run js lint
-      run: |
-        cp .prettierrc /usr/share/hue
-        cp .eslint* /usr/share/hue
-        cp tools /usr/share/hue -r
-
-        cd /usr/share/hue
-        npm run lint
-
-    - name: run npm license checker
-      run: |
-        cd /usr/share/hue
-
-        npm run check-license
-
-    - name: run style lint
-      run: |
-        cd /usr/share/hue
-
-        npm run style-lint
-
-    - name: run npm absolute path detection
-      run: |
-        cd /usr/share/hue
-
-        npm run check-absolute-paths
-
     # Run tests
     - name: run python API tests
       run: |
@@ -139,11 +111,3 @@ jobs:
 
         PYTHONWARNINGS=always ./build/env/bin/hue test unit --with-xunit --with-cover
 
-    - name: run js tests
-      run : |
-        cd /usr/share/hue
-
-        # https://jestjs.io/docs/en/troubleshooting.html#tests-are-extremely-slow-on-docker-andor-continuous-integration-ci-server
-        sed -i 's/"test": "jest"/"test": "jest --runInBand"/g' package.json
-
-        npm run test

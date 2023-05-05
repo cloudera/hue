@@ -14,10 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-@import '../../../components/styles/colors';
+@use 'variables' as vars;
 
-.file-chooser__button {
-  background-color: $hue-primary-color-dark;
+
+.hue-file-chooser__button {
+  background-color: vars.$hue-primary-color-dark;
   color: white;
   margin-left: 40px;
   margin-top: 12px;

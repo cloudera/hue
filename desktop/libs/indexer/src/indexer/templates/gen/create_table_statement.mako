@@ -84,7 +84,11 @@ CREATE \
 % if table.get("external", False):
 EXTERNAL \
 % endif
-TABLE ${ '`%s`.`%s`' % (database, table["name"]) | n }
+TABLE \
+% if 'hue__tmp_' in table["name"]:
+IF NOT EXISTS \
+% endif
+${ '`%s`.`%s`' % (database, table["name"]) | n }
 ${ column_list(table, columns) | n } \
 % if kudu_partition_columns  and table.get('file_format') == 'kudu':
 PARTITION BY ${ ', '.join([kudu_partition(partition) for partition in kudu_partition_columns]) | n }

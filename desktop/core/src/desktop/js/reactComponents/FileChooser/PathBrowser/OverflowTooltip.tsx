@@ -14,17 +14,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import '@testing-library/jest-dom';
+import React, { ReactElement, ReactNode } from 'react';
+import { Tooltip } from 'antd';
 
-import React from 'react';
+interface OverflowTooltipProps {
+  title: string;
+  isOverflowing: boolean;
+  toolTipTriggers: string | string[];
+  children: ReactNode | ReactElement;
+}
 
-import FileChooserWithButton from './FileChooserWithButton';
+const OverflowTooltip: React.FC<OverflowTooltipProps> = ({
+  title,
+  isOverflowing,
+  toolTipTriggers,
+  children
+}) => {
+  return isOverflowing ? (
+    <Tooltip title={title} trigger={toolTipTriggers}>
+      {children}
+    </Tooltip>
+  ) : (
+    <>{children}</>
+  );
+};
 
-test('Filechooser modal opens on button click', async () => {
-  const user = userEvent.setup();
-  const { queryByText } = render(<FileChooserWithButton title={'File chooser component'} />);
-  await user.click(screen.getByRole('button', { name: 'File chooser component' }));
-  expect(queryByText('Choose a file')).toBeInTheDocument();
-});
+export default OverflowTooltip;

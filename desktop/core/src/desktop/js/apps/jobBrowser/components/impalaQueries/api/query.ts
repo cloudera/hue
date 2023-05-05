@@ -16,28 +16,25 @@
  * limitations under the License.
  */
 
-import api from '../../../commons/api-utils/api';
-import { AxiosResponse } from 'axios';
-
 import { ImpalaQuery, ImpalaQueryProfile } from '../index.d';
 import { SearchRequest, SearchResponse } from '../../../commons/api-utils/search';
+import { get, post } from 'api/utils';
 
 const QUERIES_URL = '/jobbrowser/query-store/api/impala/queries';
 
-export const searchQueries = async <Q>(options: SearchRequest): Promise<SearchResponse<Q>> => {
-  const response = await api.post<SearchRequest, AxiosResponse<SearchResponse<Q>>>(
-    QUERIES_URL,
-    options
-  );
-  return response.data;
+export const searchQueries = async <Q>(data: SearchRequest): Promise<SearchResponse<Q>> => {
+  const response = await post<SearchResponse<Q>>(QUERIES_URL, data, {
+    qsEncodeData: false
+  });
+  return response;
 };
 
 type QueryData = { query: ImpalaQuery; profile: ImpalaQueryProfile };
 export const loadQuery = async (queryId: string): Promise<ImpalaQuery> => {
   const url = `${QUERIES_URL}/${encodeURIComponent(queryId)}`;
-  const response = await api.get<ImpalaQuery, AxiosResponse<QueryData>>(url);
+  const response = await get<QueryData>(url);
   return {
-    ...response.data.query,
-    profile: response.data.profile
+    ...response.query,
+    profile: response.profile
   };
 };
