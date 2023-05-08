@@ -2189,7 +2189,7 @@ SDXAAS = ConfigSection(
 
 def is_sdxaas_jwt_enabled():
   """Check if SDXaaS token url is configured"""
-  return SDXAAS.TOKEN_URL.get() != ''
+  return bool(SDXAAS.TOKEN_URL.get())
 
 def handle_raz_api_auth():
   """Return RAZ authentication type from JWT (if SDXaaS token URL is set) or KERBEROS"""
