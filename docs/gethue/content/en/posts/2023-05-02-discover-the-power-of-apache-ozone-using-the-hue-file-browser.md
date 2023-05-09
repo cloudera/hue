@@ -66,7 +66,7 @@ To configure Hue for Ozone file browsing, make the necessary changes to the hue.
 ```
 [[[default]]]
 fs_defaultfs=ofs://[**SERVICE_ID**]
-webhdfs_url=http://[***OZONE-HTTPFS-HOST***]:[***OZONE-HTTPFS-PORT***]/webhdfs/v1
+webhdfs_url=http(s)://[***OZONE-HTTPFS-HOST***]:[***OZONE-HTTPFS-PORT***]/webhdfs/v1
 ssl_cert_ca_verify=true
 security_enabled=true
 ```
