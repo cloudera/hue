@@ -379,7 +379,6 @@ def top_columns(request):
   api = get_api(request.user, interface)
 
   data = api.top_columns(db_tables=db_tables, connector=connector, database_name=database)
-  data = list(data)
 
   response['status'] = 0
   response['values'] = data or []

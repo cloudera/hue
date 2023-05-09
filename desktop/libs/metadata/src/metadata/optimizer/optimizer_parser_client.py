@@ -36,7 +36,7 @@ LOG = logging.getLogger(__name__)
 class OptimizerParserClient(Api):
     # retriving the data from the database 
     def top_tables(self, workfloadId=None, database_name='default', page_size=1000, startingToken=None, connector=None):
-            result_query = SqlQueryParser.objects.filter(database=database_name).values('database' , 'table_name').annotate(usage_count=Count('*')).order_by('-usage_count').values('database' , 'table_name', 'usage_count')[:5]
+            result_top_tables = SqlQueryParser.objects.filter(database=database_name).values('database' , 'table_name').annotate(usage_count=Count('*')).order_by('-usage_count').values('database' , 'table_name', 'usage_count')[:5]
       
             data = {
                 'results': [{
@@ -75,8 +75,8 @@ class OptimizerParserClient(Api):
 
             i=0
             for d in data['results']:
-                d['database'] = result_query[i]['database']
-                d['name'] = result_query[i]['table_name']
+                d['database'] = result_top_tables[i]['database']
+                d['name'] = result_top_tables[i]['table_name']
                 i = i+1
 
             return data
@@ -84,6 +84,62 @@ class OptimizerParserClient(Api):
     def top_columns(self, db_tables=None, page_size=100, startingToken=None, connector=None, database_name='default'):
       db_tables = ' '.join(map(str, db_tables))
       db_table_only = db_tables.split(".")[1]
-      results = SqlQueryParser.objects.filter(database=database_name, table_name = db_table_only).values('database', 'table_name', 'column_name').annotate(usage_count=Count('*')).order_by('-usage_count')[:5]
+      result_top_columns = SqlQueryParser.objects.filter(database=database_name, table_name = db_table_only).values('database', 'table_name', 'column_name').annotate(usage_count=Count('*')).order_by('-usage_count')[:4]
+
+      results = { 
+        'selectColumns': [{
+            "dbName": 'default',
+            "tableName": 'sample_07',
+            "columnName": 'description',
+            "columnCount": 6,
+            "groupbyCol": 0,
+            "selectCol": 6,
+            "filterCol": 0,
+            "joinCol": 0,
+            "orderbyCol": 0,
+            "workloadPercent": 100,
+          }, {
+            "dbName": 'default',
+            "tableName": 'sample_07',
+            "columnName": 'description',
+            "columnCount": 5,
+            "groupbyCol": 0,
+            "selectCol": 5,
+            "filterCol": 0,
+            "joinCol": 0,
+            "orderbyCol": 0,
+            "workloadPercent": 100,
+          }, {
+          "dbName": 'default',
+            "tableName": 'sample_07',
+            "columnName": 'description',
+            "columnCount": 4,
+            "groupbyCol": 0,
+            "selectCol": 4,
+            "filterCol": 0,
+            "joinCol": 0,
+            "orderbyCol": 0,
+            "workloadPercent": 100,
+          }, {
+            "dbName": 'default',
+            "tableName": 'sample_07',
+            "columnName": 'description',
+            "columnCount": 3,
+            "groupbyCol": 0,
+            "selectCol": 4,
+            "filterCol": 0,
+            "joinCol": 0,
+            "orderbyCol": 0,
+            "workloadPercent": 100,
+          }
+        ]
+    }
+        
+      j=0
+      for r in results['selectColumns']:
+          r['dbName'] = result_top_columns[j]['database']
+          r['tableName'] = result_top_columns[j]['table_name']
+          r['columnName'] = result_top_columns[j]['column_name']
+          j = j+1
 
       return results
