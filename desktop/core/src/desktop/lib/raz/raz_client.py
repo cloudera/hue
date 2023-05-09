@@ -30,6 +30,8 @@ from datetime import datetime, timedelta
 
 from desktop.conf import AUTH_USERNAME
 from desktop.lib.exceptions_renderable import PopupException
+from desktop.lib.sdxaas.knox_jwt import fetch_jwt
+
 import desktop.lib.raz.signer_protos_pb2 as raz_signer
 
 if sys.version_info[0] > 2:
@@ -44,16 +46,19 @@ LOG = logging.getLogger(__name__)
 
 class RazToken:
 
-  def __init__(self, raz_url, auth_handler):
+  def __init__(self, raz_url, auth_type):
     self.raz_url = raz_url
-    self.auth_handler = auth_handler
+    self.auth_handler = requests_kerberos.HTTPKerberosAuth(mutual_authentication=requests_kerberos.OPTIONAL)
     self.init_time = datetime.now()
     self.raz_token = None
+    self.auth_type = auth_type
+
     o = lib_urlparse(self.raz_url)
     if not o.netloc:
       raise PopupException('Could not parse the host of the Raz server %s' % self.raz_url)
     self.raz_hostname, self.raz_port = o.netloc.split(':')
     self.scheme = o.scheme
+
 
   def get_delegation_token(self, user):
     ip_address = socket.gethostbyname(self.raz_hostname)
@@ -63,9 +68,22 @@ class RazToken:
       "renewer": AUTH_USERNAME.get(),
       "doAs": user
     }
-    r = requests.get(self.raz_url, GET_PARAMS, auth=self.auth_handler, verify=False)
+
+    if self.auth_type == 'kerberos':
+      r = requests.get(self.raz_url, GET_PARAMS, auth=self.auth_handler, verify=False)
+    elif self.auth_type == 'jwt':
+      jwt_token = fetch_jwt()
+      if jwt_token is None:
+        raise PopupException('Knox JWT is not available to send to RAZ.')
+
+      _headers = {'Authorization': 'Bearer %s' % (jwt_token)}
+      r = requests.get(self.raz_url, GET_PARAMS, headers=_headers, verify=False)
+
     self.raz_token = json.loads(r.text)['Token']['urlString']
+    LOG.debug('Raz token: %s' % self.raz_token)
+
     return self.raz_token
+
 
   def renew_delegation_token(self, user):
     if self.raz_token is None:
@@ -296,10 +314,7 @@ def get_raz_client(raz_url, username, auth='kerberos', service='s3', service_nam
   if not username:
     raise PopupException('No username set.')
 
-  if auth == 'kerberos' or True:  # True until JWT option
-    auth_handler = requests_kerberos.HTTPKerberosAuth(mutual_authentication=requests_kerberos.OPTIONAL)
-
-  raz = RazToken(raz_url, auth_handler)
+  raz = RazToken(raz_url, auth)
   raz_token = raz.get_delegation_token(user=username)
 
   return RazClient(raz_url, raz_token, username, service=service, service_name=service_name, cluster_name=cluster_name)
