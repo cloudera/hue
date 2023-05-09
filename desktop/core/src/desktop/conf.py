@@ -2174,6 +2174,28 @@ def has_raz_url():
   return bool(_get_raz_url())
 
 
+SDXAAS = ConfigSection(
+  key='sdxaas',
+  help=_("""Configuration for SDXaaS JWT support."""),
+  members=dict(
+    TOKEN_URL=Config(
+      key='token_url',
+      help=_('Comma separated host URLs to fetch token from.'),
+      type=str,
+      default='',
+    )
+  )
+)
+
+def is_sdxaas_jwt_enabled():
+  """Check if SDXaaS token url is configured"""
+  return bool(SDXAAS.TOKEN_URL.get())
+
+def handle_raz_api_auth():
+  """Return RAZ authentication type from JWT (if SDXaaS token URL is set) or KERBEROS"""
+  return 'jwt' if is_sdxaas_jwt_enabled() else 'kerberos'
+
+
 RAZ = ConfigSection(
   key='raz',
   help=_("""Configuration for RAZ service integration"""),
@@ -2192,9 +2214,9 @@ RAZ = ConfigSection(
     ),
     API_AUTHENTICATION=Config(
         key='api_authentication',
-        help=_('How to authenticate against: KERBEROS or JWT (not supported yet)'),
+        help=_('How to authenticate against: KERBEROS or JWT'),
         type=coerce_str_lowercase,
-        default='kerberos',
+        dynamic_default=handle_raz_api_auth,
     ),
     AUTOCREATE_USER_DIR=Config(
       key='autocreate_user_dir',
