@@ -152,7 +152,7 @@
     "util": "0.12.4",
     "vti": "0.0.24",
     "vue-loader": "16.5.0",
-    "webpack": "5.54.0",
+    "webpack": "5.76.0",
     "webpack-bundle-analyzer": "4.4.2",
     "webpack-bundle-tracker": "1.0.0",
     "webpack-cli": "4.7.0"
