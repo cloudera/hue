@@ -117,6 +117,7 @@ class RazClient(object):
     self.service_name = service_name
     self.cluster_name = cluster_name
     self.requestid = str(uuid.uuid4())
+    self.auth_type = 'kerberos'
 
 
   def check_access(self, method, url, params=None, headers=None, data=None):
@@ -145,7 +146,7 @@ class RazClient(object):
       "context": {}
     }
     request_headers = {"Content-Type": "application/json"}
-    raz_url = "%s/api/authz/%s/access?delegation=%s" % (self.raz_url, self.service, self.raz_token)
+    raz_url = "%s/api/authz/%s/access" % (self.raz_url, self.service)
 
     if self.service == 'adls':
       self._make_adls_request(request_data, method, path, url_params, resource_path)
@@ -153,6 +154,21 @@ class RazClient(object):
       self._make_s3_request(request_data, request_headers, method, params, headers, url_params, endpoint, resource_path, data=data)
 
     LOG.debug('Raz url: %s' % raz_url)
+
+    if self.auth_type == 'kerberos':
+      auth_handler = requests_kerberos.HTTPKerberosAuth(mutual_authentication=requests_kerberos.OPTIONAL)
+
+      LOG.debug("Sending access check headers: {%s} request_data: {%s}" % (request_headers, request_data))
+      raz_req = requests.post(raz_url, headers=request_headers, json=request_data, auth=auth_handler, verify=False)
+    elif self.auth_type == 'jwt':
+      jwt_token = fetch_jwt()
+      if jwt_token is None:
+        raise PopupException('Knox JWT is not available to send to RAZ.')
+      
+      request_headers['Authorization'] = 'Bearer %s' % (jwt_token)
+      LOG.debug("Sending access check headers: {%s} request_data: {%s}" % (request_headers, request_data))
+      raz_req = requests.post(raz_url, headers=request_headers, json=request_data, verify=False)
+
     LOG.debug("Sending access check headers: {%s} request_data: {%s}" % (request_headers, request_data))
     raz_req = requests.post(raz_url, headers=request_headers, json=request_data, verify=False)
 
