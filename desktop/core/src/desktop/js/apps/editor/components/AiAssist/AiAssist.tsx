@@ -3,20 +3,26 @@ import { Skeleton } from 'antd';
 import Alert from 'cuix/dist/components/Alert/Alert';
 
 import huePubSub from 'utils/huePubSub';
+import { SyntaxParser } from 'parse/types';
 import sqlParserRepository from 'parse/sql/sqlParserRepository';
 import { ParsedSqlStatement } from 'parse/sqlStatementsParser';
-import {
-  generateExplanation,
-  generateCorrectedSql,
-  generateOptimizedSql,
-  generateSQLfromNQL,
-  fetchWithMemoryCache
-} from 'api/apiAIHelper';
+import { generativeFunctionFactory } from 'api/apiAIHelper';
 import SqlExecutable from '../../execution/sqlExecutable';
 import { getLeadingEmptyLineCount } from '../editorUtils';
 
 import SqlCodeSnippet from './SqlCodeSnippet/SqlCodeSnippet';
-import './ExplainSql.scss';
+import './AiAssist.scss';
+
+export interface ParseError {
+  line: number;
+  loc: {
+    last_column: number;
+  };
+  text: string;
+}
+
+const { generateExplanation, generateCorrectedSql, generateOptimizedSql, generateSQLfromNQL } =
+  generativeFunctionFactory();
 
 // Matches comments like '/* comment1 */' and '-- comment2'
 const SQL_COMMENTS_REGEX = /\/\*[\s\S]*?\*\/\n?|--.*?\n/g;
@@ -56,11 +62,10 @@ const extractNqlFromStatement = (rawStatement: string) => {
   return matches ? matches[3].trim() : '';
 };
 
-export interface ExplainSqlProps {
+export interface AiAssistProps {
   activeExecutable?: SqlExecutable;
 }
-
-const ExplainSql: FunctionComponent<ExplainSqlProps> = ({ activeExecutable }) => {
+const AiAssist = ({ activeExecutable }: AiAssistProps) => {
   const currentExecutable =
     activeExecutable instanceof Function ? activeExecutable() : activeExecutable;
 
@@ -71,7 +76,7 @@ const ExplainSql: FunctionComponent<ExplainSqlProps> = ({ activeExecutable }) =>
   const nqlKeywordDetected: boolean = isStartingWithNqlKeyword(selectedStatement);
   const isTypingNqlKeyword: boolean = isUserTypingNqlKeyword(selectedStatement);
   const lastSelectedStatement = useRef(selectedStatement);
-  const lastDialect = useRef();
+  const lastDialect = useRef('');
   const { firstLine, lastLine } = getEditorLineNumbers(parsedStatement);
 
   const [explanation, setExplanation] = useState('');
@@ -80,8 +85,8 @@ const ExplainSql: FunctionComponent<ExplainSqlProps> = ({ activeExecutable }) =>
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingSuggestion, setIsLoadingSuggestion] = useState(false);
   const [isGeneratingSql, setIsGeneratingSql] = useState(false);
-  const [parser, setParser] = useState();
-  const [parseError, setParseError] = useState();
+  const [parser, setParser] = useState<SyntaxParser>();
+  const [parseError, setParseError] = useState<ParseError | undefined>();
 
   const loadParser = async () => {
     const executor = activeExecutable?.executor;
@@ -130,7 +135,7 @@ const ExplainSql: FunctionComponent<ExplainSqlProps> = ({ activeExecutable }) =>
     setIsGeneratingSql(false);
   };
 
-  const loadOptimization = async statement => {
+  const loadOptimization = async (statement: string) => {
     setIsLoadingSuggestion(true);
     const dialect = lastDialect.current;
     const { sql, explanation } = await generateOptimizedSql({ statement, dialect });
@@ -140,7 +145,7 @@ const ExplainSql: FunctionComponent<ExplainSqlProps> = ({ activeExecutable }) =>
     setIsLoadingSuggestion(false);
   };
 
-  const acceptSuggestion = statement => {
+  const acceptSuggestion = (statement: string) => {
     huePubSub.publish('ace.replace', {
       text: statement,
       location: {
@@ -240,7 +245,7 @@ const ExplainSql: FunctionComponent<ExplainSqlProps> = ({ activeExecutable }) =>
       lastSelectedStatement.current = selectedStatement;
 
       // Clear any leftover sugestions
-      const newParseError: false | Object = parser?.parseSyntax('', selectedStatement.trim());
+      const newParseError = parser?.parseSyntax('', selectedStatement.trim()) as ParseError;
       setParseError(newParseError);
     }
 
@@ -276,4 +281,4 @@ const ExplainSql: FunctionComponent<ExplainSqlProps> = ({ activeExecutable }) =>
     </>
   );
 };
-export default ExplainSql;
+export default AiAssist;

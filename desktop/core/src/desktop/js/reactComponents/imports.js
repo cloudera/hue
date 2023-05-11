@@ -7,7 +7,7 @@ export async function loadComponent(name) {
     case 'ReactExample':
       return (await import('../apps/editor/components/result/reactExample/ReactExample')).default;
     case 'ExplainSql':
-        return (await import('../apps/editor/components/ExplainSql/ExplainSql')).default;      
+        return (await import('../apps/editor/components/AiAssist/AiAssist')).default;      
 
     // Application global root components here
     case 'AppBanner':
