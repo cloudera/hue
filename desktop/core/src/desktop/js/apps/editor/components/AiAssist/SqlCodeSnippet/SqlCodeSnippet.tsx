@@ -22,22 +22,24 @@ interface SqlCodeSnippetProps {
   children: string;
   firstLine: number;
   lastLine: number;
-  isSuggestion: boolean;
-  isNLQ: boolean;
-  parseError?: {
-    line: number;
-    loc: {
-      last_column: number;
-    };
-    text: string;
-  };
+  isSuggestion?: boolean;
+  isNLQ?: boolean;
+  parseError?:
+    | {
+        line: number;
+        loc: {
+          last_column: number;
+        };
+        text: string;
+      }
+    | undefined;
   hideSuggestFix?: boolean;
-  explanation: string;
-  topInfoBar;
-  isLoading: boolean;
+  explanation?: string;
+  topInfoBar: string;
+  isLoading?: boolean;
 }
 
-const SqlCodeSnippet: FunctionComponent<SqlCodeSnippetProps> = ({
+const SqlCodeSnippet = ({
   acceptMsg,
   children: sqlStatement,
   firstLine,
@@ -53,7 +55,7 @@ const SqlCodeSnippet: FunctionComponent<SqlCodeSnippetProps> = ({
   topInfoBar,
   parseError,
   explanation
-}) => {
+}: SqlCodeSnippetProps) => {
   const renderParseError = () => {
     // TODO: i18n
     const msg = `The SQL statement contains a syntax error on line ${firstLine + parseError.line}:${
@@ -149,7 +151,7 @@ const SqlCodeSnippet: FunctionComponent<SqlCodeSnippetProps> = ({
         {sqlStatement}
       </SyntaxHighlighter>
       {explanation && <div className="hue-explain-sql--explanation">{explanation}</div>}
-      {!isSuggestion && !parseError && !isNLQ && renderSqlActionBar()}      
+      {!isSuggestion && !parseError && !isNLQ && renderSqlActionBar()}
       {parseError && renderParseError()}
       {isSuggestion && renderSuggestion()}
       {isNLQ && !hideSuggestFix && renderNqlActionBar()}
