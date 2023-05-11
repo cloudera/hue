@@ -34,6 +34,7 @@ export interface hueWindow {
   AUTOCOMPLETE_TIMEOUT?: number;
   CACHEABLE_TTL?: { default?: number; sqlAnalyzer?: number };
   CLOSE_SESSIONS?: { [dialect: string]: boolean };
+  CSRF_TOKEN?: string;
   CUSTOM_DASHBOARD_URL?: string;
   DEV?: boolean;
   DISABLE_LOCAL_STORAGE?: boolean;

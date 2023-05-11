@@ -1,9 +1,37 @@
-import MD5 from 'crypto-js/MD5';
+// import MD5 from 'crypto-js/MD5';
+import { hueWindow } from 'types/types';
 
 import Executor from '../apps/editor/execution/executor';
 import dataCatalog from '../catalog/dataCatalog';
-// import SqlExecutable from '../apps/editor/execution/sqlExecutable';
-// import { Compute, Connector, Namespace } from '../config/types';
+
+interface GenerateExplanation {
+  (params: { statement: string; dialect: string }): Promise<string>;
+}
+interface GenerateCorrectedSql {
+  (params: { statement: string; dialect: string }): Promise<{ sql: string; explanation: string }>;
+}
+
+interface GenerateOptimizedSql {
+  (params: { statement: string; dialect: string }): Promise<{ sql: string; explanation: string }>;
+}
+
+interface GenerateSQLfromNQL {
+  (params: { nql: string; databaseName: string; executor: Executor; dialect: string }): Promise<{
+    sql: string;
+    assumptions: string;
+  }>;
+}
+interface GenerativeFunctionSet {
+  generateExplanation: GenerateExplanation;
+  generateCorrectedSql: GenerateCorrectedSql;
+  generateOptimizedSql: GenerateOptimizedSql;
+  generateSQLfromNQL: GenerateSQLfromNQL;
+}
+export function generativeFunctionFactory(): GenerativeFunctionSet {
+  // TODO: Here we can conditionally use different implementations depending
+  // on LLM configuration and strategy if needed;
+  return { generateExplanation, generateCorrectedSql, generateOptimizedSql, generateSQLfromNQL };
+}
 
 const API_URL = '/api/editor/chat/';
 const EXTRACT_CODE_AND_EXPLAIN_REGEX =
@@ -18,16 +46,27 @@ const extractLlmResponse = (response: any) => {
 };
 
 const extractCodeAndExplanation = (llmResponse: string) => {
-  const matches = EXTRACT_CODE_AND_EXPLAIN_REGEX.exec(llmResponse);
-  return matches ? { sql: matches[1].trim(), explanation: matches[2].trim() } : {};
+  const matches = EXTRACT_CODE_AND_EXPLAIN_REGEX.exec(llmResponse) || [];
+  return { sql: matches[1]?.trim(), explanation: matches[2].trim() };
 };
 
-const fetchFromLlm = async ({ url, data, method = 'POST', contentType = 'application/json' }) => {
+interface FetchFromLlmParams {
+  url: string;
+  data: any;
+  method?: string;
+  contentType?: string;
+}
+const fetchFromLlm = async ({
+  url,
+  data,
+  method = 'POST',
+  contentType = 'application/json'
+}: FetchFromLlmParams) => {
   const promise = fetch(url, {
     method,
     headers: {
       'Content-Type': contentType,
-      'X-Csrftoken': window.CSRF_TOKEN
+      'X-Csrftoken': (<hueWindow>window).CSRF_TOKEN
     },
     body: JSON.stringify(data)
   })
@@ -37,13 +76,7 @@ const fetchFromLlm = async ({ url, data, method = 'POST', contentType = 'applica
   return promise;
 };
 
-export const generateExplanation = async ({
-  statement,
-  dialect
-}: {
-  statement: string;
-  dialect: string;
-}) => {
+const generateExplanation: GenerateExplanation = async ({ statement, dialect }) => {
   // TODO: handle exceptions
   const result = await fetchFromLlm({
     url: API_URL,
@@ -56,13 +89,7 @@ export const generateExplanation = async ({
   return result;
 };
 
-export const generateCorrectedSql = async ({
-  statement,
-  dialect
-}: {
-  statement: string;
-  dialect: string;
-}) => {
+const generateCorrectedSql: GenerateCorrectedSql = async ({ statement, dialect }) => {
   const multiPartResponse = await fetchFromLlm({
     url: API_URL,
     data: {
@@ -74,13 +101,7 @@ export const generateCorrectedSql = async ({
   return extractCodeAndExplanation(multiPartResponse);
 };
 
-export const generateOptimizedSql = async ({
-  statement,
-  dialect
-}: {
-  statement: string;
-  dialect: string;
-}) => {
+const generateOptimizedSql: GenerateOptimizedSql = async ({ statement, dialect }) => {
   const multiPartResponse = await fetchFromLlm({
     url: API_URL,
     data: {
@@ -92,18 +113,7 @@ export const generateOptimizedSql = async ({
   return extractCodeAndExplanation(multiPartResponse);
 };
 
-interface SQLfromNQLParams {
-  nql: string;
-  databaseName: string;
-  executor: Executor;
-  dialect: string;
-}
-export const generateSQLfromNQL = async ({
-  nql,
-  databaseName,
-  executor,
-  dialect
-}: SQLfromNQLParams) => {
+const generateSQLfromNQL: GenerateSQLfromNQL = async ({ nql, databaseName, executor, dialect }) => {
   const allTables = await getTableList({ databaseName, executor });
   const relevantTablesInTags = await fetchFromLlm({
     url: API_URL,
@@ -112,7 +122,7 @@ export const generateSQLfromNQL = async ({
       prompt: nql,
       metadata: allTables.toString()
     }
-  });  
+  });
   const relevantTables = EXTRACT_TABLES.exec(relevantTablesInTags) || [];
   const tableMetadata = await getTableMetaData(relevantTables);
   const multiPartResult = await fetchFromLlm({
@@ -124,16 +134,15 @@ export const generateSQLfromNQL = async ({
       dialect
     }
   });
-  const match = EXTRACT_CODE_AND_ASSUMPTIONS_REGEX.exec(multiPartResult);
-  console.info(match);
-  return match ? { sql: match[1].trim(), assumptions: match[2].trim() } : {};
+  const match = EXTRACT_CODE_AND_ASSUMPTIONS_REGEX.exec(multiPartResult) || [];
+  return { sql: match[1]?.trim(), assumptions: match[2]?.trim() };
 };
 
 interface getTableListParams {
   databaseName: string;
   executor: Executor;
 }
-export const getTableList = async ({ databaseName, executor }: getTableListParams) => {
+const getTableList = async ({ databaseName, executor }: getTableListParams) => {
   const dbEntry = await dataCatalog.getEntry({
     path: databaseName,
     connector: executor?.connector(),
@@ -145,7 +154,7 @@ export const getTableList = async ({ databaseName, executor }: getTableListParam
   return tableNames;
 };
 
-export const getTableMetaData = async (tableNames: Array<string>) => {
+const getTableMetaData = async (tableNames: Array<string>) => {
   // MOCK
   return {
     tableName: tableNames[0],
@@ -299,52 +308,52 @@ export const getTableMetaData = async (tableNames: Array<string>) => {
   };
 };
 
-const oneDayMs = 1000 * 60 * 60 * 24;
-const cacheStore = {};
-export const fetchWithMemoryCache = async ({
-  url,
-  data,
-  method = 'POST',
-  contentType = 'application/json',
-  cacheName = 'shared',
-  keepFor = oneDayMs
-}) => {
-  if (!cacheStore[cacheName]) {
-    cacheStore[cacheName] = {};
-  }
+// const oneDayMs = 1000 * 60 * 60 * 24;
+// const cacheStore = {};
+// export const fetchWithMemoryCache = async ({
+//   url,
+//   data,
+//   method = 'POST',
+//   contentType = 'application/json',
+//   cacheName = 'shared',
+//   keepFor = oneDayMs
+// }) => {
+//   if (!cacheStore[cacheName]) {
+//     cacheStore[cacheName] = {};
+//   }
 
-  const dataCacheKeyInput = method === 'POST' ? JSON.stringify(data) : '';
-  const cacheKey = MD5(`${url}${dataCacheKeyInput}`).toString();
-  const myStore = cacheStore[cacheName];
-  const cached = myStore[cacheKey];
-  if (cached) {
-    const { responseData, timestamp } = cached;
-    const expirationTime = new Date(timestamp).getTime() + keepFor;
-    if (expirationTime > Date.now()) {
-      return responseData;
-    }
-    delete myStore[cacheKey];
-  }
+//   const dataCacheKeyInput = method === 'POST' ? JSON.stringify(data) : '';
+//   const cacheKey = MD5(`${url}${dataCacheKeyInput}`).toString();
+//   const myStore = cacheStore[cacheName];
+//   const cached = myStore[cacheKey];
+//   if (cached) {
+//     const { responseData, timestamp } = cached;
+//     const expirationTime = new Date(timestamp).getTime() + keepFor;
+//     if (expirationTime > Date.now()) {
+//       return responseData;
+//     }
+//     delete myStore[cacheKey];
+//   }
 
-  const promise = fetch(url, {
-    method,
-    headers: {
-      'Content-Type': contentType,
-      'X-Csrftoken': window.CSRF_TOKEN
-    },
-    body: JSON.stringify(data)
-  })
-    .then(response => response.json())
-    .then(responseData => {
-      const cacheItem = { responseData, timestamp: new Date() };
-      myStore[cacheKey] = cacheItem;
-      const cacheKeys = Object.keys(myStore);
-      if (cacheKeys.length > 50) {
-        delete myStore[cacheKeys[0]];
-      }
-      return responseData;
-    });
+//   const promise = fetch(url, {
+//     method,
+//     headers: {
+//       'Content-Type': contentType,
+//       'X-Csrftoken': window.CSRF_TOKEN
+//     },
+//     body: JSON.stringify(data)
+//   })
+//     .then(response => response.json())
+//     .then(responseData => {
+//       const cacheItem = { responseData, timestamp: new Date() };
+//       myStore[cacheKey] = cacheItem;
+//       const cacheKeys = Object.keys(myStore);
+//       if (cacheKeys.length > 50) {
+//         delete myStore[cacheKeys[0]];
+//       }
+//       return responseData;
+//     });
 
-  myStore[cacheKey] = { promise };
-  return promise;
-};
+//   myStore[cacheKey] = { promise };
+//   return promise;
+// };
