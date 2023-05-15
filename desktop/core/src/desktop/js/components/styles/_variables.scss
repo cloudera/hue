@@ -1,0 +1,56 @@
+/*
+ Licensed to Cloudera, Inc. under one
+ or more contributor license agreements.  See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership.  Cloudera, Inc. licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+*/
+
+// THESE VARIABLES ARE FOR REACT.JS COMPONENTS
+// (and possibly some Vue components until they have been translated to react)
+
+// Many, but not all, cuix can be imported from the cuix-core library.
+// These variable are prefixed with fluidx which is the legacy name of cuix.
+// Includes both spacing and color variables.
+@import '@cloudera/cuix-core/variables.scss';
+
+// Some handy variables used by cuix are only available as less variables where the
+// origin of the value can be either cuix or antd. Here we manually recreate the once we
+// want in Hue as sass variables.
+$animation-duration-base: 0.2s;
+$animation-duration-slow: 0.3s;
+$text-color: $fluidx-gray-900;
+$line-height-base: 1.4285;
+$border-radius-base: 3px;
+
+$font-size-sm: 12px;
+$font-size-base: 14px;
+$font-size-lg: 16px;
+$font-size-xl: 20px;
+
+// Specific HUE variables
+$hue-primary-color-dark: #0b7fad;
+$hue-primary-color-light: #dbe8f1;
+$hue-trunk: #9678d3;
+
+$hue-action-primary: $fluidx-blue-500;
+$hue-action-primary-hover: $fluidx-blue-700;
+$hue-action-danger: $fluidx-red-500;
+$hue-action-danger-hover: $fluidx-red-700;
+$hue-action-disabled: $fluidx-gray-200;
+
+$hue-border-color: $fluidx-gray-300;
+$hue-disabled-color: $fluidx-gray-200;
+
+$hue-error-color: $fluidx-red-500;
+$hue-warning-color: $fluidx-orange-400;

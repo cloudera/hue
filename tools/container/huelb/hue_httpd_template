@@ -12,7 +12,7 @@ ErrorLog "${HUE_LOG_DIR}/httpd_error_log"
 LogLevel warn
 
 <IfModule log_config_module>
-  LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined
+  LogFormat "%{X-Forwarded-For}i %h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined
   LogFormat "%h %l %u %t \"%r\" %>s %b" common
   CustomLog "${HUE_LOG_DIR}/httpd_access_log" common
 </IfModule>
