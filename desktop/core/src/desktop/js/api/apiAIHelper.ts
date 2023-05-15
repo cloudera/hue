@@ -3,6 +3,7 @@ import { hueWindow } from 'types/types';
 
 import Executor from '../apps/editor/execution/executor';
 import dataCatalog from '../catalog/dataCatalog';
+import { getRelevantTableDetails } from 'reactComponents/loadCatalogs';
 
 interface GenerateExplanation {
   (params: { statement: string; dialect: string }): Promise<string>;

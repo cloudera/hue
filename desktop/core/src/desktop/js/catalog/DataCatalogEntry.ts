@@ -585,7 +585,6 @@ export default class DataCatalogEntry {
    * Get the children of the catalog entry, columns for a table entry etc.
    */
   getChildren(options?: CatalogGetOptions): CancellablePromise<DataCatalogEntry[]> {
-    // debugger;
     if (this.childrenPromise && this.childrenPromise.cancelled) {
       this.childrenPromise = undefined;
     }
@@ -1573,6 +1572,10 @@ export default class DataCatalogEntry {
     if (!this.sourceMetaPromise || shouldReload(options)) {
       return this.reloadSourceMeta(options);
     }
+    huePubSub.publish('fetch_tables_metadata', {
+      sourceMetaPromise: this.sourceMetaPromise,
+      entry: this
+    });
     return applyCancellable(this.sourceMetaPromise, options);
   }
 
