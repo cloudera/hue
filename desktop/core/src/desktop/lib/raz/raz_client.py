@@ -149,7 +149,6 @@ class RazClient(object):
 
       if jwt_token is None:
         raise PopupException('Knox JWT is not available to send to RAZ.')
-      LOG.debug('JWT: %s' % jwt_token)
 
       request_headers['Authorization'] = 'Bearer %s' % (jwt_token)
       raz_req = requests.post(raz_url, headers=request_headers, json=request_data, verify=False)
