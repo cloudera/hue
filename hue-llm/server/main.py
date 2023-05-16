@@ -21,10 +21,8 @@ def read_root():
 @app.post("/api/infer")
 def read_item(payload: dict = Body(...)):
     model = payload["model"]
-    model_path = model_paths[model]
+    prompt = payload["prompt"]
 
-    infer = inferrer_factory(model, path.join(server_dir, model_path))
-    inferrance = infer(payload)
-    return {
-        "inferrance": inferrance
-    }
+    model_path = path.join(server_dir, model_paths[model])
+    infer = inferrer_factory(model, model_path)
+    return infer(prompt)
