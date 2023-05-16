@@ -9,6 +9,7 @@ channels==3.0.3
 channels-redis==3.2.0
 configobj==5.0.6
 cryptography==36.0.1
+cx-Oracle==8.3.0
 django-auth-ldap==2.3.0
 Django==3.2.16
 daphne==3.0.2
