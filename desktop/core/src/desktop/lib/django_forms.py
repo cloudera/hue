@@ -17,8 +17,6 @@
 #
 # Extra form fields and widgets.
 
-from future import standard_library
-standard_library.install_aliases()
 from builtins import filter
 from builtins import range
 from builtins import object

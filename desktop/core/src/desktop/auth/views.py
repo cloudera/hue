@@ -16,8 +16,6 @@
 # limitations under the License.
 import json
 
-from future import standard_library
-standard_library.install_aliases()
 try:
   import oauth2 as oauth
 except:

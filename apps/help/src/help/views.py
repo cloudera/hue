@@ -15,8 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from future import standard_library
-standard_library.install_aliases()
 from builtins import str
 from desktop.lib.django_util import render
 from desktop.lib.exceptions_renderable import PopupException

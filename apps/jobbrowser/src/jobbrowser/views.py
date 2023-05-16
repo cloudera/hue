@@ -16,8 +16,6 @@
 # limitations under the License.
 
 from past.builtins import cmp
-from future import standard_library
-standard_library.install_aliases()
 from builtins import filter
 from builtins import str
 import functools

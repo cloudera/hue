@@ -21,8 +21,6 @@ Classes for a custom upload handler to stream into S3.
 See http://docs.djangoproject.com/en/1.9/topics/http/file-uploads/
 """
 
-from future import standard_library
-standard_library.install_aliases()
 import logging
 import sys
 

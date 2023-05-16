@@ -49,8 +49,6 @@ Each URL is mapped to one engine and should be created once per process.
 Each query statement grabs a connection from the engine and will return it after its close().
 Disposing the engine closes all its connections.
 '''
-from future import standard_library
-standard_library.install_aliases()
 
 from builtins import next, object
 import datetime

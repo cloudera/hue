@@ -18,8 +18,6 @@
 """
 Common library to export either CSV or XLS.
 """
-from future import standard_library
-standard_library.install_aliases()
 from builtins import next, object
 import gc
 import logging

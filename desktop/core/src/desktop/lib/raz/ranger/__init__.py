@@ -16,7 +16,7 @@
 from __future__ import absolute_import
 
 from builtins import map
-from future.utils import raise_
+from six import reraise as raise_
 import calendar
 import errno
 import logging

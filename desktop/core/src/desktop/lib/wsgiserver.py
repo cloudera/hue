@@ -100,9 +100,7 @@ number of requests and their responses, so we run a nested loop:
 """
 
 
-from future import standard_library
-from future.utils import raise_
-standard_library.install_aliases()
+from six import reraise as raise_
 from builtins import hex
 from builtins import range
 from past.builtins import basestring

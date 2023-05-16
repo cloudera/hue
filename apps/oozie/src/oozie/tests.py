@@ -16,9 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from future import standard_library
 from functools import reduce
-standard_library.install_aliases()
 from builtins import str
 from past.builtins import basestring
 from builtins import object

@@ -19,8 +19,6 @@
 The HQLdesign class can (de)serialize a design to/from a QueryDict.
 """
 
-from future import standard_library
-standard_library.install_aliases()
 from builtins import object
 import json
 import logging

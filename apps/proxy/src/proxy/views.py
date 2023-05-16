@@ -23,8 +23,6 @@
 # to create links (within the application) to trusted
 # URLs, by appending an HMAC to the parameters.
 
-from future import standard_library
-standard_library.install_aliases()
 from builtins import str
 import logging
 import re

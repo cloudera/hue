@@ -18,8 +18,6 @@
 See desktop/auth/backend.py
 """
 
-from future import standard_library
-standard_library.install_aliases()
 import json
 import cgi
 import logging

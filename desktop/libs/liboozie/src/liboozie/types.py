@@ -23,8 +23,6 @@ http://incubator.apache.org/oozie/docs/3.2.0-incubating/docs/WebServicesAPI.html
 """
 from __future__ import division
 
-from future import standard_library
-standard_library.install_aliases()
 from builtins import object
 import logging
 import math

@@ -16,8 +16,6 @@
 # limitations under the License.
 #
 from __future__ import division
-from future import standard_library
-standard_library.install_aliases()
 from builtins import map
 from builtins import range
 from past.builtins import basestring
