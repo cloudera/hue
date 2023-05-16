@@ -103,7 +103,7 @@ class RazClient(object):
     LOG.debug('Raz url: %s' % raz_url)
     LOG.debug("Sending access check headers: {%s} request_data: {%s}" % (request_headers, request_data))
 
-    raz_req = self._handle_raz_req(raz_url, auth_type, request_headers, request_data)
+    raz_req = self._handle_raz_req(raz_url, request_headers, request_data)
 
     signed_response_result = None
     signed_response = None
@@ -140,7 +140,7 @@ class RazClient(object):
             return dict([(i.key, i.value) for i in signed_response.signer_generated_headers])
 
 
-  def _handle_raz_req(self, raz_url, auth_type, request_headers, request_data):
+  def _handle_raz_req(self, raz_url, request_headers, request_data):
     if self.auth_type == 'kerberos':
       auth_handler = requests_kerberos.HTTPKerberosAuth(mutual_authentication=requests_kerberos.OPTIONAL)
       raz_req = requests.post(raz_url, headers=request_headers, json=request_data, auth=auth_handler, verify=False)
