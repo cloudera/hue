@@ -1,0 +1,6 @@
+{
+  "model_paths": {
+    "llama": "models/ggml-model-q4_0.bin",
+    "dummy": "dummy/path"
+  }
+}
