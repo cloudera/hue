@@ -10,7 +10,7 @@ channels-redis==3.2.0
 configobj==5.0.6
 cryptography==36.0.1
 cx-Oracle==8.3.0
-django-auth-ldap==2.3.0
+django-auth-ldap==4.3.0
 Django==3.2.16
 daphne==3.0.2
 django-celery-beat==2.2.1
@@ -53,7 +53,7 @@ pytest==6.0.2
 pytest-django==3.10.0
 python-dateutil==2.8.2
 python-daemon==2.2.4
-python-ldap==3.1.0
+python-ldap==3.4.3
 python-oauth2==1.1.0
 python-pam==2.0.2
 pytidylib==0.3.2
