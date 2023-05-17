@@ -53,7 +53,8 @@ import desktop.views
 from desktop import appmanager, metrics
 from desktop.auth.backend import is_admin, find_or_create_user, ensure_has_a_group, rewrite_user
 from desktop.conf import AUTH, HTTP_ALLOWED_METHODS, ENABLE_PROMETHEUS, KNOX, DJANGO_DEBUG_MODE, AUDIT_EVENT_LOG_DIR, \
-    METRICS, SERVER_USER, REDIRECT_WHITELIST, SECURE_CONTENT_SECURITY_POLICY, has_connectors, is_gunicorn_report_enabled
+    METRICS, SERVER_USER, REDIRECT_WHITELIST, SECURE_CONTENT_SECURITY_POLICY, has_connectors, is_gunicorn_report_enabled, \
+    CUSTOM_CACHE_CONTROL
 from desktop.context_processors import get_app_name
 from desktop.lib import apputil, i18n, fsmanager
 from desktop.lib.django_util import JsonResponse, render, render_json
@@ -949,3 +950,19 @@ class MultipleProxyMiddleware:
           parts = request.META[field].split(',')
           request.META[field] = parts[-1].strip()
     return self.get_response(request)
+
+
+class CacheControlMiddleware(MiddlewareMixin):
+  def __init__(self, get_response):
+    self.get_response = get_response
+    self.custom_cache_control = CUSTOM_CACHE_CONTROL.get()
+    if not self.custom_cache_control:
+      LOG.info('Unloading CacheControlMiddleware')
+      raise exceptions.MiddlewareNotUsed
+
+  def process_response(self, request, response):
+    if self.custom_cache_control:
+      response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+      response['Pragma'] = 'no-cache'
+      response['Expires'] = '0'
+    return response
