@@ -1671,6 +1671,13 @@ SEND_DBUG_MESSAGES = Config(
   default=False
 )
 
+CUSTOM_CACHE_CONTROL = Config(
+  key="custom_cache_control",
+  help=_("Flag to disable webpage caching."),
+  type=coerce_bool,
+  default=False
+)
+
 DATABASE_LOGGING = Config(
   key="database_logging",
   help=_("Enable or disable database debug mode."),
