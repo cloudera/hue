@@ -21,7 +21,9 @@ import logging
 import json
 import posixpath
 import sys
+import time
 
+from desktop.auth.backend import rewrite_user
 from desktop.lib.i18n import force_unicode
 from desktop.lib.rest.http_client import HttpClient, RestException
 from desktop.lib.rest.resource import Resource
@@ -37,10 +39,8 @@ else:
 LOG = logging.getLogger()
 _JSON_CONTENT_TYPE = 'application/json'
 _API_VERSION = 'v1'
-SESSIONS = {}
 SESSION_KEY = '%(username)s-%(connector_name)s'
-
-n = 0
+OPERATION_TOKEN = '%(username)s-%(connector_name)s' + '-operation-token'
 
 
 def query_error_handler(func):
@@ -78,78 +78,130 @@ class FlinkSqlApi(Api):
 
     response = {
       'type': lang,
-      'id': session['session_id']
+      'id': session['sessionHandle']
     }
 
     return response
 
-  def _get_session(self):
-    session_key = SESSION_KEY % {
-      'username': self.user.username,
+
+  def _get_session_key(self):
+    return SESSION_KEY % {
+      'username': self.user.username if hasattr(self.user, 'username') else self.user,
       'connector_name': self.interpreter['name']
     }
 
-    if session_key not in SESSIONS:
-      SESSIONS[session_key] = self.db.create_session()
+
+  def _get_session_info_from_user(self):
+    self.user = rewrite_user(self.user)
+    session_key = self._get_session_key()
+
+    if self.user.profile.data.get(session_key):
+      return self.user.profile.data[session_key]
+
+
+  def _set_session_info_to_user(self, session_info):
+    self.user = rewrite_user(self.user)
+    session_key = self._get_session_key()
+
+    self.user.profile.update_data({session_key: session_info})
+    self.user.profile.save()
+
+
+  def _remove_session_info_from_user(self):
+    self.user = rewrite_user(self.user)
+    session_key = self._get_session_key()
+    operation_token_key = self._get_operation_token_key()
+
+    if self.user.profile.data.get(session_key):
+      json_data = self.user.profile.data
+      json_data.pop(session_key)
+      json_data.pop(operation_token_key)
+      self.user.profile.json_data = json.dumps(json_data)
+    
+    self.user.profile.save()
+
+
+  def _get_operation_token_key(self):
+    return OPERATION_TOKEN % {
+      'username': self.user.username if hasattr(self.user, 'username') else self.user,
+      'connector_name': self.interpreter['name']
+    }
+
+
+  def _get_operation_token_info_from_user(self, operation_handle):
+    self.user = rewrite_user(self.user)
+    operation_token_key = self._get_operation_token_key()
+
+    if self.user.profile.data.get(operation_token_key):
+      return self.user.profile.data[operation_token_key][operation_handle]
+
+  
+  def _set_operation_token_info_to_user(self, operation_handle, token):
+    self.user = rewrite_user(self.user)
+    operation_token_key = self._get_operation_token_key()
+
+    json_data = self.user.profile.data
+
+    if self.user.profile.data.get(operation_token_key) is None:
+      json_data[operation_token_key] = {}
+    
+    json_data[operation_token_key][operation_handle] = token
+    self.user.profile.update_data(json_data)
+    
+    self.user.profile.save()
+  
+
+  def _remove_operation_token_info_from_user(self, operation_handle):
+    self.user = rewrite_user(self.user)
+    operation_token_key = self._get_operation_token_key()
+
+    if self.user.profile.data.get(operation_token_key):
+      json_data = self.user.profile.data
+      json_data[operation_token_key].pop(operation_handle)
+      self.user.profile.json_data = json.dumps(json_data)
+    
+    self.user.profile.save()
+
+
+  def _get_session(self):
+    session = self._get_session_info_from_user()
+
+    if not session:
+      session = self.db.create_session()
 
     try:
-      self.db.session_heartbeat(session_id=SESSIONS[session_key]['session_id'])
+      self.db.session_heartbeat(session_handle=session['sessionHandle'])
     except Exception as e:
-      if 'Session: %(id)s does not exist' % SESSIONS[session_key] in str(e):
-        LOG.warning('Session: %(id)s does not exist, opening a new one' % SESSIONS[session_key])
-        SESSIONS[session_key] = self.db.create_session()
+      if "Session '%(sessionHandle)s' does not exist" % session in str(e):
+        LOG.warning('Session %(sessionHandle)s does not exist, opening a new one' % session)
+        session = self.db.create_session()
       else:
         raise e
 
-    SESSIONS[session_key]['id'] = SESSIONS[session_key]['session_id']
+    session['id'] = session['sessionHandle']
+    self._set_session_info_to_user(session)
 
-    return SESSIONS[session_key]
+    return session
 
 
   @query_error_handler
   def execute(self, notebook, snippet):
-    global n
-    n = 0
     session = self._get_session()
-    session_id = session['id']
-    job_id = None
+    session_handle = session['id']
 
     statement = snippet['statement'].strip().rstrip(';')
 
-    resp = self.db.execute_statement(session_id=session_id, statement=statement)
-
-    if resp['statement_types'][0] == 'SELECT':
-      job_id = resp['results'][0]['data'][0][0]
-      data, description = [], []
-      # TODO: change_flags
-    else:
-      data, description = resp['results'][0]['data'], resp['results'][0]['columns']
-
-    has_result_set = data is not None
+    operation_handle = self.db.execute_statement(session_handle=session_handle, statement=statement)
+    self._set_operation_token_info_to_user(operation_handle['operationHandle'], 0)
 
     return {
-      'sync': job_id is None,
-      'has_result_set': has_result_set,
-      'guid': job_id,
-      'result': {
-        'has_more': job_id is not None,
-        'data': data if job_id is None else [],
-        'meta': [{
-            'name': col['name'],
-            'type': col['type'],
-            'comment': ''
-          }
-          for col in description
-        ]
-        if has_result_set else [],
-        'type': 'table'
-      }
+      'has_result_set': True,
+      'guid': operation_handle['operationHandle'],
     }
 
 
   @query_error_handler
   def check_status(self, notebook, snippet):
-    global n
     response = {}
     session = self._get_session()
 
@@ -164,17 +216,19 @@ class FlinkSqlApi(Api):
           try:
             resp = self.db.fetch_status(session['id'], statement_id)
             if resp.get('status') == 'RUNNING':
-              status = 'streaming'
-              response['result'] = self.fetch_result(notebook, snippet, n, False)
+              status = 'running'
             elif resp.get('status') == 'FINISHED':
               status = 'available'
-            elif resp.get('status') == 'FAILED':
-              status = 'failed'
             elif resp.get('status') == 'CANCELED':
               status = 'expired'
+            elif resp.get('status') == 'CLOSED':
+              status = 'closed'
+            elif resp.get('status') == 'ERROR':
+              status = 'error'
+              self._remove_operation_token_info_from_user(statement_id) 
           except Exception as e:
-            if '%s does not exist in current session' % statement_id in str(e):
-              LOG.warning('Job: %s does not exist' % statement_id)
+            if 'Can not find the submitted operation in the OperationManager with the %s' % statement_id in str(e):
+              LOG.warning('Operation Handle: %s does not exist' % statement_id)
             else:
               raise e
 
@@ -185,26 +239,33 @@ class FlinkSqlApi(Api):
 
   @query_error_handler
   def fetch_result(self, notebook, snippet, rows, start_over):
-    global n
     session = self._get_session()
     statement_id = snippet['result']['handle']['guid']
-    token = n #rows
 
-    resp = self.db.fetch_results(session['id'], job_id=statement_id, token=token)
+    token = self._get_operation_token_info_from_user(statement_id)
 
-    next_result = resp.get('next_result_uri')
+    resp = self.db.fetch_results(session['id'], operation_handle=statement_id, token=token)
+
+    next_result = resp.get('nextResultUri') if resp else None
+
     if next_result:
       n = int(next_result.rsplit('/', 1)[-1])
+      self._set_operation_token_info_to_user(statement_id, n)
+
+    data = [db['fields'] for db in resp['results']['data'] if resp and resp['results'] and resp['results']['data']]
+
+    if not bool(next_result):
+      self._remove_operation_token_info_from_user(statement_id)  ## This will not be required if close_statement one will start working
 
     return {
         'has_more': bool(next_result),
-        'data': resp and resp['results'][0]['data'] or [],  # No escaping...
+        'data': data,  # No escaping...
         'meta': [{
             'name': column['name'],
-            'type': column['type'],
-            'comment': ''
+            'type': column['logicalType']['type'],
+            'comment': column['comment']
           }
-          for column in resp['results'][0]['columns'] if resp
+          for column in resp['results']['columns'] if resp
         ],
         'type': 'table'
     }
@@ -236,28 +297,67 @@ class FlinkSqlApi(Api):
   def get_sample_data(self, snippet, database=None, table=None, column=None, is_async=False, operation=None):
     if operation == 'hello':
       snippet['statement'] = "SELECT 'Hello World!'"
+    else:
+      snippet['statement'] = "SELECT * FROM %(database)s.%(table)s LIMIT 100;" % {
+        'database': database,
+        'table': table
+       }
+    
+    session = self._get_session()
+    operation_handle = self.db.execute_statement(session_handle=session['id'], statement=snippet['statement'])
+    resp = self.db.fetch_results(session['id'], operation_handle['operationHandle'], 0)
 
-    notebook = {}
-    sample = self.execute(notebook, snippet)
+    sample = [db['fields'] for db in resp['results']['data'] if resp and resp['results'] and resp['results']['data']]
+    n = 0
+    
+    while resp['resultType'] != 'EOS':
+      resp = self.db.fetch_results(session['id'], operation_handle['operationHandle'], n)
+      if resp['resultType'] == 'PAYLOAD':
+        n = n+1
+      sample += [db['fields'] for db in resp['results']['data'] if resp and resp['results'] and resp['results']['data']]
+      time.sleep(1)
+      if len(sample) > 0:
+        break
 
     response = {
       'status': 0,
-      'result': {}
+      'result': {'handle': {'guid': operation_handle['operationHandle']}}
     }
-
-    response['rows'] = sample['result']['data']
-    response['full_headers'] = sample['result']['meta']
+    response['rows'] = sample
+    response['full_headers'] = [
+      {
+        'name': column['name'],
+        'type': column['logicalType']['type'],
+        'comment': column['comment']
+      }
+      for column in resp['results']['columns'] if resp
+    ]
 
     return response
 
 
+  @query_error_handler
   def cancel(self, notebook, snippet):
+    session = self._get_session()
+    operation_handle = snippet['result']['handle']['guid']
+
+    try:
+      self.db.cancel(session['id'], operation_handle)
+    except Exception as e:
+      message = force_unicode(str(e)).lower()
+      LOG.debug(message)
+
+    return {'status': 0}
+
+  @query_error_handler
+  def close_statement(self, notebook, snippet):
     session = self._get_session()
     statement_id = snippet['result']['handle']['guid']
 
     try:
       if session and statement_id:
-        self.db.close_statement(session_id=session['id'], job_id=statement_id)
+        self.db.close_statement(session_handle=session['id'], operation_handle=statement_id)
+        # self._remove_operation_token_info_from_user(statement_id)     ## Needs to check why Hue db not getting updated
       else:
         return {'status': -1} # missing operation ids
     except Exception as e:
@@ -272,50 +372,79 @@ class FlinkSqlApi(Api):
   def close_session(self, session):
     # Avoid closing session on page refresh or editor close for now
     pass
-    # session = self._get_session()
-    # self.db.close_session(session['id'])
+
+    # response = {
+    #   'status': 0,
+    #   'session': session['id']
+    # }
+
+    # stored_session = self._get_session_info_from_user()
+    # if stored_session and session['id'] == stored_session['id']:
+    #   self.db.close_session(session['id'])
+    #   self._remove_session_info_from_user()
+    # else:
+    #   return {'status': -1}
+    
+    # return response
+
+  
+  def _check_status_and_fetch_result(self, session_handle, operation_handle):
+    resp = self.db.fetch_results(session_handle, operation_handle, 0)
+
+    while resp['resultType'] == 'NOT_READY':
+      resp = self.db.fetch_results(session_handle, operation_handle, 0)
+    
+    data = [i['fields'] for i in resp['results']['data'] if resp and resp['results'] and resp['results']['data']]
+    return data
 
 
   def _show_databases(self):
     session = self._get_session()
-    session_id = session['id']
+    session_handle = session['id']
 
-    resp = self.db.execute_statement(session_id=session_id, statement='SHOW DATABASES')
+    operation_handle = self.db.execute_statement(session_handle=session_handle, statement='SHOW DATABASES')
+    db_list = self._check_status_and_fetch_result(session_handle, operation_handle['operationHandle'])
 
-    return [db[0] for db in resp['results'][0]['data']]
+    return [db[0] for db in db_list]
 
 
   def _show_tables(self, database):
     session = self._get_session()
-    session_id = session['id']
+    session_handle = session['id']
 
-    resp = self.db.execute_statement(session_id=session_id, statement='USE %(database)s' % {'database': database})
-    resp = self.db.execute_statement(session_id=session_id, statement='SHOW TABLES')
+    self.db.execute_statement(session_handle=session_handle, statement='USE %(database)s' % {'database': database})
+    operation_handle = self.db.execute_statement(session_handle=session_handle, statement='SHOW TABLES')
+    table_list = self._check_status_and_fetch_result(session_handle, operation_handle['operationHandle'])
 
-    return [table[0] for table in resp['results'][0]['data']]
+    return [{
+        'name': table[0],
+        'type': 'Table',
+        'comment': '',
+      }
+      for table in table_list
+    ]
 
 
   def _get_columns(self, database, table):
     session = self._get_session()
-    session_id = session['id']
+    session_handle = session['id']
 
-    resp = self.db.execute_statement(session_id=session_id, statement='USE %(database)s' % {'database': database})
-    resp = self.db.execute_statement(session_id=session_id, statement='DESCRIBE %(table)s' % {'table': table})
-    columns = resp['results'][0]['data']
+    self.db.execute_statement(session_handle=session_handle, statement='USE %(database)s' % {'database': database})
+    operation_handle = self.db.execute_statement(session_handle=session_handle, statement='DESCRIBE %(table)s' % {'table': table})
+    column_list = self._check_status_and_fetch_result(session_handle, operation_handle['operationHandle'])
 
     return [{
         'name': col[0],
         'type': col[1],  # Types to unify
         'comment': '',
       }
-      for col in columns
+      for col in column_list
     ]
 
 
 class FlinkSqlClient():
   '''
-  Implements https://github.com/ververica/flink-sql-gateway
-  Could be a pip module or sqlalchemy dialect in the future.
+  Implements https://nightlies.apache.org/flink/flink-docs-master/docs/dev/table/sql-gateway/rest/.
   '''
 
   def __init__(self, user, api_url):
@@ -332,62 +461,65 @@ class FlinkSqlClient():
 
   def create_session(self, **properties):
     data = {
-        "session_name": "test",  # optional
-        "planner": "blink",  # required, "old"/"blink"
-        "execution_type": "streaming",  # required, "batch"/"streaming"
-        "properties": {  # optional
-            "key": "value"
-        }
+        "sessionName": "test",  # optional
     }
     data.update(properties)
 
     return self._root.post('sessions', data=json.dumps(data), contenttype=_JSON_CONTENT_TYPE)
 
-  def session_heartbeat(self, session_id):
-    return self._root.post('sessions/%(session_id)s/heartbeat' % {'session_id': session_id})
+  def session_heartbeat(self, session_handle):
+    return self._root.post('sessions/%(session_handle)s/heartbeat' % {'session_handle': session_handle})
 
-  def execute_statement(self, session_id, statement):
+  def execute_statement(self, session_handle, statement):
     data = {
         "statement": statement,  # required
-        "execution_timeout": ""  # execution time limit in milliseconds, optional, but required for stream SELECT ?
+        "executionTimeout": ""  # execution time limit in milliseconds, optional, but required for stream SELECT ?
     }
 
     return self._root.post(
-        'sessions/%(session_id)s/statements' % {
-        'session_id': session_id
+        'sessions/%(session_handle)s/statements' % {
+        'session_handle': session_handle
       },
       data=json.dumps(data),
       contenttype=_JSON_CONTENT_TYPE
     )
 
-  def fetch_status(self, session_id, job_id):
+  def fetch_status(self, session_handle, operation_handle):
     return self._root.get(
-      'sessions/%(session_id)s/jobs/%(job_id)s/status' % {
-        'session_id': session_id,
-        'job_id': job_id
+      'sessions/%(session_handle)s/operations/%(operation_handle)s/status' % {
+        'session_handle': session_handle,
+        'operation_handle': operation_handle
       }
     )
 
-  def fetch_results(self, session_id, job_id, token=0):
+  def fetch_results(self, session_handle, operation_handle, token=0):
     return self._root.get(
-      'sessions/%(session_id)s/jobs/%(job_id)s/result/%(token)s' % {
-        'session_id': session_id,
-        'job_id': job_id,
+      'sessions/%(session_handle)s/operations/%(operation_handle)s/result/%(token)s' % {
+        'session_handle': session_handle,
+        'operation_handle': operation_handle,
         'token': token
       }
     )
 
-  def close_statement(self, session_id, job_id):
+  def close_statement(self, session_handle, operation_handle):
     return self._root.delete(
-      'sessions/%(session_id)s/jobs/%(job_id)s' % {
-        'session_id': session_id,
-        'job_id': job_id,
+      'sessions/%(session_handle)s/operations/%(operation_handle)s/close' % {
+        'session_handle': session_handle,
+        'operation_handle': operation_handle,
       }
     )
 
-  def close_session(self, session_id):
+  def cancel(self, session_handle, operation_handle):
     return self._root.delete(
-      'sessions/%(session_id)s' % {
-        'session_id': session_id,
+      'sessions/%(session_handle)s/operations/%(operation_handle)s/cancle' % {
+        'session_handle': session_handle,
+        'operation_handle': operation_handle,
+      }
+    )
+
+  def close_session(self, session_handle):
+    return self._root.delete(
+      'sessions/%(session_handle)s' % {
+        'session_handle': session_handle,
       }
     )
