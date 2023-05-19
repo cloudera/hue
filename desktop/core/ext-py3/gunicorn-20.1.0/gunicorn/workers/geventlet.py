@@ -130,7 +130,7 @@ class EventletWorker(AsyncWorker):
         return super().is_already_handled(respiter)
 
     def init_process(self):
-        self.patch()
+        #self.patch()
         super().init_process()
 
     def handle_quit(self, sig, frame):

@@ -141,7 +141,7 @@ class GeventWorker(AsyncWorker):
         gevent.spawn(super().handle_usr1, sig, frame)
 
     def init_process(self):
-        self.patch()
+        #self.patch()
         hub.reinit()
         super().init_process()
 
