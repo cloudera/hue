@@ -84,8 +84,8 @@ jobs:
 
     steps:
       - build-py-38-common:
-        go_arch: "amd64"
-        hugo_arch: "64bit"
+          go_arch: "amd64"
+          hugo_arch: "64bit"
 
   build-py-38-arm64:
     machine:
@@ -96,8 +96,8 @@ jobs:
 
     steps:
       - build-py-38-common:
-        go_arch: "arm64"
-        hugo_arch: "ARM64"
+          go_arch: "arm64"
+          hugo_arch: "ARM64"
 
 workflows:
   version: 2
