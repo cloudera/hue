@@ -116,14 +116,6 @@
       <groupId>org.apache.hadoop</groupId>
       <artifactId>hadoop-hdfs</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.apache.ozone</groupId>
-      <artifactId>ozone-filesystem-common</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.ozone</groupId>
-      <artifactId>ozone-filesystem</artifactId>
-    </dependency>
 
     <!-- Test -->
     <dependency>
@@ -222,5 +214,21 @@
       </resource>
     </resources>
   </build>
+
+  <profiles>
+    <profile>
+      <id>ozone</id>
+      <dependencies>
+        <dependency>
+          <groupId>org.apache.ozone</groupId>
+          <artifactId>ozone-filesystem-common</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.ozone</groupId>
+          <artifactId>ozone-filesystem</artifactId>
+        </dependency>
+      </dependencies>
+    </profile>
+  </profiles>
 
 </project>
