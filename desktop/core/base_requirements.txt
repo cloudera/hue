@@ -7,7 +7,7 @@ celery[redis]==5.2.7
 cffi==1.15.0
 channels==3.0.3
 channels-redis==3.2.0
-configobj==5.0.6
+configobj==5.0.8
 cx-Oracle==8.3.0
 django-auth-ldap==4.3.0
 Django==3.2.16
@@ -29,7 +29,6 @@ djangorestframework-simplejwt==5.2.0
 djangorestframework==3.12.2
 future==0.18.3
 greenlet==2.0.2
-gunicorn==19.9.0
 ipython==8.1.1  # Python >= 3.8
 jaeger-client==4.3.0
 jdcal==1.0.1
@@ -49,12 +48,12 @@ pylint-django==2.3.0
 pytest==6.0.2
 pytest-django==3.10.0
 python-dateutil==2.8.2
-python-daemon==2.2.4
-python-ldap==3.4.3
+python-daemon==3.0.1
+python-ldap==3.1.0
 python-oauth2==1.1.0
 python-pam==2.0.2
 pytidylib==0.3.2
-pytz==2021.3
+pytz==2023.3
 PyJWT==2.4.0
 PyYAML==5.4.1
 requests-kerberos==0.12.0
@@ -77,3 +76,4 @@ six==1.16.0
 -e file:///${ROOT}/desktop/core/ext-py3/djangosaml2-0.18.0
 -e file:///${ROOT}/desktop/core/ext-py3/eventlet-0.30.2
 -e file:///${ROOT}/desktop/core/ext-py3/pysaml2-5.0.0
+-e file:///${ROOT}/desktop/core/ext-py3/gunicorn-20.1.0
