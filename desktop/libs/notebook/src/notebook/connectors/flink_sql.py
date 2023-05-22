@@ -37,6 +37,7 @@ else:
 
 
 LOG = logging.getLogger()
+
 _JSON_CONTENT_TYPE = 'application/json'
 _API_VERSION = 'v1'
 SESSION_KEY = '%(username)s-%(connector_name)s'
@@ -445,11 +446,12 @@ class FlinkSqlApi(Api):
 class FlinkSqlClient():
   '''
   Implements https://nightlies.apache.org/flink/flink-docs-master/docs/dev/table/sql-gateway/rest/.
+  Could be a pip module or sqlalchemy dialect in the future.
   '''
 
   def __init__(self, user, api_url):
     self.user = user
-    self._url = posixpath.join(api_url + '/' + _API_VERSION + '/')
+    self._url = posixpath.join(api_url.rstrip('/') + '/' + _API_VERSION + '/')
     self._client = HttpClient(self._url, logger=LOG)
     self._root = Resource(self._client)
 
@@ -461,7 +463,7 @@ class FlinkSqlClient():
 
   def create_session(self, **properties):
     data = {
-        "sessionName": "test",  # optional
+        "sessionName": self.user.username + "-flink-sql",
     }
     data.update(properties)
 
@@ -511,7 +513,7 @@ class FlinkSqlClient():
 
   def cancel(self, session_handle, operation_handle):
     return self._root.delete(
-      'sessions/%(session_handle)s/operations/%(operation_handle)s/cancle' % {
+      'sessions/%(session_handle)s/operations/%(operation_handle)s/cancel' % {
         'session_handle': session_handle,
         'operation_handle': operation_handle,
       }
@@ -519,6 +521,13 @@ class FlinkSqlClient():
 
   def close_session(self, session_handle):
     return self._root.delete(
+      'sessions/%(session_handle)s' % {
+        'session_handle': session_handle,
+      }
+    )
+
+  def get_session_conf(self, session_handle):
+    return self._root.get(
       'sessions/%(session_handle)s' % {
         'session_handle': session_handle,
       }
