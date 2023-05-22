@@ -107,6 +107,7 @@
 
       % if return_json:
         $('#submit-rerun-form${ SUFFIX }').submit(function (e) {
+          huePubSub.publish('graph.clear.widget.status');
           $.ajax({
             type: "POST",
             url: window.HUE_BASE_URL + '${ action }', // window.HUE_BASE_URL is empty string when Knox is not enabled
