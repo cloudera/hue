@@ -7,12 +7,12 @@ version: 2.1
 commands:
   build-py-38-common:
     parameters:
-        go_arch:
-          # amd64 or arm64
-          type: string
-        hugo_arch:
-          # 64bit (AMD64) or ARM64
-          type: string
+      go_arch:
+        # amd64 or arm64
+        type: string
+      hugo_arch:
+        # 64bit (AMD64) or ARM64
+        type: string
     steps:
       - checkout
 
