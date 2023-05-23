@@ -33,6 +33,7 @@ from desktop.lib.paths import get_desktop_root
 from django.core.management.base import BaseCommand
 from django.core.wsgi import get_wsgi_application
 from django.utils.translation import gettext as _
+from django.db import connection
 from gunicorn import util
 from six import iteritems
 
@@ -75,6 +76,12 @@ def post_fork(server, worker):
   global PID_FILE
   with open(PID_FILE, "a") as f:
     f.write("%s\n"%worker.pid)
+
+def post_worker_init(worker):
+  connection.connect()
+
+def worker_int(worker):
+  connection.close()
 
 def enable_logging(args, options):
   HUE_DESKTOP_VERSION = pkg_resources.get_distribution("desktop").version or "Unknown"
@@ -206,7 +213,9 @@ def rungunicornserver(args=[], options={}):
       'worker_connections': 1000,
       'worker_tmp_dir': options['worker_tmp_dir'],
       'workers': conf.GUNICORN_NUMBER_OF_WORKERS.get() if conf.GUNICORN_NUMBER_OF_WORKERS.get() is not None else 5,
-      'post_fork': post_fork
+      'post_fork': post_fork,
+      'post_worker_init': post_worker_init,
+      'worker_int': worker_int
   }
   StandaloneApplication(handler_app, gunicorn_options).run()
 
