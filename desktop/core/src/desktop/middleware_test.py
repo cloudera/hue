@@ -22,12 +22,15 @@ import tempfile
 
 from django.conf import settings
 from django.test.client import Client
-from nose.tools import assert_equal, assert_false, assert_true
+from nose.tools import assert_equal, assert_false, assert_true, assert_not_in
 from nose.plugins.skip import SkipTest
+from django.http import HttpResponse
+from django.core import exceptions
 
 import desktop.conf
 
-from desktop.conf import AUDIT_EVENT_LOG_DIR
+from desktop.middleware import CacheControlMiddleware
+from desktop.conf import AUDIT_EVENT_LOG_DIR, CUSTOM_CACHE_CONTROL
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_permission
 
@@ -200,4 +203,33 @@ def test_spnego_middleware():
     for finish in done:
       finish()
     settings.AUTHENTICATION_BACKENDS = orig_backends
+
+def test_cache_control_middleware():
+  c = Client()
+  request = c.get("/")
+
+  def dummy_get_response(request):
+    return HttpResponse()
+
+  reset = CUSTOM_CACHE_CONTROL.set_for_testing(True)
+  try:
+    middleware = CacheControlMiddleware(dummy_get_response)
+    response = middleware(request)
+    assert_equal(response['Cache-Control'], 'no-cache, no-store, must-revalidate')
+    assert_equal(response['Pragma'], 'no-cache')
+    assert_equal(response['Expires'], '0')
+  finally:
+    reset()
+
+  reset = CUSTOM_CACHE_CONTROL.set_for_testing(False)
+  try:
+    middleware = CacheControlMiddleware(dummy_get_response)
+    response = middleware(request)
+    assert_not_in('Cache-Control', response)
+    assert_not_in('Pragma', response)
+    assert_not_in('Expires', response)
+  except exceptions.MiddlewareNotUsed:
+    response = dummy_get_response(request)
+  finally:
+    reset()
 
