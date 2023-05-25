@@ -425,7 +425,7 @@ class PamBackend(DesktopBackendBase):
       LOG.debug('Setting username to %s using PAM pwd module for user %s' % (getpwnam(username).pw_name, username))
       username = getpwnam(username).pw_name
 
-    if pam.authenticate(username, password, AUTH.PAM_SERVICE.get()):
+    if pam.authenticate(username, password, AUTH.PAM_SERVICE.get(), print_failure_messages=True, resetcreds=False):
       is_super = False
       if User.objects.exclude(id=install_sample_user().id).count() == 0:
         is_super = True
