@@ -1,2 +1,0 @@
-include README.md Makefile LICENSE
-include test_*.py
