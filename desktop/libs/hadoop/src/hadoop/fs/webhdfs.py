@@ -23,6 +23,8 @@ from future import standard_library
 standard_library.install_aliases()
 from builtins import oct
 from builtins import object
+from cachetools.func import ttl_cache
+from datetime import datetime, timedelta
 import errno
 import logging
 import posixpath
@@ -942,7 +944,7 @@ class WebHdfs(Hdfs):
         del params['user.name']
     return params
 
-
+  @ttl_cache(maxsize=128, ttl=timedelta(hours=8), timer=datetime.now, typed=False)
   def get_delegation_token(self, renewer):
     """get_delegation_token(user) -> Delegation token"""
     # Workaround for HDFS-3988
