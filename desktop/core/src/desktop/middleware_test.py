@@ -22,6 +22,8 @@ import tempfile
 
 from django.conf import settings
 from django.test.client import Client
+from django.test import RequestFactory
+import unittest
 from nose.tools import assert_equal, assert_false, assert_true, assert_not_in
 from nose.plugins.skip import SkipTest
 from django.http import HttpResponse
@@ -29,7 +31,7 @@ from django.core import exceptions
 
 import desktop.conf
 
-from desktop.middleware import CacheControlMiddleware
+from desktop.middleware import CacheControlMiddleware, MultipleProxyMiddleware
 from desktop.conf import AUDIT_EVENT_LOG_DIR, CUSTOM_CACHE_CONTROL
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_permission
@@ -232,4 +234,32 @@ def test_cache_control_middleware():
     response = dummy_get_response(request)
   finally:
     reset()
+
+def get_response(request):
+  return request
+
+class TestMultipleProxyMiddleware(unittest.TestCase):
+
+  def setUp(self):
+    self.factory = RequestFactory()
+    self.middleware = MultipleProxyMiddleware(get_response)
+
+  def test_multiple_proxy_middleware(self):
+    request = self.factory.get('/')
+    request.META['HTTP_X_FORWARDED_FOR'] = '192.0.2.0, 192.0.2.1, 192.0.2.2'
+    request.META['HTTP_X_REAL_IP'] = '192.0.2.1'
+    self.middleware(request)
+    assert_equal(request.META['HTTP_X_FORWARDED_FOR'], '192.0.2.1')
+
+  def test_multiple_proxy_middleware_without_x_real_ip(self):
+    request = self.factory.get('/')
+    request.META['HTTP_X_FORWARDED_FOR'] = '192.0.2.0, 192.0.2.1, 192.0.2.2'
+    self.middleware(request)
+    assert_equal(request.META['HTTP_X_FORWARDED_FOR'], '192.0.2.2')
+
+  def test_multiple_proxy_middleware_without_x_forwarded_for(self):
+    request = self.factory.get('/')
+    request.META['REMOTE_ADDR'] = '192.0.2.0'
+    self.middleware(request)
+    assert_equal(request.META['HTTP_X_FORWARDED_FOR'], '192.0.2.0')
 
