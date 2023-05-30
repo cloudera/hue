@@ -933,7 +933,12 @@ class WebHdfs(Hdfs):
 
 
   def _set_params_with_delegation_token(self, params):
-    token = self.get_delegation_token(self.user)
+    try:
+      token = self.get_delegation_token(self.user)
+    except:
+      with self.get_delegation_token.cache_lock:
+        self.get_delegation_token.cache.pop(self.get_delegation_token.cache_key(self.user), None)
+      token = self.get_delegation_token(self.user)
     if token:
       params['delegation'] = token
       # doas should not be present with delegation token as the token includes the username
@@ -944,7 +949,9 @@ class WebHdfs(Hdfs):
         del params['user.name']
     return params
 
-  @ttl_cache(maxsize=128, ttl=timedelta(hours=8), timer=datetime.now, typed=False)
+  # a renew-interval (default is 24 hours)
+  # https://blog.cloudera.com/hadoop-delegation-tokens-explained/
+  @ttl_cache(maxsize=128, ttl=timedelta(hours=24), timer=datetime.now, typed=False)
   def get_delegation_token(self, renewer):
     """get_delegation_token(user) -> Delegation token"""
     # Workaround for HDFS-3988
