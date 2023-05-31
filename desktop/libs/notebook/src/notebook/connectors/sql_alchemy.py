@@ -85,6 +85,7 @@ else:
   from urllib import quote_plus as urllib_quote_plus
   from cStringIO import StringIO
 
+import urllib
 
 ENGINES = {}
 CONNECTIONS = {}
@@ -169,8 +170,13 @@ class SqlAlchemyApi(Api):
     if url.startswith('awsathena+rest://'):
       url = url.replace(url[17:37], urllib_quote_plus(url[17:37]))
       url = url.replace(url[38:50], urllib_quote_plus(url[38:50]))
-      s3_staging_dir = url.rsplit('s3_staging_dir=', 1)[1]
+      parsed = urllib.parse.urlparse(url)
+      s3_staging_dir=urllib.parse.parse_qs(parsed.query)['s3_staging_dir'][0]
       url = url.replace(s3_staging_dir, urllib_quote_plus(s3_staging_dir))
+      work_group=urllib.parse.parse_qs(parsed.query)['work_group'][0]
+      url = url.replace(work_group, urllib_quote_plus(work_group))
+      catalog_name=urllib.parse.parse_qs(parsed.query)['catalog_name'][0]
+      url = url.replace(catalog_name, urllib_quote_plus(catalog_name))
 
     m = re.search(URL_PATTERN, url)
     driver_name = m.group('driver_name')
