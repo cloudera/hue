@@ -1,0 +1,67 @@
+@use 'variables' as vars;
+@use '../sharedAiAssistVars' as ai-assist-vars;
+
+.cuix.antd {
+  .hue-ai-assist-bar__toolbar {
+    background-color: transparent;
+    width: calc(100% - 84px);
+
+    // Override the default toolbar button styles
+    .hue-toolbar-button {
+      color: vars.$fluidx-blue-400;
+      text-transform: uppercase;
+      font-weight: bold;
+      font-size: 12px;
+
+      // Reset inherited styling we don't want
+      &:hover,
+      &:focus,
+      &:focus-visible,
+      &:not([disabled]):active,
+      &:target {
+        background-color: transparent;
+        border-color: transparent;
+        outline: none;
+        box-shadow: none;
+      }
+    }
+
+    .hue-toolbar-button[disabled] {
+      color: vars.$fluidx-slate-200; // lightsteelblue; //vars.$fluidx-blue-300;
+    }
+
+    .hue-ai-assist-bar__toolbar-button--active {
+      order: -2;
+    }
+  }
+
+  .hue-ai-assist-bar__toolbar__input-wrapper {
+    flex-grow: 0;
+    width: 0px;
+    transition: flex-grow 0.5s ease;
+    // border: 1px solid red;
+  }
+
+  .hue-ai-assist-bar__toolbar__input-wrapper--expanded {
+    flex-grow: 1;
+    order: -1;
+  }
+
+  .hue-ai-assist-bar__generate-text-input {
+    all: unset;
+    caret-color: vars.$fluidx-blue-400;
+    color: vars.$fluidx-blue-400;
+    font-size: 14px;
+    transition: all 0.5s;
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    &::placeholder {
+      color: vars.$fluidx-blue-200;
+    }
+    &:focus {
+      text-overflow: inherit;
+    }
+  }  
+}
