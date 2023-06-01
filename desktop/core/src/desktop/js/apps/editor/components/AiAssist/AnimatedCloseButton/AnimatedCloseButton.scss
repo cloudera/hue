@@ -1,0 +1,87 @@
+@use 'variables' as vars;
+
+@mixin close-button($color: vars.$fluidx-blue-400) {
+  position: relative;
+  transform: rotate(0deg);
+  transition: 0.5s ease-in-out;
+  cursor: pointer;
+
+  span {
+    display: block;
+    position: absolute;
+    left: 0;
+    width: 100%;
+    background-color: $color;
+    transform: rotate(0deg);
+    transition: 0.2s ease-in-out;
+  }
+
+  span:nth-child(1),
+  span:nth-child(3) {
+    width: 50%;
+    transform: rotate(45deg);
+  }
+
+  span:nth-child(2) {
+    transform: rotate(-45deg);
+  }
+
+  &:hover span:nth-child(1) {
+    transform: rotate(135deg);
+  }
+
+  &:hover span:nth-child(2) {
+    transform: rotate(0deg);
+  }
+
+  &:hover span:nth-child(3) {
+    transform: rotate(45deg);
+  }
+}
+
+@mixin close-button-size($width, $height) {
+  width: $width;
+  height: $height;
+
+  span {
+    top: $height/2;
+    height: $height/12;
+    border-radius: $height/12;
+  }
+
+  span:nth-child(1) {
+    left: $width/16;
+    top: $height/3.2;
+  }
+
+  span:nth-child(3) {
+    left: $width/2.4;
+    top: $height/1.5;
+  }
+
+  &:hover span:nth-child(1) {
+    left: -($width/24);
+  }
+
+  &:hover span:nth-child(1) {
+    top: $height/3.2;
+  }
+
+  &:hover span:nth-child(3) {
+    top: $height/1.5;
+    left: -($width/24);
+  }
+}
+
+.hue-animated-close-button {
+  @include close-button();
+}
+
+.hue-animated-close-button--large {
+  @include close-button-size(24px, 24px);
+}
+
+.hue-animated-close-button--small {
+  @include close-button-size(12px, 12px);
+}
+

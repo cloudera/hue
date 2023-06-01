@@ -15,40 +15,6 @@
       }
     }
 
-    // .hue-ai-preview-modal__diff-highlighter {
-    //   display: flex;
-    //   column-gap: 12px;
-    //   & > * {
-    //     flex-grow: 1;
-    //   }
-    // }
-
-    // .hue-ai-preview-modal__diff-highlighter-row {
-    //   display: block;
-    // }
-    // .hue-ai-preview-modal__diff-highlighter-row--added,
-    // .hue-ai-preview-modal__diff-highlighter-row--deleted {
-    //   .react-syntax-highlighter-line-number {
-    //     color: vars.$fluidx-gray-500;
-    //   }
-    // }
-    // .hue-ai-preview-modal__diff-highlighter-row--added {
-    //   background-color: vars.$fluidx-slate-600;
-    // }
-    // .hue-ai-preview-modal__diff-highlighter-row--deleted {
-    //   background-color: vars.$fluidx-red-800;
-    // }
-    // .hue-ai-preview-modal__diff-highlighter-row--kept {
-    //   // background-color: vars.$fluidx-gray-800;
-    // }
-    // .hue-ai-preview-modal__diff-highlighter-row--empty {
-    //   background-color: #212c35;//vars.$fluidx-gray-800;
-    //   .react-syntax-highlighter-line-number {
-    //     // background-color: vars.$fluidx-slate-800;
-    //     color: transparent;
-    //   }      
-    // }
-
     .hue-ai-preview-modal__text-container {
       background-color: vars.$fluidx-blue-050;
       border: 1px solid vars.$fluidx-blue-100;
