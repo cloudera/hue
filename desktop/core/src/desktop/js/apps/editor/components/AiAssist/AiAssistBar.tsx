@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useState, useEffect, useRef } from 'react';
+import React, { FunctionComponent, useState, useEffect, useRef, useMemo } from 'react';
 import {
   BugOutlined,
   ThunderboltOutlined,
@@ -16,6 +16,7 @@ import { generativeFunctionFactory } from 'api/apiAIHelper';
 import SqlExecutable from '../../execution/sqlExecutable';
 import { getLeadingEmptyLineCount } from '../editorUtils';
 import AiPreviewModal from './PreviewModal/AiPreviewModal';
+import {useKeywordCase} from './hooks';
 
 import './AiAssistBar.scss';
 
@@ -119,6 +120,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
   const [isGeneratingSql, setIsGeneratingSql] = useState(false);
   const [parser, setParser] = useState<SyntaxParser>();
   const [parseError, setParseError] = useState<ParseError | undefined>();
+  const keywordCase = useKeywordCase(parser, selectedStatement);
 
   const inputExpanded = isEditMode || isGenerateMode;
 
@@ -577,6 +579,8 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
           explanation={explanation || suggestionExplanation}
           lineNumberStart={getEditorLineNumbers(parsedStatement).firstLine}
           showCopyToClipboard={!explanation}
+          dialect={lastDialect.current}
+          keywordCase={keywordCase}
 
           // suggestion={`
           // SELECT *
