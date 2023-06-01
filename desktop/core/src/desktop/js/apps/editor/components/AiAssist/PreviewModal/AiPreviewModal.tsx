@@ -12,6 +12,8 @@ import { fluidxSlate800, fluidxSpacingS, fluidxSpacingXs } from '@cloudera/cuix-
 import CopyClipboardIcon from '@cloudera/cuix-core/icons/react/CopyClipboardIcon';
 import CheckmarkIcon from '@cloudera/cuix-core/icons/react/CheckmarkIcon';
 import { diffLines, Change } from 'diff';
+import { format } from 'sql-formatter';
+
 import classNames from 'classnames';
 
 import SyntaxHighlighterDiff from '../SyntaxHighlighterDiff/SyntaxHighlighterDiff';
@@ -21,16 +23,21 @@ import './AiPreviewModal.scss';
 const PreviewModal = ({
   open,
   title,
-  suggestion = '',
+  suggestion: suggestionRaw = '',
   assumptions = '',
   explanation = '',
   onCancel,
   onInsert,
   primaryButtonLabel,
-  showDiffFrom = '',
+  showDiffFrom: showDiffFromRaw = '',
   lineNumberStart = 1,
-  showCopyToClipboard = true
+  showCopyToClipboard = true,
+  dialect,
+  keywordCase
 }) => {
+  const suggestion = format(suggestionRaw, { language: dialect, keywordCase });
+  const showDiffFrom = format(showDiffFromRaw, { language: dialect, keywordCase });
+
   const clearStates = () => {
     setCopied(false);
   };
@@ -44,8 +51,6 @@ const PreviewModal = ({
     onCancel();
   };
 
-  const [copied, setCopied] = useState(false);
-
   const copyToClipboard = (text: string): void => {
     navigator.permissions.query({ name: 'clipboard-write' }).then(result => {
       if (result.state === 'granted') {
@@ -56,6 +61,8 @@ const PreviewModal = ({
     });
     setCopied(true);
   };
+
+  const [copied, setCopied] = useState(false);
 
   return (
     <Modal
