@@ -182,7 +182,7 @@ def rungunicornserver(args=[], options={}):
       'limit_request_field_size': conf.LIMIT_REQUEST_FIELD_SIZE.get(),
       'limit_request_fields': conf.LIMIT_REQUEST_FIELDS.get(),
       'limit_request_line': conf.LIMIT_REQUEST_LINE.get(),
-      'loglevel': 'info',
+      'loglevel': 'DEBUG' if conf.DJANGO_DEBUG_MODE.get() else 'INFO',
       'max_requests': 1200,                   # The maximum number of requests a worker will process before restarting.
       'max_requests_jitter': 0,
       'paste': None,
