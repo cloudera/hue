@@ -1,0 +1,8 @@
+@use 'variables' as vars;
+
+.hue-ai-assist-bar__circles-loader {
+  width: auto;
+}
+.hue-ai-assist-bar__circles-loader-circle {
+  fill: vars.$fluidx-blue-050;
+}
