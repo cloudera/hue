@@ -27,7 +27,7 @@ import re
 import sys
 
 from logging import FileHandler
-from logging.handlers import RotatingFileHandler
+from logging.handlers import RotatingFileHandler, SocketHandler
 
 from desktop.lib.paths import get_desktop_root
 from desktop.log import formatter
@@ -186,7 +186,8 @@ def basic_logging(proc_name, log_dir=None):
       handler = logging.StreamHandler()
       handler.setFormatter(logging.Formatter(LOG_FORMAT, DATE_FORMAT))
       root_logger.addHandler(handler)
-    handler.setLevel(lvl)
+    if handler:
+      handler.setLevel(lvl)
 
     # Set all loggers but error.log to the same logging level
     for h in root_logger.__dict__['handlers']:
@@ -194,6 +195,17 @@ def basic_logging(proc_name, log_dir=None):
         if os.path.basename(h.baseFilename) != 'error.log':
           h.setLevel(lvl)
 
+    # Set all loggers but error.log to the same logging level
+    for h in root_logger.__dict__['handlers']:
+      if isinstance(h, (SocketHandler)) and h.level != 40:
+        h.setLevel(lvl)
+
+    from desktop.conf import DATABASE_LOGGING
+    if not DATABASE_LOGGING.get():
+      def disable_database_logging():
+        logger = logging.getLogger()
+        logger.manager.loggerDict['django.db.backends'].level = 20 # INFO level
+      disable_database_logging()
 
 def fancy_logging():
   """Configure logging into a buffer for /logs endpoint."""
