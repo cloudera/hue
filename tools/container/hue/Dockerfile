@@ -50,6 +50,8 @@ RUN ln -s ${HUE_CONF}/conf/log.conf ${HUE_HOME}/desktop/conf/log.conf; \
     ln -s ${HUE_CONF}/conf/gunicorn_log.conf ${HUE_HOME}/desktop/conf/gunicorn_log.conf; \
     ln -s ${HUE_CONF}/conf/log4j.properties ${HUE_HOME}/desktop/conf/log4j.properties
 
+COPY hue-notice.txt ${HUE_HOME}/NOTICE.txt
+
 # supervisor stuff
 RUN mkdir -p /etc/supervisor.d/ && chmod +w /etc/supervisor.d && mkdir -p /var/log/root && chown -R ${HUEUSER}:${HUEUSER} /var/log/root
 ADD supervisor-files/etc/supervisord.conf /etc/supervisord.conf

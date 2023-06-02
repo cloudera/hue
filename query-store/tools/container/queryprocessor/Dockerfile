@@ -53,6 +53,8 @@ RUN mkdir -p ${HUE_QP_LOG_DIR} && chown -R ${HUEUSER}:${HUEUSER} ${HUE_QP_LOG_DI
     chmod 0440 /etc/sudoers.d/${HUEUSER} && \
     chmod +x /healthz.sh
 
+COPY --chown=${HUEUSER}:${HUEUSER} hueqp-notice.txt ${HUE_QP_HOME}/NOTICE.txt
+
 EXPOSE 8080 9090 9091
 WORKDIR ${HUE_QP_HOME}
 

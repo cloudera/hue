@@ -39,6 +39,8 @@ RUN sed -i "s|Listen 80|Listen 8080|g" /etc/httpd/conf/httpd.conf && sed -i "s|U
 RUN chmod -v +x ${HUE_HOME}/run_httpd.sh
 RUN mkdir -p /run && chown -R ${HUEUSER}:${HUEUSER} /run && mkdir -p /tmp/httpd && chown -R ${HUEUSER}:${HUEUSER} /tmp/httpd && chown -R ${HUEUSER}:${HUEUSER} /etc/httpd && chown -R ${HUEUSER}:${HUEUSER} /var/log && chown -R ${HUEUSER}:${HUEUSER} /etc/httpd/logs
 
+COPY huelb-notice.txt ${HUE_HOME}/NOTICE.txt
+
 EXPOSE 8080
 # https://httpd.apache.org/docs/2.4/stopping.html#gracefulstop
 STOPSIGNAL SIGINT
