@@ -15,6 +15,7 @@ async def validation_exception_handler(request, err):
     return JSONResponse(status_code=500, content={"error": f"{err}"})
 
 @app.get("/")
+@app.post("/")
 def read_root():
     return {"Hello": "From Hue LLM Server"}
 
