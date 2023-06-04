@@ -18,24 +18,43 @@ The host infra could be:
 
 The design keeps the Hue LLM Interface separate from the actual Hue server to cater the specific hardware needs of the LLMs. As the LLMs need custom hardware, it won't be practical to expect a Hue server machine to satisfy those needs.
 
+![alt text](./assets/architecture_diagram.png)
+
 ## Dependency
 
 - Python 3.9 or higher
 
-## Running Hue LLM Server Locally
+## Running Hue LLM Server
 
-1. Download the model file into `.server/models` directory. Add the model and path to it in `./server/configs.json`.
+1. Download the model file into `.server/models` directory. Add the model and path to the model file in `./server/configs.json`.
 
-2. Activate python environment with the requirements. Python 3.9 or higher must be available.
+Supported Models - [LLaMA](https://github.com/ggerganov/llama.cpp)
+
+2. Activate python environment. Python 3.9 or higher should be available.
 ```
-source ./activate.sh
+source ./server/activate.sh
+```
+This would activate a virtual python environment with the dependencies. Once the server is finished running, make sure the environment is deactivated with the following command.
+```
+deactivate
 ```
 
 3. Start server
 ```
 uvicorn --app-dir ./server main:app
 ```
-The api must now start runing at
+Hue LLM Server should now be available at http://localhost:8000
+
+### Inferance API
+- Path: /api/infer
+- Method: POST
+- Payload:
+```
+{
+  "model": "<model_name>", // Eg: llama
+  "prompt": "<prompt_text>"
+}
+```
 
 ### Additional dependencies for each model
 LLaMA:
@@ -44,7 +63,7 @@ pip install llama-cpp-python
 ```
 
 ### Development Notes
-requirements.txt must be updated after adding a new pip dependency.
+requirements.txt should be updated after adding a new pip dependency.
 ```
 pip freeze > requirements.txt
 ```
