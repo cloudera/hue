@@ -1,14 +1,14 @@
 import React from 'react';
 import classNames from 'classnames';
 
-function ToolbarInput ({ expanded, placeholder, onSubmit }) {
+function AiAssistToolbarInput ({ expanded, placeholder, onSubmit }) {
   return (
     <li
       className={classNames(
         'hue-toolbar-button__wrapper',
-        'hue-ai-assist-bar__toolbar__input-wrapper',
+        'hue-ai-assist-toolbar-input__wrapper',
         {
-          'hue-ai-assist-bar__toolbar__input-wrapper--expanded': expanded
+          'hue-ai-assist-toolbar-input__wrapper--expanded': expanded
         }
       )}
     >
@@ -18,8 +18,7 @@ function ToolbarInput ({ expanded, placeholder, onSubmit }) {
           type="text"
           autoFocus
           spellCheck="false"
-          className="hue-ai-assist-bar__generate-text-input"
-          // onChange={evt => console.info(evt.target.value, evt)}
+          className="hue-ai-assist-toolbar-input__text-input"
           onKeyDown={(event)=>{
             if (event.key === 'Enter') {
               const userInput = (event.target as HTMLInputElement).value;
@@ -33,4 +32,4 @@ function ToolbarInput ({ expanded, placeholder, onSubmit }) {
   );
 };
 
-export default ToolbarInput;
+export default AiAssistToolbarInput;

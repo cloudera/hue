@@ -9,11 +9,11 @@ import {
 } from '@ant-design/icons';
 
 import Toolbar, { ToolbarButton } from '../../../../../reactComponents/Toolbar/Toolbar';
-import ToolbarInput from './ToolbarInput';
+import AiAssistToolbarInput from './AiAssistToolbarInput';
 
 import { ParseError } from 'utils/parseError';
 
-import './AssistToolbar.scss';
+import './AiAssistToolbar.scss';
 
 interface AssistToolbarProps {
   isGenerateMode: boolean;
@@ -49,12 +49,12 @@ function AssistToolbar({
 }: AssistToolbarProps) {
   return (
     <Toolbar
-      className="hue-ai-assist-bar__toolbar"
+      className="hue-ai-assist-toolbar"
       content={() => (
         <>
           <ToolbarButton
             className={classNames({
-              'hue-ai-assist-bar__toolbar-button--active': isGenerateMode
+              'hue-ai-assist-toolbar__button--active': isGenerateMode
             })}
             disabled={isLoading}
             title="Generate SQL using natural language"
@@ -68,14 +68,14 @@ function AssistToolbar({
           >
             {!isEditMode ? 'Generate' : ''}
           </ToolbarButton>
-          <ToolbarInput
+          <AiAssistToolbarInput
             expanded={isGenerateMode && inputExpanded}
             placeholder="E.g. How many of our unique website vistors are using Mac?"
             onSubmit={onInputSubmit}
           />
           <ToolbarButton
             className={classNames({
-              'hue-ai-assist-bar__toolbar-button--active': isEditMode
+              'hue-ai-assist-toolbar__button--active': isEditMode
             })}
             disabled={isLoading}
             title="Edit SQL using natural language"
@@ -89,7 +89,7 @@ function AssistToolbar({
           >
             {!isGenerateMode ? 'Edit' : ''}
           </ToolbarButton>
-          <ToolbarInput
+          <AiAssistToolbarInput
             expanded={isEditMode && inputExpanded}
             placeholder="E.g. only inlcude people under 50 years"
             onSubmit={onInputSubmit}

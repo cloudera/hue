@@ -2,7 +2,7 @@
 @use '../sharedAiAssistVars' as ai-assist-vars;
 
 .cuix.antd {
-  .hue-ai-assist-bar__toolbar {
+  .hue-ai-assist-toolbar {
     background-color: transparent;
     width: calc(100% - 84px);
 
@@ -24,30 +24,28 @@
         outline: none;
         box-shadow: none;
       }
+      &:not([disabled]):hover {
+        color: vars.$fluidx-blue-600;
+      }
     }
 
-    .hue-toolbar-button[disabled] {
-      color: vars.$fluidx-slate-200; // lightsteelblue; //vars.$fluidx-blue-300;
-    }
-
-    .hue-ai-assist-bar__toolbar-button--active {
+    .hue-ai-assist-toolbar__button--active {
       order: -2;
     }
   }
 
-  .hue-ai-assist-bar__toolbar__input-wrapper {
+  .hue-ai-assist-toolbar-input__wrapper {
     flex-grow: 0;
     width: 0px;
     transition: flex-grow 0.5s ease;
-    // border: 1px solid red;
   }
 
-  .hue-ai-assist-bar__toolbar__input-wrapper--expanded {
+  .hue-ai-assist-toolbar-input__wrapper--expanded {
     flex-grow: 1;
     order: -1;
   }
 
-  .hue-ai-assist-bar__generate-text-input {
+  .hue-ai-assist-toolbar-input__text-input {
     all: unset;
     caret-color: vars.$fluidx-blue-400;
     color: vars.$fluidx-blue-400;
