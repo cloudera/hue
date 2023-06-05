@@ -97,22 +97,8 @@ export function generativeFunctionFactory(): GenerativeFunctionSet {
   };
 }
 
-const API_URL = '/api/editor/chat/';
-const EXTRACT_CODE_AND_EXPLAIN_REGEX =
-  /<code>([\s\S]*?)<\/code>[\s\S]*?<explain>([\s\S]*?)<\/explain>/;
-const EXTRACT_CODE_AND_ASSUMPTIONS_REGEX =
-  /<code>(.*?)<\/code>.*<assumptions>(.*?)<\/assumptions>/s;
-const EXTRACT_TABLES = /<tables>(.*?)<\/tables>/;
-
-const extractLlmResponse = (response: any) => {
-  // TODO: Make this onfigurable for different LLMs
-  return response.hasOwnProperty('open_ai') ? response.open_ai : '';
-};
-
-const extractCodeAndExplanation = (llmResponse: string) => {
-  const matches = EXTRACT_CODE_AND_EXPLAIN_REGEX.exec(llmResponse) || [];
-  return { sql: matches[1]?.trim(), explanation: matches[2].trim() };
-};
+const TABLES_API_URL = '/api/editor/ai/tables';
+const SQL_API_URL = '/api/editor/ai/sql';
 
 interface FetchFromLlmParams {
   url: string;
@@ -133,26 +119,22 @@ const fetchFromLlm = async ({
       'X-Csrftoken': (<hueWindow>window).CSRF_TOKEN
     },
     body: JSON.stringify(data)
-  })
-    .then(response => response.json())
-    .then(extractLlmResponse);
+  }).then(response => response.json());
 
   return promise;
 };
 
 const generateExplanation: GenerateExplanation = async ({ statement, dialect }) => {
   // TODO: handle exceptions
-  const result = await fetchFromLlm({
-    url: API_URL,
+  const response = await fetchFromLlm({
+    url: SQL_API_URL,
     data: {
-      type: 'explain',
-      dialect,
-      prompt: statement
+      task: 'summarize',
+      sql: statement,
+      dialect
     }
   });
-
-  console.info('explain result', JSON.stringify(result));
-  return result;
+  return response.summary;
 };
 
 const generateCorrectedSql: GenerateCorrectedSql = async ({
@@ -161,25 +143,30 @@ const generateCorrectedSql: GenerateCorrectedSql = async ({
   onStatusChange
 }) => {
   // TODO: Add call onStatusChange if we include metadata in the LLM call
-  const multiPartResponse = await fetchFromLlm({
-    url: API_URL,
+  return await fetchFromLlm({
+    url: SQL_API_URL,
     data: {
-      type: 'correctandexplain',
-      prompt: statement,
+      task: 'fix',
+      sql: statement,
       dialect
     }
   });
+};
 
-  try {
-    return extractCodeAndExplanation(multiPartResponse);
-  } catch {
-    console.error(multiPartResponse);
-    return {
-      error: {
-        message: 'Sorry, the response from the AI model could not be interpreted.'
-      }
-    };
-  }
+const getRelevantTables = async (input: string, tableParams: getTableListParams, onStatusChange: (arg: string) => void) => {
+  const allTables = (await getTableList(tableParams)) as Array<string>;
+  console.info('allTables', allTables);
+  onStatusChange('Finding relevant tables');
+
+  const relevantTables = await fetchFromLlm({
+    url: TABLES_API_URL,
+    data: {
+      input: input,
+      metadata: allTables
+    }
+  });
+
+  return relevantTables;
 };
 
 const generateOptimizedSql: GenerateOptimizedSql = async ({
@@ -189,42 +176,26 @@ const generateOptimizedSql: GenerateOptimizedSql = async ({
   dialect,
   onStatusChange
 }) => {
-  const allTables = (await getTableList({ databaseName, executor })) as Array<string>;
-  console.info('allTables', allTables);
-  onStatusChange('Finding relevant tables');
-  const relevantTablesInTags = await fetchFromLlm({
-    url: API_URL,
-    data: {
-      type: 'listRelevantTables',
-      prompt: statement,
-      metadata: allTables.toString()
-    }
-  });
-
-  console.info('relevantTablesInTags', relevantTablesInTags);
-  onStatusChange('Extracting table meta data');
-  const relevantTables = EXTRACT_TABLES.exec(relevantTablesInTags) || [];
-  const tableMetadata = await getTableMetaData(relevantTables);  
+  const relevantTables = await getRelevantTables(
+    statement,
+    { databaseName, executor },
+    onStatusChange
+  );
+  console.info('relevantTables', relevantTables);
+  const tableMetadata = await getTableMetaData(relevantTables);
 
   onStatusChange('Generating SQL query');
-  const multiPartResponse = await fetchFromLlm({
-    url: API_URL,
+  return await fetchFromLlm({
+    url: SQL_API_URL,
     data: {
-      type: 'optimize',
-      prompt: statement,
-      dialect
+      task: 'optimize',
+      sql: statement,
+      dialect,
+      metadata: {
+        tables: tableMetadata
+      }
     }
   });
-  try {
-    return extractCodeAndExplanation(multiPartResponse);
-  } catch (e) {
-    console.error(multiPartResponse);
-    return {
-      error: {
-        message: 'Sorry, the response from the AI model could not be interpreted.'
-      }
-    };
-  }
 };
 
 const generateSQLfromNQL: GenerateSQLfromNQL = async ({
@@ -234,36 +205,22 @@ const generateSQLfromNQL: GenerateSQLfromNQL = async ({
   dialect,
   onStatusChange
 }) => {
-  const allTables = (await getTableList({ databaseName, executor })) as Array<string>;
-  console.info('allTables', allTables);
-  onStatusChange('Finding relevant tables');
-  const relevantTablesInTags = await fetchFromLlm({
-    url: API_URL,
+  const relevantTables = await getRelevantTables(nql, { databaseName, executor }, onStatusChange);
+  console.info('relevantTables', relevantTables);
+  const tableMetadata = await getTableMetaData(relevantTables);
+
+  onStatusChange('Generating SQL query');
+  return await fetchFromLlm({
+    url: SQL_API_URL,
     data: {
-      type: 'listRelevantTables',
-      prompt: nql,
-      metadata: allTables.toString()
+      task: 'generate',
+      input: nql,
+      dialect,
+      metadata: {
+        tables: tableMetadata
+      }
     }
   });
-  console.info('relevantTablesInTags', relevantTablesInTags);
-  onStatusChange('Extracting table meta data');
-  const relevantTables = EXTRACT_TABLES.exec(relevantTablesInTags) || [];
-  const tableMetadata = await getTableMetaData(relevantTables);
-  onStatusChange('Generating SQL query');
-  const data = {
-    type: 'generateSql',
-    prompt: nql,
-    metadata: JSON.stringify(tableMetadata),
-    dialect
-  };
-  console.info(data);
-  const multiPartResult = await fetchFromLlm({
-    url: API_URL,
-    data
-  });
-  console.info('multiPartResult', multiPartResult);
-  const match = EXTRACT_CODE_AND_ASSUMPTIONS_REGEX.exec(multiPartResult) || [];
-  return { sql: match[1]?.trim(), assumptions: match[2]?.trim() };
 };
 
 const generateEditedSQLfromNQL: GenerateEditedSQLfromNQL = async ({
@@ -274,38 +231,23 @@ const generateEditedSQLfromNQL: GenerateEditedSQLfromNQL = async ({
   dialect,
   onStatusChange
 }) => {
-  const allTables = (await getTableList({ databaseName, executor })) as Array<string>;
-  onStatusChange('Finding relevant tables');
-  const relevantTablesInTags = await fetchFromLlm({
-    url: API_URL,
+  const relevantTables = await getRelevantTables(nql, { databaseName, executor }, onStatusChange);
+  console.info('relevantTables', relevantTables);
+  const tableMetadata = await getTableMetaData(relevantTables);
+
+  onStatusChange('Generating SQL query');
+  return await fetchFromLlm({
+    url: SQL_API_URL,
     data: {
-      type: 'listRelevantTables',
-      prompt: nql,
-      metadata: allTables.toString()
+      task: 'edit',
+      sql,
+      input: nql,
+      dialect,
+      metadata: {
+        tables: tableMetadata
+      }
     }
   });
-  onStatusChange('Extracting table meta data');
-  const relevantTables = EXTRACT_TABLES.exec(relevantTablesInTags) || [];
-  const tableMetadata = await getTableMetaData(relevantTables);
-  onStatusChange('Generating SQL query');
-  const data = {
-    type: 'editSql',
-    prompt: `
-    SQL: ${sql}
-    REQUESTED CHANGE: ${nql}`,
-    metadata: JSON.stringify(tableMetadata),
-    dialect
-  };
-  console.info('DATA SENTS:', data);
-  const multiPartResult = await fetchFromLlm({
-    url: API_URL,
-    data
-  });
-  // SOMETIMES THE RESPONSE (USING <code>...</code> and <assumptions> ... </assumptions>)
-  // IS NOT FORMATTED AS EXPECTED FROM CHATGPT
-  console.info('multiPartResult', multiPartResult);
-  const match = EXTRACT_CODE_AND_ASSUMPTIONS_REGEX.exec(multiPartResult) || [];
-  return { sql: match[1]?.trim(), assumptions: match[2]?.trim() };
 };
 
 interface getTableListParams {
@@ -316,7 +258,7 @@ const getTableList = async ({ databaseName, executor }: getTableListParams) => {
   // TODO: USe real data
   return new Promise((resolve, reject) => {
     setTimeout(() => {
-      resolve(['website_visitors']);
+      resolve(['sample_07', 'sample_08', 'web_logs', 'offices']);
     }, 3000);
   });
   // const dbEntry = await dataCatalog.getEntry({
@@ -336,156 +278,23 @@ const getTableMetaData = async (tableNames: Array<string>) => {
   // We divide it into 3 separate steps so that the UI can show status on progress.
   return new Promise((resolve, reject) => {
     setTimeout(() => {
-      resolve({
-        tableName: 'web_logs',
-        columns: [
-          {
-            name: '_version_',
-            type: 'bigint',
-            comment: ''
-          },
-          {
-            name: 'app',
-            type: 'string',
-            comment: ''
-          },
-          {
-            name: 'bytes',
-            type: 'int',
-            comment: ''
-          },
-          {
-            name: 'city',
-            type: 'string',
-            comment: ''
-          },
-          {
-            name: 'client_ip',
-            type: 'string',
-            comment: ''
-          },
-          {
-            name: 'code',
-            type: 'smallint',
-            comment: ''
-          },
-          {
-            name: 'country_code',
-            type: 'string',
-            comment: ''
-          },
-          {
-            name: 'country_code3',
-            type: 'string',
-            comment: ''
-          },
-          {
-            name: 'country_name',
-            type: 'string',
-            comment: ''
-          },
-          {
-            name: 'device_family',
-            type: 'string',
-            comment: ''
-          },
-          {
-            name: 'extension',
-            type: 'string',
-            comment: ''
-          },
-          {
-            name: 'latitude',
-            type: 'float',
-            comment: ''
-          },
-          {
-            name: 'longitude',
-            type: 'float',
-            comment: ''
-          },
-          {
-            name: 'method',
-            type: 'string',
-            comment: ''
-          },
-          {
-            name: 'os_family',
-            type: 'string',
-            comment: ''
-          },
-          {
-            name: 'os_major',
-            type: 'string',
-            comment: ''
-          },
-          {
-            name: 'protocol',
-            type: 'string',
-            comment: ''
-          },
-          {
-            name: 'record',
-            type: 'string',
-            comment: ''
-          },
-          {
-            name: 'referer',
-            type: 'string',
-            comment: ''
-          },
-          {
-            name: 'region_code',
-            type: 'string',
-            comment: ''
-          },
-          {
-            name: 'request',
-            type: 'string',
-            comment: ''
-          },
-          {
-            name: 'subapp',
-            type: 'string',
-            comment: ''
-          },
-          {
-            name: 'time',
-            type: 'string',
-            comment: ''
-          },
-          {
-            name: 'url',
-            type: 'string',
-            comment: ''
-          },
-          {
-            name: 'user_agent',
-            type: 'string',
-            comment: ''
-          },
-          {
-            name: 'user_agent_family',
-            type: 'string',
-            comment: ''
-          },
-          {
-            name: 'user_agent_major',
-            type: 'string',
-            comment: ''
-          },
-          {
-            name: 'id',
-            type: 'string',
-            comment: ''
-          },
-          {
-            name: 'date',
-            type: 'string',
-            comment: ''
-          }
-        ]
-      });
+      resolve([
+        {
+          name: 'offices',
+          columns: [
+            {
+              name: 'id',
+              type: 'string',
+              comment: ''
+            },
+            {
+              name: 'address',
+              type: 'string',
+              comment: ''
+            }
+          ]
+        }
+      ]);
     }, 3000);
   });
 };
