@@ -74,6 +74,8 @@ werkzeug==2.3.6  # Should remove it here and from devtools.mk
 django-utils-six==2.0
 six==1.16.0
 openai==0.27.4
+sentence-transformers==2.2.2
+pyformatting==0.3.3
 -e file:///${ROOT}/desktop/core/ext-py3/requests-2.27.1
 -e file:///${ROOT}/desktop/core/ext-py3/boto-2.49.0
 -e file:///${ROOT}/desktop/core/ext-py3/django-axes-5.13.0
