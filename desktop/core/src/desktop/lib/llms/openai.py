@@ -7,15 +7,13 @@ from .base import LlmApi, Task
 
 from desktop.conf import LLM
 
-_GENERATE = """Act as an {dialect} SQL expert.
-Translate the NQL statement into SQL using the following metadata {metadata}.
+_GENERATE = """Act as an {dialect} SQL expert. Translate the NQL statement into SQL using the following metadata: {metadata}.
 List any the assumptions not covered by the supplied metadata.
-NQL: {userprompt}.
-Return the answer in the following format: <code></code><assumptions></assumptions>"""
+NQL: {input}
+Wrap the sql in a <code> tag and the assumptions in an <assumptions> tag"""
 
-_EDIT = """Act as an {dialect} SQL expert and modify the SQL using the following metadata {metadata}.
+_EDIT = """Act as an {dialect} SQL expert. Based on the input modify the SQL using the following metadata: {metadata}.
 List any the assumptions not covered by the supplied metadata.
-Modify the SQL query based on the input.
 SQL query: {sql}
 Input: {input}
 Make sure to return the answer in the following format: <code></code><assumptions></assumptions>"""
