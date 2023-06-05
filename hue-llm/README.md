@@ -41,9 +41,11 @@ deactivate
 
 3. Start server
 ```
-uvicorn --app-dir ./server main:app
+uvicorn --app-dir ./server main:app --port 8001
 ```
 Hue LLM Server should now be available at http://localhost:8000
+
+Start with `--log-level trace` option to get all logs
 
 ### Inferance API
 - Path: /api/infer
@@ -59,8 +61,9 @@ Hue LLM Server should now be available at http://localhost:8000
 ### Additional dependencies for each model
 LLaMA:
 ```
-pip install llama-cpp-python
+pip install llama-cpp-python==0.1.48
 ```
+Environment must be re-activated after adding llama-cpp.
 
 ### Development Notes
 requirements.txt should be updated after adding a new pip dependency.

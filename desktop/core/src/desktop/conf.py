@@ -209,11 +209,27 @@ LLM = ConfigSection(
   key='llm',
   help=_("""Configuration options for LLM"""),
   members=dict(
-    ENABLE=Config(
-      key='enable_llm_sql',
-      help=_('Enable LLM'),
-      default=True,
-      type=coerce_bool),
+    SQL_LLM=Config(
+      key='sql_llm',
+      help=_('LLM to be used to SQL inference. Eg: hue_llm, openai'),
+      default='hue_llm',
+      type=str),
+    HUE_LLM=ConfigSection(
+      key="hue_llm",
+      help=_('Configurations for the LLM hosted using Hue infra'),
+      members=dict(
+        BASE_URL=Config(
+          key='base_url',
+          default='http://localhost:8001',
+          help=_('Base URL for the Hue LLM API'),
+          type=str),
+        PATH=Config(
+          key='path',
+          default='/api/infer',
+          help=_('Path to inference API'),
+          type=str),
+      )
+    ),
     OPENAI=ConfigSection(
       key='openai',
       help=_('Configuration options for the OpenAI API'),
@@ -235,7 +251,7 @@ LLM = ConfigSection(
           default='davinci'),
       )
     )
-    
+
   )
 )
 

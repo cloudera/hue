@@ -37,10 +37,14 @@ from desktop.lib.connectors import api as connector_api
 from useradmin import views as useradmin_views, api as useradmin_api
 
 from beeswax import api as beeswax_api
+
 from desktop.lib.llm import llm
 
-LOG = logging.getLogger(__name__)
+from desktop.lib.llms.factory import llm_api_factory
+from desktop.lib.llms.base import is_llm_sql_enabled
+from desktop.lib.llms.semantic_search import filter
 
+LOG = logging.getLogger(__name__)
 
 # Core
 
@@ -238,20 +242,21 @@ def importer_submit(request):
   django_request = get_django_request(request)
   return indexer_api3.importer_submit(django_request)
 
+llm_sql_disabled_response = JsonResponse({
+  "message": "LLM SQL is not enabled on this server"
+}, status=403)
 
 @api_view(["POST"])
 def generate_sql(request, query=None):
   database = request.POST.get("database")
   query = request.POST.get("prompt")
-  
+
   if llm.is_llm_sql_enabled():
     parsed_data = parse_database(request, database)
     generated_query = llm.generate_sql(query, parsed_data)
     return JsonResponse(generated_query)
   else:
-    return JsonResponse({
-      "message": "LLM SQL is not enabled on this server"
-    }, status=403)
+    return llm_sql_disabled_response
 
 @api_view(["POST"])
 def chat(request, prompt=None, conversation_id=None):
@@ -264,10 +269,39 @@ def chat(request, prompt=None, conversation_id=None):
     generated_response = llm.chat(prompt, metadata, type, dialect)
     return JsonResponse(generated_response)
   else:
-    return JsonResponse({
-      "message": "LLM SQL is not enabled on this server"
-    }, status=403)
+    return llm_sql_disabled_response
 
+@api_view(["POST"])
+def tables(request):
+  input = request.data.get("input")
+  metadata = request.data.get("metadata")
+
+  if is_llm_sql_enabled():
+    tables = filter(metadata, input)
+
+    # TODO: Use LLM and filter tables even further
+    # llm_api = llm_api_factory()
+    # tables = llm_api.process(Task.FILTER_TABLES, input, dialect, tables)
+    return JsonResponse({
+      "tables": tables
+    })
+  else:
+    return llm_sql_disabled_response
+
+@api_view(["POST"])
+def sql(request):
+  task = request.data.get("task")
+  input = request.data.get("input")
+  sql = request.data.get("sql")
+  dialect = request.data.get("dialect")
+  metadata = request.data.get("metadata")
+
+  if is_llm_sql_enabled():
+    llm_api = llm_api_factory()
+    response = llm_api.process(task, input, sql, dialect, metadata)
+    return JsonResponse(response)
+  else:
+    return llm_sql_disabled_response
 
 def parse_database(request, database=None):
   django_request = get_django_request(request)
@@ -285,7 +319,7 @@ def parse_database(request, database=None):
 
   if cached_database:
       return cached_database
-  
+
   databases = notebook_api.autocomplete1(django_request, None, database, None, None, None)
 
   database_details = {}
