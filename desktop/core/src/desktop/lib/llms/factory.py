@@ -1,5 +1,6 @@
 from .base import LlmApi
 from .llama import HueLlamaApi
+from .openai import OpenAiApi
 
 from desktop.conf import LLM
 
@@ -12,6 +13,6 @@ def llm_api_factory() -> LlmApi:
     if sql_llm == "hue_llm":
         return HueLlamaApi()
     elif sql_llm == "openai":
-        print("Create Open AI")
+        return OpenAiApi()
     else:
         LOG.error("Invalid sql_llm configuration")
