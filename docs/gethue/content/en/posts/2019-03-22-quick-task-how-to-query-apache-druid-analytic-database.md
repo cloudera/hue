@@ -91,7 +91,7 @@ As usual feel free to comment here or to send feedback to the [hue-user][9] li
 
  [1]: https://impala.apache.org/
  [2]: https://hive.apache.org/
- [3]: http://cloudera.github.io/hue/latest/user/editor/
+ [3]: https://docs.gethue.com/user/querying/#editor
  [4]: http://druid.io/
  [5]: http://druid.io/docs/latest/design/index.html#what-is-druid
  [6]: http://druid.io/downloads.html

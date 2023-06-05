@@ -80,5 +80,5 @@ categories:
  [2]: https://gethue.com/sql-editor/
  [3]: https://cdn.gethue.com/uploads/2019/04/Screen-Shot-2019-03-29-at-3.53.54-PM.png
  [4]: https://cdn.gethue.com/uploads/2019/04/Screen-Shot-2019-03-29-at-3.50.35-PM.png
- [5]: http://cloudera.github.io/hue/latest/administrator/configuration/editor/#hive
+ [5]: https://docs.gethue.com/administrator/configuration/connectors/#apache-hive
  [6]: https://gethue.com/restrict-number-of-concurrent-sessions-per-user/
