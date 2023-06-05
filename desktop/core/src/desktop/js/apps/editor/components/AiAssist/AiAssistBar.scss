@@ -1,0 +1,420 @@
+@use 'variables' as vars;
+
+$expand-animation-time: 0.75s;
+$adjusted-left-margin: 20px;
+
+@mixin close-button($width: 24px, $height: 24px, $color:  vars.$fluidx-blue-400) {
+  width: $width;
+  height: $height;
+  position: relative;
+  transform: rotate(0deg);
+  transition: 0.5s ease-in-out;
+  cursor: pointer;
+
+  span {
+    display: block;
+    position: absolute;
+    left: 0;
+    top: $height/2;
+    height: $height/12; // Original height was 2px when overall height was 24px
+    width: 100%;
+    background-color: $color;
+    border-radius: $height/12; // Original border-radius was 2px when overall height was 24px
+    transform: rotate(0deg);
+    transition: 0.2s ease-in-out;
+  } 
+  
+  span:nth-child(1),
+  span:nth-child(3) {
+    width: 50%;
+    transform: rotate(45deg);
+  }
+  
+  span:nth-child(1) {
+    left: $width/16; // Original left was 1.5px when overall width was 24px
+    top: $height/3.2; // Original top was 7.5px when overall height was 24px
+  }
+  
+  span:nth-child(2) {
+    transform: rotate(-45deg);
+  }
+  
+  span:nth-child(3) {
+    left: $width/2.4; // Original left was 10px when overall width was 24px
+    top: $height/1.5; // Original top was 16px when overall height was 24px
+  }
+  
+  &:hover span:nth-child(1) {
+    left: -($width/24); // Original left was -1px when overall width was 24px
+  }
+  
+  &:hover span:nth-child(1) {
+    top: $height/3.2; // Original top was 7.5px when overall height was 24px
+    transform: rotate(135deg);
+  }
+  
+  &:hover span:nth-child(2) {
+    transform: rotate(0deg);
+  }
+  
+  &:hover span:nth-child(3) {
+    top: $height/1.5; // Original top was 16px when overall height was 24px
+    left: -($width/24); // Original left was -1px when overall width was 24px
+    transform: rotate(45deg);
+  }
+}
+
+.cuix.antd {
+  .hue-ai-assist-bar__icon {
+    cursor: pointer;
+    margin-top: 6px;
+    width: 12px;
+    height: 12px;
+    position: absolute;
+    background: vars.$fluidx-blue-400;
+    border-radius: 50%;
+    box-shadow: 0 0 0 0 vars.$fluidx-blue-300;
+    color: vars.$fluidx-blue-600;
+    right: calc(100% - #{$adjusted-left-margin});
+    z-index: 2;
+  }
+
+  .hue-ai-assist-bar__icon-loading-dots {
+    width: auto;
+  }
+
+  .hue-ai-assist-bar__icon-loading-status {
+    color: white;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .hue-ai-assist-bar__icon--expanding,
+  .hue-ai-assist-bar__icon--expanded {
+    width: 1px;
+    height: 1px;
+    margin-top: 8px;
+    right: 34px;
+  }
+
+  .hue-ai-assist-bar__icon--expanding {
+    animation: aiIconAnimation ($expand-animation-time * 1.2) ease-in-out 1;
+  }
+
+  .hue-ai-assist-bar__icon--loading {
+    animation: aiIconLoadingAnimation ($expand-animation-time * 0.5) ease-in-out 1;
+    border-radius: 12px;
+    width: 24px;
+    height: 24px;
+    right: 34px;
+    margin-top: 8px;
+    // background-color: vars.$fluidx-purple-300;
+    // animation: spin 0.5s linear infinite;
+    // animation: pulse 2s infinite;
+  }
+
+  .hue-ai-assist-bar__icon--loading-with-status {
+    animation-fill-mode: forwards;
+    animation: aiIconLoadingStatusAnimation ($expand-animation-time * 0.5) ease-in-out 1;
+    width: auto;
+    display: flex;
+    align-items: center;
+    column-gap: 12px;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  // ERROR
+  .hue-ai-assist-bar__icon--error {
+    background-color: vars.$fluidx-red-050;
+    border-radius: 12px;
+    width: 24px;
+    height: 24px;
+    right: 34px;
+    margin-top: 8px;
+    width: auto;
+    display: flex;
+    align-items: center;
+    column-gap: 12px;
+    padding-left: 12px;
+    padding-right: 12px;
+    
+  }
+
+   .hue-ai-assist-bar__icon-error-text {
+    overflow: hidden;
+    white-space: nowrap;
+    color: vars.$fluidx-red-500;
+  }
+
+  .hue-ai-assistbar__error-close-btn {
+    display: block;
+    animation: closeButtonAnimation ($expand-animation-time * 1.2) ease-in-out 1;
+  }
+
+  .hue-ai-assistbar__close-btn {
+    position: absolute;
+    top: 7px;
+    right: 34px;
+    display: none;
+  }
+
+  .hue-ai-assistbar__close-btn--expanded {
+    right: 0px;
+    display: block;
+    animation: closeButtonAnimation ($expand-animation-time * 1.2) ease-in-out 1;
+  }
+
+  .hue-ai-assist-bar {
+    height: 0px;
+    margin: 0 -8px 0 -55px;
+
+    transition: height vars.$animation-duration-base ease;
+    overflow: hidden;
+    background-color: vars.$fluidx-blue-050;
+    padding-left: 46px;
+  }
+
+  .hue-ai-assist-bar--expanded {
+    height: 40px;
+    transition: vars.$animation-duration-base;
+    border-bottom: 1px solid vars.$fluidx-blue-100;
+  }
+
+  .hue-ai-assist-bar__content {
+    height: 40px;
+    display: flex;
+    align-items: center;
+    width: 1px;
+  }
+
+  .hue-ai-assist-bar__content--expanded {
+    animation: contentAnimation $expand-animation-time ease-in-out 1;
+    // border: 1px solid red;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .hue-ai-assist-bar__toolbar {
+    background-color: transparent;
+    width: calc(100% - 84px);
+
+    // Override the toolbar button styles
+    .hue-toolbar-button {
+      color: vars.$fluidx-blue-400;
+      text-transform: uppercase;
+      font-weight: bold;
+      font-size: 12px;
+
+      // Reset inherited styling we don't want
+      &:hover,
+      &:focus,
+      &:focus-visible,
+      &:not([disabled]):active,
+      &:target {
+        background-color: transparent;
+        border-color: transparent;
+        outline: none;
+        box-shadow: none;
+      }
+    }
+
+    .hue-toolbar-button[disabled] {
+      color: vars.$fluidx-slate-200; // lightsteelblue; //vars.$fluidx-blue-300;
+    }
+
+    .hue-ai-assist-bar__toolbar-button--active {
+      order: -2;
+    }
+  }
+
+  .hue-ai-assist-bar__toolbar__input-wrapper {
+    flex-grow: 0;
+    width: 0px;
+    transition: flex-grow 0.5s ease;
+    // border: 1px solid red;
+  }
+
+  .hue-ai-assist-bar__toolbar__input-wrapper--expanded {
+    flex-grow: 1;
+    order: -1;
+  }
+
+  .hue-ai-assist-bar__generate-text-input {
+    all: unset;
+    caret-color: vars.$fluidx-blue-400;
+    color: vars.$fluidx-blue-400;
+    font-size: 14px;
+    transition: all 0.5s;
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    &::placeholder {
+      color: vars.$fluidx-blue-200;
+    }
+    &:focus {
+      // width: 70%;
+      text-overflow: inherit;
+    }
+
+    // // Override antd Select styling
+    // .ant-select-selector {
+    //   border: none;
+    //   background-color: transparent;
+    //   padding: 0;
+    //   box-shadow: none;
+
+    //   .ant-select-selection-search {
+    //     left: 0;
+    //   }
+    // }
+
+    // .ant-select-selection-search-input {
+    //   box-shadow: none;
+    // }
+
+    // .ant-select-selection-placeholder {
+    //   color: vars.$fluidx-blue-200;
+    // }
+
+    // .ant-select-arrow {
+    //   display: none;
+    //   box-shadow: none;
+    // }
+  }
+}
+
+.hue-ai-assistbar__close-btn {
+  @include close-button();  
+}
+
+.hue-ai-assistbar__error-close-btn {
+  @include close-button(16px, 16px, vars.$fluidx-red-500);
+}
+
+
+.editor-top-expanded {
+  .cuix.antd .hue-ai-assist-bar {
+    margin-left: 12px;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 vars.$fluidx-blue-400; // rgba(0, 0, 255, 0.7);
+  }
+
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 10px rgba(0, 0, 0, 0);
+  }
+
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
+  }
+}
+
+@keyframes contentAnimation {
+  0% {
+    width: 0px;
+  }
+  15% {
+    width: 0px;
+  }
+  100% {
+    width: 100%;
+  }
+}
+@keyframes closeButtonAnimation {
+  0% {
+    right: 34px;
+    visibility: hidden;
+  }
+
+  80% {
+    right: 34px;
+    visibility: hidden;
+  }
+
+  100% {
+    right: 0px;
+    visibility: visible;
+  }
+}
+
+@keyframes aiIconAnimation {
+  0% {
+    border-radius: 6px;
+    width: 12px;
+    height: 12px;
+    right: calc(100% - #{$adjusted-left-margin});
+    // background-color: vars.$fluidx-purple-300;
+  }
+
+  10% {
+    // background-color: vars.$fluidx-purple-300;
+    border-radius: 12px;
+    width: 24px;
+    height: 24px;
+    right: calc(calc(100% - #{$adjusted-left-margin}) - 12px);
+  }
+
+  20% {
+    border-radius: 12px;
+    width: 200px;
+    height: 24px;
+    right: calc(100% - 200px);
+  }
+
+  80% {
+    border-radius: 12px;
+    width: 24px;
+    height: 24px;
+    right: 34px;
+    margin-top: 8px;
+  }
+
+  100% {
+    border-radius: 0px;
+    width: 1px;
+    height: 1px;
+    right: 34px;
+    // TEST
+    margin-top: 18px;
+    right: 46px;
+  }
+}
+
+@keyframes aiIconLoadingAnimation {
+  0% {
+    border-radius: 0px;
+    width: 1px;
+    height: 1px;
+    right: 34px;
+    margin-top: 18px;
+    right: 46px;
+  }
+
+  100% {
+    border-radius: 12px;
+    width: 24px;
+    height: 24px;
+    right: 34px;
+    margin-top: 8px;
+  }
+}
+
+@keyframes aiIconLoadingStatusAnimation {
+  0% {
+    max-width: 24px;
+  }
+
+  100% {
+    max-width: 400px; // Workaround since we can't animate to 'auto'
+  }
+}
+
+

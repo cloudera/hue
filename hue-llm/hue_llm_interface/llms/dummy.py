@@ -1,8 +1,8 @@
 def build(model_path):
     def infer(prompt):
-        inferrance = f'Model: Dummy | Model Path: {model_path} | Prompt: {prompt}'
+        inference = f'Model: Dummy | Model Path: {model_path} | Prompt: {prompt}'
         return {
-            "inferrance": inferrance
+            "inference": inference
         }
 
     return infer
