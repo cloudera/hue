@@ -15,21 +15,20 @@ Input: {input}
 A:"""
 
 _SUMMARIZE = """Act as a {dialect} SQL expert.
-Table details: {metadata}
-Q: Summarize the SQL query.
 SQL query: {sql}
+Q: Summarize the above SQL query.
 A:"""
 
 _OPTIMIZE = """Act as a {dialect} SQL expert.
 Table details: {metadata}
-Q: Optimize the SQL query.
 SQL query: {sql}
+Q: Optimize the SQL query.
 A:"""
 
 _FIX = """Act as a {dialect} SQL expert.
 Table details: {metadata}
-Q: Fix the SQL query.
 SQL query: {sql}
+Q: Fix the SQL query.
 A:"""
 
 TASK_TEMPLATES = {
@@ -42,10 +41,14 @@ TASK_TEMPLATES = {
 
 class HueLlamaApi(HueLlmApi):
     def __init__(self):
-        super().__init__('llama', TASK_TEMPLATES)
+        super().__init__(TASK_TEMPLATES, 'llama')
 
-    def parse_inference(self, inference):
-        return {
-            'sql': inference,
-            'assumptions': ''
-        }
+    def parse_inference(self, task, inference):
+        if task == Task.SUMMARIZE:
+            return {
+                'summary': inference
+            }
+        else:
+            return {
+                'sql': inference
+            }

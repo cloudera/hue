@@ -18,6 +18,9 @@ class Task(str, Enum):
     FILTER_TABLES = 'filter_tables'
 
 class LlmApi(abc.ABC):
+    def __init__(self, task_templates):
+        self.task_templates = task_templates
+
     @abc.abstractmethod
     def process(self, task, input, sql, dialect, metadata):
         pass
@@ -32,10 +35,25 @@ class LlmApi(abc.ABC):
 
         return '; '.join(formatted_metadata)
 
+    @abc.abstractmethod
+    def infer(self, prompt):
+        pass
+
+    def process(self, task, input, sql, dialect, metadata):
+        template = self.task_templates[task]
+        metadata_str = self.format_metadata(metadata) if metadata else None
+        prompt = optional_format(template, input=input, sql=sql, dialect=dialect, metadata=metadata_str)
+        inference = self.infer(prompt)
+        return self.parse_inference(task, inference)
+
+    @abc.abstractmethod
+    def parse_inference(self, task, inference):
+        pass
+
 class HueLlmApi(LlmApi):
-    def __init__(self, model, task_templates):
+    def __init__(self, task_templates, model):
+        super().__init__(task_templates)
         self.model = model
-        self.task_templates = task_templates
 
     def _get_client(self):
         client = HttpClient(LLM.HUE_LLM.BASE_URL.get())
@@ -54,17 +72,6 @@ class HueLlmApi(LlmApi):
         }).encode('utf8')
         response = resource.post(relpath=LLM.HUE_LLM.PATH.get(), data=data)
         return response['inference']
-
-    @abc.abstractmethod
-    def parse_inference(self, inference):
-        pass
-
-    def process(self, task, input, sql, dialect, metadata):
-        template = self.task_templates[task]
-        metadata_str = self.format_metadata(metadata)
-        prompt = optional_format(template, input=input, sql=sql, dialect=dialect, metadata=metadata_str)
-        inference = self.infer(prompt)
-        return self.parse_inference(inference)
 
 def is_llm_sql_enabled():
     llm_enabled = LLM.SQL_LLM.get()
