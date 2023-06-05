@@ -19,7 +19,7 @@ import AiPreviewModal from './PreviewModal/AiPreviewModal';
 import { useKeywordCase } from './hooks';
 import AnimatedLauncher from './AnimatedLauncher/AnimatedLauncher';
 import AnimatedCloseButton from './AnimatedCloseButton/AnimatedCloseButton';
-import AssistToolbar from './AssistToolbar/AssistToolbar';
+import AssistToolbar from './AiAssistToolbar/AiAssistToolbar';
 
 import './AiAssistBar.scss';
 
