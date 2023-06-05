@@ -150,7 +150,7 @@ build/env/bin/hue runcpserver
 
 <span style="font-weight: 400;">As always please feel free to comment and send feedback on the </span>[<span style="font-weight: 400;">hue-user</span>][8] <span style="font-weight: 400;">list or </span>[<span style="font-weight: 400;">@gethue</span>][9]<span style="font-weight: 400;">!</span>
 
- [1]: http://cloudera.github.io/hue/latest/admin-manual/manual.html
+ [1]: https://docs.gethue.com/administrator/
  [2]: https://cdn.gethue.com/uploads/2019/02/Screen-Shot-2019-02-27-at-3.05.28-PM.png
  [3]: https://cdn.gethue.com/uploads/2019/02/Screen-Shot-2019-02-27-at-3.10.39-PM.png
  [4]: http://hue-2.example.com:8888

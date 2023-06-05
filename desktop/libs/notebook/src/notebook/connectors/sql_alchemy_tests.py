@@ -78,7 +78,7 @@ class TestApi(object):
       'name': 'hive',
       'options': {
         'url': 'awsathena+rest://XXXXXXXXXXXXXXX:XXXXXXXXXXXXXXXXXXX@athena.us-west-2.amazonaws.com:443/default?'
-            's3_staging_dir=s3://gethue-athena/scratch'
+            's3_staging_dir=s3://gethue-athena/scratch&work_group=demo_group&catalog_name=AwsDataCatalog'
       }
     }
 

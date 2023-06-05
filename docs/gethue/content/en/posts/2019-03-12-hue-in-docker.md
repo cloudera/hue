@@ -133,7 +133,7 @@ As usual feel free to send feedback to the [hue-user][10] list or [@gethue][1
  [5]: https://hub.docker.com/r/gethue/hue/
  [6]: https://cdn.gethue.com/uploads/2017/12/Screen-Shot-2017-11-15-at-3.34.20-PM.png
  [7]: https://github.com/cloudera/hue/blob/master/desktop/conf.dist/hue.ini
- [8]: http://cloudera.github.io/hue/latest/admin-manual/manual.html
+ [8]: https://docs.gethue.com/administrator/
  [9]: https://kubernetes.io/
  [10]: http://groups.google.com/a/cloudera.org/group/hue-user
  [11]: https://twitter.com/gethue

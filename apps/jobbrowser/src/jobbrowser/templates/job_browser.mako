@@ -486,13 +486,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               <!-- /ko -->
               <div id="slas" data-bind="visible: interface() === 'slas'"></div>
 
-              <!-- ko if: interface() === 'hive-queries' -->
-                <queries-list></queries-list>
-              <!-- /ko -->
+              <div data-bind="template: { name: 'hive-queries-template', if: interface() === 'hive-queries' }"></div>
 
-              <!-- ko if: interface() === 'impala-queries' -->
-                <impala-queries></impala-queries>
-              <!-- /ko -->
+              <div data-bind="template: { name: 'impala-queries-template', if: interface() === 'impala-queries' }"></div>
 
               <!-- ko if: interface() === 'oozie-info' -->
                 <!-- ko hueSpinner: { spin: oozieInfoLoading(), center: true, size: 'xlarge' } --><!-- /ko -->
@@ -596,6 +592,13 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   <!-- /ko -->
 </div>
 
+<script type="text/html" id="hive-queries-template">
+  <queries-list></queries-list>
+</script>
+
+<script type="text/html" id="impala-queries-template">
+  <impala-queries></impala-queries>
+</script>
 
 <script type="text/html" id="breadcrumbs-icons${ SUFFIX }">
 <!-- ko switch: type -->
