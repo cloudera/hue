@@ -41,6 +41,7 @@ RUN pip3 install --upgrade --no-cache-dir setuptools virtualenv pip && \
   chown -R hue /usr/share/hue && \
   rm -rf /hue/desktop/conf && \
   cp -r /hue/desktop/conf.dist /hue/desktop/conf && \
+  mkdir -m 755 /var/log/hue && \
   cd /hue && \
   ln -fs /usr/local/bin/pip3.8 /usr/bin/pip3.8 && \
   ln -fs /usr/local/bin/pip3.8 /usr/bin/pip3 && \
