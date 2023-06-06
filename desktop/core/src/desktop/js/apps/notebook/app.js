@@ -960,10 +960,11 @@ huePubSub.subscribe('app.dom.loaded', app => {
               const dialect = snippet.dialect();
               const statement = snippet.statement_raw();
               sqlParserRepository.getAutocompleteParser(dialect).then(parser => {
-                const parseResults = parser.parseSql(statement, '');
+                const parseResults = parser.parseSql(statement + ' ', '');
                 $.post('/metadata/api/optimizer/upload/query', {
                   sourcePlatform: dialect,
-                  locations: JSON.stringify(parseResults.locations)
+                  locations: JSON.stringify(parseResults.locations),
+                  statement: statement
                 });
               });
             } else {

@@ -1161,14 +1161,16 @@ class Document2Manager(models.Manager, Document2QueryMixin):
     LOG.info("Moved %d documents to home directory for user: %s" % (count, user.username))
     return home_dir
 
-class SqlQueryParser(models.Model):
-  database = models.CharField(default=None, max_length=255)
+class SqlParserSuggestions(models.Model):
+  database = models.CharField(default='', max_length=255)
   table_name = models.CharField(default='', max_length=255)
+  table_name_1 = models.CharField(default='', max_length=255)
   column_name = models.CharField(default='', max_length=255)
+  column_name_1 = models.CharField(default='', max_length=255)
+  join_type = models.CharField(default='', max_length=255)
 
   def __str__(self):
     return self.name
-  
 class Document2(models.Model):
 
   HOME_DIR = ''

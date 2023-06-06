@@ -29,7 +29,7 @@ from desktop.auth.backend import is_admin
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.i18n import force_unicode
 from desktop.models import Document2
-from desktop.models import SqlQueryParser
+from desktop.models import SqlParserSuggestions
 from libsentry.privilege_checker import MissingSentryPrivilegeException
 from notebook.api import _get_statement
 from notebook.models import Notebook
@@ -455,6 +455,9 @@ def upload_query(request):
   interface = request.POST.get('interface', OPTIMIZER.INTERFACE.get())
   source_platform = request.POST.get('sourcePlatform', 'default')
   query_id = request.POST.get('query_id')
+  statement = request.POST.get('statement')
+  join_flag = statement.lower().find(' join') >-1
+
   sql_query = request.POST.get('locations')
   sql_query = json.loads(sql_query) # extracting the SQL query in the form of a list
 
@@ -475,6 +478,8 @@ def upload_query(request):
   elif OPTIMIZER.AUTO_UPLOAD_QUERIES.get() and sql_query:
     try:
       #extracting values related to table(s) and database
+      tables = []
+      columns = []
       for i in sql_query:
         if i['type'] == 'table':
           if len(i['identifierChain']) > 1:
@@ -484,16 +489,32 @@ def upload_query(request):
             table_name = i['identifierChain'][0]['name']
             database_name = 'default'
 
+          tables.append(table_name)
+
         #extracting values related to column(s)
         if i['type'] == 'column':
           if len(i['identifierChain']) > 1:
             column_name = i['identifierChain'][len(i['identifierChain'])-1]['name']
           else:
-            column_name = i['identifierChain'][0]['name']    
+            column_name = i['identifierChain'][0]['name']  
+          columns.append(column_name)
+
+      table_unique = []
+      for item in tables:
+          if item not in table_unique: 
+              table_unique.append(item)   
+      
+      column_unique = []
+      for col in columns:
+          if col not in column_unique: 
+              column_unique.append(col)
 
       # sending the fetched values from the SQL query to the database
-      Sql_obj = SqlQueryParser(database=database_name , table_name = table_name , column_name = column_name)
-      Sql_obj.save()
+      if join_flag:
+        SqlParser_obj = SqlParserSuggestions(database=database_name, table_name = table_unique[0], table_name_1 = table_unique[1], column_name = column_unique[-2], column_name_1 = column_unique[-1], join_type=join)
+      else:
+        SqlParser_obj = SqlParserSuggestions(database=database_name, table_name = table_unique[0], table_name_1 = '', column_name = column_unique[0], column_name_1 = '', join_type='')
+      SqlParser_obj.save()
 
       response['query_upload'] = _('SQL parser saved to DB')
     except:
