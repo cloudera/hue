@@ -207,11 +207,15 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
     setIsLoading(false);
   };
 
-  const loadOptimization = async (statement: string) => {
+  const loadOptimization = async (statement: string, activeExecutable: SqlExecutable) => {
     setIsLoading(true);
+    const executor = activeExecutable?.executor;
+    const databaseName = activeExecutable?.database || '';
     const dialect = lastDialect.current;
     const { sql, explanation, error } = await generateOptimizedSql({
       statement,
+      databaseName,
+      executor,
       dialect,
       onStatusChange: handleStatusUpdate
     });
@@ -533,7 +537,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
                 <ToolbarButton
                   onClick={() => {
                     setErrorStatusText('');
-                    loadOptimization(parsedStatement?.statement);
+                    loadOptimization(parsedStatement?.statement, currentExecutable);
                   }}
                   title="Optimize your SQL statement"
                   disabled={isLoading}
