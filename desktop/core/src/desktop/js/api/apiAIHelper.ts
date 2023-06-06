@@ -3,7 +3,6 @@ import { hueWindow } from 'types/types';
 
 import Executor from '../apps/editor/execution/executor';
 import dataCatalog from '../catalog/dataCatalog';
-import { getRelevantTableDetails } from 'reactComponents/loadCatalogs';
 
 // The Error interface is based on the new Improved Hue Error UX
 // specification. It is not yet implemented but lets try to follow the
@@ -182,7 +181,11 @@ const generateOptimizedSql: GenerateOptimizedSql = async ({
     onStatusChange
   );
   console.info('relevantTables', relevantTables);
-  const tableMetadata = await getTableMetaData(relevantTables);
+  const tableMetadata = await getRelevantTableDetails(
+    databaseName,
+    relevantTables['tables'],
+    executor
+  );
 
   onStatusChange('Generating SQL query');
   return await fetchFromLlm({
@@ -198,6 +201,41 @@ const generateOptimizedSql: GenerateOptimizedSql = async ({
   });
 };
 
+const fetchColumnsData = async (databaseName: string, tableName: string, executor: Executor) => {
+  const dbEntry = await dataCatalog.getEntry({
+    path: [databaseName, tableName],
+    connector: executor.connector(),
+    namespace: executor.namespace(),
+    compute: executor.compute()
+  });
+  const columns = await dbEntry.getChildren();
+  return columns;
+};
+
+export const getRelevantTableDetails = async (
+  databaseName: string,
+  tableNames: string[],
+  executor: Executor
+) => {
+  const relevantTables = [];
+  for (const tableName of tableNames) {
+    const columns = await fetchColumnsData(databaseName, tableName, executor);
+    const tableDetails = {
+      // databaseName: databaseName,
+      name: tableName,
+      columns: columns.map(({ definition }) => {
+        delete definition.index;
+        delete definition.partitionKey;
+        delete definition.primaryKey;
+        return definition;
+      })
+    };
+    relevantTables.push(tableDetails);
+  }
+  return relevantTables;
+};
+
+
 const generateSQLfromNQL: GenerateSQLfromNQL = async ({
   nql,
   databaseName,
@@ -206,8 +244,11 @@ const generateSQLfromNQL: GenerateSQLfromNQL = async ({
   onStatusChange
 }) => {
   const relevantTables = await getRelevantTables(nql, { databaseName, executor }, onStatusChange);
-  console.info('relevantTables', relevantTables);
-  const tableMetadata = await getTableMetaData(relevantTables);
+  const tableMetadata = await getRelevantTableDetails(
+    databaseName,
+    relevantTables['tables'],
+    executor
+  );
 
   onStatusChange('Generating SQL query');
   return await fetchFromLlm({
@@ -233,7 +274,12 @@ const generateEditedSQLfromNQL: GenerateEditedSQLfromNQL = async ({
 }) => {
   const relevantTables = await getRelevantTables(nql, { databaseName, executor }, onStatusChange);
   console.info('relevantTables', relevantTables);
-  const tableMetadata = await getTableMetaData(relevantTables);
+  const tableMetadata = await getRelevantTableDetails(
+    databaseName,
+    relevantTables['tables'],
+    executor
+  );
+
 
   onStatusChange('Generating SQL query');
   return await fetchFromLlm({
@@ -255,21 +301,15 @@ interface getTableListParams {
   executor: Executor;
 }
 const getTableList = async ({ databaseName, executor }: getTableListParams) => {
-  // TODO: USe real data
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      resolve(['sample_07', 'sample_08', 'web_logs', 'offices']);
-    }, 3000);
+  const dbEntry = await dataCatalog.getEntry({
+    path: databaseName,
+    connector: executor?.connector(),
+    namespace: executor?.namespace(),
+    compute: executor?.compute()
   });
-  // const dbEntry = await dataCatalog.getEntry({
-  //   path: databaseName,
-  //   connector: executor?.connector(),
-  //   namespace: executor?.namespace(),
-  //   compute: executor?.compute()
-  // });
-  // const dbChildren = await dbEntry.getChildren();
-  // const tableNames = dbChildren.map(({ name }) => name);
-  // return tableNames;
+  const dbChildren = await dbEntry.getChildren();
+  const tableNames = dbChildren.map(({ name }) => name);
+  return tableNames;
 };
 
 const getTableMetaData = async (tableNames: Array<string>) => {
