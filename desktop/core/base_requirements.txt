@@ -43,6 +43,7 @@ openpyxl==3.0.9
 phoenixdb==1.2.1
 prompt-toolkit==2.0.10
 protobuf==3.20.3
+psycopg2-binary==2.9.6
 pyformance==0.3.2
 pylint==2.6.0
 pylint-django==2.3.0
