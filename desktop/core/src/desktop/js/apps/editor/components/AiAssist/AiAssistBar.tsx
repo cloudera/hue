@@ -79,8 +79,8 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
   const [isAnimating, setIsAnimating] = useState<'no' | 'expand' | 'contract'>('no');
   const [isEditMode, setIsEditMode] = useState(false);
   const [isGenerateMode, setIsGenerateMode] = useState(false);
-  const [showSuggestedSqlModal, setShowSuggestedSqlModal] = useState(false);
-  const [explanation, setExplanation] = useState('');
+  const [showSuggestedSqlModal, setShowSuggestedSqlModal] = useState(true);
+  const [explanation, setExplanation] = useState('This is the explanation of the query.');
   const [suggestion, setSuggestion] = useState('');
   const [suggestionExplanation, setSuggestionExplanation] = useState('');
   const [assumptions, setAssumptions] = useState('');
@@ -174,7 +174,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
     setIsLoading(false);
   };
 
-  const loadOptimization = async (statement: string, activeExecutable: SqlExecutable) => {
+  const loadOptimization = async (statement: string) => {
     setIsLoading(true);
     const executor = activeExecutable?.executor;
     const databaseName = activeExecutable?.database || '';
@@ -232,18 +232,6 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
     setIsGenerateMode(false);
   };
 
-  // const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-  //   if (event.key === 'Enter' && inputExpanded) {
-  //     const userInput = (event.target as HTMLInputElement).value;
-  //     const sqlStatmentToModify = parsedStatement.statement;
-  //     if (isGenerateMode) {
-  //       generateSqlQuery(userInput, currentExecutable);
-  //     } else if (isEditMode) {
-  //       editSqlQuery(userInput, sqlStatmentToModify, currentExecutable);
-  //     }
-  //   }
-  // };
-
   const handleToobarInputSubmit = (userInput: string) => {
     const sqlStatmentToModify = parsedStatement.statement;
     if (isGenerateMode) {
@@ -251,7 +239,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
     } else if (isEditMode) {
       editSqlQuery(userInput, sqlStatmentToModify, currentExecutable);
     }
-  }
+  };
 
   const handleInsert = (sql: string, rawExplain: string) => {
     const leadingEmptyLines = getLeadingEmptyLineCount({ statement: sql });
@@ -261,6 +249,14 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
 
     acceptSuggestion(textToInsert);
     setExplanation('');
+  };
+
+  const toggleOpen = () => {
+    setIsAnimating(prev => {
+      console.log(`prev: ${prev}, isExpanded: ${isExpanded}`);
+      return prev === 'no' ? (isExpanded ? 'contract' : 'expand') : prev;
+    });
+    setIsExpanded(prev => !prev);
   };
 
   useEffect(() => {
@@ -283,18 +279,17 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
     }
   }, [selectedStatement, parser]);
 
-
-
   return (
     <>
       <AnimatedLauncher
+        onAnimationEnd={() => setIsAnimating('no')  }
         isAnimating={isAnimating}
         isExpanded={isExpanded}
         isLoading={isLoading}
         loadingStatusText={loadingStatusText}
         errorStatusText={errorStatusText}
-        setIsExpanded={setIsExpanded}
-        setIsAnimating={setIsAnimating}
+        onExpandClick={toggleOpen}
+        onCloseErrorClick={() => setErrorStatusText('')}
         setErrorStatusText={setErrorStatusText}
       />
       <div
@@ -306,7 +301,8 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
       >
         <div
           className={classNames('hue-ai-assist-bar__content', {
-            'hue-ai-assist-bar__content--expanded': isExpanded
+            'hue-ai-assist-bar__content--expanded': isExpanded,
+            'hue-ai-assist-bar__content--contracting': isAnimating === 'contract'
           })}
         >
           <AssistToolbar
@@ -328,15 +324,15 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
         <AnimatedCloseButton
           title="Close AI assistbar"
           className={classNames('hue-ai-assistbar__close-btn', {
-            'hue-ai-assistbar__close-btn--expanded': isExpanded
+            'hue-ai-assistbar__close-btn--showing': isExpanded,
+            'hue-ai-assistbar__close-btn--hiding': isAnimating === 'contract'
           })}
-          onClick={() => {
-            setIsExpanded(false);
-          }}
+          onClick={toggleOpen}
         />
       </div>
       {showSuggestedSqlModal && (
         <AiPreviewModal
+          autoFormat={!explanation}
           title="Suggestion"
           open={true}
           onCancel={() => {

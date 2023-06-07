@@ -1,12 +1,12 @@
 @use 'variables' as vars;
 @use 'sharedAiAssistVars' as ai-assist-vars;
 
+$bar-vertical-animation-time: (ai-assist-vars.$expand-animation-time * 0.5); // vars.$animation-duration-base
+
 .cuix.antd {
   .hue-ai-assist-bar {
     height: 0px;
     margin: 0 -8px 0 -55px;
-
-    transition: height vars.$animation-duration-base ease;
     overflow: hidden;
     background-color: vars.$fluidx-blue-050;
     padding-left: 46px;
@@ -14,8 +14,16 @@
 
   .hue-ai-assist-bar--expanded {
     height: 40px;
-    transition: vars.$animation-duration-base;
+    animation: mainBarAnimationIn $bar-vertical-animation-time ease-in-out 1;
     border-bottom: 1px solid vars.$fluidx-blue-100;
+  }
+
+  .hue-ai-assist-bar--contracting {
+    height: 40px;
+    border-bottom: 1px solid vars.$fluidx-blue-100;
+    animation: mainBarAnimationOut $bar-vertical-animation-time ease-in-out 1;
+    animation-fill-mode: forwards;
+    animation-delay: (ai-assist-vars.$expand-animation-time * 0.8);    
   }
 
   .hue-ai-assist-bar__content {
@@ -26,7 +34,14 @@
   }
 
   .hue-ai-assist-bar__content--expanded {
-    animation: contentAnimation ai-assist-vars.$expand-animation-time ease-in-out 1;
+    animation: contentAnimationIn ai-assist-vars.$expand-animation-time ease-in-out 1;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .hue-ai-assist-bar__content--contracting {
+    animation: contentAnimationOut ai-assist-vars.$expand-animation-time ease-in-out 1;    
+    animation-fill-mode: forwards;
     width: 100%;
     overflow: hidden;
   }
@@ -38,10 +53,18 @@
     display: none;
   }
 
-  .hue-ai-assistbar__close-btn--expanded {
+  .hue-ai-assistbar__close-btn--showing {
     right: 0px;
     display: block;
     animation: closeButtonAnimation (ai-assist-vars.$expand-animation-time * 1.2) ease-in-out 1;
+  }
+
+  .hue-ai-assistbar__close-btn--hiding {
+    right: 34px;
+    display: block;
+    animation: closeButtonAnimation (ai-assist-vars.$expand-animation-time * 1.2) ease-in-out 1;
+    animation-direction: reverse;
+    animation-fill-mode: forwards;
   }
 }
 
@@ -51,7 +74,27 @@
   }
 }
 
-@keyframes contentAnimation {
+
+@keyframes mainBarAnimationIn {
+  0% {
+    height: 0;
+  }
+  100% {
+    height: 40px;
+  }
+}
+
+@keyframes mainBarAnimationOut {
+  0% {
+    height: 40px;
+  }
+  100% {
+    
+    height: 0;
+  }
+}
+
+@keyframes contentAnimationIn {
   0% {
     width: 0px;
   }
@@ -62,6 +105,19 @@
     width: 100%;
   }
 }
+@keyframes contentAnimationOut {
+  0% {
+    width: 100%;
+  }
+  20% {
+    width: 100%;
+  }
+  100% {
+    width: 0px;
+  }
+}
+
+// Animates how the Close button position itself when the bar is expanded
 @keyframes closeButtonAnimation {
   0% {
     right: 34px;
@@ -78,34 +134,3 @@
     visibility: visible;
   }
 }
-
-@keyframes aiIconLoadingAnimation {
-  0% {
-    border-radius: 0px;
-    width: 1px;
-    height: 1px;
-    right: 34px;
-    margin-top: 18px;
-    right: 46px;
-  }
-
-  100% {
-    border-radius: 12px;
-    width: 24px;
-    height: 24px;
-    right: 34px;
-    margin-top: 8px;
-  }
-}
-
-@keyframes aiIconLoadingStatusAnimation {
-  0% {
-    max-width: 24px;
-  }
-
-  100% {
-    max-width: 400px; // Workaround since we can't animate to 'auto'
-  }
-}
-
-

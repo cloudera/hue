@@ -14,6 +14,7 @@ import AiAssistToolbarInput from './AiAssistToolbarInput';
 import { ParseError } from 'utils/parseError';
 
 import './AiAssistToolbar.scss';
+import { set } from 'lodash';
 
 interface AssistToolbarProps {
   isGenerateMode: boolean;
@@ -47,6 +48,10 @@ function AssistToolbar({
   parseError,
   onInputSubmit
 }: AssistToolbarProps) {
+  const handOnCancelInput = () => {
+    setIsGenerateMode(false);
+    setIsEditMode(false);
+  };
   return (
     <Toolbar
       className="hue-ai-assist-toolbar"
@@ -69,9 +74,11 @@ function AssistToolbar({
             {!isEditMode ? 'Generate' : ''}
           </ToolbarButton>
           <AiAssistToolbarInput
-            expanded={isGenerateMode && inputExpanded}
+            isLoading={isLoading}
+            isExpanded={isGenerateMode && inputExpanded}
             placeholder="E.g. How many of our unique website vistors are using Mac?"
             onSubmit={onInputSubmit}
+            onCancel={handOnCancelInput}
           />
           <ToolbarButton
             className={classNames({
@@ -90,9 +97,11 @@ function AssistToolbar({
             {!isGenerateMode ? 'Edit' : ''}
           </ToolbarButton>
           <AiAssistToolbarInput
-            expanded={isEditMode && inputExpanded}
+            isExpanded={isEditMode && inputExpanded}
+            isLoading={isLoading}
             placeholder="E.g. only inlcude people under 50 years"
             onSubmit={onInputSubmit}
+            onCancel={handOnCancelInput}
           />
           <ToolbarButton
             disabled={isLoading}
