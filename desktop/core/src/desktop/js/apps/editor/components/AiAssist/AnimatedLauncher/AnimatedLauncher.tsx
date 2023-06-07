@@ -1,73 +1,72 @@
 import React from 'react';
 import classNames from 'classnames';
 
+
 import AnimatedCloseButton from '../AnimatedCloseButton/AnimatedCloseButton';
 
 import CirclesLoader from '../CirclesLoader/CirclesLoader';
 
 import './AnimatedLauncher.scss';
 
-interface AnimatedLauncerProps {
+interface AnimatedLauncherProps {
   isAnimating: string;
   isExpanded: boolean;
   isLoading: boolean;
   loadingStatusText: string;
   errorStatusText: string;
-  setIsExpanded: React.Dispatch<React.SetStateAction<boolean>>;
-  setIsAnimating: React.Dispatch<React.SetStateAction<'no' | 'expand' | 'contract'>>;
   setErrorStatusText: React.Dispatch<React.SetStateAction<string>>;
+  onExpandClick: () => void;
+  onCloseErrorClick: () => void;
+  onAnimationEnd: (event: React.AnimationEvent<HTMLDivElement>) => void;
 }
 
-function AnimatedLauncer({
+function AnimatedLauncher({
   isAnimating,
   isExpanded,
   isLoading,
   loadingStatusText,
   errorStatusText,
-  setIsExpanded,
-  setIsAnimating,
-  setErrorStatusText
-}: AnimatedLauncerProps) {
-
+  onExpandClick,
+  onCloseErrorClick,
+  onAnimationEnd
+}: AnimatedLauncherProps) {
+  const showErrorMessage = !!errorStatusText;
+  console.info('isAnimating:', isAnimating)
   return (
     <div
-      onAnimationEnd={event => {
-        // event.stopPropagation();
-        // if (event.target === event.currentTarget) {
-        // setIsLoading(false);
-      }}
-      className={classNames('hue-ai-assist-bar__icon', {
-        'hue-ai-assist-bar__icon--expanding': isAnimating === 'expand',
-        'hue-ai-assist-bar__icon--expanded': isExpanded,
-        'hue-ai-assist-bar__icon--loading': isExpanded && isLoading,
-        'hue-ai-assist-bar__icon--loading-with-status':
+      onAnimationEnd={onAnimationEnd}
+      className={classNames('hue-ai-assist-bar__animated-launcher', {
+        'hue-ai-assist-bar__animated-launcher--expanding': isAnimating === 'expand',
+        'hue-ai-assist-bar__animated-launcher--contracting': isAnimating === 'contract',
+        'hue-ai-assist-bar__animated-launcher--expanded': isExpanded,
+        'hue-ai-assist-bar__animated-launcher--loading': isExpanded && isLoading,
+        'hue-ai-assist-bar__animated-launcher--loading-with-status':
           isExpanded && isLoading && loadingStatusText,
-        'hue-ai-assist-bar__icon--error': !!errorStatusText
+        'hue-ai-assist-bar__animated-launcher--error': showErrorMessage
       })}
-      onClick={() => {
-        setIsExpanded(true);
-        setIsAnimating(prev => (prev === 'no' ? (isExpanded ? 'contract' : 'expand') : prev));
-      }}
+      onClick={onExpandClick}
     >
-      {isExpanded && isLoading && <CirclesLoader />}
       {isExpanded && isLoading && (
-        <div className="hue-ai-assist-bar__icon-loading-status">{loadingStatusText}</div>
+        <>
+          <CirclesLoader />
+          <div className="hue-ai-assist-bar__animated-launcher-loading-status">
+            {loadingStatusText}
+          </div>
+        </>
       )}
       {isExpanded && errorStatusText && (
         <>
           <AnimatedCloseButton
             title="Close Error Message"
-            className="hue-ai-assist-bar__icon-error-close-btn"
+            className="hue-ai-assist-bar__animated-launcher-error-close-btn"
             size="small"
-            onClick={() => {
-              setErrorStatusText('');
-            }}
+            onClick={onCloseErrorClick}
           />
-          <div className="hue-ai-assist-bar__icon-error-text">{errorStatusText}</div>
+          <div className="hue-ai-assist-bar__animated-launcher-error-text">{errorStatusText}</div>
         </>
       )}
     </div>
   );
 }
 
-export default AnimatedLauncer;
+export default AnimatedLauncher;
