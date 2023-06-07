@@ -133,7 +133,7 @@ const SqlCodeSnippet = ({
     </div>
   );
 
-  // console.info(!explanation && !parseError && !isNLQ);
+
 
   return (
     <div className="hue-explain-sql__code-wrapper">

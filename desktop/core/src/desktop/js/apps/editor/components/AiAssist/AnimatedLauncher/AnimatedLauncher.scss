@@ -3,6 +3,98 @@
 
 $adjusted-left-margin: 20px;
 
+.cuix.antd {
+  .hue-ai-assist-bar__animated-launcher {
+    cursor: pointer;
+    margin-top: 6px;
+    width: 12px;
+    height: 12px;
+    position: absolute;
+    background: vars.$fluidx-blue-400;
+    border-radius: 50%;
+    box-shadow: 0 0 0 0 vars.$fluidx-blue-300;
+    color: vars.$fluidx-blue-600;
+    right: calc(100% - #{$adjusted-left-margin});
+    z-index: 2;
+  }
+
+  .hue-ai-assist-bar__animated-launcher-loading-status {
+    color: white;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .hue-ai-assist-bar__animated-launcher--expanding,
+  .hue-ai-assist-bar__animated-launcher--expanded {
+    width: 1px;
+    height: 1px;
+    margin-top: 8px;
+    right: 34px;
+  }
+
+  .hue-ai-assist-bar__animated-launcher--expanding {
+    animation: expandAndSlide (ai-assist-vars.$expand-animation-time * 1.2) ease-in-out 1;
+  }
+
+  .hue-ai-assist-bar__animated-launcher--contracting {
+    margin-top: 6px;
+    width: 12px;
+    height: 12px;    
+    right: calc(100% - #{$adjusted-left-margin});
+    animation: expandAndSlide (ai-assist-vars.$expand-animation-time * 1.2) ease-in-out 1;
+    animation-direction: reverse;
+  }
+
+  .hue-ai-assist-bar__animated-launcher--loading {
+    animation: loadingAnimation (ai-assist-vars.$expand-animation-time * 0.5) ease-in-out 1;
+    border-radius: 12px;
+    width: 24px;
+    height: 24px;
+    right: 34px;
+    margin-top: 8px;
+    display: flex;
+  }
+
+  .hue-ai-assist-bar__animated-launcher--loading-with-status {
+    animation-fill-mode: forwards;
+    animation: loadingStatusAnimation (ai-assist-vars.$expand-animation-time * 0.5) ease-in-out 1;
+    width: auto;
+    display: flex;
+    align-items: center;
+    column-gap: 12px;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  // ERROR
+  .hue-ai-assist-bar__animated-launcher--error {
+    background-color: vars.$fluidx-red-050;
+    border-radius: 12px;
+    width: 24px;
+    height: 24px;
+    right: 34px;
+    margin-top: 8px;
+    width: auto;
+    display: flex;
+    align-items: center;
+    column-gap: 12px;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .hue-ai-assist-bar__animated-launcher-error-text {
+    overflow: hidden;
+    white-space: nowrap;
+    color: vars.$fluidx-red-500;
+  }
+
+  .hue-ai-assist-bar__animated-launcher-error-close-btn {
+    span {
+      background-color: vars.$fluidx-red-500;
+    }  
+  }
+}
+
 @keyframes expandAndSlide {
   0% {
     border-radius: 6px;
@@ -42,85 +134,31 @@ $adjusted-left-margin: 20px;
   }
 }
 
-.cuix.antd {
-  .hue-ai-assist-bar__icon {
-    cursor: pointer;
-    margin-top: 6px;
-    width: 12px;
-    height: 12px;
-    position: absolute;
-    background: vars.$fluidx-blue-400;
-    border-radius: 50%;
-    box-shadow: 0 0 0 0 vars.$fluidx-blue-300;
-    color: vars.$fluidx-blue-600;
-    right: calc(100% - #{$adjusted-left-margin});
-    z-index: 2;
-  }
-
-  .hue-ai-assist-bar__icon-loading-status {
-    color: white;
-    overflow: hidden;
-    white-space: nowrap;
-  }
-
-  .hue-ai-assist-bar__icon--expanding,
-  .hue-ai-assist-bar__icon--expanded {
+@keyframes loadingAnimation {
+  0% {
+    border-radius: 0px;
     width: 1px;
     height: 1px;
-    margin-top: 8px;
     right: 34px;
+    margin-top: 18px;
+    right: 46px;
   }
 
-  .hue-ai-assist-bar__icon--expanding {
-    animation: expandAndSlide (ai-assist-vars.$expand-animation-time * 1.2) ease-in-out 1;
-  }
-
-  .hue-ai-assist-bar__icon--loading {
-    animation: aiIconLoadingAnimation (ai-assist-vars.$expand-animation-time * 0.5) ease-in-out 1;
+  100% {
     border-radius: 12px;
     width: 24px;
     height: 24px;
     right: 34px;
     margin-top: 8px;
-    display: flex;
+  }
+}
+
+@keyframes loadingStatusAnimation {
+  0% {
+    max-width: 24px;
   }
 
-  .hue-ai-assist-bar__icon--loading-with-status {
-    animation-fill-mode: forwards;
-    animation: aiIconLoadingStatusAnimation (ai-assist-vars.$expand-animation-time * 0.5) ease-in-out 1;
-    width: auto;
-    display: flex;
-    align-items: center;
-    column-gap: 12px;
-    padding-left: 12px;
-    padding-right: 12px;
-  }
-
-  // ERROR
-  .hue-ai-assist-bar__icon--error {
-    background-color: vars.$fluidx-red-050;
-    border-radius: 12px;
-    width: 24px;
-    height: 24px;
-    right: 34px;
-    margin-top: 8px;
-    width: auto;
-    display: flex;
-    align-items: center;
-    column-gap: 12px;
-    padding-left: 12px;
-    padding-right: 12px;
-  }
-
-  .hue-ai-assist-bar__icon-error-text {
-    overflow: hidden;
-    white-space: nowrap;
-    color: vars.$fluidx-red-500;
-  }
-
-  .hue-ai-assist-bar__icon-error-close-btn {
-    span {
-      background-color: vars.$fluidx-red-500;
-    }  
+  100% {
+    max-width: 400px; // Workaround since we can't animate to 'auto'
   }
 }
