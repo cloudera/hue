@@ -29,7 +29,7 @@ from desktop.auth.backend import is_admin
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.i18n import force_unicode
 from desktop.models import Document2
-from desktop.models import SqlParserSuggestions
+from desktop.models import SqlOptimizerParser
 from libsentry.privilege_checker import MissingSentryPrivilegeException
 from notebook.api import _get_statement
 from notebook.models import Notebook
@@ -511,9 +511,9 @@ def upload_query(request):
 
       # sending the fetched values from the SQL query to the database
       if join_flag:
-        SqlParser_obj = SqlParserSuggestions(database=database_name, table_name = table_unique[0], table_name_1 = table_unique[1], column_name = column_unique[-2], column_name_1 = column_unique[-1], join_type=join)
+        SqlParser_obj = SqlOptimizerParser(database=database_name, table_name = table_unique[0], table_name_1 = table_unique[1], column_name = column_unique[-2], column_name_1 = column_unique[-1], join_type='join')
       else:
-        SqlParser_obj = SqlParserSuggestions(database=database_name, table_name = table_unique[0], table_name_1 = '', column_name = column_unique[0], column_name_1 = '', join_type='')
+        SqlParser_obj = SqlOptimizerParser(database=database_name, table_name = table_unique[0], table_name_1 = '', column_name = column_unique[0], column_name_1 = '', join_type='')
       SqlParser_obj.save()
 
       response['query_upload'] = _('SQL parser saved to DB')

@@ -1161,16 +1161,6 @@ class Document2Manager(models.Manager, Document2QueryMixin):
     LOG.info("Moved %d documents to home directory for user: %s" % (count, user.username))
     return home_dir
 
-class SqlParserSuggestions(models.Model):
-  database = models.CharField(default='', max_length=255)
-  table_name = models.CharField(default='', max_length=255)
-  table_name_1 = models.CharField(default='', max_length=255)
-  column_name = models.CharField(default='', max_length=255)
-  column_name_1 = models.CharField(default='', max_length=255)
-  join_type = models.CharField(default='', max_length=255)
-
-  def __str__(self):
-    return self.name
 class Document2(models.Model):
 
   HOME_DIR = ''
@@ -1695,7 +1685,16 @@ class Directory(Document2):
     self.type = 'directory'
     super(Directory, self).save(*args, **kwargs)
 
+class SqlOptimizerParser(models.Model):
+  database = models.CharField(default='', max_length=255)
+  table_name = models.CharField(default='', max_length=255)
+  table_name_1 = models.CharField(default='', max_length=255)
+  column_name = models.CharField(default='', max_length=255)
+  column_name_1 = models.CharField(default='', max_length=255)
+  join_type = models.CharField(default='', max_length=255)
 
+  def __str__(self):
+    return self.name
 class Document2Permission(models.Model):
   """
   Combine either:

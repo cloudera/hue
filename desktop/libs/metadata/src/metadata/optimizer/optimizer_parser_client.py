@@ -22,7 +22,7 @@ import json
 
 from desktop.lib.exceptions_renderable import PopupException
 from django.db.models import Count
-from desktop.models import SqlParserSuggestions
+from desktop.models import SqlOptimizerParser
 from metadata.optimizer.base import Api
 
 if sys.version_info[0] > 2:
@@ -37,7 +37,8 @@ LOG = logging.getLogger(__name__)
 class OptimizerParserClient(Api):
     # retriving the data from the database 
     def top_tables(self, workfloadId=None, database_name='default', page_size=1000, startingToken=None, connector=None):
-            result_top_tables = SqlParserSuggestions.objects.filter(database=database_name).values('database' , 'table_name').annotate(usage_count=Count('*')).order_by('-usage_count').values('database' , 'table_name', 'usage_count')[:4]
+            result_top_tables = SqlOptimizerParser.objects.filter(database=database_name).values('database' , 'table_name').annotate(usage_count=Count('*')).order_by('-usage_count').values('database' , 'table_name', 'usage_count')[:4]
+            print('result_top_tables:',result_top_tables)
       
             data = {
                 'results': [{
@@ -79,7 +80,8 @@ class OptimizerParserClient(Api):
     def top_columns(self, db_tables=None, page_size=100, startingToken=None, connector=None, database_name='default'):
       db_tables = ' '.join(map(str, db_tables))
       db_table_only = db_tables.split(".")[1]
-      result_top_columns = SqlParserSuggestions.objects.filter(database=database_name, table_name = db_table_only).values('database', 'table_name', 'column_name').annotate(usage_count=Count('*')).order_by('-usage_count')[:4]
+      result_top_columns = SqlOptimizerParser.objects.filter(database=database_name, table_name = db_table_only).values('database', 'table_name', 'column_name').annotate(usage_count=Count('*')).order_by('-usage_count')[:4]
+      print('result_top_columns:',result_top_columns)
 
       results = { 
         'selectColumns': [{
@@ -143,7 +145,7 @@ class OptimizerParserClient(Api):
     def top_joins(self, db_tables=None, connector=None, database_name='default'):
       db_tables = ' '.join(map(str, db_tables))
       db_table_only = db_tables.split(".")[1]
-      result_top_joins = SqlParserSuggestions.objects.filter(database=database_name, table_name=db_table_only).values('database', 'table_name', 'table_name_1', 'column_name', 'column_name_1').annotate(usage_count=Count('*')).order_by('-usage_count')[:2]
+      result_top_joins = SqlOptimizerParser.objects.filter(database=database_name, table_name=db_table_only, join_type='join').values('database', 'table_name', 'table_name_1', 'column_name', 'column_name_1').annotate(usage_count=Count('*')).order_by('-usage_count')[:2]
       print('result_top_joins: ', result_top_joins)
 
       key = {
@@ -175,5 +177,5 @@ class OptimizerParserClient(Api):
         r['joinCols'][0]['columns'][0] = result_top_joins[j]['column_name']
         r['joinCols'][0]['columns'][1] = result_top_joins[j]['column_name_1']
         j=j+1
-              
+          
       return key
