@@ -91,12 +91,6 @@ if [ "$(echo "$PYVER >= 3.8" | bc -l)" -eq 1 ]; then
   virtualenv-make-relocatable "build/env"
   $ENV_PYTHON $VIRTUAL_BOOTSTRAP --relocatable_pth "build/env"
   popd
-elif [ "$(echo "$PYVER == 2.7" | bc -l)" -eq 1 ]; then
-  if [ -e "$HUE_ROOT/tools/enable-python27.sh" ]; then
-    source $HUE_ROOT/tools/enable-python27.sh
-  fi
-
-  $ENV_PYTHON $VIRTUAL_BOOTSTRAP --relocatable "$HUE_ROOT/build/env"
 fi
 
 # Step 1b. Fix any broken lib64 directory

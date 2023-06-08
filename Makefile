@@ -131,22 +131,7 @@ endif
 ###################################
 
 .PHONY: virtual-env
-virtual-env: virtual-env2.7 virtual-env3.8 virtual-env3.9
-
-.PHONY: virtual-env2.7
-virtual-env2.7: $(BLD_DIR_ENV)/stamp
-$(BLD_DIR_ENV)/stamp:
-ifeq ($(PYTHON_VER),python2.7)
-	@echo "--- Creating virtual environment at $(BLD_DIR_ENV) using $(PYTHON_VER)"
-	@$(SYS_PYTHON) $(VIRTUAL_BOOTSTRAP) $(VIRTUALENV_OPTS) --system-site-packages $(BLD_DIR_ENV)
-	@echo "--- Virtual environment $(BLD_DIR_ENV) ready"
-	@touch $@
-	@echo '--- Installing PIP_MODULES in virtual-env'
-	@echo "--- start installing PIP_MODULES in virtual-env"
-	@$(ENV_PIP) install --upgrade pip
-	@$(ENV_PIP) install --upgrade --force-reinstall $(PIP_MODULES)
-	@echo "--- done installing PIP_MODULES in virtual-env"
-endif
+virtual-env: virtual-env3.8 virtual-env3.9
 
 .PHONY: virtual-env3.8
 virtual-env3.8: $(BLD_DIR_ENV)/stamp
@@ -232,7 +217,6 @@ INSTALL_CORE_FILES = \
 	ext \
 	tools/app_reg \
 	tools/virtual-bootstrap \
-	tools/enable-python27.sh \
 	tools/relocatable.sh \
 	VERS* LICENSE* README*
 
