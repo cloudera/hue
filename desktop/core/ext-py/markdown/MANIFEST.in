@@ -1,6 +1,0 @@
-recursive-include bin *
-recursive-include markdown *.py
-recursive-include docs *
-prune markdown/extensions/legacy.py
-include setup.py
-include MANIFEST
