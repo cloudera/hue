@@ -38,7 +38,7 @@ else:
   from urllib import unquote as lib_urlunquote
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class RazClient(object):
