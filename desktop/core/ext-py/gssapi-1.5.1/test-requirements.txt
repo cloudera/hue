@@ -1,7 +1,0 @@
-flake8
-nose
-nose_parameterized
-shouldbe
-six
-Cython
-k5test
