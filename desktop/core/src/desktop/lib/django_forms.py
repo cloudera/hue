@@ -45,7 +45,7 @@ else:
   from urllib import quote_plus as urllib_quote_plus
   from django.utils.encoding import force_unicode as force_str
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 try:
   from django.utils.encoding import StrAndUnicode

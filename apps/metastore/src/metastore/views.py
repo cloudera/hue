@@ -56,7 +56,7 @@ else:
   from django.utils.translation import ugettext as _
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 SAVE_RESULTS_CTAS_TIMEOUT = 300         # seconds
 
 

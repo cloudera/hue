@@ -30,7 +30,7 @@ from sqoop.client.job import Job
 from sqoop.test_base import SqoopServerProvider
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class TestSqoopServerBase(SqoopServerProvider):

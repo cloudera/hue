@@ -22,7 +22,7 @@ from desktop.lib.raz.ranger.model.ranger_raz import RangerRazRequest, ResourceAc
 from desktop.lib.raz.ranger.clients.ranger_raz_client import RangerRazClient
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class RangerRazS3:

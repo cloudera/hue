@@ -54,7 +54,7 @@ else:
   from urlparse import urlsplit as lib_urlsplit
   from django.utils.translation import ugettext as _
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 DEFAULT_USER = "webui"
 

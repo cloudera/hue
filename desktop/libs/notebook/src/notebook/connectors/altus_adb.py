@@ -35,7 +35,7 @@ else:
   from django.utils.translation import ugettext as _
   from urllib import quote as urllib_quote, quote_plus as urllib_quote_plus
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 RUNNING_STATES = ('QUEUED', 'RUNNING', 'SUBMITTING')

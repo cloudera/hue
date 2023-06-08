@@ -34,7 +34,7 @@ import logging
 from django.utils.encoding import smart_str
 from hbase.hbase_site import is_impersonation_enabled
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 def do_as(func):

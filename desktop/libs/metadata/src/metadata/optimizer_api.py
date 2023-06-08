@@ -45,7 +45,7 @@ else:
   from django.utils.translation import ugettext as _
   from base64 import decodestring as decodebytes
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 try:

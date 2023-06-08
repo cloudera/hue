@@ -42,7 +42,7 @@ else:
   from django.utils.http import urlquote as quote
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 DOWNLOAD_CHUNK_SIZE = 1 * 1024 * 1024 # 1MB
 ILLEGAL_CHARS = r'[\000-\010]|[\013-\014]|[\016-\037]'

@@ -34,7 +34,7 @@ except ImportError:
   from django.utils.functional import wraps
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 def hue_permission_required(action, app):

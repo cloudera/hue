@@ -35,7 +35,7 @@ _SSL_SITE_DICT = None                  # A dictionary of name/value config optio
 _CNF_TRUSTORE_LOCATION = 'ssl.client.truststore.location'
 _CNF_TRUSTORE_PASSWORD = 'ssl.client.truststore.password'
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 def reset():

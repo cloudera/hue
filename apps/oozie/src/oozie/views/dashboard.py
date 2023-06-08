@@ -79,7 +79,7 @@ def get_workflow():
     return OldWorkflow
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 """

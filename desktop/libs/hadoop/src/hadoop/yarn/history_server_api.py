@@ -27,7 +27,7 @@ from desktop.lib.rest.resource import Resource
 from hadoop import cluster
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 _API_VERSION = 'v1'
 _JSON_CONTENT_TYPE = 'application/json'

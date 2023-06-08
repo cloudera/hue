@@ -43,7 +43,7 @@ if sys.version_info[0] > 2:
 else:
   from django.utils.translation import ugettext as _
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 _DEFAULT_OBJ_PER_PAGINATION = 10
 

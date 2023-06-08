@@ -40,7 +40,7 @@ from desktop.lib.raz.clients import S3RazClient
 from aws.conf import IS_SELF_SIGNING_ENABLED
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class SignedUrlS3Connection(S3Connection):

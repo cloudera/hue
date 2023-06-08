@@ -6,7 +6,7 @@ from django.db import models
 
 import logging
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class Migration(SchemaMigration):

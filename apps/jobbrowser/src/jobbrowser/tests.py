@@ -54,7 +54,7 @@ from datetime import datetime
 from babel import localtime
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 _INITIALIZED = False
 
 

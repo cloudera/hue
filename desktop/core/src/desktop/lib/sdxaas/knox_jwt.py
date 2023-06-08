@@ -22,7 +22,7 @@ import requests_kerberos
 from desktop.conf import SDXAAS
 from desktop.lib.exceptions_renderable import PopupException
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 _KNOX_TOKEN_API = '/knoxtoken/api/v1/token'
 _KNOX_TOKEN_GET_PARAM_STRING = '?knox.token.include.groups=true'

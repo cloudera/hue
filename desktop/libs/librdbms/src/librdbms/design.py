@@ -34,7 +34,7 @@ if sys.version_info[0] > 2:
 else:
   from django.utils.translation import ugettext as _
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 SERIALIZATION_VERSION = "0.0.1"
 

@@ -72,7 +72,7 @@ else:
   from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 SAMPLE_USER_ID = 1100713
 SAMPLE_USER_INSTALL = 'hue'

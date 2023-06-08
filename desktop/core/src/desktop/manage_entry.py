@@ -26,7 +26,7 @@ import sys
 import traceback
 import subprocess
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 def _deprecation_check(arg0):
   """HUE-71. Deprecate build/env/bin/desktop"""

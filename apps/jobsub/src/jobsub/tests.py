@@ -33,7 +33,7 @@ from oozie.models import Workflow, Node, Start, Kill, End, Link
 from useradmin.models import User
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class TestJobsubWithHadoop(OozieServerProvider):

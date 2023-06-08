@@ -23,7 +23,7 @@ from nose.plugins.skip import SkipTest
 from nose.tools import assert_true, assert_equal
 
 from desktop.lib.django_test_util import make_logged_in_client
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 def test_about():
   #@TODO@ Fix this test
