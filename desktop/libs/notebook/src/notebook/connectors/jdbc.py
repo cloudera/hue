@@ -50,9 +50,9 @@ def query_error_handler(func):
         else:
           raise QueryError, _('%s: is the DB Proxy server running?') % message, sys.exc_info()[2]
       elif 'Access denied' in message:
-        raise AuthenticationRequired, '', sys.exc_info()[2]
+        raise AuthenticationRequired('').with_traceback(sys.exc_info()[2])
       else:
-        raise QueryError, message, sys.exc_info()[2]
+        raise QueryError(message).with_traceback(sys.exc_info()[2])
 
   return decorator
 
