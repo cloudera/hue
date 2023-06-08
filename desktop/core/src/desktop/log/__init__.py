@@ -201,7 +201,7 @@ def basic_logging(proc_name, log_dir=None):
         h.setLevel(lvl)
 
     from desktop.conf import DATABASE_LOGGING
-    if not DATABASE_LOGGING.get():
+    if hasattr(DATABASE_LOGGING, 'get') and not DATABASE_LOGGING.get():
       def disable_database_logging():
         logger = logging.getLogger()
         logger.manager.loggerDict['django.db.backends'].level = 20 # INFO level
