@@ -34,7 +34,7 @@ else:
   from django.utils.translation import ugettext as _
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 LOG_OFFSET_BYTES = LOG_OFFSET.get()
 
 

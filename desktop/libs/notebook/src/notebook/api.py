@@ -53,7 +53,7 @@ else:
   from urllib import unquote as urllib_unquote
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 DEFAULT_HISTORY_NAME = ''
 

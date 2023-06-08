@@ -42,7 +42,7 @@ else:
   from django.contrib.auth.models import User
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 def get_backend_names():

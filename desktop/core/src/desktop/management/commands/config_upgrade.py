@@ -34,7 +34,7 @@ if sys.version_info[0] > 2:
 else:
   from django.utils.translation import ugettext as _
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 class Command(BaseCommand):
   help = _('Upgrades the Hue configuration with a mapping file.')

@@ -42,7 +42,7 @@ if sys.version_info[0] > 2:
 else:
   from django.utils.translation import ugettext as _
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 VERSION = 'v9'
 _JSON_CONTENT_TYPE = 'application/json'
 CLUSTER_SOURCE_IDS_CACHE_KEY = 'nav-cluster-source-ids-id'

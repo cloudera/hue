@@ -29,7 +29,7 @@ from desktop.conf import ENABLE_ORGANIZATIONS, AUTH
 
 from useradmin.models import User
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class JwtAuthentication(authentication.BaseAuthentication):

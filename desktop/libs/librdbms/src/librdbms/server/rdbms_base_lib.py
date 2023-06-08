@@ -21,7 +21,7 @@ import logging
 from librdbms.design import SQLdesign
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class BaseRDBMSDataTable(object):

@@ -34,7 +34,7 @@ from pwd import getpwnam
 
 import logging
 import sys
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 try:
   import ldap

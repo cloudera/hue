@@ -45,7 +45,7 @@ else:
 
 _shared_cluster = None
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 STARTUP_DEADLINE = 60.0

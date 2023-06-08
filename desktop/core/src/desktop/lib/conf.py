@@ -103,7 +103,7 @@ SUPPORTED_THRIFT_TRANSPORTS = ('buffered', 'framed')
 # a BoundContainer(BoundConfig) object which has all of the application's configs as members
 GLOBAL_CONFIG = None
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 __all__ = ["UnspecifiedConfigSection", "ConfigSection", "Config", "load_confs", "coerce_bool", "coerce_csv", "coerce_json_dict"]
 

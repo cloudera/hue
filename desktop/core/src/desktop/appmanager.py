@@ -40,7 +40,7 @@ APP_DIRS = [
     get_desktop_root('libs')
 ]
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 ######################################################################
 # Global variables set after calling load_apps()

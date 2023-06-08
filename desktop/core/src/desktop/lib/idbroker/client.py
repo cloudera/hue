@@ -23,7 +23,7 @@ from desktop.lib.idbroker import conf
 from desktop.lib.rest import http_client, resource
 from hadoop.core_site import is_kerberos_enabled
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 _KNOX_TOKEN_API = '/knoxtoken/api/v1/token'
 _CAB_API_CREDENTIALS_GLOBAL = '/cab/api/v1/credentials'

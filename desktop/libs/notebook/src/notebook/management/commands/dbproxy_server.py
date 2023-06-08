@@ -22,7 +22,7 @@ from django.core.management.base import BaseCommand
 from notebook.conf import DBPROXY_EXTRA_CLASSPATH
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class Command(BaseCommand):

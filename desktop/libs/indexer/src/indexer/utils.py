@@ -47,7 +47,7 @@ else:
   from django.utils.translation import ugettext as _
   from StringIO import StringIO as string_io
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 TIMESTAMP_PATTERN = '\[([\w\d\s\-\/\:\+]*?)\]'
 FIELD_XML_TEMPLATE = '<field name="%(name)s" type="%(type)s" indexed="%(indexed)s" stored="%(stored)s" required="%(required)s" multiValued="%(multiValued)s" />'
 DEFAULT_FIELD = {

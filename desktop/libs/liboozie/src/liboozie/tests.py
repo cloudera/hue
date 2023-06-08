@@ -29,7 +29,7 @@ import desktop.conf as desktop_conf
 from desktop.lib.test_utils import reformat_xml
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 def test_valid_external_id():

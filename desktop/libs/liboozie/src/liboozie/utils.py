@@ -44,7 +44,7 @@ else:
     from StringIO import StringIO as string_io
   new_str = unicode
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 _NAME_REGEX = re.compile('^[a-zA-Z][\-_a-zA-Z0-0]*$')
 
 
