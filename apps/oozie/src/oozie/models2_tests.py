@@ -43,7 +43,7 @@ from oozie.models2 import Node, Workflow, WorkflowConfiguration, find_dollar_var
 from oozie.tests import OozieMockBase, save_temp_workflow, MockOozieApi
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class TestEditor(OozieMockBase):

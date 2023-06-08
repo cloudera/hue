@@ -26,7 +26,7 @@ from desktop.lib.raz.ranger.model.ranger_raz import RangerRazResult
 from apache_ranger.utils import *
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class RangerRazClient:

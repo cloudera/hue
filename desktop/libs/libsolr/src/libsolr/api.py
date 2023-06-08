@@ -51,7 +51,7 @@ else:
   from urllib import unquote as urllib_unquote
   new_str = unicode
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 try:

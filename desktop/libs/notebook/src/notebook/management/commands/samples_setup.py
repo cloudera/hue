@@ -25,7 +25,7 @@ from beeswax.management.commands.beeswax_install_examples import Command as Edit
 from useradmin.models import User
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class Command(BaseCommand):

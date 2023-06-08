@@ -37,7 +37,7 @@ SERVER_HELP = r"""
 from celery.bin.celery import CeleryCommand
 from celery.bin.celery import main as celery_main
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 CELERY_OPTIONS = {
   'server_user': conf.SERVER_USER.get(),
   'server_group': conf.SERVER_GROUP.get(),

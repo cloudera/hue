@@ -20,7 +20,7 @@ import logging
 import stat as stat_module
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger()
 
 
 def do_overwrite_save(fs, path, data):

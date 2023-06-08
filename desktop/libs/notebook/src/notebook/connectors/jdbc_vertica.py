@@ -25,7 +25,7 @@ import logging
 import math
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class JdbcApiVertica(JdbcApi):
