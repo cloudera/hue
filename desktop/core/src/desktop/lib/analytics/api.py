@@ -23,7 +23,7 @@ from desktop.lib.django_util import JsonResponse
 from notebook.models import Analytics
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 def admin_stats(request):

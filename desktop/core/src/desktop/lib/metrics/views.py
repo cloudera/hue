@@ -26,7 +26,7 @@ from desktop.lib.metrics.registry import global_registry
 from desktop.lib.view_util import is_ajax
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 @login_notrequired

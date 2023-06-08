@@ -36,7 +36,7 @@ else:
 
 __all__ = ['get_job_or_exception']
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 def get_connector_or_exception(exception_class=PopupException):

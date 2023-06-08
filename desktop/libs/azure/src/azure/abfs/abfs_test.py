@@ -37,7 +37,7 @@ from azure.conf import ABFS_CLUSTERS,AZURE_ACCOUNTS, is_abfs_enabled
 
 from azure.abfs.upload import DEFAULT_WRITE_SIZE
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 """
 Interfaces for ADLS via HttpFs/WebHDFS

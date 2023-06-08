@@ -66,7 +66,7 @@ else:
   from django.utils.translation import ugettext as _
 
 WORKFLOW_DEPTH_LIMIT = 24
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class Job(object):

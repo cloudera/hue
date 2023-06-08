@@ -44,7 +44,7 @@ from oozie.conf import REMOTE_SAMPLE_DIR
 _oozie_lock = threading.Lock()
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class OozieServerProvider(object):

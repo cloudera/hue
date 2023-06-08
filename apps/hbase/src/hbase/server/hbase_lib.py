@@ -26,7 +26,7 @@ from hbased import Hbase as thrift_hbase
 from hbased import ttypes
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 def get_client_type():

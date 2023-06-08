@@ -41,7 +41,7 @@ else:
   from urlparse import urlparse as lib_urlparse
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 DEFAULT_USER = DEFAULT_USER.get()
 
 

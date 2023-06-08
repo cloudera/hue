@@ -34,7 +34,7 @@ if sys.version_info[0] > 2:
 else:
   from urlparse import urlsplit as lib_urlsplit
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 MAX_HEAP_SIZE = 20
 

@@ -31,7 +31,7 @@ if sys.version_info[0] > 2:
 else:
   from cStringIO import StringIO as buffer_writer
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class THttpClient(TTransportBase):

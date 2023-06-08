@@ -56,7 +56,7 @@ _SHARED_HIVE_SERVER_CLOSER = None
 _SUPPORTED_EXECUTION_ENGINES = ['mr', 'spark', 'tez']
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 def is_hive_on_spark():

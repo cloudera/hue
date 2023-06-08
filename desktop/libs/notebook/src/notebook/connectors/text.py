@@ -20,7 +20,7 @@ import logging
 from notebook.connectors.base import Api
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class TextApi(Api):

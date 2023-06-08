@@ -65,7 +65,7 @@ if sys.version_info[0] > 2:
 else:
   from django.utils.translation import ugettext as _, activate as activate_translation
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 def list_workflows(request):

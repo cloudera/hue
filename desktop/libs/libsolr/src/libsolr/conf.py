@@ -32,7 +32,7 @@ else:
   from django.utils.translation import ugettext_lazy as _t
   from urlparse import urlparse
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 SSL_CERT_CA_VERIFY = Config(

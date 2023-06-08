@@ -25,7 +25,7 @@ from django.db import connections
 from django.db.utils import OperationalError
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class Command(BaseCommand):

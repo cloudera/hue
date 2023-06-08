@@ -44,7 +44,7 @@ else:
   from urlparse import urlparse as lib_urlparse
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 def get_ofs_home_directory():

@@ -30,7 +30,7 @@ from useradmin.models import User
 from desktop.auth.backend import rewrite_user
 from desktop.lib.django_test_util import make_logged_in_client
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class TestRdbmsIndexer(object):

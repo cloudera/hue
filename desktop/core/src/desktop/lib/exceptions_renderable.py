@@ -31,7 +31,7 @@ else:
 import desktop.lib.django_util
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 def raise_popup_exception(message, title="Error", detail=None, error_code=500):

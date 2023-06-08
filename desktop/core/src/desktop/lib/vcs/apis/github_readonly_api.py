@@ -42,7 +42,7 @@ else:
   from urlparse import urlsplit as lib_urlsplit, urlunsplit as lib_urlunsplit
   from django.utils.translation import ugettext as _
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class GithubReadOnlyApi(Api):

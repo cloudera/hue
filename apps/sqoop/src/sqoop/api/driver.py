@@ -36,7 +36,7 @@ else:
 __all__ = ['driver']
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 @never_cache
 def driver(request):
