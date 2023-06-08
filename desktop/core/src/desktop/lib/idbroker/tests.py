@@ -28,7 +28,7 @@ if sys.version_info[0] > 2:
 else:
   from mock import patch
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 class TestIDBroker(unittest.TestCase):
   def test_username_authentication(self):

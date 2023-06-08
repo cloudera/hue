@@ -29,7 +29,7 @@ else:
   from django.utils.translation import ugettext_lazy as _t
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 DEFAULT_NN_HTTP_PORT = 50070
 
 

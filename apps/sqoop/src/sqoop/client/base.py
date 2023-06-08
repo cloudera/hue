@@ -32,7 +32,7 @@ from sqoop.client.resource import SqoopResource
 from sqoop.sqoop_properties import has_sqoop_has_security
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 DEFAULT_USER = 'hue'
 API_VERSION = 'v1'
 

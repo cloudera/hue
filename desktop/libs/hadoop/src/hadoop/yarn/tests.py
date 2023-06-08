@@ -26,7 +26,7 @@ from hadoop.yarn.mapreduce_api import MapreduceApi, get_mapreduce_api
 
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 def test_get_log_client():

@@ -46,7 +46,7 @@ else:
   from urlparse import urlparse
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 try:

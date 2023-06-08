@@ -76,7 +76,7 @@ else:
   from django.utils.http import is_safe_url as url_has_allowed_host_and_scheme, urlquote as quote
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 MIDDLEWARE_HEADER = "X-Hue-Middleware-Response"
 

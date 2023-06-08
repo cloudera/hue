@@ -37,7 +37,7 @@ else:
 
 DEFAULT_WRITE_SIZE = 30 * 1000 * 1000 # TODO: set in configuration
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class ABFSFileUploadError(UploadFileException):

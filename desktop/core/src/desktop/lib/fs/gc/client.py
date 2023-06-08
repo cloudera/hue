@@ -16,7 +16,7 @@
 from __future__ import absolute_import
 
 import logging
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 try:
   import gcs_oauth2_boto_plugin

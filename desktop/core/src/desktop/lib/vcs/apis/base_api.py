@@ -27,7 +27,7 @@ else:
 from desktop.lib.exceptions_renderable import PopupException
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 GITHUB_OFFICIAL = 'github'
 GIT_READ_ONLY = 'git-read-only'

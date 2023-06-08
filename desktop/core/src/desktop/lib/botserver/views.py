@@ -46,7 +46,7 @@ if sys.version_info[0] > 2:
 else:
   from django.utils.translation import ugettext as _
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 class SlackBotException(PopupException):
   def __init__(self, msg, detail=None, error_code=200):

@@ -38,7 +38,7 @@ else:
 __all__ = ['get_submissions', 'submissions']
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 @never_cache
 def get_submissions(request):

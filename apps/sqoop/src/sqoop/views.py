@@ -20,7 +20,7 @@ import logging
 from desktop.lib.django_util import render
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 def app(request):

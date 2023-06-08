@@ -18,7 +18,7 @@ from thrift.transport import TTransport
 from django.utils.functional import wraps
 from django.utils.encoding import smart_str
 all_structs = []
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class Iface(object):

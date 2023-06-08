@@ -26,7 +26,7 @@ from desktop.lib.idbroker import conf as conf_idbroker
 from desktop.lib.idbroker.client import IDBroker
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 def _make_adls_client(identifier, user):

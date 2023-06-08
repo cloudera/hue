@@ -32,7 +32,7 @@ else:
   from urlparse import urlparse
   from django.utils.translation import ugettext_lazy as _t
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 # Deprecated. Should be automatically guessed from Solr admin info API now.

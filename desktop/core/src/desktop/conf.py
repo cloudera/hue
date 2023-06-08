@@ -45,7 +45,7 @@ else:
   from django.utils.translation import ugettext_lazy as _
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 def is_oozie_enabled():
@@ -87,7 +87,7 @@ def coerce_timedelta(value):
 def get_dn(fqdn=None):
   """This function returns fqdn(if possible)"""
   val = []
-  LOG = logging.getLogger(__name__)
+  LOG = logging.getLogger()
   try:
     if fqdn is None:
       fqdn = socket.getfqdn()

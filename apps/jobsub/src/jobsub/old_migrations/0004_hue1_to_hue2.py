@@ -27,7 +27,7 @@ from django.db import models
 from desktop.lib.django_db_util import remove_content_type
 from jobsub.models import JobDesign, OozieJavaAction, OozieStreamingAction, OozieDesign
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 class Migration(DataMigration):
 

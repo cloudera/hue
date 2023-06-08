@@ -94,7 +94,7 @@ TEST_USER_GROUP_MAPPING = {
    'webui': ['webui'], 'hue': ['supergroup']
 }
 
-LOGGER=logging.getLogger(__name__)
+LOGGER=logging.getLogger()
 
 
 class MiniHadoopCluster(object):
