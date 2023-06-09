@@ -14,13 +14,22 @@ function big_console_header() {
   set -x
 }
 
-function check_python_path() {
+function check_python38_path() {
   export python38_bin="$PYTHON38_PATH/bin/python3.8"
   if [ ! -e "$python38_bin" ]; then
-    echo "Python bin does not exists at " $python38_bin
+    echo "Python38 bin does not exists at " $python38_bin
     exit 1
   fi
   export pip38_bin="$PYTHON38_PATH/bin/pip3.8"
+}
+
+function check_python39_path() {
+  export python39_bin="$PYTHON39_PATH/bin/python3.9"
+  if [ ! -e "$python39_bin" ]; then
+    echo "Python39 bin does not exists at " $python38_bin
+    exit 1
+  fi
+  export pip39_bin="$PYTHON39_PATH/bin/pip3.9"
 }
 
 function check_sqlite3() {
@@ -298,6 +307,36 @@ function ubuntu20_install() {
         tar zxvf sqlite-autoconf-3350500.tar.gz && \
         cd sqlite-autoconf-3350500 && \
         ./configure --prefix=/usr/local/ && make && make install'
+    export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+  fi
+}
+
+function redhat9_install() {
+  if [[ $FORCEINSTALL -eq 1 ]]; then
+    # pre-req install
+    sudo -- sh -c 'yum install -y \
+      java-11-openjdk \
+      java-11-openjdk-devel \
+      java-11-openjdk-headless \
+      krb5-workstation \
+      ncurses-devel \
+      nmap-ncat \
+      xmlsec1 \
+      xmlsec1-openssl \
+      libss \
+      ncurses-c++-libs'
+    # MySQLdb install
+    sudo -- sh -c 'yum install -y python3-mysqlclient'
+    # NODEJS 14 install
+    sudo -- sh -c 'curl -sL https://rpm.nodesource.com/setup_14.x | bash - && yum install -y nodejs'
+    # Pip modules install
+    sudo pip39_bin=${pip39_bin} -- sh -c '${pip39_bin} install virtualenv virtualenv-make-relocatable mysqlclient'
+    sudo pip39_bin=${pip39_bin} -- sh -c 'ln -fs ${pip39_bin} $(dirname ${pip39_bin})/pip'
+    # sqlite3 install
+    sudo -- sh -c 'curl -o sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
+      tar zxvf sqlite-autoconf-3350500.tar.gz && \
+      cd sqlite-autoconf-3350500 && \
+      ./configure --prefix=/usr/local/ && make && make install'
     export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
   fi
 }
