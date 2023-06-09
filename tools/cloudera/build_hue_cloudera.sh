@@ -46,7 +46,11 @@ function install_prerequisite() {
   fi
 
   export SQLITE3_PATH=${SQLITE3_PATH:-"$TOOLS_HOME/sqlite/sqlite3"}
-  check_python_path
+  if [[ $1 != "redhat9" ]]; then
+    check_python38_path
+  else
+    check_python39_path
+  fi
   check_sqlite3
   if [[ $1 == "centos7" || $1 == "snapshot" ]]; then
     export PYTHON38_PATH=/opt/cloudera/cm-agent
@@ -62,6 +66,8 @@ function install_prerequisite() {
     ubuntu18_install
   elif [[ $1 == "ubuntu20" ]]; then
     ubuntu20_install
+  elif [[ $1 == "redhat9" ]]; then
+    redhat9_install
   fi
 
 }
@@ -87,6 +93,13 @@ export ORACLE_INSTANTCLIENT19_PATH="/opt/toolchain/instantclient_19_15"
 export LD_LIBRARY_PATH=/usr/local/lib:$ORACLE_INSTANTCLIENT19_PATH:$LD_LIBRARY_PATH
 export LD_RUN_PATH=/usr/local/lib:$ORACLE_INSTANTCLIENT19_PATH:$LD_RUN_PATH
 export PATH=$HOME/.local/bin:$PYTHON38_PATH/bin:${TOOLS_HOME}/sqlite:/usr/bin:$PATH
+
+if [[ $DOCKEROS == "redhat9" ]]; then
+  export PYTHON_H=$PYTHON39_PATH/include/python3.9/Python.h
+  export PYTHON_VER=python3.9
+  export SYS_PYTHON=$PYTHON39_PATH/bin/python3.9
+  export PATH=$PYTHON39_PATH/bin:$PATH
+fi
 
 HUE_SRC=$(realpath $WORK_DIR/../..)
 export ROOT=$HUE_SRC
