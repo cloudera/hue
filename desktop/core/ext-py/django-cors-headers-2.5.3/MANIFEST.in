@@ -1,5 +1,0 @@
-include HISTORY.rst README.rst
-include LICENSE
-include runtests.py tox.ini pytest.ini requirements.txt
-graft tests
-global-exclude *.py[cod] __pycache__
