@@ -65,7 +65,7 @@ class MetastoreSource {
 
     huePubSub.subscribe(ASSIST_DB_PANEL_IS_READY_EVENT, () => {
       this.lastLoadNamespacesDeferred.done(() => {
-        const namespaceId = _this.namespace().namespace.id;
+        const namespaceId = this.namespace().namespace.id;
         const localStorageKey = `assist_${this.type}_${namespaceId}.lastSelectedDb`;
         let lastSelectedDb = getFromLocalStorage(localStorageKey);
         if (!lastSelectedDb && lastSelectedDb !== '') {
