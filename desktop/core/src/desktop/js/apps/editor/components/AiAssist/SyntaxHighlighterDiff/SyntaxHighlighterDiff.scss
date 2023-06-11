@@ -8,6 +8,7 @@
     // TODO: Rename these classes to not include preview-moda
     .hue-syntax-highlighter-diff {
       display: flex;
+      overflow: hidden;
       column-gap: 12px;
       & > * {
         flex-grow: 1;

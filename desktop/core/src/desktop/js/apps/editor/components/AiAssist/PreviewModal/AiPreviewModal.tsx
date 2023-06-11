@@ -1,36 +1,64 @@
-import React, { useState, FunctionComponent } from 'react';
+import React, { useState } from 'react';
 // import { Button } from 'antd';
 import { Button } from 'antd';
-import LinkButton from 'cuix/dist/components/Button/LinkButton';
 import DefaultButton from 'cuix/dist/components/Button/Button';
 import Modal from 'cuix/dist/components/Modal';
 import execCommandCopy from 'copy-to-clipboard';
-import PrimaryButton from 'cuix/dist/components/Button/PrimaryButton';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import { stackoverflowDark } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import { fluidxSlate800, fluidxSpacingS, fluidxSpacingXs } from '@cloudera/cuix-core/variables';
 import CopyClipboardIcon from '@cloudera/cuix-core/icons/react/CopyClipboardIcon';
 import CheckmarkIcon from '@cloudera/cuix-core/icons/react/CheckmarkIcon';
-import { diffLines, Change } from 'diff';
+import { KeywordCase, format } from 'sql-formatter';
+
 import classNames from 'classnames';
 
 import SyntaxHighlighterDiff from '../SyntaxHighlighterDiff/SyntaxHighlighterDiff';
 
 import './AiPreviewModal.scss';
 
+interface PreviewModalProps {
+  open: boolean;
+  title: string;
+  autoFormat: boolean;
+  suggestion: string;
+  assumptions: string;
+  explanation: string;
+  onCancel: () => void;
+  onInsert: (value: string) => void;
+  primaryButtonLabel: string;
+  showDiffFrom: string;
+  lineNumberStart: number;
+  showCopyToClipboard: boolean;
+  dialect: string;
+  keywordCase: KeywordCase | undefined;
+}
+
 const PreviewModal = ({
   open,
   title,
-  suggestion = '',
+  autoFormat,
+  suggestion: suggestionRaw = '',
   assumptions = '',
   explanation = '',
   onCancel,
   onInsert,
   primaryButtonLabel,
-  showDiffFrom = '',
+  showDiffFrom: showDiffFromRaw = '',
   lineNumberStart = 1,
-  showCopyToClipboard = true
-}) => {
+  showCopyToClipboard = true,
+  dialect,
+  keywordCase
+}: PreviewModalProps) => {
+  const formatSql = (sql: string) =>
+    autoFormat ? format(sql, { language: dialect, keywordCase }) : sql;
+
+  const [copied, setCopied] = useState(false);  
+  const [userChoiceAutoFormat, setUserChoiceAutoFormat] = useState();
+
+  const suggestion = formatSql(suggestionRaw);
+  const showDiffFrom = formatSql(showDiffFromRaw);
+
   const clearStates = () => {
     setCopied(false);
   };
@@ -44,8 +72,6 @@ const PreviewModal = ({
     onCancel();
   };
 
-  const [copied, setCopied] = useState(false);
-
   const copyToClipboard = (text: string): void => {
     navigator.permissions.query({ name: 'clipboard-write' }).then(result => {
       if (result.state === 'granted') {
@@ -56,6 +82,8 @@ const PreviewModal = ({
     });
     setCopied(true);
   };
+
+  
 
   return (
     <Modal

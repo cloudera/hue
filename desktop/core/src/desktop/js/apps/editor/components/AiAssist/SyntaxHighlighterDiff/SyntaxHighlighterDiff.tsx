@@ -1,6 +1,9 @@
 import React from 'react';
 import SyntaxHighlighter from 'react-syntax-highlighter';
-import { stackoverflowDark, stackoverflowLight } from 'react-syntax-highlighter/dist/esm/styles/hljs';
+import {
+  stackoverflowDark,
+  stackoverflowLight
+} from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import { diffLines, Change } from 'diff';
 import classNames from 'classnames';
 
@@ -21,7 +24,11 @@ const alignLineNumbers = (lineNumber, maxNumberOfLines) => {
   return `${lineNumber}${spacesToAdd}`;
 };
 
-const SyntaxHighlighterDiff = ({ newCode, oldCode, lineNumberStart = 1 }) => {
+const SyntaxHighlighterDiff = ({
+  newCode,
+  oldCode,
+  lineNumberStart = 1,
+}) => {
   const diff = diffLines(oldCode, newCode);
   const maxNumberOfLines = diff.reduce((total, obj) => total + obj.count, 0);
   const maxLineNumber = maxNumberOfLines + lineNumberStart;
@@ -74,9 +81,9 @@ const SyntaxHighlighterDiff = ({ newCode, oldCode, lineNumberStart = 1 }) => {
         {lineColum.map(val => {
           const className = classNames({
             [DIFF_STYLE.rowAdded]: val.includes('+'),
-            [DIFF_STYLE.rowDeleted]: val.includes('-'),  
-            [DIFF_STYLE.rowEmpty]: val === '',
-          })
+            [DIFF_STYLE.rowDeleted]: val.includes('-'),
+            [DIFF_STYLE.rowEmpty]: val === ''
+          });
           return <div className={className}>{val ? val : ' '}</div>;
         })}
       </pre>
