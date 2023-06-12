@@ -1246,6 +1246,12 @@ AUTH = ConfigSection(
           type=str,
           help=_("The identifier of the resource intend to access")
         ),
+        USERNAME_HEADER=Config(
+          key="username_header",
+          default="sub",
+          type=str,
+          help=_("The JWT payload header containing the username.")
+        ),
         VERIFY=Config(
             key="verify",
             default=True,

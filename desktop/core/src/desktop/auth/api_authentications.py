@@ -53,28 +53,25 @@ class JwtAuthentication(authentication.BaseAuthentication):
 
     LOG.debug('JwtAuthentication: got access token from %s: %s' % (request.path, access_token))
 
-    public_key_pem = ''
-    if AUTH.JWT.VERIFY.get():
-      public_key_pem = self._handle_public_key(access_token)
+    try:
+      public_key_pem = self._handle_public_key(access_token) if AUTH.JWT.VERIFY.get() else ''
+    except Exception as e:
+      LOG.error('JwtAuthentication: Error fetching public key %s' % str(e))
+      raise exceptions.AuthenticationFailed(e)
 
     params = {
       'jwt': access_token,
       'key': public_key_pem,
       'issuer': AUTH.JWT.ISSUER.get(),
       'audience': AUTH.JWT.AUDIENCE.get(),
-      'algorithms': ["RS256"]
-    }
-
-    if sys.version_info[0] > 2:
-      params['options'] = {
+      'algorithms': ["RS256"],
+      'options': {
         'verify_signature': AUTH.JWT.VERIFY.get()
       }
-    else:
-      params['verify'] = AUTH.JWT.VERIFY.get()
+    }
 
     try:
       payload = jwt.decode(**params)
-
     except jwt.DecodeError:
       LOG.error('JwtAuthentication: Invalid token')
       raise exceptions.AuthenticationFailed('JwtAuthentication: Invalid token')
@@ -90,14 +87,15 @@ class JwtAuthentication(authentication.BaseAuthentication):
     except Exception as e:
       LOG.error('JwtAuthentication: %s' % str(e))
       raise exceptions.AuthenticationFailed(e)
-    
-    if payload.get('user') is None:
-      LOG.debug('JwtAuthentication: no user ID in token')
+
+
+    if payload.get(AUTH.JWT.USERNAME_HEADER.get()) is None: 
+      LOG.debug('JwtAuthentication: no username in token')
       return None
 
-    LOG.debug('JwtAuthentication: got user ID %s and tenant ID %s' % (payload.get('user'), payload.get('tenantId')))
+    LOG.debug('JwtAuthentication: got username %s' % (payload.get(AUTH.JWT.USERNAME_HEADER.get())))
 
-    user = find_or_create_user(payload.get('user'), is_superuser=False)
+    user = find_or_create_user(payload.get(AUTH.JWT.USERNAME_HEADER.get()), is_superuser=False)
     ensure_has_a_group(user)
     user = rewrite_user(user)
 
@@ -112,18 +110,20 @@ class JwtAuthentication(authentication.BaseAuthentication):
 
   def _handle_public_key(self, access_token):
     token_metadata = jwt.get_unverified_header(access_token)
-    headers = {'kid': token_metadata.get('kid', {})} 
+    kid = token_metadata.get('kid')
 
     if AUTH.JWT.KEY_SERVER_URL.get():
-      response = requests.get(AUTH.JWT.KEY_SERVER_URL.get(), headers=headers)
+      response = requests.get(AUTH.JWT.KEY_SERVER_URL.get(), verify=False)
       jwk = json.loads(response.content)
 
       if jwk.get('keys'):
-        public_key = jwt.algorithms.RSAAlgorithm.from_jwk(json.dumps(jwk["keys"][0])).public_key()
-        public_key_pem = public_key.public_bytes(encoding=serialization.Encoding.PEM,
-                                                 format=serialization.PublicFormat.SubjectPublicKeyInfo)
+        for key in jwk.get('keys'):
+          if key.get('kid') and key.get('kid') == kid:
+            public_key = jwt.algorithms.RSAAlgorithm.from_jwk(json.dumps(key))
+            public_key_pem = public_key.public_bytes(encoding=serialization.Encoding.PEM,
+                                                     format=serialization.PublicFormat.SubjectPublicKeyInfo)
 
-        return public_key_pem
+            return public_key_pem
 
 
 class DummyCustomAuthentication(authentication.BaseAuthentication):
