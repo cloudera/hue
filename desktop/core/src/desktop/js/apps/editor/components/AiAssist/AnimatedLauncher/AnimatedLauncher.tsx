@@ -31,7 +31,6 @@ function AnimatedLauncher({
   onAnimationEnd
 }: AnimatedLauncherProps) {
   const showErrorMessage = !!errorStatusText;
-  console.info('isAnimating:', isAnimating)
   return (
     <div
       onAnimationEnd={onAnimationEnd}

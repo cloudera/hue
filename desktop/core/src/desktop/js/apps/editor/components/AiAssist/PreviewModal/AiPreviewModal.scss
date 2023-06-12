@@ -8,6 +8,7 @@
       white-space: pre-line;
     }
 
+    // TODO: move these classes outside of the modal to use proper BEM
     .hue-ai-preview-modal__syntax-highlighter {
       // TODO: better way to do this? Override color
       .react-syntax-highlighter-line-number {
@@ -36,5 +37,30 @@
     .hue-ai-preview-modal__copy-button-icon {
       color: vars.$fluidx-green-600;
     }
+  }
+
+  .hue-ai-preview-modal__config-container {
+    display: flex;
+    align-items: end;
+    flex-direction: column;
+    font-size: 12px;
+    margin-bottom: 4px;
+  }
+
+  .hue-ai-preview-modal__config-switch {
+    height: 14px;
+    min-width: 22px;
+    margin-right: 8px;
+    // We need to override the default switch styles in order 
+    // make it smaller and change the color;
+    .ant-switch-handle {
+      width: 12px;
+      height: 12px;
+      top: 1px;      
+    }
+    &.ant-switch-checked .ant-switch-handle {
+      left: calc(100% - 12px - 2px);
+    }
+
   }
 }

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 // import { Button } from 'antd';
 import { Button } from 'antd';
 import DefaultButton from 'cuix/dist/components/Button/Button';
+import Switch from 'cuix/dist/components/Switch';
 import Modal from 'cuix/dist/components/Modal';
 import execCommandCopy from 'copy-to-clipboard';
 import SyntaxHighlighter from 'react-syntax-highlighter';
@@ -50,12 +51,15 @@ const PreviewModal = ({
   dialect,
   keywordCase
 }: PreviewModalProps) => {
-  const formatSql = (sql: string) =>
-    autoFormat ? format(sql, { language: dialect, keywordCase }) : sql;
+  const [copied, setCopied] = useState(false);
+  // TODO: Use local storage or some user setting here
+  const [userChoiceAutoFormat, setUserChoiceAutoFormat] = useState<boolean | undefined>(undefined);
 
-  const [copied, setCopied] = useState(false);  
-  const [userChoiceAutoFormat, setUserChoiceAutoFormat] = useState();
-
+  const formatSql = (sql: string) => {
+    const applyAutoFormat = userChoiceAutoFormat === undefined && autoFormat || userChoiceAutoFormat;
+    return applyAutoFormat ? format(sql, { language: dialect, keywordCase }) : sql;
+  }  
+  
   const suggestion = formatSql(suggestionRaw);
   const showDiffFrom = formatSql(showDiffFromRaw);
 
@@ -82,8 +86,6 @@ const PreviewModal = ({
     });
     setCopied(true);
   };
-
-  
 
   return (
     <Modal
@@ -123,6 +125,15 @@ const PreviewModal = ({
       }
     >
       <div className="hue-ai-preview-modal__diff-highlighter">
+        <div className="hue-ai-preview-modal__config-container">
+          <Switch
+            checked={userChoiceAutoFormat === undefined ? autoFormat : userChoiceAutoFormat}
+            onChange={setUserChoiceAutoFormat}
+            className="hue-ai-preview-modal__config-switch"
+            label="Autoformat SQL"
+          />
+        </div>
+
         {showDiffFrom && (
           <SyntaxHighlighterDiff
             lineNumberStart={lineNumberStart}
