@@ -2103,7 +2103,7 @@ USE_THRIFT_HTTP_JWT = Config(
   key="use_thrift_http_jwt",
   help=_("Use JWT as Bearer header for authentication when using Thrift over HTTP transport."),
   type=coerce_bool,
-  dynamic_default=is_jwt_authentication_enabled
+  default=False
 )
 
 DISABLE_LOCAL_STORAGE = Config(
