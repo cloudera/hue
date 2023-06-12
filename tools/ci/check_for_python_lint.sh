@@ -17,8 +17,6 @@
 
 # Checking all python changes in the new commits
 
-exit 0
-
 HOME=${1:-"."}
 FOUND_ISSUE=-1
 
