@@ -1246,6 +1246,12 @@ AUTH = ConfigSection(
           type=str,
           help=_("The identifier of the resource intend to access")
         ),
+        USERNAME_HEADER=Config(
+          key="username_header",
+          default="sub",
+          type=str,
+          help=_("The JWT payload header containing the username.")
+        ),
         VERIFY=Config(
             key="verify",
             default=True,
@@ -2097,7 +2103,7 @@ USE_THRIFT_HTTP_JWT = Config(
   key="use_thrift_http_jwt",
   help=_("Use JWT as Bearer header for authentication when using Thrift over HTTP transport."),
   type=coerce_bool,
-  dynamic_default=is_jwt_authentication_enabled
+  default=False
 )
 
 DISABLE_LOCAL_STORAGE = Config(
