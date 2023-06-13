@@ -2114,10 +2114,10 @@ USE_THRIFT_HTTP_JWT = Config(
 
 DISABLE_LOCAL_STORAGE = Config(
   key='disable_local_storage',
-  default="false",
+  default=False,
   type=coerce_bool,
-  help=_("Hue uses Localstorage to keep the users settings and database preferences."
-         "Please make this value true in case local storage should not be used")
+  help=_("Hue uses Localstorage to keep the users settings and database preferences,"
+         "please make this value true in case local storage should not be used.")
 )
 
 ENABLE_CONNECTORS = Config(
