@@ -1,9 +1,8 @@
 from sentence_transformers import SentenceTransformer, util
 import torch
 
-embedder = SentenceTransformer('all-MiniLM-L6-v2')
-
 def filter(corpus, query):
+    embedder = SentenceTransformer('all-MiniLM-L6-v2')
     corpus_embeddings = embedder.encode(corpus, convert_to_tensor=True)
     query_embedding = embedder.encode(query, convert_to_tensor=True)
 
