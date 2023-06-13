@@ -77,7 +77,7 @@ class TestEditorApi():
     self.user_not_me = User.objects.get(username="not_api_user")
 
   def test_urls_exist(self):
-    assert_equal(reverse('api:editor_execute', args=['hive']), '/api/editor/execute/hive')
+    assert_equal(reverse('api:editor_execute', args=['hive']), '/api/v1/editor/execute/hive')
 
   def test_editor_execute(self):
     with patch('desktop.api_public.notebook_api.execute') as execute:
