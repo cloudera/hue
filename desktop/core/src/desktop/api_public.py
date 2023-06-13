@@ -43,6 +43,8 @@ from desktop.lib.llm import llm
 from desktop.lib.llms.factory import llm_api_factory
 from desktop.lib.llms.base import is_llm_sql_enabled
 from desktop.lib.llms.semantic_search import filter
+from desktop.lib.llms.vector_db import filter_vector_db
+from desktop.lib.llms.base import is_vector_db_enabled
 
 LOG = logging.getLogger(__name__)
 
@@ -275,9 +277,13 @@ def chat(request, prompt=None, conversation_id=None):
 def tables(request):
   input = request.data.get("input")
   metadata = request.data.get("metadata")
-
+  database = request.data.get("database")
+  tables = []
   if is_llm_sql_enabled():
-    tables = filter(metadata, input)
+    if is_vector_db_enabled():
+      tables = filter_vector_db(metadata, input, database)
+    else:
+      tables = filter(metadata, input)
 
     # TODO: Use LLM and filter tables even further
     # llm_api = llm_api_factory()
