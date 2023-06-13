@@ -21,7 +21,7 @@ standard_library.install_aliases()
 import logging
 import sys
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 import urllib.request, urllib.parse, urllib.error
 try:

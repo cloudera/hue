@@ -27,7 +27,7 @@ if sys.version_info[0] > 2:
 else:
   from django.utils.translation import ugettext_lazy as _t
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 _CNF_CAB_ADDRESS = 'fs.%s.ext.cab.address' # http://host:8444/gateway
 _CNF_CAB_ADDRESS_DT_PATH = 'fs.%s.ext.cab.dt.path' # dt

@@ -25,7 +25,7 @@ from pyformance.reporters.reporter import Reporter
 from desktop.lib.metrics import global_registry
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class FileReporter(Reporter):

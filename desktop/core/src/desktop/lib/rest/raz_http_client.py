@@ -30,7 +30,7 @@ else:
   from urllib import quote as lib_urlquote
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class RazHttpClient(HttpClient):

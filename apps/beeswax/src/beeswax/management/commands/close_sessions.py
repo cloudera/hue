@@ -25,7 +25,7 @@ from beeswax.models import Session
 from beeswax.server import dbms
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class Command(BaseCommand):

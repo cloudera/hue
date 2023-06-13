@@ -38,7 +38,7 @@ from useradmin import views as useradmin_views, api as useradmin_api
 from beeswax import api as beeswax_api
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 # Core

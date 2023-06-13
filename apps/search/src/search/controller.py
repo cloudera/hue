@@ -23,7 +23,7 @@ from libsolr.api import SolrApi
 from search.conf import SOLR_URL
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class SearchController(object):

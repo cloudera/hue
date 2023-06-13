@@ -29,7 +29,7 @@ from desktop.lib.idbroker.client import IDBroker
 
 from hadoop.core_site import get_raz_s3_default_bucket
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 HTTP_SOCKET_TIMEOUT_S = 60

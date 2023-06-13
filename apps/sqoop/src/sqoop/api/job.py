@@ -41,7 +41,7 @@ else:
 __all__ = ['get_jobs', 'create_job', 'update_job', 'job', 'jobs', 'job_clone', 'job_delete', 'job_start', 'job_stop', 'job_status']
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 @never_cache
 def get_jobs(request):

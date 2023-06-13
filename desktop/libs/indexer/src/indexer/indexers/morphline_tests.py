@@ -48,7 +48,7 @@ else:
   from StringIO import StringIO as string_io
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class TestIndexer(object):

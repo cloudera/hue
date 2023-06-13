@@ -45,7 +45,7 @@ else:
   from django.utils.translation import ugettext_lazy as _
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 def is_oozie_enabled():
@@ -87,7 +87,7 @@ def coerce_timedelta(value):
 def get_dn(fqdn=None):
   """This function returns fqdn(if possible)"""
   val = []
-  LOG = logging.getLogger(__name__)
+  LOG = logging.getLogger()
   try:
     if fqdn is None:
       fqdn = socket.getfqdn()
@@ -543,6 +543,12 @@ USE_X_FORWARDED_HOST = Config(
   help=_("Enable X-Forwarded-Host header if the load balancer requires it."),
   type=coerce_bool,
   dynamic_default=is_lb_enabled)
+
+ENABLE_XFF_FOR_HIVE_IMPALA = Config(
+  key="enable_xff_for_hive_impala",
+  help=_("Enable X-Forwarded-For header if the hive/impala requires it."),
+  type=coerce_bool,
+  default=False)
 
 SECURE_PROXY_SSL_HEADER = Config(
   key="secure_proxy_ssl_header",
@@ -1245,6 +1251,12 @@ AUTH = ConfigSection(
           default=None,
           type=str,
           help=_("The identifier of the resource intend to access")
+        ),
+        USERNAME_HEADER=Config(
+          key="username_header",
+          default="sub",
+          type=str,
+          help=_("The JWT payload header containing the username.")
         ),
         VERIFY=Config(
             key="verify",
@@ -2097,7 +2109,7 @@ USE_THRIFT_HTTP_JWT = Config(
   key="use_thrift_http_jwt",
   help=_("Use JWT as Bearer header for authentication when using Thrift over HTTP transport."),
   type=coerce_bool,
-  dynamic_default=is_jwt_authentication_enabled
+  default=False
 )
 
 DISABLE_LOCAL_STORAGE = Config(

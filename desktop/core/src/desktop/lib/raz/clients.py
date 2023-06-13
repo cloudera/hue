@@ -20,7 +20,7 @@ from desktop.conf import RAZ
 from desktop.lib.raz.raz_client import get_raz_client
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class S3RazClient():

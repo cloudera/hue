@@ -26,7 +26,7 @@ import os
 
 from multiprocessing import Manager
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 MAX_LABEL_SUFFIX = ': Max'
 MAX_DESCRIPTION_SUFFIX = ': Max. This is computed over the lifetime of the process.'

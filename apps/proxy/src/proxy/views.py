@@ -38,7 +38,7 @@ from desktop.lib.exceptions import MessageException
 
 from proxy import conf
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = logging.getLogger()
 
 def check_host_port(host, port):
   """

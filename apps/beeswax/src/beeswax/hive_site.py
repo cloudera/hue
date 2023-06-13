@@ -38,7 +38,7 @@ if sys.version_info[0] > 2:
 else:
   open_file = file
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 _HIVE_SITE_PATH = None                  # Path to hive-site.xml
 _HIVE_SITE_DICT = None                  # A dictionary of name/value config options

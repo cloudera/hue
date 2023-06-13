@@ -35,7 +35,7 @@ else:
   from mock import patch, Mock, MagicMock
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class TestAnalytics(object):
