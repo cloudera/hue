@@ -110,16 +110,20 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
     const executor = activeExecutable?.executor;
     const databaseName = activeExecutable?.database || '';
     const dialect = lastDialect.current;
-    const explanation = await generateExplanation({
+    const { explanation, error } = await generateExplanation({
       statement,
       dialect,
       executor,
       databaseName,
       onStatusChange: handleStatusUpdate
     });
-    setSuggestion(statement);
-    setExplanation(breakLines(explanation));
-    setShowSuggestedSqlModal(true);
+    if (error) {
+      handleApiError(error.message);
+    } else {
+      setSuggestion(statement);
+      setExplanation(breakLines(explanation));
+      setShowSuggestedSqlModal(true);
+    }
     setIsLoading(false);
   };
 
@@ -128,17 +132,20 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
     const executor = activeExecutable?.executor;
     const databaseName = activeExecutable?.database || '';
     const dialect = lastDialect.current;
-    const { sql, assumptions } = await generateSQLfromNQL({
+    const { sql, assumptions, error } = await generateSQLfromNQL({
       nql,
       databaseName,
       executor,
       dialect,
       onStatusChange: handleStatusUpdate
     });
-    setSuggestion(sql);
-    setAssumptions(assumptions);
-    setShowSuggestedSqlModal(true);
-
+    if (error) {
+      handleApiError(error.message);
+    } else {
+      setSuggestion(sql);
+      setAssumptions(assumptions);
+      setShowSuggestedSqlModal(true);
+    }
     setIsLoading(false);
   };
 
@@ -151,7 +158,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
     const executor = activeExecutable?.executor;
     const databaseName = activeExecutable?.database || '';
     const dialect = lastDialect.current;
-    const { sql, assumptions } = await generateEditedSQLfromNQL({
+    const { sql, assumptions, error } = await generateEditedSQLfromNQL({
       nql,
       sql: sqlToModify,
       databaseName,
@@ -159,9 +166,13 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
       dialect,
       onStatusChange: handleStatusUpdate
     });
-    setSuggestion(sql);
-    setAssumptions(assumptions);
-    setShowSuggestedSqlModal(true);
+    if (error) {
+      handleApiError(error.message);
+    } else {
+      setSuggestion(sql);
+      setAssumptions(assumptions);
+      setShowSuggestedSqlModal(true);
+    }
 
     setIsLoading(false);
   };
@@ -243,11 +254,28 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
     setExplanation('');
   };
 
+  const resetAll = () => {
+    setIsEditMode(false);
+    setIsGenerateMode(false);
+    setShowSuggestedSqlModal(false);
+    setExplanation('');
+    setSuggestion('');
+    setSuggestionExplanation('');
+    setAssumptions('');
+    setIsLoading(false);
+    setLoadingStatusText('');
+    setErrorStatusText('');
+    setParser(undefined);
+    setParseError(undefined);
+  };
+
   const toggleOpen = () => {
     setIsAnimating(prev => {
-      console.log(`prev: ${prev}, isExpanded: ${isExpanded}`);
       return prev === 'no' ? (isExpanded ? 'contract' : 'expand') : prev;
     });
+    if (isExpanded) {
+      resetAll();
+    }
     setIsExpanded(prev => !prev);
   };
 
@@ -274,7 +302,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
   return (
     <>
       <AnimatedLauncher
-        onAnimationEnd={() => setIsAnimating('no')  }
+        onAnimationEnd={() => setIsAnimating('no')}
         isAnimating={isAnimating}
         isExpanded={isExpanded}
         isLoading={isLoading}
