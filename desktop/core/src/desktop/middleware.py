@@ -64,6 +64,7 @@ from desktop.lib.metrics import global_registry
 from desktop.lib.view_util import is_ajax
 from desktop.log import get_audit_logger
 from desktop.log.access import access_log, log_page_hit, access_warn
+from desktop.auth.backend import knox_login_headers
 
 from libsaml.conf import CDP_LOGOUT_URL
 
@@ -750,6 +751,7 @@ class SpnegoMiddleware(MiddlewareMixin):
           if user:
             request.user = user
             login(request, user)
+            knox_login_headers(request)
             msg = 'Successful login for user: %s' % request.user.username
           else:
             msg = 'Failed login for user: %s' % request.user.username
@@ -944,15 +946,27 @@ class MultipleProxyMiddleware:
     Rewrites the proxy headers so that only the most
     recent proxy is used.
     """
+    location = -1
+
+    if 'HTTP_X_REAL_IP' in request.META:
+      if 'HTTP_X_FORWARDED_FOR' in request.META and \
+        request.META['HTTP_X_REAL_IP'] in request.META['HTTP_X_FORWARDED_FOR']:
+        location = 0
+        for item in request.META['HTTP_X_FORWARDED_FOR'].split(','):
+          if request.META['HTTP_X_REAL_IP'].strip() != item.strip():
+            location += 1
+          else:
+            request.META['HTTP_X_FORWARDED_FOR'] = item.strip()
+            break;
+
     for field in self.FORWARDED_FOR_FIELDS:
       if field in request.META:
         if ',' in request.META[field]:
           parts = request.META[field].split(',')
-          request.META[field] = parts[-1].strip()
+          request.META[field] = parts[location].strip()
 
     if 'HTTP_X_FORWARDED_FOR' not in request.META and 'REMOTE_ADDR' in request.META:
       request.META['HTTP_X_FORWARDED_FOR'] = request.META['REMOTE_ADDR']
-
     return self.get_response(request)
 
 
