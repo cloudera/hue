@@ -222,15 +222,15 @@ def add_xff_header(func):
     configuration = None
     if args[1].__dict__ is not None and 'configuration' in args[1].__dict__:
       configuration = args[1].__dict__['configuration']
-    if configuration is not None and 'HTTP-X-FORWARDED-FOR' in configuration:
-        xff = configuration.get('HTTP-X-FORWARDED-FOR')
+    if configuration is not None and 'X-Forwarded-For' in configuration:
+        xff = configuration.get('X-Forwarded-For')
     try:
         if hasattr(self._oprot.trans, 'TFramedTransport'):
           trans_client = self._oprot.trans._TFramedTransport__trans
         else:
           trans_client = self._oprot.trans._TBufferedTransport__trans
 
-        trans_client.setCustomHeaders({'HTTP-X-FORWARDED-FOR': xff})
+        trans_client.setCustomHeaders({'X-Forwarded-For': xff})
     except AttributeError as e:
         LOG.error('Could not set HTTP-X-FORWARDED-FOR header: %s' % smart_str(e))
 

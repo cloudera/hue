@@ -30,7 +30,7 @@ from TCLIService.ttypes import TOpenSessionReq, TGetTablesReq, TFetchResultsReq,
   TGetCrossReferenceReq, TGetPrimaryKeysReq
 
 from desktop.lib import python_util, thrift_util
-from desktop.conf import DEFAULT_USER, USE_THRIFT_HTTP_JWT
+from desktop.conf import DEFAULT_USER, USE_THRIFT_HTTP_JWT, ENABLE_XFF_FOR_HIVE_IMPALA
 
 from beeswax import conf as beeswax_conf, hive_site
 from beeswax.hive_site import hiveserver2_use_ssl
@@ -677,9 +677,9 @@ class HiveServerClient(object):
 
     if self.query_server['server_name'] == 'beeswax': # All the time
       kwargs['configuration'].update({'hive.server2.proxy.user': user.username})
-      xff_header = json.loads(user.userprofile.json_data).get('HTTP-X-FORWARDED-FOR', None)
-      if xff_header:
-        kwargs['configuration'].update({'HTTP-X-FORWARDED-FOR': xff_header})
+      xff_header = json.loads(user.userprofile.json_data).get('X-Forwarded-For', None)
+      if xff_header and ENABLE_XFF_FOR_HIVE_IMPALA.get():
+        kwargs['configuration'].update({'X-Forwarded-For': xff_header})
 
     if self.query_server['server_name'] == 'hplsql' or interpreter['dialect'] == 'hplsql': # All the time
       kwargs['configuration'].update({'hive.server2.proxy.user': user.username, 'set:hivevar:mode': 'HPLSQL'})
@@ -692,9 +692,9 @@ class HiveServerClient(object):
 
     if self.query_server.get('dialect') == 'impala' and self.query_server['SESSION_TIMEOUT_S'] > 0:
       kwargs['configuration'].update({'idle_session_timeout': str(self.query_server['SESSION_TIMEOUT_S'])})
-      xff_header = json.loads(user.userprofile.json_data).get('HTTP-X-FORWARDED-FOR', None)
-      if xff_header:
-        kwargs['configuration'].update({'HTTP-X-FORWARDED-FOR': xff_header})
+      xff_header = json.loads(user.userprofile.json_data).get('X-Forwarded-For', None)
+      if xff_header and ENABLE_XFF_FOR_HIVE_IMPALA.get():
+        kwargs['configuration'].update({'X-Forwarded-For': xff_header})
 
     LOG.info('Opening %s thrift session for user %s' % (self.query_server['server_name'], user.username))
 
