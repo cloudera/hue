@@ -544,6 +544,12 @@ USE_X_FORWARDED_HOST = Config(
   type=coerce_bool,
   dynamic_default=is_lb_enabled)
 
+ENABLE_XFF_FOR_HIVE_IMPALA = Config(
+  key="enable_xff_for_hive_impala",
+  help=_("Enable X-Forwarded-For header if the hive/impala requires it."),
+  type=coerce_bool,
+  default=False)
+
 SECURE_PROXY_SSL_HEADER = Config(
   key="secure_proxy_ssl_header",
   help=_("Support for HTTPS termination at the load-balancer level with SECURE_PROXY_SSL_HEADER."),
