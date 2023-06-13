@@ -1,15 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import {
-  BugOutlined,
-  ThunderboltOutlined,
-  BulbOutlined,
-  EditOutlined,
-  CommentOutlined
-} from '@ant-design/icons';
 import classNames from 'classnames';
 import huePubSub from 'utils/huePubSub';
 import { SyntaxParser } from 'parse/types';
-import Toolbar, { ToolbarButton } from '../../../../reactComponents/Toolbar/Toolbar';
 import sqlParserRepository from 'parse/sql/sqlParserRepository';
 import { ParsedSqlStatement } from 'parse/sqlStatementsParser';
 import { generativeFunctionFactory } from 'api/apiAIHelper';
@@ -79,7 +71,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
   const [isAnimating, setIsAnimating] = useState<'no' | 'expand' | 'contract'>('no');
   const [isEditMode, setIsEditMode] = useState(false);
   const [isGenerateMode, setIsGenerateMode] = useState(false);
-  const [showSuggestedSqlModal, setShowSuggestedSqlModal] = useState(true);
+  const [showSuggestedSqlModal, setShowSuggestedSqlModal] = useState(false);
   const [explanation, setExplanation] = useState('This is the explanation of the query.');
   const [suggestion, setSuggestion] = useState('');
   const [suggestionExplanation, setSuggestionExplanation] = useState('');
