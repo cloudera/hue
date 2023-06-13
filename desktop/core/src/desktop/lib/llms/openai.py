@@ -55,7 +55,7 @@ class OpenAiApi(LlmApi):
         response = openai.Completion.create(
             engine=model_name,
             prompt=prompt,
-            max_tokens=150,
+            max_tokens=1500,
             n=1,
             stop=None,
             temperature=0
