@@ -114,6 +114,14 @@ def samlgroup_check(request):
       LOG.info("User %s found in the required SAML groups %s" % (request.user.username, ",".join(saml_group_found)))
   return True
 
+def saml_login_headers(request):
+  userprofile = get_profile(request.user)
+  try:
+    userprofile.update_data({'X-Forwarded-For': request.META['HTTP_X_FORWARDED_FOR']})
+    userprofile.save()
+  except KeyError as e:
+    LOG.error('X-FORWARDED-FOR header not found: %s' % smart_str(e))
+
 def hue(request):
   current_app, other_apps, apps_list = _get_apps(request.user, '')
   clusters = list(get_clusters(request.user).values())
