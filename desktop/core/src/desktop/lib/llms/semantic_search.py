@@ -1,5 +1,6 @@
 from sentence_transformers import SentenceTransformer, util
 import torch
+from desktop.conf import LLM
 
 def filter(corpus, query):
     embedder = SentenceTransformer('all-MiniLM-L6-v2')

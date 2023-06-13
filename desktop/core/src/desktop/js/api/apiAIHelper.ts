@@ -154,6 +154,17 @@ const generateCorrectedSql: GenerateCorrectedSql = async ({
 
 const getRelevantTables = async (input: string, tableParams: getTableListParams, onStatusChange: (arg: string) => void) => {
   const allTables = (await getTableList(tableParams)) as Array<string>;
+
+  let tableMetadata = allTables;
+
+  if (window.IS_VECTOR_DB_ENABLED) {
+    tableMetadata = await getRelevantTableDetails(
+      tableParams.databaseName,
+      allTables,
+      tableParams.executor
+    );
+  }
+
   console.info('allTables', allTables);
   onStatusChange('Finding relevant tables');
 
@@ -161,7 +172,8 @@ const getRelevantTables = async (input: string, tableParams: getTableListParams,
     url: TABLES_API_URL,
     data: {
       input: input,
-      metadata: allTables
+      metadata: tableMetadata,
+      database: tableParams.databaseName
     }
   });
 
