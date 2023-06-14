@@ -1658,9 +1658,9 @@ else:
 
           for (var i = 0; i < permissions.length; i++) {
             if (mode & 1) {
-              $("#chmodForm input[name='" + permissions[i] + "']").attr("checked", true);
+              $("#chmodForm input[name='" + permissions[i] + "']").prop("checked", true);
             } else {
-              $("#chmodForm input[name='" + permissions[i] + "']").attr("checked", false);
+              $("#chmodForm input[name='" + permissions[i] + "']").prop("checked", false);
             }
             mode >>>= 1;
           }
