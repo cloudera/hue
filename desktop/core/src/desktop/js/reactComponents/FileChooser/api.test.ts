@@ -31,7 +31,7 @@ describe('tests the filesystems api', () => {
 
     const filesystems = await fetchFileSystems();
 
-    expect(getSpy).toHaveBeenCalledWith('/api/storage/filesystems');
+    expect(getSpy).toHaveBeenCalledWith('/api/v1/storage/filesystems');
     expect(filesystems).toEqual(mockData);
   });
 
