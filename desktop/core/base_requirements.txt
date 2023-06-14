@@ -68,7 +68,7 @@ tabulate==0.8.9
 git+https://github.com/gethue/thrift.git
 thrift-sasl==0.4.3
 git+https://github.com/gethue/django-babel.git
-werkzeug==2.0.1  # Should remove it here and from devtools.mk
+werkzeug==2.3.6  # Should remove it here and from devtools.mk
 django-utils-six==2.0
 six==1.16.0
 -e file:///${ROOT}/desktop/core/ext-py3/requests-2.27.1
