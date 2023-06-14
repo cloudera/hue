@@ -354,23 +354,23 @@ else:
           <tbody>
             <tr>
               <td><strong>${_('Read')}</strong></td>
-              <td class="center"><input type="checkbox" data-bind="attr: {checked: selectedFile.mode }" checked="" name="user_read"></td>
-              <td class="center"><input type="checkbox" data-bind="attr: {checked: selectedFile.mode }" checked="" name="group_read"></td>
-              <td class="center"><input type="checkbox" data-bind="attr: {checked: selectedFile.mode }" checked="" name="other_read"></td>
+              <td class="center"><input type="checkbox" name="user_read"></td>
+              <td class="center"><input type="checkbox" name="group_read"></td>
+              <td class="center"><input type="checkbox" name="other_read"></td>
               <td colspan="2">&nbsp;</td>
             </tr>
             <tr>
               <td><strong>${_('Write')}</strong></td>
-              <td class="center"><input type="checkbox" data-bind="attr: {checked: selectedFile.mode }" checked="" name="user_write"></td>
-              <td class="center"><input type="checkbox" data-bind="attr: {checked: selectedFile.mode }" checked="" name="group_write"></td>
-              <td class="center"><input type="checkbox" data-bind="attr: {checked: selectedFile.mode }" checked="" name="other_write"></td>
+              <td class="center"><input type="checkbox" name="user_write"></td>
+              <td class="center"><input type="checkbox" name="group_write"></td>
+              <td class="center"><input type="checkbox" name="other_write"></td>
               <td colspan="2">&nbsp;</td>
             </tr>
             <tr>
               <td><strong>${_('Execute')}</strong></td>
-              <td class="center"><input type="checkbox" checked="" name="user_execute"></td>
-              <td class="center"><input type="checkbox" checked="" name="group_execute"></td>
-              <td class="center"><input type="checkbox" checked="" name="other_execute"></td>
+              <td class="center"><input type="checkbox" name="user_execute"></td>
+              <td class="center"><input type="checkbox" name="group_execute"></td>
+              <td class="center"><input type="checkbox" name="other_execute"></td>
               <td colspan="2">&nbsp;</td>
             </tr>
             <tr>
