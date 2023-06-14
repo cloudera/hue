@@ -1429,7 +1429,7 @@ class ApiHelper {
 
   async getHistory(options) {
     return new Promise((resolve, reject) => {
-      $.get('/api/editor/get_history', {
+      $.get('/api/v1/editor/get_history', {
         doc_type: options.type,
         limit: options.limit || 50,
         page: options.page || 1,
