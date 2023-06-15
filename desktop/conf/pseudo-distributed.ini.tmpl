@@ -452,10 +452,8 @@
     ## reverse_proxy_header=HTTP_X_FORWARDED_FOR
 
     [[[jwt]]]
-      # Adds custom JWT Authentication backend for REST APIs in top priority.
-      ## is_enabled=false
-
       # Endpoint to fetch the public key from verification server.
+      # Also adds custom JWT Authentication backend for REST APIs in top priority if set.
       ## key_server_url=https://ext_authz:8000
 
       # The JWT payload header containing the username.
