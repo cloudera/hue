@@ -121,6 +121,11 @@ def saml_login_headers(request):
     userprofile.save()
   except KeyError as e:
     LOG.error('X-FORWARDED-FOR header not found: %s' % smart_str(e))
+  try:
+    userprofile.update_data({'X-CSRF-TOKEN': request.META['CSRF_COOKIE']})
+    userprofile.save()
+  except:
+    LOG.error("X-CSRF-TOKEN header not found")
 
 def hue(request):
   current_app, other_apps, apps_list = _get_apps(request.user, '')

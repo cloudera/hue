@@ -550,6 +550,12 @@ ENABLE_XFF_FOR_HIVE_IMPALA = Config(
   type=coerce_bool,
   default=False)
 
+ENABLE_X_CSRF_TOKEN_FOR_HIVE_IMPALA = Config(
+  key="enable_x_csrf_token_for_hive_impala",
+  help=_("Enable X_CSRF_TOKEN header if the hive/impala requires it."),
+  type=coerce_bool,
+  default=False)
+
 SECURE_PROXY_SSL_HEADER = Config(
   key="secure_proxy_ssl_header",
   help=_("Support for HTTPS termination at the load-balancer level with SECURE_PROXY_SSL_HEADER."),
