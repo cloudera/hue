@@ -306,7 +306,11 @@ const generateEditedSQLfromNQL: GenerateEditedSQLfromNQL = async ({
 }) => {
   let relevantTables, tableMetadata;
   try {
-    relevantTables = await getRelevantTables(nql, { databaseName, executor }, onStatusChange);
+    relevantTables = await getRelevantTables(
+      `${sql} ${nql}`,
+      { databaseName, executor },
+      onStatusChange
+    );
   } catch (e) {
     return handleError(e, 'Could not find relevant tables');
   }
@@ -350,7 +354,7 @@ const generateExplanation: GenerateExplanation = async ({ statement, dialect, on
         sql: statement,
         dialect
       }
-    });    
+    });
     return response.summary;
   } catch (e) {
     return handleError(e, 'Call to AI to explain SQL query failed');
