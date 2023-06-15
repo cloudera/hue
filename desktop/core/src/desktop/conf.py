@@ -151,9 +151,9 @@ def is_python2():
   """Hue is running on Python 2."""
   return sys.version_info[0] == 2
 
-def is_jwt_authentication_enabled():
-  """JWT backend flag enabled or backend set in api auth explicitly"""
-  return AUTH.JWT.IS_ENABLED.get() or 'desktop.auth.api_authentications.JwtAuthentication' in AUTH.API_AUTH.get()
+def is_custom_jwt_auth_enabled():
+  """Returns True if key server url is set else returns False"""
+  return bool(AUTH.JWT.KEY_SERVER_URL.get())
 
 USE_CHERRYPY_SERVER = Config(
   key="use_cherrypy_server",
@@ -1228,12 +1228,6 @@ AUTH = ConfigSection(
       key="jwt",
       help=_("Configuration for Custom JWT Authentication."),
       members=dict(
-        IS_ENABLED=Config(
-            key='is_enabled',
-            help=_('Adds custom JWT Authentication backend for REST APIs in top priority.'),
-            type=coerce_bool,
-            default=False,
-        ),
         KEY_SERVER_URL=Config(
             key="key_server_url",
             default=None,
