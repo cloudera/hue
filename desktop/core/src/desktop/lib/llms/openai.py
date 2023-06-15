@@ -16,7 +16,7 @@ _EDIT = """Act as an {dialect} SQL expert. Based on the input modify the SQL usi
 List any assumptions not covered by the supplied metadata.
 SQL query: {sql}
 Input: {input}
-Make sure to return the answer in the following format: <code></code><assumptions></assumptions>"""
+Wrap the SQL in a <code> tag and the assumptions in a <assumptions> tag"""
 
 _SUMMARIZE = """Act as an {dialect} SQL expert.
 Explain in natural language using non technical terms, what this query does: {sql}.
