@@ -252,7 +252,7 @@ LLM = ConfigSection(
           key='model',
           help=_('OpenAI model for LLM'),
           type=str,
-          default='davinci'),
+          default='gpt-3.5-turbo-16k'),
       )
     ),
     METADATA = ConfigSection(
