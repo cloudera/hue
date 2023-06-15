@@ -41,7 +41,7 @@ TASK_TEMPLATES = {
 }
 
 openai.api_key = LLM.OPENAI.TOKEN.get()
-model_name = LLM.OPENAI.MODEL.get()
+_model_name = LLM.OPENAI.MODEL.get()
 
 def extractTagContent(tag, text):
     matches = re.findall(f'<{tag}>(.*?)</{tag}>', text, flags=re.DOTALL)
@@ -52,16 +52,16 @@ class OpenAiApi(LlmApi):
         super().__init__(TASK_TEMPLATES)
 
     def infer(self, prompt):
-        response = openai.Completion.create(
-            engine=model_name,
-            prompt=prompt,
-            max_tokens=1500,
-            n=1,
-            stop=None,
-            temperature=0
+        response = openai.ChatCompletion.create(
+            model=_model_name,
+            temperature=0,
+            messages=[{
+                "role": "user",
+                "content": prompt
+            }]
         )
         choices = response.choices[0]
-        return choices.text.strip()
+        return choices.message.content.strip()
 
     def parse_inference(self, task, inference):
         if task == Task.SUMMARIZE:
