@@ -8,12 +8,12 @@ from .base import LlmApi, Task
 from desktop.conf import LLM
 
 _GENERATE = """Act as an {dialect} SQL expert. Translate the NQL statement into SQL using the following metadata: {metadata}.
-List any the assumptions not covered by the supplied metadata.
+List any assumptions not covered by the supplied metadata.
 NQL: {input}
-Wrap the sql in a <code> tag and the assumptions in an <assumptions> tag"""
+Wrap the SQL in a <code> tag and the assumptions in a <assumptions> tag"""
 
 _EDIT = """Act as an {dialect} SQL expert. Based on the input modify the SQL using the following metadata: {metadata}.
-List any the assumptions not covered by the supplied metadata.
+List any assumptions not covered by the supplied metadata.
 SQL query: {sql}
 Input: {input}
 Make sure to return the answer in the following format: <code></code><assumptions></assumptions>"""
