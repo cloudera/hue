@@ -236,9 +236,7 @@ class WebHdfs(Hdfs):
   @ttl_cache(maxsize=128, ttl=timedelta(hours=24), timer=datetime.now, typed=False)
   def get_delegation_token(self, renewer):
     """get_delegation_token(user) -> Delegation token"""
-    params = {
-      "doas": self.user
-    }
+    params = self._getparams()
     params['op'] = 'GETDELEGATIONTOKEN'
     params['renewer'] = renewer
     headers = self._getheaders()
@@ -568,7 +566,6 @@ class WebHdfs(Hdfs):
     params['op'] = 'GETHOMEDIRECTORY'
     headers = self._getheaders()
     res = self._root.get(params=params, headers=headers)
-    print(res)
     for key, value in res.items():
       if key.lower() == "path":
         return self.normpath(value)
@@ -642,7 +639,8 @@ class WebHdfs(Hdfs):
     `permission' should be an octal integer or string.
     """
     path = self.strip_normpath(path)
-    params = self._getparams()
+    
+    
     params['op'] = 'CREATE'
     params['overwrite'] = overwrite and 'true' or 'false'
     if blocksize is not None:
