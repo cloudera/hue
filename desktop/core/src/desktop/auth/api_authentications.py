@@ -136,7 +136,6 @@ class JwtAuthentication(authentication.BaseAuthentication):
 
     if "," in key_server_urls:
       # Config format is "['url1', 'url2']" for HA, so we need to clean up and split correctly in list.
-      # For non-HA, its normal url string.
       key_server_urls_list = key_server_urls.replace("%20", "").replace("['", "").replace("']", "").replace("'", "").split(',')
 
       for jku in key_server_urls_list:
@@ -150,6 +149,7 @@ class JwtAuthentication(authentication.BaseAuthentication):
         if (res is not None) and (res.status_code in (200, 401)):
           return jku
     else:
+      # For non-HA, its normal url string.
       return key_server_urls
 
 class DummyCustomAuthentication(authentication.BaseAuthentication):
