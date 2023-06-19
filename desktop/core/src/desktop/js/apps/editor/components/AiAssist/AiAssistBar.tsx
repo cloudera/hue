@@ -302,7 +302,11 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
   return (
     <>
       <AnimatedLauncher
-        onAnimationEnd={() => setIsAnimating('no')}
+        onAnimationEnd={() => {
+          setIsAnimating('no')
+          const barStatus = isExpanded ? 'expanded' : 'collapsed';
+          huePubSub.publish(`aiassistbar.bar.${barStatus}`);                  
+        }}
         isAnimating={isAnimating}
         isExpanded={isExpanded}
         isLoading={isLoading}

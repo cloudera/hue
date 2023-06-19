@@ -80,7 +80,6 @@ function AiAssistToolbarInput({
   const availableWidth = useResizeAwareElementSize(toolbarButtonWrapperRef)?.width;
 
   useEffect(() => {
-    console.info(JSON.stringify(value));
     const availableWidth = calculateAvailableWidth(toolbarButtonWrapperRef);
     const maxWidth = availableWidth ? Math.min(availableWidth, MAX_INPUT_WIDTH) : MAX_INPUT_WIDTH;
     const singleLineHeight = getSingleLineHeight(spanSingleLineRef);
