@@ -9,6 +9,7 @@ import './AiAssistToolbarInput.scss';
 
 const ENTER_KEY = 'Enter';
 const ESCAPE_KEY = 'Escape';
+const TAB_KEY = 'Tab';
 const MAX_INPUT_WIDTH = 700;
 const MAX_INPUT_LINES = 10;
 
@@ -20,7 +21,7 @@ const isMultiLineSpan = (
   spanRefToMeasure: React.RefObject<HTMLSpanElement>,
   singleLineSpanRefToCompareWith: React.RefObject<HTMLSpanElement>,
   text: string
-): boolean => {  
+): boolean => {
   const isEmpty = text === '';
   const trailingNewLine = text.endsWith('\n');
   const singleLineHeight = getSingleLineHeight(singleLineSpanRefToCompareWith);
@@ -63,21 +64,26 @@ function AiAssistToolbarInput({
   onSubmit,
   onCancel,
   isLoading,
-  isExpanded
+  isExpanded,
+  prefill = ''
 }: {
   isExpanded: boolean;
   isLoading: boolean;
   placeholder: string;
+  prefill?: string;
   onSubmit: (value: string) => void;
   onCancel: () => void;
 }) {
   const [value, setValue] = useState<string>('');
+  const [dirty, setDirty] = useState<boolean>(false);
+  const [touched, setTouched] = useState<boolean>(false);
   const toolbarButtonWrapperRef = useRef<HTMLDivElement>(null);
   const spanSizeRef = useRef<HTMLSpanElement | null>(null);
   const spanSingleLineRef = useRef<HTMLSpanElement | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
   const availableWidth = useResizeAwareElementSize(toolbarButtonWrapperRef)?.width;
+  const placeHolderText = prefill ? prefill : placeholder;
 
   useEffect(() => {
     const availableWidth = calculateAvailableWidth(toolbarButtonWrapperRef);
@@ -88,15 +94,36 @@ function AiAssistToolbarInput({
     updateTextareaDimensions({
       sizeMeasureSpan: spanSizeRef.current,
       textarea: textareaRef.current,
-      userText: value,
+      userText: value || prefill,
       maxWidth,
       maxHeight,
       singleLineHeight,
       availableWidth
     });
-  }, [value, availableWidth]);
+  }, [value, prefill, availableWidth]);
 
   const isMultiLine = isMultiLineSpan(spanSizeRef, spanSingleLineRef, value);
+
+  const handleSubmit = () => {
+    onSubmit(value);
+    setValue('');
+    setDirty(false);
+    setTouched(false);
+  };
+
+  const handleCancel = () => {
+    onCancel();
+    setValue('');
+    setDirty(false);
+    setTouched(false);
+  };
+
+  const handleOnChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newValue = e.target.value;
+    setValue(newValue);
+    setDirty(newValue ? true : false);
+    setTouched(true);
+  };
 
   return (
     <li
@@ -108,11 +135,12 @@ function AiAssistToolbarInput({
       {isExpanded && (
         <>
           <textarea
+            title={!dirty && !touched ? 'Press Tab to insert NQL from comment' : ''}
             disabled={isLoading}
             ref={textareaRef}
             value={value}
-            onChange={e => setValue(e.target.value)}
-            placeholder={placeholder}
+            onChange={handleOnChange}
+            placeholder={placeHolderText}
             autoFocus
             spellCheck="false"
             className={classNames('hue-ai-assist-toolbar-input__text-input', {
@@ -121,14 +149,17 @@ function AiAssistToolbarInput({
             })}
             onKeyDown={event => {
               if (event.key === ENTER_KEY && !event.shiftKey && value) {
-                onSubmit(value);
+                handleSubmit();
               } else if (event.key === ESCAPE_KEY) {
-                onCancel();
+                handleCancel();
+              } else if (event.key === TAB_KEY && !dirty && prefill) {
+                setValue(prefill);
+                event.preventDefault();
               }
             }}
           />
           <span className="hue-ai-assist-toolbar-input__size-reference-element" ref={spanSizeRef}>
-            {value}
+            {value || placeHolderText}
           </span>
           <span
             className="hue-ai-assist-toolbar-input__single-line-reference-element"
@@ -140,7 +171,7 @@ function AiAssistToolbarInput({
             <Button
               disabled={isLoading}
               className={'hue-toolbar-button'}
-              onClick={() => onSubmit(value)}
+              onClick={handleSubmit}
               type="link"
               title="Hit enter or click here to execute"
             >
