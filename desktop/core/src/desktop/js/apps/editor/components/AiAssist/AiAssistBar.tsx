@@ -38,10 +38,6 @@ const getSelectedLineNumbers = (parsedStatement: ParsedSqlStatement) => {
   return { firstLine, lastLine };
 };
 
-const getCursorLineNumber = (parsedStatement: ParsedSqlStatement) => {
-  return parsedStatement?.location?.first_line || undefined;
-};
-
 const breakLines = (input: string): string => {
   let words = input.split(' ');
   let result = '';
@@ -223,30 +219,33 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
   };
 
   const acceptSuggestion = (statement: string) => {
-    let startLine = firstLine;
-    let endLine = lastLine;
-    if(isGenerateMode) {
-      const cursorLine = getCursorLineNumber(parsedStatement);
-      startLine = cursorLine
-      endLine = cursorLine;
+    let lineNrToMoveTo = firstLine;
+    if (isGenerateMode) {
+      const zeroBasedLineNr = 1;
+      const lineNrOfCursor = cursorPosition.current?.row || 0;
+      // TODO: lineNrToMoveTo fails if the user inserts new lines without moving the cursor afterwards.
+      // We need to find a way to get the current cursor position from the editor
+      // when the code is changed using keyboar interactactions
+      lineNrToMoveTo = lineNrOfCursor + zeroBasedLineNr || 1;
+      huePubSub.publish('editor.insert.at.cursor', { text: statement });
+    } else {
+      huePubSub.publish('ace.replace', {
+        text: statement,
+        location: {
+          first_line: firstLine,
+          first_column: 1,
+          last_line: lastLine,
+          // TODO: what to use here?
+          last_column: 10000
+        }
+      });
     }
-    console.info('getCursorLineNumber', getCursorLineNumber(parsedStatement));
     setShowSuggestedSqlModal(false);
-    huePubSub.publish('ace.replace', {
-      text: statement,
-      location: {
-        first_line: startLine,
-        first_column: 1,
-        last_line: endLine,
-        // TODO: what to use here?
-        last_column: 10000
-      }
-    });
     huePubSub.publish('ace.cursor.move', {
-      column: 1,
-      row: startLine
-    })
-    
+      column: 0,
+      row: lineNrToMoveTo
+    });
+
     resetAll();
   };
 
@@ -313,6 +312,23 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
       setAssumptions('');
     }
   }, [selectedStatement, parser]);
+
+  useEffect(() => {
+    const EDITOR_CURSOR_POSITION_CHANGE_EVENT = 'cursor-changed';
+    const handleEditorCursorPostionChange = (event: CustomEvent) => {
+      cursorPosition.current = event.detail;
+    };
+    document.addEventListener(
+      EDITOR_CURSOR_POSITION_CHANGE_EVENT,
+      handleEditorCursorPostionChange as any
+    );
+    return () => {
+      document.removeEventListener(
+        EDITOR_CURSOR_POSITION_CHANGE_EVENT,
+        handleEditorCursorPostionChange as any
+      );
+    };
+  }, []);
 
   return (
     <>
@@ -384,7 +400,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
           showDiffFrom={!isGenerateMode && !explanation ? parsedStatement?.statement : undefined}
           assumptions={assumptions}
           explanation={explanation || suggestionExplanation}
-          lineNumberStart={getEditorLineNumbers(parsedStatement).firstLine}
+          lineNumberStart={getSelectedLineNumbers(parsedStatement).firstLine}
           showCopyToClipboard={!explanation}
           dialect={lastDialect.current}
           keywordCase={keywordCase}
