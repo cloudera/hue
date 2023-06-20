@@ -55,6 +55,22 @@ const breakLines = (input: string): string => {
   return (result += line);
 };
 
+const extractLeadingNqlComments = (sql: string): string => {
+  const regex = /^(--.*?$|\/\*(.|\n)*?\*\/)/gm;
+  const comments = sql.match(regex) || [];
+  const prefixSingleLine = '-- NQL:';
+  const prefixMultiLine = '/* NQL:';
+  const commentsTexts = comments
+    .filter(comment => comment.startsWith(prefixSingleLine) || comment.startsWith(prefixMultiLine))
+    .map(comment => {
+      return comment.startsWith(prefixSingleLine)
+        ? comment.slice(prefixSingleLine.length).trim()
+        : comment.slice(prefixMultiLine.length, -2).trim();
+    });
+
+  return commentsTexts.join('\n');
+};
+
 export interface AiAssistBarProps {
   activeExecutable?: SqlExecutable;
 }
@@ -81,9 +97,11 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
   const [errorStatusText, setErrorStatusText] = useState('');
   const [parser, setParser] = useState<SyntaxParser>();
   const [parseError, setParseError] = useState<ParseError | undefined>();
-
+  const [nql, setNql] = useState('');
+  const cursorPosition = useRef<{ row: number; column: number } | undefined>();
   const keywordCase = useKeywordCase(parser, selectedStatement);
   const inputExpanded = isEditMode || isGenerateMode;
+  const inputPrefill = inputExpanded ? extractLeadingNqlComments(selectedStatement) : '';
 
   const loadParser = async () => {
     const executor = activeExecutable?.executor;
@@ -142,6 +160,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
     if (error) {
       handleApiError(error.message);
     } else {
+      setNql(nql);
       setSuggestion(sql);
       setAssumptions(assumptions);
       setShowSuggestedSqlModal(true);
@@ -169,6 +188,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
     if (error) {
       handleApiError(error.message);
     } else {
+      setNql(nql);
       setSuggestion(sql);
       setAssumptions(assumptions);
       setShowSuggestedSqlModal(true);
@@ -265,7 +285,6 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
     const textToInsert = comment ? `${comment}${sql.trim()}\n` : sql;
 
     acceptSuggestion(textToInsert);
-    setExplanation('');
   };
 
   const resetAll = () => {
@@ -276,6 +295,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
     setSuggestion('');
     setSuggestionExplanation('');
     setAssumptions('');
+    setNql('');
     setIsLoading(false);
     setLoadingStatusText('');
     setErrorStatusText('');
@@ -334,9 +354,9 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
     <>
       <AnimatedLauncher
         onAnimationEnd={() => {
-          setIsAnimating('no')
+          setIsAnimating('no');
           const barStatus = isExpanded ? 'expanded' : 'collapsed';
-          huePubSub.publish(`aiassistbar.bar.${barStatus}`);                  
+          huePubSub.publish(`aiassistbar.bar.${barStatus}`);
         }}
         isAnimating={isAnimating}
         isExpanded={isExpanded}
@@ -374,6 +394,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
             loadOptimization={loadOptimization}
             loadFixSuggestion={loadFixSuggestion}
             parseError={parseError}
+            inputPrefill={inputPrefill}
           />
         </div>
         <AnimatedCloseButton
@@ -400,6 +421,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
           showDiffFrom={!isGenerateMode && !explanation ? parsedStatement?.statement : undefined}
           assumptions={assumptions}
           explanation={explanation || suggestionExplanation}
+          nql={nql}
           lineNumberStart={getSelectedLineNumbers(parsedStatement).firstLine}
           showCopyToClipboard={!explanation}
           dialect={lastDialect.current}
