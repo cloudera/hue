@@ -2445,19 +2445,26 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <form class="form-inline">
             ##<input data-bind="value: textFilter" type="text" class="input-xlarge search-query" placeholder="${_('Filter by name')}">
 
-            ##<span data-bind="foreach: statesValuesFilter">
-            ##  <label class="checkbox">
-            ##    <div class="pull-left margin-left-5 status-border status-content" data-bind="css: value, hueCheckbox: checked"></div>
-            ##    <div class="inline-block" data-bind="text: name, toggle: checked"></div>
-            ##  </label>
-            ##</span>
+              <label class="checkbox">
+                <div class="pull-left margin-left-5 status-border status-content completed" data-bind="hueCheckbox: filterCompleted"></div>
+                <div class="inline-block" data-bind="toggle: filterCompleted">${_("Succeeded")}</div>
+              </label>
+              </span>
+              <label class="checkbox">
+                <div class="pull-left margin-left-5 status-border status-content running" data-bind="hueCheckbox: filterRunning"></div>
+                <div class="inline-block" data-bind="toggle: filterRunning">${_("Running")}</div>
+              </label>
+              <label class="checkbox">
+                <div class="pull-left margin-left-5 status-border status-content failed" data-bind="hueCheckbox: filterFailed"></div>
+                <div class="inline-block" data-bind="toggle: filterFailed">${_("Failed")}</div>
+              </label>
             <div data-bind="template: { name: 'job-actions${ SUFFIX }' }" class="pull-right"></div>
           </form>
 
           <table id="schedulesTable" class="datatables table table-condensed status-border-container">
             <thead>
             <tr>
-              <th width="1%"><div class="select-all hue-checkbox fa" data-bind="hueCheckAll: { allValues: apps, selectedValues: selectedJobs }"></div></th>
+              <th width="1%"><div class="select-all hue-checkbox fa" data-bind="hueCheckAll: { allValues: filteredApps, selectedValues: selectedJobs }"></div></th>
               <th>${_('Status')}</th>
               <th>${_('Title')}</th>
               <th>${_('type')}</th>
@@ -2470,7 +2477,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               <th>${_('lastModifiedTime')}</th>
             </tr>
             </thead>
-            <tbody data-bind="foreach: apps">
+            <tbody data-bind="foreach: filteredApps">
               <tr class="status-border pointer" data-bind="
                 css: {
                   'completed': properties.status() == 'SUCCEEDED',
@@ -3585,6 +3592,25 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       var self = this;
 
       self.apps = ko.observableArray().extend({ rateLimit: 50 });
+
+      self.filterCompleted = ko.observable(false);
+      self.filterRunning = ko.observable(false);
+      self.filterFailed = ko.observable(false);
+
+      self.filteredApps = ko.pureComputed(function () {
+        if (!self.filterCompleted() && !self.filterRunning() && !self.filterFailed()) {
+          return self.apps();
+        }
+
+        return self.apps().filter(function (app) {
+          var appStatus = app.status();
+          return (
+            (self.filterFailed() && FAILED_STATUSES[appStatus]) ||
+            (self.filterRunning() && RUNNING_STATUSES[appStatus]) ||
+            (self.filterCompleted() && COMPLETED_STATUSES[appStatus]))
+        });
+      })
+
       self.runningApps = ko.pureComputed(function() {
         return $.grep(self.apps(), function(app) {
           return app.isRunning();

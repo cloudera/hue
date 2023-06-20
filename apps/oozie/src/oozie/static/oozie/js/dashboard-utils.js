@@ -14,28 +14,48 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+var RUNNING_STATUSES = {
+  RUNNING: true,
+  READY: true,
+  PREP: true,
+  WAITING: true,
+  SUSPENDED: true,
+  PREPSUSPENDED: true,
+  PREPPAUSED: true,
+  PAUSED: true,
+  SUBMITTED: true,
+  SUSPENDEDWITHERROR: true,
+  PAUSEDWITHERROR: true,
+  RUNNINGWITHERROR: true
+};
+
+var COMPLETED_STATUSES = {
+  SUCCEEDED: true,
+  OK: true,
+  DONE: true
+};
+
+var FAILED_STATUSES = {
+  KILLED: true,
+  FAILED: true,
+  DONEWITHERROR: true
+};
 
 function getStatusClass(status, prefix) {
   if (prefix == null) {
-    prefix = "label-";
+    prefix = 'label-';
   }
-  var klass = "";
-  if (['SUCCEEDED', 'OK', 'DONE'].indexOf(status) > -1) {
-    klass = prefix + "success";
-  }
-  else if (['RUNNING', 'READY', 'PREP', 'WAITING', 'SUSPENDED', 'PREPSUSPENDED', 'PREPPAUSED', 'PAUSED',
-    'SUBMITTED',
-    'SUSPENDEDWITHERROR',
-    'PAUSEDWITHERROR'].indexOf(status) > -1) {
-    klass = prefix + "warning";
-  }
-  else if (status == "IGNORED") {
-    klass = prefix + "ignored";
-  }
-  else {
-    klass = prefix + "important";
-    if (prefix == "bar-") {
-      klass = prefix + "danger";
+  var klass = '';
+  if (COMPLETED_STATUSES[status]) {
+    klass = prefix + 'success';
+  } else if (RUNNING_STATUSES[status]) {
+    klass = prefix + 'warning';
+  } else if (status === 'IGNORED') {
+    klass = prefix + 'ignored';
+  } else {
+    klass = prefix + 'important';
+    if (prefix === 'bar-') {
+      klass = prefix + 'danger';
     }
   }
   return klass;
