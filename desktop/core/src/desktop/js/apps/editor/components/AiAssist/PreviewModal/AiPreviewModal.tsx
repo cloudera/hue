@@ -12,11 +12,35 @@ import CopyClipboardIcon from '@cloudera/cuix-core/icons/react/CopyClipboardIcon
 import CheckmarkIcon from '@cloudera/cuix-core/icons/react/CheckmarkIcon';
 import { KeywordCase, format } from 'sql-formatter';
 
-import classNames from 'classnames';
-
 import SyntaxHighlighterDiff from '../SyntaxHighlighterDiff/SyntaxHighlighterDiff';
 
 import './AiPreviewModal.scss';
+
+const insertLineBreaks = (input: string): string => {
+  let output = '';
+  let lineLength = 0;
+  const MAX_LINE_LENGTH = 90;
+  const SPACE = ' ';
+  const LINE_BREAK = '\n';
+
+  input.split(SPACE).forEach(word => {
+    const append = word + SPACE;
+    if (lineLength + word.length > MAX_LINE_LENGTH) {      
+      output += LINE_BREAK + append;
+      lineLength = append.length; 
+    } else {
+      output += append;
+      lineLength += append.length;
+    }
+
+    if (word.includes(LINE_BREAK)) {
+      const index = word.lastIndexOf(LINE_BREAK);
+      lineLength = word.length - index;
+    }
+  });
+
+  return output;
+};
 
 interface PreviewModalProps {
   open: boolean;
@@ -25,6 +49,7 @@ interface PreviewModalProps {
   suggestion: string;
   assumptions: string;
   explanation: string;
+  nql?: string;
   onCancel: () => void;
   onInsert: (value: string) => void;
   primaryButtonLabel: string;
@@ -42,6 +67,7 @@ const PreviewModal = ({
   suggestion: suggestionRaw = '',
   assumptions = '',
   explanation = '',
+  nql = '',
   onCancel,
   onInsert,
   primaryButtonLabel,
@@ -54,13 +80,22 @@ const PreviewModal = ({
   const [copied, setCopied] = useState(false);
   // TODO: Use local storage or some user setting here
   const [userChoiceAutoFormat, setUserChoiceAutoFormat] = useState<boolean | undefined>(undefined);
+  const [userChoiceIncludeNql, setUserChoiceIncludeNql] = useState<boolean>(true);
 
   const formatSql = (sql: string) => {
-    const applyAutoFormat = userChoiceAutoFormat === undefined && autoFormat || userChoiceAutoFormat;
+    const applyAutoFormat =
+      (userChoiceAutoFormat === undefined && autoFormat) || userChoiceAutoFormat;
     return applyAutoFormat ? format(sql, { language: dialect, keywordCase }) : sql;
-  }  
-  
-  const suggestion = formatSql(suggestionRaw);
+  };
+
+  const includeNqlAsComment = (sql: string, nql: string) => {
+    const addComment = nql && userChoiceIncludeNql;
+    const nqlWithPrefix = nql && nql.trim().startsWith('NQL:') ? nql : `NQL: ${nql}`;
+    const commentWithLinebreaks = insertLineBreaks(nqlWithPrefix);
+    return addComment ? `/* ${commentWithLinebreaks} */\n${sql}` : sql;
+  };
+
+  const suggestion = formatSql(includeNqlAsComment(suggestionRaw, nql));
   const showDiffFrom = formatSql(showDiffFromRaw);
 
   const clearStates = () => {
@@ -132,6 +167,12 @@ const PreviewModal = ({
             className="hue-ai-preview-modal__config-switch"
             label="Autoformat SQL"
           />
+          <Switch
+            checked={userChoiceIncludeNql}
+            onChange={setUserChoiceIncludeNql}
+            className="hue-ai-preview-modal__config-switch"
+            label="Include NQL as comment"
+          />          
         </div>
 
         {showDiffFrom && (

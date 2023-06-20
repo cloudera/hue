@@ -24,6 +24,7 @@ interface AssistToolbarProps {
   setIsEditMode: React.Dispatch<React.SetStateAction<boolean>>;
   isEditMode: boolean;
   inputExpanded: boolean;
+  inputPrefill: string;
   loadExplanation: (statement: string) => Promise<void>;
   parsedStatement: any;
   loadOptimization: (statement: string) => Promise<void>;
@@ -41,6 +42,7 @@ function AssistToolbar({
   setIsEditMode,
   isEditMode,
   inputExpanded,
+  inputPrefill,
   loadExplanation,
   parsedStatement,
   loadOptimization,
@@ -102,6 +104,7 @@ function AssistToolbar({
             placeholder="E.g. only inlcude people under 50 years"
             onSubmit={onInputSubmit}
             onCancel={handOnCancelInput}
+            prefill={inputPrefill}
           />
           <ToolbarButton
             disabled={isLoading}
