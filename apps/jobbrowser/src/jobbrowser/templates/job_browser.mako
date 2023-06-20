@@ -211,7 +211,16 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       </tr>
       </thead>
       <tbody data-bind="foreach: apps">
-        <tr class="status-border pointer" data-bind="css: {'completed': apiStatus() == 'SUCCEEDED', 'info': apiStatus() == 'PAUSED', 'running': apiStatus() == 'RUNNING', 'failed': apiStatus() == 'FAILED'}, click: fetchJob">
+        <tr class="status-border pointer" data-bind="
+          css: {
+            'completed': apiStatus() == 'SUCCEEDED',
+            'info': apiStatus() == 'PAUSED',
+            'running': apiStatus() == 'RUNNING',
+            'failed': apiStatus() == 'FAILED'
+          },
+          click: function (data, event) {
+            onTableRowClick(event, id());
+          }">
           <td data-bind="click: function() {}, clickBubble: false">
             <div class="hue-checkbox fa" data-bind="click: function() {}, clickBubble: false, multiCheck: '#' + $parent.tableId, value: $data, hueChecked: $parent.selectedJobs"></div>
           </td>
@@ -392,7 +401,16 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                 <!-- ko ifnot: jobs.loadingJobs() -->
                   <!-- ko if: $root.isMini -->
                   <ul class="unstyled status-border-container" id="jobsTable" data-bind="foreach: jobs.apps">
-                    <li class="status-border pointer" data-bind="css: {'completed': apiStatus() == 'SUCCEEDED', 'info': apiStatus() === 'PAUSED', 'running': apiStatus() === 'RUNNING', 'failed': apiStatus() == 'FAILED'}, click: fetchJob">
+                    <li class="status-border pointer" data-bind="
+                      css: {
+                        'completed': apiStatus() == 'SUCCEEDED',
+                        'info': apiStatus() === 'PAUSED',
+                        'running': apiStatus() === 'RUNNING',
+                        'failed': apiStatus() == 'FAILED'
+                      },
+                      click: function (data, event) {
+                        onTableRowClick(event, id());
+                      }">
                       <span class="muted pull-left" data-bind="momentFromNow: {data: submitted, interval: 10000, titleFormat: 'LLL'}"></span><span class="muted">&nbsp;-&nbsp;</span><span class="muted" data-bind="text: status"></span></td>
                       <span class="muted pull-right" data-bind="text: duration().toHHMMSS()"></span>
                       <div class="clearfix"></div>
@@ -738,7 +756,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <!-- ko if: doc_url -->
           <li class="nav-header">${ _('Document') }</li>
           <li>
-            <a data-bind="hueLink: doc_url" href="javascript: void(0);" title="${ _('Open in editor') }">
+            <a data-bind="hueLink: doc_url" title="${ _('Open in editor') }">
               <span data-bind="text: name"></span>
             </a>
           </li>
@@ -1854,7 +1872,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <!-- ko if: doc_url -->
           <li class="nav-header">${ _('Document') }</li>
           <li>
-            <a data-bind="hueLink: doc_url" href="javascript: void(0);" title="${ _('Open in editor') }">
+            <a data-bind="hueLink: doc_url" title="${ _('Open in editor') }">
               <span data-bind="text: name"></span>
             </a>
           </li>
@@ -1931,7 +1949,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <!-- ko if: doc_url -->
           <li class="nav-header">${ _('Document') }</li>
           <li>
-            <a data-bind="hueLink: doc_url" href="javascript: void(0);" title="${ _('Open in editor') }">
+            <a data-bind="hueLink: doc_url" title="${ _('Open in editor') }">
               <span data-bind="text: name"></span>
             </a>
           </li>
@@ -2009,7 +2027,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <!-- ko if: doc_url -->
           <li class="nav-header">${ _('Document') }</li>
           <li>
-            <a data-bind="hueLink: doc_url" href="javascript: void(0);" title="${ _('Open in editor') }">
+            <a data-bind="hueLink: doc_url" title="${ _('Open in editor') }">
               <span data-bind="text: name"></span>
             </a>
           </li>
@@ -2073,7 +2091,15 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             </tr>
             </thead>
             <tbody data-bind="foreach: apps">
-              <tr class="status-border pointer" data-bind="css: {'completed': properties.status() == 'SUCCEEDED', 'running': ['RUNNING', 'FAILED', 'KILLED'].indexOf(properties.status()) != -1, 'failed': properties.status() == 'FAILED' || properties.status() == 'KILLED'}, click: function() {  if (properties.externalId() && properties.externalId() != '-') { $root.job().id(properties.externalId()); $root.job().fetchJob(); } }">
+              <tr class="status-border pointer" data-bind="
+                css: {
+                  'completed': properties.status() == 'SUCCEEDED',
+                  'running': ['RUNNING', 'FAILED', 'KILLED'].indexOf(properties.status()) != -1,
+                  'failed': properties.status() == 'FAILED' || properties.status() == 'KILLED'
+                },
+                click: function(data, event) {
+                  $root.job().onTableRowClick(event, properties.externalId());
+                }">
                 <td data-bind="click: function() {}, clickBubble: false">
                   <div class="hue-checkbox fa" data-bind="click: function() {}, clickBubble: false, multiCheck: '#schedulesHiveTable', value: $data, hueChecked: $parent.selectedJobs"></div>
                 </td>
@@ -2150,9 +2176,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <!-- ko if: doc_url -->
           <li class="nav-header">${ _('Document') }</li>
           <li>
-            <a data-bind="documentContextPopover: { uuid: doc_url().split('=')[1], orientation: 'bottom', offset: { top: 5 } }" href="javascript: void(0);" title="${ _('Preview document') }">
-              <span data-bind="text: name"></span> <i class="fa fa-info"></i>
-            </a>
+            <div>
+              <a data-bind="hueLink: doc_url, text: name" title="${ _('Open') }" ></a>
+              <a data-bind="documentContextPopover: { uuid: doc_url().split('=')[1], orientation: 'bottom', offset: { top: 5 } }" href="javascript: void(0);" title="${ _('Preview document') }">
+                <i class="fa fa-info"></i>
+              </a>
+            </div>
           </li>
           <!-- /ko -->
           <!-- ko ifnot: doc_url -->
@@ -2246,7 +2275,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                 <td data-bind="text: errorMessage"></td>
                 <td data-bind="text: errorCode"></td>
                 <td data-bind="text: externalId, click: function() { $root.job().id(ko.unwrap(externalId)); $root.job().fetchJob();}, style: { color: '#0B7FAD' }" class="pointer"></td>
-                <td data-bind="text: id, click: function() {  $root.job().id(id); $root.job().fetchJob(); }, style: { color: '#0B7FAD' }" class="pointer"></td>
+                <td data-bind="text: id, click: function(data, event) { $root.job().onTableRowClick(event, id); }, style: { color: '#0B7FAD' }" class="pointer"></td>
                 <td data-bind="moment: {data: startTime, format: 'LLL'}"></td>
                 <td data-bind="moment: {data: endTime, format: 'LLL'}"></td>
 		<td data-bind="text: data"></td>
@@ -2361,9 +2390,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <!-- ko if: doc_url -->
           <li class="nav-header">${ _('Document') }</li>
           <li>
-            <a data-bind="documentContextPopover: { uuid: doc_url().split('=')[1], orientation: 'bottom', offset: { top: 5 } }" href="javascript: void(0);" title="${ _('Preview document') }">
-              <span data-bind="text: name"></span> <i class="fa fa-info"></i>
-            </a>
+            <div>
+              <a data-bind="hueLink: doc_url, text: name" title="${ _('Open') }" ></a>
+              <a data-bind="documentContextPopover: { uuid: doc_url().split('=')[1], orientation: 'bottom', offset: { top: 5 } }" href="javascript: void(0);" title="${ _('Preview document') }">
+                <i class="fa fa-info"></i>
+              </a>
+            </div>
           </li>
           <!-- /ko -->
           <!-- ko ifnot: doc_url -->
@@ -2439,7 +2471,15 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             </tr>
             </thead>
             <tbody data-bind="foreach: apps">
-              <tr class="status-border pointer" data-bind="css: {'completed': properties.status() == 'SUCCEEDED', 'running': ['RUNNING', 'FAILED', 'KILLED'].indexOf(properties.status()) != -1, 'failed': properties.status() == 'FAILED' || properties.status() == 'KILLED'}, click: function() {  if (properties.externalId() && properties.externalId() != '-') { $root.job().id(properties.externalId()); $root.job().fetchJob(); } }">
+              <tr class="status-border pointer" data-bind="
+                css: {
+                  'completed': properties.status() == 'SUCCEEDED',
+                  'running': ['RUNNING', 'FAILED', 'KILLED'].indexOf(properties.status()) != -1,
+                  'failed': properties.status() == 'FAILED' || properties.status() == 'KILLED'
+                },
+                click: function(data, event) {
+                  $root.job().onTableRowClick(event, properties.externalId());
+                }">
                 <td data-bind="click: function() {}, clickBubble: false">
                   <div class="hue-checkbox fa" data-bind="click: function() {}, clickBubble: false, multiCheck: '#schedulesTable', value: $data, hueChecked: $parent.selectedJobs"></div>
                 </td>
@@ -2486,9 +2526,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <!-- ko if: doc_url -->
           <li class="nav-header">${ _('Document') }</li>
           <li>
-            <a data-bind="documentContextPopover: { uuid: doc_url().split('=')[1], orientation: 'bottom', offset: { top: 5 } }" href="javascript: void(0);" title="${ _('Preview document') }">
-              <span data-bind="text: name"></span> <i class="fa fa-info"></i>
-            </a>
+            <div>
+              <a data-bind="hueLink: doc_url, text: name" title="${ _('Open') }" ></a>
+              <a data-bind="documentContextPopover: { uuid: doc_url().split('=')[1], orientation: 'bottom', offset: { top: 5 } }" href="javascript: void(0);" title="${ _('Preview document') }">
+                <i class="fa fa-info"></i>
+              </a>
+            </div>
           </li>
           <!-- /ko -->
           <!-- ko ifnot: doc_url -->
@@ -3048,6 +3091,22 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           });
         }
       }
+
+      self.onTableRowClick = function (event, id) {
+        var openInNewTab = event && (event.which === 2 || event.metaKey || event.ctrlKey);
+        var idToOpen = id || self.id();
+        if (idToOpen && idToOpen !== '-') {
+          if (openInNewTab) {
+            var urlParts = window.location.toString().split('#');
+            var newUrl = urlParts[0] + '#!id=' + idToOpen;
+            window.open(newUrl, '_blank');
+          } else {
+            self.id(idToOpen);
+            self.fetchJob();
+          }
+        }
+      }
+
       self.fetchJob = function () {
         // TODO: Remove cancelActiveRequest from apiHelper when in webpack
         vm.apiHelper.cancelActiveRequest(lastFetchJobRequest);
