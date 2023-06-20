@@ -135,21 +135,20 @@ class JwtAuthentication(authentication.BaseAuthentication):
       return None
 
     if "," in key_server_urls:
-      # Config format is "['url1', 'url2']" for HA, so we need to clean up and split correctly in list.
-      key_server_urls_list = key_server_urls.replace("%20", "").replace("['", "").replace("']", "").replace("'", "").split(',')
+      key_server_urls_list = key_server_urls.split(',')
 
       for jku in key_server_urls_list:
         try:
           res = requests.get(jku.rstrip('/'), verify=False)
         except Exception as e:
-          if 'Name or service not known' in str(e):
+          if 'Failed to establish a new connection' in str(e):
             LOG.warning('JKU %s is not available.' % jku)
 
         # Check response for None and if response code is successful (200) or authentication needed (401), use that host URL.
         if (res is not None) and (res.status_code in (200, 401)):
           return jku
     else:
-      # For non-HA, its normal url string.
+      # For non-HA, it's normal url string.
       return key_server_urls
 
 class DummyCustomAuthentication(authentication.BaseAuthentication):
