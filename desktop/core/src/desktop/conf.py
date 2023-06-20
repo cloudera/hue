@@ -2194,7 +2194,7 @@ SDXAAS = ConfigSection(
     TOKEN_URL=Config(
       key='token_url',
       help=_('Comma separated host URLs to fetch token from.'),
-      type=str,
+      type=coerce_string,
       default='',
     )
   )
