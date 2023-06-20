@@ -56,11 +56,12 @@ const breakLines = (input: string): string => {
 };
 
 const extractLeadingNqlComments = (sql: string): string => {
-  const regex = /^(--.*?$|\/\*(.|\n)*?\*\/)/gm;
+  const regex = /^(\s*--.*?$|\s*\/\*(.|\n)*?\*\/)/gm;
   const comments = sql.match(regex) || [];
   const prefixSingleLine = '-- NQL:';
   const prefixMultiLine = '/* NQL:';
   const commentsTexts = comments
+    .map(comment => comment.trim())
     .filter(comment => comment.startsWith(prefixSingleLine) || comment.startsWith(prefixMultiLine))
     .map(comment => {
       return comment.startsWith(prefixSingleLine)
