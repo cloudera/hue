@@ -624,6 +624,12 @@
         subTracker.subscribe('assist.set.manual.visibility', resizeAce);
         subTracker.subscribe('split.panel.resized', resizeAce);
 
+        subTracker.subscribe('ace.cursor.move', (position: Ace.Position): void => {
+          console.info('ace.cursor.move', position);
+          editor.moveCursorToPosition(position);
+          editor.renderer.scrollCursorIntoView();
+        });
+        
         subTracker.subscribe(
           'ace.replace',
           (data: { text: string; location: ParsedLocation }): void => {

@@ -31,11 +31,15 @@ const {
   generateEditedSQLfromNQL
 } = generativeFunctionFactory();
 
-const getEditorLineNumbers = (parsedStatement: ParsedSqlStatement) => {
+const getSelectedLineNumbers = (parsedStatement: ParsedSqlStatement) => {
   const { first_line: firstLineInlcudingEmptyLines, last_line: lastLine } =
     parsedStatement?.location || {};
   const firstLine = firstLineInlcudingEmptyLines + getLeadingEmptyLineCount(parsedStatement);
   return { firstLine, lastLine };
+};
+
+const getCursorLineNumber = (parsedStatement: ParsedSqlStatement) => {
+  return parsedStatement?.location?.first_line || undefined;
 };
 
 const breakLines = (input: string): string => {
@@ -66,13 +70,13 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
   const selectedStatement: string = parsedStatement?.statement || '';
   const lastSelectedStatement = useRef(selectedStatement);
   const lastDialect = useRef('');
-  const { firstLine, lastLine } = getEditorLineNumbers(parsedStatement);
+  const { firstLine, lastLine } = getSelectedLineNumbers(parsedStatement);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isAnimating, setIsAnimating] = useState<'no' | 'expand' | 'contract'>('no');
   const [isEditMode, setIsEditMode] = useState(false);
   const [isGenerateMode, setIsGenerateMode] = useState(false);
   const [showSuggestedSqlModal, setShowSuggestedSqlModal] = useState(false);
-  const [explanation, setExplanation] = useState('This is the explanation of the query.');
+  const [explanation, setExplanation] = useState('');
   const [suggestion, setSuggestion] = useState('');
   const [suggestionExplanation, setSuggestionExplanation] = useState('');
   const [assumptions, setAssumptions] = useState('');
@@ -219,20 +223,31 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
   };
 
   const acceptSuggestion = (statement: string) => {
+    let startLine = firstLine;
+    let endLine = lastLine;
+    if(isGenerateMode) {
+      const cursorLine = getCursorLineNumber(parsedStatement);
+      startLine = cursorLine
+      endLine = cursorLine;
+    }
+    console.info('getCursorLineNumber', getCursorLineNumber(parsedStatement));
     setShowSuggestedSqlModal(false);
     huePubSub.publish('ace.replace', {
       text: statement,
       location: {
-        first_line: firstLine,
+        first_line: startLine,
         first_column: 1,
-        last_line: lastLine,
+        last_line: endLine,
         // TODO: what to use here?
         last_column: 10000
       }
     });
-    setSuggestion('');
-    setIsGenerateMode(false);
-    setIsGenerateMode(false);
+    huePubSub.publish('ace.cursor.move', {
+      column: 1,
+      row: startLine
+    })
+    
+    resetAll();
   };
 
   const handleToobarInputSubmit = (userInput: string) => {
