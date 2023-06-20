@@ -51,7 +51,7 @@ def handle_knox_ha():
         return k_url
   else:
     # For non-HA, it's normal url string.
-    return key_server_urls
+    return knox_urls
 
 
 def fetch_jwt():
