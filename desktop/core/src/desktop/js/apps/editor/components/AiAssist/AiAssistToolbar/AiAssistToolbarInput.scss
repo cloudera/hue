@@ -2,12 +2,13 @@
 @use '../sharedAiAssistVars' as ai-assist-vars;
 
 $line-height: 20px;
+$semi-transparent-background: rgba(237, 247, 255, 0.5);
 
-.cuix.antd {    
+.cuix.antd {
   .hue-ai-assist-toolbar-input__wrapper {
     flex-grow: 0;
     width: 0px;
-    transition: flex-grow 0.5s ease;
+    // transition: flex-grow 0.5s ease;
   }
 
   .hue-ai-assist-toolbar-input__wrapper--expanded {
@@ -19,7 +20,7 @@ $line-height: 20px;
     all: unset;
     caret-color: vars.$fluidx-blue-400;
     color: vars.$fluidx-blue-400;
-    font-size: 14px;    
+    font-size: 14px;
     overflow: hidden;
     margin-top: 30px;
     line-height: $line-height;
@@ -40,15 +41,19 @@ $line-height: 20px;
     }
   }
 
-  .hue-ai-assist-toolbar-input__text-input--empty  {
+  .hue-ai-assist-toolbar-input__text-input--empty {
     width: 100%;
     border-left: 2px solid transparent;
   }
 
-  .hue-ai-assist-toolbar-input__text-input--multi-line  {
+  .hue-ai-assist-toolbar-input__text-input--multi-line,
+  .hue-ai-assist-toolbar-input__text-input--is-prefill {
     z-index: 2; // Needed to make sure the input is on top of the editor
     backdrop-filter: blur(5px);
-    background-color: rgba(237, 247, 255, 0.5);
+    background-color: $semi-transparent-background;
+  }
+
+  .hue-ai-assist-toolbar-input__text-input--multi-line {
     border-left: 2px solid;
     border-right: 2px solid;
   }
@@ -62,7 +67,7 @@ $line-height: 20px;
     color: red;
     line-height: $line-height;
     word-wrap: break-word;
-    display: inline-block;    
+    display: inline-block;
   }
 
   .hue-ai-assist-toolbar-input__single-line-reference-element {

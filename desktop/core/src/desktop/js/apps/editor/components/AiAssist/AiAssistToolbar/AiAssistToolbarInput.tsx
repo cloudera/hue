@@ -127,6 +127,9 @@ function AiAssistToolbarInput({
 
   return (
     <li
+      onAnimationEnd={() => {
+        console.info('onAnimationEnd');
+      }}
       ref={toolbarButtonWrapperRef}
       className={classNames('hue-toolbar-button__wrapper', 'hue-ai-assist-toolbar-input__wrapper', {
         'hue-ai-assist-toolbar-input__wrapper--expanded': isExpanded
@@ -135,7 +138,7 @@ function AiAssistToolbarInput({
       {isExpanded && (
         <>
           <textarea
-            title={!dirty && !touched ? 'Press Tab to insert NQL from comment' : ''}
+            title={!dirty && !touched && prefill? 'Press Tab to insert NQL from comment' : ''}
             disabled={isLoading}
             ref={textareaRef}
             value={value}
@@ -145,7 +148,8 @@ function AiAssistToolbarInput({
             spellCheck="false"
             className={classNames('hue-ai-assist-toolbar-input__text-input', {
               ['hue-ai-assist-toolbar-input__text-input--empty']: !value,
-              ['hue-ai-assist-toolbar-input__text-input--multi-line']: isMultiLine
+              ['hue-ai-assist-toolbar-input__text-input--multi-line']: isMultiLine,
+              ['hue-ai-assist-toolbar-input__text-input--is-prefill']: !value && prefill
             })}
             onKeyDown={event => {
               if (event.key === ENTER_KEY && !event.shiftKey && value) {
