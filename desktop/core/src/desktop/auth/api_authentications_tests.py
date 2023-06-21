@@ -225,3 +225,36 @@ class TestJwtAuthentication():
         finally:
           for reset in resets:
             reset()
+
+
+  def test_handle_jku_ha(self):
+    with patch('desktop.auth.api_authentications.requests.get') as requests_get:
+      requests_get.return_value = Mock(status_code=200)
+
+      # Non-HA mode
+      reset = AUTH.JWT.KEY_SERVER_URL.set_for_testing('https://ext-authz:8000/api/v1/jwks.json')
+
+      try:
+        jku = JwtAuthentication()._handle_jku_ha()
+        assert_equal(jku, 'https://ext-authz:8000/api/v1/jwks.json')
+      finally:
+        reset()
+
+      # HA mode - where first URL sends 200 status code
+      reset = AUTH.JWT.KEY_SERVER_URL.set_for_testing('https://ext-authz:8000/api/v1/jwks.json, https://ext1-authz:8000/api/v1/jwks.json')
+
+      try:
+        jku = JwtAuthentication()._handle_jku_ha()
+        assert_equal(jku, 'https://ext-authz:8000/api/v1/jwks.json')
+      finally:
+        reset()
+
+      # When no JKU URL is healthy
+      requests_get.return_value = Mock(status_code=404)
+      reset = AUTH.JWT.KEY_SERVER_URL.set_for_testing('https://ext-authz:8000/api/v1/jwks.json, https://ext1-authz:8000/api/v1/jwks.json')
+
+      try:
+        jku = JwtAuthentication()._handle_jku_ha()
+        assert_equal(jku, None)
+      finally:
+        reset()
