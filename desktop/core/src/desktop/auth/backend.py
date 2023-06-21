@@ -34,7 +34,7 @@ from pwd import getpwnam
 
 import logging
 import sys
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 try:
   import ldap
@@ -238,6 +238,13 @@ def force_username_case(username):
     username = username.upper()
   return username
 
+def knox_login_headers(request):
+  userprofile = get_profile(request.user)
+  try:
+    userprofile.update_data({'X-Forwarded-For': request.META['HTTP_X_FORWARDED_FOR']})
+    userprofile.save()
+  except Exception:
+    LOG.error("X-FORWARDED-FOR header not found")
 
 class DesktopBackendBase(object):
   """

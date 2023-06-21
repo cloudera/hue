@@ -24,7 +24,7 @@ from desktop.lib.i18n import smart_unicode
 from useradmin.models import User, Group
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 def error_handler(view_fn):

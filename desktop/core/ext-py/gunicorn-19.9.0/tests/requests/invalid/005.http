@@ -1,3 +1,0 @@
-GET /foo HTTP/1.1\r\n
-ba\0z: bar\r\n
-\r\n

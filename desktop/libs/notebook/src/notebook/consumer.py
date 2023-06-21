@@ -21,7 +21,7 @@ import logging
 from desktop.conf import has_channels
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 if has_channels():

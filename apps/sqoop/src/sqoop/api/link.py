@@ -41,7 +41,7 @@ else:
 __all__ = ['get_links', 'create_link', 'update_link', 'link', 'links', 'link_clone', 'link_delete']
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 @never_cache
 def get_links(request):

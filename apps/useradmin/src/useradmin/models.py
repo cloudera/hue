@@ -76,7 +76,7 @@ else:
   monkey_patch_username_validator()
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class UserProfile(models.Model):

@@ -36,7 +36,7 @@ from desktop.auth.backend import force_username_case, rewrite_user
 from desktop.conf import AUTH
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class SAML2Backend(_Saml2Backend):

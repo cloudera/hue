@@ -90,7 +90,7 @@ CONNECTIONS = {}
 ENGINE_KEY = '%(username)s-%(connector_name)s'
 URL_PATTERN = '(?P<driver_name>.+?://)(?P<host>[^:/ ]+):(?P<port>[0-9]*).*'
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 def query_error_handler(func):

@@ -13,7 +13,7 @@ This section goes into greater detail on how to build and reuse the components o
 ### Dependencies
 
 * The OS specific packages are listed in the [install guide](/administrator/installation/dependencies/)
-* Python 3.6+ and Django 3 (or Python 2.7 with Django 1.11)
+* Python 3.8/3.9 and Django 3.2
 * Vue.js 3
 * Node.js ([14.0+](https://deb.nodesource.com/setup_10.x))
 
@@ -21,7 +21,7 @@ This section goes into greater detail on how to build and reuse the components o
 
 Build once:
 
-    # If you are using Python 3.6+, set PYTHON_VER before the build, like
+    # If you are using Python 3.8, set PYTHON_VER before the build, like
     export PYTHON_VER=python3.8
 
     # Mac user might need to set
@@ -207,14 +207,14 @@ And it will automatically kick the CI and notify reviewers.
 
 ### Ship It
 
-Once we get ship it from at least one reviewer, we can push the changes to master
+Once we get ship it from at least two reviewer, we can push the changes to master
 
     git rebase origin/master
     git push origin HEAD:ci-commit-master-<yourname>
 
 * The push will auto run the tests and push it to master
-* It can be seen on https://circleci.com/gh/cloudera/workflows/hue
-  * Two builds would be made - One for Python 2.7 and another for Python 3.6
+* It can be seen on https://github.com/cloudera/hue/actions
+  * Two builds should be green - One for Python 3.8 and another for Python 3.9
   * If successful, the change would be auto merged to master
   * On failure, we will get a mail
   * Runs usually take 10-20 min

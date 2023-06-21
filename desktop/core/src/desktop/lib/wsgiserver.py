@@ -146,7 +146,7 @@ else:
   from urlparse import urlparse as lib_urlparse
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 def plat_specific_errors(*errnames):
