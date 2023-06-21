@@ -50,7 +50,7 @@ else:
   from urlparse import urlparse as lib_urlparse
   from urllib import quote as urllib_quote
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 # Azure has a 30MB block limit on upload.
 UPLOAD_CHUCK_SIZE = 30 * 1000 * 1000

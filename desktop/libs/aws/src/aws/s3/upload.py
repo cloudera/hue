@@ -45,7 +45,7 @@ else:
 
 DEFAULT_WRITE_SIZE = 1024 * 1024 * 50  # TODO: set in configuration (currently 50 MiB)
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class S3FileUploadError(UploadFileException):

@@ -32,7 +32,7 @@ from libsentry.sentry_site import get_sentry_server_authentication,\
   get_sentry_server_principal
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 """

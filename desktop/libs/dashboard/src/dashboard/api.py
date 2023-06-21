@@ -51,7 +51,7 @@ else:
   from django.utils.encoding import force_unicode as force_str
   from django.utils.translation import ugettext as _
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 @allow_viewer_only

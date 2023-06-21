@@ -19,7 +19,7 @@ from builtins import object
 import logging
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 def get_engine(user, engine='solr', facet=None, source='data', cluster='""'):

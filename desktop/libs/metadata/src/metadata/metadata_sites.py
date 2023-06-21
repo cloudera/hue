@@ -20,7 +20,7 @@ import logging
 import os
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 _SITE_DICT = None

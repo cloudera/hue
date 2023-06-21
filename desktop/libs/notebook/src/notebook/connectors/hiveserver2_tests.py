@@ -51,7 +51,7 @@ else:
   from mock import patch, Mock
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class TestApiWithConnectors(object):

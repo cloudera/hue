@@ -28,7 +28,7 @@ from desktop.lib.rest.resource import Resource
 from spark.conf import get_livy_server_url, SECURITY_ENABLED, SSL_CERT_CA_VERIFY, CSRF_ENABLED
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 DEFAULT_USER = 'hue'
 
 _API_VERSION = 'v1'

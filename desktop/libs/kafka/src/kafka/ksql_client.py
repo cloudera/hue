@@ -36,7 +36,7 @@ if has_channels():
   from notebook.consumer import _send_to_channel
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class KSqlApiException(Exception):

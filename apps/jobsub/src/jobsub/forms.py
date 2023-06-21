@@ -29,7 +29,7 @@ if sys.version_info[0] > 2:
 else:
   from django.utils.translation import ugettext as _
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 # This aligns with what Oozie accepts as a workflow name
 _OOZIE_WORKFLOW_NAME_REGEX = '^([a-zA-Z_]([\-_a-zA-Z0-9])*){1,39}$'

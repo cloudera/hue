@@ -4,7 +4,7 @@ from south.db import db
 from south.v2 import SchemaMigration
 from django.db import connection, models
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 class Migration(SchemaMigration):
 

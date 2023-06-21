@@ -26,7 +26,7 @@ from hadoop import pseudo_hdfs4
 from hadoop.fs.fsutils import remove_header, do_overwrite_save
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class FsUtilsTests(unittest.TestCase):

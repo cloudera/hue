@@ -1,3 +1,0 @@
-include LICENSE
-include readme.md changelog.md
-recursive-include docs *.md

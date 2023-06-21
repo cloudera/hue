@@ -36,7 +36,7 @@ if sys.version_info[0] > 2:
 else:
   from cStringIO import StringIO as string_io
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 LENGTH = 1024*10 # 10KB
 

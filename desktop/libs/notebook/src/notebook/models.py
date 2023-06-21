@@ -51,7 +51,7 @@ else:
   from urllib import quote as urllib_quote
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 # Materialize and HTML escape results

@@ -44,7 +44,7 @@ else:
   from django.utils.translation import ugettext_lazy as _
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger()
 
 
 class FormSet(BaseFormSet):

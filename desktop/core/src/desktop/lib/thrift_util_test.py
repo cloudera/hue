@@ -50,7 +50,7 @@ from desktop.auth.backend import rewrite_user, find_or_create_user, ensure_has_a
 
 from useradmin.models import User
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class SimpleThriftServer(object):

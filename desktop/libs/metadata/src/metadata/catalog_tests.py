@@ -38,7 +38,7 @@ from metadata.catalog.navigator_client import NavigatorApi
 from metadata.catalog.atlas_client import AtlasApi
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class TestAtlas(object):

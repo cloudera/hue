@@ -1,5 +1,0 @@
-include *.txt
-include *.md
-recursive-include docs
-recursive-include pydruid
-include LICENSE
