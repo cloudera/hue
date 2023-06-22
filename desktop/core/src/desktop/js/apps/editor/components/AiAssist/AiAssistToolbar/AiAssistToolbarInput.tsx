@@ -60,23 +60,27 @@ const updateTextareaDimensions = ({
 };
 
 function AiAssistToolbarInput({
+  isAnimating,
   placeholder,
   onSubmit,
   onCancel,
+  onAnimationEnded,
   isLoading,
   isExpanded,
   prefill = ''
 }: {
-  isExpanded: boolean;
+  isAnimating: boolean;
+  isExpanded: boolean;  
   isLoading: boolean;
   placeholder: string;
   prefill?: string;
   onSubmit: (value: string) => void;
   onCancel: () => void;
+  onAnimationEnded:() => void;
 }) {
   const [value, setValue] = useState<string>('');
   const [dirty, setDirty] = useState<boolean>(false);
-  const [touched, setTouched] = useState<boolean>(false);
+  const [touched, setTouched] = useState<boolean>(false);  
   const toolbarButtonWrapperRef = useRef<HTMLDivElement>(null);
   const spanSizeRef = useRef<HTMLSpanElement | null>(null);
   const spanSingleLineRef = useRef<HTMLSpanElement | null>(null);
@@ -128,7 +132,7 @@ function AiAssistToolbarInput({
   return (
     <li
       onAnimationEnd={() => {
-        console.info('onAnimationEnd');
+        onAnimationEnded();
       }}
       ref={toolbarButtonWrapperRef}
       className={classNames('hue-toolbar-button__wrapper', 'hue-ai-assist-toolbar-input__wrapper', {
@@ -148,6 +152,7 @@ function AiAssistToolbarInput({
             spellCheck="false"
             className={classNames('hue-ai-assist-toolbar-input__text-input', {
               ['hue-ai-assist-toolbar-input__text-input--empty']: !value,
+              ['hue-ai-assist-toolbar-input__text-input--animating']: isAnimating,
               ['hue-ai-assist-toolbar-input__text-input--multi-line']: isMultiLine,
               ['hue-ai-assist-toolbar-input__text-input--is-prefill']: !value && prefill
             })}
