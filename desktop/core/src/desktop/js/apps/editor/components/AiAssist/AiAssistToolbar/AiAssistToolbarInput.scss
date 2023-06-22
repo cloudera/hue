@@ -61,8 +61,9 @@ $semi-transparent-background: rgba(237, 247, 255, 0.5);
   // Used as a reference element for measuring the width of the input
   // which is needed to create a growing input field.
   .hue-ai-assist-toolbar-input__size-reference-element {
-    visibility: hidden;
-    white-space: pre-line;
+    // visibility: hidden;
+    white-space: pre-wrap;
+    overflow-wrap: break-all;
     border: 1px dotted red;
     color: red;
     line-height: $line-height;
