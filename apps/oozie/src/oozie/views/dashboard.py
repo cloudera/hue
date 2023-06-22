@@ -253,6 +253,7 @@ def list_oozie_coordinators(request):
 
     json_jobs = []
     total_jobs = 0
+    # Status lists here
     if request.GET.getlist('status'):
       kwargs['filters'].extend([('status', status) for status in request.GET.getlist('status')])
       co_list = oozie_api.get_coordinators(**kwargs)
