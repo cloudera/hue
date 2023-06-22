@@ -3,15 +3,17 @@
 
 $line-height: 20px;
 $semi-transparent-background: rgba(237, 247, 255, 0.5);
+$input-animation-time: 0.5s;
 
 .cuix.antd {
   .hue-ai-assist-toolbar-input__wrapper {
     flex-grow: 0;
     width: 0px;
-    // transition: flex-grow 0.5s ease;
+    animation: contractInput $input-animation-time ease forwards;   
   }
 
   .hue-ai-assist-toolbar-input__wrapper--expanded {
+    animation: expandInput $input-animation-time ease forwards;
     flex-grow: 1;
     order: -1;
   }
@@ -45,6 +47,9 @@ $semi-transparent-background: rgba(237, 247, 255, 0.5);
     width: 100%;
     border-left: 2px solid transparent;
   }
+  .hue-ai-assist-toolbar-input__text-input--animating {
+    visibility: hidden;
+  }  
 
   .hue-ai-assist-toolbar-input__text-input--multi-line,
   .hue-ai-assist-toolbar-input__text-input--is-prefill {
@@ -75,5 +80,24 @@ $semi-transparent-background: rgba(237, 247, 255, 0.5);
     visibility: hidden;
     position: absolute;
     line-height: $line-height;
+  }
+}
+
+
+@keyframes expandInput {
+  from {
+    flex-grow: 0;
+  }
+  to {
+    flex-grow: 1;
+  }
+}
+
+@keyframes contractInput {
+  from {
+    flex-grow: 1;
+  }
+  to {
+    flex-grow: 0;
   }
 }
