@@ -48,6 +48,9 @@ RUN set -eux; \
 RUN set -eux; \
       curl -sL https://rpm.nodesource.com/setup_14.x | bash - \
         && yum install -y nodejs \
+        && curl -sSLO https://repo.mysql.com/mysql80-community-release-el8-5.noarch.rpm \
+        && rpm -ivh mysql80-community-release-el8-5.noarch.rpm \
+        && yum install -y mysql-community-libs mysql-community-client-plugins mysql-community-common mysql-community-devel gcc \
         && yum clean all -y
 
 CMD ["/bin/bash"]
