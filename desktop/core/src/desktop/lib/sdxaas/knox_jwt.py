@@ -29,25 +29,29 @@ _KNOX_TOKEN_GET_PARAM_STRING = '?knox.token.include.groups=true'
 
 
 def handle_knox_ha():
-  knox_urls = SDXAAS.TOKEN_URL.get()
-  auth_handler = requests_kerberos.HTTPKerberosAuth(mutual_authentication=requests_kerberos.OPTIONAL)
   res = None
+  auth_handler = requests_kerberos.HTTPKerberosAuth(mutual_authentication=requests_kerberos.OPTIONAL)
 
-  if knox_urls:
-    # Config format is "['url1', 'url2']" for HA, so we need to clean up and split correctly in list.
-    # For non-HA, its normal url string.
-    knox_urls_list = knox_urls.replace("%20", "").replace("['", "").replace("']", "").replace("'", "").split(',')
+  knox_urls = SDXAAS.TOKEN_URL.get()
+  if not knox_urls:
+    return None
+
+  if "," in knox_urls:
+    knox_urls_list = knox_urls.split(',')
 
     for k_url in knox_urls_list:
       try:
         res = requests.get(k_url.rstrip('/') + _KNOX_TOKEN_API, auth=auth_handler, verify=False)
       except Exception as e:
-        if 'Name or service not known' in str(e):
+        if 'Failed to establish a new connection' in str(e):
           LOG.warning('Knox URL %s is not available.' % k_url)
 
       # Check response for None and if response code is successful (200) or authentication needed (401), use that host URL.
       if (res is not None) and (res.status_code in (200, 401)):
         return k_url
+  else:
+    # For non-HA, it's normal url string.
+    return knox_urls
 
 
 def fetch_jwt():
