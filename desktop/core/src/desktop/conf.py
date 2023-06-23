@@ -1231,7 +1231,7 @@ AUTH = ConfigSection(
         KEY_SERVER_URL=Config(
             key="key_server_url",
             default=None,
-            type=str,
+            type=coerce_string,
             help=_("Endpoint to fetch the public key from verification server.")
         ),
         ISSUER=Config(
