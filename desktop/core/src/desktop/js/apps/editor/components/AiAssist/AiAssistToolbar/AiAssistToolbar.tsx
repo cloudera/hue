@@ -54,6 +54,9 @@ function AssistToolbar({
     setIsGenerateMode(false);
     setIsEditMode(false);
   };
+
+  const hasSelectedStatement = parsedStatement?.statement?.trim();
+
   return (
     <Toolbar
       className="hue-ai-assist-toolbar"
@@ -63,7 +66,7 @@ function AssistToolbar({
             className={classNames({
               'hue-ai-assist-toolbar__button--active': isGenerateMode
             })}
-            disabled={isLoading}
+            disabled={isLoading || hasSelectedStatement}
             title="Generate SQL using natural language"
             aria-label="Generate SQL using natural language"
             icon={<CommentOutlined />}
@@ -89,7 +92,7 @@ function AssistToolbar({
             className={classNames({
               'hue-ai-assist-toolbar__button--active': isEditMode
             })}
-            disabled={isLoading}
+            disabled={isLoading || !hasSelectedStatement}
             title="Edit SQL using natural language"
             aria-label="Edit SQL using natural language"
             icon={<EditOutlined />}
@@ -113,7 +116,7 @@ function AssistToolbar({
             prefill={inputPrefill}
           />
           <ToolbarButton
-            disabled={isLoading}
+            disabled={isLoading || !hasSelectedStatement}
             title="Explain SQL statements"
             aria-label="Explain SQL statement"
             icon={<BulbOutlined />}
@@ -130,7 +133,7 @@ function AssistToolbar({
               loadOptimization(parsedStatement?.statement);
             }}
             title="Optimize your SQL statement"
-            disabled={isLoading}
+            disabled={isLoading || !hasSelectedStatement}
             icon={<ThunderboltOutlined />}
           >
             {!inputExpanded ? 'Optimize' : ''}
@@ -140,7 +143,7 @@ function AssistToolbar({
               setErrorStatusText('');
               loadFixSuggestion(parsedStatement?.statement);
             }}
-            disabled={!parseError || isLoading}
+            disabled={!parseError || isLoading || !hasSelectedStatement}
             icon={<BugOutlined />}
           >
             {!inputExpanded ? 'Fix' : ''}
