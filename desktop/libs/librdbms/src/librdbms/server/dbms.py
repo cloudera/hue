@@ -23,7 +23,7 @@ from desktop.lib.python_util import force_dict_to_strings
 from librdbms.conf import DATABASES, get_database_password
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 MYSQL = 'mysql'
 POSTGRESQL = 'postgresql'

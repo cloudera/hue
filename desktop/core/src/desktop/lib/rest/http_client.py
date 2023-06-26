@@ -45,7 +45,7 @@ pyopenssl.DEFAULT_SSL_CIPHER_LIST = conf.SSL_CIPHER_LIST.get()
 
 __docformat__ = "epytext"
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 CACHE_SESSION = {}
 CACHE_SESSION_LOCK = threading.Lock()

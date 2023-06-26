@@ -22,7 +22,7 @@ import time
 from desktop.supervisor import DjangoCommandSupervisee
 from desktop.conf import KERBEROS as CONF
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 SPEC = DjangoCommandSupervisee("kt_renewer")
 
 NEED_KRB181_WORKAROUND = None

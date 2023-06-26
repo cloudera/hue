@@ -20,7 +20,7 @@ import logging
 from notebook.dashboard_api import SQLDashboardApi
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class ImpalaDashboardApi(SQLDashboardApi):

@@ -33,7 +33,7 @@ else:
 
 __all = ['get_conf', 'get_trash_interval', 'get_s3a_access_key', 'get_s3a_secret_key']
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 _CORE_SITE_PATH = None                  # Path to core-site.xml
 _CORE_SITE_DICT = None                  # A dictionary of name/value config options

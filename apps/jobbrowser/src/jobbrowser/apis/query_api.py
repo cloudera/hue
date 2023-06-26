@@ -38,7 +38,7 @@ else:
   from django.utils.translation import ugettext as _
 
 ANALYZER = rules.TopDownAnalysis() # We need to parse some files so save as global
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 try:
   from beeswax.models import Session

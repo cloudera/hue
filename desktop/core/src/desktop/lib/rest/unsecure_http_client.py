@@ -24,7 +24,7 @@ from desktop.lib.rest.http_client import HttpClient, RestException
 
 __docformat__ = "epytext"
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 CACHE_UNSECURE_SESSION = None
 CACHE_UNSECURE_SESSION_LOCK = threading.Lock()

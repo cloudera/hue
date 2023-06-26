@@ -22,7 +22,7 @@ from azure.conf import get_refresh_url
 from desktop.lib.python_util import current_ms_from_utc
 from desktop.lib.rest import http_client, resource
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 class ActiveDirectory(object):
   def __init__(self, url=None, aws_access_key_id=None, aws_secret_access_key=None, version=None):

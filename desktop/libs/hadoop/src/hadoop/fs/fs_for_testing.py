@@ -25,7 +25,7 @@ import os
 from django.utils import lorem_ipsum
 from hadoop.fs import LocalSubFileSystem
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger()
 
 def create(dir=None):
   """Creates a "filesystem" in a new temp dir and creates one file in it."""

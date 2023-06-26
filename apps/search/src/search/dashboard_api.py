@@ -25,7 +25,7 @@ from dashboard.dashboard_api import DashboardApi
 from dashboard.models import augment_solr_response
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class SearchApi(DashboardApi):

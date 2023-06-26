@@ -28,7 +28,7 @@ from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.i18n import force_unicode
 from desktop.lib.scheduler.lib.api import get_api
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 try:
   from oozie.decorators import check_document_access_permission

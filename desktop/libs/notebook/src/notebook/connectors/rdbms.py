@@ -28,7 +28,7 @@ from librdbms.server import dbms
 from notebook.connectors.base import Api, QueryError, QueryExpired, _get_snippet_name
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 def query_error_handler(func):

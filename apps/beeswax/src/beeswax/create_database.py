@@ -31,7 +31,7 @@ from beeswax.forms import CreateDatabaseForm
 from beeswax.views import execute_directly
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 def create_database(request):

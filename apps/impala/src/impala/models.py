@@ -23,7 +23,7 @@ from beeswax.server.dbms import get_query_server_config, QueryServerException
 from beeswax.server import dbms
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class Dashboard(object):

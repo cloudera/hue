@@ -68,7 +68,7 @@ else:
   from cStringIO import StringIO as string_io
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 _INITIALIZED = False

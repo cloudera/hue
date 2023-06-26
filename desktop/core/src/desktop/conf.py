@@ -45,7 +45,7 @@ else:
   from django.utils.translation import ugettext_lazy as _
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 def is_oozie_enabled():
@@ -87,7 +87,7 @@ def coerce_timedelta(value):
 def get_dn(fqdn=None):
   """This function returns fqdn(if possible)"""
   val = []
-  LOG = logging.getLogger(__name__)
+  LOG = logging.getLogger()
   try:
     if fqdn is None:
       fqdn = socket.getfqdn()
@@ -151,9 +151,9 @@ def is_python2():
   """Hue is running on Python 2."""
   return sys.version_info[0] == 2
 
-def is_jwt_authentication_enabled():
-  """JWT backend flag enabled or backend set in api auth explicitly"""
-  return AUTH.JWT.IS_ENABLED.get() or 'desktop.auth.api_authentications.JwtAuthentication' in AUTH.API_AUTH.get()
+def is_custom_jwt_auth_enabled():
+  """Returns True if key server url is set else returns False"""
+  return bool(AUTH.JWT.KEY_SERVER_URL.get())
 
 USE_CHERRYPY_SERVER = Config(
   key="use_cherrypy_server",
@@ -543,6 +543,12 @@ USE_X_FORWARDED_HOST = Config(
   help=_("Enable X-Forwarded-Host header if the load balancer requires it."),
   type=coerce_bool,
   dynamic_default=is_lb_enabled)
+
+ENABLE_XFF_FOR_HIVE_IMPALA = Config(
+  key="enable_xff_for_hive_impala",
+  help=_("Enable X-Forwarded-For header if the hive/impala requires it."),
+  type=coerce_bool,
+  default=False)
 
 SECURE_PROXY_SSL_HEADER = Config(
   key="secure_proxy_ssl_header",
@@ -1222,16 +1228,10 @@ AUTH = ConfigSection(
       key="jwt",
       help=_("Configuration for Custom JWT Authentication."),
       members=dict(
-        IS_ENABLED=Config(
-            key='is_enabled',
-            help=_('Adds custom JWT Authentication backend for REST APIs in top priority.'),
-            type=coerce_bool,
-            default=False,
-        ),
         KEY_SERVER_URL=Config(
             key="key_server_url",
             default=None,
-            type=str,
+            type=coerce_string,
             help=_("Endpoint to fetch the public key from verification server.")
         ),
         ISSUER=Config(
@@ -1245,6 +1245,12 @@ AUTH = ConfigSection(
           default=None,
           type=str,
           help=_("The identifier of the resource intend to access")
+        ),
+        USERNAME_HEADER=Config(
+          key="username_header",
+          default="sub",
+          type=str,
+          help=_("The JWT payload header containing the username.")
         ),
         VERIFY=Config(
             key="verify",
@@ -1671,6 +1677,13 @@ SEND_DBUG_MESSAGES = Config(
   default=False
 )
 
+CUSTOM_CACHE_CONTROL = Config(
+  key="custom_cache_control",
+  help=_("Flag to disable webpage caching."),
+  type=coerce_bool,
+  default=False
+)
+
 DATABASE_LOGGING = Config(
   key="database_logging",
   help=_("Enable or disable database debug mode."),
@@ -2090,15 +2103,15 @@ USE_THRIFT_HTTP_JWT = Config(
   key="use_thrift_http_jwt",
   help=_("Use JWT as Bearer header for authentication when using Thrift over HTTP transport."),
   type=coerce_bool,
-  dynamic_default=is_jwt_authentication_enabled
+  default=False
 )
 
 DISABLE_LOCAL_STORAGE = Config(
   key='disable_local_storage',
-  default="false",
+  default=False,
   type=coerce_bool,
-  help=_("Hue uses Localstorage to keep the users settings and database preferences."
-         "Please make this value true in case local storage should not be used")
+  help=_("Hue uses Localstorage to keep the users settings and database preferences,"
+         "please make this value true in case local storage should not be used.")
 )
 
 ENABLE_CONNECTORS = Config(
@@ -2181,7 +2194,7 @@ SDXAAS = ConfigSection(
     TOKEN_URL=Config(
       key='token_url',
       help=_('Comma separated host URLs to fetch token from.'),
-      type=str,
+      type=coerce_string,
       default='',
     )
   )

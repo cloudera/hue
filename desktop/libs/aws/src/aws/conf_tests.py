@@ -33,7 +33,7 @@ if sys.version_info[0] > 2:
 else:
   from mock import patch
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 class TestAWSConf(unittest.TestCase):
   def setUp(self):
