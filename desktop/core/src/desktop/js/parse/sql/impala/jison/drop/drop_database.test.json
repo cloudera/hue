@@ -1,0 +1,70 @@
+[
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "DROP ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "DATABASE",
+      "SCHEMA"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest databases",
+    "beforeCursor": "DROP DATABASE ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestDatabases": {},
+      "suggestKeywords": [
+        "IF EXISTS"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest databases",
+    "beforeCursor": "DROP SCHEMA ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestDatabases": {},
+      "suggestKeywords": [
+        "IF EXISTS"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "DROP DATABASE IF ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "EXISTS"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest databases",
+    "beforeCursor": "DROP DATABASE IF EXISTS ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestDatabases": {}
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "DROP DATABASE foo ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "CASCADE",
+        "RESTRICT"
+      ]
+    }
+  }
+]

@@ -203,14 +203,8 @@ ${ hueIcons.symbols() }
 
 % if hasattr(request, 'environ') and request.environ.get("PATH_INFO").find("/hue/") < 0:
   <script>
-    window.location.replace("/");
+    window.location.replace(window.HUE_BASE_URL || "/");
   </script>
-% endif
-
-% if banner_message or conf.CUSTOM.BANNER_TOP_HTML.get():
-  <div class="banner">
-    ${ banner_message or conf.CUSTOM.BANNER_TOP_HTML.get() | n,unicode }
-  </div>
 % endif
 
 <%

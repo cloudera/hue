@@ -36,7 +36,6 @@ import {
   toVNodes,
   camelize,
   hyphenate,
-  callHooks,
   setInitialProps,
   createCustomEvent,
   convertAttributeValue
@@ -85,7 +84,7 @@ export default function wrap(
   }
 
   class CustomElement extends HTMLElement {
-    _wrapper: App;
+    _wrapper?: App;
     _component?: ComponentPublicInstance;
 
     _props!: KeyHash;
@@ -95,26 +94,8 @@ export default function wrap(
     constructor() {
       super();
 
-      const eventProxies = this.createEventProxies(<string[]>componentObj.emits);
-
       this._props = {};
       this._slotChildren = [];
-
-      // eslint-disable-next-line @typescript-eslint/no-this-alias
-      const self = this;
-      this._wrapper = createApp({
-        render() {
-          const props = Object.assign({}, self._props, eventProxies);
-          delete props.dataVApp;
-          return h(componentObj, props, () => self._slotChildren);
-        },
-        mounted() {
-          self._mounted = true;
-        },
-        unmounted() {
-          self._mounted = false;
-        }
-      });
 
       // Use MutationObserver to react to future attribute & slot content change
       const observer = new MutationObserver(mutations => {
@@ -191,28 +172,42 @@ export default function wrap(
     }
 
     connectedCallback() {
-      if (!this._component || !this._mounted) {
-        if (isInitialized) {
-          // initialize attributes
-          this.syncInitialAttributes();
-        }
-
-        // initialize children
-        this.syncSlots();
-
-        // Mount the component
-        this._component = this._wrapper.mount(this);
-      } else {
-        // Call mounted on re-insert
-        callHooks(this._component, 'mounted');
+      if (isInitialized) {
+        // initialize attributes
+        this.syncInitialAttributes();
       }
+
+      const eventProxies = this.createEventProxies(<string[]>componentObj.emits);
+
+      // eslint-disable-next-line @typescript-eslint/no-this-alias
+      const self = this;
+      this._wrapper = createApp({
+        render() {
+          const props = Object.assign({}, self._props, eventProxies);
+          delete props.dataVApp;
+          return h(componentObj, props, () => self._slotChildren);
+        },
+        mounted() {
+          self._mounted = true;
+        },
+        unmounted() {
+          self._mounted = false;
+        }
+      });
+
+      // initialize children
+      this.syncSlots();
+
+      // Mount the component
+      this._component = this._wrapper.mount(this);
+
       if (options?.connectedCallback) {
         options.connectedCallback.bind(this)();
       }
     }
 
     disconnectedCallback() {
-      callHooks(this._component, 'unmounted');
+      this._wrapper?.unmount();
     }
   }
 

@@ -33,7 +33,6 @@ const hueGlobals = [
   'MediumEditor',
   'moment',
   'Role',
-  'trackOnGA',
   '__webpack_public_path__',
 
   // jest
@@ -112,7 +111,7 @@ module.exports = {
       }
     },
     {
-      files: ['*.ts'],
+      files: ['*.ts', '*.tsx'],
       extends: ['plugin:@typescript-eslint/recommended'],
       parser: '@typescript-eslint/parser',
       plugins: ['jest', '@typescript-eslint'],
@@ -123,9 +122,9 @@ module.exports = {
   ],
   extends: ['plugin:prettier/recommended'],
   globals: globals,
-  parser: 'babel-eslint',
+  parser: '@babel/eslint-parser',
   parserOptions: {
-    parser: 'babel-eslint',
+    parser: '@babel/eslint-parser',
     ecmaVersion: 2017,
     sourceType: 'module',
     ecmaFeatures: {

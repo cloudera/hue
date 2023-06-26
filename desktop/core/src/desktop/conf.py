@@ -45,7 +45,7 @@ else:
   from django.utils.translation import ugettext_lazy as _
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 def is_oozie_enabled():
@@ -87,7 +87,7 @@ def coerce_timedelta(value):
 def get_dn(fqdn=None):
   """This function returns fqdn(if possible)"""
   val = []
-  LOG = logging.getLogger(__name__)
+  LOG = logging.getLogger()
   try:
     if fqdn is None:
       fqdn = socket.getfqdn()
@@ -151,9 +151,9 @@ def is_python2():
   """Hue is running on Python 2."""
   return sys.version_info[0] == 2
 
-def is_jwt_authentication_enabled():
-  """JWT backend flag enabled or backend set in api auth explicitly"""
-  return AUTH.JWT.IS_ENABLED.get() or 'desktop.auth.api_authentications.JwtAuthentication' in AUTH.API_AUTH.get()
+def is_custom_jwt_auth_enabled():
+  """Returns True if key server url is set else returns False"""
+  return bool(AUTH.JWT.KEY_SERVER_URL.get())
 
 USE_CHERRYPY_SERVER = Config(
   key="use_cherrypy_server",
@@ -205,6 +205,39 @@ X_FRAME_OPTIONS = Config(
   type=str,
   default="SAMEORIGIN")
 
+HUE_IMAGE_VERSION = Config(
+  key="hue_image_version",
+  help=_("Image version of Hue"),
+  type=str,
+  default="")
+
+HUE_HOST_NAME = Config(
+  key="hue_host",
+  help=_("Name of Hue host selected"),
+  type=str,
+  default="")
+
+LIMIT_REQUEST_FIELD_SIZE = Config(
+  key="limit_request_field_size",
+  help=_("This property specifies the maximum allowed size of an HTTP request header field."),
+  default=8190,
+  type=int
+)
+
+LIMIT_REQUEST_FIELDS = Config(
+  key="limit_request_fields",
+  help=_("This property specifies the maximum number of HTTP headers fields in a request."),
+  default=100,
+  type=int
+)
+
+LIMIT_REQUEST_LINE = Config(
+  key="limit_request_line",
+  help=_("This property specifies the maximum size of HTTP request line in bytes."),
+  default=4094,
+  type=int
+)
+
 SSL_CERTIFICATE = Config(
   key="ssl_certificate",
   help=_("Filename of SSL Certificate"),
@@ -227,40 +260,13 @@ SSL_CIPHER_LIST = Config(
   key="ssl_cipher_list",
   help=_("List of allowed and disallowed ciphers"),
 
-  # From https://wiki.mozilla.org/Security/Server_Side_TLS v3.7 default
-  # recommendation, which should be compatible with Firefox 1, Chrome 1, IE 7,
-  # Opera 5 and Safari 1.
+  # Based on "Intermediate compatibility" recommendations from
+  # https://wiki.mozilla.org/Security/Server_Side_TLS#Intermediate_compatibility_.28recommended.29
+  # which should be compatible with Firefox 27, Chrome 31, IE 11,
+  # Opera 20 and Safari 9.
   default=':'.join([
     'ECDHE-RSA-AES128-GCM-SHA256',
-    'ECDHE-ECDSA-AES128-GCM-SHA256',
     'ECDHE-RSA-AES256-GCM-SHA384',
-    'ECDHE-ECDSA-AES256-GCM-SHA384',
-    'DHE-RSA-AES128-GCM-SHA256',
-    'DHE-DSS-AES128-GCM-SHA256',
-    'kEDH+AESGCM',
-    'ECDHE-RSA-AES128-SHA256',
-    'ECDHE-ECDSA-AES128-SHA256',
-    'ECDHE-RSA-AES128-SHA',
-    'ECDHE-ECDSA-AES128-SHA',
-    'ECDHE-RSA-AES256-SHA384',
-    'ECDHE-ECDSA-AES256-SHA384',
-    'ECDHE-RSA-AES256-SHA',
-    'ECDHE-ECDSA-AES256-SHA',
-    'DHE-RSA-AES128-SHA256',
-    'DHE-RSA-AES128-SHA',
-    'DHE-DSS-AES128-SHA256',
-    'DHE-RSA-AES256-SHA256',
-    'DHE-DSS-AES256-SHA',
-    'DHE-RSA-AES256-SHA',
-    'AES128-GCM-SHA256',
-    'AES256-GCM-SHA384',
-    'AES128-SHA256',
-    'AES256-SHA256',
-    'AES128-SHA',
-    'AES256-SHA',
-    'AES',
-    'CAMELLIA',
-    'DES-CBC3-SHA',
     '!aNULL',
     '!eNULL',
     '!EXPORT',
@@ -343,10 +349,10 @@ SECURE_CONTENT_SECURITY_POLICY = Config(
   help=_('X-Content-Type-Options: nosniff. This is a HTTP response header feature that helps prevent attacks '
     'based on MIME-type confusion.'),
   type=str,
-  default="script-src 'self' 'unsafe-inline' 'unsafe-eval' *.google-analytics.com *.doubleclick.net data:;"+
-          "img-src 'self' *.google-analytics.com *.doubleclick.net http://*.tile.osm.org *.tile.osm.org *.gstatic.com data:;"+
+  default="script-src 'self' 'unsafe-inline' 'unsafe-eval' *.googletagmanager.com *.doubleclick.net data:;"+
+          "img-src 'self' *.doubleclick.net http://*.tile.osm.org *.tile.osm.org *.gstatic.com data:;"+
           "style-src 'self' 'unsafe-inline' fonts.googleapis.com;"+
-          "connect-src 'self';"+
+          "connect-src 'self' *.google-analytics.com;"+
           "frame-src *;"+
           "child-src 'self' data: *.vimeo.com;"+
           "object-src 'none'")
@@ -468,9 +474,15 @@ USER_ACCESS_HISTORY_SIZE = Config(
 COLLECT_USAGE = Config(
   key="collect_usage",
   help=_("Help improve Hue with anonymous usage analytics."
-         "Use Google Analytics to see how many times an application or specific section of an application is used, nothing more."),
+         "Use Google Analytics 4 to see how many times an application or specific section of an application is used, nothing more."),
   type=coerce_bool,
   default=True)
+
+GTAG_ID = Config(
+  key="gtag_id",
+  help=_("The gTag id used for anonymous analytics with Google Analytics 4."),
+  type=str,
+  default="G-25K7599S1Q")
 
 REST_RESPONSE_SIZE = Config(
   key="rest_response_size",
@@ -531,6 +543,12 @@ USE_X_FORWARDED_HOST = Config(
   help=_("Enable X-Forwarded-Host header if the load balancer requires it."),
   type=coerce_bool,
   dynamic_default=is_lb_enabled)
+
+ENABLE_XFF_FOR_HIVE_IMPALA = Config(
+  key="enable_xff_for_hive_impala",
+  help=_("Enable X-Forwarded-For header if the hive/impala requires it."),
+  type=coerce_bool,
+  default=False)
 
 SECURE_PROXY_SSL_HEADER = Config(
   key="secure_proxy_ssl_header",
@@ -728,6 +746,11 @@ METRICS = ConfigSection(
       default=30000),
   )
 )
+
+def is_gunicorn_report_enabled():
+  return 'rungunicornserver' in sys.argv \
+    and METRICS.LOCATION.get() is not None \
+    and METRICS.COLLECTION_INTERVAL.get() is not None
 
 SLACK = ConfigSection(
   key='slack',
@@ -1205,16 +1228,10 @@ AUTH = ConfigSection(
       key="jwt",
       help=_("Configuration for Custom JWT Authentication."),
       members=dict(
-        IS_ENABLED=Config(
-            key='is_enabled',
-            help=_('Adds custom JWT Authentication backend for REST APIs in top priority.'),
-            type=coerce_bool,
-            default=False,
-        ),
         KEY_SERVER_URL=Config(
             key="key_server_url",
             default=None,
-            type=str,
+            type=coerce_string,
             help=_("Endpoint to fetch the public key from verification server.")
         ),
         ISSUER=Config(
@@ -1228,6 +1245,12 @@ AUTH = ConfigSection(
           default=None,
           type=str,
           help=_("The identifier of the resource intend to access")
+        ),
+        USERNAME_HEADER=Config(
+          key="username_header",
+          default="sub",
+          type=str,
+          help=_("The JWT payload header containing the username.")
         ),
         VERIFY=Config(
             key="verify",
@@ -1654,6 +1677,13 @@ SEND_DBUG_MESSAGES = Config(
   default=False
 )
 
+CUSTOM_CACHE_CONTROL = Config(
+  key="custom_cache_control",
+  help=_("Flag to disable webpage caching."),
+  type=coerce_bool,
+  default=False
+)
+
 DATABASE_LOGGING = Config(
   key="database_logging",
   help=_("Enable or disable database debug mode."),
@@ -1768,6 +1798,13 @@ EDITOR_AUTOCOMPLETE_TIMEOUT = Config(
   help=_('Timeout value in ms for autocomplete of columns, tables, values etc. 0 = disabled.')
 )
 
+ENABLE_HUE_5 = Config(
+  key="enable_hue_5",
+  help=_("Feature flag to enable Hue 5."),
+  type=coerce_bool,
+  default=False
+)
+
 USE_NEW_EDITOR = Config( # To remove in Hue 4
   key='',
   default=True,
@@ -1789,19 +1826,6 @@ ENABLE_SHARING = Config(
     'Global setting to enable or disable document sharing. Note that this does not affect currently shared documents.'),
   type=coerce_bool,
   default=True)
-
-ENABLE_DJANGO_DEBUG_TOOL = Config(
-  key="enable_django_debug_tool",
-  help=_('Allow use django debug tool with Chrome browser for debugging issue, django_debug_mode must be true also'),
-  type=coerce_bool,
-  default=False)
-
-DJANGO_DEBUG_TOOL_USERS = Config(
-  key='django_debug_tool_users',
-  default='',
-  type=coerce_csv,
-  help=_('Comma separated list of users that allow to use django debug tool. If it is empty, all users are allowed.')
-)
 
 USE_NEW_ASSIST_PANEL = Config(
   key='use_new_assist_panel',
@@ -2079,15 +2103,15 @@ USE_THRIFT_HTTP_JWT = Config(
   key="use_thrift_http_jwt",
   help=_("Use JWT as Bearer header for authentication when using Thrift over HTTP transport."),
   type=coerce_bool,
-  dynamic_default=is_jwt_authentication_enabled
+  default=False
 )
 
 DISABLE_LOCAL_STORAGE = Config(
   key='disable_local_storage',
-  default="false",
+  default=False,
   type=coerce_bool,
-  help=_("Hue uses Localstorage to keep the users settings and database preferences."
-         "Please make this value true in case local storage should not be used")
+  help=_("Hue uses Localstorage to keep the users settings and database preferences,"
+         "please make this value true in case local storage should not be used.")
 )
 
 ENABLE_CONNECTORS = Config(
@@ -2163,6 +2187,28 @@ def has_raz_url():
   return bool(_get_raz_url())
 
 
+SDXAAS = ConfigSection(
+  key='sdxaas',
+  help=_("""Configuration for SDXaaS JWT support."""),
+  members=dict(
+    TOKEN_URL=Config(
+      key='token_url',
+      help=_('Comma separated host URLs to fetch token from.'),
+      type=coerce_string,
+      default='',
+    )
+  )
+)
+
+def is_sdxaas_jwt_enabled():
+  """Check if SDXaaS token url is configured"""
+  return bool(SDXAAS.TOKEN_URL.get())
+
+def handle_raz_api_auth():
+  """Return RAZ authentication type from JWT (if SDXaaS token URL is set) or KERBEROS"""
+  return 'jwt' if is_sdxaas_jwt_enabled() else 'kerberos'
+
+
 RAZ = ConfigSection(
   key='raz',
   help=_("""Configuration for RAZ service integration"""),
@@ -2181,9 +2227,15 @@ RAZ = ConfigSection(
     ),
     API_AUTHENTICATION=Config(
         key='api_authentication',
-        help=_('How to authenticate against: KERBEROS or JWT (not supported yet)'),
+        help=_('How to authenticate against: KERBEROS or JWT'),
         type=coerce_str_lowercase,
-        default='kerberos',
+        dynamic_default=handle_raz_api_auth,
+    ),
+    AUTOCREATE_USER_DIR=Config(
+      key='autocreate_user_dir',
+      help=_('Autocreate the user home directory in the remote storage home path.'),
+      type=coerce_bool,
+      default=True,
     ),
   )
 )
@@ -2547,3 +2599,73 @@ def is_gs_enabled():
 def has_gs_access(user):
   from desktop.auth.backend import is_admin
   return user.is_authenticated and user.is_active and (is_admin(user) or user.has_hue_permission(action="gs_access", app="filebrowser"))
+
+
+def get_ozone_conf_dir_default():
+  """
+  Get from environment variable OZONE_CONF_DIR or '/etc/ozone/conf'
+  """
+  return os.environ.get("OZONE_CONF_DIR", "/etc/ozone/conf")
+
+
+PERMISSION_ACTION_OFS = "ofs_access"
+
+OZONE = UnspecifiedConfigSection(
+  "ozone",
+  help="One entry for each Ozone cluster",
+  each=ConfigSection(
+    help="Information about a single Ozone cluster",
+    members=dict(
+      FS_DEFAULTFS=Config(
+          "fs_defaultfs",
+          help="The equivalent of fs.defaultFS (aka fs.default.name)",
+          type=str,
+          default=None
+      ),
+      LOGICAL_NAME=Config(
+          "logical_name",
+          default="",
+          type=str,
+          help=_('NameNode logical name.')
+      ),
+      WEBHDFS_URL=Config(
+          "webhdfs_url",
+          help="The URL to WebHDFS/HttpFS service. Defaults to the WebHDFS URL on the NameNode.",
+          type=str,
+          default=None
+      ),
+      SECURITY_ENABLED=Config(
+          "security_enabled",
+          help="Whether Ozone requires client to perform Kerberos authentication",
+          type=coerce_bool,
+          default=False
+      ),
+      SSL_CERT_CA_VERIFY=Config(
+          "ssl_cert_ca_verify",
+          help="Choose whether Hue should validate certificates received from the server.",
+          dynamic_default=default_ssl_validate,
+          type=coerce_bool
+      ),
+      TEMP_DIR=Config(
+          "temp_dir",
+          help="Ozone directory for temporary files",
+          default='/tmp',
+          type=str
+      ),
+      OZONE_CONF_DIR=Config(
+          key="ozone_conf_dir",
+          dynamic_default=get_ozone_conf_dir_default,
+          help="Directory of the Ozone configuration. Defaults to the env variable OZONE_CONF_DIR when set, or '/etc/ozone/conf'",
+          type=str
+      ),
+    )
+  )
+)
+
+def is_ofs_enabled():
+  return ('default' in list(OZONE.keys()) and OZONE['default'].get_raw() and OZONE['default'].WEBHDFS_URL.get())
+
+
+def has_ofs_access(user):
+  from desktop.auth.backend import is_admin
+  return user.is_authenticated and user.is_active and (is_admin(user) or user.has_hue_permission(action="ofs_access", app="filebrowser"))

@@ -1,0 +1,61 @@
+[
+  {
+    "namePrefix": "should not find errors",
+    "beforeCursor": "ADD FILES /tmp/test.txt \"/path with space/cde.txt\" '/path with space/fgh.txt';",
+    "afterCursor": "",
+    "noErrors": true,
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ADD ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "FILES"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest files",
+    "beforeCursor": "ADD FILES /boo/file.txt /",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestHdfs": { "path": "/" }
+    }
+  },
+  {
+    "namePrefix": "should suggest files",
+    "beforeCursor": "ADD FILES /boo/file1.txt \"/",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestHdfs": { "path": "/" }
+    }
+  },
+  {
+    "namePrefix": "should suggest files",
+    "beforeCursor": "ADD FILES '/boo/file2.txt' \"/foo/",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestHdfs": { "path": "/foo/" }
+    }
+  },
+  {
+    "namePrefix": "should suggest files",
+    "beforeCursor": "ADD FILES '/boo/file2.txt' /foo.txt '/foo /bar/bla",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestHdfs": { "path": "/foo /bar/" }
+    }
+  }
+]

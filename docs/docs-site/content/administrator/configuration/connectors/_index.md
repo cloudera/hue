@@ -32,13 +32,11 @@ Read about [how to build your own parser](/developer/development/#sql-parsers) i
 
 ### Connectors
 
-Admins can configure the connectors via the UI or [API](/developer/api/rest/#connectors). This feature requires Editor v2 and is quite functional despite not being offically released and on by default.
+Admins can configure the connectors via the UI or [API](/developer/api/rest/#connectors). This feature requires the Hue 5 feature flag set and is quite functional despite not being officially released and on by default.
 
     [desktop]
     enable_connectors=true
-
-    [notebook]
-    enable_notebook_2=true
+    enable_hue_5=true
 
 **NOTE:** After enabling the above flags, if a `django.db.utils.OperationalError: (1054, "Unknown column 'useradmin_huepermission.connector_id' in 'field list'")` error comes, then try **changing the DB name** in the hue.ini under `[[database]]` because there is no upgrade path and run the migrate command `./build/env/bin/hue migrate`.
 
@@ -115,6 +113,16 @@ In order to prevent spamming zookeeper, HiveServer2 is cached for the life of th
 
     [beeswax]
     cache_timeout = 60
+
+### HPL/SQL
+It is an Apache open source procedural extension for SQL for Hive users. This [HPL/SQL Editor](https://gethue.com/blog/2022-02-01-hplsql-support/) post demoes the integration.
+
+    [[[hplsql]]]
+    name=Hplsql
+    interface=hiveserver2
+**Note:** 
+- HPL/SQL uses the `[beeswax]` config like Hive uses.
+- In hplsql mode, you must terminate the commands using the forward slash character (/). The semicolon (;) is used throughout procedure declarations and can no longer be relied upon to terminate a query in the editor.
 
 ### Apache Impala
 
@@ -253,11 +261,11 @@ Then give Hue the information about the database source:
     [[[athena]]]
     name = AWS Athena
     interface=sqlalchemy
-    options='{"url": "awsathena+rest://${AWS_ACCESS_KEY_ID}:${AWS_SECRET_ACCESS_KEY}@athena.${REGION}.amazonaws.com:443/${SCHEMA}?s3_staging_dir=${S3_BUCKET_DIRECTORY}"}'
+    options='{"url": "awsathena+rest://${AWS_ACCESS_KEY_ID}:${AWS_SECRET_ACCESS_KEY}@athena.${REGION}.amazonaws.com:443/${SCHEMA}?s3_staging_dir=${S3_BUCKET_DIRECTORY}&work_group=${WORK_GROUP}&catalog_name=${CATALOG_NAME}"}'
 
 e.g.
 
-    options='{"url": "awsathena+rest://XXXXXXXXXXXXXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX@athena.us-west-2.amazonaws.com:443/default?s3_staging_dir=s3://gethue-athena/scratch"}'
+    options='{"url": "awsathena+rest://XXXXXXXXXXXXXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX@athena.us-west-2.amazonaws.com:443/default?s3_staging_dir=s3://gethue-athena/scratch&work_group=demo_group&catalog_name=AwsDataCatalog"}'
 
 Note: Keys and S3 buckets need to be URL quoted but Hue does it automatically for you.
 

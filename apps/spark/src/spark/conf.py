@@ -30,7 +30,7 @@ else:
   from django.utils.translation import ugettext_lazy as _t, ugettext as _
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 # Livy

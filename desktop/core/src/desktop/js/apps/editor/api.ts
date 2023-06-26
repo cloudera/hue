@@ -19,7 +19,7 @@ import { ExecutionStatus } from './execution/sqlExecutable';
 import { CancellablePromise } from 'api/cancellablePromise';
 import { get } from 'api/utils';
 
-const HISTORY_API_URL = '/api/editor/get_history';
+const HISTORY_API_URL = '/api/v1/editor/get_history';
 
 export const formatSql = async (options: {
   statements: string;

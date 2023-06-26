@@ -40,10 +40,10 @@
 </script>
 
 <style lang="scss" scoped>
-  @import '../styles/colors';
+  @import '../styles/variables';
 
   .dropdown-group-header {
-    color: $fluid-gray-800;
+    color: $fluidx-gray-800;
     font-weight: 500;
     padding: 6px 10px;
   }

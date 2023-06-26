@@ -43,7 +43,7 @@ else:
   from django.utils.translation import ugettext as _
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 SERIALIZATION_VERSION = '0.4.1'
 
@@ -83,10 +83,10 @@ class HQLdesign(object):
   want to use "$" natively, but we leave that as an advanced
   option to turn off.
   """
-  _QUERY_ATTRS = [ 'query', 'type', 'is_parameterized', 'email_notify', 'database' ]
-  _SETTINGS_ATTRS = [ 'key', 'value' ]
-  _FILE_RES_ATTRS = [ 'type', 'path' ]
-  _FUNCTIONS_ATTRS = [ 'name', 'class_name' ]
+  _QUERY_ATTRS = ['query', 'type', 'is_parameterized', 'email_notify', 'database']
+  _SETTINGS_ATTRS = ['key', 'value']
+  _FILE_RES_ATTRS = ['type', 'path']
+  _FUNCTIONS_ATTRS = ['name', 'class_name']
 
   def __init__(self, form=None, query_type=None):
     """Initialize the design from a valid form data."""
@@ -136,7 +136,10 @@ class HQLdesign(object):
   @property
   def statements(self):
     hql_query = strip_trailing_semicolon(self.hql_query)
-    return [strip_trailing_semicolon(statement) for (start_row, start_col), (end_row, end_col), statement in split_statements(hql_query)]
+    dialect = 'hplsql' if self._data_dict['query']['type'] == 4 else None
+    return [
+      strip_trailing_semicolon(statement) for (start_row, start_col), (end_row, end_col), statement in split_statements(hql_query, dialect)
+    ]
 
   @staticmethod
   def get_default_data_dict():
@@ -248,7 +251,7 @@ def normalize_form_dict(form, attr_list):
   Each attr is a field name. And the value is obtained by looking up the form's data dict.
   """
   assert isinstance(form, forms.Form)
-  res = { }
+  res = {}
   for attr in attr_list:
     res[attr] = form.cleaned_data.get(attr)
   return res
@@ -259,7 +262,7 @@ def normalize_formset_dict(formset, attr_list):
   normalize_formset_dict(formset, attr_list) -> A list of dictionary of (attr, value)
   """
   assert isinstance(formset, BaseSimpleFormSet)
-  res = [ ]
+  res = []
   for form in formset.forms:
     res.append(normalize_form_dict(form, attr_list))
   return res

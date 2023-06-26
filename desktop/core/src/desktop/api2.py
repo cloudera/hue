@@ -20,11 +20,13 @@ standard_library.install_aliases()
 from builtins import map
 import logging
 import os
+import re
 import json
 import sys
 import tempfile
 import zipfile
 
+from collections import defaultdict
 from datetime import datetime
 
 from django.core import management
@@ -45,7 +47,7 @@ from useradmin.models import User, Group
 
 from desktop import appmanager
 from desktop.auth.backend import is_admin
-from desktop.conf import ENABLE_CONNECTORS, ENABLE_GIST_PREVIEW, get_clusters, IS_K8S_ONLY, ENABLE_SHARING
+from desktop.conf import ENABLE_CONNECTORS, ENABLE_GIST_PREVIEW, CUSTOM, get_clusters, IS_K8S_ONLY, ENABLE_SHARING
 from desktop.lib.conf import BoundContainer, GLOBAL_CONFIG, is_anonymous
 from desktop.lib.django_util import JsonResponse, login_notrequired, render
 from desktop.lib.exceptions_renderable import PopupException
@@ -54,7 +56,9 @@ from desktop.lib.i18n import smart_str, force_unicode
 from desktop.lib.paths import get_desktop_root
 from desktop.models import Document2, Document, Directory, FilesystemException, uuid_default, \
   UserPreferences, get_user_preferences, set_user_preferences, get_cluster_config, __paginate, _get_gist_document
-from desktop.views import serve_403_error
+from desktop.views import get_banner_message, serve_403_error
+
+from hadoop.cluster import is_yarn
 
 if sys.version_info[0] > 2:
   from io import StringIO as string_io
@@ -63,7 +67,7 @@ else:
   from StringIO import StringIO as string_io
   from django.utils.translation import ugettext as _
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 def api_error_handler(func):
@@ -82,11 +86,19 @@ def api_error_handler(func):
 
   return decorator
 
+@api_error_handler
+def get_banners(request):
+  banners = {
+    'system': get_banner_message(request),
+    'configured': CUSTOM.BANNER_TOP_HTML.get()
+  }
+  return JsonResponse(banners)
 
 @api_error_handler
 def get_config(request):
   config = get_cluster_config(request.user)
   config['hue_config']['is_admin'] = is_admin(request.user)
+  config['hue_config']['is_yarn_enabled'] = is_yarn()
   config['clusters'] = list(get_clusters(request.user).values())
   config['documents'] = {
     'types': list(Document2.objects.documents(user=request.user).order_by().values_list('type', flat=True).distinct())
@@ -137,6 +149,7 @@ def get_hue_config(request):
           conf['value'] = str(module.get_raw())
         else:
           conf['value'] = str(module.get_raw()).decode('utf-8', 'replace')
+        conf['value'] = re.sub('(.*)://(.*):(.*)@(.*)', r'\1://\2:**********@\4', conf['value'])
       attrs.append(conf)
 
     return attrs
@@ -803,6 +816,54 @@ def export_documents(request):
     return make_response(f.getvalue(), 'json', filename)
 
 
+def topological_sort(docs):
+
+  '''There is a bug in django 1.11 (https://code.djangoproject.com/ticket/26291)
+     and we are handling it via sorting the given documents in topological format.
+     
+     Hence this function is needed only if we are using Python2 based Hue as it uses django 1.11
+     and python3 based Hue don't require this method as it uses django 3.2.
+
+     input => docs: -> list of documents which needs to import in Hue
+     output => serialized_doc: -> list of sorted documents 
+     (if document1 is dependent on document2 then document1 is listed after document2)'''
+
+  size = len(docs)
+  graph = defaultdict(list)
+  for doc in docs:     ## creating a graph, assuming a document is a node of graph
+    dep_size = len(doc['fields']['dependencies'])
+    for i in range(dep_size):
+      graph[(doc['fields']['dependencies'])[i][0]].append(doc['fields']['uuid'])
+
+  visited = {}
+  _doc = {}
+  for doc in docs:     ## making all the nodes of graph unvisited and capturing the doc in the dict with uuid as key
+    _doc[doc['fields']['uuid']] = doc
+    visited[doc['fields']['uuid']] = False
+  
+  stack = []
+  for doc in docs:     ## calling _topological_sort function to sort the doc if node is not visited
+    if visited[doc['fields']['uuid']] == False:
+      _topological_sort(doc['fields']['uuid'], visited, stack, graph)
+  
+  stack = stack[::-1]  ## list is in revered order so we are just reversing it
+
+  serialized_doc = []
+  for i in range(size):
+    serialized_doc.append(_doc[stack[i]])
+    
+  return serialized_doc
+
+
+def _topological_sort(vertex, visited, stack, graph):
+  visited[vertex] = True
+  for i in graph[vertex]:
+    if visited[i] == False:
+      _topological_sort(i, visited, stack, graph)
+
+  stack.append(vertex)
+
+
 @ensure_csrf_cookie
 def import_documents(request):
   def is_reserved_directory(doc):
@@ -857,6 +918,11 @@ def import_documents(request):
       # Set last modified date to now
       doc['fields']['last_modified'] = datetime.now().replace(microsecond=0).isoformat()
       docs.append(doc)
+  
+  if sys.version_info[0] < 3:
+    ## In Django 1.11 loaddata cannot deserialize fixtures with forward references hence 
+    ## calling the topological_sort function to sort the document
+    docs = topological_sort(docs)
 
   f = tempfile.NamedTemporaryFile(mode='w+', suffix='.json')
   f.write(json.dumps(docs))

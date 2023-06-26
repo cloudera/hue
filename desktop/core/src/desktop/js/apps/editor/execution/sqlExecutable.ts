@@ -79,7 +79,7 @@ export interface SqlExecutableRaw extends ExecutableRaw {
 }
 
 const BATCHABLE_STATEMENT_TYPES =
-  /ALTER|ANALYZE|WITH|REFRESH|CREATE|DELETE|DROP|GRANT|INSERT|INVALIDATE|LOAD|SET|TRUNCATE|UPDATE|UPSERT|USE/i;
+  /ALTER|ANALYZE|WITH|REFRESH|CREATE|DELETE|DROP|GRANT|INSERT|INVALIDATE|LOAD|SET|TRUNCATE|UPDATE|FROM|UPSERT|USE/i;
 const SELECT_END_REGEX = /([^;]*)([;]?[^;]*)/;
 const ERROR_REGEX = /line ([0-9]+)(:([0-9]+))?/i;
 const TABLE_DDL_REGEX =
@@ -288,12 +288,10 @@ export default class SqlExecutable {
 
       if (this.handle && this.handle.has_result_set && this.handle.sync) {
         this.result = new ExecutionResult(this);
-        if (this.handle.sync) {
-          if (this.handle.result) {
-            this.result.handleResultResponse(this.handle.result);
-          }
-          this.result.fetchRows();
+        if (this.handle.result) {
+          this.result.handleResultResponse(this.handle.result);
         }
+        this.result.fetchRows();
       }
 
       if (this.executor.isSqlAnalyzerEnabled && this.history) {
@@ -326,6 +324,10 @@ export default class SqlExecutable {
     actualCheckCount++;
 
     const queryStatus = await checkExecutionStatus({ executable: this });
+
+    if (this.handle && typeof queryStatus.has_result_set !== 'undefined') {
+      this.handle.has_result_set = queryStatus.has_result_set;
+    }
 
     switch (queryStatus.status) {
       case ExecutionStatus.success:

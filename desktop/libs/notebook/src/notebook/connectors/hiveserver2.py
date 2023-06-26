@@ -50,19 +50,19 @@ else:
   from django.utils.translation import ugettext as _
   from urllib import quote as urllib_quote, unquote as urllib_unquote
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 try:
   from beeswax import conf as beeswax_conf, data_export
   from beeswax.api import _autocomplete, _get_sample_data
   from beeswax.conf import CONFIG_WHITELIST as hive_settings, DOWNLOAD_ROW_LIMIT, DOWNLOAD_BYTES_LIMIT, MAX_NUMBER_OF_SESSIONS, \
-      has_session_pool, has_multiple_sessions, CLOSE_SESSIONS, HPLSQL
+      has_session_pool, has_multiple_sessions, CLOSE_SESSIONS
   from beeswax.data_export import upload
   from beeswax.design import hql_query
   from beeswax.models import QUERY_TYPES, HiveServerQueryHandle, HiveServerQueryHistory, QueryHistory, Session
   from beeswax.server import dbms
-  from beeswax.server.dbms import get_query_server_config, QueryServerException
+  from beeswax.server.dbms import get_query_server_config, QueryServerException, reset_ha
   from beeswax.views import parse_out_jobs, parse_out_queries
 except ImportError as e:
   LOG.warning('Hive and HiveServer2 interfaces are not enabled: %s' % e)
@@ -101,6 +101,8 @@ def query_error_handler(func):
       message = force_unicode(str(e))
       if 'timed out' in message:
         raise OperationTimeout(e)
+      elif 'Connection refused' in message or 'Name or service not known' in message or 'Could not connect to any' in message:
+        reset_ha()
       else:
         raise QueryError(message)
     except QueryServerException as e:
@@ -180,20 +182,36 @@ class HS2Api(Api):
   @query_error_handler
   def create_session(self, lang='hive', properties=None):
     application = 'beeswax' if lang == 'hive' or lang == 'llap' else lang
-    if application == 'beeswax' and HPLSQL.get():
-      application = 'hplsql'
 
-    if has_session_pool():
-      session = Session.objects.get_tez_session(self.user, application, MAX_NUMBER_OF_SESSIONS.get())
-    elif not has_multiple_sessions():
-      session = Session.objects.get_session(self.user, application=application)
-    else:
-      session = None
+    uses_session_pool = has_session_pool()
+    uses_multiple_sessions = has_multiple_sessions()
+
+    if lang == 'impala':
+      uses_session_pool = False
+      uses_multiple_sessions = False
+
+    try:
+      if uses_session_pool:
+        session = Session.objects.get_tez_session(self.user, application, MAX_NUMBER_OF_SESSIONS.get())
+      elif not uses_multiple_sessions:
+        session = Session.objects.get_session(self.user, application=application)
+      else:
+        session = None
+    except Exception as e:
+      if 'Connection refused' in str(e) or 'Name or service not known' in str(e):
+        LOG.exception('Connection being refused or service is not available in either session or in multiple sessions'
+                      '- HA failover')
+        reset_ha()
 
     reuse_session = session is not None
     if not reuse_session:
       db = dbms.get(self.user, query_server=get_query_server_config(name=lang, connector=self.interpreter))
-      session = db.open_session(self.user)
+      try:
+        session = db.open_session(self.user)
+      except Exception as e:
+        if 'Connection refused' in str(e) or 'Name or service not known' in str(e):
+          LOG.exception('Connection being refused or service is not available in reuse session - HA failover')
+          reset_ha()
 
     response = {
       'type': lang,
@@ -278,8 +296,13 @@ class HS2Api(Api):
       except Exception as e:
         LOG.exception('Error closing statement %s' % str(e))
 
+    close_sessions = CLOSE_SESSIONS.get()
+
+    if session['type'] == 'impala':
+      close_sessions = False
+
     try:
-      if idle and CLOSE_SESSIONS.get():
+      if idle and close_sessions:
         response['result'].append(self.close_session(session))
     except QueryExpired:
       pass
@@ -639,15 +662,13 @@ class HS2Api(Api):
     hql = '''
 DROP TABLE IF EXISTS `%(table)s`;
 
-CREATE TABLE `%(table)s` ROW FORMAT DELIMITED
+CREATE EXTERNAL TABLE `%(table)s` ROW FORMAT DELIMITED
      FIELDS TERMINATED BY '\\t'
      ESCAPED BY '\\\\'
      LINES TERMINATED BY '\\n'
      STORED AS TEXTFILE LOCATION '%(location)s'
      AS
 %(hql)s;
-
-ALTER TABLE `%(table)s` SET TBLPROPERTIES('EXTERNAL'='TRUE');
 
 DROP TABLE IF EXISTS `%(table)s`;
     ''' % {
@@ -694,8 +715,6 @@ DROP TABLE IF EXISTS `%(table)s`;
       session_id = session.get('id')
       if session_id:
         filters = {'id': session_id, 'application': 'beeswax' if type == 'hive' or type == 'llap' else type}
-        if HPLSQL.get() and filters['application'] == 'beeswax':
-          filters['application'] = 'hplsql'
         if not is_admin(self.user):
           filters['owner'] = self.user
         return Session.objects.get(**filters)
@@ -741,10 +760,11 @@ DROP TABLE IF EXISTS `%(table)s`;
       functions = next((prop['value'] for prop in properties if prop['key'] == 'functions'), None)
 
     database = snippet.get('database') or 'default'
+    query_type = QUERY_TYPES[4] if 'dialect' in snippet and snippet['dialect'] == 'hplsql' else QUERY_TYPES[0]
 
     return hql_query(
       statement,
-      query_type=QUERY_TYPES[0],
+      query_type=query_type,
       settings=settings,
       file_resources=file_resources,
       functions=functions,
@@ -796,6 +816,8 @@ DROP TABLE IF EXISTS `%(table)s`;
       name = 'llap'
     elif dialect == 'impala':
       name = 'impala'
+    elif dialect == 'hplsql':
+      name = 'hplsql'
     else:
       name = 'sparksql'
 

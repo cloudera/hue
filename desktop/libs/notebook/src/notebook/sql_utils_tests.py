@@ -17,9 +17,9 @@
 # limitations under the License.
 
 from beeswax.design import hql_query
-from notebook.sql_utils import strip_trailing_semicolon, split_statements, get_hplsql_statements
+from notebook.sql_utils import strip_trailing_semicolon, split_statements
 
-from nose.tools import assert_equal
+from nose.tools import assert_equal, assert_not_equal
 
 
 def test_split_statements():
@@ -53,5 +53,10 @@ def test_get_hplsql_statements():
   # Not spliting statements at semicolon
   assert_equal(
     "CREATE FUNCTION hello()\n RETURNS STRING\nBEGIN\n RETURN 'Hello, world';\nEND",
-    get_hplsql_statements("CREATE FUNCTION hello()\n RETURNS STRING\nBEGIN\n RETURN 'Hello, world';\nEND;")[0]['statement']
+    split_statements("CREATE FUNCTION hello()\n RETURNS STRING\nBEGIN\n RETURN 'Hello, world';\nEND", 'hplsql')[0][2]
+  )
+
+  assert_not_equal(
+    "CREATE FUNCTION hello()\n RETURNS STRING\nBEGIN\n RETURN 'Hello, world';\nEND",
+    split_statements("CREATE FUNCTION hello()\n RETURNS STRING\nBEGIN\n RETURN 'Hello, world';\nEND")[0][2]
   )

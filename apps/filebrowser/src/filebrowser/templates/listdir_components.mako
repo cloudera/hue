@@ -354,23 +354,23 @@ else:
           <tbody>
             <tr>
               <td><strong>${_('Read')}</strong></td>
-              <td class="center"><input type="checkbox" data-bind="attr: {checked: selectedFile.mode }" checked="" name="user_read"></td>
-              <td class="center"><input type="checkbox" data-bind="attr: {checked: selectedFile.mode }" checked="" name="group_read"></td>
-              <td class="center"><input type="checkbox" data-bind="attr: {checked: selectedFile.mode }" checked="" name="other_read"></td>
+              <td class="center"><input type="checkbox" name="user_read"></td>
+              <td class="center"><input type="checkbox" name="group_read"></td>
+              <td class="center"><input type="checkbox" name="other_read"></td>
               <td colspan="2">&nbsp;</td>
             </tr>
             <tr>
               <td><strong>${_('Write')}</strong></td>
-              <td class="center"><input type="checkbox" data-bind="attr: {checked: selectedFile.mode }" checked="" name="user_write"></td>
-              <td class="center"><input type="checkbox" data-bind="attr: {checked: selectedFile.mode }" checked="" name="group_write"></td>
-              <td class="center"><input type="checkbox" data-bind="attr: {checked: selectedFile.mode }" checked="" name="other_write"></td>
+              <td class="center"><input type="checkbox" name="user_write"></td>
+              <td class="center"><input type="checkbox" name="group_write"></td>
+              <td class="center"><input type="checkbox" name="other_write"></td>
               <td colspan="2">&nbsp;</td>
             </tr>
             <tr>
               <td><strong>${_('Execute')}</strong></td>
-              <td class="center"><input type="checkbox" checked="" name="user_execute"></td>
-              <td class="center"><input type="checkbox" checked="" name="group_execute"></td>
-              <td class="center"><input type="checkbox" checked="" name="other_execute"></td>
+              <td class="center"><input type="checkbox" name="user_execute"></td>
+              <td class="center"><input type="checkbox" name="group_execute"></td>
+              <td class="center"><input type="checkbox" name="other_execute"></td>
               <td colspan="2">&nbsp;</td>
             </tr>
             <tr>
@@ -461,26 +461,32 @@ else:
     <div id="createDirectoryModal" class="modal hide fade">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
-        <!-- ko if: (!isS3() && !isABFS()) || (isS3() && !isS3Root()) || (isABFS() && !isABFSRoot()) -->
+        <!-- ko if: (!isS3() && !isABFS() && !isOFS()) || (isS3() && !isS3Root()) || (isABFS() && !isABFSRoot()) || (isOFS() && !isOFSServiceID() && !isOFSVol())  -->
         <h2 class="modal-title">${_('Create Directory')}</h2>
         <!-- /ko -->
-        <!-- ko if: isS3() && isS3Root() -->
+        <!-- ko if: (isS3() && isS3Root()) || (isOFS() && isOFSVol()) -->
         <h2 class="modal-title">${_('Create Bucket')}</h2>
         <!-- /ko -->
         <!-- ko if: isABFS() && isABFSRoot() -->
         <h2 class="modal-title">${_('Create File System')}</h2>
         <!-- /ko -->
+        <!-- ko if: isOFS() && isOFSServiceID() -->
+        <h2 class="modal-title">${_('Create Volume')}</h2>
+        <!-- /ko -->
       </div>
       <div class="modal-body">
         <label>
-          <!-- ko if: (!isS3() && !isABFS()) || (isS3() && !isS3Root()) || (isABFS() && !isABFSRoot()) -->
+          <!-- ko if: (!isS3() && !isABFS() && !isOFS()) || (isS3() && !isS3Root()) || (isABFS() && !isABFSRoot()) || (isOFS() && !isOFSServiceID() && !isOFSVol()) -->
           ${_('Directory Name')}
           <!-- /ko -->
-          <!-- ko if: isS3() && isS3Root() -->
+          <!-- ko if: (isS3() && isS3Root()) || (isOFS() && isOFSVol()) -->
           ${_('Bucket Name')}
           <!-- /ko -->
           <!-- ko if: isABFS() && isABFSRoot() -->
           ${_('File System Name')}
+          <!-- /ko -->
+          <!-- ko if: isOFS() && isOFSServiceID() -->
+          ${_('Volume Name')}
           <!-- /ko -->
           <input id="newDirectoryNameInput" name="name" value="" type="text" class="input-xlarge"/></label>
           <input type="hidden" name="path" data-bind="value: currentPath"/>
@@ -494,6 +500,12 @@ else:
         </div>
         <div id="smallFileSystemNameAlert" class="hide" style="position: absolute; left: 10px;">
           <span class="label label-important"><span class="newName"></span> ${_('File system requires namesize to be 3 or more characters')}</span>
+        </div>
+        <div id="volumeBucketNameAlert" class="hide" style="position: absolute; left: 10px;">
+          <span class="label label-important"><span class="newName"></span> ${_('Volume and Bucket name should be 3 to 63 characters.')}</span>
+        </div>
+        <div id="upperCaseVolumeBucketNameAlert" class="hide" style="position: absolute; left: 10px;">
+          <span class="label label-important"><span class="newName"></span> ${_('Upper case characters are not supported for Volume and Bucket names.')}</span>
         </div>
         <a class="btn" href="#" data-dismiss="modal">${_('Cancel')}</a>
         <input class="btn btn-primary" type="submit" value="${_('Create')}" />
@@ -575,12 +587,12 @@ else:
   <!-- actions context menu -->
   <ul class="context-menu dropdown-menu">
   <!-- ko ifnot: $root.inTrash -->
-    <li data-bind="visible: (!isS3() && !isABFS()) || (isS3() && !isS3Root()) || (isABFS() && !isABFSRoot()), css: {'disabled': $root.selectedFiles().length != 1 || isCurrentDirSelected().length > 0}">
+    <li data-bind="visible: (!isS3() && !isABFS() && !isOFS()) || (isS3() && !isS3Root()) || (isABFS() && !isABFSRoot()) || (isOFS() && !isOFSServiceID() && !isOFSVol()), css: {'disabled': $root.selectedFiles().length != 1 || isCurrentDirSelected().length > 0}">
     <a href="javascript: void(0)" title="${_('Rename')}" data-bind="click: ($root.selectedFiles().length == 1 && isCurrentDirSelected().length == 0) ? $root.renameFile: void(0)"><i class="fa fa-fw fa-font"></i>
     ${_('Rename')}</a></li>
-    <li data-bind="visible: (!isS3() && !isABFS()) || (isS3() && !isS3Root()) || (isABFS() && !isABFSRoot()), css: {'disabled': $root.selectedFiles().length == 0 || isCurrentDirSelected().length > 0}">
+    <li data-bind="visible: (!isS3() && !isABFS() && !isOFS()) || (isS3() && !isS3Root()) || (isABFS() && !isABFSRoot()) || (isOFS() && !isOFSServiceID() && !isOFSVol()), css: {'disabled': $root.selectedFiles().length == 0 || isCurrentDirSelected().length > 0}">
     <a href="javascript: void(0)" title="${_('Move')}" data-bind="click: ( $root.selectedFiles().length > 0 && isCurrentDirSelected().length == 0) ? $root.move: void(0)"><i class="fa fa-fw fa-random"></i> ${_('Move')}</a></li>
-    <li data-bind="visible: (!isS3() && !isABFS()) || (isS3() && !isS3Root()) || (isABFS() && !isABFSRoot()), css: {'disabled': $root.selectedFiles().length == 0 || isCurrentDirSelected().length > 0}">
+    <li data-bind="visible: (!isS3() && !isABFS() && !isOFS()) || (isS3() && !isS3Root()) || (isABFS() && !isABFSRoot()) || (isOFS() && !isOFSServiceID() && !isOFSVol()), css: {'disabled': $root.selectedFiles().length == 0 || isCurrentDirSelected().length > 0}">
     <a href="javascript: void(0)" title="${_('Copy')}" data-bind="click: ($root.selectedFiles().length > 0 && isCurrentDirSelected().length == 0) ? $root.copy: void(0)"><i class="fa fa-fw fa-files-o"></i> ${_('Copy')}</a></li>
     % if show_download_button:
     <li data-bind="css: {'disabled': $root.inTrash() || $root.selectedFiles().length != 1 || selectedFile().type != 'file'}">
@@ -801,16 +813,6 @@ else:
       return (bytes / Math.pow(k, i)).toPrecision(dm) + ' ' + sizes[i];
     }
 
-    var updateHash = function (hash) {
-      hash = encodeURI(decodeURIComponent(hash));
-      %if not is_embeddable:
-      window.location.hash = hash;
-      %else:
-      hueUtils.changeURL('#' + hash);
-      huePubSub.publish('fb.update.hash');
-      %endif
-    }
-
     var Page = function (page) {
       if (page != null) {
         return {
@@ -916,11 +918,11 @@ else:
               if (this.url == null || this.url == "") {
                 // forcing root on empty breadcrumb url
                 this.url = "/";
-              }
-
-              fileBrowserViewModel.targetPageNum(1);
-              fileBrowserViewModel.targetPath("${url('filebrowser:filebrowser.views.view', path='')}" + stripHashes(this.url));
-              updateHash(this.url);
+              }              
+              fileBrowserViewModel.targetPageNum(1);              
+              const pathPrefix = "${url('filebrowser:filebrowser.views.view', path='')}";
+              huePubSub.publish('open.filebrowserlink', { pathPrefix, decodedPath: this.url, fileBrowserModel: fileBrowserViewModel});
+              window.hueAnalytics.log('filebrowser', 'directory-breadcrumb-navigation');             
             }
             else {
               window.open($(e.target).attr('href'));
@@ -1055,7 +1057,8 @@ else:
       };
 
       self.currentPath = ko.observable(currentDirPath);
-      self.currentPath.subscribe(function (path) {
+
+      self.currentPath.subscribe(function (path) {        
         $(document).trigger('currPathLoaded', { path: path });
       });
 
@@ -1071,6 +1074,10 @@ else:
         return self.currentPath().toLowerCase().indexOf('abfs://') === 0;
       });
 
+      self.isOFS = ko.pureComputed(function () {
+        return self.currentPath().toLowerCase().indexOf('ofs://') === 0;
+      });
+
       self.scheme = ko.pureComputed(function () {
         var path = self.currentPath();
         return path.substring(0, path.indexOf(':/')) || "hdfs";
@@ -1082,6 +1089,8 @@ else:
           return 'adls';
         } else if (scheme === 's3a' ){
           return 's3';
+        } else if (scheme === 'ofs' ){
+          return 'ofs';
         } else if (!scheme || scheme == 'hdfs') {
           return 'hdfs';
         } else {
@@ -1097,6 +1106,8 @@ else:
           return 'adl:/';
         } else if (path.indexOf('abfs://') >= 0) {
           return 'abfs://';
+        } else if (path.indexOf('ofs://') >= 0) {
+          return 'ofs://';
         } else {
           return '/';
         }
@@ -1115,13 +1126,13 @@ else:
         return currentPath.indexOf('/') === 0 || currentPath.indexOf('hdfs') === 0
       });
       self.isCompressEnabled = ko.pureComputed(function () {
-        return !self.isS3() && !self.isAdls() && !self.isABFS();
+        return !self.isS3() && !self.isAdls() && !self.isABFS() && !self.isOFS();
       });
       self.isSummaryEnabled = ko.pureComputed(function () {
-        return self.isHdfs();
+        return self.isHdfs() || self.isOFS();
       });
       self.isPermissionEnabled = ko.pureComputed(function () {
-        return !self.isS3() && !self.isABFSRoot();
+        return !self.isS3() && !self.isABFSRoot() && !self.isOFS();
       });
       self.isReplicationEnabled = ko.pureComputed(function () {
         return self.isHdfs();
@@ -1139,6 +1150,18 @@ else:
 
       self.isABFSRoot = ko.pureComputed(function () {
         return self.isABFS() && self.currentPath().toLowerCase() === 'abfs://';
+      });
+
+      self.isOFSRoot = ko.pureComputed(function () {
+        return self.isOFS() && self.currentPath().toLowerCase() === 'ofs://';
+      });
+
+      self.isOFSServiceID = ko.pureComputed(function () {
+        return self.isOFS() && self.currentPath().split("/").length === 3 && self.currentPath().split("/")[2] !== '';
+      });
+
+      self.isOFSVol = ko.pureComputed(function () {
+        return self.isOFS() && self.currentPath().split("/").length === 4 && self.currentPath().split("/")[3] !== '';
       });
 
       self.inTrash = ko.computed(function() {
@@ -1162,7 +1185,7 @@ else:
       self.showSummary = function () {
         self.isLoadingSummary(true);
         $("#contentSummaryModal").modal("show");
-        $.getJSON("${url('filebrowser:content_summary', path='')}" + self.selectedFile().path, function (data) {
+        $.getJSON("${url('filebrowser:content_summary', path='')}" + encodeURIComponent(self.selectedFile().path), function (data) {
           if (data.status == 0) {
             self.contentSummary(ko.mapping.fromJS(data.summary));
             self.isLoadingSummary(false);
@@ -1182,8 +1205,8 @@ else:
 
       self.retrieveData = function (clearAssistCache) {
         self.isLoading(true);
-
-        $.getJSON(self.targetPath() + (self.targetPath().indexOf('?') > 0 ? '&' : '?') + "pagesize=" + self.recordsPerPage() + "&pagenum=" + self.targetPageNum() + "&filter=" + self.searchQuery() + "&sortby=" + self.sortBy() + "&descending=" + self.sortDescending() + "&format=json", function (data) {
+        const encodedSearchFilter = encodeURIComponent(self.searchQuery());
+        $.getJSON(self.targetPath() + (self.targetPath().indexOf('?') > 0 ? '&' : '?') + "pagesize=" + self.recordsPerPage() + "&pagenum=" + self.targetPageNum() + "&filter=" + encodedSearchFilter + "&sortby=" + self.sortBy() + "&descending=" + self.sortDescending() + "&format=json", function (data) {
           if (data.error){
             $(document).trigger("error", data.error);
             self.isLoading(false);
@@ -1322,6 +1345,7 @@ else:
 
       self.searchQuery.subscribe(function (newValue) {
         if (newValue !== '' || self.enableFilterAfterSearch) {
+          window.hueAnalytics.log('filebrowser', newValue === '' ? 'search-file-name-clear' : 'search-file-name');
           self.filter();
         }
         self.enableFilterAfterSearch = true;
@@ -1340,7 +1364,6 @@ else:
             e.preventDefault();
             fileBrowserViewModel.targetPageNum(1);
             fileBrowserViewModel.targetPath("${url('filebrowser:filebrowser.views.view', path='')}?" + folderPath);
-            updateHash('');
             fileBrowserViewModel.retrieveData();
           }
           else {
@@ -1351,6 +1374,7 @@ else:
 
       self.openHome = function (vm, e) {
         self.openDefaultFolder(vm, e, 'default_to_home');
+        window.hueAnalytics.log('filebrowser', 'home-btn-click');
       }
 
       self.openTrash = function (vm, e) {
@@ -1359,28 +1383,23 @@ else:
 
       self.viewFile = function (file, e) {
         e.stopImmediatePropagation();
+        const decodedPath = file.path;
+        const pathPrefix = "${url('filebrowser:filebrowser.views.view', path='')}";
+
         if (file.type == "dir") {
           // Reset page number so that we don't hit a page that doesn't exist
-          self.targetPageNum(1);
+          self.targetPageNum(1);        
           self.enableFilterAfterSearch = false;
           self.searchQuery("");
-          self.targetPath(file.url);
-          updateHash(stripHashes(file.path));
+          huePubSub.publish('open.filebrowserlink', { pathPrefix, decodedPath, fileBrowserModel: self });
         } else {
-          %if is_embeddable:
-          huePubSub.publish('open.link', file.url);
-          %else:
-          window.location.href = file.url;
-          %endif
-        }
-      };
-
-      self.editFile = function () {
-        huePubSub.publish('open.link', self.selectedFile().url.replace("${url('filebrowser:filebrowser.views.view', path='')}", "${url('filebrowser:filebrowser_views_edit', path='')}"));
+          huePubSub.publish('open.filebrowserlink', { pathPrefix, decodedPath });
+        }        
       };
 
       self.downloadFile = function () {
-        huePubSub.publish('open.link', self.selectedFile().url.replace("${url('filebrowser:filebrowser.views.view', path='')}", "${url('filebrowser:filebrowser_views_download', path='')}"));
+        huePubSub.publish('ignore.next.unload');
+        huePubSub.publish('open.filebrowserlink', { pathPrefix: '/filebrowser/download=', decodedPath: self.selectedFile().path });  
       };
 
       self.renameFile = function () {
@@ -1390,7 +1409,7 @@ else:
 
         $("#newNameInput").val(self.selectedFile().name);
 
-        $("#renameForm").attr("action", "/filebrowser/rename?next=${url('filebrowser:filebrowser.views.view', path='')}" + self.currentPath());
+        $("#renameForm").attr("action", "/filebrowser/rename?next=${url('filebrowser:filebrowser.views.view', path='')}" + encodeURIComponent(self.currentPath()));
 
         $('#renameForm').ajaxForm({
           dataType:  'json',
@@ -1412,7 +1431,7 @@ else:
 
         $("#setReplFileName").text(self.selectedFile().path);
 
-        $("#setReplicationFactorForm").attr("action", "/filebrowser/set_replication?next=${url('filebrowser:filebrowser.views.view', path='')}" + self.currentPath());
+        $("#setReplicationFactorForm").attr("action", "/filebrowser/set_replication?next=${url('filebrowser:filebrowser.views.view', path='')}" + encodeURIComponent(self.currentPath()));
 
         $('#setReplicationFactorForm').ajaxForm({
           dataType: 'json',
@@ -1448,7 +1467,7 @@ else:
 
         if (!isMoveOnSelf){
           hiddenFields($("#moveForm"), "src_path", paths);
-          $("#moveForm").attr("action", "/filebrowser/move?next=${url('filebrowser:filebrowser.views.view', path='')}" + self.currentPath());
+          $("#moveForm").attr("action", "/filebrowser/move?next=${url('filebrowser:filebrowser.views.view', path='')}" + encodeURIComponent(self.currentPath()));
           $('#moveForm').ajaxForm({
             dataType:  'json',
             success: function() {
@@ -1506,7 +1525,7 @@ else:
 
         hiddenFields($("#copyForm"), "src_path", paths);
 
-        $("#copyForm").attr("action", "/filebrowser/copy?next=${url('filebrowser:filebrowser.views.view', path='')}" + self.currentPath());
+        $("#copyForm").attr("action", "/filebrowser/copy?next=${url('filebrowser:filebrowser.views.view', path='')}" + encodeURIComponent(self.currentPath()));
 
         $("#copyModal").modal({
           keyboard:true,
@@ -1558,7 +1577,7 @@ else:
 
           hiddenFields($("#chownForm"), 'path', paths);
 
-          $("#chownForm").attr("action", "/filebrowser/chown?next=${url('filebrowser:filebrowser.views.view', path='')}" + self.currentPath());
+          $("#chownForm").attr("action", "/filebrowser/chown?next=${url('filebrowser:filebrowser.views.view', path='')}" + encodeURIComponent(self.currentPath()));
 
           $("select[name='user']").val(self.selectedFile().stats.user);
 
@@ -1598,6 +1617,7 @@ else:
       };
 
       self.changePermissions = function (data, event) {
+        window.hueAnalytics.log('filebrowser', 'actions-menu/change-permissions-click');
         if (!self.isCurrentDirSentryManaged()) {
           var paths = [];
 
@@ -1610,7 +1630,7 @@ else:
 
           hiddenFields($("#chmodForm"), 'path', paths);
 
-          $("#chmodForm").attr("action", "/filebrowser/chmod?next=${url('filebrowser:filebrowser.views.view', path='')}" + self.currentPath());
+          $("#chmodForm").attr("action", "/filebrowser/chmod?next=${url('filebrowser:filebrowser.views.view', path='')}" + encodeURIComponent(self.currentPath()));
 
           $("#changePermissionModal").modal({
             keyboard: true,
@@ -1638,9 +1658,9 @@ else:
 
           for (var i = 0; i < permissions.length; i++) {
             if (mode & 1) {
-              $("#chmodForm input[name='" + permissions[i] + "']").attr("checked", true);
+              $("#chmodForm input[name='" + permissions[i] + "']").prop("checked", true);
             } else {
-              $("#chmodForm input[name='" + permissions[i] + "']").attr("checked", false);
+              $("#chmodForm input[name='" + permissions[i] + "']").prop("checked", false);
             }
             mode >>>= 1;
           }
@@ -1658,7 +1678,7 @@ else:
 
         $("#deleteForm").attr("action", "/filebrowser/rmtree" + "?" +
           (self.skipTrash() ? "skip_trash=true&" : "") +
-          "next=${url('filebrowser:filebrowser.views.view', path='')}" + self.currentPath());
+          "next=${url('filebrowser:filebrowser.views.view', path='')}" + encodeURIComponent(self.currentPath()));
 
         $("#deleteModal").modal({
           keyboard:true,
@@ -1823,7 +1843,7 @@ else:
       };
 
       self.createDirectory = function (formElement) {
-        $(formElement).attr("action", "/filebrowser/mkdir?next=${url('filebrowser:filebrowser.views.view', path='')}" + self.currentPath());
+        $(formElement).attr("action", "/filebrowser/mkdir?next=${url('filebrowser:filebrowser.views.view', path='')}" + encodeURIComponent(self.currentPath()));
         if ($.trim($("#newDirectoryNameInput").val()) == "") {
           $("#directoryNameRequiredAlert").show();
           $("#newDirectoryNameInput").addClass("fieldError");
@@ -1844,6 +1864,20 @@ else:
           resetPrimaryButtonsStatus(); //globally available
           return false;
         }
+        if (self.isOFSServiceID() || self.isOFSVol()) {
+          if ($("#newDirectoryNameInput").val().length < 3 || $("#newDirectoryNameInput").val().length > 63) {
+            $("#volumeBucketNameAlert").show();
+            $("#newDirectoryNameInput").addClass("fieldError");
+            resetPrimaryButtonsStatus(); //globally available
+            return false;
+          }
+          if ($("#newDirectoryNameInput").val() !== $("#newDirectoryNameInput").val().toLowerCase()) {
+            $("#upperCaseVolumeBucketNameAlert").show();
+            $("#newDirectoryNameInput").addClass("fieldError");
+            resetPrimaryButtonsStatus(); //globally available
+            return false;
+          }
+        }
         $(formElement).ajaxSubmit({
           dataType:  'json',
           success: function() {
@@ -1860,7 +1894,7 @@ else:
       };
 
       self.createFile = function (formElement) {
-        $(formElement).attr("action", "/filebrowser/touch?next=${url('filebrowser:filebrowser.views.view', path='')}" + self.currentPath());
+        $(formElement).attr("action", "/filebrowser/touch?next=${url('filebrowser:filebrowser.views.view', path='')}" + encodeURIComponent(self.currentPath()));
         if ($.trim($("#newFileNameInput").val()) == "") {
           $("#fileNameRequiredAlert").show();
           $("#newFileNameInput").addClass("fieldError");
@@ -1899,7 +1933,7 @@ else:
 
         hiddenFields($("#restoreTrashForm"), 'path', paths);
 
-        $("#restoreTrashForm").attr("action", "/filebrowser/trash/restore?next=${url('filebrowser:filebrowser.views.view', path='')}" + self.currentPath());
+        $("#restoreTrashForm").attr("action", "/filebrowser/trash/restore?next=${url('filebrowser:filebrowser.views.view', path='')}" + encodeURIComponent(self.currentPath()));
 
         $("#restoreTrashModal").modal({
           keyboard:true,
@@ -2002,6 +2036,14 @@ else:
         });
 
         $("#fileUploader").on('fb:updatePath', function (e, options) {
+          const uploadingToOzone = self.currentPath().startsWith("ofs://");
+          const ozoneSizeLimit = Math.min(
+            ...[UPLOAD_CHUNK_SIZE, MAX_FILE_SIZE_UPLOAD_LIMIT].filter(Number.isFinite)
+          );
+          const newSizeLimit = uploadingToOzone ? ozoneSizeLimit : MAX_FILE_SIZE_UPLOAD_LIMIT;
+          if (newSizeLimit) {
+            uploader.setOption('sizeLimit', newSizeLimit);
+          }
           uploader.setParams({
             dest: options.dest,
             fileFieldLabel: "hdfs_file"
@@ -2407,6 +2449,7 @@ else:
       huePubSub.publish('update.autocompleters');
 
       $(".create-directory-link").click(function () {
+        window.hueAnalytics.log('filebrowser', 'new-directory-btn-click');
         $("#newDirectoryNameInput").val('');
         $("#createDirectoryModal").modal({
           keyboard:true,
@@ -2427,6 +2470,8 @@ else:
         $("#directoryNameRequiredAlert").hide();
         $("#directoryNameExistsAlert").hide();
         $("#smallFileSystemNameAlert").hide();
+        $("#volumeBucketNameAlert").hide();
+        $("#upperCaseVolumeBucketNameAlert").hide();
       });
 
       $("#newFileNameInput").focus(function () {
@@ -2453,39 +2498,7 @@ else:
 
       $("*[rel='tooltip']").tooltip({ placement:"bottom" });
 
-      var hashchange = function () {
-        if (window.location.pathname.indexOf('/filebrowser') > -1) {
-          var targetPath = "";
-          var hash = decodeURI(window.location.hash.substring(1));
-          if (hash != null && hash != "" && hash.indexOf('/') > -1) {
-            targetPath = "${url('filebrowser:filebrowser.views.view', path='')}";
-            if (hash.indexOf("!!") != 0) {
-              targetPath += stripHashes(encodeURIComponent(hash));
-            }
-            else {
-              targetPath = fileBrowserViewModel.targetPath() + encodeURI(hash);
-            }
-            fileBrowserViewModel.targetPageNum(1)
-          }
-          if (window.location.href.indexOf("#") == -1) {
-            fileBrowserViewModel.targetPageNum(1);
-            targetPath = "${current_request_path | n,unicode }";
-          }
-          if (targetPath != "") {
-            fileBrowserViewModel.targetPath(targetPath);
-            fileBrowserViewModel.retrieveData();
-          }
-        }
-      }
-
-      huePubSub.subscribe('fb.update.hash', hashchange, 'filebrowser');
-
-      if (window.location.hash != null && window.location.hash.length > 1) {
-        hashchange();
-      }
-      else {
-        fileBrowserViewModel.retrieveData();
-      }
+      fileBrowserViewModel.retrieveData();
 
 
       $("#editBreadcrumb").click(function (e) {
@@ -2493,6 +2506,7 @@ else:
           $(this).hide();
           $(".hue-breadcrumbs").hide();
           $("#hueBreadcrumbText").show().focus();
+          window.hueAnalytics.log('filebrowser', 'edit-breadcrumb-click');
         }
       });
 
@@ -2502,21 +2516,18 @@ else:
         skipKeydownEvents: true,
         onEnter: function (el) {
           var target_path = stripHashes(el.val());
-          if (window.USER_HOME_DIR.split('/')[2] !== el.val().split('/')[2] && window.RAZ_IS_ENABLED){
-            $.jHueNotify.warn("${ _('You are not allowed to go outside ') }" + window.USER_HOME_DIR + "${ _(' bucket.') }");
+          if (el.val().split('/')[2] === '' && window.RAZ_IS_ENABLED){
+            $.jHueNotify.warn("${ _('Listing of buckets is not allowed. Redirecting to the home directory.') }");
             target_path = window.USER_HOME_DIR;
           } 
-          fileBrowserViewModel.targetPath("${url('filebrowser:filebrowser.views.view', path='')}" + target_path); 
+          fileBrowserViewModel.targetPath("${url('filebrowser:filebrowser.views.view', path='')}" + encodeURIComponent(target_path)); 
           fileBrowserViewModel.getStats(function (data) {
-            if (data.type != null && data.type == "file") {
-              %if is_embeddable:
-              huePubSub.publish('open.link', data.url);
-              %else:
-              huePubSub.publish('open.link', data.url);
-              %endif
+            const pathPrefix = "${url('filebrowser:filebrowser.views.view', path='')}";
+            if (data.type != null && data.type == "file") {              
+              huePubSub.publish('open.filebrowserlink', { pathPrefix, decodedPath: target_path});              
               return false;
             } else {
-              updateHash(target_path);
+              huePubSub.publish('open.filebrowserlink', { pathPrefix, decodedPath: target_path, fileBrowserModel: fileBrowserViewModel});
             }
             $("#jHueHdfsAutocomplete").hide();
           });
@@ -2543,7 +2554,6 @@ else:
         }
       });
 
-      $(window).bind("hashchange.fblist", hashchange);
 
       $(".actionbar").data("originalWidth", $(".actionbar").width());
 

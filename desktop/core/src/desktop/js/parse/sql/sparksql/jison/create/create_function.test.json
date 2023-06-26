@@ -1,0 +1,138 @@
+[
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "FUNCTION",
+      "TEMPORARY FUNCTION",
+      "OR REPLACE"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE OR ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": ["REPLACE"]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE OR REPLACE ",
+    "afterCursor": "",
+    "containsKeywords": ["FUNCTION", "TEMPORARY FUNCTION"],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE OR REPLACE TEMPORARY ",
+    "afterCursor": "",
+    "containsKeywords": ["FUNCTION"],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE TEMPORARY ",
+    "afterCursor": "",
+    "containsKeywords": ["FUNCTION"],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE FUNCTION ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": ["IF NOT EXISTS"],
+      "suggestDatabases": {
+        "appendDot": true
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE OR REPLACE FUNCTION IF ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": ["NOT EXISTS"]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE TEMPORARY FUNCTION IF NOT ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": ["EXISTS"]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE TEMPORARY FUNCTION IF NOT EXISTS foo.bar ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": ["AS"]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE TEMPORARY FUNCTION IF NOT EXISTS foo AS 'SimpleUdf' ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": ["USING"]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE FUNCTION foo AS 'SimpleUdf' USING ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": ["ARCHIVE", "FILE", "JAR"]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE FUNCTION ",
+    "afterCursor": " foo AS 'SimpleUdf' USING JAR 'some.jar';",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": ["IF NOT EXISTS"]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE TEMPORARY FUNCTION IF NOT ",
+    "afterCursor": " foo AS 'SimpleUdf' USING JAR 'some.jar';",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": ["EXISTS"]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE ",
+    "afterCursor": " FUNCTION foo AS 'SimpleUdf';",
+    "containsKeywords": [
+      "TEMPORARY",
+      "OR REPLACE"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  }
+]

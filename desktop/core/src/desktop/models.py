@@ -51,7 +51,8 @@ from useradmin.organization import _fitered_queryset
 from desktop import appmanager
 from desktop.auth.backend import is_admin
 from desktop.conf import get_clusters, IS_MULTICLUSTER_ONLY, ENABLE_ORGANIZATIONS, ENABLE_PROMETHEUS, \
-    has_connectors, TASK_SERVER, APP_BLACKLIST, ENABLE_SHARING, ENABLE_CONNECTORS, ENABLE_UNIFIED_ANALYTICS, RAZ
+    has_connectors, TASK_SERVER, APP_BLACKLIST, COLLECT_USAGE, ENABLE_SHARING, ENABLE_CONNECTORS, ENABLE_UNIFIED_ANALYTICS, RAZ, \
+    HUE_IMAGE_VERSION, HUE_HOST_NAME
 from desktop.lib import fsmanager
 from desktop.lib.connectors.api import _get_installed_connectors
 from desktop.lib.connectors.models import Connector
@@ -71,7 +72,7 @@ else:
   from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 SAMPLE_USER_ID = 1100713
 SAMPLE_USER_INSTALL = 'hue'
@@ -79,6 +80,7 @@ SAMPLE_USER_OWNERS = ['hue', 'sample']
 
 UTC_TIME_FORMAT = "%Y-%m-%dT%H:%M"
 HUE_VERSION = None
+IMAGE_VERSION = None
 
 
 def uuid_default():
@@ -90,13 +92,25 @@ def hue_version():
   if HUE_VERSION is None:
     HUE_VERSION = HUE_DESKTOP_VERSION
 
+  return HUE_VERSION
+
+def hue_image_version():
+  global IMAGE_VERSION
+
+  if IMAGE_VERSION is None:
     p = get_run_root('cloudera', 'cdh_version.properties')
     if os.path.exists(p):
       build_version = _version_from_properties(open(p))
       if build_version:
-        HUE_VERSION = '%s - %s' % (HUE_VERSION, build_version)
+        IMAGE_VERSION = '%s' % (build_version)
 
-  return HUE_VERSION
+    else:
+      IMAGE_VERSION = HUE_IMAGE_VERSION.get()
+
+  return IMAGE_VERSION
+
+def name_of_hue_host():
+  return HUE_HOST_NAME.get()
 
 def _version_from_properties(f):
   return dict(line.strip().split('=') for line in f.readlines() if len(line.strip().split('=')) == 2).get('cloudera.cdh.release')
@@ -1764,6 +1778,9 @@ class ClusterConfig(object):
     app_config = self.get_apps()
     editors = app_config.get('editor')
     main_button_action = self.get_main_quick_action(app_config)
+    img_version = hue_image_version()
+    version_of_hue = hue_version()
+    hue_host_name = name_of_hue_host()
 
     if main_button_action.get('is_sql'):
       default_sql_interpreter = main_button_action['type']
@@ -1785,8 +1802,12 @@ class ClusterConfig(object):
       'cluster_type': self.cluster_type,
       'has_computes': self.cluster_type in ('altus', 'snowball'), # or any grouped engine connectors
       'hue_config': {
-        'enable_sharing': ENABLE_SHARING.get()
-      }
+        'enable_sharing': ENABLE_SHARING.get(),
+        'collect_usage': COLLECT_USAGE.get()
+      },
+      'vw_name': hue_host_name,
+      'img_version': img_version,
+      'hue_version': version_of_hue
     }
 
 
@@ -1849,6 +1870,15 @@ class ClusterConfig(object):
     }
 
 
+  def displayName(self, dialect, name):
+    if ENABLE_UNIFIED_ANALYTICS.get() and dialect == 'hive':
+      return 'Unified Analytics'
+    elif name.lower() == 'hplsql':
+      return 'HPL/SQL'
+    else:
+      return name
+
+
   def _get_editor(self):
     interpreters = []
 
@@ -1860,7 +1890,7 @@ class ClusterConfig(object):
           'name': interpreter['name'],
           'type': interpreter['type'],  # Connector v1
           'id': interpreter['type'],
-        'displayName': 'Unified Analytics' if ENABLE_UNIFIED_ANALYTICS.get() and interpreter['dialect'] == 'hive' else interpreter['name'],
+          'displayName': self.displayName(interpreter['dialect'], interpreter['name']),
           'buttonName': _('Query'),
           'tooltip': _('%s Query') % interpreter['type'].title(),
           'optimizer': get_optimizer_mode(),
@@ -2023,6 +2053,17 @@ class ClusterConfig(object):
         'page': '/filebrowser/view=' + urllib_quote(home_path, safe=SAFE_CHARACTERS_URI_COMPONENTS)
       })
 
+    if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('ofs', self.user):
+      from desktop.lib.fs.ozone.ofs import get_ofs_home_directory
+      home_path = get_ofs_home_directory().encode('utf-8')
+      interpreters.append({
+        'type': 'ofs',
+        'displayName': _('Ozone'),
+        'buttonName': _('Browse'),
+        'tooltip': _('Ozone'),
+        'page': '/filebrowser/view=' + urllib_quote(home_path, safe=SAFE_CHARACTERS_URI_COMPONENTS)
+      })
+
     if 'metastore' in self.apps:
       interpreters.append({
         'type': 'tables',
@@ -2043,9 +2084,9 @@ class ClusterConfig(object):
 
     if 'jobbrowser' in self.apps:
       from hadoop.cluster import get_default_yarncluster  # Circular loop
-      from jobbrowser.conf import ENABLE_HIVE_QUERY_BROWSER
+      from jobbrowser.conf import ENABLE_HIVE_QUERY_BROWSER, QUERY_STORE
 
-      if get_default_yarncluster() or ENABLE_HIVE_QUERY_BROWSER.get():
+      if get_default_yarncluster() or ENABLE_HIVE_QUERY_BROWSER.get() or QUERY_STORE.IS_ENABLED.get():
         interpreters.append({
           'type': 'yarn',
           'displayName': _('Jobs'),

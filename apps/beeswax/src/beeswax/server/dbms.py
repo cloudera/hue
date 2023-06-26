@@ -39,7 +39,7 @@ from libzookeeper import conf as libzookeeper_conf
 
 from azure.abfs import abfspath
 from beeswax.conf import HIVE_SERVER_HOST, HIVE_SERVER_PORT, HIVE_SERVER_HOST, HIVE_HTTP_THRIFT_PORT, HIVE_METASTORE_HOST, \
-    HIVE_METASTORE_PORT, LIST_PARTITIONS_LIMIT, SERVER_CONN_TIMEOUT, \
+    HIVE_METASTORE_PORT, LIST_PARTITIONS_LIMIT, SERVER_CONN_TIMEOUT, ZOOKEEPER_CONN_TIMEOUT, \
     AUTH_USERNAME, AUTH_PASSWORD, APPLY_NATURAL_SORT_MAX, QUERY_PARTITIONS_LIMIT, HIVE_DISCOVERY_HIVESERVER2_ZNODE, \
     HIVE_DISCOVERY_HS2, HIVE_DISCOVERY_LLAP, HIVE_DISCOVERY_LLAP_HA, HIVE_DISCOVERY_LLAP_ZNODE, CACHE_TIMEOUT, \
     LLAP_SERVER_HOST, LLAP_SERVER_PORT, LLAP_SERVER_THRIFT_PORT, USE_SASL as HIVE_USE_SASL, CLOSE_SESSIONS, has_session_pool, \
@@ -61,20 +61,41 @@ if sys.version_info[0] > 2:
 else:
   from django.utils.translation import ugettext as _
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
+
+RESET_HS2_QUERY_SERVER = False
 DBMS_CACHE = {}
 DBMS_CACHE_LOCK = threading.Lock()
 cache = caches[CACHES_HIVE_DISCOVERY_KEY]
 
 # Using file cache to make sure eventlet threads are uniform, this cache is persistent on startup
 # So we clear it to make sure the server resets hiveserver2 host.
-cache.clear()
+def reset_ha():
+  global RESET_HS2_QUERY_SERVER
+  cache.clear()
+  RESET_HS2_QUERY_SERVER = True
+
+
+reset_ha()
+
+
+def get_zk_hs2():
+  hiveservers = None
+  zk = KazooClient(hosts=libzookeeper_conf.ENSEMBLE.get(), read_only=True)
+  zk.start(timeout=ZOOKEEPER_CONN_TIMEOUT.get())
+  znode = HIVE_DISCOVERY_HIVESERVER2_ZNODE.get()
+  if zk.exists(znode):
+    LOG.debug("Selecting up Hive server via the following node {0}".format(znode))
+    hiveservers = zk.get_children(znode)
+  zk.stop()
+  return hiveservers
 
 
 def get(user, query_server=None, cluster=None):
   global DBMS_CACHE
   global DBMS_CACHE_LOCK
+  global RESET_HS2_QUERY_SERVER
 
   if query_server is None:
     query_server = get_query_server_config(connector=cluster)
@@ -106,7 +127,15 @@ def get(user, query_server=None, cluster=None):
             HiveServerClientCompatible(HiveServerClient(query_server, user)),
             QueryHistory.SERVER_TYPE[1][0]
         )
-
+    elif RESET_HS2_QUERY_SERVER:
+      from beeswax.server.hive_server2_lib import HiveServerClient, HiveServerClientCompatible
+      RESET_HS2_QUERY_SERVER = False
+      LOG.debug('Setting DBMS cache for the new hs2')
+      DBMS_CACHE[user.id].clear()
+      DBMS_CACHE[user.id][query_server['server_name']] = HiveServer2Dbms(
+        HiveServerClientCompatible(HiveServerClient(query_server, user)),
+        QueryHistory.SERVER_TYPE[1][0]
+      )
     return DBMS_CACHE[user.id][query_server['server_name']]
   finally:
     DBMS_CACHE_LOCK.release()
@@ -124,7 +153,7 @@ def get_query_server_config(name='beeswax', connector=None):
         if HIVE_DISCOVERY_LLAP.get():
           LOG.debug("Checking zookeeper for discovering Hive LLAP server endpoint")
           zk = KazooClient(hosts=libzookeeper_conf.ENSEMBLE.get(), read_only=True)
-          zk.start()
+          zk.start(timeout=ZOOKEEPER_CONN_TIMEOUT.get())
           if HIVE_DISCOVERY_LLAP_HA.get():
             znode = "{0}/instances".format(HIVE_DISCOVERY_LLAP_ZNODE.get())
             LOG.debug("Setting up Hive LLAP HA with the following node {0}".format(znode))
@@ -172,29 +201,49 @@ def get_query_server_config(name='beeswax', connector=None):
       activeEndpoint = cache.get("hiveserver2")
       if activeEndpoint is None:
         if HIVE_DISCOVERY_HS2.get():
-          zk = KazooClient(hosts=libzookeeper_conf.ENSEMBLE.get(), read_only=True)
-          zk.start()
-          znode = HIVE_DISCOVERY_HIVESERVER2_ZNODE.get()
-          LOG.info("Selecting up Hive server via the following node {0}".format(znode))
-          if zk.exists(znode):
-            hiveservers = zk.get_children(znode)
-            LOG.info("Available Hive Servers: {0}".format(hiveservers))
-            if not hiveservers:
-              raise PopupException(_('There is no running Hive server available'))
-            server_to_use = 0  # if CONF.HIVE_SPREAD.get() randint(0, len(hiveservers)-1) else 0
-            LOG.info("Selected Hive server {0}: {1}".format(server_to_use, hiveservers[server_to_use]))
-            cache.set(
-              "hiveserver2",
-              json.dumps({
-                "host": hiveservers[server_to_use].split(";")[0].split("=")[1].split(":")[0],
-                "port": hiveservers[server_to_use].split(";")[0].split("=")[1].split(":")[1]
-              })
-            )
-          else:
-            cache.set("hiveserver2", json.dumps({"host": HIVE_SERVER_HOST.get(), "port": HIVE_HTTP_THRIFT_PORT.get()}))
-          zk.stop()
+          hiveservers = get_zk_hs2()
+          LOG.debug("Available Hive Servers: {0}".format(hiveservers))
+          if not hiveservers:
+            LOG.error('There are no running Hive server available')
+            raise PopupException(_('There are no running Hive server available'))
+          server_to_use = 0
+          LOG.debug("Selected Hive server {0}: {1}".format(server_to_use, hiveservers[server_to_use]))
+          cache.set(
+            "hiveserver2",
+            json.dumps({
+              "host": hiveservers[server_to_use].split(";")[0].split("=")[1].split(":")[0],
+              "port": hiveservers[server_to_use].split(";")[0].split("=")[1].split(":")[1]
+            })
+          )
         else:
           cache.set("hiveserver2", json.dumps({"host": HIVE_SERVER_HOST.get(), "port": HIVE_HTTP_THRIFT_PORT.get()}))
+      else:
+        # Setting hs2 cache in-case there is no HS2 discovery
+        cache.set("hiveserver2", json.dumps({"host": HIVE_SERVER_HOST.get(), "port": HIVE_HTTP_THRIFT_PORT.get()}))
+        if HIVE_DISCOVERY_HS2.get():
+          # Replace ActiveEndpoint if the current HS2 is down
+          hiveservers = get_zk_hs2()
+          if hiveservers:
+            server_to_use = 0
+            hs2_host_name = hiveservers[server_to_use].split(";")[0].split("=")[1].split(":")[0]
+            hs2_in_active_endpoint = hs2_host_name in activeEndpoint
+            LOG.debug("Is the current HS2 active {0}".format(hs2_in_active_endpoint))
+            if not hs2_in_active_endpoint:
+              LOG.error(
+                'Current HiveServer is down, working to connect with the next available HiveServer from Zookeeper')
+              reset_ha()
+              server_to_use = 0
+              LOG.debug("Selected HiveServer {0}: {1}".format(server_to_use, hiveservers[server_to_use]))
+              cache.set(
+                "hiveserver2",
+                json.dumps({
+                  "host": hiveservers[server_to_use].split(";")[0].split("=")[1].split(":")[0],
+                  "port": hiveservers[server_to_use].split(";")[0].split("=")[1].split(":")[1]
+                })
+              )
+          else:
+            LOG.error('Currently there are no HiveServer2 running')
+            raise PopupException(_('Currently there are no HiveServer2 running'))
 
       activeEndpoint = json.loads(cache.get("hiveserver2"))
 
@@ -216,7 +265,7 @@ def get_query_server_config(name='beeswax', connector=None):
     else:
       kerberos_principal = get_hiveserver2_kerberos_principal(HIVE_SERVER_HOST.get())
       query_server = {
-          'server_name': 'beeswax',
+          'server_name': 'beeswax' if name != 'hplsql' else 'hplsql',
           'server_host': activeEndpoint["host"],
           'server_port': LLAP_SERVER_PORT.get() if name == 'llap' else HIVE_SERVER_PORT.get(),
           'principal': kerberos_principal,

@@ -71,7 +71,7 @@ ingress:
 aws:
   accessKeyId: ""
   secretAccessKey: ""
-  awsRegion: "us-east-1"
+  region: "us-east-1"
 hive:
   site: |
     <!--

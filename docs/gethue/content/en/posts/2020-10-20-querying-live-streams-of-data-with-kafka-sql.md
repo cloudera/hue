@@ -105,8 +105,8 @@ More improvements are on the way, in particular in the SQL autocomplete and Edit
 
 In case you have an existing Hue Editor and want to point to the ksqlDB, just activate it via this config change:
 
-    [notebook]
-    enable_notebook_2=true
+    [desktop]
+    enable_hue_5=true
 
     [[interpreters]]
 

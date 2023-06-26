@@ -114,12 +114,14 @@ $(EXT_PY_ENV_INSTALL_TARGETS): CUR_EXT_PY=$(notdir $(@D))
 #   	Pip install any 3rd party package that are based on requirements.txt
 #
 .PHONY: ext-env-pip-install
-ext-env-pip-install:
+ext-env-pip-install: $(REQUIREMENT_DOT_FILE)
+$(REQUIREMENT_DOT_FILE):
 	@echo '--- Installing $(REQUIREMENT_FILE) into virtual-env via $(ENV_PIP)'
 	@$(ENV_PIP) install -r $(REQUIREMENT_FILE)
 	@echo '--- Finished $(REQUIREMENT_FILE) into virtual-env'
 	@$(ENV_PIP) install $(NAVOPTAPI_WHL)
 	@echo '--- Finished $(NAVOPTAPI_WHL) into virtual-env'
+	@touch $@
 
 #
 # ext-eggs
@@ -129,10 +131,12 @@ ext-env-pip-install:
 .PHONY: ext-eggs
 ext-eggs: $(EXT_PY_EGG_TARGETS)
 $(EXT_PY_EGG_TARGETS):
+ifeq ($(PYTHON_VER),python2.7)
 	@echo '--- Building egg for $(CUR_EXT_PY)'
 	@cd ext-py/$(CUR_EXT_PY) && $(ENV_PYTHON) \
 	  -c '__import__("setuptools.sandbox").sandbox.run_setup("setup.py", __import__("sys").argv[1:])' \
 	  bdist_egg
+endif
 	@mkdir -p $(@D) && touch $@
 
 #
@@ -184,7 +188,7 @@ distclean:: clean
 .PHONY: compile-locale
 compile-locale:
 	$(PYBABEL) extract . -F babel.cfg -k _ -k _t -o $(LOCALE_ROOT)/en_US.pot --copyright-holder="Cloudera, Inc" --project="Hue" --version=""
-	$(PYBABEL) update -D django -i $(LOCALE_ROOT)/en_US.pot -d $(LOCALE_ROOT)
+	$(PYBABEL) update -D django -i $(LOCALE_ROOT)/en_US.pot -d $(LOCALE_ROOT) -N  # skipping the fuzzy translation
 	$(PYBABEL) compile -D django -d $(LOCALE_ROOT)
 
 

@@ -1,0 +1,30 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`QueryDetailsDiff.vue should render 1`] = `
+<div>
+  <div
+    class="buttons-container"
+  >
+    <hue-button-stub
+      alert="false"
+      borderless="true"
+      disabled="false"
+      large="false"
+      primary="false"
+      small="false"
+    />
+  </div>
+  <div
+    class="hue-layout-row"
+  >
+    <query-info-top-stub
+      query="[object Object]"
+    />
+    <query-info-top-stub
+      class="query-b"
+      query="[object Object]"
+    />
+  </div>
+  <tabs-stub />
+</div>
+`;

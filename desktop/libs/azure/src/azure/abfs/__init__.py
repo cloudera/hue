@@ -30,7 +30,7 @@ from azure.conf import get_default_abfs_fs
 from desktop.conf import RAZ
 from filebrowser.conf import REMOTE_STORAGE_HOME
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 #check this first for problems
 ABFS_PATH_RE = re.compile(
@@ -182,10 +182,10 @@ def get_home_dir_for_abfs(user=None):
   except:
     remote_home_abfs = 'abfs://'
 
-  # Check from remote_storage_home config only for RAZ env
-  if RAZ.IS_ENABLED.get() and hasattr(REMOTE_STORAGE_HOME, 'get') and REMOTE_STORAGE_HOME.get():
+  if hasattr(REMOTE_STORAGE_HOME, 'get') and REMOTE_STORAGE_HOME.get() and REMOTE_STORAGE_HOME.get().startswith('abfs://'):
     remote_home_abfs = REMOTE_STORAGE_HOME.get()
-    remote_home_abfs = _handle_user_dir_raz(user, remote_home_abfs)
+
+  remote_home_abfs = _handle_user_dir_raz(user, remote_home_abfs)
 
   return remote_home_abfs
 

@@ -1,0 +1,235 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`CountersTable.vue should render 1`] = `
+<div>
+  <div
+    class="hue-table-container"
+  >
+    <table
+      class="hue-table"
+    >
+      <caption>
+        <!-- Because of Web:TableWithoutCaptionCheck -->
+        
+      </caption>
+      <thead>
+        <tr
+          class="header-row"
+        >
+          
+          <th
+            class=""
+            scope="col"
+          >
+            Group Name
+          </th>
+          <th
+            class=""
+            scope="col"
+          >
+            Counter Name
+          </th>
+          <th
+            class="test-class1"
+            scope="col"
+          >
+            Counter set 1
+          </th>
+          <th
+            class="test-class2"
+            scope="col"
+          >
+            Counter set 2
+          </th>
+          <th
+            class=""
+            scope="col"
+          >
+            Variance
+          </th>
+          
+          <!-- To fill the blank space to the right when table width is smaller than available horizontal space -->
+          <th
+            class="column-flush"
+            scope="col"
+          />
+        </tr>
+      </thead>
+      <tbody
+        class=""
+      >
+        
+        <tr>
+          
+          <td
+            class=""
+          >
+            
+            test-group1
+            
+          </td>
+          <td
+            class=""
+          >
+            
+            test-counter1
+            
+          </td>
+          <td
+            class="test-class1"
+          >
+            
+            str-val1
+            
+          </td>
+          <td
+            class="test-class2"
+          >
+            
+            str-val3
+            
+          </td>
+          <td
+            class=""
+          >
+            
+            <!--v-if-->
+            
+          </td>
+          
+          <td
+            class="column-flush"
+          />
+        </tr>
+        <tr>
+          
+          <td
+            class=""
+          >
+            
+            test-group1
+            
+          </td>
+          <td
+            class=""
+          >
+            
+            test-counter2
+            
+          </td>
+          <td
+            class="test-class1"
+          >
+            
+            str-val2
+            
+          </td>
+          <td
+            class="test-class2"
+          >
+            
+            str-val4
+            
+          </td>
+          <td
+            class=""
+          >
+            
+            <!--v-if-->
+            
+          </td>
+          
+          <td
+            class="column-flush"
+          />
+        </tr>
+        <tr>
+          
+          <td
+            class=""
+          >
+            
+            test-group1
+            
+          </td>
+          <td
+            class=""
+          >
+            
+            test-counter3
+            
+          </td>
+          <td
+            class="test-class1"
+          >
+            
+            1
+            
+          </td>
+          <td
+            class="test-class2"
+          >
+            
+            2
+            
+          </td>
+          <td
+            class=""
+          >
+            
+            <!--v-if-->
+            
+          </td>
+          
+          <td
+            class="column-flush"
+          />
+        </tr>
+        <tr>
+          
+          <td
+            class=""
+          >
+            
+            test-group2
+            
+          </td>
+          <td
+            class=""
+          >
+            
+            test-counter1
+            
+          </td>
+          <td
+            class="test-class1"
+          >
+            
+            
+            
+          </td>
+          <td
+            class="test-class2"
+          >
+            
+            str-val5
+            
+          </td>
+          <td
+            class=""
+          >
+            
+            <!--v-if-->
+            
+          </td>
+          
+          <td
+            class="column-flush"
+          />
+        </tr>
+        
+      </tbody>
+    </table>
+  </div>
+</div>
+`;

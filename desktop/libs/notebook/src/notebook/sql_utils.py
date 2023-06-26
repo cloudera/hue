@@ -22,7 +22,6 @@ import os
 import re
 import sys
 
-from beeswax.conf import HPLSQL
 from desktop.lib.i18n import smart_str
 
 if sys.version_info[0] > 2:
@@ -32,12 +31,12 @@ else:
 
 
 # Note: Might be replaceable by sqlparse.split
-def get_statements(hql_query):
+def get_statements(hql_query, dialect=None):
   hql_query = strip_trailing_semicolon(hql_query)
   hql_query_sio = string_io(hql_query)
 
   statements = []
-  for (start_row, start_col), (end_row, end_col), statement in split_statements(hql_query_sio.read()):
+  for (start_row, start_col), (end_row, end_col), statement in split_statements(hql_query_sio.read(), dialect):
     statements.append({
       'start': {
         'row': start_row,
@@ -51,22 +50,6 @@ def get_statements(hql_query):
     })
   return statements
 
-def get_hplsql_statements(hplsql_query):
-  statements = []
-  statements.append(
-    {
-      'start': {
-        'row': 0,
-        'column': 0
-      },
-      'end': {
-        'row': 0,
-        'column': len(hplsql_query) - 1
-      },
-      'statement': strip_trailing_semicolon(hplsql_query.rstrip())
-    })
-  return statements
-
 def get_current_statement(snippet):
   # Multiquery, if not first statement or arrived to the last query
   should_close = False
@@ -74,10 +57,7 @@ def get_current_statement(snippet):
   statement_id = handle.get('statement_id', 0)
   statements_count = handle.get('statements_count', 1)
 
-  if HPLSQL.get() and snippet['dialect'] == 'hive':
-    statements = get_hplsql_statements(snippet['statement'])
-  else:
-    statements = get_statements(snippet['statement'])
+  statements = get_statements(snippet['statement'], snippet['dialect'] if 'dialect' in snippet else None)
 
   statement_id = min(statement_id, len(statements) - 1) # In case of removal of statements
   previous_statement_hash = compute_statement_hash(statements[statement_id]['statement'])
@@ -111,7 +91,7 @@ def compute_statement_hash(statement):
   else:
     return hashlib.sha224(smart_str(statement)).hexdigest()
 
-def split_statements(hql):
+def split_statements(hql, dialect=None):
   """
   Split statements at semicolons ignoring the ones inside quotes and comments.
   The comment symbols that come inside quotes should be ignored.
@@ -126,7 +106,7 @@ def split_statements(hql):
   end_row = 0
   end_col = len(hql) - 1
 
-  if hql.find(';') in (-1, len(hql) - 1):
+  if hql.find(';') in (-1, len(hql) - 1) or dialect == 'hplsql':
     return [((start_row, start_col), (end_row, end_col), hql)]
 
   lines = hql.splitlines()

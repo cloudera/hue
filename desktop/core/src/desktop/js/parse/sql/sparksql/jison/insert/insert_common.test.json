@@ -1,0 +1,72 @@
+[
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "",
+    "afterCursor": "",
+    "containsKeywords": [
+      "INSERT"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "INSERT ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "INTO",
+        "INTO TABLE",
+        "OVERWRITE",
+        "OVERWRITE DIRECTORY",
+        "OVERWRITE LOCAL DIRECTORY",
+        "OVERWRITE TABLE",
+        "TABLE"
+      ],
+      "suggestDatabases": {
+        "appendDot": true
+      },
+      "suggestTables": {
+        "tablesOnly": true
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "INSERT INTO ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "TABLE"
+      ],
+      "suggestDatabases": {
+        "appendDot": true
+      },
+      "suggestTables": {
+        "tablesOnly": true
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "INSERT OVERWRITE ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "DIRECTORY",
+        "LOCAL DIRECTORY",
+        "TABLE"
+      ],
+      "suggestDatabases": {
+        "appendDot": true
+      },
+      "suggestTables": {
+        "tablesOnly": true
+      }
+    }
+  }
+]

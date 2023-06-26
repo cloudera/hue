@@ -1,8 +1,8 @@
 module.exports = {
   moduleFileExtensions: ['js', 'jsx', 'ts', 'tsx', 'json', 'vue'],
   transform: {
-    '^.+\\.(js|ts)$': 'babel-jest',
-    '^.+\\.vue$': 'vue-jest'
+    '^.+\\.(js|ts|jsx|tsx)$': 'babel-jest',
+    '^.+\\.vue$': '@vue/vue3-jest',
   },
   moduleNameMapper: {
     '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
@@ -11,7 +11,7 @@ module.exports = {
   moduleDirectories: ['node_modules', 'desktop/core/src/desktop/js'],
   modulePaths: ['desktop/core/src/desktop/js'],
   testMatch: ['<rootDir>/desktop/core/src/desktop/js/**/*.test.(js|jsx|ts|tsx)'],
-  testEnvironment: 'jsdom',
+  testEnvironment: 'jest-environment-jsdom',
   testURL: 'https://www.gethue.com/hue',
   setupFilesAfterEnv: ['<rootDir>/desktop/core/src/desktop/js/jest/jest.init.js'],
   watchPathIgnorePatterns: ['<rootDir>/desktop/core/src/desktop/static'],

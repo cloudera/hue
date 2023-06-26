@@ -37,6 +37,8 @@ from desktop.lib.python_util import force_dict_to_strings
 
 from aws.conf import is_enabled as is_s3_enabled
 from azure.conf import is_abfs_enabled
+from desktop.conf import is_ofs_enabled
+from urllib.parse import urlparse
 
 if sys.version_info[0] > 2:
   from django.utils.translation import gettext_lazy as _
@@ -117,6 +119,7 @@ USE_TZ = False
 # Examples: "http://media.lawrence.com/media/", "http://example.com/media/"
 MEDIA_URL = ''
 
+DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880  # Setting this variable to 5MB as sometime request size > 2.5MB (default value)
 
 ############################################################
 # Part 3: Django configuration
@@ -137,17 +140,12 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'build', 'static')
 
 
-# List of callables that know how to import templates from various sources.
-GTEMPLATE_LOADERS = (
-  'django.template.loaders.filesystem.Loader',
-  'django.template.loaders.app_directories.Loader'
-)
-
 MIDDLEWARE = [
     # The order matters
     'desktop.middleware.MetricsMiddleware',
     'desktop.middleware.EnsureSafeMethodMiddleware',
     'desktop.middleware.AuditLoggingMiddleware',
+    'desktop.middleware.MultipleProxyMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -167,7 +165,7 @@ MIDDLEWARE = [
     'desktop.middleware.ExceptionMiddleware',
     'desktop.middleware.ClusterMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-
+    'desktop.middleware.CacheControlMiddleware',
     'django.middleware.http.ConditionalGetMiddleware',
     #'axes.middleware.FailedLoginMiddleware',
     'desktop.middleware.MimeTypeJSFileFixStreamingMiddleware',
@@ -253,13 +251,11 @@ TEMPLATES = [
     'NAME': 'mako',
     'OPTIONS': {
       'context_processors': GTEMPLATE_CONTEXT_PROCESSORS,
-      'loaders': GTEMPLATE_LOADERS,
     },
   },
   {
     'BACKEND': 'django.template.backends.django.DjangoTemplates',
     'DIRS': [
-      get_desktop_root("core/templates/debug_toolbar"),
       get_desktop_root("core/templates/djangosaml2"),
     ],
     'NAME': 'django',
@@ -336,7 +332,8 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': desktop.conf.AUTH.API_AUTH.get()
 }
-if desktop.conf.AUTH.JWT.IS_ENABLED.get() and 'desktop.auth.api_authentications.JwtAuthentication' not in REST_FRAMEWORK['DEFAULT_AUTHENTICATION_CLASSES']:
+if desktop.conf.is_custom_jwt_auth_enabled() and \
+  'desktop.auth.api_authentications.JwtAuthentication' not in REST_FRAMEWORK['DEFAULT_AUTHENTICATION_CLASSES']:
   REST_FRAMEWORK['DEFAULT_AUTHENTICATION_CLASSES'].insert(0, 'desktop.auth.api_authentications.JwtAuthentication')
 
 SIMPLE_JWT = {
@@ -378,7 +375,7 @@ EMAIL_SUBJECT_PREFIX = 'Hue %s - ' % desktop.conf.CLUSTER_ID.get()
 # Permissive CORS for public /api
 INSTALLED_APPS.append('corsheaders')
 MIDDLEWARE.insert(0, 'corsheaders.middleware.CorsMiddleware')
-CORS_URLS_REGEX = r'^/api/.*$'
+CORS_URLS_REGEX = r'^/api/.*$|/saml2/login/'
 CORS_ALLOW_CREDENTIALS = True
 if sys.version_info[0] > 2:
   CORS_ALLOW_ALL_ORIGINS = True
@@ -418,6 +415,11 @@ else:
     "ATOMIC_REQUESTS": True,
     "CONN_MAX_AGE": desktop.conf.DATABASE.CONN_MAX_AGE.get(),
   }
+
+  if desktop.conf.DATABASE.ENGINE.get() == 'django.db.backends.oracle' and \
+     'PORT=' in desktop.conf.DATABASE.NAME.get():
+    # remove port number for Oracle RAC, and the port number is in description string
+    del default_db["PORT"]
 
 DATABASES = {
   'default': default_db
@@ -463,6 +465,7 @@ if desktop.conf.TASK_SERVER.ENABLED.get():
 SESSION_COOKIE_NAME = desktop.conf.SESSION.COOKIE_NAME.get()
 SESSION_COOKIE_AGE = desktop.conf.SESSION.TTL.get()
 SESSION_COOKIE_SECURE = desktop.conf.SESSION.SECURE.get()
+SECURE_REFERRER_POLICY = None
 SESSION_EXPIRE_AT_BROWSER_CLOSE = desktop.conf.SESSION.EXPIRE_AT_BROWSER_CLOSE.get()
 
 # HTTP only
@@ -476,6 +479,13 @@ CSRF_COOKIE_NAME = 'csrftoken'
 TRUSTED_ORIGINS = []
 if desktop.conf.SESSION.TRUSTED_ORIGINS.get():
   TRUSTED_ORIGINS += desktop.conf.SESSION.TRUSTED_ORIGINS.get()
+
+# All Hue LB's must be in the TRUSTED_ORIGINS
+if desktop.conf.HUE_LOAD_BALANCER.get():
+  for hue_lb in desktop.conf.HUE_LOAD_BALANCER.get():
+    # We only want the host:port and strip out the scheme
+    lb_host = urlparse(hue_lb).netloc
+    TRUSTED_ORIGINS.append(lb_host)
 
 # This is required for knox
 if desktop.conf.KNOX.KNOX_PROXYHOSTS.get(): # The hosts provided here don't have port. Add default knox port
@@ -664,6 +674,9 @@ if is_s3_enabled():
 if is_abfs_enabled():
   file_upload_handlers.insert(0, 'azure.abfs.upload.ABFSFileUploadHandler')
 
+if is_ofs_enabled():
+  file_upload_handlers.insert(0, 'desktop.lib.fs.ozone.upload.OFSFileUploadHandler')
+
 
 FILE_UPLOAD_HANDLERS = tuple(file_upload_handlers)
 
@@ -718,55 +731,6 @@ DOCUMENT2_SEARCH_MAX_LENGTH = 2000
 
 # To avoid performace issue, config check will display warning when Document2 over this size
 DOCUMENT2_MAX_ENTRIES = 100000
-
-DEBUG_TOOLBAR_PATCH_SETTINGS = False
-
-def show_toolbar(request):
-  # Here can be used to decide if showing toolbar bases on request object:
-  #   For example, limit IP address by checking request.META['REMOTE_ADDR'], which can avoid setting INTERNAL_IPS.
-  list_allowed_users = desktop.conf.DJANGO_DEBUG_TOOL_USERS.get()
-  is_user_allowed = list_allowed_users[0] == '' or request.user.username in list_allowed_users
-  return DEBUG and desktop.conf.ENABLE_DJANGO_DEBUG_TOOL.get() and is_user_allowed
-
-if DEBUG and desktop.conf.ENABLE_DJANGO_DEBUG_TOOL.get():
-  idx = MIDDLEWARE.index('desktop.middleware.ClusterMiddleware')
-  MIDDLEWARE.insert(idx + 1, 'debug_panel.middleware.DebugPanelMiddleware')
-
-  INSTALLED_APPS += (
-      'debug_toolbar',
-      'debug_panel',
-  )
-
-  DEBUG_TOOLBAR_PANELS = [
-      'debug_toolbar.panels.versions.VersionsPanel',
-      'debug_toolbar.panels.timer.TimerPanel',
-      'debug_toolbar.panels.settings.SettingsPanel',
-      'debug_toolbar.panels.headers.HeadersPanel',
-      'debug_toolbar.panels.request.RequestPanel',
-      'debug_toolbar.panels.sql.SQLPanel',
-      'debug_toolbar.panels.staticfiles.StaticFilesPanel',
-      'debug_toolbar.panels.templates.TemplatesPanel',
-      'debug_toolbar.panels.cache.CachePanel',
-      'debug_toolbar.panels.signals.SignalsPanel',
-      'debug_toolbar.panels.logging.LoggingPanel',
-      'debug_toolbar.panels.redirects.RedirectsPanel',
-  ]
-
-  DEBUG_TOOLBAR_CONFIG = {
-      'JQUERY_URL': os.path.join(STATIC_ROOT, 'desktop/ext/js/jquery/jquery-2.2.4.min.js'),
-      'RESULTS_CACHE_SIZE': 200,
-      'SHOW_TOOLBAR_CALLBACK': show_toolbar
-  }
-
-  CACHES.update({
-      'debug-panel': {
-          'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-          'LOCATION': '/var/tmp/debug-panel-cache',
-          'OPTIONS': {
-              'MAX_ENTRIES': 10000
-          }
-      }
-  })
 
 
 ################################################################
@@ -844,6 +808,8 @@ MODULES_TO_PATCH = (
 
 if sys.version_info[0] > 2:
   MIDDLEWARE.append('axes.middleware.AxesMiddleware')  # AxesMiddleware should be the last middleware in the MIDDLEWARE list.
+else:
+  MIDDLEWARE.remove('desktop.middleware.MultipleProxyMiddleware')
 
 try:
   import hashlib

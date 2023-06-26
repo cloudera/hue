@@ -301,8 +301,7 @@ class HistoryPanel {
                 }
                 notebook.close(); // TODO: Don't close when onSuccessUrl is editor?
               } else {
-                // Perform last DROP statement execute
-                snippet.execute();
+                snippet.execute(true);
               }
             }
           });

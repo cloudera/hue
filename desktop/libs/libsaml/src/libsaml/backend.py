@@ -24,6 +24,7 @@ import json
 import logging
 
 from django.contrib.auth import logout as auth_logout
+from django.http import HttpResponse
 from djangosaml2.backends import Saml2Backend as _Saml2Backend
 from djangosaml2.views import logout as saml_logout
 from libsaml import conf
@@ -35,7 +36,7 @@ from desktop.auth.backend import force_username_case, rewrite_user
 from desktop.conf import AUTH
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class SAML2Backend(_Saml2Backend):
@@ -120,6 +121,13 @@ class SAML2Backend(_Saml2Backend):
       response = saml_logout(request)
       auth_logout(request)
       return response
+    elif conf.CDP_LOGOUT_URL.get():
+      auth_logout(request)
+      redirect_url = conf.get_logout_redirect_url()
+      html = '<html><body onload="document.forms[0].submit()">' \
+             '<form action="%s" method="POST"><input name="logoutRedirect" type="hidden" value="%s"/></form>' \
+             '</body></html>' % (conf.CDP_LOGOUT_URL.get(), redirect_url)
+      return HttpResponse(html)
     else:
       return None
 

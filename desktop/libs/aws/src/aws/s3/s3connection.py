@@ -21,10 +21,10 @@ import sys
 import xml.sax
 
 if sys.version_info[0] > 2:
-  from urllib.parse import unquote, urlparse as lib_urlparse
+  from urllib.parse import unquote, urlparse as lib_urlparse, parse_qs, urlencode
 else:
-  from urllib import unquote
-  from urlparse import urlparse as lib_urlparse
+  from urllib import unquote, urlencode
+  from urlparse import urlparse as lib_urlparse, parse_qs
 
 from boto.connection import HTTPRequest
 from boto.exception import BotoClientError
@@ -40,7 +40,7 @@ from desktop.lib.raz.clients import S3RazClient
 from aws.conf import IS_SELF_SIGNING_ENABLED
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class SignedUrlS3Connection(S3Connection):
@@ -103,23 +103,34 @@ class RazS3Connection(SignedUrlS3Connection):
                     retry_handler=None):
 
     if isinstance(bucket, self.bucket_class):
-        bucket = bucket.name
+      bucket = bucket.name
     if isinstance(key, Key):
-        key = key.name
+      key = key.name
+
     path = self.calling_format.build_path_base(bucket, key)
     LOG.debug('path=%s' % path)
+
     auth_path = self.calling_format.build_auth_path(bucket, key)
     LOG.debug('auth_path=%s' % auth_path)
+
     host = self.calling_format.build_host(self.server_name(), bucket)
+
     if query_args:
-        path += '?' + query_args
-        LOG.debug('path=%s' % path)
-        auth_path += '?' + query_args
-        LOG.debug('auth_path=%s' % auth_path)
+      # Clean prefix to remove s3a%3A//[S3_BUCKET]/ for sending correct relative path to RAZ
+      if 'prefix=s3a%3A//' in query_args:
+        qs_parsed = parse_qs(query_args) # all strings will be unquoted
+        prefix_relative_path = qs_parsed['prefix'][0].partition(bucket + '/')[2]
+        qs_parsed['prefix'][0] = prefix_relative_path
+
+        query_args = unquote(urlencode(qs_parsed, doseq=True))
+
+      path += '?' + query_args
+      LOG.debug('path=%s' % path)
+      auth_path += '?' + query_args
+      LOG.debug('auth_path=%s' % auth_path)
 
     params = {}
-    http_request = self.build_base_http_request(method, path, auth_path,
-                                                params, headers, data, host)
+    http_request = self.build_base_http_request(method, path, auth_path, params, headers, data, host)
 
     # Actual override starts here
     LOG.debug('http_request: %s, %s, %s, %s, %s, %s, %s' % (method, path, auth_path, params, headers, data, host))
@@ -127,7 +138,10 @@ class RazS3Connection(SignedUrlS3Connection):
 
     url = 'https://%(host)s%(path)s' % {'host': host, 'path': path}
 
-    raz_headers = self.get_signed_url(action=method, url=url, headers=headers)
+    # Do not send the xml data for signing for upload operation
+    xml_data = '' if query_args and 'uploadId=' in query_args else data
+
+    raz_headers = self.get_signed_url(action=method, url=url, headers=headers, data=xml_data)
     LOG.debug('Raz returned those headers: %s' % raz_headers)
 
     if raz_headers is not None:
@@ -141,10 +155,10 @@ class RazS3Connection(SignedUrlS3Connection):
                       retry_handler=retry_handler)
 
 
-  def get_signed_url(self, action='GET', url=None, headers=None):
+  def get_signed_url(self, action='GET', url=None, headers=None, data=None):
     raz_client = S3RazClient(username=self.username)
 
-    return raz_client.get_url(action, url, headers)
+    return raz_client.get_url(action, url, headers, data)
 
 
 class SelfSignedUrlS3Connection(SignedUrlS3Connection):
@@ -156,19 +170,19 @@ class SelfSignedUrlS3Connection(SignedUrlS3Connection):
                     query_args=None, sender=None, override_num_retries=None,
                     retry_handler=None):
     if isinstance(bucket, self.bucket_class):
-        bucket = bucket.name
+      bucket = bucket.name
     if isinstance(key, Key):
-        key = key.name
+      key = key.name
     path = self.calling_format.build_path_base(bucket, key)
     boto.log.debug('path=%s' % path)
     auth_path = self.calling_format.build_auth_path(bucket, key)
     boto.log.debug('auth_path=%s' % auth_path)
     host = self.calling_format.build_host(self.server_name(), bucket)
     if query_args:
-        path += '?' + query_args
-        boto.log.debug('path=%s' % path)
-        auth_path += '?' + query_args
-        boto.log.debug('auth_path=%s' % auth_path)
+      path += '?' + query_args
+      boto.log.debug('path=%s' % path)
+      auth_path += '?' + query_args
+      boto.log.debug('auth_path=%s' % auth_path)
 
     params = {}
     http_request = self.build_base_http_request(method, path, auth_path,
@@ -203,17 +217,17 @@ class SelfSignedUrlS3Connection(SignedUrlS3Connection):
 
 
 def url_client_connect_to_region(region_name, **kw_params):
-    if 'host' in kw_params:
-        host = kw_params.pop('host')
-        if host not in ['', None]:
-            region = S3RegionInfo(
-                name='custom',
-                endpoint=host,
-                connection_cls=SelfSignedUrlS3Connection  # Override S3Connection class in connect_to_region of boto/s3/__init__.py
-            )
-            return region.connect(**kw_params)
+  if 'host' in kw_params:
+    host = kw_params.pop('host')
+    if host not in ['', None]:
+      region = S3RegionInfo(
+          name='custom',
+          endpoint=host,
+          connection_cls=SelfSignedUrlS3Connection  # Override S3Connection class in connect_to_region of boto/s3/__init__.py
+      )
+      return region.connect(**kw_params)
 
-    return connect('s3', region_name, region_cls=S3RegionInfo,
+  return connect('s3', region_name, region_cls=S3RegionInfo,
                    connection_cls=SelfSignedUrlS3Connection, **kw_params)
 
 
@@ -337,17 +351,17 @@ class UrlBucket(Bucket):
       provider = self.connection.provider
       # k.metadata = boto.utils.get_aws_metadata(response.msg, provider)
       for field in Key.base_fields:
-          k.__dict__[field.lower().replace('-', '_')] = \
-              response.getheader(field)
+        k.__dict__[field.lower().replace('-', '_')] = \
+          response.getheader(field)
       # the following machinations are a workaround to the fact that
       # apache/fastcgi omits the content-length header on HEAD
       # requests when the content-length is zero.
       # See http://goo.gl/0Tdax for more details.
       clen = response.getheader('content-length')
       if clen:
-          k.size = int(response.getheader('content-length'))
+        k.size = int(response.getheader('content-length'))
       else:
-          k.size = 0
+        k.size = 0
       k.name = key_name
       k.handle_version_headers(response)
       k.handle_encryption_headers(response)

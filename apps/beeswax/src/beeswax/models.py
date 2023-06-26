@@ -31,7 +31,6 @@ from django.urls import reverse
 from enum import Enum
 from TCLIService.ttypes import TSessionHandle, THandleIdentifier, TOperationState, TOperationHandle, TOperationType
 
-from beeswax.conf import HPLSQL
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.models import Document, Document2
 from desktop.redaction import global_redaction_engine
@@ -46,14 +45,14 @@ else:
   from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 QUERY_SUBMISSION_TIMEOUT = datetime.timedelta(0, 60 * 60)               # 1 hour
 
 # Constants for DB fields, hue ini
 BEESWAX = 'beeswax'
 HIVE_SERVER2 = 'hiveserver2'
-QUERY_TYPES = (HQL, IMPALA, RDBMS, SPARK) = list(range(4))
+QUERY_TYPES = (HQL, IMPALA, RDBMS, SPARK, HPLSQL) = list(range(5))
 
 class QueryHistory(models.Model):
   """
@@ -271,7 +270,7 @@ class SavedQuery(models.Model):
   DEFAULT_NEW_DESIGN_NAME = _('My saved query')
   AUTO_DESIGN_SUFFIX = _(' (new)')
   TYPES = QUERY_TYPES
-  TYPES_MAPPING = {'beeswax': HQL, 'hql': HQL, 'impala': IMPALA, 'rdbms': RDBMS, 'spark': SPARK}
+  TYPES_MAPPING = {'beeswax': HQL, 'hql': HQL, 'impala': IMPALA, 'rdbms': RDBMS, 'spark': SPARK, 'hplsql': HPLSQL}
 
   type = models.IntegerField(null=False)
   owner = models.ForeignKey(User, on_delete=models.CASCADE, db_index=True)
@@ -400,8 +399,6 @@ class SavedQuery(models.Model):
 class SessionManager(models.Manager):
 
   def get_session(self, user, application='beeswax', filter_open=True):
-    if HPLSQL.get() and application == 'beeswax':
-      application = 'hplsql'
     try:
       q = self.filter(owner=user, application=application).exclude(guid='').exclude(secret='')
       if filter_open:

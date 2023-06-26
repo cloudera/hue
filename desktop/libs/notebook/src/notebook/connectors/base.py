@@ -42,7 +42,7 @@ else:
   from django.utils.translation import ugettext as _
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class SessionExpired(Exception):
@@ -385,6 +385,14 @@ def get_interpreter(connector_type, user=None):
         'options': {},
         'is_sql': False
       }]
+    elif connector_type == 'custom':
+      interpreter = [{
+        'name': 'custom',
+        'type': 'custom',
+        'interface': '',
+        'options': {},
+        'is_sql': False
+      }]
     else:
       raise PopupException(_('Snippet type %s is not configured.') % connector_type)
   elif len(interpreter) > 1:
@@ -399,7 +407,8 @@ def patch_snippet_for_connector(snippet):
   # TODO Connector unification
   """
   if snippet.get('connector') and snippet['connector'].get('type'):
-    snippet['type'] = snippet['connector']['type']  # To rename to 'id'
+    if snippet['connector']['dialect'] != 'hplsql':   # this is a workaround for hplsql describe not working
+      snippet['type'] = snippet['connector']['type']  # To rename to 'id'
     snippet['dialect'] = snippet['connector']['dialect']
   else:
     snippet['dialect'] = snippet['type']
@@ -424,6 +433,11 @@ def get_api(request, snippet):
     interpreter = get_interpreter(connector_type=connector_name, user=request.user)
 
   interface = interpreter['interface']
+
+  # reconstruct 'custom' interpreter.
+  if snippet.get('type') and snippet.get('type') == 'custom': 
+    interface = snippet.get('interface') 
+    interpreter['options'] = snippet.get('options')
 
   if get_cluster_config(request.user)['has_computes']:
     compute = json.loads(request.POST.get('cluster', '""'))  # Via Catalog autocomplete API or Notebook create sessions.

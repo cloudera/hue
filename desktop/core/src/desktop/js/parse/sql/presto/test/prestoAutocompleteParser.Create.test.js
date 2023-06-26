@@ -50,7 +50,7 @@ describe('prestoAutocompleteParser.js CREATE statements', () => {
     assertAutoComplete({
       beforeCursor: 'CREATE ROLE baaa;',
       afterCursor: '',
-      noError: true,
+      noErrors: true,
       containsKeywords: ['SELECT'],
       expectedResult: {
         lowerCase: false

@@ -32,7 +32,7 @@ else:
   from django.utils.translation import ugettext_lazy as _t, ugettext as _
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 HIVE_DISCOVERY_LLAP = Config(
   key="hive_discovery_llap",
@@ -125,12 +125,6 @@ HIVE_HTTP_THRIFT_PORT = Config(
   dynamic_default=get_hive_thrift_http_port,
   type=int)
 
-HPLSQL = Config(
-  key="hplsql",
-  default=False,
-  type=coerce_bool,
-  help=_t('Enable the HPLSQL mode.'))
-
 HIVE_METASTORE_HOST = Config(
   key="hive_metastore_host",
   help=_t("Host where Hive Metastore Server (HMS) is running. If Kerberos security is enabled, "
@@ -164,6 +158,12 @@ SERVER_CONN_TIMEOUT = Config(
   default=120,
   type=int,
   help=_t('Timeout in seconds for Thrift calls.'))
+
+ZOOKEEPER_CONN_TIMEOUT = Config(
+  key='zookeeper_conn_timeout',
+  default=30,
+  type=int,
+  help=_t('Timeout in seconds for zookeeper connection.'))
 
 USE_GET_LOG_API = Config( # To remove in Hue 4
   key='use_get_log_api',
@@ -246,7 +246,7 @@ MAX_NUMBER_OF_SESSIONS = Config(
           # does not have ability to manage them effectively. The cost of a session is low
           "-1 is unlimited number of sessions."),
   type=int,
-  default=1
+  default=-1
 )
 
 THRIFT_VERSION = Config(

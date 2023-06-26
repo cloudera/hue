@@ -207,6 +207,13 @@
       <path d="M476.92,424.62,384.62,323.08h61.54V215.38h61.54V323.08h61.54Z"></path>
     </symbol>
 
+    <symbol id="hi-ofs" viewBox="0 0 24 24">
+      <path d="M20.2,10.5h3.1c-0.1-1.5-0.5-3-1.2-4.2l-2.4,2.2C20,9.1,20.1,9.8,20.2,10.5z"></path>
+      <path d="M23.1,3.8l-9.8,0L9.6,7.3h3.9c0.2,0,0.3,0.1,0.3,0.2c0.1,0.1,0,0.3-0.1,0.4C13.7,8,7,14.5,5.8,15.6H11L4.1,24c1.4-1,4.7-3.5,7.1-5.3c2.7-2.1,8.2-6.6,9.4-7.5h-5.5L23.1,3.8z"></path>
+      <path d="M20,13.5c-0.9,3.5-4.2,6.1-8,6.1c-0.3,0-0.6,0-0.9,0c-1,0.8-2.1,1.6-3.1,2.4c1.3,0.5,2.6,0.7,4,0.7c6.3,0,11.3-5.1,11.3-11.3c0-0.2,0-0.4,0-0.6l-0.8,0.6C22.5,11.4,21.4,12.3,20,13.5z"></path>
+      <path d="M5.3,16.3h-1c0,0,0.2-0.2,0.6-0.6c-0.8-1.3-1.2-2.7-1.2-4.3c0-4.6,3.7-8.3,8.3-8.3c0.5,0,1,0.1,1.4,0.1h6.5c-2-2-4.8-3.2-7.9-3.2C5.7,0,0.6,5.1,0.6,11.3c0,4,2.1,7.5,5.2,9.6l2-2.4C6.9,17.9,6,17.2,5.3,16.3z"></path>
+    </symbol>
+
     <symbol id="hi-oozie" viewBox="0 0 640 640">
       <path d="M523.82,640H116.18A116.31,116.31,0,0,1,0,523.82V116.18A116.31,116.31,0,0,1,116.18,0H523.82A116.31,116.31,0,0,1,640,116.18V523.82A116.31,116.31,0,0,1,523.82,640ZM116.18,32.05a84.23,84.23,0,0,0-84.13,84.13V523.82a84.23,84.23,0,0,0,84.13,84.13H523.82a84.23,84.23,0,0,0,84.13-84.13V116.18a84.23,84.23,0,0,0-84.13-84.13Z"></path>
       <path d="M320,530c-115.79,0-210-94.21-210-210s94.21-210,210-210,210,94.21,210,210S435.79,530,320,530Zm0-388c-98.15,0-178,79.85-178,178s79.85,178,178,178,178-79.85,178-178S418.15,142,320,142Z"></path>
@@ -565,6 +572,7 @@
     <!-- ko case: 'hbase' --><svg class="hi hi-fw"><use xlink:href="#hi-hbase"></use></svg><!-- /ko -->
     <!-- ko case: 'hdfs' --><i class="fa fa-fw fa-folder-o"></i><!-- /ko -->
     <!-- ko case: 'hive' --><svg class="hi hi-fw"><use xlink:href="#hi-hive"></use></svg><!-- /ko -->
+    <!-- ko case: 'hplsql' --><svg class="hi hi-fw"><use xlink:href="#hi-hive"></use></svg><!-- /ko -->
     <!-- ko case: 'impala' --><svg class="hi hi-fw"><use xlink:href="#hi-impala"></use></svg><!-- /ko -->
     <!-- ko case: 'indexes' --><i class="fa fa-fw fa-search-plus"></i><!-- /ko -->
     <!-- ko case: 'jar' --><svg class="hi hi-fw"><use xlink:href="#hi-spark"></use></svg><!-- /ko -->
@@ -588,6 +596,7 @@
     <!-- ko case: 'shell' --><i class="fa fa-fw fa-terminal"></i><!-- /ko -->
     <!-- ko case: 'spark' --><svg class="hi hi-fw"><use xlink:href="#hi-spark"></use></svg><!-- /ko -->
     <!-- ko case: 'spark2' --><svg class="hi hi-fw"><use xlink:href="#hi-spark"></use></svg><!-- /ko -->
+    <!-- ko case: 'sparksql' --><svg class="hi hi-fw"><use xlink:href="#hi-spark"></use></svg><!-- /ko -->
     <!-- ko case: 'sqoop' --><svg class="hi hi-fw"><use xlink:href="#hi-sqoop"></use></svg><!-- /ko -->
     <!-- ko case: 'sqoop1' --><svg class="hi hi-fw"><use xlink:href="#hi-sqoop"></use></svg><!-- /ko -->
     <!-- ko case: 'tables' --><i class="fa fa-fw fa-table"></i><!-- /ko -->

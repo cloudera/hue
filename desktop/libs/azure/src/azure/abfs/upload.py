@@ -37,7 +37,7 @@ else:
 
 DEFAULT_WRITE_SIZE = 30 * 1000 * 1000 # TODO: set in configuration
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class ABFSFileUploadError(UploadFileException):
@@ -82,7 +82,7 @@ class ABFSFileUploadHandler(FileUploadHandler):
         self._fs.create(self.target_path)
         self.file = SimpleUploadedFile(name=file_name, content='')
         raise StopFutureHandlers()
-      except (ABFSFileUploadHandler, ABFSFileSystemException) as e:
+      except (ABFSFileUploadError, ABFSFileSystemException) as e:
         LOG.error("Encountered error in ABFSUploadHandler check_access: %s" % e)
         self.request.META['upload_failed'] = e
         raise StopUpload()

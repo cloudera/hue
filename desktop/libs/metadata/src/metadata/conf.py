@@ -37,7 +37,7 @@ else:
 OPTIMIZER_AUTH_PASSWORD = None
 NAVIGATOR_AUTH_PASSWORD = None
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 def get_auth_username():
@@ -54,7 +54,13 @@ def default_catalog_config_dir():
 
 def default_catalog_interface():
   """Detect if the configured catalog is Navigator or default to Atlas"""
-  return 'atlas' if atlas_flags.get_api_url() else 'navigator'
+  from metadata.metadata_sites import get_navigator_server_url
+  catalog_interface = ''
+  if atlas_flags.get_api_url():
+    catalog_interface = 'atlas'
+  elif get_navigator_server_url():
+    catalog_interface = 'navigator'
+  return catalog_interface
 
 def default_navigator_config_dir():
   """Get from usual main Hue config directory"""
@@ -63,7 +69,7 @@ def default_navigator_config_dir():
 def default_navigator_url():
   """Get from usual main Hue config directory"""
   from metadata.metadata_sites import get_navigator_server_url
-  return get_navigator_server_url() + '/api'
+  return get_navigator_server_url() + '/api' if get_navigator_server_url() else None
 
 
 def get_optimizer_url():
@@ -320,7 +326,13 @@ CATALOG = ConfigSection(
     SEARCH_CLUSTER=Config(
       key="search_cluster",
       help=_t("Limits found entities to a specific cluster."),
-      default=None
+      default='cm'
+    ),
+    ENABLE_BASIC_SEARCH=Config(
+      key="enable_basic_search",
+      help=_t("Limits found entities to a specific cluster."),
+      default=True,
+      type=coerce_bool
     ),
     FETCH_SIZE_SEARCH_INTERACTIVE=Config(
       key="fetch_size_search_interactive",

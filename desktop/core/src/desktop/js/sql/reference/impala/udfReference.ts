@@ -1540,10 +1540,10 @@ const CONDITIONAL_FUNCTIONS: UdfCategoryFunctions = {
     name: 'nvl2',
     returnTypes: ['T'],
     arguments: [[{ type: 'T' }], [{ type: 'T' }], [{ type: 'T' }]],
-    signature: 'nvl2(T a, T ifNull, T ifNotNull)',
+    signature: 'nvl2(T a, T ifNotNull, T ifNull)',
     draggable: 'nvl2()',
     description:
-      'Enhanced variant of the nvl() function. Tests an expression and returns different result values depending on whether it is NULL or not. If the first argument is NULL, returns the second argument. If the first argument is not NULL, returns the third argument. Equivalent to the nvl2() function from Oracle.'
+      'Returns the second argument, ifNotNull, if the first argument is not NULL. Returns the third argument, ifNull, if the first argument is NULL.'
   },
   zeroifnull: {
     name: 'zeroifnull',
@@ -1591,6 +1591,15 @@ const STRING_FUNCTIONS: UdfCategoryFunctions = {
     draggable: 'btrim()',
     description:
       'Removes all instances of one or more characters from the start and end of a STRING value. By default, removes only spaces. If a non-NULL optional second argument is specified, the function removes all occurrences of characters in that second argument from the beginning and end of the string.'
+  },
+  bytes: {
+    name: 'bytes',
+    returnTypes: ['INT'],
+    arguments: [[{ type: 'STRING' }]],
+    signature: 'bytes(STRING byte_expression)',
+    draggable: 'bytes()',
+    description:
+      'Returns the number of bytes contained in the specified byte string. Syntax: BYTES(byte_expression) Where: byte_expression is the byte string for which the number of bytes is to be returned. The BYTES function is  similar to the LENGTH() function except that it always returns the number of bytes regardless of the status of UTF-8 mode whether it is turned ON or OFF.'
   },
   char_length: {
     name: 'char_length',

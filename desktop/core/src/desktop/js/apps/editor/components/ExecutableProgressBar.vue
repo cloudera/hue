@@ -114,7 +114,7 @@
 </script>
 
 <style lang="scss" scoped>
-  @import '../../../components/styles/colors.scss';
+  @import '../../../components/styles/variables.scss';
   @import '../../../components/styles/mixins.scss';
 
   .executable-progress-container {
@@ -129,7 +129,7 @@
       position: relative;
 
       .executable-progress-bar {
-        background-color: $fluid-white;
+        background-color: $fluidx-white;
 
         @include ease-transition(height);
 
@@ -157,11 +157,11 @@
         }
 
         &.progress-success {
-          background-color: $fluid-green-400;
+          background-color: $fluidx-green-400;
         }
 
         &.progress-failed {
-          background-color: $fluid-red-400;
+          background-color: $fluidx-red-400;
         }
       }
     }

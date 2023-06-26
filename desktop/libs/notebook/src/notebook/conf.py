@@ -34,7 +34,7 @@ else:
   from django.utils.translation import ugettext_lazy as _t, ugettext as _
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 # Not used when connector are on
 INTERPRETERS_CACHE = None
@@ -75,6 +75,15 @@ def _connector_to_interpreter(connector):
       'options': {setting['name']: setting['value'] for setting in connector['settings']},
       'dialect_properties': connector['dialect_properties'],
   }
+
+
+def displayName(dialect, name):
+  if ENABLE_UNIFIED_ANALYTICS.get() and dialect == 'hive':
+    return 'Unified Analytics'
+  elif name.lower() == 'hplsql':
+    return 'HPL/SQL'
+  else:
+    return name
 
 
 def get_ordered_interpreters(user=None):
@@ -128,16 +137,16 @@ def get_ordered_interpreters(user=None):
 
   return [{
       "name": i.get('nice_name', i['name']),
-      'displayName': 'Unified Analytics' if ENABLE_UNIFIED_ANALYTICS.get() and i.get('dialect', i['name']).lower() == 'hive' else i.get('nice_name', i['name']),
+      'displayName': displayName(i.get('dialect', i['name']).lower(), i.get('nice_name', i['name'])),
       "type": i['type'],
       "interface": i['interface'],
       "options": i['options'],
-      'dialect': i.get('dialect', i['name']).lower(),
+      'dialect': i.get('dialect', i['type']).lower(),
       'dialect_properties': i.get('dialect_properties') or {},  # Empty when connectors off
       'category': i.get('category', 'editor'),
       "is_sql": i.get('is_sql') or \
           i['interface'] in ["hiveserver2", "rdbms", "jdbc", "solr", "sqlalchemy", "ksql", "flink"] or \
-          i['type'] == 'sql',
+          i['type'] in ["sql", "sparksql"],
       "is_catalog": i['interface'] in ["hms",],
     }
     for i in interpreters
@@ -206,13 +215,6 @@ DBPROXY_EXTRA_CLASSPATH = Config(
 ENABLE_QUERY_BUILDER = Config(
   key="enable_query_builder",
   help=_t("Flag to enable the SQL query builder of the table assist."),
-  type=coerce_bool,
-  default=False
-)
-
-ENABLE_NOTEBOOK_2 = Config(
-  key="enable_notebook_2",
-  help=_t("Feature flag to enable Notebook 2."),
   type=coerce_bool,
   default=False
 )

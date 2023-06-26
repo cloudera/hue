@@ -29,7 +29,7 @@ from django.views.decorators.http import require_POST
 from beeswax.data_export import DOWNLOAD_COOKIE_AGE
 from beeswax.management.commands import beeswax_install_examples
 from desktop.auth.decorators import admin_required
-from desktop.conf import ENABLE_DOWNLOAD, USE_NEW_EDITOR
+from desktop.conf import ENABLE_DOWNLOAD, ENABLE_HUE_5, USE_NEW_EDITOR
 from desktop.lib import export_csvxls
 from desktop.lib.connectors.models import Connector
 from desktop.lib.django_util import render, JsonResponse
@@ -39,7 +39,7 @@ from desktop.models import Document2, Document, FilesystemException, _get_gist_d
 from desktop.views import serve_403_error
 from metadata.conf import has_optimizer, has_catalog, has_workload_analytics
 
-from notebook.conf import get_ordered_interpreters, ENABLE_NOTEBOOK_2, SHOW_NOTEBOOKS, EXAMPLES
+from notebook.conf import get_ordered_interpreters, SHOW_NOTEBOOKS, EXAMPLES
 from notebook.connectors.base import Notebook, _get_snippet_name, get_interpreter
 from notebook.connectors.spark_shell import SparkApi
 from notebook.decorators import check_editor_access_permission, check_document_access_permission, check_document_modify_permission
@@ -52,7 +52,7 @@ else:
   from django.utils.translation import ugettext as _
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 def notebooks(request):
@@ -142,7 +142,7 @@ def editor(request, is_mobile=False, is_embeddable=False):
     editor_type = _get_editor_type(editor_id)
 
   template = 'editor.mako'
-  if ENABLE_NOTEBOOK_2.get():
+  if ENABLE_HUE_5.get():
     template = 'editor2.mako'
   elif is_mobile:
     template = 'editor_m.mako'
@@ -207,7 +207,7 @@ def browse(request, database, table, partition_spec=None):
         namespace=namespace,
         compute=compute
     )
-    return render('editor2.mako' if ENABLE_NOTEBOOK_2.get() else 'editor.mako', request, {
+    return render('editor2.mako' if ENABLE_HUE_5.get() else 'editor.mako', request, {
         'notebooks_json': json.dumps([editor.get_data()]),
         'options_json': json.dumps({
             'languages': get_ordered_interpreters(request.user),
@@ -294,7 +294,7 @@ def execute_and_watch(request):
   else:
     raise PopupException(_('Action %s is unknown') % action)
 
-  return render('editor2.mako' if ENABLE_NOTEBOOK_2.get() else 'editor.mako', request, {
+  return render('editor2.mako' if ENABLE_HUE_5.get() else 'editor.mako', request, {
       'notebooks_json': json.dumps([editor.get_data()]),
       'options_json': json.dumps({
           'languages': [{"name": "%s SQL" % editor_type.title(), "type": editor_type}],

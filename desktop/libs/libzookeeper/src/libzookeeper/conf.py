@@ -28,7 +28,7 @@ if sys.version_info[0] > 2:
 else:
   from urlparse import urlparse
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 def zkensemble():

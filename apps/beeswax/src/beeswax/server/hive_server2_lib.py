@@ -30,13 +30,14 @@ from TCLIService.ttypes import TOpenSessionReq, TGetTablesReq, TFetchResultsReq,
   TGetCrossReferenceReq, TGetPrimaryKeysReq
 
 from desktop.lib import python_util, thrift_util
-from desktop.conf import DEFAULT_USER, USE_THRIFT_HTTP_JWT
+from desktop.conf import DEFAULT_USER, USE_THRIFT_HTTP_JWT, ENABLE_XFF_FOR_HIVE_IMPALA
 
 from beeswax import conf as beeswax_conf, hive_site
 from beeswax.hive_site import hiveserver2_use_ssl
-from beeswax.conf import CONFIG_WHITELIST, LIST_PARTITIONS_LIMIT, HPLSQL, MAX_CATALOG_SQL_ENTRIES
+from beeswax.conf import CONFIG_WHITELIST, LIST_PARTITIONS_LIMIT, MAX_CATALOG_SQL_ENTRIES
 from beeswax.models import Session, HiveServerQueryHandle, HiveServerQueryHistory
-from beeswax.server.dbms import Table, DataTable, QueryServerException, InvalidSessionQueryServerException
+from beeswax.server.dbms import Table, DataTable, QueryServerException, InvalidSessionQueryServerException, reset_ha
+from notebook.connectors.base import get_interpreter
 
 if sys.version_info[0] > 2:
   from django.utils.translation import gettext as _
@@ -44,7 +45,7 @@ else:
   from django.utils.translation import ugettext as _
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 IMPALA_RESULTSET_CACHE_SIZE = 'impala.resultset.cache.size'
 DEFAULT_USER = DEFAULT_USER.get()
 
@@ -665,6 +666,8 @@ class HiveServerClient(object):
         'username': user.username,  # If SASL or LDAP, it gets the username from the authentication mechanism since it dependents on it.
         'configuration': {},
     }
+    connector_type = 'hive' if self.query_server['server_name'] == 'beeswax' else self.query_server['server_name']
+    interpreter = get_interpreter(connector_type=connector_type, user=self.user)
 
     if self.impersonation_enabled:
       kwargs.update({'username': DEFAULT_USER})
@@ -674,8 +677,12 @@ class HiveServerClient(object):
 
     if self.query_server['server_name'] == 'beeswax': # All the time
       kwargs['configuration'].update({'hive.server2.proxy.user': user.username})
-      if HPLSQL.get():
-        kwargs['configuration'].update({'set:hivevar:mode': 'HPLSQL'})
+      xff_header = json.loads(user.userprofile.json_data).get('X-Forwarded-For', None)
+      if xff_header and ENABLE_XFF_FOR_HIVE_IMPALA.get():
+        kwargs['configuration'].update({'X-Forwarded-For': xff_header})
+
+    if self.query_server['server_name'] == 'hplsql' or interpreter['dialect'] == 'hplsql': # All the time
+      kwargs['configuration'].update({'hive.server2.proxy.user': user.username, 'set:hivevar:mode': 'HPLSQL'})
 
     if self.query_server['server_name'] == 'llap': # All the time
       kwargs['configuration'].update({'hive.server2.proxy.user': user.username})
@@ -685,10 +692,17 @@ class HiveServerClient(object):
 
     if self.query_server.get('dialect') == 'impala' and self.query_server['SESSION_TIMEOUT_S'] > 0:
       kwargs['configuration'].update({'idle_session_timeout': str(self.query_server['SESSION_TIMEOUT_S'])})
+      xff_header = json.loads(user.userprofile.json_data).get('X-Forwarded-For', None)
+      if xff_header and ENABLE_XFF_FOR_HIVE_IMPALA.get():
+        kwargs['configuration'].update({'X-Forwarded-For': xff_header})
 
     LOG.info('Opening %s thrift session for user %s' % (self.query_server['server_name'], user.username))
 
-    req = TOpenSessionReq(**kwargs)
+    try:
+      req = TOpenSessionReq(**kwargs)
+    except Exception as e:
+      if 'Connection refused' in str(e):
+        reset_ha()
     res = self._client.OpenSession(req)
     self.coordinator_host = self._client.get_coordinator_host()
     if self.coordinator_host:
@@ -707,11 +721,10 @@ class HiveServerClient(object):
 
     encoded_status, encoded_guid = HiveServerQueryHandle(secret=sessionId.secret, guid=sessionId.guid).get()
     properties = json.dumps(res.configuration)
-    application = 'hplsql' if HPLSQL.get() and self.query_server['server_name'] == 'beeswax' else self.query_server['server_name']
 
     session = Session.objects.create(
         owner=user,
-        application=application,
+        application=self.query_server['server_name'],
         status_code=res.status.statusCode,
         secret=encoded_status,
         guid=encoded_guid,
@@ -721,7 +734,7 @@ class HiveServerClient(object):
 
     # HS2 does not return properties in TOpenSessionResp
     # TEZ returns properties, but we need the configuration to detect engine
-    properties = session.get_properties()
+    properties = session.get_properties() or {}
     if not properties or self.query_server['server_name'] == 'beeswax':
       configuration = self.get_configuration(session=session)
       properties.update(configuration)
@@ -997,10 +1010,7 @@ class HiveServerClient(object):
 
     # The query can override the default configuration
     configuration.update(self._get_query_configuration(query))
-    if HPLSQL.get() and self.query_server['server_name'] == 'beeswax':
-      query_statement = query.hql_query
-    else:
-      query_statement = query.get_query_statement(statement)
+    query_statement = query.get_query_statement(statement)
 
     return self.execute_async_statement(statement=query_statement, conf_overlay=configuration, session=session)
 

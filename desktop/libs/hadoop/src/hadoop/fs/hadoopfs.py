@@ -27,6 +27,7 @@ from past.builtins import cmp
 from future import standard_library
 standard_library.install_aliases()
 from builtins import object
+import codecs
 import errno
 import logging
 import math
@@ -53,7 +54,7 @@ else:
   from urlparse import urlsplit as lib_urlsplit
   from django.utils.translation import ugettext as _
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 DEFAULT_USER = "webui"
 
@@ -72,6 +73,10 @@ DN_THRIFT_TIMEOUT = 3
 
 # Encoding used by HDFS namespace
 HDFS_ENCODING = 'utf-8'
+
+# Taken from https://stackoverflow.com/questions/898669/how-can-i-detect-if-a-file-is-binary-non-text-in-python
+textchars = bytearray({7, 8, 9, 10, 12, 13, 27} | set(range(0x20, 0x100)) - {0x7f})
+is_binary_string = lambda bytes: bool(bytes.translate(None, textchars))
 
 def encode_fs_path(path):
   """encode_fs_path(path) -> byte string in utf8"""
@@ -227,6 +232,49 @@ class Hdfs(object):
       else:
         self._copy_file(local_src, remote_dst)
 
+  def _copy_binary_file(self, local_src, remote_dst, chunk_size):
+    src = open(local_src, mode="rb")
+    try:
+      try:
+        self.create(remote_dst, permission=0o755)
+        chunk = src.read(chunk_size)
+        while chunk:
+          self.append(remote_dst, chunk)
+          chunk = src.read(chunk_size)
+        LOG.info(_('Copied %s -> %s.') % (local_src, remote_dst))
+      except:
+        LOG.exception(_('Copying %s -> %s failed.') % (local_src, remote_dst))
+        raise
+    finally:
+      src.close()
+
+  def _copy_non_binary_file(self, local_src, remote_dst, chunk_size):
+    for data_format in ("ascii", "utf-8", "latin-1", "iso-8859"):
+      src_copied = False
+      if sys.version_info[0] > 2:
+        src = open(local_src, encoding=data_format)
+      else:
+        src = codecs.open(local_src, encoding=data_format)
+      try:
+        self.create(remote_dst, permission=0o755)
+        chunk = src.read(chunk_size)
+        while chunk:
+          self.append(remote_dst, chunk)
+          chunk = src.read(chunk_size)
+        src_copied = True
+      except:
+        LOG.exception(_('Copying %s -> %s failed with %s encoding format') % (local_src, remote_dst, data_format))
+        self.remove(remote_dst)
+      finally:
+        src.close()
+      if src_copied:
+        break
+    if src_copied:
+      LOG.info(_('Copied %s -> %s using %s encoding format') % (local_src, remote_dst, data_format))
+    else:
+      LOG.exception(_('Copying %s -> %s failed with %s encoding format') % (local_src, remote_dst, data_format))
+      raise
+
   def _copy_file(self, local_src, remote_dst, chunk_size=1024 * 1024 * 64):
     if os.path.isfile(local_src):
       if self.exists(remote_dst):
@@ -234,21 +282,16 @@ class Hdfs(object):
         return
       else:
         LOG.info(_('%(remote_dst)s does not exist. Trying to copy.') % {'remote_dst': remote_dst})
-
-      src = file(local_src)
-      try:
-        try:
-          self.create(remote_dst, permission=0o755)
-          chunk = src.read(chunk_size)
-          while chunk:
-            self.append(remote_dst, chunk)
-            chunk = src.read(chunk_size)
-          LOG.info(_('Copied %s -> %s.') % (local_src, remote_dst))
-        except:
-          LOG.exception(_('Copying %s -> %s failed.') % (local_src, remote_dst))
-          raise
-      finally:
-        src.close()
+      binary_file = False
+      with open(local_src, 'rb') as bf:
+        if is_binary_string(bf.read(1024)):
+          binary_file = True
+      if binary_file:
+        LOG.info(_('file %s is binary file.') % local_src)
+        self._copy_binary_file(local_src, remote_dst, chunk_size=chunk_size)
+      else:
+        LOG.info(_('file %s is not a binary file.') % local_src)
+        self._copy_non_binary_file(local_src, remote_dst, chunk_size=chunk_size)
     else:
       LOG.info(_('Skipping %s (not a file).') % local_src)
 

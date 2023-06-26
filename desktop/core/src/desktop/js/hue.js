@@ -21,9 +21,7 @@ import _ from 'lodash';
 import $ from 'jquery/jquery.common';
 import 'ext/bootstrap.2.3.2.min';
 import 'ext/bootstrap-editable.1.5.1.min';
-
 import 'utils/d3Extensions';
-import * as d3 from 'd3';
 import d3v3 from 'd3v3';
 import Dropzone from 'dropzone';
 import filesize from 'filesize';
@@ -44,7 +42,7 @@ import CancellableJqPromise from 'api/cancellableJqPromise';
 import { DOCUMENT_TYPE_I18n, DOCUMENT_TYPES } from 'doc/docSupport';
 import contextCatalog from 'catalog/contextCatalog';
 import dataCatalog from 'catalog/dataCatalog';
-import hueAnalytics from 'utils/hueAnalytics';
+import hueAnalytics, { setupGlobalListenersForAnalytics } from 'utils/hueAnalytics';
 import HueColors from 'utils/hueColors';
 import hueDebug from 'utils/hueDebug';
 import hueDrop from 'utils/hueDrop';
@@ -61,6 +59,7 @@ import 'components/sidebar/HueSidebarWebComponent';
 import 'components/assist/AssistPanelWebComponent';
 
 import 'ko/components/assist/assistViewModel';
+import { BOTH_ASSIST_TOGGLE_EVENT } from 'ko/components/assist/events';
 import OnePageViewModel from 'onePageViewModel';
 import SidePanelViewModel from 'sidePanelViewModel';
 import TopNavViewModel from 'topNavViewModel';
@@ -76,6 +75,7 @@ import HueDocument from 'doc/hueDocument';
 import { getLastKnownConfig, refreshConfig } from 'config/hueConfig';
 import { simpleGet } from 'api/apiUtils'; // In analytics.mako, metrics.mako, threads.mako
 import Mustache from 'mustache'; // In hbase/templates/app.mako, jobsub.templates.js, search.ko.js, search.util.js
+import { createReactComponents } from 'reactComponents/createRootElements.js';
 
 // TODO: Migrate away
 window._ = _;
@@ -83,7 +83,6 @@ window.apiHelper = apiHelper;
 window.simpleGet = simpleGet;
 window.CancellableJqPromise = CancellableJqPromise;
 window.contextCatalog = contextCatalog;
-window.d3 = d3;
 window.d3v3 = d3v3;
 window.dataCatalog = dataCatalog;
 window.DOCUMENT_TYPE_I18n = DOCUMENT_TYPE_I18n;
@@ -96,6 +95,7 @@ window.HdfsAutocompleter = HdfsAutocompleter;
 window.hueAnalytics = hueAnalytics;
 window.HueColors = HueColors;
 window.hueDebug = hueDebug;
+window.hueDebugAnalytics = false;
 window.HueDocument = HueDocument;
 window.hueDrop = hueDrop;
 window.HueFileEntry = HueFileEntry;
@@ -114,9 +114,12 @@ window.SqlAutocompleter = SqlAutocompleter;
 window.sqlStatementsParser = sqlStatementsParser;
 window.hplsqlStatementsParser = hplsqlStatementsParser;
 window.sqlUtils = sqlUtils;
+window.createReactComponents = createReactComponents;
 
 $(document).ready(async () => {
   await refreshConfig(); // Make sure we have config up front
+
+  createReactComponents('.main-page');
 
   const onePageViewModel = new OnePageViewModel();
   ko.applyBindings(onePageViewModel, $('.page-content')[0]);
@@ -125,7 +128,7 @@ $(document).ready(async () => {
   ko.applyBindings(sidePanelViewModel, $('.left-panel')[0]);
   ko.applyBindings(sidePanelViewModel, $('#leftResizer')[0]);
   ko.applyBindings(sidePanelViewModel, $('.right-panel')[0]);
-  if (!window.ENABLE_NOTEBOOK_2) {
+  if (!window.ENABLE_HUE_5) {
     ko.applyBindings(sidePanelViewModel, $('.context-panel')[0]);
   }
 
@@ -173,5 +176,14 @@ $(document).ready(async () => {
     }, 10);
   });
 
+  setupGlobalListenersForAnalytics();
+
   $('.page-content').jHueScrollUp();
+});
+
+// Framework independent global keyboard shortcuts
+document.addEventListener('keydown', e => {
+  if (e.key === '.' && (e.metaKey || e.ctrlKey)) {
+    huePubSub.publish(BOTH_ASSIST_TOGGLE_EVENT);
+  }
 });

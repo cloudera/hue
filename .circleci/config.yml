@@ -3,106 +3,55 @@
 # Check https://circleci.com/docs/2.0/language-python/ for more details
 #
 version: 2.1
-jobs:
-  build:
-    docker:
-      # specify the version you desire here
-      # - image: circleci/python:3.8.0
-      - image: gethue/hue:latest-py2
 
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/postgres:9.4
-
-    working_directory: ~/repo
-
+commands:
+  build-py-38-common:
+    parameters:
+      go_arch:
+        # amd64 or arm64
+        type: string
+      hugo_arch:
+        # 64bit (AMD64) or ARM64
+        type: string
     steps:
       - checkout
 
-      # Download and cache dependencies
-      # - restore_cache:
-      #     keys:
-      #       - v1-dependencies-{{ checksum "requirements.txt" }}
-      #       # fallback to using the latest cache if no exact match is found
-      #       - v1-dependencies-
-
-      # - run:
-      #     name: install dependencies
-      #     command: |
-      #       python -m venv venv
-      #       . venv/bin/activate
-      #       pip install -r requirements.txt
-
-      # - save_cache:
-      #     paths:
-      #       - ./venv
-      #     key: v1-dependencies-{{ checksum "requirements.txt" }}
-
-      # Revert to traditional pip install when build refactored, in the meantime:
       - run:
-          name: refresh sources
+          name: compile
           command: |
-            rm -r /usr/share/hue/desktop/core/src/desktop
-            cp -r desktop/core/src/desktop /usr/share/hue/desktop/core/src/desktop
 
-            for lib in `ls desktop/libs`
-            do
-              rm -r /usr/share/hue/desktop/libs/$lib/src/$lib
-              cp -r desktop/libs/$lib/src/$lib /usr/share/hue/desktop/libs/$lib/src/$lib
-            done
-            for lib in `ls apps | grep -v Makefile`
-            do
-              rm -r /usr/share/hue/apps/$lib/src/$lib
-              cp -r apps/$lib/src/$lib /usr/share/hue/apps/$lib/src/$lib
-            done
+            if [ -d /usr/share/hue ]; then
+              # Running in gethue/hue Docker container
+              apt-get update
+              apt-get install -y python3.8-dev python3.8-venv python3.8-distutils libsnappy-dev # This should not be needed as some point
+              curl -sL https://bootstrap.pypa.io/get-pip.py | python3.8
+            else
+              sudo ln -fs /usr/share/zoneinfo/UTC /etc/localtime
+              export DEBIAN_FRONTEND=noninteractive
+              sudo apt-get update
+              sudo apt-get install -y gcc g++ build-essential python3.8-dev python3.8-venv python3.8-distutils asciidoc rsync curl libkrb5-dev libldap2-dev libsasl2-dev libxml2-dev libxslt-dev  libsasl2-modules-gssapi-mit libsnappy-dev libffi-dev
+              curl -sL https://deb.nodesource.com/setup_14.x | sudo bash - && sudo apt-get install -y nodejs
+              curl -sL https://bootstrap.pypa.io/get-pip.py | sudo python3.8
+              sudo apt-get install -y libncursesw5-dev libgdbm-dev libc6-dev libssl-dev openssl
+            fi
 
-            rm -r /usr/share/hue/tools
-            cp -r tools /usr/share/hue
+            export PYTHON_VER=python3.8
+            export ROOT=$PWD
+            make apps
 
-            rm /usr/share/hue/desktop/conf/*.ini
-            cp desktop/conf/pseudo-distributed.ini.tmpl /usr/share/hue/desktop/conf/pseudo-distributed.ini
-
-            # ini configuration tweaks
-            ## Very slow if on, cuts time in two and does not skip tests
-            sed -i 's/## has_iam_detection=true/  has_iam_detection=false/g' /usr/share/hue/desktop/conf/pseudo-distributed.ini
-
-            cd /usr/share/hue
-            # make npm-install # Not available
-            cp ~/repo/babel.config.js .
-            cp ~/repo/tsconfig.json .
-            cp ~/repo/jest.config.js .
-            cp ~/repo/.pylintrc .
-            cp ~/repo/.stylelintrc .
-
-            cp ~/repo/webpack.config*.js .
-            rm package.json
-            cp ~/repo/package.json .
-            rm package-lock.json
-            cp ~/repo/package-lock.json .
-            npm install
-            npm i eslint-plugin-jest@latest --save-dev # Seems to not be found otherwise
-            npm run webpack
-            npm run webpack-login
-            npm run webpack-workers
-            ./build/env/bin/hue collectstatic --noinput
-
-            cp -r ~/repo/docs .
-
-      # Run documentation lint
       - run:
           name: run documentation lints
           command: |
             cd ~/repo
 
             # Installs to move to image building
-            curl -O https://dl.google.com/go/go1.15.linux-amd64.tar.gz
-            tar -xvf go1.15.linux-amd64.tar.gz
+            curl -O https://dl.google.com/go/go1.17.linux-<< parameters.go_arch >>.tar.gz
+            tar -xvf go1.17.linux-<< parameters.go_arch >>.tar.gz
             export GO111MODULE=on
             go/bin/go get -u github.com/raviqqe/muffet@v1.5.7
 
-            curl --output hugo_0.69.0_Linux-64bit.tar.gz -L https://github.com/gohugoio/hugo/releases/download/v0.69.0/hugo_0.69.0_Linux-64bit.tar.gz
-            tar -xvf hugo_0.69.0_Linux-64bit.tar.gz
+            curl --output hugo_0.69.0_Linux.tar.gz -L https://github.com/gohugoio/hugo/releases/download/v0.69.0/hugo_0.69.0_Linux-<< parameters.hugo_arch >>.tar.gz
+            tar -xvf hugo_0.69.0_Linux.tar.gz
 
             export PATH=$PWD:$HOME/go/bin:$PATH
 
@@ -110,194 +59,57 @@ jobs:
             ./tools/ci/check_for_website_dead_links.sh docs/docs-site
             # ./tools/ci/check_for_website_dead_links.sh docs/gethue
 
-      # Run code lints
       - run:
           name: run python lints
           command: |
-            cd ~/repo
-
-            /usr/share/hue/build/env/bin/pip install pylint==1.7.5 pylint-django==0.7.2 configparser==4.0.2
-            ./tools/ci/check_for_python_lint.sh /usr/share/hue
+            ./build/env/bin/pip install pylint==2.5.3 pylint-django==2.3.0 configparser==5.3.0
+            ./tools/ci/check_for_python_lint.sh
 
       - run:
-          name: run commit title format check
+          name: run tests
           command: |
-            cd ~/repo
-
-            ./tools/ci/check_for_commit_message.sh
-
-      - run:
-          name: run js lint
-          command: |
-            cd /usr/share/hue
-            cp ~/repo/.prettierrc .
-            cp ~/repo/.eslint* .
-            cp ~/repo/tools . -r
-
-            npm run lint
-
-      - run:
-          name: run style lint
-          command: |
-            cd /usr/share/hue
-
-            npm run style-lint
-
-      - run:
-          name: run npm license checker
-          command: |
-            cd /usr/share/hue
-
-            npm run check-license
-
-      - run:
-          name: run npm absolute path detection
-          command: |
-            cd /usr/share/hue
-
-            npm run check-absolute-paths
-
-      # Run tests
-      - run:
-          name: run python API tests
-          command: |
-            cd /usr/share/hue
-
             PYTHONWARNINGS=always ./build/env/bin/hue test unit --with-xunit --with-cover
-
-      - run:
-          name: run js tests
-          command: |
-            cd /usr/share/hue
-
-            # https://jestjs.io/docs/en/troubleshooting.html#tests-are-extremely-slow-on-docker-andor-continuous-integration-ci-server
-            sed -i 's/"test": "jest"/"test": "jest --runInBand"/g' package.json
-
-            npm run test
 
       - store_artifacts:
           path: test-reports
           destination: test-reports
 
 
-  commit:
-    docker:
-      - image: circleci/python:3.8.0
-
-    working_directory: ~/repo
-
-    steps:
-      - checkout
-
-      - add_ssh_keys:
-          fingerprints:
-            - "8c:68:29:28:04:80:38:31:c0:59:d9:3d:65:3e:b7:8c"
-
-      - run:
-          name: push to master
-          command: |
-            git push origin HEAD:master
-
-
-  build-py-36:
+jobs:
+  build-py-38:
     docker:
       - image: gethue/hue:latest-py2 # Should be circleci/python:3.6 at some point
 
     working_directory: ~/repo
 
     steps:
-      - checkout
+      - build-py-38-common:
+          go_arch: "amd64"
+          hugo_arch: "64bit"
 
-      # Download and cache dependencies
-      # - restore_cache:
-      #     keys:
-      #       - v1-dependencies-{{ checksum "desktop/core/requirements.txt" }}
-      #       # fallback to using the latest cache if no exact match is found
-      #       - v1-dependencies-
-
-      - run:
-          name: compile
-          command: |
-            apt-get update && apt-get install -y python3.6-dev libsnappy-dev asciidoc # This should not be needed as some point
-
-            export PYTHON_VER=python3.6
-            make apps
-
-            make prod
-
-      - run:
-          name: run tests
-          command: |
-            PYTHONWARNINGS=always ./build/env/bin/hue test unit --with-xunit --with-cover
-
-      # - run:
-      #     name: install dependencies
-      #     command: |
-      #       python -m venv venv
-      #       make apps
-
-      # - save_cache:
-      #     paths:
-      #       - ./build/venv
-      #     key: v1-dependencies-{{ checksum "esktop/core/requirements.txt" }}
-
-
-  build-py-38:
-    docker:
-      - image: gethue/hue:latest-py2 # Should be circleci/python:3.x at some point
+  build-py-38-arm64:
+    machine:
+      image: ubuntu-2004:202101-01
+    resource_class: arm.medium
 
     working_directory: ~/repo
 
     steps:
-      - checkout
-
-      - run:
-          name: compile
-          command: |
-            apt-get install -y python3.8-dev python3.8-venv python3.8-distutils libsnappy-dev # This should not be needed as some point
-
-            export PYTHON_VER=python3.8
-            make apps
-
-      - run:
-          name: run tests
-          command: |
-            PYTHONWARNINGS=always ./build/env/bin/hue test unit --with-xunit --with-cover
-
+      - build-py-38-common:
+          go_arch: "arm64"
+          hugo_arch: "ARM64"
 
 workflows:
   version: 2
-  run-tests-and-rebase-master:
-    jobs:
-      - build:
-          filters:
-            branches:
-              ignore:
-                - master
-                - py3-ci
-      - build-py-36:
-          filters:
-            branches:
-              ignore:
-                - master
-                - py3-ci
-      - commit:
-          requires:
-            - build
-            - build-py-36
-          filters:
-            branches:
-              only:
-                - /.*ci-commit-master.*/
   build-python3:
     jobs:
       - build-py-38:
           filters:
             branches:
-              only:
-                - py3-ci
-      - build-py-36:
+              ignore:
+                - master
+      - build-py-38-arm64:
           filters:
             branches:
-              only:
-                - py3-ci
+              ignore:
+                - master

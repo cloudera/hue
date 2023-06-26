@@ -1,0 +1,134 @@
+[
+  {
+    "namePrefix": "should not find errors",
+    "beforeCursor": "ANALYZE TABLES IN school_db COMPUTE STATISTICS NOSCAN;",
+    "afterCursor": "",
+    "noErrors": true,
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should not find errors",
+    "beforeCursor": "ANALYZE TABLES COMPUTE STATISTICS;",
+    "afterCursor": "",
+    "noErrors": true,
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ANALYZE ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "TABLES"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ANALYZE TABLES ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "COMPUTE STATISTICS",
+      "FROM",
+      "IN"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest databases",
+    "beforeCursor": "ANALYZE TABLES FROM ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestDatabases": {}
+    }
+  },
+  {
+    "namePrefix": "should suggest databases",
+    "beforeCursor": "ANALYZE TABLES IN ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestDatabases": {}
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ANALYZE TABLES FROM foo ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "COMPUTE STATISTICS"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ANALYZE TABLES IN foo ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "COMPUTE STATISTICS"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ANALYZE TABLES COMPUTE ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "STATISTICS"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ANALYZE TABLES FROM foo COMPUTE ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "STATISTICS"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ANALYZE TABLES FROM foo COMPUTE STATISTICS ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "NOSCAN"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ANALYZE TABLES IN foo COMPUTE STATISTICS ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "NOSCAN"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  }
+]

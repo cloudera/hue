@@ -48,7 +48,7 @@ if sys.version_info[0] > 2:
 else:
   from django.utils.translation import ugettext as _
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 def submit_dryrun(run_func):
@@ -408,10 +408,12 @@ STORED AS TEXTFILE %s""" % (self.properties.get('send_result_path'),
     """From XML and job.properties HDFS files"""
     deployment_dir = os.path.dirname(application_path)
     xml = self.fs.do_as_user(self.user, self.fs.read, application_path, 0, 1 * 1024 ** 2)
+    xml = xml.decode('utf-8') if hasattr(xml, 'decode') else xml
 
     properties_file = deployment_dir + '/job.properties'
     if self.fs.do_as_user(self.user, self.fs.exists, properties_file):
       properties = self.fs.do_as_user(self.user, self.fs.read, properties_file, 0, 1 * 1024 ** 2)
+      properties = properties.decode('utf-8') if hasattr(properties, 'decode') else properties
     else:
       properties = None
 
@@ -555,7 +557,10 @@ STORED AS TEXTFILE %s""" % (self.properties.get('send_result_path'),
         jar_path = node.data['properties'].get('jar_path')
         if jar_path:
           if not jar_path.startswith('/'):  # If workspace relative path
-            jar_path = self.fs.join(self.job.deployment_dir, jar_path)
+            if jar_path.startswith('s3a://') or jar_path.startswith('abfs://'):
+              jar_path = jar_path
+            else:
+              jar_path = self.fs.join(self.job.deployment_dir, jar_path)
           if not jar_path.startswith(lib_path):  # If not already in lib
             files.append(jar_path)
 
@@ -572,12 +577,15 @@ STORED AS TEXTFILE %s""" % (self.properties.get('send_result_path'),
       if files:
         for jar_file in files:
           LOG.debug("Updating %s" % jar_file)
-          jar_lib_path = self.fs.join(lib_path, self.fs.basename(jar_file))
+          if jar_file.startswith('s3a://') or jar_file.startswith('abfs://'):
+            jar_lib_path = jar_file
+          else:
+            jar_lib_path = self.fs.join(lib_path, self.fs.basename(jar_file))
           # Refresh if needed
           if self.fs.exists(jar_lib_path) and self.fs.exists(jar_file):
             stat_src = self.fs.stats(jar_file)
             stat_dest = self.fs.stats(jar_lib_path)
-            if stat_src.fileId != stat_dest.fileId:
+            if hasattr(stat_src, 'fileId') and hasattr(stat_dest, 'fileId') and stat_src.fileId != stat_dest.fileId:
               self.fs.remove(jar_lib_path, skip_trash=True)
           self.fs.copyfile(jar_file, jar_lib_path)
 
@@ -608,10 +616,16 @@ STORED AS TEXTFILE %s""" % (self.properties.get('send_result_path'),
 
   def _create_file(self, deployment_dir, file_name, data, do_as=False):
     file_path = self.fs.join(deployment_dir, file_name)
+
+    # In Py3 because of i18n, the xml data is not properly utf-8 encoded for some languages.
+    # This can later throw UnicodeEncodeError exception for request body in HDFS or other FS API calls. To tackle this,
+    # We are converting the data into bytes by utf-8 encoding instead of str type.
+    data = smart_str(data).encode('utf-8') if sys.version_info[0] > 2 else smart_str(data)
+
     if do_as:
-      self.fs.do_as_user(self.user, self.fs.create, file_path, overwrite=True, permission=0o644, data=smart_str(data))
+      self.fs.do_as_user(self.user, self.fs.create, file_path, overwrite=True, permission=0o644, data=data)
     else:
-      self.fs.create(file_path, overwrite=True, permission=0o644, data=smart_str(data))
+      self.fs.create(file_path, overwrite=True, permission=0o644, data=data)
     LOG.debug("Created/Updated %s" % (file_path,))
 
   def _generate_altus_action_script(self, service, command, arguments, auth_key_id, auth_key_secret):

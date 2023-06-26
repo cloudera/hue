@@ -27,6 +27,7 @@ import { GET_KNOWN_CONFIG_TOPIC } from 'config/events';
 import AssistInnerPanel from 'ko/components/assist/assistInnerPanel';
 import componentUtils from 'ko/components/componentUtils';
 import huePubSub from 'utils/huePubSub';
+import hueAnalytics from 'utils/hueAnalytics';
 import I18n from 'utils/i18n';
 import { withLocalStorage } from 'utils/storageUtils';
 
@@ -129,7 +130,8 @@ class AssistPanel {
               interpreter.type === 'adls' ||
               interpreter.type === 'hdfs' ||
               interpreter.type === 's3' ||
-              interpreter.type === 'abfs'
+              interpreter.type === 'abfs' ||
+              interpreter.type === 'ofs'
           );
 
           if (storageBrowsers.length) {
@@ -283,6 +285,9 @@ class AssistPanel {
       });
 
       self.visiblePanel.subscribe(newValue => {
+        if (self.lastOpenPanelType() !== newValue?.type) {
+          hueAnalytics.log('left-assist-panel', 'panel-selection/' + newValue?.type);
+        }
         self.lastOpenPanelType(newValue.type);
       });
 

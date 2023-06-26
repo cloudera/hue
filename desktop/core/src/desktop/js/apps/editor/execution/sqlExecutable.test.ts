@@ -144,6 +144,59 @@ describe('sqlExecutable.js', () => {
     expect(subject.status).toEqual(ExecutionStatus.available);
   });
 
+  it('should update the handle on check status after execute', async () => {
+    const subject = createSubject(SELECT_STATEMENT, undefined, 'impala');
+
+    let statusResolve: (data: unknown) => void;
+    const statusPromise = new CancellablePromise<unknown>(resolve => {
+      statusResolve = resolve;
+    });
+
+    jest.spyOn(ApiUtils, 'post').mockImplementation((url: string): CancellablePromise<unknown> => {
+      if (url.indexOf('/create_session') !== -1) {
+        return CancellablePromise.resolve({ session: { type: 'foo' } });
+      }
+      if (url.indexOf('/execute') !== -1) {
+        expect(url).toContain('/execute/impala');
+        return CancellablePromise.resolve({
+          handle: {
+            has_result_set: false
+          },
+          history_id: 1,
+          history_uuid: 'some-history_uuid',
+          history_parent_uuid: 'some_history_parent_uuid'
+        });
+      }
+      if (url.indexOf('/check_status') !== -1) {
+        statusResolve({
+          query_status: { status: ExecutionStatus.available, has_result_set: true }
+        });
+        return statusPromise;
+      }
+      if (url.indexOf('/get_logs') !== -1) {
+        return CancellablePromise.resolve({ status: 0, logs: '' });
+      }
+
+      if (url.indexOf('/fetch_result_data')) {
+        return CancellablePromise.resolve({});
+      }
+      fail('fail for URL: ' + url);
+      throw new Error('Did not find URL: ' + url);
+    });
+
+    expect(subject.status).toEqual(ExecutionStatus.ready);
+
+    await subject.execute();
+
+    expect(subject.status).not.toEqual(ExecutionStatus.available);
+    expect(subject.handle?.has_result_set).toBeFalsy();
+
+    await statusPromise;
+
+    expect(subject.status).toEqual(ExecutionStatus.available);
+    expect(subject.handle?.has_result_set).toBeTruthy();
+  });
+
   // xit('should set the correct status after failed execute', done => {
   //   const subject = createSubject('SELECT * FROM customers');
   //

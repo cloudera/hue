@@ -1,0 +1,59 @@
+[
+  {
+    "namePrefix": "should not find errors",
+    "beforeCursor": "DROP TEMPORARY FUNCTION IF EXISTS baa;",
+    "afterCursor": "",
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "noErrors": true,
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "DROP ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "FUNCTION",
+      "TEMPORARY FUNCTION"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "DROP TEMPORARY ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "FUNCTION"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "DROP FUNCTION ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "IF EXISTS"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "DROP FUNCTION IF ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "EXISTS"
+      ]
+    }
+  }
+]

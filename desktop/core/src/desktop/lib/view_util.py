@@ -27,7 +27,7 @@ from django.urls import reverse
 from hadoop.fs.hadoopfs import Hdfs
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 def big_filesizeformat(bytes):

@@ -32,7 +32,7 @@ from boto.s3.key import Key
 from boto.s3.prefix import Prefix
 
 from aws import s3
-from aws.conf import get_default_region, get_locations, PERMISSION_ACTION_S3
+from aws.conf import get_default_region, get_locations, PERMISSION_ACTION_S3, is_raz_s3
 from aws.s3 import normpath, s3file, translate_s3_error, S3A_ROOT
 from aws.s3.s3stat import S3Stat
 
@@ -51,7 +51,7 @@ DEFAULT_READ_SIZE = 1024 * 1024  # 1MB
 BUCKET_NAME_PATTERN = re.compile(
   "^((?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9_\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9_\-]*[A-Za-z0-9]))$")
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class S3FileSystemException(IOError):
@@ -67,6 +67,7 @@ def auth_error_handler(view_fn):
     try:
       return view_fn(*args, **kwargs)
     except (S3ResponseError, IOError) as e:
+      LOG.exception('S3 error: ' + str(e))
       if 'Forbidden' in str(e) or (hasattr(e, 'status') and e.status == 403):
         path = kwargs.get('path')
         if not path and len(args) > 1:
@@ -88,7 +89,10 @@ def auth_error_handler(view_fn):
 def get_s3_home_directory(user=None):
   from desktop.models import _handle_user_dir_raz
 
-  remote_home_s3 = REMOTE_STORAGE_HOME.get() if hasattr(REMOTE_STORAGE_HOME, 'get') and REMOTE_STORAGE_HOME.get() else 's3a://'
+  remote_home_s3 = 's3a://'
+  if hasattr(REMOTE_STORAGE_HOME, 'get') and REMOTE_STORAGE_HOME.get() and REMOTE_STORAGE_HOME.get().startswith('s3a://'):
+    remote_home_s3 = REMOTE_STORAGE_HOME.get()
+
   remote_home_s3 = _handle_user_dir_raz(user, remote_home_s3)
 
   return remote_home_s3
@@ -391,7 +395,15 @@ class S3FileSystem(object):
     return self._filebrowser_action
 
   def create_home_dir(self, home_path):
-    LOG.info('Create home directory is not available for S3 filesystem')
+    # When S3 raz is enabled, try to create user home dir for REMOTE_STORAGE_HOME path
+    if is_raz_s3():
+      LOG.debug('Attempting to create user directory for path: %s' % home_path)
+      try:
+        self.mkdir(home_path)
+      except Exception as e:
+        LOG.exception('Failed to create user home directory for path %s with error: %s' % (home_path, str(e)))
+    else:
+      LOG.info('Create home directory is not available for S3 filesystem')
 
   @translate_s3_error
   @auth_error_handler

@@ -34,7 +34,7 @@ else:
   from mock import patch, Mock
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class TestRazS3Connection():
@@ -204,7 +204,8 @@ class TestSelfSignedUrlClientIntegration(S3TestBase):
     kwargs = {'action': 'GET', 'bucket': 'gethue-test', 'key': 'data/query-hive-weblogs.csv'}
     url = SelfSignedUrlClient(self.connection).generate_url(**kwargs)
 
-    url = 'https://gethue-test.s3.amazonaws.com/data/query-hive-weblogs.csv?AWSAccessKeyId=AKIA23E77ZX2HVY76YGL&Signature=3lhK%2BwtQ9Q2u5VDIqb4MEpoY3X4%3D&Expires=1617207304'
+    url = 'https://gethue-test.s3.amazonaws.com/data/query-hive-weblogs.csv?'
+    'AWSAccessKeyId=AKIA23E77ZX2HVY76YGL&Signature=3lhK%2BwtQ9Q2u5VDIqb4MEpoY3X4%3D&Expires=1617207304'
 
     assert_true('data/query-hive-weblogs.csv' in url)
     assert_true('AWSAccessKeyId=' in url)

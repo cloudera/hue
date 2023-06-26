@@ -133,7 +133,7 @@ describe('impalaAutocompleteParser.js DESCRIBE statements', () => {
       afterCursor: '',
       expectedResult: {
         lowerCase: false,
-        suggestKeywords: ['DATABASE', 'EXTENDED', 'FORMATTED'],
+        suggestKeywords: ['DATABASE', 'HISTORY', 'EXTENDED', 'FORMATTED'],
         suggestTables: {},
         suggestDatabases: { appendDot: true }
       }
@@ -158,7 +158,7 @@ describe('impalaAutocompleteParser.js DESCRIBE statements', () => {
       afterCursor: '',
       expectedResult: {
         lowerCase: false,
-        suggestKeywords: ['DATABASE', 'EXTENDED', 'FORMATTED'],
+        suggestKeywords: ['DATABASE', 'HISTORY', 'EXTENDED', 'FORMATTED'],
         suggestTables: {},
         suggestDatabases: { appendDot: true }
       }
@@ -196,6 +196,64 @@ describe('impalaAutocompleteParser.js DESCRIBE statements', () => {
       expectedResult: {
         lowerCase: false,
         suggestTables: { identifierChain: [{ name: 'db' }] }
+      }
+    });
+  });
+
+  it('should suggest tables for "DESCRIBE HISTORY |"', () => {
+    assertAutoComplete({
+      beforeCursor: 'DESCRIBE HISTORY ',
+      afterCursor: '',
+      expectedResult: {
+        lowerCase: false,
+        suggestTables: {},
+        suggestDatabases: { appendDot: true }
+      }
+    });
+  });
+
+  it('should suggest tables for "DESCRIBE HISTORY db.|"', () => {
+    assertAutoComplete({
+      beforeCursor: 'DESCRIBE HISTORY db.',
+      afterCursor: '',
+      expectedResult: {
+        lowerCase: false,
+        suggestTables: { identifierChain: [{ name: 'db' }] }
+      }
+    });
+  });
+
+  it('should suggest tables for "DESCRIBE HISTORY tbl |"', () => {
+    assertAutoComplete({
+      beforeCursor: 'DESCRIBE HISTORY tbl ',
+      afterCursor: '',
+      expectedResult: {
+        lowerCase: false,
+        suggestKeywords: ['BETWEEN', 'FROM']
+      }
+    });
+  });
+
+  it('should suggest tables for "DESCRIBE HISTORY tbl FROM |"', () => {
+    assertAutoComplete({
+      beforeCursor: 'DESCRIBE HISTORY tbl FROM ',
+      afterCursor: '',
+      containsKeywords: ['INTERVAL'],
+      expectedResult: {
+        lowerCase: false,
+        suggestFunctions: {}
+      }
+    });
+  });
+
+  it('should suggest tables for "DESCRIBE HISTORY ice_t BETWEEN \'2022-01-04 10:00:00\' AND |"', () => {
+    assertAutoComplete({
+      beforeCursor: "DESCRIBE HISTORY ice_t BETWEEN '2022-01-04 10:00:00' AND ",
+      afterCursor: '',
+      containsKeywords: [],
+      expectedResult: {
+        lowerCase: false,
+        suggestFunctions: {}
       }
     });
   });

@@ -43,7 +43,7 @@ if sys.version_info[0] > 2:
 else:
   from django.utils.translation import ugettext as _
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class InstallException(Exception):
@@ -230,6 +230,7 @@ class SampleTable(object):
           status='ready',
           database=self.db_name,
           on_success_url='assist.db.refresh',
+          last_executed=int(self.request.ts * 1000) if self.request else -1,
           is_task=False,
       )
 
@@ -372,6 +373,7 @@ class SampleTable(object):
         status='ready',
         database=self.db_name,
         on_success_url='assist.db.refresh',
+        last_executed=int(self.request.ts * 1000) if self.request and hasattr(self.request, 'ts') else -1,
         is_task=False,
     )
     job.execute_and_wait(self.request)

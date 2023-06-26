@@ -10,20 +10,27 @@ on:
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     strategy:
       matrix:
-        python-version: [3.8]
+        python-version: [3.8, 3.9]
 
     steps:
     - name: Checkout
       uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - name: run commit title format check
+      run: |
+        ./tools/ci/check_for_commit_message.sh
 
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
+
     - name: Cache pip
       uses: actions/cache@v2
       with:
@@ -36,14 +43,21 @@ jobs:
 
     - name: compile
       run: |
-        python -m pip install --upgrade pip
         sudo apt-get update
-        sudo apt-get install -y python3.8-dev python3.8-venv python3.8-distutils asciidoc libkrb5-dev libldap2-dev libsasl2-dev libsasl2-modules-gssapi-mit libsnappy-dev # This should not be needed as some point
+        sudo apt-get install -y gcc g++ build-essential python${{ matrix.python-version }}-dev python${{ matrix.python-version }}-venv python${{ matrix.python-version }}-distutils asciidoc rsync curl sudo libkrb5-dev libldap2-dev libsasl2-dev libxml2-dev libxslt-dev  libsasl2-modules-gssapi-mit libsnappy-dev libffi-dev # This should not be needed as some point
+        sudo curl -sL https://deb.nodesource.com/setup_14.x | sudo bash - && sudo apt-get install -y nodejs
+        sudo curl -sL https://bootstrap.pypa.io/get-pip.py | sudo python${{ matrix.python-version }}
+        sudo apt-get install -y python3-setuptools
+        sudo apt-get install -y libncursesw5-dev libgdbm-dev libc6-dev libssl-dev openssl
 
-        export PYTHON_VER=python3.8
+        export PYTHON_VER=python${{ matrix.python-version }}
+        export ROOT=$PWD
         make apps
 
-        make prod
+    - name: run python lints
+      run: |
+        ./build/env/bin/pip install pylint==2.5.3 pylint-django==2.3.0 configparser==5.3.0
+        ./tools/ci/check_for_python_lint.sh
 
     - name: run tests
       run: |

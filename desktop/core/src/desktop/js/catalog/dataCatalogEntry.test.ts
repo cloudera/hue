@@ -14,9 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { merge } from 'lodash';
+
 import { CancellablePromise } from 'api/cancellablePromise';
 import dataCatalog from 'catalog/dataCatalog';
-import DataCatalogEntry, { Sample } from 'catalog/DataCatalogEntry';
+import DataCatalogEntry, { Sample, TableAnalysis } from 'catalog/DataCatalogEntry';
 import { Compute, Connector, Namespace } from 'config/types';
 import * as CatalogApi from './api';
 
@@ -60,9 +62,128 @@ describe('dataCatalogEntry.ts', () => {
 
   afterAll(clearStorage);
 
+  describe('getAnalysis', () => {
+    const getAnalysisObj = () => ({
+      message: '',
+      name: 'iceberg-table-test',
+      partition_keys: [],
+      cols: [{ name: 'i', type: 'int', comment: '' }],
+      path_location: 'test',
+      hdfs_link: '/filebrowser/view=/warehouse/tablespace/managed/hive/sample_07',
+      is_view: false,
+      properties: [],
+      details: {
+        stats: {
+          table_type: 'ICEBERG'
+        },
+        properties: {}
+      },
+      stats: [],
+      primary_keys: []
+    });
+
+    const emptyAnalysisApiSpy = (additionalAnalysis: Record<string, unknown> = {}) => {
+      const customAnalysis = merge({}, getAnalysisObj(), additionalAnalysis);
+      jest
+        .spyOn(CatalogApi, 'fetchDescribe')
+        .mockReturnValue(CancellablePromise.resolve<TableAnalysis>(customAnalysis));
+    };
+
+    it('should return true for isIcebergTable after the analysis has has been loaded', async () => {
+      emptyAnalysisApiSpy();
+      const entry = await getEntry('someDb.someIcebergTable');
+
+      expect(entry.isIcebergTable()).toBeFalsy();
+
+      await entry.getAnalysis();
+      expect(entry.isIcebergTable()).toBeTruthy();
+    });
+
+    it('returns true for isTransactionalTable when details.stats.transactional="true"', async () => {
+      emptyAnalysisApiSpy({ details: { stats: { transactional: 'true' } } });
+      const entry = await getEntry('someDb.someTransactionalTable');
+
+      expect(entry.isTransactionalTable()).toBeFalsy();
+
+      await entry.getAnalysis();
+      expect(entry.isTransactionalTable()).toBeTruthy();
+    });
+
+    it('returns false for isTransactionalTable when there is no details.stats.transactional defined', async () => {
+      emptyAnalysisApiSpy();
+      const entry = await getEntry('someDb.someTransactionalTable');
+
+      expect(entry.isTransactionalTable()).toBeFalsy();
+
+      await entry.getAnalysis();
+      expect(entry.isTransactionalTable()).toBeFalsy();
+    });
+
+    it('should return the hdfs path based on the hdfs_link', async () => {
+      emptyAnalysisApiSpy();
+      const entry = await getEntry('someDb.someTable');
+      await entry.getAnalysis();
+      expect(entry.getHdfsFilePath()).toEqual('/warehouse/tablespace/managed/hive/sample_07');
+    });
+
+    it('rejects a cachedOnly request if there is no previous promise', async () => {
+      emptyAnalysisApiSpy();
+      const entryA = await getEntry('someDb.someTable');
+      let rejected = false;
+      await entryA.getAnalysis({ cachedOnly: true }).catch(() => {
+        rejected = true;
+      });
+
+      expect(rejected).toBeTruthy();
+    });
+
+    it('should return the same analysis promise for the same entry', async () => {
+      emptyAnalysisApiSpy();
+      const entryA = await getEntry('someDb.someTable');
+      const entryB = await getEntry('someDb.someTable');
+      expect(entryA.getAnalysis()).toEqual(entryB.getAnalysis());
+    });
+
+    it('should not return the same analysis promise for different entries', async () => {
+      emptyAnalysisApiSpy();
+      const entryA = await getEntry('someDb.someTableOne');
+      const entryB = await getEntry('someDb.someTableTwo');
+      expect(entryA.getAnalysis()).not.toEqual(entryB.getAnalysis());
+    });
+
+    it('should keep the analysis promise for future session use', async () => {
+      emptyAnalysisApiSpy();
+      const entryA = await getEntry('someDb.someTable');
+      await entryA.clearCache();
+      const analysisPromise = entryA.getAnalysis();
+      expect(entryA.analysisPromise).toEqual(analysisPromise);
+      const entryB = await getEntry('someDb.someTable');
+      expect(entryB.analysisPromise).toEqual(analysisPromise);
+    });
+
+    it('should not cancel when cancellable option is not set to true', async () => {
+      emptyAnalysisApiSpy();
+      const entryA = await getEntry('someDb.someTable');
+      const analysisPromise = entryA.getAnalysis({ cancellable: false });
+      await analysisPromise.cancel();
+      expect(analysisPromise.cancelled).toBeFalsy();
+      expect(entryA.analysisPromise).toEqual(analysisPromise);
+    });
+
+    it('should not return a cancelled analysis promise', async () => {
+      emptyAnalysisApiSpy();
+      const entryA = await getEntry('someDb.someTable');
+      const cancelledPromise = entryA.getAnalysis({ cancellable: true });
+      await cancelledPromise.cancel();
+      const newPromise = entryA.getAnalysis();
+      expect(cancelledPromise.cancelled).toBeTruthy();
+      expect(newPromise).not.toEqual(cancelledPromise);
+    });
+  });
+
   describe('getSample', () => {
     const emptySampleApiSpy = () => {
-      spyOn(CatalogApi, 'fetchSample').and.returnValue(
+      jest.spyOn(CatalogApi, 'fetchSample').mockReturnValue(
         CancellablePromise.resolve<Sample>({
           data: [],
           meta: [],
@@ -110,7 +231,7 @@ describe('dataCatalogEntry.ts', () => {
     });
 
     it('should bubble up exceptions', async () => {
-      spyOn(CatalogApi, 'fetchSample').and.returnValue(CancellablePromise.reject('failed!'));
+      jest.spyOn(CatalogApi, 'fetchSample').mockReturnValue(CancellablePromise.reject('failed!'));
       const entryA = await getEntry('someDb.someTable');
       let caught = false;
       try {

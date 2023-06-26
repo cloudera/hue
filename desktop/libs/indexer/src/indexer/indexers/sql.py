@@ -32,7 +32,6 @@ from hadoop.fs.hadoopfs import Hdfs
 from notebook.connectors.base import get_interpreter
 from notebook.models import make_notebook
 from useradmin.models import User
-from impala.conf import USER_SCRATCH_DIR_PERMISSION
 
 from desktop.lib import django_mako
 from desktop.lib.exceptions_renderable import PopupException
@@ -47,7 +46,7 @@ else:
   from urlparse import urlparse
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 try:
@@ -55,6 +54,11 @@ try:
 except ImportError as e:
   LOG.warning('Hive and HiveServer2 interfaces are not enabled')
 
+try:
+  from impala import conf as impala_conf
+except ImportError as e:
+  LOG.warning("Impala app is not enabled")
+  impala_conf = None
 
 class SQLIndexer(object):
 
@@ -78,10 +82,12 @@ class SQLIndexer(object):
     kudu_partition_columns = destination['kuduPartitionColumns']
     comment = destination['description']
 
-    source_path = urllib_unquote(source['path'])
+    source_path = source['path']
     load_data = destination['importData']
+    isIceberg = destination['isIceberg']
+
     external = not destination['useDefaultLocation']
-    external_path = urllib_unquote(destination['nonDefaultLocation'])
+    external_path = destination['nonDefaultLocation']
 
     editor_type = destination['sourceType']
     is_transactional = destination['isTransactional']
@@ -132,7 +138,7 @@ class SQLIndexer(object):
     "escapeChar"    = "\\\\"
     ''' % source['format']
 
-    use_temp_table = table_format in ('parquet', 'orc', 'kudu') or is_transactional
+    use_temp_table = table_format in ('parquet', 'orc', 'kudu') or is_transactional or isIceberg
     if use_temp_table: # We'll be using a temp table to load data
       if load_data:
         table_name, final_table_name = 'hue__tmp_%s' % table_name, table_name
@@ -170,12 +176,13 @@ class SQLIndexer(object):
         user_scratch_dir = self.fs.get_home_dir() + '/.scratchdir/%s' % str(uuid.uuid4()) # Make sure it's unique.
         self.fs.do_as_user(self.user, self.fs.mkdir, user_scratch_dir, 0o0777)
         self.fs.do_as_user(self.user, self.fs.rename, source['path'], user_scratch_dir)
-        if USER_SCRATCH_DIR_PERMISSION.get():
+        if editor_type == 'impala' and impala_conf and impala_conf.USER_SCRATCH_DIR_PERMISSION.get():
           self.fs.do_as_user(self.user, self.fs.chmod, user_scratch_dir, 0o0777, True)
         source_path = user_scratch_dir + '/' + source['path'].split('/')[-1]
 
     if external_path.lower().startswith("abfs"): #this is to check if its using an ABFS path
       external_path = abfspath(external_path)
+
 
     tbl_properties = OrderedDict()
     if skip_header:
@@ -243,7 +250,13 @@ class SQLIndexer(object):
         }
       else:
         columns_list = ['*']
-        extra_create_properties = 'STORED AS %(file_format)s' % {'file_format': file_format}
+        extra_create_properties = ''
+        if isIceberg:
+          if source_type == 'hive':
+            extra_create_properties = "STORED BY ICEBERG\n"
+          elif source_type == 'impala':
+            file_format = 'ICEBERG'
+        extra_create_properties += 'STORED AS %(file_format)s' % {'file_format': file_format}
         if is_transactional:
           extra_create_properties += "\nTBLPROPERTIES('transactional'='true', 'transactional_properties'='%s')" % \
               default_transactional_type
@@ -354,7 +367,7 @@ class SQLIndexer(object):
             row = self.nomalize_booleans(row, columns)
           _csv_rows.append(tuple(row))
 
-        if _csv_rows:
+        if _csv_rows:  #sql for data insertion
           csv_rows = str(_csv_rows)[1:-1]
 
           if dialect in ('hive', 'mysql'):
@@ -364,18 +377,23 @@ class SQLIndexer(object):
               'csv_rows': csv_rows
             }
           elif dialect == 'impala':
-             # casting from string to boolean is not allowed in impala so string -> int -> bool
-            sql_ = ',\n'.join([
-              '  CAST ( `%(name)s` AS %(type)s ) `%(name)s`' % col if col['type'] != 'boolean' \
-              else '  CAST ( CAST ( `%(name)s` AS TINYINT ) AS boolean ) `%(name)s`' % col for col in columns
-            ])
-
-            sql += '''\nINSERT INTO %(database)s.%(table_name)s_tmp VALUES %(csv_rows)s;\n
-CREATE TABLE IF NOT EXISTS %(database)s.%(table_name)s
-AS SELECT\n%(sql_)s\nFROM  %(database)s.%(table_name)s_tmp;\n\nDROP TABLE IF EXISTS %(database)s.%(table_name)s_tmp;'''% {
+            sql += '''\nINSERT INTO %(database)s.%(table_name)s_tmp VALUES %(csv_rows)s;\n'''% {
               'database': database,
               'table_name': table_name,
               'csv_rows': csv_rows,
+            }
+
+        if dialect == 'impala':
+          # casting from string to boolean is not allowed in impala so string -> int -> bool
+          sql_ = ',\n'.join([
+            '  CAST ( `%(name)s` AS %(type)s ) `%(name)s`' % col if col['type'] != 'boolean' \
+            else '  CAST ( CAST ( `%(name)s` AS TINYINT ) AS boolean ) `%(name)s`' % col for col in columns
+          ])
+
+          sql += '''\nCREATE TABLE IF NOT EXISTS %(database)s.%(table_name)s
+AS SELECT\n%(sql_)s\nFROM  %(database)s.%(table_name)s_tmp;\n\nDROP TABLE IF EXISTS %(database)s.%(table_name)s_tmp;'''% {
+              'database': database,
+              'table_name': table_name,
               'sql_': sql_
             }
 

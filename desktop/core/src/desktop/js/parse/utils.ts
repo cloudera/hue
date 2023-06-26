@@ -17,10 +17,11 @@
 import { Connector } from 'config/types';
 import hplsqlStatementsParser from 'parse/hplsqlStatementsParser';
 import sqlStatementsParser from 'parse/sqlStatementsParser';
+import { SqlStatementsParser } from './types';
 
-export const getStatementsParser = (connector: Connector): any => {
-  if (connector.dialect === 'hive' && window.HPLSQL) {
-    return hplsqlStatementsParser;
+export const getStatementsParser = (connector: Connector): SqlStatementsParser => {
+  if (connector.dialect === 'hplsql') {
+    return hplsqlStatementsParser as unknown as SqlStatementsParser;
   } else {
     return sqlStatementsParser;
   }

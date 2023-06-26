@@ -34,7 +34,7 @@ else:
   from mock import patch, Mock, MagicMock
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class TestStandardTables():
@@ -225,5 +225,6 @@ class TestTransactionalTables():
         statement="UPSERT INTO us_population VALUES ('CA', 'San Jose', 912332)",
         status='ready',
         database='default',
+        last_executed=-1,
         on_success_url='assist.db.refresh', is_task=False
       )

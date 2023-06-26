@@ -31,17 +31,73 @@ if [ $# != 0 ] ; then
   usage
 fi
 
+find_os() {
+  unameOut="$(uname -s)"
+  case "${unameOut}" in
+    Linux*)     machine=Linux;;
+    Darwin*)    machine=Mac;;
+    CYGWIN*)    machine=Cygwin;;
+    MINGW*)     machine=MinGw;;
+    *)          machine="UNKNOWN:${unameOut}"
+  esac
+  echo ${machine}
+}
+
+find_home() {
+  runningos=$(find_os)
+  WORK_DIR=""
+  if [[ ${runningos} == "Linux" ]]; then
+    WORK_DIR=$(dirname "$(readlink -f "$0" || echo "$argv0")")
+  elif [[ ${runningos} == "Mac" ]]; then
+    WORK_DIR="$( cd "$( dirname "$argv0" )" && pwd )"
+  else
+    echo "Not Supported " $runningos
+    exit 1
+  fi
+  echo ${WORK_DIR}
+}
+
 # We're in <hue_root>/tools
-CURR_DIR="$(dirname $0)"
-HUE_ROOT="$CURR_DIR/.."
+CURR_DIR=$(find_home)
+
+if [[ $CURR_DIR == */hue ]]; then
+  HUE_ROOT=$CURR_DIR
+elif [[ $CURR_DIR == */tools ]]; then
+  HUE_ROOT=$(dirname $CURR_DIR)
+fi
+
 ENV_PYTHON="$HUE_ROOT/build/env/bin/python"
 VIRTUAL_BOOTSTRAP="$CURR_DIR/virtual-bootstrap/virtual-bootstrap.py"
 
-source $HUE_ROOT/tools/enable-python27.sh
+if [[ ! -e $ENV_PYTHON ]]; then
+  echo "Is $ENV_PYTHON available?"
+  echo "Failing to perform relocataion"
+  exit 127
+fi
+
+if [[ ! -e $VIRTUAL_BOOTSTRAP ]]; then
+  echo "Is $VIRTUAL_BOOTSTRAP available?"
+  echo "Failing to perform relocataion"
+  exit 127
+fi
 
 export PATH=$(dirname $ENV_PYTHON):$PATH
+
+PYVER=$($ENV_PYTHON -V 2>&1 | awk '{print $2}' | cut -d '.' -f 1,2)
 # Step 1. Fix virtualenv
-$ENV_PYTHON $VIRTUAL_BOOTSTRAP --relocatable "$HUE_ROOT/build/env"
+if [ "$(echo "$PYVER >= 3.8" | bc -l)" -eq 1 ]; then
+  pushd .
+  cd $HUE_ROOT
+  virtualenv-make-relocatable "build/env"
+  $ENV_PYTHON $VIRTUAL_BOOTSTRAP --relocatable_pth "build/env"
+  popd
+elif [ "$(echo "$PYVER == 2.7" | bc -l)" -eq 1 ]; then
+  if [ -e "$HUE_ROOT/tools/enable-python27.sh" ]; then
+    source $HUE_ROOT/tools/enable-python27.sh
+  fi
+
+  $ENV_PYTHON $VIRTUAL_BOOTSTRAP --relocatable "$HUE_ROOT/build/env"
+fi
 
 # Step 1b. Fix any broken lib64 directory
 LIB64="$HUE_ROOT/build/env/lib64"

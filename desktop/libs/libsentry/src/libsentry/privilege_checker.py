@@ -28,7 +28,7 @@ from libsentry.conf import PRIVILEGE_CHECKER_CACHING
 from libsentry.sentry_site import get_hive_sentry_provider
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 PRIVILEGE_HIERARCHY = {

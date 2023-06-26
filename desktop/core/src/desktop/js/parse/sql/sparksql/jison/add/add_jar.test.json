@@ -1,0 +1,142 @@
+[
+  {
+    "namePrefix": "should not find errors",
+    "beforeCursor": "ADD JAR /tmp/test;",
+    "afterCursor": "",
+    "noErrors": true,
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should not find errors",
+    "beforeCursor": "ADD JAR \"ivy://group:module:version?exclude=group:module&transitive=true\";",
+    "afterCursor": "",
+    "noErrors": true,
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should not find errors",
+    "beforeCursor": "ADD JAR \"/path/to/file/abc.txt\";",
+    "afterCursor": "",
+    "noErrors": true,
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should not find errors",
+    "beforeCursor": "ADD JAR '/path/to/file with space/abc.txt';",
+    "afterCursor": "",
+    "noErrors": true,
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "ADD ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "JAR"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest files",
+    "beforeCursor": "ADD JAR /",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestHdfs": { "path": "/" }
+    }
+  },
+  {
+    "namePrefix": "should suggest files",
+    "beforeCursor": "ADD JAR /boo/",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestHdfs": { "path": "/boo/" }
+    }
+  },
+  {
+    "namePrefix": "should suggest files",
+    "beforeCursor": "ADD JAR '",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestHdfs": { "path": "" }
+    }
+  },
+  {
+    "namePrefix": "should suggest files",
+    "beforeCursor": "ADD JAR '/foo/",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestHdfs": { "path": "/foo/" }
+    }
+  },
+  {
+    "namePrefix": "should suggest files",
+    "beforeCursor": "ADD JAR '/foo bar/",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestHdfs": { "path": "/foo bar/" }
+    }
+  },
+  {
+    "namePrefix": "should suggest files",
+    "beforeCursor": "ADD JAR \"",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestHdfs": { "path": "" }
+    }
+  },
+  {
+    "namePrefix": "should suggest files",
+    "beforeCursor": "ADD JAR \"/foo/",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestHdfs": { "path": "/foo/" }
+    }
+  },
+  {
+    "namePrefix": "should suggest files",
+    "beforeCursor": "ADD JAR \"/foo bar/",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestHdfs": { "path": "/foo bar/" }
+    }
+  },
+  {
+    "namePrefix": "should suggest files",
+    "beforeCursor": "ADD JAR \"/foo bar/partial",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestHdfs": { "path": "/foo bar/" }
+    }
+  }
+]

@@ -52,7 +52,7 @@ else:
   from django.utils.translation import ungettext as _t, ugettext as _
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 # Values for template_lib parameter
 DJANGO = 'django'

@@ -1,3 +1,0 @@
-include LICENSE README.rst
-recursive-include src *.c *.h
-recursive-include pysrc *.py

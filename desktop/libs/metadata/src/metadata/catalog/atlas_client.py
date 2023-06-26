@@ -20,6 +20,7 @@ import json
 import logging
 import re
 import sys
+import requests
 
 from desktop.lib.exceptions_renderable import raise_popup_exception
 from desktop.lib.rest import resource
@@ -33,7 +34,7 @@ if sys.version_info[0] > 2:
 else:
   from django.utils.translation import ugettext as _
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 _HAS_CATALOG_NAMESPACE = None
 _JSON_CONTENT_TYPE = 'application/json'
@@ -65,7 +66,25 @@ class AtlasApi(Api):
   def __init__(self, user=None):
     super(AtlasApi, self).__init__(user)
 
-    self._api_url = CATALOG.API_URL.get().strip('/') + "/api/atlas"
+    self._api_url = None
+
+    # Checking which server is active server if there are multiple else use the one thats listed
+    atlas_servers = CATALOG.API_URL.get().replace("%20", "").replace("['", "").replace("']", "").replace("'", "").split(',')
+
+    for atlas_server in atlas_servers:
+      atlas_url = atlas_server.strip().strip('/') + '/api/atlas/admin/status'
+      response = requests.get(atlas_url)
+      atlas_is_active = response.json()
+
+      if "ACTIVE" in atlas_is_active["Status"]:
+        LOG.debug('Setting Atlas API endpoint to: %s' % atlas_server)
+        self._api_url = atlas_server.strip().strip('/') + "/api/atlas"
+        break
+
+    if self._api_url is None:
+      self._api_url = CATALOG.API_URL.get()
+      LOG.warning('No Atlas server available for use, defaulting to %s' % self._api_url)
+
     self._username = CATALOG.SERVER_USER.get()
     self._password = CATALOG.SERVER_PASSWORD.get()
 
@@ -172,8 +191,13 @@ class AtlasApi(Api):
     }
 
     try:
-      atlas_response = self._root.get('/v2/search/dsl?query=%s' % dsl_query, headers=self.__headers,
-                                      params=self.__params)
+      if CATALOG.ENABLE_BASIC_SEARCH.get():
+        atlas_response = self._root.get('/v2/search/basic?query=%s' % dsl_query, headers=self.__headers,
+                                       params=self.__params)
+      else:
+        atlas_response = self._root.get('/v2/search/dsl?query=%s' % dsl_query, headers=self.__headers,
+                                       params=self.__params)
+
       if not 'entities' in atlas_response or len(atlas_response['entities']) < 1:
         raise CatalogEntityDoesNotExistException('Could not find entity with query: %s' % dsl_query)
 
@@ -351,7 +375,10 @@ class AtlasApi(Api):
         else:
           atlas_dsl_query = 'from %s where qualifiedName like \'%s*\' limit %s' % (atlas_type, parentPath, limit)
 
-      atlas_response = self._root.get('/v2/search/dsl?query=%s' % atlas_dsl_query)
+      if CATALOG.ENABLE_BASIC_SEARCH.get():
+        atlas_response = self._root.get('/v2/search/basic?query=%s' % atlas_dsl_query)
+      else:
+        atlas_response = self._root.get('/v2/search/dsl?query=%s' % atlas_dsl_query)
 
       # Adapt Atlas entities to Navigator structure in the results
       if 'entities' in atlas_response:

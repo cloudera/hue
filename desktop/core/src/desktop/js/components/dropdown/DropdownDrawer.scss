@@ -16,7 +16,7 @@
  limitations under the License.
 */
 
-@import '../styles/colors';
+@import '../styles/variables';
 @import '../styles/mixins';
 
 .hue-dropdown-drawer {
@@ -35,7 +35,7 @@
     z-index: 1000;
     margin: 2px 0 0;
     padding: 0;
-    background-color: $fluid-white;
+    background-color: $fluidx-white;
     border: 1px solid $hue-border-color;
     border-radius: $hue-panel-border-radius;
 
@@ -54,7 +54,7 @@
       }
 
       li {
-        color: $fluid-gray-800;
+        color: $fluidx-gray-800;
 
         button,
         a {

@@ -49,7 +49,7 @@ ${ fb_components.menubar() }
   %endif
 </style>
 
-<div id="${ path.startswith('s3a://') and 'filebrowser_s3Components' or path.startswith('abfs://') and 'filebrowser_abfsComponents' or 'filebrowserComponents' }" class="container-fluid filebrowser" style="min-height: calc(100vh - 130px);">
+<div id="${ path.startswith('s3a://') and 'filebrowser_s3Components' or path.startswith('abfs://') and 'filebrowser_abfsComponents'  or path.startswith('ofs://') and 'filebrowser_ofsComponents'or 'filebrowserComponents' }" class="container-fluid filebrowser" style="min-height: calc(100vh - 130px);">
   <div class="card card-small">
     <div class="actionbar">
     <%actionbar:render>
@@ -61,22 +61,22 @@ ${ fb_components.menubar() }
         <div class="btn-toolbar" style="display: inline; vertical-align: middle">
           <div id="ch-dropdown" class="btn-group" style="vertical-align: middle">
             <button class="btn dropdown-toggle" title="${_('Actions')}" data-toggle="dropdown"
-            data-bind="visible: !inTrash(), enable: selectedFiles().length > 0 && ((!isS3() && !isABFS()) || (isS3() && !isS3Root()) || (isABFS() && !isABFSRoot()))">
+            data-bind="visible: !inTrash(), enable: selectedFiles().length > 0 && ((!isS3() && !isABFS() && !isOFS()) || (isS3() && !isS3Root()) || (isABFS() && !isABFSRoot()) || (isOFS() && !(isOFSRoot() || isOFSServiceID() || isOFSVol())))">
               <i class="fa fa-cog"></i> ${_('Actions')}
               <span class="caret" style="line-height: 15px"></span>
             </button>
             <ul class="dropdown-menu" style="top: auto">
-              <li><a href="javascript: void(0)" title="${_('Rename')}" data-bind="visible: !inTrash() && selectedFiles().length == 1, click: renameFile,
+              <li><a data-hue-analytics="filebrowser:actions-menu/rename-click" href="javascript: void(0)" title="${_('Rename')}" data-bind="visible: !inTrash() && selectedFiles().length == 1 && !isOFSServiceID() && !isOFSVol(), click: renameFile,
               enable: selectedFiles().length == 1 && isCurrentDirSelected().length == 0"><i class="fa fa-fw fa-font"></i>
               ${_('Rename')}</a></li>
-              <li><a href="javascript: void(0)" title="${_('Move')}" data-bind="click: move, enable: selectedFiles().length > 0 &&
+              <li><a data-hue-analytics="filebrowser:actions-menu/move-click" href="javascript: void(0)" title="${_('Move')}" data-bind="click: move, enable: selectedFiles().length > 0 &&
               isCurrentDirSelected().length == 0"><i class="fa fa-fw fa-random"></i> ${_('Move')}</a></li>
               <li data-bind="css: {'disabled': $root.selectedFiles().length == 0 || isCurrentDirSelected().length > 0}">
-              <a href="javascript: void(0)" title="${_('Copy')}" data-bind="click: ($root.selectedFiles().length > 0 && isCurrentDirSelected().length == 0) ? $root.copy: void(0), enable: selectedFiles().length > 0 &&
+              <a data-hue-analytics="filebrowser:actions-menu/copy-click" href="javascript: void(0)" title="${_('Copy')}" data-bind="click: ($root.selectedFiles().length > 0 && isCurrentDirSelected().length == 0) ? $root.copy: void(0), enable: selectedFiles().length > 0 &&
               isCurrentDirSelected().length == 0"><i class="fa fa-fw fa-files-o"></i> ${_('Copy')}</a></li>
               % if show_download_button:
               <li>
-                <a href="javascript: void(0)" title="${_('Download')}" data-bind="visible: !inTrash() && selectedFiles().length == 1 && selectedFile().type == 'file', click: downloadFile">
+                <a data-hue-analytics="filebrowser:actions-menu/download-click" href="javascript: void(0)" title="${_('Download')}" data-bind="visible: !inTrash() && selectedFiles().length == 1 && selectedFile().type == 'file', click: downloadFile">
                   <i class="fa fa-fw fa-arrow-circle-o-down"></i> ${_('Download')}
                 </a>
               </li>
@@ -96,35 +96,35 @@ ${ fb_components.menubar() }
               </li>
               <li class="divider" data-bind="visible: isCompressEnabled() || isReplicationEnabled() || isSummaryEnabled()"></li>
               <li data-bind="css: {'disabled': inTrash() || selectedFiles().length > 1 }, visible: isSummaryEnabled()">
-                <a class="pointer" data-bind="click: function(){ selectedFiles().length == 1 ? showSummary(): void(0)}">
+                <a data-hue-analytics="filebrowser:actions-menu/show-summary-click" class="pointer" data-bind="click: function(){ selectedFiles().length == 1 ? showSummary(): void(0)}">
                   <i class="fa fa-fw fa-pie-chart"></i> ${_('Summary')}
                 </a>
               </li>
               <li>
-                <a href="javascript: void(0)" title="${_('Set Replication')}" data-bind="visible: !inTrash() && isReplicationEnabled() && selectedFiles().length == 1 && selectedFile().type == 'file', click: setReplicationFactor">
+                <a data-hue-analytics="filebrowser:actions-menu/set-replication-click"href="javascript: void(0)" title="${_('Set Replication')}" data-bind="visible: !inTrash() && isReplicationEnabled() && selectedFiles().length == 1 && selectedFile().type == 'file', click: setReplicationFactor">
                   <i class="fa fa-fw fa-hdd-o"></i> ${_('Set replication')}
                 </a>
               </li>
               % if not is_trash_enabled:
               <li>
-                <a href="javascript: void(0)" title="${_('Delete')}" data-bind="visible: !inTrash() && selectedFiles().length > 0 && isCurrentDirSelected().length == 0, click: deleteSelected">
+                <a data-hue-analytics="filebrowser:actions-menu/delete-click" href="javascript: void(0)" title="${_('Delete')}" data-bind="visible: !inTrash() && selectedFiles().length > 0 && isCurrentDirSelected().length == 0, click: deleteSelected">
                   <i class="fa fa-fw fa-bolt"></i> ${_('Delete')}
                 </a>
               </li>
               % endif
               % if ENABLE_EXTRACT_UPLOADED_ARCHIVE.get():
-                <li><a href="javascript: void(0)" title="${_('Compress selection into a single archive')}" data-bind="click: function() { setCompressArchiveDefault(); confirmCompressFiles();}, visible: showCompressButton">
+                <li><a data-hue-analytics="filebrowser:actions-menu/compress-click" href="javascript: void(0)" title="${_('Compress selection into a single archive')}" data-bind="click: function() { setCompressArchiveDefault(); confirmCompressFiles();}, visible: showCompressButton">
                   <i class="fa fa-fw fa-file-archive-o"></i> ${_('Compress')}</a>
                 </li>
-                <li><a href="javascript: void(0)" title="${_('Extract selected archive')}" data-bind="visible: selectedFiles().length == 1 && isArchive(selectedFile().name) && isCompressEnabled(), click: confirmExtractArchive">
+                <li><a data-hue-analytics="filebrowser:actions-menu/extract-click" href="javascript: void(0)" title="${_('Extract selected archive')}" data-bind="visible: selectedFiles().length == 1 && isArchive(selectedFile().name) && isCompressEnabled(), click: confirmExtractArchive">
                   <i class="fa fa-fw fa-file-archive-o"></i> ${_('Extract')}</a>
                 </li>
               % endif
             </ul>
           </div>
-          <button class="btn fileToolbarBtn" title="${_('Copy Path')}" data-bind="enable: selectedFiles().length == 1 && isCurrentDirSelected().length == 0, click: copyPath"><i class="fa fa-fw fa-files-o"></i> ${_('Copy Path')}</button>
-          <button class="btn fileToolbarBtn" title="${_('Open in Importer')}" data-bind="enable: selectedFiles().length == 1 && isCurrentDirSelected().length == 0 && selectedFile().type == 'file', click: openInImporter"><i class="fa fa-fw fa-database"></i> ${_('Open in Importer')}</button>
-          <button class="btn fileToolbarBtn" title="${_('Restore from trash')}" data-bind="visible: inRestorableTrash(), click: restoreTrashSelected, enable: selectedFiles().length > 0 && isCurrentDirSelected().length == 0"><i class="fa fa-cloud-upload"></i> ${_('Restore')}</button>
+          <button data-hue-analytics="filebrowser:copy-path-btn-click" class="btn fileToolbarBtn" title="${_('Copy Path')}" data-bind="enable: selectedFiles().length == 1 && isCurrentDirSelected().length == 0, click: copyPath"><i class="fa fa-fw fa-files-o"></i> ${_('Copy Path')}</button>
+          <button data-hue-analytics="filebrowser:open-in-importer-btn-click" class="btn fileToolbarBtn" title="${_('Open in Importer')}" data-bind="enable: selectedFiles().length == 1 && isCurrentDirSelected().length == 0 && selectedFile().type == 'file', click: openInImporter"><i class="fa fa-fw fa-database"></i> ${_('Open in Importer')}</button>
+          <button data-hue-analytics="filebrowser:restore-btn-click" class="btn fileToolbarBtn" title="${_('Restore from trash')}" data-bind="visible: inRestorableTrash(), click: restoreTrashSelected, enable: selectedFiles().length > 0 && isCurrentDirSelected().length == 0"><i class="fa fa-cloud-upload"></i> ${_('Restore')}</button>
           <!-- ko ifnot: inTrash -->
           % if is_trash_enabled:
           <div id="delete-dropdown" class="btn-group" style="vertical-align: middle">
@@ -171,24 +171,25 @@ ${ fb_components.menubar() }
           <!-- /ko -->
           <!-- ko ifnot: isS3() || isABFS() -->
           <div id="upload-dropdown" class="btn-group" style="vertical-align: middle">
-            <a href="javascript: void(0)" class="btn upload-link dropdown-toggle" title="${_('Upload')}" data-bind="click: uploadFile, visible: !inTrash(), css: {'disabled': isS3() && isS3Root() || isABFS() && isABFSRoot()}">
+            <a data-hue-analytics="filebrowser:upload-btn-click" href="javascript: void(0)" class="btn upload-link dropdown-toggle" title="${_('Upload')}" data-bind="click: uploadFile, visible: !inTrash(), css: {'disabled': isS3() && isS3Root() || isABFS() && isABFSRoot() || (isOFS() && (isOFSRoot() || isOFSServiceID() || isOFSVol()))}">
               <i class="fa fa-arrow-circle-o-up"></i> ${_('Upload')}
             </a>
           </div>
           <!-- /ko -->
           % endif
           <div class="btn-group" style="vertical-align: middle">
-            <a href="javascript: void(0)" data-toggle="dropdown" class="btn dropdown-toggle" data-bind="visible: !inTrash()">
+            <a href="javascript: void(0)" data-toggle="dropdown" class="btn dropdown-toggle" data-bind="visible: !inTrash(), css: {'disabled': isOFSRoot()}">
               <i class="fa fa-plus-circle"></i> ${_('New')}
               <span class="caret"></span>
             </a>
             <ul class="dropdown-menu pull-right" style="top: auto">
-              <li data-bind="visible: !isS3() && !isABFS() || isS3() && !isS3Root() || isABFS() && !isABFSRoot()"><a href="javascript: void(0)" class="create-file-link" title="${_('File')}"><i class="fa fa-file-o"></i> ${_('File')}</a></li>
+              <li data-bind="visible: !isS3() && !isABFS() && !isOFS() || isS3() && !isS3Root() || isABFS() && !isABFSRoot() || isOFS() && !isOFSServiceID() && !isOFSVol()"><a data-hue-analytics="filebrowser:new-file-btn-click" href="javascript: void(0)" class="create-file-link" title="${_('File')}"><i class="fa fa-file-o"></i> ${_('File')}</a></li>
               <li><a href="javascript: void(0)" class="create-directory-link" title="${_('Directory')}">
                 <i class="fa fa-folder"></i>
-                <span data-bind="visible: !isS3() && !isABFS() || isS3() && !isS3Root() || isABFS() && !isABFSRoot()">${_('Directory')}</span>
-                <span data-bind="visible: isS3() && isS3Root()">${_('Bucket')}</span>
+                <span data-bind="visible: !isS3() && !isABFS() && !isOFS() || isS3() && !isS3Root() || isABFS() && !isABFSRoot() || isOFS() && !isOFSServiceID() && !isOFSVol()">${_('Directory')}</span>
+                <span data-bind="visible: (isS3() && isS3Root()) || (isOFS() && isOFSVol())">${_('Bucket')}</span>
                 <span data-bind="visible: isABFS() && isABFSRoot()">${_('File System')}</span>
+                <span data-bind="visible: isOFS() && isOFSServiceID()">${_('Volume')}</span>
               </a></li>
             </ul>
           </div>

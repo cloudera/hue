@@ -22,7 +22,7 @@ import os
 from sqoop.conf import SQOOP_CONF_DIR
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 _PROPERTIES_DICT = None

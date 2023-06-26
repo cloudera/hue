@@ -18,16 +18,19 @@
 
 <template>
   <Sidebar
-    :sidebar-items="sidebarItems"
-    :use-drawer-for-user="false"
-    :user-drawer-item="userDrawerItem"
-    :user-drawer-children="userDrawerChildren"
-    :use-drawer-for-help="false"
-    :help-drawer-item="helpDrawerItem"
-    :help-drawer-children="helpDrawerChildren"
     :active-item-name="activeItemName"
-    :is-collapsed="isCollapsed"
     :drawer-topic="drawerTopic"
+    :help-drawer-children="helpDrawerChildren"
+    :help-drawer-item="helpDrawerItem"
+    :hue-version="hueVersion"
+    :img-version="imgVersion"
+    :is-collapsed="isCollapsed"
+    :sidebar-items="sidebarItems"
+    :use-drawer-for-help="false"
+    :use-drawer-for-user="false"
+    :user-drawer-children="userDrawerChildren"
+    :user-drawer-item="userDrawerItem"
+    :warehouse-name="warehouseName"
     @toggle-collapsed="toggleCollapsed"
     @header-click="onHeaderClick"
   />
@@ -97,6 +100,7 @@
     'oozie-bundle': `<svg class="hi hi-fw"><use xlink:href="#hi-oozie-bundle"></use></svg>`,
     'oozie-coordinator': `<svg class="hi hi-fw"><use xlink:href="#hi-oozie-coordinator"></use></svg>`,
     'oozie-workflow': `<svg class="hi hi-fw"><use xlink:href="#hi-oozie-workflow"></use></svg>`,
+    ofs: `<svg class="hi hi-fw"><use xlink:href="#hi-ofs"></use></svg>`,
     pig: `<svg class="hi hi-fw"><use xlink:href="#hi-pig"></use></svg>`,
     py: `<svg class="hi hi-fw"><use xlink:href="#hi-py"></use></svg>`,
     pyspark: `<svg class="hi hi-fw"><use xlink:href="#hi-spark"></use></svg>`,
@@ -236,14 +240,20 @@
     data(): {
       sidebarItems: SidebarItem[];
       activeItemName: string;
-      isCollapsed: boolean;
       drawerTopic: string | null;
+      hueVersion: string | null;
+      imgVersion: string | null;
+      isCollapsed: boolean;
+      warehouseName: string | null;
     } {
       return {
-        sidebarItems: [],
         activeItemName: '',
+        drawerTopic: null,
+        hueVersion: null,
+        imgVersion: null,
         isCollapsed: getFromLocalStorage('hue.sidebar.collapse', true),
-        drawerTopic: null
+        sidebarItems: [],
+        warehouseName: null
       };
     },
 
@@ -299,6 +309,8 @@
               adaptedName = 'adls';
             } else if (location.href.indexOf('=abfs') !== -1) {
               adaptedName = 'abfs';
+            } else if (location.href.indexOf('=ofs') !== -1) {
+              adaptedName = 'ofs';
             } else {
               adaptedName = 'hdfs';
             }
@@ -358,9 +370,9 @@
             if ((<SidebarAccordionItem>item).children) {
               found = findInside((<SidebarAccordionItem>item).children);
             }
-            const navigationItem = <SidebarNavigationItem>item;
-            if (!found && navigationItem.name === possibleItemName) {
-              found = navigationItem.name;
+            const { name } = <SidebarNavigationItem>item;
+            if (!found && (name === possibleItemName || name === `sdkapps-${possibleItemName}`)) {
+              found = name;
             }
             return found;
           });
@@ -375,6 +387,10 @@
 
       hueConfigUpdated(clusterConfig: HueConfig): void {
         const items: SidebarItem[] = [];
+
+        this.hueVersion = clusterConfig?.hue_version || null;
+        this.imgVersion = clusterConfig?.img_version || null;
+        this.warehouseName = clusterConfig?.vw_name || null;
 
         if (clusterConfig && clusterConfig.app_config) {
           const favourite = clusterConfig.main_button_action;
@@ -398,7 +414,7 @@
                 return;
               }
               if (config && config.interpreters.length) {
-                if (config.interpreters.length === 1) {
+                if (config.interpreters.length === 1 && config.name !== 'other') {
                   appsItems.push({
                     type: 'navigation',
                     name: `${appName}-${config.name}`,

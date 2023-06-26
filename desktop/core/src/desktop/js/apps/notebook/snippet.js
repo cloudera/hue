@@ -17,11 +17,12 @@
 import $ from 'jquery';
 import * as ko from 'knockout';
 import komapping from 'knockout.mapping';
-import { markdown } from 'markdown';
+import snarkdown from 'snarkdown';
 
 import AceAutocompleteWrapper from 'apps/notebook/aceAutocompleteWrapper';
 import apiHelper from 'api/apiHelper';
 import dataCatalog from 'catalog/dataCatalog';
+import deXSS from 'utils/html/deXSS';
 import hueAnalytics from 'utils/hueAnalytics';
 import huePubSub from 'utils/huePubSub';
 import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
@@ -31,7 +32,7 @@ import { getStatementsParser } from 'parse/utils';
 import { SHOW_EVENT as SHOW_GIST_MODAL_EVENT } from 'ko/components/ko.shareGistModal';
 import { cancelActiveRequest } from 'api/apiUtils';
 import { ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT } from 'apps/editor/events';
-import { findEditorConnector } from 'config/hueConfig';
+import { findEditorConnector, getLastKnownConfig } from 'config/hueConfig';
 import {
   ASSIST_GET_DATABASE_EVENT,
   ASSIST_GET_SOURCE_EVENT,
@@ -1035,7 +1036,10 @@ class Snippet {
         const previousHash = self.result.handle().previous_statement_hash;
         self.executeNextTimeout = setTimeout(() => {
           // Don't execute if the handle has changed during the timeout
-          if (previousHash === self.result.handle().previous_statement_hash) {
+          if (
+            self.status() !== 'running' &&
+            previousHash === self.result.handle().previous_statement_hash
+          ) {
             self.execute(true); // Execute next, need to wait as we disabled fast click
           }
         }, 1000);
@@ -1883,6 +1887,7 @@ class Snippet {
               } else {
                 notebook.sessions()[0].session_id(data.handle.session_guid);
                 notebook.sessions()[0].id(data.handle.session_id);
+                notebook.sessions()[0].type(self.type());
               }
             }
             if (vm.editorMode()) {
@@ -2572,6 +2577,14 @@ class Snippet {
                   } else {
                     job.percentJob = ko.observable(job.percentJob);
                   }
+                  const config = getLastKnownConfig();
+                  // Yarn job names start with 'application' and we skip them if yarn config is not present.
+                  if (
+                    job.name.startsWith('application') &&
+                    !(config && config['hue_config'] && config['hue_config']['is_yarn_enabled'])
+                  ) {
+                    return;
+                  }
                   self.jobs.push(job);
                 } else if (typeof job.percentJob !== 'undefined') {
                   for (let i = 0; i < _found.length; i++) {
@@ -2788,9 +2801,11 @@ class Snippet {
   }
 
   renderMarkdown() {
-    return this.statement_raw().replace(/([^$]*)([$]+[^$]*[$]+)?/g, (a, textRepl, code) => {
-      return markdown.toHTML(textRepl).replace(/^<p>|<\/p>$/g, '') + (code ? code : '');
-    });
+    return this.statement_raw().replace(
+      /([^$]*)([$]+[^$]*[$]+)?/g,
+      (a, textRepl, code) =>
+        deXSS(snarkdown(textRepl)).replace(/^<p>|<\/p>$/g, '') + (code ? code : '')
+    );
   }
 
   async exportHistory() {

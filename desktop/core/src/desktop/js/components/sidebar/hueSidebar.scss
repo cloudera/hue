@@ -14,7 +14,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-@import '../styles/colors';
 @import '../styles/variables';
 
 .sidebar {
@@ -22,11 +21,11 @@
   // This overrides global scrollbar styles, temporary until the global ones are removed.
   ::-webkit-scrollbar-thumb {
     border: none;
-    background-color: $fluid-gray-900;
+    background-color: $fluidx-gray-900;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background-color: $fluid-gray-700;
+    background-color: $fluidx-gray-700;
   }
 
   &.sidebar-collapsed {
@@ -36,7 +35,7 @@
       display: block;
 
       > svg {
-        color: $fluid-white;
+        color: $fluidx-white;
         height: 30px;
         width: 110px;
       }

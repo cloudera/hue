@@ -28,7 +28,7 @@ from desktop.lib.rest.resource import Resource
 from spark.conf import get_livy_server_url, SECURITY_ENABLED, SSL_CERT_CA_VERIFY, CSRF_ENABLED
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 DEFAULT_USER = 'hue'
 
 _API_VERSION = 'v1'
@@ -152,6 +152,9 @@ class LivyClient(object):
 
   def get_batches(self):
     return self._root.get('batches')
+
+  def cancel_statement(self, session, statement_id):
+    return self._root.post('sessions/%s/statements/%s/cancel' % (session, statement_id))
 
   def submit_batch(self, properties):
     properties['proxyUser'] = self.user

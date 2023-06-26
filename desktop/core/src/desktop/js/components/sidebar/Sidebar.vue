@@ -74,6 +74,14 @@
         :active-item-name="activeItemName"
       />
       <div class="sidebar-footer-bottom-row">
+        <div
+          v-if="!isCollapsed && (hueVersion || imgVersion || warehouseName)"
+          class="sidebar-footer-version-number"
+        >
+          <div v-if="warehouseName" :title="warehouseName">{{ warehouseName }}</div>
+          <div v-if="imgVersion" :title="footerVersionTitle">{{ imgVersion }}</div>
+          <div v-if="hueVersion && !imgVersion">{{ hueVersion }}</div>
+        </div>
         <BaseNavigationItem
           :css-classes="'sidebar-footer-collapse-btn'"
           :item="{
@@ -155,7 +163,18 @@
         type: Array as PropType<SidebarAccordionSubItem[]>,
         default: () => []
       },
-
+      hueVersion: {
+        type: String,
+        default: null
+      },
+      imgVersion: {
+        type: String,
+        default: null
+      },
+      warehouseName: {
+        type: String,
+        default: null
+      },
       activeItemName: {
         type: String,
         required: true
@@ -182,6 +201,12 @@
     },
 
     computed: {
+      footerVersionTitle(): string | null {
+        if (this.imgVersion && this.hueVersion) {
+          return `${this.imgVersion} - ${this.hueVersion}`;
+        }
+        return null;
+      },
       helpItem(): SidebarAccordionItem | SidebarNavigationItem | null {
         if (this.helpDrawerItem != null) {
           const sharedProps = {
@@ -214,7 +239,7 @@
         const sharedProps = {
           name: 'user',
           displayName: this.userDrawerItem.displayName,
-          iconHtml: `<div class="sidebar-user-icon" role="img">${this.userDrawerItem.displayName[0].toUpperCase()}</div>`
+          iconHtml: `<div class="sidebar-user-icon server-position-pointer-welcome-tour" role="img">${this.userDrawerItem.displayName[0].toUpperCase()}</div>`
         };
         if (this.useDrawerForUser) {
           return {

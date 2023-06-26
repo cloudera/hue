@@ -54,7 +54,11 @@ Plugin.prototype.show = function () {
   _this.options.message = _this.options.message.replace(/(<([^>]+)>)/gi, ''); // escape HTML messages
   _this.options.message = deXSS(_this.options.message); // escape XSS messages
 
-  if (/^(504|upstream connect error|Gateway Time-out)/.test(_this.options.message.trim())) {
+  if (
+    /^(504|upstream connect error|Gateway Time-out|Service connectivity error)/.test(
+      _this.options.message.trim()
+    )
+  ) {
     console.warn(_this.options.message);
     return;
   }

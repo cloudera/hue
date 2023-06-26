@@ -1,0 +1,25 @@
+[
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "DROP ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "ROLE"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should not report errors",
+    "beforeCursor": "DROP ROLE boo;",
+    "afterCursor": "",
+    "noErrors": true,
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  }
+]

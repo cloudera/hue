@@ -315,6 +315,9 @@ qq.FileUploaderBasic.prototype = {
     setParams: function(params){
         this._options.params = params;
     },
+    setOption: function(key, val){
+        this._options[key] = val;
+    },
     getInProgress: function(){
         return this._filesInProgress;
     },
@@ -1256,11 +1259,12 @@ qq.extend(qq.UploadHandlerXhr.prototype, {
             }
         };
 
-        var formData = new FormData();
-        formData.append(params.fileFieldLabel, file);
+        var formData = new FormData();        
+        formData.append(params.fileFieldLabel, file, file.name.normalize('NFC'));
         formData.append('dest', params.dest);
 
-        var action = this._options.action + "?dest=" + params.dest;
+        const destination = encodeURIComponent(params.dest);
+        var action = this._options.action + "?dest=" + destination;
         xhr.open("POST", action, true);
         xhr.send(formData);
     },

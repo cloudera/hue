@@ -53,15 +53,20 @@ import desktop.views
 from desktop import appmanager, metrics
 from desktop.auth.backend import is_admin, find_or_create_user, ensure_has_a_group, rewrite_user
 from desktop.conf import AUTH, HTTP_ALLOWED_METHODS, ENABLE_PROMETHEUS, KNOX, DJANGO_DEBUG_MODE, AUDIT_EVENT_LOG_DIR, \
-    SERVER_USER, REDIRECT_WHITELIST, SECURE_CONTENT_SECURITY_POLICY, has_connectors
+    METRICS, SERVER_USER, REDIRECT_WHITELIST, SECURE_CONTENT_SECURITY_POLICY, has_connectors, is_gunicorn_report_enabled, \
+    CUSTOM_CACHE_CONTROL
 from desktop.context_processors import get_app_name
 from desktop.lib import apputil, i18n, fsmanager
 from desktop.lib.django_util import JsonResponse, render, render_json
 from desktop.lib.exceptions import StructuredException
 from desktop.lib.exceptions_renderable import PopupException
+from desktop.lib.metrics import global_registry
 from desktop.lib.view_util import is_ajax
 from desktop.log import get_audit_logger
 from desktop.log.access import access_log, log_page_hit, access_warn
+from desktop.auth.backend import knox_login_headers
+
+from libsaml.conf import CDP_LOGOUT_URL
 
 if sys.version_info[0] > 2:
   from django.utils.translation import gettext as _
@@ -72,7 +77,7 @@ else:
   from django.utils.http import is_safe_url as url_has_allowed_host_and_scheme, urlquote as quote
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 MIDDLEWARE_HEADER = "X-Hue-Middleware-Response"
 
@@ -308,7 +313,7 @@ class LoginAndPermissionMiddleware(MiddlewareMixin):
     if request.path in ['/oidc/authenticate/', '/oidc/callback/', '/oidc/logout/', '/hue/oidc_failed/']:
       return None
 
-    if AUTH.AUTO_LOGIN_ENABLED.get() and request.path.startswith('/api/token/auth'):
+    if AUTH.AUTO_LOGIN_ENABLED.get() and request.path.startswith('/api/v1/token/auth'):
       pass # allow /api/token/auth can create user or make it active
     elif request.path.startswith('/api/'):
       return None
@@ -355,9 +360,7 @@ class LoginAndPermissionMiddleware(MiddlewareMixin):
           not (
               is_admin(request.user) or
               request.user.has_hue_permission(action="access", app=app_accessed) or
-              request.user.has_hue_permission(action=access_view, app=app_accessed)
-          ) and \
-          not (app_accessed == '__debug__' and DJANGO_DEBUG_MODE.get()):
+              request.user.has_hue_permission(action=access_view, app=app_accessed)):
         access_log(request, 'permission denied', level=access_log_level)
         return PopupException(
             _("You do not have permission to access the %(app_name)s application.") % {'app_name': app_accessed.capitalize()},
@@ -384,11 +387,12 @@ class LoginAndPermissionMiddleware(MiddlewareMixin):
 
     logging.info("Redirecting to login page: %s", request.get_full_path())
     access_log(request, 'login redirection', level=access_log_level)
-    no_idle_backends = (
-        "libsaml.backend.SAML2Backend",
+    no_idle_backends = [
         "desktop.auth.backend.SpnegoDjangoBackend",
         "desktop.auth.backend.KnoxSpnegoDjangoBackend"
-    )
+    ]
+    if CDP_LOGOUT_URL.get() == "":
+      no_idle_backends.append("libsaml.backend.SAML2Backend")
     if request.ajax and all(no_idle_backend not in AUTH.BACKEND.get() for no_idle_backend in no_idle_backends):
       # Send back a magic header which causes Hue.Request to interpose itself
       # in the ajax request and make the user login before resubmitting the
@@ -747,6 +751,7 @@ class SpnegoMiddleware(MiddlewareMixin):
           if user:
             request.user = user
             login(request, user)
+            knox_login_headers(request)
             msg = 'Successful login for user: %s' % request.user.username
           else:
             msg = 'Failed login for user: %s' % request.user.username
@@ -867,15 +872,18 @@ class EnsureSafeRedirectURLMiddleware(MiddlewareMixin):
     else:
       return response
 
-
 class MetricsMiddleware(MiddlewareMixin):
   """
   Middleware to track the number of active requests.
   """
 
   def process_request(self, request):
+    # import threading
+    # LOG.debug("===> MetricsMiddleware pid: %d thread: %d" % (os.getpid(), threading.get_ident()))
     self._response_timer = metrics.response_time.time()
     metrics.active_requests.inc()
+    if is_gunicorn_report_enabled():
+      global_registry().update_metrics_shared_data()
 
   def process_exception(self, request, exception):
     self._response_timer.stop()
@@ -884,6 +892,8 @@ class MetricsMiddleware(MiddlewareMixin):
   def process_response(self, request, response):
     self._response_timer.stop()
     metrics.active_requests.dec()
+    if is_gunicorn_report_enabled():
+      global_registry().update_metrics_shared_data()
     return response
 
 
@@ -919,4 +929,58 @@ class MimeTypeJSFileFixStreamingMiddleware(MiddlewareMixin):
     if request.path_info.endswith('.js'):
       response['Content-Type'] = "application/javascript"
 
+    return response
+
+class MultipleProxyMiddleware:
+  FORWARDED_FOR_FIELDS = [
+    'HTTP_X_FORWARDED_FOR',
+    'HTTP_X_FORWARDED_HOST',
+    'HTTP_X_FORWARDED_SERVER',
+  ]
+
+  def __init__(self, get_response):
+    self.get_response = get_response
+
+  def __call__(self, request):
+    """
+    Rewrites the proxy headers so that only the most
+    recent proxy is used.
+    """
+    location = -1
+
+    if 'HTTP_X_REAL_IP' in request.META:
+      if 'HTTP_X_FORWARDED_FOR' in request.META and \
+        request.META['HTTP_X_REAL_IP'] in request.META['HTTP_X_FORWARDED_FOR']:
+        location = 0
+        for item in request.META['HTTP_X_FORWARDED_FOR'].split(','):
+          if request.META['HTTP_X_REAL_IP'].strip() != item.strip():
+            location += 1
+          else:
+            request.META['HTTP_X_FORWARDED_FOR'] = item.strip()
+            break;
+
+    for field in self.FORWARDED_FOR_FIELDS:
+      if field in request.META:
+        if ',' in request.META[field]:
+          parts = request.META[field].split(',')
+          request.META[field] = parts[location].strip()
+
+    if 'HTTP_X_FORWARDED_FOR' not in request.META and 'REMOTE_ADDR' in request.META:
+      request.META['HTTP_X_FORWARDED_FOR'] = request.META['REMOTE_ADDR']
+    return self.get_response(request)
+
+
+class CacheControlMiddleware(MiddlewareMixin):
+  def __init__(self, get_response):
+    self.get_response = get_response
+    self.custom_cache_control = CUSTOM_CACHE_CONTROL.get()
+    if not self.custom_cache_control:
+      LOG.info('Unloading CacheControlMiddleware')
+      raise exceptions.MiddlewareNotUsed
+
+  def process_response(self, request, response):
+    if self.custom_cache_control:
+      response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+      response['Pragma'] = 'no-cache'
+      response['Expires'] = '0'
     return response

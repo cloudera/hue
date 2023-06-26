@@ -1,10 +1,10 @@
 [unix_http_server]
-file=/var/log/${HUE_USER}/supervisord.sock
+file=/var/log/${HUEUSER}/supervisord.sock
 username=${UUID_GEN}
 password=${UUID_GEN}
 
 [supervisord]
-pidfile=/var/log/${HUE_USER}/supervisord.pid
+pidfile=/var/log/${HUEUSER}/supervisord.pid
 stdout_logfile=/dev/stdout
 stdout_logfile_maxbytes=0
 stderr_logfile=/dev/stderr

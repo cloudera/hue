@@ -16,6 +16,7 @@
 
 export const SHOW_LEFT_ASSIST_EVENT = 'left.assist.show';
 export const SHOW_RIGHT_ASSIST_EVENT = 'right.assist.show';
+export const BOTH_ASSIST_TOGGLE_EVENT = 'both.assists.toggle';
 
 export const ASSIST_IS_DB_PANEL_READY_EVENT = 'assist.is.db.panel.ready';
 export const ASSIST_DB_PANEL_IS_READY_EVENT = 'assist.db.panel.is.ready';

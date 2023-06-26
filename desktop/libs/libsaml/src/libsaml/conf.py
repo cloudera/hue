@@ -28,7 +28,7 @@ if sys.version_info[0] > 2:
 else:
   from django.utils.translation import ugettext_lazy as _t, ugettext as _
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 BASEDIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -206,6 +206,11 @@ REQUIRED_GROUPS_ATTRIBUTE = Config(
   type=str,
   help=_t("Name of the SAML attribute containing the list of groups the user belongs to."))
 
+CDP_LOGOUT_URL = Config(
+  key="logout_url",
+  type=str,
+  default="",
+  help=_t("To log users out of magic-sso, CDP control panel use Logout URL"))
 
 def get_key_file_password():
   password = os.environ.get('HUE_SAML_KEY_FILE_PASSWORD')
@@ -224,3 +229,11 @@ def config_validator(user):
   if USERNAME_SOURCE.get() not in USERNAME_SOURCES:
     res.append(("libsaml.username_source", _("username_source not configured properly. SAML integration may not work.")))
   return res
+
+def get_logout_redirect_url():
+  # This logic was derived from KNOX.
+  prod_url = "consoleauth.altus.cloudera.com"
+  redirect_url = "https://sso.cloudera.com/bin/services/support/api/public/logout"
+  if prod_url not in CDP_LOGOUT_URL.get():
+    redirect_url = "https://sso.staging-upgrade.aem.cloudera.com/bin/services/support/api/public/logout"
+  return redirect_url

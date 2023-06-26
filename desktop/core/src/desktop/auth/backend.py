@@ -34,7 +34,7 @@ from pwd import getpwnam
 
 import logging
 import sys
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 try:
   import ldap
@@ -238,6 +238,13 @@ def force_username_case(username):
     username = username.upper()
   return username
 
+def knox_login_headers(request):
+  userprofile = get_profile(request.user)
+  try:
+    userprofile.update_data({'X-Forwarded-For': request.META['HTTP_X_FORWARDED_FOR']})
+    userprofile.save()
+  except Exception:
+    LOG.error("X-FORWARDED-FOR header not found")
 
 class DesktopBackendBase(object):
   """
@@ -425,7 +432,7 @@ class PamBackend(DesktopBackendBase):
       LOG.debug('Setting username to %s using PAM pwd module for user %s' % (getpwnam(username).pw_name, username))
       username = getpwnam(username).pw_name
 
-    if pam.authenticate(username, password, AUTH.PAM_SERVICE.get()):
+    if pam.authenticate(username, password, AUTH.PAM_SERVICE.get(), print_failure_messages=True, resetcreds=False):
       is_super = False
       if User.objects.exclude(id=install_sample_user().id).count() == 0:
         is_super = True
@@ -594,7 +601,7 @@ class LdapBackend(object):
       LOG.warning("LDAP was not properly configured: %s", detail)
       return None
 
-    if AUTH.PAM_USE_PWD_MODULE.get():
+    if AUTH.PAM_USE_PWD_MODULE.get() and user is not None:
       LOG.debug('Setting LDAP username to %s using PAM pwd module for user %s' % (getpwnam(username).pw_name, username))
       pam_user = getpwnam(username).pw_name
       try:
@@ -873,13 +880,16 @@ class OIDCBackend(OIDCAuthenticationBackend):
         return None
       username = default_username_algo(email)
 
-    return self.UserModel.objects.create_user(
-        username=username,
-        email=email,
-        first_name=first_name,
-        last_name=last_name,
-        is_superuser=self.is_hue_superuser(claims)
+    user = self.UserModel.objects.create_user(
+      username=username,
+      email=email,
+      first_name=first_name,
+      last_name=last_name,
+      is_superuser=self.is_hue_superuser(claims)
     )
+
+    ensure_has_a_group(user)
+    return user
 
   def get_or_create_user(self, access_token, id_token, verified_id):
     user = super(OIDCBackend, self).get_or_create_user(access_token, id_token, verified_id)

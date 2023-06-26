@@ -1,0 +1,76 @@
+[
+  {
+    "namePrefix": "should not find errors",
+    "beforeCursor": "SHOW TABLE EXTENDED LIKE 'employee';",
+    "afterCursor": "",
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "noErrors": true
+  },
+  {
+    "namePrefix": "should not find errors",
+    "beforeCursor": "SHOW TABLE EXTENDED IN default LIKE 'employee' PARTITION (grade=1);",
+    "afterCursor": "",
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "noErrors": true
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "SHOW ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "TABLE EXTENDED"
+    ]
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "SHOW TABLE ",
+    "afterCursor": "",
+    "expectedResult": {
+      "suggestKeywords": ["EXTENDED"]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "SHOW TABLE EXTENDED ",
+    "afterCursor": "",
+    "expectedResult": {
+      "suggestKeywords": ["FROM", "IN", "LIKE"]
+    }
+  },
+  {
+    "namePrefix": "should suggest databases",
+    "beforeCursor": "SHOW TABLE EXTENDED FROM ",
+    "afterCursor": "",
+    "expectedResult": {
+      "suggestDatabases": {}
+    }
+  },
+  {
+    "namePrefix": "should suggest databases",
+    "beforeCursor": "SHOW TABLE EXTENDED IN ",
+    "afterCursor": "",
+    "expectedResult": {
+      "suggestDatabases": {}
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "SHOW TABLE EXTENDED IN foo ",
+    "afterCursor": "",
+    "expectedResult": {
+      "suggestKeywords": ["LIKE"]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "SHOW TABLE EXTENDED IN `foo bar` LIKE 'abc' ",
+    "afterCursor": "",
+    "expectedResult": {
+      "suggestKeywords": ["PARTITION"]
+    }
+  }
+]

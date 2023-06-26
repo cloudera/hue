@@ -51,7 +51,7 @@ else:
   from mock import patch, Mock
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class TestApiWithConnectors(object):
@@ -315,6 +315,65 @@ class TestApi():
         assert_true(jobs, jobs)
         assert_equal(jobs[0]['name'], 'job_id_00001')
         assert_equal(jobs[0]['url'], '')  # Is empty
+
+
+  def test_close_statement(self):
+    with patch('notebook.connectors.hiveserver2.HS2Api._get_db') as _get_db:
+      _get_db.return_value = Mock(
+        use=Mock(
+        ),
+        client=Mock(
+          query=Mock(
+            side_effect=QueryServerException(
+              Exception('Execution error!'),
+              message='Error while compiling statement: FAILED: HiveAccessControlException Permission denied'
+            )
+          ),
+        ),
+      )
+      notebook = {}
+      snippet = {
+        'id': '7ccdd296-20a3-da33-16ec-db58149aba0b', 'type': 'impala', 'status': 'running', 'statementType': 'text',
+        'statement': 'SELECT *\nFROM `default`.sample_07\nLIMIT 100\n;', 'aceCursorPosition': None, 'statementPath': '',
+        'associatedDocumentUuid': None,
+        'properties': {'settings': []},
+        'result': {
+          'id': 'd9a8dc1b-7f6d-169f-7dd7-660723cba3f4', 'type': 'table',
+          'handle': {
+            'secret': 'obUXjEDWTh+ke73YLlOlMw==', 'guid': '2iv5rEXrRE4AAAAABtXdxA==', 'operation_type': 0, 'has_result_set': True,
+            'modified_row_count': None, 'log_context': None, 'session_guid': '2440c57bc3806c6e:598514f42764cc91', 'session_id': 2094,
+            'session_type': 'impala', 'statement_id': 0, 'has_more_statements': False, 'statements_count': 1,
+            'previous_statement_hash': '39b8e5b3c37fda5ebd438da23f3e198c914750a64aa147f819a6a1e0', 'start': {'row': 0, 'column': 0},
+            'end': {'row': 0, 'column': 43}, 'statement': 'SELECT *\nFROM `default`.sample_07\nLIMIT 100'
+          }
+        }, 'database': 'default',
+        'compute': {
+          'id': 'default', 'name': 'default', 'namespace': 'default', 'interface': 'impala', 'type': 'direct', 'options': {}
+        }, 'wasBatchExecuted': False, 'dialect': 'impala'
+      }
+      api = HS2Api(self.user)
+
+      response = api.close_statement(notebook, snippet)
+      assert_equal(response['status'], 0)
+
+      snippet = {
+        'id': '7ccdd296-20a3-da33-16ec-db58149aba0b', 'type': 'impala', 'status': 'running',
+        'statementType': 'text', 'statement': 'SELECT *\nFROM `default`.sample_07\nLIMIT 100\n;',
+        'aceCursorPosition': None, 'statementPath': '', 'associatedDocumentUuid': None,
+        'properties': {'settings': []},
+        'result': {
+          'id': 'd9a8dc1b-7f6d-169f-7dd7-660723cba3f4', 'type': 'table',
+          'handle': {
+            'has_more_statements': False, 'statement_id': 0, 'statements_count': 1,
+            'previous_statement_hash': '39b8e5b3c37fda5ebd438da23f3e198c914750a64aa147f819a6a1e0'
+          }
+        }, 'database': 'default', 'compute': {'id': 'default', 'name': 'default', 'namespace': 'default',
+        'interface': 'impala', 'type': 'direct', 'options': {}}, 'wasBatchExecuted': False, 'dialect': 'impala'
+      }
+      api = HS2Api(self.user)
+      
+      response = api.close_statement(notebook, snippet)
+      assert_equal(response['status'], -1)  # snippet['result']['handel'] ['guid'] and ['secret'] are missing
 
 
   def test_get_error_message_from_query(self):
@@ -629,7 +688,8 @@ class TestHiveserver2ApiNonMock(object):
 
     assert_equal(self.api.progress({}, snippet, logs=logs), 5)
 
-    logs += """INFO  : Starting Job = job_1466104358744_0003, Tracking URL = http://jennykim-1.vpc.cloudera.com:8088/proxy/application_1466104358744_0003/
+    logs += """INFO  : Starting Job = job_1466104358744_0003, Tracking URL = """\
+      """http://jennykim-1.vpc.cloudera.com:8088/proxy/application_1466104358744_0003/
         INFO  : Kill Command = /usr/lib/hadoop/bin/hadoop job  -kill job_1466104358744_0003
         INFO  : Hadoop job information for Stage-1: number of mappers: 1; number of reducers: 1
         INFO  : 2016-06-20 13:30:34,494 Stage-1 map = 0%,  reduce = 0%
@@ -811,7 +871,9 @@ class TestHiveserver2ApiNonMock(object):
 
 
   def test_plan_extraction_from_profile(self):
-    query_plan = self.api._get_impala_profile_plan(query_id='e147228183f1f0b3:6f086cc600000000', profile=IMPALA_CUSTOMER_QUERY_SAMPLE_PROFILE)
+    query_plan = self.api._get_impala_profile_plan(
+      query_id='e147228183f1f0b3:6f086cc600000000', profile=IMPALA_CUSTOMER_QUERY_SAMPLE_PROFILE
+    )
 
     assert_true(query_plan)
     assert_equal(IMPALA_CUSTOMER_QUERY_SAMPLE_PROFILE_PLAN, query_plan)
@@ -850,26 +912,26 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
   def create_query_document(self, owner, query_type='hive', database='default',
                             name='Test Query', description='Test Query', statement='',
                             files=None, functions=None, settings=None):
-      """
-      Creates and returns a query Document2 object
-      :param owner: owner of doc
-      :param query_type: hive, impala or spark
-      :param database: database name
-      :param name: name of document
-      :param description: description of document
-      :param statement: SQL statement (can be multi-query statement)
-      :param files: list of dicts representing files
-      :param functions: list of dicts representing functions
-      :param settings: list of dicts representing settings
-      :return: Document2 object representing query
-      """
-      if query_type not in ('hive', 'impala', 'spark'):
-          raise ValueError("Invalid query_type: %s" % query_type)
+    """
+    Creates and returns a query Document2 object
+    :param owner: owner of doc
+    :param query_type: hive, impala or spark
+    :param database: database name
+    :param name: name of document
+    :param description: description of document
+    :param statement: SQL statement (can be multi-query statement)
+    :param files: list of dicts representing files
+    :param functions: list of dicts representing functions
+    :param settings: list of dicts representing settings
+    :return: Document2 object representing query
+    """
+    if query_type not in ('hive', 'impala', 'spark'):
+      raise ValueError("Invalid query_type: %s" % query_type)
 
-      notebook = make_notebook(name=name, description=description, editor_type=query_type, statement=statement,
-                               status='ready', database=database, files=files, functions=functions, settings=settings)
-      notebook_doc, save_as = _save_notebook(notebook.get_data(), owner)
-      return notebook_doc
+    notebook = make_notebook(name=name, description=description, editor_type=query_type, statement=statement,
+                              status='ready', database=database, files=files, functions=functions, settings=settings)
+    notebook_doc, save_as = _save_notebook(notebook.get_data(), owner)
+    return notebook_doc
 
 
   def get_snippet(self, notebook, snippet_idx=0):
@@ -885,33 +947,33 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
 
 
   def execute_and_wait(self, query_doc, snippet_idx=0, timeout=30.0, wait=1.0):
-      notebook = Notebook(document=query_doc)
-      snippet = self.get_snippet(notebook, snippet_idx=snippet_idx)
+    notebook = Notebook(document=query_doc)
+    snippet = self.get_snippet(notebook, snippet_idx=snippet_idx)
 
-      curr = time.time()
-      end = curr + timeout
-      status = 'ready'
+    curr = time.time()
+    end = curr + timeout
+    status = 'ready'
 
-      response = self.client.post(reverse('notebook:execute'),
+    response = self.client.post(reverse('notebook:execute'),
+                                {'notebook': notebook.get_json(), 'snippet': json.dumps(snippet)})
+    notebook = Notebook(document=query_doc)
+    snippet = self.get_snippet(notebook, snippet_idx=snippet_idx)
+    data = json.loads(response.content)
+    snippet['result']['handle'] = data['handle']
+
+    while status != 'available' and curr <= end:
+      response = self.client.post(reverse('notebook:check_status'),
                                   {'notebook': notebook.get_json(), 'snippet': json.dumps(snippet)})
-      notebook = Notebook(document=query_doc)
-      snippet = self.get_snippet(notebook, snippet_idx=snippet_idx)
       data = json.loads(response.content)
-      snippet['result']['handle'] = data['handle']
+      status = data['query_status']['status']
+      snippet['status'] = status
+      time.sleep(wait)
+      curr = time.time()
 
-      while status != 'available' and curr <= end:
-        response = self.client.post(reverse('notebook:check_status'),
-                                    {'notebook': notebook.get_json(), 'snippet': json.dumps(snippet)})
-        data = json.loads(response.content)
-        status = data['query_status']['status']
-        snippet['status'] = status
-        time.sleep(wait)
-        curr = time.time()
+    if status != 'available':
+      raise Exception('Query failed to complete or return results.')
 
-      if status != 'available':
-        raise Exception('Query failed to complete or return results.')
-
-      return snippet
+    return snippet
 
 
   def test_query_with_unicode(self):
@@ -1371,7 +1433,8 @@ IMPALA_CUSTOMER_QUERY_SAMPLE_PROFILE = IMPALA_CUSTOMER_QUERY_SAMPLE_PROFILE_PLAN
  ID  Src. Node  Tgt. Node(s)  Target type  Partition filter  Pending (Expected)  First arrived  Completed   Enabled
 -------------------------------------------------------------------------------------------------------------------
 
-    Backend startup latencies: Count: 1, min / max: 1ms / 1ms, 25th %-ile: 1ms, 50th %-ile: 1ms, 75th %-ile: 1ms, 90th %-ile: 1ms, 95th %-ile: 1ms, 99.9th %-ile: 1ms
+    Backend startup latencies: Count: 1, min / max: 1ms / 1ms, 25th %-ile: 1ms, 50th %-ile: 1ms, """\
+      """75th %-ile: 1ms, 90th %-ile: 1ms, 95th %-ile: 1ms, 99.9th %-ile: 1ms
     Per Node Peak Memory Usage: self-service-analytics-2.gce.cloudera.com:22000(530.52 KB)
      - FiltersReceived: 0 (0)
      - FinalizationTimer: 0.000ns
@@ -1427,8 +1490,12 @@ IMPALA_CUSTOMER_QUERY_SAMPLE_PROFILE = IMPALA_CUSTOMER_QUERY_SAMPLE_PROFILE_PLAN
            - SendersBlockedTimer: 0.000ns
            - SendersBlockedTotalTimer(*): 0.000ns
     Coordinator Fragment F01:
-      Instance e147228183f1f0b3:6f086cc600000000 (host=self-service-analytics-2.gce.cloudera.com:22000):(Total: 76.006ms, non-child: 1.000ms, % non-child: 1.32%)
-        MemoryUsage(4s000ms): 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB
+      Instance e147228183f1f0b3:6f086cc600000000 (host=self-service-analytics-2.gce.cloudera.com:22000):"""\
+        """(Total: 76.006ms, non-child: 1.000ms, % non-child: 1.32%)
+        MemoryUsage(4s000ms): 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, """\
+          """31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, """\
+          """31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, """\
+          """31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB
          - AverageThreadTokens: 0.00
          - BloomFilterBytes: 0
          - PeakMemoryUsage: 34.12 KB (34939)
@@ -1469,7 +1536,10 @@ IMPALA_CUSTOMER_QUERY_SAMPLE_PROFILE = IMPALA_CUSTOMER_QUERY_SAMPLE_PROFILE_PLAN
            - RowsReturned: 106 (106)
            - RowsReturnedRate: 1.71 K/sec
           DataStreamReceiver:
-            BytesReceived(4s000ms): 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB
+            BytesReceived(4s000ms): 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, """\
+              """5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, """\
+              """5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, """\
+              """5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB, 5.50 KB
              - BytesReceived: 5.50 KB (5632)
              - DeserializeRowBatchTimer: 0.000ns
              - FirstBatchArrivalWaitTime: 62.005ms
@@ -1626,7 +1696,8 @@ IMPALA_CUSTOMER_QUERY_SAMPLE_PROFILE = IMPALA_CUSTOMER_QUERY_SAMPLE_PROFILE_PLAN
          - TotalRawHdfsReadTime(*): 38.003ms
          - TotalReadThroughput: 0.00 /sec
     Fragment F00:
-      Instance e147228183f1f0b3:6f086cc600000001 (host=self-service-analytics-2.gce.cloudera.com:22000):(Total: 76.006ms, non-child: 1.000ms, % non-child: 1.32%)
+      Instance e147228183f1f0b3:6f086cc600000001 (host=self-service-analytics-2.gce.cloudera.com:22000):"""\
+        """(Total: 76.006ms, non-child: 1.000ms, % non-child: 1.32%)
         Hdfs split stats (<volume id>:<# splits>/<split lengths>): 0:1/15.44 KB
          - AverageThreadTokens: 0.00
          - BloomFilterBytes: 0

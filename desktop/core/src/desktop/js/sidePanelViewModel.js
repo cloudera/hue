@@ -20,7 +20,11 @@ import * as ko from 'knockout';
 import hueAnalytics from 'utils/hueAnalytics';
 import huePubSub from 'utils/huePubSub';
 import { ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT } from 'apps/editor/events';
-import { SHOW_LEFT_ASSIST_EVENT, SHOW_RIGHT_ASSIST_EVENT } from 'ko/components/assist/events';
+import {
+  SHOW_LEFT_ASSIST_EVENT,
+  SHOW_RIGHT_ASSIST_EVENT,
+  BOTH_ASSIST_TOGGLE_EVENT
+} from 'ko/components/assist/events';
 import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
 import defer from 'utils/timing/defer';
 
@@ -36,6 +40,7 @@ class SidePanelViewModel {
         setInLocalStorage('assist.left_assist_panel_visible', val);
       }
       hueAnalytics.convert('hue', 'leftAssistVisible/' + val);
+      hueAnalytics.log('left-assist-panel', 'show-assist-toggle/' + val);
       window.setTimeout(() => {
         huePubSub.publish('split.panel.resized');
         $(window).trigger('resize');
@@ -132,6 +137,16 @@ class SidePanelViewModel {
         self.assistWithoutStorage(false);
       });
     };
+
+    huePubSub.subscribe(BOTH_ASSIST_TOGGLE_EVENT, () => {
+      const hideBoth = self.rightAssistVisible() || self.leftAssistVisible();
+      if (hideBoth) {
+        hideAssists(true, true);
+      } else {
+        self.leftAssistVisible(true);
+        self.rightAssistVisible(true);
+      }
+    });
 
     huePubSub.subscribe('both.assists.hide', preventStorage => {
       hideAssists(true, true, preventStorage);

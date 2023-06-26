@@ -1,1 +1,0 @@
-.. literalinclude:: ../jws-help.txt

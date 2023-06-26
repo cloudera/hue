@@ -542,7 +542,13 @@
 
         const createPlaceholderElement = (): HTMLElement => {
           const element = document.createElement('div');
-          element.innerText = I18n('Example: SELECT * FROM tablename, or press CTRL + space');
+          if (connector.dialect === 'hplsql') {
+            element.innerText = I18n(
+              'Example: CREATE PROCEDURE name AS SELECT * FROM tablename limit 10 GO'
+            );
+          } else {
+            element.innerText = I18n('Example: SELECT * FROM tablename, or press CTRL + space');
+          }
           element.style.marginLeft = '6px';
           element.classList.add('ace_invisible');
           element.classList.add('ace_emptyMessage');

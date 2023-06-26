@@ -250,6 +250,9 @@ ${ components.menubar(is_embeddable) }
           </a>
         </span>
         ${ _('Table') }
+        <!-- ko if: $parent.catalogEntry.isIcebergTable() -->
+          <i class="fa muted fa-snowflake-o" title="${ _('Iceberg table') }"></i>
+        <!-- /ko -->
       <!-- /ko -->
     </div>
     <!-- ko ifnot: $parent.catalogEntry.isView() -->
@@ -263,11 +266,16 @@ ${ components.menubar(is_embeddable) }
       ${_('and stored in')}
       <!-- ko if: details.properties.format === 'kudu' -->
         <div>${_('Kudu')}</div>
+      <!-- /ko -->
+      <!-- ko if: details.properties.format !== 'kudu' -->
+        <!-- ko if: hdfs_link -->
+          <div>          
+            <a data-bind="hueLink: hdfs_link, attr: { title: $parent.catalogEntry.getHdfsFilePath() }" target="_blank" >${_('location')}</a>
+          </div>
         <!-- /ko -->
-        <!-- ko if: details.properties.format !== 'kudu' -->
-        <div>
-          <a href="javascript: void(0);" data-bind="storageContextPopover: { path: hdfs_link.replace('/filebrowser/view=', ''), offset: { left: 5 } }"> ${_('location')}</a>
-        </div>
+        <!-- ko ifnot: hdfs_link -->
+          <div>${_('unknown location')}</div>
+        <!-- /ko -->
       <!-- /ko -->
     </div>
     <!-- /ko -->
@@ -480,12 +488,14 @@ ${ components.menubar(is_embeddable) }
             <div>${ _('Owner') }</div>
             <div><span data-bind="text: owner_name ? owner_name : '${ _ko('None') }'"></span> <span data-bind="visible: owner_type">(<span data-bind="text: owner_type"></span>)</span></div>
           </div>
-          <div class="metastore-property">
-            <div>${ _('Location') }</div>
-            <div>
-              <a href="javascript: void(0);" data-bind="storageContextPopover: { path: hdfs_link.replace('/filebrowser/view=', ''), offset: { left: 5 } }"> ${_('Location')}</a>
+          <!-- ko if: hdfs_link  -->
+            <div class="metastore-property">
+              <div>${ _('Location') }</div>
+              <div>              
+                <a data-bind="hueLink: hdfs_link, attr: { title: $parent.catalogEntry.getHdfsFilePath() }" target="_blank" >${_('location')}</a>
+              </div>
             </div>
-          </div>
+          <!-- /ko -->
         </div>
       </div>
       <!-- ko with: parameters -->
@@ -892,7 +902,7 @@ ${ components.menubar(is_embeddable) }
                         <a class="btn btn-default" data-bind="attr: { 'href': '/metastore/table/'+ catalogEntry.path.join('/') + '/read' }" title="${_('Browse Data')}"><i class="fa fa-play fa-fw"></i> ${_('Browse Data')}</a>
                       % endif
                       % if has_write_access:
-                        <a href="javascript: void(0);" class="btn btn-default" data-bind="click: showImportData, visible: tableDetails() && !catalogEntry.isView()" title="${_('Import Data')}"><i class="fa fa-upload fa-fw"></i> ${_('Import')}</a>
+                        <a href="javascript: void(0);" class="btn btn-default" data-bind="click: showImportData, visible: enableImport($root.source().type)" title="${_('Import Data')}"><i class="fa fa-upload fa-fw"></i> ${_('Import')}</a>
                       % endif
                       % if has_write_access:
                         <a href="#dropSingleTable" data-toggle="modal" class="btn btn-default" data-bind="attr: { 'title' : tableDetails() && catalogEntry.isView() ? '${_('Drop View')}' : '${_('Drop Table')}' }"><i class="fa fa-times fa-fw"></i> ${_('Drop')}</a>

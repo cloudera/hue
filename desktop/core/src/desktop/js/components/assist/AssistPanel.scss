@@ -16,7 +16,7 @@
  limitations under the License.
 */
 
-@import '../styles/colors';
+@import '../styles/variables';
 @import '../styles/mixins';
 
 .hue-assist-panel {
@@ -24,5 +24,5 @@
 
   padding-top: 5px;
   padding-left: 5px;
-  background-color: $fluid-gray-050;
+  background-color: $fluidx-gray-050;
 }

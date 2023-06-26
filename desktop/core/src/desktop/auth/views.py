@@ -49,8 +49,9 @@ from desktop.lib import fsmanager
 from desktop.lib.django_util import render, login_notrequired, JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.log.access import access_log, access_warn, last_access_map
-from desktop.views import samlgroup_check
+from desktop.views import samlgroup_check, saml_login_headers
 from desktop.settings import LOAD_BALANCER_COOKIE
+from django.utils.encoding import smart_str
 
 
 if sys.version_info[0] > 2:
@@ -61,7 +62,7 @@ else:
   from django.utils.translation import ugettext as _
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 def get_current_users():
@@ -163,6 +164,10 @@ def dt_login(request, from_modal=False):
         if userprofile.creation_method == UserProfile.CreationMethod.EXTERNAL: # This is to fix a bug in Hue 4.3
           userprofile.creation_method = UserProfile.CreationMethod.EXTERNAL.name
         userprofile.update_data({'auth_backend': user.backend})
+        try:
+          userprofile.update_data({'X-Forwarded-For': request.META['HTTP_X_FORWARDED_FOR']})
+        except KeyError as e:
+          LOG.error('HTTP-X-FORWARDED-FOR header not found: %s' %smart_str(e))
         userprofile.save()
 
         msg = 'Successful login for user: %s' % user.username
@@ -201,11 +206,12 @@ def dt_login(request, from_modal=False):
     # local user login failed, give the right auth_form with 'server' field
     auth_form = auth_forms.LdapAuthenticationForm()
   
-  if not from_modal and SESSION.ENABLE_TEST_COOKIE.get() :
+  if not from_modal and SESSION.ENABLE_TEST_COOKIE.get():
     request.session.set_test_cookie()
 
   if 'SAML2Backend' in backend_names:
     request.session['samlgroup_permitted_flag'] = samlgroup_check(request)
+    saml_login_headers(request)
 
   renderable_path = 'login.mako'
   if from_modal:

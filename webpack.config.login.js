@@ -37,6 +37,7 @@ module.exports = {
     }
   },
   output: {
+    hashFunction: 'xxhash64',
     path: __dirname + '/desktop/core/src/desktop/static/desktop/js/bundles/login',
     filename: shared.output.filename
   },

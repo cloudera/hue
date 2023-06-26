@@ -112,7 +112,7 @@ Hueチームは全てのコントリビューターに感謝し、Hue 4.3 のリ
  [6]: https://github.com/cloudera/hue/commits/release-4.3.0
  [7]: http://cloudera.github.io/hue/docs-4.3.0/release-notes/release-notes-4.3.0.html
  [8]: http://demo.gethue.com/
- [9]: http://cloudera.github.io/hue/latest/admin-manual/manual.html#centosoracleredhat-6x
+ [9]: https://docs.gethue.com/administrator/installation/dependencies/#redhat-68--69-os
  [10]: http://jp.gethue.com/additional-sql-improvements-in-hue-4-3/
  [11]: https://cdn.gethue.com/uploads/2018/10/sample_context_operations.gif
  [12]: https://gethue.com/simplifying-the-end-user-data-catalog-search/
