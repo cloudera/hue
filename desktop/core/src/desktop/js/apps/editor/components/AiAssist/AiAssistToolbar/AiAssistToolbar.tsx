@@ -24,6 +24,7 @@ interface AssistToolbarProps {
   isEditMode: boolean;
   inputExpanded: boolean;
   inputPrefill: string;
+  inputValue: string;
   loadExplanation: (statement: string) => Promise<void>;
   parsedStatement: any;
   loadOptimization: (statement: string) => Promise<void>;
@@ -31,6 +32,7 @@ interface AssistToolbarProps {
   parseError: ParseError | undefined;
   className?: string;
   onInputSubmit: (value: string) => void;
+  onInputChanged: (value: string) => void;
 }
 
 function AssistToolbar({
@@ -41,13 +43,15 @@ function AssistToolbar({
   setIsEditMode,
   isEditMode,
   inputExpanded,
+  inputValue,
   inputPrefill,
   loadExplanation,
   parsedStatement,
   loadOptimization,
   loadFixSuggestion,
   parseError,
-  onInputSubmit
+  onInputSubmit,
+  onInputChanged,
 }: AssistToolbarProps) {
   const [isAnimatingInput, setIsAnimatingInput] = React.useState(false);
   const handOnCancelInput = () => {
@@ -86,6 +90,8 @@ function AssistToolbar({
             placeholder="E.g. How many of our unique website vistors are using Mac?"
             onSubmit={onInputSubmit}
             onCancel={handOnCancelInput}
+            onInputChanged={onInputChanged}
+            value={inputValue}
             onAnimationEnded={() => setIsAnimatingInput(false)}
           />
           <ToolbarButton
@@ -109,9 +115,11 @@ function AssistToolbar({
             isAnimating={isAnimatingInput}
             isExpanded={isEditMode && inputExpanded}
             isLoading={isLoading}
+            value={inputValue}
             placeholder="E.g. only inlcude people under 50 years"
             onSubmit={onInputSubmit}
             onCancel={handOnCancelInput}
+            onInputChanged={onInputChanged}
             onAnimationEnded={() => setIsAnimatingInput(false)}
             prefill={inputPrefill}
           />

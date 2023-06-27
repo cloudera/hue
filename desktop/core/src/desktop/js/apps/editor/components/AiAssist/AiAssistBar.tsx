@@ -99,6 +99,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
   const [parser, setParser] = useState<SyntaxParser>();
   const [parseError, setParseError] = useState<ParseError | undefined>();
   const [nql, setNql] = useState('');
+  const [inputValue, setInputValue] = useState<string>('');
   const cursorPosition = useRef<{ row: number; column: number } | undefined>();
   const keywordCase = useKeywordCase(parser, selectedStatement);
   const inputExpanded = isEditMode || isGenerateMode;
@@ -167,6 +168,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
       setShowSuggestedSqlModal(true);
     }
     setIsLoading(false);
+    setInputValue('');
   };
 
   const editSqlQuery = async (
@@ -196,6 +198,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
     }
 
     setIsLoading(false);
+    setInputValue('');
   };
 
   const loadOptimization = async (statement: string) => {
@@ -302,6 +305,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
     setErrorStatusText('');
     setParser(undefined);
     setParseError(undefined);
+    setInputValue('');
   };
 
   const toggleOpen = () => {
@@ -384,11 +388,13 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
           <AssistToolbar
             isGenerateMode={isGenerateMode}
             isLoading={isLoading}
+            inputValue={inputValue}
             setErrorStatusText={setErrorStatusText}
             setIsGenerateMode={setIsGenerateMode}
             setIsEditMode={setIsEditMode}
             isEditMode={isEditMode}
             onInputSubmit={handleToobarInputSubmit}
+            onInputChanged={setInputValue}
             inputExpanded={inputExpanded}
             loadExplanation={loadExplanation}
             parsedStatement={parsedStatement}
