@@ -24,12 +24,12 @@ Explain in natural language using non technical terms, what this query does: {sq
 
 _OPTIMIZE = """Act as an {dialect} SQL expert.
 Optimize this SQL query and explain the improvement if any.
-Wrap the new code in a <code> tag and the explanation in an <explain> tag: {userprompt}
+Wrap the new code in a <code> tag and the explanation in an <explain> tag: {sql}
 """
 
 _FIX = """Act as an {dialect} SQL expert.
 Fix this broken sql query and explain the fix.
-Wrap the corrected code in a <code> tag and the explaination in an <explain> tag: {userprompt}
+Wrap the corrected code in a <code> tag and the explaination in an <explain> tag: {sql}
 """
 
 TASK_TEMPLATES = {
