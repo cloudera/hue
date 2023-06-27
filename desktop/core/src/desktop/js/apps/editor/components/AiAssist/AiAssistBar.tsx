@@ -203,7 +203,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
     const executor = activeExecutable?.executor;
     const databaseName = activeExecutable?.database || '';
     const dialect = lastDialect.current;
-    const { sql, explanation, error } = await generateOptimizedSql({
+    const { sql, explain, error } = await generateOptimizedSql({
       statement,
       databaseName,
       executor,
@@ -215,7 +215,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
       handleApiError(error.message);
     } else {
       setSuggestion(sql);
-      setSuggestionExplanation(explanation);
+      setSuggestionExplanation(explain);
       setShowSuggestedSqlModal(true);
     }
     setIsLoading(false);
