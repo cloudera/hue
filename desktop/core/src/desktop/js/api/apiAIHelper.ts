@@ -347,7 +347,7 @@ const generateEditedSQLfromNQL: GenerateEditedSQLfromNQL = async ({
 const generateExplanation: GenerateExplanation = async ({ statement, dialect, onStatusChange }) => {
   try {
     onStatusChange('Generating explanation');
-    const response = await fetchFromLlm({
+    return await fetchFromLlm({
       url: SQL_API_URL,
       data: {
         task: 'summarize',
@@ -355,7 +355,6 @@ const generateExplanation: GenerateExplanation = async ({ statement, dialect, on
         dialect
       }
     });
-    return response.summary;
   } catch (e) {
     return handleError(e, 'Call to AI to explain SQL query failed');
   }

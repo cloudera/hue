@@ -129,7 +129,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
     const executor = activeExecutable?.executor;
     const databaseName = activeExecutable?.database || '';
     const dialect = lastDialect.current;
-    const { explanation, error } = await generateExplanation({
+    const { summary, error } = await generateExplanation({
       statement,
       dialect,
       executor,
@@ -140,7 +140,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
       handleApiError(error.message);
     } else {
       setSuggestion(statement);
-      setExplanation(breakLines(explanation));
+      setExplanation(breakLines(summary));
       setShowSuggestedSqlModal(true);
     }
     setIsLoading(false);
