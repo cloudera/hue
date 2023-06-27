@@ -245,6 +245,11 @@ def knox_login_headers(request):
     userprofile.save()
   except Exception:
     LOG.error("X-FORWARDED-FOR header not found")
+  try:
+    userprofile.update_data({'X-CSRF-TOKEN': request.META['CSRF_COOKIE']})
+    userprofile.save()
+  except:
+    LOG.error("X-CSRF-TOKEN header not found")
 
 class DesktopBackendBase(object):
   """
