@@ -80,7 +80,10 @@ class THttpClient(TTransportBase):
     self._headers.update(timeout=str(int(ms / 1000)))
 
   def setCustomHeaders(self, headers):
-    self._headers = headers
+    if self._headers:
+      self._headers.update(headers)
+    else:
+      self._headers = headers
 
   def read(self, sz):
     return self._data
