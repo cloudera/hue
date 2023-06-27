@@ -2008,6 +2008,15 @@ class ClusterConfig(object):
 
     remote_home_storage = get_remote_home_storage(self.user)
 
+
+    interpreters.append({
+      'type': 'hdfs',
+      'displayName': 'Storage Browser',
+      'buttonName':'Storage Browser',
+      'tooltip': 'Storage Browser',
+      'page': '/filebrowser/'
+    })
+
     for hdfs_connector in hdfs_connectors:
       force_home = remote_home_storage and not remote_home_storage.startswith('/')
       home_path = self.user.get_home_directory(force_home=force_home).encode('utf-8')
