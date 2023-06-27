@@ -65,9 +65,11 @@ function AiAssistToolbarInput({
   onSubmit,
   onCancel,
   onAnimationEnded,
+  onInputChanged,
   isLoading,
   isExpanded,
-  prefill = ''
+  prefill = '',
+  value
 }: {
   isAnimating: boolean;
   isExpanded: boolean;  
@@ -76,9 +78,11 @@ function AiAssistToolbarInput({
   prefill?: string;
   onSubmit: (value: string) => void;
   onCancel: () => void;
+  onInputChanged: (value: string) => void;
   onAnimationEnded:() => void;
+  value: string;
 }) {
-  const [value, setValue] = useState<string>('');
+ 
   const [dirty, setDirty] = useState<boolean>(false);
   const [touched, setTouched] = useState<boolean>(false);  
   const toolbarButtonWrapperRef = useRef<HTMLDivElement>(null);
@@ -110,21 +114,20 @@ function AiAssistToolbarInput({
 
   const handleSubmit = () => {
     onSubmit(value);
-    setValue('');
     setDirty(false);
     setTouched(false);
   };
 
   const handleCancel = () => {
     onCancel();
-    setValue('');
     setDirty(false);
     setTouched(false);
+    onInputChanged('');
   };
 
   const handleOnChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newValue = e.target.value;
-    setValue(newValue);
+    onInputChanged(newValue);
     setDirty(newValue ? true : false);
     setTouched(true);
   };
@@ -162,7 +165,7 @@ function AiAssistToolbarInput({
               } else if (event.key === ESCAPE_KEY) {
                 handleCancel();
               } else if (event.key === TAB_KEY && !dirty && prefill) {
-                setValue(prefill);
+                onInputChanged(prefill);
                 event.preventDefault();
               }
             }}
