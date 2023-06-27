@@ -14,7 +14,6 @@ import AiAssistToolbarInput from './AiAssistToolbarInput';
 import { ParseError } from 'utils/parseError';
 
 import './AiAssistToolbar.scss';
-import { set } from 'lodash';
 
 interface AssistToolbarProps {
   isGenerateMode: boolean;
@@ -24,6 +23,7 @@ interface AssistToolbarProps {
   setIsEditMode: React.Dispatch<React.SetStateAction<boolean>>;
   isEditMode: boolean;
   inputExpanded: boolean;
+  inputPrefill: string;
   loadExplanation: (statement: string) => Promise<void>;
   parsedStatement: any;
   loadOptimization: (statement: string) => Promise<void>;
@@ -41,6 +41,7 @@ function AssistToolbar({
   setIsEditMode,
   isEditMode,
   inputExpanded,
+  inputPrefill,
   loadExplanation,
   parsedStatement,
   loadOptimization,
@@ -48,10 +49,14 @@ function AssistToolbar({
   parseError,
   onInputSubmit
 }: AssistToolbarProps) {
+  const [isAnimatingInput, setIsAnimatingInput] = React.useState(false);
   const handOnCancelInput = () => {
     setIsGenerateMode(false);
     setIsEditMode(false);
   };
+
+  const hasSelectedStatement = parsedStatement?.statement?.trim();
+
   return (
     <Toolbar
       className="hue-ai-assist-toolbar"
@@ -61,7 +66,7 @@ function AssistToolbar({
             className={classNames({
               'hue-ai-assist-toolbar__button--active': isGenerateMode
             })}
-            disabled={isLoading}
+            disabled={isLoading || hasSelectedStatement}
             title="Generate SQL using natural language"
             aria-label="Generate SQL using natural language"
             icon={<CommentOutlined />}
@@ -69,22 +74,25 @@ function AssistToolbar({
               setErrorStatusText('');
               setIsGenerateMode(prev => !prev);
               setIsEditMode(false);
+              setIsAnimatingInput(true);
             }}
           >
             {!isEditMode ? 'Generate' : ''}
           </ToolbarButton>
           <AiAssistToolbarInput
+            isAnimating={isAnimatingInput}
             isLoading={isLoading}
             isExpanded={isGenerateMode && inputExpanded}
             placeholder="E.g. How many of our unique website vistors are using Mac?"
             onSubmit={onInputSubmit}
             onCancel={handOnCancelInput}
+            onAnimationEnded={() => setIsAnimatingInput(false)}
           />
           <ToolbarButton
             className={classNames({
               'hue-ai-assist-toolbar__button--active': isEditMode
             })}
-            disabled={isLoading}
+            disabled={isLoading || !hasSelectedStatement}
             title="Edit SQL using natural language"
             aria-label="Edit SQL using natural language"
             icon={<EditOutlined />}
@@ -92,19 +100,23 @@ function AssistToolbar({
               setErrorStatusText('');
               setIsEditMode(prev => !prev);
               setIsGenerateMode(false);
+              setIsAnimatingInput(true);
             }}
           >
             {!isGenerateMode ? 'Edit' : ''}
           </ToolbarButton>
           <AiAssistToolbarInput
+            isAnimating={isAnimatingInput}
             isExpanded={isEditMode && inputExpanded}
             isLoading={isLoading}
             placeholder="E.g. only inlcude people under 50 years"
             onSubmit={onInputSubmit}
             onCancel={handOnCancelInput}
+            onAnimationEnded={() => setIsAnimatingInput(false)}
+            prefill={inputPrefill}
           />
           <ToolbarButton
-            disabled={isLoading}
+            disabled={isLoading || !hasSelectedStatement}
             title="Explain SQL statements"
             aria-label="Explain SQL statement"
             icon={<BulbOutlined />}
@@ -121,7 +133,7 @@ function AssistToolbar({
               loadOptimization(parsedStatement?.statement);
             }}
             title="Optimize your SQL statement"
-            disabled={isLoading}
+            disabled={isLoading || !hasSelectedStatement}
             icon={<ThunderboltOutlined />}
           >
             {!inputExpanded ? 'Optimize' : ''}
@@ -131,7 +143,7 @@ function AssistToolbar({
               setErrorStatusText('');
               loadFixSuggestion(parsedStatement?.statement);
             }}
-            disabled={!parseError || isLoading}
+            disabled={!parseError || isLoading || !hasSelectedStatement}
             icon={<BugOutlined />}
           >
             {!inputExpanded ? 'Fix' : ''}

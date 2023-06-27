@@ -619,9 +619,16 @@
           lastFocusedEditor = editor === focusedEditor;
         });
 
+        subTracker.subscribe('aiassistbar.bar.expanded', resizeAce);
+        subTracker.subscribe('aiassistbar.bar.collapsed', resizeAce);
         subTracker.subscribe('assist.set.manual.visibility', resizeAce);
         subTracker.subscribe('split.panel.resized', resizeAce);
 
+        subTracker.subscribe('ace.cursor.move', (position: Ace.Position): void => {
+          editor.moveCursorToPosition(position);
+          editor.renderer.scrollCursorIntoView();
+        });
+        
         subTracker.subscribe(
           'ace.replace',
           (data: { text: string; location: ParsedLocation }): void => {

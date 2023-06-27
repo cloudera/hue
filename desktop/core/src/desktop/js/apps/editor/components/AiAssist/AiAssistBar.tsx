@@ -31,7 +31,7 @@ const {
   generateEditedSQLfromNQL
 } = generativeFunctionFactory();
 
-const getEditorLineNumbers = (parsedStatement: ParsedSqlStatement) => {
+const getSelectedLineNumbers = (parsedStatement: ParsedSqlStatement) => {
   const { first_line: firstLineInlcudingEmptyLines, last_line: lastLine } =
     parsedStatement?.location || {};
   const firstLine = firstLineInlcudingEmptyLines + getLeadingEmptyLineCount(parsedStatement);
@@ -55,6 +55,23 @@ const breakLines = (input: string): string => {
   return (result += line);
 };
 
+const extractLeadingNqlComments = (sql: string): string => {
+  const regex = /^(\s*--.*?$|\s*\/\*(.|\n)*?\*\/)/gm;
+  const comments = sql.match(regex) || [];
+  const prefixSingleLine = '-- NQL:';
+  const prefixMultiLine = '/* NQL:';
+  const commentsTexts = comments
+    .map(comment => comment.trim())
+    .filter(comment => comment.startsWith(prefixSingleLine) || comment.startsWith(prefixMultiLine))
+    .map(comment => {
+      return comment.startsWith(prefixSingleLine)
+        ? comment.slice(prefixSingleLine.length).trim()
+        : comment.slice(prefixMultiLine.length, -2).trim();
+    });
+
+  return commentsTexts.join('\n');
+};
+
 export interface AiAssistBarProps {
   activeExecutable?: SqlExecutable;
 }
@@ -66,13 +83,13 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
   const selectedStatement: string = parsedStatement?.statement || '';
   const lastSelectedStatement = useRef(selectedStatement);
   const lastDialect = useRef('');
-  const { firstLine, lastLine } = getEditorLineNumbers(parsedStatement);
+  const { firstLine, lastLine } = getSelectedLineNumbers(parsedStatement);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isAnimating, setIsAnimating] = useState<'no' | 'expand' | 'contract'>('no');
   const [isEditMode, setIsEditMode] = useState(false);
   const [isGenerateMode, setIsGenerateMode] = useState(false);
   const [showSuggestedSqlModal, setShowSuggestedSqlModal] = useState(false);
-  const [explanation, setExplanation] = useState('This is the explanation of the query.');
+  const [explanation, setExplanation] = useState('');
   const [suggestion, setSuggestion] = useState('');
   const [suggestionExplanation, setSuggestionExplanation] = useState('');
   const [assumptions, setAssumptions] = useState('');
@@ -81,9 +98,11 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
   const [errorStatusText, setErrorStatusText] = useState('');
   const [parser, setParser] = useState<SyntaxParser>();
   const [parseError, setParseError] = useState<ParseError | undefined>();
-
+  const [nql, setNql] = useState('');
+  const cursorPosition = useRef<{ row: number; column: number } | undefined>();
   const keywordCase = useKeywordCase(parser, selectedStatement);
   const inputExpanded = isEditMode || isGenerateMode;
+  const inputPrefill = inputExpanded ? extractLeadingNqlComments(selectedStatement) : '';
 
   const loadParser = async () => {
     const executor = activeExecutable?.executor;
@@ -110,16 +129,20 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
     const executor = activeExecutable?.executor;
     const databaseName = activeExecutable?.database || '';
     const dialect = lastDialect.current;
-    const explanation = await generateExplanation({
+    const { summary, error } = await generateExplanation({
       statement,
       dialect,
       executor,
       databaseName,
       onStatusChange: handleStatusUpdate
     });
-    setSuggestion(statement);
-    setExplanation(breakLines(explanation));
-    setShowSuggestedSqlModal(true);
+    if (error) {
+      handleApiError(error.message);
+    } else {
+      setSuggestion(statement);
+      setExplanation(breakLines(summary));
+      setShowSuggestedSqlModal(true);
+    }
     setIsLoading(false);
   };
 
@@ -128,17 +151,21 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
     const executor = activeExecutable?.executor;
     const databaseName = activeExecutable?.database || '';
     const dialect = lastDialect.current;
-    const { sql, assumptions } = await generateSQLfromNQL({
+    const { sql, assumptions, error } = await generateSQLfromNQL({
       nql,
       databaseName,
       executor,
       dialect,
       onStatusChange: handleStatusUpdate
     });
-    setSuggestion(sql);
-    setAssumptions(assumptions);
-    setShowSuggestedSqlModal(true);
-
+    if (error) {
+      handleApiError(error.message);
+    } else {
+      setNql(nql);
+      setSuggestion(sql);
+      setAssumptions(assumptions);
+      setShowSuggestedSqlModal(true);
+    }
     setIsLoading(false);
   };
 
@@ -151,7 +178,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
     const executor = activeExecutable?.executor;
     const databaseName = activeExecutable?.database || '';
     const dialect = lastDialect.current;
-    const { sql, assumptions } = await generateEditedSQLfromNQL({
+    const { sql, assumptions, error } = await generateEditedSQLfromNQL({
       nql,
       sql: sqlToModify,
       databaseName,
@@ -159,9 +186,14 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
       dialect,
       onStatusChange: handleStatusUpdate
     });
-    setSuggestion(sql);
-    setAssumptions(assumptions);
-    setShowSuggestedSqlModal(true);
+    if (error) {
+      handleApiError(error.message);
+    } else {
+      setNql(nql);
+      setSuggestion(sql);
+      setAssumptions(assumptions);
+      setShowSuggestedSqlModal(true);
+    }
 
     setIsLoading(false);
   };
@@ -208,20 +240,34 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
   };
 
   const acceptSuggestion = (statement: string) => {
+    let lineNrToMoveTo = firstLine;
+    if (isGenerateMode) {
+      const zeroBasedLineNr = 1;
+      const lineNrOfCursor = cursorPosition.current?.row || 0;
+      // TODO: lineNrToMoveTo fails if the user inserts new lines without moving the cursor afterwards.
+      // We need to find a way to get the current cursor position from the editor
+      // when the code is changed using keyboar interactactions
+      lineNrToMoveTo = lineNrOfCursor + zeroBasedLineNr || 1;
+      huePubSub.publish('editor.insert.at.cursor', { text: statement });
+    } else {
+      huePubSub.publish('ace.replace', {
+        text: statement,
+        location: {
+          first_line: firstLine,
+          first_column: 1,
+          last_line: lastLine,
+          // TODO: what to use here?
+          last_column: 10000
+        }
+      });
+    }
     setShowSuggestedSqlModal(false);
-    huePubSub.publish('ace.replace', {
-      text: statement,
-      location: {
-        first_line: firstLine,
-        first_column: 1,
-        last_line: lastLine,
-        // TODO: what to use here?
-        last_column: 10000
-      }
+    huePubSub.publish('ace.cursor.move', {
+      column: 0,
+      row: lineNrToMoveTo
     });
-    setSuggestion('');
-    setIsGenerateMode(false);
-    setIsGenerateMode(false);
+
+    resetAll();
   };
 
   const handleToobarInputSubmit = (userInput: string) => {
@@ -240,14 +286,31 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
     const textToInsert = comment ? `${comment}${sql.trim()}\n` : sql;
 
     acceptSuggestion(textToInsert);
+  };
+
+  const resetAll = () => {
+    setIsEditMode(false);
+    setIsGenerateMode(false);
+    setShowSuggestedSqlModal(false);
     setExplanation('');
+    setSuggestion('');
+    setSuggestionExplanation('');
+    setAssumptions('');
+    setNql('');
+    setIsLoading(false);
+    setLoadingStatusText('');
+    setErrorStatusText('');
+    setParser(undefined);
+    setParseError(undefined);
   };
 
   const toggleOpen = () => {
     setIsAnimating(prev => {
-      console.log(`prev: ${prev}, isExpanded: ${isExpanded}`);
       return prev === 'no' ? (isExpanded ? 'contract' : 'expand') : prev;
     });
+    if (isExpanded) {
+      resetAll();
+    }
     setIsExpanded(prev => !prev);
   };
 
@@ -271,10 +334,31 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
     }
   }, [selectedStatement, parser]);
 
+  useEffect(() => {
+    const EDITOR_CURSOR_POSITION_CHANGE_EVENT = 'cursor-changed';
+    const handleEditorCursorPostionChange = (event: CustomEvent) => {
+      cursorPosition.current = event.detail;
+    };
+    document.addEventListener(
+      EDITOR_CURSOR_POSITION_CHANGE_EVENT,
+      handleEditorCursorPostionChange as any
+    );
+    return () => {
+      document.removeEventListener(
+        EDITOR_CURSOR_POSITION_CHANGE_EVENT,
+        handleEditorCursorPostionChange as any
+      );
+    };
+  }, []);
+
   return (
     <>
       <AnimatedLauncher
-        onAnimationEnd={() => setIsAnimating('no')  }
+        onAnimationEnd={() => {
+          setIsAnimating('no');
+          const barStatus = isExpanded ? 'expanded' : 'collapsed';
+          huePubSub.publish(`aiassistbar.bar.${barStatus}`);
+        }}
         isAnimating={isAnimating}
         isExpanded={isExpanded}
         isLoading={isLoading}
@@ -311,6 +395,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
             loadOptimization={loadOptimization}
             loadFixSuggestion={loadFixSuggestion}
             parseError={parseError}
+            inputPrefill={inputPrefill}
           />
         </div>
         <AnimatedCloseButton
@@ -337,7 +422,8 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
           showDiffFrom={!isGenerateMode && !explanation ? parsedStatement?.statement : undefined}
           assumptions={assumptions}
           explanation={explanation || suggestionExplanation}
-          lineNumberStart={getEditorLineNumbers(parsedStatement).firstLine}
+          nql={nql}
+          lineNumberStart={getSelectedLineNumbers(parsedStatement).firstLine}
           showCopyToClipboard={!explanation}
           dialect={lastDialect.current}
           keywordCase={keywordCase}

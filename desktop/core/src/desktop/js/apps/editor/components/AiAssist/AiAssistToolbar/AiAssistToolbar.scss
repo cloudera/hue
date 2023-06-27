@@ -37,43 +37,4 @@
       order: -2;
     }
   }
-
-  .hue-ai-assist-toolbar-input__wrapper {
-    flex-grow: 0;
-    width: 0px;
-    transition: flex-grow 0.5s ease;
-  }
-
-  .hue-ai-assist-toolbar-input__wrapper--expanded {
-    flex-grow: 1;
-    order: -1;
-  }
-
-  .hue-ai-assist-toolbar-input__text-input {
-    all: unset;
-    caret-color: vars.$fluidx-blue-400;
-    color: vars.$fluidx-blue-400;
-    font-size: 14px;    
-    overflow: hidden;
-    text-overflow: ellipsis;
-
-    &::placeholder {
-      color: vars.$fluidx-blue-200;
-    }
-    &:focus {
-      text-overflow: inherit;
-    }
-  }
-
-  .hue-ai-assist-toolbar-input__text-input--empty  {
-    width: 100%;
-  }
-
-  // Used as a reference element for measuring the width of the input
-  // which is needed to create a growing input field.
-  .hue-ai-assist-toolbar-input__width-reference-element {
-    visibility: hidden;
-    white-space: pre;
-    position: absolute;
-  }
 }

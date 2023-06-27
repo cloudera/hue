@@ -207,7 +207,7 @@ X_FRAME_OPTIONS = Config(
 
 LLM = ConfigSection(
   key='llm',
-  help=_("""Configuration options for LLM"""),
+  help=_("Configuration options for LLM"),
   members=dict(
     SQL_LLM=Config(
       key='sql_llm',
@@ -218,7 +218,7 @@ LLM = ConfigSection(
       key='relevancy',
       help=_('Relevency for table search either vector search or vector db'),
       default='vector_search',
-      type=str),  
+      type=str),
     HUE_LLM=ConfigSection(
       key="hue_llm",
       help=_('Configurations for the LLM hosted using Hue infra'),
@@ -243,8 +243,7 @@ LLM = ConfigSection(
           key='enable_open_ai',
           help=_('Open AI'),
           default=True,
-          type=coerce_bool
-        ),
+          type=coerce_bool),
         TOKEN=Config(
           key='token',
           help=_('API token for the OpenAI API'),
@@ -253,10 +252,25 @@ LLM = ConfigSection(
           key='model',
           help=_('OpenAI model for LLM'),
           type=str,
-          default='davinci'),
+          default='gpt-3.5-turbo-16k'),
+      )
+    ),
+    METADATA = ConfigSection(
+      key='metadata',
+      help=_("Configuration options for metadata opeartions"),
+      members=dict(
+        CACHE_SIZE=Config(
+          key='cache_size',
+          help=_('Metadata embedding cache size'),
+          default=5000,
+          type=int),
+        EMBEDDING_MODEL=Config(
+          key='embedding_model',
+          help=_('Model used for metadata embedding. Must be compatible with SentenceTransformer'),
+          default='all-MiniLM-L6-v2',
+          type=str),
       )
     )
-
   )
 )
 

@@ -80,6 +80,7 @@ $adjusted-left-margin: 20px;
     column-gap: 12px;
     padding-left: 12px;
     padding-right: 12px;
+    z-index: 3; // Make sure it is not hidden by an expanded textarea
   }
 
   .hue-ai-assist-bar__animated-launcher-error-text {

@@ -1,4 +1,5 @@
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect, useRef } from 'react';
+import { throttle } from 'lodash';
 
 export const useKeywordCase = (parser: any, selectedStatement: string) => {
   const sqlKeywords = useMemo(() => {
@@ -18,4 +19,50 @@ export const useKeywordCase = (parser: any, selectedStatement: string) => {
   }, [selectedStatement, sqlKeywords]);
 
   return keywordCase;
+};
+
+interface UseResizeAwareElementSize {
+  height: number;
+  width: number;
+}
+
+export const useResizeAwareElementSize = (
+  refElement: React.RefObject<HTMLElement>
+): UseResizeAwareElementSize | undefined => {
+  const [size, setSize] = useState<UseResizeAwareElementSize>();
+  const observerRef = useRef<ResizeObserver | null>(null);
+
+  // Throttle to avoid too many rerenders during animations
+  // use useRef to avoid creating a new function on every render
+  const throttledSetSize = useRef(
+    throttle(() => {
+      setSize(
+        refElement.current
+          ? {
+              height: refElement.current?.clientHeight,
+              width: refElement.current?.clientWidth
+            }
+          : undefined
+      );
+    }, 100)
+  ).current;
+
+  useEffect(() => {
+    // We need a state change to trigger the rerender
+    const handleResize = (): void => {
+      throttledSetSize();
+    };
+
+    if (refElement.current) {
+      observerRef.current = new ResizeObserver(handleResize);
+      observerRef.current.observe(refElement.current);
+    }
+
+    return (): void => {
+      observerRef.current?.disconnect();
+      observerRef.current = null;
+    };
+  }, [refElement]);
+
+  return size;
 };

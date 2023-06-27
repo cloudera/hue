@@ -8,15 +8,15 @@ from .base import LlmApi, Task
 from desktop.conf import LLM
 
 _GENERATE = """Act as an {dialect} SQL expert. Translate the NQL statement into SQL using the following metadata: {metadata}.
-List any the assumptions not covered by the supplied metadata.
+List any assumptions not covered by the supplied metadata.
 NQL: {input}
-Wrap the sql in a <code> tag and the assumptions in an <assumptions> tag"""
+Wrap the SQL in a <code> tag and the assumptions in a <assumptions> tag"""
 
 _EDIT = """Act as an {dialect} SQL expert. Based on the input modify the SQL using the following metadata: {metadata}.
-List any the assumptions not covered by the supplied metadata.
+List any assumptions not covered by the supplied metadata.
 SQL query: {sql}
 Input: {input}
-Make sure to return the answer in the following format: <code></code><assumptions></assumptions>"""
+Wrap the SQL in a <code> tag and the assumptions in a <assumptions> tag"""
 
 _SUMMARIZE = """Act as an {dialect} SQL expert.
 Explain in natural language using non technical terms, what this query does: {sql}.
@@ -24,12 +24,12 @@ Explain in natural language using non technical terms, what this query does: {sq
 
 _OPTIMIZE = """Act as an {dialect} SQL expert.
 Optimize this SQL query and explain the improvement if any.
-Wrap the new code in a <code> tag and the explanation in an <explain> tag: {userprompt}
+Wrap the new code in a <code> tag and the explanation in an <explain> tag: {sql}
 """
 
 _FIX = """Act as an {dialect} SQL expert.
 Fix this broken sql query and explain the fix.
-Wrap the corrected code in a <code> tag and the explaination in an <explain> tag: {userprompt}
+Wrap the corrected code in a <code> tag and the explaination in an <explain> tag: {sql}
 """
 
 TASK_TEMPLATES = {
@@ -41,7 +41,7 @@ TASK_TEMPLATES = {
 }
 
 openai.api_key = LLM.OPENAI.TOKEN.get()
-model_name = LLM.OPENAI.MODEL.get()
+_model_name = LLM.OPENAI.MODEL.get()
 
 def extractTagContent(tag, text):
     matches = re.findall(f'<{tag}>(.*?)</{tag}>', text, flags=re.DOTALL)
@@ -52,16 +52,16 @@ class OpenAiApi(LlmApi):
         super().__init__(TASK_TEMPLATES)
 
     def infer(self, prompt):
-        response = openai.Completion.create(
-            engine=model_name,
-            prompt=prompt,
-            max_tokens=1500,
-            n=1,
-            stop=None,
-            temperature=0
+        response = openai.ChatCompletion.create(
+            model=_model_name,
+            temperature=0,
+            messages=[{
+                "role": "user",
+                "content": prompt
+            }]
         )
         choices = response.choices[0]
-        return choices.text.strip()
+        return choices.message.content.strip()
 
     def parse_inference(self, task, inference):
         if task == Task.SUMMARIZE:
