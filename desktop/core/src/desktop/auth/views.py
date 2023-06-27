@@ -167,7 +167,11 @@ def dt_login(request, from_modal=False):
         try:
           userprofile.update_data({'X-Forwarded-For': request.META['HTTP_X_FORWARDED_FOR']})
         except KeyError as e:
-          LOG.error('HTTP-X-FORWARDED-FOR header not found: %s' %smart_str(e))
+          LOG.error('HTTP-X-FORWARDED-FOR header not found: %s' % smart_str(e))
+        try:
+          userprofile.update_data({'X-CSRF-TOKEN': request.META['CSRF_COOKIE']})
+        except KeyError as e:
+          LOG.error('X-CSRF-TOKEN header not found: %s' % smart_str(e))
         userprofile.save()
 
         msg = 'Successful login for user: %s' % user.username
