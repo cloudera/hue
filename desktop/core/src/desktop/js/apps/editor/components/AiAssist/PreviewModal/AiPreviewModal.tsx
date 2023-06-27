@@ -85,7 +85,14 @@ const PreviewModal = ({
   const formatSql = (sql: string) => {
     const applyAutoFormat =
       (userChoiceAutoFormat === undefined && autoFormat) || userChoiceAutoFormat;
-    return applyAutoFormat ? format(sql, { language: dialect, keywordCase }) : sql;
+    if(applyAutoFormat) {
+      try {
+        sql = format(sql, { language: dialect, keywordCase });
+      } catch(e) {
+        // Handle gracefully
+      }
+    }
+    return sql;
   };
 
   const includeNqlAsComment = (sql: string, nql: string) => {
