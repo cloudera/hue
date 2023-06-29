@@ -4,6 +4,7 @@ import huePubSub from 'utils/huePubSub';
 import { SyntaxParser } from 'parse/types';
 import sqlParserRepository from 'parse/sql/sqlParserRepository';
 import { ParsedSqlStatement } from 'parse/sqlStatementsParser';
+import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
 import { generativeFunctionFactory } from 'api/apiAIHelper';
 import SqlExecutable from '../../execution/sqlExecutable';
 import { getLeadingEmptyLineCount } from '../editorUtils';
@@ -12,6 +13,7 @@ import { useKeywordCase } from './hooks';
 import AnimatedLauncher from './AnimatedLauncher/AnimatedLauncher';
 import AnimatedCloseButton from './AnimatedCloseButton/AnimatedCloseButton';
 import AssistToolbar from './AiAssistToolbar/AiAssistToolbar';
+import { nqlCommentRegex } from './sharedRegexes';
 
 import './AiAssistBar.scss';
 
@@ -56,8 +58,7 @@ const breakLines = (input: string): string => {
 };
 
 const extractLeadingNqlComments = (sql: string): string => {
-  const regex = /^(\s*--.*?$|\s*\/\*(.|\n)*?\*\/)/gm;
-  const comments = sql.match(regex) || [];
+  const comments = sql.match(nqlCommentRegex) || [];
   const prefixSingleLine = '-- NQL:';
   const prefixMultiLine = '/* NQL:';
   const commentsTexts = comments
@@ -84,7 +85,9 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
   const lastSelectedStatement = useRef(selectedStatement);
   const lastDialect = useRef('');
   const { firstLine, lastLine } = getSelectedLineNumbers(parsedStatement);
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(
+    getFromLocalStorage('hue.aiAssistBar.isExpanded', false)
+  );
   const [isAnimating, setIsAnimating] = useState<'no' | 'expand' | 'contract'>('no');
   const [isEditMode, setIsEditMode] = useState(false);
   const [isGenerateMode, setIsGenerateMode] = useState(false);
@@ -315,7 +318,11 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
     if (isExpanded) {
       resetAll();
     }
-    setIsExpanded(prev => !prev);
+    setIsExpanded(prev => {
+      const expanded = !prev;
+      setInLocalStorage('hue.aiAssistBar.isExpanded', expanded);
+      return expanded;
+    });
   };
 
   useEffect(() => {
