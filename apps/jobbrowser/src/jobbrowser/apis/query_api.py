@@ -96,7 +96,7 @@ class QueryApi(Api):
             job['duration'],
             re.MULTILINE
         ).groups()),
-        'submitted': datetime.strptime(job['start_time'][:-3], "%Y-%m-%d %H:%M:%S.%f").
+        'submitted': parse_job_timestamp(job['start_time']).
           replace(tzinfo=pytz.utc).astimezone(localtime._get_localzone()).strftime("%Y-%m-%d %H:%M:%S.%f"),
         # Extra specific
         'rows_fetched': job['rows_fetched'],
@@ -333,3 +333,12 @@ class QueryApi(Api):
     for f in filters:
       tuples = list(filter(f, tuples))
     return tuples
+
+
+def parse_job_timestamp(timestamp: str) -> datetime:
+  timestamp_to_parse = timestamp
+  if '.' not in timestamp:
+    timestamp_to_parse = f'{timestamp}.000000'
+  if len(timestamp[timestamp.rfind('.')+1:]) == 9:
+    timestamp_to_parse = timestamp[:-3]
+  return datetime.strptime(timestamp_to_parse, "%Y-%m-%d %H:%M:%S.%f")

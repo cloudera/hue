@@ -44,7 +44,7 @@ from useradmin.models import User
 
 from jobbrowser import views
 from jobbrowser.api import get_api
-from jobbrowser.apis.query_api import QueryApi
+from jobbrowser.apis.query_api import QueryApi, parse_job_timestamp
 from jobbrowser.apis import job_api
 from jobbrowser.conf import SHARE_JOBS
 from jobbrowser.models import can_view_job, can_modify_job, LinkJobLogs
@@ -624,7 +624,7 @@ class TestImpalaApi(object):
     self.api = QueryApi(None, impala_api=api)
 
   def handle_query_start_time(self, start_time):
-    query_start_time = datetime.strptime(start_time[:-3], "%Y-%m-%d %H:%M:%S.%f"). \
+    query_start_time = parse_job_timestamp(start_time). \
       replace(tzinfo=pytz.utc).astimezone(localtime._get_localzone()).strftime("%Y-%m-%d %H:%M:%S.%f")
     return query_start_time
 
@@ -675,6 +675,12 @@ class TestImpalaApi(object):
       'submitted': self.handle_query_start_time('2017-10-25 15:38:26.637010000'), 'apiStatus': 'SUCCEEDED',
       'doc_url': 'http://url.com/query_plan?query_id=8a46a8865624698f:b80b211500000000'}.items():
       assert_equal(response.get(key), value)
+
+  def test_parse_job_timestamp(self):
+    assert_equal(parse_job_timestamp('2017-10-25 15:38:26'), datetime(2017, 10, 25, 15, 38, 26, 0))
+    assert_equal(parse_job_timestamp('2017-10-25 15:38:26.637010000'), datetime(2017, 10, 25, 15, 38, 26, 637010))
+    assert_equal(parse_job_timestamp('2017-10-25 15:38:26.637010'), datetime(2017, 10, 25, 15, 38, 26, 637010))
+    assert_equal(parse_job_timestamp('2017-10-25 15:38:26.637'), datetime(2017, 10, 25, 15, 38, 26, 637000))
 
 
 class TestSparkNoHadoop(object):
