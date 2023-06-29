@@ -12,6 +12,9 @@ import CopyClipboardIcon from '@cloudera/cuix-core/icons/react/CopyClipboardIcon
 import CheckmarkIcon from '@cloudera/cuix-core/icons/react/CheckmarkIcon';
 import { KeywordCase, format } from 'sql-formatter';
 
+import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
+import { nqlCommentRegex } from '../sharedRegexes';
+
 import SyntaxHighlighterDiff from '../SyntaxHighlighterDiff/SyntaxHighlighterDiff';
 
 import './AiPreviewModal.scss';
@@ -25,9 +28,9 @@ const insertLineBreaks = (input: string): string => {
 
   input.split(SPACE).forEach(word => {
     const append = word + SPACE;
-    if (lineLength + word.length > MAX_LINE_LENGTH) {      
+    if (lineLength + word.length > MAX_LINE_LENGTH) {
       output += LINE_BREAK + append;
-      lineLength = append.length; 
+      lineLength = append.length;
     } else {
       output += append;
       lineLength += append.length;
@@ -40,6 +43,39 @@ const insertLineBreaks = (input: string): string => {
   });
 
   return output;
+};
+
+const appendComments = (
+  previousSql: string,
+  newSql: string,
+  newComment: string
+): string => {
+  let existingComments = '';
+  let query = newSql;
+
+  const commentsKeptInNewSql = newSql.match(nqlCommentRegex)?.join('\n') || undefined;
+
+  // We don't know for sure if an AI modified SQL will
+  // retain the commemts in the original SQL.
+  if (commentsKeptInNewSql) {
+    existingComments = commentsKeptInNewSql;
+    query = newSql.replace(existingComments, '').trim();
+  } else {
+    const commentsFromPreviousSql = previousSql.match(nqlCommentRegex)?.join('\n') || undefined;
+    existingComments = commentsFromPreviousSql ? commentsFromPreviousSql.trim() : '';
+  }
+
+  existingComments = existingComments ? existingComments + '\n' : '';
+  return `${existingComments}/* ${newComment.trim()} */\n${query.trim()}`;
+};
+
+const replaceNQLComment = (newSql: string, newComment: string): string => {
+  const commentsKeptInNewSql = newSql.match(nqlCommentRegex)?.join('\n') || undefined;
+
+  // We don't know for sure if an AI modified SQL will
+  // retain the commemts in the original SQL.
+  const query = commentsKeptInNewSql ? newSql.replace(commentsKeptInNewSql, '') : newSql;
+  return `/* ${newComment.trim()} */\n${query.trim()}`;
 };
 
 interface PreviewModalProps {
@@ -78,9 +114,15 @@ const PreviewModal = ({
   keywordCase
 }: PreviewModalProps) => {
   const [copied, setCopied] = useState(false);
-  // TODO: Use local storage or some user setting here
-  const [userChoiceAutoFormat, setUserChoiceAutoFormat] = useState<boolean | undefined>(undefined);
-  const [userChoiceIncludeNql, setUserChoiceIncludeNql] = useState<boolean>(true);
+  const [userChoiceAutoFormat, setUserChoiceAutoFormat] = useState<boolean>(
+    getFromLocalStorage('hue.aiAssistBar.previewModal.autoFormat', true)
+  );
+  const [userChoiceIncludeNql, setUserChoiceIncludeNql] = useState<boolean>(
+    getFromLocalStorage('hue.aiAssistBar.previewModal.includeNql', true)
+  );
+  const [userChoiceReplaceNql, setUserChoiceReplaceNql] = useState<boolean>(
+    getFromLocalStorage('hue.aiAssistBar.previewModal.replaceNql', false)
+  );
 
   const formatSql = (sql: string) => {
     const applyAutoFormat =
@@ -95,14 +137,17 @@ const PreviewModal = ({
     return sql;
   };
 
-  const includeNqlAsComment = (sql: string, nql: string) => {
+  const includeNqlAsComment = (previousSql: string, sql: string, nql: string) => {
     const addComment = nql && userChoiceIncludeNql;
     const nqlWithPrefix = nql && nql.trim().startsWith('NQL:') ? nql : `NQL: ${nql}`;
     const commentWithLinebreaks = insertLineBreaks(nqlWithPrefix);
-    return addComment ? `/* ${commentWithLinebreaks} */\n${sql}` : sql;
+    const sqlWithNqlComment = userChoiceReplaceNql
+      ? replaceNQLComment(sql, commentWithLinebreaks)
+      : appendComments(previousSql, sql, commentWithLinebreaks);
+    return addComment ? sqlWithNqlComment : sql;
   };
 
-  const suggestion = formatSql(includeNqlAsComment(suggestionRaw, nql));
+  const suggestion = formatSql(includeNqlAsComment(showDiffFromRaw, suggestionRaw, nql));
   const showDiffFrom = formatSql(showDiffFromRaw);
 
   const clearStates = () => {
@@ -170,15 +215,30 @@ const PreviewModal = ({
         <div className="hue-ai-preview-modal__config-container">
           <Switch
             checked={userChoiceAutoFormat === undefined ? autoFormat : userChoiceAutoFormat}
-            onChange={setUserChoiceAutoFormat}
+            onChange={(useAutoformat: boolean) => {
+              setInLocalStorage('hue.aiAssistBar.previewModal.autoFormat', useAutoformat);
+              setUserChoiceAutoFormat(useAutoformat);
+            }}
             className="hue-ai-preview-modal__config-switch"
             label="Autoformat SQL"
           />
           <Switch
             checked={userChoiceIncludeNql}
-            onChange={setUserChoiceIncludeNql}
+            onChange={(includeNql: boolean) => {
+              setInLocalStorage('hue.aiAssistBar.previewModal.includeNql', includeNql);
+              setUserChoiceIncludeNql(includeNql);
+            }}
             className="hue-ai-preview-modal__config-switch"
-            label="Include NQL as comment"
+            label="Include prompt as comment"
+          />
+          <Switch
+            checked={userChoiceReplaceNql}
+            onChange={(reolaceNql: boolean) => {
+              setInLocalStorage('hue.aiAssistBar.previewModal.replaceNql', reolaceNql);
+              setUserChoiceReplaceNql(reolaceNql);
+            }}
+            className="hue-ai-preview-modal__config-switch"
+            label="Replace comments"
           />          
         </div>
 
