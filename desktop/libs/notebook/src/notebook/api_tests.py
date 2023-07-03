@@ -176,7 +176,7 @@ class TestApi(object):
 
     assert_equal(0, data['status'], data)
     doc = Document2.objects.get(pk=data['id'])
-    assert_equal('query-mysql', doc.type)
+    assert_equal('query-hive', doc.type)
 
 
   def test_save_notebook_with_connector_on(self):
@@ -206,7 +206,7 @@ class TestApi(object):
 
     assert_equal(0, data['status'], data)
     doc = Document2.objects.get(pk=data['id'])
-    assert_equal('query-mysql', doc.type)
+    assert_equal('query-hive', doc.type)
 
 
   def test_historify(self):
