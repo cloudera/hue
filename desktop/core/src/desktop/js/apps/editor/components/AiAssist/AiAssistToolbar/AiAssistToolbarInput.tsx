@@ -110,6 +110,12 @@ function AiAssistToolbarInput({
     });
   }, [value, prefill, availableWidth]);
 
+  useEffect(() => {
+    if(!isAnimating && isExpanded){
+      textareaRef.current?.focus();
+    }    
+  }, [isAnimating, isExpanded]);
+
   const isMultiLine = isMultiLineSpan(spanSizeRef, spanSingleLineRef, value);
 
   const handleSubmit = () => {
