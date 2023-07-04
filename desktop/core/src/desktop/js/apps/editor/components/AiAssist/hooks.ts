@@ -67,12 +67,11 @@ export const useResizeAwareElementSize = (
   return size;
 };
 
-
 export const useKeyboardShortcuts = (shortcuts: Record<string, () => void>) => {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       const { key, ctrlKey, metaKey } = event;
-      
+
       if (ctrlKey && metaKey && key in shortcuts) {
         event.preventDefault();
         shortcuts[key]?.();
@@ -84,5 +83,5 @@ export const useKeyboardShortcuts = (shortcuts: Record<string, () => void>) => {
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [shortcuts]);
+  }, []);
 };
