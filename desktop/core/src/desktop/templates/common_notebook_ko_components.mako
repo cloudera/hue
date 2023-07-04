@@ -857,6 +857,14 @@ else:
             { shortcut: 'Alt-0', macShortcut: 'Command-Option-0', description: '${ _('Fold all')}' },
             { shortcut: 'Alt-Shift-0', macShortcut: 'Command-Option-Shift-0', description: '${ _('Unfold all')}' }]
         },{
+          label: '${ _('AI tools')}',
+          shortcuts: [
+            { shortcut: 'Ctrl-Command-G', macShortcut: 'Ctrl-Command-G', description: '${ _('Toggle SQL Generation input')}' },
+            { shortcut: 'Ctrl-Command-E', macShortcut: 'Ctrl-Command-E', description: '${ _('Toggle SQL Edit input')}' },
+            { shortcut: 'Ctrl-Command-X', macShortcut: 'Ctrl-Command-X', description: '${ _('Explain selected SQL statement')}' },
+            { shortcut: 'Ctrl-Command-O', macShortcut: 'Ctrl-Command-O', description: '${ _('Optimize selected SQL statement')}' },
+            { shortcut: 'Ctrl-Command-F', macShortcut: 'Ctrl-Command-F', description: '${ _('Fix selected SQL statement')}' }]            
+        },{
           label: '${ _('Other')}',
           shortcuts: [
             { shortcut: 'Ctrl-Space', macShortcut: 'Ctrl-Space', description: '${ _('Autocomplete when Live Autocompletion is off')}' },

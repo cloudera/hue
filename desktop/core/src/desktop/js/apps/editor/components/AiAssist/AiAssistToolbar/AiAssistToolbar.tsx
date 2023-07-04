@@ -10,6 +10,7 @@ import {
 
 import Toolbar, { ToolbarButton } from '../../../../../reactComponents/Toolbar/Toolbar';
 import AiAssistToolbarInput from './AiAssistToolbarInput';
+import { useKeyboardShortcuts } from '../hooks';
 
 import { ParseError } from 'utils/parseError';
 
@@ -51,13 +52,50 @@ function AssistToolbar({
   loadFixSuggestion,
   parseError,
   onInputSubmit,
-  onInputChanged,
+  onInputChanged
 }: AssistToolbarProps) {
   const [isAnimatingInput, setIsAnimatingInput] = React.useState(false);
   const handOnCancelInput = () => {
     setIsGenerateMode(false);
     setIsEditMode(false);
   };
+
+  const toggleGenerateMode = () => {
+    setErrorStatusText('');
+    setIsGenerateMode(prev => !prev);
+    setIsEditMode(false);
+    setIsAnimatingInput(true);    
+  }
+
+  const toggleEditMode = () => {
+    setErrorStatusText('');
+    setIsEditMode(prev => !prev);
+    setIsGenerateMode(false);
+    setIsAnimatingInput(true);    
+  }
+
+  const handleExplainClick = () => {
+    setErrorStatusText('');
+    loadExplanation(parsedStatement?.statement);    
+  }
+
+  const handleOptimizeClick = () => {
+    setErrorStatusText('');
+    loadOptimization(parsedStatement?.statement);
+  }
+
+  const handleFixClick = () => {
+    setErrorStatusText('');
+    loadFixSuggestion(parsedStatement?.statement);    
+  }
+
+  useKeyboardShortcuts({
+    e: toggleEditMode,
+    g: toggleGenerateMode,
+    x: handleExplainClick,
+    o: handleOptimizeClick,
+    f: handleFixClick
+  });
 
   const hasSelectedStatement = parsedStatement?.statement?.trim();
 
@@ -71,15 +109,10 @@ function AssistToolbar({
               'hue-ai-assist-toolbar__button--active': isGenerateMode
             })}
             disabled={isLoading || hasSelectedStatement}
-            title="Generate SQL using natural language"
+            title="Generate SQL using natural language (Command-Ctrl-G)"
             aria-label="Generate SQL using natural language"
             icon={<CommentOutlined />}
-            onClick={() => {
-              setErrorStatusText('');
-              setIsGenerateMode(prev => !prev);
-              setIsEditMode(false);
-              setIsAnimatingInput(true);
-            }}
+            onClick={toggleGenerateMode}
           >
             {!isEditMode ? 'Generate' : ''}
           </ToolbarButton>
@@ -99,15 +132,10 @@ function AssistToolbar({
               'hue-ai-assist-toolbar__button--active': isEditMode
             })}
             disabled={isLoading || !hasSelectedStatement}
-            title="Edit SQL using natural language"
+            title="Edit selected SQL statement using natural language (Command-Ctrl-E)"
             aria-label="Edit SQL using natural language"
             icon={<EditOutlined />}
-            onClick={() => {
-              setErrorStatusText('');
-              setIsEditMode(prev => !prev);
-              setIsGenerateMode(false);
-              setIsAnimatingInput(true);
-            }}
+            onClick={toggleEditMode}
           >
             {!isGenerateMode ? 'Edit' : ''}
           </ToolbarButton>
@@ -125,32 +153,24 @@ function AssistToolbar({
           />
           <ToolbarButton
             disabled={isLoading || !hasSelectedStatement}
-            title="Explain SQL statements"
+            title="Explain selected SQL statement (Command-Ctrl-X)"
             aria-label="Explain SQL statement"
             icon={<BulbOutlined />}
-            onClick={() => {
-              setErrorStatusText('');
-              loadExplanation(parsedStatement?.statement);
-            }}
+            onClick={handleExplainClick}
           >
             {!inputExpanded ? 'Explain' : ''}
           </ToolbarButton>
           <ToolbarButton
-            onClick={() => {
-              setErrorStatusText('');
-              loadOptimization(parsedStatement?.statement);
-            }}
-            title="Optimize your SQL statement"
+            onClick={handleOptimizeClick}
+            title="Optimize selected SQL statement (Command-Ctrl-O)"
             disabled={isLoading || !hasSelectedStatement}
             icon={<ThunderboltOutlined />}
           >
             {!inputExpanded ? 'Optimize' : ''}
           </ToolbarButton>
           <ToolbarButton
-            onClick={() => {
-              setErrorStatusText('');
-              loadFixSuggestion(parsedStatement?.statement);
-            }}
+            title="Fix selected SQL statement (Command-Ctrl-F)"
+            onClick={handleFixClick}
             disabled={!parseError || isLoading || !hasSelectedStatement}
             icon={<BugOutlined />}
           >
