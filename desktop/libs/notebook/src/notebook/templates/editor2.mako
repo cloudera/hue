@@ -704,7 +704,7 @@ There is no bridge to KO for components using this integration. Example using in
 </script>
 
 <script type="text/html" id="editor-modals">
-  <div id="editorHelpModal" class="modal transparent-modal hide" data-backdrop="true" style="width:980px;margin-left:-510px!important">
+  <div id="editorHelpModal" class="modal transparent-modal hide" data-backdrop="true" style="width:1080px;margin-left:-510px!important">
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
       <h2 class="modal-title">${_('Editor help')}</h2>
