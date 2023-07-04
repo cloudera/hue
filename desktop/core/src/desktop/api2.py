@@ -822,6 +822,8 @@ def import_documents(request):
   if not _is_import_valid(documents):
     raise PopupException(_('Failed to import documents, the file does not contain the expected JSON schema for Hue documents.'))
 
+  documents = _sort_docs_by_depth(documents)
+
   docs = []
 
   uuids_map = dict((doc['fields']['uuid'], None) for doc in documents if not is_reserved_directory(doc))
@@ -1051,6 +1053,31 @@ def search_entities_interactive(request):
       return metadata_search_entities_interactive(request)
     else:
       return JsonResponse({'status': 1, 'message': _('Navigator not enabled')})
+
+
+def _sort_docs_by_depth(documents):
+  """
+  Sort the documents by depth, as documents forms a document tree
+  :params documents: document list
+  :return: the sorted documents list
+  """
+  doc_parent_map = {}
+  for doc in documents:
+    uuid = doc["fields"]["uuid"]
+    parent = doc["fields"]["parent_directory"][0] if doc["fields"]["parent_directory"] else None
+    doc_parent_map[uuid] = parent
+
+  doc_depth_map = {}
+  for doc in documents:
+    current = doc["fields"]["uuid"]
+    uuid = current
+    depth = 0
+    while doc_parent_map.get(uuid, None):
+      uuid = doc_parent_map[uuid]
+      depth += 1
+    doc_depth_map[current] = depth
+  documents.sort(key=lambda document: doc_depth_map.get(document["fields"]["uuid"], 0))
+  return documents
 
 
 def _is_import_valid(documents):
