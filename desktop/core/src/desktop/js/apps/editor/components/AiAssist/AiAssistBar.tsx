@@ -34,6 +34,9 @@ const {
 } = generativeFunctionFactory();
 
 const getSelectedLineNumbers = (parsedStatement: ParsedSqlStatement) => {
+  if (!parsedStatement) {
+    return { firstLine: 0, lastLine: 0 };
+  }
   const { first_line: firstLineInlcudingEmptyLines, last_line: lastLine } =
     parsedStatement?.location || {};
   const firstLine = firstLineInlcudingEmptyLines + getLeadingEmptyLineCount(parsedStatement);
@@ -325,23 +328,42 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
     });
   };
 
-  useEffect(() => {
-    if (!lastSelectedStatement.current) {
-      lastSelectedStatement.current = selectedStatement;
+  const updateInputModeOnStatementChange = (
+    previousSelection: string | undefined,
+    newSelection: string
+  ) => {
+    const editorWasEmpty = previousSelection?.trim() === '';
+    const userClearedEditor = !editorWasEmpty && newSelection === '';
+    const userTypedInEmptyEditor = editorWasEmpty && newSelection !== '';
+
+    if (userClearedEditor) {
+      setIsEditMode(false);
+    } else if (userTypedInEmptyEditor) {
+      setIsGenerateMode(false);
     }
+  };
+
+  useEffect(() => {
     loadParser();
 
     const selectionChanged = lastSelectedStatement.current !== selectedStatement;
+    if (selectionChanged) {
+      updateInputModeOnStatementChange(lastSelectedStatement?.current, selectedStatement);
 
-    if (parser && (selectionChanged || !explanation)) {
+      setSuggestion('');
+      setAssumptions('');
+      lastSelectedStatement.current = selectedStatement;
+
+      if (parser) {
+        const newParseError = parser?.parseSyntax('', selectedStatement.trim()) as ParseError;
+        setParseError(newParseError);
+      }
+    }
+
+    if (parser) {
       lastSelectedStatement.current = selectedStatement;
       const newParseError = parser?.parseSyntax('', selectedStatement.trim()) as ParseError;
       setParseError(newParseError);
-    }
-
-    if (selectionChanged) {
-      setSuggestion('');
-      setAssumptions('');
     }
   }, [selectedStatement, parser]);
 
