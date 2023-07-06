@@ -15,7 +15,6 @@ $input-animation-time: 0.5s;
   .hue-ai-assist-toolbar-input__wrapper--expanded {
     animation: expandInput $input-animation-time ease forwards;
     flex-grow: 1;
-    order: -1;
   }
 
   .hue-ai-assist-toolbar-input__text-input {
