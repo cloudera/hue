@@ -105,9 +105,6 @@ function AssistToolbar({
       content={() => (
         <>
           <ToolbarButton
-            className={classNames({
-              'hue-ai-assist-toolbar__button--active': isGenerateMode
-            })}
             disabled={isLoading || hasSelectedStatement}
             title="Generate SQL using natural language (Command-Ctrl-G)"
             aria-label="Generate SQL using natural language"
@@ -128,9 +125,6 @@ function AssistToolbar({
             onAnimationEnded={() => setIsAnimatingInput(false)}
           />
           <ToolbarButton
-            className={classNames({
-              'hue-ai-assist-toolbar__button--active': isEditMode
-            })}
             disabled={isLoading || !hasSelectedStatement}
             title="Edit selected SQL statement using natural language (Command-Ctrl-E)"
             aria-label="Edit SQL using natural language"
