@@ -237,6 +237,28 @@ def add_xff_header(func):
     return func(*args, **kwargs)
   return wraps(func)(decorate)
 
+def add_csrf_header(func):
+  def decorate(*args, **kwargs):
+    self = args[0]
+    csrf = None
+    configuration = None
+    if args[1].__dict__ is not None and 'configuration' in args[1].__dict__:
+      configuration = args[1].__dict__['configuration']
+    if configuration is not None and 'X-CSRF-TOKEN' in configuration:
+        csrf = configuration.get('X-CSRF-TOKEN')
+    try:
+        if hasattr(self._oprot.trans, 'TFramedTransport'):
+          trans_client = self._oprot.trans._TFramedTransport__trans
+        else:
+          trans_client = self._oprot.trans._TBufferedTransport__trans
+
+        trans_client.setCustomHeaders({'X-CSRF-TOKEN': csrf})
+    except AttributeError as e:
+        LOG.error('Could not set CSRF header: %s' % smart_str(e))
+
+    return func(*args, **kwargs)
+  return wraps(func)(decorate)
+
 class Client(Iface):
     def __init__(self, iprot, oprot=None):
         self._iprot = self._oprot = iprot
@@ -244,6 +266,7 @@ class Client(Iface):
             self._oprot = oprot
         self._seqid = 0
 
+    @add_csrf_header
     @add_xff_header
     def OpenSession(self, req):
         """

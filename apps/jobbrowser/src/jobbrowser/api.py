@@ -88,6 +88,10 @@ class YarnApi(JobBrowserApi):
     return self.get_job(job_id)
 
   @rm_ha
+  def kill_job(self, job_id):
+    return self.resource_manager_api.kill(job_id)
+
+  @rm_ha
   def get_jobs(self, user, **kwargs):
     state_filters = {'running': 'UNDEFINED', 'completed': 'SUCCEEDED', 'failed': 'FAILED', 'killed': 'KILLED',}
     states_filters = {'running': 'NEW,NEW_SAVING,SUBMITTED,ACCEPTED,RUNNING', 'completed': 'FINISHED', 'failed': 'FAILED,KILLED',}

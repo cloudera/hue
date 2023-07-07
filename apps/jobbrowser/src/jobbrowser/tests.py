@@ -921,6 +921,11 @@ class MockResourceManagerApi(object):
       u'app': MockResourceManagerApi.APPS[job_id]
     }
 
+  def kill(self, job_id):
+    job_id = job_id.replace('job', 'application')
+    self.APPS[job_id]['state'] = 'KILLED'
+
+
 class MockImpalaQueryApi(object):
   APPS = {
     '8a46a8865624698f:b80b211500000000': {
