@@ -55,7 +55,7 @@ class ScheduleApi(Api):
     jobs = oozie_api.get_coordinators(**kwargs)
 
     return {
-      'apps':[{
+      'apps': [{
         'id': app['id'],
         'name': app['appName'],
         'status': app['status'],
@@ -72,12 +72,34 @@ class ScheduleApi(Api):
     }
 
 
-  def app(self, appid, offset=1):
+  def app(self, appid, offset=1, filters={}):
     oozie_api = get_oozie(self.user)
     coordinator = oozie_api.get_coordinator(jobid=appid)
 
     mock_get = MockGet()
     mock_get.update('offset', offset)
+
+    """ 
+      The Oozie job api supports one or more "status" parameters. The valid status values are:
+      
+      WAITING, READY, SUBMITTED, RUNNING, SUSPENDED, TIMEDOUT, SUCCEEDED, KILLED, FAILED, IGNORED, SKIPPED
+      
+      The job browser UI has a generic filter mechanism that is re-used across all different type of jobs, that
+      parameter is called "states" and it only has three possible values: completed, running or failed
+      
+      Here we adapt this to fit the API requirements, "state" becomes "status" and the values are translated
+      based on how it's been done historically (for instance list_oozie_coordinator.mako around line 725).
+    """
+    if 'states' in filters:
+      statusFilters = []
+      for stateFilter in filters.get('states'):
+        if stateFilter == 'completed':
+          statusFilters.append('SUCCEEDED')
+        elif stateFilter == 'running':
+          statusFilters.extend(['RUNNING', 'READY', 'SUBMITTED', 'SUSPENDED', 'WAITING'])
+        elif stateFilter == 'failed':
+          statusFilters.extend(['KILLED', 'FAILED', 'TIMEDOUT', 'SKIPPED'])
+      mock_get.update('status', statusFilters)
     request = MockDjangoRequest(self.user, get=mock_get)
     response = list_oozie_coordinator(request, job_id=appid)
 
@@ -133,36 +155,36 @@ class ScheduleApi(Api):
       return coordinator['properties']['tasks']
 
   _API_STATUSES = {
-    'PREP':               'RUNNING',
-    'RUNNING':            'RUNNING',
-    'RUNNINGWITHERROR':   'RUNNING',
-    'PREPSUSPENDED':      'PAUSED',
-    'SUSPENDED':          'PAUSED',
+    'PREP': 'RUNNING',
+    'RUNNING': 'RUNNING',
+    'RUNNINGWITHERROR': 'RUNNING',
+    'PREPSUSPENDED': 'PAUSED',
+    'SUSPENDED': 'PAUSED',
     'SUSPENDEDWITHERROR': 'PAUSED',
-    'PREPPAUSED':         'PAUSED',
-    'PAUSED':             'PAUSED',
-    'PAUSEDWITHERROR':    'PAUSED',
-    'SUCCEEDED':          'SUCCEEDED',
-    'DONEWITHERROR':      'FAILED',
-    'KILLED':             'FAILED',
-    'FAILED':             'FAILED',
+    'PREPPAUSED': 'PAUSED',
+    'PAUSED': 'PAUSED',
+    'PAUSEDWITHERROR': 'PAUSED',
+    'SUCCEEDED': 'SUCCEEDED',
+    'DONEWITHERROR': 'FAILED',
+    'KILLED': 'FAILED',
+    'FAILED': 'FAILED',
   }
 
   def _api_status(self, status):
     return self._API_STATUSES.get(status, 'FAILED')
 
   _TASK_API_STATUSES = {
-    'WAITING':   'RUNNING',
-    'READY':     'RUNNING',
+    'WAITING': 'RUNNING',
+    'READY': 'RUNNING',
     'SUBMITTED': 'RUNNING',
-    'RUNNING':   'RUNNING',
+    'RUNNING': 'RUNNING',
     'SUSPENDED': 'PAUSED',
     'SUCCEEDED': 'SUCCEEDED',
-    'TIMEDOUT':  'FAILED',
-    'KILLED':    'FAILED',
-    'FAILED':    'FAILED',
-    'IGNORED':   'FAILED',
-    'SKIPPED':   'FAILED',
+    'TIMEDOUT': 'FAILED',
+    'KILLED': 'FAILED',
+    'FAILED': 'FAILED',
+    'IGNORED': 'FAILED',
+    'SKIPPED': 'FAILED',
   }
 
   def _task_api_status(self, status):
@@ -192,4 +214,4 @@ class MockGet(object):
       return self._prop.get(prop, default)
 
   def getlist(self, prop):
-    return []
+    return self._prop.get(prop)

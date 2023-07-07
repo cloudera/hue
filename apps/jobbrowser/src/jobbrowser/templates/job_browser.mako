@@ -2444,13 +2444,17 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <!-- ko with: coordinatorActions() -->
           <form class="form-inline">
             ##<input data-bind="value: textFilter" type="text" class="input-xlarge search-query" placeholder="${_('Filter by name')}">
-
-            ##<span data-bind="foreach: statesValuesFilter">
-            ##  <label class="checkbox">
-            ##    <div class="pull-left margin-left-5 status-border status-content" data-bind="css: value, hueCheckbox: checked"></div>
-            ##    <div class="inline-block" data-bind="text: name, toggle: checked"></div>
-            ##  </label>
-            ##</span>
+            <!-- ko with: $root.job() -->
+            <!-- ko if: type() === 'schedule' -->
+            <span data-bind="foreach: statesValuesFilter">
+              <label class="checkbox">
+                <div class="pull-left margin-left-5 status-border status-content" data-bind="css: value, hueCheckbox: checked"></div>
+                <div class="inline-block" data-bind="text: name, toggle: checked"></div>
+              </label>
+            </span>
+            <!-- ko hueSpinner: { spin: applyingFilters, inline: true } --><!-- /ko -->
+            <!-- /ko -->
+            <!-- /ko -->
             <div data-bind="template: { name: 'job-actions${ SUFFIX }' }" class="pull-right"></div>
           </form>
 
@@ -2963,8 +2967,16 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           {'types': ko.mapping.toJS(self.typesFilter())},
         ];
       });
-      self.filters.subscribe(function(value) {
-        self.fetchProfile('tasks');
+      self.applyingFilters = ko.observable(false);
+      self.filters.subscribe(function () {
+        if (self.type() === 'schedule') {
+          self.applyingFilters(true);
+          self.updateJob(false, true).always(function () {
+            self.applyingFilters(false);
+          });
+        } else {
+          self.fetchProfile('tasks');
+        }
       });
       self.metadataFilter = ko.observable('');
       self.metadataFilter.subscribe(function(newValue) {
@@ -3057,7 +3069,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           cluster: ko.mapping.toJSON(vm.compute),
           app_id: ko.mapping.toJSON(self.id),
           interface: ko.mapping.toJSON(vm.interface),
-          pagination: ko.mapping.toJSON(self.pagination)
+          pagination: ko.mapping.toJSON(self.pagination),
+          filters: ko.mapping.toJSON(self.filters)
         }, function (data) {
           if (data.status == 0) {
             if (data.app) {
@@ -3250,10 +3263,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         });
       };
 
-      self.updateJob = function (updateLogs) {
+      self.updateJob = function (updateLogs, forceUpdate) {
         huePubSub.publish('graph.refresh.view');
         var deferred = $.Deferred();
-        if (vm.job() == self && self.apiStatus() == 'RUNNING') {
+        if (vm.job() == self && (self.apiStatus() == 'RUNNING' || forceUpdate)) {
           vm.apiHelper.cancelActiveRequest(lastUpdateJobRequest);
           lastUpdateJobRequest = self._fetchJob(function (data) {
             var requests = [];
