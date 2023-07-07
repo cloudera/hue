@@ -492,7 +492,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               <!-- /ko -->
               <!-- /ko -->
 
-              <!-- ko if: $root.job() && $root.job().hasPagination() && interface() === 'schedules' -->
+              <!-- ko if: $root.job() && !$root.job().forceUpdatingJob() && $root.job().hasPagination() && interface() === 'schedules' -->
               <div data-bind="template: { name: 'pagination${ SUFFIX }', data: $root.job() }, visible: !jobs.loadingJobs()"></div>
               <!-- /ko -->
               <div data-bind="template: { name: 'pagination${ SUFFIX }', data: $root.jobs }, visible: !$root.job() && !jobs.loadingJobs()"></div>
@@ -2452,7 +2452,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                 <div class="inline-block" data-bind="text: name, toggle: checked"></div>
               </label>
             </span>
-            <!-- ko hueSpinner: { spin: applyingFilters, inline: true } --><!-- /ko -->
             <!-- /ko -->
             <!-- /ko -->
             <div data-bind="template: { name: 'job-actions${ SUFFIX }' }" class="pull-right"></div>
@@ -2474,6 +2473,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               <th>${_('lastModifiedTime')}</th>
             </tr>
             </thead>
+            <!-- ko if: !$root.job().forceUpdatingJob() -->
             <tbody data-bind="foreach: apps">
               <tr class="status-border pointer" data-bind="
                 css: {
@@ -2499,6 +2499,14 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                 <td data-bind="text: properties.lastModifiedTime"></td>
               </tr>
             </tbody>
+            <!-- /ko -->
+            <!-- ko if: $root.job().forceUpdatingJob() -->
+            <tbody>
+              <tr>
+                <td colspan="11"><!-- ko hueSpinner: { spin: true, inline: true, size: 'large' } --><!-- /ko --></td>
+              </tr>
+            </tbody>
+            <!-- /ko -->
           </table>
           <!-- /ko -->
         </div>
@@ -2810,9 +2818,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.paginationPage = ko.observable(1);
       self.paginationOffset = ko.observable(1); // Starting index
       self.paginationResultPage = ko.observable(50);
-      self.totalApps = ko.observable(null);
+      self.totalApps = ko.observable(job.properties && job.properties.total_actions || 0);
       self.hasPagination = ko.computed(function() {
-        return ['workflows', 'schedules', 'bundles'].indexOf(vm.interface()) != -1;
+        return self.totalApps() && ['workflows', 'schedules', 'bundles'].indexOf(vm.interface()) !== -1;
       });
       self.pagination = ko.pureComputed(function() {
         return {
@@ -2822,11 +2830,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         };
       });
 
-      self.pagination.subscribe(function(value) {
-        if (vm.interface() === 'schedules' && value.page > 1) {
-          vm.interface('schedules');
-          self.hasPagination(true);
-          self.fetchJob();
+      self.pagination.subscribe(function() {
+        if (vm.interface() === 'schedules') {
+          self.updateJob(false, true);
         }
       });
 
@@ -2967,13 +2973,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           {'types': ko.mapping.toJS(self.typesFilter())},
         ];
       });
-      self.applyingFilters = ko.observable(false);
+      self.forceUpdatingJob = ko.observable(false);
       self.filters.subscribe(function () {
         if (self.type() === 'schedule') {
-          self.applyingFilters(true);
-          self.updateJob(false, true).always(function () {
-            self.applyingFilters(false);
-          });
+          self.updateJob(false, true);
         } else {
           self.fetchProfile('tasks');
         }
@@ -3268,6 +3271,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         var deferred = $.Deferred();
         if (vm.job() == self && (self.apiStatus() == 'RUNNING' || forceUpdate)) {
           vm.apiHelper.cancelActiveRequest(lastUpdateJobRequest);
+          if (forceUpdate) {
+            self.forceUpdatingJob(true);
+          }
           lastUpdateJobRequest = self._fetchJob(function (data) {
             var requests = [];
             if (['schedule', 'workflow'].indexOf(vm.job().type()) >= 0) {
@@ -3304,6 +3310,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             $.when.apply(this, requests).done(function (){
               deferred.resolve();
             });
+          }).always(function () {
+            self.forceUpdatingJob(false);
           });
         }
         return deferred;
