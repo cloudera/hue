@@ -667,7 +667,10 @@ class HiveServerClient(object):
         'configuration': {},
     }
     connector_type = 'hive' if self.query_server['server_name'] == 'beeswax' else self.query_server['server_name']
-    interpreter = get_interpreter(connector_type=connector_type, user=self.user)
+    interpreter_dialect = self.query_server['dialect']
+    if not interpreter_dialect:
+      interpreter = get_interpreter(connector_type=connector_type, user=self.user)
+      interpreter_dialect = interpreter.get('dialect')
 
     if self.impersonation_enabled:
       kwargs.update({'username': DEFAULT_USER})
@@ -684,7 +687,7 @@ class HiveServerClient(object):
       if csrf_header and ENABLE_X_CSRF_TOKEN_FOR_HIVE_IMPALA.get():
         kwargs['configuration'].update({'X-CSRF-TOKEN': csrf_header})
 
-    if self.query_server['server_name'] == 'hplsql' or interpreter['dialect'] == 'hplsql': # All the time
+    if self.query_server['server_name'] == 'hplsql' or interpreter_dialect == 'hplsql': # All the time
       kwargs['configuration'].update({'hive.server2.proxy.user': user.username, 'set:hivevar:mode': 'HPLSQL'})
 
     if self.query_server['server_name'] == 'llap': # All the time
