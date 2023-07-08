@@ -36,7 +36,7 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.models import Document2, get_cluster_config, _get_apps
 
 from beeswax.design import hql_query
-from beeswax.models import SavedQuery
+from beeswax.models import SavedQuery, Namespace
 from beeswax.server import dbms
 from beeswax.server.dbms import get_query_server_config
 from desktop.lib.view_util import location_to_url
@@ -85,9 +85,8 @@ Database Views
 
 def databases(request):
   search_filter = request.GET.get('filter', '')
-  cluster = json.loads(request.POST.get('cluster', '{}'))
 
-  db = _get_db(user=request.user, cluster=cluster)
+  db = _get_db(user=request.user, cluster=_find_cluster(request))
   databases = db.get_databases(search_filter)
   apps_list = _get_apps(request.user, '')
 
@@ -110,7 +109,7 @@ def databases(request):
 @check_has_write_access_permission
 def drop_database(request):
   source_type = request.POST.get('source_type', request.GET.get('source_type', 'hive'))
-  cluster = json.loads(request.POST.get('cluster', '{}'))
+  cluster = _find_cluster(request)
 
   db = _get_db(user=request.user, source_type=source_type, cluster=cluster)
 
@@ -164,7 +163,7 @@ def alter_database(request, database):
   response = {'status': -1, 'data': ''}
 
   source_type = request.POST.get('source_type', 'hive')
-  cluster = json.loads(request.POST.get('cluster', '{}'))
+  cluster = _find_cluster(request)
 
   db = _get_db(user=request.user, source_type=source_type, cluster=cluster)
 
@@ -192,7 +191,7 @@ def get_database_metadata(request, database):
   response = {'status': -1, 'data': ''}
 
   source_type = request.POST.get('source_type', 'hive')
-  cluster = json.loads(request.POST.get('cluster', '{}'))
+  cluster = _find_cluster(request)
 
   db = _get_db(user=request.user, source_type=source_type, cluster=cluster)
 
@@ -236,7 +235,7 @@ def table_queries(request, database, table):
 Table Views
 """
 def show_tables(request, database=None):
-  cluster = json.loads(request.POST.get('cluster', '{}'))
+  cluster = _find_cluster(request)
 
   db = _get_db(user=request.user, cluster=cluster)
 
@@ -291,7 +290,7 @@ def show_tables(request, database=None):
 
 
 def get_table_metadata(request, database, table):
-  cluster = json.loads(request.POST.get('cluster', '{}'))
+  cluster = _find_cluster(request)
   source_type = request.POST.get('source_type')
 
   db = _get_db(user=request.user, source_type=source_type, cluster=cluster)
@@ -315,9 +314,8 @@ def get_table_metadata(request, database, table):
 
 def describe_table(request, database, table):
   app_name = get_app_name(request)
-  cluster = json.loads(request.POST.get('cluster', '{}'))
+  cluster = _find_cluster(request)
   source_type = request.POST.get('source_type', request.GET.get('connector_id', request.GET.get('source_type', 'hive')))
-
   db = _get_db(user=request.user, source_type=source_type, cluster=cluster)
 
   try:
@@ -380,7 +378,7 @@ def alter_table(request, database, table):
   response = {'status': -1, 'data': ''}
 
   source_type = request.POST.get('source_type', 'hive')
-  cluster = json.loads(request.POST.get('cluster', '{}'))
+  cluster = _find_cluster(request)
 
   db = _get_db(user=request.user, source_type=source_type, cluster=cluster)
 
@@ -415,7 +413,7 @@ def alter_column(request, database, table):
   response = {'status': -1, 'message': ''}
 
   source_type = request.POST.get('source_type', 'hive')
-  cluster = json.loads(request.POST.get('cluster', '{}'))
+  cluster = _find_cluster(request)
 
   db = _get_db(user=request.user, source_type=source_type, cluster=cluster)
 
@@ -460,7 +458,7 @@ def alter_column(request, database, table):
 @check_has_write_access_permission
 def drop_table(request, database):
   source_type = request.POST.get('source_type', request.GET.get('source_type', 'hive'))
-  cluster = json.loads(request.POST.get('cluster', '{}'))
+  cluster = _find_cluster(request)
 
   db = _get_db(user=request.user, source_type=source_type, cluster=cluster)
 
@@ -528,7 +526,7 @@ def load_table(request, database, table):
   response = {'status': -1, 'data': 'None'}
 
   source_type = request.POST.get('source_type', request.GET.get('source_type', 'hive'))
-  cluster = json.loads(request.POST.get('cluster', '{}'))
+  cluster = _find_cluster(request)
 
   db = _get_db(user=request.user, source_type=source_type, cluster=cluster)
 
@@ -602,7 +600,7 @@ def load_table(request, database, table):
 
 
 def describe_partitions(request, database, table):
-  cluster = json.loads(request.POST.get('cluster', '{}'))
+  cluster = _find_cluster(request)
 
   db = _get_db(user=request.user, cluster=cluster)
   table_obj = db.get_table(database, table)
@@ -687,7 +685,7 @@ def _massage_partition(database, table, partition):
 
 
 def browse_partition(request, database, table, partition_spec):
-  cluster = json.loads(request.POST.get('cluster', '{}'))
+  cluster = _find_cluster(request)
 
   db = _get_db(user=request.user, cluster=cluster)
   try:
@@ -723,7 +721,7 @@ def read_partition(request, database, table, partition_spec):
 @check_has_write_access_permission
 def drop_partition(request, database, table):
   source_type = request.POST.get('source_type', 'hive')
-  cluster = json.loads(request.POST.get('cluster', '{}'))
+  cluster = _find_cluster(request)
 
   db = _get_db(user=request.user, source_type=source_type, cluster=cluster)
 
@@ -779,6 +777,21 @@ def _get_db(user, source_type=None, cluster=None):
   query_server = get_query_server_config(name=name, connector=cluster)
   return dbms.get(user, query_server)
 
+
+def _find_cluster(request):
+  cluster = json.loads(request.POST.get('cluster', '{}'))
+  source_type = request.POST.get('source_type', request.GET.get('connector_id', request.GET.get('source_type', 'hive')))
+  namespace_id = request.GET.get('namespace')
+  if not cluster:
+    # Find the default compute
+    if namespace_id:
+      ns = Namespace.objects.filter(id=namespace_id).first()
+    else:
+      ns = Namespace.objects.filter(dialect=source_type).first()
+    if ns:
+      computes = ns.get_computes(request.user) if ns else None
+      cluster = computes[0] if computes else None
+  return cluster
 
 def _get_servername(db):
   if has_connectors():
