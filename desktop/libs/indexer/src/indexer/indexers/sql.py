@@ -230,7 +230,8 @@ class SQLIndexer(object):
         'overwrite': False,
         'partition_columns': [(partition['name'], partition['partitionValue']) for partition in partition_columns],
       }
-      query_server_config = dbms.get_query_server_config(name=source_type)
+      compute = destination['compute'] if 'compute' in destination else None
+      query_server_config = dbms.get_query_server_config(name=source_type, connector=compute)
       db = dbms.get(self.user, query_server=query_server_config)
       sql += "\n\n%s;" % db.load_data(database, table_name, form_data, None, generate_ddl_only=True)
 
@@ -299,7 +300,9 @@ class SQLIndexer(object):
         database=database,
         on_success_url=on_success_url,
         last_executed=start_time,
-        is_task=True
+        is_task=True,
+        namespace=destination['namespace'] if 'namespace' in destination else None,
+        compute=destination['compute'] if 'compute' in destination else None
     )
 
   def nomalize_booleans(self, row, columns):
