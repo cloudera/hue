@@ -1800,7 +1800,7 @@ class ClusterConfig(object):
       ],
       'default_sql_interpreter': default_sql_interpreter,
       'cluster_type': self.cluster_type,
-      'has_computes': self.cluster_type in ('altus', 'snowball'), # or any grouped engine connectors
+      'has_computes': self.cluster_type in ('cdw', 'altus', 'snowball'), # or any grouped engine connectors
       'hue_config': {
         'enable_sharing': ENABLE_SHARING.get(),
         'collect_usage': COLLECT_USAGE.get()
