@@ -2890,6 +2890,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         return ['RUNNING', 'PAUSED'].indexOf(self.apiStatus()) != -1 || job.isRunning;
       });
 
+      self.isRunning.subscribe(function () {
+        // The JB page for jobs is split in two tables, "Running" and "Completed", this esentially unchecks any job
+        // that moves from one table to the other.
+        ko.utils.arrayRemoveItem(vm.jobs.selectedJobs(), self)
+      });
+
       self.user = ko.observableDefault(job.user);
       self.queue = ko.observableDefault(job.queue);
       self.cluster = ko.observableDefault(job.cluster);
