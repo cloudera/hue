@@ -684,7 +684,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
                 </label>
               </div>
 
-              <div class="control-group" data-bind="visible: icebergEnabled">
+              <div class="control-group" data-bind="visible: icebergEnabled && $root.createWizard.source.inputFormat() === 'file'">
                 <label class="checkbox inline-block">
                   <input data-hue-analytics="importer:is-iceberg-checkbox-interaction" type="checkbox" data-bind="checked: isIceberg"> ${_('Iceberg table')}
                 </label>

@@ -211,7 +211,16 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       </tr>
       </thead>
       <tbody data-bind="foreach: apps">
-        <tr class="status-border pointer" data-bind="css: {'completed': apiStatus() == 'SUCCEEDED', 'info': apiStatus() == 'PAUSED', 'running': apiStatus() == 'RUNNING', 'failed': apiStatus() == 'FAILED'}, click: fetchJob">
+        <tr class="status-border pointer" data-bind="
+          css: {
+            'completed': apiStatus() == 'SUCCEEDED',
+            'info': apiStatus() == 'PAUSED',
+            'running': apiStatus() == 'RUNNING',
+            'failed': apiStatus() == 'FAILED'
+          },
+          click: function (data, event) {
+            onTableRowClick(event, id());
+          }">
           <td data-bind="click: function() {}, clickBubble: false">
             <div class="hue-checkbox fa" data-bind="click: function() {}, clickBubble: false, multiCheck: '#' + $parent.tableId, value: $data, hueChecked: $parent.selectedJobs"></div>
           </td>
@@ -392,7 +401,16 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                 <!-- ko ifnot: jobs.loadingJobs() -->
                   <!-- ko if: $root.isMini -->
                   <ul class="unstyled status-border-container" id="jobsTable" data-bind="foreach: jobs.apps">
-                    <li class="status-border pointer" data-bind="css: {'completed': apiStatus() == 'SUCCEEDED', 'info': apiStatus() === 'PAUSED', 'running': apiStatus() === 'RUNNING', 'failed': apiStatus() == 'FAILED'}, click: fetchJob">
+                    <li class="status-border pointer" data-bind="
+                      css: {
+                        'completed': apiStatus() == 'SUCCEEDED',
+                        'info': apiStatus() === 'PAUSED',
+                        'running': apiStatus() === 'RUNNING',
+                        'failed': apiStatus() == 'FAILED'
+                      },
+                      click: function (data, event) {
+                        onTableRowClick(event, id());
+                      }">
                       <span class="muted pull-left" data-bind="momentFromNow: {data: submitted, interval: 10000, titleFormat: 'LLL'}"></span><span class="muted">&nbsp;-&nbsp;</span><span class="muted" data-bind="text: status"></span></td>
                       <span class="muted pull-right" data-bind="text: duration().toHHMMSS()"></span>
                       <div class="clearfix"></div>
@@ -474,7 +492,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               <!-- /ko -->
               <!-- /ko -->
 
-              <!-- ko if: $root.job() && $root.job().hasPagination() && interface() === 'schedules' -->
+              <!-- ko if: $root.job() && !$root.job().forceUpdatingJob() && $root.job().hasPagination() && interface() === 'schedules' -->
               <div data-bind="template: { name: 'pagination${ SUFFIX }', data: $root.job() }, visible: !jobs.loadingJobs()"></div>
               <!-- /ko -->
               <div data-bind="template: { name: 'pagination${ SUFFIX }', data: $root.jobs }, visible: !$root.job() && !jobs.loadingJobs()"></div>
@@ -738,7 +756,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <!-- ko if: doc_url -->
           <li class="nav-header">${ _('Document') }</li>
           <li>
-            <a data-bind="hueLink: doc_url" href="javascript: void(0);" title="${ _('Open in editor') }">
+            <a data-bind="hueLink: doc_url" title="${ _('Open in editor') }">
               <span data-bind="text: name"></span>
             </a>
           </li>
@@ -1854,7 +1872,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <!-- ko if: doc_url -->
           <li class="nav-header">${ _('Document') }</li>
           <li>
-            <a data-bind="hueLink: doc_url" href="javascript: void(0);" title="${ _('Open in editor') }">
+            <a data-bind="hueLink: doc_url" title="${ _('Open in editor') }">
               <span data-bind="text: name"></span>
             </a>
           </li>
@@ -1931,7 +1949,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <!-- ko if: doc_url -->
           <li class="nav-header">${ _('Document') }</li>
           <li>
-            <a data-bind="hueLink: doc_url" href="javascript: void(0);" title="${ _('Open in editor') }">
+            <a data-bind="hueLink: doc_url" title="${ _('Open in editor') }">
               <span data-bind="text: name"></span>
             </a>
           </li>
@@ -2009,7 +2027,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <!-- ko if: doc_url -->
           <li class="nav-header">${ _('Document') }</li>
           <li>
-            <a data-bind="hueLink: doc_url" href="javascript: void(0);" title="${ _('Open in editor') }">
+            <a data-bind="hueLink: doc_url" title="${ _('Open in editor') }">
               <span data-bind="text: name"></span>
             </a>
           </li>
@@ -2073,7 +2091,15 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             </tr>
             </thead>
             <tbody data-bind="foreach: apps">
-              <tr class="status-border pointer" data-bind="css: {'completed': properties.status() == 'SUCCEEDED', 'running': ['RUNNING', 'FAILED', 'KILLED'].indexOf(properties.status()) != -1, 'failed': properties.status() == 'FAILED' || properties.status() == 'KILLED'}, click: function() {  if (properties.externalId() && properties.externalId() != '-') { $root.job().id(properties.externalId()); $root.job().fetchJob(); } }">
+              <tr class="status-border pointer" data-bind="
+                css: {
+                  'completed': properties.status() == 'SUCCEEDED',
+                  'running': ['RUNNING', 'FAILED', 'KILLED'].indexOf(properties.status()) != -1,
+                  'failed': properties.status() == 'FAILED' || properties.status() == 'KILLED'
+                },
+                click: function(data, event) {
+                  $root.job().onTableRowClick(event, properties.externalId());
+                }">
                 <td data-bind="click: function() {}, clickBubble: false">
                   <div class="hue-checkbox fa" data-bind="click: function() {}, clickBubble: false, multiCheck: '#schedulesHiveTable', value: $data, hueChecked: $parent.selectedJobs"></div>
                 </td>
@@ -2150,9 +2176,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <!-- ko if: doc_url -->
           <li class="nav-header">${ _('Document') }</li>
           <li>
-            <a data-bind="documentContextPopover: { uuid: doc_url().split('=')[1], orientation: 'bottom', offset: { top: 5 } }" href="javascript: void(0);" title="${ _('Preview document') }">
-              <span data-bind="text: name"></span> <i class="fa fa-info"></i>
-            </a>
+            <div>
+              <a data-bind="hueLink: doc_url, text: name" title="${ _('Open') }" ></a>
+              <a data-bind="documentContextPopover: { uuid: doc_url().split('=')[1], orientation: 'bottom', offset: { top: 5 } }" href="javascript: void(0);" title="${ _('Preview document') }">
+                <i class="fa fa-info"></i>
+              </a>
+            </div>
           </li>
           <!-- /ko -->
           <!-- ko ifnot: doc_url -->
@@ -2246,7 +2275,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                 <td data-bind="text: errorMessage"></td>
                 <td data-bind="text: errorCode"></td>
                 <td data-bind="text: externalId, click: function() { $root.job().id(ko.unwrap(externalId)); $root.job().fetchJob();}, style: { color: '#0B7FAD' }" class="pointer"></td>
-                <td data-bind="text: id, click: function() {  $root.job().id(id); $root.job().fetchJob(); }, style: { color: '#0B7FAD' }" class="pointer"></td>
+                <td data-bind="text: id, click: function(data, event) { $root.job().onTableRowClick(event, id); }, style: { color: '#0B7FAD' }" class="pointer"></td>
                 <td data-bind="moment: {data: startTime, format: 'LLL'}"></td>
                 <td data-bind="moment: {data: endTime, format: 'LLL'}"></td>
 		<td data-bind="text: data"></td>
@@ -2361,9 +2390,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <!-- ko if: doc_url -->
           <li class="nav-header">${ _('Document') }</li>
           <li>
-            <a data-bind="documentContextPopover: { uuid: doc_url().split('=')[1], orientation: 'bottom', offset: { top: 5 } }" href="javascript: void(0);" title="${ _('Preview document') }">
-              <span data-bind="text: name"></span> <i class="fa fa-info"></i>
-            </a>
+            <div>
+              <a data-bind="hueLink: doc_url, text: name" title="${ _('Open') }" ></a>
+              <a data-bind="documentContextPopover: { uuid: doc_url().split('=')[1], orientation: 'bottom', offset: { top: 5 } }" href="javascript: void(0);" title="${ _('Preview document') }">
+                <i class="fa fa-info"></i>
+              </a>
+            </div>
           </li>
           <!-- /ko -->
           <!-- ko ifnot: doc_url -->
@@ -2412,13 +2444,16 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <!-- ko with: coordinatorActions() -->
           <form class="form-inline">
             ##<input data-bind="value: textFilter" type="text" class="input-xlarge search-query" placeholder="${_('Filter by name')}">
-
-            ##<span data-bind="foreach: statesValuesFilter">
-            ##  <label class="checkbox">
-            ##    <div class="pull-left margin-left-5 status-border status-content" data-bind="css: value, hueCheckbox: checked"></div>
-            ##    <div class="inline-block" data-bind="text: name, toggle: checked"></div>
-            ##  </label>
-            ##</span>
+            <!-- ko with: $root.job() -->
+            <!-- ko if: type() === 'schedule' -->
+            <span data-bind="foreach: statesValuesFilter">
+              <label class="checkbox">
+                <div class="pull-left margin-left-5 status-border status-content" data-bind="css: value, hueCheckbox: checked"></div>
+                <div class="inline-block" data-bind="text: name, toggle: checked"></div>
+              </label>
+            </span>
+            <!-- /ko -->
+            <!-- /ko -->
             <div data-bind="template: { name: 'job-actions${ SUFFIX }' }" class="pull-right"></div>
           </form>
 
@@ -2438,8 +2473,17 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               <th>${_('lastModifiedTime')}</th>
             </tr>
             </thead>
+            <!-- ko if: !$root.job().forceUpdatingJob() -->
             <tbody data-bind="foreach: apps">
-              <tr class="status-border pointer" data-bind="css: {'completed': properties.status() == 'SUCCEEDED', 'running': ['RUNNING', 'FAILED', 'KILLED'].indexOf(properties.status()) != -1, 'failed': properties.status() == 'FAILED' || properties.status() == 'KILLED'}, click: function() {  if (properties.externalId() && properties.externalId() != '-') { $root.job().id(properties.externalId()); $root.job().fetchJob(); } }">
+              <tr class="status-border pointer" data-bind="
+                css: {
+                  'completed': properties.status() == 'SUCCEEDED',
+                  'running': ['RUNNING', 'FAILED', 'KILLED'].indexOf(properties.status()) != -1,
+                  'failed': properties.status() == 'FAILED' || properties.status() == 'KILLED'
+                },
+                click: function(data, event) {
+                  $root.job().onTableRowClick(event, properties.externalId());
+                }">
                 <td data-bind="click: function() {}, clickBubble: false">
                   <div class="hue-checkbox fa" data-bind="click: function() {}, clickBubble: false, multiCheck: '#schedulesTable', value: $data, hueChecked: $parent.selectedJobs"></div>
                 </td>
@@ -2455,6 +2499,14 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                 <td data-bind="text: properties.lastModifiedTime"></td>
               </tr>
             </tbody>
+            <!-- /ko -->
+            <!-- ko if: $root.job().forceUpdatingJob() -->
+            <tbody>
+              <tr>
+                <td colspan="11"><!-- ko hueSpinner: { spin: true, inline: true, size: 'large' } --><!-- /ko --></td>
+              </tr>
+            </tbody>
+            <!-- /ko -->
           </table>
           <!-- /ko -->
         </div>
@@ -2486,9 +2538,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <!-- ko if: doc_url -->
           <li class="nav-header">${ _('Document') }</li>
           <li>
-            <a data-bind="documentContextPopover: { uuid: doc_url().split('=')[1], orientation: 'bottom', offset: { top: 5 } }" href="javascript: void(0);" title="${ _('Preview document') }">
-              <span data-bind="text: name"></span> <i class="fa fa-info"></i>
-            </a>
+            <div>
+              <a data-bind="hueLink: doc_url, text: name" title="${ _('Open') }" ></a>
+              <a data-bind="documentContextPopover: { uuid: doc_url().split('=')[1], orientation: 'bottom', offset: { top: 5 } }" href="javascript: void(0);" title="${ _('Preview document') }">
+                <i class="fa fa-info"></i>
+              </a>
+            </div>
           </li>
           <!-- /ko -->
           <!-- ko ifnot: doc_url -->
@@ -2763,9 +2818,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.paginationPage = ko.observable(1);
       self.paginationOffset = ko.observable(1); // Starting index
       self.paginationResultPage = ko.observable(50);
-      self.totalApps = ko.observable(null);
+      self.totalApps = ko.observable(job.properties && job.properties.total_actions || 0);
       self.hasPagination = ko.computed(function() {
-        return ['workflows', 'schedules', 'bundles'].indexOf(vm.interface()) != -1;
+        return self.totalApps() && ['workflows', 'schedules', 'bundles'].indexOf(vm.interface()) !== -1;
       });
       self.pagination = ko.pureComputed(function() {
         return {
@@ -2775,11 +2830,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         };
       });
 
-      self.pagination.subscribe(function(value) {
-        if (vm.interface() === 'schedules' && value.page > 1) {
-          vm.interface('schedules');
-          self.hasPagination(true);
-          self.fetchJob();
+      self.pagination.subscribe(function() {
+        if (vm.interface() === 'schedules') {
+          self.updateJob(false, true);
         }
       });
 
@@ -2835,6 +2888,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.progress = ko.observableDefault(job.progress);
       self.isRunning = ko.computed(function() {
         return ['RUNNING', 'PAUSED'].indexOf(self.apiStatus()) != -1 || job.isRunning;
+      });
+
+      self.isRunning.subscribe(function () {
+        // The JB page for jobs is split in two tables, "Running" and "Completed", this esentially unchecks any job
+        // that moves from one table to the other.
+        ko.utils.arrayRemoveItem(vm.jobs.selectedJobs(), self)
       });
 
       self.user = ko.observableDefault(job.user);
@@ -2920,8 +2979,13 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           {'types': ko.mapping.toJS(self.typesFilter())},
         ];
       });
-      self.filters.subscribe(function(value) {
-        self.fetchProfile('tasks');
+      self.forceUpdatingJob = ko.observable(false);
+      self.filters.subscribe(function () {
+        if (self.type() === 'schedule') {
+          self.updateJob(false, true);
+        } else {
+          self.fetchProfile('tasks');
+        }
       });
       self.metadataFilter = ko.observable('');
       self.metadataFilter.subscribe(function(newValue) {
@@ -3014,7 +3078,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           cluster: ko.mapping.toJSON(vm.compute),
           app_id: ko.mapping.toJSON(self.id),
           interface: ko.mapping.toJSON(vm.interface),
-          pagination: ko.mapping.toJSON(self.pagination)
+          pagination: ko.mapping.toJSON(self.pagination),
+          filters: ko.mapping.toJSON(self.filters)
         }, function (data) {
           if (data.status == 0) {
             if (data.app) {
@@ -3048,6 +3113,22 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           });
         }
       }
+
+      self.onTableRowClick = function (event, id) {
+        var openInNewTab = event && (event.which === 2 || event.metaKey || event.ctrlKey);
+        var idToOpen = id || self.id();
+        if (idToOpen && idToOpen !== '-') {
+          if (openInNewTab) {
+            var urlParts = window.location.toString().split('#');
+            var newUrl = urlParts[0] + '#!id=' + idToOpen;
+            window.open(newUrl, '_blank');
+          } else {
+            self.id(idToOpen);
+            self.fetchJob();
+          }
+        }
+      }
+
       self.fetchJob = function () {
         // TODO: Remove cancelActiveRequest from apiHelper when in webpack
         vm.apiHelper.cancelActiveRequest(lastFetchJobRequest);
@@ -3191,11 +3272,14 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         });
       };
 
-      self.updateJob = function (updateLogs) {
+      self.updateJob = function (updateLogs, forceUpdate) {
         huePubSub.publish('graph.refresh.view');
         var deferred = $.Deferred();
-        if (vm.job() == self && self.apiStatus() == 'RUNNING') {
+        if (vm.job() == self && (self.apiStatus() == 'RUNNING' || forceUpdate)) {
           vm.apiHelper.cancelActiveRequest(lastUpdateJobRequest);
+          if (forceUpdate) {
+            self.forceUpdatingJob(true);
+          }
           lastUpdateJobRequest = self._fetchJob(function (data) {
             var requests = [];
             if (['schedule', 'workflow'].indexOf(vm.job().type()) >= 0) {
@@ -3232,6 +3316,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             $.when.apply(this, requests).done(function (){
               deferred.resolve();
             });
+          }).always(function () {
+            self.forceUpdatingJob(false);
           });
         }
         return deferred;
