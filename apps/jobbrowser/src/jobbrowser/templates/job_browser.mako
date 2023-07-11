@@ -3671,9 +3671,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         return self.isCoordinator();
       });
       self.rerunEnabled = ko.pureComputed(function() {
-        return self.hasRerun() && self.selectedJobs().length == 1 && $.grep(self.selectedJobs(), function(job) {
-          return job.rerunEnabled();
-        }).length == self.selectedJobs().length;
+          var validSelectionCount =
+                  self.selectedJobs().length === 1 ||
+                  (self.selectedJobs().length > 1 && vm.interface() === 'schedules');
+          return self.hasRerun() && validSelectionCount && $.grep(self.selectedJobs(), function (job) {
+              return job.rerunEnabled();
+          }).length === self.selectedJobs().length;
       });
 
       self.hasPause = ko.pureComputed(function() {
