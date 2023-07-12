@@ -1,17 +1,23 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import classNames from 'classnames';
 import { EnterOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
 
-import { useResizeAwareElementSize } from '../hooks';
+import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
+
+import AiAssistToolbarHistory, { HistoryItem } from './AiAssistToolbarHistory';
+import { useResizeAwareElementSize, useLocalStorageHistory } from '../hooks';
 
 import './AiAssistToolbarInput.scss';
 
 const ENTER_KEY = 'Enter';
 const ESCAPE_KEY = 'Escape';
+const DOWN_KEY = 'ArrowDown';
 const TAB_KEY = 'Tab';
 const MAX_INPUT_WIDTH = 700;
 const MAX_INPUT_LINES = 10;
+const AUTO_SHOW_STORAGE_KEY = 'hue.aiAssistBar.history.autoShow';
+const HISTORY_STORAGE_KEY = 'hue.aiAssistBar.history.items';
 
 const getSingleLineHeight = (singleLineSpanRef: React.RefObject<HTMLSpanElement>): number => {
   return singleLineSpanRef?.current?.clientHeight || 0;
@@ -43,8 +49,16 @@ const updateTextareaDimensions = ({
   maxHeight,
   singleLineHeight,
   availableWidth
+}: {
+  sizeMeasureSpan: HTMLElement | null;
+  textarea: HTMLTextAreaElement;
+  userText: string;
+  maxWidth: number;
+  maxHeight: number;
+  singleLineHeight: number;
+  availableWidth: number;
 }) => {
-  if (sizeMeasureSpan && textarea) {
+  if (sizeMeasureSpan) {
     sizeMeasureSpan.style.maxWidth = `${maxWidth}px`;
 
     const calculatedWidth = sizeMeasureSpan.offsetWidth;
@@ -57,6 +71,36 @@ const updateTextareaDimensions = ({
     textarea.style.height = modifiedHeight;
     textarea.style.maxHeight = `${maxHeight}px`;
   }
+};
+
+const isPrefillMultiLine = (sizeMeasureSpan: HTMLElement | null, singleLineHeight: number) => {
+  return !!sizeMeasureSpan && sizeMeasureSpan.offsetHeight > singleLineHeight;
+};
+
+const truncatePlaceholderText = (placeholder: string, spanSingleLineRef, spanSizeRef) => {
+  const placeHolderTextFullLength = placeholder;
+  const singleLineHeight = getSingleLineHeight(spanSingleLineRef);
+  const needsEllipsis = isPrefillMultiLine(spanSizeRef.current, singleLineHeight);
+  const placeHolderText = needsEllipsis
+    ? `${placeHolderTextFullLength.slice(0, 50)}...`
+    : placeHolderTextFullLength;
+  return placeHolderText;
+};
+
+const calculateDropdownPosition = (
+  textareaElement: HTMLTextAreaElement,
+  textAreaIsMultiLine: boolean
+) => {
+  const textareaTop = textareaElement.getBoundingClientRect().top;
+  const textareaLeft = textareaElement.getBoundingClientRect().left;
+  const DEFAULT_PADDING = 4;
+  const extraSpacingTop = textAreaIsMultiLine ? 0 : DEFAULT_PADDING;
+  const dropdownTop = textareaTop + extraSpacingTop + textareaElement.clientHeight;
+
+  return {
+    top: dropdownTop,
+    left: textareaLeft
+  };
 };
 
 function AiAssistToolbarInput({
@@ -72,53 +116,75 @@ function AiAssistToolbarInput({
   value
 }: {
   isAnimating: boolean;
-  isExpanded: boolean;  
+  isExpanded: boolean;
   isLoading: boolean;
   placeholder: string;
   prefill?: string;
   onSubmit: (value: string) => void;
   onCancel: () => void;
   onInputChanged: (value: string) => void;
-  onAnimationEnded:() => void;
+  onAnimationEnded: () => void;
   value: string;
 }) {
- 
+  const autoShow = getFromLocalStorage(AUTO_SHOW_STORAGE_KEY, true);
   const [dirty, setDirty] = useState<boolean>(false);
-  const [touched, setTouched] = useState<boolean>(false);  
+  const [touched, setTouched] = useState<boolean>(false);
+  const [historyDropdownPostion, setHistoryDropdownPostion] =
+    useState<{ top: number; left: number }>();
+  const [historyDropdownWidth, setHistoryDropdownWidth] = useState<number>();
+  const [showHistoryDropdown, setShowHistoryDropdown] = useState<boolean>(autoShow);
+  const [singleLinePlaceholderText, setSingleLinePlaceholderText] = useState<string>();
+  const [userChoiceAutoShowHistory, setUserChoiceAutoShowHistory] = useState<boolean>(autoShow);
+  const [historyItems, addHistoryItem] = useLocalStorageHistory(HISTORY_STORAGE_KEY, 50);
+
+
   const toolbarButtonWrapperRef = useRef<HTMLDivElement>(null);
   const spanSizeRef = useRef<HTMLSpanElement | null>(null);
   const spanSingleLineRef = useRef<HTMLSpanElement | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const historyDropdownRef = useRef<HTMLElement | null>(null);
 
-  const availableWidth = useResizeAwareElementSize(toolbarButtonWrapperRef)?.width;
-  const placeHolderText = prefill ? prefill : placeholder;
-
-  useEffect(() => {
-    const availableWidth = calculateAvailableWidth(toolbarButtonWrapperRef);
-    const maxWidth = availableWidth ? Math.min(availableWidth, MAX_INPUT_WIDTH) : MAX_INPUT_WIDTH;
-    const singleLineHeight = getSingleLineHeight(spanSingleLineRef);
-    const maxHeight = `${getSingleLineHeight(spanSingleLineRef) * MAX_INPUT_LINES}`;
-
-    updateTextareaDimensions({
-      sizeMeasureSpan: spanSizeRef.current,
-      textarea: textareaRef.current,
-      userText: value || prefill,
-      maxWidth,
-      maxHeight,
-      singleLineHeight,
-      availableWidth
-    });
-  }, [value, prefill, availableWidth]);
-
-  useEffect(() => {
-    if(!isAnimating && isExpanded){
-      textareaRef.current?.focus();
-    }    
-  }, [isAnimating, isExpanded]);
-
+  const resizeAwareMaxWidth = useResizeAwareElementSize(toolbarButtonWrapperRef)?.width;
+  const placeholderText = prefill || placeholder;
   const isMultiLine = isMultiLineSpan(spanSizeRef, spanSingleLineRef, value);
 
+  useEffect(() => {
+    const availableWidth = calculateAvailableWidth(toolbarButtonWrapperRef) || 0;
+    const maxWidth = availableWidth ? Math.min(availableWidth, MAX_INPUT_WIDTH) : MAX_INPUT_WIDTH;
+    const singleLineHeight = getSingleLineHeight(spanSingleLineRef);
+    const maxHeight = getSingleLineHeight(spanSingleLineRef) * MAX_INPUT_LINES;
+
+    if (textareaRef.current) {
+      updateTextareaDimensions({
+        sizeMeasureSpan: spanSizeRef.current,
+        textarea: textareaRef.current,
+        userText: value,
+        maxWidth,
+        maxHeight,
+        singleLineHeight,
+        availableWidth
+      });
+
+      setSingleLinePlaceholderText(
+        truncatePlaceholderText(placeholderText, spanSingleLineRef, spanSizeRef)
+      );
+
+      setHistoryDropdownPostion(calculateDropdownPosition(textareaRef.current, isMultiLine));
+      setHistoryDropdownWidth(textareaRef.current.parentElement?.clientWidth);
+    }
+  }, [value, prefill, resizeAwareMaxWidth]);
+
+  useEffect(() => {
+    if (!isAnimating && isExpanded) {
+      if (userChoiceAutoShowHistory && !showHistoryDropdown) {
+        setShowHistoryDropdown(true)
+      }      
+      focusInput();
+    }
+  }, [isAnimating, isExpanded]);
+
   const handleSubmit = () => {
+    addHistoryItem({value: value, date: new Date().getTime()});
     onSubmit(value);
     setDirty(false);
     setTouched(false);
@@ -138,6 +204,30 @@ function AiAssistToolbarInput({
     setTouched(true);
   };
 
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === ENTER_KEY && !event.shiftKey && value) {
+      handleSubmit();
+    } else if (event.key === ESCAPE_KEY) {
+      handleCancel();
+    } else if (event.key === TAB_KEY && !dirty && prefill) {
+      onInputChanged(prefill);
+      event.preventDefault();
+    } else if (event.key === DOWN_KEY) {
+      setShowHistoryDropdown(true);
+      historyDropdownRef.current?.focus();
+    }
+  };
+
+  const focusInput = () => {
+    textareaRef.current?.focus();
+  };
+
+  const handleHistorySelect = (item: HistoryItem) => {
+    onInputChanged(item.value);
+    setShowHistoryDropdown(false);
+    focusInput();
+  }
+
   return (
     <li
       onAnimationEnd={() => {
@@ -151,13 +241,16 @@ function AiAssistToolbarInput({
       {isExpanded && (
         <>
           <textarea
-            title={!dirty && !touched && prefill? 'Press Tab to insert NQL from comment' : ''}
+            title={
+              !dirty && !touched && prefill
+                ? `Press Tab to insert prompt:\n${placeholderText}`
+                : 'Press down arrow to select from history'
+            }
             disabled={isLoading}
             ref={textareaRef}
             value={value}
             onChange={handleOnChange}
-            placeholder={placeHolderText}
-            autoFocus
+            placeholder={singleLinePlaceholderText}
             spellCheck="false"
             className={classNames('hue-ai-assist-toolbar-input__text-input', {
               ['hue-ai-assist-toolbar-input__text-input--empty']: !value,
@@ -165,19 +258,11 @@ function AiAssistToolbarInput({
               ['hue-ai-assist-toolbar-input__text-input--multi-line']: isMultiLine,
               ['hue-ai-assist-toolbar-input__text-input--is-prefill']: !value && prefill
             })}
-            onKeyDown={event => {
-              if (event.key === ENTER_KEY && !event.shiftKey && value) {
-                handleSubmit();
-              } else if (event.key === ESCAPE_KEY) {
-                handleCancel();
-              } else if (event.key === TAB_KEY && !dirty && prefill) {
-                onInputChanged(prefill);
-                event.preventDefault();
-              }
-            }}
+            onKeyDown={handleKeyDown}
           />
+
           <span className="hue-ai-assist-toolbar-input__size-reference-element" ref={spanSizeRef}>
-            {value || placeHolderText}
+            {value || placeholderText}
           </span>
           <span
             className="hue-ai-assist-toolbar-input__single-line-reference-element"
@@ -185,6 +270,24 @@ function AiAssistToolbarInput({
           >
             ""
           </span>
+          <AiAssistToolbarHistory
+            ref={historyDropdownRef}
+            position={historyDropdownPostion}
+            width={historyDropdownWidth}
+            show={!isAnimating && showHistoryDropdown}
+            autoShow={userChoiceAutoShowHistory}
+            onToggleAutoShow={newAutoShow => {
+              setInLocalStorage(AUTO_SHOW_STORAGE_KEY, newAutoShow);
+              setUserChoiceAutoShowHistory(newAutoShow);
+            }}
+            onHide={() => {
+              focusInput();
+              setShowHistoryDropdown(false);
+            }}
+            onSelect={handleHistorySelect}
+            searchValue={value}
+            items={historyItems}            
+          />
           {value && (
             <Button
               disabled={isLoading}
