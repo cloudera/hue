@@ -21,7 +21,7 @@ DIGEST_SHA256 = "http://www.w3.org/2001/04/xmlenc#sha256"
 DIGEST_SHA384 = "http://www.w3.org/2001/04/xmldsig-more#sha384"
 DIGEST_SHA512 = "http://www.w3.org/2001/04/xmlenc#sha512"
 DIGEST_RIPEMD160 = "http://www.w3.org/2001/04/xmlenc#ripemd160"
-digest_default = DIGEST_SHA1
+digest_default = DIGEST_SHA256
 DIGEST_ALLOWED_ALG = (
     ("DIGEST_SHA1", DIGEST_SHA1),
     ("DIGEST_SHA224", DIGEST_SHA224),
@@ -46,7 +46,7 @@ SIG_RSA_SHA256 = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"
 SIG_RSA_SHA384 = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha384"
 SIG_RSA_SHA512 = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha512"
 SIG_RSA_RIPEMD160 = "http://www.w3.org/2001/04/xmldsig-more#rsa-ripemd160"
-sig_default = SIG_RSA_SHA1
+sig_default = SIG_RSA_SHA256
 SIG_ALLOWED_ALG = (
     ("SIG_RSA_SHA1", SIG_RSA_SHA1),
     ("SIG_RSA_SHA224", SIG_RSA_SHA224),
