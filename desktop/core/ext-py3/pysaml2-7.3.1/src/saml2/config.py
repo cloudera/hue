@@ -21,7 +21,7 @@ from saml2.saml import NAME_FORMAT_URI
 from saml2.virtual_org import VirtualOrg
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger()
 
 __author__ = "rolandh"
 
@@ -32,6 +32,7 @@ COMMON_ARGS = [
     "entityid",
     "xmlsec_binary",
     "key_file",
+    "key_file_passphrase",
     "cert_file",
     "encryption_keypairs",
     "additional_cert_files",
@@ -174,6 +175,7 @@ class Config:
         self.xmlsec_path = []
         self.debug = False
         self.key_file = None
+        self.key_file_passphrase = None
         self.cert_file = None
         self.encryption_keypairs = None
         self.additional_cert_files = None
