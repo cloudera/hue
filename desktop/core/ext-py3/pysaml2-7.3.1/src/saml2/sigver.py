@@ -982,6 +982,11 @@ def security_context(conf):
     except AttributeError:
         metadata = None
 
+    try:
+        id_attr = conf.id_attr_name
+    except AttributeError:
+        id_attr = None
+
     sec_backend = None
 
     if conf.crypto_backend == "xmlsec1":
@@ -1042,6 +1047,7 @@ def security_context(conf):
         encryption_keypairs=conf.encryption_keypairs,
         sec_backend=sec_backend,
         delete_tmpfiles=conf.delete_tmpfiles,
+        id_attr=id_attr,
     )
 
 
@@ -1229,8 +1235,10 @@ class SecurityContext:
         encryption_keypairs=None,
         enc_cert_type="pem",
         sec_backend=None,
+        id_attr=None,
         delete_tmpfiles=True,
     ):
+        self.id_attr = id_attr or SecurityContext.DEFAULT_ID_ATTR_NAME
 
         if not isinstance(crypto, CryptoBackend):
             raise ValueError("crypto should be of type CryptoBackend")
@@ -1334,6 +1342,9 @@ class SecurityContext:
         if not isinstance(keys, list):
             keys = [keys]
 
+        if not id_attr:
+            id_attr = self.id_attr
+
         keys_filtered = (key for key in keys if key)
         keys_encoded = (key.encode("ascii") if not isinstance(key, bytes) else key for key in keys_filtered)
         key_files = list(make_temp(key, decode=False, delete_tmpfiles=self.delete_tmpfiles) for key in keys_encoded)
@@ -1389,6 +1400,9 @@ class SecurityContext:
             cert_file = self.cert_file
             cert_type = self.cert_type
 
+        if not id_attr:
+            id_attr = self.id_attr
+
         return self.crypto.validate_signature(
             signedtext,
             cert_file=cert_file,
@@ -1411,6 +1425,9 @@ class SecurityContext:
                 _issuer = issuer.text.strip()
             except AttributeError:
                 _issuer = None
+
+        if not id_attr:
+            id_attr = self.id_attr
 
         # More trust in certs from metadata then certs in the XML document
         if self.metadata:
@@ -1545,6 +1562,7 @@ class SecurityContext:
                     pem_fd.name,
                     node_name=node_name,
                     node_id=item.id,
+                    id_attr=id_attr,
                 ):
                     verified = True
                     break
@@ -1562,7 +1580,7 @@ class SecurityContext:
 
         return item
 
-    def check_signature(self, item, node_name=NODE_NAME, origdoc=None, must=False, issuer=None):
+    def check_signature(self, item, node_name=NODE_NAME, origdoc=None, id_attr='', must=False, issuer=None):
         """
 
         :param item: Parsed entity
@@ -1576,6 +1594,7 @@ class SecurityContext:
             item,
             node_name,
             origdoc,
+            id_attr=id_attr,
             must=must,
             issuer=issuer,
         )
@@ -1727,6 +1746,9 @@ class SecurityContext:
 
         if not key and not key_file:
             key_file = self.key_file
+
+        if not id_attr:
+            id_attr = self.id_attr
 
         if not passphrase:
             passphrase = self.key_file_passphrase
