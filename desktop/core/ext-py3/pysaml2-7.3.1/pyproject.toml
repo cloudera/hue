@@ -1,0 +1,239 @@
+[tool.poetry]
+name = "pysaml2"
+version = "7.3.1"
+description = "Python implementation of SAML Version 2 Standard"
+license = "Apache-2.0"
+authors = ["IdentityPython <discuss@idpy.org>"]
+maintainers = ["IdentityPython <discuss@idpy.org>"]
+readme = "README.md"
+homepage = "https://idpy.org"
+repository = "https://github.com/IdentityPython/pysaml2"
+documentation = "https://pysaml2.readthedocs.io"
+keywords = [
+    "saml",
+    "saml2",
+    "standard",
+    "federation",
+    "identity",
+    "idpy",
+    "IdentityPython",
+]
+classifiers = [
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+packages = [
+    { include = "saml2", from = "src" },
+    { include = "saml2test", from = "src" },
+    { include = "utility", from = "src" },
+]
+
+[tool.poetry.urls]
+"Bug Tracker" = "https://github.com/IdentityPython/pysaml2/issues"
+
+[tool.poetry.scripts]
+make_metadata = "saml2.tools.make_metadata:main"
+mdexport = "saml2.tools.mdexport:main"
+merge_metadata = "saml2.tools.merge_metadata:main"
+parse_xsd2 = "saml2.tools.parse_xsd2:main"
+
+[tool.poetry.dependencies]
+python = "^3.6.2"
+cryptography = ">=3.1"
+defusedxml = "*"
+importlib-metadata = {version = ">=1.7.0", python = "<3.8"}
+importlib-resources = {python = "<3.9", version = "*"}
+paste = {optional = true, version = "*"}
+pyopenssl = "*"
+python-dateutil = "*"
+pytz = "*"
+"repoze.who" = {optional = true, version = "*"}
+requests = "^2"
+xmlschema = ">=1.2.1"
+"zope.interface" = {optional = true, version = "*"}
+
+[tool.poetry.extras]
+s2repoze = ["paste", "repoze-who", "zope-interface"]
+
+[tool.poetry.group.dev]
+optional = true
+
+[tool.poetry.group.dev.dependencies]
+black = "*"
+isort = {version = "^5.10.1", extras = ["pyproject"]}
+tox = "^3.25.1"
+flake8 = ">=4"
+Flake8-pyproject = "^1.1.0.post0"
+flake8-bugbear = "^22.8.23"
+flake8-logging-format = "^0.7.5"
+ipdb = "^0.13.9"
+
+[tool.poetry.group.test]
+optional = true
+
+[tool.poetry.group.test.dependencies]
+pyasn1 = "*"
+pymongo = ">=3.5, <5"
+pytest = ">=6.0"
+responses = "*"
+
+[tool.poetry.group.coverage]
+optional = true
+
+[tool.poetry.group.coverage.dependencies]
+coverage = "*"
+pytest-cov = "*"
+
+[tool.poetry.group.docs]
+optional = true
+
+[tool.poetry.group.docs.dependencies]
+sphinx = "*"
+
+[build-system]
+requires = ["poetry_core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -vvv"
+testpaths = [
+    "tests",
+]
+markers = [
+    "mongo",
+]
+pythonpath = [
+    "tests",
+]
+
+[tool.coverage.run]
+branch = true
+source = ["saml2"]
+
+[tool.coverage.report]
+exclude_lines = [
+  "pragma: no cover",
+  "def __repr__",
+  "def __str__",
+  "raise AssertionError",
+  "raise NotImplementedError",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+  "if typing.TYPE_CHECKING:",
+]
+
+[tool.coverage.html]
+directory = "cov_html"
+
+[tool.flake8]
+max-line-length = 120
+max-complexity = 18
+count = true
+show-source = true
+statistics = true
+disable-noqa = false
+enable-extensions = [
+    'G', # flake8-logging-format
+]
+# 'ignore' defaults to: E121,E123,E126,E226,E24,E704,W503,W504
+extend-ignore = [
+    'E501', # line too long; instead, use B950
+    'E203', # whitespace before ‘,’, ‘;’, or ‘:’; may conflict with black
+    'W503', # line break before binary operator
+]
+per-file-ignores = [
+    '__init__.py:F401',
+]
+# 'select' defaults to: E,F,W,C90
+extend-select = [
+    # * Default warnings reported by flake8-bugbear (B) -
+    #   https://github.com/PyCQA/flake8-bugbear#list-of-warnings
+    'B',
+    # * The B950 flake8-bugbear opinionated warnings -
+    #   https://github.com/PyCQA/flake8-bugbear#opinionated-warnings
+    'B9',
+    #
+    # * Complexity violations reported by mccabe (C) -
+    #   http://flake8.pycqa.org/en/latest/user/error-codes.html#error-violation-codes
+    #   mccabe only ever reports one violation - C901 based on the complexity value
+    #   provided by the user.
+    #   This is selected by default.
+    #'C90',
+    #
+    # * Documentation conventions compliance reported by pydocstyle (D) -
+    #   http://www.pydocstyle.org/en/stable/error_codes.html
+    #'D', # FIXME TODO
+    #
+    # * Default errors reported by pycodestyle (E) -
+    #   https://pycodestyle.readthedocs.io/en/latest/intro.html#error-codes
+    #   This is selected by default.
+    #'E',
+    #
+    # * Default errors reported by pyflakes (F) -
+    #   http://flake8.pycqa.org/en/latest/user/error-codes.html
+    #   This is selected by default.
+    #'F',
+    #
+    # * flake8-mypy - enable limited type checking as a linter
+    #   http://flake8.pycqa.org/en/latest/user/error-codes.html
+    #'T4', # FIXME TODO
+    #
+    # * Default warnings reported by pycodestyle (W) -
+    #   https://pycodestyle.readthedocs.io/en/latest/intro.html#error-codes
+    #   This is selected by default.
+    #'W',
+]
+extend-exclude = [
+    '.github', '.gitlab',
+    '.Python', '.*.pyc', '.*.pyo', '.*.pyd', '.*.py.class', '*.egg-info',
+    'venv*', '.venv*', '.*_cache',
+    'lib', 'lib64', '.*.so',
+    'build', 'dist', 'sdist', 'wheels',
+]
+
+[tool.black]
+line-length = 120
+extend-exclude = '''
+# A regex preceded with ^/ will apply only to files and directories
+# in the root of the project.
+(
+    \.pytest_cache
+)
+'''
+
+[tool.isort]
+profile = 'black'
+# The 'black' profile means:
+#   multi_line_output = 3
+#   include_trailing_comma = true
+#   force_grid_wrap = 0
+#   use_parentheses = true
+#   ensure_newline_before_comments = true
+#   line_length = 88
+line_length = 120  # override black provile line_length
+force_single_line = true  # override black profile multi_line_output
+star_first = true
+group_by_package = true
+force_sort_within_sections = true
+lines_after_imports = 2
+honor_noqa = true
+atomic = true
+ignore_comments = true
+skip_gitignore = true
+src_paths = [
+    'src',
+    'test',
+]
+
+# XXX TODO
+#[tool.mypy]
+#pretty = true
+#check_untyped_defs = true
+#ignore_errors = false
+#ignore_missing_imports = true
+#show_error_codes = true
+#strict_optional = true
+#warn_unused_ignores = true
+#warn_redundant_casts = true
+#warn_unused_configs = true
+#warn_unreachable = true

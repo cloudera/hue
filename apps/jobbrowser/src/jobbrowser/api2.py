@@ -94,8 +94,11 @@ def job(request, interface=None):
     app_id = json.loads(request.POST.get('app_id'))
 
   if interface == 'schedules':
+    filters = dict([(key, value) for _filter in json.loads(
+        request.POST.get('filters', '[]')) for key, value in list(_filter.items()) if value
+    ])
     offset = json.loads(request.POST.get('pagination', '{"offset": 1}')).get('offset')
-    response_app = get_api(request.user, interface, cluster=cluster).app(app_id, offset=offset)
+    response_app = get_api(request.user, interface, cluster=cluster).app(app_id, offset=offset, filters=filters)
   else:
     response_app = get_api(request.user, interface, cluster=cluster).app(app_id)
 
