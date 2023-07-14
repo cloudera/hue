@@ -61,6 +61,7 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.paths import get_run_root, SAFE_CHARACTERS_URI_COMPONENTS
 from desktop.redaction import global_redaction_engine
 from desktop.settings import DOCUMENT2_SEARCH_MAX_LENGTH, HUE_DESKTOP_VERSION
+from desktop.conf import ENABLE_HUE_5
 
 from filebrowser.conf import REMOTE_STORAGE_HOME
 
@@ -2008,61 +2009,73 @@ class ClusterConfig(object):
 
     remote_home_storage = get_remote_home_storage(self.user)
 
-    for hdfs_connector in hdfs_connectors:
-      force_home = remote_home_storage and not remote_home_storage.startswith('/')
-      home_path = self.user.get_home_directory(force_home=force_home).encode('utf-8')
-      interpreters.append({
-        'type': 'hdfs',
-        'displayName': hdfs_connector,
-        'buttonName': _('Browse'),
-        'tooltip': hdfs_connector,
-        'page': '/filebrowser/' + (
-          not self.user.is_anonymous and
-          'view=' + urllib_quote(home_path, safe=SAFE_CHARACTERS_URI_COMPONENTS) or ''
-        )
-      })
-
-    if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('s3a', self.user):
-      home_path = remote_home_storage if remote_home_storage else 's3a://'.encode('utf-8')
-      interpreters.append({
-        'type': 's3',
-        'displayName': _('S3'),
-        'buttonName': _('Browse'),
-        'tooltip': _('S3'),
-        'page': '/filebrowser/view=' + urllib_quote(home_path, safe=SAFE_CHARACTERS_URI_COMPONENTS)
-      })
-
-    if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('adl', self.user):
-      home_path = remote_home_storage if remote_home_storage else 'adl:/'.encode('utf-8')
-      interpreters.append({
-        'type': 'adls',
-        'displayName': _('ADLS'),
-        'buttonName': _('Browse'),
-        'tooltip': _('ADLS'),
-        'page': '/filebrowser/view=' + urllib_quote(home_path, safe=SAFE_CHARACTERS_URI_COMPONENTS)
-      })
-
-    if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('abfs', self.user):
+    #TODO: handle all file systems
+    if ENABLE_HUE_5.get():
       from azure.abfs.__init__ import get_home_dir_for_abfs
       home_path = remote_home_storage if remote_home_storage else get_home_dir_for_abfs(self.user).encode('utf-8')
       interpreters.append({
         'type': 'abfs',
-        'displayName': _('ABFS'),
-        'buttonName': _('Browse'),
-        'tooltip': _('ABFS'),
+        'displayName': 'Storage Browser',
+        'buttonName':'Storage Browser',
+        'tooltip': 'Storage Browser',
         'page': '/filebrowser/view=' + urllib_quote(home_path, safe=SAFE_CHARACTERS_URI_COMPONENTS)
       })
+    else:
+      for hdfs_connector in hdfs_connectors:
+        force_home = remote_home_storage and not remote_home_storage.startswith('/')
+        home_path = self.user.get_home_directory(force_home=force_home).encode('utf-8')
+        interpreters.append({
+          'type': 'hdfs',
+          'displayName': hdfs_connector,
+          'buttonName': _('Browse'),
+          'tooltip': hdfs_connector,
+          'page': '/filebrowser/' + (
+            not self.user.is_anonymous and
+            'view=' + urllib_quote(home_path, safe=SAFE_CHARACTERS_URI_COMPONENTS) or ''
+          )
+        })
 
-    if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('ofs', self.user):
-      from desktop.lib.fs.ozone.ofs import get_ofs_home_directory
-      home_path = get_ofs_home_directory().encode('utf-8')
-      interpreters.append({
-        'type': 'ofs',
-        'displayName': _('Ozone'),
-        'buttonName': _('Browse'),
-        'tooltip': _('Ozone'),
-        'page': '/filebrowser/view=' + urllib_quote(home_path, safe=SAFE_CHARACTERS_URI_COMPONENTS)
-      })
+      if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('s3a', self.user):
+        home_path = remote_home_storage if remote_home_storage else 's3a://'.encode('utf-8')
+        interpreters.append({
+          'type': 's3',
+          'displayName': _('S3'),
+          'buttonName': _('Browse'),
+          'tooltip': _('S3'),
+          'page': '/filebrowser/view=' + urllib_quote(home_path, safe=SAFE_CHARACTERS_URI_COMPONENTS)
+        })
+
+      if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('adl', self.user):
+        home_path = remote_home_storage if remote_home_storage else 'adl:/'.encode('utf-8')
+        interpreters.append({
+          'type': 'adls',
+          'displayName': _('ADLS'),
+          'buttonName': _('Browse'),
+          'tooltip': _('ADLS'),
+          'page': '/filebrowser/view=' + urllib_quote(home_path, safe=SAFE_CHARACTERS_URI_COMPONENTS)
+        })
+
+      if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('abfs', self.user):
+        from azure.abfs.__init__ import get_home_dir_for_abfs
+        home_path = remote_home_storage if remote_home_storage else get_home_dir_for_abfs(self.user).encode('utf-8')
+        interpreters.append({
+          'type': 'abfs',
+          'displayName': _('ABFS'),
+          'buttonName': _('Browse'),
+          'tooltip': _('ABFS'),
+          'page': '/filebrowser/view=' + urllib_quote(home_path, safe=SAFE_CHARACTERS_URI_COMPONENTS)
+        })
+
+      if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('ofs', self.user):
+        from desktop.lib.fs.ozone.ofs import get_ofs_home_directory
+        home_path = get_ofs_home_directory().encode('utf-8')
+        interpreters.append({
+          'type': 'ofs',
+          'displayName': _('Ozone'),
+          'buttonName': _('Browse'),
+          'tooltip': _('Ozone'),
+          'page': '/filebrowser/view=' + urllib_quote(home_path, safe=SAFE_CHARACTERS_URI_COMPONENTS)
+        })
 
     if 'metastore' in self.apps:
       interpreters.append({
