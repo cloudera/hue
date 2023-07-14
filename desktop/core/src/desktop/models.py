@@ -2016,7 +2016,7 @@ class ClusterConfig(object):
       interpreters.append({
         'type': 'abfs',
         'displayName': 'Storage Browser',
-        'buttonName':'Storage Browser',
+        'buttonName': 'Storage Browser',
         'tooltip': 'Storage Browser',
         'page': '/filebrowser/view=' + urllib_quote(home_path, safe=SAFE_CHARACTERS_URI_COMPONENTS)
       })
