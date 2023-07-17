@@ -54,7 +54,7 @@ from desktop import appmanager, metrics
 from desktop.auth.backend import is_admin, find_or_create_user, ensure_has_a_group, rewrite_user
 from desktop.conf import AUTH, HTTP_ALLOWED_METHODS, ENABLE_PROMETHEUS, KNOX, DJANGO_DEBUG_MODE, AUDIT_EVENT_LOG_DIR, \
     METRICS, SERVER_USER, REDIRECT_WHITELIST, SECURE_CONTENT_SECURITY_POLICY, has_connectors, is_gunicorn_report_enabled, \
-    CUSTOM_CACHE_CONTROL
+    CUSTOM_CACHE_CONTROL, HUE_LOAD_BALANCER
 from desktop.context_processors import get_app_name
 from desktop.lib import apputil, i18n, fsmanager
 from desktop.lib.django_util import JsonResponse, render, render_json
@@ -67,6 +67,7 @@ from desktop.log.access import access_log, log_page_hit, access_warn
 from desktop.auth.backend import knox_login_headers
 
 from libsaml.conf import CDP_LOGOUT_URL
+from urllib.parse import urlparse
 
 if sys.version_info[0] > 2:
   from django.utils.translation import gettext as _
@@ -91,6 +92,7 @@ DJANGO_VIEW_AUTH_WHITELIST = [
 if ENABLE_PROMETHEUS.get():
   DJANGO_VIEW_AUTH_WHITELIST.append(django_prometheus.exports.ExportToDjangoView)
 
+HUE_LB_HOSTS = [urlparse(hue_lb).netloc for hue_lb in HUE_LOAD_BALANCER.get()] if HUE_LOAD_BALANCER.get() else []
 
 class AjaxMiddleware(MiddlewareMixin):
   """
@@ -728,14 +730,14 @@ class SpnegoMiddleware(MiddlewareMixin):
             principal = self.clean_principal(username)
             if principal.intersection(principals):
               # This may contain chain of reverse proxies, e.g. knox proxy, hue load balancer
-              # Compare hostname on both HTTP_X_FORWARDED_HOST & KNOX_PROXYHOSTS.
+              # Compare hostname on both HTTP_X_FORWARDED_HOST & KNOX_PROXYHOSTS+HUE_LB.
               # Both of these can be configured to use either hostname or IPs and we have to normalize to one or the other
               req_hosts = self.clean_host(request.META['HTTP_X_FORWARDED_HOST'])
-              knox_proxy = self.clean_host(KNOX.KNOX_PROXYHOSTS.get())
-              if req_hosts.intersection(knox_proxy):
+              allowed_hosts = self.clean_host(KNOX.KNOX_PROXYHOSTS.get() + HUE_LB_HOSTS)
+              if req_hosts.intersection(allowed_hosts):
                 knox_verification = True
               else:
-                access_warn(request, 'Failed to verify provided host %s with %s ' % (req_hosts, knox_proxy))
+                access_warn(request, 'Failed to verify provided host %s with %s ' % (req_hosts, allowed_hosts))
             else:
               access_warn(request, 'Failed to verify provided username %s with %s ' % (principal, principals))
             # If knox authentication failed then generate 401 (Unauthorized error)
