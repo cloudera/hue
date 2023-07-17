@@ -61,7 +61,7 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.paths import get_run_root, SAFE_CHARACTERS_URI_COMPONENTS
 from desktop.redaction import global_redaction_engine
 from desktop.settings import DOCUMENT2_SEARCH_MAX_LENGTH, HUE_DESKTOP_VERSION
-from desktop.conf import ENABLE_HUE_5
+from desktop.conf import ENABLE_NEW_STORAGE_BROWSER
 
 from filebrowser.conf import REMOTE_STORAGE_HOME
 
@@ -2010,7 +2010,7 @@ class ClusterConfig(object):
     remote_home_storage = get_remote_home_storage(self.user)
 
     #TODO: handle all file systems
-    if ENABLE_HUE_5.get():
+    if ENABLE_NEW_STORAGE_BROWSER.get():
       from azure.abfs.__init__ import get_home_dir_for_abfs
       home_path = remote_home_storage if remote_home_storage else get_home_dir_for_abfs(self.user).encode('utf-8')
       interpreters.append({

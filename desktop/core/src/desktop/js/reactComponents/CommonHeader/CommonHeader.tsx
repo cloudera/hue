@@ -16,8 +16,6 @@
 
 import React from 'react';
 
-import { i18nReact } from '../../utils/i18nReact';
-
 import './CommonHeader.scss';
 
 interface CommonHeaderProps {
@@ -31,15 +29,13 @@ const defaultProps = {
 };
 
 const CommonHeader: React.FC<CommonHeaderProps> = ({ title, icon, testId }) => {
-  const { t } = i18nReact.useTranslation();
-
   return (
     <div className="hue-common-header" data-testid={testId}>
       <div className="hue-header-icon" data-testid={`${testId}-icon`}>
         {icon}
       </div>
       <div className="hue-header-title" data-testid={`${testId}-title`}>
-        {t(title)}
+        {title}
       </div>
       {/* TODO: Add actions dropdown*/}
     </div>

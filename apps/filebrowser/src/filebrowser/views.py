@@ -48,7 +48,7 @@ from aws.s3.s3fs import S3FileSystemException, S3ListAllBucketsException, get_s3
 from desktop import appmanager
 from desktop.auth.backend import is_admin
 from desktop.conf import RAZ
-from desktop.conf import ENABLE_HUE_5
+from desktop.conf import ENABLE_NEW_STORAGE_BROWSER
 from desktop.lib import fsmanager
 from desktop.lib import i18n
 from desktop.lib.conf import coerce_bool
@@ -521,116 +521,116 @@ def listdir_paged(request, path):
     filter=?          - Specify a substring filter to search for in
                         the filename field.
   """
-  if ENABLE_HUE_5.get():
+  if ENABLE_NEW_STORAGE_BROWSER.get():
     return render('storage_browser.mako', request, {})
+
+  path = _normalize_path(path)
+
+  if not request.fs.isdir(path):
+    raise PopupException("Not a directory: %s" % (path,))
+
+  pagenum = int(request.GET.get('pagenum', 1))
+  pagesize = int(request.GET.get('pagesize', 30))
+  do_as = None
+  if is_admin(request.user) or request.user.has_hue_permission(action="impersonate", app="security"):
+    do_as = request.GET.get('doas', request.user.username)
+  if hasattr(request, 'doas'):
+    do_as = request.doas
+
+  if request.fs._get_scheme(path) == 'hdfs':
+    home_dir_path = request.user.get_home_directory()
   else:
-    path = _normalize_path(path)
+    home_dir_path = None
+  breadcrumbs = parse_breadcrumbs(path)
+  s3_listing_not_allowed = ''
 
-    if not request.fs.isdir(path):
-      raise PopupException("Not a directory: %s" % (path,))
-
-    pagenum = int(request.GET.get('pagenum', 1))
-    pagesize = int(request.GET.get('pagesize', 30))
-    do_as = None
-    if is_admin(request.user) or request.user.has_hue_permission(action="impersonate", app="security"):
-      do_as = request.GET.get('doas', request.user.username)
-    if hasattr(request, 'doas'):
-      do_as = request.doas
-
-    if request.fs._get_scheme(path) == 'hdfs':
-      home_dir_path = request.user.get_home_directory()
+  try:
+    if do_as:
+      all_stats = request.fs.do_as_user(do_as, request.fs.listdir_stats, path)
     else:
-      home_dir_path = None
-    breadcrumbs = parse_breadcrumbs(path)
-    s3_listing_not_allowed = ''
+      all_stats = request.fs.listdir_stats(path)
+  except S3ListAllBucketsException as e:
+    s3_listing_not_allowed = str(e)
+    all_stats = []
 
-    try:
-      if do_as:
-        all_stats = request.fs.do_as_user(do_as, request.fs.listdir_stats, path)
-      else:
-        all_stats = request.fs.listdir_stats(path)
-    except S3ListAllBucketsException as e:
-      s3_listing_not_allowed = str(e)
-      all_stats = []
+  # Filter first
+  filter_str = request.GET.get('filter', None)
+  if filter_str:
+    filtered_stats = [sb for sb in all_stats if filter_str in sb['name']]
+    all_stats = filtered_stats
 
-    # Filter first
-    filter_str = request.GET.get('filter', None)
-    if filter_str:
-      filtered_stats = [sb for sb in all_stats if filter_str in sb['name']]
-      all_stats = filtered_stats
+  # Sort next
+  sortby = request.GET.get('sortby', None)
+  descending_param = request.GET.get('descending', None)
+  if sortby is not None:
+    if sortby not in ('type', 'name', 'atime', 'mtime', 'user', 'group', 'size'):
+      logger.info("Invalid sort attribute '%s' for listdir." % sortby)
+    else:
+      all_stats = sorted(all_stats, key=operator.attrgetter(sortby), reverse=coerce_bool(descending_param))
 
-    # Sort next
-    sortby = request.GET.get('sortby', None)
-    descending_param = request.GET.get('descending', None)
-    if sortby is not None:
-      if sortby not in ('type', 'name', 'atime', 'mtime', 'user', 'group', 'size'):
-        logger.info("Invalid sort attribute '%s' for listdir." % sortby)
-      else:
-        all_stats = sorted(all_stats, key=operator.attrgetter(sortby), reverse=coerce_bool(descending_param))
+  # Do pagination
+  try:
+    paginator = Paginator(all_stats, pagesize, allow_empty_first_page=True)
+    page = paginator.page(pagenum)
+    shown_stats = page.object_list
+  except EmptyPage:
+    logger.warn("No results found for requested page.")
+    paginator = None
+    page = None
+    shown_stats = []
 
-    # Do pagination
-    try:
-      paginator = Paginator(all_stats, pagesize, allow_empty_first_page=True)
-      page = paginator.page(pagenum)
-      shown_stats = page.object_list
-    except EmptyPage:
-      logger.warn("No results found for requested page.")
-      paginator = None
-      page = None
-      shown_stats = []
+  # Include same dir always as first option to see stats of the current folder.
+  current_stat = request.fs.stats(path)
+  # The 'path' field would be absolute, but we want its basename to be
+  # actually '.' for display purposes. Encode it since _massage_stats expects byte strings.
+  current_stat.path = path
+  current_stat.name = "."
+  shown_stats.insert(0, current_stat)
 
-    # Include same dir always as first option to see stats of the current folder.
-    current_stat = request.fs.stats(path)
+  # Include parent dir always as second option, unless at filesystem root or when RAZ is enabled.
+  if not (request.fs.isroot(path) or RAZ.IS_ENABLED.get()):
+    parent_path = request.fs.parent_path(path)
+    parent_stat = request.fs.stats(parent_path)
     # The 'path' field would be absolute, but we want its basename to be
-    # actually '.' for display purposes. Encode it since _massage_stats expects byte strings.
-    current_stat.path = path
-    current_stat.name = "."
-    shown_stats.insert(0, current_stat)
+    # actually '..' for display purposes. Encode it since _massage_stats expects byte strings.
+    parent_stat['path'] = parent_path
+    parent_stat['name'] = ".."
+    shown_stats.insert(0, parent_stat)
 
-    # Include parent dir always as second option, unless at filesystem root or when RAZ is enabled.
-    if not (request.fs.isroot(path) or RAZ.IS_ENABLED.get()):
-      parent_path = request.fs.parent_path(path)
-      parent_stat = request.fs.stats(parent_path)
-      # The 'path' field would be absolute, but we want its basename to be
-      # actually '..' for display purposes. Encode it since _massage_stats expects byte strings.
-      parent_stat['path'] = parent_path
-      parent_stat['name'] = ".."
-      shown_stats.insert(0, parent_stat)
+  if page:
+    page.object_list = [_massage_stats(request, stat_absolute_path(path, s)) for s in shown_stats]
 
-    if page:
-      page.object_list = [_massage_stats(request, stat_absolute_path(path, s)) for s in shown_stats]
+  is_hdfs = request.fs._get_scheme(path) == 'hdfs'
+  is_trash_enabled = is_hdfs and int(get_trash_interval()) > 0
+  is_fs_superuser = is_hdfs and _is_hdfs_superuser(request)
 
-    is_hdfs = request.fs._get_scheme(path) == 'hdfs'
-    is_trash_enabled = is_hdfs and int(get_trash_interval()) > 0
-    is_fs_superuser = is_hdfs and _is_hdfs_superuser(request)
-
-    data = {
-        'path': path,
-        'breadcrumbs': breadcrumbs,
-        'current_request_path': '/filebrowser/view=' + urllib_quote(path.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS),
-        'is_trash_enabled': is_trash_enabled,
-        'files': page.object_list if page else [],
-        'page': _massage_page(page, paginator) if page else {},
-        'pagesize': pagesize,
-        'home_directory': home_dir_path if home_dir_path and request.fs.isdir(home_dir_path) else None,
-        'descending': descending_param,
-        # The following should probably be deprecated
-        'cwd_set': True,
-        'file_filter': 'any',
-        'current_dir_path': path,
-        'is_fs_superuser': is_fs_superuser,
-        'groups': is_fs_superuser and [str(x) for x in Group.objects.values_list('name', flat=True)] or [],
-        'users': is_fs_superuser and [str(x) for x in User.objects.values_list('username', flat=True)] or [],
-        'superuser': request.fs.superuser,
-        'supergroup': request.fs.supergroup,
-        'is_sentry_managed': request.fs.is_sentry_managed(path),
-        'apps': list(appmanager.get_apps_dict(request.user).keys()),
-        'show_download_button': SHOW_DOWNLOAD_BUTTON.get(),
-        'show_upload_button': SHOW_UPLOAD_BUTTON.get(),
-        'is_embeddable': request.GET.get('is_embeddable', False),
-        's3_listing_not_allowed': s3_listing_not_allowed
-    }
-    return render('listdir.mako', request, data)
+  data = {
+      'path': path,
+      'breadcrumbs': breadcrumbs,
+      'current_request_path': '/filebrowser/view=' + urllib_quote(path.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS),
+      'is_trash_enabled': is_trash_enabled,
+      'files': page.object_list if page else [],
+      'page': _massage_page(page, paginator) if page else {},
+      'pagesize': pagesize,
+      'home_directory': home_dir_path if home_dir_path and request.fs.isdir(home_dir_path) else None,
+      'descending': descending_param,
+      # The following should probably be deprecated
+      'cwd_set': True,
+      'file_filter': 'any',
+      'current_dir_path': path,
+      'is_fs_superuser': is_fs_superuser,
+      'groups': is_fs_superuser and [str(x) for x in Group.objects.values_list('name', flat=True)] or [],
+      'users': is_fs_superuser and [str(x) for x in User.objects.values_list('username', flat=True)] or [],
+      'superuser': request.fs.superuser,
+      'supergroup': request.fs.supergroup,
+      'is_sentry_managed': request.fs.is_sentry_managed(path),
+      'apps': list(appmanager.get_apps_dict(request.user).keys()),
+      'show_download_button': SHOW_DOWNLOAD_BUTTON.get(),
+      'show_upload_button': SHOW_UPLOAD_BUTTON.get(),
+      'is_embeddable': request.GET.get('is_embeddable', False),
+      's3_listing_not_allowed': s3_listing_not_allowed
+  }
+  return render('listdir.mako', request, data)
 
 
 def scheme_absolute_path(root, path):

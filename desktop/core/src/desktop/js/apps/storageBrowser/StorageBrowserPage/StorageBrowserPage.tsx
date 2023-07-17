@@ -16,14 +16,18 @@
 
 import React from 'react';
 
+import { i18nReact } from '../../../utils/i18nReact';
+
 import CommonHeader from '../../../reactComponents/CommonHeader/CommonHeader';
 //TODO: substitute for file browser icon
 import ABFSIcon from '../../../components/icons/AdlsIcon';
 
 const StorageBrowserPage = (): JSX.Element => {
+  const { t } = i18nReact.useTranslation();
+
   return (
     <>
-      <CommonHeader title="Storage Browser" icon={<ABFSIcon />} />
+      <CommonHeader title={t('Storage Browser')} icon={<ABFSIcon />} />
     </>
   );
 };
