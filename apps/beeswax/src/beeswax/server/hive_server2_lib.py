@@ -30,7 +30,7 @@ from TCLIService.ttypes import TOpenSessionReq, TGetTablesReq, TFetchResultsReq,
   TGetCrossReferenceReq, TGetPrimaryKeysReq
 
 from desktop.lib import python_util, thrift_util
-from desktop.conf import DEFAULT_USER, USE_THRIFT_HTTP_JWT, ENABLE_XFF_FOR_HIVE_IMPALA
+from desktop.conf import DEFAULT_USER, USE_THRIFT_HTTP_JWT, ENABLE_XFF_FOR_HIVE_IMPALA, ENABLE_X_CSRF_TOKEN_FOR_HIVE_IMPALA
 
 from beeswax import conf as beeswax_conf, hive_site
 from beeswax.hive_site import hiveserver2_use_ssl
@@ -680,6 +680,9 @@ class HiveServerClient(object):
       xff_header = json.loads(user.userprofile.json_data).get('X-Forwarded-For', None)
       if xff_header and ENABLE_XFF_FOR_HIVE_IMPALA.get():
         kwargs['configuration'].update({'X-Forwarded-For': xff_header})
+      csrf_header = json.loads(user.userprofile.json_data).get('X-CSRF-TOKEN')
+      if csrf_header and ENABLE_X_CSRF_TOKEN_FOR_HIVE_IMPALA.get():
+        kwargs['configuration'].update({'X-CSRF-TOKEN': csrf_header})
 
     if self.query_server['server_name'] == 'hplsql' or interpreter['dialect'] == 'hplsql': # All the time
       kwargs['configuration'].update({'hive.server2.proxy.user': user.username, 'set:hivevar:mode': 'HPLSQL'})
@@ -695,6 +698,9 @@ class HiveServerClient(object):
       xff_header = json.loads(user.userprofile.json_data).get('X-Forwarded-For', None)
       if xff_header and ENABLE_XFF_FOR_HIVE_IMPALA.get():
         kwargs['configuration'].update({'X-Forwarded-For': xff_header})
+      csrf_header = json.loads(user.userprofile.json_data).get('X-CSRF-TOKEN', None)
+      if csrf_header and ENABLE_X_CSRF_TOKEN_FOR_HIVE_IMPALA.get():
+        kwargs['configuration'].update({'X-CSRF-TOKEN': csrf_header})
 
     LOG.info('Opening %s thrift session for user %s' % (self.query_server['server_name'], user.username))
 
