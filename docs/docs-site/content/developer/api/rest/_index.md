@@ -256,27 +256,35 @@ Same but in Python:
 
 ### Listing Databases
 
-    curl -X POST https://demo.gethue.com/api/v1/editor/autocomplete/
+    curl -X POST https://demo.gethue.com/api/v1/editor/autocomplete/ -d 'snippet={"type":"hive"}'
+
+    {"status": 0, "databases": ["default", "information_schema", "sys"]}
+
+- **snippet:** select the `type` from the configured dialects (e.g. `hive`) or connector IDs (e.g. `1`)
 
 ### Database details
 
-    curl -X POST https://demo.gethue.com/api/v1/editor/autocomplete/<DB>/
+    curl -X POST https://demo.gethue.com/api/v1/editor/autocomplete/<DB>/ -d 'snippet={"type":"hive"}'
+
+- **snippet:** select the `type` from the configured dialects (e.g. `hive`) or connector IDs (e.g. `1`)
 
 Describe database API:
 
     curl -X POST https://demo.gethue.com/api/v1/editor/describe/<DB>/ -d 'source_type=mysql'
 
-- **source_type:** select the configured databases (e.g. `hive`) or connector ID (e.g. `1`)
+- **source_type:** select from the configured dialects (e.g. `hive`) or connector IDs (e.g. `1`)
 
 ### Table details
 
-    curl -X POST https://demo.gethue.com/api/v1/editor/autocomplete/<DB>/<TABLE>/
+    curl -X POST https://demo.gethue.com/api/v1/editor/autocomplete/<DB>/<TABLE>/ -d 'snippet={"type":"hive"}'
+
+- **snippet:** select the `type` from the configured dialects (e.g. `hive`) or connector IDs (e.g. `1`)
 
 Describe table API:
 
     curl -X POST https://demo.gethue.com/api/v1/editor/describe/<DB>/<TABLE>/ -d 'source_type=1'
 
-- **source_type:** select the configured databases (e.g. `hive`) or connector ID (e.g. `1`)
+- **source_type:** select from the configured dialects (e.g. `hive`) or connector IDs (e.g. `1`)
 
 Analyze API:
 
@@ -286,11 +294,15 @@ Analyze API:
 
 Sample table data API:
 
-    curl -X POST https://demo.gethue.com/api/v1/editor/sample/<DB>/<TABLE>/
+    curl -X POST https://demo.gethue.com/api/v1/editor/sample/<DB>/<TABLE>/ -d 'snippet={"type":"hive"}'
+
+- **snippet:** select the `type` from the configured dialects (e.g. `hive`) or connector IDs (e.g. `1`)
 
 ### Column details
 
-    curl -X POST https://demo.gethue.com/api/v1/editor/autocomplete/<DB>/<TABLE>/<COL1>/
+    curl -X POST https://demo.gethue.com/api/v1/editor/autocomplete/<DB>/<TABLE>/<COL1>/ -d 'snippet={"type":"hive"}'
+
+- **snippet:** select the `type` from the configured dialects (e.g. `hive`) or connector IDs (e.g. `1`)
 
 Analyze API:
 
@@ -300,42 +312,32 @@ Analyze API:
 
 Sample column data API:
 
-    curl -X POST https://demo.gethue.com/api/v1/editor/sample/<DB>/<TABLE>/<COL1>/
+    curl -X POST https://demo.gethue.com/api/v1/editor/sample/<DB>/<TABLE>/<COL1>/ -d 'snippet={"type":"hive"}'
+
+- **snippet:** select the `type` from the configured dialects (e.g. `hive`) or connector IDs (e.g. `1`)
 
 ### Listing Functions
 
 Default functions:
 
-    $.post("/notebook/api/autocomplete/", {
-      "snippet": ko.mapping.toJSON({
-          type: "hive"
-      }),
-      "operation": "functions"
-    }, function(data) {
-      console.log(ko.mapping.toJSON(data));
-    });
+    curl  -X POST https://demo.gethue.com/api/v1/editor/autocomplete -d 'snippet={"type":"hive"}' -d 'operation=functions'
+
+- **snippet:** select the `type` from the configured dialects (e.g. `hive`) or connector IDs (e.g. `1`)
+- **operation:** specify the type of operation (e.g., `functions`)
 
 For a specific database:
 
-    $.post("/notebook/api/autocomplete/<DB>", {
-      "snippet": ko.mapping.toJSON({
-          type: "hive"
-      }),
-      "operation": "functions"
-    }, function(data) {
-      console.log(ko.mapping.toJSON(data));
-    });
+    curl  -X POST https://demo.gethue.com/api/v1/editor/autocomplete/<DB> -d 'snippet={"type":"hive"}' -d 'operation=functions'
+
+- **snippet:** select the `type` from the configured dialects (e.g. `hive`) or connector IDs (e.g. `1`)
+- **operation:** specify the type of operation (e.g., `functions`)
 
 For a specific function/UDF details (e.g. trunc):
 
-    $.post("/notebook/api/autocomplete/<function_name>", {
-      "snippet": ko.mapping.toJSON({
-          type: "hive"
-      }),
-      "operation": "function"
-    }, function(data) {
-      console.log(ko.mapping.toJSON(data));
-    });
+    curl  -X POST https://demo.gethue.com/api/v1/editor/autocomplete/<function_name> -d 'snippet={"type":"hive"}' -d 'operation=function'
+
+- **snippet:** select the `type` from the configured dialects (e.g. `hive`) or connector IDs (e.g. `1`)
+- **operation:** specify the type of operation (e.g., `function`)
 
 ### Query history
 
