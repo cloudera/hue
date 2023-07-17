@@ -30,7 +30,7 @@ from liboozie.types import WorkflowList, CoordinatorList, Coordinator, Workflow,
 from liboozie.utils import config_gen
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 DEFAULT_USER = DEFAULT_USER.get()
 API_VERSION = 'v1' # Overridden to v2 for SLA
 

@@ -30,7 +30,7 @@ if sys.version_info[0] > 2:
 else:
   open_file = file
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 def test_impala_flags():

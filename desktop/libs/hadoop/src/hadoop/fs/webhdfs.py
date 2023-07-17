@@ -59,7 +59,7 @@ DEFAULT_HDFS_SUPERUSER = desktop.conf.DEFAULT_HDFS_SUPERUSER.get()
 # The number of bytes to read if not specified
 DEFAULT_READ_SIZE = 1024 * 1024 # 1MB
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class WebHdfs(Hdfs):

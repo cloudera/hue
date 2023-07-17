@@ -32,7 +32,7 @@ else:
   from django.utils.translation import ugettext as _
   open_file = file
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 class Command(BaseCommand):
   help = _("Creates a Hue application directory structure.")

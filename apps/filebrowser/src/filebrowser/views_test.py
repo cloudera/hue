@@ -78,7 +78,7 @@ else:
   from mock import patch, Mock
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 def cleanup_tree(cluster, path):

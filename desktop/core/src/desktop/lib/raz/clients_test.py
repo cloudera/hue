@@ -71,29 +71,28 @@ class AdlsRazClientTest(unittest.TestCase):
     self.username = 'csso_hueuser'
   
   def test_check_rename_operation(self):
-    with patch('desktop.lib.raz.raz_client.RazToken.get_delegation_token') as raz_token:
-      with patch('desktop.lib.raz.raz_client.requests.post') as requests_post:
-        with patch('desktop.lib.raz.raz_client.uuid.uuid4') as uuid:
-          with patch('desktop.lib.raz.raz_client.RazClient.check_access') as check_access:
+    with patch('desktop.lib.raz.raz_client.requests.post') as requests_post:
+      with patch('desktop.lib.raz.raz_client.uuid.uuid4') as uuid:
+        with patch('desktop.lib.raz.raz_client.RazClient.check_access') as check_access:
 
-            reset = RAZ.API_URL.set_for_testing('https://raz_url:8000')
-            check_access.return_value = {'token': 'some_random_sas_token'}
+          reset = RAZ.API_URL.set_for_testing('https://raz_url:8000')
+          check_access.return_value = {'token': 'some_random_sas_token'}
 
-            try:
-              sas_token = AdlsRazClient(
-                username=self.username
-              ).get_url(
-                action='PUT',
-                path='https://gethuestorage.dfs.core.windows.net/data/user/csso_hueuser/rename_destination_dir',
-                headers={'x-ms-version': '2019-12-12', 'x-ms-rename-source': '/data/user/csso_hueuser/rename_source_dir'})
+          try:
+            sas_token = AdlsRazClient(
+              username=self.username
+            ).get_url(
+              action='PUT',
+              path='https://gethuestorage.dfs.core.windows.net/data/user/csso_hueuser/rename_destination_dir',
+              headers={'x-ms-version': '2019-12-12', 'x-ms-rename-source': '/data/user/csso_hueuser/rename_source_dir'})
 
-              check_access.assert_called_with(
-                headers={
-                  'x-ms-version': '2019-12-12', 
-                  'x-ms-rename-source': '/data/user/csso_hueuser/rename_source_dir?some_random_sas_token'
-                },
-                method='PUT',
-                url='https://gethuestorage.dfs.core.windows.net/data/user/csso_hueuser/rename_destination_dir'
-              )
-            finally:
-              reset()
+            check_access.assert_called_with(
+              headers={
+                'x-ms-version': '2019-12-12', 
+                'x-ms-rename-source': '/data/user/csso_hueuser/rename_source_dir?some_random_sas_token'
+              },
+              method='PUT',
+              url='https://gethuestorage.dfs.core.windows.net/data/user/csso_hueuser/rename_destination_dir'
+            )
+          finally:
+            reset()

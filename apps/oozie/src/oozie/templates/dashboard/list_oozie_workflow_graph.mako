@@ -140,6 +140,12 @@ ${ dashboard.import_layout() }
         }
       }
 
+      huePubSub.subscribe('graph.clear.widget.status', function() {
+        viewModel.getAllWidgets().forEach(function(widget) {
+          widget.status('');
+        });
+      });
+
       huePubSub.subscribe('graph.refresh.view', refreshView);
 
       huePubSub.subscribe('graph.stop.refresh.view', function(){

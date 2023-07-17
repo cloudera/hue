@@ -190,7 +190,7 @@ Here is a list of the main improvements. For all the changes, check out the�
   <span style="font-weight: 300;">SAML update (with idle session fix)</span>
 </li>
 <li style="font-weight: 400;">
-  <span style="font-weight: 300;"><a href="http://cloudera.github.io/hue/latest/">Documentation revamp</a></span>
+  <span style="font-weight: 300;"><a href="https://docs.gethue.com/">Documentation revamp</a></span>
 </li>
 <li style="font-weight: 400;">
   <span style="font-weight: 300;">Thread page</span>

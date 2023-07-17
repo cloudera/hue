@@ -33,7 +33,7 @@ import uuid
 from django.urls import reverse
 from django.views.decorators.http import require_POST
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 try:
   from simple_salesforce.api import Salesforce

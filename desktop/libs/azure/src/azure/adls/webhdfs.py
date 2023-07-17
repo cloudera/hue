@@ -33,7 +33,7 @@ from desktop.lib.rest import http_client, resource
 from azure.conf import get_default_adls_url, get_default_adls_fs, PERMISSION_ACTION_ADLS
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 #Azure has a 30MB block limit on upload.
 UPLOAD_CHUCK_SIZE = 30 * 1000 * 1000

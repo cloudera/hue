@@ -21,7 +21,7 @@ import logging
 from azure.abfs.__init__ import strip_path, abfsdatetime_to_timestamp
 from django.utils.encoding import smart_str
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 CHAR_TO_OCT = {"---": 0, "--x": 1, "-w-": 2, "-wx": 3, "r--": 4, "r-x": 5, "rw-": 6, "rwx": 7}
 
 

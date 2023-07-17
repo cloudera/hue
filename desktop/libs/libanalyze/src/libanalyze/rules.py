@@ -44,7 +44,7 @@ else:
   string_types = types.StringTypes
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 def to_double(metric_value):

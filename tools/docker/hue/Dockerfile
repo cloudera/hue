@@ -41,6 +41,7 @@ RUN pip3 install --upgrade --no-cache-dir setuptools virtualenv pip && \
   chown -R hue /usr/share/hue && \
   rm -rf /hue/desktop/conf && \
   cp -r /hue/desktop/conf.dist /hue/desktop/conf && \
+  mkdir -m 755 /var/log/hue && \
   cd /hue && \
   ln -fs /usr/local/bin/pip3.8 /usr/bin/pip3.8 && \
   ln -fs /usr/local/bin/pip3.8 /usr/bin/pip3 && \
@@ -85,7 +86,10 @@ RUN ./build/env/bin/pip install --no-cache-dir \
   # install after sqlalchemy-clickhouse and version == 1.0.4 \
   # otherwise Code: 516, Authentication failed will display \
   infi.clickhouse_orm==1.0.4 \
-  mysqlclient
+  mysqlclient \
+  PyAthena==2.25.2
+  # PyAthena == 3.x.x is latest, but not working with current configuration \
+  # otherwise, 'VisitableType' object is not subscriptable in Hue UI
 
 USER hue
 

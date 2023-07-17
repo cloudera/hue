@@ -23,7 +23,7 @@ from builtins import str, object
 import logging
 import sys
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 try:
   import ldap

@@ -50,7 +50,7 @@ if sys.version_info[0] > 2:
 else:
   from mock import patch, Mock
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 def _make_query(client, query, submission_type="Execute",

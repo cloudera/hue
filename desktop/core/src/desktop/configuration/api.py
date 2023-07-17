@@ -43,7 +43,7 @@ except (ImportError, RuntimeError) as e:
   OozieWorkflowConfiguration = None
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 def api_error_handler(func):

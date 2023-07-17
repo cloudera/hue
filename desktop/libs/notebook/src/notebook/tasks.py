@@ -57,7 +57,7 @@ else:
 
 
 LOG_TASK = get_task_logger(__name__)
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 STATE_MAP = {
   'SUBMITTED': 'waiting',
   states.RECEIVED: 'waiting',
