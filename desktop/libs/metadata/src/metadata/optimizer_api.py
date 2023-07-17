@@ -118,6 +118,7 @@ def top_tables(request):
   api = get_api(request.user, interface)
 
   data = api.top_tables(database_name=database, page_size=limit, connector=connector)
+  print('top_tables: %s' % data)
 
   if OPTIMIZER.APPLY_SENTRY_PERMISSIONS.get():
     checker = get_checker(user=self.user)
@@ -313,6 +314,7 @@ def top_joins(request):
   api = get_api(request.user, interface)
 
   data = api.top_joins(db_tables=db_tables, connector=connector)
+  print('top_joins: %s' % data)
 
   if data:
     response['status'] = 0
@@ -379,6 +381,7 @@ def top_columns(request):
   api = get_api(request.user, interface)
 
   data = api.top_columns(db_tables=db_tables, connector=connector, database_name=database)
+  print('top_columns: %s' % data)
 
   response['status'] = 0
   response['values'] = data or []
