@@ -327,9 +327,9 @@ Default functions:
 
 For a specific database:
 
-    curl  -X POST https://demo.gethue.com/api/v1/editor/autocomplete/<DB> -d 'snippet={"type":"hive"}' -d 'operation=functions'
+    curl  -X POST https://demo.gethue.com/api/v1/editor/autocomplete/<DB> -d 'snippet={"type":"impala"}' -d 'operation=functions'
 
-- **snippet:** select the `type` from the configured dialects (e.g. `hive`) or connector IDs (e.g. `1`)
+- **snippet:** select the `type` from the configured dialects (e.g. `impala`) or connector IDs (e.g. `1`)
 - **operation:** specify the type of operation (e.g., `functions`)
 
 For a specific function/UDF details (e.g. trunc):
