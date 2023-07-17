@@ -64,6 +64,8 @@ def _convert_to_6_digit_ms_local_time(start_time):
     if len(microseconds) > 6:
       microseconds = microseconds[:6]
     start_time = '.'.join([time, microseconds])
+  else:
+    start_time = f'{start_time}.000000'
   
   local_tz = pytz.timezone(os.environ.get('TZ', 'UTC'))
   # Convert to datetime object in UTC, convert to provided timezone, and then format back into a string

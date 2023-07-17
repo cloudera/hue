@@ -71,6 +71,16 @@ class TestConvertTo6DigitMsLocalTime():
 
     assert_equal(expected_time, converted_time)
 
+  @patch.dict(os.environ, {'TZ': 'America/New_York'})
+  def convert_0_digit(self):
+    start_time = "2023-07-14 12:00:00"
+    converted_time = _convert_to_6_digit_ms_local_time(start_time)
+
+    # America/New_York timezone is UTC-4
+    expected_time = "2023-07-14 08:00:00.000000"
+
+    assert_equal(expected_time, converted_time)    
+
 class TestApi():
 
   def setUp(self):
