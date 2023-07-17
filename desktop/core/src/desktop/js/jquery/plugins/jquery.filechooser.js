@@ -125,6 +125,23 @@ const defaults = {
         home: '',
         name: 'ABFS'
       }
+    },
+    ofs: {
+      scheme: 'ofs',
+      root: 'ofs://',
+      home: '/?default_ofs_home',
+      icon: {
+        svg: {
+          brand: '#hi-ofs',
+          home: '#hi-ofs'
+        },
+        brand: 'fa-windows',
+        home: 'fa-windows'
+      },
+      label: {
+        home: '',
+        name: 'OFS'
+      }
     }
   },
   fsSelected: 'hdfs',
@@ -288,13 +305,17 @@ Plugin.prototype.navigateTo = function (path) {
   $(_parent.element)
     .find('.filechooser-tree')
     .html('<i style="font-size: 24px; color: #DDD" class="fa fa-spinner fa-spin"></i>');
-  let pageSize = '?pagesize=1000';
-  const index = path.indexOf('?');
-  if (index > -1) {
-    pageSize = path.substring(index) + pageSize.replace(/\?/, '&');
-    path = path.substring(0, index);
-  }
-  $.getJSON('/filebrowser/view=' + encodeURIComponent(path) + pageSize, data => {
+
+  // The default paths '/?default_to_home', '/?default_s3_home' etc already contains a query string
+  // so we append pageSizeParam as an additional param, not a new query string.
+  const isDefaultRedirectFlag = /^\/\?default_.*_(home|trash)$/.test(path);
+  const pageSizeParam = 'pagesize=1000';
+  const encodedPath = encodeURIComponent(path);
+  const pathAndQuery = isDefaultRedirectFlag
+    ? path + '&' + pageSizeParam
+    : encodedPath + '?' + pageSizeParam;
+
+  $.getJSON('/filebrowser/view=' + pathAndQuery, data => {
     $(_parent.element).find('.filechooser-tree').empty();
 
     path = data.current_dir_path || path; // use real path.
@@ -420,6 +441,7 @@ Plugin.prototype.navigateTo = function (path) {
       }
 
       $search.find('.fa-search').on('click', () => {
+        window.hueAnalytics.log('filechooser', 'show-search-btn-click');
         if ($searchInput.is(':visible')) {
           slideOutInput();
         } else {
@@ -438,6 +460,7 @@ Plugin.prototype.navigateTo = function (path) {
 
       $search.find('.fa-refresh').on('click', () => {
         _parent.navigateTo(path);
+        window.hueAnalytics.log('filechooser', 'refresh-btn-click');
       });
 
       $search.appendTo($(_parent.element).find('.filechooser-tree'));
@@ -487,6 +510,7 @@ Plugin.prototype.navigateTo = function (path) {
         if ($(e.target).is('ul') || $(e.target).hasClass('spacer')) {
           $(this).hide();
           $hdfsAutocomplete.show().focus();
+          window.hueAnalytics.log('filechooser', 'show-edit-breadcrumbs-path');
         }
       });
 
@@ -512,6 +536,7 @@ Plugin.prototype.navigateTo = function (path) {
             const _url = crumb.url != null && crumb.url != '' ? crumb.url : '/';
             _parent.options.onFolderChange(_url);
             _parent.navigateTo(_url);
+            window.hueAnalytics.log('filechooser', 'breadcrumb-navigation-click');
           });
           _crumb.appendTo($scrollingBreadcrumbs);
         });
@@ -529,6 +554,7 @@ Plugin.prototype.navigateTo = function (path) {
           _parent.options.onFolderChange(_url);
           _parent.navigateTo(_url);
           $('#jHueHdfsAutocomplete').hide();
+          window.hueAnalytics.log('filechooser', 'confirm-edit-breadcrumbs-path');
         },
         onBlur: function () {
           $hdfsAutocomplete.hide();
@@ -690,12 +716,14 @@ Plugin.prototype.navigateTo = function (path) {
         _folderCancel.click(() => {
           if (_uploadFileBtn) {
             _uploadFileBtn.removeClass('disabled');
+            window.hueAnalytics.log('filechooser', 'create-folder-cancel-btn-click');
           }
           _createFolderBtn.removeClass('disabled');
           _createFolderDetails.slideUp();
         });
         _folderBtn.click(() => {
           if (_folderName.val().length > 0) {
+            window.hueAnalytics.log('filechooser', 'create-folder-btn-2-click');
             $.ajax({
               type: 'POST',
               url: '/filebrowser/mkdir',
@@ -724,6 +752,7 @@ Plugin.prototype.navigateTo = function (path) {
 
         _createFolderBtn.click(() => {
           if (_uploadFileBtn) {
+            window.hueAnalytics.log('filechooser', 'create-folder-btn-1-click');
             _uploadFileBtn.addClass('disabled');
           }
           _createFolderBtn.addClass('disabled');
@@ -779,6 +808,7 @@ function initUploader(path, _parent, el, labels) {
     },
     onSubmit: function (id, fileName) {
       num_of_pending_uploads++;
+      window.hueAnalytics.log('filechooser', 'uploading-file');
     },
     template:
       '<div class="qq-uploader">' +

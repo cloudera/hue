@@ -24,6 +24,7 @@ import re
 import sys
 import time
 import unittest
+import pytz
 
 from django.urls import reverse
 from nose.plugins.skip import SkipTest
@@ -49,8 +50,11 @@ from jobbrowser.conf import SHARE_JOBS
 from jobbrowser.models import can_view_job, can_modify_job, LinkJobLogs
 from jobbrowser.yarn_models import SparkJob
 
+from datetime import datetime
+from babel import localtime
 
-LOG = logging.getLogger(__name__)
+
+LOG = logging.getLogger()
 _INITIALIZED = False
 
 
@@ -619,6 +623,11 @@ class TestImpalaApi(object):
     api = MockImpalaQueryApi('http://url.com')
     self.api = QueryApi(None, impala_api=api)
 
+  def handle_query_start_time(self, start_time):
+    query_start_time = datetime.strptime(start_time[:-3], "%Y-%m-%d %H:%M:%S.%f"). \
+      replace(tzinfo=pytz.utc).astimezone(localtime._get_localzone()).strftime("%Y-%m-%d %H:%M:%S.%f")
+    return query_start_time
+
   def test_apps(self):
     response = self.api.apps({})
     target = [
@@ -631,7 +640,7 @@ class TestImpalaApi(object):
         'id': u'8a46a8865624698f:b80b211500000000',
         'apiStatus': 'SUCCEEDED',
         'name': u'SELECT sample_07.description, sample_07.salary FROM   sample...',
-        'submitted': u'2017-10-25 15:38:26.637010000',
+        'submitted': self.handle_query_start_time('2017-10-25 15:38:26.637010000'),
         'queue': u'root.admin',
         'waiting': True, 'progress': u'1 / 1 ( 100%)',
         'type': u'QUERY', 'waiting_time': u'52m8s'
@@ -641,7 +650,7 @@ class TestImpalaApi(object):
         'rows_fetched': 53, 'user': u'admin', 'canWrite': False,
         'duration': 3369000.0, 'id': u'4d497267f34ff17d:817bdfb500000000',
         'apiStatus': 'SUCCEEDED', 'name': u'select * from customers',
-        'submitted': u'2017-10-25 15:38:12.872825000', 'queue': u'root.admin',
+        'submitted': self.handle_query_start_time('2017-10-25 15:38:12.872825000'), 'queue': u'root.admin',
         'waiting': True, 'progress': u'2 / 3 (66.6667%)', 'type': u'QUERY', 'waiting_time': u'52m8s'
       }
     ]
@@ -653,7 +662,8 @@ class TestImpalaApi(object):
     response = self.api.app('4d497267f34ff17d:817bdfb500000000')
     for key, value in {'status': u'FINISHED', 'name': u'select * from customers',
       'duration': 3369000.0, 'progress': 66.6667, 'user': u'admin', 'type': 'queries',
-      'id': '4d497267f34ff17d:817bdfb500000000', 'submitted': u'2017-10-25 15:38:12.872825000',
+      'id': '4d497267f34ff17d:817bdfb500000000',
+      'submitted': self.handle_query_start_time('2017-10-25 15:38:12.872825000'),
       'apiStatus': 'SUCCEEDED', 'doc_url': 'http://url.com/query_plan?query_id=4d497267f34ff17d:817bdfb500000000'}.items():
       assert_equal(response.get(key), value)
 
@@ -661,7 +671,8 @@ class TestImpalaApi(object):
 
     for key, value in {'status': u'FINISHED', 'name': u'SELECT sample_07.description, sample_07.salary FROM   sample...',
       'duration': 3355000.0, 'progress': 100.0, 'user': u'admin', 'type': 'queries',
-      'id': '8a46a8865624698f:b80b211500000000', 'submitted': u'2017-10-25 15:38:26.637010000', 'apiStatus': 'SUCCEEDED',
+      'id': '8a46a8865624698f:b80b211500000000',
+      'submitted': self.handle_query_start_time('2017-10-25 15:38:26.637010000'), 'apiStatus': 'SUCCEEDED',
       'doc_url': 'http://url.com/query_plan?query_id=8a46a8865624698f:b80b211500000000'}.items():
       assert_equal(response.get(key), value)
 
@@ -909,6 +920,11 @@ class MockResourceManagerApi(object):
     return {
       u'app': MockResourceManagerApi.APPS[job_id]
     }
+
+  def kill(self, job_id):
+    job_id = job_id.replace('job', 'application')
+    self.APPS[job_id]['state'] = 'KILLED'
+
 
 class MockImpalaQueryApi(object):
   APPS = {

@@ -1,0 +1,120 @@
+[
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "VIEW"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest columns",
+    "beforeCursor": "CREATE VIEW foo AS SELECT a, ",
+    "afterCursor": " FROM tableOne",
+    "hasLocations": true,
+    "containsKeywords": [
+      "*",
+      "CASE"
+    ],
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestAggregateFunctions": {
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "tableOne"
+              }
+            ]
+          }
+        ]
+      },
+      "suggestAnalyticFunctions": true,
+      "suggestFunctions": {},
+      "suggestColumns": {
+        "source": "select",
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "tableOne"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE VIEW ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "IF NOT EXISTS"
+      ],
+      "suggestDatabases": {
+        "appendDot": true
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE VIEW ",
+    "afterCursor": " boo AS SELECT * FROM baa;",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "IF NOT EXISTS"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE VIEW IF ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "NOT EXISTS"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE VIEW IF NOT ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "EXISTS"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE VIEW boo AS ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "SELECT"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "CREATE VIEW IF NOT EXISTS boo AS ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "SELECT"
+      ]
+    }
+  }
+]

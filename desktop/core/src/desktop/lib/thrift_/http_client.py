@@ -31,7 +31,7 @@ if sys.version_info[0] > 2:
 else:
   from cStringIO import StringIO as buffer_writer
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class THttpClient(TTransportBase):
@@ -80,7 +80,10 @@ class THttpClient(TTransportBase):
     self._headers.update(timeout=str(int(ms / 1000)))
 
   def setCustomHeaders(self, headers):
-    self._headers = headers
+    if self._headers:
+      self._headers.update(headers)
+    else:
+      self._headers = headers
 
   def read(self, sz):
     return self._data

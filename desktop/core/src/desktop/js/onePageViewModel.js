@@ -59,7 +59,7 @@ class OnePageViewModel {
           waitForObservable(viewModel.selectedNotebook, () => {
             if (viewModel.editorType() !== type) {
               viewModel.selectedNotebook().selectedSnippet(type);
-              if (!window.ENABLE_NOTEBOOK_2) {
+              if (!window.ENABLE_HUE_5) {
                 viewModel.editorType(type);
               }
               viewModel.newNotebook(type);
@@ -317,9 +317,6 @@ class OnePageViewModel {
       huePubSub.publish('hue.datatable.search.hide');
       huePubSub.publish('hue.scrollleft.hide');
       huePubSub.publish('context.panel.visible', false);
-      if (app === 'filebrowser') {
-        $(window).unbind('hashchange.fblist');
-      }
       if (app.startsWith('oozie')) {
         huePubSub.clearAppSubscribers('oozie');
       }
@@ -600,7 +597,7 @@ class OnePageViewModel {
                   self.isLoadingEmbeddable(true);
                   viewModel
                     .openNotebook(getUrlParameter('editor'))
-                    [window.ENABLE_NOTEBOOK_2 ? 'finally' : 'always'](() => {
+                    [window.ENABLE_HUE_5 ? 'finally' : 'always'](() => {
                       self.isLoadingEmbeddable(false);
                     });
                 });
@@ -618,12 +615,6 @@ class OnePageViewModel {
         }
       },
       { url: '/filebrowser/view=*', app: 'filebrowser' },
-      {
-        url: '/filebrowser/download=*',
-        app: function (ctx) {
-          location.href = window.HUE_BASE_URL + '/filebrowser/download=' + ctx.params[0];
-        }
-      },
       {
         url: '/filebrowser/*',
         app: function () {
@@ -700,11 +691,9 @@ class OnePageViewModel {
           if (notebookId !== '') {
             self.getActiveAppViewModel(viewModel => {
               self.isLoadingEmbeddable(true);
-              viewModel
-                .openNotebook(notebookId)
-                [window.ENABLE_NOTEBOOK_2 ? 'finally' : 'always'](() => {
-                  self.isLoadingEmbeddable(false);
-                });
+              viewModel.openNotebook(notebookId)[window.ENABLE_HUE_5 ? 'finally' : 'always'](() => {
+                self.isLoadingEmbeddable(false);
+              });
             });
           } else {
             self.getActiveAppViewModel(viewModel => {
@@ -831,13 +820,31 @@ class OnePageViewModel {
       });
     });
 
+    const getModifiedCtxParamForFilePath = (ctx, mappingUrl) => {
+      // FIX. The page library decodes the ctx.params differently than it decodes
+      // the ctx.path, e.g. '+' is turned into ' ' which we don't want. Therefore we use
+      // the path to extract the params manually and get the correct characters.
+      const pathWithoutParams = mappingUrl.slice(0, -1);
+      const paramsOnly = ctx.path.replace(pathWithoutParams, '');
+      const filePathParam = decodeURIComponent(paramsOnly);
+
+      // Unfortunate hack needed since % has to be double encoded since the page library
+      // decodes it twice. This is temporarily double encoding only between the
+      // huePubSub.publish('open.link', fullUrl); and the onePgeViewModel.js.
+      return filePathParam.replaceAll('%25', '%');
+    };
+
     pageMapping.forEach(mapping => {
       page(
         mapping.url,
         _.isFunction(mapping.app)
           ? mapping.app
           : ctx => {
-              self.currentContextParams(ctx.params);
+              const ctxParams =
+                mapping.app === 'filebrowser'
+                  ? { 0: getModifiedCtxParamForFilePath(ctx, mapping.url) }
+                  : ctx.params;
+              self.currentContextParams(ctxParams);
               self.currentQueryString(ctx.querystring);
               self.loadApp(mapping.app);
             }
@@ -879,6 +886,45 @@ class OnePageViewModel {
         console.warn('Received an open.link without href.');
       }
     });
+
+    huePubSub.subscribe(
+      'open.filebrowserlink',
+      ({ pathPrefix, decodedPath, fileBrowserModel, browserTarget }) => {
+        if (pathPrefix.includes('download=')) {
+          // The download view on the backend requires the slashes not to
+          // be encoded in order for the file to be correctly named.
+          const encodedPath = encodeURIComponent(decodedPath).replaceAll('%2F', '/');
+          const possibleKnoxUrlPathPrefix = window.HUE_BASE_URL;
+          window.location = possibleKnoxUrlPathPrefix + pathPrefix + encodedPath;
+          return;
+        }
+
+        const appPrefix = '/hue';
+        const urlEncodedPercentage = '%25';
+        // Fix. The '%' character needs to be encoded twice due to a bug in the page library
+        // that decodes the url twice. Even when we don't directly call page() we still need this
+        // fix since the user can reload the page which will trigger a call to page().
+        const pageFixedEncodedPath = encodeURIComponent(
+          decodedPath.replaceAll('%', urlEncodedPercentage)
+        );
+        const href = window.HUE_BASE_URL + appPrefix + pathPrefix + pageFixedEncodedPath;
+
+        if (browserTarget) {
+          window.open(href, browserTarget);
+          return;
+        }
+
+        // We don't want reload the entire filebrowser when navigating between folders
+        // and already on the listdir_components page.
+        if (fileBrowserModel) {
+          fileBrowserModel.targetPath(pathPrefix + encodeURIComponent(decodedPath));
+          window.history.pushState(null, '', href);
+          fileBrowserModel.retrieveData();
+        } else {
+          page(href);
+        }
+      }
+    );
   }
 }
 

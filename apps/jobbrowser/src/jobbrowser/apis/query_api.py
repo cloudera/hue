@@ -23,6 +23,8 @@ import re
 import sys
 import time
 from datetime import datetime
+import pytz
+from babel import localtime
 
 from desktop.lib import export_csvxls
 from libanalyze import analyze as analyzer, rules
@@ -36,12 +38,12 @@ else:
   from django.utils.translation import ugettext as _
 
 ANALYZER = rules.TopDownAnalysis() # We need to parse some files so save as global
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 try:
   from beeswax.models import Session
   from impala.server import get_api as get_impalad_api, _get_impala_server_url
-except Exception as e:
+except ImportError as e:
   LOG.exception('Some application are not enabled: %s' % e)
 
 
@@ -73,6 +75,10 @@ class QueryApi(Api):
     jobs_iter = itertools.chain(jobs['in_flight_queries'], jobs['completed_queries'])
     jobs_iter_filtered = self._n_filter(filter_list, jobs_iter)
 
+    #apps['submitted'] time is stripped to microseconds and converted from type string to datetime object using
+    #datetime.strptime() to fetch the local time instead of the UTC time. Finally, The local time is converted to type string
+    #using datetime.strftime()
+
     apps = {
       'apps': sorted([{
         'id': job['query_id'],
@@ -90,7 +96,8 @@ class QueryApi(Api):
             job['duration'],
             re.MULTILINE
         ).groups()),
-        'submitted': job['start_time'],
+        'submitted': datetime.strptime(job['start_time'][:-3], "%Y-%m-%d %H:%M:%S.%f").
+          replace(tzinfo=pytz.utc).astimezone(localtime._get_localzone()).strftime("%Y-%m-%d %H:%M:%S.%f"),
         # Extra specific
         'rows_fetched': job['rows_fetched'],
         'waiting': job['waiting'],

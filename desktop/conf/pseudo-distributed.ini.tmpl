@@ -99,6 +99,15 @@
   # This is available for the Impala service only currently. It is highly recommended to only point to a series of coordinator-only nodes only.
   # enable_smart_thrift_pool=false
 
+  # Limits for request headers
+  ## limit_request_field_size=8190
+  ## limit_request_fields=100
+  ## limit_request_line=4094
+
+  # Flag to disable webpage caching. Enabling this flag will reduce the performance of the application but it ensures
+  # that the client is always receiving the latest version of the resource.
+  ## custom_cache_control=true
+
   # Filename of SSL Certificate
   ## ssl_certificate=
 
@@ -124,7 +133,7 @@
   ## secure_browser_xss_filter=true
 
   # X-Content-Type-Options: nosniff This is a HTTP response header feature that helps prevent attacks based on MIME-type confusion.
-  ## secure_content_security_policy="script-src 'self' 'unsafe-inline' 'unsafe-eval' *.google-analytics.com *.doubleclick.net data:;img-src 'self' *.google-analytics.com *.doubleclick.net http://*.tile.osm.org *.tile.osm.org *.gstatic.com data:;style-src 'self' 'unsafe-inline' fonts.googleapis.com;connect-src 'self';frame-src *;child-src 'self' data: *.vimeo.com;object-src 'none'"
+  ## secure_content_security_policy="script-src 'self' 'unsafe-inline' 'unsafe-eval' *.googletagmanager.com *.doubleclick.net data:;img-src 'self' *.doubleclick.net http://*.tile.osm.org *.tile.osm.org *.gstatic.com data:;style-src 'self' 'unsafe-inline' fonts.googleapis.com;connect-src 'self' *.google-analytics.com;frame-src *;child-src 'self' data: *.vimeo.com;object-src 'none'"
 
   # Strict-Transport-Security HTTP Strict Transport Security(HSTS) is a policy which is communicated by the server to the user agent via HTTP response header field name "Strict-Transport-Security". HSTS policy specifies a period of time during which the user agent(browser) should only access the server in a secure fashion(https).
   ## secure_ssl_redirect=False
@@ -139,7 +148,7 @@
   # https://wiki.mozilla.org/Security/Server_Side_TLS v3.7 intermediate
   # recommendation, which should be compatible with Firefox 1, Chrome 1, IE 7,
   # Opera 5 and Safari 1.
-  ## ssl_cipher_list=ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-DSS-AES128-GCM-SHA256:kEDH+AESGCM:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA:ECDHE-ECDSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-DSS-AES128-SHA256:DHE-RSA-AES256-SHA256:DHE-DSS-AES256-SHA:DHE-RSA-AES256-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:AES:CAMELLIA:DES-CBC3-SHA:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!PSK:!aECDH:!EDH-DSS-DES-CBC3-SHA:!EDH-RSA-DES-CBC3-SHA:!KRB5-DES-CBC3-SHA
+  ## ssl_cipher_list=ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!PSK:!aECDH:!EDH-DSS-DES-CBC3-SHA:!EDH-RSA-DES-CBC3-SHA:!KRB5-DES-CBC3-SHA
 
   # Path to default Certificate Authority certificates.
   ## ssl_cacerts=/etc/hue/cacerts.pem
@@ -159,6 +168,7 @@
   # Help improve Hue with anonymous usage analytics.
   # Use Google Analytics to see how many times an application or specific section of an application is used, nothing more.
   ## collect_usage=true
+  ## gtag_id='G-25K7599S1Q'
 
   # Tile layer server URL for the Leaflet map charts
   # Read more on http://leafletjs.com/reference.html#tilelayer
@@ -181,6 +191,12 @@
   # Enable X-Forwarded-Host header if the load balancer requires it.
   ## use_x_forwarded_host=true
 
+  # Enable X-Forwarded-For header if hive/impala requires it.
+  ## enable_xff_for_hive_impala=true
+
+  # Enable X-CSRF-Token header if hive/impala requires it.
+  ## enable_x_csrf_token_for_hive_impala=true
+
   # Support for HTTPS termination at the load-balancer level with SECURE_PROXY_SSL_HEADER.
   ## secure_proxy_ssl_header=false
 
@@ -192,6 +208,14 @@
   # For example, to restrict to your local domain and FQDN, the following value can be used:
   # ^\/.*$,^http:\/\/www.mydomain.com\/.*$
   ## redirect_whitelist=^(\/[a-zA-Z0-9]+.*|\/)$
+
+  # Image version/ Build version of Hue
+  # hue_image_version="2022.2.2.1"
+  ## hue_image_version=
+
+  # Name of the Hue host
+  # hue_host="hue-hive-1"
+  ## hue_host=
 
   # Comma separated list of apps to not load at server startup.
   # e.g.: pig,zookeeper
@@ -288,12 +312,6 @@
   # Comma separated list of strings representing the host/domain names that the Hue server can serve.
   # e.g.: localhost,domain1,*
   ## allowed_hosts="*"
-
-  # Allow use django debug tool with Chrome browser for debugging issue, django_debug_mode must be true also
-  ## enable_django_debug_tool=false
-
-  # Comma separated list of users' username that allow to use django debug tool. If it is empty, all users are allowed.
-  ## django_debug_tool_users=
 
   # Number of characters in rest api reponse calls to dump to the logs when debug is enabled. Set to -1 for entire response.
   ## rest_response_size=2000
@@ -437,16 +455,17 @@
     ## reverse_proxy_header=HTTP_X_FORWARDED_FOR
 
     [[[jwt]]]
-      # Adds custom JWT Authentication backend for REST APIs in top priority.
-      ## is_enabled=false
-
       # Endpoint to fetch the public key from verification server.
+      # Also adds custom JWT Authentication backend for REST APIs in top priority if set.
       ## key_server_url=https://ext_authz:8000
 
-      # The identifier of the service issued the JWT
+      # The JWT payload header containing the username.
+      ## username_header=sub
+
+      # The identifier of the service issued the JWT.
       ## issuer=None
 
-      # The identifier of the resource intend to access
+      # The identifier of the resource intend to access.
       ## audience=None
 
       # Verify custom JWT signature.
@@ -904,6 +923,30 @@
         # The JSON credentials to authenticate to Google Cloud e.g. '{ "type": "service_account", "project_id": .... }'
         # json_credentials=None
 
+  ## Configuration for Ozone File System
+  # ------------------------------------------------------------------------
+  [[ozone]]
+    # Default Ozone cluster
+    [[[default]]]
+      # Enter the filesystem URI
+      fs_defaultfs=ofs://localhost:8020
+
+      # NameNode logical name.
+      ## logical_name=
+
+      # Use HttpFS as the communication mechanism.
+      # Domain should be the HttpFS host and port.
+      # Default port is 9778 for HttpFS.
+      ## webhdfs_url=http://localhost:9778/webhdfs/v1
+
+      # Whether Ozone requires client to perform Kerberos authentication.
+      ## security_enabled=false
+
+      # Choose whether Hue should validate certificates received from the server.
+      ## ssl_cert_ca_verify=true
+
+      # Directory of the Ozone configuration
+      ## ozone_conf_dir=$OZONE_CONF_DIR when set or '/etc/ozone/conf'
 
   ## Configuration for RAZ service integration
   # ------------------------------------------------------------------------
@@ -914,9 +957,11 @@
   ## Endpoint to contact
   # api_url=https://localhost:8080
 
-  ## How to authenticate against: KERBEROS or JWT (not supported yet)
+  ## How to authenticate against: KERBEROS or JWT
   # api_authentication=KERBEROS
 
+  ## Autocreate the user home directory in the remote home storage path.
+  # autocreate_user_dir=true
 
 ###########################################################################
 # Settings to configure the snippets available in the Notebook
@@ -1204,6 +1249,9 @@
       # Whether Hue should list this HDFS cluster. For historical reason there is no way to disable HDFS.
       ## is_enabled=true
 
+  # Size, in bytes, of the chunks Django should store into memory and feed into the handler. Default is 64MB.
+  ## upload_chunk_size=64*1024*1024
+
   # Configuration for YARN (MR2)
   # ------------------------------------------------------------------------
   [[yarn_clusters]]
@@ -1325,6 +1373,9 @@
 
   # Timeout in seconds for thrift calls to Hive service
   ## server_conn_timeout=120
+
+  # Timeout in seconds for zookeeper connectivity to get the znode information
+  ## zookeeper_conn_timeout=30
 
   # Choose whether to use the old GetLog() thrift call from before Hive 0.14 to retrieve the logs.
   # If false, use the FetchResults() thrift call from Hive 1.0 or more instead.
@@ -1568,6 +1619,13 @@
   # Optionally set this if you want a different home directory path. e.g. s3a://gethue.
   ## remote_storage_home=s3a://gethue
 
+  # Optionally set this to control the caching strategy for files download
+  ## file_download_cache_control=no-store, no-cache, max-age=0, must-revalidate, proxy-revalidate
+
+  # A limit on a file size (bytes) that can be uploaded to a filesystem.
+  # A value of -1 means there will be no limit.
+  ## max_file_size_upload_limit=-1
+
 
 ###########################################################################
 # Settings to configure Pig
@@ -1654,6 +1712,8 @@
   ## Query sent when no term is entered
   ## empty_query=*:*
 
+  ## Download limit with max of 15k
+  ## download_limit=1000
 
 ###########################################################################
 # Settings to configure Solr API lib
@@ -1736,15 +1796,15 @@
   # Show the Hive section for listing the query history and providing more troubleshooting information.
   ## enable_hive_query_browser=false
 
-  # Show the Queries section for listing Hive/Impala query history and providing more troubleshooting information.
-  ## enable_queries_list=false
-
   # Use the proxy API instead of the ORM to access the query_store.
   ## use_proxy=true
 
   [[query_store]]
     # URL of Query Store API server.
-    ##server_url=http://localhost:8080/
+    ##server_url=
+
+    # Show the Hive/Impala queries UI. The value is automatically set to false if server_url is empty, else true.
+    ##is_enabled=false
 
 ###########################################################################
 # Settings to configure Sentry / Security App.

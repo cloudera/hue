@@ -45,7 +45,7 @@ else:
   from django.utils.translation import ugettext as _
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class Command(BaseCommand):
@@ -369,7 +369,10 @@ class Command(BaseCommand):
 
     if ENABLE_V2.get():
       with transaction.atomic():
-        management.call_command('loaddata', 'initial_oozie_examples.json', verbosity=2, commit=False)
+        if sys.version_info[0] > 2:
+          management.call_command('loaddata', 'initial_oozie_examples.json', verbosity=2)
+        else:
+          management.call_command('loaddata', 'initial_oozie_examples.json', verbosity=2, commit=False)
 
     # Install editor oozie examples without doc1 link
     LOG.info("Using Hue 4, will install oozie editor samples.")

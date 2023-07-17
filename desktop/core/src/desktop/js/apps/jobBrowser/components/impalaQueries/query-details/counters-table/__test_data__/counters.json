@@ -1,0 +1,57 @@
+[
+  {
+    "title": "Counter set 1",
+    "counters": [
+      {
+        "counterGroupName": "test-group1",
+        "counters": [
+          {
+            "counterName": "test-counter1",
+            "counterValue": "str-val1"
+          },
+          {
+            "counterName": "test-counter2",
+            "counterValue": "str-val2"
+          },
+          {
+            "counterName": "test-counter3",
+            "counterValue": "1"
+          }
+        ]
+      }
+    ],
+    "cssClass": "test-class1"
+  },
+  {
+    "title": "Counter set 2",
+    "counters": [
+      {
+        "counterGroupName": "test-group1",
+        "counters": [
+          {
+            "counterName": "test-counter1",
+            "counterValue": "str-val3"
+          },
+          {
+            "counterName": "test-counter2",
+            "counterValue": "str-val4"
+          },
+          {
+            "counterName": "test-counter3",
+            "counterValue": "2"
+          }
+        ]
+      },
+      {
+        "counterGroupName": "test-group2",
+        "counters": [
+          {
+            "counterName": "test-counter1",
+            "counterValue": "str-val5"
+          }
+        ]
+      }
+    ],
+    "cssClass": "test-class2"
+  }
+]

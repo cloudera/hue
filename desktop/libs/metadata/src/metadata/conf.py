@@ -37,7 +37,7 @@ else:
 OPTIMIZER_AUTH_PASSWORD = None
 NAVIGATOR_AUTH_PASSWORD = None
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 def get_auth_username():

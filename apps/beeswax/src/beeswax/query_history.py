@@ -41,7 +41,7 @@ else:
   from django.utils.translation import ugettext as _
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 QUERY_HISTORY_CACHE_MAX_USER_COUNT = 10
 QUERY_HISTORY_CACHE_MAX_LENGTH_PER_USER = 25

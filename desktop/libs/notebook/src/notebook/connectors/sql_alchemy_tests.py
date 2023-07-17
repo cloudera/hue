@@ -38,7 +38,7 @@ else:
   from mock import patch, Mock, MagicMock
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class TestApi(object):
@@ -78,7 +78,7 @@ class TestApi(object):
       'name': 'hive',
       'options': {
         'url': 'awsathena+rest://XXXXXXXXXXXXXXX:XXXXXXXXXXXXXXXXXXX@athena.us-west-2.amazonaws.com:443/default?'
-            's3_staging_dir=s3://gethue-athena/scratch'
+            's3_staging_dir=s3://gethue-athena/scratch&work_group=demo_group&catalog_name=AwsDataCatalog'
       }
     }
 
@@ -243,6 +243,29 @@ class TestApi(object):
       create_engine.assert_called_with('presto://hue:8080/hue',
                                        connect_args={'principal_username': 'test'},
                                        pool_pre_ping=True)
+
+  def test_create_engine_with_impersonation_phoenix(self):
+    interpreter = {
+      'name': 'phoenix',
+      'options': {
+        'url': 'phoenix://hue:8080/hue',
+        'session': {},
+        'has_impersonation': False  # Off
+      }
+    }
+
+    with patch('notebook.connectors.sql_alchemy.create_engine') as create_engine:
+      engine = SqlAlchemyApi(self.user, interpreter)._create_engine()
+
+      create_engine.assert_called_with('phoenix://hue:8080/hue', pool_pre_ping=False)
+
+
+    interpreter['options']['has_impersonation'] = True  # On
+
+    with patch('notebook.connectors.sql_alchemy.create_engine') as create_engine:
+      engine = SqlAlchemyApi(self.user, interpreter)._create_engine()
+
+      create_engine.assert_called_with('phoenix://test@hue:8080/hue', pool_pre_ping=False)
 
 
   def test_explain(self):

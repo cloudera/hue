@@ -25,7 +25,7 @@ from . import confparse
 from hadoop.conf import DEFAULT_NN_HTTP_PORT
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 _HDFS_SITE_DICT = None
 

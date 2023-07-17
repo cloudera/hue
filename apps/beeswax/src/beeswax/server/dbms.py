@@ -39,7 +39,7 @@ from libzookeeper import conf as libzookeeper_conf
 
 from azure.abfs import abfspath
 from beeswax.conf import HIVE_SERVER_HOST, HIVE_SERVER_PORT, HIVE_SERVER_HOST, HIVE_HTTP_THRIFT_PORT, HIVE_METASTORE_HOST, \
-    HIVE_METASTORE_PORT, LIST_PARTITIONS_LIMIT, SERVER_CONN_TIMEOUT, \
+    HIVE_METASTORE_PORT, LIST_PARTITIONS_LIMIT, SERVER_CONN_TIMEOUT, ZOOKEEPER_CONN_TIMEOUT, \
     AUTH_USERNAME, AUTH_PASSWORD, APPLY_NATURAL_SORT_MAX, QUERY_PARTITIONS_LIMIT, HIVE_DISCOVERY_HIVESERVER2_ZNODE, \
     HIVE_DISCOVERY_HS2, HIVE_DISCOVERY_LLAP, HIVE_DISCOVERY_LLAP_HA, HIVE_DISCOVERY_LLAP_ZNODE, CACHE_TIMEOUT, \
     LLAP_SERVER_HOST, LLAP_SERVER_PORT, LLAP_SERVER_THRIFT_PORT, USE_SASL as HIVE_USE_SASL, CLOSE_SESSIONS, has_session_pool, \
@@ -61,7 +61,7 @@ if sys.version_info[0] > 2:
 else:
   from django.utils.translation import ugettext as _
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 RESET_HS2_QUERY_SERVER = False
@@ -83,7 +83,7 @@ reset_ha()
 def get_zk_hs2():
   hiveservers = None
   zk = KazooClient(hosts=libzookeeper_conf.ENSEMBLE.get(), read_only=True)
-  zk.start()
+  zk.start(timeout=ZOOKEEPER_CONN_TIMEOUT.get())
   znode = HIVE_DISCOVERY_HIVESERVER2_ZNODE.get()
   if zk.exists(znode):
     LOG.debug("Selecting up Hive server via the following node {0}".format(znode))
@@ -153,7 +153,7 @@ def get_query_server_config(name='beeswax', connector=None):
         if HIVE_DISCOVERY_LLAP.get():
           LOG.debug("Checking zookeeper for discovering Hive LLAP server endpoint")
           zk = KazooClient(hosts=libzookeeper_conf.ENSEMBLE.get(), read_only=True)
-          zk.start()
+          zk.start(timeout=ZOOKEEPER_CONN_TIMEOUT.get())
           if HIVE_DISCOVERY_LLAP_HA.get():
             znode = "{0}/instances".format(HIVE_DISCOVERY_LLAP_ZNODE.get())
             LOG.debug("Setting up Hive LLAP HA with the following node {0}".format(znode))

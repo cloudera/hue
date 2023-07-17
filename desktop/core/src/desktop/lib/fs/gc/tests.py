@@ -25,7 +25,7 @@ from desktop.conf import is_gs_enabled
 
 from desktop.lib.fsmanager import get_client
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class TestGCS(unittest.TestCase):

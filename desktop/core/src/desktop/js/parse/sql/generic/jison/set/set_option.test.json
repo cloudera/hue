@@ -1,0 +1,62 @@
+[
+  {
+    "namePrefix": "should not report errors",
+    "beforeCursor": "set bla.bla=\"ble\";",
+    "afterCursor": "",
+    "noErrors": true,
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "expectedResult": {
+      "lowerCase": true
+    }
+  },
+  {
+    "namePrefix": "should not report errors",
+    "beforeCursor": "set bla.bla='ble';",
+    "afterCursor": "",
+    "noErrors": true,
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "expectedResult": {
+      "lowerCase": true
+    }
+  },
+  {
+    "namePrefix": "should not report errors",
+    "beforeCursor": "set mem_limit=64g;",
+    "afterCursor": "",
+    "noErrors": true,
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "expectedResult": {
+      "lowerCase": true
+    }
+  },
+  {
+    "namePrefix": "should not report errors",
+    "beforeCursor": "set DISABLE_UNSAFE_SPILLS=true;",
+    "afterCursor": "",
+    "noErrors": true,
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "expectedResult": {
+      "lowerCase": true
+    }
+  },
+  {
+    "namePrefix": "should not report errors",
+    "beforeCursor": "set RESERVATION_REQUEST_TIMEOUT=900000;",
+    "afterCursor": "",
+    "noErrors": true,
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "expectedResult": {
+      "lowerCase": true
+    }
+  }
+]

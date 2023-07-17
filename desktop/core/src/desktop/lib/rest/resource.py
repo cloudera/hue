@@ -29,7 +29,7 @@ from desktop.lib.i18n import smart_unicode
 from desktop.lib.apputil import WARN_LEVEL_CALL_DURATION_MS, INFO_LEVEL_CALL_DURATION_MS
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class Resource(object):

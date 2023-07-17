@@ -19,6 +19,7 @@ import logging
 import requests
 import jwt
 import json
+import sys
 
 from cryptography.hazmat.primitives import serialization
 from rest_framework import authentication, exceptions
@@ -28,7 +29,7 @@ from desktop.conf import ENABLE_ORGANIZATIONS, AUTH
 
 from useradmin.models import User
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class JwtAuthentication(authentication.BaseAuthentication):
@@ -52,19 +53,25 @@ class JwtAuthentication(authentication.BaseAuthentication):
 
     LOG.debug('JwtAuthentication: got access token from %s: %s' % (request.path, access_token))
 
-    public_key_pem = ''
-    if AUTH.JWT.VERIFY.get():
-      public_key_pem = self._handle_public_key(access_token)
+    try:
+      public_key_pem = self._handle_public_key(access_token) if AUTH.JWT.VERIFY.get() else ''
+    except Exception as e:
+      LOG.error('JwtAuthentication: Error fetching public key %s' % str(e))
+      raise exceptions.AuthenticationFailed(e)
+
+    params = {
+      'jwt': access_token,
+      'key': public_key_pem,
+      'issuer': AUTH.JWT.ISSUER.get(),
+      'audience': AUTH.JWT.AUDIENCE.get(),
+      'algorithms': ["RS256"],
+      'options': {
+        'verify_signature': AUTH.JWT.VERIFY.get()
+      }
+    }
 
     try:
-      payload = jwt.decode(
-        access_token,
-        public_key_pem,
-        issuer=AUTH.JWT.ISSUER.get(),
-        audience=AUTH.JWT.AUDIENCE.get(),
-        algorithms=["RS256"],
-        verify=AUTH.JWT.VERIFY.get()
-      )
+      payload = jwt.decode(**params)
     except jwt.DecodeError:
       LOG.error('JwtAuthentication: Invalid token')
       raise exceptions.AuthenticationFailed('JwtAuthentication: Invalid token')
@@ -80,14 +87,15 @@ class JwtAuthentication(authentication.BaseAuthentication):
     except Exception as e:
       LOG.error('JwtAuthentication: %s' % str(e))
       raise exceptions.AuthenticationFailed(e)
-    
-    if payload.get('user') is None:
-      LOG.debug('JwtAuthentication: no user ID in token')
+
+
+    if payload.get(AUTH.JWT.USERNAME_HEADER.get()) is None: 
+      LOG.debug('JwtAuthentication: no username in token')
       return None
 
-    LOG.debug('JwtAuthentication: got user ID %s and tenant ID %s' % (payload.get('user'), payload.get('tenantId')))
+    LOG.debug('JwtAuthentication: got username %s' % (payload.get(AUTH.JWT.USERNAME_HEADER.get())))
 
-    user = find_or_create_user(payload.get('user'), is_superuser=False)
+    user = find_or_create_user(payload.get(AUTH.JWT.USERNAME_HEADER.get()), is_superuser=False)
     ensure_has_a_group(user)
     user = rewrite_user(user)
 
@@ -102,19 +110,46 @@ class JwtAuthentication(authentication.BaseAuthentication):
 
   def _handle_public_key(self, access_token):
     token_metadata = jwt.get_unverified_header(access_token)
-    headers = {'kid': token_metadata.get('kid', {})} 
+    kid = token_metadata.get('kid')
+    key_server_url = self._handle_jku_ha()
 
-    if AUTH.JWT.KEY_SERVER_URL.get():
-      response = requests.get(AUTH.JWT.KEY_SERVER_URL.get(), headers=headers)
+    if key_server_url:
+      LOG.debug('Fetching JWKS from URL: %s' % key_server_url)
+      response = requests.get(key_server_url, verify=False)
       jwk = json.loads(response.content)
 
       if jwk.get('keys'):
-        public_key = jwt.algorithms.RSAAlgorithm.from_jwk(json.dumps(jwk["keys"][0])).public_key()
-        public_key_pem = public_key.public_bytes(encoding=serialization.Encoding.PEM,
-                                                 format=serialization.PublicFormat.SubjectPublicKeyInfo)
+        for key in jwk.get('keys'):
+          if key.get('kid') and key.get('kid') == kid:
+            public_key = jwt.algorithms.RSAAlgorithm.from_jwk(json.dumps(key))
+            public_key_pem = public_key.public_bytes(encoding=serialization.Encoding.PEM,
+                                                     format=serialization.PublicFormat.SubjectPublicKeyInfo)
 
-        return public_key_pem
+            return public_key_pem
 
+  def _handle_jku_ha(self):
+    res = None
+
+    key_server_urls = AUTH.JWT.KEY_SERVER_URL.get()
+    if not key_server_urls:
+      return None
+
+    if "," in key_server_urls:
+      key_server_urls_list = key_server_urls.split(',')
+
+      for jku in key_server_urls_list:
+        try:
+          res = requests.get(jku.rstrip('/'), verify=False)
+        except Exception as e:
+          if 'Failed to establish a new connection' in str(e):
+            LOG.warning('JKU %s is not available.' % jku)
+
+        # Check response for None and if response code is successful (200) or authentication needed (401), use that host URL.
+        if (res is not None) and (res.status_code in (200, 401)):
+          return jku
+    else:
+      # For non-HA, it's normal url string.
+      return key_server_urls
 
 class DummyCustomAuthentication(authentication.BaseAuthentication):
   """

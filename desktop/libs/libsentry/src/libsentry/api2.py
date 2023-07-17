@@ -33,7 +33,7 @@ else:
   from django.utils.translation import ugettext as _
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 API_CACHE = None
 API_CACHE_LOCK = threading.Lock()

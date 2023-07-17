@@ -25,7 +25,7 @@ from pyformance.reporters.reporter import Reporter
 from desktop.lib.metrics import global_registry
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class FileReporter(Reporter):
@@ -52,7 +52,13 @@ class FileReporter(Reporter):
         delete=False)
 
     try:
-      json.dump(self.registry.dump_metrics(), f)
+      # import threading
+      # LOG.info("===> FileReporter pid: %d thread: %d" % (os.getpid(), threading.get_ident()))
+      metrics_data = global_registry().get_metrics_shared_data() \
+        if 'rungunicornserver' in sys.argv \
+        else self.registry.dump_metrics()
+
+      json.dump(metrics_data, f)
       f.close()
 
       os.rename(f.name, self.location)

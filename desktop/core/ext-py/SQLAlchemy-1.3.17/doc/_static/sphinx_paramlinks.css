@@ -1,7 +1,0 @@
-a.paramlink {
-	visibility: hidden;
-}
-
-li:hover > a.paramlink {
-   visibility: visible;
-}

@@ -28,8 +28,6 @@ import sys
 # https://docs.djangoproject.com/en/1.7/ref/applications/#django.apps.AppConfig.ready
 #
 
-import debug_toolbar
-
 import desktop.lib.metrics.file_reporter
 desktop.lib.metrics.file_reporter.start_file_reporter()
 
@@ -49,9 +47,9 @@ from desktop import appmanager
 from desktop import views as desktop_views
 from desktop import api as desktop_api
 from desktop import api2 as desktop_api2
-from desktop import api_public_urls
+from desktop import api_public_urls_v1
 from desktop.auth import views as desktop_auth_views
-from desktop.conf import METRICS, USE_NEW_EDITOR, ENABLE_DJANGO_DEBUG_TOOL, ANALYTICS, has_connectors, ENABLE_PROMETHEUS, SLACK
+from desktop.conf import METRICS, USE_NEW_EDITOR, ANALYTICS, has_connectors, ENABLE_PROMETHEUS, SLACK
 from desktop.configuration import api as desktop_configuration_api
 from desktop.lib.vcs import api as desktop_lib_vcs_api
 from desktop.settings import is_oidc_configured
@@ -208,11 +206,11 @@ dynamic_patterns += [
 ]
 
 dynamic_patterns += [
-  re_path('^api/token/auth/?$', TokenObtainPairView.as_view(), name='token_obtain'),
-  re_path('^api/token/verify/?$', TokenVerifyView.as_view(), name='token_verify'),
-  re_path('^api/token/refresh/?$', TokenRefreshView.as_view(), name='token_refresh'),
+  re_path('^api/v1/token/auth/?$', TokenObtainPairView.as_view(), name='token_obtain'),
+  re_path('^api/v1/token/verify/?$', TokenVerifyView.as_view(), name='token_verify'),
+  re_path('^api/v1/token/refresh/?$', TokenRefreshView.as_view(), name='token_refresh'),
 
-  re_path(r'^api/', include(('desktop.api_public_urls', 'api'), 'api')),
+  re_path(r'^api/v1/', include(('desktop.api_public_urls_v1', 'api'), 'api')),
 ]
 
 dynamic_patterns += [
@@ -276,12 +274,6 @@ urlpatterns = []
 urlpatterns.extend(dynamic_patterns)
 urlpatterns.extend(app_urls_patterns)
 urlpatterns.extend(static_patterns)
-
-
-if settings.DEBUG and ENABLE_DJANGO_DEBUG_TOOL.get():
-  urlpatterns += [
-    re_path(r'^__debug__/', include(debug_toolbar.urls)),
-  ]
 
 if is_oidc_configured():
   urlpatterns += [

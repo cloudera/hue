@@ -18,7 +18,7 @@
   import sys
 
   from desktop import conf
-  from desktop.conf import IS_MULTICLUSTER_ONLY, has_multi_clusters
+  from desktop.conf import ENABLE_HUE_5, IS_MULTICLUSTER_ONLY, has_multi_clusters
   from desktop.views import _ko, commonshare, login_modal
   from desktop.lib.i18n import smart_unicode
   from desktop.models import PREFERENCE_IS_WELCOME_TOUR_SEEN, hue_version, get_cluster_config
@@ -28,7 +28,6 @@
   from filebrowser.conf import SHOW_UPLOAD_BUTTON
   from indexer.conf import ENABLE_NEW_INDEXER
   from metadata.conf import has_optimizer, OPTIMIZER
-  from notebook.conf import ENABLE_NOTEBOOK_2
 
   from desktop.auth.backend import is_admin
   from webpack_loader.templatetags.webpack_loader import render_bundle
@@ -45,6 +44,25 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
 <head>
+
+  % if conf.COLLECT_USAGE.get():
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=${conf.GTAG_ID.get()}"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', '${ conf.GTAG_ID.get()}', { 
+        // Prevent GA from accidentally passing client meta data present in urls
+        send_page_view: false, 
+        page_location: 'redacted',
+        page_referrer: 'redacted',
+        allow_google_signals: false
+        });
+    </script>
+  % endif
+
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta charset="utf-8">
   <title>Hue</title>
@@ -127,11 +145,7 @@ ${ hueIcons.symbols() }
   <hue-sidebar-web-component style="flex: 1 1 auto"></hue-sidebar-web-component>
 
   <div class="main-page">
-    % if banner_message or conf.CUSTOM.BANNER_TOP_HTML.get():
-      <div class="banner">
-        ${ banner_message or conf.CUSTOM.BANNER_TOP_HTML.get() | n,unicode }
-      </div>
-    % endif
+    <AppBanner data-reactcomponent='AppBanner'></AppBanner>
 
     <nav class="navbar navbar-default">
       <div class="navbar-inner top-nav">
@@ -200,7 +214,7 @@ ${ hueIcons.symbols() }
       }"><div class="resize-bar"></div></div>
 
       <div class="page-content">
-        <!-- ko if: window.ENABLE_NOTEBOOK_2 -->
+        <!-- ko if: window.ENABLE_HUE_5 -->
         <!-- ko component: 'session-panel' --><!-- /ko -->
         <!-- /ko -->
         <!-- ko hueSpinner: { spin: isLoadingEmbeddable, center: true, size: 'xlarge', blackout: true } --><!-- /ko -->
@@ -265,7 +279,7 @@ ${ hueIcons.symbols() }
           }
         }" style="display: none;"></div>
 
-      %if not ENABLE_NOTEBOOK_2.get():
+      %if not ENABLE_HUE_5.get():
       <div class="context-panel" data-bind="slideVisible: contextPanelVisible">
         <div class="margin-top-10 padding-left-10 padding-right-10">
           <h4 class="margin-bottom-30"><i class="fa fa-cogs"></i> ${_('Session')}</h4>
@@ -326,7 +340,6 @@ ${ commonHeaderFooterComponents.header_pollers(user, is_s3_enabled, apps) }
 ${ smart_unicode(login_modal(request).content) | n,unicode }
 % endif
 
-<div class="shepherd-backdrop"></div>
 
 <iframe id="zoomDetectFrame" style="width: 250px; display: none" ></iframe>
 
@@ -441,7 +454,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
     %if is_admin(user):
       tour.addStep('admin', {
         text: '${ _ko('As a superuser, you can check system configuration from the user menu and install sample data and jobs for your users.') }',
-        attachTo: '.hue-sidebar .shepherd-user-menu right'
+        attachTo: '.server-position-pointer-welcome-tour left'
       });
     %endif
 

@@ -39,7 +39,6 @@ module.exports = function(grunt) {
           'desktop/core/src/desktop/static/desktop/css/hue.css': 'desktop/core/src/desktop/static/desktop/less/hue.less',
           'desktop/core/src/desktop/static/desktop/css/hue3-extra.css': 'desktop/core/src/desktop/static/desktop/less/hue3-extra.less',
           'desktop/core/src/desktop/static/desktop/css/login.css': 'desktop/core/src/desktop/static/desktop/less/login.less',
-          'desktop/core/src/desktop/static/desktop/css/login4.css': 'desktop/core/src/desktop/static/desktop/less/login4.less',
           'desktop/core/src/desktop/static/desktop/css/httperrors.css': 'desktop/core/src/desktop/static/desktop/less/httperrors.less',
           'apps/metastore/src/metastore/static/metastore/css/metastore.css': 'apps/metastore/src/metastore/static/metastore/less/metastore.less',
           'desktop/libs/notebook/src/notebook/static/notebook/css/notebook.css': 'desktop/libs/notebook/src/notebook/static/notebook/less/notebook.less',

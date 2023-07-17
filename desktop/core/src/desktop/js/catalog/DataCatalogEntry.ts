@@ -180,7 +180,7 @@ export interface NavigatorMeta extends TimestampedData {
 }
 
 export interface TableAnalysis extends TimestampedData {
-  cols: { comment?: string | null; type: string; name: string };
+  cols: { comment?: string | null; type: string; name: string }[];
   comment?: string | null;
   details: {
     properties: { [propertyKey: string]: string };
@@ -1412,6 +1412,22 @@ export default class DataCatalogEntry {
       return true;
     }
     return false;
+  }
+
+  getHdfsFilePath(): string {
+    const hdfs_link = this.analysis?.hdfs_link || '';
+    return hdfs_link.replace('/filebrowser/view=', '');
+  }
+
+  /**
+   * Returns true if the entry is an Iceberg table
+   */
+  isIcebergTable(): boolean {
+    return this.analysis?.details?.stats?.table_type === 'ICEBERG';
+  }
+
+  isTransactionalTable(): boolean {
+    return this.analysis?.details?.stats?.transactional === 'true';
   }
 
   /**

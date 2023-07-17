@@ -41,4 +41,6 @@
 /desktop/core/src/desktop/js/parse/sql/dasksql/dasksqlAutocompleteParser.js
 /desktop/core/src/desktop/js/parse/sql/dasksql/dasksqlSyntaxParser.js
 /desktop/core/src/desktop/js/parse/sql/dasksql/spec/dasksqlAutocompleteParser_Locations_Spec.js
+/desktop/core/src/desktop/js/parse/sql/sparksql/sparksqlAutocompleteParser.js
+/desktop/core/src/desktop/js/parse/sql/sparksql/sparksqlSyntaxParser.js
 **/node_modules/**

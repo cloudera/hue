@@ -23,7 +23,7 @@ from django.utils.encoding import smart_str
 from desktop.lib import export_csvxls
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 DL_FORMATS = [ 'csv', 'xls' ]
 
 

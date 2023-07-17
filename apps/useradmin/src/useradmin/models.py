@@ -76,7 +76,7 @@ else:
   monkey_patch_username_validator()
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class UserProfile(models.Model):
@@ -297,6 +297,7 @@ def update_app_permissions(**kwargs):
             not (new_dp.app == 'filebrowser' and new_dp.action == 'gs_access' and not is_idbroker_enabled('gs')) and \
             not (new_dp.app == 'filebrowser' and new_dp.action == 'adls_access') and \
             not (new_dp.app == 'filebrowser' and new_dp.action == 'abfs_access') and \
+            not (new_dp.app == 'filebrowser' and new_dp.action == 'ofs_access') and \
             not (new_dp.app == 'oozie' and new_dp.action == 'disable_editor_access'):
           GroupPermission.objects.create(group=default_group, hue_permission=new_dp)
 

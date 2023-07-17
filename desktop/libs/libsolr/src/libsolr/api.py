@@ -51,11 +51,11 @@ else:
   from urllib import unquote as urllib_unquote
   new_str = unicode
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 try:
-  from search.conf import EMPTY_QUERY, SECURITY_ENABLED, SOLR_URL
+  from search.conf import EMPTY_QUERY, SECURITY_ENABLED, SOLR_URL, DOWNLOAD_LIMIT
 except ImportError as e:
   LOG.warning('Solr Search is not enabled')
 
@@ -100,13 +100,13 @@ class SolrApi(object):
     solr_query['collection'] = collection['name']
 
     if query.get('download'):
-      solr_query['rows'] = 1000
+      solr_query['rows'] = min(DOWNLOAD_LIMIT.get(), 15000)
       solr_query['start'] = 0
     else:
       solr_query['rows'] = int(collection['template']['rows'] or 10)
       solr_query['start'] = int(query['start'])
 
-    solr_query['rows'] = min(solr_query['rows'], 1000)
+    solr_query['rows'] = min(solr_query['rows'], min(DOWNLOAD_LIMIT.get(), 15000))
     solr_query['start'] = min(solr_query['start'], 10000)
 
     params = self._get_params() + (
@@ -139,11 +139,14 @@ class SolrApi(object):
               'mincount': int(facet['properties']['mincount'])
           }
 
-          if facet['properties']['canRange'] or timeFilter and timeFilter['time_field'] == facet['field'] and (facet['id'] not in timeFilter['time_filter_overrides'] or facet['widgetType'] != 'histogram-widget'):
+          if facet['properties']['canRange'] or timeFilter and timeFilter['time_field'] == facet['field'] and \
+              (facet['id'] not in timeFilter['time_filter_overrides'] or facet['widgetType'] != 'histogram-widget'):
             keys.update(self._get_time_filter_query(timeFilter, facet, collection))
 
           params += (
-             ('facet.range', '{!key=%(key)s ex=%(id)s f.%(field)s.facet.range.start=%(start)s f.%(field)s.facet.range.end=%(end)s f.%(field)s.facet.range.gap=%(gap)s f.%(field)s.facet.mincount=%(mincount)s}%(field)s' % keys),
+             ('facet.range', '{!key=%(key)s ex=%(id)s f.%(field)s.facet.range.start=%(start)s '
+                             'f.%(field)s.facet.range.end=%(end)s f.%(field)s.facet.range.gap=%(gap)s '
+                             'f.%(field)s.facet.mincount=%(mincount)s}%(field)s' % keys),
           )
         elif facet['type'] == 'field':
           keys = {
@@ -155,12 +158,14 @@ class SolrApi(object):
           }
 
           params += (
-              ('facet.field', '{!key=%(key)s ex=%(id)s f.%(field)s.facet.limit=%(limit)s f.%(field)s.facet.mincount=%(mincount)s}%(field)s' % keys),
+              ('facet.field', '{!key=%(key)s ex=%(id)s f.%(field)s.facet.limit=%(limit)s '
+                              'f.%(field)s.facet.mincount=%(mincount)s}%(field)s' % keys),
           )
         elif facet['type'] == 'nested':
           _f = {}
           if facet['properties']['facets']:
-            self._n_facet_dimension(facet, _f, facet['properties']['facets'], 1, timeFilter, collection, can_range = facet['properties']['canRange'])
+            self._n_facet_dimension(facet, _f, facet['properties']['facets'], 1, timeFilter, collection,
+                                    can_range=facet['properties']['canRange'])
 
           if facet['properties'].get('domain'):
             if facet['properties']['domain'].get('blockParent') or facet['properties']['domain'].get('blockChildren'):
@@ -229,7 +234,8 @@ class SolrApi(object):
                 'fields_limits': ' '.join(fields_limits)
             }
             params += (
-                ('facet.pivot', '{!key=%(key)s ex=%(id)s f.%(field)s.facet.limit=%(limit)s f.%(field)s.facet.mincount=%(mincount)s %(fields_limits)s}%(fields)s' % keys),
+                ('facet.pivot', '{!key=%(key)s ex=%(id)s f.%(field)s.facet.limit=%(limit)s '
+                                'f.%(field)s.facet.mincount=%(mincount)s %(fields_limits)s}%(fields)s' % keys),
             )
 
     params += self._get_fq(collection, query)
@@ -332,7 +338,8 @@ class SolrApi(object):
         })
 
         # Only on dim 1 currently
-        if can_range or (timeFilter and timeFilter['time_field'] == facet['field'] and (widget['id'] not in timeFilter['time_filter_overrides'])): # or facet['widgetType'] != 'bucket-widget'):
+        if can_range or (timeFilter and timeFilter['time_field'] == facet['field']
+                         and (widget['id'] not in timeFilter['time_filter_overrides'])): # or facet['widgetType'] != 'bucket-widget'):
           facet['widgetType'] = widget['widgetType']
           _f[f_name].update(self._get_time_filter_query(timeFilter, facet, collection))
 
@@ -528,7 +535,8 @@ class SolrApi(object):
         ('wt', 'json'),
       )
 
-      response = self._root.post('%(collection)s/config' % {'collection': name}, params=params, data=json.dumps(properties), contenttype='application/json')
+      response = self._root.post('%(collection)s/config' % {'collection': name}, params=params,
+                                 data=json.dumps(properties), contenttype='application/json')
       return self._get_json(response)
     except RestException as e:
       raise PopupException(e, title=_('Error while accessing Solr'))
@@ -542,7 +550,8 @@ class SolrApi(object):
 
       data = {'add-field': fields}
 
-      response = self._root.post('%(collection)s/schema' % {'collection': name}, params=params, data=json.dumps(data), contenttype='application/json')
+      response = self._root.post('%(collection)s/schema' % {'collection': name}, params=params,
+                                 data=json.dumps(data), contenttype='application/json')
       return self._get_json(response)
     except RestException as e:
       raise PopupException(e, title=_('Error while accessing Solr'))
@@ -603,7 +612,7 @@ class SolrApi(object):
         LOG.error(msg)
         raise PopupException(msg)
     except RestException as e:
-        raise PopupException(e, title=_('Error while accessing Solr'))
+      raise PopupException(e, title=_('Error while accessing Solr'))
 
 
   def delete_collection(self, name):
@@ -831,7 +840,8 @@ class SolrApi(object):
     elif content_type == 'json':
       content_type = 'application/json'
     else:
-      LOG.error("Trying to update collection  %s with content type %s. Allowed content types: csv/json" % (collection_or_core_name, content_type))
+      LOG.error("Trying to update collection  %s with content type %s. Allowed content types: "
+                "csv/json" % (collection_or_core_name, content_type))
 
     params = self._get_params() + (
         ('wt', 'json'),
@@ -906,7 +916,7 @@ class SolrApi(object):
 
   def _get_params(self):
     if self.security_enabled:
-      return (('doAs', self._user ),)
+      return (('doAs', self._user),)
     return (('user.name', SERVER_USER.get()), ('doAs', self._user),)
 
   def _get_q(self, query):
@@ -979,7 +989,8 @@ class SolrApi(object):
       }
     else:
       props = {}
-      # If the start & end are equal to min/max, then we want to show the whole domain. Since min/max can change, we fetch latest values and update start/end
+      # If the start & end are equal to min/max, then we want to show the whole domain. Since min/max can change,
+      # we fetch latest values and update start/end
       if properties['start'] == properties['min'] and properties['end'] == properties['max']:
         stats_json = self.stats(collection['name'], [facet['field']])
         stat_facet = stats_json['stats']['stats_fields'][facet['field']]
@@ -987,7 +998,7 @@ class SolrApi(object):
         properties['end'] = None
       else: # the user has zoomed in. Only show that section.
         stat_facet = {'min': properties['min'], 'max': properties['max']}
-      _compute_range_facet(facet['widgetType'], stat_facet, props, properties['start'], properties['end'], SLOTS = properties['slot'])
+      _compute_range_facet(facet['widgetType'], stat_facet, props, properties['start'], properties['end'], SLOTS=properties['slot'])
       return {
         'start': '%(start)s' % props,
         'end': '%(end)s' % props,
@@ -1035,15 +1046,18 @@ class SolrApi(object):
                 value = "*"
                 exclude = '-'
                 f.append('%s%s:%s' % (exclude, field, value))
-          _params ='{!tag=%(id)s}' % fq + ' '.join(f)
+          _params = '{!tag=%(id)s}' % fq + ' '.join(f)
           params += (('fq', urllib_unquote(utf_quoter(_params))),)
       elif fq['type'] == 'range':
         params += (('fq', '{!tag=%(id)s}' % fq + ' '.join([urllib_unquote(
-                    utf_quoter('%s%s:[%s TO %s}' % ('-' if field['exclude'] else '', fq['field'], f['from'], f['to']))) for field, f in zip(fq['filter'], fq['properties'])])),)
+                    utf_quoter('%s%s:[%s TO %s}' % ('-' if field['exclude'] else '', fq['field'], f['from'], f['to'])
+                               )) for field, f in zip(fq['filter'], fq['properties'])])),)
       elif fq['type'] == 'range-up':
         params += (('fq', '{!tag=%(id)s}' % fq + ' '.join([urllib_unquote(
-                    utf_quoter('%s%s:[%s TO %s}' % ('-' if field['exclude'] else '', fq['field'], f['from'] if fq['is_up'] else '*', '*' if fq['is_up'] else f['from'])))
-                                                          for field, f in zip(fq['filter'], fq['properties'])])),)
+                    utf_quoter('%s%s:[%s TO %s}' %
+                               ('-' if field['exclude'] else '', fq['field'], f['from']
+                               if fq['is_up'] else '*', '*' if fq['is_up'] else f['from'])))
+          for field, f in zip(fq['filter'], fq['properties'])])),)
       elif fq['type'] == 'map':
         _keys = fq.copy()
         _keys.update(fq['properties'])

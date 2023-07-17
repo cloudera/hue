@@ -27,6 +27,7 @@ CONTAINER_HUE_OPT=/opt
 # This step is performed inside the docker(compile step)
 compile_py3hue() {
   export HUE_HOME="/opt/${HUEUSER}"
+  export ROOT="/opt/${HUEUSER}"
   mkdir -p $CONTAINER_HUE_OPT
   cd $CONTAINER_HUE_SRC
   INSTALL_DIR=${HUE_HOME} make install

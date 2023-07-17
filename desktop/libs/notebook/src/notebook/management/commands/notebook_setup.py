@@ -18,6 +18,7 @@
 import logging
 import os
 import pwd
+import sys
 
 from django.core import management
 from django.core.management.base import BaseCommand
@@ -27,7 +28,7 @@ from desktop.models import Directory, Document, Document2, Document2Permission, 
 from useradmin.models import get_default_user_group, install_sample_user, User
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class Command(BaseCommand):
@@ -46,7 +47,10 @@ class Command(BaseCommand):
       sample_user = install_sample_user()
 
       with transaction.atomic():
-        management.call_command('loaddata', 'initial_notebook_examples.json', verbosity=2, commit=False)
+        if sys.version_info[0] > 2:
+          management.call_command('loaddata', 'initial_notebook_examples.json', verbosity=2)
+        else:
+          management.call_command('loaddata', 'initial_notebook_examples.json', verbosity=2, commit=False)
         Document.objects.sync()
 
       # Get or create sample user directories

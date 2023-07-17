@@ -32,7 +32,7 @@ else:
   from django.utils.translation import ugettext_lazy as _, ugettext as _t
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 DEFAULT_CALLING_FORMAT = 'boto.s3.connection.OrdinaryCallingFormat'

@@ -15,15 +15,24 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 */
-@import (reference) "cui/colors.less";
-@import (reference) "hue-mixins.less";
-@import "hue-assist";
-@import "hue-autocomplete";
-@import "hue-cui-overrides.less";
-@import "hue-cross-version.less";
-@import "hue-multi-cluster-icons.less";
-@import "components/hue-clearable.less";
-@import "hue4.less";
+
+// Legacy styles for Mako, Knockout.js and Vue components
+@import (reference) 'cui/colors.less';
+@import (reference) 'hue-mixins.less';
+@import 'hue-assist';
+@import 'hue-autocomplete';
+@import 'hue-cui-overrides.less';
+@import 'hue-cross-version.less';
+@import 'hue-multi-cluster-icons.less';
+@import 'components/hue-clearable.less';
+@import 'hue4.less';
+
+// Styles for react.js components based on the Ant design library
+// and the Cuix library. Will only be applied for components wrapped in
+// the classes "cuix" and "antd" in order not to intefere with the legacy styles.
+@import 'root-wrapped-antd.less';
+@import 'cuix/dist/styles/variables.less';
+@import 'cuix/dist/styles/cuix-ant-overrides.less';
 
 html {
   height: 100%;

@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-@import '../styles/colors';
+@import '../styles/mixins';
 @import '../styles/variables';
 @import './variables';
 
@@ -107,8 +107,8 @@
   display: flex;
   flex-shrink: 0;
   align-items: center;
-  color: $fluid-white;
-  padding: 0 0 0 $fluid-spacing-m;
+  color: $fluidx-white;
+  padding: 0 0 0 $fluidx-spacing-m;
   font-size: 16px;
 
   & > a {
@@ -120,7 +120,7 @@
 
 .sidebar-app-switcher-trigger {
   transition: font-size $sidebar-animation-duration-base;
-  margin-right: $fluid-spacing-xxs;
+  margin-right: $fluidx-spacing-xxs;
   flex-shrink: 0;
   font-size: 20px;
   color: $sidebar-default-text-color;
@@ -137,7 +137,7 @@
 }
 
 .sidebar-header-product-text-logo {
-  margin-left: $fluid-spacing-xxs;
+  margin-left: $fluidx-spacing-xxs;
   white-space: nowrap;
   overflow: hidden;
   height: 40px;
@@ -146,7 +146,7 @@
 .sidebar-body {
   flex: auto;
   overflow: hidden auto;
-  padding-top: $fluid-spacing-m;
+  padding-top: $fluidx-spacing-m;
   position: relative;
 
   > div {
@@ -175,12 +175,12 @@
   display: flex;
   align-items: center;
   color: $sidebar-default-text-color;
-  padding-left: $fluid-spacing-m;
+  padding-left: $fluidx-spacing-m;
 }
 
 .sidebar-sidebar-section-name {
   opacity: 1;
-  margin-top: $fluid-spacing-s;
+  margin-top: $fluidx-spacing-s;
   white-space: nowrap;
 }
 
@@ -218,7 +218,7 @@
   width: 20px;
   display: flex;
   justify-content: center;
-  margin-right: $fluid-spacing-xs;
+  margin-right: $fluidx-spacing-xs;
   transition-duration: $sidebar-animation-duration-base;
   // using the `all` syntax seemed to cause the icon color change to be delayed
   // compared to the rest of the icon.
@@ -252,7 +252,7 @@
 
   .sidebar-sidebar-item-accordion-sub-item {
     width: $sidebar-width;
-    margin-left: $fluid-spacing-s;
+    margin-left: $fluidx-spacing-s;
   }
 }
 
@@ -300,6 +300,8 @@
   position: absolute;
   top: 13px;
   left: 6px;
+  width: 1em;
+  height: 1em;
   transition: transform $sidebar-animation-duration-base;
 
   svg {
@@ -371,11 +373,16 @@
 }
 
 .sidebar-footer-version-number {
-  margin-left: $fluid-spacing-m;
+  margin-left: $fluidx-spacing-m;
   color: $sidebar-default-text-color;
   flex-grow: 1;
+  font-family: Roboto Mono, Menlo, Monaco, Consolas, "Courier New", monospace;
   font-size: $font-size-sm;
   overflow: hidden;
+
+  > div {
+    @include nowrap-ellipsis;
+  }
 }
 
 .sidebar-footer-collapse-btn {

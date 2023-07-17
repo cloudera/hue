@@ -1,0 +1,20 @@
+name: Suggest enhancement or feature 🦋 
+description: Requesting a new feature or enhancement to existing functionality
+title: " <add title>"
+labels: [ENHANCEMENT]
+body:
+- type: markdown
+  attributes:
+    value: "## Thanks for engaging with the Hue community! &#10084;&#65039;"
+- type: markdown
+  attributes:
+    value: |       
+      If this is a question rather than a suggested enhancement please use the discussion forum at [hue/discussions](https://github.com/cloudera/hue/discussions) or [discourse.gethue.com](https://discourse.gethue.com/)
+      
+      Hue is open source so if you are a developer you can also give a go at implementing the enhancement/feature yourself and create a [pull request](https://github.com/cloudera/hue/blob/master/CONTRIBUTING.md) with your code. Don't hesitate to reach out to us if you are interested but feel like you need some help getting started.
+- type: textarea
+  attributes:
+    label: Description
+    description: A concise description of what kind of feature or enhancement you would like to see, preferably including real use case. 
+  validations:
+    required: true

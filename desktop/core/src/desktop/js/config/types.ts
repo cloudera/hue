@@ -81,7 +81,11 @@ export interface HueConfig extends GenericApiResponse {
   status: number;
   hue_config: {
     enable_sharing: boolean;
+    collect_usage: boolean;
   };
+  hue_version?: string;
+  img_version?: string;
+  vw_name?: string;
 }
 
 export interface Interpreter {

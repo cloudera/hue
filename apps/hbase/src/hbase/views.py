@@ -43,7 +43,7 @@ else:
   from django.utils.translation import ugettext as _
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 def has_write_access(user):
@@ -101,7 +101,10 @@ def api_dump(response):
         #detect if avro file
         if(data[:3] == '\x4F\x62\x6A'):
           #write data to file in memory
-          output = io.StringIO()
+          try:
+            output = io.StringIO()
+          except:
+            output = string_io()
           output.write(data)
 
           #read and parse avro

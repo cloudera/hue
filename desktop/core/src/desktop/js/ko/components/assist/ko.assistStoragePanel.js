@@ -30,9 +30,12 @@ const TEMPLATE = `
     <li><a href="javascript:void(0);" data-bind="click: function (data) { showContextPopover(data, { target: $parentContext.$contextSourceElement }, { left: -15, top: 2 }); }"><i class="fa fa-fw fa-info"></i> ${I18n(
       'Show details'
     )}</a></li>
-    <li><a href="javascript:void(0);" data-bind="hueLink: definition.url"><i class="fa fa-fw" data-bind="css: {'fa-folder-open-o': definition.type === 'dir', 'fa-file-text-o': definition.type === 'file'}"></i> ${I18n(
-      'Open in Browser'
-    )}</a></li>
+    <li>
+      <a href="javascript:void(0);" data-bind="click: ()=> {huePubSub.publish('open.filebrowserlink', { pathPrefix: '/filebrowser/view=', decodedPath: definition.path });}">
+        <i class="fa fa-fw" data-bind="css: {'fa-folder-open-o': definition.type === 'dir', 'fa-file-text-o': definition.type === 'file'}"></i> 
+        ${I18n('Open in Browser')}
+      </a>
+    </li>
     <!-- ko if: definition.type === 'file' -->
     <li><a href="javascript:void(0);" data-bind="click: openInImporter"><!-- ko template: { name: 'app-icon-template', data: { icon: 'importer' } } --><!-- /ko --> ${I18n(
       'Open in Importer'
@@ -221,7 +224,9 @@ class AssistStoragePanel {
 
     huePubSub.subscribe('assist.storage.go.home', () => {
       const path =
-        this.activeSource().type === 's3' || this.activeSource().type === 'abfs'
+        this.activeSource().type === 's3' ||
+        this.activeSource().type === 'abfs' ||
+        this.activeSource().type === 'ofs'
           ? '/'
           : window.USER_HOME_DIR;
       this.loadPath(path);

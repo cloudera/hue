@@ -30,7 +30,7 @@ if sys.version_info[0] > 2:
 else:
   from django.utils.translation import ugettext as _
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 # Cache one JDBC connection by user for not saving user credentials
 API_CACHE = {}
@@ -45,11 +45,14 @@ def query_error_handler(func):
     except Exception as e:
       message = force_unicode(smart_str(e))
       if 'error occurred while trying to connect to the Java server' in message:
-        raise QueryError, _('%s: is the DB Proxy server running?') % message, sys.exc_info()[2]
+        if sys.version_info[0] > 2:
+          raise QueryError(_('%s: is the DB Proxy server running?') % message).with_traceback(sys.exc_info()[2])
+        else:
+          raise QueryError, _('%s: is the DB Proxy server running?') % message, sys.exc_info()[2]
       elif 'Access denied' in message:
-        raise AuthenticationRequired, '', sys.exc_info()[2]
+        raise AuthenticationRequired('').with_traceback(sys.exc_info()[2])
       else:
-        raise QueryError, message, sys.exc_info()[2]
+        raise QueryError(message).with_traceback(sys.exc_info()[2])
 
   return decorator
 

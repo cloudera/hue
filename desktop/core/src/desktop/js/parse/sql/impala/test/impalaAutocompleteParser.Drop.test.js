@@ -243,42 +243,6 @@ describe('impalaAutocompleteParser.js DROP statements', () => {
     });
   });
 
-  describe('DROP DATABASE', () => {
-    it('should suggest databases for "DROP SCHEMA |"', () => {
-      assertAutoComplete({
-        beforeCursor: 'DROP SCHEMA ',
-        afterCursor: '',
-        expectedResult: {
-          lowerCase: false,
-          suggestDatabases: {},
-          suggestKeywords: ['IF EXISTS']
-        }
-      });
-    });
-
-    it('should suggest keywords for "DROP DATABASE IF |"', () => {
-      assertAutoComplete({
-        beforeCursor: 'DROP DATABASE IF ',
-        afterCursor: '',
-        expectedResult: {
-          lowerCase: false,
-          suggestKeywords: ['EXISTS']
-        }
-      });
-    });
-
-    it('should suggest keywords for "DROP DATABASE foo |"', () => {
-      assertAutoComplete({
-        beforeCursor: 'DROP DATABASE foo ',
-        afterCursor: '',
-        expectedResult: {
-          lowerCase: false,
-          suggestKeywords: ['CASCADE', 'RESTRICT']
-        }
-      });
-    });
-  });
-
   describe('DROP FUNCTION', () => {
     it('should handle "DROP AGGREGATE FUNCTION IF EXISTS baa.boo(INT, STRING ...);', () => {
       assertAutoComplete({

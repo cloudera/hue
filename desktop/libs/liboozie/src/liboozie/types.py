@@ -52,7 +52,7 @@ else:
   from django.utils.translation import ugettext as _
   from cStringIO import StringIO as string_io
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class Action(object):
@@ -593,7 +593,7 @@ class Coordinator(Job):
     end = mktime(self.endTime)
 
     if end != start:
-      progress = min(int((1 - math.floor((end - next) / (end - start))) * 100), 100)
+      progress = min(int((1 - (end - next) / (end - start)) * 100), 100)
     else:
       progress = 100
 

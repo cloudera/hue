@@ -1,0 +1,77 @@
+[
+  {
+    "namePrefix": "should not find errors",
+    "beforeCursor": "SHOW VIEWS;",
+    "afterCursor": "",
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "noErrors": true
+  },
+  {
+    "namePrefix": "should not find errors",
+    "beforeCursor": "SHOW VIEWS IN userdb;",
+    "afterCursor": "",
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "noErrors": true
+  },
+  {
+    "namePrefix": "should not find errors",
+    "beforeCursor": "SHOW VIEWS FROM default LIKE 'sam*';",
+    "afterCursor": "",
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "noErrors": true
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "SHOW ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "VIEWS"
+    ]
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "SHOW VIEWS ",
+    "afterCursor": "",
+    "expectedResult": {
+      "suggestKeywords": ["FROM", "IN", "LIKE"]
+    }
+  },
+  {
+    "namePrefix": "should suggest databases",
+    "beforeCursor": "SHOW VIEWS FROM ",
+    "afterCursor": "",
+    "expectedResult": {
+      "suggestDatabases": {}
+    }
+  },
+  {
+    "namePrefix": "should suggest databases",
+    "beforeCursor": "SHOW VIEWS IN ",
+    "afterCursor": "",
+    "expectedResult": {
+      "suggestDatabases": {}
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "SHOW VIEWS IN foo ",
+    "afterCursor": "",
+    "expectedResult": {
+      "suggestKeywords": ["LIKE"]
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "SHOW VIEWS FROM `bar foo` ",
+    "afterCursor": "",
+    "expectedResult": {
+      "suggestKeywords": ["LIKE"]
+    }
+  }
+]

@@ -92,7 +92,7 @@ else:
   from cStringIO import StringIO as string_io
   open_file = file
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 def _list_dir_without_temp_files(fs, target_dir):

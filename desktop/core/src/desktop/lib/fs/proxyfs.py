@@ -22,11 +22,18 @@ from builtins import object
 import logging
 import sys
 
+from crequest.middleware import CrequestMiddleware
 from useradmin.models import User
 
 from desktop.auth.backend import is_admin
-from desktop.conf import DEFAULT_USER, ENABLE_ORGANIZATIONS
+from desktop.conf import DEFAULT_USER, ENABLE_ORGANIZATIONS, is_ofs_enabled
+from desktop.lib.fs.ozone import OFS_ROOT
 
+from aws.conf import is_raz_s3
+from aws.s3.s3fs import get_s3_home_directory
+
+from azure.conf import is_raz_abfs
+from azure.abfs.__init__ import get_home_dir_for_abfs
 
 if sys.version_info[0] > 2:
   from urllib.parse import urlparse as lib_urlparse
@@ -34,7 +41,7 @@ else:
   from urlparse import urlparse as lib_urlparse
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 DEFAULT_USER = DEFAULT_USER.get()
 
 
@@ -81,7 +88,8 @@ class ProxyFS(object):
         return True
       user = rewrite_user(User.objects.get(username=self.getuser()))
       return user.is_authenticated and user.is_active and \
-        (is_admin(user) or not filebrowser_action or user.has_hue_permission(action=filebrowser_action, app="filebrowser") or RAZ.IS_ENABLED.get())
+        (is_admin(user) or not filebrowser_action or
+         user.has_hue_permission(action=filebrowser_action, app="filebrowser") or RAZ.IS_ENABLED.get())
 
     except User.DoesNotExist:
       LOG.exception('proxyfs.has_access()')
@@ -198,10 +206,40 @@ class ProxyFS(object):
   def create(self, path, *args, **kwargs):
     self._get_fs(path).create(path, *args, **kwargs)
 
+  def get_content_summary(self, path):
+    return self._get_fs(path).get_content_summary(path)
+
   def create_home_dir(self, home_path=None):
-    if home_path is None:
-      home_path = self.get_home_dir()
-    self._get_fs(home_path).create_home_dir(home_path)
+    """
+    Initially home_path will have path value for HDFS, try creating the user home dir for it first.
+    Then, we check if S3/ABFS is configured via RAZ. If yes, try creating user home dir for them next.
+    """
+    from desktop.conf import RAZ # Imported dynamically in order to have proper value.
+
+    try:
+      self._get_fs(home_path).create_home_dir(home_path)
+    except Exception as e:
+      LOG.debug('Error creating HDFS home directory for path %s : %s' % (home_path, str(e)))
+
+    # All users will have access to Ozone root.
+    if is_ofs_enabled():
+      LOG.debug('Creation of user home path is not supported in Ozone.')
+
+    # Get the new home_path for S3/ABFS when RAZ is enabled.
+    if is_raz_s3():
+      home_path = get_s3_home_directory(User.objects.get(username=self.getuser()))
+    elif is_raz_abfs():
+      home_path = get_home_dir_for_abfs(User.objects.get(username=self.getuser()))
+
+    # Try getting user from the request and create home dirs. This helps when Hue admin is trying to create the dir for other users.
+    # That way only Hue admin needs authorization to create for all Hue users and not each individual user.
+    # If normal users also have authorization, then they can also create the dir for themselves if they want.
+    request = CrequestMiddleware.get_request()
+    username = request.user.username if request and hasattr(request, 'user') and request.user.is_authenticated else self.getuser()
+
+    if RAZ.AUTOCREATE_USER_DIR.get() and (is_raz_s3() or is_raz_abfs()):
+      fs = self.do_as_user(username, self._get_fs, home_path)
+      fs.create_home_dir(home_path)
 
   def chown(self, path, *args, **kwargs):
     self._get_fs(path).chown(path, *args, **kwargs)
@@ -217,7 +255,7 @@ class ProxyFS(object):
     return fs.mktemp(subdir=subdir, prefix=prefix, basedir=basedir)
 
   def purge_trash(self):
-    fs = self._get_fs()  # Only webhdfs supports trash.
+    fs = self._get_fs(None)  # Only webhdfs supports trash.
     if fs and hasattr(fs, 'purge_trash'):
       fs.purge_trash()
 

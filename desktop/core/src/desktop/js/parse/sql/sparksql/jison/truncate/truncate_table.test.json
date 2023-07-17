@@ -1,0 +1,88 @@
+[
+  {
+    "namePrefix": "should not find errors",
+    "beforeCursor": "TRUNCATE TABLE table_identifier PARTITION (a = 1, b = 2);",
+    "afterCursor": "",
+    "containsKeywords": [
+      "SELECT"
+    ],
+    "noErrors": true,
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "TRUNCATE ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "TABLE"
+    ],
+    "expectedResult": {
+      "lowerCase": false
+    }
+  },
+  {
+    "namePrefix": "should suggest tables",
+    "beforeCursor": "TRUNCATE TABLE ",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestTables": {
+        "onlyTables": true
+      },
+      "suggestDatabases": {
+        "appendDot": true
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest tables",
+    "beforeCursor": "TRUNCATE TABLE foo.",
+    "afterCursor": "",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestTables": {
+        "identifierChain": [
+          {
+            "name": "foo"
+          }
+        ],
+        "onlyTables": true
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "TRUNCATE TABLE foo.bar ",
+    "afterCursor": " ",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestKeywords": [
+        "PARTITION"
+      ]
+    }
+  },
+  {
+    "namePrefix": "should suggest columns",
+    "beforeCursor": "TRUNCATE TABLE foo.bar PARTITION (",
+    "afterCursor": " ",
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestColumns": {
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "foo"
+              },
+              {
+                "name": "bar"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+]

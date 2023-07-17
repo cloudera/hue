@@ -1,0 +1,123 @@
+// Licensed to Cloudera, Inc. under one
+// or more contributor license agreements.  See the NOTICE file
+// distributed with this work for additional information
+// regarding copyright ownership.  Cloudera, Inc. licenses this file
+// to you under the Apache License, Version 2.0 (the
+// "License"); you may not use this file except in compliance
+// with the License.  You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+@use 'variables' as vars;
+
+.hue-path-browser {
+  display: flex;
+
+  .hue-filesystem__icon {
+    object-fit: cover;
+    width: 24px;
+    height: 24px;
+    margin-left: 10px;
+    margin-right: 10px;
+  }
+
+  .hue-toggle-breadcrumb-input:empty {
+    pointer-events: auto;
+    width: 60px;
+    visibility: visible;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+
+    &:hover {
+      cursor: text;
+      background-color: vars.$fluidx-gray-100;
+    }
+
+    &:focus {
+      background-color: vars.$fluidx-gray-100;
+    }
+  }
+}
+
+.hue-path-browser__breadcrumb {
+  /* stylelint-disable no-invalid-position-at-import-rule */
+  @import './OverflowingItem.scss';
+
+  display: flex;
+  gap: 10px;
+  max-width: 60%;
+
+  &:hover {
+    cursor: pointer;
+  }
+
+  .hue-path-browser__dropdown-button {
+    border: none;
+    box-shadow: none;
+
+    &:hover {
+      background-color: vars.$fluidx-gray-100;
+    }
+
+    &:focus {
+      background-color: vars.$fluidx-gray-100;
+    }
+  }
+}
+
+.hue-path-browser__breadcrumb-seperator {
+  width: 14px;
+  height: 28px;
+  flex: 0 0 auto;
+}
+
+.hue-path-browser__dropdown {
+  width: 200px;
+
+  .hue-path-browser__dropdown {
+    background-color: vars.$fluidx-gray-200;
+    overflow-y: scroll;
+    max-height: 200px;
+  }
+
+  .ant-dropdown-menu-title-content {
+    display: inline-block;
+    overflow-x: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+}
+
+.hue-path-browser-panel {
+  .hue-path-browser__input {
+    width: 300px;
+
+    .ant-input-prefix {
+      width: 24px;
+      height: 24px;
+    }
+  }
+
+  .hue-path-browser-panel__button {
+    border: none;
+    box-shadow: none;
+    color: vars.$fluidx-blue-400;
+    padding: 0;
+    width: 100%;
+
+    &:hover {
+      border: vars.$fluidx-gray-300 solid 1px;
+    }
+
+    &:focus {
+      border: vars.$fluidx-gray-300 solid 1px;
+    }
+  }
+}

@@ -1,0 +1,137 @@
+[
+  {
+    "namePrefix": "should not find errors",
+    "beforeCursor": "DESC customer;",
+    "afterCursor": "",
+    "noErrors": true,
+    "containsKeywords": [
+      "SELECT"
+    ]
+  },
+  {
+    "namePrefix": "should not find errors",
+    "beforeCursor": "DESCRIBE TABLE EXTENDED customer PARTITION (state = 'AR');",
+    "afterCursor": "",
+    "noErrors": true,
+    "containsKeywords": [
+      "SELECT"
+    ]
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "DESCRIBE ",
+    "afterCursor": "",
+    "containsKeywords": [
+      "EXTENDED",
+      "TABLE"
+    ],
+    "expectedResult": {
+      "suggestTables": {},
+      "suggestDatabases": {
+        "appendDot": true
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest tables",
+    "beforeCursor": "DESCRIBE TABLE EXTENDED ",
+    "afterCursor": "",
+    "expectedResult": {
+      "suggestTables": {},
+      "suggestDatabases": {
+        "appendDot": true
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest tables",
+    "beforeCursor": "DESC foo.",
+    "afterCursor": "",
+    "expectedResult": {
+      "suggestTables": {
+        "identifierChain": [
+          {
+            "name": "foo"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest tables",
+    "beforeCursor": "DESC EXTENDED foo.",
+    "afterCursor": "",
+    "expectedResult": {
+      "suggestTables": {
+        "identifierChain": [
+          {
+            "name": "foo"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest keywords",
+    "beforeCursor": "DESCRIBE TABLE foo.bar ",
+    "afterCursor": "",
+    "expectedResult": {
+      "suggestKeywords": [
+        "PARTITION"
+      ],
+      "suggestColumns": {
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "foo"
+              },
+              {
+                "name": "bar"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest columns",
+    "beforeCursor": "DESCRIBE TABLE foo.bar PARTITION (a=1,",
+    "afterCursor": "",
+    "expectedResult": {
+      "suggestColumns": {
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "foo"
+              },
+              {
+                "name": "bar"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "namePrefix": "should suggest columns",
+    "beforeCursor": "DESC TABLE EXTENDED bar PARTITION (a=1,b=2) ",
+    "afterCursor": "",
+    "expectedResult": {
+      "suggestColumns": {
+        "tables": [
+          {
+            "identifierChain": [
+              {
+                "name": "bar"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+]

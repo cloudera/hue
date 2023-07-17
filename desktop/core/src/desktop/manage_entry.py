@@ -26,7 +26,7 @@ import sys
 import traceback
 import subprocess
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 def _deprecation_check(arg0):
   """HUE-71. Deprecate build/env/bin/desktop"""
@@ -110,7 +110,7 @@ def entry():
     else:
       from ConfigParser import NoOptionError, RawConfigParser
 
-    config = RawConfigParser()
+    config = RawConfigParser(strict=False) if sys.version_info[0] > 2 else RawConfigParser()
     config.read(cm_config_file)
     try:
       cm_agent_run_dir = config.get('General', 'agent_wide_credential_cache_location')
@@ -162,7 +162,8 @@ def entry():
       print("If the above does not work, make sure Hue has been started on this server.")
 
     if not envline == None:
-      empty, environment = envline.split("environment=")
+      # spliting envline by "environment=" won't work since new key cdp_environment was added
+      environment = envline.replace("environment=", "")
       for envvar in environment.split(","):
         include_env_vars = ("HADOOP_C", "PARCEL", "SCM_DEFINES", "LD_LIBRARY")
         if any(include_env_var in envvar for include_env_var in include_env_vars):
@@ -186,9 +187,11 @@ def entry():
       JAVA_HOME = "UNKNOWN"
 
       if locate_java is not None:
-        for line in iter(locate_java.stdout.readline, ''):
-          if 'JAVA_HOME' in line:
-            JAVA_HOME = line.rstrip().split('=')[1]
+        for line in iter(locate_java.stdout.readline, b''):
+          if b'JAVA_HOME' in line:
+            JAVA_HOME = line.rstrip().split(b'=')[1]
+            if sys.version_info[0] > 2 and type(JAVA_HOME) == bytes:
+              JAVA_HOME = JAVA_HOME.decode("utf-8")
 
       if JAVA_HOME != "UNKNOWN":
         os.environ["JAVA_HOME"] = JAVA_HOME

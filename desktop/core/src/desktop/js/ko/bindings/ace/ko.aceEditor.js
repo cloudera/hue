@@ -640,6 +640,16 @@ registerBinding(NAME, {
       dblClickAbfsItemSub.remove();
     });
 
+    const dblClickOfsItemSub = huePubSub.subscribe('assist.dblClickOfsItem', assistOfsEntry => {
+      if ($el.data('last-active-editor')) {
+        editor.session.insert(editor.getCursorPosition(), 'ofs://' + assistOfsEntry.path + "'");
+      }
+    });
+
+    disposeFunctions.push(() => {
+      dblClickOfsItemSub.remove();
+    });
+
     const dblClickGitItemSub = huePubSub.subscribe('assist.dblClickGitItem', assistGitEntry => {
       if ($el.data('last-active-editor')) {
         editor.session.setValue(assistGitEntry.fileContent());

@@ -35,7 +35,7 @@ from metadata.metadata_sites import get_navigator_hue_server_name
 from metadata.catalog.navigator_client import NavigatorApi
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class MockedRoot(object):

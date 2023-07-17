@@ -27,13 +27,14 @@ from django.http import Http404
 from django.utils.functional import wraps
 
 from dashboard.models import extract_solr_exception_message
+from desktop.conf import ENABLE_HUE_5
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_unicode
 from desktop.lib.rest.http_client import RestException
 from desktop.models import Document2, Document, FilesystemException
 
-from notebook.conf import check_has_missing_permission, ENABLE_NOTEBOOK_2
+from notebook.conf import check_has_missing_permission
 from notebook.connectors.base import QueryExpired, QueryError, SessionExpired, AuthenticationRequired, OperationTimeout, \
   OperationNotSupported
 from notebook.models import _get_editor_type
@@ -44,7 +45,7 @@ else:
   from django.utils.translation import ugettext as _
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 def check_editor_access_permission():
@@ -120,7 +121,7 @@ def api_error_handler(f):
     except SessionExpired as e:
       response['status'] = -2
     except QueryExpired as e:
-      if ENABLE_NOTEBOOK_2.get():
+      if ENABLE_HUE_5.get():
         response['query_status'] = {'status': 'expired'}
         response['status'] = 0
       else:

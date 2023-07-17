@@ -29,6 +29,7 @@ from django.forms.formsets import formset_factory, BaseFormSet
 
 from aws.s3 import S3A_ROOT, normpath as s3_normpath
 from azure.abfs.__init__ import ABFS_ROOT, normpath as abfs_normpath
+from desktop.lib.fs.ozone import OFS_ROOT, normpath as ofs_normpath
 from desktop.lib import i18n
 from hadoop.fs import normpath
 from useradmin.models import User, Group
@@ -43,7 +44,7 @@ else:
   from django.utils.translation import ugettext_lazy as _
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger()
 
 
 class FormSet(BaseFormSet):
@@ -80,6 +81,8 @@ class PathField(CharField):
       cleaned_path = s3_normpath(cleaned_path)
     elif value.lower().startswith(ABFS_ROOT):
       cleaned_path = abfs_normpath(cleaned_path)
+    elif value.lower().startswith(OFS_ROOT):
+      cleaned_path = ofs_normpath(cleaned_path)
     else:
       cleaned_path = normpath(cleaned_path)
     return cleaned_path

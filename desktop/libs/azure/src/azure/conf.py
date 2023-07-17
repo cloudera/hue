@@ -18,7 +18,7 @@ from __future__ import absolute_import
 import logging
 import sys
 
-from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_password_from_script
+from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_password_from_script, coerce_bool
 from desktop.lib.idbroker import conf as conf_idbroker
 
 from hadoop import core_site
@@ -28,7 +28,7 @@ if sys.version_info[0] > 2:
 else:
   from django.utils.translation import ugettext_lazy as _t
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 PERMISSION_ACTION_ABFS = "abfs_access"
 PERMISSION_ACTION_ADLS = "adls_access"
@@ -146,7 +146,7 @@ ABFS_CLUSTERS = UnspecifiedConfigSection(
     members=dict(
       ENABLE_DEFAULTFS_FROM_CORESITE=Config(
         key="enable_defaultfs_from_coresite",
-        type=bool,
+        type=coerce_bool,
         default=True,
         help="Enable this param to use the defaultFS from core-site.xml"),
       FS_DEFAULTFS=Config("fs_defaultfs", help="abfs://<container_name>@<account_name>.dfs.core.windows.net", type=str, default=None),
@@ -157,16 +157,18 @@ ABFS_CLUSTERS = UnspecifiedConfigSection(
   )
 )
 
+def is_raz_abfs():
+  from desktop.conf import RAZ  # Must be imported dynamically in order to have proper value
+  return (RAZ.IS_ENABLED.get() and 'default' in list(ABFS_CLUSTERS.keys()))
+
 def is_adls_enabled():
   return ('default' in list(AZURE_ACCOUNTS.keys()) and AZURE_ACCOUNTS['default'].get_raw() and AZURE_ACCOUNTS['default'].CLIENT_ID.get() \
     or (conf_idbroker.is_idbroker_enabled('azure') and has_azure_metadata())) and 'default' in list(ADLS_CLUSTERS.keys())
 
 def is_abfs_enabled():
-  from desktop.conf import RAZ  # Must be imported dynamically in order to have proper value
-
   return ('default' in list(AZURE_ACCOUNTS.keys()) and AZURE_ACCOUNTS['default'].get_raw() and AZURE_ACCOUNTS['default'].CLIENT_ID.get() \
     or (conf_idbroker.is_idbroker_enabled('azure') and has_azure_metadata())) and 'default' in list(ABFS_CLUSTERS.keys()) \
-    or (RAZ.IS_ENABLED.get() and 'default' in list(ABFS_CLUSTERS.keys()))
+    or is_raz_abfs()
 
 def has_adls_access(user):
   from desktop.conf import RAZ  # Must be imported dynamically in order to have proper value

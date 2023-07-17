@@ -24,6 +24,7 @@ import {
 import { ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT } from 'apps/editor/events';
 import componentUtils from 'ko/components/componentUtils';
 import huePubSub from 'utils/huePubSub';
+import hueAnalytics from 'utils/hueAnalytics';
 import I18n from 'utils/i18n';
 import { withLocalStorage } from 'utils/storageUtils';
 
@@ -121,10 +122,11 @@ class RightAssistPanel {
     this.functionsTabAvailable = ko.pureComputed(
       () =>
         this.connector() &&
-        (this.connector().dialect === 'hive' ||
+        (this.connector().dialect === 'flink' ||
+          this.connector().dialect === 'hive' ||
           this.connector().dialect === 'impala' ||
           this.connector().dialect === 'pig' ||
-          this.connector().dialect === 'flink')
+          this.connector().dialect === 'sparksql')
     );
     this.langRefTabAvailable = ko.pureComputed(
       () =>
@@ -215,6 +217,7 @@ class RightAssistPanel {
   }
 
   switchTab(tabName) {
+    hueAnalytics.log('right-assist-panel', 'tab-click/' + tabName);
     if (this.activeTab() === tabName) {
       this.visible(false);
       this.activeTab(undefined);

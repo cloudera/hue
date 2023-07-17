@@ -37,7 +37,7 @@ if sys.version_info[0] > 2:
 else:
   from urllib import unquote as urllib_unquote
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class GithubClientException(Exception):

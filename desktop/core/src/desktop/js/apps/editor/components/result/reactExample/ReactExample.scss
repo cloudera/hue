@@ -1,0 +1,16 @@
+// Component styling using BEM notation
+@use 'classes';
+@use 'variables' as vars;
+@use 'mixins';
+
+$my-color:   #f8f8f8;
+
+.react-example {
+  background-color: $my-color;
+}
+
+.react-example__title,
+.react-example__description {
+  color: vars.$hue-primary-color-dark;
+  @include mixins.fade-in();
+}

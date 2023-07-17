@@ -21,7 +21,12 @@ All Hue metrics should be defined in the APP/metrics.py file so they are discove
 from builtins import object
 import functools
 import pyformance
+import logging
+import os
 
+from multiprocessing import Manager
+
+LOG = logging.getLogger()
 
 MAX_LABEL_SUFFIX = ': Max'
 MAX_DESCRIPTION_SUFFIX = ': Max. This is computed over the lifetime of the process.'
@@ -65,13 +70,25 @@ PERCENTILE_99_DESCRIPTION_SUFFIX = ': 99th Percentile. This is computed over the
 PERCENTILE_999_LABEL_SUFFIX = ': 999th Percentile'
 PERCENTILE_999_DESCRIPTION_SUFFIX = ': 999th Percentile. This is computed over the past hour.'
 
+REQUESTS_ACTIVE_KEY = 'requests.active'
+REQUESTS_EXCEPTIONS_KEY = 'requests.exceptions'
+REQUESTS_RESPONSE_TIME_KEY = 'requests.response-time'
+AUTH_OAUTH_AUTH_TIME_KEY = 'auth.oauth.auth-time'
+AUTH_SAML2_AUTH_TIME_KEY = 'auth.saml2.auth-time'
+AUTH_LDAP_AUTH_TIME_KEY = 'auth.ldap.auth-time'
+AUTH_PAM_AUTH_TIME_KEY = 'auth.pam.auth-time'
+AUTH_SPNEGO_AUTH_TIME_KEY = 'auth.spnego.auth-time'
 
 class MetricsRegistry(object):
   def __init__(self, registry=None):
+    import sys
     if registry is None:
       registry = pyformance.global_registry()
     self._registry = registry
     self._schemas = []
+    global metrics_dict
+    metrics_dict = Manager().dict() if 'rungunicornserver' in sys.argv else None
+    self._metrics_dict = metrics_dict
 
   def _register_schema(self, schema):
     self._schemas.append(schema)
@@ -103,6 +120,110 @@ class MetricsRegistry(object):
   def timer(self, name, **kwargs):
     self._schemas.append(TimerDefinition(name, **kwargs))
     return Timer(self._registry.timer(name))
+
+  def update_metrics_shared_data(self):
+    # Update from middleware in Gunicorn worker process
+    metrics = self.dump_metrics()
+    if self._metrics_dict is not None:
+      self._metrics_dict[os.getpid()] = metrics
+
+  def get_metrics_shared_data(self):
+    # Getting from reporter in Gunicorn main process
+    metrics_data = self._metrics_dict.values() if self._metrics_dict is not None else []
+    size = len(metrics_data)
+
+    if size > 0:
+      active_requests_list = []
+      active_exceptions_list = []
+      requests_response_time_list = []
+      auth_oauth_auth_time_list = []
+      auth_saml2_auth_time_list = []
+      auth_ldap_auth_time_list = []
+      auth_pam_auth_time_list = []
+      auth_spnego_auth_time_list = []
+
+      for value in metrics_data:
+        active_requests_list.append(value['requests.active'])
+        active_exceptions_list.append(value['requests.exceptions'])
+        requests_response_time_list.append(value[REQUESTS_RESPONSE_TIME_KEY])
+        auth_oauth_auth_time_list.append(value[AUTH_OAUTH_AUTH_TIME_KEY])
+        auth_saml2_auth_time_list.append(value[AUTH_SAML2_AUTH_TIME_KEY])
+        auth_ldap_auth_time_list.append(value[AUTH_LDAP_AUTH_TIME_KEY])
+        auth_pam_auth_time_list.append(value[AUTH_PAM_AUTH_TIME_KEY])
+        auth_spnego_auth_time_list.append(value[AUTH_SPNEGO_AUTH_TIME_KEY])
+
+      metrics_master = self.dump_metrics()
+      self.calculate_count(metrics_master[REQUESTS_ACTIVE_KEY], active_requests_list)
+      self.calculate_count(metrics_master[REQUESTS_EXCEPTIONS_KEY], active_exceptions_list)
+      self.calculate_time_series(metrics_master[REQUESTS_RESPONSE_TIME_KEY], requests_response_time_list, size)
+      self.calculate_time_series(metrics_master[AUTH_OAUTH_AUTH_TIME_KEY], auth_oauth_auth_time_list, size)
+      self.calculate_time_series(metrics_master[AUTH_SAML2_AUTH_TIME_KEY], auth_saml2_auth_time_list, size)
+      self.calculate_time_series(metrics_master[AUTH_LDAP_AUTH_TIME_KEY], auth_ldap_auth_time_list, size)
+      self.calculate_time_series(metrics_master[AUTH_PAM_AUTH_TIME_KEY], auth_pam_auth_time_list, size)
+      self.calculate_time_series(metrics_master[AUTH_SPNEGO_AUTH_TIME_KEY], auth_spnego_auth_time_list, size)
+
+      return metrics_master
+    else:
+      return self.dump_metrics()
+
+  def calculate_count(self, count_obj, count_list):
+    value = 0
+    for count in count_list:
+      value += count['count']
+    count_obj['count'] = value
+
+  def calculate_time_series(self, time_obj, time_list, size):
+    avg_list = []
+    sum_list = []
+    count_list = []
+    max_lit = []
+    min_list = []
+    std_dev_list = []
+    rate_15m_list = []
+    rate_5m_list = []
+    rate_1m_list = []
+    mean_rate_list = []
+    # percentile_50_list = []
+    percentile_75_list = []
+    percentile_95_list = []
+    percentile_99_list = []
+    percentile_999_list = []
+
+    for time in time_list:
+      avg_list.append(time['avg'])
+      sum_list.append(time['sum'])
+      count_list.append(time['count'])
+      max_lit.append(time['max'])
+      min_list.append(time['min'])
+      std_dev_list.append(time['std_dev'])
+      rate_15m_list.append(time['15m_rate'])
+      rate_5m_list.append(time['5m_rate'])
+      rate_1m_list.append(time['1m_rate'])
+      mean_rate_list.append(time['mean_rate'])
+      # percentile_50_list.append(time['50_percentile'])
+      percentile_75_list.append(time['75_percentile'])
+      percentile_95_list.append(time['95_percentile'])
+      percentile_99_list.append(time['99_percentile'])
+      percentile_999_list.append(time['999_percentile'])
+
+    time_obj['avg'] = sum(avg_list) / size
+    time_obj['sum'] = sum(sum_list) / size
+    time_obj['count'] = sum(count_list)
+    time_obj['max'] = sum(max_lit) / size
+    time_obj['min'] = sum(min_list) / size
+    time_obj['std_dev'] = sum(std_dev_list) / size
+    time_obj['15m_rate'] = sum(rate_15m_list) / size
+    time_obj['5m_rate'] = sum(rate_5m_list) / size
+    time_obj['1m_rate'] = sum(rate_1m_list) / size
+    time_obj['mean_rate'] = sum(mean_rate_list) / size
+    # time_obj['50_percentile'] = sum(percentile_50_list) / size
+    time_obj['75_percentile'] = sum(percentile_75_list) / size
+    time_obj['95_percentile'] = sum(percentile_95_list) / size
+    time_obj['99_percentile'] = sum(percentile_99_list) / size
+    time_obj['999_percentile'] = sum(percentile_999_list) / size
+
+  def get_hue_metrics(self, key):
+    return self._registry.get_metrics(key)
 
   def dump_metrics(self):
     metrics = self._registry.dump_metrics()

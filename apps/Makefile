@@ -112,4 +112,4 @@ I18N_APPS := about \
 COMPILE_LOCALE_TARGETS := $(I18N_APPS:%=.recursive-compile-locales/%)
 compile-locales: $(COMPILE_LOCALE_TARGETS)
 .recursive-compile-locales/%:
-	@$(MAKE) -C $* compile-locale
+	-@$(MAKE) -C $* compile-locale

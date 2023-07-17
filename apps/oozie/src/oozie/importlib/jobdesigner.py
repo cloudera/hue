@@ -23,7 +23,7 @@ from jobsub.models import OozieMapreduceAction, OozieStreamingAction, OozieJavaA
 from oozie.models import Mapreduce, Java, Streaming
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 def get_root_action(design):

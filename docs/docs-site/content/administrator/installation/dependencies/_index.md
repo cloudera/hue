@@ -12,10 +12,10 @@ You will need Python, some OS packages, a Database and Node.js.
 Hue employs some Python modules which use native code and requires certain development libraries be installed on your system. To install from the tarball, you'll need these library development packages and tools installed on your system:
 
 Versions supported:
-* Python 2.7
-* Python 3.6+
+* Python 3.8
+* Python 3.9
 ```
-# If you are using Python 3.6+, set PYTHON_VER before the build, like
+# If you are using Python 3.8, set PYTHON_VER before the build, like
 export PYTHON_VER=python3.8
 ```
 
@@ -152,20 +152,25 @@ This is a verified step-by-step guide on how to get Hue up and running on a fres
 
 3. Install postgres (unless you prefer something else)
 
-   `brew install postgres`
+   `brew install postgresql@14`
 
 4. Start Postgres
 
-   `brew services start postgresql`
+   `brew services start postgresql@14`
 
 5. Create the hue database and set permissions
 
    ```
+   # Create the DB
    createdb hue_d --lc-collate='en_US.UTF-8' -T "template0"
+   
+   # Connect to the dbms shell
    psql -s hue_d
-   hue_d=# create user hue_u with password 'huepassword';
-   hue_d=# grant all privileges on database hue_d to hue_u;
-   hue_d=# \q
+   
+   # Run the following lines one by one
+   create user hue_u with password 'huepassword';
+   grant all privileges on database hue_d to hue_u;
+   \q
    ```
 
 6. Install gmp, openssl and libffi (Note some might be installed from postgres)
@@ -177,15 +182,11 @@ This is a verified step-by-step guide on how to get Hue up and running on a fres
 
    - For Intel Macs, only Python 3.8 works as April 2022. Python 3.8 via Homebrew might work. However, direct download from python.org is preferred and tested.
 
-8. Install mysql client
-
-   `brew install mysql`
-
-9. Install node and npm (unless already present)
+8. Install node and npm (unless already present) using nvm or brew
 
    `brew install node`
 
-10. In the cloned hue folder run:
+9. In the hue directory run:
 
     ```
     export PYTHON_VER=python3.8
@@ -193,15 +194,23 @@ This is a verified step-by-step guide on how to get Hue up and running on a fres
     export CFLAGS="-I$(xcrun --show-sdk-path)/usr/include/sasl"
     export LDFLAGS="-L/usr/local/opt/libffi/lib -L/usr/local/opt/openssl@1.1/lib"
     export CPPFLAGS="-L/usr/local/opt/libffi/lib/include -L/usr/local/opt/openssl@1.1/lib/include"
+    ```
 
+    Also export `ROOT` which should point to your Hue directory:
+    ```
+    export ROOT=<path_to_hue_directory>
+    ```
+    
+    Then run:
+    ```
     make apps
     ```
 
-11. Configure Hue to your liking, edit
+10. Configure Hue to your liking, edit
 
     `desktop/conf/pseudo-distributed.ini`
 
-    For postgres according to step 5 above set:
+    According to step 5 above for postgres, set under `[desktop]`:
 
     ```
     [[database]]
@@ -213,13 +222,20 @@ This is a verified step-by-step guide on how to get Hue up and running on a fres
       name=hue_d
     ```
 
-12. If you use postgres as configured in the previous step you'll need to add the psycopg2 lib manually
+11. If you use postgres as configured in the previous step you'll need to add the psycopg2 lib manually
 
     `./build/env/bin/pip install psycopg2-binary`
 
-13. Start Hue (note that export from step 10 above needs to be active)
+12. Apply migrations (if any)
 
-    `./build/env/bin/hue runserver 0.0.0.0:8888`
+    ```
+    ./build/env/bin/hue makemigrations
+    ./build/env/bin/hue migrate
+    ```
+
+13. Start Hue
+
+    `./build/env/bin/hue runserver`
 
 #### 10.14, 10.15
 
@@ -279,57 +295,6 @@ For Centos / Red Hat use this source:
 Upgrade to npm 7+:
 
     npm install --global npm
-
-## Installing Python 2.7
-
-### CentOS 6.8 / 6.9 OS
-
-Check your OS Version:
-
-    cat /etc/redhat-release
-
-Make sure "/etc/redhat-release" contains "CentOS 6.8 or 6.9" version. These instructions are tested on CentOS 6.8 and 6.9 versions only. It may or may not work on previous CentOS 6 series OS.
-
-    yum install -y centos-release-SCL
-    yum install -y scl-utils
-    yum install -y python27
-
-### RedHat 6.8 / 6.9 OS
-
-Check your OS Version
-
-    cat /etc/redhat-release
-
-Make sure `/etc/redhat-release` contains "RedHat 6.8 or 6.9" version. These instructions are tested on RedHat 6.8 and 6.9 versions only. It may or may not work on previous RedHat 6 series OS.
-
-    wget http://mirror.infra.cloudera.com/centos/6/extras/x86_64/Packages/centos-release-scl-rh-2-3.el6.centos.noarch.rpm
-    rpm -ivh centos-release-scl-rh-2-3.el6.centos.noarch.rpm
-    yum install -y scl-utils
-    yum install -y python27
-
-### Oracle 6.8 / 6.9 OS
-
-Check your OS Version
-
-    cat /etc/redhat-release
-
-Make sure `/etc/redhat-release` contains "Oracle 6.8 or 6.9" version. These instructions are tested on Oracle 6.8 and 6.9 versions only. It may or may not work on previous Oracle 6 series OS.
-
-    wget -O /etc/yum.repos.d/public-yum-ol6.repo http://yum.oracle.com/public-yum-ol6.repo
-
-Set the value of the enabled parameter for the software_collections repository to 1: for file `/etc/yum.repos.d/public-yum-ol6.repo`
-
-    [ol6_software_collections]
-    name=Software Collection Library release 3.0 packages for Oracle Linux 6 (x86_64)
-    baseurl=http://yum.oracle.com/repo/OracleLinux/OL6/SoftwareCollections/x86_64/
-    gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
-    gpgcheck=1
-    enabled=1
-
-for more details, refer to this link: [https://docs.oracle.com/cd/E37670_01/E59096/html/section_e3v_nbl_cr.html](https://docs.oracle.com/cd/E37670_01/E59096/html/section_e3v_nbl_cr.html)
-
-    yum install -y scl-utils
-    yum install -y python27
 
 ## Java
 
