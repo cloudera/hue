@@ -64,7 +64,7 @@ def escape_rows(rows, nulls_only=False, encoding=None):
 
       for field in row:
         if isinstance(field, numbers.Number):
-          if math.isnan(field) or math.isinf(field):
+          if math.isnan(field) or math.isinf(field) or len(str(field)) > 16:
             escaped_field = json.dumps(field)
           else:
             escaped_field = field
