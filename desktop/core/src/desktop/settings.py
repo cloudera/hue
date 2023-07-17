@@ -38,7 +38,6 @@ from desktop.lib.python_util import force_dict_to_strings
 from aws.conf import is_enabled as is_s3_enabled
 from azure.conf import is_abfs_enabled
 from desktop.conf import is_ofs_enabled
-from urllib.parse import urlparse
 
 if sys.version_info[0] > 2:
   from django.utils.translation import gettext_lazy as _
@@ -479,13 +478,6 @@ CSRF_COOKIE_NAME = 'csrftoken'
 TRUSTED_ORIGINS = []
 if desktop.conf.SESSION.TRUSTED_ORIGINS.get():
   TRUSTED_ORIGINS += desktop.conf.SESSION.TRUSTED_ORIGINS.get()
-
-# All Hue LB's must be in the TRUSTED_ORIGINS
-if desktop.conf.HUE_LOAD_BALANCER.get():
-  for hue_lb in desktop.conf.HUE_LOAD_BALANCER.get():
-    # We only want the host:port and strip out the scheme
-    lb_host = urlparse(hue_lb).netloc
-    TRUSTED_ORIGINS.append(lb_host)
 
 # This is required for knox
 if desktop.conf.KNOX.KNOX_PROXYHOSTS.get(): # The hosts provided here don't have port. Add default knox port
