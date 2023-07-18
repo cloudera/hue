@@ -256,27 +256,35 @@ Same but in Python:
 
 ### Listing Databases
 
-    curl -X POST https://demo.gethue.com/api/v1/editor/autocomplete/
+    curl -X POST https://demo.gethue.com/api/v1/editor/autocomplete/ -d 'snippet={"type":"hive"}'
+
+    {"status": 0, "databases": ["default", "information_schema", "sys"]}
+
+- **snippet:** select the `type` from the configured dialects (e.g. `hive`) or connector IDs (e.g. `1`)
 
 ### Database details
 
-    curl -X POST https://demo.gethue.com/api/v1/editor/autocomplete/<DB>/
+    curl -X POST https://demo.gethue.com/api/v1/editor/autocomplete/<DB>/ -d 'snippet={"type":"hive"}'
+
+- **snippet:** select the `type` from the configured dialects (e.g. `hive`) or connector IDs (e.g. `1`)
 
 Describe database API:
 
     curl -X POST https://demo.gethue.com/api/v1/editor/describe/<DB>/ -d 'source_type=mysql'
 
-- **source_type:** select the configured databases (e.g. `hive`) or connector ID (e.g. `1`)
+- **source_type:** select from the configured dialects (e.g. `hive`) or connector IDs (e.g. `1`)
 
 ### Table details
 
-    curl -X POST https://demo.gethue.com/api/v1/editor/autocomplete/<DB>/<TABLE>/
+    curl -X POST https://demo.gethue.com/api/v1/editor/autocomplete/<DB>/<TABLE>/ -d 'snippet={"type":"hive"}'
+
+- **snippet:** select the `type` from the configured dialects (e.g. `hive`) or connector IDs (e.g. `1`)
 
 Describe table API:
 
     curl -X POST https://demo.gethue.com/api/v1/editor/describe/<DB>/<TABLE>/ -d 'source_type=1'
 
-- **source_type:** select the configured databases (e.g. `hive`) or connector ID (e.g. `1`)
+- **source_type:** select from the configured dialects (e.g. `hive`) or connector IDs (e.g. `1`)
 
 Analyze API:
 
@@ -286,11 +294,15 @@ Analyze API:
 
 Sample table data API:
 
-    curl -X POST https://demo.gethue.com/api/v1/editor/sample/<DB>/<TABLE>/
+    curl -X POST https://demo.gethue.com/api/v1/editor/sample/<DB>/<TABLE>/ -d 'snippet={"type":"hive"}'
+
+- **snippet:** select the `type` from the configured dialects (e.g. `hive`) or connector IDs (e.g. `1`)
 
 ### Column details
 
-    curl -X POST https://demo.gethue.com/api/v1/editor/autocomplete/<DB>/<TABLE>/<COL1>/
+    curl -X POST https://demo.gethue.com/api/v1/editor/autocomplete/<DB>/<TABLE>/<COL1>/ -d 'snippet={"type":"hive"}'
+
+- **snippet:** select the `type` from the configured dialects (e.g. `hive`) or connector IDs (e.g. `1`)
 
 Analyze API:
 
@@ -300,42 +312,32 @@ Analyze API:
 
 Sample column data API:
 
-    curl -X POST https://demo.gethue.com/api/v1/editor/sample/<DB>/<TABLE>/<COL1>/
+    curl -X POST https://demo.gethue.com/api/v1/editor/sample/<DB>/<TABLE>/<COL1>/ -d 'snippet={"type":"hive"}'
+
+- **snippet:** select the `type` from the configured dialects (e.g. `hive`) or connector IDs (e.g. `1`)
 
 ### Listing Functions
 
 Default functions:
 
-    $.post("/notebook/api/autocomplete/", {
-      "snippet": ko.mapping.toJSON({
-          type: "hive"
-      }),
-      "operation": "functions"
-    }, function(data) {
-      console.log(ko.mapping.toJSON(data));
-    });
+    curl  -X POST https://demo.gethue.com/api/v1/editor/autocomplete -d 'snippet={"type":"hive"}' -d 'operation=functions'
+
+- **snippet:** select the `type` from the configured dialects (e.g. `hive`) or connector IDs (e.g. `1`)
+- **operation:** specify the type of operation (e.g., `functions`)
 
 For a specific database:
 
-    $.post("/notebook/api/autocomplete/<DB>", {
-      "snippet": ko.mapping.toJSON({
-          type: "hive"
-      }),
-      "operation": "functions"
-    }, function(data) {
-      console.log(ko.mapping.toJSON(data));
-    });
+    curl  -X POST https://demo.gethue.com/api/v1/editor/autocomplete/<DB> -d 'snippet={"type":"impala"}' -d 'operation=functions'
+
+- **snippet:** select the `type` from the configured dialects (e.g. `impala`) or connector IDs (e.g. `1`)
+- **operation:** specify the type of operation (e.g., `functions`)
 
 For a specific function/UDF details (e.g. trunc):
 
-    $.post("/notebook/api/autocomplete/<function_name>", {
-      "snippet": ko.mapping.toJSON({
-          type: "hive"
-      }),
-      "operation": "function"
-    }, function(data) {
-      console.log(ko.mapping.toJSON(data));
-    });
+    curl  -X POST https://demo.gethue.com/api/v1/editor/autocomplete/<function_name> -d 'snippet={"type":"hive"}' -d 'operation=function'
+
+- **snippet:** select the `type` from the configured dialects (e.g. `hive`) or connector IDs (e.g. `1`)
+- **operation:** specify the type of operation (e.g., `function`)
 
 ### Query history
 
@@ -642,100 +644,3 @@ Some of the parameters:
 Searching for entities with the `dummy` catalog:
 
     curl -X POST https://demo.gethue.com/api/v1/metadata/search/entities_interactive/ -d 'query_s="*sample"&interface="dummy"'
-
-### Finding an entity
-
-e.g. in order to get its id:
-
-    $.get("/metadata/api/navigator/find_entity", {
-        type: "table",
-        database: "default",
-        name: "sample_07",
-        interface: "dummy"
-    }, function(data) {
-        console.log(ko.mapping.toJSON(data));
-    });
-
-Adding/updating a comment with the dummy backend:
-
-    $.post("/metadata/api/catalog/update_properties/", {
-        id: "22",
-        properties: ko.mapping.toJSON({"description":"Adding a description"}),
-        interface: "dummy"
-    }, function(data) {
-        console.log(ko.mapping.toJSON(data));
-    });
-
-### Adding a tag
-
-    $.post("/metadata/api/catalog/add_tags/", {
-      id: "22",
-      tags: ko.mapping.toJSON(["usage"]),
-      interface: "dummy"
-    }, function(data) {
-        console.log(ko.mapping.toJSON(data));
-    });
-
-### Deleting a property
-
-    $.post("/metadata/api/catalog/delete_metadata_properties/", {
-       "id": "32",
-       "keys": ko.mapping.toJSON(["project", "steward"])
-    }, function(data) {
-       console.log(ko.mapping.toJSON(data));
-    });
-
-### Getting the model mapping
-
-    $.get("/metadata/api/catalog/models/properties/mappings/", function(data) {
-      console.log(ko.mapping.toJSON(data));
-    });
-
-### Getting a namespace
-
-    $.post("/metadata/api/catalog/namespace/", {
-      namespace: 'huecatalog'
-    }, function(data) {
-      console.log(ko.mapping.toJSON(data));
-    });
-
-### Creating a namespace
-
-    $.post("/metadata/api/catalog/namespace/create/", {
-      "namespace": "huecatalog",
-      "description": "my desc"
-    }, function(data) {
-      console.log(ko.mapping.toJSON(data));
-    });
-
-### Creating a namespace property
-
-    $.post("/metadata/api/catalog/namespace/property/create/", {
-      "namespace": "huecatalog",
-      "properties": ko.mapping.toJSON({
-        "name" : "relatedEntities2",
-        "displayName" : "Related objects",
-        "description" : "My desc",
-        "multiValued" : true,
-        "maxLength" : 50,
-        "pattern" : ".*",
-        "enumValues" : null,
-        "type" : "TEXT"
-      })
-    }, function(data) {
-      console.log(ko.mapping.toJSON(data));
-    });
-
-### Map a namespace property
-
-To a class:
-
-    $.post("/metadata/api/catalog/namespace/property/map/", {
-      "class": "hv_view",
-      "properties": ko.mapping.toJSON([{
-          namespace: "huecatalog",
-          name: "relatedQueries"
-      }])
-    }, function(data) {
-      console.log(ko.mapping.toJSON(data));
-    });
