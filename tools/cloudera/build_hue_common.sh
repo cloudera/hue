@@ -121,6 +121,36 @@ function redhat8_ppc_install() {
   fi
 }
 
+function redhat9_ppc_install() {
+  if [[ $FORCEINSTALL -eq 1 ]]; then
+    # pre-req install
+    sudo -- sh -c 'yum install -y \
+      java-11-openjdk-devel \
+      java-11-openjdk-headless \
+      krb5-workstation \
+      nmap-ncat \
+      xmlsec1 \
+      xmlsec1-openssl \
+      libss \
+      ncurses-devel'
+    # MySQLdb install
+    sudo -- sh -c 'yum install -y python3-mysqlclient'
+    # NODEJS 14 install
+    sudo -- sh -c 'yum install -y nodejs npm'
+    # Pip modules install
+    sudo pip39_bin=${pip39_bin} -- sh -c '${pip39_bin} install virtualenv virtualenv-make-relocatable mysqlclient==2.1.1'
+    sudo pip39_bin=${pip39_bin} -- sh -c 'ln -fs ${pip39_bin} $(dirname ${pip39_bin})/pip'
+    # sqlite3 install
+    sudo TOOLS_HOME=${TOOLS_HOME} -- sh -c 'mkdir -p ${TOOLS_HOME} && \
+      cd ${TOOLS_HOME} && \
+      curl -o sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
+      tar zxvf sqlite-autoconf-3350500.tar.gz && \
+      cd sqlite-autoconf-3350500 && \
+      ./configure --prefix=${TOOLS_HOME}/sqlite && make && make install'
+    export LD_LIBRARY_PATH=${TOOLS_HOME}/sqlite/lib:/usr/local/lib:$LD_LIBRARY_PATH
+  fi
+}
+
 function sles12_install() {
   if [[ $FORCEINSTALL -eq 1 ]]; then
     # pre-req install
