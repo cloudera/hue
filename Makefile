@@ -191,9 +191,9 @@ ifeq ($(PYTHON_VER),python3.9)
 	@touch $@
 	@echo '--- Installing PIP_MODULES in virtual-env'
 	@if [[ "ppc64le" == $(PPC64LE) ]]; then \
-	  echo '--- Installing $(REQUIREMENT_PPC64LE_FILE) into virtual-env via $(ENV_PIP)'; \
-	  $(ENV_PIP) install -r $(REQUIREMENT_PPC64LE_FILE); \
-	  echo '--- Finished $(REQUIREMENT_PPC64LE_FILE) into virtual-env'; \
+	  echo '--- Installing $(REQUIREMENT_PPC64LE_FILE_PY39) into virtual-env via $(ENV_PIP)'; \
+	  $(ENV_PIP) install -r $(REQUIREMENT_PPC64LE_FILE_PY39); \
+	  echo '--- Finished $(REQUIREMENT_PPC64LE_FILE_PY39) into virtual-env'; \
 	 else \
 	  echo '--- Installing $(REQUIREMENT_FILE) into virtual-env via $(ENV_PIP)'; \
 	  $(ENV_PIP) install -r $(REQUIREMENT_FILE); \
