@@ -25,6 +25,7 @@ import time
 from datetime import datetime
 import pytz
 from babel import localtime
+import os
 
 from desktop.lib import export_csvxls
 from libanalyze import analyze as analyzer, rules
@@ -57,6 +58,21 @@ def _get_api(user, cluster=None):
     server_url = _get_impala_server_url(session)
   return get_impalad_api(user=user, url=server_url)
 
+def _convert_to_6_digit_ms_local_time(start_time):  
+  if '.' in start_time:
+    time, microseconds = start_time.split('.')
+    if len(microseconds) > 6:
+      microseconds = microseconds[:6]
+    start_time = '.'.join([time, microseconds])
+  else:
+    start_time = f'{start_time}.000000'
+  
+  local_tz = pytz.timezone(os.environ.get('TZ', 'UTC'))
+  # Convert to datetime object in UTC, convert to provided timezone, and then format back into a string
+  return (datetime.strptime(start_time, "%Y-%m-%d %H:%M:%S.%f")
+          .replace(tzinfo=pytz.utc)
+          .astimezone(local_tz)
+          .strftime("%Y-%m-%d %H:%M:%S.%f"))
 
 class QueryApi(Api):
 
@@ -73,11 +89,7 @@ class QueryApi(Api):
 
     filter_list = self._get_filter_list(filters)
     jobs_iter = itertools.chain(jobs['in_flight_queries'], jobs['completed_queries'])
-    jobs_iter_filtered = self._n_filter(filter_list, jobs_iter)
-
-    #apps['submitted'] time is stripped to microseconds and converted from type string to datetime object using
-    #datetime.strptime() to fetch the local time instead of the UTC time. Finally, The local time is converted to type string
-    #using datetime.strftime()
+    jobs_iter_filtered = self._n_filter(filter_list, jobs_iter)    
 
     apps = {
       'apps': sorted([{
@@ -96,8 +108,7 @@ class QueryApi(Api):
             job['duration'],
             re.MULTILINE
         ).groups()),
-        'submitted': datetime.strptime(job['start_time'][:-3], "%Y-%m-%d %H:%M:%S.%f").
-          replace(tzinfo=pytz.utc).astimezone(localtime._get_localzone()).strftime("%Y-%m-%d %H:%M:%S.%f"),
+        'submitted': _convert_to_6_digit_ms_local_time(job['start_time']),
         # Extra specific
         'rows_fetched': job['rows_fetched'],
         'waiting': job['waiting'],
