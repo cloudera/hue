@@ -23,12 +23,14 @@ import sys
 from django.urls import reverse
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_equal, assert_true
+import os
 
 from desktop.auth.backend import rewrite_user
 from desktop.lib.django_test_util import make_logged_in_client
 from useradmin.models import User
 
 from jobbrowser.apis.query_api import QueryApi
+from jobbrowser.apis.query_api import _convert_to_6_digit_ms_local_time
 
 if sys.version_info[0] > 2:
   from unittest.mock import patch, Mock
@@ -38,6 +40,46 @@ else:
 
 LOG = logging.getLogger()
 
+class TestConvertTo6DigitMsLocalTime():
+  @patch.dict(os.environ, {'TZ': 'America/New_York'})
+  def convert_6_digit(self):
+    start_time = "2023-07-14 12:00:00.123456"
+    converted_time = _convert_to_6_digit_ms_local_time(start_time)
+
+    # America/New_York timezone is UTC-4
+    expected_time = "2023-07-14 08:00:00.123456"
+
+    assert_equal(expected_time, converted_time)
+
+  @patch.dict(os.environ, {'TZ': 'America/New_York'})
+  def convert_3_digit(self):
+    start_time = "2023-07-14 12:00:00.123"
+    converted_time = _convert_to_6_digit_ms_local_time(start_time)
+
+    # America/New_York timezone is UTC-4
+    expected_time = "2023-07-14 08:00:00.123000"
+
+    assert_equal(expected_time, converted_time)
+      
+  @patch.dict(os.environ, {'TZ': 'America/New_York'})
+  def convert_9_digit(self):
+    start_time = "2023-07-14 12:00:00.123456789"
+    converted_time = _convert_to_6_digit_ms_local_time(start_time)
+
+    # America/New_York timezone is UTC-4
+    expected_time = "2023-07-14 08:00:00.123456"
+
+    assert_equal(expected_time, converted_time)
+
+  @patch.dict(os.environ, {'TZ': 'America/New_York'})
+  def convert_0_digit(self):
+    start_time = "2023-07-14 12:00:00"
+    converted_time = _convert_to_6_digit_ms_local_time(start_time)
+
+    # America/New_York timezone is UTC-4
+    expected_time = "2023-07-14 08:00:00.000000"
+
+    assert_equal(expected_time, converted_time)    
 
 class TestApi():
 
