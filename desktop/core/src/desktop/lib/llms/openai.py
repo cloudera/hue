@@ -8,15 +8,16 @@ from .base import LlmApi, Task
 from desktop.conf import LLM
 
 _GENERATE = """Act as an {dialect} SQL expert. Translate the NQL statement into SQL using the following metadata: {metadata}.
-List any assumptions not covered by the supplied metadata.
+List any assumptions not covered by the supplied metadata. Use lower() and LIKE '%%' unless you are sure about how to match the data.
+
 NQL: {input}
-Wrap the SQL in a <code> tag and the assumptions in a <assumptions> tag"""
+Wrap the SQL in a <code> tag and the assumptions in a <assumptions> tag with a closing </assumptions>"""
 
 _EDIT = """Act as an {dialect} SQL expert. Based on the input modify the SQL using the following metadata: {metadata}.
-List any assumptions not covered by the supplied metadata.
+List any assumptions not covered by the supplied metadata. Use lower() and LIKE '%%' unless you are sure about how to match the data.
 SQL query: {sql}
 Input: {input}
-Wrap the SQL in a <code> tag and the assumptions in a <assumptions> tag"""
+Wrap the SQL in a <code> tag and the assumptions in a <assumptions> tag with a closing </assumptions>"""
 
 _SUMMARIZE = """Act as an {dialect} SQL expert.
 Explain in natural language using non technical terms, what this query does: {sql}.
@@ -29,7 +30,7 @@ Wrap the new code in a <code> tag and the explanation in an <explain> tag with a
 
 _FIX = """Act as an {dialect} SQL expert.
 Fix this broken sql query and explain the fix.
-Wrap the corrected code in a <code> tag and the explaination in an <explain> tag: {sql}
+Wrap the corrected code in a <code> tag and the explaination in an <explain> tag with a closing </explain>: {sql}
 """
 
 TASK_TEMPLATES = {

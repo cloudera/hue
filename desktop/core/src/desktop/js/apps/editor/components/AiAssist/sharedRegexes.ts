@@ -1,0 +1,1 @@
+export const nqlCommentRegex = /^(\s*--.*?$|\s*\/\*(.|\n)*?\*\/)/gm;

@@ -4,6 +4,7 @@
 $line-height: 20px;
 $semi-transparent-background: rgba(237, 247, 255, 0.5);
 $input-animation-time: 0.5s;
+$input-padding: 4px;
 
 .cuix.antd {
   .hue-ai-assist-toolbar-input__wrapper {
@@ -15,7 +16,6 @@ $input-animation-time: 0.5s;
   .hue-ai-assist-toolbar-input__wrapper--expanded {
     animation: expandInput $input-animation-time ease forwards;
     flex-grow: 1;
-    order: -1;
   }
 
   .hue-ai-assist-toolbar-input__text-input {
@@ -24,15 +24,15 @@ $input-animation-time: 0.5s;
     color: vars.$fluidx-blue-400;
     font-size: 14px;
     overflow: hidden;
-    margin-top: 30px;
+    margin-top: 30px; // TODO: use variable
     line-height: $line-height;
     white-space: pre-line;
 
     position: absolute;
-    top: -20px;
-    padding-left: 4px;
-    padding-bottom: 4px;
-    padding-right: 4px;
+    top: -20px; // TODO: use variable
+    padding-left: $input-padding;
+    padding-bottom: $input-padding;
+    padding-right: $input-padding;
     height: inherit;
 
     &::placeholder {
@@ -69,11 +69,12 @@ $input-animation-time: 0.5s;
     visibility: hidden;
     white-space: pre-wrap;
     overflow-wrap: break-all;
-    border: 1px dotted red;
     color: red;
     line-height: $line-height;
     word-wrap: break-word;
     display: inline-block;
+    padding-left: $input-padding;
+    padding-right: $input-padding;
   }
 
   .hue-ai-assist-toolbar-input__single-line-reference-element {

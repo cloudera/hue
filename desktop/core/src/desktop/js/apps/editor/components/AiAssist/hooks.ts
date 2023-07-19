@@ -1,5 +1,7 @@
 import { useMemo, useState, useEffect, useRef } from 'react';
-import { throttle } from 'lodash';
+import { max, throttle } from 'lodash';
+
+import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
 
 export const useKeywordCase = (parser: any, selectedStatement: string) => {
   const sqlKeywords = useMemo(() => {
@@ -65,4 +67,60 @@ export const useResizeAwareElementSize = (
   }, [refElement]);
 
   return size;
+};
+
+export const useKeyboardShortcuts = (shortcuts: Record<string, () => void>) => {
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const { key, ctrlKey, metaKey } = event;
+
+      if (ctrlKey && metaKey && key in shortcuts) {
+        event.preventDefault();
+        shortcuts[key]?.();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+};
+
+export interface HistoryItem {
+  date: number;
+  value: string;
+}
+
+export const useLocalStorageHistory = (
+  key: string,
+  maxHistoryLength: number = 10
+): [HistoryItem[], (newItem: HistoryItem) => void] => {
+  const [history, setHistory] = useState<HistoryItem[]>(() => {
+    const savedHistory = getFromLocalStorage(key) as HistoryItem[];
+    return savedHistory?.length > 0 ? savedHistory : [];
+  });
+
+  useEffect(() => {
+    setInLocalStorage(key, history);
+  }, [history, key]);
+
+  const addNewItem = (newItem: HistoryItem) => {
+    setHistory(prevHistory => {
+      const oldItemIndex = prevHistory.findIndex(
+        existingItem => existingItem.value === newItem.value
+      );
+      if (oldItemIndex !== -1) {
+        prevHistory.splice(oldItemIndex, 1);
+      }
+      const newHistory = [newItem, ...prevHistory];
+      if (newHistory.length > maxHistoryLength) {
+        newHistory.pop();
+      }
+      return newHistory;
+    });
+  };
+
+  return [history, addNewItem];
 };

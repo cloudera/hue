@@ -1,0 +1,102 @@
+@use 'variables' as vars;
+@use '../sharedAiAssistVars' as ai-assist-vars;
+
+$max-height: 300px;
+
+  // NOTE THESE STYLES ARE FOR A PORTAL 
+  // so they will not automatically be wraped by .cuix.antd
+  .hue-ai-assist-toolbar-history {
+    position: absolute;
+    background-color: rgba(237, 247, 255, 1);
+    // backdrop-filter: blur(5px);
+    padding-top: 8px;
+    padding-bottom: 8px;
+    z-index: 6;
+    border-radius: 3px;
+    border: 1px solid vars.$fluidx-blue-100;
+    margin-top: 8px;
+    // box-shadow: 0 3px 5px rgba(0, 0, 0, 0.175);
+
+    &:focus-visible {
+      outline: none;
+    }
+  }
+
+  .hue-ai-assist-toolbar-history__top {
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: center;
+    color: vars.$fluidx-blue-400;
+    padding: 0 8px 8px 8px;
+  }
+
+  .hue-ai-assist-toolbar-history__menu-container {
+    margin: 0;
+    max-height: $max-height;
+    overflow-x: scroll;
+  }
+
+  .hue-ai-assist-toolbar-history__toggle-auto-show {
+    background-color: transparent;
+    color: vars.$fluidx-blue-400;
+  }
+  
+
+  .hue-ai-assist-toolbar-history__item {
+    list-style-type: none;
+    padding: 4px 8px;
+    cursor: pointer;
+    color: vars.$fluidx-blue-400;
+    &:hover {
+      background-color: vars.$fluidx-blue-200;
+      color: white;
+      .hue-ai-assist-toolbar-history__item-time {
+        color: white;
+      }
+    }
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+  }
+  .hue-ai-assist-toolbar-history__item--active {
+    background-color: vars.$fluidx-blue-200;
+    color: white;
+    .hue-ai-assist-toolbar-history__item-time {
+      color: white;
+    }
+  }
+
+  .hue-ai-assist-toolbar-history__item--active, .hue-ai-assist-toolbar-history__item:hover {
+    .hue-ai-assist-toolbar-history__item-highlight {
+      background-color: transparent;
+    }
+  }
+
+  // svg selector is needed to override some global nv.d3 svg styles
+  svg.hue-ai-assist-toolbar-history__item-icon {
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;    
+    margin-right: 16px;
+  }
+
+  .hue-ai-assist-toolbar-history__item-value {
+    overflow: hidden;
+    font-size: 14px;
+    text-overflow: ellipsis;
+    line-height: 20px;
+    white-space: nowrap;
+  }  
+  .hue-ai-assist-toolbar-history__item-highlight {
+    background-color: vars.$fluidx-amber-050;
+  }
+
+  .hue-ai-assist-toolbar-history__item-time {
+    font-size: 12px;
+    color: vars.$fluidx-blue-200;
+    width: 100px;
+    min-width: 100px;
+    text-align: right;
+    flex-grow: 1;    
+  }
+

@@ -4,6 +4,7 @@ import huePubSub from 'utils/huePubSub';
 import { SyntaxParser } from 'parse/types';
 import sqlParserRepository from 'parse/sql/sqlParserRepository';
 import { ParsedSqlStatement } from 'parse/sqlStatementsParser';
+import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
 import { generativeFunctionFactory } from 'api/apiAIHelper';
 import SqlExecutable from '../../execution/sqlExecutable';
 import { getLeadingEmptyLineCount } from '../editorUtils';
@@ -12,6 +13,7 @@ import { useKeywordCase } from './hooks';
 import AnimatedLauncher from './AnimatedLauncher/AnimatedLauncher';
 import AnimatedCloseButton from './AnimatedCloseButton/AnimatedCloseButton';
 import AssistToolbar from './AiAssistToolbar/AiAssistToolbar';
+import { nqlCommentRegex } from './sharedRegexes';
 
 import './AiAssistBar.scss';
 
@@ -32,6 +34,9 @@ const {
 } = generativeFunctionFactory();
 
 const getSelectedLineNumbers = (parsedStatement: ParsedSqlStatement) => {
+  if (!parsedStatement) {
+    return { firstLine: 0, lastLine: 0 };
+  }
   const { first_line: firstLineInlcudingEmptyLines, last_line: lastLine } =
     parsedStatement?.location || {};
   const firstLine = firstLineInlcudingEmptyLines + getLeadingEmptyLineCount(parsedStatement);
@@ -56,8 +61,7 @@ const breakLines = (input: string): string => {
 };
 
 const extractLeadingNqlComments = (sql: string): string => {
-  const regex = /^(\s*--.*?$|\s*\/\*(.|\n)*?\*\/)/gm;
-  const comments = sql.match(regex) || [];
+  const comments = sql.match(nqlCommentRegex) || [];
   const prefixSingleLine = '-- NQL:';
   const prefixMultiLine = '/* NQL:';
   const commentsTexts = comments
@@ -84,7 +88,9 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
   const lastSelectedStatement = useRef(selectedStatement);
   const lastDialect = useRef('');
   const { firstLine, lastLine } = getSelectedLineNumbers(parsedStatement);
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(
+    getFromLocalStorage('hue.aiAssistBar.isExpanded', false)
+  );
   const [isAnimating, setIsAnimating] = useState<'no' | 'expand' | 'contract'>('no');
   const [isEditMode, setIsEditMode] = useState(false);
   const [isGenerateMode, setIsGenerateMode] = useState(false);
@@ -99,6 +105,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
   const [parser, setParser] = useState<SyntaxParser>();
   const [parseError, setParseError] = useState<ParseError | undefined>();
   const [nql, setNql] = useState('');
+  const [inputValue, setInputValue] = useState<string>('');
   const cursorPosition = useRef<{ row: number; column: number } | undefined>();
   const keywordCase = useKeywordCase(parser, selectedStatement);
   const inputExpanded = isEditMode || isGenerateMode;
@@ -167,6 +174,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
       setShowSuggestedSqlModal(true);
     }
     setIsLoading(false);
+    setInputValue('');
   };
 
   const editSqlQuery = async (
@@ -196,6 +204,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
     }
 
     setIsLoading(false);
+    setInputValue('');
   };
 
   const loadOptimization = async (statement: string) => {
@@ -302,6 +311,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
     setErrorStatusText('');
     setParser(undefined);
     setParseError(undefined);
+    setInputValue('');
   };
 
   const toggleOpen = () => {
@@ -311,26 +321,49 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
     if (isExpanded) {
       resetAll();
     }
-    setIsExpanded(prev => !prev);
+    setIsExpanded(prev => {
+      const expanded = !prev;
+      setInLocalStorage('hue.aiAssistBar.isExpanded', expanded);
+      return expanded;
+    });
+  };
+
+  const updateInputModeOnStatementChange = (
+    previousSelection: string | undefined,
+    newSelection: string
+  ) => {
+    const editorWasEmpty = previousSelection?.trim() === '';
+    const userClearedEditor = !editorWasEmpty && newSelection === '';
+    const userTypedInEmptyEditor = editorWasEmpty && newSelection !== '';
+
+    if (userClearedEditor) {
+      setIsEditMode(false);
+    } else if (userTypedInEmptyEditor) {
+      setIsGenerateMode(false);
+    }
   };
 
   useEffect(() => {
-    if (!lastSelectedStatement.current) {
-      lastSelectedStatement.current = selectedStatement;
-    }
     loadParser();
 
     const selectionChanged = lastSelectedStatement.current !== selectedStatement;
+    if (selectionChanged) {
+      updateInputModeOnStatementChange(lastSelectedStatement?.current, selectedStatement);
 
-    if (parser && (selectionChanged || !explanation)) {
+      setSuggestion('');
+      setAssumptions('');
+      lastSelectedStatement.current = selectedStatement;
+
+      if (parser) {
+        const newParseError = parser?.parseSyntax('', selectedStatement.trim()) as ParseError;
+        setParseError(newParseError);
+      }
+    }
+
+    if (parser) {
       lastSelectedStatement.current = selectedStatement;
       const newParseError = parser?.parseSyntax('', selectedStatement.trim()) as ParseError;
       setParseError(newParseError);
-    }
-
-    if (selectionChanged) {
-      setSuggestion('');
-      setAssumptions('');
     }
   }, [selectedStatement, parser]);
 
@@ -384,11 +417,13 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
           <AssistToolbar
             isGenerateMode={isGenerateMode}
             isLoading={isLoading}
+            inputValue={inputValue}
             setErrorStatusText={setErrorStatusText}
             setIsGenerateMode={setIsGenerateMode}
             setIsEditMode={setIsEditMode}
             isEditMode={isEditMode}
             onInputSubmit={handleToobarInputSubmit}
+            onInputChanged={setInputValue}
             inputExpanded={inputExpanded}
             loadExplanation={loadExplanation}
             parsedStatement={parsedStatement}
