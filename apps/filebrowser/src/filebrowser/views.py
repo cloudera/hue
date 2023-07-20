@@ -120,7 +120,7 @@ INLINE_DISPLAY_MIMETYPE = re.compile(
 INLINE_DISPLAY_MIMETYPE_EXCEPTIONS = re.compile('image/svg\+xml')
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger()
 
 
 class ParquetOptions(object):

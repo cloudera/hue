@@ -50,7 +50,7 @@ else:
   from django.utils.translation import ugettext as _
   from urllib import quote as urllib_quote, unquote as urllib_unquote
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 try:

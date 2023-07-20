@@ -43,7 +43,7 @@ if sys.version_info[0] > 2:
 else:
   from django.utils.translation import ugettext as _
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 _DEFAULT_OBJ_PER_PAGINATION = 10
 
@@ -86,6 +86,10 @@ class YarnApi(JobBrowserApi):
 
   def get_job_link(self, job_id):
     return self.get_job(job_id)
+
+  @rm_ha
+  def kill_job(self, job_id):
+    return self.resource_manager_api.kill(job_id)
 
   @rm_ha
   def get_jobs(self, user, **kwargs):

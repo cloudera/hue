@@ -1,4 +1,4 @@
-cryptography==36.0.1
+cryptography==41.0.1
 numpy==1.23.1
 pandas==1.4.2
 lxml==4.9.1

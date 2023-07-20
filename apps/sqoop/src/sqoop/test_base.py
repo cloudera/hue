@@ -38,7 +38,7 @@ from sqoop.conf import SERVER_URL
 
 service_lock = threading.Lock()
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class SqoopServerProvider(object):

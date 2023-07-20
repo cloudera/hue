@@ -40,7 +40,7 @@ else:
   from django.utils.translation import ugettext as _
   from StringIO import StringIO as string_io
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 IMPORT_PEEK_SIZE = 1024 * 1024

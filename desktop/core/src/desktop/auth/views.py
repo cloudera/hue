@@ -49,7 +49,7 @@ from desktop.lib import fsmanager
 from desktop.lib.django_util import render, login_notrequired, JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.log.access import access_log, access_warn, last_access_map
-from desktop.views import samlgroup_check
+from desktop.views import samlgroup_check, saml_login_headers
 from desktop.settings import LOAD_BALANCER_COOKIE
 from django.utils.encoding import smart_str
 
@@ -62,7 +62,7 @@ else:
   from django.utils.translation import ugettext as _
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 def get_current_users():
@@ -165,9 +165,13 @@ def dt_login(request, from_modal=False):
           userprofile.creation_method = UserProfile.CreationMethod.EXTERNAL.name
         userprofile.update_data({'auth_backend': user.backend})
         try:
-          userprofile.update_data({'HTTP-X-FORWARDED-FOR': request.META['HTTP_X_FORWARDED_FOR']})
+          userprofile.update_data({'X-Forwarded-For': request.META['HTTP_X_FORWARDED_FOR']})
         except KeyError as e:
-          LOG.error('HTTP-X-FORWARDED-FOR header not found: %s' %smart_str(e))
+          LOG.error('HTTP-X-FORWARDED-FOR header not found: %s' % smart_str(e))
+        try:
+          userprofile.update_data({'X-CSRF-TOKEN': request.META['CSRF_COOKIE']})
+        except KeyError as e:
+          LOG.error('X-CSRF-TOKEN header not found: %s' % smart_str(e))
         userprofile.save()
 
         msg = 'Successful login for user: %s' % user.username
@@ -211,6 +215,7 @@ def dt_login(request, from_modal=False):
 
   if 'SAML2Backend' in backend_names:
     request.session['samlgroup_permitted_flag'] = samlgroup_check(request)
+    saml_login_headers(request)
 
   renderable_path = 'login.mako'
   if from_modal:

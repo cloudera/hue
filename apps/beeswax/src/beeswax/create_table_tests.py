@@ -24,7 +24,7 @@ from django import forms
 from beeswax.forms import _clean_terminator
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class TestCreateTable(object):

@@ -24,7 +24,7 @@ from hadoop import cluster
 from libzookeeper.conf import ENSEMBLE, PRINCIPAL_NAME
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class ReadOnlyClientException(Exception):

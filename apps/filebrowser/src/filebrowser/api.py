@@ -26,7 +26,7 @@ from azure.abfs.__init__ import get_home_dir_for_abfs
 from aws.s3.s3fs import get_s3_home_directory
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 def error_handler(view_fn):

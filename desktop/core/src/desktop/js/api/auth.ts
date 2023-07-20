@@ -16,7 +16,7 @@
 
 import { post } from 'api/utils';
 
-const JWT_URL = 'api/token/auth/';
+const JWT_URL = 'api/v1/token/auth/';
 
 export const login = async (username: string, email: string, password: string): Promise<void> => {
   if (email !== '') {

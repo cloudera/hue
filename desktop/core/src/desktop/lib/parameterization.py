@@ -21,7 +21,7 @@ import logging
 from string import Template
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 def recursive_walk(function, data):

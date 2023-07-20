@@ -55,7 +55,7 @@ if sys.version_info[0] > 2:
 else:
   from django.utils.translation import ugettext as _
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 try:
@@ -302,14 +302,20 @@ def kill_job(request, job):
   if not can_kill_job(job, request.user):
     raise PopupException(_("Kill operation is forbidden."))
 
+  api = get_api(request.user, request.jt)
+
   try:
-    job.kill()
+    from jobbrowser.api import YarnApi
+
+    if isinstance(api, YarnApi):
+      api.kill_job(job.jobId)
+    else:
+      job.kill()
   except Exception as e:
     LOG.exception('Killing job')
     raise PopupException(e)
 
   cur_time = time.time()
-  api = get_api(request.user, request.jt)
 
   while time.time() - cur_time < 15:
     try:

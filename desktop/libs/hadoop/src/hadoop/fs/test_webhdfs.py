@@ -37,7 +37,7 @@ from hadoop.pseudo_hdfs4 import is_live_cluster
 from functools import reduce
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class WebhdfsTests(unittest.TestCase):

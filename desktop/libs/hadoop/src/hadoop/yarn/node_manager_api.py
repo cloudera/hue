@@ -25,7 +25,7 @@ from desktop.lib.rest.resource import Resource
 from hadoop import cluster
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 DEFAULT_USER = 'hue'
 
 _API_VERSION = 'v1'

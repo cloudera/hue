@@ -23,7 +23,7 @@ import logging
 from django.contrib.contenttypes.models import ContentType
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 def remove_content_type(app_label, model_name):

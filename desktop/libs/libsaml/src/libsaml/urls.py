@@ -23,7 +23,7 @@ if sys.version_info[0] > 2:
 else:
   from django.conf.urls import url as re_path
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 try:
   from djangosaml2 import views as djangosaml2_views

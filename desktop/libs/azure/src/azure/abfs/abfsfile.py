@@ -21,7 +21,7 @@ from hadoop.fs.hadoopfs import require_open
 from azure.abfs.__init__ import normpath
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 SEEK_SET, SEEK_CUR, SEEK_END = os.SEEK_SET, os.SEEK_CUR, os.SEEK_END
 
 

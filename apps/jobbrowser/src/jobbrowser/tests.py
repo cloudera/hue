@@ -54,7 +54,7 @@ from datetime import datetime
 from babel import localtime
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 _INITIALIZED = False
 
 
@@ -920,6 +920,11 @@ class MockResourceManagerApi(object):
     return {
       u'app': MockResourceManagerApi.APPS[job_id]
     }
+
+  def kill(self, job_id):
+    job_id = job_id.replace('job', 'application')
+    self.APPS[job_id]['state'] = 'KILLED'
+
 
 class MockImpalaQueryApi(object):
   APPS = {
