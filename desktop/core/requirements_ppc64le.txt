@@ -1,4 +1,4 @@
-http://ibm-ppc-builds.s3.amazonaws.com/silx-py-libs/cryptography-38.0.1-cp37-abi3-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl
+http://ibm-ppc-builds.s3.amazonaws.com/silx-py-libs/cryptography-41.0.1-cp38-cp38-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl
 http://ibm-ppc-builds.s3.amazonaws.com/silx-py-libs/numpy-1.23.1-cp38-cp38-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl
 http://ibm-ppc-builds.s3.amazonaws.com/silx-py-libs/pandas-1.4.3-cp38-cp38-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl
 http://ibm-ppc-builds.s3.amazonaws.com/silx-py-libs/lxml-4.6.4-cp38-cp38-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl
