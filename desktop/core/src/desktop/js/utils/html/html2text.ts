@@ -14,9 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import deXSS from './deXSS';
+
 const html2text = (value: string): string => {
   const element = document.createElement('div');
-  element.innerHTML = value;
+  const clean = deXSS(value);
+  element.innerHTML = clean;
   return element.innerText.replace(/\u00A0/g, ' ');
 };
 

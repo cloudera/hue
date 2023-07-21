@@ -414,7 +414,7 @@ else:
                 }
                 result += '</tr>';
               });
-              $('.clipboard-content').html(result);
+              $('.clipboard-content').html(hueUtils.deXSS(result));
             } else {
               $('.clipboard-content').html(window.I18n('Error while copying results.'));
             }
