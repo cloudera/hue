@@ -34,7 +34,11 @@ function find_home() {
 }
 
 function install_prerequisite() {
-  if [[ $1 == "redhat8_ppc" ]]; then
+  if [[ $1 == "redhat9_ppc" ]]; then
+    export FORCEINSTALL=0
+    export SQLITE3_PATH="$TOOLS_HOME/sqlite/bin/sqlite3"
+    redhat9_ppc_install
+  elif [[ $1 == "redhat8_ppc" ]]; then
     export FORCEINSTALL=0
     export SQLITE3_PATH="$TOOLS_HOME/sqlite/bin/sqlite3"
     redhat8_ppc_install
@@ -46,7 +50,7 @@ function install_prerequisite() {
   fi
 
   export SQLITE3_PATH=${SQLITE3_PATH:-"$TOOLS_HOME/sqlite/sqlite3"}
-  if [[ $1 != "redhat9" ]]; then
+  if [[ $1 != "redhat9" && $1 != "redhat9_ppc" ]]; then
     check_python38_path
   else
     check_python39_path
@@ -94,7 +98,7 @@ export LD_LIBRARY_PATH=/usr/local/lib:$ORACLE_INSTANTCLIENT19_PATH:$LD_LIBRARY_P
 export LD_RUN_PATH=/usr/local/lib:$ORACLE_INSTANTCLIENT19_PATH:$LD_RUN_PATH
 export PATH=$HOME/.local/bin:$PYTHON38_PATH/bin:${TOOLS_HOME}/sqlite:/usr/bin:$PATH
 
-if [[ $DOCKEROS == "redhat9" ]]; then
+if [[ $DOCKEROS == "redhat9" || $DOCKEROS == "redhat9_ppc" ]]; then
   export PYTHON_H=$PYTHON39_PATH/include/python3.9/Python.h
   export PYTHON_VER=python3.9
   export SYS_PYTHON=$PYTHON39_PATH/bin/python3.9
