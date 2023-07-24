@@ -66,6 +66,9 @@ function install_prerequisite() {
   elif [[ $1 == "sles12" ]]; then
     sles12_install
     export PATH=/usr/lib/mit/bin:$PATH
+  elif [[ $1 == "sles15" ]]; then
+    sles15_install
+    export PATH=/usr/lib/mit/bin:$PATH
   elif [[ $1 == "ubuntu18" ]]; then
     ubuntu18_install
   elif [[ $1 == "ubuntu20" ]]; then
