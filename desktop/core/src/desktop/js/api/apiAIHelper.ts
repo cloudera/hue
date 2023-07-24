@@ -111,16 +111,32 @@ const fetchFromLlm = async ({
   method = 'POST',
   contentType = 'application/json'
 }: FetchFromLlmParams) => {
-  const promise = fetch(url, {
-    method,
-    headers: {
-      'Content-Type': contentType,
-      'X-Csrftoken': (<hueWindow>window).CSRF_TOKEN
-    },
-    body: JSON.stringify(data)
-  }).then(response => response.json());
+  if (url === SQL_API_URL) {
+    console.log("new code");
+    return new Promise((resolve, reject) => {
+      const eventSource = new EventSource(url);
 
-  return promise;
+      eventSource.onmessage = event => {
+        const data = JSON.parse(event.data);
+        resolve(data);
+      };
+
+      eventSource.onerror = error => {
+        reject(error);
+      };
+    });
+  } else {
+    const promise = fetch(url, {
+      method,
+      headers: {
+        'Content-Type': contentType,
+        'X-Csrftoken': (<hueWindow>window).CSRF_TOKEN
+      },
+      body: JSON.stringify(data)
+    }).then(response => response.json());
+
+    return promise;
+  }
 };
 
 const getRelevantTables = async (

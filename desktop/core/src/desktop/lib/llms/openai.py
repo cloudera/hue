@@ -2,9 +2,9 @@ import abc
 import re
 
 import openai
-
+from django.http import StreamingHttpResponse, HttpResponse
 from .base import LlmApi, Task
-
+import pdb
 from desktop.conf import LLM
 
 _GENERATE = """Act as an {dialect} SQL expert. Translate the NQL statement into SQL using the following metadata: {metadata}.
@@ -52,17 +52,26 @@ class OpenAiApi(LlmApi):
     def __init__(self):
         super().__init__(TASK_TEMPLATES)
 
-    def infer(self, prompt):
-        response = openai.ChatCompletion.create(
-            model=_model_name,
-            temperature=0,
-            messages=[{
-                "role": "user",
-                "content": prompt
-            }]
-        )
-        choices = response.choices[0]
-        return choices.message.content.strip()
+    def infer(self, prompt, stream=False):
+        def event_stream():
+
+            response = openai.ChatCompletion.create(
+                model=_model_name,
+                temperature=0,
+                messages=[{
+                    "role": "user",
+                    "content": prompt
+                }],
+                stream=True
+            )
+            for line in response:
+                chunk = line['choices'][0].get('delta', {}).get('content', '')
+                if chunk:
+                    yield 'data: %s\n\n' % chunk
+        # pdb.set_trace
+        # choices = response.choices[0]
+        return StreamingHttpResponse(event_stream(), content_type='text/event-stream')
+        # return choices.message.content.strip()
 
     def parse_inference(self, task, inference):
         if task == Task.SUMMARIZE:

@@ -305,7 +305,7 @@ def sql(request):
   if is_llm_sql_enabled():
     llm_api = llm_api_factory()
     response = llm_api.process(task, input, sql, dialect, metadata)
-    return JsonResponse(response)
+    return response
   else:
     return llm_sql_disabled_response
 

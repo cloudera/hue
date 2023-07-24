@@ -44,7 +44,8 @@ class LlmApi(abc.ABC):
         metadata_str = self.format_metadata(metadata) if metadata else None
         prompt = optional_format(template, input=input, sql=sql, dialect=dialect, metadata=metadata_str)
         inference = self.infer(prompt)
-        return self.parse_inference(task, inference)
+        # pdb.set_trace()
+        return inference
 
     @abc.abstractmethod
     def parse_inference(self, task, inference):
