@@ -975,7 +975,7 @@ Where,
 
 Configure Hue as a proxy user for all other users and groups, meaning it may submit a request on behalf of any other user:
 
-HttpFS: Verify or add the following configuration in `httpfs-site.xml`:
+HttpFS: Verify or add the following configuration in Ozone service's `httpfs-site.xml`:
 
         <!-- Hue HttpFS proxy user setting -->
         <property>
