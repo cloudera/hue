@@ -180,6 +180,35 @@ function sles12_install() {
   fi
 }
 
+function sles15_install() {
+  if [[ $FORCEINSTALL -eq 1 ]]; then
+    # pre-req install
+    sudo -- sh -c 'zypper install -y cyrus-sasl-gssapi \
+      cyrus-sasl-plain \
+      java-11-openjdk \
+      java-11-openjdk-devel \
+      java-11-openjdk-headless \
+      krb5-client pam_krb5 krb5-plugin-kdb-ldap \
+      libpcap \
+      ncurses-devel \
+      nmap \
+      xmlsec1 xmlsec1-devel  xmlsec1-openssl-devel'
+    # MySQLdb install
+    sudo -- sh -c 'zypper install -y libmariadb-devel mariadb-client python3-mysqlclient'
+    # NODEJS 14 install
+    sudo -- sh -c 'zypper install -y nodejs18 npm16'
+    # Pip modules install
+    sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install virtualenv virtualenv-make-relocatable mysqlclient==2.1.1'
+    sudo pip38_bin=${pip38_bin} -- sh -c 'ln -fs ${pip38_bin} $(dirname ${pip38_bin})/pip'
+    # sqlite3 install
+    sudo -- sh -c 'curl --insecure -o sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
+        tar zxvf sqlite-autoconf-3350500.tar.gz && \
+        cd sqlite-autoconf-3350500 && \
+        ./configure --prefix=/usr/local/ && make && make install'
+    export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+  fi
+}
+
 function centos7_install() {
   if [[ $FORCEINSTALL -eq 1 ]]; then
     # pre-req install
