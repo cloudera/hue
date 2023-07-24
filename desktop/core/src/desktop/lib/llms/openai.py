@@ -67,10 +67,9 @@ class OpenAiApi(LlmApi):
             for line in response:
                 chunk = line['choices'][0].get('delta', {}).get('content', '')
                 if chunk:
-                    yield 'data: %s\n\n' % chunk
-        # pdb.set_trace
+                    yield chunk
         # choices = response.choices[0]
-        return StreamingHttpResponse(event_stream(), content_type='text/event-stream')
+        return event_stream
         # return choices.message.content.strip()
 
     def parse_inference(self, task, inference):

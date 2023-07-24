@@ -118,17 +118,18 @@ const AiAssist = ({ activeExecutable }: AiAssistProps) => {
     setIsLoadingSuggestion(false);
   };
 
-  const loadSqlFromNql = async (nql: string, activeExecutable: SqlExecutable) => {
+  const loadSqlFromNql = (nql: string, activeExecutable: SqlExecutable) => {
     setIsGeneratingSql(true);
     const executor = activeExecutable?.executor;
     const databaseName = activeExecutable?.database || '';
     const dialect = lastDialect.current;
-    const { sql, assumptions } = await generateSQLfromNQL({
+    const { sql, assumptions } = generateSQLfromNQL({
       nql,
       databaseName,
       executor,
       dialect
     });
+    debugger;
     console.info(sql, assumptions);
     setSuggestion(sql);
     setSuggestionExplanation(assumptions);

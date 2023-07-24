@@ -158,13 +158,15 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
     const executor = activeExecutable?.executor;
     const databaseName = activeExecutable?.database || '';
     const dialect = lastDialect.current;
-    const { sql, assumptions, error } = await generateSQLfromNQL({
+
+    const { sql, assumptions, error } = generateSQLfromNQL({
       nql,
       databaseName,
       executor,
       dialect,
       onStatusChange: handleStatusUpdate
     });
+    // debugger;
     if (error) {
       handleApiError(error.message);
     } else {

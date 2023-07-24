@@ -237,7 +237,7 @@ const generateSQLfromNQL: GenerateSQLfromNQL = async ({
   const allTables = (await getTableList({ databaseName, executor })) as Array<string>;
   console.info('allTables', allTables);
   onStatusChange('Finding relevant tables');
-  const relevantTablesInTags = await fetchFromLlm({
+  const relevantTablesInTags = fetchFromLlm({
     url: API_URL,
     data: {
       type: 'listRelevantTables',

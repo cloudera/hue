@@ -112,19 +112,44 @@ const fetchFromLlm = async ({
   contentType = 'application/json'
 }: FetchFromLlmParams) => {
   if (url === SQL_API_URL) {
-    console.log("new code");
-    return new Promise((resolve, reject) => {
-      const eventSource = new EventSource(url);
+    // // const urlWithCsrfToken = `${url}?X-Csrftoken=${(<hueWindow>window).CSRF_TOKEN}`;
+    // const urlWithParams = `${url}?task=${encodeURIComponent(data.task)}&input=${encodeURIComponent(
+    //   data.input
+    // )}&sql=${encodeURIComponent(data.sql)}&dialect=${encodeURIComponent(
+    //   data.dialect
+    // )}&metadata=${encodeURIComponent(data.metadata)}`;
+    // return new Promise((resolve, reject) => {
+    //   const eventSource = new EventSource(urlWithParams);
 
-      eventSource.onmessage = event => {
-        const data = JSON.parse(event.data);
-        resolve(data);
-      };
+    //   eventSource.onmessage = event => {
+    //     const data = JSON.parse(event.data);
+    //     resolve(data);
+    //   };
 
-      eventSource.onerror = error => {
-        reject(error);
-      };
-    });
+    //   eventSource.onerror = error => {
+    //     reject(error);
+    //   };
+    // });
+
+
+    const response = await fetch(`${url}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'text/event-stream',
+        'X-Csrftoken': (<hueWindow>window).CSRF_TOKEN
+      },
+      body: JSON.stringify(data)
+    })
+    const reader = response.body.pipeThrough(new TextDecoderStream()).getReader()
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) {
+        break;
+      }
+      debugger;
+      console.log(value);
+    }
+    return response;
   } else {
     const promise = fetch(url, {
       method,
@@ -296,7 +321,7 @@ const generateSQLfromNQL: GenerateSQLfromNQL = async ({
 
   onStatusChange('Generating SQL query');
   try {
-    return await fetchFromLlm({
+    return fetchFromLlm({
       url: SQL_API_URL,
       data: {
         task: 'generate',

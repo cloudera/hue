@@ -15,8 +15,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import datetime
 import logging
 import json
+import time
 
 from django.http import QueryDict, HttpResponse
 from rest_framework.permissions import AllowAny
@@ -35,11 +37,11 @@ from desktop.lib import fsmanager
 from desktop.lib.connectors import api as connector_api
 
 from useradmin import views as useradmin_views, api as useradmin_api
-
+import pdb
 from beeswax import api as beeswax_api
-
+from django.http import StreamingHttpResponse, HttpResponse
 from desktop.lib.llm import llm
-
+from django.views.decorators.csrf import csrf_exempt
 from desktop.lib.llms.factory import llm_api_factory
 from desktop.lib.llms.base import is_llm_sql_enabled
 from desktop.lib.llms.metadata import semantic_search
@@ -294,20 +296,25 @@ def tables(request):
   else:
     return llm_sql_disabled_response
 
-@api_view(["POST"])
+# @api_view(["GrET"])
 def sql(request):
-  task = request.data.get("task")
-  input = request.data.get("input")
-  sql = request.data.get("sql")
-  dialect = request.data.get("dialect")
-  metadata = request.data.get("metadata")
-
-  if is_llm_sql_enabled():
-    llm_api = llm_api_factory()
-    response = llm_api.process(task, input, sql, dialect, metadata)
-    return response
-  else:
-    return llm_sql_disabled_response
+  # def event_stream():
+  #     while True:
+  #         time.sleep(3)
+  #         yield 'data: The server time is: %s\n\n' % datetime.datetime.now()
+  # return StreamingHttpResponse(event_stream(), content_type='text/event-stream')
+  data = json.loads(request.body)
+  # pdb.set_trace()
+  task = data.get("task")
+  input = data.get("input")
+  sql = data.get("sql")
+  dialect = data.get("dialect")
+  metadata = data.get("metadata")
+  llm_api = llm_api_factory()
+  event_stream = llm_api.process(task, input, sql, dialect, metadata)
+  return StreamingHttpResponse(event_stream(), content_type='text/event-stream')
+  # pdb.set_trace()
+  # return response
 
 def parse_database(request, database=None):
   django_request = get_django_request(request)
