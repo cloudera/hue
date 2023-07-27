@@ -19,16 +19,15 @@ import React from 'react';
 import { i18nReact } from '../../../utils/i18nReact';
 
 import CommonHeader from '../../../reactComponents/CommonHeader/CommonHeader';
-//TODO: substitute for file browser icon
-import ABFSIcon from '../../../components/icons/AdlsIcon';
+import DataBrowserIcon from '@cloudera/cuix-core/icons/react/DataBrowserIcon';
 
-const StorageBrowserPage = (): JSX.Element => {
+const StorageBrowserPage: React.FC = (): JSX.Element => {
   const { t } = i18nReact.useTranslation();
 
   return (
-    <>
-      <CommonHeader title={t('Storage Browser')} icon={<ABFSIcon />} />
-    </>
+    <div className="hue-storage-browser">
+      <CommonHeader title={t('Storage Browser')} icon={<DataBrowserIcon />} />
+    </div>
   );
 };
 

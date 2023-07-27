@@ -75,6 +75,14 @@
     database: string;
   }
 
+  interface BrowserInterpreter {
+    buttonName: string;
+    displayName: string;
+    page: string;
+    tooltip: string;
+    type: string;
+  }
+
   const APP_ICON_INDEX: { [name: string]: string } = {
     abfs: `<svg class="hi hi-fw"><use xlink:href="#hi-adls"></use></svg>`,
     adls: `<svg class="hi hi-fw"><use xlink:href="#hi-adls"></use></svg>`,
@@ -484,7 +492,33 @@
             });
           }
           if (appConfig.browser && appConfig.browser.interpreters) {
-            appConfig.browser.interpreters.forEach(browser => {
+            // Replace old file browser entries with the new storage browser if the feature flag is enabled.
+            let browserInterpreters: BrowserInterpreter[] = [];
+            if (clusterConfig.hue_config.enable_new_storage_browser) {
+              let firstFileBrowserFound = false;
+              appConfig.browser.interpreters.forEach(browser => {
+                const isFileBrowser = /\/filebrowser/.test(browser.page);
+                if (isFileBrowser) {
+                  if (!firstFileBrowserFound) {
+                    browserInterpreters.push({
+                      buttonName: 'Browse',
+                      displayName: 'Storage Browser',
+                      //by default the first filesystem's url in the config is used.
+                      page: browser.page,
+                      tooltip: 'Storage Browser',
+                      type: 'storageBrowser'
+                    });
+                  }
+                  firstFileBrowserFound = true;
+                } else {
+                  browserInterpreters.push(browser);
+                }
+              });
+            } else {
+              browserInterpreters = appConfig.browser.interpreters;
+            }
+
+            browserInterpreters.forEach(browser => {
               if (browser.type === 'tables') {
                 browserItems.push({
                   type: 'navigation',

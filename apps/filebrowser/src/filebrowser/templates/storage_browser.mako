@@ -24,12 +24,6 @@
     ${ render_bundle(bundle) | n,unicode }
 % endfor
 
-<script type="text/javascript">
-  (function () {    
-    window.createReactComponents('#embeddable_filebrowser');
-  })();
-</script>
-
 <div>
   <StorageBrowserPage data-reactcomponent='StorageBrowserPage'></StorageBrowserPage>
 </div>
