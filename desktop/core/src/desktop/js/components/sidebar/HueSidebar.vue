@@ -54,7 +54,7 @@
     ASSIST_ACTIVE_DB_CHANGED_EVENT,
     ASSIST_SET_DATABASE_EVENT
   } from 'ko/components/assist/events';
-  import { AppType, Connector, HueConfig, Namespace } from 'config/types';
+  import { AppType, Connector, HueConfig, Namespace, BrowserInterpreter } from 'config/types';
   import { hueWindow } from 'types/types';
   import { CONFIG_REFRESHED_TOPIC } from 'config/events';
   import { getLastKnownConfig } from 'config/hueConfig';
@@ -75,18 +75,11 @@
     database: string;
   }
 
-  interface BrowserInterpreter {
-    buttonName: string;
-    displayName: string;
-    page: string;
-    tooltip: string;
-    type: string;
-  }
-
   const APP_ICON_INDEX: { [name: string]: string } = {
     abfs: `<svg class="hi hi-fw"><use xlink:href="#hi-adls"></use></svg>`,
     adls: `<svg class="hi hi-fw"><use xlink:href="#hi-adls"></use></svg>`,
     dashboard: `<svg class="hi hi-fw"><use xlink:href="#hi-dashboard"></use></svg>`,
+    'data-browser': `<svg class="hi hi-fw"><use xlink:href="#hi-data-browser"></use></svg>`,
     default: `<i class="fa fa-fw fa-database"></i>`,
     'dist-cp': `<i class="fa fa-fw fa-files-o"></i>`,
     documents: `<svg class="hi hi-fw"><use xlink:href="#hi-documents"></use></svg>`,
@@ -502,11 +495,12 @@
                   if (!firstFileBrowserFound) {
                     browserInterpreters.push({
                       buttonName: 'Browse',
+                      //TODO: Get i18n here
                       displayName: 'Storage Browser',
                       //by default the first filesystem's url in the config is used.
                       page: browser.page,
                       tooltip: 'Storage Browser',
-                      type: 'storageBrowser'
+                      type: 'data-browser'
                     });
                   }
                   firstFileBrowserFound = true;
