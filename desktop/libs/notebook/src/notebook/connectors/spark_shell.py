@@ -307,7 +307,7 @@ class SparkApi(Api):
     Parse the data from the 'result' dict based on whether it has complex datatypes or not.
 
     If the 'is_complex_type' flag is True, it parses the result dict, checking for 'schema' and 'values' 
-    and if found, formatting them into a list of dictionaries with the appropriate 'row_schema' and 'row_data' format. 
+    and if found, formatting them into a appropriate result data dictionary representing that result column. 
     If the flag is False, it simply returns the 'data' as is.
 
     Args:
@@ -327,7 +327,7 @@ class SparkApi(Api):
             # Extract the row_schema from the 'schema' dict.
             row_schema = [val['name'] for val in element['schema']]
 
-            # Combine row_schema with 'values' to create the 'row_data' dict and add as a result element.
+            # Combine row_schema with 'values' to create the 'row_data' dict and add as a result column.
             row_data.append(dict(zip(row_schema, element['values'])))
           else:
             # If the element is not a valid dict, add it to row_data as is.
