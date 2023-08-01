@@ -45,11 +45,7 @@ const insertLineBreaks = (input: string): string => {
   return output;
 };
 
-const appendComments = (
-  previousSql: string,
-  newSql: string,
-  newComment: string
-): string => {
+const appendComments = (previousSql: string, newSql: string, newComment: string): string => {
   let existingComments = '';
   let query = newSql;
 
@@ -127,10 +123,10 @@ const PreviewModal = ({
   const formatSql = (sql: string) => {
     const applyAutoFormat =
       (userChoiceAutoFormat === undefined && autoFormat) || userChoiceAutoFormat;
-    if(applyAutoFormat) {
+    if (applyAutoFormat) {
       try {
         sql = format(sql, { language: dialect, keywordCase });
-      } catch(e) {
+      } catch (e) {
         // Handle gracefully
       }
     }
@@ -239,7 +235,7 @@ const PreviewModal = ({
             }}
             className="hue-ai-preview-modal__config-switch"
             label="Replace comments"
-          />          
+          />
         </div>
 
         {showDiffFrom && (
@@ -250,21 +246,24 @@ const PreviewModal = ({
           />
         )}
         {!showDiffFrom && (
-          <SyntaxHighlighter
-            showLineNumbers
-            className="hue-ai-preview-modal__syntax-highlighter"
-            language="SQL"
-            style={stackoverflowDark}
-            customStyle={{
-              backgroundColor: fluidxSlate800,
-              padding: `${fluidxSpacingXs} ${fluidxSpacingS}`
-            }}
-            // TODO: rename class
-            codeTagProps={{ className: 'hue-explain-sql__code' }}
-            wrapLines={true}
-          >
-            {suggestion}
-          </SyntaxHighlighter>
+          <>
+            <SyntaxHighlighter
+              showLineNumbers
+              className="hue-ai-preview-modal__syntax-highlighter"
+              language="SQL"
+              style={stackoverflowDark}
+              customStyle={{
+                backgroundColor: fluidxSlate800,
+                padding: `${fluidxSpacingXs} ${fluidxSpacingS}`
+              }}
+              // TODO: rename class
+              codeTagProps={{ className: 'hue-explain-sql__code' }}
+              wrapLines={true}
+            >
+              {suggestion}
+            </SyntaxHighlighter>
+            <span className="blinking-cursor"></span>
+          </>
         )}
       </div>
       <div className="hue-ai-preview-modal__text-container">

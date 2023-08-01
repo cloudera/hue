@@ -25,6 +25,8 @@ export interface ParseError {
   text: string;
 }
 
+let sug = "";
+
 const {
   generateExplanation,
   generateCorrectedSql,
@@ -153,6 +155,33 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
     setIsLoading(false);
   };
 
+  const extractTextBetweenTags = (htmlString, startTag, endTag) => {
+    const startIndex = htmlString.indexOf(startTag);
+  
+    if (startIndex === -1) {
+      return ""; // Start tag not found
+    }
+  
+    const endIndex = endTag ? htmlString.indexOf(endTag, startIndex) : -1;
+    const textEndIndex = endIndex !== -1 ? endIndex : htmlString.length;
+  
+    const text = htmlString.substring(startIndex + startTag.length, textEndIndex);
+    // text.append("<span className='testing'>test</span>");
+    return text ? text.trim() : 'Generating...';
+  };
+
+  const setNewSuggestion = (value, done) => {
+    sug = sug + value;
+    let codeText = extractTextBetweenTags(sug, '<code>', '</code>');
+    codeText = codeText;
+    setSuggestion(codeText);
+
+    let assumptionsText = extractTextBetweenTags(sug, '<assumptions>', '</assumptions>');
+    assumptionsText = assumptionsText;
+    setAssumptions(assumptionsText);
+  };
+
+
   const generateSqlQuery = async (nql: string, activeExecutable: SqlExecutable) => {
     setIsLoading(true);
     const executor = activeExecutable?.executor;
@@ -164,15 +193,16 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
       databaseName,
       executor,
       dialect,
-      onStatusChange: handleStatusUpdate
+      onStatusChange: handleStatusUpdate,
+      setNewSuggestion: setNewSuggestion
     });
     // debugger;
     if (error) {
       handleApiError(error.message);
     } else {
       setNql(nql);
-      setSuggestion(sql);
-      setAssumptions(assumptions);
+      setSuggestion("Generating...");
+      setAssumptions("Generating...");
       setShowSuggestedSqlModal(true);
     }
     setIsLoading(false);

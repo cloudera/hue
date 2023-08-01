@@ -74,6 +74,21 @@ $bar-vertical-animation-time: (ai-assist-vars.$expand-animation-time * 0.5); // 
   }
 }
 
+.blinking-cursor {
+  position: absolute;
+  display: inline-block;
+  width: 10px;
+  height: 25px;
+  background-color: #333;
+  animation: blink-animation 1s infinite;
+}
+
+@keyframes blink-animation {
+  50% {
+    opacity: 0;
+  }
+}
+
 
 @keyframes mainBarAnimationIn {
   0% {

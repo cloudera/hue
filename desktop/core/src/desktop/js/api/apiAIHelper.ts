@@ -103,13 +103,15 @@ interface FetchFromLlmParams {
   url: string;
   data: any;
   method?: string;
-  contentType?: string;
+  contentType?: string,
+  setNewSuggestion: any,
 }
 const fetchFromLlm = async ({
   url,
   data,
   method = 'POST',
-  contentType = 'application/json'
+  contentType = 'application/json',
+  setNewSuggestion,
 }: FetchFromLlmParams) => {
   if (url === SQL_API_URL) {
     // // const urlWithCsrfToken = `${url}?X-Csrftoken=${(<hueWindow>window).CSRF_TOKEN}`;
@@ -144,10 +146,10 @@ const fetchFromLlm = async ({
     while (true) {
       const { value, done } = await reader.read();
       if (done) {
+        setNewSuggestion(value, true)
         break;
       }
-      debugger;
-      console.log(value);
+      setNewSuggestion(value, false);
     }
     return response;
   } else {
@@ -300,7 +302,8 @@ const generateSQLfromNQL: GenerateSQLfromNQL = async ({
   databaseName,
   executor,
   dialect,
-  onStatusChange
+  onStatusChange,
+  setNewSuggestion
 }) => {
   let relevantTables, tableMetadata;
   try {
@@ -330,7 +333,8 @@ const generateSQLfromNQL: GenerateSQLfromNQL = async ({
         metadata: {
           tables: tableMetadata
         }
-      }
+      },
+      setNewSuggestion: setNewSuggestion,
     });
   } catch (e) {
     return handleError(e, 'Call to AI to generate SQL query failed');

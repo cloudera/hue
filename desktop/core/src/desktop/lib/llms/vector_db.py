@@ -15,7 +15,7 @@ def filter_vector_db(metadata, query, database):
     added_tables = set()
 
     current_datetime = datetime.datetime.now()
-
+    pdb.set_trace()
     for table in metadata:
         table_name = table['name']
 
