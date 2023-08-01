@@ -1811,6 +1811,13 @@ ENABLE_HUE_5 = Config(
   default=False
 )
 
+ENABLE_NEW_STORAGE_BROWSER = Config(
+  key="enable_new_storage_browser",
+  help=_("Feature flag to enable new Hue Storage browser."),
+  type=coerce_bool,
+  default=False
+)
+
 USE_NEW_EDITOR = Config( # To remove in Hue 4
   key='',
   default=True,
