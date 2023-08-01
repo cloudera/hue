@@ -304,18 +304,16 @@ class SparkApi(Api):
 
   def _handle_result_data(self, result, is_complex_type=False):
     data = []
-
     if is_complex_type:
       for row in result['data']:
         row_data = []
-        for ele in row:
-          if isinstance(ele, dict):
-            row_schema = []
-            for val in ele['schema']:
-              row_schema.append(val['name'])
-            row_data.append(dict(zip(row_schema, ele['values'])))
+        for element in row:
+          if isinstance(element, dict) and 'schema' in element and 'values' in element:
+            row_schema = [val['name'] for val in element['schema']]
+
+            row_data.append(dict(zip(row_schema, element['values'])))
           else:
-            row_data.append(ele)
+            row_data.append(element)
 
         data.append(row_data)
     else:
