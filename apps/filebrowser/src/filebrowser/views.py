@@ -48,6 +48,7 @@ from aws.s3.s3fs import S3FileSystemException, S3ListAllBucketsException, get_s3
 from desktop import appmanager
 from desktop.auth.backend import is_admin
 from desktop.conf import RAZ
+from desktop.conf import ENABLE_NEW_STORAGE_BROWSER
 from desktop.lib import fsmanager
 from desktop.lib import i18n
 from desktop.lib.conf import coerce_bool
@@ -520,6 +521,9 @@ def listdir_paged(request, path):
     filter=?          - Specify a substring filter to search for in
                         the filename field.
   """
+  if ENABLE_NEW_STORAGE_BROWSER.get():
+    return render('storage_browser.mako', request, {})
+
   path = _normalize_path(path)
 
   if not request.fs.isdir(path):
