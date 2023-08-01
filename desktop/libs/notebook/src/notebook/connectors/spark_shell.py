@@ -311,11 +311,11 @@ class SparkApi(Api):
     If the flag is False, it simply returns the 'data' as is.
 
     Args:
-        result (dict): A dict containing the query result data from Livy to be parsed.
-        is_complex_type (bool, optional): A flag indicating whether the data has complex datatypes.
+      result (dict): A dict containing the query result data from Livy to be parsed.
+      is_complex_type (bool, optional): A flag indicating whether the data has complex datatypes.
 
     Returns:
-        list: A list of result data where each element represents a result row and each result row contains formatted columns.
+      list: A list of result data where each element represents a result row and each result row contains formatted columns.
     """
     data = []
     if is_complex_type:
