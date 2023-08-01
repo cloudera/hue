@@ -303,20 +303,39 @@ class SparkApi(Api):
 
 
   def _handle_result_data(self, result, is_complex_type=False):
+    """
+    Parse the data from the 'result' dict based on whether it has complex datatypes or not.
+
+    If the 'is_complex_type' flag is True, it parses the result dict, checking for 'schema' and 'values' 
+    and if found, formatting them into a list of dictionaries with the appropriate 'row_schema' and 'row_data' format. 
+    If the flag is False, it simply returns the 'data' as is.
+
+    Args:
+        result (dict): A dict containing the query result data from Livy to be parsed.
+        is_complex_type (bool, optional): A flag indicating whether the data has complex datatypes.
+
+    Returns:
+        list: A list of result data where each element represents a result row and each result row contains formatted columns.
+    """
     data = []
     if is_complex_type:
+      # If the query result contains complex datatypes, we are formatting the rows.
       for row in result['data']:
         row_data = []
         for element in row:
           if isinstance(element, dict) and 'schema' in element and 'values' in element:
+            # Extract the row_schema from the 'schema' dict.
             row_schema = [val['name'] for val in element['schema']]
 
+            # Combine row_schema with 'values' to create the 'row_data' dict and add as a result element.
             row_data.append(dict(zip(row_schema, element['values'])))
           else:
+            # If the element is not a valid dict, add it to row_data as is.
             row_data.append(element)
 
         data.append(row_data)
     else:
+      # If the query result is not having complex datatype, return the 'data' as it is.
       data = result['data']
     
     return data
