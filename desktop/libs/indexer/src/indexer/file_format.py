@@ -350,6 +350,7 @@ class CSVFormat(FileFormat):
   @classmethod
   def _guess_dialect(cls, sample):
     sniffer = csv.Sniffer()
+    sample = sample.replace('\r\n', '\n')
     dialect = sniffer.sniff(sample if isinstance(sample, str) else sample.decode('utf-8'))
     has_header = cls._hasHeader(sniffer, sample, dialect)
     return dialect, has_header
