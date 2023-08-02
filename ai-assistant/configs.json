@@ -1,0 +1,4 @@
+{
+  "model": "gpt2",
+  "max_new_tokens": 100
+}
