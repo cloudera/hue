@@ -102,6 +102,18 @@ class TestIndexer(object):
     'hasHeader': True,
     'quoteChar': '"'
   }
+  maldformedCSV = '''02Q,Titan Airways\r\n04Q,Tradewind Aviation\r\n05Q,"Comlux Aviation, AG"\r\n06Q,Master Top Linhas Aereas Ltd.\r\n'''
+  '''07Q,Flair Airlines Ltd.\r\n09Q,"Swift Air, LLC"\r\n0BQ,DCA\r\n0CQ,ACM AIR CHARTER GmbH\r\n0FQ,"Maine Aviation Aircraft Charter, LLC"'''
+  '''\r\n0GQ,"Inter Island Airways, d/b/a Inter Island Air"\r\n0HQ,Polar Airlines de Mexico d/b/a Nova Air\r\n0J,JetClub AG'''
+  '''\r\n0JQ,Vision Airlines\r\n0KQ,"Mokulele Flight Services, Inc."\r\n0LQ,"Metropix UK, LLP."'''
+  '''\r\n0MQ,"Multi-Aero, Inc. d/b/a Air Choice One"\r\n0Q,Flying Service N.V.\r\n16,PSA Airlines Inc.\r\n17,Piedmont Airlines\r\n'''
+  maldformedCSVFormat = {
+    'type': 'csv',
+    'fieldSeparator': ',',
+    'recordSeparator': '\n',
+    'hasHeader': False,
+    'quoteChar': '"'
+  }
 
   def setUp(self):
     self.c = make_logged_in_client(is_superuser=False)
@@ -117,15 +129,19 @@ class TestIndexer(object):
 
   def test_guess_csv_format(self):
     stream = string_io(TestIndexer.simpleCSVString)
+    malformedstream = string_io(TestIndexer.maldformedCSV)
     indexer = MorphlineIndexer(self.user, solr_client=self.solr_client)
 
     guessed_format = indexer.guess_format({'file': {"stream": stream, "name": "test.csv"}})
+    processed_guess_format = indexer.guess_format({'file': {"stream": malformedstream, "name": "test.csv"}})
 
     fields = indexer.guess_field_types({"file": {"stream": stream, "name": "test.csv"}, "format": guessed_format})['columns']
     # test format
     expected_format = self.simpleCSVFormat
+    expected_format_for_malformedCSV = self.maldformedCSVFormat
 
     assert_equal(expected_format, guessed_format)
+    assert_equal(expected_format_for_malformedCSV, processed_guess_format)
 
     # test fields
     expected_fields = self.simpleCSVFields
