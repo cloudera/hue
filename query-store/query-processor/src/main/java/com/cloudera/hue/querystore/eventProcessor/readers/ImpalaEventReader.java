@@ -55,14 +55,19 @@ public class ImpalaEventReader implements EventReader<ImpalaRuntimeProfileTree> 
     // TODO: For non gz, we could improive performance using FSDataInputStream & stream.seek(offset)
     // TODO: Could move CDW specific items to ImpalaCDWEventReader
     InputStream stream = fs.open(filePath);
-    if(filePath.toString().toLowerCase().endsWith(".gz")) {
+    if (filePath.toString().toLowerCase().endsWith(".gz")) {
       stream = new GZIPInputStream(stream);
     }
 
+    // GZIPInputStr only provides skip. So we need to recreate the stream and use skip.
     stream.skip(offset);
 
-    // reader.close() is costly.
-    // Just abandon the BufferedReader and create new, next GC will pick and clean it up.
+    if (reader != null) {
+      // As we are re-creating the stream for GZIPInputStr, we need to close the reader
+      // If we were using FSDataInputStream. We could use seek, and refrain from calling reader.close()
+      // Just abandon the BufferedReader and create new, next GC will pick and clean it up.
+      reader.close();
+    }
     reader = new BufferedReader(new InputStreamReader(stream));
   }
 
