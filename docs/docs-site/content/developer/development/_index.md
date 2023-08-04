@@ -26,6 +26,9 @@ Build once:
 
     # Mac user might need to set
     export SKIP_PYTHONDEV_CHECK=true
+ 
+    # Export ROOT which should point to your Hue directory
+    export ROOT=<path_to_hue_directory>
 
     # Export ROOT which should point to your Hue directory
     export ROOT=<path_to_hue_directory>
