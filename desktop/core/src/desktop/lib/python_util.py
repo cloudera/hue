@@ -44,7 +44,7 @@ BOMS = (
 
 __all__ = ['CaseInsensitiveDict', 'create_synchronous_io_multiplexer']
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class CaseInsensitiveDict(dict):

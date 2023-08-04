@@ -21,7 +21,7 @@ import sys
 from desktop.views import commonheader, commonfooter
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 %>
 
 <%namespace name="layout" file="about_layout.mako" />

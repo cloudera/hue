@@ -448,7 +448,7 @@ class AssistEditorContextPanel {
                       const tableName =
                         location.identifierChain[location.identifierChain.length - 1].name;
                       const found = tableEntries.some(tableEntry => {
-                        if (tableEntry.name === tableName) {
+                        if (tableEntry.name.toLowerCase() === tableName.toLowerCase()) {
                           const assistTableEntry = new AssistDbEntry(
                             tableEntry,
                             dbEntry,

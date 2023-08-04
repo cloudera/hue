@@ -14,13 +14,22 @@ function big_console_header() {
   set -x
 }
 
-function check_python_path() {
+function check_python38_path() {
   export python38_bin="$PYTHON38_PATH/bin/python3.8"
   if [ ! -e "$python38_bin" ]; then
-    echo "Python bin does not exists at " $python38_bin
+    echo "Python38 bin does not exists at " $python38_bin
     exit 1
   fi
   export pip38_bin="$PYTHON38_PATH/bin/pip3.8"
+}
+
+function check_python39_path() {
+  export python39_bin="$PYTHON39_PATH/bin/python3.9"
+  if [ ! -e "$python39_bin" ]; then
+    echo "Python39 bin does not exists at " $python38_bin
+    exit 1
+  fi
+  export pip39_bin="$PYTHON39_PATH/bin/pip3.9"
 }
 
 function check_sqlite3() {
@@ -99,8 +108,38 @@ function redhat8_ppc_install() {
     # NODEJS 14 install
     sudo -- sh -c 'yum install -y nodejs npm'
     # Pip modules install
-    sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install virtualenv virtualenv-make-relocatable mysqlclient'
+    sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install virtualenv virtualenv-make-relocatable mysqlclient==2.1.1'
     sudo pip38_bin=${pip38_bin} -- sh -c 'ln -fs ${pip38_bin} $(dirname ${pip38_bin})/pip'
+    # sqlite3 install
+    sudo TOOLS_HOME=${TOOLS_HOME} -- sh -c 'mkdir -p ${TOOLS_HOME} && \
+      cd ${TOOLS_HOME} && \
+      curl -o sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
+      tar zxvf sqlite-autoconf-3350500.tar.gz && \
+      cd sqlite-autoconf-3350500 && \
+      ./configure --prefix=${TOOLS_HOME}/sqlite && make && make install'
+    export LD_LIBRARY_PATH=${TOOLS_HOME}/sqlite/lib:/usr/local/lib:$LD_LIBRARY_PATH
+  fi
+}
+
+function redhat9_ppc_install() {
+  if [[ $FORCEINSTALL -eq 1 ]]; then
+    # pre-req install
+    sudo -- sh -c 'yum install -y \
+      java-11-openjdk-devel \
+      java-11-openjdk-headless \
+      krb5-workstation \
+      nmap-ncat \
+      xmlsec1 \
+      xmlsec1-openssl \
+      libss \
+      ncurses-devel'
+    # MySQLdb install
+    sudo -- sh -c 'yum install -y python3-mysqlclient'
+    # NODEJS 14 install
+    sudo -- sh -c 'yum install -y nodejs npm'
+    # Pip modules install
+    sudo pip39_bin=${pip39_bin} -- sh -c '${pip39_bin} install virtualenv virtualenv-make-relocatable mysqlclient==2.1.1'
+    sudo pip39_bin=${pip39_bin} -- sh -c 'ln -fs ${pip39_bin} $(dirname ${pip39_bin})/pip'
     # sqlite3 install
     sudo TOOLS_HOME=${TOOLS_HOME} -- sh -c 'mkdir -p ${TOOLS_HOME} && \
       cd ${TOOLS_HOME} && \
@@ -130,7 +169,36 @@ function sles12_install() {
     # NODEJS 14 install
     sudo -- sh -c 'zypper install -y npm14 nodejs14'
     # Pip modules install
-    sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install virtualenv virtualenv-make-relocatable mysqlclient'
+    sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install virtualenv virtualenv-make-relocatable mysqlclient==2.1.1'
+    sudo pip38_bin=${pip38_bin} -- sh -c 'ln -fs ${pip38_bin} $(dirname ${pip38_bin})/pip'
+    # sqlite3 install
+    sudo -- sh -c 'curl --insecure -o sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
+        tar zxvf sqlite-autoconf-3350500.tar.gz && \
+        cd sqlite-autoconf-3350500 && \
+        ./configure --prefix=/usr/local/ && make && make install'
+    export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+  fi
+}
+
+function sles15_install() {
+  if [[ $FORCEINSTALL -eq 1 ]]; then
+    # pre-req install
+    sudo -- sh -c 'zypper install -y cyrus-sasl-gssapi \
+      cyrus-sasl-plain \
+      java-11-openjdk \
+      java-11-openjdk-devel \
+      java-11-openjdk-headless \
+      krb5-client pam_krb5 krb5-plugin-kdb-ldap \
+      libpcap \
+      ncurses-devel \
+      nmap \
+      xmlsec1 xmlsec1-devel  xmlsec1-openssl-devel'
+    # MySQLdb install
+    sudo -- sh -c 'zypper install -y libmariadb-devel mariadb-client python3-mysqlclient'
+    # NODEJS 14 install
+    sudo -- sh -c 'zypper install -y nodejs18 npm16'
+    # Pip modules install
+    sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install virtualenv virtualenv-make-relocatable mysqlclient==2.1.1'
     sudo pip38_bin=${pip38_bin} -- sh -c 'ln -fs ${pip38_bin} $(dirname ${pip38_bin})/pip'
     # sqlite3 install
     sudo -- sh -c 'curl --insecure -o sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
@@ -176,7 +244,7 @@ function centos7_install() {
       ./configure --enable-shared --prefix=/opt/cloudera/cm-agent && \
       make install'
     # Pip modules install
-    sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install virtualenv virtualenv-make-relocatable mysqlclient'
+    sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install virtualenv virtualenv-make-relocatable mysqlclient==2.1.1'
     sudo pip38_bin=${pip38_bin} -- sh -c 'ln -fs ${pip38_bin} $(dirname ${pip38_bin})/pip'
   fi
 }
@@ -200,7 +268,7 @@ function redhat8_install() {
     # NODEJS 14 install
     sudo -- sh -c 'curl -sL https://rpm.nodesource.com/setup_14.x | bash - && yum install -y nodejs'
     # Pip modules install
-    sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install virtualenv virtualenv-make-relocatable mysqlclient'
+    sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install virtualenv virtualenv-make-relocatable mysqlclient==2.1.1'
     sudo pip38_bin=${pip38_bin} -- sh -c 'ln -fs ${pip38_bin} $(dirname ${pip38_bin})/pip'
     # sqlite3 install
     sudo -- sh -c 'curl -o sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
@@ -244,7 +312,7 @@ function ubuntu18_install() {
     sudo -- sh -c 'curl -sL https://deb.nodesource.com/setup_14.x | sudo bash - && \
       apt -y install nodejs'
     # Pip modules install
-    sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install virtualenv virtualenv-make-relocatable mysqlclient'
+    sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install virtualenv virtualenv-make-relocatable mysqlclient==2.1.1'
     sudo pip38_bin=${pip38_bin} -- sh -c 'ln -fs ${pip38_bin} $(dirname ${pip38_bin})/pip'
     # sqlite3 install
     sudo -- sh -c 'curl -o sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
@@ -291,13 +359,43 @@ function ubuntu20_install() {
     sudo -- sh -c 'curl -sL https://deb.nodesource.com/setup_14.x | sudo bash - && \
       apt -y install nodejs'
     # Pip modules install
-    sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install virtualenv virtualenv-make-relocatable mysqlclient'
+    sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install virtualenv virtualenv-make-relocatable mysqlclient==2.1.1'
     sudo pip38_bin=${pip38_bin} -- sh -c 'ln -fs ${pip38_bin} $(dirname ${pip38_bin})/pip'
     # sqlite3 install
     sudo -- sh -c 'curl -o sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
         tar zxvf sqlite-autoconf-3350500.tar.gz && \
         cd sqlite-autoconf-3350500 && \
         ./configure --prefix=/usr/local/ && make && make install'
+    export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+  fi
+}
+
+function redhat9_install() {
+  if [[ $FORCEINSTALL -eq 1 ]]; then
+    # pre-req install
+    sudo -- sh -c 'yum install -y \
+      java-11-openjdk \
+      java-11-openjdk-devel \
+      java-11-openjdk-headless \
+      krb5-workstation \
+      ncurses-devel \
+      nmap-ncat \
+      xmlsec1 \
+      xmlsec1-openssl \
+      libss \
+      ncurses-c++-libs'
+    # MySQLdb install
+    sudo -- sh -c 'yum install -y python3-mysqlclient'
+    # NODEJS 14 install
+    sudo -- sh -c 'curl -sL https://rpm.nodesource.com/setup_14.x | bash - && yum install -y nodejs'
+    # Pip modules install
+    sudo pip39_bin=${pip39_bin} -- sh -c '${pip39_bin} install virtualenv virtualenv-make-relocatable mysqlclient==2.1.1'
+    sudo pip39_bin=${pip39_bin} -- sh -c 'ln -fs ${pip39_bin} $(dirname ${pip39_bin})/pip'
+    # sqlite3 install
+    sudo -- sh -c 'curl -o sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
+      tar zxvf sqlite-autoconf-3350500.tar.gz && \
+      cd sqlite-autoconf-3350500 && \
+      ./configure --prefix=/usr/local/ && make && make install'
     export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
   fi
 }

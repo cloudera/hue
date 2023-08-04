@@ -1,0 +1,20 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`QueryInfoTop.vue should render 1`] = `
+<div
+  class="hue-info-box"
+>
+  <labeled-info-stub
+    class="inline-info"
+    label="Query ID"
+  />
+  <labeled-info-stub
+    class="inline-info"
+    label="User"
+  />
+  <labeled-info-stub
+    class="inline-info"
+    label="Status"
+  />
+</div>
+`;

@@ -30,7 +30,7 @@ from azure.conf import get_default_abfs_fs
 from desktop.conf import RAZ
 from filebrowser.conf import REMOTE_STORAGE_HOME
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 #check this first for problems
 ABFS_PATH_RE = re.compile(

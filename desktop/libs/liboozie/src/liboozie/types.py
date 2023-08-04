@@ -52,7 +52,7 @@ else:
   from django.utils.translation import ugettext as _
   from cStringIO import StringIO as string_io
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class Action(object):

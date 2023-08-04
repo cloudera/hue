@@ -28,7 +28,7 @@ from desktop.lib.connectors.api import _get_installed_connectors
 from desktop.lib.paths import get_build_dir
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 FS_CACHE = None
 FS_DEFAULT_NAME = 'default'

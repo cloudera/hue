@@ -1,6 +1,6 @@
 {
   "name": "gethue",
-  "version": "5.0.0",
+  "version": "6.0.0",
   "description": "Hue is an Open source SQL Query Editor for Databases/Warehouses",
   "keywords": [
     "Query Editor",
@@ -30,14 +30,17 @@
     "node": ">=0.10.0"
   },
   "dependencies": {
+    "@ant-design/icons": "5.0.1",
+    "@cloudera/cuix-core": "file:desktop/core/src/desktop/static/desktop/ext/cuix/cloudera-cuix-core-1.0.6.tgz",
     "@gethue/sql-formatter": "4.0.3",
     "@selectize/selectize": "0.14.0",
-    "antd": "4.23.1",
+    "antd": "4.24.5",
     "axios": "0.24.0",
     "babel-preset-react-app": "3.1.2",
     "classnames": "2.3.2",
     "clipboard": "1.7.1",
     "core-js": "3.19.1",
+    "cuix": "file:desktop/core/src/desktop/static/desktop/ext/cuix/cuix-13.0.4.tgz",
     "d3v3": "1.0.3",
     "dropzone": "5.5.1",
     "file-saver": "2.0.5",
@@ -57,7 +60,7 @@
     "knockout.validation": "2.0.3",
     "localforage": "1.7.3",
     "lodash": "4.17.21",
-    "luxon": "1.25.0",
+    "luxon": "1.28.1",
     "medium-editor": "5.23.3",
     "mustache": "4.1.0",
     "page": "1.8.6",
@@ -149,7 +152,7 @@
     "util": "0.12.4",
     "vti": "0.0.24",
     "vue-loader": "16.5.0",
-    "webpack": "5.54.0",
+    "webpack": "5.76.0",
     "webpack-bundle-analyzer": "4.4.2",
     "webpack-bundle-tracker": "1.0.0",
     "webpack-cli": "4.7.0"
@@ -177,7 +180,8 @@
     "test-coverage": "jest --coverage",
     "test-dev": "jest --watch",
     "test-clearCache": "jest --clearCache",
-    "check-license": "node ./tools/license/checkLicenses.js",
-    "check-absolute-paths": "node ./tools/detect-absolute-paths/detectAbsolutePaths.js"
+    "check-license": "node ./tools/ci/check_for_js_licenses.js",
+    "check-absolute-paths": "node ./tools/ci/check_for_absolute_paths.js",
+    "check-pinned-versions": "node ./tools/ci/check_for_pinned_versions.js"
   }
 }

@@ -29,7 +29,7 @@ from hadoop import cluster
 from hadoop.yarn.resource_manager_api import get_resource_manager
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 _API_VERSION = 'v1'
 _JSON_CONTENT_TYPE = 'application/json'

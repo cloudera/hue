@@ -56,7 +56,7 @@ Can be seen in older version: <http://cloudera.github.io/hue/docs-4.3.0/>
 
 ### After
 
-Can be seen in latest: <http://cloudera.github.io/hue/latest/>
+Can be seen in latest: <https://docs.gethue.com/>
 
 [<img src="https://cdn.gethue.com/uploads/2019/04/new_hue_doc_4.5.png"/>][4]
 
@@ -118,17 +118,17 @@ Thank you to everybody using the product and who contributed. One popular ask is
 </div>
 
  [1]: https://gethue.com/additional-sql-improvements-in-hue-4-3/
- [2]: http://cloudera.github.io/hue/latest/
+ [2]: https://docs.gethue.com/
  [3]: https://cdn.gethue.com/uploads/2019/03/hue_4.3_documentation.png.png
  [4]: https://cdn.gethue.com/uploads/2019/04/new_hue_doc_4.5.png
- [5]: http://cloudera.github.io/hue/latest/administrator/
- [6]: http://cloudera.github.io/hue/latest/user/
- [7]: http://cloudera.github.io/hue/latest/developer/
- [8]: http://cloudera.github.io/hue/latest/releases/
+ [5]: https://docs.gethue.com/administrator/
+ [6]: https://docs.gethue.com/user/
+ [7]: hhttps://docs.gethue.com/developer/
+ [8]: https://docs.gethue.com/releases/
  [9]: https://cdn.gethue.com/uploads/2019/03/doc_right_side.png
  [10]: https://cdn.gethue.com/uploads/2019/04/doc_right_toc.png
  [11]: https://cdn.gethue.com/uploads/2019/03/breadcrumbs_docs.png
  [12]: https://cdn.gethue.com/uploads/2019/03/docs_copy_clipboard.png
  [13]: https://cdn.gethue.com/uploads/2019/03/docs_search_bar.png
  [14]: https://cdn.gethue.com/uploads/2019/03/docs_git_edit.png
- [15]: http://cloudera.github.io/hue/latest/user/editor/
+ [15]: https://docs.gethue.com/administrator/configuration/connectors/#databases

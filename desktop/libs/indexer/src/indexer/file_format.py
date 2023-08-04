@@ -40,7 +40,7 @@ else:
   from django.utils.translation import ugettext as _
   from StringIO import StringIO as string_io
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 IMPORT_PEEK_SIZE = 1024 * 1024
@@ -350,6 +350,7 @@ class CSVFormat(FileFormat):
   @classmethod
   def _guess_dialect(cls, sample):
     sniffer = csv.Sniffer()
+    sample = sample.replace('\r\n', '\n')
     dialect = sniffer.sniff(sample if isinstance(sample, str) else sample.decode('utf-8'))
     has_header = cls._hasHeader(sniffer, sample, dialect)
     return dialect, has_header

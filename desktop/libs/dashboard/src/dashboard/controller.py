@@ -28,7 +28,7 @@ from desktop.models import Document2, Document, SAMPLE_USER_OWNERS
 from dashboard.models import Collection2
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class DashboardController(object):

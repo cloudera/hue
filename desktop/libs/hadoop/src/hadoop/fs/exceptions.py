@@ -22,7 +22,7 @@ from desktop.lib.exceptions import StructuredException
 from desktop.lib.rest.http_client import RestException
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class PermissionDeniedException(StructuredException):

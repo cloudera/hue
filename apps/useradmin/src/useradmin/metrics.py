@@ -22,7 +22,7 @@ from prometheus_client import Gauge
 from desktop.lib.metrics import global_registry
 from desktop.lib.security_util import get_localhost_name
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 def active_users():
   from useradmin.models import UserProfile

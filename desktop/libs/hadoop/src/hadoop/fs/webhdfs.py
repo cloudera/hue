@@ -59,7 +59,7 @@ DEFAULT_HDFS_SUPERUSER = desktop.conf.DEFAULT_HDFS_SUPERUSER.get()
 # The number of bytes to read if not specified
 DEFAULT_READ_SIZE = 1024 * 1024 # 1MB
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class WebHdfs(Hdfs):
@@ -798,7 +798,7 @@ class WebHdfs(Hdfs):
     if owner is None:
       owner = self.user
 
-    # Hue was defauling permissions on copying files to the permissions
+    # Hue was defaulting permissions on copying files to the permissions
     # of the original file, but was not doing the same for directories
     # changed below for directories to remain consistent
     if dir_mode is None:

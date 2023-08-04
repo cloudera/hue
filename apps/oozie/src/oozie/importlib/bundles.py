@@ -29,7 +29,7 @@ else:
   from django.utils.translation import ugettext as _
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 OOZIE_NAMESPACES = ['uri:oozie:bundle:0.1', 'uri:oozie:bundle:0.2']
 

@@ -53,7 +53,8 @@ import desktop.views
 from desktop import appmanager, metrics
 from desktop.auth.backend import is_admin, find_or_create_user, ensure_has_a_group, rewrite_user
 from desktop.conf import AUTH, HTTP_ALLOWED_METHODS, ENABLE_PROMETHEUS, KNOX, DJANGO_DEBUG_MODE, AUDIT_EVENT_LOG_DIR, \
-    METRICS, SERVER_USER, REDIRECT_WHITELIST, SECURE_CONTENT_SECURITY_POLICY, has_connectors, is_gunicorn_report_enabled
+    METRICS, SERVER_USER, REDIRECT_WHITELIST, SECURE_CONTENT_SECURITY_POLICY, has_connectors, is_gunicorn_report_enabled, \
+    CUSTOM_CACHE_CONTROL, HUE_LOAD_BALANCER
 from desktop.context_processors import get_app_name
 from desktop.lib import apputil, i18n, fsmanager
 from desktop.lib.django_util import JsonResponse, render, render_json
@@ -63,8 +64,10 @@ from desktop.lib.metrics import global_registry
 from desktop.lib.view_util import is_ajax
 from desktop.log import get_audit_logger
 from desktop.log.access import access_log, log_page_hit, access_warn
+from desktop.auth.backend import knox_login_headers
 
 from libsaml.conf import CDP_LOGOUT_URL
+from urllib.parse import urlparse
 
 if sys.version_info[0] > 2:
   from django.utils.translation import gettext as _
@@ -75,7 +78,7 @@ else:
   from django.utils.http import is_safe_url as url_has_allowed_host_and_scheme, urlquote as quote
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 MIDDLEWARE_HEADER = "X-Hue-Middleware-Response"
 
@@ -89,6 +92,7 @@ DJANGO_VIEW_AUTH_WHITELIST = [
 if ENABLE_PROMETHEUS.get():
   DJANGO_VIEW_AUTH_WHITELIST.append(django_prometheus.exports.ExportToDjangoView)
 
+HUE_LB_HOSTS = [urlparse(hue_lb).netloc for hue_lb in HUE_LOAD_BALANCER.get()] if HUE_LOAD_BALANCER.get() else []
 
 class AjaxMiddleware(MiddlewareMixin):
   """
@@ -311,7 +315,7 @@ class LoginAndPermissionMiddleware(MiddlewareMixin):
     if request.path in ['/oidc/authenticate/', '/oidc/callback/', '/oidc/logout/', '/hue/oidc_failed/']:
       return None
 
-    if AUTH.AUTO_LOGIN_ENABLED.get() and request.path.startswith('/api/token/auth'):
+    if AUTH.AUTO_LOGIN_ENABLED.get() and request.path.startswith('/api/v1/token/auth'):
       pass # allow /api/token/auth can create user or make it active
     elif request.path.startswith('/api/'):
       return None
@@ -726,14 +730,14 @@ class SpnegoMiddleware(MiddlewareMixin):
             principal = self.clean_principal(username)
             if principal.intersection(principals):
               # This may contain chain of reverse proxies, e.g. knox proxy, hue load balancer
-              # Compare hostname on both HTTP_X_FORWARDED_HOST & KNOX_PROXYHOSTS.
+              # Compare hostname on both HTTP_X_FORWARDED_HOST & KNOX_PROXYHOSTS+HUE_LB.
               # Both of these can be configured to use either hostname or IPs and we have to normalize to one or the other
               req_hosts = self.clean_host(request.META['HTTP_X_FORWARDED_HOST'])
-              knox_proxy = self.clean_host(KNOX.KNOX_PROXYHOSTS.get())
-              if req_hosts.intersection(knox_proxy):
+              allowed_hosts = self.clean_host(KNOX.KNOX_PROXYHOSTS.get() + HUE_LB_HOSTS)
+              if req_hosts.intersection(allowed_hosts):
                 knox_verification = True
               else:
-                access_warn(request, 'Failed to verify provided host %s with %s ' % (req_hosts, knox_proxy))
+                access_warn(request, 'Failed to verify provided host %s with %s ' % (req_hosts, allowed_hosts))
             else:
               access_warn(request, 'Failed to verify provided username %s with %s ' % (principal, principals))
             # If knox authentication failed then generate 401 (Unauthorized error)
@@ -749,6 +753,7 @@ class SpnegoMiddleware(MiddlewareMixin):
           if user:
             request.user = user
             login(request, user)
+            knox_login_headers(request)
             msg = 'Successful login for user: %s' % request.user.username
           else:
             msg = 'Failed login for user: %s' % request.user.username
@@ -943,9 +948,41 @@ class MultipleProxyMiddleware:
     Rewrites the proxy headers so that only the most
     recent proxy is used.
     """
+    location = -1
+
+    if 'HTTP_X_REAL_IP' in request.META:
+      if 'HTTP_X_FORWARDED_FOR' in request.META and \
+        request.META['HTTP_X_REAL_IP'] in request.META['HTTP_X_FORWARDED_FOR']:
+        location = 0
+        for item in request.META['HTTP_X_FORWARDED_FOR'].split(','):
+          if request.META['HTTP_X_REAL_IP'].strip() != item.strip():
+            location += 1
+          else:
+            request.META['HTTP_X_FORWARDED_FOR'] = item.strip()
+            break;
+
     for field in self.FORWARDED_FOR_FIELDS:
       if field in request.META:
         if ',' in request.META[field]:
           parts = request.META[field].split(',')
-          request.META[field] = parts[-1].strip()
+          request.META[field] = parts[location].strip()
+
+    if 'HTTP_X_FORWARDED_FOR' not in request.META and 'REMOTE_ADDR' in request.META:
+      request.META['HTTP_X_FORWARDED_FOR'] = request.META['REMOTE_ADDR']
     return self.get_response(request)
+
+
+class CacheControlMiddleware(MiddlewareMixin):
+  def __init__(self, get_response):
+    self.get_response = get_response
+    self.custom_cache_control = CUSTOM_CACHE_CONTROL.get()
+    if not self.custom_cache_control:
+      LOG.info('Unloading CacheControlMiddleware')
+      raise exceptions.MiddlewareNotUsed
+
+  def process_response(self, request, response):
+    if self.custom_cache_control:
+      response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+      response['Pragma'] = 'no-cache'
+      response['Expires'] = '0'
+    return response

@@ -14,7 +14,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-@import '../styles/colors';
 @import '../styles/variables';
 @import './variables';
 
@@ -59,7 +58,7 @@ $sidebar-drawer-behind-z-index: $sidebar-z-index - 1;
     align-items: center;
     justify-content: space-between;
     padding: 0 24px;
-    margin: 0 0 $fluid-spacing-xs 0;
+    margin: 0 0 $fluidx-spacing-xs 0;
     height: 56px;
     flex-shrink: 0;
   }
@@ -70,7 +69,7 @@ $sidebar-drawer-behind-z-index: $sidebar-z-index - 1;
   }
 
   .cdp-app-switcher-app-icon {
-    margin-left: $fluid-spacing-m - $sidebar-indicator-width;
+    margin-left: $fluidx-spacing-m - $sidebar-indicator-width;
   }
 
   .cdp-app-switcher-app-list {
@@ -86,7 +85,7 @@ $sidebar-drawer-behind-z-index: $sidebar-z-index - 1;
       transition: background-color $animation-duration-base;
 
       &:hover {
-        background-color: $fluid-gray-100;
+        background-color: $fluidx-gray-100;
       }
 
       svg {
@@ -98,7 +97,7 @@ $sidebar-drawer-behind-z-index: $sidebar-z-index - 1;
         display: inline-block;
         margin-left: 16px;
         font-size: 14px;
-        color: $fluid-gray-700;
+        color: $fluidx-gray-700;
       }
     }
   }
@@ -112,7 +111,7 @@ $sidebar-drawer-behind-z-index: $sidebar-z-index - 1;
 
 .sidebar-drawer-common-menu-header {
   height: $sidebar-header-height;
-  border-bottom: 1px solid $fluid-gray-100;
+  border-bottom: 1px solid $fluidx-gray-100;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -127,7 +126,7 @@ $sidebar-drawer-behind-z-index: $sidebar-z-index - 1;
 
 .sidebar-drawer-common-menu-body {
   padding: 24px;
-  border-bottom: 1px solid $fluid-gray-100;
+  border-bottom: 1px solid $fluidx-gray-100;
   flex-grow: 1;
   min-height: 0;
   overflow: auto;
@@ -154,15 +153,15 @@ $sidebar-drawer-behind-z-index: $sidebar-z-index - 1;
       height: 32px;
       display: flex;
       align-items: center;
-      color: $fluid-gray-700;
+      color: $fluidx-gray-700;
       padding: 0 24px;
 
       &:hover {
-        background-color: $fluid-gray-200;
+        background-color: $fluidx-gray-200;
       }
 
       svg {
-        margin-right: $fluid-spacing-xs;
+        margin-right: $fluidx-spacing-xs;
         font-size: 20px;
         height: 20px;
         width: 20px;
@@ -178,7 +177,7 @@ $sidebar-drawer-behind-z-index: $sidebar-z-index - 1;
   h6,
   p {
     padding: 0;
-    color: $fluid-gray-800;
+    color: $fluidx-gray-800;
     margin: 0 0 0.5em 0;
   }
 
@@ -276,7 +275,7 @@ $sidebar-drawer-behind-z-index: $sidebar-z-index - 1;
   }
 
   dd {
-    margin-bottom: $fluid-spacing-s;
+    margin-bottom: $fluidx-spacing-s;
   }
 
   ul {
@@ -334,12 +333,12 @@ $sidebar-drawer-behind-z-index: $sidebar-z-index - 1;
       height: 32px;
       display: flex;
       align-items: center;
-      color: $fluid-gray-700;
+      color: $fluidx-gray-700;
       padding: 0 24px;
       width: 100%;
 
       &:hover {
-        background-color: $fluid-gray-200;
+        background-color: $fluidx-gray-200;
       }
 
       svg {
@@ -390,7 +389,7 @@ $sidebar-drawer-behind-z-index: $sidebar-z-index - 1;
 
   .cdp-panel-header {
     height: $sidebar-header-height;
-    border-bottom: 1px solid $fluid-gray-300;
+    border-bottom: 1px solid $fluidx-gray-300;
     display: flex;
     align-items: center;
     flex-shrink: 0;
@@ -403,7 +402,7 @@ $sidebar-drawer-behind-z-index: $sidebar-z-index - 1;
       text-overflow: ellipsis;
       font-size: 20px;
       font-weight: 400;
-      color: $fluid-gray-900;
+      color: $fluidx-gray-900;
     }
 
     img {
@@ -425,7 +424,7 @@ $sidebar-drawer-behind-z-index: $sidebar-z-index - 1;
       text-overflow: ellipsis;
       font-size: 16px;
       font-weight: 400;
-      color: $fluid-gray-900;
+      color: $fluidx-gray-900;
       margin-bottom: 20px;
     }
   }

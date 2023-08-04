@@ -33,7 +33,6 @@ from notebook.connectors.base import get_interpreter
 from notebook.models import make_notebook
 from useradmin.models import User
 
-from desktop.conf import OZONE
 from desktop.lib import django_mako
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.settings import BASE_DIR
@@ -47,7 +46,7 @@ else:
   from urlparse import urlparse
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 try:
@@ -183,18 +182,7 @@ class SQLIndexer(object):
 
     if external_path.lower().startswith("abfs"): #this is to check if its using an ABFS path
       external_path = abfspath(external_path)
-    elif external_path.lower().startswith("ofs") or source_path.lower().startswith("ofs"):  # This is to check if its using an OFS path
-      if OZONE['default'].FS_DEFAULTFS.get():
-        fs_defaultfs_schemeless = OZONE['default'].FS_DEFAULTFS.get()[6:]
 
-        # Add fs_defaultfs netloc in the OFS path for Hive/Impala.
-        # fs_defaultfs can be Ozone service ID if Ozone is in HA or Ozone Manager URI in non-HA mode.
-        # E.g: ofs:// + fs_defaultfs_schemeless + /vol1/buk1/key
-
-        external_path = external_path[:6] + fs_defaultfs_schemeless + external_path[5:]
-        source_path = source_path[:6] + fs_defaultfs_schemeless + source_path[5:]
-      else:
-        raise PopupException('Ozone fs_defaultFS is not configured.')
 
     tbl_properties = OrderedDict()
     if skip_header:

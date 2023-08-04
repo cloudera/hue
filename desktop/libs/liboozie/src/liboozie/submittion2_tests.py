@@ -41,7 +41,7 @@ from liboozie.credentials_tests import TestCredentials
 from liboozie.submission2 import Submission
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 @attr('integration')

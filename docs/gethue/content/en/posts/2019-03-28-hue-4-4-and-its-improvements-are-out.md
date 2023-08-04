@@ -163,7 +163,7 @@ Onwards!
 &nbsp;
 
  [1]: https://cdn.gethue.com/uploads/2015/08/hue-logo-copy.png
- [2]: http://cloudera.github.io/hue/latest/releases/release-notes-4.4.0/index.html
+ [2]: https://docs.gethue.com/releases/release-notes-4.4.0/
  [3]: https://github.com/cloudera/hue/archive/release-4.4.0.zip
  [4]: http://demo.gethue.com/
  [5]: https://blog.cloudera.com/blog/2018/06/new-in-cloudera-5-15-simplifying-the-end-user-data-catalog-for-the-self-service-analytic-database/

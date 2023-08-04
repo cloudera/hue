@@ -41,7 +41,7 @@ else:
   from urlparse import urlparse as lib_urlparse
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 DEFAULT_USER = DEFAULT_USER.get()
 
 
@@ -223,7 +223,7 @@ class ProxyFS(object):
 
     # All users will have access to Ozone root.
     if is_ofs_enabled():
-      LOG.debug('Creation of user home path is not supported in Ozone. Redirect to %s' % OFS_ROOT)
+      LOG.debug('Creation of user home path is not supported in Ozone.')
 
     # Get the new home_path for S3/ABFS when RAZ is enabled.
     if is_raz_s3():

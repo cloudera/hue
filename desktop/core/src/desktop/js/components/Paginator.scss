@@ -16,7 +16,7 @@
  limitations under the License.
 */
 
-@import 'styles/colors';
+@import './styles/variables';
 
 .hue-paginator {
   width: 100%;
@@ -31,7 +31,7 @@
 
   .navigation-actions {
     a {
-      color: $fluid-gray-700;
+      color: $fluidx-gray-700;
 
       &.disabled {
         cursor: default;

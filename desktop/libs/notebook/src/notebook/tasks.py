@@ -39,14 +39,13 @@ from django.http import FileResponse, HttpRequest
 from beeswax.data_export import DataAdapter
 from desktop.auth.backend import rewrite_user
 from desktop.celery import app
-from desktop.conf import TASK_SERVER
+from desktop.conf import ENABLE_HUE_5, TASK_SERVER
 from desktop.lib import export_csvxls, fsmanager
 from desktop.models import Document2
 from desktop.settings import CACHES_CELERY_KEY, CACHES_CELERY_QUERY_RESULT_KEY
 from useradmin.models import User
 
 from notebook.api import _get_statement
-from notebook.conf import ENABLE_NOTEBOOK_2
 from notebook.connectors.base import get_api, QueryExpired, ExecutionWrapper, QueryError
 from notebook.models import make_notebook, MockedDjangoRequest, Notebook
 from notebook.sql_utils import get_current_statement
@@ -58,7 +57,7 @@ else:
 
 
 LOG_TASK = get_task_logger(__name__)
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 STATE_MAP = {
   'SUBMITTED': 'waiting',
   states.RECEIVED: 'waiting',
@@ -492,7 +491,7 @@ def _cleanup(notebook, snippet):
   caches[CACHES_CELERY_KEY].delete(_fetch_progress_key(notebook, snippet))
 
 def _get_query_key(notebook, snippet):
-  if ENABLE_NOTEBOOK_2.get():
+  if ENABLE_HUE_5.get():
     if snippet.get('executable'):
       query_key = snippet['executable']['id']
     elif snippet.get('executor'):

@@ -1,0 +1,59 @@
+name: Frontend CI
+
+on:
+  push:
+    branches:
+    - master
+  pull_request:
+    branches:
+    - master
+    paths:
+      - '**.js'
+      - '**.jsx'
+      - '**.ts'
+      - '**.tsx'
+      - '**.less'
+      - '**.scss'
+      - '**.vue'
+      - 'package*.json'
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Caching npm with setup node
+      uses: actions/setup-node@v3
+      with:
+        node-version: 14
+        cache: 'npm'
+
+    - name: Install npm dependencies
+      run: npm ci
+
+    - name: run commit title format check
+      run: ./tools/ci/check_for_commit_message.sh 
+
+    - name: run npm version checker
+      run: npm run check-pinned-versions
+
+    - name: run npm license checker
+      run: npm run check-license
+
+    - name: run npm absolute path detection
+      run: npm run check-absolute-paths
+
+    - name: run js lint
+      run: npm run lint
+
+    - name: run style lint
+      run: npm run style-lint
+
+    - name: run js tests
+      run: |
+        # https://jestjs.io/docs/en/troubleshooting.html#tests-are-extremely-slow-on-docker-andor-continuous-integration-ci-server
+        sed -i 's/"test": "jest"/"test": "jest --runInBand"/g' package.json
+
+        npm run test

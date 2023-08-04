@@ -156,15 +156,15 @@ export interface AuthRequest {
   message?: string;
 }
 
-const CANCEL_STATEMENT_API = '/api/editor/cancel_statement';
-const CHECK_STATUS_API = '/api/editor/check_status';
-const CLOSE_SESSION_API = '/api/editor/close_session';
-const CLOSE_STATEMENT_API = '/api/editor/close_statement';
-const CREATE_SESSION_API = '/api/editor/create_session';
-const EXECUTE_API_PREFIX = '/api/editor/execute/';
-const FETCH_RESULT_DATA_API = '/api/editor/fetch_result_data';
-const FETCH_RESULT_SIZE_API = '/api/editor/fetch_result_size';
-const GET_LOGS_API = '/api/editor/get_logs';
+const CANCEL_STATEMENT_API = '/api/v1/editor/cancel_statement';
+const CHECK_STATUS_API = '/api/v1/editor/check_status';
+const CLOSE_SESSION_API = '/api/v1/editor/close_session';
+const CLOSE_STATEMENT_API = '/api/v1/editor/close_statement';
+const CREATE_SESSION_API = '/api/v1/editor/create_session';
+const EXECUTE_API_PREFIX = '/api/v1/editor/execute/';
+const FETCH_RESULT_DATA_API = '/api/v1/editor/fetch_result_data';
+const FETCH_RESULT_SIZE_API = '/api/v1/editor/fetch_result_size';
+const GET_LOGS_API = '/api/v1/editor/get_logs';
 
 export const createSession = async (options: {
   type: string;

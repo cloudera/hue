@@ -62,7 +62,7 @@ else:
   from django.utils.translation import ugettext as _
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 # For scraping Job IDs from logs
 HADOOP_JOBS_RE = re.compile("Starting Job = ([a-z0-9_]+?),")

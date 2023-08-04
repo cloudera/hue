@@ -176,6 +176,45 @@ class TestSparkApi(object):
         assert_raises(Exception, self.api.execute, notebook, snippet)
 
 
+  def test_handle_result_data(self):
+    # When result data has no complex type.
+    data = {
+      'data': [[1, 'Test']]
+    }
+    processed_data = self.api._handle_result_data(data, is_complex_type=False)
+    assert_equal(processed_data, [[1, 'Test']])
+
+    # When result data has struct complex type with 'schema' and 'values'.
+    data = {
+      'data': [[1, 'Test',
+              {
+                'schema': [{
+                      'dataType': {},
+                      'metadata': {'map': {}},
+                      'name': 'city',
+                      'nullable': True
+                    },
+                    {
+                      'dataType': {},
+                      'metadata': {'map': {}},
+                      'name': 'State',
+                      'nullable': True
+                    }
+                  ],
+                'values': ['Toronto', 'ON']}]]}
+
+    processed_data = self.api._handle_result_data(data, is_complex_type=True)
+    assert_equal(processed_data, [[1, 'Test', {'State': 'ON', 'city': 'Toronto'}]])
+
+    # When result data has map complex type.
+    data = {
+      'data': [['0', 535.0, {'site_id': 'BEB'}, {'c_id': 'EF'}, '2023-06-16T23:53:31Z']]
+    }
+
+    processed_data = self.api._handle_result_data(data, is_complex_type=True)
+    assert_equal(processed_data, [['0', 535.0, {'site_id': 'BEB'}, {'c_id': 'EF'}, '2023-06-16T23:53:31Z']])
+
+
   def test_check_status(self):
     with patch('notebook.connectors.spark_shell._get_snippet_session') as _get_snippet_session:
       with patch('notebook.connectors.spark_shell.get_spark_api') as get_spark_api:

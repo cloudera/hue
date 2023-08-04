@@ -19,7 +19,7 @@ import errno
 import logging
 import os.path
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 _FLAGS = None
 

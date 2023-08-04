@@ -16,12 +16,16 @@
 
 import { get } from '../../api/utils';
 import { CancellablePromise } from '../../api/cancellablePromise';
+import { PathAndFileData } from './types';
 
-const FILESYSTEMS_API_URL = '/api/storage/filesystems';
-
+const FILESYSTEMS_API_URL = '/api/v1/storage/filesystems';
+const VIEWFILES_API_URl = '/api/v1/storage/view=';
 export interface ApiFileSystem {
   file_system: string;
   user_home_directory: string;
 }
 
 export const fetchFileSystems = (): CancellablePromise<ApiFileSystem[]> => get(FILESYSTEMS_API_URL);
+
+export const fetchFiles = (filePath: string): CancellablePromise<PathAndFileData> =>
+  get(VIEWFILES_API_URl + filePath);

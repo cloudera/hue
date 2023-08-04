@@ -35,9 +35,7 @@
       <a v-if="details" class="more-less-button" @click="showDetails = false">
         {{ I18n('Less details') }}
       </a>
-      <pre class="inline-alert-details">
-        {{ details }}
-      </pre>
+      <pre class="inline-alert-details">{{ details }}</pre>
     </div>
     <a v-else-if="details" class="more-less-button" @click="showDetails = true">
       {{ I18n('More details') }}
@@ -122,7 +120,7 @@
 </script>
 
 <style lang="scss" scoped>
-  @import '../components/styles/colors';
+  @import '../components/styles/variables';
   @import '../components/styles/mixins';
 
   .inline-alert {
@@ -132,41 +130,41 @@
     border-radius: $hue-panel-border-radius;
 
     // ea-unknown
-    background-color: $fluid-gray-050;
-    border: 1px solid $fluid-gray-500;
+    background-color: $fluidx-gray-050;
+    border: 1px solid $fluidx-gray-500;
     .alert-color {
-      color: $fluid-gray-500;
+      color: $fluidx-gray-500;
     }
 
     &.ea-success {
-      background-color: $fluid-green-050;
-      border: 1px solid $fluid-green-400;
+      background-color: $fluidx-green-050;
+      border: 1px solid $fluidx-green-400;
       .alert-color {
-        color: $fluid-green-500;
+        color: $fluidx-green-500;
       }
     }
 
     &.ea-error {
-      background-color: $fluid-red-050;
-      border: 1px solid $fluid-red-400;
+      background-color: $fluidx-red-050;
+      border: 1px solid $fluidx-red-400;
       .alert-color {
-        color: $fluid-red-500;
+        color: $fluidx-red-500;
       }
     }
 
     &.ea-warning {
-      background-color: $fluid-orange-050;
-      border: 1px solid $fluid-orange-400;
+      background-color: $fluidx-orange-050;
+      border: 1px solid $fluidx-orange-400;
       .alert-color {
-        color: $fluid-orange-500;
+        color: $fluidx-orange-500;
       }
     }
 
     &.ea-info {
-      background-color: $fluid-blue-050;
-      border: 1px solid $fluid-blue-400;
+      background-color: $fluidx-blue-050;
+      border: 1px solid $fluidx-blue-400;
       .alert-color {
-        color: $fluid-blue-500;
+        color: $fluidx-blue-500;
       }
     }
 
@@ -193,7 +191,7 @@
     .inline-alert-title,
     .inline-alert-message,
     .inline-alert-details {
-      color: $fluid-gray-900;
+      color: $fluidx-gray-900;
     }
 
     .inline-alert-message {

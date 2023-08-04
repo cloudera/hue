@@ -1,0 +1,22 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`LabeledInfo.vue should render 1`] = `
+<div>
+  <div
+    class="labeled-info-title"
+  >
+    TestLable
+  </div>
+  <div
+    class="labled-info-value"
+  >
+    
+    
+    <div>
+      Some item
+    </div>
+    
+    
+  </div>
+</div>
+`;

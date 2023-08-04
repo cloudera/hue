@@ -14,14 +14,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const AUTOCOMPLETE_API_PREFIX = '/api/editor/autocomplete/';
-export const BANNERS_API = '/api/banners/';
+export const AUTOCOMPLETE_API_PREFIX = '/api/v1/editor/autocomplete/';
+export const BANNERS_API = '/api/v1/banners/';
 export const SAMPLE_API_PREFIX = '/notebook/api/sample/';
-export const EXECUTE_API_PREFIX = '/api/editor/execute/'; // Dups with api.ts
+export const EXECUTE_API_PREFIX = '/api/v1/editor/execute/'; // Dups with api.ts
 export const DOCUMENTS_API = '/desktop/api2/doc/';
 export const DOCUMENTS_SEARCH_API = '/desktop/api2/docs/';
 export const GET_HUE_CONFIG_API = '/desktop/api2/get_hue_config';
-export const FETCH_CONFIG_API = '/api/get_config/';
+export const FETCH_CONFIG_API = '/api/v1/get_config/';
 export const HDFS_API_PREFIX = '/filebrowser/view=' + encodeURIComponent('/');
 export const OFS_API_PREFIX = '/filebrowser/view=' + encodeURIComponent('ofs://');
 export const ADLS_API_PREFIX = '/filebrowser/view=' + encodeURIComponent('adl:/');
@@ -42,16 +42,16 @@ export const SEND_SLACK_MESSAGE = '/desktop/slack/api/message/send';
 export const TOPO_URL = '/desktop/topo/';
 
 export const SEARCH_API = '/desktop/api/search/entities';
-export const INTERACTIVE_SEARCH_API = '/api/metadata/search/entities_interactive';
+export const INTERACTIVE_SEARCH_API = '/api/v1/metadata/search/entities_interactive';
 
-export const CREATE_SESSION_API = '/api/editor/create_session'; // Note: dup by api.ts
-export const CLOSE_SESSION_API = '/api/editor/close_session'; // Note: dup by api.ts
+export const CREATE_SESSION_API = '/api/v1/editor/create_session'; // Note: dup by api.ts
+export const CLOSE_SESSION_API = '/api/v1/editor/close_session'; // Note: dup by api.ts
 export const FETCH_RESULT_SIZE_API = '/notebook/api/fetch_result_size';
 export const FETCH_RESULT_DATA_API = '/notebook/api/fetch_result_data';
-export const GET_LOGS_API = '/api/editor/get_logs';
+export const GET_LOGS_API = '/api/v1/editor/get_logs';
 export const CANCEL_STATEMENT_API = '/notebook/api/cancel_statement';
 export const CLOSE_STATEMENT_API = '/notebook/api/close_statement';
-export const CHECK_STATUS_API = '/api/editor/check_status';
+export const CHECK_STATUS_API = '/api/v1/editor/check_status';
 
 export const HBASE_API_PREFIX = '/hbase/api/';
 export const SAVE_TO_FILE_API = '/filebrowser/save';

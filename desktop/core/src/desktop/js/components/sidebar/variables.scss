@@ -14,7 +14,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-@import '../styles/colors';
 @import '../styles/variables';
 
 $sidebar-selection-color: $hue-primary-color-dark !default;
@@ -22,8 +21,8 @@ $sidebar-width: 248px;
 $sidebar-collapsed-width: 56px;
 $sidebar-bg-color: #132329;
 $sidebar-overflow-indicator-color: #517989;
-$sidebar-default-text-color: $fluid-gray-400;
-$sidebar-hover-color: $fluid-white;
+$sidebar-default-text-color: $fluidx-gray-400;
+$sidebar-hover-color: $fluidx-white;
 $sidebar-item-height: 40px;
 $sidebar-animation-duration-base: $animation-duration-base;
 $sidebar-header-height: 56px;

@@ -34,7 +34,7 @@ else:
   from django.utils.translation import ugettext_lazy as _t, ugettext as _
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 # Not used when connector are on
 INTERPRETERS_CACHE = None
@@ -215,13 +215,6 @@ DBPROXY_EXTRA_CLASSPATH = Config(
 ENABLE_QUERY_BUILDER = Config(
   key="enable_query_builder",
   help=_t("Flag to enable the SQL query builder of the table assist."),
-  type=coerce_bool,
-  default=False
-)
-
-ENABLE_NOTEBOOK_2 = Config(
-  key="enable_notebook_2",
-  help=_t("Feature flag to enable Notebook 2."),
   type=coerce_bool,
   default=False
 )

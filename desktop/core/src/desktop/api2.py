@@ -20,6 +20,7 @@ standard_library.install_aliases()
 from builtins import map
 import logging
 import os
+import re
 import json
 import sys
 import tempfile
@@ -47,6 +48,7 @@ from useradmin.models import User, Group
 from desktop import appmanager
 from desktop.auth.backend import is_admin
 from desktop.conf import ENABLE_CONNECTORS, ENABLE_GIST_PREVIEW, CUSTOM, get_clusters, IS_K8S_ONLY, ENABLE_SHARING
+from desktop.conf import ENABLE_NEW_STORAGE_BROWSER
 from desktop.lib.conf import BoundContainer, GLOBAL_CONFIG, is_anonymous
 from desktop.lib.django_util import JsonResponse, login_notrequired, render
 from desktop.lib.exceptions_renderable import PopupException
@@ -66,7 +68,7 @@ else:
   from StringIO import StringIO as string_io
   from django.utils.translation import ugettext as _
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 def api_error_handler(func):
@@ -98,6 +100,7 @@ def get_config(request):
   config = get_cluster_config(request.user)
   config['hue_config']['is_admin'] = is_admin(request.user)
   config['hue_config']['is_yarn_enabled'] = is_yarn()
+  config['hue_config']['enable_new_storage_browser'] = ENABLE_NEW_STORAGE_BROWSER.get()
   config['clusters'] = list(get_clusters(request.user).values())
   config['documents'] = {
     'types': list(Document2.objects.documents(user=request.user).order_by().values_list('type', flat=True).distinct())
@@ -148,6 +151,7 @@ def get_hue_config(request):
           conf['value'] = str(module.get_raw())
         else:
           conf['value'] = str(module.get_raw()).decode('utf-8', 'replace')
+        conf['value'] = re.sub('(.*)://(.*):(.*)@(.*)', r'\1://\2:**********@\4', conf['value'])
       attrs.append(conf)
 
     return attrs

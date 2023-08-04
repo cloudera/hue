@@ -104,6 +104,10 @@
   ## limit_request_fields=100
   ## limit_request_line=4094
 
+  # Flag to disable webpage caching. Enabling this flag will reduce the performance of the application but it ensures
+  # that the client is always receiving the latest version of the resource.
+  ## custom_cache_control=true
+
   # Filename of SSL Certificate
   ## ssl_certificate=
 
@@ -187,6 +191,12 @@
   # Enable X-Forwarded-Host header if the load balancer requires it.
   ## use_x_forwarded_host=true
 
+  # Enable X-Forwarded-For header if hive/impala requires it.
+  ## enable_xff_for_hive_impala=true
+
+  # Enable X-CSRF-Token header if hive/impala requires it.
+  ## enable_x_csrf_token_for_hive_impala=true
+
   # Support for HTTPS termination at the load-balancer level with SECURE_PROXY_SSL_HEADER.
   ## secure_proxy_ssl_header=false
 
@@ -198,6 +208,14 @@
   # For example, to restrict to your local domain and FQDN, the following value can be used:
   # ^\/.*$,^http:\/\/www.mydomain.com\/.*$
   ## redirect_whitelist=^(\/[a-zA-Z0-9]+.*|\/)$
+
+  # Image version/ Build version of Hue
+  # hue_image_version="2022.2.2.1"
+  ## hue_image_version=
+
+  # Name of the Hue host
+  # hue_host="hue-hive-1"
+  ## hue_host=
 
   # Comma separated list of apps to not load at server startup.
   # e.g.: pig,zookeeper
@@ -437,16 +455,17 @@
     ## reverse_proxy_header=HTTP_X_FORWARDED_FOR
 
     [[[jwt]]]
-      # Adds custom JWT Authentication backend for REST APIs in top priority.
-      ## is_enabled=false
-
       # Endpoint to fetch the public key from verification server.
+      # Also adds custom JWT Authentication backend for REST APIs in top priority if set.
       ## key_server_url=https://ext_authz:8000
 
-      # The identifier of the service issued the JWT
+      # The JWT payload header containing the username.
+      ## username_header=sub
+
+      # The identifier of the service issued the JWT.
       ## issuer=None
 
-      # The identifier of the resource intend to access
+      # The identifier of the resource intend to access.
       ## audience=None
 
       # Verify custom JWT signature.
@@ -938,7 +957,7 @@
   ## Endpoint to contact
   # api_url=https://localhost:8080
 
-  ## How to authenticate against: KERBEROS or JWT (not supported yet)
+  ## How to authenticate against: KERBEROS or JWT
   # api_authentication=KERBEROS
 
   ## Autocreate the user home directory in the remote home storage path.
@@ -1232,7 +1251,7 @@
 
   # Size, in bytes, of the chunks Django should store into memory and feed into the handler. Default is 64MB.
   ## upload_chunk_size=64*1024*1024
-  
+
   # Configuration for YARN (MR2)
   # ------------------------------------------------------------------------
   [[yarn_clusters]]
@@ -1603,6 +1622,10 @@
   # Optionally set this to control the caching strategy for files download
   ## file_download_cache_control=no-store, no-cache, max-age=0, must-revalidate, proxy-revalidate
 
+  # A limit on a file size (bytes) that can be uploaded to a filesystem.
+  # A value of -1 means there will be no limit.
+  ## max_file_size_upload_limit=-1
+
 
 ###########################################################################
 # Settings to configure Pig
@@ -1773,15 +1796,15 @@
   # Show the Hive section for listing the query history and providing more troubleshooting information.
   ## enable_hive_query_browser=false
 
-  # Show the Queries section for listing Hive/Impala query history and providing more troubleshooting information.
-  ## enable_queries_list=false
-
   # Use the proxy API instead of the ORM to access the query_store.
   ## use_proxy=true
 
   [[query_store]]
     # URL of Query Store API server.
-    ##server_url=http://localhost:8080/
+    ##server_url=
+
+    # Show the Hive/Impala queries UI. The value is automatically set to false if server_url is empty, else true.
+    ##is_enabled=false
 
 ###########################################################################
 # Settings to configure Sentry / Security App.

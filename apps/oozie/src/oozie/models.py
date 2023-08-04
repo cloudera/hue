@@ -68,7 +68,7 @@ else:
   from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 PATH_MAX = 512
 name_validator = RegexValidator(regex='^[a-zA-Z_][\-_a-zA-Z0-9]{1,39}$',

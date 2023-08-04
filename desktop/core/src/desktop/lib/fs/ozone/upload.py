@@ -25,14 +25,12 @@ from hadoop.conf import UPLOAD_CHUNK_SIZE
 from hadoop.fs.exceptions import WebHdfsException
 
 if sys.version_info[0] > 2:
-  from urllib.parse import urlparse as lib_urlparse
   from django.utils.translation import gettext as _
 else:
-  from urlparse import urlparse as lib_urlparse
   from django.utils.translation import ugettext as _
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class OFSFileUploadError(UploadFileException):
@@ -120,9 +118,9 @@ class OFSFileUploadHandler(FileUploadHandler):
 
   def _get_scheme(self):
     if self.destination:
-      dst_parse = lib_urlparse(self.destination)
-      if dst_parse.scheme:
-        return dst_parse.scheme.lower()
+      dst_parts = self.destination.split('://')
+      if dst_parts:
+        return dst_parts[0].lower()
       else:
         raise OFSFileUploadError('Destination does not start with a valid scheme.')
     else:

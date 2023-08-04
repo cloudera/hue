@@ -26,7 +26,7 @@ except ImportError as e:
 from librdbms.server.rdbms_base_lib import BaseRDBMSDataTable, BaseRDBMSResult, BaseRDMSClient
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class DataTable(BaseRDBMSDataTable): pass

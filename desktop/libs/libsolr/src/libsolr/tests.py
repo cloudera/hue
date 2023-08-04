@@ -33,7 +33,7 @@ from useradmin.models import User
 from libsolr.api import SolrApi
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 try:

@@ -48,6 +48,7 @@ from aws.s3.s3fs import S3FileSystemException, S3ListAllBucketsException, get_s3
 from desktop import appmanager
 from desktop.auth.backend import is_admin
 from desktop.conf import RAZ
+from desktop.conf import ENABLE_NEW_STORAGE_BROWSER
 from desktop.lib import fsmanager
 from desktop.lib import i18n
 from desktop.lib.conf import coerce_bool
@@ -120,7 +121,7 @@ INLINE_DISPLAY_MIMETYPE = re.compile(
 INLINE_DISPLAY_MIMETYPE_EXCEPTIONS = re.compile('image/svg\+xml')
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger()
 
 
 class ParquetOptions(object):
@@ -197,8 +198,10 @@ def download(request, path):
     request.fs.read(path, offset=0, length=1)
   except WebHdfsException as e:
     if e.code == 403:
-      raise PopupException(_('User %s is not authorized to download file at path "%s"') %
-                           (request.user.username, path))
+      raise PopupException(_('User %s is not authorized to download file at path "%s"') % (request.user.username, path))
+    elif request.fs._get_scheme(path).lower() == 'abfs' and e.code == 416:
+      # Safe to skip ABFS exception of code 416 for zero length objects, file will get downloaded anyway.
+      logger.exception('Skipping exception from ABFS: ' + str(e))
     else:
       raise PopupException(_('Failed to download file at path "%s": %s') % (path, e))
 
@@ -518,6 +521,9 @@ def listdir_paged(request, path):
     filter=?          - Specify a substring filter to search for in
                         the filename field.
   """
+  if ENABLE_NEW_STORAGE_BROWSER.get():
+    return render('storage_browser.mako', request, {})
+
   path = _normalize_path(path)
 
   if not request.fs.isdir(path):
@@ -1319,10 +1325,21 @@ def copy(request):
   recurring = ['dest_path']
   params = ['src_path']
   def bulk_copy(*args, **kwargs):
+    ofs_skip_files = ''
     for arg in args:
       if arg['src_path'] == arg['dest_path']:
         raise PopupException(_('Source path and destination path cannot be same'))
-      request.fs.copy(arg['src_path'], arg['dest_path'], recursive=True, owner=request.user)
+
+      # Copy method for OFS returns a string of skipped files if their size is greater than chunk size.
+      if arg['src_path'].startswith('ofs://'):
+        ofs_skip_files += request.fs.copy(arg['src_path'], arg['dest_path'], recursive=True, owner=request.user)
+      else:
+        request.fs.copy(arg['src_path'], arg['dest_path'], recursive=True, owner=request.user)
+    
+    # Send skipped filenames via raising exception to let users know.
+    if ofs_skip_files:
+      raise PopupException("Following files were skipped due to file size limitations:" + ofs_skip_files)
+
   return generic_op(CopyFormSet, request, bulk_copy, ["src_path", "dest_path"], None,
                     data_extractor=formset_data_extractor(recurring, params),
                     arg_extractor=formset_arg_extractor,

@@ -33,7 +33,7 @@ from useradmin.views import ensure_home_directory
 from liboozie.submittion import Submission
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 @attr('integration')
