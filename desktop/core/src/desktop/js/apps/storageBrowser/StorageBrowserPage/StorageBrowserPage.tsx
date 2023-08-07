@@ -14,19 +14,54 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { Tabs, Spin } from 'antd';
+import type { TabsProps } from 'antd';
 
-import { i18nReact } from '../../../utils/i18nReact';
-
-import CommonHeader from '../../../reactComponents/CommonHeader/CommonHeader';
 import DataBrowserIcon from '@cloudera/cuix-core/icons/react/DataBrowserIcon';
 
+import { i18nReact } from '../../../utils/i18nReact';
+import CommonHeader from '../../../reactComponents/CommonHeader/CommonHeader';
+import StorageBrowserTabContent from './StorageBrowserTabContents/StorageBrowserTabContent';
+import { fetchFileSystems } from '../../../reactComponents/FileChooser/api';
+
+import './StorageBrowserPage.scss';
+
 const StorageBrowserPage: React.FC = (): JSX.Element => {
+  const [fileSystemTabs, setFileSystemTabs] = useState<TabsProps['items'] | undefined>();
+  const [loading, setLoading] = useState(true);
+
   const { t } = i18nReact.useTranslation();
+
+  useEffect(() => {
+    if (!fileSystemTabs) {
+      setLoading(true);
+      fetchFileSystems()
+        .then(fileSystems => {
+          const fileSystemsObj = fileSystems.map((system, index) => {
+            return {
+              label: system.file_system.toUpperCase(),
+              key: index.toString(),
+              children: <StorageBrowserTabContent user_home_dir={system.user_home_directory} />
+            };
+          });
+          setFileSystemTabs(fileSystemsObj);
+        })
+        .catch(error => {
+          //TODO: Properly handle errors.
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }
+  }, []);
 
   return (
     <div className="hue-storage-browser">
       <CommonHeader title={t('Storage Browser')} icon={<DataBrowserIcon />} />
+      <Spin spinning={loading}>
+        <Tabs className="hue-storage-browser__tab" defaultActiveKey="0" items={fileSystemTabs} />
+      </Spin>
     </div>
   );
 };
