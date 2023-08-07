@@ -17,6 +17,9 @@ Versions supported:
 ```
 # If you are using Python 3.8, set PYTHON_VER before the build, like
 export PYTHON_VER=python3.8
+
+# Export ROOT which should point to your Hue directory
+export ROOT=<path_to_hue_directory>
 ```
 
 ## Database
