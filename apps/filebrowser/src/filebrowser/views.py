@@ -521,9 +521,6 @@ def listdir_paged(request, path):
     filter=?          - Specify a substring filter to search for in
                         the filename field.
   """
-  if ENABLE_NEW_STORAGE_BROWSER.get():
-    return render('storage_browser.mako', request, {})
-
   path = _normalize_path(path)
 
   if not request.fs.isdir(path):
@@ -630,6 +627,9 @@ def listdir_paged(request, path):
       'is_embeddable': request.GET.get('is_embeddable', False),
       's3_listing_not_allowed': s3_listing_not_allowed
   }
+
+  if ENABLE_NEW_STORAGE_BROWSER.get():
+    return render('storage_browser.mako', request, data)
   return render('listdir.mako', request, data)
 
 
