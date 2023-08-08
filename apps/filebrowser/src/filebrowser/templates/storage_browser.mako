@@ -24,8 +24,5 @@
     ${ render_bundle(bundle) | n,unicode }
 % endfor
 
-<div>
-  <StorageBrowserPage data-reactcomponent='StorageBrowserPage'></StorageBrowserPage>
-</div>
-
+<StorageBrowserPage data-reactcomponent='StorageBrowserPage'></StorageBrowserPage>
 
