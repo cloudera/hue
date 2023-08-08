@@ -38,10 +38,10 @@ const StorageBrowserPage: React.FC = (): JSX.Element => {
       setLoading(true);
       fetchFileSystems()
         .then(fileSystems => {
-          const fileSystemsObj = fileSystems.map((system, index) => {
+          const fileSystemsObj = fileSystems.map(system => {
             return {
               label: system.file_system.toUpperCase(),
-              key: index.toString(),
+              key: system.file_system + '_tab',
               children: <StorageBrowserTabContent user_home_dir={system.user_home_directory} />
             };
           });

@@ -15,8 +15,18 @@
 // limitations under the License.
 
 @use 'variables' as vars;
+@import '../../../components/styles/mixins';
 
-.hue-storage-browser__tab {
-  background-color: vars.$fluidx-gray-100;
-  padding: 0 16px;
+.hue-storage-browser {
+  @include fillAbsolute;
+  @include flexRowLayout;
+  display: flex;
+
+  .hue-storage-browser__tab {
+    background-color: vars.$fluidx-gray-100;
+    padding: 0 16px;
+    //TODO: Find fix so the flex is applied
+    flex: 0 0 100%;
+  }
 }
+
