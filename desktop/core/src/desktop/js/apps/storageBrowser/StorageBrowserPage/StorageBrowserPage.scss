@@ -20,6 +20,7 @@
 .hue-storage-browser {
   @include fillAbsolute;
   @include flexRowLayout;
+
   display: flex;
 
   .hue-storage-browser__tab {
