@@ -16,7 +16,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Modal from 'antd/lib/modal/Modal';
-import { Col, Menu, Row, Spin } from 'antd';
+import { Col, Menu, Row, Spin, Button } from 'antd';
 
 import HdfsIcon from '../../../components/icons/HdfsIcon';
 import S3Icon from '../../../components/icons/S3Icon';
@@ -124,10 +124,20 @@ const FileChooserModal: React.FC<FileProps> = ({ show, onCancel, title, okText }
           </Col>
           <Col span={19}>
             <Spin spinning={loadingFiles}>
-              <PathBrowser
-                handleFilePathChange={setFilePath}
-                breadcrumbs={filesData?.breadcrumbs}
-              ></PathBrowser>
+              <Row className="hue-path-browser-panel" onClick={e => e.stopPropagation()}>
+                <Col span={18}>
+                  <PathBrowser
+                    handleFilePathChange={setFilePath}
+                    breadcrumbs={filesData?.breadcrumbs}
+                  ></PathBrowser>
+                </Col>
+                <Col span={3}>
+                  <Button className="hue-path-browser-panel__button">New Folder</Button>
+                </Col>
+                <Col span={3}>
+                  <Button className="hue-path-browser-panel__button">Upload</Button>
+                </Col>
+              </Row>
             </Spin>
           </Col>
         </Row>
