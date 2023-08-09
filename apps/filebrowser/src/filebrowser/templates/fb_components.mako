@@ -16,6 +16,7 @@
 <%!
 import datetime
 import sys
+from desktop.views import _ko
 from desktop.lib.paths import SAFE_CHARACTERS_URI_COMPONENTS
 
 from django.template.defaultfilters import urlencode, stringformat, date, filesizeformat, time
@@ -97,14 +98,14 @@ else:
             <% label, f_url = breadcrumb_item['label'], breadcrumb_item['url'] %>
             %if label[-1] == '/':
             <li><a href="javascript: void(0)" data-bind="click: ()=> {
-              huePubSub.publish('open.filebrowserlink', { pathPrefix: '/filebrowser/view=', decodedPath: `${f_url | n}` });
+              huePubSub.publish('open.filebrowserlink', { pathPrefix: '/filebrowser/view=', decodedPath: '${_ko(f_url) | n, h}' });
               window.hueAnalytics.log('filebrowser', 'file-breadcrumb-navigation');
-              }"><span class="divider">${label}</span></a></li>              
+              }"><span class="divider">${label | n, h}</span></a></li>
             %else:
             <li><a href="javascript: void(0)" data-bind="click: ()=> {
-              huePubSub.publish('open.filebrowserlink', { pathPrefix: '/filebrowser/view=', decodedPath: `${f_url | n}` });
+              huePubSub.publish('open.filebrowserlink', { pathPrefix: '/filebrowser/view=', decodedPath: '${_ko(f_url) | n, h}' });
               window.hueAnalytics.log('filebrowser', 'file-breadcrumb-navigation');
-              }">${label}</a><span class="divider">/</span></li>              
+              }">${label | n, h}</a><span class="divider">/</span></li>
             %endif
           % endfor
           </ul>
