@@ -242,7 +242,10 @@ ${ fb_components.menubar() }
   function getContent (callback) {
     // We don't use the python variable path_enc here since that will 
     // produce a double encoded path after calling the python url function
-    const decodedPath = "${path | n}";
+    // In this case we don't want to sanitize the path for XSS as we want exact match on the actual file name,
+    // so to prevent breaking the page on substitution we enforce a js compatible string by only encoding the backtick
+    // char (`) with a js decode to restore it in case file actually has backtick in the name.
+    const decodedPath = `${path.replace("`", "&#96;") | n}`.replaceAll('&#96;', '`');
     const encodedPath = encodeURIComponent(decodedPath);
     const pathPrefix = "/filebrowser/view=";
     const contentPath = pathPrefix+encodedPath;
@@ -311,7 +314,7 @@ ${ fb_components.menubar() }
     var self = this;
 
     self.goToParentDirectory = function () {
-      huePubSub.publish('open.filebrowserlink', { pathPrefix: "/filebrowser/view=", decodedPath: "${view['dirname'] | n}" });
+      huePubSub.publish('open.filebrowserlink', { pathPrefix: "/filebrowser/view=", decodedPath: "${view['dirname'] | n, h}" });
     }
 
     self.changePage = function () {
@@ -379,8 +382,8 @@ ${ fb_components.menubar() }
     self.editFile = function() {
       self.isViewing(false);
       self.isLoading(true);
-      
-      const encodedPath = encodeURIComponent("${path | n}");      
+
+      const encodedPath = encodeURIComponent("${path | n, h}");
       $.ajax({
         url: '/filebrowser/edit=' + encodedPath + '?is_embeddable=true',
         beforeSend:function (xhr) {
@@ -403,7 +406,7 @@ ${ fb_components.menubar() }
     }
 
     self.downloadFile = function () {
-      huePubSub.publish('open.filebrowserlink', { pathPrefix: "/filebrowser/download=", decodedPath:  "${path | n}" });      
+      huePubSub.publish('open.filebrowserlink', { pathPrefix: "/filebrowser/download=", decodedPath:  "${path | n, h}" });
     };
 
     self.pageChanged = function () {
