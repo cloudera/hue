@@ -82,13 +82,6 @@ public class QuerySearchResource {
     return hiveQueryResource.getSearchedQueries(request.getParams(), securityContext);
   }
 
-  private String getEffectiveUser(SecurityContext securityContext) {
-    if (securityContext.isUserInRole(AppAuthentication.Role.ADMIN.name())) {
-      return null;
-    }
-    return securityContext.getUserPrincipal().getName();
-  }
-
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("/facets")
@@ -107,10 +100,11 @@ public class QuerySearchResource {
 
     Set<String> facetFieldSets = filterFacetable(HiveQueryBasicInfo.TABLE_INFORMATION, ifacetFields);
 
-    String userName = getEffectiveUser(securityContext);
+    String userName = securityContext.getUserPrincipal().getName();
+    AppAuthentication.Role role = appAuth.getRole(userName);
 
     Optional<List<FacetValue>> facetValueList = repository.getFacetValues(facetFieldSets, iStartTime, iEndTime,
-        userName, appAuth.getRole(userName), dasConfig.getConf(QP_FACETS_RESULT_LIMIT));
+        userName, role, dasConfig.getConf(QP_FACETS_RESULT_LIMIT));
 
     Map<String, Object> response = ImmutableMap.of("facets", facetValueList.get());
 	return Response.ok(response).build();
