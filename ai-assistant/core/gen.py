@@ -15,24 +15,21 @@
 # limitations under the License.
 
 from transformers import pipeline, AutoTokenizer
-from dataclasses import dataclass
 
-from .configs import model, max_new_tokens
+from . import configs
+from .classes import Input, Output
 
-@dataclass
-class Inference:
-    inference: str
+_tokenizer = AutoTokenizer.from_pretrained(configs.model)
+_pipe = pipeline("text-generation", model=configs.model)
 
-_tokenizer = AutoTokenizer.from_pretrained(model)
-_pipe = pipeline("text-generation", model=model)
+print(f'Model {configs.model} loaded successfully!')
 
-print(f'Model {model} loaded successfully!')
-
-def generator(prompt: str) -> Inference:
+def generator(input: Input) -> Output:
     response = _pipe(
-        prompt,
-        max_new_tokens=max_new_tokens,
+        input.prompt,
+        max_new_tokens=configs.max_new_tokens,
         pad_token_id=_tokenizer.eos_token_id,
         return_full_text=False,
     )
-    return Inference(response[0]['generated_text'])
+    inference: str = response[0]['generated_text'] # type: ignore
+    return Output(inference)
