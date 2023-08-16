@@ -14,32 +14,29 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import asyncio
-
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 
-from core.gen import generator, Inference
+from core.classes import Input, Output
 from core.configs import model
+from core.scheduler import Scheduler
 
 app = FastAPI()
+scheduler = Scheduler()
 
 @app.exception_handler(Exception)
 async def validation_exception_handler(request, err):
     return JSONResponse(status_code=500, content={"error": f"{err}"})
 
-# --- Queue Mechanism -----------------------------------------------
-
-async def infinite_loop(in_queue):
-    while True:
-        (string, out_queue) = await in_queue.get()
-        inference = generator(string)
-        await out_queue.put(inference)
-
 @app.on_event("startup")
-async def start():
-    app.in_queue = asyncio.Queue()
-    asyncio.create_task(infinite_loop(app.in_queue))
+def startup():
+    print("Starting scheduler")
+    scheduler.start()
+
+@app.on_event("shutdown")
+def shutdown():
+    print("Stoping scheduler")
+    scheduler.stop()
 
 # --- APIs ----------------------------------------------------------
 
@@ -51,7 +48,7 @@ def default():
     }
 
 @app.post("/api/infer")
-async def infer(prompt: str) -> Inference:
-    out_queue = asyncio.Queue()
-    await app.in_queue.put((prompt, out_queue))
-    return await out_queue.get()
+async def infer(input: Input) -> Output:
+    return await scheduler.process(input)
+
+# StoppingText
