@@ -25,7 +25,7 @@ deactivate
 
 3. Start server
 ```
-uvicorn main:app --reload
+uvicorn server:app --reload
 ```
 Hue AI Server should now be available at http://localhost:8000
 
