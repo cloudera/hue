@@ -21,7 +21,13 @@ from . import configs
 from .classes import Input, Output
 
 _tokenizer = AutoTokenizer.from_pretrained(configs.model)
-_pipe = pipeline("text-generation", model=configs.model)
+_pipe = pipeline(
+    "text-generation",
+    model=configs.model,
+    framework='pt',
+    torch_dtype=torch.float16,
+    device_map="auto",
+)
 
 print(f'Model {configs.model} loaded successfully!')
 
