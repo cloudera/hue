@@ -50,5 +50,3 @@ def default():
 @app.post("/api/infer")
 async def infer(input: Input) -> Output:
     return await scheduler.process(input)
-
-# StoppingText
