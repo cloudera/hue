@@ -14,17 +14,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from fastapi import FastAPI
-from fastapi.openapi.utils import get_openapi
-
 from core import configs
-from .consts import SERVICE_NAME, SERVICE_VERSION
 
-def init_docs(app: FastAPI):
-    openapi_schema = get_openapi(
-        title=SERVICE_NAME,
-        version=SERVICE_VERSION,
-        description=f"Hosted Model: {configs.model}",
-        routes=app.routes,
-    )
-    app.openapi = lambda: openapi_schema
+SERVICE_NAME = "AI Assistant"
+SERVICE_VERSION = "0.1.0"
+
+SERVICE_DETAILS = {
+    "service": SERVICE_NAME,
+    "version": SERVICE_VERSION,
+    "model": configs.model
+}

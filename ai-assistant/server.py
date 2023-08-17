@@ -18,10 +18,10 @@ from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 
 from core.classes import Input, Output
-from core.configs import model
 from core.scheduler import Scheduler
 
 from utils.docs import init_docs
+from utils.consts import SERVICE_DETAILS
 
 app = FastAPI()
 scheduler = Scheduler()
@@ -44,10 +44,7 @@ def shutdown():
 
 @app.get("/")
 def default():
-    return {
-        "service": "AI Assistant",
-        "model": model
-    }
+    return SERVICE_DETAILS
 
 @app.post("/api/infer")
 async def infer(input: Input) -> Output:
