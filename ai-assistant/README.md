@@ -6,7 +6,7 @@
 
 ## Running Hue AI Assistant
 
-1. Configure in `./server/configs.json`. Default values are as follows.
+1. Configure in `./configs.json`. Default values are as follows.
 ```
 {
   "model": "gpt2", # Huggingface model name
