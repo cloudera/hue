@@ -21,6 +21,8 @@ from core.classes import Input, Output
 from core.configs import model
 from core.scheduler import Scheduler
 
+from utils.docs import init_docs
+
 app = FastAPI()
 scheduler = Scheduler()
 
@@ -50,3 +52,8 @@ def default():
 @app.post("/api/infer")
 async def infer(input: Input) -> Output:
     return await scheduler.process(input)
+
+# --- APIs ----------------------------------------------------------
+
+# Must come after API section
+init_docs(app)
