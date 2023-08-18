@@ -259,6 +259,41 @@ def decode_utf8(input_iterator):
   for l in input_iterator:
     yield l.decode('utf-8')
 
+
+def etl_sample_rows(request):
+  file_format = json.loads(request.POST.get('fileFormat', '{}'))
+  path = file_format["path"]
+  
+  if file_format['inputFormat'] == 'file':
+    file_obj = request.fs.open(path)
+    content = file_obj.read().decode("utf-8")
+    csvfile = string_io(content)
+  else:
+    csvfile = open(path, 'r')
+
+  format = file_format['format']
+  delimiter = format['fieldSeparator']
+  quote_char = format['quoteChar']
+  reader = csv.reader(csvfile, delimiter=delimiter, quotechar=quote_char)
+  
+  sample = []
+  for count, csv_row in enumerate(reader):
+    if format['hasHeader'] and count == 0:
+      continue
+    sample.append(csv_row)
+    if count == 99:
+      break
+
+  columns = format['sampleCols']
+
+  format_ =  {
+    'sample': sample,
+    'columns': columns
+  }
+
+  return JsonResponse(format_)
+
+
 def guess_field_types(request):
   file_format = json.loads(request.POST.get('fileFormat', '{}'))
 

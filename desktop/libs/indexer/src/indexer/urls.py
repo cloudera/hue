@@ -78,12 +78,15 @@ urlpatterns += [
   re_path(r'^api/indexer/guess_format/?$', indexer_api3.guess_format, name='guess_format'),
   re_path(r'^api/indexer/guess_field_types/?$', indexer_api3.guess_field_types, name='guess_field_types'),
   re_path(r'^api/indexer/index/?$', indexer_api3.index, name='index'),
+  re_path(r'^api/indexer/etl_sample_rows/?$', indexer_api3.etl_sample_rows, name='etl_sample_rows'),
 
   re_path(r'^api/importer/submit', indexer_api3.importer_submit, name='importer_submit'),
   re_path(r'^api/importer/save/?$', indexer_api3.save_pipeline, name='save_pipeline'),
   
   re_path(r'^api/indexer/upload_local_file/?$', indexer_api3.upload_local_file, name='upload_local_file'),
-  re_path(r'^api/indexer/upload_local_file_drag_and_drop/?$', indexer_api3.upload_local_file_drag_and_drop, name='upload_local_file_drag_and_drop'),
+  re_path(
+    r'^api/indexer/upload_local_file_drag_and_drop/?$', indexer_api3.upload_local_file_drag_and_drop, name='upload_local_file_drag_and_drop'
+  ),
 ]
 
 urlpatterns += [
