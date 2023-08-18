@@ -237,6 +237,11 @@ def importer_submit(request):
   django_request = get_django_request(request)
   return indexer_api3.importer_submit(django_request)
 
+@api_view(["POST"])
+def transformation_sample_rows(request):
+  django_request = get_django_request(request)
+  return indexer_api3.transformation_sample_rows(django_request)
+
 
 # Connector
 

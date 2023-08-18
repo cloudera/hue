@@ -3096,7 +3096,8 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
           "source": ko.mapping.toJSON(self.source),
           "destination": ko.mapping.toJSON(self.destination),
           "start_time": ko.mapping.toJSON((new Date()).getTime()),
-          "show_command": options.show || ''
+          "show_command": options.show || '',
+          "transformationDefinition": ko.mapping.toJSON('')
         }, function (resp) {
           self.indexingStarted(false);
           if (resp.status === 0) {

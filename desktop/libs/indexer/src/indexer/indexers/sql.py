@@ -66,7 +66,7 @@ class SQLIndexer(object):
     self.fs = fs
     self.user = user
 
-  def create_table_from_a_file(self, source, destination, start_time=-1, file_encoding=None):
+  def create_table_from_a_file(self, source, destination, start_time=-1, file_encoding=None, transformationDefinition='{}'):
     if '.' in destination['name']:
       database, table_name = destination['name'].split('.', 1)
     else:
@@ -310,7 +310,7 @@ class SQLIndexer(object):
           row[cnt] = 'NULL'
     return row
 
-  def create_table_from_local_file(self, source, destination, start_time=-1):
+  def create_table_from_local_file(self, source, destination, start_time=-1, transformationDefinition='{}'):
     if '.' in destination['name']:
       database, table_name = destination['name'].split('.', 1)
     else:
@@ -447,16 +447,16 @@ def _create_database(request, source, destination, start_time):
   return notebook.execute(request, batch=False)
 
 
-def _create_table(request, source, destination, start_time=-1, file_encoding=None):
-  notebook = SQLIndexer(user=request.user, fs=request.fs).create_table_from_a_file(source, destination, start_time, file_encoding)
+def _create_table(request, source, destination, start_time=-1, file_encoding=None, transformationDefinition='{}'):
+  notebook = SQLIndexer(user=request.user, fs=request.fs).create_table_from_a_file(source, destination, start_time, file_encoding, transformationDefinition)
 
   if request.POST.get('show_command'):
     return {'status': 0, 'commands': notebook.get_str()}
   else:
     return notebook.execute(request, batch=False)
 
-def _create_table_from_local(request, source, destination, start_time=-1):
-  notebook = SQLIndexer(user=request.user, fs=request.fs).create_table_from_local_file(source, destination, start_time)
+def _create_table_from_local(request, source, destination, start_time=-1, transformationDefinition='{}'):
+  notebook = SQLIndexer(user=request.user, fs=request.fs).create_table_from_local_file(source, destination, start_time, transformationDefinition)
 
   if request.POST.get('show_command'):
     return {'status': 0, 'commands': notebook.get_str()}

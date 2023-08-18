@@ -259,6 +259,49 @@ def decode_utf8(input_iterator):
   for l in input_iterator:
     yield l.decode('utf-8')
 
+
+@require_POST
+@api_error_handler
+def transformation_sample_rows(request):
+  '''
+  Returns sample rows for transformation operation
+  '''
+  file_format = json.loads(request.POST.get('fileFormat', '{}'))
+  limit = request.POST.get('limit', 100)
+  path = file_format["path"]
+  
+  if file_format['inputFormat'] == 'file':
+    if path[-3:] == 'xls' or path[-4:] == 'xlsx':
+      path = excel_to_csv_file_name_change(path)
+    file_obj = request.fs.open(path)
+    content = file_obj.read().decode("utf-8")
+    csvfile = string_io(content)
+  else:
+    csvfile = open(path, 'r')
+
+  format = file_format['format']
+  delimiter = format['fieldSeparator'] if 'fieldSeparator' in format else ","
+  quote_char = format['quoteChar'] if 'quoteChar' in format else "\""
+  reader = csv.reader(csvfile, delimiter=delimiter, quotechar=quote_char)
+  
+  sample = []
+  for count, csv_row in enumerate(reader):
+    if format['hasHeader'] and count == 0:
+      continue
+    sample.append(csv_row)
+    if count == limit:
+      break
+
+  columns = file_format['sampleCols']
+
+  format_ =  {
+    'sample': sample,
+    'columns': columns
+  }
+
+  return JsonResponse(format_)
+
+
 def guess_field_types(request):
   file_format = json.loads(request.POST.get('fileFormat', '{}'))
 
@@ -455,6 +498,7 @@ def importer_submit(request):
   destination = json.loads(request.POST.get('destination', '{}'))
   destination['ouputFormat'] = outputFormat  # Workaround a very weird bug
   start_time = json.loads(request.POST.get('start_time', '-1'))
+  transformationDefinition = json.loads(request.POST.get('transformationDefinition', '{}'))
 
   file_encoding = None
   if source['inputFormat'] == 'file':
@@ -560,7 +604,8 @@ def importer_submit(request):
         request,
         source,
         destination,
-        start_time
+        start_time,
+        transformationDefinition
       )
     else:
       # TODO: if inputFormat is 'stream' and tableFormat is 'kudu' --> create Table only
@@ -569,7 +614,8 @@ def importer_submit(request):
         source,
         destination,
         start_time,
-        file_encoding
+        file_encoding,
+        transformationDefinition
       )
 
   request.audit = {
