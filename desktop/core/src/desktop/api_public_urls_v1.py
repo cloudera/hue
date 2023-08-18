@@ -157,11 +157,6 @@ urlpatterns += [
 ]
 
 urlpatterns += [
-  re_path(r'^editor/generate_sql', api_public.generate_sql, name='generate_sql'),
-  re_path(r'^editor/chat', api_public.chat, name='chat'),
-]
-
-urlpatterns += [
   re_path(r'^editor/ai/tables', api_public.tables, name='tables'),
   re_path(r'^editor/ai/sql', api_public.sql, name='sql'),
 ]
