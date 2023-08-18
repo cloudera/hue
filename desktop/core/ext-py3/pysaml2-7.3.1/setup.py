@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from setuptools import setup
+import setuptools
 
 package_dir = \
 {'': 'src', 'saml2test': 'src/saml2test', 'utility': 'src/utility'}
@@ -71,4 +71,4 @@ setup_kwargs = {
 }
 
 
-setup(**setup_kwargs)
+setuptools.setup(**setup_kwargs)
