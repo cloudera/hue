@@ -39,4 +39,19 @@
       font-weight: vars.$fluidx-heading-h3-weight;
     }
   }
+
+  .hue-storage-browser-pathBrowserPanel {
+    display: flex;
+    margin-top: 4px;
+
+    .hue-storage-browser-filePath {
+      flex: 0 0 auto;
+      color: vars.$text-color;
+      font-weight: 600;
+    }
+
+    .hue-toggle-breadcrumb-input:empty {
+      background-color: vars.$fluidx-white;
+    }
+  }
 }

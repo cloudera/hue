@@ -22,6 +22,7 @@ import { fetchFiles } from '../../../../reactComponents/FileChooser/api';
 import { PathAndFileData } from '../../../../reactComponents/FileChooser/types';
 
 import './StorageBrowserTabContent.scss';
+import PathBrowser from '../../../../reactComponents/FileChooser/PathBrowser/PathBrowser';
 
 interface StorageBrowserTabContentProps {
   user_home_dir: string;
@@ -60,8 +61,17 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
         <div className="hue-storage-browser__title-bar" data-testid={`${testId}-title-bar`}>
           <BucketIcon className="hue-storage-browser__icon" data-testid={`${testId}-icon`} />
           <div className="hue-storage-browser__folder-name" data-testid={`${testId}-folder-namer`}>
-            {filesData?.breadcrumbs[filesData?.breadcrumbs.length - 1].label}
+            {filesData?.breadcrumbs[filesData?.breadcrumbs?.length - 1].label}
           </div>
+        </div>
+        <div className="hue-storage-browser-pathBrowserPanel">
+          <div className="hue-storage-browser-filePath">File Path:</div>
+          <PathBrowser
+            breadcrumbs={filesData?.breadcrumbs}
+            handleFilePathChange={setFilePath}
+            seperator={'/'}
+            showIcon={false}
+          />
         </div>
       </div>
     </Spin>

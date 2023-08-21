@@ -15,9 +15,8 @@
 // limitations under the License.
 
 import React, { useRef, useEffect, useState, RefObject } from 'react';
-import { Input, Button, Dropdown, Row, Col } from 'antd';
+import { Input, Button, Dropdown } from 'antd';
 import type { MenuProps } from 'antd';
-import { RightOutlined } from '@ant-design/icons';
 
 import HdfsIcon from '../../../components/icons/HdfsIcon';
 import S3Icon from '../../../components/icons/S3Icon';
@@ -30,9 +29,16 @@ import './PathBrowser.scss';
 interface PathBrowserProps {
   breadcrumbs?: BreadcrumbData[];
   handleFilePathChange: (path: string) => void;
+  seperator: string;
+  showIcon: boolean;
 }
 
-const PathBrowser: React.FC<PathBrowserProps> = ({ breadcrumbs, handleFilePathChange }) => {
+const PathBrowser: React.FC<PathBrowserProps> = ({
+  breadcrumbs,
+  handleFilePathChange,
+  seperator,
+  showIcon
+}) => {
   const [isEditMode, setIsEditMode] = useState(false);
 
   const icons = {
@@ -95,7 +101,7 @@ const PathBrowser: React.FC<PathBrowserProps> = ({ breadcrumbs, handleFilePathCh
       <>
         {!isEditMode ? (
           <div className="hue-path-browser">
-            <div className="hue-filesystem__icon">
+            <div className={showIcon ? 'hue-filesystem__icon' : 'hide-hue-filesystem__icon'}>
               {icons[extractFileSystem(breadcrumbs[0].label)]}
             </div>
             <div className="hue-path-browser__breadcrumb">
@@ -111,7 +117,7 @@ const PathBrowser: React.FC<PathBrowserProps> = ({ breadcrumbs, handleFilePathCh
                         componentType="breadcrumb"
                       />
                       {index != breadcrumbs.length - 1 ? (
-                        <RightOutlined className="hue-path-browser__breadcrumb-seperator" />
+                        <div className="hue-path-browser__breadcrumb-seperator">{seperator}</div>
                       ) : (
                         <></>
                       )}
@@ -127,7 +133,7 @@ const PathBrowser: React.FC<PathBrowserProps> = ({ breadcrumbs, handleFilePathCh
                     componentType="breadcrumb"
                     key={breadcrumbs[0].url}
                   />
-                  <RightOutlined className="hue-path-browser__breadcrumb-seperator" />
+                  <div className="hue-path-browser__breadcrumb-seperator">{seperator}</div>
                   <Dropdown
                     overlayClassName="hue-path-browser__dropdown"
                     menu={{
@@ -139,7 +145,7 @@ const PathBrowser: React.FC<PathBrowserProps> = ({ breadcrumbs, handleFilePathCh
                   >
                     <Button className="hue-path-browser__dropdown-button">..</Button>
                   </Dropdown>
-                  <RightOutlined className="hue-path-browser__breadcrumb-seperator" />
+                  <div className="hue-path-browser__breadcrumb-seperator">{seperator}</div>
                   <OverflowingItem
                     key={breadcrumbs[breadcrumbs.length - 2].url}
                     label={breadcrumbs[breadcrumbs.length - 2].label}
@@ -147,7 +153,7 @@ const PathBrowser: React.FC<PathBrowserProps> = ({ breadcrumbs, handleFilePathCh
                     handleFilePathChange={handleFilePathChange}
                     componentType="breadcrumb"
                   />
-                  <RightOutlined className="hue-path-browser__breadcrumb-seperator" />
+                  <div className="hue-path-browser__breadcrumb-seperator">{seperator}</div>
                   <OverflowingItem
                     key={breadcrumbs[breadcrumbs.length - 1].url}
                     label={breadcrumbs[breadcrumbs.length - 1].label}

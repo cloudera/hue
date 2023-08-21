@@ -18,6 +18,7 @@
 
 .hue-path-browser {
   display: flex;
+  width: 100%;
 
   .hue-filesystem__icon {
     object-fit: cover;
@@ -25,6 +26,10 @@
     height: 24px;
     margin-left: 10px;
     margin-right: 10px;
+  }
+
+  .hide-hue-filesystem__icon {
+    display: none;
   }
 
   .hue-toggle-breadcrumb-input:empty {
@@ -73,8 +78,9 @@
 }
 
 .hue-path-browser__breadcrumb-seperator {
-  width: 14px;
-  height: 28px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   flex: 0 0 auto;
 }
 
