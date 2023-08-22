@@ -33,7 +33,7 @@ class LlmApi(abc.ABC):
             column_names = ', '.join(map(lambda col: f'{col["name"]} {col["type"]}', table["columns"]))
             formatted_metadata.append(f'create table {table_name} ({column_names})')
 
-        return '; '.join(formatted_metadata)
+        return ';\n\n'.join(formatted_metadata)
 
     @abc.abstractmethod
     def infer(self, prompt):
