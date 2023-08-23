@@ -32,6 +32,8 @@ import { getStatementsParser } from 'parse/utils';
 import { SHOW_EVENT as SHOW_GIST_MODAL_EVENT } from 'ko/components/ko.shareGistModal';
 import { cancelActiveRequest } from 'api/apiUtils';
 import { ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT } from 'apps/editor/events';
+import { EXECUTABLE_UPDATED_TOPIC } from 'apps/editor/execution/events';
+import Executor from 'apps/editor/execution/executor';
 import { findEditorConnector, getLastKnownConfig } from 'config/hueConfig';
 import {
   ASSIST_GET_DATABASE_EVENT,
@@ -45,6 +47,11 @@ import {
   REFRESH_STATEMENT_LOCATIONS_EVENT
 } from 'ko/bindings/ace/aceLocationHandler';
 import UUID from 'utils/string/UUID';
+import SqlExecutable, { ExecutionStatus } from 'apps/editor/execution/sqlExecutable';
+
+// TODO: Remove together with ENABLE_HUE_5. Temporary here for debug
+window.SqlExecutable = SqlExecutable;
+window.Executor = Executor;
 
 const NOTEBOOK_MAPPING = {
   ignore: [
@@ -72,7 +79,13 @@ const NOTEBOOK_MAPPING = {
     'user',
     'positionStatement',
     'lastExecutedStatement',
-    'downloadResultViewModel'
+    'downloadResultViewModel',
+    'parentVm',
+    'activeExecutable',
+    'beforeExecute',
+    'updateFromExecutable',
+    'executor'
+
   ]
 };
 
@@ -180,7 +193,7 @@ const ERROR_REGEX = /line ([0-9]+)(\:([0-9]+))?/i;
 class Snippet {
   constructor(vm, notebook, snippet) {
     const self = this;
-
+    self.parentVm = vm;
     self.id = ko.observable(
       typeof snippet.id != 'undefined' && snippet.id != null ? snippet.id : UUID()
     );
@@ -191,6 +204,7 @@ class Snippet {
       typeof snippet.type != 'undefined' && snippet.type != null ? snippet.type : 'hive'
     );
 
+    self.activeExecutable = ko.observable();
     self.connector = ko.observable();
 
     const updateConnector = id => {
@@ -535,6 +549,11 @@ class Snippet {
     self.lastExecutedStatement = ko.observable(null);
     self.statementsList = ko.observableArray();
 
+    self.beforeExecute = () => {
+      beforeExecute = true;
+      huePubSub.publish(REFRESH_STATEMENT_LOCATIONS_EVENT, this);
+    };
+
     huePubSub.subscribe(CURSOR_POSITION_CHANGED_EVENT, details => {
       if (details.editorId === self.id()) {
         self.aceCursorPosition(details.position);
@@ -559,6 +578,7 @@ class Snippet {
               break;
             }
           }
+          self.activeExecutable(self.executor.update(statementDetails, self.beforeExecute, self));
           if (statementDetails.activeStatement) {
             self.positionStatement(statementDetails.activeStatement);
           } else {
@@ -999,7 +1019,7 @@ class Snippet {
       }
       return statement;
     });
-
+    
     self.result = new Result(snippet, snippet.result);
     if (!self.result.hasSomeResults()) {
       self.currentQueryTab('queryHistory');
@@ -1718,6 +1738,7 @@ class Snippet {
     self.lastExecutedSelectionRange = undefined;
 
     self.execute = function (automaticallyTriggered) {
+      debugger;
       self.clearActiveExecuteRequests();
 
       if (!automaticallyTriggered && self.ace()) {
@@ -1759,7 +1780,6 @@ class Snippet {
         self.showExecutionAnalysis(false);
         huePubSub.publish('editor.clear.execution.analysis');
       }
-
       self.status('running');
       self.statusForButtons('executing');
 
@@ -1825,6 +1845,7 @@ class Snippet {
           snippet: komapping.toJSON(self.getContext())
         },
         data => {
+          debugger;
           try {
             if (self.isSqlDialect() && data && data.handle) {
               self.lastExecutedStatement(
@@ -2781,6 +2802,17 @@ class Snippet {
       }
       return true;
     };
+
+    self.executor = new Executor({
+      compute: self.compute,
+      database: self.database,
+      connector: self.connector,
+      namespace: self.namespace,
+      defaultLimit: self.defaultLimit,
+      snippet: self,
+      isSqlEngine: self.isSqlDialect
+    });
+    huePubSub.publish(REFRESH_STATEMENT_LOCATIONS_EVENT, self);
 
     self.refreshHistory = notebook.fetchHistory;
   }
