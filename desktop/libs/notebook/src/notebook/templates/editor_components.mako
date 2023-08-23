@@ -918,6 +918,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     <div class="snippet-container row-fluid" data-bind="visibleOnHover: { override: $root.editorMode() || inFocus() || saveResultsModalVisible(), selector: '.snippet-actions' }">
       <div class="snippet card card-widget" data-bind="css: {'notebook-snippet' : ! $root.editorMode(), 'editor-mode': $root.editorMode(), 'active-editor': inFocus, 'snippet-text' : type() == 'text'}, attr: {'id': 'snippet_' + id()}, clickForAceFocus: ace">
         <div style="position: relative;">
+          <AiAssistBar class="cuix antd" data-bind="reactWrapper: 'AiAssistBar', props: { activeExecutable: activeExecutable }"></AiAssistBar>
           <div class="snippet-row" style="position: relative;">
             <div class="snippet-left-bar">
               <!-- ko template: { if: ! $root.editorMode() && ! $root.isPresentationMode() && ! $root.isResultFullScreenMode(), name: 'notebook-snippet-type-controls${ suffix }' } --><!-- /ko -->
@@ -1137,7 +1138,6 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       <a class="btn" rel="tooltip" data-placement="bottom" title="${ _("Execute all") }" data-bind="visible: ! isExecutingAll(), click: function() { executeAll(); }">
         <i class="fa fa-fw fa-play"></i>
       </a>
-      <!-- ko if: ! (snippets()[executingAllIndex()] && snippets()[executingAllIndex()].isCanceling()) -->
       <a class="btn red" rel="tooltip" data-placement="bottom" title="${ _("Stop all") }" data-bind="visible: isExecutingAll(), click: function() { cancelExecutingAll(); }">
         <i class="fa fa-fw fa-stop"></i>
       </a>
@@ -1728,11 +1728,9 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     <div class="label label-info" data-bind="attr: {'title':'${ _ko('Showing results of the statement #')}' + (result.statement_id() + 1)}, visible: $root.editorMode() && result.statements_count() > 1">
       <div class="pull-left" data-bind="text: (result.statement_id() + 1)"></div><div class="pull-left">/</div><div class="pull-left" data-bind="text: result.statements_count()"></div>
     </div>
-    <!-- ko if: !isCanceling() -->
     <a class="snippet-side-btn red" data-bind="click: cancel, visible: status() == 'running' || status() == 'starting'" title="${ _('Cancel operation') }">
       <i class="fa fa-fw fa-stop snippet-side-single"></i>
     </a>
-    <!-- /ko -->
     <!-- ko if: isCanceling() -->
     <a class="snippet-side-btn" style="cursor: default;" title="${ _('Canceling operation...') }">
       <i class="fa fa-fw fa-spinner snippet-side-single fa-spin"></i>
@@ -1745,6 +1743,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       </a>
       <!-- /ko -->
       <!-- ko if: ! isBatchable() || ! wasBatchExecuted() -->
+      <a data-bind="click: function () { console.log($data.status()) }">a</a>
       <a class="snippet-side-btn" style="padding-right:0" href="javascript: void(0)" data-bind="attr: {'title': $root.editorMode() && result.statements_count() > 1 ? '${ _ko('Execute next statement')}' : '${ _ko('Execute or CTRL + ENTER') }'}, click: function() { wasBatchExecuted(false); execute(); }, visible: status() != 'running' && status() != 'loading' && status() != 'starting', css: {'blue': $parent.history().length == 0 || $root.editorMode(), 'disabled': ! isReady() }, style: {'padding-left': $parent.isBatchable() ? '2px' : '0' }">
         <i class="fa fa-fw fa-play" data-bind="css: { 'snippet-side-single' : ! $parent.isBatchable() }"></i>
       </a>
