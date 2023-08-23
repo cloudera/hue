@@ -6,6 +6,7 @@ LABEL description="Hue SQL Assistant - gethue.com"
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update -y && apt-get install -y \
+  pkg-config \
   python3-pip \
   libkrb5-dev  \
   libsasl2-modules-gssapi-mit \
