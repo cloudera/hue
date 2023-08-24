@@ -29,7 +29,7 @@ interface GenerateExplanation {
   }): Promise<string | { error: Error }>;
 }
 interface GenerateCorrectedSql {
-  (params: { statement: string; dialect: string; onStatusChange: (arg: string) => void }): Promise<
+  (params: { statement: string; databaseName: string; executor: Executor;dialect: string; onStatusChange: (arg: string) => void }): Promise<
     | {
         sql: string;
         explanation: string;
@@ -122,6 +122,27 @@ const fetchFromLlm = async ({
 
   return promise;
 };
+
+const getTablesAndMetadata = async (
+  input: string,
+  databaseName: string,
+  executor: Executor,
+  onStatusChange: (arg: string) => void
+) => {
+  let relevantTables, tableMetadata;
+  try {
+    relevantTables = await getRelevantTables(input, { databaseName, executor }, onStatusChange);
+  } catch (e) {
+    throw new Error('Could not find relevant tables');
+  }
+  try {
+    tableMetadata = await getRelevantTableDetails(databaseName, relevantTables['tables'], executor);
+  } catch (e) {
+    throw new Error('Could not load relevant table metadata');
+  }
+  return { relevantTables, tableMetadata };
+};
+
 
 const getRelevantTables = async (
   input: string,
@@ -223,18 +244,15 @@ const generateOptimizedSql: GenerateOptimizedSql = async ({
   dialect,
   onStatusChange
 }) => {
-  let relevantTables, tableMetadata;
+  let tableMetadata;
   try {
-    relevantTables = await getRelevantTables(statement, { databaseName, executor }, onStatusChange);
+    ({ tableMetadata } = await getTablesAndMetadata(statement, databaseName, executor, onStatusChange));
   } catch (e) {
-    return handleError(e, 'Could not find relevant tables');
+    if (e instanceof Error) {
+      return handleError(e, e.message);
+    }
   }
-  try {
-    tableMetadata = await getRelevantTableDetails(databaseName, relevantTables['tables'], executor);
-  } catch (e) {
-    return handleError(e, 'Could not load relevant table metadata');
-  }
-
+  
   onStatusChange('Optimizing SQL query');
 
   try {
@@ -261,23 +279,15 @@ const generateSQLfromNQL: GenerateSQLfromNQL = async ({
   dialect,
   onStatusChange
 }) => {
-  let relevantTables, tableMetadata;
+  let tableMetadata;
   try {
-    relevantTables = await getRelevantTables(nql, { databaseName, executor }, onStatusChange);
+    ({ tableMetadata } = await getTablesAndMetadata(nql, databaseName, executor, onStatusChange));
   } catch (e) {
-    return handleError(e, 'Could not find relevant tables');
+    if (e instanceof Error) {
+      return handleError(e, e.message);
+    }
   }
-  try {
-    tableMetadata = await getRelevantTableDetails(
-      databaseName,
-      relevantTables['tables'],
-      executor,
-      onStatusChange
-    );
-  } catch (e) {
-    return handleError(e, 'Could not load relevant table metadata');
-  }
-
+  
   onStatusChange('Generating SQL query');
   try {
     return await fetchFromLlm({
@@ -304,25 +314,13 @@ const generateEditedSQLfromNQL: GenerateEditedSQLfromNQL = async ({
   dialect,
   onStatusChange
 }) => {
-  let relevantTables, tableMetadata;
+  let tableMetadata;
   try {
-    relevantTables = await getRelevantTables(
-      `${sql} ${nql}`,
-      { databaseName, executor },
-      onStatusChange
-    );
+    ({ tableMetadata } = await getTablesAndMetadata(nql, databaseName, executor, onStatusChange));
   } catch (e) {
-    return handleError(e, 'Could not find relevant tables');
-  }
-  try {
-    tableMetadata = await getRelevantTableDetails(
-      databaseName,
-      relevantTables['tables'],
-      executor,
-      onStatusChange
-    );
-  } catch (e) {
-    return handleError(e, 'Could not load relevant table metadata');
+    if (e instanceof Error) {
+      return handleError(e, e.message);
+    }
   }
 
   onStatusChange('Generating SQL query');
@@ -344,15 +342,27 @@ const generateEditedSQLfromNQL: GenerateEditedSQLfromNQL = async ({
   }
 };
 
-const generateExplanation: GenerateExplanation = async ({ statement, dialect, onStatusChange }) => {
+const generateExplanation: GenerateExplanation = async ({ statement, dialect, databaseName, executor, onStatusChange }) => {
   try {
+    let tableMetadata;
+    try {
+      ({ tableMetadata } = await getTablesAndMetadata(statement, databaseName, executor, onStatusChange));
+    } catch (e) {
+      if (e instanceof Error) {
+        return handleError(e, e.message);
+      }
+    }
+  
     onStatusChange('Generating explanation');
     return await fetchFromLlm({
       url: SQL_API_URL,
       data: {
         task: 'summarize',
         sql: statement,
-        dialect
+        dialect,
+        metadata: {
+          tables: tableMetadata
+        }
       }
     });
   } catch (e) {
@@ -360,11 +370,16 @@ const generateExplanation: GenerateExplanation = async ({ statement, dialect, on
   }
 };
 
-const generateCorrectedSql: GenerateCorrectedSql = async ({
-  statement,
-  dialect,
-  onStatusChange
-}) => {
+const generateCorrectedSql: GenerateCorrectedSql = async ({ statement, dialect, databaseName, executor, onStatusChange }) => {
+  let tableMetadata;
+  try {
+    ({ tableMetadata } = await getTablesAndMetadata(statement, databaseName, executor, onStatusChange));
+  } catch (e) {
+    if (e instanceof Error) {
+      return handleError(e, e.message);
+    }
+  }
+
   onStatusChange('Generating corrected SQL query');
   try {
     return await fetchFromLlm({
@@ -372,7 +387,10 @@ const generateCorrectedSql: GenerateCorrectedSql = async ({
       data: {
         task: 'fix',
         sql: statement,
-        dialect
+        dialect,
+        metadata: {
+          tables: tableMetadata
+        }
       }
     });
   } catch (e) {
