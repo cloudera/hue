@@ -19,16 +19,16 @@ SQL query: {sql}
 Input: {input}
 Wrap the SQL in a <code> tag and the assumptions in a <assumptions> tag with a closing </assumptions>"""
 
-_SUMMARIZE = """Act as an {dialect} SQL expert.
+_SUMMARIZE = """Act as an {dialect} SQL expert. Based on the input Summarize the SQL using the following metadata: {metadata}.
 Explain in natural language using non technical terms, what this query does: {sql}.
 """
 
-_OPTIMIZE = """Act as an {dialect} SQL expert.
-Optimize this SQL query and explain the improvement if any.
+_OPTIMIZE = """Act as an {dialect} SQL expert. 
+Optimize this SQL query and explain the improvement if any. Based on the input Optimize the SQL using the following metadata: {metadata}.
 Wrap the new code in a <code> tag and the explanation in an <explain> tag with a closing </explain>: {sql}
 """
 
-_FIX = """Act as an {dialect} SQL expert.
+_FIX = """Act as an {dialect} SQL expert. Based on the input fix the SQL using the following metadata: {metadata}.
 Fix this broken sql query and explain the fix.
 Wrap the corrected code in a <code> tag and the explaination in an <explain> tag with a closing </explain>: {sql}
 """
