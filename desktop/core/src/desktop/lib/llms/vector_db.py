@@ -5,13 +5,11 @@ import pdb
 import datetime
 
 def filter_vector_db(metadata, query, database):
-    client = chromadb.Client(Settings(
-        chroma_db_impl="duckdb+parquet",
-        persist_directory="chrome"
-    ))
-
-    prompt = query
-    collection = client.get_or_create_collection(name="tables")
+    client = chromadb.PersistentClient(path="chrome")
+    prompt = "find the table required for the prompt here: "
+    prompt += query
+    pdb.set_trace()
+    collection = client.get_or_create_collection(name="tables1",metadata={"hnsw:space": "cosine"})
     added_tables = set()
 
     current_datetime = datetime.datetime.now()
@@ -39,7 +37,7 @@ def filter_vector_db(metadata, query, database):
                         continue
 
         collection.upsert(
-            documents=table,
+            documents=table_name,
             metadatas=[{"database": database, "table_name": table_name, "created_at": current_datetime.strftime("%Y-%m-%d %H:%M:%S")}],
             ids=document_ids
         )
