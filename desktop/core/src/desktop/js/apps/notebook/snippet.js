@@ -85,7 +85,6 @@ const NOTEBOOK_MAPPING = {
     'beforeExecute',
     'updateFromExecutable',
     'executor'
-
   ]
 };
 

@@ -57,7 +57,12 @@ const NOTEBOOK_MAPPING = {
     'user',
     'positionStatement',
     'lastExecutedStatement',
-    'downloadResultViewModel'
+    'downloadResultViewModel',
+    'parentVm',
+    'activeExecutable',
+    'beforeExecute',
+    'updateFromExecutable',
+    'executor'
   ]
 };
 
