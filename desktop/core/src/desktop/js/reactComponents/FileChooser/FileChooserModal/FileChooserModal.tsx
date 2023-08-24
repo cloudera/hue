@@ -127,8 +127,10 @@ const FileChooserModal: React.FC<FileProps> = ({ show, onCancel, title, okText }
               <Row className="hue-path-browser-panel" onClick={e => e.stopPropagation()}>
                 <Col span={18}>
                   <PathBrowser
-                    handleFilePathChange={setFilePath}
                     breadcrumbs={filesData?.breadcrumbs}
+                    handleFilePathChange={setFilePath}
+                    seperator={'>'}
+                    showIcon={true}
                   ></PathBrowser>
                 </Col>
                 <Col span={3}>

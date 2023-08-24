@@ -15,6 +15,7 @@
 // limitations under the License.
 
 import React, { useEffect, useRef, useState } from 'react';
+import classNames from 'classnames';
 import { Button } from 'antd';
 
 import OverflowTooltip from './OverflowTooltip';
@@ -26,30 +27,25 @@ interface OverflowingItemProps {
   url: string;
   handleFilePathChange: (path: string) => void;
   componentType: OverflowingComponentType;
+  isLastBreadcrumb?: boolean;
+  testId?: string;
 }
 
-//TODO: change to add classnames to components instead of inline styles
-const customStyles: {
-  [key in OverflowingComponentType]: React.CSSProperties;
-} = {
-  breadcrumb: {
-    minWidth: '5ch'
-  },
-  menu: {
-    width: '100%',
-    textAlign: 'left'
-  }
+const defaultProps = {
+  isLastBreadcrumb: false,
+  testId: 'hue-path-browser__overflowing'
 };
 
 const OverflowingItem: React.FC<OverflowingItemProps> = ({
   label,
   url,
   handleFilePathChange,
-  componentType
+  componentType,
+  isLastBreadcrumb,
+  testId
 }) => {
   const textElementRef = useRef<HTMLDivElement>(null);
   const [isOverflown, setIsOverflown] = useState(false);
-
   const compareSize = () => {
     const element = textElementRef.current;
 
@@ -71,11 +67,15 @@ const OverflowingItem: React.FC<OverflowingItemProps> = ({
     <OverflowTooltip isOverflowing={isOverflown} title={label} toolTipTriggers={['hover', 'focus']}>
       <Button
         ref={textElementRef}
-        className="hue-path-browser__overflowing-label"
+        className={classNames(
+          `hue-path-browser__overflowing-label`,
+          `hue-path-browser__overflowing-${componentType}`,
+          isLastBreadcrumb ? `hue-path-browser__overflowing-last-breadcrumb` : ``
+        )}
         onClick={() => {
           handleFilePathChange(url);
         }}
-        style={customStyles[componentType]}
+        data-testid={`${testId}-label-${componentType}`}
       >
         {label}
       </Button>
@@ -83,4 +83,5 @@ const OverflowingItem: React.FC<OverflowingItemProps> = ({
   );
 };
 
+OverflowingItem.defaultProps = defaultProps;
 export default OverflowingItem;

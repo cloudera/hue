@@ -18,6 +18,7 @@
 
 .hue-path-browser {
   display: flex;
+  width: 100%;
 
   .hue-filesystem__icon {
     object-fit: cover;
@@ -25,6 +26,10 @@
     height: 24px;
     margin-left: 10px;
     margin-right: 10px;
+  }
+
+  .hide-hue-filesystem__icon {
+    display: none;
   }
 
   .hue-toggle-breadcrumb-input:empty {
@@ -61,6 +66,7 @@
   .hue-path-browser__dropdown-button {
     border: none;
     box-shadow: none;
+    background-color: transparent;
 
     &:hover {
       background-color: vars.$fluidx-gray-100;
@@ -73,18 +79,19 @@
 }
 
 .hue-path-browser__breadcrumb-seperator {
-  width: 14px;
-  height: 28px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   flex: 0 0 auto;
 }
 
 .hue-path-browser__dropdown {
   width: 200px;
+  background-color: vars.$fluidx-gray-200;
 
-  .hue-path-browser__dropdown {
-    background-color: vars.$fluidx-gray-200;
-    overflow-y: scroll;
+  .ant-dropdown-menu {
     max-height: 200px;
+    overflow-y: scroll;
   }
 
   .ant-dropdown-menu-title-content {
@@ -98,10 +105,13 @@
 .hue-path-browser-panel {
   .hue-path-browser__input {
     width: 300px;
+    flex: 0 0 auto;
+    // height: 32px;
 
     .ant-input-prefix {
       width: 24px;
       height: 24px;
+      object-fit: cover;
     }
   }
 
