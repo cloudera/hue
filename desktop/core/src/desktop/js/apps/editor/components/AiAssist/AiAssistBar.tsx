@@ -233,8 +233,12 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
   const loadFixSuggestion = async (statement: string) => {
     setIsLoading(true);
     const dialect = lastDialect.current;
+    const executor = activeExecutable?.executor;
+    const databaseName = activeExecutable?.database || '';
     const { sql, explanation, error } = await generateCorrectedSql({
       statement,
+      databaseName,
+      executor,
       dialect,
       onStatusChange: handleStatusUpdate
     });
