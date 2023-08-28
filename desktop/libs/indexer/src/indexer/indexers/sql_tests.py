@@ -36,6 +36,8 @@ if sys.version_info[0] > 2:
 else:
   from mock import patch, Mock, MagicMock
 
+def mock_uuid():
+  return '52f840a8-3dde-434d-934a-2d6e06f3687e'
 
 class TestSQLIndexer(object):
 
@@ -105,6 +107,124 @@ DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;'''.split(';')],
     [statement.strip() for statement in notebook.get_data()['snippets'][0]['statement_raw'].split(';')]
   )
 
+  @patch('uuid.uuid4', mock_uuid)
+  def test_create_table_from_a_file_to_csv_for_kms_encryption(self):
+    def mock_parent_path(path):
+      return '/'.join(path.split('/')[:-1])
+
+    class MockStat:
+      def __init__(self, encBit=True, mode=16877):
+        self.encBit = encBit
+        self.mode = mode
+
+      def __getitem__(self, key):
+        if key == 'mode':
+          return 16877
+
+    def enc_source_dict(key):
+      return {
+        'path': '/enc_zn/upload_dir/data.csv',
+        'format': {'quoteChar': '"', 'fieldSeparator': ','},
+        'sampleCols': [{u'operations': [], u'comment': u'', u'name': u'customers.id'}],
+        'sourceType': 'hive'
+      }.get(key, Mock())
+    source = MagicMock()
+    source.__getitem__.side_effect = enc_source_dict
+
+    def destination_dict(key):
+      return {
+        'name': 'default.export_table',
+        'tableFormat': 'csv',
+        'importData': True,
+        'isIceberg': False,
+        'nonDefaultLocation': '/warehouse/tablespace/managed/hive/customer_stats.csv',
+        'columns': [{'name': 'id', 'type': 'int'}],
+        'partitionColumns': [{'name': 'day', 'type': 'date', 'partitionValue': '20200101'}],
+        'description': 'No comment!',
+        'sourceType': 'hive-1'
+      }.get(key, Mock())
+    destination = MagicMock()
+    destination.__getitem__.side_effect = destination_dict
+
+    fs = Mock(
+        stats=Mock(
+          return_value=MockStat()
+        ),
+        parent_path=mock_parent_path,
+        get_home_dir=Mock(return_value='/user/test'),
+    )
+
+    notebook = SQLIndexer(user=self.user, fs=fs).create_table_from_a_file(source, destination)
+
+    ### source dir is in encryption zone, so the scratch dir is in the same dir
+    assert_equal(
+      [statement.strip() for statement in u'''DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;
+CREATE TABLE IF NOT EXISTS `default`.`hue__tmp_export_table`
+(
+  `id` int ) COMMENT "No comment!"
+PARTITIONED BY (
+  `day` date )
+ROW FORMAT   SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
+  WITH SERDEPROPERTIES ("separatorChar" = ",",
+    "quoteChar"     = """,
+    "escapeChar"    = "\\\\"
+    )
+  STORED AS TextFile TBLPROPERTIES('skip.header.line.count'='1', 'transactional'='false')
+;
+LOAD DATA INPATH '/enc_zn/upload_dir/.scratchdir/52f840a8-3dde-434d-934a-2d6e06f3687e/data.csv' INTO TABLE `default`.`hue__tmp_export_table` PARTITION (day='20200101');
+CREATE TABLE `default`.`export_table` COMMENT "No comment!"
+        STORED AS csv
+TBLPROPERTIES('transactional'='true', 'transactional_properties'='insert_only')
+        AS SELECT *
+        FROM `default`.`hue__tmp_export_table`;
+DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;'''.split(';')],
+    [statement.strip() for statement in notebook.get_data()['snippets'][0]['statement_raw'].split(';')]
+  )
+
+    fs = Mock(
+        stats=Mock(
+          return_value=MockStat(encBit=False)
+        ),
+        parent_path=mock_parent_path,
+        get_home_dir=Mock(return_value='/user/test'),
+    )
+
+    def source_dict(key):
+      return {
+        'path': '/user/test/data.csv',
+        'format': {'quoteChar': '"', 'fieldSeparator': ','},
+        'sampleCols': [{u'operations': [], u'comment': u'', u'name': u'customers.id'}],
+        'sourceType': 'hive'
+      }.get(key, Mock())
+    source = MagicMock()
+    source.__getitem__.side_effect = source_dict
+
+    notebook = SQLIndexer(user=self.user, fs=fs).create_table_from_a_file(source, destination)
+
+    ### source dir is not in encryption zone, so the scratch dir is in user's home dir
+    assert_equal(
+      [statement.strip() for statement in u'''DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;
+CREATE TABLE IF NOT EXISTS `default`.`hue__tmp_export_table`
+(
+  `id` int ) COMMENT "No comment!"
+PARTITIONED BY (
+  `day` date )
+ROW FORMAT   SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
+  WITH SERDEPROPERTIES ("separatorChar" = ",",
+    "quoteChar"     = """,
+    "escapeChar"    = "\\\\"
+    )
+  STORED AS TextFile TBLPROPERTIES('skip.header.line.count'='1', 'transactional'='false')
+;
+LOAD DATA INPATH '/user/test/.scratchdir/52f840a8-3dde-434d-934a-2d6e06f3687e/data.csv' INTO TABLE `default`.`hue__tmp_export_table` PARTITION (day='20200101');
+CREATE TABLE `default`.`export_table` COMMENT "No comment!"
+        STORED AS csv
+TBLPROPERTIES('transactional'='true', 'transactional_properties'='insert_only')
+        AS SELECT *
+        FROM `default`.`hue__tmp_export_table`;
+DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;'''.split(';')],
+      [statement.strip() for statement in notebook.get_data()['snippets'][0]['statement_raw'].split(';')]
+    )
 
 class MockRequest(object):
   def __init__(self, fs=None, user=None):
