@@ -1,24 +1,43 @@
 import { useMemo, useState, useEffect, useRef } from 'react';
-import { max, throttle } from 'lodash';
+import { throttle } from 'lodash';
+import huePubSub from 'utils/huePubSub';
 
 import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
 
+// Determines the most common case (upper/lower) of the keywords in the
+// statement currently selected by the editor
 export const useKeywordCase = (parser: any, selectedStatement: string) => {
+  const [autoFormatCount, setAutoFormatCount] = useState(0);
+  useEffect(() => {
+    // Subscribe to autoformatting events from the editor itself
+    // to trigger a recalculation of the keyword case
+    const subscription = huePubSub.subscribe('editor.autoformat.applied', () => {
+      setAutoFormatCount(prevCount => prevCount + 1);
+    });
+    return () => {
+      subscription.remove();
+    };
+  }, []);
+
   const sqlKeywords = useMemo(() => {
     const terminals: { [key: number]: string } = parser?.terminals_ || {};
     const onlyLettersRegex = /^[A-Za-z]+$/;
     const upperCase = Object.values(terminals).filter(str => onlyLettersRegex.test(str));
     const lowerCase = upperCase.map(keyword => keyword.toLowerCase());
-
     return { upperCase, lowerCase };
   }, [parser]);
 
   const keywordCase = useMemo(() => {
+    const hasKey = (statement: string, keyword: string)=> {
+      const regex = new RegExp('\\b' + keyword + '\\b', 'g');
+      return statement.match(regex);      
+    }
     const { upperCase, lowerCase } = sqlKeywords;
-    const upperCaseCount = upperCase.filter(keyword => selectedStatement.includes(keyword)).length;
-    const lowerCaseCount = lowerCase.filter(keyword => selectedStatement.includes(keyword)).length;
+    const upperCaseCount = upperCase.filter(keyword => hasKey(selectedStatement, keyword)).length;
+    const lowerCaseCount = lowerCase.filter(keyword => hasKey(selectedStatement, keyword)).length;    
+
     return lowerCaseCount > upperCaseCount ? 'lower' : 'upper';
-  }, [selectedStatement, sqlKeywords]);
+  }, [selectedStatement, sqlKeywords, autoFormatCount]);
 
   return keywordCase;
 };
