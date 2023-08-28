@@ -27,6 +27,8 @@ import I18n from 'utils/i18n';
 import { SHOW_EVENT as SHOW_GIST_MODAL_EVENT } from 'ko/components/ko.shareGistModal';
 import { DIALECT, STATUS } from 'apps/editor/snippet';
 
+const AUTOFORMAT_APPLIED = 'editor.autoformat.applied';
+
 const TEMPLATE = `
 <div class="snippet-editor-actions">
   <div class="btn-group">
@@ -187,6 +189,8 @@ class SnippetEditorActions {
       this.snippet.statement_raw(formatted_statements);
       this.snippet.ace().setValue(this.snippet.statement_raw(), 1);
     }
+
+    huePubSub.publish(AUTOFORMAT_APPLIED, {});
   }
 
   dispose() {}
