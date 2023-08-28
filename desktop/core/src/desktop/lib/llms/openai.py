@@ -28,8 +28,8 @@ Optimize this SQL query and explain the improvement if any. Based on the input O
 Wrap the new code in a <code> tag and the explanation in an <explain> tag with a closing </explain>: {sql}
 """
 
-_FIX = """Act as an {dialect} SQL expert. Based on the input fix the SQL using the following metadata: {metadata}.
-Fix this broken sql query and explain the fix.
+_FIX = """Act as an {dialect} SQL expert.
+Fix this syntactically broken sql query and explain the fix using the following metadata: {metadata}. Do not optimize and only make the minimal modifcation needed to create a valid query.
 Wrap the corrected code in a <code> tag and the explaination in an <explain> tag with a closing </explain>: {sql}
 """
 
