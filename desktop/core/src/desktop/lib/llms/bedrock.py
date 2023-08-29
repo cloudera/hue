@@ -3,8 +3,6 @@ import re
 import io
 import json
 
-import boto3
-
 from .base import LlmApi, Task
 
 _GENERATE = """Act as an {dialect} SQL expert. Translate the NQL statement into SQL using the following metadata: {metadata}.
@@ -43,8 +41,6 @@ TASK_TEMPLATES = {
 
 _model_name = "amazon.titan-tg1-large"
 
-bedrock = boto3.client('bedrock')
-
 def extractTagContent(tag, text):
     matches = re.findall(f'<{tag}>(.*?)</{tag}>', text, flags=re.DOTALL)
     return matches[0] if len(matches) > 0 else None
@@ -52,6 +48,9 @@ def extractTagContent(tag, text):
 class BedrockApi(LlmApi):
     def __init__(self):
         super().__init__(TASK_TEMPLATES)
+
+        import boto3
+        self.bedrock = boto3.client('bedrock')
 
     def infer(self, prompt):
         body = {
@@ -63,7 +62,7 @@ class BedrockApi(LlmApi):
                 "topP": 0.9
             }
         }
-        response = bedrock.invoke_model(
+        response = self.bedrock.invoke_model(
             modelId=_model_name,
             body=json.dumps(body)
         )
