@@ -24,11 +24,12 @@ import AdlsIcon from '../../../components/icons/AdlsIcon';
 
 import { BreadcrumbData } from '../types';
 import OverflowingItem from './OverflowingItem';
+import Breadcrumb from './Breadcrumb';
 import './PathBrowser.scss';
 
 interface PathBrowserProps {
   breadcrumbs?: BreadcrumbData[];
-  handleFilePathChange: (path: string) => void;
+  onFilepathChange: (path: string) => void;
   seperator: string;
   showIcon: boolean;
   testId?: string;
@@ -40,7 +41,7 @@ const defaultProps = {
 
 const PathBrowser: React.FC<PathBrowserProps> = ({
   breadcrumbs,
-  handleFilePathChange,
+  onFilepathChange,
   seperator,
   showIcon,
   testId
@@ -94,8 +95,7 @@ const PathBrowser: React.FC<PathBrowserProps> = ({
             key={breadcrumb.url}
             label={breadcrumb.label}
             url={breadcrumb.url}
-            handleFilePathChange={handleFilePathChange}
-            componentType="menu"
+            onFilepathChange={onFilepathChange}
           />
         )
       };
@@ -108,24 +108,26 @@ const PathBrowser: React.FC<PathBrowserProps> = ({
       <>
         {!isEditMode ? (
           <div className="hue-path-browser" data-testid={`${testId}`}>
-            <div
-              className={showIcon ? 'hue-filesystem__icon' : 'hide-hue-filesystem__icon'}
-              data-testid={`${testId}-icon`}
-            >
-              {icons[extractFileSystem(breadcrumbs[0].label)]}
-            </div>
-            <div className="hue-path-browser__breadcrumb" data-testid={`${testId}-breadcrumb`}>
+            {showIcon ? (
+              <div
+                className="hue-path-browser__file-system-icon"
+                data-testid={`${testId}__file-system-icon`}
+              >
+                {icons[extractFileSystem(breadcrumbs[0].label)]}
+              </div>
+            ) : (
+              <></>
+            )}
+            <div className="hue-path-browser__breadcrumbs" data-testid={`${testId}-breadcrumb`}>
               {breadcrumbs.length <= 3 ? (
                 breadcrumbs.map((item: BreadcrumbData, index: number) => {
                   return (
                     <>
-                      <OverflowingItem
+                      <Breadcrumb
                         key={item.url}
                         label={index === 0 ? extractFileSystem(item.label) : item.label}
                         url={item.url}
-                        handleFilePathChange={handleFilePathChange}
-                        componentType="breadcrumb"
-                        isLastBreadcrumb={index === breadcrumbs.length - 1 ? true : false}
+                        onFilepathChange={onFilepathChange}
                       />
                       {index != breadcrumbs.length - 1 ? (
                         <div
@@ -142,11 +144,10 @@ const PathBrowser: React.FC<PathBrowserProps> = ({
                 })
               ) : (
                 <>
-                  <OverflowingItem
+                  <Breadcrumb
                     label={extractFileSystem(breadcrumbs[0].label)}
                     url={breadcrumbs[0].url}
-                    handleFilePathChange={handleFilePathChange}
-                    componentType="breadcrumb"
+                    onFilepathChange={onFilepathChange}
                     key={breadcrumbs[0].url}
                   />
                   <div
@@ -178,12 +179,11 @@ const PathBrowser: React.FC<PathBrowserProps> = ({
                   >
                     {seperator}
                   </div>
-                  <OverflowingItem
+                  <Breadcrumb
                     key={breadcrumbs[breadcrumbs.length - 2].url}
                     label={breadcrumbs[breadcrumbs.length - 2].label}
                     url={breadcrumbs[breadcrumbs.length - 2].url}
-                    handleFilePathChange={handleFilePathChange}
-                    componentType="breadcrumb"
+                    onFilepathChange={onFilepathChange}
                   />
                   <div
                     className="hue-path-browser__breadcrumb-seperator"
@@ -191,19 +191,18 @@ const PathBrowser: React.FC<PathBrowserProps> = ({
                   >
                     {seperator}
                   </div>
-                  <OverflowingItem
+                  <Breadcrumb
                     key={breadcrumbs[breadcrumbs.length - 1].url}
                     label={breadcrumbs[breadcrumbs.length - 1].label}
                     url={breadcrumbs[breadcrumbs.length - 1].url}
-                    handleFilePathChange={handleFilePathChange}
-                    componentType="breadcrumb"
-                    isLastBreadcrumb
+                    onFilepathChange={onFilepathChange}
                   />
                 </>
               )}
             </div>
             <Button
-              className="hue-toggle-breadcrumb-input"
+              className="hue-path-browser__toggle-breadcrumb-input-btn"
+              aria-label="hue-path-browser__toggle-breadcrumb-input-btn"
               title="Edit path"
               onClick={() => {
                 setIsEditMode(true);
@@ -217,7 +216,7 @@ const PathBrowser: React.FC<PathBrowserProps> = ({
               prefix={showIcon ? icons[extractFileSystem(breadcrumbs[0].label)] : <span />}
               defaultValue={decodeURIComponent(breadcrumbs[breadcrumbs.length - 1].url)}
               onPressEnter={customPath => {
-                handleFilePathChange((customPath.target as HTMLInputElement).value);
+                onFilepathChange((customPath.target as HTMLInputElement).value);
               }}
               className="hue-path-browser__input"
               autoFocus

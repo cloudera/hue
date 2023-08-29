@@ -20,25 +20,21 @@
   display: flex;
   width: 100%;
 
-  .hue-filesystem__icon {
+  .hue-path-browser__file-system-icon {
     object-fit: cover;
     width: 24px;
     height: 24px;
-    margin-left: 10px;
-    margin-right: 10px;
+    margin: 0 vars.$fluidx-spacing-xs;
   }
 
-  .hide-hue-filesystem__icon {
-    display: none;
-  }
-
-  .hue-toggle-breadcrumb-input:empty {
+  .hue-path-browser__toggle-breadcrumb-input-btn:empty {
     pointer-events: auto;
     width: 60px;
     visibility: visible;
     border: none;
     box-shadow: none;
     padding: 0;
+    background-color: vars.$fluidx-white;
 
     &:hover {
       cursor: text;
@@ -51,12 +47,12 @@
   }
 }
 
-.hue-path-browser__breadcrumb {
+.hue-path-browser__breadcrumbs {
   /* stylelint-disable no-invalid-position-at-import-rule */
   @import './OverflowingItem.scss';
 
   display: flex;
-  gap: 10px;
+  gap: vars.$fluidx-spacing-xs;
   max-width: 60%;
 
   &:hover {
@@ -75,6 +71,10 @@
     &:focus {
       background-color: vars.$fluidx-gray-100;
     }
+  }
+
+  .hue-path-browser__breadcrumb:last-of-type button:last-of-type {
+    color: vars.$fluidx-gray-700;
   }
 }
 
@@ -106,7 +106,6 @@
   .hue-path-browser__input {
     width: 300px;
     flex: 0 0 auto;
-    // height: 32px;
 
     .ant-input-prefix {
       width: 24px;

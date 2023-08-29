@@ -128,7 +128,7 @@ const FileChooserModal: React.FC<FileProps> = ({ show, onCancel, title, okText }
                 <Col span={18}>
                   <PathBrowser
                     breadcrumbs={filesData?.breadcrumbs}
-                    handleFilePathChange={setFilePath}
+                    onFilepathChange={setFilePath}
                     seperator={'>'}
                     showIcon={true}
                   ></PathBrowser>

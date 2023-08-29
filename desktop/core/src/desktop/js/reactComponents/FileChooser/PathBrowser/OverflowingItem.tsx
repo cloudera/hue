@@ -15,33 +15,26 @@
 // limitations under the License.
 
 import React, { useEffect, useRef, useState } from 'react';
-import classNames from 'classnames';
 import { Button } from 'antd';
 
 import OverflowTooltip from './OverflowTooltip';
 import './OverflowingItem.scss';
 
-type OverflowingComponentType = 'breadcrumb' | 'menu';
 interface OverflowingItemProps {
   label: string;
   url: string;
-  handleFilePathChange: (path: string) => void;
-  componentType: OverflowingComponentType;
-  isLastBreadcrumb?: boolean;
+  onFilepathChange: (path: string) => void;
   testId?: string;
 }
 
 const defaultProps = {
-  isLastBreadcrumb: false,
   testId: 'hue-path-browser__overflowing'
 };
 
 const OverflowingItem: React.FC<OverflowingItemProps> = ({
   label,
   url,
-  handleFilePathChange,
-  componentType,
-  isLastBreadcrumb,
+  onFilepathChange,
   testId
 }) => {
   const textElementRef = useRef<HTMLDivElement>(null);
@@ -67,15 +60,11 @@ const OverflowingItem: React.FC<OverflowingItemProps> = ({
     <OverflowTooltip isOverflowing={isOverflown} title={label} toolTipTriggers={['hover', 'focus']}>
       <Button
         ref={textElementRef}
-        className={classNames(
-          `hue-path-browser__overflowing-label`,
-          `hue-path-browser__overflowing-${componentType}`,
-          isLastBreadcrumb ? `hue-path-browser__overflowing-last-breadcrumb` : ``
-        )}
+        className="hue-path-browser__overflowing-label"
         onClick={() => {
-          handleFilePathChange(url);
+          onFilepathChange(url);
         }}
-        data-testid={`${testId}-label-${componentType}`}
+        data-testid={`${testId}-label`}
       >
         {label}
       </Button>

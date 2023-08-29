@@ -17,7 +17,7 @@
 
 .hue-storage-browser-tabContent {
   background-color: vars.$fluidx-white;
-  margin: 16px 0;
+  margin: vars.$fluidx-spacing-s 0;
   padding: 16px;
   //TODO: Set height to content
 
@@ -26,7 +26,7 @@
     align-items: center;
 
     .hue-storage-browser__icon {
-      margin-right: 10px;
+      margin-right: vars.$fluidx-spacing-xs;
       flex: 0 0 auto;
       height: 24px;
       width: 24px;
@@ -40,19 +40,15 @@
     }
   }
 
-  .hue-storage-browser-pathBrowserPanel {
+  .hue-storage-browser__path-browser-panel {
     display: flex;
-    margin-top: 4px;
+    margin-top: vars.$fluidx-spacing-xxs;
 
-    .hue-storage-browser-filePath {
+    .hue-storage-browser__filePath {
       flex: 0 0 auto;
       color: vars.$text-color;
       font-weight: 600;
-      margin-right: 10px;
-    }
-
-    .hue-toggle-breadcrumb-input:empty {
-      background-color: vars.$fluidx-white;
+      margin-right: vars.$fluidx-spacing-xs;
     }
   }
 }

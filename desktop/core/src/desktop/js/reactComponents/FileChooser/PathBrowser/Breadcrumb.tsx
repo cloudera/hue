@@ -13,20 +13,24 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-@use 'variables' as vars;
 
-.hue-path-browser__overflowing-label {
-  background-color: transparent;
-  color: vars.$fluidx-blue-400;
-  white-space: nowrap;
-  padding: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  border: none;
-  flex: 0 1 auto;
-  box-shadow: none;
+import React from 'react';
 
-  > span {
-    display: contents;
-  }
+import OverflowingItem from './OverflowingItem';
+import './Breadcrumb.scss';
+
+interface BreadcrumbProps {
+  label: string;
+  url: string;
+  onFilepathChange: (path: string) => void;
 }
+
+const Breadcrumb: React.FC<BreadcrumbProps> = ({ label, url, onFilepathChange }) => {
+  return (
+    <div className="hue-path-browser__breadcrumb">
+      <OverflowingItem label={label} url={url} onFilepathChange={onFilepathChange} />
+    </div>
+  );
+};
+
+export default Breadcrumb;

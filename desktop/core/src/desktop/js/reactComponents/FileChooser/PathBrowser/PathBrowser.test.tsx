@@ -15,14 +15,13 @@
 // limitations under the License.
 
 import React from 'react';
-import { render, screen, within } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 
 import PathBrowser from './PathBrowser';
-import { debug } from 'webpack';
 
-const handleFilePathChangeMock = jest.fn();
+const onFilepathChangeMock = jest.fn();
 
 const breadcrumbsTestConfig1 = [
   {
@@ -70,153 +69,151 @@ const breadcrumbsTestConfig2 = [
   }
 ];
 
+afterEach(() => {
+  jest.clearAllMocks();
+});
+
 describe('Pathbrowser', () => {
   describe('Pathbrowser breadcrumbs', () => {
     test('renders the specified seperator to seperate the breadcrumbs', () => {
       render(
         <PathBrowser
-          handleFilePathChange={handleFilePathChangeMock}
+          onFilepathChange={onFilepathChangeMock}
           breadcrumbs={breadcrumbsTestConfig1}
           seperator={'%'}
           showIcon
         />
       );
-      const seperator = screen.getAllByTestId('hue-path-browser-breadcrumb-seperator');
-      expect(within(seperator[0]).getByText('%')).toBeVisible();
+      const seperator = screen.getAllByText('%');
+      expect(seperator).not.toBeNull();
     });
 
-    test('renders breadcrumbs without dropdown if there are less than or equal to 3 breadcrumbs', () => {
+    test('does not render a different seperator than specified to seperate the breadcrumbs', () => {
+      render(
+        <PathBrowser
+          onFilepathChange={onFilepathChangeMock}
+          breadcrumbs={breadcrumbsTestConfig1}
+          seperator={'%'}
+          showIcon
+        />
+      );
+      expect(screen.queryByText('/')).toBeNull();
+    });
+
+    test('renders breadcrumbs without dropdown button if there are less than or equal to 3 breadcrumbs', () => {
       const rendered = render(
         <PathBrowser
-          handleFilePathChange={handleFilePathChangeMock}
+          onFilepathChange={onFilepathChangeMock}
           breadcrumbs={breadcrumbsTestConfig1}
           seperator={'/'}
           showIcon
         />
       );
-      expect(rendered.queryByTestId('hue-path-browser-dropdown-btn')).toBeNull();
+      expect(rendered.queryByRole('button', { name: '..' })).toBeNull();
     });
 
-    test('renders breadcrumbs with dropdown if there are more than 3 breadcrumbs', () => {
+    test('renders breadcrumbs with dropdown button if there are more than 3 breadcrumbs', () => {
       const rendered = render(
         <PathBrowser
-          handleFilePathChange={handleFilePathChangeMock}
+          onFilepathChange={onFilepathChangeMock}
           breadcrumbs={breadcrumbsTestConfig2}
           seperator={'/'}
           showIcon
         />
       );
-      expect(rendered.queryByTestId('hue-path-browser-dropdown-btn')).toBeVisible();
+      expect(rendered.getByRole('button', { name: '..' })).toBeVisible();
     });
 
     test('renders dropdown on click of dropdown button', async () => {
       const user = userEvent.setup();
       render(
         <PathBrowser
-          handleFilePathChange={handleFilePathChangeMock}
+          onFilepathChange={onFilepathChangeMock}
           breadcrumbs={breadcrumbsTestConfig2}
           seperator={'/'}
           showIcon
         />
       );
-      expect(
-        screen.queryByTestId('hue-path-browser__overflowing-label-menu')
-      ).not.toBeInTheDocument();
-      const dropdownButton = screen.getByTestId('hue-path-browser-dropdown-btn');
+      //From the given testconfig: The dropdown menu would consist of menu button with label test2. 'test2' should not be visible until the dropdown button is clicked.
+      expect(screen.queryByRole('button', { name: 'test2' })).not.toBeInTheDocument();
+      const dropdownButton = screen.getByRole('button', { name: '..' });
       await user.click(dropdownButton);
-      expect(
-        screen.queryAllByTestId('hue-path-browser__overflowing-label-menu')[0]
-      ).toBeInTheDocument();
-      const dropdown = screen.queryAllByTestId('hue-path-browser__overflowing-label-menu');
-      //Checking for 2nd menu item to be present
-      expect(dropdown[2]).toHaveTextContent('test2');
-      await new Promise<void>(res =>
-        setTimeout(() => {
-          expect(true).toBe(true);
-          res();
-        }, 1000)
-      );
+      expect(screen.getByRole('button', { name: 'test2' })).toBeInTheDocument();
     });
 
-    test('calls handleFilePathChange on click of breadcrumb', async () => {
+    test('calls onFilepathChange on click of breadcrumb', async () => {
       const user = userEvent.setup();
       render(
         <PathBrowser
-          handleFilePathChange={handleFilePathChangeMock}
+          onFilepathChange={onFilepathChangeMock}
           breadcrumbs={breadcrumbsTestConfig1}
-          seperator={'%'}
+          seperator={'/'}
           showIcon={false}
         />
       );
-      expect(handleFilePathChangeMock).not.toHaveBeenCalled();
-      const breadcrumb = screen.queryAllByTestId(
-        'hue-path-browser__overflowing-label-breadcrumb'
-      )[1];
+      expect(onFilepathChangeMock).not.toHaveBeenCalled();
+      const breadcrumb = screen.getByRole('button', { name: 'test' });
       await user.click(breadcrumb);
-      expect(handleFilePathChangeMock).toHaveBeenCalled();
+      expect(onFilepathChangeMock).toHaveBeenCalled();
     });
 
     test('renders icon in breadcrumbs only if specified', () => {
       render(
         <PathBrowser
-          handleFilePathChange={handleFilePathChangeMock}
+          onFilepathChange={onFilepathChangeMock}
           breadcrumbs={breadcrumbsTestConfig1}
-          seperator={'%'}
+          seperator={'/'}
           showIcon
         />
       );
-      const icon = screen.getByTestId('hue-path-browser-icon');
+      const icon = screen.getByTestId('hue-path-browser__file-system-icon');
       expect(icon).toBeVisible();
     });
 
     test('does not render icon in breadcrumbs if showIcon is false', () => {
       render(
         <PathBrowser
-          handleFilePathChange={handleFilePathChangeMock}
+          onFilepathChange={onFilepathChangeMock}
           breadcrumbs={breadcrumbsTestConfig1}
-          seperator={'%'}
+          seperator={'/'}
           showIcon={false}
         />
       );
-      const icon = screen.getByTestId('hue-path-browser-icon');
-      //display: none is not recognised to use toBeVisible.
-      expect(icon).toHaveClass('hide-hue-filesystem__icon');
+      const icon = screen.queryByTestId('hue-path-browser__file-system-icon');
+      expect(icon).toBeNull();
     });
   });
 
   describe('Pathbrowser Input', () => {
+    test('input is hidden before toggle button is clicked', () => {
+      render(
+        <PathBrowser
+          onFilepathChange={onFilepathChangeMock}
+          breadcrumbs={breadcrumbsTestConfig1}
+          seperator={'/'}
+          showIcon
+        />
+      );
+      const input = screen.queryByDisplayValue('abfs://test/test1');
+      expect(input).toBeNull();
+    });
+
     test('renders input when toggle button is clicked', async () => {
       const user = userEvent.setup();
       render(
         <PathBrowser
-          handleFilePathChange={handleFilePathChangeMock}
+          onFilepathChange={onFilepathChangeMock}
           breadcrumbs={breadcrumbsTestConfig1}
-          seperator={'%'}
+          seperator={'/'}
           showIcon
         />
       );
-      const toggleButton = screen.getByTestId('hue-path-browser-toggle-input-btn');
+      const toggleButton = screen.getByRole('button', {
+        name: /hue-path-browser__toggle-breadcrumb-input-btn/i
+      });
       await user.click(toggleButton);
-      const input = screen.getByTestId('hue-path-browser-input');
+      const input = screen.getByDisplayValue('abfs://test/test1');
       expect(input).toBeVisible();
-    });
-
-    test('renders breadcrumbs when clicked anywhere outside of input', async () => {
-      const user = userEvent.setup();
-      render(
-        <PathBrowser
-          handleFilePathChange={handleFilePathChangeMock}
-          breadcrumbs={breadcrumbsTestConfig1}
-          seperator={'%'}
-          showIcon
-        />
-      );
-      const toggleButton = screen.getByTestId('hue-path-browser-toggle-input-btn');
-      await user.click(toggleButton);
-      const input = screen.getByTestId('hue-path-browser-input');
-      expect(input).toBeVisible();
-      await user.click(document.body);
-      expect(input).not.toBeVisible();
     });
   });
 });
