@@ -2,6 +2,7 @@ from .base import LlmApi
 from .llama import HueLlamaApi
 from .llama2 import LLaMA2Api
 from .openai import OpenAiApi
+from .bedrock import BedrockApi
 
 from desktop.conf import LLM
 
@@ -15,7 +16,9 @@ def llm_api_factory() -> LlmApi:
         return HueLlamaApi()
     elif sql_llm == "openai":
         return OpenAiApi()
-    elif sql_llm == "llama2":
-        return LLaMA2Api()
+    elif sql_llm == "openai":
+        return OpenAiApi()
+    elif sql_llm == "bedrock":
+        return BedrockApi()
     else:
         LOG.error("Invalid sql_llm configuration")
