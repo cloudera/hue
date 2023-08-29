@@ -24,8 +24,9 @@ Explain in natural language using non technical terms, what this query does: {sq
 """
 
 _OPTIMIZE = """Act as an {dialect} SQL expert. 
-Optimize this SQL query and explain the improvement if any. Based on the input Optimize the SQL using the following metadata: {metadata}.
-Wrap the new code in a <code> tag and the explanation in an <explain> tag with a closing </explain>: {sql}
+Optimize this SQL query and explain the improvement if any. Only optimize in a way so that the result of the query remains the same. If you can't
+optimize the query then shortly explain alternative options if any.
+Use the following metadata: {metadata}. Wrap the new code in a <code> tag and the explanation in an <explain> tag with a closing </explain>: {sql}
 """
 
 _FIX = """Act as an {dialect} SQL expert.
