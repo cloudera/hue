@@ -94,6 +94,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
   const [isAnimating, setIsAnimating] = useState<'no' | 'expand' | 'contract'>('no');
   const [isEditMode, setIsEditMode] = useState(false);
   const [isGenerateMode, setIsGenerateMode] = useState(false);
+  const [isOptimizeMode, setIsOptimizeMode] = useState(false);
   const [showSuggestedSqlModal, setShowSuggestedSqlModal] = useState(false);
   const [explanation, setExplanation] = useState('');
   const [suggestion, setSuggestion] = useState('');
@@ -209,6 +210,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
 
   const loadOptimization = async (statement: string) => {
     setIsLoading(true);
+    setIsOptimizeMode(true);
     const executor = activeExecutable?.executor;
     const databaseName = activeExecutable?.database || '';
     const dialect = lastDialect.current;
@@ -302,6 +304,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
   };
 
   const resetAll = () => {
+    setIsOptimizeMode(false);
     setIsEditMode(false);
     setIsGenerateMode(false);
     setShowSuggestedSqlModal(false);
@@ -448,12 +451,16 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
       </div>
       {showSuggestedSqlModal && (
         <AiPreviewModal
+          actionType={
+            isGenerateMode ? 'generate' : isEditMode ? 'edit' : isOptimizeMode ? 'optimize' : 'fix'
+          }
           autoFormat={!explanation}
           title="Suggestion"
           open={true}
           onCancel={() => {
             setExplanation('');
             setShowSuggestedSqlModal(false);
+            setIsOptimizeMode(false);
           }}
           onInsert={sql => handleInsert(sql, explanation)}
           primaryButtonLabel={explanation ? 'Insert as comment' : 'Insert'}
