@@ -45,11 +45,7 @@ const insertLineBreaks = (input: string): string => {
   return output;
 };
 
-const appendComments = (
-  previousSql: string,
-  newSql: string,
-  newComment: string
-): string => {
+const appendComments = (previousSql: string, newSql: string, newComment: string): string => {
   let existingComments = '';
   let query = newSql;
 
@@ -79,6 +75,7 @@ const replaceNQLComment = (newSql: string, newComment: string): string => {
 };
 
 interface PreviewModalProps {
+  actionType: 'generate' | 'edit' | 'optimize' | 'fix';
   open: boolean;
   title: string;
   autoFormat: boolean;
@@ -97,6 +94,7 @@ interface PreviewModalProps {
 }
 
 const PreviewModal = ({
+  actionType,
   open,
   title,
   autoFormat,
@@ -127,10 +125,10 @@ const PreviewModal = ({
   const formatSql = (sql: string) => {
     const applyAutoFormat =
       (userChoiceAutoFormat === undefined && autoFormat) || userChoiceAutoFormat;
-    if(applyAutoFormat) {
+    if (applyAutoFormat) {
       try {
         sql = format(sql, { language: dialect, keywordCase });
-      } catch(e) {
+      } catch (e) {
         // Handle gracefully
       }
     }
@@ -173,6 +171,41 @@ const PreviewModal = ({
     });
     setCopied(true);
   };
+
+  if (actionType === 'optimize' || actionType === 'fix') {
+    const noDiffDetected =
+      format(suggestionRaw, { language: dialect, keywordCase: 'upper' }) ===
+      format(showDiffFromRaw, { language: dialect, keywordCase: 'upper' });
+
+    if (noDiffDetected) {
+      return (
+        <Modal
+          wrapClassName="cuix hue-ai-preview-modal"
+          open={open}
+          title={title}
+          onCancel={handleCancel}
+          width={'80%'}
+          footer={
+            <div className="hue-ai-preview-modal__footer">
+              <Button key="submit" type="primary" onClick={handleCancel}>
+                OK
+              </Button>
+            </div>
+          }
+        >
+          <p>
+            {actionType === 'optimize'
+              ? `No optimization to the SQL statement could be suggested.`
+              : `No fix to the SQL statement could be suggested.`}
+          </p>
+          <div className="hue-ai-preview-modal__text-container">
+            <h4 className="hue-ai-preview-modal__text-container-title">Alternative actions</h4>
+            <p className="hue-ai-preview-modal__assumptions">{explanation}</p>
+          </div>
+        </Modal>
+      );
+    }
+  }
 
   return (
     <Modal
@@ -239,7 +272,7 @@ const PreviewModal = ({
             }}
             className="hue-ai-preview-modal__config-switch"
             label="Replace comments"
-          />          
+          />
         </div>
 
         {showDiffFrom && (
