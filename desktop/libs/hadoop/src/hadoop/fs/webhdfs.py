@@ -236,7 +236,13 @@ class WebHdfs(Hdfs):
   @ttl_cache(maxsize=128, ttl=timedelta(hours=24), timer=datetime.now, typed=False)
   def get_delegation_token(self, renewer):
     """get_delegation_token(user) -> Delegation token"""
-    params = self._getparams()
+    params = {}
+    # Workaround for HDFS-3988
+    if self._security_enabled:
+      self.get_home_dir()
+      params["doas"] = self.user
+    else:
+      params = self._getparams()
     params['op'] = 'GETDELEGATIONTOKEN'
     params['renewer'] = renewer
     headers = self._getheaders()
