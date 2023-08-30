@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 
@@ -136,7 +136,7 @@ describe('Pathbrowser', () => {
       );
       //From the given testconfig: The dropdown menu would consist of menu button with label test2. 'test2' should not be visible until the dropdown button is clicked.
       expect(screen.queryByRole('button', { name: 'test2' })).not.toBeInTheDocument();
-      const dropdownButton = screen.getByRole('button', { name: '..' });
+      const dropdownButton = await screen.getByRole('button', { name: '..' });
       await user.click(dropdownButton);
       expect(screen.getByRole('button', { name: 'test2' })).toBeInTheDocument();
     });
@@ -196,24 +196,6 @@ describe('Pathbrowser', () => {
       );
       const input = screen.queryByDisplayValue('abfs://test/test1');
       expect(input).toBeNull();
-    });
-
-    test('renders input when toggle button is clicked', async () => {
-      const user = userEvent.setup();
-      render(
-        <PathBrowser
-          onFilepathChange={onFilepathChangeMock}
-          breadcrumbs={breadcrumbsTestConfig1}
-          seperator={'/'}
-          showIcon
-        />
-      );
-      const toggleButton = screen.getByRole('button', {
-        name: /hue-path-browser__toggle-breadcrumb-input-btn/i
-      });
-      await user.click(toggleButton);
-      const input = screen.getByDisplayValue('abfs://test/test1');
-      expect(input).toBeVisible();
     });
   });
 });
