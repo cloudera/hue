@@ -18,7 +18,7 @@
   display: contents;
 
   .hue-path-browser__overflowing-label {
-    min-width: 4ch;
+    min-width: var(--minWidth);
   }
 }
 

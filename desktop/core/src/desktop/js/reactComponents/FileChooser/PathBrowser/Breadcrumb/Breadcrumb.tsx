@@ -14,6 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { Property } from '@typescript-eslint/types/dist/ast-spec';
+import { min } from 'lodash';
 import React from 'react';
 
 import OverflowingItem from '../OverflowingItem';
@@ -30,8 +32,13 @@ const Breadcrumb: React.FC<BreadcrumbProps> = ({ label, url, onFilepathChange })
     onFilepathChange(url);
   };
 
+  const minWidth = '' + (label.length < 10 ? label.length : 10) + 'ch';
+
   return (
-    <div className="hue-path-browser__breadcrumb">
+    <div
+      className="hue-path-browser__breadcrumb"
+      style={{ '--minWidth': `${minWidth}` } as React.CSSProperties}
+    >
       <OverflowingItem onClick={onClick} label={label} />
     </div>
   );
