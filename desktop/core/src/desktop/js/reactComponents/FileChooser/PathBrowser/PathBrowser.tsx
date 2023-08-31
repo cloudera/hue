@@ -23,8 +23,8 @@ import S3Icon from '../../../components/icons/S3Icon';
 import AdlsIcon from '../../../components/icons/AdlsIcon';
 
 import { BreadcrumbData } from '../types';
-import OverflowingItem from './OverflowingItem';
-import Breadcrumb from './Breadcrumb';
+import Breadcrumb from './Breadcrumb/Breadcrumb';
+import DropDownMenuItem from './DropdownMenuItem/DropdownMenuItem';
 import './PathBrowser.scss';
 
 interface PathBrowserProps {
@@ -91,7 +91,7 @@ const PathBrowser: React.FC<PathBrowserProps> = ({
       return {
         key: breadcrumb.url,
         label: (
-          <OverflowingItem
+          <DropDownMenuItem
             key={breadcrumb.url}
             label={breadcrumb.label}
             url={breadcrumb.url}
@@ -108,21 +108,19 @@ const PathBrowser: React.FC<PathBrowserProps> = ({
       <>
         {!isEditMode ? (
           <div className="hue-path-browser" data-testid={`${testId}`}>
-            {showIcon ? (
+            {showIcon && (
               <div
                 className="hue-path-browser__file-system-icon"
                 data-testid={`${testId}__file-system-icon`}
               >
                 {icons[extractFileSystem(breadcrumbs[0].label)]}
               </div>
-            ) : (
-              <></>
             )}
             <div className="hue-path-browser__breadcrumbs" data-testid={`${testId}-breadcrumb`}>
               {breadcrumbs.length <= 3 ? (
                 breadcrumbs.map((item: BreadcrumbData, index: number) => {
                   return (
-                    <>
+                    <React.Fragment key={item.url + index}>
                       <Breadcrumb
                         key={item.url}
                         label={index === 0 ? extractFileSystem(item.label) : item.label}
@@ -139,7 +137,7 @@ const PathBrowser: React.FC<PathBrowserProps> = ({
                       ) : (
                         <></>
                       )}
-                    </>
+                    </React.Fragment>
                   );
                 })
               ) : (

@@ -22,8 +22,7 @@ import './OverflowingItem.scss';
 
 interface OverflowingItemProps {
   label: string;
-  url: string;
-  onFilepathChange: (path: string) => void;
+  onClick: () => void;
   testId?: string;
 }
 
@@ -31,12 +30,7 @@ const defaultProps = {
   testId: 'hue-path-browser__overflowing'
 };
 
-const OverflowingItem: React.FC<OverflowingItemProps> = ({
-  label,
-  url,
-  onFilepathChange,
-  testId
-}) => {
+const OverflowingItem: React.FC<OverflowingItemProps> = ({ label, onClick, testId }) => {
   const textElementRef = useRef<HTMLDivElement>(null);
   const [isOverflown, setIsOverflown] = useState(false);
   const compareSize = () => {
@@ -61,9 +55,7 @@ const OverflowingItem: React.FC<OverflowingItemProps> = ({
       <Button
         ref={textElementRef}
         className="hue-path-browser__overflowing-label"
-        onClick={() => {
-          onFilepathChange(url);
-        }}
+        onClick={onClick}
         data-testid={`${testId}-label`}
       >
         {label}

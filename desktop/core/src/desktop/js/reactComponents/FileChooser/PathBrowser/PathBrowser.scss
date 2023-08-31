@@ -16,14 +16,17 @@
 
 @use 'variables' as vars;
 
+$icon-width: 24px;
+$icon-height: 24px;
+
 .hue-path-browser {
   display: flex;
   width: 100%;
 
   .hue-path-browser__file-system-icon {
     object-fit: cover;
-    width: 24px;
-    height: 24px;
+    width: $icon-width;
+    height: $icon-height;
     margin: 0 vars.$fluidx-spacing-xs;
   }
 
@@ -108,8 +111,8 @@
     flex: 0 0 auto;
 
     .ant-input-prefix {
-      width: 24px;
-      height: 24px;
+      width: $icon-width;
+      height: $icon-height;
       object-fit: cover;
     }
   }

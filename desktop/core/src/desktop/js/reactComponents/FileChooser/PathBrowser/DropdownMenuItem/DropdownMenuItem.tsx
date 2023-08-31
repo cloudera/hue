@@ -16,21 +16,25 @@
 
 import React from 'react';
 
-import OverflowingItem from './OverflowingItem';
-import './Breadcrumb.scss';
+import OverflowingItem from '../OverflowingItem';
+import './DropdownMenuItem.scss';
 
-interface BreadcrumbProps {
+interface DropDownMenuItemProps {
   label: string;
   url: string;
   onFilepathChange: (path: string) => void;
 }
 
-const Breadcrumb: React.FC<BreadcrumbProps> = ({ label, url, onFilepathChange }) => {
+const DropDownMenuItem: React.FC<DropDownMenuItemProps> = ({ label, url, onFilepathChange }) => {
+  const onClick = () => {
+    onFilepathChange(url);
+  };
+
   return (
-    <div className="hue-path-browser__breadcrumb">
-      <OverflowingItem label={label} url={url} onFilepathChange={onFilepathChange} />
+    <div className="hue-path-browser__dropdown-item">
+      <OverflowingItem label={label} onClick={onClick}></OverflowingItem>
     </div>
   );
 };
 
-export default Breadcrumb;
+export default DropDownMenuItem;
