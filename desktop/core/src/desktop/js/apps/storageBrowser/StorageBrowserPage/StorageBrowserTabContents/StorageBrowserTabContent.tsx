@@ -17,7 +17,9 @@
 import React, { useState, useEffect } from 'react';
 import { Spin } from 'antd';
 
+import { i18nReact } from '../../../../utils/i18nReact';
 import BucketIcon from '@cloudera/cuix-core/icons/react/BucketIcon';
+import PathBrowser from '../../../../reactComponents/FileChooser/PathBrowser/PathBrowser';
 import { fetchFiles } from '../../../../reactComponents/FileChooser/api';
 import { PathAndFileData } from '../../../../reactComponents/FileChooser/types';
 
@@ -40,6 +42,8 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
   const [filesData, setFilesData] = useState<PathAndFileData | undefined>();
   const [loadingFiles, setloadingFiles] = useState(true);
 
+  const { t } = i18nReact.useTranslation();
+
   useEffect(() => {
     setloadingFiles(true);
     fetchFiles(filePath)
@@ -60,8 +64,20 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
         <div className="hue-storage-browser__title-bar" data-testid={`${testId}-title-bar`}>
           <BucketIcon className="hue-storage-browser__icon" data-testid={`${testId}-icon`} />
           <div className="hue-storage-browser__folder-name" data-testid={`${testId}-folder-namer`}>
-            {filesData?.breadcrumbs[filesData?.breadcrumbs.length - 1].label}
+            {filesData?.breadcrumbs[filesData?.breadcrumbs?.length - 1].label}
           </div>
+        </div>
+        <div
+          className="hue-storage-browser__path-browser-panel"
+          data-testid={`${testId}-path-browser-panel`}
+        >
+          <div className="hue-storage-browser__filePath">{t('File Path:')}</div>
+          <PathBrowser
+            breadcrumbs={filesData?.breadcrumbs}
+            onFilepathChange={setFilePath}
+            seperator={'/'}
+            showIcon={false}
+          />
         </div>
       </div>
     </Spin>
