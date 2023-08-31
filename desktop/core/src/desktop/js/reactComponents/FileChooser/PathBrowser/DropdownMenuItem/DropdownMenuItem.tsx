@@ -26,13 +26,13 @@ interface DropDownMenuItemProps {
 }
 
 const DropDownMenuItem: React.FC<DropDownMenuItemProps> = ({ label, url, onFilepathChange }) => {
-  const onClick = () => {
+  const handleFilepathChange = () => {
     onFilepathChange(url);
   };
 
   return (
     <div className="hue-path-browser__dropdown-item">
-      <OverflowingItem label={label} onClick={onClick}></OverflowingItem>
+      <OverflowingItem label={label} onClick={handleFilepathChange}></OverflowingItem>
     </div>
   );
 };

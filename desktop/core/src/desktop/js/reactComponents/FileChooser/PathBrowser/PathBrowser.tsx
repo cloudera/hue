@@ -127,15 +127,13 @@ const PathBrowser: React.FC<PathBrowserProps> = ({
                         url={item.url}
                         onFilepathChange={onFilepathChange}
                       />
-                      {index != breadcrumbs.length - 1 ? (
+                      {index != breadcrumbs.length - 1 && (
                         <div
                           className="hue-path-browser__breadcrumb-seperator"
                           data-testid={`${testId}-breadcrumb-seperator`}
                         >
                           {seperator}
                         </div>
-                      ) : (
-                        <></>
                       )}
                     </React.Fragment>
                   );

@@ -43,7 +43,7 @@
   .hue-storage-browser__path-browser-panel {
     display: flex;
     margin-top: vars.$fluidx-spacing-xxs;
-
+    //TODO: Remove nesting of classes.
     .hue-storage-browser__filePath {
       flex: 0 0 auto;
       color: vars.$text-color;
