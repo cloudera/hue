@@ -1,6 +1,5 @@
 import chromadb
 from chromadb.config import Settings
-import pdb
 
 import datetime
 
@@ -8,8 +7,8 @@ def filter_vector_db(metadata, query, database):
     client = chromadb.PersistentClient(path="chrome")
     prompt = "find the table required for the prompt here: "
     prompt += query
-    pdb.set_trace()
-    collection = client.get_or_create_collection(name="tables1",metadata={"hnsw:space": "cosine"})
+
+    collection = client.get_or_create_collection(name="tables")
     added_tables = set()
 
     current_datetime = datetime.datetime.now()

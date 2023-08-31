@@ -1,6 +1,5 @@
 import abc
 import json
-
 from enum import Enum
 from pyformatting import optional_format
 
@@ -41,8 +40,8 @@ class LlmApi(abc.ABC):
 
     def process(self, task, input, sql, dialect, metadata):
         template = self.task_templates[task]
-        metadata_str = self.format_metadata(metadata) if metadata else None
-        prompt = optional_format(template, input=input, sql=sql, dialect=dialect, metadata=metadata_str)
+        # metadata_str = self.format_metadata(metadata) if metadata else None
+        prompt = optional_format(template, input=input, sql=sql, dialect=dialect, metadata=metadata['ddl'])
         inference = self.infer(prompt)
         return self.parse_inference(task, inference)
 
