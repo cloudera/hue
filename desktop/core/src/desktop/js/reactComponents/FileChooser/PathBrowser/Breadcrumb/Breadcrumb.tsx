@@ -14,36 +14,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { ReactElement, ReactNode } from 'react';
-import { Tooltip } from 'antd';
+import { Property } from '@typescript-eslint/types/dist/ast-spec';
+import { min } from 'lodash';
+import React from 'react';
 
-interface OverflowTooltipProps {
-  title: string;
-  isOverflowing: boolean;
-  toolTipTriggers: string | string[];
-  children: ReactNode | ReactElement;
-  testId?: string;
+import OverflowingItem from '../OverflowingItem';
+import './Breadcrumb.scss';
+
+interface BreadcrumbProps {
+  label: string;
+  url: string;
+  onFilepathChange: (path: string) => void;
 }
 
-const defaultProps = {
-  testId: 'hue-overflowing'
-};
+const Breadcrumb: React.FC<BreadcrumbProps> = ({ label, url, onFilepathChange }) => {
+  const handleFilepathChange = () => {
+    onFilepathChange(url);
+  };
 
-const OverflowTooltip: React.FC<OverflowTooltipProps> = ({
-  title,
-  isOverflowing,
-  toolTipTriggers,
-  children,
-  testId
-}) => {
-  return isOverflowing ? (
-    <Tooltip title={title} trigger={toolTipTriggers} data-testid={`${testId}-tooltip`}>
-      {children}
-    </Tooltip>
-  ) : (
-    <>{children}</>
+  const minWidth = '' + (label.length < 10 ? label.length : 10) + 'ch';
+
+  return (
+    <div
+      className="hue-path-browser__breadcrumb"
+      style={{ '--minWidth': `${minWidth}` } as React.CSSProperties}
+    >
+      <OverflowingItem onClick={handleFilepathChange} label={label} />
+    </div>
   );
 };
 
-OverflowTooltip.defaultProps = defaultProps;
-export default OverflowTooltip;
+export default Breadcrumb;

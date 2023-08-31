@@ -16,24 +16,28 @@
 
 @use 'variables' as vars;
 
+$icon-width: 24px;
+$icon-height: 24px;
+
 .hue-path-browser {
   display: flex;
+  width: 100%;
 
-  .hue-filesystem__icon {
+  .hue-path-browser__file-system-icon {
     object-fit: cover;
-    width: 24px;
-    height: 24px;
-    margin-left: 10px;
-    margin-right: 10px;
+    width: $icon-width;
+    height: $icon-height;
+    margin: 0 vars.$fluidx-spacing-xs;
   }
 
-  .hue-toggle-breadcrumb-input:empty {
+  .hue-path-browser__toggle-breadcrumb-input-btn:empty {
     pointer-events: auto;
     width: 60px;
     visibility: visible;
     border: none;
     box-shadow: none;
     padding: 0;
+    background-color: vars.$fluidx-white;
 
     &:hover {
       cursor: text;
@@ -46,12 +50,12 @@
   }
 }
 
-.hue-path-browser__breadcrumb {
+.hue-path-browser__breadcrumbs {
   /* stylelint-disable no-invalid-position-at-import-rule */
   @import './OverflowingItem.scss';
 
   display: flex;
-  gap: 10px;
+  gap: vars.$fluidx-spacing-xs;
   max-width: 60%;
 
   &:hover {
@@ -61,6 +65,7 @@
   .hue-path-browser__dropdown-button {
     border: none;
     box-shadow: none;
+    background-color: transparent;
 
     &:hover {
       background-color: vars.$fluidx-gray-100;
@@ -70,21 +75,26 @@
       background-color: vars.$fluidx-gray-100;
     }
   }
+
+  .hue-path-browser__breadcrumb:last-of-type button:last-of-type {
+    color: vars.$fluidx-gray-700;
+  }
 }
 
 .hue-path-browser__breadcrumb-seperator {
-  width: 14px;
-  height: 28px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   flex: 0 0 auto;
 }
 
 .hue-path-browser__dropdown {
   width: 200px;
+  background-color: vars.$fluidx-gray-200;
 
-  .hue-path-browser__dropdown {
-    background-color: vars.$fluidx-gray-200;
-    overflow-y: scroll;
+  .ant-dropdown-menu {
     max-height: 200px;
+    overflow-y: scroll;
   }
 
   .ant-dropdown-menu-title-content {
@@ -98,10 +108,12 @@
 .hue-path-browser-panel {
   .hue-path-browser__input {
     width: 300px;
+    flex: 0 0 auto;
 
     .ant-input-prefix {
-      width: 24px;
-      height: 24px;
+      width: $icon-width;
+      height: $icon-height;
+      object-fit: cover;
     }
   }
 

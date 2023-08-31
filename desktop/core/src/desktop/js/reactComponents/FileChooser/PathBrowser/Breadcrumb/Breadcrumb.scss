@@ -14,36 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { ReactElement, ReactNode } from 'react';
-import { Tooltip } from 'antd';
+.hue-path-browser__breadcrumb {
+  display: contents;
 
-interface OverflowTooltipProps {
-  title: string;
-  isOverflowing: boolean;
-  toolTipTriggers: string | string[];
-  children: ReactNode | ReactElement;
-  testId?: string;
+  .hue-path-browser__overflowing-label {
+    min-width: var(--minWidth);
+  }
 }
 
-const defaultProps = {
-  testId: 'hue-overflowing'
-};
-
-const OverflowTooltip: React.FC<OverflowTooltipProps> = ({
-  title,
-  isOverflowing,
-  toolTipTriggers,
-  children,
-  testId
-}) => {
-  return isOverflowing ? (
-    <Tooltip title={title} trigger={toolTipTriggers} data-testid={`${testId}-tooltip`}>
-      {children}
-    </Tooltip>
-  ) : (
-    <>{children}</>
-  );
-};
-
-OverflowTooltip.defaultProps = defaultProps;
-export default OverflowTooltip;
