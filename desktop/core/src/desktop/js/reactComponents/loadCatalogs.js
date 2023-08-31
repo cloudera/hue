@@ -17,12 +17,14 @@ export const getRelevantTableDetails = async (databaseName, tableNames, executor
     const columns = await fetchColumnsData(databaseName, tableName, executor);
     const tableDetails = {
       tableName: tableName,
-      columns: columns.map(({ definition }) => definition)
+      columns: columns.map(({ definition }) => definition),
+      partitions: columns.partitions,
     };
     relevantTables.push(tableDetails);
   }
   return relevantTables;
 };
+
 
 const delay = duration => new Promise(resolve => setTimeout(resolve, duration));
 

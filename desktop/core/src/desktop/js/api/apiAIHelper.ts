@@ -149,6 +149,7 @@ const getRelevantTables = async (
   tableParams: getTableListParams,
   onStatusChange: (arg: string) => void
 ) => {
+  onStatusChange('Finding relevant tables');
   const allTables = (await getTableList(tableParams)) as Array<string>;
 
   let tableMetadata = allTables;
@@ -160,10 +161,7 @@ const getRelevantTables = async (
       tableParams.executor
     );
   }
-
-  console.info('allTables', allTables);
-  onStatusChange('Finding relevant tables');
-
+  
   const relevantTables = await fetchFromLlm({
     url: TABLES_API_URL,
     data: {
@@ -184,6 +182,35 @@ const handleError = (error: any, msg: string): { error: Error } => {
     }
   };
 };
+
+const generateTableDDL = (tableObject: any, dialect: string): string => {
+  const tableName = tableObject.name;
+
+  const columnDefinitions = tableObject.columns.map((col: any) => {
+    let columnDef = `${col.name} ${col.type}`;
+    if (col.primaryKey) {
+      columnDef += ' PRIMARY KEY';
+    }
+    if (col.foreignKey) {
+      columnDef += ` FOREIGN KEY (${col.foreignKey.name}) REFERENCES ${col.foreignKey.to}`;
+    }
+    if (col.comment && col.comment != "" ) {
+      columnDef += ` COMMENT '${col.comment}'`;
+    }
+    return columnDef;
+  }).join(', ');
+
+  // const partitions = tableObject.partitions.map((p: any) => `${p.name} ${p.type}`).join(', ');
+
+  return `CREATE TABLE ${tableName} (${columnDefinitions});`;
+};
+
+
+const generateAllTableDDLs = (tableMetadatas: any[], dialect: string): string => {
+  const allDDLs = tableMetadatas.map(table => generateTableDDL(table, dialect));
+  return allDDLs.join('\n\n');
+};
+
 
 const fetchColumnsData = async (databaseName: string, tableName: string, executor: Executor) => {
   const dbEntry = await dataCatalog.getEntry({
@@ -207,14 +234,11 @@ export const getRelevantTableDetails = async (
   for (const tableName of tableNames) {
     const columns = await fetchColumnsData(databaseName, tableName, executor);
     const tableDetails = {
-      // databaseName: databaseName,
       name: tableName,
       columns: columns.map(({ definition }) => {
-        delete definition.index;
-        delete definition.partitionKey;
-        delete definition.primaryKey;
         return definition;
-      })
+      }),
+      partitions: columns.partitions,
     };
     relevantTables.push(tableDetails);
   }
@@ -253,6 +277,9 @@ const generateOptimizedSql: GenerateOptimizedSql = async ({
     }
   }
   
+  // Generate DDL for tables
+  const ddlString = generateAllTableDDLs(tableMetadata, dialect);
+  
   onStatusChange('Optimizing SQL query');
 
   try {
@@ -263,7 +290,8 @@ const generateOptimizedSql: GenerateOptimizedSql = async ({
         sql: statement,
         dialect,
         metadata: {
-          tables: tableMetadata
+          tables: tableMetadata,
+          ddl: ddlString  
         }
       }
     });
@@ -280,6 +308,7 @@ const generateSQLfromNQL: GenerateSQLfromNQL = async ({
   onStatusChange
 }) => {
   let tableMetadata;
+  onStatusChange('Generating SQL query');
   try {
     ({ tableMetadata } = await getTablesAndMetadata(nql, databaseName, executor, onStatusChange));
   } catch (e) {
@@ -287,8 +316,7 @@ const generateSQLfromNQL: GenerateSQLfromNQL = async ({
       return handleError(e, e.message);
     }
   }
-  
-  onStatusChange('Generating SQL query');
+  const ddlString = generateAllTableDDLs(tableMetadata, dialect);
   try {
     return await fetchFromLlm({
       url: SQL_API_URL,
@@ -297,7 +325,8 @@ const generateSQLfromNQL: GenerateSQLfromNQL = async ({
         input: nql,
         dialect,
         metadata: {
-          tables: tableMetadata
+          tables: tableMetadata,
+          ddl: ddlString  
         }
       }
     });
@@ -322,6 +351,7 @@ const generateEditedSQLfromNQL: GenerateEditedSQLfromNQL = async ({
       return handleError(e, e.message);
     }
   }
+  const ddlString = generateAllTableDDLs(tableMetadata, dialect);
 
   onStatusChange('Generating SQL query');
   try {
@@ -333,7 +363,8 @@ const generateEditedSQLfromNQL: GenerateEditedSQLfromNQL = async ({
         input: nql,
         dialect,
         metadata: {
-          tables: tableMetadata
+          tables: tableMetadata,
+          ddl: ddlString  
         }
       }
     });
@@ -352,7 +383,7 @@ const generateExplanation: GenerateExplanation = async ({ statement, dialect, da
         return handleError(e, e.message);
       }
     }
-  
+    const ddlString = generateAllTableDDLs(tableMetadata, dialect);
     onStatusChange('Generating explanation');
     return await fetchFromLlm({
       url: SQL_API_URL,
@@ -361,7 +392,8 @@ const generateExplanation: GenerateExplanation = async ({ statement, dialect, da
         sql: statement,
         dialect,
         metadata: {
-          tables: tableMetadata
+          tables: tableMetadata,
+          ddl: ddlString  
         }
       }
     });
@@ -379,7 +411,7 @@ const generateCorrectedSql: GenerateCorrectedSql = async ({ statement, dialect, 
       return handleError(e, e.message);
     }
   }
-
+  const ddlString = generateAllTableDDLs(tableMetadata, dialect);
   onStatusChange('Generating corrected SQL query');
   try {
     return await fetchFromLlm({
@@ -389,7 +421,8 @@ const generateCorrectedSql: GenerateCorrectedSql = async ({ statement, dialect, 
         sql: statement,
         dialect,
         metadata: {
-          tables: tableMetadata
+          tables: tableMetadata,
+          ddl: ddlString  
         }
       }
     });
