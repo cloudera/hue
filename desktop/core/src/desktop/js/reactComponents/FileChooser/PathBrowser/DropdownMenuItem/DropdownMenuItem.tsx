@@ -14,36 +14,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { ReactElement, ReactNode } from 'react';
-import { Tooltip } from 'antd';
+import React from 'react';
 
-interface OverflowTooltipProps {
-  title: string;
-  isOverflowing: boolean;
-  toolTipTriggers: string | string[];
-  children: ReactNode | ReactElement;
-  testId?: string;
+import OverflowingItem from '../OverflowingItem';
+import './DropdownMenuItem.scss';
+
+interface DropDownMenuItemProps {
+  label: string;
+  url: string;
+  onFilepathChange: (path: string) => void;
 }
 
-const defaultProps = {
-  testId: 'hue-overflowing'
-};
+const DropDownMenuItem: React.FC<DropDownMenuItemProps> = ({ label, url, onFilepathChange }) => {
+  const handleFilepathChange = () => {
+    onFilepathChange(url);
+  };
 
-const OverflowTooltip: React.FC<OverflowTooltipProps> = ({
-  title,
-  isOverflowing,
-  toolTipTriggers,
-  children,
-  testId
-}) => {
-  return isOverflowing ? (
-    <Tooltip title={title} trigger={toolTipTriggers} data-testid={`${testId}-tooltip`}>
-      {children}
-    </Tooltip>
-  ) : (
-    <>{children}</>
+  return (
+    <div className="hue-path-browser__dropdown-item">
+      <OverflowingItem label={label} onClick={handleFilepathChange}></OverflowingItem>
+    </div>
   );
 };
 
-OverflowTooltip.defaultProps = defaultProps;
-export default OverflowTooltip;
+export default DropDownMenuItem;
