@@ -20,36 +20,19 @@ import { Button } from 'antd';
 import OverflowTooltip from './OverflowTooltip';
 import './OverflowingItem.scss';
 
-type OverflowingComponentType = 'breadcrumb' | 'menu';
 interface OverflowingItemProps {
   label: string;
-  url: string;
-  handleFilePathChange: (path: string) => void;
-  componentType: OverflowingComponentType;
+  onClick: () => void;
+  testId?: string;
 }
 
-//TODO: change to add classnames to components instead of inline styles
-const customStyles: {
-  [key in OverflowingComponentType]: React.CSSProperties;
-} = {
-  breadcrumb: {
-    minWidth: '5ch'
-  },
-  menu: {
-    width: '100%',
-    textAlign: 'left'
-  }
+const defaultProps = {
+  testId: 'hue-path-browser__overflowing'
 };
 
-const OverflowingItem: React.FC<OverflowingItemProps> = ({
-  label,
-  url,
-  handleFilePathChange,
-  componentType
-}) => {
+const OverflowingItem: React.FC<OverflowingItemProps> = ({ label, onClick, testId }) => {
   const textElementRef = useRef<HTMLDivElement>(null);
   const [isOverflown, setIsOverflown] = useState(false);
-
   const compareSize = () => {
     const element = textElementRef.current;
 
@@ -72,10 +55,8 @@ const OverflowingItem: React.FC<OverflowingItemProps> = ({
       <Button
         ref={textElementRef}
         className="hue-path-browser__overflowing-label"
-        onClick={() => {
-          handleFilePathChange(url);
-        }}
-        style={customStyles[componentType]}
+        onClick={onClick}
+        data-testid={`${testId}-label`}
       >
         {label}
       </Button>
@@ -83,4 +64,5 @@ const OverflowingItem: React.FC<OverflowingItemProps> = ({
   );
 };
 
+OverflowingItem.defaultProps = defaultProps;
 export default OverflowingItem;

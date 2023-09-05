@@ -15,24 +15,37 @@
 // limitations under the License.
 
 import React, { useRef, useEffect, useState, RefObject } from 'react';
-import { Input, Button, Dropdown, Row, Col } from 'antd';
+import { Input, Button, Dropdown } from 'antd';
 import type { MenuProps } from 'antd';
-import { RightOutlined } from '@ant-design/icons';
 
 import HdfsIcon from '../../../components/icons/HdfsIcon';
 import S3Icon from '../../../components/icons/S3Icon';
 import AdlsIcon from '../../../components/icons/AdlsIcon';
 
 import { BreadcrumbData } from '../types';
-import OverflowingItem from './OverflowingItem';
+import Breadcrumb from './Breadcrumb/Breadcrumb';
+import DropDownMenuItem from './DropdownMenuItem/DropdownMenuItem';
 import './PathBrowser.scss';
 
 interface PathBrowserProps {
   breadcrumbs?: BreadcrumbData[];
-  handleFilePathChange: (path: string) => void;
+  onFilepathChange: (path: string) => void;
+  seperator: string;
+  showIcon: boolean;
+  testId?: string;
 }
 
-const PathBrowser: React.FC<PathBrowserProps> = ({ breadcrumbs, handleFilePathChange }) => {
+const defaultProps = {
+  testId: 'hue-path-browser'
+};
+
+const PathBrowser: React.FC<PathBrowserProps> = ({
+  breadcrumbs,
+  onFilepathChange,
+  seperator,
+  showIcon,
+  testId
+}) => {
   const [isEditMode, setIsEditMode] = useState(false);
 
   const icons = {
@@ -78,11 +91,11 @@ const PathBrowser: React.FC<PathBrowserProps> = ({ breadcrumbs, handleFilePathCh
       return {
         key: breadcrumb.url,
         label: (
-          <OverflowingItem
+          <DropDownMenuItem
+            key={breadcrumb.url}
             label={breadcrumb.label}
             url={breadcrumb.url}
-            handleFilePathChange={handleFilePathChange}
-            componentType="menu"
+            onFilepathChange={onFilepathChange}
           />
         )
       };
@@ -92,104 +105,125 @@ const PathBrowser: React.FC<PathBrowserProps> = ({ breadcrumbs, handleFilePathCh
 
   if (breadcrumbs) {
     return (
-      <Row className="hue-path-browser-panel" onClick={e => e.stopPropagation()}>
-        <Col span={18}>
-          {!isEditMode ? (
-            <div className="hue-path-browser">
-              <div className="hue-filesystem__icon">
+      <>
+        {!isEditMode ? (
+          <div className="hue-path-browser" data-testid={`${testId}`}>
+            {showIcon && (
+              <div
+                className="hue-path-browser__file-system-icon"
+                data-testid={`${testId}__file-system-icon`}
+              >
                 {icons[extractFileSystem(breadcrumbs[0].label)]}
               </div>
-              <div className="hue-path-browser__breadcrumb">
-                {breadcrumbs.length <= 3 ? (
-                  breadcrumbs.map((item: BreadcrumbData, index: number) => {
-                    return (
-                      <>
-                        <OverflowingItem
-                          key={item.url}
-                          label={index === 0 ? extractFileSystem(item.label) : item.label}
-                          url={item.url}
-                          handleFilePathChange={handleFilePathChange}
-                          componentType="breadcrumb"
-                        />
-                        {index != breadcrumbs.length - 1 ? (
-                          <RightOutlined className="hue-path-browser__breadcrumb-seperator" />
-                        ) : (
-                          <></>
-                        )}
-                      </>
-                    );
-                  })
-                ) : (
-                  <>
-                    <OverflowingItem
-                      label={extractFileSystem(breadcrumbs[0].label)}
-                      url={breadcrumbs[0].url}
-                      handleFilePathChange={handleFilePathChange}
-                      componentType="breadcrumb"
-                      key={breadcrumbs[0].url}
-                    />
-                    <RightOutlined className="hue-path-browser__breadcrumb-seperator" />
-                    <Dropdown
-                      overlayClassName="hue-path-browser__dropdown"
-                      menu={{
-                        items: extractMenuItems(breadcrumbs.slice(1, breadcrumbs.length - 2)),
-                        className: 'hue-path-browser__dropdown-menu'
-                      }}
-                      trigger={['hover', 'click']}
-                      autoFocus
+            )}
+            <div className="hue-path-browser__breadcrumbs" data-testid={`${testId}-breadcrumb`}>
+              {breadcrumbs.length <= 3 ? (
+                breadcrumbs.map((item: BreadcrumbData, index: number) => {
+                  return (
+                    <React.Fragment key={item.url + index}>
+                      <Breadcrumb
+                        key={item.url}
+                        label={index === 0 ? extractFileSystem(item.label) : item.label}
+                        url={item.url}
+                        onFilepathChange={onFilepathChange}
+                      />
+                      {index != breadcrumbs.length - 1 && (
+                        <div
+                          className="hue-path-browser__breadcrumb-seperator"
+                          data-testid={`${testId}-breadcrumb-seperator`}
+                        >
+                          {seperator}
+                        </div>
+                      )}
+                    </React.Fragment>
+                  );
+                })
+              ) : (
+                <>
+                  <Breadcrumb
+                    label={extractFileSystem(breadcrumbs[0].label)}
+                    url={breadcrumbs[0].url}
+                    onFilepathChange={onFilepathChange}
+                    key={breadcrumbs[0].url}
+                  />
+                  <div
+                    className="hue-path-browser__breadcrumb-seperator"
+                    data-testid={`${testId}-breadcrumb-seperator`}
+                  >
+                    {seperator}
+                  </div>
+                  <Dropdown
+                    overlayClassName="hue-path-browser__dropdown"
+                    menu={{
+                      items: extractMenuItems(breadcrumbs.slice(1, breadcrumbs.length - 2)),
+                      className: 'hue-path-browser__dropdown-menu'
+                    }}
+                    trigger={['hover', 'click']}
+                    autoFocus
+                    data-testid={`${testId}-dropdown`}
+                  >
+                    <Button
+                      className="hue-path-browser__dropdown-button"
+                      data-testid={`${testId}-dropdown-btn`}
                     >
-                      <Button className="hue-path-browser__dropdown-button">..</Button>
-                    </Dropdown>
-                    <RightOutlined className="hue-path-browser__breadcrumb-seperator" />
-                    <OverflowingItem
-                      key={breadcrumbs[breadcrumbs.length - 2].url}
-                      label={breadcrumbs[breadcrumbs.length - 2].label}
-                      url={breadcrumbs[breadcrumbs.length - 2].url}
-                      handleFilePathChange={handleFilePathChange}
-                      componentType="breadcrumb"
-                    />
-                    <RightOutlined className="hue-path-browser__breadcrumb-seperator" />
-                    <OverflowingItem
-                      key={breadcrumbs[breadcrumbs.length - 1].url}
-                      label={breadcrumbs[breadcrumbs.length - 1].label}
-                      url={breadcrumbs[breadcrumbs.length - 1].url}
-                      handleFilePathChange={handleFilePathChange}
-                      componentType="breadcrumb"
-                    />
-                  </>
-                )}
-              </div>
-              <Button
-                className="hue-toggle-breadcrumb-input"
-                title="Edit path"
-                onClick={() => {
-                  setIsEditMode(true);
-                }}
-              ></Button>
+                      ..
+                    </Button>
+                  </Dropdown>
+                  <div
+                    className="hue-path-browser__breadcrumb-seperator"
+                    data-testid={`${testId}-breadcrumb-seperator`}
+                  >
+                    {seperator}
+                  </div>
+                  <Breadcrumb
+                    key={breadcrumbs[breadcrumbs.length - 2].url}
+                    label={breadcrumbs[breadcrumbs.length - 2].label}
+                    url={breadcrumbs[breadcrumbs.length - 2].url}
+                    onFilepathChange={onFilepathChange}
+                  />
+                  <div
+                    className="hue-path-browser__breadcrumb-seperator"
+                    data-testid={`${testId}-breadcrumb-seperator`}
+                  >
+                    {seperator}
+                  </div>
+                  <Breadcrumb
+                    key={breadcrumbs[breadcrumbs.length - 1].url}
+                    label={breadcrumbs[breadcrumbs.length - 1].label}
+                    url={breadcrumbs[breadcrumbs.length - 1].url}
+                    onFilepathChange={onFilepathChange}
+                  />
+                </>
+              )}
             </div>
-          ) : (
-            <div ref={wrapperRef}>
-              <Input
-                prefix={icons[extractFileSystem(breadcrumbs[0].label)]}
-                defaultValue={decodeURIComponent(breadcrumbs[breadcrumbs.length - 1].url)}
-                onPressEnter={customPath => {
-                  handleFilePathChange((customPath.target as HTMLInputElement).value);
-                }}
-                className="hue-path-browser__input"
-                autoFocus
-              ></Input>
-            </div>
-          )}
-        </Col>
-        <Col span={3}>
-          <Button className="hue-path-browser-panel__button">New Folder</Button>
-        </Col>
-        <Col span={3}>
-          <Button className="hue-path-browser-panel__button">Upload</Button>
-        </Col>
-      </Row>
+            <Button
+              className="hue-path-browser__toggle-breadcrumb-input-btn"
+              aria-label="hue-path-browser__toggle-breadcrumb-input-btn"
+              title="Edit path"
+              onClick={() => {
+                setIsEditMode(true);
+              }}
+              data-testid={`${testId}-toggle-input-btn`}
+            ></Button>
+          </div>
+        ) : (
+          <div ref={wrapperRef}>
+            <Input
+              prefix={showIcon ? icons[extractFileSystem(breadcrumbs[0].label)] : <span />}
+              defaultValue={decodeURIComponent(breadcrumbs[breadcrumbs.length - 1].url)}
+              onPressEnter={customPath => {
+                onFilepathChange((customPath.target as HTMLInputElement).value);
+              }}
+              className="hue-path-browser__input"
+              autoFocus
+              data-testid={`${testId}-input`}
+            ></Input>
+          </div>
+        )}
+      </>
     );
   }
 };
 
+PathBrowser.defaultProps = defaultProps;
 export default PathBrowser;

@@ -17,7 +17,7 @@
 
 .hue-storage-browser-tabContent {
   background-color: vars.$fluidx-white;
-  margin: 16px 0;
+  margin: vars.$fluidx-spacing-s 0;
   padding: 16px;
   //TODO: Set height to content
 
@@ -26,7 +26,7 @@
     align-items: center;
 
     .hue-storage-browser__icon {
-      margin-right: 10px;
+      margin-right: vars.$fluidx-spacing-xs;
       flex: 0 0 auto;
       height: 24px;
       width: 24px;
@@ -37,6 +37,18 @@
       font-size: vars.$fluidx-heading-h3-size;
       line-height: vars.$fluidx-heading-h3-line-height;
       font-weight: vars.$fluidx-heading-h3-weight;
+    }
+  }
+
+  .hue-storage-browser__path-browser-panel {
+    display: flex;
+    margin-top: vars.$fluidx-spacing-xxs;
+    //TODO: Remove nesting of classes.
+    .hue-storage-browser__filePath {
+      flex: 0 0 auto;
+      color: vars.$text-color;
+      font-weight: 600;
+      margin-right: vars.$fluidx-spacing-xs;
     }
   }
 }
