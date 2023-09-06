@@ -274,6 +274,16 @@ LLM = ConfigSection(
   )
 )
 
+def is_llm_sql_enabled():
+    llm_enabled = LLM.SQL_LLM.get()
+    return bool(llm_enabled.strip())
+
+
+def is_vector_db_enabled():
+    RELEVENCY = LLM.RELEVENCY.get()
+    return RELEVENCY=="vector_db"
+    # return bool(llm_enabled.strip())
+
 HUE_IMAGE_VERSION = Config(
   key="hue_image_version",
   help=_("Image version of Hue"),
