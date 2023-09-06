@@ -1,9 +1,5 @@
-import abc
-import re
-import io
-import json
-
-from .base import LlmApi, Task
+from .base_model import BaseModel, Task
+from ..utils.xml import extract_tag_content
 
 _GENERATE = """Act as an {dialect} SQL expert. Translate the NQL statement into SQL using the following metadata: {metadata}.
 List any assumptions not covered by the supplied metadata. Use lower() and LIKE '%%' unless you are sure about how to match the data.
@@ -17,17 +13,18 @@ SQL query: {sql}
 Input: {input}
 Wrap the SQL in a <code> tag and the assumptions in a <assumptions> tag with a closing </assumptions>"""
 
-_SUMMARIZE = """Act as an {dialect} SQL expert.
+_SUMMARIZE = """Act as an {dialect} SQL expert. Based on the input Summarize the SQL using the following metadata: {metadata}.
 Explain in natural language using non technical terms, what this query does: {sql}.
 """
 
 _OPTIMIZE = """Act as an {dialect} SQL expert.
-Optimize this SQL query and explain the improvement if any.
-Wrap the new code in a <code> tag and the explanation in an <explain> tag with a closing </explain>: {sql}
+Optimize this SQL query and explain the improvement if any. Only optimize in a way so that the result of the query remains the same. If you can't
+optimize the query then shortly explain alternative options if any.
+Use the following metadata: {metadata}. Wrap the new code in a <code> tag and the explanation in an <explain> tag with a closing </explain>: {sql}
 """
 
 _FIX = """Act as an {dialect} SQL expert.
-Fix this broken sql query and explain the fix.
+Fix this syntactically broken sql query and explain the fix using the following metadata: {metadata}. Do not optimize and only make the minimal modifcation needed to create a valid query.
 Wrap the corrected code in a <code> tag and the explaination in an <explain> tag with a closing </explain>: {sql}
 """
 
@@ -39,46 +36,19 @@ TASK_TEMPLATES = {
     Task.FIX: _FIX
 }
 
-_model_name = "amazon.titan-tg1-large"
-
-def extractTagContent(tag, text):
-    matches = re.findall(f'<{tag}>(.*?)</{tag}>', text, flags=re.DOTALL)
-    return matches[0] if len(matches) > 0 else None
-
-class BedrockApi(LlmApi):
+class TitanModel(BaseModel):
     def __init__(self):
         super().__init__(TASK_TEMPLATES)
 
-        import boto3
-        self.bedrock = boto3.client('bedrock')
-
-    def infer(self, prompt):
-        body = {
-            "inputText": prompt,
-            "textGenerationConfig": {
-                "maxTokenCount": 512,
-                "stopSequences": [],
-                "temperature": 0,
-                "topP": 0.9
-            }
-        }
-        response = self.bedrock.invoke_model(
-            modelId=_model_name,
-            body=json.dumps(body)
-        )
-
-        data = json.loads(io.BytesIO(response['body'].read()).readlines()[0].decode('utf-8'))
-
-        return data["results"][0]["outputText"]
-
-    def parse_inference(self, task, inference):
+    def parse_response(self, task, inference):
+        # TODO: Make the following implementation more elegant
         if task == Task.SUMMARIZE:
             return {
                 'summary': inference
             }
         else:
             return {
-                'sql': extractTagContent('code', inference),
-                'assumptions': extractTagContent('assumptions', inference),
-                'explain': extractTagContent('explain', inference),
+                'sql': extract_tag_content('code', inference),
+                'assumptions': extract_tag_content('assumptions', inference),
+                'explain': extract_tag_content('explain', inference),
             }

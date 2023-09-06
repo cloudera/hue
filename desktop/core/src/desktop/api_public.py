@@ -28,6 +28,7 @@ from desktop.lib.django_util import JsonResponse
 from metadata import optimizer_api
 from notebook import api as notebook_api
 from notebook.conf import get_ordered_interpreters
+from desktop.conf import is_llm_sql_enabled, is_vector_db_enabled
 
 from desktop import api2 as desktop_api
 from desktop.auth.backend import rewrite_user
@@ -38,11 +39,9 @@ from useradmin import views as useradmin_views, api as useradmin_api
 
 from beeswax import api as beeswax_api
 
-from desktop.lib.llms.factory import llm_api_factory
-from desktop.lib.llms.base import is_llm_sql_enabled
-from desktop.lib.llms.metadata import semantic_search
-from desktop.lib.llms.vector_db import filter_vector_db
-from desktop.lib.llms.base import is_vector_db_enabled
+from desktop.lib.ai.sql import perform_sql_task
+from desktop.lib.ai.metadata import semantic_search
+from desktop.lib.ai.vector_db import filter_vector_db
 
 LOG = logging.getLogger(__name__)
 
@@ -259,8 +258,6 @@ def tables(request):
       tables = semantic_search(metadata, input)
 
     # TODO: Use LLM and filter tables even further
-    # llm_api = llm_api_factory()
-    # tables = llm_api.process(Task.FILTER_TABLES, input, dialect, tables)
     return JsonResponse({
       "tables": tables
     })
@@ -276,8 +273,7 @@ def sql(request):
   metadata = request.data.get("metadata")
 
   if is_llm_sql_enabled():
-    llm_api = llm_api_factory()
-    response = llm_api.process(task, input, sql, dialect, metadata)
+    response = perform_sql_task(task, input, sql, dialect, metadata)
     return JsonResponse(response)
   else:
     return llm_sql_disabled_response
