@@ -17,6 +17,7 @@
 
 import logging
 import json
+import dataclasses
 
 from django.http import QueryDict, HttpResponse
 from rest_framework.permissions import AllowAny
@@ -274,7 +275,7 @@ def sql(request):
 
   if is_llm_sql_enabled():
     response = perform_sql_task(task, input, sql, dialect, metadata)
-    return JsonResponse(response)
+    return JsonResponse(dataclasses.asdict(response))
   else:
     return llm_sql_disabled_response
 

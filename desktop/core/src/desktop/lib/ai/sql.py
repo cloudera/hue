@@ -1,3 +1,8 @@
+import logging
+LOG = logging.getLogger()
+
+from .types import SQLResponse
+
 from .models.base_model import BaseModel
 from .models.gpt import GPTModel
 from .models.titan import TitanModel
@@ -6,9 +11,6 @@ from .models.task import TaskType
 from .services.base_service import BaseService
 from .services.openai import OpenAiService
 from .services.bedrock import BedrockService
-
-import logging
-LOG = logging.getLogger()
 
 from desktop.conf import LLM
 
@@ -21,7 +23,7 @@ def _model_factory(model_name: str, task: TaskType) -> BaseModel:
         LOG.error("Model configured is invalid")
         raise Exception(f"Invalid model name - {model_name}")
 
-def _service_factory(service_name) -> BaseService:
+def _service_factory(service_name: str) -> BaseService:
     if service_name == "openai":
         return OpenAiService()
     elif service_name == "bedrock":
@@ -30,7 +32,7 @@ def _service_factory(service_name) -> BaseService:
         LOG.error("Service configured is invalid")
         raise Exception(f"Invalid service name - {service_name}")
 
-def format_metadata(metadata) -> str:
+def format_metadata(metadata: dict) -> str:
     formatted_metadata = []
 
     for table in metadata["tables"]:
@@ -40,7 +42,7 @@ def format_metadata(metadata) -> str:
 
     return ';\n\n'.join(formatted_metadata)
 
-def perform_sql_task(task, input, sql, dialect, metadata):
+def perform_sql_task(task: TaskType, input: str, sql: str, dialect: str, metadata: dict) -> SQLResponse:
     model = _model_factory(LLM.SQL_LLM.get(), task)
     service = _service_factory(LLM.SQL_LLM.get())
 
