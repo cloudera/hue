@@ -1,4 +1,5 @@
-from .base_model import BaseModel, Task
+from .task import Task, TaskType, ResponseDict, get_task
+from .base_model import BaseModel
 from ..utils.xml import extract_tag_content
 
 _GENERATE = """Act as an {dialect} SQL expert. Translate the NQL statement into SQL using the following metadata: {metadata}.
@@ -28,27 +29,32 @@ Fix this syntactically broken sql query and explain the fix using the following 
 Wrap the corrected code in a <code> tag and the explaination in an <explain> tag with a closing </explain>: {sql}
 """
 
-TASK_TEMPLATES = {
-    Task.GENERATE: _GENERATE,
-    Task.EDIT: _EDIT,
-    Task.SUMMARIZE: _SUMMARIZE,
-    Task.OPTIMIZE: _OPTIMIZE,
-    Task.FIX: _FIX
+def _code_assumptions_parser(response: str) -> ResponseDict:
+    return {
+        'sql': extract_tag_content('code', response),
+        'assumptions': extract_tag_content('assumptions', response),
+    }
+
+def _code_explain_parser(response: str) -> ResponseDict:
+    return {
+        'sql': extract_tag_content('code', response),
+        'explain': extract_tag_content('explain', response),
+    }
+
+def _summary_parser(response: str) -> ResponseDict:
+    return {
+        'summary': response
+    }
+
+_TASKS = {
+    TaskType.GENERATE: Task(_GENERATE, _code_assumptions_parser),
+    TaskType.EDIT: Task(_EDIT, _code_assumptions_parser),
+    TaskType.SUMMARIZE: Task(_SUMMARIZE, _summary_parser),
+    TaskType.OPTIMIZE: Task(_OPTIMIZE, _code_explain_parser),
+    TaskType.FIX: Task(_FIX, _code_explain_parser)
 }
 
+# TODO: Just make this an instance if we need not override model functionalities
 class GPTModel(BaseModel):
-    def __init__(self):
-        super().__init__(TASK_TEMPLATES)
-
-    def parse_response(self, task, inference):
-        # TODO: Make the following implementation more elegant
-        if task == Task.SUMMARIZE:
-            return {
-                'summary': inference
-            }
-        else:
-            return {
-                'sql': extract_tag_content('code', inference),
-                'assumptions': extract_tag_content('assumptions', inference),
-                'explain': extract_tag_content('explain', inference),
-            }
+    def __init__(self, task_type: TaskType):
+        super().__init__(get_task(_TASKS, task_type))
