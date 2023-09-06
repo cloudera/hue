@@ -1,6 +1,7 @@
-from .task import Task, TaskType, ResponseDict, get_task
+from .task import Task, TaskType, get_task
 from .base_model import BaseModel
 from ..utils.xml import extract_tag_content
+from ..types import SQLResponse
 
 _GENERATE = """Act as an {dialect} SQL expert. Translate the NQL statement into SQL using the following metadata: {metadata}.
 List any assumptions not covered by the supplied metadata. Use lower() and LIKE '%%' unless you are sure about how to match the data.
@@ -29,22 +30,22 @@ Fix this syntactically broken sql query and explain the fix using the following 
 Wrap the corrected code in a <code> tag and the explaination in an <explain> tag with a closing </explain>: {sql}
 """
 
-def _code_assumptions_parser(response: str) -> ResponseDict:
-    return {
-        'sql': extract_tag_content('code', response),
-        'assumptions': extract_tag_content('assumptions', response),
-    }
+def _code_assumptions_parser(response: str) -> SQLResponse:
+    return SQLResponse(
+        sql=extract_tag_content('code', response),
+        assumptions=extract_tag_content('assumptions', response),
+    )
 
-def _code_explain_parser(response: str) -> ResponseDict:
-    return {
-        'sql': extract_tag_content('code', response),
-        'explain': extract_tag_content('explain', response),
-    }
+def _code_explain_parser(response: str) -> SQLResponse:
+    return SQLResponse(
+        sql=extract_tag_content('code', response),
+        explain=extract_tag_content('explain', response),
+    )
 
-def _summary_parser(response: str) -> ResponseDict:
-    return {
-        'summary': response
-    }
+def _summary_parser(response: str) -> SQLResponse:
+    return SQLResponse(
+        summary=response,
+    )
 
 _TASKS = {
     TaskType.GENERATE: Task(_GENERATE, _code_assumptions_parser),
@@ -54,7 +55,6 @@ _TASKS = {
     TaskType.FIX: Task(_FIX, _code_explain_parser)
 }
 
-# TODO: Just make this an instance if we need not override model functionalities
 class GPTModel(BaseModel):
     def __init__(self, task_type: TaskType):
         super().__init__(get_task(_TASKS, task_type))

@@ -1,5 +1,6 @@
 from enum import Enum
 from typing import Callable, Dict
+from ..types import SQLResponse
 
 import logging
 LOG = logging.getLogger()
@@ -12,11 +13,8 @@ class TaskType(str, Enum):
     FIX = 'fix',
     FILTER_TABLES = 'filter_tables'
 
-ResponseDict = Dict[str, str]
-ResponseParser = Callable[[str], ResponseDict]
-
 class Task:
-    def __init__(self, template: str, parser: ResponseParser):
+    def __init__(self, template: str, parser: Callable[[str], SQLResponse]):
       self.template = template
       self.parser = parser
 
