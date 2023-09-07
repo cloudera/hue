@@ -12,16 +12,16 @@ from .services.base_service import BaseService
 from .services.openai import OpenAiService
 from .services.bedrock import BedrockService
 
-from desktop.conf import LLM
+from desktop.conf import AI_INTERFACE
 
-def _model_factory(model_name: str, task: TaskType) -> BaseModel:
-    if model_name == "openai":
+def _model_factory(model: str, task: TaskType) -> BaseModel:
+    if model == "gpt":
         return GPTModel(task)
-    elif model_name == "bedrock":
+    elif model == "titan":
         return TitanModel(task)
     else:
         LOG.error("Model configured is invalid")
-        raise Exception(f"Invalid model name - {model_name}")
+        raise Exception(f"Invalid model name - {model}")
 
 def _service_factory(service_name: str) -> BaseService:
     if service_name == "openai":
@@ -43,8 +43,8 @@ def format_metadata(metadata: dict) -> str:
     return ';\n\n'.join(formatted_metadata)
 
 def perform_sql_task(task: TaskType, input: str, sql: str, dialect: str, metadata: dict) -> SQLResponse:
-    model = _model_factory(LLM.SQL_LLM.get(), task)
-    service = _service_factory(LLM.SQL_LLM.get())
+    service = _service_factory(AI_INTERFACE.SERVICE.get())
+    model = _model_factory(AI_INTERFACE.MODEL.get() or service.get_default_model(), task)
 
     metadata_str = format_metadata(metadata) if metadata else ""
     prompt = model.build_prompt(input, sql, dialect, metadata_str)

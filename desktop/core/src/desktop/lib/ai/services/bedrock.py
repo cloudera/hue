@@ -3,14 +3,18 @@ import json
 
 from .base_service import BaseService
 
-from desktop.conf import LLM
+from desktop.conf import AI_INTERFACE
 
-_model_name = "amazon.titan-tg1-large"
+_default_model = "titan"
+_model_name = AI_INTERFACE.MODEL_NAME.get() or "amazon.titan-tg1-large"
 
 class BedrockService(BaseService):
     def __init__(self):
         import boto3
         self.bedrock = boto3.client('bedrock')
+
+    def get_default_model(self) -> str:
+        return _default_model
 
     def process(self, prompt: str) -> str:
         body = {

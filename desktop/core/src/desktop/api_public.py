@@ -29,7 +29,7 @@ from desktop.lib.django_util import JsonResponse
 from metadata import optimizer_api
 from notebook import api as notebook_api
 from notebook.conf import get_ordered_interpreters
-from desktop.conf import is_llm_sql_enabled, is_vector_db_enabled
+from desktop.conf import is_ai_interface_enabled, is_vector_db_enabled
 
 from desktop import api2 as desktop_api
 from desktop.auth.backend import rewrite_user
@@ -252,7 +252,7 @@ def tables(request):
   metadata = request.data.get("metadata")
   database = request.data.get("database")
   tables = []
-  if is_llm_sql_enabled():
+  if is_ai_interface_enabled():
     if is_vector_db_enabled():
       tables = filter_vector_db(metadata, input, database)
     else:
@@ -273,7 +273,7 @@ def sql(request):
   dialect = request.data.get("dialect")
   metadata = request.data.get("metadata")
 
-  if is_llm_sql_enabled():
+  if is_ai_interface_enabled():
     response = perform_sql_task(task, input, sql, dialect, metadata)
     return JsonResponse(dataclasses.asdict(response))
   else:

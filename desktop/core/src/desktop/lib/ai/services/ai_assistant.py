@@ -5,9 +5,9 @@ from desktop.lib.rest.resource import Resource
 
 from .base_service import BaseService
 
-from desktop.conf import LLM
+from desktop.conf import AI_INTERFACE
 
-_base_url = LLM.HUE_LLM.BASE_URL.get()
+_base_url = AI_INTERFACE.BASE_URL.get()
 _path = "/api/infer"
 
 def _get_client():

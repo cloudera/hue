@@ -7,8 +7,6 @@ from desktop.lib.rest.resource import Resource
 
 from .base import LlmApi, Task
 
-from desktop.conf import LLM
-
 _GENERATE = """{metadata}
 
 -- Using valid SQLite, answer the following questions for the tables provided above.
@@ -45,7 +43,7 @@ TASK_TEMPLATES = {
     Task.FIX: _FIX
 }
 
-_base_url = LLM.HUE_LLM.BASE_URL.get()
+_base_url = ""
 _path = "/api/infer"
 
 def extractTagContent(tag, text):
