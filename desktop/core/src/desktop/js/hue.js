@@ -28,7 +28,8 @@ import filesize from 'filesize';
 import localforage from 'localforage';
 import nv from 'nvd3/nv.all';
 import page from 'page';
-import qq from 'ext/fileuploader.custom';
+import qq from 'ext/fileuploader.custom.new';
+import fileuploader from 'ext/fileuploader.custom';
 import sprintf from 'sprintf-js';
 
 import ko from 'ko/ko.all';
@@ -109,6 +110,7 @@ window.Mustache = Mustache;
 window.nv = nv;
 window.page = page;
 window.qq = qq;
+window.fileuploader = fileuploader;
 window.sprintf = sprintf;
 window.SqlAutocompleter = SqlAutocompleter;
 window.sqlStatementsParser = sqlStatementsParser;
