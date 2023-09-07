@@ -1737,7 +1737,6 @@ class Snippet {
     self.lastExecutedSelectionRange = undefined;
 
     self.execute = function (automaticallyTriggered) {
-      debugger;
       self.clearActiveExecuteRequests();
 
       if (!automaticallyTriggered && self.ace()) {
@@ -1844,7 +1843,6 @@ class Snippet {
           snippet: komapping.toJSON(self.getContext())
         },
         data => {
-          debugger;
           try {
             if (self.isSqlDialect() && data && data.handle) {
               self.lastExecutedStatement(
