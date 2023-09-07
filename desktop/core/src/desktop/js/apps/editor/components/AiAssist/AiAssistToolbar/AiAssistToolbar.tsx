@@ -1,5 +1,4 @@
 import React from 'react';
-import classNames from 'classnames';
 import {
   BugOutlined,
   ThunderboltOutlined,
@@ -11,8 +10,6 @@ import {
 import Toolbar, { ToolbarButton } from '../../../../../reactComponents/Toolbar/Toolbar';
 import AiAssistToolbarInput from './AiAssistToolbarInput';
 import { useKeyboardShortcuts } from '../hooks';
-
-import { ParseError } from 'utils/parseError';
 
 import './AiAssistToolbar.scss';
 
@@ -30,7 +27,7 @@ interface AssistToolbarProps {
   parsedStatement: any;
   loadOptimization: (statement: string) => Promise<void>;
   loadFixSuggestion: (statement: string) => Promise<void>;
-  parseError: ParseError | undefined;
+  isSqlError: boolean;
   className?: string;
   onInputSubmit: (value: string) => void;
   onInputChanged: (value: string) => void;
@@ -50,7 +47,7 @@ function AssistToolbar({
   parsedStatement,
   loadOptimization,
   loadFixSuggestion,
-  parseError,
+  isSqlError,
   onInputSubmit,
   onInputChanged
 }: AssistToolbarProps) {
@@ -165,7 +162,7 @@ function AssistToolbar({
           <ToolbarButton
             title="Fix selected SQL statement (Command-Ctrl-F)"
             onClick={handleFixClick}
-            disabled={!parseError || isLoading || !hasSelectedStatement}
+            disabled={!isSqlError || isLoading || !hasSelectedStatement}
             icon={<BugOutlined />}
           >
             {!inputExpanded ? 'Fix' : ''}
