@@ -229,8 +229,22 @@ AI_INTERFACE = ConfigSection(
       key='token',
       help=_('Service API token'),
       type=str),
+    TOKEN_SCRIPT = Config(
+      key="token_script",
+      help=_("Execute this script to produce the service API token."),
+      type=coerce_password_from_script,
+      default=None)
   )
 )
+
+def get_ai_service_token():
+  token = os.environ.get('HUE_AI_INTERFACE_TOKEN')
+  if not token:
+    token = AI_INTERFACE.TOKEN.get()
+  if not token:
+    token = AI_INTERFACE.TOKEN_SCRIPT.get()
+
+  return token
 
 SEMANTIC_SEARCH = ConfigSection(
   key='semantic_search',
