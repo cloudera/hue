@@ -205,84 +205,61 @@ X_FRAME_OPTIONS = Config(
   type=str,
   default="SAMEORIGIN")
 
-LLM = ConfigSection(
-  key='llm',
-  help=_("Configuration options for LLM"),
+AI_INTERFACE = ConfigSection(
+  key='ai_interface',
+  help=_("AI interface configurations"),
   members=dict(
-    SQL_LLM=Config(
-      key='sql_llm',
-      help=_('LLM to be used to SQL inference. Eg: hue_llm, openai'),
-      default='hue_llm',
+    SERVICE = Config(
+      key='service',
+      help=_('API service to be used for AI tasks. AI is disabled when a service is not configured. Eg: openai, bedrock, ai_assistant'),
       type=str),
-    RELEVENCY=Config(
-      key='relevancy',
-      help=_('Relevency for table search either vector search or vector db'),
-      default='vector_search',
+    MODEL = Config(
+      key='model',
+      help=_('Model to be used for AI tasks. . Eg: gpt, llama'),
       type=str),
-    HUE_LLM=ConfigSection(
-      key="hue_llm",
-      help=_('Configurations for the LLM hosted using Hue infra'),
-      members=dict(
-        BASE_URL=Config(
-          key='base_url',
-          default='http://localhost:8001',
-          help=_('Base URL for the Hue LLM API'),
-          type=str),
-        PATH=Config(
-          key='path',
-          default='/api/infer',
-          help=_('Path to inference API'),
-          type=str),
-      )
-    ),
-    OPENAI=ConfigSection(
-      key='openai',
-      help=_('Configuration options for the OpenAI API'),
-      members=dict(
-        ENABLE=Config(
-          key='enable_open_ai',
-          help=_('Open AI'),
-          default=True,
-          type=coerce_bool),
-        TOKEN=Config(
-          key='token',
-          help=_('API token for the OpenAI API'),
-          type=str),
-        MODEL=Config(
-          key='model',
-          help=_('OpenAI model for LLM'),
-          type=str,
-          default='gpt-3.5-turbo-16k'),
-      )
-    ),
-    METADATA = ConfigSection(
-      key='metadata',
-      help=_("Configuration options for metadata opeartions"),
-      members=dict(
-        CACHE_SIZE=Config(
-          key='cache_size',
-          help=_('Metadata embedding cache size'),
-          default=5000,
-          type=int),
-        EMBEDDING_MODEL=Config(
-          key='embedding_model',
-          help=_('Model used for metadata embedding. Must be compatible with SentenceTransformer'),
-          default='all-MiniLM-L6-v2',
-          type=str),
-      )
-    )
+    MODEL_NAME = Config(
+      key='model_name',
+      help=_('Fully qualified name of the model to be used. Eg: gpt-3.5-turbo-16k'),
+      type=str),
+    BASE_URL = Config(
+      key='base_url',
+      help=_('Service API base URL'),
+      type=str),
+    TOKEN = Config(
+      key='token',
+      help=_('Service API token'),
+      type=str),
   )
 )
 
-def is_llm_sql_enabled():
-    llm_enabled = LLM.SQL_LLM.get()
-    return bool(llm_enabled.strip())
+SEMANTIC_SEARCH = ConfigSection(
+  key='semantic_search',
+  help=_("Semantic search configurations"),
+  members=dict(
+    RELEVENCY=Config(
+      key='relevancy',
+      help=_('Tech used for semantic search. Possible values - vector_search or vector_db'),
+      default='vector_search',
+      type=str),
+    EMBEDDING_MODEL=Config(
+      key='embedding_model',
+      help=_('Model used for data embedding. Must be compatible with SentenceTransformer'),
+      default='all-MiniLM-L6-v2',
+      type=str),
+    CACHE_SIZE=Config(
+      key='cache_size',
+      help=_('Size of the LRU cache used to store embeddings'),
+      default=5000,
+      type=int),
+  )
+)
 
+def is_ai_interface_enabled():
+    return bool(AI_INTERFACE.SERVICE.get().strip())
 
 def is_vector_db_enabled():
-    RELEVENCY = LLM.RELEVENCY.get()
+    RELEVENCY = SEMANTIC_SEARCH.RELEVENCY.get()
     return RELEVENCY=="vector_db"
-    # return bool(llm_enabled.strip())
 
 HUE_IMAGE_VERSION = Config(
   key="hue_image_version",

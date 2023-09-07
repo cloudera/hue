@@ -2,10 +2,10 @@ from sentence_transformers import SentenceTransformer, util
 import torch
 
 from ..utils.cache import LRUCache
-from desktop.conf import LLM
+from desktop.conf import SEMANTIC_SEARCH
 
-_embedding_model = LLM.METADATA.EMBEDDING_MODEL.get()
-corpus_cache = LRUCache(LLM.METADATA.CACHE_SIZE.get())
+_embedding_model = SEMANTIC_SEARCH.EMBEDDING_MODEL.get()
+corpus_cache = LRUCache(SEMANTIC_SEARCH.CACHE_SIZE.get())
 # Could create a similar cache for query, but might be an overkill
 
 def _get_cached_embeddings(embedder, corpus):
