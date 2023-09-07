@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import classNames from 'classnames';
 import huePubSub from 'utils/huePubSub';
-import { SyntaxParser } from 'parse/types';
-import sqlParserRepository from 'parse/sql/sqlParserRepository';
 import { ParsedSqlStatement } from 'parse/sqlStatementsParser';
 import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
 import { generativeFunctionFactory } from 'api/apiAIHelper';
@@ -10,20 +8,13 @@ import SqlExecutable from '../../execution/sqlExecutable';
 import { getLeadingEmptyLineCount } from '../editorUtils';
 import AiPreviewModal from './PreviewModal/AiPreviewModal';
 import { useKeywordCase } from './hooks';
+import { useParser } from './ParserHook';
 import AnimatedLauncher from './AnimatedLauncher/AnimatedLauncher';
 import AnimatedCloseButton from './AnimatedCloseButton/AnimatedCloseButton';
 import AssistToolbar from './AiAssistToolbar/AiAssistToolbar';
 import { nqlCommentRegex } from './sharedRegexes';
 
 import './AiAssistBar.scss';
-
-export interface ParseError {
-  line: number;
-  loc: {
-    last_column: number;
-  };
-  text: string;
-}
 
 const {
   generateExplanation,
@@ -86,7 +77,6 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
   const parsedStatement = currentExecutable?.parsedStatement;
   const selectedStatement: string = parsedStatement?.statement || '';
   const lastSelectedStatement = useRef(selectedStatement);
-  const lastDialect = useRef('');
   const { firstLine, lastLine } = getSelectedLineNumbers(parsedStatement);
   const [isExpanded, setIsExpanded] = useState(
     getFromLocalStorage('hue.aiAssistBar.isExpanded', false)
@@ -103,26 +93,13 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [loadingStatusText, setLoadingStatusText] = useState('');
   const [errorStatusText, setErrorStatusText] = useState('');
-  const [parser, setParser] = useState<SyntaxParser>();
-  const [parseError, setParseError] = useState<ParseError | undefined>();
   const [nql, setNql] = useState('');
   const [inputValue, setInputValue] = useState<string>('');
   const cursorPosition = useRef<{ row: number; column: number } | undefined>();
-  const keywordCase = useKeywordCase(parser, selectedStatement);
+  const [syntaxParser, sqlDialect, hasIncorrectSql] = useParser(currentExecutable);
+  const keywordCase = useKeywordCase(syntaxParser, selectedStatement);
   const inputExpanded = isEditMode || isGenerateMode;
   const inputPrefill = inputExpanded ? extractLeadingNqlComments(selectedStatement) : '';
-
-  const loadParser = async () => {
-    const executor = activeExecutable?.executor;
-    const connector = executor?.connector();
-    const dialect = connector?.dialect;
-
-    if (lastDialect.current !== dialect) {
-      const matchingParser = await sqlParserRepository.getSyntaxParser(dialect);
-      setParser(matchingParser);
-      lastDialect.current = dialect;
-    }
-  };
 
   const handleStatusUpdate = (status: string) => {
     setLoadingStatusText(status);
@@ -136,7 +113,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
     setIsLoading(true);
     const executor = activeExecutable?.executor;
     const databaseName = activeExecutable?.database || '';
-    const dialect = lastDialect.current;
+    const dialect = sqlDialect;
     const { summary, error } = await generateExplanation({
       statement,
       dialect,
@@ -158,7 +135,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
     setIsLoading(true);
     const executor = activeExecutable?.executor;
     const databaseName = activeExecutable?.database || '';
-    const dialect = lastDialect.current;
+    const dialect = sqlDialect;
     const { sql, assumptions, error } = await generateSQLfromNQL({
       nql,
       databaseName,
@@ -186,7 +163,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
     setIsLoading(true);
     const executor = activeExecutable?.executor;
     const databaseName = activeExecutable?.database || '';
-    const dialect = lastDialect.current;
+    const dialect = sqlDialect;
     const { sql, assumptions, error } = await generateEditedSQLfromNQL({
       nql,
       sql: sqlToModify,
@@ -213,7 +190,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
     setIsOptimizeMode(true);
     const executor = activeExecutable?.executor;
     const databaseName = activeExecutable?.database || '';
-    const dialect = lastDialect.current;
+    const dialect = sqlDialect;
     const { sql, explain, error } = await generateOptimizedSql({
       statement,
       databaseName,
@@ -234,7 +211,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
 
   const loadFixSuggestion = async (statement: string) => {
     setIsLoading(true);
-    const dialect = lastDialect.current;
+    const dialect = sqlDialect;
     const executor = activeExecutable?.executor;
     const databaseName = activeExecutable?.database || '';
     const { sql, explanation, error } = await generateCorrectedSql({
@@ -316,8 +293,6 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
     setIsLoading(false);
     setLoadingStatusText('');
     setErrorStatusText('');
-    setParser(undefined);
-    setParseError(undefined);
     setInputValue('');
   };
 
@@ -351,28 +326,11 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
   };
 
   useEffect(() => {
-    loadParser();
-
-    const selectionChanged = lastSelectedStatement.current !== selectedStatement;
-    if (selectionChanged) {
-      updateInputModeOnStatementChange(lastSelectedStatement?.current, selectedStatement);
-
-      setSuggestion('');
-      setAssumptions('');
-      lastSelectedStatement.current = selectedStatement;
-
-      if (parser) {
-        const newParseError = parser?.parseSyntax('', selectedStatement.trim()) as ParseError;
-        setParseError(newParseError);
-      }
-    }
-
-    if (parser) {
-      lastSelectedStatement.current = selectedStatement;
-      const newParseError = parser?.parseSyntax('', selectedStatement.trim()) as ParseError;
-      setParseError(newParseError);
-    }
-  }, [selectedStatement, parser]);
+    updateInputModeOnStatementChange(lastSelectedStatement?.current, selectedStatement);
+    setSuggestion('');
+    setAssumptions('');
+    lastSelectedStatement.current = selectedStatement;
+  }, [selectedStatement]);
 
   useEffect(() => {
     const EDITOR_CURSOR_POSITION_CHANGE_EVENT = 'cursor-changed';
@@ -436,7 +394,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
             parsedStatement={parsedStatement}
             loadOptimization={loadOptimization}
             loadFixSuggestion={loadFixSuggestion}
-            parseError={parseError}
+            isSqlError={hasIncorrectSql}
             inputPrefill={inputPrefill}
           />
         </div>
@@ -471,7 +429,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
           nql={nql}
           lineNumberStart={getSelectedLineNumbers(parsedStatement).firstLine}
           showCopyToClipboard={!explanation}
-          dialect={lastDialect.current}
+          dialect={sqlDialect}
           keywordCase={keywordCase}
         />
       )}
