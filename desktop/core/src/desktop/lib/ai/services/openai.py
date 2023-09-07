@@ -1,10 +1,10 @@
 from .base_service import BaseService
 
-from desktop.conf import AI_INTERFACE
+from desktop.conf import AI_INTERFACE, get_ai_service_token
 
 _default_model = "gpt"
 _model_name = AI_INTERFACE.MODEL_NAME.get() or "gpt-3.5-turbo-16k"
-_api_key = AI_INTERFACE.TOKEN.get()
+_api_key = get_ai_service_token()
 
 class OpenAiService(BaseService):
     def __init__(self):
