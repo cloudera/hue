@@ -1185,6 +1185,7 @@ export default class AceLocationHandler implements Disposable {
                 ) {
                   // Break if found
                   this.verifyThrottle = window.setTimeout(verify, VERIFY_DELAY);
+                  huePubSub.publish('sql.error.missing.name', false);
                   return;
                 }
                 if (!uniqueSet.has(nameLower)) {
@@ -1231,6 +1232,7 @@ export default class AceLocationHandler implements Disposable {
                   token.parseLocation.location.last_line - 1,
                   token.parseLocation.location.last_column - 1
                 );
+                huePubSub.publish('sql.error.missing.name', true);
                 this.addAnchoredMarker(range, token, 'hue-ace-syntax-warning');
               }
               this.verifyThrottle = window.setTimeout(verify, VERIFY_DELAY);

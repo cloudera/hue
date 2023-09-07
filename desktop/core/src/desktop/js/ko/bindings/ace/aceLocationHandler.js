@@ -1113,6 +1113,7 @@ class AceLocationHandler {
                 ) {
                   // Break if found
                   self.verifyThrottle = window.setTimeout(verify, VERIFY_DELAY);
+                  huePubSub.publish('sql.error.missing.name', false);
                   return;
                 }
                 if (!uniqueIndex[nameLower]) {
@@ -1156,6 +1157,7 @@ class AceLocationHandler {
                   token.parseLocation.location.last_line - 1,
                   token.parseLocation.location.last_column - 1
                 );
+                huePubSub.publish('sql.error.missing.name', true);
                 self.addAnchoredMarker(range, token, 'hue-ace-syntax-warning');
               }
               self.verifyThrottle = window.setTimeout(verify, VERIFY_DELAY);
