@@ -377,8 +377,8 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 % endif
 
 
-<div data-bind="css: {'main-content': true, 'editor-mode': $root.editorMode()}">
-  <div class="vertical-full container-fluid" data-bind="style: { 'padding-left' : $root.isLeftPanelVisible() || $root.isPresentationMode() || $root.isResultFullScreenMode() ? '0' : '20px' }" >
+<div data-bind="css: {'main-content': true, 'editor-mode': $root.editorMode()}">  
+  <div class="vertical-full container-fluid" data-bind="style: { 'padding-left' : ($root.isLeftPanelVisible() || $root.isPresentationMode() || $root.isResultFullScreenMode() ? '0' : '20px'), 'padding-right' : '0'}" >
     <div class="vertical-full">
       <div class="vertical-full tab-pane row-fluid panel-container" data-bind="css: { active: selectedNotebook() === $data }, template: { name: 'notebook${ suffix }'}">
       </div>
@@ -918,7 +918,9 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     <div class="snippet-container row-fluid" data-bind="visibleOnHover: { override: $root.editorMode() || inFocus() || saveResultsModalVisible(), selector: '.snippet-actions' }">
       <div class="snippet card card-widget" data-bind="css: {'notebook-snippet' : ! $root.editorMode(), 'editor-mode': $root.editorMode(), 'active-editor': inFocus, 'snippet-text' : type() == 'text'}, attr: {'id': 'snippet_' + id()}, clickForAceFocus: ace">
         <div style="position: relative;">
-          <AiAssistBar class="cuix antd" data-bind="reactWrapper: 'AiAssistBar', props: { activeExecutable: activeExecutable }"></AiAssistBar>
+          <!-- ko ifnot: $root.isPresentationMode() -->
+            <AiAssistBar class="cuix antd" data-bind="reactWrapper: 'AiAssistBar', props: { activeExecutable: activeExecutable }"></AiAssistBar>
+          <!-- /ko -->
           <div class="snippet-row" style="position: relative;">
             <div class="snippet-left-bar">
               <!-- ko template: { if: ! $root.editorMode() && ! $root.isPresentationMode() && ! $root.isResultFullScreenMode(), name: 'notebook-snippet-type-controls${ suffix }' } --><!-- /ko -->
