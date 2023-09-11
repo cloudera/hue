@@ -92,12 +92,6 @@ class GSFileSystem(S3FileSystem):
 
   def netnormpath(self, path):
     return normpath(path)
-  
-  # @staticmethod
-  # def _append_separator(path):
-  #   if path and not path.endswith('/'):
-  #     path += '/'
-  #   return path
 
   @staticmethod
   def parent_path(path):
@@ -122,17 +116,12 @@ class GSFileSystem(S3FileSystem):
 
   def _get_key(self, path, validate=True):
     bucket_name, key_name = parse_uri(path)[:2]
-    print('++++++++++++++++++++++++++++++++++++++++++++++++')
-    print(bucket_name, key_name)
-    print('++++++++++++++++++++++++++++++++++++++++++++++++')
-    
     bucket = self._get_bucket(bucket_name)
 
-    print('--------------------------------')
-    print(bucket)
-    print('--------------------------------')
     try:
-      return bucket.get_key(key_name, headers=self.header_values)
+      # Bucket get_key call expects key name ending with '/' for GS
+      key_name_with_slash = self._append_separator(key_name)
+      return bucket.get_key(key_name_with_slash, headers=self.header_values)
     except BotoClientError as e:
       raise S3FileSystemException(_('Failed to access path at "%s": %s') % (path, e.reason))
     except S3ResponseError as e:
@@ -145,9 +134,6 @@ class GSFileSystem(S3FileSystem):
         raise S3FileSystemException(e.message or e.reason)
     except GSResponseError as e:
       raise e
-    except Exception as e:
-      raise e
-
 
 
   @translate_s3_error

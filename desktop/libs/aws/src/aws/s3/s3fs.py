@@ -177,15 +177,7 @@ class S3FileSystem(object):
 
   def _get_key(self, path, validate=True):
     bucket_name, key_name = s3.parse_uri(path)[:2]
-    print('++++++++++++++++++++++++++++++++++++++++++++++++')
-    print(bucket_name, key_name)
-    print('++++++++++++++++++++++++++++++++++++++++++++++++')
-    
     bucket = self._get_bucket(bucket_name)
-
-    print('--------------------------------')
-    print(bucket)
-    print('--------------------------------')
 
     try:
       return bucket.get_key(key_name, validate=validate)
