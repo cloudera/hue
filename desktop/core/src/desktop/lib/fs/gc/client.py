@@ -24,7 +24,6 @@ except ImportError:
   LOG.warning('gcs_oauth2_boto_plugin module not found')
 import json
 
-from aws.s3.s3fs import S3FileSystem
 from boto.auth_handler import AuthHandler, NotReadyToAuthenticate
 from boto.gs.bucket import Bucket
 from boto.gs.connection import GSConnection
@@ -34,6 +33,7 @@ from boto.s3.connection import SubdomainCallingFormat
 from desktop import conf
 from desktop.lib.idbroker import conf as conf_idbroker
 from desktop.lib.idbroker.client import IDBroker
+from desktop.lib.fs.gc.gs import GSFileSystem
 
 
 def get_credential_provider(config, user):
@@ -45,11 +45,10 @@ def _make_client(identifier, user):
   config = conf.GC_ACCOUNTS[identifier] if identifier in list(conf.GC_ACCOUNTS.keys()) else None
   client = Client.from_config(config, get_credential_provider(config, user))
 
-  return S3FileSystem(
+  return GSFileSystem(
     client.get_s3_connection(),
     client.expiration,
     headers={"x-goog-project-id": client.project},
-    filebrowser_action=conf.PERMISSION_ACTION_GS
   )  # It would be nice if the connection was lazy loaded
 
 

@@ -177,7 +177,16 @@ class S3FileSystem(object):
 
   def _get_key(self, path, validate=True):
     bucket_name, key_name = s3.parse_uri(path)[:2]
+    print('++++++++++++++++++++++++++++++++++++++++++++++++')
+    print(bucket_name, key_name)
+    print('++++++++++++++++++++++++++++++++++++++++++++++++')
+    
     bucket = self._get_bucket(bucket_name)
+
+    print('--------------------------------')
+    print(bucket)
+    print('--------------------------------')
+
     try:
       return bucket.get_key(key_name, validate=validate)
     except BotoClientError as e:
@@ -198,7 +207,7 @@ class S3FileSystem(object):
       return Location.DEFAULT
 
   def _stats(self, path):
-    if s3.is_root(path):
+    if S3FileSystem.isroot(path):
       return S3Stat.for_s3_root()
 
     try:
@@ -259,7 +268,7 @@ class S3FileSystem(object):
   @staticmethod
   def parent_path(path):
     parent_dir = S3FileSystem._append_separator(path)
-    if not s3.is_root(parent_dir):
+    if not S3FileSystem.isroot(parent_dir):
       bucket_name, key_name, basename = s3.parse_uri(path)
       if not basename:  # bucket is top-level so return root
         parent_dir = S3A_ROOT
