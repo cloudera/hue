@@ -105,7 +105,13 @@ export const simpleGet = (url, data, options) => {
     } else if (typeof options.successCallback !== 'undefined') {
       options.successCallback(data);
     }
-  }).fail(assistErrorCallback(options));
+  }).fail(error => {
+    if (error.message) {
+      huePubSub.publish( topic: 'hue.error.occured',error);
+    } else {
+    assistErrorCallback(options);
+    }
+  });
 };
 
 /**

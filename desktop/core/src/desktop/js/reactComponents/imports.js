@@ -19,6 +19,9 @@ export async function loadComponent(name) {
 
     case 'FileChooserWithButton':
       return (await import('./FileChooser/FileChooserWithButton/FileChooserWithButton')).default;
+    
+    case 'NewErrorNotification':
+      return (await import('./notifications/NewErrorNotification')).default;
 
     default:
       console.error(`A placeholder component is rendered because you probably forgot to include your new component in the 

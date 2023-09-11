@@ -146,6 +146,12 @@ ${ hueIcons.symbols() }
 
   <div class="main-page">
     <AppBanner data-reactcomponent='AppBanner'></AppBanner>
+    <NewErrorNotification data-reactcomponent='NewErrorNotification'></NewErrorNotification>
+
+      //Register the react component 
+      huePubSub.subscribe( topic: 'hue.error.occured', function (errorObject){
+    // you open the cuix error notification using the error object, change react to visible or what not
+  });
 
     <nav class="navbar navbar-default">
       <div class="navbar-inner top-nav">

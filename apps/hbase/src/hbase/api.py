@@ -57,6 +57,8 @@ class HbaseApi(object):
         raise PopupException(_("HBase Thrift 1 server cannot be contacted: %s") % e.message)
       else:
         error_msg = e.message.split('\n', 1)[0]
+        if error_msg.indexOf('Tsocket read 0 bytes'):
+          raise NewErrorNotificationPopup(message = 'Hue has trouble connecting HBase, this is likely due to config issue', description = 'Please check the docs on <a> www.cloudera.com </a>')
         raise PopupException(_("Api Error: %s") % error_msg)
 
   def queryCluster(self, action, cluster, *args):
