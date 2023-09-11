@@ -70,6 +70,18 @@ def auth_error_handler(view_fn):
   return decorator
 
 
+def get_gs_home_directory(user=None):
+  from desktop.models import _handle_user_dir_raz
+
+  remote_home_gs = 'gs://'
+  if hasattr(REMOTE_STORAGE_HOME, 'get') and REMOTE_STORAGE_HOME.get() and REMOTE_STORAGE_HOME.get().startswith('gs://'):
+    remote_home_gs = REMOTE_STORAGE_HOME.get()
+
+  remote_home_gs = _handle_user_dir_raz(user, remote_home_gs)
+
+  return remote_home_gs
+
+
 class GSFileSystem(S3FileSystem):
 
   def __init__(self, gs_connection, expiration=None, fs='gs', headers=None, filebrowser_action=PERMISSION_ACTION_GS):
@@ -138,7 +150,6 @@ class GSFileSystem(S3FileSystem):
 
   @translate_s3_error
   def listdir_stats(self, path, glob=None):
-    print('in listdir_stats ------>>>>' + path)
     if glob is not None:
       raise NotImplementedError(_("Option `glob` is not implemented"))
 
