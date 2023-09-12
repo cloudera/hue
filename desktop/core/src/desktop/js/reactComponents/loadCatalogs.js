@@ -62,7 +62,7 @@ export async function LoadDataCatalogs() {
         completedTables++;
       } catch (error) {
         console.error("Error loading table: " + eachTable.name, error);
-        continue; // Skip to the next iteration if there is an error
+        continue;
       }
       const progress = Math.floor((completedTables / numTablesToLoad) * 100);
       localStorage.setItem('database_cache_progress_' + databaseName, progress);
