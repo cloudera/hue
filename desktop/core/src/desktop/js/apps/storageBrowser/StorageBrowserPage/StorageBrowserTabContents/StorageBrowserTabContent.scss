@@ -15,6 +15,9 @@
 // limitations under the License.
 @use 'variables' as vars;
 
+$icon-margin: 5px;
+$action-dropdown-width: 214px;
+
 .hue-storage-browser-tabContent {
   background-color: vars.$fluidx-white;
   margin: vars.$fluidx-spacing-s 0;
@@ -42,7 +45,7 @@
 
   .hue-storage-browser__path-browser-panel {
     display: flex;
-    margin-top: vars.$fluidx-spacing-xxs;
+    margin: vars.$fluidx-spacing-xs 0;
     //TODO: Remove nesting of classes.
     .hue-storage-browser__filePath {
       flex: 0 0 auto;
@@ -51,4 +54,57 @@
       margin-right: vars.$fluidx-spacing-xs;
     }
   }
+}
+
+.hue-storage-browser__actions-bar {
+  display: flex;
+  margin: vars.$fluidx-spacing-s 0;
+  justify-content: space-between;
+}
+
+.hue-storage-browser__search {
+  flex: 0 0 auto;
+  display: flex;
+}
+
+.hue-storage-browser__actions-bar-right {
+  display: flex;
+  height: 32px;
+}
+
+.hue-storage-browser__bulk-action-btn {
+  flex: 0 0 auto;
+  color: vars.$fluidx-blue-600;
+  margin-right: vars.$fluidx-spacing-xs;
+  border: solid 1px vars.$fluidx-gray-300;
+  box-shadow: none;
+  background-color: transparent;
+
+  .anticon {
+    margin-left: $icon-margin;
+  }
+}
+
+.hue-storage-browser__new-btn {
+  flex: 0 0 auto;
+  color: vars.$fluidx-white;
+  background-color: vars.$fluidx-blue-600;
+  border: solid 1px vars.$fluidx-blue-600;
+  box-shadow: none;
+
+  .anticon {
+    margin-left: $icon-margin;
+  }
+
+  .anticon.anticon-plus-circle {
+    margin-right: $icon-margin;
+  }
+}
+
+.hue-storage-browser__bulk-action {
+  width: $action-dropdown-width;
+}
+
+.hue-storage-browser__new-action {
+  width: $action-dropdown-width;
 }
