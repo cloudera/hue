@@ -269,7 +269,8 @@ SEMANTIC_SEARCH = ConfigSection(
 )
 
 def is_ai_interface_enabled():
-    return bool(AI_INTERFACE.SERVICE.get().strip())
+    service = AI_INTERFACE.SERVICE.get()
+    return bool(service and service.strip())
 
 def is_vector_db_enabled():
     RELEVENCY = SEMANTIC_SEARCH.RELEVENCY.get()
