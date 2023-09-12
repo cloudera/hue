@@ -232,16 +232,22 @@ export const getRelevantTableDetails = async (
   onStatusChange && onStatusChange('Finding relevant table metadata');
   const relevantTables = [];
   for (const tableName of tableNames) {
-    const columns = await fetchColumnsData(databaseName, tableName, executor);
-    const tableDetails = {
-      name: tableName,
-      columns: columns.map(({ definition }) => {
-        return definition;
-      }),
-      partitions: columns.partitions,
-    };
-    relevantTables.push(tableDetails);
+    try {
+      const columns = await fetchColumnsData(databaseName, tableName, executor);
+      const tableDetails = {
+        name: tableName,
+        columns: columns.map(({ definition }) => {
+          return definition;
+        }),
+        partitions: columns.partitions,
+      };
+      relevantTables.push(tableDetails);
+    } catch (error) {
+      console.error(`Could not fetch columns data for table: ${tableName}`, error);
+      continue;
+    }
   }
+  
   return relevantTables;
 };
 
