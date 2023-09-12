@@ -43,14 +43,30 @@ export async function LoadDataCatalogs() {
 
     const databaseName = data.entry.path[0];
     const totalTables = dataCatalogEntry.tables_meta.length;
+
+    const configLimit = window.AUTO_FETCH_TABLE_META_LIMIT;
+    if (configLimit === 0) {
+      return;
+    }
+
+    const numTablesToLoad = configLimit === -1 ? totalTables : Math.min(configLimit, totalTables);
+
     let completedTables = 0;
 
-    for (const eachTable of dataCatalogEntry.tables_meta) {
+    for (let i = 0; i < numTablesToLoad; i++) {
+      const eachTable = dataCatalogEntry.tables_meta[i];
+      console.log("loading " + eachTable.name);
       await delay(100);
-      await fetchColumnsData(databaseName, eachTable.name, data.entry);
-      completedTables++;
-      const progress = Math.floor((completedTables / totalTables) * 100);
+      try {
+        await fetchColumnsData(databaseName, eachTable.name, data.entry);
+        completedTables++;
+      } catch (error) {
+        console.error("Error loading table: " + eachTable.name, error);
+        continue; // Skip to the next iteration if there is an error
+      }
+      const progress = Math.floor((completedTables / numTablesToLoad) * 100);
       localStorage.setItem('database_cache_progress_' + databaseName, progress);
     }
   });
 }
+
