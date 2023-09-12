@@ -86,12 +86,13 @@ BUILDTYPE=$1
 DOCKEROS=$2
 HUE_JAR_VERSION=$3
 
+export VIRTUAL_ENV_VERSION="20.24.4"
+export VIRTUAL_ENV_RELOCATABLE_VERSION="0.0.1"
+
 big_console_header "Hue PreRequisite Start" "$@"
 install_prerequisite $DOCKEROS
 big_console_header "Hue PreRequisite End" "$@"
 
-export VIRTUAL_ENV_VERSION="20.24.4"
-export VIRTUAL_ENV_RELOCATABLE_VERSION="0.0.1"
 export DESKTOP_VERSION=$2
 export HUE_WEBPACK_CONFIG='webpack.config.internal.js'
 export PYTHON_H=$PYTHON38_PATH/include/python3.8/Python.h
