@@ -76,7 +76,7 @@ function redhat7_ppc_install() {
       ./configure --enable-shared --prefix=/opt/cloudera/cm-agent && \
       make install'
     # Pip modules install
-    sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install virtualenv==${VIRTUAL_ENV_VERSION} virtualenv-make-relocatable==${VIRTUAL_ENV_RELOCATABLE_VERSION}'
+    sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}''
     sudo pip38_bin=${pip38_bin} -- sh -c 'ln -fs ${pip38_bin} $(dirname ${pip38_bin})/pip'
   fi
 }
@@ -108,7 +108,7 @@ function redhat8_ppc_install() {
     # NODEJS 14 install
     sudo -- sh -c 'yum install -y nodejs npm'
     # Pip modules install
-    sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install virtualenv==${VIRTUAL_ENV_VERSION} virtualenv-make-relocatable==${VIRTUAL_ENV_RELOCATABLE_VERSION} mysqlclient==2.1.1'
+    sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}' mysqlclient==2.1.1'
     sudo pip38_bin=${pip38_bin} -- sh -c 'ln -fs ${pip38_bin} $(dirname ${pip38_bin})/pip'
     # sqlite3 install
     sudo TOOLS_HOME=${TOOLS_HOME} -- sh -c 'mkdir -p ${TOOLS_HOME} && \
@@ -138,7 +138,7 @@ function redhat9_ppc_install() {
     # NODEJS 14 install
     sudo -- sh -c 'yum install -y nodejs npm'
     # Pip modules install
-    sudo pip39_bin=${pip39_bin} -- sh -c '${pip39_bin} install virtualenv==${VIRTUAL_ENV_VERSION} virtualenv-make-relocatable==${VIRTUAL_ENV_RELOCATABLE_VERSION} mysqlclient==2.1.1'
+    sudo pip39_bin=${pip39_bin} -- sh -c '${pip39_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}' mysqlclient==2.1.1'
     sudo pip39_bin=${pip39_bin} -- sh -c 'ln -fs ${pip39_bin} $(dirname ${pip39_bin})/pip'
     # sqlite3 install
     sudo TOOLS_HOME=${TOOLS_HOME} -- sh -c 'mkdir -p ${TOOLS_HOME} && \
@@ -169,7 +169,7 @@ function sles12_install() {
     # NODEJS 14 install
     sudo -- sh -c 'zypper install -y npm14 nodejs14'
     # Pip modules install
-    sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install virtualenv==${VIRTUAL_ENV_VERSION} virtualenv-make-relocatable==${VIRTUAL_ENV_RELOCATABLE_VERSION} mysqlclient==2.1.1'
+    sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}' mysqlclient==2.1.1'
     sudo pip38_bin=${pip38_bin} -- sh -c 'ln -fs ${pip38_bin} $(dirname ${pip38_bin})/pip'
     # sqlite3 install
     sudo -- sh -c 'curl --insecure -o sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
@@ -198,7 +198,7 @@ function sles15_install() {
     # NODEJS 14 install
     sudo -- sh -c 'zypper install -y nodejs18 npm16'
     # Pip modules install
-    sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install virtualenv==${VIRTUAL_ENV_VERSION} virtualenv-make-relocatable==${VIRTUAL_ENV_RELOCATABLE_VERSION} mysqlclient==2.1.1'
+    sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}' mysqlclient==2.1.1'
     sudo pip38_bin=${pip38_bin} -- sh -c 'ln -fs ${pip38_bin} $(dirname ${pip38_bin})/pip'
     # sqlite3 install
     sudo -- sh -c 'curl --insecure -o sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
@@ -244,7 +244,7 @@ function centos7_install() {
       ./configure --enable-shared --prefix=/opt/cloudera/cm-agent && \
       make install'
     # Pip modules install
-    sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install virtualenv==${VIRTUAL_ENV_VERSION} virtualenv-make-relocatable==${VIRTUAL_ENV_RELOCATABLE_VERSION} mysqlclient==2.1.1'
+    sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}' mysqlclient==2.1.1'
     sudo pip38_bin=${pip38_bin} -- sh -c 'ln -fs ${pip38_bin} $(dirname ${pip38_bin})/pip'
   fi
 }
@@ -268,7 +268,7 @@ function redhat8_install() {
     # NODEJS 14 install
     sudo -- sh -c 'curl -sL https://rpm.nodesource.com/setup_14.x | bash - && yum install -y nodejs'
     # Pip modules install
-    sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install virtualenv==${VIRTUAL_ENV_VERSION} virtualenv-make-relocatable==${VIRTUAL_ENV_RELOCATABLE_VERSION} mysqlclient==2.1.1'
+    sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}' mysqlclient==2.1.1'
     sudo pip38_bin=${pip38_bin} -- sh -c 'ln -fs ${pip38_bin} $(dirname ${pip38_bin})/pip'
     # sqlite3 install
     sudo -- sh -c 'curl -o sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
@@ -312,7 +312,7 @@ function ubuntu18_install() {
     sudo -- sh -c 'curl -sL https://deb.nodesource.com/setup_14.x | sudo bash - && \
       apt -y install nodejs'
     # Pip modules install
-    sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install virtualenv==${VIRTUAL_ENV_VERSION} virtualenv-make-relocatable==${VIRTUAL_ENV_RELOCATABLE_VERSION} mysqlclient==2.1.1'
+    sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}' mysqlclient==2.1.1'
     sudo pip38_bin=${pip38_bin} -- sh -c 'ln -fs ${pip38_bin} $(dirname ${pip38_bin})/pip'
     # sqlite3 install
     sudo -- sh -c 'curl -o sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
@@ -359,7 +359,7 @@ function ubuntu20_install() {
     sudo -- sh -c 'curl -sL https://deb.nodesource.com/setup_14.x | sudo bash - && \
       apt -y install nodejs'
     # Pip modules install
-    sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install virtualenv==${VIRTUAL_ENV_VERSION} virtualenv-make-relocatable==${VIRTUAL_ENV_RELOCATABLE_VERSION} mysqlclient==2.1.1'
+    sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}' mysqlclient==2.1.1'
     sudo pip38_bin=${pip38_bin} -- sh -c 'ln -fs ${pip38_bin} $(dirname ${pip38_bin})/pip'
     # sqlite3 install
     sudo -- sh -c 'curl -o sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
@@ -389,7 +389,7 @@ function redhat9_install() {
     # NODEJS 14 install
     sudo -- sh -c 'curl -sL https://rpm.nodesource.com/setup_14.x | bash - && yum install -y nodejs'
     # Pip modules install
-    sudo pip39_bin=${pip39_bin} -- sh -c '${pip39_bin} install virtualenv==${VIRTUAL_ENV_VERSION} virtualenv-make-relocatable==${VIRTUAL_ENV_RELOCATABLE_VERSION} mysqlclient==2.1.1'
+    sudo pip39_bin=${pip39_bin} -- sh -c '${pip39_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}' mysqlclient==2.1.1'
     sudo pip39_bin=${pip39_bin} -- sh -c 'ln -fs ${pip39_bin} $(dirname ${pip39_bin})/pip'
     # sqlite3 install
     sudo -- sh -c 'curl -o sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
