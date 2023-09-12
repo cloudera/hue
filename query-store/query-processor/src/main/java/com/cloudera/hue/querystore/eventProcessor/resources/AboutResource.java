@@ -12,6 +12,7 @@ import com.cloudera.hue.querystore.eventProcessor.EventProcessorConfiguration;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @Path("about")
 public class AboutResource {
@@ -29,6 +30,20 @@ public class AboutResource {
   @Produces(MediaType.APPLICATION_JSON)
   public Response getConfigs() throws JsonProcessingException {
     JsonNode jsonNode = objectMapper.valueToTree(this.eventProcessorConfiguration);
+
+    ObjectNode server = (ObjectNode) jsonNode.get("server");
+
+    ObjectNode applicationConnectors = (ObjectNode) (server.get("applicationConnectors").get(0));
+    if (applicationConnectors.has("keyStorePassword")) {
+      applicationConnectors.set("keyStorePassword", null);
+    }
+    if (applicationConnectors.has("trustStorePassword")) {
+      applicationConnectors.set("trustStorePassword", null);
+    }
+    if (applicationConnectors.has("keyManagerPassword")) {
+      applicationConnectors.set("keyManagerPassword", null);
+    }
+
     EventProcessorConfiguration configs = null;
     configs = objectMapper.treeToValue(jsonNode, EventProcessorConfiguration.class);
     configs.getDatabase().setPassword("");
