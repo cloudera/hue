@@ -126,14 +126,57 @@ class GSFileSystem(S3FileSystem):
       return stats
     raise S3FileSystemException("No such file or directory: '%s'" % path)
 
+
+  @translate_s3_error
+  @auth_error_handler
+  def create(self, path, overwrite=False, data=None):
+
+    key = self._get_key(path)
+    if not key:
+      try:
+        bucket_name, key_name = parse_uri(path)[:2]
+        bucket = self._get_bucket(bucket_name)
+
+        key = bucket.new_key(key_name)
+
+      except Exception as e:
+        raise e
+      
+    if key:
+      key.set_contents_from_string(data or '', replace=overwrite)
+    else:
+      raise Exception('Cannot perform create operation.')
+
+
   def _get_key(self, path, validate=True):
     bucket_name, key_name = parse_uri(path)[:2]
+
+    # print('++++++++++++++++++++++++++++++++++++++++++++++++')
+    # print(bucket_name, key_name)
+    # print('++++++++++++++++++++++++++++++++++++++++++++++++')
+
     bucket = self._get_bucket(bucket_name)
 
+    # print('-------------------------------- bucket ')
+    # print(bucket)
+    # print('--------------------------------')
+
     try:
-      # Bucket get_key call expects key name ending with '/' for GS
+      # get_key() expects key name ending with '/' for directory in GS
+      # Check for directory
       key_name_with_slash = self._append_separator(key_name)
-      return bucket.get_key(key_name_with_slash, headers=self.header_values)
+      key = bucket.get_key(key_name_with_slash, headers=self.header_values)
+
+      if not key:
+        # get_key() expects key name as it is for file like object in GS
+        # Check for file like object now
+        key = bucket.get_key(key_name, headers=self.header_values)
+
+      # import pdb
+      # pdb.set_trace()
+
+      return key
+
     except BotoClientError as e:
       raise S3FileSystemException(_('Failed to access path at "%s": %s') % (path, e.reason))
     except S3ResponseError as e:
