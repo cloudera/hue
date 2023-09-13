@@ -24,9 +24,9 @@ from boto.s3.prefix import Prefix
 
 from desktop.conf import PERMISSION_ACTION_GS
 from desktop.lib.fs.gc import GS_ROOT, abspath, parse_uri, translate_s3_error, normpath, join as gs_join
+from desktop.lib.fs.gc.gsstat import GSStat
 
 from aws.s3.s3fs import S3FileSystem
-from aws.s3.s3stat import S3Stat
 
 
 DEFAULT_READ_SIZE = 1024 * 1024  # 1MB
@@ -199,7 +199,7 @@ class GSFileSystem(S3FileSystem):
     if S3FileSystem.isroot(path):
       try:
         return sorted(
-          [S3Stat.from_bucket(b, self.fs) for b in self._s3_connection.get_all_buckets(headers=self.header_values)], key=lambda x: x.name)
+          [GSStat.from_bucket(b, self.fs) for b in self._s3_connection.get_all_buckets(headers=self.header_values)], key=lambda x: x.name)
       except S3FileSystemException as e:
         raise e
       except S3ResponseError as e:
@@ -217,7 +217,7 @@ class GSFileSystem(S3FileSystem):
     res = []
     for item in bucket.list(prefix=prefix, delimiter='/', headers=self.header_values):
       if isinstance(item, Prefix):
-        res.append(S3Stat.from_key(Key(item.bucket, item.name), is_dir=True, fs=self.fs))
+        res.append(GSStat.from_key(Key(item.bucket, item.name), is_dir=True, fs=self.fs))
       else:
         if item.name == prefix:
           continue
@@ -277,6 +277,7 @@ class GSFileSystem(S3FileSystem):
     Actually it creates an empty object: s3://[bucket]/[path]/
     """
     bucket_name, key_name = parse_uri(path)[:2]
+
     if not BUCKET_NAME_PATTERN.match(bucket_name):
       raise S3FileSystemException(_('Invalid bucket name: %s') % bucket_name)
 
@@ -295,9 +296,54 @@ class GSFileSystem(S3FileSystem):
         return None
       else:
         raise S3FileSystemException("'%s' already exists and is not a directory" % path)
+
     path = self._append_separator(path)  # folder-key should ends by /
     self.create(path)  # create empty object
+
+
+  def _stats(self, path):
+    if S3FileSystem.isroot(path):
+      return GSStat.for_gs_root()
+    
+    try:
+      key = self._get_key(path)
+
+    except BotoClientError as e:
+      raise S3FileSystemException(_('Failed to access path "%s": %s') % (path, e.reason))
+    except S3ResponseError as e:
+      if e.status == 404:
+        return None
+      elif e.status == 403:
+        raise S3FileSystemException(_('User is not authorized to access path: "%s"') % path)
+      else:
+        raise S3FileSystemException(_('Failed to access path "%s": %s') % (path, e.reason))
+    except Exception as e: # SSL errors show up here, because they've been remapped in boto
+      raise S3FileSystemException(_('Failed to access path "%s": %s') % (path, str(e)))
+
+    if key is None:
+      bucket_name, key_name = parse_uri(path)[:2]
+      bucket = self._get_bucket(bucket_name)
+
+      key = Key(bucket, key_name)
+    
+    return self._stats_key(key, self.fs)
   
+
+  @staticmethod
+  def _stats_key(key, fs='gs'):
+    if key.size is not None:
+      is_directory_name = not key.name or key.name[-1] == '/'
+
+      return GSStat.from_key(key, is_dir=is_directory_name, fs=fs)
+    else:
+      key.name = GSFileSystem._append_separator(key.name)
+      ls = key.bucket.get_all_keys(prefix=key.name, max_keys=1)  # Not sure possible via signed request
+
+      if len(ls) > 0:
+        return GSStat.from_key(key, is_dir=True, fs=fs)
+
+    return None
+
 
   def _copy(self, src, dst, recursive, use_src_basename):
     src_st = self.stats(src)
