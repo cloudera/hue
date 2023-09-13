@@ -55,6 +55,8 @@ def get_app_for_module(module):
       return app
     elif module.__name__.startswith('desktop.lib.connectors'):
       return app
+    elif module.__name__.startswith('desktop.lib.scheduler'):
+      return app
     elif module.__name__.startswith(app) and not module.__name__.startswith("desktop.lib"):
       return app
   return None
