@@ -14,8 +14,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import os
 import re
 import logging
+import time
 
 from boto.exception import BotoClientError, S3ResponseError, GSResponseError
 from boto.gs.connection import Location
@@ -150,32 +152,26 @@ class GSFileSystem(S3FileSystem):
 
   def _get_key(self, path, validate=True):
     bucket_name, key_name = parse_uri(path)[:2]
-
-    # print('++++++++++++++++++++++++++++++++++++++++++++++++')
-    # print(bucket_name, key_name)
-    # print('++++++++++++++++++++++++++++++++++++++++++++++++')
-
     bucket = self._get_bucket(bucket_name)
-
-    # print('-------------------------------- bucket ')
-    # print(bucket)
-    # print('--------------------------------')
 
     try:
       # get_key() expects key name ending with '/' for directory in GS
       # Check for directory
-      key_name_with_slash = self._append_separator(key_name)
-      key = bucket.get_key(key_name_with_slash, headers=self.header_values)
+      # key_name_with_slash = self._append_separator(key_name)
+      # key = bucket.get_key(key_name_with_slash, headers=self.header_values)
 
-      if not key:
-        # get_key() expects key name as it is for file like object in GS
-        # Check for file like object now
-        key = bucket.get_key(key_name, headers=self.header_values)
+      # if not key:
+      #   # get_key() expects key name as it is for file like object in GS
+      #   # Check for file like object now
+      #   key = bucket.get_key(key_name, headers=self.header_values)
+      
+
+      return bucket.get_key(key_name, headers=self.header_values)
 
       # import pdb
       # pdb.set_trace()
 
-      return key
+      # return key
 
     except BotoClientError as e:
       raise S3FileSystemException(_('Failed to access path at "%s": %s') % (path, e.reason))
@@ -234,24 +230,22 @@ class GSFileSystem(S3FileSystem):
   @auth_error_handler
   def rmtree(self, path, skipTrash=True):
     if not skipTrash:
-      raise NotImplementedError(_('Moving to trash is not implemented for S3'))
+      raise NotImplementedError(_('Moving to trash is not implemented for GS'))
 
     bucket_name, key_name = parse_uri(path)[:2]
     if bucket_name and not key_name:
       self._delete_bucket(bucket_name)
     else:
       if self.isdir(path):
-        path = self._append_separator(path)  # Really need to make sure we end with a '/'
+        # Really need to make sure we end with a '/' for directory and it reflects in key_name
+        path = self._append_separator(path)
+        _, key_name = parse_uri(path)[:2]
 
-      key = self._get_key(path, validate=False)
-
-      if key.exists():
-        to_delete = [key]
+      key = self._get_key(path)
+      if key:
         dir_keys = []
-
         if self.isdir(path):
-          dir_keys = key.bucket.list(prefix=path)
-          to_delete = itertools.chain(dir_keys, to_delete)
+          dir_keys = key.bucket.list(prefix=key_name)
 
         if not dir_keys:
           # Avoid Raz bulk delete issue
@@ -259,14 +253,18 @@ class GSFileSystem(S3FileSystem):
           if deleted_key.exists():
             raise S3FileSystemException('Could not delete key %s' % deleted_key)
         else:
-          result = key.bucket.delete_keys(to_delete)
-          if result.errors:
-            msg = "%d errors occurred while attempting to delete the following S3 paths:\n%s" % (
-              len(result.errors), '\n'.join(['%s: %s' % (error.key, error.message) for error in result.errors])
-            )
-            LOG.error(msg)
-            raise S3FileSystemException(msg)
-  
+          # key.bucket.delete_keys() call is not supported from GS side
+          # So, try deleting the keys one by one
+
+          # TODO: What if one key deletion fails, then what about the whole delete operation flow?
+          # TODO: What if there are a lot of keys? Any limit on loop?
+          # TODO: Any other error/exception handling?
+
+          for key in list(dir_keys):
+            deleted_key = key.delete()
+            # if deleted_key.exists():
+            #   raise S3FileSystemException('Could not delete key %s' % deleted_key)
+
 
   @translate_s3_error
   @auth_error_handler
@@ -274,7 +272,7 @@ class GSFileSystem(S3FileSystem):
     """
     Creates a directory and any parent directory if necessary.
 
-    Actually it creates an empty object: s3://[bucket]/[path]/
+    Actually it creates an empty object: gs://[bucket]/[path]/
     """
     bucket_name, key_name = parse_uri(path)[:2]
 
