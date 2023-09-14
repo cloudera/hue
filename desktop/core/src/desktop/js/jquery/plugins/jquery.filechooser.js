@@ -98,8 +98,8 @@ const defaults = {
       home: '/?default_gs_home',
       icon: {
         svg: {
-          brand: '#hi-gs',
-          home: '#hi-gs'
+          brand: '#hi-adls',
+          home: '#hi-adls'
         },
         brand: 'fa-windows',
         home: 'fa-windows'

@@ -62,7 +62,7 @@ class Client(object):
   @classmethod
   def from_config(cls, config, credential_provider):
     credentials = credential_provider.get_credentials()
-    return Client(json_credentials=credentials.get('JsonCredentials'), expiration=credentials.get('Expiration', 0))
+    return Client(json_credentials=credentials.get('JsonCredentials'), expiration=credentials.get('Expiration'))
 
   def get_s3_connection(self):
     return HueGSConnection(provider=HueProvider('google', json_credentials=self.json_credentials))

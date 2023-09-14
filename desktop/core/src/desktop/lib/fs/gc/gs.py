@@ -17,6 +17,7 @@
 import os
 import re
 import logging
+import posixpath
 import time
 
 from boto.exception import BotoClientError, S3ResponseError, GSResponseError
@@ -27,6 +28,9 @@ from boto.s3.prefix import Prefix
 from desktop.conf import PERMISSION_ACTION_GS
 from desktop.lib.fs.gc import GS_ROOT, abspath, parse_uri, translate_s3_error, normpath, join as gs_join
 from desktop.lib.fs.gc.gsstat import GSStat
+from desktop.lib.fs.gc.gsfile import open as gsfile_open
+
+from filebrowser.conf import REMOTE_STORAGE_HOME
 
 from aws.s3.s3fs import S3FileSystem
 
@@ -185,6 +189,14 @@ class GSFileSystem(S3FileSystem):
         raise S3FileSystemException(e.message or e.reason)
     except GSResponseError as e:
       raise e
+
+
+  @translate_s3_error
+  def open(self, path, mode='r'):
+    key = self._get_key(path)
+    if key is None:
+      raise S3FileSystemException("No such file or directory: '%s'" % path)
+    return gsfile_open(key, mode=mode)
 
 
   @translate_s3_error
@@ -372,13 +384,13 @@ class GSFileSystem(S3FileSystem):
     for key in src_bucket.list(prefix=src_key):
       if not key.name.startswith(src_key):
         raise S3FileSystemException(_("Invalid key to transform: %s") % key.name)
-      dst_name = posixpath.normpath(s3.join(dst_key, key.name[cut:]))
+      dst_name = posixpath.normpath(gs_join(dst_key, key.name[cut:]))
 
       if self.isdir(normpath(self.join(GS_ROOT, key.bucket.name, key.name))):
         dst_name = self._append_separator(dst_name)
 
       key.copy(dst_bucket, dst_name)
-  
+
   @translate_s3_error
   @auth_error_handler
   def rename(self, old, new):
