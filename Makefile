@@ -184,7 +184,7 @@ $(BLD_DIR_ENV)/stamp:
 ifeq ($(PYTHON_VER),python3.9)
 	@echo "--- Creating virtual environment at $(BLD_DIR_ENV) using $(PYTHON_VER)"
 	@$(SYS_PYTHON) -m pip install --upgrade pip==22.2.2
-	@$(SYS_PIP) install virtualenv==$(VIRTUAL_ENV_VERSION) virtualenv-make-relocatable==$(VIRTUAL_ENV_RELOCATABLE_VERSION)
+	@$(SYS_PIP) install virtualenv==20.19.0 virtualenv-make-relocatable==0.0.1
 	@if [[ "ppc64le" == $(PPC64LE) ]]; then \
 	  $(SYS_PYTHON) -m venv $(BLD_DIR_ENV); \
 	 fi
