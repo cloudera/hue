@@ -20,9 +20,10 @@ import logging
 import posixpath
 import time
 
-from boto.exception import BotoClientError, S3ResponseError, GSResponseError
+from boto.exception import BotoClientError, GSResponseError
 from boto.gs.connection import Location
 from boto.gs.key import Key
+
 from boto.s3.prefix import Prefix
 
 from desktop.conf import PERMISSION_ACTION_GS
@@ -42,21 +43,21 @@ BUCKET_NAME_PATTERN = re.compile(
 
 LOG = logging.getLogger()
 
-class S3FileSystemException(IOError):
+class GSFileSystemException(IOError):
   def __init__(self, *args, **kwargs):
-    super(S3FileSystemException, self).__init__(*args, **kwargs)
+    super(GSFileSystemException, self).__init__(*args, **kwargs)
 
 
-class S3ListAllBucketsException(S3FileSystemException):
+class GSListAllBucketsException(GSFileSystemException):
   def __init__(self, *args, **kwargs):
-    super(S3FileSystemException, self).__init__(*args, **kwargs)
+    super(GSFileSystemException, self).__init__(*args, **kwargs)
 
 
 def auth_error_handler(view_fn):
   def decorator(*args, **kwargs):
     try:
       return view_fn(*args, **kwargs)
-    except (S3ResponseError, IOError) as e:
+    except (GSResponseError, IOError) as e:
       LOG.exception('S3 error: ' + str(e))
       if 'Forbidden' in str(e) or (hasattr(e, 'status') and e.status == 403):
         path = kwargs.get('path')
@@ -65,12 +66,12 @@ def auth_error_handler(view_fn):
         msg = _('User is not authorized to perform the attempted operation. Check that the user has appropriate permissions.')
         if path:
           msg = _('User is not authorized to write or modify path: %s. Check that the user has write permissions.') % path
-        raise S3FileSystemException(msg)
+        raise GSFileSystemException(msg)
       else:
         msg = str(e)
-        if isinstance(e, S3ResponseError):
+        if isinstance(e, GSResponseError):
           msg = e.message or e.reason
-        raise S3FileSystemException(msg)
+        raise GSFileSystemException(msg)
     except Exception as e:
       raise e
   return decorator
@@ -114,7 +115,7 @@ class GSFileSystem(S3FileSystem):
   @staticmethod
   def parent_path(path):
     parent_dir = GSFileSystem._append_separator(path)
-    if not S3FileSystem.isroot(parent_dir):
+    if not GSFileSystem.isroot(parent_dir):
       bucket_name, key_name, basename = parse_uri(path)
       if not basename:  # bucket is top-level so return root
         parent_dir = GS_ROOT
@@ -130,7 +131,7 @@ class GSFileSystem(S3FileSystem):
     stats = self._stats(path)
     if stats:
       return stats
-    raise S3FileSystemException("No such file or directory: '%s'" % path)
+    raise GSFileSystemException("No such file or directory: '%s'" % path)
 
 
   @translate_s3_error
@@ -159,34 +160,17 @@ class GSFileSystem(S3FileSystem):
     bucket = self._get_bucket(bucket_name)
 
     try:
-      # get_key() expects key name ending with '/' for directory in GS
-      # Check for directory
-      # key_name_with_slash = self._append_separator(key_name)
-      # key = bucket.get_key(key_name_with_slash, headers=self.header_values)
-
-      # if not key:
-      #   # get_key() expects key name as it is for file like object in GS
-      #   # Check for file like object now
-      #   key = bucket.get_key(key_name, headers=self.header_values)
-      
-
       return bucket.get_key(key_name, headers=self.header_values)
-
-      # import pdb
-      # pdb.set_trace()
-
-      # return key
-
     except BotoClientError as e:
-      raise S3FileSystemException(_('Failed to access path at "%s": %s') % (path, e.reason))
-    except S3ResponseError as e:
+      raise GSFileSystemException(_('Failed to access path at "%s": %s') % (path, e.reason))
+    except GSResponseError as e:
       if e.status in (301, 400):
-        raise S3FileSystemException(_('Failed to access path: "%s" '
+        raise GSFileSystemException(_('Failed to access path: "%s" '
           'Check that you have access to read this bucket and that the region is correct: %s') % (path, e.message or e.reason))
       elif e.status == 403:
-        raise S3FileSystemException(_('User is not authorized to access path at "%s".' % path))
+        raise GSFileSystemException(_('User is not authorized to access path at "%s".' % path))
       else:
-        raise S3FileSystemException(e.message or e.reason)
+        raise GSFileSystemException(e.message or e.reason)
     except GSResponseError as e:
       raise e
 
@@ -195,7 +179,7 @@ class GSFileSystem(S3FileSystem):
   def open(self, path, mode='r'):
     key = self._get_key(path)
     if key is None:
-      raise S3FileSystemException("No such file or directory: '%s'" % path)
+      raise GSFileSystemException("No such file or directory: '%s'" % path)
     return gsfile_open(key, mode=mode)
 
 
@@ -204,20 +188,20 @@ class GSFileSystem(S3FileSystem):
     if glob is not None:
       raise NotImplementedError(_("Option `glob` is not implemented"))
 
-    if S3FileSystem.isroot(path):
+    if GSFileSystem.isroot(path):
       try:
         return sorted(
           [GSStat.from_bucket(b, self.fs) for b in self._s3_connection.get_all_buckets(headers=self.header_values)], key=lambda x: x.name)
-      except S3FileSystemException as e:
+      except GSFileSystemException as e:
         raise e
-      except S3ResponseError as e:
+      except GSResponseError as e:
         if 'Forbidden' in str(e) or (hasattr(e, 'status') and e.status == 403):
-          raise S3ListAllBucketsException(
+          raise GSListAllBucketsException(
             _('You do not have permissions to list all buckets. Please specify a bucket name you have access to.'))
         else:
-          raise S3FileSystemException(_('Failed to retrieve buckets: %s') % e.reason)
+          raise GSFileSystemException(_('Failed to retrieve buckets: %s') % e.reason)
       except Exception as e:
-        raise S3FileSystemException(('Failed to retrieve buckets: %s') % e)
+        raise GSFileSystemException(('Failed to retrieve buckets: %s') % e)
 
     bucket_name, prefix = parse_uri(path)[:2]
     bucket = self._get_bucket(bucket_name)
@@ -263,7 +247,7 @@ class GSFileSystem(S3FileSystem):
           # Avoid Raz bulk delete issue
           deleted_key = key.delete()
           if deleted_key.exists():
-            raise S3FileSystemException('Could not delete key %s' % deleted_key)
+            raise GSFileSystemException('Could not delete key %s' % deleted_key)
         else:
           # key.bucket.delete_keys() call is not supported from GS side
           # So, try deleting the keys one by one
@@ -275,7 +259,7 @@ class GSFileSystem(S3FileSystem):
           for key in list(dir_keys):
             deleted_key = key.delete()
             # if deleted_key.exists():
-            #   raise S3FileSystemException('Could not delete key %s' % deleted_key)
+            #   raise GSFileSystemException('Could not delete key %s' % deleted_key)
 
 
   @translate_s3_error
@@ -289,46 +273,46 @@ class GSFileSystem(S3FileSystem):
     bucket_name, key_name = parse_uri(path)[:2]
 
     if not BUCKET_NAME_PATTERN.match(bucket_name):
-      raise S3FileSystemException(_('Invalid bucket name: %s') % bucket_name)
+      raise GSFileSystemException(_('Invalid bucket name: %s') % bucket_name)
 
     try:
       self._get_or_create_bucket(bucket_name)
-    except S3FileSystemException as e:
+    except GSFileSystemException as e:
       raise e
-    except S3ResponseError as e:
-      raise S3FileSystemException(_('Failed to create S3 bucket "%s": %s: %s') % (bucket_name, e.reason, e.body))
+    except GSResponseError as e:
+      raise GSFileSystemException(_('Failed to create S3 bucket "%s": %s: %s') % (bucket_name, e.reason, e.body))
     except Exception as e:
-      raise S3FileSystemException(_('Failed to create S3 bucket "%s": %s') % (bucket_name, e))
+      raise GSFileSystemException(_('Failed to create S3 bucket "%s": %s') % (bucket_name, e))
 
     stats = self._stats(path)
     if stats:
       if stats.isDir:
         return None
       else:
-        raise S3FileSystemException("'%s' already exists and is not a directory" % path)
+        raise GSFileSystemException("'%s' already exists and is not a directory" % path)
 
     path = self._append_separator(path)  # folder-key should ends by /
     self.create(path)  # create empty object
 
 
   def _stats(self, path):
-    if S3FileSystem.isroot(path):
+    if GSFileSystem.isroot(path):
       return GSStat.for_gs_root()
     
     try:
       key = self._get_key(path)
 
     except BotoClientError as e:
-      raise S3FileSystemException(_('Failed to access path "%s": %s') % (path, e.reason))
-    except S3ResponseError as e:
+      raise GSFileSystemException(_('Failed to access path "%s": %s') % (path, e.reason))
+    except GSResponseError as e:
       if e.status == 404:
         return None
       elif e.status == 403:
-        raise S3FileSystemException(_('User is not authorized to access path: "%s"') % path)
+        raise GSFileSystemException(_('User is not authorized to access path: "%s"') % path)
       else:
-        raise S3FileSystemException(_('Failed to access path "%s": %s') % (path, e.reason))
+        raise GSFileSystemException(_('Failed to access path "%s": %s') % (path, e.reason))
     except Exception as e: # SSL errors show up here, because they've been remapped in boto
-      raise S3FileSystemException(_('Failed to access path "%s": %s') % (path, str(e)))
+      raise GSFileSystemException(_('Failed to access path "%s": %s') % (path, str(e)))
 
     if key is None:
       bucket_name, key_name = parse_uri(path)[:2]
@@ -363,7 +347,7 @@ class GSFileSystem(S3FileSystem):
     dst = abspath(src, dst)
     dst_st = self._stats(dst)
     if src_st.isDir and dst_st and not dst_st.isDir:
-      raise S3FileSystemException("Cannot overwrite non-directory '%s' with directory '%s'" % (dst, src))
+      raise GSFileSystemException("Cannot overwrite non-directory '%s' with directory '%s'" % (dst, src))
 
     src_bucket, src_key = parse_uri(src)[:2]
     dst_bucket, dst_key = parse_uri(dst)[:2]
@@ -383,7 +367,7 @@ class GSFileSystem(S3FileSystem):
 
     for key in src_bucket.list(prefix=src_key):
       if not key.name.startswith(src_key):
-        raise S3FileSystemException(_("Invalid key to transform: %s") % key.name)
+        raise GSFileSystemException(_("Invalid key to transform: %s") % key.name)
       dst_name = posixpath.normpath(gs_join(dst_key, key.name[cut:]))
 
       if self.isdir(normpath(self.join(GS_ROOT, key.bucket.name, key.name))):
