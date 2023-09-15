@@ -66,4 +66,3 @@ class GSStat(S3Stat):
     for k in keys:
       res[k] = self[k]
     return res
-
