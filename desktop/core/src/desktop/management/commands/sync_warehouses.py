@@ -57,7 +57,10 @@ class Command(BaseCommand):
 
 
 def sync_warehouses(args, options):
-  (hives, impalas) = get_computes_from_k8s()
+  computes = get_computes_from_k8s()
+
+  hives = [c for c in computes if c['dialect'] == 'hive']
+  impalas = [c for c in computes if c['dialect'] == 'impala']
 
   (hive_warehouse, created) = models.Namespace.objects.get_or_create(
     external_id="CDW_HIVE_WAREHOUSE",
@@ -89,9 +92,7 @@ if __name__ == '__main__':
 
 def get_computes_from_k8s():
   catalogs = []
-  hives = []
-  impalas = []
-  computes = {}
+  computes = []
 
   for n in core_v1.list_namespace().items:
     namespace = n.metadata.name
@@ -105,15 +106,13 @@ def get_computes_from_k8s():
     if namespace.startswith('warehouse-'):
       catalogs.append(item)
     elif namespace.startswith('compute-'):
-      hives.append(item)
-      computes[namespace] = item
+      computes.append(item)
       update_hive_configs(namespace, item, 'hiveserver2-service.%s.svc.cluster.local' % namespace)
     elif namespace.startswith('impala-'):
-      impalas.append(item)
-      computes[namespace] = item
+      computes.append(item)
       populate_impala(namespace, item)
 
-  return (hives, impalas)
+  return computes
 
 def update_hive_configs(namespace, hive, host, port=80):
   hs2_stfs = apps_v1.read_namespaced_stateful_set('hiveserver2', namespace)
@@ -204,6 +203,8 @@ def update_impala_configs(namespace, impala, host):
     {"name": "hive_metastore_uris", "value": hive_metastore_uris},
   ]
 
+  impala.pop('server_port', None)
+  impala.pop('api_port', None)
   impala.update({
     'dialect': 'impala',
     'interface': 'hiveserver2',
