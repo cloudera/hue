@@ -54,6 +54,15 @@ jobs:
         export ROOT=$PWD
         make apps
 
+    - name: run tests
+      run: |
+        PYTHONWARNINGS=always ./build/env/bin/hue test unit --with-xunit --with-cover
+
+    - name: run python lints
+      run: |
+        ./build/env/bin/pip install pylint==2.5.3 pylint-django==2.3.0 configparser==5.3.0
+        ./tools/ci/check_for_python_lint.sh
+
     - name: run documentation lints
       run: |
         # Installs to move to image building
@@ -70,13 +79,4 @@ jobs:
         # Trigger linting if documentation changes
         ./tools/ci/check_for_website_dead_links.sh docs/docs-site
         # ./tools/ci/check_for_website_dead_links.sh docs/gethue
-
-    - name: run tests
-      run: |
-        PYTHONWARNINGS=always ./build/env/bin/hue test unit --with-xunit --with-cover
-
-    - name: run python lints
-      run: |
-        ./build/env/bin/pip install pylint==2.5.3 pylint-django==2.3.0 configparser==5.3.0
-        ./tools/ci/check_for_python_lint.sh
 
