@@ -36,7 +36,7 @@ from django.core.files.uploadhandler import FileUploadHandler, SkipFile, StopFut
 
 from desktop.lib.fsmanager import get_client
 from desktop.lib.fs.gc import parse_uri
-from desktop.lib.fs.gc.gs import S3FileSystemException
+from desktop.lib.fs.gc.gs import GSFileSystemException
 
 if sys.version_info[0] > 2:
   from django.utils.translation import gettext as _
@@ -91,7 +91,7 @@ class GSFileUploadHandler(FileUploadHandler):
         self._mp = self._bucket.initiate_multipart_upload(self.target_path)
         self.file = SimpleUploadedFile(name=file_name, content='')
         raise StopFutureHandlers()
-      except (GSFileUploadError, S3FileSystemException) as e:
+      except (GSFileUploadError, GSFileSystemException) as e:
         LOG.error("Encountered error in GSUploadHandler check_access: %s" % e)
         self.request.META['upload_failed'] = e
         raise StopUpload()
@@ -130,7 +130,7 @@ class GSFileUploadHandler(FileUploadHandler):
 
   def _check_access(self):
     if not self._fs.check_access(self.destination, permission='WRITE'):
-      raise S3FileSystemException('Insufficient permissions to write to GS path "%s".' % self.destination)
+      raise GSFileSystemException('Insufficient permissions to write to GS path "%s".' % self.destination)
 
 
   def _get_scheme(self):
@@ -139,7 +139,7 @@ class GSFileUploadHandler(FileUploadHandler):
       if dst_parts:
         return dst_parts[0].lower()
       else:
-        raise S3FileSystemException('Destination does not start with a valid scheme.')
+        raise GSFileSystemException('Destination does not start with a valid scheme.')
     else:
       return None
 
