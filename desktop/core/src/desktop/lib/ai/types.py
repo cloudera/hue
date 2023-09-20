@@ -7,3 +7,5 @@ class SQLResponse:
     assumptions: Optional[str] = None
     explain: Optional[str] = None
     summary: Optional[str] = None
+    warning: Optional[str] = None
+    semanticerror: Optional[str] = None

@@ -313,8 +313,7 @@ const generateSQLfromNQL: GenerateSQLfromNQL = async ({
   dialect,
   onStatusChange
 }) => {
-  let tableMetadata;
-  onStatusChange('Generating SQL query');
+  let tableMetadata;    
   try {
     ({ tableMetadata } = await getTablesAndMetadata(nql, databaseName, executor, onStatusChange));
   } catch (e) {
@@ -323,6 +322,8 @@ const generateSQLfromNQL: GenerateSQLfromNQL = async ({
     }
   }
   const ddlString = generateAllTableDDLs(tableMetadata, dialect);
+
+  onStatusChange('Generating SQL query');
   try {
     return await fetchFromLlm({
       url: SQL_API_URL,

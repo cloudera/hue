@@ -4,10 +4,21 @@ from ..utils.xml import extract_tag_content
 from ..types import SQLResponse
 
 _GENERATE = """Act as an {dialect} SQL expert. Translate the NQL statement into SQL using the following metadata: {metadata}.
-List any assumptions not covered by the supplied metadata. Use lower() and LIKE '%%' unless you are sure about how to match the data.
+Use lower() and LIKE '%%' unless you are sure about how to match the data.
+
+Always list any assumptions not covered by the supplied metadata.
+Always warn if the generated SQL modifies or deletes data. The warning should inform why the SQL could be dangeroues to execute.
+If the NQL can't be interpreted then there is a semantic error and you should explain the reason for it.
+If the SQL can be generated is should be placed in the code tag.
 
 NQL: {input}
-Wrap the SQL in a <code> tag and the assumptions in a <assumptions> tag with a closing </assumptions>"""
+
+Return the result in the following format:
+<code></code>
+<semanticerror></semanticerror>
+<assumptions></assumptions>
+<warning></warning>
+"""
 
 _EDIT = """Act as an {dialect} SQL expert. Based on the input modify the SQL using the following metadata: {metadata}.
 List any assumptions not covered by the supplied metadata. Use lower() and LIKE '%%' unless you are sure about how to match the data.
@@ -34,6 +45,8 @@ def _code_assumptions_parser(response: str) -> SQLResponse:
     return SQLResponse(
         sql=extract_tag_content('code', response),
         assumptions=extract_tag_content('assumptions', response),
+        warning=extract_tag_content('warning', response),
+        semanticerror=extract_tag_content('semanticerror', response),
     )
 
 def _code_explain_parser(response: str) -> SQLResponse:

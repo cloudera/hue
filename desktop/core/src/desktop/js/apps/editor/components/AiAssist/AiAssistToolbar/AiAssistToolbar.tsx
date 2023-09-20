@@ -61,30 +61,30 @@ function AssistToolbar({
     setErrorStatusText('');
     setIsGenerateMode(prev => !prev);
     setIsEditMode(false);
-    setIsAnimatingInput(true);    
-  }
+    setIsAnimatingInput(true);
+  };
 
   const toggleEditMode = () => {
     setErrorStatusText('');
     setIsEditMode(prev => !prev);
     setIsGenerateMode(false);
-    setIsAnimatingInput(true);    
-  }
+    setIsAnimatingInput(true);
+  };
 
   const handleExplainClick = () => {
     setErrorStatusText('');
-    loadExplanation(parsedStatement?.statement);    
-  }
+    loadExplanation(parsedStatement?.statement);
+  };
 
   const handleOptimizeClick = () => {
     setErrorStatusText('');
     loadOptimization(parsedStatement?.statement);
-  }
+  };
 
   const handleFixClick = () => {
     setErrorStatusText('');
-    loadFixSuggestion(parsedStatement?.statement);    
-  }
+    loadFixSuggestion(parsedStatement?.statement);
+  };
 
   useKeyboardShortcuts({
     e: toggleEditMode,

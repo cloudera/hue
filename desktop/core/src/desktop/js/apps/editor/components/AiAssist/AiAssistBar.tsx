@@ -7,14 +7,18 @@ import { generativeFunctionFactory } from 'api/apiAIHelper';
 import SqlExecutable from '../../execution/sqlExecutable';
 import { getLeadingEmptyLineCount } from '../editorUtils';
 import AiPreviewModal from './PreviewModal/AiPreviewModal';
+import GuardrailsModal from './GuardrailsModal/GuardrailsModal';
 import { useKeywordCase } from './hooks';
 import { useParser } from './ParserHook';
 import AnimatedLauncher from './AnimatedLauncher/AnimatedLauncher';
 import AnimatedCloseButton from './AnimatedCloseButton/AnimatedCloseButton';
 import AssistToolbar from './AiAssistToolbar/AiAssistToolbar';
 import { nqlCommentRegex } from './sharedRegexes';
+import { withGuardrails, GuardrailAlert, GuardrailAlertType } from './guardRails';
 
 import './AiAssistBar.scss';
+
+export type AiBarActionType = 'generate' | 'edit' | 'optimize' | 'fix' | 'explain';
 
 const {
   generateExplanation,
@@ -86,10 +90,12 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
   const [isGenerateMode, setIsGenerateMode] = useState(false);
   const [isOptimizeMode, setIsOptimizeMode] = useState(false);
   const [showSuggestedSqlModal, setShowSuggestedSqlModal] = useState(false);
+  const [showGuardrailsModal, setShowGuardrailsModal] = useState(false);
   const [explanation, setExplanation] = useState('');
   const [suggestion, setSuggestion] = useState('');
   const [suggestionExplanation, setSuggestionExplanation] = useState('');
   const [assumptions, setAssumptions] = useState('');
+  const [guardrailAlert, setGuardrailAlert] = useState<GuardrailAlert>();
   const [isLoading, setIsLoading] = useState(false);
   const [loadingStatusText, setLoadingStatusText] = useState('');
   const [errorStatusText, setErrorStatusText] = useState('');
@@ -133,10 +139,12 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
 
   const generateSqlQuery = async (nql: string, activeExecutable: SqlExecutable) => {
     setIsLoading(true);
+    setGuardrailAlert(undefined);
+    setErrorStatusText('');
     const executor = activeExecutable?.executor;
     const databaseName = activeExecutable?.database || '';
     const dialect = sqlDialect;
-    const { sql, assumptions, error } = await generateSQLfromNQL({
+    const { sql, assumptions, error, guardrailAlert } = await withGuardrails(generateSQLfromNQL)({
       nql,
       databaseName,
       executor,
@@ -145,14 +153,15 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
     });
     if (error) {
       handleApiError(error.message);
-    } else {
+    } else if (guardrailAlert?.type !== GuardrailAlertType.SEMANTIC_ERROR) {
       setNql(nql);
       setSuggestion(sql);
       setAssumptions(assumptions);
       setShowSuggestedSqlModal(true);
+      setInputValue('');
     }
+    setGuardrailAlert(guardrailAlert);
     setIsLoading(false);
-    setInputValue('');
   };
 
   const editSqlQuery = async (
@@ -214,7 +223,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
     const dialect = sqlDialect;
     const executor = activeExecutable?.executor;
     const databaseName = activeExecutable?.database || '';
-    const { sql, explanation, error } = await generateCorrectedSql({
+    const { sql, explain, error } = await generateCorrectedSql({
       statement,
       databaseName,
       executor,
@@ -225,7 +234,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
       handleApiError(error.message);
     } else {
       setSuggestion(sql);
-      setSuggestionExplanation(explanation);
+      setSuggestionExplanation(explain);
       setShowSuggestedSqlModal(true);
     }
     setIsLoading(false);
@@ -238,7 +247,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
       const lineNrOfCursor = cursorPosition.current?.row || 0;
       // TODO: lineNrToMoveTo fails if the user inserts new lines without moving the cursor afterwards.
       // We need to find a way to get the current cursor position from the editor
-      // when the code is changed using keyboar interactactions
+      // when the code is changed using keyboard interactactions
       lineNrToMoveTo = lineNrOfCursor + zeroBasedLineNr || 1;
       huePubSub.publish('editor.insert.at.cursor', { text: statement });
     } else {
@@ -289,6 +298,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
     setSuggestion('');
     setSuggestionExplanation('');
     setAssumptions('');
+    setGuardrailAlert(undefined);
     setNql('');
     setIsLoading(false);
     setLoadingStatusText('');
@@ -329,6 +339,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
     updateInputModeOnStatementChange(lastSelectedStatement?.current, selectedStatement);
     setSuggestion('');
     setAssumptions('');
+    setGuardrailAlert(undefined);
     lastSelectedStatement.current = selectedStatement;
   }, [selectedStatement]);
 
@@ -362,9 +373,15 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
         isLoading={isLoading}
         loadingStatusText={loadingStatusText}
         errorStatusText={errorStatusText}
+        warningStatusText={
+          guardrailAlert?.type === GuardrailAlertType.SEMANTIC_ERROR ? guardrailAlert?.title : ''
+        }
         onExpandClick={toggleOpen}
         onCloseErrorClick={() => setErrorStatusText('')}
-        setErrorStatusText={setErrorStatusText}
+        onMoreWarningInfoClick={() => {
+          setShowGuardrailsModal(true);
+        }}
+        onCloseWarningClick={() => setGuardrailAlert(undefined)}
       />
       <div
         className={classNames('hue-ai-assist-bar', {
@@ -407,18 +424,36 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
           onClick={toggleOpen}
         />
       </div>
+      {showGuardrailsModal && guardrailAlert && (
+        <GuardrailsModal
+          open
+          alert={guardrailAlert}
+          onClose={() => {
+            setShowGuardrailsModal(false);
+            setGuardrailAlert(undefined);
+          }}
+        />
+      )}
       {showSuggestedSqlModal && (
         <AiPreviewModal
           actionType={
-            isGenerateMode ? 'generate' : isEditMode ? 'edit' : isOptimizeMode ? 'optimize' : 'fix'
+            isGenerateMode
+              ? 'generate'
+              : isEditMode
+              ? 'edit'
+              : isOptimizeMode
+              ? 'optimize'
+              : explanation
+              ? 'explain'
+              : 'fix'
           }
-          autoFormat={!explanation}
           title="Suggestion"
-          open={true}
+          open
           onCancel={() => {
             setExplanation('');
             setShowSuggestedSqlModal(false);
             setIsOptimizeMode(false);
+            setGuardrailAlert(undefined);
           }}
           onInsert={sql => handleInsert(sql, explanation)}
           primaryButtonLabel={explanation ? 'Insert as comment' : 'Insert'}
@@ -428,9 +463,9 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
           explanation={explanation || suggestionExplanation}
           nql={nql}
           lineNumberStart={getSelectedLineNumbers(parsedStatement).firstLine}
-          showCopyToClipboard={!explanation}
           dialect={sqlDialect}
           keywordCase={keywordCase}
+          guardrailAlert={guardrailAlert}
         />
       )}
     </>
