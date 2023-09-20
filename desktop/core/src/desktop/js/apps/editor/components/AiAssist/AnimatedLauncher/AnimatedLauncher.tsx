@@ -1,8 +1,9 @@
 import React from 'react';
 import classNames from 'classnames';
 
-
 import AnimatedCloseButton from '../AnimatedCloseButton/AnimatedCloseButton';
+import LinkButton from 'cuix/dist/components/Button/LinkButton';
+import GuardrailsModal from '../GuardrailsModal/GuardrailsModal';
 
 import CirclesLoader from '../CirclesLoader/CirclesLoader';
 
@@ -12,11 +13,13 @@ interface AnimatedLauncherProps {
   isAnimating: string;
   isExpanded: boolean;
   isLoading: boolean;
-  loadingStatusText: string;
-  errorStatusText: string;
-  setErrorStatusText: React.Dispatch<React.SetStateAction<string>>;
+  loadingStatusText?: string;
+  errorStatusText?: string;
+  warningStatusText?: string;
   onExpandClick: () => void;
   onCloseErrorClick: () => void;
+  onCloseWarningClick: () => void;
+  onMoreWarningInfoClick: () => void;
   onAnimationEnd: (event: React.AnimationEvent<HTMLDivElement>) => void;
 }
 
@@ -26,11 +29,15 @@ function AnimatedLauncher({
   isLoading,
   loadingStatusText,
   errorStatusText,
+  warningStatusText,
   onExpandClick,
   onCloseErrorClick,
+  onCloseWarningClick,
+  onMoreWarningInfoClick,
   onAnimationEnd
 }: AnimatedLauncherProps) {
   const showErrorMessage = !!errorStatusText;
+  const showWarningMessage = !!warningStatusText;
   return (
     <div
       onAnimationEnd={onAnimationEnd}
@@ -41,9 +48,12 @@ function AnimatedLauncher({
         'hue-ai-assist-bar__animated-launcher--loading': isExpanded && isLoading,
         'hue-ai-assist-bar__animated-launcher--loading-with-status':
           isExpanded && isLoading && loadingStatusText,
-        'hue-ai-assist-bar__animated-launcher--error': showErrorMessage
+        'hue-ai-assist-bar__animated-launcher--error': showErrorMessage,
+        'hue-ai-assist-bar__animated-launcher--warning': showWarningMessage
       })}
-      onClick={onExpandClick}
+      onClick={() => {
+        if (isExpanded && !isAnimating) onExpandClick();
+      }}
     >
       {isExpanded && isLoading && (
         <>
@@ -53,7 +63,7 @@ function AnimatedLauncher({
           </div>
         </>
       )}
-      {isExpanded && errorStatusText && (
+      {isExpanded && showErrorMessage && (
         <>
           <AnimatedCloseButton
             title="Close Error Message"
@@ -62,6 +72,24 @@ function AnimatedLauncher({
             onClick={onCloseErrorClick}
           />
           <div className="hue-ai-assist-bar__animated-launcher-error-text">{errorStatusText}</div>
+        </>
+      )}
+      {isExpanded && showWarningMessage && (
+        <>
+          <AnimatedCloseButton
+            title="Close Warning Message"
+            className="hue-ai-assist-bar__animated-launcher-warning-close-btn"
+            size="small"
+            onClick={onCloseWarningClick}
+          />
+          <div
+            className="hue-ai-assist-bar__animated-launcher-warning-text"
+          >
+            {warningStatusText}
+            <LinkButton onClick={onMoreWarningInfoClick} data-event="" className="hue-ai-assist-bar__animated-launcher-warning-link">
+              More info...
+            </LinkButton>
+          </div>
         </>
       )}
     </div>

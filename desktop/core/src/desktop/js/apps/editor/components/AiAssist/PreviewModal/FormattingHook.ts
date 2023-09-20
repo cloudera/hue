@@ -1,0 +1,127 @@
+import { useState } from 'react';
+import { format } from 'sql-formatter';
+
+import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
+
+import { nqlCommentRegex } from '../sharedRegexes';
+
+const LOCAL_STORAGE_KEY = 'hue.aiAssistBar.sqlFormattingConf';
+
+const insertLineBreaks = (input: string): string => {
+  let output = '';
+  let lineLength = 0;
+  const MAX_LINE_LENGTH = 90;
+  const SPACE = ' ';
+  const LINE_BREAK = '\n';
+
+  input.split(SPACE).forEach(word => {
+    const append = word + SPACE;
+    if (lineLength + word.length > MAX_LINE_LENGTH) {
+      output += LINE_BREAK + append;
+      lineLength = append.length;
+    } else {
+      output += append;
+      lineLength += append.length;
+    }
+
+    if (word.includes(LINE_BREAK)) {
+      const index = word.lastIndexOf(LINE_BREAK);
+      lineLength = word.length - index;
+    }
+  });
+
+  return output;
+};
+
+const appendComments = (previousSql: string, newSql: string, newComment: string): string => {
+  let existingComments = '';
+  let query = newSql;
+
+  const commentsKeptInNewSql = newSql.match(nqlCommentRegex)?.join('\n') || undefined;
+
+  // We don't know for sure if an AI modified SQL will
+  // retain the commemts in the original SQL.
+  if (commentsKeptInNewSql) {
+    existingComments = commentsKeptInNewSql;
+    query = newSql.replace(existingComments, '').trim();
+  } else {
+    const commentsFromPreviousSql = previousSql.match(nqlCommentRegex)?.join('\n') || undefined;
+    existingComments = commentsFromPreviousSql ? commentsFromPreviousSql.trim() : '';
+  }
+
+  existingComments = existingComments ? existingComments + '\n' : '';
+  return `${existingComments}/* ${newComment.trim()} */\n${query.trim()}`;
+};
+
+const replaceNQLComment = (newSql: string, newComment: string): string => {
+  const commentsKeptInNewSql = newSql.match(nqlCommentRegex)?.join('\n') || undefined;
+
+  // We don't know for sure if an AI modified SQL will
+  // retain the commemts in the original SQL.
+  const query = commentsKeptInNewSql ? newSql.replace(commentsKeptInNewSql, '') : newSql;
+  return `/* ${newComment.trim()} */\n${query.trim()}`;
+};
+
+const includeNqlAsComment = ({ oldSql, newSql, nql, includeNql, replaceNql }) => {
+  const addComment = nql && includeNql;
+  const nqlWithPrefix = nql && nql.trim().startsWith('NQL:') ? nql : `NQL: ${nql}`;
+  const commentWithLinebreaks = insertLineBreaks(nqlWithPrefix);
+  const sqlWithNqlComment = replaceNql
+    ? replaceNQLComment(newSql, commentWithLinebreaks)
+    : appendComments(oldSql, newSql, commentWithLinebreaks);
+  return addComment ? sqlWithNqlComment : newSql;
+};
+
+export interface FormattingConfig {
+  autoFormat: boolean;
+  includeNql: boolean;
+  replaceNql: boolean;
+}
+
+export const useFormatting = ({ dialect, keywordCase, oldSql, newSql, nql }) => {
+  const defaultConfig: FormattingConfig = {
+    autoFormat: true,
+    includeNql: true,
+    replaceNql: false
+  };
+
+  const savedConfiguration = getFromLocalStorage(
+    LOCAL_STORAGE_KEY,
+    defaultConfig
+  );
+  const [formattingConfig, setFormattingConfig] = useState<FormattingConfig>(savedConfiguration);
+  const { autoFormat, includeNql, replaceNql } = formattingConfig;
+
+  const updateFormattingSettings = (newSettings: FormattingConfig) => {
+    setFormattingConfig(newSettings);
+    setInLocalStorage(LOCAL_STORAGE_KEY, newSettings);
+  };
+
+  const formatSql = (sql: string) => {
+    if (autoFormat) {
+      try {
+        sql = format(sql, { language: dialect, keywordCase });
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    return sql;
+  };
+
+  const withNqlComments = includeNqlAsComment({
+    oldSql,
+    newSql,
+    nql,
+    includeNql,
+    replaceNql
+  });
+  const suggestion = formatSql(withNqlComments);
+  const showDiffFrom = formatSql(oldSql);
+
+  return {
+    formattingConfig,
+    updateFormattingSettings,
+    suggestion,
+    showDiffFrom
+  };
+};

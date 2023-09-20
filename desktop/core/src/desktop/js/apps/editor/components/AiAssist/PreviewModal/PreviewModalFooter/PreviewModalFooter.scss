@@ -1,0 +1,16 @@
+@use 'variables' as vars;
+
+// We need to get the cuix class in but we can't add it to the root
+.ant-modal-root {
+  .hue-preview-modal-footer {
+    display: flex;
+
+    .hue-preview-modal-footer__spacer {
+      flex-grow: 2;
+    }
+
+    .hue-preview-modal-footer__copy-button-icon {
+      color: vars.$fluidx-green-600;
+    }
+  }
+}

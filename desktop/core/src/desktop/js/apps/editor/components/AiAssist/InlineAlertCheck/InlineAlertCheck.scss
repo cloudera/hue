@@ -1,0 +1,15 @@
+@use 'variables' as vars;
+
+.ant-modal-root {
+  .hue-inline-alert-check {
+    // Need tooverride, can't add custom class.
+    .ant-alert-with-description {
+      margin-bottom: vars.$fluidx-spacing-m;
+      // Need to override the description that for some reason is set to display: none
+      .ant-alert-description {
+        display: block;
+        max-width: 600px;
+      }
+    }
+  }
+}

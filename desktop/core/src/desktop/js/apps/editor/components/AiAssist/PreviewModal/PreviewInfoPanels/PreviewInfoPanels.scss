@@ -1,0 +1,20 @@
+@use 'variables' as vars;
+@use 'mixins';
+
+.ant-modal-root {
+  .hue-preview-info-panels {
+    background-color: vars.$fluidx-blue-050;
+    border: 1px solid vars.$fluidx-blue-100;
+    padding: 12px;
+
+    .hue-preview-info__title {
+      color: vars.$fluidx-blue-400;
+      text-transform: uppercase;
+    }
+
+    .hue-preview-info__text-container {
+      white-space: pre-line;
+      max-width: 80ch;
+    }
+  }
+}

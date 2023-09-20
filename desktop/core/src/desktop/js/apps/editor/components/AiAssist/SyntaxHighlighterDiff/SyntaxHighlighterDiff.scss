@@ -5,8 +5,8 @@
 // TODO: Don't wrap here, but rather import into hue-ai-preview-modal
 .ant-modal-root {
   .hue-ai-preview-modal {
-    // TODO: Rename these classes to not include preview-moda
     .hue-syntax-highlighter-diff {
+      background-color: vars.$fluidx-slate-700;
       display: flex;
       overflow: hidden;
       column-gap: 12px;
@@ -23,6 +23,7 @@
 
     .hue-syntax-highlighter-diff__container {
       display: flex;
+      max-width: 50%;
     }
     .hue-syntax-highlighter-diff__line-numbers {
       padding-right: 0;
