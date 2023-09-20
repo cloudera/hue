@@ -215,7 +215,7 @@ class HS2Api(Api):
 
     response = {
       'type': lang,
-      'id': session.id if session else None
+      'id': session.id
     }
 
     if not properties:
@@ -229,7 +229,7 @@ class HS2Api(Api):
         properties = self.get_properties(lang)
 
     response['properties'] = properties
-    response['configuration'] = json.loads(session.properties) if session else None
+    response['configuration'] = json.loads(session.properties)
     response['reuse_session'] = reuse_session
     response['session_id'] = ''
 
@@ -319,10 +319,7 @@ class HS2Api(Api):
     session = self._get_session(notebook, snippet['type'])
 
     query = self._prepare_hql_query(snippet, statement['statement'], session)
-    compute = snippet.get('compute')
-    session_type = compute['name'] if compute else snippet['type']
-    _session = self._get_session_by_id(notebook, session_type)
-
+    _session = self._get_session_by_id(notebook, snippet['type'])
 
     try:
       if statement.get('statement_id') == 0: # TODO: move this to client

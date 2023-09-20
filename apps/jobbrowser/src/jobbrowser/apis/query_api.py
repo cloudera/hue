@@ -42,22 +42,18 @@ ANALYZER = rules.TopDownAnalysis() # We need to parse some files so save as glob
 LOG = logging.getLogger()
 
 try:
-  from beeswax.models import Session, Compute
+  from beeswax.models import Session
   from impala.server import get_api as get_impalad_api, _get_impala_server_url
 except ImportError as e:
   LOG.exception('Some application are not enabled: %s' % e)
 
 
 def _get_api(user, cluster=None):
-  compute = cluster['compute'] if cluster.get('compute') else cluster
-  if compute and compute.get('type') == 'impala-compute':
-    if compute.get('id') and not (compute.get('options') and compute['options'].get('http_url')):
-      compute = Compute.objects.get(id=compute['id']).to_dict()  # Reload the full compute from db
-    if compute.get('options') and compute['options'].get('api_url'):
-      server_url = compute['options'].get('api_url')
+  if cluster and cluster.get('type') == 'altus-dw':
+    server_url = 'http://impala-coordinator-%(name)s:25000' % cluster
   else:
     # TODO: multi computes if snippet.get('compute') or snippet['type'] has computes
-    application = cluster['compute']['type'] if cluster.get('compute') else cluster.get('interface', 'impala')
+    application = cluster.get('interface', 'impala')
     session = Session.objects.get_session(user, application=application)
     server_url = _get_impala_server_url(session)
   return get_impalad_api(user=user, url=server_url)

@@ -56,8 +56,6 @@ class TestHiveServerClient():
         'use_sasl': True,
         'server_host': 'localhost',
         'server_port': 10000,
-        'dialect': 'hive',
-        'interface': 'hiveserver2'
     }
 
   def test_open_session(self):

@@ -248,13 +248,12 @@ const HueContextSelector = function (params) {
   }
 
   self.loadingContext = ko.pureComputed(() => {
-    /*return (
+    return (
       self[TYPES_INDEX.cluster.loading]() ||
       self[TYPES_INDEX.namespace.loading]() ||
       self[TYPES_INDEX.compute.loading]() ||
       self.loadingDatabases()
-    );*/
-    return false;
+    );
   });
 };
 

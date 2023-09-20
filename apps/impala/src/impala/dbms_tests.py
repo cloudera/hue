@@ -48,10 +48,8 @@ class TestDbms():
 
   def test_get_connector_config(self):
     connector = {
-      'type': 'impala-compute',
-      'name': 'impala-1',
+      'type': 'impala-1',
       'dialect': 'impala',
-      'interface': 'hiveserver2',
       'options': {'server_host': 'gethue.com', 'server_port': 10000}
     }
 
