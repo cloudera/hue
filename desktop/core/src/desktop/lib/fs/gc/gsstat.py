@@ -20,21 +20,47 @@ from aws.s3.s3stat import S3Stat
 
 
 class GSStat(S3Stat):
+  """Custom class for Google Cloud Storage (GS) file statistics.
+
+  This class extends S3Stat and provides methods for creating GSStat objects from GS bucket and key objects.
+  """
+
   def __init__(self, name, path, isDir, size, mtime):
-    super(GSStat, self).__init__(
-      name=name, 
-      path=path, 
-      isDir=isDir, 
-      size=size, 
+    super().__init__(
+      name=name,
+      path=path,
+      isDir=isDir,
+      size=size,
       mtime=mtime
     )
 
+
   @classmethod
   def from_bucket(cls, bucket, fs='gs'):
+    """Create a GSStat object from a GS bucket.
+
+    Args:
+        bucket: The GS bucket object.
+        fs (str): The file system (e.g., 'gs').
+
+    Returns:
+        GSStat: A GSStat object representing the GS bucket.
+    """
     return cls(bucket.name, '%s://%s' % (fs, bucket.name), True, 0, None)
+
 
   @classmethod
   def from_key(cls, key, is_dir=False, fs='gs'):
+    """Create a GSStat object from a GS key object.
+
+    Args:
+        key: The GS key object.
+        is_dir (bool): True if the key represents a directory, False otherwise.
+        fs (str): The file system (e.g., 'gs').
+
+    Returns:
+        GSStat: A GSStat object representing the GS key.
+    """
     if key.name:
       name = posixpath.basename(key.name[:-1] if key.name[-1] == '/' else key.name)
       path = '%s://%s/%s' % (fs, key.bucket.name, key.name)
@@ -53,14 +79,20 @@ class GSStat(S3Stat):
 
     return cls(name, path, is_dir, size, mtime)
 
+
   @classmethod
   def for_gs_root(cls):
+    """Create a GSStat object representing the root of the GS file system.
+
+    Returns:
+        GSStat: A GSStat object representing the root of the GS file system.
+    """
     return cls('GS', 'gs://', True, 0, None)
 
+
   def to_json_dict(self):
-    """
-    Returns a dictionary for easy serialization
-    """
+    """Returns a dictionary representation of the GSStat object for easy serialization."""
+
     keys = ('path', 'size', 'atime', 'mtime', 'mode', 'user', 'group', 'aclBit')
     res = {}
     for k in keys:
