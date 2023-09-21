@@ -431,6 +431,7 @@ def get_api(request, snippet):
 
   connector_name = snippet['type']
 
+  interpreter = None
   if has_connectors() and snippet.get('type') == 'hello' and is_admin(request.user):
     LOG.debug('Using the interpreter from snippet')
     interpreter = snippet.get('interpreter')
@@ -444,7 +445,7 @@ def get_api(request, snippet):
   elif has_connectors() and snippet.get('connector'):
     LOG.debug("Connectors are enabled and picking the connector from snippet['connector']")
     interpreter = snippet['connector']
-  else:
+  if not interpreter:
     LOG.debug("Picking up the connectors from the configs using connector_name: %s" % connector_name)
     interpreter = get_interpreter(connector_type=connector_name, user=request.user)
 
