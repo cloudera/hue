@@ -17,6 +17,7 @@
 import $ from 'jquery';
 
 import logError from 'utils/logError';
+import huePubSub from 'utils/huePubSub';
 
 /**
  * @param {Object} [response]
@@ -76,7 +77,7 @@ export const assistErrorCallback = options => {
     if (!options || !options.silenceErrors) {
       logError(errorResponse);
       if (errorMessage && errorMessage.indexOf('AuthorizationException') === -1) {
-        $(document).trigger('error', errorMessage);
+        huePubSub.publish('hue.global.error', {message: errorMessage})
       }
     }
 

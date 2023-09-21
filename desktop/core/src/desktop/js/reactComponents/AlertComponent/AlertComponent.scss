@@ -1,0 +1,71 @@
+.flash-messages {
+    position: fixed;
+    width: 30%;
+    z-index: 9999;
+    top: 7px;
+    right: 0;
+    margin-right: 24px;
+    display: flex;
+    flex-flow: column;
+    row-gap: 10px;
+
+    button:hover,
+    button:focus {
+        background-color: unset;
+    }
+
+    button span {
+        font-size: 12px;
+        padding-top: 5px;
+    }
+
+    button svg.cdp-icon-close {
+        height: 16px;
+    }
+
+    .ant-alert-warning {
+        color: #3d1300;
+        ;
+        background: #fff3e5;
+        border: 1px solid #f96702;
+        ;
+
+        button {
+            color: #6c2500;
+            ;
+        }
+
+    }
+
+    .ant-alert-success {
+        color: #023c02;
+        background: #e5ffe5;
+        border: 1px solid #2fae2f;
+
+        button {
+            color: #0a5f0a;
+        }
+    }
+
+    .ant-alert-error {
+        color: #3d0000;
+        ;
+        background: #ffecec;
+        ;
+        border: 1px solid #fe3f3f;
+        ;
+        display: flex;
+        align-items: flex-start;
+
+        button {
+            color: #6e0707;
+            position: absolute;
+            top: 0.5rem;
+            right: 3%;
+        }
+    }
+
+    .ant-alert-message {
+        margin-right: 1rem;
+    }
+}

@@ -363,7 +363,6 @@ class Notebook {
         $.each(self.getSnippets(session.type()), (index, snippet) => {
           snippet.status('failed');
         });
-        $(document).trigger('error', message);
         if (failCallback) {
           failCallback();
         }
@@ -395,6 +394,7 @@ class Notebook {
             $(document).trigger('showAuthModal', { type: session.type(), message: data.message });
           } else {
             fail(data.message);
+            huePubSub.publish('hue.global.error', {message: data.message})  
           }
         }
       )
