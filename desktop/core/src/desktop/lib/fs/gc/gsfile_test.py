@@ -16,7 +16,7 @@
 # limitations under the License.
 
 from nose.tools import assert_true, assert_false, assert_equal, assert_raises
-from unittest.mock import patch, Mock
+from unittest.mock import Mock
 
 from desktop.lib.fs.gc.gsfile import open, _ReadableGSFile
 
