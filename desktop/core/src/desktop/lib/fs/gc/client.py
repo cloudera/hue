@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import logging
+LOG = logging.getLogger()
 
 try:
   import gcs_oauth2_boto_plugin
@@ -31,9 +32,6 @@ from desktop import conf
 from desktop.lib.idbroker import conf as conf_idbroker
 from desktop.lib.idbroker.client import IDBroker
 from desktop.lib.fs.gc.gs import GSFileSystem
-
-
-LOG = logging.getLogger()
 
 
 def get_credential_provider(config, user):
