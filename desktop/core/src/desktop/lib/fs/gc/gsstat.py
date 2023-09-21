@@ -70,12 +70,12 @@ class GSStat(S3Stat):
 
     size = key.size or 0
 
-    s3_date = None
+    gs_date = None
     if key.last_modified is not None:
-      s3_date = key.last_modified
+      gs_date = key.last_modified
     elif hasattr(key, 'date') and key.date is not None:
-      s3_date = key.date
-    mtime = s3datetime_to_timestamp(s3_date) if s3_date else None
+      gs_date = key.date
+    mtime = s3datetime_to_timestamp(gs_date) if gs_date else None
 
     return cls(name, path, is_dir, size, mtime)
 

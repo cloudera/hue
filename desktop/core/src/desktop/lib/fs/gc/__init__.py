@@ -29,8 +29,10 @@ import time
 
 from functools import wraps
 
-from boto.exception import S3ResponseError
+from boto.exception import GSResponseError
 from hadoop.fs import normpath as fs_normpath
+
+LOG = logging.getLogger()
 
 
 ERRNO_MAP = {
@@ -43,27 +45,26 @@ GS_PATH_RE = re.compile('^/*[gG][sS]://([^/]+)(/(.*?([^/]+)?/?))?$')
 GS_ROOT = 'gs://'
 
 
-def lookup_s3error(error):
+def lookup_gserror(error):
   err_no = ERRNO_MAP.get(error.status, DEFAULT_ERRNO)
   return IOError(err_no, error.reason)
 
 
-def translate_s3_error(fn):
+def translate_gs_error(fn):
   @wraps(fn)
   def wrapped(*args, **kwargs):
     try:
       return fn(*args, **kwargs)
-    except S3ResponseError:
+    except GSResponseError:
       _, exc, tb = sys.exc_info()
-      logging.error('S3 error: %s' % exc)
-      lookup = lookup_s3error(exc)
+      LOG.error('GS error: %s' % exc)
+      lookup = lookup_gserror(exc)
       raise_(lookup.__class__, lookup, tb)
   return wrapped
 
 
 def parse_uri(uri):
-  """
-  Returns tuple (bucket_name, key_name, key_basename).
+  """Returns tuple (bucket_name, key_name, key_basename).
   Raises ValueError if invalid GS URI is passed.
   """
   match = GS_PATH_RE.match(uri)
@@ -74,15 +75,12 @@ def parse_uri(uri):
   return match.group(1), key, basename
 
 def is_root(uri):
-  """
-  Check if URI is GS root (gs://)
-  """
+  """Check if URI is GS root (gs://)."""
   return uri.lower() == GS_ROOT
 
 
 def abspath(cd, uri):
-  """
-  Returns absolute URI, examples:
+  """Returns absolute URI, examples:
 
   abspath('gs://bucket/key', key2') == 'gs://bucket/key/key2'
   abspath('gs://bucket/key', 'gs://bucket2/key2') == 'gs://bucket2/key2'
@@ -107,9 +105,7 @@ def join(*comp_list):
 
 
 def normpath(path):
-  """
-  Return normalized path but ignore leading GS_ROOT prefix if it exists
-  """
+  """Return normalized path but ignore leading GS_ROOT prefix if it exists."""
   if path.lower().startswith(GS_ROOT):
     if is_root(path):
       normalized = path

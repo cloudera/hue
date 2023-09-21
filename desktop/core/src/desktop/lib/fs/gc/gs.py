@@ -27,7 +27,7 @@ from boto.gs.key import Key
 from boto.s3.prefix import Prefix
 
 from desktop.conf import PERMISSION_ACTION_GS
-from desktop.lib.fs.gc import GS_ROOT, abspath, parse_uri, translate_s3_error, normpath, join as gs_join
+from desktop.lib.fs.gc import GS_ROOT, abspath, parse_uri, translate_gs_error, normpath, join as gs_join
 from desktop.lib.fs.gc.gsstat import GSStat
 from desktop.lib.fs.gc.gsfile import open as gsfile_open
 
@@ -92,7 +92,7 @@ def get_gs_home_directory(user=None):
 class GSFileSystem(S3FileSystem):
 
   def __init__(self, gs_connection, expiration=None, fs='gs', headers=None, filebrowser_action=PERMISSION_ACTION_GS):
-    super(GSFileSystem, self).__init__(
+    super().__init__(
       gs_connection,
       expiration=expiration,
       fs=fs,
@@ -100,7 +100,6 @@ class GSFileSystem(S3FileSystem):
       filebrowser_action=filebrowser_action
     )
   
-
   @staticmethod
   def join(*comp_list):
     return gs_join(*comp_list)
@@ -114,30 +113,60 @@ class GSFileSystem(S3FileSystem):
 
   @staticmethod
   def parent_path(path):
+    """Get the parent path of a GS path.
+
+    Args:
+      path (str): The GS path for which to find the parent path.
+
+    Returns:
+      str: The parent path.
+    """
     parent_dir = GSFileSystem._append_separator(path)
+
     if not GSFileSystem.isroot(parent_dir):
       bucket_name, key_name, basename = parse_uri(path)
-      if not basename:  # bucket is top-level so return root
+
+      if not basename:  # bucket is top-level, so return root
         parent_dir = GS_ROOT
       else:
         bucket_path = '%s%s' % (GS_ROOT, bucket_name)
         key_path = '/'.join(key_name.split('/')[:-1])
         parent_dir = abspath(bucket_path, key_path)
+
     return parent_dir
   
-  @translate_s3_error
+  @translate_gs_error
   def stats(self, path):
+    """Get file or directory stats for a GS path.
+
+    Args:
+      path (str): The GS path to get stats for.
+
+    Returns:
+      GSStat: An object representing the stats of the file or directory.
+    
+    Raises:
+      GSFileSystemException: If the file or directory does not exist.
+    """
     path = normpath(path)
     stats = self._stats(path)
     if stats:
       return stats
     raise GSFileSystemException("No such file or directory: '%s'" % path)
 
-
-  @translate_s3_error
+  @translate_gs_error
   @auth_error_handler
   def create(self, path, overwrite=False, data=None):
+    """Create a file in GS at the specified path.
 
+    Args:
+      path (str): The GS path where the file should be created.
+      overwrite (bool): Whether to overwrite the file if it already exists.
+      data (str): The data to write to the file.
+
+    Raises:
+      Exception: If the create operation fails or some problem occurs when fetching the GS bucket or creating new key in it.
+    """
     key = self._get_key(path)
     if not key:
       try:
@@ -145,15 +174,13 @@ class GSFileSystem(S3FileSystem):
         bucket = self._get_bucket(bucket_name)
 
         key = bucket.new_key(key_name)
-
       except Exception as e:
         raise e
-      
+
     if key:
       key.set_contents_from_string(data or '', replace=overwrite)
     else:
       raise Exception('Cannot perform create operation.')
-
 
   def _get_key(self, path, validate=True):
     bucket_name, key_name = parse_uri(path)[:2]
@@ -174,21 +201,31 @@ class GSFileSystem(S3FileSystem):
     except GSResponseError as e:
       raise e
 
-
-  @translate_s3_error
+  @translate_gs_error
   def open(self, path, mode='r'):
     key = self._get_key(path)
     if key is None:
       raise GSFileSystemException("No such file or directory: '%s'" % path)
     return gsfile_open(key, mode=mode)
 
-
-  @translate_s3_error
+  @translate_gs_error
   def listdir_stats(self, path, glob=None):
+    """List and get stats for files and directories in a GS bucket.
+    For path 'gs://', it gets stats for all listed buckets in GS filesystem.
+
+    Args:
+      path (str): The GS path to list.
+      glob (str, optional): Glob pattern for filtering files. Default is None.
+
+    Returns:
+      list of GSStat: A list of GSStat objects representing files and directories in the path.
+                      For 'gs://' path, it return a list of GSStat objects for all listed buckets.
+    """
     if glob is not None:
       raise NotImplementedError(_("Option `glob` is not implemented"))
 
     if GSFileSystem.isroot(path):
+      # Return sorted stats of all listed buckets for path gs://
       try:
         return sorted(
           [GSStat.from_bucket(b, self.fs) for b in self._s3_connection.get_all_buckets(headers=self.header_values)], key=lambda x: x.name)
@@ -206,6 +243,7 @@ class GSFileSystem(S3FileSystem):
     bucket_name, prefix = parse_uri(path)[:2]
     bucket = self._get_bucket(bucket_name)
     prefix = self._append_separator(prefix)
+
     res = []
     for item in bucket.list(prefix=prefix, delimiter='/', headers=self.header_values):
       if isinstance(item, Prefix):
@@ -214,17 +252,26 @@ class GSFileSystem(S3FileSystem):
         if item.name == prefix:
           continue
         res.append(self._stats_key(item, self.fs))
+
     return res
 
-
-  @translate_s3_error
+  @translate_gs_error
   def listdir(self, path, glob=None):
     return [parse_uri(x.path)[2] for x in self.listdir_stats(path, glob)]
-  
 
-  @translate_s3_error
+  @translate_gs_error
   @auth_error_handler
   def rmtree(self, path, skipTrash=True):
+    """Remove keys from GS filesystem.
+
+    Args:
+      path (str): The GS key path of the file or directory to remove.
+      skipTrash (bool): Whether to skip the trash when deleting.
+
+    Raises:
+      NotImplementedError: Since moving to trash is not implemented.
+      GSFileSystemException: If the removal operation fails.
+    """
     if not skipTrash:
       raise NotImplementedError(_('Moving to trash is not implemented for GS'))
 
@@ -262,11 +309,10 @@ class GSFileSystem(S3FileSystem):
             #   raise GSFileSystemException('Could not delete key %s' % deleted_key)
 
 
-  @translate_s3_error
+  @translate_gs_error
   @auth_error_handler
   def mkdir(self, path, *args, **kwargs):
-    """
-    Creates a directory and any parent directory if necessary.
+    """Creates a directory and any parent directory if necessary.
 
     Actually it creates an empty object: gs://[bucket]/[path]/
     """
@@ -291,7 +337,7 @@ class GSFileSystem(S3FileSystem):
       else:
         raise GSFileSystemException("'%s' already exists and is not a directory" % path)
 
-    path = self._append_separator(path)  # folder-key should ends by /
+    path = self._append_separator(path)  # directory-key should ends by /
     self.create(path)  # create empty object
 
 
@@ -301,7 +347,6 @@ class GSFileSystem(S3FileSystem):
     
     try:
       key = self._get_key(path)
-
     except BotoClientError as e:
       raise GSFileSystemException(_('Failed to access path "%s": %s') % (path, e.reason))
     except GSResponseError as e:
@@ -340,10 +385,25 @@ class GSFileSystem(S3FileSystem):
 
 
   def _copy(self, src, dst, recursive, use_src_basename):
+    """Copy files and directories from a source GS path to a destination GS path.
+
+    Args:
+      src (str): The source GS path.
+      dst (str): The destination GS path.
+      recursive (bool): Whether to copy recursively for directories.
+      use_src_basename (bool): Whether to use the source basename when copying directories.
+
+    Returns:
+      None: If copying is successful.
+
+    Raises:
+      GSFileSystemException: If any errors occur during the copy operation.
+    """
     src_st = self.stats(src)
     if src_st.isDir and not recursive:
-      return # omitting directory
+      return None # omitting directory
 
+    # Check if the source is a directory and destination is not a directory
     dst = abspath(src, dst)
     dst_st = self._stats(dst)
     if src_st.isDir and dst_st and not dst_st.isDir:
@@ -356,8 +416,10 @@ class GSFileSystem(S3FileSystem):
     src_bucket = self._get_bucket(src_bucket)
     dst_bucket = self._get_bucket(dst_bucket)
 
+    # Determine whether to keep the source basename when copying directories and 
+    # calculate the cut-off length for key names accordingly.
     if keep_src_basename:
-      cut = len(posixpath.dirname(src_key))  # cut of an parent directory name
+      cut = len(posixpath.dirname(src_key))  # cut of the parent directory name
       if cut:
         cut += 1
     else:
@@ -368,16 +430,27 @@ class GSFileSystem(S3FileSystem):
     for key in src_bucket.list(prefix=src_key):
       if not key.name.startswith(src_key):
         raise GSFileSystemException(_("Invalid key to transform: %s") % key.name)
+
       dst_name = posixpath.normpath(gs_join(dst_key, key.name[cut:]))
 
+      # Ensure directory paths end with a separator
       if self.isdir(normpath(self.join(GS_ROOT, key.bucket.name, key.name))):
         dst_name = self._append_separator(dst_name)
 
       key.copy(dst_bucket, dst_name)
 
-  @translate_s3_error
+  @translate_gs_error
   @auth_error_handler
   def rename(self, old, new):
+    """Rename a file or directory in GS.
+
+    Copies the content to the new key and then deletes the old one.
+    The new key is created if it didn't exists earlier.
+
+    Args:
+      old (str): The current GS path of the file or directory.
+      new (str): The new GS path to rename to.
+    """
     new = abspath(old, new)
     self.copy(old, new, recursive=True)
     self.rmtree(old, skipTrash=True)
