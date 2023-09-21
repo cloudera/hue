@@ -25,6 +25,7 @@ from boto.gs.connection import Location
 from boto.gs.key import Key
 
 from boto.s3.prefix import Prefix
+from django.utils.translation import gettext as _
 
 from desktop.conf import PERMISSION_ACTION_GS
 from desktop.lib.fs.gc import GS_ROOT, abspath, parse_uri, translate_gs_error, normpath, join as gs_join
@@ -58,7 +59,7 @@ def auth_error_handler(view_fn):
     try:
       return view_fn(*args, **kwargs)
     except (GSResponseError, IOError) as e:
-      LOG.exception('S3 error: ' + str(e))
+      LOG.exception('GS error: ' + str(e))
       if 'Forbidden' in str(e) or (hasattr(e, 'status') and e.status == 403):
         path = kwargs.get('path')
         if not path and len(args) > 1:
@@ -326,9 +327,9 @@ class GSFileSystem(S3FileSystem):
     except GSFileSystemException as e:
       raise e
     except GSResponseError as e:
-      raise GSFileSystemException(_('Failed to create S3 bucket "%s": %s: %s') % (bucket_name, e.reason, e.body))
+      raise GSFileSystemException(_('Failed to create GS bucket "%s": %s: %s') % (bucket_name, e.reason, e.body))
     except Exception as e:
-      raise GSFileSystemException(_('Failed to create S3 bucket "%s": %s') % (bucket_name, e))
+      raise GSFileSystemException(_('Failed to create GS bucket "%s": %s') % (bucket_name, e))
 
     stats = self._stats(path)
     if stats:
