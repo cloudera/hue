@@ -110,6 +110,7 @@ $action-dropdown-width: 214px;
 
 .hue-storage-browser__bulk-action {
   width: $action-dropdown-width;
+
   svg {
     //d3 conflict
     display: inline-block;
@@ -120,6 +121,7 @@ $action-dropdown-width: 214px;
 
 .hue-storage-browser__new-action {
   width: $action-dropdown-width;
+
   svg {
     //d3 conflict
     display: inline-block;
