@@ -16,13 +16,23 @@
 import errno
 
 from boto.s3.keyfile import KeyFile
-
 from aws.s3.s3file import _ReadableS3File
-
-DEFAULT_READ_SIZE = 1024 * 1024  # 1MB
 
 
 def open(key, mode='r'):
+  """Open a Google Cloud Storage (GS) file.
+
+  Args:
+    key: The GS key object.
+    mode (str): The mode for opening the file (default is 'r').
+
+  Returns:
+    _ReadableGSFile: A readable GS file object.
+      
+  Raises:
+    IOError: If an unsupported mode is provided.
+  """
+
   if mode == 'r':
     return _ReadableGSFile(key)
   else:
@@ -30,6 +40,10 @@ def open(key, mode='r'):
 
 
 class _ReadableGSFile(_ReadableS3File):
+  """Readable GS file class.
+
+  This class extends _ReadableS3File for reading GS files.
+  """
   def __init__(self, key):
     key_copy = key.bucket.get_key(key.name)
     KeyFile.__init__(self, key_copy)

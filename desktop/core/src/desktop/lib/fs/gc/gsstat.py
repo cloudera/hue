@@ -40,11 +40,11 @@ class GSStat(S3Stat):
     """Create a GSStat object from a GS bucket.
 
     Args:
-        bucket: The GS bucket object.
-        fs (str): The file system (e.g., 'gs').
+      bucket: The GS bucket object.
+      fs (str): The file system (e.g., 'gs').
 
     Returns:
-        GSStat: A GSStat object representing the GS bucket.
+      GSStat: A GSStat object representing the GS bucket.
     """
     return cls(bucket.name, '%s://%s' % (fs, bucket.name), True, 0, None)
 
@@ -54,12 +54,12 @@ class GSStat(S3Stat):
     """Create a GSStat object from a GS key object.
 
     Args:
-        key: The GS key object.
-        is_dir (bool): True if the key represents a directory, False otherwise.
-        fs (str): The file system (e.g., 'gs').
+      key: The GS key object.
+      is_dir (bool): True if the key represents a directory, False otherwise.
+      fs (str): The file system (e.g., 'gs').
 
     Returns:
-        GSStat: A GSStat object representing the GS key.
+      GSStat: A GSStat object representing the GS key.
     """
     if key.name:
       name = posixpath.basename(key.name[:-1] if key.name[-1] == '/' else key.name)
@@ -85,7 +85,7 @@ class GSStat(S3Stat):
     """Create a GSStat object representing the root of the GS file system.
 
     Returns:
-        GSStat: A GSStat object representing the root of the GS file system.
+      GSStat: A GSStat object representing the root of the GS file system.
     """
     return cls('GS', 'gs://', True, 0, None)
 

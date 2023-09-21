@@ -129,7 +129,7 @@ class GSFileUploadHandler(FileUploadHandler):
     """Check if the upload destination is Google Cloud Storage (GS).
 
     Returns:
-        bool: True if the destination is GS, False otherwise.
+      bool: True if the destination is GS, False otherwise.
     """
     return self._get_scheme() and self._get_scheme().startswith('gs')
 
@@ -138,7 +138,7 @@ class GSFileUploadHandler(FileUploadHandler):
     """Check if the user has write access to the GS destination path.
 
     Raises:
-        GSFileSystemException: If access permission is insufficient.
+      GSFileSystemException: If access permission is insufficient.
     """
     if not self._fs.check_access(self.destination, permission='WRITE'):
       raise GSFileSystemException('Insufficient permissions to write to GS path "%s".' % self.destination)
