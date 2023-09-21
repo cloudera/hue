@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -13,38 +14,27 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import errno
 
-from boto.s3.keyfile import KeyFile
-from aws.s3.s3file import _ReadableS3File
+from nose.tools import assert_true, assert_false, assert_equal, assert_raises
+from unittest.mock import patch, Mock
 
+from desktop.lib.fs.gc.gsfile import open, _ReadableGSFile
 
-def open(key, mode='r'):
-  """Open a Google Cloud Storage (GS) file in read mode.
+class TestGSFile(object):
 
-  Args:
-    key: The GS key object.
-    mode (str): The mode for opening the file (default is 'r').
+  def test_open_read_mode(self):
+    mock_gs_key = Mock()
+    mock_gs_key.name = "gethue_dir/test.csv"
+    mock_gs_key.bucket.get_key.return_value = mock_gs_key
+    
+    gs_file = open(mock_gs_key, mode='r')
 
-  Returns:
-    _ReadableGSFile: A readable GS file object.
-      
-  Raises:
-    IOError: If an unsupported mode is provided.
-  """
+    assert_true(isinstance(gs_file, _ReadableGSFile))
+    mock_gs_key.bucket.get_key.assert_called_once_with('gethue_dir/test.csv')
+  
+  def test_open_invalid_mode(self):
+    mock_gs_key = Mock()
+    mock_gs_key.side_effect = IOError('Unavailable mode "w"')
 
-  if mode == 'r':
-    return _ReadableGSFile(key)
-  else:
-    raise IOError(errno.EINVAL, 'Unavailable mode "%s"' % mode)
-
-
-class _ReadableGSFile(_ReadableS3File):
-  """Readable GS file class.
-
-  This class extends _ReadableS3File for reading GS files.
-  """
-  def __init__(self, key):
-    key_copy = key.bucket.get_key(key.name)
-    KeyFile.__init__(self, key_copy)
+    assert_raises(IOError, open, mock_gs_key, 'w')
 
