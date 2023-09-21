@@ -44,7 +44,7 @@ class TestNotebook(object):
   def test_get_api(self):
     request = Mock()
     snippet = {
-      'connector': {'optimizer': 'api', 'interface': 'hiveserver2', 'type': 'hive-compute', 'dialect': 'hive'},
+      'connector': {'optimizer': 'api'},
       'type': 'hive'  # Backward compatibility
     }
 
