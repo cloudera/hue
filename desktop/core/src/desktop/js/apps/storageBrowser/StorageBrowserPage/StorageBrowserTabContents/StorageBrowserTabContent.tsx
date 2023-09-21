@@ -20,17 +20,16 @@ import type { MenuProps } from 'antd';
 
 import { i18nReact } from '../../../../utils/i18nReact';
 import BucketIcon from '@cloudera/cuix-core/icons/react/BucketIcon';
-import {
-  FileOutlined,
-  CaretDownOutlined,
-  PlusCircleOutlined,
-  CopyOutlined,
-  DownloadOutlined,
-  DeleteOutlined,
-  SwapOutlined,
-  FolderOutlined,
-  UploadOutlined
-} from '@ant-design/icons';
+import CopyClipboardIcon from '@cloudera/cuix-core/icons/react/CopyClipboardIcon';
+import DataMovementIcon from '@cloudera/cuix-core/icons/react/DataMovementIcon';
+import DeleteIcon from '@cloudera/cuix-core/icons/react/DeleteIcon';
+import DownloadIcon from '@cloudera/cuix-core/icons/react/DownloadIcon';
+import DropDownIcon from '@cloudera/cuix-core/icons/react/DropdownIcon';
+import FolderIcon from '@cloudera/cuix-core/icons/react/ProjectIcon';
+import ImportIcon from '@cloudera/cuix-core/icons/react/ImportIcon';
+import PlusCircleIcon from '@cloudera/cuix-core/icons/react/PlusCircleIcon';
+//Todo: Use cuix icon (Currently fileIcon does not exist in cuix)
+import { FileOutlined } from '@ant-design/icons';
 
 import PathBrowser from '../../../../reactComponents/FileChooser/PathBrowser/PathBrowser';
 import { fetchFiles } from '../../../../reactComponents/FileChooser/api';
@@ -69,7 +68,7 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
           label: 'New File'
         },
         {
-          icon: <FolderOutlined />,
+          icon: <FolderIcon />,
           key: 'new_folder',
           label: 'New Folder'
         }
@@ -81,17 +80,17 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
       label: 'UPLOAD',
       children: [
         {
-          icon: <UploadOutlined />,
+          icon: <ImportIcon />,
           key: 'upload_file',
           label: 'File'
         },
         {
-          icon: <UploadOutlined />,
+          icon: <ImportIcon />,
           key: 'upload_folder',
           label: 'Folder'
         },
         {
-          icon: <UploadOutlined />,
+          icon: <ImportIcon />,
           key: 'upload_zip',
           label: 'Zip Folder'
         }
@@ -101,22 +100,22 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
 
   const bulkActionsMenuItems: MenuProps['items'] = [
     {
-      icon: <CopyOutlined />,
+      icon: <CopyClipboardIcon />,
       key: 'copy',
       label: 'Copy'
     },
     {
-      icon: <SwapOutlined />,
+      icon: <DataMovementIcon />,
       key: 'move',
       label: 'Move'
     },
     {
-      icon: <DownloadOutlined />,
+      icon: <DownloadIcon />,
       key: 'download',
       label: 'Download'
     },
     {
-      icon: <DeleteOutlined />,
+      icon: <DeleteIcon />,
       key: 'delete',
       label: 'Delete'
     }
@@ -170,7 +169,7 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
             >
               <Button className="hue-storage-browser__bulk-action-btn">
                 Bulk Actions
-                <CaretDownOutlined />
+                <DropDownIcon />
               </Button>
             </Dropdown>
             <Dropdown
@@ -181,9 +180,9 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
               }}
               trigger={['hover', 'click']}
             >
-              <Button className="hue-storage-browser__new-btn" icon={<PlusCircleOutlined />}>
+              <Button className="hue-storage-browser__new-btn" icon={<PlusCircleIcon />}>
                 New
-                <CaretDownOutlined />
+                <DropDownIcon />
               </Button>
             </Dropdown>
           </div>
