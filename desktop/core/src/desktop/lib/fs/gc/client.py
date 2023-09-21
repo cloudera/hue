@@ -13,10 +13,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import
-
 import logging
-LOG = logging.getLogger()
 
 try:
   import gcs_oauth2_boto_plugin
@@ -34,6 +31,9 @@ from desktop import conf
 from desktop.lib.idbroker import conf as conf_idbroker
 from desktop.lib.idbroker.client import IDBroker
 from desktop.lib.fs.gc.gs import GSFileSystem
+
+
+LOG = logging.getLogger()
 
 
 def get_credential_provider(config, user):
@@ -123,7 +123,7 @@ class HueGSConnection(GSConnection):
 class CredentialProviderConf(object):
 
   def __init__(self, conf):
-    self._conf=conf
+    self._conf = conf
 
   def validate(self):
     credentials = self.get_credentials()
@@ -149,7 +149,7 @@ class CredentialProviderConf(object):
 class CredentialProviderIDBroker(object):
 
   def __init__(self, idbroker):
-    self.idbroker=idbroker
+    self.idbroker = idbroker
     self.credentials = None
 
   def validate(self):
