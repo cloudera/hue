@@ -409,7 +409,7 @@ class ABFS(object):
     path = Init_ABFS.strip_scheme(path)
     headers = self._getheaders()
     if length != 0 and length != '0':
-      headers['range'] = 'bytes=%s-%s' % (str(offset), str(int(offset) + int(length)))
+      headers['range'] = 'bytes=%s-%s' % (str(offset), str(int(offset) + int(length) - 1))
 
     return self._root.get(path, headers=headers)
 
