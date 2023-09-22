@@ -9,3 +9,4 @@ class SQLResponse:
     summary: Optional[str] = None
     warning: Optional[str] = None
     semanticerror: Optional[str] = None
+    sqlerror: Optional[str] = None

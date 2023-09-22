@@ -1,10 +1,8 @@
 import React from 'react';
 import classNames from 'classnames';
+import LinkButton from 'cuix/dist/components/Button/LinkButton';
 
 import AnimatedCloseButton from '../AnimatedCloseButton/AnimatedCloseButton';
-import LinkButton from 'cuix/dist/components/Button/LinkButton';
-import GuardrailsModal from '../GuardrailsModal/GuardrailsModal';
-
 import CirclesLoader from '../CirclesLoader/CirclesLoader';
 
 import './AnimatedLauncher.scss';
@@ -38,6 +36,13 @@ function AnimatedLauncher({
 }: AnimatedLauncherProps) {
   const showErrorMessage = !!errorStatusText;
   const showWarningMessage = !!warningStatusText;
+
+  const handleClickOnCircleOrInfobar = () => {
+    const loaderIsShowingMessage =
+      isExpanded && (loadingStatusText || showErrorMessage || showWarningMessage);
+    if (!loaderIsShowingMessage) onExpandClick();
+  };
+
   return (
     <div
       onAnimationEnd={onAnimationEnd}
@@ -51,9 +56,7 @@ function AnimatedLauncher({
         'hue-ai-assist-bar__animated-launcher--error': showErrorMessage,
         'hue-ai-assist-bar__animated-launcher--warning': showWarningMessage
       })}
-      onClick={() => {
-        if (isExpanded && !isAnimating) onExpandClick();
-      }}
+      onClick={handleClickOnCircleOrInfobar}
     >
       {isExpanded && isLoading && (
         <>
@@ -82,11 +85,13 @@ function AnimatedLauncher({
             size="small"
             onClick={onCloseWarningClick}
           />
-          <div
-            className="hue-ai-assist-bar__animated-launcher-warning-text"
-          >
+          <div className="hue-ai-assist-bar__animated-launcher-warning-text">
             {warningStatusText}
-            <LinkButton onClick={onMoreWarningInfoClick} data-event="" className="hue-ai-assist-bar__animated-launcher-warning-link">
+            <LinkButton
+              onClick={onMoreWarningInfoClick}
+              data-event=""
+              className="hue-ai-assist-bar__animated-launcher-warning-link"
+            >
               More info...
             </LinkButton>
           </div>

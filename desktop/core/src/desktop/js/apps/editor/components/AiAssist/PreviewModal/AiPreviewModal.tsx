@@ -62,7 +62,7 @@ const PreviewModal = ({
     nql
   });
 
-  if (actionType === 'optimize' || actionType === 'fix') {
+  if (actionType === 'optimize' || actionType === 'fix' || actionType === 'edit') {
     const noDiffDetected =
       format(suggestionRaw, { language: dialect, keywordCase: 'upper' }) ===
       format(showDiffFromRaw, { language: dialect, keywordCase: 'upper' });
@@ -70,11 +70,11 @@ const PreviewModal = ({
     if (noDiffDetected) {
       return (
         <Modal
-          wrapClassName="cuix hue-ai-preview-modal"
+          wrapClassName="cuix hue-ai-preview-modal hue-ai-preview-modal--no-diff"
           open={open}
           title={title}
           onCancel={onCancel}
-          width={'80%'}
+          width={'100ch'}
           footer={
             <div className="hue-ai-preview-modal__footer">
               <Button key="submit" type="primary" onClick={onCancel}>
@@ -86,12 +86,13 @@ const PreviewModal = ({
           <p>
             {actionType === 'optimize'
               ? `No optimization to the SQL statement could be suggested.`
-              : `No fix to the SQL statement could be suggested.`}
+              : actionType === 'fix'
+              ? `No fix to the SQL statement could be suggested.`
+              : `The SQL statement could not be edited based on the input given.`}
           </p>
-          <div className="hue-ai-preview-modal__text-container">
-            <h4 className="hue-ai-preview-modal__text-container-title">Alternative actions</h4>
-            <p className="hue-ai-preview-modal__assumptions">{explanation}</p>
-          </div>
+          <PreviewInfoPanels
+            alternativeActions={explanation || 'No alternative actions could be suggested'}
+          />
         </Modal>
       );
     }

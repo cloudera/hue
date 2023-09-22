@@ -153,7 +153,10 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
     });
     if (error) {
       handleApiError(error.message);
-    } else if (guardrailAlert?.type !== GuardrailAlertType.SEMANTIC_ERROR) {
+    } else if (
+      guardrailAlert?.type !== GuardrailAlertType.SEMANTIC_ERROR &&
+      guardrailAlert?.type !== GuardrailAlertType.INVALID_AI_RESPONSE
+    ) {
       setNql(nql);
       setSuggestion(sql);
       setAssumptions(assumptions);
@@ -170,10 +173,13 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
     activeExecutable: SqlExecutable
   ) => {
     setIsLoading(true);
+    setGuardrailAlert(undefined);
     const executor = activeExecutable?.executor;
     const databaseName = activeExecutable?.database || '';
     const dialect = sqlDialect;
-    const { sql, assumptions, error } = await generateEditedSQLfromNQL({
+    const { sql, assumptions, error, guardrailAlert } = await withGuardrails(
+      generateEditedSQLfromNQL
+    )({
       nql,
       sql: sqlToModify,
       databaseName,
@@ -183,13 +189,16 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
     });
     if (error) {
       handleApiError(error.message);
-    } else {
+    } else if (
+      guardrailAlert?.type !== GuardrailAlertType.SEMANTIC_ERROR &&
+      guardrailAlert?.type !== GuardrailAlertType.INVALID_AI_RESPONSE
+    ) {
       setNql(nql);
       setSuggestion(sql);
       setAssumptions(assumptions);
       setShowSuggestedSqlModal(true);
     }
-
+    setGuardrailAlert(guardrailAlert);
     setIsLoading(false);
     setInputValue('');
   };
@@ -197,10 +206,11 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
   const loadOptimization = async (statement: string) => {
     setIsLoading(true);
     setIsOptimizeMode(true);
+    setGuardrailAlert(undefined);
     const executor = activeExecutable?.executor;
     const databaseName = activeExecutable?.database || '';
     const dialect = sqlDialect;
-    const { sql, explain, error } = await generateOptimizedSql({
+    const { sql, explain, error, guardrailAlert } = await withGuardrails(generateOptimizedSql)({
       statement,
       databaseName,
       executor,
@@ -210,20 +220,25 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
 
     if (error) {
       handleApiError(error.message);
-    } else {
+    } else if (
+      guardrailAlert?.type !== GuardrailAlertType.SQL_ERROR &&
+      guardrailAlert?.type !== GuardrailAlertType.INVALID_AI_RESPONSE
+    ) {
       setSuggestion(sql);
       setSuggestionExplanation(explain);
       setShowSuggestedSqlModal(true);
     }
+    setGuardrailAlert(guardrailAlert);
     setIsLoading(false);
   };
 
   const loadFixSuggestion = async (statement: string) => {
     setIsLoading(true);
+    setGuardrailAlert(undefined);
     const dialect = sqlDialect;
     const executor = activeExecutable?.executor;
     const databaseName = activeExecutable?.database || '';
-    const { sql, explain, error } = await generateCorrectedSql({
+    const { sql, explain, error, guardrailAlert } = await withGuardrails(generateCorrectedSql)({
       statement,
       databaseName,
       executor,
@@ -232,11 +247,15 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
     });
     if (error) {
       handleApiError(error.message);
-    } else {
+    } else if (
+      guardrailAlert?.type !== GuardrailAlertType.SQL_ERROR &&
+      guardrailAlert?.type !== GuardrailAlertType.INVALID_AI_RESPONSE
+    ) {
       setSuggestion(sql);
       setSuggestionExplanation(explain);
       setShowSuggestedSqlModal(true);
     }
+    setGuardrailAlert(guardrailAlert);
     setIsLoading(false);
   };
 
@@ -360,6 +379,22 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
     };
   }, []);
 
+  // TODO: use a single state variable for this
+  const actionType = isGenerateMode
+    ? 'generate'
+    : isEditMode
+    ? 'edit'
+    : isOptimizeMode
+    ? 'optimize'
+    : explanation
+    ? 'explain'
+    : 'fix';
+
+  const showBarInlineWarning =
+    guardrailAlert?.type === GuardrailAlertType.SEMANTIC_ERROR ||
+    guardrailAlert?.type === GuardrailAlertType.SQL_ERROR ||
+    guardrailAlert?.type === GuardrailAlertType.INVALID_AI_RESPONSE;
+
   return (
     <>
       <AnimatedLauncher
@@ -373,9 +408,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
         isLoading={isLoading}
         loadingStatusText={loadingStatusText}
         errorStatusText={errorStatusText}
-        warningStatusText={
-          guardrailAlert?.type === GuardrailAlertType.SEMANTIC_ERROR ? guardrailAlert?.title : ''
-        }
+        warningStatusText={showBarInlineWarning ? guardrailAlert?.title : ''}
         onExpandClick={toggleOpen}
         onCloseErrorClick={() => setErrorStatusText('')}
         onMoreWarningInfoClick={() => {
@@ -436,17 +469,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
       )}
       {showSuggestedSqlModal && (
         <AiPreviewModal
-          actionType={
-            isGenerateMode
-              ? 'generate'
-              : isEditMode
-              ? 'edit'
-              : isOptimizeMode
-              ? 'optimize'
-              : explanation
-              ? 'explain'
-              : 'fix'
-          }
+          actionType={actionType}
           title="Suggestion"
           open
           onCancel={() => {
