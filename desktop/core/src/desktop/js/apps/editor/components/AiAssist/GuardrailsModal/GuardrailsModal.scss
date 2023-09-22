@@ -12,5 +12,21 @@
         display: block;
       }
     }
+
+    .hue-ai-guardrails-modal__ai-response-container {
+      background-color: vars.$fluidx-blue-050;
+      border: 1px solid vars.$fluidx-blue-100;
+      padding: 12px;
+  
+      .hue-ai-guardrails-modal__ai-title {
+        color: vars.$fluidx-blue-400;
+        text-transform: uppercase;
+      }
+  
+      .hue-ai-guardrails-modal__ai-text-container {
+        white-space: pre-line;
+        max-width: 80ch;
+      }
+    }    
   }
 }

@@ -4,18 +4,20 @@ import { GuardrailAlert, GuardrailAlertType } from '../../guardRails';
 import './PreviewInfoPanels.scss';
 
 export interface PreviewInfoPanelsProps {
-  explanation: string;
-  assumptions: string;
+  explanation?: string;
+  assumptions?: string;
+  alternativeActions?: string;
   guardrailAlert?: GuardrailAlert;
 }
 
 const PreviewInfoPanels = ({
+  alternativeActions,
   explanation,
   assumptions,
   guardrailAlert
 }: PreviewInfoPanelsProps) => {
   const unsafeSqlDetected = guardrailAlert?.type === GuardrailAlertType.UNSAFE_SQL;
-  return explanation || assumptions || unsafeSqlDetected ? (
+  return explanation || assumptions || unsafeSqlDetected || alternativeActions ? (
     <div className="hue-preview-info-panels">
       {(explanation || assumptions) && (
         <>
@@ -29,6 +31,12 @@ const PreviewInfoPanels = ({
         <>
           <h4 className="hue-preview-info__title">Additional info</h4>
           <p className="hue-preview-info__text-container">{guardrailAlert?.aiMsg}</p>
+        </>
+      )}
+      {alternativeActions && (
+        <>
+          <h4 className="hue-preview-info__title">Alternative actions</h4>
+          <p className="hue-preview-info__text-container">{alternativeActions}</p>
         </>
       )}
     </div>
