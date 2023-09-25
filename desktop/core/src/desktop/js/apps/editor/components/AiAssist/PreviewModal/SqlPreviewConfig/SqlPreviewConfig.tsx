@@ -1,7 +1,7 @@
 import React from 'react';
 import Switch from 'cuix/dist/components/Switch';
 
-import { FormattingConfig } from '../FormattingHook';
+import { FormattingConfig } from '../FormattingUtils';
 import { AiBarActionType } from '../../AiAssistBar';
 
 import './SqlPreviewConfig.scss';

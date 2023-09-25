@@ -11,12 +11,18 @@ import SyntaxHighlighterDiff from '../SyntaxHighlighterDiff/SyntaxHighlighterDif
 import InlineAlertCheck from '../InlineAlertCheck/InlineAlertCheck';
 import { AiBarActionType } from '../AiAssistBar';
 
-import { useFormatting } from './FormattingHook';
+import { useFormatting, formatClean } from './FormattingUtils';
 import PreviewInfoPanels from './PreviewInfoPanels/PreviewInfoPanels';
 import PreviewModalFooter from './PreviewModalFooter/PreviewModalFooter';
 import SqlPreviewConfig from './SqlPreviewConfig/SqlPreviewConfig';
 
 import './AiPreviewModal.scss';
+
+const hasDiff = (codeA, codeB, dialect): boolean => {
+  const cleanNew = formatClean(codeA, dialect);
+  const cleanOld = formatClean(codeB, dialect);
+  return cleanNew !== cleanOld;
+};
 
 interface PreviewModalProps {
   actionType: AiBarActionType;
@@ -63,16 +69,13 @@ const PreviewModal = ({
   });
 
   if (actionType === 'optimize' || actionType === 'fix' || actionType === 'edit') {
-    const noDiffDetected =
-      format(suggestionRaw, { language: dialect, keywordCase: 'upper' }) ===
-      format(showDiffFromRaw, { language: dialect, keywordCase: 'upper' });
-
-    if (noDiffDetected) {
+    const diffDetected = hasDiff(suggestionRaw, showDiffFromRaw, dialect);
+    if (!diffDetected) {
       return (
         <Modal
           wrapClassName="cuix hue-ai-preview-modal hue-ai-preview-modal--no-diff"
           open={open}
-          title={title}
+          title={'No change suggested'}
           onCancel={onCancel}
           width={'100ch'}
           footer={
@@ -88,7 +91,7 @@ const PreviewModal = ({
               ? `No optimization to the SQL statement could be suggested.`
               : actionType === 'fix'
               ? `No fix to the SQL statement could be suggested.`
-              : `The SQL statement could not be edited based on the input given.`}
+              : `The SQL statement could not be edited based on the input given. The AI return an unmodified SQL statement.`}
           </p>
           <PreviewInfoPanels
             alternativeActions={explanation || 'No alternative actions could be suggested'}

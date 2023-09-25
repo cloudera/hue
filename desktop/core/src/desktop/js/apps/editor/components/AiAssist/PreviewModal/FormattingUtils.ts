@@ -3,7 +3,7 @@ import { format } from 'sql-formatter';
 
 import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
 
-import { nqlCommentRegex } from '../sharedRegexes';
+import { nqlCommentRegex, singleLineCommentRegex, multiLineCommentRegex } from '../sharedRegexes';
 
 const LOCAL_STORAGE_KEY = 'hue.aiAssistBar.sqlFormattingConf';
 
@@ -71,6 +71,15 @@ const includeNqlAsComment = ({ oldSql, newSql, nql, includeNql, replaceNql }) =>
     : appendComments(oldSql, newSql, commentWithLinebreaks);
   return addComment ? sqlWithNqlComment : newSql;
 };
+
+const removeComments = (statement: string) => {
+  return statement.replace(singleLineCommentRegex, '').replace(multiLineCommentRegex, '');
+}
+
+export const formatClean = (sql: string, dialect: string) => {
+  const cleanedSql = removeComments(sql).trim();
+  return format(cleanedSql, { language: dialect, keywordCase: 'upper' });
+}
 
 export interface FormattingConfig {
   autoFormat: boolean;
