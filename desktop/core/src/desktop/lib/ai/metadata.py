@@ -40,6 +40,9 @@ def _get_words(text) -> list:
 
 # Perform semantic search on the corpus using the provided query
 def semantic_search(corpus, query, limit = 10):
+    if len(corpus) < limit:
+        return corpus
+
     corpus = list(set(corpus))
     k = min(len(corpus), limit)
     embedder = SentenceTransformer(_embedding_model)
