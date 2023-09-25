@@ -28,6 +28,7 @@ from desktop.webpack_utils import get_hue_bundles
 from metadata.conf import has_optimizer, OPTIMIZER
 
 from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_BATCH_EXECUTE, ENABLE_EXTERNAL_STATEMENT, ENABLE_PRESENTATION
+from desktop.conf import AI_INTERFACE
 
 if sys.version_info[0] > 2:
   from django.utils.translation import gettext as _
@@ -918,9 +919,11 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     <div class="snippet-container row-fluid" data-bind="visibleOnHover: { override: $root.editorMode() || inFocus() || saveResultsModalVisible(), selector: '.snippet-actions' }">
       <div class="snippet card card-widget" data-bind="css: {'notebook-snippet' : ! $root.editorMode(), 'editor-mode': $root.editorMode(), 'active-editor': inFocus, 'snippet-text' : type() == 'text'}, attr: {'id': 'snippet_' + id()}, clickForAceFocus: ace">
         <div style="position: relative;">
+          % if AI_INTERFACE.SERVICE.get() != None:
           <!-- ko ifnot: $root.isPresentationMode() -->
             <AiAssistBar class="cuix antd" data-bind="reactWrapper: 'AiAssistBar', props: { activeExecutable: activeExecutable }"></AiAssistBar>
           <!-- /ko -->
+          % endif
           <div class="snippet-row" style="position: relative;">
             <div class="snippet-left-bar">
               <!-- ko template: { if: ! $root.editorMode() && ! $root.isPresentationMode() && ! $root.isResultFullScreenMode(), name: 'notebook-snippet-type-controls${ suffix }' } --><!-- /ko -->
