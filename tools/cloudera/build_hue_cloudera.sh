@@ -61,7 +61,7 @@ function install_prerequisite() {
     export pip38_bin="$PYTHON38_PATH/bin/pip3.8"
     centos7_install
     source /opt/rh/rh-nodejs14/enable
-  elif [[ $1 == "redhat8" ]]; then
+  elif [[ $1 == "redhat8" || $1 == "redhat8-arm64" ]]; then
     redhat8_install
   elif [[ $1 == "sles12" ]]; then
     sles12_install
