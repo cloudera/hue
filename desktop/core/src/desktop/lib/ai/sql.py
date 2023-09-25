@@ -11,6 +11,7 @@ from .models.task import TaskType
 from .services.base_service import BaseService
 from .services.openai import OpenAiService
 from .services.bedrock import BedrockService
+from .services.azure import AzureService
 
 from desktop.conf import AI_INTERFACE
 
@@ -26,6 +27,8 @@ def _model_factory(model: str, task: TaskType) -> BaseModel:
 def _service_factory(service_name: str) -> BaseService:
     if service_name == "openai":
         return OpenAiService()
+    elif service_name == "azure":
+        return AzureService()
     elif service_name == "bedrock":
         return BedrockService()
     else:
