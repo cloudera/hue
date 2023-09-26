@@ -27,7 +27,7 @@ from boto.gs.key import Key
 from boto.s3.prefix import Prefix
 from django.utils.translation import gettext as _
 
-from desktop.conf import PERMISSION_ACTION_GS
+from desktop.conf import PERMISSION_ACTION_GS, GS_BULK_DELETE_DIR_KEYS_MAX_LIMIT
 from desktop.lib.fs.gc import GS_ROOT, abspath, parse_uri, translate_gs_error, normpath, join as gs_join
 from desktop.lib.fs.gc.gsstat import GSStat
 from desktop.lib.fs.gc.gsfile import open as gsfile_open
@@ -298,17 +298,16 @@ class GSFileSystem(S3FileSystem):
             raise GSFileSystemException('Could not delete key %s' % deleted_key)
         else:
           # key.bucket.delete_keys() call is not supported from GS side
-          # So, try deleting the keys one by one
+          # So, try deleting the all keys with directory prefix one by one
 
-          # TODO: What if one key deletion fails, then what about the whole delete operation flow?
-          # TODO: What if there are a lot of keys? Any limit on loop?
-          # TODO: Any other error/exception handling?
-
+          # TODO: Check on the UI side if key count is greater than max limit and show nice notification.
+          deleted_dir_key_count = 0
           for key in list(dir_keys):
-            deleted_key = key.delete()
-            # if deleted_key.exists():
-            #   raise GSFileSystemException('Could not delete key %s' % deleted_key)
+            if deleted_dir_key_count > GS_BULK_DELETE_DIR_KEYS_MAX_LIMIT.get():
+              break
 
+            deleted_key = key.delete()
+            deleted_dir_key_count += 1
 
   @translate_gs_error
   @auth_error_handler
@@ -341,7 +340,6 @@ class GSFileSystem(S3FileSystem):
     path = self._append_separator(path)  # directory-key should ends by /
     self.create(path)  # create empty object
 
-
   def _stats(self, path):
     if GSFileSystem.isroot(path):
       return GSStat.for_gs_root()
@@ -368,7 +366,6 @@ class GSFileSystem(S3FileSystem):
     
     return self._stats_key(key, self.fs)
   
-
   @staticmethod
   def _stats_key(key, fs='gs'):
     if key.size is not None:
@@ -383,7 +380,6 @@ class GSFileSystem(S3FileSystem):
         return GSStat.from_key(key, is_dir=True, fs=fs)
 
     return None
-
 
   def _copy(self, src, dst, recursive, use_src_basename):
     """Copy files and directories from a source GS path to a destination GS path.
