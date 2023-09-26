@@ -78,7 +78,13 @@ const removeComments = (statement: string) => {
 
 export const formatClean = (sql: string, dialect: string) => {
   const cleanedSql = removeComments(sql).trim();
-  return format(cleanedSql, { language: dialect, keywordCase: 'upper' });
+  let newFormat = sql;
+  try {
+    newFormat = format(cleanedSql, { language: dialect, keywordCase: 'upper' });
+  } catch (e) {
+    console.error(e);
+  }
+  return newFormat;
 }
 
 export interface FormattingConfig {
@@ -107,14 +113,15 @@ export const useFormatting = ({ dialect, keywordCase, oldSql, newSql, nql }) => 
   };
 
   const formatSql = (sql: string) => {
+    let newFormat = sql;
     if (autoFormat) {
       try {
-        sql = format(sql, { language: dialect, keywordCase });
+        newFormat = format(sql, { language: dialect, keywordCase });
       } catch (e) {
         console.error(e);
       }
     }
-    return sql;
+    return newFormat;
   };
 
   const withNqlComments = includeNqlAsComment({
