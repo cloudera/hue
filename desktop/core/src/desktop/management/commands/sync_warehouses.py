@@ -95,22 +95,26 @@ def get_computes_from_k8s():
   computes = []
 
   for n in core_v1.list_namespace().items:
-    namespace = n.metadata.name
-    item = {
-      'name': n.metadata.labels.get('displayname'),
-      'description': '%s (%s)' % (n.metadata.labels.get('displayname'), n.metadata.name),
-      'external_id': namespace,
-      #'creation_timestamp': n.metadata.labels.get('creation_timestamp'),
-    }
+    try:
+      namespace = n.metadata.name
+      LOG.info('Getting details for ns: %s' % namespace)
+      item = {
+        'name': n.metadata.labels.get('displayname'),
+        'description': '%s (%s)' % (n.metadata.labels.get('displayname'), n.metadata.name),
+        'external_id': namespace,
+        #'creation_timestamp': n.metadata.labels.get('creation_timestamp'),
+      }
 
-    if namespace.startswith('warehouse-'):
-      catalogs.append(item)
-    elif namespace.startswith('compute-'):
-      computes.append(item)
-      update_hive_configs(namespace, item, 'hiveserver2-service.%s.svc.cluster.local' % namespace)
-    elif namespace.startswith('impala-'):
-      computes.append(item)
-      populate_impala(namespace, item)
+      if namespace.startswith('warehouse-'):
+        catalogs.append(item)
+      elif namespace.startswith('compute-'):
+        update_hive_configs(namespace, item, 'hiveserver2-service.%s.svc.cluster.local' % namespace)
+        computes.append(item)
+      elif namespace.startswith('impala-'):
+        populate_impala(namespace, item)
+        computes.append(item)
+    except Exception as e:
+      LOG.exception('Could not get details for ns: %s' % n)
 
   return computes
 
