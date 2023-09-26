@@ -437,7 +437,7 @@ def get_api(request, snippet):
     interpreter = snippet.get('interpreter')
   elif get_cluster_config(request.user).get('has_computes'):
     if snippet.get('type') in ('hive-compute', 'impala-compute') and snippet.get('id'):
-      LOG.debug("Loading the compute from db using snippet['id']: %" % snippet['id'])
+      LOG.debug("Loading the compute from db using snippet['id']: %s" % snippet['id'])
       interpreter = Compute.objects.get(id=snippet['id']).to_dict()
     if snippet.get('compute'):
       LOG.debug("Using the compute as is from snippet['compute']")
