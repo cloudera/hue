@@ -49,10 +49,10 @@ Use the following metadata: {metadata}.
 
 SQL: {sql}
 
-Always explain the optimzation or suggest alternative options if any. The explanation should be wrapped in an <explain> tag.
+Always explain the optimization or suggest alternative options if any. The explanation should be wrapped in an <explain> tag but should not contain SQL.
 If the SQL can't be interpreted then there is a sqlerror and you should explain the reason for it.
 If the SQL can't be optimized then shortly explain alternative options if any.
-If the SQL can be optimized is should be placed in the code tag and an explanation in the explain tag.
+If the SQL can be optimized is should be placed in the code tag. 
 
 Return the result in the following format:
 <code></code>
