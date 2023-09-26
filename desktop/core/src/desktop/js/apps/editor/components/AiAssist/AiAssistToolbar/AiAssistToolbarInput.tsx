@@ -274,7 +274,7 @@ function AiAssistToolbarInput({
             ref={historyDropdownRef}
             position={historyDropdownPostion}
             width={historyDropdownWidth}
-            show={!isAnimating && showHistoryDropdown}
+            show={!isAnimating && !isLoading && showHistoryDropdown}
             autoShow={userChoiceAutoShowHistory}
             onToggleAutoShow={newAutoShow => {
               setInLocalStorage(AUTO_SHOW_STORAGE_KEY, newAutoShow);
