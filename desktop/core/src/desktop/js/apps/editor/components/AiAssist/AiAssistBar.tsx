@@ -474,6 +474,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
           open
           onCancel={() => {
             setExplanation('');
+            setSuggestionExplanation('');
             setShowSuggestedSqlModal(false);
             setIsOptimizeMode(false);
             setGuardrailAlert(undefined);
