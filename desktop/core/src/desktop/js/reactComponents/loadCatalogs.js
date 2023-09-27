@@ -35,6 +35,8 @@ const getCacheProgress = databaseName => {
 };
 
 export async function LoadDataCatalogs() {
+  if(!window.AI_INTERFACE_ENABLED) return;
+  
   huePubSub.subscribe('fetch_tables_metadata', async data => {
     const dataCatalogEntry = await data.sourceMetaPromise;
     if (!dataCatalogEntry.tables_meta) {

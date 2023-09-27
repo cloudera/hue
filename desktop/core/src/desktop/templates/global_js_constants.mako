@@ -122,6 +122,7 @@
   window.ENABLE_HISTORY_V2 = '${ hasattr(ENABLE_HISTORY_V2, 'get') and ENABLE_HISTORY_V2.get() }' === 'True';
 
   window.ENABLE_SQL_SYNTAX_CHECK = '${ conf.ENABLE_SQL_SYNTAX_CHECK.get() }' === 'True';
+  window.AI_INTERFACE_ENABLED = '${ conf.AI_INTERFACE.SERVICE.get() }' !== 'None';
 
   window.HAS_CATALOG = '${ has_catalog(request.user) }' === 'True';
   window.CATALOG_URL = '${ get_catalog_url() or "" }'

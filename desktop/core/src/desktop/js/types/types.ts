@@ -27,6 +27,10 @@ declare global {
     format: (format: string) => string;
   }
 
+  interface Window {
+    AI_INTERFACE_ENABLED: boolean;
+  }
+
   const moment: Moment & ((val: unknown) => Moment);
 }
 
