@@ -72,7 +72,7 @@ const includeNqlAsComment = ({ oldSql, newSql, nql, includeNql, replaceNql }) =>
   return addComment ? sqlWithNqlComment : newSql;
 };
 
-const removeComments = (statement: string) => {
+export const removeComments = (statement: string) => {
   return statement.replace(singleLineCommentRegex, '').replace(multiLineCommentRegex, '');
 }
 
@@ -86,6 +86,22 @@ export const formatClean = (sql: string, dialect: string) => {
   }
   return newFormat;
 }
+
+export const extractLeadingNqlComments = (sql: string): string => {
+  const comments = sql.match(nqlCommentRegex) || [];
+  const prefixSingleLine = '-- NQL:';
+  const prefixMultiLine = '/* NQL:';
+  const commentsTexts = comments
+    .map(comment => comment.trim())
+    .filter(comment => comment.startsWith(prefixSingleLine) || comment.startsWith(prefixMultiLine))
+    .map(comment => {
+      return comment.startsWith(prefixSingleLine)
+        ? comment.slice(prefixSingleLine.length).trim()
+        : comment.slice(prefixMultiLine.length, -2).trim();
+    });
+
+  return commentsTexts.join('\n');
+};
 
 export interface FormattingConfig {
   autoFormat: boolean;
