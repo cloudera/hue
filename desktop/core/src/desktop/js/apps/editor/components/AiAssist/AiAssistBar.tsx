@@ -13,8 +13,8 @@ import { useParser } from './ParserHook';
 import AnimatedLauncher from './AnimatedLauncher/AnimatedLauncher';
 import AnimatedCloseButton from './AnimatedCloseButton/AnimatedCloseButton';
 import AssistToolbar from './AiAssistToolbar/AiAssistToolbar';
-import { nqlCommentRegex } from './sharedRegexes';
 import { withGuardrails, GuardrailAlert, GuardrailAlertType } from './guardRails';
+import { extractLeadingNqlComments, removeComments } from './PreviewModal/FormattingUtils';
 
 import './AiAssistBar.scss';
 
@@ -53,22 +53,6 @@ const breakLines = (input: string): string => {
     }
   }
   return (result += line);
-};
-
-const extractLeadingNqlComments = (sql: string): string => {
-  const comments = sql.match(nqlCommentRegex) || [];
-  const prefixSingleLine = '-- NQL:';
-  const prefixMultiLine = '/* NQL:';
-  const commentsTexts = comments
-    .map(comment => comment.trim())
-    .filter(comment => comment.startsWith(prefixSingleLine) || comment.startsWith(prefixMultiLine))
-    .map(comment => {
-      return comment.startsWith(prefixSingleLine)
-        ? comment.slice(prefixSingleLine.length).trim()
-        : comment.slice(prefixMultiLine.length, -2).trim();
-    });
-
-  return commentsTexts.join('\n');
 };
 
 export interface AiAssistBarProps {
@@ -346,8 +330,11 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
     const editorWasEmpty = previousSelection?.trim() === '';
     const userClearedEditor = !editorWasEmpty && newSelection === '';
     const userTypedInEmptyEditor = editorWasEmpty && newSelection !== '';
+    const nqlPrompt = extractLeadingNqlComments(newSelection);
+    const statementOnlyContainsNql =
+      nqlPrompt.length && removeComments(newSelection.trim()).length === 0;
 
-    if (userClearedEditor) {
+    if (userClearedEditor || statementOnlyContainsNql) {
       setIsEditMode(false);
     } else if (userTypedInEmptyEditor) {
       setIsGenerateMode(false);

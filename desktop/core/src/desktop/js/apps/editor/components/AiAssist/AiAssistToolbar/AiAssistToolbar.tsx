@@ -10,6 +10,7 @@ import {
 import Toolbar, { ToolbarButton } from '../../../../../reactComponents/Toolbar/Toolbar';
 import AiAssistToolbarInput from './AiAssistToolbarInput';
 import { useKeyboardShortcuts } from '../hooks';
+import { extractLeadingNqlComments, removeComments } from '../PreviewModal/FormattingUtils';
 
 import './AiAssistToolbar.scss';
 
@@ -94,7 +95,13 @@ function AssistToolbar({
     f: handleFixClick
   });
 
-  const hasSelectedStatement = parsedStatement?.statement?.trim();
+  const selectedStatement = parsedStatement?.statement?.trim() || '';
+  const selectedStatementHasContent = !!selectedStatement;
+  const nqlPrompt = extractLeadingNqlComments(selectedStatement);
+  const selectedStatementHasNqlCommentOnly =
+    nqlPrompt.length > 0 && removeComments(selectedStatement.trim()).length === 0;
+  const selectedStatementMissingSql: boolean =
+    !selectedStatementHasContent || selectedStatementHasNqlCommentOnly;
 
   return (
     <Toolbar
@@ -102,7 +109,7 @@ function AssistToolbar({
       content={() => (
         <>
           <ToolbarButton
-            disabled={isLoading || hasSelectedStatement}
+            disabled={isLoading || (selectedStatement && !selectedStatementHasNqlCommentOnly)}
             title="Generate SQL using natural language (Command-Ctrl-G)"
             aria-label="Generate SQL using natural language"
             icon={<CommentOutlined />}
@@ -120,9 +127,10 @@ function AssistToolbar({
             onInputChanged={onInputChanged}
             value={inputValue}
             onAnimationEnded={() => setIsAnimatingInput(false)}
+            prefill={inputPrefill}
           />
           <ToolbarButton
-            disabled={isLoading || !hasSelectedStatement}
+            disabled={isLoading || selectedStatementMissingSql}
             title="Edit selected SQL statement using natural language (Command-Ctrl-E)"
             aria-label="Edit SQL using natural language"
             icon={<EditOutlined />}
@@ -143,7 +151,7 @@ function AssistToolbar({
             prefill={inputPrefill}
           />
           <ToolbarButton
-            disabled={isLoading || !hasSelectedStatement}
+            disabled={isLoading || selectedStatementMissingSql}
             title="Explain selected SQL statement (Command-Ctrl-X)"
             aria-label="Explain SQL statement"
             icon={<BulbOutlined />}
@@ -154,7 +162,7 @@ function AssistToolbar({
           <ToolbarButton
             onClick={handleOptimizeClick}
             title="Optimize selected SQL statement (Command-Ctrl-O)"
-            disabled={isLoading || !hasSelectedStatement}
+            disabled={isLoading || selectedStatementMissingSql}
             icon={<ThunderboltOutlined />}
           >
             {!inputExpanded ? 'Optimize' : ''}
@@ -162,7 +170,7 @@ function AssistToolbar({
           <ToolbarButton
             title="Fix selected SQL statement (Command-Ctrl-F)"
             onClick={handleFixClick}
-            disabled={!isSqlError || isLoading || !hasSelectedStatement}
+            disabled={!isSqlError || isLoading || selectedStatementMissingSql}
             icon={<BugOutlined />}
           >
             {!inputExpanded ? 'Fix' : ''}
