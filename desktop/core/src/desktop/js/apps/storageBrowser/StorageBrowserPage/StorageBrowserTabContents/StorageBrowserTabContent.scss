@@ -14,6 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 @use 'variables' as vars;
+@use 'mixins';
 
 $icon-margin: 5px;
 $action-dropdown-width: 214px;
@@ -60,13 +61,7 @@ $action-dropdown-width: 214px;
   display: flex;
   margin: vars.$fluidx-spacing-s 0;
   justify-content: space-between;
-
-  svg {
-    //d3 conflict
-    display: inline-block;
-    height: 1em;
-    width: 1em;
-  }
+  @include mixins.hue-svg-icon__d3-conflict;
 }
 
 .hue-storage-browser__search {
@@ -108,24 +103,7 @@ $action-dropdown-width: 214px;
   }
 }
 
-.hue-storage-browser__bulk-action {
+.hue-storage-browser__actions-dropdown {
   width: $action-dropdown-width;
-
-  svg {
-    //d3 conflict
-    display: inline-block;
-    height: 1em;
-    width: 1em;
-  }
-}
-
-.hue-storage-browser__new-action {
-  width: $action-dropdown-width;
-
-  svg {
-    //d3 conflict
-    display: inline-block;
-    height: 1em;
-    width: 1em;
-  }
+  @include mixins.hue-svg-icon__d3-conflict;
 }

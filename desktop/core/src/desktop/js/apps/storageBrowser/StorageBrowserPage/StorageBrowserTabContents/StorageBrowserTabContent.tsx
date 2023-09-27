@@ -60,39 +60,39 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
     {
       key: 'create',
       type: 'group',
-      label: 'CREATE',
+      label: t('CREATE'),
       children: [
         {
           icon: <FileOutlined />,
           key: 'new_file',
-          label: 'New File'
+          label: t('New File')
         },
         {
           icon: <FolderIcon />,
           key: 'new_folder',
-          label: 'New Folder'
+          label: t('New Folder')
         }
       ]
     },
     {
       key: 'upload',
       type: 'group',
-      label: 'UPLOAD',
+      label: t('UPLOAD'),
       children: [
         {
           icon: <ImportIcon />,
           key: 'upload_file',
-          label: 'File'
+          label: t('File')
         },
         {
           icon: <ImportIcon />,
           key: 'upload_folder',
-          label: 'Folder'
+          label: t('Folder')
         },
         {
           icon: <ImportIcon />,
           key: 'upload_zip',
-          label: 'Zip Folder'
+          label: t('Zip Folder')
         }
       ]
     }
@@ -102,22 +102,22 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
     {
       icon: <CopyClipboardIcon />,
       key: 'copy',
-      label: 'Copy'
+      label: t('Copy')
     },
     {
       icon: <DataMovementIcon />,
       key: 'move',
-      label: 'Move'
+      label: t('Move')
     },
     {
       icon: <DownloadIcon />,
       key: 'download',
-      label: 'Download'
+      label: t('Download')
     },
     {
       icon: <DeleteIcon />,
       key: 'delete',
-      label: 'Delete'
+      label: t('Delete')
     }
   ];
 
@@ -157,10 +157,10 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
           />
         </div>
         <div className="hue-storage-browser__actions-bar">
-          <Input className="hue-storage-browser__search" placeholder={'Search'} />
+          <Input className="hue-storage-browser__search" placeholder={t('Search')} />
           <div className="hue-storage-browser__actions-bar-right">
             <Dropdown
-              overlayClassName="hue-storage-browser__bulk-action"
+              overlayClassName="hue-storage-browser__actions-dropdown"
               menu={{
                 items: bulkActionsMenuItems,
                 className: 'hue-storage-browser__action-menu'
@@ -168,12 +168,12 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
               trigger={['hover', 'click']}
             >
               <Button className="hue-storage-browser__bulk-action-btn">
-                Bulk Actions
+                {t('Bulk Actions')}
                 <DropDownIcon />
               </Button>
             </Dropdown>
             <Dropdown
-              overlayClassName="hue-storage-browser__new-action"
+              overlayClassName="hue-storage-browser__actions-dropdown"
               menu={{
                 items: newActionsMenuItems,
                 className: 'hue-storage-browser__action-menu'
@@ -181,7 +181,7 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
               trigger={['hover', 'click']}
             >
               <Button className="hue-storage-browser__new-btn" icon={<PlusCircleIcon />}>
-                New
+                {t('New')}
                 <DropDownIcon />
               </Button>
             </Dropdown>
