@@ -185,7 +185,13 @@ const AiAssistToolbarHistory = forwardRef(function AiAssistToolbarHistory(
               aria-label={toggleTitle}
               title={toggleTitle}
               data-event=""
-              icon={autoShow ? <ViewIcon /> : <HideIcon />}
+              icon={autoShow ? 
+                <div style={{width: '24px', height: '24px'}}>
+                  <ViewIcon />
+                </div> : 
+                <div style={{width: '24px', height: '24px'}}>
+                  <HideIcon />
+                </div>}
               onFocusCapture={e => e.stopPropagation()}
             />
           </div>
