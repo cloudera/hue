@@ -40,10 +40,21 @@ def format_metadata(metadata: dict) -> str:
 
     for table in metadata["tables"]:
         table_name = table["name"]
-        column_names = ', '.join(map(lambda col: f'{col["name"]} {col["type"]}', table["columns"]))
+        formatted_columns = []
+        for col in table["columns"]:
+            column_str = f'{col["name"]} {col["type"]}'
+            if col.get("comment"):
+                column_str += f' COMMENT "{col["comment"]}"'
+            if col.get("primaryKey"):
+                column_str += ' PRIMARY KEY'
+            if col.get("partitionKey"):
+                column_str += ' PARTITIONED BY'
+            formatted_columns.append(column_str)
+        column_names = ', '.join(formatted_columns)
         formatted_metadata.append(f'create table {table_name} ({column_names})')
 
     return ';\n\n'.join(formatted_metadata)
+
 
 def perform_sql_task(task: TaskType, input: str, sql: str, dialect: str, metadata: dict) -> SQLResponse:
     service = _service_factory(AI_INTERFACE.SERVICE.get())
