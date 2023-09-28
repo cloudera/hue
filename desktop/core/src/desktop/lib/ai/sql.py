@@ -86,8 +86,11 @@ def build_sample_data(reader: TableReader, table) -> str:
 
 def get_table_key(table) -> str:
     table_name = table["name"]
-    col_names = ",".join(map(lambda col: col["name"], table["columns"]))
-    return f"{table_name}-{col_names}"
+    db_name = table["dbName"]
+    col_names = list(map(lambda col: col["name"], table["columns"]))
+    col_names.sort()
+    col_names = ",".join(col_names)
+    return f"{db_name}.{table_name}-{col_names}"
 
 def perform_sql_task(request, task: TaskType, input: str, sql: str, dialect: str, metadata: dict) -> SQLResponse:
     service = _service_factory(AI_INTERFACE.SERVICE.get())
