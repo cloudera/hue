@@ -235,6 +235,7 @@ export const getRelevantTableDetails = async (
     try {
       const columns = await fetchColumnsData(databaseName, tableName, executor);
       const tableDetails = {
+        dbName: databaseName,
         name: tableName,
         columns: columns.map(({ definition }) => {
           return definition;

@@ -23,6 +23,7 @@ import logging
 import sqlparse
 import sys
 
+from typing import List
 
 from django.urls import reverse
 from django.db.models import Q
@@ -331,6 +332,55 @@ def fetch_result_data(request):
 
     return JsonResponse(response)
 
+class TableReader:
+  def __init__(self, request, dialect) -> None:
+    self.dialect = dialect
+
+    snippet = {
+      "type": dialect,
+      "result": {
+        "handle": {
+          "statement": ""
+        }
+      },
+      "statement": "",
+      "properties": {}
+    }
+
+    self.notebook = {
+      "type": dialect,
+      "sessions": [
+        {
+          'type': dialect,
+          'properties': HS2Api.get_properties(dialect),
+          'id': None
+        }
+      ]
+    }
+
+    self.api = get_api(request, snippet)
+
+  def build_select_sql(self, db_name: str, table_name: str, columns: List[str], limit: int) -> str:
+    if self.dialect in ["hive", "impala"]:
+      column_names = ", ".join(columns)
+      return f"SELECT {column_names} FROM {db_name}.{table_name} LIMIT {limit}"
+    else:
+      raise Exception(f"Unsupported dialect - {self.dialect}")
+
+  def fetch(self, db_name: str, table_name: str, columns: List[str], limit: int):
+    statement = self.build_select_sql(db_name, table_name, columns, limit)
+
+    read_snippet = {
+      "type": self.dialect,
+      "statement": statement,
+      "result": {},
+      "properties": {}
+    }
+    read_snippet["result"]["handle"] = self.api.execute(self.notebook, read_snippet)
+    result = self.api.fetch_result(self.notebook, read_snippet, limit, False)
+    data = escape_rows(result['data'], nulls_only=False)
+
+    return data
 
 def _fetch_result_data(request, notebook=None, snippet=None, operation_id=None, rows=100, start_over=False, nulls_only=False):
   snippet = _get_snippet(request.user, notebook, snippet, operation_id)
