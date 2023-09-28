@@ -17,6 +17,11 @@ from notebook.api import TableReader
 
 from desktop.conf import AI_INTERFACE
 
+# Following best practices sugested in https://arxiv.org/abs/2204.00498
+SAMPLE_ROWS = 3
+
+MAX_VALUE_LENGTH = 20
+
 def _model_factory(model: str, task: TaskType) -> BaseModel:
     if model == "gpt":
         return GPTModel(task)
@@ -54,8 +59,6 @@ def build_create_table_ddl(table: dict) -> str:
 
     return f'CREATE TABLE {table_name} ({column_names});'
 
-SAMPLE_ROWS = 3
-# Following best practices sugested in https://arxiv.org/abs/2204.00498
 def build_sample_data(reader: TableReader, table) -> str:
     table_name = table["name"]
     db_name = table["dbName"]
@@ -64,7 +67,7 @@ def build_sample_data(reader: TableReader, table) -> str:
     rows = reader.fetch(db_name, table["name"], col_names, SAMPLE_ROWS)
 
     col_str = ", ".join(col_names)
-    rows_str = "\n".join(map(lambda row: ", ".join(str(v) for v in row), rows))
+    rows_str = "\n".join(map(lambda row: ", ".join(str(v)[0:MAX_VALUE_LENGTH] for v in row), rows))
 
     row_count = len(rows)
     if row_count > 0:
