@@ -274,7 +274,7 @@ def sql(request):
   metadata = request.data.get("metadata")
 
   if is_ai_interface_enabled():
-    response = perform_sql_task(task, input, sql, dialect, metadata)
+    response = perform_sql_task(request, task, input, sql, dialect, metadata)
     return JsonResponse(dataclasses.asdict(response))
   else:
     return llm_sql_disabled_response
