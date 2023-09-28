@@ -12,6 +12,7 @@ from .services.base_service import BaseService
 from .services.openai import OpenAiService
 from .services.bedrock import BedrockService
 from .services.azure import AzureService
+from ..utils.cache import LRUCache
 
 from notebook.api import TableReader
 
@@ -21,6 +22,8 @@ from desktop.conf import AI_INTERFACE
 SAMPLE_ROWS = 3
 
 MAX_VALUE_LENGTH = 20
+
+table_meta_cache = LRUCache(AI_INTERFACE.TABLE_META_CACHE_SIZE.get())
 
 def _model_factory(model: str, task: TaskType) -> BaseModel:
     if model == "gpt":
@@ -81,6 +84,11 @@ def build_sample_data(reader: TableReader, table) -> str:
     else:
         return "/*\nTable is empty\n*/"
 
+def get_table_key(table) -> str:
+    table_name = table["name"]
+    col_names = ",".join(map(lambda col: col["name"], table["columns"]))
+    return f"{table_name}-{col_names}"
+
 def perform_sql_task(request, task: TaskType, input: str, sql: str, dialect: str, metadata: dict) -> SQLResponse:
     service = _service_factory(AI_INTERFACE.SERVICE.get())
     model = _model_factory(AI_INTERFACE.MODEL.get() or service.get_default_model(), task)
@@ -90,9 +98,14 @@ def perform_sql_task(request, task: TaskType, input: str, sql: str, dialect: str
     table_metadatas = []
     if metadata:
         for table in metadata["tables"]:
-            create_ddl = build_create_table_ddl(table)
-            sample_data = build_sample_data(reader, table)
-            table_metadatas.append(f"{create_ddl}\n{sample_data}")
+            table_key = get_table_key(table)
+            table_meta = table_meta_cache.get(table_key)
+            if table_meta == None:
+                create_ddl = build_create_table_ddl(table)
+                sample_data = build_sample_data(reader, table)
+                table_meta = f"{create_ddl}\n{sample_data}"
+                table_meta_cache.put(table_key, table_meta)
+            table_metadatas.append(table_meta)
 
     metadata_str = '\n\n'.join(table_metadatas)
     prompt = model.build_prompt(input, sql, dialect, metadata_str)
