@@ -59,6 +59,12 @@ def build_create_table_ddl(table: dict) -> str:
 
     return f'CREATE TABLE {table_name} ({column_names});'
 
+def get_val_str(value) -> str:
+    value = str(value)
+    if len(value) > MAX_VALUE_LENGTH:
+        value = value[:MAX_VALUE_LENGTH] + "..."
+    return value
+
 def build_sample_data(reader: TableReader, table) -> str:
     table_name = table["name"]
     db_name = table["dbName"]
@@ -67,7 +73,7 @@ def build_sample_data(reader: TableReader, table) -> str:
     rows = reader.fetch(db_name, table["name"], col_names, SAMPLE_ROWS)
 
     col_str = ", ".join(col_names)
-    rows_str = "\n".join(map(lambda row: ", ".join(str(v)[0:MAX_VALUE_LENGTH] for v in row), rows))
+    rows_str = "\n".join(map(lambda row: ", ".join(get_val_str(v) for v in row), rows))
 
     row_count = len(rows)
     if row_count > 0:
