@@ -438,7 +438,7 @@ class S3FileSystem(object):
   @translate_s3_error
   @auth_error_handler
   def copy(self, src, dst, recursive=False, *args, **kwargs):
-    return self._copy(src, dst, recursive=recursive, use_src_basename=True)
+    self._copy(src, dst, recursive=recursive, use_src_basename=True)
 
   @translate_s3_error
   @auth_error_handler
@@ -462,6 +462,10 @@ class S3FileSystem(object):
     if src_st.isDir and dst_st and not dst_st.isDir:
       raise S3FileSystemException("Cannot overwrite non-directory '%s' with directory '%s'" % (dst, src))
 
+    # Skip operation if destination path is same as source path
+    if self._check_key_parent_path(src, dst):
+      raise S3FileSystemException('Destination path is same as the source path, skipping the operation.')
+
     src_bucket, src_key = s3.parse_uri(src)[:2]
     dst_bucket, dst_key = s3.parse_uri(dst)[:2]
 
@@ -478,9 +482,6 @@ class S3FileSystem(object):
       if not src_key.endswith('/'):
         cut += 1
 
-    # Initially set to False assuming copy operation will work fine.
-    skip_copy = False
-
     for key in src_bucket.list(prefix=src_key):
       if not key.name.startswith(src_key):
         raise S3FileSystemException(_("Invalid key to transform: %s") % key.name)
@@ -489,24 +490,28 @@ class S3FileSystem(object):
       if self.isdir(normpath(self.join(S3A_ROOT, key.bucket.name, key.name))):
         dst_name = self._append_separator(dst_name)
 
-      # Set skip_copy to True if the key already exist in destination path and copy is skipped.
-      # This helps later to not the delete the source key then.
-      if dst_bucket.get_key(dst_name, validate=True):
-        skip_copy = True
-
       key.copy(dst_bucket, dst_name)
-
-    return skip_copy
 
   @translate_s3_error
   @auth_error_handler
   def rename(self, old, new):
     new = s3.abspath(old, new)
-    skip_copy = self.copy(old, new, recursive=True)
 
-    # Don't delete the source key if the copy operation was skipped.
-    if not skip_copy:
+    # Skip operation if destination path is same as source path
+    if not self._check_key_parent_path(old, new):
+      self.copy(old, new, recursive=True)
       self.rmtree(old, skipTrash=True)
+    else:
+      raise S3FileSystemException('Destination path is same as source path, skipping the operation.')
+  
+  @translate_s3_error
+  @auth_error_handler
+  def _check_key_parent_path(self, src, dst):
+    # Return True if parent path of source is same as destination path.
+    if S3FileSystem.parent_path(src) == dst:
+      return True
+    else:
+      return False
 
   @translate_s3_error
   @auth_error_handler
