@@ -438,7 +438,7 @@ class S3FileSystem(object):
   @translate_s3_error
   @auth_error_handler
   def copy(self, src, dst, recursive=False, *args, **kwargs):
-    self._copy(src, dst, recursive=recursive, use_src_basename=True)
+    return self._copy(src, dst, recursive=recursive, use_src_basename=True)
 
   @translate_s3_error
   @auth_error_handler
@@ -478,6 +478,9 @@ class S3FileSystem(object):
       if not src_key.endswith('/'):
         cut += 1
 
+    # Initially set to False assuming copy operation will work fine.
+    skip_copy = False
+
     for key in src_bucket.list(prefix=src_key):
       if not key.name.startswith(src_key):
         raise S3FileSystemException(_("Invalid key to transform: %s") % key.name)
@@ -486,14 +489,24 @@ class S3FileSystem(object):
       if self.isdir(normpath(self.join(S3A_ROOT, key.bucket.name, key.name))):
         dst_name = self._append_separator(dst_name)
 
+      # Set skip_copy to True if the key already exist in destination path and copy is skipped.
+      # This helps later to not the delete the source key then.
+      if dst_bucket.get_key(dst_name, validate=True):
+        skip_copy = True
+
       key.copy(dst_bucket, dst_name)
+
+    return skip_copy
 
   @translate_s3_error
   @auth_error_handler
   def rename(self, old, new):
     new = s3.abspath(old, new)
-    self.copy(old, new, recursive=True)
-    self.rmtree(old, skipTrash=True)
+    skip_copy = self.copy(old, new, recursive=True)
+
+    # Don't delete the source key if the copy operation was skipped.
+    if not skip_copy:
+      self.rmtree(old, skipTrash=True)
 
   @translate_s3_error
   @auth_error_handler
