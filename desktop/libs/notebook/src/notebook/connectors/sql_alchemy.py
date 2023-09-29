@@ -441,11 +441,6 @@ class SqlAlchemyApi(Api):
 
   @query_error_handler
   def autocomplete(self, snippet, database=None, table=None, column=None, nested=None, operation=None):
-    if snippet['type'] == 'phoenix':
-      if database:
-        database = database.upper()
-      if table:
-        table = table.upper()
     engine = self._get_engine()
     inspector = inspect(engine)
 
