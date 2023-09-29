@@ -71,18 +71,22 @@ def get_val_str(value) -> str:
 def build_sample_data(reader: TableReader, table) -> str:
     table_name = table["name"]
     db_name = table["dbName"]
-
     col_names = list(map(lambda col: col["name"], table["columns"]))
-    rows = reader.fetch(db_name, table["name"], col_names, SAMPLE_ROWS)
 
-    col_str = DATA_DELIMITER.join(col_names)
-    rows_str = "\n".join(map(lambda row: DATA_DELIMITER.join(get_val_str(v) for v in row), rows))
+    try:
+      rows = reader.fetch(db_name, table["name"], col_names, SAMPLE_ROWS)
 
-    row_count = len(rows)
-    if row_count > 0:
-        return f"/*\n{row_count} example rows of table {table_name}:\n{col_str}\n{rows_str}\n*/"
-    else:
-        return "/*\nTable is empty\n*/"
+      col_str = DATA_DELIMITER.join(col_names)
+      rows_str = "\n".join(map(lambda row: DATA_DELIMITER.join(get_val_str(v) for v in row), rows))
+
+      row_count = len(rows)
+      if row_count > 0:
+          return f"/*\n{row_count} example rows of table {table_name}:\n{col_str}\n{rows_str}\n*/"
+      else:
+          return "/*\nTable is empty\n*/"
+    except Exception as exc:
+      LOG.error(f"Error fetching sample data for table {table_name} - {exc}")
+      return "/*\nExample rows not available\n*/"
 
 def get_table_key(table) -> str:
     table_name = table["name"]
