@@ -378,6 +378,9 @@ class TableReader:
       "properties": {}
     }
     read_snippet["result"]["handle"] = self.api.execute(self.notebook, read_snippet)
+    while self.api.check_status(self.notebook, read_snippet)['status'] == 'running':
+      # TODO: Make this async
+      time.sleep(0.2)
     result = self.api.fetch_result(self.notebook, read_snippet, limit, False)
     return list(result['data'])
 
