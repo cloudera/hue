@@ -1452,14 +1452,14 @@ else:
         });
       };
       
-      self.allowCopyMoveTo = function (destination) {
-        const removeLastSlash = function (path) {
-          if (path.charAt(path.length - 1) === '/') {
-            return path.slice(0, -1);
-          }
-          return path;
-        };
+      const removeLastSlash = function (path) {
+        if (path.charAt(path.length - 1) === '/') {
+          return path.slice(0, -1);
+        }
+        return path;
+      };
 
+      self.allowCopyMoveTo = function (destination) {
         const source = self.currentPath();
         return removeLastSlash(source) !== removeLastSlash(destination);
       };
