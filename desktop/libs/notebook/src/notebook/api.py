@@ -22,6 +22,7 @@ import logging
 
 import sqlparse
 import sys
+import time
 
 from typing import List
 
@@ -378,9 +379,7 @@ class TableReader:
     }
     read_snippet["result"]["handle"] = self.api.execute(self.notebook, read_snippet)
     result = self.api.fetch_result(self.notebook, read_snippet, limit, False)
-    data = escape_rows(result['data'], nulls_only=False)
-
-    return data
+    return list(result['data'])
 
 def _fetch_result_data(request, notebook=None, snippet=None, operation_id=None, rows=100, start_over=False, nulls_only=False):
   snippet = _get_snippet(request.user, notebook, snippet, operation_id)
