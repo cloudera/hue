@@ -23,7 +23,7 @@ SAMPLE_ROWS = 3
 MAX_VALUE_LENGTH = 20
 DATA_DELIMITER = ","
 
-table_meta_cache = LRUCache(AI_INTERFACE.TABLE_META_CACHE_SIZE.get())
+table_meta_cache = LRUCache(AI_INTERFACE.TABLE_DATA_CACHE_SIZE.get())
 
 def _model_factory(model: str, task: TaskType) -> BaseModel:
     if model == "gpt":
