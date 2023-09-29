@@ -24,6 +24,7 @@ MAX_VALUE_LENGTH = 20
 DATA_DELIMITER = ","
 
 table_meta_cache = LRUCache(AI_INTERFACE.TABLE_DATA_CACHE_SIZE.get())
+ADD_TABLE_DATA = AI_INTERFACE.ADD_TABLE_DATA.get()
 
 def _model_factory(model: str, task: TaskType) -> BaseModel:
     if model == "gpt":
@@ -96,25 +97,29 @@ def get_table_key(table) -> str:
     col_names = ",".join(col_names)
     return f"{db_name}.{table_name}-{col_names}"
 
+def format_metadata(metadata, reader) -> str:
+    table_metadatas = []
+
+    for table in metadata["tables"]:
+        table_key = get_table_key(table)
+        table_meta = table_meta_cache.get(table_key)
+        if table_meta == None:
+            table_meta = build_create_table_ddl(table)
+            if ADD_TABLE_DATA:
+                sample_data = build_sample_data(reader, table)
+                table_meta = f"{table_meta}\n{sample_data}"
+            table_meta_cache.put(table_key, table_meta)
+        table_metadatas.append(table_meta)
+
+    return '\n\n'.join(table_metadatas)
+
 def perform_sql_task(request, task: TaskType, input: str, sql: str, dialect: str, metadata: dict) -> SQLResponse:
     service = _service_factory(AI_INTERFACE.SERVICE.get())
     model = _model_factory(AI_INTERFACE.MODEL.get() or service.get_default_model(), task)
 
     reader = TableReader(request, "hive")
+    metadata_str = format_metadata(metadata, reader) if metadata else ""
 
-    table_metadatas = []
-    if metadata:
-        for table in metadata["tables"]:
-            table_key = get_table_key(table)
-            table_meta = table_meta_cache.get(table_key)
-            if table_meta == None:
-                create_ddl = build_create_table_ddl(table)
-                sample_data = build_sample_data(reader, table)
-                table_meta = f"{create_ddl}\n{sample_data}"
-                table_meta_cache.put(table_key, table_meta)
-            table_metadatas.append(table_meta)
-
-    metadata_str = '\n\n'.join(table_metadatas)
     prompt = model.build_prompt(input, sql, dialect, metadata_str)
     response_str = service.process(prompt)
     response = model.parse_response(response_str)
