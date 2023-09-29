@@ -23,20 +23,20 @@ METADATA: {metadata}
 
 # NOTE: Can't get the approach of using a semanticerror tag to work with this template. Likely too much noice. 
 # If the EDIT_INSTRUCTION is non-sensical then the LLM will often return the SQL as is which is then handled as a non diff in the UI. 
-_EDIT = """Act as an {dialect} SQL expert. Use the EDIT_INSTRUCTION below and modify the SQL using the following metadata: {metadata}.
+_EDIT= """
+YOUR MAIN GOAL:
+Act as an {dialect} SQL expert and modify the SQL based on the INPUT. Return the SQL wrapped in a <code> tag.
 Use lower() and LIKE '%%' unless you are sure about how to match the data.
 
+YOUR ADDITIONAL GOALS:
+List any assumptions not covered by the supplied metadata wrapped in an <assumptions> tag.
+Always include a warning in a <warning> tag if the generated SQL modifies or deletes data or risk being very resource-intensive. The warning should inform why the SQL could be dangeroues to execute.
+
 SQL: {sql}
-EDIT_INSTRUCTION: {input}
 
-Always list any assumptions not covered by the supplied metadata.
-Always warn if the generated SQL modifies or deletes data. The warning should inform why the SQL could be dangeroues to execute.
-Only return any SQL if you have modified it based on the EDIT_INSTRUCTION in wrapped in <code>.
+INPUT: {input}
 
-Return the result in the following format:
-<code></code>
-<assumptions></assumptions>
-<warning></warning>
+METADATA: {metadata}
 """
 
 _SUMMARIZE = """Act as an {dialect} SQL expert. Based on the input Summarize the SQL using the following metadata: {metadata}.
@@ -79,6 +79,7 @@ Return the result in the following format:
 
 
 def _code_assumptions_parser(response: str) -> SQLResponse:
+    # LOG.debug('\n\n' + response + '\n\n')
     return SQLResponse(
         sql=extract_tag_content('code', response),
         assumptions=extract_tag_content('assumptions', response),
