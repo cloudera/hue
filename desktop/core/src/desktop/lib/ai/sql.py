@@ -20,8 +20,8 @@ from desktop.conf import AI_INTERFACE
 
 # Following best practices sugested in https://arxiv.org/abs/2204.00498
 SAMPLE_ROWS = 3
-
 MAX_VALUE_LENGTH = 20
+DATA_DELIMITER = ","
 
 table_meta_cache = LRUCache(AI_INTERFACE.TABLE_META_CACHE_SIZE.get())
 
@@ -63,9 +63,9 @@ def build_create_table_ddl(table: dict) -> str:
     return f'CREATE TABLE {table_name} ({column_names});'
 
 def get_val_str(value) -> str:
-    value = str(value)
+    value = str(value).strip()
     if len(value) > MAX_VALUE_LENGTH:
-        value = value[:MAX_VALUE_LENGTH] + "..."
+        value = value[:MAX_VALUE_LENGTH].strip() + "..."
     return value
 
 def build_sample_data(reader: TableReader, table) -> str:
@@ -75,8 +75,8 @@ def build_sample_data(reader: TableReader, table) -> str:
     col_names = list(map(lambda col: col["name"], table["columns"]))
     rows = reader.fetch(db_name, table["name"], col_names, SAMPLE_ROWS)
 
-    col_str = ", ".join(col_names)
-    rows_str = "\n".join(map(lambda row: ", ".join(get_val_str(v) for v in row), rows))
+    col_str = DATA_DELIMITER.join(col_names)
+    rows_str = "\n".join(map(lambda row: DATA_DELIMITER.join(get_val_str(v) for v in row), rows))
 
     row_count = len(rows)
     if row_count > 0:
