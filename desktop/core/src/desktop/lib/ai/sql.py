@@ -117,7 +117,7 @@ def perform_sql_task(request, task: TaskType, input: str, sql: str, dialect: str
     service = _service_factory(AI_INTERFACE.SERVICE.get())
     model = _model_factory(AI_INTERFACE.MODEL.get() or service.get_default_model(), task)
 
-    reader = TableReader(request, "hive")
+    reader = TableReader(request, dialect)
     metadata_str = format_metadata(metadata, reader) if metadata else ""
 
     prompt = model.build_prompt(input, sql, dialect, metadata_str)
