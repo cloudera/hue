@@ -1040,9 +1040,10 @@ def describe(request, database, table=None, column=None):
   source_type = request.POST.get('source_type', '')
   cluster = json.loads(request.POST.get('cluster', '{}'))
   connector = cluster if cluster else json.loads(request.POST.get('connector', '{}'))
+  compute = json.loads(request.POST.get('compute', '{}'))
 
-  snippet = {'type': source_type, 'connector': connector}
-  patch_snippet_for_connector(snippet)
+  snippet = {'type': source_type, 'connector': connector, 'compute': compute}
+  patch_snippet_for_connector(snippet, user=request.user)
 
   describe = get_api(request, snippet).describe(notebook, snippet, database, table, column=column)
   response.update(describe)
