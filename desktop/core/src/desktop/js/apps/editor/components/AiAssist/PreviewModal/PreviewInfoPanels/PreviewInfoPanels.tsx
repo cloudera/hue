@@ -5,6 +5,7 @@ import './PreviewInfoPanels.scss';
 
 export interface PreviewInfoPanelsProps {
   explanation?: string;
+  summary?: string;
   assumptions?: string;
   alternativeActions?: string;
   guardrailAlert?: GuardrailAlert;
@@ -13,6 +14,7 @@ export interface PreviewInfoPanelsProps {
 const PreviewInfoPanels = ({
   alternativeActions,
   explanation,
+  summary,
   assumptions,
   guardrailAlert
 }: PreviewInfoPanelsProps) => {
@@ -21,6 +23,12 @@ const PreviewInfoPanels = ({
     <div className="hue-preview-info-panels">
       {(explanation || assumptions) && (
         <>
+          {summary && (
+            <>
+              <h4 className="hue-preview-info__title">Summary</h4>
+              <p className="hue-preview-info__text-container">{summary}</p>
+            </>
+          )}
           <h4 className="hue-preview-info__title">{explanation ? 'Explanation' : 'Assumptions'}</h4>
           <p className="hue-preview-info__text-container">
             {explanation ? explanation : assumptions}{' '}
