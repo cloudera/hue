@@ -36,7 +36,8 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.models import Document2, get_cluster_config, _get_apps
 
 from beeswax.design import hql_query
-from beeswax.models import SavedQuery, Namespace
+from beeswax.common import find_compute
+from beeswax.models import SavedQuery
 from beeswax.server import dbms
 from beeswax.server.dbms import get_query_server_config
 from desktop.lib.view_util import location_to_url
@@ -782,15 +783,7 @@ def _find_cluster(request):
   cluster = json.loads(request.POST.get('cluster', '{}'))
   source_type = request.POST.get('source_type', request.GET.get('connector_id', request.GET.get('source_type', 'hive')))
   namespace_id = request.GET.get('namespace')
-  if not cluster:
-    # Find the default compute
-    if namespace_id:
-      ns = Namespace.objects.filter(id=namespace_id).first()
-    else:
-      ns = Namespace.objects.filter(dialect=source_type).first()
-    if ns:
-      computes = ns.get_computes(request.user) if ns else None
-      cluster = computes[0] if computes else None
+  cluster = find_compute(cluster=cluster, user=request.user, namespace_id=namespace_id, dialect=source_type)
   return cluster
 
 def _get_servername(db):

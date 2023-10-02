@@ -45,7 +45,7 @@ from beeswax.conf import HIVE_SERVER_HOST, HIVE_SERVER_PORT, HIVE_SERVER_HOST, H
     HIVE_DISCOVERY_HS2, HIVE_DISCOVERY_LLAP, HIVE_DISCOVERY_LLAP_HA, HIVE_DISCOVERY_LLAP_ZNODE, CACHE_TIMEOUT, \
     LLAP_SERVER_HOST, LLAP_SERVER_PORT, LLAP_SERVER_THRIFT_PORT, USE_SASL as HIVE_USE_SASL, CLOSE_SESSIONS, has_session_pool, \
     MAX_NUMBER_OF_SESSIONS
-from beeswax.common import apply_natural_sort
+from beeswax.common import apply_natural_sort, is_compute
 from beeswax.design import hql_query
 from beeswax.hive_site import hiveserver2_use_ssl, hiveserver2_impersonation_enabled, get_hiveserver2_kerberos_principal, \
     hiveserver2_transport_mode, hiveserver2_thrift_http_path
@@ -143,8 +143,7 @@ def get(user, query_server=None, cluster=None):
 
 
 def get_query_server_config(name='beeswax', connector=None):
-  if connector and (has_connectors() or connector.get('compute')
-                    or connector.get('type') in ('hive-compute', 'impala-compute')):
+  if connector and (has_connectors() or is_compute(connector)):
     LOG.debug("Query via connector %s (%s)" % (name, connector.get('type')))
     query_server = get_query_server_config_via_connector(connector)
   else:
