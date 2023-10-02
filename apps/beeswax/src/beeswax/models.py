@@ -649,8 +649,7 @@ class Namespace(models.Model):
       'description': self.description,
       'dialect': self.dialect,
       'interface': self.interface,
-      'external_id': self.external_id,
-      'last_modified': self.last_modified
+      'external_id': self.external_id
     }
 
 class Compute(models.Model):
@@ -692,8 +691,7 @@ class Compute(models.Model):
       'interface': self.interface,
       'is_ready': self.is_ready,
       'options': self.options,
-      'external_id': self.external_id,
-      'last_modified': self.last_modified
+      'external_id': self.external_id
     }
 
   @property
