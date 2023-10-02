@@ -31,6 +31,7 @@ interface PreviewModalProps {
   suggestion: string;
   assumptions: string;
   explanation: string;
+  summary: string;
   nql?: string;
   guardrailAlert?: GuardrailAlert;
   onCancel: () => void;
@@ -49,6 +50,7 @@ const PreviewModal = ({
   suggestion: suggestionRaw = '',
   assumptions = '',
   explanation = '',
+  summary = '',
   nql = '',
   guardrailAlert,
   onCancel,
@@ -156,6 +158,7 @@ const PreviewModal = ({
         )}
       </div>
       <PreviewInfoPanels
+        summary={summary}
         explanation={explanation}
         assumptions={assumptions}
         guardrailAlert={guardrailAlert}

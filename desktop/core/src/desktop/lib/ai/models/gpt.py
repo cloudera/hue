@@ -39,8 +39,14 @@ INPUT: {input}
 METADATA: {metadata}
 """
 
-_SUMMARIZE = """Act as an {dialect} SQL expert. Based on the input Summarize the SQL using the following metadata: {metadata}.
-Explain in natural language using non technical terms, what this query does: {sql}.
+_SUMMARIZE = """
+SQL: {sql}
+
+METADATA: {metadata}
+
+Act as an {dialect} SQL expert. Explain in detail what the provided SQL query does and wrap the explation in an <explain> tag with closing </explain>.
+Provide a short summary in natural language of the expected result. Wrap the summary in a <summary> tag tag with closing </summary>.
+
 """
 
 _OPTIMIZE = """Act as an {dialect} SQL expert.
@@ -79,7 +85,6 @@ Return the result in the following format:
 
 
 def _code_assumptions_parser(response: str) -> SQLResponse:
-    # LOG.debug('\n\n' + response + '\n\n')
     return SQLResponse(
         sql=extract_tag_content('code', response),
         assumptions=extract_tag_content('assumptions', response),
@@ -99,7 +104,8 @@ def _code_explain_parser(response: str) -> SQLResponse:
 
 def _summary_parser(response: str) -> SQLResponse:
     return SQLResponse(
-        summary=response,
+        summary=extract_tag_content('summary', response),
+        explain=extract_tag_content('explain', response),
     )
 
 

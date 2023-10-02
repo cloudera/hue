@@ -76,6 +76,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
   const [showSuggestedSqlModal, setShowSuggestedSqlModal] = useState(false);
   const [showGuardrailsModal, setShowGuardrailsModal] = useState(false);
   const [explanation, setExplanation] = useState('');
+  const [summary, setSummary] = useState('');
   const [suggestion, setSuggestion] = useState('');
   const [suggestionExplanation, setSuggestionExplanation] = useState('');
   const [assumptions, setAssumptions] = useState('');
@@ -104,7 +105,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
     const executor = activeExecutable?.executor;
     const databaseName = activeExecutable?.database || '';
     const dialect = sqlDialect;
-    const { summary, error } = await generateExplanation({
+    const { explain, summary, error } = await generateExplanation({
       statement,
       dialect,
       executor,
@@ -115,7 +116,8 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
       handleApiError(error.message);
     } else {
       setSuggestion(statement);
-      setExplanation(breakLines(summary));
+      setExplanation(breakLines(explain));
+      setSummary(breakLines(summary));
       setShowSuggestedSqlModal(true);
     }
     setIsLoading(false);
@@ -298,6 +300,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
     setIsGenerateMode(false);
     setShowSuggestedSqlModal(false);
     setExplanation('');
+    setSummary('');
     setSuggestion('');
     setSuggestionExplanation('');
     setAssumptions('');
@@ -461,6 +464,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
           open
           onCancel={() => {
             setExplanation('');
+            setSummary('');
             setSuggestionExplanation('');
             setShowSuggestedSqlModal(false);
             setIsOptimizeMode(false);
@@ -472,6 +476,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
           showDiffFrom={!isGenerateMode && !explanation ? parsedStatement?.statement : undefined}
           assumptions={assumptions}
           explanation={explanation || suggestionExplanation}
+          summary={summary}
           nql={nql}
           lineNumberStart={getSelectedLineNumbers(parsedStatement).firstLine}
           dialect={sqlDialect}
