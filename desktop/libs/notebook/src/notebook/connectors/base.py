@@ -25,13 +25,12 @@ import uuid
 
 from django.utils.encoding import smart_str
 
-from beeswax.models import Compute
+from beeswax.common import find_compute, is_compute
 from desktop.auth.backend import is_admin
 from desktop.conf import TASK_SERVER, has_connectors
 from desktop.lib import export_csvxls
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_unicode
-from desktop.models import get_cluster_config
 from metadata.optimizer.base import get_api as get_optimizer_api
 
 from notebook.conf import get_ordered_interpreters
@@ -402,17 +401,20 @@ def get_interpreter(connector_type, user=None):
   return interpreter[0]
 
 
-def patch_snippet_for_connector(snippet):
+def patch_snippet_for_connector(snippet, user=None):
   """
   Connector backward compatibility switcher.
   # TODO Connector unification
   """
-  if snippet['type'] == 'hive-compute' or snippet['type'] == 'impala-compute':
-    # No patching is needed
+  if is_compute(snippet):
+    snippet['connector'] = find_compute(cluster=snippet, user=user)
+    if snippet['connector'] and snippet['connector'].get('dialect'):
+      snippet['dialect'] = snippet['connector']['dialect']
     return
   if snippet.get('connector') and snippet['connector'].get('type'):
-    if snippet['connector']['dialect'] != 'hplsql':   # this is a workaround for hplsql describe not working
+    if snippet['connector'].get('dialect') != 'hplsql':   # this is a workaround for hplsql describe not working
       snippet['type'] = snippet['connector']['type']  # To rename to 'id'
+  if snippet.get('connector') and snippet['connector'].get('dialect'):
     snippet['dialect'] = snippet['connector']['dialect']
   else:
     snippet['dialect'] = snippet['type']
@@ -427,7 +429,7 @@ def get_api(request, snippet):
   if snippet.get('type') == 'report':
     snippet['type'] = 'impala'
 
-  patch_snippet_for_connector(snippet)
+  patch_snippet_for_connector(snippet, request.user)
 
   connector_name = snippet['type']
 
@@ -435,13 +437,9 @@ def get_api(request, snippet):
   if has_connectors() and snippet.get('type') == 'hello' and is_admin(request.user):
     LOG.debug('Using the interpreter from snippet')
     interpreter = snippet.get('interpreter')
-  elif get_cluster_config(request.user).get('has_computes'):
-    if snippet.get('type') in ('hive-compute', 'impala-compute') and snippet.get('id'):
-      LOG.debug("Loading the compute from db using snippet['id']: %s" % snippet['id'])
-      interpreter = Compute.objects.get(id=snippet['id']).to_dict()
-    if snippet.get('compute'):
-      LOG.debug("Using the compute as is from snippet['compute']")
-      interpreter = snippet['compute']
+  elif is_compute(snippet):
+    LOG.debug("Finding the compute from db using snippet: %s" % snippet)
+    interpreter = find_compute(cluster=snippet, user=request.user)
   elif has_connectors() and snippet.get('connector'):
     LOG.debug("Connectors are enabled and picking the connector from snippet['connector']")
     interpreter = snippet['connector']
@@ -619,7 +617,7 @@ class Api(object):
     query = response['statement']
 
     client = get_optimizer_api(self.user, interface)
-    patch_snippet_for_connector(snippet)
+    patch_snippet_for_connector(snippet, self.user)
 
     return client.query_risk(query=query, source_platform=snippet['dialect'], db_name=snippet.get('database') or 'default')
 
