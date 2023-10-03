@@ -57,7 +57,6 @@ export async function LoadDataCatalogs() {
 
     for (let i = 0; i < numTablesToLoad; i++) {
       const eachTable = dataCatalogEntry.tables_meta[i];
-      console.log("loading " + eachTable.name);
       await delay(100);
       try {
         await fetchColumnsData(databaseName, eachTable.name, data.entry);
