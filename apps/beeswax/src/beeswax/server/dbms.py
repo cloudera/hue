@@ -27,6 +27,7 @@ from django.core.cache import caches
 from django.urls import reverse
 from kazoo.client import KazooClient
 
+from beeswax.models import Compute
 from desktop.conf import CLUSTER_ID, has_connectors
 from desktop.lib.django_util import format_preserving_redirect
 from desktop.lib.exceptions_renderable import PopupException
@@ -44,7 +45,7 @@ from beeswax.conf import HIVE_SERVER_HOST, HIVE_SERVER_PORT, HIVE_SERVER_HOST, H
     HIVE_DISCOVERY_HS2, HIVE_DISCOVERY_LLAP, HIVE_DISCOVERY_LLAP_HA, HIVE_DISCOVERY_LLAP_ZNODE, CACHE_TIMEOUT, \
     LLAP_SERVER_HOST, LLAP_SERVER_PORT, LLAP_SERVER_THRIFT_PORT, USE_SASL as HIVE_USE_SASL, CLOSE_SESSIONS, has_session_pool, \
     MAX_NUMBER_OF_SESSIONS
-from beeswax.common import apply_natural_sort
+from beeswax.common import apply_natural_sort, is_compute
 from beeswax.design import hql_query
 from beeswax.hive_site import hiveserver2_use_ssl, hiveserver2_impersonation_enabled, get_hiveserver2_kerberos_principal, \
     hiveserver2_transport_mode, hiveserver2_thrift_http_path
@@ -142,8 +143,8 @@ def get(user, query_server=None, cluster=None):
 
 
 def get_query_server_config(name='beeswax', connector=None):
-  if connector and has_connectors(): # TODO: Give empty connector when no connector in use
-    LOG.debug("Query via connector %s" % name)
+  if connector and (has_connectors() or is_compute(connector)):
+    LOG.debug("Query via connector %s (%s)" % (name, connector.get('type')))
     query_server = get_query_server_config_via_connector(connector)
   else:
     LOG.debug("Query via ini %s" % name)
@@ -306,28 +307,27 @@ def get_query_server_config(name='beeswax', connector=None):
 
 def get_query_server_config_via_connector(connector):
   # TODO: connector is actually a notebook interpreter
-  connector_name = full_connector_name = connector['type']
-  compute_name = None
-  if connector.get('compute'):
-    compute_name = connector['compute']['name']
-    full_connector_name = '%s-%s' % (connector_name, compute_name)
-  LOG.debug("Query cluster connector %s compute %s" % (connector_name, compute_name))
+  compute = connector.get('compute', connector)
+  connector_name = connector['type']
+  compute_name = compute['name']
+  if compute.get('id'):
+    compute = Compute.objects.get(id=compute['id']).to_dict() #Reload the full compute from db
+  LOG.debug("Query cluster connector %s compute %s" % (connector_name, compute))
 
-  if connector['options'].get('has_ssh') == 'true':
+  if compute['options'].get('has_ssh') == 'true':
     server_host = '127.0.0.1'
-    server_port = connector['options']['server_port']
   else:
-    server_host = (connector['compute']['options'] if 'compute' in connector else connector['options'])['server_host']
-    server_port = int((connector['compute']['options'] if 'compute' in connector else connector['options'])['server_port'])
+    server_host = compute['options']['server_host']
+  server_port = int(compute['options']['server_port'])
 
-  if 'impersonation_enabled' in connector['options']:
-    impersonation_enabled = connector['options']['impersonation_enabled'] == 'true'
+  if 'impersonation_enabled' in compute['options']:
+    impersonation_enabled = bool(compute['options']['impersonation_enabled'])
   else:
     impersonation_enabled = hiveserver2_impersonation_enabled()
 
   return {
-      'dialect': connector['dialect'],
-      'server_name': full_connector_name,
+      'dialect': compute['dialect'],
+      'server_name': compute_name,
       'server_host': server_host,
       'server_port': server_port,
       'principal': 'TODO',
@@ -335,10 +335,12 @@ def get_query_server_config_via_connector(connector):
       'auth_password': AUTH_PASSWORD.get(),
 
       'impersonation_enabled': impersonation_enabled,
-      'use_sasl': connector['options'].get('use_sasl', 'true') == 'true',
+      'use_sasl': str(compute['options'].get('use_sasl', True)).upper() == 'TRUE',
       'SESSION_TIMEOUT_S': 15 * 60,
       'querycache_rows': 1000,
       'QUERY_TIMEOUT_S': 15 * 60,
+      'transport_mode': compute['options'].get('transport_mode', 'http'),
+      'http_url': compute['options'].get('http_url', 'http://%s:%s/cliservice' % (server_host, server_port)),
   }
 
 
