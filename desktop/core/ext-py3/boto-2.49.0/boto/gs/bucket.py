@@ -273,9 +273,9 @@ class Bucket(S3Bucket):
         query_args_l = []
         if generation:
             query_args_l.append('generation=%s' % generation)
-        self._delete_key_internal(key_name, headers=headers,
-                                  version_id=version_id, mfa_token=mfa_token,
-                                  query_args_l=query_args_l)
+        return self._delete_key_internal(key_name, headers=headers,
+                                         version_id=version_id, mfa_token=mfa_token,
+                                         query_args_l=query_args_l)
 
     def set_acl(self, acl_or_str, key_name='', headers=None, version_id=None,
                 generation=None, if_generation=None, if_metageneration=None):
