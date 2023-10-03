@@ -462,6 +462,10 @@ class S3FileSystem(object):
     if src_st.isDir and dst_st and not dst_st.isDir:
       raise S3FileSystemException("Cannot overwrite non-directory '%s' with directory '%s'" % (dst, src))
 
+    # Skip operation if destination path is same as source path
+    if self._check_key_parent_path(src, dst):
+      raise S3FileSystemException('Destination path is same as the source path, skipping the operation.')
+
     src_bucket, src_key = s3.parse_uri(src)[:2]
     dst_bucket, dst_key = s3.parse_uri(dst)[:2]
 
@@ -492,8 +496,22 @@ class S3FileSystem(object):
   @auth_error_handler
   def rename(self, old, new):
     new = s3.abspath(old, new)
-    self.copy(old, new, recursive=True)
-    self.rmtree(old, skipTrash=True)
+
+    # Skip operation if destination path is same as source path
+    if not self._check_key_parent_path(old, new):
+      self.copy(old, new, recursive=True)
+      self.rmtree(old, skipTrash=True)
+    else:
+      raise S3FileSystemException('Destination path is same as source path, skipping the operation.')
+  
+  @translate_s3_error
+  @auth_error_handler
+  def _check_key_parent_path(self, src, dst):
+    # Return True if parent path of source is same as destination path.
+    if S3FileSystem.parent_path(src) == dst:
+      return True
+    else:
+      return False
 
   @translate_s3_error
   @auth_error_handler
