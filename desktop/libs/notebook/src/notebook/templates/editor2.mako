@@ -1047,16 +1047,6 @@ There is no bridge to KO for components using this integration. Example using in
           </div>
           <!-- /ko -->
 
-          <!-- ko if: (window.getLastKnownConfig()?.hue_config?.enable_llm_sql) -->
-          <div class="tab-pane" id="aiAssist" data-bind="css: {'active': currentQueryTab() == 'aiAssist'}">
-            <div class="editor-bottom-tab-panel">
-              <div style="width: 100%; height: 100%; overflow-y: auto;">
-                <ExplainSql class="cuix antd" data-bind="reactWrapper: 'ExplainSql', props: { activeExecutable: activeExecutable }"></ExplainSql>
-              </div>
-            </div>
-          </div>
-          <!-- /ko -->          
-
           <div class="tab-pane" id="executionAnalysis" data-bind="css: {'active': currentQueryTab() == 'executionAnalysis'}">
             <div class="execution-analysis-tab-panel">
               <execution-analysis-panel-ko-bridge class="execution-analysis-bridge" data-bind="

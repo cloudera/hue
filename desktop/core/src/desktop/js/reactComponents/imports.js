@@ -6,8 +6,6 @@ export async function loadComponent(name) {
     // Page specific root components here
     case 'ReactExample':
       return (await import('../apps/editor/components/result/reactExample/ReactExample')).default;
-    case 'ExplainSql':
-        return (await import('../apps/editor/components/AiAssist/AiAssist')).default;
     case 'AiAssistBar':
           return (await import('../apps/editor/components/AiAssist/AiAssistBar')).default;             
 
