@@ -113,7 +113,7 @@
     "babel-jest": "27.3.1",
     "babel-jscs": "3.0.0-beta1",
     "babel-loader": "8.2.2",
-    "babel-plugin-module-resolver": "4.1.0",
+    "babel-plugin-module-resolver": "5.0.0",
     "babel-preset-typescript-vue3": "2.0.12",
     "clean-webpack-plugin": "1.0.1",
     "copy-webpack-plugin": "6.4.1",
