@@ -412,7 +412,7 @@ else:
           <span id="moveNameRequiredAlert" class="hide label label-important">${_('Required')}</span>
         </div>
         <a class="btn" onclick="$('#moveModal').modal('hide');">${_('Cancel')}</a>
-        <input class="btn btn-primary" type="submit" value="${_('Move')}"/>
+        <input data-bind="enable: $root.enableMoveButton()" class="btn btn-primary" type="submit" value="${_('Move')}"/>
       </div>
     </div>
   </form>
@@ -434,7 +434,7 @@ else:
           <span id="copyNameRequiredAlert" class="hide label label-important">${_('Required')}</span>
         </div>
         <a class="btn" onclick="$('#copyModal').modal('hide');">${_('Cancel')}</a>
-        <input class="btn btn-primary" type="submit" value="${_('Copy')}"/>
+        <input data-bind="enable: $root.enableCopyButton()" class="btn btn-primary" type="submit" value="${_('Copy')}"/>
       </div>
     </div>
   </form>
@@ -945,6 +945,8 @@ else:
       self.searchQuery = ko.observable("");
       self.skipTrash = ko.observable(false);
       self.enableFilterAfterSearch = true;
+      self.enableMoveButton = ko.observable(false);
+      self.enableCopyButton = ko.observable(false);
       self.isCurrentDirSentryManaged = ko.observable(false);
       self.errorMessage = ko.observable("");
       self.pendingUploads = ko.observable(0);
@@ -1449,6 +1451,18 @@ else:
           $('#newRepFactorInput').val(self.selectedFile().stats.replication);
         });
       };
+      
+      const removeLastSlash = function (path) {
+        if (path.charAt(path.length - 1) === '/') {
+          return path.slice(0, -1);
+        }
+        return path;
+      };
+
+      self.allowCopyMoveTo = function (destination) {
+        const source = self.currentPath();
+        return removeLastSlash(source) !== removeLastSlash(destination);
+      };
 
       self.move = function (mode, unselectedDrag) {
         var paths = [];
@@ -1492,6 +1506,7 @@ else:
             });
 
             $("#moveModal").on("shown", function () {
+              self.enableMoveButton(false);
               $("#moveDestination").val('');
               $("#moveNameRequiredAlert").hide();
               $("#moveForm").find("input[name='*dest_path']").removeClass("fieldError");
@@ -1503,6 +1518,10 @@ else:
                 filesystemsFilter: [self.scheme()],
                 onNavigate: function (filePath) {
                   $("#moveDestination").val(filePath);
+                  self.enableMoveButton(self.allowCopyMoveTo(filePath));            
+                },
+                onFolderChange: function () {
+                  self.enableMoveButton(false);
                 },
                 createFolder: false,
                 uploadFile: false
@@ -1546,6 +1565,7 @@ else:
         });
 
         $("#copyModal").on("shown", function () {
+          self.enableCopyButton(false);
           $("#copyDestination").val('');
           $("#copyNameRequiredAlert").hide();
           $("#copyForm").find("input[name='*dest_path']").removeClass("fieldError");
@@ -1557,7 +1577,11 @@ else:
             filesystemsFilter: [self.scheme()],
             onNavigate: function (filePath) {
               $("#copyDestination").val(filePath);
+              self.enableCopyButton(self.allowCopyMoveTo(filePath)); 
             },
+            onFolderChange: function () {
+              self.enableCopyButton(false);
+            },            
             createFolder: false,
             uploadFile: false
           });
@@ -2403,7 +2427,9 @@ else:
           skipEnter: true,
           skipKeydownEvents: true,
           onEnter: function (el) {
-            $("#jHueHdfsAutocomplete").hide();
+            $("#jHueHdfsAutocomplete").hide();            
+            const allowMove = fileBrowserViewModel.allowCopyMoveTo(el.val());
+            fileBrowserViewModel.enableMoveButton(allowMove);
           },
           isS3: fileBrowserViewModel.isS3(),
           root: fileBrowserViewModel.rootCurrent()
@@ -2414,6 +2440,8 @@ else:
           skipKeydownEvents: true,
           onEnter: function (el) {
             $("#jHueHdfsAutocomplete").hide();
+            const allowCopy = fileBrowserViewModel.allowCopyMoveTo(el.val());
+            fileBrowserViewModel.enableCopyButton(allowCopy);
           },
           isS3: fileBrowserViewModel.isS3(),
           root: fileBrowserViewModel.rootCurrent()
