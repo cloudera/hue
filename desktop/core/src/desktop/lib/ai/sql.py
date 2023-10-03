@@ -3,12 +3,12 @@ LOG = logging.getLogger()
 
 from .types import SQLResponse
 
-from .models.base_model import BaseModel
+from .lib.base_model import BaseModel
 from .models.gpt import GPTModel
 from .models.titan import TitanModel
-from .models.task import TaskType
+from .lib.task import TaskType
 
-from .services.base_service import BaseService
+from .lib.base_service import BaseService
 from .services.openai import OpenAiService
 from .services.bedrock import BedrockService
 from .services.azure import AzureService

@@ -1,5 +1,5 @@
-from .task import Task, TaskType, get_task
-from .base_model import BaseModel
+from ..lib.task import Task, TaskType, get_task
+from ..lib.base_model import BaseModel
 from ..utils.xml import extract_tag_content
 from ..types import SQLResponse
 
@@ -18,8 +18,8 @@ NQL: {input}
 METADATA: {metadata}
 """
 
-# NOTE: Can't get the approach of using a semanticerror tag to work with this template. Likely too much noice. 
-# If the EDIT_INSTRUCTION is non-sensical then the LLM will often return the SQL as is which is then handled as a non diff in the UI. 
+# NOTE: Can't get the approach of using a semanticerror tag to work with this template. Likely too much noice.
+# If the EDIT_INSTRUCTION is non-sensical then the LLM will often return the SQL as is which is then handled as a non diff in the UI.
 _EDIT= """
 YOUR MAIN GOAL:
 Act as an {dialect} SQL expert and modify the SQL based on the INPUT. Return the SQL wrapped in a <code> tag.
@@ -55,7 +55,7 @@ SQL: {sql}
 Always explain the optimization or suggest alternative options if any. The explanation should be wrapped in an <explain> tag but should not contain SQL.
 If the SQL can't be interpreted then there is a sqlerror and you should explain the reason for it.
 If the SQL can't be optimized then shortly explain alternative options if any.
-If the SQL can be optimized is should be placed in the code tag. 
+If the SQL can be optimized is should be placed in the code tag.
 
 Return the result in the following format:
 <code></code>
@@ -64,14 +64,14 @@ Return the result in the following format:
 """
 
 _FIX = """Act as an {dialect} SQL expert.
-Try to fix this syntactically broken sql query using the following metadata: {metadata}. 
+Try to fix this syntactically broken sql query using the following metadata: {metadata}.
 
 SQL: {sql}
 
 Do not optimize and only make the minimal modifcation needed to create a valid query.
 
 If the provided SQL is nonsensical then return an appropriate message in a <sqlerror> tag.
-If you you can identify and fix the problematic syntax then wrap the corrected code in a <code> tag and add a 
+If you you can identify and fix the problematic syntax then wrap the corrected code in a <code> tag and add a
 short explaination in an <explain> tag with a closing </explain>.
 
 Return the result in the following format:
