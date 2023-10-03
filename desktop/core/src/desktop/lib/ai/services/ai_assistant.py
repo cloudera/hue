@@ -3,7 +3,7 @@ import json
 from desktop.lib.rest.http_client import HttpClient
 from desktop.lib.rest.resource import Resource
 
-from .base_service import BaseService
+from ..lib.base_service import BaseService
 
 from desktop.conf import AI_INTERFACE
 

@@ -1,7 +1,7 @@
 import io
 import json
 
-from .base_service import BaseService
+from ..lib.base_service import BaseService
 
 from desktop.conf import AI_INTERFACE
 

@@ -1,4 +1,4 @@
-from .base_service import BaseService
+from ..lib.base_service import BaseService
 
 from desktop.conf import AI_INTERFACE, get_ai_service_token
 
