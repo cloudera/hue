@@ -4,6 +4,7 @@ import json
 from ..lib.base_service import BaseService
 from ..lib.base_model import BaseModel
 from ..models.titan import TitanModel
+from ..models.claude import ClaudeModel
 
 from desktop.conf import AI_INTERFACE
 
@@ -15,6 +16,8 @@ class BedrockService(BaseService):
         super().__init__(self.get_model(model_name))
 
     def get_model(self, model_name: str) -> BaseModel:
+        if model_name == "claude":
+            return ClaudeModel()
         return TitanModel()
 
     def call_model(self, data: dict) -> str:
@@ -24,5 +27,4 @@ class BedrockService(BaseService):
             body=json.dumps(data)
         )
 
-        data = json.loads(io.BytesIO(response['body'].read()).readlines()[0].decode('utf-8'))
-        return data["results"][0]["outputText"]
+        return io.BytesIO(response['body'].read()).readlines()[0].decode('utf-8')

@@ -15,3 +15,8 @@ class BaseModel(abc.ABC):
     @abc.abstractmethod
     def build_data(self, prompt: str) -> dict:
         pass
+
+    # Extract the text data from the full model response
+    @abc.abstractmethod
+    def extract_response(self, response: str) -> str:
+        pass
