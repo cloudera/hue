@@ -114,5 +114,19 @@ _TASKS = {
 }
 
 class TitanModel(BaseModel):
-    def __init__(self, task_type: TaskType):
-        super().__init__(get_task(_TASKS, task_type))
+    def get_default_name(self) -> str:
+        return "amazon.titan-tg1-large"
+
+    def get_task(self, task_type: TaskType) -> Task:
+        return get_task(_TASKS, task_type)
+
+    def build_data(self, prompt: str) -> dict:
+        return {
+            "inputText": prompt,
+            "textGenerationConfig": {
+                "maxTokenCount": 512,
+                "stopSequences": [],
+                "temperature": 0,
+                "topP": 0.9
+            }
+        }

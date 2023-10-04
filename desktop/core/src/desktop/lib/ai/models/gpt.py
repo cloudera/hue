@@ -119,5 +119,14 @@ _TASKS = {
 
 
 class GPTModel(BaseModel):
-    def __init__(self, task_type: TaskType):
-        super().__init__(get_task(_TASKS, task_type))
+    def get_default_name(self) -> str:
+        return "gpt-3.5-turbo-16k"
+
+    def get_task(self, task_type: TaskType) -> Task:
+        return get_task(_TASKS, task_type)
+
+    def build_data(self, prompt: str) -> dict:
+        return {
+            "role": "user",
+            "content": prompt
+        }

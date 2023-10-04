@@ -2,35 +2,27 @@ import io
 import json
 
 from ..lib.base_service import BaseService
+from ..lib.base_model import BaseModel
+from ..models.titan import TitanModel
 
 from desktop.conf import AI_INTERFACE
 
-_default_model = "titan"
-_model_name = AI_INTERFACE.MODEL_NAME.get() or "amazon.titan-tg1-large"
-
 class BedrockService(BaseService):
-    def __init__(self):
+    def __init__(self, model_name: str):
         import boto3
         self.bedrock = boto3.client('bedrock')
 
-    def get_default_model(self) -> str:
-        return _default_model
+        super().__init__(self.get_model(model_name))
 
-    def process(self, prompt: str) -> str:
-        body = {
-            "inputText": prompt,
-            "textGenerationConfig": {
-                "maxTokenCount": 512,
-                "stopSequences": [],
-                "temperature": 0,
-                "topP": 0.9
-            }
-        }
+    def get_model(self, model_name: str) -> BaseModel:
+        return TitanModel()
+
+    def call_model(self, data: dict) -> str:
+        model_name = AI_INTERFACE.MODEL_NAME.get() or self.model.get_default_name()
         response = self.bedrock.invoke_model(
-            modelId=_model_name,
-            body=json.dumps(body)
+            modelId=model_name,
+            body=json.dumps(data)
         )
 
         data = json.loads(io.BytesIO(response['body'].read()).readlines()[0].decode('utf-8'))
-
         return data["results"][0]["outputText"]

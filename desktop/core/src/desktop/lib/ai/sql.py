@@ -6,7 +6,7 @@ from .types import SQLResponse
 from .lib.base_model import BaseModel
 from .models.gpt import GPTModel
 from .models.titan import TitanModel
-from .lib.task import TaskType
+from .lib.task import TaskType, TaskParams
 
 from .lib.base_service import BaseService
 from .services.openai import OpenAiService
@@ -26,22 +26,16 @@ DATA_DELIMITER = ","
 table_meta_cache = LRUCache(AI_INTERFACE.TABLE_DATA_CACHE_SIZE.get())
 ADD_TABLE_DATA = AI_INTERFACE.ADD_TABLE_DATA.get()
 
-def _model_factory(model: str, task: TaskType) -> BaseModel:
-    if model == "gpt":
-        return GPTModel(task)
-    elif model == "titan":
-        return TitanModel(task)
-    else:
-        LOG.error("Model configured is invalid")
-        raise Exception(f"Invalid model name - {model}")
+def _get_service() -> BaseService:
+    service_name = AI_INTERFACE.SERVICE.get()
+    model_name = AI_INTERFACE.MODEL.get()
 
-def _service_factory(service_name: str) -> BaseService:
     if service_name == "openai":
-        return OpenAiService()
+        return OpenAiService(model_name)
     elif service_name == "azure":
-        return AzureService()
+        return AzureService(model_name)
     elif service_name == "bedrock":
-        return BedrockService()
+        return BedrockService(model_name)
     else:
         LOG.error("Service configured is invalid")
         raise Exception(f"Invalid service name - {service_name}")
@@ -114,14 +108,12 @@ def format_metadata(metadata, reader) -> str:
     return '\n\n'.join(table_metadatas)
 
 def perform_sql_task(request, task: TaskType, input: str, sql: str, dialect: str, metadata: dict) -> SQLResponse:
-    service = _service_factory(AI_INTERFACE.SERVICE.get())
-    model = _model_factory(AI_INTERFACE.MODEL.get() or service.get_default_model(), task)
-
     reader = TableReader(request, dialect)
     metadata_str = format_metadata(metadata, reader) if metadata else ""
 
-    prompt = model.build_prompt(input, sql, dialect, metadata_str)
-    response_str = service.process(prompt)
-    response = model.parse_response(response_str)
+    task_params = TaskParams(dialect, input, sql, metadata_str)
+
+    service = _get_service()
+    response = service.process(task, task_params)
 
     return response
