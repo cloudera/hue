@@ -4,8 +4,8 @@ import { hueWindow } from 'types/types';
 import Executor from '../apps/editor/execution/executor';
 import dataCatalog from '../catalog/dataCatalog';
 
-const TABLES_API_URL = '/api/editor/ai/tables';
-const SQL_API_URL = '/api/editor/ai/sql';
+const TABLES_API_URL = '/api/v1/editor/ai/tables';
+const SQL_API_URL = '/api/v1/editor/ai/sql';
 
 // The Error interface is based on the new Improved Hue Error UX
 // specification. It is not yet implemented but lets try to follow the
