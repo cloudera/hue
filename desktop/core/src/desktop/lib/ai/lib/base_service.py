@@ -25,6 +25,7 @@ class BaseService(abc.ABC):
         response_str = self.call_model(data)
 
         # Step 3 - Parse response
+        response_str = self.model.extract_response(response_str)
         response = task.parser(response_str)
 
         return response

@@ -5,6 +5,9 @@ from ..lib.base_model import BaseModel
 from ..utils.xml import extract_tag_content
 from ..types import SQLResponse
 
+import logging
+LOG = logging.getLogger()
+
 _GENERATE = """
 YOUR MAIN GOAL:
 Act as an {dialect} SQL expert and Translate the NQL statement into SQL. Return the SQL wrapped in a <code> tag.
@@ -82,6 +85,7 @@ Return the result in the following format:
 <explain></explain>
 """
 
+
 def _code_assumptions_parser(response: str) -> SQLResponse:
     return SQLResponse(
         sql=extract_tag_content('code', response),
@@ -115,24 +119,24 @@ _TASKS = {
     TaskType.FIX: Task(_FIX, _code_explain_parser)
 }
 
-class TitanModel(BaseModel):
+class ClaudeModel(BaseModel):
     def get_default_name(self) -> str:
-        return "amazon.titan-tg1-large"
+        return "anthropic.claude-v2"
 
     def get_task(self, task_type: TaskType) -> Task:
         return get_task(_TASKS, task_type)
 
     def build_data(self, prompt: str) -> dict:
         return {
-            "inputText": prompt,
-            "textGenerationConfig": {
-                "maxTokenCount": 512,
-                "stopSequences": [],
-                "temperature": 0,
-                "topP": 0.9
-            }
+            "prompt": f"Human: {prompt}\nAssistant:",
+            "max_tokens_to_sample": 300,
+            "temperature": 1,
+            "top_k": 250,
+            "top_p": 0.999,
+            "stop_sequences": ["\n\nHuman:"],
+            "anthropic_version": "bedrock-2023-05-31" # TODO: Make into a configuration
         }
 
     def extract_response(self, response_str: str) -> str:
         resp = json.loads(response_str)
-        return resp["results"][0]["outputText"]
+        return resp["completion"]

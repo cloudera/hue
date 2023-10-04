@@ -130,3 +130,6 @@ class GPTModel(BaseModel):
             "role": "user",
             "content": prompt
         }
+
+    def extract_response(self, response_str: str) -> str:
+        return response_str
