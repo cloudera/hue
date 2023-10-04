@@ -1,20 +1,17 @@
 import abc
-from pyformatting import optional_format
 
-from .task import Task
+from .task import Task, TaskType
 from ..types import SQLResponse
 
 class BaseModel(abc.ABC):
-    def __init__(self, task: Task):
-        self.task = task
+    @abc.abstractmethod
+    def get_default_name(self) -> str:
+        pass
 
-    def build_prompt(self, input: str, sql: str, dialect: str, metadata: str) -> str:
-        prompt = optional_format(self.task.template,
-                                 input=input,
-                                 sql=sql,
-                                 dialect=dialect,
-                                 metadata=metadata)
-        return prompt
+    @abc.abstractmethod
+    def get_task(self, task_type: TaskType) -> Task:
+        pass
 
-    def parse_response(self, response) -> SQLResponse:
-        return self.task.parser(response)
+    @abc.abstractmethod
+    def build_data(self, prompt: str) -> dict:
+        pass
