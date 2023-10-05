@@ -8,27 +8,27 @@
     flex-direction: row;
     justify-content: flex-end;
     gap: 12px;
-    font-size: 12px;    
+    font-size: 12px;
     background-color: vars.$fluidx-slate-700;
     border-top-left-radius: ai-assist-vars.$border-radius;
     border-top-right-radius: ai-assist-vars.$border-radius;
     padding: 4px 16px;
   }
-  
+
   .hue-sql-preview-config__switch {
     height: 14px;
     min-width: 22px;
     margin-right: 8px;
-    // We need to override the default switch styles in order 
+    // We need to override the default switch styles in order
     // make it smaller and change the color;
     .ant-switch-handle {
       width: 12px;
       height: 12px;
-      top: 1px;      
+      top: 1px;
     }
+
     &.ant-switch-checked .ant-switch-handle {
       left: calc(100% - 12px - 2px);
     }
-  
   }
 }

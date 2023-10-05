@@ -14,8 +14,8 @@
       font-size: 12px;
 
       &[disabled] {
-        color:  vars.$fluidx-blue-100;
-      }      
+        color: vars.$fluidx-blue-100;
+      }
 
       // Reset inherited styling we don't want
       &:hover,
@@ -28,6 +28,7 @@
         outline: none;
         box-shadow: none;
       }
+
       &:not([disabled]):hover {
         color: vars.$fluidx-blue-600;
       }
