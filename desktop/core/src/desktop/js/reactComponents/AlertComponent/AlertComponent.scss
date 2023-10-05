@@ -1,3 +1,5 @@
+@import '../../components/sidebar/variables.scss';
+
 .flash-messages {
     position: fixed;
     width: 30%;
@@ -24,41 +26,36 @@
     }
 
     .ant-alert-warning {
-        color: #3d1300;
-        ;
-        background: #fff3e5;
-        border: 1px solid #f96702;
-        ;
+        color: $cui-orange-750;
+        background: $cui-orange-025;
+        border: 1px solid $cui-orange-450;
 
         button {
-            color: #6c2500;
+            color: $cui-green-650;
             ;
         }
 
     }
 
     .ant-alert-success {
-        color: #023c02;
-        background: #e5ffe5;
-        border: 1px solid #2fae2f;
+        color: $cui-green-850;
+        background: $cui-green-075;
+        border: 1px solid $cui-green-450;
 
         button {
-            color: #0a5f0a;
+            color: $cui-green-650;
         }
     }
 
     .ant-alert-error {
-        color: #3d0000;
-        ;
-        background: #ffecec;
-        ;
-        border: 1px solid #fe3f3f;
-        ;
+        color: $cui-orange-725;
+        background: $cui-red-075;
+        border: 1px solid $cui-red-450;
         display: flex;
         align-items: flex-start;
 
         button {
-            color: #6e0707;
+            color: $cui-red-750;
             position: absolute;
             top: 0.5rem;
             right: 3%;

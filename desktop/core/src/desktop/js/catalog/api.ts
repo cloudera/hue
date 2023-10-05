@@ -39,6 +39,7 @@ import { hueWindow } from 'types/types';
 import '../utils/json.bigDataParse';
 import sleep from 'utils/timing/sleep';
 import UUID from 'utils/string/UUID';
+import huePubSub from 'utils/huePubSub';
 
 interface AnalyzeResponse {
   status: number;
@@ -167,11 +168,12 @@ export const fetchDescribe = ({
         silenceErrors,
         handleSuccess: (response: Analysis & DefaultApiResponse, postResolve, postReject) => {
           if (successResponseIsError(response)) {
-            postReject(extractErrorMessage(response));
+            huePubSub.publish('hue.global.error', {message: response.message});
           } else {
             const adjustedResponse = response;
             adjustedResponse.hueTimestamp = Date.now();
             postResolve(adjustedResponse);
+            huePubSub.publish('hue.global.error', {message: adjustedResponse.message});
           }
         }
       }

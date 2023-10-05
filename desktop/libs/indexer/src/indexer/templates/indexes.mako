@@ -796,7 +796,7 @@ ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode
               callback();
             }
           } else {
-            $(document).trigger("error", data.message);
+            huePubSub.publish('hue.global.error', {message: data.message})
           }
         }).fail(function (xhr, textStatus, errorThrown) {
           $(document).trigger("error", xhr.responseText);
