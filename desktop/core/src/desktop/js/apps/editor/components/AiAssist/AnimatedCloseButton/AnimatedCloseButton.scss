@@ -44,32 +44,29 @@
   height: $height;
 
   span {
-    top: $height/2;
-    height: $height/12;
-    border-radius: $height/12;
+    top: $height / 2;
+    height: $height / 12;
+    border-radius: $height / 12;
   }
 
   span:nth-child(1) {
-    left: $width/16;
-    top: $height/3.2;
+    left: $width / 16;
+    top: $height / 3.2;
   }
 
   span:nth-child(3) {
-    left: $width/2.4;
-    top: $height/1.5;
+    left: $width / 2.4;
+    top: $height / 1.5;
   }
 
   &:hover span:nth-child(1) {
-    left: -($width/24);
-  }
-
-  &:hover span:nth-child(1) {
-    top: $height/3.2;
+    left: -($width / 24);
+    top: $height / 3.2;
   }
 
   &:hover span:nth-child(3) {
-    top: $height/1.5;
-    left: -($width/24);
+    top: $height / 1.5;
+    left: -($width / 24);
   }
 }
 
@@ -84,4 +81,3 @@
 .hue-animated-close-button--small {
   @include close-button-size(12px, 12px);
 }
-
