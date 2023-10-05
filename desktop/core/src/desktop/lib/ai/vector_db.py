@@ -1,14 +1,12 @@
 import chromadb
-from chromadb.config import Settings
-
 import datetime
 
 def filter_vector_db(metadata, query, database):
-    client = chromadb.PersistentClient(path="chrome")
-    prompt = "find the table required for the prompt here: "
-    prompt += query
+    chrome_client = chromadb.PersistentClient(path="chrome")
+    prompt = f"find the table required for the prompt here: {query}"
 
-    collection = client.get_or_create_collection(name="tables")
+
+    collection = chrome_client.get_or_create_collection(name="tables")
     added_tables = set()
 
     current_datetime = datetime.datetime.now()
