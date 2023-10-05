@@ -53,8 +53,6 @@ export const refreshConfig = async (): Promise<HueConfig> => {
       const apiResponse = await post<HueConfig>(URLS.FETCH_CONFIG_API, {}, { silenceErrors: true });
       if (apiResponse.status == 0) {
         lastKnownConfig = apiResponse;
-        // TEMP STUB. Remove this and use real config.
-        lastKnownConfig.hue_config.enable_llm_sql = true;
         resolve(lastKnownConfig);
       } else {
         huePubSub.publish('hue.error', apiResponse.message);
