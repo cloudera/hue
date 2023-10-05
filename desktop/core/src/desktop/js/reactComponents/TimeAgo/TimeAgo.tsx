@@ -14,7 +14,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 // THIS COMPONENT WAS DIRECTLY TRANSLATED FROM VUE file
 // desktop/core/src/desktop/js/components/TimeAgo.vue
 // TODO: use i18nReact instead of I18n

@@ -12,7 +12,7 @@ export const useParser = (activeExecutable: SqlExecutable) => {
   const [sqlDialect, setSqlDialect] = useState<string>('');
 
   const parsedStatement = activeExecutable?.parsedStatement;
-  const selectedStatement: string = parsedStatement?.statement || '';  
+  const selectedStatement: string = parsedStatement?.statement || '';
 
   const loadParser = async executor => {
     const connector = executor?.connector();

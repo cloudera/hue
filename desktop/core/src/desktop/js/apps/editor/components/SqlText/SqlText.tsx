@@ -131,13 +131,13 @@ const SqlText: React.FC<Props> = ({
     // }
     // (this.$el as HTMLElement).querySelectorAll('.ace_invisible_space').forEach(el => el.remove());
     return (
-     <div class="ace_editor ace-hue" style={`"background-color: transparent; ${overflowStyle}"`}>
+      <div class="ace_editor ace-hue" style={`"background-color: transparent; ${overflowStyle}"`}>
         <div class="ace_layer" style={`"position: static; ${overflowStyle}"`}>
           HELLO;
           {res.join('')}
         </div>
       </div>
-    )
+    );
   }
   return apa;
 };

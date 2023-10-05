@@ -78,11 +78,9 @@ describe('QueryKillButton.vue', () => {
   });
 
   it('should render Error, disabled', async () => {
-    jest.spyOn(queryApiUtils, 'kill').mockImplementation(
-      async (): Promise<void> => {
-        throw new Error();
-      }
-    );
+    jest.spyOn(queryApiUtils, 'kill').mockImplementation(async (): Promise<void> => {
+      throw new Error();
+    });
 
     const wrapper = mount(QueryKillButton, {
       propsData: {
@@ -101,11 +99,9 @@ describe('QueryKillButton.vue', () => {
   });
 
   it('should render Unknown, disabled', async () => {
-    jest.spyOn(queryApiUtils, 'kill').mockImplementation(
-      async (): Promise<void> => {
-        true;
-      }
-    );
+    jest.spyOn(queryApiUtils, 'kill').mockImplementation(async (): Promise<void> => {
+      true;
+    });
     jest.spyOn(queryApiUtils, 'waitIf').mockImplementation(async (): Promise<boolean> => true);
 
     const wrapper = mount(QueryKillButton, {

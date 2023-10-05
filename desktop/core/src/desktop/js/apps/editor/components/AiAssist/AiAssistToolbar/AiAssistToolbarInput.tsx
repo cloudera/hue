@@ -137,7 +137,6 @@ function AiAssistToolbarInput({
   const [userChoiceAutoShowHistory, setUserChoiceAutoShowHistory] = useState<boolean>(autoShow);
   const [historyItems, addHistoryItem] = useLocalStorageHistory(HISTORY_STORAGE_KEY, 50);
 
-
   const toolbarButtonWrapperRef = useRef<HTMLDivElement>(null);
   const spanSizeRef = useRef<HTMLSpanElement | null>(null);
   const spanSingleLineRef = useRef<HTMLSpanElement | null>(null);
@@ -177,14 +176,14 @@ function AiAssistToolbarInput({
   useEffect(() => {
     if (!isAnimating && isExpanded) {
       if (userChoiceAutoShowHistory && !showHistoryDropdown) {
-        setShowHistoryDropdown(true)
-      }      
+        setShowHistoryDropdown(true);
+      }
       focusInput();
     }
   }, [isAnimating, isExpanded]);
 
   const handleSubmit = () => {
-    addHistoryItem({value: value, date: new Date().getTime()});
+    addHistoryItem({ value: value, date: new Date().getTime() });
     onSubmit(value);
     setDirty(false);
     setTouched(false);
@@ -226,7 +225,7 @@ function AiAssistToolbarInput({
     onInputChanged(item.value);
     setShowHistoryDropdown(false);
     focusInput();
-  }
+  };
 
   return (
     <li
@@ -286,7 +285,7 @@ function AiAssistToolbarInput({
             }}
             onSelect={handleHistorySelect}
             searchValue={value}
-            items={historyItems}            
+            items={historyItems}
           />
           {value && (
             <Button

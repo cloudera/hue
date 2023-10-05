@@ -4,7 +4,7 @@ describe('getLeadingEmptyLineCount', () => {
   test('returns 0 when there are no leading empty lines', () => {
     const parsedStatement = {
       statement: 'SELECT * FROM my_table;',
-      type: 'SELECT',
+      type: 'SELECT'
     };
     const result = getLeadingEmptyLineCount(parsedStatement);
     expect(result).toBe(0);
@@ -13,7 +13,7 @@ describe('getLeadingEmptyLineCount', () => {
   test('returns the number of leading empty lines', () => {
     const parsedStatement = {
       statement: '\n\n  SELECT * FROM my_table;',
-      type: 'SELECT',
+      type: 'SELECT'
     };
     const result = getLeadingEmptyLineCount(parsedStatement);
     expect(result).toBe(2);
@@ -22,7 +22,7 @@ describe('getLeadingEmptyLineCount', () => {
   test('returns the number of leading empty lines with mixed line breaks', () => {
     const parsedStatement = {
       statement: '\r\n\r\n\nSELECT * FROM my_table;',
-      type: 'SELECT',
+      type: 'SELECT'
     };
     const result = getLeadingEmptyLineCount(parsedStatement);
     expect(result).toBe(3);
@@ -31,7 +31,7 @@ describe('getLeadingEmptyLineCount', () => {
   test('returns 0 when the statement starts with non-empty whitespace', () => {
     const parsedStatement = {
       statement: '  SELECT * FROM my_table;',
-      type: 'SELECT',
+      type: 'SELECT'
     };
     const result = getLeadingEmptyLineCount(parsedStatement);
     expect(result).toBe(0);
@@ -40,7 +40,7 @@ describe('getLeadingEmptyLineCount', () => {
   test('returns 0 when the statement is empty', () => {
     const parsedStatement = {
       statement: '',
-      type: 'SELECT',
+      type: 'SELECT'
     };
     const result = getLeadingEmptyLineCount(parsedStatement);
     expect(result).toBe(0);

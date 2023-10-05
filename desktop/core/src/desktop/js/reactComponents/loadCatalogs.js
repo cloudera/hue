@@ -18,13 +18,12 @@ export const getRelevantTableDetails = async (databaseName, tableNames, executor
     const tableDetails = {
       tableName: tableName,
       columns: columns.map(({ definition }) => definition),
-      partitions: columns.partitions,
+      partitions: columns.partitions
     };
     relevantTables.push(tableDetails);
   }
   return relevantTables;
 };
-
 
 const delay = duration => new Promise(resolve => setTimeout(resolve, duration));
 
@@ -35,8 +34,10 @@ const getCacheProgress = databaseName => {
 };
 
 export async function LoadDataCatalogs() {
-  if(!window.AI_INTERFACE_ENABLED) return;
-  
+  if (!window.AI_INTERFACE_ENABLED) {
+    return;
+  }
+
   huePubSub.subscribe('fetch_tables_metadata', async data => {
     const dataCatalogEntry = await data.sourceMetaPromise;
     if (!dataCatalogEntry.tables_meta) {
@@ -62,7 +63,7 @@ export async function LoadDataCatalogs() {
         await fetchColumnsData(databaseName, eachTable.name, data.entry);
         completedTables++;
       } catch (error) {
-        console.error("Error loading table: " + eachTable.name, error);
+        console.error('Error loading table: ' + eachTable.name, error);
         continue;
       }
       const progress = Math.floor((completedTables / numTablesToLoad) * 100);
@@ -70,4 +71,3 @@ export async function LoadDataCatalogs() {
     }
   });
 }
-

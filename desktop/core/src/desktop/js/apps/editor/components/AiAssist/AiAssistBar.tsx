@@ -39,12 +39,12 @@ const getSelectedLineNumbers = (parsedStatement: ParsedSqlStatement) => {
 };
 
 const breakLines = (input: string): string => {
-  let words = input.split(' ');
+  const words = input.split(' ');
   let result = '';
   let line = '';
 
   for (let i = 0; i < words.length; i++) {
-    let word = words[i];
+    const word = words[i];
     if (line.length + word.length <= 90) {
       line += word + ' ';
     } else {

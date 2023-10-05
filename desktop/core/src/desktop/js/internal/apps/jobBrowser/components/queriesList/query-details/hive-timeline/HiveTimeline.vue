@@ -39,15 +39,9 @@
       </div>
 
       <div class="sub-groups">
-        <div class="bar" :data-value="normalizedPerf.compile" title="Compile">
-          Compile
-        </div>
-        <div class="bar" :data-value="normalizedPerf.parse" title="Parse">
-          Parse
-        </div>
-        <div class="bar" :data-value="normalizedPerf.TezBuildDag" title="Build Dag">
-          Build Dag
-        </div>
+        <div class="bar" :data-value="normalizedPerf.compile" title="Compile">Compile</div>
+        <div class="bar" :data-value="normalizedPerf.parse" title="Parse">Parse</div>
+        <div class="bar" :data-value="normalizedPerf.TezBuildDag" title="Build Dag">Build Dag</div>
 
         <div class="bar" :data-value="normalizedPerf.TezSubmitDag" title="Submit Dag">
           Submit Dag
@@ -60,9 +54,7 @@
           Submit To Running
         </div>
 
-        <div class="bar" :data-value="normalizedPerf.TezRunDag" title="Run Dag">
-          Run Dag
-        </div>
+        <div class="bar" :data-value="normalizedPerf.TezRunDag" title="Run Dag">Run Dag</div>
 
         <div
           class="bar"
