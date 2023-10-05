@@ -39,7 +39,7 @@ $adjusted-left-margin: 20px;
   .hue-ai-assist-bar__animated-launcher--contracting {
     margin-top: 6px;
     width: 12px;
-    height: 12px;    
+    height: 12px;
     right: calc(100% - #{$adjusted-left-margin});
     animation: expandAndSlide (ai-assist-vars.$expand-animation-time * 1.2) ease-in-out 1;
     animation-direction: reverse;
@@ -66,7 +66,8 @@ $adjusted-left-margin: 20px;
     padding-right: 12px;
   }
 
-  .hue-ai-assist-bar__animated-launcher--error, .hue-ai-assist-bar__animated-launcher--warning {
+  .hue-ai-assist-bar__animated-launcher--error,
+  .hue-ai-assist-bar__animated-launcher--warning {
     background-color: vars.$fluidx-red-050;
     border-radius: 12px;
     width: 24px;
@@ -87,7 +88,8 @@ $adjusted-left-margin: 20px;
     border: 1px solid #ffe1c1 //vars.$hue-warning-color;
   }
 
-  .hue-ai-assist-bar__animated-launcher-error-text, .hue-ai-assist-bar__animated-launcher-warning-text {
+  .hue-ai-assist-bar__animated-launcher-error-text,
+  .hue-ai-assist-bar__animated-launcher-warning-text {
     overflow: hidden;
     white-space: nowrap;
     color: vars.$fluidx-red-500;
@@ -99,20 +101,20 @@ $adjusted-left-margin: 20px;
     margin-left: 12px;
   }
 
-  .hue-ai-assist-bar__animated-launcher-warning-text {    
+  .hue-ai-assist-bar__animated-launcher-warning-text {
     color: vars.$hue-warning-color;
   }
 
   .hue-ai-assist-bar__animated-launcher-error-close-btn {
     span {
       background-color: vars.$fluidx-red-500;
-    }  
+    }
   }
 
   .hue-ai-assist-bar__animated-launcher-warning-close-btn {
     span {
       background-color: vars.$hue-warning-color;
-    }  
+    }
   }
 }
 
@@ -147,7 +149,7 @@ $adjusted-left-margin: 20px;
   }
 
   100% {
-    border-radius: 0px;
+    border-radius: 0;
     width: 1px;
     height: 1px;
     margin-top: 18px;
@@ -157,7 +159,7 @@ $adjusted-left-margin: 20px;
 
 @keyframes loadingAnimation {
   0% {
-    border-radius: 0px;
+    border-radius: 0;
     width: 1px;
     height: 1px;
     right: 34px;

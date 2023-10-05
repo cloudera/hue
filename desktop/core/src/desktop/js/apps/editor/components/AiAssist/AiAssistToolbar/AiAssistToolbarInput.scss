@@ -9,8 +9,8 @@ $input-padding: 4px;
 .cuix.antd {
   .hue-ai-assist-toolbar-input__wrapper {
     flex-grow: 0;
-    width: 0px;
-    animation: contractInput $input-animation-time ease forwards;   
+    width: 0;
+    animation: contractInput $input-animation-time ease forwards;
   }
 
   .hue-ai-assist-toolbar-input__wrapper--expanded {
@@ -27,7 +27,6 @@ $input-padding: 4px;
     margin-top: 30px; // TODO: use variable
     line-height: $line-height;
     white-space: pre-line;
-
     position: absolute;
     top: -20px; // TODO: use variable
     padding-left: $input-padding;
@@ -38,6 +37,7 @@ $input-padding: 4px;
     &::placeholder {
       color: vars.$fluidx-blue-200;
     }
+
     &:focus {
       text-overflow: inherit;
     }
@@ -47,9 +47,10 @@ $input-padding: 4px;
     width: 100%;
     border-left: 2px solid transparent;
   }
+
   .hue-ai-assist-toolbar-input__text-input--animating {
     visibility: hidden;
-  }  
+  }
 
   .hue-ai-assist-toolbar-input__text-input--multi-line,
   .hue-ai-assist-toolbar-input__text-input--is-prefill {
@@ -89,6 +90,7 @@ $input-padding: 4px;
   from {
     flex-grow: 0;
   }
+
   to {
     flex-grow: 1;
   }
@@ -98,6 +100,7 @@ $input-padding: 4px;
   from {
     flex-grow: 1;
   }
+
   to {
     flex-grow: 0;
   }

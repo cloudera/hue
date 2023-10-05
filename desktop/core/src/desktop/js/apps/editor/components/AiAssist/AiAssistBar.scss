@@ -5,7 +5,7 @@ $bar-vertical-animation-time: (ai-assist-vars.$expand-animation-time * 0.5); // 
 
 .cuix.antd {
   .hue-ai-assist-bar {
-    height: 0px;
+    height: 0;
     margin: 0 -10px 0 -55px;
     overflow: hidden;
     background-color: vars.$fluidx-blue-050;
@@ -23,7 +23,7 @@ $bar-vertical-animation-time: (ai-assist-vars.$expand-animation-time * 0.5); // 
     border-bottom: 1px solid vars.$fluidx-blue-100;
     animation: mainBarAnimationOut $bar-vertical-animation-time ease-in-out 1;
     animation-fill-mode: forwards;
-    animation-delay: (ai-assist-vars.$expand-animation-time * 0.8);    
+    animation-delay: (ai-assist-vars.$expand-animation-time * 0.8);
   }
 
   .hue-ai-assist-bar__content {
@@ -40,7 +40,7 @@ $bar-vertical-animation-time: (ai-assist-vars.$expand-animation-time * 0.5); // 
   }
 
   .hue-ai-assist-bar__content--contracting {
-    animation: contentAnimationOut ai-assist-vars.$expand-animation-time ease-in-out 1;    
+    animation: contentAnimationOut ai-assist-vars.$expand-animation-time ease-in-out 1;
     animation-fill-mode: forwards;
     width: 100%;
     overflow: hidden;
@@ -54,7 +54,7 @@ $bar-vertical-animation-time: (ai-assist-vars.$expand-animation-time * 0.5); // 
   }
 
   .hue-ai-assistbar__close-btn--showing {
-    right: 0px;
+    right: 0;
     display: block;
     animation: closeButtonAnimation (ai-assist-vars.$expand-animation-time * 1.2) ease-in-out 1;
   }
@@ -79,6 +79,7 @@ $bar-vertical-animation-time: (ai-assist-vars.$expand-animation-time * 0.5); // 
   0% {
     height: 0;
   }
+
   100% {
     height: 40px;
   }
@@ -88,19 +89,21 @@ $bar-vertical-animation-time: (ai-assist-vars.$expand-animation-time * 0.5); // 
   0% {
     height: 40px;
   }
+
   100% {
-    
     height: 0;
   }
 }
 
 @keyframes contentAnimationIn {
   0% {
-    width: 0px;
+    width: 0;
   }
+
   15% {
-    width: 0px;
+    width: 0;
   }
+
   100% {
     width: 100%;
   }
@@ -109,11 +112,13 @@ $bar-vertical-animation-time: (ai-assist-vars.$expand-animation-time * 0.5); // 
   0% {
     width: 100%;
   }
+
   20% {
     width: 100%;
   }
+
   100% {
-    width: 0px;
+    width: 0;
   }
 }
 
@@ -130,7 +135,7 @@ $bar-vertical-animation-time: (ai-assist-vars.$expand-animation-time * 0.5); // 
   }
 
   100% {
-    right: 0px;
+    right: 0;
     visibility: visible;
   }
 }
