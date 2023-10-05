@@ -9,7 +9,7 @@ LOG = logging.getLogger()
 _GENERATE = """
 YOUR MAIN GOAL:
 Act as an {dialect} SQL expert and Translate the NQL statement into SQL. Return the SQL wrapped in a <code> tag.
-Use lower() and LIKE '%%' unless you are sure about how to match the data.
+{dialect_prompt}
 
 YOUR ADDITIONAL GOALS:
 List any assumptions not covered by the supplied metadata wrapped in an <assumptions> tag.
@@ -26,7 +26,7 @@ METADATA: {metadata}
 _EDIT= """
 YOUR MAIN GOAL:
 Act as an {dialect} SQL expert and modify the SQL based on the INPUT. Return the SQL wrapped in a <code> tag.
-Use lower() and LIKE '%%' unless you are sure about how to match the data.
+{dialect_prompt}
 
 YOUR ADDITIONAL GOALS:
 List any assumptions not covered by the supplied metadata wrapped in an <assumptions> tag.

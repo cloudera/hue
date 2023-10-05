@@ -3,7 +3,7 @@ from typing import Callable, Dict
 from dataclasses import dataclass
 
 from pyformatting import optional_format
-
+from desktop.conf import AI_INTERFACE
 from ..types import SQLResponse
 
 import logging
@@ -34,7 +34,8 @@ class Task:
                                  input=params.input,
                                  sql=params.sql,
                                  dialect=params.dialect,
-                                 metadata=params.metadata)
+                                 metadata=params.metadata,
+                                 dialect_prompt=build_dialect_prompt(params.dialect))
         return prompt
 
 def get_task(tasks: Dict[TaskType, Task], type: TaskType) -> Task:
@@ -44,3 +45,14 @@ def get_task(tasks: Dict[TaskType, Task], type: TaskType) -> Task:
         LOG.error(exp)
         raise Exception(exp)
     return task
+
+
+def build_dialect_prompt(dialect: str) -> str:
+    ADD_TABLE_DATA = AI_INTERFACE.ADD_TABLE_DATA.get()
+    dialect_prompt = ""
+    if not ADD_TABLE_DATA:
+        if dialect.lower() == 'hive':
+            dialect_prompt += "Use lower() and ILIKE '%%' unless you are sure about how to match the data."
+        else:
+            dialect_prompt += "Use lower() and LIKE '%%' unless you are sure about how to match the data."
+    return dialect_prompt
