@@ -135,9 +135,8 @@ const getTablesAndMetadata = async (
   executor: Executor,
   onStatusChange: (arg: string) => void
 ) => {
-  let relevantTables, tableMetadata;
-
-  relevantTables = await getRelevantTables(input, { databaseName, executor }, onStatusChange);
+  const relevantTables = await getRelevantTables(input, { databaseName, executor }, onStatusChange);
+  let tableMetadata;
   try {
     onStatusChange('Retrieving table metadata');
     tableMetadata = await getRelevantTableDetails(databaseName, relevantTables['tables'], executor);

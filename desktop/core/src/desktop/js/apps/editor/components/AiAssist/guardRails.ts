@@ -52,7 +52,6 @@ function checkAllPropertiesNullOrEmpty(obj: any): boolean {
 
 function getFirstKeywordsInUppercase(sqlStatement: string) {
   const parsed: ParsedSqlStatement[] = sqlStatementsParser.parse(sqlStatement);
-  console.log(parsed);
   const firstTokens = parsed.map(parsedObj => parsedObj?.firstToken?.toUpperCase());
   return firstTokens.filter(token => token !== undefined);
 }
