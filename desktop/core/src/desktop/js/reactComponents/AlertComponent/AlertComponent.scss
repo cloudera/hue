@@ -1,5 +1,4 @@
-@import '/Users/ananya.agarwal/hue/desktop/core/src/desktop/static/desktop/less/cui/colors.less';
-// @import (reference) "cui/colors.less";
+@import '../../components/sidebar/variables.scss';
 
 .flash-messages {
     position: fixed;
@@ -28,35 +27,35 @@
 
     .ant-alert-warning {
         color: $cui-orange-750;
-        background: @cui-orange-025;
-        border: 1px solid @cui-orange-450;
+        background: $cui-orange-025;
+        border: 1px solid $cui-orange-450;
 
         button {
-            color: @cui-orange-650;
+            color: $cui-green-650;
             ;
         }
 
     }
 
     .ant-alert-success {
-        color: @cui-green-850;
-        background: @cui-green-075: 
-        border: 1px solid @cui-green-450;
+        color: $cui-green-850;
+        background: $cui-green-075;
+        border: 1px solid $cui-green-450;
 
         button {
-            color: @cui-green-650;
+            color: $cui-green-650;
         }
     }
 
     .ant-alert-error {
-        color: @cui-orange-725;
-        background: @cui-red-075;
-        border: 1px solid @cui-red-450;
+        color: $cui-orange-725;
+        background: $cui-red-075;
+        border: 1px solid $cui-red-450;
         display: flex;
         align-items: flex-start;
 
         button {
-            color: @cui-red-750;
+            color: $cui-red-750;
             position: absolute;
             top: 0.5rem;
             right: 3%;

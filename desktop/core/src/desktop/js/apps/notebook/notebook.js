@@ -391,7 +391,8 @@ class Notebook {
               setTimeout(callback, 500);
             }
           } else if (data.status == 401) {
-            $(document).trigger('showAuthModal', { type: session.type(), message: data.message });
+            //$(document).trigger('showAuthModal', { type: session.type(), message: data.message });
+            huePubSub.publish('hue.global.error', {message: data.message })
           } else {
             fail(data.message);
             huePubSub.publish('hue.global.error', {message: data.message})  
