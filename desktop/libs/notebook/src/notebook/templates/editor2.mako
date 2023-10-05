@@ -949,9 +949,6 @@ There is no bridge to KO for components using this integration. Example using in
           <!-- ko if: explanation -->
           <li data-hue-analytics="editor:bottom-tab-click/query-explain" data-bind="click: function() { currentQueryTab('queryExplain'); }, css: {'active': currentQueryTab() == 'queryExplain'}"><a class="inactive-action" href="#queryExplain" data-toggle="tab">${_('Explain')}</a></li>
           <!-- /ko -->
-          <!-- ko if: window.getLastKnownConfig()?.hue_config?.enable_llm_sql -->
-          <li data-hue-analytics="editor:bottom-tab-click/ai-assist" data-bind="click: function() { currentQueryTab('aiAssist'); }, css: {'active': currentQueryTab() == 'aiAssist'}"><a class="inactive-action" href="#queryExplain" data-toggle="tab">${_('AI assist')}</a></li>
-          <!-- /ko -->          
           <!-- ko foreach: pinnedContextTabs -->
           <li data-bind="click: function() { $parent.currentQueryTab(tabId) }, css: { 'active': $parent.currentQueryTab() === tabId }">
             <a class="inactive-action" data-toggle="tab" data-bind="attr: { 'href': '#' + tabId }">
