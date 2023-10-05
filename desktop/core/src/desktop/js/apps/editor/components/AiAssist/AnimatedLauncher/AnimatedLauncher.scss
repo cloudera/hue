@@ -26,8 +26,8 @@ $adjusted-left-margin: 20px;
 
   .hue-ai-assist-bar__animated-launcher--expanding,
   .hue-ai-assist-bar__animated-launcher--expanded {
-    width: 1px;
-    height: 1px;
+    width: 0;
+    height: 0;
     margin-top: 8px;
     right: 34px;
   }
@@ -56,7 +56,6 @@ $adjusted-left-margin: 20px;
   }
 
   .hue-ai-assist-bar__animated-launcher--loading-with-status {
-    animation-fill-mode: forwards;
     animation: loadingStatusAnimation (ai-assist-vars.$expand-animation-time * 0.5) ease-in-out 1;
     width: auto;
     display: flex;
@@ -70,7 +69,6 @@ $adjusted-left-margin: 20px;
   .hue-ai-assist-bar__animated-launcher--warning {
     background-color: vars.$fluidx-red-050;
     border-radius: 12px;
-    width: 24px;
     height: 24px;
     right: 34px;
     margin-top: 8px;
@@ -162,7 +160,6 @@ $adjusted-left-margin: 20px;
     border-radius: 0;
     width: 1px;
     height: 1px;
-    right: 34px;
     margin-top: 18px;
     right: 46px;
   }
