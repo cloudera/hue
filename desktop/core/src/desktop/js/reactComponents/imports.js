@@ -7,7 +7,7 @@ export async function loadComponent(name) {
     case 'ReactExample':
       return (await import('../apps/editor/components/result/reactExample/ReactExample')).default;
     case 'AiAssistBar':
-          return (await import('../apps/editor/components/AiAssist/AiAssistBar')).default;             
+      return (await import('../apps/editor/components/AiAssist/AiAssistBar')).default;
 
     case 'StorageBrowserPage':
       return (await import('../apps/storageBrowser/StorageBrowserPage/StorageBrowserPage')).default;

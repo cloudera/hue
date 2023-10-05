@@ -84,32 +84,32 @@
             markerHeight="2"
             orient="auto"
           >
-            <path style="fill: #aaa;" d="M0,-5L10,0L0,5" />
+            <path style="fill: #aaa" d="M0,-5L10,0L0,5" />
           </marker>
 
           <radialGradient id="vertex-grad" cx="50%" cy="50%" r="100%" fx="50%" fy="50%">
-            <stop offset="0%" style="stop-color: #b0c4de;" />
-            <stop offset="100%" style="stop-color: #769ccd;" />
+            <stop offset="0%" style="stop-color: #b0c4de" />
+            <stop offset="100%" style="stop-color: #769ccd" />
           </radialGradient>
 
           <radialGradient id="input-grad" cx="50%" cy="50%" r="100%" fx="50%" fy="50%">
-            <stop offset="0%" style="stop-color: #adff2e;" />
-            <stop offset="100%" style="stop-color: #91d723;" />
+            <stop offset="0%" style="stop-color: #adff2e" />
+            <stop offset="100%" style="stop-color: #91d723" />
           </radialGradient>
 
           <radialGradient id="output-grad" cx="50%" cy="50%" r="100%" fx="50%" fy="50%">
-            <stop offset="0%" style="stop-color: #fa8072;" />
-            <stop offset="100%" style="stop-color: #d26457;" />
+            <stop offset="0%" style="stop-color: #fa8072" />
+            <stop offset="100%" style="stop-color: #d26457" />
           </radialGradient>
 
           <radialGradient id="task-grad" cx="50%" cy="50%" r="100%" fx="50%" fy="50%">
-            <stop offset="0%" style="stop-color: #d0bfd1;" />
-            <stop offset="100%" style="stop-color: #af8fb1;" />
+            <stop offset="0%" style="stop-color: #d0bfd1" />
+            <stop offset="100%" style="stop-color: #af8fb1" />
           </radialGradient>
 
           <radialGradient id="group-grad" cx="50%" cy="50%" r="100%" fx="50%" fy="50%">
-            <stop offset="0%" style="stop-color: #bbbbbb;" />
-            <stop offset="100%" style="stop-color: #999999;" />
+            <stop offset="0%" style="stop-color: #bbbbbb" />
+            <stop offset="100%" style="stop-color: #999999" />
           </radialGradient>
 
           <filter id="grey-glow">

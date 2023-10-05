@@ -628,7 +628,7 @@
           editor.moveCursorToPosition(position);
           editor.renderer.scrollCursorIntoView();
         });
-        
+
         subTracker.subscribe(
           'ace.replace',
           (data: { text: string; location: ParsedLocation }): void => {

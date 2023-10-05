@@ -40,7 +40,9 @@ function AnimatedLauncher({
   const handleClickOnCircleOrInfobar = () => {
     const loaderIsShowingMessage =
       isExpanded && (loadingStatusText || showErrorMessage || showWarningMessage);
-    if (!loaderIsShowingMessage) onExpandClick();
+    if (!loaderIsShowingMessage) {
+      onExpandClick();
+    }
   };
 
   return (

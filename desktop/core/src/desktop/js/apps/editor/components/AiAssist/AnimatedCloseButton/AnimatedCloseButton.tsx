@@ -7,11 +7,11 @@ type Size = 'small' | 'large';
 type Direction = 'left' | 'right';
 
 type Props = {
-  title: string,
-  className?: string,
-  onClick: () => void,
-  size?: Size,
-  direction?: Direction,
+  title: string;
+  className?: string;
+  onClick: () => void;
+  size?: Size;
+  direction?: Direction;
 };
 
 function AnimatedCloseButton({

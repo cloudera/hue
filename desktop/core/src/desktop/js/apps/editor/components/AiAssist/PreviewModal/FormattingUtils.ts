@@ -74,7 +74,7 @@ const includeNqlAsComment = ({ oldSql, newSql, nql, includeNql, replaceNql }) =>
 
 export const removeComments = (statement: string) => {
   return statement.replace(singleLineCommentRegex, '').replace(multiLineCommentRegex, '');
-}
+};
 
 export const formatClean = (sql: string, dialect: string) => {
   const cleanedSql = removeComments(sql).trim();
@@ -85,7 +85,7 @@ export const formatClean = (sql: string, dialect: string) => {
     console.error(e);
   }
   return newFormat;
-}
+};
 
 export const extractLeadingNqlComments = (sql: string): string => {
   const comments = sql.match(nqlCommentRegex) || [];
@@ -116,10 +116,7 @@ export const useFormatting = ({ dialect, keywordCase, oldSql, newSql, nql }) => 
     replaceNql: false
   };
 
-  const savedConfiguration = getFromLocalStorage(
-    LOCAL_STORAGE_KEY,
-    defaultConfig
-  );
+  const savedConfiguration = getFromLocalStorage(LOCAL_STORAGE_KEY, defaultConfig);
   const [formattingConfig, setFormattingConfig] = useState<FormattingConfig>(savedConfiguration);
   const { autoFormat, includeNql, replaceNql } = formattingConfig;
 

@@ -24,11 +24,7 @@ const alignLineNumbers = (lineNumber, maxNumberOfLines) => {
   return `${lineNumber}${spacesToAdd}`;
 };
 
-const SyntaxHighlighterDiff = ({
-  newCode,
-  oldCode,
-  lineNumberStart = 1,
-}) => {
+const SyntaxHighlighterDiff = ({ newCode, oldCode, lineNumberStart = 1 }) => {
   const diff = diffLines(oldCode, newCode);
   const maxNumberOfLines = diff.reduce((total, obj) => total + obj.count, 0);
   const maxLineNumber = maxNumberOfLines + lineNumberStart;
@@ -116,7 +112,7 @@ const SyntaxHighlighterDiff = ({
               });
             });
 
-            let htmlClassname = [
+            const htmlClassname = [
               DIFF_STYLE.row,
               !diffLine ? DIFF_STYLE.rowEmpty : '',
               diffLine?.added ? DIFF_STYLE.rowAdded : '',

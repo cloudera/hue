@@ -108,9 +108,8 @@
           const events = process.events;
           const eventsUnderMouse: ProcessEvent[] = [];
 
-          const eventElements: NodeListOf<HTMLElement> = this.$el.querySelectorAll(
-            '.dag-swimlane-event'
-          );
+          const eventElements: NodeListOf<HTMLElement> =
+            this.$el.querySelectorAll('.dag-swimlane-event');
 
           eventElements.forEach((element: HTMLElement, index: number) => {
             const offsetLeft = element.getBoundingClientRect().left;

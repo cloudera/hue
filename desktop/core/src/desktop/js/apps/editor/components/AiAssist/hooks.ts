@@ -28,13 +28,13 @@ export const useKeywordCase = (parser: any, selectedStatement: string) => {
   }, [parser]);
 
   const keywordCase = useMemo(() => {
-    const hasKey = (statement: string, keyword: string)=> {
+    const hasKey = (statement: string, keyword: string) => {
       const regex = new RegExp('\\b' + keyword + '\\b', 'g');
-      return statement.match(regex);      
-    }
+      return statement.match(regex);
+    };
     const { upperCase, lowerCase } = sqlKeywords;
     const upperCaseCount = upperCase.filter(keyword => hasKey(selectedStatement, keyword)).length;
-    const lowerCaseCount = lowerCase.filter(keyword => hasKey(selectedStatement, keyword)).length;    
+    const lowerCaseCount = lowerCase.filter(keyword => hasKey(selectedStatement, keyword)).length;
 
     return lowerCaseCount > upperCaseCount ? 'lower' : 'upper';
   }, [selectedStatement, sqlKeywords, autoFormatCount]);
@@ -114,7 +114,7 @@ export interface HistoryItem {
 
 export const useLocalStorageHistory = (
   key: string,
-  maxHistoryLength: number = 10
+  maxHistoryLength = 10
 ): [HistoryItem[], (newItem: HistoryItem) => void] => {
   const [history, setHistory] = useState<HistoryItem[]>(() => {
     const savedHistory = getFromLocalStorage(key) as HistoryItem[];
