@@ -205,35 +205,6 @@ const handleError = (error: any, msg: string): { error: Error } => {
   };
 };
 
-const generateTableDDL = (tableObject: any, dialect: string): string => {
-  const tableName = tableObject.name;
-
-  const columnDefinitions = tableObject.columns
-    .map((col: any) => {
-      let columnDef = `${col.name} ${col.type}`;
-      if (col.primaryKey) {
-        columnDef += ' PRIMARY KEY';
-      }
-      if (col.foreignKey) {
-        columnDef += ` FOREIGN KEY (${col.foreignKey.name}) REFERENCES ${col.foreignKey.to}`;
-      }
-      if (col.comment && col.comment != '') {
-        columnDef += ` COMMENT '${col.comment}'`;
-      }
-      return columnDef;
-    })
-    .join(', ');
-
-  // const partitions = tableObject.partitions.map((p: any) => `${p.name} ${p.type}`).join(', ');
-
-  return `CREATE TABLE ${tableName} (${columnDefinitions});`;
-};
-
-const generateAllTableDDLs = (tableMetadatas: any[], dialect: string): string => {
-  const allDDLs = tableMetadatas.map(table => generateTableDDL(table, dialect));
-  return allDDLs.join('\n\n');
-};
-
 const fetchColumnsData = async (databaseName: string, tableName: string, executor: Executor) => {
   const dbEntry = await dataCatalog.getEntry({
     path: [databaseName, tableName],
@@ -311,9 +282,6 @@ const generateOptimizedSql: GenerateOptimizedSql = async ({
     }
   }
 
-  // Generate DDL for tables
-  const ddlString = generateAllTableDDLs(tableMetadata, dialect);
-
   onStatusChange('Optimizing SQL query');
 
   try {
@@ -324,8 +292,7 @@ const generateOptimizedSql: GenerateOptimizedSql = async ({
         sql: statement,
         dialect,
         metadata: {
-          tables: tableMetadata,
-          ddl: ddlString
+          tables: tableMetadata
         }
       }
     });
@@ -349,7 +316,6 @@ const generateSQLfromNQL: GenerateSQLfromNQL = async ({
       return handleError(e, e.message);
     }
   }
-  const ddlString = generateAllTableDDLs(tableMetadata, dialect);
 
   onStatusChange('Generating SQL query');
   try {
@@ -360,8 +326,7 @@ const generateSQLfromNQL: GenerateSQLfromNQL = async ({
         input: nql,
         dialect,
         metadata: {
-          tables: tableMetadata,
-          ddl: ddlString
+          tables: tableMetadata
         }
       }
     });
@@ -386,7 +351,6 @@ const generateEditedSQLfromNQL: GenerateEditedSQLfromNQL = async ({
       return handleError(e, e.message);
     }
   }
-  const ddlString = generateAllTableDDLs(tableMetadata, dialect);
 
   onStatusChange('Generating SQL query');
   try {
@@ -398,8 +362,7 @@ const generateEditedSQLfromNQL: GenerateEditedSQLfromNQL = async ({
         input: nql,
         dialect,
         metadata: {
-          tables: tableMetadata,
-          ddl: ddlString
+          tables: tableMetadata
         }
       }
     });
@@ -429,7 +392,7 @@ const generateExplanation: GenerateExplanation = async ({
         return handleError(e, e.message);
       }
     }
-    const ddlString = generateAllTableDDLs(tableMetadata, dialect);
+
     onStatusChange('Generating explanation');
     return await fetchFromLlm({
       url: SQL_API_URL,
@@ -438,8 +401,7 @@ const generateExplanation: GenerateExplanation = async ({
         sql: statement,
         dialect,
         metadata: {
-          tables: tableMetadata,
-          ddl: ddlString
+          tables: tableMetadata
         }
       }
     });
@@ -468,7 +430,7 @@ const generateCorrectedSql: GenerateCorrectedSql = async ({
       return handleError(e, e.message);
     }
   }
-  const ddlString = generateAllTableDDLs(tableMetadata, dialect);
+
   onStatusChange('Generating corrected SQL query');
   try {
     return await fetchFromLlm({
@@ -478,8 +440,7 @@ const generateCorrectedSql: GenerateCorrectedSql = async ({
         sql: statement,
         dialect,
         metadata: {
-          tables: tableMetadata,
-          ddl: ddlString
+          tables: tableMetadata
         }
       }
     });

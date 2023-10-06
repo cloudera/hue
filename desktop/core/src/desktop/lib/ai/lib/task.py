@@ -51,7 +51,7 @@ def build_dialect_prompt(dialect: str) -> str:
     ADD_TABLE_DATA = AI_INTERFACE.ADD_TABLE_DATA.get()
     dialect_prompt = ""
     if not ADD_TABLE_DATA:
-        if dialect.lower() == 'hive':
+        if dialect.lower() in ["postgresql", "mysql"]:
             dialect_prompt += "Use lower() and ILIKE '%%' unless you are sure about how to match the data."
         else:
             dialect_prompt += "Use lower() and LIKE '%%' unless you are sure about how to match the data."
