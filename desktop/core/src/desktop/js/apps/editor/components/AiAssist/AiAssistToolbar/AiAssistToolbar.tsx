@@ -28,7 +28,7 @@ import {
 import Toolbar, { ToolbarButton } from '../../../../../reactComponents/Toolbar/Toolbar';
 import AiAssistToolbarInput from './AiAssistToolbarInput';
 import { useKeyboardShortcuts } from '../hooks';
-import { extractLeadingNqlComments, removeComments } from '../PreviewModal/FormattingUtils';
+import { extractLeadingNqlComments, removeComments } from '../PreviewModal/formattingUtils';
 
 import './AiAssistToolbar.scss';
 

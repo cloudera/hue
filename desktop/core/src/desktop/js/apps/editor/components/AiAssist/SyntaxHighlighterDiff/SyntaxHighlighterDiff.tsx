@@ -52,6 +52,7 @@ const SyntaxHighlighterDiff = ({ newCode, oldCode, lineNumberStart = 1 }) => {
   const formattedDiffOld: string[] = [];
   let previousLinesNew = lineNumberStart;
   let previousLinesOld = lineNumberStart;
+  
   diff.forEach((part: Change, index: number) => {
     const { removed, added, count } = part;
     const lines = part.value.split('\n');

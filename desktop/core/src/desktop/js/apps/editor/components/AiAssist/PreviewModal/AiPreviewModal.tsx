@@ -29,14 +29,14 @@ import SyntaxHighlighterDiff from '../SyntaxHighlighterDiff/SyntaxHighlighterDif
 import InlineAlertCheck from '../InlineAlertCheck/InlineAlertCheck';
 import { AiBarActionType } from '../AiAssistBar';
 
-import { useFormatting, formatClean } from './FormattingUtils';
+import { useFormatting, formatClean } from './formattingUtils';
 import PreviewInfoPanels from './PreviewInfoPanels/PreviewInfoPanels';
 import PreviewModalFooter from './PreviewModalFooter/PreviewModalFooter';
 import SqlPreviewConfig from './SqlPreviewConfig/SqlPreviewConfig';
 
 import './AiPreviewModal.scss';
 
-const hasDiff = (codeA, codeB, dialect): boolean => {
+const hasDiff = (codeA: string, codeB: string, dialect: string): boolean => {
   const cleanNew = formatClean(codeA, dialect);
   const cleanOld = formatClean(codeB, dialect);
   return cleanNew !== cleanOld;
