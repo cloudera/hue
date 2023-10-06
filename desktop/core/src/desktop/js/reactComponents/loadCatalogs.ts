@@ -1,4 +1,5 @@
 
+import { getLastKnownConfig } from 'config/hueConfig';
 import huePubSub from 'utils/huePubSub';
 import sleep from 'utils/timing/sleep';
 
@@ -35,7 +36,8 @@ const getCacheProgress = (databaseName: string) => {
 };
 
 export async function loadDataCatalogs() {
-  if (!window.AI_INTERFACE_ENABLED) {
+  const config = getLastKnownConfig();
+  if (!(config?.hue_config?.is_ai_interface_enabled)) {
     return;
   }
 
@@ -48,12 +50,13 @@ export async function loadDataCatalogs() {
     const databaseName = data.entry.path[0];
     const totalTables = dataCatalogEntry.tables_meta.length;
 
-    const configLimit = window.AUTO_FETCH_TABLE_META_LIMIT;
+    const config = getLastKnownConfig();
+    const configLimit = config?.hue_config?.auto_fetch_table_meta_limit
     if (configLimit === 0) {
       return;
     }
 
-    const numTablesToLoad = configLimit === -1 ? totalTables : Math.min(configLimit, totalTables);
+    const numTablesToLoad = configLimit === -1 ? totalTables : Math.min(configLimit || 20, totalTables);
 
     let completedTables = 0;
 

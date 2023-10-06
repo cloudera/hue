@@ -60,7 +60,6 @@ import {
 } from 'ko/components/assist/events';
 import { EXECUTABLE_UPDATED_TOPIC } from './execution/events';
 
-// TODO: Remove together with ENABLE_HUE_5. Temporary here for debug
 window.SqlExecutable = SqlExecutable;
 window.Executor = Executor;
 

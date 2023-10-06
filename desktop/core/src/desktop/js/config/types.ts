@@ -82,6 +82,9 @@ export interface HueConfig extends GenericApiResponse {
   hue_config: {
     enable_sharing: boolean;
     collect_usage: boolean;
+    is_ai_interface_enabled: boolean;
+    is_vector_db_enabled: boolean;
+    auto_fetch_table_meta_limit: number;
   };
   hue_version?: string;
   img_version?: string;
