@@ -1143,6 +1143,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       <a class="btn" rel="tooltip" data-placement="bottom" title="${ _("Execute all") }" data-bind="visible: ! isExecutingAll(), click: function() { executeAll(); }">
         <i class="fa fa-fw fa-play"></i>
       </a>
+      <!-- ko if: ! (snippets()[executingAllIndex()] && snippets()[executingAllIndex()].isCanceling()) -->
       <a class="btn red" rel="tooltip" data-placement="bottom" title="${ _("Stop all") }" data-bind="visible: isExecutingAll(), click: function() { cancelExecutingAll(); }">
         <i class="fa fa-fw fa-stop"></i>
       </a>
@@ -1733,9 +1734,11 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     <div class="label label-info" data-bind="attr: {'title':'${ _ko('Showing results of the statement #')}' + (result.statement_id() + 1)}, visible: $root.editorMode() && result.statements_count() > 1">
       <div class="pull-left" data-bind="text: (result.statement_id() + 1)"></div><div class="pull-left">/</div><div class="pull-left" data-bind="text: result.statements_count()"></div>
     </div>
+    <!-- ko if: !isCanceling() -->
     <a class="snippet-side-btn red" data-bind="click: cancel, visible: status() == 'running' || status() == 'starting'" title="${ _('Cancel operation') }">
       <i class="fa fa-fw fa-stop snippet-side-single"></i>
     </a>
+    <!-- /ko -->
     <!-- ko if: isCanceling() -->
     <a class="snippet-side-btn" style="cursor: default;" title="${ _('Canceling operation...') }">
       <i class="fa fa-fw fa-spinner snippet-side-single fa-spin"></i>
