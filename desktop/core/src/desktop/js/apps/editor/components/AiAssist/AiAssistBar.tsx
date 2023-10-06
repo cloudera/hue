@@ -85,7 +85,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
   const selectedStatement: string = parsedStatement?.statement || '';
   const lastSelectedStatement = useRef(selectedStatement);
   const { firstLine, lastLine } = getSelectedLineNumbers(parsedStatement);
-  
+
   const [isExpanded, setIsExpanded] = useState(
     getFromLocalStorage('hue.aiAssistBar.isExpanded', false)
   );
@@ -323,7 +323,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
     setShowSuggestedSqlModal(false);
     setIsOptimizeMode(false);
     setGuardrailAlert(undefined);
-  }
+  };
 
   const resetAll = () => {
     setIsOptimizeMode(false);

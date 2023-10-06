@@ -65,7 +65,7 @@ const ESCAPE_KEY = 'Escape';
 const DOWN_KEY = 'ArrowDown';
 const UP_KEY = 'ArrowUp';
 
-const insertBetween = (highlighted:HighlightableTextItem) => {
+const insertBetween = (highlighted: HighlightableTextItem) => {
   return (result: HighlightableTextItem[], value: HighlightableTextItem, index, array) => {
     if (index < array.length - 1) {
       return result.concat([value, { ...highlighted, key: `${highlighted.key}${index}` }]);
