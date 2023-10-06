@@ -164,7 +164,8 @@ const getRelevantTables = async (
   }
 
   let tableMetadata = allTables;
-  if (window.IS_VECTOR_DB_ENABLED) {
+  const config = getLastKnownConfig();
+  if (config?.hue_config?.is_vector_db_enabled) {
     tableMetadata = await getRelevantTableDetails(
       tableParams.databaseName,
       allTables,

@@ -108,8 +108,6 @@
   window.ENABLE_DOWNLOAD = '${ conf.ENABLE_DOWNLOAD.get() }' === 'True';
   window.ENABLE_NEW_CREATE_TABLE = '${ hasattr(ENABLE_NEW_CREATE_TABLE, 'get') and ENABLE_NEW_CREATE_TABLE.get()}' === 'True';
   window.ENABLE_HUE_5 = '${ ENABLE_HUE_5.get() }' === 'True';
-  window.IS_VECTOR_DB_ENABLED = '${ is_vector_db_enabled() }' === 'True';
-  window.AUTO_FETCH_TABLE_META_LIMIT = '20';
 
   window.ENABLE_PREDICT = '${ OPTIMIZER.ENABLE_PREDICT.get() }' === 'True';
   window.ENABLE_SQL_INDEXER = '${ ENABLE_SQL_INDEXER.get() }' === 'True';
@@ -122,7 +120,6 @@
   window.ENABLE_HISTORY_V2 = '${ hasattr(ENABLE_HISTORY_V2, 'get') and ENABLE_HISTORY_V2.get() }' === 'True';
 
   window.ENABLE_SQL_SYNTAX_CHECK = '${ conf.ENABLE_SQL_SYNTAX_CHECK.get() }' === 'True';
-  window.AI_INTERFACE_ENABLED = '${ conf.AI_INTERFACE.SERVICE.get() }' !== 'None';
 
   window.HAS_CATALOG = '${ has_catalog(request.user) }' === 'True';
   window.CATALOG_URL = '${ get_catalog_url() or "" }'
