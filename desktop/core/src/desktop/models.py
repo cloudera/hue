@@ -2032,6 +2032,16 @@ class ClusterConfig(object):
         'page': '/filebrowser/view=' + urllib_quote(home_path, safe=SAFE_CHARACTERS_URI_COMPONENTS)
       })
 
+    if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('gs', self.user):
+      home_path = remote_home_storage if remote_home_storage else 'gs://'.encode('utf-8')
+      interpreters.append({
+        'type': 'gs',
+        'displayName': _('GS'),
+        'buttonName': _('Browse'),
+        'tooltip': _('Google Storage'),
+        'page': '/filebrowser/view=' + urllib_quote(home_path, safe=SAFE_CHARACTERS_URI_COMPONENTS)
+      })
+
     if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('adl', self.user):
       home_path = remote_home_storage if remote_home_storage else 'adl:/'.encode('utf-8')
       interpreters.append({

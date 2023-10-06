@@ -28,6 +28,7 @@ export const ADLS_API_PREFIX = '/filebrowser/view=' + encodeURIComponent('adl:/'
 export const ABFS_API_PREFIX = '/filebrowser/view=' + encodeURIComponent('ABFS://');
 export const GIT_API_PREFIX = '/desktop/api/vcs/contents/';
 export const S3_API_PREFIX = '/filebrowser/view=' + encodeURIComponent('s3a://');
+export const GS_API_PREFIX = '/filebrowser/view=' + encodeURIComponent('gs://');
 export const IMPALA_INVALIDATE_API = '/impala/api/invalidate';
 export const CONFIG_SAVE_API = '/desktop/api/configurations/save/';
 export const CONFIG_APPS_API = '/desktop/api/configurations';
