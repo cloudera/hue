@@ -20,7 +20,7 @@
   <div>
     <div>
       <div class="buttons-container">
-        <hue-button borderless @click="showQueries">
+        <hue-button @click="showQueries" borderless>
           <em class="fa fa-chevron-left" />
           Queries
         </hue-button>
