@@ -21,16 +21,21 @@ import { format } from 'sql-formatter';
 
 import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
 
-import { nqlCommentRegex, singleLineCommentRegex, multiLineCommentRegex } from '../sharedRegexes';
+import { nqlCommentRegex, multiLineCommentRegex } from '../sharedRegexes';
 
+const SINGLE_LINE_COMMENT_REGEX = /^(\s)*--.*$/gm;
 const LOCAL_STORAGE_KEY = 'hue.aiAssistBar.sqlFormattingConf';
+const MAX_LINE_LENGTH = 90;
+const SPACE = ' ';
+const LINE_BREAK = '\n';
 
+/***
+ * Insert line breaks in a string so that no line is longer than 90 characters.
+ * Useful for formatting LLM text responses.
+ */
 const insertLineBreaks = (input: string): string => {
   let output = '';
   let lineLength = 0;
-  const MAX_LINE_LENGTH = 90;
-  const SPACE = ' ';
-  const LINE_BREAK = '\n';
 
   input.split(SPACE).forEach(word => {
     const append = word + SPACE;
@@ -71,7 +76,7 @@ const appendComments = (previousSql: string, newSql: string, newComment: string)
   return `${existingComments}/* ${newComment.trim()} */\n${query.trim()}`;
 };
 
-const replaceNQLComment = (newSql: string, newComment: string): string => {
+const replaceNqlComment = (newSql: string, newComment: string): string => {
   const commentsKeptInNewSql = newSql.match(nqlCommentRegex)?.join('\n') || undefined;
 
   // We don't know for sure if an AI modified SQL will
@@ -85,13 +90,13 @@ const includeNqlAsComment = ({ oldSql, newSql, nql, includeNql, replaceNql }) =>
   const nqlWithPrefix = nql && nql.trim().startsWith('NQL:') ? nql : `NQL: ${nql}`;
   const commentWithLinebreaks = insertLineBreaks(nqlWithPrefix);
   const sqlWithNqlComment = replaceNql
-    ? replaceNQLComment(newSql, commentWithLinebreaks)
+    ? replaceNqlComment(newSql, commentWithLinebreaks)
     : appendComments(oldSql, newSql, commentWithLinebreaks);
   return addComment ? sqlWithNqlComment : newSql;
 };
 
 export const removeComments = (statement: string) => {
-  return statement.replace(singleLineCommentRegex, '').replace(multiLineCommentRegex, '');
+  return statement.replace(SINGLE_LINE_COMMENT_REGEX, '').replace(multiLineCommentRegex, '');
 };
 
 export const formatClean = (sql: string, dialect: string) => {
@@ -149,6 +154,7 @@ export const useFormatting = ({ dialect, keywordCase, oldSql, newSql, nql }) => 
       try {
         newFormat = format(sql, { language: dialect, keywordCase });
       } catch (e) {
+        console.error('Ignored formatting SQL due to error. Proceeding with unformatted SQL.');
         console.error(e);
       }
     }

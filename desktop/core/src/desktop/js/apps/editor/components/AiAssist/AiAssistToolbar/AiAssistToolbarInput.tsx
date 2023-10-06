@@ -55,7 +55,11 @@ const isMultiLineSpan = (
 
 const calculateAvailableWidth = (toolbarButtonWrapperRef: React.RefObject<HTMLSpanElement>) => {
   const containerWidth = toolbarButtonWrapperRef.current?.clientWidth;
-  const newLineButtonWidth = 64;
+  const buttonElement = toolbarButtonWrapperRef.current?.querySelector(
+    '.hue-toolbar-button'
+  ) as HTMLElement;
+  const additionalPadding = 18;
+  const newLineButtonWidth = buttonElement ? buttonElement.offsetWidth + additionalPadding : 0;
   return containerWidth ? containerWidth - newLineButtonWidth : undefined;
 };
 
@@ -111,8 +115,8 @@ const calculateDropdownPosition = (
 ) => {
   const textareaTop = textareaElement.getBoundingClientRect().top;
   const textareaLeft = textareaElement.getBoundingClientRect().left;
-  const DEFAULT_PADDING = 4;
-  const extraSpacingTop = textAreaIsMultiLine ? 0 : DEFAULT_PADDING;
+  const DEFAULT_VERTICAL_SPACING = 4;
+  const extraSpacingTop = textAreaIsMultiLine ? 0 : DEFAULT_VERTICAL_SPACING;
   const dropdownTop = textareaTop + extraSpacingTop + textareaElement.clientHeight;
 
   return {
@@ -156,10 +160,10 @@ function AiAssistToolbarInput({
   const [historyItems, addHistoryItem] = useLocalStorageHistory(HISTORY_STORAGE_KEY, 50);
 
   const toolbarButtonWrapperRef = useRef<HTMLDivElement>(null);
-  const spanSizeRef = useRef<HTMLSpanElement | null>(null);
-  const spanSingleLineRef = useRef<HTMLSpanElement | null>(null);
-  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
-  const historyDropdownRef = useRef<HTMLElement | null>(null);
+  const spanSizeRef = useRef<HTMLSpanElement>(null);
+  const spanSingleLineRef = useRef<HTMLSpanElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const historyDropdownRef = useRef<HTMLElement>(null);
 
   const resizeAwareMaxWidth = useResizeAwareElementSize(toolbarButtonWrapperRef)?.width;
   const placeholderText = prefill || placeholder;

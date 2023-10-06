@@ -32,7 +32,7 @@ import AnimatedLauncher from './AnimatedLauncher/AnimatedLauncher';
 import AnimatedCloseButton from './AnimatedCloseButton/AnimatedCloseButton';
 import AssistToolbar from './AiAssistToolbar/AiAssistToolbar';
 import { withGuardrails, GuardrailAlert, GuardrailAlertType } from './guardRails';
-import { extractLeadingNqlComments, removeComments } from './PreviewModal/FormattingUtils';
+import { extractLeadingNqlComments, removeComments } from './PreviewModal/formattingUtils';
 
 import './AiAssistBar.scss';
 
@@ -76,6 +76,7 @@ const breakLines = (input: string): string => {
 export interface AiAssistBarProps {
   activeExecutable?: SqlExecutable;
 }
+
 const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
   const currentExecutable =
     activeExecutable instanceof Function ? activeExecutable() : activeExecutable;
@@ -84,6 +85,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
   const selectedStatement: string = parsedStatement?.statement || '';
   const lastSelectedStatement = useRef(selectedStatement);
   const { firstLine, lastLine } = getSelectedLineNumbers(parsedStatement);
+  
   const [isExpanded, setIsExpanded] = useState(
     getFromLocalStorage('hue.aiAssistBar.isExpanded', false)
   );
@@ -104,8 +106,9 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
   const [errorStatusText, setErrorStatusText] = useState('');
   const [nql, setNql] = useState('');
   const [inputValue, setInputValue] = useState<string>('');
-  const cursorPosition = useRef<{ row: number; column: number } | undefined>();
   const [syntaxParser, sqlDialect, hasIncorrectSql] = useParser(currentExecutable);
+
+  const cursorPosition = useRef<{ row: number; column: number } | undefined>();
   const keywordCase = useKeywordCase(syntaxParser, selectedStatement);
   const inputExpanded = isEditMode || isGenerateMode;
   const inputPrefill = inputExpanded ? extractLeadingNqlComments(selectedStatement) : '';
@@ -281,6 +284,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
           first_column: 1,
           last_line: lastLine,
           // TODO: what to use here?
+          // We are replacing complete lines so we don't know what the last column is.
           last_column: 10000
         }
       });
@@ -311,6 +315,15 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
 
     acceptSuggestion(textToInsert);
   };
+
+  const handleCancel = () => {
+    setExplanation('');
+    setSummary('');
+    setSuggestionExplanation('');
+    setShowSuggestedSqlModal(false);
+    setIsOptimizeMode(false);
+    setGuardrailAlert(undefined);
+  }
 
   const resetAll = () => {
     setIsOptimizeMode(false);
@@ -480,14 +493,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
           actionType={actionType}
           title="Suggestion"
           open
-          onCancel={() => {
-            setExplanation('');
-            setSummary('');
-            setSuggestionExplanation('');
-            setShowSuggestedSqlModal(false);
-            setIsOptimizeMode(false);
-            setGuardrailAlert(undefined);
-          }}
+          onCancel={handleCancel}
           onInsert={sql => handleInsert(sql, explanation)}
           primaryButtonLabel={explanation ? 'Insert as comment' : 'Insert'}
           suggestion={suggestion}

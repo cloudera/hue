@@ -64,7 +64,7 @@ function AnimatedLauncher({
   };
 
   return (
-    <div
+    <button
       onAnimationEnd={onAnimationEnd}
       className={classNames('hue-ai-assist-bar__animated-launcher', {
         'hue-ai-assist-bar__animated-launcher--expanding': isAnimating === 'expand',
@@ -117,7 +117,7 @@ function AnimatedLauncher({
           </div>
         </>
       )}
-    </div>
+    </button>
   );
 }
 

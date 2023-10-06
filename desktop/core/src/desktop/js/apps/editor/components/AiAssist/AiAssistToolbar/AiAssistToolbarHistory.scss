@@ -21,19 +21,17 @@
 
 $max-height: 300px;
 
-// NOTE THESE STYLES ARE FOR A PORTAL
+// NOTE! These styles are for a react portal
 // so they will not automatically be wraped by .cuix.antd
 .hue-ai-assist-toolbar-history {
   position: absolute;
   background-color: rgba(237, 247, 255, 1);
-  // backdrop-filter: blur(5px);
   padding-top: 8px;
   padding-bottom: 8px;
   z-index: 6;
   border-radius: 3px;
   border: 1px solid vars.$fluidx-blue-100;
   margin-top: 8px;
-  // box-shadow: 0 3px 5px rgba(0, 0, 0, 0.175);
 
   &:focus-visible {
     outline: none;

@@ -22,7 +22,7 @@
 // We need to get the cuix class in but we can't add it to the root
 .ant-modal-root {
   .hue-ai-guardrails-modal {
-    // Need tooverride, can't add custom class.
+    // Need to override, can't add custom class.
     .ant-alert-with-description {
       margin-bottom: vars.$fluidx-spacing-m;
       // Need to override the description that for some reason is set to display: none
