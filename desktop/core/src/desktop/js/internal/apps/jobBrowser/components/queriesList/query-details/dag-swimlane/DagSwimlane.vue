@@ -31,7 +31,9 @@
           @hideTooltip="hideTooltip"
           @click="click"
         />
-        <div class="consolidated-view-label">Consolidated</div>
+        <div class="consolidated-view-label">
+          Consolidated
+        </div>
       </div>
       <div class="process-visuals">
         <div class="zoom-panel">

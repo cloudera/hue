@@ -18,7 +18,7 @@
 
 <template>
   <div>
-    <HueTable v-if="rows.length" :columns="columns" :rows="rows">
+    <HueTable v-if="rows.length" :columns="columns" :rows="rows" >
       <template #cell-variance="row">
         <VarianceCell :data="row" />
       </template>
