@@ -1,4 +1,3 @@
-// import MD5 from 'crypto-js/MD5';
 import { hueWindow } from 'types/types';
 
 import Executor from '../apps/editor/execution/executor';
