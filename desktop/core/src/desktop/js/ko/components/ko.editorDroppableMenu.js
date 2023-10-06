@@ -113,6 +113,7 @@ class EditorDroppableMenu extends DisposableComponent {
         let text = ui.helper.text();
         if (
           meta.type === 's3' ||
+          meta.type === 'gs' ||
           meta.type === 'hdfs' ||
           meta.type === 'adls' ||
           meta.type === 'abfs' ||

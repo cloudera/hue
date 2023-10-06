@@ -40,6 +40,12 @@ else:
               <i class="fa fa-fw fa-cubes"></i> ${ get_default_region() }
             </span>
           </li>
+        %elif path.lower().find('gs://') == 0:
+          <li style="padding-top: 12px">
+            <span class="breadcrumb-link homeLink">
+              <svg class="hi"><use xlink:href='#hi-adls'></use></svg>
+            </span>
+          </li>
         %elif path.lower().find('adl:/') == 0:
           <li style="padding-top: 12px">
             <span class="breadcrumb-link homeLink">
