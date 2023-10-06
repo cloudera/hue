@@ -47,7 +47,7 @@ import {
   REFRESH_STATEMENT_LOCATIONS_EVENT
 } from 'ko/bindings/ace/aceLocationHandler';
 import UUID from 'utils/string/UUID';
-import SqlExecutable, { ExecutionStatus } from 'apps/editor/execution/sqlExecutable';
+import SqlExecutable from 'apps/editor/execution/sqlExecutable';
 
 // TODO: Remove together with ENABLE_HUE_5. Temporary here for debug
 window.SqlExecutable = SqlExecutable;
@@ -1018,7 +1018,7 @@ class Snippet {
       }
       return statement;
     });
-    
+
     self.result = new Result(snippet, snippet.result);
     if (!self.result.hasSomeResults()) {
       self.currentQueryTab('queryHistory');
