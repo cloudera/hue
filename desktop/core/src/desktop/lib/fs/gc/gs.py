@@ -406,6 +406,10 @@ class GSFileSystem(S3FileSystem):
     if src_st.isDir and dst_st and not dst_st.isDir:
       raise GSFileSystemException("Cannot overwrite non-directory '%s' with directory '%s'" % (dst, src))
 
+    # Skip operation if destination path is same as source path
+    if self._check_key_parent_path(src, dst):
+      raise GSFileSystemException('Destination path is same as the source path, skipping the operation.')
+
     src_bucket, src_key = parse_uri(src)[:2]
     dst_bucket, dst_key = parse_uri(dst)[:2]
 
@@ -449,6 +453,19 @@ class GSFileSystem(S3FileSystem):
       new (str): The new GS path to rename to.
     """
     new = abspath(old, new)
-    self.copy(old, new, recursive=True)
-    self.rmtree(old, skipTrash=True)
-  
+
+    # Skip operation if destination path is same as source path
+    if not self._check_key_parent_path(old, new):
+      self.copy(old, new, recursive=True)
+      self.rmtree(old, skipTrash=True)
+    else:
+      raise GSFileSystemException('Destination path is same as source path, skipping the operation.')
+
+  @translate_gs_error
+  @auth_error_handler
+  def _check_key_parent_path(self, src, dst):
+    # Return True if parent path of source is same as destination path.
+    if GSFileSystem.parent_path(src) == dst:
+      return True
+    else:
+      return False
