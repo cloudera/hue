@@ -44,7 +44,7 @@ from desktop.lib.ai.sql import perform_sql_task
 from desktop.lib.ai.metadata import semantic_search
 from desktop.lib.ai.vector_db import filter_vector_db
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 # Core
 
