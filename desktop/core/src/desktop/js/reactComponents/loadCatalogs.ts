@@ -1,6 +1,9 @@
-import huePubSub from 'utils/huePubSub';
 
-const fetchColumnsData = async (databaseName, tableName, executor) => {
+import huePubSub from 'utils/huePubSub';
+import sleep from 'utils/timing/sleep';
+
+
+const fetchColumnsData = async (databaseName: string, tableName: string, executor: any) => {
   const dbEntry = await executor.dataCatalog.getEntry({
     path: [databaseName, tableName],
     connector: executor.connector,
@@ -11,13 +14,13 @@ const fetchColumnsData = async (databaseName, tableName, executor) => {
   return columns;
 };
 
-export const getRelevantTableDetails = async (databaseName, tableNames, executor) => {
-  const relevantTables = [];
+export const getRelevantTableDetails = async (databaseName: string, tableNames: string[], executor: any) => {
+  const relevantTables: any[] = [];
   for (const tableName of tableNames) {
     const columns = await fetchColumnsData(databaseName, tableName, executor);
     const tableDetails = {
       tableName: tableName,
-      columns: columns.map(({ definition }) => definition),
+      columns: columns.map(({ definition }: any) => definition),
       partitions: columns.partitions
     };
     relevantTables.push(tableDetails);
@@ -25,20 +28,18 @@ export const getRelevantTableDetails = async (databaseName, tableNames, executor
   return relevantTables;
 };
 
-const delay = duration => new Promise(resolve => setTimeout(resolve, duration));
-
-const getCacheProgress = databaseName => {
+const getCacheProgress = (databaseName: string) => {
   const progressKey = 'database_cache_progress_' + databaseName;
   const progress = localStorage.getItem(progressKey);
   return progress ? parseInt(progress, 10) : 0;
 };
 
-export async function LoadDataCatalogs() {
+export async function loadDataCatalogs() {
   if (!window.AI_INTERFACE_ENABLED) {
     return;
   }
 
-  huePubSub.subscribe('fetch_tables_metadata', async data => {
+  huePubSub.subscribe('fetch_tables_metadata', async (data: { sourceMetaPromise: Promise<any>; entry: any }) => {
     const dataCatalogEntry = await data.sourceMetaPromise;
     if (!dataCatalogEntry.tables_meta) {
       return;
@@ -58,7 +59,7 @@ export async function LoadDataCatalogs() {
 
     for (let i = 0; i < numTablesToLoad; i++) {
       const eachTable = dataCatalogEntry.tables_meta[i];
-      await delay(100);
+      await sleep(100);
       try {
         await fetchColumnsData(databaseName, eachTable.name, data.entry);
         completedTables++;
@@ -67,7 +68,7 @@ export async function LoadDataCatalogs() {
         continue;
       }
       const progress = Math.floor((completedTables / numTablesToLoad) * 100);
-      localStorage.setItem('database_cache_progress_' + databaseName, progress);
+      localStorage.setItem('database_cache_progress_' + databaseName, progress.toString());
     }
   });
 }
