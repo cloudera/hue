@@ -121,14 +121,14 @@ def find_compute(cluster=None, user=None, dialect=None, namespace_id=None):
     # If found, we will attempt to reload it, first by id then by name
     if selected_compute:
       if selected_compute.get('id'):
-        c = Compute.objects.filter(id=selected_compute['id']).first().to_dict()
+        c = Compute.objects.filter(id=selected_compute['id']).first()
         if c:
-          return c
+          return c.to_dict()
 
       if selected_compute.get('name'):
-        c = Compute.objects.filter(name=selected_compute['name']).first().to_dict()
+        c = Compute.objects.filter(name=selected_compute['name']).first()
         if c:
-          return c
+          return c.to_dict()
 
       # If we could not load by id or name, then we want to pick a default compute based on dialect
       dialect = selected_compute['dialect'] if selected_compute.get('dialect') else dialect
