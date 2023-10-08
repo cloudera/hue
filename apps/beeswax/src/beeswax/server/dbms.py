@@ -331,6 +331,7 @@ def get_query_server_config_via_connector(connector):
     impersonation_enabled = hiveserver2_impersonation_enabled()
 
   return {
+      'is_compute': True,
       'dialect': compute['dialect'],
       'server_name': compute_name,
       'server_host': server_host,
