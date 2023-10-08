@@ -678,7 +678,8 @@ class HiveServerClient(object):
       if self.query_server.get('dialect') == 'impala':  # Only when Impala accepts it
         kwargs['configuration'].update({'impala.doas.user': user.username})
 
-    if self.query_server['server_name'] == 'beeswax': # All the time
+    if self.query_server['server_name'] == 'beeswax' or \
+        (self.query_server.get('is_compute') and self.query_server.get('dialect') == 'hive'):
       kwargs['configuration'].update({'hive.server2.proxy.user': user.username})
       xff_header = json.loads(user.userprofile.json_data).get('X-Forwarded-For', None)
       if xff_header and ENABLE_XFF_FOR_HIVE_IMPALA.get():
