@@ -338,8 +338,8 @@ def get_query_server_config_via_connector(connector):
       # For connectors/computes, the auth details are not available
       # from configs and needs patching before submitting requests
       'principal': 'TODO',
-      'auth_username': None,
-      'auth_password': '',
+      'auth_username': compute['options'].get('auth_username'),
+      'auth_password': compute['options'].get('auth_password', 'hue'),
 
       'impersonation_enabled': impersonation_enabled,
       'use_sasl': str(compute['options'].get('use_sasl', True)).upper() == 'TRUE',
@@ -348,6 +348,10 @@ def get_query_server_config_via_connector(connector):
       'QUERY_TIMEOUT_S': 15 * 60,
       'transport_mode': compute['options'].get('transport_mode', 'http'),
       'http_url': compute['options'].get('http_url', 'http://%s:%s/cliservice' % (server_host, server_port)),
+
+      'close_sessions': str(compute['options'].get('close_sessions', True)).upper() == 'TRUE',
+      'has_session_pool': str(compute['options'].get('has_session_pool', True)).upper() == 'TRUE',
+      'max_number_of_sessions': compute['options'].get('has_session_pool', -1)
   }
 
 
