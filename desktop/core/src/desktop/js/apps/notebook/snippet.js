@@ -549,7 +549,6 @@ class Snippet {
     self.statementsList = ko.observableArray();
 
     self.beforeExecute = () => {
-      beforeExecute = true;
       huePubSub.publish(REFRESH_STATEMENT_LOCATIONS_EVENT, this);
     };
 
