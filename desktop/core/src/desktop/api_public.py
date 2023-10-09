@@ -289,12 +289,12 @@ def parse_database(request, database=None):
   cached_database = cache.get(database_cache_key)
 
   if cached_database:
-      return cached_database
+    return cached_database
   database_cache_key = f'parse_database:{database}'
   cached_database = cache.get(database_cache_key)
 
   if cached_database:
-      return cached_database
+    return cached_database
 
   databases = notebook_api.autocomplete1(django_request, None, database, None, None, None)
 

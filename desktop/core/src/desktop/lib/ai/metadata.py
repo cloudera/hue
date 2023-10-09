@@ -56,7 +56,7 @@ def _get_words(text) -> list:
   return list(set(words))
 
 # Perform semantic search on the corpus using the provided query
-def semantic_search(corpus, query, limit = 10):
+def semantic_search(corpus, query, limit=10):
   if len(corpus) < limit:
     return corpus
 
