@@ -23,7 +23,6 @@
       DISPLAY_APP_SWITCHER, ENABLE_HUE_5, IS_K8S_ONLY, IS_MULTICLUSTER_ONLY, USE_DEFAULT_CONFIGURATION,\
       USE_NEW_ASSIST_PANEL, VCS, ENABLE_GIST, ENABLE_LINK_SHARING, has_channels, has_connectors,\
       ENABLE_UNIFIED_ANALYTICS, RAZ
-  from desktop.conf import is_vector_db_enabled
   from desktop.models import hue_version, _get_apps, get_cluster_config, _handle_user_dir_raz
 
   from beeswax.conf import DOWNLOAD_BYTES_LIMIT, DOWNLOAD_ROW_LIMIT, LIST_PARTITIONS_LIMIT, CLOSE_SESSIONS
@@ -108,7 +107,6 @@
   window.ENABLE_DOWNLOAD = '${ conf.ENABLE_DOWNLOAD.get() }' === 'True';
   window.ENABLE_NEW_CREATE_TABLE = '${ hasattr(ENABLE_NEW_CREATE_TABLE, 'get') and ENABLE_NEW_CREATE_TABLE.get()}' === 'True';
   window.ENABLE_HUE_5 = '${ ENABLE_HUE_5.get() }' === 'True';
-
   window.ENABLE_PREDICT = '${ OPTIMIZER.ENABLE_PREDICT.get() }' === 'True';
   window.ENABLE_SQL_INDEXER = '${ ENABLE_SQL_INDEXER.get() }' === 'True';
 

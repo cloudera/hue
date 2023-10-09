@@ -22,12 +22,12 @@ from desktop.lib.ai.models.gpt import GPTModel
 
 from desktop.conf import AI_INTERFACE, get_ai_service_token
 
-_api_key = get_ai_service_token()
+API_KEY = get_ai_service_token()
 
 class OpenAiService(BaseService):
   def __init__(self, model_name: str):
     import openai
-    openai.api_key = _api_key # type: ignore
+    openai.api_key = API_KEY # type: ignore
     self.openai = openai
 
     super().__init__(self.get_model(model_name))
