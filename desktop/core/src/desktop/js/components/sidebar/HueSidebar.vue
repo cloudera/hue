@@ -306,6 +306,8 @@
           case 'filebrowser':
             if (location.href.indexOf('=S3A') !== -1) {
               adaptedName = 's3';
+            } else if (location.href.indexOf('=gs') !== -1) {
+              adaptedName = 'gs';
             } else if (location.href.indexOf('=adl') !== -1) {
               adaptedName = 'adls';
             } else if (location.href.indexOf('=abfs') !== -1) {

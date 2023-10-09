@@ -92,6 +92,23 @@ const defaults = {
         name: 'S3'
       }
     },
+    gs: {
+      scheme: 'gs',
+      root: 'gs://',
+      home: '/?default_gs_home',
+      icon: {
+        svg: {
+          brand: '#hi-adls',
+          home: '#hi-adls'
+        },
+        brand: 'fa-windows',
+        home: 'fa-windows'
+      },
+      label: {
+        home: '',
+        name: 'GS'
+      }
+    },
     adl: {
       scheme: 'adl',
       root: 'adl:/',

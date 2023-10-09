@@ -130,6 +130,7 @@ class AssistPanel {
               interpreter.type === 'adls' ||
               interpreter.type === 'hdfs' ||
               interpreter.type === 's3' ||
+              interpreter.type === 'gs' ||
               interpreter.type === 'abfs' ||
               interpreter.type === 'ofs'
           );

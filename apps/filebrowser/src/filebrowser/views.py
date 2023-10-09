@@ -58,6 +58,7 @@ from desktop.lib.export_csvxls import file_reader
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.fs import splitpath
 from desktop.lib.fs.ozone.ofs import get_ofs_home_directory
+from desktop.lib.fs.gc.gs import get_gs_home_directory
 from desktop.lib.i18n import smart_str
 from desktop.lib.paths import SAFE_CHARACTERS_URI, SAFE_CHARACTERS_URI_COMPONENTS
 from desktop.lib.tasks.compress_files.compress_utils import compress_files_in_hdfs
@@ -149,7 +150,7 @@ def _decode_slashes(path):
   # as %2F while the rest of the path is actually decoded. 
   encoded_slash = '%2F'
   if path.startswith(encoded_slash) or path.startswith('abfs:' + encoded_slash) or \
-    path.startswith('s3a:' + encoded_slash) or path.startswith('ofs:' + encoded_slash):
+    path.startswith('s3a:' + encoded_slash) or path.startswith('gs:' + encoded_slash) or path.startswith('ofs:' + encoded_slash):
     path = path.replace(encoded_slash, '/')
 
   return path
@@ -162,6 +163,8 @@ def _normalize_path(path):
     path = path.replace('abfs:/', 'abfs://')
   if path.startswith('s3a:/') and not path.startswith('s3a://'):
     path = path.replace('s3a:/', 's3a://')
+  if path.startswith('gs:/') and not path.startswith('gs://'):
+    path = path.replace('gs:/', 'gs://')
   if path.startswith('ofs:/') and not path.startswith('ofs://'):
     path = path.replace('ofs:/', 'ofs://')
 
@@ -247,6 +250,15 @@ def view(request, path):
 
   if 'default_s3_home' in request.GET:
     home_dir_path = get_s3_home_directory(request.user)
+    if request.fs.isdir(home_dir_path):
+      return format_preserving_redirect(
+          request,
+          '/filebrowser/view=' + urllib_quote(home_dir_path.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS)
+      )
+
+  # default_gs_home is set in jquery.filechooser.js
+  if 'default_gs_home' in request.GET:
+    home_dir_path = get_gs_home_directory()
     if request.fs.isdir(home_dir_path):
       return format_preserving_redirect(
           request,

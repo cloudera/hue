@@ -1169,6 +1169,9 @@ class AutocompleteResults {
     if (/^s3a:\/\//i.test(path)) {
       fetchFunction = 'fetchS3Path';
       path = path.substring(5);
+    } else if (/^gs:\/\//i.test(path)) {
+      fetchFunction = 'fetchGSPath';
+      path = path.substring(4);
     } else if (/^adl:\/\//i.test(path)) {
       fetchFunction = 'fetchAdlsPath';
       path = path.substring(5);
