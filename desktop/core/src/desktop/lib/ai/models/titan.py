@@ -1,9 +1,26 @@
+#!/usr/bin/env python
+# Licensed to Cloudera, Inc. under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  Cloudera, Inc. licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import json
 
-from ..lib.task import Task, TaskType, get_task
-from ..lib.base_model import BaseModel
-from ..utils.xml import extract_tag_content
-from ..types import SQLResponse
+from desktop.lib.ai.lib.task import Task, TaskType, get_task
+from desktop.lib.ai.lib.base_model import BaseModel
+from desktop.lib.ai.utils.xml import extract_tag_content
+from desktop.lib.ai.types import SQLResponse
 
 _GENERATE = """
 YOUR MAIN GOAL:
@@ -83,56 +100,56 @@ Return the result in the following format:
 """
 
 def _code_assumptions_parser(response: str) -> SQLResponse:
-    return SQLResponse(
-        sql=extract_tag_content('code', response),
-        assumptions=extract_tag_content('assumptions', response),
-        warning=extract_tag_content('warning', response),
-        semanticerror=extract_tag_content('semanticerror', response),
-    )
+  return SQLResponse(
+    sql=extract_tag_content('code', response),
+    assumptions=extract_tag_content('assumptions', response),
+    warning=extract_tag_content('warning', response),
+    semanticerror=extract_tag_content('semanticerror', response),
+  )
 
 
 def _code_explain_parser(response: str) -> SQLResponse:
-    return SQLResponse(
-        sql=extract_tag_content('code', response),
-        explain=extract_tag_content('explain', response),
-        warning=extract_tag_content('warning', response),
-        sqlerror=extract_tag_content('sqlerror', response),
-    )
+  return SQLResponse(
+    sql=extract_tag_content('code', response),
+    explain=extract_tag_content('explain', response),
+    warning=extract_tag_content('warning', response),
+    sqlerror=extract_tag_content('sqlerror', response),
+  )
 
 
 def _summary_parser(response: str) -> SQLResponse:
-    return SQLResponse(
-        summary=extract_tag_content('summary', response),
-        explain=extract_tag_content('explain', response),
-    )
+  return SQLResponse(
+    summary=extract_tag_content('summary', response),
+    explain=extract_tag_content('explain', response),
+  )
 
 
 _TASKS = {
-    TaskType.GENERATE: Task(_GENERATE, _code_assumptions_parser),
-    TaskType.EDIT: Task(_EDIT, _code_assumptions_parser),
-    TaskType.SUMMARIZE: Task(_SUMMARIZE, _summary_parser),
-    TaskType.OPTIMIZE: Task(_OPTIMIZE, _code_explain_parser),
-    TaskType.FIX: Task(_FIX, _code_explain_parser)
+  TaskType.GENERATE: Task(_GENERATE, _code_assumptions_parser),
+  TaskType.EDIT: Task(_EDIT, _code_assumptions_parser),
+  TaskType.SUMMARIZE: Task(_SUMMARIZE, _summary_parser),
+  TaskType.OPTIMIZE: Task(_OPTIMIZE, _code_explain_parser),
+  TaskType.FIX: Task(_FIX, _code_explain_parser)
 }
 
 class TitanModel(BaseModel):
-    def get_default_name(self) -> str:
-        return "amazon.titan-tg1-large"
+  def get_default_name(self) -> str:
+    return "amazon.titan-tg1-large"
 
-    def get_task(self, task_type: TaskType) -> Task:
-        return get_task(_TASKS, task_type)
+  def get_task(self, task_type: TaskType) -> Task:
+    return get_task(_TASKS, task_type)
 
-    def build_data(self, prompt: str) -> dict:
-        return {
-            "inputText": prompt,
-            "textGenerationConfig": {
-                "maxTokenCount": 512,
-                "stopSequences": [],
-                "temperature": 0,
-                "topP": 0.9
-            }
-        }
+  def build_data(self, prompt: str) -> dict:
+    return {
+      "inputText": prompt,
+      "textGenerationConfig": {
+        "maxTokenCount": 512,
+        "stopSequences": [],
+        "temperature": 0,
+        "topP": 0.9
+      }
+    }
 
-    def extract_response(self, response_str: str) -> str:
-        resp = json.loads(response_str)
-        return resp["results"][0]["outputText"]
+  def extract_response(self, response_str: str) -> str:
+    resp = json.loads(response_str)
+    return resp["results"][0]["outputText"]
