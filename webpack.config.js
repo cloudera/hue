@@ -78,6 +78,10 @@ const config = {
         },]
       },
       {
+        test: /\.css$/i,
+        use: [{ loader: 'style-loader' }, { loader: 'css-loader' }]
+      },
+      {
         test: /\.less$/i,
         use: [
           { loader: "style-loader" },
