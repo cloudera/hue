@@ -161,7 +161,7 @@ function AssistToolbar({
             isExpanded={isEditMode && inputExpanded}
             isLoading={isLoading}
             value={inputValue}
-            placeholder="E.g. only inlcude people under 50 years"
+            placeholder="E.g. Only inlcude people under 50 years"
             onSubmit={onInputSubmit}
             onCancel={handOnCancelInput}
             onInputChanged={onInputChanged}
@@ -170,7 +170,7 @@ function AssistToolbar({
           />
           <ToolbarButton
             disabled={isLoading || selectedStatementMissingSql}
-            title="Explain selected SQL statement (Command-Ctrl-X)"
+            title="Explain the selected SQL statement (Command-Ctrl-X)"
             aria-label="Explain SQL statement"
             icon={<BulbOutlined />}
             onClick={handleExplainClick}
@@ -179,14 +179,14 @@ function AssistToolbar({
           </ToolbarButton>
           <ToolbarButton
             onClick={handleOptimizeClick}
-            title="Optimize selected SQL statement (Command-Ctrl-O)"
+            title="Optimize the selected SQL statement (Command-Ctrl-O)"
             disabled={isLoading || selectedStatementMissingSql}
             icon={<ThunderboltOutlined />}
           >
             {!inputExpanded ? 'Optimize' : ''}
           </ToolbarButton>
           <ToolbarButton
-            title="Fix selected SQL statement (Command-Ctrl-F)"
+            title="Fix the selected SQL statement (Command-Ctrl-F)"
             onClick={handleFixClick}
             disabled={!isSqlError || isLoading || selectedStatementMissingSql}
             icon={<BugOutlined />}

@@ -315,7 +315,7 @@ function AiAssistToolbarInput({
               className={'hue-toolbar-button'}
               onClick={handleSubmit}
               type="link"
-              title="Hit enter or click here to execute"
+              title="Press enter or click here to execute"
             >
               <EnterOutlined className="hue-ai-assist-toolbar-input__enter-icon" />
             </Button>
