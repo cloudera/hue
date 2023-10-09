@@ -19,7 +19,7 @@ from sentence_transformers import SentenceTransformer, util
 import torch
 import re
 
-from ..utils.cache import LRUCache
+from desktop.lib.utils.cache import LRUCache
 from desktop.conf import SEMANTIC_SEARCH
 
 _embedding_model = SEMANTIC_SEARCH.EMBEDDING_MODEL.get()

@@ -17,8 +17,8 @@
 
 import abc
 
-from .task import Task, TaskType
-from ..types import SQLResponse
+from desktop.lib.ai.lib.task import Task, TaskType
+from desktop.lib.ai.types import SQLResponse
 
 class BaseModel(abc.ABC):
   @abc.abstractmethod

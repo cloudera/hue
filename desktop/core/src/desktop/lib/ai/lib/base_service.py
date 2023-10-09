@@ -17,9 +17,9 @@
 
 import abc
 
-from ..types import SQLResponse
-from .task import TaskParams, TaskType
-from .base_model import BaseModel
+from desktop.lib.ai.types import SQLResponse
+from desktop.lib.ai.lib.task import TaskParams, TaskType
+from desktop.lib.ai.lib.base_model import BaseModel
 
 class BaseService(abc.ABC):
   model: BaseModel

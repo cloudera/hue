@@ -21,7 +21,7 @@ from dataclasses import dataclass
 
 from pyformatting import optional_format
 from desktop.conf import AI_INTERFACE
-from ..types import SQLResponse
+from desktop.lib.ai.types import SQLResponse
 
 import logging
 LOG = logging.getLogger()

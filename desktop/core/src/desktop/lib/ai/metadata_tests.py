@@ -17,7 +17,7 @@
 
 from nose.tools import assert_true, assert_false, assert_equals, assert_raises
 
-from .metadata import semantic_search
+from desktop.lib.ai.metadata import semantic_search
 
 class TestMetadata(object):
 

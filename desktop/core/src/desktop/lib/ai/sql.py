@@ -18,18 +18,18 @@
 import logging
 LOG = logging.getLogger()
 
-from .types import SQLResponse
+from desktop.lib.ai.types import SQLResponse
 
-from .lib.base_model import BaseModel
-from .models.gpt import GPTModel
-from .models.titan import TitanModel
-from .lib.task import TaskType, TaskParams
+from desktop.lib.ai.lib.base_model import BaseModel
+from desktop.lib.ai.models.gpt import GPTModel
+from desktop.lib.ai.models.titan import TitanModel
+from desktop.lib.ai.lib.task import TaskType, TaskParams
 
-from .lib.base_service import BaseService
-from .services.openai import OpenAiService
-from .services.bedrock import BedrockService
-from .services.azure import AzureService
-from ..utils.cache import LRUCache
+from desktop.lib.ai.lib.base_service import BaseService
+from desktop.lib.ai.services.openai import OpenAiService
+from desktop.lib.ai.services.bedrock import BedrockService
+from desktop.lib.ai.services.azure import AzureService
+from desktop.lib.utils.cache import LRUCache
 
 from notebook.api import TableReader
 
