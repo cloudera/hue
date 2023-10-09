@@ -215,7 +215,7 @@ AI_INTERFACE = ConfigSection(
       type=str),
     MODEL = Config(
       key='model',
-      help=_('Model to be used for AI tasks. . Eg: gpt, llama'),
+      help=_('Model to be used for AI tasks. Eg: gpt, llama'),
       type=str),
     MODEL_NAME = Config(
       key='model_name',
@@ -227,12 +227,12 @@ AI_INTERFACE = ConfigSection(
       type=str),
     ADD_TABLE_DATA = Config(
       key="add_table_data",
-      help=_('When enabled, sample rows from the table would be added to the prompt. Default True'),
+      help=_('When enabled, sample rows from the table are added to the prompt. Default True.'),
       type=coerce_bool,
       default=True),
     TABLE_DATA_CACHE_SIZE=Config(
       key='table_data_cache_size',
-      help=_('Size of the LRU cache used to store table sample data'),
+      help=_('Size of the LRU cache used for storing table sample data.'),
       default=500,
       type=int),
     AUTO_FETCH_TABLE_META_LIMIT=Config(
@@ -246,7 +246,7 @@ AI_INTERFACE = ConfigSection(
       type=str),
     TOKEN_SCRIPT = Config(
       key="token_script",
-      help=_("Execute this script to produce the service API token."),
+      help=_("Run this script to produce the service API token."),
       type=coerce_password_from_script,
       default=None)
   )
@@ -277,19 +277,19 @@ SEMANTIC_SEARCH = ConfigSection(
       type=str),
     CACHE_SIZE=Config(
       key='cache_size',
-      help=_('Size of the LRU cache used to store embeddings'),
+      help=_('Size of the LRU cache used for storing embeddings.'),
       default=5000,
       type=int),
   )
 )
 
 def is_ai_interface_enabled():
-    service = AI_INTERFACE.SERVICE.get()
-    return bool(service and service.strip())
+  service = AI_INTERFACE.SERVICE.get()
+  return bool(service and service.strip())
 
 def is_vector_db_enabled():
-    RELEVENCY = SEMANTIC_SEARCH.RELEVENCY.get()
-    return RELEVENCY=="vector_db"
+  RELEVENCY = SEMANTIC_SEARCH.RELEVENCY.get()
+  return RELEVENCY=="vector_db"
 
 HUE_IMAGE_VERSION = Config(
   key="hue_image_version",
