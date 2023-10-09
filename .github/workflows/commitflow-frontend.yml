@@ -16,6 +16,7 @@ on:
       - '**.scss'
       - '**.vue'
       - 'package*.json'
+      - 'commitflow-frontend.yml'
 
 jobs:
   build:
