@@ -111,7 +111,7 @@ const PreviewModal = ({
               ? `No optimization to the SQL statement could be suggested.`
               : actionType === 'fix'
               ? `No fix to the SQL statement could be suggested.`
-              : `The SQL statement could not be edited based on the input given. The AI return an unmodified SQL statement.`}
+              : `The SQL statement could not be edited based on the input given. The AI has returned an unmodified SQL statement.`}
           </p>
           <PreviewInfoPanels
             alternativeActions={explanation || 'No alternative actions could be suggested'}
