@@ -733,6 +733,11 @@ def _get_sample_data(db, database, table, column, is_async=False, cluster=None, 
       query_server = get_query_server_config('impala', connector=cluster)
       db = dbms.get(db.client.user, query_server, cluster=cluster)
 
+  if table_obj and table_obj.is_view:
+    response = {'status': -1}
+    response['message'] = _('Not getting sample data as this is a view which can be expensive when run.')
+    return response
+
   sample_data = db.get_sample(database, table_obj, column, generate_sql_only=is_async, operation=operation)
   response = {'status': -1}
 
