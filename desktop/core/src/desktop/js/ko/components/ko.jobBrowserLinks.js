@@ -32,15 +32,15 @@ const TEMPLATE = `
         <span>${I18n('Queries')}</span>
       </a>
     <!-- /ko -->
-    <!-- ko if: window.HAS_JOB_BROWSER -->
+    <!-- ko if: window.HAS_JOB_BROWSER && !window.getLastKnownConfig().has_computes -->
     <!-- ko ifnot: window.IS_K8S_ONLY -->
-      <a class="btn btn-flat" style="padding-right: 4px" title="${I18n(
+      <a class="btn btn-flat" id="jobs-browser" style="padding-right: 4px" title="${I18n(
         'Job browser'
       )}" data-bind="hueLink: '/jobbrowser#!jobs', click: function() { huePubSub.publish('hide.jobs.panel'); }">
         <span>${I18n(window.IS_MULTICLUSTER_ONLY ? 'Queries' : 'Jobs')}</span>
       </a>
     <!-- /ko -->
-    <button class="btn btn-flat btn-toggle-jobs-panel" title="${I18n(
+    <button class="btn btn-flat btn-toggle-jobs-panel" id="jobs-browser-button" title="${I18n(
       'Jobs preview'
     )}" data-bind="click: function() { huePubSub.publish('toggle.jobs.panel'); }, style: {'paddingLeft': jobCount() > 0 ? '0': '4px'}">
       <span class="jobs-badge" data-bind="visible: jobCount() > 0, text: jobCount"></span>

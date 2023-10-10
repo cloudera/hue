@@ -63,7 +63,7 @@ const TEMPLATE = `
     )}</span>
     <!-- /ko -->
 
-    <!-- ko if: availableNamespaces().length > 0 && !hideNamespaces -->
+    <!-- ko if: availableNamespaces().length > 0 && !hideNamespaces && !window.getLastKnownConfig().has_computes -->
     <!-- ko ifnot: hideLabels --><span class="editor-header-title">${I18n(
       'Namespace'
     )}</span><!-- /ko -->
@@ -79,6 +79,9 @@ const TEMPLATE = `
     <!-- /ko -->
 
     <!-- ko if: availableDatabases().length > 0 && !hideDatabases-->
+    <!-- ko ifnot: hideLabels --><span class="editor-header-title">${I18n(
+      'Active database'
+    )}</span><!-- /ko -->
     <div data-bind="component: { name: 'hue-drop-down', params: { titleName: 'Database', value: database, entries: availableDatabases, foreachVisible: true, searchable: true, linkTitle: '${I18n(
       'Active database'
     )}' } }" style="display: inline-block"></div>
@@ -248,12 +251,12 @@ const HueContextSelector = function (params) {
   }
 
   self.loadingContext = ko.pureComputed(() => {
-    /*return (
+    return (
       self[TYPES_INDEX.cluster.loading]() ||
       self[TYPES_INDEX.namespace.loading]() ||
       self[TYPES_INDEX.compute.loading]() ||
       self.loadingDatabases()
-    );*/
+    );
     return false;
   });
 };
@@ -289,27 +292,28 @@ HueContextSelector.prototype.setMatchingCompute = function (namespace) {
   const self = this;
   if (self[TYPES_INDEX.compute.name]) {
     // Select the first corresponding compute when a namespace is selected (unless selected)
-    self[TYPES_INDEX.compute.lastPromise].done(() => {
-      if (
-        !self[TYPES_INDEX.compute.name]() ||
-        (self[TYPES_INDEX.compute.name]().namespace &&
-          self[TYPES_INDEX.compute.name]().namespace !== namespace.id)
-      ) {
-        const found = self[TYPES_INDEX.compute.available]().some(compute => {
-          if (namespace.id === compute.namespace) {
-            self[TYPES_INDEX.compute.name](compute);
-            setInLocalStorage('contextSelector.' + TYPES_INDEX.compute.localStorageId, namespace);
-            return true;
+    try {
+      self[TYPES_INDEX.compute.lastPromise].done(() => {
+        if (
+          !self[TYPES_INDEX.compute.name]() ||
+          (self[TYPES_INDEX.compute.name]().namespace &&
+            self[TYPES_INDEX.compute.name]().namespace !== namespace.id)
+        ) {
+          const found = self[TYPES_INDEX.compute.available]().some(compute => {
+            if (namespace.id === compute.namespace) {
+              self[TYPES_INDEX.compute.name](compute);
+              setInLocalStorage('contextSelector.' + TYPES_INDEX.compute.localStorageId, namespace);
+              return true;
+            }
+          });
+          if (!found) {
+            // This can happen when a namespace refers to a compute that isn't returned by the computes call
+            // TODO: What should we do?
+            self[TYPES_INDEX.compute.name](undefined);
           }
-        });
-
-        if (!found) {
-          // This can happen when a namespace refers to a compute that isn't returned by the computes call
-          // TODO: What should we do?
-          self[TYPES_INDEX.compute.name](undefined);
         }
-      }
-    });
+      });
+    } catch (e) {}
   }
 };
 
