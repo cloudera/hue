@@ -22,28 +22,13 @@ import { ACTIVE_STATEMENT_CHANGED_EVENT } from './AceLocationHandler';
 import Executor from 'apps/editor/execution/executor';
 import SqlExecutable from 'apps/editor/execution/sqlExecutable';
 import SubscriptionTracker, { Disposable } from 'components/utils/SubscriptionTracker';
-import { ParsedSqlStatement } from 'parse/sqlStatementsParser';
-
-const LINE_BREAK_REGEX = /(\r\n)|(\n)|(\r)/g;
-const LEADING_WHITE_SPACE_REGEX = /^\s+/;
+import { getLeadingEmptyLineCount } from '../editorUtils';
 
 const ACTIVE_CSS = 'ace-active-gutter-decoration';
 const COMPLETED_CSS = 'ace-completed-gutter-decoration';
 const EXECUTING_CSS = 'ace-executing-gutter-decoration';
 const FAILED_CSS = 'ace-failed-gutter-decoration';
 const FAILED_MARKER_CSS = 'ace-failed-marker';
-
-const getLeadingEmptyLineCount = (parsedStatement: ParsedSqlStatement): number => {
-  let leadingEmptyLineCount = 0;
-  const leadingWhiteSpace = parsedStatement.statement.match(LEADING_WHITE_SPACE_REGEX);
-  if (leadingWhiteSpace) {
-    const lineBreakMatch = leadingWhiteSpace[0].match(LINE_BREAK_REGEX);
-    if (lineBreakMatch) {
-      leadingEmptyLineCount = lineBreakMatch.length;
-    }
-  }
-  return leadingEmptyLineCount;
-};
 
 export default class AceGutterHandler implements Disposable {
   editor: Ace.Editor;

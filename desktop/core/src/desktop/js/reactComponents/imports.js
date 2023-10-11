@@ -1,11 +1,13 @@
-// ADD NEW RACT COMPONENTS HERE
-// We need a way to match an imported module with a component name
+// ADD NEW REACT COMPONENTS HERE
+// For a react root we need a way to match an imported module with a component name
 // so we handle the imports dynamically for that reason.
 export async function loadComponent(name) {
   switch (name) {
-    // Page specific components here
+    // Page specific root components here
     case 'ReactExample':
       return (await import('../apps/editor/components/result/reactExample/ReactExample')).default;
+    case 'ExplainSql':
+        return (await import('../apps/editor/components/ExplainSql/ExplainSql')).default;      
 
     case 'StorageBrowserPage':
       return (await import('../apps/storageBrowser/StorageBrowserPage/StorageBrowserPage')).default;

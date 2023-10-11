@@ -259,8 +259,9 @@ def chat(request, prompt=None, conversation_id=None):
   prompt = request.data.get("prompt")
   type = request.data.get("type")
   metadata = request.data.get("metadata")
+  dialect = request.data.get("dialect")
   if llm.is_llm_sql_enabled():
-    generated_response = llm.chat(prompt, metadata, type)
+    generated_response = llm.chat(prompt, metadata, type, dialect)
     return JsonResponse(generated_response)
   else:
     return JsonResponse({
