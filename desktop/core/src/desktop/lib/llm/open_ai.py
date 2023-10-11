@@ -52,6 +52,11 @@ def generate_instruction(type, userprompt, metadata, dialect):
             List any the assumptions not covered by the supplied metadata.  \
             NQL: {userprompt}. \
             Return the answer in the following format: <code></code><assumptions></assumptions>"
+    if type=="editSql":
+        return f"Act as an {dialect} SQL expert and modify the SQL using the following metadata {metadata}. \
+            List any the assumptions not covered by the supplied metadata.  \
+            {userprompt}. \
+            Return the answer in the following format: <code></code><assumptions></assumptions>"    
     elif type=="listRelevantTables":
         return f"This is a list of existing tables {metadata}. Assume the names reflect their content. Filter out the names you would need metadata for in order to translate the following NQL to SLQ: {userprompt}. Only return the list of names, separated by comma and wrap it a <tables> tag."        
     elif type=="optimize":
@@ -59,6 +64,6 @@ def generate_instruction(type, userprompt, metadata, dialect):
     elif type=="correctandexplain":
         return f"Act as an {dialect} SQL expert. Fix this broken sql query and explain the fix. Wrap the corrected code in a <code> tag and the explaination in an <explain> tag: {userprompt}"
     elif type=="explain":
-        return f"Act as an {dialect} SQL expert and explain what this query does: {userprompt}"
+        return f"Act as an {dialect} SQL expert and explain in natural language using non technical terms, what this query does: {userprompt}. "
     else:
         return ""
