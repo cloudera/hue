@@ -1,0 +1,16 @@
+@use 'variables' as vars;
+@use 'mixins';
+
+.cuix.antd {
+
+  .hue-explain-sql-panel {
+    // TODO: fix
+    display: flex;
+    flex-direction: column;
+    row-gap: 20px;
+    margin-top: 20px;
+    @include mixins.fade-in();
+  }
+  
+}
+

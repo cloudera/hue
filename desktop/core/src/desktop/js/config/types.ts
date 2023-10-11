@@ -82,6 +82,7 @@ export interface HueConfig extends GenericApiResponse {
   hue_config: {
     enable_sharing: boolean;
     collect_usage: boolean;
+    enable_llm_sql: boolean;
   };
   hue_version?: string;
   img_version?: string;

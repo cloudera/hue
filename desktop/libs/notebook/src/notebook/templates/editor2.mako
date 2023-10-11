@@ -948,6 +948,9 @@ There is no bridge to KO for components using this integration. Example using in
           <!-- ko if: explanation -->
           <li data-hue-analytics="editor:bottom-tab-click/query-explain" data-bind="click: function() { currentQueryTab('queryExplain'); }, css: {'active': currentQueryTab() == 'queryExplain'}"><a class="inactive-action" href="#queryExplain" data-toggle="tab">${_('Explain')}</a></li>
           <!-- /ko -->
+          <!-- ko if: window.getLastKnownConfig()?.hue_config?.enable_llm_sql -->
+          <li data-hue-analytics="editor:bottom-tab-click/ai-assist" data-bind="click: function() { currentQueryTab('aiAssist'); }, css: {'active': currentQueryTab() == 'aiAssist'}"><a class="inactive-action" href="#queryExplain" data-toggle="tab">${_('AI assist')}</a></li>
+          <!-- /ko -->          
           <!-- ko foreach: pinnedContextTabs -->
           <li data-bind="click: function() { $parent.currentQueryTab(tabId) }, css: { 'active': $parent.currentQueryTab() === tabId }">
             <a class="inactive-action" data-toggle="tab" data-bind="attr: { 'href': '#' + tabId }">
@@ -1042,6 +1045,16 @@ There is no bridge to KO for components using this integration. Example using in
             </div>
           </div>
           <!-- /ko -->
+
+          <!-- ko if: (window.getLastKnownConfig()?.hue_config?.enable_llm_sql) -->
+          <div class="tab-pane" id="aiAssist" data-bind="css: {'active': currentQueryTab() == 'aiAssist'}">
+            <div class="editor-bottom-tab-panel">
+              <div style="width: 100%; height: 100%; overflow-y: auto;">
+                <ExplainSql class="cuix antd" data-bind="reactWrapper: 'ExplainSql', props: { activeExecutable: activeExecutable }"></ExplainSql>
+              </div>
+            </div>
+          </div>
+          <!-- /ko -->          
 
           <div class="tab-pane" id="executionAnalysis" data-bind="css: {'active': currentQueryTab() == 'executionAnalysis'}">
             <div class="execution-analysis-tab-panel">

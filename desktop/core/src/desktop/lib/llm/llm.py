@@ -48,11 +48,11 @@ def generate_sql(prompt, parsed_data):
 
     return response;  
 
-def chat(prompt, metadata=None, type="generate_sql", conversation_id=None):
+def chat(prompt, metadata=None, type="generate_sql", dialect="", conversation_id=None):
    response = {}
 
    if LLM.OPENAI.ENABLE.get():
-      response['open_ai'] = openai_completion_api(prompt, metadata, type)
+      response['open_ai'] = openai_completion_api(prompt, metadata, type, dialect)
    return response
 
 

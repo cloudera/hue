@@ -12,7 +12,14 @@ If you want to add a new component as a descendant to an already existing react 
 
 If you want to add a react component where there currently is no react ancestor in the DOM you will have to integrate it as a react root node in the page itself, either directly in an HTML page or by using the Knockout-to-React bridge. There is currently no Vue-to-React bridge in Hue.
 
-A react root element (or the first container element within it) must include the HTML classes `cuix` and `antd` in order for the styling of the child components to work. 
+A react root element (or the first container element within it) must include the HTML classes `cuix` and `antd` in order for the styling of the child components to work.
+
+A react root component must be imported and added to the file [js/reactComponents/imports.js](https://github.com/cloudera/hue/blob/master/desktop/core/src/desktop/js/reactComponents/imports.js)
+
+```js
+ case 'MyComponent':
+   return (await import('./MyComponent/MyComponent')).default;
+```
 
 ### HTML/Mako page integration
 
@@ -31,13 +38,6 @@ If your react component isn't dependent on any Knockout observables or Vue compo
 ```
 
 The MyComponent tag must be present as a descendant of the DOM element specified by the selector (#some-container) when this script runs. The attribute `data-reactcomponent` is mapped to the component name and `data-props` contains the props in JSON format.
-
-The component must also be imported and added to the file [js/reactComponents/imports.js](https://github.com/cloudera/hue/blob/master/desktop/core/src/desktop/js/reactComponents/imports.js)
-
-```js
- case 'MyComponent':
-   return (await import('./MyComponent/MyComponent')).default;
-```
 
 ### Knockout.js integration
 

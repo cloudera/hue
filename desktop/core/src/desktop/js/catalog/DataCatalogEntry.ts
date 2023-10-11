@@ -585,6 +585,7 @@ export default class DataCatalogEntry {
    * Get the children of the catalog entry, columns for a table entry etc.
    */
   getChildren(options?: CatalogGetOptions): CancellablePromise<DataCatalogEntry[]> {
+    // debugger;
     if (this.childrenPromise && this.childrenPromise.cancelled) {
       this.childrenPromise = undefined;
     }
