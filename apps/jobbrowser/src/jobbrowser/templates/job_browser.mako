@@ -3089,7 +3089,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               callback(data);
             }
           } else {
-            huePubSub.publish('hue.global.error', {message: 'data.message'})
+            huePubSub.publish('hue.global.error', {message: data.message});
           }
         });
       };

@@ -168,12 +168,11 @@ export const fetchDescribe = ({
         silenceErrors,
         handleSuccess: (response: Analysis & DefaultApiResponse, postResolve, postReject) => {
           if (successResponseIsError(response)) {
-            huePubSub.publish('hue.global.error', {message: response.message});
+            postReject(extractErrorMessage(response));
           } else {
             const adjustedResponse = response;
             adjustedResponse.hueTimestamp = Date.now();
             postResolve(adjustedResponse);
-            huePubSub.publish('hue.global.error', {message: adjustedResponse.message});
           }
         }
       }

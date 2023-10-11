@@ -130,8 +130,8 @@
 % endif
 
 <div id="jHueNotify" class="alert hide">
-  <div class="message"></div>
   <button class="close">&times;</button>
+  <div class="message"></div> 
 </div>
 
 
