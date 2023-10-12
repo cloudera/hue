@@ -1660,6 +1660,10 @@ export default class DataCatalogEntry {
       operation?: string;
     }
   ): CancellablePromise<Sample> {
+    if (this.isView()) {
+      return CancellablePromise.reject();
+    }
+
     if (this.samplePromise && this.samplePromise.cancelled) {
       this.samplePromise = undefined;
     }
