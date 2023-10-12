@@ -333,7 +333,7 @@ ${ layout.menubar(section='quick_start') }
             $(document).trigger('info', data.message);
           }
           if (data.errorMessage) {
-            $(document).trigger('error', data.errorMessage);
+            huePubSub.publish('hue.global.error', {message: data.errorMessage});
           }
           if (data.status == 0 && $(event.target).data("is-connector")) {
             huePubSub.publish('cluster.config.refresh.config');
@@ -358,7 +358,7 @@ ${ layout.menubar(section='quick_start') }
           huePubSub.publish('cluster.config.refresh.config');
         }
       } else {
-        $(document).trigger('error', data.message);
+        huePubSub.publish('hue.global.error', {message: data.message});
       }
     })
     .always(function(data) {
@@ -382,6 +382,7 @@ ${ layout.menubar(section='quick_start') }
       })
       .fail(function() {
         $(document).trigger('error', '${ _("Check config failed: ")}');
+        //huePubSub.publish('hue.global.error', {message: '${ _("Check config failed: ")}'});
       });
     }
 
@@ -407,7 +408,7 @@ ${ layout.menubar(section='quick_start') }
       var calls = jQuery.map($(button).data("sample-data"), function(app) {
         return $.post($(button).data("sample-url"), {data: app}, function(data) {
           if (data.status != 0) {
-            $(document).trigger('error', data.message);
+            huePubSub.publish('hue.global.error', {message: data.message});
           }
         });
       });
@@ -493,7 +494,7 @@ ${ layout.menubar(section='quick_start') }
         if (data.status == 0) {
           $(document).trigger('info', '${ _("Configuration updated") }');
         } else {
-          $(document).trigger('error', data.data);
+          huePubSub.publish('hue.global.error', {message: data.data});
         }
       });
     });

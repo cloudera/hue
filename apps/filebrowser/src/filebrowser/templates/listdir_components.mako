@@ -2040,6 +2040,7 @@ else:
             self.pendingUploads(self.pendingUploads() - 1);
             if (response.status != 0) {
               $(document).trigger('error', "${ _('Error: ') }" + response.data);
+              //huePubSub.publish('hue.global.error', {message: "${ _('Error: ') }" + response.data});
             }
             else {
               $(document).trigger('info', response.path + "${ _(' uploaded successfully.') }");
@@ -2252,7 +2253,7 @@ else:
                 var response = JSON.parse(data.xhr.response);
                 if (response && response.status != null) {
                   if (response.status != 0) {
-                    $(document).trigger('error', response.data);
+                    huePubSub.publish('hue.global.error', {message: response.data});
                   } else {
                     $(document).trigger('info', response.path + ' ' + I18n('uploaded successfully'));
                     fileBrowserViewModel.filesToHighlight.push(response.path);

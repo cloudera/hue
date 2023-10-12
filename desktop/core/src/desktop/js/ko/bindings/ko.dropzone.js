@@ -77,7 +77,7 @@ ko.bindingHandlers.dropzone = {
           const response = JSON.parse(file.xhr.response);
           if (response && response.status != null) {
             if (response.status !== 0) {
-              $(document).trigger('error', response.data);
+              huePubSub.publish('hue.global.error', {message: response.data});
               if (value.onError) {
                 value.onError(file.name);
               }

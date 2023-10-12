@@ -467,7 +467,7 @@ else:
                 $(document).trigger("error", resp.message);
               }
             } else {
-              $(document).trigger('error', resp.message);
+              huePubSub.publish('hue.global.error', {message: resp.message});
             }
           }).fail(function (xhr, textStatus, errorThrown) {
             $(document).trigger("error", xhr.responseText);

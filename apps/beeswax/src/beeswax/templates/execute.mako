@@ -2380,6 +2380,7 @@ function createNewQuery() {
 // Server error handling.
 $(document).on('server.error', function (e, data) {
   $(document).trigger('error', "${_('Server error occurred: ')}" + data.message ? data.message : data.error);
+  //huePubSub.publish('hue.global.error', {message: "${_('Server error occurred: ')}" + data.message ? data.message : data.error});
 });
 $(document).on('server.unmanageable_error', function (e, responseText) {
   var message = responseText;
@@ -2387,6 +2388,7 @@ $(document).on('server.unmanageable_error', function (e, responseText) {
     message = '${ _("Hue server is probably down.") }';
   }
   $(document).trigger('error', "${_('Unmanageable server error occurred: ')}" + message);
+  //huePubSub.publish('hue.global.error', {message: "${_('Unmanageable server error occurred: ')}" + message});
 });
 
 // Other
@@ -2418,7 +2420,7 @@ $(document).on('error_save.design', function (e, message) {
         if (message.saveform.description) {
           _message += " - ${_('Description')}: " + message.saveform.description.join(' ');
         }
-        $(document).trigger('error', _message);
+        huePubSub.publish('hue.global.error', {message: _message});
       }
     }
   }
@@ -2426,7 +2428,7 @@ $(document).on('error_save.design', function (e, message) {
     if (message) {
       _message += ": " + message;
     }
-    $(document).trigger('error', _message);
+    huePubSub.publish('hue.global.error', {message: _message});
   }
 });
 $(document).on('error_save.results', function (e, message) {
@@ -2434,7 +2436,7 @@ $(document).on('error_save.results', function (e, message) {
   if (message) {
     _message += ": " + message;
   }
-  $(document).trigger('error', _message);
+  huePubSub.publish('hue.global.error', {message: _message});
 });
 $(document).on('error_cancel.query', function (e, message) {
   $(document).trigger("error", "${ _('Problem: ') }" + message);

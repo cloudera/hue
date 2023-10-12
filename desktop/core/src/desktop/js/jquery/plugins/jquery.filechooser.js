@@ -742,7 +742,7 @@ Plugin.prototype.navigateTo = function (path) {
                 }
               },
               error: function (xhr) {
-                $(document).trigger('error', xhr.responseText);
+                huePubSub.publish('hue.global.error', {message: xhr.responseText});
               }
             });
           }
@@ -782,7 +782,7 @@ Plugin.prototype.navigateTo = function (path) {
       );
     } else {
       console.error(e);
-      $(document).trigger('error', e.statusText);
+      huePubSub.publish('hue.global.error', {message: e.statusText});
     }
   });
 };
@@ -800,7 +800,7 @@ function initUploader(path, _parent, el, labels) {
     onComplete: function (id, fileName, responseJSON) {
       num_of_pending_uploads--;
       if (responseJSON.status == -1) {
-        $(document).trigger('error', responseJSON.data);
+        huePubSub.publish('hue.global.error', {message: responseJSON.data});
       } else if (!num_of_pending_uploads) {
         _parent.navigateTo(path);
         huePubSub.publish('assist.' + getFs(getScheme(path)) + '.refresh');
