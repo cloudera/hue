@@ -464,13 +464,13 @@ else:
                 $(self.saveResultsModalId).modal('hide');
                 huePubSub.publish('notebook.task.submitted', resp);
               } else if (resp && resp.message) {
-                $(document).trigger("error", resp.message);
+                huePubSub.publish('hue.global.error', {message: resp.message});
               }
             } else {
               huePubSub.publish('hue.global.error', {message: resp.message});
             }
           }).fail(function (xhr, textStatus, errorThrown) {
-            $(document).trigger("error", xhr.responseText);
+            huePubSub.publish('hue.global.error', {message: xhr.responseText});
           }).done(function() {
             $(self.saveResultsModalId + ' button.btn-primary').button('reset');
             $(self.saveResultsModalId + ' .loader').hide();

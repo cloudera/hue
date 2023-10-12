@@ -2319,11 +2319,13 @@ class Snippet {
               // No supported yet for this snippet
             } else {
               //$(document).trigger("error", data.message);
+              //huePubSub.publish('hue.global.error', {message: data.message});
             }
           }
         }
       ).fail((xhr, textStatus, errorThrown) => {
         //$(document).trigger("error", xhr.responseText);
+        //huePubSub.publish('hue.global.error', {message: xhr.responseText});
       });
     };
 
@@ -2506,6 +2508,7 @@ class Snippet {
       ).fail((xhr, textStatus, errorThrown) => {
         if (xhr.status !== 502) {
           // $(document).trigger("error", xhr.responseText);
+          //huePubSub.publish('hue.global.error', {message: xhr.responseText});
         }
         // self.status('failed'); // Can conflict with slow close and new query execution
       });

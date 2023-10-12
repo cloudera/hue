@@ -2439,7 +2439,7 @@ $(document).on('error_save.results', function (e, message) {
   huePubSub.publish('hue.global.error', {message: _message});
 });
 $(document).on('error_cancel.query', function (e, message) {
-  $(document).trigger("error", "${ _('Problem: ') }" + message);
+  huePubSub.publish('hue.global.error', {message: "${ _('Problem: ') }" + message});
 });
 $(document).on('cancelled.query', function (e) {
   $(document).trigger("info", "${ _('Query canceled!') }")

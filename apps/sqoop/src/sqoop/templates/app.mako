@@ -766,7 +766,7 @@ function handle_form_errors(e, node, options, data) {
   switch(data.status) {
     case 1:
     $.each(errors, function(index, err) {
-      $(document).trigger("error", err);
+      huePubSub.publish('hue.global.error', {message: err});
     });
     break;
     case 100:
@@ -832,6 +832,7 @@ $(document).on('started.job', function(e, job, options, submission_dict) {
 
 $(document).on('start_fail.job', function(e, job, options, error) {
   $(document).trigger("error", "${ _('Error: ') }" + (typeof error.exception != "undefined" ? error.exception : error));
+  ## here
 });
 
 $(document).on('stopped.job', function(e, job, options, submission_dict) {
@@ -839,11 +840,11 @@ $(document).on('stopped.job', function(e, job, options, submission_dict) {
 });
 
 $(document).on('stop_fail.job', function(e, job, options, submission_dict) {
-  $(document).trigger("error", "${ _('Could not stop job.') }");
+  huePubSub.publish('hue.global.error', {message: "${ _('Could not stop job.') }"});
 });
 
 $(document).one('load_fail.job', function() {
-  $(document).trigger("error", "${ _('Could not load node.') }");
+  huePubSub.publish('hue.global.error', {message: "${ _('Could not load node.') }"});
 });
 
 $(document).on('save_fail.job', handle_form_errors);

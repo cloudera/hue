@@ -3265,7 +3265,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             vm.job().fetchLogs();
 
           } else {
-            $(document).trigger("error", data.message);
+            huePubSub.publish('hue.global.error', {message: data.message});
           }
         }).always(function () {
           self.loadingJob(false);
@@ -3345,7 +3345,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               $('.jb-panel pre:visible').css('overflow-y', 'auto').height(Math.max(200, $(window).height() - $('.jb-panel pre:visible').offset().top - $('.page-content').scrollTop() - 75));
             }
           } else {
-            $(document).trigger("error", data.message);
+            huePubSub.publish('hue.global.error', {message: data.message});
           }
         });
         return lastFetchLogsRequest;
@@ -3402,7 +3402,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               callback(data);
             }
           } else {
-            $(document).trigger("error", data.message);
+            huePubSub.publish('hue.global.error', {message: data.message});
           }
         });
         return lastFetchProfileRequest;
@@ -3421,7 +3421,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             self.progress(data.app.progress);
             self.canWrite(data.app.canWrite);
           } else {
-            $(document).trigger("error", data.message);
+            huePubSub.publish('hue.global.error', {message: data.message});
           }
         });
         return lastFetchStatusRequest;
@@ -3460,10 +3460,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             if (data.status == 0) {
               $.jHueNotify.info("${ _('Successfully updated Coordinator Job Properties') }");
             } else {
-              $(document).trigger("error", data.message);
+              huePubSub.publish('hue.global.error', {message: data.message});
             }
           }).fail(function (xhr, textStatus, errorThrown) {
-            $(document).trigger("error", xhr.responseText);
+            huePubSub.publish('hue.global.error', {message: xhr.responseText});
           });
 
         } else if (action == 'sync_workflow') {
@@ -3474,7 +3474,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           }, function (data) {
             $(document).trigger("showSubmitPopup", data);
           }).fail(function (xhr, textStatus, errorThrown) {
-            $(document).trigger("error", xhr.responseText);
+            huePubSub.publish('hue.global.error', {message: xhr.responseText});
           });
         } else {
           vm.jobs._control([self.id()], action, function(data) {
@@ -3791,7 +3791,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               callback(data);
             };
           } else {
-            $(document).trigger("error", data.message);
+            huePubSub.publish('hue.global.error', {message: data.message});
           }
         });
       };
@@ -3979,7 +3979,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               self.selectedJobs([]);
             }
           } else {
-            $(document).trigger("error", data.message);
+            huePubSub.publish('hue.global.error', {message: data.message});
           }
         }).always(function () {
         });
@@ -4320,7 +4320,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               if (id) {
                 openJob(id);
               } else {
-                $(document).trigger("error", '${ _("No log available") }');
+                huePubSub.publish('hue.global.error', {message: '${ _("No log available") }'});
               }
             }
           );
