@@ -237,7 +237,7 @@
     'Columns': '${ _('Columns') }',
     'columns': '${ _('columns') }',
     'Compilation': '${ _('Compilation') }',
-    'Compute': '${ _('Compute') }',
+    'Compute': '${ _('Virtual Warehouse') }',
     'condition': '${ _('condition') }',
     'Confirm History Clearing': '${ _('Confirm History Clearing') }',
     'Confirm the deletion?': '${ _('Confirm the deletion?') }',
