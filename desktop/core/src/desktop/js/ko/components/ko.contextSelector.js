@@ -63,7 +63,7 @@ const TEMPLATE = `
     )}</span>
     <!-- /ko -->
 
-    <!-- ko if: availableNamespaces().length > 0 && !hideNamespaces && !window.getLastKnownConfig().has_computes -->
+    <!-- ko if: availableNamespaces().length > 1 && !hideNamespaces && !window.getLastKnownConfig().has_computes -->
     <!-- ko ifnot: hideLabels --><span class="editor-header-title">${I18n(
       'Namespace'
     )}</span><!-- /ko -->
@@ -257,7 +257,6 @@ const HueContextSelector = function (params) {
       self[TYPES_INDEX.compute.loading]() ||
       self.loadingDatabases()
     );
-    return false;
   });
 };
 
