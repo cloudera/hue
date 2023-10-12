@@ -273,7 +273,10 @@ HueContextSelector.prototype.setMatchingNamespace = function (compute) {
           const found = self[TYPES_INDEX.namespace.available]().some(namespace => {
             if (compute.namespace === namespace.id) {
               self[TYPES_INDEX.namespace.name](namespace);
-              setInLocalStorage('contextSelector.' + TYPES_INDEX.namespace.localStorageId, namespace);
+              setInLocalStorage(
+                'contextSelector.' + TYPES_INDEX.namespace.localStorageId,
+                namespace
+              );
               return true;
             }
           });
@@ -285,8 +288,7 @@ HueContextSelector.prototype.setMatchingNamespace = function (compute) {
           }
         }
       });
-    } catch (e) { }
-
+    } catch (e) {}
   }
 };
 
