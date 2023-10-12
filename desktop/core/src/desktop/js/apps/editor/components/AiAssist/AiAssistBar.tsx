@@ -31,6 +31,7 @@ import { useParser } from './ParserHook';
 import AnimatedLauncher from './AnimatedLauncher/AnimatedLauncher';
 import AnimatedCloseButton from './AnimatedCloseButton/AnimatedCloseButton';
 import AssistToolbar from './AiAssistToolbar/AiAssistToolbar';
+import UntrustedAiModal from './UntrustedAiModal/UntrustedAiModal';
 import { withGuardrails, GuardrailAlert, GuardrailAlertType } from './guardRails';
 import { extractLeadingNqlComments, removeComments } from './PreviewModal/formattingUtils';
 
@@ -478,6 +479,10 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
           onClick={toggleOpen}
         />
       </div>
+      <UntrustedAiModal
+        aiAssistBarExpanded={isExpanded}
+        onCloseBar={() => isExpanded && toggleOpen()}
+      />
       {showGuardrailsModal && guardrailAlert && (
         <GuardrailsModal
           open
