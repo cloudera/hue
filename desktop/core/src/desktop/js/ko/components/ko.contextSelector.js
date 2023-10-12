@@ -79,7 +79,7 @@ const TEMPLATE = `
     <!-- /ko -->
 
     <!-- ko if: availableDatabases().length > 0 && !hideDatabases-->
-    <!-- ko ifnot: hideLabels --><span class="editor-header-title">${I18n(
+    <!-- ko if: window.getLastKnownConfig().has_computes && !hideLabels --><span class="editor-header-title">${I18n(
       'Active database'
     )}</span><!-- /ko -->
     <div data-bind="component: { name: 'hue-drop-down', params: { titleName: 'Database', value: database, entries: availableDatabases, foreachVisible: true, searchable: true, linkTitle: '${I18n(
