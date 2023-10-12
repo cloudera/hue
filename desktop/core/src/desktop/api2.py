@@ -48,7 +48,7 @@ from desktop import appmanager
 from desktop.auth.backend import is_admin
 from desktop.conf import ENABLE_CONNECTORS, ENABLE_GIST_PREVIEW, CUSTOM, get_clusters, ENABLE_SHARING
 from desktop.conf import ENABLE_NEW_STORAGE_BROWSER
-from desktop.conf import AI_INTERFACE, is_ai_interface_enabled, is_vector_db_enabled
+from desktop.conf import AI_INTERFACE, is_ai_interface_enabled, is_ai_trusted_service, ai_service_name, is_vector_db_enabled
 from desktop.lib.conf import BoundContainer, GLOBAL_CONFIG, is_anonymous
 from desktop.lib.django_util import JsonResponse, login_notrequired, render
 from desktop.lib.exceptions_renderable import PopupException
@@ -102,6 +102,8 @@ def get_config(request):
   config['hue_config']['is_yarn_enabled'] = is_yarn()
   config['hue_config']['enable_new_storage_browser'] = ENABLE_NEW_STORAGE_BROWSER.get()
   config['hue_config']['is_ai_interface_enabled'] = is_ai_interface_enabled()
+  config['hue_config']['ai_service_name'] = ai_service_name()
+  config['hue_config']['is_ai_trusted_service'] = is_ai_trusted_service()
   config['hue_config']['is_vector_db_enabled'] = is_vector_db_enabled()
   config['hue_config']['auto_fetch_table_meta_limit'] = AI_INTERFACE.AUTO_FETCH_TABLE_META_LIMIT.get()
   config['clusters'] = list(get_clusters(request.user).values())

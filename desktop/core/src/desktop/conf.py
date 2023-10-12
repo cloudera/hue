@@ -213,6 +213,11 @@ AI_INTERFACE = ConfigSection(
       key='service',
       help=_('API service to be used for AI tasks. AI is disabled when a service is not configured. Eg: openai, bedrock, ai_assistant'),
       type=str),
+    TRUSTED_SERVICE = Config(
+      key="trusted_service",
+      help=_('Indicates if the LLM is trusted or not. Turn on to disable warning. Default False.'),
+      type=coerce_bool,
+      default=False),      
     MODEL = Config(
       key='model',
       help=_('Model to be used for AI tasks. Eg: gpt, llama'),
@@ -287,9 +292,15 @@ def is_ai_interface_enabled():
   service = AI_INTERFACE.SERVICE.get()
   return bool(service and service.strip())
 
+def is_ai_trusted_service():
+  return AI_INTERFACE.TRUSTED_SERVICE.get()
+
 def is_vector_db_enabled():
   RELEVENCY = SEMANTIC_SEARCH.RELEVENCY.get()
   return RELEVENCY=="vector_db"
+
+def ai_service_name():
+  return AI_INTERFACE.SERVICE.get()
 
 HUE_IMAGE_VERSION = Config(
   key="hue_image_version",
