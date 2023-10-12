@@ -264,26 +264,29 @@ HueContextSelector.prototype.setMatchingNamespace = function (compute) {
   const self = this;
   if (self[TYPES_INDEX.namespace.name]) {
     // Select the first corresponding namespace when a compute is selected (unless selected)
-    self[TYPES_INDEX.namespace.lastPromise].done(() => {
-      if (
-        !self[TYPES_INDEX.namespace.name]() ||
-        self[TYPES_INDEX.namespace.name]().id !== compute.namespace
-      ) {
-        const found = self[TYPES_INDEX.namespace.available]().some(namespace => {
-          if (compute.namespace === namespace.id) {
-            self[TYPES_INDEX.namespace.name](namespace);
-            setInLocalStorage('contextSelector.' + TYPES_INDEX.namespace.localStorageId, namespace);
-            return true;
-          }
-        });
+    try {
+      self[TYPES_INDEX.namespace.lastPromise].done(() => {
+        if (
+          !self[TYPES_INDEX.namespace.name]() ||
+          self[TYPES_INDEX.namespace.name]().id !== compute.namespace
+        ) {
+          const found = self[TYPES_INDEX.namespace.available]().some(namespace => {
+            if (compute.namespace === namespace.id) {
+              self[TYPES_INDEX.namespace.name](namespace);
+              setInLocalStorage('contextSelector.' + TYPES_INDEX.namespace.localStorageId, namespace);
+              return true;
+            }
+          });
 
-        if (!found) {
-          // This can happen when a compute refers to a namespace that isn't returned by the namespaces call
-          // TODO: What should we do?
-          self[TYPES_INDEX.namespace.name](undefined);
+          if (!found) {
+            // This can happen when a compute refers to a namespace that isn't returned by the namespaces call
+            // TODO: What should we do?
+            self[TYPES_INDEX.namespace.name](undefined);
+          }
         }
-      }
-    });
+      });
+    } catch (e) { }
+
   }
 };
 
