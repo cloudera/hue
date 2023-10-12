@@ -219,13 +219,19 @@ class ABFS(object):
     if directory_name != "":
       params['directory'] = directory_name
 
-    res = self._root._invoke("GET", file_system, params, headers=self._getheaders(), **kwargs)
-    resp = self._root._format_response(res)
-
-    if account != '':
-      file_system = file_system + account
-    for x in resp['paths']:
-      dir_stats.append(ABFSStat.for_directory(res.headers, x, root + file_system + "/" + x['name']))
+    while True:
+      res = self._root._invoke("GET", file_system, params, headers=self._getheaders(), **kwargs)
+      resp = self._root._format_response(res)
+      if account:
+        file_system += account
+      for x in resp['paths']:
+        dir_stats.append(ABFSStat.for_directory(res.headers, x, root + file_system + "/" + x['name']))
+      # If the number of paths returned exceeds the 5000, a continuation token is provided in the response header x-ms-continuation,
+      # which must be used in subsequent invocations to continue listing the paths.
+      if 'x-ms-continuation' in res.headers:
+        params['continuation'] = res.headers['x-ms-continuation']
+      else:
+        break
 
     return dir_stats
 
