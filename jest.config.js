@@ -1,8 +1,9 @@
 module.exports = {
   moduleFileExtensions: ['js', 'jsx', 'ts', 'tsx', 'json', 'vue'],
+  transformIgnorePatterns: ['node_modules/(?!(cuix|@cloudera/cuix-core)/)'],
   transform: {
     '^.+\\.(js|ts|jsx|tsx)$': 'babel-jest',
-    '^.+\\.vue$': '@vue/vue3-jest',
+    '^.+\\.vue$': '@vue/vue3-jest'
   },
   moduleNameMapper: {
     '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
