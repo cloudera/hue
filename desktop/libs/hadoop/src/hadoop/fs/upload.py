@@ -28,7 +28,10 @@ See http://docs.djangoproject.com/en/1.2/topics/http/file-uploads/
 from builtins import object
 import errno
 import logging
+import os
+import posixpath
 import sys
+import unicodedata
 import time
 
 from django.core.files.uploadhandler import FileUploadHandler, StopFutureHandlers, StopUpload, UploadFileException, SkipFile
@@ -38,6 +41,9 @@ from desktop.lib import fsmanager
 import hadoop.cluster
 from hadoop.conf import UPLOAD_CHUNK_SIZE
 from hadoop.fs.exceptions import WebHdfsException
+from desktop.lib.exceptions_renderable import PopupException
+from filebrowser.conf import ARCHIVE_UPLOAD_TEMPDIR
+from filebrowser.utils import generate_chunks, calculate_total_size
 
 if sys.version_info[0] > 2:
   from django.utils.translation import gettext as _
@@ -49,6 +55,96 @@ LOG = logging.getLogger()
 
 
 UPLOAD_SUBDIR = 'hue-uploads'
+
+
+class LocalFineUploaderChunkedUpload(object):
+  def __init__(self, request, *args, **kwargs):
+    self._request = request
+    self.qquuid = kwargs.get('qquuid')
+    self.qqtotalparts = kwargs.get('qqtotalparts')
+    self.totalfilesize = kwargs.get('qqtotalfilesize')
+    self.file_name = kwargs.get('qqfilename')
+    if self.file_name:
+      self.file_name = unicodedata.normalize('NFC', self.file_name) # Normalize unicode
+    local = "local:/"
+    if local in kwargs.get('dest', ""):
+      self.dest = kwargs.get('dest')[len(local):]
+    else:
+      self.dest = kwargs.get('dest')
+    self.file_name = kwargs.get('qqfilename')
+    self.filepath = request.fs.join(self.dest, self.file_name)
+    self._file = None
+    self.chunk_size = 0
+  def check_access(self):
+    pass
+  def upload_chunks(self):
+    pass
+  def upload(self):
+    self.check_access()
+    self.upload_chunks()
+
+class HDFSFineUploaderChunkedUpload(object):
+  def __init__(self, request, *args, **kwargs):
+    self._request = request
+    self.qquuid = kwargs.get('qquuid')
+    self.qqtotalparts = kwargs.get('qqtotalparts')
+    self.totalfilesize = kwargs.get('qqtotalfilesize')
+    self.file_name = kwargs.get('qqfilename')
+    if self.file_name:
+      self.file_name = unicodedata.normalize('NFC', self.file_name) # Normalize unicode
+    self.dest = kwargs.get('dest')
+    self.file_name = kwargs.get('qqfilename')
+    self.filepath = request.fs.join(self.dest, self.file_name)
+    self._file = None
+    self.chunk_size = 0
+
+  def check_access(self):
+    if self._request.fs.isdir(self.dest) and posixpath.sep in self.file_name:
+      raise PopupException(_('HDFSFineUploaderChunkedUpload: Sorry, no "%(sep)s" in the filename %(name)s.' %
+                             {'sep': posixpath.sep, 'name': self.file_name}))
+
+    fs = fsmanager.get_filesystem('default')
+    if not fs:
+      logging.warning('HDFSFineUploaderChunkedUpload: No HDFS set for HDFS upload')
+      raise PopupException(_('HDFSFineUploaderChunkedUpload: No HDFS set for HDFS upload'))
+    else:
+      fs.setuser(self._request.user.username)
+      self.chunk_size = fs.get_upload_chuck_size(self.dest) if self.dest else UPLOAD_CHUNK_SIZE.get()
+      logging.debug("Chunk size = %d" % self.chunk_size)
+
+    if self.totalfilesize != calculate_total_size(self.qquuid, self.qqtotalparts):
+      raise PopupException(_('HDFSFineUploaderChunkedUpload: Sorry, the file size is not correct. %(name)s %(qquuid)s %(size)s') %
+                            {'name': self.file_name, 'qquuid': self.qquuid, 'size': self.totalfilesize})
+
+  def upload_chunks(self):
+    self._file = HDFStemporaryUploadedFile(self._request, self.file_name, self.dest)
+    logging.debug('HDFSFineUploaderChunkedUpload: Upload attempt to %s' % (self._file.get_temp_path(),))
+    for i, (chunk, total) in enumerate(generate_chunks(self.qquuid, self.qqtotalparts, default_write_size=self.chunk_size), 1):
+      logging.debug("HDFSFineUploaderChunkedUpload: uploading file %s, part %d, size %d, dest: %s" %
+                    (self.file_name, i, total, self.dest))
+      self._file.write(chunk)
+    self._file.flush()
+    self._file.finish_upload(self.totalfilesize)
+    self._file._do_cleanup = False
+    self._file.close()
+
+    try:
+      self._request.fs.upload(file=self._file, path=self.dest, username=self._request.user.username)
+    except IOError as ex:
+      already_exists = False
+      try:
+        already_exists = self._request.fs.exists(self.dest)
+      except Exception:
+        pass
+      if already_exists:
+        msg = _('Destination %(name)s already exists.')  % {'name': self.filepath}
+      else:
+        msg = _('Copy to %(name)s failed: %(error)s') % {'name': self.filepath, 'error': ex}
+      raise PopupException(msg)
+
+  def upload(self):
+    self.check_access()
+    self.upload_chunks()
 
 
 class HDFSerror(UploadFileException):
@@ -124,6 +220,51 @@ class HDFStemporaryUploadedFile(object):
   def close(self):
     self._file.close()
 
+class FineUploaderChunkedUploadHandler(FileUploadHandler):
+  """
+  A custom file upload handler for handling chunked uploads using FineUploader.
+
+  Attributes:
+  - qquuid (str): The unique identifier for the uploaded file.
+  - qqpartindex (int): The index of the current chunk being uploaded.
+  - qqpartbyteoffset (int): The byte offset of the current chunk within the file.
+  - qqtotalfilesize (int): The total size of the uploaded file.
+  - qqtotalparts (int): The total number of chunks that make up the file.
+  - qqfilename (str): The name of the uploaded file.
+  - qqchunksize (int): The size of each chunk being uploaded.
+  """
+  def __init__(self, request=None, *args, **kwargs):
+    super().__init__(request, *args, **kwargs)
+    # Capture FineUploader parameters from the request
+    self.qquuid = self.request.GET.get('qquuid', "")
+    self.qqpartindex = int(self.request.GET.get('qqpartindex', 0))
+    self.qqpartbyteoffset = int(self.request.GET.get('qqpartbyteoffset', 0))
+    self.qqtotalfilesize = int(self.request.GET.get('qqtotalfilesize', 0))
+    self.qqtotalparts = int(self.request.GET.get('qqtotalparts', 1))
+    self.qqfilename = self.request.GET.get('qqfilename', "")
+    self.qqchunksize = int(self.request.GET.get('qqchunksize', 0))
+    self._starttime = time.time()
+    self.chunk_file_path = os.path.join(ARCHIVE_UPLOAD_TEMPDIR.get(), f'{self.qquuid}_{self.qqpartindex}')
+
+  def receive_data_chunk(self, raw_data, start):
+    """
+    Receives a chunk of data and writes it to a temporary file.
+    Args:
+    - raw_data (bytes): The raw data of the chunk being uploaded.
+    - start (int): The starting byte offset of the chunk within the file.
+    """
+    with open(self.chunk_file_path, 'ab+') as dest:
+      dest.seek(0)  # This will overwrite the file if it already exists
+      dest.write(raw_data)
+
+  def file_complete(self, file_size):
+    """
+    Called when the entire file has been uploaded and all chunks have been processed.
+    Args:
+    - file_size (int): The total size of the uploaded file.
+    """
+    elapsed = time.time() - self._starttime
+    LOG.info('Uploaded %s bytes %s to in %s seconds' % (file_size, self.chunk_file_path, elapsed))
 
 class HDFSfileUploadHandler(FileUploadHandler):
   """
@@ -176,7 +317,8 @@ class HDFSfileUploadHandler(FileUploadHandler):
     LOG.debug("HDFSfileUploadHandler receive_data_chunk")
 
     if not self._activated:
-      if self.request.META.get('PATH_INFO').startswith('/filebrowser') and self.request.META.get('PATH_INFO') != '/filebrowser/upload/archive':
+      if self.request.META.get('PATH_INFO').startswith('/filebrowser') and \
+         self.request.META.get('PATH_INFO') != '/filebrowser/upload/archive':
         raise SkipFile()
       return raw_data
 

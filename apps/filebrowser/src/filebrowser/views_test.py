@@ -44,6 +44,7 @@ from azure.conf import is_abfs_enabled, is_adls_enabled, ABFS_CLUSTERS
 from django.urls import reverse
 from django.utils.encoding import smart_str
 from django.http import HttpResponse
+from django.test import TestCase
 
 from nose.plugins.attrib import attr
 from nose.plugins.skip import SkipTest
@@ -1529,6 +1530,53 @@ class TestADLSAccessPermissions(object):
       assert_equal(200, response.status_code)
     finally:
       remove_from_group(self.user.username, 'has_adls')
+
+
+class UploadChunksTestCase(TestCase):
+  def setUp(self):
+    self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
+    grant_access('test', 'test', 'filebrowser')
+    add_to_group('test')
+    self.user = User.objects.get(username="test")
+    self.url = '/filebrowser/upload/chunks/?dest=/tmp&fileFieldLabel=local&qquuid=123&qqfilename=test.txt&qqtotalfilesize=12'
+    self.filename = "test.txt"
+
+  def test_upload_chunks_success(self):
+    url = '/filebrowser/upload/chunks/?dest=/tmp&fileFieldLabel=local&qquuid=123&qqfilename=test.txt&qqtotalfilesize=12'
+    response = self.client.post(url, {'filename': self.filename})
+    self.assertEqual(response.status_code, 200)
+    # In Test Setup HDFS is not available, so it will fail
+    self.assertEqual(response.json()['success'], False)
+
+  def test_upload_chunks_large_file(self):
+    # simulate a large file upload
+    url = '/filebrowser/upload/chunks/?dest=/tmp&fileFieldLabel=hdfs_file&qqpartindex=2&qqpartbyteoffset=4000000&'
+    url += 'qqchunksize=2000000&qqtotalparts=36&qqtotalfilesize=71138958&qqfilename=ym_2020.csv&qquuid=123'
+    response = self.client.post(url, {'filename': self.filename})
+    self.assertEqual(response.status_code, 200)
+    self.assertEqual(response.json()['success'], True)
+    self.assertEqual(response.json()['uuid'], '123')
+
+  def test_upload_chunks_small_file(self):
+    # simulate a small file upload
+    url = '/filebrowser/upload/chunks/?dest=/tmp&fileFieldLabel=hdfs_file&qqtotalfilesize=48&qqfilename=ym_2020.csv&qquuid=123'
+    response = self.client.post(url, {'qqtotalfilesize': 1000, 'qquuid': '123'})
+    self.assertEqual(response.status_code, 200)
+    # In Test Setup HDFS is not available, so it will fail
+    self.assertEqual(response.json()['success'], False)
+
+  def test_upload_chunks_error(self):
+    # simulate an error in the upload
+    url = '/filebrowser/upload/chunks/'
+    try:
+      response = self.client.post(url)
+    except Exception as e:
+      self.assertEqual(e.status_code, 500)
+      self.assertEqual(e.json()['success'], False)
+      self.assertEqual(e.json()['error'], 'Error in upload')
+    self.assertEqual(response.status_code, 200)
+    self.assertEqual(response.json()['success'], False)
+    self.assertEqual(response.json()['error'], 'Error in upload')
 
 class TestOFSAccessPermissions(object):
   def setUp(self):
