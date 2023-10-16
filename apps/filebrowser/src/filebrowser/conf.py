@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
 import sys
 
 from desktop.conf import ENABLE_DOWNLOAD
@@ -26,7 +27,6 @@ if sys.version_info[0] > 2:
 else:
   from django.utils.translation import ugettext_lazy as _
 
-
 MAX_SNAPPY_DECOMPRESSION_SIZE = Config(
   key="max_snappy_decompression_size",
   help=_("Max snappy decompression size in bytes."),
@@ -37,8 +37,20 @@ MAX_SNAPPY_DECOMPRESSION_SIZE = Config(
 ARCHIVE_UPLOAD_TEMPDIR = Config(
   key="archive_upload_tempdir",
   help=_("Location on local filesystem where the uploaded archives are temporary stored."),
-  default=None,
+  default="/tmp/hue_uploads",
   type=str)
+
+FILE_UPLOAD_CHUNK_SIZE = Config(
+  key="file_upload_chunk_size",
+  default=5000000,
+  type=int,
+  help=_('Configure chunk size of the chunked file uploader. Default chunk size is set to 5MB.'))
+
+CONCURRENT_MAX_CONNECTIONS = Config(
+  key="concurrent_max_connections",
+  default=5,
+  type=int,
+  help=_('Configure the maximum number of concurrent connections(chunks) for file uploads using the chunked file uploader.'))
 
 def get_desktop_enable_download():
   """Get desktop enable_download default"""
