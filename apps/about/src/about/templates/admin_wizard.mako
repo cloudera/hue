@@ -381,8 +381,7 @@ ${ layout.menubar(section='quick_start') }
         $("#check-config-section .info").removeClass('hide');
       })
       .fail(function() {
-        $(document).trigger('error', '${ _("Check config failed: ")}');
-        //huePubSub.publish('hue.global.error', {message: '${ _("Check config failed: ")}'});
+        huePubSub.publish('hue.global.error', {message: '${ _("Check config failed: ")}'});
       });
     }
 

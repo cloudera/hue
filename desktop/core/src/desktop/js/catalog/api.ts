@@ -39,7 +39,6 @@ import { hueWindow } from 'types/types';
 import '../utils/json.bigDataParse';
 import sleep from 'utils/timing/sleep';
 import UUID from 'utils/string/UUID';
-import huePubSub from 'utils/huePubSub';
 
 interface AnalyzeResponse {
   status: number;

@@ -2039,8 +2039,7 @@ else:
           onComplete: function (id, fileName, response) {
             self.pendingUploads(self.pendingUploads() - 1);
             if (response.status != 0) {
-              $(document).trigger('error', "${ _('Error: ') }" + response.data);
-              //huePubSub.publish('hue.global.error', {message: "${ _('Error: ') }" + response.data});
+              huePubSub.publish('hue.global.error', {message: "${ _('Error: ') }" + response.data});
             }
             else {
               $(document).trigger('info', response.path + "${ _(' uploaded successfully.') }");

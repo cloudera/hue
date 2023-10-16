@@ -2379,16 +2379,14 @@ function createNewQuery() {
 
 // Server error handling.
 $(document).on('server.error', function (e, data) {
-  $(document).trigger('error', "${_('Server error occurred: ')}" + data.message ? data.message : data.error);
-  //huePubSub.publish('hue.global.error', {message: "${_('Server error occurred: ')}" + data.message ? data.message : data.error});
+  huePubSub.publish('hue.global.error', {message: "${_('Server error occurred: ')}" + data.message ? data.message : data.error});
 });
 $(document).on('server.unmanageable_error', function (e, responseText) {
   var message = responseText;
   if (! message) {
     message = '${ _("Hue server is probably down.") }';
   }
-  $(document).trigger('error', "${_('Unmanageable server error occurred: ')}" + message);
-  //huePubSub.publish('hue.global.error', {message: "${_('Unmanageable server error occurred: ')}" + message});
+  huePubSub.publish('hue.global.error', {message: "${_('Unmanageable server error occurred: ')}" + message});
 });
 
 // Other

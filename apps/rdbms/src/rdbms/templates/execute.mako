@@ -907,8 +907,7 @@ ${ commonshare() | n,unicode }
 
   // Server error handling.
   $(document).on('server.error', function(e, data) {
-    $(document).trigger('error', "${_('Server error occurred: ')}" + data.error);
-    //huePubSub.publish('hue.global.error', {message: "${_('Server error occurred: ')}" + data.error});
+    huePubSub.publish('hue.global.error', {message: "${_('Server error occurred: ')}" + data.error});
   });
   $(document).on('server.unmanageable_error', function(e, responseText) {
     huePubSub.publish('hue.global.error', {message: "${_('Unmanageable server error occurred: ')}" + responseText});

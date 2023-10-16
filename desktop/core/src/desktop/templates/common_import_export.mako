@@ -148,9 +148,8 @@ else:
           }
         },
         error: function () {
-          $(document).trigger('error', "${_('An unexpected error occurred while importing your documents')}");
+          huePubSub.publish('hue.global.error', {message: "${_('An unexpected error occurred while importing your documents')}"});
           $('#import-document-data').modal('hide');
-          //here
         }
       });
     };

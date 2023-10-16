@@ -123,7 +123,7 @@ var CoordinatorEditorViewModel = (function () {
           });
         }
       }).fail(function (xhr, textStatus, errorThrown) {
-        huePubSub.publish('hue.global.error', {message: xhr.responseTexte});
+        huePubSub.publish('hue.global.error', {message: xhr.responseText});
       });
     }
 

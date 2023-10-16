@@ -831,8 +831,7 @@ $(document).on('started.job', function(e, job, options, submission_dict) {
 });
 
 $(document).on('start_fail.job', function(e, job, options, error) {
-  $(document).trigger("error", "${ _('Error: ') }" + (typeof error.exception != "undefined" ? error.exception : error));
-  ## here
+  huePubSub.publish('hue.global.error', {message: "${ _('Error: ') }" + (typeof error.exception != "undefined" ? error.exception : error)});
 });
 
 $(document).on('stopped.job', function(e, job, options, submission_dict) {

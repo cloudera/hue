@@ -620,8 +620,7 @@ function import_jobsub_load_success(data) {
   if (data.status == 0) {
     import_jobsub_action.initialize(data.data);
   } else {
-    $(document).trigger("error", interpret_server_error(data, "${ _('Received invalid response from server') } "));
-    //huePubSub.publish('hue.global.error', {message: interpret_server_error(data, "${ _('Received invalid response from server') } ")});
+    huePubSub.publish('hue.global.error', {message: interpret_server_error(data, "${ _('Received invalid response from server') } ")});
   }
 }
 
