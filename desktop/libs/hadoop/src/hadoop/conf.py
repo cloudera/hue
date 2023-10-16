@@ -51,9 +51,9 @@ def find_file_recursive(desired_glob, root):
 
 UPLOAD_CHUNK_SIZE = Config(
   key="upload_chunk_size",
-  help="Size, in bytes, of the 'chunks' Django should store into memory and feed into the handler. Default is 64MB.",
+  help="Size, in bytes, of the 'chunks' Django should store into memory and feed into the handler. Default is 128MB.",
   type=int,
-  default=1024 * 1024 * 64)
+  default=1024 * 1024 * 128)
 
 
 def has_hdfs_enabled():

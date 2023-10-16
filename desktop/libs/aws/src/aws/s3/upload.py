@@ -21,10 +21,12 @@ Classes for a custom upload handler to stream into S3.
 See http://docs.djangoproject.com/en/1.9/topics/http/file-uploads/
 """
 
+import io
 from future import standard_library
 standard_library.install_aliases()
 import logging
 import sys
+import unicodedata
 
 if sys.version_info[0] > 2:
   from io import BytesIO as stream_io
@@ -43,9 +45,85 @@ if sys.version_info[0] > 2:
 else:
   from django.utils.translation import ugettext as _
 
-DEFAULT_WRITE_SIZE = 1024 * 1024 * 50  # TODO: set in configuration (currently 50 MiB)
+DEFAULT_WRITE_SIZE = 1024 * 1024 * 128  # TODO: set in configuration (currently 128 MiB)
 
 LOG = logging.getLogger()
+
+from desktop.lib.exceptions_renderable import PopupException
+from filebrowser.utils import generate_chunks, calculate_total_size
+
+class S3FineUploaderChunkedUpload(object):
+  def __init__(self, request, *args, **kwargs):
+    self._part_num = 1
+    self._mp = None
+    self._request = request
+    self.qquuid = kwargs.get('qquuid')
+    self.qqtotalparts = kwargs.get('qqtotalparts')
+    self.totalfilesize = kwargs.get('qqtotalfilesize')
+    self.file_name = kwargs.get('qqfilename')
+    if self.file_name:
+      self.file_name = unicodedata.normalize('NFC', self.file_name) # Normalize unicode
+    self.destination = kwargs.get('dest', None)  # GET param avoids infinite looping
+    self.file_name = kwargs.get('qqfilename')
+    self._fs = get_client(fs='s3a', user=self._request.user.username)
+    self.bucket_name, self.key_name = parse_uri(self.destination)[:2]
+    # Verify that the path exists
+    self._fs._stats(self.destination)
+    self._bucket = self._fs._get_bucket(self.bucket_name)
+    self.filepath = self._fs.join(self.key_name, self.file_name)
+
+  def check_access(self):
+    if self._is_s3_upload():
+      try:
+        # Check access permissions before attempting upload
+        self._check_access()
+        # Create a multipart upload request
+        LOG.debug("S3FineUploaderChunkedUpload: Initiating S3 multipart upload to target path: %s" % self.filepath)
+        self._mp = self._bucket.initiate_multipart_upload(self.filepath)
+      except (S3FileUploadError, S3FileSystemException) as e:
+        LOG.error("S3FineUploaderChunkedUpload: Encountered error in S3UploadHandler check_access: %s" % e)
+        self.request.META['upload_failed'] = e
+        raise PopupException("S3FineUploaderChunkedUpload: Initiating S3 multipart upload to target path: %s failed" % self.filepath)
+
+    if self.totalfilesize != calculate_total_size(self.qquuid, self.qqtotalparts):
+      raise PopupException(_('S3FineUploaderChunkedUpload: Sorry, the file size is not correct. %(name)s %(qquuid)s %(size)s') %
+                            {'name': self.file_name, 'qquuid': self.qquuid, 'size': self.totalfilesize})
+
+  def upload_chunks(self):
+    try:
+      for i, (chunk, total) in enumerate(generate_chunks(self.qquuid, self.qqtotalparts, default_write_size=DEFAULT_WRITE_SIZE), 1):
+        LOG.debug("S3FineUploaderChunkedUpload: uploading file %s, part %d, size %d, dest: %s" %
+                  (self.file_name, i, total, self.destination))
+        self._mp.upload_part_from_file(fp=chunk, part_num=i)
+    except Exception as e:
+      self._mp.cancel_upload()
+      LOG.exception('Failed to upload file to S3 at %s: %s' % (self.filepath, e))
+      raise PopupException("S3FineUploaderChunkedUpload: uploading file %s failed with %s" % (self.filepath, e))
+    finally:
+      # Finish the upload
+      LOG.info("S3FineUploaderChunkedUpload: has completed file upload to S3, total file size is: %d." % self.totalfilesize)
+      self._mp.complete_upload()
+
+  def upload(self):
+    self.check_access()
+    self.upload_chunks()
+
+  def _is_s3_upload(self):
+    return self._get_scheme() and self._get_scheme().startswith('S3')
+
+  def _check_access(self):
+    if not self._fs.check_access(self.destination, permission='WRITE'):
+      raise S3FileSystemException('S3FineUploaderChunkedUpload: Insufficient permissions to write to S3 path "%s".' % self.destination)
+
+  def _get_scheme(self):
+    if self.destination:
+      dst_parts = self.destination.split('://')
+      if dst_parts:
+        return dst_parts[0].upper()
+      else:
+        raise S3FileSystemException('S3FineUploaderChunkedUpload: Destination does not start with a valid scheme.')
+    else:
+      return None
 
 
 class S3FileUploadError(UploadFileException):

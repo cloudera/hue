@@ -1916,6 +1916,16 @@ ENABLE_NEW_STORAGE_BROWSER = Config(
   default=False
 )
 
+def get_chunked_fileuploader():
+  return ENABLE_NEW_FILE_UPLOADER.get();
+
+ENABLE_NEW_FILE_UPLOADER = Config(
+  key="enable_new_file_uploader",
+  help=_("Enable new chunked file uploader."),
+  type=coerce_bool,
+  default=False
+)
+
 USE_NEW_EDITOR = Config( # To remove in Hue 4
   key='',
   default=True,
