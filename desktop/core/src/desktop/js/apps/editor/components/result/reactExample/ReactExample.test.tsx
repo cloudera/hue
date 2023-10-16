@@ -4,10 +4,6 @@ import '@testing-library/jest-dom';
 
 import ReactExample from './ReactExample';
 
-// For now, this is needed to mock cuix components exported as ESM (ECMAScript module)
-jest.mock('cuix/dist/components/Button/PrimaryButton', () => () => undefined);
-jest.mock('@cloudera/cuix-core/icons/react/PlusCircleIcon', () => () => undefined);
-
 // Required by the antd Pagination component
 window.matchMedia = jest.fn().mockImplementation(query => {
   return {
