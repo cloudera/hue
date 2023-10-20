@@ -94,11 +94,10 @@ def build_sample_data(reader: TableReader, table) -> str:
     row_count = len(rows)
     if row_count > 0:
       return f"/*\n{row_count} example rows of table {table_name}:\n{col_str}\n{rows_str}\n*/"
-    else:
-      return "/*\nTable is empty\n*/"
   except Exception as exc:
     LOG.error(f"Error fetching sample data for table {table_name} - {exc}")
-    return "/*\nExample rows not available\n*/"
+
+  return "/*\nExample rows not available\n*/"
 
 def get_table_key(table) -> str:
   table_name = table["name"]
