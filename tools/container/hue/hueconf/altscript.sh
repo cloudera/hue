@@ -6,4 +6,9 @@ if [ "${ALIAS}" = "" ]; then
     exit 1
 fi
 
-exec /usr/bin/java -cp /etc/hue/conf/security-7.2.3.jar com.cloudera.enterprise.crypto.JceksPasswordExtractor /jceks/secrets.jceks "${ALIAS}"
+JCEKS_PATH=$2
+if [ "${JCEKS_PATH}" = "" ]; then
+    JCEKS_PATH="/jceks/secrets.jceks"
+fi
+
+exec /usr/bin/java -cp /etc/hue/conf/security-7.2.3.jar com.cloudera.enterprise.crypto.JceksPasswordExtractor "${JCEKS_PATH}" "${ALIAS}"
