@@ -74,6 +74,12 @@ const breakLines = (input: string): string => {
   return (result += line);
 };
 
+const getDbName = (activeExecutable: SqlExecutable | undefined) => {
+  // In safari the activeExecutable?.database is null when reloading the
+  // editor page, but the executor still has the database name.
+  return activeExecutable?.database || activeExecutable?.executor?.database() || '';
+};
+
 export interface AiAssistBarProps {
   activeExecutable?: SqlExecutable;
 }
@@ -125,7 +131,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
   const loadExplanation = async (statement: string) => {
     setIsLoading(true);
     const executor = activeExecutable?.executor;
-    const databaseName = activeExecutable?.database || '';
+    const databaseName = getDbName(activeExecutable);
     const dialect = sqlDialect;
     const { explain, summary, error } = await generateExplanation({
       statement,
@@ -150,7 +156,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
     setGuardrailAlert(undefined);
     setErrorStatusText('');
     const executor = activeExecutable?.executor;
-    const databaseName = activeExecutable?.database || '';
+    const databaseName = getDbName(activeExecutable);
     const dialect = sqlDialect;
     const { sql, assumptions, error, guardrailAlert } = await withGuardrails(generateSQLfromNQL)({
       nql,
@@ -183,7 +189,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
     setIsLoading(true);
     setGuardrailAlert(undefined);
     const executor = activeExecutable?.executor;
-    const databaseName = activeExecutable?.database || '';
+    const databaseName = getDbName(activeExecutable);
     const dialect = sqlDialect;
     const { sql, assumptions, error, guardrailAlert } = await withGuardrails(
       generateEditedSQLfromNQL
@@ -216,7 +222,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
     setIsOptimizeMode(true);
     setGuardrailAlert(undefined);
     const executor = activeExecutable?.executor;
-    const databaseName = activeExecutable?.database || '';
+    const databaseName = getDbName(activeExecutable);
     const dialect = sqlDialect;
     const { sql, explain, error, guardrailAlert } = await withGuardrails(generateOptimizedSql)({
       statement,
@@ -245,7 +251,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
     setGuardrailAlert(undefined);
     const dialect = sqlDialect;
     const executor = activeExecutable?.executor;
-    const databaseName = activeExecutable?.database || '';
+    const databaseName = getDbName(activeExecutable);
     const { sql, explain, error, guardrailAlert } = await withGuardrails(generateCorrectedSql)({
       statement,
       databaseName,

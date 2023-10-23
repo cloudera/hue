@@ -250,6 +250,9 @@ interface getTableListParams {
   executor: Executor;
 }
 const getTableList = async ({ databaseName, executor }: getTableListParams) => {
+  if (!databaseName) {
+    throw new Error('Missing database');
+  }
   const dbEntry = await dataCatalog.getEntry({
     path: databaseName,
     connector: executor?.connector(),
