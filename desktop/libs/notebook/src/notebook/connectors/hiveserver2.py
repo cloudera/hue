@@ -317,8 +317,8 @@ class HS2Api(Api):
     db = self._get_db(snippet, interpreter=self.interpreter)
 
     statement = self._get_current_statement(notebook, snippet)
-    compute = snippet.get('compute')
-    session_type = compute['name'] if is_compute(snippet) else snippet['type']
+    compute = snippet.get('compute', {})
+    session_type = compute['name'] if is_compute(snippet) and compute.get('name') else snippet['type']
     session = self._get_session(notebook, session_type)
 
     query = self._prepare_hql_query(snippet, statement['statement'], session)
