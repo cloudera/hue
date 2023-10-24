@@ -27,7 +27,7 @@ from boto.gs.key import Key
 from boto.s3.prefix import Prefix
 from django.utils.translation import gettext as _
 
-from desktop.conf import PERMISSION_ACTION_GS, GS_BULK_DELETE_DIR_KEYS_MAX_LIMIT
+from desktop.conf import PERMISSION_ACTION_GS, GS_BULK_DELETE_DIR_KEYS_MAX_LIMIT, is_raz_gs
 from desktop.lib.fs.gc import GS_ROOT, abspath, parse_uri, translate_gs_error, normpath, join as gs_join
 from desktop.lib.fs.gc.gsstat import GSStat
 from desktop.lib.fs.gc.gsfile import open as gsfile_open
@@ -135,7 +135,18 @@ class GSFileSystem(S3FileSystem):
         parent_dir = abspath(bucket_path, key_path)
 
     return parent_dir
-  
+
+  def create_home_dir(self, home_path):
+    # When GS raz is enabled, try to create user home dir for REMOTE_STORAGE_HOME path
+    if is_raz_gs():
+      LOG.debug('Attempting to create user directory for path: %s' % home_path)
+      try:
+        self.mkdir(home_path)
+      except Exception as e:
+        LOG.exception('Failed to create user home directory for path %s with error: %s' % (home_path, str(e)))
+    else:
+      LOG.info('Create home directory is not available for GS filesystem')
+
   @translate_gs_error
   def stats(self, path):
     """Get file or directory stats for a GS path.

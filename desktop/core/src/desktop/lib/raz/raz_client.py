@@ -55,11 +55,17 @@ class RazClient(object):
         'service_name': 'adls',
         'serviceType': 'adls'
       }
-    else:
+    elif self.service == 's3':
       self.service_params = {
         'endpoint_prefix': 's3',
         'service_name': 's3',
         'serviceType': 's3'
+      }
+    else:
+      self.service_params = {
+        'endpoint_prefix': 'gs',
+        'service_name': 'gs',
+        'serviceType': 'gs'
       }
 
     self.service_name = service_name
@@ -99,6 +105,8 @@ class RazClient(object):
       self._make_adls_request(request_data, method, path, url_params, resource_path)
     elif self.service == 's3':
       self._make_s3_request(request_data, request_headers, method, params, headers, url_params, endpoint, resource_path, data=data)
+    elif self.service == 'gs':
+      self._make_gs_request(request_data, request_headers, method, params, headers, url_params, endpoint, resource_path, data=data)
 
     LOG.debug('Raz url: %s' % raz_url)
     LOG.debug("Sending access check headers: {%s} request_data: {%s}" % (request_headers, request_data))
@@ -127,8 +135,21 @@ class RazClient(object):
         if self.service == 'adls':
           LOG.debug("Received SAS %s" % signed_response_data["ADLS_DSAS"])
           return {'token': signed_response_data["ADLS_DSAS"]}
-        else:
+
+        elif self.service == 's3':
           signed_response_result = signed_response_data["S3_SIGN_RESPONSE"]
+
+          if signed_response_result is not None:
+            raz_response_proto = raz_signer.SignResponseProto()
+            signed_response = raz_response_proto.FromString(base64.b64decode(signed_response_result))
+            LOG.debug("Received signed Response %s" % signed_response)
+
+          # Signed headers "only"
+          if signed_response is not None:
+            return dict([(i.key, i.value) for i in signed_response.signer_generated_headers])
+
+        elif self.service == 'gs':
+          signed_response_result = signed_response_data["GS_SIGN_RESPONSE"]
 
           if signed_response_result is not None:
             raz_response_proto = raz_signer.SignResponseProto()
@@ -267,6 +288,46 @@ class RazClient(object):
     request_headers["Accept-Encoding"] = "gzip,deflate"
     request_data["context"] = {
       "S3_SIGN_REQUEST": signed_request
+    }
+
+
+  def _make_gs_request(self, request_data, request_headers, method, params, headers, url_params, endpoint, resource_path, data=None):
+    # In GET operations with non-ascii chars, only the non-ascii part is URL encoded.
+    # We need to unquote the path fully before making a signed request for RAZ.
+    if method == 'GET' and 'prefix' in url_params and '%' in url_params['prefix']:
+      url_params['prefix'] = lib_urlunquote(url_params['prefix'])
+
+    allparams = [raz_signer.StringListStringMapProto(key=key, value=[val]) for key, val in url_params.items()]
+    allparams.extend([raz_signer.StringListStringMapProto(key=key, value=[val]) for key, val in params.items()])
+    headers = [raz_signer.StringStringMapProto(key=key, value=val) for key, val in headers.items()]
+
+    LOG.debug(
+      "Preparing sign request with "
+      "http_method: {%s}, headers: {%s}, parameters: {%s}, endpoint: {%s}, resource_path: {%s}, content_to_sign: {%s}" %
+      (method, headers, allparams, endpoint, resource_path, data)
+    )
+
+    # Raz signed request proto call expects data as bytes instead of str for Py3.
+    if sys.version_info[0] > 2 and data is not None and not isinstance(data, bytes):
+      data = data.encode()
+
+    raz_req = raz_signer.SignRequestProto(
+        endpoint_prefix=self.service_params['endpoint_prefix'],
+        service_name=self.service_params['service_name'],
+        endpoint=endpoint,
+        http_method=method,
+        headers=headers,
+        parameters=allparams,
+        resource_path=resource_path,
+        content_to_sign=data,
+        time_offset=0
+    )
+    raz_req_serialized = raz_req.SerializeToString()
+    signed_request = base64.b64encode(raz_req_serialized).decode('utf-8')
+
+    request_headers["Accept-Encoding"] = "gzip,deflate"
+    request_data["context"] = {
+      "GS_SIGN_REQUEST": signed_request
     }
 
 
