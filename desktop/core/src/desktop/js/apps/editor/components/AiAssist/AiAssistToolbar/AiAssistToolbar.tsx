@@ -27,7 +27,6 @@ import {
 
 import Toolbar, { ToolbarButton } from '../../../../../reactComponents/Toolbar/Toolbar';
 import AiAssistToolbarInput from './AiAssistToolbarInput';
-import { useKeyboardShortcuts } from '../hooks';
 import { extractLeadingNqlComments, removeComments } from '../PreviewModal/formattingUtils';
 
 import './AiAssistToolbar.scss';
@@ -105,14 +104,6 @@ function AssistToolbar({
     loadFixSuggestion(parsedStatement?.statement);
   };
 
-  useKeyboardShortcuts({
-    e: toggleEditMode,
-    g: toggleGenerateMode,
-    x: handleExplainClick,
-    o: handleOptimizeClick,
-    f: handleFixClick
-  });
-
   const selectedStatement = parsedStatement?.statement?.trim() || '';
   const selectedStatementHasContent = !!selectedStatement;
   const nqlPrompt = extractLeadingNqlComments(selectedStatement);
@@ -128,7 +119,7 @@ function AssistToolbar({
         <>
           <ToolbarButton
             disabled={isLoading || (selectedStatement && !selectedStatementHasNqlCommentOnly)}
-            title="Generate SQL using natural language (Command-Ctrl-G)"
+            title="Generate SQL using natural language"
             aria-label="Generate SQL using natural language"
             icon={<CommentOutlined />}
             onClick={toggleGenerateMode}
@@ -149,7 +140,7 @@ function AssistToolbar({
           />
           <ToolbarButton
             disabled={isLoading || selectedStatementMissingSql}
-            title="Edit selected SQL statement using natural language (Command-Ctrl-E)"
+            title="Edit selected SQL statement using natural language"
             aria-label="Edit SQL using natural language"
             icon={<EditOutlined />}
             onClick={toggleEditMode}
@@ -170,7 +161,7 @@ function AssistToolbar({
           />
           <ToolbarButton
             disabled={isLoading || selectedStatementMissingSql}
-            title="Explain the selected SQL statement (Command-Ctrl-X)"
+            title="Explain the selected SQL statement"
             aria-label="Explain SQL statement"
             icon={<BulbOutlined />}
             onClick={handleExplainClick}
@@ -179,14 +170,14 @@ function AssistToolbar({
           </ToolbarButton>
           <ToolbarButton
             onClick={handleOptimizeClick}
-            title="Optimize the selected SQL statement (Command-Ctrl-O)"
+            title="Optimize the selected SQL statement"
             disabled={isLoading || selectedStatementMissingSql}
             icon={<ThunderboltOutlined />}
           >
             {!inputExpanded ? 'Optimize' : ''}
           </ToolbarButton>
           <ToolbarButton
-            title="Fix the selected SQL statement (Command-Ctrl-F)"
+            title="Fix the selected SQL statement"
             onClick={handleFixClick}
             disabled={!isSqlError || isLoading || selectedStatementMissingSql}
             icon={<BugOutlined />}
