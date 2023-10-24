@@ -29,6 +29,7 @@ import sys
 
 from django.urls import reverse
 
+from beeswax.common import is_compute
 from desktop.auth.backend import is_admin
 from desktop.conf import USE_DEFAULT_CONFIGURATION, has_connectors
 from desktop.lib.conf import BoundConfig
@@ -316,11 +317,11 @@ class HS2Api(Api):
     db = self._get_db(snippet, interpreter=self.interpreter)
 
     statement = self._get_current_statement(notebook, snippet)
-    session = self._get_session(notebook, snippet['type'])
+    compute = snippet.get('compute', {})
+    session_type = compute['name'] if is_compute(snippet) and compute.get('name') else snippet['type']
+    session = self._get_session(notebook, session_type)
 
     query = self._prepare_hql_query(snippet, statement['statement'], session)
-    compute = snippet.get('compute')
-    session_type = compute['name'] if compute else snippet['type']
     _session = self._get_session_by_id(notebook, session_type)
 
 
@@ -349,7 +350,7 @@ class HS2Api(Api):
       'log_context': handle.log_context,
       'session_guid': handle.session_guid,
       'session_id': handle.session_id,
-      'session_type': snippet['type']
+      'session_type': session_type
     }
     response.update(statement)
 
