@@ -1895,7 +1895,7 @@ class Snippet {
               if (!notebook.sessions().length) {
                 notebook.addSession(
                   new Session(vm, {
-                    type: self.type(),
+                    type: data.handle.session_type || self.type(),
                     session_id: data.handle.session_guid,
                     id: data.handle.session_id,
                     properties: {}
@@ -1904,7 +1904,7 @@ class Snippet {
               } else {
                 notebook.sessions()[0].session_id(data.handle.session_guid);
                 notebook.sessions()[0].id(data.handle.session_id);
-                notebook.sessions()[0].type(self.type());
+                notebook.sessions()[0].type(data.handle.session_type || self.type());
               }
             }
             if (vm.editorMode()) {
