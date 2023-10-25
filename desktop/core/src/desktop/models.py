@@ -44,7 +44,7 @@ from hadoop.core_site import get_raz_api_url, get_raz_s3_default_bucket
 from kafka.conf import has_kafka
 from indexer.conf import ENABLE_DIRECT_UPLOAD
 from metadata.conf import get_optimizer_mode
-from notebook.conf import DEFAULT_LIMIT, SHOW_NOTEBOOKS, get_ordered_interpreters
+from notebook.conf import DEFAULT_LIMIT, SHOW_NOTEBOOKS, get_ordered_interpreters, DEFAULT_INTERPRETER
 from useradmin.models import User, Group, get_organization
 from useradmin.organization import _fitered_queryset
 
@@ -1784,8 +1784,13 @@ class ClusterConfig(object):
 
     if main_button_action.get('is_sql'):
       default_sql_interpreter = main_button_action['type']
+      print('123',default_sql_interpreter)
+    elif DEFAULT_INTERPRETER.get() != '':
+      default_sql_interpreter = DEFAULT_INTERPRETER.get();
+      print('1122',default_sql_interpreter)
     else:
       default_sql_interpreter = editors and editors['default_sql_interpreter']
+      print('156',default_sql_interpreter)
 
     return {
       'app_config': app_config,
@@ -1979,7 +1984,7 @@ class ClusterConfig(object):
           'buttonName': interpreter['name'].title(),
           'page': '/dashboard/new_search?engine=%(type)s' % interpreter,
           'tooltip': _('%s Dashboard') % interpreter['name'].title(),
-          'is_sql': True
+          'is_sql': False
         }
         for interpreter in interpreters
       ])
