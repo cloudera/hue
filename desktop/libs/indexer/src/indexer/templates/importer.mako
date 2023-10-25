@@ -3117,8 +3117,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
               $('#showCommandsModal').modal('show');
             }
           } else {
-            $(document).trigger("error", resp && resp.message ? resp.message : '${ _("Error importing") }');
-            ## here
+            huePubSub.publish('hue.global.error', {message: resp && resp.message ? resp.message : '${ _("Error importing") }'});
           }
         }).fail(function (xhr) {
           self.indexingStarted(false);

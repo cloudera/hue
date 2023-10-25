@@ -207,8 +207,7 @@ ${ utils.submit_popup_event() }
         window.location.reload();
         $('#deleteWf').modal('hide');
       }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.status == 500 ? JSON.parse(xhr.responseText).message : xhr.responseText);
-        //here
+        huePubSub.publish('hue.global.error', {message: xhr.status == 500 ? JSON.parse(xhr.responseText).message : xhr.responseText});
       });
     };
 
