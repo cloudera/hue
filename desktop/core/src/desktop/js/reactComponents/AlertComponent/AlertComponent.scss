@@ -16,7 +16,7 @@
 
 @import '../../components/styles/variables';
 
-.flash-messages {
+.hue-alert {
     position: fixed;
     width: 30%;
     z-index: 9999;
@@ -42,9 +42,9 @@
     }
 
     .ant-alert-warning {
-        color: $cui-orange-750;
-        background: $cui-orange-025;
-        border: 1px solid $cui-orange-450;
+        color: $fluidx-orange-900;
+        background: $fluidx-orange-050;
+        border: 1px solid $fluidx-orange-500;
 
         button {
             color: $cui-green-650;
@@ -63,7 +63,7 @@
         }
     }
 
-    .ant-alert-error {
+    .hue-alert--error {
         color: $cui-orange-725;
         background: $cui-red-075;
         border: 1px solid $cui-red-450;
