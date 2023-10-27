@@ -195,7 +195,7 @@ DEFAULT_INTERPRETER = Config(
   key="default_interpreter",
   help=_t("The default interpreter to use as main action."),
   type=str,
-  default='',
+  default=''
 )
 
 DEFAULT_LIMIT = Config(

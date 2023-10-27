@@ -1784,13 +1784,8 @@ class ClusterConfig(object):
 
     if main_button_action.get('is_sql'):
       default_sql_interpreter = main_button_action['type']
-      print('123',default_sql_interpreter)
-    elif DEFAULT_INTERPRETER.get() != '':
-      default_sql_interpreter = DEFAULT_INTERPRETER.get();
-      print('1122',default_sql_interpreter)
     else:
       default_sql_interpreter = editors and editors['default_sql_interpreter']
-      print('156',default_sql_interpreter)
 
     return {
       'app_config': app_config,
@@ -1860,10 +1855,21 @@ class ClusterConfig(object):
       LOG.exception('Could not load back default app')
 
     if default_interpreter:
-      return default_interpreter[0]
+      interpreter_counter = 0
+      interpreter_index = 0
+
+      for di in default_interpreter:
+        if DEFAULT_INTERPRETER.get() != '':
+          if di['name'] == DEFAULT_INTERPRETER.get():
+            interpreter_index = interpreter_counter
+            break
+
+        interpreter_counter+=1
+      return default_interpreter[interpreter_index]
+
     else:
       return default_app
-
+    
 
   def _get_home(self):
     return {
