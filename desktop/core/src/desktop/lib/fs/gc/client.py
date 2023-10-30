@@ -32,6 +32,7 @@ from desktop import conf
 from desktop.lib.idbroker import conf as conf_idbroker
 from desktop.lib.idbroker.client import IDBroker
 from desktop.lib.fs.gc.gs import GSFileSystem
+from desktop.lib.fs.gc.gsconnection import RazGSConnection
 
 
 def get_credential_provider(config, user):
@@ -54,7 +55,6 @@ def _make_client(identifier, user):
   return GSFileSystem(
     gs_client_connection,
     gs_client_expiration,
-    # headers={"x-goog-project-id": client.project},
   )  # It would be nice if the connection was lazy loaded
 
 

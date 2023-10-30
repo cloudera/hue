@@ -21,7 +21,8 @@ import xml.sax
 
 from urllib.parse import unquote, urlparse as lib_urlparse, parse_qs, urlencode
 
-from boto.gs.bucket import Bucket, Key
+from boto.gs.bucket import Bucket
+from boto.gs.key import Key
 from boto.gs.connection import GSConnection
 from boto.s3.connection import SubdomainCallingFormat
 
@@ -51,11 +52,9 @@ class SignedUrlGSConnection(GSConnection):
   def __init__(self, username, gs_access_key_id=None, gs_secret_access_key=None,
                 is_secure=True, port=None, proxy=None, proxy_port=None,
                 proxy_user=None, proxy_pass=None,
-                host=DefaultHost, debug=0, https_connection_factory=None,
+                host=GSConnection.DefaultHost, debug=0, https_connection_factory=None,
                 calling_format=SubdomainCallingFormat(), path='/',
-                provider='google', bucket_class=Bucket, security_token=None,
-                suppress_consec_slashes=True, anon=False,
-                validate_certs=None, profile_name=None):
+                suppress_consec_slashes=True, anon=False):
 
     self.username = username
 
@@ -68,9 +67,7 @@ class SignedUrlGSConnection(GSConnection):
       proxy_user=proxy_user, proxy_pass=proxy_pass,
       host=host, debug=debug, https_connection_factory=https_connection_factory,
       calling_format=calling_format, path=path,
-      provider=provider, bucket_class=bucket_class, security_token=security_token,
-      suppress_consec_slashes=suppress_consec_slashes, anon=anon,
-      validate_certs=validate_certs, profile_name=profile_name
+      suppress_consec_slashes=suppress_consec_slashes, anon=anon
     )
 
 
@@ -106,6 +103,8 @@ class RazGSConnection(SignedUrlGSConnection):
     host = self.calling_format.build_host(self.server_name(), bucket)
 
     if query_args:
+      # TODO:Check for generation and remove it from query args
+
       # # Clean prefix to remove s3a%3A//[S3_BUCKET]/ for sending correct relative path to RAZ
       # if 'prefix=s3a%3A//' in query_args:
       #   qs_parsed = parse_qs(query_args) # all strings will be unquoted
@@ -120,6 +119,8 @@ class RazGSConnection(SignedUrlGSConnection):
       LOG.debug('auth_path=%s' % auth_path)
 
     params = {}
+    # TODO: Change all headers from x-goog to x-amz because RAZ sends back only x-AMZ headers and 
+    # then call to GS will failing saying found 2 types of headers and only 1 type required.
     http_request = self.build_base_http_request(method, path, auth_path, params, headers, data, host)
 
     # Actual override starts here
