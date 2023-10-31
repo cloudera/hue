@@ -1855,21 +1855,12 @@ class ClusterConfig(object):
       LOG.exception('Could not load back default app')
 
     if default_interpreter:
-      interpreter_counter = 0
-      interpreter_index = 0
-
-      for di in default_interpreter:
-        if DEFAULT_INTERPRETER.get() != '':
+      if DEFAULT_INTERPRETER.get() != '':
+        for di in default_interpreter:
           if di['name'] == DEFAULT_INTERPRETER.get():
-            interpreter_index = interpreter_counter
-            break
+            return di
+    return default_interpreter[0]
 
-        interpreter_counter+=1
-      return default_interpreter[interpreter_index]
-
-    else:
-      return default_app
-    
 
   def _get_home(self):
     return {
@@ -1990,7 +1981,7 @@ class ClusterConfig(object):
           'buttonName': interpreter['name'].title(),
           'page': '/dashboard/new_search?engine=%(type)s' % interpreter,
           'tooltip': _('%s Dashboard') % interpreter['name'].title(),
-          'is_sql': False
+          'is_sql': True
         }
         for interpreter in interpreters
       ])
