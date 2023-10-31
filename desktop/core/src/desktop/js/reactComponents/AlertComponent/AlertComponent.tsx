@@ -41,6 +41,7 @@ const AlertComponent: React.FC = () => {
         setErrors(filteredErrors);
     };
 
+    //TODO: add support for warnings and success messages
     return (
         <div className='flash-messages cuix antd'>
             {errors.map((errorObj, index) => (

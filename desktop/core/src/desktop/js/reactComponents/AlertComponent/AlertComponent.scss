@@ -33,7 +33,7 @@
     }
 
     button span {
-        font-size: 12px;
+        font-size: $font-size-sm;
         padding-top: 5px;
     }
 
@@ -41,44 +41,43 @@
         height: 16px;
     }
 
-    .ant-alert-warning {
+    .hue-alert--warning {
         color: $fluidx-orange-900;
         background: $fluidx-orange-050;
         border: 1px solid $fluidx-orange-500;
 
         button {
-            color: $cui-green-650;
-            ;
+            color: $fluidx-green-800;
         }
 
     }
 
-    .ant-alert-success {
-        color: $cui-green-850;
-        background: $cui-green-075;
-        border: 1px solid $cui-green-450;
+    .hue-alert--success {
+        color: $fluidx-green-900;
+        background: $fluidx-green-050;
+        border: 1px solid $fluidx-green-600;
 
         button {
-            color: $cui-green-650;
+            color: $fluidx-green-800;
         }
     }
 
     .hue-alert--error {
-        color: $cui-orange-725;
-        background: $cui-red-075;
-        border: 1px solid $cui-red-450;
+        color: $fluidx-orange-900;
+        background: $fluidx-red-050;
+        border: 1px solid $fluidx-red-500;
         display: flex;
         align-items: flex-start;
 
         button {
-            color: $cui-red-750;
+            color: $fluidx-red-800;
             position: absolute;
             top: 0.5rem;
             right: 3%;
         }
     }
 
-    .ant-alert-message {
+    .hue-alert--message {
         margin-right: 1rem;
     }
 }
