@@ -36,7 +36,7 @@ const AlertComponent: React.FC = () => {
         };
     }, []);
 
-    const handleClose = (errorObj: ErrorAlert, id: number) => {
+    const handleClose = (errorObj: ErrorAlert) => {
         const filteredErrors = errors.filter((errorObj) => errorObj !== errorObj);
         setErrors(filteredErrors);
     };
