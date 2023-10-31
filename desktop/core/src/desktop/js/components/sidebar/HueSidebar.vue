@@ -102,6 +102,7 @@
     'oozie-coordinator': `<svg class="hi hi-fw"><use xlink:href="#hi-oozie-coordinator"></use></svg>`,
     'oozie-workflow': `<svg class="hi hi-fw"><use xlink:href="#hi-oozie-workflow"></use></svg>`,
     ofs: `<svg class="hi hi-fw"><use xlink:href="#hi-ofs"></use></svg>`,
+    gs: `<svg class="hi hi-fw"><use xlink:href="#hi-gs"></use></svg>`,
     pig: `<svg class="hi hi-fw"><use xlink:href="#hi-pig"></use></svg>`,
     py: `<svg class="hi hi-fw"><use xlink:href="#hi-py"></use></svg>`,
     pyspark: `<svg class="hi hi-fw"><use xlink:href="#hi-spark"></use></svg>`,
