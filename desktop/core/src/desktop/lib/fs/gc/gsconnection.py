@@ -14,14 +14,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import boto
 import logging
-import requests
-import xml.sax
+import re
 
-from urllib.parse import unquote, urlparse as lib_urlparse, parse_qs, urlencode
-
-from boto.gs.bucket import Bucket
 from boto.gs.key import Key
 from boto.gs.connection import GSConnection
 from boto.s3.connection import SubdomainCallingFormat
@@ -35,9 +30,9 @@ LOG = logging.getLogger()
 
 class SignedUrlGSConnection(GSConnection):
   """
-  Contact S3 via a presigned Url of the resource hence not requiring any S3 credentials.
+  Contact GS via a presigned Url of the resource hence not requiring any GS credentials.
 
-  This is a client replacing the building of the Http Request of the S3 resource via asking a third party providing for a presigned Urls.
+  This is a client replacing the building of the Http Request of the GS resource via asking a third party providing for a presigned Urls.
   The request information is then injected into the regular boto HTTPRequest as the format is the same. Raw calls via the requests
   lib would work but the unmarshalling back from XML to boto2 Python object is tedious.
 
@@ -46,7 +41,7 @@ class SignedUrlGSConnection(GSConnection):
   https://github.com/boto/boto/blob/develop/boto/s3/connection.py
   https://github.com/boto/boto/blob/develop/boto/connection.py
 
-  Example of a presigned S3 Url declaring a `list all buckets` call:
+  Example of a presigned GS Url declaring a `list all buckets` call:
   https://s3-us-west-1.amazonaws.com/?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA23E77ZX2HVY76YGL%2F20210505%2Fus-west-1%2Fs3%2Faws4_request&X-Amz-Date=20210505T171457Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=994d0ec2ca19a00aa2925fe62cab0e727591b1951a8a47504b2b9124facbd6cf
   """
   def __init__(self, username, gs_access_key_id=None, gs_secret_access_key=None,
@@ -73,7 +68,7 @@ class SignedUrlGSConnection(GSConnection):
 
 class RazGSConnection(SignedUrlGSConnection):
   """
-  Class asking a RAZ server presigned Urls for all the operations on S3 resources.
+  Class asking a RAZ server presigned Urls for all the operations on GS resources.
   Some operations can be denied depending on the privileges of the users in Ranger.
 
   Then fill-up the boto HttpRequest with the presigned Url data and lets boto executes the request as usual,
@@ -103,15 +98,12 @@ class RazGSConnection(SignedUrlGSConnection):
     host = self.calling_format.build_host(self.server_name(), bucket)
 
     if query_args:
-      # TODO:Check for generation and remove it from query args
+      # Call to RAZ for getting the signed headers does not expect the 'generation' argument in the query_args
+      # This might be done to make their side RAZ-GS implementation similar to S3
 
-      # # Clean prefix to remove s3a%3A//[S3_BUCKET]/ for sending correct relative path to RAZ
-      # if 'prefix=s3a%3A//' in query_args:
-      #   qs_parsed = parse_qs(query_args) # all strings will be unquoted
-      #   prefix_relative_path = qs_parsed['prefix'][0].partition(bucket + '/')[2]
-      #   qs_parsed['prefix'][0] = prefix_relative_path
-
-      #   query_args = unquote(urlencode(qs_parsed, doseq=True))
+      # Using regex to remove the 'generation' arg and its value from the query string
+      query_args = re.sub(r'&?generation=[^&]*', '', query_args)
+      query_args = query_args.lstrip('&') # Remove any leading '&' if 'generation' is at the beginning
 
       path += '?' + query_args
       LOG.debug('path=%s' % path)
@@ -119,8 +111,16 @@ class RazGSConnection(SignedUrlGSConnection):
       LOG.debug('auth_path=%s' % auth_path)
 
     params = {}
-    # TODO: Change all headers from x-goog to x-amz because RAZ sends back only x-AMZ headers and 
-    # then call to GS will failing saying found 2 types of headers and only 1 type required.
+    # GS expects only one type of headers i.e. either all x-amz-* or all x-goog-*, and the signed headers returned from RAZ are of x-amz-* type
+    # So, we are converting all x-goog-* headers to x-amz-* headers before sending the final request to GS from Hue
+    if headers:
+      updated_headers = {'x-amz-' + key[7:]: value for key, value in headers.items() if key.startswith('x-goog-')}
+      headers.update(updated_headers)
+
+      for key in list(headers.keys()):
+          if key.startswith('x-goog-'):
+              del headers[key]
+
     http_request = self.build_base_http_request(method, path, auth_path, params, headers, data, host)
 
     # Actual override starts here
