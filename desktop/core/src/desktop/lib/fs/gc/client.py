@@ -41,12 +41,11 @@ def get_credential_provider(config, user):
 
 
 def _make_client(identifier, user):
-  config = conf.GC_ACCOUNTS[identifier] if identifier in list(conf.GC_ACCOUNTS.keys()) else None
-
   if conf.is_raz_gs():
     gs_client_connection = RazGSConnection(username=user)  # Note: Remaining GS configuration is fully skipped
     gs_client_expiration = None
   else:
+    config = conf.GC_ACCOUNTS[identifier] if identifier in list(conf.GC_ACCOUNTS.keys()) else None
     gs_client_builder = Client.from_config(config, get_credential_provider(config, user))
 
     gs_client_connection = gs_client_builder.get_gs_connection()

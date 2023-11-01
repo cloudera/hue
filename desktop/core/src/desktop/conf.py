@@ -2250,6 +2250,12 @@ RAZ = ConfigSection(
       type=coerce_bool,
       default=True,
     ),
+    IS_RAZ_GS_ENABLED = Config(
+      help=_('Enable integration with Google Storage for RAZ'),
+      key='is_raz_gs_enabled',
+      default=False,
+      type=coerce_bool
+    )
   )
 )
 
@@ -2588,7 +2594,7 @@ PERMISSION_ACTION_GS = "gs_access"
 GS_BULK_DELETE_DIR_KEYS_MAX_LIMIT = Config(
   help=_('Maximum number of keys with specific directory prefix that can be deleted in a single bulk operation in GS.'),
   key='gs_bulk_delete_dir_keys_max_limit',
-  default=100,
+  default=1000,
   type=coerce_zero_or_positive_integer
 )
 
@@ -2626,7 +2632,7 @@ def has_gs_access(user):
 def is_raz_gs():
   from desktop.conf import RAZ  # Must be imported dynamically in order to have proper value
 
-  return (RAZ.IS_ENABLED.get() and 'default' in list(GC_ACCOUNTS.keys()) and GC_ACCOUNTS['default'].get_raw())
+  return (RAZ.IS_ENABLED.get() and RAZ.IS_RAZ_GS_ENABLED.get())
 
 
 def get_ozone_conf_dir_default():
