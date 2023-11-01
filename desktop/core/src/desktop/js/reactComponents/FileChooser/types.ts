@@ -33,7 +33,7 @@ interface Stats {
   user: string;
 }
 
-interface File {
+export interface File {
   humansize: string;
   is_sentry_managed: boolean;
   mode: string;
@@ -45,6 +45,16 @@ interface File {
   type: string;
   url: string;
 }
+
+export interface StorageBrowserTableData {
+  name: string;
+  size: string;
+  user: string;
+  groups: string;
+  permission: string;
+  lastUpdated: string;
+}
+
 export interface BreadcrumbData {
   label: string;
   url: string;

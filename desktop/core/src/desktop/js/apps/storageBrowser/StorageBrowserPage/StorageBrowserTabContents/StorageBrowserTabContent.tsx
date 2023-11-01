@@ -32,8 +32,12 @@ import PlusCircleIcon from '@cloudera/cuix-core/icons/react/PlusCircleIcon';
 import { FileOutlined } from '@ant-design/icons';
 
 import PathBrowser from '../../../../reactComponents/FileChooser/PathBrowser/PathBrowser';
+import StorageBrowserTable from '../StorageBrowserTable/StorageBrowserTable';
 import { fetchFiles } from '../../../../reactComponents/FileChooser/api';
-import { PathAndFileData } from '../../../../reactComponents/FileChooser/types';
+import {
+  PathAndFileData,
+  StorageBrowserTableData
+} from '../../../../reactComponents/FileChooser/types';
 
 import './StorageBrowserTabContent.scss';
 
@@ -52,6 +56,7 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
 }): JSX.Element => {
   const [filePath, setFilePath] = useState<string>(user_home_dir);
   const [filesData, setFilesData] = useState<PathAndFileData | undefined>();
+  const [files, setFiles] = useState<StorageBrowserTableData[] | undefined>();
   const [loadingFiles, setloadingFiles] = useState(true);
 
   const { t } = i18nReact.useTranslation();
@@ -126,6 +131,20 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
     fetchFiles(filePath)
       .then(responseFilesData => {
         setFilesData(responseFilesData);
+        // eslint-disable-next-line prefer-const
+        let tableData: StorageBrowserTableData[] = [];
+        responseFilesData.files.map(file => {
+          const temp: StorageBrowserTableData = {
+            name: file.name,
+            size: file.humansize,
+            user: file.stats.user,
+            groups: file.stats.group,
+            permission: file.rwx,
+            lastUpdated: file.mtime
+          };
+          tableData.push(temp);
+        });
+        setFiles(tableData);
       })
       .catch(error => {
         //TODO: handle errors
@@ -188,6 +207,7 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
             </Dropdown>
           </div>
         </div>
+        <StorageBrowserTable dataSource={files}></StorageBrowserTable>
       </div>
     </Spin>
   );
