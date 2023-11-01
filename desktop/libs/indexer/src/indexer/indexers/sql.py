@@ -85,6 +85,7 @@ class SQLIndexer(object):
     source_path = source['path']
     load_data = destination['importData']
     isIceberg = destination['isIceberg']
+    copyFile = destination['copyFile']
 
     external = not destination['useDefaultLocation']
     external_path = destination['nonDefaultLocation']
@@ -166,7 +167,10 @@ class SQLIndexer(object):
           # If dir not just the file, create data dir and move file there. Make sure it's unique.
           external_path = external_path + '/%s%s_table' % (external_file_name, str(uuid.uuid4()))
           self.fs.mkdir(external_path)
-          self.fs.rename(source_path, external_path)
+          if copyFile:
+            self.fs.copy(source_path, external_path)
+          else:
+            self.fs.rename(source_path, external_path)
     elif load_data: # We'll use load data command
       parent_path = self.fs.parent_path(source_path)
       stats = self.fs.stats(parent_path)

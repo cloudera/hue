@@ -690,6 +690,12 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
                 </label>
               </div>
 
+              <div class="control-group" data-bind="visible: !useDefaultLocation() && !isTransactional() && $root.createWizard.source.inputFormat() === 'file'">
+                <label class="checkbox inline-block">
+                  <input data-hue-analytics="importer:copyFile-checkbox-interaction" type="checkbox" data-bind="checked: copyFile"> ${_('Copy file')}
+                </label>
+              </div>
+
               <div class="control-group">
                 <label><div>${ _('Description') }</div>
                     <input type="text" class="form-control input-xxlarge" data-bind="value: description, valueUpdate: 'afterkeydown'" placeholder="${ _('Description') }">
@@ -2622,6 +2628,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
       })      
       self.useDefaultLocation = ko.observable(true);
       self.useDefaultLocation.subscribe(function(val) {
+        self.copyFile(false);
         window.hueAnalytics.log('importer', 'default-location/' + val);
       })
       self.nonDefaultLocation = ko.observable('');
@@ -2633,6 +2640,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
       self.isTransactionalVisible = ko.observable((vm.sourceType == 'impala' && isTransactionalVisibleImpala) || (vm.sourceType == 'hive' && isTransactionalVisibleHive));
       self.isTransactional = ko.observable(self.isTransactionalVisible());
       self.isTransactional.subscribe(function(val) {
+        self.copyFile(false);
         window.hueAnalytics.log('importer', 'is-transactional/' + val);
       })   
       self.isInsertOnly = ko.observable(true); // Impala doesn't have yet full support.
@@ -2658,6 +2666,8 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
         }
         window.hueAnalytics.log('importer', 'is-iceberg/' + val);
       });
+
+      self.copyFile = ko.observable(false);
 
       self.hasHeader = ko.observable(false);
 
