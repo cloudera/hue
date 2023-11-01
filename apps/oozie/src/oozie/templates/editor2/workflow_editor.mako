@@ -70,7 +70,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, request, "40px") | n,unicod
         %if is_embeddable:
           <li>
             <a href="javascript: void(0)" data-bind="publish: { 'assist.show.documents': 'oozie-workflow2' }">
-              <svg class="hi hi-fw hi-bigger"><use xlink:href="#hi-documents"></use></svg> ${ _('Workflows') }
+              <svg class="hi hi-fw hi-bigger"><use href="#hi-documents"></use></svg> ${ _('Workflows') }
             </a>
           </li>
         %endif
