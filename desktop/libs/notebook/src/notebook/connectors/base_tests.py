@@ -81,7 +81,7 @@ class TestNotebook(object):
     with patch('notebook.api.Document2.objects.get_by_uuid') as get_by_uuid:
       with patch('notebook.api.get_api') as get_api:
         with patch('notebook.api.Notebook') as NotebookMock:
-          get_api.return_value=Mock(
+          get_api.return_value = Mock(
             check_status=Mock(return_value={'status': 0})
           )
           resp = query.check_status(request=request, operation_id=operation_id)

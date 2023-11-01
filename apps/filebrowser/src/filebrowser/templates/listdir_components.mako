@@ -180,11 +180,11 @@ else:
       <h2 class="modal-title">${ _('Confirm Delete') }</h2>
     </div>
     <div class="modal-body">
-      <!-- ko if: isS3() && isS3Root() -->
+      <!-- ko if: (isS3() && isS3Root()) || (isGS() && isGSRoot()) -->
       <p>${_('Are you sure you want to delete these buckets?')}</p>
       <p class="muted">${_('Deleting a bucket will delete all of its contents and release the bucket name to be reserved by others.')}</p>
       <!-- /ko -->
-      <!-- ko ifnot: isS3() && isS3Root() -->
+      <!-- ko ifnot: (isS3() && isS3Root()) && (isGS() && isGSRoot()) -->
       <!-- ko ifnot: $root.skipTrash -->
       <p>${_('Are you sure you want to delete these files?')}</p>
       <!-- /ko -->
@@ -412,7 +412,7 @@ else:
           <span id="moveNameRequiredAlert" class="hide label label-important">${_('Required')}</span>
         </div>
         <a class="btn" onclick="$('#moveModal').modal('hide');">${_('Cancel')}</a>
-        <input class="btn btn-primary" type="submit" value="${_('Move')}"/>
+        <input data-bind="enable: $root.enableMoveButton()" class="btn btn-primary" type="submit" value="${_('Move')}"/>
       </div>
     </div>
   </form>
@@ -434,7 +434,7 @@ else:
           <span id="copyNameRequiredAlert" class="hide label label-important">${_('Required')}</span>
         </div>
         <a class="btn" onclick="$('#copyModal').modal('hide');">${_('Cancel')}</a>
-        <input class="btn btn-primary" type="submit" value="${_('Copy')}"/>
+        <input data-bind="enable: $root.enableCopyButton()" class="btn btn-primary" type="submit" value="${_('Copy')}"/>
       </div>
     </div>
   </form>
@@ -461,10 +461,10 @@ else:
     <div id="createDirectoryModal" class="modal hide fade">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
-        <!-- ko if: (!isS3() && !isABFS() && !isOFS()) || (isS3() && !isS3Root()) || (isABFS() && !isABFSRoot()) || (isOFS() && !isOFSServiceID() && !isOFSVol())  -->
+        <!-- ko if: (!isS3() && !isGS() && !isABFS() && !isOFS()) || (isS3() && !isS3Root()) || (isGS() && !isGSRoot()) || (isABFS() && !isABFSRoot()) || (isOFS() && !isOFSServiceID() && !isOFSVol())  -->
         <h2 class="modal-title">${_('Create Directory')}</h2>
         <!-- /ko -->
-        <!-- ko if: (isS3() && isS3Root()) || (isOFS() && isOFSVol()) -->
+        <!-- ko if: (isS3() && isS3Root()) || (isGS() && isGSRoot()) || (isOFS() && isOFSVol()) -->
         <h2 class="modal-title">${_('Create Bucket')}</h2>
         <!-- /ko -->
         <!-- ko if: isABFS() && isABFSRoot() -->
@@ -476,10 +476,10 @@ else:
       </div>
       <div class="modal-body">
         <label>
-          <!-- ko if: (!isS3() && !isABFS() && !isOFS()) || (isS3() && !isS3Root()) || (isABFS() && !isABFSRoot()) || (isOFS() && !isOFSServiceID() && !isOFSVol()) -->
+          <!-- ko if: (!isS3() && !isGS() && !isABFS() && !isOFS()) || (isS3() && !isS3Root()) || (isGS() && !isGSRoot()) || (isABFS() && !isABFSRoot()) || (isOFS() && !isOFSServiceID() && !isOFSVol()) -->
           ${_('Directory Name')}
           <!-- /ko -->
-          <!-- ko if: (isS3() && isS3Root()) || (isOFS() && isOFSVol()) -->
+          <!-- ko if: (isS3() && isS3Root()) || (isGS() && isGSRoot()) || (isOFS() && isOFSVol()) -->
           ${_('Bucket Name')}
           <!-- /ko -->
           <!-- ko if: isABFS() && isABFSRoot() -->
@@ -587,12 +587,12 @@ else:
   <!-- actions context menu -->
   <ul class="context-menu dropdown-menu">
   <!-- ko ifnot: $root.inTrash -->
-    <li data-bind="visible: (!isS3() && !isABFS() && !isOFS()) || (isS3() && !isS3Root()) || (isABFS() && !isABFSRoot()) || (isOFS() && !isOFSServiceID() && !isOFSVol()), css: {'disabled': $root.selectedFiles().length != 1 || isCurrentDirSelected().length > 0}">
+    <li data-bind="visible: (!isS3() && !isGS() && !isABFS() && !isOFS()) || (isS3() && !isS3Root()) || (isGS() && !isGSRoot()) || (isABFS() && !isABFSRoot()) || (isOFS() && !isOFSServiceID() && !isOFSVol()), css: {'disabled': $root.selectedFiles().length != 1 || isCurrentDirSelected().length > 0}">
     <a href="javascript: void(0)" title="${_('Rename')}" data-bind="click: ($root.selectedFiles().length == 1 && isCurrentDirSelected().length == 0) ? $root.renameFile: void(0)"><i class="fa fa-fw fa-font"></i>
     ${_('Rename')}</a></li>
-    <li data-bind="visible: (!isS3() && !isABFS() && !isOFS()) || (isS3() && !isS3Root()) || (isABFS() && !isABFSRoot()) || (isOFS() && !isOFSServiceID() && !isOFSVol()), css: {'disabled': $root.selectedFiles().length == 0 || isCurrentDirSelected().length > 0}">
+    <li data-bind="visible: (!isS3() && !isGS() &&  !isABFS() && !isOFS()) || (isS3() && !isS3Root()) || (isGS() && !isGSRoot()) || (isABFS() && !isABFSRoot()) || (isOFS() && !isOFSServiceID() && !isOFSVol()), css: {'disabled': $root.selectedFiles().length == 0 || isCurrentDirSelected().length > 0}">
     <a href="javascript: void(0)" title="${_('Move')}" data-bind="click: ( $root.selectedFiles().length > 0 && isCurrentDirSelected().length == 0) ? $root.move: void(0)"><i class="fa fa-fw fa-random"></i> ${_('Move')}</a></li>
-    <li data-bind="visible: (!isS3() && !isABFS() && !isOFS()) || (isS3() && !isS3Root()) || (isABFS() && !isABFSRoot()) || (isOFS() && !isOFSServiceID() && !isOFSVol()), css: {'disabled': $root.selectedFiles().length == 0 || isCurrentDirSelected().length > 0}">
+    <li data-bind="visible: (!isS3() && !isGS() && !isABFS() && !isOFS()) || (isS3() && !isS3Root()) || (isGS() && !isGSRoot()) || (isABFS() && !isABFSRoot()) || (isOFS() && !isOFSServiceID() && !isOFSVol()), css: {'disabled': $root.selectedFiles().length == 0 || isCurrentDirSelected().length > 0}">
     <a href="javascript: void(0)" title="${_('Copy')}" data-bind="click: ($root.selectedFiles().length > 0 && isCurrentDirSelected().length == 0) ? $root.copy: void(0)"><i class="fa fa-fw fa-files-o"></i> ${_('Copy')}</a></li>
     % if show_download_button:
     <li data-bind="css: {'disabled': $root.inTrash() || $root.selectedFiles().length != 1 || selectedFile().type != 'file'}">
@@ -649,7 +649,7 @@ else:
   <div id="submit-wf-modal" class="modal hide"></div>
 
   <script id="fileTemplate" type="text/html">
-    <tr class="row-animated" style="cursor: pointer" data-bind="visible: !(name == '..' && window.RAZ_IS_ENABLED), drop: { enabled: name !== '.' && type !== 'file' && (!$root.isS3() || ($root.isS3() && !$root.isS3Root())), value: $data }, event: { mouseover: toggleHover, mouseout: toggleHover, contextmenu: showContextMenu }, click: $root.viewFile, css: { 'row-selected': selected(), 'row-highlighted': highlighted(), 'row-deleted': deleted() }">
+    <tr class="row-animated" style="cursor: pointer" data-bind="visible: !(name == '..' && window.RAZ_IS_ENABLED), drop: { enabled: name !== '.' && type !== 'file' && ((!$root.isS3() || ($root.isS3() && !$root.isS3Root())) || (!$root.isGS() || ($root.isGS() && !$root.isGSRoot()))), value: $data }, event: { mouseover: toggleHover, mouseout: toggleHover, contextmenu: showContextMenu }, click: $root.viewFile, css: { 'row-selected': selected(), 'row-highlighted': highlighted(), 'row-deleted': deleted() }">
       <td class="center" data-bind="click: name !== '..' ? handleSelect : void(0)" style="cursor: default">
         <div data-bind="multiCheck: '#fileBrowserTable', visible: name != '..', css: { 'hue-checkbox': name != '..', 'fa': name != '..', 'fa-check': selected }"></div>
       </td>
@@ -663,7 +663,7 @@ else:
         <a href="#" data-bind="click: $root.viewFile"><i class="fa fa-level-up"></i></a>
         <!-- /ko -->
         <!-- ko if: name != '..' -->
-        <strong><a href="#" class="draggable-fb" data-bind="drag: { enabled: (!$root.isS3() || ($root.isS3() && !$root.isS3Root())), value: $data }, click: $root.viewFile, text: name, attr: { 'draggable': $.inArray(name, ['.', '..', '.Trash']) === -1 && !isBucket()}"></a></strong>
+        <strong><a href="#" class="draggable-fb" data-bind="drag: { enabled: (!$root.isS3() || ($root.isS3() && !$root.isS3Root()) || (!$root.isGS() || ($root.isGS() && !$root.isGSRoot()))), value: $data }, click: $root.viewFile, text: name, attr: { 'draggable': $.inArray(name, ['.', '..', '.Trash']) === -1 && !isBucket()}"></a></strong>
         <!-- /ko -->
       </td>
       <td>
@@ -688,9 +688,9 @@ else:
         % endif
       </td>
       <td>
-        <span data-bind="text: permissions, visible: $root.isS3() || !selected() || $root.isCurrentDirSentryManaged() || isSentryManaged"></span>
+        <span data-bind="text: permissions, visible: $root.isS3() || $root.isGS() || !selected() || $root.isCurrentDirSentryManaged() || isSentryManaged"></span>
         <a href="#" rel="tooltip" title="${_('Change permissions')}"
-            data-bind="text: permissions, visible: !$root.isS3() && !$root.inTrash() && selected() && !$root.isCurrentDirSentryManaged() && !isSentryManaged, click: $root.changePermissions" data-original-title="${_('Change permissions')}"></a>
+            data-bind="text: permissions, visible: !$root.isS3() && !$root.isGS() && !$root.inTrash() && selected() && !$root.isCurrentDirSentryManaged() && !isSentryManaged, click: $root.changePermissions" data-original-title="${_('Change permissions')}"></a>
       </td>
       <td data-bind="text: stats.mtime" style="white-space: nowrap;"></td>
     </tr>
@@ -856,7 +856,7 @@ else:
           replication: file.stats.replication
         },
         isBucket: ko.pureComputed(function(){
-          return file.path.toLowerCase().indexOf('s3a://') == 0 && file.path.substr(6).indexOf('/') == -1
+          return (file.path.toLowerCase().indexOf('s3a://') == 0 && file.path.substr(6).indexOf('/') == -1) || (file.path.toLowerCase().indexOf('gs://') == 0 && file.path.substr(5).indexOf('/') == -1)
         }),
         selected: ko.observable(file.highlighted && fileBrowserViewModel.isArchive(file.name) || false),
         highlighted: ko.observable(file.highlighted || false),
@@ -945,6 +945,8 @@ else:
       self.searchQuery = ko.observable("");
       self.skipTrash = ko.observable(false);
       self.enableFilterAfterSearch = true;
+      self.enableMoveButton = ko.observable(false);
+      self.enableCopyButton = ko.observable(false);
       self.isCurrentDirSentryManaged = ko.observable(false);
       self.errorMessage = ko.observable("");
       self.pendingUploads = ko.observable(0);
@@ -1066,6 +1068,10 @@ else:
         return self.currentPath().toLowerCase().indexOf('s3a://') === 0;
       });
 
+      self.isGS = ko.pureComputed(function () {
+        return self.currentPath().toLowerCase().indexOf('gs://') === 0;
+      });
+
       self.isAdls = ko.pureComputed(function () {
         return self.currentPath().toLowerCase().indexOf('adl:/') === 0;
       });
@@ -1089,6 +1095,8 @@ else:
           return 'adls';
         } else if (scheme === 's3a' ){
           return 's3';
+        } else if (scheme === 'gs' ){
+          return 'gs';
         } else if (scheme === 'ofs' ){
           return 'ofs';
         } else if (!scheme || scheme == 'hdfs') {
@@ -1102,6 +1110,8 @@ else:
         var path = path && path.toLowerCase();
         if (path.indexOf('s3a://') >= 0) {
           return 's3a://';
+        } else if (path.indexOf('gs://') >= 0) {
+          return 'gs://';
         } else if (path.indexOf('adl:/') >= 0) {
           return 'adl:/';
         } else if (path.indexOf('abfs://') >= 0) {
@@ -1126,13 +1136,13 @@ else:
         return currentPath.indexOf('/') === 0 || currentPath.indexOf('hdfs') === 0
       });
       self.isCompressEnabled = ko.pureComputed(function () {
-        return !self.isS3() && !self.isAdls() && !self.isABFS() && !self.isOFS();
+        return !self.isS3() && !self.isGS() && !self.isAdls() && !self.isABFS() && !self.isOFS();
       });
       self.isSummaryEnabled = ko.pureComputed(function () {
         return self.isHdfs() || self.isOFS();
       });
       self.isPermissionEnabled = ko.pureComputed(function () {
-        return !self.isS3() && !self.isABFSRoot() && !self.isOFS();
+        return !self.isS3() && !self.isGS() && !self.isABFSRoot() && !self.isOFS();
       });
       self.isReplicationEnabled = ko.pureComputed(function () {
         return self.isHdfs();
@@ -1144,8 +1154,18 @@ else:
         }
       });
 
+      self.isGS.subscribe(function (newVal) {
+        if (newVal) {
+          huePubSub.publish('update.autocompleters');
+        }
+      });
+
       self.isS3Root = ko.pureComputed(function () {
         return self.isS3() && self.currentPath().toLowerCase() === 's3a://';
+      });
+
+      self.isGSRoot = ko.pureComputed(function () {
+        return self.isGS() && self.currentPath().toLowerCase() === 'gs://';
       });
 
       self.isABFSRoot = ko.pureComputed(function () {
@@ -1449,6 +1469,18 @@ else:
           $('#newRepFactorInput').val(self.selectedFile().stats.replication);
         });
       };
+      
+      const removeLastSlash = function (path) {
+        if (path.charAt(path.length - 1) === '/') {
+          return path.slice(0, -1);
+        }
+        return path;
+      };
+
+      self.allowCopyMoveTo = function (destination) {
+        const source = self.currentPath();
+        return removeLastSlash(source) !== removeLastSlash(destination);
+      };
 
       self.move = function (mode, unselectedDrag) {
         var paths = [];
@@ -1492,6 +1524,7 @@ else:
             });
 
             $("#moveModal").on("shown", function () {
+              self.enableMoveButton(false);
               $("#moveDestination").val('');
               $("#moveNameRequiredAlert").hide();
               $("#moveForm").find("input[name='*dest_path']").removeClass("fieldError");
@@ -1503,6 +1536,10 @@ else:
                 filesystemsFilter: [self.scheme()],
                 onNavigate: function (filePath) {
                   $("#moveDestination").val(filePath);
+                  self.enableMoveButton(self.allowCopyMoveTo(filePath));            
+                },
+                onFolderChange: function () {
+                  self.enableMoveButton(false);
                 },
                 createFolder: false,
                 uploadFile: false
@@ -1546,6 +1583,7 @@ else:
         });
 
         $("#copyModal").on("shown", function () {
+          self.enableCopyButton(false);
           $("#copyDestination").val('');
           $("#copyNameRequiredAlert").hide();
           $("#copyForm").find("input[name='*dest_path']").removeClass("fieldError");
@@ -1557,7 +1595,11 @@ else:
             filesystemsFilter: [self.scheme()],
             onNavigate: function (filePath) {
               $("#copyDestination").val(filePath);
+              self.enableCopyButton(self.allowCopyMoveTo(filePath)); 
             },
+            onFolderChange: function () {
+              self.enableCopyButton(false);
+            },            
             createFolder: false,
             uploadFile: false
           });
@@ -2136,7 +2178,7 @@ else:
         $('.filebrowser').on('dragenter', function (e) {
           e.preventDefault();
 
-          if (_isExternalFile && !($("#uploadFileModal").is(":visible")) && (!fileBrowserViewModel.isS3() || (fileBrowserViewModel.isS3() && !fileBrowserViewModel.isS3Root()))) {
+          if (_isExternalFile && !($("#uploadFileModal").is(":visible")) && ((!fileBrowserViewModel.isS3() || (fileBrowserViewModel.isS3() && !fileBrowserViewModel.isS3Root())) || (!fileBrowserViewModel.isGS() || (fileBrowserViewModel.isGS() && !fileBrowserViewModel.isGSRoot())))) {
             showHoverMsg("${_('Drop files here to upload')}");
           }
         });
@@ -2237,7 +2279,7 @@ else:
               }
             }
           };
-          if (ops.path.toLowerCase() !== 's3a://') {
+          if (ops.path.toLowerCase() !== 's3a://' && ops.path.toLowerCase() !== 'gs://') {
             _dropzone = new Dropzone($('.filebrowser .hoverMsg')[0], options);
 
             _dropzone.on('queuecomplete', function () {
@@ -2403,9 +2445,12 @@ else:
           skipEnter: true,
           skipKeydownEvents: true,
           onEnter: function (el) {
-            $("#jHueHdfsAutocomplete").hide();
+            $("#jHueHdfsAutocomplete").hide();            
+            const allowMove = fileBrowserViewModel.allowCopyMoveTo(el.val());
+            fileBrowserViewModel.enableMoveButton(allowMove);
           },
           isS3: fileBrowserViewModel.isS3(),
+          isGS: fileBrowserViewModel.isGS(),
           root: fileBrowserViewModel.rootCurrent()
         });
         $("#copyDestination").jHueHdfsAutocomplete({
@@ -2414,8 +2459,11 @@ else:
           skipKeydownEvents: true,
           onEnter: function (el) {
             $("#jHueHdfsAutocomplete").hide();
+            const allowCopy = fileBrowserViewModel.allowCopyMoveTo(el.val());
+            fileBrowserViewModel.enableCopyButton(allowCopy);
           },
           isS3: fileBrowserViewModel.isS3(),
+          isGS: fileBrowserViewModel.isGS(),
           root: fileBrowserViewModel.rootCurrent()
         });
       });

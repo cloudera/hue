@@ -1800,7 +1800,7 @@ class ClusterConfig(object):
       ],
       'default_sql_interpreter': default_sql_interpreter,
       'cluster_type': self.cluster_type,
-      'has_computes': self.cluster_type in ('altus', 'snowball'), # or any grouped engine connectors
+      'has_computes': self.cluster_type in ('cdw', 'altus', 'snowball'), # or any grouped engine connectors
       'hue_config': {
         'enable_sharing': ENABLE_SHARING.get(),
         'collect_usage': COLLECT_USAGE.get()
@@ -2029,6 +2029,16 @@ class ClusterConfig(object):
         'displayName': _('S3'),
         'buttonName': _('Browse'),
         'tooltip': _('S3'),
+        'page': '/filebrowser/view=' + urllib_quote(home_path, safe=SAFE_CHARACTERS_URI_COMPONENTS)
+      })
+
+    if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('gs', self.user):
+      home_path = remote_home_storage if remote_home_storage else 'gs://'.encode('utf-8')
+      interpreters.append({
+        'type': 'gs',
+        'displayName': _('GS'),
+        'buttonName': _('Browse'),
+        'tooltip': _('Google Storage'),
         'page': '/filebrowser/view=' + urllib_quote(home_path, safe=SAFE_CHARACTERS_URI_COMPONENTS)
       })
 

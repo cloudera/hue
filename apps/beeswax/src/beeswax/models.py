@@ -35,7 +35,7 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.models import Document, Document2
 from desktop.redaction import global_redaction_engine
 from librdbms.server import dbms as librdbms_dbms
-from useradmin.models import User
+from useradmin.models import User, UserProfile
 
 from beeswax.design import HQLdesign
 
@@ -607,3 +607,105 @@ class MetaInstall(models.Model):
       return MetaInstall.objects.get(id=1)
     except MetaInstall.DoesNotExist:
       return MetaInstall(id=1)
+
+class Namespace(models.Model):
+  name = models.CharField(default='', max_length=255)
+  description = models.TextField(default='')
+  dialect = models.CharField(max_length=32, db_index=True, help_text=_t('Type of namespace, e.g. hive, mysql... '))
+  interface = models.CharField(
+    max_length=32,
+    db_index=True,
+    help_text=_t('Type of interface, e.g. sqlalchemy, hiveserver2... '),
+    default='sqlalchemy'
+  )
+  external_id = models.CharField(max_length=255, null=True, db_index=True)
+  last_modified = models.DateTimeField(auto_now=True, db_index=True, verbose_name=_t('Time last modified'))
+
+  class Meta:
+    verbose_name = _t('namespace')
+    verbose_name_plural = _t('namespaces')
+    unique_together = ('name',)
+
+  def get_computes(self, user):
+    """Returns the computes belonging to the current namespace that are available to the current user."""
+    if user is None:
+      return []
+    profile = UserProfile.objects.get(user=user)
+    user_groups = set(profile.data.get("saml_attributes", {}).get("groups", []))
+
+    computes = Compute.objects.filter(namespace=self)
+    computes = [co.to_dict() for co in computes if not co.ldap_groups or co.ldap_groups.intersection(user_groups)]
+    computes.sort(key=lambda c: (not c['is_ready'], c['name']))
+    return computes
+
+  def __str__(self):
+    return '%s (%s)' % (self.name, self.dialect)
+
+  def to_dict(self):
+    return {
+      'id': self.id,
+      'type': str(self.id),
+      'name': self.name,
+      'description': self.description,
+      'dialect': self.dialect,
+      'interface': self.interface,
+      'external_id': self.external_id
+    }
+
+class Compute(models.Model):
+  """
+  Instance of a compute type pointing to a Hive or Impala compute resources.
+  """
+  name = models.CharField(default='', max_length=255)
+  description = models.TextField(default='')
+  dialect = models.CharField(max_length=32, db_index=True, help_text=_t('Type of compute, e.g. hive, impala... '))
+  interface = models.CharField(
+      max_length=32,
+      db_index=True,
+      help_text=_t('Type of interface, e.g. sqlalchemy, hiveserver2... '),
+      default='sqlalchemy'
+  )
+  namespace = models.ForeignKey(Namespace, on_delete=models.CASCADE, null=True)
+  is_ready = models.BooleanField(default=True)
+  external_id = models.CharField(max_length=255, null=True, db_index=True)
+  ldap_groups_json = models.TextField(default='[]')
+  settings = models.TextField(default='{}')
+  last_modified = models.DateTimeField(auto_now=True, db_index=True, verbose_name=_t('Time last modified'))
+
+  class Meta:
+    verbose_name = _t('compute')
+    verbose_name_plural = _t('computes')
+    unique_together = ('name',)
+
+  def __str__(self):
+    return '%s (%s)' % (self.name, self.dialect)
+
+  def to_dict(self):
+    return {
+      'id': self.id,
+      'type': self.dialect + '-compute',
+      'name': self.name,
+      'namespace': self.namespace.name,
+      'description': self.description,
+      'dialect': self.dialect,
+      'interface': self.interface,
+      'is_ready': self.is_ready,
+      'options': self.options,
+      'external_id': self.external_id
+    }
+
+  @property
+  def ldap_groups(self):
+    if not self.ldap_groups_json:
+      self.ldap_groups_json = json.dumps([])
+    return set(json.loads(self.ldap_groups_json))
+
+  @ldap_groups.setter
+  def ldap_groups(self, val):
+    self.ldap_groups_json = json.dumps(list(val or []))
+
+  @property
+  def options(self):
+    if not self.settings:
+      self.settings = json.dumps([])
+    return {setting['name']: setting['value'] for setting in json.loads(self.settings)}
