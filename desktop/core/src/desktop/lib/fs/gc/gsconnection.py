@@ -119,7 +119,7 @@ class RazGSConnection(SignedUrlGSConnection):
 
       for key in list(headers.keys()):
         if key.startswith('x-goog-'):
-            del headers[key]
+          del headers[key]
 
     http_request = self.build_base_http_request(method, path, auth_path, params, headers, data, host)
 
