@@ -2250,7 +2250,7 @@ RAZ = ConfigSection(
       type=coerce_bool,
       default=True,
     ),
-    IS_RAZ_GS_ENABLED = Config(
+    IS_RAZ_GS_ENABLED=Config(
       help=_('Enable integration with Google Storage for RAZ'),
       key='is_raz_gs_enabled',
       default=False,

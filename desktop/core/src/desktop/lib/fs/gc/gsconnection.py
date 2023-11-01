@@ -111,15 +111,15 @@ class RazGSConnection(SignedUrlGSConnection):
       LOG.debug('auth_path=%s' % auth_path)
 
     params = {}
-    # GS expects only one type of headers i.e. either all x-amz-* or all x-goog-*, and the signed headers returned from RAZ are of x-amz-* type
+    # GS expects only one type of headers, either all x-amz-* or all x-goog-*, and the signed headers returned from RAZ are of x-amz-* type
     # So, we are converting all x-goog-* headers to x-amz-* headers before sending the final request to GS from Hue
     if headers:
       updated_headers = {'x-amz-' + key[7:]: value for key, value in headers.items() if key.startswith('x-goog-')}
       headers.update(updated_headers)
 
       for key in list(headers.keys()):
-          if key.startswith('x-goog-'):
-              del headers[key]
+        if key.startswith('x-goog-'):
+            del headers[key]
 
     http_request = self.build_base_http_request(method, path, auth_path, params, headers, data, host)
 
