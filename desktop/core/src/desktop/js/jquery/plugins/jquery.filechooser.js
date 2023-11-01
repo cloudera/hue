@@ -98,8 +98,8 @@ const defaults = {
       home: '/?default_gs_home',
       icon: {
         svg: {
-          brand: '#hi-adls',
-          home: '#hi-adls'
+          brand: '#hi-gs',
+          home: '#hi-gs'
         },
         brand: 'fa-windows',
         home: 'fa-windows'
@@ -350,7 +350,7 @@ Plugin.prototype.navigateTo = function (path) {
     //var filesysteminfo = self.options.filesysteminfo;
     const fs = _parent.options.filesysteminfo[_parent.options.fsSelected || 'hdfs'];
     const el = fs.icon.svg
-      ? '<svg class="hi"><use xlink:href="' + fs.icon.svg.home + '"></use></svg>'
+      ? '<svg class="hi"><use href="' + fs.icon.svg.home + '"></use></svg>'
       : '<i class="fa ' + fs.icon.home + '"></i> ' + fs.label.home;
     const _homelink = $('<a>')
       .addClass('nounderline')

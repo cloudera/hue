@@ -245,7 +245,7 @@ function impalaDagre(id) {
   function getIcon(icon) {
     var html = '';
     if (icon && icon.svg) {
-      html += '<svg class="hi"><use xlink:href="#'+ icon.svg +'"></use></svg>'
+      html += '<svg class="hi"><use href="#'+ icon.svg +'"></use></svg>'
     } else if (icon && icon.font) {
       html += "<div class='fa fa-fw valign-middle " + icon.font + "'></div>";
     }
@@ -507,7 +507,7 @@ function impalaDagre(id) {
     if (topNodes && topNodes.length) {
       var cpuTimelineSection = detailsContent.append('div').classed('details-section', true);
       var cpuTimelineTitle = cpuTimelineSection.append('header');
-      cpuTimelineTitle.append('svg').classed('hi', true).append('use').attr('xlink:href', '#hi-filter');
+      cpuTimelineTitle.append('svg').classed('hi', true).append('use').attr('href', '#hi-filter');
       var metricsMax = getMetricsMax() ? ' (' + ko.bindingHandlers.numberFormat.human(getMetricsMax(), 5) + ')' : '';
       cpuTimelineTitle.append('h5').text(window.I18n('Top Nodes') + metricsMax);
       var cpuTimelineSectionTable = cpuTimelineSection.append('table').classed('clickable ncolumn', true);
@@ -547,7 +547,7 @@ function impalaDagre(id) {
       var executionSum = sum(data, 'duration');
       var cpuTimelineSection = detailsContent.append('div').classed('details-section', true);
       var cpuTimelineTitle = cpuTimelineSection.append('header');
-      cpuTimelineTitle.append('svg').classed('hi', true).append('use').attr('xlink:href', icon);
+      cpuTimelineTitle.append('svg').classed('hi', true).append('use').attr('href', icon);
       cpuTimelineTitle.append('h5').text(title + ' (' + ko.bindingHandlers.numberFormat.human(executionSum, 5) + ')');
       cpuTimelineSection.node().appendChild($.parseXML(timeline).children[0]);
 
@@ -581,7 +581,7 @@ function impalaDagre(id) {
       var timelineSum = sum(timelineData, 'duration');
       var timelineSection = detailsContent.append('div').classed('details-section', true);
       var timelineTitle = timelineSection.append('header');
-      timelineTitle.append('svg').classed('hi', true).append('use').attr('xlink:href', '#hi-access-time');
+      timelineTitle.append('svg').classed('hi', true).append('use').attr('href', '#hi-access-time');
       timelineTitle.append('h5').text(window.I18n('Timeline') + ' (' + ko.bindingHandlers.numberFormat.human(timelineSum, 5) + ')');
       timelineSection.node().appendChild($.parseXML(timeline).children[0]);
 
@@ -599,7 +599,7 @@ function impalaDagre(id) {
     var metricsChildSections = metricsSection.selectAll('div').data(Object.keys(data.children));
 
     var metricsTitle = metricsSection.append('header');
-    metricsTitle.append('svg').classed('hi', true).append('use').attr('xlink:href', '#hi-bar-chart');
+    metricsTitle.append('svg').classed('hi', true).append('use').attr('href', '#hi-bar-chart');
     metricsTitle.append('h5').text(window.I18n('Metrics'));
 
     var metricsContent = metricsSection.append('table').classed('column metrics', true);

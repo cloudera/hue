@@ -483,14 +483,24 @@ class S3FileSystem(object):
       if not src_key.endswith('/'):
         cut += 1
 
-    for key in src_bucket.list(prefix=src_key):
-      if not key.name.startswith(src_key):
-        raise S3FileSystemException(_("Invalid key to transform: %s") % key.name)
-      dst_name = posixpath.normpath(s3.join(dst_key, key.name[cut:]))
+    # handling files and directories distinctly. When dealing with files, extract the key and copy the file to the specified location.
+    # Regarding directories, when listing keys with the 'test1' prefix, it was including all directories or files starting with 'test1,'
+    # such as test1, test123, and test1234. Since we need the test1 directory only, we add '/' after the source key name,
+    # resulting in 'test1/'.
+    if src_st.isDir:
+      src_key = self._append_separator(src_key)
+      for key in src_bucket.list(prefix=src_key):
+        if not key.name.startswith(src_key):
+          raise S3FileSystemException(_("Invalid key to transform: %s") % key.name)
+        dst_name = posixpath.normpath(s3.join(dst_key, key.name[cut:]))
 
-      if self.isdir(normpath(self.join(S3A_ROOT, key.bucket.name, key.name))):
-        dst_name = self._append_separator(dst_name)
+        if self.isdir(normpath(self.join(S3A_ROOT, key.bucket.name, key.name))):
+          dst_name = self._append_separator(dst_name)
 
+        key.copy(dst_bucket, dst_name)
+    else:
+      key = self._get_key(src)
+      dst_name = posixpath.normpath(s3.join(dst_key, src_key[cut:]))
       key.copy(dst_bucket, dst_name)
 
   @translate_s3_error
