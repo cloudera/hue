@@ -972,9 +972,6 @@
   ## Show the notebook menu or not
   # show_notebooks=true
 
-  ## If set it will use this as default interpreter (editor)
-  # default_interpreter=
-
   ## Flag to enable the selection of queries from files, saved queries into the editor or as snippet.
   # enable_external_statements=false
 
@@ -1005,6 +1002,10 @@
 
   ## Default limit to use in SELECT statements if not present. Set to 0 to disable.
   # default_limit=5000
+
+  ## Set the default interpreter for all users. 
+  ## Starred interpreters at user level will get more priority than the value below.
+  # default_interpreter=""
 
   # One entry for each type of snippet.
   [[interpreters]]

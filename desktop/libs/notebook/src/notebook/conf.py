@@ -193,7 +193,7 @@ INTERPRETERS_SHOWN_ON_WHEEL = Config(
 
 DEFAULT_INTERPRETER = Config(
   key="default_interpreter",
-  help=_t("The default interpreter to use as main action."),
+  help=_t("Set the default interpreter for all users. Starred interpreters at user level will get more priority than the value below."),
   type=str,
   default=''
 )
