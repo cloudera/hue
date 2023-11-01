@@ -203,8 +203,8 @@
       </defs>
       <g fill="none" fill-rule="evenodd">
         <g transform="translate(-24 -12)">
-          <use fill="#000" filter="url(#a01)" xlink:href="#b01"></use>
-          <use fill="#FFF" xlink:href="#b01"></use>
+          <use fill="#000" filter="url(#a01)" href="#b01"></use>
+          <use fill="#FFF" href="#b01"></use>
         </g>
         <path fill="#FFF" d="M-24-12h248v56H-24z"></path>
         <path fill="#7D7D7D" d="M98.874 23.504c.483.584.724 1.448.724 2.593v5.185H98.08v-4.908c0-.844-.153-1.459-.461-1.846-.308-.388-.782-.581-1.42-.581-.663 0-1.171.208-1.526.624-.354.416-.53 1.011-.53 1.786v4.925h-1.517v-4.908c0-.844-.151-1.459-.453-1.846-.303-.388-.773-.581-1.412-.581-.662 0-1.174.208-1.534.624-.36.416-.54 1.011-.54 1.786v4.925h-1.516v-8.445h1.516v1.11a2.539 2.539 0 0 1 1.046-.98c.441-.226.958-.339 1.55-.339 1.371 0 2.249.561 2.632 1.683.256-.567.622-.989 1.098-1.266.477-.278 1.04-.417 1.69-.417.965 0 1.688.292 2.17.876zm-12.852-.667v1.352a3.269 3.269 0 0 0-.784-.086c-.72 0-1.267.222-1.638.667-.373.446-.558 1.072-.558 1.882v4.63h-1.517v-8.445h1.5v1.144c.208-.405.496-.713.862-.928.366-.214.805-.32 1.316-.32.302 0 .575.034.819.104zm-8.243 6.46c.371-.584.558-1.327.558-2.229 0-.936-.19-1.69-.567-2.263-.378-.573-1.008-.858-1.891-.858s-1.513.291-1.89.875c-.378.584-.567 1.333-.567 2.246 0 .925.194 1.673.583 2.246.39.572 1.014.858 1.874.858.894 0 1.528-.292 1.9-.876zm-4.174 1.587a3.574 3.574 0 0 1-1.342-1.613 5.569 5.569 0 0 1-.427-2.203c0-.82.145-1.566.436-2.237.29-.67.737-1.205 1.342-1.604.603-.399 1.36-.599 2.265-.599.93 0 1.696.206 2.3.616.605.41 1.049.951 1.334 1.621.284.671.427 1.405.427 2.203 0 .81-.143 1.547-.427 2.212a3.58 3.58 0 0 1-1.342 1.604c-.61.404-1.374.606-2.292.606-.906 0-1.665-.202-2.274-.606zm-6.073-6.8h-1.29v-1.247h1.29v-1.353c0-.902.217-1.567.653-1.995.436-.427 1.13-.64 2.082-.64.384 0 .715.033.994.103v1.266a3.544 3.544 0 0 0-.785-.104c-.952 0-1.428.502-1.428 1.509v1.214h2.178v1.248h-2.178v7.197h-1.516v-7.197zm-5.499 6.721c-.39-.41-.583-1.078-.583-2.003v-4.717h-1.325v-1.248h1.325V20.79h1.498v2.047h2.423v1.248h-2.423v4.509c0 .532.114.923.34 1.17.227.25.572.374 1.037.374.325 0 .662-.047 1.011-.14v1.25a6.195 6.195 0 0 1-1.43.173c-.859 0-1.483-.205-1.873-.616zm-5.01-1.283c.372-.503.558-1.2.558-2.09v-.035h-1.708c-.883 0-1.54.105-1.97.313-.43.208-.644.572-.644 1.092 0 .463.157.824.47 1.084.314.26.772.39 1.377.39.906 0 1.545-.251 1.917-.754zm.627-6.46c.523.29.895.7 1.116 1.231.22.532.331 1.191.331 1.977v5.012h-1.516v-1.127c-.28.428-.662.757-1.15.989-.488.23-1.076.346-1.76.346-.988 0-1.74-.231-2.258-.693-.517-.463-.775-1.081-.775-1.856 0-.937.349-1.607 1.045-2.012.698-.404 1.72-.607 3.068-.607h1.83v-.277c0-.497-.062-.908-.183-1.232a1.424 1.424 0 0 0-.628-.745c-.296-.173-.705-.26-1.228-.26-.698 0-1.211.144-1.543.433-.33.29-.496.7-.496 1.232H51.95c0-.89.305-1.587.916-2.09.61-.503 1.495-.755 2.658-.755.894 0 1.603.145 2.125.434zm-9.114 8.22h1.516V19.038h-1.516v12.244zm-5.594-6.746c.895 0 1.554-.176 1.978-.529.424-.352.636-.882.636-1.587s-.212-1.231-.636-1.578c-.424-.346-1.083-.52-1.978-.52h-2.109v4.214h2.11zm-3.73-5.498h4.114c1.335 0 2.32.293 2.953.876.633.584.95 1.414.95 2.49 0 1.098-.325 1.944-.976 2.54-.65.595-1.627.893-2.927.893h-2.493v5.445h-1.62V19.038zM31.65 29.522c.372-.503.558-1.2.558-2.09v-.035h-1.708c-.883 0-1.54.105-1.97.313-.43.208-.644.572-.644 1.092 0 .463.157.824.47 1.084.314.26.773.39 1.377.39.906 0 1.545-.251 1.917-.754zm.628-6.46c.522.29.894.7 1.115 1.231.22.532.331 1.191.331 1.977v5.012h-1.516v-1.127a2.741 2.741 0 0 1-1.15.989c-.488.23-1.075.346-1.76.346-.988 0-1.74-.231-2.257-.693-.518-.463-.776-1.081-.776-1.856 0-.937.349-1.607 1.045-2.012.698-.404 1.72-.607 3.068-.607h1.83v-.277c0-.497-.061-.908-.183-1.232a1.422 1.422 0 0 0-.628-.745c-.296-.173-.705-.26-1.228-.26-.697 0-1.211.144-1.542.433-.332.29-.497.7-.497 1.232h-1.551c0-.89.304-1.587.915-2.09.61-.503 1.496-.755 2.658-.755.894 0 1.603.145 2.126.434zM21.95 30.805c-.39-.41-.583-1.078-.583-2.003v-4.717h-1.325v-1.248h1.325V20.79h1.498v2.047h2.422v1.248h-2.422v4.509c0 .532.114.923.34 1.17.226.25.572.374 1.037.374.325 0 .662-.047 1.01-.14v1.25a6.195 6.195 0 0 1-1.428.173c-.86 0-1.485-.205-1.874-.616zm-5.01-1.283c.372-.503.558-1.2.558-2.09v-.035H15.79c-.884 0-1.54.105-1.97.313-.43.208-.645.572-.645 1.092 0 .463.157.824.47 1.084.315.26.773.39 1.378.39.906 0 1.545-.251 1.917-.754zm.627-6.46c.523.29.895.7 1.116 1.231.22.532.33 1.191.33 1.977v5.012H17.5v-1.127c-.28.428-.663.757-1.151.989-.488.23-1.075.346-1.76.346-.988 0-1.74-.231-2.257-.693-.517-.463-.776-1.081-.776-1.856 0-.937.35-1.607 1.046-2.012.697-.404 1.72-.607 3.068-.607h1.83v-.277c0-.497-.062-.908-.184-1.232a1.423 1.423 0 0 0-.627-.745c-.297-.173-.706-.26-1.228-.26-.698 0-1.212.144-1.543.433-.331.29-.497.7-.497 1.232h-1.55c0-.89.304-1.587.914-2.09.61-.503 1.496-.755 2.658-.755.894 0 1.603.145 2.126.434zm-13 6.868c1.056 0 1.887-.203 2.491-.608a3.169 3.169 0 0 0 1.264-1.647c.238-.694.357-1.531.357-2.515 0-.994-.122-1.838-.366-2.532a3.17 3.17 0 0 0-1.272-1.638c-.604-.4-1.43-.599-2.475-.599H2.406v9.539h2.161zM.785 19.038h3.99c1.987 0 3.419.553 4.296 1.657.877 1.104 1.316 2.592 1.316 4.465 0 1.885-.439 3.376-1.316 4.474-.877 1.1-2.309 1.648-4.296 1.648H.786V19.038z"></path>
@@ -432,7 +432,7 @@
 
     <symbol id="hi-timeline" viewBox="0 0 24 24">
       <defs><path id="a" d="M0 0h24v24H0V0z"></path></defs>
-      <clipPath id="b"><use xlink:href="#a01" overflow="visible"></use>
+      <clipPath id="b"><use href="#a01" overflow="visible"></use>
       </clipPath>
       <path clip-path="url(#b01)" d="M23 8c0 1.1-.9 2-2 2-.18 0-.35-.02-.51-.07l-3.56 3.55c.05.16.07.34.07.52 0 1.1-.9 2-2 2s-2-.9-2-2c0-.18.02-.36.07-.52l-2.55-2.55c-.16.05-.34.07-.52.07s-.36-.02-.52-.07l-4.55 4.56c.05.16.07.33.07.51 0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2c.18 0 .35.02.51.07l4.56-4.55C8.02 9.36 8 9.18 8 9c0-1.1.9-2 2-2s2 .9 2 2c0 .18-.02.36-.07.52l2.55 2.55c.16-.05.34-.07.52-.07s.36.02.52.07l3.55-3.56C19.02 8.35 19 8.18 19 8c0-1.1.9-2 2-2s2 .9 2 2z"></path>
     </symbol>
@@ -537,87 +537,87 @@
 
   <script type="text/html" id="app-switcher-icon-template">
     <svg class="hi app-img">
-      <!-- ko if: img == 'hi-as-navopt' --><use xlink:href="#hi-as-navopt"></use><!-- /ko -->
-      <!-- ko if: img == 'hi-as-cdsw' --><use xlink:href="#hi-as-cdsw"></use><!-- /ko -->
-      <!-- ko if: img == 'hi-as-cm' --><use xlink:href="#hi-as-cm"></use><!-- /ko -->
-      <!-- ko if: img == 'hi-as-nav' --><use xlink:href="#hi-as-nav"></use><!-- /ko -->
-      <!-- ko if: img == 'hi-as-hue' --><use xlink:href="#hi-as-hue"></use><!-- /ko -->
+      <!-- ko if: img == 'hi-as-navopt' --><use href="#hi-as-navopt"></use><!-- /ko -->
+      <!-- ko if: img == 'hi-as-cdsw' --><use href="#hi-as-cdsw"></use><!-- /ko -->
+      <!-- ko if: img == 'hi-as-cm' --><use href="#hi-as-cm"></use><!-- /ko -->
+      <!-- ko if: img == 'hi-as-nav' --><use href="#hi-as-nav"></use><!-- /ko -->
+      <!-- ko if: img == 'hi-as-hue' --><use href="#hi-as-hue"></use><!-- /ko -->
     </svg>
   </script>
 
   <script type="text/html" id="document-icon-template">
     <svg class="hi" data-bind="with: document">
       <!-- ko if: isDirectory -->
-      <use xlink:href="#hi-folder"></use>
+      <use href="#hi-folder"></use>
       <!-- /ko -->
       <!-- ko ifnot: isDirectory -->
       <!-- ko switch: definition().type -->
-      <!-- ko case: 'link-pigscript' --><use xlink:href="#hi-file-pig"></use><!-- /ko -->
-      <!-- ko case: 'link-workflow' --><use xlink:href="#hi-file-job-designer"></use><!-- /ko -->
-      <!-- ko case: 'notebook' --><use xlink:href="#hi-file-notebook"></use><!-- /ko -->
-      <!-- ko case: 'oozie-bundle2' --><use xlink:href="#hi-file-oozie-bundle"></use><!-- /ko -->
-      <!-- ko case: 'oozie-coordinator2' --><use xlink:href="#hi-file-oozie-coordinator"></use><!-- /ko -->
-      <!-- ko case: 'oozie-workflow2' --><use xlink:href="#hi-file-oozie-workflow"></use><!-- /ko -->
-      <!-- ko case: 'query-hive' --><use xlink:href="#hi-file-hive"></use><!-- /ko -->
-      <!-- ko case: 'query-impala' --><use xlink:href="#hi-file-impala"></use><!-- /ko -->
-      <!-- ko case: 'search-dashboard' --><use xlink:href="#hi-file-search"></use><!-- /ko -->
-      <!-- ko case: $default --><use xlink:href="#hi-file"></use><!-- /ko -->
+      <!-- ko case: 'link-pigscript' --><use href="#hi-file-pig"></use><!-- /ko -->
+      <!-- ko case: 'link-workflow' --><use href="#hi-file-job-designer"></use><!-- /ko -->
+      <!-- ko case: 'notebook' --><use href="#hi-file-notebook"></use><!-- /ko -->
+      <!-- ko case: 'oozie-bundle2' --><use href="#hi-file-oozie-bundle"></use><!-- /ko -->
+      <!-- ko case: 'oozie-coordinator2' --><use href="#hi-file-oozie-coordinator"></use><!-- /ko -->
+      <!-- ko case: 'oozie-workflow2' --><use href="#hi-file-oozie-workflow"></use><!-- /ko -->
+      <!-- ko case: 'query-hive' --><use href="#hi-file-hive"></use><!-- /ko -->
+      <!-- ko case: 'query-impala' --><use href="#hi-file-impala"></use><!-- /ko -->
+      <!-- ko case: 'search-dashboard' --><use href="#hi-file-search"></use><!-- /ko -->
+      <!-- ko case: $default --><use href="#hi-file"></use><!-- /ko -->
       <!-- /ko -->
       <!-- /ko -->
       <!-- ko if: $parent.showShareAddon && (isShared() || isSharedWithMe()) && selected() -->
-      <use xlink:href="#hi-share-addon-selected"></use>
+      <use href="#hi-share-addon-selected"></use>
       <!-- /ko -->
       <!-- ko if: $parent.showShareAddon && (isShared() || isSharedWithMe()) && !selected() -->
-      <use xlink:href="#hi-share-addon"></use>
+      <use href="#hi-share-addon"></use>
       <!-- /ko -->
     </svg>
   </script>
 
   <script type="text/html" id="app-icon-template">
     <!-- ko switch: icon -->
-    <!-- ko case: 'dashboard' --><svg class="hi hi-fw"><use xlink:href="#hi-dashboard"></use></svg><!-- /ko -->
-    <!-- ko case: 'data-browser' --><svg class="hi hi-fw"><use xlink:href="#hi-data-browser"></use></svg><!-- /ko -->
-    <!-- ko case: 'documents' --><svg class="hi hi-fw"><use xlink:href="#hi-documents"></use></svg><!-- /ko -->
+    <!-- ko case: 'dashboard' --><svg class="hi hi-fw"><use href="#hi-dashboard"></use></svg><!-- /ko -->
+    <!-- ko case: 'data-browser' --><svg class="hi hi-fw"><use href="#hi-data-browser"></use></svg><!-- /ko -->
+    <!-- ko case: 'documents' --><svg class="hi hi-fw"><use href="#hi-documents"></use></svg><!-- /ko -->
     <!-- ko case: 'report' --><i class="fa fa-fw fa-area-chart"></i><!-- /ko -->
     <!-- ko case: 'dist-cp' --><i class="fa fa-fw fa-files-o"></i><!-- /ko -->
-    <!-- ko case: 'editor' --><svg class="hi hi-fw"><use xlink:href="#hi-editor"></use></svg><!-- /ko -->
-    <!-- ko case: 'gs' --><svg class="hi hi-fw"><use xlink:href="#hi-gs"></use></svg><!-- /ko -->
-    <!-- ko case: 'hbase' --><svg class="hi hi-fw"><use xlink:href="#hi-hbase"></use></svg><!-- /ko -->
+    <!-- ko case: 'editor' --><svg class="hi hi-fw"><use href="#hi-editor"></use></svg><!-- /ko -->
+    <!-- ko case: 'gs' --><svg class="hi hi-fw"><use href="#hi-gs"></use></svg><!-- /ko -->
+    <!-- ko case: 'hbase' --><svg class="hi hi-fw"><use href="#hi-hbase"></use></svg><!-- /ko -->
     <!-- ko case: 'hdfs' --><i class="fa fa-fw fa-folder-o"></i><!-- /ko -->
-    <!-- ko case: 'hive' --><svg class="hi hi-fw"><use xlink:href="#hi-hive"></use></svg><!-- /ko -->
-    <!-- ko case: 'hplsql' --><svg class="hi hi-fw"><use xlink:href="#hi-hive"></use></svg><!-- /ko -->
-    <!-- ko case: 'impala' --><svg class="hi hi-fw"><use xlink:href="#hi-impala"></use></svg><!-- /ko -->
+    <!-- ko case: 'hive' --><svg class="hi hi-fw"><use href="#hi-hive"></use></svg><!-- /ko -->
+    <!-- ko case: 'hplsql' --><svg class="hi hi-fw"><use href="#hi-hive"></use></svg><!-- /ko -->
+    <!-- ko case: 'impala' --><svg class="hi hi-fw"><use href="#hi-impala"></use></svg><!-- /ko -->
     <!-- ko case: 'indexes' --><i class="fa fa-fw fa-search-plus"></i><!-- /ko -->
-    <!-- ko case: 'jar' --><svg class="hi hi-fw"><use xlink:href="#hi-spark"></use></svg><!-- /ko -->
+    <!-- ko case: 'jar' --><svg class="hi hi-fw"><use href="#hi-spark"></use></svg><!-- /ko -->
     <!-- ko case: 'java' --><i class="fa fa-fw fa-file-code-o"></i><!-- /ko -->
-    <!-- ko case: 'job-designer' --><svg class="hi hi-fw"><use xlink:href="#hi-job-designer"></use></svg><!-- /ko -->
+    <!-- ko case: 'job-designer' --><svg class="hi hi-fw"><use href="#hi-job-designer"></use></svg><!-- /ko -->
     <!-- ko case: 'mapreduce' --><i class="fa fa-fw fa-file-archive-o"></i><!-- /ko -->
-    <!-- ko case: 'markdown' --><svg class="hi hi-fw"><use xlink:href="#hi-markdown"></use></svg><!-- /ko -->
-    <!-- ko case: 'notebook' --><svg class="hi hi-fw"><use xlink:href="#hi-file-notebook"></use></svg><!-- /ko -->
-    <!-- ko case: 'oozie' --><svg class="hi hi-fw"><use xlink:href="#hi-oozie"></use></svg><!-- /ko -->
-    <!-- ko case: 'oozie-bundle' --><svg class="hi hi-fw"><use xlink:href="#hi-oozie-bundle"></use></svg><!-- /ko -->
-    <!-- ko case: 'oozie-coordinator' --><svg class="hi hi-fw"><use xlink:href="#hi-oozie-coordinator"></use></svg><!-- /ko -->
-    <!-- ko case: 'oozie-workflow' --><svg class="hi hi-fw"><use xlink:href="#hi-oozie-workflow"></use></svg><!-- /ko -->
-    <!-- ko case: 'pig' --><svg class="hi hi-fw"><use xlink:href="#hi-pig"></use></svg><!-- /ko -->
-    <!-- ko case: 'py' --><svg class="hi hi-fw"><use xlink:href="#hi-py"></use></svg><!-- /ko -->
-    <!-- ko case: 'pyspark' --><svg class="hi hi-fw"><use xlink:href="#hi-spark"></use></svg><!-- /ko -->
-    <!-- ko case: 'r' --><svg class="hi hi-fw"><use xlink:href="#hi-r"></use></svg><!-- /ko -->
-    <!-- ko case: 'scala' --><svg class="hi hi-fw"><use xlink:href="#hi-scala"></use></svg><!-- /ko -->
+    <!-- ko case: 'markdown' --><svg class="hi hi-fw"><use href="#hi-markdown"></use></svg><!-- /ko -->
+    <!-- ko case: 'notebook' --><svg class="hi hi-fw"><use href="#hi-file-notebook"></use></svg><!-- /ko -->
+    <!-- ko case: 'oozie' --><svg class="hi hi-fw"><use href="#hi-oozie"></use></svg><!-- /ko -->
+    <!-- ko case: 'oozie-bundle' --><svg class="hi hi-fw"><use href="#hi-oozie-bundle"></use></svg><!-- /ko -->
+    <!-- ko case: 'oozie-coordinator' --><svg class="hi hi-fw"><use href="#hi-oozie-coordinator"></use></svg><!-- /ko -->
+    <!-- ko case: 'oozie-workflow' --><svg class="hi hi-fw"><use href="#hi-oozie-workflow"></use></svg><!-- /ko -->
+    <!-- ko case: 'pig' --><svg class="hi hi-fw"><use href="#hi-pig"></use></svg><!-- /ko -->
+    <!-- ko case: 'py' --><svg class="hi hi-fw"><use href="#hi-py"></use></svg><!-- /ko -->
+    <!-- ko case: 'pyspark' --><svg class="hi hi-fw"><use href="#hi-spark"></use></svg><!-- /ko -->
+    <!-- ko case: 'r' --><svg class="hi hi-fw"><use href="#hi-r"></use></svg><!-- /ko -->
+    <!-- ko case: 'scala' --><svg class="hi hi-fw"><use href="#hi-scala"></use></svg><!-- /ko -->
     <!-- ko case: 'solr' --><i class="fa fa-fw fa-search-plus"></i><!-- /ko -->
-    <!-- ko case: 'scheduler' --><svg class="hi hi-fw"><use xlink:href="#hi-oozie"></use></svg><!-- /ko -->
+    <!-- ko case: 'scheduler' --><svg class="hi hi-fw"><use href="#hi-oozie"></use></svg><!-- /ko -->
     <!-- ko case: 'security' --><i class="fa fa-fw fa-lock"></i><!-- /ko -->
     <!-- ko case: 'shell' --><i class="fa fa-fw fa-terminal"></i><!-- /ko -->
-    <!-- ko case: 'spark' --><svg class="hi hi-fw"><use xlink:href="#hi-spark"></use></svg><!-- /ko -->
-    <!-- ko case: 'spark2' --><svg class="hi hi-fw"><use xlink:href="#hi-spark"></use></svg><!-- /ko -->
-    <!-- ko case: 'sparksql' --><svg class="hi hi-fw"><use xlink:href="#hi-spark"></use></svg><!-- /ko -->
-    <!-- ko case: 'sqoop' --><svg class="hi hi-fw"><use xlink:href="#hi-sqoop"></use></svg><!-- /ko -->
-    <!-- ko case: 'sqoop1' --><svg class="hi hi-fw"><use xlink:href="#hi-sqoop"></use></svg><!-- /ko -->
+    <!-- ko case: 'spark' --><svg class="hi hi-fw"><use href="#hi-spark"></use></svg><!-- /ko -->
+    <!-- ko case: 'spark2' --><svg class="hi hi-fw"><use href="#hi-spark"></use></svg><!-- /ko -->
+    <!-- ko case: 'sparksql' --><svg class="hi hi-fw"><use href="#hi-spark"></use></svg><!-- /ko -->
+    <!-- ko case: 'sqoop' --><svg class="hi hi-fw"><use href="#hi-sqoop"></use></svg><!-- /ko -->
+    <!-- ko case: 'sqoop1' --><svg class="hi hi-fw"><use href="#hi-sqoop"></use></svg><!-- /ko -->
     <!-- ko case: 'tables' --><i class="fa fa-fw fa-table"></i><!-- /ko -->
     <!-- ko case: 'database' --><i class="fa fa-fw fa-database"></i><!-- /ko -->
     <!-- ko case: 'text' --><i class="fa fa-fw fa-i-cursor"></i><!-- /ko -->
     <!-- ko case: 'yarn' --><i class="fa fa-fw fa-tasks"></i><!-- /ko -->
     <!-- ko case: 'warehouses' --><i class="altus-icon altus-adb-cluster" style="margin: 0 1px 0 3px"></i><!-- /ko -->
-    <!-- ko case: 'workflows' --><svg class="hi hi-fw"><use xlink:href="#hi-oozie"></use></svg><!-- /ko -->
+    <!-- ko case: 'workflows' --><svg class="hi hi-fw"><use href="#hi-oozie"></use></svg><!-- /ko -->
     <!-- ko case: $else --><i class="fa fa-fw fa-database"></i><!-- /ko -->
     <!-- /ko -->
   </script>
