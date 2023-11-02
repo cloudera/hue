@@ -779,17 +779,17 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
       });
 
       $(document).on("addedBulkPrivileges", function () {
-        $(document).trigger("info", "${ _('The current privileges have been successfully added to the checked items.') }");
+        huePubSub.publish('hue.global.info', {message: "${ _('The current privileges have been successfully added to the checked items.') }"});
         $("#bulkActionsModal").modal("hide");
       });
 
       $(document).on("deletedBulkPrivileges", function () {
-        $(document).trigger("info", "${ _('All the privileges have been successfully removed from the checked items.') }");
+        huePubSub.publish('hue.global.info', {message: "${ _('All the privileges have been successfully removed from the checked items.') }"});
         $("#bulkActionsModal").modal("hide");
       });
 
       $(document).on("syncdBulkPrivileges", function () {
-        $(document).trigger("info", "${ _('All the privileges for the checked items have been replaced with the current selection.') }");
+        huePubSub.publish('hue.global.info', {message: "${ _('All the privileges for the checked items have been replaced with the current selection.') }"});
         $("#bulkActionsModal").modal("hide");
       });
 

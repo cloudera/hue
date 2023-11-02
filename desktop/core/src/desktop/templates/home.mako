@@ -420,7 +420,7 @@ ${ commonshare() | n,unicode }
           data.name = hueUtils.htmlEncode(data.name);
           viewModel.createTag(data);
           $("#tagsNew").val("");
-          $(document).trigger("info", "${_('Project created')}");
+          huePubSub.publish('hue.global.info', {message: "${_('Project created')}"});
           $("#addTagModal").modal("hide");
         }
       }).fail(function (xhr, textStatus, errorThrown) {
@@ -454,7 +454,7 @@ ${ commonshare() | n,unicode }
     }, function (response) {
       if (response != null) {
         if (response.status == 0) {
-          $(document).trigger("info", response.message);
+          huePubSub.publish('hue.global.info', {message: response.message});
           $("#removeTagModal").modal("hide");
           viewModel.deleteTag(tag);
           viewModel.filterDocs(viewModel.history());
@@ -490,7 +490,7 @@ ${ commonshare() | n,unicode }
           $(document).trigger("error", "${_("There was an error processing your action: ")}" + response.message);
         }
         else {
-          $(document).trigger("info", "${ _("Project updated successfully.") }");
+          huePubSub.publish('hue.global.info', {message: "${ _("Project updated successfully.") }"});
           viewModel.updateDoc(response.doc);
         }
       }

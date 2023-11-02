@@ -772,7 +772,7 @@ Plugin.prototype.navigateTo = function (path) {
     }
   }).fail(e => {
     if (!_parent.options.suppressErrors) {
-      $(document).trigger('info', _parent.options.labels.FILE_NOT_FOUND);
+      huePubSub.publish('hue.global.info', {message:  _parent.options.labels.FILE_NOT_FOUND});
       _parent.options.onError();
     }
     if (e.status === 404 || e.status === 500) {

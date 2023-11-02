@@ -222,7 +222,7 @@ function hac_errorHandler(data) {
   $(document).trigger('error.autocomplete');
   if (typeof HIVE_AUTOCOMPLETE_FAILS_SILENTLY_ON == "undefined" || data.code == null || HIVE_AUTOCOMPLETE_FAILS_SILENTLY_ON.indexOf(data.code) == -1){
     if (typeof HIVE_AUTOCOMPLETE_FAILS_QUIETLY_ON != "undefined" && HIVE_AUTOCOMPLETE_FAILS_QUIETLY_ON.indexOf(data.code) > -1){
-      $(document).trigger('info', data.error);
+      huePubSub.publish('hue.global.info', {message: data.error});
     }
     else {
       $(document).trigger('error', data.error);
