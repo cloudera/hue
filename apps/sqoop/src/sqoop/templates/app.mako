@@ -823,11 +823,11 @@ $(document).on('link_error.jobs', function(e, name, options, jqXHR) {
 });
 
 $(document).on('start.job', function(e, options, job) {
-  $(document).trigger("info", "${ _('The job is starting...') }");
+  huePubSub.publish('hue.global.info', {message:  "${ _('The job is starting...') }"});
 });
 
 $(document).on('started.job', function(e, job, options, submission_dict) {
-  $(document).trigger("info", "${ _('Started job.') }");
+  huePubSub.publish('hue.global.info', {message: "${ _('Started job.') }"});
 });
 
 $(document).on('start_fail.job', function(e, job, options, error) {
@@ -835,7 +835,7 @@ $(document).on('start_fail.job', function(e, job, options, error) {
 });
 
 $(document).on('stopped.job', function(e, job, options, submission_dict) {
-  $(document).trigger("info", "${ _('Stopped job.') }");
+  huePubSub.publish('hue.global.info', {message: "${ _('Stopped job.') }"});
 });
 
 $(document).on('stop_fail.job', function(e, job, options, submission_dict) {

@@ -306,7 +306,7 @@ var SentryViewModel = (function () {
           component: vm.component()
         }, function (data) {
           if (data.status == 0) {
-            $(document).trigger("info", data.message);
+            huePubSub.publish('hue.global.info', {message: data.message});
             vm.showCreateRole(false);
             self.reset();
             var role = new Role(vm, data.role);
@@ -331,7 +331,7 @@ var SentryViewModel = (function () {
           component: vm.component()
         }, function (data) {
           if (data.status == 0) {
-            $(document).trigger("info", data.message);
+            huePubSub.publish('hue.global.info', {message: data.message});
             vm.showCreateRole(false);
             vm.list_sentry_privileges_by_authorizable();
             $(document).trigger("createdRole");
@@ -1199,7 +1199,7 @@ var SentryViewModel = (function () {
         },
         success: function (data) {
           if (data.status == 0) {
-            $(document).trigger("info", data.message);
+            huePubSub.publish('hue.global.info', {message: data.message});
             self.assist.refreshTree();
             self.clearTempRoles();
             $(document).trigger("createdRole");

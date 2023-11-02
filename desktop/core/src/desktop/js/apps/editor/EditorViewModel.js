@@ -223,7 +223,7 @@ export default class EditorViewModel {
           const options = {
             successCallback: result => {
               if (result && result.exists) {
-                $(document).trigger('info', result.path + ' saved successfully.');
+                huePubSub.publish('hue.global.info', {message: result.path + ' saved successfully.'});
               }
             }
           };

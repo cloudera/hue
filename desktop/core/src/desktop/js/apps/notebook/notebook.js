@@ -503,7 +503,7 @@ class Notebook {
             self.isSaved(true);
             const wasHistory = self.isHistory();
             self.isHistory(false);
-            $(document).trigger('info', data.message);
+            huePubSub.publish('hue.global.info', {message: data.message});
             if (editorMode) {
               if (!data.save_as) {
                 const existingQuery = self

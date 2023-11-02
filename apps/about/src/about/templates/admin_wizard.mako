@@ -330,7 +330,7 @@ ${ layout.menubar(section='quick_start') }
           connector: connector.id
         }, function(data) {
           if (data.message) {
-            $(document).trigger('info', data.message);
+            huePubSub.publish('hue.global.info', {message: data.message});
           }
           if (data.errorMessage) {
             huePubSub.publish('hue.global.error', {message: data.errorMessage});
@@ -350,9 +350,9 @@ ${ layout.menubar(section='quick_start') }
     $.post(button.data("sample-url"), function(data) {
       if (data.status == 0) {
         if (data.message) {
-          $(document).trigger('info', data.message);
+          huePubSub.publish('hue.global.info', {message: data.message});
         } else {
-          $(document).trigger('info', '${ _("Examples refreshed") }');
+          huePubSub.publish('hue.global.info', {message: '${ _("Examples refreshed") }'});
         }
         if ($(button).data("is-connector")) {
           huePubSub.publish('cluster.config.refresh.config');
@@ -413,7 +413,7 @@ ${ layout.menubar(section='quick_start') }
       });
       $.when.apply(this, calls)
       .then(function() {
-        $(document).trigger('info', '${ _("Examples refreshed") }');
+        huePubSub.publish('hue.global.info', {message: '${ _("Examples refreshed") }'});
       })
       .always(function(data) {
         $(button).button('reset');
@@ -491,7 +491,7 @@ ${ layout.menubar(section='quick_start') }
     $(".updatePreferences").click(function () {
       $.post("${ url('about:update_preferences') }", $("input").serialize(), function(data) {
         if (data.status == 0) {
-          $(document).trigger('info', '${ _("Configuration updated") }');
+          huePubSub.publish('hue.global.info', {message: '${ _("Configuration updated") }'});
         } else {
           huePubSub.publish('hue.global.error', {message: data.data});
         }

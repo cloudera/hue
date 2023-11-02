@@ -2042,7 +2042,7 @@ else:
               huePubSub.publish('hue.global.error', {message: "${ _('Error: ') }" + response.data});
             }
             else {
-              $(document).trigger('info', response.path + "${ _(' uploaded successfully.') }");
+              huePubSub.publish('hue.global.info', {message: response.path + "${ _(' uploaded successfully.') }"});
               self.filesToHighlight.push(response.path);
             }
             if (self.pendingUploads() == 0) {
@@ -2254,7 +2254,7 @@ else:
                   if (response.status != 0) {
                     huePubSub.publish('hue.global.error', {message: response.data});
                   } else {
-                    $(document).trigger('info', response.path + ' ' + I18n('uploaded successfully'));
+                    huePubSub.publish('hue.global.info', {message: response.path + ' ' + I18n('uploaded successfully')});
                     fileBrowserViewModel.filesToHighlight.push(response.path);
                   }
                 }
