@@ -17,6 +17,7 @@
 import Dropzone from 'dropzone';
 import $ from 'jquery';
 import * as ko from 'knockout';
+import huePubSub from 'utils/huePubSub';
 
 import I18n from 'utils/i18n';
 
