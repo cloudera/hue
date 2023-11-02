@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { i18nReact } from '../../../../utils/i18nReact';
 import Table from 'cuix/dist/components/Table';
 import { ColumnProps } from 'antd/lib/table';
@@ -48,6 +48,8 @@ const StorageBrowserTable: React.FC<StorageBrowserTableProps> = ({
   testId,
   ...restProps
 }): JSX.Element => {
+  const [tableHeight, setTableHeight] = useState<number>();
+
   const { t } = i18nReact.useTranslation();
 
   const getColumns = file => {
@@ -86,6 +88,28 @@ const StorageBrowserTable: React.FC<StorageBrowserTableProps> = ({
     };
   };
 
+  useEffect(() => {
+    const calculateTableHeight = () => {
+      const windowHeight = window.innerHeight;
+      // Todo: move 400 to dynamic based on  table header height, tab nav and some header.
+      const tableHeightFix = windowHeight - 400;
+      return tableHeightFix;
+    };
+
+    const handleWindowResize = () => {
+      const tableHeight = calculateTableHeight();
+      setTableHeight(tableHeight);
+    };
+
+    handleWindowResize(); // Calculate initial scroll height
+
+    window.addEventListener('resize', handleWindowResize);
+
+    return () => {
+      window.removeEventListener('resize', handleWindowResize);
+    };
+  }, []);
+
   if (dataSource) {
     return (
       <>
@@ -96,6 +120,7 @@ const StorageBrowserTable: React.FC<StorageBrowserTableProps> = ({
           onRow={onRowClicked}
           rowClassName={rowClassName}
           rowKey={(record, index) => record.path + '' + index}
+          scroll={{ y: tableHeight }}
           data-testid={`${testId}`}
           {...restProps}
         ></Table>
