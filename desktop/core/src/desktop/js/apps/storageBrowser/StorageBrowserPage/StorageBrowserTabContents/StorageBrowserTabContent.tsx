@@ -140,7 +140,8 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
             user: file.stats.user,
             groups: file.stats.group,
             permission: file.rwx,
-            lastUpdated: file.mtime
+            lastUpdated: file.mtime,
+            type: file.type
           };
           tableData.push(temp);
         });

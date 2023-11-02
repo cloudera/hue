@@ -18,6 +18,9 @@ import React from 'react';
 import { i18nReact } from '../../../../utils/i18nReact';
 import Table from 'cuix/dist/components/Table';
 import { ColumnProps } from 'antd/lib/table';
+import FolderIcon from '@cloudera/cuix-core/icons/react/ProjectIcon';
+//Todo: Use cuix icon (Currently fileIcon does not exist in cuix)
+import { FileOutlined } from '@ant-design/icons';
 
 import { StorageBrowserTableData } from '../../../../reactComponents/FileChooser/types';
 import './StorageBrowserTable.scss';
@@ -45,22 +48,29 @@ const StorageBrowserTable: React.FC<StorageBrowserTableProps> = ({
 }): JSX.Element => {
   const { t } = i18nReact.useTranslation();
 
-  const getColumns = files => {
+  const getColumns = file => {
     // eslint-disable-next-line prefer-const
     let columns: ColumnProps<unknown>[] = [];
-    for (const [key] of Object.entries(files[0])) {
+    for (const [key] of Object.entries(file)) {
       const temp: ColumnProps<unknown> = {
         dataIndex: `${key}`,
         title: t(`${key}`),
         key: `${key}`,
-        width: '20em',
-        ellipsis: true,
-        //TODO: Apply tooltip only for truncated values
-        render: key => <Tooltip title={key}>{key}</Tooltip>
+        width: '20em'
       };
+      if (key === 'name') {
+        temp.ellipsis = true;
+        //TODO: Apply tooltip only for truncated values
+        temp.render = (_, record: any) => (
+          <Tooltip title={record.name}>
+            {record.type === 'dir' ? <FolderIcon /> : <FileOutlined />}
+            <span className="hue-storage-browser__table-name-cell">{record.name}</span>
+          </Tooltip>
+        );
+      }
       columns.push(temp);
     }
-    return columns;
+    return columns.filter(col => col.dataIndex !== 'type');
   };
 
   if (dataSource) {
@@ -68,7 +78,7 @@ const StorageBrowserTable: React.FC<StorageBrowserTableProps> = ({
       <>
         <Table
           className={className}
-          columns={getColumns(dataSource)}
+          columns={getColumns(dataSource[0])}
           dataSource={dataSource}
           rowClassName={rowClassName}
           data-testid={`${testId}`}

@@ -53,6 +53,7 @@ export interface StorageBrowserTableData {
   groups: string;
   permission: string;
   lastUpdated: string;
+  type: string;
 }
 
 export interface BreadcrumbData {

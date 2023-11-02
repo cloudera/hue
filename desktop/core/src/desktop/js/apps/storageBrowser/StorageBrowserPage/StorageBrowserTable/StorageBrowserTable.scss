@@ -14,11 +14,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 @use 'variables' as vars;
+@use 'mixins';
 
 .hue-storage-browser__table {
+  @include mixins.hue-svg-icon__d3-conflict;
+
+  svg {
+    color: vars.$fluidx-blue-700;
+    margin-right: 6px;
+  }
+
   thead {
     //TODO:Check why height isnt applied in safari browser
-    height: 40px;  
+    height: 40px;
     background-color: vars.$fluidx-gray-040;
   }
 
@@ -29,6 +37,7 @@
   .hue-storage-browser__table-row {
     height: 40px;
     border-bottom: solid 1px vars.$fluidx-gray-300;
+
     td.ant-table-cell {
       white-space: nowrap;
       overflow-x: hidden;
@@ -37,4 +46,8 @@
       max-width: 400px;
     }
   }
+}
+
+.hue-storage-browser__table-name-cell {
+  color: vars.$fluidx-blue-700;
 }
