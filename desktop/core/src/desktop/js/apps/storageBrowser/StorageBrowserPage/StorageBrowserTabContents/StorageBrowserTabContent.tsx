@@ -141,7 +141,8 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
             groups: file.stats.group,
             permission: file.rwx,
             lastUpdated: file.mtime,
-            type: file.type
+            type: file.type,
+            path: file.path
           };
           tableData.push(temp);
         });
@@ -208,7 +209,10 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
             </Dropdown>
           </div>
         </div>
-        <StorageBrowserTable dataSource={files}></StorageBrowserTable>
+        <StorageBrowserTable
+          dataSource={files}
+          onFilepathChange={setFilePath}
+        ></StorageBrowserTable>
       </div>
     </Spin>
   );

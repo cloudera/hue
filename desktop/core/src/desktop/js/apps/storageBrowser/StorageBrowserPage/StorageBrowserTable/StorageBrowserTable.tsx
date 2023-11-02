@@ -29,6 +29,7 @@ import Tooltip from 'antd/es/tooltip';
 interface StorageBrowserTableProps {
   className?: string;
   dataSource: StorageBrowserTableData[];
+  onFilepathChange: (path: string) => void;
   rowClassName?: string;
   testId?: string;
 }
@@ -42,6 +43,7 @@ const defaultProps = {
 const StorageBrowserTable: React.FC<StorageBrowserTableProps> = ({
   className,
   dataSource,
+  onFilepathChange,
   rowClassName,
   testId,
   ...restProps
@@ -70,7 +72,18 @@ const StorageBrowserTable: React.FC<StorageBrowserTableProps> = ({
       }
       columns.push(temp);
     }
-    return columns.filter(col => col.dataIndex !== 'type');
+    return columns.filter(col => col.dataIndex !== 'type' && col.dataIndex !== 'path');
+  };
+
+  const onRowClicked = record => {
+    return {
+      onClick: e => {
+        if (record.type === 'dir') {
+          onFilepathChange(record.path);
+        }
+        //TODO: handle onclick file
+      }
+    };
   };
 
   if (dataSource) {
@@ -80,7 +93,9 @@ const StorageBrowserTable: React.FC<StorageBrowserTableProps> = ({
           className={className}
           columns={getColumns(dataSource[0])}
           dataSource={dataSource}
+          onRow={onRowClicked}
           rowClassName={rowClassName}
+          rowKey={(record, index) => record.path + '' + index}
           data-testid={`${testId}`}
           {...restProps}
         ></Table>

@@ -54,6 +54,7 @@ export interface StorageBrowserTableData {
   permission: string;
   lastUpdated: string;
   type: string;
+  path: string;
 }
 
 export interface BreadcrumbData {
