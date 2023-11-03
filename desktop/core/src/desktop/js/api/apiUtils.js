@@ -77,7 +77,7 @@ export const assistErrorCallback = options => {
     if (!options || !options.silenceErrors) {
       logError(errorResponse);
       if (errorMessage && errorMessage.indexOf('AuthorizationException') === -1) {
-        huePubSub.publish('hue.global.error', {message: errorMessage});
+        huePubSub.publish('hue.global.error', { message: errorMessage });
       }
     }
 

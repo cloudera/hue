@@ -365,7 +365,7 @@ class MetastoreTable {
         if (resp.history_uuid) {
           huePubSub.publish('notebook.task.submitted', resp);
         } else {
-          huePubSub.publish('hue.global.error', {message: resp.message});
+          huePubSub.publish('hue.global.error', { message: resp.message });
         }
       });
     };
@@ -378,7 +378,7 @@ class MetastoreTable {
           if (data && data.status === 0) {
             this.relationshipsDetails(ko.mapping.fromJS(data));
           } else {
-            huePubSub.publish('hue.global.error', {message: data.message});
+            huePubSub.publish('hue.global.error', { message: data.message });
           }
         })
         .fail(xhr => {
@@ -422,7 +422,7 @@ class MetastoreTable {
         $('#import-data-modal').html(data['data']);
       })
       .fail(xhr => {
-        huePubSub.publish('hue.global.error', {message: xhr.responseText});
+        huePubSub.publish('hue.global.error', { message: xhr.responseText });
       });
   }
 

@@ -21,40 +21,40 @@ import huePubSub from 'utils/huePubSub';
 import './AlertComponent.scss';
 
 interface ErrorAlert {
-    message: string;
+  message: string;
 }
 
 const AlertComponent: React.FC = () => {
-    const [errors, setErrors] = useState<ErrorAlert[]>([]);
+  const [errors, setErrors] = useState<ErrorAlert[]>([]);
 
-    useEffect(() => {
-        const hueSub = huePubSub.subscribe('hue.global.error', (errorObj: ErrorAlert) => {
-            setErrors((prevData) => [...prevData, errorObj]);
-        });
-        return () => {
-            hueSub.remove();
-        };
-    }, []);
-
-    const handleClose = (errorObj: ErrorAlert) => {
-        const filteredErrors = errors.filter((errorObj) => errorObj !== errorObj);
-        setErrors(filteredErrors);
+  useEffect(() => {
+    const hueSub = huePubSub.subscribe('hue.global.error', (errorObj: ErrorAlert) => {
+      setErrors(prevData => [...prevData, errorObj]);
+    });
+    return () => {
+      hueSub.remove();
     };
+  }, []);
 
-    //TODO: add support for warnings and success messages
-    return (
-        <div className='flash-messages cuix antd'>
-            {errors.map((errorObj, index) => (
-                <Alert
-                    key={index}
-                    type="error"
-                    message={errorObj.message}
-                    closable={true}
-                    onClose={() => handleClose(errorObj, index)}
-                />
-            ))}
-        </div>
-    );
+  const handleClose = (errorObj: ErrorAlert) => {
+    const filteredErrors = errors.filter(errorObj => errorObj !== errorObj);
+    setErrors(filteredErrors);
+  };
+
+  //TODO: add support for warnings and success messages
+  return (
+    <div className="flash-messages cuix antd">
+      {errors.map((errorObj, index) => (
+        <Alert
+          key={index}
+          type="error"
+          message={errorObj.message}
+          closable={true}
+          onClose={() => handleClose(errorObj, index)}
+        />
+      ))}
+    </div>
+  );
 };
 
 export default AlertComponent;

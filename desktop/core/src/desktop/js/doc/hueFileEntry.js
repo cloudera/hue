@@ -134,7 +134,9 @@ class HueFileEntry {
         }
         this.selectedDocsWithDependents(docsWithDependents);
       }).fail(response => {
-        huePubSub.publish('hue.global.error', {message: 'Error getting document data: ' + response.responseText});
+        huePubSub.publish('hue.global.error', {
+          message: 'Error getting document data: ' + response.responseText
+        });
       });
     };
 
