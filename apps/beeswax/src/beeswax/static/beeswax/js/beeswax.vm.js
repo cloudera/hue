@@ -643,7 +643,7 @@ function BeeswaxViewModel(server, apiHelper) {
           self.setErrors(data.message, data.errors);
           self.design.isRunning(false);
           $(document).trigger('error.query');
-          $(document).trigger("error", data.message);
+          huePubSub.publish('hue.global.error', {message: data.message});
           if (typeof window.console !== 'undefined') {
             console.error(data.message);
           }
