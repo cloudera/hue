@@ -1855,7 +1855,7 @@ class ClusterConfig(object):
       LOG.exception('Could not load back default app')
 
     if default_interpreter:
-      if DEFAULT_INTERPRETER.get() != '':
+      if DEFAULT_INTERPRETER.get():
         for di in default_interpreter:
           if di['name'] == DEFAULT_INTERPRETER.get():
             return di
