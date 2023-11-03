@@ -368,7 +368,7 @@ class Notebook {
         $.each(self.getSnippets(session.type()), (index, snippet) => {
           snippet.status('failed');
         });
-        $(document).trigger('error', message);
+        huePubSub.publish('hue.global.error', { message: message });
         if (failCallback) {
           failCallback();
         }
@@ -560,12 +560,12 @@ class Notebook {
               callback();
             }
           } else {
-            $(document).trigger('error', data.message);
+            huePubSub.publish('hue.global.error', { message: data.message });
           }
         }
       ).fail((xhr, textStatus, errorThrown) => {
         if (xhr.status !== 502) {
-          $(document).trigger('error', xhr.responseText);
+          huePubSub.publish('hue.global.error', { message: xhr.responseText });
         }
       });
     };
@@ -618,7 +618,7 @@ class Notebook {
         },
         data => {
           if (!silent && data && data.status != 0 && data.status != -2 && data.message) {
-            $(document).trigger('error', data.message);
+            huePubSub.publish('hue.global.error', { message: data.message });
           }
 
           if (callback) {
@@ -627,7 +627,7 @@ class Notebook {
         }
       ).fail(xhr => {
         if (!silent && xhr.status !== 502) {
-          $(document).trigger('error', xhr.responseText);
+          huePubSub.publish('hue.global.error', { message: xhr.responseText });
         }
       });
     };
@@ -762,7 +762,7 @@ class Notebook {
         }
       ).fail(xhr => {
         if (xhr.status !== 502) {
-          $(document).trigger('error', xhr.responseText);
+          huePubSub.publish('hue.global.error', { message: xhr.responseText });
         }
       });
       $(document).trigger('hideHistoryModal');
@@ -834,7 +834,7 @@ class Notebook {
             }
           ).fail(xhr => {
             if (xhr.status !== 502) {
-              $(document).trigger('error', xhr.responseText);
+              huePubSub.publish('hue.global.error', { message: xhr.responseText });
             }
           });
         };
@@ -870,7 +870,7 @@ class Notebook {
         }
       ).fail((xhr, textStatus, errorThrown) => {
         if (xhr.status !== 502) {
-          $(document).trigger('error', xhr.responseText);
+          huePubSub.publish('hue.global.error', { message: xhr.responseText });
         }
       });
     };

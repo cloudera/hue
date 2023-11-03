@@ -96,7 +96,7 @@ function rdbms_getTableColumns(serverName, databaseName, tableName, textScanned,
           }
           if (data.error) {
             if (typeof RDBMS_AUTOCOMPLETE_FAILS_SILENTLY_ON == "undefined" || data.code === null || RDBMS_AUTOCOMPLETE_FAILS_SILENTLY_ON.indexOf(data.code) == -1){
-              $(document).trigger('error', data.error);
+              huePubSub.publish('hue.global.error', {message: data.error});
             }
           }
           else {
@@ -119,7 +119,7 @@ function rdbms_getTableColumns(serverName, databaseName, tableName, textScanned,
         }
         if (data.error) {
           if (typeof RDBMS_AUTOCOMPLETE_FAILS_SILENTLY_ON == "undefined" || data.code === null || RDBMS_AUTOCOMPLETE_FAILS_SILENTLY_ON.indexOf(data.code) == -1){
-            $(document).trigger('error', data.error);
+            huePubSub.publish('hue.global.error', {message: data.error});
           }
         }
         else {
@@ -146,7 +146,7 @@ function rdbms_getTables(serverName, databaseName, callback) {
           }
           if (data.error) {
             if (typeof RDBMS_AUTOCOMPLETE_FAILS_SILENTLY_ON == "undefined" || data.code === null || RDBMS_AUTOCOMPLETE_FAILS_SILENTLY_ON.indexOf(data.code) == -1){
-              $(document).trigger('error', data.error);
+              huePubSub.publish('hue.global.error', {message: data.error});
             }
           }
           else {
@@ -167,7 +167,7 @@ function rdbms_getTables(serverName, databaseName, callback) {
         }
         if (data.error) {
           if (typeof RDBMS_AUTOCOMPLETE_FAILS_SILENTLY_ON == "undefined" || data.code === null || RDBMS_AUTOCOMPLETE_FAILS_SILENTLY_ON.indexOf(data.code) == -1){
-            $(document).trigger('error', data.error);
+            huePubSub.publish('hue.global.error', {message: data.error});
           }
         }
         else {

@@ -144,11 +144,11 @@ else:
           if (data.status == 0) {
             self.importedDocSummary(data);
           } else {
-            $(document).trigger('error', data.message);
+            huePubSub.publish('hue.global.error', {message: data.message});
           }
         },
         error: function () {
-          $(document).trigger('error', "${_('An unexpected error occurred while importing your documents')}");
+          huePubSub.publish('hue.global.error', {message: "${_('An unexpected error occurred while importing your documents')}"});
           $('#import-document-data').modal('hide');
         }
       });
