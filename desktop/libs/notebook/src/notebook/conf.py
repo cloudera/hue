@@ -207,6 +207,13 @@ INTERPRETERS_SHOWN_ON_WHEEL = Config(
   default=[]
 )
 
+DEFAULT_INTERPRETER = Config(
+  key="default_interpreter",
+  help=_t("Set the default interpreter for all users. Starred interpreters at user level will get more priority than the value below."),
+  type=str,
+  default=''
+)
+
 DEFAULT_LIMIT = Config(
   "default_limit",
   help="Default limit to use in SELECT statements if not present. Set to 0 to disable.",
