@@ -79,7 +79,7 @@
                 </a>
                 % else:
                 <a title="${ _('Switch to the dashboard') }" href="${ is_embeddable and '/hue/jobbrowser/#!workflows' or getURL(section, dashboard, ENABLE_V2.get())}">
-                  <svg class="svg-app-icon"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#hi-oozie"></use></svg> ${ _('Oozie Editor') }
+                  <svg class="svg-app-icon"><use href="#hi-oozie"></use></svg> ${ _('Oozie Editor') }
                   <!-- ko component: { name: 'hue-favorite-app', params: { app: 'scheduler', interpreter: '${ getInterpreter(section) }' }} --><!-- /ko -->
                 </a>
                 % endif

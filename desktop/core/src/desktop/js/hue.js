@@ -150,11 +150,11 @@ $(document).ready(async () => {
         if (resp.history_uuid) {
           huePubSub.publish('open.editor.query', resp);
         } else if (resp.message) {
-          $(document).trigger('error', resp.message);
+          huePubSub.publish('hue.global.error', { message: resp.message });
         }
       }
     ).fail(xhr => {
-      $(document).trigger('error', xhr.responseText);
+      huePubSub.publish('hue.global.error', { message: xhr.responseText });
     });
   });
 

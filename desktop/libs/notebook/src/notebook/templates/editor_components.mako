@@ -262,7 +262,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         </li>
         <li>
           <a href="javascript:void(0)" data-bind="publish: { 'assist.show.documents': editorMode() ? 'query-' + editorType() : editorType() }">
-            <svg class="hi hi-fw hi-bigger"><use xlink:href="#hi-documents"></use></svg> <span data-bind="text: editorMode() ? '${ _ko('Queries') }' : '${ _ko('Notebooks') }'"></span>
+            <svg class="hi hi-fw hi-bigger"><use href="#hi-documents"></use></svg> <span data-bind="text: editorMode() ? '${ _ko('Queries') }' : '${ _ko('Notebooks') }'"></span>
           </a>
         </li>
         <li class="divider"></li>
@@ -2224,7 +2224,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       sparksql: {
         placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
         aceMode: 'ace/mode/sparksql',
-        snippetImage: '${ static("beeswax/art/icon_spark_48.png") }',
+        snippetImage: '${ static("spark/art/icon_spark_48.png") }',
         sqlDialect: true
       },
       mapreduce: {

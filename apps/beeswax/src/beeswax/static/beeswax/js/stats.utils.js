@@ -75,14 +75,14 @@ function showStats(options) {
         }
       }
       else {
-        $(document).trigger("error", options.errorLabel);
+        huePubSub.publish('hue.global.error', {message: options.errorLabel});
         $("#tableAnalysis").hide();
         $("#columnAnalysis").hide();
       }
     },
     error: function (e) {
       if (e.status == 500) {
-        $(document).trigger("error", options.errorLabel);
+        huePubSub.publish('hue.global.error', {message: options.errorLabel});
         $("#tableAnalysis").hide();
         $("#columnAnalysis").hide();
       }
@@ -123,14 +123,14 @@ function loadTerms(options) {
         }
       }
       else {
-        $(document).trigger("error", options.errorLabel);
+        huePubSub.publish('hue.global.error', {message: options.errorLabel});
         $("#tableAnalysis").hide();
         $("#columnAnalysis").hide();
       }
     },
     error: function (e) {
       if (e.status == 500) {
-        $(document).trigger("error", options.errorLabel);
+        huePubSub.publish('hue.global.error', {message: options.errorLabel});
         $("#tableAnalysis").hide();
         $("#columnAnalysis").hide();
       }
@@ -180,7 +180,7 @@ function refreshLoop(el){
         }
       }
       else {
-        $(document).trigger("error", data.message);
+        huePubSub.publish('hue.global.error', {message: data.message});
       }
     }
   });

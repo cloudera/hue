@@ -487,11 +487,11 @@ ${ commonheader(_("Streams Browser"), "search", user, request, "60px") | n,unico
             vm.indexes.push(ko.mapping.fromJS(data.topic));
             huePubSub.publish('assist.collections.refresh');
           } else {
-            $(document).trigger("error", data.message);
+            huePubSub.publish('hue.global.error', {message: data.message});
           }
           $('#createAlias').modal('hide');
         }).fail(function (xhr, textStatus, errorThrown) {
-          $(document).trigger("error", xhr.responseText);
+          huePubSub.publish('hue.global.error', {message: xhr.responseText});
         });
         hueAnalytics.log('kafka', 'create_topic');
       }
@@ -544,10 +544,10 @@ ${ commonheader(_("Streams Browser"), "search", user, request, "60px") | n,unico
           if (data.status == 0) {
             self.sample(data.sample);
           } else {
-            $(document).trigger("error", data.message);
+            huePubSub.publish('hue.global.error', {message: data.message});
           }
         }).fail(function (xhr, textStatus, errorThrown) {
-          $(document).trigger("error", xhr.responseText);
+          huePubSub.publish('hue.global.error', {message: xhr.responseText});
         }).always(function () {
           self.loadingSample(false);
         });
@@ -563,11 +563,11 @@ ${ commonheader(_("Streams Browser"), "search", user, request, "60px") | n,unico
             huePubSub.publish('assist.collections.refresh');
             vm.showIndexes(false);
           } else {
-            $(document).trigger("error", data.message);
+            huePubSub.publish('hue.global.error', {message: data.message});
           }
           $('#deleteIndex').modal('hide');
         }).fail(function (xhr, textStatus, errorThrown) {
-          $(document).trigger("error", xhr.responseText);
+          huePubSub.publish('hue.global.error', {message: xhr.responseText});
         });
         hueAnalytics.log('indexes', 'delete_index');
       };
@@ -727,10 +727,10 @@ ${ commonheader(_("Streams Browser"), "search", user, request, "60px") | n,unico
               callback();
             }
           } else {
-            $(document).trigger("error", data.message);
+            huePubSub.publish('hue.global.error', {message: data.message});
           }
         }).fail(function (xhr, textStatus, errorThrown) {
-          $(document).trigger("error", xhr.responseText);
+          huePubSub.publish('hue.global.error', {message: xhr.responseText});
         }).always(function () {
           self.isLoading(false);
         });
@@ -758,10 +758,10 @@ ${ commonheader(_("Streams Browser"), "search", user, request, "60px") | n,unico
             self.section('list-index');
             self.tab('index-overview');
           } else {
-            $(document).trigger("error", data.message);
+            huePubSub.publish('hue.global.error', {message: data.message});
           }
         }).fail(function (xhr, textStatus, errorThrown) {
-          $(document).trigger("error", xhr.responseText);
+          huePubSub.publish('hue.global.error', {message: xhr.responseText});
         });
         hueAnalytics.log('kafka', 'list_topic');
       };
@@ -774,11 +774,11 @@ ${ commonheader(_("Streams Browser"), "search", user, request, "60px") | n,unico
             self.indexes.removeAll(self.selectedIndexes());
             huePubSub.publish('assist.collections.refresh');
           } else {
-            $(document).trigger("error", data.message);
+            huePubSub.publish('hue.global.error', {message: data.message});
           }
           $('#deleteIndexes').modal('hide');
         }).fail(function (xhr, textStatus, errorThrown) {
-          $(document).trigger("error", xhr.responseText);
+          huePubSub.publish('hue.global.error', {message: xhr.responseText});
         });
         hueAnalytics.log('indexes', 'delete_indexes');
       };

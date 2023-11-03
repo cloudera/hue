@@ -1037,8 +1037,11 @@ def describe(request, database, table=None, column=None):
   response = {'status': -1, 'message': ''}
   notebook = json.loads(request.POST.get('notebook', '{}'))
   source_type = request.POST.get('source_type', '')
+  connector = json.loads(request.POST.get('connector', '{}'))
   cluster = json.loads(request.POST.get('cluster', '{}'))
-  connector = cluster if cluster else json.loads(request.POST.get('connector', '{}'))
+  if cluster and cluster.get('type') != 'direct':
+    connector = cluster
+
   compute = json.loads(request.POST.get('compute', '{}'))
 
   snippet = {'type': source_type, 'connector': connector, 'compute': compute}
