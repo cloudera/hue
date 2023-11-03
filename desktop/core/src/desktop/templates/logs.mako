@@ -134,10 +134,10 @@ ${ layout.menubar(section='log_view') }
 
       $.post(_url, {}, function(data) {
         if (data,status != 0) {
-          $(document).trigger("error", data.message);
+          huePubSub.publish('hue.global.error', {message: data.message});
         }
       }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
+        huePubSub.publish('hue.global.error', {message: xhr.responseText});
       });
     };
   }

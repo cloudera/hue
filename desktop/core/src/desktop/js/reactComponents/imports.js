@@ -16,6 +16,9 @@ export async function loadComponent(name) {
     case 'AppBanner':
       return (await import('./AppBanner/AppBanner')).default;
 
+    case 'AlertComponent':
+      return (await import('./AlertComponent/AlertComponent')).default;
+
     case 'ReactExampleGlobal':
       return (await import('./ReactExampleGlobal/ReactExampleGlobal')).default;
 
