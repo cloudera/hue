@@ -23,13 +23,13 @@ import { getAltusBaseUrl, getMowBaseUrl } from 'ko/components/appSwitcher/enviro
 
 const TEMPLATE = `
   <div class="hue-sidebar-header">
-    <a class="hue-app-switcher-trigger" data-bind="toggle: open"><svg class="show"><use xlink:href="#hi-app-picker"></use></svg></a>
-    <div class="hue-app-switcher-logo"><svg><use xlink:href="#hi-sidebar-logo"></use></svg></div>
+    <a class="hue-app-switcher-trigger" data-bind="toggle: open"><svg class="show"><use href="#hi-app-picker"></use></svg></a>
+    <div class="hue-app-switcher-logo"><svg><use href="#hi-sidebar-logo"></use></svg></div>
   </div>
 
   <div class="hue-app-switcher" data-bind="css: { 'open': open }">
     <div class="app-switcher-header">
-      <svg class="show"><use xlink:href="#hi-cdp-logo"></use></svg>
+      <svg class="show"><use href="#hi-cdp-logo"></use></svg>
       <a href="javascript: void(0);" class="close" data-bind="toggle: open">&times;</a></form>
     </div>
 

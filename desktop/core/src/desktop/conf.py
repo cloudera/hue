@@ -2585,6 +2585,13 @@ def get_ldap_bind_password(ldap_config):
 
 PERMISSION_ACTION_GS = "gs_access"
 
+GS_BULK_DELETE_DIR_KEYS_MAX_LIMIT = Config(
+  help=_('Maximum number of keys with specific directory prefix that can be deleted in a single bulk operation in GS.'),
+  key='gs_bulk_delete_dir_keys_max_limit',
+  default=100,
+  type=coerce_zero_or_positive_integer
+)
+
 GC_ACCOUNTS = UnspecifiedConfigSection(
   'gc_accounts',
   help=_('One entry for each GC account'),

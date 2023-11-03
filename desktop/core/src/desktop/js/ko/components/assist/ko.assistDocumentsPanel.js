@@ -157,7 +157,7 @@ const TEMPLATE = `
             <!-- /ko -->
             <li class="divider"></li>
             <li data-bind="css: { 'disabled': $data.isTrash() || $data.isTrashed() || !$data.canModify() }">
-              <a href="javascript:void(0);" data-bind="click: function () { $('.new-document-drop-down').removeClass('open'); huePubSub.publish('show.create.directory.modal', $data); }"><svg class="hi"><use xlink:href="#hi-folder"></use><use xlink:href="#hi-plus-addon"></use></svg> ${I18n(
+              <a href="javascript:void(0);" data-bind="click: function () { $('.new-document-drop-down').removeClass('open'); huePubSub.publish('show.create.directory.modal', $data); }"><svg class="hi"><use href="#hi-folder"></use><use href="#hi-plus-addon"></use></svg> ${I18n(
                 'New folder'
               )}</a>
             </li>

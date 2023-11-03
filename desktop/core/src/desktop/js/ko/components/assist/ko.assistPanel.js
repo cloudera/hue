@@ -46,7 +46,7 @@ const TEMPLATE = `
     <div class="assist-panel-switches">
       <!-- ko foreach: availablePanels -->
       <div class="inactive-action assist-type-switch" data-bind="click: function () { $parent.visiblePanel($data); }, css: { 'blue': $parent.visiblePanel() === $data }, style: { 'float': rightAlignIcon ? 'right' : 'left' },  attr: { 'title': name }">
-        <!-- ko if: iconSvg --><span style="font-size:22px;"><svg class="hi"><use data-bind="attr: {'xlink:href': iconSvg }" xlink:href=''></use></svg></span><!-- /ko -->
+        <!-- ko if: iconSvg --><span style="font-size:22px;"><svg class="hi"><use data-bind="attr: {'href': iconSvg }" href=''></use></svg></span><!-- /ko -->
         <!-- ko if: !iconSvg --><i class="fa fa-fw valign-middle" data-bind="css: icon"></i><!-- /ko -->
       </div>
       <!-- /ko -->
@@ -130,6 +130,7 @@ class AssistPanel {
               interpreter.type === 'adls' ||
               interpreter.type === 'hdfs' ||
               interpreter.type === 's3' ||
+              interpreter.type === 'gs' ||
               interpreter.type === 'abfs' ||
               interpreter.type === 'ofs'
           );

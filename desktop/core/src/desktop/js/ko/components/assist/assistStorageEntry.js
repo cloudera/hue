@@ -40,6 +40,10 @@ const TYPE_SPECIFICS = {
     apiHelperFetchFunction: 'fetchS3Path',
     dblClickPubSubId: 'assist.dblClickS3Item'
   },
+  gs: {
+    apiHelperFetchFunction: 'fetchGSPath',
+    dblClickPubSubId: 'assist.dblClickGSItem'
+  },
   ofs: {
     apiHelperFetchFunction: 'fetchOfsPath',
     dblClickPubSubId: 'assist.dblClickOfsItem'
