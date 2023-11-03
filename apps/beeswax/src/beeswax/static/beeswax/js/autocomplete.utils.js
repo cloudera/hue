@@ -225,7 +225,7 @@ function hac_errorHandler(data) {
       $(document).trigger('info', data.error);
     }
     else {
-      $(document).trigger('error', data.error);
+      huePubSub.publish('hue.global.error', {message: data.error});
     }
   }
 }

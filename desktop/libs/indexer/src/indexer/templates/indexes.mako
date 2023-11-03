@@ -538,11 +538,11 @@ ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode
             vm.indexes.push(ko.mapping.fromJS(data.alias));
             huePubSub.publish('assist.collections.refresh');
           } else {
-            $(document).trigger("error", data.message);
+            huePubSub.publish('hue.global.error', {message: data.message});
           }
           $('#createAlias').modal('hide');
         }).fail(function (xhr, textStatus, errorThrown) {
-          $(document).trigger("error", xhr.responseText);
+          huePubSub.publish('hue.global.error', {message: xhr.responseText});
         });
         hueAnalytics.log('indexes', 'create_alias');
       }
@@ -596,10 +596,10 @@ ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode
           if (data.status == 0) {
             self.sample(data.sample);
           } else {
-            $(document).trigger("error", data.message);
+            huePubSub.publish('hue.global.error', {message: data.message});
           }
         }).fail(function (xhr, textStatus, errorThrown) {
-          $(document).trigger("error", xhr.responseText);
+          huePubSub.publish('hue.global.error', {message: xhr.responseText});
         }).always(function () {
           self.loadingSample(false);
         });
@@ -613,10 +613,10 @@ ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode
           if (data.status == 0) {
             self.config(data.config);
           } else {
-            $(document).trigger("error", data.message);
+            huePubSub.publish('hue.global.error', {message: data.message});
           }
         }).fail(function (xhr, textStatus, errorThrown) {
-          $(document).trigger("error", xhr.responseText);
+          huePubSub.publish('hue.global.error', {message: xhr.responseText});
         }).always(function () {
           self.loadingConfig(false);
         });
@@ -632,11 +632,11 @@ ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode
             huePubSub.publish('assist.collections.refresh');
             vm.showIndexes(false);
           } else {
-            $(document).trigger("error", data.message);
+            huePubSub.publish('hue.global.error', {message: data.message});
           }
           $('#deleteIndex').modal('hide');
         }).fail(function (xhr, textStatus, errorThrown) {
-          $(document).trigger("error", xhr.responseText);
+          huePubSub.publish('hue.global.error', {message: xhr.responseText});
         });
         hueAnalytics.log('indexes', 'delete_index');
       };
@@ -796,10 +796,10 @@ ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode
               callback();
             }
           } else {
-            $(document).trigger("error", data.message);
+            huePubSub.publish('hue.global.error', {message: data.message})
           }
         }).fail(function (xhr, textStatus, errorThrown) {
-          $(document).trigger("error", xhr.responseText);
+          huePubSub.publish('hue.global.error', {message: xhr.responseText});
         }).always(function () {
           self.isLoading(false);
         });
@@ -828,10 +828,10 @@ ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode
             self.section('list-index');
             self.tab('index-overview');
           } else {
-            $(document).trigger("error", data.message);
+            huePubSub.publish('hue.global.error', {message: data.message});
           }
         }).fail(function (xhr, textStatus, errorThrown) {
-          $(document).trigger("error", xhr.responseText);
+          huePubSub.publish('hue.global.error', {message: xhr.responseText});
         });
         hueAnalytics.log('indexes', 'list_index');
       };
@@ -844,11 +844,11 @@ ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode
             self.indexes.removeAll(self.selectedIndexes());
             huePubSub.publish('assist.collections.refresh');
           } else {
-            $(document).trigger("error", data.message);
+            huePubSub.publish('hue.global.error', {message: data.message});
           }
           $('#deleteIndexes').modal('hide');
         }).fail(function (xhr, textStatus, errorThrown) {
-          $(document).trigger("error", xhr.responseText);
+          huePubSub.publish('hue.global.error', {message: xhr.responseText});
         });
         hueAnalytics.log('indexes', 'delete_indexes');
       };

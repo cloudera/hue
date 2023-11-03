@@ -197,7 +197,7 @@ ${ utils.submit_popup_event() }
       }, function (data) {
         $(document).trigger("showSubmitPopup", data);
       }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
+        huePubSub.publish('hue.global.error', {message: xhr.responseText});
       });
     };
 
@@ -207,7 +207,7 @@ ${ utils.submit_popup_event() }
       }, function() {
         window.location.reload();
       }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.status == 500 ? JSON.parse(xhr.responseText).message : xhr.responseText);
+        huePubSub.publish('hue.global.error', {message: xhr.status == 500 ? JSON.parse(xhr.responseText).message : xhr.responseText});
       });
     };
 
@@ -217,7 +217,7 @@ ${ utils.submit_popup_event() }
       }, function(data) {
         window.location.reload();
       }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
+        huePubSub.publish('hue.global.error', {message: xhr.responseText});
       });
     };
 
