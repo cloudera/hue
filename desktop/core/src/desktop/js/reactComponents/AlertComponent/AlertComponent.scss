@@ -17,67 +17,66 @@
 @import '../../components/styles/variables';
 
 .hue-alert {
-    position: fixed;
-    width: 30%;
-    z-index: 9999;
-    top: 7px;
-    right: 0;
-    margin-right: 24px;
+  position: fixed;
+  width: 30%;
+  z-index: 9999;
+  top: 7px;
+  right: 0;
+  margin-right: 24px;
+  display: flex;
+  flex-flow: column;
+  row-gap: 10px;
+
+  button:hover,
+  button:focus {
+    background-color: unset;
+  }
+
+  button span {
+    font-size: $font-size-sm;
+    padding-top: 5px;
+  }
+
+  button svg.cdp-icon-close {
+    height: 16px;
+  }
+
+  .hue-alert--warning {
+    color: $fluidx-orange-900;
+    background: $fluidx-orange-050;
+    border: 1px solid $fluidx-orange-500;
+
+    button {
+      color: $fluidx-green-800;
+    }
+  }
+
+  .hue-alert--success {
+    color: $fluidx-green-900;
+    background: $fluidx-green-050;
+    border: 1px solid $fluidx-green-600;
+
+    button {
+      color: $fluidx-green-800;
+    }
+  }
+
+  .hue-alert--error {
+    color: $fluidx-orange-900;
+    background: $fluidx-red-050;
+    border: 1px solid $fluidx-red-500;
     display: flex;
-    flex-flow: column;
-    row-gap: 10px;
+    align-items: flex-start;
 
-    button:hover,
-    button:focus {
-        background-color: unset;
+    button {
+      color: $fluidx-red-800;
+      position: absolute;
+      top: 0.5rem;
+      right: 3%;
     }
+  }
 
-    button span {
-        font-size: $font-size-sm;
-        padding-top: 5px;
-    }
-
-    button svg.cdp-icon-close {
-        height: 16px;
-    }
-
-    .hue-alert--warning {
-        color: $fluidx-orange-900;
-        background: $fluidx-orange-050;
-        border: 1px solid $fluidx-orange-500;
-
-        button {
-            color: $fluidx-green-800;
-        }
-
-    }
-
-    .hue-alert--success {
-        color: $fluidx-green-900;
-        background: $fluidx-green-050;
-        border: 1px solid $fluidx-green-600;
-
-        button {
-            color: $fluidx-green-800;
-        }
-    }
-
-    .hue-alert--error {
-        color: $fluidx-orange-900;
-        background: $fluidx-red-050;
-        border: 1px solid $fluidx-red-500;
-        display: flex;
-        align-items: flex-start;
-
-        button {
-            color: $fluidx-red-800;
-            position: absolute;
-            top: 0.5rem;
-            right: 3%;
-        }
-    }
-
-    .hue-alert--message {
-        margin-right: 1rem;
-    }
+  .hue-alert--message {
+    margin-right: 1rem;
+  }
 }
