@@ -622,7 +622,7 @@ $(document).ready(function () {
   $(document).ajaxError(function (event, jqxhr, settings, exception) {
     if (jqxhr.status == 500) {
       window.clearInterval(_runningInterval);
-      $(document).trigger("error", "${_('There was a problem communicating with the server. Refresh the page.')}");
+      huePubSub.publish('hue.global.error', {message: "${_('There was a problem communicating with the server. Refresh the page.')}"});
     }
   });
 
@@ -762,7 +762,7 @@ $(document).ready(function () {
           _this.button("reset");
           $("#killModal").modal("hide");
           if (response.status != 0) {
-            $(document).trigger("error", "${ _('There was a problem killing this job.') }");
+            huePubSub.publish('hue.global.error', {message: "${ _('There was a problem killing this job.') }"});
           }
           else {
             callJobDetails({ url: _this.data("url")});
