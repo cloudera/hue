@@ -16,54 +16,50 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
-
 from nose.tools import assert_true, assert_false
-from desktop.lib.fs.ozone.upload import OFSFileUploadHandler
+from desktop.lib.fs.gc.upload import GSFileUploadHandler
 
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock
-else:
-  from mock import patch, Mock
+from unittest.mock import patch, Mock
 
 
-class TestOFSFileUploadHandler(object):
+class TestGSFileUploadHandler(object):
 
-  def test_is_ofs_upload(self):
-    with patch('desktop.lib.fs.ozone.upload.get_client') as get_client:
+  def test_is_gs_upload(self):
+    with patch('desktop.lib.fs.gc.upload.get_client') as get_client:
       get_client.return_value = Mock()
-
-      # Check for ofs path
-      request = Mock(GET={'dest': 'ofs://service-id/vol1/buck1/key'})
-      upload_handler = OFSFileUploadHandler(request)
-
-      assert_true(upload_handler._is_ofs_upload())
-
-      # Check for s3a path
-      request = Mock(GET={'dest': 's3a://buck1/key'})
-      upload_handler = OFSFileUploadHandler(request)
-
-      assert_false(upload_handler._is_ofs_upload())
 
       # Check for gs path
       request = Mock(GET={'dest': 'gs://buck1/key'})
-      upload_handler = OFSFileUploadHandler(request)
+      upload_handler = GSFileUploadHandler(request)
 
-      assert_false(upload_handler._is_ofs_upload())
+      assert_true(upload_handler._is_gs_upload())
+
+      # Check for ofs path
+      request = Mock(GET={'dest': 'ofs://service-id/vol1/buck1/key'})
+      upload_handler = GSFileUploadHandler(request)
+
+      assert_false(upload_handler._is_gs_upload())
+
+      # Check for s3a path
+      request = Mock(GET={'dest': 's3a://buck1/key'})
+      upload_handler = GSFileUploadHandler(request)
+
+      assert_false(upload_handler._is_gs_upload())
 
       # Check for abfs path
       request = Mock(GET={'dest': 'abfs://container1/key'})
-      upload_handler = OFSFileUploadHandler(request)
+      upload_handler = GSFileUploadHandler(request)
 
-      assert_false(upload_handler._is_ofs_upload())
+      assert_false(upload_handler._is_gs_upload())
 
       # Check for hdfs path
       request = Mock(GET={'dest': '/user/gethue'})
-      upload_handler = OFSFileUploadHandler(request)
+      upload_handler = GSFileUploadHandler(request)
 
-      assert_false(upload_handler._is_ofs_upload())
+      assert_false(upload_handler._is_gs_upload())
 
       request = Mock(GET={'dest': 'hdfs://user/gethue'})
-      upload_handler = OFSFileUploadHandler(request)
+      upload_handler = GSFileUploadHandler(request)
 
-      assert_false(upload_handler._is_ofs_upload())
+      assert_false(upload_handler._is_gs_upload())
+

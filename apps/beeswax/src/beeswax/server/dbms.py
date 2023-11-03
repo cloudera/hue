@@ -101,6 +101,11 @@ def get(user, query_server=None, cluster=None):
   if query_server is None:
     query_server = get_query_server_config(connector=cluster)
 
+  # if the auth_username is not set then we attempt to set using the current user
+  # this is likely to be the case when using connectors/computes
+  if not query_server.get('auth_username') and user and user.username:
+    query_server['auth_username'] = user.username
+
   DBMS_CACHE_LOCK.acquire()
   try:
     DBMS_CACHE.setdefault(user.id, {})
@@ -326,13 +331,16 @@ def get_query_server_config_via_connector(connector):
     impersonation_enabled = hiveserver2_impersonation_enabled()
 
   return {
+      'is_compute': True,
       'dialect': compute['dialect'],
       'server_name': compute_name,
       'server_host': server_host,
       'server_port': server_port,
+      # For connectors/computes, the auth details are not available
+      # from configs and needs patching before submitting requests
       'principal': 'TODO',
-      'auth_username': AUTH_USERNAME.get(),
-      'auth_password': AUTH_PASSWORD.get(),
+      'auth_username': compute['options'].get('auth_username'),
+      'auth_password': compute['options'].get('auth_password', 'hue'),
 
       'impersonation_enabled': impersonation_enabled,
       'use_sasl': str(compute['options'].get('use_sasl', True)).upper() == 'TRUE',
@@ -341,6 +349,10 @@ def get_query_server_config_via_connector(connector):
       'QUERY_TIMEOUT_S': 15 * 60,
       'transport_mode': compute['options'].get('transport_mode', 'http'),
       'http_url': compute['options'].get('http_url', 'http://%s:%s/cliservice' % (server_host, server_port)),
+
+      'close_sessions': str(compute['options'].get('close_sessions', True)).upper() == 'TRUE',
+      'has_session_pool': str(compute['options'].get('has_session_pool', True)).upper() == 'TRUE',
+      'max_number_of_sessions': compute['options'].get('has_session_pool', -1)
   }
 
 

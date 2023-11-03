@@ -5,7 +5,7 @@ exports[`HueIcon.vue should render 1`] = `
   class="hue-icon"
 >
   <use
-    xlink:href="#hi-some-icon"
+    href="#hi-some-icon"
   />
 </svg>
 `;

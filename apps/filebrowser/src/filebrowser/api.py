@@ -21,6 +21,7 @@ from desktop.lib.django_util import JsonResponse
 from desktop.lib import fsmanager
 from desktop.lib.i18n import smart_unicode
 from desktop.lib.fs.ozone.ofs import get_ofs_home_directory
+from desktop.lib.fs.gc.gs import get_gs_home_directory
 
 from azure.abfs.__init__ import get_home_dir_for_abfs
 from aws.s3.s3fs import get_s3_home_directory
@@ -66,6 +67,8 @@ def get_filesystems_with_home_dirs(request): # Using as a public API only for no
       user_home_dir = request.user.get_home_directory()
     elif fs == 's3a':
       user_home_dir = get_s3_home_directory(request.user)
+    elif fs == 'gs':
+      user_home_dir = get_gs_home_directory(request.user)
     elif fs == 'abfs':
       user_home_dir = get_home_dir_for_abfs(request.user)
     elif fs == 'ofs':

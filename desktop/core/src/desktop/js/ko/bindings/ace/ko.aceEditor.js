@@ -670,6 +670,16 @@ registerBinding(NAME, {
       dblClickS3ItemSub.remove();
     });
 
+    const dblClickGSItemSub = huePubSub.subscribe('assist.dblClickGSItem', assistGSEntry => {
+      if ($el.data('last-active-editor')) {
+        editor.session.insert(editor.getCursorPosition(), "'gs://" + assistGSEntry.path + "'");
+      }
+    });
+
+    disposeFunctions.push(() => {
+      dblClickGSItemSub.remove();
+    });
+
     const sampleErrorInsertSub = huePubSub.subscribe('sample.error.insert.click', popoverEntry => {
       const table = popoverEntry.identifierChain[popoverEntry.identifierChain.length - 1]['name'];
       const text = 'SELECT * FROM ' + table + ' LIMIT 100;';
