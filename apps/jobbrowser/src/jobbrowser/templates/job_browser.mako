@@ -4018,7 +4018,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           return '${ ENABLE_HISTORY_V2.get() }' == 'True';
         };
         var jobsInterfaceCondition = function () {
-          return self.appConfig() && self.appConfig()['browser'] && self.appConfig()['browser']['interpreter_names'].indexOf('yarn') != -1 && (!self.cluster() || self.cluster()['type'].indexOf('altus') == -1);
+          return !window.getLastKnownConfig().has_computes && self.appConfig() && self.appConfig()['browser'] && self.appConfig()['browser']['interpreter_names'].indexOf('yarn') != -1 && (!self.cluster() || self.cluster()['type'].indexOf('altus') == -1);
         };
         var dataEngInterfaceCondition = function () {
           return self.cluster() && self.cluster()['type'] == 'altus-de';
@@ -4045,10 +4045,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           return '${ is_mini }' == 'False' && self.appConfig() && self.appConfig()['editor'] && (self.appConfig()['editor']['interpreter_names'].indexOf('pyspark') != -1 || self.appConfig()['editor']['interpreter_names'].indexOf('sparksql') != -1);
         };
         var queryInterfaceCondition = function () {
-          return '${ ENABLE_QUERY_BROWSER.get() }' == 'True' && self.appConfig() && self.appConfig()['editor'] && self.appConfig()['editor']['interpreter_names'].indexOf('impala') != -1 && (!self.cluster() || self.cluster()['type'].indexOf('altus') == -1);
+          return !window.getLastKnownConfig().has_computes && '${ ENABLE_QUERY_BROWSER.get() }' == 'True' && self.appConfig() && self.appConfig()['editor'] && self.appConfig()['editor']['interpreter_names'].indexOf('impala') != -1 && (!self.cluster() || self.cluster()['type'].indexOf('altus') == -1);
         };
         var queryHiveInterfaceCondition = function () {
-          return '${ ENABLE_HIVE_QUERY_BROWSER.get() }' == 'True';
+          return !window.getLastKnownConfig().has_computes && '${ ENABLE_HIVE_QUERY_BROWSER.get() }' == 'True';
         };
         var scheduleHiveInterfaceCondition = function () {
           return '${ ENABLE_QUERY_SCHEDULING.get() }' == 'True';
