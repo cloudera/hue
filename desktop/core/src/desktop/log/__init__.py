@@ -61,7 +61,8 @@ def _read_log_conf(proc_name, log_dir):
     elif match.group(0) == '%PROC_NAME%':
       return proc_name
 
-  log_conf = get_desktop_root('conf', 'log.conf')
+  log_conf_file = os.getenv("DESKTOP_LOG_CONF_FILE", 'log.conf')
+  log_conf = get_desktop_root('conf', log_conf_file)
 
   if not os.path.isfile(log_conf):
     return None
@@ -174,38 +175,36 @@ def basic_logging(proc_name, log_dir=None):
   if env_debug:
     env_loglevel = 'DEBUG'
 
-  if env_loglevel:
-    try:
-      lvl = getattr(logging, env_loglevel.upper())
-    except AttributeError:
-      raise Exception("Invalid log level in DESKTOP_LOGLEVEL: %s" % (env_loglevel,))
+  # In Python 3, function setLevel will call clear cache in the root logger
+  if not env_loglevel:
+    env_loglevel = 'INFO'
 
-    # Set the StreamHandler to the level (create one if necessary)
-    handler = _find_console_stream_handler(root_logger)
-    if not handler:
-      handler = logging.StreamHandler()
-      handler.setFormatter(logging.Formatter(LOG_FORMAT, DATE_FORMAT))
-      root_logger.addHandler(handler)
-    if handler:
-      handler.setLevel(lvl)
+  try:
+    lvl = getattr(logging, env_loglevel.upper())
+  except AttributeError:
+    raise Exception("Invalid log level in DESKTOP_LOGLEVEL: %s" % (env_loglevel,))
 
-    # Set all loggers but error.log to the same logging level
-    for h in root_logger.__dict__['handlers']:
-      if isinstance(h, (FileHandler, RotatingFileHandler)):
-        if os.path.basename(h.baseFilename) != 'error.log':
-          h.setLevel(lvl)
+  # Set the StreamHandler to the level (create one if necessary)
+  handler = _find_console_stream_handler(root_logger)
+  if not handler:
+    handler = logging.StreamHandler()
+    handler.setFormatter(logging.Formatter(LOG_FORMAT, DATE_FORMAT))
+    root_logger.addHandler(handler)
+  if handler:
+    handler.setLevel(lvl)
 
-    # Set all loggers but error.log to the same logging level
-    for h in root_logger.__dict__['handlers']:
-      if isinstance(h, (SocketHandler)) and h.level != 40:
-        h.setLevel(lvl)
+  # Set all loggers but error.log to the same logging level
+  for h in root_logger.__dict__['handlers']:
+    if ((isinstance(h, (SocketHandler)) and h.level != 40) or
+        (isinstance(h, (FileHandler, RotatingFileHandler)) and os.path.basename(h.baseFilename) != 'error.log')):
+      h.setLevel(lvl)
 
-    from desktop.conf import DATABASE_LOGGING
-    if hasattr(DATABASE_LOGGING, 'get') and not DATABASE_LOGGING.get():
-      def disable_database_logging():
-        logger = logging.getLogger()
-        logger.manager.loggerDict['django.db.backends'].level = 20 # INFO level
-      disable_database_logging()
+  from desktop.conf import DATABASE_LOGGING
+  if hasattr(DATABASE_LOGGING, 'get') and not DATABASE_LOGGING.get():
+    def disable_database_logging():
+      logger = logging.getLogger()
+      logger.manager.loggerDict['django.db.backends'].level = 20 # INFO level
+    disable_database_logging()
 
 def fancy_logging():
   """Configure logging into a buffer for /logs endpoint."""
