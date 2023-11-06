@@ -133,22 +133,24 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
     const executor = activeExecutable?.executor;
     const databaseName = getDbName(activeExecutable);
     const dialect = sqlDialect;
-    const { explain, summary, error } = await generateExplanation({
-      statement,
-      dialect,
-      executor,
-      databaseName,
-      onStatusChange: handleStatusUpdate
-    });
-    if (error) {
-      handleApiError(error.message);
-    } else {
+    try {
+      const { explain, summary } = await generateExplanation({
+        statement,
+        dialect,
+        executor,
+        databaseName,
+        onStatusChange: handleStatusUpdate
+      });
+
       setSuggestion(statement);
       setExplanation(breakLines(explain));
       setSummary(breakLines(summary));
       setShowSuggestedSqlModal(true);
+    } catch (error) {
+      handleApiError(error.message);
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   const generateSqlQuery = async (nql: string, activeExecutable: SqlExecutable) => {
@@ -158,27 +160,32 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
     const executor = activeExecutable?.executor;
     const databaseName = getDbName(activeExecutable);
     const dialect = sqlDialect;
-    const { sql, assumptions, error, guardrailAlert } = await withGuardrails(generateSQLfromNQL)({
-      nql,
-      databaseName,
-      executor,
-      dialect,
-      onStatusChange: handleStatusUpdate
-    });
-    if (error) {
+    let sql, assumptions, guardrailAlert;
+    try {
+      ({ sql, assumptions, guardrailAlert } = await withGuardrails(generateSQLfromNQL)({
+        nql,
+        databaseName,
+        executor,
+        dialect,
+        onStatusChange: handleStatusUpdate
+      }));
+
+      if (
+        guardrailAlert?.type !== GuardrailAlertType.SEMANTIC_ERROR &&
+        guardrailAlert?.type !== GuardrailAlertType.INVALID_AI_RESPONSE
+      ) {
+        setNql(nql);
+        setSuggestion(sql);
+        setAssumptions(assumptions);
+        setShowSuggestedSqlModal(true);
+        setInputValue('');
+      }
+    } catch (error) {
       handleApiError(error.message);
-    } else if (
-      guardrailAlert?.type !== GuardrailAlertType.SEMANTIC_ERROR &&
-      guardrailAlert?.type !== GuardrailAlertType.INVALID_AI_RESPONSE
-    ) {
-      setNql(nql);
-      setSuggestion(sql);
-      setAssumptions(assumptions);
-      setShowSuggestedSqlModal(true);
-      setInputValue('');
+    } finally {
+      setGuardrailAlert(guardrailAlert);
+      setIsLoading(false);
     }
-    setGuardrailAlert(guardrailAlert);
-    setIsLoading(false);
   };
 
   const editSqlQuery = async (
@@ -191,30 +198,32 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
     const executor = activeExecutable?.executor;
     const databaseName = getDbName(activeExecutable);
     const dialect = sqlDialect;
-    const { sql, assumptions, error, guardrailAlert } = await withGuardrails(
-      generateEditedSQLfromNQL
-    )({
-      nql,
-      sql: sqlToModify,
-      databaseName,
-      executor,
-      dialect,
-      onStatusChange: handleStatusUpdate
-    });
-    if (error) {
+    let sql, assumptions, guardrailAlert;
+    try {
+      ({ sql, assumptions, guardrailAlert } = await withGuardrails(generateEditedSQLfromNQL)({
+        nql,
+        sql: sqlToModify,
+        databaseName,
+        executor,
+        dialect,
+        onStatusChange: handleStatusUpdate
+      }));
+      if (
+        guardrailAlert?.type !== GuardrailAlertType.SEMANTIC_ERROR &&
+        guardrailAlert?.type !== GuardrailAlertType.INVALID_AI_RESPONSE
+      ) {
+        setNql(nql);
+        setSuggestion(sql);
+        setAssumptions(assumptions);
+        setShowSuggestedSqlModal(true);
+      }
+    } catch (error) {
       handleApiError(error.message);
-    } else if (
-      guardrailAlert?.type !== GuardrailAlertType.SEMANTIC_ERROR &&
-      guardrailAlert?.type !== GuardrailAlertType.INVALID_AI_RESPONSE
-    ) {
-      setNql(nql);
-      setSuggestion(sql);
-      setAssumptions(assumptions);
-      setShowSuggestedSqlModal(true);
+    } finally {
+      setGuardrailAlert(guardrailAlert);
+      setIsLoading(false);
+      setInputValue('');
     }
-    setGuardrailAlert(guardrailAlert);
-    setIsLoading(false);
-    setInputValue('');
   };
 
   const loadOptimization = async (statement: string) => {
@@ -224,26 +233,30 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
     const executor = activeExecutable?.executor;
     const databaseName = getDbName(activeExecutable);
     const dialect = sqlDialect;
-    const { sql, explain, error, guardrailAlert } = await withGuardrails(generateOptimizedSql)({
-      statement,
-      databaseName,
-      executor,
-      dialect,
-      onStatusChange: handleStatusUpdate
-    });
+    let sql, explain, guardrailAlert;
+    try {
+      ({ sql, explain, guardrailAlert } = await withGuardrails(generateOptimizedSql)({
+        statement,
+        databaseName,
+        executor,
+        dialect,
+        onStatusChange: handleStatusUpdate
+      }));
 
-    if (error) {
+      if (
+        guardrailAlert?.type !== GuardrailAlertType.SQL_ERROR &&
+        guardrailAlert?.type !== GuardrailAlertType.INVALID_AI_RESPONSE
+      ) {
+        setSuggestion(sql);
+        setSuggestionExplanation(explain);
+        setShowSuggestedSqlModal(true);
+      }
+    } catch (error) {
       handleApiError(error.message);
-    } else if (
-      guardrailAlert?.type !== GuardrailAlertType.SQL_ERROR &&
-      guardrailAlert?.type !== GuardrailAlertType.INVALID_AI_RESPONSE
-    ) {
-      setSuggestion(sql);
-      setSuggestionExplanation(explain);
-      setShowSuggestedSqlModal(true);
+    } finally {
+      setGuardrailAlert(guardrailAlert);
+      setIsLoading(false);
     }
-    setGuardrailAlert(guardrailAlert);
-    setIsLoading(false);
   };
 
   const loadFixSuggestion = async (statement: string) => {
@@ -252,25 +265,29 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
     const dialect = sqlDialect;
     const executor = activeExecutable?.executor;
     const databaseName = getDbName(activeExecutable);
-    const { sql, explain, error, guardrailAlert } = await withGuardrails(generateCorrectedSql)({
-      statement,
-      databaseName,
-      executor,
-      dialect,
-      onStatusChange: handleStatusUpdate
-    });
-    if (error) {
+    let sql, explain, guardrailAlert;
+    try {
+      ({ sql, explain, guardrailAlert } = await withGuardrails(generateCorrectedSql)({
+        statement,
+        databaseName,
+        executor,
+        dialect,
+        onStatusChange: handleStatusUpdate
+      }));
+      if (
+        guardrailAlert?.type !== GuardrailAlertType.SQL_ERROR &&
+        guardrailAlert?.type !== GuardrailAlertType.INVALID_AI_RESPONSE
+      ) {
+        setSuggestion(sql);
+        setSuggestionExplanation(explain);
+        setShowSuggestedSqlModal(true);
+      }
+    } catch (error) {
       handleApiError(error.message);
-    } else if (
-      guardrailAlert?.type !== GuardrailAlertType.SQL_ERROR &&
-      guardrailAlert?.type !== GuardrailAlertType.INVALID_AI_RESPONSE
-    ) {
-      setSuggestion(sql);
-      setSuggestionExplanation(explain);
-      setShowSuggestedSqlModal(true);
+    } finally {
+      setGuardrailAlert(guardrailAlert);
+      setIsLoading(false);
     }
-    setGuardrailAlert(guardrailAlert);
-    setIsLoading(false);
   };
 
   const acceptSuggestion = (statement: string) => {
