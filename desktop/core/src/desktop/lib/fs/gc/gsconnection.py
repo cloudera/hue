@@ -41,8 +41,8 @@ class SignedUrlGSConnection(GSConnection):
   https://github.com/boto/boto/blob/develop/boto/s3/connection.py
   https://github.com/boto/boto/blob/develop/boto/connection.py
 
-  Example of a presigned GS Url declaring a `list all buckets` call:
-  https://s3-us-west-1.amazonaws.com/?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA23E77ZX2HVY76YGL%2F20210505%2Fus-west-1%2Fs3%2Faws4_request&X-Amz-Date=20210505T171457Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=994d0ec2ca19a00aa2925fe62cab0e727591b1951a8a47504b2b9124facbd6cf
+  Example of a presigned GS Url declaring a `list bucket` call:
+  https://hue-gs-bucket.storage.googleapis.com/?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA23E77ZX2HVY76YGL%2F20210505%2Fus-west-1%2Fs3%2Faws4_request&X-Amz-Date=20210505T171457Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=994d0ec2ca19a00aa2925fe62cab0e727591b1951a8a47504b2b9124facbd6cf
   """
   def __init__(self, username, gs_access_key_id=None, gs_secret_access_key=None,
                 is_secure=True, port=None, proxy=None, proxy_port=None,
@@ -138,7 +138,7 @@ class RazGSConnection(SignedUrlGSConnection):
     if raz_headers is not None:
       http_request.headers.update(raz_headers)
     else:
-      LOG.error('We got back empty header from Raz for the request %s' % http_request)
+      raise Exception('Aborting operation: We got back empty header from Raz for the request %s' % http_request)
 
     LOG.debug('Overriden: %s' % http_request)
 
