@@ -27,7 +27,7 @@ from boto.gs.key import Key
 from boto.s3.prefix import Prefix
 from django.utils.translation import gettext as _
 
-from desktop.conf import PERMISSION_ACTION_GS, GS_BULK_DELETE_DIR_KEYS_MAX_LIMIT, is_raz_gs
+from desktop.conf import PERMISSION_ACTION_GS, is_raz_gs
 from desktop.lib.fs.gc import GS_ROOT, abspath, parse_uri, translate_gs_error, normpath, join as gs_join
 from desktop.lib.fs.gc.gsstat import GSStat
 from desktop.lib.fs.gc.gsfile import open as gsfile_open
@@ -310,15 +310,8 @@ class GSFileSystem(S3FileSystem):
         else:
           # key.bucket.delete_keys() call is not supported from GS side
           # So, try deleting the all keys with directory prefix one by one
-
-          # TODO: Check on the UI side if key count is greater than max limit and show nice notification.
-          deleted_dir_key_count = 0
           for key in list(dir_keys):
-            if deleted_dir_key_count > GS_BULK_DELETE_DIR_KEYS_MAX_LIMIT.get():
-              break
-
             deleted_key = key.delete()
-            deleted_dir_key_count += 1
 
   @translate_gs_error
   @auth_error_handler
