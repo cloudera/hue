@@ -55,7 +55,7 @@ class RazClient(object):
         'service_name': 'adls',
         'serviceType': 'adls'
       }
-    else:
+    elif self.service in ('s3', 'gs'):
       self.service_params = {
         'endpoint_prefix': 's3',
         'service_name': 's3',
@@ -97,7 +97,7 @@ class RazClient(object):
 
     if self.service == 'adls':
       self._make_adls_request(request_data, method, path, url_params, resource_path)
-    elif self.service == 's3':
+    elif self.service in ('s3', 'gs'):
       self._make_s3_request(request_data, request_headers, method, params, headers, url_params, endpoint, resource_path, data=data)
 
     LOG.debug('Raz url: %s' % raz_url)
@@ -127,7 +127,8 @@ class RazClient(object):
         if self.service == 'adls':
           LOG.debug("Received SAS %s" % signed_response_data["ADLS_DSAS"])
           return {'token': signed_response_data["ADLS_DSAS"]}
-        else:
+
+        elif self.service in ('s3', 'gs'):
           signed_response_result = signed_response_data["S3_SIGN_RESPONSE"]
 
           if signed_response_result is not None:
