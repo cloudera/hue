@@ -775,7 +775,7 @@ else:
           });
         },
         error: function (xhr, textStatus, errorThrown) {
-          $(document).trigger("error", xhr.responseText);
+          huePubSub.publish('hue.global.error', {message: xhr.responseText});
           resetPrimaryButtonsStatus();
         }
       });
@@ -1210,11 +1210,11 @@ else:
             self.contentSummary(ko.mapping.fromJS(data.summary));
             self.isLoadingSummary(false);
           } else {
-            $(document).trigger("error", data.message);
+            huePubSub.publish('hue.global.error', {message: data.message});
             $("#contentSummaryModal").modal("hide");
           }
         }).fail(function (xhr, textStatus, errorThrown) {
-          $(document).trigger("error", xhr.responseText);
+          huePubSub.publish('hue.global.error', {message: xhr.responseText});
           $("#contentSummaryModal").modal("hide");
         });
       }
@@ -1228,7 +1228,7 @@ else:
         const encodedSearchFilter = encodeURIComponent(self.searchQuery());
         $.getJSON(self.targetPath() + (self.targetPath().indexOf('?') > 0 ? '&' : '?') + "pagesize=" + self.recordsPerPage() + "&pagenum=" + self.targetPageNum() + "&filter=" + encodedSearchFilter + "&sortby=" + self.sortBy() + "&descending=" + self.sortDescending() + "&format=json", function (data) {
           if (data.error){
-            $(document).trigger("error", data.error);
+            huePubSub.publish('hue.global.error', {message: data.error});
             self.isLoading(false);
             return false;
           }
@@ -1651,7 +1651,7 @@ else:
               self.retrieveData(true);
             },
             error: function (xhr, textStatus, errorThrown) {
-              $(document).trigger("error", xhr.responseText);
+              huePubSub.publish('hue.global.error', {message: xhr.responseText});
               resetPrimaryButtonsStatus();
             }
           });
@@ -1689,7 +1689,7 @@ else:
               self.retrieveData(true);
             },
             error: function (xhr, textStatus, errorThrown) {
-              $(document).trigger("error", xhr.responseText);
+              huePubSub.publish('hue.global.error', {message: xhr.responseText});
               resetPrimaryButtonsStatus();
             }
           });
@@ -1751,7 +1751,7 @@ else:
             }, 1000);
           },
           error: function(xhr, textStatus, errorThrown) {
-            $(document).trigger("error", xhr.responseText);
+            huePubSub.publish('hue.global.error', {message: xhr.responseText});
             resetPrimaryButtonsStatus();
           }
         });
@@ -1841,10 +1841,10 @@ else:
             $.jHueNotify.info("${ _('Task ') }" + data.history_uuid + "${_(' submitted.') }");
             huePubSub.publish('notebook.task.submitted', data);
           } else {
-            $(document).trigger("error", data.message);
+            huePubSub.publish('hue.global.error', {message: data.message});
           }
         }).fail(function (xhr, textStatus, errorThrown) {
-          $(document).trigger("error", xhr.responseText);
+          huePubSub.publish('hue.global.error', {message: xhr.responseText});
         });
       };
 
@@ -1877,10 +1877,10 @@ else:
             $.jHueNotify.info("${ _('Task ') }" + data.history_uuid + "${_(' submitted.') }");
             huePubSub.publish('notebook.task.submitted', data);
           } else {
-            $(document).trigger("error", data.message);
+            huePubSub.publish('hue.global.error', {message: data.message});
           }
         }).fail(function (xhr, textStatus, errorThrown) {
-          $(document).trigger("error", xhr.responseText);
+          huePubSub.publish('hue.global.error', {message: xhr.responseText});
         });
       };
 
@@ -1928,7 +1928,7 @@ else:
             self.retrieveData(true);
           },
           error: function (xhr, textStatus, errorThrown) {
-            $(document).trigger("error", xhr.responseText);
+            huePubSub.publish('hue.global.error', {message: xhr.responseText});
             resetPrimaryButtonsStatus();
           }
         });
@@ -1959,7 +1959,7 @@ else:
             self.retrieveData(true);
           },
           error: function (xhr, textStatus, errorThrown) {
-            $(document).trigger("error", xhr.responseText);
+            huePubSub.publish('hue.global.error', {message: xhr.responseText});
             resetPrimaryButtonsStatus();
           }
         });
@@ -1989,7 +1989,7 @@ else:
             self.retrieveData(true);
           },
           error: function(xhr, textStatus, errorThrown) {
-            $(document).trigger("error", xhr.responseText);
+            huePubSub.publish('hue.global.error', {message: xhr.responseText});
             resetPrimaryButtonsStatus();
           }
         });
@@ -2057,7 +2057,7 @@ else:
           onComplete: function (id, fileName, response) {
             self.pendingUploads(self.pendingUploads() - 1);
             if (response.status != 0) {
-              $(document).trigger('error', "${ _('Error: ') }" + response.data);
+              huePubSub.publish('hue.global.error', {message: "${ _('Error: ') }" + response.data});
             }
             else {
               $(document).trigger('info', response.path + "${ _(' uploaded successfully.') }");
@@ -2270,7 +2270,7 @@ else:
                 var response = JSON.parse(data.xhr.response);
                 if (response && response.status != null) {
                   if (response.status != 0) {
-                    $(document).trigger('error', response.data);
+                    huePubSub.publish('hue.global.error', {message: response.data});
                   } else {
                     $(document).trigger('info', response.path + ' ' + I18n('uploaded successfully'));
                     fileBrowserViewModel.filesToHighlight.push(response.path);
@@ -2592,10 +2592,10 @@ else:
         error:function (x, e) {
           if (x.status == 500 && x.responseText.indexOf("jobbrowser") == -1) {
             if (x.responseJSON && x.responseJSON.detail) {
-              $(document).trigger("error", x.responseJSON.detail);
+              huePubSub.publish('hue.global.error', {message: x.responseJSON.detail});
             }
             else {
-              $(document).trigger("error", "${_('There was a problem with your request.')}");
+              huePubSub.publish('hue.global.error', {message: "${_('There was a problem with your request.')}"});
             }
             $("#hueBreadcrumbText").blur();
           }

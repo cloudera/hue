@@ -2050,7 +2050,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
             self.rdbmsDbIsValid(true);
             self.rdbmsDatabaseNames(resp.data);
           } else if (resp.status === 1) {
-            $(document).trigger("error", "${ _('Connection Failed: ') }" + resp.message);
+            huePubSub.publish('hue.global.error', {message: "${ _('Connection Failed: ') }" + resp.message});
             self.rdbmsDbIsValid(false);
           }
         }).always(function(){
@@ -2120,7 +2120,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
             if (resp.status === 0 && resp.hosts) {
               self.channelSourceHosts(resp.hosts);
             } else {
-              $(document).trigger("error", "${ _('Error getting hosts') }" + resp.message);
+              huePubSub.publish('hue.global.error', {message: "${ _('Error getting hosts') }" + resp.message});
             }
           });
         }
@@ -2214,7 +2214,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
           if (resp.status === 0 && resp.data) {
             huePubSub.publish('notebook.task.submitted', resp);
           } else if (resp.status === 1) {
-            $(document).trigger("error", "${ _('Connection Failed: ') }" + resp.message);
+            huePubSub.publish('hue.global.error', {message: "${ _('Connection Failed: ') }" + resp.message});
             self.rdbmsDbIsValid(false);
           }
         });
@@ -2346,7 +2346,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
                 return {'name': config, 'value': config};
               }));
             } else {
-              $(document).trigger("error", data.message);
+              huePubSub.publish('hue.global.error', {message: data.message});
             }
           });
         }
@@ -2907,7 +2907,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
           "fileFormat": ko.mapping.toJSON(self.source)
         }, function (resp) {
           if (resp.status !== 0) {
-            $(document).trigger("error", resp.message);
+            huePubSub.publish('hue.global.error', {message: resp.message});
           } else {
             var newFormat = ko.mapping.fromJS(new FileType(resp['type'], resp));
             self.source.format(newFormat);
@@ -2931,7 +2931,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
           self.isGuessingFormat(false);
           viewModel.wizardEnabled(true);
         }).fail(function (xhr) {
-          $(document).trigger("error", xhr.responseText);
+          huePubSub.publish('hue.global.error', {message: xhr.responseText});
           viewModel.isLoading(false);
           self.isGuessingFormat(false);
         });
@@ -2952,7 +2952,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
           guessFieldTypesXhr = null;
         }).fail(function (xhr) {
           self.loadSampleData({sample_cols: [], columns: [], sample: []});
-          $(document).trigger("error", xhr.responseText);
+          huePubSub.publish('hue.global.error', {message: xhr.responseText});
           self.isGuessingFieldTypes(false);
           viewModel.isLoading(false);
           guessFieldTypesXhr = null;
@@ -3011,7 +3011,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
           "destination": ko.mapping.toJSON(self.destination)
         }, function (resp) {
           if (resp.status !== 0) {
-            $(document).trigger("error", resp.message);
+            huePubSub.publish('hue.global.error', {message: resp.message});
             self.indexingStarted(false);
             self.isIndexing(false);
           } else if (resp.on_success_url) {
@@ -3100,7 +3100,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
           }
           viewModel.isLoading(false);
         }).fail(function (xhr, textStatus, errorThrown) {
-          $(document).trigger("error", xhr.responseText);
+          huePubSub.publish('hue.global.error', {message: xhr.responseText});
           viewModel.isLoading(false);
           self.indexingStarted(false);
           self.isIndexing(false);
@@ -3131,11 +3131,11 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
               $('#showCommandsModal').modal('show');
             }
           } else {
-            $(document).trigger("error", resp && resp.message ? resp.message : '${ _("Error importing") }');
+            huePubSub.publish('hue.global.error', {message: resp && resp.message ? resp.message : '${ _("Error importing") }'});
           }
         }).fail(function (xhr) {
           self.indexingStarted(false);
-          $(document).trigger("error", xhr.responseText);
+          huePubSub.publish('hue.global.error', {message: xhr.responseText});
         });
 % endif
 

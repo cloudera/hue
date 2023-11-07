@@ -351,7 +351,7 @@ def get_query_server_config_via_connector(connector):
       'http_url': compute['options'].get('http_url', 'http://%s:%s/cliservice' % (server_host, server_port)),
 
       'close_sessions': str(compute['options'].get('close_sessions', True)).upper() == 'TRUE',
-      'has_session_pool': str(compute['options'].get('has_session_pool', True)).upper() == 'TRUE',
+      'has_session_pool': str(compute['options'].get('has_session_pool', False)).upper() == 'TRUE',
       'max_number_of_sessions': compute['options'].get('has_session_pool', -1)
   }
 
