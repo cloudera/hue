@@ -22,47 +22,30 @@ from desktop.lib.ai.lib.base_model import BaseModel
 from desktop.lib.ai.utils.xml import extract_tag_content
 from desktop.lib.ai.types import SQLResponse
 
-_GENERATE = """
-YOUR MAIN GOAL:
-Act as an {dialect} SQL expert and Translate the NQL statement into SQL. Return the SQL wrapped in a <code> tag.
-Use lower() and LIKE '%%' unless you are sure about how to match the data.
-
-YOUR ADDITIONAL GOALS:
-List any assumptions not covered by the supplied metadata wrapped in an <assumptions> tag.
-Always inlcude a warning in a <warning> tag if the generated SQL modifies or deletes data or risk being very resource-intensive. The warning should inform why the SQL could be dangeroues to execute.
-Return an error message wrapped in a <semanticerror> tag if the NQL can't be interpreted.
+_GENERATE = """Act as an {dialect} SQL expert.
+Translate the NQL statement into SQL using the following metadata: {metadata}.
+List any assumptions not covered by the supplied metadata. {dialect_prompt}
 
 NQL: {input}
 
-METADATA: {metadata}
-"""
+Wrap the SQL in a <code> tag and the assumptions in a <assumptions> tag with a closing </assumptions>"""
 
-# NOTE: Can't get the approach of using a semanticerror tag to work with this template. Likely too much noice.
-# If the EDIT_INSTRUCTION is non-sensical then the LLM will often return the SQL as is which is then handled as a non diff in the UI.
-_EDIT= """
-YOUR MAIN GOAL:
-Act as an {dialect} SQL expert and modify the SQL based on the INPUT. Return the SQL wrapped in a <code> tag.
-Use lower() and LIKE '%%' unless you are sure about how to match the data.
+_EDIT = """Act as an {dialect} SQL expert.
+Based on the input modify the SQL using the following metadata: {metadata}.
+List any assumptions not covered by the supplied metadata. {dialect_prompt}
 
-YOUR ADDITIONAL GOALS:
-List any assumptions not covered by the supplied metadata wrapped in an <assumptions> tag.
-Always include a warning in a <warning> tag if the generated SQL modifies or deletes data or risk being very resource-intensive. The warning should inform why the SQL could be dangeroues to execute.
+SQL query: {sql}
+Input: {input}
 
-SQL: {sql}
+Wrap the SQL in a <code> tag and the assumptions in a <assumptions> tag with a closing </assumptions>"""
 
-INPUT: {input}
+_SUMMARIZE = """Act as an {dialect} SQL expert.
+Use the following metadata: {metadata}.
 
-METADATA: {metadata}
-"""
+SQL query: {sql}
 
-_SUMMARIZE = """
-SQL: {sql}
-
-METADATA: {metadata}
-
-Act as an {dialect} SQL expert. Explain in detail what the provided SQL query does and wrap the explation in an <explain> tag with closing </explain>.
+Explain in detail what the provided SQL query does and wrap the explation in an <explain> tag with closing </explain>.
 Provide a short summary in natural language of the expected result. Wrap the summary in a <summary> tag tag with closing </summary>.
-
 """
 
 _OPTIMIZE = """Act as an {dialect} SQL expert.
@@ -72,30 +55,23 @@ Use the following metadata: {metadata}.
 SQL: {sql}
 
 Always explain the optimization or suggest alternative options if any. The explanation should be wrapped in an <explain> tag but should not contain SQL.
-If the SQL can't be interpreted then there is a sqlerror and you should explain the reason for it.
-If the SQL can't be optimized then shortly explain alternative options if any.
-If the SQL can be optimized is should be placed in the code tag.
+If the SQL can be optimized it should be placed in the code tag.
 
 Return the result in the following format:
 <code></code>
-<sqlerror></sqlerror>
 <explain></explain>
 """
 
 _FIX = """Act as an {dialect} SQL expert.
 Try to fix this syntactically broken sql query using the following metadata: {metadata}.
 
-SQL: {sql}
+SQL query: {sql}
 
 Do not optimize and only make the minimal modifcation needed to create a valid query.
-
-If the provided SQL is nonsensical then return an appropriate message in a <sqlerror> tag.
-If you you can identify and fix the problematic syntax then wrap the corrected code in a <code> tag and add a
-short explaination in an <explain> tag with a closing </explain>.
+Wrap the corrected SQL in a <code> tag and the explaination in an <explain> tag with a closing </explain>.
 
 Return the result in the following format:
 <code></code>
-<sqlerror></sqlerror>
 <explain></explain>
 """
 
