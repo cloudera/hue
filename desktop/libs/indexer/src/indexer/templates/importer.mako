@@ -1172,7 +1172,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
 <script type="text/html" id="table-field-template">
   <div>
     <label data-bind="visible: level() == 0 || ($parent.type() != 'array' && $parent.type() != 'map')">${ _('Name') }&nbsp;
-      <input data-hue-analytics="importer:field-name-click" type="text" class="input-large" placeholder="${ _('Field name') }" required data-bind="textInput: name, attr: { pattern: $root.createWizard.source.columnNamePattern, title: $root.createWizard.source.columnNameAllowedCharacters() }">
+      <input data-hue-analytics="importer:field-name-click" type="text" class="input-large" placeholder="${ _('Field name') }" required data-bind="textInput: name" pattern="^[a-zA-Z0-9_]+$" title="${ _('Only alphanumeric and underscore characters') }">
     </label>
 
     <label class="margin-left-5">${ _('Type') }&nbsp;
@@ -1541,14 +1541,6 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
       return "new_field_" + fieldNum
     };
 
-    var getColumnNameValidationRegex = function (sourceType) {
-        if (sourceType === 'hive') {
-          return "^[a-zA-Z0-9_ ]+$";
-        } else {
-          return "^[a-zA-Z0-9_]+$";
-        }
-    };
-
     var createDefaultField = function () {
       var defaultField = ko.mapping.fromJS(${default_field_type | n});
 
@@ -1860,8 +1852,6 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
         }
         return self.inputFormatsAll();
       });
-      self.columnNamePattern = getColumnNameValidationRegex(vm.sourceType);
-      self.columnNameAllowedCharacters = ko.observable(vm.sourceType === 'hive' ? _('Only alphanumeric, underscore and space characters') : _('Only alphanumeric and underscore characters') );
 
       self.interpreters = ko.pureComputed(function() {
         return window.getLastKnownConfig().app_config.editor.interpreters.filter(function (interpreter) { return interpreter.is_sql && interpreter.dialect != 'phoenix' });
@@ -2852,7 +2842,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
       self.readyToIndex = ko.pureComputed(function () {
         var validFields = self.destination.columns().length || self.destination.outputFormat() === 'database';
         var isValidColumnNames = self.destination.columns().every(function (column) {
-          return RegExp(getColumnNameValidationRegex(vm.sourceType)).test(column.name());
+          return /^[a-zA-Z0-9_]+$/.test(column.name());
         });
   
         var validTableColumns = self.destination.outputFormat() !== 'table' || ($.grep(self.destination.columns(), function(column) {
