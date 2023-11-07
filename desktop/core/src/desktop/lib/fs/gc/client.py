@@ -32,6 +32,7 @@ from desktop import conf
 from desktop.lib.idbroker import conf as conf_idbroker
 from desktop.lib.idbroker.client import IDBroker
 from desktop.lib.fs.gc.gs import GSFileSystem
+from desktop.lib.fs.gc.gsconnection import RazGSConnection
 
 
 def get_credential_provider(config, user):
@@ -40,13 +41,19 @@ def get_credential_provider(config, user):
 
 
 def _make_client(identifier, user):
-  config = conf.GC_ACCOUNTS[identifier] if identifier in list(conf.GC_ACCOUNTS.keys()) else None
-  client = Client.from_config(config, get_credential_provider(config, user))
+  if conf.is_raz_gs():
+    gs_client_connection = RazGSConnection(username=user)  # Note: Remaining GS configuration is fully skipped
+    gs_client_expiration = None
+  else:
+    config = conf.GC_ACCOUNTS[identifier] if identifier in list(conf.GC_ACCOUNTS.keys()) else None
+    gs_client_builder = Client.from_config(config, get_credential_provider(config, user))
+
+    gs_client_connection = gs_client_builder.get_gs_connection()
+    gs_client_expiration = gs_client_builder.expiration
 
   return GSFileSystem(
-    client.get_s3_connection(),
-    client.expiration,
-    headers={"x-goog-project-id": client.project},
+    gs_client_connection,
+    gs_client_expiration,
   )  # It would be nice if the connection was lazy loaded
 
 
@@ -62,7 +69,7 @@ class Client(object):
     credentials = credential_provider.get_credentials()
     return Client(json_credentials=credentials.get('JsonCredentials'), expiration=credentials.get('Expiration'))
 
-  def get_s3_connection(self):
+  def get_gs_connection(self):
     return HueGSConnection(provider=HueProvider('google', json_credentials=self.json_credentials))
 
 
