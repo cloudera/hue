@@ -660,12 +660,12 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
             <span data-bind="visible: showProperties">
               <div class="control-group">
                 <label class="checkbox inline-block" data-bind="visible: tableFormat() != 'kudu'">
-                  <input data-hue-analytics="importer:store-in-default-localtion-checkbox-interaction" type="checkbox" data-bind="checked: useDefaultLocation, disable: isIceberg"> ${_('Store in Default location')}
+                  <input data-hue-analytics="importer:store-in-default-localtion-checkbox-interaction" type="checkbox" data-bind="checked: useDefaultLocation, disable: isIceberg() || useCopy()"> ${_('Store in Default location')}
                 </label>
               </div>
               <div class="control-group" data-bind="visible: isTransactionalVisible">
                 <label class="checkbox inline-block">
-                  <input type="checkbox" data-hue-analytics="importer:is-transactional-checkbox-interaction" data-bind="checked: isTransactional, disable: isIceberg"> ${_('Transactional table')}
+                  <input type="checkbox" data-hue-analytics="importer:is-transactional-checkbox-interaction" data-bind="checked: isTransactional, disable: isIceberg() || useCopy()"> ${_('Transactional table')}
                 </label>
                 <label class="checkbox inline-block" title="${_('Full transactional support available in Hive with ORC')}">
                   <input type="checkbox" data-bind="checked: isInsertOnly, enable: isTransactionalUpdateEnabled"> ${_('Insert only')}
@@ -688,6 +688,15 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
                 <label class="checkbox inline-block">
                   <input data-hue-analytics="importer:is-iceberg-checkbox-interaction" type="checkbox" data-bind="checked: isIceberg"> ${_('Iceberg table')}
                 </label>
+              </div>
+
+              <div class="control-group" data-bind="visible: !useDefaultLocation() && !isTransactional() && $root.createWizard.source.inputFormat() === 'file'">
+                <label class="checkbox inline-block">
+                  <input data-hue-analytics="importer:useCopy-checkbox-interaction" type="checkbox" data-bind="checked: useCopy"> ${_('Copy file')}
+                </label>
+                <a href="javascript:void(0)" style="display: inline" data-trigger="hover" data-toggle="popover" data-placement="right" rel="popover" title="${ _('Choosing this option will copy the file instead of moving it to the new location, and ensuring the original file remains unchanged.') }">
+                  <i class="fa fa-info-circle"></i>
+                </a>
               </div>
 
               <div class="control-group">
@@ -2671,6 +2680,8 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
         }
         window.hueAnalytics.log('importer', 'is-iceberg/' + val);
       });
+
+      self.useCopy = ko.observable(false);
 
       self.hasHeader = ko.observable(false);
 
