@@ -918,8 +918,6 @@
 
   # Settings for the Google Cloud lib
   # ------------------------------------------------------------------------
-  # Maximum number of keys with specific directory prefix that can be deleted in a single bulk operation in GS.
-  ## gs_bulk_delete_dir_keys_max_limit=100
 
   [[gc_accounts]]
     [[[default]]]
@@ -965,6 +963,9 @@
 
   ## Autocreate the user home directory in the remote home storage path.
   # autocreate_user_dir=true
+
+  ## Enable integration with Google Storage for RAZ
+  # is_raz_gs_enabled=false
 
 ###########################################################################
 # Settings to configure the snippets available in the Notebook
