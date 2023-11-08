@@ -24,11 +24,19 @@ from desktop.lib.ai.models.titan import TitanModel
 from desktop.lib.ai.models.claude import ClaudeModel
 
 from desktop.conf import AI_INTERFACE
+from aws.conf import AWS_ACCOUNTS, get_access_key_id, get_secret_access_key
+
+ACCOUNT_NAME = 'bedrock'
 
 class BedrockService(BaseService):
   def __init__(self, model_name: str):
     import boto3
-    self.bedrock = boto3.client('bedrock')
+    self.bedrock = boto3.client(
+      'bedrock-runtime',
+      aws_access_key_id = get_access_key_id(ACCOUNT_NAME),
+      aws_secret_access_key = get_secret_access_key(ACCOUNT_NAME),
+      region_name = AWS_ACCOUNTS[ACCOUNT_NAME].REGION.get()
+    )
 
     super().__init__(self.get_model(model_name))
 
