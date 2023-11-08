@@ -36,21 +36,21 @@ const AlertComponent: React.FC = () => {
     };
   }, []);
 
-  const handleClose = (errorObj: ErrorAlert) => {
-    const filteredErrors = errors.filter(errorObj => errorObj !== errorObj);
+  const handleClose = (errorObjToClose: ErrorAlert) => {
+    const filteredErrors = errors.filter(errorObj => errorObj !== errorObjToClose);
     setErrors(filteredErrors);
   };
 
   //TODO: add support for warnings and success messages
   return (
-    <div className="flash-messages cuix antd">
+    <div className="hue-alert flash-messages cuix antd">
       {errors.map((errorObj, index) => (
         <Alert
           key={index}
           type="error"
           message={errorObj.message}
           closable={true}
-          onClose={() => handleClose(errorObj, index)}
+          onClose={() => handleClose(errorObj)}
         />
       ))}
     </div>
