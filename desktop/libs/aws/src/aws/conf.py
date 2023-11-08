@@ -276,6 +276,15 @@ AWS_ACCOUNTS = UnspecifiedConfigSection(
   )
 )
 
+def get_access_key_id(account_name: str = 'default'):
+  CONFIGS = AWS_ACCOUNTS[account_name]
+  access_key_id = CONFIGS.ACCESS_KEY_ID.get()
+  return access_key_id or CONFIGS.ACCESS_KEY_ID_SCRIPT.get()
+
+def get_secret_access_key(account_name: str = 'default'):
+  CONFIGS = AWS_ACCOUNTS[account_name]
+  secret_access_key = CONFIGS.SECRET_ACCESS_KEY.get()
+  return secret_access_key or CONFIGS.SECRET_ACCESS_KEY_SCRIPT.get()
 
 def is_enabled():
   return ('default' in list(AWS_ACCOUNTS.keys()) and AWS_ACCOUNTS['default'].get_raw() and AWS_ACCOUNTS['default'].ACCESS_KEY_ID.get()) or \

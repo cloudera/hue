@@ -122,9 +122,7 @@ class ClaudeModel(BaseModel):
     return {
       "prompt": f"Human: {prompt}\nAssistant:",
       "max_tokens_to_sample": 300,
-      "temperature": 1,
-      "top_k": 250,
-      "top_p": 0.999,
+      "temperature": 0,
       "stop_sequences": ["\n\nHuman:"],
       "anthropic_version": "bedrock-2023-05-31" # TODO: Make into a configuration
     }
