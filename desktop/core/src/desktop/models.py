@@ -44,7 +44,7 @@ from hadoop.core_site import get_raz_api_url, get_raz_s3_default_bucket
 from kafka.conf import has_kafka
 from indexer.conf import ENABLE_DIRECT_UPLOAD
 from metadata.conf import get_optimizer_mode
-from notebook.conf import DEFAULT_LIMIT, SHOW_NOTEBOOKS, get_ordered_interpreters
+from notebook.conf import DEFAULT_LIMIT, SHOW_NOTEBOOKS, get_ordered_interpreters, DEFAULT_INTERPRETER
 from useradmin.models import User, Group, get_organization
 from useradmin.organization import _fitered_queryset
 
@@ -1855,9 +1855,11 @@ class ClusterConfig(object):
       LOG.exception('Could not load back default app')
 
     if default_interpreter:
-      return default_interpreter[0]
-    else:
-      return default_app
+      if DEFAULT_INTERPRETER.get():
+        for di in default_interpreter:
+          if di['name'] == DEFAULT_INTERPRETER.get():
+            return di
+    return default_interpreter[0]
 
 
   def _get_home(self):

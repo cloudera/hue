@@ -398,7 +398,7 @@ ${ layout.menubar(section='bundles', dashboard=True) }
         { 'notification': $(this).attr("data-message") },
         function(response) {
           if (response['status'] != 0) {
-            $(document).trigger("error", "${ _('Problem: ') }" + response['data']);
+            huePubSub.publish('hue.global.error', {message: "${ _('Problem: ') }" + response['data']});
             $("#confirmation a.btn-danger").button("reset");
           } else {
             window.location.reload();
@@ -414,7 +414,7 @@ ${ layout.menubar(section='bundles', dashboard=True) }
         { 'notification': $(this).data("message") },
         function(response) {
           if (response['status'] != 0) {
-            $(document).trigger("error", "${ _('Error: ') }" + response['data']);
+            huePubSub.publish('hue.global.error', {message: "${ _('Error: ') }" + response['data']});
             $("#confirmation a.btn-danger").button("reset");
           } else {
             window.location.reload();

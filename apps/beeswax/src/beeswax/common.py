@@ -20,6 +20,7 @@ Common utils for beeswax.
 """
 from __future__ import print_function
 
+import numbers
 import re
 import time
 
@@ -120,7 +121,7 @@ def find_compute(cluster=None, user=None, dialect=None, namespace_id=None):
 
     # If found, we will attempt to reload it, first by id then by name
     if selected_compute:
-      if selected_compute.get('id'):
+      if selected_compute.get('id') and isinstance(selected_compute['id'], numbers.Integral):
         c = Compute.objects.filter(id=selected_compute['id']).first()
         if c:
           return c.to_dict()
@@ -138,7 +139,7 @@ def find_compute(cluster=None, user=None, dialect=None, namespace_id=None):
 
   # We will attempt to find a default compute based on other criteria
   ns = None
-  if namespace_id:
+  if namespace_id and isinstance(namespace_id, numbers.Integral):
     ns = Namespace.objects.filter(id=namespace_id).first()
 
   if not ns and dialect:

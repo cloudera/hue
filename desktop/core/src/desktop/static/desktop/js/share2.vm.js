@@ -19,7 +19,7 @@ var shareViewModel;
 
 
 var errorCallback = function(response) {
-  $(document).trigger("error", "There was an error processing your action: " + response.responseText);
+  huePubSub.publish('hue.global.error', {message: "There was an error processing your action: " + response.responseText});
 };
 
 function ShareViewModel(updateDocF) {
@@ -262,13 +262,13 @@ function shareDocFinal() {
   }, function (response) {
     if (response != null) {
       if (response.status != 0) {
-        $(document).trigger("error", "There was an error processing your action: " + response.message);
+        huePubSub.publish('hue.global.error', {message: "There was an error processing your action: " + response.message});
       }
       else {
         shareViewModel.setDocUuid(shareViewModel.docUuid);
       }
     }
   }).fail(function (response) {
-    $(document).trigger("error", "There was an error processing your action: " + response.responseText);
+    huePubSub.publish('hue.global.error', {message: "There was an error processing your action: " + response.responseText});
   });
 }

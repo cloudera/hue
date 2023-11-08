@@ -535,7 +535,7 @@ var PigViewModel = function (props) {
           self.updateScripts();
           $(document).trigger("saved");
         }, "json").fail( function(xhr, textStatus, errorThrown) {
-          $(document).trigger("error", xhr.responseText);
+          huePubSub.publish('hue.global.error', {message: xhr.responseText});
         });
   }
 
@@ -567,7 +567,7 @@ var PigViewModel = function (props) {
           $(document).trigger("startLogsRefresh");
           self.updateScripts();
         }, "json").fail( function(xhr, textStatus, errorThrown) {
-          $(document).trigger("error", xhr.responseText);
+          huePubSub.publish('hue.global.error', {message: xhr.responseText});
         });
   }
 

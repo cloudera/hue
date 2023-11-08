@@ -150,7 +150,7 @@ ${ components.menubar(hiveserver2_impersonation_enabled) }
     $(document).ajaxError(function (event, jqxhr, settings, exception) {
       if (jqxhr.status == 500) {
         window.clearInterval(_runningInterval);
-        $(document).trigger("error", "${_('There was a problem communicating with the server: ')}" + JSON.parse(jqxhr.responseText).message);
+        huePubSub.publish('hue.global.error', {message: "${_('There was a problem communicating with the server: ')}" + JSON.parse(jqxhr.responseText).message});
       }
     });
 
@@ -219,7 +219,7 @@ ${ components.menubar(hiveserver2_impersonation_enabled) }
                 }
                 $("a[data-row-selector='true']").jHueRowSelector();
               } catch (error) {
-                $(document).trigger("error", error);
+                huePubSub.publish('hue.global.error', {message: error});
               }
             } else {
               updateJobRow(job, foundRow);
@@ -408,7 +408,7 @@ ${ components.menubar(hiveserver2_impersonation_enabled) }
           _this.button("reset");
           $("#killModal").modal("hide");
           if (response.status != 0) {
-            $(document).trigger("error", "${ _('There was a problem killing this job.') }");
+            huePubSub.publish('hue.global.error', {message: "${ _('There was a problem killing this job.') }"});
           }
           else {
             callJobDetails({ url: _this.data("url")});

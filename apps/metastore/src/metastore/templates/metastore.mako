@@ -983,7 +983,7 @@ ${ components.menubar(is_embeddable) }
           huePubSub.publish('notebook.task.submitted', resp);
           huePubSub.publish('metastore.clear.selection');
         } else if (resp && resp.message) {
-          $(document).trigger("error", resp.message);
+          huePubSub.publish('hue.global.error', {message: resp.message});
         }
         $("#dropTable").modal('hide');
         $("#dropSingleTable").modal('hide');
@@ -991,7 +991,7 @@ ${ components.menubar(is_embeddable) }
         $("#dropPartition").modal('hide');
       },
       error: function (xhr) {
-        $(document).trigger("error", xhr.responseText);
+        huePubSub.publish('hue.global.error', {message: xhr.responseText});
       }
     });
   }
@@ -1003,10 +1003,10 @@ ${ components.menubar(is_embeddable) }
       if (resp.uri_path) {
         huePubSub.publish('open.link', resp.uri_path);
       } else if (resp.message) {
-        $(document).trigger("error", resp.message);
+        huePubSub.publish('hue.global.error', {message: resp.message});
       }
     }).fail(function (xhr) {
-      $(document).trigger("error", xhr.responseText);
+      huePubSub.publish('hue.global.error', {message: xhr.responseText});
     });
   }
 
@@ -1020,10 +1020,10 @@ ${ components.menubar(is_embeddable) }
       if (resp.history_uuid) {
         huePubSub.publish('open.editor.query', resp);
       } else if (resp.message) {
-        $(document).trigger("error", resp.message);
+        huePubSub.publish('hue.global.error', {message: resp.message});
       }
     }).fail(function (xhr) {
-      $(document).trigger("error", xhr.responseText);
+      huePubSub.publish('hue.global.error', {message: xhr.responseText});
     });
   }
 
