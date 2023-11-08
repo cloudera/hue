@@ -271,6 +271,8 @@ class Provider(object):
         access_key_name, secret_key_name, security_token_name, \
             profile_name_name = self.CredentialMap[self.name]
 
+        boto.log.debug("BOTO_DEBUG: provider.py: 274: get_credentials().")
+
         # Load profile from shared environment variable if it was not
         # already passed in and the environment variable exists
         if profile_name is None and profile_name_name is not None and \
@@ -282,6 +284,8 @@ class Provider(object):
 
 
         shared = self.shared_credentials
+
+        boto.log.debug("BOTO_DEBUG: provider.py: 288: get_credentials(). access_key: %s, secret_key: %s, security_token: %s, profile_name: %s, access_key_name: %s, secret_key_name: %s, security_token_name: %s, profile_name_name: %s, shared: %s" % (access_key, secret_key, security_token, profile_name, access_key_name, secret_key_name, security_token_name, profile_name_name, shared))
 
         if access_key is not None:
             self.access_key = access_key
@@ -385,6 +389,7 @@ class Provider(object):
             boto.log.debug('Inside metadata if watch here ----->')
             self._populate_keys_from_metadata_server()
         self._secret_key = self._convert_key_to_str(self._secret_key)
+        boto.log.debug("BOTO_DEBUG: provider.py: 392: get_credentials() self.access_key: %s, self.secret_key: %s, self.security_token: %s, self.profile_name: %s" % (self.access_key, self.secret_key, self.security_token, self.profile_name))
 
     def _populate_keys_from_metadata_server(self):
         # get_instance_metadata is imported here because of a circular
@@ -399,6 +404,7 @@ class Provider(object):
         metadata = get_instance_metadata(
             timeout=timeout, num_retries=attempts,
             data='meta-data/iam/security-credentials/')
+        boto.log.debug("BOTO_DEBUG: provider.py: 407: _populate_keys_from_metadata_server() metadata: %s" % metadata)
         if metadata:
             creds = self._get_credentials_from_metadata(metadata)
             self._access_key = creds[0]
