@@ -41,8 +41,6 @@ from useradmin import views as useradmin_views, api as useradmin_api
 from beeswax import api as beeswax_api
 
 from desktop.lib.ai.sql import perform_sql_task
-from desktop.lib.ai.metadata import semantic_search
-from desktop.lib.ai.vector_db import filter_vector_db
 
 LOG = logging.getLogger()
 
@@ -254,8 +252,10 @@ def tables(request):
   tables = []
   if is_ai_interface_enabled():
     if is_vector_db_enabled():
+      from desktop.lib.ai.vector_db import filter_vector_db
       tables = filter_vector_db(metadata, input, database)
     else:
+      from desktop.lib.ai.metadata import semantic_search
       tables = semantic_search(metadata, input)
 
     # TODO: Use LLM and filter tables even further
