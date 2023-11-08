@@ -568,6 +568,9 @@ class AWSAuthConnection(object):
         self._last_rs = None
         self._auth_handler = auth.get_auth_handler(
             host, config, self.provider, self._required_auth_capability())
+
+        boto.log.debug("auth_handler: %s" % str(self._auth_handler))
+
         if getattr(self, 'AuthServiceName', None) is not None:
             self.auth_service_name = self.AuthServiceName
         self.request_hook = None
@@ -937,6 +940,7 @@ class AWSAuthConnection(object):
                 boto.log.debug('Final headers: %s' % request.headers)
                 request.start_time = datetime.now()
                 if callable(sender):
+                    boto.log.debug('Sender is callable')
                     response = sender(connection, request.method, request.path,
                                       request.body, request.headers)
                 else:

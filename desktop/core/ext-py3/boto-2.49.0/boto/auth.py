@@ -173,6 +173,8 @@ class HmacAuthV1Handler(AuthHandler, HmacKeys):
         self._hmac_256 = None
 
     def add_auth(self, http_request, **kwargs):
+        boto.log.debug('Inside HmacAuthV1Handler add_auth')
+
         headers = http_request.headers
         method = http_request.method
         auth_path = http_request.auth_path
@@ -306,6 +308,7 @@ class HmacAuthV3HTTPHandler(AuthHandler, HmacKeys):
         """
         # This could be a retry.  Make sure the previous
         # authorization header is removed first.
+        boto.log.debug('Inside HmacAuthV3HTTPHandler add_auth')
         if 'X-Amzn-Authorization' in req.headers:
             del req.headers['X-Amzn-Authorization']
         req.headers['X-Amz-Date'] = formatdate(usegmt=True)
@@ -533,6 +536,7 @@ class HmacAuthV4Handler(AuthHandler, HmacKeys):
         """
         # This could be a retry.  Make sure the previous
         # authorization header is removed first.
+        boto.log.debug('Inside add_auth 4444')
         if 'X-Amzn-Authorization' in req.headers:
             del req.headers['X-Amzn-Authorization']
         now = datetime.datetime.utcnow()
@@ -745,6 +749,7 @@ class S3HmacAuthV4Handler(HmacAuthV4Handler, AuthHandler):
         return super(S3HmacAuthV4Handler, self).payload(http_request)
 
     def add_auth(self, req, **kwargs):
+        boto.log.debug('Inside add_auth 5555')
         if 'x-amz-content-sha256' not in req.headers:
             if '_sha256' in req.headers:
                 req.headers['x-amz-content-sha256'] = req.headers.pop('_sha256')
@@ -835,6 +840,7 @@ class STSAnonHandler(AuthHandler):
         return '&'.join(pairs)
 
     def add_auth(self, http_request, **kwargs):
+        boto.log.debug('Inside add_auth 6666')
         headers = http_request.headers
         qs = self._build_query_string(
             http_request.params
@@ -854,6 +860,7 @@ class QuerySignatureHelper(HmacKeys):
     """
 
     def add_auth(self, http_request, **kwargs):
+        boto.log.debug('Inside add_auth 7777')
         headers = http_request.headers
         params = http_request.params
         params['AWSAccessKeyId'] = self._provider.access_key
@@ -965,6 +972,7 @@ class POSTPathQSV2AuthHandler(QuerySignatureV2AuthHandler, AuthHandler):
     capability = ['mws']
 
     def add_auth(self, req, **kwargs):
+        boto.log.debug('Inside add_auth 8888')
         req.params['AWSAccessKeyId'] = self._provider.access_key
         req.params['SignatureVersion'] = self.SignatureVersion
         req.params['Timestamp'] = boto.utils.get_ts()

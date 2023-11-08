@@ -180,6 +180,9 @@ class Provider(object):
 
     def __init__(self, name, access_key=None, secret_key=None,
                  security_token=None, profile_name=None):
+        
+        boto.log.debug("Inside Provider init method -------->>>")
+        boto.log.debug('profile_name: %s' % profile_name)
         self.host = None
         self.port = None
         self.host_header = None
@@ -198,6 +201,7 @@ class Provider(object):
         if os.path.isfile(shared_path):
             self.shared_credentials.load_from_path(shared_path)
 
+        boto.log.debug('profile_name just before get_credentials: %s' % profile_name)
         self.get_credentials(access_key, secret_key, security_token, profile_name)
         self.configure_headers()
         self.configure_errors()
@@ -272,6 +276,10 @@ class Provider(object):
         if profile_name is None and profile_name_name is not None and \
            profile_name_name.upper() in os.environ:
             profile_name = os.environ[profile_name_name.upper()]
+        
+
+        boto.log.debug("Inside get_credentials --- profile_name: %s" % profile_name)
+
 
         shared = self.shared_credentials
 
@@ -374,6 +382,7 @@ class Provider(object):
 
         if ((self._access_key is None or self._secret_key is None) and
                 self.MetadataServiceSupport[self.name]):
+            boto.log.debug('Inside metadata if watch here ----->')
             self._populate_keys_from_metadata_server()
         self._secret_key = self._convert_key_to_str(self._secret_key)
 
@@ -395,6 +404,11 @@ class Provider(object):
             self._access_key = creds[0]
             self._secret_key = creds[1]
             self._security_token = creds[2]
+
+            boto.log.debug('metadata self._access_key: %s' % self._access_key)
+            boto.log.debug('metadata self._secret_key: %s' % self._secret_key)
+            boto.log.debug('metadata self._security_token: %s' % self._security_token)
+
             expires_at = creds[3]
             # I'm assuming there's only one role on the instance profile.
             self._credential_expiry_time = datetime.strptime(
