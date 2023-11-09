@@ -34,6 +34,7 @@ from boto.s3 import S3RegionInfo
 from boto.s3.bucket import Bucket, Key
 from boto.s3.connection import S3Connection, NoHostProvided
 from boto.s3.prefix import Prefix
+from boto.provider import Provider
 
 from desktop.conf import RAZ
 from desktop.lib.raz.clients import S3RazClient
@@ -73,13 +74,17 @@ class SignedUrlS3Connection(S3Connection):
     # No auth handler with RAZ
     anon = RAZ.IS_ENABLED.get() and not IS_SELF_SIGNING_ENABLED.get()
 
+    # Disable instance metadata fetching when RAZ is enabled
+    raz_s3_provider = Provider(provider, aws_access_key_id, aws_secret_access_key, security_token, profile_name)
+    raz_s3_provider.MetadataServiceSupport['aws'] = False
+
     super(SignedUrlS3Connection, self).__init__(
       aws_access_key_id=aws_access_key_id, aws_secret_access_key=aws_secret_access_key,
                 is_secure=is_secure, port=port, proxy=proxy, proxy_port=proxy_port,
                 proxy_user=proxy_user, proxy_pass=proxy_pass,
                 host=host, debug=debug, https_connection_factory=https_connection_factory,
                 calling_format=calling_format, path=path,
-                provider=provider, bucket_class=bucket_class, security_token=security_token,
+                provider=raz_s3_provider, bucket_class=bucket_class, security_token=security_token,
                 suppress_consec_slashes=suppress_consec_slashes, anon=anon,
                 validate_certs=validate_certs, profile_name=profile_name)
 
