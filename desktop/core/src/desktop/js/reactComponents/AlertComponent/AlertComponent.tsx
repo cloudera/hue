@@ -29,6 +29,10 @@ const AlertComponent: React.FC = () => {
 
   useEffect(() => {
     const hueSub = huePubSub.subscribe('hue.global.error', (newError: ErrorAlert) => {
+      if (!newError.message) {
+        return;
+      }
+
       setErrors(activeErrors => {
         // Prevent showing the same message multiple times.
         // TODO: Consider showing a count in the error notification when the same message is reported multiple times.
