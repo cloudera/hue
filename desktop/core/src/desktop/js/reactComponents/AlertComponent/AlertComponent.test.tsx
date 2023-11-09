@@ -47,6 +47,15 @@ describe('AlertComponent', () => {
     expect(alerts[1]).toHaveTextContent('Error 2');
   });
 
+  test("it shouldn't show empty error messages", async () => {
+    render(<AlertComponent />);
+    expect(screen.queryAllByRole('alert')).toHaveLength(0);
+
+    act(() => huePubSub.publish('hue.global.error', { message: '' }));
+
+    expect(screen.queryAllByRole('alert')).toHaveLength(0);
+  });
+
   test('it should show unique error messages', async () => {
     render(<AlertComponent />);
     expect(screen.queryAllByRole('alert')).toHaveLength(0);
