@@ -44,6 +44,13 @@ from aws.conf import IS_SELF_SIGNING_ENABLED
 LOG = logging.getLogger()
 
 
+class RAZS3Provider(Provider):
+  MetadataServiceSupport = {
+    'aws': False,
+    'google': False
+  }
+
+
 class SignedUrlS3Connection(S3Connection):
   """
   Contact S3 via a presigned Url of the resource hence not requiring any S3 credentials.
@@ -75,8 +82,7 @@ class SignedUrlS3Connection(S3Connection):
     anon = RAZ.IS_ENABLED.get() and not IS_SELF_SIGNING_ENABLED.get()
 
     # Disable instance metadata fetching when RAZ is enabled
-    raz_s3_provider = Provider(provider, aws_access_key_id, aws_secret_access_key, security_token, profile_name)
-    raz_s3_provider.MetadataServiceSupport['aws'] = False
+    raz_s3_provider = RAZS3Provider(provider, aws_access_key_id, aws_secret_access_key, security_token, profile_name)
 
     super(SignedUrlS3Connection, self).__init__(
       aws_access_key_id=aws_access_key_id, aws_secret_access_key=aws_secret_access_key,
@@ -87,6 +93,15 @@ class SignedUrlS3Connection(S3Connection):
                 provider=raz_s3_provider, bucket_class=bucket_class, security_token=security_token,
                 suppress_consec_slashes=suppress_consec_slashes, anon=anon,
                 validate_certs=validate_certs, profile_name=profile_name)
+
+  def _required_auth_capability(self):
+    """
+    Only invoke Anonymous auth handler when RAZ is enabled.
+
+    This is because RAZ is already sending signed headers and we simply need to pass it to S3 
+    without using any extra auth layer again for any region.
+    """
+    return ['anon']
 
 
 class RazS3Connection(SignedUrlS3Connection):
