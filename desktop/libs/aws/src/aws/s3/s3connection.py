@@ -160,6 +160,12 @@ class RazS3Connection(SignedUrlS3Connection):
 
     return raz_client.get_url(action, url, headers, data)
 
+  def _required_auth_capability(self):
+    if self.anon:
+      return ['anon']
+    else:
+      return super(SignedUrlS3Connection, self)._required_auth_capability()
+
 
 class SelfSignedUrlS3Connection(SignedUrlS3Connection):
   """
