@@ -34,6 +34,7 @@ import AssistToolbar from './AiAssistToolbar/AiAssistToolbar';
 import UntrustedAiModal from './UntrustedAiModal/UntrustedAiModal';
 import { withGuardrails, GuardrailAlert, GuardrailAlertType } from './guardRails';
 import { extractLeadingNqlComments, removeComments } from './PreviewModal/formattingUtils';
+import { AutocompleteParser } from '../../../../parse/types';
 
 import './AiAssistBar.scss';
 
@@ -46,6 +47,18 @@ const {
   generateSQLfromNQL,
   generateEditedSQLfromNQL
 } = generativeFunctionFactory();
+
+const extractTablesAndViews = (sql: string, parser: AutocompleteParser): Array<string> => {
+  const result = parser.parseSql(sql, '');
+  const tableNames = result.locations
+    .filter(loc => loc.type === 'table' || loc.type === 'view')
+    .map(loc =>
+      // The identifierChain is actually never undefined when the type is table,
+      // but the typescript type definition doesn't consider that.
+      loc.identifierChain ? loc.identifierChain[loc.identifierChain.length - 1].name : ''
+    );
+  return tableNames;
+};
 
 const getSelectedLineNumbers = (parsedStatement: ParsedSqlStatement) => {
   if (!parsedStatement) {
@@ -113,7 +126,8 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
   const [errorStatusText, setErrorStatusText] = useState('');
   const [nql, setNql] = useState('');
   const [inputValue, setInputValue] = useState<string>('');
-  const [syntaxParser, sqlDialect, hasIncorrectSql] = useParser(currentExecutable);
+  const [syntaxParser, sqlDialect, hasIncorrectSql, autocompleteParser] =
+    useParser(currentExecutable);
 
   const cursorPosition = useRef<{ row: number; column: number } | undefined>();
   const keywordCase = useKeywordCase(syntaxParser, selectedStatement);
@@ -198,10 +212,14 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
     const executor = activeExecutable?.executor;
     const databaseName = getDbName(activeExecutable);
     const dialect = sqlDialect;
+    const tableNamesUsed = extractTablesAndViews(sqlToModify, autocompleteParser);
+
     let sql, assumptions, guardrailAlert;
     try {
       ({ sql, assumptions, guardrailAlert } = await withGuardrails(generateEditedSQLfromNQL)({
         nql,
+        previousNql: inputPrefill,
+        tableNamesUsed,
         sql: sqlToModify,
         databaseName,
         executor,

@@ -89,6 +89,8 @@ interface EditSQLResponse {
 interface GenerateEditedSQLfromNQL {
   (params: {
     nql: string;
+    previousNql?: string;
+    tableNamesUsed?: string[];
     sql: string;
     databaseName: string;
     executor: Executor;
@@ -351,6 +353,8 @@ const generateSQLfromNQL: GenerateSQLfromNQL = async ({
 const generateEditedSQLfromNQL: GenerateEditedSQLfromNQL = async ({
   sql,
   nql,
+  previousNql,
+  tableNamesUsed,
   databaseName,
   executor,
   dialect,
@@ -358,7 +362,14 @@ const generateEditedSQLfromNQL: GenerateEditedSQLfromNQL = async ({
 }) => {
   let tableMetadata;
   try {
-    ({ tableMetadata } = await getTablesAndMetadata(nql, databaseName, executor, onStatusChange));
+    const tables = tableNamesUsed?.join(' ') || '';
+    const inputForTableList = `${tables} ${previousNql || ''} ${nql}`;
+    ({ tableMetadata } = await getTablesAndMetadata(
+      inputForTableList,
+      databaseName,
+      executor,
+      onStatusChange
+    ));
   } catch (e) {
     throw augmentError(e, 'Could not find relevant tables');
   }

@@ -19,7 +19,7 @@
 import { useState, useEffect } from 'react';
 import huePubSub from 'utils/huePubSub';
 import sqlParserRepository from 'parse/sql/sqlParserRepository';
-import { SyntaxParser } from 'parse/types';
+import { SyntaxParser, AutocompleteParser } from 'parse/types';
 import SqlExecutable from '../../execution/sqlExecutable';
 
 // TODO: why not use a state for lastDialect?
@@ -27,6 +27,7 @@ export const useParser = (activeExecutable: SqlExecutable) => {
   const [hasMissingNameError, setMissingNameError] = useState<boolean>(false);
   const [hasParseError, setHasParseError] = useState<boolean>(false);
   const [syntaxParser, setSyntaxParser] = useState<SyntaxParser>();
+  const [autocompleteParser, setAutocompleteParser] = useState<AutocompleteParser>();
   const [sqlDialect, setSqlDialect] = useState<string>('');
 
   const parsedStatement = activeExecutable?.parsedStatement;
@@ -34,6 +35,8 @@ export const useParser = (activeExecutable: SqlExecutable) => {
 
   const updateParserAndDialect = async (executorDialect: string) => {
     if (sqlDialect !== executorDialect) {
+      const autocompleteParser = await sqlParserRepository.getAutocompleteParser(executorDialect);
+      setAutocompleteParser(autocompleteParser);
       const matchingParser = await sqlParserRepository.getSyntaxParser(executorDialect);
       setSyntaxParser(matchingParser);
       setSqlDialect(executorDialect);
@@ -64,5 +67,5 @@ export const useParser = (activeExecutable: SqlExecutable) => {
 
   const hasIncorrectSql = hasMissingNameError || hasParseError;
 
-  return [syntaxParser, sqlDialect, hasIncorrectSql];
+  return [syntaxParser, sqlDialect, hasIncorrectSql, autocompleteParser];
 };
