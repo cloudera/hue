@@ -113,7 +113,7 @@ class TestS3FileSystem():
           name='data',
           exists=Mock(return_value=True),
           bucket=Mock(
-            list=Mock(return_value=['s3a://gethue/data/1', 's3a://gethue/data/2']),
+            list=Mock(return_value=['data/1', 'data/2']),
             delete_keys=Mock(
               return_value=Mock(
                 errors=[]
