@@ -276,21 +276,57 @@ AWS_ACCOUNTS = UnspecifiedConfigSection(
   )
 )
 
-def get_access_key_id(account_name: str = 'default'):
-  CONFIGS = AWS_ACCOUNTS[account_name]
-  access_key_id = CONFIGS.ACCESS_KEY_ID.get()
-  return access_key_id or CONFIGS.ACCESS_KEY_ID_SCRIPT.get()
-
-def get_secret_access_key(account_name: str = 'default'):
-  CONFIGS = AWS_ACCOUNTS[account_name]
-  secret_access_key = CONFIGS.SECRET_ACCESS_KEY.get()
-  return secret_access_key or CONFIGS.SECRET_ACCESS_KEY_SCRIPT.get()
 
 def is_enabled():
   return ('default' in list(AWS_ACCOUNTS.keys()) and AWS_ACCOUNTS['default'].get_raw() and AWS_ACCOUNTS['default'].ACCESS_KEY_ID.get()) or \
       has_iam_metadata() or \
       conf_idbroker.is_idbroker_enabled('s3a') or \
       is_raz_s3()
+
+
+BEDROCK_ACCOUNT = ConfigSection(
+  key='bedrock_account',
+  help=_("Information about Bedrock AWS account"),
+  members=dict(
+    ACCESS_KEY_ID=Config(
+      key='access_key_id',
+      type=str,
+    ),
+    ACCESS_KEY_ID_SCRIPT=Config(
+      key='access_key_id_script',
+      default=None,
+      private=True,
+      type=coerce_password_from_script,
+      help=_("Execute this script to produce the AWS access key ID.")),
+    SECRET_ACCESS_KEY=Config(
+      key='secret_access_key',
+      type=str,
+      private=True,
+    ),
+    SECRET_ACCESS_KEY_SCRIPT=Config(
+      key='secret_access_key_script',
+      default=None,
+      private=True,
+      type=coerce_password_from_script,
+      help=_("Execute this script to produce the AWS secret access key.")
+    ),
+    REGION=Config(
+      key='region',
+      default=None,
+      type=str
+    ),
+  )
+)
+
+
+def get_bedrock_access_key_id():
+  access_key_id = BEDROCK_ACCOUNT.ACCESS_KEY_ID.get()
+  return access_key_id or BEDROCK_ACCOUNT.ACCESS_KEY_ID_SCRIPT.get()
+
+
+def get_bedrock_secret_access_key():
+  secret_access_key = BEDROCK_ACCOUNT.SECRET_ACCESS_KEY.get()
+  return secret_access_key or BEDROCK_ACCOUNT.SECRET_ACCESS_KEY_SCRIPT.get()
 
 
 def is_ec2_instance():
