@@ -138,8 +138,6 @@ if USE_NEW_EDITOR.get():
     % endif
   </style>
 
-  ${ commonHeaderFooterComponents.header_i18n_redirection() }
-
   % if user.is_authenticated:
   <%
     global_constants_url = '/desktop/globalJsConstants.js?v=' + hue_version()

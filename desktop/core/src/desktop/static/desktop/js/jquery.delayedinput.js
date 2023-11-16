@@ -44,9 +44,7 @@
     var _this = this;
     var _timeout = -1;
     if (_this.options.fn != null) {
-      var event = isIE11 ? 'input' : 'keyup';
-
-      $(_this.element).on(event, function (e) {
+      $(_this.element).on('keyup', function (e) {
         if (!(_this.options.skipOnEnterAndKeys && [13, 37, 38, 39, 40].indexOf(e.keyCode) > -1)){
           window.clearTimeout(_timeout);
           _timeout = window.setTimeout(_this.options.fn, _this.options.timeout);
