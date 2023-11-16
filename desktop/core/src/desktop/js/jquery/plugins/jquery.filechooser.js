@@ -449,13 +449,11 @@ Plugin.prototype.navigateTo = function (path) {
             $searchInput.removeClass('x onX').val('');
           }
         });
-      if (!isIE11) {
-        $searchInput.on('blur', e => {
-          if ($searchInput.val() === '') {
-            slideOutInput();
-          }
-        });
-      }
+      $searchInput.on('blur', e => {
+        if ($searchInput.val() === '') {
+          slideOutInput();
+        }
+      });
 
       $search.find('.fa-search').on('click', () => {
         window.hueAnalytics.log('filechooser', 'show-search-btn-click');
