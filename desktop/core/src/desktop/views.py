@@ -488,10 +488,6 @@ def dynamic_bundle(request, config, bundle_name):
 def assist_m(request):
   return render('assist_m.mako', request, None)
 
-@login_notrequired
-def unsupported(request):
-  return render('unsupported.mako', request, None)
-
 def index(request):
   return redirect('desktop_views_hue')
 
