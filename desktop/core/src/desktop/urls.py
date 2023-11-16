@@ -138,9 +138,6 @@ dynamic_patterns += [
 
   re_path(r'^dynamic_bundle/(?P<config>\w+)/(?P<bundle_name>.+)', desktop_views.dynamic_bundle),
 
-  # Unsupported browsers
-  re_path(r'^boohoo$', desktop_views.unsupported, name='desktop_views_unsupported'),
-
   # Top level web page!
   re_path(r'^$', desktop_views.index, name="desktop_views.index"),
 ]

@@ -89,7 +89,6 @@
   <link rel="stylesheet" href="${ static('desktop/css/nv.d3.css') }">
   <link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-fileupload.css') }" >
 
-  ${ commonHeaderFooterComponents.header_i18n_redirection() }
   <%
     global_constants_url = '/desktop/globalJsConstants.js?v=' + hue_version()
   %>
