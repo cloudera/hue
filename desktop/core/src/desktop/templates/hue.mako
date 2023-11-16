@@ -21,7 +21,7 @@
   from desktop.auth.backend import is_admin
   from desktop.conf import ENABLE_HUE_5, has_multi_clusters
   from desktop.lib.i18n import smart_unicode
-  from desktop.models import PREFERENCE_IS_WELCOME_TOUR_SEEN, hue_version
+  from desktop.models import hue_version
   from desktop.views import _ko, commonshare, login_modal
   from desktop.webpack_utils import get_hue_bundles
 
@@ -141,7 +141,8 @@ ${ hueIcons.symbols() }
 
   <div class="main-page">
     <AppBanner data-reactcomponent='AppBanner'></AppBanner>
-    <AlertComponent data-reactcomponent='AlertComponent' ></AlertComponent> 
+    <AlertComponent data-reactcomponent='AlertComponent'></AlertComponent>
+    <WelcomeTour data-reactcomponent='WelcomeTour'></WelcomeTour>
 
     <nav class="navbar navbar-default">
       <div class="navbar-inner top-nav">
@@ -305,10 +306,9 @@ ${ commonshare() | n,unicode }
 
 <script src="${ static('desktop/js/polyfills.js') }"></script>
 <script src="${ static('desktop/ext/js/tether.js') }"></script>
-<script src="${ static('desktop/ext/js/shepherd.min.js') }"></script>
 <script src="${ static('desktop/ext/js/moment-with-locales.min.js') }"></script>
-<script src="${ static('desktop/ext/js/moment-timezone-with-data.min.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/tzdetect.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/moment-timezone-with-data.min.js') }"></script>
+<script src="${ static('desktop/ext/js/tzdetect.js') }"></script>
 
 <script src="${ static('desktop/ext/js/bootstrap-fileupload.js') }"></script>
 <script src="${ static('desktop/js/bootstrap-tooltip.js') }"></script>
@@ -338,84 +338,6 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
 
 
 <iframe id="zoomDetectFrame" style="width: 250px; display: none" ></iframe>
-
-<script type="text/javascript">
-  $(document).ready(function () {
-    var tour = new Shepherd.Tour({
-      defaults: {
-        classes: 'shepherd-theme-hue',
-        showCancelLink: true
-      }
-    });
-
-    tour.addStep('welcome', {
-      text: '<b>${ _ko('Welcome to Hue 4!') }</b><br><br>${ _ko('We want to introduce you to the new interface. It takes less than a minute. Ready? ') }'
-    });
-
-    tour.addStep('topnav', {
-      text: '${ _ko('A new nav bar and big blue button!') }<br><br>${ _ko('Open Hue to your favorite app, select other apps from the blue button, do global search, and view notification panels at right.') }',
-      attachTo: '.navbar-default bottom'
-    });
-
-    %if is_admin(user):
-      tour.addStep('admin', {
-        text: '${ _ko('As a superuser, you can check system configuration from the user menu and install sample data and jobs for your users.') }',
-        attachTo: '.server-position-pointer-welcome-tour left'
-      });
-    %endif
-
-    tour.addStep('leftpanel', {
-      text: '${ _ko('Discover data sources with the improved data assist panel. Remember to right-click for more!') }',
-      attachTo: '.left-panel right'
-    });
-
-    tour.addStep('pagecontent', {
-      text: '${ _ko('This is the main attraction, where your selected app runs.') }<br>${ _ko('Hover on the app name to star it as your favorite application.') }',
-      attachTo: '.page-content center'
-    });
-
-    tour.addStep('rightpanel', {
-      text: '${ _ko('Some apps have a right panel with additional information to assist you in your data discovery.') }',
-      attachTo: '.right-panel left'
-    });
-
-    tour.addStep('bye', {
-      text: '${ _ko('This ends the tour. To see it again, click Welcome Tour from the username drop down.') }<br><br>${ _ko('And now go ') }<b>${ _ko('Query, Explore, Repeat') }</b>!'
-    });
-
-    var closeTourOnEsc = function (e) {
-      if (e.keyCode === 27) {
-        tour.cancel();
-      }
-    };
-
-    % if False and (is_demo or not user_preferences.get(PREFERENCE_IS_WELCOME_TOUR_SEEN)):
-      $(document).on('keyup', closeTourOnEsc);
-      $(document).on('click', '.shepherd-backdrop', tour.cancel);
-      tour.start();
-    % endif
-
-
-    tour.on('complete', function () {
-      $.post('/desktop/api2/user_preferences/${ PREFERENCE_IS_WELCOME_TOUR_SEEN }', {
-        'set': 'seen'
-      });
-      $(document).off('keyup', closeTourOnEsc);
-    });
-
-    tour.on('cancel', function () {
-      $.post('/desktop/api2/user_preferences/${ PREFERENCE_IS_WELCOME_TOUR_SEEN }', {
-        'set': 'seen'
-      });
-      $(document).off('keyup', closeTourOnEsc);
-    });
-
-    huePubSub.subscribe('show.welcome.tour', function () {
-      $(document).on('keyup', closeTourOnEsc);
-      tour.start();
-    });
-  });
-</script>
 
 ${ commonHeaderFooterComponents.footer(messages) }
 
