@@ -25,6 +25,9 @@ export async function loadComponent(name) {
     case 'FileChooserWithButton':
       return (await import('./FileChooser/FileChooserWithButton/FileChooserWithButton')).default;
 
+    case 'WelcomeTour':
+      return (await import('./WelcomeTour/WelcomeTour')).default;
+
     default:
       console.error(`A placeholder component is rendered because you probably forgot to include your new component in the 
       loadComponent function of reactComponents/imports.js`);
