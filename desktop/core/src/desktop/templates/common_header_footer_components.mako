@@ -32,35 +32,6 @@ else:
   from django.utils.translation import ugettext as _
 %>
 
-<%def name="header_i18n_redirection()">
-  <!--[if lt IE 9]>
-  <script type="text/javascript">
-    if (document.documentMode && document.documentMode < 9){
-      location.href = "${ url('desktop_views_unsupported') }";
-    }
-  </script>
-  <![endif]-->
-
-
-  <script type="text/javascript">
-    // check if it's a Firefox < 7
-    var _UA = navigator.userAgent.toLowerCase();
-    for (var i = 1; i < 7; i++) {
-      if (_UA.indexOf("firefox/" + i + ".") > -1) {
-        location.href = "${ url('desktop_views_unsupported') }";
-      }
-    }
-
-    // check for IE document modes
-    if (document.documentMode && document.documentMode < 9) {
-      location.href = "${ url('desktop_views_unsupported') }";
-    }
-
-    // sets a global variable to see if it's IE11 or not
-    var isIE11 = !!window.MSInputMethodContext && !!document.documentMode;
-  </script>
-</%def>
-
 <%def name="header_pollers(user, is_s3_enabled, apps)">
   <script type="text/javascript">
     Dropzone.autoDiscover = false;
