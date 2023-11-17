@@ -28,8 +28,19 @@ const AlertComponent: React.FC = () => {
   const [errors, setErrors] = useState<ErrorAlert[]>([]);
 
   useEffect(() => {
-    const hueSub = huePubSub.subscribe('hue.global.error', (errorObj: ErrorAlert) => {
-      setErrors(prevData => [...prevData, errorObj]);
+    const hueSub = huePubSub.subscribe('hue.global.error', (newError: ErrorAlert) => {
+      if (!newError.message) {
+        return;
+      }
+
+      setErrors(activeErrors => {
+        // Prevent showing the same message multiple times.
+        // TODO: Consider showing a count in the error notification when the same message is reported multiple times.
+        if (activeErrors.some(activeError => activeError.message === newError.message)) {
+          return activeErrors;
+        }
+        return [...activeErrors, newError];
+      });
     });
     return () => {
       hueSub.remove();
@@ -44,9 +55,9 @@ const AlertComponent: React.FC = () => {
   //TODO: add support for warnings and success messages
   return (
     <div className="hue-alert flash-messages cuix antd">
-      {errors.map((errorObj, index) => (
+      {errors.map(errorObj => (
         <Alert
-          key={index}
+          key={errorObj.message}
           type="error"
           message={errorObj.message}
           closable={true}
