@@ -92,6 +92,23 @@ const defaults = {
         name: 'S3'
       }
     },
+    gs: {
+      scheme: 'gs',
+      root: 'gs://',
+      home: '/?default_gs_home',
+      icon: {
+        svg: {
+          brand: '#hi-gs',
+          home: '#hi-gs'
+        },
+        brand: 'fa-windows',
+        home: 'fa-windows'
+      },
+      label: {
+        home: '',
+        name: 'GS'
+      }
+    },
     adl: {
       scheme: 'adl',
       root: 'adl:/',
@@ -333,7 +350,7 @@ Plugin.prototype.navigateTo = function (path) {
     //var filesysteminfo = self.options.filesysteminfo;
     const fs = _parent.options.filesysteminfo[_parent.options.fsSelected || 'hdfs'];
     const el = fs.icon.svg
-      ? '<svg class="hi"><use xlink:href="' + fs.icon.svg.home + '"></use></svg>'
+      ? '<svg class="hi"><use href="' + fs.icon.svg.home + '"></use></svg>'
       : '<i class="fa ' + fs.icon.home + '"></i> ' + fs.label.home;
     const _homelink = $('<a>')
       .addClass('nounderline')
@@ -742,7 +759,7 @@ Plugin.prototype.navigateTo = function (path) {
                 }
               },
               error: function (xhr) {
-                $(document).trigger('error', xhr.responseText);
+                huePubSub.publish('hue.global.error', { message: xhr.responseText });
               }
             });
           }
@@ -782,7 +799,7 @@ Plugin.prototype.navigateTo = function (path) {
       );
     } else {
       console.error(e);
-      $(document).trigger('error', e.statusText);
+      huePubSub.publish('hue.global.error', { message: e.statusText });
     }
   });
 };
@@ -800,7 +817,7 @@ function initUploader(path, _parent, el, labels) {
     onComplete: function (id, fileName, responseJSON) {
       num_of_pending_uploads--;
       if (responseJSON.status == -1) {
-        $(document).trigger('error', responseJSON.data);
+        huePubSub.publish('hue.global.error', { message: responseJSON.data });
       } else if (!num_of_pending_uploads) {
         _parent.navigateTo(path);
         huePubSub.publish('assist.' + getFs(getScheme(path)) + '.refresh');

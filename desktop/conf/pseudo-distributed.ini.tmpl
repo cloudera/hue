@@ -916,12 +916,13 @@
    # Django cache to use to store temporarily used data during query execution. This is in addition to result_file_storage and result_backend.
    ## execution_storage='{"BACKEND": "django.core.cache.backends.locmem.LocMemCache", "LOCATION": "celery-hue"}'
 
-   # Settings for the Google Cloud lib
-   # ------------------------------------------------------------------------
-   [[gc_accounts]]
-      [[[default]]]
-        # The JSON credentials to authenticate to Google Cloud e.g. '{ "type": "service_account", "project_id": .... }'
-        # json_credentials=None
+  # Settings for the Google Cloud lib
+  # ------------------------------------------------------------------------
+
+  [[gc_accounts]]
+    [[[default]]]
+      # The JSON credentials to authenticate to Google Cloud e.g. '{ "type": "service_account", "project_id": .... }'
+      ## json_credentials=None
 
   ## Configuration for Ozone File System
   # ------------------------------------------------------------------------
@@ -963,6 +964,9 @@
   ## Autocreate the user home directory in the remote home storage path.
   # autocreate_user_dir=true
 
+  ## Enable integration with Google Storage for RAZ
+  # is_raz_gs_enabled=false
+
 ###########################################################################
 # Settings to configure the snippets available in the Notebook
 ###########################################################################
@@ -1002,6 +1006,10 @@
 
   ## Default limit to use in SELECT statements if not present. Set to 0 to disable.
   # default_limit=5000
+
+  ## Set the default interpreter for all users. 
+  ## Starred interpreters at user level will get more priority than the value below.
+  # default_interpreter=
 
   # One entry for each type of snippet.
   [[interpreters]]

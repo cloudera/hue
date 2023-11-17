@@ -2250,6 +2250,12 @@ RAZ = ConfigSection(
       type=coerce_bool,
       default=True,
     ),
+    IS_RAZ_GS_ENABLED=Config(
+      help=_('Enable integration with Google Storage for RAZ'),
+      key='is_raz_gs_enabled',
+      default=False,
+      type=coerce_bool
+    )
   )
 )
 
@@ -2606,12 +2612,20 @@ def is_cm_managed():
 
 def is_gs_enabled():
   from desktop.lib.idbroker import conf as conf_idbroker # Circular dependencies  desktop.conf -> idbroker.conf -> desktop.conf
+
   return ('default' in list(GC_ACCOUNTS.keys()) and GC_ACCOUNTS['default'].JSON_CREDENTIALS.get()) or \
-      conf_idbroker.is_idbroker_enabled('gs')
+      conf_idbroker.is_idbroker_enabled('gs') or \
+      is_raz_gs()
 
 def has_gs_access(user):
   from desktop.auth.backend import is_admin
-  return user.is_authenticated and user.is_active and (is_admin(user) or user.has_hue_permission(action="gs_access", app="filebrowser"))
+  return user.is_authenticated and user.is_active and (
+    is_admin(user) or user.has_hue_permission(action="gs_access", app="filebrowser") or is_raz_gs())
+
+def is_raz_gs():
+  from desktop.conf import RAZ  # Must be imported dynamically in order to have proper value
+
+  return (RAZ.IS_ENABLED.get() and RAZ.IS_RAZ_GS_ENABLED.get())
 
 
 def get_ozone_conf_dir_default():

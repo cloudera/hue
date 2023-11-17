@@ -44,7 +44,7 @@ from hadoop.core_site import get_raz_api_url, get_raz_s3_default_bucket
 from kafka.conf import has_kafka
 from indexer.conf import ENABLE_DIRECT_UPLOAD
 from metadata.conf import get_optimizer_mode
-from notebook.conf import DEFAULT_LIMIT, SHOW_NOTEBOOKS, get_ordered_interpreters
+from notebook.conf import DEFAULT_LIMIT, SHOW_NOTEBOOKS, get_ordered_interpreters, DEFAULT_INTERPRETER
 from useradmin.models import User, Group, get_organization
 from useradmin.organization import _fitered_queryset
 
@@ -1855,9 +1855,11 @@ class ClusterConfig(object):
       LOG.exception('Could not load back default app')
 
     if default_interpreter:
-      return default_interpreter[0]
-    else:
-      return default_app
+      if DEFAULT_INTERPRETER.get():
+        for di in default_interpreter:
+          if di['name'] == DEFAULT_INTERPRETER.get():
+            return di
+    return default_interpreter[0]
 
 
   def _get_home(self):
@@ -2029,6 +2031,16 @@ class ClusterConfig(object):
         'displayName': _('S3'),
         'buttonName': _('Browse'),
         'tooltip': _('S3'),
+        'page': '/filebrowser/view=' + urllib_quote(home_path, safe=SAFE_CHARACTERS_URI_COMPONENTS)
+      })
+
+    if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('gs', self.user):
+      home_path = remote_home_storage if remote_home_storage else 'gs://'.encode('utf-8')
+      interpreters.append({
+        'type': 'gs',
+        'displayName': _('GS'),
+        'buttonName': _('Browse'),
+        'tooltip': _('Google Storage'),
         'page': '/filebrowser/view=' + urllib_quote(home_path, safe=SAFE_CHARACTERS_URI_COMPONENTS)
       })
 

@@ -424,7 +424,7 @@ ${ commonshare() | n,unicode }
           $("#addTagModal").modal("hide");
         }
       }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", "${_("There was an error processing your action: ")}" + xhr.responseText); // reserved name, duplicate etc
+        huePubSub.publish('hue.global.error', {message: "${_("There was an error processing your action: ")}" + xhr.responseText}); // reserved name, duplicate etc
       });
     });
 
@@ -460,11 +460,11 @@ ${ commonshare() | n,unicode }
           viewModel.filterDocs(viewModel.history());
         }
         else {
-          $(document).trigger("error", "${_("There was an error processing your action: ")}" + response.message);
+          huePubSub.publish('hue.global.error', {message: "${_("There was an error processing your action: ")}" + response.message});
         }
       }
     }).fail(function (response) {
-      $(document).trigger("error", "${_("There was an error processing your action: ")}" + response.responseText);
+      huePubSub.publish('hue.global.error', {message: "${_("There was an error processing your action: ")}" + response.responseText});
     });
   }
 
@@ -487,7 +487,7 @@ ${ commonshare() | n,unicode }
     }, function (response) {
       if (response != null) {
         if (response.status != 0) {
-          $(document).trigger("error", "${_("There was an error processing your action: ")}" + response.message);
+          huePubSub.publish('hue.global.error', {message: "${_("There was an error processing your action: ")}" + response.message});
         }
         else {
           huePubSub.publish('hue.global.info', {message: "${ _("Project updated successfully.") }"});
@@ -496,7 +496,7 @@ ${ commonshare() | n,unicode }
       }
       $("#documentMoveModal").modal("hide");
     }).fail(function (response) {
-      $(document).trigger("error", "${_("There was an error processing your action: ")}" + response.responseText);
+      huePubSub.publish('hue.global.error', {message: "${_("There was an error processing your action: ")}" + response.responseText});
     });
   }
 

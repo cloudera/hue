@@ -273,7 +273,7 @@ export default class Notebook {
           }
         ).fail(xhr => {
           if (xhr.status !== 502) {
-            $(document).trigger('error', xhr.responseText);
+            huePubSub.publish('hue.global.error', { message: xhr.responseText });
           }
         });
       };
@@ -368,12 +368,12 @@ export default class Notebook {
           callback();
         }
       } else {
-        $(document).trigger('error', data.message);
+        huePubSub.publish('hue.global.error', { message: data.message });
       }
     } catch (err) {
       console.error(err);
       if (err && err.status !== 502) {
-        $(document).trigger('error', err.responseText);
+        huePubSub.publish('hue.global.error', { message: err.responseText });
       }
     }
   }
@@ -405,7 +405,7 @@ export default class Notebook {
       }
     ).fail(xhr => {
       if (xhr.status !== 502) {
-        $(document).trigger('error', xhr.responseText);
+        huePubSub.publish('hue.global.error', { message: xhr.responseText });
       }
     });
   }

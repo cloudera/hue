@@ -25,7 +25,7 @@ from django.test.client import Client
 from django.urls import reverse
 
 from desktop import appmanager
-from desktop.conf import is_oozie_enabled, has_connectors, is_cm_managed, ENABLE_UNIFIED_ANALYTICS
+from desktop.conf import is_oozie_enabled, has_connectors, is_cm_managed, ENABLE_UNIFIED_ANALYTICS, get_clusters
 from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_json_dict, coerce_bool, coerce_csv
 
 if sys.version_info[0] > 2:
@@ -89,6 +89,9 @@ def displayName(dialect, name):
 def get_ordered_interpreters(user=None):
   global INTERPRETERS_CACHE
 
+  clusters = get_clusters(user)
+  has_computes = clusters and [c for c in clusters.values() if c.get('type') == 'cdw']
+
   if has_connectors():
     from desktop.lib.connectors.api import _get_installed_connectors
     interpreters = [
@@ -115,6 +118,8 @@ def get_ordered_interpreters(user=None):
     for interpreter in INTERPRETERS_CACHE:
       if check_has_missing_permission(user, interpreter, user_apps=user_apps):
         pass  # Not allowed
+      elif has_computes and interpreter in ('hive', 'impala') and not computes_for_dialect(interpreter, user):
+        pass  # No available computes for the dialect so skip
       else:
         user_interpreters.append(interpreter)
 
@@ -151,6 +156,17 @@ def get_ordered_interpreters(user=None):
     }
     for i in interpreters
   ]
+
+def computes_for_dialect(dialect, user):
+  # import here due to avoid cyclic dependency
+  from beeswax.models import Namespace
+
+  ns_with_computes = []
+  ns_objs = Namespace.objects.filter(dialect=dialect)
+  if ns_objs:
+    ns_with_computes = [ns for ns in ns_objs if ns.get_computes(user)]
+
+  return ns_with_computes
 
 # cf. admin wizard too
 
@@ -189,6 +205,13 @@ INTERPRETERS_SHOWN_ON_WHEEL = Config(
           "Only the first 5 interpreters will appear on the wheel."),
   type=coerce_csv,
   default=[]
+)
+
+DEFAULT_INTERPRETER = Config(
+  key="default_interpreter",
+  help=_t("Set the default interpreter for all users. Starred interpreters at user level will get more priority than the value below."),
+  type=str,
+  default=''
 )
 
 DEFAULT_LIMIT = Config(

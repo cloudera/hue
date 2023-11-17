@@ -619,7 +619,7 @@ export default class NotebookViewModel {
             }
             deferredOpen.resolve();
           } else {
-            $(document).trigger('error', data.message);
+            huePubSub.publish('hue.global.error', { message: data.message });
             deferredOpen.reject();
             self.newNotebook();
           }

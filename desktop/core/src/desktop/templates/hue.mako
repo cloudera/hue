@@ -18,18 +18,13 @@
   import sys
 
   from desktop import conf
-  from desktop.conf import ENABLE_HUE_5, IS_MULTICLUSTER_ONLY, has_multi_clusters
-  from desktop.views import _ko, commonshare, login_modal
+  from desktop.auth.backend import is_admin
+  from desktop.conf import ENABLE_HUE_5, has_multi_clusters
   from desktop.lib.i18n import smart_unicode
-  from desktop.models import PREFERENCE_IS_WELCOME_TOUR_SEEN, hue_version, get_cluster_config
+  from desktop.models import PREFERENCE_IS_WELCOME_TOUR_SEEN, hue_version
+  from desktop.views import _ko, commonshare, login_modal
   from desktop.webpack_utils import get_hue_bundles
 
-  from dashboard.conf import IS_ENABLED as IS_DASHBOARD_ENABLED
-  from filebrowser.conf import SHOW_UPLOAD_BUTTON
-  from indexer.conf import ENABLE_NEW_INDEXER
-  from metadata.conf import has_optimizer, OPTIMIZER
-
-  from desktop.auth.backend import is_admin
   from webpack_loader.templatetags.webpack_loader import render_bundle
 
   if sys.version_info[0] > 2:
@@ -131,7 +126,7 @@
 
 <div id="jHueNotify" class="alert hide">
   <button class="close">&times;</button>
-  <div class="message"></div>
+  <div class="message"></div> 
 </div>
 
 
@@ -146,6 +141,7 @@ ${ hueIcons.symbols() }
 
   <div class="main-page">
     <AppBanner data-reactcomponent='AppBanner'></AppBanner>
+    <AlertComponent data-reactcomponent='AlertComponent' ></AlertComponent> 
 
     <nav class="navbar navbar-default">
       <div class="navbar-inner top-nav">
@@ -344,97 +340,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
 <iframe id="zoomDetectFrame" style="width: 250px; display: none" ></iframe>
 
 <script type="text/javascript">
-
-  window.EMBEDDABLE_PAGE_URLS = {
-    403: { url: '/403', title: '403' },
-    404: { url: '/404', title: '404' },
-    500: { url: '/500', title: '500' },
-    editor: { url: '/editor', title: '${_('Editor')}' },
-    notebook: { url: '/notebook', title: '${_('Notebook')}' },
-    metastore: { url: '/metastore/*', title: '${_('Table Browser')}' },
-    dashboard: { url: '/dashboard/*', title: '${_('Dashboard')}' },
-    oozie_workflow: { url: '/oozie/editor/workflow/*', title: '${_('Workflow')}' },
-    oozie_coordinator: { url: '/oozie/editor/coordinator/*', title: '${_('Schedule')}' },
-    oozie_bundle: { url: '/oozie/editor/bundle/*', title: '${_('Bundle')}' },
-    oozie_info: { url: '/oozie/list_oozie_info', title: '${_('Oozie')}' },
-    jobbrowser: { url: '/jobbrowser/apps', title: '${_('Job Browser')}' },
-    filebrowser: { url: '/filebrowser/view=*', title: '${_('File Browser')}' },
-    home: { url: '/home*', title: '${_('Home')}' },
-    catalog: { url: '/catalog', title: '${_('Catalog')}' },
-    indexer: { url: '/indexer/indexer/', title: '${_('Indexer')}' },
-    kafka: { url: '/indexer/topics/', title: '${_('Streams')}' },
-    collections: { url: '/dashboard/admin/collections', title: '${_('Search')}' },
-    % if hasattr(ENABLE_NEW_INDEXER, 'get') and ENABLE_NEW_INDEXER.get():
-        indexes: { url: '/indexer/indexes/*', title: '${_('Indexes')}' },
-    % else:
-        indexes: { url: '/indexer/', title: '${_('Indexes')}' },
-    % endif
-    importer: { url: '/indexer/importer/', title: '${_('Importer')}' },
-    useradmin_users: { url: '/useradmin/users', title: '${_('User Admin - Users')}' },
-    useradmin_groups: { url: '/useradmin/groups', title: '${_('User Admin - Groups')}' },
-    useradmin_newgroup: { url: '/useradmin/groups/new', title: '${_('User Admin - New Group')}' },
-    useradmin_editgroup: { url: '/useradmin/groups/edit/:group', title: '${_('User Admin - Edit Group')}' },
-    useradmin_permissions: { url: '/useradmin/permissions', title: '${_('User Admin - Permissions')}' },
-    useradmin_editpermission: { url: '/useradmin/permissions/edit/*', title: '${_('User Admin - Edit Permission')}' },
-    useradmin_configurations: { url: '/useradmin/configurations', title: '${_('User Admin - Configurations')}' },
-    useradmin_organizations: { url: '/useradmin/organizations', title: '${_('User Admin - Organizations')}' },
-    useradmin_newuser: { url: '/useradmin/users/new', title: '${_('User Admin - New User')}' },
-    useradmin_addldapusers: { url: '/useradmin/users/add_ldap_users', title: '${_('User Admin - Add LDAP User')}' },
-    useradmin_edituser: { url: '/useradmin/users/edit/:user', title: '${_('User Admin - Edit User')}' },
-    useradmin_addldapgroups: { url: '/useradmin/users/add_ldap_groups', title: '${_('User Admin - Add LDAP Groups')}' },
-    hbase: { url: '/hbase/', title: '${_('HBase Browser')}' },
-    security_hive: { url: '/security/hive', title: '${_('Security - Hive')}' },
-    security_hdfs: { url: '/security/hdfs', title: '${_('Security - HDFS')}' },
-    security_hive2: { url: '/security/hive2', title: '${_('Security - Hive')}' },
-    security_solr: { url: '/security/solr', title: '${_('Security - SOLR')}' },
-    help: { url: '/help/', title: '${_('Help')}' },
-    admin_wizard: { url: '/about/admin_wizard', title: '${_('Admin Wizard')}' },
-    logs: { url: '/logs', title: '${_('Logs')}' },
-    dump_config: { url: '/desktop/dump_config', title: '${_('Dump Configuration')}' },
-    threads: { url: '/desktop/debug/threads', title: '${_('Threads')}' },
-    metrics: { url: '/desktop/metrics', title: '${_('Metrics')}' },
-    connectors: { url: '/desktop/connectors', title: '${_('Connectors')}' },
-    analytics: { url: '/desktop/analytics', title: '${_('Analytics')}' },
-    sqoop: { url: '/sqoop', title: '${_('Sqoop')}' },
-    jobsub: { url: '/jobsub/not_available', title: '${_('Job Designer')}' },
-    % if other_apps:
-      % for other in other_apps:
-        ${ other.display_name }: { url: '/${ other.display_name }', title: '${ other.nice_name }' },
-      % endfor
-    % endif
-  }
-
-  window.SKIP_CACHE = [
-    'home', 'oozie_workflow', 'oozie_coordinator', 'oozie_bundle', 'dashboard', 'metastore', 'filebrowser',
-    'useradmin_users', 'useradmin_groups', 'useradmin_newgroup', 'useradmin_editgroup',
-    'useradmin_permissions', 'useradmin_editpermission', 'useradmin_configurations', 'useradmin_newuser',
-    'useradmin_addldapusers', 'useradmin_addldapgroups', 'useradmin_edituser', 'useradmin_organizations',
-    'importer',
-    'security_hive', 'security_hdfs', 'security_hive2', 'security_solr', 'logs',
-    % if hasattr(ENABLE_NEW_INDEXER, 'get') and ENABLE_NEW_INDEXER.get():
-      'indexes',
-    % endif
-    % if other_apps:
-      % for other in other_apps:
-        '${ other.display_name }',
-      % endfor
-    % endif
-  ];
-
-  window.OTHER_APPS = [];
-  % if other_apps:
-    % for other in other_apps:
-      window.OTHER_APPS.push('${ other.display_name }');
-    % endfor
-  % endif
-
-  % if is_admin(user):
-  window.SHOW_ADD_MORE_EDITORS = true;
-  % endif
-
-
   $(document).ready(function () {
-
     var tour = new Shepherd.Tour({
       defaults: {
         classes: 'shepherd-theme-hue',

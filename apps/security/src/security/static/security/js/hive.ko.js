@@ -272,10 +272,10 @@ var HiveViewModel = (function () {
             self.originalGroups.push(group);
           });
         } else {
-          $(document).trigger("error", data.message);
+          huePubSub.publish('hue.global.error', {message: data.message});
         }
       }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
+        huePubSub.publish('hue.global.error', {message: xhr.responseText});
       });
     }
 
@@ -296,10 +296,10 @@ var HiveViewModel = (function () {
             vm.list_sentry_privileges_by_authorizable();
             $(document).trigger("createdRole");
           } else {
-            $(document).trigger("error", data.message);
+            huePubSub.publish('hue.global.error', {message: data.message});
           }
         }).fail(function (xhr, textStatus, errorThrown) {
-          $(document).trigger("error", xhr.responseText);
+          huePubSub.publish('hue.global.error', {message: xhr.responseText});
         }).always(function () {
           self.isLoading(false);
         });
@@ -319,10 +319,10 @@ var HiveViewModel = (function () {
             vm.list_sentry_privileges_by_authorizable();
             $(document).trigger("createdRole");
           } else {
-            $(document).trigger("error", data.message);
+            huePubSub.publish('hue.global.error', {message: data.message});
           }
         }).fail(function (xhr, textStatus, errorThrown) {
-          $(document).trigger("error", xhr.responseText);
+          huePubSub.publish('hue.global.error', {message: xhr.responseText});
         }).always(function () {
           self.isLoading(false);
         });
@@ -340,10 +340,10 @@ var HiveViewModel = (function () {
           vm.list_sentry_privileges_by_authorizable();
           $(document).trigger("removedRole");
         } else {
-          $(document).trigger("error", data.message);
+          huePubSub.publish('hue.global.error', {message: data.message});
         }
       }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
+        huePubSub.publish('hue.global.error', {message: xhr.responseText});
       }).always(function () {
         self.isLoading(false);
       });
@@ -358,10 +358,10 @@ var HiveViewModel = (function () {
           vm.list_sentry_privileges_by_authorizable();
           $(document).trigger("createdRole");
         } else {
-          $(document).trigger("error", data.message);
+          huePubSub.publish('hue.global.error', {message: data.message});
         }
       }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
+        huePubSub.publish('hue.global.error', {message: xhr.responseText});
       });
     }
   }
@@ -804,7 +804,7 @@ var HiveViewModel = (function () {
           cache: false
         };
         $.ajax(request).fail(function (xhr, textStatus, errorThrown) {
-          $(document).trigger("error", xhr.responseText);
+          huePubSub.publish('hue.global.error', {message: xhr.responseText});
         });
       }
       else {
@@ -1016,7 +1016,7 @@ var HiveViewModel = (function () {
         },
         success: function (data) {
           if (typeof data.status !== "undefined" && data.status == -1) {
-            $(document).trigger("error", data.message);
+            huePubSub.publish('hue.global.error', {message: data.message});
           }
           else {
             self.roles.removeAll();
@@ -1032,7 +1032,7 @@ var HiveViewModel = (function () {
           }
         }
       }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
+        huePubSub.publish('hue.global.error', {message: xhr.responseText});
       }).always(function () {
         self.isLoadingRoles(false);
       });
@@ -1064,7 +1064,7 @@ var HiveViewModel = (function () {
         },
         success: function (data) {
           if (typeof data.status !== "undefined" && data.status == -1) {
-            $(document).trigger("error", data.message);
+            huePubSub.publish('hue.global.error', {message: data.message});
           }
           else {
             role.privileges.removeAll();
@@ -1080,7 +1080,7 @@ var HiveViewModel = (function () {
           }
         }
       }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
+        huePubSub.publish('hue.global.error', {message: xhr.responseText});
       });
     };
 
@@ -1136,11 +1136,11 @@ var HiveViewModel = (function () {
             self.clearTempRoles();
             $(document).trigger("createdRole");
           } else {
-            $(document).trigger("error", data.message);
+            huePubSub.publish('hue.global.error', {message: data.message});
           }
         }
       }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
+        huePubSub.publish('hue.global.error', {message: xhr.responseText});
       });
     }
 
@@ -1208,11 +1208,11 @@ var HiveViewModel = (function () {
             }
             self.assist.loadData(self.assist.growingTree());
           } else {
-            $(document).trigger("error", data.message);
+            huePubSub.publish('hue.global.error', {message: data.message});
           }
         }
       }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
+        huePubSub.publish('hue.global.error', {message: xhr.responseText});
       }).always(function () {
         self.isLoadingPrivileges(false);
       });
@@ -1250,10 +1250,10 @@ var HiveViewModel = (function () {
             $(document).trigger("deletedBulkPrivileges");
           }
         } else {
-          $(document).trigger("error", data.message);
+          huePubSub.publish('hue.global.error', {message: data.message});
         }
       }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
+        huePubSub.publish('hue.global.error', {message: xhr.responseText});
       });
     }
 
@@ -1270,10 +1270,10 @@ var HiveViewModel = (function () {
           self.list_sentry_privileges_by_authorizable(); // Refresh
           $(document).trigger("addedBulkPrivileges");
         } else {
-          $(document).trigger("error", data.message);
+          huePubSub.publish('hue.global.error', {message: data.message});
         }
       }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
+        huePubSub.publish('hue.global.error', {message: xhr.responseText});
       });
     }
 

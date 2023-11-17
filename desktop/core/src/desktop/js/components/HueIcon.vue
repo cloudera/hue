@@ -18,7 +18,7 @@
 
 <template>
   <svg class="hue-icon">
-    <use :xlink:href="xlinkAttr" />
+    <use :href="xlinkAttr" />
   </svg>
 </template>
 

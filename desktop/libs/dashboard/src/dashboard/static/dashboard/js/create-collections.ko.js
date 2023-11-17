@@ -170,11 +170,11 @@ var CreateCollectionViewModel = function(steps) {
         if (data.status == 0) {
           huePubSub.publish('hue.global.info', {message: data.message});
         } else {
-          $(document).trigger("error", data.message);
+          huePubSub.publish('hue.global.error', {message: data.message});
         }
       })
       .fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
+        huePubSub.publish('hue.global.error', {message: xhr.responseTex});
       });
     }
   };

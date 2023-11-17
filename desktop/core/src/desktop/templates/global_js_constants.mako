@@ -28,6 +28,7 @@
   from beeswax.conf import DOWNLOAD_BYTES_LIMIT, DOWNLOAD_ROW_LIMIT, LIST_PARTITIONS_LIMIT, CLOSE_SESSIONS
   from dashboard.conf import HAS_SQL_ENABLED
   from hadoop.conf import UPLOAD_CHUNK_SIZE
+  from indexer.conf import ENABLE_NEW_INDEXER
   from jobbrowser.conf import ENABLE_HISTORY_V2
   from filebrowser.conf import SHOW_UPLOAD_BUTTON, REMOTE_STORAGE_HOME, MAX_FILE_SIZE_UPLOAD_LIMIT
   from indexer.conf import ENABLE_NEW_INDEXER
@@ -49,14 +50,70 @@
 <%namespace name="sqlDocIndex" file="/sql_doc_index.mako" />
 (function () {
   <%
-    apps = _get_apps(user)[2]
+    current_app, other_apps, apps = _get_apps(user)
   %>
-
   window.AUTOCOMPLETE_TIMEOUT = ${ conf.EDITOR_AUTOCOMPLETE_TIMEOUT.get() };
-
   window.BANNER_TOP_HTML = '${ conf.CUSTOM.BANNER_TOP_HTML.get() }';
-
   window.DISABLE_LOCAL_STORAGE = '${ conf.DISABLE_LOCAL_STORAGE.get() }' === 'True';
+
+  window.EMBEDDABLE_PAGE_URLS = {
+    403: { url: '/403', title: '403' },
+    404: { url: '/404', title: '404' },
+    500: { url: '/500', title: '500' },
+    editor: { url: '/editor', title: '${_('Editor')}' },
+    notebook: { url: '/notebook', title: '${_('Notebook')}' },
+    metastore: { url: '/metastore/*', title: '${_('Table Browser')}' },
+    dashboard: { url: '/dashboard/*', title: '${_('Dashboard')}' },
+    oozie_workflow: { url: '/oozie/editor/workflow/*', title: '${_('Workflow')}' },
+    oozie_coordinator: { url: '/oozie/editor/coordinator/*', title: '${_('Schedule')}' },
+    oozie_bundle: { url: '/oozie/editor/bundle/*', title: '${_('Bundle')}' },
+    oozie_info: { url: '/oozie/list_oozie_info', title: '${_('Oozie')}' },
+    jobbrowser: { url: '/jobbrowser/apps', title: '${_('Job Browser')}' },
+    filebrowser: { url: '/filebrowser/view=*', title: '${_('File Browser')}' },
+    home: { url: '/home*', title: '${_('Home')}' },
+    catalog: { url: '/catalog', title: '${_('Catalog')}' },
+    indexer: { url: '/indexer/indexer/', title: '${_('Indexer')}' },
+    kafka: { url: '/indexer/topics/', title: '${_('Streams')}' },
+    collections: { url: '/dashboard/admin/collections', title: '${_('Search')}' },
+    % if hasattr(ENABLE_NEW_INDEXER, 'get') and ENABLE_NEW_INDEXER.get():
+        indexes: { url: '/indexer/indexes/*', title: '${_('Indexes')}' },
+    % else:
+        indexes: { url: '/indexer/', title: '${_('Indexes')}' },
+    % endif
+    importer: { url: '/indexer/importer/', title: '${_('Importer')}' },
+    useradmin_users: { url: '/useradmin/users', title: '${_('User Admin - Users')}' },
+    useradmin_groups: { url: '/useradmin/groups', title: '${_('User Admin - Groups')}' },
+    useradmin_newgroup: { url: '/useradmin/groups/new', title: '${_('User Admin - New Group')}' },
+    useradmin_editgroup: { url: '/useradmin/groups/edit/:group', title: '${_('User Admin - Edit Group')}' },
+    useradmin_permissions: { url: '/useradmin/permissions', title: '${_('User Admin - Permissions')}' },
+    useradmin_editpermission: { url: '/useradmin/permissions/edit/*', title: '${_('User Admin - Edit Permission')}' },
+    useradmin_configurations: { url: '/useradmin/configurations', title: '${_('User Admin - Configurations')}' },
+    useradmin_organizations: { url: '/useradmin/organizations', title: '${_('User Admin - Organizations')}' },
+    useradmin_newuser: { url: '/useradmin/users/new', title: '${_('User Admin - New User')}' },
+    useradmin_addldapusers: { url: '/useradmin/users/add_ldap_users', title: '${_('User Admin - Add LDAP User')}' },
+    useradmin_edituser: { url: '/useradmin/users/edit/:user', title: '${_('User Admin - Edit User')}' },
+    useradmin_addldapgroups: { url: '/useradmin/users/add_ldap_groups', title: '${_('User Admin - Add LDAP Groups')}' },
+    hbase: { url: '/hbase/', title: '${_('HBase Browser')}' },
+    security_hive: { url: '/security/hive', title: '${_('Security - Hive')}' },
+    security_hdfs: { url: '/security/hdfs', title: '${_('Security - HDFS')}' },
+    security_hive2: { url: '/security/hive2', title: '${_('Security - Hive')}' },
+    security_solr: { url: '/security/solr', title: '${_('Security - SOLR')}' },
+    help: { url: '/help/', title: '${_('Help')}' },
+    admin_wizard: { url: '/about/admin_wizard', title: '${_('Admin Wizard')}' },
+    logs: { url: '/logs', title: '${_('Logs')}' },
+    dump_config: { url: '/desktop/dump_config', title: '${_('Dump Configuration')}' },
+    threads: { url: '/desktop/debug/threads', title: '${_('Threads')}' },
+    metrics: { url: '/desktop/metrics', title: '${_('Metrics')}' },
+    connectors: { url: '/desktop/connectors', title: '${_('Connectors')}' },
+    analytics: { url: '/desktop/analytics', title: '${_('Analytics')}' },
+    sqoop: { url: '/sqoop', title: '${_('Sqoop')}' },
+    jobsub: { url: '/jobsub/not_available', title: '${_('Job Designer')}' },
+    % if other_apps:
+      % for other in other_apps:
+        ${ other.display_name }: { url: '/${ other.display_name }', title: '${ other.nice_name }' },
+      % endfor
+    % endif
+  }
 
   window.CACHEABLE_TTL = {
     default: ${ conf.CUSTOM.CACHEABLE_TTL.get() },
@@ -88,6 +145,22 @@
 
   window.SAML_LOGOUT_URL = '${ CDP_LOGOUT_URL.get() }';
   window.SAML_REDIRECT_URL = '${ get_logout_redirect_url() }';
+  window.SKIP_CACHE = [
+    'home', 'oozie_workflow', 'oozie_coordinator', 'oozie_bundle', 'dashboard', 'metastore', 'filebrowser',
+    'useradmin_users', 'useradmin_groups', 'useradmin_newgroup', 'useradmin_editgroup',
+    'useradmin_permissions', 'useradmin_editpermission', 'useradmin_configurations', 'useradmin_newuser',
+    'useradmin_addldapusers', 'useradmin_addldapgroups', 'useradmin_edituser', 'useradmin_organizations',
+    'importer',
+    'security_hive', 'security_hdfs', 'security_hive2', 'security_solr', 'logs',
+    % if hasattr(ENABLE_NEW_INDEXER, 'get') and ENABLE_NEW_INDEXER.get():
+      'indexes',
+    % endif
+    % if other_apps:
+      % for other in other_apps:
+        '${ other.display_name }',
+      % endfor
+    % endif
+  ];
 
   window.HAS_GIT = ${ len(VCS.keys()) } > 0;
   window.HAS_MULTI_CLUSTER = '${ get_cluster_config(user)['has_computes'] }' === 'True';
@@ -137,8 +210,19 @@
 
   window.SHOW_NOTEBOOKS = '${ SHOW_NOTEBOOKS.get() }' === 'True'
   window.SHOW_UPLOAD_BUTTON = '${ hasattr(SHOW_UPLOAD_BUTTON, 'get') and SHOW_UPLOAD_BUTTON.get() }' === 'True'
+  % if is_admin(user):
+  window.SHOW_ADD_MORE_EDITORS = true;
+  % endif
+
   window.UPLOAD_CHUNK_SIZE = ${ UPLOAD_CHUNK_SIZE.get() };
   window.MAX_FILE_SIZE_UPLOAD_LIMIT = ${ MAX_FILE_SIZE_UPLOAD_LIMIT.get() if hasattr(MAX_FILE_SIZE_UPLOAD_LIMIT, 'get') and MAX_FILE_SIZE_UPLOAD_LIMIT.get() >= 0 else 'undefined' };
+
+  window.OTHER_APPS = [];
+  % if other_apps:
+    % for other in other_apps:
+      window.OTHER_APPS.push('${ other.display_name }');
+    % endfor
+  % endif
 
   window.IS_MULTICLUSTER_ONLY = '${ IS_MULTICLUSTER_ONLY.get() }' === 'True';
   window.IS_K8S_ONLY = '${ IS_K8S_ONLY.get() }' === 'True';
@@ -237,7 +321,7 @@
     'Columns': '${ _('Columns') }',
     'columns': '${ _('columns') }',
     'Compilation': '${ _('Compilation') }',
-    'Compute': '${ _('Compute') }',
+    'Compute': '${ _('Virtual Warehouse') }',
     'condition': '${ _('condition') }',
     'Confirm History Clearing': '${ _('Confirm History Clearing') }',
     'Confirm the deletion?': '${ _('Confirm the deletion?') }',

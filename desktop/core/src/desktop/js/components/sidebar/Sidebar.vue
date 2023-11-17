@@ -39,7 +39,7 @@
     <div class="sidebar-header">
       <a href="javascript:void(0);" @click="$emit('header-click', $event)">
         <svg>
-          <use xlink:href="#hi-sidebar-logo" />
+          <use href="#hi-sidebar-logo" />
         </svg>
       </a>
     </div>

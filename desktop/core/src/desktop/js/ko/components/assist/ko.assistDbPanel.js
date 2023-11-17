@@ -743,7 +743,10 @@ class AssistDbPanel {
     this.init(options.navigationSettings);
     huePubSub.publish(ASSIST_DB_PANEL_IS_READY_EVENT);
 
-    huePubSub.subscribe(ASSIST_IS_DB_PANEL_READY_EVENT, () => {
+    huePubSub.subscribe(ASSIST_IS_DB_PANEL_READY_EVENT, callback => {
+      if (callback) {
+        callback();
+      }
       huePubSub.publish(ASSIST_DB_PANEL_IS_READY_EVENT);
     });
   }
