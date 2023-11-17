@@ -19,10 +19,9 @@ import * as ko from 'knockout';
 import koMapping from 'knockout.mapping';
 
 import componentUtils from './componentUtils';
+import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import UUID from 'utils/string/UUID';
-import huePubSub from 'utils/huePubSub';
-
 export const NAME = 'hue-sentry-privileges';
 
 const TEMPLATE = `
