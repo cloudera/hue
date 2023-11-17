@@ -74,10 +74,10 @@ werkzeug==2.3.6  # Should remove it here and from devtools.mk
 django-utils-six==2.0
 six==1.16.0
 openai==0.27.4
-sentence-transformers==2.2.2
 pyformatting==0.3.3
-chromadb==0.3.29
 boto3==1.28.81
+-r ${ROOT}/desktop/core/pytorch_requirements.txt
+sentence-transformers==2.2.2
 -e file:///${ROOT}/desktop/core/ext-py3/requests-2.28.0
 -e file:///${ROOT}/desktop/core/ext-py3/boto-2.49.0
 -e file:///${ROOT}/desktop/core/ext-py3/django-axes-5.13.0
