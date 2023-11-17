@@ -382,7 +382,7 @@ class MetastoreTable {
           }
         })
         .fail(xhr => {
-          huePubSub.publish('hue.global.info', {message: xhr.responseText});
+          huePubSub.publish('hue.global.info', { message: xhr.responseText });
         });
     };
   }
