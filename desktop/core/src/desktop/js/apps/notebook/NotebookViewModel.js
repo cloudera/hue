@@ -360,7 +360,9 @@ export default class NotebookViewModel {
           const options = {
             successCallback: function (result) {
               if (result && result.exists) {
-                huePubSub.publish('hue.global.info', {message: result.path + ' saved successfully.'});
+                huePubSub.publish('hue.global.info', {
+                  message: result.path + ' saved successfully.'
+                });
               } else {
                 self._ajaxError(result);
               }
