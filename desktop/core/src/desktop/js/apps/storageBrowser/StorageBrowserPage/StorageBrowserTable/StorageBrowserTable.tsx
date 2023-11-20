@@ -19,10 +19,11 @@ import { i18nReact } from '../../../../utils/i18nReact';
 import Table from 'cuix/dist/components/Table';
 import { ColumnProps } from 'antd/lib/table';
 import FolderIcon from '@cloudera/cuix-core/icons/react/ProjectIcon';
-//Todo: Use cuix icon (Currently fileIcon does not exist in cuix)
+//TODO: Use cuix icon (Currently fileIcon does not exist in cuix)
 import { FileOutlined } from '@ant-design/icons';
 
-import { StorageBrowserTableData } from '../../../../reactComponents/FileChooser/types';
+import { PageStats, StorageBrowserTableData } from '../../../../reactComponents/FileChooser/types';
+import StorageBrowserPagination from './StorageBrowserPagination/StorageBrowserPagination';
 import './StorageBrowserTable.scss';
 import Tooltip from 'antd/es/tooltip';
 
@@ -30,6 +31,10 @@ interface StorageBrowserTableProps {
   className?: string;
   dataSource: StorageBrowserTableData[];
   onFilepathChange: (path: string) => void;
+  onPageNumberChange: (pageNumber: number) => void;
+  onPageSizeChange: (pageSize: number) => void;
+  pageSize: number;
+  pageStats: PageStats;
   rowClassName?: string;
   testId?: string;
 }
@@ -44,6 +49,10 @@ const StorageBrowserTable: React.FC<StorageBrowserTableProps> = ({
   className,
   dataSource,
   onFilepathChange,
+  onPageNumberChange,
+  onPageSizeChange,
+  pageSize,
+  pageStats,
   rowClassName,
   testId,
   ...restProps
@@ -53,17 +62,16 @@ const StorageBrowserTable: React.FC<StorageBrowserTableProps> = ({
   const { t } = i18nReact.useTranslation();
 
   const getColumns = file => {
-    // eslint-disable-next-line prefer-const
-    let columns: ColumnProps<unknown>[] = [];
+    const columns: ColumnProps<unknown>[] = [];
     for (const [key] of Object.entries(file)) {
       const temp: ColumnProps<unknown> = {
         dataIndex: `${key}`,
-        title: t(`${key}`),
-        key: `${key}`,
-        width: '20em'
+        title: t(`${key}`.charAt(0).toUpperCase() + `${key}`.slice(1)),
+        key: `${key}`
       };
       if (key === 'name') {
-        temp.ellipsis = true;
+        // temp.ellipsis = true;
+        temp.width = '45rem';
         //TODO: Apply tooltip only for truncated values
         temp.render = (_, record: any) => (
           <Tooltip title={record.name}>
@@ -71,6 +79,8 @@ const StorageBrowserTable: React.FC<StorageBrowserTableProps> = ({
             <span className="hue-storage-browser__table-name-cell">{record.name}</span>
           </Tooltip>
         );
+      } else {
+        key === 'lastUpdated' ? (temp.width = '15rem') : (temp.width = '10rem');
       }
       columns.push(temp);
     }
@@ -91,8 +101,8 @@ const StorageBrowserTable: React.FC<StorageBrowserTableProps> = ({
   useEffect(() => {
     const calculateTableHeight = () => {
       const windowHeight = window.innerHeight;
-      // Todo: move 400 to dynamic based on  table header height, tab nav and some header.
-      const tableHeightFix = windowHeight - 400;
+      // TODO: move 450 to dynamic based on  table header height, tab nav and some header.
+      const tableHeightFix = windowHeight - 450;
       return tableHeightFix;
     };
 
@@ -118,12 +128,19 @@ const StorageBrowserTable: React.FC<StorageBrowserTableProps> = ({
           columns={getColumns(dataSource[0])}
           dataSource={dataSource}
           onRow={onRowClicked}
+          pagination={false}
           rowClassName={rowClassName}
           rowKey={(record, index) => record.path + '' + index}
           scroll={{ y: tableHeight }}
           data-testid={`${testId}`}
           {...restProps}
         ></Table>
+        <StorageBrowserPagination
+          onPageNumberChange={onPageNumberChange}
+          onPageSizeChange={onPageSizeChange}
+          pageSize={pageSize}
+          pageStats={pageStats}
+        ></StorageBrowserPagination>
       </>
     );
   }

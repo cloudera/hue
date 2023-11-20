@@ -19,6 +19,8 @@
 .hue-storage-browser__table {
   @include mixins.hue-svg-icon__d3-conflict;
 
+  margin: 0 vars.$fluidx-spacing-s;
+
   svg {
     color: vars.$fluidx-blue-700;
     margin-right: 6px;

@@ -57,12 +57,25 @@ export interface StorageBrowserTableData {
   path: string;
 }
 
+export interface PageStats {
+  number: number;
+  num_pages: number;
+  previous_page_number: number;
+  next_page_number: number;
+  start_index: number;
+  end_index: number;
+  total_count: number;
+}
+
 export interface BreadcrumbData {
   label: string;
   url: string;
 }
+
 export interface PathAndFileData {
   path: string;
   breadcrumbs: BreadcrumbData[];
   files: File[];
+  page: PageStats;
+  pagesize: number;
 }

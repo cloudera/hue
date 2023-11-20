@@ -27,5 +27,32 @@ export interface ApiFileSystem {
 
 export const fetchFileSystems = (): CancellablePromise<ApiFileSystem[]> => get(FILESYSTEMS_API_URL);
 
-export const fetchFiles = (filePath: string): CancellablePromise<PathAndFileData> =>
-  get(VIEWFILES_API_URl + filePath);
+export const fetchFiles = (
+  filePath: string,
+  pagesize?: number,
+  pagenum?: number,
+  filter?: string,
+  sortby?: string,
+  descending?: boolean
+): CancellablePromise<PathAndFileData> => {
+  //If value is undefined default value is assigned.
+  pagesize = pagesize || 15;
+  pagenum = pagenum || 1;
+  filter = filter || '';
+  sortby = sortby || '';
+  descending = descending || false;
+  return get(
+    VIEWFILES_API_URl +
+      filePath +
+      '?pagesize=' +
+      pagesize +
+      '&pagenum=' +
+      pagenum +
+      '&filter=' +
+      filter +
+      '&sortby=' +
+      sortby +
+      '&descending=' +
+      descending
+  );
+};
