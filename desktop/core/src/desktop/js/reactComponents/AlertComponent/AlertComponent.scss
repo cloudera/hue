@@ -27,6 +27,10 @@
   flex-flow: column;
   row-gap: 10px;
 
+  .ant-alert {
+    padding-right: 12px;
+  }
+
   button:hover,
   button:focus {
     background-color: unset;
@@ -34,7 +38,6 @@
 
   button span {
     font-size: $font-size-sm;
-    padding-top: 5px;
   }
 
   button svg.cdp-icon-close {
