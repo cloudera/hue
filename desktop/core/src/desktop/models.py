@@ -1859,7 +1859,9 @@ class ClusterConfig(object):
         for di in default_interpreter:
           if di['name'] == DEFAULT_INTERPRETER.get():
             return di
-    return default_interpreter[0]
+      return default_interpreter[0]
+    else:
+      return default_app
 
 
   def _get_home(self):
