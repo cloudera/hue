@@ -311,8 +311,18 @@ class LoginAndPermissionMiddleware(MiddlewareMixin):
     request.view_func = view_func
     access_log_level = getattr(view_func, 'access_log_level', None)
 
-    # Skip loop for oidc
-    if request.path in ['/oidc/authenticate/', '/oidc/callback/', '/oidc/logout/', '/hue/oidc_failed/', '/saml2/login/', '/saml2/logout/', '/accounts/logout/']:
+    # Skip loop for oidc and saml2
+    skip_paths = [
+        '/oidc/authenticate/',
+        '/oidc/callback/',
+        '/oidc/logout/',
+        '/hue/oidc_failed/',
+        '/saml2/login/',
+        '/saml2/logout/',
+        '/accounts/logout/'
+    ]
+
+    if request.path in skip_paths:
       return None
 
     if AUTH.AUTO_LOGIN_ENABLED.get() and request.path.startswith('/api/v1/token/auth'):
