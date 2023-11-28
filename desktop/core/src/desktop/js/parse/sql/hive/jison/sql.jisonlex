@@ -26,6 +26,8 @@
 '\u2020'                             { parser.yy.partialCursor = false; parser.yy.cursorFound = yylloc; return 'CURSOR'; }
 '\u2021'                             { parser.yy.partialCursor = true; parser.yy.cursorFound = yylloc; return 'PARTIAL_CURSOR'; }
 
+<between>'AND'                       { this.popState(); return 'BETWEEN_AND'; }
+
 // Reserved Keywords
 'ALL'                                { return 'ALL'; }
 'ALTER'                              { parser.determineCase(yytext); parser.addStatementTypeLocation('ALTER', yylloc, yy.lexer.upcomingInput()); return 'ALTER'; }
@@ -321,8 +323,6 @@ STORED\s+AS\s+DIRECTORIES            { return 'STORED_AS_DIRECTORIES'; }
 '.'                                  { return '.'; }
 '['                                  { return '['; }
 ']'                                  { return ']'; }
-
-<between>'AND'                       { this.popState(); return 'BETWEEN_AND'; }
 
 // --- UDFs ---
 AVG\s*\(                             { yy.lexer.unput('('); yytext = 'avg'; parser.addFunctionLocation(yylloc, yytext); return 'AVG'; }
