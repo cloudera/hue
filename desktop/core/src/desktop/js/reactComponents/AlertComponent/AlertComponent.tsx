@@ -60,6 +60,7 @@ const AlertComponent: React.FC = () => {
           key={errorObj.message}
           type="error"
           message={errorObj.message}
+          showIcon={true}
           closable={true}
           onClose={() => handleClose(errorObj)}
         />
