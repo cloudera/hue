@@ -49,6 +49,7 @@ const StorageBrowserPage: React.FC = (): JSX.Element => {
         })
         .catch(error => {
           //TODO: Properly handle errors.
+          console.error(error);
         })
         .finally(() => {
           setLoading(false);
