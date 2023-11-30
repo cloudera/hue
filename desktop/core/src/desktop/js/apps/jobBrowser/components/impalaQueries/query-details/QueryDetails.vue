@@ -76,7 +76,6 @@
   import CountersTable from './counters-table/CountersTable.vue';
 
   import { CounterDetails, CounterGroup, ImpalaQuery, ImpalaQueryProfile } from '../index';
-  import { hueWindow } from 'types/types';
   import huePubSub from 'utils/huePubSub';
 
   import I18n from 'utils/i18n';
