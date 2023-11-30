@@ -27,7 +27,7 @@
   "license": "Apache-2.0",
   "private": false,
   "engines": {
-    "node": ">=0.10.0"
+    "node": ">=20.10.0"
   },
   "dependencies": {
     "@ant-design/icons": "5.0.1",
