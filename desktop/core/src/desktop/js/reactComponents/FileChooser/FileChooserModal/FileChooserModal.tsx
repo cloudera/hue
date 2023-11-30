@@ -78,6 +78,7 @@ const FileChooserModal: React.FC<FileProps> = ({ show, onCancel, title, okText }
         })
         .catch(error => {
           //TODO: Properly handle errors.
+          console.error(error);
         })
         .finally(() => {
           setLoading(false);
@@ -94,6 +95,7 @@ const FileChooserModal: React.FC<FileProps> = ({ show, onCancel, title, okText }
         })
         .catch(error => {
           //TODO: handle errors
+          console.error(error);
         })
         .finally(() => {
           setloadingFiles(false);
