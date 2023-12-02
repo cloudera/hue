@@ -129,6 +129,7 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
       })
       .catch(error => {
         //TODO: handle errors
+        console.error(error);
       })
       .finally(() => {
         setloadingFiles(false);

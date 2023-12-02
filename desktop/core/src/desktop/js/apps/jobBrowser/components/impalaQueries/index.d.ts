@@ -82,3 +82,12 @@ export interface CounterDetails {
   counterName: string;
   counterValue: string;
 }
+
+export type CounterMetrics = { [key: string]: string };
+
+export type Profile = {
+  cpuMetrics: CounterMetrics;
+  hdfsMetrics: CounterMetrics;
+  memoryMetrics: CounterMetrics;
+  threadTimeMetrics: CounterMetrics;
+};
