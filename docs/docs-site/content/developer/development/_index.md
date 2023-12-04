@@ -114,16 +114,16 @@ For checking git commit message format automatically locally:
     cp tools/githooks/* .git/hooks
     chmod +x .git/hooks/*
 
-#### Visual Code
+#### Visual Studio Code
 
-Adding the 'hue' directory as a workspace, then:
+Add the 'hue' directory as a workspace, then install the following extensions:
 
 Recommended extensions:
 
-* Python - Microsoft
-* EsLint - Dirk Baeumur
-* Mako - tommorris
-* Docker - Microsoft
+* [Python](https://marketplace.visualstudio.com/items?itemName=ms-python.python) - Microsoft
+* [EsLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) - Dirk Baeumur
+* [Mako](https://marketplace.visualstudio.com/items?itemName=tommorris.mako) - tommorris
+* [Docker](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-docker) - Microsoft
 
 #### PyCharm
 

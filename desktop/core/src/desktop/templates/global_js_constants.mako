@@ -28,6 +28,7 @@
   from beeswax.conf import DOWNLOAD_BYTES_LIMIT, DOWNLOAD_ROW_LIMIT, LIST_PARTITIONS_LIMIT, CLOSE_SESSIONS
   from dashboard.conf import HAS_SQL_ENABLED
   from hadoop.conf import UPLOAD_CHUNK_SIZE
+  from indexer.conf import ENABLE_NEW_INDEXER
   from jobbrowser.conf import ENABLE_HISTORY_V2
   from filebrowser.conf import SHOW_UPLOAD_BUTTON, REMOTE_STORAGE_HOME, MAX_FILE_SIZE_UPLOAD_LIMIT
   from indexer.conf import ENABLE_NEW_INDEXER
@@ -49,14 +50,70 @@
 <%namespace name="sqlDocIndex" file="/sql_doc_index.mako" />
 (function () {
   <%
-    apps = _get_apps(user)[2]
+    current_app, other_apps, apps = _get_apps(user)
   %>
-
   window.AUTOCOMPLETE_TIMEOUT = ${ conf.EDITOR_AUTOCOMPLETE_TIMEOUT.get() };
-
   window.BANNER_TOP_HTML = '${ conf.CUSTOM.BANNER_TOP_HTML.get() }';
-
   window.DISABLE_LOCAL_STORAGE = '${ conf.DISABLE_LOCAL_STORAGE.get() }' === 'True';
+
+  window.EMBEDDABLE_PAGE_URLS = {
+    403: { url: '/403', title: '403' },
+    404: { url: '/404', title: '404' },
+    500: { url: '/500', title: '500' },
+    editor: { url: '/editor', title: '${_('Editor')}' },
+    notebook: { url: '/notebook', title: '${_('Notebook')}' },
+    metastore: { url: '/metastore/*', title: '${_('Table Browser')}' },
+    dashboard: { url: '/dashboard/*', title: '${_('Dashboard')}' },
+    oozie_workflow: { url: '/oozie/editor/workflow/*', title: '${_('Workflow')}' },
+    oozie_coordinator: { url: '/oozie/editor/coordinator/*', title: '${_('Schedule')}' },
+    oozie_bundle: { url: '/oozie/editor/bundle/*', title: '${_('Bundle')}' },
+    oozie_info: { url: '/oozie/list_oozie_info', title: '${_('Oozie')}' },
+    jobbrowser: { url: '/jobbrowser/apps', title: '${_('Job Browser')}' },
+    filebrowser: { url: '/filebrowser/view=*', title: '${_('File Browser')}' },
+    home: { url: '/home*', title: '${_('Home')}' },
+    catalog: { url: '/catalog', title: '${_('Catalog')}' },
+    indexer: { url: '/indexer/indexer/', title: '${_('Indexer')}' },
+    kafka: { url: '/indexer/topics/', title: '${_('Streams')}' },
+    collections: { url: '/dashboard/admin/collections', title: '${_('Search')}' },
+    % if hasattr(ENABLE_NEW_INDEXER, 'get') and ENABLE_NEW_INDEXER.get():
+        indexes: { url: '/indexer/indexes/*', title: '${_('Indexes')}' },
+    % else:
+        indexes: { url: '/indexer/', title: '${_('Indexes')}' },
+    % endif
+    importer: { url: '/indexer/importer/', title: '${_('Importer')}' },
+    useradmin_users: { url: '/useradmin/users', title: '${_('User Admin - Users')}' },
+    useradmin_groups: { url: '/useradmin/groups', title: '${_('User Admin - Groups')}' },
+    useradmin_newgroup: { url: '/useradmin/groups/new', title: '${_('User Admin - New Group')}' },
+    useradmin_editgroup: { url: '/useradmin/groups/edit/:group', title: '${_('User Admin - Edit Group')}' },
+    useradmin_permissions: { url: '/useradmin/permissions', title: '${_('User Admin - Permissions')}' },
+    useradmin_editpermission: { url: '/useradmin/permissions/edit/*', title: '${_('User Admin - Edit Permission')}' },
+    useradmin_configurations: { url: '/useradmin/configurations', title: '${_('User Admin - Configurations')}' },
+    useradmin_organizations: { url: '/useradmin/organizations', title: '${_('User Admin - Organizations')}' },
+    useradmin_newuser: { url: '/useradmin/users/new', title: '${_('User Admin - New User')}' },
+    useradmin_addldapusers: { url: '/useradmin/users/add_ldap_users', title: '${_('User Admin - Add LDAP User')}' },
+    useradmin_edituser: { url: '/useradmin/users/edit/:user', title: '${_('User Admin - Edit User')}' },
+    useradmin_addldapgroups: { url: '/useradmin/users/add_ldap_groups', title: '${_('User Admin - Add LDAP Groups')}' },
+    hbase: { url: '/hbase/', title: '${_('HBase Browser')}' },
+    security_hive: { url: '/security/hive', title: '${_('Security - Hive')}' },
+    security_hdfs: { url: '/security/hdfs', title: '${_('Security - HDFS')}' },
+    security_hive2: { url: '/security/hive2', title: '${_('Security - Hive')}' },
+    security_solr: { url: '/security/solr', title: '${_('Security - SOLR')}' },
+    help: { url: '/help/', title: '${_('Help')}' },
+    admin_wizard: { url: '/about/admin_wizard', title: '${_('Admin Wizard')}' },
+    logs: { url: '/logs', title: '${_('Logs')}' },
+    dump_config: { url: '/desktop/dump_config', title: '${_('Dump Configuration')}' },
+    threads: { url: '/desktop/debug/threads', title: '${_('Threads')}' },
+    metrics: { url: '/desktop/metrics', title: '${_('Metrics')}' },
+    connectors: { url: '/desktop/connectors', title: '${_('Connectors')}' },
+    analytics: { url: '/desktop/analytics', title: '${_('Analytics')}' },
+    sqoop: { url: '/sqoop', title: '${_('Sqoop')}' },
+    jobsub: { url: '/jobsub/not_available', title: '${_('Job Designer')}' },
+    % if other_apps:
+      % for other in other_apps:
+        ${ other.display_name }: { url: '/${ other.display_name }', title: '${ other.nice_name }' },
+      % endfor
+    % endif
+  }
 
   window.CACHEABLE_TTL = {
     default: ${ conf.CUSTOM.CACHEABLE_TTL.get() },
@@ -88,6 +145,22 @@
 
   window.SAML_LOGOUT_URL = '${ CDP_LOGOUT_URL.get() }';
   window.SAML_REDIRECT_URL = '${ get_logout_redirect_url() }';
+  window.SKIP_CACHE = [
+    'home', 'oozie_workflow', 'oozie_coordinator', 'oozie_bundle', 'dashboard', 'metastore', 'filebrowser',
+    'useradmin_users', 'useradmin_groups', 'useradmin_newgroup', 'useradmin_editgroup',
+    'useradmin_permissions', 'useradmin_editpermission', 'useradmin_configurations', 'useradmin_newuser',
+    'useradmin_addldapusers', 'useradmin_addldapgroups', 'useradmin_edituser', 'useradmin_organizations',
+    'importer',
+    'security_hive', 'security_hdfs', 'security_hive2', 'security_solr', 'logs',
+    % if hasattr(ENABLE_NEW_INDEXER, 'get') and ENABLE_NEW_INDEXER.get():
+      'indexes',
+    % endif
+    % if other_apps:
+      % for other in other_apps:
+        '${ other.display_name }',
+      % endfor
+    % endif
+  ];
 
   window.HAS_GIT = ${ len(VCS.keys()) } > 0;
   window.HAS_MULTI_CLUSTER = '${ get_cluster_config(user)['has_computes'] }' === 'True';
@@ -137,8 +210,19 @@
 
   window.SHOW_NOTEBOOKS = '${ SHOW_NOTEBOOKS.get() }' === 'True'
   window.SHOW_UPLOAD_BUTTON = '${ hasattr(SHOW_UPLOAD_BUTTON, 'get') and SHOW_UPLOAD_BUTTON.get() }' === 'True'
+  % if is_admin(user):
+  window.SHOW_ADD_MORE_EDITORS = true;
+  % endif
+
   window.UPLOAD_CHUNK_SIZE = ${ UPLOAD_CHUNK_SIZE.get() };
   window.MAX_FILE_SIZE_UPLOAD_LIMIT = ${ MAX_FILE_SIZE_UPLOAD_LIMIT.get() if hasattr(MAX_FILE_SIZE_UPLOAD_LIMIT, 'get') and MAX_FILE_SIZE_UPLOAD_LIMIT.get() >= 0 else 'undefined' };
+
+  window.OTHER_APPS = [];
+  % if other_apps:
+    % for other in other_apps:
+      window.OTHER_APPS.push('${ other.display_name }');
+    % endfor
+  % endif
 
   window.IS_MULTICLUSTER_ONLY = '${ IS_MULTICLUSTER_ONLY.get() }' === 'True';
   window.IS_K8S_ONLY = '${ IS_K8S_ONLY.get() }' === 'True';
@@ -167,9 +251,10 @@
 
   // TODO: Replace with json import
   window.HUE_I18n = {
-    '1 hour':  '${ _('1 hour') }',
-    '1 week':  '${ _('1 week') }',
-    '8 hours':  '${ _('8 hours') }',
+    '1 hour': '${ _('1 hour') }',
+    '1 week': '${ _('1 week') }',
+    '8 hours': '${ _('8 hours') }',
+    'A new top bar!': '${ _('A new top bar!') }',
     'Active cluster': '${ _('Active cluster') }',
     'Active compute': '${ _('Active compute') }',
     'Active database': '${ _('Active database') }',
@@ -182,18 +267,20 @@
     'Add tags...': '${ _('Add tags...') }',
     'Add': '${ _('Add') }',
     'Admin': '${ _('Admin') }',
-    'Administration': '${ _('Administration') }',
     'Administer Server': '${ _('Administer Server') }',
     'Administer Users': '${ _('Administer Users') }',
-    'aggregate': '${ _('aggregate') }',
+    'Administration': '${ _('Administration') }',
     'Aggregate': '${ _('Aggregate') }',
+    'aggregate': '${ _('aggregate') }',
     'alias': '${ _('alias') }',
     'All': '${_('All')}',
     'An error occurred refreshing the table stats. Please try again.': '${_('An error occurred refreshing the table stats. Please try again.')}',
     'Analysis was not possible for the executed query.': '${_('Analysis was not possible for the executed query.')}',
+    'And now go ': '${_('And now go ')}',
     'and': '${_('and')}',
     'Apps': '${ _('Apps') }',
     'Are you sure you want to clear the task history?': '${ _('Are you sure you want to clear the task history?') }',
+    'As a superuser, you can check system configuration from the user menu and install sample data and jobs for your users.': '${ _('As a superuser, you can check system configuration from the user menu and install sample data and jobs for your users.') }',
     'Assist': '${ _('Assist') }',
     'Assistant': '${ _('Assistant') }',
     'at cursor': '${ _('at cursor') }',
@@ -203,8 +290,8 @@
     'Bars': '${ _('Bars') }',
     'Brazil': '${ _('Brazil') }',
     'Browse column privileges': '${_('Browse column privileges')}',
-    'Browse db privileges': '${ _('Browse db privileges') }',
     'Browse DB privileges': '${_('Browse DB privileges')}',
+    'Browse db privileges': '${ _('Browse db privileges') }',
     'Browse table privileges': '${_('Browse table privileges')}',
     'Browsers': '${ _('Browsers') }',
     'Bundle': '${ _('Bundle') }',
@@ -272,8 +359,10 @@
     'dir': '${ _('dir') }',
     'Directory name': '${ _('Directory name') }',
     'Directory': '${ _('Directory') }',
+    'Discover data sources with the improved data assist panel. Remember to right-click for more!': '${ _('Discover data sources with the improved data assist panel. Remember to right-click for more!') }',
     'DistCp Job': '${_('DistCp Job')}',
     'distinct': '${ _('distinct') }',
+    'Do global search and view status of jobs and notifications on the right.': '${_('Do global search and view status of jobs and notifications on the right.')}',
     'Do you really want to delete the following document(s)?': '${ _('Do you really want to delete the following document(s)?') }',
     'Document type': '${ _('Document type') }',
     'Documentation': '${ _('Documentation') }',
@@ -320,17 +409,14 @@
     'Filter columns...': '${ _('Filter columns...') }',
     'Filter databases...': '${ _('Filter databases...') }',
     'Filter sources...': '${ _('Filter sources...') }',
-    'filter': '${ _('filter') }',
     'Filter': '${ _('Filter') }',
+    'filter': '${ _('filter') }',
     'Filter...': '${ _('Filter...') }',
     'Fix': '${ _('Fix') }',
     'Folder name': '${_('Folder name')}',
     'Foreign key': '${_('Foreign key')}',
     'Foreign keys': '${_('Foreign keys')}',
     'Format the current SQL query': '${ _('Format the current SQL query') }',
-    'Share the query selection via a link': '${ _('Share the query selection via a link') }',
-    'Share link': '${ _('Share link') }',
-    'Share as a gist': '${ _('Share as a gist') }',
     'Format': '${ _('Format') }',
     'France': '${ _('France') }',
     'Functions': '${ _('Functions') }',
@@ -349,6 +435,7 @@
     'Hide advanced': '${_('Hide advanced')}',
     'Hide Details': '${ _('Hide Details') }',
     'Hive Query': '${_('Hive Query')}',
+    'Hover on the app name to star it as your favorite application.': '${ _('Hover on the app name to star it as your favorite application.') }',
     'Identifiers': '${ _('Identifiers') }',
     'Ignore this type of error': '${_('Ignore this type of error')}',
     'Impala Query': '${_('Impala Query')}',
@@ -386,6 +473,7 @@
     'Language Reference': '${ _('Language Reference') }',
     'latitude': '${ _('latitude') }',
     'legend': '${ _('legend') }',
+    'Left Assist Panel': '${ _('Left Assist Panel') }',
     'Limit the number of results to...': '${ _('Limit the number of results to...') }',
     'limit': '${ _('limit') }',
     'Lines': '${ _('Lines') }',
@@ -419,13 +507,14 @@
     'Namespaces': '${ _('Namespaces') }',
     'New document': '${ _('New document') }',
     'New folder': '${ _('New folder') }',
+    'Next': '${ _('Next') }',
     'No clusters available': '${ _('No clusters available') }',
     'No clusters available.': '${ _('No clusters available.') }',
     'No clusters found': '${ _('No clusters found') }',
     'No columns found': '${ _('No columns found') }',
     'No computes found': '${ _('No computes found') }',
-    'No data available': '${ _('No data available') }',
     'No Data Available.': '${ _('No Data Available.') }',
+    'No data available': '${ _('No data available') }',
     'No databases found': '${ _('No databases found') }',
     'No databases found.': '${ _('No databases found.') }',
     'No documents found': '${ _('No documents found') }',
@@ -453,6 +542,7 @@
     'Oozie Bundle': '${_('Oozie Bundle')}',
     'Oozie Schedule': '${_('Oozie Schedule')}',
     'Oozie Workflow': '${_('Oozie Workflow')}',
+    'Open apps and browsers, get help and manage your user profile.': '${_('Open apps and browsers, get help and manage your user profile.')}',
     'Open cluster': '${_('Open cluster')}',
     'Open document': '${_('Open document')}',
     'Open folder': '${_('Open folder')}',
@@ -494,6 +584,7 @@
     'Query requires a select or aggregate.': '${ _('Query requires a select or aggregate.') }',
     'Query running': '${ _('Query running') }',
     'Query settings': '${ _('Query settings') }',
+    'Query, Explore, Repeat': '${ _('Query, Explore, Repeat') }',
     'queued': '${ _('queued') }',
     'Re-create session': '${ _('Re-create session') }',
     'Re-create': '${ _('Re-create') }',
@@ -507,6 +598,7 @@
     'Result image': '${ _('Result image') }',
     'result(s) copied to the clipboard' : '${ _('result(s) copied to the clipboard') }',
     'Results have expired, rerun the query if needed.': '${ _('Results have expired, rerun the query if needed.') }',
+    'Right Assist Panel': '${ _('Right Assist Panel') }',
     'Risks': '${ _('Risks') }',
     'Running': '${ _('Running') }',
     'sample query': '${ _('sample query') }',
@@ -538,6 +630,9 @@
     'Set as default application': '${_('Set as default application')}',
     'Set as default settings': '${_('Set as default settings')}',
     'Settings': '${ _('Settings') }',
+    'Share as a gist': '${ _('Share as a gist') }',
+    'Share link': '${ _('Share link') }',
+    'Share the query selection via a link': '${ _('Share the query selection via a link') }',
     'Share': '${ _('Share') }',
     'Sharing': '${ _('Sharing') }',
     'Shell Script': '${_('Shell Script')}',
@@ -551,9 +646,11 @@
     'Show row details': '${_('Show row details')}',
     'Show sample': '${_('Show sample')}',
     'Show view SQL': '${_('Show view SQL')}',
+    'Sidebar for navigation': '${_('Sidebar for navigation')}',
     'Sign out': '${ _('Sign out') }',
     'Size': '${ _('Size') }',
     'Solr Search': '${ _('Solr Search') }',
+    'Some apps have a right panel with additional information to assist you in your data discovery.': '${ _('Some apps have a right panel with additional information to assist you in your data discovery.') }',
     'Sort ascending': '${ _('Sort ascending') }',
     'Sort descending': '${ _('Sort descending') }',
     'sorting': '${ _('sorting') }',
@@ -572,8 +669,8 @@
     'Success.': '${ _('Success.') }',
     'Summary': '${_('Summary')}',
     'Table Browser': '${ _('Table Browser') }',
-    'table': '${ _('table') }',
     'Table': '${ _('Table') }',
+    'table': '${ _('table') }',
     'Tables': '${ _('Tables') }',
     'Tags can only contain 1 to 50 alphanumeric characters, _ or -.': '${ _('Tags can only contain 1 to 50 alphanumeric characters, _ or -.') }',
     'Tags could not be loaded.': '${ _('Tags could not be loaded.') }',
@@ -594,7 +691,9 @@
     'There was a problem loading the indexes': '${ _('There was a problem loading the indexes') }',
     'There was a problem loading the table preview': '${ _('There was a problem loading the table preview') }',
     'There was an error loading the document.': '${ _('There was an error loading the document.') }',
+    'This ends the tour. To see it again, click Welcome Tour from the help section in the sidebar.': '${ _('This ends the tour. To see it again, click Welcome Tour from the help section in the sidebar.') }',
     'This field does not support stats': '${ _('This field does not support stats') }',
+    'This is the main attraction, where your selected app runs.': '${ _('This is the main attraction, where your selected app runs.') }',
     'This will sync missing tables.': '${ _('This will sync missing tables.') }',
     'Timeline Chart': '${ _('Timeline Chart') }',
     'Timeline': '${ _('Timeline') }',
@@ -627,7 +726,9 @@
     'view': '${ _('view') }',
     'Views': '${ _('Views') }',
     'virtual': '${ _('virtual') }',
+    'We want to introduce you to the new interface. It takes less than a minute. Ready?': '${ _('We want to introduce you to the new interface. It takes less than a minute. Ready?') }',
     'Welcome Tour': '${ _('Welcome Tour') }',
+    'Welcome to Hue 4!': '${ _('Welcome to Hue 4!') }',
     'With grant option': '${ _('With grant option') }',
     'With grant': '${ _('With grant') }',
     'Workflow': '${ _('Workflow') }',
@@ -635,7 +736,7 @@
     'x-axis': '${ _('x-axis') }',
     'y-axis': '${ _('y-axis') }',
     'Yes': '${ _('Yes') }',
-    'Yes, delete': '${ _('Yes, delete') }',
+    'Yes, delete': '${ _('Yes, delete') }'
   };
   window.HUE_LANG = '${get_language()}';
 
