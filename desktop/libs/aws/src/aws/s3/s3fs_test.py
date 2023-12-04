@@ -102,7 +102,7 @@ class TestS3FileSystem():
         fs.rmtree(path='s3a://gethue/data')
 
         key.delete.assert_called()
-        key.bucket.list.assert_called_with(prefix='s3a://gethue/data/')
+        key.bucket.list.assert_called_with(prefix='data/')
         key.bucket.delete_keys.assert_not_called()
 
   def test_rmtree_non_empty_dir(self):
@@ -113,7 +113,7 @@ class TestS3FileSystem():
           name='data',
           exists=Mock(return_value=True),
           bucket=Mock(
-            list=Mock(return_value=['s3a://gethue/data/1', 's3a://gethue/data/2']),
+            list=Mock(return_value=['data/1', 'data/2']),
             delete_keys=Mock(
               return_value=Mock(
                 errors=[]
@@ -134,7 +134,7 @@ class TestS3FileSystem():
         fs.rmtree(path='s3a://gethue/data')
 
         key.delete.assert_not_called()
-        key.bucket.list.assert_called_with(prefix='s3a://gethue/data/')
+        key.bucket.list.assert_called_with(prefix='data/')
         key.bucket.delete_keys.assert_called()
 
 
