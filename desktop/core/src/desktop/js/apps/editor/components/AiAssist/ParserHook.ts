@@ -32,10 +32,7 @@ export const useParser = (activeExecutable: SqlExecutable) => {
   const parsedStatement = activeExecutable?.parsedStatement;
   const selectedStatement: string = parsedStatement?.statement || '';
 
-  const loadParser = async executor => {
-    const connector = executor?.connector();
-    const executorDialect = connector?.dialect;
-
+  const updateParserAndDialect = async (executorDialect: string) => {
     if (sqlDialect !== executorDialect) {
       const matchingParser = await sqlParserRepository.getSyntaxParser(executorDialect);
       setSyntaxParser(matchingParser);
@@ -54,13 +51,16 @@ export const useParser = (activeExecutable: SqlExecutable) => {
     };
   }, []);
 
+  const connector = activeExecutable?.executor?.connector();
+  const executorDialect = connector?.dialect;
+
   useEffect(() => {
-    loadParser(activeExecutable?.executor);
+    updateParserAndDialect(executorDialect);
     if (syntaxParser) {
       const newParseError = !!syntaxParser?.parseSyntax('', selectedStatement.trim());
       setHasParseError(newParseError);
     }
-  }, [selectedStatement, syntaxParser]);
+  }, [selectedStatement, executorDialect]);
 
   const hasIncorrectSql = hasMissingNameError || hasParseError;
 
