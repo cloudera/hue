@@ -920,8 +920,8 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       <div class="snippet card card-widget" data-bind="css: {'notebook-snippet' : ! $root.editorMode(), 'editor-mode': $root.editorMode(), 'active-editor': inFocus, 'snippet-text' : type() == 'text'}, attr: {'id': 'snippet_' + id()}, clickForAceFocus: ace">
         <div style="position: relative;">
           % if AI_INTERFACE.SERVICE.get() != None:
-          <!-- ko ifnot: $root.isPresentationMode() -->
-            <AiAssistBar class="cuix antd" data-bind="reactWrapper: 'AiAssistBar', props: { activeExecutable: activeExecutable }"></AiAssistBar>
+          <!-- ko if: activeExecutable() && !$root.isPresentationMode()-->            
+              <AiAssistBar class="cuix antd" data-bind="reactWrapper: 'AiAssistBar', props: { activeExecutable: activeExecutable }"></AiAssistBar>            
           <!-- /ko -->
           % endif
           <div class="snippet-row" style="position: relative;">

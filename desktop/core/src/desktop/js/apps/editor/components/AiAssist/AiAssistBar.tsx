@@ -94,14 +94,15 @@ const getDbName = (activeExecutable: SqlExecutable | undefined) => {
 };
 
 export interface AiAssistBarProps {
-  activeExecutable?: SqlExecutable;
+  activeExecutable: SqlExecutable;
 }
 
-const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
-  const currentExecutable =
-    activeExecutable instanceof Function ? activeExecutable() : activeExecutable;
-
-  const parsedStatement = currentExecutable?.parsedStatement;
+// This is a react root component and it will be rendered each time the wrapping KO binding
+// is responding to an KO observable update. This means that this compoenent will be re-rendered
+// even if the activeExecutable is just modified and not replaced (unlike normal react props).
+// NOTE that for any future child components the activeExecutable will be considered unmodified.
+const AiAssistBar = ({ activeExecutable }: AiAssistBarProps): JSX.Element => {
+  const parsedStatement = activeExecutable?.parsedStatement;
   const selectedStatement: string = parsedStatement?.statement || '';
   const lastSelectedStatement = useRef(selectedStatement);
   const { firstLine, lastLine } = getSelectedLineNumbers(parsedStatement);
@@ -126,8 +127,8 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
   const [errorStatusText, setErrorStatusText] = useState('');
   const [nql, setNql] = useState('');
   const [inputValue, setInputValue] = useState<string>('');
-  const [syntaxParser, sqlDialect, hasIncorrectSql, autocompleteParser] =
-    useParser(currentExecutable);
+  const { syntaxParser, sqlDialect, hasIncorrectSql, autocompleteParser } =
+    useParser(activeExecutable);
 
   const cursorPosition = useRef<{ row: number; column: number } | undefined>();
   const keywordCase = useKeywordCase(syntaxParser, selectedStatement);
@@ -343,9 +344,9 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
   const handleToobarInputSubmit = (userInput: string) => {
     const sqlStatmentToModify = parsedStatement.statement;
     if (isGenerateMode) {
-      generateSqlQuery(userInput, currentExecutable);
+      generateSqlQuery(userInput, activeExecutable);
     } else if (isEditMode) {
-      editSqlQuery(userInput, sqlStatmentToModify, currentExecutable);
+      editSqlQuery(userInput, sqlStatmentToModify, activeExecutable);
     }
   };
 
@@ -432,12 +433,12 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps) => {
     };
     document.addEventListener(
       EDITOR_CURSOR_POSITION_CHANGE_EVENT,
-      handleEditorCursorPostionChange as any
+      handleEditorCursorPostionChange as EventListener
     );
     return () => {
       document.removeEventListener(
         EDITOR_CURSOR_POSITION_CHANGE_EVENT,
-        handleEditorCursorPostionChange as any
+        handleEditorCursorPostionChange as EventListener
       );
     };
   }, []);

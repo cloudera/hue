@@ -16,31 +16,41 @@
   limitations under the License.
 */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import huePubSub from 'utils/huePubSub';
 import sqlParserRepository from 'parse/sql/sqlParserRepository';
 import { SyntaxParser, AutocompleteParser } from 'parse/types';
 import SqlExecutable from '../../execution/sqlExecutable';
 
-// TODO: why not use a state for lastDialect?
-export const useParser = (activeExecutable: SqlExecutable) => {
+const hasError = (syntaxParser: React.RefObject<SyntaxParser | undefined>, sql: string): boolean =>
+  !!syntaxParser.current?.parseSyntax('', sql.trim());
+
+export const useParser = (
+  activeExecutable: SqlExecutable
+): {
+  autocompleteParser: AutocompleteParser | undefined;
+  hasIncorrectSql: boolean;
+  sqlDialect: string;
+  syntaxParser: SyntaxParser | undefined;
+} => {
   const [hasMissingNameError, setMissingNameError] = useState<boolean>(false);
   const [hasParseError, setHasParseError] = useState<boolean>(false);
-  const [syntaxParser, setSyntaxParser] = useState<SyntaxParser>();
-  const [autocompleteParser, setAutocompleteParser] = useState<AutocompleteParser>();
-  const [sqlDialect, setSqlDialect] = useState<string>('');
+  const syntaxParserRef = useRef<SyntaxParser>();
+  const autocompleteParserRef = useRef<AutocompleteParser>();
+  const previousSqlDialectRef = useRef<string>('');
 
   const parsedStatement = activeExecutable?.parsedStatement;
   const selectedStatement: string = parsedStatement?.statement || '';
+  const connector = activeExecutable?.executor?.connector();
+  const sqlDialect = connector?.dialect;
 
-  const updateParserAndDialect = async (executorDialect: string) => {
-    if (sqlDialect !== executorDialect) {
-      const autocompleteParser = await sqlParserRepository.getAutocompleteParser(executorDialect);
-      setAutocompleteParser(autocompleteParser);
-      const matchingParser = await sqlParserRepository.getSyntaxParser(executorDialect);
-      setSyntaxParser(matchingParser);
-      setSqlDialect(executorDialect);
-    }
+  const updateAndParse = async (sqlDialect: string) => {
+    const syntaxParser = await sqlParserRepository.getSyntaxParser(sqlDialect);
+    syntaxParserRef.current = syntaxParser;
+    setHasParseError(hasError(syntaxParserRef, selectedStatement));
+
+    const autocompleteParser = await sqlParserRepository.getAutocompleteParser(sqlDialect);
+    autocompleteParserRef.current = autocompleteParser;
   };
 
   // Subscribe once to be notified when the editor finds that a
@@ -54,18 +64,26 @@ export const useParser = (activeExecutable: SqlExecutable) => {
     };
   }, []);
 
-  const connector = activeExecutable?.executor?.connector();
-  const executorDialect = connector?.dialect;
-
   useEffect(() => {
-    updateParserAndDialect(executorDialect);
-    if (syntaxParser) {
-      const newParseError = !!syntaxParser?.parseSyntax('', selectedStatement.trim());
-      setHasParseError(newParseError);
+    if (previousSqlDialectRef.current !== sqlDialect) {
+      previousSqlDialectRef.current = sqlDialect;
+
+      // To check if there are any parse errors when a new parser is loaded async
+      // we use an async function outside of the sync useEfect hook.
+      updateAndParse(sqlDialect);
     }
-  }, [selectedStatement, executorDialect]);
 
-  const hasIncorrectSql = hasMissingNameError || hasParseError;
+    // If the parser is already loaded but the selectedStatement
+    // has changed we can check for parse errors immediately.
+    if (syntaxParserRef.current) {
+      setHasParseError(hasError(syntaxParserRef, selectedStatement));
+    }
+  }, [selectedStatement, sqlDialect]);
 
-  return [syntaxParser, sqlDialect, hasIncorrectSql, autocompleteParser];
+  return {
+    syntaxParser: syntaxParserRef.current,
+    sqlDialect,
+    hasIncorrectSql: hasMissingNameError || hasParseError,
+    autocompleteParser: autocompleteParserRef.current
+  };
 };
