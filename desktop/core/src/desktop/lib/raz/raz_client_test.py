@@ -380,12 +380,26 @@ class RazClientTest(unittest.TestCase):
         client = RazClient(self.raz_url, 'kerberos', username=self.username, service="s3", service_name="cm_s3", cluster_name="cl1")
         raz_response = client._handle_raz_ha(self.raz_url, auth_handler=HTTPKerberosAuth(), data=request_data, headers={})
 
+        requests_post.assert_called_with(
+          'https://raz.gethue.com:8080/api/authz/s3/access?doAs=gethue',
+          auth=HTTPKerberosAuth(), 
+          headers={}, 
+          json=request_data, 
+          verify=False
+        )
         assert_equal(raz_response.status_code, 200)
 
         # HA mode - where first URL sends 200 status code
         client = RazClient(self.raz_urls_ha, 'kerberos', username=self.username, service="s3", service_name="cm_s3", cluster_name="cl1")
         raz_response = client._handle_raz_ha(self.raz_urls_ha, auth_handler=HTTPKerberosAuth(), data=request_data, headers={})
 
+        requests_post.assert_called_with(
+          'https://raz_host_1.gethue.com:8080/api/authz/s3/access?doAs=gethue',
+          auth=HTTPKerberosAuth(), 
+          headers={}, 
+          json=request_data, 
+          verify=False
+        )
         assert_equal(raz_response.status_code, 200)
 
         # When no RAZ URL is healthy
