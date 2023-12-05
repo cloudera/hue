@@ -151,9 +151,9 @@ class RazClient(object):
 
       request_headers['Authorization'] = 'Bearer %s' % (jwt_token)
       raz_response = self._handle_raz_ha(raz_url, headers=request_headers, data=request_data)
-    
+
     if not raz_response:
-      raise PopupException('Failed to receive response from RAZ server.')
+      raise PopupException('Failed to receive a valid response from RAZ.')
 
     return raz_response
 
@@ -183,23 +183,6 @@ class RazClient(object):
       # Check response for None and if response code is successful (200), return the raz response.
       if (raz_response is not None) and (raz_response.status_code == 200):
         return raz_response
-    
-    
-    # # Try to fetch signed header/token from RAZ URL serially.
-    # for r_url in raz_urls:
-    #   LOG.info('Attempting to connect to RAZ URL: %s' % r_url)
-    #   try:
-    #       raz_response = requests.post(r_url.strip('/'), **kwargs)
-    #       if raz_response.ok:
-    #           return raz_response
-    #       else:
-    #           raise Exception('RAZ URL %s is not available.' % r_url)
-
-    #   except Exception as e:
-    #     LOG.warning('Failed to connect to RAZ URL: %s' % r_url)
-
-    # # Raise exception when all URLs are not available.
-    # raise Exception('Failed to talk to RAZ: No healthy RAZ URL available.')
 
 
   def _make_adls_request(self, request_data, method, path, url_params, resource_path):

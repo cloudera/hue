@@ -34,6 +34,7 @@ class RazClientTest(unittest.TestCase):
   def setUp(self):
     self.username = 'gethue'
     self.raz_url = 'https://raz.gethue.com:8080'
+    self.raz_urls_ha = 'https://raz_host_1.gethue.com:8080/,https://raz_host_2.gethue.com:8080/'
 
     self.s3_path = 'https://gethue-test.s3.amazonaws.com/gethue/data/customer.csv'
     self.adls_path = 'https://gethuestorage.dfs.core.windows.net/gethue-container/user/csso_hueuser/customer.csv'
@@ -62,6 +63,7 @@ class RazClientTest(unittest.TestCase):
         with patch('desktop.lib.raz.raz_client.uuid.uuid4') as uuid:
 
           requests_post.return_value = Mock(
+            status_code=200,
             json=Mock(return_value=
             {
               'operResult': {
@@ -118,28 +120,39 @@ class RazClientTest(unittest.TestCase):
     with patch('desktop.lib.sdxaas.knox_jwt.requests_kerberos.HTTPKerberosAuth') as HTTPKerberosAuth:
       with patch('desktop.lib.raz.raz_client.requests.post') as requests_post:
         with patch('desktop.lib.raz.raz_client.fetch_jwt') as fetch_jwt:
-
           request_headers = {}
           request_data = Mock()
 
           # When auth type is Kerberos
           client = RazClient(self.raz_url, 'kerberos', username=self.username, service="adls", service_name="cm_adls", cluster_name="cl1")
+          client._handle_raz_ha = Mock()
+
           raz_req = client._handle_raz_req(self.raz_url, request_headers, request_data)
 
+          client._handle_raz_ha.assert_called_with('https://raz.gethue.com:8080', auth_handler=HTTPKerberosAuth(), data=request_data, headers={})
           fetch_jwt.assert_not_called()
 
           # When auth type is JWT
           fetch_jwt.return_value = 'test_jwt_token'
 
           client = RazClient(self.raz_url, 'jwt', username=self.username, service="adls", service_name="cm_adls", cluster_name="cl1")
+          client._handle_raz_ha = Mock()
+
           raz_req = client._handle_raz_req(self.raz_url, request_headers, request_data)
 
+          client._handle_raz_ha.assert_called_with('https://raz.gethue.com:8080', data=request_data, headers={'Authorization': 'Bearer test_jwt_token'})
           fetch_jwt.assert_called()
 
-          # Should raise PopupException when JWT is None
-          fetch_jwt.return_value = None 
+          # Should raise PopupException when RAZ response is None
+          client = RazClient(self.raz_url, 'jwt', username=self.username, service="adls", service_name="cm_adls", cluster_name="cl1")
+          client._handle_raz_ha = Mock(return_value=None)
 
-          # token = RazToken(raz_url='https://raz.gethue.com:8080', auth_type='jwt')
+          assert_raises(PopupException, client._handle_raz_req, self.raz_url, request_headers, request_data)
+
+          # Should raise PopupException when JWT is None
+          fetch_jwt.return_value = None
+          client._handle_raz_ha = Mock()
+
           assert_raises(PopupException, client._handle_raz_req, self.raz_url, request_headers, request_data)
 
 
@@ -294,6 +307,7 @@ class RazClientTest(unittest.TestCase):
             with patch('desktop.lib.raz.raz_client.uuid.uuid4') as uuid:
 
               requests_post.return_value = Mock(
+                status_code=200,
                 json=Mock(return_value=
                   {
                     'operResult': {
@@ -354,3 +368,31 @@ class RazClientTest(unittest.TestCase):
               )
               assert_true(resp)
               assert_equal(resp['AWSAccessKeyId'], 'AKIA23E77ZX2HVY76YGL')
+
+
+  def test_handle_raz_ha(self):
+    with patch('desktop.lib.sdxaas.knox_jwt.requests_kerberos.HTTPKerberosAuth') as HTTPKerberosAuth:
+      with patch('desktop.lib.raz.raz_client.requests.post') as requests_post:
+        requests_post.return_value = Mock(status_code=200)
+        request_data = Mock()
+
+        # Non-HA mode
+        client = RazClient(self.raz_url, 'kerberos', username=self.username, service="s3", service_name="cm_s3", cluster_name="cl1")
+        raz_response = client._handle_raz_ha(self.raz_url, auth_handler=HTTPKerberosAuth(), data=request_data, headers={})
+
+        assert_equal(raz_response.status_code, 200)
+
+        # HA mode - where first URL sends 200 status code
+        client = RazClient(self.raz_urls_ha, 'kerberos', username=self.username, service="s3", service_name="cm_s3", cluster_name="cl1")
+        raz_response = client._handle_raz_ha(self.raz_urls_ha, auth_handler=HTTPKerberosAuth(), data=request_data, headers={})
+
+        assert_equal(raz_response.status_code, 200)
+
+        # When no RAZ URL is healthy
+        requests_post.return_value = Mock(status_code=404)
+
+        client = RazClient(self.raz_urls_ha, 'kerberos', username=self.username, service="s3", service_name="cm_s3", cluster_name="cl1")
+        raz_response = client._handle_raz_ha(self.raz_urls_ha, auth_handler=HTTPKerberosAuth(), data=request_data, headers={})
+
+        assert_equal(raz_response, None)
+
