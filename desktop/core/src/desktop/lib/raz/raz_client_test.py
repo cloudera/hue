@@ -129,7 +129,12 @@ class RazClientTest(unittest.TestCase):
 
           raz_req = client._handle_raz_req(self.raz_url, request_headers, request_data)
 
-          client._handle_raz_ha.assert_called_with('https://raz.gethue.com:8080', auth_handler=HTTPKerberosAuth(), data=request_data, headers={})
+          client._handle_raz_ha.assert_called_with(
+            'https://raz.gethue.com:8080',
+            auth_handler=HTTPKerberosAuth(),
+            data=request_data,
+            headers={}
+          )
           fetch_jwt.assert_not_called()
 
           # When auth type is JWT
@@ -140,7 +145,11 @@ class RazClientTest(unittest.TestCase):
 
           raz_req = client._handle_raz_req(self.raz_url, request_headers, request_data)
 
-          client._handle_raz_ha.assert_called_with('https://raz.gethue.com:8080', data=request_data, headers={'Authorization': 'Bearer test_jwt_token'})
+          client._handle_raz_ha.assert_called_with(
+            'https://raz.gethue.com:8080',
+            data=request_data,
+            headers={'Authorization': 'Bearer test_jwt_token'}
+          )
           fetch_jwt.assert_called()
 
           # Should raise PopupException when RAZ response is None
