@@ -2235,7 +2235,7 @@ RAZ = ConfigSection(
     API_URL=Config(
         key='api_url',
         help=_('Endpoint to contact'),
-        type=str,
+        type=coerce_string,
         dynamic_default=_get_raz_url,
     ),
     API_AUTHENTICATION=Config(
