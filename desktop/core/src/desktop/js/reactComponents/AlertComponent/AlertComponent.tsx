@@ -20,48 +20,62 @@ import Alert from 'cuix/dist/components/Alert/Alert';
 import huePubSub from 'utils/huePubSub';
 import './AlertComponent.scss';
 
-interface ErrorAlert {
+interface HueAlert {
   message: string;
+  type: 'error' | 'info' | 'warn';
 }
 
 const AlertComponent: React.FC = () => {
-  const [errors, setErrors] = useState<ErrorAlert[]>([]);
+  const [alerts, setAlerts] = useState<HueAlert[]>([]);
 
-  useEffect(() => {
-    const hueSub = huePubSub.subscribe('hue.global.error', (newError: ErrorAlert) => {
-      if (!newError.message) {
+    const updateAlerts(alerts,type) => {
+      if (!alert.message) {
         return;
       }
+    }
 
-      setErrors(activeErrors => {
-        // Prevent showing the same message multiple times.
-        // TODO: Consider showing a count in the error notification when the same message is reported multiple times.
-        if (activeErrors.some(activeError => activeError.message === newError.message)) {
-          return activeErrors;
-        }
-        return [...activeErrors, newError];
-      });
+  useEffect(() => {
+    const hueSub = huePubSub.subscribe('hue.global.error', (newAlert: HueAlert) => {
+    updateAlerts(newAlert, 'error');
     });
     return () => {
       hueSub.remove();
     };
   }, []);
 
-  const handleClose = (errorObjToClose: ErrorAlert) => {
-    const filteredErrors = errors.filter(errorObj => errorObj !== errorObjToClose);
-    setErrors(filteredErrors);
+  useEffect(() => {
+    const hueSub = huePubSub.subscribe('hue.global.info', (newAlert: HueAlert) => {
+    updateAlerts(newAlert, 'info');
+    });
+    return () => {
+      hueSub.remove();
+    };
+  }, []);
+
+  useEffect(() => {
+    const hueSub = huePubSub.subscribe('hue.global.warn', (newAlert: HueAlert) => {
+    updateAlerts(newAlert, 'warn');
+    });
+    return () => {
+      hueSub.remove();
+    };
+  }, []);
+
+  const handleClose = (errorObjToClose: HueAlert) => {
+    const filteredErrors = alerts.filter(errorObj => errorObj !== errorObjToClose);
+    setAlerts(filteredErrors);
   };
 
   //TODO: add support for warnings and success messages
   return (
     <div className="hue-alert flash-messages cuix antd">
-      {errors.map(errorObj => (
+      {alerts.map(alertObj => (
         <Alert
-          key={errorObj.message}
-          type="error"
-          message={errorObj.message}
+          key={alertObj.message}
+          type={alertObj.type}
+          message={alertObj.message}
           closable={true}
-          onClose={() => handleClose(errorObj)}
+          onClose={() => handleClose(alertObj)}
         />
       ))}
     </div>
