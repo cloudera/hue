@@ -158,8 +158,8 @@ class RazClient(object):
     return raz_response
 
 
-  def _handle_raz_ha(self, raz_urls, headers, data, auth_handler=None, verify=False):
-    raz_urls_list = raz_urls.split(',')
+  def _handle_raz_ha(self, raz_url, headers, data, auth_handler=None, verify=False):
+    raz_urls_list = raz_url.split(',')
     params = {
       'headers': headers, 
       'json': data,
