@@ -42,7 +42,7 @@ ARCHIVE_UPLOAD_TEMPDIR = Config(
 
 FILE_UPLOAD_CHUNK_SIZE = Config(
   key="file_upload_chunk_size",
-  default=5000000,
+  default=5242880,
   type=int,
   help=_('Configure chunk size of the chunked file uploader. Default chunk size is set to 5MB.'))
 
