@@ -51,4 +51,23 @@ describe('useHuePubSub', () => {
 
     expect(result.current).toEqual('some info');
   });
+
+  test('triggers a callback with the info when a message is published', () => {
+    let callbackCalled = false;
+    renderHook(() =>
+      useHuePubSub<string>({
+        topic: 'my.test.topic',
+        callback: a => {
+          expect(a).toEqual('some info');
+          callbackCalled = true;
+        }
+      })
+    );
+
+    act(() => {
+      publishCallback('some info');
+    });
+
+    expect(callbackCalled).toBeTruthy();
+  });
 });
