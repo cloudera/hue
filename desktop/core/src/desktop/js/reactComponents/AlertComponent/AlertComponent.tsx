@@ -28,7 +28,7 @@ interface HueAlert {
 const AlertComponent: React.FC = () => {
   const [alerts, setAlerts] = useState<HueAlert[]>([]);
 
-    const updateAlerts(alerts,type) => {
+    const updateAlerts = (alerts,type) => {
       if (!alerts.message) {
         return;
       }
