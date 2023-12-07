@@ -22,21 +22,21 @@ import './AlertComponent.scss';
 
 interface HueAlert {
   message: string;
-  type: "error" | "info" | "success" | "warning" | undefined;
+  type: 'error' | 'info' | 'success' | 'warning' | undefined;
 }
 
 const AlertComponent: React.FC = () => {
   const [alerts, setAlerts] = useState<HueAlert[]>([]);
 
-    const updateAlerts = (alerts,type) => {
-      if (!alerts.message) {
-        return;
-      }
+  const updateAlerts = (alerts, type) => {
+    if (!alerts.message) {
+      return;
     }
+  };
 
   useEffect(() => {
     const hueSub = huePubSub.subscribe('hue.global.error', (newAlert: HueAlert) => {
-    updateAlerts(newAlert, 'error');
+      updateAlerts(newAlert, 'error');
     });
     return () => {
       hueSub.remove();
@@ -45,7 +45,7 @@ const AlertComponent: React.FC = () => {
 
   useEffect(() => {
     const hueSub = huePubSub.subscribe('hue.global.info', (newAlert: HueAlert) => {
-    updateAlerts(newAlert, 'info');
+      updateAlerts(newAlert, 'info');
     });
     return () => {
       hueSub.remove();
@@ -54,7 +54,7 @@ const AlertComponent: React.FC = () => {
 
   useEffect(() => {
     const hueSub = huePubSub.subscribe('hue.global.warn', (newAlert: HueAlert) => {
-    updateAlerts(newAlert, 'warn');
+      updateAlerts(newAlert, 'warn');
     });
     return () => {
       hueSub.remove();
