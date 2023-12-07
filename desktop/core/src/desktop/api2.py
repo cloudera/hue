@@ -47,7 +47,7 @@ from beeswax.models import Namespace
 from desktop import appmanager
 from desktop.auth.backend import is_admin
 from desktop.conf import ENABLE_CONNECTORS, ENABLE_GIST_PREVIEW, CUSTOM, get_clusters, IS_K8S_ONLY, ENABLE_SHARING
-from desktop.conf import ENABLE_NEW_STORAGE_BROWSER, ENABLE_NEW_FILE_UPLOADER
+from desktop.conf import ENABLE_NEW_STORAGE_BROWSER, ENABLE_CHUNKED_FILE_UPLOADER
 from desktop.conf import AI_INTERFACE, is_ai_interface_enabled, is_ai_trusted_service, ai_service_name, is_vector_db_enabled
 from desktop.lib.conf import BoundContainer, GLOBAL_CONFIG, is_anonymous
 from desktop.lib.django_util import JsonResponse, login_notrequired, render
@@ -106,7 +106,7 @@ def get_config(request):
   config['hue_config']['is_ai_trusted_service'] = is_ai_trusted_service()
   config['hue_config']['is_vector_db_enabled'] = is_vector_db_enabled()
   config['hue_config']['auto_fetch_table_meta_limit'] = AI_INTERFACE.AUTO_FETCH_TABLE_META_LIMIT.get()
-  config['hue_config']['enable_new_file_uploader'] = ENABLE_NEW_FILE_UPLOADER.get()
+  config['hue_config']['enable_chunked_file_uploader'] = ENABLE_CHUNKED_FILE_UPLOADER.get()
   config['clusters'] = list(get_clusters(request.user).values())
   config['documents'] = {
     'types': list(Document2.objects.documents(user=request.user).order_by().values_list('type', flat=True).distinct())
