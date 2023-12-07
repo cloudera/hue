@@ -1818,11 +1818,11 @@ ENABLE_NEW_STORAGE_BROWSER = Config(
   default=False
 )
 
-def get_chunked_fileuploader():
-  return ENABLE_NEW_FILE_UPLOADER.get();
+def is_chunked_fileuploader_enabled():
+  return ENABLE_CHUNKED_FILE_UPLOADER.get();
 
-ENABLE_NEW_FILE_UPLOADER = Config(
-  key="enable_new_file_uploader",
+ENABLE_CHUNKED_FILE_UPLOADER = Config(
+  key="enable_chunked_file_uploader",
   help=_("Enable new chunked file uploader."),
   type=coerce_bool,
   default=False
