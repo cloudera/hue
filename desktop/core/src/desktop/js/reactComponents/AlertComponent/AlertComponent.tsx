@@ -29,7 +29,7 @@ const AlertComponent: React.FC = () => {
   const [alerts, setAlerts] = useState<HueAlert[]>([]);
 
     const updateAlerts(alerts,type) => {
-      if (!alert.message) {
+      if (!alerts.message) {
         return;
       }
     }
@@ -66,7 +66,6 @@ const AlertComponent: React.FC = () => {
     setAlerts(filteredErrors);
   };
 
-  //TODO: add support for warnings and success messages
   return (
     <div className="hue-alert flash-messages cuix antd">
       {alerts.map(alertObj => (
