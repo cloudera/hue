@@ -22,7 +22,7 @@ import './AlertComponent.scss';
 
 interface HueAlert {
   message: string;
-  type: 'error' | 'info' | 'warn';
+  type: "error" | "info" | "success" | "warning" | undefined;
 }
 
 const AlertComponent: React.FC = () => {
