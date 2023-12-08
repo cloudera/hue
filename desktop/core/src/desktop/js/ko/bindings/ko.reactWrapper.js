@@ -29,6 +29,14 @@ const getProps = allBindings => {
   return { ...props, children: ko.toJS(props.children) };
 };
 
+const unwrapProps = props => {
+  const processedProps = Object.create(null);
+  Object.entries(props).forEach(([propName, propValue]) => {
+    processedProps[propName] = ko.unwrap(propValue);
+  });
+  return processedProps;
+};
+
 ko.bindingHandlers.reactWrapper = (() => {
   return {
     init: function (el, valueAccessor, allBindings, viewModel, bindingContext) {
@@ -40,7 +48,7 @@ ko.bindingHandlers.reactWrapper = (() => {
       const reactRoot = createRoot(el);
       el.__KO_React_root = reactRoot;
       loadComponent(componentName).then(Component => {
-        reactRoot.render(createElement(Component, props));
+        reactRoot.render(createElement(Component, unwrapProps(props)));
       });
 
       // Since the react component is a root component we need to handle the
@@ -57,7 +65,7 @@ ko.bindingHandlers.reactWrapper = (() => {
       const props = getProps(allBindings);
 
       loadComponent(componentName).then(Component => {
-        el.__KO_React_root.render(createElement(Component, props));
+        el.__KO_React_root.render(createElement(Component, unwrapProps(props)));
       });
 
       // Handle KO observables
