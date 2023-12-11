@@ -22,16 +22,29 @@ import './AlertComponent.scss';
 
 interface HueAlert {
   message: string;
-  type: 'error' | 'info' | 'success' | 'warning' | undefined;
+  type: 'error' | 'info' | 'warning';
+}
+
+interface ShowAlert {
+  alert: HueAlert;
+  type: 'error' | 'info' | 'warning';
 }
 
 const AlertComponent: React.FC = () => {
-  const [alerts, setAlerts] = useState<HueAlert[]>([]);
+  const [alert, setAlerts] = useState<ShowAlert[]>([]);
 
-  const updateAlerts = (alerts, type) => {
-    if (!alerts.message) {
+  const updateAlerts = (alert, type) => {
+    if (!alert.message) {
       return;
     }
+    setAlerts(activeAlerts => {
+      // Prevent showing the same message multiple times.
+      // TODO: Consider showing a count in the error notification when the same message is reported multiple times.
+      if (activeAlerts.some(activeAlerts => activeAlerts.alert.message === newAlert.alert.message)) {
+        return activeAlerts;
+      }
+      return [...activeAlerts, { alert, type }];
+    });
   };
 
   useEffect(() => {
@@ -62,17 +75,17 @@ const AlertComponent: React.FC = () => {
   }, []);
 
   const handleClose = (errorObjToClose: HueAlert) => {
-    const filteredErrors = alerts.filter(errorObj => errorObj !== errorObjToClose);
+    const filteredErrors = alert.filter(errorObj => errorObj !== errorObjToClose);
     setAlerts(filteredErrors);
   };
 
   return (
     <div className="hue-alert flash-messages cuix antd">
-      {alerts.map(alertObj => (
+      {alert.map(alertObj => (
         <Alert
-          key={alertObj.message}
+          key={alertObj.alert.message}
           type={alertObj.type}
-          message={alertObj.message}
+          message={alertObj.alert.message}
           closable={true}
           onClose={() => handleClose(alertObj)}
         />
