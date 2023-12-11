@@ -19,6 +19,7 @@ import Alert from 'cuix/dist/components/Alert/Alert';
 
 import huePubSub from 'utils/huePubSub';
 import './AlertComponent.scss';
+import { i18nReact } from '../../utils/i18nReact';
 
 interface ErrorAlert {
   message: string;
@@ -52,6 +53,20 @@ const AlertComponent: React.FC = () => {
     setErrors(filteredErrors);
   };
 
+  const { t } = i18nReact.useTranslation();
+
+  const getHeader = (alert)=> {
+    if (alert.type === 'error') {
+      return t('Error');
+    }
+    else if (alert.type === 'info') {
+      return t('Info message here');
+    }
+    else if (alert.type === 'warning') {
+      return t('Warning');
+    }
+  }
+
   //TODO: add support for warnings and success messages
   return (
     <div className="hue-alert flash-messages cuix antd">
@@ -59,7 +74,7 @@ const AlertComponent: React.FC = () => {
         <Alert
           key={errorObj.message}
           type="error"
-          message="Error"
+          message={getHeader(errorObj)}
           description={errorObj.message}
           showIcon={true}
           closable={true}
