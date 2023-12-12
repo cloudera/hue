@@ -22,7 +22,6 @@ import './AlertComponent.scss';
 
 interface HueAlert {
   message: string;
-  type: 'error' | 'info' | 'warning';
 }
 
 interface ShowAlert {
@@ -40,7 +39,7 @@ const AlertComponent: React.FC = () => {
     setAlerts(activeAlerts => {
       // Prevent showing the same message multiple times.
       // TODO: Consider showing a count in the error notification when the same message is reported multiple times.
-      if (activeAlerts.some(activeAlerts => activeAlerts.alert.message === newAlert.alert.message)) {
+      if (activeAlerts.some(activeAlerts => activeAlerts.alert.message === alert.message)) {
         return activeAlerts;
       }
       return [...activeAlerts, { alert, type }];
@@ -66,8 +65,8 @@ const AlertComponent: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    const hueSub = huePubSub.subscribe('hue.global.warn', (newAlert: HueAlert) => {
-      updateAlerts(newAlert, 'warn');
+    const hueSub = huePubSub.subscribe('hue.global.warning', (newAlert: HueAlert) => {
+      updateAlerts(newAlert, 'warning');
     });
     return () => {
       hueSub.remove();
