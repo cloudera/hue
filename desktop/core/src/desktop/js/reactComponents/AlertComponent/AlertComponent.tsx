@@ -60,7 +60,7 @@ const AlertComponent: React.FC = () => {
       return t('Error');
     }
     else if (alert.type === 'info') {
-      return t('Info message here');
+      return t('Info');
     }
     else if (alert.type === 'warning') {
       return t('Warning');
