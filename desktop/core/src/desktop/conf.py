@@ -1818,6 +1818,16 @@ ENABLE_NEW_STORAGE_BROWSER = Config(
   default=False
 )
 
+def is_chunked_fileuploader_enabled():
+  return ENABLE_CHUNKED_FILE_UPLOADER.get();
+
+ENABLE_CHUNKED_FILE_UPLOADER = Config(
+  key="enable_chunked_file_uploader",
+  help=_("Enable new chunked file uploader."),
+  type=coerce_bool,
+  default=False
+)
+
 USE_NEW_EDITOR = Config( # To remove in Hue 4
   key='',
   default=True,
@@ -2235,7 +2245,7 @@ RAZ = ConfigSection(
     API_URL=Config(
         key='api_url',
         help=_('Endpoint to contact'),
-        type=str,
+        type=coerce_string,
         dynamic_default=_get_raz_url,
     ),
     API_AUTHENTICATION=Config(

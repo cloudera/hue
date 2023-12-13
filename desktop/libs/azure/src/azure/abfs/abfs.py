@@ -449,7 +449,7 @@ class ABFS(object):
       params['action'] = 'append'
     headers = {}
     if size == 0 or size == '0':
-      headers['Content-Length'] = str(len(data))
+      headers['Content-Length'] = str(len(data.getvalue()))
       if headers['Content-Length'] == '0':
         return
     else:

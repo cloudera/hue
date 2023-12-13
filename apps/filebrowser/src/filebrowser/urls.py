@@ -44,6 +44,8 @@ urlpatterns = [
   # POST operations
   re_path(r'^save$', filebrowser_views.save_file, name="filebrowser_views_save_file"),
   re_path(r'^upload/file$', filebrowser_views.upload_file, name='upload_file'),
+  re_path(r'^upload/chunks', filebrowser_views.upload_chunks, name='upload_chunks'),
+  re_path(r'^upload/complete', filebrowser_views.upload_complete, name='upload_complete'),
   re_path(r'^extract_archive', filebrowser_views.extract_archive_using_batch_job, name='extract_archive_using_batch_job'),
   re_path(r'^compress_files', filebrowser_views.compress_files_using_batch_job, name='compress_files_using_batch_job'),
   re_path(r'^trash/restore$', filebrowser_views.trash_restore, name='trash_restore'),
