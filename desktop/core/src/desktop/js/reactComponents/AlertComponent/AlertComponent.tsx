@@ -79,19 +79,17 @@ const AlertComponent: React.FC = () => {
     setAlerts(filteredErrors);
   };
 
-  const {t} = i18nReact.useTranslation();
+  const { t } = i18nReact.useTranslation();
 
-  const getHeader = (alert)=> {
+  const getHeader = alert => {
     if (alert.type === 'error') {
       return t('Error');
-    }
-    else if (alert.type === 'info') {
+    } else if (alert.type === 'info') {
       return t('Info');
-    }
-    else if (alert.type === 'warning') {
+    } else if (alert.type === 'warning') {
       return t('Warning');
     }
-  }
+  };
 
   return (
     <div className="hue-alert flash-messages cuix antd">
