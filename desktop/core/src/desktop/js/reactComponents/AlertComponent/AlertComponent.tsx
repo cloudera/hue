@@ -19,6 +19,7 @@ import Alert from 'cuix/dist/components/Alert/Alert';
 
 import huePubSub from 'utils/huePubSub';
 import './AlertComponent.scss';
+import { i18nReact } from '../../utils/i18nReact';
 
 interface HueAlert {
   message: string;
@@ -78,13 +79,29 @@ const AlertComponent: React.FC = () => {
     setAlerts(filteredErrors);
   };
 
+  const {t} = i18nReact.useTranslation();
+
+  const getHeader = (alert)=> {
+    if (alert.type === 'error') {
+      return t('Error');
+    }
+    else if (alert.type === 'info') {
+      return t('Info');
+    }
+    else if (alert.type === 'warning') {
+      return t('Warning');
+    }
+  }
+
   return (
     <div className="hue-alert flash-messages cuix antd">
       {alert.map(alertObj => (
         <Alert
           key={alertObj.alert.message}
           type={alertObj.type}
-          message={alertObj.alert.message}
+          message={getHeader(alertObj)}
+          description={alertObj.alert.message}
+          showIcon={true}
           closable={true}
           onClose={() => handleClose(alertObj)}
         />
