@@ -24,13 +24,13 @@ interface HueAlert {
   message: string;
 }
 
-interface ShowAlert {
+interface VisibleAlert {
   alert: HueAlert;
   type: 'error' | 'info' | 'warning';
 }
 
 const AlertComponent: React.FC = () => {
-  const [alert, setAlerts] = useState<ShowAlert[]>([]);
+  const [alert, setAlerts] = useState<VisibleAlert[]>([]);
 
   const updateAlerts = (alert, type) => {
     if (!alert.message) {
