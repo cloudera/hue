@@ -74,9 +74,9 @@ const AlertComponent: React.FC = () => {
     };
   }, []);
 
-  const handleClose = (errorObjToClose: HueAlert) => {
-    const filteredErrors = alert.filter(errorObj => errorObj !== errorObjToClose);
-    setAlerts(filteredErrors);
+  const handleClose = (alertObjToClose: HueAlert) => {
+    const filteredAlerts = alert.filter(alertObj => alertObj.alert !== alertObjToClose);
+    setAlerts(filteredAlerts);
   };
 
   const { t } = i18nReact.useTranslation();
@@ -103,7 +103,7 @@ const AlertComponent: React.FC = () => {
           description={alertObj.alert.message}
           showIcon={true}
           closable={true}
-          onClose={() => handleClose(alertObj)}
+          onClose={() => handleClose(alertObj.alert)}
         />
       ))}
     </div>
