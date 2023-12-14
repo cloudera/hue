@@ -16,7 +16,7 @@
 import React from 'react';
 import { Button, Dropdown } from 'antd';
 import type { MenuProps } from 'antd';
-import { i18nReact } from '../../../../../utils/i18nReact';
+import { i18nReact } from '../../utils/i18nReact';
 
 import PageFirstIcon from '@cloudera/cuix-core/icons/react/PageFirstIcon';
 import PagePreviousIcon from '@cloudera/cuix-core/icons/react/PagePreviousIcon';
@@ -24,25 +24,28 @@ import PageNextIcon from '@cloudera/cuix-core/icons/react/PageNextIcon';
 import PageLastIcon from '@cloudera/cuix-core/icons/react/PageLastIcon';
 import DropdownIcon from '@cloudera/cuix-core/icons/react/DropdownIcon';
 
-import { PageStats } from '../../../../../reactComponents/FileChooser/types';
-import './StorageBrowserPagination.scss';
+import { PageStats } from '../FileChooser/types';
+import './Pagination.scss';
 
-interface StorageBrowserPaginationProps {
+interface PaginationProps {
+  onNextPageButtonClicked: (nextPageNumber: number, numPages: number) => void;
   onPageNumberChange: (pageNumber: number) => void;
   onPageSizeChange: (pageSize: number) => void;
+  onPreviousPageButtonClicked: (previousPageNumber: number) => void;
   pageSize: number;
   pageSizeOptions?: number[];
   pageStats: PageStats;
 }
 
 const defaultProps = {
-  currentPage: 1,
-  pageSizeOptions: [15, 30, 45, 60, 100, 200, 1000]
+  pageSizeOptions: [10, 50, 500, 1000]
 };
 
-const StorageBrowserPagination: React.FC<StorageBrowserPaginationProps> = ({
+const Pagination: React.FC<PaginationProps> = ({
+  onNextPageButtonClicked,
   onPageNumberChange,
   onPageSizeChange,
+  onPreviousPageButtonClicked,
   pageSize,
   pageSizeOptions,
   pageStats
@@ -69,7 +72,7 @@ const StorageBrowserPagination: React.FC<StorageBrowserPaginationProps> = ({
   });
 
   return (
-    <div className="hue-storage-browser__pagination">
+    <div className="hue-pagination">
       <div className="hue-pagination__page-size-control">
         {t('Rows per page: ')}
         <Dropdown menu={{ items: pageSizeOptionsMenu }}>
@@ -89,23 +92,13 @@ const StorageBrowserPagination: React.FC<StorageBrowserPaginationProps> = ({
           <PageFirstIcon />
         </Button>
         <Button
-          onClick={() =>
-            onPageNumberChange(
-              //If previous page does not exists api returns 0
-              pageStats.previous_page_number === 0 ? 1 : pageStats.previous_page_number
-            )
-          }
+          onClick={() => onPreviousPageButtonClicked(pageStats.previous_page_number)}
           className="hue-pagination__control-button"
         >
           <PagePreviousIcon />
         </Button>
         <Button
-          onClick={() =>
-            onPageNumberChange(
-              //If next page does not exists api returns 0
-              pageStats.next_page_number === 0 ? pageStats.num_pages : pageStats.next_page_number
-            )
-          }
+          onClick={() => onNextPageButtonClicked(pageStats.next_page_number, pageStats.num_pages)}
           className="hue-pagination__control-button"
         >
           <PageNextIcon />
@@ -121,5 +114,5 @@ const StorageBrowserPagination: React.FC<StorageBrowserPaginationProps> = ({
   );
 };
 
-StorageBrowserPagination.defaultProps = defaultProps;
-export default StorageBrowserPagination;
+Pagination.defaultProps = defaultProps;
+export default Pagination;

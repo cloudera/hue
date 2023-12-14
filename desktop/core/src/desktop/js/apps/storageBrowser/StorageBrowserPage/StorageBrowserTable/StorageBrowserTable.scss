@@ -16,40 +16,42 @@
 @use 'variables' as vars;
 @use 'mixins';
 
+$cell-height: 40px;
+
 .hue-storage-browser__table {
   @include mixins.hue-svg-icon__d3-conflict;
 
   margin: 0 vars.$fluidx-spacing-s;
 
-  svg {
+  .hue-storage-browser__table-cell-icon {
     color: vars.$fluidx-blue-700;
     margin-right: 6px;
   }
 
   thead {
     //TODO:Check why height isnt applied in safari browser
-    height: 40px;
+    height: $cell-height;
     background-color: vars.$fluidx-gray-040;
   }
 
   th.ant-table-cell {
     text-align: left;
   }
+}
 
-  .hue-storage-browser__table-row {
-    height: 40px;
-    border-bottom: solid 1px vars.$fluidx-gray-300;
+.hue-storage-browser__table-row {
+  height: $cell-height;
+  border-bottom: solid 1px vars.$fluidx-gray-300;
 
-    td.ant-table-cell {
-      white-space: nowrap;
-      overflow-x: hidden;
-      text-overflow: ellipsis;
-      //ellipsis does not work without display as block or specifying max-width. Display as block not possible in table
-      max-width: 400px;
-    }
+  td.ant-table-cell {
+    white-space: nowrap;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+    //ellipsis does not work without display as block or specifying max-width. Display as block not possible in table
+    max-width: 400px;
   }
 }
 
-.hue-storage-browser__table-name-cell {
+.hue-storage-browser__table-cell-name {
   color: vars.$fluidx-blue-700;
 }

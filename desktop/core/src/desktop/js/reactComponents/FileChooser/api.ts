@@ -20,6 +20,7 @@ import { PathAndFileData } from './types';
 
 const FILESYSTEMS_API_URL = '/api/v1/storage/filesystems';
 const VIEWFILES_API_URl = '/api/v1/storage/view=';
+
 export interface ApiFileSystem {
   file_system: string;
   user_home_directory: string;
@@ -27,6 +28,7 @@ export interface ApiFileSystem {
 
 export const fetchFileSystems = (): CancellablePromise<ApiFileSystem[]> => get(FILESYSTEMS_API_URL);
 
+//TODO: Use object as parameter instead
 export const fetchFiles = (
   filePath: string,
   pagesize?: number,
@@ -36,7 +38,7 @@ export const fetchFiles = (
   descending?: boolean
 ): CancellablePromise<PathAndFileData> => {
   //If value is undefined default value is assigned.
-  pagesize = pagesize || 15;
+  pagesize = pagesize || 10;
   pagenum = pagenum || 1;
   filter = filter || '';
   sortby = sortby || '';

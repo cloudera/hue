@@ -16,7 +16,7 @@
 @use 'variables' as vars;
 @use 'mixins';
 
-.hue-storage-browser__pagination {
+.hue-pagination {
   background-color: vars.$fluidx-gray-100;
   height: 20px;
   margin: 0;
