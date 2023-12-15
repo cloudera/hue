@@ -46,6 +46,8 @@ RUN rm desktop/conf/*
 COPY desktop/conf.dist desktop/conf
 
 # Need recent version for Ubuntu
+# Upgrading to node-v16 because of the following CVE's in node-v14 "CVE-2021-3450, CVE-2021-44531, CVE-2023-32004, CVE-2023-32006"
+# Node-v20-LTS is not supported by old OS'es - Redhat7_ppc, Centos7, Ubuntu18, Sles12. So upgrading to node-v16
 RUN curl -sL https://deb.nodesource.com/setup_16.x | sudo bash - \
   && apt-get install -y nodejs
 

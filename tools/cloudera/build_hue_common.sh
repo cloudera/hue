@@ -55,7 +55,9 @@ function redhat7_ppc_install() {
       xmlsec1 \
       xmlsec1-openssl \
       unzip'
-    # NODEJS 14 install
+    # NODEJS 16 install
+    # Upgrading to node-v16 because of the following CVE's in node-v14 "CVE-2021-3450, CVE-2021-44531, CVE-2023-32004, CVE-2023-32006"
+    # Node-v20-LTS is not supported by old OS'es - Redhat7_ppc, Centos7, Ubuntu18, Sles12. So upgrading to node-v16
     sudo -- sh -c 'curl -fsSL https://nodejs.org/dist/v16.20.2/node-v16.20.2-linux-ppc64le.tar.gz -o node-v16.20.2-linux-ppc64le.tar.gz && \
       mkdir -p /usr/local/lib/nodejs && \
       tar -xzf node-v16.20.2-linux-ppc64le.tar.gz -C /usr/local/lib/nodejs'
@@ -108,7 +110,7 @@ function redhat8_ppc_install() {
       ncurses-devel'
     # MySQLdb install
     sudo -- sh -c 'yum install -y python3-mysqlclient'
-    # NODEJS 14 install
+    # NODEJS install
     sudo sh -c 'curl -fsSL https://nodejs.org/dist/v20.11.0/node-v20.11.0-linux-ppc64le.tar.gz -o node-v20.11.0-linux-ppc64le.tar.gz && \
       mkdir -p /usr/local/lib/nodejs && \
       tar -xzf node-v20.11.0-linux-ppc64le.tar.gz -C /usr/local/lib/nodejs'
@@ -142,7 +144,7 @@ function redhat9_ppc_install() {
       ncurses-devel'
     # MySQLdb install
     sudo -- sh -c 'yum install -y python3-mysqlclient'
-    # NODEJS 14 install
+    # NODEJS install
     sudo sh -c 'curl -fsSL https://nodejs.org/dist/v20.11.0/node-v20.11.0-linux-ppc64le.tar.gz -o node-v20.11.0-linux-ppc64le.tar.gz && \
       mkdir -p /usr/local/lib/nodejs && \
       tar -xzf node-v20.11.0-linux-ppc64le.tar.gz -C /usr/local/lib/nodejs'
@@ -178,6 +180,8 @@ function sles12_install() {
     # MySQLdb install
     sudo -- sh -c 'zypper install -y libmysqlclient-devel libmysqlclient18 libmysqld18 libmysqld-devel'
     # NODEJS 16 install
+    # Upgrading to node-v16 because of the following CVE's in node-v14 "CVE-2021-3450, CVE-2021-44531, CVE-2023-32004, CVE-2023-32006"
+    # Node-v20-LTS is not supported by old OS'es - Redhat7_ppc, Centos7, Ubuntu18, Sles12. So upgrading to node-v16
     sudo -- sh -c 'zypper install -y npm14 nodejs16'
     # Pip modules install
     sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}' mysqlclient==2.1.1'
@@ -240,6 +244,8 @@ function centos7_install() {
         rpm -ivh mysql80-community-release-el7-11.noarch.rpm && \
         yum install -y mysql-community-libs mysql-community-client-plugins mysql-community-common'
     # NODEJS 16 install
+    # Upgrading to node-v16 because of the following CVE's in node-v14 "CVE-2021-3450, CVE-2021-44531, CVE-2023-32004, CVE-2023-32006"
+    # Node-v20-LTS is not supported by old OS'es - Redhat7_ppc, Centos7, Ubuntu18, Sles12. So upgrading to node-v16
     sudo -- sh -c 'curl -fsSL https://rpm.nodesource.com/setup_16.x | sudo bash - && \
         yum install -y nodejs npm'
     # sqlite3 install
@@ -322,6 +328,8 @@ function ubuntu18_install() {
     # MySQLdb install
     # It is pre-installed
     # NODEJS 16 install
+    # Upgrading to node-v16 because of the following CVE's in node-v14 "CVE-2021-3450, CVE-2021-44531, CVE-2023-32004, CVE-2023-32006"
+    # Node-v20-LTS is not supported by old OS'es - Redhat7_ppc, Centos7, Ubuntu18, Sles12. So upgrading to node-v16
     sudo -- sh -c 'curl -sL https://deb.nodesource.com/setup_16.x | sudo bash - && \
       apt -y install nodejs'
     # Pip modules install

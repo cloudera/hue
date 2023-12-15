@@ -46,8 +46,6 @@ function install_prerequisite() {
     export FORCEINSTALL=0
     export SQLITE3_PATH="$TOOLS_HOME/sqlite/bin/sqlite3"
     redhat7_ppc_install
-    # NODEJS install
-    source /opt/rh/rh-nodejs14/enable
   fi
 
   export SQLITE3_PATH=${SQLITE3_PATH:-"$TOOLS_HOME/sqlite/sqlite3"}
