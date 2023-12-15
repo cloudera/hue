@@ -46,6 +46,7 @@ function install_prerequisite() {
     export FORCEINSTALL=0
     export SQLITE3_PATH="$TOOLS_HOME/sqlite/bin/sqlite3"
     redhat7_ppc_install
+    # NODEJS install
     source /opt/rh/rh-nodejs14/enable
   fi
 
@@ -60,7 +61,6 @@ function install_prerequisite() {
     export PYTHON38_PATH=/opt/cloudera/cm-agent
     export pip38_bin="$PYTHON38_PATH/bin/pip3.8"
     centos7_install
-    source /opt/rh/rh-nodejs14/enable
   elif [[ $1 == "redhat8" ]]; then
     redhat8_install
   elif [[ $1 == "sles12" ]]; then

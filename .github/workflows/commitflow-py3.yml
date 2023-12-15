@@ -45,7 +45,7 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y gcc g++ build-essential python${{ matrix.python-version }}-dev python${{ matrix.python-version }}-venv python${{ matrix.python-version }}-distutils asciidoc rsync curl sudo libkrb5-dev libldap2-dev libsasl2-dev libxml2-dev libxslt-dev  libsasl2-modules-gssapi-mit libsnappy-dev libffi-dev # This should not be needed as some point
-        sudo curl -sL https://deb.nodesource.com/setup_14.x | sudo bash - && sudo apt-get install -y nodejs
+        sudo curl -sL https://deb.nodesource.com/setup_20.x | sudo bash - && sudo apt-get install -y nodejs
         sudo curl -sL https://bootstrap.pypa.io/get-pip.py | sudo python${{ matrix.python-version }}
         sudo apt-get install -y python3-setuptools
         sudo apt-get install -y libncursesw5-dev libgdbm-dev libc6-dev libssl-dev openssl
@@ -69,7 +69,7 @@ jobs:
         curl -O https://dl.google.com/go/go1.17.linux-amd64.tar.gz
         tar -xvf go1.17.linux-amd64.tar.gz
         export GO111MODULE=on
-        go/bin/go get -u github.com/raviqqe/muffet@v1.5.7
+        go/bin/go install github.com/raviqqe/muffet@v1.5.7
 
         curl --output hugo_0.69.0_Linux.tar.gz -L https://github.com/gohugoio/hugo/releases/download/v0.69.0/hugo_0.69.0_Linux-64bit.tar.gz
         tar -xvf hugo_0.69.0_Linux.tar.gz

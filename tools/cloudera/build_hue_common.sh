@@ -56,9 +56,12 @@ function redhat7_ppc_install() {
       xmlsec1-openssl \
       unzip'
     # NODEJS 14 install
-    sudo -- sh -c 'yum install -y rh-nodejs14-runtime-3.6-1.el7.ppc64le.rpm \
-      rh-nodejs14-npm-6.14.15-14.18.2.1.el7.ppc64le.rpm \
-      rh-nodejs14-nodejs-14.18.2-1.el7.ppc64le.rpm'
+    sudo -- sh -c 'curl -fsSL https://nodejs.org/dist/v16.20.2/node-v16.20.2-linux-ppc64le.tar.gz -o node-v16.20.2-linux-ppc64le.tar.gz && \
+      mkdir -p /usr/local/lib/nodejs && \
+      tar -xzf node-v16.20.2-linux-ppc64le.tar.gz -C /usr/local/lib/nodejs'
+    echo 'export PATH=/usr/local/lib/nodejs/node-v16.20.2-linux-ppc64le/bin:$PATH' >> ~/.bashrc
+    source ~/.bashrc
+
     # sqlite3 install
     sudo TOOLS_HOME=${TOOLS_HOME} -- sh -c 'mkdir -p ${TOOLS_HOME} && \
       cd ${TOOLS_HOME} && \
@@ -106,7 +109,11 @@ function redhat8_ppc_install() {
     # MySQLdb install
     sudo -- sh -c 'yum install -y python3-mysqlclient'
     # NODEJS 14 install
-    sudo -- sh -c 'yum install -y nodejs npm'
+    sudo sh -c 'curl -fsSL https://nodejs.org/dist/v20.11.0/node-v20.11.0-linux-ppc64le.tar.gz -o node-v20.11.0-linux-ppc64le.tar.gz && \
+      mkdir -p /usr/local/lib/nodejs && \
+      tar -xzf node-v20.11.0-linux-ppc64le.tar.gz -C /usr/local/lib/nodejs'
+    echo 'export PATH=/usr/local/lib/nodejs/node-v20.11.0-linux-ppc64le/bin:$PATH' >> ~/.bashrc
+    source ~/.bashrc
     # Pip modules install
     sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}' mysqlclient==2.1.1'
     sudo pip38_bin=${pip38_bin} -- sh -c 'ln -fs ${pip38_bin} $(dirname ${pip38_bin})/pip'
@@ -136,7 +143,11 @@ function redhat9_ppc_install() {
     # MySQLdb install
     sudo -- sh -c 'yum install -y python3-mysqlclient'
     # NODEJS 14 install
-    sudo -- sh -c 'yum install -y nodejs npm'
+    sudo sh -c 'curl -fsSL https://nodejs.org/dist/v20.11.0/node-v20.11.0-linux-ppc64le.tar.gz -o node-v20.11.0-linux-ppc64le.tar.gz && \
+      mkdir -p /usr/local/lib/nodejs && \
+      tar -xzf node-v20.11.0-linux-ppc64le.tar.gz -C /usr/local/lib/nodejs'
+    echo 'export PATH=/usr/local/lib/nodejs/node-v20.11.0-linux-ppc64le/bin:$PATH' >> ~/.bashrc
+    source ~/.bashrc
     # Pip modules install
     sudo pip39_bin=${pip39_bin} -- sh -c '${pip39_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}' mysqlclient==2.1.1'
     sudo pip39_bin=${pip39_bin} -- sh -c 'ln -fs ${pip39_bin} $(dirname ${pip39_bin})/pip'
@@ -166,8 +177,8 @@ function sles12_install() {
       xmlsec1 xmlsec1-devel  xmlsec1-openssl-devel'
     # MySQLdb install
     sudo -- sh -c 'zypper install -y libmysqlclient-devel libmysqlclient18 libmysqld18 libmysqld-devel'
-    # NODEJS 14 install
-    sudo -- sh -c 'zypper install -y npm14 nodejs14'
+    # NODEJS 16 install
+    sudo -- sh -c 'zypper install -y npm14 nodejs16'
     # Pip modules install
     sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}' mysqlclient==2.1.1'
     sudo pip38_bin=${pip38_bin} -- sh -c 'ln -fs ${pip38_bin} $(dirname ${pip38_bin})/pip'
@@ -195,7 +206,7 @@ function sles15_install() {
       xmlsec1 xmlsec1-devel  xmlsec1-openssl-devel'
     # MySQLdb install
     sudo -- sh -c 'zypper install -y libmariadb-devel mariadb-client python3-mysqlclient'
-    # NODEJS 14 install
+    # NODEJS 20 install
     sudo -- sh -c 'zypper install -y nodejs18 npm16'
     # Pip modules install
     sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}' mysqlclient==2.1.1'
@@ -228,8 +239,9 @@ function centos7_install() {
     sudo -- sh -c 'curl -sSLO https://dev.mysql.com/get/mysql80-community-release-el7-11.noarch.rpm && \
         rpm -ivh mysql80-community-release-el7-11.noarch.rpm && \
         yum install -y mysql-community-libs mysql-community-client-plugins mysql-community-common'
-    # NODEJS 14 install
-    sudo -- sh -c 'yum install -y rh-nodejs14-nodejs'
+    # NODEJS 16 install
+    sudo -- sh -c 'curl -fsSL https://rpm.nodesource.com/setup_16.x | sudo bash - && \
+        yum install -y nodejs npm'
     # sqlite3 install
     sudo -- sh -c 'curl -o sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
         tar zxvf sqlite-autoconf-3350500.tar.gz && \
@@ -265,8 +277,9 @@ function redhat8_install() {
       ncurses-c++-libs'
     # MySQLdb install
     sudo -- sh -c 'yum install -y python3-mysqlclient'
-    # NODEJS 14 install
-    sudo -- sh -c 'curl -sL https://rpm.nodesource.com/setup_14.x | bash - && yum install -y nodejs'
+    # NODEJS 20 install
+    sudo -- sh -c 'curl -fsSL https://rpm.nodesource.com/setup_lts.x | sudo bash - && \
+      yum install -y nodejs'
     # Pip modules install
     sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}' mysqlclient==2.1.1'
     sudo pip38_bin=${pip38_bin} -- sh -c 'ln -fs ${pip38_bin} $(dirname ${pip38_bin})/pip'
@@ -308,8 +321,8 @@ function ubuntu18_install() {
         zlibc'
     # MySQLdb install
     # It is pre-installed
-    # NODEJS 14 install
-    sudo -- sh -c 'curl -sL https://deb.nodesource.com/setup_14.x | sudo bash - && \
+    # NODEJS 16 install
+    sudo -- sh -c 'curl -sL https://deb.nodesource.com/setup_16.x | sudo bash - && \
       apt -y install nodejs'
     # Pip modules install
     sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}' mysqlclient==2.1.1'
@@ -355,9 +368,10 @@ function ubuntu20_install() {
         util-linux'
     # MySQLdb install
     # It is pre-installed
-    # NODEJS 14 install
-    sudo -- sh -c 'curl -sL https://deb.nodesource.com/setup_14.x | sudo bash - && \
-      apt -y install nodejs'
+    # NODEJS 20 install
+    sudo -- sh -c 'apt-get install -y curl && \
+      curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash - && \
+      apt-get install -y nodejs'
     # Pip modules install
     sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}' mysqlclient==2.1.1'
     sudo pip38_bin=${pip38_bin} -- sh -c 'ln -fs ${pip38_bin} $(dirname ${pip38_bin})/pip'
@@ -386,8 +400,9 @@ function redhat9_install() {
       ncurses-c++-libs'
     # MySQLdb install
     sudo -- sh -c 'yum install -y python3-mysqlclient'
-    # NODEJS 14 install
-    sudo -- sh -c 'curl -sL https://rpm.nodesource.com/setup_14.x | bash - && yum install -y nodejs'
+    # NODEJS 20 install
+    sudo -- sh -c 'curl -fsSL https://rpm.nodesource.com/setup_lts.x | sudo bash - && \
+      yum install -y nodejs'
     # Pip modules install
     sudo pip39_bin=${pip39_bin} -- sh -c '${pip39_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}' mysqlclient==2.1.1'
     sudo pip39_bin=${pip39_bin} -- sh -c 'ln -fs ${pip39_bin} $(dirname ${pip39_bin})/pip'

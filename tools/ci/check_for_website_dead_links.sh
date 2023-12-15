@@ -21,7 +21,7 @@
 #   docs/gethue
 #
 # https://github.com/raviqqe/muffet
-# go get -u github.com/raviqqe/muffet
+# go install github.com/raviqqe/muffet
 #
 # We lower the concurrency and whitelist Jiras to avoid hammering the external sites.
 
