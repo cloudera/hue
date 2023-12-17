@@ -218,10 +218,24 @@ class WebHdfs(Hdfs):
     return self.join(trash_path, self.TRASH_CURRENT)
 
   def _getparams(self):
+    if self._security_enabled:
+      token = cache.get(self.user, None)
+      if not token:
+        token = self.get_delegation_token(self.user)
+        cache.set(self.user, token, desktop.conf.KERBEROS.REINIT_FREQUENCY)
+      return {'delegation': token}
     return {
       "user.name": WebHdfs.DEFAULT_USER,
       "doas": self.user
     }
+
+  def get_delegation_token(self, user):
+    params['op'] = 'GETDELEGATIONTOKEN'
+    params['doas'] = user
+    params['renewer'] = user
+    headers = self._getheaders()
+    res = self._root.get(params=params, headers=headers)
+    return res['Token'] and res['Token']['urlString']
 
   def _getheaders(self):
     return None
@@ -274,8 +288,6 @@ class WebHdfs(Hdfs):
     """
     path = self.strip_normpath(path)
     params = self._getparams()
-    if self._security_enabled:
-      params = self._set_params_with_delegation_token(params)
     if glob is not None:
       params['filter'] = glob
     params['op'] = 'LISTSTATUS'
@@ -299,8 +311,6 @@ class WebHdfs(Hdfs):
     """
     path = self.strip_normpath(path)
     params = self._getparams()
-    if self._security_enabled:
-      params = self._set_params_with_delegation_token(params)
     params['op'] = 'GETCONTENTSUMMARY'
     headers = self._getheaders()
     json = self._root.get(path, params, headers)
@@ -311,8 +321,6 @@ class WebHdfs(Hdfs):
     """This version of stats returns None if the entry is not found"""
     path = self.strip_normpath(path)
     params = self._getparams()
-    if self._security_enabled:
-      params = self._set_params_with_delegation_token(params)
     params['op'] = 'GETFILESTATUS'
     headers = self._getheaders()
     try:
@@ -395,8 +403,6 @@ class WebHdfs(Hdfs):
     """
     path = self.strip_normpath(path)
     params = self._getparams()
-    if self._security_enabled:
-      params = self._set_params_with_delegation_token(params)
     params['op'] = 'DELETE'
     params['recursive'] = recursive and 'true' or 'false'
     headers = self._getheaders()
@@ -467,8 +473,6 @@ class WebHdfs(Hdfs):
     """
     path = self.strip_normpath(path)
     params = self._getparams()
-    if self._security_enabled:
-      params = self._set_params_with_delegation_token(params)
     params['op'] = 'MKDIRS'
     headers = self._getheaders()
     if mode is None:
@@ -486,8 +490,6 @@ class WebHdfs(Hdfs):
       new = Hdfs.join(Hdfs.dirname(old), new)
     new = self.strip_normpath(new)
     params = self._getparams()
-    if self._security_enabled:
-      params = self._set_params_with_delegation_token(params)
     params['op'] = 'RENAME'
     # Encode `new' because it's in the params
     params['destination'] = smart_str(new)
@@ -511,8 +513,6 @@ class WebHdfs(Hdfs):
   def set_replication(self, filename, repl_factor):
     """set replication factor(filename, repl_factor)"""
     params = self._getparams()
-    if self._security_enabled:
-      params = self._set_params_with_delegation_token(params)
     params['op'] = 'SETREPLICATION'
     params['replication'] = repl_factor
     headers = self._getheaders()
@@ -528,8 +528,6 @@ class WebHdfs(Hdfs):
       params['owner'] = user
     if group is not None:
       params['group'] = group
-    if self._security_enabled:
-      params = self._set_params_with_delegation_token(params)
     headers = self._getheaders()
     if recursive:
       for xpath in self.listdir_recursive(path):
@@ -546,8 +544,6 @@ class WebHdfs(Hdfs):
     """
     path = self.strip_normpath(path)
     params = self._getparams()
-    if self._security_enabled:
-      params = self._set_params_with_delegation_token(params)
     params['op'] = 'SETPERMISSION'
     params['permission'] = safe_octal(mode)
     headers = self._getheaders()
@@ -579,8 +575,6 @@ class WebHdfs(Hdfs):
     """
     path = self.strip_normpath(path)
     params = self._getparams()
-    if self._security_enabled:
-      params = self._set_params_with_delegation_token(params)
     params['op'] = 'OPEN'
     params['offset'] = long(offset)
     if length is not None:
@@ -598,8 +592,6 @@ class WebHdfs(Hdfs):
     """
     path = self.strip_normpath(path)
     params = self._getparams()
-    if self._security_enabled:
-      params = self._set_params_with_delegation_token(params)
     params['op'] = 'OPEN'
     params['offset'] = long(offset)
     params['length'] = long(length)
@@ -642,8 +634,6 @@ class WebHdfs(Hdfs):
     """
     path = self.strip_normpath(path)
     params = self._getparams()
-    if self._security_enabled:
-      params = self._set_params_with_delegation_token(params)
     params['op'] = 'CREATE'
     params['overwrite'] = overwrite and 'true' or 'false'
     if blocksize is not None:
@@ -665,8 +655,6 @@ class WebHdfs(Hdfs):
     """
     path = self.strip_normpath(path)
     params = self._getparams()
-    if self._security_enabled:
-      params = self._set_params_with_delegation_token(params)
     params['op'] = 'APPEND'
     headers = self._getheaders()
     self._invoke_with_redirect('POST', path, params, data, headers)
@@ -676,8 +664,6 @@ class WebHdfs(Hdfs):
   def modify_acl_entries(self, path, aclspec):
     path = self.strip_normpath(path)
     params = self._getparams()
-    if self._security_enabled:
-      params = self._set_params_with_delegation_token(params)
     params['op'] = 'MODIFYACLENTRIES'
     params['aclspec'] = aclspec
     headers = self._getheaders()
@@ -687,8 +673,6 @@ class WebHdfs(Hdfs):
   def remove_acl_entries(self, path, aclspec):
     path = self.strip_normpath(path)
     params = self._getparams()
-    if self._security_enabled:
-      params = self._set_params_with_delegation_token(params)
     params['op'] = 'REMOVEACLENTRIES'
     params['aclspec'] = aclspec
     headers = self._getheaders()
@@ -698,8 +682,6 @@ class WebHdfs(Hdfs):
   def remove_default_acl(self, path):
     path = self.strip_normpath(path)
     params = self._getparams()
-    if self._security_enabled:
-      params = self._set_params_with_delegation_token(params)
     params['op'] = 'REMOVEDEFAULTACL'
     headers = self._getheaders()
     return self._root.put(path, params, headers=headers)
@@ -708,8 +690,6 @@ class WebHdfs(Hdfs):
   def remove_acl(self, path):
     path = self.strip_normpath(path)
     params = self._getparams()
-    if self._security_enabled:
-      params = self._set_params_with_delegation_token(params)
     params['op'] = 'REMOVEACL'
     headers = self._getheaders()
     return self._root.put(path, params, headers=headers)
@@ -718,8 +698,6 @@ class WebHdfs(Hdfs):
   def set_acl(self, path, aclspec):
     path = self.strip_normpath(path)
     params = self._getparams()
-    if self._security_enabled:
-      params = self._set_params_with_delegation_token(params)
     params['op'] = 'SETACL'
     params['aclspec'] = aclspec
     headers = self._getheaders()
@@ -729,8 +707,6 @@ class WebHdfs(Hdfs):
   def get_acl_status(self, path):
     path = self.strip_normpath(path)
     params = self._getparams()
-    if self._security_enabled:
-      params = self._set_params_with_delegation_token(params)
     params['op'] = 'GETACLSTATUS'
     headers = self._getheaders()
     return self._root.get(path, params, headers=headers)
@@ -739,8 +715,6 @@ class WebHdfs(Hdfs):
   def check_access(self, path, aclspec='rw-'):
     path = self.strip_normpath(path)
     params = self._getparams()
-    if self._security_enabled:
-      params = self._set_params_with_delegation_token(params)
     params['op'] = 'CHECKACCESS'
     params['fsaction'] = aclspec
     headers = self._getheaders()
@@ -930,35 +904,6 @@ class WebHdfs(Hdfs):
     except Exception as ex:
       LOG.exception("Failed to read redirect from response: %s (%s)" % (webhdfs_ex, ex))
       raise webhdfs_ex
-
-
-  def _set_params_with_delegation_token(self, params):
-    token = cache.get(self.user, None)
-    if not token:
-      token = self.get_delegation_token(self.user)
-      cache.set(self.user, token, desktop.conf.KERBEROS.REINIT_FREQUENCY)
-    if token:
-      params['delegation'] = token
-      # doas should not be present with delegation token as the token includes the username
-      # https://hadoop.apache.org/docs/r1.0.4/webhdfs.html
-      if 'doas' in params:
-        del params['doas']
-      if 'user.name' in params:
-        del params['user.name']
-    return params
-
-
-  def get_delegation_token(self, renewer):
-    """get_delegation_token(user) -> Delegation token"""
-    # Workaround for HDFS-3988
-    if self._security_enabled:
-      self.get_home_dir()
-    params = self._getparams()
-    params['op'] = 'GETDELEGATIONTOKEN'
-    params['renewer'] = renewer
-    headers = self._getheaders()
-    res = self._root.get(params=params, headers=headers)
-    return res['Token'] and res['Token']['urlString']
 
 
   def do_as_user(self, username, fn, *args, **kwargs):
