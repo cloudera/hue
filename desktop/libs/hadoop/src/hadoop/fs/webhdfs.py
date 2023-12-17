@@ -774,7 +774,8 @@ class WebHdfs(Hdfs):
     if dir_mode is None:
       dir_mode = self.getDefaultDirPerms()
 
-    self.do_as_user(owner, self.mkdir, destination, mode=dir_mode)
+    if not self.exists(destination):
+      self.do_as_user(owner, self.mkdir, destination, mode=dir_mode)
 
     for stat in self.listdir_stats(source):
       source_file = stat.path
