@@ -199,8 +199,6 @@ class WebHdfs(Hdfs):
       if not path:
         path = home_dir
       params = self._getparams()
-      if self._security_enabled:
-        params = self._set_params_with_delegation_token(params)
       params['op'] = 'GETTRASHROOT'
       headers = self._getheaders()
 
