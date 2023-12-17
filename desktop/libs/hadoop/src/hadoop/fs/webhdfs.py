@@ -23,7 +23,6 @@ from future import standard_library
 standard_library.install_aliases()
 from builtins import oct
 from builtins import object
-from cachetools.func import ttl_cache
 from datetime import datetime, timedelta
 import errno
 import logging
@@ -34,6 +33,7 @@ import threading
 import time
 import urllib.request, urllib.error
 
+from django.core.cache import caches
 from django.utils.encoding import smart_str
 
 import hadoop.conf
@@ -62,6 +62,8 @@ DEFAULT_HDFS_SUPERUSER = desktop.conf.DEFAULT_HDFS_SUPERUSER.get()
 DEFAULT_READ_SIZE = 1024 * 1024 # 1MB
 
 LOG = logging.getLogger(__name__)
+
+cache = caches["webhdfs_delegation_token"]
 
 
 class WebHdfs(Hdfs):
@@ -931,7 +933,10 @@ class WebHdfs(Hdfs):
 
 
   def _set_params_with_delegation_token(self, params):
-    token = self.get_delegation_token(self.user)
+    token = cache.get(self.user, None)
+    if not token:
+      token = self.get_delegation_token(self.user)
+      cache.set(self.user, token, desktop.conf.KERBEROS.REINIT_FREQUENCY)
     if token:
       params['delegation'] = token
       # doas should not be present with delegation token as the token includes the username
@@ -943,7 +948,6 @@ class WebHdfs(Hdfs):
     return params
 
 
-  @ttl_cache(maxsize=128, ttl=timedelta(hours=8), timer=datetime.now, typed=False)
   def get_delegation_token(self, renewer):
     """get_delegation_token(user) -> Delegation token"""
     # Workaround for HDFS-3988
