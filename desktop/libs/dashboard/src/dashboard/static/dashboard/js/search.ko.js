@@ -2966,7 +2966,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
           }
           var oldId  = self.collection.id();
           self.collection.id(data.id);
-          huePubSub.publish('hue.global.info', {message: data.message});
+          huePubSub.publish('hue.global.info', { message: data.message });
           if (oldId !== data.id) {
             hueUtils.changeURL('/hue/dashboard/?collection=' + data.id);
           }

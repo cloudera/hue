@@ -2375,7 +2375,7 @@ else:
                   if (response.status != 0) {
                     huePubSub.publish('hue.global.error', {message: response.data});
                   } else {
-                    huePubSub.publish('hue.global.info', {message: response.path + ' ' + I18n('uploaded successfully')});
+                    huePubSub.publish('hue.global.info', { message: response.path + ' ' + I18n('uploaded successfully')});
                     fileBrowserViewModel.filesToHighlight.push(response.path);
                   }
                 }

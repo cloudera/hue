@@ -2392,7 +2392,7 @@ $(document).on('server.unmanageable_error', function (e, responseText) {
 // Other
 $(document).on('saved.design', function (e, id) {
   $('#saveAs').modal('hide');
-  huePubSub.publish('hue.global.info', {message: "${_('Query saved.')}"});
+  huePubSub.publish('hue.global.info', { message: "${_('Query saved.')}"});
   huePubSub.publish('open.link', "/${ app_name }/execute/design/" + id);
 });
 $(document).on('error_save.design', function (e, message) {
@@ -2440,7 +2440,7 @@ $(document).on('error_cancel.query', function (e, message) {
   huePubSub.publish('hue.global.error', {message: "${ _('Problem: ') }" + message});
 });
 $(document).on('cancelled.query', function (e) {
-  huePubSub.publish('hue.global.info', {message: "${ _('Query canceled!') }"});
+  huePubSub.publish('hue.global.info', { message: "${ _('Query canceled!') }"});
 });
 
 function updateSidebarTooltips(selector) {

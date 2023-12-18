@@ -823,15 +823,15 @@ $(document).on('link_error.jobs', function(e, name, options, jqXHR) {
 });
 
 $(document).on('start.job', function(e, options, job) {
-  huePubSub.publish('hue.global.info', {message:  "${ _('The job is starting...') }"});
+  huePubSub.publish('hue.global.info', { message:  "${ _('The job is starting...') }"});
 });
 
 $(document).on('started.job', function(e, job, options, submission_dict) {
-  huePubSub.publish('hue.global.info', {message: "${ _('Started job.') }"});
+  huePubSub.publish('hue.global.info', { message: "${ _('Started job.') }"});
 });
 
 $(document).on('start_fail.job', function(e, job, options, error) {
-  huePubSub.publish('hue.global.error', {message: "${ _('Error: ') }" + (typeof error.exception != "undefined" ? error.exception : error)});
+  huePubSub.publish('hue.global.error', { message: "${ _('Error: ') }" + (typeof error.exception != "undefined" ? error.exception : error)});
 });
 
 $(document).on('stopped.job', function(e, job, options, submission_dict) {

@@ -352,21 +352,21 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
       });
 
       $(document).on("updatedAcls", function() {
-        huePubSub.publish('hue.global.info', {message: "${ _('The selected ACLs have been successfully updated.') }"});
+        huePubSub.publish('hue.global.info', { message: "${ _('The selected ACLs have been successfully updated.') }"});
       });
 
       $(document).on("addedBulkAcls", function() {
-        huePubSub.publish('hue.global.info', {message: "${ _('The current ACLs have been successfully added to the checked paths.') }"});
+        huePubSub.publish('hue.global.info', { message: "${ _('The current ACLs have been successfully added to the checked paths.') }"});
         $("#bulkActionsModal").modal("hide");
       });
 
       $(document).on("deletedBulkAcls", function() {
-        huePubSub.publish('hue.global.info', {message: "${ _('All the ACLs have been successfully removed from the checked paths.') }"});
+        huePubSub.publish('hue.global.info', { message: "${ _('All the ACLs have been successfully removed from the checked paths.') }"});
         $("#bulkActionsModal").modal("hide");
       });
 
       $(document).on("syncdBulkAcls", function() {
-        huePubSub.publish('hue.global.info', {message: "${ _('All the ACLs for the checked items have been replaced with the current selection.') }"});
+        huePubSub.publish('hue.global.info', { message: "${ _('All the ACLs for the checked items have been replaced with the current selection.') }"});
         $("#bulkActionsModal").modal("hide");
       });
 
