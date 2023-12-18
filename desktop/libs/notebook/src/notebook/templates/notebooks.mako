@@ -208,7 +208,7 @@ ${ commonimportexport(request) | n,unicode }
         window.location.reload();
         $('#deleteNotebook').modal('hide');
       }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
+        huePubSub.publish('hue.global.error', {message: xhr.responseText});
       });
     };
 
@@ -218,7 +218,7 @@ ${ commonimportexport(request) | n,unicode }
       }, function(data) {
         window.location.reload();
       }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
+        huePubSub.publish('hue.global.error', {message: xhr.responseText});
       });
     };
 

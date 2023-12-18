@@ -17,7 +17,7 @@
 import $ from 'jquery';
 import * as ko from 'knockout';
 
-import { ASSIST_SET_DATABASE_EVENT } from './assist/events';
+import { ASSIST_IS_DB_PANEL_READY_EVENT, ASSIST_SET_DATABASE_EVENT } from './assist/events';
 import componentUtils from './componentUtils';
 import contextCatalog from 'catalog/contextCatalog';
 import dataCatalog from 'catalog/dataCatalog';
@@ -427,6 +427,27 @@ HueContextSelector.prototype.reloadDatabases = function () {
                     databaseNames.push(databaseEntry.name);
                   });
                   self.availableDatabases(databaseNames);
+                  if (!self.database() && databaseNames.length) {
+                    /* The code below takes care of a corner case when the editor is loaded and the assist DB panel
+                       isn't open in which case an active DB might not be set.
+
+                       There's quite some related logic in the editor code (snippet.js) for when the assist DB panel is
+                       open on load. Ideally we should move all that logic here, however it's not trivial to untangle as
+                       it contains some editor specific integration. Perhaps it's cleaner to deal with if in Editor V2.
+                    */
+                    // TODO: Move the logic for setting active DB from assist panel here.
+                    let dbPanelReady = false;
+                    huePubSub.publish(ASSIST_IS_DB_PANEL_READY_EVENT, () => {
+                      dbPanelReady = true;
+                    });
+                    if (!dbPanelReady) {
+                      if (databaseNames.some(name => name === 'default')) {
+                        self.database('default');
+                      } else {
+                        self.database(databaseNames[0]);
+                      }
+                    }
+                  }
                 })
                 .catch(() => {
                   self.availableDatabases([]);

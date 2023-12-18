@@ -22,7 +22,7 @@ from django.template.defaultfilters import urlencode, stringformat, filesizeform
 from desktop.lib.django_util import reverse_with_get, extract_field_data
 from django.utils.encoding import smart_str
 
-from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
+from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE, FILE_UPLOAD_CHUNK_SIZE, CONCURRENT_MAX_CONNECTIONS
 
 if sys.version_info[0] > 2:
   from django.utils.translation import gettext as _
@@ -698,6 +698,31 @@ else:
 
   <script src="${ static('desktop/ext/js/datatables-paging-0.1.js') }" type="text/javascript" charset="utf-8"></script>
 
+  <script type="text/template" id="qq-template">
+    <div class="qq-uploader-selector" style="margin-left: 10px">
+        <div class="qq-upload-drop-area-selector" qq-hide-dropzone><span>${_('Drop the files here to upload')}</span></div>
+        <div class="qq-upload-button-selector qq-no-float">${_('Select files')}</div> &nbsp;
+        <span class="muted">${_('or drag and drop them here')}</span>
+
+        <ul class="qq-upload-list-selector qq-upload-files unstyled qq-no-float" style="margin-right: 0;">
+            <li>
+                <span class="qq-upload-spinner-selector hide" style="display:none"></span>
+                <div class="progress-row dz-processing">
+                    <span class="break-word qq-upload-file-selector"></span>
+                    <div class="pull-right">
+                        <span class="qq-upload-file-selector" style="display:block"></span>
+                        <span class="muted qq-upload-size-selector"></span>&nbsp;&nbsp;
+                        <a href="#" title="${_('Cancel')}" class="complex-layout"><i class="fa fa-fw fa-times qq-upload-cancel-selector"></i></a>
+                        <span class="qq-upload-done-selector" style="display:none"><i class="fa fa-fw fa-check muted"></i></span>
+                        <span class="qq-upload-failed-text">${_('Failed')}</span>
+                    </div>
+                    <div class="progress-row-bar" style="width: 0%;"></div>
+                </div>
+            </li>
+        </ul>
+    </div>
+  </script>
+
 
   <script>
     var _dragged;
@@ -775,7 +800,7 @@ else:
           });
         },
         error: function (xhr, textStatus, errorThrown) {
-          $(document).trigger("error", xhr.responseText);
+          huePubSub.publish('hue.global.error', {message: xhr.responseText});
           resetPrimaryButtonsStatus();
         }
       });
@@ -1210,11 +1235,11 @@ else:
             self.contentSummary(ko.mapping.fromJS(data.summary));
             self.isLoadingSummary(false);
           } else {
-            $(document).trigger("error", data.message);
+            huePubSub.publish('hue.global.error', {message: data.message});
             $("#contentSummaryModal").modal("hide");
           }
         }).fail(function (xhr, textStatus, errorThrown) {
-          $(document).trigger("error", xhr.responseText);
+          huePubSub.publish('hue.global.error', {message: xhr.responseText});
           $("#contentSummaryModal").modal("hide");
         });
       }
@@ -1228,7 +1253,7 @@ else:
         const encodedSearchFilter = encodeURIComponent(self.searchQuery());
         $.getJSON(self.targetPath() + (self.targetPath().indexOf('?') > 0 ? '&' : '?') + "pagesize=" + self.recordsPerPage() + "&pagenum=" + self.targetPageNum() + "&filter=" + encodedSearchFilter + "&sortby=" + self.sortBy() + "&descending=" + self.sortDescending() + "&format=json", function (data) {
           if (data.error){
-            $(document).trigger("error", data.error);
+            huePubSub.publish('hue.global.error', {message: data.error});
             self.isLoading(false);
             return false;
           }
@@ -1651,7 +1676,7 @@ else:
               self.retrieveData(true);
             },
             error: function (xhr, textStatus, errorThrown) {
-              $(document).trigger("error", xhr.responseText);
+              huePubSub.publish('hue.global.error', {message: xhr.responseText});
               resetPrimaryButtonsStatus();
             }
           });
@@ -1689,7 +1714,7 @@ else:
               self.retrieveData(true);
             },
             error: function (xhr, textStatus, errorThrown) {
-              $(document).trigger("error", xhr.responseText);
+              huePubSub.publish('hue.global.error', {message: xhr.responseText});
               resetPrimaryButtonsStatus();
             }
           });
@@ -1751,7 +1776,7 @@ else:
             }, 1000);
           },
           error: function(xhr, textStatus, errorThrown) {
-            $(document).trigger("error", xhr.responseText);
+            huePubSub.publish('hue.global.error', {message: xhr.responseText});
             resetPrimaryButtonsStatus();
           }
         });
@@ -1841,10 +1866,10 @@ else:
             $.jHueNotify.info("${ _('Task ') }" + data.history_uuid + "${_(' submitted.') }");
             huePubSub.publish('notebook.task.submitted', data);
           } else {
-            $(document).trigger("error", data.message);
+            huePubSub.publish('hue.global.error', {message: data.message});
           }
         }).fail(function (xhr, textStatus, errorThrown) {
-          $(document).trigger("error", xhr.responseText);
+          huePubSub.publish('hue.global.error', {message: xhr.responseText});
         });
       };
 
@@ -1877,10 +1902,10 @@ else:
             $.jHueNotify.info("${ _('Task ') }" + data.history_uuid + "${_(' submitted.') }");
             huePubSub.publish('notebook.task.submitted', data);
           } else {
-            $(document).trigger("error", data.message);
+            huePubSub.publish('hue.global.error', {message: data.message});
           }
         }).fail(function (xhr, textStatus, errorThrown) {
-          $(document).trigger("error", xhr.responseText);
+          huePubSub.publish('hue.global.error', {message: xhr.responseText});
         });
       };
 
@@ -1928,7 +1953,7 @@ else:
             self.retrieveData(true);
           },
           error: function (xhr, textStatus, errorThrown) {
-            $(document).trigger("error", xhr.responseText);
+            huePubSub.publish('hue.global.error', {message: xhr.responseText});
             resetPrimaryButtonsStatus();
           }
         });
@@ -1959,7 +1984,7 @@ else:
             self.retrieveData(true);
           },
           error: function (xhr, textStatus, errorThrown) {
-            $(document).trigger("error", xhr.responseText);
+            huePubSub.publish('hue.global.error', {message: xhr.responseText});
             resetPrimaryButtonsStatus();
           }
         });
@@ -1989,7 +2014,7 @@ else:
             self.retrieveData(true);
           },
           error: function(xhr, textStatus, errorThrown) {
-            $(document).trigger("error", xhr.responseText);
+            huePubSub.publish('hue.global.error', {message: xhr.responseText});
             resetPrimaryButtonsStatus();
           }
         });
@@ -2021,63 +2046,140 @@ else:
       };
 
       self.uploadFile = (function () {
-        self.pendingUploads(0);
-        var action = "/filebrowser/upload/file";
-        var uploader = new qq.FileUploader({
-          element: document.getElementById("fileUploader"),
-          action: action,
-          template: '<div class="qq-uploader" style="margin-left: 10px">' +
-          '<div class="qq-upload-drop-area"><span>${_('Drop the files here to upload')}</span></div>' +
-          '<div class="qq-upload-button qq-no-float">${_('Select files')}</div> &nbsp; <span class="muted">${_('or drag and drop them here')}</span>' +
-          '<ul class="qq-upload-list qq-upload-files unstyled qq-no-float" style="margin-right: 0;"></ul>' +
-          '</div>',
-          fileTemplate: '<li><span class="qq-upload-file-extended" style="display:none"></span><span class="qq-upload-spinner hide" style="display:none"></span>' +
-          '<div class="progress-row dz-processing">' +
-          '<span class="break-word qq-upload-file"></span>' +
-          '<div class="pull-right">' +
-          '<span class="muted qq-upload-size"></span>&nbsp;&nbsp;' +
-          '<a href="#" title="${_('Cancel')}" class="complex-layout"><i class="fa fa-fw fa-times qq-upload-cancel"></i></a>' +
-          '<span class="qq-upload-done" style="display:none"><i class="fa fa-fw fa-check muted"></i></span>' +
-          '<span class="qq-upload-failed-text">${_('Failed')}</span>' +
-          '</div>' +
-          '<div class="progress-row-bar" style="width: 0%;"></div>' +
-          '</div></li>',
-          params: {
-            dest: self.currentPath(),
-            fileFieldLabel: "hdfs_file"
-          },
-          onProgress: function (id, fileName, loaded, total) {
-            $('.qq-upload-files').find('li').each(function(){
-              var listItem = $(this);
-              if (listItem.find('.qq-upload-file-extended').text() == fileName){
-                listItem.find('.progress-row-bar').css('width', (loaded/total)*100 + '%');
-              }
-            });
-          },
-          onComplete: function (id, fileName, response) {
-            self.pendingUploads(self.pendingUploads() - 1);
-            if (response.status != 0) {
-              $(document).trigger('error', "${ _('Error: ') }" + response.data);
-            }
-            else {
-              $(document).trigger('info', response.path + "${ _(' uploaded successfully.') }");
-              self.filesToHighlight.push(response.path);
-            }
-            if (self.pendingUploads() == 0) {
-              $('#uploadFileModal').modal('hide');
-              self.retrieveData(true);
-            }
-          },
-          onSubmit: function (id, fileName, responseJSON) {
-            self.pendingUploads(self.pendingUploads() + 1);
-          },
-          onCancel: function (id, fileName) {
-            self.pendingUploads(self.pendingUploads() - 1);
-          },
-          debug: false
-        });
+          var uploader;  
+          if (window.getLastKnownConfig().hue_config.enable_chunked_file_uploader) {
+            self.pendingUploads(0);
+            var action = "/filebrowser/upload/chunks/";
+            uploader = new qq.FileUploader({
+              element: document.getElementById("fileUploader"),
+              request: {
+                  endpoint: action,
+                  paramsInBody: false,
+                  params: {
+                      dest: self.currentPath(),
+                      inputName: "hdfs_file"
+                  }
+              },
+              maxConnections: window.CONCURRENT_MAX_CONNECTIONS || 5,
+              chunking: {
+                  enabled: true,
+                  concurrent: {
+                      enabled: true
+                  },
+                  partSize: window.FILE_UPLOAD_CHUNK_SIZE || 5242880,
+                  success: {
+                      endpoint: "/filebrowser/upload/complete/"
+                  },
+                  paramNames: {
+                      partIndex: "qqpartindex",
+                      partByteOffset: "qqpartbyteoffset",
+                      chunkSize: "qqchunksize",
+                      totalFileSize: "qqtotalfilesize",
+                      totalParts: "qqtotalparts"
+                  }
+              },
 
-        $("#fileUploader").on('fb:updatePath', function (e, options) {
+              template: 'qq-template',
+              callbacks: {
+                  onProgress: function (id, fileName, loaded, total) {
+                  console.log(loaded);
+                  $('.qq-upload-files').find('li').each(function(){
+                    var listItem = $(this);
+                    if (listItem.find('.qq-upload-file-selector').text() == fileName){
+                      listItem.find('.progress-row-bar').css('width', (loaded/total)*100 + '%');
+                    }
+                  });
+                  },
+                  onComplete: function (id, fileName, response) {
+                    self.pendingUploads(self.pendingUploads() - 1);
+                    if (response.status != 0) {
+                      $(document).trigger('error', "${ _('Error: ') }" + response.data);
+                    }
+                    else {
+                      $(document).trigger('info', response.path + "${ _(' uploaded successfully.') }");
+                      self.filesToHighlight.push(response.path);
+                    }
+                    if (self.pendingUploads() == 0) {
+                      $('#uploadFileModal').modal('hide');
+                      self.retrieveData(true);
+                    }
+                  },
+
+                  onAllComplete: function(succeeded, failed){
+                    $('#uploadFileModal').modal('hide');
+                  },
+                  onSubmit: function (id, fileName, responseJSON) {
+                    var newPath = "/filebrowser/upload/chunks/file?dest=" + encodeURIComponent(self.currentPath().normalize('NFC'));
+                    this.setEndpoint(newPath);
+                    self.pendingUploads(self.pendingUploads() + 1);
+                  },
+                  onCancel: function (id, fileName) {
+                    self.pendingUploads(self.pendingUploads() - 1);
+                  }
+              },
+
+              debug: false
+            });
+          }
+          else {
+            self.pendingUploads(0);
+            var action = "/filebrowser/upload/file";
+            uploader = new fileuploader.FileUploader({
+              element: document.getElementById("fileUploader"),
+              action: action,
+              template: '<div class="qq-uploader" style="margin-left: 10px">' +
+              '<div class="qq-upload-drop-area"><span>${_('Drop the files here to upload')}</span></div>' +
+              '<div class="qq-upload-button qq-no-float">${_('Select files')}</div> &nbsp; <span class="muted">${_('or drag and drop them here')}</span>' +
+              '<ul class="qq-upload-list qq-upload-files unstyled qq-no-float" style="margin-right: 0;"></ul>' +
+              '</div>',
+              fileTemplate: '<li><span class="qq-upload-file-extended" style="display:none"></span><span class="qq-upload-spinner hide" style="display:none"></span>' +
+              '<div class="progress-row dz-processing">' +
+              '<span class="break-word qq-upload-file"></span>' +
+              '<div class="pull-right">' +
+              '<span class="muted qq-upload-size"></span>&nbsp;&nbsp;' +
+              '<a href="#" title="${_('Cancel')}" class="complex-layout"><i class="fa fa-fw fa-times qq-upload-cancel"></i></a>' +
+              '<span class="qq-upload-done" style="display:none"><i class="fa fa-fw fa-check muted"></i></span>' +
+              '<span class="qq-upload-failed-text">${_('Failed')}</span>' +
+              '</div>' +
+              '<div class="progress-row-bar" style="width: 0%;"></div>' +
+              '</div></li>',
+              params: {
+                dest: self.currentPath(),
+                fileFieldLabel: "hdfs_file"
+              },
+              onProgress: function (id, fileName, loaded, total) {
+                $('.qq-upload-files').find('li').each(function(){
+                  var listItem = $(this);
+                  if (listItem.find('.qq-upload-file-extended').text() == fileName){
+                    listItem.find('.progress-row-bar').css('width', (loaded/total)*100 + '%');
+                  }
+                });
+              },
+              onComplete: function (id, fileName, response) {
+                self.pendingUploads(self.pendingUploads() - 1);
+                if (response.status != 0) {
+                  $(document).trigger('error', "${ _('Error: ') }" + response.data);
+                }
+                else {
+                  $(document).trigger('info', response.path + "${ _(' uploaded successfully.') }");
+                  self.filesToHighlight.push(response.path);
+                }
+                if (self.pendingUploads() == 0) {
+                  $('#uploadFileModal').modal('hide');
+                  self.retrieveData(true);
+                }
+              },
+              onSubmit: function (id, fileName, responseJSON) {
+                self.pendingUploads(self.pendingUploads() + 1);
+              },
+              onCancel: function (id, fileName) {
+                self.pendingUploads(self.pendingUploads() - 1);
+              },
+              debug: false
+            });
+          }
+
+          $("#fileUploader").on('fb:updatePath', function (e, options) {
           const uploadingToOzone = self.currentPath().startsWith("ofs://");
           const ozoneSizeLimit = Math.min(
             ...[UPLOAD_CHUNK_SIZE, MAX_FILE_SIZE_UPLOAD_LIMIT].filter(Number.isFinite)
@@ -2270,7 +2372,7 @@ else:
                 var response = JSON.parse(data.xhr.response);
                 if (response && response.status != null) {
                   if (response.status != 0) {
-                    $(document).trigger('error', response.data);
+                    huePubSub.publish('hue.global.error', {message: response.data});
                   } else {
                     $(document).trigger('info', response.path + ' ' + I18n('uploaded successfully'));
                     fileBrowserViewModel.filesToHighlight.push(response.path);
@@ -2592,10 +2694,10 @@ else:
         error:function (x, e) {
           if (x.status == 500 && x.responseText.indexOf("jobbrowser") == -1) {
             if (x.responseJSON && x.responseJSON.detail) {
-              $(document).trigger("error", x.responseJSON.detail);
+              huePubSub.publish('hue.global.error', {message: x.responseJSON.detail});
             }
             else {
-              $(document).trigger("error", "${_('There was a problem with your request.')}");
+              huePubSub.publish('hue.global.error', {message: "${_('There was a problem with your request.')}"});
             }
             $("#hueBreadcrumbText").blur();
           }
@@ -2641,7 +2743,9 @@ else:
           _dropzone.enable();
         }
         $(".qq-upload-list").empty();
+        $(".qq-upload-list-selector").empty();
         $(".qq-upload-drop-area").hide();
+        $(".qq-upload-drop-area-selector").hide();
       });
     });
   </script>

@@ -132,7 +132,7 @@ There is no bridge to KO for components using this integration. Example using in
         </li>
         <li>
           <a data-hue-analytics="editor:queries-button-click" href="javascript:void(0)" data-bind="publish: { 'assist.show.documents': editorMode() ? 'query-' + editorType() : editorType() }">
-            <svg class="hi hi-fw hi-bigger"><use xlink:href="#hi-documents"></use></svg> <span data-bind="text: editorMode() ? '${ _ko('Queries') }' : '${ _ko('Notebooks') }'"></span>
+            <svg class="hi hi-fw hi-bigger"><use href="#hi-documents"></use></svg> <span data-bind="text: editorMode() ? '${ _ko('Queries') }' : '${ _ko('Notebooks') }'"></span>
           </a>
         </li>
         <li>

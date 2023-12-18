@@ -362,12 +362,11 @@ class S3FileSystem(object):
       key = self._get_key(path, validate=False)
 
       if key.exists():
-        to_delete = [key]
         dir_keys = []
 
         if self.isdir(path):
-          dir_keys = key.bucket.list(prefix=path)
-          to_delete = itertools.chain(dir_keys, to_delete)
+          _, dir_key_name = s3.parse_uri(path)[:2]
+          dir_keys = key.bucket.list(prefix=dir_key_name)
 
         if not dir_keys:
           # Avoid Raz bulk delete issue
@@ -375,7 +374,7 @@ class S3FileSystem(object):
           if deleted_key.exists():
             raise S3FileSystemException('Could not delete key %s' % deleted_key)
         else:
-          result = key.bucket.delete_keys(to_delete)
+          result = key.bucket.delete_keys(list(dir_keys))
           if result.errors:
             msg = "%d errors occurred while attempting to delete the following S3 paths:\n%s" % (
               len(result.errors), '\n'.join(['%s: %s' % (error.key, error.message) for error in result.errors])

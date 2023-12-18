@@ -58,13 +58,9 @@
   <rule dir="OUT" name="HUE/hue/outbound/huerooturl/css" pattern="/static/{*}/{**}?{**}">
     <rewrite template="{$frontend[path]}/hue/static/{*}/{**}?{**}"/>
   </rule>
-  <rule dir="OUT" name="HUE/hue/outbound/huerooturl/root" pattern="/boohoo">
-    <rewrite template="{$frontend[path]}/hue/boohoo"/>
-  </rule>
   <filter name="HUE/hue/outbound/huerooturl">
     <content type="*/html">
         <apply path="/desktop/globalJsConstants.*" rule="HUE/hue/outbound/huerooturl/desktop"/>
-        <apply path="/boohoo" rule="HUE/hue/outbound/huerooturl/root"/>
         <apply path="\/static\/.*\/.*\.(js|css|html|png)" rule="HUE/hue/outbound/huerooturl/static"/>
         <apply path="\/static\/desktop\/js\/ace" rule="HUE/hue/outbound/huerooturl/static"/>
     </content>
