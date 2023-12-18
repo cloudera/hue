@@ -83,7 +83,7 @@ ko.bindingHandlers.dropzone = {
                 value.onError(file.name);
               }
             } else {
-              $(document).trigger('info', response.path + ' ' + I18n('uploaded successfully'));
+              huePubSub.publish('hue.global.info', {message: response.path + ' ' + I18n('uploaded successfully')});
               if (value.onComplete) {
                 value.onComplete(response.path);
               }

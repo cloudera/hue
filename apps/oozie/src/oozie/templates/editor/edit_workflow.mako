@@ -636,7 +636,7 @@ function workflow_save_success(data) {
   if (data.status != 0) {
     huePubSub.publish('hue.global.error', {message: interpret_server_error(data, "${ _('Could not save workflow') }")});
   } else {
-    $(document).trigger("info", "${ _('Workflow saved') }");
+    huePubSub.publish('hue.global.info', {message: "${ _('Workflow saved') }"});
     workflow.reload(data.data);
     workflow.is_dirty( false );
     workflow.loading( false );
@@ -902,7 +902,7 @@ $('#importJobsub').on('click', '.action-row', function(e) {
 
           workflow.el.trigger('workflow:rebuild');
           routie('editWorkflow');
-          $(document).trigger("info", "${ _('Action imported at the top of the workflow.') } ");
+          huePubSub.publish('hue.global.info', {message: "${ _('Action imported at the top of the workflow.') } "});
         } else {
           huePubSub.publish('hue.global.error', {message: interpret_server_error(data, "${ _('Received invalid response from server') }")});
         }
@@ -943,7 +943,7 @@ $('#importOozieAction').on('click', '.action-row', function(e) {
 
     workflow.el.trigger('workflow:rebuild');
     routie('editWorkflow');
-    $(document).trigger("info", "${ _('Action imported at the top of the workflow.') }");
+    huePubSub.publish('hue.global.info', {message: "${ _('Action imported at the top of the workflow.') }"});
   }
 });
 

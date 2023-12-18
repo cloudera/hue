@@ -168,7 +168,7 @@ var CreateCollectionViewModel = function(steps) {
       })
       .done(function(data) {
         if (data.status == 0) {
-          $(document).trigger("info", data.message);
+          huePubSub.publish('hue.global.info', {message: data.message});
         } else {
           huePubSub.publish('hue.global.error', {message: data.message});
         }
