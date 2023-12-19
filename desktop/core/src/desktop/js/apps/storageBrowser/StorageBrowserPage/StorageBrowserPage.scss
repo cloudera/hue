@@ -28,6 +28,10 @@
     padding: 0 16px;
     //TODO: Find fix so the flex is applied
     flex: 0 0 100%;
+
+    .ant-tabs-content-holder {
+      height: 100vh;
+    }
   }
 }
 
