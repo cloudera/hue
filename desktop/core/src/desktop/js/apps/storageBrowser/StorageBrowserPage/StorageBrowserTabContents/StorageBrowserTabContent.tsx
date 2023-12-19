@@ -28,12 +28,17 @@ import DropDownIcon from '@cloudera/cuix-core/icons/react/DropdownIcon';
 import FolderIcon from '@cloudera/cuix-core/icons/react/ProjectIcon';
 import ImportIcon from '@cloudera/cuix-core/icons/react/ImportIcon';
 import PlusCircleIcon from '@cloudera/cuix-core/icons/react/PlusCircleIcon';
-//Todo: Use cuix icon (Currently fileIcon does not exist in cuix)
+//TODO: Use cuix icon (Currently fileIcon does not exist in cuix)
 import { FileOutlined } from '@ant-design/icons';
 
 import PathBrowser from '../../../../reactComponents/FileChooser/PathBrowser/PathBrowser';
+import StorageBrowserTable from '../StorageBrowserTable/StorageBrowserTable';
 import { fetchFiles } from '../../../../reactComponents/FileChooser/api';
-import { PathAndFileData } from '../../../../reactComponents/FileChooser/types';
+import {
+  PathAndFileData,
+  StorageBrowserTableData,
+  PageStats
+} from '../../../../reactComponents/FileChooser/types';
 
 import './StorageBrowserTabContent.scss';
 
@@ -51,8 +56,12 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
   testId
 }): JSX.Element => {
   const [filePath, setFilePath] = useState<string>(user_home_dir);
-  const [filesData, setFilesData] = useState<PathAndFileData | undefined>();
+  const [filesData, setFilesData] = useState<PathAndFileData>();
+  const [files, setFiles] = useState<StorageBrowserTableData[]>();
   const [loadingFiles, setloadingFiles] = useState(true);
+  const [pageStats, setPageStats] = useState<PageStats>();
+  const [pageSize, setPageSize] = useState<number>();
+  const [pageNumber, setPageNumber] = useState<number>(1);
 
   const { t } = i18nReact.useTranslation();
 
@@ -123,9 +132,22 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
 
   useEffect(() => {
     setloadingFiles(true);
-    fetchFiles(filePath)
+    fetchFiles(filePath, pageSize, pageNumber)
       .then(responseFilesData => {
         setFilesData(responseFilesData);
+        const tableData: StorageBrowserTableData[] = responseFilesData.files.map(file => ({
+          name: file.name,
+          size: file.humansize,
+          user: file.stats.user,
+          groups: file.stats.group,
+          permission: file.rwx,
+          lastUpdated: file.mtime,
+          type: file.type,
+          path: file.path
+        }));
+        setFiles(tableData);
+        setPageStats(responseFilesData.page);
+        setPageSize(responseFilesData.pagesize);
       })
       .catch(error => {
         //TODO: handle errors
@@ -134,7 +156,7 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
       .finally(() => {
         setloadingFiles(false);
       });
-  }, [filePath]);
+  }, [filePath, pageSize, pageNumber]);
 
   return (
     <Spin spinning={loadingFiles}>
@@ -188,6 +210,14 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
             </Dropdown>
           </div>
         </div>
+        <StorageBrowserTable
+          dataSource={files}
+          pageStats={pageStats}
+          pageSize={pageSize}
+          onFilepathChange={setFilePath}
+          onPageSizeChange={setPageSize}
+          onPageNumberChange={setPageNumber}
+        ></StorageBrowserTable>
       </div>
     </Spin>
   );
