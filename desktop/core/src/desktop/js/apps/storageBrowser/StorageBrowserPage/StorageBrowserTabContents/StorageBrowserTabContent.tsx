@@ -28,7 +28,7 @@ import DropDownIcon from '@cloudera/cuix-core/icons/react/DropdownIcon';
 import FolderIcon from '@cloudera/cuix-core/icons/react/ProjectIcon';
 import ImportIcon from '@cloudera/cuix-core/icons/react/ImportIcon';
 import PlusCircleIcon from '@cloudera/cuix-core/icons/react/PlusCircleIcon';
-//Todo: Use cuix icon (Currently fileIcon does not exist in cuix)
+//TODO: Use cuix icon (Currently fileIcon does not exist in cuix)
 import { FileOutlined } from '@ant-design/icons';
 
 import PathBrowser from '../../../../reactComponents/FileChooser/PathBrowser/PathBrowser';
@@ -170,6 +170,19 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
     fetchFiles(filePath, pageSize, pageNumber, filterData, sortByColumn, sortOrder)
       .then(responseFilesData => {
         setFilesData(responseFilesData);
+        const tableData: StorageBrowserTableData[] = responseFilesData.files.map(file => ({
+          name: file.name,
+          size: file.humansize,
+          user: file.stats.user,
+          groups: file.stats.group,
+          permission: file.rwx,
+          lastUpdated: file.mtime,
+          type: file.type,
+          path: file.path
+        }));
+        setFiles(tableData);
+        setPageStats(responseFilesData.page);
+        setPageSize(responseFilesData.pagesize);
       })
       .catch(error => {
         //TODO: handle errors
