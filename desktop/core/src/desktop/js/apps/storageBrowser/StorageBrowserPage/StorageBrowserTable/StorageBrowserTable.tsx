@@ -19,6 +19,8 @@ import { i18nReact } from '../../../../utils/i18nReact';
 import Table from 'cuix/dist/components/Table';
 import { ColumnProps } from 'antd/lib/table';
 import FolderIcon from '@cloudera/cuix-core/icons/react/ProjectIcon';
+import SortAscending from '@cloudera/cuix-core/icons/react/SortAscendingIcon';
+import SortDescending from '@cloudera/cuix-core/icons/react/SortDescendingIcon';
 //TODO: Use cuix icon (Currently fileIcon does not exist in cuix)
 import { FileOutlined } from '@ant-design/icons';
 
@@ -33,8 +35,12 @@ interface StorageBrowserTableProps {
   onFilepathChange: (path: string) => void;
   onPageNumberChange: (pageNumber: number) => void;
   onPageSizeChange: (pageSize: number) => void;
+  onSortByColumnChange: (sortByColumn: string) => void;
+  onSortByDescendingChange: (sortByDescending: boolean) => void;
   pageSize: number;
   pageStats: PageStats;
+  sortByColumn: string;
+  sortByDescending: boolean;
   rowClassName?: string;
   testId?: string;
 }
@@ -51,6 +57,10 @@ const StorageBrowserTable: React.FC<StorageBrowserTableProps> = ({
   onFilepathChange,
   onPageNumberChange,
   onPageSizeChange,
+  onSortByColumnChange,
+  onSortByDescendingChange,
+  sortByColumn,
+  sortByDescending,
   pageSize,
   pageStats,
   rowClassName,
@@ -61,12 +71,39 @@ const StorageBrowserTable: React.FC<StorageBrowserTableProps> = ({
 
   const { t } = i18nReact.useTranslation();
 
+  const onColumnTitleClicked = (columnClicked: string) => {
+    if (columnClicked === sortByColumn) {
+      onSortByDescendingChange(!sortByDescending);
+    } else {
+      onSortByColumnChange(columnClicked);
+      if (sortByDescending) {
+        onSortByDescendingChange(false);
+      }
+    }
+  };
+
   const getColumns = file => {
     const columns: ColumnProps<unknown>[] = [];
     for (const [key] of Object.entries(file)) {
       const column: ColumnProps<unknown> = {
         dataIndex: `${key}`,
-        title: t(`${key}`.charAt(0).toUpperCase() + `${key}`.slice(1)),
+        title: (
+          <div
+            className="hue-storage-browser__table-column-title"
+            onClick={() => onColumnTitleClicked(key)}
+          >
+            <div>{t(`${key}`.charAt(0).toUpperCase() + `${key}`.slice(1))}</div>
+            {`${key}` === `${sortByColumn}` ? (
+              sortByDescending ? (
+                <SortDescending />
+              ) : (
+                <SortAscending />
+              )
+            ) : (
+              <div></div>
+            )}
+          </div>
+        ),
         key: `${key}`
       };
       if (key === 'name') {
