@@ -39,7 +39,7 @@ class ABFSStat(object):
       self.atime = 0
       self.mtime = 0
     self.size = size
-    self.user = owner
+    self.user = owner if owner is not None else ''
     self.group = group
     self.mode = mode or (0o777 if isDir else 0o666)
     if self.isDir:
