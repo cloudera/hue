@@ -112,12 +112,8 @@ const StorageBrowserTable: React.FC<StorageBrowserTableProps> = ({
                 <SortDescending />
               ) : sortOrder === SortEnum.ASC ? (
                 <SortAscending />
-              ) : (
-                <></>
-              )
-            ) : (
-              <div></div>
-            )}
+              ) : null
+            ) : null}
           </div>
         ),
         key: `${key}`
