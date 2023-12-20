@@ -55,6 +55,11 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
   user_home_dir,
   testId
 }): JSX.Element => {
+  enum SortEnum {
+    ASC = 'ascending',
+    DSC = 'descending',
+    NONE = 'none'
+  }
   const [filePath, setFilePath] = useState<string>(user_home_dir);
   const [filesData, setFilesData] = useState<PathAndFileData>();
   const [files, setFiles] = useState<StorageBrowserTableData[]>();
@@ -63,7 +68,7 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
   const [pageSize, setPageSize] = useState<number>();
   const [pageNumber, setPageNumber] = useState<number>(1);
   const [sortByColumn, setSortByColumn] = useState<string>('');
-  const [sortByDescending, setSortByDescending] = useState<boolean>(false);
+  const [sortOrder, setSortOrder] = useState<SortEnum>(SortEnum.NONE);
   //TODO: Add filter functionality
   const [filterData, setFilterData] = useState<string>('');
 
@@ -136,6 +141,14 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
 
   useEffect(() => {
     setloadingFiles(true);
+    let sortByDescending = false;
+    if (sortOrder === SortEnum.ASC) {
+      sortByDescending = false;
+    } else if (sortOrder === SortEnum.DSC) {
+      sortByDescending = true;
+    } else {
+      setSortByColumn('');
+    }
     fetchFiles(filePath, pageSize, pageNumber, filterData, sortByColumn, sortByDescending)
       .then(responseFilesData => {
         setFilesData(responseFilesData);
@@ -143,9 +156,9 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
           name: file.name,
           size: file.humansize,
           user: file.stats.user,
-          groups: file.stats.group,
+          group: file.stats.group,
           permission: file.rwx,
-          lastUpdated: file.mtime,
+          mtime: file.mtime,
           type: file.type,
           path: file.path
         }));
@@ -160,7 +173,7 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
       .finally(() => {
         setloadingFiles(false);
       });
-  }, [filePath, pageSize, pageNumber, sortByColumn, sortByDescending]);
+  }, [filePath, pageSize, pageNumber, sortByColumn, sortOrder]);
 
   return (
     <Spin spinning={loadingFiles}>
@@ -222,9 +235,9 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
           onPageSizeChange={setPageSize}
           onPageNumberChange={setPageNumber}
           onSortByColumnChange={setSortByColumn}
-          onSortByDescendingChange={setSortByDescending}
+          onSortOrderChange={setSortOrder}
           sortByColumn={sortByColumn}
-          sortByDescending={sortByDescending}
+          sortOrder={sortOrder}
         ></StorageBrowserTable>
       </div>
     </Spin>

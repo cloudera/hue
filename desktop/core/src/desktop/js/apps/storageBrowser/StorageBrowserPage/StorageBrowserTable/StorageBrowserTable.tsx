@@ -29,6 +29,11 @@ import Pagination from '../../../../reactComponents/Pagination/Pagination';
 import './StorageBrowserTable.scss';
 import Tooltip from 'antd/es/tooltip';
 
+enum SortEnum {
+  ASC = 'ascending',
+  DSC = 'descending',
+  NONE = 'none'
+}
 interface StorageBrowserTableProps {
   className?: string;
   dataSource: StorageBrowserTableData[];
@@ -36,11 +41,11 @@ interface StorageBrowserTableProps {
   onPageNumberChange: (pageNumber: number) => void;
   onPageSizeChange: (pageSize: number) => void;
   onSortByColumnChange: (sortByColumn: string) => void;
-  onSortByDescendingChange: (sortByDescending: boolean) => void;
+  onSortOrderChange: (sortOrder: SortEnum) => void;
   pageSize: number;
   pageStats: PageStats;
   sortByColumn: string;
-  sortByDescending: boolean;
+  sortOrder: SortEnum;
   rowClassName?: string;
   testId?: string;
 }
@@ -58,9 +63,9 @@ const StorageBrowserTable: React.FC<StorageBrowserTableProps> = ({
   onPageNumberChange,
   onPageSizeChange,
   onSortByColumnChange,
-  onSortByDescendingChange,
+  onSortOrderChange,
   sortByColumn,
-  sortByDescending,
+  sortOrder,
   pageSize,
   pageStats,
   rowClassName,
@@ -73,12 +78,19 @@ const StorageBrowserTable: React.FC<StorageBrowserTableProps> = ({
 
   const onColumnTitleClicked = (columnClicked: string) => {
     if (columnClicked === sortByColumn) {
-      onSortByDescendingChange(!sortByDescending);
+      switch (sortOrder) {
+        case SortEnum.NONE:
+          onSortOrderChange(SortEnum.ASC);
+          break;
+        case SortEnum.ASC:
+          onSortOrderChange(SortEnum.DSC);
+          break;
+        default:
+          onSortOrderChange(SortEnum.NONE);
+      }
     } else {
       onSortByColumnChange(columnClicked);
-      if (sortByDescending) {
-        onSortByDescendingChange(false);
-      }
+      onSortOrderChange(SortEnum.ASC);
     }
   };
 
@@ -86,18 +98,22 @@ const StorageBrowserTable: React.FC<StorageBrowserTableProps> = ({
     const columns: ColumnProps<unknown>[] = [];
     for (const [key] of Object.entries(file)) {
       const column: ColumnProps<unknown> = {
-        dataIndex: `${key}`,
+        dataIndex: key,
         title: (
           <div
-            className="hue-storage-browser__table-column-title"
+            className="hue-storage-browser__table-column-header"
             onClick={() => onColumnTitleClicked(key)}
           >
-            <div>{t(`${key}`.charAt(0).toUpperCase() + `${key}`.slice(1))}</div>
-            {`${key}` === `${sortByColumn}` ? (
-              sortByDescending ? (
+            <div className="hue-storage-browser__table-column-title">
+              {key === 'mtime' ? t('Last Updated') : t(key)}
+            </div>
+            {key === sortByColumn ? (
+              sortOrder === SortEnum.DSC ? (
                 <SortDescending />
-              ) : (
+              ) : sortOrder === SortEnum.ASC ? (
                 <SortAscending />
+              ) : (
+                <></>
               )
             ) : (
               <div></div>
@@ -118,7 +134,7 @@ const StorageBrowserTable: React.FC<StorageBrowserTableProps> = ({
           </Tooltip>
         );
       } else {
-        column.width = key === 'lastUpdated' ? '15%' : '10%';
+        column.width = key === 'mtime' ? '15%' : '10%';
       }
       columns.push(column);
     }

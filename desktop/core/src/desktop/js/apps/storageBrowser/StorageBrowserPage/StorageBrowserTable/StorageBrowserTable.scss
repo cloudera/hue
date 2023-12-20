@@ -60,6 +60,10 @@ $cell-height: 40px;
   color: vars.$fluidx-blue-700;
 }
 
-.hue-storage-browser__table-column-title {
+.hue-storage-browser__table-column-header {
   display: flex;
+}
+
+.hue-storage-browser__table-column-title {
+  text-transform: capitalize;
 }
