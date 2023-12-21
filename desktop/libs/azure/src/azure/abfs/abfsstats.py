@@ -33,14 +33,14 @@ class ABFSStat(object):
     self.isDir = isDir
     self.type = 'DIRECTORY' if isDir else 'FILE'
     try:
-      self.atime = abfsdatetime_to_timestamp(atime) if atime else None
-      self.mtime = abfsdatetime_to_timestamp(mtime) if mtime else None
+      self.atime = abfsdatetime_to_timestamp(atime) if atime else 0
+      self.mtime = abfsdatetime_to_timestamp(mtime) if mtime else 0
     except:
       self.atime = 0
       self.mtime = 0
     self.size = size
-    self.user = owner if owner is not None else ''
-    self.group = group
+    self.user = owner if owner else ''
+    self.group = group if group else ''
     self.mode = mode or (0o777 if isDir else 0o666)
     if self.isDir:
       self.mode |= stat.S_IFDIR
