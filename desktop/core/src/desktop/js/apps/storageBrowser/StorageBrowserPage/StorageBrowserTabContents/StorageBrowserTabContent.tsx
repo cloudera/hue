@@ -37,7 +37,8 @@ import { fetchFiles } from '../../../../reactComponents/FileChooser/api';
 import {
   PathAndFileData,
   StorageBrowserTableData,
-  PageStats
+  PageStats,
+  SortOrder
 } from '../../../../reactComponents/FileChooser/types';
 
 import './StorageBrowserTabContent.scss';
@@ -62,6 +63,10 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
   const [pageStats, setPageStats] = useState<PageStats>();
   const [pageSize, setPageSize] = useState<number>();
   const [pageNumber, setPageNumber] = useState<number>(1);
+  const [sortByColumn, setSortByColumn] = useState<string>('');
+  const [sortOrder, setSortOrder] = useState<SortOrder>(SortOrder.NONE);
+  //TODO: Add filter functionality
+  const [filterData, setFilterData] = useState<string>('');
 
   const { t } = i18nReact.useTranslation();
 
@@ -132,16 +137,16 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
 
   useEffect(() => {
     setloadingFiles(true);
-    fetchFiles(filePath, pageSize, pageNumber)
+    fetchFiles(filePath, pageSize, pageNumber, filterData, sortByColumn, sortOrder)
       .then(responseFilesData => {
         setFilesData(responseFilesData);
         const tableData: StorageBrowserTableData[] = responseFilesData.files.map(file => ({
           name: file.name,
           size: file.humansize,
           user: file.stats.user,
-          groups: file.stats.group,
+          group: file.stats.group,
           permission: file.rwx,
-          lastUpdated: file.mtime,
+          mtime: file.mtime,
           type: file.type,
           path: file.path
         }));
@@ -156,7 +161,7 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
       .finally(() => {
         setloadingFiles(false);
       });
-  }, [filePath, pageSize, pageNumber]);
+  }, [filePath, pageSize, pageNumber, sortByColumn, sortOrder]);
 
   return (
     <Spin spinning={loadingFiles}>
@@ -217,6 +222,10 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
           onFilepathChange={setFilePath}
           onPageSizeChange={setPageSize}
           onPageNumberChange={setPageNumber}
+          onSortByColumnChange={setSortByColumn}
+          onSortOrderChange={setSortOrder}
+          sortByColumn={sortByColumn}
+          sortOrder={sortOrder}
         ></StorageBrowserTable>
       </div>
     </Spin>
