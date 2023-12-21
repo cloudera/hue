@@ -19,10 +19,16 @@ import { i18nReact } from '../../../../utils/i18nReact';
 import Table from 'cuix/dist/components/Table';
 import { ColumnProps } from 'antd/lib/table';
 import FolderIcon from '@cloudera/cuix-core/icons/react/ProjectIcon';
+import SortAscending from '@cloudera/cuix-core/icons/react/SortAscendingIcon';
+import SortDescending from '@cloudera/cuix-core/icons/react/SortDescendingIcon';
 //TODO: Use cuix icon (Currently fileIcon does not exist in cuix)
 import { FileOutlined } from '@ant-design/icons';
 
-import { PageStats, StorageBrowserTableData } from '../../../../reactComponents/FileChooser/types';
+import {
+  PageStats,
+  StorageBrowserTableData,
+  SortOrder
+} from '../../../../reactComponents/FileChooser/types';
 import Pagination from '../../../../reactComponents/Pagination/Pagination';
 import './StorageBrowserTable.scss';
 import Tooltip from 'antd/es/tooltip';
@@ -33,8 +39,12 @@ interface StorageBrowserTableProps {
   onFilepathChange: (path: string) => void;
   onPageNumberChange: (pageNumber: number) => void;
   onPageSizeChange: (pageSize: number) => void;
+  onSortByColumnChange: (sortByColumn: string) => void;
+  onSortOrderChange: (sortOrder: SortOrder) => void;
   pageSize: number;
   pageStats: PageStats;
+  sortByColumn: string;
+  sortOrder: SortOrder;
   rowClassName?: string;
   testId?: string;
 }
@@ -51,6 +61,10 @@ const StorageBrowserTable: React.FC<StorageBrowserTableProps> = ({
   onFilepathChange,
   onPageNumberChange,
   onPageSizeChange,
+  onSortByColumnChange,
+  onSortOrderChange,
+  sortByColumn,
+  sortOrder,
   pageSize,
   pageStats,
   rowClassName,
@@ -61,12 +75,43 @@ const StorageBrowserTable: React.FC<StorageBrowserTableProps> = ({
 
   const { t } = i18nReact.useTranslation();
 
+  const onColumnTitleClicked = (columnClicked: string) => {
+    if (columnClicked === sortByColumn) {
+      if (sortOrder === SortOrder.NONE) {
+        onSortOrderChange(SortOrder.ASC);
+      } else if (sortOrder === SortOrder.ASC) {
+        onSortOrderChange(SortOrder.DSC);
+      } else {
+        onSortOrderChange(SortOrder.NONE);
+      }
+    } else {
+      onSortByColumnChange(columnClicked);
+      onSortOrderChange(SortOrder.ASC);
+    }
+  };
+
   const getColumns = file => {
     const columns: ColumnProps<unknown>[] = [];
     for (const [key] of Object.entries(file)) {
       const column: ColumnProps<unknown> = {
-        dataIndex: `${key}`,
-        title: t(`${key}`.charAt(0).toUpperCase() + `${key}`.slice(1)),
+        dataIndex: key,
+        title: (
+          <div
+            className="hue-storage-browser__table-column-header"
+            onClick={() => onColumnTitleClicked(key)}
+          >
+            <div className="hue-storage-browser__table-column-title">
+              {key === 'mtime' ? t('Last Updated') : t(key)}
+            </div>
+            {key === sortByColumn ? (
+              sortOrder === SortOrder.DSC ? (
+                <SortDescending />
+              ) : sortOrder === SortOrder.ASC ? (
+                <SortAscending />
+              ) : null
+            ) : null}
+          </div>
+        ),
         key: `${key}`
       };
       if (key === 'name') {
@@ -81,7 +126,7 @@ const StorageBrowserTable: React.FC<StorageBrowserTableProps> = ({
           </Tooltip>
         );
       } else {
-        column.width = key === 'lastUpdated' ? '15%' : '10%';
+        column.width = key === 'mtime' ? '15%' : '10%';
       }
       columns.push(column);
     }

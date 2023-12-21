@@ -16,7 +16,7 @@
 
 import { get } from '../../api/utils';
 import { CancellablePromise } from '../../api/cancellablePromise';
-import { PathAndFileData } from './types';
+import { PathAndFileData, SortOrder } from './types';
 
 const FILESYSTEMS_API_URL = '/api/v1/storage/filesystems';
 const VIEWFILES_API_URl = '/api/v1/storage/view=';
@@ -35,14 +35,21 @@ export const fetchFiles = (
   pagenum?: number,
   filter?: string,
   sortby?: string,
-  descending?: boolean
+  sortOrder?: SortOrder
 ): CancellablePromise<PathAndFileData> => {
+  let descending = false;
+  if (sortOrder === SortOrder.ASC) {
+    descending = false;
+  } else if (sortOrder === SortOrder.DSC) {
+    descending = true;
+  } else {
+    sortby = '';
+  }
   //If value is undefined default value is assigned.
   pagesize = pagesize || 10;
   pagenum = pagenum || 1;
   filter = filter || '';
   sortby = sortby || '';
-  descending = descending || false;
   return get(
     VIEWFILES_API_URl +
       filePath +
