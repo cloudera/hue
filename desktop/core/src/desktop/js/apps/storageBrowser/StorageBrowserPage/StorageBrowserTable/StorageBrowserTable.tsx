@@ -19,7 +19,6 @@ import { i18nReact } from '../../../../utils/i18nReact';
 import Table from 'cuix/dist/components/Table';
 import { ColumnProps } from 'antd/lib/table';
 import FolderIcon from '@cloudera/cuix-core/icons/react/ProjectIcon';
-<<<<<<< HEAD
 import SortAscending from '@cloudera/cuix-core/icons/react/SortAscendingIcon';
 import SortDescending from '@cloudera/cuix-core/icons/react/SortDescendingIcon';
 //TODO: Use cuix icon (Currently fileIcon does not exist in cuix)
@@ -30,19 +29,12 @@ import {
   StorageBrowserTableData,
   SortOrder
 } from '../../../../reactComponents/FileChooser/types';
-=======
-//TODO: Use cuix icon (Currently fileIcon does not exist in cuix)
-import { FileOutlined } from '@ant-design/icons';
-
-import { PageStats, StorageBrowserTableData } from '../../../../reactComponents/FileChooser/types';
->>>>>>> c96cbde4cd ([frontend] Initial Implementation of Storage browser table (#3525))
 import Pagination from '../../../../reactComponents/Pagination/Pagination';
 import './StorageBrowserTable.scss';
 import Tooltip from 'antd/es/tooltip';
 
 interface StorageBrowserTableProps {
   className?: string;
-<<<<<<< HEAD
   dataSource?: StorageBrowserTableData[];
   onFilepathChange: (path: string) => void;
   onPageNumberChange: (pageNumber: number) => void;
@@ -53,14 +45,6 @@ interface StorageBrowserTableProps {
   pageStats?: PageStats;
   sortByColumn: string;
   sortOrder: SortOrder;
-=======
-  dataSource: StorageBrowserTableData[];
-  onFilepathChange: (path: string) => void;
-  onPageNumberChange: (pageNumber: number) => void;
-  onPageSizeChange: (pageSize: number) => void;
-  pageSize: number;
-  pageStats: PageStats;
->>>>>>> c96cbde4cd ([frontend] Initial Implementation of Storage browser table (#3525))
   rowClassName?: string;
   testId?: string;
 }
@@ -77,13 +61,10 @@ const StorageBrowserTable: React.FC<StorageBrowserTableProps> = ({
   onFilepathChange,
   onPageNumberChange,
   onPageSizeChange,
-<<<<<<< HEAD
   onSortByColumnChange,
   onSortOrderChange,
   sortByColumn,
   sortOrder,
-=======
->>>>>>> c96cbde4cd ([frontend] Initial Implementation of Storage browser table (#3525))
   pageSize,
   pageStats,
   rowClassName,
@@ -94,7 +75,6 @@ const StorageBrowserTable: React.FC<StorageBrowserTableProps> = ({
 
   const { t } = i18nReact.useTranslation();
 
-<<<<<<< HEAD
   const onColumnTitleClicked = (columnClicked: string) => {
     if (columnClicked === sortByColumn) {
       if (sortOrder === SortOrder.NONE) {
@@ -132,24 +112,12 @@ const StorageBrowserTable: React.FC<StorageBrowserTableProps> = ({
             ) : null}
           </div>
         ),
-=======
-  const getColumns = file => {
-    const columns: ColumnProps<unknown>[] = [];
-    for (const [key] of Object.entries(file)) {
-      const column: ColumnProps<unknown> = {
-        dataIndex: `${key}`,
-        title: t(`${key}`.charAt(0).toUpperCase() + `${key}`.slice(1)),
->>>>>>> c96cbde4cd ([frontend] Initial Implementation of Storage browser table (#3525))
         key: `${key}`
       };
       if (key === 'name') {
         column.width = '45%';
         //TODO: Apply tooltip only for truncated values
-<<<<<<< HEAD
         column.render = (_, record: StorageBrowserTableData) => (
-=======
-        column.render = (_, record: any) => (
->>>>>>> c96cbde4cd ([frontend] Initial Implementation of Storage browser table (#3525))
           <Tooltip title={record.name}>
             <span className="hue-storage-browser__table-cell-icon">
               {record.type === 'dir' ? <FolderIcon /> : <FileOutlined />}
@@ -158,31 +126,19 @@ const StorageBrowserTable: React.FC<StorageBrowserTableProps> = ({
           </Tooltip>
         );
       } else {
-<<<<<<< HEAD
         column.width = key === 'mtime' ? '15%' : '10%';
-=======
-        column.width = key === 'lastUpdated' ? '15%' : '10%';
->>>>>>> c96cbde4cd ([frontend] Initial Implementation of Storage browser table (#3525))
       }
       columns.push(column);
     }
     return columns.filter(col => col.dataIndex !== 'type' && col.dataIndex !== 'path');
   };
 
-<<<<<<< HEAD
   const onRowClicked = (record: StorageBrowserTableData) => {
     return {
       onClick: () => {
         if (record.type === 'dir') {
           onFilepathChange(record.path);
           onPageNumberChange(1);
-=======
-  const onRowClicked = record => {
-    return {
-      onClick: e => {
-        if (record.type === 'dir') {
-          onFilepathChange(record.path);
->>>>>>> c96cbde4cd ([frontend] Initial Implementation of Storage browser table (#3525))
         }
         //TODO: handle onclick file
       }
@@ -190,20 +146,12 @@ const StorageBrowserTable: React.FC<StorageBrowserTableProps> = ({
   };
 
   //pagination related functions handled by parent
-<<<<<<< HEAD
   const onPreviousPageButtonClicked = (previousPageNumber: number) => {
-=======
-  const onPreviousPageButtonClicked = previousPageNumber => {
->>>>>>> c96cbde4cd ([frontend] Initial Implementation of Storage browser table (#3525))
     //If previous page does not exists api returns 0
     onPageNumberChange(previousPageNumber === 0 ? 1 : previousPageNumber);
   };
 
-<<<<<<< HEAD
   const onNextPageButtonClicked = (nextPageNumber: number, numPages: number) => {
-=======
-  const onNextPageButtonClicked = (nextPageNumber, numPages) => {
->>>>>>> c96cbde4cd ([frontend] Initial Implementation of Storage browser table (#3525))
     //If next page does not exists api returns 0
     onPageNumberChange(nextPageNumber === 0 ? numPages : nextPageNumber);
   };
@@ -231,11 +179,7 @@ const StorageBrowserTable: React.FC<StorageBrowserTableProps> = ({
     };
   }, []);
 
-<<<<<<< HEAD
   if (dataSource && pageStats) {
-=======
-  if (dataSource) {
->>>>>>> c96cbde4cd ([frontend] Initial Implementation of Storage browser table (#3525))
     return (
       <>
         <Table
@@ -260,11 +204,8 @@ const StorageBrowserTable: React.FC<StorageBrowserTableProps> = ({
         />
       </>
     );
-<<<<<<< HEAD
   } else {
     return <div />;
-=======
->>>>>>> c96cbde4cd ([frontend] Initial Implementation of Storage browser table (#3525))
   }
 };
 

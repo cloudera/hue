@@ -50,9 +50,9 @@ export interface StorageBrowserTableData {
   name: string;
   size: string;
   user: string;
-  groups: string;
+  group: string;
   permission: string;
-  lastUpdated: string;
+  mtime: string;
   type: string;
   path: string;
 }
@@ -78,4 +78,10 @@ export interface PathAndFileData {
   files: File[];
   page: PageStats;
   pagesize: number;
+}
+
+export enum SortOrder {
+  ASC = 'ascending',
+  DSC = 'descending',
+  NONE = 'none'
 }
