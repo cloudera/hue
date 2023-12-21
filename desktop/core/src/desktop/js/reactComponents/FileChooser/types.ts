@@ -79,3 +79,9 @@ export interface PathAndFileData {
   page: PageStats;
   pagesize: number;
 }
+
+export enum SortOrder {
+  ASC = 'ascending',
+  DSC = 'descending',
+  NONE = 'none'
+}

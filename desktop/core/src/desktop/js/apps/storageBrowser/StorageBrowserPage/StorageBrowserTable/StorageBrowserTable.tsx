@@ -24,16 +24,15 @@ import SortDescending from '@cloudera/cuix-core/icons/react/SortDescendingIcon';
 //TODO: Use cuix icon (Currently fileIcon does not exist in cuix)
 import { FileOutlined } from '@ant-design/icons';
 
-import { PageStats, StorageBrowserTableData } from '../../../../reactComponents/FileChooser/types';
+import {
+  PageStats,
+  StorageBrowserTableData,
+  SortOrder
+} from '../../../../reactComponents/FileChooser/types';
 import Pagination from '../../../../reactComponents/Pagination/Pagination';
 import './StorageBrowserTable.scss';
 import Tooltip from 'antd/es/tooltip';
 
-enum SortEnum {
-  ASC = 'ascending',
-  DSC = 'descending',
-  NONE = 'none'
-}
 interface StorageBrowserTableProps {
   className?: string;
   dataSource: StorageBrowserTableData[];
@@ -41,11 +40,11 @@ interface StorageBrowserTableProps {
   onPageNumberChange: (pageNumber: number) => void;
   onPageSizeChange: (pageSize: number) => void;
   onSortByColumnChange: (sortByColumn: string) => void;
-  onSortOrderChange: (sortOrder: SortEnum) => void;
+  onSortOrderChange: (sortOrder: SortOrder) => void;
   pageSize: number;
   pageStats: PageStats;
   sortByColumn: string;
-  sortOrder: SortEnum;
+  sortOrder: SortOrder;
   rowClassName?: string;
   testId?: string;
 }
@@ -78,19 +77,16 @@ const StorageBrowserTable: React.FC<StorageBrowserTableProps> = ({
 
   const onColumnTitleClicked = (columnClicked: string) => {
     if (columnClicked === sortByColumn) {
-      switch (sortOrder) {
-        case SortEnum.NONE:
-          onSortOrderChange(SortEnum.ASC);
-          break;
-        case SortEnum.ASC:
-          onSortOrderChange(SortEnum.DSC);
-          break;
-        default:
-          onSortOrderChange(SortEnum.NONE);
+      if (sortOrder === SortOrder.NONE) {
+        onSortOrderChange(SortOrder.ASC);
+      } else if (sortOrder === SortOrder.ASC) {
+        onSortOrderChange(SortOrder.DSC);
+      } else {
+        onSortOrderChange(SortOrder.NONE);
       }
     } else {
       onSortByColumnChange(columnClicked);
-      onSortOrderChange(SortEnum.ASC);
+      onSortOrderChange(SortOrder.ASC);
     }
   };
 
@@ -108,9 +104,9 @@ const StorageBrowserTable: React.FC<StorageBrowserTableProps> = ({
               {key === 'mtime' ? t('Last Updated') : t(key)}
             </div>
             {key === sortByColumn ? (
-              sortOrder === SortEnum.DSC ? (
+              sortOrder === SortOrder.DSC ? (
                 <SortDescending />
-              ) : sortOrder === SortEnum.ASC ? (
+              ) : sortOrder === SortOrder.ASC ? (
                 <SortAscending />
               ) : null
             ) : null}
