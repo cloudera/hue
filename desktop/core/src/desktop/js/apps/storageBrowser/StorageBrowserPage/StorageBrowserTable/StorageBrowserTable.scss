@@ -37,6 +37,10 @@ $cell-height: 40px;
   th.ant-table-cell {
     text-align: left;
   }
+
+  table {
+    width: 100%;
+  }
 }
 
 .hue-storage-browser__table-row {
@@ -54,4 +58,12 @@ $cell-height: 40px;
 
 .hue-storage-browser__table-cell-name {
   color: vars.$fluidx-blue-700;
+}
+
+.hue-storage-browser__table-column-header {
+  display: flex;
+}
+
+.hue-storage-browser__table-column-title {
+  text-transform: capitalize;
 }

@@ -174,9 +174,9 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
           name: file.name,
           size: file.humansize,
           user: file.stats.user,
-          groups: file.stats.group,
+          group: file.stats.group,
           permission: file.rwx,
-          lastUpdated: file.mtime,
+          mtime: file.mtime,
           type: file.type,
           path: file.path
         }));

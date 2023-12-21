@@ -15,7 +15,7 @@
 // limitations under the License.
 import { get, post } from '../../api/utils';
 import { CancellablePromise } from '../../api/cancellablePromise';
-import { PathAndFileData } from './types';
+import { PathAndFileData, SortOrder } from './types';
 
 const FILESYSTEMS_API_URL = '/api/v1/storage/filesystems';
 const VIEWFILES_API_URl = '/api/v1/storage/view=';
