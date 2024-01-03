@@ -803,6 +803,21 @@ Alternative:
     ## The JDBC driver clickhouse-jdbc.jar and its related jars need to be in the CLASSPATH environment variable.
     options='{"url": "jdbc:clickhouse://localhost:8123", "driver": "ru.yandex.clickhouse.ClickHouseDriver", "user": "readonly", "password": ""}'
 
+
+### Apache Kyuubi
+
+[Apache Kyuubi](https://kyuubi.readthedocs.io/en/master/) is a distributed and multi-tenant gateway to provide serverless SQL on data warehouses and lakehouses.
+
+Give Hue the information about the database source:
+
+    [[[kyuubi]]]
+    name=Kyuubi
+    interface=jdbc
+    ## Specific options for connecting to the Kyuubi server.
+    ## The JDBC driver kyuubi-hive-jdbc.jar and its related jars need to be in the CLASSPATH environment variable.
+    options='{"url": "jdbc:hive2://localhost:10009", "driver": "org.apache.kyuubi.jdbc.KyuubiHiveDriver", "user": "readonly", "password": ""}'
+
+
 ### Elastic Search
 
 The dialect for https://github.com/elastic/elasticsearch should be added to the Python system or Hue Python virtual environment:
