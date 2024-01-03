@@ -40,6 +40,7 @@ urlpatterns = [
   re_path(r'^organizations/?$', useradmin_views.list_organizations, name="useradmin.views.list_organizations"),
   re_path(r'^users/edit/(?P<username>%s)$' % (username_re,), useradmin_views.edit_user, name="useradmin.views.edit_user"),
   re_path(r'^users/add_ldap_users$', useradmin_views.add_ldap_users, name="useradmin.views.add_ldap_users"),
+  # re_path(r'^users/document_cleanup$', useradmin_views.document_cleanup, name="useradmin.views.document_cleanup"),
   re_path(r'^users/add_ldap_groups$', useradmin_views.add_ldap_groups, name="useradmin.views.add_ldap_groups"),
   re_path(r'^users/sync_ldap_users_groups$', useradmin_views.sync_ldap_users_groups, name="useradmin_views_sync_ldap_users_groups"),
   re_path(r'^groups/edit/(?P<name>%s)$' % (groupname_re,), useradmin_views.edit_group, name="useradmin.views.edit_group"),

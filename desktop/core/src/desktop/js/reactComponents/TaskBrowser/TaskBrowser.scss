@@ -1,0 +1,435 @@
+@import '@cloudera/cuix-core/variables.scss';
+
+.tableStyle {
+  background-color: rgb(255, 255, 255);
+  border: 1px solid #ddd;
+//   border-bottom-color: rgb(58, 135, 14);
+  border-collapse: collapse;
+//   border-left-color: rgb(58, 135, 14);
+//   border-left-style: solid;
+//   border-left-width: 4px;
+//   border-right-color: rgb(58, 135, 14);
+//   border-top-color: rgb(58, 135, 14);
+  color: rgb(66, 66, 66);
+  cursor: pointer;
+  display: table-row;
+  font-family: Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+//   height: 32px;
+  line-height: 20px;
+  text-indent: 0px;
+  text-size-adjust: 100%;
+  vertical-align: middle;
+  visibility: visible;
+}
+
+.thStyle {
+  padding: 8px;
+  text-align: left;
+  background-color: #f2f2f2;
+  border-bottom: 2px solid #ddd;
+  font-size: 13px;
+
+}
+
+.tdStyle {
+  padding-left: 8px;
+  padding-right: 8px;
+  padding-top: 3px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid #ddd;
+  font-family: Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 13px;
+
+}
+
+.popupStyle {
+  position: fixed; // Fixed position to cover the whole screen
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); // Semi-transparent background
+  z-index: 1000; // High z-index to be on top of other content
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.popupContentStyle {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1001; // Keep a high z-index
+  width: 60%;  // Adjust width as needed
+  max-height: 80%; // Adjust max height as needed
+  overflow-y: auto; // Add scroll for overflow content
+  position: relative; // Relative positioning within the flex container
+}
+
+.badgeSuccess {
+  background-color: rgb(58, 135, 14);
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+  border-collapse: collapse;
+  border-top-left-radius: 3px;
+  border-top-right-radius:  3px;
+  color: rgb(255, 255, 255);
+  display: inline-block;
+  font-family: Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 11.844px;
+  font-weight: 700;
+//   height: 14px;
+  line-height: 14px;
+  padding-bottom: 2px;
+  padding-left: 4px;
+  padding-right: 4px;
+  padding-top: 2px;
+  text-align: left;
+  text-indent: 0px;
+  text-shadow:  0 -1px 0 rgba(0, 0, 0, 0.25);
+  text-size-adjust: 100%;
+  text-wrap: nowrap;
+  vertical-align: baseline;
+  visibility: visible;
+  white-space-collapse: collapse;
+}
+
+.badgeFailure {
+  background-color: rgb(217, 21, 12);
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+  border-collapse: collapse;
+  border-top-left-radius: 3px;
+  border-top-right-radius:  3px;
+  color: rgb(255, 255, 255);
+  display: inline-block;
+  font-family: Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 11.844px;
+  font-weight: 700;
+//   height: 14px;
+  line-height: 14px;
+  padding-bottom: 2px;
+  padding-left: 4px;
+  padding-right: 4px;
+  padding-top: 2px;
+  text-align: left;
+  text-indent: 0px;
+  text-shadow:  0 -1px 0 rgba(0, 0, 0, 0.25);
+  text-size-adjust: 100%;
+  text-wrap: nowrap;
+  vertical-align: baseline;
+  visibility: visible;
+  white-space-collapse: collapse;
+}
+
+.badgeRunning {
+  background-color: rgb(255, 163, 25);
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+  border-collapse: collapse;
+  border-top-left-radius: 3px;
+  border-top-right-radius:  3px;
+  color: rgb(255, 255, 255);
+  display: inline-block;
+  font-family: Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 11.844px;
+  font-weight: 700;
+//   height: 14px;
+  line-height: 14px;
+  padding-bottom: 2px;
+  padding-left: 4px;
+  padding-right: 4px;
+  padding-top: 2px;
+  text-align: left;
+  text-indent: 0px;
+  text-shadow:  0 -1px 0 rgba(0, 0, 0, 0.25);
+  text-size-adjust: 100%;
+  text-wrap: nowrap;
+  vertical-align: baseline;
+  visibility: visible;
+  white-space-collapse: collapse;
+}
+
+.checkboxCompleted {
+  background-color: #fff;
+  border-bottom-color: #3a870e;
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
+  border-image-outset: 0;
+  border-image-repeat: stretch;
+  border-image-slice: 100%;
+  border-image-source: none;
+  border-image-width: 1;
+  border-left-color: #3a870e;
+  border-left-style: solid;
+  border-left-width: 1px;
+  border-right-color: #3a870e;
+  border-right-style: solid;
+  border-right-width: 1px;
+  border-top-color: #3a870e;
+  border-top-style: solid;
+  border-top-width: 1px;
+  color: #3a870e;
+  cursor: default;
+  display: block;
+  float: left;
+  font-family: FontAwesome;
+  font-size: 14px;
+  height: 15px;
+  line-height: 14px;
+  margin: 5px 4.2px 2px 0;
+  padding: 0;
+  text-rendering: auto;
+  text-size-adjust: 100%;
+  visibility: visible;
+  width: 15px;
+  -webkit-font-smoothing: antialiased;
+}
+
+.checkboxRunning {
+  background-color: #fff;
+  border-bottom-color: #ffa319;
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
+  border-image-outset: 0;
+  border-image-repeat: stretch;
+  border-image-slice: 100%;
+  border-image-source: none;
+  border-image-width: 1;
+  border-left-color: #ffa319;
+  border-left-style: solid;
+  border-left-width: 1px;
+  border-right-color: #ffa319;
+  border-right-style: solid;
+  border-right-width: 1px;
+  border-top-color: #ffa319;
+  border-top-style: solid;
+  border-top-width: 1px;
+  color: #ffa319;
+  cursor: default;
+  display: block;
+  float: left;
+  font-family: FontAwesome;
+  font-size: 14px;
+  height: 15px;
+  line-height: 14px;
+  margin: 5px 4.2px 2px 0;
+  padding: 0;
+  text-rendering: auto;
+  text-size-adjust: 100%;
+  visibility: visible;
+  width: 15px;
+  -webkit-font-smoothing: antialiased;
+}
+
+.checkboxFailed {
+  background-color: #fff;
+  border-bottom-color: #d9150c;
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
+  border-image-outset: 0;
+  border-image-repeat: stretch;
+  border-image-slice: 100%;
+  border-image-source: none;
+  border-image-width: 1;
+  border-left-color: #d9150c;
+  border-left-style: solid;
+  border-left-width: 1px;
+  border-right-color: #d9150c;
+  border-right-style: solid;
+  border-right-width: 1px;
+  border-top-color: #d9150c;
+  border-top-style: solid;
+  border-top-width: 1px;
+  color: #d9150c;
+  cursor: default;
+  display: block;
+  float: left;
+  font-family: FontAwesome;
+  font-size: 14px;
+  height: 15px;
+  line-height: 14px;
+  margin: 5px 4.2px 2px 0;
+  padding: 0;
+  text-rendering: auto;
+  text-size-adjust: 100%;
+  visibility: visible;
+  width: 15px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Base Custom Checkbox Style */
+.custom-checkbox {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  background-color: #fff;
+  position: relative;
+  top: 0;
+  left: 0;
+  cursor: pointer;
+  vertical-align: middle;
+  border-style: solid;
+  border-width: 1px;
+  margin: 5px 4.2px 2px 0;
+  font-family: FontAwesome;
+  font-size: 14px;
+  line-height: 14px;
+  text-rendering: auto;
+  text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+}
+
+.checkbox-text {
+  line-height: 20px;
+  vertical-align: middle;
+}
+
+/* Specific status styles for checkbox border and checkmark color */
+.checkboxCompleted + .custom-checkbox {
+  border-color: #3a870e;
+}
+
+.checkboxRunning + .custom-checkbox {
+  border-color: #ffa319;
+}
+
+.checkboxFailed + .custom-checkbox {
+  border-color: #d9150c;
+}
+
+.checkboxCompleted:checked + .custom-checkbox:before,
+.checkboxRunning:checked + .custom-checkbox:before,
+.checkboxFailed:checked + .custom-checkbox:before {
+  content: '\2713';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+}
+
+.checkboxCompleted:checked + .custom-checkbox:before {
+  color: #3a870e;
+}
+
+.checkboxRunning:checked + .custom-checkbox:before {
+  color: #ffa319;
+}
+
+.checkboxFailed:checked + .custom-checkbox:before {
+  color: #d9150c;
+}
+
+.row-success {
+  border-left: 4px solid green;
+}
+
+.row-failure {
+  border-left: 4px solid red;
+}
+
+.row-running {
+  border-left: 4px solid orange;
+}
+
+.row-grayout-table-header {
+  border-left: 4px solid gray;
+}
+
+
+
+.customCursorClass {
+  cursor: pointer;
+}
+
+.hue-horizontally-scrollable {
+  color: rgb(66, 66, 66);
+  display: block;
+  font-family: Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+//   height: 2933px;
+  line-height: 20px;
+  overflow-x: auto;
+  text-size-adjust: 100%;
+  visibility: visible;
+//   width: 1852px;
+  -webkit-font-smoothing: antialiased;
+}
+
+table.datatables {
+  border-top: none !important;
+
+  th {
+    border-top: 1px solid cui-blue-300 !important;
+  }
+}
+
+.flex-container-style {
+  display: flex;
+  align-items: center; // Align items vertically
+  justify-content: flex-start; // Align items to the start of the container
+  flex-wrap: wrap; // Allow items to wrap in smaller viewports if necessary
+  gap: 10px; // Spacing between items
+}
+
+.button-input-style {
+  padding-right: 15px;
+  font-size: 14px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  // Adjust width as necessary, or remove to allow natural width
+}
+
+.pointer {
+    cursor: pointer !important;
+}
+
+.schedule-task-button {
+  padding-right: 15px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #0056b3;
+  }
+}
+
+.kill-task-button {
+  padding-right: 15px;
+  background-color: #dc3545;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #c82333;
+  }
+}
+
+.status-filter-button {
+  padding: 8px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  // Add specific colors for each button based on class
+  &.success {
+    background-color: green;
+  }
+  &.failed {
+    background-color: red;
+  }
+  &.running {
+    background-color: orange;
+  }
+}
+
+
+
+// ... additional styles ...

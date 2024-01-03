@@ -40,6 +40,7 @@ from django.forms.utils import ErrorList
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.utils.encoding import smart_str
+from django.contrib.auth.decorators import user_passes_test
 
 import desktop.conf
 from desktop.auth.backend import is_admin
@@ -443,7 +444,6 @@ def edit_user(request, username=None):
         'username': username,
         'is_embeddable': is_embeddable
       })
-
 
 def edit_group(request, name=None):
   """

@@ -90,6 +90,7 @@
     useradmin_configurations: { url: '/useradmin/configurations', title: '${_('User Admin - Configurations')}' },
     useradmin_organizations: { url: '/useradmin/organizations', title: '${_('User Admin - Organizations')}' },
     useradmin_newuser: { url: '/useradmin/users/new', title: '${_('User Admin - New User')}' },
+    useradmin_document_cleanup: { url: '/useradmin/users/document_cleanup', title: '${_('User Admin - Document Cleanup')}' },
     useradmin_addldapusers: { url: '/useradmin/users/add_ldap_users', title: '${_('User Admin - Add LDAP User')}' },
     useradmin_edituser: { url: '/useradmin/users/edit/:user', title: '${_('User Admin - Edit User')}' },
     useradmin_addldapgroups: { url: '/useradmin/users/add_ldap_groups', title: '${_('User Admin - Add LDAP Groups')}' },
@@ -103,7 +104,9 @@
     logs: { url: '/logs', title: '${_('Logs')}' },
     dump_config: { url: '/desktop/dump_config', title: '${_('Dump Configuration')}' },
     threads: { url: '/desktop/debug/threads', title: '${_('Threads')}' },
+<!--    metrics: { url: '/desktop/metrics', title: '${_('Metrics')}' },-->
     metrics: { url: '/desktop/metrics', title: '${_('Metrics')}' },
+    taskserver: { url: '/task_server', title: '${_('Task Server')}' },
     connectors: { url: '/desktop/connectors', title: '${_('Connectors')}' },
     analytics: { url: '/desktop/analytics', title: '${_('Analytics')}' },
     sqoop: { url: '/sqoop', title: '${_('Sqoop')}' },
@@ -490,6 +493,8 @@
     'max': '${ _('max') }',
     'Memory': '${ _('Memory') }',
     'Metrics': '${ _('Metrics') }',
+<!--    'taskserver': '${ _('Task Server') }',-->
+<!--    'Metrics2': '${ _('Metrics2') }',-->
     'min': '${ _('min') }',
     'Missing label configuration.': '${ _('Missing label configuration.') }',
     'Missing latitude configuration.': '${ _('Missing latitude configuration.') }',

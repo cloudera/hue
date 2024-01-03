@@ -27,7 +27,8 @@ const pluginName = 'jHueNotify',
   TYPES = {
     INFO: 'INFO',
     ERROR: 'ERROR',
-    GENERAL: 'GENERAL'
+    GENERAL: 'GENERAL',
+    URL: 'URL'
   },
   defaults = {
     level: TYPES.GENERAL,
@@ -51,8 +52,8 @@ Plugin.prototype.show = function () {
   const _this = this;
   const MARGIN = 4;
 
-  _this.options.message = _this.options.message.replace(/(<([^>]+)>)/gi, ''); // escape HTML messages
-  _this.options.message = deXSS(_this.options.message); // escape XSS messages
+//  _this.options.message = _this.options.message.replace(/(<([^>]+)>)/gi, ''); // escape HTML messages
+//  _this.options.message = deXSS(_this.options.message); // escape XSS messages
 
   if (
     /^(504|upstream connect error|Gateway Time-out|Service connectivity error)/.test(
@@ -139,6 +140,13 @@ Plugin.prototype.show = function () {
     }
     el.appendTo('body');
   }
+
+  if (this.options.level === TYPES.URL) {
+
+  } else {
+    _this.options.message = _this.options.message.replace(/(<([^>]+)>)/gi, ''); // escape HTML messages
+    _this.options.message = deXSS(_this.options.message); // escape XSS messages
+  }
 };
 
 $[pluginName] = function () {};
@@ -155,6 +163,12 @@ $[pluginName].error = function (message) {
   new Plugin({ level: TYPES.ERROR, message: message, sticky: true });
 };
 
+$[pluginName].url = function (message) {
+  new Plugin({ level: TYPES.URL, message: message });
+};
+
 $[pluginName].notify = function (options) {
   new Plugin(options);
 };
+
+
