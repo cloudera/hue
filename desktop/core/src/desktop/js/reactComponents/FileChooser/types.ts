@@ -33,7 +33,7 @@ interface Stats {
   user: string;
 }
 
-interface File {
+export interface File {
   humansize: string;
   is_sentry_managed: boolean;
   mode: string;
@@ -45,12 +45,43 @@ interface File {
   type: string;
   url: string;
 }
+
+export interface StorageBrowserTableData {
+  name: string;
+  size: string;
+  user: string;
+  group: string;
+  permission: string;
+  mtime: string;
+  type: string;
+  path: string;
+}
+
+export interface PageStats {
+  number: number;
+  num_pages: number;
+  previous_page_number: number;
+  next_page_number: number;
+  start_index: number;
+  end_index: number;
+  total_count: number;
+}
+
 export interface BreadcrumbData {
   label: string;
   url: string;
 }
+
 export interface PathAndFileData {
   path: string;
   breadcrumbs: BreadcrumbData[];
   files: File[];
+  page: PageStats;
+  pagesize: number;
+}
+
+export enum SortOrder {
+  ASC = 'ascending',
+  DSC = 'descending',
+  NONE = 'none'
 }
