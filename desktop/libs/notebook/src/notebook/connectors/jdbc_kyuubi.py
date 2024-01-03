@@ -19,6 +19,7 @@ from librdbms.jdbc import query_and_fetch
 
 from notebook.connectors.jdbc import JdbcApi
 from notebook.connectors.jdbc import Assist
+
 class JdbcApiKyuubi(JdbcApi):
 
   def _createAssist(self, db):
