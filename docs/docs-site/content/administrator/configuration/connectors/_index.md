@@ -806,7 +806,7 @@ Alternative:
 
 ### Apache Kyuubi
 
-[Apache Kyuubi](https://kyuubi.readthedocs.io/en/master/) is a distributed and multi-tenant gateway to provide serverless SQL on data warehouses and lakehouses.
+[Apache Kyuubi](https://kyuubi.apache.org/) is a distributed and multi-tenant gateway to provide serverless SQL on data warehouses and lakehouses.
 
 Give Hue the information about the database source:
 
@@ -814,7 +814,7 @@ Give Hue the information about the database source:
     name=Kyuubi
     interface=jdbc
     ## Specific options for connecting to the Kyuubi server.
-    ## The JDBC driver kyuubi-hive-jdbc.jar and its related jars need to be in the CLASSPATH environment variable.
+    ## The JDBC driver kyuubi-hive-jdbc-shaded.jar and its related jars need to be in the CLASSPATH environment variable.
     options='{"url": "jdbc:hive2://localhost:10009", "driver": "org.apache.kyuubi.jdbc.KyuubiHiveDriver", "user": "readonly", "password": ""}'
 
 
