@@ -229,6 +229,7 @@ class WebHdfs(Hdfs):
     }
 
   def get_delegation_token(self, user):
+    params = {}
     params['op'] = 'GETDELEGATIONTOKEN'
     params['doas'] = user
     params['renewer'] = user
