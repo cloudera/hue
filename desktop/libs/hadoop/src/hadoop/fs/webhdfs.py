@@ -37,7 +37,6 @@ from django.core.cache import caches
 from django.utils.encoding import smart_str
 
 import hadoop.conf
-import desktop.conf
 
 from desktop.lib.rest import http_client, resource
 from desktop.settings import CACHES_WEBHDFS_DELEGATION_TOKEN_KEY
@@ -221,7 +220,7 @@ class WebHdfs(Hdfs):
       token = cache.get(self.user, None)
       if not token:
         token = self.get_delegation_token(self.user)
-        cache.set(self.user, token, desktop.conf.KERBEROS.REINIT_FREQUENCY)
+        cache.set(self.user, token)
       return {'delegation': token}
     return {
       "user.name": WebHdfs.DEFAULT_USER,
