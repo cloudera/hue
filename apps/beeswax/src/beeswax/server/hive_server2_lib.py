@@ -1427,7 +1427,7 @@ class PartitionValueCompatible(object):
   def _get_partition_spec(self, name, value):
     partition_spec = "`%s`='%s'" % (name, value)
     partition_key = next((key for key in self.partition_keys if key.name == name), None)
-    if partition_key and partition_key.type.upper() not in ('STRING', 'CHAR', 'VARCHAR', 'TIMESTAMP', 'DATE'):
+    if partition_key and partition_key.type.split('(')[0].upper() not in ('STRING', 'CHAR', 'VARCHAR', 'TIMESTAMP', 'DATE'):
       partition_spec = "`%s`=%s" % (name, value)
     return partition_spec
 
