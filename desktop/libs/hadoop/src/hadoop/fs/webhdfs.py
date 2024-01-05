@@ -40,6 +40,7 @@ import hadoop.conf
 import desktop.conf
 
 from desktop.lib.rest import http_client, resource
+from desktop.settings import CACHES_WEBHDFS_DELEGATION_TOKEN_KEY
 from past.builtins import long
 from hadoop.fs import normpath as fs_normpath, SEEK_SET, SEEK_CUR, SEEK_END
 from hadoop.fs.hadoopfs import Hdfs
@@ -63,7 +64,7 @@ DEFAULT_READ_SIZE = 1024 * 1024 # 1MB
 
 LOG = logging.getLogger(__name__)
 
-cache = caches["webhdfs_delegation_token"]
+cache = caches[CACHES_WEBHDFS_DELEGATION_TOKEN_KEY]
 
 
 class WebHdfs(Hdfs):
