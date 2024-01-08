@@ -558,6 +558,15 @@ class OnePageViewModel {
         }
       },
       {
+        url: '/task_server',
+        app: function () {
+          self.loadApp('taskserver');
+//          self.getActiveAppViewModel(viewModel => {
+//            viewModel.fetchMetrics();
+//          });
+        }
+      },
+      {
         url: '/desktop/connectors',
         app: function () {
           self.loadApp('connectors');
@@ -803,6 +812,7 @@ class OnePageViewModel {
       { url: '/useradmin/permissions/edit/*', app: 'useradmin_editpermission' },
       { url: '/useradmin/users/', app: 'useradmin_users' },
       { url: '/useradmin/users/add_ldap_users', app: 'useradmin_addldapusers' },
+      { url: '/useradmin/users/document_cleanup', app: 'useradmin_document_cleanup' },
       { url: '/useradmin/users/add_ldap_groups', app: 'useradmin_addldapgroups' },
       { url: '/useradmin/users/edit/:user', app: 'useradmin_edituser' },
       { url: '/useradmin/users/new', app: 'useradmin_newuser' },

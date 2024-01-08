@@ -75,6 +75,9 @@ def is_selected(section, matcher):
                   <a href="${ url('desktop.lib.metrics.views.index') }">${_('Metrics')}</a>
                 </li>
                 % endif
+                <li class="${is_selected(section, 'task_server')}">
+                  <a href="${ url('desktop.views.task_server_view') }">${_('Task Server')}</a>
+                </li>
               % endif
             </ul>
           </div>
