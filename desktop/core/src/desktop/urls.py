@@ -168,7 +168,8 @@ dynamic_patterns += [
   re_path(r'^desktop/api2/doc/restore/?$', desktop_api2.restore_document),
   re_path(r'^desktop/api2/doc/share/link/?$', desktop_api2.share_document_link),
   re_path(r'^desktop/api2/doc/share/?$', desktop_api2.share_document),
-  re_path(r'^api/handle_submit?$', desktop_api2.handle_submit),
+  re_path(r'^desktop/api2/handle_submit/?$', desktop_api2.handle_submit),
+  re_path(r'^desktop/api2/get_taskserver_tasks/?$', desktop_api2.get_taskserver_tasks),
 
   re_path(r'^desktop/api2/get_config/?$', desktop_api2.get_config),
   re_path(r'^desktop/api2/get_hue_config/?$', desktop_api2.get_hue_config),
