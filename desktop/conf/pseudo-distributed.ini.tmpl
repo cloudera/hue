@@ -191,6 +191,12 @@
   # Enable X-Forwarded-Host header if the load balancer requires it.
   ## use_x_forwarded_host=true
 
+  # Enable X-Forwarded-For header if hive/impala requires it.
+  ## enable_xff_for_hive_impala=true
+
+  # Enable X-CSRF-Token header if hive/impala requires it.
+  ## enable_x_csrf_token_for_hive_impala=true
+
   # Support for HTTPS termination at the load-balancer level with SECURE_PROXY_SSL_HEADER.
   ## secure_proxy_ssl_header=false
 
@@ -449,16 +455,17 @@
     ## reverse_proxy_header=HTTP_X_FORWARDED_FOR
 
     [[[jwt]]]
-      # Adds custom JWT Authentication backend for REST APIs in top priority.
-      ## is_enabled=false
-
       # Endpoint to fetch the public key from verification server.
+      # Also adds custom JWT Authentication backend for REST APIs in top priority if set.
       ## key_server_url=https://ext_authz:8000
 
-      # The identifier of the service issued the JWT
+      # The JWT payload header containing the username.
+      ## username_header=sub
+
+      # The identifier of the service issued the JWT.
       ## issuer=None
 
-      # The identifier of the resource intend to access
+      # The identifier of the resource intend to access.
       ## audience=None
 
       # Verify custom JWT signature.
@@ -909,12 +916,13 @@
    # Django cache to use to store temporarily used data during query execution. This is in addition to result_file_storage and result_backend.
    ## execution_storage='{"BACKEND": "django.core.cache.backends.locmem.LocMemCache", "LOCATION": "celery-hue"}'
 
-   # Settings for the Google Cloud lib
-   # ------------------------------------------------------------------------
-   [[gc_accounts]]
-      [[[default]]]
-        # The JSON credentials to authenticate to Google Cloud e.g. '{ "type": "service_account", "project_id": .... }'
-        # json_credentials=None
+  # Settings for the Google Cloud lib
+  # ------------------------------------------------------------------------
+
+  [[gc_accounts]]
+    [[[default]]]
+      # The JSON credentials to authenticate to Google Cloud e.g. '{ "type": "service_account", "project_id": .... }'
+      ## json_credentials=None
 
   ## Configuration for Ozone File System
   # ------------------------------------------------------------------------
@@ -956,6 +964,9 @@
   ## Autocreate the user home directory in the remote home storage path.
   # autocreate_user_dir=true
 
+  ## Enable integration with Google Storage for RAZ
+  # is_raz_gs_enabled=false
+
 ###########################################################################
 # Settings to configure the snippets available in the Notebook
 ###########################################################################
@@ -995,6 +1006,10 @@
 
   ## Default limit to use in SELECT statements if not present. Set to 0 to disable.
   # default_limit=5000
+
+  ## Set the default interpreter for all users. 
+  ## Starred interpreters at user level will get more priority than the value below.
+  # default_interpreter=
 
   # One entry for each type of snippet.
   [[interpreters]]

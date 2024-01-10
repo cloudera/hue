@@ -31,7 +31,7 @@ else:
   from django.utils.translation import ugettext_lazy as _
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class Command(BaseCommand):

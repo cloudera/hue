@@ -28,7 +28,7 @@ import sys
 
 DEFAULT_HUE_CONFIG_PATH = "/etc/hue/conf/hue.ini"
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class Command(BaseCommand):

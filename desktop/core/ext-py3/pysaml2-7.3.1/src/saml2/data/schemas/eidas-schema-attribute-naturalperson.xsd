@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://eidas.europa.eu/attributes/naturalperson" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://eidas.europa.eu/attributes/naturalperson" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1">
+  <xsd:attribute name="LatinScript" type="xsd:boolean" default="true"/>
+  <!-- Mandatory attribute types for a natural person. -->
+  <xsd:simpleType name="PersonIdentifierType">
+    <xsd:annotation>
+      <xsd:documentation>Unique identifier for the natural person as defined by the eIDAS Regulation.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string"/>
+  </xsd:simpleType>
+  <xsd:complexType name="CurrentFamilyNameType">
+    <xsd:annotation>
+      <xsd:documentation>Current family name of the natural person.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:string">
+        <xsd:attribute ref="LatinScript"/>
+      </xsd:extension>
+    </xsd:simpleContent>
+  </xsd:complexType>
+  <xsd:complexType name="CurrentGivenNameType">
+    <xsd:annotation>
+      <xsd:documentation>Current given names of the natural person.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:string">
+        <xsd:attribute ref="LatinScript"/>
+      </xsd:extension>
+    </xsd:simpleContent>
+  </xsd:complexType>
+  <xsd:simpleType name="DateOfBirthType">
+    <xsd:annotation>
+      <xsd:documentation>Date of Birth for the Natural Person (Based on xsd:date i.e. YYYY-MM-DD format).</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:date"/>
+  </xsd:simpleType>
+  <!-- Optional attribute types for a natural person. -->
+  <xsd:complexType name="CurrentAddressStructuredType">
+    <xsd:annotation>
+      <xsd:documentation>Current address of the natural person.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="PoBox" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+      <xsd:element name="LocatorDesignator" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+      <xsd:element name="LocatorName" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+      <xsd:element name="CvaddressArea" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+      <xsd:element name="Thoroughfare" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+      <xsd:element name="PostName" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+      <xsd:element name="AdminunitFirstline" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+      <xsd:element name="AdminunitSecondline" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+      <xsd:element name="PostCode" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:simpleType name="CurrentAddressType">
+    <xsd:annotation>
+      <xsd:documentation>Current address of the natural person as a base64 encoded string.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string"/>
+  </xsd:simpleType>
+  <xsd:simpleType name="GenderType">
+    <xsd:annotation>
+      <xsd:documentation>Gender of the natural person.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="Male"/>
+      <xsd:enumeration value="Female"/>
+      <xsd:enumeration value="Unspecified"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:complexType name="BirthNameType">
+    <xsd:annotation>
+      <xsd:documentation>First name(s) and family name(s) of the natural person at birth.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:string">
+        <xsd:attribute ref="LatinScript"/>
+      </xsd:extension>
+    </xsd:simpleContent>
+  </xsd:complexType>
+  <xsd:complexType name="PlaceOfBirthType">
+    <xsd:annotation>
+      <xsd:documentation>Place of birth for a natural person.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:string"></xsd:extension>
+    </xsd:simpleContent>
+  </xsd:complexType>
+</xsd:schema>

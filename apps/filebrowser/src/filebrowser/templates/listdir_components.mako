@@ -22,7 +22,7 @@ from django.template.defaultfilters import urlencode, stringformat, filesizeform
 from desktop.lib.django_util import reverse_with_get, extract_field_data
 from django.utils.encoding import smart_str
 
-from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
+from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE, FILE_UPLOAD_CHUNK_SIZE, CONCURRENT_MAX_CONNECTIONS
 
 if sys.version_info[0] > 2:
   from django.utils.translation import gettext as _
@@ -180,11 +180,11 @@ else:
       <h2 class="modal-title">${ _('Confirm Delete') }</h2>
     </div>
     <div class="modal-body">
-      <!-- ko if: isS3() && isS3Root() -->
+      <!-- ko if: (isS3() && isS3Root()) || (isGS() && isGSRoot()) -->
       <p>${_('Are you sure you want to delete these buckets?')}</p>
       <p class="muted">${_('Deleting a bucket will delete all of its contents and release the bucket name to be reserved by others.')}</p>
       <!-- /ko -->
-      <!-- ko ifnot: isS3() && isS3Root() -->
+      <!-- ko ifnot: (isS3() && isS3Root()) && (isGS() && isGSRoot()) -->
       <!-- ko ifnot: $root.skipTrash -->
       <p>${_('Are you sure you want to delete these files?')}</p>
       <!-- /ko -->
@@ -354,23 +354,23 @@ else:
           <tbody>
             <tr>
               <td><strong>${_('Read')}</strong></td>
-              <td class="center"><input type="checkbox" data-bind="attr: {checked: selectedFile.mode }" checked="" name="user_read"></td>
-              <td class="center"><input type="checkbox" data-bind="attr: {checked: selectedFile.mode }" checked="" name="group_read"></td>
-              <td class="center"><input type="checkbox" data-bind="attr: {checked: selectedFile.mode }" checked="" name="other_read"></td>
+              <td class="center"><input type="checkbox" name="user_read"></td>
+              <td class="center"><input type="checkbox" name="group_read"></td>
+              <td class="center"><input type="checkbox" name="other_read"></td>
               <td colspan="2">&nbsp;</td>
             </tr>
             <tr>
               <td><strong>${_('Write')}</strong></td>
-              <td class="center"><input type="checkbox" data-bind="attr: {checked: selectedFile.mode }" checked="" name="user_write"></td>
-              <td class="center"><input type="checkbox" data-bind="attr: {checked: selectedFile.mode }" checked="" name="group_write"></td>
-              <td class="center"><input type="checkbox" data-bind="attr: {checked: selectedFile.mode }" checked="" name="other_write"></td>
+              <td class="center"><input type="checkbox" name="user_write"></td>
+              <td class="center"><input type="checkbox" name="group_write"></td>
+              <td class="center"><input type="checkbox" name="other_write"></td>
               <td colspan="2">&nbsp;</td>
             </tr>
             <tr>
               <td><strong>${_('Execute')}</strong></td>
-              <td class="center"><input type="checkbox" checked="" name="user_execute"></td>
-              <td class="center"><input type="checkbox" checked="" name="group_execute"></td>
-              <td class="center"><input type="checkbox" checked="" name="other_execute"></td>
+              <td class="center"><input type="checkbox" name="user_execute"></td>
+              <td class="center"><input type="checkbox" name="group_execute"></td>
+              <td class="center"><input type="checkbox" name="other_execute"></td>
               <td colspan="2">&nbsp;</td>
             </tr>
             <tr>
@@ -412,7 +412,7 @@ else:
           <span id="moveNameRequiredAlert" class="hide label label-important">${_('Required')}</span>
         </div>
         <a class="btn" onclick="$('#moveModal').modal('hide');">${_('Cancel')}</a>
-        <input class="btn btn-primary" type="submit" value="${_('Move')}"/>
+        <input data-bind="enable: $root.enableMoveButton()" class="btn btn-primary" type="submit" value="${_('Move')}"/>
       </div>
     </div>
   </form>
@@ -434,7 +434,7 @@ else:
           <span id="copyNameRequiredAlert" class="hide label label-important">${_('Required')}</span>
         </div>
         <a class="btn" onclick="$('#copyModal').modal('hide');">${_('Cancel')}</a>
-        <input class="btn btn-primary" type="submit" value="${_('Copy')}"/>
+        <input data-bind="enable: $root.enableCopyButton()" class="btn btn-primary" type="submit" value="${_('Copy')}"/>
       </div>
     </div>
   </form>
@@ -461,10 +461,10 @@ else:
     <div id="createDirectoryModal" class="modal hide fade">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
-        <!-- ko if: (!isS3() && !isABFS() && !isOFS()) || (isS3() && !isS3Root()) || (isABFS() && !isABFSRoot()) || (isOFS() && !isOFSServiceID() && !isOFSVol())  -->
+        <!-- ko if: (!isS3() && !isGS() && !isABFS() && !isOFS()) || (isS3() && !isS3Root()) || (isGS() && !isGSRoot()) || (isABFS() && !isABFSRoot()) || (isOFS() && !isOFSServiceID() && !isOFSVol())  -->
         <h2 class="modal-title">${_('Create Directory')}</h2>
         <!-- /ko -->
-        <!-- ko if: (isS3() && isS3Root()) || (isOFS() && isOFSVol()) -->
+        <!-- ko if: (isS3() && isS3Root()) || (isGS() && isGSRoot()) || (isOFS() && isOFSVol()) -->
         <h2 class="modal-title">${_('Create Bucket')}</h2>
         <!-- /ko -->
         <!-- ko if: isABFS() && isABFSRoot() -->
@@ -476,10 +476,10 @@ else:
       </div>
       <div class="modal-body">
         <label>
-          <!-- ko if: (!isS3() && !isABFS() && !isOFS()) || (isS3() && !isS3Root()) || (isABFS() && !isABFSRoot()) || (isOFS() && !isOFSServiceID() && !isOFSVol()) -->
+          <!-- ko if: (!isS3() && !isGS() && !isABFS() && !isOFS()) || (isS3() && !isS3Root()) || (isGS() && !isGSRoot()) || (isABFS() && !isABFSRoot()) || (isOFS() && !isOFSServiceID() && !isOFSVol()) -->
           ${_('Directory Name')}
           <!-- /ko -->
-          <!-- ko if: (isS3() && isS3Root()) || (isOFS() && isOFSVol()) -->
+          <!-- ko if: (isS3() && isS3Root()) || (isGS() && isGSRoot()) || (isOFS() && isOFSVol()) -->
           ${_('Bucket Name')}
           <!-- /ko -->
           <!-- ko if: isABFS() && isABFSRoot() -->
@@ -587,12 +587,12 @@ else:
   <!-- actions context menu -->
   <ul class="context-menu dropdown-menu">
   <!-- ko ifnot: $root.inTrash -->
-    <li data-bind="visible: (!isS3() && !isABFS() && !isOFS()) || (isS3() && !isS3Root()) || (isABFS() && !isABFSRoot()) || (isOFS() && !isOFSServiceID() && !isOFSVol()), css: {'disabled': $root.selectedFiles().length != 1 || isCurrentDirSelected().length > 0}">
+    <li data-bind="visible: (!isS3() && !isGS() && !isABFS() && !isOFS()) || (isS3() && !isS3Root()) || (isGS() && !isGSRoot()) || (isABFS() && !isABFSRoot()) || (isOFS() && !isOFSServiceID() && !isOFSVol()), css: {'disabled': $root.selectedFiles().length != 1 || isCurrentDirSelected().length > 0}">
     <a href="javascript: void(0)" title="${_('Rename')}" data-bind="click: ($root.selectedFiles().length == 1 && isCurrentDirSelected().length == 0) ? $root.renameFile: void(0)"><i class="fa fa-fw fa-font"></i>
     ${_('Rename')}</a></li>
-    <li data-bind="visible: (!isS3() && !isABFS() && !isOFS()) || (isS3() && !isS3Root()) || (isABFS() && !isABFSRoot()) || (isOFS() && !isOFSServiceID() && !isOFSVol()), css: {'disabled': $root.selectedFiles().length == 0 || isCurrentDirSelected().length > 0}">
+    <li data-bind="visible: (!isS3() && !isGS() &&  !isABFS() && !isOFS()) || (isS3() && !isS3Root()) || (isGS() && !isGSRoot()) || (isABFS() && !isABFSRoot()) || (isOFS() && !isOFSServiceID() && !isOFSVol()), css: {'disabled': $root.selectedFiles().length == 0 || isCurrentDirSelected().length > 0}">
     <a href="javascript: void(0)" title="${_('Move')}" data-bind="click: ( $root.selectedFiles().length > 0 && isCurrentDirSelected().length == 0) ? $root.move: void(0)"><i class="fa fa-fw fa-random"></i> ${_('Move')}</a></li>
-    <li data-bind="visible: (!isS3() && !isABFS() && !isOFS()) || (isS3() && !isS3Root()) || (isABFS() && !isABFSRoot()) || (isOFS() && !isOFSServiceID() && !isOFSVol()), css: {'disabled': $root.selectedFiles().length == 0 || isCurrentDirSelected().length > 0}">
+    <li data-bind="visible: (!isS3() && !isGS() && !isABFS() && !isOFS()) || (isS3() && !isS3Root()) || (isGS() && !isGSRoot()) || (isABFS() && !isABFSRoot()) || (isOFS() && !isOFSServiceID() && !isOFSVol()), css: {'disabled': $root.selectedFiles().length == 0 || isCurrentDirSelected().length > 0}">
     <a href="javascript: void(0)" title="${_('Copy')}" data-bind="click: ($root.selectedFiles().length > 0 && isCurrentDirSelected().length == 0) ? $root.copy: void(0)"><i class="fa fa-fw fa-files-o"></i> ${_('Copy')}</a></li>
     % if show_download_button:
     <li data-bind="css: {'disabled': $root.inTrash() || $root.selectedFiles().length != 1 || selectedFile().type != 'file'}">
@@ -649,7 +649,7 @@ else:
   <div id="submit-wf-modal" class="modal hide"></div>
 
   <script id="fileTemplate" type="text/html">
-    <tr class="row-animated" style="cursor: pointer" data-bind="visible: !(name == '..' && window.RAZ_IS_ENABLED), drop: { enabled: name !== '.' && type !== 'file' && (!$root.isS3() || ($root.isS3() && !$root.isS3Root())), value: $data }, event: { mouseover: toggleHover, mouseout: toggleHover, contextmenu: showContextMenu }, click: $root.viewFile, css: { 'row-selected': selected(), 'row-highlighted': highlighted(), 'row-deleted': deleted() }">
+    <tr class="row-animated" style="cursor: pointer" data-bind="visible: !(name == '..' && window.RAZ_IS_ENABLED), drop: { enabled: name !== '.' && type !== 'file' && ((!$root.isS3() || ($root.isS3() && !$root.isS3Root())) || (!$root.isGS() || ($root.isGS() && !$root.isGSRoot()))), value: $data }, event: { mouseover: toggleHover, mouseout: toggleHover, contextmenu: showContextMenu }, click: $root.viewFile, css: { 'row-selected': selected(), 'row-highlighted': highlighted(), 'row-deleted': deleted() }">
       <td class="center" data-bind="click: name !== '..' ? handleSelect : void(0)" style="cursor: default">
         <div data-bind="multiCheck: '#fileBrowserTable', visible: name != '..', css: { 'hue-checkbox': name != '..', 'fa': name != '..', 'fa-check': selected }"></div>
       </td>
@@ -663,7 +663,7 @@ else:
         <a href="#" data-bind="click: $root.viewFile"><i class="fa fa-level-up"></i></a>
         <!-- /ko -->
         <!-- ko if: name != '..' -->
-        <strong><a href="#" class="draggable-fb" data-bind="drag: { enabled: (!$root.isS3() || ($root.isS3() && !$root.isS3Root())), value: $data }, click: $root.viewFile, text: name, attr: { 'draggable': $.inArray(name, ['.', '..', '.Trash']) === -1 && !isBucket()}"></a></strong>
+        <strong><a href="#" class="draggable-fb" data-bind="drag: { enabled: (!$root.isS3() || ($root.isS3() && !$root.isS3Root()) || (!$root.isGS() || ($root.isGS() && !$root.isGSRoot()))), value: $data }, click: $root.viewFile, text: name, attr: { 'draggable': $.inArray(name, ['.', '..', '.Trash']) === -1 && !isBucket()}"></a></strong>
         <!-- /ko -->
       </td>
       <td>
@@ -688,15 +688,40 @@ else:
         % endif
       </td>
       <td>
-        <span data-bind="text: permissions, visible: $root.isS3() || !selected() || $root.isCurrentDirSentryManaged() || isSentryManaged"></span>
+        <span data-bind="text: permissions, visible: $root.isS3() || $root.isGS() || !selected() || $root.isCurrentDirSentryManaged() || isSentryManaged"></span>
         <a href="#" rel="tooltip" title="${_('Change permissions')}"
-            data-bind="text: permissions, visible: !$root.isS3() && !$root.inTrash() && selected() && !$root.isCurrentDirSentryManaged() && !isSentryManaged, click: $root.changePermissions" data-original-title="${_('Change permissions')}"></a>
+            data-bind="text: permissions, visible: !$root.isS3() && !$root.isGS() && !$root.inTrash() && selected() && !$root.isCurrentDirSentryManaged() && !isSentryManaged, click: $root.changePermissions" data-original-title="${_('Change permissions')}"></a>
       </td>
       <td data-bind="text: stats.mtime" style="white-space: nowrap;"></td>
     </tr>
   </script>
 
   <script src="${ static('desktop/ext/js/datatables-paging-0.1.js') }" type="text/javascript" charset="utf-8"></script>
+
+  <script type="text/template" id="qq-template">
+    <div class="qq-uploader-selector" style="margin-left: 10px">
+        <div class="qq-upload-drop-area-selector" qq-hide-dropzone><span>${_('Drop the files here to upload')}</span></div>
+        <div class="qq-upload-button-selector qq-no-float">${_('Select files')}</div> &nbsp;
+        <span class="muted">${_('or drag and drop them here')}</span>
+
+        <ul class="qq-upload-list-selector qq-upload-files unstyled qq-no-float" style="margin-right: 0;">
+            <li>
+                <span class="qq-upload-spinner-selector hide" style="display:none"></span>
+                <div class="progress-row dz-processing">
+                    <span class="break-word qq-upload-file-selector"></span>
+                    <div class="pull-right">
+                        <span class="qq-upload-file-selector" style="display:block"></span>
+                        <span class="muted qq-upload-size-selector"></span>&nbsp;&nbsp;
+                        <a href="#" title="${_('Cancel')}" class="complex-layout"><i class="fa fa-fw fa-times qq-upload-cancel-selector"></i></a>
+                        <span class="qq-upload-done-selector" style="display:none"><i class="fa fa-fw fa-check muted"></i></span>
+                        <span class="qq-upload-failed-text">${_('Failed')}</span>
+                    </div>
+                    <div class="progress-row-bar" style="width: 0%;"></div>
+                </div>
+            </li>
+        </ul>
+    </div>
+  </script>
 
 
   <script>
@@ -775,7 +800,7 @@ else:
           });
         },
         error: function (xhr, textStatus, errorThrown) {
-          $(document).trigger("error", xhr.responseText);
+          huePubSub.publish('hue.global.error', {message: xhr.responseText});
           resetPrimaryButtonsStatus();
         }
       });
@@ -856,7 +881,7 @@ else:
           replication: file.stats.replication
         },
         isBucket: ko.pureComputed(function(){
-          return file.path.toLowerCase().indexOf('s3a://') == 0 && file.path.substr(6).indexOf('/') == -1
+          return (file.path.toLowerCase().indexOf('s3a://') == 0 && file.path.substr(6).indexOf('/') == -1) || (file.path.toLowerCase().indexOf('gs://') == 0 && file.path.substr(5).indexOf('/') == -1)
         }),
         selected: ko.observable(file.highlighted && fileBrowserViewModel.isArchive(file.name) || false),
         highlighted: ko.observable(file.highlighted || false),
@@ -945,6 +970,8 @@ else:
       self.searchQuery = ko.observable("");
       self.skipTrash = ko.observable(false);
       self.enableFilterAfterSearch = true;
+      self.enableMoveButton = ko.observable(false);
+      self.enableCopyButton = ko.observable(false);
       self.isCurrentDirSentryManaged = ko.observable(false);
       self.errorMessage = ko.observable("");
       self.pendingUploads = ko.observable(0);
@@ -1066,6 +1093,10 @@ else:
         return self.currentPath().toLowerCase().indexOf('s3a://') === 0;
       });
 
+      self.isGS = ko.pureComputed(function () {
+        return self.currentPath().toLowerCase().indexOf('gs://') === 0;
+      });
+
       self.isAdls = ko.pureComputed(function () {
         return self.currentPath().toLowerCase().indexOf('adl:/') === 0;
       });
@@ -1089,6 +1120,8 @@ else:
           return 'adls';
         } else if (scheme === 's3a' ){
           return 's3';
+        } else if (scheme === 'gs' ){
+          return 'gs';
         } else if (scheme === 'ofs' ){
           return 'ofs';
         } else if (!scheme || scheme == 'hdfs') {
@@ -1102,6 +1135,8 @@ else:
         var path = path && path.toLowerCase();
         if (path.indexOf('s3a://') >= 0) {
           return 's3a://';
+        } else if (path.indexOf('gs://') >= 0) {
+          return 'gs://';
         } else if (path.indexOf('adl:/') >= 0) {
           return 'adl:/';
         } else if (path.indexOf('abfs://') >= 0) {
@@ -1126,13 +1161,13 @@ else:
         return currentPath.indexOf('/') === 0 || currentPath.indexOf('hdfs') === 0
       });
       self.isCompressEnabled = ko.pureComputed(function () {
-        return !self.isS3() && !self.isAdls() && !self.isABFS() && !self.isOFS();
+        return !self.isS3() && !self.isGS() && !self.isAdls() && !self.isABFS() && !self.isOFS();
       });
       self.isSummaryEnabled = ko.pureComputed(function () {
         return self.isHdfs() || self.isOFS();
       });
       self.isPermissionEnabled = ko.pureComputed(function () {
-        return !self.isS3() && !self.isABFSRoot() && !self.isOFS();
+        return !self.isS3() && !self.isGS() && !self.isABFSRoot() && !self.isOFS();
       });
       self.isReplicationEnabled = ko.pureComputed(function () {
         return self.isHdfs();
@@ -1144,8 +1179,18 @@ else:
         }
       });
 
+      self.isGS.subscribe(function (newVal) {
+        if (newVal) {
+          huePubSub.publish('update.autocompleters');
+        }
+      });
+
       self.isS3Root = ko.pureComputed(function () {
         return self.isS3() && self.currentPath().toLowerCase() === 's3a://';
+      });
+
+      self.isGSRoot = ko.pureComputed(function () {
+        return self.isGS() && self.currentPath().toLowerCase() === 'gs://';
       });
 
       self.isABFSRoot = ko.pureComputed(function () {
@@ -1190,11 +1235,11 @@ else:
             self.contentSummary(ko.mapping.fromJS(data.summary));
             self.isLoadingSummary(false);
           } else {
-            $(document).trigger("error", data.message);
+            huePubSub.publish('hue.global.error', {message: data.message});
             $("#contentSummaryModal").modal("hide");
           }
         }).fail(function (xhr, textStatus, errorThrown) {
-          $(document).trigger("error", xhr.responseText);
+          huePubSub.publish('hue.global.error', {message: xhr.responseText});
           $("#contentSummaryModal").modal("hide");
         });
       }
@@ -1208,7 +1253,7 @@ else:
         const encodedSearchFilter = encodeURIComponent(self.searchQuery());
         $.getJSON(self.targetPath() + (self.targetPath().indexOf('?') > 0 ? '&' : '?') + "pagesize=" + self.recordsPerPage() + "&pagenum=" + self.targetPageNum() + "&filter=" + encodedSearchFilter + "&sortby=" + self.sortBy() + "&descending=" + self.sortDescending() + "&format=json", function (data) {
           if (data.error){
-            $(document).trigger("error", data.error);
+            huePubSub.publish('hue.global.error', {message: data.error});
             self.isLoading(false);
             return false;
           }
@@ -1449,6 +1494,18 @@ else:
           $('#newRepFactorInput').val(self.selectedFile().stats.replication);
         });
       };
+      
+      const removeLastSlash = function (path) {
+        if (path.charAt(path.length - 1) === '/') {
+          return path.slice(0, -1);
+        }
+        return path;
+      };
+
+      self.allowCopyMoveTo = function (destination) {
+        const source = self.currentPath();
+        return removeLastSlash(source) !== removeLastSlash(destination);
+      };
 
       self.move = function (mode, unselectedDrag) {
         var paths = [];
@@ -1492,6 +1549,7 @@ else:
             });
 
             $("#moveModal").on("shown", function () {
+              self.enableMoveButton(false);
               $("#moveDestination").val('');
               $("#moveNameRequiredAlert").hide();
               $("#moveForm").find("input[name='*dest_path']").removeClass("fieldError");
@@ -1503,6 +1561,10 @@ else:
                 filesystemsFilter: [self.scheme()],
                 onNavigate: function (filePath) {
                   $("#moveDestination").val(filePath);
+                  self.enableMoveButton(self.allowCopyMoveTo(filePath));            
+                },
+                onFolderChange: function () {
+                  self.enableMoveButton(false);
                 },
                 createFolder: false,
                 uploadFile: false
@@ -1546,6 +1608,7 @@ else:
         });
 
         $("#copyModal").on("shown", function () {
+          self.enableCopyButton(false);
           $("#copyDestination").val('');
           $("#copyNameRequiredAlert").hide();
           $("#copyForm").find("input[name='*dest_path']").removeClass("fieldError");
@@ -1557,7 +1620,11 @@ else:
             filesystemsFilter: [self.scheme()],
             onNavigate: function (filePath) {
               $("#copyDestination").val(filePath);
+              self.enableCopyButton(self.allowCopyMoveTo(filePath)); 
             },
+            onFolderChange: function () {
+              self.enableCopyButton(false);
+            },            
             createFolder: false,
             uploadFile: false
           });
@@ -1609,7 +1676,7 @@ else:
               self.retrieveData(true);
             },
             error: function (xhr, textStatus, errorThrown) {
-              $(document).trigger("error", xhr.responseText);
+              huePubSub.publish('hue.global.error', {message: xhr.responseText});
               resetPrimaryButtonsStatus();
             }
           });
@@ -1647,7 +1714,7 @@ else:
               self.retrieveData(true);
             },
             error: function (xhr, textStatus, errorThrown) {
-              $(document).trigger("error", xhr.responseText);
+              huePubSub.publish('hue.global.error', {message: xhr.responseText});
               resetPrimaryButtonsStatus();
             }
           });
@@ -1658,9 +1725,9 @@ else:
 
           for (var i = 0; i < permissions.length; i++) {
             if (mode & 1) {
-              $("#chmodForm input[name='" + permissions[i] + "']").attr("checked", true);
+              $("#chmodForm input[name='" + permissions[i] + "']").prop("checked", true);
             } else {
-              $("#chmodForm input[name='" + permissions[i] + "']").attr("checked", false);
+              $("#chmodForm input[name='" + permissions[i] + "']").prop("checked", false);
             }
             mode >>>= 1;
           }
@@ -1709,7 +1776,7 @@ else:
             }, 1000);
           },
           error: function(xhr, textStatus, errorThrown) {
-            $(document).trigger("error", xhr.responseText);
+            huePubSub.publish('hue.global.error', {message: xhr.responseText});
             resetPrimaryButtonsStatus();
           }
         });
@@ -1799,10 +1866,10 @@ else:
             $.jHueNotify.info("${ _('Task ') }" + data.history_uuid + "${_(' submitted.') }");
             huePubSub.publish('notebook.task.submitted', data);
           } else {
-            $(document).trigger("error", data.message);
+            huePubSub.publish('hue.global.error', {message: data.message});
           }
         }).fail(function (xhr, textStatus, errorThrown) {
-          $(document).trigger("error", xhr.responseText);
+          huePubSub.publish('hue.global.error', {message: xhr.responseText});
         });
       };
 
@@ -1835,10 +1902,10 @@ else:
             $.jHueNotify.info("${ _('Task ') }" + data.history_uuid + "${_(' submitted.') }");
             huePubSub.publish('notebook.task.submitted', data);
           } else {
-            $(document).trigger("error", data.message);
+            huePubSub.publish('hue.global.error', {message: data.message});
           }
         }).fail(function (xhr, textStatus, errorThrown) {
-          $(document).trigger("error", xhr.responseText);
+          huePubSub.publish('hue.global.error', {message: xhr.responseText});
         });
       };
 
@@ -1886,7 +1953,7 @@ else:
             self.retrieveData(true);
           },
           error: function (xhr, textStatus, errorThrown) {
-            $(document).trigger("error", xhr.responseText);
+            huePubSub.publish('hue.global.error', {message: xhr.responseText});
             resetPrimaryButtonsStatus();
           }
         });
@@ -1917,7 +1984,7 @@ else:
             self.retrieveData(true);
           },
           error: function (xhr, textStatus, errorThrown) {
-            $(document).trigger("error", xhr.responseText);
+            huePubSub.publish('hue.global.error', {message: xhr.responseText});
             resetPrimaryButtonsStatus();
           }
         });
@@ -1947,7 +2014,7 @@ else:
             self.retrieveData(true);
           },
           error: function(xhr, textStatus, errorThrown) {
-            $(document).trigger("error", xhr.responseText);
+            huePubSub.publish('hue.global.error', {message: xhr.responseText});
             resetPrimaryButtonsStatus();
           }
         });
@@ -1979,63 +2046,140 @@ else:
       };
 
       self.uploadFile = (function () {
-        self.pendingUploads(0);
-        var action = "/filebrowser/upload/file";
-        var uploader = new qq.FileUploader({
-          element: document.getElementById("fileUploader"),
-          action: action,
-          template: '<div class="qq-uploader" style="margin-left: 10px">' +
-          '<div class="qq-upload-drop-area"><span>${_('Drop the files here to upload')}</span></div>' +
-          '<div class="qq-upload-button qq-no-float">${_('Select files')}</div> &nbsp; <span class="muted">${_('or drag and drop them here')}</span>' +
-          '<ul class="qq-upload-list qq-upload-files unstyled qq-no-float" style="margin-right: 0;"></ul>' +
-          '</div>',
-          fileTemplate: '<li><span class="qq-upload-file-extended" style="display:none"></span><span class="qq-upload-spinner hide" style="display:none"></span>' +
-          '<div class="progress-row dz-processing">' +
-          '<span class="break-word qq-upload-file"></span>' +
-          '<div class="pull-right">' +
-          '<span class="muted qq-upload-size"></span>&nbsp;&nbsp;' +
-          '<a href="#" title="${_('Cancel')}" class="complex-layout"><i class="fa fa-fw fa-times qq-upload-cancel"></i></a>' +
-          '<span class="qq-upload-done" style="display:none"><i class="fa fa-fw fa-check muted"></i></span>' +
-          '<span class="qq-upload-failed-text">${_('Failed')}</span>' +
-          '</div>' +
-          '<div class="progress-row-bar" style="width: 0%;"></div>' +
-          '</div></li>',
-          params: {
-            dest: self.currentPath(),
-            fileFieldLabel: "hdfs_file"
-          },
-          onProgress: function (id, fileName, loaded, total) {
-            $('.qq-upload-files').find('li').each(function(){
-              var listItem = $(this);
-              if (listItem.find('.qq-upload-file-extended').text() == fileName){
-                listItem.find('.progress-row-bar').css('width', (loaded/total)*100 + '%');
-              }
-            });
-          },
-          onComplete: function (id, fileName, response) {
-            self.pendingUploads(self.pendingUploads() - 1);
-            if (response.status != 0) {
-              $(document).trigger('error', "${ _('Error: ') }" + response.data);
-            }
-            else {
-              $(document).trigger('info', response.path + "${ _(' uploaded successfully.') }");
-              self.filesToHighlight.push(response.path);
-            }
-            if (self.pendingUploads() == 0) {
-              $('#uploadFileModal').modal('hide');
-              self.retrieveData(true);
-            }
-          },
-          onSubmit: function (id, fileName, responseJSON) {
-            self.pendingUploads(self.pendingUploads() + 1);
-          },
-          onCancel: function (id, fileName) {
-            self.pendingUploads(self.pendingUploads() - 1);
-          },
-          debug: false
-        });
+          var uploader;  
+          if (window.getLastKnownConfig().hue_config.enable_chunked_file_uploader) {
+            self.pendingUploads(0);
+            var action = "/filebrowser/upload/chunks/";
+            uploader = new qq.FileUploader({
+              element: document.getElementById("fileUploader"),
+              request: {
+                  endpoint: action,
+                  paramsInBody: false,
+                  params: {
+                      dest: self.currentPath(),
+                      inputName: "hdfs_file"
+                  }
+              },
+              maxConnections: window.CONCURRENT_MAX_CONNECTIONS || 5,
+              chunking: {
+                  enabled: true,
+                  concurrent: {
+                      enabled: true
+                  },
+                  partSize: window.FILE_UPLOAD_CHUNK_SIZE || 5242880,
+                  success: {
+                      endpoint: "/filebrowser/upload/complete/"
+                  },
+                  paramNames: {
+                      partIndex: "qqpartindex",
+                      partByteOffset: "qqpartbyteoffset",
+                      chunkSize: "qqchunksize",
+                      totalFileSize: "qqtotalfilesize",
+                      totalParts: "qqtotalparts"
+                  }
+              },
 
-        $("#fileUploader").on('fb:updatePath', function (e, options) {
+              template: 'qq-template',
+              callbacks: {
+                  onProgress: function (id, fileName, loaded, total) {
+                  console.log(loaded);
+                  $('.qq-upload-files').find('li').each(function(){
+                    var listItem = $(this);
+                    if (listItem.find('.qq-upload-file-selector').text() == fileName){
+                      listItem.find('.progress-row-bar').css('width', (loaded/total)*100 + '%');
+                    }
+                  });
+                  },
+                  onComplete: function (id, fileName, response) {
+                    self.pendingUploads(self.pendingUploads() - 1);
+                    if (response.status != 0) {
+                      $(document).trigger('error', "${ _('Error: ') }" + response.data);
+                    }
+                    else {
+                      $(document).trigger('info', response.path + "${ _(' uploaded successfully.') }");
+                      self.filesToHighlight.push(response.path);
+                    }
+                    if (self.pendingUploads() == 0) {
+                      $('#uploadFileModal').modal('hide');
+                      self.retrieveData(true);
+                    }
+                  },
+
+                  onAllComplete: function(succeeded, failed){
+                    $('#uploadFileModal').modal('hide');
+                  },
+                  onSubmit: function (id, fileName, responseJSON) {
+                    var newPath = "/filebrowser/upload/chunks/file?dest=" + encodeURIComponent(self.currentPath().normalize('NFC'));
+                    this.setEndpoint(newPath);
+                    self.pendingUploads(self.pendingUploads() + 1);
+                  },
+                  onCancel: function (id, fileName) {
+                    self.pendingUploads(self.pendingUploads() - 1);
+                  }
+              },
+
+              debug: false
+            });
+          }
+          else {
+            self.pendingUploads(0);
+            var action = "/filebrowser/upload/file";
+            uploader = new fileuploader.FileUploader({
+              element: document.getElementById("fileUploader"),
+              action: action,
+              template: '<div class="qq-uploader" style="margin-left: 10px">' +
+              '<div class="qq-upload-drop-area"><span>${_('Drop the files here to upload')}</span></div>' +
+              '<div class="qq-upload-button qq-no-float">${_('Select files')}</div> &nbsp; <span class="muted">${_('or drag and drop them here')}</span>' +
+              '<ul class="qq-upload-list qq-upload-files unstyled qq-no-float" style="margin-right: 0;"></ul>' +
+              '</div>',
+              fileTemplate: '<li><span class="qq-upload-file-extended" style="display:none"></span><span class="qq-upload-spinner hide" style="display:none"></span>' +
+              '<div class="progress-row dz-processing">' +
+              '<span class="break-word qq-upload-file"></span>' +
+              '<div class="pull-right">' +
+              '<span class="muted qq-upload-size"></span>&nbsp;&nbsp;' +
+              '<a href="#" title="${_('Cancel')}" class="complex-layout"><i class="fa fa-fw fa-times qq-upload-cancel"></i></a>' +
+              '<span class="qq-upload-done" style="display:none"><i class="fa fa-fw fa-check muted"></i></span>' +
+              '<span class="qq-upload-failed-text">${_('Failed')}</span>' +
+              '</div>' +
+              '<div class="progress-row-bar" style="width: 0%;"></div>' +
+              '</div></li>',
+              params: {
+                dest: self.currentPath(),
+                fileFieldLabel: "hdfs_file"
+              },
+              onProgress: function (id, fileName, loaded, total) {
+                $('.qq-upload-files').find('li').each(function(){
+                  var listItem = $(this);
+                  if (listItem.find('.qq-upload-file-extended').text() == fileName){
+                    listItem.find('.progress-row-bar').css('width', (loaded/total)*100 + '%');
+                  }
+                });
+              },
+              onComplete: function (id, fileName, response) {
+                self.pendingUploads(self.pendingUploads() - 1);
+                if (response.status != 0) {
+                  $(document).trigger('error', "${ _('Error: ') }" + response.data);
+                }
+                else {
+                  $(document).trigger('info', response.path + "${ _(' uploaded successfully.') }");
+                  self.filesToHighlight.push(response.path);
+                }
+                if (self.pendingUploads() == 0) {
+                  $('#uploadFileModal').modal('hide');
+                  self.retrieveData(true);
+                }
+              },
+              onSubmit: function (id, fileName, responseJSON) {
+                self.pendingUploads(self.pendingUploads() + 1);
+              },
+              onCancel: function (id, fileName) {
+                self.pendingUploads(self.pendingUploads() - 1);
+              },
+              debug: false
+            });
+          }
+
+          $("#fileUploader").on('fb:updatePath', function (e, options) {
           const uploadingToOzone = self.currentPath().startsWith("ofs://");
           const ozoneSizeLimit = Math.min(
             ...[UPLOAD_CHUNK_SIZE, MAX_FILE_SIZE_UPLOAD_LIMIT].filter(Number.isFinite)
@@ -2136,7 +2280,7 @@ else:
         $('.filebrowser').on('dragenter', function (e) {
           e.preventDefault();
 
-          if (_isExternalFile && !($("#uploadFileModal").is(":visible")) && (!fileBrowserViewModel.isS3() || (fileBrowserViewModel.isS3() && !fileBrowserViewModel.isS3Root()))) {
+          if (_isExternalFile && !($("#uploadFileModal").is(":visible")) && ((!fileBrowserViewModel.isS3() || (fileBrowserViewModel.isS3() && !fileBrowserViewModel.isS3Root())) || (!fileBrowserViewModel.isGS() || (fileBrowserViewModel.isGS() && !fileBrowserViewModel.isGSRoot())))) {
             showHoverMsg("${_('Drop files here to upload')}");
           }
         });
@@ -2228,7 +2372,7 @@ else:
                 var response = JSON.parse(data.xhr.response);
                 if (response && response.status != null) {
                   if (response.status != 0) {
-                    $(document).trigger('error', response.data);
+                    huePubSub.publish('hue.global.error', {message: response.data});
                   } else {
                     $(document).trigger('info', response.path + ' ' + I18n('uploaded successfully'));
                     fileBrowserViewModel.filesToHighlight.push(response.path);
@@ -2237,7 +2381,7 @@ else:
               }
             }
           };
-          if (ops.path.toLowerCase() !== 's3a://') {
+          if (ops.path.toLowerCase() !== 's3a://' && ops.path.toLowerCase() !== 'gs://') {
             _dropzone = new Dropzone($('.filebrowser .hoverMsg')[0], options);
 
             _dropzone.on('queuecomplete', function () {
@@ -2403,9 +2547,12 @@ else:
           skipEnter: true,
           skipKeydownEvents: true,
           onEnter: function (el) {
-            $("#jHueHdfsAutocomplete").hide();
+            $("#jHueHdfsAutocomplete").hide();            
+            const allowMove = fileBrowserViewModel.allowCopyMoveTo(el.val());
+            fileBrowserViewModel.enableMoveButton(allowMove);
           },
           isS3: fileBrowserViewModel.isS3(),
+          isGS: fileBrowserViewModel.isGS(),
           root: fileBrowserViewModel.rootCurrent()
         });
         $("#copyDestination").jHueHdfsAutocomplete({
@@ -2414,8 +2561,11 @@ else:
           skipKeydownEvents: true,
           onEnter: function (el) {
             $("#jHueHdfsAutocomplete").hide();
+            const allowCopy = fileBrowserViewModel.allowCopyMoveTo(el.val());
+            fileBrowserViewModel.enableCopyButton(allowCopy);
           },
           isS3: fileBrowserViewModel.isS3(),
+          isGS: fileBrowserViewModel.isGS(),
           root: fileBrowserViewModel.rootCurrent()
         });
       });
@@ -2544,10 +2694,10 @@ else:
         error:function (x, e) {
           if (x.status == 500 && x.responseText.indexOf("jobbrowser") == -1) {
             if (x.responseJSON && x.responseJSON.detail) {
-              $(document).trigger("error", x.responseJSON.detail);
+              huePubSub.publish('hue.global.error', {message: x.responseJSON.detail});
             }
             else {
-              $(document).trigger("error", "${_('There was a problem with your request.')}");
+              huePubSub.publish('hue.global.error', {message: "${_('There was a problem with your request.')}"});
             }
             $("#hueBreadcrumbText").blur();
           }
@@ -2593,7 +2743,9 @@ else:
           _dropzone.enable();
         }
         $(".qq-upload-list").empty();
+        $(".qq-upload-list-selector").empty();
         $(".qq-upload-drop-area").hide();
+        $(".qq-upload-drop-area-selector").hide();
       });
     });
   </script>

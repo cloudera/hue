@@ -435,7 +435,7 @@ ${layout.menubar(section='coordinators', dashboard=True)}
           { "notification":$(this).attr("data-message") },
           function (response) {
             if (response["status"] != 0) {
-              $(document).trigger("error", "${ _('Problem: ') }" + response["data"]);
+              huePubSub.publish('hue.global.error', {message: "${ _('Problem: ') }" + response["data"]});
               $("#confirmation a.btn-danger").button("reset");
             } else {
               window.location.reload();
@@ -520,7 +520,7 @@ ${layout.menubar(section='coordinators', dashboard=True)}
                   ]);
                 }
                 catch (error) {
-                  $(document).trigger("error", error);
+                  huePubSub.publish('hue.global.error', {message: error});
                 }
               }
             }
@@ -539,7 +539,7 @@ ${layout.menubar(section='coordinators', dashboard=True)}
         numRunning = data.jobs.length;
         window.setTimeout(refreshRunning, 20000);
       }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseJSON['detail']);
+        huePubSub.publish('hue.global.error', {message: xhr.responseJSON['detail']});
       });
     }
 
@@ -595,7 +595,7 @@ ${layout.menubar(section='coordinators', dashboard=True)}
             ], false);
           }
           catch (error) {
-            $(document).trigger("error", error);
+            huePubSub.publish('hue.global.error', {message: error});
           }
         });
         completedTable.fnDraw();

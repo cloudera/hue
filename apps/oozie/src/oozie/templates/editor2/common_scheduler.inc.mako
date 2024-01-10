@@ -410,7 +410,7 @@ else:
           <span class="badge badge-info" data-bind="click: selectWorkflow">
             <span data-bind="text: name(), attr: {'title': uuid()}"></span>
           </span>
-          <a data-bind="hueLink: '${ url('oozie:edit_workflow') }?workflow=' + uuid()" title="${ _('Open') }">
+          <a data-bind="hueLink: '${ url('oozie:edit_workflow') }?workflow=' + uuid()" target="_blank" title="${ _('Open') }">
             <i class="fa fa-external-link-square"></i>
           </a>
         </li>

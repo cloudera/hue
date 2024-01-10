@@ -1,4 +1,0 @@
--r requirements_test.txt
-
-sphinx
-sphinx_rtd_theme

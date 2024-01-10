@@ -666,7 +666,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
       $.post($(this).attr("data-url"), params,
           function (response) {
             if (response['status'] != 0) {
-              $(document).trigger("error", "${ _('Problem: ') }" + response['data']);
+              huePubSub.publish('hue.global.error', {message: "${ _('Problem: ') }" + response['data']});
               $("#confirmation a.btn-confirm").button("reset");
               $("#confirmation").modal("hide");
             } else {
@@ -683,7 +683,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
           { 'notification': $(this).data("message") },
           function (response) {
             if (response['status'] != 0) {
-              $(document).trigger("error", "${ _('Error: ') }" + response['data']);
+              huePubSub.publish('hue.global.error', {message: "${ _('Error: ') }" + response['data']});
               $("#confirmation a.btn-confirm").button("reset");
             } else {
               window.location.reload();

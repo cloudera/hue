@@ -150,4 +150,4 @@ make: \*** [desktop] Error 2
   </code></pre>
 </p>
 
- [1]: http://cloudera.github.io/hue/latest/administrator/installation/
+ [1]: https://docs.gethue.com/administrator/installation/

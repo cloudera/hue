@@ -80,7 +80,7 @@ else:
   from django.conf.urls import url as re_path
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 def test_home():
@@ -224,7 +224,7 @@ def test_log_view():
 
   URL = reverse(views.log_view)
 
-  LOG = logging.getLogger(__name__)
+  LOG = logging.getLogger()
   LOG.warning('une voix m’a réveillé')
 
   # UnicodeDecodeError: 'ascii' codec can't decode byte... should not happen
@@ -235,7 +235,7 @@ def test_log_view():
 
   URL = reverse(views.log_view)
 
-  LOG = logging.getLogger(__name__)
+  LOG = logging.getLogger()
   LOG.warning('Got response: PK\x03\x04\n\x00\x00\x08\x00\x00\xad\x0cN?\x00\x00\x00\x00')
 
   # DjangoUnicodeDecodeError: 'utf8' codec can't decode byte 0xad in position 75: invalid start byte... should not happen
@@ -248,7 +248,7 @@ def test_download_log_view():
 
   URL = reverse(views.download_log_view)
 
-  LOG = logging.getLogger(__name__)
+  LOG = logging.getLogger()
   LOG.warning(u'une voix m’a réveillé')
 
   # UnicodeDecodeError: 'ascii' codec can't decode byte... should not happen

@@ -78,6 +78,8 @@
 ###################################
 ROOT := $(realpath .)
 PPC64LE := $(shell uname -m)
+VIRTUAL_ENV_VERSION := 20.24.4
+VIRTUAL_ENV_RELOCATABLE_VERSION := 0.0.1
 
 include $(ROOT)/Makefile.vars.priv
 
@@ -154,7 +156,7 @@ $(BLD_DIR_ENV)/stamp:
 ifeq ($(PYTHON_VER),python3.8)
 	@echo "--- Creating virtual environment at $(BLD_DIR_ENV) using $(PYTHON_VER)"
 	@$(SYS_PYTHON) -m pip install --upgrade pip==22.2.2
-	@$(SYS_PIP) install virtualenv==20.19.0 virtualenv-make-relocatable==0.0.1
+	@$(SYS_PIP) install virtualenv==$(VIRTUAL_ENV_VERSION) virtualenv-make-relocatable==$(VIRTUAL_ENV_RELOCATABLE_VERSION)
 	@if [[ "ppc64le" == $(PPC64LE) ]]; then \
 	  $(SYS_PYTHON) -m venv $(BLD_DIR_ENV); \
 	 fi
@@ -191,9 +193,9 @@ ifeq ($(PYTHON_VER),python3.9)
 	@touch $@
 	@echo '--- Installing PIP_MODULES in virtual-env'
 	@if [[ "ppc64le" == $(PPC64LE) ]]; then \
-	  echo '--- Installing $(REQUIREMENT_PPC64LE_FILE) into virtual-env via $(ENV_PIP)'; \
-	  $(ENV_PIP) install -r $(REQUIREMENT_PPC64LE_FILE); \
-	  echo '--- Finished $(REQUIREMENT_PPC64LE_FILE) into virtual-env'; \
+	  echo '--- Installing $(REQUIREMENT_PPC64LE_FILE_PY39) into virtual-env via $(ENV_PIP)'; \
+	  $(ENV_PIP) install -r $(REQUIREMENT_PPC64LE_FILE_PY39); \
+	  echo '--- Finished $(REQUIREMENT_PPC64LE_FILE_PY39) into virtual-env'; \
 	 else \
 	  echo '--- Installing $(REQUIREMENT_FILE) into virtual-env via $(ENV_PIP)'; \
 	  $(ENV_PIP) install -r $(REQUIREMENT_FILE); \

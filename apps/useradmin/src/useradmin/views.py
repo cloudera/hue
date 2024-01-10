@@ -24,7 +24,7 @@ import subprocess
 import sys
 import json
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 from axes.conf import settings
 from axes.models import AccessAttempt

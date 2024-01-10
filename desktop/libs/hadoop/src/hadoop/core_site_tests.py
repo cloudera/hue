@@ -25,7 +25,6 @@ import tempfile
 from nose.tools import assert_true, assert_equal, assert_false, assert_not_equal, assert_raises
 
 from desktop.models import get_remote_home_storage
-from aws.conf import get_region
 
 from hadoop import core_site
 
@@ -34,7 +33,7 @@ if sys.version_info[0] > 2:
 else:
   open_file = file
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 def test_core_site():
@@ -97,7 +96,6 @@ def test_core_site():
     assert_equal(core_site.get_default_fs(), 'abfs://data@gethuedevstorage.dfs.core.windows.net/hue-adls')
 
     assert_equal(get_remote_home_storage(), 's3a://gethue-dev')
-    assert_equal(get_region(), 'us-west-2')
   finally:
     core_site.reset()
     for f in finish:

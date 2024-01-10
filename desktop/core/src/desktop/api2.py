@@ -40,14 +40,14 @@ from django.views.decorators.http import require_POST
 from metadata.conf import has_catalog
 from metadata.catalog_api import search_entities as metadata_search_entities, _highlight, \
   search_entities_interactive as metadata_search_entities_interactive
-from notebook.connectors.altus import SdxApi, AnalyticDbApi, DataEngApi, DataWarehouse2Api
-from notebook.connectors.base import Notebook, get_interpreter
-from notebook.models import Analytics
+from notebook.connectors.base import Notebook
 from useradmin.models import User, Group
 
+from beeswax.models import Namespace
 from desktop import appmanager
 from desktop.auth.backend import is_admin
 from desktop.conf import ENABLE_CONNECTORS, ENABLE_GIST_PREVIEW, CUSTOM, get_clusters, IS_K8S_ONLY, ENABLE_SHARING
+from desktop.conf import ENABLE_NEW_STORAGE_BROWSER, ENABLE_CHUNKED_FILE_UPLOADER
 from desktop.lib.conf import BoundContainer, GLOBAL_CONFIG, is_anonymous
 from desktop.lib.django_util import JsonResponse, login_notrequired, render
 from desktop.lib.exceptions_renderable import PopupException
@@ -67,7 +67,7 @@ else:
   from StringIO import StringIO as string_io
   from django.utils.translation import ugettext as _
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 def api_error_handler(func):
@@ -99,6 +99,8 @@ def get_config(request):
   config = get_cluster_config(request.user)
   config['hue_config']['is_admin'] = is_admin(request.user)
   config['hue_config']['is_yarn_enabled'] = is_yarn()
+  config['hue_config']['enable_new_storage_browser'] = ENABLE_NEW_STORAGE_BROWSER.get()
+  config['hue_config']['enable_chunked_file_uploader'] = ENABLE_CHUNKED_FILE_UPLOADER.get()
   config['clusters'] = list(get_clusters(request.user).values())
   config['documents'] = {
     'types': list(Document2.objects.documents(user=request.user).order_by().values_list('type', flat=True).distinct())
@@ -168,57 +170,32 @@ def get_context_namespaces(request, interface):
   response = {}
   namespaces = []
 
-  clusters = list(get_clusters(request.user).values())
-
-  # Currently broken if not sent
-  namespaces.extend([{
-      'id': cluster['id'],
-      'name': cluster['name'],
-      'status': 'CREATED',
-      'computes': [cluster]
-    } for cluster in clusters if cluster.get('type') == 'direct'
-  ])
-
-  if interface == 'hive' or interface == 'impala' or interface == 'report':
-    if get_cluster_config(request.user)['has_computes']:
-      # Note: attaching computes to namespaces might be done via the frontend in the future
-      if interface == 'impala':
-        if IS_K8S_ONLY.get():
-          adb_clusters = DataWarehouse2Api(request.user).list_clusters()['clusters']
-        else:
-          adb_clusters = AnalyticDbApi(request.user).list_clusters()['clusters']
-        for _cluster in adb_clusters: # Add "fake" namespace if needed
-          if not _cluster.get('namespaceCrn'):
-            _cluster['namespaceCrn'] = _cluster['crn']
-            _cluster['id'] = _cluster['crn']
-            _cluster['namespaceName'] = _cluster['clusterName']
-            _cluster['name'] = _cluster['clusterName']
-            _cluster['compute_end_point'] = '%(publicHost)s' % _cluster['coordinatorEndpoint'] if IS_K8S_ONLY.get() else '',
-      else:
-        adb_clusters = []
-
-      if IS_K8S_ONLY.get():
-        sdx_namespaces = []
-      else:
-        sdx_namespaces = SdxApi(request.user).list_namespaces()
-
-      # Adding "fake" namespace for cluster without one
-      sdx_namespaces.extend([_cluster for _cluster in adb_clusters if not _cluster.get('namespaceCrn') or \
-        (IS_K8S_ONLY.get() and 'TERMINAT' not in _cluster['status'])])
-
-      namespaces.extend([{
-          'id': namespace.get('crn', 'None'),
-          'name': namespace.get('namespaceName'),
-          'status': namespace.get('status'),
-          'computes': [_cluster for _cluster in adb_clusters if _cluster.get('namespaceCrn') == namespace.get('crn')]
-        } for namespace in sdx_namespaces if namespace.get('status') == 'CREATED' or IS_K8S_ONLY.get()
-      ])
+  ns_objs = Namespace.objects.filter(dialect=interface)
+  if ns_objs:
+    namespaces = [{
+        'id': ns.id,
+        'name': ns.name,
+        'status': 'CREATED',
+        'computes': [{'id': c['id'], 'type': c['type'], 'name': c['name'], 'dialect': c['dialect'],
+                      'interface': c['interface']} for c in ns.get_computes(request.user)]
+      } for ns in ns_objs
+    ]
+    namespaces = [ns for ns in namespaces if ns['computes']]
+  else:
+    # Currently broken if not sent
+    clusters = list(get_clusters(request.user).values())
+    namespaces.extend([{
+        'id': cluster['id'],
+        'name': cluster['name'],
+        'status': 'CREATED',
+        'computes': [cluster]
+      } for cluster in clusters if cluster.get('type') == 'direct'
+    ])
 
   response[interface] = namespaces
   response['status'] = 0
 
   return JsonResponse(response)
-
 
 @api_error_handler
 def get_context_computes(request, interface):
@@ -226,30 +203,13 @@ def get_context_computes(request, interface):
   Some clusters like Snowball can have multiple computes for a certain languages (Hive, Impala...).
   '''
   response = {}
-  computes = []
 
-  clusters = list(get_clusters(request.user).values())
-
-  if get_cluster_config(request.user)['has_computes']: # TODO: only based on interface selected?
-    interpreter = get_interpreter(connector_type=interface, user=request.user)
-    if interpreter['dialect'] == 'impala':
-      # dw_clusters = DataWarehouse2Api(request.user).list_clusters()['clusters']
-      dw_clusters = [
-        {'crn': 'c1', 'clusterName': 'c1', 'status': 'created', 'options': {'server_host': 'c1.gethue.com', 'server_port': 10000}},
-        {'crn': 'c2', 'clusterName': 'c2', 'status': 'created', 'options': {'server_host': 'c2.gethue.com', 'server_port': 10000}},
-      ]
-      computes.extend([{
-          'id': cluster.get('crn'),
-          'name': cluster.get('clusterName'),
-          'status': cluster.get('status'),
-          'namespace': cluster.get('namespaceCrn', cluster.get('crn')),
-          'type': interpreter['dialect'],
-          'options': cluster['options'],
-        } for cluster in dw_clusters]
-      )
-  else:
+  ns = Namespace.objects.filter(dialect=interface).first()
+  computes = ns.get_computes(request.user) if ns else None
+  if not computes:
     # Currently broken if not sent
-    computes.extend([{
+    clusters = list(get_clusters(request.user).values())
+    computes = [{
         'id': cluster['id'],
         'name': cluster['name'],
         'namespace': cluster['id'],
@@ -257,7 +217,7 @@ def get_context_computes(request, interface):
         'type': cluster['type'],
         'options': {}
       } for cluster in clusters if cluster.get('type') == 'direct'
-    ])
+    ]
 
   response[interface] = computes
   response['status'] = 0

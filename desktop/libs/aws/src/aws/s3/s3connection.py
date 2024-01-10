@@ -40,7 +40,7 @@ from desktop.lib.raz.clients import S3RazClient
 from aws.conf import IS_SELF_SIGNING_ENABLED
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class SignedUrlS3Connection(S3Connection):
@@ -159,6 +159,23 @@ class RazS3Connection(SignedUrlS3Connection):
     raz_client = S3RazClient(username=self.username)
 
     return raz_client.get_url(action, url, headers, data)
+
+  '''
+  Force AnonAuthHandler when Raz is enabled
+
+  We want to always use AnonAuthHandler when Raz is enabled and that is what gets used in most cases,
+  except for some regions.
+  
+  S3Connection._required_auth_capability() has a decorator @detect_potential_s3sigv4 that overrides
+  the default func (which works correctly) for certain regions (boto.auth.SIGV4_DETECT). This breaks
+  Raz regions cn-*, eu-central, ap-northeast-2, ap-south-1, us-east-2, ca-central and eu-west-2.
+  We end up using auth.S3HmacAuthV4Handler rather than AnonAuthHandler for these regions and therefore fail.
+  
+  This function overrides skips the @detect_potential_s3sigv4 decorator from S3Connection super class
+  and forces the use of AnonAuthHandler.
+  '''
+  def _required_auth_capability(self):
+    return ['anon']
 
 
 class SelfSignedUrlS3Connection(SignedUrlS3Connection):

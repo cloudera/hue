@@ -32,7 +32,7 @@ else:
   from django.utils.translation import ugettext_lazy as _t
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 def get_user_request_organization():

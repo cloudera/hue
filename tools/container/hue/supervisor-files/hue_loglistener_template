@@ -1,6 +1,6 @@
 [program:hue_loglistener]
 directory=${HUE_HOME}
-command="${HUE_HOME}/desktop/core/src/desktop/loglistener.py"
+command=python3.8 ${HUE_HOME}/desktop/core/src/desktop/loglistener.py
 autostart=true
 startretries=3
 stdout_logfile=/dev/stdout

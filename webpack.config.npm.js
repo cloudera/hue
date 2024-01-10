@@ -65,7 +65,26 @@ const copySourceConfig = {
     new CopyWebpackPlugin({
       patterns: [
         { from: './NPM-README.md', to: `${DIST_DIR}/README.md` },
-        { from: './package.json', to: `${DIST_DIR}/package.json` },
+        {
+          from: './package.json',
+          to: `${DIST_DIR}/package.json`,
+          transform: (content) => {
+            // Remove local dependencies (currently only cuix) since it is not needed
+            // and cannot be accessed by the npm registry.
+            const contentStr = content.toString();      
+            const contentObj = JSON.parse(contentStr);
+
+            // Iterate over the dependencies and remove local references
+            Object.keys(contentObj.dependencies || {}).forEach((key) => {
+              const value = contentObj.dependencies[key];
+              if (value.startsWith("file:")) {
+                delete contentObj.dependencies[key];
+              }
+            });
+            
+            return JSON.stringify(contentObj, null, 2);
+          }
+        },
         {
           from: JS_ROOT,
           to: `${DIST_DIR}`,

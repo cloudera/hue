@@ -76,7 +76,7 @@ else:
   from django.utils.translation import ugettext as _
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 def is_alive(request):
@@ -113,6 +113,19 @@ def samlgroup_check(request):
 
       LOG.info("User %s found in the required SAML groups %s" % (request.user.username, ",".join(saml_group_found)))
   return True
+
+def saml_login_headers(request):
+  userprofile = get_profile(request.user)
+  try:
+    userprofile.update_data({'X-Forwarded-For': request.META['HTTP_X_FORWARDED_FOR']})
+    userprofile.save()
+  except KeyError as e:
+    LOG.error('X-FORWARDED-FOR header not found: %s' % smart_str(e))
+  try:
+    userprofile.update_data({'X-CSRF-TOKEN': request.META['CSRF_COOKIE']})
+    userprofile.save()
+  except:
+    LOG.error("X-CSRF-TOKEN header not found")
 
 def hue(request):
   current_app, other_apps, apps_list = _get_apps(request.user, '')
@@ -474,10 +487,6 @@ def dynamic_bundle(request, config, bundle_name):
 
 def assist_m(request):
   return render('assist_m.mako', request, None)
-
-@login_notrequired
-def unsupported(request):
-  return render('unsupported.mako', request, None)
 
 def index(request):
   return redirect('desktop_views_hue')

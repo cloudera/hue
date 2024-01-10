@@ -27,7 +27,7 @@ from django.core.validators import RegexValidator
 from django.template.context import RequestContext
 from django.utils.module_loading import import_string
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 def monkey_patch_username_validator():

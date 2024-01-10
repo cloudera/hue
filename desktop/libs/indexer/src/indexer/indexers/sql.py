@@ -46,7 +46,7 @@ else:
   from urlparse import urlparse
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 try:
@@ -85,6 +85,7 @@ class SQLIndexer(object):
     source_path = source['path']
     load_data = destination['importData']
     isIceberg = destination['isIceberg']
+    copyFile = destination['useCopy']
 
     external = not destination['useDefaultLocation']
     external_path = destination['nonDefaultLocation']
@@ -166,14 +167,20 @@ class SQLIndexer(object):
           # If dir not just the file, create data dir and move file there. Make sure it's unique.
           external_path = external_path + '/%s%s_table' % (external_file_name, str(uuid.uuid4()))
           self.fs.mkdir(external_path)
-          self.fs.rename(source_path, external_path)
+          if copyFile:
+            self.fs.copy(source_path, external_path)
+          else:
+            self.fs.rename(source_path, external_path)
     elif load_data: # We'll use load data command
       parent_path = self.fs.parent_path(source_path)
       stats = self.fs.stats(parent_path)
       split = urlparse(source_path)
       # Only for HDFS, import data and non-external table
       if split.scheme in ('', 'hdfs') and oct(stats["mode"])[-1] != '7':
-        user_scratch_dir = self.fs.get_home_dir() + '/.scratchdir/%s' % str(uuid.uuid4()) # Make sure it's unique.
+        # check if the csv file is in encryption zone (encBit), then the scratch dir will be
+        # in the same directory
+        base_dir = parent_path if stats.encBit else self.fs.get_home_dir()
+        user_scratch_dir = base_dir + '/.scratchdir/%s' % str(uuid.uuid4()) # Make sure it's unique.
         self.fs.do_as_user(self.user, self.fs.mkdir, user_scratch_dir, 0o0777)
         self.fs.do_as_user(self.user, self.fs.rename, source['path'], user_scratch_dir)
         if editor_type == 'impala' and impala_conf and impala_conf.USER_SCRATCH_DIR_PERMISSION.get():
@@ -227,7 +234,8 @@ class SQLIndexer(object):
         'overwrite': False,
         'partition_columns': [(partition['name'], partition['partitionValue']) for partition in partition_columns],
       }
-      query_server_config = dbms.get_query_server_config(name=source_type)
+      compute = destination['compute'] if 'compute' in destination else None
+      query_server_config = dbms.get_query_server_config(name=source_type, connector=compute)
       db = dbms.get(self.user, query_server=query_server_config)
       sql += "\n\n%s;" % db.load_data(database, table_name, form_data, None, generate_ddl_only=True)
 
@@ -296,7 +304,9 @@ class SQLIndexer(object):
         database=database,
         on_success_url=on_success_url,
         last_executed=start_time,
-        is_task=True
+        is_task=True,
+        namespace=destination['namespace'] if 'namespace' in destination else None,
+        compute=destination['compute'] if 'compute' in destination else None
     )
 
   def nomalize_booleans(self, row, columns):

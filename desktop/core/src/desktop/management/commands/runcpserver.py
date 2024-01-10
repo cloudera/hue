@@ -32,7 +32,7 @@ SERVER_HELP = r"""
   the current configuration.
 """
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 class Command(BaseCommand):
   help = _("Web server for Hue.")

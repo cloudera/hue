@@ -32,7 +32,7 @@ from metadata.conf import OPTIMIZER, has_optimizer
 from metadata.optimizer.optimizer_client import OptimizerClient
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class BaseTestOptimizerClient(object):

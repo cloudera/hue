@@ -57,7 +57,7 @@ else:
   from django.utils.translation import ugettext as _
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 def error_handler(view_fn):
@@ -732,6 +732,11 @@ def _get_sample_data(db, database, table, column, is_async=False, cluster=None, 
     if table_obj.is_impala_only and db.client.query_server['server_name'] != 'impala':  # Kudu table, now Hive should support it though
       query_server = get_query_server_config('impala', connector=cluster)
       db = dbms.get(db.client.user, query_server, cluster=cluster)
+
+  if table_obj and table_obj.is_view:
+    response = {'status': -1}
+    response['message'] = _('Not getting sample data as this is a view which can be expensive when run.')
+    return response
 
   sample_data = db.get_sample(database, table_obj, column, generate_sql_only=is_async, operation=operation)
   response = {'status': -1}

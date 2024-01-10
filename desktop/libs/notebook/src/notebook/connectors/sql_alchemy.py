@@ -76,22 +76,21 @@ from notebook.connectors.base import Api, QueryError, QueryExpired, _get_snippet
 from notebook.models import escape_rows
 
 if sys.version_info[0] > 2:
-  from urllib.parse import quote_plus as urllib_quote_plus
+  from urllib.parse import quote_plus as urllib_quote_plus, urlparse as urllib_urlparse, parse_qs as urllib_parse_qs
   from past.builtins import long
   from io import StringIO
   from django.utils.translation import gettext as _
 else:
   from django.utils.translation import ugettext as _
-  from urllib import quote_plus as urllib_quote_plus
+  from urllib import quote_plus as urllib_quote_plus, urlparse as urllib_urlparse, parse_qs as urllib_parse_qs
   from cStringIO import StringIO
-
 
 ENGINES = {}
 CONNECTIONS = {}
 ENGINE_KEY = '%(username)s-%(connector_name)s'
 URL_PATTERN = '(?P<driver_name>.+?://)(?P<host>[^:/ ]+):(?P<port>[0-9]*).*'
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 def query_error_handler(func):
@@ -169,8 +168,13 @@ class SqlAlchemyApi(Api):
     if url.startswith('awsathena+rest://'):
       url = url.replace(url[17:37], urllib_quote_plus(url[17:37]))
       url = url.replace(url[38:50], urllib_quote_plus(url[38:50]))
-      s3_staging_dir = url.rsplit('s3_staging_dir=', 1)[1]
+      parsed = urllib_urlparse(url)
+      s3_staging_dir = urllib_parse_qs(parsed.query)['s3_staging_dir'][0]
       url = url.replace(s3_staging_dir, urllib_quote_plus(s3_staging_dir))
+      work_group = urllib_parse_qs(parsed.query)['work_group'][0]
+      url = url.replace(work_group, urllib_quote_plus(work_group))
+      catalog_name = urllib_parse_qs(parsed.query)['catalog_name'][0]
+      url = url.replace(catalog_name, urllib_quote_plus(catalog_name))
 
     m = re.search(URL_PATTERN, url)
     driver_name = m.group('driver_name')
@@ -437,11 +441,6 @@ class SqlAlchemyApi(Api):
 
   @query_error_handler
   def autocomplete(self, snippet, database=None, table=None, column=None, nested=None, operation=None):
-    if snippet['type'] == 'phoenix':
-      if database:
-        database = database.upper()
-      if table:
-        table = table.upper()
     engine = self._get_engine()
     inspector = inspect(engine)
 

@@ -22,16 +22,22 @@ interface OverflowTooltipProps {
   isOverflowing: boolean;
   toolTipTriggers: string | string[];
   children: ReactNode | ReactElement;
+  testId?: string;
 }
+
+const defaultProps = {
+  testId: 'hue-overflowing'
+};
 
 const OverflowTooltip: React.FC<OverflowTooltipProps> = ({
   title,
   isOverflowing,
   toolTipTriggers,
-  children
+  children,
+  testId
 }) => {
   return isOverflowing ? (
-    <Tooltip title={title} trigger={toolTipTriggers}>
+    <Tooltip title={title} trigger={toolTipTriggers} data-testid={`${testId}-tooltip`}>
       {children}
     </Tooltip>
   ) : (
@@ -39,4 +45,5 @@ const OverflowTooltip: React.FC<OverflowTooltipProps> = ({
   );
 };
 
+OverflowTooltip.defaultProps = defaultProps;
 export default OverflowTooltip;

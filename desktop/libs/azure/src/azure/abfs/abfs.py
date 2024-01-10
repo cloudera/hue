@@ -50,7 +50,7 @@ else:
   from urlparse import urlparse as lib_urlparse
   from urllib import quote as urllib_quote
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 # Azure has a 30MB block limit on upload.
 UPLOAD_CHUCK_SIZE = 30 * 1000 * 1000
@@ -219,13 +219,19 @@ class ABFS(object):
     if directory_name != "":
       params['directory'] = directory_name
 
-    res = self._root._invoke("GET", file_system, params, headers=self._getheaders(), **kwargs)
-    resp = self._root._format_response(res)
-
-    if account != '':
-      file_system = file_system + account
-    for x in resp['paths']:
-      dir_stats.append(ABFSStat.for_directory(res.headers, x, root + file_system + "/" + x['name']))
+    while True:
+      res = self._root._invoke("GET", file_system, params, headers=self._getheaders(), **kwargs)
+      resp = self._root._format_response(res)
+      if account:
+        file_system += account
+      for x in resp['paths']:
+        dir_stats.append(ABFSStat.for_directory(res.headers, x, root + file_system + "/" + x['name']))
+      # If the number of paths returned exceeds the 5000, a continuation token is provided in the response header x-ms-continuation,
+      # which must be used in subsequent invocations to continue listing the paths.
+      if 'x-ms-continuation' in res.headers:
+        params['continuation'] = res.headers['x-ms-continuation']
+      else:
+        break
 
     return dir_stats
 
@@ -409,7 +415,7 @@ class ABFS(object):
     path = Init_ABFS.strip_scheme(path)
     headers = self._getheaders()
     if length != 0 and length != '0':
-      headers['range'] = 'bytes=%s-%s' % (str(offset), str(int(offset) + int(length)))
+      headers['range'] = 'bytes=%s-%s' % (str(offset), str(int(offset) + int(length) - 1))
 
     return self._root.get(path, headers=headers)
 
@@ -443,7 +449,7 @@ class ABFS(object):
       params['action'] = 'append'
     headers = {}
     if size == 0 or size == '0':
-      headers['Content-Length'] = str(len(data))
+      headers['Content-Length'] = str(len(data.getvalue()))
       if headers['Content-Length'] == '0':
         return
     else:

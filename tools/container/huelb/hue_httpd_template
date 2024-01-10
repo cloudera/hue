@@ -7,6 +7,7 @@ LoadModule lbmethod_byrequests_module /etc/httpd/modules/mod_lbmethod_byrequests
 LoadModule authz_core_module /etc/httpd/modules/mod_authz_core.so
 LoadModule log_config_module /etc/httpd/modules/mod_log_config.so
 LoadModule mime_module /etc/httpd/modules/mod_mime.so
+LoadModule mpm_event_module /etc/httpd/modules/mpm_event_module.so
 
 ErrorLog "${HUE_LOG_DIR}/httpd_error_log"
 LogLevel warn
@@ -15,6 +16,16 @@ LogLevel warn
   LogFormat "%{X-Forwarded-For}i %h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined
   LogFormat "%h %l %u %t \"%r\" %>s %b" common
   CustomLog "${HUE_LOG_DIR}/httpd_access_log" common
+</IfModule>
+
+<IfModule mpm_event_module>
+  ServerLimit             5000
+  StartServers            1000
+  MaxClients              10000
+  MinSpareThreads         750
+  MaxSpareThreads         2500
+  ThreadsPerChild         500
+  MaxRequestsPerChild     10000
 </IfModule>
 
 <IfModule mime_module>
@@ -43,6 +54,10 @@ ProxyPass / balancer://hue/ stickysession=ROUTEID
 
 SetEnv proxy-initial-not-pooled 1
 ProxyTimeout 900
+
+KeepAlive On
+KeepAliveTimeout 120
+MaxKeepAliveRequests 500
 
 AllowEncodedSlashes NoDecode
 User ${HUEUSER}

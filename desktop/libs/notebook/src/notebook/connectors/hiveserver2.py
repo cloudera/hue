@@ -29,6 +29,7 @@ import sys
 
 from django.urls import reverse
 
+from beeswax.common import is_compute
 from desktop.auth.backend import is_admin
 from desktop.conf import USE_DEFAULT_CONFIGURATION, has_connectors
 from desktop.lib.conf import BoundConfig
@@ -50,7 +51,7 @@ else:
   from django.utils.translation import ugettext as _
   from urllib import quote as urllib_quote, unquote as urllib_unquote
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 try:
@@ -215,7 +216,7 @@ class HS2Api(Api):
 
     response = {
       'type': lang,
-      'id': session.id
+      'id': session.id if session else None
     }
 
     if not properties:
@@ -229,7 +230,7 @@ class HS2Api(Api):
         properties = self.get_properties(lang)
 
     response['properties'] = properties
-    response['configuration'] = json.loads(session.properties)
+    response['configuration'] = json.loads(session.properties) if session else None
     response['reuse_session'] = reuse_session
     response['session_id'] = ''
 
@@ -316,10 +317,13 @@ class HS2Api(Api):
     db = self._get_db(snippet, interpreter=self.interpreter)
 
     statement = self._get_current_statement(notebook, snippet)
-    session = self._get_session(notebook, snippet['type'])
+    compute = snippet.get('compute', {})
+    session_type = compute['name'] if is_compute(snippet) and compute.get('name') else snippet['type']
+    session = self._get_session(notebook, session_type)
 
     query = self._prepare_hql_query(snippet, statement['statement'], session)
-    _session = self._get_session_by_id(notebook, snippet['type'])
+    _session = self._get_session_by_id(notebook, session_type)
+
 
     try:
       if statement.get('statement_id') == 0: # TODO: move this to client
@@ -346,7 +350,7 @@ class HS2Api(Api):
       'log_context': handle.log_context,
       'session_guid': handle.session_guid,
       'session_id': handle.session_id,
-      'session_type': snippet['type']
+      'session_type': session_type
     }
     response.update(statement)
 

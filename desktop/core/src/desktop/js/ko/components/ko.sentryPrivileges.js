@@ -19,9 +19,9 @@ import * as ko from 'knockout';
 import koMapping from 'knockout.mapping';
 
 import componentUtils from './componentUtils';
+import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import UUID from 'utils/string/UUID';
-
 export const NAME = 'hue-sentry-privileges';
 
 const TEMPLATE = `
@@ -483,11 +483,11 @@ class Role {
               self.originalGroups.push(group);
             });
           } else {
-            $(document).trigger('error', data.message);
+            huePubSub.publish('hue.global.error', { message: data.message });
           }
         }
       ).fail(xhr => {
-        $(document).trigger('error', xhr.responseText);
+        huePubSub.publish('hue.global.error', { message: xhr.responseText });
       });
     };
 
@@ -511,12 +511,12 @@ class Role {
               vm.listSentryPrivilegesByAuthorizable();
               $(document).trigger('createdRole');
             } else {
-              $(document).trigger('error', data.message);
+              huePubSub.publish('hue.global.error', { message: data.message });
             }
           }
         )
           .fail(xhr => {
-            $(document).trigger('error', xhr.responseText);
+            huePubSub.publish('hue.global.error', { message: xhr.responseText });
           })
           .always(() => {
             self.isLoading(false);
@@ -540,12 +540,12 @@ class Role {
               vm.listSentryPrivilegesByAuthorizable();
               $(document).trigger('createdRole');
             } else {
-              $(document).trigger('error', data.message);
+              huePubSub.publish('hue.global.error', { message: data.message });
             }
           }
         )
           .fail(xhr => {
-            $(document).trigger('error', xhr.responseText);
+            huePubSub.publish('hue.global.error', { message: xhr.responseText });
           })
           .always(() => {
             self.isLoading(false);
@@ -567,12 +567,12 @@ class Role {
             vm.listSentryPrivilegesByAuthorizable();
             $(document).trigger('removedRole');
           } else {
-            $(document).trigger('error', data.message);
+            huePubSub.publish('hue.global.error', { message: data.message });
           }
         }
       )
         .fail(xhr => {
-          $(document).trigger('error', xhr.responseText);
+          huePubSub.publish('hue.global.error', { message: xhr.responseText });
         })
         .always(() => {
           self.isLoading(false);
@@ -591,11 +591,11 @@ class Role {
             vm.listSentryPrivilegesByAuthorizable();
             $(document).trigger('createdRole');
           } else {
-            $(document).trigger('error', data.message);
+            huePubSub.publish('hue.global.error', { message: data.message });
           }
         }
       ).fail(xhr => {
-        $(document).trigger('error', xhr.responseText);
+        huePubSub.publish('hue.global.error', { message: xhr.responseText });
       });
     };
   }
@@ -748,12 +748,12 @@ class SentryPrivilegesViewModel {
               self.privileges(_privileges);
             }
           } else {
-            $(document).trigger('error', data.message);
+            huePubSub.publish('hue.global.error', { message: data.message });
           }
         }
       })
         .fail(xhr => {
-          $(document).trigger('error', xhr.responseText);
+          huePubSub.publish('hue.global.error', { message: xhr.responseText });
         })
         .always(() => {
           self.isLoadingPrivileges(false);

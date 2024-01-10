@@ -33,7 +33,7 @@ from desktop.conf import ENABLE_PROMETHEUS
 from desktop.lib.metrics import global_registry
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 ALLOWED_DJANGO_PROMETHEUS_METRICS = (
     'django_http_requests_latency_including_middlewares_seconds',

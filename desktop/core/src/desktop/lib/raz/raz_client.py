@@ -38,13 +38,13 @@ else:
   from urllib import unquote as lib_urlunquote
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class RazClient(object):
 
   def __init__(self, raz_url, auth_type, username, service='s3', service_name='cm_s3', cluster_name='myCluster'):
-    self.raz_url = raz_url.strip('/')
+    self.raz_url = raz_url
     self.auth_type = auth_type
     self.username = username
     self.service = service
@@ -55,7 +55,7 @@ class RazClient(object):
         'service_name': 'adls',
         'serviceType': 'adls'
       }
-    else:
+    elif self.service in ('s3', 'gs'):
       self.service_params = {
         'endpoint_prefix': 's3',
         'service_name': 's3',
@@ -93,17 +93,15 @@ class RazClient(object):
       "context": {}
     }
     request_headers = {"Content-Type": "application/json"}
-    raz_url = "%s/api/authz/%s/access?doAs=%s" % (self.raz_url, self.service, self.username)
 
     if self.service == 'adls':
       self._make_adls_request(request_data, method, path, url_params, resource_path)
-    elif self.service == 's3':
+    elif self.service in ('s3', 'gs'):
       self._make_s3_request(request_data, request_headers, method, params, headers, url_params, endpoint, resource_path, data=data)
 
-    LOG.debug('Raz url: %s' % raz_url)
     LOG.debug("Sending access check headers: {%s} request_data: {%s}" % (request_headers, request_data))
 
-    raz_req = self._handle_raz_req(raz_url, request_headers, request_data)
+    raz_req = self._handle_raz_req(self.raz_url, request_headers, request_data)
 
     signed_response_result = None
     signed_response = None
@@ -127,7 +125,8 @@ class RazClient(object):
         if self.service == 'adls':
           LOG.debug("Received SAS %s" % signed_response_data["ADLS_DSAS"])
           return {'token': signed_response_data["ADLS_DSAS"]}
-        else:
+
+        elif self.service in ('s3', 'gs'):
           signed_response_result = signed_response_data["S3_SIGN_RESPONSE"]
 
           if signed_response_result is not None:
@@ -143,17 +142,47 @@ class RazClient(object):
   def _handle_raz_req(self, raz_url, request_headers, request_data):
     if self.auth_type == 'kerberos':
       auth_handler = requests_kerberos.HTTPKerberosAuth(mutual_authentication=requests_kerberos.OPTIONAL)
-      raz_req = requests.post(raz_url, headers=request_headers, json=request_data, auth=auth_handler, verify=False)
+      raz_response = self._handle_raz_ha(raz_url, headers=request_headers, data=request_data, auth_handler=auth_handler)
+
     elif self.auth_type == 'jwt':
       jwt_token = fetch_jwt()
-
       if jwt_token is None:
         raise PopupException('Knox JWT is not available to send to RAZ.')
 
       request_headers['Authorization'] = 'Bearer %s' % (jwt_token)
-      raz_req = requests.post(raz_url, headers=request_headers, json=request_data, verify=False)
+      raz_response = self._handle_raz_ha(raz_url, headers=request_headers, data=request_data)
 
-    return raz_req
+    if not raz_response:
+      raise PopupException('Failed to receive a valid response from RAZ.')
+
+    return raz_response
+
+
+  def _handle_raz_ha(self, raz_url, headers, data, auth_handler=None, verify=False):
+    raz_urls_list = raz_url.split(',')
+    params = {
+      'headers': headers, 
+      'json': data,
+      'verify': verify
+    }
+
+    if auth_handler:
+      params['auth'] = auth_handler
+
+    raz_response = None
+    for r_url in raz_urls_list:
+      r_url = "%s/api/authz/%s/access?doAs=%s" % (r_url.rstrip('/'), self.service, self.username)
+      LOG.info('Attempting to connect to RAZ URL: %s' % r_url)
+
+      try:
+        raz_response = requests.post(r_url, **params)
+      except Exception as e:
+        if 'Failed to establish a new connection' in str(e):
+          LOG.warning('Raz URL %s is not available.' % r_url)
+
+      # Check response for None and if response code is successful (200), return the raz response.
+      if (raz_response is not None) and (raz_response.status_code == 200):
+        return raz_response
 
 
   def _make_adls_request(self, request_data, method, path, url_params, resource_path):

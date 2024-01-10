@@ -1,3 +1,0 @@
-GET /get_one_header_no_body HTTP/1.1\r\n
-Accept: */*\r\n
-\r\n

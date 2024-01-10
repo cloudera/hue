@@ -45,6 +45,12 @@ class TestOFSFileUploadHandler(object):
 
       assert_false(upload_handler._is_ofs_upload())
 
+      # Check for gs path
+      request = Mock(GET={'dest': 'gs://buck1/key'})
+      upload_handler = OFSFileUploadHandler(request)
+
+      assert_false(upload_handler._is_ofs_upload())
+
       # Check for abfs path
       request = Mock(GET={'dest': 'abfs://container1/key'})
       upload_handler = OFSFileUploadHandler(request)

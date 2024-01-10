@@ -30,7 +30,7 @@ from TCLIService.ttypes import TOpenSessionReq, TGetTablesReq, TFetchResultsReq,
   TGetCrossReferenceReq, TGetPrimaryKeysReq
 
 from desktop.lib import python_util, thrift_util
-from desktop.conf import DEFAULT_USER, USE_THRIFT_HTTP_JWT
+from desktop.conf import DEFAULT_USER, USE_THRIFT_HTTP_JWT, ENABLE_XFF_FOR_HIVE_IMPALA, ENABLE_X_CSRF_TOKEN_FOR_HIVE_IMPALA
 
 from beeswax import conf as beeswax_conf, hive_site
 from beeswax.hive_site import hiveserver2_use_ssl
@@ -45,7 +45,7 @@ else:
   from django.utils.translation import ugettext as _
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 IMPALA_RESULTSET_CACHE_SIZE = 'impala.resultset.cache.size'
 DEFAULT_USER = DEFAULT_USER.get()
 
@@ -667,7 +667,10 @@ class HiveServerClient(object):
         'configuration': {},
     }
     connector_type = 'hive' if self.query_server['server_name'] == 'beeswax' else self.query_server['server_name']
-    interpreter = get_interpreter(connector_type=connector_type, user=self.user)
+    interpreter_dialect = self.query_server['dialect']
+    if not interpreter_dialect:
+      interpreter = get_interpreter(connector_type=connector_type, user=self.user)
+      interpreter_dialect = interpreter.get('dialect')
 
     if self.impersonation_enabled:
       kwargs.update({'username': DEFAULT_USER})
@@ -675,13 +678,17 @@ class HiveServerClient(object):
       if self.query_server.get('dialect') == 'impala':  # Only when Impala accepts it
         kwargs['configuration'].update({'impala.doas.user': user.username})
 
-    if self.query_server['server_name'] == 'beeswax': # All the time
+    if self.query_server['server_name'] == 'beeswax' or \
+        (self.query_server.get('is_compute') and self.query_server.get('dialect') == 'hive'):
       kwargs['configuration'].update({'hive.server2.proxy.user': user.username})
-      xff_header = json.loads(user.userprofile.json_data).get('HTTP-X-FORWARDED-FOR', None)
-      if xff_header:
-        kwargs['configuration'].update({'HTTP-X-FORWARDED-FOR': xff_header})
+      xff_header = json.loads(user.userprofile.json_data).get('X-Forwarded-For', None)
+      if xff_header and ENABLE_XFF_FOR_HIVE_IMPALA.get():
+        kwargs['configuration'].update({'X-Forwarded-For': xff_header})
+      csrf_header = json.loads(user.userprofile.json_data).get('X-CSRF-TOKEN')
+      if csrf_header and ENABLE_X_CSRF_TOKEN_FOR_HIVE_IMPALA.get():
+        kwargs['configuration'].update({'X-CSRF-TOKEN': csrf_header})
 
-    if self.query_server['server_name'] == 'hplsql' or interpreter['dialect'] == 'hplsql': # All the time
+    if self.query_server['server_name'] == 'hplsql' or interpreter_dialect == 'hplsql': # All the time
       kwargs['configuration'].update({'hive.server2.proxy.user': user.username, 'set:hivevar:mode': 'HPLSQL'})
 
     if self.query_server['server_name'] == 'llap': # All the time
@@ -692,9 +699,12 @@ class HiveServerClient(object):
 
     if self.query_server.get('dialect') == 'impala' and self.query_server['SESSION_TIMEOUT_S'] > 0:
       kwargs['configuration'].update({'idle_session_timeout': str(self.query_server['SESSION_TIMEOUT_S'])})
-      xff_header = json.loads(user.userprofile.json_data).get('HTTP-X-FORWARDED-FOR', None)
-      if xff_header:
-        kwargs['configuration'].update({'HTTP-X-FORWARDED-FOR': xff_header})
+      xff_header = json.loads(user.userprofile.json_data).get('X-Forwarded-For', None)
+      if xff_header and ENABLE_XFF_FOR_HIVE_IMPALA.get():
+        kwargs['configuration'].update({'X-Forwarded-For': xff_header})
+      csrf_header = json.loads(user.userprofile.json_data).get('X-CSRF-TOKEN', None)
+      if csrf_header and ENABLE_X_CSRF_TOKEN_FOR_HIVE_IMPALA.get():
+        kwargs['configuration'].update({'X-CSRF-TOKEN': csrf_header})
 
     LOG.info('Opening %s thrift session for user %s' % (self.query_server['server_name'], user.username))
 

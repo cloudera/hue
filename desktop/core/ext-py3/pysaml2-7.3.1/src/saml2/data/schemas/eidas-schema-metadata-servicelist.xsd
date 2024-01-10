@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ser="http://eidas.europa.eu/metadata/servicelist" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" version="1.0" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://eidas.europa.eu/metadata/servicelist">
+  <xs:import namespace="http://www.w3.org/2000/09/xmldsig#" schemaLocation="http://www.w3.org/TR/2002/REC-xmldsig-core-20020212/xmldsig-core-schema.xsd"/>
+  <xs:annotation>
+    <xs:documentation>Document identifier: eidas-metadata-servicelist-1.0</xs:documentation>
+  </xs:annotation>
+  <xs:element name="MetadataServiceList" type="ser:MetadataServiceListType"/>
+  <xs:complexType name="MetadataServiceListType">
+    <xs:annotation>
+      <xs:documentation>The MetadataServiceListType is the root type for representing a metadata service list. It holds scheme information, metadata locations for each member state and optionally distribution point(s).</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="SchemeInformation" type="ser:SchemeInformationType"/>
+      <xs:element name="MetadataList" type="ser:MetadataSchemeEndpointListType" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="DistributionPoints" type="ser:DistributionPointsType"/>
+      <xs:element ref="ds:Signature" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="Version" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>The version of a metadata service list.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="IssueDate" type="xs:dateTime" use="required">
+      <xs:annotation>
+        <xs:documentation>Issuance time for a metadata service list.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="NextUpdate" type="xs:dateTime">
+      <xs:annotation>
+        <xs:documentation>Time when the next metadata service list will be published.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="ID" type="xs:ID">
+      <xs:annotation>
+        <xs:documentation>The unique ID for a metadata service list.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="SchemeInformationType">
+    <xs:annotation>
+      <xs:documentation>Scheme information about a published metadata service list, where the publisher and territory are included.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="IssuerName" type="xs:string"/>
+      <xs:element name="SchemeIdentifier" type="xs:anyURI"/>
+      <xs:element name="SchemeTerritory" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="MetadataSchemeEndpointListType">
+    <xs:annotation>
+      <xs:documentation>Defines the metadata location(s) for a specific member state (territory).</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element type="ser:MetadataLocationType" name="MetadataLocation" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="Territory" type="xs:string" use="required"/>
+    <xs:anyAttribute namespace="##any" processContents="lax"/>
+  </xs:complexType>
+  <xs:complexType name="DistributionPointsType">
+    <xs:annotation>
+      <xs:documentation>A list of distribution points. URLs from where the metadata service list can be downloaded.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="DistributionPoint" type="xs:anyURI" minOccurs="1" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="MetadataLocationType">
+    <xs:sequence>
+      <xs:element name="Endpoint" type="ser:MsEndpointType" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>A list of eIDAS endpoints (nodes) for the current location.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element ref="ds:KeyInfo" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Key material (usually a certificate) that should be used to verify the signature of the downloaded metadata for this metadata location.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="Location" type="xs:anyURI" use="required">
+      <xs:annotation>
+        <xs:documentation>The URL from where the metadata for the endpoint(s) can be obtained.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:anyAttribute namespace="##any" processContents="lax"/>
+  </xs:complexType>
+  <xs:complexType name="MsEndpointType">
+    <xs:annotation>
+      <xs:documentation>Defines a member state "endpoint" (eIDAS node).</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="EndpointType" type="xs:anyURI" use="required">
+      <xs:annotation>
+        <xs:documentation>The type of endpoint. Currently defined URI:s are: http://eidas.europa.eu/metadata/ept/ProxyService for an eIDAS Proxy Service, and, http://eidas.europa.eu/metadata/ept/Connector for an eIDAS Connector.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="EntityID" type="xs:anyURI" use="required">
+      <xs:annotation>
+        <xs:documentation>The SAML entityID of the endpoint. For an eIDAS connector this is the entityID for the SP-part of the node, and for an eIDAS Proxy Service this is the entityID for the IdP-part of the node.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:anyAttribute namespace="##any" processContents="lax"/>
+  </xs:complexType>
+</xs:schema>

@@ -46,7 +46,7 @@ Notable Changes
   * [HUE-8140](https://issues.cloudera.org/browse/HUE-8140) [editor] Improve multi-statement execution
   * [HUE-8662](https://issues.cloudera.org/browse/HUE-8662) [core] Fix missing static URLs
 * The [Hue Docker image](https://github.com/cloudera/hue/tree/master/tools/docker) was simplified
-* [Upstream](http://cloudera.github.io/hue/latest/) documentations has a better table of contents, restyling, update of old instructions... Reporting issues or sending a suggestion is one click away via GitHub, so feel free to send some pull requests!
+* [Upstream](https://docs.gethue.com/) documentations has a better table of contents, restyling, update of old instructions... Reporting issues or sending a suggestion is one click away via GitHub, so feel free to send some pull requests!
 
 
 Compatibility

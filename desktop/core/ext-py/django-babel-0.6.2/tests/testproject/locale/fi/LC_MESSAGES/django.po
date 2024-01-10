@@ -1,8 +1,0 @@
-# the header message is required to turn off the fuzzy bit for the catalog
-msgid ""
-msgstr ""
-
-#: tests/templates/test.txt:2
-msgid "This could be translated."
-msgstr "Tämän voisi kääntää."
-

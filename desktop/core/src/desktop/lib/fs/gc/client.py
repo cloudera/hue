@@ -13,10 +13,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import
-
 import logging
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 try:
   import gcs_oauth2_boto_plugin
@@ -24,7 +22,6 @@ except ImportError:
   LOG.warning('gcs_oauth2_boto_plugin module not found')
 import json
 
-from aws.s3.s3fs import S3FileSystem
 from boto.auth_handler import AuthHandler, NotReadyToAuthenticate
 from boto.gs.bucket import Bucket
 from boto.gs.connection import GSConnection
@@ -34,6 +31,8 @@ from boto.s3.connection import SubdomainCallingFormat
 from desktop import conf
 from desktop.lib.idbroker import conf as conf_idbroker
 from desktop.lib.idbroker.client import IDBroker
+from desktop.lib.fs.gc.gs import GSFileSystem
+from desktop.lib.fs.gc.gsconnection import RazGSConnection
 
 
 def get_credential_provider(config, user):
@@ -42,14 +41,19 @@ def get_credential_provider(config, user):
 
 
 def _make_client(identifier, user):
-  config = conf.GC_ACCOUNTS[identifier] if identifier in list(conf.GC_ACCOUNTS.keys()) else None
-  client = Client.from_config(config, get_credential_provider(config, user))
+  if conf.is_raz_gs():
+    gs_client_connection = RazGSConnection(username=user)  # Note: Remaining GS configuration is fully skipped
+    gs_client_expiration = None
+  else:
+    config = conf.GC_ACCOUNTS[identifier] if identifier in list(conf.GC_ACCOUNTS.keys()) else None
+    gs_client_builder = Client.from_config(config, get_credential_provider(config, user))
 
-  return S3FileSystem(
-    client.get_s3_connection(),
-    client.expiration,
-    headers={"x-goog-project-id": client.project},
-    filebrowser_action=conf.PERMISSION_ACTION_GS
+    gs_client_connection = gs_client_builder.get_gs_connection()
+    gs_client_expiration = gs_client_builder.expiration
+
+  return GSFileSystem(
+    gs_client_connection,
+    gs_client_expiration,
   )  # It would be nice if the connection was lazy loaded
 
 
@@ -63,9 +67,9 @@ class Client(object):
   @classmethod
   def from_config(cls, config, credential_provider):
     credentials = credential_provider.get_credentials()
-    return Client(json_credentials=credentials.get('JsonCredentials'), expiration=credentials.get('Expiration', 0))
+    return Client(json_credentials=credentials.get('JsonCredentials'), expiration=credentials.get('Expiration'))
 
-  def get_s3_connection(self):
+  def get_gs_connection(self):
     return HueGSConnection(provider=HueProvider('google', json_credentials=self.json_credentials))
 
 
@@ -124,7 +128,7 @@ class HueGSConnection(GSConnection):
 class CredentialProviderConf(object):
 
   def __init__(self, conf):
-    self._conf=conf
+    self._conf = conf
 
   def validate(self):
     credentials = self.get_credentials()
@@ -150,7 +154,7 @@ class CredentialProviderConf(object):
 class CredentialProviderIDBroker(object):
 
   def __init__(self, idbroker):
-    self.idbroker=idbroker
+    self.idbroker = idbroker
     self.credentials = None
 
   def validate(self):

@@ -25,7 +25,7 @@ import beeswax.conf
 from liboozie.credentials import Credentials
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class TestCredentials(object):

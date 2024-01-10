@@ -261,11 +261,11 @@ Then give Hue the information about the database source:
     [[[athena]]]
     name = AWS Athena
     interface=sqlalchemy
-    options='{"url": "awsathena+rest://${AWS_ACCESS_KEY_ID}:${AWS_SECRET_ACCESS_KEY}@athena.${REGION}.amazonaws.com:443/${SCHEMA}?s3_staging_dir=${S3_BUCKET_DIRECTORY}"}'
+    options='{"url": "awsathena+rest://${AWS_ACCESS_KEY_ID}:${AWS_SECRET_ACCESS_KEY}@athena.${REGION}.amazonaws.com:443/${SCHEMA}?s3_staging_dir=${S3_BUCKET_DIRECTORY}&work_group=${WORK_GROUP}&catalog_name=${CATALOG_NAME}"}'
 
 e.g.
 
-    options='{"url": "awsathena+rest://XXXXXXXXXXXXXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX@athena.us-west-2.amazonaws.com:443/default?s3_staging_dir=s3://gethue-athena/scratch"}'
+    options='{"url": "awsathena+rest://XXXXXXXXXXXXXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX@athena.us-west-2.amazonaws.com:443/default?s3_staging_dir=s3://gethue-athena/scratch&work_group=demo_group&catalog_name=AwsDataCatalog"}'
 
 Note: Keys and S3 buckets need to be URL quoted but Hue does it automatically for you.
 
@@ -959,9 +959,37 @@ Verify that core-site.xml has the following configuration:
 
 If the configuration is not present, add it to /etc/hadoop/conf/core-site.xml and restart Hadoop.
 
+### Apache Ozone
+
+Hue can read and write files on the Ozone filesystem, similar to HDFS. Add the following settings under `[desktop]`, and within the `[[ozone]]` section:
+
+        [[[default]]]
+        fs_defaultfs=ofs://[***SERVICE-ID***]
+        webhdfs_url=http://[***OZONE-HTTPFS-HOST***]:[***OZONE-HTTPFS-PORT***]/webhdfs/v1
+        ssl_cert_ca_verify=true
+        security_enabled=true
+        
+Where,
+- **fs_defaultfs:** Ozone service ID (HA mode) or URL for Ozone Manager (non-HA mode).
+- **webhdfs_url:** URL of HttpFS endpoint for the running Ozone service (`https` for secure service else `http`).
+
+Configure Hue as a proxy user for all other users and groups, meaning it may submit a request on behalf of any other user:
+
+HttpFS: Verify or add the following configuration in Ozone service's `httpfs-site.xml`:
+
+        <!-- Hue HttpFS proxy user setting -->
+        <property>
+        <name>httpfs.proxyuser.hue.hosts</name>
+        <value>*</value>
+        </property>
+        <property>
+        <name>httpfs.proxyuser.hue.groups</name>
+        <value>*</value>
+        </property>
+
 ### S3
 
-Hue's filebrowser can now allow users to explore, manage, and upload data in an S3 account, in addition to HDFS.
+Hue's filebrowser can now allow users to explore, manage, and upload data in an S3 account, in addition to HDFS and Ozone.
 
 Read more about it in the [S3 User Documentation](/user/browsing#s3).
 
@@ -991,15 +1019,12 @@ Alternatively (but not recommended for production or secure environments), you c
 
 The region should be set to the AWS region corresponding to the S3 account. By default, this region will be set to 'us-east-1'.
 
-**Using Ozone**
-Apache Ozone should work out of the box.
-
 **Using Ceph**
 New end points have been added in [HUE-5420](https://issues.cloudera.org/browse/HUE-5420)
 
 ### Azure File Systems
 
-Hue's file browser can now allow users to explore, manage, and upload data in an ADLS v1 or ADLS v2 (ABFS), in addition to HDFS and S3.
+Hue's file browser can now allow users to explore, manage, and upload data in an ADLS v1 or ADLS v2 (ABFS), in addition to HDFS, Ozone and S3.
 
 In order to add an Azure account to Hue, you'll need to configure Hue with valid Azure credentials, including the client ID, client secret and tenant ID.
 These keys can securely stored in a script that outputs the actual access key and secret key to stdout to be read by Hue (this is similar to how Hue reads password scripts). In order to use script files, add the following section to your hue.ini configuration file:
@@ -1033,10 +1058,6 @@ The json credentials of a service account can be stored for development in plain
     [[gc_accounts]]
     [[[default]]]
     json_credentials='{ "type": "service_account", "project_id": .... }'
-
-### Apache Ozone
-
-The API is the same as [S3](#s3).
 
 ### HBase
 

@@ -28,7 +28,7 @@ from desktop.models import Directory, Document, Document2, Document2Permission, 
 from useradmin.models import get_default_user_group, install_sample_user, User
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class Command(BaseCommand):

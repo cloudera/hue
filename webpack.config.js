@@ -33,11 +33,15 @@ const config = {
       import: './desktop/core/src/desktop/js/apps/tableBrowser/app.js',
       dependOn: 'hue'
     },
+    storageBrowser: {
+      import: './desktop/core/src/desktop/js/apps/storageBrowser/app.js',
+      dependOn: 'hue'
+    },
     jobBrowser: { import: './desktop/core/src/desktop/js/apps/jobBrowser/app.js', dependOn: 'hue' }
   },
   mode: 'development',
   module: {
-    rules: [    
+    rules: [
       {
         test: /\.vue$/,
         exclude: /node_modules/,
@@ -72,6 +76,10 @@ const config = {
             },
           },
         },]
+      },
+      {
+        test: /\.css$/i,
+        use: [{ loader: 'style-loader' }, { loader: 'css-loader' }]
       },
       {
         test: /\.less$/i,

@@ -40,7 +40,7 @@ from dashboard.models import Collection2, augment_response
 from desktop.models import Document2
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 LIMIT = 100
 

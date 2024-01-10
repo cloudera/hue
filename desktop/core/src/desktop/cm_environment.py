@@ -23,7 +23,7 @@ import sys
 
 from hue_shared import which
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 """

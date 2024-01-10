@@ -36,6 +36,8 @@ if sys.version_info[0] > 2:
 else:
   from mock import patch, Mock, MagicMock
 
+def mock_uuid():
+  return '52f840a8-3dde-434d-934a-2d6e06f3687e'
 
 class TestSQLIndexer(object):
 
@@ -105,6 +107,124 @@ DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;'''.split(';')],
     [statement.strip() for statement in notebook.get_data()['snippets'][0]['statement_raw'].split(';')]
   )
 
+  @patch('uuid.uuid4', mock_uuid)
+  def test_create_table_from_a_file_to_csv_for_kms_encryption(self):
+    def mock_parent_path(path):
+      return '/'.join(path.split('/')[:-1])
+
+    class MockStat:
+      def __init__(self, encBit=True, mode=16877):
+        self.encBit = encBit
+        self.mode = mode
+
+      def __getitem__(self, key):
+        if key == 'mode':
+          return 16877
+
+    def enc_source_dict(key):
+      return {
+        'path': '/enc_zn/upload_dir/data.csv',
+        'format': {'quoteChar': '"', 'fieldSeparator': ','},
+        'sampleCols': [{u'operations': [], u'comment': u'', u'name': u'customers.id'}],
+        'sourceType': 'hive'
+      }.get(key, Mock())
+    source = MagicMock()
+    source.__getitem__.side_effect = enc_source_dict
+
+    def destination_dict(key):
+      return {
+        'name': 'default.export_table',
+        'tableFormat': 'csv',
+        'importData': True,
+        'isIceberg': False,
+        'nonDefaultLocation': '/warehouse/tablespace/managed/hive/customer_stats.csv',
+        'columns': [{'name': 'id', 'type': 'int'}],
+        'partitionColumns': [{'name': 'day', 'type': 'date', 'partitionValue': '20200101'}],
+        'description': 'No comment!',
+        'sourceType': 'hive-1'
+      }.get(key, Mock())
+    destination = MagicMock()
+    destination.__getitem__.side_effect = destination_dict
+
+    fs = Mock(
+        stats=Mock(
+          return_value=MockStat()
+        ),
+        parent_path=mock_parent_path,
+        get_home_dir=Mock(return_value='/user/test'),
+    )
+
+    notebook = SQLIndexer(user=self.user, fs=fs).create_table_from_a_file(source, destination)
+
+    ### source dir is in encryption zone, so the scratch dir is in the same dir
+    assert_equal(
+      [statement.strip() for statement in u'''DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;
+CREATE TABLE IF NOT EXISTS `default`.`hue__tmp_export_table`
+(
+  `id` int ) COMMENT "No comment!"
+PARTITIONED BY (
+  `day` date )
+ROW FORMAT   SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
+  WITH SERDEPROPERTIES ("separatorChar" = ",",
+    "quoteChar"     = """,
+    "escapeChar"    = "\\\\"
+    )
+  STORED AS TextFile TBLPROPERTIES('skip.header.line.count'='1', 'transactional'='false')
+;
+LOAD DATA INPATH '/enc_zn/upload_dir/.scratchdir/52f840a8-3dde-434d-934a-2d6e06f3687e/data.csv' INTO TABLE `default`.`hue__tmp_export_table` PARTITION (day='20200101');
+CREATE TABLE `default`.`export_table` COMMENT "No comment!"
+        STORED AS csv
+TBLPROPERTIES('transactional'='true', 'transactional_properties'='insert_only')
+        AS SELECT *
+        FROM `default`.`hue__tmp_export_table`;
+DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;'''.split(';')],
+    [statement.strip() for statement in notebook.get_data()['snippets'][0]['statement_raw'].split(';')]
+  )
+
+    fs = Mock(
+        stats=Mock(
+          return_value=MockStat(encBit=False)
+        ),
+        parent_path=mock_parent_path,
+        get_home_dir=Mock(return_value='/user/test'),
+    )
+
+    def source_dict(key):
+      return {
+        'path': '/user/test/data.csv',
+        'format': {'quoteChar': '"', 'fieldSeparator': ','},
+        'sampleCols': [{u'operations': [], u'comment': u'', u'name': u'customers.id'}],
+        'sourceType': 'hive'
+      }.get(key, Mock())
+    source = MagicMock()
+    source.__getitem__.side_effect = source_dict
+
+    notebook = SQLIndexer(user=self.user, fs=fs).create_table_from_a_file(source, destination)
+
+    ### source dir is not in encryption zone, so the scratch dir is in user's home dir
+    assert_equal(
+      [statement.strip() for statement in u'''DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;
+CREATE TABLE IF NOT EXISTS `default`.`hue__tmp_export_table`
+(
+  `id` int ) COMMENT "No comment!"
+PARTITIONED BY (
+  `day` date )
+ROW FORMAT   SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
+  WITH SERDEPROPERTIES ("separatorChar" = ",",
+    "quoteChar"     = """,
+    "escapeChar"    = "\\\\"
+    )
+  STORED AS TextFile TBLPROPERTIES('skip.header.line.count'='1', 'transactional'='false')
+;
+LOAD DATA INPATH '/user/test/.scratchdir/52f840a8-3dde-434d-934a-2d6e06f3687e/data.csv' INTO TABLE `default`.`hue__tmp_export_table` PARTITION (day='20200101');
+CREATE TABLE `default`.`export_table` COMMENT "No comment!"
+        STORED AS csv
+TBLPROPERTIES('transactional'='true', 'transactional_properties'='insert_only')
+        AS SELECT *
+        FROM `default`.`hue__tmp_export_table`;
+DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;'''.split(';')],
+      [statement.strip() for statement in notebook.get_data()['snippets'][0]['statement_raw'].split(';')]
+    )
 
 class MockRequest(object):
   def __init__(self, fs=None, user=None):
@@ -176,7 +296,7 @@ def test_generate_create_text_table_with_data_partition():
     u'outputFormats': [{u'name': u'Table', u'value': u'table'}, {u'name': u'Solr index', u'value': u'index'}],
     u'customMapDelimiter': u'\\003', u'showProperties': False, u'useDefaultLocation': True, u'description': u'',
     u'primaryKeyObjects': [], u'customFieldDelimiter': u',', u'existingTargetUrl': u'', u'importData': True, u'isIceberg': False,
-    u'databaseName': u'default', u'KUDU_DEFAULT_RANGE_PARTITION_COLUMN': {u'include_upper_val': u'<=', u'upper_val': 1,
+    u'useCopy': False, u'databaseName': u'default', u'KUDU_DEFAULT_RANGE_PARTITION_COLUMN': {u'include_upper_val': u'<=', u'upper_val': 1,
     u'name': u'VALUES', u'include_lower_val': u'<=', u'lower_val': 0, u'values': [{u'value': u''}]}, u'primaryKeys': [],
     u'outputFormat': u'table', u'nonDefaultLocation': u'/user/romain/customer_stats.csv', u'name': u'default.customer_stats',
     u'tableFormat': u'text', 'ouputFormat': u'table',
@@ -251,7 +371,7 @@ def test_generate_create_kudu_table_with_data():
     u'description': u'Big Data', u'primaryKeyObjects': [{u'operations': [], u'comment': u'', u'name': u'id', u'level': 0,
     u'keyType': u'string', u'required': False, u'nested': [], u'isPartition': False, u'length': 100, u'multiValued': False,
     u'unique': False, u'type': u'string', u'showProperties': False, u'keep': True}], u'customFieldDelimiter': u',',
-    u'existingTargetUrl': u'', u'importData': True, u'isIceberg': False, u'databaseName': u'default',
+    u'existingTargetUrl': u'', u'importData': True, u'isIceberg': False, u'useCopy': False, u'databaseName': u'default',
     u'KUDU_DEFAULT_RANGE_PARTITION_COLUMN': {u'include_upper_val': u'<=', u'upper_val': 1, u'name': u'VALUES',
     u'include_lower_val': u'<=', u'lower_val': 0, u'values': [{u'value': u''}]}, u'primaryKeys': [u'id'],
     u'outputFormat': u'table', u'nonDefaultLocation': u'/user/admin/index_data.csv', u'name': u'index_data',
@@ -407,9 +527,9 @@ def test_generate_create_parquet_table():
     '''"text","name":"Text"},{"value":"parquet","name":"Parquet"},{"value":"kudu","name":"Kudu"},{"value":"csv","name":"Csv"},'''
     '''{"value":"avro","name":"Avro"},{"value":"json","name":"Json"},{"value":"regexp","name":"Regexp"},{"value":"orc",'''
     '''"name":"ORC"}],"partitionColumns":[],"kuduPartitionColumns":[],"primaryKeys":[],"primaryKeyObjects":[],"importData":true,'''
-    '''"isIceberg":false,"useDefaultLocation":true,"nonDefaultLocation":"/user/hue/data/query-hive-360.csv","hasHeader":true,'''
-    '''"useCustomDelimiters":false,"customFieldDelimiter":",","customCollectionDelimiter":"\\\\002","customMapDelimiter":"\\\\003",'''
-    '''"customRegexp":""}'''
+    '''"isIceberg":false,"useCopy":false,"useDefaultLocation":true,"nonDefaultLocation":"/user/hue/data/query-hive-360.csv",'''
+    '''"hasHeader":true,"useCustomDelimiters":false,"customFieldDelimiter":",","customCollectionDelimiter":"\\\\002",'''
+    '''"customMapDelimiter":"\\\\003","customRegexp":""}'''
   )
 
   path = {'isDir': False, 'split': ('/user/hue/data', 'query-hive-360.csv'), 'listdir': ['/user/hue/data']}
@@ -499,9 +619,9 @@ def test_generate_create_iceberg_table():
     '''"text","name":"Text"},{"value":"parquet","name":"Parquet"},{"value":"kudu","name":"Kudu"},{"value":"csv","name":"Csv"},'''
     '''{"value":"avro","name":"Avro"},{"value":"json","name":"Json"},{"value":"regexp","name":"Regexp"},{"value":"orc",'''
     '''"name":"ORC"}],"partitionColumns":[],"kuduPartitionColumns":[],"primaryKeys":[],"primaryKeyObjects":[],"importData":true,'''
-    '''"isIceberg":true,"useDefaultLocation":true,"nonDefaultLocation":"/user/hue/data/query-hive-360.csv","hasHeader":true,'''
-    '''"useCustomDelimiters":false,"customFieldDelimiter":",","customCollectionDelimiter":"\\\\002","customMapDelimiter":"\\\\003",'''
-    '''"customRegexp":""}'''
+    '''"isIceberg":true,"useCopy":false,"useDefaultLocation":true,"nonDefaultLocation":"/user/hue/data/query-hive-360.csv",'''
+    '''"hasHeader":true,"useCustomDelimiters":false,"customFieldDelimiter":",","customCollectionDelimiter":"\\\\002",'''
+    '''"customMapDelimiter":"\\\\003","customRegexp":""}'''
   )
 
   path = {'isDir': False, 'split': ('/user/hue/data', 'query-hive-360.csv'), 'listdir': ['/user/hue/data']}
@@ -595,7 +715,7 @@ def test_generate_create_orc_table_transactional():
   '''{"value":"orc","name":"ORC"}],"partitionColumns":[],"kuduPartitionColumns":[],"primaryKeys":[],"primaryKeyObjects":[],'''
   '''"importData":true,"useDefaultLocation":true,"nonDefaultLocation":"/user/hue/data/query-hive-360.csv","hasHeader":true,'''
   '''"useCustomDelimiters":false,"customFieldDelimiter":",","customCollectionDelimiter":"\\\\002","customMapDelimiter":"\\\\003",'''
-  '''"customRegexp":"","isIceberg":false}'''
+  '''"customRegexp":"","isIceberg":false,"useCopy":false}'''
   )
 
   path = {'isDir': False, 'split': ('/user/hue/data', 'query-hive-360.csv'), 'listdir': ['/user/hue/data']}
@@ -661,7 +781,7 @@ def test_generate_create_empty_kudu_table():
     '''"partitionColumns":[],"kuduPartitionColumns":[],"primaryKeys": ["acct_client"],"primaryKeyObjects":[],"importData":false,'''
     '''"useDefaultLocation":true,"nonDefaultLocation":"/user/hue/data/query-hive-360.csv","hasHeader":false,"useCustomDelimiters":'''
     '''false,"customFieldDelimiter":",","customCollectionDelimiter":"\\\\002","customMapDelimiter":"\\\\003","customRegexp":"",'''
-    '''"isIceberg":false}'''
+    '''"isIceberg":false,"useCopy":false}'''
   )
 
   path = {'isDir': False, 'split': ('/user/hue/data', 'query-hive-360.csv'), 'listdir': ['/user/hue/data']}
@@ -779,8 +899,8 @@ def test_create_ddl_with_nonascii():
                  u'rdbmsSplitByColumn': [], u'existingTargetUrl': u'', u'channelSinkTypes':
                    [{u'name': u'This topic', u'value': u'kafka'}, {u'name': u'Solr', u'value': u'solr'},
                     {u'name': u'HDFS', u'value': u'hdfs'}], u'defaultName': u'default.renamed_chinese_cities_gb2312',
-                 u'isTransactionalUpdateEnabled': False, u'importData': True, u'isIceberg': False, u'databaseName': u'default',
-                 u'indexerRunJob': False, u'indexerReplicationFactor': 1, u'KUDU_DEFAULT_RANGE_PARTITION_COLUMN':
+                 u'isTransactionalUpdateEnabled': False, u'importData': True, u'isIceberg': False, u'useCopy': False, u'databaseName':
+                 u'default', u'indexerRunJob': False, u'indexerReplicationFactor': 1, u'KUDU_DEFAULT_RANGE_PARTITION_COLUMN':
                    {u'include_upper_val': u'<=', u'upper_val': 1, u'name': u'VALUES', u'include_lower_val': u'<=',
                     u'lower_val': 0, u'values': [{u'value': u''}]}, u'primaryKeys': [], u'indexerConfigSet': u'',
                  u'sqoopJobLibPaths': [{u'path': u''}], u'outputFormat': u'table',

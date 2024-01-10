@@ -38,7 +38,7 @@ else:
   from mock import patch, Mock, MagicMock
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class TestHiveServerClient():
@@ -56,6 +56,8 @@ class TestHiveServerClient():
         'use_sasl': True,
         'server_host': 'localhost',
         'server_port': 10000,
+        'dialect': 'hive',
+        'interface': 'hiveserver2'
     }
 
   def test_open_session(self):

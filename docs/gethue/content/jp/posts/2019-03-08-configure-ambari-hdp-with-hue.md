@@ -113,7 +113,7 @@ build/env/bin/hue runcpserver
 
 いつものように、コメントやフィードバックは [hue-user][8] リストは [@gethue ][9]までお送りください！
 
- [1]: http://cloudera.github.io/hue/latest/admin-manual/manual.html
+ [1]: https://docs.gethue.com/administrator/
  [2]: https://cdn.gethue.com/uploads/2019/02/Screen-Shot-2019-02-27-at-3.05.28-PM.png
  [3]: https://cdn.gethue.com/uploads/2019/02/Screen-Shot-2019-02-27-at-3.10.39-PM.png
  [4]: http://hue-2.example.com:8888
