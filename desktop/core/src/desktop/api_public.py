@@ -267,14 +267,15 @@ def tables(request):
 
 @api_view(["POST"])
 def sql(request):
+  django_request = get_django_request(request)
+  _patch_operation_id_request(django_request)
   task = request.data.get("task")
   input = request.data.get("input")
   sql = request.data.get("sql")
   dialect = request.data.get("dialect")
   metadata = request.data.get("metadata")
-
   if is_ai_interface_enabled():
-    response = perform_sql_task(request, task, input, sql, dialect, metadata)
+    response = perform_sql_task(django_request, task, input, sql, dialect, metadata)
     return JsonResponse(dataclasses.asdict(response))
   else:
     return llm_sql_disabled_response
