@@ -12,8 +12,9 @@ cx-Oracle==8.3.0
 django-auth-ldap==4.3.0
 Django==3.2.20
 daphne==3.0.2
-django-celery-beat==2.2.1
-django-celery-results==2.4.0
+django-redis==5.4.0
+django-celery-beat==2.5.0
+django-celery-results==2.5.1
 django-cors-headers==3.7.0
 django-crequest==2018.5.11
 django-debug-panel==0.8.3
