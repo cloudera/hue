@@ -19,12 +19,21 @@
 import { post } from '../api/utils';
 import Executor from '../apps/editor/execution/executor';
 import dataCatalog from '../catalog/dataCatalog';
+import { ExtendedColumn } from '../catalog/DataCatalogEntry';
 import { getLastKnownConfig } from '../config/hueConfig';
 
 import HueError from './HueError';
 
 const TABLES_API_URL = '/api/v1/editor/ai/tables';
 const SQL_API_URL = '/api/v1/editor/ai/sql';
+
+export interface TableColumnsMetadataItem {
+  columns: Array<ExtendedColumn>;
+  dbName: string;
+  name: string;
+}
+
+export type TableColumnsMetadata = Array<TableColumnsMetadataItem>;
 
 interface ExplainSqlResponse {
   explain: string;
@@ -71,6 +80,7 @@ interface GenerateOptimizedSql {
 interface GenerateSqlResponse {
   sql: string;
   assumptions: string;
+  tableColumnsMetadata?: TableColumnsMetadata;
 }
 interface GenerateSQLfromNQL {
   (params: {
@@ -85,6 +95,7 @@ interface GenerateSQLfromNQL {
 interface EditSQLResponse {
   sql: string;
   assumptions: string;
+  tableColumnsMetadata?: TableColumnsMetadata;
 }
 interface GenerateEditedSQLfromNQL {
   (params: {
@@ -334,7 +345,7 @@ const generateSQLfromNQL: GenerateSQLfromNQL = async ({
 
   onStatusChange('Generating SQL query');
   try {
-    return await fetchFromLlm<GenerateSqlResponse>({
+    const result = await fetchFromLlm<GenerateSqlResponse>({
       url: SQL_API_URL,
       data: {
         task: 'generate',
@@ -345,6 +356,7 @@ const generateSQLfromNQL: GenerateSQLfromNQL = async ({
         }
       }
     });
+    return { ...result, tableColumnsMetadata: tableMetadata };
   } catch (e) {
     throw augmentError(e, 'Call to AI to generate SQL query failed ');
   }
@@ -376,7 +388,7 @@ const generateEditedSQLfromNQL: GenerateEditedSQLfromNQL = async ({
 
   onStatusChange('Generating SQL query');
   try {
-    return await fetchFromLlm<EditSQLResponse>({
+    const result = await fetchFromLlm<EditSQLResponse>({
       url: SQL_API_URL,
       data: {
         task: 'edit',
@@ -388,6 +400,7 @@ const generateEditedSQLfromNQL: GenerateEditedSQLfromNQL = async ({
         }
       }
     });
+    return { ...result, tableColumnsMetadata: tableMetadata };
   } catch (e) {
     throw augmentError(e, 'Call to AI to edit SQL query failed');
   }

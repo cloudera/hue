@@ -1,0 +1,55 @@
+/*
+  Licensed to Cloudera, Inc. under one
+  or more contributor license agreements.  See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership.  Cloudera, Inc. licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+*/
+
+@use 'variables' as vars;
+@use 'mixins';
+
+.ant-modal-root {
+  .hue-preview-warning-panels {
+    $background-color: vars.$fluidx-orange-050;
+    $text-color: vars.$fluidx-orange-900;
+    $border-color: vars.$fluidx-orange-500;
+
+    background-color: $background-color;
+    border: 1px solid $border-color;
+    padding: 12px;
+    color: $text-color;
+
+    .hue-preview-warning__title {
+      color: $text-color;
+      text-transform: uppercase;
+    }
+
+    .hue-preview-warning__actions-title {
+      color: $text-color;
+    }
+
+    .hue-preview-warning__text-container,
+    .hue-preview-warning__action-container {
+      max-width: 80ch;
+    }
+
+    .hue-preview-warning__text-container {
+      white-space: pre-line;
+    }
+
+    .hue-preview-warning__action-container {
+      list-style-position: inside;
+    }
+  }
+}
