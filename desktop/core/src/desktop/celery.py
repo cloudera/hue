@@ -25,13 +25,13 @@ from celery import Celery
 from celery.schedules import crontab
 
 from desktop.conf import TASK_SERVER
-from desktop.settings import TIME_ZONE, INSTALLED_APPS
+from desktop.settings import TIME_ZONE, INSTALLED_APPS, CELERY_RESULT_BACKEND, CELERY_BROKER_URL
 
 
 # Set the default Django settings module for the 'celery' program.
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'desktop.settings')
 
-app = Celery('desktop')
+app = Celery('desktop', backend=CELERY_RESULT_BACKEND, broker=CELERY_BROKER_URL)
 
 # Using a string here means the worker doesn't have to serialize
 # the configuration object to child processes.

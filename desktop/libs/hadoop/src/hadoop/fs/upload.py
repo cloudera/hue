@@ -50,12 +50,9 @@ if sys.version_info[0] > 2:
 else:
   from django.utils.translation import ugettext as _
 
-
 LOG = logging.getLogger()
 
-
 UPLOAD_SUBDIR = 'hue-uploads'
-
 
 class LocalFineUploaderChunkedUpload(object):
   def __init__(self, request, *args, **kwargs):
@@ -94,7 +91,10 @@ class HDFSFineUploaderChunkedUpload(object):
       self.file_name = unicodedata.normalize('NFC', self.file_name) # Normalize unicode
     self.dest = kwargs.get('dest')
     self.file_name = kwargs.get('qqfilename')
-    self.filepath = request.fs.join(self.dest, self.file_name)
+    if kwargs.get('filepath', None) != None:
+      self.filepath = kwargs.get('filepath')
+    else:
+      self.filepath = request.fs.join(self.dest, self.file_name)
     self._file = None
     self.chunk_size = 0
 
