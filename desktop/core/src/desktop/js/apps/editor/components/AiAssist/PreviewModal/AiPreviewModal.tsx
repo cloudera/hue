@@ -22,7 +22,7 @@ import Modal from 'cuix/dist/components/Modal';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import { stackoverflowDark } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import { fluidxSlate800, fluidxSpacingS, fluidxSpacingXs } from '@cloudera/cuix-core/variables';
-import { KeywordCase, format } from 'sql-formatter';
+import { KeywordCase } from 'sql-formatter';
 
 import { GuardrailAlert, GuardrailAlertType } from '../guardRails';
 import SyntaxHighlighterDiff from '../SyntaxHighlighterDiff/SyntaxHighlighterDiff';
@@ -31,6 +31,7 @@ import { AiBarActionType } from '../AiAssistBar';
 
 import { useFormatting, formatClean } from './formattingUtils';
 import PreviewInfoPanels from './PreviewInfoPanels/PreviewInfoPanels';
+import PreviewWarningPanels from './PreviewWarningPanels/PreviewWarningPanels';
 import PreviewModalFooter from './PreviewModalFooter/PreviewModalFooter';
 import SqlPreviewConfig from './SqlPreviewConfig/SqlPreviewConfig';
 
@@ -78,8 +79,8 @@ const PreviewModal = ({
   lineNumberStart = 1,
   dialect,
   keywordCase
-}: PreviewModalProps) => {
-  const [unsafeSqlUnderstood, setUnsafeSqlUnderstood] = useState(false);
+}: PreviewModalProps): JSX.Element => {
+  const [guardRailWarningAcknowledged, setGuardRailWarningAcknowledged] = useState(false);
   const { formattingConfig, updateFormattingSettings, suggestion, showDiffFrom } = useFormatting({
     dialect,
     keywordCase,
@@ -122,6 +123,9 @@ const PreviewModal = ({
   }
 
   const unsafeSql = guardrailAlert?.type === GuardrailAlertType.UNSAFE_SQL;
+  const hallucinatedSql = guardrailAlert?.type === GuardrailAlertType.HALLUCINATION;
+  const syntaxtError = guardrailAlert?.type === GuardrailAlertType.SYNTAX_ERROR;
+  const hasGuardRailWarning = unsafeSql || hallucinatedSql || syntaxtError;
 
   return (
     <Modal
@@ -133,7 +137,7 @@ const PreviewModal = ({
       footer={
         <PreviewModalFooter
           primaryButtonLabel={primaryButtonLabel}
-          disableActions={unsafeSql && !unsafeSqlUnderstood}
+          disableActions={hasGuardRailWarning && !guardRailWarningAcknowledged}
           showCopyToClipboard={actionType !== 'explain'}
           onPrimaryBtnClick={() => onInsert(suggestion)}
           onCancelBtnClick={onCancel}
@@ -175,17 +179,20 @@ const PreviewModal = ({
           </SyntaxHighlighter>
         )}
       </div>
-      <PreviewInfoPanels
-        summary={summary}
-        explanation={explanation}
-        assumptions={assumptions}
-        guardrailAlert={guardrailAlert}
-      />
+      {!hallucinatedSql && (
+        <PreviewInfoPanels
+          summary={summary}
+          explanation={explanation}
+          assumptions={assumptions}
+          guardrailAlert={guardrailAlert}
+        />
+      )}
+      {hallucinatedSql && <PreviewWarningPanels guardrailAlert={guardrailAlert} />}
       <InlineAlertCheck
-        show={unsafeSql}
-        msg={guardrailAlert?.msg}
+        show={hasGuardRailWarning}
+        msg={guardrailAlert?.confirmationText}
         checkboxLabel="I understand this SQL"
-        onCheckboxChange={setUnsafeSqlUnderstood}
+        onCheckboxChange={setGuardRailWarningAcknowledged}
       />
     </Modal>
   );
