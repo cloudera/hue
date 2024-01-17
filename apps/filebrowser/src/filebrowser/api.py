@@ -19,6 +19,7 @@ import logging
 import posixpath
 
 from django.http import HttpResponse
+from django.utils.translation import gettext as _
 
 from desktop.lib.django_util import JsonResponse
 from desktop.lib import fsmanager
@@ -90,12 +91,9 @@ def mkdir(request):
   path = request.POST.get('path')
   name = request.POST.get('name')
 
-  if posixpath.sep in name or "#" in name:
-      raise Exception(_("Could not name folder \"%s\": Slashes or hashes are not allowed in filenames." % name))
+  if name and (posixpath.sep in name or "#" in name):
+    raise Exception(_("Error creating %s directory. Slashes or hashes are not allowed in directory name." % name))
 
-  try:
-    request.fs.mkdir(request.fs.join(path, name))
-    return HttpResponse(status=200)
-  except Exception as e:
-    raise Exception('Failed to create directory with name: %s' % name, e)
+  request.fs.mkdir(request.fs.join(path, name))
+  return HttpResponse(status=200)
 
