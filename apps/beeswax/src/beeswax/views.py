@@ -625,8 +625,9 @@ def install_examples(request):
       if dialect == 'beeswax':
         dialect = 'hive'
       db_name = request.POST.get('db_name', 'default')
-      connector_id = request.POST.get('connector_id')
-      beeswax_install_examples.Command().handle(dialect=dialect, db_name=db_name, user=request.user, request=request)
+      interpreter = common.find_compute(dialect=dialect, user=request.user)
+      beeswax_install_examples.Command().handle(dialect=dialect, db_name=db_name, user=request.user,
+                                                request=request, interpreter=interpreter)
       response['status'] = 0
     except Exception as err:
       LOG.exception(err)
