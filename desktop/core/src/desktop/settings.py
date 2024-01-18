@@ -749,6 +749,23 @@ if desktop.conf.TASK_SERVER.ENABLED.get() or desktop.conf.TASK_SERVER.BEAT_ENABL
   CELERY_TASK_SERIALIZER = 'json'
 
   CELERYD_OPTS = desktop.conf.TASK_SERVER.RESULT_CELERYD_OPTS.get()
+  CELERY_TASK_DEFAULT_QUEUE = 'default'
+
+  CELERY_TASK_QUEUES = {
+    'low_priority': {
+        'exchange': 'low_priority', # unused
+        'routing_key': 'low_priority',
+    },
+    'high_priority': {
+        'exchange': 'high_priority', # unused
+        'routing_key': 'high_priority',
+    },
+    'default': {
+         'exchange': 'default',
+         'routing_key': 'default'
+    }, 
+  }
+
 
 # %n will be replaced with the first part of the nodename.
 # CELERYD_LOG_FILE="/var/log/celery/%n%I.log"
