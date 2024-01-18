@@ -185,10 +185,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps): JSX.Element => {
         onStatusChange: handleStatusUpdate
       }));
 
-      if (
-        guardrailAlert?.type !== GuardrailAlertType.SEMANTIC_ERROR &&
-        guardrailAlert?.type !== GuardrailAlertType.INVALID_AI_RESPONSE
-      ) {
+      if (guardrailAlert?.type !== GuardrailAlertType.INVALID_AI_RESPONSE) {
         setNql(nql);
         setSuggestion(sql);
         setAssumptions(assumptions);
@@ -227,10 +224,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps): JSX.Element => {
         dialect,
         onStatusChange: handleStatusUpdate
       }));
-      if (
-        guardrailAlert?.type !== GuardrailAlertType.SEMANTIC_ERROR &&
-        guardrailAlert?.type !== GuardrailAlertType.INVALID_AI_RESPONSE
-      ) {
+      if (guardrailAlert?.type !== GuardrailAlertType.INVALID_AI_RESPONSE) {
         setNql(nql);
         setSuggestion(sql);
         setAssumptions(assumptions);
@@ -262,10 +256,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps): JSX.Element => {
         onStatusChange: handleStatusUpdate
       }));
 
-      if (
-        guardrailAlert?.type !== GuardrailAlertType.SQL_ERROR &&
-        guardrailAlert?.type !== GuardrailAlertType.INVALID_AI_RESPONSE
-      ) {
+      if (guardrailAlert?.type !== GuardrailAlertType.INVALID_AI_RESPONSE) {
         setSuggestion(sql);
         setSuggestionExplanation(explain);
         setShowSuggestedSqlModal(true);
@@ -293,10 +284,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps): JSX.Element => {
         dialect,
         onStatusChange: handleStatusUpdate
       }));
-      if (
-        guardrailAlert?.type !== GuardrailAlertType.SQL_ERROR &&
-        guardrailAlert?.type !== GuardrailAlertType.INVALID_AI_RESPONSE
-      ) {
+      if (guardrailAlert?.type !== GuardrailAlertType.INVALID_AI_RESPONSE) {
         setSuggestion(sql);
         setSuggestionExplanation(explain);
         setShowSuggestedSqlModal(true);
@@ -454,10 +442,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps): JSX.Element => {
     ? 'explain'
     : 'fix';
 
-  const showBarInlineWarning =
-    guardrailAlert?.type === GuardrailAlertType.SEMANTIC_ERROR ||
-    guardrailAlert?.type === GuardrailAlertType.SQL_ERROR ||
-    guardrailAlert?.type === GuardrailAlertType.INVALID_AI_RESPONSE;
+  const showBarInlineWarning = guardrailAlert?.type === GuardrailAlertType.INVALID_AI_RESPONSE;
 
   return (
     <>
