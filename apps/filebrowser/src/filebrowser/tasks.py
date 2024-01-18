@@ -68,7 +68,8 @@ def upload_file_task(**kwargs):
   except Exception as err:
     upload_file_task.update_state(task_id=task_id, state='FAILURE', meta={})
     raise Exception(f"Upload failed {err=}, {type(err)=}")
-  
+
+  upload_file_task.update_state(task_id=task_id, state='SUCCESS', meta=kwargs)
   return
   
 def _get_request(postdict=None, user_id=None, scheme=None):
