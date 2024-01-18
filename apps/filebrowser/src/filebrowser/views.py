@@ -1491,7 +1491,7 @@ def perform_upload_task(request, *args, **kwargs):
     kwargs["scheme"] = scheme
     kwargs["filepath"] = _fs.filepath
     task_id = kwargs.get("qquuid")
-    upload_file_task.apply_async(task_id=task_id, args=(), kwargs=kwargs, link_error=error_handler.s())
+    upload_file_task.apply_async(task_id=task_id, args=(), kwargs=kwargs, link_error=error_handler.s(), queue="default")
     result = "task started %s" % task_id
     logger.info("Task started %s" % task_id)
   else:

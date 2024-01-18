@@ -31,7 +31,15 @@ from desktop.settings import TIME_ZONE, INSTALLED_APPS, CELERY_RESULT_BACKEND, C
 # Set the default Django settings module for the 'celery' program.
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'desktop.settings')
 
-app = Celery('desktop', backend=CELERY_RESULT_BACKEND, broker=CELERY_BROKER_URL)
+class MyCelery(Celery):
+    def gen_task_name(self, name, module):
+        if module.endswith('.tasks'):
+            module = module[:-6]
+        return super().gen_task_name(name, module)
+
+app = MyCelery('desktop', backend=CELERY_RESULT_BACKEND, broker=CELERY_BROKER_URL)
+app.conf.broker_transport_options = {'visibility_timeout': 3600}  # 1 hour.
+app.conf.result_key_prefix = 'desktop_'
 
 # Using a string here means the worker doesn't have to serialize
 # the configuration object to child processes.
