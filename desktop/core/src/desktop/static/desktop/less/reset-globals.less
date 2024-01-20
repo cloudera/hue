@@ -86,3 +86,10 @@ video {
   line-height: inherit;
   font-family: inherit;
 }
+
+// Overwrite global SVG legacy style from nvd3
+svg:not(.leaflet-zoom-animated) {
+  display: unset;
+  width: unset;
+  height: unset;
+}
