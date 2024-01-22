@@ -19,49 +19,89 @@ import Alert from 'cuix/dist/components/Alert/Alert';
 
 import huePubSub from 'utils/huePubSub';
 import './AlertComponent.scss';
+import { i18nReact } from '../../utils/i18nReact';
 
-interface ErrorAlert {
+interface HueAlert {
   message: string;
 }
 
+interface VisibleAlert {
+  alert: HueAlert;
+  type: 'error' | 'info' | 'warning';
+}
+
 const AlertComponent: React.FC = () => {
-  const [errors, setErrors] = useState<ErrorAlert[]>([]);
+  const [alert, setAlerts] = useState<VisibleAlert[]>([]);
+
+  const updateAlerts = (alert, type) => {
+    if (!alert.message) {
+      return;
+    }
+    setAlerts(activeAlerts => {
+      // Prevent showing the same message multiple times.
+      // TODO: Consider showing a count in the error notification when the same message is reported multiple times.
+      if (activeAlerts.some(activeAlerts => activeAlerts.alert.message === alert.message)) {
+        return activeAlerts;
+      }
+      return [...activeAlerts, { alert, type }];
+    });
+  };
 
   useEffect(() => {
-    const hueSub = huePubSub.subscribe('hue.global.error', (newError: ErrorAlert) => {
-      if (!newError.message) {
-        return;
-      }
-
-      setErrors(activeErrors => {
-        // Prevent showing the same message multiple times.
-        // TODO: Consider showing a count in the error notification when the same message is reported multiple times.
-        if (activeErrors.some(activeError => activeError.message === newError.message)) {
-          return activeErrors;
-        }
-        return [...activeErrors, newError];
-      });
+    const hueSub = huePubSub.subscribe('hue.global.error', (newAlert: HueAlert) => {
+      updateAlerts(newAlert, 'error');
     });
     return () => {
       hueSub.remove();
     };
   }, []);
 
-  const handleClose = (errorObjToClose: ErrorAlert) => {
-    const filteredErrors = errors.filter(errorObj => errorObj !== errorObjToClose);
-    setErrors(filteredErrors);
+  useEffect(() => {
+    const hueSub = huePubSub.subscribe('hue.global.info', (newAlert: HueAlert) => {
+      updateAlerts(newAlert, 'info');
+    });
+    return () => {
+      hueSub.remove();
+    };
+  }, []);
+
+  useEffect(() => {
+    const hueSub = huePubSub.subscribe('hue.global.warning', (newAlert: HueAlert) => {
+      updateAlerts(newAlert, 'warning');
+    });
+    return () => {
+      hueSub.remove();
+    };
+  }, []);
+
+  const handleClose = (alertObjToClose: HueAlert) => {
+    const filteredAlerts = alert.filter(alertObj => alertObj.alert !== alertObjToClose);
+    setAlerts(filteredAlerts);
   };
 
-  //TODO: add support for warnings and success messages
+  const { t } = i18nReact.useTranslation();
+
+  const getHeader = alert => {
+    if (alert.type === 'error') {
+      return t('Error');
+    } else if (alert.type === 'info') {
+      return t('Info');
+    } else if (alert.type === 'warning') {
+      return t('Warning');
+    }
+  };
+
   return (
     <div className="hue-alert flash-messages cuix antd">
-      {errors.map(errorObj => (
+      {alert.map(alertObj => (
         <Alert
-          key={errorObj.message}
-          type="error"
-          message={errorObj.message}
+          key={alertObj.alert.message}
+          type={alertObj.type}
+          message={getHeader(alertObj)}
+          description={alertObj.alert.message}
+          showIcon={true}
           closable={true}
-          onClose={() => handleClose(errorObj)}
+          onClose={() => handleClose(alertObj.alert)}
         />
       ))}
     </div>

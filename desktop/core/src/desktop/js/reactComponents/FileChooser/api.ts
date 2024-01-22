@@ -16,10 +16,11 @@
 
 import { get } from '../../api/utils';
 import { CancellablePromise } from '../../api/cancellablePromise';
-import { PathAndFileData } from './types';
+import { PathAndFileData, SortOrder } from './types';
 
 const FILESYSTEMS_API_URL = '/api/v1/storage/filesystems';
 const VIEWFILES_API_URl = '/api/v1/storage/view=';
+
 export interface ApiFileSystem {
   file_system: string;
   user_home_directory: string;
@@ -27,5 +28,40 @@ export interface ApiFileSystem {
 
 export const fetchFileSystems = (): CancellablePromise<ApiFileSystem[]> => get(FILESYSTEMS_API_URL);
 
-export const fetchFiles = (filePath: string): CancellablePromise<PathAndFileData> =>
-  get(VIEWFILES_API_URl + filePath);
+//TODO: Use object as parameter instead
+export const fetchFiles = (
+  filePath: string,
+  pagesize?: number,
+  pagenum?: number,
+  filter?: string,
+  sortby?: string,
+  sortOrder?: SortOrder
+): CancellablePromise<PathAndFileData> => {
+  let descending = false;
+  if (sortOrder === SortOrder.ASC) {
+    descending = false;
+  } else if (sortOrder === SortOrder.DSC) {
+    descending = true;
+  } else {
+    sortby = '';
+  }
+  //If value is undefined default value is assigned.
+  pagesize = pagesize || 10;
+  pagenum = pagenum || 1;
+  filter = filter || '';
+  sortby = sortby || '';
+  return get(
+    VIEWFILES_API_URl +
+      filePath +
+      '?pagesize=' +
+      pagesize +
+      '&pagenum=' +
+      pagenum +
+      '&filter=' +
+      filter +
+      '&sortby=' +
+      sortby +
+      '&descending=' +
+      descending
+  );
+};
