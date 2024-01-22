@@ -14,7 +14,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+import datetime
 import logging
 
 from celery.utils.log import get_task_logger
@@ -53,22 +53,29 @@ def error_handler(request, exc, traceback):
 @app.task()
 def upload_file_task(**kwargs):
   task_id = kwargs.get("qquuid")
-  upload_file_task.update_state(task_id=task_id, state='STARTED', meta={})
-  print(kwargs)
   user_id = kwargs["user_id"]
   scheme = kwargs["scheme"]
   postdict = kwargs.get("postdict", None)
+  request = _get_request(postdict=postdict, user_id=user_id, scheme=scheme)
+  kwargs["username"] = request.user.username
+  kwargs["state"] = "STARTED"
+  kwargs["task_start"] = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+  upload_file_task.update_state(task_id=task_id, state='STARTED', meta=kwargs)
   try:
-    request = _get_request(postdict=postdict, user_id=user_id, scheme=scheme)
     from filebrowser.views import UPLOAD_CLASSES
     upload_class = UPLOAD_CLASSES.get(kwargs["scheme"], None)
     _fs = upload_class(request, args=[], **kwargs)
+    kwargs["state"] = "RUNNING"
+    upload_file_task.update_state(task_id=task_id, state='RUNNING', meta=kwargs)
     _fs.upload_chunks()
-    upload_file_task.update_state(task_id=task_id, state='PROGRESS', meta={})
   except Exception as err:
-    upload_file_task.update_state(task_id=task_id, state='FAILURE', meta={})
-    raise Exception(f"Upload failed {err=}, {type(err)=}")
+    kwargs["state"] = "FAILURE"
+    upload_file_task.update_state(task_id=task_id, state='FAILURE', meta=kwargs)
+    raise Exception(f"Upload failed %s" % err)
 
+  kwargs["state"] = "SUCCESS"
+  kwargs["started"] = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+  kwargs["task_end"] = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
   upload_file_task.update_state(task_id=task_id, state='SUCCESS', meta=kwargs)
   return
   
