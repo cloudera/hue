@@ -225,8 +225,8 @@ function centos7_install() {
       xmlsec1-openssl \
       unzip'
     # MySQLdb install
-    sudo -- sh -c 'curl -sSLO https://dev.mysql.com/get/mysql80-community-release-el7-5.noarch.rpm && \
-        rpm -ivh mysql80-community-release-el7-5.noarch.rpm && \
+    sudo -- sh -c 'curl -sSLO https://dev.mysql.com/get/mysql80-community-release-el7-11.noarch.rpm && \
+        rpm -ivh mysql80-community-release-el7-11.noarch.rpm && \
         yum install -y mysql-community-libs mysql-community-client-plugins mysql-community-common'
     # NODEJS 14 install
     sudo -- sh -c 'yum install -y rh-nodejs14-nodejs'
