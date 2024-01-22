@@ -95,8 +95,10 @@ class HDFSFineUploaderChunkedUpload(object):
       self.filepath = kwargs.get('filepath')
     else:
       self.filepath = request.fs.join(self.dest, self.file_name)
+      kwargs['filepath'] = self.filepath
     self._file = None
-    self.chunk_size = 0
+    if kwargs.get('chunk_size', None) != None:
+      self.chunk_size = kwargs.get('chunk_size')
 
   def check_access(self):
     if self._request.fs.isdir(self.dest) and posixpath.sep in self.file_name:
@@ -123,6 +125,8 @@ class HDFSFineUploaderChunkedUpload(object):
       logging.debug("HDFSFineUploaderChunkedUpload: uploading file %s, part %d, size %d, dest: %s" %
                     (self.file_name, i, total, self.dest))
       self._file.write(chunk)
+      percentcomplete = int((total * 100) / self.totalfilesize)
+      logging.debug("HDFSFineUploaderChunkedUpload: progress %d" % percentcomplete)
     self._file.flush()
     self._file.finish_upload(self.totalfilesize)
     self._file._do_cleanup = False

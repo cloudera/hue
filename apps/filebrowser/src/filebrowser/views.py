@@ -1490,6 +1490,7 @@ def perform_upload_task(request, *args, **kwargs):
     kwargs["user_id"] = request.user.id
     kwargs["scheme"] = scheme
     kwargs["filepath"] = _fs.filepath
+    kwargs["chunk_size"] = _fs.chunk_size
     task_id = kwargs.get("qquuid")
     upload_file_task.apply_async(task_id=task_id, args=(), kwargs=kwargs, link_error=error_handler.s(), queue="default")
     result = "task started %s" % task_id
