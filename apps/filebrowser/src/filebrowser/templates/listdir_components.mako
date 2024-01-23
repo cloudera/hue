@@ -2096,8 +2096,18 @@ else:
                       huePubSub.publish('hue.global.error', {message: "${ _('Error: ') }" + response.data});
                     }
                     else {
-                      huePubSub.publish('hue.global.info', {message: response.path + "${ _(' uploaded successfully.') }"});
+                      console.log("logging the response")
+                      console.log(response.task_id)
+                      let taskUrl = "http://127.0.0.1:8000/hue/task_server";
+                      let taskLink = '<a href="' + taskUrl + '">' + response.task_id + '</a>';
+                      let successMessage = response.path + "${ _(' uploaded successfully. Task ID: ')}" + taskLink;
+                      $(document).trigger('info', successMessage);
                       self.filesToHighlight.push(response.path);
+<!--                      setTimeout(function() {-->
+<!--                        window.location.href = "http://127.0.0.1:8000/hue/task_server";-->
+<!--                      }, 3000);-->
+
+
                     }
                     if (self.pendingUploads() == 0) {
                       $('#uploadFileModal').modal('hide');
