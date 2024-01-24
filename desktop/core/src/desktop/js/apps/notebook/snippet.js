@@ -1872,6 +1872,12 @@ class Snippet {
             self.result.clear();
             self.result.handle(data.handle);
             self.result.hasResultset(data.handle.has_result_set);
+
+            if (self.type() === 'trino') {
+              const existing_handle = self.result.handle();
+              existing_handle.row_n = data.handle.row_n;
+              existing_handle.next_uri = data.handle.next_uri;
+            }
             self.showLogs(true);
             if (data.handle.sync) {
               self.loadData(data.result, 100);
@@ -2197,6 +2203,12 @@ class Snippet {
               if (data.status === 0) {
                 self.showExecutionAnalysis(true);
                 self.loadData(data.result, rows);
+
+                if (self.type() === 'trino') {
+                  const existing_handle = self.result.handle();
+                  existing_handle.row_n = data.result.row_n;
+                  existing_handle.next_uri = data.result.next_uri;
+                }
               } else {
                 self._ajaxError(data, () => {
                   self.isFetchingData = false;
@@ -2372,6 +2384,11 @@ class Snippet {
                   self.status() == 'starting' ||
                   self.status() == 'waiting'
                 ) {
+                  if (self.type() === 'trino') {
+                    const existing_handle = self.result.handle();
+                    existing_handle.row_n = 0;
+                    existing_handle.next_uri = data.query_status.next_uri;
+                  }
                   const delay = self.result.executionTime() > 45000 ? 5000 : 1000; // 5s if more than 45s
                   if (!notebook.unloaded()) {
                     self.checkStatusTimeout = setTimeout(_checkStatus, delay);
