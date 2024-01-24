@@ -526,6 +526,9 @@ def get_api(request, snippet):
   elif interface == 'flink':
     from notebook.connectors.flink_sql import FlinkSqlApi
     return FlinkSqlApi(request.user, interpreter=interpreter)
+  elif interface == 'trino':
+    from notebook.connectors.trino import TrinoApi
+    return TrinoApi(request.user, interpreter=interpreter)
   elif interface == 'kafka':
     from notebook.connectors.kafka import KafkaApi
     return KafkaApi(request.user)
