@@ -19,7 +19,7 @@
 set -e
 ERRORS=false
 
-for FILE in `git diff --name-only` ; do
+for FILE in `git diff --cached --name-only` ; do
     if [[ "$FILE" =~ ^.+(py)$ ]]; then
         if [ "grep 'distinct()' $FILE" ]; then  # HUE-3191: Check if distinct() exists in any Python files
             ERRORS=true
@@ -29,6 +29,13 @@ for FILE in `git diff --name-only` ; do
         if [ "grep 'pdb.set_trace()' $FILE" ]; then
             ERRORS=true
             echo -e "[ERROR] $FILE: Found pdb.set_trace() debug statements in file.\n"
+        fi
+    elif [[ "$FILE" =~ ^.+(js|jsx|ts|tsx)$ ]]; then
+        echo "Running ESLint for $FILE..."
+        eslint "$FILE"  # Run ESLint for JavaScript/JSX files
+        if [ $? -ne 0 ]; then
+            ERRORS=true
+            echo -e "[ERROR] ESLint found issues in $FILE.\n"
         fi
     fi
 done
