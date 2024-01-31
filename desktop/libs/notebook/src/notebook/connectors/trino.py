@@ -60,9 +60,9 @@ class TrinoApi(Api):
 
     self.options = interpreter['options']
     
-    api_url = self.options['url']
-    hostname, port = self.get_hostname_and_port(api_url)
-    trino_session = self.get_trino_client_session(api_url)
+    self.api_url = self.options['url']
+    hostname, port = self.get_hostname_and_port(self.api_url)
+    trino_session = ClientSession(user.username)
     
     self.db = TrinoRequest(hostname, port, trino_session)
 
@@ -79,15 +79,11 @@ class TrinoApi(Api):
     pass
 
 
-  def get_trino_client_session(self, url):
-    catalog = urlparse(url).path.split('/')[-1]
-    user = self.user.username
-
-    return ClientSession(user, catalog)
-
-
   @query_error_handler
   def execute(self, notebook, snippet):
+    database = snippet['database']
+    query_client = TrinoQuery(self.db, 'USE ' + database)
+    query_client.execute()
     
     statement = snippet['statement'].rstrip(';')
     query_client = TrinoQuery(self.db, statement)
@@ -274,11 +270,17 @@ class TrinoApi(Api):
 
 
   def _show_databases(self):
+    catalogs = self._show_catalogs()
+    hostname, port = self.get_hostname_and_port(self.api_url)
+    databases = []
 
-    query_client = TrinoQuery(self.db, 'SHOW SCHEMAS')
-    response = query_client.execute()
-    res = response.rows
-    databases = [item for sublist in res for item in sublist]
+    for catalog in catalogs:
+      trino_session = ClientSession(self.user.username, catalog)
+      trino_request = TrinoRequest(hostname, port, trino_session)
+
+      query_client = TrinoQuery(trino_request, 'SHOW SCHEMAS')
+      response = query_client.execute()
+      databases += [f'{catalog}.{item}' for sublist in response.rows for item in sublist]
 
     return databases
 
