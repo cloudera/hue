@@ -54,10 +54,7 @@ class S3TestBase(unittest.TestCase):
 
     cls.path_prefix = 'test-hue/%s' % generate_id(size=16)
 
-    if aws_conf.IS_SELF_SIGNING_ENABLED.get():
-      cls.s3_connection = get_client(name='default', fs='s3a', user='hue')._s3_connection
-    else:
-      cls.s3_connection = aws.get_client('default').get_s3_connection()  # Probably broken nowadays
+    cls.s3_connection = aws.get_client('default').get_s3_connection()  # Probably broken nowadays
     cls.bucket = cls.s3_connection.get_bucket(cls.bucket_name, validate=True)
 
   @classmethod
