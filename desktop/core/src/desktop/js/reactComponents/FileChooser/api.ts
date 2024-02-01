@@ -13,13 +13,14 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
+import axios, { AxiosResponse } from 'axios';
 import { get } from '../../api/utils';
 import { CancellablePromise } from '../../api/cancellablePromise';
 import { PathAndFileData, SortOrder } from './types';
 
 const FILESYSTEMS_API_URL = '/api/v1/storage/filesystems';
 const VIEWFILES_API_URl = '/api/v1/storage/view=';
+const MAKE_DIRECTORY_API_URL = '/api/v1/storage/mkdir';
 
 export interface ApiFileSystem {
   file_system: string;
@@ -64,4 +65,12 @@ export const fetchFiles = (
       '&descending=' +
       descending
   );
+};
+
+export const mkdir = async (folderName: string, path: string): Promise<AxiosResponse> => {
+  const createDirFormData = new FormData();
+  createDirFormData.append('name', folderName);
+  createDirFormData.append('path', path);
+  const response = await axios.post(MAKE_DIRECTORY_API_URL, createDirFormData);
+  return response;
 };
