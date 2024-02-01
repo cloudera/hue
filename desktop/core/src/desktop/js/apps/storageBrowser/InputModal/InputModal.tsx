@@ -13,9 +13,9 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-import React, { useRef } from 'react';
+import React, { useState } from 'react';
 import Modal from 'cuix/dist/components/Modal';
-import { Input, InputRef } from 'antd';
+import { Input } from 'antd';
 import { i18nReact } from '../../../utils/i18nReact';
 
 import './InputModal.scss';
@@ -26,8 +26,8 @@ interface InputModalProps {
   inputLabel: string;
   inputPlaceholder?: string;
   okText?: string;
-  onCancel: () => void;
-  onOk: (name: string) => void;
+  onClose: () => void;
+  onCreate: (name: string) => void;
   showModal: boolean;
   title: string;
 }
@@ -44,35 +44,41 @@ const InputModal: React.FC<InputModalProps> = ({
   inputLabel,
   inputPlaceholder,
   okText,
-  onCancel,
-  onOk,
+  onClose,
+  onCreate,
   showModal,
   title
 }): JSX.Element => {
   const { t } = i18nReact.useTranslation();
-  const textInput = useRef<InputRef>(null);
-
-  const extractText = (): string => {
-    let nameText: string;
-    if (textInput.current !== null) {
-      nameText = textInput.current.input.value;
-    }
-    return nameText;
-  };
+  const [textInput, setTextInput] = useState<string>('');
 
   return (
     <Modal
       cancelText={t(cancelText)}
       className="hue-input-modal"
       okText={t(okText)}
-      onCancel={onCancel}
-      onOk={() => onOk(extractText())}
+      onCancel={() => {
+        setTextInput('');
+        onClose();
+      }}
+      onOk={() => {
+        onCreate(textInput);
+        setTextInput('');
+        onClose();
+      }}
       open={showModal}
       title={t(title)}
     >
       <div className="hue-input-modal__description">{t(description)}</div>
       <div className="hue-input-modal__input-label">{t(inputLabel)}</div>
-      <Input className="hue-input-modal__input" ref={textInput} placeholder={t(inputPlaceholder)} />
+      <Input
+        className="hue-input-modal__input"
+        value={textInput}
+        onInput={e => {
+          setTextInput((e.target as HTMLInputElement).value);
+        }}
+        placeholder={t(inputPlaceholder)}
+      />
     </Modal>
   );
 };

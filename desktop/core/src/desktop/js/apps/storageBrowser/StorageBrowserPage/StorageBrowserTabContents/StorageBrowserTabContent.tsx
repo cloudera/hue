@@ -32,8 +32,9 @@ import PlusCircleIcon from '@cloudera/cuix-core/icons/react/PlusCircleIcon';
 import { FileOutlined } from '@ant-design/icons';
 
 import PathBrowser from '../../../../reactComponents/FileChooser/PathBrowser/PathBrowser';
+import InputModal from '../../InputModal/InputModal';
 import StorageBrowserTable from '../StorageBrowserTable/StorageBrowserTable';
-import { fetchFiles } from '../../../../reactComponents/FileChooser/api';
+import { fetchFiles, mkdir } from '../../../../reactComponents/FileChooser/api';
 import {
   PathAndFileData,
   StorageBrowserTableData,
@@ -67,6 +68,8 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
   const [sortOrder, setSortOrder] = useState<SortOrder>(SortOrder.NONE);
   //TODO: Add filter functionality
   const [filterData] = useState<string>('');
+  const [showNewFolderModal, setShowNewFolderModal] = useState<boolean>();
+  const [refreshKey, setRefreshKey] = useState<number>(0);
 
   const { t } = i18nReact.useTranslation();
 
@@ -84,7 +87,10 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
         {
           icon: <FolderIcon />,
           key: 'new_folder',
-          label: t('New Folder')
+          label: t('New Folder'),
+          onClick: () => {
+            setShowNewFolderModal(true);
+          }
         }
       ]
     },
@@ -95,18 +101,8 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
       children: [
         {
           icon: <ImportIcon />,
-          key: 'upload_file',
-          label: t('File')
-        },
-        {
-          icon: <ImportIcon />,
-          key: 'upload_folder',
-          label: t('Folder')
-        },
-        {
-          icon: <ImportIcon />,
-          key: 'upload_zip',
-          label: t('Zip Folder')
+          key: 'upload',
+          label: t('New Upload')
         }
       ]
     }
@@ -135,6 +131,18 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
     }
   ];
 
+  //TODO:Add loading after calling mkdir api
+  const handleCreateNewFolder = (folderName: string) => {
+    mkdir(folderName, filePath)
+      .then(() => {
+        setRefreshKey(oldKey => oldKey + 1);
+      })
+      .catch(error => {
+        // eslint-disable-next-line no-restricted-syntax
+        console.log(error);
+      });
+  };
+
   useEffect(() => {
     setloadingFiles(true);
     fetchFiles(filePath, pageSize, pageNumber, filterData, sortByColumn, sortOrder)
@@ -161,7 +169,7 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
       .finally(() => {
         setloadingFiles(false);
       });
-  }, [filePath, pageSize, pageNumber, sortByColumn, sortOrder]);
+  }, [filePath, pageSize, pageNumber, sortByColumn, sortOrder, refreshKey]);
 
   return (
     <Spin spinning={loadingFiles}>
@@ -226,7 +234,16 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
           onSortOrderChange={setSortOrder}
           sortByColumn={sortByColumn}
           sortOrder={sortOrder}
-        ></StorageBrowserTable>
+        />
+        <InputModal
+          title={'Create New Folder'}
+          description={'You can add a new folder to your storage browser'}
+          inputLabel={'Enter folder name here'}
+          okText={'Create'}
+          showModal={showNewFolderModal}
+          onCreate={handleCreateNewFolder}
+          onClose={() => setShowNewFolderModal(!showNewFolderModal)}
+        />
       </div>
     </Spin>
   );
