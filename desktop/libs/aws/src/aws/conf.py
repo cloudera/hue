@@ -164,13 +164,6 @@ HAS_IAM_DETECTION = Config(
   type=coerce_bool
 )
 
-IS_SELF_SIGNING_ENABLED = Config(
-  key='is_self_signing_enabled',
-  help=_('Skip boto and use self signed URL and requests to make the calls to S3. Used for testing the RAZ integration.'),
-  type=coerce_bool,
-  private=True,
-  default=False,
-)
 
 def get_default_get_environment_credentials():
   '''Allow to check if environment credentials are present or not'''
@@ -348,7 +341,7 @@ def is_raz_s3():
   from desktop.conf import RAZ  # Must be imported dynamically in order to have proper value
 
   return (RAZ.IS_ENABLED.get() and 'default' in list(AWS_ACCOUNTS.keys()) and \
-          AWS_ACCOUNTS['default'].HOST.get() and AWS_ACCOUNTS['default'].get_raw() and not IS_SELF_SIGNING_ENABLED.get())
+          AWS_ACCOUNTS['default'].HOST.get() and AWS_ACCOUNTS['default'].get_raw())
 
 
 def config_validator(user):
