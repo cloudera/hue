@@ -104,12 +104,7 @@ def touch(request):
   name = request.POST.get('name')
 
   if name and (posixpath.sep in name):
-    raise Exception(_("Could not name file \"%s\": Slashes are not allowed in filenames." % name))
+    raise Exception(_("Error creating %s file. Slashes are not allowed in filename." % name))
   
-  request.fs.create(
-    request.fs.join(
-      (path.encode('utf-8') if not isinstance(path, str) else path),
-      (name.encode('utf-8') if not isinstance(name, str) else name)
-    )
-  )
+  request.fs.create(request.fs.join(path, name))
   return HttpResponse(status=200)
