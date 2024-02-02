@@ -1213,7 +1213,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
             shareViewModel.setDocUuid(data.doc_uuid);
           }
           self.workflow.id(data.id);
-          $(document).trigger("info", data.message);
+          huePubSub.publish('hue.global.info', { message: data.message });
           self.workflow.tracker().markCurrentStateAsClean();
           huePubSub.publish('assist.document.refresh');
           hueUtils.changeURL('/hue/oozie/editor/workflow/edit/?workflow=' + data.id);
