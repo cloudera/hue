@@ -7,16 +7,6 @@ on:
   pull_request:
     branches:
     - master
-    paths:
-      - '**.js'
-      - '**.jsx'
-      - '**.ts'
-      - '**.tsx'
-      - '**.less'
-      - '**.scss'
-      - '**.vue'
-      - 'package*.json'
-      - '**commitflow-frontend.yml'
 
 jobs:
   build:

@@ -16,6 +16,10 @@
 # limitations under the License.
 
 import logging
+import posixpath
+
+from django.http import HttpResponse
+from django.utils.translation import gettext as _
 
 from desktop.lib.django_util import JsonResponse
 from desktop.lib import fsmanager
@@ -80,3 +84,27 @@ def get_filesystems_with_home_dirs(request): # Using as a public API only for no
     })
 
   return JsonResponse(filesystems, safe=False)
+
+
+@error_handler
+def mkdir(request):
+  path = request.POST.get('path')
+  name = request.POST.get('name')
+
+  if name and (posixpath.sep in name or "#" in name):
+    raise Exception(_("Error creating %s directory. Slashes or hashes are not allowed in directory name." % name))
+
+  request.fs.mkdir(request.fs.join(path, name))
+  return HttpResponse(status=200)
+
+
+@error_handler
+def touch(request):
+  path = request.POST.get('path')
+  name = request.POST.get('name')
+
+  if name and (posixpath.sep in name):
+    raise Exception(_("Error creating %s file. Slashes are not allowed in filename." % name))
+  
+  request.fs.create(request.fs.join(path, name))
+  return HttpResponse(status=200)

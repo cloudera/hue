@@ -493,6 +493,9 @@ def get_api(request, snippet):
     elif interpreter['options'] and interpreter['options'].get('url', '').find('vertica') >= 0:
       from notebook.connectors.jdbc_vertica import JdbcApiVertica
       return JdbcApiVertica(request.user, interpreter=interpreter)
+    elif interpreter['options'] and interpreter['options'].get('driver', '').find('kyuubi') >= 0:
+      from notebook.connectors.jdbc_kyuubi import JdbcApiKyuubi
+      return JdbcApiKyuubi(request.user, interpreter=interpreter)
     else:
       from notebook.connectors.jdbc import JdbcApi
       return JdbcApi(request.user, interpreter=interpreter)
@@ -523,6 +526,9 @@ def get_api(request, snippet):
   elif interface == 'flink':
     from notebook.connectors.flink_sql import FlinkSqlApi
     return FlinkSqlApi(request.user, interpreter=interpreter)
+  elif interface == 'trino':
+    from notebook.connectors.trino import TrinoApi
+    return TrinoApi(request.user, interpreter=interpreter)
   elif interface == 'kafka':
     from notebook.connectors.kafka import KafkaApi
     return KafkaApi(request.user)
