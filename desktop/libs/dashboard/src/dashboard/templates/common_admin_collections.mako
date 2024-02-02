@@ -226,11 +226,11 @@ ${ commonimportexport(request) | n,unicode }
     $(document).on("collectionDeleted", function () {
       $("#deleteModal").modal("hide");
       $("#deleteModalBtn").button("reset");
-      $(document).trigger("info", "${ _("Dashboard(s) deleted successfully.") }");
+      huePubSub.publish('hue.global.info', { message: "${ _("Dashboard(s) deleted successfully.") }"});
     });
 
     $(document).on("collectionCopied", function () {
-      $(document).trigger("info", "${ _("Dashboard(s) copied successfully.") }");
+      huePubSub.publish('hue.global.info', { message: "${ _("Dashboard(s) copied successfully.") }"});
     });
 
     $(document).on("confirmDelete", function () {

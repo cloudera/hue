@@ -371,7 +371,7 @@ else:
         %elif message.tags == 'warning':
           huePubSub.publish('hue.global.warning', { message: '${ escapejs(escape(message)) }'});
         %else:
-          $(document).trigger('info', '${ escapejs(escape(message)) }');
+          huePubSub.publish('hue.global.info', { message: '${ escapejs(escape(message)) }'});
         %endif
       %endfor
     %endif
