@@ -38,7 +38,7 @@ import { PathAndFileData } from '../../../../reactComponents/FileChooser/types';
 =======
 import InputModal from '../../InputModal/InputModal';
 import StorageBrowserTable from '../StorageBrowserTable/StorageBrowserTable';
-import { fetchFiles, mkdir } from '../../../../reactComponents/FileChooser/api';
+import { fetchFiles, mkdir, touch } from '../../../../reactComponents/FileChooser/api';
 import {
   PathAndFileData,
   StorageBrowserTableData,
@@ -73,6 +73,7 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
   //TODO: Add filter functionality
   const [filterData] = useState<string>('');
   const [showNewFolderModal, setShowNewFolderModal] = useState<boolean>();
+  const [showNewFileModal, setShowNewFileModal] = useState<boolean>();
   const [refreshKey, setRefreshKey] = useState<number>(0);
 
   const { t } = i18nReact.useTranslation();
@@ -86,7 +87,10 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
         {
           icon: <FileOutlined />,
           key: 'new_file',
-          label: t('New File')
+          label: t('New File'),
+          onClick: () => {
+            setShowNewFileModal(true);
+          }
         },
         {
           icon: <FolderIcon />,
@@ -135,9 +139,21 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
     }
   ];
 
-  //TODO:Add loading after calling mkdir api
   const handleCreateNewFolder = (folderName: string) => {
+    setloadingFiles(true);
     mkdir(folderName, filePath)
+      .then(() => {
+        setRefreshKey(oldKey => oldKey + 1);
+      })
+      .catch(error => {
+        // eslint-disable-next-line no-restricted-syntax
+        console.log(error);
+      });
+  };
+
+  const handleCreateNewFile = (fileName: string) => {
+    setloadingFiles(true);
+    touch(fileName, filePath)
       .then(() => {
         setRefreshKey(oldKey => oldKey + 1);
       })
@@ -234,6 +250,15 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
           showModal={showNewFolderModal}
           onCreate={handleCreateNewFolder}
           onClose={() => setShowNewFolderModal(!showNewFolderModal)}
+        />
+        <InputModal
+          title={'Create New File'}
+          description={'You can add a new file to your storage browser'}
+          inputLabel={'Enter file name here'}
+          okText={'Create'}
+          showModal={showNewFileModal}
+          onCreate={handleCreateNewFile}
+          onClose={() => setShowNewFileModal(!showNewFileModal)}
         />
       </div>
     </Spin>
