@@ -21,6 +21,8 @@ import { PathAndFileData } from './types';
 const FILESYSTEMS_API_URL = '/api/v1/storage/filesystems';
 const VIEWFILES_API_URl = '/api/v1/storage/view=';
 const MAKE_DIRECTORY_API_URL = '/api/v1/storage/mkdir';
+const TOUCH_API_URL = '/api/v1/storage/touch';
+
 export interface ApiFileSystem {
   file_system: string;
   user_home_directory: string;
@@ -71,5 +73,13 @@ export const mkdir = async (folderName: string, path: string): Promise<AxiosResp
   createDirFormData.append('name', folderName);
   createDirFormData.append('path', path);
   const response = await axios.post(MAKE_DIRECTORY_API_URL, createDirFormData);
+  return response;
+};
+
+export const touch = async (fileName: string, path: string): Promise<AxiosResponse> => {
+  const touchFormData = new FormData();
+  touchFormData.append('name', fileName);
+  touchFormData.append('path', path);
+  const response = await axios.post(TOUCH_API_URL, touchFormData);
   return response;
 };
