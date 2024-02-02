@@ -1429,7 +1429,7 @@ ${ commonshare() | n,unicode }
   };
 
   function showAlert(msg) {
-    $(document).trigger("info", msg);
+    huePubSub.publish('hue.global.info', { message: msg });
   }
 
 </script>
