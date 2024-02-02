@@ -219,6 +219,11 @@ def storage_mkdir(request):
   django_request = get_django_request(request)
   return filebrowser_api.mkdir(django_request)
 
+@api_view(["POST"])
+def storage_touch(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.touch(django_request)
+
 
 # Importer
 
