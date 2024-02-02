@@ -138,6 +138,7 @@ const StorageBrowserTable: React.FC<StorageBrowserTableProps> = ({
       onClick: () => {
         if (record.type === 'dir') {
           onFilepathChange(record.path);
+          onPageNumberChange(1);
         }
         //TODO: handle onclick file
       }
