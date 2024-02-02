@@ -97,3 +97,14 @@ def mkdir(request):
   request.fs.mkdir(request.fs.join(path, name))
   return HttpResponse(status=200)
 
+
+@error_handler
+def touch(request):
+  path = request.POST.get('path')
+  name = request.POST.get('name')
+
+  if name and (posixpath.sep in name):
+    raise Exception(_("Error creating %s file. Slashes are not allowed in filename." % name))
+  
+  request.fs.create(request.fs.join(path, name))
+  return HttpResponse(status=200)
