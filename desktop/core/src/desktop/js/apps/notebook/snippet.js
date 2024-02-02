@@ -2692,7 +2692,7 @@ class Snippet {
     self.uploadTableStats = function (options) {
       hueAnalytics.log('notebook', 'load_table_stats');
       if (options.showProgress) {
-        $(document).trigger('info', 'Preparing table data...');
+        huePubSub.publish('hue.global.info', { message: 'Preparing table data...' });
       }
 
       $.post(
@@ -2742,7 +2742,9 @@ class Snippet {
         data => {
           if (data.status == 0) {
             if (showProgress) {
-              $(document).trigger('info', 'Query processing: ' + data.upload_status.status.state);
+              huePubSub.publish('hue.global.info', {
+                message: 'Query processing: ' + data.upload_status.status.state
+              });
             }
             if (['WAITING', 'IN_PROGRESS'].indexOf(data.upload_status.status.state) != -1) {
               window.setTimeout(() => {

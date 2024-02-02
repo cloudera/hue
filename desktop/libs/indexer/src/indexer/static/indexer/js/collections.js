@@ -357,7 +357,7 @@ var EditCollectionViewModel = function() {
       'type': self.sourceType()
     }).done(function(data) {
       if (data.status == 0) {
-        $(document).trigger("info", data.message);
+        huePubSub.publish('hue.global.info', { message: data.message });
       } else {
         huePubSub.publish('hue.global.error', {message: data.message});
       }
@@ -452,7 +452,7 @@ var ManageCollectionsViewModel = function() {
       'collection': ko.mapping.toJSON(collection)
     }).done(function(data) {
       self.isLoading(false);
-      $(document).trigger("info", data.message);
+      huePubSub.publish('hue.global.info', { message: data.message });
       self.fetchCollections();
     })
     .fail(function (xhr, textStatus, errorThrown) {
