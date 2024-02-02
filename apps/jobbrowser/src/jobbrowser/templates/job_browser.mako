@@ -3478,7 +3478,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           });
         } else {
           vm.jobs._control([self.id()], action, function(data) {
-            $(document).trigger("info", data.message);
+            huePubSub.publish('hue.global.info', { message: data.message });
             self.fetchStatus();
           });
         }
@@ -3519,7 +3519,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           "auto_resize_cpu": self.updateClusterAutoResizeCpu()
         }, function(data) {
           console.log(ko.mapping.toJSON(data));
-          ## $(document).trigger("info", ko.mapping.toJSON(data));
+          ## huePubSub.publish('hue.global.info', { message: ko.mapping.toJSON(data) });
           self.updateJob();
         });
       }
@@ -3895,7 +3895,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             "namespace_name": "crn:altus:sdx:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:namespace:analytics/7ea35fe5-dbc9-4b17-92b1-97a1ab32e410"
           }, function(data) {
             console.log(ko.mapping.toJSON(data));
-            $(document).trigger("info", ko.mapping.toJSON(data));
+            huePubSub.publish('hue.global.info', { message: ko.mapping.toJSON(data) });
             self.updateJobs();
             huePubSub.publish('context.catalog.refresh');
           });
@@ -3914,7 +3914,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           }, function(data) {
             console.log(ko.mapping.toJSON(data));
             self.createClusterFormReset();
-            ##$(document).trigger("info", ko.mapping.toJSON(data));
+            ##huePubSub.publish('hue.global.info', { message: ko.mapping.toJSON(data) });
             self.updateJobs();
             huePubSub.publish('context.catalog.refresh');
           });
@@ -3957,7 +3957,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             }),
             action,
             function(data) {
-              $(document).trigger("info", data.message);
+              huePubSub.publish('hue.global.info', { message: data.message });
               self.updateJobs();
             }
           )

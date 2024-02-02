@@ -502,7 +502,7 @@ class Role {
           },
           data => {
             if (data.status === 0) {
-              $(document).trigger('info', data.message);
+              huePubSub.publish('hue.global.info', { message: data.message });
               vm.showCreateRole(false);
               self.reset();
               const role = new Role(vm, data.role);
@@ -535,7 +535,7 @@ class Role {
           },
           data => {
             if (data.status === 0) {
-              $(document).trigger('info', data.message);
+              huePubSub.publish('hue.global.info', { message: data.message });
               vm.showCreateRole(false);
               vm.listSentryPrivilegesByAuthorizable();
               $(document).trigger('createdRole');
