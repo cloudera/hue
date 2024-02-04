@@ -17,6 +17,7 @@
 
 import logging
 import posixpath
+import os
 
 from django.http import HttpResponse
 from django.utils.translation import gettext as _
@@ -107,4 +108,23 @@ def touch(request):
     raise Exception(_("Error creating %s file. Slashes are not allowed in filename." % name))
   
   request.fs.create(request.fs.join(path, name))
+  return HttpResponse(status=200)
+
+@error_handler
+def rename(request):
+  src_path = request.POST.get('src_path')
+  dest_path = request.POST.get('dest_path')
+
+  """If dest_path doesn't have a directory specified, use same dir."""
+  if "#" in dest_path:
+    raise Exception(_(
+      "Error renaming %s to %s. Hashes are not allowed in file or directory names." % (os.path.basename(src_path), dest_path)
+      ))
+  if "/" not in dest_path:
+    src_dir = os.path.dirname(src_path)
+    dest_path = request.fs.join(src_dir, dest_path)
+  if request.fs.exists(dest_path):
+    raise Exception(_('The destination path "%s" already exists.') % dest_path)
+
+  request.fs.rename(src_path, dest_path)
   return HttpResponse(status=200)
