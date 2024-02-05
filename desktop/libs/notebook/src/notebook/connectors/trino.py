@@ -302,8 +302,13 @@ class TrinoApi(Api):
     query_client = TrinoQuery(self.db, 'SHOW TABLES')
     response = query_client.execute()
     tables = response.rows
-
-    return tables
+    return [{
+        'name': table[0],
+        'type': 'table',
+        'comment': '',
+      }
+      for table in tables
+    ]
 
 
   def _get_columns(self, database, table):
