@@ -115,14 +115,16 @@ def rename(request):
   src_path = request.POST.get('src_path')
   dest_path = request.POST.get('dest_path')
 
-  """If dest_path doesn't have a directory specified, use same dir."""
   if "#" in dest_path:
     raise Exception(_(
       "Error renaming %s to %s. Hashes are not allowed in file or directory names." % (os.path.basename(src_path), dest_path)
       ))
+
+  # If dest_path doesn't have a directory specified, use same dir.
   if "/" not in dest_path:
     src_dir = os.path.dirname(src_path)
     dest_path = request.fs.join(src_dir, dest_path)
+
   if request.fs.exists(dest_path):
     raise Exception(_('The destination path "%s" already exists.') % dest_path)
 
