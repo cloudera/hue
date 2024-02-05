@@ -244,7 +244,6 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
         />
         <InputModal
           title={'Create New Folder'}
-          description={'You can add a new folder to your storage browser'}
           inputLabel={'Enter folder name here'}
           okText={'Create'}
           showModal={showNewFolderModal}
@@ -253,7 +252,6 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
         />
         <InputModal
           title={'Create New File'}
-          description={'You can add a new file to your storage browser'}
           inputLabel={'Enter file name here'}
           okText={'Create'}
           showModal={showNewFileModal}

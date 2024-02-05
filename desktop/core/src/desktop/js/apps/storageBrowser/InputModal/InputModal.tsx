@@ -22,9 +22,7 @@ import './InputModal.scss';
 
 interface InputModalProps {
   cancelText?: string;
-  description: string;
   inputLabel: string;
-  inputPlaceholder?: string;
   okText?: string;
   onClose: () => void;
   onCreate: (name: string) => void;
@@ -34,15 +32,12 @@ interface InputModalProps {
 
 const defaultProps = {
   cancelText: 'Cancel',
-  inputPlaceholder: 'Enter text here',
   okText: 'Submit'
 };
 
 const InputModal: React.FC<InputModalProps> = ({
   cancelText,
-  description,
   inputLabel,
-  inputPlaceholder,
   okText,
   onClose,
   onCreate,
@@ -69,7 +64,6 @@ const InputModal: React.FC<InputModalProps> = ({
       open={showModal}
       title={t(title)}
     >
-      <div className="hue-input-modal__description">{t(description)}</div>
       <div className="hue-input-modal__input-label">{t(inputLabel)}</div>
       <Input
         className="hue-input-modal__input"
@@ -77,7 +71,6 @@ const InputModal: React.FC<InputModalProps> = ({
         onInput={e => {
           setTextInput((e.target as HTMLInputElement).value);
         }}
-        placeholder={t(inputPlaceholder)}
       />
     </Modal>
   );
