@@ -224,6 +224,10 @@ def storage_touch(request):
   django_request = get_django_request(request)
   return filebrowser_api.touch(django_request)
 
+@api_view(["POST"])
+def storage_rename(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.rename(django_request)
 
 # Importer
 
