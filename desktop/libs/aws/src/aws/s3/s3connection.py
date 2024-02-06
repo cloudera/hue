@@ -42,16 +42,26 @@ from desktop.lib.raz.clients import S3RazClient
 LOG = logging.getLogger()
 
 
-class SignedUrlS3Connection(S3Connection):
+class RazS3Connection(S3Connection):
   """
-  Contact S3 via a presigned Url of the resource hence not requiring any S3 credentials.
+  Class asking a RAZ server presigned Urls for all the operations on S3 resources hence not requiring any S3 credentials.
+  Some operations can be denied depending on the privileges of the users in Ranger.
 
-  This is a client replacing the building of the Http Request of the S3 resource via asking a third party providing for a presigned Urls.
+  This client replaces the building of the Http Request of the S3 resource via asking RAZ for presigned URLs.
   The request information is then injected into the regular boto HTTPRequest as the format is the same. Raw calls via the requests
   lib would work but the unmarshalling back from XML to boto2 Python object is tedious.
 
+  It fills-up the boto HttpRequest with the presigned URL data and lets boto executes the request as usual,
+  so that we get the XML unmarshalling for free.
+
+  Flow:
+    1. signed_url = self.get_signed_url(/bucket/dir/key)
+    2. request = http_request(signed_url)
+    3. return self._mexe(requests)
+
   The main logic consists in some light overrides in S3Connection#make_request() and AWSAuthConnection#make_request() so that we
   send an updated HTTPRequest.
+
   https://github.com/boto/boto/blob/develop/boto/s3/connection.py
   https://github.com/boto/boto/blob/develop/boto/connection.py
 
@@ -72,7 +82,7 @@ class SignedUrlS3Connection(S3Connection):
     # No auth handler with RAZ
     anon = RAZ.IS_ENABLED.get()
 
-    super(SignedUrlS3Connection, self).__init__(
+    super(RazS3Connection, self).__init__(
       aws_access_key_id=aws_access_key_id, aws_secret_access_key=aws_secret_access_key,
                 is_secure=is_secure, port=port, proxy=proxy, proxy_port=proxy_port,
                 proxy_user=proxy_user, proxy_pass=proxy_pass,
@@ -82,20 +92,6 @@ class SignedUrlS3Connection(S3Connection):
                 suppress_consec_slashes=suppress_consec_slashes, anon=anon,
                 validate_certs=validate_certs, profile_name=profile_name)
 
-
-class RazS3Connection(SignedUrlS3Connection):
-  """
-  Class asking a RAZ server presigned Urls for all the operations on S3 resources.
-  Some operations can be denied depending on the privileges of the users in Ranger.
-
-  Then fill-up the boto HttpRequest with the presigned Url data and lets boto executes the request as usual,
-  so that we get the XML unmarshalling for free.
-
-  Flow:
-    1. signed_url = self.get_signed_url(/bucket/dir/key)
-    2. request = http_request(signed_url)
-    3. return self._mexe(requests)
-  """
 
   def make_request(self, method, bucket='', key='', headers=None, data='',
                     query_args=None, sender=None, override_num_retries=None,
@@ -159,19 +155,20 @@ class RazS3Connection(SignedUrlS3Connection):
 
     return raz_client.get_url(action, url, headers, data)
 
-  '''
-  Force AnonAuthHandler when Raz is enabled
 
-  We want to always use AnonAuthHandler when Raz is enabled and that is what gets used in most cases,
-  except for some regions.
-  
-  S3Connection._required_auth_capability() has a decorator @detect_potential_s3sigv4 that overrides
-  the default func (which works correctly) for certain regions (boto.auth.SIGV4_DETECT). This breaks
-  Raz regions cn-*, eu-central, ap-northeast-2, ap-south-1, us-east-2, ca-central and eu-west-2.
-  We end up using auth.S3HmacAuthV4Handler rather than AnonAuthHandler for these regions and therefore fail.
-  
-  This function overrides skips the @detect_potential_s3sigv4 decorator from S3Connection super class
-  and forces the use of AnonAuthHandler.
-  '''
   def _required_auth_capability(self):
+    """
+    Force AnonAuthHandler when Raz is enabled
+
+    We want to always use AnonAuthHandler when Raz is enabled and that is what gets used in most cases,
+    except for some regions.
+
+    S3Connection._required_auth_capability() has a decorator @detect_potential_s3sigv4 that overrides
+    the default func (which works correctly) for certain regions (boto.auth.SIGV4_DETECT). This breaks
+    Raz regions cn-*, eu-central, ap-northeast-2, ap-south-1, us-east-2, ca-central and eu-west-2.
+    We end up using auth.S3HmacAuthV4Handler rather than AnonAuthHandler for these regions and therefore fail.
+
+    This function overrides skips the @detect_potential_s3sigv4 decorator from S3Connection super class
+    and forces the use of AnonAuthHandler.
+    """
     return ['anon']

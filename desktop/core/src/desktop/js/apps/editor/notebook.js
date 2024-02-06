@@ -331,7 +331,7 @@ export default class Notebook {
         this.isSaved(true);
         const wasHistory = this.isHistory();
         this.isHistory(false);
-        $(document).trigger('info', data.message);
+        huePubSub.publish('hue.global.info', { message: data.message });
         if (editorMode) {
           huePubSub.publish(UPDATE_SAVED_QUERIES_EVENT, data);
 
