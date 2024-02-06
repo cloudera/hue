@@ -28,21 +28,28 @@ from desktop.lib.raz.clients import GSRazClient
 LOG = logging.getLogger()
 
 
-class SignedUrlGSConnection(GSConnection):
+class RazGSConnection(GSConnection):
   """
-  Contact GS via a presigned Url of the resource hence not requiring any GS credentials.
+  Class asking a RAZ server presigned URLs for all the operations on GS resources hence not requiring any GS credentials.
+  Some operations can be denied depending on the privileges of the users in Ranger.
 
-  This is a client replacing the building of the Http Request of the GS resource via asking a third party providing for a presigned Urls.
+  This client replaces the building of the Http Request of the GS resource via asking RAZ for presigned URLs.
   The request information is then injected into the regular boto HTTPRequest as the format is the same. Raw calls via the requests
   lib would work but the unmarshalling back from XML to boto2 Python object is tedious.
 
-  The main logic consists in some light overrides in S3Connection#make_request() and AWSAuthConnection#make_request() so that we
-  send an updated HTTPRequest.
-  https://github.com/boto/boto/blob/develop/boto/s3/connection.py
-  https://github.com/boto/boto/blob/develop/boto/connection.py
+  Then fill-up the boto HttpRequest with the presigned Url data and lets boto executes the request as usual,
+  so that we get the XML unmarshalling for free.
 
-  Example of a presigned GS Url declaring a `list bucket` call:
-  https://hue-gs-bucket.storage.googleapis.com/?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA23E77ZX2HVY76YGL%2F20210505%2Fus-west-1%2Fs3%2Faws4_request&X-Amz-Date=20210505T171457Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=994d0ec2ca19a00aa2925fe62cab0e727591b1951a8a47504b2b9124facbd6cf
+  Flow:
+    1. signed_url = self.get_signed_url(/bucket/dir/key)
+    2. request = http_request(signed_url)
+    3. return self._mexe(requests)
+  
+  The main logic consists in some light overrides in GSConnection#make_request() and AWSAuthConnection#make_request() so that we
+  send an updated HTTPRequest.
+
+  https://github.com/boto/boto/blob/develop/boto/gs/connection.py
+  https://github.com/boto/boto/blob/develop/boto/connection.py
   """
   def __init__(self, username, gs_access_key_id=None, gs_secret_access_key=None,
                 is_secure=True, port=None, proxy=None, proxy_port=None,
@@ -56,7 +63,7 @@ class SignedUrlGSConnection(GSConnection):
     # No auth handler with RAZ
     anon = RAZ.IS_ENABLED.get()
 
-    super(SignedUrlGSConnection, self).__init__(
+    super(GSConnection, self).__init__(
       gs_access_key_id=gs_access_key_id, gs_secret_access_key=gs_secret_access_key,
       is_secure=is_secure, port=port, proxy=proxy, proxy_port=proxy_port,
       proxy_user=proxy_user, proxy_pass=proxy_pass,
@@ -65,20 +72,6 @@ class SignedUrlGSConnection(GSConnection):
       suppress_consec_slashes=suppress_consec_slashes, anon=anon
     )
 
-
-class RazGSConnection(SignedUrlGSConnection):
-  """
-  Class asking a RAZ server presigned Urls for all the operations on GS resources.
-  Some operations can be denied depending on the privileges of the users in Ranger.
-
-  Then fill-up the boto HttpRequest with the presigned Url data and lets boto executes the request as usual,
-  so that we get the XML unmarshalling for free.
-
-  Flow:
-    1. signed_url = self.get_signed_url(/bucket/dir/key)
-    2. request = http_request(signed_url)
-    3. return self._mexe(requests)
-  """
 
   def make_request(self, method, bucket='', key='', headers=None, data='',
                     query_args=None, sender=None, override_num_retries=None,
