@@ -2162,7 +2162,7 @@ else:
                   
                 }
                 else {
-                  huePubSub.publish('hue.global.info', {message: response.path + "${ _(' uploaded successfully.') }");
+                  huePubSub.publish('hue.global.info', {message: response.path + "${ _(' uploaded successfully.') }"});
                   self.filesToHighlight.push(response.path);
                 }
                 if (self.pendingUploads() == 0) {
