@@ -63,7 +63,7 @@ class RazGSConnection(GSConnection):
     # No auth handler with RAZ
     anon = RAZ.IS_ENABLED.get()
 
-    super(GSConnection, self).__init__(
+    super(RazGSConnection, self).__init__(
       gs_access_key_id=gs_access_key_id, gs_secret_access_key=gs_secret_access_key,
       is_secure=is_secure, port=port, proxy=proxy, proxy_port=proxy_port,
       proxy_user=proxy_user, proxy_pass=proxy_pass,
