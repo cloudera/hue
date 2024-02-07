@@ -16,7 +16,6 @@
 import React, { useState } from 'react';
 import Modal from 'cuix/dist/components/Modal';
 import { Input } from 'antd';
-import { i18nReact } from '../../../utils/i18nReact';
 
 import './InputModal.scss';
 
@@ -44,14 +43,13 @@ const InputModal: React.FC<InputModalProps> = ({
   showModal,
   title
 }): JSX.Element => {
-  const { t } = i18nReact.useTranslation();
   const [textInput, setTextInput] = useState<string>('');
 
   return (
     <Modal
-      cancelText={t(cancelText)}
+      cancelText={cancelText}
       className="hue-input-modal"
-      okText={t(okText)}
+      okText={okText}
       onCancel={() => {
         setTextInput('');
         onClose();
@@ -62,9 +60,9 @@ const InputModal: React.FC<InputModalProps> = ({
         onClose();
       }}
       open={showModal}
-      title={t(title)}
+      title={title}
     >
-      <div className="hue-input-modal__input-label">{t(inputLabel)}</div>
+      <div className="hue-input-modal__input-label">{inputLabel}</div>
       <Input
         className="hue-input-modal__input"
         value={textInput}
