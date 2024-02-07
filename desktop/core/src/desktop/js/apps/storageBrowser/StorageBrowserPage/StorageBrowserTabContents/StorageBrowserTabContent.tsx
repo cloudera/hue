@@ -252,20 +252,20 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
           sortOrder={sortOrder}
         />
         <InputModal
-          title={'Create New Folder'}
-          inputLabel={'Enter folder name here'}
-          okText={'Create'}
+          title={t('Create New Folder')}
+          inputLabel={t('Enter folder name here')}
+          okText={t('Create')}
           showModal={showNewFolderModal}
           onCreate={handleCreateNewFolder}
-          onClose={() => setShowNewFolderModal(!showNewFolderModal)}
+          onClose={() => setShowNewFolderModal(false)}
         />
         <InputModal
-          title={'Create New File'}
-          inputLabel={'Enter file name here'}
-          okText={'Create'}
+          title={t('Create New File')}
+          inputLabel={t('Enter file name here')}
+          okText={t('Create')}
           showModal={showNewFileModal}
           onCreate={handleCreateNewFile}
-          onClose={() => setShowNewFileModal(!showNewFileModal)}
+          onClose={() => setShowNewFileModal(false)}
         />
       </div>
     </Spin>
