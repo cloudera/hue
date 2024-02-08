@@ -18,6 +18,7 @@
 # HUE_CONF_DIR=/etc/hue/conf HUE_IGNORE_PASSWORD_SCRIPT_ERRORS=1 /opt/hive/build/env/bin/hue sync_warehouses
 
 from beeswax import models
+from beeswax.conf import AUTH_USERNAME, AUTH_PASSWORD
 from django.core.management.base import BaseCommand
 from hadoop import confparse
 import json
@@ -131,6 +132,8 @@ def update_hive_configs(namespace, hive, host, port=80):
     {"name": "server_port", "value": port},
     {"name": "transport_mode", "value": 'http'},
     {"name": "http_url", "value": 'http://%s:%s/cliservice' % (host, port)},
+    {"name": "auth_username", "value": AUTH_USERNAME.get()},
+    {"name": "auth_password", "value": AUTH_PASSWORD.get()},
     {"name": "is_llap", "value": False},
     {"name": "use_sasl", "value": True},
     {"name": "hive_metastore_uris", "value": hive_metastore_uris},
