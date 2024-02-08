@@ -18,22 +18,20 @@
 
 import React from 'react';
 import SyntaxHighlighter from 'react-syntax-highlighter';
-import {
-  stackoverflowDark,
-  stackoverflowLight
-} from 'react-syntax-highlighter/dist/esm/styles/hljs';
+import { stackoverflowDark } from 'react-syntax-highlighter/dist/esm/styles/hljs';
+import { fluidxRed800, fluidxSlate600 } from '@cloudera/cuix-core/variables';
+
 import { diffLines, Change } from 'diff';
 import classNames from 'classnames';
 
 import './SyntaxHighlighterDiff.scss';
 
-const DIFF_STYLE = {
-  row: 'hue-syntax-highlighter-diff__row',
-  rowEmpty: 'hue-syntax-highlighter-diff__row--empty',
-  rowAdded: 'hue-syntax-highlighter-diff__row--added',
-  rowDeleted: 'hue-syntax-highlighter-diff__row--deleted'
+export const DIFF_INLINE_STYLE = {
+  row: { display: 'block' },
+  rowEmpty: { backgroundColor: '#212c35' },
+  rowAdded: { backgroundColor: fluidxSlate600 },
+  rowDeleted: { backgroundColor: fluidxRed800 }
 };
-
 const alignLineNumbers = (lineNumber, maxNumberOfLines) => {
   const maxLineNumberCharCount = maxNumberOfLines.toString().length;
   const lineNumberCharCount = lineNumber.toString().length;
@@ -42,9 +40,18 @@ const alignLineNumbers = (lineNumber, maxNumberOfLines) => {
   return `${lineNumber}${spacesToAdd}`;
 };
 
-const SyntaxHighlighterDiff = ({ newCode, oldCode, lineNumberStart = 1 }) => {
+interface SyntaxHighlighterDiffProps {
+  newCode: string;
+  oldCode: string;
+  lineNumberStart?: number;
+}
+const SyntaxHighlighterDiff = ({
+  newCode,
+  oldCode,
+  lineNumberStart = 1
+}: SyntaxHighlighterDiffProps): JSX.Element => {
   const diff = diffLines(oldCode, newCode);
-  const maxNumberOfLines = diff.reduce((total, obj) => total + obj.count, 0);
+  const maxNumberOfLines = diff.reduce((total, obj) => total + (obj.count || 1), 0);
   const maxLineNumber = maxNumberOfLines + lineNumberStart;
   const lineColumnNew: string[] = [];
   const lineColumnOld: string[] = [];
@@ -53,8 +60,9 @@ const SyntaxHighlighterDiff = ({ newCode, oldCode, lineNumberStart = 1 }) => {
   let previousLinesNew = lineNumberStart;
   let previousLinesOld = lineNumberStart;
 
-  diff.forEach((part: Change, index: number) => {
+  diff.forEach((part: Change) => {
     const { removed, added, count } = part;
+    const safeCount = count || 1;
     const lines = part.value.split('\n');
 
     lines.forEach((line, index) => {
@@ -81,25 +89,28 @@ const SyntaxHighlighterDiff = ({ newCode, oldCode, lineNumberStart = 1 }) => {
       }
     });
     if (!added && !removed) {
-      previousLinesOld += count;
-      previousLinesNew += count;
+      previousLinesOld += safeCount;
+      previousLinesNew += safeCount;
     } else if (!added) {
-      previousLinesOld += count;
+      previousLinesOld += safeCount;
     } else if (!removed) {
-      previousLinesNew += count;
+      previousLinesNew += safeCount;
     }
   });
 
-  const renderModifiedLineNumberColumn = lineColum => {
+  const renderModifiedLineNumberColumn = (lineColum, type) => {
     return (
-      <pre className={classNames('hue-syntax-highlighter-diff__line-numbers', {})}>
+      <pre
+        data-testid={`syntax-highlighter-row-nr-col-${type}`}
+        className={classNames('hue-syntax-highlighter-diff__line-numbers', {})}
+      >
         {lineColum.map(val => {
-          const className = classNames({
-            [DIFF_STYLE.rowAdded]: val.includes('+'),
-            [DIFF_STYLE.rowDeleted]: val.includes('-'),
-            [DIFF_STYLE.rowEmpty]: val === ''
-          });
-          return <div className={className}>{val ? val : ' '}</div>;
+          const style = {
+            ...(val.includes('+') ? DIFF_INLINE_STYLE.rowAdded : {}),
+            ...(val.includes('-') ? DIFF_INLINE_STYLE.rowDeleted : {}),
+            ...(val === '' ? DIFF_INLINE_STYLE.rowEmpty : {})
+          };
+          return <div style={style}>{val ? val : ' '}</div>;
         })}
       </pre>
     );
@@ -112,8 +123,9 @@ const SyntaxHighlighterDiff = ({ newCode, oldCode, lineNumberStart = 1 }) => {
 
     return (
       <div className="hue-syntax-highlighter-diff__container">
-        {renderModifiedLineNumberColumn(lineColum)}
+        {renderModifiedLineNumberColumn(lineColum, type)}
         <SyntaxHighlighter
+          data-testid={`syntax-highlighter-${type}`}
           className={classNames('hue-syntax-highlighter-diff__code', {})}
           language="SQL"
           style={stackoverflowDark}
@@ -121,7 +133,7 @@ const SyntaxHighlighterDiff = ({ newCode, oldCode, lineNumberStart = 1 }) => {
             backgroundColor: 'initial',
             padding: 'initial'
           }}
-          lineProps={() => {
+          lineProps={(): React.HTMLProps<HTMLElement> => {
             const line = formattedDiff[lineNumber - 1];
             const diffLine = diff.find(part => {
               const lines: Array<string> = part.value.split('\n');
@@ -130,18 +142,17 @@ const SyntaxHighlighterDiff = ({ newCode, oldCode, lineNumberStart = 1 }) => {
                 return currLine === line;
               });
             });
-
-            const htmlClassname = [
-              DIFF_STYLE.row,
-              !diffLine ? DIFF_STYLE.rowEmpty : '',
-              diffLine?.added ? DIFF_STYLE.rowAdded : '',
-              diffLine?.removed ? DIFF_STYLE.rowDeleted : ''
-            ]
-              .filter(Boolean)
-              .join(' ');
+            const style = {
+              ...DIFF_INLINE_STYLE.row,
+              ...(!diffLine ? DIFF_INLINE_STYLE.rowEmpty : {}),
+              ...(diffLine?.added ? DIFF_INLINE_STYLE.rowAdded : {}),
+              ...(diffLine?.removed ? DIFF_INLINE_STYLE.rowDeleted : {})
+            };
 
             lineNumber++;
-            return { class: htmlClassname };
+            // Can't use className prop because of this issue, so styling is set here in JS code
+            // https://github.com/react-syntax-highlighter/react-syntax-highlighter/issues/391
+            return { style };
           }}
           wrapLines={true}
         >
