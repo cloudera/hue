@@ -34,6 +34,7 @@
     "@cloudera/cuix-core": "file:desktop/core/src/desktop/static/desktop/ext/cuix/cloudera-cuix-core-1.0.6.tgz",
     "@gethue/sql-formatter": "4.0.3",
     "@selectize/selectize": "0.14.0",
+    "@types/diff": "5.0.9",
     "antd": "4.24.5",
     "axios": "0.24.0",
     "babel-preset-react-app": "3.1.2",
