@@ -56,21 +56,5 @@
       padding-left: 0;
       flex-grow: 1;
     }
-
-    .hue-syntax-highlighter-diff__row {
-      display: block;
-    }
-
-    .hue-syntax-highlighter-diff__row--added {
-      background-color: vars.$fluidx-slate-600;
-    }
-
-    .hue-syntax-highlighter-diff__row--deleted {
-      background-color: vars.$fluidx-red-800;
-    }
-
-    .hue-syntax-highlighter-diff__row--empty {
-      background-color: #212c35;
-    }
   }
 }
