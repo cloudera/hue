@@ -17,7 +17,7 @@
 */
 
 import { useState } from 'react';
-import { format } from 'sql-formatter';
+import { format, KeywordCase } from 'sql-formatter';
 
 import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
 
@@ -95,11 +95,11 @@ const includeNqlAsComment = ({ oldSql, newSql, nql, includeNql, replaceNql }) =>
   return addComment ? sqlWithNqlComment : newSql;
 };
 
-export const removeComments = (statement: string) => {
+export const removeComments = (statement: string): string => {
   return statement.replace(SINGLE_LINE_COMMENT_REGEX, '').replace(multiLineCommentRegex, '');
 };
 
-export const formatClean = (sql: string, dialect: string) => {
+export const formatClean = (sql: string, dialect: string): string => {
   const cleanedSql = removeComments(sql).trim();
   let newFormat = sql;
   try {
@@ -132,7 +132,27 @@ export interface FormattingConfig {
   replaceNql: boolean;
 }
 
-export const useFormatting = ({ dialect, keywordCase, oldSql, newSql, nql }) => {
+interface useFormattingProps {
+  dialect: string;
+  keywordCase: KeywordCase;
+  oldSql: string;
+  newSql: string;
+  nql: string;
+  preventAutoFormat: boolean;
+}
+export const useFormatting = ({
+  dialect,
+  keywordCase,
+  oldSql,
+  newSql,
+  nql,
+  preventAutoFormat
+}: useFormattingProps): {
+  formattingConfig: FormattingConfig;
+  updateFormattingSettings: (newSettings: FormattingConfig) => void;
+  suggestion: string;
+  showDiffFrom: string;
+} => {
   const defaultConfig: FormattingConfig = {
     autoFormat: true,
     includeNql: true,
@@ -140,7 +160,12 @@ export const useFormatting = ({ dialect, keywordCase, oldSql, newSql, nql }) => 
   };
 
   const savedConfiguration = getFromLocalStorage(LOCAL_STORAGE_KEY, defaultConfig);
-  const [formattingConfig, setFormattingConfig] = useState<FormattingConfig>(savedConfiguration);
+  const overriddenConfiguration = {
+    ...savedConfiguration,
+    autoFormat: preventAutoFormat ? false : savedConfiguration.autoFormat
+  };
+  const [formattingConfig, setFormattingConfig] =
+    useState<FormattingConfig>(overriddenConfiguration);
   const { autoFormat, includeNql, replaceNql } = formattingConfig;
 
   const updateFormattingSettings = (newSettings: FormattingConfig) => {

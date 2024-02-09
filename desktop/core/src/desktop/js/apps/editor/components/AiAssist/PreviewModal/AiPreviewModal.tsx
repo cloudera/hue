@@ -29,7 +29,7 @@ import SyntaxHighlighterDiff from '../SyntaxHighlighterDiff/SyntaxHighlighterDif
 import InlineAlertCheck from '../InlineAlertCheck/InlineAlertCheck';
 import { AiBarActionType } from '../AiAssistBar';
 
-import { useFormatting, formatClean } from './formattingUtils';
+import { useFormatting, formatClean, removeComments } from './formattingUtils';
 import PreviewInfoPanels from './PreviewInfoPanels/PreviewInfoPanels';
 import PreviewWarningPanels from './PreviewWarningPanels/PreviewWarningPanels';
 import PreviewModalFooter from './PreviewModalFooter/PreviewModalFooter';
@@ -37,9 +37,19 @@ import SqlPreviewConfig from './SqlPreviewConfig/SqlPreviewConfig';
 
 import './AiPreviewModal.scss';
 
-const hasDiff = (codeA: string, codeB: string, dialect: string): boolean => {
-  const cleanNew = formatClean(codeA, dialect);
-  const cleanOld = formatClean(codeB, dialect);
+const hasDiff = ({
+  newCode,
+  oldCode,
+  dialect,
+  preserveOldCodeFormat = false
+}: {
+  newCode: string;
+  oldCode: string;
+  dialect: string;
+  preserveOldCodeFormat: boolean;
+}): boolean => {
+  const cleanNew = formatClean(newCode, dialect);
+  const cleanOld = preserveOldCodeFormat ? removeComments(oldCode) : formatClean(oldCode, dialect);
   return cleanNew !== cleanOld;
 };
 
@@ -86,11 +96,18 @@ const PreviewModal = ({
     keywordCase,
     oldSql: showDiffFromRaw,
     newSql: suggestionRaw,
-    nql
+    nql,
+    preventAutoFormat: actionType === 'fix'
   });
 
   if (actionType === 'optimize' || actionType === 'fix' || actionType === 'edit') {
-    const diffDetected = hasDiff(suggestionRaw, showDiffFromRaw, dialect);
+    const oldCodeHasSyntaxError = actionType === 'fix';
+    const diffDetected = hasDiff({
+      newCode: suggestionRaw,
+      oldCode: showDiffFromRaw,
+      dialect,
+      preserveOldCodeFormat: oldCodeHasSyntaxError
+    });
     if (!diffDetected) {
       return (
         <Modal
