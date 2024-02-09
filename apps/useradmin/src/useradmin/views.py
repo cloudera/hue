@@ -445,47 +445,6 @@ def edit_user(request, username=None):
         'is_embeddable': is_embeddable
       })
 
-# @user_passes_test(lambda u: u.is_superuser)
-# def document_cleanup(request):
-#   try:
-#     # Call the cleanup script
-#     command = ["./build/env/bin/hue", "desktop_document_cleanup", "--keep-days", "1", "--cm-managed"]
-#     subprocess.run(command, check=True, env={"DESKTOP_DEBUG": "True"})
-#     return HttpResponse("Cleanup successful")
-#   except subprocess.CalledProcessError as e:
-#     return HttpResponse(f"An error occurred: {e}", status=500)
-
-import os
-from subprocess import call, CalledProcessError
-from django.http import HttpResponse
-from django.contrib.auth.decorators import user_passes_test
-
-HUE_DIR = '/Users/aselvam/Desktop/work_cloudera/hues/cdh/hue'  # Replace with the actual path to your Hue directory
-
-
-@user_passes_test(lambda u: u.is_superuser)
-def document_cleanup(request):
-  # Set the necessary environment variables
-  os.environ['DESKTOP_DEBUG'] = 'True'
-
-  # Change to the Hue directory
-  os.chdir(HUE_DIR)
-
-  # Run the script
-  try:
-    result = call(["./build/env/bin/hue", "desktop_document_cleanup", "--keep-days", "1"])
-    # result = call(["./build/env/bin/hue", "desktop_document_cleanup", "--keep-days", "1", "--cm-managed"])
-
-    if result == 0:
-      return HttpResponse("Cleanup successful")
-    else:
-      return HttpResponse("An error occurred during cleanup", status=500)
-  except CalledProcessError as e:
-    return HttpResponse(f"An error occurred during cleanup: {str(e)}", status=500)
-  except FileNotFoundError:
-    return HttpResponse("Hue executable not found", status=500)
-
-
 def edit_group(request, name=None):
   """
   edit_group(request, name = None) -> reply
