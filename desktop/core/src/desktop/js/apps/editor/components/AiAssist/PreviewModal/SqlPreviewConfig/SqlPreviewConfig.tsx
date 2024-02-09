@@ -34,17 +34,19 @@ const SqlPreviewConfig = ({
   formattingConfig,
   updateFormattingConfig,
   actionType
-}: SqlPreviewConfigProps) => {
+}: SqlPreviewConfigProps): JSX.Element => {
   const { autoFormat, includeNql, replaceNql } = formattingConfig;
   return (
     <div className="hue-sql-preview-config">
       <Switch
+        disabled={actionType === 'fix'}
         checked={autoFormat}
         onChange={(autoFormat: boolean) => {
           updateFormattingConfig({ ...formattingConfig, autoFormat });
         }}
         className="hue-sql-preview-config__switch"
         label="Autoformat SQL"
+        title={actionType === 'fix' ? 'Autoformat is not available for SQL containing errors' : ''}
       />
       {(actionType === 'edit' || actionType === 'generate') && (
         <>
