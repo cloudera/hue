@@ -104,13 +104,17 @@ const SyntaxHighlighterDiff = ({
         data-testid={`syntax-highlighter-row-nr-col-${type}`}
         className={classNames('hue-syntax-highlighter-diff__line-numbers', {})}
       >
-        {lineColum.map(val => {
+        {lineColum.map((val, index) => {
           const style = {
             ...(val.includes('+') ? DIFF_INLINE_STYLE.rowAdded : {}),
             ...(val.includes('-') ? DIFF_INLINE_STYLE.rowDeleted : {}),
             ...(val === '' ? DIFF_INLINE_STYLE.rowEmpty : {})
           };
-          return <div style={style}>{val ? val : ' '}</div>;
+          return (
+            <div key={index} style={style}>
+              {val ? val : ' '}
+            </div>
+          );
         })}
       </pre>
     );
