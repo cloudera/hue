@@ -108,7 +108,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps): JSX.Element => {
   const { firstLine, lastLine } = getSelectedLineNumbers(parsedStatement);
 
   const [isExpanded, setIsExpanded] = useState(
-    getFromLocalStorage('hue.aiAssistBar.isExpanded', false)
+    getFromLocalStorage('hue.aiAssistBar.isExpanded', true)
   );
   const [isAnimating, setIsAnimating] = useState<'no' | 'expand' | 'contract'>('no');
   const [isEditMode, setIsEditMode] = useState(false);
