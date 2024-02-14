@@ -20,35 +20,39 @@ import React from 'react';
 import Switch from 'cuix/dist/components/Switch';
 
 import { FormattingConfig } from '../formattingUtils';
-import { AiBarActionType } from '../../AiAssistBar';
+import { AiActionModes } from '../../AiAssistBar';
 
 import './SqlPreviewConfig.scss';
 
 export interface SqlPreviewConfigProps {
   formattingConfig: FormattingConfig;
   updateFormattingConfig: (FormattingConfig) => void;
-  actionType: AiBarActionType;
+  actionMode: AiActionModes;
 }
 
 const SqlPreviewConfig = ({
   formattingConfig,
   updateFormattingConfig,
-  actionType
+  actionMode
 }: SqlPreviewConfigProps): JSX.Element => {
   const { autoFormat, includeNql, replaceNql } = formattingConfig;
   return (
     <div className="hue-sql-preview-config">
       <Switch
-        disabled={actionType === 'fix'}
+        disabled={actionMode === AiActionModes.FIX}
         checked={autoFormat}
         onChange={(autoFormat: boolean) => {
           updateFormattingConfig({ ...formattingConfig, autoFormat });
         }}
         className="hue-sql-preview-config__switch"
         label="Autoformat SQL"
-        title={actionType === 'fix' ? 'Autoformat is not available for SQL containing errors' : ''}
+        title={
+          actionMode === AiActionModes.FIX
+            ? 'Autoformat is not available for SQL containing errors'
+            : ''
+        }
       />
-      {(actionType === 'edit' || actionType === 'generate') && (
+      {(actionMode === AiActionModes.EDIT || actionMode === AiActionModes.GENERATE) && (
         <>
           <Switch
             checked={includeNql}
