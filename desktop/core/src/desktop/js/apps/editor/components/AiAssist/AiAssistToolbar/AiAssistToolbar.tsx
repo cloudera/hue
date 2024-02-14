@@ -28,21 +28,21 @@ import {
 import Toolbar, { ToolbarButton } from '../../../../../reactComponents/Toolbar/Toolbar';
 import AiAssistToolbarInput from './AiAssistToolbarInput';
 import { extractLeadingNqlComments, removeComments } from '../PreviewModal/formattingUtils';
+import { AiActionModes } from '../AiAssistBar';
 
 import './AiAssistToolbar.scss';
 
+type ActionModes = AiActionModes | undefined;
 interface AssistToolbarProps {
-  isGenerateMode: boolean;
+  actionMode: ActionModes;
+  setActionMode: React.Dispatch<React.SetStateAction<AiActionModes | undefined>>;
   isLoading: boolean;
   setErrorStatusText: React.Dispatch<React.SetStateAction<string>>;
-  setIsGenerateMode: React.Dispatch<React.SetStateAction<boolean>>;
-  setIsEditMode: React.Dispatch<React.SetStateAction<boolean>>;
-  isEditMode: boolean;
   inputExpanded: boolean;
   inputPrefill: string;
   inputValue: string;
   loadExplanation: (statement: string) => Promise<void>;
-  parsedStatement: any;
+  parsedStatement: { statement: string };
   loadOptimization: (statement: string) => Promise<void>;
   loadFixSuggestion: (statement: string) => Promise<void>;
   isSqlError: boolean;
@@ -52,12 +52,10 @@ interface AssistToolbarProps {
 }
 
 function AssistToolbar({
-  isGenerateMode,
+  actionMode,
+  setActionMode,
   isLoading,
   setErrorStatusText,
-  setIsGenerateMode,
-  setIsEditMode,
-  isEditMode,
   inputExpanded,
   inputValue,
   inputPrefill,
@@ -68,24 +66,16 @@ function AssistToolbar({
   isSqlError,
   onInputSubmit,
   onInputChanged
-}: AssistToolbarProps) {
+}: AssistToolbarProps): JSX.Element {
   const [isAnimatingInput, setIsAnimatingInput] = React.useState(false);
-  const handOnCancelInput = () => {
-    setIsGenerateMode(false);
-    setIsEditMode(false);
+
+  const handleCancelInput = () => {
+    setActionMode(undefined);
   };
 
-  const toggleGenerateMode = () => {
+  const toggleMode = (modeClicked: AiActionModes) => {
     setErrorStatusText('');
-    setIsGenerateMode(prev => !prev);
-    setIsEditMode(false);
-    setIsAnimatingInput(true);
-  };
-
-  const toggleEditMode = () => {
-    setErrorStatusText('');
-    setIsEditMode(prev => !prev);
-    setIsGenerateMode(false);
+    actionMode === modeClicked ? setActionMode(undefined) : setActionMode(modeClicked);
     setIsAnimatingInput(true);
   };
 
@@ -118,21 +108,21 @@ function AssistToolbar({
       content={() => (
         <>
           <ToolbarButton
-            disabled={isLoading || (selectedStatement && !selectedStatementHasNqlCommentOnly)}
+            disabled={isLoading || (!!selectedStatement && !selectedStatementHasNqlCommentOnly)}
             title="Generate SQL using natural language"
             aria-label="Generate SQL using natural language"
             icon={<CommentOutlined />}
-            onClick={toggleGenerateMode}
+            onClick={() => toggleMode(AiActionModes.GENERATE)}
           >
-            {!isEditMode ? 'Generate' : ''}
+            {actionMode === AiActionModes.EDIT ? '' : 'Generate'}
           </ToolbarButton>
           <AiAssistToolbarInput
             isAnimating={isAnimatingInput}
             isLoading={isLoading}
-            isExpanded={isGenerateMode && inputExpanded}
+            isExpanded={actionMode === AiActionModes.GENERATE && inputExpanded}
             placeholder="E.g. How many of our unique website vistors are using Mac?"
             onSubmit={onInputSubmit}
-            onCancel={handOnCancelInput}
+            onCancel={handleCancelInput}
             onInputChanged={onInputChanged}
             value={inputValue}
             onAnimationEnded={() => setIsAnimatingInput(false)}
@@ -143,18 +133,18 @@ function AssistToolbar({
             title="Edit selected SQL statement using natural language"
             aria-label="Edit SQL using natural language"
             icon={<EditOutlined />}
-            onClick={toggleEditMode}
+            onClick={() => toggleMode(AiActionModes.EDIT)}
           >
-            {!isGenerateMode ? 'Edit' : ''}
+            {actionMode === AiActionModes.GENERATE ? '' : 'Edit'}
           </ToolbarButton>
           <AiAssistToolbarInput
             isAnimating={isAnimatingInput}
-            isExpanded={isEditMode && inputExpanded}
+            isExpanded={actionMode === AiActionModes.EDIT && inputExpanded}
             isLoading={isLoading}
             value={inputValue}
             placeholder="E.g. Only inlcude people under 50 years"
             onSubmit={onInputSubmit}
-            onCancel={handOnCancelInput}
+            onCancel={handleCancelInput}
             onInputChanged={onInputChanged}
             onAnimationEnded={() => setIsAnimatingInput(false)}
             prefill={inputPrefill}

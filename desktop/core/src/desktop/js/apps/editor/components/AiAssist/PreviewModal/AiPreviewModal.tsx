@@ -27,7 +27,7 @@ import { KeywordCase } from 'sql-formatter';
 import { GuardrailAlert, GuardrailAlertType } from '../guardRails';
 import SyntaxHighlighterDiff from '../SyntaxHighlighterDiff/SyntaxHighlighterDiff';
 import InlineAlertCheck from '../InlineAlertCheck/InlineAlertCheck';
-import { AiBarActionType } from '../AiAssistBar';
+import { AiActionModes } from '../AiAssistBar';
 
 import { useFormatting, formatClean, removeComments } from './formattingUtils';
 import PreviewInfoPanels from './PreviewInfoPanels/PreviewInfoPanels';
@@ -54,9 +54,8 @@ const hasDiff = ({
 };
 
 interface PreviewModalProps {
-  actionType: AiBarActionType;
+  actionMode: AiActionModes;
   open: boolean;
-  title: string;
   suggestion: string;
   assumptions: string;
   explanation: string;
@@ -73,9 +72,8 @@ interface PreviewModalProps {
 }
 
 const PreviewModal = ({
-  actionType,
+  actionMode,
   open,
-  title,
   suggestion: suggestionRaw = '',
   assumptions = '',
   explanation = '',
@@ -90,6 +88,25 @@ const PreviewModal = ({
   dialect,
   keywordCase
 }: PreviewModalProps): JSX.Element => {
+  const titles = {
+    [AiActionModes.GENERATE]: 'Generated SQL - suggestion',
+    [AiActionModes.EDIT]: 'Edited SQL - suggestion',
+    [AiActionModes.OPTIMIZE]: 'Optimized SQL - suggestion',
+    [AiActionModes.EXPLAIN]: 'Explained SQL',
+    [AiActionModes.FIX]: 'Fixed SQL - suggestion'
+  };
+  const titlesOnNoDiff = {
+    [AiActionModes.OPTIMIZE]: 'Optimized SQL - no suggestion',
+    [AiActionModes.EDIT]: 'Edited SQL - no suggestion',
+    [AiActionModes.FIX]: 'Fixed SQL - no suggestion'
+  };
+  const mesagesOnNoDiff = {
+    [AiActionModes.OPTIMIZE]: 'No optimization to the SQL statement could be suggested.',
+    [AiActionModes.EDIT]: 'No fix to the SQL statement could be suggested.',
+    [AiActionModes.FIX]: `The SQL statement could not be edited based on the input given. 
+      The AI has returned an unmodified SQL statement.`
+  };
+
   const [guardRailWarningAcknowledged, setGuardRailWarningAcknowledged] = useState(false);
   const { formattingConfig, updateFormattingSettings, suggestion, showDiffFrom } = useFormatting({
     dialect,
@@ -97,23 +114,28 @@ const PreviewModal = ({
     oldSql: showDiffFromRaw,
     newSql: suggestionRaw,
     nql,
-    preventAutoFormat: actionType === 'fix'
+    preventAutoFormat: actionMode === AiActionModes.FIX
   });
 
-  if (actionType === 'optimize' || actionType === 'fix' || actionType === 'edit') {
-    const oldCodeHasSyntaxError = actionType === 'fix';
+  if (
+    actionMode === AiActionModes.OPTIMIZE ||
+    actionMode === AiActionModes.FIX ||
+    actionMode === AiActionModes.EDIT
+  ) {
+    const oldCodeHasSyntaxError = actionMode === AiActionModes.FIX
     const diffDetected = hasDiff({
       newCode: suggestionRaw,
       oldCode: showDiffFromRaw,
       dialect,
       preserveOldCodeFormat: oldCodeHasSyntaxError
     });
+
     if (!diffDetected) {
       return (
         <Modal
           wrapClassName="cuix hue-ai-preview-modal hue-ai-preview-modal--no-diff"
           open={open}
-          title={'No change suggested'}
+          title={titlesOnNoDiff[actionMode]}
           onCancel={onCancel}
           width={'100ch'}
           footer={
@@ -124,13 +146,7 @@ const PreviewModal = ({
             </div>
           }
         >
-          <p>
-            {actionType === 'optimize'
-              ? `No optimization to the SQL statement could be suggested.`
-              : actionType === 'fix'
-              ? `No fix to the SQL statement could be suggested.`
-              : `The SQL statement could not be edited based on the input given. The AI has returned an unmodified SQL statement.`}
-          </p>
+          <p>{mesagesOnNoDiff[actionMode]}</p>
           <PreviewInfoPanels
             alternativeActions={explanation || 'No alternative actions could be suggested'}
           />
@@ -148,14 +164,14 @@ const PreviewModal = ({
     <Modal
       wrapClassName="cuix hue-ai-preview-modal"
       open={open}
-      title={title}
+      title={titles[actionMode]}
       onCancel={onCancel}
       width={'80%'}
       footer={
         <PreviewModalFooter
           primaryButtonLabel={primaryButtonLabel}
           disableActions={hasGuardRailWarning && !guardRailWarningAcknowledged}
-          showCopyToClipboard={actionType !== 'explain'}
+          showCopyToClipboard={actionMode !== AiActionModes.EXPLAIN}
           onPrimaryBtnClick={() => onInsert(suggestion)}
           onCancelBtnClick={onCancel}
           suggestion={suggestion}
@@ -163,9 +179,9 @@ const PreviewModal = ({
       }
     >
       <div className="hue-ai-preview-modal__diff-highlighter">
-        {actionType !== 'explain' && (
+        {actionMode !== AiActionModes.EXPLAIN && (
           <SqlPreviewConfig
-            actionType={actionType}
+            actionMode={actionMode}
             formattingConfig={formattingConfig}
             updateFormattingConfig={updateFormattingSettings}
           />

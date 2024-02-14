@@ -38,7 +38,13 @@ import { AutocompleteParser } from '../../../../parse/types';
 
 import './AiAssistBar.scss';
 
-export type AiBarActionType = 'generate' | 'edit' | 'optimize' | 'fix' | 'explain';
+export enum AiActionModes {
+  GENERATE = 'generate',
+  EDIT = 'edit',
+  OPTIMIZE = 'optimize',
+  FIX = 'fix',
+  EXPLAIN = 'explain'
+}
 
 const {
   generateExplanation,
@@ -111,9 +117,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps): JSX.Element => {
     getFromLocalStorage('hue.aiAssistBar.isExpanded', true)
   );
   const [isAnimating, setIsAnimating] = useState<'no' | 'expand' | 'contract'>('no');
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [isGenerateMode, setIsGenerateMode] = useState(false);
-  const [isOptimizeMode, setIsOptimizeMode] = useState(false);
+  const [actionMode, setActionMode] = useState<AiActionModes | undefined>();
   const [showSuggestedSqlModal, setShowSuggestedSqlModal] = useState(false);
   const [showGuardrailsModal, setShowGuardrailsModal] = useState(false);
   const [explanation, setExplanation] = useState('');
@@ -132,7 +136,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps): JSX.Element => {
 
   const cursorPosition = useRef<{ row: number; column: number } | undefined>();
   const keywordCase = useKeywordCase(syntaxParser, selectedStatement);
-  const inputExpanded = isEditMode || isGenerateMode;
+  const inputExpanded = actionMode === AiActionModes.EDIT || actionMode === AiActionModes.GENERATE;
   const inputPrefill = inputExpanded ? extractLeadingNqlComments(selectedStatement) : '';
 
   const handleStatusUpdate = (status: string) => {
@@ -241,7 +245,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps): JSX.Element => {
 
   const loadOptimization = async (statement: string) => {
     setIsLoading(true);
-    setIsOptimizeMode(true);
+    setActionMode(AiActionModes.OPTIMIZE);
     setGuardrailAlert(undefined);
     const executor = activeExecutable?.executor;
     const databaseName = getDbName(activeExecutable);
@@ -299,7 +303,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps): JSX.Element => {
 
   const acceptSuggestion = (statement: string) => {
     let lineNrToMoveTo = firstLine;
-    if (isGenerateMode) {
+    if (actionMode === AiActionModes.GENERATE) {
       const zeroBasedLineNr = 1;
       const lineNrOfCursor = cursorPosition.current?.row || 0;
       // TODO: lineNrToMoveTo fails if the user inserts new lines without moving the cursor afterwards.
@@ -331,9 +335,9 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps): JSX.Element => {
 
   const handleToobarInputSubmit = (userInput: string) => {
     const sqlStatmentToModify = parsedStatement.statement;
-    if (isGenerateMode) {
+    if (actionMode === AiActionModes.GENERATE) {
       generateSqlQuery(userInput, activeExecutable);
-    } else if (isEditMode) {
+    } else if (actionMode === AiActionModes.EDIT) {
       editSqlQuery(userInput, sqlStatmentToModify, activeExecutable);
     }
   };
@@ -352,14 +356,15 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps): JSX.Element => {
     setSummary('');
     setSuggestionExplanation('');
     setShowSuggestedSqlModal(false);
-    setIsOptimizeMode(false);
+
+    if (actionMode === AiActionModes.OPTIMIZE) {
+      setActionMode(undefined);
+    }
     setGuardrailAlert(undefined);
   };
 
   const resetAll = () => {
-    setIsOptimizeMode(false);
-    setIsEditMode(false);
-    setIsGenerateMode(false);
+    setActionMode(undefined);
     setShowSuggestedSqlModal(false);
     setExplanation('');
     setSummary('');
@@ -399,10 +404,10 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps): JSX.Element => {
     const statementOnlyContainsNql =
       nqlPrompt.length && removeComments(newSelection.trim()).length === 0;
 
-    if (userClearedEditor || statementOnlyContainsNql) {
-      setIsEditMode(false);
-    } else if (userTypedInEmptyEditor) {
-      setIsGenerateMode(false);
+    if (actionMode === AiActionModes.EDIT && (userClearedEditor || statementOnlyContainsNql)) {
+      setActionMode(undefined);
+    } else if (actionMode === AiActionModes.GENERATE && userTypedInEmptyEditor) {
+      setActionMode(undefined);
     }
   };
 
@@ -431,18 +436,11 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps): JSX.Element => {
     };
   }, []);
 
-  // TODO: use a single state variable for this
-  const actionType = isGenerateMode
-    ? 'generate'
-    : isEditMode
-    ? 'edit'
-    : isOptimizeMode
-    ? 'optimize'
-    : explanation
-    ? 'explain'
-    : 'fix';
-
   const showBarInlineWarning = guardrailAlert?.type === GuardrailAlertType.INVALID_AI_RESPONSE;
+  const diffSource =
+    actionMode !== AiActionModes.GENERATE && actionMode !== AiActionModes.EDIT
+      ? parsedStatement?.statement
+      : undefined;
 
   return (
     <>
@@ -479,13 +477,11 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps): JSX.Element => {
           })}
         >
           <AssistToolbar
-            isGenerateMode={isGenerateMode}
+            actionMode={actionMode}
+            setActionMode={setActionMode}
             isLoading={isLoading}
             inputValue={inputValue}
             setErrorStatusText={setErrorStatusText}
-            setIsGenerateMode={setIsGenerateMode}
-            setIsEditMode={setIsEditMode}
-            isEditMode={isEditMode}
             onInputSubmit={handleToobarInputSubmit}
             onInputChanged={setInputValue}
             inputExpanded={inputExpanded}
@@ -520,16 +516,15 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps): JSX.Element => {
           }}
         />
       )}
-      {showSuggestedSqlModal && (
+      {showSuggestedSqlModal && actionMode && (
         <AiPreviewModal
-          actionType={actionType}
-          title="Suggestion"
+          actionMode={actionMode}
           open
           onCancel={handleCancel}
           onInsert={sql => handleInsert(sql, explanation)}
           primaryButtonLabel={explanation ? 'Insert as comment' : 'Insert'}
           suggestion={suggestion}
-          showDiffFrom={!isGenerateMode && !explanation ? parsedStatement?.statement : undefined}
+          showDiffFrom={diffSource}
           assumptions={assumptions}
           explanation={explanation || suggestionExplanation}
           summary={summary}
