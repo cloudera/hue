@@ -363,8 +363,8 @@ class TableReader:
 
   def build_select_sql(self, db_name: str, table_name: str, columns: List[str], limit: int) -> str:
     if self.dialect in ["hive", "impala"]:
-      column_names = ", ".join(columns)
-      return f"SELECT {column_names} FROM {db_name}.{table_name} LIMIT {limit}"
+      column_names = ", ".join([f"`{column}`" for column in columns])
+      return f"SELECT {column_names} FROM `{db_name}`.`{table_name}` LIMIT {limit}"
     else:
       raise Exception(f"Unsupported dialect - {self.dialect}")
 
