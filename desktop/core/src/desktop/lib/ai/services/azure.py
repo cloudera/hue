@@ -21,15 +21,17 @@ from desktop.lib.ai.models.gpt import GPTModel
 
 from desktop.conf import AI_INTERFACE, get_ai_service_token
 
+_api_url = AI_INTERFACE.BASE_URL.get()
 _api_key = get_ai_service_token()
+_api_version = AI_INTERFACE.SERVICE_VERSION.get() or "2024-02-15-preview"
 
 class AzureService(BaseService):
   def __init__(self, model_name: str):
     import openai
     openai.api_type = "azure"
-    openai.api_base = AI_INTERFACE.BASE_URL.get()
+    openai.api_base = _api_url
     openai.api_key = _api_key
-    openai.api_version = "2023-07-01-preview" # TODO: This could be a configuration
+    openai.api_version = _api_version
     self.openai = openai
 
     super().__init__(self.get_model(model_name))
