@@ -28,7 +28,8 @@
     @focusout="onFocusOut"
   >
     <button
-      class="sidebar-base-btn sidebar-sidebar-item" data-testid = "sidebar-query-editor-button"
+      class="sidebar-base-btn sidebar-sidebar-item"
+      data-testid="sidebar-query-editor-button"
       :aria-label="item.displayName"
       :class="{ 'sidebar-active': isActive, 'sidebar-accordion-item-btn-open': tooltip }"
       @click="toggleOpen"
