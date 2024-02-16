@@ -24,7 +24,7 @@ export const HUE_DROP_DOWN_COMPONENT = 'hue-drop-down';
 
 const TEMPLATE = `
   <!-- ko if: !menuOnly && (!dropDownVisible() || !searchable) -->
-  <a class="inactive-action hue-drop-down-active" href="javascript:void(0)" data-bind="toggle: dropDownVisible, css: { 'blue': dropDownVisible }">
+  <a class="inactive-action hue-drop-down-active" href="javascript:void(0)" data-testid = "database-selection-dropdown" data-bind="toggle: dropDownVisible, css: { 'blue': dropDownVisible }">
     <!-- ko if: icon --><i class="fa" data-bind="css: icon"></i><!-- /ko -->
     <!-- ko if: !noLabel && value -->
     <span class="hue-drop-down-selected" data-bind="text: value() && typeof value()[labelAttribute] !== 'undefined' ? value()[labelAttribute] : value(), visible: ! dropDownVisible() || !searchable, attr: { 'title': titleTooltip }" ></span>
@@ -33,11 +33,11 @@ const TEMPLATE = `
   </a>
   <!-- /ko -->
   <!-- ko if: !menuOnly && (dropDownVisible() && searchable) -->
-  <input class="hue-drop-down-input" type="text" data-bind="textInput: filter, attr: { 'placeHolder': inputPlaceHolder }, visible: dropDownVisible, style: { color: filterEdited() ? '#000' : '#AAA', 'min-height': '22px', 'margin-left': '10px' }"/>
+  <input class="hue-drop-down-input" type="text" data-testid = "hue-database-drop-down-input-textbox" data-bind="textInput: filter, attr: { 'placeHolder': inputPlaceHolder }, visible: dropDownVisible, style: { color: filterEdited() ? '#000' : '#AAA', 'min-height': '22px', 'margin-left': '10px' }"/>
   <i class="fa fa-caret-down"></i>
   <!-- /ko -->
   <div class="hue-drop-down-container" data-bind="css: { 'open' : dropDownVisible, 'hue-drop-down-fixed': fixedPosition, 'hue-drop-down-container-searchable': searchable }, dropDownKeyUp: { onEsc: onEsc, onEnter: onEnter, dropDownVisible: dropDownVisible }">
-    <div style="overflow-y: auto;" class="dropdown-menu" data-bind="visible: filteredEntries().length > 0">
+    <div style="overflow-y: auto;" class="dropdown-menu" data-testid = "filter-database-search-input-textbox" data-bind="visible: filteredEntries().length > 0">
       <!-- ko if: foreachVisible -->
       <ul class="hue-inner-drop-down" data-bind="foreachVisible: { data: filteredEntries, minHeight: 34, container: '.dropdown-menu' }">
         <!-- ko if: typeof $data.divider !== 'undefined' && $data.divider -->

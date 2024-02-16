@@ -292,7 +292,7 @@ const TEMPLATE =
       <!-- ko if: selectedSource().selectedNamespace() -->
       <!-- ko if: selectedSource().selectedNamespace().selectedDatabase() -->
       <a data-bind="click: back, appAwareTemplateContextMenu: { template: 'sql-context-items', viewModel: selectedSource().selectedNamespace().selectedDatabase() }">
-        <i class="fa fa-chevron-left assist-breadcrumb-back" ></i>
+        <i class="fa fa-chevron-left assist-breadcrumb-back" data-testid = "database-select-back-button" ></i>
         <i class="fa assist-breadcrumb-text" data-bind="css: { 'fa-server': nonSqlType, 'fa-database': !nonSqlType }"></i>
         <span class="assist-breadcrumb-text" data-bind="text: breadcrumb, attr: {'title': breadcrumbTitle }"></span>
       </a>
@@ -300,14 +300,14 @@ const TEMPLATE =
       <!-- ko ifnot: selectedSource().selectedNamespace().selectedDatabase() -->
       <!-- ko if: window.HAS_MULTI_CLUSTER-->
       <a data-bind="click: back">
-        <i class="fa fa-chevron-left assist-breadcrumb-back"></i>
+        <i class="fa fa-chevron-left assist-breadcrumb-back" data-testid = "database-select-back-button"></i>
         <i class="fa fa-snowflake-o assist-breadcrumb-text"></i>
         <span class="assist-breadcrumb-text" data-bind="text: breadcrumb, attr: {'title': breadcrumbTitle }"></span>
       </a>
       <!-- /ko -->
       <!-- ko ifnot: window.HAS_MULTI_CLUSTER -->
       <a data-bind="click: back">
-        <i class="fa fa-chevron-left assist-breadcrumb-back"></i>
+        <i class="fa fa-chevron-left assist-breadcrumb-back" data-testid = "database-select-back-button"></i>
         <i class="fa fa-server assist-breadcrumb-text"></i>
         <span class="assist-breadcrumb-text" data-bind="text: breadcrumb"></span>
       </a>
@@ -316,7 +316,7 @@ const TEMPLATE =
       <!-- /ko -->
       <!-- ko ifnot: selectedSource().selectedNamespace() -->
       <a data-bind="click: back">
-        <i class="fa fa-chevron-left assist-breadcrumb-back"></i>
+        <i class="fa fa-chevron-left assist-breadcrumb-back" data-testid = "database-select-back-button"></i>
         <i class="fa fa-server assist-breadcrumb-text"></i>
         <span class="assist-breadcrumb-text" data-bind="text: breadcrumb"></span>
       </a>
@@ -348,7 +348,7 @@ const TEMPLATE =
       <!-- ko ifnot: loading -->
       <span class="assist-tables-counter">(<span data-bind="text: filteredNamespaces().length"></span>)</span>
       <!-- ko if: window.HAS_MULTI_CLUSTER -->
-      <a class="inactive-action" href="javascript:void(0)" data-bind="click: triggerRefresh"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${I18n(
+      <a class="inactive-action" href="javascript:void(0)" data-bind="click: triggerRefresh"><i class="pointer fa fa-refresh" data-testid = "table-refresh-button" data-bind="css: { 'fa-spin blue' : loading }" title="${I18n(
         'Refresh'
       )}"></i></a>
       <!-- /ko -->
@@ -384,7 +384,7 @@ const TEMPLATE =
         <i class="pointer fa fa-plus" title="${I18n('Create index')}"></i>
       </a>
       <!-- /ko -->
-      <a class="inactive-action" href="javascript:void(0)" data-bind="click: triggerRefresh"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${I18n(
+      <a class="inactive-action" href="javascript:void(0)" data-bind="click: triggerRefresh"><i class="pointer fa fa-refresh" data-testid = "table-refresh-button" data-bind="css: { 'fa-spin blue' : loading }" title="${I18n(
         'Refresh'
       )}"></i></a>
       <!-- /ko -->

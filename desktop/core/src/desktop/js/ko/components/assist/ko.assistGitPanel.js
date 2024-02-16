@@ -29,7 +29,7 @@ const TEMPLATE = `
 
   <script type="text/html" id="assist-git-header-actions">
     <div class="assist-db-header-actions">
-      <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.git.refresh'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${I18n(
+      <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.git.refresh'); }"><i class="pointer fa fa-refresh" data-testid = "table-refresh-button" data-bind="css: { 'fa-spin blue' : loading }" title="${I18n(
         'Manual refresh'
       )}"></i></a>
     </div>

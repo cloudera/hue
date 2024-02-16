@@ -52,7 +52,7 @@ ${ commonheader(_("Bundle Editor"), "Oozie", user, request) | n,unicode }
     </a>
 
 
-    <div class="dropdown pull-right margin-left-10">
+    <div class="dropdown pull-right margin-left-10" data-testid = "data-toggle-dropdown-button">
       <a class="btn" data-toggle="dropdown" href="javascript: void(0)">
         <i class="fa fa-fw fa-ellipsis-v"></i>
       </a>

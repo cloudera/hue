@@ -83,7 +83,7 @@ const TEMPLATE = `
       <!-- /ko -->
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.storage.refresh'); }" title="${I18n(
         'Manual refresh'
-      )}"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }"></i></a>
+      )}"><i class="pointer fa fa-refresh" data-testid = "table-refresh-button" data-bind="css: { 'fa-spin blue' : loading }"></i></a>
     </div>
   </script>
 

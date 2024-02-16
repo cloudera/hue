@@ -191,7 +191,7 @@ else:
         </div>
       % endif
 
-      <div class="dropdown pull-right margin-left-10">
+      <div class="dropdown pull-right margin-left-10" data-testid = "data-toggle-dropdown-button">
         <a class="btn" data-toggle="dropdown" href="javascript: void(0)" data-bind="click: function() { showPlusButtonHint(false); }">
           <i class="fa fa-fw fa-ellipsis-v"></i>
         </a>
