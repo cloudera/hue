@@ -50,7 +50,6 @@ ${layout.menubar(section='users')}
       <%def name="search()">
         <input type="text" class="input-xlarge search-query filter-input" placeholder="${_('Search for name, group, etc...')}">
       </%def>
-<!--      delete button not needed-->
       <%def name="actions()">
         % if is_admin(user):
           <button class="btn delete-user-btn" title="${_('Delete')}" disabled="disabled">
@@ -58,8 +57,6 @@ ${layout.menubar(section='users')}
           </button>
         % endif
       </%def>
-<!--end delete button-->
-<!--add/create LDAP user-->
       <%def name="creation()">
         % if is_admin(user):
           % if is_ldap_setup:
@@ -76,25 +73,14 @@ ${layout.menubar(section='users')}
             </a>
           % endif
 
-          <a href="${ url('useradmin:useradmin.views.document_cleanup') }"
+          <a href="https://docs.gethue.com/administrator/administration/user-management/"
             title="${ _('Learn how to integrate Hue with your company LDAP') }" target="_blank">
             <i class="fa fa-question-circle"></i>
           </a>
         % endif
       </%def>
-
-      <%def name="additional_actions()">
-        % if is_admin(user):
-          <a href="${ url('useradmin:useradmin.views.document_cleanup') }" class="btn">
-            <i class="fa fa-plus-circle"></i> ${_('Clean Up Documents')}
-          </a>
-        % endif
-      </%def>
-
-
-<!--end LDAP user-->
     </%actionbar:render>
-<!--table display start-->
+
     <table class="table table-condensed datatables">
       <thead>
       <tr>
@@ -113,8 +99,6 @@ ${layout.menubar(section='users')}
         <th width="15%">${_('Last Login')}</th>
       </tr>
       </thead>
-<!--      end table display -->
-<!--      creating rows in tables-->
       <tbody>
         % for listed_user in users:
         <tr class="tableRow"

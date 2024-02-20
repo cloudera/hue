@@ -238,7 +238,6 @@ export const TaskBrowserTable = ({ handleShowLogs, handleSchedulePopup }) => {
 
   // Render the table with the tasks data
   return (
-    <div className="jobbrowser-full">
     <div className="content-panel-inner">
     <div className="flex-container-style">
       <button onClick={handleSchedulePopup} className="btn schedule-task-button">Schedule Task</button>
@@ -289,6 +288,9 @@ export const TaskBrowserTable = ({ handleShowLogs, handleSchedulePopup }) => {
                 {task.result?.task_name === 'fileupload'
                   ? `{file name: ${task.result?.qqfilename}}`
                   : JSON.stringify(task.parameters)}
+                {task.result?.task_name === 'document_cleanup'
+                  ? `{keep days: ${task.result?.parameters}}`
+                  : JSON.stringify(task.parameters)}
               </td>
               <td className="tdStyle">
                 <span className={`badgeStyle ${task.status === 'SUCCESS' ? 'badgeSuccess' : task.status === 'FAILURE' ? 'badgeFailure' : 'badgeRunning'}`}>
@@ -297,12 +299,11 @@ export const TaskBrowserTable = ({ handleShowLogs, handleSchedulePopup }) => {
                 </span>
               </td>
               <td className="tdStyle"> {formatTimestamp(task.result?.task_start)}</td>
-              <td className="tdStyle">{calculateDuration(task.result?.task_start, task.result?.task_end)}</td>
+              <td className="tdStyle">{calculateDuration(task.result?.task_start, task.date_done)}</td>
             </tr>
           ))}
         </tbody>
       </table>
-    </div>
     </div>
   );
 };
