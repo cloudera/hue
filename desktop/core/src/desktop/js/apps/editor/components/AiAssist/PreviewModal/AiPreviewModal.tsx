@@ -163,10 +163,10 @@ const PreviewModal = ({
   return (
     <Modal
       wrapClassName="cuix hue-ai-preview-modal"
+      className="hue-ai-preview-modal-inner"
       open={open}
       title={titles[actionMode]}
       onCancel={onCancel}
-      width={'80%'}
       footer={
         <PreviewModalFooter
           primaryButtonLabel={primaryButtonLabel}
@@ -188,11 +188,13 @@ const PreviewModal = ({
         )}
 
         {showDiffFrom && (
-          <SyntaxHighlighterDiff
-            lineNumberStart={lineNumberStart}
-            newCode={suggestion}
-            oldCode={showDiffFrom}
-          />
+          <div className="hue-syntax-highlighter-diff-wrapper">
+            <SyntaxHighlighterDiff
+              lineNumberStart={lineNumberStart}
+              newCode={suggestion}
+              oldCode={showDiffFrom}
+            />
+          </div>
         )}
         {!showDiffFrom && (
           <SyntaxHighlighter

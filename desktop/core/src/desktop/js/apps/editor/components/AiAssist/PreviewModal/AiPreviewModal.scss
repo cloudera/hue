@@ -20,17 +20,55 @@
 @use '../sharedAiAssistVars' as ai-assist-vars;
 @use 'mixins';
 
+$top: 100px; // Same value as specified in cuix
+
 // We need to get the cuix class in but we can't add it to the root
 .ant-modal-root {
   .hue-ai-preview-modal {
-    // TODO: move these classes outside of the modal to use proper BEM
-    .hue-ai-preview-modal__syntax-highlighter {
-      border-bottom-left-radius: ai-assist-vars.$border-radius;
-      border-bottom-right-radius: ai-assist-vars.$border-radius;
-      // TODO: better way to do this? Override color
-      .react-syntax-highlighter-line-number {
-        color: vars.$fluidx-gray-700;
+    .hue-ai-preview-modal-inner {
+      top: $top;
+      max-height: calc(95vh - #{$top});
+      overflow: hidden;
+      display: flex;
+      width: 80% !important;
+      max-width: 1824px;
+
+      .ant-modal-content {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+      }
+
+      .ant-modal-body {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+
+        .hue-ai-preview-modal__diff-highlighter {
+          max-height: 80%;
+          min-width: 540px;
+          display: flex;
+          flex-direction: column;
+
+          .hue-syntax-highlighter-diff-wrapper {
+            overflow: auto;
+            background-color: vars.$fluidx-slate-700;
+          }
+        }
+
+        .hue-preview-info-panels {
+          overflow: auto;
+        }
       }
     }
+  }
+}
+
+.hue-ai-preview-modal__syntax-highlighter {
+  border-bottom-left-radius: ai-assist-vars.$border-radius;
+  border-bottom-right-radius: ai-assist-vars.$border-radius;
+
+  .react-syntax-highlighter-line-number {
+    color: vars.$fluidx-gray-700;
   }
 }
