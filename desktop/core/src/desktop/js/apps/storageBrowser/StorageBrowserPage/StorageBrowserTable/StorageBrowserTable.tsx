@@ -30,8 +30,10 @@ import {
   SortOrder
 } from '../../../../reactComponents/FileChooser/types';
 import Pagination from '../../../../reactComponents/Pagination/Pagination';
+import StorageBrowserActions from '../StorageBrowserActions/StorageBrowserActions';
 import './StorageBrowserTable.scss';
 import Tooltip from 'antd/es/tooltip';
+import SummaryModal from '../../SummaryModal/SummaryModal';
 
 interface StorageBrowserTableProps {
   className?: string;
@@ -72,6 +74,9 @@ const StorageBrowserTable: React.FC<StorageBrowserTableProps> = ({
   ...restProps
 }): JSX.Element => {
   const [tableHeight, setTableHeight] = useState<number>();
+  const [showSummaryModal, setShowSummaryModal] = useState<boolean>(false);
+  //TODO: accept multiple files and folder select
+  const [selectedFilePath, setSelectedFilePath] = useState<string>('');
 
   const { t } = i18nReact.useTranslation();
 
@@ -126,10 +131,23 @@ const StorageBrowserTable: React.FC<StorageBrowserTableProps> = ({
           </Tooltip>
         );
       } else {
-        column.width = key === 'mtime' ? '15%' : '10%';
+        column.width = key === 'mtime' ? '15%' : '8.5%';
       }
       columns.push(column);
     }
+    columns.push({
+      dataIndex: 'actions',
+      title: '',
+      key: 'actions',
+      render: (_, record: StorageBrowserTableData) => (
+        <StorageBrowserActions
+          onSelectFile={setSelectedFilePath}
+          onSelectSummary={setShowSummaryModal}
+          rowData={record}
+        />
+      ),
+      width: '2%'
+    });
     return columns.filter(col => col.dataIndex !== 'type' && col.dataIndex !== 'path');
   };
 
@@ -212,6 +230,11 @@ const StorageBrowserTable: React.FC<StorageBrowserTableProps> = ({
           pageSize={pageSize}
           pageStats={pageStats}
         />
+        <SummaryModal
+          showModal={showSummaryModal}
+          path={selectedFilePath}
+          onClose={() => setShowSummaryModal(false)}
+        ></SummaryModal>
       </>
     );
   } else {
