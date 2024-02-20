@@ -42,7 +42,8 @@
 
     .hue-syntax-highlighter-diff__container {
       display: flex;
-      max-width: 50%;
+      max-width: 900px;
+      min-width: 300px;
     }
 
     .hue-syntax-highlighter-diff__line-numbers {
