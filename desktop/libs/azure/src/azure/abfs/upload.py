@@ -45,25 +45,24 @@ from filebrowser.utils import generate_chunks, calculate_total_size
 
 class ABFSFineUploaderChunkedUpload(object):
   def __init__(self, request, *args, **kwargs):
-    self.destination = kwargs.get('dest', None)  # GET param avoids infinite looping
-    self.target_path = None
-    self.file = None
     self._request = request
-    self._part_size = DEFAULT_WRITE_SIZE
-
     self.qquuid = kwargs.get('qquuid')
     self.qqtotalparts = kwargs.get('qqtotalparts')
     self.totalfilesize = kwargs.get('qqtotalfilesize')
     self.file_name = kwargs.get('qqfilename')
     if self.file_name:
       self.file_name = unicodedata.normalize('NFC', self.file_name) # Normalize unicode
+    self.destination = kwargs.get('dest', None)  # GET param avoids infinite looping
+    self.target_path = None
+
+    if kwargs.get('chunk_size', None) != None:
+      self.chunk_size = kwargs.get('chunk_size')
 
     if self._is_abfs_upload():
       self._fs = self._get_abfs(request)
       self.filesystem, self.directory = parse_uri(self.destination)[:2]
        # Verify that the path exists
       self._fs.stats(self.destination)
-    LOG.debug("Chunk size = %d" % DEFAULT_WRITE_SIZE)
 
   def check_access(self):
     LOG.info('ABFSFineUploaderChunkedUpload: handle file upload wit temp file %s.' % self.file_name)

@@ -1543,7 +1543,7 @@ def upload_chunks(request):
     return JsonResponse({'success': True, 'uuid': request.GET.get('qquuid')})
 
   # case where file is smaller than the chunk size
-  if int(request.GET.get("qqtotalparts", 0)) == 0 and int(request.GET.get("qqtotalfilesize", 0)) <= 2000000:
+  if int(request.GET.get("qqtotalparts", 0)) == 0:
     chunks = extract_upload_data(request, "GET")
     try:
       response = perform_upload_task(request, **chunks)
