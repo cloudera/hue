@@ -2045,43 +2045,6 @@ else:
         });
       };
 
-      function updateStatusMessage(listitem, message) {
-        // Find the list item element for the given fileName.
-        // This requires that your file list items include the file name in a way that can be uniquely selected.
-        // Adjust the selector as necessary based on your actual HTML structure.
-        $('.qq-upload-files li').each(function() {
-          console.log("upload status hello")
-          var listItem = $(this);
-          if (listItem.find('.qq-upload-file-selector').text() === fileName) {
-            // Find the element within the list item that is used to display status messages.
-            // You might need to adjust the class or element selector based on your HTML.
-            var statusElement = listItem.find('.progress-row-text');
-            if (statusElement.length === 0) {
-              // If there's no dedicated status element, you might need to append one or use an existing element.
-              // This example shows how you could append a new <span> element for the status message.
-              // Adjust according to your UI structure.
-              statusElement = $('<span class="progress-row-text"></span>').appendTo(listItem.find('.pull-right'));
-            }
-            // Update the text of the status element with the new message.
-            statusElement.text(message);
-
-            setTimeout(function() {
-              // This example hides the entire list item, adjust as needed
-              // For instance, you might want to fade out the status message or progress bar specifically
-              listItem.fadeOut('slow', function() {
-                // If you want to remove the listItem after fading out
-                listItem.remove();
-              });
-              
-              // Alternatively, if you just want to clear the message or hide the progress bar:
-              // statusElement.text(''); // Clear the status message
-              // listItem.find('.progress-row-bar').hide(); // Hide the progress bar
-            }, 2000); // 2000 milliseconds = 2 seconds
-          }
-        });
-      }
-
-
         function pollForRealProgress(taskIds, listItems, pendingUploads) {
             var completedUploads = 0; // Track the number of completed uploads
 
