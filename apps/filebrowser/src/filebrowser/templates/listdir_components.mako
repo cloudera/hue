@@ -2098,7 +2098,7 @@ else:
       self.uploadFile = (function () {
           var uploader; 
           
-          if (window.getLastKnownConfig().hue_config.enable_chunked_file_uploader) {
+          if ((window.getLastKnownConfig().hue_config.enable_chunked_file_uploader) && (window.getLastKnownConfig().hue_config.enable_task_server))  {
             self.pendingUploads(0);
             var action = "/filebrowser/upload/chunks/";
 
@@ -2219,6 +2219,80 @@ else:
                     var newPath = "/filebrowser/upload/chunks/file?dest=" + encodeURIComponent(self.currentPath().normalize('NFC'));
                     this.setEndpoint(newPath);
                     ## currentUploadingTaskId = response.task_id;
+                    self.pendingUploads(self.pendingUploads() + 1);
+                  },
+                  onCancel: function (id, fileName) {
+                    self.pendingUploads(self.pendingUploads() - 1);
+                  }
+              },
+
+              debug: false
+            });
+          }
+          else if (window.getLastKnownConfig().hue_config.enable_chunked_file_uploader) {
+            self.pendingUploads(0);
+            var action = "/filebrowser/upload/chunks/";
+            uploader = new qq.FileUploader({
+              element: document.getElementById("fileUploader"),
+              request: {
+                  endpoint: action,
+                  paramsInBody: false,
+                  params: {
+                      dest: self.currentPath(),
+                      inputName: "hdfs_file"
+                  }
+              },
+              maxConnections: window.CONCURRENT_MAX_CONNECTIONS || 5,
+              chunking: {
+                  enabled: true,
+                  concurrent: {
+                      enabled: true
+                  },
+                  partSize: window.FILE_UPLOAD_CHUNK_SIZE || 5242880,
+                  success: {
+                      endpoint: "/filebrowser/upload/complete/"
+                  },
+                  paramNames: {
+                      partIndex: "qqpartindex",
+                      partByteOffset: "qqpartbyteoffset",
+                      chunkSize: "qqchunksize",
+                      totalFileSize: "qqtotalfilesize",
+                      totalParts: "qqtotalparts"
+                  }
+              },
+
+              template: 'qq-template',
+              callbacks: {
+                  onProgress: function (id, fileName, loaded, total) {
+                  console.log(loaded);
+                  $('.qq-upload-files').find('li').each(function(){
+                    var listItem = $(this);
+                    if (listItem.find('.qq-upload-file-selector').text() == fileName){
+                      listItem.find('.progress-row-bar').css('width', (loaded/total)*100 + '%');
+                    }
+                  });
+                  },
+                  onComplete: function (id, fileName, response) {
+                    self.pendingUploads(self.pendingUploads() - 1);
+                    if (response.status != 0) {
+                      huePubSub.publish('hue.global.error', {message: "${ _('Error: ') }" + response.data});
+                    }
+                    else {
+                      huePubSub.publish('hue.global.info', {message: response.path + "${ _(' uploaded successfully.') }"});
+                      self.filesToHighlight.push(response.path);
+                    }
+                    if (self.pendingUploads() == 0) {
+                      $('#uploadFileModal').modal('hide');
+                      self.retrieveData(true);
+                    }
+                  },
+
+                  onAllComplete: function(succeeded, failed){
+                    $('#uploadFileModal').modal('hide');
+                  },
+                  onSubmit: function (id, fileName, responseJSON) {
+                    var newPath = "/filebrowser/upload/chunks/file?dest=" + encodeURIComponent(self.currentPath().normalize('NFC'));
+                    this.setEndpoint(newPath);
                     self.pendingUploads(self.pendingUploads() + 1);
                   },
                   onCancel: function (id, fileName) {
