@@ -181,6 +181,179 @@
   white-space-collapse: collapse;
 }
 
+.checkboxCompleted {
+  background-color: #fff;
+  border-bottom-color: #3a870e;
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
+  border-image-outset: 0;
+  border-image-repeat: stretch;
+  border-image-slice: 100%;
+  border-image-source: none;
+  border-image-width: 1;
+  border-left-color: #3a870e;
+  border-left-style: solid;
+  border-left-width: 1px;
+  border-right-color: #3a870e;
+  border-right-style: solid;
+  border-right-width: 1px;
+  border-top-color: #3a870e;
+  border-top-style: solid;
+  border-top-width: 1px;
+  color: #3a870e;
+  cursor: default;
+  display: block;
+  float: left;
+  font-family: FontAwesome;
+  font-size: 14px;
+  height: 15px;
+  line-height: 14px;
+  margin: 5px 4.2px 2px 0;
+  padding: 0;
+  text-rendering: auto;
+  text-size-adjust: 100%;
+  visibility: visible;
+  width: 15px;
+  -webkit-font-smoothing: antialiased;
+}
+
+.checkboxRunning {
+  background-color: #fff;
+  border-bottom-color: #ffa319;
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
+  border-image-outset: 0;
+  border-image-repeat: stretch;
+  border-image-slice: 100%;
+  border-image-source: none;
+  border-image-width: 1;
+  border-left-color: #ffa319;
+  border-left-style: solid;
+  border-left-width: 1px;
+  border-right-color: #ffa319;
+  border-right-style: solid;
+  border-right-width: 1px;
+  border-top-color: #ffa319;
+  border-top-style: solid;
+  border-top-width: 1px;
+  color: #ffa319;
+  cursor: default;
+  display: block;
+  float: left;
+  font-family: FontAwesome;
+  font-size: 14px;
+  height: 15px;
+  line-height: 14px;
+  margin: 5px 4.2px 2px 0;
+  padding: 0;
+  text-rendering: auto;
+  text-size-adjust: 100%;
+  visibility: visible;
+  width: 15px;
+  -webkit-font-smoothing: antialiased;
+}
+
+.checkboxFailed {
+  background-color: #fff;
+  border-bottom-color: #d9150c;
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
+  border-image-outset: 0;
+  border-image-repeat: stretch;
+  border-image-slice: 100%;
+  border-image-source: none;
+  border-image-width: 1;
+  border-left-color: #d9150c;
+  border-left-style: solid;
+  border-left-width: 1px;
+  border-right-color: #d9150c;
+  border-right-style: solid;
+  border-right-width: 1px;
+  border-top-color: #d9150c;
+  border-top-style: solid;
+  border-top-width: 1px;
+  color: #d9150c;
+  cursor: default;
+  display: block;
+  float: left;
+  font-family: FontAwesome;
+  font-size: 14px;
+  height: 15px;
+  line-height: 14px;
+  margin: 5px 4.2px 2px 0;
+  padding: 0;
+  text-rendering: auto;
+  text-size-adjust: 100%;
+  visibility: visible;
+  width: 15px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Base Custom Checkbox Style */
+.custom-checkbox {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  background-color: #fff;
+  position: relative;
+  top: 0;
+  left: 0;
+  cursor: pointer;
+  vertical-align: middle;
+  border-style: solid;
+  border-width: 1px;
+  margin: 5px 4.2px 2px 0;
+  font-family: FontAwesome;
+  font-size: 14px;
+  line-height: 14px;
+  text-rendering: auto;
+  text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+}
+
+.checkbox-text {
+  line-height: 20px;
+  vertical-align: middle;
+}
+
+/* Specific status styles for checkbox border and checkmark color */
+.checkboxCompleted + .custom-checkbox {
+  border-color: #3a870e; /* Green for success */
+}
+
+.checkboxRunning + .custom-checkbox {
+  border-color: #ffa319; /* Orange for running */
+}
+
+.checkboxFailed + .custom-checkbox {
+  border-color: #d9150c; /* Red for failed */
+}
+
+/* Checkmark styles */
+.checkboxCompleted:checked + .custom-checkbox:before,
+.checkboxRunning:checked + .custom-checkbox:before,
+.checkboxFailed:checked + .custom-checkbox:before {
+  content: '\2713'; /* Unicode checkmark */
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  color: white; /* White checkmark */
+}
+
+/* You can add specific colors for the checkmark for each status if needed */
+.checkboxCompleted:checked + .custom-checkbox:before {
+  color: #3a870e; /* Adjust if you want a different checkmark color for success */
+}
+
+.checkboxRunning:checked + .custom-checkbox:before {
+  color: #ffa319; /* Adjust if you want a different checkmark color for running */
+}
+
+.checkboxFailed:checked + .custom-checkbox:before {
+  color: #d9150c; /* Adjust if you want a different checkmark color for failed */
+}
+
 .row-success {
   border-left: 4px solid green;
 }
