@@ -18,7 +18,7 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
 
@@ -27,12 +27,12 @@ jobs:
         ./tools/ci/check_for_commit_message.sh
 
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
 
     - name: Cache pip
-      uses: actions/cache@v2
+      uses: actions/cache@v4 
       with:
         # This path is specific to Ubuntu
         path: ~/.cache/pip
