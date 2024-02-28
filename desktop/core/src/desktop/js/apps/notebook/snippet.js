@@ -1858,7 +1858,7 @@ class Snippet {
 
             if (self.type() === 'trino') {
               const existing_handle = self.result.handle();
-              existing_handle.row_n = data.handle.row_n;
+              existing_handle.row_count = data.handle.row_count;
               existing_handle.next_uri = data.handle.next_uri;
             }
             self.showLogs(true);
@@ -2189,7 +2189,7 @@ class Snippet {
 
                 if (self.type() === 'trino') {
                   const existing_handle = self.result.handle();
-                  existing_handle.row_n = data.result.row_n;
+                  existing_handle.row_count = data.result.row_count;
                   existing_handle.next_uri = data.result.next_uri;
                 }
               } else {
@@ -2369,7 +2369,7 @@ class Snippet {
                 ) {
                   if (self.type() === 'trino') {
                     const existing_handle = self.result.handle();
-                    existing_handle.row_n = 0;
+                    existing_handle.row_count = 0;
                     existing_handle.next_uri = data.query_status.next_uri;
                   }
                   const delay = self.result.executionTime() > 45000 ? 5000 : 1000; // 5s if more than 45s
