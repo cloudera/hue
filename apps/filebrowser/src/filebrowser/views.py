@@ -17,6 +17,12 @@
 
 from future import standard_library
 standard_library.install_aliases()
+
+from django.views.decorators.csrf import csrf_exempt
+from filebrowser.conf import ARCHIVE_UPLOAD_TEMPDIR
+from django.core.files.uploadhandler import FileUploadHandler, StopUpload, StopFutureHandlers
+from hadoop.conf import UPLOAD_CHUNK_SIZE
+
 from builtins import object
 import errno
 import logging
@@ -58,6 +64,7 @@ from desktop.lib.export_csvxls import file_reader
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.fs import splitpath
 from desktop.lib.fs.ozone.ofs import get_ofs_home_directory
+from desktop.lib.fs.gc.gs import get_gs_home_directory
 from desktop.lib.i18n import smart_str
 from desktop.lib.paths import SAFE_CHARACTERS_URI, SAFE_CHARACTERS_URI_COMPONENTS
 from desktop.lib.tasks.compress_files.compress_utils import compress_files_in_hdfs
@@ -78,6 +85,11 @@ from filebrowser.lib import xxd
 from filebrowser.forms import RenameForm, UploadFileForm, UploadArchiveForm, MkDirForm, EditorForm, TouchForm,\
     RenameFormSet, RmTreeFormSet, ChmodFormSet, ChownFormSet, CopyFormSet, RestoreFormSet,\
     TrashPurgeForm, SetReplicationFactorForm
+
+from hadoop.fs.upload import HDFSFineUploaderChunkedUpload, LocalFineUploaderChunkedUpload
+from aws.s3.upload import S3FineUploaderChunkedUpload
+from azure.abfs.upload import ABFSFineUploaderChunkedUpload
+from desktop.lib.fs.ozone.upload import OFSFineUploaderChunkedUpload
 
 if sys.version_info[0] > 2:
   import io
@@ -120,9 +132,27 @@ INLINE_DISPLAY_MIMETYPE = re.compile(
 
 INLINE_DISPLAY_MIMETYPE_EXCEPTIONS = re.compile('image/svg\+xml')
 
+SCHEME_PREFIXES = {
+    's3a': 's3a://',
+    'ofs': 'ofs://',
+    'abfs': 'abfs://',
+    'hdfs': 'hdfs://',
+    'gs': 'gs://',
+    'local': 'local://',
+}
+
+UPLOAD_CLASSES = {
+    's3a': S3FineUploaderChunkedUpload,
+    'ofs': OFSFineUploaderChunkedUpload,
+    'abfs': ABFSFineUploaderChunkedUpload,
+    'hdfs': HDFSFineUploaderChunkedUpload,
+    'local': LocalFineUploaderChunkedUpload,
+}
+
+if not os.path.exists(ARCHIVE_UPLOAD_TEMPDIR.get()):
+  os.makedirs(ARCHIVE_UPLOAD_TEMPDIR.get())
 
 logger = logging.getLogger()
-
 
 class ParquetOptions(object):
   def __init__(self, col=None, format='json', no_headers=True, limit=-1):
@@ -146,10 +176,11 @@ def index(request):
 
 def _decode_slashes(path):
   # This is a fix for some installations where the path is still having the slash (/) encoded
-  # as %2F while the rest of the path is actually decoded. 
+  # as %2F while the rest of the path is actually decoded.
   encoded_slash = '%2F'
-  if path.startswith(encoded_slash) or path.startswith('abfs:' + encoded_slash) or \
-    path.startswith('s3a:' + encoded_slash) or path.startswith('ofs:' + encoded_slash):
+  if path and path.startswith(encoded_slash) or path.startswith('abfs:' + encoded_slash) or \
+    path.startswith('s3a:' + encoded_slash) or path.startswith('gs:' + encoded_slash) or \
+    path.startswith('ofs:' + encoded_slash):
     path = path.replace(encoded_slash, '/')
 
   return path
@@ -158,15 +189,19 @@ def _normalize_path(path):
   path = _decode_slashes(path)
 
   # Check if protocol missing / and add it back (e.g. Kubernetes ingress can strip double slash)
-  if path.startswith('abfs:/') and not path.startswith('abfs://'):
-    path = path.replace('abfs:/', 'abfs://')
-  if path.startswith('s3a:/') and not path.startswith('s3a://'):
-    path = path.replace('s3a:/', 's3a://')
-  if path.startswith('ofs:/') and not path.startswith('ofs://'):
-    path = path.replace('ofs:/', 'ofs://')
+  for scheme, prefix in SCHEME_PREFIXES.items():
+    single_slash_prefix = f"{scheme}:/"
+    if path and path.startswith(single_slash_prefix) and not path.startswith(prefix):
+      path = path.replace(single_slash_prefix, prefix)
 
   return path
 
+def get_scheme(path):
+  path = _normalize_path(path)
+  for scheme, prefix in SCHEME_PREFIXES.items():
+    if path.startswith(prefix):
+      return scheme
+  return 'hdfs'
 
 def download(request, path):
   """
@@ -247,6 +282,15 @@ def view(request, path):
 
   if 'default_s3_home' in request.GET:
     home_dir_path = get_s3_home_directory(request.user)
+    if request.fs.isdir(home_dir_path):
+      return format_preserving_redirect(
+          request,
+          '/filebrowser/view=' + urllib_quote(home_dir_path.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS)
+      )
+
+  # default_gs_home is set in jquery.filechooser.js
+  if 'default_gs_home' in request.GET:
+    home_dir_path = get_gs_home_directory()
     if request.fs.isdir(home_dir_path):
       return format_preserving_redirect(
           request,
@@ -1211,7 +1255,7 @@ def generic_op(form_class, request, op, parameter_names, piggyback=None, templat
       if next:
         logging.debug("Next: %s" % next)
         file_path_prefix = '/filebrowser/view='
-        if next.startswith(file_path_prefix):          
+        if next.startswith(file_path_prefix):
           decoded_file_path = next[len(file_path_prefix):]
           filepath_encoded_next = file_path_prefix + urllib_quote(decoded_file_path.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS)
           return format_preserving_redirect(request, filepath_encoded_next)
@@ -1335,7 +1379,7 @@ def copy(request):
         ofs_skip_files += request.fs.copy(arg['src_path'], arg['dest_path'], recursive=True, owner=request.user)
       else:
         request.fs.copy(arg['src_path'], arg['dest_path'], recursive=True, owner=request.user)
-    
+
     # Send skipped filenames via raising exception to let users know.
     if ofs_skip_files:
       raise PopupException("Following files were skipped due to file size limitations:" + ofs_skip_files)
@@ -1406,6 +1450,105 @@ def trash_restore(request):
 def trash_purge(request):
   return generic_op(TrashPurgeForm, request, request.fs.purge_trash, [], None)
 
+def _create_response(request, _fs, result="success", data="Success"):
+  return {
+      'path': _fs.filepath,
+      'result': result,
+      'next': request.GET.get("next"),
+      'success': True,
+      'uuid': _fs.qquuid,
+      'status': 0,
+      'data': data
+  }
+
+def perform_upload(request, *args, **kwargs):
+  """
+  Uploads a file to the specified destination.
+  Args:
+    request: The HTTP request object.
+    **kwargs: Arbitrary keyword arguments.
+  Returns:
+    A dictionary containing the following keys:
+      - path: The path of the uploaded file.
+      - result: The result of the upload operation.
+      - next: The URL to redirect to after the upload operation.
+      - success: A boolean indicating whether the upload operation was successful.
+      - uuid: The UUID of the uploaded file.
+      - status: The status of the upload operation.
+      - data: Additional data about the upload operation.
+  """
+  scheme = get_scheme(kwargs['dest'])
+  upload_class = UPLOAD_CLASSES.get(scheme, LocalFineUploaderChunkedUpload)
+  _fs = upload_class(request, **kwargs)
+  _fs.upload()
+  if scheme == 'hdfs':
+    result = _massage_stats(request, stat_absolute_path(_fs.filepath, request.fs.stats(_fs.filepath)))
+  else:
+    result = "success"
+  return _create_response(request, _fs, result=result, data="Success")
+
+def extract_upload_data(request, method):
+  data = request.POST if method == "POST" else request.GET
+  chunks = {
+    "qquuid": data.get('qquuid'),
+    "qqpartindex": int(data.get('qqpartindex', 0)),
+    "qqpartbyteoffset": int(data.get('qqpartbyteoffset', 0)),
+    "qqtotalfilesize": int(data.get('qqtotalfilesize', 0)),
+    "qqtotalparts": int(data.get('qqtotalparts', 1)),
+    "qqfilename": data.get('qqfilename'),
+    "qqchunksize": int(data.get('qqchunksize', 0)),
+    "dest": data.get('dest', None),
+    "fileFieldLabel": data.get('fileFieldLabel')
+  }
+  return chunks
+
+@require_http_methods(["POST"])
+def upload_chunks(request):
+  """
+  View function to handle chunked file uploads using Fine Uploader.
+  Args:
+  - request: The HTTP request object.
+  Returns:
+  - JsonResponse: A JSON response object with the following keys:
+    - success: A boolean indicating whether the upload was successful.
+    - uuid: A string representing the unique identifier for the uploaded file.
+    - error: A string representing the error message if the upload failed.
+  """
+  try:
+    for _ in request.FILES.values():  # This processes the upload.
+      pass
+  except StopUpload:
+    return JsonResponse({'success': False, 'error': 'Error in upload'})
+
+  # case where file is larger than the single chunk size
+  if int(request.GET.get("qqtotalparts", 0)) > 0:
+    return JsonResponse({'success': True, 'uuid': request.GET.get('qquuid')})
+
+  # case where file is smaller than the chunk size
+  if int(request.GET.get("qqtotalparts", 0)) == 0 and int(request.GET.get("qqtotalfilesize", 0)) <= 2000000:
+    chunks = extract_upload_data(request, "GET")
+    try:
+      response = perform_upload(request, **chunks)
+      return JsonResponse(response)
+    except Exception as e:
+      return JsonResponse({'success': False, 'error': 'Error in upload'})
+  return JsonResponse({'success': False, 'error': 'Unsupported request method'})
+
+@require_http_methods(["POST"])
+def upload_complete(request):
+  """
+  View function that handles the completion of a file upload.
+  Args:
+    request (HttpRequest): The HTTP request object.
+  Returns:
+    JsonResponse: A JSON response containing the result of the upload.
+  """
+  chunks = extract_upload_data(request, "POST")
+  try:
+    response = perform_upload(request, **chunks)
+    return JsonResponse(response)
+  except Exception as e:
+    return JsonResponse({'success': False, 'error': 'Error in upload'})
 
 @require_http_methods(["POST"])
 def upload_file(request):

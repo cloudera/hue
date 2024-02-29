@@ -155,7 +155,7 @@ var Node = function (node, vm) {
           self.properties.parameters.push(ko.mapping.fromJS({'value': ''}));
         }
       }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
+        huePubSub.publish('hue.global.error', {message: xhr.responseText});
       });
     }
   };
@@ -388,10 +388,10 @@ var Workflow = function (vm, workflow) {
 
         vm.currentlyCreatingFork = false;
       } else {
-        $(document).trigger("error", data.message);
+        huePubSub.publish('hue.global.error', {message: data.message});
       }
     }).fail(function (xhr, textStatus, errorThrown) {
-      $(document).trigger("error", xhr.responseText);
+      huePubSub.publish('hue.global.error', {message: xhr.responseText});
     });
     hueAnalytics.log('oozie/editor/workflow', 'add_node');
   };
@@ -1213,15 +1213,15 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
             shareViewModel.setDocUuid(data.doc_uuid);
           }
           self.workflow.id(data.id);
-          $(document).trigger("info", data.message);
+          huePubSub.publish('hue.global.info', { message: data.message });
           self.workflow.tracker().markCurrentStateAsClean();
           huePubSub.publish('assist.document.refresh');
           hueUtils.changeURL('/hue/oozie/editor/workflow/edit/?workflow=' + data.id);
         } else {
-          $(document).trigger("error", data.message);
+          huePubSub.publish('hue.global.error', {message: data.message});
         }
       }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
+        huePubSub.publish('hue.global.error', {message: xhr.responseText});
       }).always(function () {
         self.isSaving(false);
       });
@@ -1238,10 +1238,10 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
         console.log(data.xml);
       }
       else {
-        $(document).trigger("error", data.message);
+        huePubSub.publish('hue.global.error', {message: data.message});
       }
     }).fail(function (xhr, textStatus, errorThrown) {
-      $(document).trigger("error", xhr.responseText);
+      huePubSub.publish('hue.global.error', {message: xhr.responseText});
     });
   };
 
@@ -1253,7 +1253,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
     }, function (data) {
       $(document).trigger("showSubmitPopup", data);
     }).fail(function (xhr, textStatus, errorThrown) {
-      $(document).trigger("error", xhr.responseText);
+      huePubSub.publish('hue.global.error', {message: xhr.responseText});
     });
   };
 
@@ -1264,7 +1264,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
     }, function (data) {
       $(document).trigger("showSubmitPopup", data);
     }).fail(function (xhr, textStatus, errorThrown) {
-      $(document).trigger("error", xhr.responseText);
+      huePubSub.publish('hue.global.error', {message: xhr.responseText});
     });
   };
 

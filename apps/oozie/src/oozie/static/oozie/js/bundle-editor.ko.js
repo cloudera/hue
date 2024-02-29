@@ -47,7 +47,7 @@ var Bundle = function (vm, bundle) {
 
       self.coordinators.push(ko.mapping.fromJS(_var));
     }).fail(function (xhr, textStatus, errorThrown) {
-      $(document).trigger("error", xhr.responseText);
+      huePubSub.publish('hue.global.error', {message: xhr.responseText});
     });
   };
 }
@@ -121,14 +121,14 @@ var BundleEditorViewModel = function (bundle_json, coordinators_json, can_edit_j
           }
           self.bundle.id(data.id);
           self.bundle.tracker().markCurrentStateAsClean();
-          $(document).trigger("info", data.message);
+          huePubSub.publish('hue.global.info', { message: data.message });
           hueUtils.changeURL('/hue/oozie/editor/bundle/edit/?bundle=' + data.id);
         }
         else {
-          $(document).trigger("error", data.message);
+          huePubSub.publish('hue.global.error', {message: data.message});
         }
       }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
+        huePubSub.publish('hue.global.error', {message: xhr.responseText});
       }).always(function () {
         self.isSaving(false);
       });
@@ -145,7 +145,7 @@ var BundleEditorViewModel = function (bundle_json, coordinators_json, can_edit_j
       }, function (data) {
         $(document).trigger("showSubmitPopup", data);
       }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
+        huePubSub.publish('hue.global.error', {message: xhr.responseText});
       });
     }
   };

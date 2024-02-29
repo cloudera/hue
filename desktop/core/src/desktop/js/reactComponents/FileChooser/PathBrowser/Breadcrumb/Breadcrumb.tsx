@@ -14,8 +14,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Property } from '@typescript-eslint/types/dist/ast-spec';
-import { min } from 'lodash';
 import React from 'react';
 
 import OverflowingItem from '../OverflowingItem';

@@ -21,7 +21,7 @@ import os
 import boto
 
 from aws import conf as aws_conf
-from aws.s3.s3connection import url_client_connect_to_region, RazS3Connection
+from aws.s3.s3connection import RazS3Connection
 from aws.s3.s3fs import S3FileSystem, S3FileSystemException
 
 from desktop.lib.idbroker import conf as conf_idbroker
@@ -45,7 +45,7 @@ def _make_client(identifier, user):
   client_conf = aws_conf.AWS_ACCOUNTS[identifier] if identifier in aws_conf.AWS_ACCOUNTS else None
 
   if aws_conf.is_raz_s3():
-    host = aws_conf.get_default_host() or client_conf.HOST.get()
+    host = client_conf.HOST.get()
     s3_client = RazS3Connection(username=user, host=host)  # Note: Remaining AWS configuration is fully skipped
     s3_client_expiration = None
   else:
@@ -173,14 +173,11 @@ class Client(object):
     try:
       # Use V4 signature support by default
       os.environ['S3_USE_SIGV4'] = 'True'
-      if self._host is not None and not aws_conf.IS_SELF_SIGNING_ENABLED.get():
+      if self._host is not None:
         kwargs.update({'host': self._host})
         connection = boto.s3.connection.S3Connection(**kwargs)
       elif self._region:
-        if aws_conf.IS_SELF_SIGNING_ENABLED.get():
-          connection = url_client_connect_to_region(self._region, **kwargs)
-        else:
-          connection = boto.s3.connect_to_region(self._region, **kwargs)
+        connection = boto.s3.connect_to_region(self._region, **kwargs)
       else:
         kwargs.update({'host': 's3.amazonaws.com'})
         connection = boto.s3.connection.S3Connection(**kwargs)

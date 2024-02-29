@@ -620,7 +620,7 @@ function import_jobsub_load_success(data) {
   if (data.status == 0) {
     import_jobsub_action.initialize(data.data);
   } else {
-    $(document).trigger("error", interpret_server_error(data, "${ _('Received invalid response from server') } "));
+    huePubSub.publish('hue.global.error', {message: interpret_server_error(data, "${ _('Received invalid response from server') } ")});
   }
 }
 
@@ -628,15 +628,15 @@ function import_workflow_load_success(data) {
   if (data.status == 0) {
     import_workflow_action.initialize(data.data);
   } else {
-    $(document).trigger("error", interpret_server_error(data, "${ _('Received invalid response from server') } "));
+    huePubSub.publish('hue.global.error', {message: interpret_server_error(data, "${ _('Received invalid response from server') } ")});
   }
 }
 
 function workflow_save_success(data) {
   if (data.status != 0) {
-    $(document).trigger("error", interpret_server_error(data, "${ _('Could not save workflow') }"));
+    huePubSub.publish('hue.global.error', {message: interpret_server_error(data, "${ _('Could not save workflow') }")});
   } else {
-    $(document).trigger("info", "${ _('Workflow saved') }");
+    huePubSub.publish('hue.global.info', { message: "${ _('Workflow saved') }"});
     workflow.reload(data.data);
     workflow.is_dirty( false );
     workflow.loading( false );
@@ -646,7 +646,7 @@ function workflow_save_success(data) {
 
 function workflow_save_error(jqXHR) {
   if (jqXHR.status !== 400) {
-    $(document).trigger("error", interpret_server_error(jqXHR.responseJSON, "${ _('Could not save workflow') }"));
+    huePubSub.publish('hue.global.error', {message: interpret_server_error(jqXHR.responseJSON, "${ _('Could not save workflow') }")});
   } else {
     ko.mapping.fromJS(jqXHR.responseJSON.details.errors, workflow.errors);
     workflow.loading(false);
@@ -655,7 +655,7 @@ function workflow_save_error(jqXHR) {
 }
 
 function workflow_read_only_handler() {
-  $(document).trigger("error", "${ _('Workflow is in read only mode.') }");
+  huePubSub.publish('hue.global.error', {message: "${ _('Workflow is in read only mode.') }"});
   workflow.loading(false);
 }
 
@@ -670,14 +670,14 @@ function workflow_load_success(data) {
     ko.applyBindings(kill_view_model, $('#editKill')[0]);
 
   } else {
-    $(document).trigger("error", interpret_server_error(data, "${ _('Error loading workflow') }"));
+    huePubSub.publish('hue.global.error', {message: interpret_server_error(data, "${ _('Error loading workflow') }")});
   }
   workflow.loading(false);
 }
 
 function workflow_load_error(jqXHR) {
   var data = jqXHR.responseJSON;
-  $(document).trigger("error", interpret_server_error(jqXHR.responseJSON, "${ _('Error loading workflow') }"));
+  huePubSub.publish('hue.global.error', {message:  interpret_server_error(jqXHR.responseJSON, "${ _('Error loading workflow') }")});
   workflow.loading(false);
 }
 
@@ -902,9 +902,9 @@ $('#importJobsub').on('click', '.action-row', function(e) {
 
           workflow.el.trigger('workflow:rebuild');
           routie('editWorkflow');
-          $(document).trigger("info", "${ _('Action imported at the top of the workflow.') } ");
+          huePubSub.publish('hue.global.info', { message: "${ _('Action imported at the top of the workflow.') } "});
         } else {
-          $(document).trigger("error", interpret_server_error(data, "${ _('Received invalid response from server') }"));
+          huePubSub.publish('hue.global.error', {message: interpret_server_error(data, "${ _('Received invalid response from server') }")});
         }
       }
     });
@@ -926,7 +926,7 @@ $('#importOozie').on('click', '.action-row', function(e) {
           import_view_model.oozie().initialize({nodes: data.data.actions});
           routie('importAction/oozie');
         } else {
-          $(document).trigger("error", interpret_server_error(data, "${ _('Received invalid response from server') }"));
+          huePubSub.publish('hue.global.error', {message: interpret_server_error(data, "${ _('Received invalid response from server') }")});
         }
       }
     });
@@ -943,7 +943,7 @@ $('#importOozieAction').on('click', '.action-row', function(e) {
 
     workflow.el.trigger('workflow:rebuild');
     routie('editWorkflow');
-    $(document).trigger("info", "${ _('Action imported at the top of the workflow.') }");
+    huePubSub.publish('hue.global.info', { message: "${ _('Action imported at the top of the workflow.') }"});
   }
 });
 
@@ -1035,7 +1035,7 @@ $(document).ready(function () {
     $.post(_url, function (data) {
       window.location = data.url;
     }).fail(function(){
-      $(document).trigger("error", "${ _('There was a problem copying this workflow.') }");
+      huePubSub.publish('hue.global.error', {message: "${ _('There was a problem copying this workflow.') }"});
     });
   });
 
@@ -1068,7 +1068,8 @@ $(document).ready(function () {
         $('#submit-wf-modal').modal('show');
       }
     ).fail(function(){
-      $(document).trigger("error", "${ _('There was a problem submitting this workflow.') }");
+
+      huePubSub.publish('hue.global.error', {message: "${ _('There was a problem submitting this workflow.') }"});
     });
   }
 

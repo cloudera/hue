@@ -3089,7 +3089,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               callback(data);
             }
           } else {
-            $(document).trigger("error", data.message);
+            huePubSub.publish('hue.global.error', {message: data.message});
           }
         });
       };
@@ -3265,7 +3265,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             vm.job().fetchLogs();
 
           } else {
-            $(document).trigger("error", data.message);
+            huePubSub.publish('hue.global.error', {message: data.message});
           }
         }).always(function () {
           self.loadingJob(false);
@@ -3345,7 +3345,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               $('.jb-panel pre:visible').css('overflow-y', 'auto').height(Math.max(200, $(window).height() - $('.jb-panel pre:visible').offset().top - $('.page-content').scrollTop() - 75));
             }
           } else {
-            $(document).trigger("error", data.message);
+            huePubSub.publish('hue.global.error', {message: data.message});
           }
         });
         return lastFetchLogsRequest;
@@ -3402,7 +3402,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               callback(data);
             }
           } else {
-            $(document).trigger("error", data.message);
+            huePubSub.publish('hue.global.error', {message: data.message});
           }
         });
         return lastFetchProfileRequest;
@@ -3421,7 +3421,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             self.progress(data.app.progress);
             self.canWrite(data.app.canWrite);
           } else {
-            $(document).trigger("error", data.message);
+            huePubSub.publish('hue.global.error', {message: data.message});
           }
         });
         return lastFetchStatusRequest;
@@ -3460,10 +3460,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             if (data.status == 0) {
               $.jHueNotify.info("${ _('Successfully updated Coordinator Job Properties') }");
             } else {
-              $(document).trigger("error", data.message);
+              huePubSub.publish('hue.global.error', {message: data.message});
             }
           }).fail(function (xhr, textStatus, errorThrown) {
-            $(document).trigger("error", xhr.responseText);
+            huePubSub.publish('hue.global.error', {message: xhr.responseText});
           });
 
         } else if (action == 'sync_workflow') {
@@ -3474,11 +3474,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           }, function (data) {
             $(document).trigger("showSubmitPopup", data);
           }).fail(function (xhr, textStatus, errorThrown) {
-            $(document).trigger("error", xhr.responseText);
+            huePubSub.publish('hue.global.error', {message: xhr.responseText});
           });
         } else {
           vm.jobs._control([self.id()], action, function(data) {
-            $(document).trigger("info", data.message);
+            huePubSub.publish('hue.global.info', { message: data.message });
             self.fetchStatus();
           });
         }
@@ -3519,7 +3519,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           "auto_resize_cpu": self.updateClusterAutoResizeCpu()
         }, function(data) {
           console.log(ko.mapping.toJSON(data));
-          ## $(document).trigger("info", ko.mapping.toJSON(data));
+          ## huePubSub.publish('hue.global.info', { message: ko.mapping.toJSON(data) });
           self.updateJob();
         });
       }
@@ -3791,7 +3791,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               callback(data);
             };
           } else {
-            $(document).trigger("error", data.message);
+            huePubSub.publish('hue.global.error', {message: data.message});
           }
         });
       };
@@ -3895,7 +3895,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             "namespace_name": "crn:altus:sdx:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:namespace:analytics/7ea35fe5-dbc9-4b17-92b1-97a1ab32e410"
           }, function(data) {
             console.log(ko.mapping.toJSON(data));
-            $(document).trigger("info", ko.mapping.toJSON(data));
+            huePubSub.publish('hue.global.info', { message: ko.mapping.toJSON(data) });
             self.updateJobs();
             huePubSub.publish('context.catalog.refresh');
           });
@@ -3914,7 +3914,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           }, function(data) {
             console.log(ko.mapping.toJSON(data));
             self.createClusterFormReset();
-            ##$(document).trigger("info", ko.mapping.toJSON(data));
+            ##huePubSub.publish('hue.global.info', { message: ko.mapping.toJSON(data) });
             self.updateJobs();
             huePubSub.publish('context.catalog.refresh');
           });
@@ -3957,7 +3957,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             }),
             action,
             function(data) {
-              $(document).trigger("info", data.message);
+              huePubSub.publish('hue.global.info', { message: data.message });
               self.updateJobs();
             }
           )
@@ -3979,7 +3979,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               self.selectedJobs([]);
             }
           } else {
-            $(document).trigger("error", data.message);
+            huePubSub.publish('hue.global.error', {message: data.message});
           }
         }).always(function () {
         });
@@ -4018,7 +4018,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           return '${ ENABLE_HISTORY_V2.get() }' == 'True';
         };
         var jobsInterfaceCondition = function () {
-          return self.appConfig() && self.appConfig()['browser'] && self.appConfig()['browser']['interpreter_names'].indexOf('yarn') != -1 && (!self.cluster() || self.cluster()['type'].indexOf('altus') == -1);
+          return !window.getLastKnownConfig().has_computes && self.appConfig() && self.appConfig()['browser'] && self.appConfig()['browser']['interpreter_names'].indexOf('yarn') != -1 && (!self.cluster() || self.cluster()['type'].indexOf('altus') == -1);
         };
         var dataEngInterfaceCondition = function () {
           return self.cluster() && self.cluster()['type'] == 'altus-de';
@@ -4045,10 +4045,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           return '${ is_mini }' == 'False' && self.appConfig() && self.appConfig()['editor'] && (self.appConfig()['editor']['interpreter_names'].indexOf('pyspark') != -1 || self.appConfig()['editor']['interpreter_names'].indexOf('sparksql') != -1);
         };
         var queryInterfaceCondition = function () {
-          return '${ ENABLE_QUERY_BROWSER.get() }' == 'True' && self.appConfig() && self.appConfig()['editor'] && self.appConfig()['editor']['interpreter_names'].indexOf('impala') != -1 && (!self.cluster() || self.cluster()['type'].indexOf('altus') == -1);
+          return !window.getLastKnownConfig().has_computes && '${ ENABLE_QUERY_BROWSER.get() }' == 'True' && self.appConfig() && self.appConfig()['editor'] && self.appConfig()['editor']['interpreter_names'].indexOf('impala') != -1 && (!self.cluster() || self.cluster()['type'].indexOf('altus') == -1);
         };
         var queryHiveInterfaceCondition = function () {
-          return '${ ENABLE_HIVE_QUERY_BROWSER.get() }' == 'True';
+          return !window.getLastKnownConfig().has_computes && '${ ENABLE_HIVE_QUERY_BROWSER.get() }' == 'True';
         };
         var scheduleHiveInterfaceCondition = function () {
           return '${ ENABLE_QUERY_SCHEDULING.get() }' == 'True';
@@ -4320,7 +4320,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               if (id) {
                 openJob(id);
               } else {
-                $(document).trigger("error", '${ _("No log available") }');
+                huePubSub.publish('hue.global.error', {message: '${ _("No log available") }'});
               }
             }
           );

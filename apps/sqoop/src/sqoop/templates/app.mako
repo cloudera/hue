@@ -766,7 +766,7 @@ function handle_form_errors(e, node, options, data) {
   switch(data.status) {
     case 1:
     $.each(errors, function(index, err) {
-      $(document).trigger("error", err);
+      huePubSub.publish('hue.global.error', {message: err});
     });
     break;
     case 100:
@@ -823,27 +823,27 @@ $(document).on('link_error.jobs', function(e, name, options, jqXHR) {
 });
 
 $(document).on('start.job', function(e, options, job) {
-  $(document).trigger("info", "${ _('The job is starting...') }");
+  huePubSub.publish('hue.global.info', { message:  "${ _('The job is starting...') }"});
 });
 
 $(document).on('started.job', function(e, job, options, submission_dict) {
-  $(document).trigger("info", "${ _('Started job.') }");
+  huePubSub.publish('hue.global.info', { message: "${ _('Started job.') }"});
 });
 
 $(document).on('start_fail.job', function(e, job, options, error) {
-  $(document).trigger("error", "${ _('Error: ') }" + (typeof error.exception != "undefined" ? error.exception : error));
+  huePubSub.publish('hue.global.error', { message: "${ _('Error: ') }" + (typeof error.exception != "undefined" ? error.exception : error)});
 });
 
 $(document).on('stopped.job', function(e, job, options, submission_dict) {
-  $(document).trigger("info", "${ _('Stopped job.') }");
+  huePubSub.publish('hue.global.info', {message: "${ _('Stopped job.') }"});
 });
 
 $(document).on('stop_fail.job', function(e, job, options, submission_dict) {
-  $(document).trigger("error", "${ _('Could not stop job.') }");
+  huePubSub.publish('hue.global.error', {message: "${ _('Could not stop job.') }"});
 });
 
 $(document).one('load_fail.job', function() {
-  $(document).trigger("error", "${ _('Could not load node.') }");
+  huePubSub.publish('hue.global.error', {message: "${ _('Could not load node.') }"});
 });
 
 $(document).on('save_fail.job', handle_form_errors);

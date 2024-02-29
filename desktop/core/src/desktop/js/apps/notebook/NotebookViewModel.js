@@ -360,7 +360,9 @@ export default class NotebookViewModel {
           const options = {
             successCallback: function (result) {
               if (result && result.exists) {
-                $(document).trigger('info', result.path + ' saved successfully.');
+                huePubSub.publish('hue.global.info', {
+                  message: result.path + ' saved successfully.'
+                });
               } else {
                 self._ajaxError(result);
               }
@@ -617,7 +619,7 @@ export default class NotebookViewModel {
             }
             deferredOpen.resolve();
           } else {
-            $(document).trigger('error', data.message);
+            huePubSub.publish('hue.global.error', { message: data.message });
             deferredOpen.reject();
             self.newNotebook();
           }

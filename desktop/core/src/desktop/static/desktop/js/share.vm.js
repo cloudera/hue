@@ -52,7 +52,7 @@ function ShareViewModel(updateDocF) {
     $.get('/desktop/api/doc/get', { id : docId }, function (data) {
       shareViewModel.selectedDoc(data)
     }).fail(function (response) {
-      $(document).trigger("error", "There was an error processing your action: " + response.responseText);
+      huePubSub.publish('hue.global.error', {message: "There was an error processing your action: " + response.responseText});
     });
   }
 }
@@ -166,7 +166,7 @@ function setupSharing(id, updateFunc) {
         id();
       }
     }).fail(function (response) {
-      $(document).trigger("error", "There was an error processing your action: " + response.responseText);
+      huePubSub.publish('hue.global.error', {message: "There was an error processing your action: " + response.responseText});
     });
 
     $("#documentShareAddBtn").on("click", function () {
@@ -263,13 +263,13 @@ function shareDocFinal() {
   }, function (response) {
     if (response != null) {
       if (response.status != 0) {
-        $(document).trigger("error", "There was an error processing your action: " + response.message);
+        huePubSub.publish('hue.global.error', {message: "There was an error processing your action: " + response.message});
       }
       else {
         shareViewModel.updateDoc(response.doc);
       }
     }
   }).fail(function (response) {
-    $(document).trigger("error", "There was an error processing your action: " + response.responseText);
+    huePubSub.publish('hue.global.error', {message: "There was an error processing your action: " + response.responseText});
   });
 }

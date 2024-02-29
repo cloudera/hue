@@ -261,3 +261,11 @@ $hue-panel-border-radius: 3px;
     flex: 1;
   }
 }
+
+@mixin hue-svg-icon__d3-conflict {
+  svg {
+    display: inline-block;
+    height: 1em;
+    width: 1em;
+  }
+}

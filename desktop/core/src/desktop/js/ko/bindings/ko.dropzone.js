@@ -17,6 +17,7 @@
 import Dropzone from 'dropzone';
 import $ from 'jquery';
 import * as ko from 'knockout';
+import huePubSub from 'utils/huePubSub';
 
 import I18n from 'utils/i18n';
 
@@ -77,12 +78,14 @@ ko.bindingHandlers.dropzone = {
           const response = JSON.parse(file.xhr.response);
           if (response && response.status != null) {
             if (response.status !== 0) {
-              $(document).trigger('error', response.data);
+              huePubSub.publish('hue.global.error', { message: response.data });
               if (value.onError) {
                 value.onError(file.name);
               }
             } else {
-              $(document).trigger('info', response.path + ' ' + I18n('uploaded successfully'));
+              huePubSub.publish('hue.global.info', {
+                message: response.path + ' ' + I18n('uploaded successfully')
+              });
               if (value.onComplete) {
                 value.onComplete(response.path);
               }

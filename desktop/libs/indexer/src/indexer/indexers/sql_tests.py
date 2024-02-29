@@ -296,7 +296,7 @@ def test_generate_create_text_table_with_data_partition():
     u'outputFormats': [{u'name': u'Table', u'value': u'table'}, {u'name': u'Solr index', u'value': u'index'}],
     u'customMapDelimiter': u'\\003', u'showProperties': False, u'useDefaultLocation': True, u'description': u'',
     u'primaryKeyObjects': [], u'customFieldDelimiter': u',', u'existingTargetUrl': u'', u'importData': True, u'isIceberg': False,
-    u'databaseName': u'default', u'KUDU_DEFAULT_RANGE_PARTITION_COLUMN': {u'include_upper_val': u'<=', u'upper_val': 1,
+    u'useCopy': False, u'databaseName': u'default', u'KUDU_DEFAULT_RANGE_PARTITION_COLUMN': {u'include_upper_val': u'<=', u'upper_val': 1,
     u'name': u'VALUES', u'include_lower_val': u'<=', u'lower_val': 0, u'values': [{u'value': u''}]}, u'primaryKeys': [],
     u'outputFormat': u'table', u'nonDefaultLocation': u'/user/romain/customer_stats.csv', u'name': u'default.customer_stats',
     u'tableFormat': u'text', 'ouputFormat': u'table',
@@ -371,7 +371,7 @@ def test_generate_create_kudu_table_with_data():
     u'description': u'Big Data', u'primaryKeyObjects': [{u'operations': [], u'comment': u'', u'name': u'id', u'level': 0,
     u'keyType': u'string', u'required': False, u'nested': [], u'isPartition': False, u'length': 100, u'multiValued': False,
     u'unique': False, u'type': u'string', u'showProperties': False, u'keep': True}], u'customFieldDelimiter': u',',
-    u'existingTargetUrl': u'', u'importData': True, u'isIceberg': False, u'databaseName': u'default',
+    u'existingTargetUrl': u'', u'importData': True, u'isIceberg': False, u'useCopy': False, u'databaseName': u'default',
     u'KUDU_DEFAULT_RANGE_PARTITION_COLUMN': {u'include_upper_val': u'<=', u'upper_val': 1, u'name': u'VALUES',
     u'include_lower_val': u'<=', u'lower_val': 0, u'values': [{u'value': u''}]}, u'primaryKeys': [u'id'],
     u'outputFormat': u'table', u'nonDefaultLocation': u'/user/admin/index_data.csv', u'name': u'index_data',
@@ -527,9 +527,9 @@ def test_generate_create_parquet_table():
     '''"text","name":"Text"},{"value":"parquet","name":"Parquet"},{"value":"kudu","name":"Kudu"},{"value":"csv","name":"Csv"},'''
     '''{"value":"avro","name":"Avro"},{"value":"json","name":"Json"},{"value":"regexp","name":"Regexp"},{"value":"orc",'''
     '''"name":"ORC"}],"partitionColumns":[],"kuduPartitionColumns":[],"primaryKeys":[],"primaryKeyObjects":[],"importData":true,'''
-    '''"isIceberg":false,"useDefaultLocation":true,"nonDefaultLocation":"/user/hue/data/query-hive-360.csv","hasHeader":true,'''
-    '''"useCustomDelimiters":false,"customFieldDelimiter":",","customCollectionDelimiter":"\\\\002","customMapDelimiter":"\\\\003",'''
-    '''"customRegexp":""}'''
+    '''"isIceberg":false,"useCopy":false,"useDefaultLocation":true,"nonDefaultLocation":"/user/hue/data/query-hive-360.csv",'''
+    '''"hasHeader":true,"useCustomDelimiters":false,"customFieldDelimiter":",","customCollectionDelimiter":"\\\\002",'''
+    '''"customMapDelimiter":"\\\\003","customRegexp":""}'''
   )
 
   path = {'isDir': False, 'split': ('/user/hue/data', 'query-hive-360.csv'), 'listdir': ['/user/hue/data']}
@@ -619,9 +619,9 @@ def test_generate_create_iceberg_table():
     '''"text","name":"Text"},{"value":"parquet","name":"Parquet"},{"value":"kudu","name":"Kudu"},{"value":"csv","name":"Csv"},'''
     '''{"value":"avro","name":"Avro"},{"value":"json","name":"Json"},{"value":"regexp","name":"Regexp"},{"value":"orc",'''
     '''"name":"ORC"}],"partitionColumns":[],"kuduPartitionColumns":[],"primaryKeys":[],"primaryKeyObjects":[],"importData":true,'''
-    '''"isIceberg":true,"useDefaultLocation":true,"nonDefaultLocation":"/user/hue/data/query-hive-360.csv","hasHeader":true,'''
-    '''"useCustomDelimiters":false,"customFieldDelimiter":",","customCollectionDelimiter":"\\\\002","customMapDelimiter":"\\\\003",'''
-    '''"customRegexp":""}'''
+    '''"isIceberg":true,"useCopy":false,"useDefaultLocation":true,"nonDefaultLocation":"/user/hue/data/query-hive-360.csv",'''
+    '''"hasHeader":true,"useCustomDelimiters":false,"customFieldDelimiter":",","customCollectionDelimiter":"\\\\002",'''
+    '''"customMapDelimiter":"\\\\003","customRegexp":""}'''
   )
 
   path = {'isDir': False, 'split': ('/user/hue/data', 'query-hive-360.csv'), 'listdir': ['/user/hue/data']}
@@ -715,7 +715,7 @@ def test_generate_create_orc_table_transactional():
   '''{"value":"orc","name":"ORC"}],"partitionColumns":[],"kuduPartitionColumns":[],"primaryKeys":[],"primaryKeyObjects":[],'''
   '''"importData":true,"useDefaultLocation":true,"nonDefaultLocation":"/user/hue/data/query-hive-360.csv","hasHeader":true,'''
   '''"useCustomDelimiters":false,"customFieldDelimiter":",","customCollectionDelimiter":"\\\\002","customMapDelimiter":"\\\\003",'''
-  '''"customRegexp":"","isIceberg":false}'''
+  '''"customRegexp":"","isIceberg":false,"useCopy":false}'''
   )
 
   path = {'isDir': False, 'split': ('/user/hue/data', 'query-hive-360.csv'), 'listdir': ['/user/hue/data']}
@@ -781,7 +781,7 @@ def test_generate_create_empty_kudu_table():
     '''"partitionColumns":[],"kuduPartitionColumns":[],"primaryKeys": ["acct_client"],"primaryKeyObjects":[],"importData":false,'''
     '''"useDefaultLocation":true,"nonDefaultLocation":"/user/hue/data/query-hive-360.csv","hasHeader":false,"useCustomDelimiters":'''
     '''false,"customFieldDelimiter":",","customCollectionDelimiter":"\\\\002","customMapDelimiter":"\\\\003","customRegexp":"",'''
-    '''"isIceberg":false}'''
+    '''"isIceberg":false,"useCopy":false}'''
   )
 
   path = {'isDir': False, 'split': ('/user/hue/data', 'query-hive-360.csv'), 'listdir': ['/user/hue/data']}
@@ -899,8 +899,8 @@ def test_create_ddl_with_nonascii():
                  u'rdbmsSplitByColumn': [], u'existingTargetUrl': u'', u'channelSinkTypes':
                    [{u'name': u'This topic', u'value': u'kafka'}, {u'name': u'Solr', u'value': u'solr'},
                     {u'name': u'HDFS', u'value': u'hdfs'}], u'defaultName': u'default.renamed_chinese_cities_gb2312',
-                 u'isTransactionalUpdateEnabled': False, u'importData': True, u'isIceberg': False, u'databaseName': u'default',
-                 u'indexerRunJob': False, u'indexerReplicationFactor': 1, u'KUDU_DEFAULT_RANGE_PARTITION_COLUMN':
+                 u'isTransactionalUpdateEnabled': False, u'importData': True, u'isIceberg': False, u'useCopy': False, u'databaseName':
+                 u'default', u'indexerRunJob': False, u'indexerReplicationFactor': 1, u'KUDU_DEFAULT_RANGE_PARTITION_COLUMN':
                    {u'include_upper_val': u'<=', u'upper_val': 1, u'name': u'VALUES', u'include_lower_val': u'<=',
                     u'lower_val': 0, u'values': [{u'value': u''}]}, u'primaryKeys': [], u'indexerConfigSet': u'',
                  u'sqoopJobLibPaths': [{u'path': u''}], u'outputFormat': u'table',

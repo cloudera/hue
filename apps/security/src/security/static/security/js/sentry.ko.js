@@ -291,10 +291,10 @@ var SentryViewModel = (function () {
             self.originalGroups.push(group);
           });
         } else {
-          $(document).trigger("error", data.message);
+          huePubSub.publish('hue.global.error', {message: data.message});
         }
       }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
+        huePubSub.publish('hue.global.error', {message: xhr.responseText});
       });
     }
 
@@ -306,7 +306,7 @@ var SentryViewModel = (function () {
           component: vm.component()
         }, function (data) {
           if (data.status == 0) {
-            $(document).trigger("info", data.message);
+            huePubSub.publish('hue.global.info', { message: data.message });
             vm.showCreateRole(false);
             self.reset();
             var role = new Role(vm, data.role);
@@ -315,10 +315,10 @@ var SentryViewModel = (function () {
             vm.list_sentry_privileges_by_authorizable();
             $(document).trigger("createdRole");
           } else {
-            $(document).trigger("error", data.message);
+            huePubSub.publish('hue.global.error', {message: data.message});
           }
         }).fail(function (xhr, textStatus, errorThrown) {
-          $(document).trigger("error", xhr.responseText);
+          huePubSub.publish('hue.global.error', {message: xhr.responseText});
         });
       }
     }
@@ -331,15 +331,15 @@ var SentryViewModel = (function () {
           component: vm.component()
         }, function (data) {
           if (data.status == 0) {
-            $(document).trigger("info", data.message);
+            huePubSub.publish('hue.global.info', { message: data.message });
             vm.showCreateRole(false);
             vm.list_sentry_privileges_by_authorizable();
             $(document).trigger("createdRole");
           } else {
-            $(document).trigger("error", data.message);
+            huePubSub.publish('hue.global.error', {message: data.message});
           }
         }).fail(function (xhr, textStatus, errorThrown) {
-          $(document).trigger("error", xhr.responseText);
+          huePubSub.publish('hue.global.error', {message: xhr.responseText});
         });
       }
     }
@@ -355,10 +355,10 @@ var SentryViewModel = (function () {
           vm.list_sentry_privileges_by_authorizable();
           $(document).trigger("removedRole");
         } else {
-          $(document).trigger("error", data.message);
+          huePubSub.publish('hue.global.error', {message: data.message});
         }
       }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
+        huePubSub.publish('hue.global.error', {message: xhr.responseText});
       });
     }
 
@@ -372,10 +372,10 @@ var SentryViewModel = (function () {
           vm.list_sentry_privileges_by_authorizable();
           $(document).trigger("createdRole");
         } else {
-          $(document).trigger("error", data.message);
+          huePubSub.publish('hue.global.error', {message: data.message});
         }
       }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
+        huePubSub.publish('hue.global.error', {message: xhr.responseText});
       });
     }
   }
@@ -843,7 +843,7 @@ var SentryViewModel = (function () {
           cache: false
         };
         $.ajax(request).fail(function (xhr, textStatus, errorThrown) {
-          $(document).trigger("error", xhr.responseText);
+          huePubSub.publish('hue.global.error', {message: xhr.responseText});
         });
       }
       else {
@@ -1064,7 +1064,7 @@ var SentryViewModel = (function () {
         },
         success: function (data) {
           if (typeof data.status !== "undefined" && data.status == -1) {
-            $(document).trigger("error", data.message);
+            huePubSub.publish('hue.global.error', {message: data.message});
           }
           else {
             self.roles.removeAll();
@@ -1080,7 +1080,7 @@ var SentryViewModel = (function () {
           }
         }
       }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
+        huePubSub.publish('hue.global.error', {message: xhr.responseText});
       }).always(function() {
         self.isLoadingRoles(false);
       });
@@ -1114,7 +1114,7 @@ var SentryViewModel = (function () {
         },
         success: function (data) {
           if (typeof data.status !== "undefined" && data.status == -1) {
-            $(document).trigger("error", data.message);
+            huePubSub.publish('hue.global.error', {message: data.message});
           }
           else {
             role.privileges.removeAll();
@@ -1130,7 +1130,7 @@ var SentryViewModel = (function () {
           }
         }
       }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
+        huePubSub.publish('hue.global.error', {message: xhr.responseText});
       });
     };
 
@@ -1199,16 +1199,16 @@ var SentryViewModel = (function () {
         },
         success: function (data) {
           if (data.status == 0) {
-            $(document).trigger("info", data.message);
+            huePubSub.publish('hue.global.info', { message: data.message });
             self.assist.refreshTree();
             self.clearTempRoles();
             $(document).trigger("createdRole");
           } else {
-            $(document).trigger("error", data.message);
+            huePubSub.publish('hue.global.error', {message: data.message});
           }
         }
       }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
+        huePubSub.publish('hue.global.error', {message: xhr.responseText});
       });
     }
 
@@ -1278,11 +1278,11 @@ var SentryViewModel = (function () {
             }
             self.assist.loadData(self.assist.growingTree());
           } else {
-            $(document).trigger("error", data.message);
+            huePubSub.publish('hue.global.error', {message: data.message});
           }
         }
       }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
+        huePubSub.publish('hue.global.error', {message: xhr.responseText});
       }).always(function() {
         self.isLoadingPrivileges(false);
       });
@@ -1321,10 +1321,10 @@ var SentryViewModel = (function () {
             $(document).trigger("deletedBulkPrivileges");
           }
         } else {
-          $(document).trigger("error", data.message);
+          huePubSub.publish('hue.global.error', {message: data.message});
         }
       }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
+        huePubSub.publish('hue.global.error', {message: xhr.responseText});
       });
     }
 
@@ -1342,10 +1342,10 @@ var SentryViewModel = (function () {
           self.list_sentry_privileges_by_authorizable(); // Refresh
           $(document).trigger("addedBulkPrivileges");
         } else {
-          $(document).trigger("error", data.message);
+          huePubSub.publish('hue.global.error', {message: data.message});
         }
       }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
+        huePubSub.publish('hue.global.error', {message: xhr.responseText});
       });
     }
 

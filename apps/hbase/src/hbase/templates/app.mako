@@ -763,7 +763,7 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
                 data.reload();
                 element.modal('hide');
               } else {
-                $(document).trigger("error", $(response.response).find('div.alert strong').text());
+                huePubSub.publish('hue.global.error', {message: $(response.response).find('div.alert strong').text()});
               }
             },
             onSubmit: function () {
@@ -991,7 +991,7 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
         var functionName = arguments.length > 0 ? arguments[0] : '';
         var handler = $.post(url, $_POST).fail(function (response) {
           if (functionName !== 'getColumnDescriptors') {
-            $(document).trigger("error", JSON.parse(response.responseText).message);
+            huePubSub.publish('hue.global.error', {message: JSON.parse(response.responseText).message});
           }
         });
         var doneHandle = handler.done;
@@ -2106,7 +2106,7 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
           multiple: false,
           onComplete: function (id, fileName, response) {
             if (response.response != null)
-              $(document).trigger("error", $(response.response).find('.alert strong').text());
+              huePubSub.publish('hue.global.error', {message: $(response.response).find('.alert strong').text()});
             else
               app.views.tabledata.reload();
           }

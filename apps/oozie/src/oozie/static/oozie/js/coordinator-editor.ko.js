@@ -123,7 +123,7 @@ var CoordinatorEditorViewModel = (function () {
           });
         }
       }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
+        huePubSub.publish('hue.global.error', {message: xhr.responseText});
       });
     }
 
@@ -259,17 +259,17 @@ var CoordinatorEditorViewModel = (function () {
             if (typeof cb === 'function') {
               cb(data);
             } else {
-              $(document).trigger("info", data.message);
+              huePubSub.publish('hue.global.info', { message: data.message });
             }
             if (!cb) { // cb from integrated scheduler
               hueUtils.changeURL('/hue/oozie/editor/coordinator/edit/?coordinator=' + data.id);
             }
           }
           else {
-            $(document).trigger("error", data.message);
+            huePubSub.publish('hue.global.error', {message: data.message});
           }
         }).fail(function (xhr, textStatus, errorThrown) {
-          $(document).trigger("error", xhr.responseText);
+          huePubSub.publish('hue.global.error', {message: xhr.responseText});
         }).always(function () {
           self.isSaving(false);
         });
@@ -287,10 +287,10 @@ var CoordinatorEditorViewModel = (function () {
           console.log(data.xml);
         }
         else {
-          $(document).trigger("error", data.message);
+          huePubSub.publish('hue.global.error', {message: data.message});
         }
       }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
+        huePubSub.publish('hue.global.error', {message: xhr.responseText});
       });
     };
 
@@ -304,7 +304,7 @@ var CoordinatorEditorViewModel = (function () {
         }, function (data) {
           $(document).trigger("showSubmitPopup", data);
         }).fail(function (xhr, textStatus, errorThrown) {
-          $(document).trigger("error", xhr.responseText);
+          huePubSub.publish('hue.global.error', {message: xhr.responseText});
         });
       }
     };

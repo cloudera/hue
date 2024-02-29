@@ -42,11 +42,11 @@ else:
     %if messages:
       %for message in messages:
         %if message.tags == 'error':
-          $(document).trigger('error', '${ escapejs(escape(message)) }');
+          huePubSub.publish('hue.global.error', {message: '${ escapejs(escape(message))}'});
         %elif message.tags == 'warning':
-          $(document).trigger('warn', '${ escapejs(escape(message)) }');
+          huePubSub.publish('hue.global.warning', { message: '${ escapejs(escape(message)) }'});
         %else:
-          $(document).trigger('info', '${ escapejs(escape(message)) }');
+          huePubSub.publish('hue.global.info', { message: '${ escapejs(escape(message)) }'});
         %endif
       %endfor
     %endif

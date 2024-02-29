@@ -1259,7 +1259,7 @@ qq.extend(qq.UploadHandlerXhr.prototype, {
             }
         };
 
-        var formData = new FormData();        
+        var formData = new FormData();
         formData.append(params.fileFieldLabel, file, file.name.normalize('NFC'));
         formData.append('dest', params.dest);
 
@@ -1313,4 +1313,5 @@ qq.extend(qq.UploadHandlerXhr.prototype, {
     }
 });
 
-export default qq;
+let fileuploader = qq;
+export default fileuploader;

@@ -37,7 +37,7 @@ from desktop.lib.python_util import force_dict_to_strings
 
 from aws.conf import is_enabled as is_s3_enabled
 from azure.conf import is_abfs_enabled
-from desktop.conf import is_ofs_enabled
+from desktop.conf import is_ofs_enabled, is_gs_enabled, is_chunked_fileuploader_enabled
 
 if sys.version_info[0] > 2:
   from django.utils.translation import gettext_lazy as _
@@ -654,21 +654,33 @@ LOAD_BALANCER_COOKIE = 'ROUTEID'
 ################################################################
 
 # Insert our custom upload handlers
-file_upload_handlers = [
+if is_chunked_fileuploader_enabled():
+  file_upload_handlers = [
+    'hadoop.fs.upload.FineUploaderChunkedUploadHandler',
+    'django.core.files.uploadhandler.MemoryFileUploadHandler',
+    'django.core.files.uploadhandler.TemporaryFileUploadHandler',
+  ]
+else:
+  file_upload_handlers = [
     'hadoop.fs.upload.HDFSfileUploadHandler',
     'django.core.files.uploadhandler.MemoryFileUploadHandler',
     'django.core.files.uploadhandler.TemporaryFileUploadHandler',
-]
+  ]
 
-if is_s3_enabled():
-  file_upload_handlers.insert(0, 'aws.s3.upload.S3FileUploadHandler')
+  if is_s3_enabled():
+    file_upload_handlers.insert(0, 'aws.s3.upload.S3FileUploadHandler')
 
-if is_abfs_enabled():
-  file_upload_handlers.insert(0, 'azure.abfs.upload.ABFSFileUploadHandler')
+  if is_gs_enabled():
+    file_upload_handlers.insert(0, 'desktop.lib.fs.gc.upload.GSFileUploadHandler')
 
-if is_ofs_enabled():
-  file_upload_handlers.insert(0, 'desktop.lib.fs.ozone.upload.OFSFileUploadHandler')
+  if is_abfs_enabled():
+    file_upload_handlers.insert(0, 'azure.abfs.upload.ABFSFileUploadHandler')
 
+  if is_ofs_enabled():
+    file_upload_handlers.insert(0, 'desktop.lib.fs.ozone.upload.OFSFileUploadHandler')
+
+  if is_ofs_enabled():
+    file_upload_handlers.insert(0, 'desktop.lib.fs.ozone.upload.OFSFileUploadHandler')
 
 FILE_UPLOAD_HANDLERS = tuple(file_upload_handlers)
 

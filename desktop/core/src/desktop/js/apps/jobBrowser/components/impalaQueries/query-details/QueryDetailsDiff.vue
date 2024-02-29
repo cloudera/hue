@@ -84,7 +84,7 @@
 
   import I18n from 'utils/i18n';
 
-  import { CounterDetails, CounterGroup, ImpalaQuery } from '../index';
+  import { CounterDetails, CounterGroup, ImpalaQuery, CounterMetrics, Profile } from '../index';
 
   import { get } from 'lodash';
 
@@ -122,8 +122,8 @@
     methods: {
       get,
       I18n,
-      getCounters: function (profile: any): CounterGroup[] {
-        const kvToCounters = (kv: any): CounterDetails[] => {
+      getCounters: function (profile: Profile): CounterGroup[] {
+        const kvToCounters = (kv: CounterMetrics): CounterDetails[] => {
           return Object.keys(kv).map(key => ({
             counterName: key,
             counterValue: kv[key]

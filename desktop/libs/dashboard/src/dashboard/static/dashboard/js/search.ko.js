@@ -509,11 +509,11 @@ var FieldAnalysis = function (vm, fieldName, fieldType) {
         self.terms.data.push({'key': 'Error', 'val': data.message});
       }
       else {
-        $(document).trigger("error", data.message);
+        huePubSub.publish('hue.global.error', {message: data.message});
       }
       self.isLoading(false);
     }, "text").fail(function (xhr, textStatus, errorThrown) {
-      $(document).trigger("error", xhr.responseText);
+      huePubSub.publish('hue.global.error', {message: xhr.responseText});
     });
   };
 
@@ -537,11 +537,11 @@ var FieldAnalysis = function (vm, fieldName, fieldType) {
         self.stats.data.push({'key': 'Error', 'val': data.message});
       }
       else {
-        $(document).trigger("error", data.message);
+        huePubSub.publish('hue.global.error', {message: data.message});
       }
       self.isLoading(false);
     }, "text").fail(function (xhr, textStatus, errorThrown) {
-      $(document).trigger("error", xhr.responseText);
+      huePubSub.publish('hue.global.error', {message: xhr.responseText});
     });
   };
 }
@@ -1216,7 +1216,7 @@ var Collection = function (vm, collection) {
           huePubSub.publish('search.facet.added', facet);
           vm.search();
         } else {
-          $(document).trigger("error", data.message);
+          huePubSub.publish('hue.global.error', {message: data.message});
         }
         if (callback) {
           callback();
@@ -1939,10 +1939,10 @@ var NewTemplate = function (vm, initial) {
           });
         }
         else {
-          $(document).trigger("error", data.message);
+          huePubSub.publish('hue.global.error', {message: data.message});
         }
     }).fail(function (xhr, textStatus, errorThrown) {
-      $(document).trigger("error", xhr.responseText);
+      huePubSub.publish('hue.global.error', {message: xhr.responseText});
     }).done(function() {
       vm.isSyncingCollections(false);
       self.inited(true);
@@ -2324,11 +2324,11 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
             facet.queryResult().status('expired');
           } else {
             //self._ajaxError(data); // common?
-            $(document).trigger("error", data.message);
+            huePubSub.publish('hue.global.error', {message: data.message});
           }
         }
       }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText || textStatus);
+        huePubSub.publish('hue.global.error', {message: xhr.responseText || textStatus});
         facet.queryResult().status('failed');
       });
     };
@@ -2351,7 +2351,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
             //self._ajaxError(data);
           }
         }).fail(function (xhr, textStatus, errorThrown) {
-          $(document).trigger("error", xhr.responseText);
+          huePubSub.publish('hue.global.error', {message: xhr.responseText});
           self.queryResult().status('failed');
         }).always(function () {
           self.isCanceling(false);
@@ -2370,7 +2370,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
           //self._ajaxError(data);
         }
       }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
+        huePubSub.publish('hue.global.error', {message: xhr.responseText});
         facet.queryResult().status('failed');
       });
     };
@@ -2417,10 +2417,10 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
         } else if (data.status == 5) {
           // No supported yet for this snippet
         } else {
-          $(document).trigger("error", data.message);
+          huePubSub.publish('hue.global.error', {message: data.message});
         }
       }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
+        huePubSub.publish('hue.global.error', {message: xhr.responseText});
       });
     };
 
@@ -2570,7 +2570,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
         }
       })
       .fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
+        huePubSub.publish('hue.global.error', {message: xhr.responseText});
       })
       .always(function () {
         if (!self.collection.async()) {
@@ -2595,7 +2595,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
       self.response(data);
 
       if (data.error) {
-        $(document).trigger("error", data.error);
+        huePubSub.publish('hue.global.error', {message: data.error});
       }
       else {
         var _resultsHash = ko.mapping.toJSON(data.response.docs) + (data.response.moreLikeThis ? '/moreLikeThis' : '');
@@ -2796,7 +2796,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
           callback();
         }
       }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
+        huePubSub.publish('hue.global.error', {message: xhr.responseText});
       });
     };
 
@@ -2878,7 +2878,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
             }
           });
         } else {
-          $(document).trigger("error", data.message);
+          huePubSub.publish('hue.global.error', {message: data.message});
         }
 
         doc.details(details);
@@ -2887,7 +2887,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
           callback(details);
         }
       }, "text").fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
+        huePubSub.publish('hue.global.error', {message: xhr.responseText});
       });
     };
 
@@ -2912,10 +2912,10 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
           doc.originalDetails(ko.toJSON(doc.details()));
         }
         else {
-          $(document).trigger("error", data.message);
+          huePubSub.publish('hue.global.error', {message: data.message});
         }
       }, "text").fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
+        huePubSub.publish('hue.global.error', {message: xhr.responseText});
       });
     };
 
@@ -2966,16 +2966,16 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
           }
           var oldId  = self.collection.id();
           self.collection.id(data.id);
-          $(document).trigger("info", data.message);
+          huePubSub.publish('hue.global.info', { message: data.message });
           if (oldId !== data.id) {
             hueUtils.changeURL('/hue/dashboard/?collection=' + data.id);
           }
         }
         else {
-          $(document).trigger("error", data.message);
+          huePubSub.publish('hue.global.error', {message: data.message});
         }
       }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
+        huePubSub.publish('hue.global.error', {message: xhr.responseText});
       });
     };
 

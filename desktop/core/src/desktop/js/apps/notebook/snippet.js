@@ -1654,7 +1654,7 @@ class Snippet {
           });
         }
       } else {
-        $(document).trigger('error', data.message);
+        huePubSub.publish('hue.global.error', { message: data.message });
         self.status('failed');
       }
     };
@@ -1855,6 +1855,12 @@ class Snippet {
             self.result.clear();
             self.result.handle(data.handle);
             self.result.hasResultset(data.handle.has_result_set);
+
+            if (self.type() === 'trino') {
+              const existing_handle = self.result.handle();
+              existing_handle.row_n = data.handle.row_n;
+              existing_handle.next_uri = data.handle.next_uri;
+            }
             self.showLogs(true);
             if (data.handle.sync) {
               self.loadData(data.result, 100);
@@ -1878,7 +1884,7 @@ class Snippet {
               if (!notebook.sessions().length) {
                 notebook.addSession(
                   new Session(vm, {
-                    type: self.type(),
+                    type: data.handle.session_type || self.type(),
                     session_id: data.handle.session_guid,
                     id: data.handle.session_id,
                     properties: {}
@@ -1887,7 +1893,7 @@ class Snippet {
               } else {
                 notebook.sessions()[0].session_id(data.handle.session_guid);
                 notebook.sessions()[0].id(data.handle.session_id);
-                notebook.sessions()[0].type(self.type());
+                notebook.sessions()[0].type(data.handle.session_type || self.type());
               }
             }
             if (vm.editorMode()) {
@@ -1936,7 +1942,7 @@ class Snippet {
         .fail((xhr, textStatus, errorThrown) => {
           if (self.statusForButtons() != 'canceled' && xhr.status !== 502) {
             // No error when manually canceled
-            $(document).trigger('error', xhr.responseText);
+            huePubSub.publish('hue.global.error', { message: xhr.responseText });
           }
           self.status('failed');
           self.statusForButtons('executed');
@@ -2120,13 +2126,13 @@ class Snippet {
             self.showSqlAnalyzer(true);
             self.hasSuggestion(true);
           } else {
-            $(document).trigger('error', data.message);
+            huePubSub.publish('hue.global.error', { message: data.message });
           }
         }
       )
         .fail((xhr, textStatus, errorThrown) => {
           if (xhr.status !== 502) {
-            $(document).trigger('error', xhr.responseText);
+            huePubSub.publish('hue.global.error', { message: xhr.responseText });
           }
         })
         .always(() => {
@@ -2180,6 +2186,12 @@ class Snippet {
               if (data.status === 0) {
                 self.showExecutionAnalysis(true);
                 self.loadData(data.result, rows);
+
+                if (self.type() === 'trino') {
+                  const existing_handle = self.result.handle();
+                  existing_handle.row_n = data.result.row_n;
+                  existing_handle.next_uri = data.result.next_uri;
+                }
               } else {
                 self._ajaxError(data, () => {
                   self.isFetchingData = false;
@@ -2192,7 +2204,7 @@ class Snippet {
           )
             .fail((xhr, textStatus, errorThrown) => {
               if (xhr.status !== 502) {
-                $(document).trigger('error', xhr.responseText);
+                huePubSub.publish('hue.global.error', { message: xhr.responseText });
               }
             })
             .always(() => {
@@ -2286,12 +2298,12 @@ class Snippet {
           if (data.status == 0) {
             self.result.meta(data.result.meta);
           } else {
-            $(document).trigger('error', data.message);
+            huePubSub.publish('hue.global.error', { message: data.message });
           }
         }
       ).fail((xhr, textStatus, errorThrown) => {
         if (xhr.status !== 502) {
-          $(document).trigger('error', xhr.responseText);
+          huePubSub.publish('hue.global.error', { message: xhr.responseText });
         }
         self.status('failed');
       });
@@ -2319,11 +2331,13 @@ class Snippet {
               // No supported yet for this snippet
             } else {
               //$(document).trigger("error", data.message);
+              //huePubSub.publish('hue.global.error', {message: data.message});
             }
           }
         }
       ).fail((xhr, textStatus, errorThrown) => {
         //$(document).trigger("error", xhr.responseText);
+        //huePubSub.publish('hue.global.error', {message: xhr.responseText});
       });
     };
 
@@ -2353,6 +2367,11 @@ class Snippet {
                   self.status() == 'starting' ||
                   self.status() == 'waiting'
                 ) {
+                  if (self.type() === 'trino') {
+                    const existing_handle = self.result.handle();
+                    existing_handle.row_n = 0;
+                    existing_handle.next_uri = data.query_status.next_uri;
+                  }
                   const delay = self.result.executionTime() > 45000 ? 5000 : 1000; // 5s if more than 45s
                   if (!notebook.unloaded()) {
                     self.checkStatusTimeout = setTimeout(_checkStatus, delay);
@@ -2400,7 +2419,7 @@ class Snippet {
         ).fail((xhr, textStatus, errorThrown) => {
           if (xhr.stausText !== 'abort') {
             if (xhr.status !== 502) {
-              $(document).trigger('error', xhr.responseText || textStatus);
+              huePubSub.publish('hue.global.error', { message: xhr.responseText || textStatus });
             }
             self.status('failed');
             notebook.isExecutingAll(false);
@@ -2475,7 +2494,7 @@ class Snippet {
         )
           .fail((xhr, textStatus, errorThrown) => {
             if (xhr.status !== 502) {
-              $(document).trigger('error', xhr.responseText);
+              huePubSub.publish('hue.global.error', { message: xhr.responseText });
             }
             self.statusForButtons('canceled');
             self.status('failed');
@@ -2506,6 +2525,7 @@ class Snippet {
       ).fail((xhr, textStatus, errorThrown) => {
         if (xhr.status !== 502) {
           // $(document).trigger("error", xhr.responseText);
+          //huePubSub.publish('hue.global.error', {message: xhr.responseText});
         }
         // self.status('failed'); // Can conflict with slow close and new query execution
       });
@@ -2612,7 +2632,7 @@ class Snippet {
       ).fail((xhr, textStatus, errorThrown) => {
         if (xhr.statusText !== 'abort') {
           if (xhr.status !== 502) {
-            $(document).trigger('error', xhr.responseText || textStatus);
+            huePubSub.publish('hue.global.error', { message: xhr.responseText || textStatus });
           }
           self.status('failed');
         }
@@ -2639,7 +2659,7 @@ class Snippet {
             );
             self.watchUploadStatus(data.upload_history[self.type()].status.workloadId);
           } else {
-            $(document).trigger('error', data.message);
+            huePubSub.publish('hue.global.error', { message: data.message });
           }
         }
       );
@@ -2655,7 +2675,7 @@ class Snippet {
     self.uploadTableStats = function (options) {
       hueAnalytics.log('notebook', 'load_table_stats');
       if (options.showProgress) {
-        $(document).trigger('info', 'Preparing table data...');
+        huePubSub.publish('hue.global.info', { message: 'Preparing table data...' });
       }
 
       $.post(
@@ -2686,7 +2706,7 @@ class Snippet {
               self.watchUploadStatus(data.upload_table_ddl.status.workloadId, options.showProgress);
             }
           } else if (options.showProgress) {
-            $(document).trigger('error', data.message);
+            huePubSub.publish('hue.global.error', { message: data.message });
           }
         }
       ).always(() => {
@@ -2705,7 +2725,9 @@ class Snippet {
         data => {
           if (data.status == 0) {
             if (showProgress) {
-              $(document).trigger('info', 'Query processing: ' + data.upload_status.status.state);
+              huePubSub.publish('hue.global.info', {
+                message: 'Query processing: ' + data.upload_status.status.state
+              });
             }
             if (['WAITING', 'IN_PROGRESS'].indexOf(data.upload_status.status.state) != -1) {
               window.setTimeout(() => {
@@ -2724,7 +2746,7 @@ class Snippet {
               );
             }
           } else if (showProgress) {
-            $(document).trigger('error', data.message);
+            huePubSub.publish('hue.global.error', { message: data.message });
           }
         }
       );
@@ -2745,7 +2767,7 @@ class Snippet {
             // eslint-disable-next-line no-restricted-syntax
             console.log(data.statement_similarity);
           } else {
-            $(document).trigger('error', data.message);
+            huePubSub.publish('hue.global.error', { message: data.message });
           }
         }
       );

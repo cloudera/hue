@@ -7,15 +7,6 @@ on:
   pull_request:
     branches:
     - master
-    paths:
-      - '**.js'
-      - '**.jsx'
-      - '**.ts'
-      - '**.tsx'
-      - '**.less'
-      - '**.scss'
-      - '**.vue'
-      - 'package*.json'
 
 jobs:
   build:
@@ -27,7 +18,7 @@ jobs:
     - name: Caching npm with setup node
       uses: actions/setup-node@v3
       with:
-        node-version: 14
+        node-version: 18
         cache: 'npm'
 
     - name: Install npm dependencies
