@@ -757,6 +757,11 @@ class AceLocationHandler {
     const marker = self.editor.getSession().$backMarkers[markerId];
     marker.token = token;
     marker.dispose = function () {
+      if (marker.token.notFound) {
+        // We conclude that there was a marker for missing token (e.g. missing table name),
+        // but the marker is being removed here, so it is no longer missing.
+        huePubSub.publish('sql.error.missing.name', false);
+      }
       range.start.detach();
       range.end.detach();
       delete marker.token.syntaxError;
@@ -1113,7 +1118,6 @@ class AceLocationHandler {
                 ) {
                   // Break if found
                   self.verifyThrottle = window.setTimeout(verify, VERIFY_DELAY);
-                  huePubSub.publish('sql.error.missing.name', false);
                   return;
                 }
                 if (!uniqueIndex[nameLower]) {

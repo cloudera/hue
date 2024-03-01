@@ -52,19 +52,6 @@ describe('PreviewModal', () => {
     expect(screen.getByRole('dialog')).toHaveTextContent(expectedTitle);
   });
 
-  test('displays the correct message when optimize returns no diff', () => {
-    render(
-      <PreviewModal
-        {...commonProps}
-        actionMode={AiActionModes.OPTIMIZE}
-        showDiffFrom={commonProps.suggestion}
-      />
-    );
-    expect(screen.getByRole('dialog')).toHaveTextContent(
-      'No optimization to the SQL statement could be suggested.'
-    );
-  });
-
   test.each([
     [AiActionModes.OPTIMIZE, 'No optimization to the SQL statement could be suggested.'],
     [AiActionModes.FIX, 'Fixed SQL - no suggestion'],

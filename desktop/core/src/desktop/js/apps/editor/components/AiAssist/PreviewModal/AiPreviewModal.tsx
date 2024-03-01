@@ -41,15 +41,15 @@ const hasDiff = ({
   newCode,
   oldCode,
   dialect,
-  preserveOldCodeFormat = false
+  preserveCodeFormat = false
 }: {
   newCode: string;
   oldCode: string;
   dialect: string;
-  preserveOldCodeFormat: boolean;
+  preserveCodeFormat: boolean;
 }): boolean => {
-  const cleanNew = formatClean(newCode, dialect);
-  const cleanOld = preserveOldCodeFormat ? removeComments(oldCode) : formatClean(oldCode, dialect);
+  const cleanNew = preserveCodeFormat ? removeComments(newCode) : formatClean(newCode, dialect);
+  const cleanOld = preserveCodeFormat ? removeComments(oldCode) : formatClean(oldCode, dialect);
   return cleanNew !== cleanOld;
 };
 
@@ -102,9 +102,9 @@ const PreviewModal = ({
   };
   const mesagesOnNoDiff = {
     [AiActionModes.OPTIMIZE]: 'No optimization to the SQL statement could be suggested.',
-    [AiActionModes.EDIT]: 'No fix to the SQL statement could be suggested.',
-    [AiActionModes.FIX]: `The SQL statement could not be edited based on the input given. 
-      The AI has returned an unmodified SQL statement.`
+    [AiActionModes.EDIT]: `The SQL statement could not be edited based on the input given. 
+    The AI has returned an unmodified SQL statement.`,
+    [AiActionModes.FIX]: 'No fix for the SQL statement could be suggested.'
   };
 
   const [guardRailWarningAcknowledged, setGuardRailWarningAcknowledged] = useState(false);
@@ -122,12 +122,12 @@ const PreviewModal = ({
     actionMode === AiActionModes.FIX ||
     actionMode === AiActionModes.EDIT
   ) {
-    const oldCodeHasSyntaxError = actionMode === AiActionModes.FIX
+    const oldCodeHasSyntaxError = actionMode === AiActionModes.FIX;
     const diffDetected = hasDiff({
       newCode: suggestionRaw,
       oldCode: showDiffFromRaw,
       dialect,
-      preserveOldCodeFormat: oldCodeHasSyntaxError
+      preserveCodeFormat: oldCodeHasSyntaxError
     });
 
     if (!diffDetected) {
