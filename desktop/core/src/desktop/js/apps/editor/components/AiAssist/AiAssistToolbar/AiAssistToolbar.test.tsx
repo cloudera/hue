@@ -5,7 +5,7 @@ import { render } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 import AssistToolbar from './AiAssistToolbar';
-import { AiActionModes } from '../AiAssistBar';
+import { AiActionModes } from '../sharedTypes';
 
 describe('AssistToolbar', () => {
   const mockSetActionMode = jest.fn();
@@ -63,10 +63,10 @@ describe('AssistToolbar', () => {
     expect(fixButton).toBeDisabled();
   });
 
-  it('should disable generate button on when there is a statement present', async () => {
+  it('should not disable generate button when there is a statement present', async () => {
     const { getByTitle } = render(<AssistToolbar {...defaultProps} />);
     const generateButton = getByTitle('Generate SQL using natural language');
-    expect(generateButton).toBeDisabled();
+    expect(generateButton).not.toBeDisabled();
   });
 
   it('should enable generate button if the statement only has nql comment', async () => {

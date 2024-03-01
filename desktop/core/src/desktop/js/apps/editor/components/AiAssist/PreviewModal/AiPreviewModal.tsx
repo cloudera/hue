@@ -27,7 +27,7 @@ import { KeywordCase } from 'sql-formatter';
 import { GuardrailAlert, GuardrailAlertType } from '../guardRails';
 import SyntaxHighlighterDiff from '../SyntaxHighlighterDiff/SyntaxHighlighterDiff';
 import InlineAlertCheck from '../InlineAlertCheck/InlineAlertCheck';
-import { AiActionModes } from '../AiAssistBar';
+import { AiActionModes } from '../sharedTypes';
 
 import { useFormatting, formatClean, removeComments } from './formattingUtils';
 import PreviewInfoPanels from './PreviewInfoPanels/PreviewInfoPanels';

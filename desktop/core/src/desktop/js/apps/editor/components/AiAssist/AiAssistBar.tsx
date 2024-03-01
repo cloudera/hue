@@ -19,11 +19,16 @@
 import React, { useState, useEffect, useRef } from 'react';
 import classNames from 'classnames';
 import huePubSub from 'utils/huePubSub';
-import { ParsedSqlStatement } from 'parse/sqlStatementsParser';
+import { AutocompleteParser } from 'parse/types';
 import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
 import { generativeFunctionFactory } from 'api/apiAIHelper';
 import SqlExecutable from '../../execution/sqlExecutable';
-import { getLeadingEmptyLineCount } from '../editorUtils';
+import {
+  getRowInterval,
+  modifyEditorContents,
+  convertToOneBased,
+  prependCommentToSql
+} from './editorIntegrationUtils';
 import AiPreviewModal from './PreviewModal/AiPreviewModal';
 import GuardrailsModal from './GuardrailsModal/GuardrailsModal';
 import { useKeywordCase } from './hooks';
@@ -34,17 +39,10 @@ import AssistToolbar from './AiAssistToolbar/AiAssistToolbar';
 import UntrustedAiModal from './UntrustedAiModal/UntrustedAiModal';
 import { withGuardrails, GuardrailAlert, GuardrailAlertType } from './guardRails';
 import { extractLeadingNqlComments, removeComments } from './PreviewModal/formattingUtils';
-import { AutocompleteParser } from '../../../../parse/types';
+import { AiActionModes } from './sharedTypes';
+import { CURSOR_POSITION_CHANGED_EVENT } from '../../../../ko/bindings/ace/aceLocationHandler';
 
 import './AiAssistBar.scss';
-
-export enum AiActionModes {
-  GENERATE = 'generate',
-  EDIT = 'edit',
-  OPTIMIZE = 'optimize',
-  FIX = 'fix',
-  EXPLAIN = 'explain'
-}
 
 const {
   generateExplanation,
@@ -64,16 +62,6 @@ const extractTablesAndViews = (sql: string, parser: AutocompleteParser): Array<s
       loc.identifierChain ? loc.identifierChain[loc.identifierChain.length - 1].name : ''
     );
   return tableNames;
-};
-
-const getSelectedLineNumbers = (parsedStatement: ParsedSqlStatement) => {
-  if (!parsedStatement) {
-    return { firstLine: 0, lastLine: 0 };
-  }
-  const { first_line: firstLineInlcudingEmptyLines, last_line: lastLine } =
-    parsedStatement?.location || {};
-  const firstLine = firstLineInlcudingEmptyLines + getLeadingEmptyLineCount(parsedStatement);
-  return { firstLine, lastLine };
 };
 
 const breakLines = (input: string): string => {
@@ -111,7 +99,6 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps): JSX.Element => {
   const parsedStatement = activeExecutable?.parsedStatement;
   const selectedStatement: string = parsedStatement?.statement || '';
   const lastSelectedStatement = useRef(selectedStatement);
-  const { firstLine, lastLine } = getSelectedLineNumbers(parsedStatement);
 
   const [isExpanded, setIsExpanded] = useState(
     getFromLocalStorage('hue.aiAssistBar.isExpanded', true)
@@ -134,7 +121,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps): JSX.Element => {
   const { syntaxParser, sqlDialect, hasIncorrectSql, autocompleteParser } =
     useParser(activeExecutable);
 
-  const cursorPosition = useRef<{ row: number; column: number } | undefined>();
+  const cursorPosition = useRef<{ row: number; column: number }>({ row: 1, column: 1 });
   const keywordCase = useKeywordCase(syntaxParser, selectedStatement);
   const inputExpanded = actionMode === AiActionModes.EDIT || actionMode === AiActionModes.GENERATE;
   const inputPrefill = inputExpanded ? extractLeadingNqlComments(selectedStatement) : '';
@@ -303,38 +290,6 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps): JSX.Element => {
     }
   };
 
-  const acceptSuggestion = (statement: string) => {
-    let lineNrToMoveTo = firstLine;
-    if (actionMode === AiActionModes.GENERATE) {
-      const zeroBasedLineNr = 1;
-      const lineNrOfCursor = cursorPosition.current?.row || 0;
-      // TODO: lineNrToMoveTo fails if the user inserts new lines without moving the cursor afterwards.
-      // We need to find a way to get the current cursor position from the editor
-      // when the code is changed using keyboard interactactions
-      lineNrToMoveTo = lineNrOfCursor + zeroBasedLineNr || 1;
-      huePubSub.publish('editor.insert.at.cursor', { text: statement });
-    } else {
-      huePubSub.publish('ace.replace', {
-        text: statement,
-        location: {
-          first_line: firstLine,
-          first_column: 1,
-          last_line: lastLine,
-          // TODO: what to use here?
-          // We are replacing complete lines so we don't know what the last column is.
-          last_column: 10000
-        }
-      });
-    }
-    setShowSuggestedSqlModal(false);
-    huePubSub.publish('ace.cursor.move', {
-      column: 0,
-      row: lineNrToMoveTo
-    });
-
-    resetAll();
-  };
-
   const handleToobarInputSubmit = (userInput: string) => {
     const sqlStatmentToModify = parsedStatement.statement;
     if (actionMode === AiActionModes.GENERATE) {
@@ -345,12 +300,16 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps): JSX.Element => {
   };
 
   const handleInsert = (sql: string, rawExplain: string) => {
-    const leadingEmptyLines = getLeadingEmptyLineCount({ statement: sql });
-    const leadingLineBreaks = '\n'.repeat(leadingEmptyLines);
-    const comment = rawExplain ? `${leadingLineBreaks}/* ${rawExplain} */\n` : '';
-    const textToInsert = comment ? `${comment}${sql.trim()}\n` : sql;
-
-    acceptSuggestion(textToInsert);
+    const sqlToInsert = prependCommentToSql(rawExplain, sql);
+    modifyEditorContents({
+      sqlToInsert: sqlToInsert,
+      actionMode,
+      activeStatementInEditor: parsedStatement,
+      cursorPosition: convertToOneBased(cursorPosition.current),
+      autocompleteParser
+    });
+    setShowSuggestedSqlModal(false);
+    resetAll();
   };
 
   const handleCancel = () => {
@@ -426,19 +385,30 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps): JSX.Element => {
   }, [selectedStatement]);
 
   useEffect(() => {
-    const EDITOR_CURSOR_POSITION_CHANGE_EVENT = 'cursor-changed';
-    const handleEditorCursorPostionChange = (event: CustomEvent) => {
-      cursorPosition.current = event.detail;
-    };
-    document.addEventListener(
-      EDITOR_CURSOR_POSITION_CHANGE_EVENT,
-      handleEditorCursorPostionChange as EventListener
-    );
+    // FOR EDITOR v2
+    // const EDITOR_CURSOR_POSITION_CHANGE_EVENT = 'cursor-changed';
+    // const handleEditorCursorPostionChange = (event: CustomEvent) => {
+    //   cursorPosition.current = event.detail;
+    // };
+    // document.addEventListener(
+    //   EDITOR_CURSOR_POSITION_CHANGE_EVENT,
+    //   handleEditorCursorPostionChange as EventListener
+    // );
+    // return () => {
+    //   document.removeEventListener(
+    //     EDITOR_CURSOR_POSITION_CHANGE_EVENT,
+    //     handleEditorCursorPostionChange as EventListener
+    //   );
+    // };
+
+    // FOR EDITOR v1
+    const subscription = huePubSub.subscribe(CURSOR_POSITION_CHANGED_EVENT, ({ position }) => {
+      const { row, column } = position || { row: 0, column: 0 };
+      cursorPosition.current = { row, column };
+    });
+
     return () => {
-      document.removeEventListener(
-        EDITOR_CURSOR_POSITION_CHANGE_EVENT,
-        handleEditorCursorPostionChange as EventListener
-      );
+      subscription.remove();
     };
   }, []);
 
@@ -535,7 +505,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps): JSX.Element => {
           explanation={explanation || suggestionExplanation}
           summary={summary}
           nql={nql}
-          lineNumberStart={getSelectedLineNumbers(parsedStatement).firstLine}
+          lineNumberStart={getRowInterval(parsedStatement).firstRow}
           dialect={sqlDialect}
           keywordCase={keywordCase}
           guardrailAlert={guardrailAlert}

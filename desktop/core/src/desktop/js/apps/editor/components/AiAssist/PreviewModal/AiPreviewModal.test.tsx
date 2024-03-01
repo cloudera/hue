@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import PreviewModal from './AiPreviewModal';
-import { AiActionModes } from '../AiAssistBar';
+import { AiActionModes } from '../sharedTypes';
 
 describe('PreviewModal', () => {
   const commonProps = {
