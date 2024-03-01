@@ -13,8 +13,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-import axios, { AxiosResponse } from 'axios';
-import { get } from '../../api/utils';
+import { get, post } from '../../api/utils';
 import { CancellablePromise } from '../../api/cancellablePromise';
 import { PathAndFileData } from './types';
 
@@ -68,18 +67,10 @@ export const fetchFiles = (
   );
 };
 
-export const mkdir = async (folderName: string, path: string): Promise<AxiosResponse> => {
-  const createDirFormData = new FormData();
-  createDirFormData.append('name', folderName);
-  createDirFormData.append('path', path);
-  const response = await axios.post(MAKE_DIRECTORY_API_URL, createDirFormData);
-  return response;
+export const mkdir = async (folderName: string, path: string): Promise<void> => {
+  await post(MAKE_DIRECTORY_API_URL, { name: folderName, path: path });
 };
 
-export const touch = async (fileName: string, path: string): Promise<AxiosResponse> => {
-  const touchFormData = new FormData();
-  touchFormData.append('name', fileName);
-  touchFormData.append('path', path);
-  const response = await axios.post(TOUCH_API_URL, touchFormData);
-  return response;
+export const touch = async (fileName: string, path: string): Promise<void> => {
+  await post(TOUCH_API_URL, { name: fileName, path: path });
 };
