@@ -29,6 +29,7 @@ import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
 
 export const NAME = 'aceEditor';
 export const INSERT_AT_CURSOR_EVENT = 'editor.insert.at.cursor';
+export const INSERT_AT_POSITION_EVENT = 'editor.insert.at.position';
 
 registerBinding(NAME, {
   init: function (element, valueAccessor) {
@@ -595,6 +596,26 @@ registerBinding(NAME, {
       }
     );
 
+    const insertAtPositionSub = huePubSub.subscribe(INSERT_AT_POSITION_EVENT, details => {
+      if ($el.data('last-active-editor')) {
+        // Adjust to 0-based index
+        const row = details.position.row - 1;
+        const column = details.position.column - 1;
+        editor.session.insert({ row, column }, details.text);
+      }
+    });
+
+    const moveCursorSub = huePubSub.subscribe('ace.cursor.move', position => {
+      // Adjust to 0-based index
+      const row = position.row - 1;
+      const column = position.column - 1;
+
+      editor.moveCursorToPosition({ row, column });
+      editor.renderer.scrollCursorIntoView();
+      editor.clearSelection();
+      editor.focus();
+    });
+
     const insertAtCursorSub = huePubSub.subscribe(INSERT_AT_CURSOR_EVENT, details => {
       if (
         (details.targetEditor && details.targetEditor === editor) ||
@@ -608,6 +629,8 @@ registerBinding(NAME, {
       insertTableAtCursorSub.remove();
       insertColumnAtCursorSub.remove();
       insertAtCursorSub.remove();
+      insertAtPositionSub.remove();
+      moveCursorSub.remove();
     });
 
     const dblClickHdfsItemSub = huePubSub.subscribe('assist.dblClickHdfsItem', assistHdfsEntry => {

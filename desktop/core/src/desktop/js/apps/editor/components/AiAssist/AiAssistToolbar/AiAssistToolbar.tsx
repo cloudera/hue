@@ -28,7 +28,7 @@ import {
 import Toolbar, { ToolbarButton } from '../../../../../reactComponents/Toolbar/Toolbar';
 import AiAssistToolbarInput from './AiAssistToolbarInput';
 import { extractLeadingNqlComments, removeComments } from '../PreviewModal/formattingUtils';
-import { AiActionModes } from '../AiAssistBar';
+import { AiActionModes } from '../sharedTypes';
 
 import './AiAssistToolbar.scss';
 
@@ -108,7 +108,7 @@ function AssistToolbar({
       content={() => (
         <>
           <ToolbarButton
-            disabled={isLoading || (!!selectedStatement && !selectedStatementHasNqlCommentOnly)}
+            disabled={isLoading}
             title="Generate SQL using natural language"
             aria-label="Generate SQL using natural language"
             icon={<CommentOutlined />}
