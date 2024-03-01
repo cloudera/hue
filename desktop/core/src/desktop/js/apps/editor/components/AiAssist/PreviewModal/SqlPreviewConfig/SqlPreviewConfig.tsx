@@ -20,7 +20,7 @@ import React from 'react';
 import Switch from 'cuix/dist/components/Switch';
 
 import { FormattingConfig } from '../formattingUtils';
-import { AiActionModes } from '../../AiAssistBar';
+import { AiActionModes } from '../../sharedTypes';
 
 import './SqlPreviewConfig.scss';
 
