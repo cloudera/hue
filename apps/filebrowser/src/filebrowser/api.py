@@ -135,10 +135,10 @@ def rename(request):
 @error_handler
 def content_summary(request, path):
   path = _normalize_path(path)
-  response = {'summary': None}
+  response = {}
 
   if not path:
-    raise Exception(_('Path parameter is required to fetch content summary'))
+    raise Exception(_('Path parameter is required to fetch content summary.'))
 
   if not request.fs.exists(path):
     return JsonResponse(response, status=404)
