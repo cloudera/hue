@@ -232,6 +232,11 @@ def storage_rename(request):
   django_request = get_django_request(request)
   return filebrowser_api.rename(django_request)
 
+@api_view(["GET"])
+def storage_content_summary(request, path):
+  django_request = get_django_request(request)
+  return filebrowser_api.content_summary(django_request, path)
+
 # Importer
 
 @api_view(["POST"])
