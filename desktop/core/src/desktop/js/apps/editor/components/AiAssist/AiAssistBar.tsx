@@ -165,6 +165,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps): JSX.Element => {
       setExplanation(breakLines(explain));
       setSummary(breakLines(summary));
       setShowSuggestedSqlModal(true);
+      setActionMode(AiActionModes.EXPLAIN);
     } catch (error) {
       handleApiError(error.message);
     } finally {
@@ -292,6 +293,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps): JSX.Element => {
         setSuggestion(sql);
         setSuggestionExplanation(explain);
         setShowSuggestedSqlModal(true);
+        setActionMode(AiActionModes.FIX);
       }
     } catch (error) {
       handleApiError(error.message);
@@ -357,7 +359,11 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps): JSX.Element => {
     setSuggestionExplanation('');
     setShowSuggestedSqlModal(false);
 
-    if (actionMode === AiActionModes.OPTIMIZE) {
+    if (
+      (actionMode === AiActionModes.OPTIMIZE,
+      actionMode === AiActionModes.FIX,
+      actionMode === AiActionModes.EXPLAIN)
+    ) {
       setActionMode(undefined);
     }
     setGuardrailAlert(undefined);
