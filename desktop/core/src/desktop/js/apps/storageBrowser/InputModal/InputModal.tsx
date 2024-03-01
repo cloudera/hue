@@ -22,41 +22,41 @@ import './InputModal.scss';
 interface InputModalProps {
   cancelText?: string;
   inputLabel: string;
-  okText?: string;
+  submitText?: string;
   onClose: () => void;
-  onCreate: (name: string) => void;
+  onCreate: (value: string) => void;
   showModal: boolean;
   title: string;
 }
 
 const defaultProps = {
   cancelText: 'Cancel',
-  okText: 'Submit'
+  submitText: 'Submit'
 };
 
 const InputModal: React.FC<InputModalProps> = ({
   cancelText,
   inputLabel,
-  okText,
+  submitText,
   onClose,
   onCreate,
   showModal,
   title
 }): JSX.Element => {
-  const [textInput, setTextInput] = useState<string>('');
+  const [value, setValue] = useState<string>('');
 
   return (
     <Modal
       cancelText={cancelText}
       className="hue-input-modal"
-      okText={okText}
+      okText={submitText}
       onCancel={() => {
-        setTextInput('');
+        setValue('');
         onClose();
       }}
       onOk={() => {
-        onCreate(textInput);
-        setTextInput('');
+        onCreate(value);
+        setValue('');
         onClose();
       }}
       open={showModal}
@@ -65,9 +65,9 @@ const InputModal: React.FC<InputModalProps> = ({
       <div className="hue-input-modal__input-label">{inputLabel}</div>
       <Input
         className="hue-input-modal__input"
-        value={textInput}
+        value={value}
         onInput={e => {
-          setTextInput((e.target as HTMLInputElement).value);
+          setValue((e.target as HTMLInputElement).value);
         }}
       />
     </Modal>

@@ -60,7 +60,7 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
   const [filePath, setFilePath] = useState<string>(user_home_dir);
   const [filesData, setFilesData] = useState<PathAndFileData>();
   const [files, setFiles] = useState<StorageBrowserTableData[]>();
-  const [loadingFiles, setloadingFiles] = useState(true);
+  const [loadingFiles, setLoadingFiles] = useState(true);
   const [pageStats, setPageStats] = useState<PageStats>();
   const [pageSize, setPageSize] = useState<number>(0);
   const [pageNumber, setPageNumber] = useState<number>(1);
@@ -136,7 +136,7 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
   ];
 
   const handleCreateNewFolder = (folderName: string) => {
-    setloadingFiles(true);
+    setLoadingFiles(true);
     mkdir(folderName, filePath)
       .then(() => {
         setRefreshKey(oldKey => oldKey + 1);
@@ -144,11 +144,14 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
       .catch(error => {
         // eslint-disable-next-line no-restricted-syntax
         console.log(error);
+      })
+      .finally(() => {
+        setLoadingFiles(false);
       });
   };
 
   const handleCreateNewFile = (fileName: string) => {
-    setloadingFiles(true);
+    setLoadingFiles(true);
     touch(fileName, filePath)
       .then(() => {
         setRefreshKey(oldKey => oldKey + 1);
@@ -156,11 +159,14 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
       .catch(error => {
         // eslint-disable-next-line no-restricted-syntax
         console.log(error);
+      })
+      .finally(() => {
+        setLoadingFiles(false);
       });
   };
 
   useEffect(() => {
-    setloadingFiles(true);
+    setLoadingFiles(true);
     fetchFiles(filePath, pageSize, pageNumber, filterData, sortByColumn, sortOrder)
       .then(responseFilesData => {
         setFilesData(responseFilesData);
@@ -183,7 +189,7 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
         console.error(error);
       })
       .finally(() => {
-        setloadingFiles(false);
+        setLoadingFiles(false);
       });
   }, [filePath, pageSize, pageNumber, sortByColumn, sortOrder, refreshKey]);
 
@@ -253,7 +259,7 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
         />
         <InputModal
           title={t('Create New Folder')}
-          inputLabel={t('Enter folder name here')}
+          inputLabel={t('Enter Folder name here')}
           okText={t('Create')}
           showModal={showNewFolderModal}
           onCreate={handleCreateNewFolder}
@@ -261,7 +267,7 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
         />
         <InputModal
           title={t('Create New File')}
-          inputLabel={t('Enter file name here')}
+          inputLabel={t('Enter File name here')}
           okText={t('Create')}
           showModal={showNewFileModal}
           onCreate={handleCreateNewFile}
