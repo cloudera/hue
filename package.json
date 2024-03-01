@@ -72,7 +72,7 @@
     "react-joyride": "2.7.0",
     "regenerator-runtime": "0.13.7",
     "removeNPMAbsolutePaths": "1.0.6",
-    "sanitize-html": "2.7.2",
+    "sanitize-html": "2.12.1",
     "select2": "4.0.13",
     "selectize-plugin-clear": "0.0.3",
     "sprintf-js": "1.1.2",
