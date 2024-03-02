@@ -50,6 +50,10 @@ const AlertComponent: React.FC = () => {
   const handleClose = (errorObjToClose: ErrorAlert) => {
     const filteredErrors = errors.filter(errorObj => errorObj !== errorObjToClose);
     setErrors(filteredErrors);
+
+    setTimeout(() => {
+      setErrors(prevErrors => prevErrors.filter(errorObj => errorObj !== errorObjToClose));
+    }, 10000);
   };
 
   //TODO: add support for warnings and success messages
