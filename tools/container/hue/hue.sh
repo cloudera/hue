@@ -111,6 +111,12 @@ function set_samlcert() {
   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib64
 }
 
+function start_celery() {
+  echo "Starting Celery worker..."
+  $HUE_BIN/hue runcelery worker --app desktop.celery --concurrency=5 --loglevel=DEBUG
+}
+
+
 # If database connectivity is not set then fail
 ret=$(db_connectivity_check)
 if [[ $ret == "fail" ]];  then
@@ -134,6 +140,7 @@ elif [[ $1 == rungunicornserver ]]; then
   fix_column_issue "axes_accesslog" "trusted"
   fix_column_issue "axes_accessattempt" "trusted"
   $HUE_BIN/hue rungunicornserver
+  start_celery
 fi
 
 exit 0
