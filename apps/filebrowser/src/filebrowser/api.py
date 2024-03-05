@@ -31,6 +31,7 @@ from desktop.lib.fs.gc.gs import get_gs_home_directory
 from azure.abfs.__init__ import get_home_dir_for_abfs
 from aws.s3.s3fs import get_s3_home_directory
 
+from filebrowser.views import _normalize_path
 
 LOG = logging.getLogger()
 
@@ -130,3 +131,24 @@ def rename(request):
 
   request.fs.rename(src_path, dest_path)
   return HttpResponse(status=200)
+
+@error_handler
+def content_summary(request, path):
+  path = _normalize_path(path)
+  response = {}
+
+  if not path:
+    raise Exception(_('Path parameter is required to fetch content summary.'))
+
+  if not request.fs.exists(path):
+    return JsonResponse(response, status=404)
+
+  try:
+    stats = request.fs.get_content_summary(path)
+    replication_factor = request.fs.stats(path)['replication']
+    stats.summary.update({'replication': replication_factor})
+    response['summary'] = stats.summary
+  except Exception as e:
+    raise Exception(_('Failed to fetch content summary for "%s". ') % path)
+
+  return JsonResponse(response)
