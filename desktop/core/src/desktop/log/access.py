@@ -84,6 +84,7 @@ class AccessInfo(dict):
     self['proto'] = request.META.get('SERVER_PROTOCOL', '-')
     self['agent'] = request.META.get('HTTP_USER_AGENT', '-')
     self['time'] = time.time()
+    self['headers'] = request.headers
     self['duration'] = None
     self['memory'] = None
 
@@ -106,7 +107,7 @@ class AccessInfo(dict):
     self['size'] = ' %s' % len(response.content) if response is not None and hasattr(response, 'content') else ' -'
     self['msg'] = ('-- %s' % msg) if msg else ''
 
-    ACCESS_LOG.log(level, '%(remote_ip)s %(username)s - "%(method)s %(path)s %(proto)s"%(duration)s%(http_code)s%(size)s%(memory)s%(msg)s' % self)
+    ACCESS_LOG.log(level, '%(remote_ip)s %(username)s - "%(method)s %(path)s %(proto)s"%(duration)s%(http_code)s%(size)s%(memory)s%(msg)s%(headers)s' % self)
 
   def add_to_access_history(self, app):
     """Record this user access to the recent access map"""

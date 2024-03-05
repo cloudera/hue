@@ -777,7 +777,9 @@ class RemoteUserDjangoBackend(django.contrib.auth.backends.RemoteUserBackend):
   """
   def authenticate(self, request=None, remote_user=None):
     username = self.clean_username(remote_user)
+    LOG.info(f"RemoteUserDjangoBackend.authenticate: {username}")
     username = force_username_case(username)
+    LOG.info(f"RemoteUserDjangoBackend.authenticate: after clean {username}")
     is_super = False
     if User.objects.exclude(id=install_sample_user().id).count() == 0:
       is_super = True
@@ -800,6 +802,7 @@ class RemoteUserDjangoBackend(django.contrib.auth.backends.RemoteUserBackend):
         user.save()
 
     user = rewrite_user(user)
+    LOG.info(f"RemoteUserDjangoBackend.authenticate: find in DB {user}")
     return user
 
   def get_user(self, user_id):
@@ -807,6 +810,23 @@ class RemoteUserDjangoBackend(django.contrib.auth.backends.RemoteUserBackend):
     user = rewrite_user(user)
     return user
 
+class HardCodedUserBackend(django.contrib.auth.backends.ModelBackend):
+  """
+  A backend that allows a single user to be hardcoded into the system.
+  """
+  def authenticate(self, username=None, password=None):
+      try:
+        user = User.objects.get(username="akamai_user")
+      except User.DoesNotExist:
+        user = User.objects.create_user(username="akamai_user", password="!")
+
+      return user
+
+  def get_user(self, user_id):
+        try:
+            return User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            return None
 
 class OIDCBackend(OIDCAuthenticationBackend):
   def authenticate(self, *args, **kwargs):
