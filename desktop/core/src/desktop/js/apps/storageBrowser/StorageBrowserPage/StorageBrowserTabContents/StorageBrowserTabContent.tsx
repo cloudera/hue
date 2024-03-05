@@ -68,8 +68,8 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
   const [sortOrder, setSortOrder] = useState<SortOrder>(SortOrder.NONE);
   //TODO: Add filter functionality
   const [filterData] = useState<string>('');
-  const [showNewFolderModal, setShowNewFolderModal] = useState<boolean>();
-  const [showNewFileModal, setShowNewFileModal] = useState<boolean>();
+  const [showNewFolderModal, setShowNewFolderModal] = useState<boolean>(false);
+  const [showNewFileModal, setShowNewFileModal] = useState<boolean>(false);
   const [refreshKey, setRefreshKey] = useState<number>(0);
 
   const { t } = i18nReact.useTranslation();
@@ -260,17 +260,17 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
         <InputModal
           title={t('Create New Folder')}
           inputLabel={t('Enter Folder name here')}
-          okText={t('Create')}
+          submitText={t('Create')}
           showModal={showNewFolderModal}
-          onCreate={handleCreateNewFolder}
+          onSubmit={handleCreateNewFolder}
           onClose={() => setShowNewFolderModal(false)}
         />
         <InputModal
           title={t('Create New File')}
           inputLabel={t('Enter File name here')}
-          okText={t('Create')}
+          submitText={t('Create')}
           showModal={showNewFileModal}
-          onCreate={handleCreateNewFile}
+          onSubmit={handleCreateNewFile}
           onClose={() => setShowNewFileModal(false)}
         />
       </div>

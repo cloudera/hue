@@ -17,33 +17,32 @@ import React, { useState } from 'react';
 import Modal from 'cuix/dist/components/Modal';
 import { Input } from 'antd';
 
+import { i18nReact } from '../../../utils/i18nReact';
+
 import './InputModal.scss';
 
+//TODO: Add unit tests
 interface InputModalProps {
   cancelText?: string;
   inputLabel: string;
   submitText?: string;
   onClose: () => void;
-  onCreate: (value: string) => void;
+  onSubmit: (value: string) => void;
   showModal: boolean;
   title: string;
 }
 
-const defaultProps = {
-  cancelText: 'Cancel',
-  submitText: 'Submit'
-};
-
 const InputModal: React.FC<InputModalProps> = ({
-  cancelText,
   inputLabel,
-  submitText,
   onClose,
-  onCreate,
+  onSubmit,
   showModal,
-  title
+  title,
+  ...i18n
 }): JSX.Element => {
   const [value, setValue] = useState<string>('');
+  const { t } = i18nReact.useTranslation();
+  const { cancelText = t('Close'), submitText = t('Submit') } = i18n;
 
   return (
     <Modal
@@ -55,7 +54,7 @@ const InputModal: React.FC<InputModalProps> = ({
         onClose();
       }}
       onOk={() => {
-        onCreate(value);
+        onSubmit(value);
         setValue('');
         onClose();
       }}
@@ -74,5 +73,4 @@ const InputModal: React.FC<InputModalProps> = ({
   );
 };
 
-InputModal.defaultProps = defaultProps;
 export default InputModal;
