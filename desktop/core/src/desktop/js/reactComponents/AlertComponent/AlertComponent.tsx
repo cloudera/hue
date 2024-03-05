@@ -25,15 +25,16 @@ interface HueAlert {
   message: string;
 }
 
+type alertType = 'error' | 'info' | 'warning';
 interface VisibleAlert {
   alert: HueAlert;
-  type: 'error' | 'info' | 'warning';
+  type: alertType;
 }
 
 const AlertComponent: React.FC = () => {
   const [alert, setAlerts] = useState<VisibleAlert[]>([]);
 
-  const updateAlerts = (alert, type) => {
+  const updateAlerts = (alert: HueAlert, type: alertType) => {
     if (!alert.message) {
       return;
     }
@@ -43,7 +44,16 @@ const AlertComponent: React.FC = () => {
       if (activeAlerts.some(activeAlerts => activeAlerts.alert.message === alert.message)) {
         return activeAlerts;
       }
-      return [...activeAlerts, { alert, type }];
+
+      const newAlert:VisibleAlert = { alert, type };
+
+      if(type === 'info') {
+        setTimeout(() => {
+          handleClose(newAlert);
+        }, 3000);
+      }
+
+      return [...activeAlerts, newAlert];
     });
   };
 
@@ -74,14 +84,14 @@ const AlertComponent: React.FC = () => {
     };
   }, []);
 
-  const handleClose = (alertObjToClose: HueAlert) => {
-    const filteredAlerts = alert.filter(alertObj => alertObj.alert !== alertObjToClose);
+  const handleClose = (alertObjToClose: VisibleAlert) => {
+    const filteredAlerts = alert.filter(alertObj => alertObj !== alertObjToClose);
     setAlerts(filteredAlerts);
   };
 
   const { t } = i18nReact.useTranslation();
 
-  const getHeader = alert => {
+  const getHeader = (alert: VisibleAlert) => {
     if (alert.type === 'error') {
       return t('Error');
     } else if (alert.type === 'info') {
@@ -101,7 +111,7 @@ const AlertComponent: React.FC = () => {
           description={alertObj.alert.message}
           showIcon={true}
           closable={true}
-          onClose={() => handleClose(alertObj.alert)}
+          onClose={() => handleClose(alertObj)}
         />
       ))}
     </div>
