@@ -70,24 +70,33 @@ class Command(BaseCommand):
     return SERVER_HELP
 
 def runcelery(*args, **options):
-  # Native does not load Hue's config
-  # CeleryCommand().handle_argv(['worker', '--app=desktop.celery', '--concurrency=1', '--loglevel=DEBUG'])
-  opts = [
-      'runcelery',
-      'worker',
-      '--app=' + options['app'],
-      '--concurrency=' + str(options['concurrency']),
-      '--loglevel=' + options['loglevel']
-  ]
-  drop_privileges_if_necessary(CELERY_OPTIONS)
+    # Native does not load Hue's config
+    opts = [
+        'celery',
+        '--app=' + options['app'],
+        'worker',
+        '--loglevel=' + options['loglevel'],
+        '--concurrency=' + str(options['concurrency'])
+    ]
+    drop_privileges_if_necessary(CELERY_OPTIONS)
 
-  if conf.DEV.get():
-    autoreload.main(celery_main, (opts,))
-  else:
-    celery_main(opts)
+    if conf.DEV.get():
+        from django.utils.autoreload import run_with_reloader
 
-  LOG.info("Stopping command '%s'" % ' '.join(opts))
-  sys.exit(-1)
+        def run_celery():
+            # Set command-line arguments for Celery
+            sys.argv = opts
+            # Call the Celery main function
+            celery_main()
+
+        run_with_reloader(run_celery)
+    else:
+        sys.argv = opts
+        celery_main()
+
+    LOG.info("Stopping command '%s'" % ' '.join(opts))
+    sys.exit(-1)
+
 
 if __name__ == '__main__':
   runcelery(sys.argv[1:])
