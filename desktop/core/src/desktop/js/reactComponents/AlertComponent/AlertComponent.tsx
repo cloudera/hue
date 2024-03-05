@@ -45,9 +45,9 @@ const AlertComponent: React.FC = () => {
         return activeAlerts;
       }
 
-      const newAlert:VisibleAlert = { alert, type };
+      const newAlert: VisibleAlert = { alert, type };
 
-      if(type === 'info') {
+      if (type === 'info') {
         setTimeout(() => {
           handleClose(newAlert);
         }, 3000);
