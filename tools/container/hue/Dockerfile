@@ -30,6 +30,12 @@ RUN yum install -y microdnf && \
     groupadd -g 1000 ${HUEUSER} && \
     useradd -g 1000 -d ${HUE_HOME} -s /bin/bash -u 1000 ${HUEUSER}
 
+
+# Install Redis
+RUN yum install -y redis && \
+    yum clean all && \
+    rm -rf /var/cache/yum
+
 COPY --chown=${HUEUSER}:${HUEUSER} ${HUEUSER} ${HUE_HOME}
 COPY --chown=${HUEUSER}:${HUEUSER} hue.sh ${HUE_HOME}/hue.sh
 
@@ -62,7 +68,7 @@ RUN chown -R ${HUEUSER}:${HUEUSER} /etc/supervisord.conf && chown -R ${HUEUSER}:
 # Remove chardet package
 RUN rm -rf ${HUE_HOME}/build/env/lib/python3.8/site-packages/pip/_vendor/chardet
 
-EXPOSE 8888 9111
+EXPOSE 8888 9111 6379
 
 # Switch to non-root default user
 USER hive
