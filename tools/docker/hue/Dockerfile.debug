@@ -24,17 +24,21 @@ RUN apt-get update -y && apt-get install -y \
   rsync \
   curl \
   sudo \
+  ca-certificates \
   openssh-server \
   git && \
   rm -rf /var/lib/apt/lists/*
 
 ADD . /hue
+COPY ./tools/docker/hue/sshd_config /etc/ssh/sshd_config
 
 RUN pip3 install --upgrade --no-cache-dir setuptools virtualenv pip && \
   curl -sL https://deb.nodesource.com/setup_14.x | bash - && \
   apt-get install -y nodejs && \
   addgroup hue && \
-  useradd -r -u 1001 -g hue hue && \
+  mkdir -p /run/sshd && \
+  useradd -m -u 1001 -g hue hue && \
+  echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/hue && \
   chown -R hue /hue && \
   mkdir /hue/build && \
   chown -R hue /hue/build && \
@@ -92,8 +96,7 @@ RUN ./build/env/bin/pip install --no-cache-dir \
   # PyAthena == 3.x.x is latest, but not working with current configuration \
   # otherwise, 'VisitableType' object is not subscriptable in Hue UI
 
-USER hue
 
 EXPOSE 8888
 
-CMD ["./startup.sh"]
+CMD ["/usr/sbin/sshd","-D","-e"]
