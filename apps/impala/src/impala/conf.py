@@ -73,6 +73,12 @@ IMPERSONATION_ENABLED = Config(
   type=coerce_bool,
   dynamic_default=is_impersonation_enabled)
 
+COORDINATOR_UI_SPNEGO = Config(
+  key='coordinator_ui_spnego',
+  help=_t("Impala Coordinator Web Server has Spnego enabled."),
+  type=coerce_bool,
+  default=False)
+
 QUERYCACHE_ROWS = Config(
   key='querycache_rows',
   help=_t("Number of initial rows of a resultset to ask Impala to cache in order to"
