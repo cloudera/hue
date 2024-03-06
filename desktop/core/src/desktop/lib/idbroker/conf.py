@@ -48,6 +48,8 @@ def _handle_idbroker_ha(fs=None):
 
   response = None
   for idb in idbroker_addr_list:
+    LOG.info('Attempting to connect to IDBroker URL: %s' % idb)
+
     try:
       response = requests.get(idb.rstrip('/') + '/dt/knoxtoken/api/v1/token', auth=HTTPKerberosAuth(), verify=False)
     except Exception as e:
