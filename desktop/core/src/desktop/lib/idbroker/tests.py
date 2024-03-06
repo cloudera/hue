@@ -16,11 +16,12 @@
 import logging
 import unittest
 
-from nose.tools import assert_equal
+from nose.tools import assert_equal, assert_raises
 from unittest.mock import Mock, patch
 
 from desktop.lib.idbroker.client import IDBroker
 from desktop.lib.idbroker.conf import _handle_idbroker_ha
+from desktop.lib.exceptions_renderable import PopupException
 
 
 LOG = logging.getLogger()
@@ -76,6 +77,21 @@ class TestIDBrokerClient(unittest.TestCase):
               assert_equal(invoke.call_count, 2) # get_cab calls twice
               assert_equal(cab.get('Credentials'), 'Credentials')
               assert_equal(set_kerberos_auth.call_count, 1)
+
+
+  def test_no_idbroker_address_found(self):
+    with patch('desktop.lib.idbroker.conf.get_conf') as conf:
+      with patch('desktop.lib.idbroker.conf.get_cab_address') as get_cab_address:
+        conf.return_value = {
+          'fs.s3a.ext.cab.address': 'address',
+          'fs.s3a.ext.cab.dt.path': 'dt_path',
+          'fs.s3a.ext.cab.path': 'path'
+        }
+
+        # No active IDBroker URL available
+        get_cab_address.return_value = None
+        assert_raises(PopupException, IDBroker.from_core_site, 's3a', 'test')
+
 
 
 class TestIDBrokerHA(unittest.TestCase):
