@@ -17,15 +17,16 @@ import logging
 import unittest
 
 from nose.tools import assert_equal
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 from desktop.lib.idbroker.client import IDBroker
+from desktop.lib.idbroker.conf import _handle_idbroker_ha
 
 
 LOG = logging.getLogger()
 
 
-class TestIDBroker(unittest.TestCase):
+class TestIDBrokerClient(unittest.TestCase):
   def test_username_authentication(self):
     with patch('desktop.lib.idbroker.conf.get_conf') as conf:
       with patch('desktop.lib.idbroker.client.resource.Resource.invoke') as invoke:
@@ -75,3 +76,49 @@ class TestIDBroker(unittest.TestCase):
               assert_equal(invoke.call_count, 2) # get_cab calls twice
               assert_equal(cab.get('Credentials'), 'Credentials')
               assert_equal(set_kerberos_auth.call_count, 1)
+
+
+class TestIDBrokerHA(unittest.TestCase):
+  def test_idbroker_non_ha(self):
+    with patch('desktop.lib.idbroker.conf.get_conf') as conf:
+      with patch('desktop.lib.idbroker.conf.requests.get') as requests_get:
+        conf.return_value = {'fs.s3a.ext.cab.address': 'https://idbroker0.gethue.com:8444/gateway'}
+        requests_get.return_value = Mock(status_code=200)
+
+        idbroker_url = _handle_idbroker_ha(fs='s3a')
+        assert_equal(idbroker_url, 'https://idbroker0.gethue.com:8444/gateway')
+        assert_equal(requests_get.call_count, 1)
+
+
+  def test_idbroker_ha(self):
+    with patch('desktop.lib.idbroker.conf.get_conf') as conf:
+      with patch('desktop.lib.idbroker.conf.requests.get') as requests_get:
+        conf.return_value = {
+          'fs.s3a.ext.cab.address': 'https://idbroker0.gethue.com:8444/gateway,https://idbroker1.gethue.com:8444/gateway'
+        }
+
+        # When IDBroker0 is healthy and IDBroker1 is unhealthy
+        requests_get.side_effect = [Mock(status_code=200), Mock(status_code=404)]
+        idbroker_url = _handle_idbroker_ha(fs='s3a')
+
+        assert_equal(idbroker_url, 'https://idbroker0.gethue.com:8444/gateway')
+        assert_equal(requests_get.call_count, 1)
+        requests_get.reset_mock()
+
+
+        # When IDBroker0 is unhealthy and IDBroker1 is healthy
+        requests_get.side_effect = [Mock(status_code=404), Mock(status_code=200)]
+        idbroker_url = _handle_idbroker_ha(fs='s3a')
+
+        assert_equal(idbroker_url, 'https://idbroker1.gethue.com:8444/gateway')
+        assert_equal(requests_get.call_count, 2)
+        requests_get.reset_mock()
+
+
+        # When both IDBroker0 and IDBroker1 are unhealthy
+        requests_get.side_effect = [Mock(status_code=404), Mock(status_code=404)]
+        idbroker_url = _handle_idbroker_ha(fs='s3a')
+
+        assert_equal(idbroker_url, None)
+        assert_equal(requests_get.call_count, 2)
+
