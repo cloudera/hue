@@ -27,7 +27,10 @@ import pytz
 from babel import localtime
 import os
 
+from urllib.parse import urlparse
+
 from desktop.lib import export_csvxls
+from impala.conf import COORDINATOR_UI_SPNEGO
 from libanalyze import analyze as analyzer, rules
 from notebook.conf import ENABLE_QUERY_ANALYSIS
 
@@ -158,12 +161,16 @@ class QueryApi(Api):
       }
     app = apps.get('apps')[0]
     progress_groups = re.search(r"([\d\.\,]+)%", app.get('progress'))
+    parsed_api_url = urlparse(self.api.url)
+
     app.update({
       'progress': float(progress_groups.group(1)) \
           if progress_groups and progress_groups.group(1) else 100 \
             if self._api_status(app.get('status')) in ['SUCCEEDED', 'FAILED'] else 1,
       'type': 'queries',
-      'doc_url': "%s/query_plan?query_id=%s" % (self.api.url, appid),
+      'doc_url': '%s/query_plan?query_id=%s' % (self.api.url, appid) if not COORDINATOR_UI_SPNEGO.get() else
+                 '%s/query_plan?scheme=%s&host=%s&port=%s&query_id=%s' %
+                   (self.api.url, parsed_api_url.scheme, parsed_api_url.hostname, parsed_api_url.port, appid),
       'properties': {
         'memory': '',
         'profile': '',
