@@ -45,6 +45,20 @@ RUN set -eux; \
       xmlsec1-openssl \
       zlib-devel
 
+#Install redis
+RUN set -eux; \
+    dnf install -y gcc make && \
+    curl -O http://download.redis.io/redis-stable.tar.gz && \
+    tar xzf redis-stable.tar.gz && \
+    cd redis-stable && \
+    make && \
+    make install && \
+    cd .. && \
+    rm -rf redis-stable redis-stable.tar.gz && \
+    dnf remove -y gcc make && \
+    dnf clean all && \
+    rm -rf /var/cache/yum
+
 RUN set -eux; \
       curl -sL https://rpm.nodesource.com/setup_14.x | bash - \
         && yum install -y nodejs \
