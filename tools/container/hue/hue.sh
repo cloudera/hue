@@ -144,4 +144,7 @@ elif [[ $1 == start_celery ]]; then
   start_celery
 fi
 
+# Start Redis server
+redis-server --port 6379
+
 exit 0
