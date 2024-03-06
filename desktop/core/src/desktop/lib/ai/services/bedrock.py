@@ -22,12 +22,13 @@ from desktop.lib.ai.lib.base_service import BaseService
 from desktop.lib.ai.lib.base_model import BaseModel
 from desktop.lib.ai.models.titan import TitanModel
 from desktop.lib.ai.models.claude import ClaudeModel
+from desktop.lib.ai.models.claude3 import Claude3Model
 
 from desktop.conf import AI_INTERFACE
 from aws.conf import BEDROCK_ACCOUNT, get_bedrock_access_key_id, get_bedrock_secret_access_key
 
 class BedrockService(BaseService):
-  def __init__(self, model_name: str):
+  def __init__(self, model_key: str):
     import boto3
     self.bedrock = boto3.client(
       'bedrock-runtime',
@@ -36,11 +37,13 @@ class BedrockService(BaseService):
       region_name = BEDROCK_ACCOUNT.REGION.get()
     )
 
-    super().__init__(self.get_model(model_name))
+    super().__init__(self.get_model(model_key))
 
-  def get_model(self, model_name: str) -> BaseModel:
-    if model_name == "claude":
+  def get_model(self, model_key: str) -> BaseModel:
+    if model_key == "claude":
       return ClaudeModel()
+    elif model_key == "claude3":
+      return Claude3Model()
     return TitanModel()
 
   def call_model(self, data: dict) -> str:
