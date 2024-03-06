@@ -140,6 +140,7 @@ elif [[ $1 == rungunicornserver ]]; then
   fix_column_issue "axes_accesslog" "trusted"
   fix_column_issue "axes_accessattempt" "trusted"
   $HUE_BIN/hue rungunicornserver
+elif [[ $1 == start_celery ]]; then
   start_celery
 fi
 
