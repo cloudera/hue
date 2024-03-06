@@ -30,12 +30,6 @@ RUN yum install -y microdnf && \
     groupadd -g 1000 ${HUEUSER} && \
     useradd -g 1000 -d ${HUE_HOME} -s /bin/bash -u 1000 ${HUEUSER}
 
-
-# Install Redis
-RUN yum install -y redis && \
-    yum clean all && \
-    rm -rf /var/cache/yum
-
 COPY --chown=${HUEUSER}:${HUEUSER} ${HUEUSER} ${HUE_HOME}
 COPY --chown=${HUEUSER}:${HUEUSER} hue.sh ${HUE_HOME}/hue.sh
 
