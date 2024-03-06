@@ -80,19 +80,11 @@ def runcelery(*args, **options):
     ]
     drop_privileges_if_necessary(CELERY_OPTIONS)
 
-    if conf.DEV.get():
-        from django.utils.autoreload import run_with_reloader
+    # Set command-line arguments for Celery
+    sys.argv = opts
 
-        def run_celery():
-            # Set command-line arguments for Celery
-            sys.argv = opts
-            # Call the Celery main function
-            celery_main()
-
-        run_with_reloader(run_celery)
-    else:
-        sys.argv = opts
-        celery_main()
+    # Call the Celery main function
+    celery_main()
 
     LOG.info("Stopping command '%s'" % ' '.join(opts))
     sys.exit(-1)
