@@ -13,8 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import
-
 from builtins import object
 import logging
 
@@ -48,8 +46,11 @@ class IDBroker(object):
 
 
   def __init__(self, user=None, address=None, dt_path=None, path=None, security=None):
-    self.user=user
-    self.address=address
+    self.user = user
+    self.address = address
+    if not self.address:
+      raise PopupException('Failed to connect to IDBroker: No active or healthy instance was found.')
+
     self.dt_path = dt_path
     self.path = path
     self.security = security
@@ -60,9 +61,9 @@ class IDBroker(object):
   def _knox_token_params(self):
     if self.user:
       if self.security['type'] == 'kerberos':
-        return { 'doAs': self.user }
+        return {'doAs': self.user}
       else:
-        return { 'user.name': self.user }
+        return {'user.name': self.user}
     else:
       return None
 
@@ -73,7 +74,8 @@ class IDBroker(object):
     elif self.security['type'] == 'basic':
       self._client.set_basic_auth(self.security['params']['username'], self.security['params']['password'])
     try:
-      res = self._root.invoke("GET", self.dt_path + _KNOX_TOKEN_API, self._knox_token_params(), allow_redirects=True, log_response=False) # Can't log response because returns credentials
+      # Can't log response because returns credentials
+      res = self._root.invoke("GET", self.dt_path + _KNOX_TOKEN_API, self._knox_token_params(), allow_redirects=True, log_response=False)
       return res.get('access_token')
     except Exception as e:
       raise PopupException('Failed to authenticate to IDBroker with error: %s' % e.message)
@@ -82,6 +84,7 @@ class IDBroker(object):
   def get_cab(self):
     self._client.set_bearer_auth(self.get_auth_token())
     try:
-      return self._root.invoke("GET", self.path + _CAB_API_CREDENTIALS_GLOBAL, allow_redirects=True, log_response=False) # Can't log response because returns credentials
+      # Can't log response because returns credentials
+      return self._root.invoke("GET", self.path + _CAB_API_CREDENTIALS_GLOBAL, allow_redirects=True, log_response=False)
     except Exception as e:
       raise PopupException('Failed to obtain storage credentials from IDBroker with error: %s' % e.message)
