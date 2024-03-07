@@ -127,7 +127,8 @@ CONFIG_WHITELIST = Config(
 USER_SCRATCH_DIR_PERMISSION = Config(
   key="user_scratch_dir_permission",
   help=_t("Due to IMPALA-10272, the importer fails with READ permissions."
-          "Setting this to True, means setting the scratch directory and its file to 777 so the importer does not fail with permission issue."),
+          "Setting this to True, means setting the scratch directory and its file to 777 so the importer "
+          "does not fail with permission issue."),
   type=coerce_bool,
   default=False
 )
