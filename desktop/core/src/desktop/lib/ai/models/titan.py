@@ -75,6 +75,14 @@ Return the result in the following format:
 <explain></explain>
 """
 
+_COMMENT = """Act as an {dialect} SQL expert.
+Explain this SQL by adding /* comments */ with as much details as possible.
+
+{sql}
+
+Return the commented SQL wrapped in a <code> tag.
+ """
+
 def _code_assumptions_parser(response: str) -> SQLResponse:
   return SQLResponse(
     sql=extract_tag_content('code', response),
@@ -99,13 +107,18 @@ def _summary_parser(response: str) -> SQLResponse:
     explain=extract_tag_content('explain', response),
   )
 
+def _code_comment(response: str) -> SQLResponse:
+  return SQLResponse(
+    sql=extract_tag_content('code', response),
+  )
 
 _TASKS = {
   TaskType.GENERATE: Task(_GENERATE, _code_assumptions_parser),
   TaskType.EDIT: Task(_EDIT, _code_assumptions_parser),
   TaskType.SUMMARIZE: Task(_SUMMARIZE, _summary_parser),
   TaskType.OPTIMIZE: Task(_OPTIMIZE, _code_explain_parser),
-  TaskType.FIX: Task(_FIX, _code_explain_parser)
+  TaskType.FIX: Task(_FIX, _code_explain_parser),
+  TaskType.COMMENT: Task(_COMMENT, _code_comment),
 }
 
 class TitanModel(BaseModel):

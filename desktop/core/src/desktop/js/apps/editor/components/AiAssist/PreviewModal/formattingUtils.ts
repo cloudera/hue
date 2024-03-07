@@ -33,13 +33,13 @@ const LINE_BREAK = '\n';
  * Insert line breaks in a string so that no line is longer than 90 characters.
  * Useful for formatting LLM text responses.
  */
-const insertLineBreaks = (input: string): string => {
+const insertLineBreaks = (input: string, maxLength: number = MAX_LINE_LENGTH): string => {
   let output = '';
   let lineLength = 0;
 
   input.split(SPACE).forEach(word => {
     const append = word + SPACE;
-    if (lineLength + word.length > MAX_LINE_LENGTH) {
+    if (lineLength + word.length > maxLength) {
       output += LINE_BREAK + append;
       lineLength = append.length;
     } else {
@@ -124,6 +124,17 @@ export const extractLeadingNqlComments = (sql: string): string => {
     });
 
   return commentsTexts.join('\n');
+};
+
+export const breakLongComments = (sql: string, maxLength = 70): string => {
+  const matches = sql.match(multiLineCommentRegex);
+  matches?.forEach(comment => {
+    const shortLineComment =
+      comment.length > maxLength ? insertLineBreaks(comment, maxLength) : comment;
+    sql = sql.replace(comment, shortLineComment);
+  });
+
+  return sql;
 };
 
 export interface FormattingConfig {

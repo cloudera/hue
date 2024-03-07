@@ -32,6 +32,7 @@ class TaskType(str, Enum):
   SUMMARIZE = 'summarize',
   OPTIMIZE = 'optimize',
   FIX = 'fix',
+  COMMENT = 'comment',
   FILTER_TABLES = 'filter_tables'
 
 @dataclass
