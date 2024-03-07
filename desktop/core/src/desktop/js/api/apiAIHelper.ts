@@ -20,7 +20,6 @@ import { post } from '../api/utils';
 import Executor from '../apps/editor/execution/executor';
 import dataCatalog from '../catalog/dataCatalog';
 import { ExtendedColumn } from '../catalog/DataCatalogEntry';
-import { getLastKnownConfig } from '../config/hueConfig';
 
 import HueError from './HueError';
 
@@ -212,16 +211,6 @@ const getRelevantTables = async (
     throw new HueError('No tables found. Please verify DB name used.');
   }
 
-  let tableMetadata = allTables;
-  const config = getLastKnownConfig();
-  if (config?.hue_config?.is_vector_db_enabled) {
-    tableMetadata = await getRelevantTableDetails(
-      tableParams.databaseName,
-      allTables,
-      tableParams.executor
-    );
-  }
-
   onStatusChange('Filtering relevant tables');
   let relevantTables;
   try {
@@ -229,7 +218,7 @@ const getRelevantTables = async (
       url: TABLES_API_URL,
       data: {
         input: input,
-        metadata: tableMetadata,
+        metadata: allTables,
         database: tableParams.databaseName
       }
     });
@@ -261,7 +250,7 @@ export const getRelevantTableDetails = async (
   tableNames: string[],
   executor: Executor,
   onStatusChange?: (arg: string) => void
-) => {
+): Promise<Array<TableColumnsMetadataItem>> => {
   onStatusChange && onStatusChange('Finding relevant table metadata');
   const relevantTables = [];
   for (const tableName of tableNames) {
@@ -270,9 +259,11 @@ export const getRelevantTableDetails = async (
       const tableDetails = {
         dbName: databaseName,
         name: tableName,
-        columns: columns.map(({ definition }) => {
-          return definition;
-        }),
+        columns: columns
+          .map(({ definition }) => {
+            return definition as ExtendedColumn;
+          })
+          .filter(def => def !== undefined),
         partitions: columns.partitions
       };
       relevantTables.push(tableDetails);
