@@ -13,10 +13,19 @@ describe('AssistToolbar', () => {
   const mockLoadExplanation = jest.fn();
   const mockLoadOptimization = jest.fn();
   const mockLoadFixSuggestion = jest.fn();
+  const mockLoadComments = jest.fn();
   const mockOnInputSubmit = jest.fn();
   const mockOnInputChanged = jest.fn();
 
   const defaultProps = {
+    showActions: [
+      AiActionModes.GENERATE,
+      AiActionModes.EDIT,
+      AiActionModes.EXPLAIN,
+      AiActionModes.OPTIMIZE,
+      AiActionModes.FIX,
+      AiActionModes.COMMENT
+    ],
     actionMode: undefined,
     setActionMode: mockSetActionMode,
     isLoading: false,
@@ -25,6 +34,7 @@ describe('AssistToolbar', () => {
     inputValue: '',
     inputPrefill: '',
     loadExplanation: mockLoadExplanation,
+    loadComments: mockLoadComments,
     parsedStatement: { statement: 'SELECT * FROM table' },
     loadOptimization: mockLoadOptimization,
     loadFixSuggestion: mockLoadFixSuggestion,
@@ -145,5 +155,25 @@ describe('AssistToolbar', () => {
     const fixButton = getByTitle('Fix the selected SQL statement');
     await user.click(fixButton);
     expect(mockLoadFixSuggestion).toHaveBeenCalledWith('SELECT * FROM table');
+  });
+
+  it('should call loadComments on commnt button click', async () => {
+    const user = userEvent.setup();
+    const props = { ...defaultProps };
+    const { getByTitle } = render(<AssistToolbar {...props} />);
+    const commentButton = getByTitle('Comment SQL');
+    await user.click(commentButton);
+    expect(mockLoadComments).toHaveBeenCalledWith('SELECT * FROM table');
+  });
+
+  it('hides the action buttons if the action is missing in the showActions prop', async () => {
+    const props = { ...defaultProps, isSqlError: true, showActions: [] };
+    const { queryByTitle } = render(<AssistToolbar {...props} />);
+
+    expect(queryByTitle('Fix the selected SQL statement')).toBeNull();
+    expect(queryByTitle('Comment SQL')).toBeNull();
+    expect(queryByTitle('Optimize the selected SQL statement')).toBeNull();
+    expect(queryByTitle('Explain the selected SQL statement')).toBeNull();
+    expect(queryByTitle('Edit selected SQL statement using natural language')).toBeNull();
   });
 });

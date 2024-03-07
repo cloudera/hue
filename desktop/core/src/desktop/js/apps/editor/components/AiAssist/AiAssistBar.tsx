@@ -38,9 +38,14 @@ import AnimatedCloseButton from './AnimatedCloseButton/AnimatedCloseButton';
 import AssistToolbar from './AiAssistToolbar/AiAssistToolbar';
 import UntrustedAiModal from './UntrustedAiModal/UntrustedAiModal';
 import { withGuardrails, GuardrailAlert, GuardrailAlertType } from './guardRails';
-import { extractLeadingNqlComments, removeComments } from './PreviewModal/formattingUtils';
+import {
+  extractLeadingNqlComments,
+  removeComments,
+  breakLongComments
+} from './PreviewModal/formattingUtils';
 import { AiActionModes } from './sharedTypes';
 import { CURSOR_POSITION_CHANGED_EVENT } from '../../../../ko/bindings/ace/aceLocationHandler';
+import { getLastKnownConfig } from '../../../../config/hueConfig';
 
 import './AiAssistBar.scss';
 
@@ -49,7 +54,8 @@ const {
   generateCorrectedSql,
   generateOptimizedSql,
   generateSQLfromNQL,
-  generateEditedSQLfromNQL
+  generateEditedSQLfromNQL,
+  generateCommentedSql
 } = generativeFunctionFactory();
 
 const extractTablesAndViews = (sql: string, parser: AutocompleteParser): Array<string> => {
@@ -290,6 +296,31 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps): JSX.Element => {
     }
   };
 
+  const loadComments = async (statement: string) => {
+    setIsLoading(true);
+    setGuardrailAlert(undefined);
+    const dialect = sqlDialect;
+    let sql, guardrailAlert;
+    try {
+      ({ sql, guardrailAlert } = await withGuardrails(generateCommentedSql)({
+        statement,
+        dialect,
+        onStatusChange: handleStatusUpdate
+      }));
+      if (guardrailAlert?.type !== GuardrailAlertType.INVALID_AI_RESPONSE) {
+        const properlyCommentedSql = breakLongComments(sql);
+        setSuggestion(properlyCommentedSql);
+        setShowSuggestedSqlModal(true);
+        setActionMode(AiActionModes.EXPLAIN);
+      }
+    } catch (error) {
+      handleApiError(error.message);
+    } finally {
+      setGuardrailAlert(guardrailAlert);
+      setIsLoading(false);
+    }
+  };
+
   const handleToobarInputSubmit = (userInput: string) => {
     const sqlStatmentToModify = parsedStatement.statement;
     if (actionMode === AiActionModes.GENERATE) {
@@ -453,6 +484,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps): JSX.Element => {
           })}
         >
           <AssistToolbar
+            showActions={getLastKnownConfig()?.hue_config?.ai_enabled_SQL_tasks as AiActionModes[]}
             actionMode={actionMode}
             setActionMode={setActionMode}
             isLoading={isLoading}
@@ -465,6 +497,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps): JSX.Element => {
             parsedStatement={parsedStatement}
             loadOptimization={loadOptimization}
             loadFixSuggestion={loadFixSuggestion}
+            loadComments={loadComments}
             isSqlError={hasIncorrectSql}
             inputPrefill={inputPrefill}
           />

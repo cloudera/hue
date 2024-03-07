@@ -3,5 +3,6 @@ export enum AiActionModes {
   EDIT = 'edit',
   OPTIMIZE = 'optimize',
   FIX = 'fix',
-  EXPLAIN = 'explain'
+  EXPLAIN = 'explain',
+  COMMENT = 'comment'
 }

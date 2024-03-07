@@ -63,6 +63,17 @@ interface GenerateCorrectedSql {
   }): Promise<CorrectSqlResponse>;
 }
 
+interface CommentedSqlResponse {
+  sql: string;
+}
+interface GenerateCommentedSql {
+  (params: {
+    statement: string;
+    dialect: string;
+    onStatusChange: (arg: string) => void;
+  }): Promise<CommentedSqlResponse>;
+}
+
 interface OptimizeSqlResponse {
   sql: string;
   explanation: string;
@@ -115,6 +126,7 @@ interface GenerativeFunctionSet {
   generateOptimizedSql: GenerateOptimizedSql;
   generateSQLfromNQL: GenerateSQLfromNQL;
   generateEditedSQLfromNQL: GenerateEditedSQLfromNQL;
+  generateCommentedSql: GenerateCommentedSql;
 }
 export function generativeFunctionFactory(): GenerativeFunctionSet {
   // TODO: Here we can conditionally use different implementations depending
@@ -124,7 +136,8 @@ export function generativeFunctionFactory(): GenerativeFunctionSet {
     generateCorrectedSql,
     generateOptimizedSql,
     generateSQLfromNQL,
-    generateEditedSQLfromNQL
+    generateEditedSQLfromNQL,
+    generateCommentedSql
   };
 }
 
@@ -477,5 +490,25 @@ const generateCorrectedSql: GenerateCorrectedSql = async ({
     });
   } catch (e) {
     throw augmentError(e, 'Call to AI to fix SQL query failed');
+  }
+};
+
+const generateCommentedSql: GenerateCommentedSql = async ({
+  statement,
+  dialect,
+  onStatusChange
+}) => {
+  onStatusChange('Generating comments for SQL query');
+  try {
+    return await fetchFromLlm<CorrectSqlResponse>({
+      url: SQL_API_URL,
+      data: {
+        task: 'comment',
+        sql: statement,
+        dialect
+      }
+    });
+  } catch (e) {
+    throw augmentError(e, 'Call to AI to comment SQL query failed');
   }
 };

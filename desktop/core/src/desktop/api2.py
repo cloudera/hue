@@ -104,6 +104,7 @@ def get_config(request):
   config['hue_config']['is_ai_interface_enabled'] = is_ai_interface_enabled()
   config['hue_config']['ai_service_name'] = ai_service_name()
   config['hue_config']['is_ai_trusted_service'] = is_ai_trusted_service()
+  config['hue_config']['ai_enabled_SQL_tasks'] = AI_INTERFACE.ENABLED_SQL_TASKS.get()
   config['hue_config']['is_vector_db_enabled'] = is_vector_db_enabled()
   config['hue_config']['auto_fetch_table_meta_limit'] = AI_INTERFACE.AUTO_FETCH_TABLE_META_LIMIT.get()
   config['hue_config']['enable_chunked_file_uploader'] = ENABLE_CHUNKED_FILE_UPLOADER.get()

@@ -87,6 +87,7 @@ export interface HueConfig extends GenericApiResponse {
     is_ai_trusted_service: boolean;
     is_vector_db_enabled: boolean;
     auto_fetch_table_meta_limit: number;
+    ai_enabled_SQL_tasks: string[];
   };
   hue_version?: string;
   img_version?: string;
