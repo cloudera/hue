@@ -24,8 +24,9 @@ import {
   EditOutlined,
   CommentOutlined
 } from '@ant-design/icons';
-
+import TourIcon from '@cloudera/cuix-core/icons/react/TourIcon';
 import Toolbar, { ToolbarButton } from '../../../../../reactComponents/Toolbar/Toolbar';
+
 import AiAssistToolbarInput from './AiAssistToolbarInput';
 import { extractLeadingNqlComments, removeComments } from '../PreviewModal/formattingUtils';
 import { AiActionModes } from '../sharedTypes';
@@ -34,6 +35,7 @@ import './AiAssistToolbar.scss';
 
 type ActionModes = AiActionModes | undefined;
 interface AssistToolbarProps {
+  showActions: AiActionModes[];
   actionMode: ActionModes;
   setActionMode: React.Dispatch<React.SetStateAction<AiActionModes | undefined>>;
   isLoading: boolean;
@@ -45,6 +47,7 @@ interface AssistToolbarProps {
   parsedStatement: { statement: string };
   loadOptimization: (statement: string) => Promise<void>;
   loadFixSuggestion: (statement: string) => Promise<void>;
+  loadComments: (statement: string) => Promise<void>;
   isSqlError: boolean;
   className?: string;
   onInputSubmit: (value: string) => void;
@@ -52,6 +55,7 @@ interface AssistToolbarProps {
 }
 
 function AssistToolbar({
+  showActions,
   actionMode,
   setActionMode,
   isLoading,
@@ -60,6 +64,7 @@ function AssistToolbar({
   inputValue,
   inputPrefill,
   loadExplanation,
+  loadComments,
   parsedStatement,
   loadOptimization,
   loadFixSuggestion,
@@ -94,6 +99,11 @@ function AssistToolbar({
     loadFixSuggestion(parsedStatement?.statement);
   };
 
+  const handleCommentClick = () => {
+    setErrorStatusText('');
+    loadComments(parsedStatement?.statement);
+  };
+
   const selectedStatement = parsedStatement?.statement?.trim() || '';
   const selectedStatementHasContent = !!selectedStatement;
   const nqlPrompt = extractLeadingNqlComments(selectedStatement);
@@ -107,73 +117,98 @@ function AssistToolbar({
       className="hue-ai-assist-toolbar"
       content={() => (
         <>
-          <ToolbarButton
-            disabled={isLoading}
-            title="Generate SQL using natural language"
-            aria-label="Generate SQL using natural language"
-            icon={<CommentOutlined />}
-            onClick={() => toggleMode(AiActionModes.GENERATE)}
-          >
-            {actionMode === AiActionModes.EDIT ? '' : 'Generate'}
-          </ToolbarButton>
-          <AiAssistToolbarInput
-            isAnimating={isAnimatingInput}
-            isLoading={isLoading}
-            isExpanded={actionMode === AiActionModes.GENERATE && inputExpanded}
-            placeholder="E.g. How many of our unique website vistors are using Mac?"
-            onSubmit={onInputSubmit}
-            onCancel={handleCancelInput}
-            onInputChanged={onInputChanged}
-            value={inputValue}
-            onAnimationEnded={() => setIsAnimatingInput(false)}
-            prefill={inputPrefill}
-          />
-          <ToolbarButton
-            disabled={isLoading || selectedStatementMissingSql}
-            title="Edit selected SQL statement using natural language"
-            aria-label="Edit SQL using natural language"
-            icon={<EditOutlined />}
-            onClick={() => toggleMode(AiActionModes.EDIT)}
-          >
-            {actionMode === AiActionModes.GENERATE ? '' : 'Edit'}
-          </ToolbarButton>
-          <AiAssistToolbarInput
-            isAnimating={isAnimatingInput}
-            isExpanded={actionMode === AiActionModes.EDIT && inputExpanded}
-            isLoading={isLoading}
-            value={inputValue}
-            placeholder="E.g. Only inlcude people under 50 years"
-            onSubmit={onInputSubmit}
-            onCancel={handleCancelInput}
-            onInputChanged={onInputChanged}
-            onAnimationEnded={() => setIsAnimatingInput(false)}
-            prefill={inputPrefill}
-          />
-          <ToolbarButton
-            disabled={isLoading || selectedStatementMissingSql}
-            title="Explain the selected SQL statement"
-            aria-label="Explain SQL statement"
-            icon={<BulbOutlined />}
-            onClick={handleExplainClick}
-          >
-            {!inputExpanded ? 'Explain' : ''}
-          </ToolbarButton>
-          <ToolbarButton
-            onClick={handleOptimizeClick}
-            title="Optimize the selected SQL statement"
-            disabled={isLoading || selectedStatementMissingSql}
-            icon={<ThunderboltOutlined />}
-          >
-            {!inputExpanded ? 'Optimize' : ''}
-          </ToolbarButton>
-          <ToolbarButton
-            title="Fix the selected SQL statement"
-            onClick={handleFixClick}
-            disabled={!isSqlError || isLoading || selectedStatementMissingSql}
-            icon={<BugOutlined />}
-          >
-            {!inputExpanded ? 'Fix' : ''}
-          </ToolbarButton>
+          {showActions?.includes(AiActionModes.GENERATE) && (
+            <>
+              <ToolbarButton
+                disabled={isLoading}
+                title="Generate SQL using natural language"
+                aria-label="Generate SQL using natural language"
+                icon={<CommentOutlined />}
+                onClick={() => toggleMode(AiActionModes.GENERATE)}
+              >
+                {actionMode === AiActionModes.EDIT ? '' : 'Generate'}
+              </ToolbarButton>
+              <AiAssistToolbarInput
+                isAnimating={isAnimatingInput}
+                isLoading={isLoading}
+                isExpanded={actionMode === AiActionModes.GENERATE && inputExpanded}
+                placeholder="E.g. How many of our unique website vistors are using Mac?"
+                onSubmit={onInputSubmit}
+                onCancel={handleCancelInput}
+                onInputChanged={onInputChanged}
+                value={inputValue}
+                onAnimationEnded={() => setIsAnimatingInput(false)}
+                prefill={inputPrefill}
+              />
+            </>
+          )}
+          {showActions?.includes(AiActionModes.EDIT) && (
+            <>
+              <ToolbarButton
+                disabled={isLoading || selectedStatementMissingSql}
+                title="Edit selected SQL statement using natural language"
+                aria-label="Edit SQL using natural language"
+                icon={<EditOutlined />}
+                onClick={() => toggleMode(AiActionModes.EDIT)}
+              >
+                {actionMode === AiActionModes.GENERATE ? '' : 'Edit'}
+              </ToolbarButton>
+              <AiAssistToolbarInput
+                isAnimating={isAnimatingInput}
+                isExpanded={actionMode === AiActionModes.EDIT && inputExpanded}
+                isLoading={isLoading}
+                value={inputValue}
+                placeholder="E.g. Only inlcude people under 50 years"
+                onSubmit={onInputSubmit}
+                onCancel={handleCancelInput}
+                onInputChanged={onInputChanged}
+                onAnimationEnded={() => setIsAnimatingInput(false)}
+                prefill={inputPrefill}
+              />
+            </>
+          )}
+
+          {showActions?.includes(AiActionModes.EXPLAIN) && (
+            <ToolbarButton
+              disabled={isLoading || selectedStatementMissingSql}
+              title="Explain the selected SQL statement"
+              aria-label="Explain SQL statement"
+              icon={<BulbOutlined />}
+              onClick={handleExplainClick}
+            >
+              {!inputExpanded ? 'Explain' : ''}
+            </ToolbarButton>
+          )}
+          {showActions?.includes(AiActionModes.OPTIMIZE) && (
+            <ToolbarButton
+              onClick={handleOptimizeClick}
+              title="Optimize the selected SQL statement"
+              disabled={isLoading || selectedStatementMissingSql}
+              icon={<ThunderboltOutlined />}
+            >
+              {!inputExpanded ? 'Optimize' : ''}
+            </ToolbarButton>
+          )}
+          {showActions?.includes(AiActionModes.FIX) && (
+            <ToolbarButton
+              title="Fix the selected SQL statement"
+              onClick={handleFixClick}
+              disabled={!isSqlError || isLoading || selectedStatementMissingSql}
+              icon={<BugOutlined />}
+            >
+              {!inputExpanded ? 'Fix' : ''}
+            </ToolbarButton>
+          )}
+          {showActions?.includes(AiActionModes.COMMENT) && (
+            <ToolbarButton
+              title="Comment SQL"
+              onClick={handleCommentClick}
+              disabled={isLoading || selectedStatementMissingSql}
+              icon={<TourIcon />}
+            >
+              {!inputExpanded ? 'Comment' : ''}
+            </ToolbarButton>
+          )}
         </>
       )}
     />

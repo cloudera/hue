@@ -259,7 +259,13 @@ AI_INTERFACE = ConfigSection(
       key="token_script",
       help=_("Run this script to produce the service API token."),
       type=coerce_password_from_script,
-      default=None)
+      default=None),
+    ENABLED_SQL_TASKS = Config(
+      key='enabled_sql_tasks',
+      help=_('A comma-separated list of SQL related AI tasks available in the Editor'),
+      type=coerce_csv,
+      default=['generate','edit','explain','optimize','fix','comment']
+      ),
   )
 )
 
