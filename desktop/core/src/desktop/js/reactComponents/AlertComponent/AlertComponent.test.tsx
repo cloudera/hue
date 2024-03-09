@@ -21,6 +21,7 @@ import userEvent from '@testing-library/user-event';
 import huePubSub from '../../utils/huePubSub';
 
 import AlertComponent from './AlertComponent';
+jest.useFakeTimers(); // Enable fake timers
 
 describe('AlertComponent', () => {
   test('it should show a global error message', async () => {
