@@ -172,6 +172,8 @@ class TrinoApi(Api):
 
       next_uri = status.next_uri
       current_length = len(data)
+      if processed_rows < 0:
+        processed_rows = 0
       data = data[processed_rows:processed_rows + 100]
       processed_rows -= current_length
 
