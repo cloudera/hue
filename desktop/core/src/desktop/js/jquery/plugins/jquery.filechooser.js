@@ -16,7 +16,9 @@
 
 import $ from 'jquery';
 import * as ko from 'knockout';
-import qq from 'ext/fileuploader.custom';
+import fileuploader from 'ext/fileuploader.custom';
+import qq from 'ext/fileuploader.custom.new.js';
+
 
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
@@ -805,48 +807,127 @@ Plugin.prototype.navigateTo = function (path) {
 let num_of_pending_uploads = 0;
 
 function initUploader(path, _parent, el, labels) {
-  new qq.FileUploader({
-    element: el[0],
-    action: '/filebrowser/upload/file',
-    params: {
-      dest: path,
-      fileFieldLabel: 'hdfs_file'
-    },
-    onComplete: function (id, fileName, responseJSON) {
-      num_of_pending_uploads--;
-      if (responseJSON.status == -1) {
-        huePubSub.publish('hue.global.error', { message: responseJSON.data });
-      } else if (!num_of_pending_uploads) {
-        _parent.navigateTo(path);
-        huePubSub.publish('assist.' + getFs(getScheme(path)) + '.refresh');
-      }
-    },
-    onSubmit: function (id, fileName) {
-      num_of_pending_uploads++;
-      window.hueAnalytics.log('filechooser', 'uploading-file');
-    },
-    template:
-      '<div class="qq-uploader">' +
-      '<div class="qq-upload-drop-area"><span></span></div>' +
-      '<div class="qq-upload-button">' +
-      labels.UPLOAD_FILE +
-      '</div><br>' +
-      '<ul class="qq-upload-list"></ul>' +
-      '</div>',
-    fileTemplate:
-      '<li>' +
-      '<span class="qq-upload-file"></span>' +
-      '<span class="qq-upload-spinner"></span>' +
-      '<span class="qq-upload-size"></span>' +
-      '<a class="qq-upload-cancel" href="#">' +
-      labels.CANCEL +
-      '</a>' +
-      '<span class="qq-upload-failed-text">' +
-      labels.FAILED +
-      '</span>' +
-      '</li>',
-    debug: false
-  });
+  var uploader;
+  if (window.getLastKnownConfig().hue_config.enable_chunked_file_uploader) {
+    var action = '/filebrowser/upload/chunks/';
+    const qqTemplate = document.createElement('div');
+    qqTemplate.id = 'qq-template';
+    qqTemplate.innerHTML = `
+      <div class="qq-uploader-selector" style="margin-left: 10px; display: flex; align-items: center;">
+        <div class="qq-upload-drop-area-selector" qq-hide-dropzone>
+          <span>${_('Drop the files here to upload')}</span>
+        </div>
+        <div style="display: flex; align-items: center; margin-left: auto;">
+          <div class="qq-upload-controls" style="display: flex; align-items: center;">
+            <ul class="qq-upload-list-selector qq-upload-files unstyled qq-no-float" style="margin-right: 0; list-style: none; padding: 0; max-width: 300px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
+              <li>
+                <span class="qq-upload-spinner-selector hide" style="display:none"></span>
+                <span class="break-word qq-upload-file-selector" style="display: inline-block; max-width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;"></span>
+                <span class="muted qq-upload-size-selector" style="margin-left: 0.5rem;"></span>
+                <a href="#" title="${_('Cancel')}" class="complex-layout" style="margin-left: 0.5rem;"><i class="fa fa-fw fa-times qq-upload-cancel-selector"></i></a>
+                <span class="qq-upload-done-selector" style="display:none; margin-left: 0.5rem;"><i class="fa fa-fw fa-check muted"></i></span>
+                <span class="qq-upload-failed-text" style="margin-left: 0.5rem;">${_('Failed')}</span>
+              </li>
+            </ul>
+          </div>
+          <div class="qq-upload-button-selector qq-no-float" style="margin-left: 1rem;">${_('Upload file')}</div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(qqTemplate);
+    uploader = new qq.FileUploader({
+      element: el[0],
+      request: {
+        endpoint: action,
+        paramsInBody: false,
+        params: {
+          dest: path,
+          inputName: 'hdfs_file'
+        }
+      },
+      maxConnections: window.CONCURRENT_MAX_CONNECTIONS || 5,
+      chunking: {
+        enabled: true,
+        concurrent: {
+          enabled: true
+        },
+        partSize: window.FILE_UPLOAD_CHUNK_SIZE || 5242880,
+        success: {
+          endpoint: '/filebrowser/upload/complete/'
+        },
+        paramNames: {
+          partIndex: 'qqpartindex',
+          partByteOffset: 'qqpartbyteoffset',
+          chunkSize: 'qqchunksize',
+          totalFileSize: 'qqtotalfilesize',
+          totalParts: 'qqtotalparts'
+        }
+      },
+      template: 'qq-template',
+      callbacks: {
+        onComplete: function (id, fileName, response) {
+          num_of_pending_uploads--;
+          if (response.status != 0) {
+            huePubSub.publish('hue.global.error', { message: response.data });
+          } else if (!num_of_pending_uploads) {
+            _parent.navigateTo(path);
+            huePubSub.publish('assist.' + getFs(getScheme(path)) + '.refresh');
+          }
+        },
+        onSubmit: function (id, fileName) {
+          var newPath = "/filebrowser/upload/chunks/file?dest=" + encodeURIComponent(path.normalize('NFC'));
+          this.setEndpoint(newPath);
+          num_of_pending_uploads++;
+          window.hueAnalytics.log('filechooser', 'uploading-file');
+        },
+      },
+      debug: false
+    });   
+  }
+  else{
+    uploader = new fileuploader.FileUploader({
+      element: el[0],
+      action: '/filebrowser/upload/file',
+      params: {
+        dest: path,
+        fileFieldLabel: 'hdfs_file'
+      },
+      onComplete: function (id, fileName, responseJSON) {
+        num_of_pending_uploads--;
+        if (responseJSON.status == -1) {
+          huePubSub.publish('hue.global.error', { message: responseJSON.data });
+        } else if (!num_of_pending_uploads) {
+          _parent.navigateTo(path);
+          huePubSub.publish('assist.' + getFs(getScheme(path)) + '.refresh');
+        }
+      },
+      onSubmit: function (id, fileName) {
+        num_of_pending_uploads++;
+        window.hueAnalytics.log('filechooser', 'uploading-file');
+      },
+      template:
+        '<div class="qq-uploader">' +
+        '<div class="qq-upload-drop-area"><span></span></div>' +
+        '<div class="qq-upload-button">' +
+        labels.UPLOAD_FILE +
+        '</div><br>' +
+        '<ul class="qq-upload-list"></ul>' +
+        '</div>',
+      fileTemplate:
+        '<li>' +
+        '<span class="qq-upload-file"></span>' +
+        '<span class="qq-upload-spinner"></span>' +
+        '<span class="qq-upload-size"></span>' +
+        '<a class="qq-upload-cancel" href="#">' +
+        labels.CANCEL +
+        '</a>' +
+        '<span class="qq-upload-failed-text">' +
+        labels.FAILED +
+        '</span>' +
+        '</li>',
+      debug: false
+    });
+  }
 }
 
 Plugin.prototype.init = function () {
