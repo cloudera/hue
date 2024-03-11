@@ -14,19 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
-import unittest
-
+from unittest.mock import patch, Mock
 from nose.tools import assert_equal, assert_raises
 
 from desktop.conf import SDXAAS
 from desktop.lib.sdxaas.knox_jwt import handle_knox_ha, fetch_jwt
 from desktop.lib.exceptions_renderable import PopupException
-
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock
-else:
-  from mock import patch, Mock
 
 
 def test_handle_knox_ha():
