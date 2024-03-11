@@ -53,11 +53,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   <link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-timepicker.min.css') }">
   <link rel="stylesheet" href="${ static('desktop/css/bootstrap-spinedit.css') }">
   <link rel="stylesheet" href="${ static('desktop/css/bootstrap-slider.css') }">
-
+  
   % for bundle in get_hue_bundles('miniJobBrowser'):
     ${ render_bundle(bundle) | n,unicode }
   % endfor
-
+  
   <script src="${ static('desktop/ext/js/bootstrap-datepicker.min.js') }" type="text/javascript" charset="utf-8"></script>
   <script src="${ static('desktop/ext/js/bootstrap-timepicker.min.js') }" type="text/javascript" charset="utf-8"></script>
   <script src="${ static('desktop/js/bootstrap-spinedit.js') }" type="text/javascript" charset="utf-8"></script>
