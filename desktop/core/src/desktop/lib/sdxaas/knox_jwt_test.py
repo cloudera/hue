@@ -37,31 +37,54 @@ def test_handle_knox_ha():
 
       # Non-HA mode
       reset = SDXAAS.TOKEN_URL.set_for_testing('https://knox-gateway0.gethue.com:8443/dl-name/kt-kerberos/')
-
       try:
         knox_url = handle_knox_ha()
+
         assert_equal(knox_url, 'https://knox-gateway0.gethue.com:8443/dl-name/kt-kerberos/')
+        assert_equal(requests_get.call_count, 0) # Simply returning the URL string
       finally:
         reset()
+        requests_get.reset_mock()
 
-      # HA mode - where first URL sends 200 status code
+      # HA mode - When gateway0 is healthy and gateway1 is unhealthy
+      requests_get.side_effect = [Mock(status_code=200), Mock(status_code=404)]
       reset = SDXAAS.TOKEN_URL.set_for_testing(
         'https://knox-gateway0.gethue.com:8443/dl-name/kt-kerberos/, https://knox-gateway1.gethue.com:8443/dl-name/kt-kerberos/')
 
       try:
         knox_url = handle_knox_ha()
+
         assert_equal(knox_url, 'https://knox-gateway0.gethue.com:8443/dl-name/kt-kerberos/')
+        assert_equal(requests_get.call_count, 1)
       finally:
         reset()
+        requests_get.reset_mock()
 
-      # When no Knox URL is healthy
+      # HA mode - When gateway0 is unhealthy and gateway1 is healthy
+      requests_get.side_effect = [Mock(status_code=404), Mock(status_code=200)]
+      reset = SDXAAS.TOKEN_URL.set_for_testing(
+        'https://knox-gateway0.gethue.com:8443/dl-name/kt-kerberos/, https://knox-gateway1.gethue.com:8443/dl-name/kt-kerberos/')
+
+      try:
+        knox_url = handle_knox_ha()
+
+        assert_equal(knox_url, 'https://knox-gateway1.gethue.com:8443/dl-name/kt-kerberos/')
+        assert_equal(requests_get.call_count, 2)
+      finally:
+        reset()
+        requests_get.reset_mock()
+
+      # When both gateway0 and gateway1 are unhealthy
       requests_get.return_value = Mock(status_code=404)
       reset = SDXAAS.TOKEN_URL.set_for_testing(
         'https://knox-gateway0.gethue.com:8443/dl-name/kt-kerberos/, https://knox-gateway1.gethue.com:8443/dl-name/kt-kerberos/')
 
       try:
         knox_url = handle_knox_ha()
+
         assert_equal(knox_url, None)
+        assert_equal(requests_get.call_count, 2)
+        requests_get.reset_mock()
       finally:
         reset()
 
