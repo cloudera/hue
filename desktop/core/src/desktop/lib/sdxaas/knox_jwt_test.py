@@ -84,9 +84,9 @@ def test_handle_knox_ha():
 
         assert_equal(knox_url, None)
         assert_equal(requests_get.call_count, 2)
-        requests_get.reset_mock()
       finally:
         reset()
+        requests_get.reset_mock()
 
 
 def test_fetch_jwt():
