@@ -47,7 +47,7 @@ const Pagination: React.FC<PaginationProps> = ({
   onPageSizeChange,
   onPreviousPageButtonClicked,
   pageSize,
-  pageSizeOptions,
+  pageSizeOptions = [],
   pageStats
 }): JSX.Element => {
   const { t } = i18nReact.useTranslation();

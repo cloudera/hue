@@ -61,12 +61,12 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
   const [files, setFiles] = useState<StorageBrowserTableData[]>();
   const [loadingFiles, setloadingFiles] = useState(true);
   const [pageStats, setPageStats] = useState<PageStats>();
-  const [pageSize, setPageSize] = useState<number>();
+  const [pageSize, setPageSize] = useState<number>(0);
   const [pageNumber, setPageNumber] = useState<number>(1);
   const [sortByColumn, setSortByColumn] = useState<string>('');
   const [sortOrder, setSortOrder] = useState<SortOrder>(SortOrder.NONE);
   //TODO: Add filter functionality
-  const [filterData, setFilterData] = useState<string>('');
+  const [filterData] = useState<string>('');
 
   const { t } = i18nReact.useTranslation();
 
