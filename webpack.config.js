@@ -37,7 +37,11 @@ const config = {
       import: './desktop/core/src/desktop/js/apps/storageBrowser/app.js',
       dependOn: 'hue'
     },
-    jobBrowser: { import: './desktop/core/src/desktop/js/apps/jobBrowser/app.js', dependOn: 'hue' }
+    jobBrowser: { import: './desktop/core/src/desktop/js/apps/jobBrowser/app.js', dependOn: 'hue' },
+    miniJobBrowser: {
+      import: './desktop/core/src/desktop/js/apps/jobBrowser/miniApp.js',
+      dependOn: 'hue'
+    }
   },
   mode: 'development',
   module: {
@@ -50,32 +54,35 @@ const config = {
       {
         test: /\.(jsx?|tsx?)$/,
         exclude: /node_modules/,
-        use: [{
-          loader: 'babel-loader',
-          options: {
-            presets: ['@babel/preset-env', '@babel/preset-react']
+        use: [
+          {
+            loader: 'babel-loader',
+            options: {
+              presets: ['@babel/preset-env', '@babel/preset-react']
+            }
           }
-        }] 
+        ]
       },
       {
         test: /\.(jsx?|tsx?)$/,
-        enforce: "pre",
-        use: ["source-map-loader"],
-      },      
+        enforce: 'pre',
+        use: ['source-map-loader']
+      },
       {
         test: /\.scss$/,
         exclude: /node_modules/,
-        use: ['style-loader', 'css-loader', {
-          loader: 'sass-loader',
-          options: {
-            sassOptions: {
-              includePaths: [
-                'desktop/core/src/desktop/js/components/styles',
-                'node_modules',
-              ],
-            },
-          },
-        },]
+        use: [
+          'style-loader',
+          'css-loader',
+          {
+            loader: 'sass-loader',
+            options: {
+              sassOptions: {
+                includePaths: ['desktop/core/src/desktop/js/components/styles', 'node_modules']
+              }
+            }
+          }
+        ]
       },
       {
         test: /\.css$/i,
@@ -84,19 +91,19 @@ const config = {
       {
         test: /\.less$/i,
         use: [
-          { loader: "style-loader" },
-          { loader: "css-loader" },
+          { loader: 'style-loader' },
+          { loader: 'css-loader' },
           {
-              loader: "less-loader",
-              options: {
-                  lessOptions: {
-                      // This is not ideal but required by antd library
-                      javascriptEnabled: true,
-                  }
+            loader: 'less-loader',
+            options: {
+              lessOptions: {
+                // This is not ideal but required by antd library
+                javascriptEnabled: true
               }
-          }          
-        ],
-      },      
+            }
+          }
+        ]
+      },
       {
         test: /\.html$/,
         exclude: /node_modules/,
@@ -114,7 +121,7 @@ const config = {
     }
   },
   output: {
-    // Needed, at the time of writing with webpack 5.54.0, when using node 18.14.1 and later. 
+    // Needed, at the time of writing with webpack 5.54.0, when using node 18.14.1 and later.
     hashFunction: 'xxhash64',
     path: __dirname + '/desktop/core/src/desktop/static/desktop/js/bundles/hue',
     filename: '[name]-bundle-[fullhash].js',
@@ -130,7 +137,7 @@ const config = {
     maxAssetSize: 400 * 1024 // 400kb
   },
   plugins: getPluginConfig(BUNDLES.HUE).concat([
-    new CleanWebpackPlugin([`${__dirname}/desktop/core/src/desktop/static/desktop/js/bundles/hue`]),    
+    new CleanWebpackPlugin([`${__dirname}/desktop/core/src/desktop/static/desktop/js/bundles/hue`])
   ]),
   resolve: {
     extensions: ['.json', '.jsx', '.js', '.tsx', '.ts', '.vue'],
