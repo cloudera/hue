@@ -701,7 +701,7 @@ import subprocess, uuid, json, datetime
 from django.views.decorators.csrf import csrf_exempt
 import redis
 
-@csrf_exempt
+# @csrf_exempt
 @api_error_handler
 @require_POST
 # @api_view(['POST'])
@@ -754,7 +754,7 @@ def handle_submit(request):
     'status': 0
   })
 
-@csrf_exempt
+# @csrf_exempt
 @api_error_handler
 #creating a new endpoint to retirve the tasks from the database
 def get_taskserver_tasks(request):
@@ -777,7 +777,7 @@ def get_taskserver_tasks(request):
   return JsonResponse(tasks, safe=False)
 
 #creating a new endpoint to monitor the status of the task, so that the progress bar in file upload can be stopped at 90%
-@csrf_exempt
+# @csrf_exempt
 @api_error_handler
 def check_upload_status(request, task_id):
   r = redis.Redis(host='localhost', port=6379, db=0)

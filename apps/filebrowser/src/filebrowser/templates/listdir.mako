@@ -164,18 +164,25 @@ ${ fb_components.menubar() }
         <div class="btn-toolbar" style="display: inline; vertical-align: middle">
           % if show_upload_button:
           <!-- ko if: isS3 -->
-            <a class="btn fileToolbarBtn" title="${_('Upload files')}" data-bind="visible: !inTrash(), css: {'disabled': isS3Root()}, click: function(){ if (!isS3Root()) { uploadFile() }}"><i class="fa fa-arrow-circle-o-up"></i> ${_('Upload')}</a>
+            <a class="btn fileToolbarBtn" title="${_('Upload files')}" data-bind="visible: !inTrash(), css: {'disabled': isS3Root()}, click: function(){ if (!isS3Root()) { uploadFile(false) }}"><i class="fa fa-arrow-circle-o-up"></i> ${_('Upload')}</a>
+            <a class="btn fileToolbarBtn" title="${_('Schedule Upload')}" data-bind="visible: !inTrash(), css: {'disabled': isS3Root()}, click: function(){ if (!isS3Root()) { uploadFile(true) }}"><i class="fa fa-arrow-circle-o-up"></i> ${_('Schedule Upload')}</a>
           <!-- /ko -->
           <!-- ko if: isGS -->
             <a class="btn fileToolbarBtn" title="${_('Upload files')}" data-bind="visible: !inTrash(), css: {'disabled': isGSRoot()}, click: function(){ if (!isGSRoot()) { uploadFile() }}"><i class="fa fa-arrow-circle-o-up"></i> ${_('Upload')}</a>
           <!-- /ko -->
           <!-- ko if: isABFS -->
-            <a class="btn fileToolbarBtn" title="${_('Upload files')}" data-bind="visible: !inTrash(), css: {'disabled': isABFSRoot()}, click: function(){ if (!isABFSRoot()) { uploadFile() }}"><i class="fa fa-arrow-circle-o-up"></i> ${_('Upload')}</a>
+            <a class="btn fileToolbarBtn" title="${_('Upload files')}" data-bind="visible: !inTrash(), css: {'disabled': isABFSRoot()}, click: function(){ if (!isABFSRoot()) { uploadFile(false) }}"><i class="fa fa-arrow-circle-o-up"></i> ${_('Upload')}</a>
+            <a class="btn fileToolbarBtn" title="${_('Schedule Upload')}" data-bind="visible: !inTrash(), css: {'disabled': isABFSRoot()}, click: function(){ if (!isABFSRoot()) { uploadFile(true) }}"><i class="fa fa-arrow-circle-o-up"></i> ${_('Schedule Upload')}</a>
           <!-- /ko -->
           <!-- ko ifnot: isS3() || isGS() || isABFS() -->
           <div id="upload-dropdown" class="btn-group" style="vertical-align: middle">
-            <a data-hue-analytics="filebrowser:upload-btn-click" href="javascript: void(0)" class="btn upload-link dropdown-toggle" title="${_('Upload')}" data-bind="click: uploadFile, visible: !inTrash(), css: {'disabled': (isOFS() && (isOFSRoot() || isOFSServiceID() || isOFSVol()))}">
+            <a data-hue-analytics="filebrowser:upload-btn-click" href="javascript: void(0)" class="btn upload-link dropdown-toggle" title="${_('Upload')}" data-bind="click: function() { uploadFile(false); }, visible: !inTrash(), css: {'disabled': (isOFS() && (isOFSRoot() || isOFSServiceID() || isOFSVol()))}">
               <i class="fa fa-arrow-circle-o-up"></i> ${_('Upload')}
+            </a>
+          </div>
+          <div id="upload-dropdown" class="btn-group" style="vertical-align: middle">
+            <a data-hue-analytics="filebrowser:upload-btn-click" href="javascript: void(0)" class="btn upload-link dropdown-toggle" title="${_('Schedule Upload')}" data-bind="click: function() { uploadFile(true); }, visible: !inTrash(), css: {'disabled': (isOFS() && (isOFSRoot() || isOFSServiceID() || isOFSVol()))}">
+              <i class="fa fa-arrow-circle-o-up"></i> ${_('Schedule Upload')}
             </a>
           </div>
           <!-- /ko -->
