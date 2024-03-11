@@ -56,12 +56,12 @@ function install_prerequisite() {
     check_python39_path
   fi
   check_sqlite3
-  if [[ $1 == "centos7" || $1 == "snapshot" ]]; then
+  if [[ $1 == "centos7" ]]; then
     export PYTHON38_PATH=/opt/cloudera/cm-agent
     export pip38_bin="$PYTHON38_PATH/bin/pip3.8"
     centos7_install
     source /opt/rh/rh-nodejs14/enable
-  elif [[ $1 == "redhat8" || $1 == "redhat8-arm64" ]]; then
+  elif [[ $1 == "redhat8" || $1 == "redhat8-arm64" || $1 == "snapshot" ]]; then
     redhat8_install
   elif [[ $1 == "sles12" ]]; then
     sles12_install
