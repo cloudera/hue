@@ -21,7 +21,6 @@ import userEvent from '@testing-library/user-event';
 import huePubSub from '../../utils/huePubSub';
 
 import AlertComponent from './AlertComponent';
-jest.useFakeTimers(); // Enable fake timers
 
 describe('AlertComponent', () => {
   test('it should show a global error message', async () => {
@@ -92,6 +91,7 @@ describe('AlertComponent', () => {
   });
 
   test('info alerts should close automatically after 3 seconds', async () => {
+    jest.useFakeTimers();
     render(<AlertComponent />);
     expect(screen.queryAllByRole('alert')).toHaveLength(0);
     act(() => huePubSub.publish('hue.global.info', { message: 'info' }));
@@ -104,5 +104,7 @@ describe('AlertComponent', () => {
     //After 3.1 seconds, it should really be closed
     jest.advanceTimersByTime(1000);
     expect(screen.queryAllByRole('alert')).toHaveLength(0);
+
+    jest.useRealTimers();
   });
 });
