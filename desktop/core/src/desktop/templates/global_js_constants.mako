@@ -29,7 +29,8 @@
   from dashboard.conf import HAS_SQL_ENABLED
   from hadoop.conf import UPLOAD_CHUNK_SIZE
   from indexer.conf import ENABLE_NEW_INDEXER
-  from jobbrowser.conf import ENABLE_HISTORY_V2
+  from jobbrowser.conf import ENABLE_HISTORY_V2, ENABLE_QUERY_BROWSER, ENABLE_HIVE_QUERY_BROWSER, MAX_JOB_FETCH, \
+      QUERY_STORE
   from filebrowser.conf import SHOW_UPLOAD_BUTTON, REMOTE_STORAGE_HOME, MAX_FILE_SIZE_UPLOAD_LIMIT
   from indexer.conf import ENABLE_NEW_INDEXER
   from libsaml.conf import get_logout_redirect_url, CDP_LOGOUT_URL
@@ -174,8 +175,6 @@
 
   window.USE_DEFAULT_CONFIGURATION = '${ USE_DEFAULT_CONFIGURATION.get() }' === 'True';
 
-  window.USER_HAS_METADATA_WRITE_PERM = '${ user.has_hue_permission(action="write", app="metadata") }' === 'True';
-
   window.ENABLE_DOWNLOAD = '${ conf.ENABLE_DOWNLOAD.get() }' === 'True';
   window.ENABLE_NEW_CREATE_TABLE = '${ hasattr(ENABLE_NEW_CREATE_TABLE, 'get') and ENABLE_NEW_CREATE_TABLE.get()}' === 'True';
   window.ENABLE_HUE_5 = '${ ENABLE_HUE_5.get() }' === 'True';
@@ -190,7 +189,7 @@
   window.ENABLE_HISTORY_V2 = '${ hasattr(ENABLE_HISTORY_V2, 'get') and ENABLE_HISTORY_V2.get() }' === 'True';
   window.ENABLE_HIVE_QUERY_BROWSER = '${ hasattr(ENABLE_QUERY_BROWSER, 'get') and ENABLE_QUERY_BROWSER.get() }' === 'True';
   window.ENABLE_QUERY_BROWSER = '${ hasattr(ENABLE_QUERY_BROWSER, 'get') and ENABLE_QUERY_BROWSER.get() }' === 'True';
-  window.ENABLE_QUERY_STORE = '${ hasattr(QUERY_STORE, 'IS_ENABLED') and hasattr(QUERY_STORE.IS_ENABLED, 'get') and QUERY_STORE.IS_ENABLED.get() }' === 'True'
+  window.ENABLE_QUERY_STORE = '${ hasattr(QUERY_STORE.IS_ENABLED, 'get') and QUERY_STORE.IS_ENABLED.get() }' === 'True'
   window.ENABLE_SQL_SYNTAX_CHECK = '${ conf.ENABLE_SQL_SYNTAX_CHECK.get() }' === 'True';
 
   window.HAS_CATALOG = '${ has_catalog(request.user) }' === 'True';
@@ -217,7 +216,7 @@
 
   window.UPLOAD_CHUNK_SIZE = ${ UPLOAD_CHUNK_SIZE.get() };
   window.MAX_FILE_SIZE_UPLOAD_LIMIT = ${ MAX_FILE_SIZE_UPLOAD_LIMIT.get() if hasattr(MAX_FILE_SIZE_UPLOAD_LIMIT, 'get') and MAX_FILE_SIZE_UPLOAD_LIMIT.get() >= 0 else 'undefined' };
-
+  window.MAX_JOB_FETCH = ${ MAX_JOB_FETCH.get() if hasattr(MAX_JOB_FETCH, 'get') and MAX_JOB_FETCH.get() >= 0 else 500 };
   window.OTHER_APPS = [];
   % if other_apps:
     % for other in other_apps:
@@ -296,6 +295,7 @@
     'Browse table privileges': '${_('Browse table privileges')}',
     'Browsers': '${ _('Browsers') }',
     'Bundle': '${ _('Bundle') }',
+    'Bundles': '${ _('Bundles') }',
     'Canada': '${ _('Canada') }',
     'Cancel upload': '${ _('Cancel upload') }',
     'Cancel': '${_('Cancel')}',
@@ -350,6 +350,7 @@
     'Database': '${ _('Database') }',
     'database': '${ _('database') }',
     'Databases': '${ _('Databases') }',
+    'days': '${ _('days') }',
     'default': '${ _('default') }',
     'Delete document': '${ _('Delete document') }',
     'Delete this privilege': '${ _('Delete this privilege') }',
@@ -435,11 +436,16 @@
     'Help': '${ _('Help') }',
     'Hide advanced': '${_('Hide advanced')}',
     'Hide Details': '${ _('Hide Details') }',
+    'History': '${ _('History') }',
     'Hive Query': '${_('Hive Query')}',
+    'Hive Queries': '${_('Hive Queries')}',
+    'Hive Schedules': '${_('Hive Schedules')}',
+    'hours': '${ _('hours') }',
     'Hover on the app name to star it as your favorite application.': '${ _('Hover on the app name to star it as your favorite application.') }',
     'Identifiers': '${ _('Identifiers') }',
     'Ignore this type of error': '${_('Ignore this type of error')}',
     'Impala Query': '${_('Impala Query')}',
+    'Impala Queries': '${_('Impala Queries')}',
     'Import complete!': '${ _('Import complete!') }',
     'Import failed!': '${ _('Import failed!') }',
     'Import Hue Documents': '${ _('Import Hue Documents') }',
@@ -485,6 +491,7 @@
     'longitude': '${ _('longitude') }',
     'Manage Users': '${ _('Manage Users') }',
     'Manual refresh': '${_('Manual refresh')}',
+    'Map': '${ _('Map') }',
     'MapReduce Job': '${_('MapReduce Job')}',
     'Marker Map': '${ _('Marker Map') }',
     'Markers': '${ _('Markers') }',
@@ -492,6 +499,7 @@
     'Memory': '${ _('Memory') }',
     'Metrics': '${ _('Metrics') }',
     'min': '${ _('min') }',
+    'minutes': '${ _('minutes') }',
     'Missing label configuration.': '${ _('Missing label configuration.') }',
     'Missing latitude configuration.': '${ _('Missing latitude configuration.') }',
     'Missing legend configuration.': '${ _('Missing legend configuration.') }',
@@ -521,6 +529,7 @@
     'No documents found': '${ _('No documents found') }',
     'No entries found': '${ _('No entries found') }',
     'No indexes selected.': '${ _('No indexes selected.') }',
+    'No log available': '${ _('No log available') }',
     'No logs available at this moment.': '${ _('No logs available at this moment.') }',
     'No match found': '${ _('No match found') }',
     'No matching records': '${ _('No matching records') }',
@@ -590,10 +599,12 @@
     'Re-create session': '${ _('Re-create session') }',
     'Re-create': '${ _('Re-create') }',
     'Read': '${ _('Read') }',
+    'Reduce': '${ _('Reduce') }',
     'Refresh': '${ _('Refresh') }',
     'region': '${ _('region') }',
     'Remove': '${ _('Remove') }',
     'Replace the editor content...': '${ _('Replace the editor content...') }',
+    'Rerun submitted.': '${ _('Rerun submitted.') }',
     'Result available': '${ _('Result available') }',
     'Result expired': '${ _('Result expired') }',
     'Result image': '${ _('Result image') }',
@@ -613,6 +624,8 @@
     'Scatter Plot': '${ _('Scatter Plot') }',
     'scatter size': '${ _('scatter size') }',
     'Schedule': '${ _('Schedule') }',
+    'Schedules': '${ _('Schedules') }',
+    'Scheduled Tasks': '${ _('Scheduled Tasks') }',
     'scope': '${ _('scope') }',
     'Search Dashboard': '${_('Search Dashboard')}',
     'Search data and saved documents...': '${ _('Search data and saved documents...') }',
@@ -650,6 +663,7 @@
     'Sidebar for navigation': '${_('Sidebar for navigation')}',
     'Sign out': '${ _('Sign out') }',
     'Size': '${ _('Size') }',
+    'SLAs': '${ _('SLAs') }',
     'Solr Search': '${ _('Solr Search') }',
     'Some apps have a right panel with additional information to assist you in your data discovery.': '${ _('Some apps have a right panel with additional information to assist you in your data discovery.') }',
     'Sort ascending': '${ _('Sort ascending') }',
@@ -667,7 +681,9 @@
     'Stopped': '${_('Stopped')}',
     'Stopping': '${ _('Stopping') }',
     'Streams': '${ _('Streams') }',
+    'Succeeded': '${ _('Succeeded') }',
     'Success.': '${ _('Success.') }',
+    'Successfully updated Coordinator Job Properties': '${ _('Successfully updated Coordinator Job Properties') }',
     'Summary': '${_('Summary')}',
     'Table Browser': '${ _('Table Browser') }',
     'Table': '${ _('Table') }',
@@ -727,12 +743,14 @@
     'view': '${ _('view') }',
     'Views': '${ _('Views') }',
     'virtual': '${ _('virtual') }',
+    'Warehouses': '${ _('Warehouses') }',
     'We want to introduce you to the new interface. It takes less than a minute. Ready?': '${ _('We want to introduce you to the new interface. It takes less than a minute. Ready?') }',
     'Welcome Tour': '${ _('Welcome Tour') }',
     'Welcome to Hue 4!': '${ _('Welcome to Hue 4!') }',
     'With grant option': '${ _('With grant option') }',
     'With grant': '${ _('With grant') }',
     'Workflow': '${ _('Workflow') }',
+    'Workflows': '${ _('Workflows') }',
     'World': '${ _('World') }',
     'x-axis': '${ _('x-axis') }',
     'y-axis': '${ _('y-axis') }',
@@ -770,6 +788,9 @@
   };
 
   window.USER_VIEW_EDIT_USER_ENABLED = '${ user.has_hue_permission(action="access_view:useradmin:edit_user", app="useradmin") or is_admin(user) }' === 'True';
+  window.USER_HAS_METADATA_WRITE_PERM = '${ user.has_hue_permission(action="write", app="metadata") }' === 'True';
+  window.USER_HAS_OOZIE_ACCESS = '${ user.has_hue_permission(action="access", app="oozie") }' === 'True';
+
   window.USER_IS_ADMIN = '${ is_admin(user) }' === 'True';
   window.USER_IS_HUE_ADMIN = '${ is_hue_admin(user) }' === 'True';
   window.DJANGO_DEBUG_MODE = '${ conf.DJANGO_DEBUG_MODE.get() }' === 'True';

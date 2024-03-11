@@ -35,6 +35,7 @@
 
 <%namespace name="hueIcons" file="/hue_icons.mako" />
 <%namespace name="commonHeaderFooterComponents" file="/common_header_footer_components.mako" />
+<%namespace name="jbCommon" file="/job_browser_common.mako" />
 
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
@@ -339,6 +340,12 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
 <iframe id="zoomDetectFrame" style="width: 250px; display: none" ></iframe>
 
 ${ commonHeaderFooterComponents.footer(messages) }
+
+## This includes common knockout templates that are shared with the Job Browser page and the mini job browser panel
+## available in the upper right corner throughout Hue
+%if 'jobbrowser' in apps:
+${ jbCommon.include() }
+%endif
 
 <div class="monospace-preload" style="opacity: 0; height: 0; width: 0;">
   ${ _('Hue and the Hue logo are trademarks of Cloudera, Inc.') }
