@@ -35,14 +35,14 @@ import Tooltip from 'antd/es/tooltip';
 
 interface StorageBrowserTableProps {
   className?: string;
-  dataSource: StorageBrowserTableData[];
+  dataSource?: StorageBrowserTableData[];
   onFilepathChange: (path: string) => void;
   onPageNumberChange: (pageNumber: number) => void;
   onPageSizeChange: (pageSize: number) => void;
   onSortByColumnChange: (sortByColumn: string) => void;
   onSortOrderChange: (sortOrder: SortOrder) => void;
   pageSize: number;
-  pageStats: PageStats;
+  pageStats?: PageStats;
   sortByColumn: string;
   sortOrder: SortOrder;
   rowClassName?: string;
@@ -90,10 +90,10 @@ const StorageBrowserTable: React.FC<StorageBrowserTableProps> = ({
     }
   };
 
-  const getColumns = file => {
-    const columns: ColumnProps<unknown>[] = [];
+  const getColumns = (file: StorageBrowserTableData) => {
+    const columns: ColumnProps<StorageBrowserTableData>[] = [];
     for (const [key] of Object.entries(file)) {
-      const column: ColumnProps<unknown> = {
+      const column: ColumnProps<StorageBrowserTableData> = {
         dataIndex: key,
         title: (
           <div
@@ -117,7 +117,7 @@ const StorageBrowserTable: React.FC<StorageBrowserTableProps> = ({
       if (key === 'name') {
         column.width = '45%';
         //TODO: Apply tooltip only for truncated values
-        column.render = (_, record: any) => (
+        column.render = (_, record: StorageBrowserTableData) => (
           <Tooltip title={record.name}>
             <span className="hue-storage-browser__table-cell-icon">
               {record.type === 'dir' ? <FolderIcon /> : <FileOutlined />}
@@ -133,9 +133,9 @@ const StorageBrowserTable: React.FC<StorageBrowserTableProps> = ({
     return columns.filter(col => col.dataIndex !== 'type' && col.dataIndex !== 'path');
   };
 
-  const onRowClicked = record => {
+  const onRowClicked = (record: StorageBrowserTableData) => {
     return {
-      onClick: e => {
+      onClick: () => {
         if (record.type === 'dir') {
           onFilepathChange(record.path);
         }
@@ -145,12 +145,12 @@ const StorageBrowserTable: React.FC<StorageBrowserTableProps> = ({
   };
 
   //pagination related functions handled by parent
-  const onPreviousPageButtonClicked = previousPageNumber => {
+  const onPreviousPageButtonClicked = (previousPageNumber: number) => {
     //If previous page does not exists api returns 0
     onPageNumberChange(previousPageNumber === 0 ? 1 : previousPageNumber);
   };
 
-  const onNextPageButtonClicked = (nextPageNumber, numPages) => {
+  const onNextPageButtonClicked = (nextPageNumber: number, numPages: number) => {
     //If next page does not exists api returns 0
     onPageNumberChange(nextPageNumber === 0 ? numPages : nextPageNumber);
   };
@@ -178,7 +178,7 @@ const StorageBrowserTable: React.FC<StorageBrowserTableProps> = ({
     };
   }, []);
 
-  if (dataSource) {
+  if (dataSource && pageStats) {
     return (
       <>
         <Table
@@ -203,6 +203,8 @@ const StorageBrowserTable: React.FC<StorageBrowserTableProps> = ({
         />
       </>
     );
+  } else {
+    return <div />;
   }
 };
 
