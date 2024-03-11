@@ -89,4 +89,22 @@ describe('AlertComponent', () => {
     expect(alertsAfterClosing[0]).toHaveTextContent('Error 1');
     expect(alertsAfterClosing[1]).toHaveTextContent('Error 3');
   });
+
+  test('info alerts should close automatically after 3 seconds', async () => {
+    jest.useFakeTimers();
+    render(<AlertComponent />);
+    expect(screen.queryAllByRole('alert')).toHaveLength(0);
+    act(() => huePubSub.publish('hue.global.info', { message: 'info' }));
+    expect(screen.queryAllByRole('alert')).toHaveLength(1);
+
+    //It should still be open after 2 seconds
+    jest.advanceTimersByTime(2000);
+    expect(screen.queryAllByRole('alert')).toHaveLength(1);
+
+    //After 3.1 seconds, it should really be closed
+    jest.advanceTimersByTime(1000);
+    expect(screen.queryAllByRole('alert')).toHaveLength(0);
+
+    jest.useRealTimers();
+  });
 });
