@@ -343,22 +343,6 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps): JSX.Element => {
     resetAll();
   };
 
-  const handleCancel = () => {
-    setExplanation('');
-    setSummary('');
-    setSuggestionExplanation('');
-    setShowSuggestedSqlModal(false);
-
-    if (
-      (actionMode === AiActionModes.OPTIMIZE,
-      actionMode === AiActionModes.FIX,
-      actionMode === AiActionModes.EXPLAIN)
-    ) {
-      setActionMode(undefined);
-    }
-    setGuardrailAlert(undefined);
-  };
-
   const resetAll = () => {
     setActionMode(undefined);
     setShowSuggestedSqlModal(false);
@@ -529,7 +513,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps): JSX.Element => {
         <AiPreviewModal
           actionMode={actionMode}
           open
-          onCancel={handleCancel}
+          onCancel={resetAll}
           onInsert={sql => handleInsert(sql, explanation)}
           primaryButtonLabel={explanation ? 'Insert as comment' : 'Insert'}
           suggestion={suggestion}
