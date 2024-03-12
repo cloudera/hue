@@ -114,6 +114,7 @@ function AssistToolbar({
 
   return (
     <Toolbar
+      testId="hue-ai-assist-toolbar"
       className="hue-ai-assist-toolbar"
       content={() => (
         <>
