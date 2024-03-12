@@ -16,7 +16,7 @@
   limitations under the License.
 */
 
-import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import classNames from 'classnames';
 import { EnterOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
@@ -147,7 +147,7 @@ function AiAssistToolbarInput({
   onInputChanged: (value: string) => void;
   onAnimationEnded: () => void;
   value: string;
-}) {
+}): JSX.Element {
   const autoShow = getFromLocalStorage(AUTO_SHOW_STORAGE_KEY, true);
   const [dirty, setDirty] = useState<boolean>(false);
   const [touched, setTouched] = useState<boolean>(false);
@@ -249,6 +249,8 @@ function AiAssistToolbarInput({
     focusInput();
   };
 
+  const executeLabel = 'Press enter or click here to execute';
+
   return (
     <li
       onAnimationEnd={() => {
@@ -315,7 +317,8 @@ function AiAssistToolbarInput({
               className={'hue-toolbar-button'}
               onClick={handleSubmit}
               type="link"
-              title="Press enter or click here to execute"
+              title={executeLabel}
+              aria-label={executeLabel}
             >
               <EnterOutlined className="hue-ai-assist-toolbar-input__enter-icon" />
             </Button>
