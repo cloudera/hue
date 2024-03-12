@@ -65,16 +65,6 @@ const ESCAPE_KEY = 'Escape';
 const DOWN_KEY = 'ArrowDown';
 const UP_KEY = 'ArrowUp';
 
-const insertBetween = (highlighted: HighlightableTextItem) => {
-  return (result: HighlightableTextItem[], value: HighlightableTextItem, index, array) => {
-    if (index < array.length - 1) {
-      return result.concat([value, { ...highlighted, key: `${highlighted.key}${index}` }]);
-    } else {
-      return result.concat(value);
-    }
-  };
-};
-
 const AiAssistToolbarHistory = forwardRef(
   (
     {
@@ -94,7 +84,7 @@ const AiAssistToolbarHistory = forwardRef(
 
     useEffect(() => {
       function handleClickOutside(event: MouseEvent) {
-        const refElement: HTMLElement = (ref as any)?.current;
+        const refElement: HTMLElement | null = (ref as React.RefObject<HTMLElement>)?.current;
         if (show && refElement && !refElement.contains(event.target as Node)) {
           onHide();
         }
@@ -106,25 +96,17 @@ const AiAssistToolbarHistory = forwardRef(
     }, [ref, onHide]);
 
     const lowerCaseSearchValue = searchValue.toLowerCase();
-    const lowerCaseItems = useMemo(
-      () =>
-        items.map(item => ({
-          ...item,
-          value: item.value.toLowerCase(),
-          length: item.value.length
-        })),
-      [items]
-    );
 
-    const filteredItems: Array<HistoryItem> = lowerCaseItems.filter(item => {
-      return !lowerCaseSearchValue || item.value.includes(lowerCaseSearchValue);
+    const filteredItems: Array<HistoryItem> = items.filter(item => {
+      const itemValueLowerCase = item.value.toLowerCase();
+      return !lowerCaseSearchValue || itemValueLowerCase.includes(lowerCaseSearchValue);
     });
 
     const itemRefs = useMemo(
       () =>
         Array(filteredItems.length)
           .fill(0)
-          .map(i => React.createRef<HTMLElement>()),
+          .map(() => React.createRef<HTMLElement>()),
       [filteredItems]
     );
 
@@ -132,21 +114,20 @@ const AiAssistToolbarHistory = forwardRef(
       let highlightableText = [{ val: item.value, key: item.value }];
       const shouldHighlightText = lowerCaseSearchValue !== '';
       if (shouldHighlightText) {
-        const highlighted: HighlightableTextItem = {
-          val: lowerCaseSearchValue,
-          highlight: true,
-          key: lowerCaseSearchValue
-        };
+        const textChunks = item.value.split(new RegExp(`(${lowerCaseSearchValue})`, 'i'));
 
-        highlightableText = item.value
-          .split(lowerCaseSearchValue)
-          .map((val, index) => ({ val, key: `${val}${index}` } as HighlightableTextItem))
-          .reduce(insertBetween(highlighted), [] as HighlightableTextItem[]);
+        highlightableText = textChunks.map((part, index) => ({
+          val: part,
+          highlight: part.toLowerCase() === lowerCaseSearchValue,
+          key: `${part}${index}`
+        }));
       }
+
       return {
-        ...item,
-        length: item.value.length,
+        date: item.date,
         highligtableValue: highlightableText,
+        value: item.value,
+        length: item.value.length,
         active: index === activeItemIndex
       };
     });
