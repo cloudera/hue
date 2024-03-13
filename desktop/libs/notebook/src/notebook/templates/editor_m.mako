@@ -173,6 +173,7 @@ ${ commonheader_m(editor_type, editor_type, user, request, "68px") | n,unicode }
   ace.config.set("basePath", "${ static('desktop/js/ace') }");
 
   var VIEW_MODEL_OPTIONS = $.extend(${ options_json | n,unicode }, {
+    editorId: ${ editor_id or 'null' },
     user: '${ user.username }',
     userId: ${ user.id },
     assistAvailable: true,
@@ -306,7 +307,7 @@ ${ commonheader_m(editor_type, editor_type, user, request, "68px") | n,unicode }
       }
     }
 
-    viewModel = new window.NotebookViewModel(${ editor_id or 'null' }, ${ notebooks_json | n,unicode }, VIEW_MODEL_OPTIONS);
+    viewModel = new window.NotebookViewModel(VIEW_MODEL_OPTIONS);
     ko.applyBindings(viewModel);
     viewModel.init();
   });

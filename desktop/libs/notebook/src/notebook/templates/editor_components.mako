@@ -2261,10 +2261,6 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 
   window.EDITOR_ENABLE_QUERY_SCHEDULING = '${ ENABLE_QUERY_SCHEDULING.get() }' === 'True';
 
-  window.EDITOR_ID = ${ editor_id or 'null' };
-
-  window.NOTEBOOKS_JSON = ${ notebooks_json | n,unicode };
-
   window.SQL_ANALYZER_AUTO_UPLOAD_QUERIES = '${ OPTIMIZER.AUTO_UPLOAD_QUERIES.get() }' === 'True';
 
   window.SQL_ANALYZER_AUTO_UPLOAD_DDL = '${ OPTIMIZER.AUTO_UPLOAD_DDL.get() }' === 'True';
