@@ -2054,7 +2054,7 @@ else:
                 
           var interval = setInterval(function() {
             $.get('/desktop/api2/check_upload_status/' + task_id, function(data) {
-              if (data.isFinalized || data.isFailure) {
+              if (data.isFinalized || data.isFailure || is_revoked) {
                 clearInterval(interval);
                 completedUploads++; // Increment the count of completed uploads
 

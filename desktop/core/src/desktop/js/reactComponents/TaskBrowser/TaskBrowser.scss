@@ -1,12 +1,5 @@
 @import '@cloudera/cuix-core/variables.scss';
 
-// .tableStyle {
-//   width: 100%;
-//   border-collapse: collapse;
-//   border: 1px solid #ddd;
-//   font-family: Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
-// }
-
 .tableStyle {
   background-color: rgb(255, 255, 255);
   border: 1px solid #ddd;
@@ -49,28 +42,6 @@
   font-size: 13px;
 
 }
-
-// .tdStyle {
-//   background-color: rgb(255, 255, 255);
-//   border-bottom-color: rgb(58, 135, 14);
-//   border-collapse: collapse;
-//   border-left-color: rgb(58, 135, 14);
-//   border-left-style: solid;
-//   border-left-width: 4px;
-//   border-right-color: rgb(58, 135, 14);
-//   border-top-color: rgb(58, 135, 14);
-//   color: rgb(66, 66, 66);
-//   cursor: pointer;
-//   display: table-row;
-//   font-family: Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
-//   font-size: 14px;
-//   height: 32px;
-//   line-height: 20px;
-//   text-indent: 0px;
-//   text-size-adjust: 100%;
-//   vertical-align: middle;
-//   visibility: visible;
-// }
 
 .popupStyle {
   position: fixed; // Fixed position to cover the whole screen
@@ -318,40 +289,38 @@
 
 /* Specific status styles for checkbox border and checkmark color */
 .checkboxCompleted + .custom-checkbox {
-  border-color: #3a870e; /* Green for success */
+  border-color: #3a870e;
 }
 
 .checkboxRunning + .custom-checkbox {
-  border-color: #ffa319; /* Orange for running */
+  border-color: #ffa319;
 }
 
 .checkboxFailed + .custom-checkbox {
-  border-color: #d9150c; /* Red for failed */
+  border-color: #d9150c;
 }
 
-/* Checkmark styles */
 .checkboxCompleted:checked + .custom-checkbox:before,
 .checkboxRunning:checked + .custom-checkbox:before,
 .checkboxFailed:checked + .custom-checkbox:before {
-  content: '\2713'; /* Unicode checkmark */
+  content: '\2713';
   position: absolute;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  color: white; /* White checkmark */
+  color: white;
 }
 
-/* You can add specific colors for the checkmark for each status if needed */
 .checkboxCompleted:checked + .custom-checkbox:before {
-  color: #3a870e; /* Adjust if you want a different checkmark color for success */
+  color: #3a870e;
 }
 
 .checkboxRunning:checked + .custom-checkbox:before {
-  color: #ffa319; /* Adjust if you want a different checkmark color for running */
+  color: #ffa319;
 }
 
 .checkboxFailed:checked + .custom-checkbox:before {
-  color: #d9150c; /* Adjust if you want a different checkmark color for failed */
+  color: #d9150c;
 }
 
 .row-success {
@@ -428,6 +397,19 @@ table.datatables {
 
   &:hover {
     background-color: #0056b3;
+  }
+}
+
+.kill-task-button {
+  padding-right: 15px;
+  background-color: #dc3545;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #c82333;
   }
 }
 
