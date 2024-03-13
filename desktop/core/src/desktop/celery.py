@@ -37,9 +37,26 @@ class MyCelery(Celery):
             module = module[:-6]
         return super().gen_task_name(name, module)
 
+    # Method to configure the beat_schedule
+    def setup_beat_schedule(self):
+        from django.utils import timezone
+        now = timezone.now()
+
+        self.conf.beat_schedule = {
+            'check_disk_usage_and_clean_task': {
+                'task': 'filebrowser.check_disk_usage_and_clean_task',
+                'schedule': 1000.0,  # Run every 100 seconds
+                'args': (),
+                'kwargs': {'cleanup_threshold': 90},  # Provide task arguments if needed
+            },
+        }
+
 app = MyCelery('desktop', backend=CELERY_RESULT_BACKEND, broker=CELERY_BROKER_URL)
 app.conf.broker_transport_options = {'visibility_timeout': 3600}  # 1 hour.
 app.conf.result_key_prefix = 'desktop_'
+
+# Call the setup_beat_schedule method
+app.setup_beat_schedule()
 
 # Using a string here means the worker doesn't have to serialize
 # the configuration object to child processes.
@@ -51,12 +68,6 @@ app.conf.timezone = TIME_ZONE
 # Load task modules from all registered Django app configs.
 app.autodiscover_tasks()
 
-# Configure Celery to use threads for concurrency
-app.conf.update(
-    task_concurrency=4,  # Use 4 threads for concurrency
-    worker_prefetch_multiplier=1,  # Prefetch one task at a time
-    worker_heartbeat=120
-)
 
 @app.task(bind=True)
 def debug_task(self):
