@@ -163,7 +163,7 @@ const TEMPLATE = `
             </li>
           </ul>
       </span>
-      <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('${ REFRESH_DOC_ASSIST_EVENT }'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${I18n(
+      <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('${ REFRESH_DOC_ASSIST_EVENT }'); }"><i class="pointer fa fa-refresh" data-testid = "table-refresh-button" data-bind="css: { 'fa-spin blue' : loading }" title="${I18n(
         'Manual refresh'
       )}"></i></a>
     </div>
@@ -189,7 +189,7 @@ const TEMPLATE = `
   <div class="assist-flex-search">
     <div class="assist-filter">
       <form autocomplete="off">
-        <input class="clearable" type="text" ${ window.PREVENT_AUTOFILL_INPUT_ATTRS } placeholder="${I18n(
+        <input class="clearable" data-testid = "filter-database-search-input-textbox" type="text" ${ window.PREVENT_AUTOFILL_INPUT_ATTRS } placeholder="${I18n(
           'Filter...'
         )}" data-bind="clearable: filter, value: filter, valueUpdate: 'afterkeydown'"/>
       </form>

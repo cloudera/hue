@@ -240,14 +240,14 @@ else:
     <!-- ko template: { ifnot: editorMode() || isPresentationMode(), name: 'notebook-actions' }--><!-- /ko -->
 
     <!-- ko ifnot: isPresentationMode() -->
-    <div class="dropdown pull-right margin-left-10">
+    <div class="dropdown pull-right margin-left-10" data-testid = "data-toggle-dropdown-button">
       <a class="btn" data-toggle="dropdown" href="javascript: void(0)">
         <i class="fa fa-fw fa-ellipsis-v"></i>
       </a>
       <ul class="dropdown-menu pull-right">
         <li>
         <!-- ko if: editorMode -->
-          <a href="javascript:void(0)" data-bind="click: function() { hueUtils.removeURLParameter('editor'); newNotebook($root.editorType(), null, selectedNotebook() ? $root.selectedNotebook().snippets()[0].currentQueryTab() : null); }, attr: { 'title': '${ _('New ') }' +  editorTypeTitle() + '${ _(' Query') }' }">
+          <a href="javascript:void(0)" data-testid = "new-query-notebook-button" data-bind="click: function() { hueUtils.removeURLParameter('editor'); newNotebook($root.editorType(), null, selectedNotebook() ? $root.selectedNotebook().snippets()[0].currentQueryTab() : null); }, attr: { 'title': '${ _('New ') }' +  editorTypeTitle() + '${ _(' Query') }' }">
             <i class="fa fa-fw fa-file-o"></i> ${ _('New') }
           </a>
         <!-- /ko -->
@@ -600,9 +600,9 @@ else:
     <div data-bind="delayedOverflow: 'slow', css: resultsKlass" style="margin-top: 5px; position: relative;">
       <ul class="nav nav-tabs nav-tabs-editor">
         <li data-bind="click: function(){ currentQueryTab('queryHistory'); }, css: {'active': currentQueryTab() == 'queryHistory'}, onClickOutside: function () { if ($parent.historyFilterVisible() && $parent.historyFilter() === '') { $parent.historyFilterVisible(false) } }">
-          <a class="inactive-action" style="display:inline-block" href="#queryHistory" data-toggle="tab">${_('Query History')}</a>
+          <a class="inactive-action" data-testid = "query-history-tab" style="display:inline-block" href="#queryHistory" data-toggle="tab">${_('Query History')}</a>
           <div style="margin-left: -15px;" class="inline-block inactive-action pointer visible-on-hover" title="${_('Search the query history')}" data-bind="click: function(data, e){ $parent.historyFilterVisible(!$parent.historyFilterVisible()); if ($parent.historyFilterVisible()) { window.setTimeout(function(){ $(e.target).parent().siblings('input').focus(); }, 0); } else { $parent.historyFilter('') }}"><i class="snippet-icon fa fa-search"></i></div>
-          <input class="input-small inline-tab-filter" type="text" data-bind="visible: $parent.historyFilterVisible, clearable: $parent.historyFilter, valueUpdate:'afterkeydown'" placeholder="${ _('Search...') }">
+          <input class="input-small inline-tab-filter" data-testid = "query-history-search-input-textbox" type="text" data-bind="visible: $parent.historyFilterVisible, clearable: $parent.historyFilter, valueUpdate:'afterkeydown'" placeholder="${ _('Search...') }">
           <div class="dropdown inline-block inactive-action pointer visible-on-hover">
             <a class="" data-toggle="dropdown" href="javascript: void(0)">
               <i class="fa fa-fw fa-ellipsis-v"></i>
@@ -622,7 +622,7 @@ else:
           </div>
         </li>
         <li class="margin-right-20" data-bind="click: function(){ currentQueryTab('savedQueries'); }, css: {'active': currentQueryTab() == 'savedQueries'}, onClickOutside: function () { if (queriesFilterVisible() && queriesFilter() === '') { queriesFilterVisible(false) } }">
-          <a class="inactive-action" style="display:inline-block" href="#savedQueries" data-toggle="tab">${_('Saved Queries')}</a>
+          <a class="inactive-action" data-testid = "saved-queries-tab" style="display:inline-block" href="#savedQueries" data-toggle="tab">${_('Saved Queries')}</a>
           <div style="margin-left: -15px;" class="inline-block inactive-action pointer visible-on-hover" title="${_('Search the saved queries')}" data-bind="visible: !queriesHasErrors(), click: function(data, e){ queriesFilterVisible(!queriesFilterVisible()); if (queriesFilterVisible()) { window.setTimeout(function(){ $(e.target).parent().siblings('input').focus(); }, 0); } else { queriesFilter('') }}"><i class="snippet-icon fa fa-search"></i></div>
           <input class="input-small inline-tab-filter" type="text" data-bind="visible: queriesFilterVisible, clearable: queriesFilter, valueUpdate:'afterkeydown'" placeholder="${ _('Search...') }">
         </li>
@@ -1715,7 +1715,7 @@ else:
 <script type ="text/html" id="snippet-execution-controls${ suffix }">
   <div class="snippet-actions" style="position: absolute; bottom: 0">
     <!-- ko if: status() == 'loading' -->
-    <a class="snippet-side-btn blue" style="cursor: default;" title="${ _('Creating session') }">
+    <a class="snippet-side-btn blue" data-testid = "query-run-button" style="cursor: default;" title="${ _('Creating session') }">
       <i class="fa fa-fw fa-spinner fa-spin"></i>
     </a>
     <!-- /ko -->
