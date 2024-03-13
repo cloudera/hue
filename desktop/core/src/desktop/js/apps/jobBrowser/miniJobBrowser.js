@@ -39,31 +39,9 @@ export const initializeMiniJobBrowser = () => {
 
   ko.applyBindings(jobBrowserViewModel, $('#jobbrowserMiniComponents')[0]);
 
-  huePubSub.subscribe(
-    'app.gained.focus',
-    app => {
-      if (app === 'jobbrowser') {
-        huePubSub.publish('graph.draw.arrows');
-        loadHash();
-      }
-    },
-    'jobbrowser'
-  );
-
-  const loadHash = () => {
-    if (window.location.pathname.indexOf('jobbrowser') > -1) {
-      jobBrowserViewModel.load();
-    }
-  };
-
-  window.onhashchange = () => {
-    loadHash();
-  };
-
   const configUpdated = clusterConfig => {
     jobBrowserViewModel.appConfig(clusterConfig && clusterConfig['app_config']);
     jobBrowserViewModel.clusterType(clusterConfig && clusterConfig['cluster_type']);
-    loadHash();
   };
 
   huePubSub.subscribe('cluster.config.set.config', configUpdated);
