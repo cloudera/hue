@@ -154,7 +154,45 @@ class TestApi(object):
 
     # Test that saving a notebook will save the search field to the first statement text
     assert_equal(doc.search, "select * from default.web_logs where app = 'metastore';")
+    assert_equal(doc.type, "query-hive")
 
+  def test_type_when_saving_an_actual_notebook(self):
+      notebook_json = """
+      {
+        "selectedSnippet": "hive",
+        "showHistory": false,
+        "description": "Test Notebook",
+        "name": "Test Notebook",
+        "sessions": [
+            {
+                "type": "hive",
+                "properties": [],
+                "id": null
+            }
+        ],
+        "type": "notebook",
+        "id": null,
+        "snippets": [{"id":"2b7d1f46-17a0-30af-efeb-33d4c29b1055","type":"hive","status":"running","statement_raw":""" \
+                      """"select * from default.web_logs where app = '${app_name}';","variables":""" \
+                      """[{"name":"app_name","value":"metastore"}],"statement":""" \
+                      """"select * from default.web_logs where app = 'metastore';","properties":{"settings":[],"files":[],"functions":[]},""" \
+                      """"result":{"id":"b424befa-f4f5-8799-a0b4-79753f2552b1","type":"table","handle":{"log_context":null,""" \
+                      """"statements_count":1,"end":{"column":21,"row":0},"statement_id":0,"has_more_statements":false,""" \
+                      """"start":{"column":0,"row":0},"secret":"rVRWw7YPRGqPT7LZ/TeFaA==an","has_result_set":true,""" \
+                      """"statement":"select * from default.web_logs where app = 'metastore';","operation_type":0,""" \
+                      """"modified_row_count":null,"guid":"7xm6+epkRx6dyvYvGNYePA==an"}},"lastExecuted": 1462554843817,"database":"default"}],
+                      "uuid": "d9efdee1-ef25-4d43-b8f9-1a170f69a05a"
+                  }
+                  """
+
+      response = self.client.post(reverse('notebook:save_notebook'), {'notebook': notebook_json})
+      data = json.loads(response.content)
+
+      assert_equal(0, data['status'], data)
+      assert_equal('notebook', data['type'], data)
+      doc = Document2.objects.get(pk=data['id'])
+
+      assert_equal(doc.type, "notebook")
 
   def test_save_notebook_with_connector_off(self):
     reset = ENABLE_CONNECTORS.set_for_testing(False)
