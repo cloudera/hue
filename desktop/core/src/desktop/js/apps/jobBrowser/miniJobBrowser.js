@@ -27,7 +27,7 @@ import './eventListeners';
 import JobBrowserViewModel from './knockout/JobBrowserViewModel';
 import Job from './knockout/Job';
 
-$(document).ready(() => {
+export const initializeMiniJobBrowser = () => {
   const jobBrowserViewModel = new JobBrowserViewModel(true);
   const openJob = id => {
     if (jobBrowserViewModel.job() == null) {
@@ -96,4 +96,4 @@ $(document).ready(() => {
       huePubSub.publish('open.link', '/jobbrowser/#!' + jobBrowserViewModel.interface());
     }
   });
-});
+};
