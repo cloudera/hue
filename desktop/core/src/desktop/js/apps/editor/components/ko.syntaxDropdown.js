@@ -92,7 +92,6 @@ class SqlSyntaxDropdownViewModel extends DisposableComponent {
     }
     this.expected = ko.observableArray(expected);
 
-
     const selectedSub = this.selected.subscribe(newValue => {
       if (typeof newValue.suppressRule !== 'undefined') {
         const suppressedRules = hueLocalStorage('hue.syntax.checker.suppressedRules') || {};
