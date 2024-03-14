@@ -113,7 +113,12 @@ function set_samlcert() {
 
 function start_celery() {
   echo "Starting Celery worker..."
-  $HUE_BIN/hue runcelery worker --app desktop.celery --concurrency=5 --loglevel=DEBUG
+  # The schedule of periodic tasks performed by celery-beat is stored in the celerybeat-schedule file.
+  touch $HUE_HOME/celerybeat-schedule
+  chmod 644 $HUE_HOME/celerybeat-schedule
+  $HUE_BIN/hue runcelery worker --app desktop.celery --concurrency=5 --loglevel=DEBUG --beat -s $HUE_HOME/celerybeat-schedule
+  # Start Redis server
+  redis-server --port 6379
 }
 
 
@@ -143,8 +148,5 @@ elif [[ $1 == rungunicornserver ]]; then
 elif [[ $1 == start_celery ]]; then
   start_celery
 fi
-
-# Start Redis server
-redis-server --port 6379
 
 exit 0

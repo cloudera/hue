@@ -55,7 +55,6 @@ RUN set -eux; \
     make install && \
     cd .. && \
     rm -rf redis-stable redis-stable.tar.gz && \
-    dnf remove -y gcc make && \
     dnf clean all && \
     rm -rf /var/cache/yum
 
