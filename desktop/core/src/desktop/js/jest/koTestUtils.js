@@ -56,10 +56,6 @@ export const koSetup = () => {
               const origSetTimeout = window.setTimeout;
               if (instantTimeout) {
                 window.setTimeout = cb => cb();
-                comp.createViewModel(data, { element: element });
-                window.setTimeout = origSetTimeout;
-              } else {
-                comp.createViewModel(data, { element: element });
               }
 
               ko.applyBindings(
@@ -69,6 +65,10 @@ export const koSetup = () => {
                 },
                 wrapper
               );
+
+              if (instantTimeout) {
+                window.setTimeout = origSetTimeout;
+              }
             } else {
               reject('no createViewModel function found on component ' + name);
             }
