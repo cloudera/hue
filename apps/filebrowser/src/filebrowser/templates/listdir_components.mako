@@ -22,7 +22,7 @@ from django.template.defaultfilters import urlencode, stringformat, filesizeform
 from desktop.lib.django_util import reverse_with_get, extract_field_data
 from django.utils.encoding import smart_str
 
-from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE, FILE_UPLOAD_CHUNK_SIZE, CONCURRENT_MAX_CONNECTIONS
+from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE, FILE_UPLOAD_CHUNK_SIZE, CONCURRENT_MAX_CONNECTIONS, MAX_FILE_SIZE_UPLOAD_LIMIT
 
 if sys.version_info[0] > 2:
   from django.utils.translation import gettext as _
@@ -2054,7 +2054,7 @@ else:
                 
           var interval = setInterval(function() {
             $.get('/desktop/api2/check_upload_status/' + task_id, function(data) {
-              if (data.isFinalized || data.isFailure || is_revoked) {
+              if (data.isFinalized || data.isFailure || data.is_revoked) {
                 clearInterval(interval);
                 completedUploads++; // Increment the count of completed uploads
 
@@ -2071,7 +2071,6 @@ else:
                   self.retrieveData(true);
                 }
               } else if (data.isRunning) {
-                console.log("running");
                 var progressPercentage = 90; // Adjust based on data.progress if available
                 listItem.find('.progress-row-bar').css('width', progressPercentage + '%');
               }
@@ -2091,10 +2090,11 @@ else:
           var scheduleUpload = false;
           
           if ((window.getLastKnownConfig().hue_config.enable_chunked_file_uploader) && (window.getLastKnownConfig().hue_config.enable_task_server))  {
+            
             self.pendingUploads(0);
             var action = "/filebrowser/upload/chunks/";
             self.taskIds = [];
-            self.listItems = [];          
+            self.listItems = [];         
           
             uploader = new qq.FileUploader({
               element: document.getElementById("fileUploader"),
@@ -2153,9 +2153,7 @@ else:
                         return $(this).find('.qq-upload-file-selector').text() === fileName;
                       });
                       self.listItems.push(listItem);
-                      console.log("schedule upload flag:", scheduleUpload);
                       if (scheduleUpload && self.pendingUploads() === 0) {
-                        console.log("before closing");
                         $('#uploadFileModal').modal('hide');
                         $(document).trigger('info', "File upload scheduled. Please check the task server page for progress.")
                       }
@@ -2173,10 +2171,33 @@ else:
                     ##$('#uploadFileModal').modal('hide');
                   },
                   onSubmit: function (id, fileName, responseJSON) {
-                    var newPath = "/filebrowser/upload/chunks/file?dest=" + encodeURIComponent(self.currentPath().normalize('NFC'));
-                    this.setEndpoint(newPath);
-                    ## currentUploadingTaskId = response.task_id;
-                    self.pendingUploads(self.pendingUploads() + 1);
+                      var deferred = new qq.Promise(); // Create a promise to defer the upload
+                      var uploader = this;
+                      
+                      // Make an AJAX request to check available disk space
+                      $.ajax({
+                        url: '/desktop/api2/get_available_space/',
+                        success: function(response) {
+                          var freeSpace = response.free_space;
+                          var file = uploader.getFile(id); // Use the stored reference
+                          
+                          if ((file.size > freeSpace) && (file.size > window.MAX_FILE_SIZE_UPLOAD_LIMIT*1024*1024)) {
+                            $(document).trigger('info', "Not enough space available to upload this file.")
+                            deferred.failure(); // Reject the promise to cancel the upload
+                          } else {
+                            var newPath = "/filebrowser/upload/chunks/file?dest=" + encodeURIComponent(self.currentPath().normalize('NFC'));
+                            uploader.setEndpoint(newPath);
+                            self.pendingUploads(self.pendingUploads() + 1);
+                            deferred.success(); // Resolve the promise to allow the upload
+                          }
+                        },
+                        error: function(xhr, status, error) {
+                          alert('Error checking available space: ' + error);
+                          deferred.failure(); // Reject the promise to cancel the upload
+                        }
+                      });
+
+                      return deferred; // Return the promise to Fine Uploader
                   },
                   onCancel: function (id, fileName) {
                     self.pendingUploads(self.pendingUploads() - 1);
@@ -2187,7 +2208,6 @@ else:
           }
           // Chunked Fileuploader without Taskserver
           else if ((window.getLastKnownConfig().hue_config.enable_chunked_file_uploader) && !(window.getLastKnownConfig().hue_config.enable_task_server)) {
-            console.log("entering scheduled upload - ", scheduleUpload);
             self.pendingUploads(0);
             var action = "/filebrowser/upload/chunks/";
             uploader = new qq.FileUploader({
@@ -2337,7 +2357,6 @@ else:
 
         return function (isScheduled) {
           scheduleUpload = isScheduled;
-          console.log("in closure", scheduleUpload)
           $("#uploadFileModal").modal({
             show: true
           });

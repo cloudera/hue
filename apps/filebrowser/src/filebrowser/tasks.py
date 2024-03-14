@@ -180,3 +180,7 @@ def check_disk_usage_and_clean_task(**kwargs):
         check_disk_usage_and_clean_task.update_state(task_id=task_id, state='SUCCESS', meta=kwargs)
         LOG.info(f"Disk usage is {disk_usage.percent}%, no need to clean up.")
 
+    # Get available disk space after cleanup
+    free_space = psutil.disk_usage('/tmp').free
+    return {'free_space': free_space}
+
