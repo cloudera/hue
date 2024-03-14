@@ -482,6 +482,7 @@ def _save_notebook(notebook, user):
   else:
     notebook_type = notebook.get('type', 'notebook')
 
+  save_as = False
 
   if notebook.get('parentSavedQueryUuid'):  # We save into the original saved query, not into the query history
     notebook_doc = Document2.objects.get_by_uuid(user=user, uuid=notebook['parentSavedQueryUuid'])
