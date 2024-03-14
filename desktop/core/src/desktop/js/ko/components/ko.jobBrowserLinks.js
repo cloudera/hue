@@ -20,6 +20,8 @@ import * as ko from 'knockout';
 import componentUtils from './componentUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
+import { initializeMiniJobBrowser } from '../../apps/jobBrowser/miniJobBrowser';
+import DisposableComponent from './DisposableComponent';
 
 export const NAME = 'hue-job-browser-links';
 
@@ -52,25 +54,30 @@ const TEMPLATE = `
 
 const JB_CHECK_INTERVAL_IN_MILLIS = 30000;
 
-class JobBrowserPanel {
+class JobBrowserPanel extends DisposableComponent {
   constructor(params) {
-    const self = this;
-
+    super();
     const $container = $('body');
-    const $jobsPanel = $('#jobsPanel');
-    const $toggle = $('.btn-toggle-jobs-panel');
+
+    this.initialized = false;
 
     const reposition = function () {
+      const $jobsPanel = $('#jobsPanel');
+      const $toggle = $('.btn-toggle-jobs-panel');
       $jobsPanel.css('top', $toggle.offset().top + $toggle.height() + 15 + 'px');
       $jobsPanel.css('left', $container.offset().left + $container.width() - 630 + 'px');
     };
 
-    huePubSub.subscribe('hide.jobs.panel', () => {
+    super.subscribe('hide.jobs.panel', () => {
       $(window).off('resize', reposition);
-      $jobsPanel.hide();
+      $('#jobsPanel').hide();
     });
 
-    huePubSub.subscribe('show.jobs.panel', options => {
+    super.subscribe('show.jobs.panel', options => {
+      if (!this.initialized) {
+        this.initialized = true;
+        initializeMiniJobBrowser();
+      }
       if (window.IS_K8S_ONLY) {
         huePubSub.publish('context.selector.set.cluster', 'impala');
       }
@@ -78,7 +85,7 @@ class JobBrowserPanel {
       huePubSub.publish('hide.history.panel');
       $(window).on('resize', reposition);
       reposition();
-      $jobsPanel.show();
+      $('#jobsPanel').show();
       huePubSub.publish('mini.jb.navigate', {
         section: options && options.interface ? options.interface : 'jobs',
         compute: options && options.compute
@@ -88,26 +95,26 @@ class JobBrowserPanel {
       }
     });
 
-    huePubSub.subscribe('toggle.jobs.panel', () => {
-      if ($jobsPanel.is(':visible')) {
+    super.subscribe('toggle.jobs.panel', () => {
+      if ($('#jobsPanel').is(':visible')) {
         huePubSub.publish('hide.jobs.panel');
       } else {
         huePubSub.publish('show.jobs.panel');
       }
     });
 
-    self.jobCounts = ko.observable({ yarn: 0, schedules: 0, history: 0 });
-    self.jobCount = ko.pureComputed(() => {
+    this.jobCounts = ko.observable({ yarn: 0, schedules: 0, history: 0 });
+    this.jobCount = ko.pureComputed(() => {
       let total = 0;
-      Object.keys(self.jobCounts()).forEach(value => {
-        total += self.jobCounts()[value];
+      Object.keys(this.jobCounts()).forEach(value => {
+        total += this.jobCounts()[value];
       });
       return total;
     });
-    self.onePageViewModel = params.onePageViewModel;
+    this.onePageViewModel = params.onePageViewModel;
 
     let lastYarnBrowserRequest = null;
-    const checkYarnBrowserStatus = function () {
+    const checkYarnBrowserStatus = () => {
       return $.post('/jobbrowser/jobs/', {
         format: 'json',
         state: 'running',
@@ -116,8 +123,8 @@ class JobBrowserPanel {
         .done(data => {
           if (data != null && data.jobs != null) {
             huePubSub.publish('jobbrowser.data', data.jobs);
-            self.jobCounts()['yarn'] = data.jobs.length;
-            self.jobCounts.valueHasMutated();
+            this.jobCounts()['yarn'] = data.jobs.length;
+            this.jobCounts.valueHasMutated();
           }
         })
         .fail(response => {
@@ -125,7 +132,7 @@ class JobBrowserPanel {
         });
     };
     let lastScheduleBrowserRequest = undefined;
-    const checkScheduleBrowserStatus = function () {
+    const checkScheduleBrowserStatus = () => {
       return $.post(
         '/scheduler/api/schedule/list',
         {
@@ -140,14 +147,14 @@ class JobBrowserPanel {
         data => {
           if (data != null && data.total != null) {
             huePubSub.publish('jobbrowser.schedule.data', data.apps);
-            self.jobCounts()['schedules'] = data.total;
-            self.jobCounts.valueHasMutated();
+            this.jobCounts()['schedules'] = data.total;
+            this.jobCounts.valueHasMutated();
           }
         }
       );
     };
     let lastHistoryBrowserRequest = null;
-    const checkHistoryBrowserStatus = function () {
+    const checkHistoryBrowserStatus = () => {
       return $.post('/jobbrowser/api/jobs/history', {
         interface: ko.mapping.toJSON('history'),
         filters: ko.mapping.toJSON([
@@ -159,8 +166,8 @@ class JobBrowserPanel {
       })
         .done(data => {
           if (data != null && data.apps != null) {
-            self.jobCounts()['history'] = data.apps.length;
-            self.jobCounts.valueHasMutated();
+            this.jobCounts()['history'] = data.apps.length;
+            this.jobCounts.valueHasMutated();
           }
         })
         .fail(response => {
@@ -192,7 +199,8 @@ class JobBrowserPanel {
         });
     };
 
-    // Load the mini jobbrowser
+    // Load the mini jobbrowser DOM and insert it in the #mini_jobrowser element
+    // Any script or styles are also inserted in the header and thus loaded async.
     $.ajax({
       url: '/jobbrowser/apps?is_embeddable=true&is_mini=true',
       beforeSend: function (xhr) {
@@ -210,9 +218,9 @@ class JobBrowserPanel {
     if (!window.IS_K8S_ONLY) {
       checkJobBrowserStatusIdx = window.setTimeout(checkJobBrowserStatus, 10);
 
-      huePubSub.subscribe('check.job.browser', checkYarnBrowserStatus);
-      huePubSub.subscribe('check.schedules.browser', checkScheduleBrowserStatus);
-      huePubSub.subscribe('check.history.browser', checkHistoryBrowserStatus);
+      super.subscribe('check.job.browser', checkYarnBrowserStatus);
+      super.subscribe('check.schedules.browser', checkScheduleBrowserStatus);
+      super.subscribe('check.history.browser', checkHistoryBrowserStatus);
     }
   }
 }
