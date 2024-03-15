@@ -1899,6 +1899,26 @@ DJANGO_EMAIL_BACKEND = Config(
   default="django.core.mail.backends.smtp.EmailBackend"
 )
 
+CORS_ENABLED = Config(
+  key="cors_enabled",
+  help=_("Enable or disable Cross-Origin Resource Sharing (CORS). Defaults to True."),
+  type=coerce_bool,
+  default=True
+)
+
+CORS_ALLOW_CREDENTIALS = Config(
+  key="cors_allow_credentials",
+  help=_("This value determines whether the server allows cookies in the cross-site HTTP requests. Defaults to True."),
+  type=coerce_bool,
+  default=True
+)
+
+CORS_ALLOWED_ORIGINS = Config(
+  key="cors_allowed_origins",
+  help=_("A comma separated list of origins allowed for CORS."),
+  type=coerce_csv
+)
+
 ENABLE_SQL_SYNTAX_CHECK = Config(
   key='enable_sql_syntax_check',
   default=True,
