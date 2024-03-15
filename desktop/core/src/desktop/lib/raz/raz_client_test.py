@@ -392,8 +392,9 @@ class RazClientTest(unittest.TestCase):
         requests_post.reset_mock()
 
         # HA mode - When RAZ instance1 is healthy and RAZ instance2 is unhealthy
-        requests_post.side_effect = [Mock(status_code=200), Mock(status_code=404)]
         client = RazClient(self.raz_urls_ha, 'kerberos', username=self.username, service="s3", service_name="cm_s3", cluster_name="cl1")
+
+        requests_post.side_effect = [Mock(status_code=200), Mock(status_code=404)]
         raz_response = client._handle_raz_ha(self.raz_urls_ha, auth_handler=HTTPKerberosAuth(), data=request_data, headers={})
 
         requests_post.assert_called_with(
@@ -409,7 +410,6 @@ class RazClientTest(unittest.TestCase):
 
         # HA mode - When RAZ instance1 is unhealthy and RAZ instance2 is healthy
         requests_post.side_effect = [Mock(status_code=404), Mock(status_code=200)]
-        client = RazClient(self.raz_urls_ha, 'kerberos', username=self.username, service="s3", service_name="cm_s3", cluster_name="cl1")
         raz_response = client._handle_raz_ha(self.raz_urls_ha, auth_handler=HTTPKerberosAuth(), data=request_data, headers={})
 
         requests_post.assert_called_with(
@@ -425,8 +425,6 @@ class RazClientTest(unittest.TestCase):
 
         # When no RAZ instance is healthy
         requests_post.return_value = Mock(status_code=404)
-
-        client = RazClient(self.raz_urls_ha, 'kerberos', username=self.username, service="s3", service_name="cm_s3", cluster_name="cl1")
         raz_response = client._handle_raz_ha(self.raz_urls_ha, auth_handler=HTTPKerberosAuth(), data=request_data, headers={})
 
         assert_equal(raz_response, None)
