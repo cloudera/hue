@@ -321,6 +321,26 @@ class TrinoApi(Api):
     ]
 
 
+  @query_error_handler
+  def explain(self, notebook, snippet):
+    statement = snippet['statement'].rstrip(';')
+    explanation = ''
+
+    if statement:
+      try:
+        TrinoQuery(self.trino_request, 'USE ' + snippet['database']).execute()
+        result = TrinoQuery(self.trino_request, 'EXPLAIN ' + statement).execute()
+        explanation = result.rows
+      except Exception as e:
+        explanation = str(e)
+
+    return {
+      'status': 0,
+      'explanation': explanation,
+      'statement': statement
+    }
+
+
   def download(self, notebook, snippet, file_format='csv'):
     result_wrapper = TrinoExecutionWrapper(self, notebook, snippet)
 
