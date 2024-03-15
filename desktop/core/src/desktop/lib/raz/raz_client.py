@@ -171,7 +171,7 @@ class RazClient(object):
 
     raz_response = None
     for r_url in raz_urls_list:
-      r_url = "%s/api/authz/%s/access?doAs=%s" % (r_url.rstrip('/'), self.service, self.username)
+      r_url = "%s/api/authz/%s/access?doAs=%s" % (r_url.strip(' ').rstrip('/'), self.service, self.username)
       LOG.info('Attempting to connect to RAZ URL: %s' % r_url)
 
       try:
