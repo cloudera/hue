@@ -424,9 +424,9 @@ class RazClientTest(unittest.TestCase):
         requests_post.reset_mock()
 
         # When no RAZ instance is healthy
-        requests_post.return_value = Mock(status_code=404)
+        requests_post.side_effect = [Mock(status_code=404), Mock(status_code=404)]
         raz_response = client._handle_raz_ha(self.raz_urls_ha, auth_handler=HTTPKerberosAuth(), data=request_data, headers={})
 
         assert_equal(raz_response, None)
         assert_equal(requests_post.call_count, 2)
-        requests_post.reset_mock()
+
