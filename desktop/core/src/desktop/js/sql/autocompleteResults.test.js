@@ -28,317 +28,77 @@ import LOTS_OF_PARSE_RESULTS from './test/lotsOfParseResults';
 import * as sqlUdfRepository from 'sql/reference/sqlUdfRepository';
 import sqlReferenceRepository from 'sql/reference/sqlReferenceRepository';
 import sleep from 'utils/timing/sleep';
+import * as hueConfig from 'config/hueConfig';
 
 describe('AutocompleteResults.js', () => {
-  const failResponse = {
-    status: 500
-  };
-
-  jest.spyOn(CatalogApi, 'fetchSourceMetadata').mockImplementation(options => {
-    if (Math.random() < 0.5) {
-      return CancellablePromise.reject(failResponse);
-    }
-    if (options.entry.path.length === 0) {
-      return CancellablePromise.resolve(JSON.parse('{"status": 0, "databases": ["default"]}'));
-    }
-    if (options.entry.path.length === 1) {
-      return CancellablePromise.resolve(
-        JSON.parse(
-          '{"status": 0, "tables_meta": [{"comment": "comment", "type": "Table", "name": "foo"}, {"comment": null, "type": "View", "name": "bar_view"}, {"comment": null, "type": "Table", "name": "bar"}]}'
-        )
-      );
-    }
-    if (options.entry.path.length === 2) {
-      return CancellablePromise.resolve(
-        JSON.parse(
-          '{"status": 0, "support_updates": false, "hdfs_link": "/filebrowser/view=/user/hive/warehouse/customers", "extended_columns": [{"comment": "", "type": "int", "name": "id"}, {"comment": "", "type": "string", "name": "name"}, {"comment": "", "type": "struct<email_format:string,frequency:string,categories:struct<promos:boolean,surveys:boolean>>", "name": "email_preferences"}, {"comment": "", "type": "map<string,struct<street_1:string,street_2:string,city:string,state:string,zip_code:string>>", "name": "addresses"}, {"comment": "", "type": "array<struct<order_id:string,order_date:string,items:array<struct<product_id:int,sku:string,name:string,price:double,qty:int>>>>", "name": "orders"}], "columns": ["id", "name", "email_preferences", "addresses", "orders"], "partition_keys": []}'
-        )
-      );
-    }
-    if (options.entry.path.length === 3) {
-      return CancellablePromise.resolve(
-        JSON.parse(
-          '{"status": 0, "comment": "", "type": "struct", "name": "email_preferences", "fields": [{"type": "string", "name": "email_format"}, {"type": "string", "name": "frequency"}, {"fields": [{"type": "boolean", "name": "promos"}, {"type": "boolean", "name": "surveys"}], "type": "struct", "name": "categories"}]}'
-        )
-      );
-    }
-    if (options.entry.path.length > 3) {
-      return CancellablePromise.resolve(
-        JSON.parse(
-          '{"status": 0, "fields": [{"type": "boolean", "name": "promos"}, {"type": "boolean", "name": "surveys"}], "type": "struct", "name": "categories"}'
-        )
-      );
-    }
-    return CancellablePromise.reject();
-  });
-
-  jest.spyOn(ApiHelper, 'fetchHdfsPath').mockImplementation(options => {
-    const deferred = $.Deferred();
-
-    deferred.done(options.successCallback);
-
-    deferred.resolve({
-      superuser: 'hdfs',
-      current_request_path: '/filebrowser/view=///var',
-      current_dir_path: '///var',
-      show_download_button: true,
-      cwd_set: true,
-      breadcrumbs: [
-        {
-          url: '/',
-          label: '/'
-        },
-        {
-          url: '/var',
-          label: 'var'
-        }
-      ],
-      apps: [
-        'help',
-        'sqoop',
-        'pig',
-        'hbase',
-        'rdbms',
-        'indexer',
-        'metastore',
-        'beeswax',
-        'jobsub',
-        'metadata',
-        'zookeeper',
-        'search',
-        'useradmin',
-        'notebook',
-        'proxy',
-        'oozie',
-        'spark',
-        'filebrowser',
-        'about',
-        'jobbrowser',
-        'dashboard',
-        'security',
-        'impala'
-      ],
-      show_upload_button: true,
-      files: [
-        {
-          humansize: '0\u00a0bytes',
-          url: '/filebrowser/view=/',
-          stats: {
-            size: 0,
-            group: 'supergroup',
-            blockSize: 0,
-            replication: 0,
-            user: 'hdfs',
-            mtime: 1476970119,
-            path: '///var/..',
-            atime: 0,
-            mode: 16877
-          },
-          name: '..',
-          mtime: 'October 20, 2016 06:28 AM',
-          rwx: 'drwxr-xr-x',
-          path: '/',
-          is_sentry_managed: false,
-          type: 'dir',
-          mode: '40755'
-        },
-        {
-          humansize: '0\u00a0bytes',
-          url: '/filebrowser/view=/var',
-          stats: {
-            size: 0,
-            group: 'supergroup',
-            blockSize: 0,
-            replication: 0,
-            user: 'hdfs',
-            mtime: 1470887321,
-            path: '///var',
-            atime: 0,
-            mode: 16877
-          },
-          name: '.',
-          mtime: 'August 10, 2016 08:48 PM',
-          rwx: 'drwxr-xr-x',
-          path: '/var',
-          is_sentry_managed: false,
-          type: 'dir',
-          mode: '40755'
-        },
-        {
-          humansize: '0\u00a0bytes',
-          url: '/filebrowser/view=/var/lib',
-          stats: {
-            size: 0,
-            group: 'supergroup',
-            blockSize: 0,
-            replication: 0,
-            user: 'hdfs',
-            mtime: 1470887321,
-            path: '/var/lib',
-            atime: 0,
-            mode: 16877
-          },
-          name: 'lib',
-          mtime: 'August 10, 2016 08:48 PM',
-          rwx: 'drwxr-xr-x',
-          path: '/var/lib',
-          is_sentry_managed: false,
-          type: 'dir',
-          mode: '40755'
-        },
-        {
-          humansize: '0\u00a0bytes',
-          url: '/filebrowser/view=/var/log',
-          stats: {
-            size: 0,
-            group: 'mapred',
-            blockSize: 0,
-            replication: 0,
-            user: 'yarn',
-            mtime: 1470887196,
-            path: '/var/log',
-            atime: 0,
-            mode: 17405
-          },
-          name: 'log',
-          mtime: 'August 10, 2016 08:46 PM',
-          rwx: 'drwxrwxr-xt',
-          path: '/var/log',
-          is_sentry_managed: false,
-          type: 'dir',
-          mode: '41775'
-        }
-      ],
-      users: [],
-      is_embeddable: false,
-      supergroup: 'supergroup',
-      descending: 'false',
-      groups: [],
-      is_trash_enabled: true,
-      pagesize: 50,
-      file_filter: 'any',
-      is_fs_superuser: false,
-      is_sentry_managed: false,
-      home_directory: '/user/admin',
-      path: '///var',
-      page: {
-        num_pages: 1,
-        total_count: 2,
-        next_page_number: 1,
-        end_index: 2,
-        number: 1,
-        previous_page_number: 1,
-        start_index: 1
+  const sourceMetaSpy = jest
+    .spyOn(CatalogApi, 'fetchSourceMetadata')
+    .mockImplementation(options => {
+      if (options.entry.path.length === 0) {
+        return CancellablePromise.resolve(JSON.parse('{"status": 0, "databases": ["default"]}'));
       }
-    });
-
-    return deferred.promise();
-  });
-
-  jest.spyOn(apiUtils, 'fetchUdfs').mockImplementation(() => Promise.resolve([]));
-
-  const subject = new AutocompleteResults({
-    snippet: {
-      autocompleteSettings: {
-        temporaryOnly: false
-      },
-      type: function () {
-        return 'hive';
-      },
-      connector: function () {
-        return { id: 'hive', dialect: 'hive' };
-      },
-      database: function () {
-        return 'default';
-      },
-      namespace: function () {
-        return { id: 'defaultNamespace' };
-      },
-      compute: function () {
-        return { id: 'defaultCompute' };
-      },
-      whenContextSet: function () {
-        return $.Deferred().resolve();
+      if (options.entry.path.length === 1) {
+        return CancellablePromise.resolve(
+          JSON.parse(
+            '{"status": 0, "tables_meta": [{"comment": "comment", "type": "Table", "name": "foo"}, {"comment": null, "type": "View", "name": "bar_view"}, {"comment": null, "type": "Table", "name": "bar"}]}'
+          )
+        );
       }
-    },
-    editor: function () {
-      return {
-        getTextBeforeCursor: function () {
-          return 'foo';
+      if (options.entry.path.length === 2) {
+        return CancellablePromise.resolve(
+          JSON.parse(
+            '{"status": 0, "support_updates": false, "hdfs_link": "/filebrowser/view=/user/hive/warehouse/customers", "extended_columns": [{"comment": "", "type": "int", "name": "id"}, {"comment": "", "type": "string", "name": "name"}, {"comment": "", "type": "struct<email_format:string,frequency:string,categories:struct<promos:boolean,surveys:boolean>>", "name": "email_preferences"}, {"comment": "", "type": "map<string,struct<street_1:string,street_2:string,city:string,state:string,zip_code:string>>", "name": "addresses"}, {"comment": "", "type": "array<struct<order_id:string,order_date:string,items:array<struct<product_id:int,sku:string,name:string,price:double,qty:int>>>>", "name": "orders"}], "columns": ["id", "name", "email_preferences", "addresses", "orders"], "partition_keys": []}'
+          )
+        );
+      }
+      if (options.entry.path.length === 3) {
+        return CancellablePromise.resolve(
+          JSON.parse(
+            '{"status": 0, "comment": "", "type": "struct", "name": "email_preferences", "fields": [{"type": "string", "name": "email_format"}, {"type": "string", "name": "frequency"}, {"fields": [{"type": "boolean", "name": "promos"}, {"type": "boolean", "name": "surveys"}], "type": "struct", "name": "categories"}]}'
+          )
+        );
+      }
+      if (options.entry.path.length > 3) {
+        return CancellablePromise.resolve(
+          JSON.parse(
+            '{"status": 0, "fields": [{"type": "boolean", "name": "promos"}, {"type": "boolean", "name": "surveys"}], "type": "struct", "name": "categories"}'
+          )
+        );
+      }
+      return CancellablePromise.reject();
+    });
+
+  const createSubject = () =>
+    new AutocompleteResults({
+      snippet: {
+        autocompleteSettings: {
+          temporaryOnly: false
         },
-        getTextAfterCursor: function () {
-          return 'bar';
-        }
-      };
-    }
+        type: () => 'hive',
+        connector: () => ({ id: 'hive', dialect: 'hive' }),
+        database: () => 'default',
+        namespace: () => ({ id: 'defaultNamespace' }),
+        compute: () => ({ id: 'defaultCompute' }),
+        whenContextSet: () => Promise.resolve()
+      },
+      editor: () => ({
+        getTextBeforeCursor: () => 'foo',
+        getTextAfterCursor: () => 'bar'
+      })
+    });
+
+  beforeEach(() => {
+    huePubSub.publish('assist.clear.all.caches');
+    dataCatalog.disableCache();
   });
 
-  describe('Test a whole lot of different parse results', () => {
-    const LOADING_OBSERVABLES = [
-      'loadingKeywords',
-      'loadingFunctions',
-      'loadingDatabases',
-      'loadingTables',
-      'loadingColumns',
-      'loadingValues',
-      'loadingPaths',
-      'loadingJoins',
-      'loadingJoinConditions',
-      'loadingAggregateFunctions',
-      'loadingGroupBys',
-      'loadingOrderBys',
-      'loadingFilters',
-      'loadingPopularTables',
-      'loadingPopularColumns'
-    ];
-
-    beforeEach(() => {
-      dataCatalog.disableCache();
-      window.AUTOCOMPLETE_TIMEOUT = 1;
-      global.AUTOCOMPLETE_TIMEOUT = 1;
-
-      huePubSub.publish('assist.clear.all.caches');
-    });
-
-    afterEach(() => {
-      AUTOCOMPLETE_TIMEOUT = 0;
-      dataCatalog.enableCache();
-    });
-
-    for (const parseResult of LOTS_OF_PARSE_RESULTS) {
-      it('should handle parse result no. ' + parseResult.index, async () => {
-        if (parseResult.suggestKeywords) {
-          const cleanedKeywords = [];
-          parseResult.suggestKeywords.forEach(keyword => {
-            if (!keyword.value) {
-              cleanedKeywords.push({ value: keyword });
-            } else {
-              cleanedKeywords.push(keyword);
-            }
-          });
-          parseResult.suggestKeywords = cleanedKeywords;
-        }
-        try {
-          await subject.update(parseResult);
-        } catch (e) {
-          fail('Got exception');
-          console.error(e);
-        }
-        if (subject.loading()) {
-          LOADING_OBSERVABLES.forEach(observable => {
-            if (subject[observable]()) {
-              fail('Still loading (' + observable + '() == true), missing ajax spec?');
-            }
-          });
-        }
-
-        expect(subject.loading()).toBeFalsy();
-      });
-    }
+  afterEach(() => {
+    dataCatalog.enableCache();
+    jest.resetAllMocks();
   });
 
   it('should handle parse results with keywords', async () => {
-    subject.entries([]);
+    const subject = createSubject();
 
     expect(subject.filtered().length).toBe(0);
 
@@ -359,7 +119,7 @@ describe('AutocompleteResults.js', () => {
   });
 
   it('should handle parse results with identifiers', async () => {
-    subject.entries([]);
+    const subject = createSubject();
 
     expect(subject.filtered().length).toBe(0);
     await subject.update({
@@ -379,7 +139,7 @@ describe('AutocompleteResults.js', () => {
   });
 
   it('should handle parse results with functions', async () => {
-    subject.entries([]);
+    const subject = createSubject();
 
     const spy = jest
       .spyOn(sqlUdfRepository, 'getUdfsWithReturnTypes')
@@ -414,7 +174,7 @@ describe('AutocompleteResults.js', () => {
   });
 
   it('should handle parse results with udf argument keywords', async () => {
-    subject.entries([]);
+    const subject = createSubject();
 
     const spy = jest
       .spyOn(sqlUdfRepository, 'getArgumentDetailsForUdf')
@@ -440,7 +200,7 @@ describe('AutocompleteResults.js', () => {
   });
 
   it('should handle parse results set options', async () => {
-    subject.entries([]);
+    const subject = createSubject();
 
     const spy = jest.spyOn(sqlReferenceRepository, 'getSetOptions').mockImplementation(
       async dialect =>
@@ -475,5 +235,258 @@ describe('AutocompleteResults.js', () => {
     expect(subject.filtered().length).toEqual(2);
     expect(subject.filtered()[0].details.description).toBeDefined();
     expect(subject.filtered()[1].details.type).toBeDefined();
+  });
+
+  it('should fetch from source when disable_source_autocomplete is set to false', async () => {
+    jest.spyOn(hueConfig, 'getLastKnownConfig').mockImplementation(() => ({
+      app_config: {
+        editor: {
+          source_autocomplete_disabled: false
+        }
+      }
+    }));
+
+    const subject = createSubject();
+
+    await subject.update({
+      lowerCase: false,
+      suggestDatabases: {}
+    });
+
+    expect(sourceMetaSpy).toHaveBeenCalled();
+  });
+
+  it('should not fetch from source when disable_source_autocomplete is set to true', async () => {
+    jest.spyOn(hueConfig, 'getLastKnownConfig').mockImplementation(() => ({
+      app_config: {
+        editor: {
+          source_autocomplete_disabled: true
+        }
+      }
+    }));
+    const subject = createSubject();
+
+    await subject.update({
+      lowerCase: false,
+      suggestDatabases: {}
+    });
+
+    expect(sourceMetaSpy).not.toHaveBeenCalled();
+  });
+
+  describe('Test a whole lot of different parse results', () => {
+    const LOADING_OBSERVABLES = [
+      'loadingKeywords',
+      'loadingFunctions',
+      'loadingDatabases',
+      'loadingTables',
+      'loadingColumns',
+      'loadingValues',
+      'loadingPaths',
+      'loadingJoins',
+      'loadingJoinConditions',
+      'loadingAggregateFunctions',
+      'loadingGroupBys',
+      'loadingOrderBys',
+      'loadingFilters',
+      'loadingPopularTables',
+      'loadingPopularColumns'
+    ];
+
+    for (const parseResult of LOTS_OF_PARSE_RESULTS) {
+      it('should handle parse result no. ' + parseResult.index, async () => {
+        jest.spyOn(apiUtils, 'fetchUdfs').mockImplementation(() => Promise.resolve([]));
+        jest.spyOn(ApiHelper, 'fetchHdfsPath').mockImplementation(options => {
+          const deferred = $.Deferred();
+
+          deferred.done(options.successCallback);
+
+          deferred.resolve({
+            superuser: 'hdfs',
+            current_request_path: '/filebrowser/view=///var',
+            current_dir_path: '///var',
+            show_download_button: true,
+            cwd_set: true,
+            breadcrumbs: [
+              {
+                url: '/',
+                label: '/'
+              },
+              {
+                url: '/var',
+                label: 'var'
+              }
+            ],
+            apps: [
+              'help',
+              'sqoop',
+              'pig',
+              'hbase',
+              'rdbms',
+              'indexer',
+              'metastore',
+              'beeswax',
+              'jobsub',
+              'metadata',
+              'zookeeper',
+              'search',
+              'useradmin',
+              'notebook',
+              'proxy',
+              'oozie',
+              'spark',
+              'filebrowser',
+              'about',
+              'jobbrowser',
+              'dashboard',
+              'security',
+              'impala'
+            ],
+            show_upload_button: true,
+            files: [
+              {
+                humansize: '0\u00a0bytes',
+                url: '/filebrowser/view=/',
+                stats: {
+                  size: 0,
+                  group: 'supergroup',
+                  blockSize: 0,
+                  replication: 0,
+                  user: 'hdfs',
+                  mtime: 1476970119,
+                  path: '///var/..',
+                  atime: 0,
+                  mode: 16877
+                },
+                name: '..',
+                mtime: 'October 20, 2016 06:28 AM',
+                rwx: 'drwxr-xr-x',
+                path: '/',
+                is_sentry_managed: false,
+                type: 'dir',
+                mode: '40755'
+              },
+              {
+                humansize: '0\u00a0bytes',
+                url: '/filebrowser/view=/var',
+                stats: {
+                  size: 0,
+                  group: 'supergroup',
+                  blockSize: 0,
+                  replication: 0,
+                  user: 'hdfs',
+                  mtime: 1470887321,
+                  path: '///var',
+                  atime: 0,
+                  mode: 16877
+                },
+                name: '.',
+                mtime: 'August 10, 2016 08:48 PM',
+                rwx: 'drwxr-xr-x',
+                path: '/var',
+                is_sentry_managed: false,
+                type: 'dir',
+                mode: '40755'
+              },
+              {
+                humansize: '0\u00a0bytes',
+                url: '/filebrowser/view=/var/lib',
+                stats: {
+                  size: 0,
+                  group: 'supergroup',
+                  blockSize: 0,
+                  replication: 0,
+                  user: 'hdfs',
+                  mtime: 1470887321,
+                  path: '/var/lib',
+                  atime: 0,
+                  mode: 16877
+                },
+                name: 'lib',
+                mtime: 'August 10, 2016 08:48 PM',
+                rwx: 'drwxr-xr-x',
+                path: '/var/lib',
+                is_sentry_managed: false,
+                type: 'dir',
+                mode: '40755'
+              },
+              {
+                humansize: '0\u00a0bytes',
+                url: '/filebrowser/view=/var/log',
+                stats: {
+                  size: 0,
+                  group: 'mapred',
+                  blockSize: 0,
+                  replication: 0,
+                  user: 'yarn',
+                  mtime: 1470887196,
+                  path: '/var/log',
+                  atime: 0,
+                  mode: 17405
+                },
+                name: 'log',
+                mtime: 'August 10, 2016 08:46 PM',
+                rwx: 'drwxrwxr-xt',
+                path: '/var/log',
+                is_sentry_managed: false,
+                type: 'dir',
+                mode: '41775'
+              }
+            ],
+            users: [],
+            is_embeddable: false,
+            supergroup: 'supergroup',
+            descending: 'false',
+            groups: [],
+            is_trash_enabled: true,
+            pagesize: 50,
+            file_filter: 'any',
+            is_fs_superuser: false,
+            is_sentry_managed: false,
+            home_directory: '/user/admin',
+            path: '///var',
+            page: {
+              num_pages: 1,
+              total_count: 2,
+              next_page_number: 1,
+              end_index: 2,
+              number: 1,
+              previous_page_number: 1,
+              start_index: 1
+            }
+          });
+
+          return deferred.promise();
+        });
+
+        const subject = createSubject();
+        if (parseResult.suggestKeywords) {
+          const cleanedKeywords = [];
+          parseResult.suggestKeywords.forEach(keyword => {
+            if (!keyword.value) {
+              cleanedKeywords.push({ value: keyword });
+            } else {
+              cleanedKeywords.push(keyword);
+            }
+          });
+          parseResult.suggestKeywords = cleanedKeywords;
+        }
+        try {
+          await subject.update(parseResult);
+        } catch (e) {
+          fail('Got exception');
+          console.error(e);
+        }
+        if (subject.loading()) {
+          LOADING_OBSERVABLES.forEach(observable => {
+            if (subject[observable]()) {
+              fail('Still loading (' + observable + '() == true), missing ajax spec?');
+            }
+          });
+        }
+
+        expect(subject.loading()).toBeFalsy();
+      });
+    }
   });
 });

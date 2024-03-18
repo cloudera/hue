@@ -49,6 +49,7 @@ export interface AppConfig<T extends Interpreter> {
 export interface EditorConfig extends AppConfig<EditorInterpreter> {
   default_limit: number | null;
   default_sql_interpreter: string;
+  source_autocomplete_disabled: boolean;
 }
 
 export enum AppType {
