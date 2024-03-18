@@ -88,8 +88,6 @@ if USE_NEW_EDITOR.get():
       sqlAnalyzer: ${ OPTIMIZER.CACHEABLE_TTL.get() }
     };
 
-    var AUTOCOMPLETE_TIMEOUT = ${ conf.EDITOR_AUTOCOMPLETE_TIMEOUT.get() };
-
     window.LEAFLET_DEFAULTS = {
       layer: '${ leaflet['layer'] |n,unicode }',
       attribution: '${ leaflet['attribution'] |n,unicode }'

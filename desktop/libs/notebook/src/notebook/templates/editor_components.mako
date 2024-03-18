@@ -2070,7 +2070,6 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     userId: ${ user.id },
     suffix: '${ suffix }',
     assistAvailable: true,
-    autocompleteTimeout: AUTOCOMPLETE_TIMEOUT,
     snippetViewSettings: {
       default: {
         placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',

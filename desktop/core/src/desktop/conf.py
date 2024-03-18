@@ -1817,11 +1817,11 @@ ENABLE_SQL_SYNTAX_CHECK = Config(
   help=_('Choose whether to enable SQL syntax check or not.')
 )
 
-EDITOR_AUTOCOMPLETE_TIMEOUT = Config(
-  key='editor_autocomplete_timeout',
-  type=int,
-  default=30000,
-  help=_('Timeout value in ms for autocomplete of columns, tables, values etc. 0 = disabled.')
+DISABLE_SOURCE_AUTOCOMPLETE = Config(
+  key='disable_source_autocomplete',
+  type=coerce_bool,
+  default=False,
+  help=_('Choose whether the editor autocomplete should gather suggestions from external sources or not.')
 )
 
 ENABLE_HUE_5 = Config(
@@ -1947,7 +1947,6 @@ TRACING = ConfigSection(
       help=_('Trace all the requests instead of a few specific ones like the SQL Editor. Much noisiers.')
     ),
 ))
-
 
 def task_server_default_result_directory():
   """Local directory to store task results."""
