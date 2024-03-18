@@ -28,7 +28,7 @@ export function useHuePubSub<T>({
   app
 }: {
   topic: string;
-  callback?: (info?: T) => void;
+  callback?: (info: T) => void;
   app?: string;
 }): T | undefined {
   const [huePubSubState, setHuePubSubState] = useState<{ info: T | undefined }>({
