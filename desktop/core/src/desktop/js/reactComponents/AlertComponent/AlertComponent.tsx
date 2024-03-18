@@ -14,26 +14,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
+import { AlertProps } from 'antd/lib/alert';
 import Alert from 'cuix/dist/components/Alert/Alert';
 
-import huePubSub from 'utils/huePubSub';
 import './AlertComponent.scss';
 import { i18nReact } from '../../utils/i18nReact';
+import { useHuePubSub } from '../useHuePubSub';
 
 interface HueAlert {
   message: string;
+  noStick: boolean;
 }
 
-type alertType = 'error' | 'info' | 'warning';
+type alertType = AlertProps['type'];
+
 interface VisibleAlert {
   alert: HueAlert;
   type: alertType;
 }
-
 const AlertComponent: React.FC = () => {
   const [alert, setAlerts] = useState<VisibleAlert[]>([]);
-
   const updateAlerts = (alert: HueAlert, type: alertType) => {
     if (!alert.message) {
       return;
@@ -47,7 +48,7 @@ const AlertComponent: React.FC = () => {
 
       const newAlert: VisibleAlert = { alert, type };
 
-      if (type === 'info') {
+      if (type === 'info' || alert.noStick) {
         setTimeout(() => {
           handleClose(newAlert);
         }, 3000);
@@ -57,32 +58,26 @@ const AlertComponent: React.FC = () => {
     });
   };
 
-  useEffect(() => {
-    const hueSub = huePubSub.subscribe('hue.global.error', (newAlert: HueAlert) => {
+  useHuePubSub<HueAlert>({
+    topic: 'hue.global.error',
+    callback: newAlert => {
       updateAlerts(newAlert, 'error');
-    });
-    return () => {
-      hueSub.remove();
-    };
-  }, []);
+    }
+  });
 
-  useEffect(() => {
-    const hueSub = huePubSub.subscribe('hue.global.info', (newAlert: HueAlert) => {
+  useHuePubSub<HueAlert>({
+    topic: 'hue.global.info',
+    callback: newAlert => {
       updateAlerts(newAlert, 'info');
-    });
-    return () => {
-      hueSub.remove();
-    };
-  }, []);
+    }
+  });
 
-  useEffect(() => {
-    const hueSub = huePubSub.subscribe('hue.global.warning', (newAlert: HueAlert) => {
+  useHuePubSub<HueAlert>({
+    topic: 'hue.global.warning',
+    callback: newAlert => {
       updateAlerts(newAlert, 'warning');
-    });
-    return () => {
-      hueSub.remove();
-    };
-  }, []);
+    }
+  });
 
   const handleClose = (alertObjToClose: VisibleAlert) => {
     const filteredAlerts = alert.filter(alertObj => alertObj !== alertObjToClose);
