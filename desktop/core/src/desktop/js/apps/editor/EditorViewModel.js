@@ -108,7 +108,6 @@ export default class EditorViewModel {
       }
     });
 
-    this.autocompleteTimeout = options.autocompleteTimeout;
     this.lastNotifiedDialect = undefined;
 
     this.combinedContent = ko.observable();

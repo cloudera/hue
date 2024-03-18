@@ -1173,7 +1173,6 @@ var autocompleter = new AceAutocompleteWrapper({
   user: HIVE_AUTOCOMPLETE_USER,
   oldEditor: true,
   optEnabled: false,
-  timeout: AUTOCOMPLETE_TIMEOUT
 });
 
 var truncateOutput = function (obj) {

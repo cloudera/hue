@@ -1083,7 +1083,6 @@ There is no bridge to KO for components using this integration. Example using in
     userId: ${ user.id },
     suffix: 'editor',
     assistAvailable: true,
-    autocompleteTimeout: AUTOCOMPLETE_TIMEOUT,
     snippetViewSettings: {
       default: {
         placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',

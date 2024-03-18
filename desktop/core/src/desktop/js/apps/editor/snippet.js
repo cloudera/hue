@@ -580,8 +580,7 @@ export default class Snippet {
     this.autocompleter = new AceAutocompleteWrapper({
       snippet: this,
       user: this.parentVm.user,
-      optEnabled: false,
-      timeout: this.parentVm.autocompleteTimeout
+      optEnabled: false
     });
 
     this.activeExecutable = ko.observable();

@@ -35,7 +35,6 @@ declare global {
 }
 
 export interface hueWindow {
-  AUTOCOMPLETE_TIMEOUT?: number;
   CACHEABLE_TTL?: { default?: number; sqlAnalyzer?: number };
   CLOSE_SESSIONS?: { [dialect: string]: boolean };
   CSRF_TOKEN?: string;

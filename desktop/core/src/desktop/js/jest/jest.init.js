@@ -39,7 +39,6 @@ class Autocomplete {}
 
 const globalVars = {
   ko: ko,
-  AUTOCOMPLETE_TIMEOUT: 1,
   CACHEABLE_TTL: 1,
   HAS_LINK_SHARING: true,
   HAS_SQL_ANALYZER: false,

@@ -2793,8 +2793,7 @@ class Snippet {
     self.autocompleter = new AceAutocompleteWrapper({
       snippet: self,
       user: vm.user,
-      optEnabled: false,
-      timeout: vm.autocompleteTimeout
+      optEnabled: false
     });
 
     self.init = function () {

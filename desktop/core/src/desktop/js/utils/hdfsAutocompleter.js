@@ -22,7 +22,6 @@ class HdfsAutocompleter {
   /**
    * @param {object} options
    * @param {string} options.user
-   * @param {Number} options.timeout
    * @param {Snippet} options.snippet
    *
    * @constructor
@@ -31,7 +30,6 @@ class HdfsAutocompleter {
     const self = this;
     self.user = options.user;
     self.snippet = options.snippet;
-    self.timeout = options.timeout;
   }
 
   hasExpired(timestamp) {
@@ -88,7 +86,6 @@ class HdfsAutocompleter {
         successCallback: successCallback,
         silenceErrors: true,
         errorCallback: onFailure,
-        timeout: self.timeout,
         editor: editor
       });
     } else {
