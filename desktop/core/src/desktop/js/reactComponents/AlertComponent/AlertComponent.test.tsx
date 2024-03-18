@@ -98,11 +98,15 @@ describe('AlertComponent', () => {
     expect(screen.queryAllByRole('alert')).toHaveLength(1);
 
     //It should still be open after 2 seconds
-    jest.advanceTimersByTime(2000);
+    act(() => {
+      jest.advanceTimersByTime(2000);
+    });
     expect(screen.queryAllByRole('alert')).toHaveLength(1);
 
     //After 3.1 seconds, it should really be closed
-    jest.advanceTimersByTime(1000);
+    act(() => {
+      jest.advanceTimersByTime(1000);
+    });
     expect(screen.queryAllByRole('alert')).toHaveLength(0);
 
     jest.useRealTimers();
