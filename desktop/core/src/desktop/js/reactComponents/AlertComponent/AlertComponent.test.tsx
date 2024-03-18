@@ -23,7 +23,7 @@ import huePubSub from '../../utils/huePubSub';
 import AlertComponent from './AlertComponent';
 
 describe('AlertComponent', () => {
-  test('it should show a global error message', async () => {
+  it('should show a global error message', async () => {
     render(<AlertComponent />);
     expect(screen.queryAllByRole('alert')).toHaveLength(0);
 
@@ -34,7 +34,7 @@ describe('AlertComponent', () => {
     expect(alerts[0]).toHaveTextContent('Some error');
   });
 
-  test('it should show multiple global error messages', async () => {
+  it('should show multiple global error messages', async () => {
     render(<AlertComponent />);
     expect(screen.queryAllByRole('alert')).toHaveLength(0);
 
@@ -47,7 +47,7 @@ describe('AlertComponent', () => {
     expect(alerts[1]).toHaveTextContent('Error 2');
   });
 
-  test("it shouldn't show empty error messages", async () => {
+  it("shouldn't show empty error messages", async () => {
     render(<AlertComponent />);
     expect(screen.queryAllByRole('alert')).toHaveLength(0);
 
@@ -56,7 +56,7 @@ describe('AlertComponent', () => {
     expect(screen.queryAllByRole('alert')).toHaveLength(0);
   });
 
-  test('it should show unique error messages', async () => {
+  it('should show unique error messages', async () => {
     render(<AlertComponent />);
     expect(screen.queryAllByRole('alert')).toHaveLength(0);
 
@@ -70,7 +70,7 @@ describe('AlertComponent', () => {
     expect(alerts[1]).toHaveTextContent('Error 2');
   });
 
-  test('alerts should be closable', async () => {
+  it('should close alerts when clicked', async () => {
     const user = userEvent.setup();
     render(<AlertComponent />);
     expect(screen.queryAllByRole('alert')).toHaveLength(0);
@@ -90,24 +90,52 @@ describe('AlertComponent', () => {
     expect(alertsAfterClosing[1]).toHaveTextContent('Error 3');
   });
 
-  test('info alerts should close automatically after 3 seconds', async () => {
+  const expectAlertToBeGoneAfterThreeSeconds = () => {
+    // It should still be open after 2 seconds
+    act(() => {
+      jest.advanceTimersByTime(2000);
+    });
+    expect(screen.queryAllByRole('alert')).toHaveLength(1);
+
+    // After 3.1 seconds, it should really be closed
+    act(() => {
+      jest.advanceTimersByTime(1100);
+    });
+    expect(screen.queryAllByRole('alert')).toHaveLength(0);
+  };
+
+  it('should close info alerts automatically after 3 seconds', async () => {
     jest.useFakeTimers();
     render(<AlertComponent />);
     expect(screen.queryAllByRole('alert')).toHaveLength(0);
     act(() => huePubSub.publish('hue.global.info', { message: 'info' }));
     expect(screen.queryAllByRole('alert')).toHaveLength(1);
 
-    //It should still be open after 2 seconds
-    act(() => {
-      jest.advanceTimersByTime(2000);
-    });
+    expectAlertToBeGoneAfterThreeSeconds();
+
+    jest.useRealTimers();
+  });
+
+  it('should close warning alerts when when noStick is set to true', async () => {
+    jest.useFakeTimers();
+    render(<AlertComponent />);
+    expect(screen.queryAllByRole('alert')).toHaveLength(0);
+    act(() => huePubSub.publish('hue.global.warning', { message: 'Some warning', noStick: true }));
     expect(screen.queryAllByRole('alert')).toHaveLength(1);
 
-    //After 3.1 seconds, it should really be closed
-    act(() => {
-      jest.advanceTimersByTime(1000);
-    });
+    expectAlertToBeGoneAfterThreeSeconds();
+
+    jest.useRealTimers();
+  });
+
+  it('should close error alerts when when noStick is set to true', async () => {
+    jest.useFakeTimers();
+    render(<AlertComponent />);
     expect(screen.queryAllByRole('alert')).toHaveLength(0);
+    act(() => huePubSub.publish('hue.global.error', { message: 'Some error', noStick: true }));
+    expect(screen.queryAllByRole('alert')).toHaveLength(1);
+
+    expectAlertToBeGoneAfterThreeSeconds();
 
     jest.useRealTimers();
   });
