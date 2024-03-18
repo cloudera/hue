@@ -16,9 +16,10 @@
 
 import axios, {
   AxiosError,
+  AxiosInstance,
   AxiosRequestConfig,
   AxiosResponse,
-  AxiosTransformer,
+  AxiosResponseTransformer,
   CancelToken
 } from 'axios';
 import qs from 'qs';
@@ -42,7 +43,7 @@ export interface DefaultApiResponse {
 export interface ApiFetchOptions<T, E = string> extends AxiosRequestConfig {
   silenceErrors?: boolean;
   ignoreSuccessErrors?: boolean;
-  transformResponse?: AxiosTransformer;
+  transformResponse?: AxiosResponseTransformer;
   qsEncodeData?: boolean;
   handleSuccess?: (
     response: T & DefaultApiResponse,
@@ -77,6 +78,8 @@ axiosInstance.interceptors.response.use(response => {
   }
   return response;
 });
+
+export const getAxiosInstance = (): AxiosInstance => axiosInstance;
 
 export const setBaseUrl = (newBaseUrl: string): void => {
   baseUrl = newBaseUrl;

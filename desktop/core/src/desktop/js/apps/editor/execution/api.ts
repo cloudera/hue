@@ -14,6 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { AxiosResponseTransformer } from 'axios';
 import KnockoutObservable from '@types/knockout';
 
 import {
@@ -423,9 +424,7 @@ export const fetchResults = async (options: {
   data.rows = options.rows;
   data.startOver = options.startOver;
 
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  const transformResponse = (response: unknown) => JSON.bigdataParse(response);
+  const transformResponse: AxiosResponseTransformer = response => JSON.bigdataParse(response);
 
   const response = await post<DefaultApiResponse & { result?: ResultApiResponse }>(
     FETCH_RESULT_DATA_API,
