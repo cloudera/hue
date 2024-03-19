@@ -836,7 +836,6 @@ class HueRemoteUserMiddleware(RemoteUserMiddleware):
       raise exceptions.MiddlewareNotUsed
     super().__init__(get_response)
     self.header = AUTH.REMOTE_USER_HEADER.get()
-    LOG.info(f"Yes middleware HueRemoteUserMiddleware using {self.header}")
 
 
 class EnsureSafeMethodMiddleware(MiddlewareMixin):

@@ -627,9 +627,6 @@ if OAUTH_AUTHENTICATION:
   INSTALLED_APPS.append('liboauth')
   LOGIN_URL = '/oauth/accounts/login'
   SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-# Print AUTHENTICATION_BACKENDS to log. To be sure that config is working
-
-logging.info(f"Backend will using {AUTHENTICATION_BACKENDS}")
 
 # URL Redirection white list.
 if desktop.conf.REDIRECT_WHITELIST.get():
