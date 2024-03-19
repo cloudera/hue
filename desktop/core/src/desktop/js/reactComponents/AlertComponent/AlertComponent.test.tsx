@@ -20,14 +20,20 @@ import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 import huePubSub from '../../utils/huePubSub';
 
-import AlertComponent from './AlertComponent';
+import AlertComponent, { HueAlert } from './AlertComponent';
+import {
+  GLOBAL_ERROR_TOPIC,
+  GLOBAL_INFO_TOPIC,
+  GLOBAL_WARNING_TOPIC,
+  HIDE_GLOBAL_ALERTS_TOPIC
+} from './events';
 
 describe('AlertComponent', () => {
   it('should show a global error message', async () => {
     render(<AlertComponent />);
     expect(screen.queryAllByRole('alert')).toHaveLength(0);
 
-    act(() => huePubSub.publish('hue.global.error', { message: 'Some error' }));
+    act(() => huePubSub.publish<HueAlert>(GLOBAL_ERROR_TOPIC, { message: 'Some error' }));
 
     const alerts = screen.queryAllByRole('alert');
     expect(alerts).toHaveLength(1);
@@ -38,8 +44,8 @@ describe('AlertComponent', () => {
     render(<AlertComponent />);
     expect(screen.queryAllByRole('alert')).toHaveLength(0);
 
-    act(() => huePubSub.publish('hue.global.error', { message: 'Error 1' }));
-    act(() => huePubSub.publish('hue.global.error', { message: 'Error 2' }));
+    act(() => huePubSub.publish<HueAlert>(GLOBAL_ERROR_TOPIC, { message: 'Error 1' }));
+    act(() => huePubSub.publish<HueAlert>(GLOBAL_ERROR_TOPIC, { message: 'Error 2' }));
 
     const alerts = screen.queryAllByRole('alert');
     expect(alerts).toHaveLength(2);
@@ -51,7 +57,7 @@ describe('AlertComponent', () => {
     render(<AlertComponent />);
     expect(screen.queryAllByRole('alert')).toHaveLength(0);
 
-    act(() => huePubSub.publish('hue.global.error', { message: '' }));
+    act(() => huePubSub.publish<HueAlert>('hue.global.error', { message: '' }));
 
     expect(screen.queryAllByRole('alert')).toHaveLength(0);
   });
@@ -60,9 +66,9 @@ describe('AlertComponent', () => {
     render(<AlertComponent />);
     expect(screen.queryAllByRole('alert')).toHaveLength(0);
 
-    act(() => huePubSub.publish('hue.global.error', { message: 'Error 1' }));
-    act(() => huePubSub.publish('hue.global.error', { message: 'Error 2' }));
-    act(() => huePubSub.publish('hue.global.error', { message: 'Error 1' }));
+    act(() => huePubSub.publish<HueAlert>(GLOBAL_ERROR_TOPIC, { message: 'Error 1' }));
+    act(() => huePubSub.publish<HueAlert>(GLOBAL_ERROR_TOPIC, { message: 'Error 2' }));
+    act(() => huePubSub.publish<HueAlert>(GLOBAL_ERROR_TOPIC, { message: 'Error 1' }));
 
     const alerts = screen.queryAllByRole('alert');
     expect(alerts).toHaveLength(2);
@@ -74,9 +80,9 @@ describe('AlertComponent', () => {
     const user = userEvent.setup();
     render(<AlertComponent />);
     expect(screen.queryAllByRole('alert')).toHaveLength(0);
-    act(() => huePubSub.publish('hue.global.error', { message: 'Error 1' }));
-    act(() => huePubSub.publish('hue.global.error', { message: 'Error 2' }));
-    act(() => huePubSub.publish('hue.global.error', { message: 'Error 3' }));
+    act(() => huePubSub.publish<HueAlert>(GLOBAL_ERROR_TOPIC, { message: 'Error 1' }));
+    act(() => huePubSub.publish<HueAlert>(GLOBAL_ERROR_TOPIC, { message: 'Error 2' }));
+    act(() => huePubSub.publish<HueAlert>(GLOBAL_ERROR_TOPIC, { message: 'Error 3' }));
 
     // Closing "Error 2"
     const initialAlerts = screen.queryAllByRole('alert');
@@ -108,7 +114,7 @@ describe('AlertComponent', () => {
     jest.useFakeTimers();
     render(<AlertComponent />);
     expect(screen.queryAllByRole('alert')).toHaveLength(0);
-    act(() => huePubSub.publish('hue.global.info', { message: 'info' }));
+    act(() => huePubSub.publish<HueAlert>(GLOBAL_INFO_TOPIC, { message: 'info' }));
     expect(screen.queryAllByRole('alert')).toHaveLength(1);
 
     expectAlertToBeGoneAfterThreeSeconds();
@@ -120,7 +126,9 @@ describe('AlertComponent', () => {
     jest.useFakeTimers();
     render(<AlertComponent />);
     expect(screen.queryAllByRole('alert')).toHaveLength(0);
-    act(() => huePubSub.publish('hue.global.warning', { message: 'Some warning', noStick: true }));
+    act(() =>
+      huePubSub.publish<HueAlert>(GLOBAL_WARNING_TOPIC, { message: 'Some warning', noStick: true })
+    );
     expect(screen.queryAllByRole('alert')).toHaveLength(1);
 
     expectAlertToBeGoneAfterThreeSeconds();
@@ -132,11 +140,26 @@ describe('AlertComponent', () => {
     jest.useFakeTimers();
     render(<AlertComponent />);
     expect(screen.queryAllByRole('alert')).toHaveLength(0);
-    act(() => huePubSub.publish('hue.global.error', { message: 'Some error', noStick: true }));
+    act(() =>
+      huePubSub.publish<HueAlert>(GLOBAL_ERROR_TOPIC, { message: 'Some error', noStick: true })
+    );
     expect(screen.queryAllByRole('alert')).toHaveLength(1);
 
     expectAlertToBeGoneAfterThreeSeconds();
 
     jest.useRealTimers();
+  });
+
+  it('should close all alerts "hide.global.alerts" is published', async () => {
+    render(<AlertComponent />);
+    expect(screen.queryAllByRole('alert')).toHaveLength(0);
+    act(() => huePubSub.publish<HueAlert>(GLOBAL_INFO_TOPIC, { message: 'Some info' }));
+    act(() => huePubSub.publish<HueAlert>(GLOBAL_WARNING_TOPIC, { message: 'Some warning' }));
+    act(() => huePubSub.publish<HueAlert>(GLOBAL_ERROR_TOPIC, { message: 'Some error' }));
+    expect(screen.queryAllByRole('alert')).toHaveLength(3);
+
+    act(() => huePubSub.publish(HIDE_GLOBAL_ALERTS_TOPIC));
+
+    expect(screen.queryAllByRole('alert')).toHaveLength(0);
   });
 });
