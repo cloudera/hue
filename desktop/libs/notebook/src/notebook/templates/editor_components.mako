@@ -104,7 +104,6 @@ else:
 <![endif]-->
 
 <%namespace name="dashboard" file="/common_dashboard.mako" />
-<%namespace name="sqlSyntaxDropdown" file="/sql_syntax_dropdown.mako" />
 
 </%def>
 
@@ -130,8 +129,6 @@ else:
   }
 % endif
 </style>
-
-${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 
 <div class="navbar hue-title-bar" data-bind="visible: ! $root.isPresentationMode() && ! $root.isResultFullScreenMode()">
   <div class="navbar-inner">
