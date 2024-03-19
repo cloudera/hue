@@ -23,6 +23,7 @@ import 'ext/jquery.hotkeys';
 import 'jquery/plugins/jquery.hdfstree';
 
 import NotebookViewModel from './NotebookViewModel';
+import '../editor/components/ko.syntaxDropdown';
 import {
   ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT,
   IGNORE_NEXT_UNLOAD_EVENT
