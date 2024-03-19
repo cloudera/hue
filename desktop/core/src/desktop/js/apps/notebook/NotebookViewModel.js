@@ -35,6 +35,7 @@ import changeURL from 'utils/url/changeURL';
 import changeURLParameter from 'utils/url/changeURLParameter';
 import getParameter from 'utils/url/getParameter';
 import UUID from 'utils/string/UUID';
+import { GLOBAL_ERROR_TOPIC, GLOBAL_INFO_TOPIC } from 'reactComponents/AlertComponent/events';
 
 export default class NotebookViewModel {
   constructor(options, CoordinatorEditorViewModel, RunningCoordinatorModel) {
@@ -359,7 +360,7 @@ export default class NotebookViewModel {
           const options = {
             successCallback: function (result) {
               if (result && result.exists) {
-                huePubSub.publish('hue.global.info', {
+                huePubSub.publish(GLOBAL_INFO_TOPIC, {
                   message: result.path + ' saved successfully.'
                 });
               } else {
@@ -617,7 +618,7 @@ export default class NotebookViewModel {
             }
             deferredOpen.resolve();
           } else {
-            huePubSub.publish('hue.global.error', { message: data.message });
+            huePubSub.publish(GLOBAL_ERROR_TOPIC, { message: data.message });
             deferredOpen.reject();
             self.newNotebook();
           }

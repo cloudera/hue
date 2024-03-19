@@ -26,6 +26,7 @@ import {
   ASSIST_IS_DB_PANEL_READY_EVENT,
   ASSIST_SET_DATABASE_EVENT
 } from 'ko/components/assist/events';
+import { GLOBAL_ERROR_TOPIC, GLOBAL_INFO_TOPIC } from 'reactComponents/AlertComponent/events';
 import hueAnalytics from 'utils/hueAnalytics';
 import huePubSub from 'utils/huePubSub';
 import { getFromLocalStorage } from 'utils/storageUtils';
@@ -363,7 +364,7 @@ class Notebook {
         $.each(self.getSnippets(session.type()), (index, snippet) => {
           snippet.status('failed');
         });
-        huePubSub.publish('hue.global.error', { message: message });
+        huePubSub.publish(GLOBAL_ERROR_TOPIC, { message: message });
         if (failCallback) {
           failCallback();
         }
@@ -503,7 +504,7 @@ class Notebook {
             self.isSaved(true);
             const wasHistory = self.isHistory();
             self.isHistory(false);
-            huePubSub.publish('hue.global.info', { message: data.message });
+            huePubSub.publish(GLOBAL_INFO_TOPIC, { message: data.message });
             if (editorMode) {
               if (!data.save_as) {
                 const existingQuery = self
@@ -555,12 +556,12 @@ class Notebook {
               callback();
             }
           } else {
-            huePubSub.publish('hue.global.error', { message: data.message });
+            huePubSub.publish(GLOBAL_ERROR_TOPIC, { message: data.message });
           }
         }
       ).fail((xhr, textStatus, errorThrown) => {
         if (xhr.status !== 502) {
-          huePubSub.publish('hue.global.error', { message: xhr.responseText });
+          huePubSub.publish(GLOBAL_ERROR_TOPIC, { message: xhr.responseText });
         }
       });
     };
@@ -613,7 +614,7 @@ class Notebook {
         },
         data => {
           if (!silent && data && data.status != 0 && data.status != -2 && data.message) {
-            huePubSub.publish('hue.global.error', { message: data.message });
+            huePubSub.publish(GLOBAL_ERROR_TOPIC, { message: data.message });
           }
 
           if (callback) {
@@ -622,7 +623,7 @@ class Notebook {
         }
       ).fail(xhr => {
         if (!silent && xhr.status !== 502) {
-          huePubSub.publish('hue.global.error', { message: xhr.responseText });
+          huePubSub.publish(GLOBAL_ERROR_TOPIC, { message: xhr.responseText });
         }
       });
     };
@@ -757,7 +758,7 @@ class Notebook {
         }
       ).fail(xhr => {
         if (xhr.status !== 502) {
-          huePubSub.publish('hue.global.error', { message: xhr.responseText });
+          huePubSub.publish(GLOBAL_ERROR_TOPIC, { message: xhr.responseText });
         }
       });
       $(document).trigger('hideHistoryModal');
@@ -829,7 +830,7 @@ class Notebook {
             }
           ).fail(xhr => {
             if (xhr.status !== 502) {
-              huePubSub.publish('hue.global.error', { message: xhr.responseText });
+              huePubSub.publish(GLOBAL_ERROR_TOPIC, { message: xhr.responseText });
             }
           });
         };
@@ -865,7 +866,7 @@ class Notebook {
         }
       ).fail((xhr, textStatus, errorThrown) => {
         if (xhr.status !== 502) {
-          huePubSub.publish('hue.global.error', { message: xhr.responseText });
+          huePubSub.publish(GLOBAL_ERROR_TOPIC, { message: xhr.responseText });
         }
       });
     };

@@ -100,7 +100,9 @@ ${ layout.menubar(section='permissions') }
         }
         else if (data && data.url) {
           huePubSub.publish('open.link', data.url);
-          $.jHueNotify.info("${ _('Permission information updated correctly') }");
+          huePubSub.publish('hue.global.info', {
+            message: "${ _('Permission information updated correctly') }"
+          });
         }
       }
     });

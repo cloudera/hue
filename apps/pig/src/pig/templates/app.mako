@@ -1147,7 +1147,9 @@ ${ commonshare() | n,unicode }
     });
 
     $(document).on("stopError", function () {
-      $.jHueNotify.error(LABELS.KILL_ERROR);
+      huePubSub.publish('hue.global.error', {
+        message: LABELS.KILL_ERROR
+      });
       hueAnalytics.log('pig', 'stop');
     });
 

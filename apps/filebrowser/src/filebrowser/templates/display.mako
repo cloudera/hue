@@ -438,7 +438,9 @@ ${ fb_components.menubar() }
       }
       if (self.upperPage() - self.page() > self.MAX_ALLOWED_PAGES_PER_REQUEST) {
         self.upperPage(self.page() + self.MAX_ALLOWED_PAGES_PER_REQUEST);
-        $.jHueNotify.info("${_('Sorry, you cannot request for more than %s pages.' % MAX_ALLOWED_PAGES_PER_REQUEST)}");
+        huePubSub.publish('hue.global.info', {
+          message: "${_('Sorry, you cannot request for more than %s pages.' % MAX_ALLOWED_PAGES_PER_REQUEST)}"
+        });
       }
       self.changePage();
     };
@@ -503,7 +505,9 @@ ${ fb_components.menubar() }
 
     % if not is_embeddable:
     $(document).ajaxError(function () {
-      $.jHueNotify.error("${_('There was an unexpected server error.')}");
+      huePubSub.publish('hue.global.error', {
+        message: "${_('There was an unexpected server error.')}"
+      });
     });
     % endif
 
