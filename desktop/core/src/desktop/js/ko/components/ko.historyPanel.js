@@ -169,7 +169,7 @@ class HistoryPanel {
       self.historyPanelVisible(false);
     });
 
-    self.editorViewModel = new NotebookViewModel(null, '', {
+    self.editorViewModel = new NotebookViewModel({
       user: window.LOGGED_USERNAME,
       userId: window.LOGGED_USER_ID,
       languages: [

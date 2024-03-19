@@ -3030,7 +3030,8 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
             self.jobId(resp.handle.id);
             $('#importerNotebook').html($('#importerNotebook-progress').html());
 
-            self.editorVM = new window.NotebookViewModel(resp.history_uuid, '', {
+            self.editorVM = new window.NotebookViewModel({
+              editorId: resp.history_uuid,
               user: '${ user.username }',
               userId: ${ user.id },
               languages: [{name: "Java", type: "java"}, {name: "Hive SQL", type: "hive"}], // TODO reuse
