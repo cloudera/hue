@@ -1738,7 +1738,9 @@ $(document).ready(function () {
 
   $("#download-excel").click(function () {
     if (viewModel.design.results.columns().length > 255) {
-      $.jHueNotify.warn("${ _('Results exceeds maximum number of columns permitted by Excel, will truncate results to 255 columns.') }")
+      huePubSub.publish('hue.global.warning', {
+        message: "${ _('Results exceeds maximum number of columns permitted by Excel, will truncate results to 255 columns.') }"
+      });
     }
   });
 
@@ -2248,7 +2250,9 @@ function trySaveAsDesign() {
     $('#saveAs').find('.control-group').removeClass('error');
     hueAnalytics.log('beeswax', 'design/save-as');
   } else if (viewModel.design.name()) {
-    $.jHueNotify.error("${_('No query provided to save.')}");
+    huePubSub.publish('hue.global.error', {
+      message: "${_('No query provided to save.')}"
+    });
     $('#saveAs').modal('hide');
   } else {
     $('#saveas-query-name').addClass('error');
@@ -2355,7 +2359,9 @@ function formatQuery() {
       }
       viewModel.design.query.value(codeMirror.getValue());
     } else {
-      $.jHueNotify.error(data);
+      huePubSub.publish('hue.global.error', {
+        message: data
+      });
     }
   });
 }

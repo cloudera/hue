@@ -85,7 +85,9 @@ $(document).ready(function(){
       }
       else if (data && data.url) {
         huePubSub.publish('open.link', data.url);
-        $.jHueNotify.info("${ _('User information updated correctly') }");
+        huePubSub.publish('hue.global.info', {
+          message: "${ _('User information updated correctly') }"
+        });
       }
     }
   });

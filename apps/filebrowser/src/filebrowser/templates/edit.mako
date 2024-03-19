@@ -121,7 +121,9 @@ ${ fb_components.menubar() }
         success: function (data) {
           if (data && data.exists) {
             resetPrimaryButtonsStatus();
-            $.jHueNotify.info(data.path + " ${ _('saved correctly') }")
+            huePubSub.publish('hue.global.info', {
+              message: data.path + " ${ _('saved correctly') }"
+            });
           }
         }
       });
@@ -147,7 +149,9 @@ ${ fb_components.menubar() }
           if (data && data.exists) {
             resetPrimaryButtonsStatus();
             $("#saveAsModal").modal("hide");
-            $.jHueNotify.info(data.path + " ${ _('saved correctly') }")
+            huePubSub.publish('hue.global.info', {
+              message: data.path + " ${ _('saved correctly') }"
+            });
           }
         }
       });

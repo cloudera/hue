@@ -19,9 +19,11 @@ import * as ko from 'knockout';
 import komapping from 'knockout.mapping';
 
 import apiHelper from 'api/apiHelper';
+import { GLOBAL_ERROR_TOPIC, GLOBAL_INFO_TOPIC } from 'reactComponents/AlertComponent/events';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import Job from './Job';
+
 export default class Jobs {
   constructor(vm) {
     this.vm = vm;
@@ -216,7 +218,7 @@ export default class Jobs {
             this.selectedJobs([]);
           }
         } else {
-          huePubSub.publish('hue.global.error', { message: data.message });
+          huePubSub.publish(GLOBAL_ERROR_TOPIC, { message: data.message });
         }
       }
     ).always(() => {});
@@ -247,7 +249,7 @@ export default class Jobs {
             callback(data);
           }
         } else {
-          huePubSub.publish('hue.global.error', { message: data.message });
+          huePubSub.publish(GLOBAL_ERROR_TOPIC, { message: data.message });
         }
       }
     );
@@ -426,7 +428,7 @@ export default class Jobs {
         this.selectedJobs().map(job => job.id()),
         action,
         data => {
-          huePubSub.publish('hue.global.info', data);
+          huePubSub.publish(GLOBAL_INFO_TOPIC, data);
           this.updateJobs();
         }
       );

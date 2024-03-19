@@ -909,7 +909,9 @@ ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode
             viewModel.fetchIndex(foundIndex);
           }
           else {
-            $.jHueNotify.error('${ _('The specified index has not been found') }')
+            huePubSub.publish('hue.global.error', {
+              message: "${ _('The specified index has not been found') }"
+            });
             viewModel.showIndexes();
           }
         }

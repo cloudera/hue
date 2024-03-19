@@ -569,11 +569,3 @@ ${ hueIcons.symbols() }
   }
   </script>
 % endif
-
-<div id="jHueNotify" class="alert alert-dismissible alert-warning hide">
-  <button type="button" class="close" data-dismiss="alert">
-    <span aria-hidden="true">&times;</span>
-    <span class="sr-only">${ _('Close') }</span>
-  </button>
-  <p class="message"></p>
-</div>

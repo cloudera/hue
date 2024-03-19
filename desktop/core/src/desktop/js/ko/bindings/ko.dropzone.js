@@ -17,8 +17,9 @@
 import Dropzone from 'dropzone';
 import $ from 'jquery';
 import * as ko from 'knockout';
-import huePubSub from 'utils/huePubSub';
 
+import { GLOBAL_ERROR_TOPIC, GLOBAL_INFO_TOPIC } from 'reactComponents/AlertComponent/events';
+import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 
 // TODO: Depends on Dropzone
@@ -71,19 +72,21 @@ ko.bindingHandlers.dropzone = {
         $('#progressStatusBar div').width(progress.toFixed() + '%');
       },
       canceled: function () {
-        $.jHueNotify.info(I18n('The upload has been canceled'));
+        huePubSub.publish(GLOBAL_INFO_TOPIC, {
+          message: I18n('The upload has been canceled')
+        });
       },
       complete: function (file) {
         if (file.xhr.response !== '') {
           const response = JSON.parse(file.xhr.response);
           if (response && response.status != null) {
             if (response.status !== 0) {
-              huePubSub.publish('hue.global.error', { message: response.data });
+              huePubSub.publish(GLOBAL_ERROR_TOPIC, { message: response.data });
               if (value.onError) {
                 value.onError(file.name);
               }
             } else {
-              huePubSub.publish('hue.global.info', {
+              huePubSub.publish(GLOBAL_INFO_TOPIC, {
                 message: response.path + ' ' + I18n('uploaded successfully')
               });
               if (value.onComplete) {
