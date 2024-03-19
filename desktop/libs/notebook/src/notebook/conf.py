@@ -53,15 +53,24 @@ def _remove_duplications(a_list):
 
 
 def check_has_missing_permission(user, interpreter, user_apps=None):
-  # TODO: port to cluster config
-  if user_apps is None:
-    user_apps = appmanager.get_apps_dict(user)  # Expensive method
-  return (interpreter == 'hive' and 'hive' not in user_apps) or \
-         (interpreter == 'impala' and 'impala' not in user_apps) or \
-         (interpreter == 'pig' and 'pig' not in user_apps) or \
-         (interpreter == 'solr' and 'search' not in user_apps) or \
-         (interpreter in ('spark', 'pyspark', 'r', 'jar', 'py', 'sparksql') and 'spark' not in user_apps) or \
-         (interpreter in ('java', 'spark2', 'mapreduce', 'shell', 'sqoop1', 'distcp') and 'oozie' not in user_apps)
+  permissions = INTERPRETERS.get()[interpreter].PERMISSIONS.get()
+  if user.username in permissions['users']:
+    LOG.info(f'User {user.username} explicitly allowed to use {interpreter} by config')
+    return False    
+  
+  matching_groups_qs = user.groups.filter(name__in=permissions['groups'])
+  LOG.info(f'User {user.username} groups {user.groups.all()} matching {permissions["groups"]} {matching_groups_qs.exists()}')
+  
+  return not matching_groups_qs.exists()
+
+  # if user_apps is None:
+  #   user_apps = appmanager.get_apps_dict(user)  # Expensive method
+  # return (interpreter == 'hive' and 'hive' not in user_apps) or \
+  #        (interpreter == 'impala' and 'impala' not in user_apps) or \
+  #        (interpreter == 'pig' and 'pig' not in user_apps) or \
+  #        (interpreter == 'solr' and 'search' not in user_apps) or \
+  #        (interpreter in ('spark', 'pyspark', 'r', 'jar', 'py', 'sparksql') and 'spark' not in user_apps) or \
+  #        (interpreter in ('java', 'spark2', 'mapreduce', 'shell', 'sqoop1', 'distcp') and 'oozie' not in user_apps)
 
 
 def _connector_to_interpreter(connector):
@@ -191,6 +200,13 @@ INTERPRETERS = UnspecifiedConfigSection(
       OPTIONS=Config(
         key='options',
         help=_t('Specific options for connecting to the server.'),
+        type=coerce_json_dict,
+        default='{}'
+      ),
+
+      PERMISSIONS=Config(
+        key='permissions',
+        help=_t('User groups that have permissions for the interpreter.'),
         type=coerce_json_dict,
         default='{}'
       )
