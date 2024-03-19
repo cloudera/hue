@@ -16,6 +16,7 @@
 
 import $ from 'jquery';
 import huePubSub from '../../utils/huePubSub';
+import { GLOBAL_ERROR_TOPIC, GLOBAL_INFO_TOPIC } from 'reactComponents/AlertComponent/events';
 
 $(document).off('shown', '.jb-logs-link');
 $(document).on('shown', '.jb-logs-link', e => {
@@ -56,14 +57,14 @@ $(document).on('showSubmitPopup', (event, data) => {
       success: function (data) {
         $('#syncWorkflowModal').modal('hide');
         if (data && data.status === 0) {
-          huePubSub.publish('hue.global.info', data);
+          huePubSub.publish(GLOBAL_INFO_TOPIC, data);
         } else {
-          huePubSub.publish('hue.global.error', data);
+          huePubSub.publish(GLOBAL_ERROR_TOPIC, data);
         }
       },
       error: function (data) {
         $('#syncWorkflowModal').modal('hide');
-        huePubSub.publish('hue.global.error', data);
+        huePubSub.publish(GLOBAL_ERROR_TOPIC, data);
       }
     });
   });

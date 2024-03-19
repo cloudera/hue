@@ -124,12 +124,6 @@
   </script>
 % endif
 
-<div id="jHueNotify" class="alert hide">
-  <button class="close">&times;</button>
-  <div class="message"></div> 
-</div>
-
-
 ${ hueIcons.symbols() }
 
 <!-- fake fields are a workaround for chrome autofill getting the wrong fields, readonly needed for 1password -->

@@ -18,6 +18,7 @@ import $ from 'jquery';
 import * as ko from 'knockout';
 import qq from 'ext/fileuploader.custom';
 
+import { GLOBAL_ERROR_TOPIC, GLOBAL_INFO_TOPIC } from 'reactComponents/AlertComponent/events';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import { hueLocalStorage } from 'utils/storageUtils';
@@ -757,7 +758,7 @@ Plugin.prototype.navigateTo = function (path) {
                 }
               },
               error: function (xhr) {
-                huePubSub.publish('hue.global.error', { message: xhr.responseText });
+                huePubSub.publish(GLOBAL_ERROR_TOPIC, { message: xhr.responseText });
               }
             });
           }
@@ -787,7 +788,7 @@ Plugin.prototype.navigateTo = function (path) {
     }
   }).fail(e => {
     if (!_parent.options.suppressErrors) {
-      huePubSub.publish('hue.global.info', { message: _parent.options.labels.FILE_NOT_FOUND });
+      huePubSub.publish(GLOBAL_INFO_TOPIC, { message: _parent.options.labels.FILE_NOT_FOUND });
       _parent.options.onError();
     }
     if (e.status === 404 || e.status === 500) {
@@ -797,7 +798,7 @@ Plugin.prototype.navigateTo = function (path) {
       );
     } else {
       console.error(e);
-      huePubSub.publish('hue.global.error', { message: e.statusText });
+      huePubSub.publish(GLOBAL_ERROR_TOPIC, { message: e.statusText });
     }
   });
 };
@@ -815,7 +816,7 @@ function initUploader(path, _parent, el, labels) {
     onComplete: function (id, fileName, responseJSON) {
       num_of_pending_uploads--;
       if (responseJSON.status == -1) {
-        huePubSub.publish('hue.global.error', { message: responseJSON.data });
+        huePubSub.publish(GLOBAL_ERROR_TOPIC, { message: responseJSON.data });
       } else if (!num_of_pending_uploads) {
         _parent.navigateTo(path);
         huePubSub.publish('assist.' + getFs(getScheme(path)) + '.refresh');

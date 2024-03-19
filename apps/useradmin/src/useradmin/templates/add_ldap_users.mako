@@ -81,11 +81,15 @@ ${ layout.menubar(section='users') }
         }
         else if (data && data.status === 0) {
           huePubSub.publish('open.link', '${ url('useradmin:useradmin.views.list_users') }');
-          $.jHueNotify.info("${ _('User added/synced correctly') }");
+          huePubSub.publish('hue.global.info', {
+            message: "${ _('User added/synced correctly') }"
+          });
         }
       },
       error: function (data) {
-        $.jHueNotify.error(data.responseJSON['message']);
+        huePubSub.publish('hue.global.error', {
+          message: data.responseJSON['message']
+        });
       }
     });
     %endif

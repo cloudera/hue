@@ -22,6 +22,7 @@ import 'ext/bootstrap-datepicker.min';
 import 'ext/jquery.hotkeys';
 import 'jquery/plugins/jquery.hdfstree';
 
+import { HIDE_GLOBAL_ALERTS_TOPIC } from 'reactComponents/AlertComponent/events';
 import { registerHueWorkers } from 'sql/workers/hueWorkerHandler';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
@@ -568,7 +569,7 @@ huePubSub.subscribe('app.dom.loaded', app => {
       value => {
         viewModel.isEditing(!viewModel.isEditing());
         if (value) {
-          $('.jHueNotify').remove();
+          huePubSub.publish(HIDE_GLOBAL_ALERTS_TOPIC);
           isAssistAvailable = viewModel.assistAvailable();
           wasLeftPanelVisible = viewModel.isLeftPanelVisible();
           wasRightPanelVisible = viewModel.isRightPanelVisible();

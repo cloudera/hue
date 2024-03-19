@@ -29,16 +29,6 @@ else:
 
 <script type="text/javascript">
   $(document).ready(function () {
-    $(document).on("info", function (e, msg) {
-      $.jHueNotify.info(msg);
-    });
-    $(document).on("warn", function (e, msg) {
-      $.jHueNotify.warn(msg);
-    });
-    $(document).on("error", function (e, msg) {
-      $.jHueNotify.error(msg);
-    });
-
     %if messages:
       %for message in messages:
         %if message.tags == 'error':

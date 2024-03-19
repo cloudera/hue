@@ -1533,14 +1533,18 @@ else:
               self.retrieveData(true);
             },
             error: function(xhr){
-              $.jHueNotify.error(xhr.responseText);
+              huePubSub.publish('hue.global.error', {
+                message: xhr.responseText
+              });
               resetPrimaryButtonsStatus();
               $('#moveDestination').val('');
             }
           });
 
           if (mode === 'nomodal') {
-            $.jHueNotify.info('${ _('Items moving to') } "' + $('#moveDestination').val() + '"');
+            huePubSub.publish('hue.global.info', {
+              message: "${ _('Items moving to') } \"" + $('#moveDestination').val() + '"'
+            });
             $("#moveForm").submit();
           } else {
             $("#moveModal").modal({
@@ -1573,7 +1577,9 @@ else:
           }
         }
         else {
-          $.jHueNotify.warn("${ _('You cannot copy a folder into itself.') }");
+          huePubSub.publish('hue.global.warning', {
+            message: "${ _('You cannot copy a folder into itself.') }"
+          });
           $('#moveDestination').val('');
         }
       };
@@ -1602,7 +1608,9 @@ else:
             self.retrieveData(true);
           },
           error: function(xhr){
-            $.jHueNotify.error(xhr.responseText);
+            huePubSub.publish('hue.global.error', {
+              message: xhr.responseText
+            });
             resetPrimaryButtonsStatus();
           }
         });
@@ -1791,7 +1799,9 @@ else:
         const path = $('<input>').val(self.selectedFile().path).appendTo('body').select()
         document.execCommand('copy');
         path.remove();
-        $.jHueNotify.info('${_('Path copied successfully to the clipboard')}');
+        huePubSub.publish('hue.global.info', {
+          message: "${_('Path copied successfully to the clipboard')}"
+        });
       }
 
       self.openInImporter = function () {
@@ -1810,7 +1820,9 @@ else:
             $('#submit-wf-modal').modal('show');
           });
         % else:
-          $.jHueNotify.warn("${ _('Submitting is not available as the Oozie app is disabled') }");
+          huePubSub.publish('hue.global.warning', {
+            message: "${ _('Submitting is not available as the Oozie app is disabled') }"
+          });
         % endif
       };
 
@@ -1863,7 +1875,9 @@ else:
           "start_time": ko.mapping.toJSON((new Date()).getTime())
         }, function (data) {
           if (data.status == 0) {
-            $.jHueNotify.info("${ _('Task ') }" + data.history_uuid + "${_(' submitted.') }");
+            huePubSub.publish('hue.global.info', {
+              message: "${ _('Task ') }" + data.history_uuid + "${_(' submitted.') }"
+            });
             huePubSub.publish('notebook.task.submitted', data);
           } else {
             huePubSub.publish('hue.global.error', {message: data.message});
@@ -1899,7 +1913,9 @@ else:
           "start_time": ko.mapping.toJSON((new Date()).getTime())
         }, function (data) {
           if (data.status == 0) {
-            $.jHueNotify.info("${ _('Task ') }" + data.history_uuid + "${_(' submitted.') }");
+            huePubSub.publish('hue.global.info', {
+              message: "${ _('Task ') }" + data.history_uuid + "${_(' submitted.') }"
+            });
             huePubSub.publish('notebook.task.submitted', data);
           } else {
             huePubSub.publish('hue.global.error', {message: data.message});
@@ -2366,7 +2382,9 @@ else:
               $('#progressStatusBar div').width(progress.toFixed() + "%");
             },
             canceled: function () {
-              $.jHueNotify.info(I18n('The upload has been canceled'));
+              huePubSub.publish('hue.global.info', {
+                message: I18n('The upload has been canceled')
+              });
             },
             complete: function (data) {
               if (data.xhr.response != '') {
@@ -2509,7 +2527,9 @@ else:
           }
         });
         if(isMoveOnSelf){
-          $.jHueNotify.warn("${ _('You cannot copy a folder into itself.') }");
+          huePubSub.publish('hue.global.warning', {
+            message: "${ _('You cannot copy a folder into itself.') }"
+          });
           $('#moveDestination').val('');
           return false;
         }
@@ -2573,7 +2593,9 @@ else:
 
       huePubSub.subscribe('submit.popup.return', function (data) {
         if (data.type == 'external_workflow') {
-          $.jHueNotify.info('${_('Workflow submitted.')}');
+          huePubSub.publish('hue.global.info', {
+            message: "${_('Workflow submitted.')}"
+          });
           huePubSub.publish('open.link', '/jobbrowser/#!id=' + data.job_id);
           huePubSub.publish('browser.job.open.link', data.job_id);
           $('.submit-modal').modal('hide');
@@ -2668,7 +2690,9 @@ else:
         onEnter: function (el) {
           var target_path = stripHashes(el.val());
           if (el.val().split('/')[2] === '' && window.RAZ_IS_ENABLED){
-            $.jHueNotify.warn("${ _('Listing of buckets is not allowed. Redirecting to the home directory.') }");
+            huePubSub.publish('hue.global.warning', {
+              message: "${ _('Listing of buckets is not allowed. Redirecting to the home directory.') }"
+            });
             target_path = window.USER_HOME_DIR;
           } 
           fileBrowserViewModel.targetPath("${url('filebrowser:filebrowser.views.view', path='')}" + encodeURIComponent(target_path)); 

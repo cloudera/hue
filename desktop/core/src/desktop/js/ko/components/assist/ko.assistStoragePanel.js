@@ -57,7 +57,9 @@ const TEMPLATE = `
             url: '/filebrowser/upload/file?dest=' + (source.type === 'adls' ? 'adl:' : '') + path,
             params: { dest: path },
             paramName: 'hdfs_file',
-            onError: function(x, e){ $(document).trigger('error', e); },
+            onError: function(x, e){
+              huePubSub.publish('hue.global.error', { message: e });
+            },
             onComplete: function () { huePubSub.publish('assist.storage.refresh'); } }" title="${I18n(
               'Upload file'
             )}" href="javascript:void(0)">
@@ -72,7 +74,7 @@ const TEMPLATE = `
             url: '/filebrowser/upload/file?dest=' + abfsPath,
             params: { dest: abfsPath },
             paramName: 'hdfs_file',
-            onError: function(x, e){ $(document).trigger('error', e); },
+            onError: function(x, e){ huePubSub.publish('hue.global.error', { message: e }); },
             onComplete: function () { huePubSub.publish('assist.storage.refresh'); } }" title="${I18n(
               'Upload file'
             )}" href="javascript:void(0)">

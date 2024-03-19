@@ -56,7 +56,9 @@ else:
     // Catches HTTP 502 errors
     function xhrOnreadystatechange() {
       if (this.readyState === 4 && this.status === 502) {
-        $.jHueNotify.error($('<span>').html(this.responseText).text());
+        huePubSub.publish('hue.global.error', {
+          message: $('<span>').html(this.responseText).text()
+        });
       }
       if (this._onreadystatechange) {
         return this._onreadystatechange.apply(this, arguments);
@@ -347,19 +349,6 @@ else:
           '</button>';
     }
 
-    $(document).on("info", function (e, msg) {
-      $.jHueNotify.info(msg);
-    });
-    $(document).on("warn", function (e, msg) {
-      $.jHueNotify.warn(msg);
-    });
-    window.huePubSub.subscribe('hue.error', function (msg) {
-      $.jHueNotify.error(msg);
-    });
-    $(document).on("error", function (e, msg) {
-      $.jHueNotify.error(msg);
-    });
-
     $($('#zoomDetectFrame')[0].contentWindow).resize(function () {
       $(window).trigger('zoom');
     });
@@ -405,7 +394,7 @@ else:
             });
           }
           window.setTimeout(function () {
-            $('.jHueNotify').remove();
+            huePubSub.publish('hide.global.alerts');
           }, 200);
         }
       }
@@ -423,7 +412,9 @@ else:
         }
         else {
           $('#login-modal').modal('hide');
-          $.jHueNotify.info('${ _('You have signed in successfully!') }');
+          huePubSub.publish('hue.global.info', {
+            message: "${ _('You have signed in successfully!') }"
+          });
           $('#login-modal .login-error').addClass('hide');
         }
       }

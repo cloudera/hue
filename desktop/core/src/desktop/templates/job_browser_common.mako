@@ -1805,7 +1805,13 @@
           <button class="btn" type="button" data-clipboard-target="#query-impala-profile" style="float: right;"
                   data-bind="
                 visible: properties.profile && properties.profile().profile,
-                clipboard: { onSuccess: function() { $.jHueNotify.info('${ _("Profile copied to clipboard!") }'); } }">
+                clipboard: {
+                  onSuccess: function() {
+                    huePubSub.publish('hue.global.info', {
+                      message: "${ _("Profile copied to clipboard!") }"
+                    }
+                  }
+                }">
           <i class="fa fa-fw fa-clipboard"></i> ${ _('Clipboard') }
           </button>
           <button class="btn" type="button" style="float: right;" data-bind="
