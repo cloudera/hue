@@ -19,22 +19,32 @@ import { AlertProps } from 'antd/lib/alert';
 import Alert from 'cuix/dist/components/Alert/Alert';
 
 import './AlertComponent.scss';
-import { i18nReact } from '../../utils/i18nReact';
+import {
+  GLOBAL_ERROR_TOPIC,
+  GLOBAL_INFO_TOPIC,
+  GLOBAL_WARNING_TOPIC,
+  HIDE_GLOBAL_ALERTS_TOPIC
+} from './events';
+import { HueAlert } from './types';
 import { useHuePubSub } from '../useHuePubSub';
-
-interface HueAlert {
-  message: string;
-  noStick: boolean;
-}
+import { i18nReact } from 'utils/i18nReact';
 
 type alertType = AlertProps['type'];
 
 interface VisibleAlert {
   alert: HueAlert;
   type: alertType;
+  timeoutHandle?: number;
 }
+
+const clearCloseTimeout = (alert: VisibleAlert) => {
+  if (alert.timeoutHandle) {
+    clearTimeout(alert.timeoutHandle);
+  }
+};
+
 const AlertComponent: React.FC = () => {
-  const [alert, setAlerts] = useState<VisibleAlert[]>([]);
+  const [alerts, setAlerts] = useState<VisibleAlert[]>([]);
   const updateAlerts = (alert: HueAlert, type: alertType) => {
     if (!alert.message) {
       return;
@@ -49,7 +59,7 @@ const AlertComponent: React.FC = () => {
       const newAlert: VisibleAlert = { alert, type };
 
       if (type === 'info' || alert.noStick) {
-        setTimeout(() => {
+        newAlert.timeoutHandle = setTimeout(() => {
           handleClose(newAlert);
         }, 3000);
       }
@@ -59,28 +69,31 @@ const AlertComponent: React.FC = () => {
   };
 
   useHuePubSub<HueAlert>({
-    topic: 'hue.global.error',
-    callback: newAlert => {
-      updateAlerts(newAlert, 'error');
-    }
+    topic: GLOBAL_ERROR_TOPIC,
+    callback: newAlert => updateAlerts(newAlert, 'error')
   });
 
   useHuePubSub<HueAlert>({
-    topic: 'hue.global.info',
-    callback: newAlert => {
-      updateAlerts(newAlert, 'info');
-    }
+    topic: GLOBAL_INFO_TOPIC,
+    callback: newAlert => updateAlerts(newAlert, 'info')
   });
 
   useHuePubSub<HueAlert>({
-    topic: 'hue.global.warning',
-    callback: newAlert => {
-      updateAlerts(newAlert, 'warning');
+    topic: GLOBAL_WARNING_TOPIC,
+    callback: newAlert => updateAlerts(newAlert, 'warning')
+  });
+
+  useHuePubSub<void>({
+    topic: HIDE_GLOBAL_ALERTS_TOPIC,
+    callback: () => {
+      alerts.forEach(visibleAlert => clearCloseTimeout(visibleAlert));
+      setAlerts([]);
     }
   });
 
-  const handleClose = (alertObjToClose: VisibleAlert) => {
-    const filteredAlerts = alert.filter(alertObj => alertObj !== alertObjToClose);
+  const handleClose = (alertToClose: VisibleAlert) => {
+    const filteredAlerts = alerts.filter(alert => alert !== alertToClose);
+    clearCloseTimeout(alertToClose);
     setAlerts(filteredAlerts);
   };
 
@@ -98,15 +111,15 @@ const AlertComponent: React.FC = () => {
 
   return (
     <div className="hue-alert flash-messages cuix antd">
-      {alert.map(alertObj => (
+      {alerts.map(visibleAlert => (
         <Alert
-          key={alertObj.alert.message}
-          type={alertObj.type}
-          message={getHeader(alertObj)}
-          description={alertObj.alert.message}
+          key={visibleAlert.alert.message}
+          type={visibleAlert.type}
+          message={getHeader(visibleAlert)}
+          description={visibleAlert.alert.message}
           showIcon={true}
           closable={true}
-          onClose={() => handleClose(alertObj)}
+          onClose={() => handleClose(visibleAlert)}
         />
       ))}
     </div>
